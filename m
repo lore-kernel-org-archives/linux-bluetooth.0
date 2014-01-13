@@ -1,57 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+pfaxs8=0eO6w7e3DRmCGyA2wLJpANscCMpLgXOAo_7A@mail.gmail.com>
-References: <1389435216-29040-1-git-send-email-luiz.dentz@gmail.com>
-	<1389435216-29040-3-git-send-email-luiz.dentz@gmail.com>
-	<CAN_7+YbqjZ7=hRjED10mDJuGnhy8pD45iuf9SWFqGM_3N=hVDg@mail.gmail.com>
-	<CABBYNZ+pfaxs8=0eO6w7e3DRmCGyA2wLJpANscCMpLgXOAo_7A@mail.gmail.com>
-Date: Mon, 13 Jan 2014 10:38:22 +0100
-Message-ID: <CAN_7+YahMeLPSME3kaA_nquB5N1B1WYGAuYY7ACaKQT1edUVyg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 3/6] audio/A2DP: Add implemention of audio Open
- Stream command
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <1389365780-20136-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1389365780-20136-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 13 Jan 2014 11:08:49 +0200
+Message-ID: <CABBYNZJfet_rQChugsSyv4ygBknj8Ao64kA532=sJHCz9nxPBA@mail.gmail.com>
+Subject: Re: [PATCH] avrcp: Remove dead code
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrei,
 
-On Mon, Jan 13, 2014 at 8:55 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Lukasz,
+On Fri, Jan 10, 2014 at 4:56 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> On Mon, Jan 13, 2014 at 2:10 AM, Lukasz Rymanowski
-> <lukasz.rymanowski@gmail.com> wrote:
->> Hi Luiz,
->>
->> On Sat, Jan 11, 2014 at 11:13 AM, Luiz Augusto von Dentz
->> <luiz.dentz@gmail.com> wrote:
->>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>
->>> ---
->>>  android/a2dp.c | 199 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>>  1 file changed, 197 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/android/a2dp.c b/android/a2dp.c
->>> index 8649cf3..479cb71 100644
->>> --- a/android/a2dp.c
->>> +++ b/android/a2dp.c
->>> @@ -37,6 +37,7 @@
->>>  #include "lib/bluetooth.h"
->>>  #include "lib/sdp.h"
->>>  #include "lib/sdp_lib.h"
->>> +#include "profiles/audio/a2dp-codecs.h"
->>
->> We need to discuss how we gonna use structs from this file in
->> hal-audio (eg. a2dp_sbc_t). Maybe we should have some special file
->> with audio structs/defines for IPC only? Then you could copy data to
->> structs you need.
+> session->target cannot be NULL since it is already checked 11 lines
+> above:
+> ...
+>         if (session == NULL || session->target == NULL)
+>                 return -ENOTCONN;
+> ...
+> ---
+>  profiles/audio/avrcp.c | 24 ++++--------------------
+>  1 file changed, 4 insertions(+), 20 deletions(-)
 >
-> Not sure what you mean about this header, its LGPL already so I see no
-> problem of including it in hal-audio.
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 8d4309a..197959f 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -3722,30 +3722,14 @@ int avrcp_set_volume(struct btd_device *dev, uint8_t volume)
+>
+>         DBG("volume=%u", volume);
+>
+> -       if (session->target) {
+> -               pdu->pdu_id = AVRCP_SET_ABSOLUTE_VOLUME;
+> -               pdu->params[0] = volume;
+> -               pdu->params_len = htons(1);
+> +       pdu->pdu_id = AVRCP_SET_ABSOLUTE_VOLUME;
+> +       pdu->params[0] = volume;
+> +       pdu->params_len = htons(1);
+>
+> -               return avctp_send_vendordep_req(session->conn,
+> +       return avctp_send_vendordep_req(session->conn,
+>                                         AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+>                                         buf, sizeof(buf),
+>                                         avrcp_handle_set_volume, session);
+> -       } else if (session->registered_events &
+> -                                       (1 << AVRCP_EVENT_VOLUME_CHANGED)) {
+> -               uint8_t id = AVRCP_EVENT_VOLUME_CHANGED;
+> -               pdu->pdu_id = AVRCP_REGISTER_NOTIFICATION;
+> -               pdu->params[0] = AVRCP_EVENT_VOLUME_CHANGED;
+> -               pdu->params[1] = volume;
+> -               pdu->params_len = htons(2);
+> -
+> -               return avctp_send_vendordep(session->conn,
+> -                                       session->transaction_events[id],
+> -                                       AVC_CTYPE_CHANGED, AVC_SUBUNIT_PANEL,
+> -                                       buf, sizeof(buf));
+> -       }
 
-You are right, it is LGPL so no problem.
-
-\Lukasz
+The above code is necessary to notify volume changes when acting as
+controller (session->control is set), so your fix is not good either
+and we should depend on session->target on the first place because
+both session->control and session->target can be set.
