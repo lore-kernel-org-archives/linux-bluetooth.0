@@ -1,32 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] IPC negative tester
-Date: Mon, 13 Jan 2014 11:36:55 +0100
-Message-Id: <1389609422-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH] emulator/bthost: Fix sending L2CAP config req
+Date: Mon, 13 Jan 2014 11:36:33 +0100
+Message-Id: <1389609393-10860-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patchset adds IPC negative tester framework with few test cases
-checking IPC's behaviour on daemon side. Expected daemon's behaviour is to
-shut down gracefully in case of receiving invalid IPC data.
+Send L2CAP config request with correct dcid field. It worked
+well only if scid and dcid of L2CAP connection were the same.
+---
+ emulator/bthost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Jakub Tyszkowski (7):
-  android/ipc-tester: Skeleton for ipc negative tester
-  android/ipc-tester: Run daemon in separate process
-  android/ipc-tester: Add IPC initialization
-  android/ipc-tester: Add daemon shutdown handler
-  android/ipc-tester: Add sending test data with ipc
-  android/ipc-tester: Register services
-  android/ipc-tester: Add basic negative test cases for IPC's daemon
-    site
-
- .gitignore                    |   1 +
- android/Makefile.am           |  17 ++
- android/ipc-negative-tester.c | 675 ++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 693 insertions(+)
- create mode 100644 android/ipc-negative-tester.c
-
---
-1.8.5
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 96d375f..f3bd4c6 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -968,7 +968,7 @@ static bool l2cap_conn_req(struct bthost *bthost, struct btconn *conn,
+ 							le16_to_cpu(psm));
+ 
+ 		memset(&conf_req, 0, sizeof(conf_req));
+-		conf_req.dcid = rsp.dcid;
++		conf_req.dcid = rsp.scid;
+ 
+ 		l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_CONFIG_REQ, 0,
+ 						&conf_req, sizeof(conf_req));
+-- 
+1.8.3.1
 
