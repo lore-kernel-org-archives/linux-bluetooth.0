@@ -1,50 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/pics: Add PICS and PIXIT for AVRCP
+Date: Mon, 13 Jan 2014 11:05:56 +0100
+Message-ID: <2251545.1hFNh98Gd4@uw000953>
+In-Reply-To: <1389600696-32598-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1389600696-32598-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1389371461-11578-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1389371461-11578-1-git-send-email-sebastianx.chlad@intel.com>
-Date: Mon, 13 Jan 2014 12:15:24 +0200
-Message-ID: <CABBYNZKuocUb4StXWW_jR9vF-X6pQJTBsPPYMLyiEz-X8VMZ8g@mail.gmail.com>
-Subject: Re: [PATCH] tools/bluetooth-player: check path validity
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Sebastian Chlad <sebastianx.chlad@intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Jakub,
 
-On Fri, Jan 10, 2014 at 6:31 PM, Sebastian Chlad
-<sebastianx.chlad@intel.com> wrote:
-> Bluetooth-player change-folder cmd approves any argument however it
-> can be and then should a valid path only. Failing in providing
-> a valid path crashes bluetooth-player thus argument should be
-> checked if it's a valid path.
+On Monday 13 of January 2014 09:11:35 Jakub Tyszkowski wrote:
+> Add PICS/PIXIT for AVRCP targeting Android 4.4.
 > ---
->  tools/bluetooth-player.c | 5 +++++
->  1 file changed, 5 insertions(+)
->
-> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-> index 2afdd17..f10d9be 100644
-> --- a/tools/bluetooth-player.c
-> +++ b/tools/bluetooth-player.c
-> @@ -738,6 +738,11 @@ static void cmd_change_folder(int argc, char *argv[])
->                 return;
->         }
->
-> +       if (dbus_validate_path(argv[1], NULL) == FALSE) {
-> +               rl_printf("Not a valid path\n");
-> +               return;
-> +       }
-> +
->         if (check_default_player() == FALSE)
->                 return;
->
-> --
-> 1.8.3.2
+>  android/Makefile.am     |   1 +
+>  android/pics-avrcp.txt  | 626 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/pixit-avrcp.txt |  36 +++
+>  3 files changed, 663 insertions(+)
+>  create mode 100644 android/pics-avrcp.txt
+>  create mode 100644 android/pixit-avrcp.txt
 
-Pushed, thanks.
-
+Both patches applied, thanks.
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
