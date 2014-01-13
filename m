@@ -1,81 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/15] android/tester: Add get remote RSSI property success test case
-Date: Mon, 13 Jan 2014 18:12:33 +0100
-Message-Id: <1389633161-11357-7-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1389633161-11357-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1389633161-11357-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] l2test: Use correct buffer size
+Date: Mon, 13 Jan 2014 18:39:44 +0200
+Message-Id: <1389631184-32758-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds remote RSSI property success test case.
----
- android/android-tester.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 927d04c..d10f0a5 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -1404,6 +1404,29 @@ static const struct generic_data
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
- };
+---
+ tools/l2test.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/l2test.c b/tools/l2test.c
+index aaa1608..0993f74 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -782,7 +782,7 @@ static void dump_mode(int sk)
+ 		data_size = imtu;
  
-+static int32_t remote_getprop_rssi_val = -60;
-+
-+static struct priority_property remote_getprop_rssi_props[] = {
-+	{
-+	.prop.type = BT_PROPERTY_REMOTE_RSSI,
-+	.prop.val = &remote_getprop_rssi_val,
-+	.prop.len = sizeof(remote_getprop_rssi_val),
-+	},
-+};
-+
-+static const struct generic_data
-+				bluetooth_remote_getprop_rssi_success_test = {
-+	.expected_hal_cb.discovery_state_changed_cb =
-+					remote_discovery_state_changed_cb,
-+	.expected_hal_cb.device_found_cb = remote_get_property_device_found_cb,
-+	.expected_hal_cb.remote_device_properties_cb =
-+					remote_test_device_properties_cb,
-+	.expected_cb_count = 3,
-+	.expected_properties_num = 1,
-+	.expected_properties = remote_getprop_rssi_props,
-+	.expected_adapter_status = BT_STATUS_SUCCESS,
-+};
-+
- static bt_callbacks_t bt_callbacks = {
- 	.size = sizeof(bt_callbacks),
- 	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -1962,6 +1985,15 @@ static void test_remote_getprop_tod_success(const void *test_data)
- 	data->if_bluetooth->start_discovery();
- }
+ 	if (defer_setup) {
+-		len = read(sk, buf, sizeof(buf));
++		len = read(sk, buf, data_size);
+ 		if (len < 0)
+ 			syslog(LOG_ERR, "Initial read error: %s (%d)",
+ 						strerror(errno), errno);
+@@ -842,7 +842,7 @@ static void recv_mode(int sk)
+ 		data_size = imtu;
  
-+static void test_remote_getprop_rssi_success(const void *test_data)
-+{
-+	struct test_data *data = tester_get_data();
-+
-+	init_test_conditions(data);
-+
-+	data->if_bluetooth->start_discovery();
-+}
-+
- /* Test Socket HAL */
- 
- static void adapter_socket_state_changed_cb(bt_state_t state)
-@@ -2588,6 +2620,11 @@ int main(int argc, char *argv[])
- 				setup_enabled_adapter,
- 				test_remote_getprop_tod_success, teardown);
- 
-+	test_bredrle("Bluetooth RemDev Get REMOTE_RSSI - Success",
-+				&bluetooth_remote_getprop_rssi_success_test,
-+				setup_enabled_adapter,
-+				test_remote_getprop_rssi_success, teardown);
-+
- 	test_bredrle("Socket Init", NULL, setup_socket_interface,
- 						test_dummy, teardown);
- 
+ 	if (defer_setup) {
+-		len = read(sk, buf, sizeof(buf));
++		len = read(sk, buf, data_size);
+ 		if (len < 0)
+ 			syslog(LOG_ERR, "Initial read error: %s (%d)",
+ 						strerror(errno), errno);
 -- 
-1.8.5.2
+1.8.3.2
 
