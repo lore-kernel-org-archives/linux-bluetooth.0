@@ -1,215 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 1/6] audio/A2DP: Add implemention of audio Open command
-Date: Mon, 13 Jan 2014 09:52:00 +0200
-Message-Id: <1389599525-6353-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] tools: Add missing check of write() return value
+Date: Sun, 12 Jan 2014 21:23:59 -0400
+Message-Id: <1389576239-22061-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Fix clang error:
 
+tools/seq2bseq.c: In function ‘convert_line’:
+tools/seq2bseq.c:52:8: error: ignoring return value of ‘write’, declared
+with attribute warn_unused_result [-Werror=unused-result]
 ---
- android/a2dp.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 158 insertions(+), 1 deletion(-)
+ tools/seq2bseq.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index b59c53d..970e2dc 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -52,9 +52,23 @@
+diff --git a/tools/seq2bseq.c b/tools/seq2bseq.c
+index 6d70777..191e623 100644
+--- a/tools/seq2bseq.c
++++ b/tools/seq2bseq.c
+@@ -31,16 +31,17 @@
+ #include <string.h>
+ #include <stdlib.h>
+ #include <getopt.h>
++#include <errno.h>
+ #include <sys/stat.h>
  
- static GIOChannel *server = NULL;
- static GSList *devices = NULL;
-+static GSList *endpoints = NULL;
- static bdaddr_t adapter_addr;
- static uint32_t record_id = 0;
- 
-+struct a2dp_preset {
-+	void *data;
-+	int8_t len;
-+};
-+
-+struct a2dp_endpoint {
-+	uint8_t id;
-+	uint8_t codec;
-+	struct avdtp_local_sep *sep;
-+	struct a2dp_preset *caps;
-+	GSList *presets;
-+};
-+
- struct a2dp_device {
- 	bdaddr_t	dst;
- 	uint8_t		state;
-@@ -70,6 +84,29 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
- 	return bacmp(&dev->dst, dst);
- }
- 
-+static void preset_free(void *data)
-+{
-+	struct a2dp_preset *preset = data;
-+
-+	g_free(preset->data);
-+	g_free(preset);
-+}
-+
-+static void unregister_endpoint(void *data)
-+{
-+	struct a2dp_endpoint *endpoint = data;
-+
-+	if (endpoint->sep)
-+		avdtp_unregister_sep(endpoint->sep);
-+
-+	if (endpoint->caps)
-+		preset_free(endpoint->caps);
-+
-+	g_slist_free_full(endpoint->presets, preset_free);
-+
-+	g_free(endpoint);
-+}
-+
- static void a2dp_device_free(struct a2dp_device *dev)
+-static void convert_line(int fd, const char *line)
++static int convert_line(int fd, const char *line)
  {
- 	if (dev->session)
-@@ -354,10 +391,127 @@ static sdp_record_t *a2dp_record(void)
- 	return record;
- }
+ 	const char *ptr = line;
+ 	char str[3];
+ 	unsigned char val;
  
-+static gboolean sep_getcap_ind(struct avdtp *session,
-+					struct avdtp_local_sep *sep,
-+					GSList **caps, uint8_t *err,
-+					void *user_data)
-+{
-+	struct a2dp_endpoint *endpoint = user_data;
-+	struct a2dp_preset *cap = endpoint->presets->data;
-+	struct avdtp_service_capability *service;
-+	struct avdtp_media_codec_capability *codec;
-+
-+	*caps = NULL;
-+
-+	service = avdtp_service_cap_new(AVDTP_MEDIA_TRANSPORT, NULL, 0);
-+	*caps = g_slist_append(*caps, service);
-+
-+	codec = g_malloc0(sizeof(*codec) + sizeof(cap->len));
-+	codec->media_type = AVDTP_MEDIA_TYPE_AUDIO;
-+	codec->media_codec_type = endpoint->codec;
-+	memcpy(codec->data, cap->data, cap->len);
-+
-+	service = avdtp_service_cap_new(AVDTP_MEDIA_CODEC, codec,
-+						sizeof(*codec) + cap->len);
-+	*caps = g_slist_append(*caps, service);
-+	g_free(codec);
-+
-+	return TRUE;
-+}
-+
-+static struct avdtp_sep_ind sep_ind = {
-+	.get_capability		= sep_getcap_ind,
-+};
-+
-+static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
-+							GSList *presets)
-+{
-+	struct a2dp_endpoint *endpoint;
-+
-+	/* FIXME: Add proper check for uuid */
-+
-+	endpoint = g_new0(struct a2dp_endpoint, 1);
-+	endpoint->id = g_slist_length(endpoints) + 1;
-+	endpoint->codec = codec;
-+	endpoint->sep = avdtp_register_sep(AVDTP_SEP_TYPE_SOURCE,
-+						AVDTP_MEDIA_TYPE_AUDIO,
-+						codec, FALSE, &sep_ind, NULL,
-+						endpoint);
-+	endpoint->caps = g_slist_nth_data(presets->data, 0);
-+	endpoint->presets = g_slist_copy(g_slist_nth(presets, 1));
-+
-+	endpoints = g_slist_append(endpoints, endpoint);
-+
-+	return endpoint->id;
-+}
-+
-+static GSList *parse_presets(const struct audio_preset *p, uint8_t count,
-+								uint16_t len)
-+{
-+	GSList *l = NULL;
-+	uint8_t i;
-+
-+	for (i = 0; count > i; i++) {
-+		struct a2dp_preset *preset;
-+
-+		if (len < sizeof(struct audio_preset)) {
-+			DBG("Invalid preset index %u", i);
-+			g_slist_free_full(l, preset_free);
-+			return NULL;
+ 	if (line[0] == '*' || line[0] == '\r' || line[0] == '\r')
+-		return;
++		return 0;
+ 
+ 	while (1) {
+ 		str[0] = *ptr++;
+@@ -49,7 +50,11 @@ static void convert_line(int fd, const char *line)
+ 
+ 		val = strtol(str, NULL, 16);
+ 
+-		write(fd, &val, 1);
++		if (write(fd, &val, 1) < 0) {
++			int err = -errno;
++			perror("Failed to write to output file");
++			return err;
 +		}
-+
-+		len -= sizeof(struct audio_preset);
-+		if (len == 0 || len < p->len) {
-+			DBG("Invalid preset size of %u for index %u", len, i);
-+			g_slist_free_full(l, preset_free);
-+			return NULL;
-+		}
-+
-+		preset = g_new0(struct a2dp_preset, 1);
-+		preset->len = p->len;
-+		preset->data = g_memdup(p->data, preset->len);
-+		l = g_slist_append(l, preset);
-+
-+		len -= preset->len;
-+		p += sizeof(struct audio_preset) + preset->len;
-+	}
-+
-+	return l;
-+}
-+
- static void bt_audio_open(const void *buf, uint16_t len)
- {
--	DBG("Not Implemented");
-+	const struct audio_cmd_open *cmd = buf;
-+	struct audio_rsp_open rsp;
-+	GSList *presets;
  
-+	DBG("");
+ 		if (*ptr == '\r' || *ptr == '\n')
+ 			break;
+@@ -57,6 +62,8 @@ static void convert_line(int fd, const char *line)
+ 		while (*ptr == ' ')
+ 			ptr++;
+ 	}
 +
-+	if (cmd->presets == 0) {
-+		error("No audio presets found");
-+		goto failed;
-+	}
-+
-+	presets = parse_presets(cmd->preset, cmd->presets, len - sizeof(*cmd));
-+	if (!presets) {
-+		error("No audio presets found");
-+		goto failed;
-+	}
-+
-+	rsp.id = register_endpoint(cmd->uuid, cmd->codec, presets);
-+	if (rsp.id == 0) {
-+		g_slist_free_full(presets, preset_free);
-+		error("Unable to register endpoint");
-+		goto failed;
-+	}
-+
-+	g_slist_free(presets);
-+
-+	audio_ipc_send_rsp_full(AUDIO_OP_OPEN, sizeof(rsp), &rsp, -1);
-+
-+	return;
-+
-+failed:
- 	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
++	return 0;
  }
  
-@@ -471,6 +625,9 @@ void bt_a2dp_unregister(void)
- {
- 	DBG("");
+ static void convert_file(const char *input_path, const char *output_path)
+@@ -133,7 +140,8 @@ static void convert_file(const char *input_path, const char *output_path)
  
-+	g_slist_free_full(endpoints, unregister_endpoint);
-+	endpoints = NULL;
-+
- 	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
- 	devices = NULL;
+ 		cur += strlen(str);
  
+-		convert_line(fd, str);
++		if (convert_line(fd, str) < 0)
++			break;
+ 	}
+ 
+ 	fclose(fp);
 -- 
-1.8.4.2
+1.8.3.2
 
