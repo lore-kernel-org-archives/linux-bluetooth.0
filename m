@@ -1,40 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/pics: Add PICS and PIXIT for AVRCP
-Date: Mon, 13 Jan 2014 09:11:35 +0100
-Message-Id: <1389600696-32598-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 2/2] android/pics: Add PICS and PIXIT for A2DP
+Date: Mon, 13 Jan 2014 09:11:36 +0100
+Message-Id: <1389600696-32598-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1389600696-32598-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1389600696-32598-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add PICS/PIXIT for AVRCP targeting Android 4.4.
+Add PICS/PIXIT for A2DP targeting Android 4.4.
 ---
- android/Makefile.am     |   1 +
- android/pics-avrcp.txt  | 626 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/pixit-avrcp.txt |  36 +++
- 3 files changed, 663 insertions(+)
- create mode 100644 android/pics-avrcp.txt
- create mode 100644 android/pixit-avrcp.txt
+ android/Makefile.am    |  1 +
+ android/pics-a2dp.txt  | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/pixit-a2dp.txt | 30 ++++++++++++++++++
+ 3 files changed, 117 insertions(+)
+ create mode 100644 android/pics-a2dp.txt
+ create mode 100644 android/pixit-a2dp.txt
 
 diff --git a/android/Makefile.am b/android/Makefile.am
-index a3ee148..98d21d8 100644
+index 98d21d8..356f932 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -147,4 +147,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
- 		android/audio-ipc-api.txt android/pics-map.txt \
+@@ -148,4 +148,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
  		android/pixit-map.txt android/pts-map.txt \
  		android/pics-l2cap.txt android/pixit-l2cap.txt \
-+		android/pics-avrcp.txt android/pixit-avrcp.txt \
+ 		android/pics-avrcp.txt android/pixit-avrcp.txt \
++		android/pics-a2dp.txt android/pixit-a2dp.txt \
  		android/pts-l2cap.txt
-diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
+diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
 new file mode 100644
-index 0000000..2be0746
+index 0000000..1579567
 --- /dev/null
-+++ b/android/pics-avrcp.txt
-@@ -0,0 +1,626 @@
-+AVRCP PICS for the PTS tool.
++++ b/android/pics-a2dp.txt
+@@ -0,0 +1,86 @@
++A2DP PICS for the PTS tool.
 +
 +PTS version: 5.0
 +
@@ -46,627 +46,87 @@ index 0000000..2be0746
 +
 +		Roles
 +-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
++Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+SPC_AVRCP_1_1     False (*)	Role: Controller (CT) (C.1)
-+TSPC_AVRCP_1_2    True		Role: Target (TG) (C.1)
++TSPC_A2DP_1_1	True		Role: Source (C.1)
++TSPC_A2DP_1_2	False (*)	Role: Sink (C.1)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of the defined roles.
-+-------------------------------------------------------------------------------
-+
-+
-+		Controller Features
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_2_1    False (*)	CT: Initiating connection establishment (M)
-+TSPC_AVRCP_2_2    False (*)	CT: Accepting connection establishment (M)
-+TSPC_AVRCP_2_3    False (*)	CT: Initiating connection release (M)
-+TSPC_AVRCP_2_4    False (*)	CT: Accepting connection release (M)
-+TSPC_AVRCP_2_5    False		CT: Sending UNIT INFO (O)
-+TSPC_AVRCP_2_6    False		CT: Sending SUBUNIT INFO (O)
-+TSPC_AVRCP_2_7    False (*)	CT: Sending PASS THROUGH command category 1
-+					(C.1)
-+TSPC_AVRCP_2_8    False		CT: Sending PASS THROUGH command category 2
-+					(C.1)
-+TSPC_AVRCP_2_9    False		CT: Sending PASS THROUGH command category 3
-+					(C.1)
-+TSPC_AVRCP_2_10   False		CT: Sending PASS THROUGH command category 4
-+					(C.1)
-+TSPC_AVRCP_2_11   False		CT: Get Capabilities (O)
-+TSPC_AVRCP_2_12   False		CT: List Player Application Setting
-+					Attributes (C.9)
-+TSPC_AVRCP_2_13   False		CT: List Player Application Setting Values (O)
-+TSPC_AVRCP_2_14   False		CT: Get Current Player Application Setting
-+					(C.10)
-+TSPC_AVRCP_2_15   False		CT: Set Player Application Setting Value (C.10)
-+TSPC_AVRCP_2_16   False		CT: Get Player Application Setting
-+						Attribute (O)
-+TSPC_AVRCP_2_17   False		CT: Get Player Application Setting Value (O)
-+TSPC_AVRCP_2_18   False		CT: Inform Displayable Character Set (O)
-+TSPC_AVRCP_2_19   False		CT: Inform Battery Status of CT (O)
-+TSPC_AVRCP_2_20   False		CT: Get Element Attributes (O)
-+TSPC_AVRCP_2_21   False		CT: Get Play Status (O)
-+TSPC_AVRCP_2_22   False		CT: Register Notification (C.11)
-+TSPC_AVRCP_2_23   False		CT: Request Continuing Response (C.2)
-+TSPC_AVRCP_2_24   False		CT: Abort Continuing Response (C.2)
-+TSPC_AVRCP_2_25   False		CT: Next Group (C.12)
-+TSPC_AVRCP_2_26   False		CT: Previous Group (C.12)
-+TSPC_AVRCP_2_27   False		CT: Media Player Selection (O)
-+TSPC_AVRCP_2_28   False		CT: SetAddressedPlayer (O)
-+TSPC_AVRCP_2_29   False		CT: GetFolderItems(MediaPlayerList) (C.5)
-+TSPC_AVRCP_2_29b  False		CT: GetTotalNumberOfItems(MediaPlayerList) (C.5)
-+TSPC_AVRCP_2_30   False		CT: EVENT_AVAILABLE_PLAYERS_CHANGED (O)
-+TSPC_AVRCP_2_31   False		CT: EVENT_ADDRESSED_PLAYER_CHANGED (O)
-+TSPC_AVRCP_2_32   False		CT: Browsing (O)
-+TSPC_AVRCP_2_33   False		CT: SetBrowsedPlayer (C.4)
-+TSPC_AVRCP_2_34   False		CT: ChangePath (C.4)
-+TSPC_AVRCP_2_35   False		CT: GetFolderItems(Filesystem) (C.4)
-+TSPC_AVRCP_2_35b  False		CT: GetTotalNumberOfItems(Filesystem) (C.4)
-+TSPC_AVRCP_2_36   False		CT: GetItemAttributes (O)
-+TSPC_AVRCP_2_37   False		CT: PlayItem(Filesystem) (C.4)
-+TSPC_AVRCP_2_38   False		CT: EVENT_UIDS_CHANGED (O)
-+TSPC_AVRCP_2_39   False		CT: Searching (O)
-+TSPC_AVRCP_2_40   False		CT: Search (C.7)
-+TSPC_AVRCP_2_41   False		CT: GetFolderItems(Search Results) (C.7)
-+TSPC_AVRCP_2_41b  False		CT: GetTotalNumberOfItems(Search Results) (C.7)
-+TSPC_AVRCP_2_42   False		CT: PlayItem(SearchResultList) (C.7)
-+TSPC_AVRCP_2_43   False		CT: NowPlaying (C.8)
-+TSPC_AVRCP_2_44   False		CT: GetFolderItems(NowPlayingList) (C.8)
-+TSPC_AVRCP_2_44b  False		CT: GetTotalNumberOfItems(NowPlayingList) (C.8)
-+TSPC_AVRCP_2_45   False		CT: PlayItem(NowPlayingList) (C.8)
-+TSPC_AVRCP_2_46   False		CT: AddToNowPlaying (O)
-+TSPC_AVRCP_2_47   False		CT: EVENT_NOW_PLAYING_CONTENT_CHANGED (O)
-+TSPC_AVRCP_2_48   False		CT: Playable Folders (O)
-+TSPC_AVRCP_2_49   False		CT: Absolute Volume (C.3)
-+TSPC_AVRCP_2_50   False		CT: SetAbsoluteVolume (C.3)
-+TSPC_AVRCP_2_51   False		CT: NotifyVolumeChange (C.3)
-+TSPC_AVRCP_2_52   False (*)	CT: Discoverable Mode (M)
-+TSPC_AVRCP_2_53   False		CT: PASSTHROUGH operation supporting press
-+					and hold (O)
-+TSPC_AVRCP_2_54   False		CT: Cover Art (O)
-+TSPC_AVRCP_2_55   False		CT: GetCapabilities, Cover Art (C.10)
-+TSPC_AVRCP_2_56   False		CT: GetImageProperties, Cover Art (C.10)
-+TSPC_AVRCP_2_57   False		CT: GetImage, Cover Art (C.9)
-+TSPC_AVRCP_2_58   False		CT: GetLinkedThumbnail, CoverArt (C.9)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of the defined categories
-+	(TSPC_AVRCP_2_7 through TSPC_AVRCP_2_10).
-+C.2: Mandatory if TSPC_AVRCP_2_20 is supported, otherwise Optional.
-+C.3: Mandatory if TSPC_AVRCP_2_8 is supported, otherwise Excluded.
-+C.4: Mandatory if TSPC_AVRCP_2_32 is supported, otherwise Excluded.
-+C.5: Mandatory if TSPC_AVRCP_2_27 is supported, otherwise Excluded.
-+C.7: Mandatory if item TSPC_AVRCP_2_39 is supported, Excluded otherwise.
-+C.8: Mandatory if TSPC_AVRCP_2_32 is supported, otherwise Excluded.
-+C.9: Mandatory to support if Player Application Settings feature is supported.
-+	If any item TSPC_AVRCP_2_13 through TSPC_AVRCP_2_15 is supported it is
-+	required to claim support for this feature in accordance with Player
-+	Application Settings support requirements, otherwise Optional.
-+C.10: Mandatory to support either Get or Set Player Application Settings
-+	(TSPC_AVRCP_2_14 or TSPC_AVRCP_2_15) if List Player Application Setting
-+	Attributes (TSPC_AVRCP_2_12) is supported. Either TSPC_AVRCP_2_14
-+	or TSPC_AVRCP_2_15 must be supported if Player Application Settings
-+	feature is supported, in accordance with Player Application Settings
-+	support requirements.
-+C.11: Mandatory if TSPC_AVRCP_2_7 or (TSPC_AVRCP_2_8 AND TSPC_AVRCP_2_49)
-+	or TSPC_AVRCP_2_9 is supported, otherwise Optional.
-+C.12: Mandatory if Basic Group Navigation Feature supported. If any item
-+	TSPC_AVRCP_2_25 or TSPC_AVRCP_2_26 is supported it is mandatory to
-+	support both, in accordance with Basic Group Navigation support
-+	requirements, otherwise Excluded.
++C.1: It is mandatory to support at least one of the defined roles.
 +-------------------------------------------------------------------------------
 +
 +
-+		Controller Profile Version
++		A2DP SRC Features
 +-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
++Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_AVRCP_2b_1   False		CT: AVRCP v1.0 (C.1)
-+TSPC_AVRCP_2b_2   False		CT: AVRCP v1.3 (C.1)
-+TSPC_AVRCP_2b_3   False		CT: AVRCP v1.4 (C.1)
-+TSPC_AVRCP_2b_4   False		CT: AVRCP v1.5 (C.1)
-+TSPC_AVRCP_2b_5   False		CT: AVRCP v1.6 (C.1)
-+-------------------------------------------------------------------------------
-+C.1: It is mandatory to support at least one of the profile versions if
-+	Controller role supported (SPC_AVRCP_1_1).
-+-------------------------------------------------------------------------------
-+
-+
-+		Operation_id of Category 1 for CT
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_3_1    False		CT: category 1 - Operation id: 0 (C.1)
-+TSPC_AVRCP_3_2    False		CT: category 1 - Operation id: 1 (C.1)
-+TSPC_AVRCP_3_3    False		CT: category 1 - Operation id: 2 (C.1)
-+TSPC_AVRCP_3_4    False		CT: category 1 - Operation id: 3 (C.1)
-+TSPC_AVRCP_3_5    False		CT: category 1 - Operation id: 4 (C.1)
-+TSPC_AVRCP_3_6    False		CT: category 1 - Operation id: 5 (C.1)
-+TSPC_AVRCP_3_7    False		CT: category 1 - Operation id: 6 (C.1)
-+TSPC_AVRCP_3_8    False		CT: category 1 - Operation id: 7 (C.1)
-+TSPC_AVRCP_3_9    False		CT: category 1 - Operation id: 8 (C.1)
-+TSPC_AVRCP_3_10   False		CT: category 1 - Operation id: 9 (C.1)
-+TSPC_AVRCP_3_11   False		CT: category 1 - Operation id: dot (C.1)
-+TSPC_AVRCP_3_12   False		CT: category 1 - Operation id: enter (C.1)
-+TSPC_AVRCP_3_13   False		CT: category 1 - Operation id: clear (C.1)
-+TSPC_AVRCP_3_14   False		CT: category 1 - Operation id: sound_select
++TSPC_A2DP_2_1	True		SRC: Initiate connection establishment (M)
++TSPC_A2DP_2_2	True		SRC: Accept connection establishment (M)
++TSPC_A2DP_2_3	True		SRC: Initiate start streaming (M)
++TSPC_A2DP_2_4	True		SRC: Accept start streaming (M)
++TSPC_A2DP_2_5	True		SRC: Send audio stream (M)
++TSPC_A2DP_2_6	True		SRC: Initiate connection release (M)
++TSPC_A2DP_2_7	True		SRC: Accept connection release (M)
++TSPC_A2DP_2_8	True (*)	SRC: Initiate suspend (O)
++TSPC_A2DP_2_9	True (*)	SRC: Accept suspend (O)
++TSPC_A2DP_2_10	True		SRC: SBC encoder (M)
++TSPC_A2DP_2_10a	False		SRC: Encode Audio Stream (O)
++TSPC_A2DP_2_11	False		SRC: SBC Configurations in 16 KHz sampling (O)
++TSPC_A2DP_2_12	False		SRC: SBC Configurations in 32 KHz sampling (O)
++TSPC_A2DP_2_13	True		SRC: SBC Configurations in 44.1 KHz sampling
 +					(C.1)
-+TSPC_AVRCP_3_15   False		CT: category 1 - Operation id: input_select
-+					(C.1)
-+TSPC_AVRCP_3_16   False		CT: category 1 - Operation id:
-+					display_information (C.1)
-+TSPC_AVRCP_3_17   False		CT: category 1 - Operation id: help (C.1)
-+TSPC_AVRCP_3_18   False		CT: category 1 - Operation id: power (C.1)
-+TSPC_AVRCP_3_19   False (*)	CT: category 1 - Operation id: play (C.1)
-+TSPC_AVRCP_3_20   False (*)	CT: category 1 - Operation id: stop (C.1)
-+TSPC_AVRCP_3_21   False (*)	CT: category 1 - Operation id: pause (C.1)
-+TSPC_AVRCP_3_22   False		CT: category 1 - Operation id: record (C.1)
-+TSPC_AVRCP_3_23   False		CT: category 1 - Operation id: rewind (C.1)
-+TSPC_AVRCP_3_24   False		CT: category 1 - Operation id: fast_forward
-+					(C.1)
-+TSPC_AVRCP_3_25   False		CT: category 1 - Operation id: eject (C.1)
-+TSPC_AVRCP_3_26   False		CT: category 1 - Operation id: forward (C.1)
-+TSPC_AVRCP_3_27   False		CT: category 1 - Operation id: backward (C.1)
-+TSPC_AVRCP_3_28   False		CT: category 1 - Operation id: angle (C.1)
-+TSPC_AVRCP_3_29   False		CT: category 1 - Operation id: subpicture (C.1)
-+TSPC_AVRCP_3_30   False		CT: category 1 - Operation id: F1 (C.1)
-+TSPC_AVRCP_3_31   False		CT: category 1 - Operation id: F2 (C.1)
-+TSPC_AVRCP_3_32   False		CT: category 1 - Operation id: F3 (C.1)
-+TSPC_AVRCP_3_33   False		CT: category 1 - Operation id: F4 (C.1)
-+TSPC_AVRCP_3_33a  False		CT: category 1 - Operation id: F5 (C.1)
-+TSPC_AVRCP_3_34   False		CT: category 1 - Operation id: vendor_unique
++TSPC_A2DP_2_14	False		SRC: SBC Configurations in 48 KHz sampling
 +					(C.1)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of these operation_ids if the device
-+	supports category 1 (TSPC_AVRCP_2_7).
++C.1: At least one of the values shall be supported.
 +-------------------------------------------------------------------------------
 +
 +
-+		Operation_id of category 2 for CT
++		Supported Codecs in SRC
 +-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
++Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_AVRCP_4_1    False		CT: category 2 - Operation id: 0 (C.2)
-+TSPC_AVRCP_4_2    False		CT: category 2 - Operation id: 1 (C.2)
-+TSPC_AVRCP_4_3    False		CT: category 2 - Operation id: 2 (C.2)
-+TSPC_AVRCP_4_4    False		CT: category 2 - Operation id: 3 (C.2)
-+TSPC_AVRCP_4_5    False		CT: category 2 - Operation id: 4 (C.2)
-+TSPC_AVRCP_4_6    False		CT: category 2 - Operation id: 5 (C.2)
-+TSPC_AVRCP_4_7    False		CT: category 2 - Operation id: 6 (C.2)
-+TSPC_AVRCP_4_8    False		CT: category 2 - Operation id: 7 (C.2)
-+TSPC_AVRCP_4_9    False		CT: category 2 - Operation id: 8 (C.2)
-+TSPC_AVRCP_4_10   False		CT: category 2 - Operation id: 9 (C.2)
-+TSPC_AVRCP_4_11   False		CT: category 2 - Operation id: dot (C.2)
-+TSPC_AVRCP_4_12   False		CT: category 2 - Operation id: enter (C.2)
-+TSPC_AVRCP_4_13   False		CT: category 2 - Operation id: clear (C.2)
-+TSPC_AVRCP_4_14   False		CT: category 2 - Operation id: sound_select
-+					(C.2)
-+TSPC_AVRCP_4_15   False		CT: category 2 - Operation id: input_select
-+					(C.2)
-+TSPC_AVRCP_4_16   False		CT: category 2 - Operation id:
-+					display_information (C.2)
-+TSPC_AVRCP_4_17   False		CT: category 2 - Operation id: help (C.2)
-+TSPC_AVRCP_4_18   False		CT: category 2 - Operation id: power (C.2)
-+TSPC_AVRCP_4_19   False (*)	CT: category 2 - Operation id: volume_up (C.2)
-+TSPC_AVRCP_4_20   False (*)	CT: category 2 - Operation id: volume_down (C.2)
-+TSPC_AVRCP_4_21   False		CT: category 2 - Operation id: mute (C.2)
-+TSPC_AVRCP_4_22   False		CT: category 2 - Operation id: F1 (C.2)
-+TSPC_AVRCP_4_23   False		CT: category 2 - Operation id: F2 (C.2)
-+TSPC_AVRCP_4_24   False		CT: category 2 - Operation id: F3 (C.2)
-+TSPC_AVRCP_4_25   False		CT: category 2 - Operation id: F4 (C.2)
-+TSPC_AVRCP_4_25a  False		CT: category 2 - Operation id: F5 (C.2)
-+TSPC_AVRCP_4_26   False		CT: category 2 - Operation id: vendor_unique
-+					(C.2)
-+-------------------------------------------------------------------------------
-+C.2: Mandatory to support at least one of these operation_ids if the device
-+	supports category 2 (TSPC_AVRCP_2_8).
++TSPC_A2DP_3_1	True		SRC: SBC encoder Codec (M)
++TSPC_A2DP_3_2	False		SRC: Additional encoder Codec (O)
 +-------------------------------------------------------------------------------
 +
 +
-+		Operation_id of category 3 for CT
++		A2DP Sink Features
 +-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
++Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_AVRCP_5_1    False		CT: category 3 - Operation id: 0 (C.3)
-+TSPC_AVRCP_5_2    False		CT: category 3 - Operation id: 1 (C.3)
-+TSPC_AVRCP_5_3    False		CT: category 3 - Operation id: 2 (C.3)
-+TSPC_AVRCP_5_4    False		CT: category 3 - Operation id: 3 (C.3)
-+TSPC_AVRCP_5_5    False		CT: category 3 - Operation id: 4 (C.3)
-+TSPC_AVRCP_5_6    False		CT: category 3 - Operation id: 5 (C.3)
-+TSPC_AVRCP_5_7    False		CT: category 3 - Operation id: 6 (C.3)
-+TSPC_AVRCP_5_8    False		CT: category 3 - Operation id: 7 (C.3)
-+TSPC_AVRCP_5_9    False		CT: category 3 - Operation id: 8 (C.3)
-+TSPC_AVRCP_5_10   False		CT: category 3 - Operation id: 9 (C.3)
-+TSPC_AVRCP_5_11   False		CT: category 3 - Operation id: dot (C.3)
-+TSPC_AVRCP_5_12   False		CT: category 3 - Operation id: enter (C.3)
-+TSPC_AVRCP_5_13   False		CT: category 3 - Operation id: clear (C.3)
-+TSPC_AVRCP_5_14   False		CT: category 3 - Operation id: channel up (C.3)
-+TSPC_AVRCP_5_15   False		CT: category 3 - Operation id: channel down
-+					(C.3)
-+TSPC_AVRCP_5_16   False		CT: category 3 - Operation id: previous channel
-+					(C.3)
-+TSPC_AVRCP_5_17   False		CT: category 3 - Operation id: sound_select
-+					(C.3)
-+TSPC_AVRCP_5_18   False		CT: category 3 - Operation id: input_select
-+					(C.3)
-+TSPC_AVRCP_5_19   False		CT: category 3 - Operation id:
-+					display_information (C.3)
-+TSPC_AVRCP_5_20   False		CT: category 3 - Operation id: help (C.3)
-+TSPC_AVRCP_5_21   False		CT: category 3 - Operation id: power (C.3)
-+TSPC_AVRCP_5_22   False		CT: category 3 - Operation id: angle (C.3)
-+TSPC_AVRCP_5_23   False		CT: category 3 - Operation id: subpicture(C.3)
-+TSPC_AVRCP_5_24   False		CT: category 3 - Operation id: F1 (C.3)
-+TSPC_AVRCP_5_25   False		CT: category 3 - Operation id: F2 (C.3)
-+TSPC_AVRCP_5_26   False		CT: category 3 - Operation id: F3 (C.3)
-+TSPC_AVRCP_5_27   False		CT: category 3 - Operation id: F4 (C.3)
-+TSPC_AVRCP_5_27a  False		CT: category 3 - Operation id: F5 (C.3)
-+TSPC_AVRCP_5_28   False		CT: category 3 - Operation id: vendor_unique
-+					(C.3)
-+-------------------------------------------------------------------------------
-+C.3: Mandatory to support at least one of these operation_ids if the device
-+	supports category 3 (TSPC_AVRCP_2_9).
++TSPC_A2DP_4_1	False		SNK: Initiate connection establishment (O)
++TSPC_A2DP_4_2	False (*)	SNK: Accept connection establishment (M)
++TSPC_A2DP_4_3	False		SNK: Initiate start streaming (O)
++TSPC_A2DP_4_4	False (*)	SNK: Accept start streaming (M)
++TSPC_A2DP_4_5	False (*)	SNK: Receive audio stream (M)
++TSPC_A2DP_4_6	False		SNK: Initiate connection release (O)
++TSPC_A2DP_4_7	False (*)	SNK: Accept connection release (M)
++TSPC_A2DP_4_8	False		SNK: Initiate suspend (O)
++TSPC_A2DP_4_9	False		SNK: Accept suspend (O)
++TSPC_A2DP_4_10	False (*)	SNK: SBC decoder (M)
++TSPC_A2DP_4_10a	False (*)	SNK: Decode Audio Stream (O)
++TSPC_A2DP_4_11	False		SNK: SBC Configurations in 16 KHz sampling (O)
++TSPC_A2DP_4_12	False		SNK: SBC Configurations in 32 KHz sampling (O)
++TSPC_A2DP_4_13	False (*)	SNK: SBC Configurations in 44.1 KHz sampling (M)
++TSPC_A2DP_4_14	False (*)	SNK: SBC Configurations in 48 KHz sampling (M)
 +-------------------------------------------------------------------------------
 +
 +
-+		Operation_id of category 4 for CT
++		Supported codecs in SNK
 +-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
++Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_AVRCP_6_1    False		CT: category 4 - Operation id: select (C.4)
-+TSPC_AVRCP_6_2    False		CT: category 4 - Operation id: up (C.4)
-+TSPC_AVRCP_6_3    False		CT: category 4 - Operation id: down (C.4)
-+TSPC_AVRCP_6_4    False		CT: category 4 - Operation id: left (C.4)
-+TSPC_AVRCP_6_5    False		CT: category 4 - Operation id: right (C.4)
-+TSPC_AVRCP_6_6    False		CT: category 4 - Operation id: right up (C.4)
-+TSPC_AVRCP_6_7    False		CT: category 4 - Operation id: right down (C.4)
-+TSPC_AVRCP_6_8    False		CT: category 4 - Operation id: left up (C.4)
-+TSPC_AVRCP_6_9    False		CT: category 4 - Operation id: left down (C.4)
-+TSPC_AVRCP_6_10   False		CT: category 4 - Operation id: root menu (C.4)
-+TSPC_AVRCP_6_11   False		CT: category 4 - Operation id: setup menu (C.4)
-+TSPC_AVRCP_6_12   False		CT: category 4 - Operation id: contents menu
-+					(C.4)
-+TSPC_AVRCP_6_13   False		CT: category 4 - Operation id: favorite menu
-+					(C.4)
-+TSPC_AVRCP_6_14   False		CT: category 4 - Operation id: exit (C.4)
-+TSPC_AVRCP_6_15   False		CT: category 4 - Operation id: 0 (C.4)
-+TSPC_AVRCP_6_16   False		CT: category 4 - Operation id: 1 (C.4)
-+TSPC_AVRCP_6_17   False		CT: category 4 - Operation id: 2 (C.4)
-+TSPC_AVRCP_6_18   False		CT: category 4 - Operation id: 3 (C.4)
-+TSPC_AVRCP_6_19   False		CT: category 4 - Operation id: 4 (C.4)
-+TSPC_AVRCP_6_20   False		CT: category 4 - Operation id: 5 (C.4)
-+TSPC_AVRCP_6_21   False		CT: category 4 - Operation id: 6 (C.4)
-+TSPC_AVRCP_6_22   False		CT: category 4 - Operation id: 7 (C.4)
-+TSPC_AVRCP_6_23   False		CT: category 4 - Operation id: 8 (C.4)
-+TSPC_AVRCP_6_24   False		CT: category 4 - Operation id: 9 (C.4)
-+TSPC_AVRCP_6_25   False		CT: category 4 - Operation id: dot (C.4)
-+TSPC_AVRCP_6_26   False		CT: category 4 - Operation id: enter (C.4)
-+TSPC_AVRCP_6_27   False		CT: category 4 - Operation id: clear (C.4)
-+TSPC_AVRCP_6_28   False		CT: category 4 - Operation id:
-+					display_information (C.4)
-+TSPC_AVRCP_6_29   False		CT: category 4 - Operation id: help (C.4)
-+TSPC_AVRCP_6_30   False		CT: category 4 - Operation id: page up (C.4)
-+TSPC_AVRCP_6_31   False		CT: category 4 - Operation id: page down (C.4)
-+TSPC_AVRCP_6_32   False		CT: category 4 - Operation id: power (C.4)
-+TSPC_AVRCP_6_33   False		CT: category 4 - Operation id: F1 (C.4)
-+TSPC_AVRCP_6_34   False		CT: category 4 - Operation id: F2 (C.4)
-+TSPC_AVRCP_6_35   False		CT: category 4 - Operation id: F3 (C.4)
-+TSPC_AVRCP_6_36   False		CT: category 4 - Operation id: F4 (C.4)
-+TSPC_AVRCP_6_36a  False		CT: category 4 - Operation id: F5 (C.4)
-+TSPC_AVRCP_6_37   False		CT: category 4 - Operation id: vendor_unique
-+					(C.4)
++TSPC_A2DP_5_1	False		SNK: SBC decoder Codec (M)
++TSPC_A2DP_5_2	False		SNK: Additional decoder Coded (O)
++TSPC_ALL	False		Enable all test cases when set to False.
 +-------------------------------------------------------------------------------
-+C.4: Mandatory to support at least one of these operation_ids if the device
-+	supports category 4 (TSPC_AVRCP_2_9).
-+-------------------------------------------------------------------------------
-+
-+
-+		Target Features
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_7_1    True (*)	TG: Initiating connection establishment (O)
-+TSPC_AVRCP_7_2    True		TG: Accept connection establishment (M)
-+TSPC_AVRCP_7_3    True		TG: Initiating connection release (M)
-+TSPC_AVRCP_7_4    True		TG: Accepting connection release (M)
-+TSPC_AVRCP_7_5    True		TG: Receiving UNIT INFO (M)
-+TSPC_AVRCP_7_6    True		TG: Receiving SUBUNIT INFO (M)
-+TSPC_AVRCP_7_7    True		TG: Receiving PASS THROUGH command category 1
-+					(C.1)
-+TSPC_AVRCP_7_8    False		TG: Receiving PASS THROUGH command category 2
-+					(C.1)
-+TSPC_AVRCP_7_9    False		TG: Receiving PASS THROUGH command category 3
-+					(C.1)
-+TSPC_AVRCP_7_10   False		TG: Receiving PASS THROUGH command category 4
-+					(C.1)
-+TSPC_AVRCP_7_11   True (*)	TG: Get Capabilities Response (C.3)
-+TSPC_AVRCP_7_12   False		TG: List Player Application Settings (C.14)
-+TSPC_AVRCP_7_13   False		TG: List Player Application Setting Values
-+					(C.14)
-+TSPC_AVRCP_7_14   False		TG: Get Current Player Application Settings
-+					(C.14)
-+TSPC_AVRCP_7_15   False		TG: Set Player Application Setting Value (C.14)
-+TSPC_AVRCP_7_16   False		TG: Get Player Application Setting Attribute
-+					(O)
-+TSPC_AVRCP_7_17   False		TG: Get Player Application Setting Value (O)
-+TSPC_AVRCP_7_18   False		TG: Inform Displayable Character Set (O)
-+TSPC_AVRCP_7_19   False		TG: Inform Battery Status Of CT Response (O)
-+TSPC_AVRCP_7_20   True (*)	TG: Get Element Attributes Response (C.3)
-+TSPC_AVRCP_7_21   True (*)	TG: Get Play Status Response (C.2)
-+TSPC_AVRCP_7_22   True (*)	TG: Register Notification Response (C.12)
-+TSPC_AVRCP_7_23   True (*)	TG: Notify Event Response:
-+					PLAYBACK_STATUS_CHANGED (C.4)
-+TSPC_AVRCP_7_24   True (*)	TG: Notify Event Response: TRACK_CHANGED (C.4)
-+TSPC_AVRCP_7_25   False		TG: Notify Event Response: TRACK_REACHED_END (O)
-+TSPC_AVRCP_7_26   False		TG: Notify Event Response: TRACK_REACHED_START
-+					(O)
-+TSPC_AVRCP_7_27   False		TG: Notify Event Response: PLAYBACK_POS_CHANGED
-+					(O)
-+TSPC_AVRCP_7_28   False		TG: Notify Event Response: BATT_STATUS_CHANGED
-+					(O)
-+TSPC_AVRCP_7_29   False		TG: Notify Event Response: SYSTEM_STATUS_CHANGED
-+					(O)
-+TSPC_AVRCP_7_30   False		TG: Notify Event Response:
-+					PLAYER_APPLICATION_SETTING_CHANGED (O)
-+TSPC_AVRCP_7_31   True (*)	TG: Request ContinuingResponse (C.2)
-+TSPC_AVRCP_7_32   True (*)	TG: Abort ContinuingResponse Response (C.2)
-+TSPC_AVRCP_7_34   False		TG: Next Group (C.15)
-+TSPC_AVRCP_7_35   False		TG: Previous Group (C.15)
-+TSPC_AVRCP_7_36   False		TG: Media Player Selection (C.8)
-+TSPC_AVRCP_7_37   False		TG: SetAddressedPlayer (C.8)
-+TSPC_AVRCP_7_38   False		TG: GetFolderItems(MediaPlayerList) (C.8)
-+TSPC_AVRCP_7_38b  False		TG: GetTotalNumberOfItems(MediaPlayerList) (C.8)
-+TSPC_AVRCP_7_39   False		TG: EVENT_AVAILABLE_PLAYERS_CHANGED (C.8)
-+TSPC_AVRCP_7_40   False		TG: EVENT_ADDRESSED_PLAYER_CHANGED (C.8)
-+TSPC_AVRCP_7_41   False		TG: Supports Multiple Players (O)
-+TSPC_AVRCP_7_42   False		TG: Browsing (O)
-+TSPC_AVRCP_7_42a  False		TG: Supports initiation of browsing channel
-+					establishment (O)
-+TSPC_AVRCP_7_43   False		TG: SetBrowsedPlayer (C.6)
-+TSPC_AVRCP_7_44   False		TG: ChangePath (C.6)
-+TSPC_AVRCP_7_45   False		TG: GetFolderItems(Filesystem) (C.6)
-+TSPC_AVRCP_7_45b  False		TG: GetTotalNumberOfItems(Filesystem) (C.6)
-+TSPC_AVRCP_7_46   False		TG: GetItemAttributes (C.6)
-+TSPC_AVRCP_7_47   False		TG: PlayItem(Filesystem) (C.6)
-+TSPC_AVRCP_7_48   False		TG: EVENT_UIDS_CHANGED (C.9)
-+TSPC_AVRCP_7_49   False		TG: Database Aware Players (O)
-+TSPC_AVRCP_7_50   False		TG: Searching (O)
-+TSPC_AVRCP_7_51   False		TG: Search (C.10)
-+TSPC_AVRCP_7_52   False		TG: GetFolderItems(Search Results) (C.10)
-+TSPC_AVRCP_7_52b  False		TG: GetTotalNumberOfItems(Search Results) (C.10)
-+TSPC_AVRCP_7_53   False		TG: PlayItem(SearchResultList) (C.10)
-+TSPC_AVRCP_7_54   False		TG: NowPlaying (C.11)
-+TSPC_AVRCP_7_55   False		TG: GetFolderItems(NowPlayingList) (C.11)
-+TSPC_AVRCP_7_55b  False		TG: GetTotalNumberOfItems(NowPlayingList) (C.11)
-+TSPC_AVRCP_7_56   False		TG: PlayItem(NowPlayingList) (C.11)
-+TSPC_AVRCP_7_57   False		TG: AddToNowPlaying (O)
-+TSPC_AVRCP_7_58   False		TG: EVENT_NOW_PLAYING_CONTENT_CHANGED (C.11)
-+TSPC_AVRCP_7_59   False		TG: Playable Folders (O)
-+TSPC_AVRCP_7_60   False		TG: Absolute Volume (C.5)
-+TSPC_AVRCP_7_61   False		TG: SetAbsoluteVolume (C.5)
-+TSPC_AVRCP_7_62   False		TG: NotifyVolumeChange (C.5)
-+TSPC_AVRCP_7_63   False		TG: Error Response (O)
-+TSPC_AVRCP_7_64   False		TG: General Reject (C.13)
-+TSPC_AVRCP_7_65   True		TG: Discoverable Mode (M)
-+TSPC_AVRCP_7_66   False		TG: PASSTHROUGH operation supporting press
-+					and hold (O)
-+TSPC_AVRCP_7_67   False		TG: Cover Art (O)
-+TSPC_AVRCP_7_68   False		TG: GetCapabilities, Cover Art (C.12)
-+TSPC_AVRCP_7_69   False		TG: GetImageProperties, Cover Art (C.12)
-+TSPC_AVRCP_7_70   False		TG: GetImage, Cover Art (C.12)
-+TSPC_AVRCP_7_71   False		TG: GetLinkedThumbnail, Cover Art (C.12)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of the categories. Supported
-+	operation_id's are shown in Table 8 to Table 11.
-+C.2: Mandatory if 7/20 is supported, otherwise Optional.
-+C.3: Mandatory if 7/7 is supported, otherwise Optional.
-+C.4: Mandatory if 7/22 and 7/20 is supported, otherwise Optional.
-+C.5: Mandatory if 7/8 is supported, otherwise Excluded.
-+C.6: Mandatory if 7/42 is supported, otherwise Excluded.
-+C.7: Mandatory if 7/36 is supported, otherwise Excluded.
-+C.8: Mandatory if (7/7 or 7/9) is supported, otherwise Excluded.
-+C.9: Mandatory if 7/49 is supported, otherwise Optional.
-+C.10: Mandatory if 7/50 is supported, otherwise Excluded.
-+C.11: Mandatory if 7/42 is supported, otherwise Optional.
-+C.12: Mandatory if 7/7 or (7/8 AND 7/60) or 7/9 is supported, otherwise Optional
-+C.13: Mandatory if 7/7 or 7/9 or 7/42 is supported, otherwise Optional.
-+C.14: Mandatory if Player Application Settings Feature supported. If any item
-+	7/12 – 7/15 is supported, all items 7/12 – 7/15 shall be supported,
-+	in accordance with Player Application Settings Feature support
-+	requirements, otherwise Excluded.
-+C.15: Mandatory if Basic Group Navigation Feature supported. If any item
-+	7/34 or 7/35 is supported it is mandatory to support both,
-+	in accordance with Basic Group Navigation support requirements,
-+	otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
-+		Target Profile Version
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_7b_1   False		TG: AVRCP v1.0 (C.1)
-+TSPC_AVRCP_7b_2   True (*)	TG: AVRCP v1.3 (C.1)
-+TSPC_AVRCP_7b_3   False		TG: AVRCP v1.4 (C.1)
-+TSPC_AVRCP_7b_4   False		TG: AVRCP v1.5 (C.1)
-+TSPC_AVRCP_7b_5   False		TG: AVRCP v1.6 (C.1)
-+-------------------------------------------------------------------------------
-+C.1: It is mandatory to support at least one of the profile versions.
-+-------------------------------------------------------------------------------
-+
-+
-+		operation_id of category 1 for TG
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_8_1    False		TG: category 1 - Operation id: 0 (O)
-+TSPC_AVRCP_8_2    False		TG: category 1 - Operation id: 1 (O)
-+TSPC_AVRCP_8_3    False		TG: category 1 - Operation id: 2 (O)
-+TSPC_AVRCP_8_4    False		TG: category 1 - Operation id: 3 (O)
-+TSPC_AVRCP_8_5    False		TG: category 1 - Operation id: 4 (O)
-+TSPC_AVRCP_8_6    False		TG: category 1 - Operation id: 5 (O)
-+TSPC_AVRCP_8_7    False		TG: category 1 - Operation id: 6 (O)
-+TSPC_AVRCP_8_8    False		TG: category 1 - Operation id: 7 (O)
-+TSPC_AVRCP_8_9    False		TG: category 1 - Operation id: 8 (O)
-+TSPC_AVRCP_8_10   False		TG: category 1 - Operation id: 9 (O)
-+TSPC_AVRCP_8_11   False		TG: category 1 - Operation id: dot (O)
-+TSPC_AVRCP_8_12   False		TG: category 1 - Operation id: enter (O)
-+TSPC_AVRCP_8_13   False		TG: category 1 - Operation id: clear (O)
-+TSPC_AVRCP_8_14   False		TG: category 1 - Operation id: sound select (O)
-+TSPC_AVRCP_8_15   False		TG: category 1 - Operation id: input select (O)
-+TSPC_AVRCP_8_16   False		TG: category 1 - Operation id: display
-+					information (O)
-+TSPC_AVRCP_8_17   False		TG: category 1 - Operation id: help (O)
-+TSPC_AVRCP_8_18   False		TG: category 1 - Operation id: power (O)
-+TSPC_AVRCP_8_19   True		TG: category 1 - Operation id: play (M)
-+TSPC_AVRCP_8_20   True		TG: category 1 - Operation id: stop (M)
-+TSPC_AVRCP_8_21   True		TG: category 1 - Operation id: pause (O)
-+TSPC_AVRCP_8_22   False		TG: category 1 - Operation id: record (O)
-+TSPC_AVRCP_8_23   True (*)	TG: category 1 - Operation id: rewind (O)
-+TSPC_AVRCP_8_24   True (*)	TG: category 1 - Operation id: fast forward (O)
-+TSPC_AVRCP_8_25   False		TG: category 1 - Operation id: eject (O)
-+TSPC_AVRCP_8_26   True (*)	TG: category 1 - Operation id: forward (O)
-+TSPC_AVRCP_8_27   True (*)	TG: category 1 - Operation id: backward (O)
-+TSPC_AVRCP_8_28   False		TG: category 1 - Operation id: angle (O)
-+TSPC_AVRCP_8_29   False		TG: category 1 - Operation id: subpicture (O)
-+TSPC_AVRCP_8_30   False		TG: category 1 - Operation id: F1 (O)
-+TSPC_AVRCP_8_31   False		TG: category 1 - Operation id: F2 (O)
-+TSPC_AVRCP_8_32   False		TG: category 1 - Operation id: F3 (O)
-+TSPC_AVRCP_8_33   False		TG: category 1 - Operation id: F4 (O)
-+TSPC_AVRCP_8_33a  False		TG: category 1 - Operation id: F5 (O)
-+TSPC_AVRCP_8_34   False		TG: category 1 - Operation id: vendor unique (O)
-+-------------------------------------------------------------------------------
-+
-+
-+		operation_id of category 2 for TG
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_9_1    False		TG: category 2 - Operation id: 0 (O)
-+TSPC_AVRCP_9_2    False		TG: category 2 - Operation id: 1 (O)
-+TSPC_AVRCP_9_3    False		TG: category 2 - Operation id: 2 (O)
-+TSPC_AVRCP_9_4    False		TG: category 2 - Operation id: 3 (O)
-+TSPC_AVRCP_9_5    False		TG: category 2 - Operation id: 4 (O)
-+TSPC_AVRCP_9_6    False		TG: category 2 - Operation id: 5 (O)
-+TSPC_AVRCP_9_7    False		TG: category 2 - Operation id: 6 (O)
-+TSPC_AVRCP_9_8    False		TG: category 2 - Operation id: 7 (O)
-+TSPC_AVRCP_9_9    False		TG: category 2 - Operation id: 8 (O)
-+TSPC_AVRCP_9_10   False		TG: category 2 - Operation id: 9 (O)
-+TSPC_AVRCP_9_11   False		TG: category 2 - Operation id: dot (O)
-+TSPC_AVRCP_9_12   False		TG: category 2 - Operation id: enter (O)
-+TSPC_AVRCP_9_13   False		TG: category 2 - Operation id: clear (O)
-+TSPC_AVRCP_9_14   False		TG: category 2 - Operation id: sound select (O)
-+TSPC_AVRCP_9_15   False		TG: category 2 - Operation id: input select (O)
-+TSPC_AVRCP_9_16   False		TG: category 2 - Operation id: display
-+					information (O)
-+TSPC_AVRCP_9_17	  False		TG: category 2 - Operation id: help (O)
-+TSPC_AVRCP_9_18	  False		TG: category 2 - Operation id: power (O)
-+TSPC_AVRCP_9_19   False (*)	TG: category 2 - Operation id: volume up (C.2)
-+TSPC_AVRCP_9_20   False (*)	TG: category 2 - Operation id: volume down (C.2)
-+TSPC_AVRCP_9_21   False		TG: category 2 - Operation id: mute (O)
-+TSPC_AVRCP_9_24   False		TG: category 2 - Operation id: F1 (O)
-+TSPC_AVRCP_9_25   False		TG: category 2 - Operation id: F2 (O)
-+TSPC_AVRCP_9_26   False		TG: category 2 - Operation id: F3 (O)
-+TSPC_AVRCP_9_27   False		TG: category 2 - Operation id: F4 (O)
-+TSPC_AVRCP_9_27a  False		TG: category 2 - Operation id: F5 (O)
-+TSPC_AVRCP_9_28   False		TG: category 2 - Operation id: vendor unique (O)
-+-------------------------------------------------------------------------------
-+C.2: Mandatory to support if the device supports category 2 (TSPC_AVRCP_7_8).
-+-------------------------------------------------------------------------------
-+
-+
-+		operation_id of category 3 for TG
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_10_1   False		TG: category 3 - Operation id: 0 (O)
-+TSPC_AVRCP_10_2   False		TG: category 3 - Operation id: 1 (O)
-+TSPC_AVRCP_10_3   False		TG: category 3 - Operation id: 2 (O)
-+TSPC_AVRCP_10_4   False		TG: category 3 - Operation id: 3 (O)
-+TSPC_AVRCP_10_5   False		TG: category 3 - Operation id: 4 (O)
-+TSPC_AVRCP_10_6   False		TG: category 3 - Operation id: 5 (O)
-+TSPC_AVRCP_10_7   False		TG: category 3 - Operation id: 6 (O)
-+TSPC_AVRCP_10_8   False		TG: category 3 - Operation id: 7 (O)
-+TSPC_AVRCP_10_9   False		TG: category 3 - Operation id: 8 (O)
-+TSPC_AVRCP_10_10  False		TG: category 3 - Operation id: 9 (O)
-+TSPC_AVRCP_10_11  False		TG: category 3 - Operation id: dot (O)
-+TSPC_AVRCP_10_12  False		TG: category 3 - Operation id: enter (O)
-+TSPC_AVRCP_10_13  False		TG: category 3 - Operation id: clear (O)
-+TSPC_AVRCP_10_14  False		TG: category 3 - Operation id: channel up (C.3)
-+TSPC_AVRCP_10_15  False		TG: category 3 - Operation id: channel down
-+					(C.3)
-+TSPC_AVRCP_10_16  False		TG: category 3 - Operation id: previous channel
-+					(O)
-+TSPC_AVRCP_10_17  False		TG: category 3 - Operation id: sound select (O)
-+TSPC_AVRCP_10_18  False		TG: category 3 - Operation id: input select (O)
-+TSPC_AVRCP_10_19  False		TG: category 3 - Operation id: display
-+					information (O)
-+TSPC_AVRCP_10_20  False		TG: category 3 - Operation id: help (O)
-+TSPC_AVRCP_10_21  False		TG: category 3 - Operation id: power (O)
-+TSPC_AVRCP_10_21a False		TG: category 3 - Operation id: angle (O)
-+TSPC_AVRCP_10_21b False		TG: category 3 - Operation id: subpicture (O)
-+TSPC_AVRCP_10_22  False		TG: category 3 - Operation id: F1 (O)
-+TSPC_AVRCP_10_23  False		TG: category 3 - Operation id: F2 (O)
-+TSPC_AVRCP_10_24  False		TG: category 3 - Operation id: F3 (O)
-+TSPC_AVRCP_10_25  False		TG: category 3 - Operation id: F4 (O)
-+TSPC_AVRCP_10_25a False		TG: category 3 - Operation id: F5 (O)
-+TSPC_AVRCP_10_26  False		TG: category 3 - Operation id: vendor unique (O)
-+-------------------------------------------------------------------------------
-+C.3: Mandatory to support if the device supports category 3 (TSPC_AVRCP_7_9).
-+-------------------------------------------------------------------------------
-+
-+
-+		operation_id of category 4 for TG
-+-------------------------------------------------------------------------------
-+Parameter Name    Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVRCP_11_1   False		TG: category 4 - Operation id: select (C.4)
-+TSPC_AVRCP_11_2   False		TG: category 4 - Operation id: up (C.4)
-+TSPC_AVRCP_11_3   False		TG: category 4 - Operation id: down (C.4)
-+TSPC_AVRCP_11_4   False		TG: category 4 - Operation id: left (C.4)
-+TSPC_AVRCP_11_5   False		TG: category 4 - Operation id: right (C.4)
-+TSPC_AVRCP_11_6   False		TG: category 4 - Operation id: right up (O)
-+TSPC_AVRCP_11_7   False		TG: category 4 - Operation id: right down (O)
-+TSPC_AVRCP_11_8   False		TG: category 4 - Operation id: left up (O)
-+TSPC_AVRCP_11_9   False		TG: category 4 - Operation id: left down (O)
-+TSPC_AVRCP_11_10  False		TG: category 4 - Operation id: root menu (C.4)
-+TSPC_AVRCP_11_11  False		TG: category 4 - Operation id: setup menu (O)
-+TSPC_AVRCP_11_12  False		TG: category 4 - Operation id: contents menu (O)
-+TSPC_AVRCP_11_13  False		TG: category 4 - Operation id: favorite menu (O)
-+TSPC_AVRCP_11_14  False		TG: category 4 - Operation id: exit (O)
-+TSPC_AVRCP_11_15  False		TG: category 4 - Operation id: 0 (O)
-+TSPC_AVRCP_11_16  False		TG: category 4 - Operation id: 1 (O)
-+TSPC_AVRCP_11_17  False		TG: category 4 - Operation id: 2 (O)
-+TSPC_AVRCP_11_18  False		TG: category 4 - Operation id: 3 (O)
-+TSPC_AVRCP_11_19  False		TG: category 4 - Operation id: 4 (O)
-+TSPC_AVRCP_11_20  False		TG: category 4 - Operation id: 5 (O)
-+TSPC_AVRCP_11_21  False		TG: category 4 - Operation id: 6 (O)
-+TSPC_AVRCP_11_22  False		TG: category 4 - Operation id: 7 (O)
-+TSPC_AVRCP_11_23  False		TG: category 4 - Operation id: 8 (O)
-+TSPC_AVRCP_11_24  False		TG: category 4 - Operation id: 9 (O)
-+TSPC_AVRCP_11_25  False		TG: category 4 - Operation id: dot (O)
-+TSPC_AVRCP_11_26  False		TG: category 4 - Operation id: enter (O)
-+TSPC_AVRCP_11_27  False		TG: category 4 - Operation id: clear (O)
-+TSPC_AVRCP_11_28  False		TG: category 4 - Operation id: disply (O)
-+TSPC_AVRCP_11_29  False		TG: category 4 - Operation id: help (O)
-+TSPC_AVRCP_11_30  False		TG: category 4 - Operation id: page up (O)
-+TSPC_AVRCP_11_31  False		TG: category 4 - Operation id: page down (O)
-+TSPC_AVRCP_11_32  False		TG: category 4 - Operation id: power (O)
-+TSPC_AVRCP_11_33  False		TG: category 4 - Operation id: F1 (O)
-+TSPC_AVRCP_11_34  False		TG: category 4 - Operation id: F2 (O)
-+TSPC_AVRCP_11_35  False		TG: category 4 - Operation id: F3 (O)
-+TSPC_AVRCP_11_36  False		TG: category 4 - Operation id: F4 (O)
-+TSPC_AVRCP_11_36a False		TG: category 4 - Operation id: F5 (O)
-+TSPC_AVRCP_11_37  False		TG: category 4 - Operation id: vendor unique (O)
-+TSPC_AVRCP_ALL    False		Enables all test cases when set to TRUE.
-+-------------------------------------------------------------------------------
-+C.4: Mandatory to support if the device supports category 4 (TSPC_AVRCP_7_10).
-+-------------------------------------------------------------------------------
-diff --git a/android/pixit-avrcp.txt b/android/pixit-avrcp.txt
+diff --git a/android/pixit-a2dp.txt b/android/pixit-a2dp.txt
 new file mode 100644
-index 0000000..9b278ad
+index 0000000..d060045
 --- /dev/null
-+++ b/android/pixit-avrcp.txt
-@@ -0,0 +1,36 @@
-+AVRCP PIXIT for the PTS tool.
++++ b/android/pixit-a2dp.txt
+@@ -0,0 +1,30 @@
++A2DP PIXIT for the PTS tool.
 +
 +PTS version: 5.0
 +
@@ -680,27 +140,21 @@ index 0000000..9b278ad
 +-------------------------------------------------------------------------------
 +TSPX_security_enabled		FALSE
 +TSPX_bd_addr_iut		112233445566 (*&)
-+TSPX_class_of_device		20050C
-+TSPX_player_feature_bitmask	0000000000000007FFF00070000000000
++TSPX_SRC_class_of_device	080418
++TSPX_SNK_class_of_device	04041C
 +TSPX_pin_code			0000
 +TSPX_delete_link_key		FALSE
 +TSPX_time_guard			300000
-+TSPX_avrcp_only			FALSE
-+TSPX_search_string		tomorrow
-+TSPX_max_avc_fragments		10
-+TSPX_establish_avdtp_stream	TRUE
 +TSPX_use_implicit_send		TRUE
-+TSPX_avrcp_version
-+TSPX_tester_av_role
 +TSPX_media_directory		C:\Program Files\Bluetooth SIG\Bluetooth PTS\
 +					bin\audio (#)
++TSPX_no_avrcp			TRUE
 +TSPX_auth_password		0000
 +TSPX_auth_user_id		PTS
 +TSPX_rfcomm_channel		8
 +TSPX_l2cap_psm			1011
 +TSPX_no_confirmations		FALSE
-+TSPX_no_cover_art_folder
-+TSPX_cover_art_folder
++TSPX_cover_art_uuid		3EEE
 +-------------------------------------------------------------------------------
 -- 
 1.8.5
