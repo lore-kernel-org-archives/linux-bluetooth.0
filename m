@@ -1,25 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 13 Jan 2014 10:40:44 +0200
+Date: Mon, 13 Jan 2014 10:27:24 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update PTS results for MAP
-Message-ID: <20140113084044.GB27885@x220.p-661hnu-f1>
-References: <1389171173-30512-1-git-send-email-jakub.tyszkowski@tieto.com>
+To: Wei Yongjun <weiyj.lk@gmail.com>
+Cc: marcel@holtmann.org, gustavo@padovan.org, yongjun_wei@trendmicro.com.cn,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH -next] Bluetooth: Convert to use ATTRIBUTE_GROUPS macro
+Message-ID: <20140113082724.GA27885@x220.p-661hnu-f1>
+References: <CAPgLHd9XikeBP3moVKugtsAD83CD1HqE82KeYOyYNdY+=0vctQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389171173-30512-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAPgLHd9XikeBP3moVKugtsAD83CD1HqE82KeYOyYNdY+=0vctQ@mail.gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
-On Wed, Jan 08, 2014, Jakub Tyszkowski wrote:
-> Update MAP PTS results for BlueZ stack on Nexus4 (Android 4.4.2).
+On Tue, Jan 07, 2014, Wei Yongjun wrote:
+> From: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
+> 
+> Use ATTRIBUTE_GROUPS macro to reduce the number of lines of code.
+> 
+> Signed-off-by: Wei Yongjun <yongjun_wei@trendmicro.com.cn>
 > ---
->  android/pts-map.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  net/bluetooth/hci_sysfs.c | 18 ++----------------
+>  1 file changed, 2 insertions(+), 16 deletions(-)
 
-Applied. Thanks.
+Applied to the bluetooth-next tree. Thanks.
 
 Johan
