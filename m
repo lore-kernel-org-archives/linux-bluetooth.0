@@ -1,31 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] emulator/bthost: Fix sending L2CAP config req
-Date: Mon, 13 Jan 2014 11:36:33 +0100
-Message-Id: <1389609393-10860-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [BlueZ v3 5/6] audio/A2DP: Add implemention of audio Resume Stream command
+Date: Mon, 13 Jan 2014 12:36:00 +0200
+Message-Id: <1389609361-27883-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1389609361-27883-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389609361-27883-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Send L2CAP config request with correct dcid field. It worked
-well only if scid and dcid of L2CAP connection were the same.
----
- emulator/bthost.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 96d375f..f3bd4c6 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -968,7 +968,7 @@ static bool l2cap_conn_req(struct bthost *bthost, struct btconn *conn,
- 							le16_to_cpu(psm));
+---
+ android/a2dp.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/android/a2dp.c b/android/a2dp.c
+index ca9260c..385c214 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -781,8 +781,29 @@ failed:
  
- 		memset(&conf_req, 0, sizeof(conf_req));
--		conf_req.dcid = rsp.dcid;
-+		conf_req.dcid = rsp.scid;
+ static void bt_stream_resume(const void *buf, uint16_t len)
+ {
+-	DBG("Not Implemented");
++	const struct audio_cmd_resume_stream *cmd = buf;
++	struct a2dp_setup *setup;
++	int err;
++
++	DBG("");
  
- 		l2cap_sig_send(bthost, conn, BT_L2CAP_PDU_CONFIG_REQ, 0,
- 						&conf_req, sizeof(conf_req));
++	setup = find_setup(cmd->id);
++	if (!setup) {
++		error("Unable to find stream for endpoint %u", cmd->id);
++		goto failed;
++	}
++
++	err = avdtp_start(setup->dev->session, setup->stream);
++	if (err < 0) {
++		error("avdtp_start: %s", strerror(-err));
++		goto failed;
++	}
++
++	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_SUCCESS);
++
++	return;
++
++failed:
+ 	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_FAILED);
+ }
+ 
 -- 
-1.8.3.1
+1.8.4.2
 
