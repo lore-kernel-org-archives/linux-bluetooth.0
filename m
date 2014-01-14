@@ -1,28 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 14 Jan 2014 13:26:54 +0200
+Date: Tue, 14 Jan 2014 13:26:10 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/README: Update documentation with AOSP 4.4
-Message-ID: <20140114112654.GC4709@x220.p-661hnu-f1>
-References: <1389653228-5285-1-git-send-email-szymon.janc@gmail.com>
+Subject: Re: [PATCH] l2test: Use correct buffer size
+Message-ID: <20140114112610.GB4709@x220.p-661hnu-f1>
+References: <1389631184-32758-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389653228-5285-1-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1389631184-32758-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Mon, Jan 13, 2014, Szymon Janc wrote:
-> This includes:
->  - sample repository to AOSP 4.4 based repository with support for
->    Nexus 4 and Nexus 7 2013 devices.
->  - adds info about snoop service
->  - other random additions
+On Mon, Jan 13, 2014, Andrei Emeltchenko wrote:
 > ---
->  android/README | 71 +++++++++++++++++++++++++++++++++++++++++-----------------
->  1 file changed, 50 insertions(+), 21 deletions(-)
+>  tools/l2test.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Applied. Thanks.
 
