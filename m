@@ -1,94 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Chlad, SebastianX" <sebastianx.chlad@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH] tools/bluetooth-player: current-folder command
-Date: Tue, 14 Jan 2014 09:44:31 +0000
-Message-ID: <2115852EF878384FA984E6B76A9F379E16789A@IRSMSX104.ger.corp.intel.com>
-References: <1389633824-6871-1-git-send-email-sebastianx.chlad@intel.com>,<CABBYNZLCqg+nNanXCv7J1kj=xzDB0S-FGonyyu4yHRzjs+KJOw@mail.gmail.com>
-In-Reply-To: <CABBYNZLCqg+nNanXCv7J1kj=xzDB0S-FGonyyu4yHRzjs+KJOw@mail.gmail.com>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/bluetooth: Fix discovering new devices
+Date: Tue, 14 Jan 2014 10:31:03 +0100
+Message-Id: <1389691863-4827-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Device found events should be send also for known devices if this is
+new discovery session. Otherwise Android will ignore those devices.
+---
+ android/bluetooth.c | 33 +++++++++++++++++++++++++++++----
+ 1 file changed, 29 insertions(+), 4 deletions(-)
 
-________________________________________
-From: Luiz Augusto von Dentz [luiz.dentz@gmail.com]
-Sent: Tuesday, January 14, 2014 11:20 AM
-To: Chlad, SebastianX
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/bluetooth-player: current-folder command
-
-Hi Sebastian,
-
-On Mon, Jan 13, 2014 at 7:23 PM, Sebastian Chlad
-<sebastianx.chlad@intel.com> wrote:
-> Add current-folder command listing path to the current folder
-> ---
->  tools/bluetooth-player.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
->
-> diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-> index f10d9be..1c0348e 100644
-> --- a/tools/bluetooth-player.c
-> +++ b/tools/bluetooth-player.c
-> @@ -891,6 +891,23 @@ done:
->         rl_printf("Attempting to list items\n");
->  }
->
-> +static void cmd_current_folder(int argc, char *argv[])
-> +{
-> +       GDBusProxy *proxy;
-> +       GDBusProxy *folder;
-> +
-> +       if (check_default_player() == FALSE)
-> +               return;
-> +
-> +       proxy = default_player;
-> +       folder = find_folder(g_dbus_proxy_get_path(proxy));
-> +
-> +       if (folder == NULL)
-> +               return;
-> +
-> +       print_property(folder, "Name");
-> +}
-> +
->  static void search_setup(DBusMessageIter *iter, void *user_data)
->  {
->         char *string = user_data;
-> @@ -1023,6 +1040,8 @@ static const struct {
->                                                 "Change current folder" },
->         { "list-items", "[start] [end]",  cmd_list_items,
->                                         "List items of current folder" },
-> +       { "current-folder", NULL,     cmd_current_folder,
-> +                                       "Show current folder name and path" },
->         { "search",     "string",     cmd_search,
->                                         "Search items containing string" },
->         { "queue",       "<item>",    cmd_queue, "Add item to playlist queue" },
-> --
-> 1.8.3.2
-
-Command show already prints the current folder, what I had in mind is
-to print to prompt the address and folder e.g. XX:..:/folder> but
-never had time to do it.
-
-Yup, 'show' prints current folder, however I found it inconvenient to use while using bluetooth-player; if one wants to check the current folder, hitting 'show' cmd prints just to much info.
-Anyhow I was thinking about same -> having prompt with both address and folder. Let me see what I could do about it.
-
-Sebastian
-
-
---
-Luiz Augusto von Dentz
----------------------------------------------------------------------
-Intel Finland Oy
-Registered Address: PL 281, 00181 Helsinki 
-Business Identity Code: 0357606 - 4 
-Domiciled in Helsinki 
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index f1e5458..735b03e 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -90,6 +90,8 @@ struct device {
+ 	uint32_t timestamp;
+ 
+ 	GSList *uuids;
++
++	bool found; /* if device is found in current discovery session */
+ };
+ 
+ struct browse_req {
+@@ -924,10 +926,19 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
+ 
+ 	DBG("new discovering state %u", ev->discovering);
+ 
+-	if (adapter.discovering)
++	if (adapter.discovering) {
+ 		cp.state = HAL_DISCOVERY_STATE_STARTED;
+-	else
++	} else {
++		GSList *l;
++
++		for(l = devices; l; l = g_slist_next(l)) {
++			struct device *dev = l->data;
++
++			dev->found = false;
++		}
++
+ 		cp.state = HAL_DISCOVERY_STATE_STOPPED;
++	}
+ 
+ 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH,
+ 			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
+@@ -966,6 +977,17 @@ static uint8_t bdaddr_type2android(uint8_t type)
+ 	return HAL_TYPE_LE;
+ }
+ 
++static bool device_found_needed(struct device *dev)
++{
++	if (!dev)
++		return true;
++
++	if (dev->bond_state == HAL_BOND_STATE_BONDED)
++		return false;
++
++	return !dev->found;
++}
++
+ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 					int8_t rssi, bool confirm,
+ 					const uint8_t *data, uint8_t data_len)
+@@ -983,12 +1005,15 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 	eir_parse(&eir, data, data_len);
+ 
+ 	dev = find_device(bdaddr);
+-	if (!dev) {
++	if (device_found_needed(dev)) {
+ 		struct hal_ev_device_found *ev = (void *) buf;
+ 		bdaddr_t android_bdaddr;
+ 		uint8_t android_type;
+ 
+-		dev = create_device(bdaddr, bdaddr_type);
++		if (!dev)
++			dev = create_device(bdaddr, bdaddr_type);
++
++		dev->found = true;
+ 
+ 		size += sizeof(*ev);
+ 
+-- 
+1.8.3.2
 
