@@ -1,81 +1,189 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 5/8] android/ipc-tester: Add sending test data with ipc
-Date: Tue, 14 Jan 2014 13:14:42 +0100
-Message-Id: <1389701685-1861-6-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 3/8] android/ipc-tester: Add IPC initialization
+Date: Tue, 14 Jan 2014 13:14:40 +0100
+Message-Id: <1389701685-1861-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1389701685-1861-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1389701685-1861-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds some data structures used to send data with ipc during test setup
-and run stage.
+This patch adds IPC mechanism initialization.
+The deamon is being started and IPC socket connection is established.
 ---
- android/ipc-negative-tester.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ android/ipc-negative-tester.c | 122 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
 
 diff --git a/android/ipc-negative-tester.c b/android/ipc-negative-tester.c
-index bbe4ce6..46a8754 100644
+index 78ca104..1736794 100644
 --- a/android/ipc-negative-tester.c
 +++ b/android/ipc-negative-tester.c
-@@ -49,6 +49,18 @@ struct test_data {
- 	bool setup_done;
+@@ -17,6 +17,8 @@
+ 
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <errno.h>
++#include <poll.h>
+ 
+ #include <sys/socket.h>
+ #include <sys/types.h>
+@@ -32,6 +34,8 @@
+ #include "src/shared/mgmt.h"
+ #include "src/shared/hciemu.h"
+ 
++#include "hal-msg.h"
++#include <cutils/properties.h>
+ 
+ #define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
+ #define EMULATOR_SIGNAL "emulator_started"
+@@ -44,8 +48,14 @@ struct test_data {
+ 	pid_t bluetoothd_pid;
  };
  
-+struct ipc_data {
-+	void *buffer;
-+	size_t len;
-+};
++#define CONNECT_TIMEOUT (5 * 1000)
++#define SERVICE_NAME "bluetoothd"
 +
-+struct generic_data {
-+	struct ipc_data ipc_data;
-+
-+	unsigned int num_services;
-+	int init_services[];
-+};
-+
- #define CONNECT_TIMEOUT (5 * 1000)
- #define SERVICE_NAME "bluetoothd"
+ static char exec_dir[PATH_MAX + 1];
  
-@@ -461,6 +473,13 @@ static void teardown(const void *data)
- 
- static void ipc_send_tc(const void *data)
++static int cmd_sk = -1;
++static int notif_sk = -1;
++
+ static void read_info_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
-+	const struct generic_data *generic_data = data;
-+	const struct ipc_data *ipc_data = &generic_data->ipc_data;
+@@ -240,6 +250,109 @@ failed:
+ 	close(fd);
+ }
+ 
++static int accept_connection(int sk)
++{
++	int err;
++	struct pollfd pfd;
++	int new_sk;
 +
-+	if (ipc_data->len) {
-+		if (write(cmd_sk, ipc_data->buffer, ipc_data->len) < 0)
-+			tester_test_failed();
++	memset(&pfd, 0 , sizeof(pfd));
++	pfd.fd = sk;
++	pfd.events = POLLIN;
++
++	err = poll(&pfd, 1, CONNECT_TIMEOUT);
++	if (err < 0) {
++		err = errno;
++		tester_warn("Failed to poll: %d (%s)", err, strerror(err));
++		return -errno;
 +	}
- }
- 
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
-@@ -475,13 +494,22 @@ static void ipc_send_tc(const void *data)
- 							3, user, g_free); \
- 	} while (0)
- 
-+static const struct generic_data dummy_data = {
-+	.ipc_data = {
-+		.buffer = "",
-+		.len = 1,
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
 +
- int main(int argc, char *argv[])
++	if (err == 0) {
++		tester_warn("bluetoothd connect timeout");
++		return -errno;
++	}
++
++	new_sk = accept(sk, NULL, NULL);
++	if (new_sk < 0) {
++		err = errno;
++		tester_warn("Failed to accept socket: %d (%s)",
++							err, strerror(err));
++		return -errno;
++	}
++
++	return new_sk;
++}
++
++static bool init_ipc(void)
++{
++	struct sockaddr_un addr;
++
++	int sk;
++	int err;
++
++	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
++	if (sk < 0) {
++		err = errno;
++		tester_warn("Failed to create socket: %d (%s)", err,
++							strerror(err));
++		return false;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++
++	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
++
++	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		err = errno;
++		tester_warn("Failed to bind socket: %d (%s)", err,
++								strerror(err));
++		close(sk);
++		return false;
++	}
++
++	if (listen(sk, 2) < 0) {
++		err = errno;
++		tester_warn("Failed to listen on socket: %d (%s)", err,
++								strerror(err));
++		close(sk);
++		return false;
++	}
++
++	/* Start Android Bluetooth daemon service */
++	if (property_set("ctl.start", SERVICE_NAME) < 0) {
++		tester_warn("Failed to start service %s", SERVICE_NAME);
++		close(sk);
++		return false;
++	}
++
++	cmd_sk = accept_connection(sk);
++	if (cmd_sk < 0) {
++		close(sk);
++		return false;
++	}
++
++	notif_sk = accept_connection(sk);
++	if (notif_sk < 0) {
++		close(sk);
++		close(cmd_sk);
++		cmd_sk = -1;
++		return false;
++	}
++
++	tester_print("bluetoothd connected");
++
++	close(sk);
++
++	return true;
++}
++
++static void cleanup_ipc(void)
++{
++	close(cmd_sk);
++	cmd_sk = -1;
++}
++
+ static void setup(const void *data)
  {
- 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
- 
- 	tester_init(&argc, &argv);
- 
--	test_bredrle("Test Dummy", NULL, setup, ipc_send_tc, teardown);
-+	test_bredrle("Test Dummy", &dummy_data, setup, ipc_send_tc, teardown);
- 
- 	return tester_run();
+ 	struct test_data *test_data = tester_get_data();
+@@ -280,12 +393,21 @@ static void setup(const void *data)
+ 		tester_setup_failed();
+ 		return;
+ 	}
++	if (!init_ipc()) {
++		tester_warn("Cannot initialize IPC mechanism!");
++		tester_setup_failed();
++		return;
++	}
++
++	/* TODO: register modules */
  }
+ 
+ static void teardown(const void *data)
+ {
+ 	struct test_data *test_data = tester_get_data();
+ 
++	cleanup_ipc();
++
+ 	if (test_data->bluetoothd_pid)
+ 		waitpid(test_data->bluetoothd_pid, NULL, 0);
+ 
 -- 
 1.8.5.2
 
