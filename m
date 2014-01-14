@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/2] android/a2dp: Fix IPC response length calculation
-Date: Tue, 14 Jan 2014 17:16:18 +0100
-Message-ID: <1389716179-21874-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1389697905-18532-5-git-send-email-szymon.janc@tieto.com>
+References: <1389697905-18532-1-git-send-email-szymon.janc@tieto.com>
+	<1389697905-18532-5-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 14 Jan 2014 17:49:54 +0200
+Message-ID: <CABBYNZJRVE50AVx0Tm+y_MMuO94U4wEARetXyhRf8UckJCwJcw@mail.gmail.com>
+Subject: Re: [RFC 4/5] android/bluetooth: Add support for caching remote
+ device info
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-struct audio_rsp_open_stream has only zero-length array member thus its
-size equals to 0. We need to explicitly specify size of array element
-type here.
----
- android/a2dp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Szymon,
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 9f3164a..145cd67 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -1088,8 +1088,8 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 		return;
- 	}
- 
--	len = sizeof(*rsp) + setup->preset->len;
--	rsp = g_malloc0(sizeof(*rsp) + setup->preset->len);
-+	len = sizeof(struct audio_preset) + setup->preset->len;
-+	rsp = g_malloc0(len);
- 	rsp->preset->len = setup->preset->len;
- 	memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
- 
--- 
-1.8.5.2
+On Tue, Jan 14, 2014 at 1:11 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Cache is limited to DEVICES_CACHE_MAX. Devices are sorted with
+> timestamp so if cache is full olderst device is removed.
+> ---
+>  android/bluetooth.c | 69 ++++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 55 insertions(+), 14 deletions(-)
+>
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 8c91d87..df442a3 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -70,6 +70,8 @@
+>  /* Default discoverable timeout 120sec as in Android */
+>  #define DEFAULT_DISCOVERABLE_TIMEOUT 120
+>
+> +#define DEVICES_CACHE_MAX 100
 
+Is this being limited because Android UI cannot handle more than that?
+Or perhaps because our IPC/MTU cannot carry more than that? If the
+latter I believe we can actually calculate the maximun e.g. MTU / pdu
+size.
