@@ -3,11 +3,11 @@ From: Szymon Janc <szymon.janc@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: Szymon Janc <szymon.janc@tieto.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC 1/5] android/bluetooth: Split devices list to devices and bonded_devices
-Date: Tue, 14 Jan 2014 19:03:31 +0100
-Message-ID: <1785860.CMCsFkMlMh@athlon>
-In-Reply-To: <CABBYNZLsSJsxLmSB=F1GYLmNyWhzRwjT33qH4p-ELwLy=AftLQ@mail.gmail.com>
-References: <1389697905-18532-1-git-send-email-szymon.janc@tieto.com> <1389697905-18532-2-git-send-email-szymon.janc@tieto.com> <CABBYNZLsSJsxLmSB=F1GYLmNyWhzRwjT33qH4p-ELwLy=AftLQ@mail.gmail.com>
+Subject: Re: [RFC 4/5] android/bluetooth: Add support for caching remote device info
+Date: Tue, 14 Jan 2014 18:55:31 +0100
+Message-ID: <1877346.eJJvW3yP1x@athlon>
+In-Reply-To: <CABBYNZJRVE50AVx0Tm+y_MMuO94U4wEARetXyhRf8UckJCwJcw@mail.gmail.com>
+References: <1389697905-18532-1-git-send-email-szymon.janc@tieto.com> <1389697905-18532-5-git-send-email-szymon.janc@tieto.com> <CABBYNZJRVE50AVx0Tm+y_MMuO94U4wEARetXyhRf8UckJCwJcw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,158 +15,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-On Tuesday 14 January 2014 17:42:02 Luiz Augusto von Dentz wrote:
+On Tuesday 14 January 2014 17:49:54 Luiz Augusto von Dentz wrote:
 > Hi Szymon,
 > 
 > On Tue, Jan 14, 2014 at 1:11 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> > From: Szymon Janc <szymon.janc@gmail.com>
-> > 
-> > Bonded devices are permament until unbondedn. Non-bonded devices will
-> > be held in (size limited) cache based on timestamp property so split
-> > list to ease separation.
+> > Cache is limited to DEVICES_CACHE_MAX. Devices are sorted with
+> > timestamp so if cache is full olderst device is removed.
 > > ---
 > > 
-> >  android/bluetooth.c | 47 +++++++++++++++++++++++++++++++++++------------
-> >  1 file changed, 35 insertions(+), 12 deletions(-)
+> >  android/bluetooth.c | 69
+> >  ++++++++++++++++++++++++++++++++++++++++++----------- 1 file changed, 55
+> >  insertions(+), 14 deletions(-)
 > > 
 > > diff --git a/android/bluetooth.c b/android/bluetooth.c
-> > index 735b03e..78e98c1 100644
+> > index 8c91d87..df442a3 100644
 > > --- a/android/bluetooth.c
 > > +++ b/android/bluetooth.c
-> > @@ -133,6 +133,8 @@ static const uint16_t uuid_list[] = {
+> > @@ -70,6 +70,8 @@
 > > 
-> >  };
-> >  
-> >  static struct mgmt *mgmt_if = NULL;
+> >  /* Default discoverable timeout 120sec as in Android */
+> >  #define DEFAULT_DISCOVERABLE_TIMEOUT 120
 > > 
-> > +
-> > +static GSList *bonded_devices = NULL;
-> > 
-> >  static GSList *devices = NULL;
-> >  
-> >  /* This list contains addresses which are asked for records */
-> > 
-> > @@ -284,6 +286,10 @@ static struct device *find_device(const bdaddr_t
-> > *bdaddr)> 
-> >  {
-> >  
-> >         GSList *l;
-> > 
-> > +       l = g_slist_find_custom(bonded_devices, bdaddr, device_match);
-> > +       if (l)
-> > +               return l->data;
-> > +
-> > 
-> >         l = g_slist_find_custom(devices, bdaddr, device_match);
-> >         if (l)
-> >         
-> >                 return l->data;
-> > 
-> > @@ -560,12 +566,30 @@ static void set_device_bond_state(const bdaddr_t
-> > *addr, uint8_t status,> 
-> >         if (!dev)
-> >         
-> >                 return;
-> > 
-> > -       if (dev->bond_state != state) {
-> > -               dev->bond_state = state;
-> > -               send_bond_state_change(&dev->bdaddr, status, state);
-> > +       if (dev->bond_state == state)
-> > +               return;
-> > 
-> > -               store_device_info(dev);
-> > +       switch (state) {
-> > +       case HAL_BOND_STATE_NONE:
-> > +               if (dev->bond_state == HAL_BOND_STATE_BONDED) {
-> > +                       bonded_devices = g_slist_remove(bonded_devices,
-> > dev); +                       devices = g_slist_prepend(devices, dev);
-> > +               }
-> > +               break;
-> > +       case HAL_BOND_STATE_BONDED:
-> > +               devices = g_slist_remove(devices, dev);
-> > +               bonded_devices = g_slist_prepend(bonded_devices, dev);
-> > +               break;
-> > +       case HAL_BOND_STATE_BONDING:
-> > +       default:
-> > +               break;
-> > 
-> >         }
-> > 
-> > +
-> > +       dev->bond_state = state;
-> > +
-> > +       store_device_info(dev);
-> > +
-> > +       send_bond_state_change(&dev->bdaddr, status, state);
-> > 
-> >  }
-> >  
-> >  static  void send_device_property(const bdaddr_t *bdaddr, uint8_t type,
-> > 
-> > @@ -2134,18 +2158,15 @@ static uint8_t get_adapter_scan_mode(void)
-> > 
-> >  static uint8_t get_adapter_bonded_devices(void)
-> >  {
-> > 
-> > -       uint8_t buf[sizeof(bdaddr_t) * g_slist_length(devices)];
-> > +       uint8_t buf[sizeof(bdaddr_t) * g_slist_length(bonded_devices)];
-> > 
-> >         int i = 0;
-> >         GSList *l;
-> >         
-> >         DBG("");
-> > 
-> > -       for (l = devices; l; l = g_slist_next(l)) {
-> > +       for (l = bonded_devices; l; l = g_slist_next(l)) {
-> > 
-> >                 struct device *dev = l->data;
-> > 
-> > -               if (dev->bond_state != HAL_BOND_STATE_BONDED)
-> > -                       continue;
-> > -
-> > 
-> >                 bdaddr2android(&dev->bdaddr, buf + (i *
-> >                 sizeof(bdaddr_t)));
-> >                 i++;
-> >         
-> >         }
-> > 
-> > @@ -2697,11 +2718,10 @@ static void send_bonded_devices_props(void)
-> > 
-> >  {
-> >  
-> >         GSList *l;
-> > 
-> > -       for (l = devices; l; l = g_slist_next(l)) {
-> > +       for (l = bonded_devices; l; l = g_slist_next(l)) {
-> > 
-> >                 struct device *dev = l->data;
-> > 
-> > -               if (dev->bond_state == HAL_BOND_STATE_BONDED)
-> > -                       get_remote_device_props(dev);
-> > +               get_remote_device_props(dev);
-> > 
-> >         }
-> >  
-> >  }
-> > 
-> > @@ -3099,6 +3119,9 @@ void bt_bluetooth_unregister(void)
-> > 
-> >  {
-> >  
-> >         DBG("");
-> > 
-> > +       g_slist_free_full(bonded_devices, (GDestroyNotify) free_device);
-> > +       bonded_devices = NULL;
-> > +
-> > 
-> >         g_slist_free_full(devices, (GDestroyNotify) free_device);
+> > +#define DEVICES_CACHE_MAX 100
 > 
-> You can make free_device to take a void pointer so you don't have to
-> cast in such cases.
+> Is this being limited because Android UI cannot handle more than that?
+> Or perhaps because our IPC/MTU cannot carry more than that? If the
+> latter I believe we can actually calculate the maximun e.g. MTU / pdu
+> size.
 
-Yes, that could be done, since this function is already present I'll change 
-that in separate patch.
+This is not related to Android UI nor MTU. This is just to limit max resources 
+usage. Value is totally arbitrary. If device is not in cache some HAL 
+functions might fail (notably set/get device property).
 
 -- 
 Szymon K. Janc
