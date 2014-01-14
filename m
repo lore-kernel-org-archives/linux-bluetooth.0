@@ -1,40 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 0/5] Remote device cache support
-Date: Tue, 14 Jan 2014 12:11:40 +0100
-Message-Id: <1389697905-18532-1-git-send-email-szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [BlueZ v2 01/12] audio/A2DP: Add implemention of SEP open indication
+Date: Tue, 14 Jan 2014 11:54:51 +0100
+Message-ID: <3272865.iSbmScqRCU@uw000953>
+In-Reply-To: <1389696168-26947-1-git-send-email-luiz.dentz@gmail.com>
+References: <1389696168-26947-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Luiz,
 
-This adds support for permanent cache of remote devices info. Cache size is
-limited to DEVICES_CACHE_MAX (currently 100) and oldest devices (based on
-timestamp) is removed if cache gets full.
+On Tuesday 14 of January 2014 12:42:37 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> ---
+>  android/a2dp.c | 49 +++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 35 insertions(+), 14 deletions(-)
+> 
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index 1f7678a..1a9adb8 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -581,9 +581,44 @@ static gboolean sep_setconf_ind(struct avdtp *session,
+>  	return TRUE;
+>  }
+>  
+> +static struct a2dp_setup *find_setup(uint8_t id)
+> +{
+> +	GSList *l;
+> +
+> +	for (l = setups; l; l = g_slist_next(l)) {
+> +		struct a2dp_setup *setup = l->data;
+> +
+> +		if (setup->endpoint->id == id)
+> +			return setup;
+> +	}
+> +
+> +	return NULL;
+> +}
+> +
+> +static gboolean sep_open_ind(struct avdtp *session, struct avdtp_local_sep *sep,
+> +				struct avdtp_stream *stream, uint8_t *err,
+> +				void *user_data)
+> +{
+> +	struct a2dp_endpoint *endpoint = user_data;
+> +	struct a2dp_setup *setup;
+> +
+> +	DBG("");
+> +
+> +	setup = find_setup(endpoint->id);
+> +	if (!setup) {
+> +		error("Unable to find stream setup for endpoint %u",
+> +								endpoint->id);
+> +		*err = AVDTP_SEP_NOT_IN_USE;
+> +		return FALSE;
+> +	}
+> +
+> +	return TRUE;
+> +}
+> +
+>  static struct avdtp_sep_ind sep_ind = {
+>  	.get_capability		= sep_getcap_ind,
+>  	.set_configuration	= sep_setconf_ind,
+> +	.open			= sep_open_ind,
+>  };
+>  
+>  static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
+> @@ -713,20 +748,6 @@ static void bt_audio_close(const void *buf, uint16_t len)
+>  	audio_ipc_send_rsp(AUDIO_OP_CLOSE, AUDIO_STATUS_SUCCESS);
+>  }
+>  
+> -static struct a2dp_setup *find_setup(uint8_t id)
+> -{
+> -	GSList *l;
+> -
+> -	for (l = setups; l; l = g_slist_next(l)) {
+> -		struct a2dp_setup *setup = l->data;
+> -
+> -		if (setup->endpoint->id == id)
+> -			return setup;
+> -	}
+> -
+> -	return NULL;
+> -}
+> -
+>  static void bt_stream_open(const void *buf, uint16_t len)
+>  {
+>  	const struct audio_cmd_open_stream *cmd = buf;
+> 
 
-notes:
- - there is still place for improvements in number of reads/writes done.
-   Will work on that when current cache approach is accepted.
- - there is no need to cache SDP (we cache UUIDs)
-
-Comments are welcome.
+All patches in this set have been applied, thanks.
 
 -- 
-BR
+Best regards, 
 Szymon Janc
-
-Szymon Janc (5):
-  android/bluetooth: Split devices list to devices and bonded_devices
-  android/bluetooth: Use defines for settings and devices files paths
-  android/bluetooth: Always store device info
-  android/bluetooth: Add support for caching remote device info
-  android/bluetooth: Add support for loading caches devices from storage
-
- android/bluetooth.c | 199 ++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 148 insertions(+), 51 deletions(-)
-
--- 
-1.8.3.2
-
