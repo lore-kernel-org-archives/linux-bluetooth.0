@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v2 11/12] audio/A2DP: Add implemention of SEP abort confirmation
-Date: Tue, 14 Jan 2014 12:42:47 +0200
-Message-Id: <1389696168-26947-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [BlueZ v2 08/12] audio/A2DP: Add implemention of SEP start confirmation
+Date: Tue, 14 Jan 2014 12:42:44 +0200
+Message-Id: <1389696168-26947-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1389696168-26947-1-git-send-email-luiz.dentz@gmail.com>
 References: <1389696168-26947-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,14 +16,14 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
  1 file changed, 15 insertions(+)
 
 diff --git a/android/a2dp.c b/android/a2dp.c
-index 146abd3..9f3164a 100644
+index 59f8bf5..940cb9c 100644
 --- a/android/a2dp.c
 +++ b/android/a2dp.c
-@@ -923,12 +923,27 @@ static void sep_close_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
+@@ -881,9 +881,24 @@ static void sep_open_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
  	setup_remove_by_id(endpoint->id);
  }
  
-+static void sep_abort_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
++static void sep_start_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
 +			struct avdtp_stream *stream, struct avdtp_error *err,
 +			void *user_data)
 +{
@@ -31,7 +31,7 @@ index 146abd3..9f3164a 100644
 +
 +	DBG("");
 +
-+	if (err)
++	if (!err)
 +		return;
 +
 +	setup_remove_by_id(endpoint->id);
@@ -40,10 +40,7 @@ index 146abd3..9f3164a 100644
  static struct avdtp_sep_cfm sep_cfm = {
  	.set_configuration	= sep_setconf_cfm,
  	.open			= sep_open_cfm,
- 	.start			= sep_start_cfm,
- 	.suspend		= sep_suspend_cfm,
- 	.close			= sep_close_cfm,
-+	.abort			= sep_abort_cfm,
++	.start			= sep_start_cfm,
  };
  
  static uint8_t register_endpoint(const uint8_t *uuid, uint8_t codec,
