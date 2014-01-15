@@ -1,157 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pics: Add PICS and PIXIT for AVCTP
-Date: Wed, 15 Jan 2014 10:31:35 +0100
-Message-Id: <1389778295-846-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH] Bluetooth: Queue incoming ACL data until BT_CONNECTED state is reached
+Date: Wed, 15 Jan 2014 11:30:31 +0200
+Message-Id: <1389778231-20307-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add PICS/PIXIT for AVCTP, targeting Android 4.4.
----
- android/Makefile.am     |  1 +
- android/pics-avctp.txt  | 75 +++++++++++++++++++++++++++++++++++++++++++++++++
- android/pixit-avctp.txt | 39 +++++++++++++++++++++++++
- 3 files changed, 115 insertions(+)
- create mode 100644 android/pics-avctp.txt
- create mode 100644 android/pixit-avctp.txt
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 7806f79..cd4a526 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -147,4 +147,5 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
- 		android/pics-l2cap.txt android/pixit-l2cap.txt \
- 		android/pics-avrcp.txt android/pixit-avrcp.txt \
- 		android/pics-a2dp.txt android/pixit-a2dp.txt \
-+		android/pics-avctp.txt android/pixit-avctp.txt \
- 		android/pts-l2cap.txt
-diff --git a/android/pics-avctp.txt b/android/pics-avctp.txt
-new file mode 100644
-index 0000000..939ffdb
---- /dev/null
-+++ b/android/pics-avctp.txt
-@@ -0,0 +1,75 @@
-+AVCTP PICS for the PTS tool.
+This patch adds a queue for incoming L2CAP data that's received before
+l2cap_connect_cfm is called and processes the data once
+l2cap_connect_cfm is called. This way we ensure that we have e.g. all
+remote features before processing L2CAP signaling data (which is very
+important for making the correct security decisions).
+
+The processing of the pending rx data needs to be done through
+queue_work since unlike l2cap_recv_acldata, l2cap_connect_cfm is called
+with the hci_dev lock held which could cause potential deadlocks.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+This patch is e.g. needed for the "L2CAP BR/EDR Server - Security Block"
+l2cap-tester test case to pass reliably.
+
+ include/net/bluetooth/l2cap.h |  3 +++
+ net/bluetooth/l2cap_core.c    | 33 +++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+)
+
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index dbc4a89984ca..40e15cd948c1 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -623,6 +623,9 @@ struct l2cap_conn {
+ 	__u32			rx_len;
+ 	__u8			tx_ident;
+ 
++	struct sk_buff_head	pending_rx;
++	struct work_struct	pending_rx_work;
 +
-+PTS version: 5.0
+ 	__u8			disc_reason;
+ 
+ 	struct delayed_work	security_timer;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b0ad2c752d73..f2ee479a87a7 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -63,6 +63,8 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
+ static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+ 		     struct sk_buff_head *skbs, u8 event);
+ 
++static void process_pending_rx(struct work_struct *work);
 +
-+* - different than PTS defaults
-+# - not yet implemented/supported
+ static inline __u8 bdaddr_type(struct hci_conn *hcon, __u8 type)
+ {
+ 	if (hcon->type == LE_LINK) {
+@@ -1546,6 +1548,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
+ 	}
+ 
+ 	mutex_unlock(&conn->chan_lock);
 +
-+M - mandatory if such role selected
-+O - optional
++	queue_work(hcon->hdev->workqueue, &conn->pending_rx_work);
+ }
+ 
+ /* Notify sockets that we cannot guaranty reliability anymore */
+@@ -1671,6 +1675,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	kfree_skb(conn->rx_skb);
+ 
++	skb_queue_purge(&conn->pending_rx);
++	flush_work(&conn->pending_rx_work);
 +
-+		Protocol Version
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVCTP_0_1	False		AVCTP 1.0 (C.1)
-+TSPC_AVCTP_0_2	True (*)	AVCTP 1.2 (C.1)
-+TSPC_AVCTP_0_3	False		AVCTP 1.3 (C.1)
-+TSPC_AVCTP_0_4	False		AVCTP 1.4 (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support only one Protocol Version.
-+-------------------------------------------------------------------------------
+ 	l2cap_unregister_all_users(conn);
+ 
+ 	mutex_lock(&conn->chan_lock);
+@@ -1773,6 +1780,9 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
+ 	else
+ 		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
+ 
++	skb_queue_head_init(&conn->pending_rx);
++	INIT_WORK(&conn->pending_rx_work, process_pending_rx);
 +
+ 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
+ 
+ 	return conn;
+@@ -7084,9 +7094,16 @@ drop:
+ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ {
+ 	struct l2cap_hdr *lh = (void *) skb->data;
++	struct hci_conn *hcon = conn->hcon;
+ 	u16 cid, len;
+ 	__le16 psm;
+ 
++	if (hcon->state != BT_CONNECTED) {
++		BT_DBG("queueing pending rx skb");
++		skb_queue_tail(&conn->pending_rx, skb);
++		return;
++	}
 +
-+		Roles
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVCTP_1_1	False		Controller (C.1)
-+TSPC_AVCTP_1_2	True (*)	Target (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of the defined roles.
-+-------------------------------------------------------------------------------
+ 	skb_pull(skb, L2CAP_HDR_SIZE);
+ 	cid = __le16_to_cpu(lh->cid);
+ 	len = __le16_to_cpu(lh->len);
+@@ -7132,6 +7149,22 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	}
+ }
+ 
++static void process_pending_rx(struct work_struct *work)
++{
++	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
++					       pending_rx_work);
 +
++	BT_DBG("");
 +
-+		Controller Features
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVCTP_2_1	False		Message fragmentation (O)
-+TSPC_AVCTP_2_2	False (*)	Transaction label management (M)
-+TSPC_AVCTP_2_3	False (*)	Packet type field management (M)
-+TSPC_AVCTP_2_4	False (*)	Message type field management (M)
-+TSPC_AVCTP_2_5	False (*)	PID field management (M)
-+TSPC_AVCTP_2_6	False (*)	IPID field mangement (M)
-+TSPC_AVCTP_2_7	False (*)	Message information management (M)
-+TSPC_AVCTP_2_8	False		Event registration for message reception (O)
-+TSPC_AVCTP_2_9	False		Event registration for connection request (O)
-+TSPC_AVCTP_2_10	False		Event registration for disconnection (O)
-+TSPC_AVCTP_2_11	False		Connect request (O)
-+TSPC_AVCTP_2_12	False		Disconnect request (O)
-+TSPC_AVCTP_2_13	False		Send message (O)
-+TSPC_AVCTP_2_14	False		Support for multiple AVCTP channel establishment
-+					(O)
-+-------------------------------------------------------------------------------
++	while (!skb_queue_empty(&conn->pending_rx)) {
++		struct sk_buff *skb;
 +
++		skb = skb_dequeue(&conn->pending_rx);
 +
-+		Target Features
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_AVCTP_3_1	True (*)	Message fragmentation (O)
-+TSPC_AVCTP_3_2	True		Transaction label management (M)
-+TSPC_AVCTP_3_3	True		Packet type field management (M)
-+TSPC_AVCTP_3_4	True		Message type field management (M)
-+TSPC_AVCTP_3_5	True		PID field management (M)
-+TSPC_AVCTP_3_6	True		IPID field management (M)
-+TSPC_AVCTP_3_7	True		Message information management (M)
-+TSPC_AVCTP_3_8	True (*)	Event registration for message reception (O)
-+TSPC_AVCTP_3_9	True (*)	Event registration for connection request (O)
-+TSPC_AVCTP_3_10	True (*)	Event registration for disconnection request (O)
-+TSPC_AVCTP_3_11	True (*)	Connect request (O)
-+TSPC_AVCTP_3_12	True (*)	Disconnect request (O)
-+TSPC_AVCTP_3_13	True (*)	Send message (O)
-+TSPC_AVCTP_ALL	False		Enables all test cases when set to TRUE
-+-------------------------------------------------------------------------------
-diff --git a/android/pixit-avctp.txt b/android/pixit-avctp.txt
-new file mode 100644
-index 0000000..c5782fd
---- /dev/null
-+++ b/android/pixit-avctp.txt
-@@ -0,0 +1,39 @@
-+AVCTP PIXIT for the PTS tool.
++		l2cap_recv_frame(conn, skb);
++	}
++}
 +
-+PTS version: 5.0
-+
-+* - different than PTS defaults
-+& - should be set to IUT Bluetooth address
-+# - should be set to PTS's bin/audio folder
-+
-+		Required PIXIT settings
-+-------------------------------------------------------------------------------
-+Parameter Name			Value
-+-------------------------------------------------------------------------------
-+TSPX_avctp_psm			0017
-+TSPX_avctp_profile_id		110E
-+TSPX_connect_avdtp		TRUE
-+TSPX_avctp_tester_command_data
-+TSPX_avctp_tester_response_data
-+TSPX_avctp_iut_command_data
-+TSPX_avctp_iut_response_data
-+TSPX_bd_addr_iut		08606E414394 (&)
-+TSPX_pin_code			0000
-+TSPX_delete_link_key		FALSE
-+TSPX_security_enabled		FALSE
-+TSPX_class_of_device		20050C
-+TSPX_player_feature_bitmask	0000000000000007FFF00070000000000
-+TSPX_avrcp_version
-+TSPX_establish_avdtp_stream	TRUE
-+TSPX_tester_av_role
-+TSPX_time_guard			300000
-+TSPX_avrcp_only			FALSE
-+TSPX_use_implicit_send		TRUE
-+TSPX_media_directory		C:\Program Files\Bluetooth SIG\Bluetooth PTS\
-+					bin\audio (#)
-+TSPX_no_confirmations		FALSE
-+TSPX_auth_password		0000
-+TSPX_auth_user_id		PTS
-+TSPX_rfcomm_channel		8
-+TSPX_l2cap_psm			1011
-+-------------------------------------------------------------------------------
+ /* ---- L2CAP interface with lower layer (HCI) ---- */
+ 
+ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
 -- 
-1.8.5.2
+1.8.4.2
 
