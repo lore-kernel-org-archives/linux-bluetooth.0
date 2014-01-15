@@ -1,95 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 6/8] android/ipc-tester: Register services
-Date: Wed, 15 Jan 2014 13:42:35 +0100
-Message-Id: <1389789757-16847-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 5/8] android/ipc-tester: Add sending test data with ipc
+Date: Wed, 15 Jan 2014 13:42:34 +0100
+Message-Id: <1389789757-16847-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1389789757-16847-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1389789757-16847-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds basic bluetooth service registration during setup procedure.
-Without this daemon would reject commands for not registered services.
+This patch adds some data structures used to send data with ipc during test setup
+and run stage.
 ---
- android/ipc-tester.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+ android/ipc-tester.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index 9ffb584..5901c78 100644
+index 9be7208..9ffb584 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -410,13 +410,53 @@ failed:
- 	return false;
- }
+@@ -55,6 +55,18 @@ struct test_data {
+ 	bool setup_done;
+ };
  
-+struct regmod_msg {
-+	struct hal_hdr header;
-+	struct hal_cmd_register_module cmd;
-+} __attribute__((packed));
++struct ipc_data {
++	void *buffer;
++	size_t len;
++};
 +
-+static bool setup_module(int service_id)
-+{
-+	struct hal_hdr response;
-+	struct hal_hdr expected_response;
++struct generic_data {
++	struct ipc_data ipc_data;
 +
-+	struct regmod_msg btmodule_msg = {
-+		.header = {
-+			.service_id = HAL_SERVICE_ID_CORE,
-+			.opcode = HAL_OP_REGISTER_MODULE,
-+			.len = sizeof(struct hal_cmd_register_module),
-+			},
-+		.cmd = {
-+			.service_id = service_id,
-+			},
-+	};
++	unsigned int num_services;
++	int init_services[];
++};
 +
-+	if (write(cmd_sk, &btmodule_msg, sizeof(btmodule_msg)) < 0)
-+		goto fail;
-+
-+	if (read(cmd_sk, &response, sizeof(response)) < 0)
-+		goto fail;
-+
-+	expected_response = btmodule_msg.header;
-+	expected_response.len = 0;
-+
-+	if (memcmp(&response, &expected_response, sizeof(response)) == 0)
-+		return true;
-+
-+fail:
-+	tester_warn("Module registration failed.");
-+	return false;
-+}
-+
- static void setup(const void *data)
+ #define CONNECT_TIMEOUT (5 * 1000)
+ #define SERVICE_NAME "bluetoothd"
+ 
+@@ -467,6 +479,13 @@ static void teardown(const void *data)
+ 
+ static void ipc_send_tc(const void *data)
  {
 +	const struct generic_data *generic_data = data;
- 	struct test_data *test_data = tester_get_data();
- 	int signal_fd[2];
- 	char buf[1024];
- 	pid_t pid;
- 	int len;
-+	unsigned int i;
- 
- 	if (pipe(signal_fd)) {
- 		tester_setup_failed();
-@@ -460,9 +500,15 @@ static void setup(const void *data)
- 		return;
- 	}
- 
--	/* TODO: register modules */
-+	tester_print("Will init %d services.", generic_data->num_services);
++	const struct ipc_data *ipc_data = &generic_data->ipc_data;
 +
-+	for (i = 0; i < generic_data->num_services; i++)
-+		if (!setup_module(generic_data->init_services[i]))
-+			tester_setup_failed();
- 
- 	test_data->setup_done = true;
-+
-+	tester_setup_complete();
++	if (ipc_data->len) {
++		if (write(cmd_sk, ipc_data->buffer, ipc_data->len) < 0)
++			tester_test_failed();
++	}
  }
  
- static void teardown(const void *data)
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+@@ -481,13 +500,22 @@ static void ipc_send_tc(const void *data)
+ 							3, user, g_free); \
+ 	} while (0)
+ 
++static const struct generic_data dummy_data = {
++	.ipc_data = {
++		.buffer = "",
++		.len = 1,
++	},
++	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
++	.num_services = 1,
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
+ 
+ 	tester_init(&argc, &argv);
+ 
+-	test_bredrle("Test Dummy", NULL, setup, ipc_send_tc, teardown);
++	test_bredrle("Test Dummy", &dummy_data, setup, ipc_send_tc, teardown);
+ 
+ 	return tester_run();
+ }
 -- 
 1.8.5.2
 
