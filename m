@@ -1,60 +1,173 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 0/8] IPC negative tester
-Date: Wed, 15 Jan 2014 17:04:04 +0100
-Message-ID: <1441708.baqoOpTijl@uw000953>
-In-Reply-To: <1389789757-16847-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1389789757-16847-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 01/12] android/tester: Add set device FRIENDLY_NAME prop success test case
+Date: Wed, 15 Jan 2014 14:24:15 +0100
+Message-ID: <11394729.TaXLZlWaWu@uw000953>
+In-Reply-To: <1389788228-32195-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1389788228-32195-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Grzegorz,
 
-On Wednesday 15 of January 2014 13:42:29 Jakub Tyszkowski wrote:
-> Following patchset adds IPC negative tester framework with few test cases
-> checking IPC's behaviour on daemon side. Expected daemon's behaviour is to
-> shut down gracefully in case of receiving invalid IPC data.
+On Wednesday 15 of January 2014 13:16:57 Grzegorz Kolodziejczyk wrote:
+> This adds set device FRIENDLY NAME property success test case.
+> ---
+>  android/android-tester.c | 99 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 99 insertions(+)
 > 
-> v2 changes:
->   * fixed few indentation issues
->   * fixed missing __attribute__((packed))
->   * fixed amount of data written for 'malformed data' test case
->   * fixed opcode for 'invalid service' test case
->   * added patch(8) with more 'malformed data' cases
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index 030111b..27f436f 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -653,6 +653,20 @@ static void remote_discovery_state_changed_cb(bt_discovery_state_t state)
+>  	}
+>  }
+>  
+> +static void remote_setprop_disc_state_changed_cb(bt_discovery_state_t state)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +
+> +	if (state == BT_DISCOVERY_STARTED && data->cb_count == 4) {
+> +		data->cb_count--;
+> +		return;
+> +	}
+> +	if (state == BT_DISCOVERY_STOPPED) {
+> +		data->cb_count--;
+> +		check_cb_count();
+> +	}
+> +}
+> +
+>  static void discovery_state_changed_cb(bt_discovery_state_t state)
+>  {
+>  	struct test_data *data = tester_get_data();
+> @@ -758,6 +772,27 @@ static void remote_get_property_device_found_cb(int num_properties,
+>  	check_expected_status(status);
+>  }
+>  
+> +static void remote_setprop_device_found_cb(int num_properties,
+> +						bt_property_t *properties)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +	const struct generic_data *test = data->test_data;
+> +	bt_status_t status;
+> +	uint8_t *bdaddr = (uint8_t *)hciemu_get_client_bdaddr(data->hciemu);
+> +	bt_bdaddr_t remote_addr;
+> +
+> +	const bt_property_t prop = test->expected_properties[0].prop;
+> +
+> +	bdaddr2android((const bdaddr_t *)bdaddr, &remote_addr.address);
+> +
+> +	if (data->cb_count == 3)
+> +		data->cb_count--;
+> +
+> +	status = data->if_bluetooth->set_remote_device_property(&remote_addr,
+> +									&prop);
+> +	check_expected_status(status);
+> +}
+> +
+>  static void device_found_cb(int num_properties, bt_property_t *properties)
+>  {
+>  	struct test_data *data = tester_get_data();
+> @@ -803,6 +838,29 @@ static void remote_test_device_properties_cb(bt_status_t status,
+>  		check_expected_property(properties[i]);
+>  }
+>  
+> +static void remote_setprop_device_properties_cb(bt_status_t status,
+> +				bt_bdaddr_t *bd_addr, int num_properties,
+> +				bt_property_t *properties)
+> +{
+> +	int i;
+> +	struct test_data *data = tester_get_data();
+> +	const struct generic_data *test = data->test_data;
+> +	uint8_t *bdaddr = (uint8_t *)hciemu_get_client_bdaddr(data->hciemu);
+> +	bt_bdaddr_t remote_addr;
+> +	const bt_property_t prop = test->expected_properties[1].prop;
+> +
+> +	for (i = 0; i < num_properties; i++)
+> +		check_expected_property(properties[i]);
+> +
+> +	if (g_slist_length(data->expected_properties_list) == 1) {
+> +		bdaddr2android((const bdaddr_t *)bdaddr, &remote_addr.address);
+> +		data->cb_count--;
+> +		check_cb_count();
+> +		data->if_bluetooth->get_remote_device_property(&remote_addr,
+> +								prop.type);
+> +	}
+> +}
+> +
+>  static void remote_device_properties_cb(bt_status_t status,
+>  				bt_bdaddr_t *bd_addr, int num_properties,
+>  				bt_property_t *properties)
+> @@ -1596,6 +1654,33 @@ static const struct generic_data bt_dev_getprop_fname_fail_test = {
+>  	.expected_adapter_status = BT_STATUS_FAIL,
+>  };
+>  
+> +static const char remote_setprop_fname_val[] = "set_fname_test";
+> +
+> +static struct priority_property remote_setprop_fname_props[] = {
+> +	{
+> +	.prop.type = BT_PROPERTY_REMOTE_FRIENDLY_NAME,
+> +	.prop.val = &remote_setprop_fname_val,
+> +	.prop.len = sizeof(remote_setprop_fname_val) - 1,
+> +	},
+> +	{
+> +	.prop.type = BT_PROPERTY_REMOTE_FRIENDLY_NAME,
+> +	.prop.val = &remote_setprop_fname_val,
+> +	.prop.len = sizeof(remote_setprop_fname_val) - 1,
+> +	},
+> +};
+> +
+> +static const struct generic_data bt_dev_setprop_fname_success_test = {
+> +	.expected_hal_cb.discovery_state_changed_cb =
+> +					remote_setprop_disc_state_changed_cb,
+> +	.expected_hal_cb.device_found_cb = remote_setprop_device_found_cb,
+> +	.expected_hal_cb.remote_device_properties_cb =
+> +					remote_setprop_device_properties_cb,
+> +	.expected_cb_count = 4,
+> +	.expected_properties_num = 2,
+> +	.expected_properties = remote_setprop_fname_props,
+> +	.expected_adapter_status = BT_STATUS_SUCCESS,
+> +};
+> +
+>  static bt_callbacks_t bt_callbacks = {
+>  	.size = sizeof(bt_callbacks),
+>  	.adapter_state_changed_cb = adapter_state_changed_cb,
+> @@ -2235,6 +2320,15 @@ static void test_dev_getprop_fname_fail(const void *test_data)
+>  	data->if_bluetooth->start_discovery();
+>  }
+>  
+> +static void test_dev_setprop_fname_success(const void *test_data)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +
+> +	init_test_conditions(data);
+> +
+> +	data->if_bluetooth->start_discovery();
+> +}
+> +
+>  /* Test Socket HAL */
+>  
+>  static void adapter_socket_state_changed_cb(bt_state_t state)
+> @@ -2907,6 +3001,11 @@ int main(int argc, char *argv[])
+>  					setup_enabled_adapter,
+>  					test_dev_getprop_fname_fail, teardown);
+>  
+> +	test_bredrle("Bluetooth Device Set FRIENDLY_NAME - Success",
+> +				&bt_dev_setprop_fname_success_test,
+> +				setup_enabled_adapter,
+> +				test_dev_setprop_fname_success, teardown);
+> +
+>  	test_bredrle("Socket Init", NULL, setup_socket_interface,
+>  						test_dummy, teardown);
+>  
 > 
-> v3 changes:
->   * changed license to GPL
->   * changed 'ipc-negative-tester' name to 'ipc-tester'
-> 
-> Jakub Tyszkowski (8):
->   android/ipc-tester: Skeleton for ipc negative tester
->   android/ipc-tester: Run daemon in separate process
->   android/ipc-tester: Add IPC initialization
->   android/ipc-tester: Add daemon shutdown handler
->   android/ipc-tester: Add sending test data with ipc
->   android/ipc-tester: Register services
->   android/ipc-tester: Add basic test cases for IPC's daemon site
->   androi/ipc-tester: Add more cases for malformed data
-> 
->  .gitignore           |   1 +
->  android/Makefile.am  |  17 ++
->  android/ipc-tester.c | 727 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 745 insertions(+)
->  create mode 100644 android/ipc-tester.c
-> 
-> --
-> 1.8.5.2
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Please send V4 with changes we discussed off-line.
+All patches applied, thanks.
 
 -- 
 Best regards, 
