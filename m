@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 08/11] android/hal-audio: Handle audio preset from stream
-Date: Wed, 15 Jan 2014 19:03:54 +0100
-Message-ID: <1389809037-11575-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 02/11] android/hal-audio: Add support to register audio endpoints
+Date: Wed, 15 Jan 2014 19:03:48 +0100
+Message-ID: <1389809037-11575-3-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1389809037-11575-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1389809037-11575-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,202 +12,238 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds handling of audio preset received after stream is
-opened. Preset is used to initialize codec and then to set input
-configuration so audio subsystem can write data in a format that
-codec can handle later.
+This patch adds support to register audio enpoints via Audio IPC.
+Endpoints are registered based on predefined codecs table and for
+each defined codec one endpoint is registered. By default, only
+SBC will be supported.
 ---
- android/hal-audio.c | 108 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 102 insertions(+), 6 deletions(-)
+ android/hal-audio.c | 187 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 187 insertions(+)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 93db6eb..946531f 100644
+index 354c3cf..6aad002 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -51,7 +51,15 @@ struct audio_input_config {
- 	audio_format_t format;
- };
+@@ -31,6 +31,11 @@
+ #include "audio-msg.h"
+ #include "hal-log.h"
+ #include "hal-msg.h"
++#include "../profiles/audio/a2dp-codecs.h"
++
++static const uint8_t a2dp_src_uuid[] = {
++		0x00, 0x00, 0x11, 0x0a, 0x00, 0x00, 0x10, 0x00,
++		0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb };
  
-+struct sbc_data {
-+	a2dp_sbc_t sbc;
+ static int listen_sk = -1;
+ static int audio_sk = -1;
+@@ -40,11 +45,138 @@ static pthread_t ipc_th = 0;
+ static pthread_mutex_t close_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
++struct audio_input_config {
++	uint32_t rate;
++	uint32_t channels;
++	audio_format_t format;
 +};
 +
- static int sbc_get_presets(struct audio_preset *preset, size_t *len);
-+static int sbc_init(struct audio_preset *preset, void **codec_data);
-+static int sbc_cleanup(void *codec_data);
-+static int sbc_get_config(void *codec_data,
++static int sbc_get_presets(struct audio_preset *preset, size_t *len);
++
++struct audio_codec {
++	uint8_t type;
++
++	int (*get_presets) (struct audio_preset *preset, size_t *len);
++
++	int (*init) (struct audio_preset *preset, void **codec_data);
++	int (*cleanup) (void *codec_data);
++	int (*get_config) (void *codec_data,
 +					struct audio_input_config *config);
- 
- struct audio_codec {
- 	uint8_t type;
-@@ -71,6 +79,10 @@ static const struct audio_codec audio_codecs[] = {
- 		.type = A2DP_CODEC_SBC,
- 
- 		.get_presets = sbc_get_presets,
++	ssize_t (*write_data) (void *codec_data, const void *buffer,
++				size_t bytes);
++};
 +
-+		.init = sbc_init,
-+		.cleanup = sbc_cleanup,
-+		.get_config = sbc_get_config,
- 	}
- };
- 
-@@ -99,6 +111,7 @@ struct a2dp_stream_out {
- 
- 	struct audio_endpoint *ep;
- 	enum a2dp_state_t audio_state;
-+	struct audio_input_config cfg;
- };
- 
++static const struct audio_codec audio_codecs[] = {
++	{
++		.type = A2DP_CODEC_SBC,
++
++		.get_presets = sbc_get_presets,
++	}
++};
++
++#define NUM_CODECS (sizeof(audio_codecs) / sizeof(audio_codecs[0]))
++
++#define MAX_AUDIO_ENDPOINTS NUM_CODECS
++
++struct audio_endpoint {
++	uint8_t id;
++	const struct audio_codec *codec;
++	void *codec_data;
++	int fd;
++};
++
++static struct audio_endpoint audio_endpoints[MAX_AUDIO_ENDPOINTS];
++
  struct a2dp_audio_dev {
-@@ -191,6 +204,64 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
- 	return i;
- }
+ 	struct audio_hw_device dev;
+ 	struct audio_stream_out *out;
+ };
  
-+static int sbc_init(struct audio_preset *preset, void **codec_data)
++static const a2dp_sbc_t sbc_presets[] = {
++	{
++		.frequency = SBC_SAMPLING_FREQ_44100 | SBC_SAMPLING_FREQ_48000,
++		.channel_mode = SBC_CHANNEL_MODE_MONO |
++				SBC_CHANNEL_MODE_DUAL_CHANNEL |
++				SBC_CHANNEL_MODE_STEREO |
++				SBC_CHANNEL_MODE_JOINT_STEREO,
++		.subbands = SBC_SUBBANDS_4 | SBC_SUBBANDS_8,
++		.allocation_method = SBC_ALLOCATION_SNR |
++					SBC_ALLOCATION_LOUDNESS,
++		.block_length = SBC_BLOCK_LENGTH_4 | SBC_BLOCK_LENGTH_8 |
++				SBC_BLOCK_LENGTH_12 | SBC_BLOCK_LENGTH_16,
++		.min_bitpool = MIN_BITPOOL,
++		.max_bitpool = MAX_BITPOOL
++	},
++	/* middle quality */
++	{
++		.frequency = SBC_SAMPLING_FREQ_44100,
++		.channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO,
++		.subbands = SBC_SUBBANDS_8,
++		.allocation_method = SBC_ALLOCATION_LOUDNESS,
++		.block_length = SBC_BLOCK_LENGTH_16,
++		.min_bitpool = MIN_BITPOOL,
++		.max_bitpool = 35
++	},
++	{
++		.frequency = SBC_SAMPLING_FREQ_48000,
++		.channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO,
++		.subbands = SBC_SUBBANDS_8,
++		.allocation_method = SBC_ALLOCATION_LOUDNESS,
++		.block_length = SBC_BLOCK_LENGTH_16,
++		.min_bitpool = MIN_BITPOOL,
++		.max_bitpool = 33
++	},
++	/* high quality */
++	{
++		.frequency = SBC_SAMPLING_FREQ_44100,
++		.channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO,
++		.subbands = SBC_SUBBANDS_8,
++		.allocation_method = SBC_ALLOCATION_LOUDNESS,
++		.block_length = SBC_BLOCK_LENGTH_16,
++		.min_bitpool = MIN_BITPOOL,
++		.max_bitpool = 53
++	},
++	{
++		.frequency = SBC_SAMPLING_FREQ_48000,
++		.channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO,
++		.subbands = SBC_SUBBANDS_8,
++		.allocation_method = SBC_ALLOCATION_LOUDNESS,
++		.block_length = SBC_BLOCK_LENGTH_16,
++		.min_bitpool = MIN_BITPOOL,
++		.max_bitpool = 51
++	},
++};
++
++static int sbc_get_presets(struct audio_preset *preset, size_t *len)
 +{
-+	struct sbc_data *sbc_data;
++	int i;
++	int count;
++	size_t new_len = 0;
++	uint8_t *ptr = (uint8_t *) preset;
++	size_t preset_size = sizeof(*preset) + sizeof(a2dp_sbc_t);
 +
 +	DBG("");
 +
-+	if (preset->len != sizeof(a2dp_sbc_t)) {
-+		DBG("preset size mismatch");
-+		return AUDIO_STATUS_FAILED;
++	count = sizeof(sbc_presets) / sizeof(sbc_presets[0]);
++
++	for (i = 0; i < count; i++) {
++		preset = (struct audio_preset *) ptr;
++
++		if (new_len + preset_size > *len)
++			break;
++
++		preset->len = sizeof(a2dp_sbc_t);
++		memcpy(preset->data, &sbc_presets[i], preset->len);
++
++		new_len += preset_size;
++		ptr += preset_size;
 +	}
 +
-+	sbc_data = calloc(sizeof(struct sbc_data), 1);
++	*len = new_len;
 +
-+	memcpy(&sbc_data->sbc, preset->data, preset->len);
-+
-+	*codec_data = sbc_data;
-+
-+	return AUDIO_STATUS_SUCCESS;
-+}
-+
-+static int sbc_cleanup(void *codec_data)
-+{
-+	DBG("");
-+
-+	free(codec_data);
-+
-+	return AUDIO_STATUS_SUCCESS;
-+}
-+
-+static int sbc_get_config(void *codec_data,
-+					struct audio_input_config *config)
-+{
-+	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
-+
-+	switch (sbc_data->sbc.frequency) {
-+	case SBC_SAMPLING_FREQ_16000:
-+		config->rate = 16000;
-+		break;
-+	case SBC_SAMPLING_FREQ_32000:
-+		config->rate = 32000;
-+		break;
-+	case SBC_SAMPLING_FREQ_44100:
-+		config->rate = 44100;
-+		break;
-+	case SBC_SAMPLING_FREQ_48000:
-+		config->rate = 48000;
-+		break;
-+	default:
-+		return AUDIO_STATUS_FAILED;
-+	}
-+	config->channels = sbc_data->sbc.channel_mode == SBC_CHANNEL_MODE_MONO ?
-+				AUDIO_CHANNEL_OUT_MONO :
-+				AUDIO_CHANNEL_OUT_STEREO;
-+	config->format = AUDIO_FORMAT_PCM_16_BIT;
-+
-+	return AUDIO_STATUS_SUCCESS;
++	return i;
 +}
 +
  static void audio_ipc_cleanup(void)
  {
  	if (audio_sk >= 0) {
-@@ -527,14 +598,25 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 
- static uint32_t out_get_sample_rate(const struct audio_stream *stream)
- {
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
-+
- 	DBG("");
--	return -ENOSYS;
-+
-+	return out->cfg.rate;
+@@ -200,6 +332,54 @@ failed:
+ 	return AUDIO_STATUS_FAILED;
  }
  
- static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
- {
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
++static int ipc_open_cmd(const struct audio_codec *codec)
++{
++	uint8_t buf[BLUEZ_AUDIO_MTU];
++	struct audio_cmd_open *cmd = (struct audio_cmd_open *) buf;
++	struct audio_rsp_open rsp;
++	size_t cmd_len = sizeof(buf) - sizeof(*cmd);
++	size_t rsp_len = sizeof(rsp);
++	int result;
 +
- 	DBG("");
--	return -ENOSYS;
++	DBG("");
 +
-+	if (rate != out->cfg.rate) {
-+		DBG("cannot set sample rate to %d", rate);
-+		return -1;
++	memcpy(cmd->uuid, a2dp_src_uuid, sizeof(a2dp_src_uuid));
++
++	cmd->codec = codec->type;
++	cmd->presets = codec->get_presets(cmd->preset, &cmd_len);
++
++	cmd_len += sizeof(*cmd);
++
++	result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN, cmd_len, cmd,
++				&rsp_len, &rsp, NULL);
++
++	if (result != AUDIO_STATUS_SUCCESS)
++		return 0;
++
++	return rsp.id;
++}
++
++static int register_endpoints(void)
++{
++	struct audio_endpoint *ep = &audio_endpoints[0];
++	size_t i;
++
++	for (i = 0; i < NUM_CODECS; i++, ep++) {
++		const struct audio_codec *codec = &audio_codecs[i];
++
++		ep->id = ipc_open_cmd(codec);
++
++		if (!ep->id)
++			return AUDIO_STATUS_FAILED;
++
++		ep->codec = codec;
++		ep->codec_data = NULL;
++		ep->fd = -1;
 +	}
 +
-+	return 0;
- }
- 
- static size_t out_get_buffer_size(const struct audio_stream *stream)
-@@ -545,14 +627,20 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
- 
- static uint32_t out_get_channels(const struct audio_stream *stream)
++	return AUDIO_STATUS_SUCCESS;
++}
++
+ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 								size_t bytes)
  {
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+@@ -592,6 +772,13 @@ static void *ipc_handler(void *data)
+ 
+ 		DBG("Audio IPC: Connected");
+ 
++		if (register_endpoints() != AUDIO_STATUS_SUCCESS) {
++			error("audio: Failed to register endpoints");
 +
- 	DBG("");
--	return -ENOSYS;
++			shutdown(audio_sk, SHUT_RDWR);
++			continue;
++		}
 +
-+	return out->cfg.channels;
- }
- 
- static audio_format_t out_get_format(const struct audio_stream *stream)
- {
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
-+
- 	DBG("");
--	return -ENOSYS;
-+
-+	return out->cfg.format;
- }
- 
- static int out_set_format(struct audio_stream *stream, audio_format_t format)
-@@ -778,6 +866,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
- 	struct a2dp_stream_out *out;
- 	struct audio_preset *preset;
-+	const struct audio_codec *codec;
- 
- 	out = calloc(1, sizeof(struct a2dp_stream_out));
- 	if (!out)
-@@ -811,7 +900,13 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	if (!preset)
- 		goto fail;
- 
--	/* TODO: initialize codec using received audio_preset */
-+	codec = out->ep->codec;
-+
-+	codec->init(preset, &out->ep->codec_data);
-+	codec->get_config(out->ep->codec_data, &out->cfg);
-+
-+	DBG("rate=%d channels=%d format=%d", out->cfg.rate,
-+			out->cfg.channels, out->cfg.format);
- 
- 	free(preset);
- 
-@@ -838,7 +933,8 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
- 
- 	ipc_close_stream_cmd(ep->id);
- 
--	/* TODO: cleanup codec */
-+	ep->codec->cleanup(ep->codec_data);
-+	ep->codec_data = NULL;
- 
- 	free(stream);
- 	a2dp_dev->out = NULL;
+ 		memset(&pfd, 0, sizeof(pfd));
+ 		pfd.fd = audio_sk;
+ 		pfd.events = POLLHUP | POLLERR | POLLNVAL;
 -- 
 1.8.5.2
 
