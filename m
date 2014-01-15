@@ -1,332 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] android: Add android ipc tester
-Date: Wed, 15 Jan 2014 20:12:26 +0100
-Message-Id: <1389813150-16914-1-git-send-email-marcin.kraglak@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 11/11] android/hal-audio: Implement set_parameters for device
+Date: Wed, 15 Jan 2014 19:03:57 +0100
+Message-ID: <1389809037-11575-12-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1389809037-11575-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1389809037-11575-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This tool will test ipc library. First test case will check
-ipc_init() call.
 ---
- .gitignore                 |   1 +
- android/Makefile.am        |   8 ++
- android/test-android-ipc.c | 277 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 286 insertions(+)
- create mode 100644 android/test-android-ipc.c
+ android/hal-audio.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/.gitignore b/.gitignore
-index ac76fe2..0d0834b 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -114,3 +114,4 @@ android/bluetoothd
- android/haltest
- android/android-tester
- android/bluetoothd-snoop
-+android/test-android-ipc
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 7806f79..271a3e8 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -117,6 +117,14 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 58f48bb..a435aec 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -943,8 +943,16 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+ static int audio_set_parameters(struct audio_hw_device *dev,
+ 							const char *kvpairs)
+ {
++	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
++	struct a2dp_stream_out *out = a2dp_dev->out;
++
+ 	DBG("");
+-	return -ENOSYS;
++
++	if (!out)
++		return 0;
++
++	return out->stream.common.set_parameters((struct audio_stream *) out,
++							kvpairs);
+ }
  
- android_android_tester_LDFLAGS = -pthread -ldl
- 
-+noinst_PROGRAMS += android/test-android-ipc
-+
-+android_test_android_ipc_SOURCES = android/test-android-ipc.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/log.h src/log.c \
-+				android/ipc.c android/ipc.h
-+android_test_android_ipc_LDADD = @GLIB_LIBS@
-+
- plugin_LTLIBRARIES += android/audio.a2dp.default.la
- 
- android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
-diff --git a/android/test-android-ipc.c b/android/test-android-ipc.c
-new file mode 100644
-index 0000000..6ac1175
---- /dev/null
-+++ b/android/test-android-ipc.c
-@@ -0,0 +1,277 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
-+#include <string.h>
-+#include <fcntl.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <sys/signalfd.h>
-+
-+#include <glib.h>
-+#include "src/shared/util.h"
-+#include "src/log.h"
-+#include "android/hal-msg.h"
-+#include "android/ipc.h"
-+
-+struct test_data {
-+	uint32_t expected_signal;
-+};
-+
-+struct context {
-+	GMainLoop *main_loop;
-+
-+	int sk;
-+
-+	guint source;
-+	guint cmd_source;
-+	guint notif_source;
-+
-+	GIOChannel *cmd_io;
-+	GIOChannel *notif_io;
-+	GIOChannel *signal_io;
-+
-+	guint signal_source;
-+
-+	const struct test_data *data;
-+};
-+
-+static void context_quit(struct context *context)
-+{
-+	g_main_loop_quit(context->main_loop);
-+}
-+
-+static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	GIOChannel *new_io;
-+	GIOCondition watch_cond;
-+	int sk;
-+
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	g_assert(!context->cmd_source || !context->notif_source);
-+
-+	sk = accept(context->sk, NULL, NULL);
-+	g_assert(sk >= 0);
-+
-+	new_io = g_io_channel_unix_new(sk);
-+
-+	watch_cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+
-+	if (context->cmd_source && !context->notif_source) {
-+		context->notif_source = g_io_add_watch(new_io, watch_cond,
-+							notif_watch, context);
-+		g_assert(context->notif_source > 0);
-+		context->notif_io = new_io;
-+	}
-+
-+	if (!context->cmd_source) {
-+		context->cmd_source = g_io_add_watch(new_io, watch_cond,
-+							cmd_watch, context);
-+		context->cmd_io = new_io;
-+	}
-+
-+	if (context->cmd_source && context->notif_source)
-+		context_quit(context);
-+
-+	return TRUE;
-+}
-+
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_data *test_data = context->data;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
-+
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
-+		return FALSE;
-+
-+	fd = g_io_channel_unix_get_fd(channel);
-+
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return FALSE;
-+
-+	g_assert(test_data->expected_signal == si.ssi_signo);
-+	context_quit(context);
-+	return TRUE;
-+}
-+
-+static guint setup_signalfd(gpointer user_data)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int ret;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
-+	g_assert(ret == 0);
-+
-+	fd = signalfd(-1, &mask, 0);
-+	g_assert(fd >= 0);
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, user_data);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
-+static struct context *create_context(gconstpointer data)
-+{
-+	struct context *context = g_new0(struct context, 1);
-+	struct sockaddr_un addr;
-+	GIOChannel *io;
-+	int ret, sk;
-+
-+	context->main_loop = g_main_loop_new(NULL, FALSE);
-+	g_assert(context->main_loop);
-+
-+	context->signal_source = setup_signalfd(context);
-+	g_assert(context->signal_source);
-+
-+	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-+	g_assert(sk >= 0);
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+
-+	ret = bind(sk, (struct sockaddr *) &addr, sizeof(addr));
-+	g_assert(ret == 0);
-+
-+	ret = listen(sk, 5);
-+	g_assert(ret == 0);
-+
-+	io = g_io_channel_unix_new(sk);
-+
-+	g_io_channel_set_close_on_unref(io, TRUE);
-+
-+	context->source = g_io_add_watch(io,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				connect_handler, context);
-+	g_assert(context->source > 0);
-+
-+	g_io_channel_unref(io);
-+
-+	context->sk = sk;
-+	context->data = data;
-+
-+	return context;
-+}
-+
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	g_io_channel_shutdown(context->notif_io, true, NULL);
-+	g_io_channel_shutdown(context->cmd_io, true, NULL);
-+	g_io_channel_unref(context->cmd_io);
-+	g_io_channel_unref(context->notif_io);
-+
-+	g_source_remove(context->notif_source);
-+	g_source_remove(context->signal_source);
-+	g_source_remove(context->cmd_source);
-+	g_source_remove(context->source);
-+
-+	g_main_loop_unref(context->main_loop);
-+
-+	g_free(context);
-+}
-+
-+static void test_init(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+
-+	ipc_init();
-+
-+	execute_context(context);
-+
-+	ipc_cleanup();
-+}
-+
-+static const struct test_data test_init_1 = {};
-+
-+int main(int argc, char *argv[])
-+{
-+	g_test_init(&argc, &argv, NULL);
-+
-+	if (g_test_verbose())
-+		__btd_log_init("*", 0);
-+
-+	g_test_add_data_func("/android_ipc/init", &test_init_1, test_init);
-+
-+	return g_test_run();
-+}
+ static char *audio_get_parameters(const struct audio_hw_device *dev,
 -- 
-1.8.3.1
+1.8.5.2
 
