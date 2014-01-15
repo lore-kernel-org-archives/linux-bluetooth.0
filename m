@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 06/10] android/hal-audio: Add support to resume output stream
-Date: Wed, 15 Jan 2014 10:59:53 +0100
-Message-ID: <1389779996-9749-7-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 04/10] android/hal-audio: Add support to open output stream
+Date: Wed, 15 Jan 2014 10:59:51 +0100
+Message-ID: <1389779996-9749-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1389779996-9749-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1389779996-9749-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,32 +12,74 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to resume output stream via Audio IPC.
-Stream is automatically resumed on first write when stream is in
-standby state.
+This patch adds support to open output stream via Audio IPC.
+Since only SBC is supported, we always try to open stream for first
+endpoint only which is enough.
 ---
- android/hal-audio.c | 37 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 35 insertions(+), 2 deletions(-)
+ android/hal-audio.c | 109 ++++++++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 88 insertions(+), 21 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index ebb742c..3c799e3 100644
+index 3b4648a..2ced954 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -415,6 +415,21 @@ static int ipc_close_stream_cmd(uint8_t endpoint_id)
+@@ -87,9 +87,23 @@ struct audio_endpoint {
+ 
+ static struct audio_endpoint audio_endpoints[MAX_AUDIO_ENDPOINTS];
+ 
++enum a2dp_state_t {
++	AUDIO_A2DP_STATE_NONE,
++	AUDIO_A2DP_STATE_STANDBY,
++	AUDIO_A2DP_STATE_SUSPENDED,
++	AUDIO_A2DP_STATE_STARTED
++};
++
++struct a2dp_stream_out {
++	struct audio_stream_out stream;
++
++	struct audio_endpoint *ep;
++	enum a2dp_state_t audio_state;
++};
++
+ struct a2dp_audio_dev {
+ 	struct audio_hw_device dev;
+-	struct audio_stream_out *out;
++	struct a2dp_stream_out *out;
+ };
+ 
+ static const a2dp_sbc_t codec_sbc_presets[] = {
+@@ -354,6 +368,38 @@ static int ipc_close_cmd(uint8_t endpoint_id)
  	return result;
  }
  
-+static int ipc_resume_stream_cmd(uint8_t endpoint_id)
++static int ipc_open_stream_cmd(uint8_t endpoint_id,
++					struct audio_preset **caps)
 +{
-+	struct audio_cmd_resume_stream cmd;
++	char buf[BLUEZ_AUDIO_MTU];
++	struct audio_cmd_open_stream cmd;
++	struct audio_rsp_open_stream *rsp =
++					(struct audio_rsp_open_stream *) &buf;
++	size_t rsp_len = sizeof(buf);
 +	int result;
 +
 +	DBG("");
 +
++	if (!caps)
++		return AUDIO_STATUS_FAILED;
++
 +	cmd.id = endpoint_id;
 +
-+	result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_RESUME_STREAM,
-+				sizeof(cmd), &cmd, NULL, NULL, NULL);
++	result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
++				sizeof(cmd), &cmd, &rsp_len, rsp, NULL);
++
++	if (result == AUDIO_STATUS_SUCCESS) {
++		size_t buf_len = sizeof(struct audio_preset) +
++					rsp->preset[0].len;
++		*caps = malloc(buf_len);
++		memcpy(*caps, &rsp->preset, buf_len);
++	} else {
++		*caps = NULL;
++	}
 +
 +	return result;
 +}
@@ -45,35 +87,83 @@ index ebb742c..3c799e3 100644
  static int register_endpoints(void)
  {
  	struct audio_endpoint *ep = &audio_endpoints[0];
-@@ -453,8 +468,26 @@ static void unregister_endpoints(void)
- static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 								size_t bytes)
+@@ -595,35 +641,56 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 
  {
--	DBG("");
--	return -ENOSYS;
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
+-	struct audio_stream_out *out;
++	struct a2dp_stream_out *out;
++	struct audio_preset *preset;
+ 
+-	out = calloc(1, sizeof(struct audio_stream_out));
++	out = calloc(1, sizeof(struct a2dp_stream_out));
+ 	if (!out)
+ 		return -ENOMEM;
+ 
+ 	DBG("");
+ 
+-	out->common.get_sample_rate = out_get_sample_rate;
+-	out->common.set_sample_rate = out_set_sample_rate;
+-	out->common.get_buffer_size = out_get_buffer_size;
+-	out->common.get_channels = out_get_channels;
+-	out->common.get_format = out_get_format;
+-	out->common.set_format = out_set_format;
+-	out->common.standby = out_standby;
+-	out->common.dump = out_dump;
+-	out->common.set_parameters = out_set_parameters;
+-	out->common.get_parameters = out_get_parameters;
+-	out->common.add_audio_effect = out_add_audio_effect;
+-	out->common.remove_audio_effect = out_remove_audio_effect;
+-	out->get_latency = out_get_latency;
+-	out->set_volume = out_set_volume;
+-	out->write = out_write;
+-	out->get_render_position = out_get_render_position;
+-
+-	*stream_out = out;
++	out->stream.common.get_sample_rate = out_get_sample_rate;
++	out->stream.common.set_sample_rate = out_set_sample_rate;
++	out->stream.common.get_buffer_size = out_get_buffer_size;
++	out->stream.common.get_channels = out_get_channels;
++	out->stream.common.get_format = out_get_format;
++	out->stream.common.set_format = out_set_format;
++	out->stream.common.standby = out_standby;
++	out->stream.common.dump = out_dump;
++	out->stream.common.set_parameters = out_set_parameters;
++	out->stream.common.get_parameters = out_get_parameters;
++	out->stream.common.add_audio_effect = out_add_audio_effect;
++	out->stream.common.remove_audio_effect = out_remove_audio_effect;
++	out->stream.get_latency = out_get_latency;
++	out->stream.set_volume = out_set_volume;
++	out->stream.write = out_write;
++	out->stream.get_render_position = out_get_render_position;
 +
-+	/* We can auto-start only from standby */
-+	if (out->audio_state == AUDIO_A2DP_STATE_STANDBY) {
-+		DBG("stream in standby, auto-start");
++	/* TODO: for now we always use endpoint 0 */
++	out->ep = &audio_endpoints[0];
 +
-+		if (ipc_resume_stream_cmd(out->ep->id) != AUDIO_STATUS_SUCCESS)
-+			return -1;
++	if (ipc_open_stream_cmd(out->ep->id, &preset) != AUDIO_STATUS_SUCCESS)
++		goto fail;
 +
-+		out->audio_state = AUDIO_A2DP_STATE_STARTED;
-+	}
++	if (!preset)
++		goto fail;
 +
-+	if (out->audio_state != AUDIO_A2DP_STATE_STARTED) {
-+		DBG("stream not started");
-+		return -1;
-+	}
++	/* TODO: initialize codec using received audio_preset */
 +
-+	/* TODO: encode data using codec */
++	free(preset);
 +
-+	return bytes;
++	*stream_out = &out->stream;
+ 	a2dp_dev->out = out;
+ 
++	out->audio_state = AUDIO_A2DP_STATE_STANDBY;
++
+ 	return 0;
++
++fail:
++	free(out);
++	*stream_out = NULL;
++	return -EIO;
  }
  
- static uint32_t out_get_sample_rate(const struct audio_stream *stream)
+ static void audio_close_output_stream(struct audio_hw_device *dev,
 -- 
 1.8.5.2
 
