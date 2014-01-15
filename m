@@ -1,81 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 5/8] android/ipc-tester: Add sending test data with ipc
-Date: Wed, 15 Jan 2014 13:42:34 +0100
-Message-Id: <1389789757-16847-6-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 4/8] android/ipc-tester: Add daemon shutdown handler
+Date: Wed, 15 Jan 2014 13:42:33 +0100
+Message-Id: <1389789757-16847-5-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1389789757-16847-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1389789757-16847-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds some data structures used to send data with ipc during test setup
-and run stage.
+Handle daemon shutdown asynchronously.
 ---
- android/ipc-tester.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ android/ipc-tester.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index 9be7208..9ffb584 100644
+index b76be32..9be7208 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -55,6 +55,18 @@ struct test_data {
- 	bool setup_done;
+@@ -52,6 +52,7 @@ struct test_data {
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
+ 	pid_t bluetoothd_pid;
++	bool setup_done;
  };
  
-+struct ipc_data {
-+	void *buffer;
-+	size_t len;
-+};
-+
-+struct generic_data {
-+	struct ipc_data ipc_data;
-+
-+	unsigned int num_services;
-+	int init_services[];
-+};
-+
  #define CONNECT_TIMEOUT (5 * 1000)
- #define SERVICE_NAME "bluetoothd"
+@@ -359,6 +360,44 @@ static void cleanup_ipc(void)
+ 	cmd_sk = -1;
+ }
  
-@@ -467,6 +479,13 @@ static void teardown(const void *data)
- 
- static void ipc_send_tc(const void *data)
- {
-+	const struct generic_data *generic_data = data;
-+	const struct ipc_data *ipc_data = &generic_data->ipc_data;
++static gboolean check_for_daemon(gpointer user_data)
++{
++	int status;
++	struct test_data *data = user_data;
 +
-+	if (ipc_data->len) {
-+		if (write(cmd_sk, ipc_data->buffer, ipc_data->len) < 0)
-+			tester_test_failed();
++	if ((waitpid(data->bluetoothd_pid, &status, WNOHANG))
++							!= data->bluetoothd_pid)
++		return true;
++
++	if (WIFEXITED(status)) {
++		tester_test_passed();
++	} else if (WIFSIGNALED(status)) {
++		switch (WTERMSIG(status)) {
++		case SIGTERM:
++			if (data->setup_done)
++				tester_test_passed();
++			else
++				tester_setup_failed();
++			break;
++		case SIGSEGV:
++			tester_warn("Daemon died with segmentation fault");
++			goto failed;
++		default:
++			tester_warn("Bad signal received %d", status);
++			goto failed;
++		}
 +	}
- }
- 
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
-@@ -481,13 +500,22 @@ static void ipc_send_tc(const void *data)
- 							3, user, g_free); \
- 	} while (0)
- 
-+static const struct generic_data dummy_data = {
-+	.ipc_data = {
-+		.buffer = "",
-+		.len = 1,
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
 +
- int main(int argc, char *argv[])
++	return true;
++
++failed:
++	if (data->setup_done)
++		tester_test_failed();
++	else
++		tester_setup_failed();
++	return false;
++}
++
+ static void setup(const void *data)
  {
- 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
+ 	struct test_data *test_data = tester_get_data();
+@@ -399,6 +438,10 @@ static void setup(const void *data)
+ 		tester_setup_failed();
+ 		return;
+ 	}
++
++	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, check_for_daemon, test_data,
++									NULL);
++
+ 	if (!init_ipc()) {
+ 		tester_warn("Cannot initialize IPC mechanism!");
+ 		tester_setup_failed();
+@@ -406,6 +449,8 @@ static void setup(const void *data)
+ 	}
  
- 	tester_init(&argc, &argv);
- 
--	test_bredrle("Test Dummy", NULL, setup, ipc_send_tc, teardown);
-+	test_bredrle("Test Dummy", &dummy_data, setup, ipc_send_tc, teardown);
- 
- 	return tester_run();
+ 	/* TODO: register modules */
++
++	test_data->setup_done = true;
  }
+ 
+ static void teardown(const void *data)
 -- 
 1.8.5.2
 
