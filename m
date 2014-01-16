@@ -1,82 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/5] android: Fix ipc cleanup
-Date: Thu, 16 Jan 2014 09:41:16 +0100
-Message-ID: <8912359.omIpJ0S0ZX@uw000953>
-In-Reply-To: <1389813150-16914-2-git-send-email-marcin.kraglak@tieto.com>
-References: <1389813150-16914-1-git-send-email-marcin.kraglak@tieto.com> <1389813150-16914-2-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv4 8/8] android/ipc-tester: Add more cases for malformed data
+Date: Thu, 16 Jan 2014 09:38:32 +0100
+Message-Id: <1389861512-2326-9-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+This patch adds tests for more types of possible data malformations.
+---
+ android/ipc-tester.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-On Wednesday 15 of January 2014 20:12:27 Marcin Kraglak wrote:
-> Remove sources while cleanup. It will avoid receiving
-> events after cleanup.
-> ---
->  android/ipc.c | 17 +++++++++++++++--
->  1 file changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/ipc.c b/android/ipc.c
-> index ed3ef3c..4277bfe 100644
-> --- a/android/ipc.c
-> +++ b/android/ipc.c
-> @@ -45,6 +45,9 @@ static struct service_handler services[HAL_SERVICE_ID_MAX + 1];
->  static GIOChannel *cmd_io = NULL;
->  static GIOChannel *notif_io = NULL;
->  
-> +static guint cmd_id;
-> +static guint notif_id;
-
-Please name it cmd_watch and notif_watch. Also explicitly initialize them to 0 here.
-
-> +
->  int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
->  						const void *buf, ssize_t len)
->  {
-> @@ -192,11 +195,11 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
->  
->  	cond = G_IO_ERR | G_IO_HUP | G_IO_NVAL;
->  
-> -	g_io_add_watch(io, cond, notif_watch_cb, NULL);
-> +	notif_id = g_io_add_watch(io, cond, notif_watch_cb, NULL);
->  
->  	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
->  
-> -	g_io_add_watch(cmd_io, cond, cmd_watch_cb, NULL);
-> +	cmd_id = g_io_add_watch(cmd_io, cond, cmd_watch_cb, NULL);
->  
->  	info("IPC: successfully connected");
->  
-> @@ -232,12 +235,22 @@ void ipc_init(void)
->  
->  void ipc_cleanup(void)
->  {
-> +	if (cmd_id) {
-> +		g_source_remove(cmd_id);
-> +		cmd_id = 0;
-> +	}
-> +
->  	if (cmd_io) {
->  		g_io_channel_shutdown(cmd_io, TRUE, NULL);
->  		g_io_channel_unref(cmd_io);
->  		cmd_io = NULL;
->  	}
->  
-> +	if (notif_id) {
-> +		g_source_remove(notif_id);
-> +		notif_id = 0;
-> +	}
-> +
->  	if (notif_io) {
->  		g_io_channel_shutdown(notif_io, TRUE, NULL);
->  		g_io_channel_unref(notif_io);
-> 
-
+diff --git a/android/ipc-tester.c b/android/ipc-tester.c
+index f4321ce..3f4db82 100644
+--- a/android/ipc-tester.c
++++ b/android/ipc-tester.c
+@@ -577,6 +577,48 @@ static const struct generic_data malformed_data = {
+ 	.num_services = 1,
+ };
+ 
++static const struct generic_data malformed_data2 = {
++	.ipc_data = {
++		/* use proper msg */
++		.buffer = &register_bt_msg,
++		/* but write incomplete */
++		.len = sizeof(register_bt_msg) - 1,
++	},
++	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
++	.num_services = 1,
++};
++
++struct malformed_data3_struct {
++	struct regmod_msg valid_msg;
++	int redundant_data;
++}  __attribute__((packed));
++
++static struct malformed_data3_struct malformed_data3_msg = {
++	/* valid register service message */
++	.valid_msg = {
++		.header = {
++			.service_id = HAL_SERVICE_ID_CORE,
++			.opcode = HAL_OP_REGISTER_MODULE,
++			.len = sizeof(struct hal_cmd_register_module),
++			},
++		.cmd = {
++			.service_id = HAL_SERVICE_ID_CORE,
++			},
++	},
++	/* plus redundant data */
++	. redundant_data = 666,
++};
++
++static const struct generic_data malformed_data3 = {
++	.ipc_data = {
++		/* use malformed msg */
++		.buffer = &malformed_data3_msg,
++		.len = sizeof(malformed_data3_msg),
++	},
++	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
++	.num_services = 1,
++};
++
+ struct hal_hdr enable_unknown_service_hdr = {
+ 	.service_id = HAL_SERVICE_ID_MAX + 1,
+ 	.opcode = HAL_OP_REGISTER_MODULE,
+@@ -653,6 +695,10 @@ int main(int argc, char *argv[])
+ 						setup, ipc_send_tc, teardown);
+ 	test_bredrle("Malformed data (wrong payload declared)", &malformed_data,
+ 						setup, ipc_send_tc, teardown);
++	test_bredrle("Malformed data2 (undersized msg)", &malformed_data2,
++						setup, ipc_send_tc, teardown);
++	test_bredrle("Malformed data3 (oversized msg)", &malformed_data3,
++						setup, ipc_send_tc, teardown);
+ 	test_bredrle("Invalid service", &enable_unknown_service_data,
+ 						setup, ipc_send_tc, teardown);
+ 	test_bredrle("Enable unregistered service",
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.2
+
