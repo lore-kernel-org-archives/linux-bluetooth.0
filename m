@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/ipc: Add PTS test results document for AVCTP
-Date: Thu, 16 Jan 2014 11:01:02 +0100
-Message-Id: <1389866462-7993-3-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1389866462-7993-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1389866462-7993-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/3] android/pts: Add PTS test results document for A2DP
+Date: Thu, 16 Jan 2014 11:01:00 +0100
+Message-Id: <1389866462-7993-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This will allow for better tracking of current state of implementation.
 ---
- android/Makefile.am   |  1 +
- android/pts-avctp.txt | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
- create mode 100644 android/pts-avctp.txt
+ android/Makefile.am  |  2 ++
+ android/pts-a2dp.txt | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 59 insertions(+)
+ create mode 100644 android/pts-a2dp.txt
 
 diff --git a/android/Makefile.am b/android/Makefile.am
-index 95ed7a7..f030bd4 100644
+index cd4a526..0ce0188 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -149,5 +149,6 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+@@ -148,4 +148,6 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+ 		android/pics-avrcp.txt android/pixit-avrcp.txt \
  		android/pics-a2dp.txt android/pixit-a2dp.txt \
  		android/pics-avctp.txt android/pixit-avctp.txt \
- 		android/pts-a2dp.txt android/pts-avrcp.txt \
-+		android/pts-avctp.txt \
- 
++		android/pts-a2dp.txt \
++
  		android/pts-l2cap.txt
-diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
 new file mode 100644
-index 0000000..c057a10
+index 0000000..a269ec1
 --- /dev/null
-+++ b/android/pts-avctp.txt
-@@ -0,0 +1,41 @@
-+PTS test results for AVCTP
++++ b/android/pts-a2dp.txt
+@@ -0,0 +1,57 @@
++PTS test results for A2DP
 +
 +PTS version: 5.0
 +Tested: --not yet tested--
@@ -44,35 +42,51 @@ index 0000000..c057a10
 +INC	test is inconclusive
 +N/A	test is disabled due to PICS setup
 +
-+		Controller (CT)
++		Source (SRC)
 +-------------------------------------------------------------------------------
 +Test Name		Result	Notes
 +-------------------------------------------------------------------------------
-+TC_CT_CCM_BV_01_C	N/A
-+TC_CT_CCM_BV_02_C	N/A
-+TC_CT_CCM_BV_03_C	N/A
-+TC_CT_CCM_BV_04_C	N/A
-+TC_CT_CCM_BI_01_C	N/A
-+TC_CT_NFR_BV_01_C	N/A
-+TC_CT_NFR_BV_04_C	N/A
-+TC_CT_FRA_BV_01_C	N/A
-+TC_CT_FRA_BV_04_C	N/A
++TC_SRC_CC_BV_09_I	INC
++TC_SRC_CC_BV_10_I	N/A
++TC_SRC_REL_BV_01_I	INC
++TC_SRC_REL_BV_02_I	INC
++TC_SRC_SET_BV_01_I	INC
++TC_SRC_SET_BV_02_I	INC
++TC_SRC_SET_BV_03_I	INC
++TC_SRC_SET_BV_04_I	INC
++TC_SRC_SET_BV_05_I	INC
++TC_SRC_SET_BV_06_I	INC
++TC_SRC_SUS_BV_01_I	INC
++TC_SRC_SUS_BV_02_I	INC
++TC_SRC_SDP_BV_01_I	INC
++TC_SRC_AS_BV_01_I	INC
 +-------------------------------------------------------------------------------
 +
 +
-+		Target (TG)
++		Sink (SNK)
 +-------------------------------------------------------------------------------
 +Test Name		Result	Notes
 +-------------------------------------------------------------------------------
-+TC_TG_CCM_BV_01_C	INC
-+TC_TG_CCM_BV_02_C	INC
-+TC_TG_CCM_BV_03_C	INC
-+TC_TG_CCM_BV_04_C	INC
-+TC_TG_NFR_BV_02_C	INC
-+TC_TG_NFR_BV_03_C	INC
-+TC_TG_NFR_BI_01_C	INC
-+TC_TG_FRA_BV_02_C	INC
-+TC_TG_FRA_BV_03_C	INC
++TC_SNK_CC_BV_01_I	N/A
++TC_SNK_CC_BV_02_I	N/A
++TC_SNK_CC_BV_03_I	N/A
++TC_SNK_CC_BV_04_I	N/A
++TC_SNK_CC_BV_05_I	N/A
++TC_SNK_CC_BV_06_I	N/A
++TC_SNK_CC_BV_07_I	N/A
++TC_SNK_CC_BV_08_I	N/A
++TC_SNK_REL_BV_01_I	N/A
++TC_SNK_REL_BV_02_I	N/A
++TC_SNK_SET_BV_01_I	N/A
++TC_SNK_SET_BV_02_I	N/A
++TC_SNK_SET_BV_03_I	N/A
++TC_SNK_SET_BV_04_I	N/A
++TC_SNK_SET_BV_05_I	N/A
++TC_SNK_SET_BV_06_I	N/A
++TC_SNK_SUS_BV_01_I	N/A
++TC_SNK_SUS_BV_02_I	N/A
++TC_SNK_SDP_BV_02_I	N/A
++TC_SNK_AS_BV_01_I	N/A
 +-------------------------------------------------------------------------------
 -- 
 1.8.5.2
