@@ -1,332 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/5] android: Add android ipc tester
-Date: Thu, 16 Jan 2014 10:45:34 +0100
-Message-Id: <1389865538-28157-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 16 Jan 2014 10:53:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: Queue incoming ACL data until BT_CONNECTED
+ state is reached
+Message-ID: <20140116085302.GB12252@x220.p-661hnu-f1>
+References: <1389778231-20307-1-git-send-email-johan.hedberg@gmail.com>
+ <BB667CD7-90B1-4D87-8647-F59CB35A258B@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BB667CD7-90B1-4D87-8647-F59CB35A258B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This tool will test ipc library. First test case will check
-ipc_init() call.
----
- .gitignore          |   1 +
- android/Makefile.am |   8 ++
- android/test-ipc.c  | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 286 insertions(+)
- create mode 100644 android/test-ipc.c
+Hi Marcel,
 
-diff --git a/.gitignore b/.gitignore
-index ac76fe2..ddd562a 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -114,3 +114,4 @@ android/bluetoothd
- android/haltest
- android/android-tester
- android/bluetoothd-snoop
-+android/test-ipc
-diff --git a/android/Makefile.am b/android/Makefile.am
-index cd4a526..0c61317 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -117,6 +117,14 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- android_android_tester_LDFLAGS = -pthread -ldl
- 
-+noinst_PROGRAMS += android/test-ipc
-+
-+android_test_ipc_SOURCES = android/test-ipc.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/log.h src/log.c \
-+				android/ipc.c android/ipc.h
-+android_test_ipc_LDADD = @GLIB_LIBS@
-+
- plugin_LTLIBRARIES += android/audio.a2dp.default.la
- 
- android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
-diff --git a/android/test-ipc.c b/android/test-ipc.c
-new file mode 100644
-index 0000000..6ac1175
---- /dev/null
-+++ b/android/test-ipc.c
-@@ -0,0 +1,277 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
-+#include <string.h>
-+#include <fcntl.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <sys/signalfd.h>
-+
-+#include <glib.h>
-+#include "src/shared/util.h"
-+#include "src/log.h"
-+#include "android/hal-msg.h"
-+#include "android/ipc.h"
-+
-+struct test_data {
-+	uint32_t expected_signal;
-+};
-+
-+struct context {
-+	GMainLoop *main_loop;
-+
-+	int sk;
-+
-+	guint source;
-+	guint cmd_source;
-+	guint notif_source;
-+
-+	GIOChannel *cmd_io;
-+	GIOChannel *notif_io;
-+	GIOChannel *signal_io;
-+
-+	guint signal_source;
-+
-+	const struct test_data *data;
-+};
-+
-+static void context_quit(struct context *context)
-+{
-+	g_main_loop_quit(context->main_loop);
-+}
-+
-+static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	GIOChannel *new_io;
-+	GIOCondition watch_cond;
-+	int sk;
-+
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	g_assert(!context->cmd_source || !context->notif_source);
-+
-+	sk = accept(context->sk, NULL, NULL);
-+	g_assert(sk >= 0);
-+
-+	new_io = g_io_channel_unix_new(sk);
-+
-+	watch_cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+
-+	if (context->cmd_source && !context->notif_source) {
-+		context->notif_source = g_io_add_watch(new_io, watch_cond,
-+							notif_watch, context);
-+		g_assert(context->notif_source > 0);
-+		context->notif_io = new_io;
-+	}
-+
-+	if (!context->cmd_source) {
-+		context->cmd_source = g_io_add_watch(new_io, watch_cond,
-+							cmd_watch, context);
-+		context->cmd_io = new_io;
-+	}
-+
-+	if (context->cmd_source && context->notif_source)
-+		context_quit(context);
-+
-+	return TRUE;
-+}
-+
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_data *test_data = context->data;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
-+
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
-+		return FALSE;
-+
-+	fd = g_io_channel_unix_get_fd(channel);
-+
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return FALSE;
-+
-+	g_assert(test_data->expected_signal == si.ssi_signo);
-+	context_quit(context);
-+	return TRUE;
-+}
-+
-+static guint setup_signalfd(gpointer user_data)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int ret;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
-+	g_assert(ret == 0);
-+
-+	fd = signalfd(-1, &mask, 0);
-+	g_assert(fd >= 0);
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, user_data);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
-+static struct context *create_context(gconstpointer data)
-+{
-+	struct context *context = g_new0(struct context, 1);
-+	struct sockaddr_un addr;
-+	GIOChannel *io;
-+	int ret, sk;
-+
-+	context->main_loop = g_main_loop_new(NULL, FALSE);
-+	g_assert(context->main_loop);
-+
-+	context->signal_source = setup_signalfd(context);
-+	g_assert(context->signal_source);
-+
-+	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-+	g_assert(sk >= 0);
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+
-+	ret = bind(sk, (struct sockaddr *) &addr, sizeof(addr));
-+	g_assert(ret == 0);
-+
-+	ret = listen(sk, 5);
-+	g_assert(ret == 0);
-+
-+	io = g_io_channel_unix_new(sk);
-+
-+	g_io_channel_set_close_on_unref(io, TRUE);
-+
-+	context->source = g_io_add_watch(io,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				connect_handler, context);
-+	g_assert(context->source > 0);
-+
-+	g_io_channel_unref(io);
-+
-+	context->sk = sk;
-+	context->data = data;
-+
-+	return context;
-+}
-+
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	g_io_channel_shutdown(context->notif_io, true, NULL);
-+	g_io_channel_shutdown(context->cmd_io, true, NULL);
-+	g_io_channel_unref(context->cmd_io);
-+	g_io_channel_unref(context->notif_io);
-+
-+	g_source_remove(context->notif_source);
-+	g_source_remove(context->signal_source);
-+	g_source_remove(context->cmd_source);
-+	g_source_remove(context->source);
-+
-+	g_main_loop_unref(context->main_loop);
-+
-+	g_free(context);
-+}
-+
-+static void test_init(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+
-+	ipc_init();
-+
-+	execute_context(context);
-+
-+	ipc_cleanup();
-+}
-+
-+static const struct test_data test_init_1 = {};
-+
-+int main(int argc, char *argv[])
-+{
-+	g_test_init(&argc, &argv, NULL);
-+
-+	if (g_test_verbose())
-+		__btd_log_init("*", 0);
-+
-+	g_test_add_data_func("/android_ipc/init", &test_init_1, test_init);
-+
-+	return g_test_run();
-+}
--- 
-1.8.3.1
+On Wed, Jan 15, 2014, Marcel Holtmann wrote:
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -63,6 +63,8 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
+> > static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
+> > 		     struct sk_buff_head *skbs, u8 event);
+> > 
+> > +static void process_pending_rx(struct work_struct *work);
+> > +
+> 
+> do we really need this forward declaration?
 
+Believe me I hate forward declarations just as much as you do. Either
+this function or then l2cap_recv_frame must be forward declared unless
+you want to move the following functions further down in l2cap_core.c:
+
+l2cap_conn_add()
+l2cap_chan_connect()
+l2cap_connect_cfm()
+
+The last two depend on l2cap_conn_add() which in turn depends on
+process_pending_rx(). It's a fairly simple patch looking like this (two
+more lines removed because the stat includes removing the forward
+declatiation - I'd of course order the patches the other way around when
+I send them):
+
+ net/bluetooth/l2cap_core.c | 430 ++++++++++++++++++++--------------------
+ 1 file changed, 214 insertions(+), 216 deletions(-)
+
+Doing this however means e.g. that l2cap_connect_cfm() isn't any more
+grouped in the same place as connect_ind() and the other callbacks. So
+I'm not sure if you wanna move those also downwards (making the patch
+bigger), not worry about it, or just stick to the forward declaration.
+
+Johan
+
+> > +static void process_pending_rx(struct work_struct *work)
+> > +{
+> > +	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
+> > +					       pending_rx_work);
+> > +
+> > +	BT_DBG("");
+> > +
+> > +	while (!skb_queue_empty(&conn->pending_rx)) {
+> > +		struct sk_buff *skb;
+> > +
+> > +		skb = skb_dequeue(&conn->pending_rx);
+> > +
+> > +		l2cap_recv_frame(conn, skb);
+> > +	}
+> > +}
+> > +
+> 
+> I realize we have done this skb_queue_empty check and then skb_dequeue
+> a bit, but that seems a little bit pointless.
+> 
+> skb_dequeue is taking a spinlock, but even then checking for empty
+> first and then dequeuing it seems more complicated that needed here.
+> We could just dequeue it check if skb == NULL.
+> 
+> 	while (1) {
+> 		struct sk_buff *skb;
+> 
+> 		skb = sbk_dequeue(&conn->pending_rx);
+> 		if (!skb)
+> 			break;
+> 
+> 		l2cap_recv_frame(conn, skb);
+> 	}
+
+I've fixed this in my v2.
+
+> And we have similar things in l2cap_streaming_send, l2cap_chan_send
+> and l2cap_le_credits. I get the feeling we should change all of these.
+
+Sure, I'll send patches for those at some point.
+
+Johan
