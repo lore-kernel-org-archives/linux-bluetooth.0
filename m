@@ -1,47 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 0/8] IPC negative tester
-Date: Thu, 16 Jan 2014 09:38:24 +0100
-Message-Id: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 16 Jan 2014 10:38:16 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] Bluetooth: Track Secure Connections support of
+ remote devices
+Message-ID: <20140116083816.GA12252@x220.p-661hnu-f1>
+References: <1389854262-62467-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1389854262-62467-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Following patchset adds IPC negative tester framework with few test cases
-checking IPC's behaviour on daemon side. Expected daemon's behaviour is to
-shut down gracefully in case of receiving invalid IPC data.
+Hi Marcel,
 
-v2 changes:
-  * fixed few indentation issues
-  * fixed missing __attribute__((packed))
-  * fixed amount of data written for 'malformed data' test case
-  * fixed opcode for 'invalid service' test case
-  * added patch(8) with more 'malformed data' cases
+On Wed, Jan 15, 2014, Marcel Holtmann wrote:
+> It is important to know if Secure Connections support has been enabled
+> for a given remote device. The information is provided in the remote
+> host features page. So track this information and provide a simple
+> helper function to extract the status.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci_core.h | 8 ++++++++
+>  net/bluetooth/hci_event.c        | 3 +++
+>  2 files changed, 11 insertions(+)
 
-v3 changes:
-  * changed license to GPL
-  * changed 'ipc-negative-tester' name to 'ipc-tester'
+All patches in this set have been applied to bluetooth-next. Thanks.
 
-v4 changes:
-  * fixed typo in first test case and last commit's message
-  * fixed daemon shutdown handler function
-
-Jakub Tyszkowski (8):
-  android/ipc-tester: Skeleton for ipc negative tester
-  android/ipc-tester: Run daemon in separate process
-  android/ipc-tester: Add IPC initialization
-  android/ipc-tester: Add daemon shutdown handler
-  android/ipc-tester: Add sending test data with ipc
-  android/ipc-tester: Register services
-  android/ipc-tester: Add basic test cases for IPC's daemon site
-  android/ipc-tester: Add more cases for malformed data
-
- .gitignore           |   1 +
- android/Makefile.am  |  17 ++
- android/ipc-tester.c | 713 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 731 insertions(+)
- create mode 100644 android/ipc-tester.c
-
---
-1.8.5.2
-
+Johan
