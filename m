@@ -1,52 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 16 Jan 2014 14:17:05 -0800
-Message-ID: <CAGXr9JHw-S5XdXEcp3APN9OKadt7LuoPQmJ2RZkAsRZ8dDJB-w@mail.gmail.com>
-Subject: Questions on BlueZ 5.13: device creation API + persistent hid/input pipeline
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 1/2] android: Add btmgmt to debug builds
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1389883945-10707-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 16 Jan 2014 14:08:27 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <BE345789-E478-4C6C-B192-4DAB782CE135@holtmann.org>
+References: <1389883945-10707-1-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-linux-bluetooth:
+Hi Andrzej,
 
-I'm running BlueZ 5.13 userland + backported BlueZ kernel modules on
-an embedded system that I'm working on. The kernel on the system is
-2.6.37-based. I ported uhid driver manually from 3.12.
+> android/Android.mk | 36 ++++++++++++++++++++++++++++++++++++
+> 1 file changed, 36 insertions(+)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 7e97ec8..b3e6a50 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -282,3 +282,39 @@ LOCAL_MODULE_TAGS := optional
+> LOCAL_MODULE := bluetoothd-snoop
+> 
+> include $(BUILD_EXECUTABLE)
+> +
+> +#
+> +# btmgmt
+> +#
+> +
+> +include $(CLEAR_VARS)
+> +
+> +LOCAL_SRC_FILES := \
+> +	../tools/btmgmt.c \
+> +	../monitor/mainloop.c \
+> +	../lib/bluetooth.c \
+> +	../lib/sdp.c \
+> +	../src/eir.c \
+> +	../src/glib-helper.c \
+> +	../src/shared/io-mainloop.c \
+> +	../src/shared/mgmt.c \
+> +	../src/shared/queue.c \
+> +	../src/shared/util.c \
+> +
+> +LOCAL_C_INCLUDES := \
+> +	$(call include-path-for, glib) \
+> +	$(call include-path-for, glib)/glib \
+> +	$(LOCAL_PATH)/.. \
+> +	$(LOCAL_PATH)/../src \
+> +	$(LOCAL_PATH)/../lib \
+> +
+> +LOCAL_SHARED_LIBRARIES := \
+> +	libglib \
 
-I'm successfully using Bluetooth classic HID remote control and
-Bluetooth LE HoG remote control on this system. However, I have two
-questions:
+have Johan fix the dependency on GLib instead. It should not be needed anymore.
 
-1) The Bluetooth classic remote that I'm using is not discoverable. It
-is only connectable. When the remote is not paired, it sends its
-Bluetooth MAC address to the host via IR, and the host needs to add
-this device to BlueZ's discovered devices database. But, how can I do
-that via D-Bus API? BlueZ 5 porting guide specifically mentions that "
-... we decided to simply get rid of explicit CreateDevice /
-CreatePairedDevice methods and instead dynamically create device
-objects as they are discovered during device discovery."
+Regards
 
-So, is there no API available to add non-discoverable devices in BlueZ 5?
+Marcel
 
-I have worked around this issue by manually adding this remote to
-<storage path>, so that bluetoothd creates the device on reboot via
-device_create_from_storage(). But, I would prefer not to restart
-bluetoothd every time a non-discoverable device needs to be added.
-
-
-2) There is a difference in HID vs HoG hid/input pipeline persistence.
-When the Bluetooth classic HID remote disconnects, the corresponding
-hid and input kernel devices are destroyed. And when it reconnects,
-hid and input devices are created again. This adds a lot of
-unnecessary delay at reconnect. And, the first keypress is always lost
-on reconnect.
-
-In contrast, for the Bluetooth LE HoG remote, the hid/input pipeline
-is persistent. When HoG remote disconnects, hid and input devices
-remain in the system and are reused when the HoG remote reconnects.
-
-Is there a way to make Bluetooth classic HID behave the same as HoG,
-i.e. retain the hid and input kernel devices on disconnect and reuse
-them on reconnect?
