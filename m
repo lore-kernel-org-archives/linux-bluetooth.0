@@ -1,93 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] android/pts: Add PTS test results document for A2DP
-Date: Thu, 16 Jan 2014 11:01:00 +0100
-Message-Id: <1389866462-7993-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 5/5] android/ipc-tester: Add next command test case
+Date: Thu, 16 Jan 2014 10:45:38 +0100
+Message-Id: <1389865538-28157-5-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1389865538-28157-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1389865538-28157-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow for better tracking of current state of implementation.
+This case will register service, next unregister it and send
+command. Expected status is raise SIGTERM.
 ---
- android/Makefile.am  |  2 ++
- android/pts-a2dp.txt | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 59 insertions(+)
- create mode 100644 android/pts-a2dp.txt
+ android/test-ipc.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index cd4a526..0ce0188 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -148,4 +148,6 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
- 		android/pics-avrcp.txt android/pixit-avrcp.txt \
- 		android/pics-a2dp.txt android/pixit-a2dp.txt \
- 		android/pics-avctp.txt android/pixit-avctp.txt \
-+		android/pts-a2dp.txt \
+diff --git a/android/test-ipc.c b/android/test-ipc.c
+index 930f9f4..1fde61b 100644
+--- a/android/test-ipc.c
++++ b/android/test-ipc.c
+@@ -306,6 +306,16 @@ static gboolean register_service(gpointer user_data)
+ 	return FALSE;
+ }
+ 
++static gboolean unregister_service(gpointer user_data)
++{
++	struct context *context = user_data;
++	const struct test_data *test_data = context->data;
 +
- 		android/pts-l2cap.txt
-diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
-new file mode 100644
-index 0000000..a269ec1
---- /dev/null
-+++ b/android/pts-a2dp.txt
-@@ -0,0 +1,57 @@
-+PTS test results for A2DP
++	ipc_unregister(test_data->service);
 +
-+PTS version: 5.0
-+Tested: --not yet tested--
++	return FALSE;
++}
 +
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
+ static void test_cmd(gconstpointer data)
+ {
+ 	struct context *context = create_context(data);
+@@ -336,6 +346,21 @@ static void test_cmd_reg(gconstpointer data)
+ 	ipc_cleanup();
+ }
+ 
++static void test_cmd_reg_1(gconstpointer data)
++{
++	struct context *context = create_context(data);
 +
-+		Source (SRC)
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_SRC_CC_BV_09_I	INC
-+TC_SRC_CC_BV_10_I	N/A
-+TC_SRC_REL_BV_01_I	INC
-+TC_SRC_REL_BV_02_I	INC
-+TC_SRC_SET_BV_01_I	INC
-+TC_SRC_SET_BV_02_I	INC
-+TC_SRC_SET_BV_03_I	INC
-+TC_SRC_SET_BV_04_I	INC
-+TC_SRC_SET_BV_05_I	INC
-+TC_SRC_SET_BV_06_I	INC
-+TC_SRC_SUS_BV_01_I	INC
-+TC_SRC_SUS_BV_02_I	INC
-+TC_SRC_SDP_BV_01_I	INC
-+TC_SRC_AS_BV_01_I	INC
-+-------------------------------------------------------------------------------
++	ipc_init();
 +
++	g_idle_add(register_service, context);
++	g_idle_add(unregister_service, context);
++	g_idle_add(send_cmd, context);
 +
-+		Sink (SNK)
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_SNK_CC_BV_01_I	N/A
-+TC_SNK_CC_BV_02_I	N/A
-+TC_SNK_CC_BV_03_I	N/A
-+TC_SNK_CC_BV_04_I	N/A
-+TC_SNK_CC_BV_05_I	N/A
-+TC_SNK_CC_BV_06_I	N/A
-+TC_SNK_CC_BV_07_I	N/A
-+TC_SNK_CC_BV_08_I	N/A
-+TC_SNK_REL_BV_01_I	N/A
-+TC_SNK_REL_BV_02_I	N/A
-+TC_SNK_SET_BV_01_I	N/A
-+TC_SNK_SET_BV_02_I	N/A
-+TC_SNK_SET_BV_03_I	N/A
-+TC_SNK_SET_BV_04_I	N/A
-+TC_SNK_SET_BV_05_I	N/A
-+TC_SNK_SET_BV_06_I	N/A
-+TC_SNK_SUS_BV_01_I	N/A
-+TC_SNK_SUS_BV_02_I	N/A
-+TC_SNK_SDP_BV_02_I	N/A
-+TC_SNK_AS_BV_01_I	N/A
-+-------------------------------------------------------------------------------
++	execute_context(context);
++
++	ipc_cleanup();
++}
++
+ static void test_cmd_handler(const void *buf, uint16_t len)
+ {
+ 	ipc_send_rsp(0, 1, 0);
+@@ -367,6 +392,15 @@ static const struct test_data test_cmd_2 = {
+ 	.handlers_size = 1
+ };
+ 
++static const struct test_data test_cmd_3 = {
++	.cmd = &test_cmd_1_hdr,
++	.cmd_size = sizeof(test_cmd_1_hdr),
++	.service = 0,
++	.handlers = cmd_handlers,
++	.handlers_size = 1,
++	.expected_signal = SIGTERM
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -378,6 +412,8 @@ int main(int argc, char *argv[])
+ 	g_test_add_data_func("/android_ipc/send_cmd_1", &test_cmd_1, test_cmd);
+ 	g_test_add_data_func("/android_ipc/send_cmd_2", &test_cmd_2,
+ 							test_cmd_reg);
++	g_test_add_data_func("/android_ipc/send_cmd_3", &test_cmd_3,
++							test_cmd_reg_1);
+ 
+ 	return g_test_run();
+ }
 -- 
-1.8.5.2
+1.8.3.1
 
