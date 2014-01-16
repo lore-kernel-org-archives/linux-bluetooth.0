@@ -8,10 +8,8 @@ To: acho@suse.com,
 Cc: Oliver Neukum <oliver@neukum.org>,
 	Oliver Neukum <oneukum@suse.de>
 Subject: [PATCH] enable Atheros 0cf3:311e for firmware upload
-Date: Thu, 16 Jan 2014 15:37:11 +0100
-Message-Id: <1389883031-10752-2-git-send-email-oliver@neukum.org>
-In-Reply-To: <1389883031-10752-1-git-send-email-oliver@neukum.org>
-References: <1389883031-10752-1-git-send-email-oliver@neukum.org>
+Date: Thu, 16 Jan 2014 15:37:10 +0100
+Message-Id: <1389883031-10752-1-git-send-email-oliver@neukum.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Oliver Neukum <oliver@neukum.org>
