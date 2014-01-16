@@ -1,130 +1,345 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Queue incoming ACL data until BT_CONNECTED state is reached
-Date: Thu, 16 Jan 2014 10:33:19 +0200
-Message-Id: <1389861199-8392-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] android: Add android ipc tester
+Date: Thu, 16 Jan 2014 09:20:53 +0100
+Message-ID: <1392850.cu721SaLRo@uw000953>
+In-Reply-To: <1389813150-16914-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1389813150-16914-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcin,
 
-This patch adds a queue for incoming L2CAP data that's received before
-l2cap_connect_cfm is called and processes the data once
-l2cap_connect_cfm is called. This way we ensure that we have e.g. all
-remote features before processing L2CAP signaling data (which is very
-important for making the correct security decisions).
+On Wednesday 15 of January 2014 20:12:26 Marcin Kraglak wrote:
+> This tool will test ipc library. First test case will check
+> ipc_init() call.
+> ---
+>  .gitignore                 |   1 +
+>  android/Makefile.am        |   8 ++
+>  android/test-android-ipc.c | 277 +++++++++++++++++++++++++++++++++++++++++++++
 
-The processing of the pending rx data needs to be done through
-queue_work since unlike l2cap_recv_acldata, l2cap_connect_cfm is called
-with the hci_dev lock held which could cause potential deadlocks.
+I would name this android/test-ipc.c.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
-v2: Updated to avoid call to skb_queue_empty()
+>  3 files changed, 286 insertions(+)
+>  create mode 100644 android/test-android-ipc.c
+> 
+> diff --git a/.gitignore b/.gitignore
+> index ac76fe2..0d0834b 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -114,3 +114,4 @@ android/bluetoothd
+>  android/haltest
+>  android/android-tester
+>  android/bluetoothd-snoop
+> +android/test-android-ipc
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 7806f79..271a3e8 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -117,6 +117,14 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+>  
+>  android_android_tester_LDFLAGS = -pthread -ldl
+>  
+> +noinst_PROGRAMS += android/test-android-ipc
+> +
+> +android_test_android_ipc_SOURCES = android/test-android-ipc.c \
+> +				src/shared/util.h src/shared/util.c \
+> +				src/log.h src/log.c \
+> +				android/ipc.c android/ipc.h
+> +android_test_android_ipc_LDADD = @GLIB_LIBS@
+> +
+>  plugin_LTLIBRARIES += android/audio.a2dp.default.la
+>  
+>  android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+> diff --git a/android/test-android-ipc.c b/android/test-android-ipc.c
+> new file mode 100644
+> index 0000000..6ac1175
+> --- /dev/null
+> +++ b/android/test-android-ipc.c
+> @@ -0,0 +1,277 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +#include <stdio.h>
+> +#include <errno.h>
+> +#include <unistd.h>
+> +#include <stdlib.h>
+> +#include <stdbool.h>
+> +#include <inttypes.h>
+> +#include <string.h>
+> +#include <fcntl.h>
+> +#include <sys/socket.h>
+> +#include <sys/un.h>
+> +#include <sys/signalfd.h>
+> +
+> +#include <glib.h>
+> +#include "src/shared/util.h"
+> +#include "src/log.h"
+> +#include "android/hal-msg.h"
+> +#include "android/ipc.h"
+> +
+> +struct test_data {
+> +	uint32_t expected_signal;
+> +};
+> +
+> +struct context {
+> +	GMainLoop *main_loop;
+> +
+> +	int sk;
+> +
+> +	guint source;
+> +	guint cmd_source;
+> +	guint notif_source;
+> +
+> +	GIOChannel *cmd_io;
+> +	GIOChannel *notif_io;
+> +	GIOChannel *signal_io;
+> +
+> +	guint signal_source;
+> +
+> +	const struct test_data *data;
+> +};
+> +
+> +static void context_quit(struct context *context)
+> +{
+> +	g_main_loop_quit(context->main_loop);
+> +}
+> +
+> +static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
+> +						gpointer user_data)
+> +{
+> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+> +		g_assert(FALSE);
+> +		return FALSE;
+> +	}
+> +
+> +	return TRUE;
+> +}
+> +
+> +static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+> +		g_assert(FALSE);
+> +		return FALSE;
+> +	}
+> +
+> +	return TRUE;
+> +}
+> +
+> +static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
+> +						gpointer user_data)
+> +{
+> +	struct context *context = user_data;
+> +	GIOChannel *new_io;
+> +	GIOCondition watch_cond;
+> +	int sk;
+> +
+> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+> +		g_assert(FALSE);
+> +		return FALSE;
+> +	}
+> +
+> +	g_assert(!context->cmd_source || !context->notif_source);
+> +
+> +	sk = accept(context->sk, NULL, NULL);
+> +	g_assert(sk >= 0);
+> +
+> +	new_io = g_io_channel_unix_new(sk);
+> +
+> +	watch_cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
+> +
+> +	if (context->cmd_source && !context->notif_source) {
+> +		context->notif_source = g_io_add_watch(new_io, watch_cond,
+> +							notif_watch, context);
+> +		g_assert(context->notif_source > 0);
+> +		context->notif_io = new_io;
+> +	}
+> +
+> +	if (!context->cmd_source) {
+> +		context->cmd_source = g_io_add_watch(new_io, watch_cond,
+> +							cmd_watch, context);
+> +		context->cmd_io = new_io;
+> +	}
+> +
+> +	if (context->cmd_source && context->notif_source)
+> +		context_quit(context);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	struct context *context = user_data;
+> +	const struct test_data *test_data = context->data;
+> +	struct signalfd_siginfo si;
+> +	ssize_t result;
+> +	int fd;
+> +
+> +	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
+> +		return FALSE;
+> +
+> +	fd = g_io_channel_unix_get_fd(channel);
+> +
+> +	result = read(fd, &si, sizeof(si));
+> +	if (result != sizeof(si))
+> +		return FALSE;
+> +
+> +	g_assert(test_data->expected_signal == si.ssi_signo);
+> +	context_quit(context);
+> +	return TRUE;
+> +}
+> +
+> +static guint setup_signalfd(gpointer user_data)
+> +{
+> +	GIOChannel *channel;
+> +	guint source;
+> +	sigset_t mask;
+> +	int ret;
+> +	int fd;
+> +
+> +	sigemptyset(&mask);
+> +	sigaddset(&mask, SIGINT);
+> +	sigaddset(&mask, SIGTERM);
+> +
+> +	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
+> +	g_assert(ret == 0);
+> +
+> +	fd = signalfd(-1, &mask, 0);
+> +	g_assert(fd >= 0);
+> +
+> +	channel = g_io_channel_unix_new(fd);
+> +
+> +	g_io_channel_set_close_on_unref(channel, TRUE);
+> +	g_io_channel_set_encoding(channel, NULL, NULL);
+> +	g_io_channel_set_buffered(channel, FALSE);
+> +
+> +	source = g_io_add_watch(channel,
+> +				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+> +				signal_handler, user_data);
+> +
+> +	g_io_channel_unref(channel);
+> +
+> +	return source;
+> +}
+> +
+> +static struct context *create_context(gconstpointer data)
+> +{
+> +	struct context *context = g_new0(struct context, 1);
+> +	struct sockaddr_un addr;
+> +	GIOChannel *io;
+> +	int ret, sk;
+> +
+> +	context->main_loop = g_main_loop_new(NULL, FALSE);
+> +	g_assert(context->main_loop);
+> +
+> +	context->signal_source = setup_signalfd(context);
+> +	g_assert(context->signal_source);
+> +
+> +	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
+> +	g_assert(sk >= 0);
+> +
+> +	memset(&addr, 0, sizeof(addr));
+> +	addr.sun_family = AF_UNIX;
+> +
+> +	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
+> +
+> +	ret = bind(sk, (struct sockaddr *) &addr, sizeof(addr));
+> +	g_assert(ret == 0);
+> +
+> +	ret = listen(sk, 5);
+> +	g_assert(ret == 0);
+> +
+> +	io = g_io_channel_unix_new(sk);
+> +
+> +	g_io_channel_set_close_on_unref(io, TRUE);
+> +
+> +	context->source = g_io_add_watch(io,
+> +				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+> +				connect_handler, context);
+> +	g_assert(context->source > 0);
+> +
+> +	g_io_channel_unref(io);
+> +
+> +	context->sk = sk;
+> +	context->data = data;
+> +
+> +	return context;
+> +}
+> +
+> +static void execute_context(struct context *context)
+> +{
+> +	g_main_loop_run(context->main_loop);
+> +
+> +	g_io_channel_shutdown(context->notif_io, true, NULL);
+> +	g_io_channel_shutdown(context->cmd_io, true, NULL);
+> +	g_io_channel_unref(context->cmd_io);
+> +	g_io_channel_unref(context->notif_io);
+> +
+> +	g_source_remove(context->notif_source);
+> +	g_source_remove(context->signal_source);
+> +	g_source_remove(context->cmd_source);
+> +	g_source_remove(context->source);
+> +
+> +	g_main_loop_unref(context->main_loop);
+> +
+> +	g_free(context);
+> +}
+> +
+> +static void test_init(gconstpointer data)
+> +{
+> +	struct context *context = create_context(data);
+> +
+> +	ipc_init();
+> +
+> +	execute_context(context);
+> +
+> +	ipc_cleanup();
+> +}
+> +
+> +static const struct test_data test_init_1 = {};
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	g_test_init(&argc, &argv, NULL);
+> +
+> +	if (g_test_verbose())
+> +		__btd_log_init("*", 0);
+> +
+> +	g_test_add_data_func("/android_ipc/init", &test_init_1, test_init);
+> +
+> +	return g_test_run();
+> +}
+> 
 
- include/net/bluetooth/l2cap.h |  3 +++
- net/bluetooth/l2cap_core.c    | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 38 insertions(+)
-
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index dbc4a89984ca..40e15cd948c1 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -623,6 +623,9 @@ struct l2cap_conn {
- 	__u32			rx_len;
- 	__u8			tx_ident;
- 
-+	struct sk_buff_head	pending_rx;
-+	struct work_struct	pending_rx_work;
-+
- 	__u8			disc_reason;
- 
- 	struct delayed_work	security_timer;
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b0ad2c752d73..001195968f58 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -63,6 +63,8 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err);
- static void l2cap_tx(struct l2cap_chan *chan, struct l2cap_ctrl *control,
- 		     struct sk_buff_head *skbs, u8 event);
- 
-+static void process_pending_rx(struct work_struct *work);
-+
- static inline __u8 bdaddr_type(struct hci_conn *hcon, __u8 type)
- {
- 	if (hcon->type == LE_LINK) {
-@@ -1546,6 +1548,8 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
- 	}
- 
- 	mutex_unlock(&conn->chan_lock);
-+
-+	queue_work(hcon->hdev->workqueue, &conn->pending_rx_work);
- }
- 
- /* Notify sockets that we cannot guaranty reliability anymore */
-@@ -1671,6 +1675,9 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
- 
- 	kfree_skb(conn->rx_skb);
- 
-+	skb_queue_purge(&conn->pending_rx);
-+	flush_work(&conn->pending_rx_work);
-+
- 	l2cap_unregister_all_users(conn);
- 
- 	mutex_lock(&conn->chan_lock);
-@@ -1773,6 +1780,9 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 	else
- 		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
- 
-+	skb_queue_head_init(&conn->pending_rx);
-+	INIT_WORK(&conn->pending_rx_work, process_pending_rx);
-+
- 	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
- 
- 	return conn;
-@@ -7084,9 +7094,16 @@ drop:
- static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct l2cap_hdr *lh = (void *) skb->data;
-+	struct hci_conn *hcon = conn->hcon;
- 	u16 cid, len;
- 	__le16 psm;
- 
-+	if (hcon->state != BT_CONNECTED) {
-+		BT_DBG("queueing pending rx skb");
-+		skb_queue_tail(&conn->pending_rx, skb);
-+		return;
-+	}
-+
- 	skb_pull(skb, L2CAP_HDR_SIZE);
- 	cid = __le16_to_cpu(lh->cid);
- 	len = __le16_to_cpu(lh->len);
-@@ -7132,6 +7149,24 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 	}
- }
- 
-+static void process_pending_rx(struct work_struct *work)
-+{
-+	struct l2cap_conn *conn = container_of(work, struct l2cap_conn,
-+					       pending_rx_work);
-+
-+	BT_DBG("");
-+
-+	while (1) {
-+		struct sk_buff *skb;
-+
-+		skb = skb_dequeue(&conn->pending_rx);
-+		if (!skb)
-+			break;
-+
-+		l2cap_recv_frame(conn, skb);
-+	}
-+}
-+
- /* ---- L2CAP interface with lower layer (HCI) ---- */
- 
- int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
 -- 
-1.8.4.2
-
+Best regards, 
+Szymon Janc
