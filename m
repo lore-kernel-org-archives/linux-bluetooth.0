@@ -1,59 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <66980755-B25D-4EE6-A443-5A60AD75351D@holtmann.org>
-References: <CALkxMhFHWv7kxfRKrN3kq8NVRgVyk0vNpiR8ryKTm8s2b_exKQ@mail.gmail.com>
-	<AF259BFC-2022-4280-9F98-D4679A280A84@holtmann.org>
-	<CALkxMhHvbgaS4cxbrrQFGk59W9LoR-R47D-iTDBkrw3TG7sofA@mail.gmail.com>
-	<66980755-B25D-4EE6-A443-5A60AD75351D@holtmann.org>
-Date: Thu, 16 Jan 2014 08:00:59 +0100
-Message-ID: <CALkxMhECbmeiHHaekdpfQtoZBM+w-BTmYkvnSSFT1SPF-jbKYA@mail.gmail.com>
-Subject: Re: Wireshark and new BlueZ BTSNOOP format
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>, Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 4/5] Bluetooth: Handle security level 4 for RFCOMM connections
+Date: Wed, 15 Jan 2014 22:37:41 -0800
+Message-Id: <1389854262-62467-4-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+With the introduction of security level 4, the RFCOMM sockets need to
+be made aware of this new level. This change ensures that the pairing
+requirements are set correctly for these connections.
 
-I want to announce that Wireshark from SVN revision 54699 support new
-"Bluetooth monitor" BTSNOOP file format. This means that you are able
-to open file created by btmon in Wireshark. Support for capturing by
-libpcap is already requested to libpcap/tcpdump team (formally,
-implementation is done)
-
-By the way: there is also support for Ubertooth for Low Energy Link
-Layer, but via USB (usbmon) interface (and ubertooth host tool, for
-example: "ubertooth btle -f").
-
-
-Pozdrawiam / Best regards
----------------------------------------------------------------------------=
-----------------------------------
-Micha=C5=82 =C5=81ab=C4=99dzki, Software Engineer
-Tieto Corporation
-
-Product Development Services
-
-http://www.tieto.com / http://www.tieto.pl
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
-ASCII: Michal Labedzki
-location: Swobodna 1 Street, 50-088 Wroc=C5=82aw, Poland
-room: 5.01 (desk next to 5.08)
----
-Please note: The information contained in this message may be legally
-privileged and confidential and protected from disclosure. If the
-reader of this message is not the intended recipient, you are hereby
-notified that any unauthorised use, distribution or copying of this
-communication is strictly prohibited. If you have received this
-communication in error, please notify us immediately by replying to
-the message and deleting it from your computer. Thank You.
----
-Please consider the environment before printing this e-mail.
----
-Tieto Poland sp=C3=B3=C5=82ka z ograniczon=C4=85 odpowiedzialno=C5=9Bci=C4=
-=85 z siedzib=C4=85 w
-Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S=C4=85dzie Rejonowym
-Szczecin-Centrum w Szczecinie, XIII Wydzia=C5=82 Gospodarczy Krajowego
-Rejestru S=C4=85dowego pod numerem 0000124858. NIP: 8542085557. REGON:
-812023656. Kapita=C5=82 zak=C5=82adowy: 4 271500 PLN
+ include/net/bluetooth/rfcomm.h |  1 +
+ net/bluetooth/rfcomm/core.c    |  4 +++-
+ net/bluetooth/rfcomm/sock.c    | 12 +++++++++++-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index 486213a1aed8..c312cfc4e922 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -295,6 +295,7 @@ struct rfcomm_conninfo {
+ #define RFCOMM_LM_TRUSTED	0x0008
+ #define RFCOMM_LM_RELIABLE	0x0010
+ #define RFCOMM_LM_SECURE	0x0020
++#define RFCOMM_LM_FIPS		0x0040
+ 
+ #define rfcomm_pi(sk) ((struct rfcomm_pinfo *) sk)
+ 
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index facd8a79c038..ba115d472f7b 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -216,6 +216,7 @@ static int rfcomm_check_security(struct rfcomm_dlc *d)
+ 
+ 	switch (d->sec_level) {
+ 	case BT_SECURITY_HIGH:
++	case BT_SECURITY_FIPS:
+ 		auth_type = HCI_AT_GENERAL_BONDING_MITM;
+ 		break;
+ 	case BT_SECURITY_MEDIUM:
+@@ -2085,7 +2086,8 @@ static void rfcomm_security_cfm(struct hci_conn *conn, u8 status, u8 encrypt)
+ 				set_bit(RFCOMM_SEC_PENDING, &d->flags);
+ 				rfcomm_dlc_set_timer(d, RFCOMM_AUTH_TIMEOUT);
+ 				continue;
+-			} else if (d->sec_level == BT_SECURITY_HIGH) {
++			} else if (d->sec_level == BT_SECURITY_HIGH ||
++				   d->sec_level == BT_SECURITY_FIPS) {
+ 				set_bit(RFCOMM_ENC_DROP, &d->flags);
+ 				continue;
+ 			}
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 3c2d3e4aa2f5..fb8158af1f39 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -648,6 +648,11 @@ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname, char __u
+ 			break;
+ 		}
+ 
++		if (opt & RFCOMM_LM_FIPS) {
++			err = -EINVAL;
++			break;
++		}
++
+ 		if (opt & RFCOMM_LM_AUTH)
+ 			rfcomm_pi(sk)->sec_level = BT_SECURITY_LOW;
+ 		if (opt & RFCOMM_LM_ENCRYPT)
+@@ -762,7 +767,11 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __u
+ 			break;
+ 		case BT_SECURITY_HIGH:
+ 			opt = RFCOMM_LM_AUTH | RFCOMM_LM_ENCRYPT |
+-							RFCOMM_LM_SECURE;
++			      RFCOMM_LM_SECURE;
++			break;
++		case BT_SECURITY_FIPS:
++			opt = RFCOMM_LM_AUTH | RFCOMM_LM_ENCRYPT |
++			      RFCOMM_LM_SECURE | RFCOMM_LM_FIPS;
+ 			break;
+ 		default:
+ 			opt = 0;
+@@ -774,6 +783,7 @@ static int rfcomm_sock_getsockopt_old(struct socket *sock, int optname, char __u
+ 
+ 		if (put_user(opt, (u32 __user *) optval))
+ 			err = -EFAULT;
++
+ 		break;
+ 
+ 	case RFCOMM_CONNINFO:
+-- 
+1.8.4.2
+
