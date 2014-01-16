@@ -1,129 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/5] android/ipc-tester: Add test case to send cmd to registered service
-Date: Thu, 16 Jan 2014 10:45:37 +0100
-Message-Id: <1389865538-28157-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 3/5] android/ipc-tester: Add test case to send cmd
+Date: Thu, 16 Jan 2014 10:45:36 +0100
+Message-Id: <1389865538-28157-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1389865538-28157-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1389865538-28157-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will test sending command to previously registered service.
+This test case will check if ipc lib will raise SIGTERM
+after sending cmd to not registered service.
 ---
- android/test-ipc.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 62 insertions(+)
+ android/test-ipc.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/android/test-ipc.c b/android/test-ipc.c
-index 99f8559..930f9f4 100644
+index 6ac1175..99f8559 100644
 --- a/android/test-ipc.c
 +++ b/android/test-ipc.c
-@@ -46,6 +46,9 @@ struct test_data {
+@@ -44,6 +44,8 @@
+ 
+ struct test_data {
  	uint32_t expected_signal;
- 	const struct hal_hdr *cmd;
- 	uint16_t cmd_size;
-+	uint8_t service;
-+	const struct ipc_handler *handlers;
-+	uint8_t handlers_size;
++	const struct hal_hdr *cmd;
++	uint16_t cmd_size;
  };
  
  struct context {
-@@ -74,11 +77,23 @@ static void context_quit(struct context *context)
- static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
+@@ -95,6 +97,7 @@ static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
  						gpointer user_data)
  {
-+	struct context *context = user_data;
+ 	struct context *context = user_data;
 +	const struct test_data *test_data = context->data;
-+	uint8_t buf[128];
-+	int sk;
-+
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
- 		g_assert(FALSE);
- 		return FALSE;
+ 	GIOChannel *new_io;
+ 	GIOCondition watch_cond;
+ 	int sk;
+@@ -126,7 +129,7 @@ static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
+ 		context->cmd_io = new_io;
  	}
  
-+	sk = g_io_channel_unix_get_fd(io);
-+
-+	g_assert(read(sk, buf, sizeof(buf)) == test_data->cmd_size);
-+	g_assert(!memcmp(test_data->cmd, buf, test_data->cmd_size));
-+
-+	context_quit(context);
-+
+-	if (context->cmd_source && context->notif_source)
++	if (context->cmd_source && context->notif_source && !test_data->cmd)
+ 		context_quit(context);
+ 
  	return TRUE;
+@@ -262,8 +265,48 @@ static void test_init(gconstpointer data)
+ 	ipc_cleanup();
  }
  
-@@ -280,6 +295,17 @@ static gboolean send_cmd(gpointer user_data)
- 	return FALSE;
- }
- 
-+static gboolean register_service(gpointer user_data)
++static gboolean send_cmd(gpointer user_data)
 +{
 +	struct context *context = user_data;
 +	const struct test_data *test_data = context->data;
++	int sk;
 +
-+	ipc_register(test_data->service, test_data->handlers,
-+						test_data->handlers_size);
++	sk = g_io_channel_unix_get_fd(context->cmd_io);
++	g_assert(sk >= 0);
++
++	g_assert(write(sk, test_data->cmd, test_data->cmd_size) ==
++						test_data->cmd_size);
 +
 +	return FALSE;
 +}
 +
- static void test_cmd(gconstpointer data)
- {
- 	struct context *context = create_context(data);
-@@ -293,6 +319,28 @@ static void test_cmd(gconstpointer data)
- 	ipc_cleanup();
- }
- 
-+static void test_cmd_reg(gconstpointer data)
++static void test_cmd(gconstpointer data)
 +{
 +	struct context *context = create_context(data);
-+	const struct test_data *test_data = context->data;
 +
 +	ipc_init();
 +
-+	g_idle_add(register_service, context);
 +	g_idle_add(send_cmd, context);
 +
 +	execute_context(context);
 +
-+	ipc_unregister(test_data->service);
-+
 +	ipc_cleanup();
-+}
-+
-+static void test_cmd_handler(const void *buf, uint16_t len)
-+{
-+	ipc_send_rsp(0, 1, 0);
 +}
 +
  static const struct test_data test_init_1 = {};
  
- static const struct hal_hdr test_cmd_1_hdr = {
-@@ -307,6 +355,18 @@ static const struct test_data test_cmd_1 = {
- 	.expected_signal = SIGTERM
- };
- 
-+static const struct ipc_handler cmd_handlers[] = {
-+	{ test_cmd_handler, false, 0 }
++static const struct hal_hdr test_cmd_1_hdr = {
++	.service_id = 0,
++	.opcode = 1,
++	.len = 0
 +};
 +
-+static const struct test_data test_cmd_2 = {
++static const struct test_data test_cmd_1 = {
 +	.cmd = &test_cmd_1_hdr,
 +	.cmd_size = sizeof(test_cmd_1_hdr),
-+	.service = 0,
-+	.handlers = cmd_handlers,
-+	.handlers_size = 1
++	.expected_signal = SIGTERM
 +};
 +
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -316,6 +376,8 @@ int main(int argc, char *argv[])
+@@ -272,6 +315,7 @@ int main(int argc, char *argv[])
+ 		__btd_log_init("*", 0);
  
  	g_test_add_data_func("/android_ipc/init", &test_init_1, test_init);
- 	g_test_add_data_func("/android_ipc/send_cmd_1", &test_cmd_1, test_cmd);
-+	g_test_add_data_func("/android_ipc/send_cmd_2", &test_cmd_2,
-+							test_cmd_reg);
++	g_test_add_data_func("/android_ipc/send_cmd_1", &test_cmd_1, test_cmd);
  
  	return g_test_run();
  }
