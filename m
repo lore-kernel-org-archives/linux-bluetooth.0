@@ -1,63 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 1/2] android: Add btmgmt to debug builds
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1389883945-10707-1-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Thu, 16 Jan 2014 14:08:27 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <BE345789-E478-4C6C-B192-4DAB782CE135@holtmann.org>
-References: <1389883945-10707-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1389886700-21480-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1389886700-21480-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 16 Jan 2014 17:54:05 +0200
+Message-ID: <CABBYNZKhPRdgbS2nXxRwnYckyEgsZ0gPX5hWvT-=w=SJ3=DzzA@mail.gmail.com>
+Subject: Re: [PATCH] android/a2dp: Fix typo in condition
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrzej,
 
-> android/Android.mk | 36 ++++++++++++++++++++++++++++++++++++
-> 1 file changed, 36 insertions(+)
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 7e97ec8..b3e6a50 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -282,3 +282,39 @@ LOCAL_MODULE_TAGS := optional
-> LOCAL_MODULE := bluetoothd-snoop
-> 
-> include $(BUILD_EXECUTABLE)
-> +
-> +#
-> +# btmgmt
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES := \
-> +	../tools/btmgmt.c \
-> +	../monitor/mainloop.c \
-> +	../lib/bluetooth.c \
-> +	../lib/sdp.c \
-> +	../src/eir.c \
-> +	../src/glib-helper.c \
-> +	../src/shared/io-mainloop.c \
-> +	../src/shared/mgmt.c \
-> +	../src/shared/queue.c \
-> +	../src/shared/util.c \
-> +
-> +LOCAL_C_INCLUDES := \
-> +	$(call include-path-for, glib) \
-> +	$(call include-path-for, glib)/glib \
-> +	$(LOCAL_PATH)/.. \
-> +	$(LOCAL_PATH)/../src \
-> +	$(LOCAL_PATH)/../lib \
-> +
-> +LOCAL_SHARED_LIBRARIES := \
-> +	libglib \
+On Thu, Jan 16, 2014 at 5:38 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> ---
+>  android/a2dp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index 9b168ed..2288912 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -1262,7 +1262,7 @@ static void bt_stream_open(const void *buf, uint16_t len)
+>                 return;
+>         }
+>
+> -       if (avdtp_stream_get_transport(setup->stream, &fd, NULL, NULL, NULL)) {
+> +       if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, NULL, NULL)) {
+>                 error("avdtp_stream_get_transport: failed");
+>                 audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
+>                 return;
+> --
+> 1.8.5.2
 
-have Johan fix the dependency on GLib instead. It should not be needed anymore.
+Applied, thanks.
 
-Regards
 
-Marcel
-
+-- 
+Luiz Augusto von Dentz
