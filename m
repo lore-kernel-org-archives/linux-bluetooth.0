@@ -1,62 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: Questions on BlueZ 5.13: device creation API + persistent hid/input pipeline
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGXr9JHi5UuDd01POdua1UZ2kY+n=0wGcxaWx4Ta=55fHvZxyw@mail.gmail.com>
-Date: Thu, 16 Jan 2014 15:42:52 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <3D384890-B1E7-41D0-A859-CB7537DD74D3@holtmann.org>
-References: <CAGXr9JHw-S5XdXEcp3APN9OKadt7LuoPQmJ2RZkAsRZ8dDJB-w@mail.gmail.com> <F4C3DE28-E297-42B1-9FA2-B3335DF0F080@holtmann.org> <CAGXr9JHi5UuDd01POdua1UZ2kY+n=0wGcxaWx4Ta=55fHvZxyw@mail.gmail.com>
-To: Petri Gynther <pgynther@google.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 10/11] android/tester: Add HIDhost SetReport test
+Date: Fri, 17 Jan 2014 01:25:50 +0200
+Message-Id: <1389914751-18545-11-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1389914751-18545-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1389914751-18545-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+---
+ android/android-tester.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
->>> 2) There is a difference in HID vs HoG hid/input pipeline persistence.
->>> When the Bluetooth classic HID remote disconnects, the corresponding
->>> hid and input kernel devices are destroyed. And when it reconnects,
->>> hid and input devices are created again. This adds a lot of
->>> unnecessary delay at reconnect. And, the first keypress is always lost
->>> on reconnect.
->>> 
->>> In contrast, for the Bluetooth LE HoG remote, the hid/input pipeline
->>> is persistent. When HoG remote disconnects, hid and input devices
->>> remain in the system and are reused when the HoG remote reconnects.
->>> 
->>> Is there a way to make Bluetooth classic HID behave the same as HoG,
->>> i.e. retain the hid and input kernel devices on disconnect and reuse
->>> them on reconnect?
->> 
->> HID and HoG work a little bit different. HID uses a kernel transport driver while HoG uses /dev/uhid to do the work. Porting HID over to use /dev/uhid is certainly a possibility. We have considered that, but nobody has done that work yet.
->> 
->> Please remember that HID (with HIDP) is finding its right place in /sys device tree. While all HoG using /dev/uhid are considered virtual devices. There is a semi proposal that we agreed on New Orleans during the PlumbersConf, but I have no idea if David actually implemented it.
->> 
->> Another option is to make the HIDP transport smarter and persistent by integrating it into BlueZ 5’s kernel mgmt support. That however means you will need a much more recent Bluetooth subsystem. So 2.6.37 is not getting you anywhere near that even if we change HIDP support.
-> 
-> I'm using BlueZ kernel modules (bluetooth, hidp) from Linux
-> backports-3.13-rc2-1, so that is pretty recent code. Works fine on top
-> of 2.6.37. However, my HID and input drivers come from 2.6.37, as they
-> are not available in backports-3.13-rc2-1.
-> 
-> I understand the difference between HID and HoG. Both hidp and uhid
-> are hid_ll_drivers. HID input reports stay entirely in kernel, whereas
-> HoG is handled in bluetoothd and input reports are passed back to
-> kernel via /dev/uhid.
-> 
-> Assuming the latest HIDP code, what kind of effort would it be to make
-> the hid/input pipeline persistent when HID remote disconnects and
-> reconnects?
-
-for the HIDP code itself there is actually a lot of work. It does not have the model of persistent connections. It is designed to disconnect and reconnect. Since normally when you disconnect your device it is off. Otherwise you just sniff the connection. It is also a bit legacy reason from where L2CAP only had a concept of sockets and not l2cap_chan that only recently got introduced.
-
-Why you are loosing your first input, that sounds like a bug we should look into. That should actually not happen.
-
-To be honest, the easiest for you might be to run HID over /dev/uhid as well. So HoG and HID are both using /dev/uhid. A port of the input plugin to use /dev/uhid for HID should be straight forward. All the building blocks should be already there.
-
-Regards
-
-Marcel
+diff --git a/android/android-tester.c b/android/android-tester.c
+index f8d539d..c79ea16 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -3204,6 +3204,10 @@ static void setup_hidhost_interface(const void *test_data)
+ #define HID_GET_OUTPUT_REPORT		0x4a
+ #define HID_GET_FEATURE_REPORT		0x4b
+ 
++#define HID_SET_INPUT_REPORT		0x51
++#define HID_SET_OUTPUT_REPORT		0x52
++#define HID_SET_FEATURE_REPORT		0x53
++
+ static void hid_prepare_reply_protocol_mode(const void *data, uint16_t len)
+ {
+ 	struct test_data *t_data = tester_get_data();
+@@ -3268,6 +3272,12 @@ static void hid_ctrl_cid_hook_cb(const void *data, uint16_t len,
+ 	case HID_GET_FEATURE_REPORT:
+ 		hid_prepare_reply_report(data, len);
+ 		break;
++	/* HID device doesnot reply for this commads, so reaching pdu's
++	 * to hid device means assuming test passed */
++	case HID_SET_INPUT_REPORT:
++	case HID_SET_OUTPUT_REPORT:
++	case HID_SET_FEATURE_REPORT:
++		tester_test_passed();
+ 	}
+ }
+ 
+@@ -3525,6 +3535,21 @@ static void test_hidhost_get_report(const void *test_data)
+ 		tester_test_failed();
+ }
+ 
++static void test_hidhost_set_report(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	const uint8_t *hid_addr = hciemu_get_client_bdaddr(data->hciemu);
++	bt_bdaddr_t bdaddr;
++	bt_status_t bt_status;
++	char *buf = "010101";
++
++	data->cb_count = 0;
++	bdaddr2android((const bdaddr_t *) hid_addr, &bdaddr);
++	bt_status = data->if_hid->set_report(&bdaddr, BTHH_INPUT_REPORT, buf);
++	if (bt_status != BT_STATUS_SUCCESS)
++		tester_test_failed();
++}
++
+ #define test_bredrle(name, data, test_setup, test, test_teardown) \
+ 	do { \
+ 		struct test_data *user; \
+@@ -3894,5 +3919,9 @@ int main(int argc, char *argv[])
+ 			&hidhost_test_get_report, setup_hidhost_connect,
+ 				test_hidhost_get_report, teardown);
+ 
++	test_bredrle("HIDHost SetReport Success",
++				NULL, setup_hidhost_connect,
++				test_hidhost_set_report, teardown);
++
+ 	return tester_run();
+ }
+-- 
+1.8.3.2
 
