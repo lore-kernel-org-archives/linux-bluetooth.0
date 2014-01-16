@@ -1,78 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 16 Jan 2014 14:04:19 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 08/19] emulator/bthost: Add rfcomm_mcc_recv stub
-Message-ID: <20140116120419.GA18106@x220.p-661hnu-f1>
-References: <1389345509-27206-1-git-send-email-marcin.kraglak@tieto.com>
- <1389345509-27206-9-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] android/bluetooth: Fix discovering new devices
+Date: Thu, 16 Jan 2014 11:22:55 +0100
+Message-ID: <3622437.o5mxG3O6lC@uw000953>
+In-Reply-To: <20140114113920.GD4709@x220.p-661hnu-f1>
+References: <1389691863-4827-1-git-send-email-szymon.janc@tieto.com> <20140114113920.GD4709@x220.p-661hnu-f1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1389345509-27206-9-git-send-email-marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Johan,
 
-On Fri, Jan 10, 2014, Marcin Kraglak wrote:
-> It will handle mcc frames in bthost.
-> ---
->  emulator/bthost.c | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
+On Tuesday 14 of January 2014 13:39:20 Johan Hedberg wrote:
+> Hi Szymon,
+> 
+> On Tue, Jan 14, 2014, Szymon Janc wrote:
+> > +	} else {
+> > +		GSList *l;
+> > +
+> > +		for(l = devices; l; l = g_slist_next(l)) {
+> 
+> Coding style thing here (space after 'for'). You might wanna consider a
+> helper function and g_slist_foreach here tough.
+> 
+> > +static bool device_found_needed(struct device *dev)
+> > +{
+> > +	if (!dev)
+> > +		return true;
+> > +
+> > +	if (dev->bond_state == HAL_BOND_STATE_BONDED)
+> > +		return false;
+> > +
+> > +	return !dev->found;
+> > +}
+> 
+> I think you should provide lots more code comments here with proper
+> explanations of each if-statement. E.g. your commit message doesn't
+> mention anything about bonded devices and yet you have a check for this
+> state here.
 
-All patches are pushed with lots of cleanups on top.
+Now I think this check is not really needed, if paired remote is responding to
+inquiry then just notify HAL as with any other device found.
 
-This one I couldn't quite understand.
+I'll send V2 shortly.
 
-> diff --git a/emulator/bthost.c b/emulator/bthost.c
-> index 242ce19..591aae9 100644
-> --- a/emulator/bthost.c
-> +++ b/emulator/bthost.c
-> @@ -1387,10 +1387,29 @@ static void rfcomm_dm_recv(struct bthost *bthost, struct btconn *conn,
->  {
->  }
->  
-> +static void rfcomm_mcc_recv(struct bthost *bthost, struct btconn *conn,
-> +			struct l2conn *l2conn, const void *data, uint16_t len)
-> +{
-> +}
-> +
->  static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
->  				struct l2conn *l2conn, const void *data,
->  				uint16_t len)
->  {
-> +	const struct rfcomm_cmd *hdr = data;
-> +	const void *p;
-> +	uint8_t ea;
-> +
-> +	ea = RFCOMM_TEST_EA(hdr->length) ? true : false;
-> +
-> +	if (!RFCOMM_GET_DLCI(hdr->address)) {
-> +		if (ea)
-> +			p = data + sizeof(struct rfcomm_hdr);
-> +		else
-> +			p = data + sizeof(struct rfcomm_hdr) + sizeof(uint8_t);
-> +
-> +		rfcomm_mcc_recv(bthost, conn, l2conn, p, p - data);
-> +	}
 
-(first of all, the above got already cleaned up to a slightly simpler
-form upstream)
-
-This "p - data" seems to be the length of data that rfcomm mcc_recv
-should consume starting at p, right? In that case "p - data" will become
-sizeof(struct rfcomm_hdr) or sizeof(struct rfcomm_hdr) +
-sizeof(uint8_t), i.e. not the amount of data after p but the amount of
-data before p! I.e. shouldn't you be subtracting these amounts from len
-instead to get what you need to pass to rfcomm_mcc_recv?
-
-In general, I think you'd be better off with not doing this kind of
-pointer arithmetic to begin with (as it already lead to this bug).
-Instead just use clear "len" variables for tracking the amount of data
-behind some pointer. Also, you seem to be missing lots of checks for
-such length variables in the code before accessing the data behind the
-pointer. Please fix that too (the only reason why your code was working
-is that rfcomm_mcc_recv never checks the length variable).
-
-Johan
+-- 
+Best regards, 
+Szymon Janc
