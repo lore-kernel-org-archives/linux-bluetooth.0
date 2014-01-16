@@ -1,83 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 8/8] android/ipc-tester: Add more cases for malformed data
-Date: Thu, 16 Jan 2014 09:38:32 +0100
-Message-Id: <1389861512-2326-9-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv4 6/8] android/ipc-tester: Register services
+Date: Thu, 16 Jan 2014 09:38:30 +0100
+Message-Id: <1389861512-2326-7-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds tests for more types of possible data malformations.
+This patch adds basic bluetooth service registration during setup procedure.
+Without this daemon would reject commands for not registered services.
 ---
- android/ipc-tester.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ android/ipc-tester.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index f4321ce..3f4db82 100644
+index 0a04fb7..12ab85b 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -577,6 +577,48 @@ static const struct generic_data malformed_data = {
- 	.num_services = 1,
- };
+@@ -396,13 +396,53 @@ static gboolean check_for_daemon(gpointer user_data)
+ 	return false;
+ }
  
-+static const struct generic_data malformed_data2 = {
-+	.ipc_data = {
-+		/* use proper msg */
-+		.buffer = &register_bt_msg,
-+		/* but write incomplete */
-+		.len = sizeof(register_bt_msg) - 1,
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
++struct regmod_msg {
++	struct hal_hdr header;
++	struct hal_cmd_register_module cmd;
++} __attribute__((packed));
 +
-+struct malformed_data3_struct {
-+	struct regmod_msg valid_msg;
-+	int redundant_data;
-+}  __attribute__((packed));
++static bool setup_module(int service_id)
++{
++	struct hal_hdr response;
++	struct hal_hdr expected_response;
 +
-+static struct malformed_data3_struct malformed_data3_msg = {
-+	/* valid register service message */
-+	.valid_msg = {
++	struct regmod_msg btmodule_msg = {
 +		.header = {
 +			.service_id = HAL_SERVICE_ID_CORE,
 +			.opcode = HAL_OP_REGISTER_MODULE,
 +			.len = sizeof(struct hal_cmd_register_module),
 +			},
 +		.cmd = {
-+			.service_id = HAL_SERVICE_ID_CORE,
++			.service_id = service_id,
 +			},
-+	},
-+	/* plus redundant data */
-+	. redundant_data = 666,
-+};
++	};
 +
-+static const struct generic_data malformed_data3 = {
-+	.ipc_data = {
-+		/* use malformed msg */
-+		.buffer = &malformed_data3_msg,
-+		.len = sizeof(malformed_data3_msg),
-+	},
-+	.init_services = {HAL_SERVICE_ID_BLUETOOTH},
-+	.num_services = 1,
-+};
++	if (write(cmd_sk, &btmodule_msg, sizeof(btmodule_msg)) < 0)
++		goto fail;
 +
- struct hal_hdr enable_unknown_service_hdr = {
- 	.service_id = HAL_SERVICE_ID_MAX + 1,
- 	.opcode = HAL_OP_REGISTER_MODULE,
-@@ -653,6 +695,10 @@ int main(int argc, char *argv[])
- 						setup, ipc_send_tc, teardown);
- 	test_bredrle("Malformed data (wrong payload declared)", &malformed_data,
- 						setup, ipc_send_tc, teardown);
-+	test_bredrle("Malformed data2 (undersized msg)", &malformed_data2,
-+						setup, ipc_send_tc, teardown);
-+	test_bredrle("Malformed data3 (oversized msg)", &malformed_data3,
-+						setup, ipc_send_tc, teardown);
- 	test_bredrle("Invalid service", &enable_unknown_service_data,
- 						setup, ipc_send_tc, teardown);
- 	test_bredrle("Enable unregistered service",
++	if (read(cmd_sk, &response, sizeof(response)) < 0)
++		goto fail;
++
++	expected_response = btmodule_msg.header;
++	expected_response.len = 0;
++
++	if (memcmp(&response, &expected_response, sizeof(response)) == 0)
++		return true;
++
++fail:
++	tester_warn("Module registration failed.");
++	return false;
++}
++
+ static void setup(const void *data)
+ {
++	const struct generic_data *generic_data = data;
+ 	struct test_data *test_data = tester_get_data();
+ 	int signal_fd[2];
+ 	char buf[1024];
+ 	pid_t pid;
+ 	int len;
++	unsigned int i;
+ 
+ 	if (pipe(signal_fd)) {
+ 		tester_setup_failed();
+@@ -446,9 +486,15 @@ static void setup(const void *data)
+ 		return;
+ 	}
+ 
+-	/* TODO: register modules */
++	tester_print("Will init %d services.", generic_data->num_services);
++
++	for (i = 0; i < generic_data->num_services; i++)
++		if (!setup_module(generic_data->init_services[i]))
++			tester_setup_failed();
+ 
+ 	test_data->setup_done = true;
++
++	tester_setup_complete();
+ }
+ 
+ static void teardown(const void *data)
 -- 
 1.8.5.2
 
