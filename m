@@ -1,96 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/5] Bluetooth: Introduce requirements for security level 4
-Date: Wed, 15 Jan 2014 22:37:39 -0800
-Message-Id: <1389854262-62467-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2 1/5] Bluetooth: Track Secure Connections support of remote devices
+Date: Wed, 15 Jan 2014 22:37:38 -0800
+Message-Id: <1389854262-62467-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The security level 4 is a new strong security requirement that is based
-around 128-bit equivalent strength for link and encryption keys required
-using FIPS approved algorithms. Which means that E0, SAFER+ and P-192
-are not allowed. Only connections created with P-256 resulting from
-using Secure Connections support are allowed.
-
-This security level needs to be enforced when Secure Connection Only
-mode is enabled for a controller or a service requires FIPS compliant
-strong security. Currently it is not possible to enable either of
-these two cases. This patch just puts in the foundation for being
-able to handle security level 4 in the future.
-
-It should be noted that devices or services with security level 4
-requirement can only communicate using Bluetooth 4.1 controllers
-with support for Secure Connections. There is no backward compatibilty
-if used with older hardware.
+It is important to know if Secure Connections support has been enabled
+for a given remote device. The information is provided in the remote
+host features page. So track this information and provide a simple
+helper function to extract the status.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/bluetooth.h |  1 +
- include/net/bluetooth/hci.h       |  1 +
- net/bluetooth/hci_conn.c          | 18 +++++++++++++-----
- 3 files changed, 15 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci_core.h | 8 ++++++++
+ net/bluetooth/hci_event.c        | 3 +++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index f4f9ee466791..904777c1cd24 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -65,6 +65,7 @@ struct bt_security {
- #define BT_SECURITY_LOW		1
- #define BT_SECURITY_MEDIUM	2
- #define BT_SECURITY_HIGH	3
-+#define BT_SECURITY_FIPS	4
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 66e96ebffe97..8d225e4ea2ce 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -448,6 +448,7 @@ enum {
+ 	HCI_CONN_LE_SMP_PEND,
+ 	HCI_CONN_MGMT_CONNECTED,
+ 	HCI_CONN_SSP_ENABLED,
++	HCI_CONN_SC_ENABLED,
+ 	HCI_CONN_POWER_SAVE,
+ 	HCI_CONN_REMOTE_OOB,
+ 	HCI_CONN_6LOWPAN,
+@@ -460,6 +461,13 @@ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+ 	       test_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
+ }
  
- #define BT_DEFER_SETUP	7
- 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 2bc19881e250..0064a9aa5df1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -313,6 +313,7 @@ enum {
- #define HCI_LM_TRUSTED	0x0008
- #define HCI_LM_RELIABLE	0x0010
- #define HCI_LM_SECURE	0x0020
-+#define HCI_LM_FIPS	0x0040
- 
- /* Authentication types */
- #define HCI_AT_NO_BONDING		0x00
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index cf96b3438a91..0266bd8e4913 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -800,10 +800,17 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
- 	if (!(conn->link_mode & HCI_LM_AUTH))
- 		goto auth;
- 
--	/* An authenticated combination key has sufficient security for any
--	   security level. */
--	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
--	    conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
-+	/* An authenticated FIPS approved combination key has sufficient
-+	 * security for security level 4. */
-+	if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256 &&
-+	    sec_level == BT_SECURITY_FIPS)
-+		goto encrypt;
++static inline bool hci_conn_sc_enabled(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++	return test_bit(HCI_SC_ENABLED, &hdev->dev_flags) &&
++	       test_bit(HCI_CONN_SC_ENABLED, &conn->flags);
++}
 +
-+	/* An authenticated combination key has sufficient security for
-+	   security level 3. */
-+	if ((conn->key_type == HCI_LK_AUTH_COMBINATION_P192 ||
-+	     conn->key_type == HCI_LK_AUTH_COMBINATION_P256) &&
-+	    sec_level == BT_SECURITY_HIGH)
- 		goto encrypt;
+ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
+ {
+ 	struct hci_conn_hash *h = &hdev->conn_hash;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index da1eca1c43db..8c44bbe19add 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2898,6 +2898,9 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev,
+ 			 * features do not indicate SSP support */
+ 			clear_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
+ 		}
++
++		if (ev->features[0] & LMP_HOST_SC)
++			set_bit(HCI_CONN_SC_ENABLED, &conn->flags);
+ 	}
  
- 	/* An unauthenticated combination key has sufficient security for
-@@ -818,7 +825,8 @@ int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
- 	   is generated using maximum PIN code length (16).
- 	   For pre 2.1 units. */
- 	if (conn->key_type == HCI_LK_COMBINATION &&
--	    (sec_level != BT_SECURITY_HIGH || conn->pin_length == 16))
-+	    (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW ||
-+	     conn->pin_length == 16))
- 		goto encrypt;
- 
- auth:
+ 	if (conn->state != BT_CONFIG)
 -- 
 1.8.4.2
 
