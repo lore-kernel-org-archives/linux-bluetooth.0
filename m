@@ -1,332 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/5] android/unit: Add android IPC unit tests
-Date: Thu, 16 Jan 2014 11:04:58 +0100
-Message-Id: <1389866702-30697-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 3/3] android/ipc: Add PTS test results document for AVCTP
+Date: Thu, 16 Jan 2014 11:01:02 +0100
+Message-Id: <1389866462-7993-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1389866462-7993-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1389866462-7993-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will test ipc library. First test case will check
-ipc_init() call.
+This will allow for better tracking of current state of implementation.
 ---
- .gitignore          |   1 +
- android/Makefile.am |   8 ++
- android/test-ipc.c  | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 286 insertions(+)
- create mode 100644 android/test-ipc.c
+ android/Makefile.am   |  1 +
+ android/pts-avctp.txt | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 42 insertions(+)
+ create mode 100644 android/pts-avctp.txt
 
-diff --git a/.gitignore b/.gitignore
-index ac76fe2..ddd562a 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -114,3 +114,4 @@ android/bluetoothd
- android/haltest
- android/android-tester
- android/bluetoothd-snoop
-+android/test-ipc
 diff --git a/android/Makefile.am b/android/Makefile.am
-index cd4a526..0c61317 100644
+index 95ed7a7..f030bd4 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -117,6 +117,14 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+@@ -149,5 +149,6 @@ EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+ 		android/pics-a2dp.txt android/pixit-a2dp.txt \
+ 		android/pics-avctp.txt android/pixit-avctp.txt \
+ 		android/pts-a2dp.txt android/pts-avrcp.txt \
++		android/pts-avctp.txt \
  
- android_android_tester_LDFLAGS = -pthread -ldl
- 
-+noinst_PROGRAMS += android/test-ipc
-+
-+android_test_ipc_SOURCES = android/test-ipc.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/log.h src/log.c \
-+				android/ipc.c android/ipc.h
-+android_test_ipc_LDADD = @GLIB_LIBS@
-+
- plugin_LTLIBRARIES += android/audio.a2dp.default.la
- 
- android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
-diff --git a/android/test-ipc.c b/android/test-ipc.c
+ 		android/pts-l2cap.txt
+diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
 new file mode 100644
-index 0000000..6ac1175
+index 0000000..c057a10
 --- /dev/null
-+++ b/android/test-ipc.c
-@@ -0,0 +1,277 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+#include <stdio.h>
-+#include <errno.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
-+#include <string.h>
-+#include <fcntl.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+#include <sys/signalfd.h>
-+
-+#include <glib.h>
-+#include "src/shared/util.h"
-+#include "src/log.h"
-+#include "android/hal-msg.h"
-+#include "android/ipc.h"
-+
-+struct test_data {
-+	uint32_t expected_signal;
-+};
-+
-+struct context {
-+	GMainLoop *main_loop;
-+
-+	int sk;
-+
-+	guint source;
-+	guint cmd_source;
-+	guint notif_source;
-+
-+	GIOChannel *cmd_io;
-+	GIOChannel *notif_io;
-+	GIOChannel *signal_io;
-+
-+	guint signal_source;
-+
-+	const struct test_data *data;
-+};
-+
-+static void context_quit(struct context *context)
-+{
-+	g_main_loop_quit(context->main_loop);
-+}
-+
-+static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	return TRUE;
-+}
-+
-+static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	GIOChannel *new_io;
-+	GIOCondition watch_cond;
-+	int sk;
-+
-+	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-+		g_assert(FALSE);
-+		return FALSE;
-+	}
-+
-+	g_assert(!context->cmd_source || !context->notif_source);
-+
-+	sk = accept(context->sk, NULL, NULL);
-+	g_assert(sk >= 0);
-+
-+	new_io = g_io_channel_unix_new(sk);
-+
-+	watch_cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+
-+	if (context->cmd_source && !context->notif_source) {
-+		context->notif_source = g_io_add_watch(new_io, watch_cond,
-+							notif_watch, context);
-+		g_assert(context->notif_source > 0);
-+		context->notif_io = new_io;
-+	}
-+
-+	if (!context->cmd_source) {
-+		context->cmd_source = g_io_add_watch(new_io, watch_cond,
-+							cmd_watch, context);
-+		context->cmd_io = new_io;
-+	}
-+
-+	if (context->cmd_source && context->notif_source)
-+		context_quit(context);
-+
-+	return TRUE;
-+}
-+
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_data *test_data = context->data;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
-+
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
-+		return FALSE;
-+
-+	fd = g_io_channel_unix_get_fd(channel);
-+
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return FALSE;
-+
-+	g_assert(test_data->expected_signal == si.ssi_signo);
-+	context_quit(context);
-+	return TRUE;
-+}
-+
-+static guint setup_signalfd(gpointer user_data)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int ret;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
-+	g_assert(ret == 0);
-+
-+	fd = signalfd(-1, &mask, 0);
-+	g_assert(fd >= 0);
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, user_data);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
-+static struct context *create_context(gconstpointer data)
-+{
-+	struct context *context = g_new0(struct context, 1);
-+	struct sockaddr_un addr;
-+	GIOChannel *io;
-+	int ret, sk;
-+
-+	context->main_loop = g_main_loop_new(NULL, FALSE);
-+	g_assert(context->main_loop);
-+
-+	context->signal_source = setup_signalfd(context);
-+	g_assert(context->signal_source);
-+
-+	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-+	g_assert(sk >= 0);
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+
-+	ret = bind(sk, (struct sockaddr *) &addr, sizeof(addr));
-+	g_assert(ret == 0);
-+
-+	ret = listen(sk, 5);
-+	g_assert(ret == 0);
-+
-+	io = g_io_channel_unix_new(sk);
-+
-+	g_io_channel_set_close_on_unref(io, TRUE);
-+
-+	context->source = g_io_add_watch(io,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				connect_handler, context);
-+	g_assert(context->source > 0);
-+
-+	g_io_channel_unref(io);
-+
-+	context->sk = sk;
-+	context->data = data;
-+
-+	return context;
-+}
-+
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	g_io_channel_shutdown(context->notif_io, true, NULL);
-+	g_io_channel_shutdown(context->cmd_io, true, NULL);
-+	g_io_channel_unref(context->cmd_io);
-+	g_io_channel_unref(context->notif_io);
-+
-+	g_source_remove(context->notif_source);
-+	g_source_remove(context->signal_source);
-+	g_source_remove(context->cmd_source);
-+	g_source_remove(context->source);
-+
-+	g_main_loop_unref(context->main_loop);
-+
-+	g_free(context);
-+}
-+
-+static void test_init(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+
-+	ipc_init();
-+
-+	execute_context(context);
-+
-+	ipc_cleanup();
-+}
-+
-+static const struct test_data test_init_1 = {};
-+
-+int main(int argc, char *argv[])
-+{
-+	g_test_init(&argc, &argv, NULL);
-+
-+	if (g_test_verbose())
-+		__btd_log_init("*", 0);
-+
-+	g_test_add_data_func("/android_ipc/init", &test_init_1, test_init);
-+
-+	return g_test_run();
-+}
++++ b/android/pts-avctp.txt
+@@ -0,0 +1,41 @@
++PTS test results for AVCTP
++
++PTS version: 5.0
++Tested: --not yet tested--
++
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
++
++		Controller (CT)
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_CT_CCM_BV_01_C	N/A
++TC_CT_CCM_BV_02_C	N/A
++TC_CT_CCM_BV_03_C	N/A
++TC_CT_CCM_BV_04_C	N/A
++TC_CT_CCM_BI_01_C	N/A
++TC_CT_NFR_BV_01_C	N/A
++TC_CT_NFR_BV_04_C	N/A
++TC_CT_FRA_BV_01_C	N/A
++TC_CT_FRA_BV_04_C	N/A
++-------------------------------------------------------------------------------
++
++
++		Target (TG)
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_TG_CCM_BV_01_C	INC
++TC_TG_CCM_BV_02_C	INC
++TC_TG_CCM_BV_03_C	INC
++TC_TG_CCM_BV_04_C	INC
++TC_TG_NFR_BV_02_C	INC
++TC_TG_NFR_BV_03_C	INC
++TC_TG_NFR_BI_01_C	INC
++TC_TG_FRA_BV_02_C	INC
++TC_TG_FRA_BV_03_C	INC
++-------------------------------------------------------------------------------
 -- 
-1.8.3.1
+1.8.5.2
 
