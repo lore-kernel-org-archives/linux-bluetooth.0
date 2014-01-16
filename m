@@ -1,47 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android: Add simple rotation of snoop file
-Date: Thu, 16 Jan 2014 09:02:43 +0100
-Message-ID: <2219671.NIHpfoq1oi@uw000953>
-In-Reply-To: <1389819699-12055-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1389819699-12055-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <66980755-B25D-4EE6-A443-5A60AD75351D@holtmann.org>
+References: <CALkxMhFHWv7kxfRKrN3kq8NVRgVyk0vNpiR8ryKTm8s2b_exKQ@mail.gmail.com>
+	<AF259BFC-2022-4280-9F98-D4679A280A84@holtmann.org>
+	<CALkxMhHvbgaS4cxbrrQFGk59W9LoR-R47D-iTDBkrw3TG7sofA@mail.gmail.com>
+	<66980755-B25D-4EE6-A443-5A60AD75351D@holtmann.org>
+Date: Thu, 16 Jan 2014 08:00:59 +0100
+Message-ID: <CALkxMhECbmeiHHaekdpfQtoZBM+w-BTmYkvnSSFT1SPF-jbKYA@mail.gmail.com>
+Subject: Re: Wireshark and new BlueZ BTSNOOP format
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>, Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hello,
 
-On Wednesday 15 of January 2014 22:01:36 Andrzej Kaczmarek wrote:
-> Already existing snoop file is renamed by adding ".old" suffix before
-> new one is created. This is useful in case phone is restarted so logs
-> are not overwritten and for this reason it's only applied in case
-> default snoop file name is used.
-> ---
->  android/bluetoothd-snoop.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/android/bluetoothd-snoop.c b/android/bluetoothd-snoop.c
-> index 02f44e9..23e0bfd 100644
-> --- a/android/bluetoothd-snoop.c
-> +++ b/android/bluetoothd-snoop.c
-> @@ -206,6 +206,9 @@ int main(int argc, char *argv[])
->  
->  	mainloop_set_signal(&mask, signal_callback, NULL, NULL);
->  
-> +	if (!strcmp(DEFAULT_SNOOP_FILE, path))
-> +		rename(DEFAULT_SNOOP_FILE, DEFAULT_SNOOP_FILE ".old");
-> +
->  	if (open_monitor(path) < 0) {
->  		printf("Failed to start bluetoothd_snoop\n");
->  		return EXIT_FAILURE;
-> 
+I want to announce that Wireshark from SVN revision 54699 support new
+"Bluetooth monitor" BTSNOOP file format. This means that you are able
+to open file created by btmon in Wireshark. Support for capturing by
+libpcap is already requested to libpcap/tcpdump team (formally,
+implementation is done)
 
-All patches in this set applied, thanks.
-(after changing commits order to not break build in 1/4)
+By the way: there is also support for Ubertooth for Low Energy Link
+Layer, but via USB (usbmon) interface (and ubertooth host tool, for
+example: "ubertooth btle -f").
 
--- 
-Best regards, 
-Szymon Janc
+
+Pozdrawiam / Best regards
+---------------------------------------------------------------------------=
+----------------------------------
+Micha=C5=82 =C5=81ab=C4=99dzki, Software Engineer
+Tieto Corporation
+
+Product Development Services
+
+http://www.tieto.com / http://www.tieto.pl
+---
+ASCII: Michal Labedzki
+location: Swobodna 1 Street, 50-088 Wroc=C5=82aw, Poland
+room: 5.01 (desk next to 5.08)
+---
+Please note: The information contained in this message may be legally
+privileged and confidential and protected from disclosure. If the
+reader of this message is not the intended recipient, you are hereby
+notified that any unauthorised use, distribution or copying of this
+communication is strictly prohibited. If you have received this
+communication in error, please notify us immediately by replying to
+the message and deleting it from your computer. Thank You.
+---
+Please consider the environment before printing this e-mail.
+---
+Tieto Poland sp=C3=B3=C5=82ka z ograniczon=C4=85 odpowiedzialno=C5=9Bci=C4=
+=85 z siedzib=C4=85 w
+Szczecinie, ul. Malczewskiego 26. Zarejestrowana w S=C4=85dzie Rejonowym
+Szczecin-Centrum w Szczecinie, XIII Wydzia=C5=82 Gospodarczy Krajowego
+Rejestru S=C4=85dowego pod numerem 0000124858. NIP: 8542085557. REGON:
+812023656. Kapita=C5=82 zak=C5=82adowy: 4 271500 PLN
