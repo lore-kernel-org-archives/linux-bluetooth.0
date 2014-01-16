@@ -1,63 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Avoid use of session socket after the session gets freed
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/5] Bluetooth: Track Secure Connections support of remote devices
-Date: Wed, 15 Jan 2014 22:37:38 -0800
-Message-Id: <1389854262-62467-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1389532808-1845-1-git-send-email-Dean_Jenkins@mentor.com>
+Date: Wed, 15 Jan 2014 22:23:00 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	vitaly_kuzmichev@mentor.com
+Message-Id: <E314E4CA-CC4C-4756-B84B-E38B018757FA@holtmann.org>
+References: <1389532808-1845-1-git-send-email-Dean_Jenkins@mentor.com>
+To: dean_jenkins@mentor.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is important to know if Secure Connections support has been enabled
-for a given remote device. The information is provided in the remote
-host features page. So track this information and provide a simple
-helper function to extract the status.
+Hi Dean,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci_core.h | 8 ++++++++
- net/bluetooth/hci_event.c        | 3 +++
- 2 files changed, 11 insertions(+)
+> The commits 08c30aca9e698faddebd34f81e1196295f9dc063 "Bluetooth: Remove
+> RFCOMM session refcnt" and 8ff52f7d04d9cc31f1e81dcf9a2ba6335ed34905
+> "Bluetooth: Return RFCOMM session ptrs to avoid freed session"
+> allow rfcomm_recv_ua and rfcomm_session_close to delete the session
+> (and free the corresponding socket) and propagate NULL session pointer
+> to the upper callers.
+> 
+> Additional fix is required to terminate the loop in rfcomm_process_rx
+> function to avoid use of freed 'sk' memory.
+> 
+> The issue is only reproducible with kernel option CONFIG_PAGE_POISONING
+> enabled making freed memory being changed and filled up with fixed char
+> value used to unmask use-after-free issues.
+> 
+> Signed-off-by: Vitaly Kuzmichev <Vitaly_Kuzmichev@mentor.com>
+> Acked-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+> ---
+> net/bluetooth/rfcomm/core.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index facd8a7..5632146 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -1857,7 +1857,7 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
+> 	BT_DBG("session %p state %ld qlen %d", s, s->state, skb_queue_len(&sk->sk_receive_queue));
+> 
+> 	/* Get data directly from socket receive queue without copying it. */
+> -	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
+> +	while (s && (skb = skb_dequeue(&sk->sk_receive_queue))) {
+> 		skb_orphan(skb);
+> 		if (!skb_linearize(skb))
+> 			s = rfcomm_recv_frame(s, skb);
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 66e96ebffe97..8d225e4ea2ce 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -448,6 +448,7 @@ enum {
- 	HCI_CONN_LE_SMP_PEND,
- 	HCI_CONN_MGMT_CONNECTED,
- 	HCI_CONN_SSP_ENABLED,
-+	HCI_CONN_SC_ENABLED,
- 	HCI_CONN_POWER_SAVE,
- 	HCI_CONN_REMOTE_OOB,
- 	HCI_CONN_6LOWPAN,
-@@ -460,6 +461,13 @@ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
- 	       test_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
- }
- 
-+static inline bool hci_conn_sc_enabled(struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	return test_bit(HCI_SC_ENABLED, &hdev->dev_flags) &&
-+	       test_bit(HCI_CONN_SC_ENABLED, &conn->flags);
-+}
-+
- static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
- {
- 	struct hci_conn_hash *h = &hdev->conn_hash;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index da1eca1c43db..8c44bbe19add 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2898,6 +2898,9 @@ static void hci_remote_ext_features_evt(struct hci_dev *hdev,
- 			 * features do not indicate SSP support */
- 			clear_bit(HCI_CONN_SSP_ENABLED, &conn->flags);
- 		}
-+
-+		if (ev->features[0] & LMP_HOST_SC)
-+			set_bit(HCI_CONN_SC_ENABLED, &conn->flags);
- 	}
- 
- 	if (conn->state != BT_CONFIG)
--- 
-1.8.4.2
+Let do a break here.
+
+		if (!s)
+			break;
+
+Regards
+
+Marcel
 
