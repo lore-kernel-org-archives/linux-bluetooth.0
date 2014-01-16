@@ -1,82 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] android/bluetooth: Fix discovering new devices
-Date: Thu, 16 Jan 2014 14:35:25 +0100
-Message-Id: <1389879325-21217-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 16 Jan 2014 14:04:19 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 08/19] emulator/bthost: Add rfcomm_mcc_recv stub
+Message-ID: <20140116120419.GA18106@x220.p-661hnu-f1>
+References: <1389345509-27206-1-git-send-email-marcin.kraglak@tieto.com>
+ <1389345509-27206-9-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1389345509-27206-9-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Device found events should be send also for known devices if this is
-new discovery session. Otherwise Android will ignore those devices.
----
-V2: report bonded devices in same way as non-bonded
+Hi Marcin,
 
+On Fri, Jan 10, 2014, Marcin Kraglak wrote:
+> It will handle mcc frames in bthost.
+> ---
+>  emulator/bthost.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 
- android/bluetooth.c | 22 ++++++++++++++++++----
- 1 file changed, 18 insertions(+), 4 deletions(-)
+All patches are pushed with lots of cleanups on top.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index f1e5458..b235cbd 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -90,6 +90,8 @@ struct device {
- 	uint32_t timestamp;
- 
- 	GSList *uuids;
-+
-+	bool found; /* if device is found in current discovery session */
- };
- 
- struct browse_req {
-@@ -903,6 +905,13 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
- 	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_NOTIF, ev->passkey);
- }
- 
-+static void clear_device_found(gpointer data, gpointer user_data)
-+{
-+	struct device *dev = data;
-+
-+	dev->found = false;
-+}
-+
- static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -924,10 +933,12 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 
- 	DBG("new discovering state %u", ev->discovering);
- 
--	if (adapter.discovering)
-+	if (adapter.discovering) {
- 		cp.state = HAL_DISCOVERY_STATE_STARTED;
--	else
-+	} else {
-+		g_slist_foreach(devices, clear_device_found, NULL);
- 		cp.state = HAL_DISCOVERY_STATE_STOPPED;
-+	}
- 
- 	ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH,
- 			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
-@@ -983,12 +994,15 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 	eir_parse(&eir, data, data_len);
- 
- 	dev = find_device(bdaddr);
--	if (!dev) {
-+	if (!dev || !dev->found) {
- 		struct hal_ev_device_found *ev = (void *) buf;
- 		bdaddr_t android_bdaddr;
- 		uint8_t android_type;
- 
--		dev = create_device(bdaddr, bdaddr_type);
-+		if (!dev)
-+			dev = create_device(bdaddr, bdaddr_type);
-+
-+		dev->found = true;
- 
- 		size += sizeof(*ev);
- 
--- 
-1.8.3.2
+This one I couldn't quite understand.
 
+> diff --git a/emulator/bthost.c b/emulator/bthost.c
+> index 242ce19..591aae9 100644
+> --- a/emulator/bthost.c
+> +++ b/emulator/bthost.c
+> @@ -1387,10 +1387,29 @@ static void rfcomm_dm_recv(struct bthost *bthost, struct btconn *conn,
+>  {
+>  }
+>  
+> +static void rfcomm_mcc_recv(struct bthost *bthost, struct btconn *conn,
+> +			struct l2conn *l2conn, const void *data, uint16_t len)
+> +{
+> +}
+> +
+>  static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
+>  				struct l2conn *l2conn, const void *data,
+>  				uint16_t len)
+>  {
+> +	const struct rfcomm_cmd *hdr = data;
+> +	const void *p;
+> +	uint8_t ea;
+> +
+> +	ea = RFCOMM_TEST_EA(hdr->length) ? true : false;
+> +
+> +	if (!RFCOMM_GET_DLCI(hdr->address)) {
+> +		if (ea)
+> +			p = data + sizeof(struct rfcomm_hdr);
+> +		else
+> +			p = data + sizeof(struct rfcomm_hdr) + sizeof(uint8_t);
+> +
+> +		rfcomm_mcc_recv(bthost, conn, l2conn, p, p - data);
+> +	}
+
+(first of all, the above got already cleaned up to a slightly simpler
+form upstream)
+
+This "p - data" seems to be the length of data that rfcomm mcc_recv
+should consume starting at p, right? In that case "p - data" will become
+sizeof(struct rfcomm_hdr) or sizeof(struct rfcomm_hdr) +
+sizeof(uint8_t), i.e. not the amount of data after p but the amount of
+data before p! I.e. shouldn't you be subtracting these amounts from len
+instead to get what you need to pass to rfcomm_mcc_recv?
+
+In general, I think you'd be better off with not doing this kind of
+pointer arithmetic to begin with (as it already lead to this bug).
+Instead just use clear "len" variables for tracking the amount of data
+behind some pointer. Also, you seem to be missing lots of checks for
+such length variables in the code before accessing the data behind the
+pointer. Please fix that too (the only reason why your code was working
+is that rfcomm_mcc_recv never checks the length variable).
+
+Johan
