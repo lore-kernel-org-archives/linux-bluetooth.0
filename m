@@ -1,189 +1,190 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 3/8] android/ipc-tester: Add IPC initialization
-Date: Thu, 16 Jan 2014 09:38:27 +0100
-Message-Id: <1389861512-2326-4-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv4 2/8] android/ipc-tester: Run daemon in separate process
+Date: Thu, 16 Jan 2014 09:38:26 +0100
+Message-Id: <1389861512-2326-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1389861512-2326-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds IPC mechanism initialization.
-The deamon is being started and IPC socket connection is established.
+This patch adds new process waiting to run daemon when needed.
 ---
- android/ipc-tester.c | 122 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 122 insertions(+)
+ android/ipc-tester.c | 124 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 123 insertions(+), 1 deletion(-)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index d920ccf..b76be32 100644
+index 9a1b4b0..d920ccf 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -23,6 +23,8 @@
+@@ -21,8 +21,14 @@
+  *
+  */
  
- #include <stdlib.h>
++#include <stdlib.h>
  #include <unistd.h>
-+#include <errno.h>
-+#include <poll.h>
  
- #include <sys/socket.h>
- #include <sys/types.h>
-@@ -38,6 +40,8 @@
- #include "src/shared/mgmt.h"
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <sys/un.h>
++#include <libgen.h>
+ #include <glib.h>
+ 
+ #include "lib/bluetooth.h"
+@@ -33,13 +39,19 @@
  #include "src/shared/hciemu.h"
  
-+#include "hal-msg.h"
-+#include <cutils/properties.h>
  
- #define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
- #define EMULATOR_SIGNAL "emulator_started"
-@@ -50,8 +54,14 @@ struct test_data {
- 	pid_t bluetoothd_pid;
++#define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
++#define EMULATOR_SIGNAL "emulator_started"
++
+ struct test_data {
+ 	struct mgmt *mgmt;
+ 	uint16_t mgmt_index;
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
++	pid_t bluetoothd_pid;
  };
  
-+#define CONNECT_TIMEOUT (5 * 1000)
-+#define SERVICE_NAME "bluetoothd"
-+
- static char exec_dir[PATH_MAX + 1];
- 
-+static int cmd_sk = -1;
-+static int notif_sk = -1;
++static char exec_dir[PATH_MAX + 1];
 +
  static void read_info_callback(uint8_t status, uint16_t length,
  					const void *param, void *user_data)
  {
-@@ -246,6 +256,109 @@ failed:
- 	close(fd);
+@@ -168,13 +180,121 @@ static void test_post_teardown(const void *data)
+ 	test_data->hciemu = NULL;
  }
  
-+static int accept_connection(int sk)
++static void bluetoothd_start(int hci_index)
 +{
-+	int err;
-+	struct pollfd pfd;
-+	int new_sk;
++	char prg_name[PATH_MAX + 1];
++	char index[8];
++	char *prg_argv[4];
 +
-+	memset(&pfd, 0 , sizeof(pfd));
-+	pfd.fd = sk;
-+	pfd.events = POLLIN;
++	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
++	snprintf(index, sizeof(index), "%d", hci_index);
 +
-+	err = poll(&pfd, 1, CONNECT_TIMEOUT);
-+	if (err < 0) {
-+		err = errno;
-+		tester_warn("Failed to poll: %d (%s)", err, strerror(err));
-+		return -errno;
-+	}
++	prg_argv[0] = prg_name;
++	prg_argv[1] = "-i";
++	prg_argv[2] = index;
++	prg_argv[3] = NULL;
 +
-+	if (err == 0) {
-+		tester_warn("bluetoothd connect timeout");
-+		return -errno;
-+	}
++	if (!tester_use_debug())
++		fclose(stderr);
 +
-+	new_sk = accept(sk, NULL, NULL);
-+	if (new_sk < 0) {
-+		err = errno;
-+		tester_warn("Failed to accept socket: %d (%s)",
-+							err, strerror(err));
-+		return -errno;
-+	}
-+
-+	return new_sk;
++	execve(prg_argv[0], prg_argv, NULL);
 +}
 +
-+static bool init_ipc(void)
++static void emulator(int pipe, int hci_index)
 +{
++	static const char SYSTEM_SOCKET_PATH[] = "\0android_system";
++	char buf[1024];
 +	struct sockaddr_un addr;
++	struct timeval tv;
++	int fd;
++	ssize_t len;
 +
-+	int sk;
-+	int err;
++	fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
++	if (fd < 0)
++		goto failed;
 +
-+	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-+	if (sk < 0) {
-+		err = errno;
-+		tester_warn("Failed to create socket: %d (%s)", err,
-+							strerror(err));
-+		return false;
-+	}
++	tv.tv_sec = WAIT_FOR_SIGNAL_TIME;
++	tv.tv_usec = 0;
++	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
 +
 +	memset(&addr, 0, sizeof(addr));
 +	addr.sun_family = AF_UNIX;
++	memcpy(addr.sun_path, SYSTEM_SOCKET_PATH, sizeof(SYSTEM_SOCKET_PATH));
 +
-+	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		err = errno;
-+		tester_warn("Failed to bind socket: %d (%s)", err,
-+								strerror(err));
-+		close(sk);
-+		return false;
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		perror("Failed to bind system socket");
++		goto failed;
 +	}
 +
-+	if (listen(sk, 2) < 0) {
-+		err = errno;
-+		tester_warn("Failed to listen on socket: %d (%s)", err,
-+								strerror(err));
-+		close(sk);
-+		return false;
-+	}
++	len = write(pipe, EMULATOR_SIGNAL, sizeof(EMULATOR_SIGNAL));
 +
-+	/* Start Android Bluetooth daemon service */
-+	if (property_set("ctl.start", SERVICE_NAME) < 0) {
-+		tester_warn("Failed to start service %s", SERVICE_NAME);
-+		close(sk);
-+		return false;
-+	}
++	if (len != sizeof(EMULATOR_SIGNAL))
++		goto failed;
 +
-+	cmd_sk = accept_connection(sk);
-+	if (cmd_sk < 0) {
-+		close(sk);
-+		return false;
-+	}
++	memset(buf, 0, sizeof(buf));
 +
-+	notif_sk = accept_connection(sk);
-+	if (notif_sk < 0) {
-+		close(sk);
-+		close(cmd_sk);
-+		cmd_sk = -1;
-+		return false;
-+	}
++	len = read(fd, buf, sizeof(buf));
++	if (len <= 0 || (strcmp(buf, "ctl.start=bluetoothd")))
++		goto failed;
 +
-+	tester_print("bluetoothd connected");
++	close(pipe);
++	close(fd);
++	bluetoothd_start(hci_index);
 +
-+	close(sk);
-+
-+	return true;
-+}
-+
-+static void cleanup_ipc(void)
-+{
-+	close(cmd_sk);
-+	cmd_sk = -1;
++failed:
++	close(pipe);
++	close(fd);
 +}
 +
  static void setup(const void *data)
  {
- 	struct test_data *test_data = tester_get_data();
-@@ -286,12 +399,21 @@ static void setup(const void *data)
- 		tester_setup_failed();
- 		return;
- 	}
-+	if (!init_ipc()) {
-+		tester_warn("Cannot initialize IPC mechanism!");
+-	tester_setup_failed();
++	struct test_data *test_data = tester_get_data();
++	int signal_fd[2];
++	char buf[1024];
++	pid_t pid;
++	int len;
++
++	if (pipe(signal_fd)) {
 +		tester_setup_failed();
 +		return;
 +	}
 +
-+	/* TODO: register modules */
++	pid = fork();
++
++	if (pid < 0) {
++		close(signal_fd[0]);
++		close(signal_fd[1]);
++		tester_setup_failed();
++		return;
++	}
++
++	if (pid == 0) {
++		if (!tester_use_debug())
++			fclose(stderr);
++
++		close(signal_fd[0]);
++		emulator(signal_fd[1], test_data->mgmt_index);
++		exit(0);
++	}
++
++	close(signal_fd[1]);
++	test_data->bluetoothd_pid = pid;
++
++	len = read(signal_fd[0], buf, sizeof(buf));
++	if (len <= 0 || (strcmp(buf, EMULATOR_SIGNAL))) {
++		close(signal_fd[0]);
++		tester_setup_failed();
++		return;
++	}
  }
  
  static void teardown(const void *data)
  {
- 	struct test_data *test_data = tester_get_data();
- 
-+	cleanup_ipc();
++	struct test_data *test_data = tester_get_data();
 +
- 	if (test_data->bluetoothd_pid)
- 		waitpid(test_data->bluetoothd_pid, NULL, 0);
++	if (test_data->bluetoothd_pid)
++		waitpid(test_data->bluetoothd_pid, NULL, 0);
++
+ 	tester_teardown_complete();
+ }
  
+@@ -196,6 +316,8 @@ static void ipc_send_tc(const void *data)
+ 
+ int main(int argc, char *argv[])
+ {
++	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
++
+ 	tester_init(&argc, &argv);
+ 
+ 	test_bredrle("Test Dummy", NULL, setup, ipc_send_tc, teardown);
 -- 
 1.8.5.2
 
