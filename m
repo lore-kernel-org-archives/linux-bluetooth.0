@@ -1,37 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v6] Bluetooth: Add hci_h4p driver
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140111002801.GA20216@amd.pavel.ucw.cz>
-Date: Wed, 15 Jan 2014 19:01:51 -0800
-Cc: =?windows-1252?Q?Pali_Roh=E1r?= <pali.rohar@gmail.com>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?=
-	<freemangordon@abv.bg>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+Date: Thu, 16 Jan 2014 01:22:24 +0100
+From: Pavel Machek <pavel@ucw.cz>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	linux-kernel <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
 	Ville Tervo <ville.tervo@nokia.com>,
 	Sebastian Reichel <sre@ring0.de>
-Message-Id: <FD05FD52-1502-4AB8-8650-FC785B700088@holtmann.org>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com> <1727897.LBX8128hIo@izba> <20140102161824.GA8204@amd.pavel.ucw.cz> <A5B72277-42D4-4A24-8A29-9BE18762E8C4@holtmann.org> <20140103001753.GA21023@amd.pavel.ucw.cz> <20140110145207.GB12048@amd.pavel.ucw.cz> <20140111002801.GA20216@amd.pavel.ucw.cz>
-To: Pavel Machek <pavel@ucw.cz>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH v6] Bluetooth: Add hci_h4p driver
+Message-ID: <20140116002224.GB3726@amd.pavel.ucw.cz>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
+ <1727897.LBX8128hIo@izba>
+ <20140102161824.GA8204@amd.pavel.ucw.cz>
+ <A5B72277-42D4-4A24-8A29-9BE18762E8C4@holtmann.org>
+ <20140103001753.GA21023@amd.pavel.ucw.cz>
+ <20140110145207.GB12048@amd.pavel.ucw.cz>
+ <20140111002801.GA20216@amd.pavel.ucw.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20140111002801.GA20216@amd.pavel.ucw.cz>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pavel,
+Hi!
 
+Ping? I did see it in bluetooth-next. Could we get it applied?
+
+Thanks,
+								Pavel
+
+
+On Sat 2014-01-11 01:28:01, Pavel Machek wrote:
 > Add hci_h4p bluetooth driver to bluetooth-next. This device is used
 > for example on Nokia N900 cell phone.
-> 
+>  
 > Signed-off-by: Pali Rohár <pali.rohar@gmail.com>
 > Signed-off-by: Pavel Machek <pavel@ucw.cz>
 > Thanks-to: Sebastian Reichel <sre@debian.org>
 > Thanks-to: Joe Perches <joe@perches.com>
-> 
+>  
 > ---
-> 
+>  
 > Changes from v5: Comment fixes and some refactoring suggested by 
 > Joe Perches. Please apply.
 > 
@@ -40,9 +51,9 @@ Hi Pavel,
 > --- a/drivers/bluetooth/Kconfig
 > +++ b/drivers/bluetooth/Kconfig
 > @@ -241,5 +241,15 @@ config BT_WILINK
-> 	  core driver to communicate with the BT core of the combo chip.
-> 
-> 	  Say Y here to compile support for Texas Instrument's WiLink7 driver
+>  	  core driver to communicate with the BT core of the combo chip.
+>  
+>  	  Say Y here to compile support for Texas Instrument's WiLink7 driver
 > -	  into the kernel or say M to compile it as module.
 > +	  into the kernel or say M to compile it as module (btwilink).
 > +
@@ -55,28 +66,25 @@ Hi Pavel,
 > +
 > +	  Say Y here to compile support for h4 extended devices into the kernel
 > +	  or say M to compile it as module (btnokia_h4p).
-> endmenu
+>  endmenu
 > diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
 > index 9fe8a87..6f25db2 100644
 > --- a/drivers/bluetooth/Makefile
 > +++ b/drivers/bluetooth/Makefile
 > @@ -31,4 +31,8 @@ hci_uart-$(CONFIG_BT_HCIUART_ATH3K)	+= hci_ath.o
-> hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
-> hci_uart-objs				:= $(hci_uart-y)
-> 
+>  hci_uart-$(CONFIG_BT_HCIUART_3WIRE)	+= hci_h5.o
+>  hci_uart-objs				:= $(hci_uart-y)
+>  
 > +obj-$(CONFIG_BT_NOKIA_H4P)		+= btnokia_h4p.o
 > +btnokia_h4p-objs := nokia_core.o nokia_fw.o nokia_uart.o nokia_fw-csr.o \
 > +		nokia_fw-bcm.o nokia_fw-ti1273.o
 > +
-> ccflags-y += -D__CHECK_ENDIAN__
+>  ccflags-y += -D__CHECK_ENDIAN__
 > diff --git a/drivers/bluetooth/hci_h4p.h b/drivers/bluetooth/hci_h4p.h
 > new file mode 100644
 > index 0000000..fd7a640
 > --- /dev/null
 > +++ b/drivers/bluetooth/hci_h4p.h
-
-can we please get the naming straight. File names do not start with hci_ anymore. We moved away from it since that term is too generic.
-
 > @@ -0,0 +1,228 @@
 > +/*
 > + * This file is part of Nokia H4P bluetooth driver
@@ -110,10 +118,7 @@ can we please get the naming straight. File names do not start with hci_ anymore
 > +#define FW_NAME_TI1271_LE	"ti1273_le.bin"
 > +#define FW_NAME_TI1271		"ti1273.bin"
 > +#define FW_NAME_BCM2048		"bcmfw.bin"
-> +#define FW_NAME_CSR		"bc4fw.bin”
-
-We do these have to be global in a header file. This should be confined to the specific firmware part.
-
+> +#define FW_NAME_CSR		"bc4fw.bin"
 > +
 > +#define UART_SYSC_OMAP_RESET	0x03
 > +#define UART_SYSS_RESETDONE	0x01
@@ -134,13 +139,7 @@ We do these have to be global in a header file. This should be confined to the s
 > +#define H4P_ACTIVE_MODE			3
 > +
 > +struct hci_h4p_info {
-
-Can we please get rid of the hci_ prefix for everything. Copying from drivers that are over 10 years old is not a good idea. Please look at recent ones.
-
 > +	struct timer_list lazy_release;
-
-Timer? Not delayed work?
-
 > +	struct hci_dev *hdev;
 > +	spinlock_t lock;
 > +
@@ -313,9 +312,6 @@ Timer? Not delayed work?
 > +void hci_h4p_store_regs(struct hci_h4p_info *info);
 > +void hci_h4p_restore_regs(struct hci_h4p_info *info);
 > +void hci_h4p_smart_idle(struct hci_h4p_info *info, bool enable);
-
-These are a lot of public functions. Are they all really needed or can the code be done smart.
-
 > +
 > +#endif /* __DRIVERS_BLUETOOTH_HCI_H4P_H */
 > diff --git a/drivers/bluetooth/nokia_core.c b/drivers/bluetooth/nokia_core.c
@@ -1320,11 +1316,6 @@ These are a lot of public functions. Are they all really needed or can the code 
 > +
 > +	return count;
 > +}
-
-Since none of these devices can function without having a valid address, the way this should work is that we should not register the HCI device when probing the platform device.
-
-The HCI device should be registered once a valid address has been written into the sysfs file. I do not want to play the tricks with bringing up the device without a valid address.
-
 > +
 > +static ssize_t hci_h4p_show_bdaddr(struct device *dev,
 > +				   struct device_attribute *attr, char *buf)
@@ -1367,14 +1358,7 @@ The HCI device should be registered once a valid address has been written into t
 > +	hdev->close = hci_h4p_hci_close;
 > +	hdev->flush = hci_h4p_hci_flush;
 > +	hdev->send = hci_h4p_hci_send_frame;
-
-It needs to use hdev->setup to load the firmware. I assume the firmware only needs to be loaded once. That is exactly what hdev->setup does. It gets executed once.
-
-
 > +	set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
-
-Is this quirk really needed? Normally only Bluetooth 1.1 and early devices qualify for it.
-
 > +
 > +	SET_HCIDEV_DEV(hdev, info->dev);
 > +
@@ -1579,11 +1563,6 @@ Is this quirk really needed? Normally only Bluetooth 1.1 and early devices quali
 > +	int i;
 > +	static const u8 nokia_oui[3] = {0x00, 0x1f, 0xdf};
 > +	int not_valid;
-
-Has this actually been confirmed that we can just randomly set an address out of the Nokia range. I do not think so. This is a pretty bad idea.
-
-I have no interest in merging a driver with such a hack.
-
 > +
 > +	not_valid = 1;
 > +	for (i = 0; i < 6; i++) {
@@ -1592,9 +1571,6 @@ I have no interest in merging a driver with such a hack.
 > +			break;
 > +		}
 > +	}
-
-Anybody every heard of memcmp or bacmp and BDADDR_ANY?
-
 > +
 > +	if (not_valid) {
 > +		dev_info(info->dev, "Valid bluetooth address not found, setting some random\n");
@@ -1790,10 +1766,6 @@ Anybody every heard of memcmp or bacmp and BDADDR_ANY?
 > +			memcpy(info->bd_addr, nokia_oui, 3);
 > +			get_random_bytes(info->bd_addr + 3, 3);
 > +		}
-
-
-And why does every single chip firmware does this differently. Seriously, this is a mess.
-
 > +
 > +		skb->data[offset + 7] = info->bd_addr[0];
 > +		skb->data[offset + 6] = info->bd_addr[1];
@@ -2179,9 +2151,6 @@ And why does every single chip firmware does this differently. Seriously, this i
 > +
 > +	return;
 > +}
-
-We have proper HCI sync command handling in recent kernels. I really do not know why this is hand coded these days. Check how the Intel firmware loading inside btusb.c does it.
-
 > diff --git a/drivers/bluetooth/nokia_uart.c b/drivers/bluetooth/nokia_uart.c
 > new file mode 100644
 > index 0000000..0fb57de
@@ -2226,9 +2195,6 @@ We have proper HCI sync command handling in recent kernels. I really do not know
 > +{
 > +	return __raw_readb(info->uart_base + (offset << 2));
 > +}
-
-Inline in a *.c file for a non-static function. Makes no sense to me.
-
 > +
 > +void hci_h4p_set_rts(struct hci_h4p_info *info, int active)
 > +{
@@ -2422,9 +2388,6 @@ Inline in a *.c file for a non-static function. Makes no sense to me.
 > + * struct hci_h4p_platform data - hci_h4p Platform data structure
 > + */
 > +struct hci_h4p_platform_data {
-
-please have a proper name here. For example btnokia_h4p_platform_data. Same applies to the file name.
-
 > +	int chip_type;
 > +	int bt_sysclk;
 > +	unsigned int bt_wakeup_gpio;
@@ -2437,8 +2400,8 @@ please have a proper name here. For example btnokia_h4p_platform_data. Same appl
 > +	const char *uart_fclk;
 > +	void (*set_pm_limits)(struct device *dev, bool set);
 > +};
+> 
 
-Regards
-
-Marcel
-
+-- 
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
