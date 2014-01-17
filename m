@@ -1,117 +1,221 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2 1/6] android: Add sample init.bluetooth.rc file
-Date: Fri, 17 Jan 2014 20:47:09 +0100
-Message-ID: <1898176.UTpxHBbyQh@athlon>
-In-Reply-To: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
-References: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAF3PWx0KN9mtfy=czsmjYPEZj_c6X_buPBOAtbirdyQm01QqJw@mail.gmail.com>
+References: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1389973213-30251-6-git-send-email-andrzej.kaczmarek@tieto.com>
+	<816CDF1A-CF41-445B-9CAF-CE5A1E06C940@holtmann.org>
+	<CAF3PWx0KN9mtfy=czsmjYPEZj_c6X_buPBOAtbirdyQm01QqJw@mail.gmail.com>
+Date: Fri, 17 Jan 2014 21:42:06 +0200
+Message-ID: <CABBYNZ+iMPo091X2CpX6G6kQqb3j9eXO1s+Z-L8FPQ2gRupsRA@mail.gmail.com>
+Subject: Re: [PATCH 5/9] android/hal-audio: Calculate SBC stream parameters
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrzej,
 
-On Friday 17 January 2014 16:30:41 Szymon Janc wrote:
-> This file is intended to be included from device init.rc.
-> ---
->  android/Android.mk        | 16 +++++++++++++++-
->  android/Makefile.am       |  1 +
->  android/init.bluetooth.rc | 37 +++++++++++++++++++++++++++++++++++++
->  3 files changed, 53 insertions(+), 1 deletion(-)
->  create mode 100644 android/init.bluetooth.rc
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 7e97ec8..afa3a51 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -109,7 +109,7 @@ LOCAL_MODULE := bluetooth.default
->  LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
->  LOCAL_MODULE_TAGS := optional
->  LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-> -LOCAL_REQUIRED_MODULES := bluetoothd bluetoothd-snoop
-> +LOCAL_REQUIRED_MODULES := bluetoothd bluetoothd-snoop init.bluetooth.rc
-> 
->  include $(BUILD_SHARED_LIBRARY)
-> 
-> @@ -282,3 +282,17 @@ LOCAL_MODULE_TAGS := optional
->  LOCAL_MODULE := bluetoothd-snoop
-> 
->  include $(BUILD_EXECUTABLE)
-> +
-> +#
-> +# init.bluetooth.rc
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_MODULE := init.bluetooth.rc
-> +LOCAL_MODULE_CLASS := ETC
-> +LOCAL_SRC_FILES := $(LOCAL_MODULE)
-> +LOCAL_MODULE_TAGS := optional
-> +LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)
-> +
-> +include $(BUILD_PREBUILT)
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 8d2714d..5aa3995 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -136,6 +136,7 @@ android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS)
-> -module -avoid-version \ endif
-> 
->  EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
-> +		android/init.bluetooth.rc \
->  		android/pics-gap.txt android/pics-hid.txt \
->  		android/pics-pan.txt android/pics-did.txt \
->  		android/pics-opp.txt android/pics-pbap.txt \
-> diff --git a/android/init.bluetooth.rc b/android/init.bluetooth.rc
-> new file mode 100644
-> index 0000000..9f9aa84
-> --- /dev/null
-> +++ b/android/init.bluetooth.rc
-> @@ -0,0 +1,37 @@
-> +# required permissions
-> +on boot
-> +    chown bluetooth bluetooth /data/misc/bluetooth
-> +    chown bluetooth bluetooth /dev/uhid
-> +
-> +# services
-> +on property:bluetooth.start=daemon
-> +    setprop bluetooth.start none
-> +    start bluetoothd
-> +
-> +on property:bluetooth.stop=daemon
-> +    setprop bluetooth.stop none
-> +    stop bluetoothd
-> +
-> +on property:bluetooth.start=snoop
-> +    setprop bluetooth.start none
-> +    start bluetoothd-snoop
-> +
-> +on property:bluetooth.stop=snoop
-> +    setprop bluetooth.stop none
-> +    stop bluetoothd-snoop
-> +
-> +service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
-> +    class main
-> +    # init does not yet support setting capabilities so run as root,
-> +    # bluetoothd drop uid to bluetooth with the right linux capabilities
-> +    group bluetooth
-> +    disabled
-> +    oneshot
-> +
-> +service bluetoothd-snoop /system/bin/logwrapper
-> /system/bin/bluetoothd-snoop +    class main
-> +    # init does not yet support setting capabilities so run as root,
-> +    # bluetoothd-snoop drops unneeded linux capabilities
-> +    group nobody
-> +    disabled
-> +    oneshot
+On Fri, Jan 17, 2014 at 9:17 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> Hi Marcel,
+>
+> On 17 January 2014 19:25, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Andrzej,
+>>
+>>> This patch adds necessary calculations for SBC stream parameters.
+>>>
+>>> Both input and output buffers are expected to have exact amount of
+>>> data to fill single media packet (based on transport channel MTU).
+>>>
+>>> Frame duration will be used to synchronize input and output streams.
+>>> ---
+>>> android/hal-audio.c | 50 ++++++++++++++++++++++++++++++-----
+>>> android/rtp.h       | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>> 2 files changed, 120 insertions(+), 6 deletions(-)
+>>> create mode 100644 android/rtp.h
+>>>
+>>> diff --git a/android/hal-audio.c b/android/hal-audio.c
+>>> index e5c646c..3f53295 100644
+>>> --- a/android/hal-audio.c
+>>> +++ b/android/hal-audio.c
+>>> @@ -33,6 +33,7 @@
+>>> #include "hal-msg.h"
+>>> #include "../profiles/audio/a2dp-codecs.h"
+>>> #include <sbc/sbc.h>
+>>> +#include "rtp.h"
+>>>
+>>> static const uint8_t a2dp_src_uuid[] = {
+>>>               0x00, 0x00, 0x11, 0x0a, 0x00, 0x00, 0x10, 0x00,
+>>> @@ -46,6 +47,12 @@ static pthread_t ipc_th = 0;
+>>> static pthread_mutex_t close_mutex = PTHREAD_MUTEX_INITIALIZER;
+>>> static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
+>>>
+>>> +struct media_packet {
+>>> +     struct rtp_header hdr;
+>>> +     struct rtp_payload payload;
+>>> +     uint8_t data[0];
+>>> +};
+>>> +
+>>> struct audio_input_config {
+>>>       uint32_t rate;
+>>>       uint32_t channels;
+>>> @@ -56,10 +63,19 @@ struct sbc_data {
+>>>       a2dp_sbc_t sbc;
+>>>
+>>>       sbc_t enc;
+>>> +
+>>> +     size_t in_frame_len;
+>>> +     size_t in_buf_size;
+>>> +
+>>> +     size_t out_buf_size;
+>>> +     uint8_t *out_buf;
+>>> +
+>>> +     unsigned frame_duration;
+>>> };
+>>>
+>>> static int sbc_get_presets(struct audio_preset *preset, size_t *len);
+>>> -static int sbc_codec_init(struct audio_preset *preset, void **codec_data);
+>>> +static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+>>> +                             void **codec_data);
+>>> static int sbc_cleanup(void *codec_data);
+>>> static int sbc_get_config(void *codec_data,
+>>>                                       struct audio_input_config *config);
+>>> @@ -69,7 +85,8 @@ struct audio_codec {
+>>>
+>>>       int (*get_presets) (struct audio_preset *preset, size_t *len);
+>>>
+>>> -     int (*init) (struct audio_preset *preset, void **codec_data);
+>>> +     int (*init) (struct audio_preset *preset, uint16_t mtu,
+>>> +                             void **codec_data);
+>>>       int (*cleanup) (void *codec_data);
+>>>       int (*get_config) (void *codec_data,
+>>>                                       struct audio_input_config *config);
+>>> @@ -251,9 +268,14 @@ static void sbc_init_encoder(struct sbc_data *sbc_data)
+>>>       }
+>>> }
+>>>
+>>> -static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
+>>> +static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+>>> +                             void **codec_data)
+>>> {
+>>>       struct sbc_data *sbc_data;
+>>> +     size_t hdr_len = sizeof(struct media_packet);
+>>> +     size_t in_frame_len;
+>>> +     size_t out_frame_len;
+>>> +     size_t num_frames;
+>>>
+>>>       DBG("");
+>>>
+>>> @@ -268,6 +290,18 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
+>>>
+>>>       sbc_init_encoder(sbc_data);
+>>>
+>>> +     in_frame_len = sbc_get_codesize(&sbc_data->enc);
+>>> +     out_frame_len = sbc_get_frame_length(&sbc_data->enc);
+>>> +     num_frames = (mtu - hdr_len) / out_frame_len;
+>>> +
+>>> +     sbc_data->in_frame_len = in_frame_len;
+>>> +     sbc_data->in_buf_size = num_frames * in_frame_len;
+>>> +
+>>> +     sbc_data->out_buf_size = hdr_len + num_frames * out_frame_len;
+>>> +     sbc_data->out_buf = calloc(1, sbc_data->out_buf_size);
+>>> +
+>>> +     sbc_data->frame_duration = sbc_get_frame_duration(&sbc_data->enc);
+>>> +
+>>>       *codec_data = sbc_data;
+>>>
+>>>       return AUDIO_STATUS_SUCCESS;
+>>> @@ -280,6 +314,7 @@ static int sbc_cleanup(void *codec_data)
+>>>       DBG("");
+>>>
+>>>       sbc_finish(&sbc_data->enc);
+>>> +     free(sbc_data->out_buf);
+>>>       free(codec_data);
+>>>
+>>>       return AUDIO_STATUS_SUCCESS;
+>>> @@ -511,7 +546,7 @@ static int ipc_close_cmd(uint8_t endpoint_id)
+>>>       return result;
+>>> }
+>>>
+>>> -static int ipc_open_stream_cmd(uint8_t endpoint_id,
+>>> +static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu,
+>>>                                       struct audio_preset **caps)
+>>> {
+>>>       char buf[BLUEZ_AUDIO_MTU];
+>>> @@ -534,6 +569,7 @@ static int ipc_open_stream_cmd(uint8_t endpoint_id,
+>>>       if (result == AUDIO_STATUS_SUCCESS) {
+>>>               size_t buf_len = sizeof(struct audio_preset) +
+>>>                                       rsp->preset[0].len;
+>>> +             *mtu = rsp->mtu;
+>>>               *caps = malloc(buf_len);
+>>>               memcpy(*caps, &rsp->preset, buf_len);
+>>>       } else {
+>>> @@ -919,6 +955,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+>>>       struct a2dp_stream_out *out;
+>>>       struct audio_preset *preset;
+>>>       const struct audio_codec *codec;
+>>> +     uint16_t mtu;
+>>>
+>>>       out = calloc(1, sizeof(struct a2dp_stream_out));
+>>>       if (!out)
+>>> @@ -946,7 +983,8 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+>>>       /* TODO: for now we always use endpoint 0 */
+>>>       out->ep = &audio_endpoints[0];
+>>>
+>>> -     if (ipc_open_stream_cmd(out->ep->id, &preset) != AUDIO_STATUS_SUCCESS)
+>>> +     if (ipc_open_stream_cmd(out->ep->id, &mtu, &preset) !=
+>>> +                     AUDIO_STATUS_SUCCESS)
+>>>               goto fail;
+>>>
+>>>       if (!preset)
+>>> @@ -954,7 +992,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+>>>
+>>>       codec = out->ep->codec;
+>>>
+>>> -     codec->init(preset, &out->ep->codec_data);
+>>> +     codec->init(preset, mtu, &out->ep->codec_data);
+>>>       codec->get_config(out->ep->codec_data, &out->cfg);
+>>>
+>>>       DBG("rate=%d channels=%d format=%d", out->cfg.rate,
+>>> diff --git a/android/rtp.h b/android/rtp.h
+>>> new file mode 100644
+>>> index 0000000..45fddcf
+>>> --- /dev/null
+>>> +++ b/android/rtp.h
+>>> @@ -0,0 +1,76 @@
+>>> +/*
+>>> + *
+>>> + *  BlueZ - Bluetooth protocol stack for Linux
+>>> + *
+>>> + *  Copyright (C) 2004-2010  Marcel Holtmann <marcel@holtmann.org>
+>>> + *
+>>> + *
+>>> + *  This library is free software; you can redistribute it and/or
+>>> + *  modify it under the terms of the GNU Lesser General Public
+>>> + *  License as published by the Free Software Foundation; either
+>>> + *  version 2.1 of the License, or (at your option) any later version.
+>>> + *
+>>> + *  This library is distributed in the hope that it will be useful,
+>>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>> + *  Lesser General Public License for more details.
+>>> + *
+>>> + *  You should have received a copy of the GNU Lesser General Public
+>>> + *  License along with this library; if not, write to the Free Software
+>>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+>>> + *
+>>> + */
+>>
+>> where is this file coming from? Why do we need a copy of it?
+>
+> From BlueZ but it was removed (was used in pcm_bluetooth.c) so I just
+> added it again since we need RTP header structures. Or should these
+> just be added inline to hal-audio.c?
 
-This is now upstream.
+I would just add these to hal-audio.c, nothing else should need it.
+
 
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Luiz Augusto von Dentz
