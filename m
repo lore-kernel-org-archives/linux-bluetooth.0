@@ -1,466 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/2] Bluetooth: Reorder L2CAP functions to avoid forward declarations
-Date: Fri, 17 Jan 2014 20:45:10 +0200
-Message-Id: <1389984311-10482-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 2/9] android: Build Audio HAL with SBC
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1389973213-30251-3-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Fri, 17 Jan 2014 10:27:25 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <04524385-0757-4DFE-B503-352781B4B9BA@holtmann.org>
+References: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com> <1389973213-30251-3-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrzej,
 
-This patch moves the l2cap_conn_add, is_valid_psm and l2cap_chan_connect
-functions further down in l2cap_core.c. The patch doesn't contain
-anything else except the relocation of these functions. By moving the
-functions further down the patch enables a subsequent patch that adds a
-pending RX queue to be implemented without a forward declaration of a
-function.
+> Build for Android requires libsbc sources to be available in
+> external/bluetooth/sbc. Build for host requires libsbc package to be
+> installed.
+> ---
+> android/Android.mk  | 14 +++++++++++---
+> android/Makefile.am |  2 ++
+> configure.ac        |  7 +++++++
+> 3 files changed, 20 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 7e97ec8..63a4a24 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -3,8 +3,9 @@ LOCAL_PATH := $(call my-dir)
+> # Retrieve BlueZ version from configure.ac file
+> BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D'AC_INIT(_,v)=v')
+> 
+> -# Specify pathmap for glib
+> -pathmap_INCL += glib:external/bluetooth/glib
+> +# Specify pathmap for glib and sbc
+> +pathmap_INCL += glib:external/bluetooth/glib \
+> +	sbc:external/bluetooth/sbc
+> 
+> # Specify common compiler flags
+> BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
+> @@ -220,11 +221,18 @@ include $(BUILD_EXECUTABLE)
+> 
+> include $(CLEAR_VARS)
+> 
+> -LOCAL_SRC_FILES := hal-audio.c
+> +LOCAL_SRC_FILES := hal-audio.c \
+> +	../../sbc/sbc/sbc.c \
+> +	../../sbc/sbc/sbc_primitives.c \
+> +	../../sbc/sbc/sbc_primitives_armv6.c \
+> +	../../sbc/sbc/sbc_primitives_iwmmxt.c \
+> +	../../sbc/sbc/sbc_primitives_mmx.c \
+> +	../../sbc/sbc/sbc_primitives_neon.c \
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 415 ++++++++++++++++++++++-----------------------
- 1 file changed, 207 insertions(+), 208 deletions(-)
+why? Can we not just build libsbc for Android?
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3f0dd552cb2b..317a5737daf6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1722,66 +1722,6 @@ static void security_timeout(struct work_struct *work)
- 	}
- }
- 
--static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
--{
--	struct l2cap_conn *conn = hcon->l2cap_data;
--	struct hci_chan *hchan;
--
--	if (conn)
--		return conn;
--
--	hchan = hci_chan_create(hcon);
--	if (!hchan)
--		return NULL;
--
--	conn = kzalloc(sizeof(struct l2cap_conn), GFP_KERNEL);
--	if (!conn) {
--		hci_chan_del(hchan);
--		return NULL;
--	}
--
--	kref_init(&conn->ref);
--	hcon->l2cap_data = conn;
--	conn->hcon = hcon;
--	hci_conn_get(conn->hcon);
--	conn->hchan = hchan;
--
--	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
--
--	switch (hcon->type) {
--	case LE_LINK:
--		if (hcon->hdev->le_mtu) {
--			conn->mtu = hcon->hdev->le_mtu;
--			break;
--		}
--		/* fall through */
--	default:
--		conn->mtu = hcon->hdev->acl_mtu;
--		break;
--	}
--
--	conn->feat_mask = 0;
--
--	if (hcon->type == ACL_LINK)
--		conn->hs_enabled = test_bit(HCI_HS_ENABLED,
--					    &hcon->hdev->dev_flags);
--
--	spin_lock_init(&conn->lock);
--	mutex_init(&conn->chan_lock);
--
--	INIT_LIST_HEAD(&conn->chan_l);
--	INIT_LIST_HEAD(&conn->users);
--
--	if (hcon->type == LE_LINK)
--		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
--	else
--		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
--
--	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
--
--	return conn;
--}
--
- static void l2cap_conn_free(struct kref *ref)
- {
- 	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
-@@ -1852,154 +1792,6 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 	return c1;
- }
- 
--static bool is_valid_psm(u16 psm, u8 dst_type)
--{
--	if (!psm)
--		return false;
--
--	if (bdaddr_type_is_le(dst_type))
--		return (psm <= 0x00ff);
--
--	/* PSM must be odd and lsb of upper byte must be 0 */
--	return ((psm & 0x0101) == 0x0001);
--}
--
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type)
--{
--	struct l2cap_conn *conn;
--	struct hci_conn *hcon;
--	struct hci_dev *hdev;
--	__u8 auth_type;
--	int err;
--
--	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
--	       dst_type, __le16_to_cpu(psm));
--
--	hdev = hci_get_route(dst, &chan->src);
--	if (!hdev)
--		return -EHOSTUNREACH;
--
--	hci_dev_lock(hdev);
--
--	l2cap_chan_lock(chan);
--
--	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
--	    chan->chan_type != L2CAP_CHAN_RAW) {
--		err = -EINVAL;
--		goto done;
--	}
--
--	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && !(psm || cid)) {
--		err = -EINVAL;
--		goto done;
--	}
--
--	switch (chan->mode) {
--	case L2CAP_MODE_BASIC:
--		break;
--	case L2CAP_MODE_LE_FLOWCTL:
--		l2cap_le_flowctl_init(chan);
--		break;
--	case L2CAP_MODE_ERTM:
--	case L2CAP_MODE_STREAMING:
--		if (!disable_ertm)
--			break;
--		/* fall through */
--	default:
--		err = -ENOTSUPP;
--		goto done;
--	}
--
--	switch (chan->state) {
--	case BT_CONNECT:
--	case BT_CONNECT2:
--	case BT_CONFIG:
--		/* Already connecting */
--		err = 0;
--		goto done;
--
--	case BT_CONNECTED:
--		/* Already connected */
--		err = -EISCONN;
--		goto done;
--
--	case BT_OPEN:
--	case BT_BOUND:
--		/* Can connect */
--		break;
--
--	default:
--		err = -EBADFD;
--		goto done;
--	}
--
--	/* Set destination address and psm */
--	bacpy(&chan->dst, dst);
--	chan->dst_type = dst_type;
--
--	chan->psm = psm;
--	chan->dcid = cid;
--
--	auth_type = l2cap_get_auth_type(chan);
--
--	if (bdaddr_type_is_le(dst_type))
--		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
--				   chan->sec_level, auth_type);
--	else
--		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
--				   chan->sec_level, auth_type);
--
--	if (IS_ERR(hcon)) {
--		err = PTR_ERR(hcon);
--		goto done;
--	}
--
--	conn = l2cap_conn_add(hcon);
--	if (!conn) {
--		hci_conn_drop(hcon);
--		err = -ENOMEM;
--		goto done;
--	}
--
--	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
--		hci_conn_drop(hcon);
--		err = -EBUSY;
--		goto done;
--	}
--
--	/* Update source addr of the socket */
--	bacpy(&chan->src, &hcon->src);
--	chan->src_type = bdaddr_type(hcon, hcon->src_type);
--
--	l2cap_chan_unlock(chan);
--	l2cap_chan_add(conn, chan);
--	l2cap_chan_lock(chan);
--
--	/* l2cap_chan_add takes its own ref so we can drop this one */
--	hci_conn_drop(hcon);
--
--	l2cap_state_change(chan, BT_CONNECT);
--	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
--
--	if (hcon->state == BT_CONNECTED) {
--		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
--			__clear_chan_timer(chan);
--			if (l2cap_chan_check_security(chan))
--				l2cap_state_change(chan, BT_CONNECTED);
--		} else
--			l2cap_do_start(chan);
--	}
--
--	err = 0;
--
--done:
--	l2cap_chan_unlock(chan);
--	hci_dev_unlock(hdev);
--	hci_dev_put(hdev);
--	return err;
--}
--
- static void l2cap_monitor_timeout(struct work_struct *work)
- {
- 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-@@ -7136,6 +6928,213 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 	}
- }
- 
-+static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
-+{
-+	struct l2cap_conn *conn = hcon->l2cap_data;
-+	struct hci_chan *hchan;
-+
-+	if (conn)
-+		return conn;
-+
-+	hchan = hci_chan_create(hcon);
-+	if (!hchan)
-+		return NULL;
-+
-+	conn = kzalloc(sizeof(struct l2cap_conn), GFP_KERNEL);
-+	if (!conn) {
-+		hci_chan_del(hchan);
-+		return NULL;
-+	}
-+
-+	kref_init(&conn->ref);
-+	hcon->l2cap_data = conn;
-+	conn->hcon = hcon;
-+	hci_conn_get(conn->hcon);
-+	conn->hchan = hchan;
-+
-+	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
-+
-+	switch (hcon->type) {
-+	case LE_LINK:
-+		if (hcon->hdev->le_mtu) {
-+			conn->mtu = hcon->hdev->le_mtu;
-+			break;
-+		}
-+		/* fall through */
-+	default:
-+		conn->mtu = hcon->hdev->acl_mtu;
-+		break;
-+	}
-+
-+	conn->feat_mask = 0;
-+
-+	if (hcon->type == ACL_LINK)
-+		conn->hs_enabled = test_bit(HCI_HS_ENABLED,
-+					    &hcon->hdev->dev_flags);
-+
-+	spin_lock_init(&conn->lock);
-+	mutex_init(&conn->chan_lock);
-+
-+	INIT_LIST_HEAD(&conn->chan_l);
-+	INIT_LIST_HEAD(&conn->users);
-+
-+	if (hcon->type == LE_LINK)
-+		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
-+	else
-+		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
-+
-+	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
-+
-+	return conn;
-+}
-+
-+static bool is_valid_psm(u16 psm, u8 dst_type) {
-+	if (!psm)
-+		return false;
-+
-+	if (bdaddr_type_is_le(dst_type))
-+		return (psm <= 0x00ff);
-+
-+	/* PSM must be odd and lsb of upper byte must be 0 */
-+	return ((psm & 0x0101) == 0x0001);
-+}
-+
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-+		       bdaddr_t *dst, u8 dst_type)
-+{
-+	struct l2cap_conn *conn;
-+	struct hci_conn *hcon;
-+	struct hci_dev *hdev;
-+	__u8 auth_type;
-+	int err;
-+
-+	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
-+	       dst_type, __le16_to_cpu(psm));
-+
-+	hdev = hci_get_route(dst, &chan->src);
-+	if (!hdev)
-+		return -EHOSTUNREACH;
-+
-+	hci_dev_lock(hdev);
-+
-+	l2cap_chan_lock(chan);
-+
-+	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
-+	    chan->chan_type != L2CAP_CHAN_RAW) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && !(psm || cid)) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	switch (chan->mode) {
-+	case L2CAP_MODE_BASIC:
-+		break;
-+	case L2CAP_MODE_LE_FLOWCTL:
-+		l2cap_le_flowctl_init(chan);
-+		break;
-+	case L2CAP_MODE_ERTM:
-+	case L2CAP_MODE_STREAMING:
-+		if (!disable_ertm)
-+			break;
-+		/* fall through */
-+	default:
-+		err = -ENOTSUPP;
-+		goto done;
-+	}
-+
-+	switch (chan->state) {
-+	case BT_CONNECT:
-+	case BT_CONNECT2:
-+	case BT_CONFIG:
-+		/* Already connecting */
-+		err = 0;
-+		goto done;
-+
-+	case BT_CONNECTED:
-+		/* Already connected */
-+		err = -EISCONN;
-+		goto done;
-+
-+	case BT_OPEN:
-+	case BT_BOUND:
-+		/* Can connect */
-+		break;
-+
-+	default:
-+		err = -EBADFD;
-+		goto done;
-+	}
-+
-+	/* Set destination address and psm */
-+	bacpy(&chan->dst, dst);
-+	chan->dst_type = dst_type;
-+
-+	chan->psm = psm;
-+	chan->dcid = cid;
-+
-+	auth_type = l2cap_get_auth_type(chan);
-+
-+	if (bdaddr_type_is_le(dst_type))
-+		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
-+				   chan->sec_level, auth_type);
-+	else
-+		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
-+				   chan->sec_level, auth_type);
-+
-+	if (IS_ERR(hcon)) {
-+		err = PTR_ERR(hcon);
-+		goto done;
-+	}
-+
-+	conn = l2cap_conn_add(hcon);
-+	if (!conn) {
-+		hci_conn_drop(hcon);
-+		err = -ENOMEM;
-+		goto done;
-+	}
-+
-+	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
-+		hci_conn_drop(hcon);
-+		err = -EBUSY;
-+		goto done;
-+	}
-+
-+	/* Update source addr of the socket */
-+	bacpy(&chan->src, &hcon->src);
-+	chan->src_type = bdaddr_type(hcon, hcon->src_type);
-+
-+	l2cap_chan_unlock(chan);
-+	l2cap_chan_add(conn, chan);
-+	l2cap_chan_lock(chan);
-+
-+	/* l2cap_chan_add takes its own ref so we can drop this one */
-+	hci_conn_drop(hcon);
-+
-+	l2cap_state_change(chan, BT_CONNECT);
-+	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
-+
-+	if (hcon->state == BT_CONNECTED) {
-+		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
-+			__clear_chan_timer(chan);
-+			if (l2cap_chan_check_security(chan))
-+				l2cap_state_change(chan, BT_CONNECTED);
-+		} else
-+			l2cap_do_start(chan);
-+	}
-+
-+	err = 0;
-+
-+done:
-+	l2cap_chan_unlock(chan);
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+	return err;
-+}
-+
- /* ---- L2CAP interface with lower layer (HCI) ---- */
- 
- int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
--- 
-1.8.4.2
+I rather install an extra library and not have to make this builtin.
+
+> 
+> LOCAL_C_INCLUDES = \
+> 	$(call include-path-for, system-core) \
+> 	$(call include-path-for, libhardware) \
+> +	$(call include-path-for, sbc) \
+> 
+> LOCAL_SHARED_LIBRARIES := \
+> 	libcutils \
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 8d2714d..01d8996 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -130,6 +130,8 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+> 
+> android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+> 
+> +android_audio_a2dp_default_la_LIBADD = @SBC_LIBS@
+> +
+> android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
+> 					-no-undefined -pthread
+> 
+> diff --git a/configure.ac b/configure.ac
+> index c85f208..79c3705 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -252,6 +252,13 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+> 					[enable_android=${enableval}])
+> AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+> 
+> +if (test "${enable_android}" = "yes"); then
+> +	PKG_CHECK_MODULES(SBC, sbc >= 1.0, dummy=yes,
+> +					AC_MSG_ERROR(libsbc1 >= 1.0 is required))
+
+This should not read libsbc1. There is no such thing as libsbc1. It should read SBC library.
+
+> +	AC_SUBST(SBC_CFLAGS)
+> +	AC_SUBST(SBC_LIBS)
+> +fi
+> +
+> AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+> 			[Directory for the Android daemon storage files])
+
+Regards
+
+Marcel
 
