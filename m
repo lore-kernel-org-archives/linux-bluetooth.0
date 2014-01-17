@@ -2,69 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2 6/6] android/snoop: Drop capabilities on startup
-Date: Fri, 17 Jan 2014 16:30:46 +0100
-Message-Id: <1389972646-3761-6-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC v2 2/6] android/hal: Update property used for start/stop services
+Date: Fri, 17 Jan 2014 16:30:42 +0100
+Message-Id: <1389972646-3761-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
 References: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/bluetoothd-snoop.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ android/hal-bluetooth.c | 13 +++++--------
+ android/hal-ipc.c       |  5 ++---
+ 2 files changed, 7 insertions(+), 11 deletions(-)
 
-diff --git a/android/bluetoothd-snoop.c b/android/bluetoothd-snoop.c
-index 9312c11..f69bc2c 100644
---- a/android/bluetoothd-snoop.c
-+++ b/android/bluetoothd-snoop.c
-@@ -29,6 +29,9 @@
- #include <ctype.h>
- #include <stdlib.h>
- #include <unistd.h>
-+#if defined(ANDROID)
-+#include <sys/capability.h>
-+#endif
+diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+index be45836..4f0e7b7 100644
+--- a/android/hal-bluetooth.c
++++ b/android/hal-bluetooth.c
+@@ -28,8 +28,6 @@
+ #include "hal-ipc.h"
+ #include "hal-utils.h"
  
- #include "lib/bluetooth.h"
- #include "lib/hci.h"
-@@ -188,11 +191,36 @@ static void close_monitor(void)
- 	monitor_fd = -1;
- }
+-#define SNOOP_SERVICE_NAME "bluetoothd-snoop"
+-
+ static const bt_callbacks_t *bt_hal_cbacks = NULL;
  
-+static void set_capabilities(void)
-+{
-+#if defined(ANDROID)
-+	struct __user_cap_header_struct header;
-+	struct __user_cap_data_struct cap;
-+
-+	header.version = _LINUX_CAPABILITY_VERSION;
-+	header.pid = 0;
-+
-+	/* CAP_NET_RAW: for snooping
-+	 * CAP_DAC_READ_SEARCH: override path search permissions
-+	 */
-+	cap.effective = cap.permitted =
-+		CAP_TO_MASK(CAP_NET_RAW) |
-+		CAP_TO_MASK(CAP_DAC_READ_SEARCH) ;
-+	cap.inheritable = 0;
-+
-+	/* TODO: Move to cap_set_proc once bionic support it */
-+	if (capset(&header, &cap) < 0)
-+		exit(EXIT_FAILURE);
-+#endif
-+}
-+
- int main(int argc, char *argv[])
+ #define enum_prop_to_hal(prop, hal_prop, type) do { \
+@@ -820,15 +818,14 @@ static int le_test_mode(uint16_t opcode, uint8_t *buf, uint8_t len)
+ 
+ static int config_hci_snoop_log(uint8_t enable)
  {
- 	const char *path;
- 	sigset_t mask;
- 
-+	set_capabilities();
++	const char *property;
 +
- 	if (argc > 1)
- 		path = argv[1];
- 	else
+ 	DBG("enable %u", enable);
+ 
+-	if (enable && property_set("ctl.start", SNOOP_SERVICE_NAME) < 0) {
+-		error("Failed to start service %s", SNOOP_SERVICE_NAME);
+-		return BT_STATUS_FAIL;
+-	}
++	property = enable ? "bluetooth.start" : "bluetooth.stop";
+ 
+-	if (!enable && property_set("ctl.stop", SNOOP_SERVICE_NAME) < 0) {
+-		error("Failed to stop service %s", SNOOP_SERVICE_NAME);
++	if (property_set(property, "snoop") < 0) {
++		error("Failed to set %s=snoop", property);
+ 		return BT_STATUS_FAIL;
+ 	}
+ 
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 97f1bcd..99ba38e 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -34,7 +34,6 @@
+ #include "hal-ipc.h"
+ 
+ #define CONNECT_TIMEOUT (5 * 1000)
+-#define SERVICE_NAME "bluetoothd"
+ 
+ static int cmd_sk = -1;
+ static int notif_sk = -1;
+@@ -259,8 +258,8 @@ bool hal_ipc_init(void)
+ 	}
+ 
+ 	/* Start Android Bluetooth daemon service */
+-	if (property_set("ctl.start", SERVICE_NAME) < 0) {
+-		error("Failed to start service %s", SERVICE_NAME);
++	if (property_set("bluetooth.start", "daemon") < 0) {
++		error("Failed to set bluetooth.start=daemon");
+ 		close(sk);
+ 		return false;
+ 	}
 -- 
 1.8.3.2
 
