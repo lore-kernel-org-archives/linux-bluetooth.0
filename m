@@ -2,60 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Natanael Copa <natanael.copa@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH 2/3] various header include fixes for building with musl libc
-Date: Fri, 17 Jan 2014 12:08:25 +0000
-Message-Id: <1389960506-10273-2-git-send-email-ncopa@alpinelinux.org>
-In-Reply-To: <1389960506-10273-1-git-send-email-ncopa@alpinelinux.org>
-References: <1389960506-10273-1-git-send-email-ncopa@alpinelinux.org>
+Subject: [PATCH 1/3] bnep: avoid use of caddr_t
+Date: Fri, 17 Jan 2014 12:08:24 +0000
+Message-Id: <1389960506-10273-1-git-send-email-ncopa@alpinelinux.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-we need:
- sys/stat.h for mode_t
- limits.h for PATH_MAX
----
- src/textfile.h  | 2 ++
- tools/csr_usb.c | 1 +
- tools/hid2hci.c | 1 +
- 3 files changed, 4 insertions(+)
+caddr_t is legacy BSD and should be avoided.
 
-diff --git a/src/textfile.h b/src/textfile.h
-index b779bd2..e26da5d 100644
---- a/src/textfile.h
-+++ b/src/textfile.h
-@@ -24,6 +24,8 @@
- #ifndef __TEXTFILE_H
- #define __TEXTFILE_H
+This fixes building against musl libc.
+---
+ profiles/network/bnep.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 2a74016..4f9b801 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -202,7 +202,7 @@ static int bnep_if_up(const char *devname)
+ 	ifr.ifr_flags |= IFF_UP;
+ 	ifr.ifr_flags |= IFF_MULTICAST;
  
-+#include <sys/stat.h>
-+
- int create_file(const char *filename, const mode_t mode);
- int create_name(char *buf, size_t size, const char *path,
- 				const char *address, const char *name);
-diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-index a483bc1..5fb6bdc 100644
---- a/tools/csr_usb.c
-+++ b/tools/csr_usb.c
-@@ -33,6 +33,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <dirent.h>
-+#include <limits.h>
- #include <sys/ioctl.h>
+-	err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
++	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
  
- #include "csr.h"
-diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-index 95b4abf..2dbfca7 100644
---- a/tools/hid2hci.c
-+++ b/tools/hid2hci.c
-@@ -35,6 +35,7 @@
- #include <string.h>
- #include <dirent.h>
- #include <getopt.h>
-+#include <limits.h>
- #include <sys/ioctl.h>
- #include <linux/types.h>
- #include <linux/hiddev.h>
+ 	close(sk);
+ 
+@@ -227,7 +227,7 @@ static int bnep_if_down(const char *devname)
+ 	ifr.ifr_flags &= ~IFF_UP;
+ 
+ 	/* Bring down the interface */
+-	err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
++	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
+ 
+ 	close(sk);
+ 
 -- 
 1.8.5.3
 
