@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 7/9] android/hal-audio: Return proper buffer size to AudioFlinger
-Date: Fri, 17 Jan 2014 16:40:11 +0100
-Message-ID: <1389973213-30251-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 9/9] android/hal-audio: Add proper SBC encoding
+Date: Fri, 17 Jan 2014 16:40:13 +0100
+Message-ID: <1389973213-30251-10-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,67 +12,170 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Input and output stream is configured in a way that each input buffer
+can be encoded to exactly one output buffer.
+
+Reading from AudioFlinger is synchronized based on amounts of frames
+which were expected to be sent since stream was resumed, i.e. as long
+as we sent enough data we can wait for period of single media packet
+before we need another buffer from input. Without synchronization
+we'd receive next input buffer as soon as we process current one.
 ---
- android/hal-audio.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ android/hal-audio.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 93 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index aeb6ea4..f2cb12a 100644
+index d8438f7..86ef97b 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -82,6 +82,7 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
- static int sbc_cleanup(void *codec_data);
- static int sbc_get_config(void *codec_data,
- 					struct audio_input_config *config);
-+static size_t sbc_get_buffer_size(void *codec_data);
- static void sbc_resume(void *codec_data);
+@@ -24,6 +24,7 @@
+ #include <sys/socket.h>
+ #include <sys/un.h>
+ #include <unistd.h>
++#include <arpa/inet.h>
  
- struct audio_codec {
-@@ -94,6 +95,7 @@ struct audio_codec {
- 	int (*cleanup) (void *codec_data);
- 	int (*get_config) (void *codec_data,
- 					struct audio_input_config *config);
-+	size_t (*get_buffer_size) (void *codec_data);
- 	void (*resume) (void *codec_data);
- 	ssize_t (*write_data) (void *codec_data, const void *buffer,
- 				size_t bytes);
-@@ -108,6 +110,7 @@ static const struct audio_codec audio_codecs[] = {
- 		.init = sbc_codec_init,
- 		.cleanup = sbc_cleanup,
- 		.get_config = sbc_get_config,
-+		.get_buffer_size = sbc_get_buffer_size,
- 		.resume = sbc_resume,
- 	}
+ #include <hardware/audio.h>
+ #include <hardware/hardware.h>
+@@ -74,8 +75,22 @@ struct sbc_data {
+ 
+ 	struct timespec start;
+ 	unsigned frames_sent;
++
++	uint16_t seq;
  };
-@@ -355,6 +358,15 @@ static int sbc_get_config(void *codec_data,
- 	return AUDIO_STATUS_SUCCESS;
- }
  
-+static size_t sbc_get_buffer_size(void *codec_data)
++static inline void timespec_diff(struct timespec *a, struct timespec *b,
++					struct timespec *res)
 +{
-+	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++	res->tv_sec = a->tv_sec - b->tv_sec;
++	res->tv_nsec = a->tv_nsec - b->tv_nsec;
 +
-+	DBG("");
-+
-+	return sbc_data->in_buf_size;
++	if (res->tv_nsec < 0) {
++		res->tv_sec--;
++		res->tv_nsec += 1000000000; /* 1sec */
++	}
 +}
 +
- static void sbc_resume(void *codec_data)
- {
- 	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
-@@ -728,8 +740,11 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+ static int sbc_get_presets(struct audio_preset *preset, size_t *len);
+ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+ 				void **codec_data);
+@@ -84,6 +99,8 @@ static int sbc_get_config(void *codec_data,
+ 					struct audio_input_config *config);
+ static size_t sbc_get_buffer_size(void *codec_data);
+ static void sbc_resume(void *codec_data);
++static ssize_t sbc_write_data(void *codec_data, const void *buffer,
++					size_t bytes, int fd);
  
- static size_t out_get_buffer_size(const struct audio_stream *stream)
- {
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
-+
- 	DBG("");
--	return 20 * 512;
-+
-+	return out->ep->codec->get_buffer_size(out->ep->codec_data);
+ struct audio_codec {
+ 	uint8_t type;
+@@ -98,7 +115,7 @@ struct audio_codec {
+ 	size_t (*get_buffer_size) (void *codec_data);
+ 	void (*resume) (void *codec_data);
+ 	ssize_t (*write_data) (void *codec_data, const void *buffer,
+-				size_t bytes);
++				size_t bytes, int fd);
+ };
+ 
+ static const struct audio_codec audio_codecs[] = {
+@@ -112,6 +129,7 @@ static const struct audio_codec audio_codecs[] = {
+ 		.get_config = sbc_get_config,
+ 		.get_buffer_size = sbc_get_buffer_size,
+ 		.resume = sbc_resume,
++		.write_data = sbc_write_data,
+ 	}
+ };
+ 
+@@ -378,6 +396,74 @@ static void sbc_resume(void *codec_data)
+ 	sbc_data->frames_sent = 0;
  }
  
- static uint32_t out_get_channels(const struct audio_stream *stream)
++static ssize_t sbc_write_data(void *codec_data, const void *buffer,
++				size_t bytes, int fd)
++{
++	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++	size_t consumed = 0;
++	size_t encoded = 0;
++	struct media_packet *mp = (struct media_packet *) sbc_data->out_buf;
++	size_t free_space = sbc_data->out_buf_size - sizeof(*mp);
++	struct timespec cur;
++	struct timespec diff;
++	unsigned expected_frames;
++	int ret;
++
++	mp->hdr.v = 2;
++	mp->hdr.pt = 1;
++	mp->hdr.sequence_number = htons(sbc_data->seq++);
++	mp->hdr.ssrc = htonl(1);
++	mp->payload.frame_count = 0;
++
++	while (bytes - consumed >= sbc_data->in_frame_len) {
++		ssize_t written = 0;
++
++		ret = sbc_encode(&sbc_data->enc, buffer + consumed,
++					sbc_data->in_frame_len,
++					mp->data + encoded, free_space,
++					&written);
++
++		if (ret < 0) {
++			DBG("failed to encode block");
++			break;
++		}
++
++		mp->payload.frame_count++;
++
++		consumed += ret;
++		encoded += written;
++		free_space -= written;
++	}
++
++	ret = write(fd, mp, sizeof(*mp) + encoded);
++	if (ret < 0) {
++		int err = errno;
++		DBG("error writing data: %d (%s)", err, strerror(err));
++	}
++
++	if (consumed != bytes || free_space != 0) {
++		/*
++		 * we should encode all input data and fill output buffer
++		 * if we did not, something went wrong but we can't really
++		 * handle this so this is just sanity check
++		 */
++		DBG("some data were not encoded");
++	}
++
++	sbc_data->frames_sent += mp->payload.frame_count;
++
++	clock_gettime(CLOCK_MONOTONIC, &cur);
++	timespec_diff(&cur, &sbc_data->start, &diff);
++	expected_frames = (diff.tv_sec * 1000000 + diff.tv_nsec / 1000) /
++				sbc_data->frame_duration;
++
++	if (sbc_data->frames_sent >= expected_frames)
++		usleep(sbc_data->frame_duration * mp->payload.frame_count);
++
++	/* we always assume that all data was processed and sent */
++	return bytes;
++}
++
+ static void audio_ipc_cleanup(void)
+ {
+ 	if (audio_sk >= 0) {
+@@ -710,9 +796,13 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 		return -1;
+ 	}
+ 
+-	/* TODO: encode data using codec */
++	if (out->ep->fd < 0) {
++		DBG("no transport");
++		return -1;
++	}
+ 
+-	return bytes;
++	return out->ep->codec->write_data(out->ep->codec_data, buffer,
++						bytes, out->ep->fd);
+ }
+ 
+ static uint32_t out_get_sample_rate(const struct audio_stream *stream)
 -- 
 1.8.5.2
 
