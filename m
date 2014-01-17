@@ -1,72 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/9] android: Add MTU data to Open Stream Audio IPC
-Date: Fri, 17 Jan 2014 16:40:05 +0100
-Message-ID: <1389973213-30251-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC v2 6/6] android/snoop: Drop capabilities on startup
+Date: Fri, 17 Jan 2014 16:30:46 +0100
+Message-Id: <1389972646-3761-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
+References: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MTU value for transport channel is sent in Open Stream response, which
-is required to calculate number of frames which can be packed into
-single media packet.
-
-This is to avoid including GPLv2 licensed headers in Audio HAL
-implementation.
 ---
- android/a2dp.c      | 8 ++++++--
- android/audio-msg.h | 1 +
- 2 files changed, 7 insertions(+), 2 deletions(-)
+ android/bluetoothd-snoop.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 2288912..e7ca8b8 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -1252,6 +1252,7 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 	struct audio_rsp_open_stream *rsp;
- 	struct a2dp_setup *setup;
- 	int fd;
-+	uint16_t omtu;
+diff --git a/android/bluetoothd-snoop.c b/android/bluetoothd-snoop.c
+index 9312c11..f69bc2c 100644
+--- a/android/bluetoothd-snoop.c
++++ b/android/bluetoothd-snoop.c
+@@ -29,6 +29,9 @@
+ #include <ctype.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#if defined(ANDROID)
++#include <sys/capability.h>
++#endif
  
- 	DBG("");
+ #include "lib/bluetooth.h"
+ #include "lib/hci.h"
+@@ -188,11 +191,36 @@ static void close_monitor(void)
+ 	monitor_fd = -1;
+ }
  
-@@ -1262,14 +1263,17 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 		return;
- 	}
++static void set_capabilities(void)
++{
++#if defined(ANDROID)
++	struct __user_cap_header_struct header;
++	struct __user_cap_data_struct cap;
++
++	header.version = _LINUX_CAPABILITY_VERSION;
++	header.pid = 0;
++
++	/* CAP_NET_RAW: for snooping
++	 * CAP_DAC_READ_SEARCH: override path search permissions
++	 */
++	cap.effective = cap.permitted =
++		CAP_TO_MASK(CAP_NET_RAW) |
++		CAP_TO_MASK(CAP_DAC_READ_SEARCH) ;
++	cap.inheritable = 0;
++
++	/* TODO: Move to cap_set_proc once bionic support it */
++	if (capset(&header, &cap) < 0)
++		exit(EXIT_FAILURE);
++#endif
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	const char *path;
+ 	sigset_t mask;
  
--	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, NULL, NULL)) {
-+	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, &omtu,
-+						NULL)) {
- 		error("avdtp_stream_get_transport: failed");
- 		audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
- 		return;
- 	}
- 
--	len = sizeof(struct audio_preset) + setup->preset->len;
-+	len = sizeof(struct audio_rsp_open_stream) +
-+			sizeof(struct audio_preset) + setup->preset->len;
- 	rsp = g_malloc0(len);
-+	rsp->mtu = omtu;
- 	rsp->preset->len = setup->preset->len;
- 	memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
- 
-diff --git a/android/audio-msg.h b/android/audio-msg.h
-index 8f03274..17cde09 100644
---- a/android/audio-msg.h
-+++ b/android/audio-msg.h
-@@ -63,6 +63,7 @@ struct audio_cmd_open_stream {
- } __attribute__((packed));
- 
- struct audio_rsp_open_stream {
-+	uint16_t mtu;
- 	struct audio_preset preset[0];
- } __attribute__((packed));
- 
++	set_capabilities();
++
+ 	if (argc > 1)
+ 		path = argv[1];
+ 	else
 -- 
-1.8.5.2
+1.8.3.2
 
