@@ -1,62 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC v2 4/6] android: Update README with init.rc updates
-Date: Fri, 17 Jan 2014 16:30:44 +0100
-Message-Id: <1389972646-3761-4-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
-References: <1389972646-3761-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 17 Jan 2014 16:07:05 +0100
+From: Natanael Copa <ncopa@alpinelinux.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 3/3] unit: prevent use of glibc's error(3)
+Message-ID: <20140117160705.67b3c508@ncopa-desktop.alpinelinux.org>
+In-Reply-To: <CABBYNZ+LYk1c0YUU0==JyKxJ_SbX6nNbcpwRCd==HUV1CKx+Ow@mail.gmail.com>
+References: <1389960506-10273-1-git-send-email-ncopa@alpinelinux.org>
+	<1389960506-10273-3-git-send-email-ncopa@alpinelinux.org>
+	<CABBYNZ+LYk1c0YUU0==JyKxJ_SbX6nNbcpwRCd==HUV1CKx+Ow@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/README | 32 +++++++-------------------------
- 1 file changed, 7 insertions(+), 25 deletions(-)
+On Fri, 17 Jan 2014 16:37:15 +0200
+Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
 
-diff --git a/android/README b/android/README
-index 717ffa2..24ed703 100644
---- a/android/README
-+++ b/android/README
-@@ -36,31 +36,13 @@ Runtime requirements
- ====================
- 
- BlueZ HAL library requires 'bluetoothd' and 'bluetoothd-snoop' services to be
--available on Android system. This can be done by defining following services in
--init.rc file of targeted board:
--
--service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
--  class main
--  group bluetooth net_admin
--  disabled
--  oneshot
--
--service bluetoothd-snoop /system/bin/bluetoothd-snoop
--  class main
--  group bluetooth net_admin
--  disabled
--  oneshot
--
--It is required that bluetooth user could start and stop bluetoothd and
--bluetoothd-snoop services by setting 'ctl.start' or 'ctl.stop' property. This
--can be achieved by whitelisting bluetooth user and bluetoothd and
--bluetoothd-snoop services in init source code.
--
--Required Android init system modifications can be found at
--https://code.google.com/p/aosp-bluez.platform-system-core/
--
--Some configuration changes like setting permissions, starting hciattach
--services etc. are device specific. For convenience examples are provided at:
-+available on Android system. Some permissions settings are also required.
-+
-+This can be done by importing init.bluetooth.rc file in init.rc file of targeted
-+board:
-+import init.bluetooth.rc
-+
-+For convenience examples are provided at:
- https://code.google.com/p/aosp-bluez.device-lge-mako/    (Nexus 4)
- https://code.google.com/p/aosp-bluez.device-asus-flo/    (Nexus 7 2013)
- 
--- 
-1.8.3.2
+> Hi Natanael,
+> 
+> On Fri, Jan 17, 2014 at 2:08 PM, Natanael Copa <natanael.copa@gmail.com> wrote:
+> > When building the test-sdp we don't want src/sdpd-request.c end up
+> > using the incompatible GNU libc's error(3).
+> >
+> > This also fixes building on musl libc which misses the error(3) GNU
+> > extension.
+> > ---
+> >  unit/test-sdp.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/unit/test-sdp.c b/unit/test-sdp.c
+> > index 6d699e2..eeed0cb 100644
+> > --- a/unit/test-sdp.c
+> > +++ b/unit/test-sdp.c
+> > @@ -134,6 +134,12 @@ void btd_debug(const char *format, ...)
+> >  {
+> >  }
+> >
+> > +void error(const char *format, ...);
+> > +
+> > +void error(const char *format, ...)
+> > +{
+> > +}
+> > +
+> >  static void context_quit(struct context *context)
+> >  {
+> >         g_main_loop_quit(context->main_loop);
+> > --
+> > 1.8.5.3
+> 
+> We could perhaps do the same thing we did in test-avdtp.c, build with
+> log support and add the following check:
+> 
+> if (g_test_verbose())
+> __btd_log_init("*", 0);
+> 
+> 
 
+sounds good to me.
+
+-nc
