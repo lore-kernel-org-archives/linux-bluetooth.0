@@ -1,42 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <ad05002fcc8e067d1f4a14321cddbc83.squirrel@mungewell.org>
-In-Reply-To: <CANq1E4TaM-eG5rBU8X2T9ux8fMgTCyaXpxF2ydZU=71QsX0UBQ@mail.gmail.com>
-References: <8ccf0ad88f16335719c367ed69c90a3e.squirrel@mungewell.org>
-    <CANq1E4TaM-eG5rBU8X2T9ux8fMgTCyaXpxF2ydZU=71QsX0UBQ@mail.gmail.com>
-Date: Fri, 17 Jan 2014 15:17:36 -0500
-Subject: Re: Dualshock4 - 'HIDP: Handshake: Unsupported request' after
- 'unplug virtual cable'.
-From: simon@mungewell.org
-To: "David Herrmann" <dh.herrmann@gmail.com>
-Cc: "Simon Wood" <simon@mungewell.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"Frank Praznik" <frank.praznik@oh.rr.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <1772554.HcRPMI1tWs@athlon>
+References: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1389973213-30251-9-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1772554.HcRPMI1tWs@athlon>
+Date: Fri, 17 Jan 2014 21:57:17 +0200
+Message-ID: <CABBYNZ+e7LL8Ok1pFTqEdtDJGNDZoZChA0hbB1v-qgPnr6pXwQ@mail.gmail.com>
+Subject: Re: [PATCH 8/9] android/hal-audio: Read fd from Output Stream response
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Szymon,
 
-> So the problem is, your host refuses the HIDP connection from the
-> device. This is intentional, as we don't want *any* remote Bluetooth
-> device to be allowed to provide HID services. This could be used for
-> very subtle attacks. The code responsible for that is
-> ./profiles/input/server.c in bluez.
+On Fri, Jan 17, 2014 at 8:13 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> Hi Andrzej,
+>
+> On Friday 17 January 2014 16:40:12 Andrzej Kaczmarek wrote:
+>> ---
+>>  android/hal-audio.c | 11 +++++++----
+>>  1 file changed, 7 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/android/hal-audio.c b/android/hal-audio.c
+>> index f2cb12a..d8438f7 100644
+>> --- a/android/hal-audio.c
+>> +++ b/android/hal-audio.c
+>> @@ -575,7 +575,7 @@ static int ipc_close_cmd(uint8_t endpoint_id)
+>>       return result;
+>>  }
+>>
+>> -static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu,
+>> +static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu, int *fd,
+>> struct audio_preset **caps)
+>>  {
+>>       char buf[BLUEZ_AUDIO_MTU];
+>> @@ -593,7 +593,7 @@ static int ipc_open_stream_cmd(uint8_t endpoint_id,
+>> uint16_t *mtu, cmd.id = endpoint_id;
+>>
+>>       result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
+>> -                             sizeof(cmd), &cmd, &rsp_len, rsp, NULL);
+>> +                             sizeof(cmd), &cmd, &rsp_len, rsp, fd);
+>>
+>>       if (result == AUDIO_STATUS_SUCCESS) {
+>>               size_t buf_len = sizeof(struct audio_preset) +
+>> @@ -990,6 +990,7 @@ static int audio_open_output_stream(struct
+>> audio_hw_device *dev, struct audio_preset *preset;
+>>       const struct audio_codec *codec;
+>>       uint16_t mtu;
+>> +     int fd;
+>>
+>>       out = calloc(1, sizeof(struct a2dp_stream_out));
+>>       if (!out)
+>> @@ -1017,13 +1018,15 @@ static int audio_open_output_stream(struct
+>> audio_hw_device *dev, /* TODO: for now we always use endpoint 0 */
+>>       out->ep = &audio_endpoints[0];
+>>
+>> -     if (ipc_open_stream_cmd(out->ep->id, &mtu, &preset) !=
+>> +     if (ipc_open_stream_cmd(out->ep->id, &mtu, &fd, &preset) !=
+>>                       AUDIO_STATUS_SUCCESS)
+>>               goto fail;
+>>
+>> -     if (!preset)
+>> +     if (!preset || fd < 0)
+>>               goto fail;
+>
+> For sanity, code under fail label should be updated to handle that either
+> preset or fd might be valid here.
+>
+>>
+>> +     out->ep->fd = fd;
+>> +
+>
+> I might be missing something but fd is never closed. Should this be done in
+> audio_close_output_stream() ?
 
-I note that there is now some DS3/SixAxis specfic stuff in there:
-http://git.kernel.org/cgit/bluetooth/bluez.git/tree/profiles/input/server.c#n167
+Yep, the fd should be closed every time we suspend as we will get
+another fd on open so we will end up with duplicated fds.
 
-> Now, there are two ways to go on:
->  - try to initiate the HIDP connection from the host instead of the
-> device. Simply use "bluetoothctl" and then "connect <bdaddr>"
->  - add the remote device to the list of known devices so incoming
-> connections are not blocked. You can do this by triggering the
-> ->device_probe() callback of the input device. I'm not sure how this
-> is done, but I think a simple "connect <bdaddr>" should trigger it on
-> *all* available services.
 
-Thanks for your suggestions, I'll try to get some logs early next week.
-
-Cheers,
-Simon
-
+-- 
+Luiz Augusto von Dentz
