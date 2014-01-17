@@ -2,40 +2,60 @@ Return-Path: <cyrus@holtmann.org>
 From: Natanael Copa <natanael.copa@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH 3/3] unit: prevent use of glibc's error(3)
-Date: Fri, 17 Jan 2014 12:08:26 +0000
-Message-Id: <1389960506-10273-3-git-send-email-ncopa@alpinelinux.org>
+Subject: [PATCH 2/3] various header include fixes for building with musl libc
+Date: Fri, 17 Jan 2014 12:08:25 +0000
+Message-Id: <1389960506-10273-2-git-send-email-ncopa@alpinelinux.org>
 In-Reply-To: <1389960506-10273-1-git-send-email-ncopa@alpinelinux.org>
 References: <1389960506-10273-1-git-send-email-ncopa@alpinelinux.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When building the test-sdp we don't want src/sdpd-request.c end up
-using the incompatible GNU libc's error(3).
-
-This also fixes building on musl libc which misses the error(3) GNU
-extension.
+we need:
+ sys/stat.h for mode_t
+ limits.h for PATH_MAX
 ---
- unit/test-sdp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ src/textfile.h  | 2 ++
+ tools/csr_usb.c | 1 +
+ tools/hid2hci.c | 1 +
+ 3 files changed, 4 insertions(+)
 
-diff --git a/unit/test-sdp.c b/unit/test-sdp.c
-index 6d699e2..eeed0cb 100644
---- a/unit/test-sdp.c
-+++ b/unit/test-sdp.c
-@@ -134,6 +134,12 @@ void btd_debug(const char *format, ...)
- {
- }
+diff --git a/src/textfile.h b/src/textfile.h
+index b779bd2..e26da5d 100644
+--- a/src/textfile.h
++++ b/src/textfile.h
+@@ -24,6 +24,8 @@
+ #ifndef __TEXTFILE_H
+ #define __TEXTFILE_H
  
-+void error(const char *format, ...);
++#include <sys/stat.h>
 +
-+void error(const char *format, ...)
-+{
-+}
-+
- static void context_quit(struct context *context)
- {
- 	g_main_loop_quit(context->main_loop);
+ int create_file(const char *filename, const mode_t mode);
+ int create_name(char *buf, size_t size, const char *path,
+ 				const char *address, const char *name);
+diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+index a483bc1..5fb6bdc 100644
+--- a/tools/csr_usb.c
++++ b/tools/csr_usb.c
+@@ -33,6 +33,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <dirent.h>
++#include <limits.h>
+ #include <sys/ioctl.h>
+ 
+ #include "csr.h"
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 95b4abf..2dbfca7 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -35,6 +35,7 @@
+ #include <string.h>
+ #include <dirent.h>
+ #include <getopt.h>
++#include <limits.h>
+ #include <sys/ioctl.h>
+ #include <linux/types.h>
+ #include <linux/hiddev.h>
 -- 
 1.8.5.3
 
