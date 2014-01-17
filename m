@@ -1,466 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 1/2] Bluetooth: Reorder L2CAP functions to avoid forward declarations
-Date: Fri, 17 Jan 2014 11:33:25 +0200
-Message-Id: <1389951206-22294-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 1/4] android: Add sample init.bluetooth.rc file
+Date: Fri, 17 Jan 2014 10:06:31 +0100
+Message-ID: <51482604.krZi3C0Dta@uw000953>
+In-Reply-To: <19D4671A-DE2F-49A3-9FEE-F17B5B1CA32D@holtmann.org>
+References: <1389713283-13038-1-git-send-email-szymon.janc@tieto.com> <2728377.B2HgAZfSS5@uw000953> <19D4671A-DE2F-49A3-9FEE-F17B5B1CA32D@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-This patch moves the l2cap_conn_add, is_valid_psm and l2cap_chan_connect
-functions further down in l2cap_core.c. The patch doesn't contain
-anything else except the relocation of these functions. By moving the
-functions further down the patch enables a subsequent patch that adds a
-pending RX queue to be implemented without a forward declaration of a
-function.
+On Friday 17 of January 2014 00:53:54 Marcel Holtmann wrote:
+> Hi Szymon,
+> 
+> >>> This file is intended to be included from device init.rc.
+> >>> ---
+> >>> android/Android.mk        | 16 +++++++++++++++-
+> >>> android/Makefile.am       |  1 +
+> >>> android/init.bluetooth.rc | 27 +++++++++++++++++++++++++++
+> >>> 3 files changed, 43 insertions(+), 1 deletion(-)
+> >>> create mode 100644 android/init.bluetooth.rc
+> >>> 
+> >>> diff --git a/android/Android.mk b/android/Android.mk
+> >>> index ae52ab4..f13e703 100644
+> >>> --- a/android/Android.mk
+> >>> +++ b/android/Android.mk
+> >>> @@ -109,7 +109,7 @@ LOCAL_MODULE := bluetooth.default
+> >>> LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+> >>> LOCAL_MODULE_TAGS := optional
+> >>> LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+> >>> -LOCAL_REQUIRED_MODULES := bluetoothd bluetoothd-snoop
+> >>> +LOCAL_REQUIRED_MODULES := bluetoothd bluetoothd-snoop init.bluetooth.rc
+> >>> 
+> >>> include $(BUILD_SHARED_LIBRARY)
+> >>> 
+> >>> @@ -263,3 +263,17 @@ LOCAL_MODULE_TAGS := optional
+> >>> LOCAL_MODULE := bluetoothd-snoop
+> >>> 
+> >>> include $(BUILD_EXECUTABLE)
+> >>> +
+> >>> +#
+> >>> +# init.bleutooth.rc
+> >>> +#
+> >>> +
+> >>> +include $(CLEAR_VARS)
+> >>> +
+> >>> +LOCAL_MODULE := init.bluetooth.rc
+> >>> +LOCAL_MODULE_CLASS := ETC
+> >>> +LOCAL_SRC_FILES := $(LOCAL_MODULE)
+> >>> +LOCAL_MODULE_TAGS := optional
+> >>> +LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)
+> >>> +
+> >>> +include $(BUILD_PREBUILT)
+> >>> diff --git a/android/Makefile.am b/android/Makefile.am
+> >>> index 7806f79..b205019 100644
+> >>> --- a/android/Makefile.am
+> >>> +++ b/android/Makefile.am
+> >>> @@ -134,6 +134,7 @@ android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
+> >>> endif
+> >>> 
+> >>> EXTRA_DIST += android/Android.mk android/hal-ipc-api.txt android/README \
+> >>> +		android/init.bluetooth.rc \
+> >>> 		android/pics-gap.txt android/pics-hid.txt \
+> >>> 		android/pics-pan.txt android/pics-did.txt \
+> >>> 		android/pics-opp.txt android/pics-pbap.txt \
+> >>> diff --git a/android/init.bluetooth.rc b/android/init.bluetooth.rc
+> >>> new file mode 100644
+> >>> index 0000000..e2be9e8
+> >>> --- /dev/null
+> >>> +++ b/android/init.bluetooth.rc
+> >>> @@ -0,0 +1,27 @@
+> >>> +chown bluetooth bluetooth /data/misc/bluetooth
+> >>> +
+> >>> +chown bluetooth bluetooth /dev/uhid
+> >>> +
+> >>> +on property:bluetooth.start=bluetoothd
+> >>> +    start bluetoothd
+> >>> +
+> >>> +on property:bluetooth.stop=bluetoothd
+> >>> +    stop bluetoothd
+> >>> +
+> >>> +on property:bluetooth.start=bluetoothd-snoop
+> >>> +    start bluetoothd-snoop
+> >>> +
+> >>> +on property:bluetooth.stop=bluetoothd-snoop
+> >>> +    stop bluetoothd-snoop
+> >> 
+> >> I think this is actually racy. The ctl.start and ctl.stop sound like they have special handling inside Android init. If you accidentally set bluetooth.start , then bad things happen.
+> > 
+> > on property:foo=bar is also triggered if foo is already set to bar so I don't
+> > see what could happen wrong here.
+> > 
+> >> 
+> >> So I would propose doing bluetooth.daemon=on/off and bluetooth.snoop=on/off
+> >> 
+> >> We just have to make sure that when bluetoothd or bluetoothd-snoop die unexpectedly that these properties get set back to off.
+> > 
+> > I'm not sure if we are able to set properties back to proper state if service
+> > exited in such case (that would trigger loop in init).
+> 
+> there is a service-exited-<name> type of action. I think we should look into using that one somehow.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 415 ++++++++++++++++++++++-----------------------
- 1 file changed, 207 insertions(+), 208 deletions(-)
+I'll exercise that and send V2.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 3f0dd552cb2b..317a5737daf6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1722,66 +1722,6 @@ static void security_timeout(struct work_struct *work)
- 	}
- }
- 
--static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
--{
--	struct l2cap_conn *conn = hcon->l2cap_data;
--	struct hci_chan *hchan;
--
--	if (conn)
--		return conn;
--
--	hchan = hci_chan_create(hcon);
--	if (!hchan)
--		return NULL;
--
--	conn = kzalloc(sizeof(struct l2cap_conn), GFP_KERNEL);
--	if (!conn) {
--		hci_chan_del(hchan);
--		return NULL;
--	}
--
--	kref_init(&conn->ref);
--	hcon->l2cap_data = conn;
--	conn->hcon = hcon;
--	hci_conn_get(conn->hcon);
--	conn->hchan = hchan;
--
--	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
--
--	switch (hcon->type) {
--	case LE_LINK:
--		if (hcon->hdev->le_mtu) {
--			conn->mtu = hcon->hdev->le_mtu;
--			break;
--		}
--		/* fall through */
--	default:
--		conn->mtu = hcon->hdev->acl_mtu;
--		break;
--	}
--
--	conn->feat_mask = 0;
--
--	if (hcon->type == ACL_LINK)
--		conn->hs_enabled = test_bit(HCI_HS_ENABLED,
--					    &hcon->hdev->dev_flags);
--
--	spin_lock_init(&conn->lock);
--	mutex_init(&conn->chan_lock);
--
--	INIT_LIST_HEAD(&conn->chan_l);
--	INIT_LIST_HEAD(&conn->users);
--
--	if (hcon->type == LE_LINK)
--		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
--	else
--		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
--
--	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
--
--	return conn;
--}
--
- static void l2cap_conn_free(struct kref *ref)
- {
- 	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
-@@ -1852,154 +1792,6 @@ static struct l2cap_chan *l2cap_global_chan_by_psm(int state, __le16 psm,
- 	return c1;
- }
- 
--static bool is_valid_psm(u16 psm, u8 dst_type)
--{
--	if (!psm)
--		return false;
--
--	if (bdaddr_type_is_le(dst_type))
--		return (psm <= 0x00ff);
--
--	/* PSM must be odd and lsb of upper byte must be 0 */
--	return ((psm & 0x0101) == 0x0001);
--}
--
--int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
--		       bdaddr_t *dst, u8 dst_type)
--{
--	struct l2cap_conn *conn;
--	struct hci_conn *hcon;
--	struct hci_dev *hdev;
--	__u8 auth_type;
--	int err;
--
--	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
--	       dst_type, __le16_to_cpu(psm));
--
--	hdev = hci_get_route(dst, &chan->src);
--	if (!hdev)
--		return -EHOSTUNREACH;
--
--	hci_dev_lock(hdev);
--
--	l2cap_chan_lock(chan);
--
--	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
--	    chan->chan_type != L2CAP_CHAN_RAW) {
--		err = -EINVAL;
--		goto done;
--	}
--
--	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && !(psm || cid)) {
--		err = -EINVAL;
--		goto done;
--	}
--
--	switch (chan->mode) {
--	case L2CAP_MODE_BASIC:
--		break;
--	case L2CAP_MODE_LE_FLOWCTL:
--		l2cap_le_flowctl_init(chan);
--		break;
--	case L2CAP_MODE_ERTM:
--	case L2CAP_MODE_STREAMING:
--		if (!disable_ertm)
--			break;
--		/* fall through */
--	default:
--		err = -ENOTSUPP;
--		goto done;
--	}
--
--	switch (chan->state) {
--	case BT_CONNECT:
--	case BT_CONNECT2:
--	case BT_CONFIG:
--		/* Already connecting */
--		err = 0;
--		goto done;
--
--	case BT_CONNECTED:
--		/* Already connected */
--		err = -EISCONN;
--		goto done;
--
--	case BT_OPEN:
--	case BT_BOUND:
--		/* Can connect */
--		break;
--
--	default:
--		err = -EBADFD;
--		goto done;
--	}
--
--	/* Set destination address and psm */
--	bacpy(&chan->dst, dst);
--	chan->dst_type = dst_type;
--
--	chan->psm = psm;
--	chan->dcid = cid;
--
--	auth_type = l2cap_get_auth_type(chan);
--
--	if (bdaddr_type_is_le(dst_type))
--		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
--				   chan->sec_level, auth_type);
--	else
--		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
--				   chan->sec_level, auth_type);
--
--	if (IS_ERR(hcon)) {
--		err = PTR_ERR(hcon);
--		goto done;
--	}
--
--	conn = l2cap_conn_add(hcon);
--	if (!conn) {
--		hci_conn_drop(hcon);
--		err = -ENOMEM;
--		goto done;
--	}
--
--	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
--		hci_conn_drop(hcon);
--		err = -EBUSY;
--		goto done;
--	}
--
--	/* Update source addr of the socket */
--	bacpy(&chan->src, &hcon->src);
--	chan->src_type = bdaddr_type(hcon, hcon->src_type);
--
--	l2cap_chan_unlock(chan);
--	l2cap_chan_add(conn, chan);
--	l2cap_chan_lock(chan);
--
--	/* l2cap_chan_add takes its own ref so we can drop this one */
--	hci_conn_drop(hcon);
--
--	l2cap_state_change(chan, BT_CONNECT);
--	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
--
--	if (hcon->state == BT_CONNECTED) {
--		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
--			__clear_chan_timer(chan);
--			if (l2cap_chan_check_security(chan))
--				l2cap_state_change(chan, BT_CONNECTED);
--		} else
--			l2cap_do_start(chan);
--	}
--
--	err = 0;
--
--done:
--	l2cap_chan_unlock(chan);
--	hci_dev_unlock(hdev);
--	hci_dev_put(hdev);
--	return err;
--}
--
- static void l2cap_monitor_timeout(struct work_struct *work)
- {
- 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
-@@ -7136,6 +6928,213 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 	}
- }
- 
-+static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
-+{
-+	struct l2cap_conn *conn = hcon->l2cap_data;
-+	struct hci_chan *hchan;
-+
-+	if (conn)
-+		return conn;
-+
-+	hchan = hci_chan_create(hcon);
-+	if (!hchan)
-+		return NULL;
-+
-+	conn = kzalloc(sizeof(struct l2cap_conn), GFP_KERNEL);
-+	if (!conn) {
-+		hci_chan_del(hchan);
-+		return NULL;
-+	}
-+
-+	kref_init(&conn->ref);
-+	hcon->l2cap_data = conn;
-+	conn->hcon = hcon;
-+	hci_conn_get(conn->hcon);
-+	conn->hchan = hchan;
-+
-+	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
-+
-+	switch (hcon->type) {
-+	case LE_LINK:
-+		if (hcon->hdev->le_mtu) {
-+			conn->mtu = hcon->hdev->le_mtu;
-+			break;
-+		}
-+		/* fall through */
-+	default:
-+		conn->mtu = hcon->hdev->acl_mtu;
-+		break;
-+	}
-+
-+	conn->feat_mask = 0;
-+
-+	if (hcon->type == ACL_LINK)
-+		conn->hs_enabled = test_bit(HCI_HS_ENABLED,
-+					    &hcon->hdev->dev_flags);
-+
-+	spin_lock_init(&conn->lock);
-+	mutex_init(&conn->chan_lock);
-+
-+	INIT_LIST_HEAD(&conn->chan_l);
-+	INIT_LIST_HEAD(&conn->users);
-+
-+	if (hcon->type == LE_LINK)
-+		INIT_DELAYED_WORK(&conn->security_timer, security_timeout);
-+	else
-+		INIT_DELAYED_WORK(&conn->info_timer, l2cap_info_timeout);
-+
-+	conn->disc_reason = HCI_ERROR_REMOTE_USER_TERM;
-+
-+	return conn;
-+}
-+
-+static bool is_valid_psm(u16 psm, u8 dst_type) {
-+	if (!psm)
-+		return false;
-+
-+	if (bdaddr_type_is_le(dst_type))
-+		return (psm <= 0x00ff);
-+
-+	/* PSM must be odd and lsb of upper byte must be 0 */
-+	return ((psm & 0x0101) == 0x0001);
-+}
-+
-+int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
-+		       bdaddr_t *dst, u8 dst_type)
-+{
-+	struct l2cap_conn *conn;
-+	struct hci_conn *hcon;
-+	struct hci_dev *hdev;
-+	__u8 auth_type;
-+	int err;
-+
-+	BT_DBG("%pMR -> %pMR (type %u) psm 0x%2.2x", &chan->src, dst,
-+	       dst_type, __le16_to_cpu(psm));
-+
-+	hdev = hci_get_route(dst, &chan->src);
-+	if (!hdev)
-+		return -EHOSTUNREACH;
-+
-+	hci_dev_lock(hdev);
-+
-+	l2cap_chan_lock(chan);
-+
-+	if (!is_valid_psm(__le16_to_cpu(psm), dst_type) && !cid &&
-+	    chan->chan_type != L2CAP_CHAN_RAW) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && !(psm || cid)) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	switch (chan->mode) {
-+	case L2CAP_MODE_BASIC:
-+		break;
-+	case L2CAP_MODE_LE_FLOWCTL:
-+		l2cap_le_flowctl_init(chan);
-+		break;
-+	case L2CAP_MODE_ERTM:
-+	case L2CAP_MODE_STREAMING:
-+		if (!disable_ertm)
-+			break;
-+		/* fall through */
-+	default:
-+		err = -ENOTSUPP;
-+		goto done;
-+	}
-+
-+	switch (chan->state) {
-+	case BT_CONNECT:
-+	case BT_CONNECT2:
-+	case BT_CONFIG:
-+		/* Already connecting */
-+		err = 0;
-+		goto done;
-+
-+	case BT_CONNECTED:
-+		/* Already connected */
-+		err = -EISCONN;
-+		goto done;
-+
-+	case BT_OPEN:
-+	case BT_BOUND:
-+		/* Can connect */
-+		break;
-+
-+	default:
-+		err = -EBADFD;
-+		goto done;
-+	}
-+
-+	/* Set destination address and psm */
-+	bacpy(&chan->dst, dst);
-+	chan->dst_type = dst_type;
-+
-+	chan->psm = psm;
-+	chan->dcid = cid;
-+
-+	auth_type = l2cap_get_auth_type(chan);
-+
-+	if (bdaddr_type_is_le(dst_type))
-+		hcon = hci_connect(hdev, LE_LINK, dst, dst_type,
-+				   chan->sec_level, auth_type);
-+	else
-+		hcon = hci_connect(hdev, ACL_LINK, dst, dst_type,
-+				   chan->sec_level, auth_type);
-+
-+	if (IS_ERR(hcon)) {
-+		err = PTR_ERR(hcon);
-+		goto done;
-+	}
-+
-+	conn = l2cap_conn_add(hcon);
-+	if (!conn) {
-+		hci_conn_drop(hcon);
-+		err = -ENOMEM;
-+		goto done;
-+	}
-+
-+	if (cid && __l2cap_get_chan_by_dcid(conn, cid)) {
-+		hci_conn_drop(hcon);
-+		err = -EBUSY;
-+		goto done;
-+	}
-+
-+	/* Update source addr of the socket */
-+	bacpy(&chan->src, &hcon->src);
-+	chan->src_type = bdaddr_type(hcon, hcon->src_type);
-+
-+	l2cap_chan_unlock(chan);
-+	l2cap_chan_add(conn, chan);
-+	l2cap_chan_lock(chan);
-+
-+	/* l2cap_chan_add takes its own ref so we can drop this one */
-+	hci_conn_drop(hcon);
-+
-+	l2cap_state_change(chan, BT_CONNECT);
-+	__set_chan_timer(chan, chan->ops->get_sndtimeo(chan));
-+
-+	if (hcon->state == BT_CONNECTED) {
-+		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
-+			__clear_chan_timer(chan);
-+			if (l2cap_chan_check_security(chan))
-+				l2cap_state_change(chan, BT_CONNECTED);
-+		} else
-+			l2cap_do_start(chan);
-+	}
-+
-+	err = 0;
-+
-+done:
-+	l2cap_chan_unlock(chan);
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
-+	return err;
-+}
-+
- /* ---- L2CAP interface with lower layer (HCI) ---- */
- 
- int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr)
+> 
+> > My idea was to use bluetooth.start/stop to start/stop (actually stop is needed
+> > only for bluetoothd-snoop service) service by bluetooth user (sort of "sudo"
+> > wrapper) but don't care about values in those props and if one want to use
+> > props to track service lifetime then just use init.svc.bluetoothd{-snoop}
+> > property.
+> 
+> Fair enough.
+> 
+> However then I would prefer if we do bluetooth.{start,stop}=daemon and bluetooth.{start,stop}=snoop to make this really tight into how our solution works.
+
+OK.
+
+> 
+> >>> +service bluetoothd /system/bin/logwrapper /system/bin/bluetoothd
+> >>> +    class main
+> >>> +    group bluetooth net_admin
+> >>> +    disabled
+> >>> +    oneshot
+> >>> +
+> >>> +service bluetoothd-snoop /system/bin/bluetoothd-snoop
+> >>> +    class main
+> >>> +    group bluetooth net_admin
+> >>> +    disabled
+> >>> +    oneshot
+> >> 
+> >> Does net_admin include CAP_NET_RAW actually or are we using some sort of patched module for this?
+> > 
+> > I'm not sure, this was probably just copied from <4.2 android. Since we
+> > start as root and drop caps I think this can be removed.
+> 
+> The snoop process just needs CAP_NET_RAW and write access to the file location. I would prefer to really make sure it runs with as less right as possible.
+
+OK.
+
 -- 
-1.8.4.2
-
+Best regards, 
+Szymon Janc
