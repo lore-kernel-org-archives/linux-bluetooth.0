@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 3/9] android/hal-audio: Rename sbc_init to avoid collision with libsbc
-Date: Fri, 17 Jan 2014 16:40:07 +0100
-Message-ID: <1389973213-30251-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 4/9] android/hal-audio: Initialize SBC encoder
+Date: Fri, 17 Jan 2014 16:40:08 +0100
+Message-ID: <1389973213-30251-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1389973213-30251-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,40 +13,122 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-audio.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ android/hal-audio.c | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 2f6f8c2..f53dba0 100644
+index f53dba0..e5c646c 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -56,7 +56,7 @@ struct sbc_data {
+@@ -32,6 +32,7 @@
+ #include "hal-log.h"
+ #include "hal-msg.h"
+ #include "../profiles/audio/a2dp-codecs.h"
++#include <sbc/sbc.h>
+ 
+ static const uint8_t a2dp_src_uuid[] = {
+ 		0x00, 0x00, 0x11, 0x0a, 0x00, 0x00, 0x10, 0x00,
+@@ -53,6 +54,8 @@ struct audio_input_config {
+ 
+ struct sbc_data {
+ 	a2dp_sbc_t sbc;
++
++	sbc_t enc;
  };
  
  static int sbc_get_presets(struct audio_preset *preset, size_t *len);
--static int sbc_init(struct audio_preset *preset, void **codec_data);
-+static int sbc_codec_init(struct audio_preset *preset, void **codec_data);
- static int sbc_cleanup(void *codec_data);
- static int sbc_get_config(void *codec_data,
- 					struct audio_input_config *config);
-@@ -80,7 +80,7 @@ static const struct audio_codec audio_codecs[] = {
- 
- 		.get_presets = sbc_get_presets,
- 
--		.init = sbc_init,
-+		.init = sbc_codec_init,
- 		.cleanup = sbc_cleanup,
- 		.get_config = sbc_get_config,
- 	}
-@@ -184,7 +184,7 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
+@@ -184,6 +187,70 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
  	return i;
  }
  
--static int sbc_init(struct audio_preset *preset, void **codec_data)
-+static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
++static void sbc_init_encoder(struct sbc_data *sbc_data)
++{
++	a2dp_sbc_t *in = &sbc_data->sbc;
++	sbc_t *out = &sbc_data->enc;
++
++	DBG("");
++
++	sbc_init(out, 0L);
++
++	switch (in->frequency) {
++	case SBC_SAMPLING_FREQ_16000:
++		out->frequency = SBC_FREQ_16000;
++		break;
++	case SBC_SAMPLING_FREQ_32000:
++		out->frequency = SBC_FREQ_32000;
++		break;
++	case SBC_SAMPLING_FREQ_44100:
++		out->frequency = SBC_FREQ_44100;
++		break;
++	case SBC_SAMPLING_FREQ_48000:
++		out->frequency = SBC_FREQ_48000;
++		break;
++	}
++
++	out->subbands = in->subbands == SBC_SUBBANDS_4 ? SBC_SB_4 : SBC_SB_8;
++
++	switch (in->channel_mode) {
++	case SBC_CHANNEL_MODE_MONO:
++		out->mode = SBC_MODE_MONO;
++		break;
++	case SBC_CHANNEL_MODE_DUAL_CHANNEL:
++		out->mode = SBC_MODE_DUAL_CHANNEL;
++		break;
++	case SBC_CHANNEL_MODE_JOINT_STEREO:
++		out->mode = SBC_MODE_JOINT_STEREO;
++		break;
++	case SBC_CHANNEL_MODE_STEREO:
++		out->mode = SBC_MODE_STEREO;
++		break;
++	}
++
++	out->endian = SBC_LE;
++
++	out->bitpool = in->max_bitpool;
++
++	out->allocation = in->allocation_method == SBC_ALLOCATION_SNR ?
++				SBC_AM_SNR : SBC_AM_LOUDNESS;
++
++	switch (in->block_length) {
++	case SBC_BLOCK_LENGTH_4:
++		out->blocks = SBC_BLK_4;
++		break;
++	case SBC_BLOCK_LENGTH_8:
++		out->blocks = SBC_BLK_8;
++		break;
++	case SBC_BLOCK_LENGTH_12:
++		out->blocks = SBC_BLK_12;
++		break;
++	case SBC_BLOCK_LENGTH_16:
++		out->blocks = SBC_BLK_16;
++		break;
++	}
++}
++
+ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
  {
  	struct sbc_data *sbc_data;
+@@ -199,6 +266,8 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
  
+ 	memcpy(&sbc_data->sbc, preset->data, preset->len);
+ 
++	sbc_init_encoder(sbc_data);
++
+ 	*codec_data = sbc_data;
+ 
+ 	return AUDIO_STATUS_SUCCESS;
+@@ -206,8 +275,11 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
+ 
+ static int sbc_cleanup(void *codec_data)
+ {
++	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++
+ 	DBG("");
+ 
++	sbc_finish(&sbc_data->enc);
+ 	free(codec_data);
+ 
+ 	return AUDIO_STATUS_SUCCESS;
 -- 
 1.8.5.2
 
