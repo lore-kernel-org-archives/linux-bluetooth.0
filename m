@@ -1,33 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/2] neard: Set device UUIDs from EIR
-Date: Sat, 18 Jan 2014 13:42:59 +0100
-Message-Id: <1390048980-16670-1-git-send-email-szymon.janc@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: Status of BlueZ GATT APIs
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25SjO5Bgdjnu6YjwKSQEiwvP+p8bfqcjJO9WEMDvG1A3PQ@mail.gmail.com>
+Date: Sat, 18 Jan 2014 00:42:19 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <06DCDA5B-0724-489D-8039-1CD8E8CC62E8@holtmann.org>
+References: <CAHrH25SjO5Bgdjnu6YjwKSQEiwvP+p8bfqcjJO9WEMDvG1A3PQ@mail.gmail.com>
+To: Arman Uguray <armansito@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Handle UUIDs received in EIR from neard in same way as UUIDs received
-on device discovery.
----
- plugins/neard.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Hi Arman,
 
-diff --git a/plugins/neard.c b/plugins/neard.c
-index 35fdaeb..da6e37c 100644
---- a/plugins/neard.c
-+++ b/plugins/neard.c
-@@ -643,7 +643,8 @@ static void store_params(struct btd_adapter *adapter, struct btd_device *device,
- 		btd_device_device_set_name(device, params->name);
- 	}
- 
--	/* TODO handle UUIDs? */
-+	if (params->services)
-+		device_add_eir_uuids(device, params->services);
- 
- 	if (params->hash) {
- 		btd_adapter_add_remote_oob_data(adapter, &params->address,
--- 
-1.8.5.3
+> I was wondering what the current plans are for the GATT D-Bus API in
+> BlueZ. Can anyone give a rough estimate of when these APIs will be
+> available in BlueZ upstream and approximately when they could make to
+> into a release?
+
+I think the best person to answer this is Claudio. INdT has been working on these patches and we have discussed the APIs during the Plumbers Conf.
+
+Maybe they just need to re-submit a new version and we could include them. I honestly don’t know until I see an updated set of the patches.
+
+Regards
+
+Marcel
 
