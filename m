@@ -1,25 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 18 Jan 2014 21:09:45 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] eir: Add support for parsing  DeviceID info
-Message-ID: <20140118190945.GA14875@x220.p-661hnu-f1>
-References: <1390057034-7983-1-git-send-email-szymon.janc@gmail.com>
+Subject: Re: [PATCH BlueZ] android: Fix const to non-const issue on android-tester
+Date: Sat, 18 Jan 2014 19:21:41 +0100
+Message-ID: <7318034.u9cudaOnMb@athlon>
+In-Reply-To: <1390056866-21560-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1390056866-21560-1-git-send-email-anderson.lizardo@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1390057034-7983-1-git-send-email-szymon.janc@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Anderson,
 
-On Sat, Jan 18, 2014, Szymon Janc wrote:
-> ---
->  src/eir.c | 10 ++++++++++
->  src/eir.h |  4 ++++
->  2 files changed, 14 insertions(+)
+On Saturday 18 January 2014 10:54:26 Anderson Lizardo wrote:
+> According to definition from hardware/bluetooth.h, the "val" field does
+> not have const modifier.
+> 
+> Fix clang errors like:
+> 
+> android/android-tester.c:760:14: error: initializing 'void *' with an
+> expression of type 'const char (*)[18]' discards qualifiers
+> [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
 
-All three patches have been applied. Thanks.
+Applied, thanks.
 
-Johan
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
