@@ -1,74 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] android: Fix const to non-const issue on android-tester
-Date: Sat, 18 Jan 2014 10:54:26 -0400
-Message-Id: <1390056866-21560-1-git-send-email-anderson.lizardo@openbossa.org>
+Date: Sat, 18 Jan 2014 15:20:42 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] agent: Remove not used enum value
+Message-ID: <20140118132042.GB4072@x220.p-661hnu-f1>
+References: <1390049485-23503-1-git-send-email-szymon.janc@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1390049485-23503-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to definition from hardware/bluetooth.h, the "val" field does
-not have const modifier.
+Hi Szymon,
 
-Fix clang errors like:
+On Sat, Jan 18, 2014, Szymon Janc wrote:
+> Only user of AGENT_REQUEST_CONFIRM_MODE is already removed.
+> ---
+>  src/agent.c | 1 -
+>  1 file changed, 1 deletion(-)
 
-android/android-tester.c:760:14: error: initializing 'void *' with an
-expression of type 'const char (*)[18]' discards qualifiers
-[-Werror,-Wincompatible-pointer-types-discards-qualifiers]
----
- android/android-tester.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+Both patches have been applied. Thanks.
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index 6f0e962..0e44bc8 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -897,7 +897,7 @@ static void remote_device_properties_cb(bt_status_t status,
- }
- 
- static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
--static const char enable_done_bdname_val[] = "BlueZ for Android";
-+static char enable_done_bdname_val[] = "BlueZ for Android";
- static bt_uuid_t enable_done_uuids_val = {
- 	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
- 					0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-@@ -1344,7 +1344,7 @@ static const struct generic_data bluetooth_discovery_device_found_test = {
- 	.expected_adapter_status = BT_STATUS_NOT_EXPECTED,
- };
- 
--static const char remote_get_properties_bdname_val[] = "00:AA:01:01:00:00";
-+static char remote_get_properties_bdname_val[] = "00:AA:01:01:00:00";
- static uint32_t remote_get_properties_cod_val = 0;
- static bt_device_type_t remote_get_properties_tod_val = BT_DEVICE_DEVTYPE_BREDR;
- static int32_t remote_get_properties_rssi_val = -60;
-@@ -1400,7 +1400,7 @@ static const struct generic_data bt_dev_getprops_success_test = {
- 	.expected_adapter_status = BT_STATUS_NOT_EXPECTED,
- };
- 
--static const char remote_getprop_bdname_val[] = "00:AA:01:01:00:00";
-+static char remote_getprop_bdname_val[] = "00:AA:01:01:00:00";
- 
- static struct priority_property remote_getprop_bdname_props[] = {
- 	{
-@@ -1675,7 +1675,7 @@ static const struct generic_data bt_dev_getprop_fname_fail_test = {
- 	.expected_adapter_status = BT_STATUS_FAIL,
- };
- 
--static const char remote_setprop_fname_val[] = "set_fname_test";
-+static char remote_setprop_fname_val[] = "set_fname_test";
- 
- static struct priority_property remote_setprop_fname_props[] = {
- 	{
-@@ -1702,7 +1702,7 @@ static const struct generic_data bt_dev_setprop_fname_success_test = {
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
- };
- 
--static const char remote_setprop_bdname_val[] = "setprop_bdname_fail";
-+static char remote_setprop_bdname_val[] = "setprop_bdname_fail";
- 
- static struct priority_property remote_setprop_bdname_props[] = {
- 	{
--- 
-1.8.3.2
-
+Johan
