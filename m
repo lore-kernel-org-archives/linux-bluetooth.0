@@ -1,54 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/3] eir: Add support for parsing  DeviceID info
-Date: Sat, 18 Jan 2014 15:57:12 +0100
-Message-Id: <1390057034-7983-1-git-send-email-szymon.janc@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] android: Fix const to non-const issue on android-tester
+Date: Sat, 18 Jan 2014 10:54:26 -0400
+Message-Id: <1390056866-21560-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/eir.c | 10 ++++++++++
- src/eir.h |  4 ++++
- 2 files changed, 14 insertions(+)
+According to definition from hardware/bluetooth.h, the "val" field does
+not have const modifier.
 
-diff --git a/src/eir.c b/src/eir.c
-index 5f3f059..d85ac7e 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -223,6 +223,16 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
- 				break;
- 			eir->randomizer = g_memdup(data, 16);
- 			break;
-+
-+		case EIR_DEVICE_ID:
-+			if (data_len < 8)
-+				break;
-+
-+			eir->did_source = data[0] | (data[1] << 8);
-+			eir->did_vendor = data[2] | (data[3] << 8);
-+			eir->did_product = data[4] | (data[5] << 8);
-+			eir->did_version = data[6] | (data[7] << 8);
-+			break;
- 		}
+Fix clang errors like:
+
+android/android-tester.c:760:14: error: initializing 'void *' with an
+expression of type 'const char (*)[18]' discards qualifiers
+[-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+---
+ android/android-tester.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 6f0e962..0e44bc8 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -897,7 +897,7 @@ static void remote_device_properties_cb(bt_status_t status,
+ }
  
- 		eir_data += field_len + 1;
-diff --git a/src/eir.h b/src/eir.h
-index 888f382..3fa1cb3 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -49,6 +49,10 @@ struct eir_data {
- 	uint8_t *hash;
- 	uint8_t *randomizer;
- 	bdaddr_t addr;
-+	uint16_t did_vendor;
-+	uint16_t did_product;
-+	uint16_t did_version;
-+	uint16_t did_source;
+ static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
+-static const char enable_done_bdname_val[] = "BlueZ for Android";
++static char enable_done_bdname_val[] = "BlueZ for Android";
+ static bt_uuid_t enable_done_uuids_val = {
+ 	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+ 					0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
+@@ -1344,7 +1344,7 @@ static const struct generic_data bluetooth_discovery_device_found_test = {
+ 	.expected_adapter_status = BT_STATUS_NOT_EXPECTED,
  };
  
- void eir_data_free(struct eir_data *eir);
+-static const char remote_get_properties_bdname_val[] = "00:AA:01:01:00:00";
++static char remote_get_properties_bdname_val[] = "00:AA:01:01:00:00";
+ static uint32_t remote_get_properties_cod_val = 0;
+ static bt_device_type_t remote_get_properties_tod_val = BT_DEVICE_DEVTYPE_BREDR;
+ static int32_t remote_get_properties_rssi_val = -60;
+@@ -1400,7 +1400,7 @@ static const struct generic_data bt_dev_getprops_success_test = {
+ 	.expected_adapter_status = BT_STATUS_NOT_EXPECTED,
+ };
+ 
+-static const char remote_getprop_bdname_val[] = "00:AA:01:01:00:00";
++static char remote_getprop_bdname_val[] = "00:AA:01:01:00:00";
+ 
+ static struct priority_property remote_getprop_bdname_props[] = {
+ 	{
+@@ -1675,7 +1675,7 @@ static const struct generic_data bt_dev_getprop_fname_fail_test = {
+ 	.expected_adapter_status = BT_STATUS_FAIL,
+ };
+ 
+-static const char remote_setprop_fname_val[] = "set_fname_test";
++static char remote_setprop_fname_val[] = "set_fname_test";
+ 
+ static struct priority_property remote_setprop_fname_props[] = {
+ 	{
+@@ -1702,7 +1702,7 @@ static const struct generic_data bt_dev_setprop_fname_success_test = {
+ 	.expected_adapter_status = BT_STATUS_SUCCESS,
+ };
+ 
+-static const char remote_setprop_bdname_val[] = "setprop_bdname_fail";
++static char remote_setprop_bdname_val[] = "setprop_bdname_fail";
+ 
+ static struct priority_property remote_setprop_bdname_props[] = {
+ 	{
 -- 
-1.8.5.3
+1.8.3.2
 
