@@ -1,72 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/5] lib: Add flag to double L2CAP IMTU size used for SDP connection
-Date: Mon, 20 Jan 2014 01:31:50 +0100
-Message-Id: <1390177914-13529-1-git-send-email-szymon.janc@gmail.com>
+Message-ID: <1390174797.3651.7.camel@deadeye.wl.decadent.org.uk>
+Subject: Re: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	Frank Huang <frankh@marvell.com>
+Date: Sun, 19 Jan 2014 23:39:57 +0000
+In-Reply-To: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
+References: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-NzcuPV+5m5yPWWALH6Df"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow to workaround Dualshock4 not respecting L2CAP MTU
-size while sending SDP response.
----
- lib/sdp.c     | 22 ++++++++++++++++++++++
- lib/sdp_lib.h |  1 +
- 2 files changed, 23 insertions(+)
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 886e7cf..4d9a4bb 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -4644,6 +4644,25 @@ static int sdp_connect_local(sdp_session_t *session)
- 	return connect(session->sock, (struct sockaddr *) &sa, sizeof(sa));
- }
- 
-+static int double_l2cap_imtu(int sk)
-+{
-+	struct l2cap_options l2o;
-+	socklen_t len;
-+
-+	memset(&l2o, 0, sizeof(l2o));
-+	len = sizeof(l2o);
-+
-+	if (getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &l2o, &len) < 0)
-+		return -1;
-+
-+	l2o.imtu = 2 * l2o.imtu;
-+
-+	if (setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, &l2o, sizeof(l2o)) < 0)
-+		return -1;
-+
-+	return 0;
-+}
-+
- static int sdp_connect_l2cap(const bdaddr_t *src,
- 		const bdaddr_t *dst, sdp_session_t *session)
- {
-@@ -4678,6 +4697,9 @@ static int sdp_connect_l2cap(const bdaddr_t *src,
- 		setsockopt(sk, SOL_SOCKET, SO_LINGER, &l, sizeof(l));
- 	}
- 
-+	if ((flags & SDP_DOUBLE_IMTU) && double_l2cap_imtu(sk) < 0)
-+		return -1;
-+
- 	sa.l2_psm = htobs(SDP_PSM);
- 	sa.l2_bdaddr = *dst;
- 
-diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
-index 6e1eb91..56ba2ea 100644
---- a/lib/sdp_lib.h
-+++ b/lib/sdp_lib.h
-@@ -81,6 +81,7 @@ static inline void sdp_list_foreach(sdp_list_t *list, sdp_list_func_t f, void *u
- #define SDP_RETRY_IF_BUSY	0x01
- #define SDP_WAIT_ON_CLOSE	0x02
- #define SDP_NON_BLOCKING	0x04
-+#define SDP_DOUBLE_IMTU		0x08
- 
- /*
-  * a session with an SDP server
--- 
-1.8.5.3
+--=-NzcuPV+5m5yPWWALH6Df
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 2014-01-09 at 19:48 -0800, Bing Zhao wrote:
+> The following changes since commit 52d77db9f133afe4d2b26aeccfd603745f45fd=
+a1:
+>=20
+>   Merge branch 'master' of git://git.kernel.org/pub/scm/linux/kernel/git/=
+egrumbach/linux-firmware (2013-12-30 15:22:40 +0100)
+>=20
+> are available in the git repository at:
+>=20
+>=20
+>   git://git.marvell.com/mwifiex-firmware.git master
+>=20
+> for you to fetch changes up to 2d4aa2037a7015c4d78cde40006f80b8012537a6:
+>=20
+>   linux-firmware: add Marvell USB8897-B0 firmware combo image (2014-01-09=
+ 19:17:35 -0800)
+>=20
+> ----------------------------------------------------------------
+> Bing Zhao (3):
+>       linux-firmware: update Marvell USB8797-B0 firmware image
+>       linux-firmware: update Marvell SD8897-B0 firmware combo image
+>       linux-firmware: add Marvell USB8897-B0 firmware combo image
+>=20
+>  WHENCE                  |   7 +++++--
+>  mrvl/sd8897_uapsta.bin  | Bin 639012 -> 668028 bytes
+>  mrvl/usb8797_uapsta.bin | Bin 508372 -> 541048 bytes
+>  mrvl/usb8897_uapsta.bin | Bin 0 -> 705364 bytes
+>  4 files changed, 5 insertions(+), 2 deletions(-)
+>  create mode 100644 mrvl/usb8897_uapsta.bin
+>=20
+> diff --git a/WHENCE b/WHENCE
+> index 4f87d8a..23faafa 100644
+> --- a/WHENCE
+> +++ b/WHENCE
+> @@ -730,10 +730,13 @@ File: mrvl/sd8797_uapsta.bin
+>  Version: 14.66.11.p151
+> =20
+>  File: mrvl/sd8897_uapsta.bin
+> -Version: 15.69.2.p11
+> +Version: 15.68.201.p113
+> =20
+>  File: mrvl/usb8797_uapsta.bin
+> -Version: 14.69.11.p179
+> +Version: 14.68.29.p26
+[...]
+
+Why are these updates rolling the version number backward?  Did the
+later versions cause regressions?
+
+Ben.
+
+--=20
+Ben Hutchings
+friends: People who know you well, but like you anyway.
+
+--=-NzcuPV+5m5yPWWALH6Df
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQIVAwUAUtxiTee/yOyVhhEJAQpldhAAyz6+50GTS5jnRqzVL4DGWu7pWFusSQhi
+N6z1E6MPI4HtRPROMpzNkBAI+ych4amYUJA2vjNorMPPOPqe6ZoHkz23IVhP652x
+jyVfWLqqsIs/Lj9VE2V4AVxrE3CnGlfV1Cy4zGYdcQIoJ/AKKYMhVtgQkFDiDvnK
+eHoR7kY6FLhZzPUJvBH1+mNEPACh4ujF+dSmp2zEMehrYHLUgjMN6/6dROmUqNdi
+XPFSXCeIDI9w20HqXrxskPG8PLYtLj+BAP6ljQFeVmAGGNEDdK1ebfKxj/aiJqSw
+pN/reefcFNuaTR00128suVuCQymvPcxXBdA+adci4hKy3na91dZF22wyZta4SN9t
+Prr4OExqE516dSq+SWfd74db1F5U10cpk1LOiLQPR+h/Wlsuxmg1Mbl9CAifaiyf
+u32vmqevOITNzrAjW9RvA6GAqIB+fLlWoHQQflAfhhlaHvIl8Lx0KZHoKBuObo3R
+1nl8Oho3WM9Fxcgh3Dy/Yx6dCZvSetZNKVXrWjTCExhRxW5Pk5Kh+KjgXKEklPXT
+DwHmKgfONPs1hAcVsCZ7MNXjqrWgrH3euixC9FIzsXVs3UBRHGRcQS71sm8BiJ/d
+yd2e4eKw0/1eRw69qpX0XuFqFpxH/HLN6ARBz2E9nbz2Tcg9uRq0o0sZDYDp5HCs
+totZkMccAKk=
+=oex4
+-----END PGP SIGNATURE-----
+
+--=-NzcuPV+5m5yPWWALH6Df--
