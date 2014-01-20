@@ -1,73 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 02/11] android/hidhost: Fix miscalculation of get report event struct length
-Date: Mon, 20 Jan 2014 16:22:35 +0100
-Message-ID: <2481120.IZcvT0pjE9@uw000953>
-In-Reply-To: <1389914751-18545-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1389914751-18545-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1389914751-18545-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 6/9] android/hal-audio: Add resume to codec callbacks
+Date: Mon, 20 Jan 2014 15:59:00 +0100
+Message-ID: <1390229943-29609-7-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Once stream is resumed it may be required to reset some state of codec,
+i.e. in case of SBC we need to reset monotonic clock and frames count
+which are used for synchronization.
+---
+ android/hal-audio.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-On Friday 17 of January 2014 01:25:42 Ravi kumar Veeramally wrote:
-> ---
->  android/hal-hidhost.c | 3 ++-
->  android/hidhost.c     | 3 ++-
->  2 files changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-> index fd3ad2d..5445d08 100644
-> --- a/android/hal-hidhost.c
-> +++ b/android/hal-hidhost.c
-> @@ -73,7 +73,8 @@ static void handle_get_report(void *buf, uint16_t len)
->  {
->  	struct hal_ev_hidhost_get_report *ev = buf;
->  
-> -	if (len != sizeof(*ev) + ev->len) {
-> +	if (len != sizeof(*ev) + sizeof(struct hal_ev_hidhost_get_report)
-> +								+ ev->len) {
-
-I don't understand this change. We have header and data len. There should be
-no need for any extra calculations.
-
-
->  		error("invalid get report event, aborting");
->  		exit(EXIT_FAILURE);
->  	}
-> diff --git a/android/hidhost.c b/android/hidhost.c
-> index c004063..8a2668c 100644
-> --- a/android/hidhost.c
-> +++ b/android/hidhost.c
-> @@ -371,13 +371,14 @@ static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
->  	ba2str(&dev->dst, address);
->  	DBG("device %s", address);
->  
-> -	ev_len = sizeof(*ev) + sizeof(struct hal_ev_hidhost_get_report) + 1;
-> +	ev_len = sizeof(*ev) + sizeof(struct hal_ev_hidhost_get_report);
-
-I don't understand why there is double sizeof() in first place.(*ev is same type)
-
->  
->  	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
->  			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
->  			(buf[0]	== (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
->  		ev = g_malloc0(ev_len);
->  		ev->status = buf[0];
-> +		ev->len = 0;
->  		bdaddr2android(&dev->dst, ev->bdaddr);
->  		goto send;
->  	}
-
-I have a feeling that there is something wrong with ev_len calculations in
-bt_hid_notify_get_report(). I'd rather prefer to have this function properly
-fixed (and possibly refactored on how it handles ev data allocation).
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 22dff53..adceab8 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -124,6 +124,9 @@ struct sbc_data {
+ 	uint8_t *out_buf;
  
-
+ 	unsigned frame_duration;
++
++	struct timespec start;
++	unsigned frames_sent;
+ };
+ 
+ static int sbc_get_presets(struct audio_preset *preset, size_t *len);
+@@ -132,6 +135,7 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+ static int sbc_cleanup(void *codec_data);
+ static int sbc_get_config(void *codec_data,
+ 					struct audio_input_config *config);
++static void sbc_resume(void *codec_data);
+ 
+ struct audio_codec {
+ 	uint8_t type;
+@@ -143,6 +147,7 @@ struct audio_codec {
+ 	int (*cleanup) (void *codec_data);
+ 	int (*get_config) (void *codec_data,
+ 					struct audio_input_config *config);
++	void (*resume) (void *codec_data);
+ 	ssize_t (*write_data) (void *codec_data, const void *buffer,
+ 				size_t bytes);
+ };
+@@ -156,6 +161,7 @@ static const struct audio_codec audio_codecs[] = {
+ 		.init = sbc_codec_init,
+ 		.cleanup = sbc_cleanup,
+ 		.get_config = sbc_get_config,
++		.resume = sbc_resume,
+ 	}
+ };
+ 
+@@ -351,6 +357,17 @@ static int sbc_get_config(void *codec_data,
+ 	return AUDIO_STATUS_SUCCESS;
+ }
+ 
++static void sbc_resume(void *codec_data)
++{
++	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++
++	DBG("");
++
++	clock_gettime(CLOCK_MONOTONIC, &sbc_data->start);
++
++	sbc_data->frames_sent = 0;
++}
++
+ static void audio_ipc_cleanup(void)
+ {
+ 	if (audio_sk >= 0) {
+@@ -673,6 +690,8 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 		if (ipc_resume_stream_cmd(out->ep->id) != AUDIO_STATUS_SUCCESS)
+ 			return -1;
+ 
++		out->ep->codec->resume(out->ep->codec_data);
++
+ 		out->audio_state = AUDIO_A2DP_STATE_STARTED;
+ 	}
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.2
+
