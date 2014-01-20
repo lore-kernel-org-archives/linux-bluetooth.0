@@ -1,27 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52DCDF84.1040902@ahsoftware.de>
-Date: Mon, 20 Jan 2014 09:34:12 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+Message-ID: <52DCA7F7.7050704@oh.rr.com>
+Date: Sun, 19 Jan 2014 23:37:11 -0500
+From: Frank Praznik <frank.praznik@oh.rr.com>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
- Gianluca Anzolin <gianluca@sottospazio.it>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, peter@hurleysoftware.com,
- "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
- Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
- stable@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
-References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it> <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org>
-In-Reply-To: <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+To: Szymon Janc <szymon.janc@gmail.com>,
+	David Herrmann <dh.herrmann@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Simon Wood <simon@mungewell.org>,
+	Frank Praznik <frank.praznik@oh.rr.com>
+Subject: Re: [PATCH 3/3] input: Add DualShock 4 detection
+References: <1390057034-7983-1-git-send-email-szymon.janc@gmail.com> <1390057034-7983-3-git-send-email-szymon.janc@gmail.com> <CANq1E4Tm2na1zVCdeDK5ihS0fQKCpJ10P0a+pTVUmcURTqCV9A@mail.gmail.com> <1572567.ZoR782tNKQ@athlon>
+In-Reply-To: <1572567.ZoR782tNKQ@athlon>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 06.01.2014 22:57, schrieb Marcel Holtmann:
+On 1/18/2014 10:13, Szymon Janc wrote:
+> Hi,
+>
+> On Saturday 18 January 2014 16:05:26 David Herrmann wrote:
+>> Hi
+>>
+>> @Simon and Frank:
+>> This patch might help fix your DS4 issues.
+>>
+>> Cheers
+>> David
+> Just for clarification, this does not add DS4 support, just detection for it
+> in input server. There is some problem with getting SDP records from DS4 by
+> bluetoothd (works with sdptool) which prevents idev from being created.
+>
+> I'm working on fixing this, but no ETA yet.
+>
+With this and the IMTU patch I was able to get my controller paired.  I 
+played around with it and from watching the traffic in btmon, there are 
+still two issues that are stopping full two way communications:
 
-> all 4 patches have been applied to bluetooth-next tree.
+1. The Dualshock 4 sends communications to the host on PSM 19, but will 
+only receive packets on PSM 17.  Currently the bluetooth stack is trying 
+to send data to the controller on PSM 19 so the data packets still 
+aren't reaching the it.
 
-Maybe a bit late, but I've just seen they miss a Cc: 
-stable@vger.kernel.org to automatically end up in 3.12 and 3.13 too.
-
-Regards,
-
-Alexander Holler
+2. The hidp layer always assigns a report type of 0xA2 (HIDP_TRANS_DATA 
+| HIDP_DATA_RTYPE_OUTPUT) to every HIDP_OUTPUT_REPORT.  The Dualshock 4 
+only accepts reports with type 0x52 (HIDP_TRANS_SEND_REPORT | 
+HIDP_DATA_RTYPE_OUTPUT).  I was able to work around this with a kludge 
+in net/bluetooth/hidp/core.c to catch the Dualshock 4 packets and use 
+the value that the controller wants, but I don't think anyone wants a 
+device-specific hack in a core protocol file.  Unfortunately, there 
+seems to be no elegant way to work around this.
