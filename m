@@ -1,37 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: "quozl@laptop.org" <quozl@laptop.org>
-CC: Ben Hutchings <ben@decadent.org.uk>,
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Frank Huang <frankh@marvell.com>
-Date: Mon, 20 Jan 2014 12:25:12 -0800
-Subject: RE: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
-Message-ID: <477F20668A386D41ADCC57781B1F70430F53691FC5@SC-VEXCH1.marvell.com>
-References: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
- <1390174797.3651.7.camel@deadeye.wl.decadent.org.uk>
- <477F20668A386D41ADCC57781B1F70430F53691E15@SC-VEXCH1.marvell.com>
- <20140120022223.GI17658@us.netrek.org>
-In-Reply-To: <20140120022223.GI17658@us.netrek.org>
-Content-Type: text/plain; charset="us-ascii"
+From: Szymon Janc <szymon.janc@gmail.com>
+To: simon@mungewell.org
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] lib: Add flag to double L2CAP IMTU size used for SDP connection
+Date: Mon, 20 Jan 2014 21:00:17 +0100
+Message-ID: <5584991.ragWnAIfdC@athlon>
+In-Reply-To: <649bfd2b8da26f5cf4b19f59d40d26fc.squirrel@mungewell.org>
+References: <1390177914-13529-1-git-send-email-szymon.janc@gmail.com> <649bfd2b8da26f5cf4b19f59d40d26fc.squirrel@mungewell.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi James,
+Hi Simon,
 
-> On Sun, Jan 19, 2014 at 06:10:03PM -0800, Bing Zhao wrote:
-> > The 2nd (69 or 68) and 3rd (11 or 29) numbers in the version string
-> > do not necessarily mean the version increasing or decreasing. Only
-> > when first 3 numbers are fixed, a smaller 4th number will mean that
-> > the version is rolling backward.
-> 
-> Ah, light dawns.  I've been dealing with these version numbers for
-> years now, for 8388, 8686 and 8787, and I didn't know that.  Is this
-> documented anywhere else?  Have the 2nd and 3rd numbers any meaning or
-> are they random?
+On Monday 20 January 2014 12:31:14 simon@mungewell.org wrote:
 
-They're not random. They represent firmware branch and features built in.
+<snip>
 
-Thanks,
-Bing
+> I also noticed a weird log at one point, although only saw this once and
+> don't know what triggered it.
+> --
+> [bluetooth]#
+> [CHG] Device 1C:66:6D:07:C3:E0 Class: 0x200404
+> [CHG] Device 1C:66:6D:07:C3:E0 Icon: audio-card <--------!!
+> [CHG] Device 1C:66:6D:07:C3:E0 Class: 0x002508
+> [CHG] Device 1C:66:6D:07:C3:E0 Icon: input-gaming
+> --
+
+Yes, I've seen this as well. I suspect that DS4 has some extra features 
+related to audio (it has jack for headphones) and it enables that for PS4 
+only, possibly switching to 'gamepad mode' if not connected to PS4. Maybe 
+related to connecting USB first or sth...
+
+But this is just my suspicion... 
+
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
