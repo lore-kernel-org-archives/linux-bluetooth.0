@@ -1,30 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52DD6627.2020709@linux.intel.com>
-Date: Mon, 20 Jan 2014 20:08:39 +0200
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/11] HIDHost E2E tests and fixes
-References: <1389914751-18545-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1991876.SYBil5rWd4@uw000953>
-In-Reply-To: <1991876.SYBil5rWd4@uw000953>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v1 18/18] bluetooth.conf: Add ObjectManager interface
+Date: Mon, 20 Jan 2014 15:05:03 -0300
+Message-Id: <1390241103-808-19-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+---
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-On 01/20/2014 05:30 PM, Szymon Janc wrote:
->   android/android-tester.c | 517 ++++++++++++++++++++++++++++++++++++++++++++++-
->   android/hal-hidhost.c    |   3 +-
->   android/hidhost.c        |  14 +-
->   3 files changed, 511 insertions(+), 23 deletions(-)
->
->
-> I've applied all patches except 2 and 9, thanks.
-> Please see comments for 02/11.
->
-Ok, I will check what went wrong.
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 0495200..ad8891a 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -18,6 +18,7 @@
+     <allow send_interface="org.bluez.Profile1"/>
+     <allow send_interface="org.bluez.HeartRateWatcher1"/>
+     <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
++    <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+   </policy>
+ 
+   <policy at_console="true">
+-- 
+1.8.3.1
 
-Thanks,
-Ravi.
