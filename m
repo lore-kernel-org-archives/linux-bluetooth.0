@@ -1,67 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5 00/11] IPC negative tester
-Date: Mon, 20 Jan 2014 23:26:17 +0100
-Message-ID: <1578139.kyyvNt276N@athlon>
-In-Reply-To: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH SBC v3 1/2] sbc: Add sbc_init_a2dp
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1390246452-29103-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 20 Jan 2014 14:07:40 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <B09D8F68-7325-46D2-836C-DC655E5BCF77@holtmann.org>
+References: <1390246452-29103-1-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Luiz,
 
-On Monday 20 January 2014 10:35:59 Jakub Tyszkowski wrote:
-> Following patchset adds IPC negative tester framework along with test cases
-> checking IPC's behaviour on daemon side. Expected daemon's behaviour is to
-> shut down gracefully in case of receiving invalid IPC data.
+> This adds sbc_init_a2dp that can be used to convert A2DP configuration to
+> the internal representation since they are not binary compatible.
+> ---
+> sbc/sbc.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> sbc/sbc.h |   2 +
+> 2 files changed, 146 insertions(+)
 > 
-> v2 changes:
->   * fixed few indentation issues
->   * fixed missing __attribute__((packed))
->   * fixed amount of data written for 'malformed data' test case
->   * fixed opcode for 'invalid service' test case
->   * added patch(8) with more 'malformed data' cases
+> diff --git a/sbc/sbc.c b/sbc/sbc.c
+> index c589217..9fd2311 100644
+> --- a/sbc/sbc.c
+> +++ b/sbc/sbc.c
+> @@ -57,6 +57,55 @@
+> #define MSBC_SYNCWORD	0xAD
+> #define MSBC_BLOCKS	15
 > 
-> v3 changes:
->   * changed license to GPL
->   * changed 'ipc-negative-tester' name to 'ipc-tester'
-> 
-> v4 changes:
->   * fixed typo in first test case and last commit's message
->   * fixed daemon shutdown handler function
-> 
-> v5 changes:
->   * added clean up in case of setup failure
->   * added test execution macro enhancement for easy data creation
->   * added test cases for core BT interfaces (Patches: 9, 10, 11)
-> 
-> Jakub Tyszkowski (11):
->   android/ipc-tester: Skeleton for ipc negative tester
->   android/ipc-tester: Run daemon in separate process
->   android/ipc-tester: Add IPC initialization
->   android/ipc-tester: Add daemon shutdown handler
->   android/ipc-tester: Add sending test data with ipc
->   android/ipc-tester: Register services
->   android/ipc-tester: Add basic test cases for IPC's daemon site
->   android/ipc-tester: Add more cases for malformed data
->   android/ipc-tester: Add cases for service opcode boundaries
->   android/ipc-tester: Add cases for Core message data size
->   android/ipc-tester: Add cases for BT message data size
-> 
->  .gitignore           |   1 +
->  android/Makefile.am  |  17 +
->  android/ipc-tester.c | 868
-> +++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, 886
-> insertions(+)
->  create mode 100644 android/ipc-tester.c
-> 
+> +#define A2DP_SAMPLING_FREQ_16000		(1 << 3)
+> +#define A2DP_SAMPLING_FREQ_32000		(1 << 2)
+> +#define A2DP_SAMPLING_FREQ_44100		(1 << 1)
+> +#define A2DP_SAMPLING_FREQ_48000		1
 
-All patches in this set have been applied, thanks.
+please use (1 << 0) here.
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+> +
+> +#define A2DP_CHANNEL_MODE_MONO			(1 << 3)
+> +#define A2DP_CHANNEL_MODE_DUAL_CHANNEL		(1 << 2)
+> +#define A2DP_CHANNEL_MODE_STEREO		(1 << 1)
+> +#define A2DP_CHANNEL_MODE_JOINT_STEREO		1
+> +
+> +#define A2DP_BLOCK_LENGTH_4			(1 << 3)
+> +#define A2DP_BLOCK_LENGTH_8			(1 << 2)
+> +#define A2DP_BLOCK_LENGTH_12			(1 << 1)
+> +#define A2DP_BLOCK_LENGTH_16			1
+> +
+> +#define A2DP_SUBBANDS_4				(1 << 1)
+> +#define A2DP_SUBBANDS_8				1
+> +
+> +#define A2DP_ALLOCATION_SNR			(1 << 1)
+> +#define A2DP_ALLOCATION_LOUDNESS		1
+> +
+> +#if __BYTE_ORDER == __LITTLE_ENDIAN
+> +
+> +struct a2dp_sbc {
+> +	uint8_t channel_mode:4;
+> +	uint8_t frequency:4;
+> +	uint8_t allocation_method:2;
+> +	uint8_t subbands:2;
+> +	uint8_t block_length:4;
+> +	uint8_t min_bitpool;
+> +	uint8_t max_bitpool;
+> +} __attribute__ ((packed));
+> +
+> +#elif __BYTE_ORDER == __BIG_ENDIAN
+> +
+> +struct a2dp_sbc {
+> +	uint8_t frequency:4;
+> +	uint8_t channel_mode:4;
+> +	uint8_t block_length:4;
+> +	uint8_t subbands:2;
+> +	uint8_t allocation_method:2;
+> +	uint8_t min_bitpool;
+> +	uint8_t max_bitpool;
+> +} __attribute__ ((packed));
+> +
+> +#else
+> +#error "Unknown byte order"
+> +#endif
+> +
+> /* This structure contains an unpacked SBC frame.
+>    Yes, there is probably quite some unused space herein */
+> struct sbc_frame {
+> @@ -1046,6 +1095,101 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
+> 	return 0;
+> }
+> 
+> +SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, const void *conf,
+> +							size_t conf_len)
+> +{
+> +	const struct a2dp_sbc *a2dp;
+> +	int err;
+> +
+> +	if (conf_len != sizeof(*a2dp))
+> +		return -EINVAL;
+> +
+> +	err = sbc_init(sbc, flags);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	a2dp = conf;
+> +
+> +	switch (a2dp->frequency) {
+> +	case A2DP_SAMPLING_FREQ_16000:
+> +		sbc->frequency = SBC_FREQ_16000;
+> +		break;
+> +	case A2DP_SAMPLING_FREQ_32000:
+> +		sbc->frequency = SBC_FREQ_32000;
+> +		break;
+> +	case A2DP_SAMPLING_FREQ_44100:
+> +		sbc->frequency = SBC_FREQ_44100;
+> +		break;
+> +	case A2DP_SAMPLING_FREQ_48000:
+> +		sbc->frequency = SBC_FREQ_48000;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->channel_mode) {
+> +	case A2DP_CHANNEL_MODE_MONO:
+> +		sbc->mode = SBC_MODE_MONO;
+> +		break;
+> +	case A2DP_CHANNEL_MODE_DUAL_CHANNEL:
+> +		sbc->mode = SBC_MODE_DUAL_CHANNEL;
+> +		break;
+> +	case A2DP_CHANNEL_MODE_STEREO:
+> +		sbc->mode = SBC_MODE_STEREO;
+> +		break;
+> +	case A2DP_CHANNEL_MODE_JOINT_STEREO:
+> +		sbc->mode = SBC_MODE_JOINT_STEREO;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->allocation_method) {
+> +	case A2DP_ALLOCATION_SNR:
+> +		sbc->allocation = SBC_AM_SNR;
+> +		break;
+> +	case A2DP_ALLOCATION_LOUDNESS:
+> +		sbc->allocation = SBC_AM_LOUDNESS;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->subbands) {
+> +	case A2DP_SUBBANDS_4:
+> +		sbc->subbands = SBC_SB_4;
+> +		break;
+> +	case A2DP_SUBBANDS_8:
+> +		sbc->subbands = SBC_SB_8;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->block_length) {
+> +	case A2DP_BLOCK_LENGTH_4:
+> +		sbc->blocks = SBC_BLK_4;
+> +		break;
+> +	case A2DP_BLOCK_LENGTH_8:
+> +		sbc->blocks = SBC_BLK_8;
+> +		break;
+> +	case A2DP_BLOCK_LENGTH_12:
+> +		sbc->blocks = SBC_BLK_12;
+> +		break;
+> +	case A2DP_BLOCK_LENGTH_16:
+> +		sbc->blocks = SBC_BLK_16;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	return 0;
+> +
+> +failed:
+> +	sbc_finish(sbc);
+> +	return -EINVAL;
+> +}
+> +
+> SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
+> {
+> 	return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
+> diff --git a/sbc/sbc.h b/sbc/sbc.h
+> index 5f8a1fc..02ad9fe 100644
+> --- a/sbc/sbc.h
+> +++ b/sbc/sbc.h
+> @@ -84,6 +84,8 @@ typedef struct sbc_struct sbc_t;
+> int sbc_init(sbc_t *sbc, unsigned long flags);
+> int sbc_reinit(sbc_t *sbc, unsigned long flags);
+> int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
+> +int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, const void *conf,
+> +							size_t conf_len);
+
+Lets get const void *conf and size_t conf_len both on the second line. It feels looks wise a little bit easier on eyes. 
+
+And then the same for the actual implementation of course. Otherwise, this looks good.
+
+Regards
+
+Marcel
+
