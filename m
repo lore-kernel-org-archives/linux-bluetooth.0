@@ -1,179 +1,177 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v1 12/18] test: Add external service GATT skeleton
-Date: Mon, 20 Jan 2014 15:04:57 -0300
-Message-Id: <1390241103-808-13-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v1 11/18] gatt: Add Discover All Primary Services
+Date: Mon, 20 Jan 2014 15:04:56 -0300
+Message-Id: <1390241103-808-12-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the initial code for an external GATT service example.
-It implements the API defined at doc/gatt-api.txt
----
- Makefile.tools      |   5 ++
- test/gatt-service.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 141 insertions(+)
- create mode 100644 test/gatt-service.c
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 7548dca..2a80962 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -367,3 +367,8 @@ test_scripts += test/sap_client.py test/bluezutils.py \
- 		test/test-heartrate test/test-alert test/test-hfp \
- 		test/test-cyclingspeed test/opp-client test/ftp-client \
- 		test/pbap-client test/map-client
-+
-+noinst_PROGRAMS += test/gatt-service
-+
-+test_gatt_service_SOURCES = test/gatt-service.c
-+test_gatt_service_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ gdbus/libgdbus-internal.la
-diff --git a/test/gatt-service.c b/test/gatt-service.c
-new file mode 100644
-index 0000000..16e2cea
---- /dev/null
-+++ b/test/gatt-service.c
-@@ -0,0 +1,136 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <stdio.h>
-+
-+#include <glib.h>
-+#include <dbus/dbus.h>
-+#include <gdbus/gdbus.h>
-+
-+#define SERVICE_IFACE			"org.bluez.Service1"
-+
-+/* Immediate Alert Service UUID */
-+#define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
-+
-+static GMainLoop *main_loop;
-+static GSList *services;
-+
-+static gboolean service_get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
+This patch adds ATT Read By Group request handling to the attribute
+server. It is the primitive to implement Discover All Primary Services
+procedure.
+---
+ src/gatt.c | 129 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 128 insertions(+), 1 deletion(-)
+
+diff --git a/src/gatt.c b/src/gatt.c
+index 33c3b6a..b204f9c 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -112,6 +112,130 @@ static void send_error(GAttrib *attrib, uint8_t opcode, uint16_t handle,
+ 	g_attrib_send(attrib, 0, pdu, plen, NULL, NULL, NULL);
+ }
+ 
++static void read_by_group_resp(GAttrib *attrib, uint16_t start,
++					uint16_t end, bt_uuid_t *pattern)
 +{
-+	const char *uuid = user_data;
++	uint8_t opdu[ATT_DEFAULT_LE_MTU];
++	GList *list;
++	struct btd_attribute *last = NULL;
++	uint8_t *group_start, *group_end = NULL, *group_uuid;
++	unsigned int uuid_type = BT_UUID_UNSPEC;
++	size_t group_len = 0, plen = 0;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	/*
++	 * Read By Group Type Response format:
++	 *    Attribute Opcode: 1 byte
++	 *    Length: 1 byte (size of each group)
++	 *    Group: start | end | <<UUID>>
++	 */
 +
-+	return TRUE;
-+}
++	opdu[0] = ATT_OP_READ_BY_GROUP_RESP;
++	group_start = &opdu[2];
++	group_uuid = &opdu[6];
 +
-+static gboolean service_get_includes(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	return TRUE;
-+}
++	for (list = local_attribute_db; list;
++			last = list->data, list = g_list_next(list)) {
++		struct btd_attribute *attr = list->data;
 +
-+static gboolean service_exist_includes(const GDBusPropertyTable *property,
-+							void *user_data)
-+{
-+	return FALSE;
-+}
++		if (attr->handle < start)
++			continue;
 +
-+static DBusMessage *service_release(DBusConnection *conn,
-+				DBusMessage *msg, void *user_data)
-+{
-+	fprintf(stderr, "Terminating...\n");
++		if (attr->handle > end)
++			break;
 +
-+	g_main_loop_quit(main_loop);
++		if (bt_uuid_cmp(&attr->type, pattern) != 0)
++			continue;
 +
-+	return NULL;
-+}
++		if (uuid_type != BT_UUID_UNSPEC &&
++						uuid_type != attr->type.type) {
++			/*
++			 * Groups should contain the same length: UUID16 and
++			 * UUID128 should be sent on different ATT PDUs
++			 */
++			break;
++		}
 +
-+static const GDBusMethodTable service_methods[] = {
-+	{ GDBUS_NOREPLY_METHOD("Release", NULL, NULL, service_release) },
-+	{ }
-+};
++		/*
++		 * MTU checking should not be shifted up, otherwise the
++		 * handle of last end group will not be set properly.
++		 */
++		if ((plen + group_len) >= ATT_DEFAULT_LE_MTU)
++			break;
 +
-+static const GDBusPropertyTable service_properties[] = {
-+	{ "UUID", "s", service_get_uuid },
-+	{ "Includes", "ao", service_get_includes, NULL,
-+					service_exist_includes },
-+	{ }
-+};
++		/* Start Grouping handle */
++		att_put_u16(attr->handle, group_start);
 +
-+static char *register_service(DBusConnection *conn, const char *uuid)
-+{
-+	static int id = 1;
-+	char *path;
++		/* Grouping <<UUID>>: Value is little endian */
++		memcpy(group_uuid, attr->value, attr->value_len);
 +
-+	path = g_strdup_printf("/service%d", id++);
-+	if (g_dbus_register_interface(conn, path, SERVICE_IFACE,
-+				service_methods, NULL, service_properties,
-+				g_strdup(uuid), g_free) == FALSE) {
-+		fprintf(stderr, "Couldn't register service interface\n");
-+		g_free(path);
-+		return NULL;
++		if (last && group_end) {
++			att_put_u16(last->handle, group_end);
++			group_end += group_len;
++			plen += group_len;
++		}
++
++		/* Grouping initial settings: First grouping */
++		if (uuid_type == BT_UUID_UNSPEC) {
++			uuid_type = attr->type.type;
++
++			/* start(0xXXXX) | end(0xXXXX) | <<UUID>> */
++			group_len = 2 + 2 + bt_uuid_len(&attr->type);
++
++			/* 2: ATT Opcode and Length */
++			plen = 2 + group_len;
++
++			/* Size of each Attribute Data */
++			opdu[1] = group_len;
++
++			group_end = &opdu[4];
++		}
++
++		group_start += group_len;
++		group_uuid += group_len;
 +	}
 +
-+	return path;
++	if (plen == 0) {
++		send_error(attrib, ATT_OP_READ_BY_GROUP_REQ, start,
++						ATT_ECODE_ATTR_NOT_FOUND);
++		return;
++	}
++
++	if (group_end)
++		att_put_u16(last->handle, group_end);
++
++	g_attrib_send(attrib, 0, opdu, plen, NULL, NULL, NULL);
 +}
 +
-+static void create_services(DBusConnection *conn)
++static void read_by_group(GAttrib *attrib, const uint8_t *ipdu, size_t ilen)
 +{
-+	char *service_path;
++	uint16_t decoded, start, end;
++	bt_uuid_t pattern;
 +
-+	service_path = register_service(conn, IAS_UUID);
++	decoded = dec_read_by_grp_req(ipdu, ilen, &start, &end, &pattern);
++	if (decoded == 0) {
++		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_INVALID_PDU);
++		return;
++	}
 +
-+	services = g_slist_prepend(services, service_path);
++	if (start > end || start == 0x0000) {
++		send_error(attrib, ipdu[0], start, ATT_ECODE_INVALID_HANDLE);
++		return;
++	}
 +
-+	printf("Registered service: %s\n", service_path);
++	 /*
++	  * Restricting Read By Group Type to <<Primary>>.
++	  * Removing the checking below requires changes to support
++	  * dynamic values(defined in the upper layer) and additional
++	  * security verification.
++	  */
++	if (bt_uuid_cmp(&pattern, &primary_uuid) != 0) {
++		send_error(attrib, ipdu[0], start, ATT_ECODE_UNSUPP_GRP_TYPE);
++		return;
++	}
++
++	read_by_group_resp(attrib, start, end, &pattern);
 +}
 +
-+int main(int argc, char *argv[])
-+{
-+	DBusConnection *dbus_conn;
+ static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
+ 							gpointer user_data)
+ {
+@@ -133,11 +257,14 @@ static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
+ 	case ATT_OP_READ_MULTI_REQ:
+ 	case ATT_OP_PREP_WRITE_REQ:
+ 	case ATT_OP_EXEC_WRITE_REQ:
+-	case ATT_OP_READ_BY_GROUP_REQ:
+ 	case ATT_OP_SIGNED_WRITE_CMD:
+ 		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
+ 		break;
+ 
++	case ATT_OP_READ_BY_GROUP_REQ:
++		read_by_group(attrib, ipdu, ilen);
++		break;
 +
-+	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+
-+	main_loop = g_main_loop_new(NULL, FALSE);
-+
-+	g_dbus_attach_object_manager(dbus_conn);
-+
-+	printf("gatt-service unique name: %s\n",
-+				dbus_bus_get_unique_name(dbus_conn));
-+
-+	create_services(dbus_conn);
-+
-+	g_main_loop_run(main_loop);
-+
-+	g_slist_free_full(services, g_free);
-+	dbus_connection_unref(dbus_conn);
-+
-+	return 0;
-+}
+ 	/* Responses */
+ 	case ATT_OP_MTU_RESP:
+ 	case ATT_OP_FIND_INFO_RESP:
 -- 
 1.8.3.1
 
