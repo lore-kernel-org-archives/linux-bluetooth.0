@@ -1,39 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/pan: Initialize GError with NULL
-Date: Mon, 20 Jan 2014 11:00:08 +0100
-Message-Id: <1390212008-5376-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1390212008-5376-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1390212008-5376-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] tester: Remove test timeout for setup failure
+Date: Mon, 20 Jan 2014 11:00:07 +0100
+Message-Id: <1390212008-5376-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes the following issue:
-
-bluetoothd[10552]: android/pan.c:register_nap_server()
-bluetoothd[10552]: android/pan.c:nap_create_bridge() bnep
-(bluetoothd:10552): GLib-WARNING **: GError set over the top of a previous GError or uninitialized memory.
-This indicates a bug in someone's code. You must ensure an error is NULL before it's set.
-The overwriting error message was: l2cap_bind: Address already in use (98)
-bluetoothd[10552]: android/pan.c:destroy_nap_device()
+If setup fails, timeout function is not removed and still can be called,
+causing random subsequent case failure.
 ---
- android/pan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/tester.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/android/pan.c b/android/pan.c
-index dfd7762..3544d74 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -542,7 +542,7 @@ static void destroy_nap_device(void)
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index f3edd74..06fc415 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -460,6 +460,11 @@ void tester_setup_failed(void)
+ 	if (test->stage != TEST_STAGE_SETUP)
+ 		return;
  
- static int register_nap_server(void)
- {
--	GError *gerr;
-+	GError *gerr = NULL;
- 	int err;
++	if (test->timeout_id > 0) {
++		g_source_remove(test->timeout_id);
++		test->timeout_id = 0;
++	}
++
+ 	print_progress(test->name, COLOR_RED, "setup failed");
  
- 	DBG("");
+ 	g_idle_add(done_callback, test);
 -- 
 1.8.5.2
 
