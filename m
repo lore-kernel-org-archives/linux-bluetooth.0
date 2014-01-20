@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 5/9] android/hal-audio: Calculate SBC stream parameters
-Date: Mon, 20 Jan 2014 15:58:59 +0100
-Message-ID: <1390229943-29609-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 2/9] android: Build Audio HAL with SBC
+Date: Mon, 20 Jan 2014 15:58:56 +0100
+Message-ID: <1390229943-29609-3-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,205 +12,74 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds necessary calculations for SBC stream parameters.
-
-Both input and output buffers are expected to have exact amount of
-data to fill single media packet (based on transport channel MTU).
-
-Frame duration will be used to synchronize input and output streams.
+Build for Android requires libsbc to be built as shared library and
+includes to be available in external/bluetooth/sbc. Build for host
+requires libsbc package to be installed.
 ---
- android/hal-audio.c | 103 +++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 97 insertions(+), 6 deletions(-)
+ android/Android.mk  | 7 +++++--
+ android/Makefile.am | 2 ++
+ configure.ac        | 7 +++++++
+ 3 files changed, 14 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 8e932ef..22dff53 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -46,6 +46,66 @@ static pthread_t ipc_th = 0;
- static pthread_mutex_t close_mutex = PTHREAD_MUTEX_INITIALIZER;
- static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
+diff --git a/android/Android.mk b/android/Android.mk
+index afa3a51..cf7a224 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -3,8 +3,9 @@ LOCAL_PATH := $(call my-dir)
+ # Retrieve BlueZ version from configure.ac file
+ BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/../configure.ac | cpp -P -D'AC_INIT(_,v)=v')
  
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
+-# Specify pathmap for glib
+-pathmap_INCL += glib:external/bluetooth/glib
++# Specify pathmap for glib and sbc
++pathmap_INCL += glib:external/bluetooth/glib \
++	sbc:external/bluetooth/sbc
+ 
+ # Specify common compiler flags
+ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
+@@ -225,9 +226,11 @@ LOCAL_SRC_FILES := hal-audio.c
+ LOCAL_C_INCLUDES = \
+ 	$(call include-path-for, system-core) \
+ 	$(call include-path-for, libhardware) \
++	$(call include-path-for, sbc) \
+ 
+ LOCAL_SHARED_LIBRARIES := \
+ 	libcutils \
++	libsbc \
+ 
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
+ 
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 924917a..69ea6d5 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -130,6 +130,8 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+ 
+ android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+ 
++android_audio_a2dp_default_la_LIBADD = @SBC_LIBS@
 +
-+struct rtp_header {
-+	unsigned cc:4;
-+	unsigned x:1;
-+	unsigned p:1;
-+	unsigned v:2;
+ android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
+ 					-no-undefined -pthread
+ 
+diff --git a/configure.ac b/configure.ac
+index c85f208..8e4053f 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -252,6 +252,13 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
+ 					[enable_android=${enableval}])
+ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ 
++if (test "${enable_android}" = "yes"); then
++	PKG_CHECK_MODULES(SBC, sbc >= 1.2, dummy=yes,
++					AC_MSG_ERROR(SBC library >= 1.2 is required))
++	AC_SUBST(SBC_CFLAGS)
++	AC_SUBST(SBC_LIBS)
++fi
 +
-+	unsigned pt:7;
-+	unsigned m:1;
-+
-+	uint16_t sequence_number;
-+	uint32_t timestamp;
-+	uint32_t ssrc;
-+	uint32_t csrc[0];
-+} __attribute__ ((packed));
-+
-+struct rtp_payload {
-+	unsigned frame_count:4;
-+	unsigned rfa0:1;
-+	unsigned is_last_fragment:1;
-+	unsigned is_first_fragment:1;
-+	unsigned is_fragmented:1;
-+} __attribute__ ((packed));
-+
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+
-+struct rtp_header {
-+	unsigned v:2;
-+	unsigned p:1;
-+	unsigned x:1;
-+	unsigned cc:4;
-+
-+	unsigned m:1;
-+	unsigned pt:7;
-+
-+	uint16_t sequence_number;
-+	uint32_t timestamp;
-+	uint32_t ssrc;
-+	uint32_t csrc[0];
-+} __attribute__ ((packed));
-+
-+struct rtp_payload {
-+	unsigned is_fragmented:1;
-+	unsigned is_first_fragment:1;
-+	unsigned is_last_fragment:1;
-+	unsigned rfa0:1;
-+	unsigned frame_count:4;
-+} __attribute__ ((packed));
-+
-+#else
-+#error "Unknown byte order"
-+#endif
-+
-+struct media_packet {
-+	struct rtp_header hdr;
-+	struct rtp_payload payload;
-+	uint8_t data[0];
-+};
-+
- struct audio_input_config {
- 	uint32_t rate;
- 	uint32_t channels;
-@@ -56,10 +116,19 @@ struct sbc_data {
- 	a2dp_sbc_t sbc;
+ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
  
- 	sbc_t enc;
-+
-+	size_t in_frame_len;
-+	size_t in_buf_size;
-+
-+	size_t out_buf_size;
-+	uint8_t *out_buf;
-+
-+	unsigned frame_duration;
- };
- 
- static int sbc_get_presets(struct audio_preset *preset, size_t *len);
--static int sbc_codec_init(struct audio_preset *preset, void **codec_data);
-+static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
-+				void **codec_data);
- static int sbc_cleanup(void *codec_data);
- static int sbc_get_config(void *codec_data,
- 					struct audio_input_config *config);
-@@ -69,7 +138,8 @@ struct audio_codec {
- 
- 	int (*get_presets) (struct audio_preset *preset, size_t *len);
- 
--	int (*init) (struct audio_preset *preset, void **codec_data);
-+	int (*init) (struct audio_preset *preset, uint16_t mtu,
-+				void **codec_data);
- 	int (*cleanup) (void *codec_data);
- 	int (*get_config) (void *codec_data,
- 					struct audio_input_config *config);
-@@ -200,9 +270,14 @@ static void sbc_init_encoder(struct sbc_data *sbc_data)
- 	out->bitpool = in->max_bitpool;
- }
- 
--static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
-+static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
-+				void **codec_data)
- {
- 	struct sbc_data *sbc_data;
-+	size_t hdr_len = sizeof(struct media_packet);
-+	size_t in_frame_len;
-+	size_t out_frame_len;
-+	size_t num_frames;
- 
- 	DBG("");
- 
-@@ -217,6 +292,18 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
- 
- 	sbc_init_encoder(sbc_data);
- 
-+	in_frame_len = sbc_get_codesize(&sbc_data->enc);
-+	out_frame_len = sbc_get_frame_length(&sbc_data->enc);
-+	num_frames = (mtu - hdr_len) / out_frame_len;
-+
-+	sbc_data->in_frame_len = in_frame_len;
-+	sbc_data->in_buf_size = num_frames * in_frame_len;
-+
-+	sbc_data->out_buf_size = hdr_len + num_frames * out_frame_len;
-+	sbc_data->out_buf = calloc(1, sbc_data->out_buf_size);
-+
-+	sbc_data->frame_duration = sbc_get_frame_duration(&sbc_data->enc);
-+
- 	*codec_data = sbc_data;
- 
- 	return AUDIO_STATUS_SUCCESS;
-@@ -229,6 +316,7 @@ static int sbc_cleanup(void *codec_data)
- 	DBG("");
- 
- 	sbc_finish(&sbc_data->enc);
-+	free(sbc_data->out_buf);
- 	free(codec_data);
- 
- 	return AUDIO_STATUS_SUCCESS;
-@@ -460,7 +548,7 @@ static int ipc_close_cmd(uint8_t endpoint_id)
- 	return result;
- }
- 
--static int ipc_open_stream_cmd(uint8_t endpoint_id,
-+static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu,
- 					struct audio_preset **caps)
- {
- 	char buf[BLUEZ_AUDIO_MTU];
-@@ -483,6 +571,7 @@ static int ipc_open_stream_cmd(uint8_t endpoint_id,
- 	if (result == AUDIO_STATUS_SUCCESS) {
- 		size_t buf_len = sizeof(struct audio_preset) +
- 					rsp->preset[0].len;
-+		*mtu = rsp->mtu;
- 		*caps = malloc(buf_len);
- 		memcpy(*caps, &rsp->preset, buf_len);
- 	} else {
-@@ -868,6 +957,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	struct a2dp_stream_out *out;
- 	struct audio_preset *preset;
- 	const struct audio_codec *codec;
-+	uint16_t mtu;
- 
- 	out = calloc(1, sizeof(struct a2dp_stream_out));
- 	if (!out)
-@@ -895,7 +985,8 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	/* TODO: for now we always use endpoint 0 */
- 	out->ep = &audio_endpoints[0];
- 
--	if (ipc_open_stream_cmd(out->ep->id, &preset) != AUDIO_STATUS_SUCCESS)
-+	if (ipc_open_stream_cmd(out->ep->id, &mtu, &preset) !=
-+			AUDIO_STATUS_SUCCESS)
- 		goto fail;
- 
- 	if (!preset)
-@@ -903,7 +994,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 
- 	codec = out->ep->codec;
- 
--	codec->init(preset, &out->ep->codec_data);
-+	codec->init(preset, mtu, &out->ep->codec_data);
- 	codec->get_config(out->ep->codec_data, &out->cfg);
- 
- 	DBG("rate=%d channels=%d format=%d", out->cfg.rate,
 -- 
 1.8.5.2
 
