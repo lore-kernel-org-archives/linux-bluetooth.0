@@ -1,40 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] android/hal-audio: Fix not closing audio_sk
-Date: Mon, 20 Jan 2014 14:25:26 +0200
-Message-Id: <1390220727-21494-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] android/A2DP: Fix sending notification on bt_a2dp_unregister
+Date: Mon, 20 Jan 2014 14:25:27 +0200
+Message-Id: <1390220727-21494-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1390220727-21494-1-git-send-email-luiz.dentz@gmail.com>
+References: <1390220727-21494-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-shutdown will only disconnect the peers but it is still needed to close
-the file descriptor.
+At this point IPC might have been closed already.
 ---
- android/hal-audio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/a2dp.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 2f6f8c2..0b4577e 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -246,6 +246,7 @@ static void audio_ipc_cleanup(void)
- {
- 	if (audio_sk >= 0) {
- 		shutdown(audio_sk, SHUT_RDWR);
-+		close(audio_sk);
- 		audio_sk = -1;
- 	}
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 8ec03c8..5569691 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -119,8 +119,10 @@ static void unregister_endpoint(void *data)
+ 	g_free(endpoint);
  }
-@@ -1090,6 +1091,7 @@ static void *ipc_handler(void *data)
  
- 		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
- 			info("Audio HAL: Socket closed");
-+			close(audio_sk);
- 			audio_sk = -1;
- 		}
+-static void a2dp_device_free(struct a2dp_device *dev)
++static void a2dp_device_free(void *data)
+ {
++	struct a2dp_device *dev = data;
++
+ 	if (dev->idle_id > 0)
+ 		g_source_remove(dev->idle_id);
  
+@@ -1471,13 +1473,6 @@ fail:
+ 	return false;
+ }
+ 
+-static void a2dp_device_disconnected(gpointer data, gpointer user_data)
+-{
+-	struct a2dp_device *dev = data;
+-
+-	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
+-}
+-
+ void bt_a2dp_unregister(void)
+ {
+ 	DBG("");
+@@ -1488,7 +1483,7 @@ void bt_a2dp_unregister(void)
+ 	g_slist_free_full(endpoints, unregister_endpoint);
+ 	endpoints = NULL;
+ 
+-	g_slist_foreach(devices, a2dp_device_disconnected, NULL);
++	g_slist_free_full(devices, a2dp_device_free);
+ 	devices = NULL;
+ 
+ 	ipc_unregister(HAL_SERVICE_ID_A2DP);
 -- 
 1.8.4.2
 
