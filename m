@@ -1,136 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v1 10/18] gatt: Register ATT command/event handler
-Date: Mon, 20 Jan 2014 15:04:55 -0300
-Message-Id: <1390241103-808-11-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v1 17/18] gatttool: Add unix socket support for interactive mode
+Date: Mon, 20 Jan 2014 15:05:02 -0300
+Message-Id: <1390241103-808-18-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
-
-This patch registers the ATT channel handler to manage incoming ATT
-commands and events.
+This patch allows running GATT operations over unix socket on
+interactive mode.
 ---
- src/gatt.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 80 insertions(+)
+ attrib/interactive.c | 19 +++++++++++--------
+ 1 file changed, 11 insertions(+), 8 deletions(-)
 
-diff --git a/src/gatt.c b/src/gatt.c
-index 4806205..33c3b6a 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -38,6 +38,7 @@
- #include "log.h"
- #include "lib/uuid.h"
- #include "attrib/att.h"
-+#include "attrib/gattrib.h"
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 9826a4b..febebaa 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -84,7 +84,7 @@ static char *get_prompt(void)
+ 	if (opt_dst)
+ 		g_string_append_printf(prompt, "[%17s]", opt_dst);
+ 	else
+-		g_string_append_printf(prompt, "[%17s]", "");
++		g_string_append_printf(prompt, "[LOCAL]");
  
- #include "gatt-dbus.h"
- #include "gatt.h"
-@@ -100,12 +101,83 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	return attr;
- }
+ 	if (conn_state == STATE_CONNECTED)
+ 		g_string_append(prompt, COLOR_OFF);
+@@ -405,15 +405,18 @@ static void cmd_connect(int argcp, char **argvp)
+ 			opt_dst_type = g_strdup("public");
+ 	}
  
-+static void send_error(GAttrib *attrib, uint8_t opcode, uint16_t handle,
-+								uint8_t ecode)
-+{
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
-+	size_t plen;
+-	if (opt_dst == NULL) {
+-		error("Remote Bluetooth address required\n");
+-		return;
++	if (opt_dst) {
 +
-+	plen = enc_error_resp(opcode, handle, ecode, pdu, sizeof(pdu));
-+
-+	g_attrib_send(attrib, 0, pdu, plen, NULL, NULL, NULL);
-+}
-+
-+static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
-+							gpointer user_data)
-+{
-+	GAttrib *attrib = user_data;
-+
-+	switch (ipdu[0]) {
-+	case ATT_OP_ERROR:
-+		break;
-+
-+	/* Requests */
-+	case ATT_OP_WRITE_CMD:
-+	case ATT_OP_WRITE_REQ:
-+	case ATT_OP_READ_REQ:
-+	case ATT_OP_READ_BY_TYPE_REQ:
-+	case ATT_OP_MTU_REQ:
-+	case ATT_OP_FIND_INFO_REQ:
-+	case ATT_OP_FIND_BY_TYPE_REQ:
-+	case ATT_OP_READ_BLOB_REQ:
-+	case ATT_OP_READ_MULTI_REQ:
-+	case ATT_OP_PREP_WRITE_REQ:
-+	case ATT_OP_EXEC_WRITE_REQ:
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+	case ATT_OP_SIGNED_WRITE_CMD:
-+		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
-+		break;
-+
-+	/* Responses */
-+	case ATT_OP_MTU_RESP:
-+	case ATT_OP_FIND_INFO_RESP:
-+	case ATT_OP_FIND_BY_TYPE_RESP:
-+	case ATT_OP_READ_BY_TYPE_RESP:
-+	case ATT_OP_READ_RESP:
-+	case ATT_OP_READ_BLOB_RESP:
-+	case ATT_OP_READ_MULTI_RESP:
-+	case ATT_OP_READ_BY_GROUP_RESP:
-+	case ATT_OP_WRITE_RESP:
-+	case ATT_OP_PREP_WRITE_RESP:
-+	case ATT_OP_EXEC_WRITE_RESP:
-+	case ATT_OP_HANDLE_CNF:
-+		break;
-+
-+	/* Notification & Indication */
-+	case ATT_OP_HANDLE_NOTIFY:
-+	case ATT_OP_HANDLE_IND:
-+		break;
-+	}
-+}
-+
-+static gboolean unix_hup_cb(GIOChannel *io, GIOCondition cond,
-+						gpointer user_data)
-+{
-+	GAttrib *attrib = user_data;
-+
-+	g_attrib_unregister_all(attrib);
-+	g_attrib_unref(attrib);
-+
-+	return FALSE;
-+}
-+
- static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
- 	struct sockaddr_un uaddr;
- 	socklen_t len = sizeof(uaddr);
- 	GIOChannel *nio;
-+	GAttrib *attrib;
- 	int err, nsk, sk;
++		rl_printf("Attempting to connect to %s\n", opt_dst);
++		set_state(STATE_CONNECTING);
++		iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type,
++					opt_sec_level, opt_psm, opt_mtu,
++					connect_cb, &gerr);
++	} else {
++		rl_printf("Local connection\n");
++		iochannel = unix_connect(connect_cb, &gerr);
+ 	}
  
- 	sk = g_io_channel_unix_get_fd(io);
-@@ -120,6 +192,14 @@ static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
- 	nio = g_io_channel_unix_new(nsk);
- 	g_io_channel_set_close_on_unref(nio, TRUE);
- 	DBG("ATT UNIX socket: %p new client", nio);
-+
-+	attrib = g_attrib_new(nio);
-+
-+	g_attrib_register(attrib, GATTRIB_ALL_EVENTS, GATTRIB_ALL_HANDLES,
-+					channel_handler_cb, attrib, NULL);
-+
-+	g_io_add_watch(nio, G_IO_HUP, unix_hup_cb, attrib);
-+
- 	g_io_channel_unref(nio);
- 
- 	return TRUE;
+-	rl_printf("Attempting to connect to %s\n", opt_dst);
+-	set_state(STATE_CONNECTING);
+-	iochannel = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+-					opt_psm, opt_mtu, connect_cb, &gerr);
+ 	if (iochannel == NULL) {
+ 		set_state(STATE_DISCONNECTED);
+ 		error("%s\n", gerr->message);
 -- 
 1.8.3.1
 
