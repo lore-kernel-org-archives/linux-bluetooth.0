@@ -1,51 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52DCA7F7.7050704@oh.rr.com>
-Date: Sun, 19 Jan 2014 23:37:11 -0500
-From: Frank Praznik <frank.praznik@oh.rr.com>
-MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@gmail.com>,
-	David Herrmann <dh.herrmann@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Simon Wood <simon@mungewell.org>,
-	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: Re: [PATCH 3/3] input: Add DualShock 4 detection
-References: <1390057034-7983-1-git-send-email-szymon.janc@gmail.com> <1390057034-7983-3-git-send-email-szymon.janc@gmail.com> <CANq1E4Tm2na1zVCdeDK5ihS0fQKCpJ10P0a+pTVUmcURTqCV9A@mail.gmail.com> <1572567.ZoR782tNKQ@athlon>
-In-Reply-To: <1572567.ZoR782tNKQ@athlon>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Message-ID: <1390186665.3651.27.camel@deadeye.wl.decadent.org.uk>
+Subject: Re: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Frank Huang <frankh@marvell.com>
+Date: Mon, 20 Jan 2014 02:57:45 +0000
+In-Reply-To: <477F20668A386D41ADCC57781B1F70430F53691E15@SC-VEXCH1.marvell.com>
+References: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
+	 <1390174797.3651.7.camel@deadeye.wl.decadent.org.uk>
+	 <477F20668A386D41ADCC57781B1F70430F53691E15@SC-VEXCH1.marvell.com>
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="=-RWSLA4TKYEPXMnhAoF7j"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 1/18/2014 10:13, Szymon Janc wrote:
-> Hi,
->
-> On Saturday 18 January 2014 16:05:26 David Herrmann wrote:
->> Hi
->>
->> @Simon and Frank:
->> This patch might help fix your DS4 issues.
->>
->> Cheers
->> David
-> Just for clarification, this does not add DS4 support, just detection for it
-> in input server. There is some problem with getting SDP records from DS4 by
-> bluetoothd (works with sdptool) which prevents idev from being created.
->
-> I'm working on fixing this, but no ETA yet.
->
-With this and the IMTU patch I was able to get my controller paired.  I 
-played around with it and from watching the traffic in btmon, there are 
-still two issues that are stopping full two way communications:
 
-1. The Dualshock 4 sends communications to the host on PSM 19, but will 
-only receive packets on PSM 17.  Currently the bluetooth stack is trying 
-to send data to the controller on PSM 19 so the data packets still 
-aren't reaching the it.
+--=-RWSLA4TKYEPXMnhAoF7j
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2. The hidp layer always assigns a report type of 0xA2 (HIDP_TRANS_DATA 
-| HIDP_DATA_RTYPE_OUTPUT) to every HIDP_OUTPUT_REPORT.  The Dualshock 4 
-only accepts reports with type 0x52 (HIDP_TRANS_SEND_REPORT | 
-HIDP_DATA_RTYPE_OUTPUT).  I was able to work around this with a kludge 
-in net/bluetooth/hidp/core.c to catch the Dualshock 4 packets and use 
-the value that the controller wants, but I don't think anyone wants a 
-device-specific hack in a core protocol file.  Unfortunately, there 
-seems to be no elegant way to work around this.
+On Sun, 2014-01-19 at 18:10 -0800, Bing Zhao wrote:
+> Hi Ben,
+>=20
+> > > @@ -730,10 +730,13 @@ File: mrvl/sd8797_uapsta.bin
+> > >  Version: 14.66.11.p151
+> > >
+> > >  File: mrvl/sd8897_uapsta.bin
+> > > -Version: 15.69.2.p11
+> > > +Version: 15.68.201.p113
+> > >
+> > >  File: mrvl/usb8797_uapsta.bin
+> > > -Version: 14.69.11.p179
+> > > +Version: 14.68.29.p26
+> > [...]
+> >=20
+> > Why are these updates rolling the version number backward?  Did the
+> > later versions cause regressions?
+>=20
+> These images are newer firmware versions actually.
+>=20
+> The 2nd (69 or 68) and 3rd (11 or 29) numbers in the version string do
+> not necessarily mean the version increasing or decreasing. Only when
+> first 3 numbers are fixed, a smaller 4th number will mean that the
+> version is rolling backward. For examples,
+
+So what do you they mean and why are they in the version number?
+
+> File: mrvl/sd8797_uapsta.bin
+> -Version: 14.66.11.p100
+> +Version: 14.66.11.p151
+>=20
+> The version is moving forward.
+>=20
+> But if we do,
+>=20
+> -Version: 14.66.11.p100
+> +Version: 14.66.11.p99
+>=20
+> this will be rolling backward.
+>=20
+>=20
+> Each firmware image contains a timestamp such as "2013/12/06, 21:28:31".
+> If you think that is informative I can add the timestamps in commit
+> logs and resend the pull request.
+
+I don't think it is.
+
+Ben.
+
+--=20
+Ben Hutchings
+One of the nice things about standards is that there are so many of them.
+
+--=-RWSLA4TKYEPXMnhAoF7j
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.15 (GNU/Linux)
+
+iQIVAwUAUtyQqee/yOyVhhEJAQovMA//Wtkd7OxfTLUqvKwIW3C0rGgOrLmvy4X6
+GDgG1ztbC0h5UAdsXEGmv2RQPhz1o/XfQP7AaDDi6wUO1hwTbhBiE6P9E1orbORZ
+EfIL1Fs9Gto6rh1DlS5lDOg9g76SfCAy5OhvmSSBpgmYUSQZNH5Mo1CjwAt/Etv+
+/GNN0egy48Kk43lJrgLD4/I/pX6vswUuiQjFcSzbalTHEY0JJbGSik4O4+vfWy1r
+1KBsAr0UsB2N7UwgjofnOmdIvqYI0ZoEUVmU9gEsBUVO83U8SOeDbSraAqtLgI6q
+U/SKXgTvOS8SklzTOKSvL+zlysV0OSdnq4RyWD5U7rV/fum22b7JUcCub7mqP49X
+VrexVDGqwTpLWUXCxmtzg9iFxjw1S3tSVnQkVN7fQ7fWt/VrAt0IkeDQDrq7NPIM
+xggDkMxcTn+eTeaO+FiES0cocjsoxWs5V9my2Cv35vdmzNMetIhdWGZYZpGrgh2y
+PWu46ZbBACdXNIJTE5oc4atCTtdfjbJuthW3SB50Ry9JpRds9JV/OTZGvndpm5hQ
+t/D5Eg/nuk/oIwSFiJ9dSgblOMwsHpPvL6CgYduD5Mmp/akH+q+F0JIgTxe9UAWA
+V7cdYt4rZwlhWIiw0pAEJ01ZLnbzW2XJeeHC80kk+Vjdh3ROuVqUjzUxdu93e+XF
+Ra7vI0OdsQA=
+=Oqst
+-----END PGP SIGNATURE-----
+
+--=-RWSLA4TKYEPXMnhAoF7j--
