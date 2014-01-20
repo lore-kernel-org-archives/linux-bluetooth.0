@@ -1,213 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH SBC 1/2] sbc: Add sbc_init_a2dp
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1390210303-22692-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 20 Jan 2014 09:43:50 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <D88B08AB-A9EB-47D7-8EC7-BB1556F4EB7C@holtmann.org>
-References: <1390210303-22692-1-git-send-email-luiz.dentz@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Harald Schmitt <linux@hschmitt.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Harald Schmitt <linux@hschmitt.de>
+Subject: [PATCH] obexd/irmc: Fix folder for LUID requests
+Date: Mon, 20 Jan 2014 18:39:18 +0100
+Message-Id: <1390239558-6384-1-git-send-email-linux@hschmitt.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+The old macro PB_LUID_FOLDER had the folder luid on the second level:
+/telecom/luid. But the luid folder occurs per IrMC spec on level three e.g.
+/telecom/pb/luid. On the second level the object store e.g. pb is specified.
+This bug was introduced with commit 62ebf8d0f345e7722334d852cf7a010b202647e7.
+---
+ obexd/plugins/irmc.c      | 6 +++---
+ obexd/plugins/phonebook.h | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-> This adds sbc_init_a2dp that can be used to convert A2DP configuration to
-> the internal representation since they are not binary compatible.
-> ---
-> sbc/sbc.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> sbc/sbc.h |   1 +
-> 2 files changed, 139 insertions(+)
-> 
-> diff --git a/sbc/sbc.c b/sbc/sbc.c
-> index c589217..4483074 100644
-> --- a/sbc/sbc.c
-> +++ b/sbc/sbc.c
-> @@ -57,6 +57,55 @@
-> #define MSBC_SYNCWORD	0xAD
-> #define MSBC_BLOCKS	15
-> 
-> +#define A2DP_SAMPLING_FREQ_16000		(1 << 3)
-> +#define A2DP_SAMPLING_FREQ_32000		(1 << 2)
-> +#define A2DP_SAMPLING_FREQ_44100		(1 << 1)
-> +#define A2DP_SAMPLING_FREQ_48000		1
-
-Use (1 << 0) here and let the compiler optimize it.
-
-> +
-> +#define A2DP_CHANNEL_MODE_MONO			(1 << 3)
-> +#define A2DP_CHANNEL_MODE_DUAL_CHANNEL		(1 << 2)
-> +#define A2DP_CHANNEL_MODE_STEREO		(1 << 1)
-> +#define A2DP_CHANNEL_MODE_JOINT_STEREO		1
-> +
-> +#define A2DP_BLOCK_LENGTH_4			(1 << 3)
-> +#define A2DP_BLOCK_LENGTH_8			(1 << 2)
-> +#define A2DP_BLOCK_LENGTH_12			(1 << 1)
-> +#define A2DP_BLOCK_LENGTH_16			1
-> +
-> +#define A2DP_SUBBANDS_4				(1 << 1)
-> +#define A2DP_SUBBANDS_8				1
-> +
-> +#define A2DP_ALLOCATION_SNR			(1 << 1)
-> +#define A2DP_ALLOCATION_LOUDNESS		1
-> +
-> +#if __BYTE_ORDER == __LITTLE_ENDIAN
-> +
-> +typedef struct {
-> +	uint8_t channel_mode:4;
-> +	uint8_t frequency:4;
-> +	uint8_t allocation_method:2;
-> +	uint8_t subbands:2;
-> +	uint8_t block_length:4;
-> +	uint8_t min_bitpool;
-> +	uint8_t max_bitpool;
-> +} __attribute__ ((packed)) a2dp_sbc_t;
-
-If these are internal anyway, then typedef is not needed. Just use a plain packed struct.
+diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
+index d343977..d0e98b4 100644
+--- a/obexd/plugins/irmc.c
++++ b/obexd/plugins/irmc.c
+@@ -326,7 +326,7 @@ static int irmc_open_nt(struct irmc_session *irmc)
+ 	return 0;
+ }
  
-> +
-> +#elif __BYTE_ORDER == __BIG_ENDIAN
-> +
-> +typedef struct {
-> +	uint8_t frequency:4;
-> +	uint8_t channel_mode:4;
-> +	uint8_t block_length:4;
-> +	uint8_t subbands:2;
-> +	uint8_t allocation_method:2;
-> +	uint8_t min_bitpool;
-> +	uint8_t max_bitpool;
-> +} __attribute__ ((packed)) a2dp_sbc_t;
-> +
-> +#else
-> +#error "Unknown byte order"
-> +#endif
-> +
-> /* This structure contains an unpacked SBC frame.
->    Yes, there is probably quite some unused space herein */
-> struct sbc_frame {
-> @@ -1046,6 +1095,95 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
-> 	return 0;
-> }
-> 
-> +SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, void *data)
-> +{
-
-const void *data. I think we should also add a size_t len to it.
-
-Using the general “data” is a bit too generic. What is it actually called in the A2DP PDU anyway?
-
-> +	a2dp_sbc_t *a2dp = data;
-> +	int err;
-> +
-> +	err = sbc_init(sbc, flags);
-> +	if (err < 0)
-> +		return err;
-> +
-> +	switch (a2dp->frequency) {
-> +        case A2DP_SAMPLING_FREQ_16000:
-
-Spaces?
-
-> +		sbc->frequency = SBC_FREQ_16000;
-> +		break;
-> +	case A2DP_SAMPLING_FREQ_32000:
-> +		sbc->frequency = SBC_FREQ_32000;
-> +		break;
-> +	case A2DP_SAMPLING_FREQ_44100:
-> +		sbc->frequency = SBC_FREQ_44100;
-> +		break;
-> +	case A2DP_SAMPLING_FREQ_48000:
-> +		sbc->frequency = SBC_FREQ_48000;
-> +		break;
-> +	default:
-> +		goto failed;
-> +	}
-> +
-> +	switch (a2dp->channel_mode) {
-> +	case A2DP_CHANNEL_MODE_MONO:
-> +		sbc->mode = SBC_MODE_MONO;
-> +		break;
-> +	case A2DP_CHANNEL_MODE_DUAL_CHANNEL:
-> +		sbc->mode = SBC_MODE_DUAL_CHANNEL;
-> +		break;
-> +	case A2DP_CHANNEL_MODE_STEREO:
-> +		sbc->mode = SBC_MODE_STEREO;
-> +		break;
-> +	case A2DP_CHANNEL_MODE_JOINT_STEREO:
-> +		sbc->mode = SBC_MODE_JOINT_STEREO;
-> +		break;
-> +	default:
-> +		goto failed;
-> +	}
-> +
-> +	switch (a2dp->allocation_method) {
-> +	case A2DP_ALLOCATION_SNR:
-> +		sbc->allocation = SBC_AM_SNR;
-> +		break;
-> +	case A2DP_ALLOCATION_LOUDNESS:
-> +		sbc->allocation = SBC_AM_LOUDNESS;
-> +		break;
-> +	default:
-> +		goto failed;
-> +	}
-> +
-> +	switch (a2dp->subbands) {
-> +	case A2DP_SUBBANDS_4:
-> +		sbc->subbands = SBC_SB_4;
-> +		break;
-> +        case A2DP_SUBBANDS_8:
-
-Spaces?
-
-> +		sbc->subbands = SBC_SB_8;
-> +		break;
-> +	default:
-> +		goto failed;
-> +	}
-> +
-> +	switch (a2dp->block_length) {
-> +	case A2DP_BLOCK_LENGTH_4:
-> +		sbc->blocks = SBC_BLK_4;
-> +		break;
-> +	case A2DP_BLOCK_LENGTH_8:
-> +		sbc->blocks = SBC_BLK_8;
-> +		break;
-> +	case A2DP_BLOCK_LENGTH_12:
-> +		sbc->blocks = SBC_BLK_12;
-> +		break;
-> +	case A2DP_BLOCK_LENGTH_16:
-> +		sbc->blocks = SBC_BLK_16;
-> +		break;
-> +	default:
-> +		goto failed;
-> +	}
-> +
-> +	return 0;
-> +
-> +failed:
-> +	sbc_finish(sbc);
-> +	return -EINVAL;
-> +}
-> +
-> SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
-> {
-> 	return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
-> diff --git a/sbc/sbc.h b/sbc/sbc.h
-> index 5f8a1fc..1d1c5a1 100644
-> --- a/sbc/sbc.h
-> +++ b/sbc/sbc.h
-> @@ -84,6 +84,7 @@ typedef struct sbc_struct sbc_t;
-> int sbc_init(sbc_t *sbc, unsigned long flags);
-> int sbc_reinit(sbc_t *sbc, unsigned long flags);
-> int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
-> +int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, void *data);
-> 
-> ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
-
-Regards
-
-Marcel
+-static int irmc_open_luid(struct irmc_session *irmc)
++static int irmc_open_pb_luid(struct irmc_session *irmc)
+ {
+ 	if (irmc->buffer == NULL)
+ 		irmc->buffer = g_string_new("");
+@@ -381,8 +381,8 @@ static void *irmc_open(const char *name, int oflag, mode_t mode, void *context,
+ 		ret = irmc_open_cal(irmc);
+ 	else if (g_str_has_prefix(path, PB_NOTES_FOLDER))
+ 		ret = irmc_open_nt(irmc);
+-	else if (g_str_has_prefix(path, PB_LUID_FOLDER))
+-		ret = irmc_open_luid(irmc);
++	else if (g_str_has_prefix(path, PB_CONTACTS_LUID_FOLDER))
++		ret = irmc_open_pb_luid(irmc);
+ 	else
+ 		ret = -EBADR;
+ 
+diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
+index 441cff2..015c9a3 100644
+--- a/obexd/plugins/phonebook.h
++++ b/obexd/plugins/phonebook.h
+@@ -37,7 +37,7 @@
+ #define PB_CALLS_INCOMING_FOLDER "/telecom/ich"
+ #define PB_CALLS_MISSED_FOLDER "/telecom/mch"
+ #define PB_CALLS_OUTGOING_FOLDER "/telecom/och"
+-#define PB_LUID_FOLDER "/telecom/luid"
++#define PB_CONTACTS_LUID_FOLDER "/telecom/pb/luid"
+ 
+ #define PB_CONTACTS "/telecom/pb.vcf"
+ #define PB_CALLS_COMBINED "/telecom/cch.vcf"
+-- 
+1.8.3.2
 
