@@ -1,104 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/pts: Add PTS test results document for A2DP
-Date: Mon, 20 Jan 2014 13:32:33 +0100
-Message-ID: <1449630.5x2WHnIIVE@uw000953>
-In-Reply-To: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] android/hal-audio: Fix not closing audio_sk
+Date: Mon, 20 Jan 2014 14:25:26 +0200
+Message-Id: <1390220727-21494-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Monday 20 of January 2014 09:54:45 Jakub Tyszkowski wrote:
-> This will allow for better tracking of current state of implementation.
-> ---
->  android/Makefile.am  |  1 +
->  android/pts-a2dp.txt | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 58 insertions(+)
->  create mode 100644 android/pts-a2dp.txt
-> 
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index f24b754..d4508a4 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -167,4 +167,5 @@ EXTRA_DIST += android/Android.mk android/README \
->  				android/pts-hid.txt \
->  				android/pts-opp.txt \
->  				android/pts-map.txt \
-> +				android/pts-a2dp.txt \
->  				android/pts-pbap.txt
-> diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
-> new file mode 100644
-> index 0000000..a269ec1
-> --- /dev/null
-> +++ b/android/pts-a2dp.txt
-> @@ -0,0 +1,57 @@
-> +PTS test results for A2DP
-> +
-> +PTS version: 5.0
-> +Tested: --not yet tested--
-> +
-> +Results:
-> +PASS	test passed
-> +FAIL	test failed
-> +INC	test is inconclusive
-> +N/A	test is disabled due to PICS setup
-> +
-> +		Source (SRC)
-> +-------------------------------------------------------------------------------
-> +Test Name		Result	Notes
-> +-------------------------------------------------------------------------------
-> +TC_SRC_CC_BV_09_I	INC
-> +TC_SRC_CC_BV_10_I	N/A
-> +TC_SRC_REL_BV_01_I	INC
-> +TC_SRC_REL_BV_02_I	INC
-> +TC_SRC_SET_BV_01_I	INC
-> +TC_SRC_SET_BV_02_I	INC
-> +TC_SRC_SET_BV_03_I	INC
-> +TC_SRC_SET_BV_04_I	INC
-> +TC_SRC_SET_BV_05_I	INC
-> +TC_SRC_SET_BV_06_I	INC
-> +TC_SRC_SUS_BV_01_I	INC
-> +TC_SRC_SUS_BV_02_I	INC
-> +TC_SRC_SDP_BV_01_I	INC
-> +TC_SRC_AS_BV_01_I	INC
-> +-------------------------------------------------------------------------------
-> +
-> +
-> +		Sink (SNK)
-> +-------------------------------------------------------------------------------
-> +Test Name		Result	Notes
-> +-------------------------------------------------------------------------------
-> +TC_SNK_CC_BV_01_I	N/A
-> +TC_SNK_CC_BV_02_I	N/A
-> +TC_SNK_CC_BV_03_I	N/A
-> +TC_SNK_CC_BV_04_I	N/A
-> +TC_SNK_CC_BV_05_I	N/A
-> +TC_SNK_CC_BV_06_I	N/A
-> +TC_SNK_CC_BV_07_I	N/A
-> +TC_SNK_CC_BV_08_I	N/A
-> +TC_SNK_REL_BV_01_I	N/A
-> +TC_SNK_REL_BV_02_I	N/A
-> +TC_SNK_SET_BV_01_I	N/A
-> +TC_SNK_SET_BV_02_I	N/A
-> +TC_SNK_SET_BV_03_I	N/A
-> +TC_SNK_SET_BV_04_I	N/A
-> +TC_SNK_SET_BV_05_I	N/A
-> +TC_SNK_SET_BV_06_I	N/A
-> +TC_SNK_SUS_BV_01_I	N/A
-> +TC_SNK_SUS_BV_02_I	N/A
-> +TC_SNK_SDP_BV_02_I	N/A
-> +TC_SNK_AS_BV_01_I	N/A
-> +-------------------------------------------------------------------------------
-> 
+shutdown will only disconnect the peers but it is still needed to close
+the file descriptor.
+---
+ android/hal-audio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-All 3 patches applied, thanks.
-
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 2f6f8c2..0b4577e 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -246,6 +246,7 @@ static void audio_ipc_cleanup(void)
+ {
+ 	if (audio_sk >= 0) {
+ 		shutdown(audio_sk, SHUT_RDWR);
++		close(audio_sk);
+ 		audio_sk = -1;
+ 	}
+ }
+@@ -1090,6 +1091,7 @@ static void *ipc_handler(void *data)
+ 
+ 		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
+ 			info("Audio HAL: Socket closed");
++			close(audio_sk);
+ 			audio_sk = -1;
+ 		}
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.8.4.2
+
