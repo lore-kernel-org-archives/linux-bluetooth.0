@@ -1,191 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 02/11] android/ipc-tester: Run daemon in separate process
-Date: Mon, 20 Jan 2014 10:36:01 +0100
-Message-Id: <1390210570-28260-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv5 04/11] android/ipc-tester: Add daemon shutdown handler
+Date: Mon, 20 Jan 2014 10:36:03 +0100
+Message-Id: <1390210570-28260-5-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds new process waiting to run daemon when needed.
+Handle daemon shutdown asynchronously.
 ---
- android/ipc-tester.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 123 insertions(+)
+ android/ipc-tester.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index 021919e..c8d1f0b 100644
+index ff17ced..b6f8131 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -21,8 +21,14 @@
-  *
-  */
- 
-+#include <stdlib.h>
- #include <unistd.h>
- 
-+#include <sys/socket.h>
-+#include <sys/types.h>
-+#include <sys/wait.h>
-+#include <sys/un.h>
-+#include <libgen.h>
- #include <glib.h>
- 
- #include "lib/bluetooth.h"
-@@ -33,13 +39,19 @@
- #include "src/shared/hciemu.h"
- 
- 
-+#define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
-+#define EMULATOR_SIGNAL "emulator_started"
-+
- struct test_data {
- 	struct mgmt *mgmt;
- 	uint16_t mgmt_index;
+@@ -52,6 +52,7 @@ struct test_data {
  	struct hciemu *hciemu;
  	enum hciemu_type hciemu_type;
-+	pid_t bluetoothd_pid;
+ 	pid_t bluetoothd_pid;
++	bool setup_done;
  };
  
-+static char exec_dir[PATH_MAX + 1];
-+
- static void read_info_callback(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -170,14 +182,123 @@ static void test_post_teardown(const void *data)
- 	}
+ #define CONNECT_TIMEOUT (5 * 1000)
+@@ -364,6 +365,31 @@ static void cleanup_ipc(void)
+ 	cmd_sk = -1;
  }
  
-+static void bluetoothd_start(int hci_index)
++static gboolean check_for_daemon(gpointer user_data)
 +{
-+	char prg_name[PATH_MAX + 1];
-+	char index[8];
-+	char *prg_argv[4];
++	int status;
++	struct test_data *data = user_data;
 +
-+	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
-+	snprintf(index, sizeof(index), "%d", hci_index);
++	if ((waitpid(data->bluetoothd_pid, &status, WNOHANG))
++							!= data->bluetoothd_pid)
++		return true;
 +
-+	prg_argv[0] = prg_name;
-+	prg_argv[1] = "-i";
-+	prg_argv[2] = index;
-+	prg_argv[3] = NULL;
-+
-+	if (!tester_use_debug())
-+		fclose(stderr);
-+
-+	execve(prg_argv[0], prg_argv, NULL);
-+}
-+
-+static void emulator(int pipe, int hci_index)
-+{
-+	static const char SYSTEM_SOCKET_PATH[] = "\0android_system";
-+	char buf[1024];
-+	struct sockaddr_un addr;
-+	struct timeval tv;
-+	int fd;
-+	ssize_t len;
-+
-+	fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
-+	if (fd < 0)
-+		goto failed;
-+
-+	tv.tv_sec = WAIT_FOR_SIGNAL_TIME;
-+	tv.tv_usec = 0;
-+	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+	memcpy(addr.sun_path, SYSTEM_SOCKET_PATH, sizeof(SYSTEM_SOCKET_PATH));
-+
-+	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		perror("Failed to bind system socket");
-+		goto failed;
++	if (data->setup_done) {
++		if (WIFEXITED(status) &&
++				(WEXITSTATUS(status) == EXIT_SUCCESS)) {
++			tester_test_passed();
++			return false;
++		}
++		tester_test_failed();
++	} else {
++		tester_setup_failed();
++		test_post_teardown(data);
 +	}
 +
-+	len = write(pipe, EMULATOR_SIGNAL, sizeof(EMULATOR_SIGNAL));
-+
-+	if (len != sizeof(EMULATOR_SIGNAL))
-+		goto failed;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	len = read(fd, buf, sizeof(buf));
-+	if (len <= 0 || (strcmp(buf, "ctl.start=bluetoothd")))
-+		goto failed;
-+
-+	close(pipe);
-+	close(fd);
-+	bluetoothd_start(hci_index);
-+
-+failed:
-+	close(pipe);
-+	close(fd);
++	tester_warn("Unexpected Daemon shutdown with status %d", status);
++	return false;
 +}
 +
  static void setup(const void *data)
  {
-+	struct test_data *test_data = tester_get_data();
-+	int signal_fd[2];
-+	char buf[1024];
-+	pid_t pid;
-+	int len;
+ 	struct test_data *test_data = tester_get_data();
+@@ -401,24 +427,29 @@ static void setup(const void *data)
+ 		goto failed;
+ 	}
+ 
++	g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, check_for_daemon, test_data,
++									NULL);
 +
-+	if (pipe(signal_fd))
-+		goto failed;
-+
-+	pid = fork();
-+
-+	if (pid < 0) {
-+		close(signal_fd[0]);
-+		close(signal_fd[1]);
-+		goto failed;
-+	}
-+
-+	if (pid == 0) {
-+		if (!tester_use_debug())
-+			fclose(stderr);
-+
-+		close(signal_fd[0]);
-+		emulator(signal_fd[1], test_data->mgmt_index);
-+		exit(0);
-+	}
-+
-+	close(signal_fd[1]);
-+	test_data->bluetoothd_pid = pid;
-+
-+	len = read(signal_fd[0], buf, sizeof(buf));
-+	if (len <= 0 || (strcmp(buf, EMULATOR_SIGNAL))) {
-+		close(signal_fd[0]);
-+		goto failed;
-+	}
-+
-+	return;
-+
-+failed:
+ 	if (!init_ipc()) {
+ 		tester_warn("Cannot initialize IPC mechanism!");
+ 		goto failed;
+ 	}
+ 	/* TODO: register modules */
+ 
++	test_data->setup_done = true;
+ 	return;
+ 
+ failed:
++	g_idle_remove_by_data(test_data);
  	tester_setup_failed();
  	test_post_teardown(data);
  }
  
+-
  static void teardown(const void *data)
  {
-+	struct test_data *test_data = tester_get_data();
-+
-+	if (test_data->bluetoothd_pid)
-+		waitpid(test_data->bluetoothd_pid, NULL, 0);
-+
- 	tester_teardown_complete();
- }
+ 	struct test_data *test_data = tester_get_data();
  
-@@ -199,6 +320,8 @@ static void ipc_send_tc(const void *data)
++	g_idle_remove_by_data(test_data);
+ 	cleanup_ipc();
  
- int main(int argc, char *argv[])
- {
-+	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
-+
- 	tester_init(&argc, &argv);
- 
- 	test_generic("Test Dummy", NULL, setup, ipc_send_tc, teardown);
+ 	if (test_data->bluetoothd_pid)
 -- 
 1.8.5.2
 
