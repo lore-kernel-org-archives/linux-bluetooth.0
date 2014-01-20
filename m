@@ -2,43 +2,28 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH 2/2] tools/bluetooth-player: check CT for searchable value
-Date: Mon, 20 Jan 2014 15:04:38 +0200
-Message-Id: <1390223078-29096-2-git-send-email-sebastianx.chlad@intel.com>
-In-Reply-To: <1390223078-29096-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1390223078-29096-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCH 1/2] tools/bluetooth-player: dispaly searchable value
+Date: Mon, 20 Jan 2014 15:04:37 +0200
+Message-Id: <1390223078-29096-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Simple check if the remote client is searchable.
 ---
- tools/bluetooth-player.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ tools/bluetooth-player.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index 32d295c..13471c2 100644
+index 1c0348e..32d295c 100644
 --- a/tools/bluetooth-player.c
 +++ b/tools/bluetooth-player.c
-@@ -945,6 +945,7 @@ static void cmd_search(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
- 	char *string;
-+	DBusMessageIter iter;
+@@ -654,6 +654,7 @@ static void cmd_show(int argc, char *argv[])
+ 	rl_printf("Player %s\n", g_dbus_proxy_get_path(proxy));
  
- 	if (argc < 2) {
- 		rl_printf("Missing string argument\n");
-@@ -962,6 +963,11 @@ static void cmd_search(int argc, char *argv[])
- 
- 	string = g_strdup(argv[1]);
- 
-+	if (g_dbus_proxy_get_property(proxy, "Searchable", &iter) == FALSE) {
-+		rl_printf("Search not supported on the client side\n");
-+		return;
-+	}
-+
- 	if (g_dbus_proxy_method_call(proxy, "Search", search_setup,
- 				search_reply, string, g_free) == FALSE) {
- 		rl_printf("Failed to search\n");
+ 	print_property(proxy, "Name");
++	print_property(proxy, "Searchable");
+ 	print_property(proxy, "Repeat");
+ 	print_property(proxy, "Equalizer");
+ 	print_property(proxy, "Shuffle");
 -- 
 1.8.3.2
 
