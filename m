@@ -1,96 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v1 04/18] lib: Move GATT UUID to uuid.h
-Date: Mon, 20 Jan 2014 15:04:49 -0300
-Message-Id: <1390241103-808-5-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v1 10/18] gatt: Register ATT command/event handler
+Date: Mon, 20 Jan 2014 15:04:55 -0300
+Message-Id: <1390241103-808-11-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves GATT UUIDs definitions to a common header. uuid.h contains
-helper functions to manipulate Bluetooth UUIDs and some common BR/EDR services
-UUIDs.
----
- attrib/gatt.h | 25 -------------------------
- lib/uuid.h    | 25 +++++++++++++++++++++++++
- 2 files changed, 25 insertions(+), 25 deletions(-)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 0f113e7..4fea3eb 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -24,31 +24,6 @@
+This patch registers the ATT channel handler to manage incoming ATT
+commands and events.
+---
+ src/gatt.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+
+diff --git a/src/gatt.c b/src/gatt.c
+index 4806205..33c3b6a 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -38,6 +38,7 @@
+ #include "log.h"
+ #include "lib/uuid.h"
+ #include "attrib/att.h"
++#include "attrib/gattrib.h"
  
- #include <bluetooth/sdp.h>
+ #include "gatt-dbus.h"
+ #include "gatt.h"
+@@ -100,12 +101,83 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	return attr;
+ }
  
--/* GATT Profile Attribute types */
--#define GATT_PRIM_SVC_UUID		0x2800
--#define GATT_SND_SVC_UUID		0x2801
--#define GATT_INCLUDE_UUID		0x2802
--#define GATT_CHARAC_UUID		0x2803
--
--/* GATT Characteristic Types */
--#define GATT_CHARAC_DEVICE_NAME			0x2A00
--#define GATT_CHARAC_APPEARANCE			0x2A01
--#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG	0x2A02
--#define GATT_CHARAC_RECONNECTION_ADDRESS	0x2A03
--#define GATT_CHARAC_PERIPHERAL_PREF_CONN	0x2A04
--#define GATT_CHARAC_SERVICE_CHANGED		0x2A05
--
--/* GATT Characteristic Descriptors */
--#define GATT_CHARAC_EXT_PROPER_UUID	0x2900
--#define GATT_CHARAC_USER_DESC_UUID	0x2901
--#define GATT_CLIENT_CHARAC_CFG_UUID	0x2902
--#define GATT_SERVER_CHARAC_CFG_UUID	0x2903
--#define GATT_CHARAC_FMT_UUID		0x2904
--#define GATT_CHARAC_AGREG_FMT_UUID	0x2905
--#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
--#define GATT_EXTERNAL_REPORT_REFERENCE	0x2907
--#define GATT_REPORT_REFERENCE		0x2908
--
- /* Client Characteristic Configuration bit field */
- #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
- #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 95e5a9a..c24cee5 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -105,6 +105,31 @@ extern "C" {
- #define OBEX_MNS_UUID		"00001133-0000-1000-8000-00805f9b34fb"
- #define OBEX_MAP_UUID		"00001134-0000-1000-8000-00805f9b34fb"
++static void send_error(GAttrib *attrib, uint8_t opcode, uint16_t handle,
++								uint8_t ecode)
++{
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	size_t plen;
++
++	plen = enc_error_resp(opcode, handle, ecode, pdu, sizeof(pdu));
++
++	g_attrib_send(attrib, 0, pdu, plen, NULL, NULL, NULL);
++}
++
++static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
++							gpointer user_data)
++{
++	GAttrib *attrib = user_data;
++
++	switch (ipdu[0]) {
++	case ATT_OP_ERROR:
++		break;
++
++	/* Requests */
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_SIGNED_WRITE_CMD:
++		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
++		break;
++
++	/* Responses */
++	case ATT_OP_MTU_RESP:
++	case ATT_OP_FIND_INFO_RESP:
++	case ATT_OP_FIND_BY_TYPE_RESP:
++	case ATT_OP_READ_BY_TYPE_RESP:
++	case ATT_OP_READ_RESP:
++	case ATT_OP_READ_BLOB_RESP:
++	case ATT_OP_READ_MULTI_RESP:
++	case ATT_OP_READ_BY_GROUP_RESP:
++	case ATT_OP_WRITE_RESP:
++	case ATT_OP_PREP_WRITE_RESP:
++	case ATT_OP_EXEC_WRITE_RESP:
++	case ATT_OP_HANDLE_CNF:
++		break;
++
++	/* Notification & Indication */
++	case ATT_OP_HANDLE_NOTIFY:
++	case ATT_OP_HANDLE_IND:
++		break;
++	}
++}
++
++static gboolean unix_hup_cb(GIOChannel *io, GIOCondition cond,
++						gpointer user_data)
++{
++	GAttrib *attrib = user_data;
++
++	g_attrib_unregister_all(attrib);
++	g_attrib_unref(attrib);
++
++	return FALSE;
++}
++
+ static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	struct sockaddr_un uaddr;
+ 	socklen_t len = sizeof(uaddr);
+ 	GIOChannel *nio;
++	GAttrib *attrib;
+ 	int err, nsk, sk;
  
-+/* GATT UUIDs section */
-+#define GATT_PRIM_SVC_UUID				0x2800
-+#define GATT_SND_SVC_UUID				0x2801
-+#define GATT_INCLUDE_UUID				0x2802
-+#define GATT_CHARAC_UUID				0x2803
+ 	sk = g_io_channel_unix_get_fd(io);
+@@ -120,6 +192,14 @@ static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
+ 	nio = g_io_channel_unix_new(nsk);
+ 	g_io_channel_set_close_on_unref(nio, TRUE);
+ 	DBG("ATT UNIX socket: %p new client", nio);
 +
-+/* GATT Characteristic Types */
-+#define GATT_CHARAC_DEVICE_NAME				0x2A00
-+#define GATT_CHARAC_APPEARANCE				0x2A01
-+#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG		0x2A02
-+#define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
-+#define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
-+#define GATT_CHARAC_SERVICE_CHANGED			0x2A05
++	attrib = g_attrib_new(nio);
 +
-+/* GATT Characteristic Descriptors */
-+#define GATT_CHARAC_EXT_PROPER_UUID			0x2900
-+#define GATT_CHARAC_USER_DESC_UUID			0x2901
-+#define GATT_CLIENT_CHARAC_CFG_UUID			0x2902
-+#define GATT_SERVER_CHARAC_CFG_UUID			0x2903
-+#define GATT_CHARAC_FMT_UUID				0x2904
-+#define GATT_CHARAC_AGREG_FMT_UUID			0x2905
-+#define GATT_CHARAC_VALID_RANGE_UUID			0x2906
-+#define GATT_EXTERNAL_REPORT_REFERENCE			0x2907
-+#define GATT_REPORT_REFERENCE				0x2908
++	g_attrib_register(attrib, GATTRIB_ALL_EVENTS, GATTRIB_ALL_HANDLES,
++					channel_handler_cb, attrib, NULL);
 +
- typedef struct {
- 	enum {
- 		BT_UUID_UNSPEC = 0,
++	g_io_add_watch(nio, G_IO_HUP, unix_hup_cb, attrib);
++
+ 	g_io_channel_unref(nio);
+ 
+ 	return TRUE;
 -- 
 1.8.3.1
 
