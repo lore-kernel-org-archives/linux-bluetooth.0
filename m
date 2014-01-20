@@ -1,92 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 06/11] android/ipc-tester: Register services
-Date: Mon, 20 Jan 2014 10:36:05 +0100
-Message-Id: <1390210570-28260-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv5 05/11] android/ipc-tester: Add sending test data with ipc
+Date: Mon, 20 Jan 2014 10:36:04 +0100
+Message-Id: <1390210570-28260-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds basic bluetooth service registration during setup procedure.
-Without this daemon would reject commands for not registered services.
+This patch adds some data structures used to send data with ipc during
+test setup and run stage. Test execution macro is extended for easy
+data preparation.
 ---
- android/ipc-tester.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ android/ipc-tester.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 58 insertions(+), 4 deletions(-)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index 7cd50f5..816719c 100644
+index b6f8131..7cd50f5 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -407,13 +407,48 @@ static gboolean check_for_daemon(gpointer user_data)
- 	return false;
- }
+@@ -55,6 +55,23 @@ struct test_data {
+ 	bool setup_done;
+ };
  
-+static bool setup_module(int service_id)
-+{
-+	struct hal_hdr response;
-+	struct hal_hdr expected_response;
++struct ipc_data {
++	void *buffer;
++	size_t len;
++};
 +
-+	struct regmod_msg btmodule_msg = {
-+		.header = {
-+			.service_id = HAL_SERVICE_ID_CORE,
-+			.opcode = HAL_OP_REGISTER_MODULE,
-+			.len = sizeof(struct hal_cmd_register_module),
-+			},
-+		.cmd = {
-+			.service_id = service_id,
-+			},
-+	};
++struct generic_data {
++	struct ipc_data ipc_data;
 +
-+	if (write(cmd_sk, &btmodule_msg, sizeof(btmodule_msg)) < 0)
-+		goto fail;
++	unsigned int num_services;
++	int init_services[];
++};
 +
-+	if (read(cmd_sk, &response, sizeof(response)) < 0)
-+		goto fail;
++struct regmod_msg {
++	struct hal_hdr header;
++	struct hal_cmd_register_module cmd;
++} __attribute__((packed));
 +
-+	expected_response = btmodule_msg.header;
-+	expected_response.len = 0;
-+
-+	if (memcmp(&response, &expected_response, sizeof(response)) == 0)
-+		return true;
-+
-+fail:
-+	tester_warn("Module registration failed.");
-+	return false;
-+}
-+
- static void setup(const void *data)
+ #define CONNECT_TIMEOUT (5 * 1000)
+ #define SERVICE_NAME "bluetoothd"
+ 
+@@ -460,27 +477,64 @@ static void teardown(const void *data)
+ 
+ static void ipc_send_tc(const void *data)
  {
 +	const struct generic_data *generic_data = data;
- 	struct test_data *test_data = tester_get_data();
- 	int signal_fd[2];
- 	char buf[1024];
- 	pid_t pid;
- 	int len;
-+	unsigned int i;
- 
- 	if (pipe(signal_fd))
- 		goto failed;
-@@ -451,9 +486,17 @@ static void setup(const void *data)
- 		tester_warn("Cannot initialize IPC mechanism!");
- 		goto failed;
- 	}
--	/* TODO: register modules */
-+	tester_print("Will init %d services.", generic_data->num_services);
++	const struct ipc_data *ipc_data = &generic_data->ipc_data;
 +
-+	for (i = 0; i < generic_data->num_services; i++)
-+		if (!setup_module(generic_data->init_services[i])) {
-+			cleanup_ipc();
-+			goto failed;
-+		}
++	if (ipc_data->len) {
++		if (write(cmd_sk, ipc_data->buffer, ipc_data->len) < 0)
++			tester_test_failed();
++	}
+ }
  
- 	test_data->setup_done = true;
+-#define test_generic(name, data, test_setup, test, test_teardown) \
++#define service_data(args...) { args }
 +
-+	tester_setup_complete();
- 	return;
++#define gen_data(writelen, writebuf, servicelist...) \
++	{								\
++		.ipc_data = {						\
++			.buffer = writebuf,				\
++			.len = writelen,				\
++		},							\
++		.init_services = service_data(servicelist),		\
++		.num_services = sizeof((const int[])			\
++					service_data(servicelist)) /	\
++					sizeof(int),			\
++	}
++
++#define test_generic(name, test, setup, teardown, buffer, writelen, \
++							services...) \
+ 	do {								\
+ 		struct test_data *user;					\
++		static const struct generic_data data =			\
++				gen_data(writelen, buffer, services);	\
+ 		user = g_malloc0(sizeof(struct test_data));		\
+ 		if (!user)						\
+ 			break;						\
+ 		user->hciemu_type = HCIEMU_TYPE_BREDRLE;		\
+-		tester_add_full(name, data, test_pre_setup, test_setup,	\
+-				test, test_teardown, test_post_teardown,\
++		tester_add_full(name, &data, test_pre_setup, setup,	\
++				test, teardown, test_post_teardown,	\
+ 				3, user, g_free);			\
+ 	} while (0)
  
- failed:
++struct regmod_msg register_bt_msg = {
++	.header = {
++		.service_id = HAL_SERVICE_ID_CORE,
++		.opcode = HAL_OP_REGISTER_MODULE,
++		.len = sizeof(struct hal_cmd_register_module),
++		},
++	.cmd = {
++		.service_id = HAL_SERVICE_ID_BLUETOOTH,
++		},
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
+ 
+ 	tester_init(&argc, &argv);
+ 
+-	test_generic("Test Dummy", NULL, setup, ipc_send_tc, teardown);
++	test_generic("Too small data",
++				ipc_send_tc, setup, teardown,
++				&register_bt_msg, 1);
+ 
+ 	return tester_run();
+ }
 -- 
 1.8.5.2
 
