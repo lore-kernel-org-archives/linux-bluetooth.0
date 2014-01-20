@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] android/pts: Add PTS test results document for AVRCP
-Date: Mon, 20 Jan 2014 09:54:46 +0100
-Message-Id: <1390208087-22838-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/3] android/pts: Add PTS test results document for A2DP
+Date: Mon, 20 Jan 2014 09:54:45 +0100
+Message-Id: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This will allow for better tracking of current state of implementation.
 ---
- android/Makefile.am   |   1 +
- android/pts-avrcp.txt | 194 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 195 insertions(+)
- create mode 100644 android/pts-avrcp.txt
+ android/Makefile.am  |  1 +
+ android/pts-a2dp.txt | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 58 insertions(+)
+ create mode 100644 android/pts-a2dp.txt
 
 diff --git a/android/Makefile.am b/android/Makefile.am
-index d4508a4..9020a46 100644
+index f24b754..d4508a4 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -168,4 +168,5 @@ EXTRA_DIST += android/Android.mk android/README \
+@@ -167,4 +167,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-hid.txt \
  				android/pts-opp.txt \
  				android/pts-map.txt \
- 				android/pts-a2dp.txt \
-+				android/pts-avrcp.txt \
++				android/pts-a2dp.txt \
  				android/pts-pbap.txt
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
 new file mode 100644
-index 0000000..f2533b4
+index 0000000..a269ec1
 --- /dev/null
-+++ b/android/pts-avrcp.txt
-@@ -0,0 +1,194 @@
-+PTS test results for AVRCP
++++ b/android/pts-a2dp.txt
+@@ -0,0 +1,57 @@
++PTS test results for A2DP
 +
 +PTS version: 5.0
 +Tested: --not yet tested--
@@ -43,188 +41,51 @@ index 0000000..f2533b4
 +INC	test is inconclusive
 +N/A	test is disabled due to PICS setup
 +
-+		Controller (CT)
++		Source (SRC)
 +-------------------------------------------------------------------------------
 +Test Name		Result	Notes
 +-------------------------------------------------------------------------------
-+TC_CT_BGN_BV_01_I	N/A
-+TC_CT_BGN_BV_02_I	N/A
-+TC_CT_CEC_BV_01_I	N/A
-+TC_CT_CEC_BV_02_I	N/A
-+TC_CT_CFG_BV_01_C	N/A
-+TC_CT_CON_BV_01_C	N/A
-+TC_CT_CON_BV_03_C	N/A
-+TC_CT_CRC_BV_01_I	N/A
-+TC_CT_CRC_BV_02_I	N/A
-+TC_CT_ICC_BV_01_I	N/A
-+TC_CT_ICC_BV_02_I	N/A
-+TC_CT_MCN_CB_BV_01_C	N/A
-+TC_CT_MCN_CB_BV_01_I	N/A
-+TC_CT_MCN_CB_BV_02_I	N/A
-+TC_CT_MCN_CB_BV_03_I	N/A
-+TC_CT_MCN_CB_BV_04_C	N/A
-+TC_CT_MCN_CB_BV_04_I	N/A
-+TC_CT_MCN_CB_BV_05_I	N/A
-+TC_CT_MCN_CB_BV_06_I	N/A
-+TC_CT_MCN_CB_BV_07_C	N/A
-+TC_CT_MCN_CB_BV_07_I	N/A
-+TC_CT_MCN_NP_BV_01_C	N/A
-+TC_CT_MCN_NP_BV_01_I	N/A
-+TC_CT_MCN_NP_BV_02_I	N/A
-+TC_CT_MCN_NP_BV_03_C	N/A
-+TC_CT_MCN_NP_BV_03_I	N/A
-+TC_CT_MCN_NP_BV_04_I	N/A
-+TC_CT_MCN_NP_BV_05_C	N/A
-+TC_CT_MCN_NP_BV_05_I	N/A
-+TC_CT_MCN_NP_BV_06_I	N/A
-+TC_CT_MCN_NP_BV_07_I	N/A
-+TC_CT_MCN_NP_BV_08_C	N/A
-+TC_CT_MCN_SRC_BV_01_C	N/A
-+TC_CT_MCN_SRC_BV_01_I	N/A
-+TC_CT_MCN_SRC_BV_02_I	N/A
-+TC_CT_MCN_SRC_BV_03_C	N/A
-+TC_CT_MCN_SRC_BV_03_I	N/A
-+TC_CT_MCN_SRC_BV_04_I	N/A
-+TC_CT_MCN_SRC_BV_05_C	N/A
-+TC_CT_MDI_BV_01_C	N/A
-+TC_CT_MDI_BV_03_C	N/A
-+TC_CT_MPS_BV_01_C	N/A
-+TC_CT_MPS_BV_01_I	N/A
-+TC_CT_MPS_BV_02_I	N/A
-+TC_CT_MPS_BV_03_C	N/A
-+TC_CT_MPS_BV_03_I	N/A
-+TC_CT_MPS_BV_08_C	N/A
-+TC_CT_NFY_BV_01_C	N/A
-+TC_CT_PAS_BV_01_C	N/A
-+TC_CT_PAS_BV_03_C	N/A
-+TC_CT_PAS_BV_05_C	N/A
-+TC_CT_PAS_BV_07_C	N/A
-+TC_CT_PAS_BV_09_C	N/A
-+TC_CT_PAS_BV_11_C	N/A
-+TC_CT_PTH_BV_01_C	N/A
-+TC_CT_PTH_BV_02_C	N/A
-+TC_CT_PTT_BV_01_I	N/A
-+TC_CT_PTT_BV_02_I	N/A
-+TC_CT_PTT_BV_03_I	N/A
-+TC_CT_PTT_BV_04_I	N/A
-+TC_CT_PTT_BV_05_I	N/A
-+TC_CT_RCR_BV_01_C	N/A
-+TC_CT_RCR_BV_03_C	N/A
-+TC_CT_VLH_BI_03_C	N/A
-+TC_CT_VLH_BI_04_C	N/A
-+TC_CT_VLH_BV_01_C	N/A
-+TC_CT_VLH_BV_01_I	N/A
-+TC_CT_VLH_BV_02_I	N/A
-+TC_CT_VLH_BV_03_C	N/A
++TC_SRC_CC_BV_09_I	INC
++TC_SRC_CC_BV_10_I	N/A
++TC_SRC_REL_BV_01_I	INC
++TC_SRC_REL_BV_02_I	INC
++TC_SRC_SET_BV_01_I	INC
++TC_SRC_SET_BV_02_I	INC
++TC_SRC_SET_BV_03_I	INC
++TC_SRC_SET_BV_04_I	INC
++TC_SRC_SET_BV_05_I	INC
++TC_SRC_SET_BV_06_I	INC
++TC_SRC_SUS_BV_01_I	INC
++TC_SRC_SUS_BV_02_I	INC
++TC_SRC_SDP_BV_01_I	INC
++TC_SRC_AS_BV_01_I	INC
 +-------------------------------------------------------------------------------
 +
 +
-+		Target (TG)
++		Sink (SNK)
 +-------------------------------------------------------------------------------
 +Test Name		Result	Notes
 +-------------------------------------------------------------------------------
-+TC_TG_BGN_BV_01_I	N/A
-+TC_TG_BGN_BV_02_I	N/A
-+TC_TG_CEC_BV_01_I	INC
-+TC_TG_CEC_BV_02_I	INC
-+TC_TG_CFG_BI_01_C	INC
-+TC_TG_CFG_BV_02_C	INC
-+TC_TG_CON_BV_02_C	N/A
-+TC_TG_CON_BV_04_C	N/A
-+TC_TG_CON_BV_05_C	N/A
-+TC_TG_CRC_BV_01_I	INC
-+TC_TG_CRC_BV_02_I	INC
-+TC_TG_ICC_BV_01_I	INC
-+TC_TG_ICC_BV_02_I	INC
-+TC_TG_INV_BI_01_C	INC
-+TC_TG_INV_BI_02_C	N/A
-+TC_TG_MCN_CB_BI_01_C	N/A
-+TC_TG_MCN_CB_BI_02_C	N/A
-+TC_TG_MCN_CB_BI_03_C	N/A
-+TC_TG_MCN_CB_BI_04_C	N/A
-+TC_TG_MCN_CB_BI_05_C	N/A
-+TC_TG_MCN_CB_BV_01_I	N/A
-+TC_TG_MCN_CB_BV_02_C	N/A
-+TC_TG_MCN_CB_BV_02_I	N/A
-+TC_TG_MCN_CB_BV_03_C	N/A
-+TC_TG_MCN_CB_BV_03_I	N/A
-+TC_TG_MCN_CB_BV_04_I	N/A
-+TC_TG_MCN_CB_BV_05_C	N/A
-+TC_TG_MCN_CB_BV_05_I	N/A
-+TC_TG_MCN_CB_BV_06_C	N/A
-+TC_TG_MCN_CB_BV_06_I	N/A
-+TC_TG_MCN_CB_BV_07_I	N/A
-+TC_TG_MCN_CB_BV_08_C	N/A
-+TC_TG_MCN_CB_BV_09_C	N/A
-+TC_TG_MCN_CB_BV_10_C	N/A
-+TC_TG_MCN_CB_BV_11_C	N/A
-+TC_TG_MCN_NP_BI_01_C	N/A
-+TC_TG_MCN_NP_BI_02_C	N/A
-+TC_TG_MCN_NP_BV_01_I	N/A
-+TC_TG_MCN_NP_BV_02_C	N/A
-+TC_TG_MCN_NP_BV_02_I	N/A
-+TC_TG_MCN_NP_BV_03_I	N/A
-+TC_TG_MCN_NP_BV_04_C	N/A
-+TC_TG_MCN_NP_BV_04_I	N/A
-+TC_TG_MCN_NP_BV_05_I	N/A
-+TC_TG_MCN_NP_BV_06_C	N/A
-+TC_TG_MCN_NP_BV_06_I	N/A
-+TC_TG_MCN_NP_BV_07_C	N/A
-+TC_TG_MCN_NP_BV_07_I	N/A
-+TC_TG_MCN_NP_BV_09_C	N/A
-+TC_TG_MCN_SRC_BV_01_I	N/A
-+TC_TG_MCN_SRC_BV_02_C	N/A
-+TC_TG_MCN_SRC_BV_02_I	N/A
-+TC_TG_MCN_SRC_BV_03_I	N/A
-+TC_TG_MCN_SRC_BV_04_C	N/A
-+TC_TG_MCN_SRC_BV_04_I	N/A
-+TC_TG_MCN_SRC_BV_06_C	N/A
-+TC_TG_MDI_BV_02_C	INC
-+TC_TG_MDI_BV_04_C	INC
-+TC_TG_MDI_BV_05_C	INC
-+TC_TG_MPS_BI_01_C	N/A
-+TC_TG_MPS_BI_02_C	N/A
-+TC_TG_MPS_BV_01_I	N/A
-+TC_TG_MPS_BV_02_C	N/A
-+TC_TG_MPS_BV_02_I	N/A
-+TC_TG_MPS_BV_03_I	N/A
-+TC_TG_MPS_BV_04_C	N/A
-+TC_TG_MPS_BV_05_C	N/A
-+TC_TG_MPS_BV_06_C	N/A
-+TC_TG_MPS_BV_07_C	N/A
-+TC_TG_MPS_BV_09_C	N/A
-+TC_TG_MPS_BV_10_C	N/A
-+TC_TG_NFY_BI_01_C	INC
-+TC_TG_NFY_BV_02_C	INC
-+TC_TG_NFY_BV_03_C	N/A
-+TC_TG_NFY_BV_04_C	INC
-+TC_TG_NFY_BV_05_C	INC
-+TC_TG_NFY_BV_06_C	N/A
-+TC_TG_NFY_BV_07_C	N/A
-+TC_TG_NFY_BV_08_C	INC
-+TC_TG_PAS_BI_01_C	N/A
-+TC_TG_PAS_BI_02_C	N/A
-+TC_TG_PAS_BI_03_C	N/A
-+TC_TG_PAS_BI_04_C	N/A
-+TC_TG_PAS_BI_05_C	N/A
-+TC_TG_PAS_BV_02_C	N/A
-+TC_TG_PAS_BV_04_C	N/A
-+TC_TG_PAS_BV_06_C	N/A
-+TC_TG_PAS_BV_08_C	N/A
-+TC_TG_PAS_BV_10_C	N/A
-+TC_TG_PTT_BV_01_I	INC
-+TC_TG_PTT_BV_02_I	N/A
-+TC_TG_PTT_BV_03_I	N/A
-+TC_TG_PTT_BV_04_I	N/A
-+TC_TG_PTT_BV_05_I	N/A
-+TC_TG_RCR_BV_02_C	INC
-+TC_TG_RCR_BV_04_C	INC
-+TC_TG_VLH_BI_01_C	N/A
-+TC_TG_VLH_BI_02_C	N/A
-+TC_TG_VLH_BV_01_I	N/A
-+TC_TG_VLH_BV_02_C	N/A
-+TC_TG_VLH_BV_02_I	N/A
-+TC_TG_VLH_BV_04_C	N/A
++TC_SNK_CC_BV_01_I	N/A
++TC_SNK_CC_BV_02_I	N/A
++TC_SNK_CC_BV_03_I	N/A
++TC_SNK_CC_BV_04_I	N/A
++TC_SNK_CC_BV_05_I	N/A
++TC_SNK_CC_BV_06_I	N/A
++TC_SNK_CC_BV_07_I	N/A
++TC_SNK_CC_BV_08_I	N/A
++TC_SNK_REL_BV_01_I	N/A
++TC_SNK_REL_BV_02_I	N/A
++TC_SNK_SET_BV_01_I	N/A
++TC_SNK_SET_BV_02_I	N/A
++TC_SNK_SET_BV_03_I	N/A
++TC_SNK_SET_BV_04_I	N/A
++TC_SNK_SET_BV_05_I	N/A
++TC_SNK_SET_BV_06_I	N/A
++TC_SNK_SUS_BV_01_I	N/A
++TC_SNK_SUS_BV_02_I	N/A
++TC_SNK_SDP_BV_02_I	N/A
++TC_SNK_AS_BV_01_I	N/A
 +-------------------------------------------------------------------------------
 -- 
 1.8.5.2
