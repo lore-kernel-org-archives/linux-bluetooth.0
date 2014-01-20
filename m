@@ -1,19 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Frank Praznik <frank.praznik@oh.rr.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: dh.herrmann@gmail.com, simon@mungewell.org
-Subject: [PATCH 0/1] HIDP: Add a special case for the Dualshock 4
-Date: Mon, 20 Jan 2014 18:37:01 -0500
-Message-Id: <1390261022-3113-1-git-send-email-frank.praznik@oh.rr.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv5 00/11] IPC negative tester
+Date: Mon, 20 Jan 2014 23:26:17 +0100
+Message-ID: <1578139.kyyvNt276N@athlon>
+In-Reply-To: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds a special case in the HIDP core for the Dualshock 4 controller.
-The controller only recognizes output reports with the report type 0x52 and 
-only accepts reports sent via the ctrl channel. 
+Hi Jakub,
 
-Unfortunately, this was the only way I could send data to the controller. I
-looked around for alternatives, but adding a special case to the HIDP system
-seemed to be the only way. If there is a way to set a custom report type and 
-specify the channel without polluting the core with a device specific quirk 
-I'll gladly use it.
+On Monday 20 January 2014 10:35:59 Jakub Tyszkowski wrote:
+> Following patchset adds IPC negative tester framework along with test cases
+> checking IPC's behaviour on daemon side. Expected daemon's behaviour is to
+> shut down gracefully in case of receiving invalid IPC data.
+> 
+> v2 changes:
+>   * fixed few indentation issues
+>   * fixed missing __attribute__((packed))
+>   * fixed amount of data written for 'malformed data' test case
+>   * fixed opcode for 'invalid service' test case
+>   * added patch(8) with more 'malformed data' cases
+> 
+> v3 changes:
+>   * changed license to GPL
+>   * changed 'ipc-negative-tester' name to 'ipc-tester'
+> 
+> v4 changes:
+>   * fixed typo in first test case and last commit's message
+>   * fixed daemon shutdown handler function
+> 
+> v5 changes:
+>   * added clean up in case of setup failure
+>   * added test execution macro enhancement for easy data creation
+>   * added test cases for core BT interfaces (Patches: 9, 10, 11)
+> 
+> Jakub Tyszkowski (11):
+>   android/ipc-tester: Skeleton for ipc negative tester
+>   android/ipc-tester: Run daemon in separate process
+>   android/ipc-tester: Add IPC initialization
+>   android/ipc-tester: Add daemon shutdown handler
+>   android/ipc-tester: Add sending test data with ipc
+>   android/ipc-tester: Register services
+>   android/ipc-tester: Add basic test cases for IPC's daemon site
+>   android/ipc-tester: Add more cases for malformed data
+>   android/ipc-tester: Add cases for service opcode boundaries
+>   android/ipc-tester: Add cases for Core message data size
+>   android/ipc-tester: Add cases for BT message data size
+> 
+>  .gitignore           |   1 +
+>  android/Makefile.am  |  17 +
+>  android/ipc-tester.c | 868
+> +++++++++++++++++++++++++++++++++++++++++++++++++++ 3 files changed, 886
+> insertions(+)
+>  create mode 100644 android/ipc-tester.c
+> 
+
+All patches in this set have been applied, thanks.
+
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
