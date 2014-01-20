@@ -1,78 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/pts: Add PTS test results document for AVCTP
-Date: Mon, 20 Jan 2014 09:54:47 +0100
-Message-Id: <1390208087-22838-3-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <52DCDF84.1040902@ahsoftware.de>
+Date: Mon, 20 Jan 2014 09:34:12 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Gianluca Anzolin <gianluca@sottospazio.it>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>, peter@hurleysoftware.com,
+ "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+ Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
+ stable@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
+References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it> <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org>
+In-Reply-To: <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow for better tracking of current state of implementation.
----
- android/Makefile.am   |  1 +
- android/pts-avctp.txt | 41 +++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 42 insertions(+)
- create mode 100644 android/pts-avctp.txt
+Am 06.01.2014 22:57, schrieb Marcel Holtmann:
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 9020a46..924917a 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -169,4 +169,5 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pts-map.txt \
- 				android/pts-a2dp.txt \
- 				android/pts-avrcp.txt \
-+				android/pts-avctp.txt \
- 				android/pts-pbap.txt
-diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
-new file mode 100644
-index 0000000..c057a10
---- /dev/null
-+++ b/android/pts-avctp.txt
-@@ -0,0 +1,41 @@
-+PTS test results for AVCTP
-+
-+PTS version: 5.0
-+Tested: --not yet tested--
-+
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
-+
-+		Controller (CT)
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_CT_CCM_BV_01_C	N/A
-+TC_CT_CCM_BV_02_C	N/A
-+TC_CT_CCM_BV_03_C	N/A
-+TC_CT_CCM_BV_04_C	N/A
-+TC_CT_CCM_BI_01_C	N/A
-+TC_CT_NFR_BV_01_C	N/A
-+TC_CT_NFR_BV_04_C	N/A
-+TC_CT_FRA_BV_01_C	N/A
-+TC_CT_FRA_BV_04_C	N/A
-+-------------------------------------------------------------------------------
-+
-+
-+		Target (TG)
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_TG_CCM_BV_01_C	INC
-+TC_TG_CCM_BV_02_C	INC
-+TC_TG_CCM_BV_03_C	INC
-+TC_TG_CCM_BV_04_C	INC
-+TC_TG_NFR_BV_02_C	INC
-+TC_TG_NFR_BV_03_C	INC
-+TC_TG_NFR_BI_01_C	INC
-+TC_TG_FRA_BV_02_C	INC
-+TC_TG_FRA_BV_03_C	INC
-+-------------------------------------------------------------------------------
--- 
-1.8.5.2
+> all 4 patches have been applied to bluetooth-next tree.
 
+Maybe a bit late, but I've just seen they miss a Cc: 
+stable@vger.kernel.org to automatically end up in 3.12 and 3.13 too.
+
+Regards,
+
+Alexander Holler
