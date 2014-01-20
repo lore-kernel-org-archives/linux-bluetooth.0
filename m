@@ -1,192 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v1 06/18] gatt: Add external services tracking
-Date: Mon, 20 Jan 2014 15:04:51 -0300
-Message-Id: <1390241103-808-7-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v1 00/18] GATT API: External Services
+Date: Mon, 20 Jan 2014 15:04:45 -0300
+Message-Id: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
- <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
+This patchset implements the minimal support for managing local
+services declarations. Based on "[RFC BlueZ v2] doc: Add GATT API"
 
-All primary services declarations provided by an external application
-will be automatically inserted in the attribute database.
----
- src/gatt-dbus.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+Limitation: Remove services and multiple services exported by the same
+remote will be implemented the next series.
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index fc41b78..fc41d00 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -39,15 +39,21 @@
- #include "log.h"
- 
- #include "error.h"
-+#include "gatt.h"
- #include "gatt-dbus.h"
- 
-+#define SERVICE_IFACE				"org.bluez.Service1"
- #define SERVICE_MGR_IFACE			"org.bluez.ServiceManager1"
- 
-+#define REGISTER_TIMER         1
-+
- struct external_app {
- 	char *owner;
- 	char *path;
- 	GDBusClient *client;
-+	GSList *proxies;
- 	unsigned int watch;
-+	guint register_timer;
- };
- 
- static GSList *external_apps;
-@@ -60,6 +66,36 @@ static int external_app_path_cmp(gconstpointer a, gconstpointer b)
- 	return g_strcmp0(eapp->path, path);
- }
- 
-+static void proxy_added(GDBusProxy *proxy, void *user_data)
-+{
-+	struct external_app *eapp = user_data;
-+	const char *interface, *path;
-+
-+	interface = g_dbus_proxy_get_interface(proxy);
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	DBG("path %s iface %s", path, interface);
-+
-+	if (g_strcmp0(interface, SERVICE_IFACE) != 0)
-+		return;
-+
-+	eapp->proxies = g_slist_append(eapp->proxies, proxy);
-+}
-+
-+static void proxy_removed(GDBusProxy *proxy, void *user_data)
-+{
-+	struct external_app *eapp = user_data;
-+	const char *interface, *path;
-+
-+	interface = g_dbus_proxy_get_interface(proxy);
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	DBG("path %s iface %s", path, interface);
-+
-+	eapp->proxies = g_slist_remove(eapp->proxies, proxy);
-+}
-+
-+
- static void external_app_watch_destroy(gpointer user_data)
- {
- 	struct external_app *eapp = user_data;
-@@ -70,6 +106,9 @@ static void external_app_watch_destroy(gpointer user_data)
- 
- 	g_dbus_client_unref(eapp->client);
- 
-+	if (eapp->register_timer)
-+		g_source_remove(eapp->register_timer);
-+
- 	g_free(eapp->owner);
- 	g_free(eapp->path);
- 	g_free(eapp);
-@@ -99,9 +138,75 @@ static struct external_app *new_external_app(DBusConnection *conn,
- 	eapp->client = client;
- 	eapp->path = g_strdup(path);
- 
-+	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
-+								NULL, eapp);
-+
- 	return eapp;
- }
- 
-+static int register_external_service(GDBusProxy *proxy)
-+{
-+	DBusMessageIter iter;
-+	const char *uuid;
-+	bt_uuid_t btuuid;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-+		return -EINVAL;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return -EINVAL;
-+
-+	dbus_message_iter_get_basic(&iter, &uuid);
-+
-+	if (bt_string_to_uuid(&btuuid, uuid) < 0)
-+		return -EINVAL;
-+
-+	if (btd_gatt_add_service(&btuuid) == NULL)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static gboolean finish_register(gpointer user_data)
-+{
-+	struct external_app *eapp = user_data;
-+	GSList *list;
-+
-+	/*
-+	 * It is not possible to detect when the last proxy object
-+	 * was reported. "Proxy added" handler reports objects
-+	 * added on demand or returned by GetManagedObjects().
-+	 * This timer helps to register all the GATT declarations
-+	 * (services, characteristics and descriptors) after fetching
-+	 * all the D-Bus objects.
-+	 */
-+
-+	eapp->register_timer = 0;
-+
-+	for (list = eapp->proxies; list; list = g_slist_next(list)) {
-+		const char *interface, *path;
-+		GDBusProxy *proxy = list->data;
-+
-+		interface = g_dbus_proxy_get_interface(proxy);
-+		path = g_dbus_proxy_get_path(proxy);
-+
-+		if (g_strcmp0(SERVICE_IFACE, interface) != 0)
-+			continue;
-+
-+		if (g_strcmp0(path, eapp->path) != 0)
-+			continue;
-+
-+		if (register_external_service(proxy) < 0) {
-+			DBG("Inconsistent external service: %s", path);
-+			continue;
-+		}
-+
-+		DBG("External service: %s", path);
-+	}
-+
-+	return FALSE;
-+}
-+
- static DBusMessage *register_service(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-@@ -109,6 +214,8 @@ static DBusMessage *register_service(DBusConnection *conn,
- 	DBusMessageIter iter;
- 	const char *path;
- 
-+	DBG("Registering GATT Service");
-+
- 	if (!dbus_message_iter_init(msg, &iter))
- 		return btd_error_invalid_args(msg);
- 
-@@ -127,6 +234,8 @@ static DBusMessage *register_service(DBusConnection *conn,
- 	external_apps = g_slist_prepend(external_apps, eapp);
- 
- 	DBG("New app %p: %s", eapp, path);
-+	eapp->register_timer = g_timeout_add_seconds(REGISTER_TIMER,
-+							finish_register, eapp);
- 
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
+Changes from PATCH v0 to PATCH v1:
+* Rebase
+
+Changes from RFC v0 to PATCH v0:
+* Changed copyright year : s/2013/2014
+* Fixed coding style
+* Added gatt-service binary to gitignore
+* Added extra comment in the source code
+
+Features:
+* API for internal and external services declaration
+* Unix socket for testing purpose: services are exported
+through unix sockets to avoid breaking the current attribute
+server.
+
+How to test:
+Run bluetoothd with EXPERIMENTAL flag (-E)
+Replace /etc/dbus-1/system.d/bluetooth.conf and reload DBus settings
+$gatttool -L --primary (or interactive mode)
+
+Roughly upstreaming plan (steps):
+* GATT Server: External Services
+* GATT Server: External Characteristics (Server)
+* GATT Server: External Descriptors (Server)
+* Replace attribute server
+* Remove ATTIO and automatic connection mechanism from userspace
+* Fix all GATT internal plugins
+* GATT Client: Remote Services
+* ...
+
+Alvaro Silva (7):
+  gatt: Add stub for gatt.{c, h} files
+  gatt: Register Manager D-Bus Interface
+  gatt: Add registering external service
+  gatt: Add external services tracking
+  gatt: Implement UnregisterService
+  gatt: Register ATT command/event handler
+  gatt: Add Discover All Primary Services
+
+Andre Guedes (1):
+  gatt: Add helper for creating GATT services
+
+Claudio Takahasi (10):
+  lib: Move GATT UUID to uuid.h
+  gatt: Add server unix socket
+  gattrib: Use default ATT LE MTU for non-standard sockets
+  test: Add external service GATT skeleton
+  gitignore: Add test/gatt-service
+  test: Add signal handling for gatt-service
+  test: Add registering external service
+  gatttool: Add unix socket connect
+  gatttool: Add unix socket support for interactive mode
+  bluetooth.conf: Add ObjectManager interface
+
+ .gitignore           |   1 +
+ Makefile.am          |   2 +
+ Makefile.tools       |   5 +
+ attrib/gatt.h        |  25 ----
+ attrib/gattrib.c     |  16 +--
+ attrib/gatttool.c    |  27 +++-
+ attrib/gatttool.h    |   1 +
+ attrib/interactive.c |  19 +--
+ attrib/utils.c       |  54 ++++++++
+ lib/uuid.h           |  30 ++++
+ src/bluetooth.conf   |   1 +
+ src/gatt-dbus.c      | 296 +++++++++++++++++++++++++++++++++++++++
+ src/gatt-dbus.h      |  25 ++++
+ src/gatt.c           | 383 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt.h           |  36 +++++
+ src/main.c           |   4 +
+ test/gatt-service.c  | 254 ++++++++++++++++++++++++++++++++++
+ 17 files changed, 1131 insertions(+), 48 deletions(-)
+ create mode 100644 src/gatt-dbus.c
+ create mode 100644 src/gatt-dbus.h
+ create mode 100644 src/gatt.c
+ create mode 100644 src/gatt.h
+ create mode 100644 test/gatt-service.c
+
 -- 
 1.8.3.1
 
