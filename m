@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH v2 5/5] device: Match Dualshock4 with name and class
-Date: Mon, 20 Jan 2014 12:08:36 +0100
-Message-Id: <1390216116-23670-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 2/5] core: Opencode get_sdp_session in sdp-client
+Date: Mon, 20 Jan 2014 12:08:33 +0100
+Message-Id: <1390216116-23670-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1390216116-23670-1-git-send-email-szymon.janc@tieto.com>
 References: <1390216116-23670-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,31 +12,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Szymon Janc <szymon.janc@gmail.com>
 
-This allows to use DS4 with legacy adapters. This seems to require
-general bonding to work correctly i.e. after dedicated bonding
-connection is rejected with "Authentication Failure" error.
+This is only used once and provides no benefit compared to opencoding.
 ---
- src/device.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/sdp-client.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/src/device.c b/src/device.c
-index 76b876e..8e2a515 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -3514,6 +3514,14 @@ static uint16_t get_sdp_flags(struct btd_device *device)
- 	if (vid == 0x054c && pid == 0x05c4)
- 		return SDP_LARGE_MTU;
- 
-+	if (btd_adapter_ssp_enabled(device->adapter))
-+		return 0;
-+
-+	/* if no EIR try matching Sony DualShock 4 with name and class */
-+	if (!strncmp(device->name, "Wireless Controller", MAX_NAME_LENGTH) &&
-+			device->class == 0x2508)
-+		return SDP_LARGE_MTU;
-+
- 	return 0;
+diff --git a/src/sdp-client.c b/src/sdp-client.c
+index 51f3048..0599626 100644
+--- a/src/sdp-client.c
++++ b/src/sdp-client.c
+@@ -86,17 +86,6 @@ static sdp_session_t *get_cached_sdp_session(const bdaddr_t *src, const bdaddr_t
+ 	return NULL;
  }
+ 
+-static sdp_session_t *get_sdp_session(const bdaddr_t *src, const bdaddr_t *dst)
+-{
+-	sdp_session_t *session;
+-
+-	session = get_cached_sdp_session(src, dst);
+-	if (session)
+-		return session;
+-
+-	return sdp_connect(src, dst, SDP_NON_BLOCKING);
+-}
+-
+ static void cache_sdp_session(bdaddr_t *src, bdaddr_t *dst,
+ 						sdp_session_t *session)
+ {
+@@ -285,7 +274,10 @@ static int create_search_context(struct search_context **ctxt,
+ 	if (!ctxt)
+ 		return -EINVAL;
+ 
+-	s = get_sdp_session(src, dst);
++	s = get_cached_sdp_session(src, dst);
++	if (!s)
++		s = sdp_connect(src, dst, SDP_NON_BLOCKING);
++
+ 	if (!s)
+ 		return -errno;
  
 -- 
 1.8.3.2
