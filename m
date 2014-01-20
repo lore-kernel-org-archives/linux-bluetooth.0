@@ -1,189 +1,231 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH SBC 1/2] sbc: Add sbc_init_a2dp
-Date: Mon, 20 Jan 2014 11:31:42 +0200
-Message-Id: <1390210303-22692-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 2/3] android/pts: Add PTS test results document for AVRCP
+Date: Mon, 20 Jan 2014 09:54:46 +0100
+Message-Id: <1390208087-22838-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This adds sbc_init_a2dp that can be used to convert A2DP configuration to
-the internal representation since they are not binary compatible.
+This will allow for better tracking of current state of implementation.
 ---
- sbc/sbc.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- sbc/sbc.h |   1 +
- 2 files changed, 139 insertions(+)
+ android/Makefile.am   |   1 +
+ android/pts-avrcp.txt | 194 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 195 insertions(+)
+ create mode 100644 android/pts-avrcp.txt
 
-diff --git a/sbc/sbc.c b/sbc/sbc.c
-index c589217..4483074 100644
---- a/sbc/sbc.c
-+++ b/sbc/sbc.c
-@@ -57,6 +57,55 @@
- #define MSBC_SYNCWORD	0xAD
- #define MSBC_BLOCKS	15
- 
-+#define A2DP_SAMPLING_FREQ_16000		(1 << 3)
-+#define A2DP_SAMPLING_FREQ_32000		(1 << 2)
-+#define A2DP_SAMPLING_FREQ_44100		(1 << 1)
-+#define A2DP_SAMPLING_FREQ_48000		1
+diff --git a/android/Makefile.am b/android/Makefile.am
+index d4508a4..9020a46 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -168,4 +168,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-opp.txt \
+ 				android/pts-map.txt \
+ 				android/pts-a2dp.txt \
++				android/pts-avrcp.txt \
+ 				android/pts-pbap.txt
+diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
+new file mode 100644
+index 0000000..f2533b4
+--- /dev/null
++++ b/android/pts-avrcp.txt
+@@ -0,0 +1,194 @@
++PTS test results for AVRCP
 +
-+#define A2DP_CHANNEL_MODE_MONO			(1 << 3)
-+#define A2DP_CHANNEL_MODE_DUAL_CHANNEL		(1 << 2)
-+#define A2DP_CHANNEL_MODE_STEREO		(1 << 1)
-+#define A2DP_CHANNEL_MODE_JOINT_STEREO		1
++PTS version: 5.0
++Tested: --not yet tested--
 +
-+#define A2DP_BLOCK_LENGTH_4			(1 << 3)
-+#define A2DP_BLOCK_LENGTH_8			(1 << 2)
-+#define A2DP_BLOCK_LENGTH_12			(1 << 1)
-+#define A2DP_BLOCK_LENGTH_16			1
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
 +
-+#define A2DP_SUBBANDS_4				(1 << 1)
-+#define A2DP_SUBBANDS_8				1
++		Controller (CT)
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_CT_BGN_BV_01_I	N/A
++TC_CT_BGN_BV_02_I	N/A
++TC_CT_CEC_BV_01_I	N/A
++TC_CT_CEC_BV_02_I	N/A
++TC_CT_CFG_BV_01_C	N/A
++TC_CT_CON_BV_01_C	N/A
++TC_CT_CON_BV_03_C	N/A
++TC_CT_CRC_BV_01_I	N/A
++TC_CT_CRC_BV_02_I	N/A
++TC_CT_ICC_BV_01_I	N/A
++TC_CT_ICC_BV_02_I	N/A
++TC_CT_MCN_CB_BV_01_C	N/A
++TC_CT_MCN_CB_BV_01_I	N/A
++TC_CT_MCN_CB_BV_02_I	N/A
++TC_CT_MCN_CB_BV_03_I	N/A
++TC_CT_MCN_CB_BV_04_C	N/A
++TC_CT_MCN_CB_BV_04_I	N/A
++TC_CT_MCN_CB_BV_05_I	N/A
++TC_CT_MCN_CB_BV_06_I	N/A
++TC_CT_MCN_CB_BV_07_C	N/A
++TC_CT_MCN_CB_BV_07_I	N/A
++TC_CT_MCN_NP_BV_01_C	N/A
++TC_CT_MCN_NP_BV_01_I	N/A
++TC_CT_MCN_NP_BV_02_I	N/A
++TC_CT_MCN_NP_BV_03_C	N/A
++TC_CT_MCN_NP_BV_03_I	N/A
++TC_CT_MCN_NP_BV_04_I	N/A
++TC_CT_MCN_NP_BV_05_C	N/A
++TC_CT_MCN_NP_BV_05_I	N/A
++TC_CT_MCN_NP_BV_06_I	N/A
++TC_CT_MCN_NP_BV_07_I	N/A
++TC_CT_MCN_NP_BV_08_C	N/A
++TC_CT_MCN_SRC_BV_01_C	N/A
++TC_CT_MCN_SRC_BV_01_I	N/A
++TC_CT_MCN_SRC_BV_02_I	N/A
++TC_CT_MCN_SRC_BV_03_C	N/A
++TC_CT_MCN_SRC_BV_03_I	N/A
++TC_CT_MCN_SRC_BV_04_I	N/A
++TC_CT_MCN_SRC_BV_05_C	N/A
++TC_CT_MDI_BV_01_C	N/A
++TC_CT_MDI_BV_03_C	N/A
++TC_CT_MPS_BV_01_C	N/A
++TC_CT_MPS_BV_01_I	N/A
++TC_CT_MPS_BV_02_I	N/A
++TC_CT_MPS_BV_03_C	N/A
++TC_CT_MPS_BV_03_I	N/A
++TC_CT_MPS_BV_08_C	N/A
++TC_CT_NFY_BV_01_C	N/A
++TC_CT_PAS_BV_01_C	N/A
++TC_CT_PAS_BV_03_C	N/A
++TC_CT_PAS_BV_05_C	N/A
++TC_CT_PAS_BV_07_C	N/A
++TC_CT_PAS_BV_09_C	N/A
++TC_CT_PAS_BV_11_C	N/A
++TC_CT_PTH_BV_01_C	N/A
++TC_CT_PTH_BV_02_C	N/A
++TC_CT_PTT_BV_01_I	N/A
++TC_CT_PTT_BV_02_I	N/A
++TC_CT_PTT_BV_03_I	N/A
++TC_CT_PTT_BV_04_I	N/A
++TC_CT_PTT_BV_05_I	N/A
++TC_CT_RCR_BV_01_C	N/A
++TC_CT_RCR_BV_03_C	N/A
++TC_CT_VLH_BI_03_C	N/A
++TC_CT_VLH_BI_04_C	N/A
++TC_CT_VLH_BV_01_C	N/A
++TC_CT_VLH_BV_01_I	N/A
++TC_CT_VLH_BV_02_I	N/A
++TC_CT_VLH_BV_03_C	N/A
++-------------------------------------------------------------------------------
 +
-+#define A2DP_ALLOCATION_SNR			(1 << 1)
-+#define A2DP_ALLOCATION_LOUDNESS		1
 +
-+#if __BYTE_ORDER == __LITTLE_ENDIAN
-+
-+typedef struct {
-+	uint8_t channel_mode:4;
-+	uint8_t frequency:4;
-+	uint8_t allocation_method:2;
-+	uint8_t subbands:2;
-+	uint8_t block_length:4;
-+	uint8_t min_bitpool;
-+	uint8_t max_bitpool;
-+} __attribute__ ((packed)) a2dp_sbc_t;
-+
-+#elif __BYTE_ORDER == __BIG_ENDIAN
-+
-+typedef struct {
-+	uint8_t frequency:4;
-+	uint8_t channel_mode:4;
-+	uint8_t block_length:4;
-+	uint8_t subbands:2;
-+	uint8_t allocation_method:2;
-+	uint8_t min_bitpool;
-+	uint8_t max_bitpool;
-+} __attribute__ ((packed)) a2dp_sbc_t;
-+
-+#else
-+#error "Unknown byte order"
-+#endif
-+
- /* This structure contains an unpacked SBC frame.
-    Yes, there is probably quite some unused space herein */
- struct sbc_frame {
-@@ -1046,6 +1095,95 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
- 	return 0;
- }
- 
-+SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, void *data)
-+{
-+	a2dp_sbc_t *a2dp = data;
-+	int err;
-+
-+	err = sbc_init(sbc, flags);
-+	if (err < 0)
-+		return err;
-+
-+	switch (a2dp->frequency) {
-+        case A2DP_SAMPLING_FREQ_16000:
-+		sbc->frequency = SBC_FREQ_16000;
-+		break;
-+	case A2DP_SAMPLING_FREQ_32000:
-+		sbc->frequency = SBC_FREQ_32000;
-+		break;
-+	case A2DP_SAMPLING_FREQ_44100:
-+		sbc->frequency = SBC_FREQ_44100;
-+		break;
-+	case A2DP_SAMPLING_FREQ_48000:
-+		sbc->frequency = SBC_FREQ_48000;
-+		break;
-+	default:
-+		goto failed;
-+	}
-+
-+	switch (a2dp->channel_mode) {
-+	case A2DP_CHANNEL_MODE_MONO:
-+		sbc->mode = SBC_MODE_MONO;
-+		break;
-+	case A2DP_CHANNEL_MODE_DUAL_CHANNEL:
-+		sbc->mode = SBC_MODE_DUAL_CHANNEL;
-+		break;
-+	case A2DP_CHANNEL_MODE_STEREO:
-+		sbc->mode = SBC_MODE_STEREO;
-+		break;
-+	case A2DP_CHANNEL_MODE_JOINT_STEREO:
-+		sbc->mode = SBC_MODE_JOINT_STEREO;
-+		break;
-+	default:
-+		goto failed;
-+	}
-+
-+	switch (a2dp->allocation_method) {
-+	case A2DP_ALLOCATION_SNR:
-+		sbc->allocation = SBC_AM_SNR;
-+		break;
-+	case A2DP_ALLOCATION_LOUDNESS:
-+		sbc->allocation = SBC_AM_LOUDNESS;
-+		break;
-+	default:
-+		goto failed;
-+	}
-+
-+	switch (a2dp->subbands) {
-+	case A2DP_SUBBANDS_4:
-+		sbc->subbands = SBC_SB_4;
-+		break;
-+        case A2DP_SUBBANDS_8:
-+		sbc->subbands = SBC_SB_8;
-+		break;
-+	default:
-+		goto failed;
-+	}
-+
-+	switch (a2dp->block_length) {
-+	case A2DP_BLOCK_LENGTH_4:
-+		sbc->blocks = SBC_BLK_4;
-+		break;
-+	case A2DP_BLOCK_LENGTH_8:
-+		sbc->blocks = SBC_BLK_8;
-+		break;
-+	case A2DP_BLOCK_LENGTH_12:
-+		sbc->blocks = SBC_BLK_12;
-+		break;
-+	case A2DP_BLOCK_LENGTH_16:
-+		sbc->blocks = SBC_BLK_16;
-+		break;
-+	default:
-+		goto failed;
-+	}
-+
-+	return 0;
-+
-+failed:
-+	sbc_finish(sbc);
-+	return -EINVAL;
-+}
-+
- SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
- {
- 	return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
-diff --git a/sbc/sbc.h b/sbc/sbc.h
-index 5f8a1fc..1d1c5a1 100644
---- a/sbc/sbc.h
-+++ b/sbc/sbc.h
-@@ -84,6 +84,7 @@ typedef struct sbc_struct sbc_t;
- int sbc_init(sbc_t *sbc, unsigned long flags);
- int sbc_reinit(sbc_t *sbc, unsigned long flags);
- int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
-+int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, void *data);
- 
- ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
- 
++		Target (TG)
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_TG_BGN_BV_01_I	N/A
++TC_TG_BGN_BV_02_I	N/A
++TC_TG_CEC_BV_01_I	INC
++TC_TG_CEC_BV_02_I	INC
++TC_TG_CFG_BI_01_C	INC
++TC_TG_CFG_BV_02_C	INC
++TC_TG_CON_BV_02_C	N/A
++TC_TG_CON_BV_04_C	N/A
++TC_TG_CON_BV_05_C	N/A
++TC_TG_CRC_BV_01_I	INC
++TC_TG_CRC_BV_02_I	INC
++TC_TG_ICC_BV_01_I	INC
++TC_TG_ICC_BV_02_I	INC
++TC_TG_INV_BI_01_C	INC
++TC_TG_INV_BI_02_C	N/A
++TC_TG_MCN_CB_BI_01_C	N/A
++TC_TG_MCN_CB_BI_02_C	N/A
++TC_TG_MCN_CB_BI_03_C	N/A
++TC_TG_MCN_CB_BI_04_C	N/A
++TC_TG_MCN_CB_BI_05_C	N/A
++TC_TG_MCN_CB_BV_01_I	N/A
++TC_TG_MCN_CB_BV_02_C	N/A
++TC_TG_MCN_CB_BV_02_I	N/A
++TC_TG_MCN_CB_BV_03_C	N/A
++TC_TG_MCN_CB_BV_03_I	N/A
++TC_TG_MCN_CB_BV_04_I	N/A
++TC_TG_MCN_CB_BV_05_C	N/A
++TC_TG_MCN_CB_BV_05_I	N/A
++TC_TG_MCN_CB_BV_06_C	N/A
++TC_TG_MCN_CB_BV_06_I	N/A
++TC_TG_MCN_CB_BV_07_I	N/A
++TC_TG_MCN_CB_BV_08_C	N/A
++TC_TG_MCN_CB_BV_09_C	N/A
++TC_TG_MCN_CB_BV_10_C	N/A
++TC_TG_MCN_CB_BV_11_C	N/A
++TC_TG_MCN_NP_BI_01_C	N/A
++TC_TG_MCN_NP_BI_02_C	N/A
++TC_TG_MCN_NP_BV_01_I	N/A
++TC_TG_MCN_NP_BV_02_C	N/A
++TC_TG_MCN_NP_BV_02_I	N/A
++TC_TG_MCN_NP_BV_03_I	N/A
++TC_TG_MCN_NP_BV_04_C	N/A
++TC_TG_MCN_NP_BV_04_I	N/A
++TC_TG_MCN_NP_BV_05_I	N/A
++TC_TG_MCN_NP_BV_06_C	N/A
++TC_TG_MCN_NP_BV_06_I	N/A
++TC_TG_MCN_NP_BV_07_C	N/A
++TC_TG_MCN_NP_BV_07_I	N/A
++TC_TG_MCN_NP_BV_09_C	N/A
++TC_TG_MCN_SRC_BV_01_I	N/A
++TC_TG_MCN_SRC_BV_02_C	N/A
++TC_TG_MCN_SRC_BV_02_I	N/A
++TC_TG_MCN_SRC_BV_03_I	N/A
++TC_TG_MCN_SRC_BV_04_C	N/A
++TC_TG_MCN_SRC_BV_04_I	N/A
++TC_TG_MCN_SRC_BV_06_C	N/A
++TC_TG_MDI_BV_02_C	INC
++TC_TG_MDI_BV_04_C	INC
++TC_TG_MDI_BV_05_C	INC
++TC_TG_MPS_BI_01_C	N/A
++TC_TG_MPS_BI_02_C	N/A
++TC_TG_MPS_BV_01_I	N/A
++TC_TG_MPS_BV_02_C	N/A
++TC_TG_MPS_BV_02_I	N/A
++TC_TG_MPS_BV_03_I	N/A
++TC_TG_MPS_BV_04_C	N/A
++TC_TG_MPS_BV_05_C	N/A
++TC_TG_MPS_BV_06_C	N/A
++TC_TG_MPS_BV_07_C	N/A
++TC_TG_MPS_BV_09_C	N/A
++TC_TG_MPS_BV_10_C	N/A
++TC_TG_NFY_BI_01_C	INC
++TC_TG_NFY_BV_02_C	INC
++TC_TG_NFY_BV_03_C	N/A
++TC_TG_NFY_BV_04_C	INC
++TC_TG_NFY_BV_05_C	INC
++TC_TG_NFY_BV_06_C	N/A
++TC_TG_NFY_BV_07_C	N/A
++TC_TG_NFY_BV_08_C	INC
++TC_TG_PAS_BI_01_C	N/A
++TC_TG_PAS_BI_02_C	N/A
++TC_TG_PAS_BI_03_C	N/A
++TC_TG_PAS_BI_04_C	N/A
++TC_TG_PAS_BI_05_C	N/A
++TC_TG_PAS_BV_02_C	N/A
++TC_TG_PAS_BV_04_C	N/A
++TC_TG_PAS_BV_06_C	N/A
++TC_TG_PAS_BV_08_C	N/A
++TC_TG_PAS_BV_10_C	N/A
++TC_TG_PTT_BV_01_I	INC
++TC_TG_PTT_BV_02_I	N/A
++TC_TG_PTT_BV_03_I	N/A
++TC_TG_PTT_BV_04_I	N/A
++TC_TG_PTT_BV_05_I	N/A
++TC_TG_RCR_BV_02_C	INC
++TC_TG_RCR_BV_04_C	INC
++TC_TG_VLH_BI_01_C	N/A
++TC_TG_VLH_BI_02_C	N/A
++TC_TG_VLH_BV_01_I	N/A
++TC_TG_VLH_BV_02_C	N/A
++TC_TG_VLH_BV_02_I	N/A
++TC_TG_VLH_BV_04_C	N/A
++-------------------------------------------------------------------------------
 -- 
-1.8.4.2
+1.8.5.2
 
