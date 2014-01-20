@@ -1,41 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Frank Praznik <frank.praznik@oh.rr.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] emulator: Fix unaligned memory access compilation errors
-Date: Mon, 20 Jan 2014 21:46:09 -0400
-Message-Id: <1390268769-30209-1-git-send-email-anderson.lizardo@openbossa.org>
+Cc: dh.herrmann@gmail.com, simon@mungewell.org,
+	Frank Praznik <frank.praznik@oh.rr.com>
+Subject: [PATCH 1/1] HIDP: Add a special case for the Dualshock 4
+Date: Mon, 20 Jan 2014 18:37:02 -0500
+Message-Id: <1390261022-3113-2-git-send-email-frank.praznik@oh.rr.com>
+In-Reply-To: <1390261022-3113-1-git-send-email-frank.praznik@oh.rr.com>
+References: <1390261022-3113-1-git-send-email-frank.praznik@oh.rr.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The u128_xor() function does proper aligned access and accepts void *
-arguments, therefore the casts are unnecessary and trigger clang errors.
----
- emulator/smp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The Dualshock 4 wants reports with type 0x52 sent on the ctrlchannel when
+running over bluetooth. This adds a special case so that the reports can
+be successfully sent.
 
-diff --git a/emulator/smp.c b/emulator/smp.c
-index 2b4f9a5..cb7cda0 100644
---- a/emulator/smp.c
-+++ b/emulator/smp.c
-@@ -248,7 +248,7 @@ static int smp_c1(struct smp_conn *conn, uint8_t rnd[16], uint8_t res[16])
- 	baswap((bdaddr_t *) (p2 + 10), (bdaddr_t *) conn->ra);
+Signed-off-by: Frank Praznik <frank.praznik@oh.rr.com>
+
+---
+
+ net/bluetooth/hidp/core.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 292e619..e597e3f 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -360,9 +360,17 @@ static int hidp_output_raw_report(struct hid_device *hid, unsigned char *data, s
+ 	int ret;
  
- 	/* res = r XOR p1 */
--	u128_xor((u128 *) res, (u128 *) rnd, (u128 *) p1);
-+	u128_xor(res, rnd, p1);
- 
- 	/* res = e(k, res) */
- 	err = smp_e(conn->smp->alg_sk, conn->tk, res, res);
-@@ -256,7 +256,7 @@ static int smp_c1(struct smp_conn *conn, uint8_t rnd[16], uint8_t res[16])
- 		return err;
- 
- 	/* res = res XOR p2 */
--	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
-+	u128_xor(res, res, p2);
- 
- 	/* res = e(k, res) */
- 	return smp_e(conn->smp->alg_sk, conn->tk, res, res);
+ 	if (report_type == HID_OUTPUT_REPORT) {
+-		report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
+-		return hidp_send_intr_message(session, report_type,
++		/* The Dualshock 4 wants report type 0x52 sent via the ctrl channel */
++		if(hid->vendor == 0x54c && hid->product == 0x5c4) {
++			report_type = HIDP_TRANS_SET_REPORT | HIDP_DATA_RTYPE_OUPUT;
++			return hidp_send_ctrl_message(session, report_type,
+ 					      data, count);
++		}
++		else {
++			report_type = HIDP_TRANS_DATA | HIDP_DATA_RTYPE_OUPUT;
++			return hidp_send_intr_message(session, report_type,
++					      data, count);
++		}
+ 	} else if (report_type != HID_FEATURE_REPORT) {
+ 		return -EINVAL;
+ 	}
 -- 
-1.8.3.2
+1.8.4.2
 
