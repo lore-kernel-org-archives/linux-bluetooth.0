@@ -1,142 +1,213 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v1 03/18] gatt: Add registering external service
-Date: Mon, 20 Jan 2014 15:04:48 -0300
-Message-Id: <1390241103-808-4-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
- <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH SBC 1/2] sbc: Add sbc_init_a2dp
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1390210303-22692-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 20 Jan 2014 09:43:50 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <D88B08AB-A9EB-47D7-8EC7-BB1556F4EB7C@holtmann.org>
+References: <1390210303-22692-1-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
+Hi Luiz,
 
-This patch allows external applications register a given service on
-Bluez. Applications must provide an object path and a dictionary of
-options. Options dictionary will be used later to provide additional
-service information.
----
- src/gatt-dbus.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 88 insertions(+), 1 deletion(-)
+> This adds sbc_init_a2dp that can be used to convert A2DP configuration to
+> the internal representation since they are not binary compatible.
+> ---
+> sbc/sbc.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> sbc/sbc.h |   1 +
+> 2 files changed, 139 insertions(+)
+> 
+> diff --git a/sbc/sbc.c b/sbc/sbc.c
+> index c589217..4483074 100644
+> --- a/sbc/sbc.c
+> +++ b/sbc/sbc.c
+> @@ -57,6 +57,55 @@
+> #define MSBC_SYNCWORD	0xAD
+> #define MSBC_BLOCKS	15
+> 
+> +#define A2DP_SAMPLING_FREQ_16000		(1 << 3)
+> +#define A2DP_SAMPLING_FREQ_32000		(1 << 2)
+> +#define A2DP_SAMPLING_FREQ_44100		(1 << 1)
+> +#define A2DP_SAMPLING_FREQ_48000		1
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 90a321b..fc41b78 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -26,22 +26,109 @@
- #endif
+Use (1 << 0) here and let the compiler optimize it.
+
+> +
+> +#define A2DP_CHANNEL_MODE_MONO			(1 << 3)
+> +#define A2DP_CHANNEL_MODE_DUAL_CHANNEL		(1 << 2)
+> +#define A2DP_CHANNEL_MODE_STEREO		(1 << 1)
+> +#define A2DP_CHANNEL_MODE_JOINT_STEREO		1
+> +
+> +#define A2DP_BLOCK_LENGTH_4			(1 << 3)
+> +#define A2DP_BLOCK_LENGTH_8			(1 << 2)
+> +#define A2DP_BLOCK_LENGTH_12			(1 << 1)
+> +#define A2DP_BLOCK_LENGTH_16			1
+> +
+> +#define A2DP_SUBBANDS_4				(1 << 1)
+> +#define A2DP_SUBBANDS_8				1
+> +
+> +#define A2DP_ALLOCATION_SNR			(1 << 1)
+> +#define A2DP_ALLOCATION_LOUDNESS		1
+> +
+> +#if __BYTE_ORDER == __LITTLE_ENDIAN
+> +
+> +typedef struct {
+> +	uint8_t channel_mode:4;
+> +	uint8_t frequency:4;
+> +	uint8_t allocation_method:2;
+> +	uint8_t subbands:2;
+> +	uint8_t block_length:4;
+> +	uint8_t min_bitpool;
+> +	uint8_t max_bitpool;
+> +} __attribute__ ((packed)) a2dp_sbc_t;
+
+If these are internal anyway, then typedef is not needed. Just use a plain packed struct.
  
- #include <stdint.h>
-+#include <errno.h>
- 
- #include <glib.h>
- #include <dbus/dbus.h>
- #include <gdbus/gdbus.h>
- 
-+#include "adapter.h"
-+#include "device.h"
-+#include "lib/uuid.h"
- #include "dbus-common.h"
- #include "log.h"
- 
-+#include "error.h"
- #include "gatt-dbus.h"
- 
- #define SERVICE_MGR_IFACE			"org.bluez.ServiceManager1"
- 
-+struct external_app {
-+	char *owner;
-+	char *path;
-+	GDBusClient *client;
-+	unsigned int watch;
-+};
-+
-+static GSList *external_apps;
-+
-+static int external_app_path_cmp(gconstpointer a, gconstpointer b)
-+{
-+	const struct external_app *eapp = a;
-+	const char *path = b;
-+
-+	return g_strcmp0(eapp->path, path);
-+}
-+
-+static void external_app_watch_destroy(gpointer user_data)
-+{
-+	struct external_app *eapp = user_data;
-+
-+	/* TODO: Remove from the database */
-+
-+	external_apps = g_slist_remove(external_apps, eapp);
-+
-+	g_dbus_client_unref(eapp->client);
-+
-+	g_free(eapp->owner);
-+	g_free(eapp->path);
-+	g_free(eapp);
-+}
-+
-+static struct external_app *new_external_app(DBusConnection *conn,
-+					const char *sender, const char *path)
-+{
-+	struct external_app *eapp;
-+	GDBusClient *client;
-+
-+	client = g_dbus_client_new(conn, sender, "/");
-+	if (client == NULL)
-+		return NULL;
-+
-+	eapp = g_new0(struct external_app, 1);
-+
-+	eapp->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
-+			sender, NULL, eapp, external_app_watch_destroy);
-+	if (eapp->watch == 0) {
-+		g_dbus_client_unref(client);
-+		g_free(eapp);
-+		return NULL;
-+	}
-+
-+	eapp->owner = g_strdup(sender);
-+	eapp->client = client;
-+	eapp->path = g_strdup(path);
-+
-+	return eapp;
-+}
-+
- static DBusMessage *register_service(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
--	return dbus_message_new_method_return(msg);
-+	struct external_app *eapp;
-+	DBusMessageIter iter;
-+	const char *path;
-+
-+	if (!dbus_message_iter_init(msg, &iter))
-+		return btd_error_invalid_args(msg);
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
-+		return btd_error_invalid_args(msg);
-+
-+	dbus_message_iter_get_basic(&iter, &path);
-+
-+	if (g_slist_find_custom(external_apps, path, external_app_path_cmp))
-+		return btd_error_already_exists(msg);
-+
-+	eapp = new_external_app(conn, dbus_message_get_sender(msg), path);
-+	if (eapp == NULL)
-+		return btd_error_failed(msg, "Not enough resources");
-+
-+	external_apps = g_slist_prepend(external_apps, eapp);
-+
-+	DBG("New app %p: %s", eapp, path);
-+
-+	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
- }
- 
- static DBusMessage *unregister_service(DBusConnection *conn,
--- 
-1.8.3.1
+> +
+> +#elif __BYTE_ORDER == __BIG_ENDIAN
+> +
+> +typedef struct {
+> +	uint8_t frequency:4;
+> +	uint8_t channel_mode:4;
+> +	uint8_t block_length:4;
+> +	uint8_t subbands:2;
+> +	uint8_t allocation_method:2;
+> +	uint8_t min_bitpool;
+> +	uint8_t max_bitpool;
+> +} __attribute__ ((packed)) a2dp_sbc_t;
+> +
+> +#else
+> +#error "Unknown byte order"
+> +#endif
+> +
+> /* This structure contains an unpacked SBC frame.
+>    Yes, there is probably quite some unused space herein */
+> struct sbc_frame {
+> @@ -1046,6 +1095,95 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
+> 	return 0;
+> }
+> 
+> +SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, void *data)
+> +{
+
+const void *data. I think we should also add a size_t len to it.
+
+Using the general “data” is a bit too generic. What is it actually called in the A2DP PDU anyway?
+
+> +	a2dp_sbc_t *a2dp = data;
+> +	int err;
+> +
+> +	err = sbc_init(sbc, flags);
+> +	if (err < 0)
+> +		return err;
+> +
+> +	switch (a2dp->frequency) {
+> +        case A2DP_SAMPLING_FREQ_16000:
+
+Spaces?
+
+> +		sbc->frequency = SBC_FREQ_16000;
+> +		break;
+> +	case A2DP_SAMPLING_FREQ_32000:
+> +		sbc->frequency = SBC_FREQ_32000;
+> +		break;
+> +	case A2DP_SAMPLING_FREQ_44100:
+> +		sbc->frequency = SBC_FREQ_44100;
+> +		break;
+> +	case A2DP_SAMPLING_FREQ_48000:
+> +		sbc->frequency = SBC_FREQ_48000;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->channel_mode) {
+> +	case A2DP_CHANNEL_MODE_MONO:
+> +		sbc->mode = SBC_MODE_MONO;
+> +		break;
+> +	case A2DP_CHANNEL_MODE_DUAL_CHANNEL:
+> +		sbc->mode = SBC_MODE_DUAL_CHANNEL;
+> +		break;
+> +	case A2DP_CHANNEL_MODE_STEREO:
+> +		sbc->mode = SBC_MODE_STEREO;
+> +		break;
+> +	case A2DP_CHANNEL_MODE_JOINT_STEREO:
+> +		sbc->mode = SBC_MODE_JOINT_STEREO;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->allocation_method) {
+> +	case A2DP_ALLOCATION_SNR:
+> +		sbc->allocation = SBC_AM_SNR;
+> +		break;
+> +	case A2DP_ALLOCATION_LOUDNESS:
+> +		sbc->allocation = SBC_AM_LOUDNESS;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->subbands) {
+> +	case A2DP_SUBBANDS_4:
+> +		sbc->subbands = SBC_SB_4;
+> +		break;
+> +        case A2DP_SUBBANDS_8:
+
+Spaces?
+
+> +		sbc->subbands = SBC_SB_8;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	switch (a2dp->block_length) {
+> +	case A2DP_BLOCK_LENGTH_4:
+> +		sbc->blocks = SBC_BLK_4;
+> +		break;
+> +	case A2DP_BLOCK_LENGTH_8:
+> +		sbc->blocks = SBC_BLK_8;
+> +		break;
+> +	case A2DP_BLOCK_LENGTH_12:
+> +		sbc->blocks = SBC_BLK_12;
+> +		break;
+> +	case A2DP_BLOCK_LENGTH_16:
+> +		sbc->blocks = SBC_BLK_16;
+> +		break;
+> +	default:
+> +		goto failed;
+> +	}
+> +
+> +	return 0;
+> +
+> +failed:
+> +	sbc_finish(sbc);
+> +	return -EINVAL;
+> +}
+> +
+> SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
+> {
+> 	return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
+> diff --git a/sbc/sbc.h b/sbc/sbc.h
+> index 5f8a1fc..1d1c5a1 100644
+> --- a/sbc/sbc.h
+> +++ b/sbc/sbc.h
+> @@ -84,6 +84,7 @@ typedef struct sbc_struct sbc_t;
+> int sbc_init(sbc_t *sbc, unsigned long flags);
+> int sbc_reinit(sbc_t *sbc, unsigned long flags);
+> int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
+> +int sbc_init_a2dp(sbc_t *sbc, unsigned long flags, void *data);
+> 
+> ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
+
+Regards
+
+Marcel
 
