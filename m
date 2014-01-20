@@ -1,59 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Harald Schmitt <linux@hschmitt.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: Harald Schmitt <linux@hschmitt.de>
-Subject: [PATCH] obexd/irmc: Fix folder for LUID requests
-Date: Mon, 20 Jan 2014 18:39:18 +0100
-Message-Id: <1390239558-6384-1-git-send-email-linux@hschmitt.de>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <52DCDF84.1040902@ahsoftware.de>
+Date: Mon, 20 Jan 2014 09:37:14 -0800
+Cc: Gianluca Anzolin <gianluca@sottospazio.it>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	peter@hurleysoftware.com,
+	"linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
+	stable@vger.kernel.org
+Message-Id: <E0DDC796-EECF-46B6-8EDF-801CF8EFD456@holtmann.org>
+References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it> <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org> <52DCDF84.1040902@ahsoftware.de>
+To: Alexander Holler <holler@ahsoftware.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The old macro PB_LUID_FOLDER had the folder luid on the second level:
-/telecom/luid. But the luid folder occurs per IrMC spec on level three e.g.
-/telecom/pb/luid. On the second level the object store e.g. pb is specified.
-This bug was introduced with commit 62ebf8d0f345e7722334d852cf7a010b202647e7.
----
- obexd/plugins/irmc.c      | 6 +++---
- obexd/plugins/phonebook.h | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Hi Alexander,
 
-diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
-index d343977..d0e98b4 100644
---- a/obexd/plugins/irmc.c
-+++ b/obexd/plugins/irmc.c
-@@ -326,7 +326,7 @@ static int irmc_open_nt(struct irmc_session *irmc)
- 	return 0;
- }
- 
--static int irmc_open_luid(struct irmc_session *irmc)
-+static int irmc_open_pb_luid(struct irmc_session *irmc)
- {
- 	if (irmc->buffer == NULL)
- 		irmc->buffer = g_string_new("");
-@@ -381,8 +381,8 @@ static void *irmc_open(const char *name, int oflag, mode_t mode, void *context,
- 		ret = irmc_open_cal(irmc);
- 	else if (g_str_has_prefix(path, PB_NOTES_FOLDER))
- 		ret = irmc_open_nt(irmc);
--	else if (g_str_has_prefix(path, PB_LUID_FOLDER))
--		ret = irmc_open_luid(irmc);
-+	else if (g_str_has_prefix(path, PB_CONTACTS_LUID_FOLDER))
-+		ret = irmc_open_pb_luid(irmc);
- 	else
- 		ret = -EBADR;
- 
-diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
-index 441cff2..015c9a3 100644
---- a/obexd/plugins/phonebook.h
-+++ b/obexd/plugins/phonebook.h
-@@ -37,7 +37,7 @@
- #define PB_CALLS_INCOMING_FOLDER "/telecom/ich"
- #define PB_CALLS_MISSED_FOLDER "/telecom/mch"
- #define PB_CALLS_OUTGOING_FOLDER "/telecom/och"
--#define PB_LUID_FOLDER "/telecom/luid"
-+#define PB_CONTACTS_LUID_FOLDER "/telecom/pb/luid"
- 
- #define PB_CONTACTS "/telecom/pb.vcf"
- #define PB_CALLS_COMBINED "/telecom/cch.vcf"
--- 
-1.8.3.2
+>> all 4 patches have been applied to bluetooth-next tree.
+> 
+> Maybe a bit late, but I've just seen they miss a Cc: stable@vger.kernel.org to automatically end up in 3.12 and 3.13 too.
+
+we can always promote them to stable. On Purpose I wanted them to cycle through bluetooth-next for a while to make sure they do not cause any other regressions.
+
+Regards
+
+Marcel
 
