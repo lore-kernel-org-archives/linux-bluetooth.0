@@ -1,70 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 08/11] android/ipc-tester: Add more cases for malformed data
-Date: Mon, 20 Jan 2014 10:36:07 +0100
-Message-Id: <1390210570-28260-9-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv5 07/11] android/ipc-tester: Add basic test cases for IPC's daemon site
+Date: Mon, 20 Jan 2014 10:36:06 +0100
+Message-Id: <1390210570-28260-8-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds tests for more types of possible data malformations.
+This patch adds first few test cases checking for proper daemon
+termination in case of receiving invalid IPC data.
 ---
- android/ipc-tester.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ android/ipc-tester.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index c8bc9b8..db0a30a 100644
+index 816719c..c8bc9b8 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -581,6 +581,27 @@ struct regmod_msg register_bt_malformed_size_msg = {
+@@ -569,15 +569,57 @@ struct regmod_msg register_bt_msg = {
  		},
  };
  
-+struct malformed_data3_struct {
-+	struct regmod_msg valid_msg;
-+	int redundant_data;
-+}  __attribute__((packed));
-+
-+static struct malformed_data3_struct malformed_data3_msg = {
-+	/* valid register service message */
-+	.valid_msg = {
-+		.header = {
-+			.service_id = HAL_SERVICE_ID_CORE,
-+			.opcode = HAL_OP_REGISTER_MODULE,
-+			.len = sizeof(struct hal_cmd_register_module),
-+			},
-+		.cmd = {
-+			.service_id = HAL_SERVICE_ID_CORE,
-+			},
-+	},
-+	/* plus redundant data */
-+	. redundant_data = 666,
++struct regmod_msg register_bt_malformed_size_msg = {
++	.header = {
++		.service_id = HAL_SERVICE_ID_CORE,
++		.opcode = HAL_OP_REGISTER_MODULE,
++		/* wrong payload size declared */
++		.len = sizeof(struct hal_cmd_register_module) - 1,
++		},
++	.cmd = {
++		.service_id = HAL_SERVICE_ID_CORE,
++		},
 +};
 +
- struct hal_hdr enable_unknown_service_hdr = {
- 	.service_id = HAL_SERVICE_ID_MAX + 1,
- 	.opcode = HAL_OP_REGISTER_MODULE,
-@@ -610,6 +631,18 @@ int main(int argc, char *argv[])
- 				sizeof(register_bt_malformed_size_msg),
- 				HAL_SERVICE_ID_BLUETOOTH);
++struct hal_hdr enable_unknown_service_hdr = {
++	.service_id = HAL_SERVICE_ID_MAX + 1,
++	.opcode = HAL_OP_REGISTER_MODULE,
++	.len = 0,
++};
++
++struct hal_hdr enable_bt_service_hdr = {
++	.service_id = HAL_SERVICE_ID_BLUETOOTH,
++	.opcode = HAL_OP_ENABLE,
++	.len = 0,
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
  
-+	test_generic("Malformed data2 (undersized msg)",
-+				ipc_send_tc, setup, teardown,
-+				&register_bt_msg,
-+				sizeof(register_bt_msg) - 1,
-+				HAL_SERVICE_ID_BLUETOOTH);
-+
-+	test_generic("Malformed data3 (oversized msg)",
-+				ipc_send_tc, setup, teardown,
-+				&malformed_data3_msg,
-+				sizeof(malformed_data3_msg),
-+				HAL_SERVICE_ID_BLUETOOTH);
-+
- 	test_generic("Invalid service",
+ 	tester_init(&argc, &argv);
+ 
++	/* check general IPC errors */
+ 	test_generic("Too small data",
  				ipc_send_tc, setup, teardown,
- 				&enable_unknown_service_hdr,
+ 				&register_bt_msg, 1);
+ 
++	test_generic("Malformed data (wrong payload declared)",
++				ipc_send_tc, setup, teardown,
++				&register_bt_malformed_size_msg,
++				sizeof(register_bt_malformed_size_msg),
++				HAL_SERVICE_ID_BLUETOOTH);
++
++	test_generic("Invalid service",
++				ipc_send_tc, setup, teardown,
++				&enable_unknown_service_hdr,
++				sizeof(enable_unknown_service_hdr),
++				HAL_SERVICE_ID_BLUETOOTH);
++
++	test_generic("Enable unregistered service",
++				ipc_send_tc, setup, teardown,
++				&enable_bt_service_hdr,
++				sizeof(enable_bt_service_hdr));
++
+ 	return tester_run();
+ }
 -- 
 1.8.5.2
 
