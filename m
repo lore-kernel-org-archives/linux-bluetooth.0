@@ -1,53 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Jan 2014 20:32:38 +0000
-From: Ben Hutchings <ben@decadent.org.uk>
-To: Bing Zhao <bzhao@marvell.com>
-Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+From: Bing Zhao <bzhao@marvell.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+CC: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
 	Frank Huang <frankh@marvell.com>
-Message-ID: <20140120203238.GT18005@decadent.org.uk>
+Date: Mon, 20 Jan 2014 12:26:47 -0800
+Subject: RE: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
+Message-ID: <477F20668A386D41ADCC57781B1F70430F53691FC8@SC-VEXCH1.marvell.com>
 References: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
- <1390174797.3651.7.camel@deadeye.wl.decadent.org.uk>
- <477F20668A386D41ADCC57781B1F70430F53691E15@SC-VEXCH1.marvell.com>
+	 <1390174797.3651.7.camel@deadeye.wl.decadent.org.uk>
+	 <477F20668A386D41ADCC57781B1F70430F53691E15@SC-VEXCH1.marvell.com>
  <1390186665.3651.27.camel@deadeye.wl.decadent.org.uk>
- <477F20668A386D41ADCC57781B1F70430F53691FC8@SC-VEXCH1.marvell.com>
+In-Reply-To: <1390186665.3651.27.camel@deadeye.wl.decadent.org.uk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <477F20668A386D41ADCC57781B1F70430F53691FC8@SC-VEXCH1.marvell.com>
-Subject: Re: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
 Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jan 20, 2014 at 12:26:47PM -0800, Bing Zhao wrote:
-> Hi Ben,
-> 
-> > > > >  File: mrvl/usb8797_uapsta.bin
-> > > > > -Version: 14.69.11.p179
-> > > > > +Version: 14.68.29.p26
-> > > > [...]
-> > > >
-> > > > Why are these updates rolling the version number backward?  Did the
-> > > > later versions cause regressions?
-> > >
-> > > These images are newer firmware versions actually.
-> > >
-> > > The 2nd (69 or 68) and 3rd (11 or 29) numbers in the version string do
-> > > not necessarily mean the version increasing or decreasing. Only when
-> > > first 3 numbers are fixed, a smaller 4th number will mean that the
-> > > version is rolling backward. For examples,
-> > 
-> > So what do you they mean and why are they in the version number?
-> 
-> The first 3 numbers altogether identifies the firmware branch/features. The 4th number is the firmware revision.
-
-This is a uniquely confusing way of generating version numbers.  If
-only the current 4th part (what you call firmware revision) follows
-the usual version ordering, then I think that should be used as the
-(public) version number.
-
-Ben.
-
--- 
-Ben Hutchings
-Gates has joked that everything goes on and off unexepectedly in the house,
-which is run by a high-end PC network built on Windows NT. - Seattle Times
+SGkgQmVuLA0KDQo+ID4gPiA+ICBGaWxlOiBtcnZsL3VzYjg3OTdfdWFwc3RhLmJpbg0KPiA+ID4g
+PiAtVmVyc2lvbjogMTQuNjkuMTEucDE3OQ0KPiA+ID4gPiArVmVyc2lvbjogMTQuNjguMjkucDI2
+DQo+ID4gPiBbLi4uXQ0KPiA+ID4NCj4gPiA+IFdoeSBhcmUgdGhlc2UgdXBkYXRlcyByb2xsaW5n
+IHRoZSB2ZXJzaW9uIG51bWJlciBiYWNrd2FyZD8gIERpZCB0aGUNCj4gPiA+IGxhdGVyIHZlcnNp
+b25zIGNhdXNlIHJlZ3Jlc3Npb25zPw0KPiA+DQo+ID4gVGhlc2UgaW1hZ2VzIGFyZSBuZXdlciBm
+aXJtd2FyZSB2ZXJzaW9ucyBhY3R1YWxseS4NCj4gPg0KPiA+IFRoZSAybmQgKDY5IG9yIDY4KSBh
+bmQgM3JkICgxMSBvciAyOSkgbnVtYmVycyBpbiB0aGUgdmVyc2lvbiBzdHJpbmcgZG8NCj4gPiBu
+b3QgbmVjZXNzYXJpbHkgbWVhbiB0aGUgdmVyc2lvbiBpbmNyZWFzaW5nIG9yIGRlY3JlYXNpbmcu
+IE9ubHkgd2hlbg0KPiA+IGZpcnN0IDMgbnVtYmVycyBhcmUgZml4ZWQsIGEgc21hbGxlciA0dGgg
+bnVtYmVyIHdpbGwgbWVhbiB0aGF0IHRoZQ0KPiA+IHZlcnNpb24gaXMgcm9sbGluZyBiYWNrd2Fy
+ZC4gRm9yIGV4YW1wbGVzLA0KPiANCj4gU28gd2hhdCBkbyB5b3UgdGhleSBtZWFuIGFuZCB3aHkg
+YXJlIHRoZXkgaW4gdGhlIHZlcnNpb24gbnVtYmVyPw0KDQpUaGUgZmlyc3QgMyBudW1iZXJzIGFs
+dG9nZXRoZXIgaWRlbnRpZmllcyB0aGUgZmlybXdhcmUgYnJhbmNoL2ZlYXR1cmVzLiBUaGUgNHRo
+IG51bWJlciBpcyB0aGUgZmlybXdhcmUgcmV2aXNpb24uDQoNClRoYW5rcywNCkJpbmcNCg0K
