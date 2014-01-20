@@ -1,26 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 20 Jan 2014 12:20:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] tester: Remove test timeout for setup failure
-Message-ID: <20140120102042.GA9704@x220.p-661hnu-f1>
-References: <1390212008-5376-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pan: Initialize GError with NULL
+Date: Mon, 20 Jan 2014 11:00:08 +0100
+Message-Id: <1390212008-5376-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1390212008-5376-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1390212008-5376-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+This patch fixes the following issue:
 
-On Mon, Jan 20, 2014, Jakub Tyszkowski wrote:
-> If setup fails, timeout function is not removed and still can be called,
-> causing random subsequent case failure.
-> ---
->  src/shared/tester.c | 5 +++++
->  1 file changed, 5 insertions(+)
+bluetoothd[10552]: android/pan.c:register_nap_server()
+bluetoothd[10552]: android/pan.c:nap_create_bridge() bnep
+(bluetoothd:10552): GLib-WARNING **: GError set over the top of a previous GError or uninitialized memory.
+This indicates a bug in someone's code. You must ensure an error is NULL before it's set.
+The overwriting error message was: l2cap_bind: Address already in use (98)
+bluetoothd[10552]: android/pan.c:destroy_nap_device()
+---
+ android/pan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Both patches have been applied. Thanks.
+diff --git a/android/pan.c b/android/pan.c
+index dfd7762..3544d74 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -542,7 +542,7 @@ static void destroy_nap_device(void)
+ 
+ static int register_nap_server(void)
+ {
+-	GError *gerr;
++	GError *gerr = NULL;
+ 	int err;
+ 
+ 	DBG("");
+-- 
+1.8.5.2
 
-Johan
