@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 7/9] android/hal-audio: Return proper buffer size to AudioFlinger
-Date: Mon, 20 Jan 2014 15:59:01 +0100
-Message-ID: <1390229943-29609-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 4/9] android/hal-audio: Initialize SBC encoder
+Date: Mon, 20 Jan 2014 15:58:58 +0100
+Message-ID: <1390229943-29609-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,66 +13,71 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-audio.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ android/hal-audio.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index adceab8..498ca48 100644
+index f53dba0..8e932ef 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -135,6 +135,7 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
- static int sbc_cleanup(void *codec_data);
- static int sbc_get_config(void *codec_data,
- 					struct audio_input_config *config);
-+static size_t sbc_get_buffer_size(void *codec_data);
- static void sbc_resume(void *codec_data);
+@@ -32,6 +32,7 @@
+ #include "hal-log.h"
+ #include "hal-msg.h"
+ #include "../profiles/audio/a2dp-codecs.h"
++#include <sbc/sbc.h>
  
- struct audio_codec {
-@@ -147,6 +148,7 @@ struct audio_codec {
- 	int (*cleanup) (void *codec_data);
- 	int (*get_config) (void *codec_data,
- 					struct audio_input_config *config);
-+	size_t (*get_buffer_size) (void *codec_data);
- 	void (*resume) (void *codec_data);
- 	ssize_t (*write_data) (void *codec_data, const void *buffer,
- 				size_t bytes);
-@@ -161,6 +163,7 @@ static const struct audio_codec audio_codecs[] = {
- 		.init = sbc_codec_init,
- 		.cleanup = sbc_cleanup,
- 		.get_config = sbc_get_config,
-+		.get_buffer_size = sbc_get_buffer_size,
- 		.resume = sbc_resume,
- 	}
+ static const uint8_t a2dp_src_uuid[] = {
+ 		0x00, 0x00, 0x11, 0x0a, 0x00, 0x00, 0x10, 0x00,
+@@ -53,6 +54,8 @@ struct audio_input_config {
+ 
+ struct sbc_data {
+ 	a2dp_sbc_t sbc;
++
++	sbc_t enc;
  };
-@@ -357,6 +360,15 @@ static int sbc_get_config(void *codec_data,
- 	return AUDIO_STATUS_SUCCESS;
+ 
+ static int sbc_get_presets(struct audio_preset *preset, size_t *len);
+@@ -184,6 +187,19 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
+ 	return i;
  }
  
-+static size_t sbc_get_buffer_size(void *codec_data)
++static void sbc_init_encoder(struct sbc_data *sbc_data)
 +{
-+	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++	a2dp_sbc_t *in = &sbc_data->sbc;
++	sbc_t *out = &sbc_data->enc;
 +
 +	DBG("");
 +
-+	return sbc_data->in_buf_size;
++	sbc_init_a2dp(out, 0L, in);
++
++	out->endian = SBC_LE;
++	out->bitpool = in->max_bitpool;
 +}
 +
- static void sbc_resume(void *codec_data)
+ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
  {
- 	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
-@@ -730,8 +742,11 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+ 	struct sbc_data *sbc_data;
+@@ -199,6 +215,8 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
  
- static size_t out_get_buffer_size(const struct audio_stream *stream)
+ 	memcpy(&sbc_data->sbc, preset->data, preset->len);
+ 
++	sbc_init_encoder(sbc_data);
++
+ 	*codec_data = sbc_data;
+ 
+ 	return AUDIO_STATUS_SUCCESS;
+@@ -206,8 +224,11 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
+ 
+ static int sbc_cleanup(void *codec_data)
  {
-+	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
++	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
 +
  	DBG("");
--	return 20 * 512;
-+
-+	return out->ep->codec->get_buffer_size(out->ep->codec_data);
- }
  
- static uint32_t out_get_channels(const struct audio_stream *stream)
++	sbc_finish(&sbc_data->enc);
+ 	free(codec_data);
+ 
+ 	return AUDIO_STATUS_SUCCESS;
 -- 
 1.8.5.2
 
