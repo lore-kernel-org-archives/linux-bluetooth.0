@@ -1,125 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v1 08/18] gatt: Add server unix socket
-Date: Mon, 20 Jan 2014 15:04:53 -0300
-Message-Id: <1390241103-808-9-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v1 03/18] gatt: Add registering external service
+Date: Mon, 20 Jan 2014 15:04:48 -0300
+Message-Id: <1390241103-808-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a server unix socket to handle local ATT traffic. This
-is a development purpose feature used to allow local testing without
-breaking the current attribute server.
----
- src/gatt.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/src/gatt.c b/src/gatt.c
-index ee045b1..4806205 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -25,6 +25,11 @@
- #include <config.h>
+This patch allows external applications register a given service on
+Bluez. Applications must provide an object path and a dictionary of
+options. Options dictionary will be used later to provide additional
+service information.
+---
+ src/gatt-dbus.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 88 insertions(+), 1 deletion(-)
+
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 90a321b..fc41b78 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -26,22 +26,109 @@
  #endif
  
-+#include <unistd.h>
+ #include <stdint.h>
 +#include <errno.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+
+ 
  #include <glib.h>
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
  
- #include "adapter.h"
-@@ -50,6 +55,7 @@ struct btd_attribute {
++#include "adapter.h"
++#include "device.h"
++#include "lib/uuid.h"
+ #include "dbus-common.h"
+ #include "log.h"
  
- static GList *local_attribute_db;
- static uint16_t next_handle = 0x0001;
-+static guint unix_watch;
++#include "error.h"
+ #include "gatt-dbus.h"
  
- static int local_database_add(uint16_t handle, struct btd_attribute *attr)
- {
-@@ -94,11 +100,71 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	return attr;
- }
+ #define SERVICE_MGR_IFACE			"org.bluez.ServiceManager1"
  
-+static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
-+							gpointer user_data)
++struct external_app {
++	char *owner;
++	char *path;
++	GDBusClient *client;
++	unsigned int watch;
++};
++
++static GSList *external_apps;
++
++static int external_app_path_cmp(gconstpointer a, gconstpointer b)
 +{
-+	struct sockaddr_un uaddr;
-+	socklen_t len = sizeof(uaddr);
-+	GIOChannel *nio;
-+	int err, nsk, sk;
++	const struct external_app *eapp = a;
++	const char *path = b;
 +
-+	sk = g_io_channel_unix_get_fd(io);
-+
-+	nsk = accept(sk, (struct sockaddr *) &uaddr, &len);
-+	if (nsk < 0) {
-+		err = errno;
-+		error("ATT UNIX socket accept: %s(%d)", strerror(err), err);
-+		return TRUE;
-+	}
-+
-+	nio = g_io_channel_unix_new(nsk);
-+	g_io_channel_set_close_on_unref(nio, TRUE);
-+	DBG("ATT UNIX socket: %p new client", nio);
-+	g_io_channel_unref(nio);
-+
-+	return TRUE;
++	return g_strcmp0(eapp->path, path);
 +}
 +
- void gatt_init(void)
++static void external_app_watch_destroy(gpointer user_data)
++{
++	struct external_app *eapp = user_data;
++
++	/* TODO: Remove from the database */
++
++	external_apps = g_slist_remove(external_apps, eapp);
++
++	g_dbus_client_unref(eapp->client);
++
++	g_free(eapp->owner);
++	g_free(eapp->path);
++	g_free(eapp);
++}
++
++static struct external_app *new_external_app(DBusConnection *conn,
++					const char *sender, const char *path)
++{
++	struct external_app *eapp;
++	GDBusClient *client;
++
++	client = g_dbus_client_new(conn, sender, "/");
++	if (client == NULL)
++		return NULL;
++
++	eapp = g_new0(struct external_app, 1);
++
++	eapp->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
++			sender, NULL, eapp, external_app_watch_destroy);
++	if (eapp->watch == 0) {
++		g_dbus_client_unref(client);
++		g_free(eapp);
++		return NULL;
++	}
++
++	eapp->owner = g_strdup(sender);
++	eapp->client = client;
++	eapp->path = g_strdup(path);
++
++	return eapp;
++}
++
+ static DBusMessage *register_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
  {
-+	struct sockaddr_un uaddr  = {
-+		.sun_family     = AF_UNIX,
-+		.sun_path       = "\0/bluetooth/unix_att",
-+	};
-+	GIOChannel *io;
-+	int sk, err;
+-	return dbus_message_new_method_return(msg);
++	struct external_app *eapp;
++	DBusMessageIter iter;
++	const char *path;
 +
- 	DBG("Starting GATT server");
- 
- 	gatt_dbus_manager_register();
++	if (!dbus_message_iter_init(msg, &iter))
++		return btd_error_invalid_args(msg);
 +
-+	sk = socket(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC , 0);
-+	if (sk < 0) {
-+		err = errno;
-+		error("ATT UNIX socket: %s(%d)", strerror(err), err);
-+		return;
-+	}
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
 +
-+	if (bind(sk, (struct sockaddr *) &uaddr, sizeof(uaddr)) < 0) {
-+		err = errno;
-+		error("binding ATT UNIX socket: %s(%d)", strerror(err), err);
-+		close(sk);
-+		return;
-+	}
++	dbus_message_iter_get_basic(&iter, &path);
 +
-+	if (listen(sk, 5) < 0) {
-+		err = errno;
-+		error("listen ATT UNIX socket: %s(%d)", strerror(err), err);
-+		close(sk);
-+		return;
-+	}
++	if (g_slist_find_custom(external_apps, path, external_app_path_cmp))
++		return btd_error_already_exists(msg);
 +
-+	io = g_io_channel_unix_new(sk);
-+	g_io_channel_set_close_on_unref(io, TRUE);
-+	unix_watch = g_io_add_watch(io,
-+				G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-+				unix_accept_cb, NULL);
-+	g_io_channel_unref(io);
++	eapp = new_external_app(conn, dbus_message_get_sender(msg), path);
++	if (eapp == NULL)
++		return btd_error_failed(msg, "Not enough resources");
++
++	external_apps = g_slist_prepend(external_apps, eapp);
++
++	DBG("New app %p: %s", eapp, path);
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
  }
  
- void gatt_cleanup(void)
-@@ -106,4 +172,5 @@ void gatt_cleanup(void)
- 	DBG("Stopping GATT server");
- 
- 	gatt_dbus_manager_unregister();
-+	g_source_remove(unix_watch);
- }
+ static DBusMessage *unregister_service(DBusConnection *conn,
 -- 
 1.8.3.1
 
