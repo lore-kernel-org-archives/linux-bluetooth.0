@@ -1,183 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v1 02/18] gatt: Register Manager D-Bus Interface
-Date: Mon, 20 Jan 2014 15:04:47 -0300
-Message-Id: <1390241103-808-3-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v1 16/18] gatttool: Add unix socket connect
+Date: Mon, 20 Jan 2014 15:05:01 -0300
+Message-Id: <1390241103-808-17-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
-
-This patch registers the Service Manager D-Bus Interface. This
-interface implements the methods to allow external application register
-and unregister GATT Services.
+This patch adds the initial support for GATT procedures over unix
+socket transport on command line mode (one-shot command). Temporary
+solution to allow local GATT procedures testing.
 ---
- Makefile.am     |  1 +
- src/gatt-dbus.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt-dbus.h | 25 +++++++++++++++++++
- src/gatt.c      |  9 +++++++
- 4 files changed, 110 insertions(+)
- create mode 100644 src/gatt-dbus.c
- create mode 100644 src/gatt-dbus.h
+ attrib/gatttool.c | 27 ++++++++++++++++++++-------
+ attrib/gatttool.h |  1 +
+ attrib/utils.c    | 54 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 75 insertions(+), 7 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 1444f0e..c395874 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/adapter.h src/adapter.c \
- 			src/profile.h src/profile.c \
- 			src/service.h src/service.c \
-+			src/gatt-dbus.h src/gatt-dbus.c \
- 			src/gatt.h src/gatt.c \
- 			src/device.h src/device.c src/attio.h \
- 			src/dbus-common.c src/dbus-common.h \
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-new file mode 100644
-index 0000000..90a321b
---- /dev/null
-+++ b/src/gatt-dbus.c
-@@ -0,0 +1,75 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index ebc8123..d701f7b 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -29,7 +29,6 @@
+ #include <errno.h>
+ #include <glib.h>
+ #include <stdlib.h>
+-#include <unistd.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+@@ -53,6 +52,7 @@ static int opt_end = 0xffff;
+ static int opt_handle = -1;
+ static int opt_mtu = 0;
+ static int opt_psm = 0;
++static gboolean opt_local = FALSE;
+ static gboolean opt_primary = FALSE;
+ static gboolean opt_characteristics = FALSE;
+ static gboolean opt_char_read = FALSE;
+@@ -511,6 +511,8 @@ static GOptionEntry options[] = {
+ 		"Specify local adapter interface", "hciX" },
+ 	{ "device", 'b', 0, G_OPTION_ARG_STRING, &opt_dst,
+ 		"Specify remote Bluetooth address", "MAC" },
++	{ "local", 'L', 0, G_OPTION_ARG_NONE, &opt_local,
++		"Use unix socket transport (local communication)", NULL },
+ 	{ "addr-type", 't', 0, G_OPTION_ARG_STRING, &opt_dst_type,
+ 		"Set LE address type. Default: public", "[public | random]"},
+ 	{ "mtu", 'm', 0, G_OPTION_ARG_INT, &opt_mtu,
+@@ -563,6 +565,11 @@ int main(int argc, char *argv[])
+ 		g_clear_error(&gerr);
+ 	}
+ 
++	if (opt_local) {
++		opt_src = NULL;
++		opt_dst = NULL;
++	}
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
+ 	if (opt_interactive) {
+ 		interactive(opt_src, opt_dst, opt_dst_type, opt_psm);
+ 		goto done;
+@@ -588,14 +595,20 @@ int main(int argc, char *argv[])
+ 		goto done;
+ 	}
+ 
+-	if (opt_dst == NULL) {
+-		g_print("Remote Bluetooth address required\n");
+-		got_error = TRUE;
+-		goto done;
++	if (opt_local)
++		chan = unix_connect(connect_cb, &gerr);
++	else {
++		if (opt_dst == NULL) {
++			g_print("Remote Bluetooth address required\n");
++			got_error = TRUE;
++			goto done;
++		}
 +
-+#include <stdint.h>
-+
-+#include <glib.h>
-+#include <dbus/dbus.h>
-+#include <gdbus/gdbus.h>
-+
-+#include "dbus-common.h"
-+#include "log.h"
-+
-+#include "gatt-dbus.h"
-+
-+#define SERVICE_MGR_IFACE			"org.bluez.ServiceManager1"
-+
-+static DBusMessage *register_service(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static DBusMessage *unregister_service(DBusConnection *conn,
-+					DBusMessage *msg, void *user_data)
-+{
-+	return dbus_message_new_method_return(msg);
-+}
-+
-+static const GDBusMethodTable methods[] = {
-+	{ GDBUS_EXPERIMENTAL_METHOD("RegisterService",
-+				GDBUS_ARGS({ "service", "o"},
-+						{ "options", "a{sv}"}),
-+				NULL, register_service) },
-+	{ GDBUS_EXPERIMENTAL_METHOD("UnregisterService",
-+				GDBUS_ARGS({"service", "o"}),
-+				NULL, unregister_service) },
-+	{ }
-+};
-+
-+gboolean gatt_dbus_manager_register(void)
-+{
-+	return g_dbus_register_interface(btd_get_dbus_connection(),
-+					"/org/bluez", SERVICE_MGR_IFACE,
-+					methods, NULL, NULL, NULL, NULL);
-+}
-+
-+void gatt_dbus_manager_unregister(void)
-+{
-+	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
-+							SERVICE_MGR_IFACE);
-+}
-diff --git a/src/gatt-dbus.h b/src/gatt-dbus.h
-new file mode 100644
-index 0000000..310cfa9
---- /dev/null
-+++ b/src/gatt-dbus.h
-@@ -0,0 +1,25 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+gboolean gatt_dbus_manager_register(void);
-+void gatt_dbus_manager_unregister(void);
-diff --git a/src/gatt.c b/src/gatt.c
-index 06619f0..e8b691a 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -25,14 +25,23 @@
- #include <config.h>
++		chan = gatt_connect(opt_src, opt_dst, opt_dst_type,
++					opt_sec_level, opt_psm, opt_mtu,
++					connect_cb, &gerr);
+ 	}
+ 
+-	chan = gatt_connect(opt_src, opt_dst, opt_dst_type, opt_sec_level,
+-					opt_psm, opt_mtu, connect_cb, &gerr);
+ 	if (chan == NULL) {
+ 		g_printerr("%s\n", gerr->message);
+ 		g_clear_error(&gerr);
+diff --git a/attrib/gatttool.h b/attrib/gatttool.h
+index 8f0913c..be8e236 100644
+--- a/attrib/gatttool.h
++++ b/attrib/gatttool.h
+@@ -27,4 +27,5 @@ GIOChannel *gatt_connect(const char *src, const char *dst,
+ 			const char *dst_type, const char *sec_level,
+ 			int psm, int mtu, BtIOConnect connect_cb,
+ 			GError **gerr);
++GIOChannel *unix_connect(BtIOConnect connect_cb, GError **gerr);
+ size_t gatt_attr_data_from_string(const char *str, uint8_t **data);
+diff --git a/attrib/utils.c b/attrib/utils.c
+index 77bab27..de7b00a 100644
+--- a/attrib/utils.c
++++ b/attrib/utils.c
+@@ -25,7 +25,12 @@
+ #include "config.h"
  #endif
  
-+#include <glib.h>
++#include <errno.h>
+ #include <stdlib.h>
++#include <unistd.h>
++#include <sys/socket.h>
++#include <sys/un.h>
 +
-+#include "log.h"
-+
-+#include "gatt-dbus.h"
- #include "gatt.h"
+ #include <glib.h>
  
- void gatt_init(void)
- {
-+	DBG("Starting GATT server");
- 
-+	gatt_dbus_manager_register();
+ #include <bluetooth/bluetooth.h>
+@@ -101,6 +106,55 @@ GIOChannel *gatt_connect(const char *src, const char *dst,
+ 	return chan;
  }
  
- void gatt_cleanup(void)
++static gboolean unix_connect_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	BtIOConnect connect_cb = user_data;
++	GError *gerr;
++
++	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
++		gerr = g_error_new_literal(G_IO_CHANNEL_ERROR,
++						G_IO_CHANNEL_ERROR_FAILED,
++						"connection attempt failed");
++		connect_cb(io, gerr, user_data);
++		g_clear_error(&gerr);
++	} else {
++		connect_cb(io, NULL, user_data);
++	}
++
++	return FALSE;
++}
++
++GIOChannel *unix_connect(BtIOConnect connect_cb, GError **gerr)
++{
++	GIOChannel *io;
++	struct sockaddr_un uaddr  = {
++		.sun_family	= AF_UNIX,
++		.sun_path	= "\0/bluetooth/unix_att",
++	};
++	int sk;
++
++	sk = socket(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC , 0);
++	if (sk < 0) {
++		g_set_error_literal(gerr, G_IO_CHANNEL_ERROR,
++				G_IO_CHANNEL_ERROR_FAILED, strerror(errno));
++		return NULL;
++	}
++
++	if (connect(sk, (struct sockaddr *) &uaddr, sizeof(uaddr)) < 0) {
++		g_set_error_literal(gerr, G_IO_CHANNEL_ERROR,
++				G_IO_CHANNEL_ERROR_FAILED, strerror(errno));
++		close(sk);
++		return NULL;
++	}
++
++	io = g_io_channel_unix_new(sk);
++	g_io_add_watch(io, G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL,
++						unix_connect_cb, connect_cb);
++
++	return io;
++}
++
+ size_t gatt_attr_data_from_string(const char *str, uint8_t **data)
  {
-+	DBG("Stopping GATT server");
- 
-+	gatt_dbus_manager_unregister();
- }
+ 	char tmp[3];
 -- 
 1.8.3.1
 
