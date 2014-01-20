@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 8/9] android/hal-audio: Read fd from Output Stream response
-Date: Mon, 20 Jan 2014 15:59:02 +0100
-Message-ID: <1390229943-29609-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 7/9] android/hal-audio: Return proper buffer size to AudioFlinger
+Date: Mon, 20 Jan 2014 15:59:01 +0100
+Message-ID: <1390229943-29609-8-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1390229943-29609-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,69 +13,66 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-audio.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ android/hal-audio.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 498ca48..f99476d 100644
+index adceab8..498ca48 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -577,7 +577,7 @@ static int ipc_close_cmd(uint8_t endpoint_id)
- 	return result;
+@@ -135,6 +135,7 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+ static int sbc_cleanup(void *codec_data);
+ static int sbc_get_config(void *codec_data,
+ 					struct audio_input_config *config);
++static size_t sbc_get_buffer_size(void *codec_data);
+ static void sbc_resume(void *codec_data);
+ 
+ struct audio_codec {
+@@ -147,6 +148,7 @@ struct audio_codec {
+ 	int (*cleanup) (void *codec_data);
+ 	int (*get_config) (void *codec_data,
+ 					struct audio_input_config *config);
++	size_t (*get_buffer_size) (void *codec_data);
+ 	void (*resume) (void *codec_data);
+ 	ssize_t (*write_data) (void *codec_data, const void *buffer,
+ 				size_t bytes);
+@@ -161,6 +163,7 @@ static const struct audio_codec audio_codecs[] = {
+ 		.init = sbc_codec_init,
+ 		.cleanup = sbc_cleanup,
+ 		.get_config = sbc_get_config,
++		.get_buffer_size = sbc_get_buffer_size,
+ 		.resume = sbc_resume,
+ 	}
+ };
+@@ -357,6 +360,15 @@ static int sbc_get_config(void *codec_data,
+ 	return AUDIO_STATUS_SUCCESS;
  }
  
--static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu,
-+static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu, int *fd,
- 					struct audio_preset **caps)
++static size_t sbc_get_buffer_size(void *codec_data)
++{
++	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++
++	DBG("");
++
++	return sbc_data->in_buf_size;
++}
++
+ static void sbc_resume(void *codec_data)
  {
- 	char buf[BLUEZ_AUDIO_MTU];
-@@ -595,7 +595,7 @@ static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu,
- 	cmd.id = endpoint_id;
+ 	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
+@@ -730,8 +742,11 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
  
- 	result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
--				sizeof(cmd), &cmd, &rsp_len, rsp, NULL);
-+				sizeof(cmd), &cmd, &rsp_len, rsp, fd);
- 
- 	if (result == AUDIO_STATUS_SUCCESS) {
- 		size_t buf_len = sizeof(struct audio_preset) +
-@@ -992,6 +992,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	struct audio_preset *preset;
- 	const struct audio_codec *codec;
- 	uint16_t mtu;
-+	int fd;
- 
- 	out = calloc(1, sizeof(struct a2dp_stream_out));
- 	if (!out)
-@@ -1019,13 +1020,15 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	/* TODO: for now we always use endpoint 0 */
- 	out->ep = &audio_endpoints[0];
- 
--	if (ipc_open_stream_cmd(out->ep->id, &mtu, &preset) !=
-+	if (ipc_open_stream_cmd(out->ep->id, &mtu, &fd, &preset) !=
- 			AUDIO_STATUS_SUCCESS)
- 		goto fail;
- 
--	if (!preset)
-+	if (!preset || fd < 0)
- 		goto fail;
- 
-+	out->ep->fd = fd;
+ static size_t out_get_buffer_size(const struct audio_stream *stream)
+ {
++	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
 +
- 	codec = out->ep->codec;
- 
- 	codec->init(preset, mtu, &out->ep->codec_data);
-@@ -1059,6 +1062,11 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
- 
- 	ipc_close_stream_cmd(ep->id);
- 
-+	if (ep->fd >= 0) {
-+		close(ep->fd);
-+		ep->fd = -1;
-+	}
+ 	DBG("");
+-	return 20 * 512;
 +
- 	ep->codec->cleanup(ep->codec_data);
- 	ep->codec_data = NULL;
++	return out->ep->codec->get_buffer_size(out->ep->codec_data);
+ }
  
+ static uint32_t out_get_channels(const struct audio_stream *stream)
 -- 
 1.8.5.2
 
