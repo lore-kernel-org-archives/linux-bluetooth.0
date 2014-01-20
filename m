@@ -1,40 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianx.chlad@intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH 1/2] tools/bluetooth-player: dispaly searchable value
-Date: Mon, 20 Jan 2014 15:04:37 +0200
-Message-Id: <1390223078-29096-1-git-send-email-sebastianx.chlad@intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/pts: Add PTS test results document for A2DP
+Date: Mon, 20 Jan 2014 13:32:33 +0100
+Message-ID: <1449630.5x2WHnIIVE@uw000953>
+In-Reply-To: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1390208087-22838-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/bluetooth-player.c | 1 +
- 1 file changed, 1 insertion(+)
+Hi Jakub,
 
-diff --git a/tools/bluetooth-player.c b/tools/bluetooth-player.c
-index 1c0348e..32d295c 100644
---- a/tools/bluetooth-player.c
-+++ b/tools/bluetooth-player.c
-@@ -654,6 +654,7 @@ static void cmd_show(int argc, char *argv[])
- 	rl_printf("Player %s\n", g_dbus_proxy_get_path(proxy));
- 
- 	print_property(proxy, "Name");
-+	print_property(proxy, "Searchable");
- 	print_property(proxy, "Repeat");
- 	print_property(proxy, "Equalizer");
- 	print_property(proxy, "Shuffle");
+On Monday 20 of January 2014 09:54:45 Jakub Tyszkowski wrote:
+> This will allow for better tracking of current state of implementation.
+> ---
+>  android/Makefile.am  |  1 +
+>  android/pts-a2dp.txt | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 58 insertions(+)
+>  create mode 100644 android/pts-a2dp.txt
+> 
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index f24b754..d4508a4 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -167,4 +167,5 @@ EXTRA_DIST += android/Android.mk android/README \
+>  				android/pts-hid.txt \
+>  				android/pts-opp.txt \
+>  				android/pts-map.txt \
+> +				android/pts-a2dp.txt \
+>  				android/pts-pbap.txt
+> diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+> new file mode 100644
+> index 0000000..a269ec1
+> --- /dev/null
+> +++ b/android/pts-a2dp.txt
+> @@ -0,0 +1,57 @@
+> +PTS test results for A2DP
+> +
+> +PTS version: 5.0
+> +Tested: --not yet tested--
+> +
+> +Results:
+> +PASS	test passed
+> +FAIL	test failed
+> +INC	test is inconclusive
+> +N/A	test is disabled due to PICS setup
+> +
+> +		Source (SRC)
+> +-------------------------------------------------------------------------------
+> +Test Name		Result	Notes
+> +-------------------------------------------------------------------------------
+> +TC_SRC_CC_BV_09_I	INC
+> +TC_SRC_CC_BV_10_I	N/A
+> +TC_SRC_REL_BV_01_I	INC
+> +TC_SRC_REL_BV_02_I	INC
+> +TC_SRC_SET_BV_01_I	INC
+> +TC_SRC_SET_BV_02_I	INC
+> +TC_SRC_SET_BV_03_I	INC
+> +TC_SRC_SET_BV_04_I	INC
+> +TC_SRC_SET_BV_05_I	INC
+> +TC_SRC_SET_BV_06_I	INC
+> +TC_SRC_SUS_BV_01_I	INC
+> +TC_SRC_SUS_BV_02_I	INC
+> +TC_SRC_SDP_BV_01_I	INC
+> +TC_SRC_AS_BV_01_I	INC
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Sink (SNK)
+> +-------------------------------------------------------------------------------
+> +Test Name		Result	Notes
+> +-------------------------------------------------------------------------------
+> +TC_SNK_CC_BV_01_I	N/A
+> +TC_SNK_CC_BV_02_I	N/A
+> +TC_SNK_CC_BV_03_I	N/A
+> +TC_SNK_CC_BV_04_I	N/A
+> +TC_SNK_CC_BV_05_I	N/A
+> +TC_SNK_CC_BV_06_I	N/A
+> +TC_SNK_CC_BV_07_I	N/A
+> +TC_SNK_CC_BV_08_I	N/A
+> +TC_SNK_REL_BV_01_I	N/A
+> +TC_SNK_REL_BV_02_I	N/A
+> +TC_SNK_SET_BV_01_I	N/A
+> +TC_SNK_SET_BV_02_I	N/A
+> +TC_SNK_SET_BV_03_I	N/A
+> +TC_SNK_SET_BV_04_I	N/A
+> +TC_SNK_SET_BV_05_I	N/A
+> +TC_SNK_SET_BV_06_I	N/A
+> +TC_SNK_SUS_BV_01_I	N/A
+> +TC_SNK_SUS_BV_02_I	N/A
+> +TC_SNK_SDP_BV_02_I	N/A
+> +TC_SNK_AS_BV_01_I	N/A
+> +-------------------------------------------------------------------------------
+> 
+
+All 3 patches applied, thanks.
+
 -- 
-1.8.3.2
-
----------------------------------------------------------------------
-Intel Finland Oy
-Registered Address: PL 281, 00181 Helsinki 
-Business Identity Code: 0357606 - 4 
-Domiciled in Helsinki 
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
-
+Best regards, 
+Szymon Janc
