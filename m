@@ -1,75 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52DD8D39.3010205@hschmitt.de>
-Date: Mon, 20 Jan 2014 21:55:21 +0100
-From: Harald Schmitt <linux@hschmitt.de>
+Date: Mon, 20 Jan 2014 20:32:38 +0000
+From: Ben Hutchings <ben@decadent.org.uk>
+To: Bing Zhao <bzhao@marvell.com>
+Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Frank Huang <frankh@marvell.com>
+Message-ID: <20140120203238.GT18005@decadent.org.uk>
+References: <1389325691-21371-1-git-send-email-bzhao@marvell.com>
+ <1390174797.3651.7.camel@deadeye.wl.decadent.org.uk>
+ <477F20668A386D41ADCC57781B1F70430F53691E15@SC-VEXCH1.marvell.com>
+ <1390186665.3651.27.camel@deadeye.wl.decadent.org.uk>
+ <477F20668A386D41ADCC57781B1F70430F53691FC8@SC-VEXCH1.marvell.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] obexd/irmc: Fix folder for LUID requests
-References: <1390239558-6384-1-git-send-email-linux@hschmitt.de> <CABBYNZLDtvMzbZN8Ju+VpAnFwQc2vVnqkgAeyM73XC8af3XeGw@mail.gmail.com>
-In-Reply-To: <CABBYNZLDtvMzbZN8Ju+VpAnFwQc2vVnqkgAeyM73XC8af3XeGw@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <477F20668A386D41ADCC57781B1F70430F53691FC8@SC-VEXCH1.marvell.com>
+Subject: Re: linux-firmware: pull-request Marvell mwifiex-firmware 2014-01-09
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+On Mon, Jan 20, 2014 at 12:26:47PM -0800, Bing Zhao wrote:
+> Hi Ben,
+> 
+> > > > >  File: mrvl/usb8797_uapsta.bin
+> > > > > -Version: 14.69.11.p179
+> > > > > +Version: 14.68.29.p26
+> > > > [...]
+> > > >
+> > > > Why are these updates rolling the version number backward?  Did the
+> > > > later versions cause regressions?
+> > >
+> > > These images are newer firmware versions actually.
+> > >
+> > > The 2nd (69 or 68) and 3rd (11 or 29) numbers in the version string do
+> > > not necessarily mean the version increasing or decreasing. Only when
+> > > first 3 numbers are fixed, a smaller 4th number will mean that the
+> > > version is rolling backward. For examples,
+> > 
+> > So what do you they mean and why are they in the version number?
+> 
+> The first 3 numbers altogether identifies the firmware branch/features. The 4th number is the firmware revision.
 
-Am 20.01.2014 20:29, schrieb Luiz Augusto von Dentz:
-> Hi Harald,
-> 
-> On Mon, Jan 20, 2014 at 7:39 PM, Harald Schmitt <linux@hschmitt.de> wrote:
->> The old macro PB_LUID_FOLDER had the folder luid on the second level:
->> /telecom/luid. But the luid folder occurs per IrMC spec on level three e.g.
->> /telecom/pb/luid. On the second level the object store e.g. pb is specified.
->> This bug was introduced with commit 62ebf8d0f345e7722334d852cf7a010b202647e7.
->> ---
->>  obexd/plugins/irmc.c      | 6 +++---
->>  obexd/plugins/phonebook.h | 2 +-
->>  2 files changed, 4 insertions(+), 4 deletions(-)
->>
->> diff --git a/obexd/plugins/irmc.c b/obexd/plugins/irmc.c
->> index d343977..d0e98b4 100644
->> --- a/obexd/plugins/irmc.c
->> +++ b/obexd/plugins/irmc.c
->> @@ -326,7 +326,7 @@ static int irmc_open_nt(struct irmc_session *irmc)
->>         return 0;
->>  }
->>
->> -static int irmc_open_luid(struct irmc_session *irmc)
->> +static int irmc_open_pb_luid(struct irmc_session *irmc)
->>  {
->>         if (irmc->buffer == NULL)
->>                 irmc->buffer = g_string_new("");
->> @@ -381,8 +381,8 @@ static void *irmc_open(const char *name, int oflag, mode_t mode, void *context,
->>                 ret = irmc_open_cal(irmc);
->>         else if (g_str_has_prefix(path, PB_NOTES_FOLDER))
->>                 ret = irmc_open_nt(irmc);
->> -       else if (g_str_has_prefix(path, PB_LUID_FOLDER))
->> -               ret = irmc_open_luid(irmc);
->> +       else if (g_str_has_prefix(path, PB_CONTACTS_LUID_FOLDER))
->> +               ret = irmc_open_pb_luid(irmc);
->>         else
->>                 ret = -EBADR;
->>
->> diff --git a/obexd/plugins/phonebook.h b/obexd/plugins/phonebook.h
->> index 441cff2..015c9a3 100644
->> --- a/obexd/plugins/phonebook.h
->> +++ b/obexd/plugins/phonebook.h
->> @@ -37,7 +37,7 @@
->>  #define PB_CALLS_INCOMING_FOLDER "/telecom/ich"
->>  #define PB_CALLS_MISSED_FOLDER "/telecom/mch"
->>  #define PB_CALLS_OUTGOING_FOLDER "/telecom/och"
->> -#define PB_LUID_FOLDER "/telecom/luid"
->> +#define PB_CONTACTS_LUID_FOLDER "/telecom/pb/luid"
->>
->>  #define PB_CONTACTS "/telecom/pb.vcf"
->>  #define PB_CALLS_COMBINED "/telecom/cch.vcf"
->> --
->> 1.8.3.2
-> 
-> I went ahead and pushed this one, but I preserve much of the define
-> and function names used before since I did not see any reason to
-> change those.
-> 
-That's fine with me. I just thought it would be more descriptive.
+This is a uniquely confusing way of generating version numbers.  If
+only the current 4th part (what you call firmware revision) follows
+the usual version ordering, then I think that should be used as the
+(public) version number.
 
+Ben.
+
+-- 
+Ben Hutchings
+Gates has joked that everything goes on and off unexepectedly in the house,
+which is run by a high-end PC network built on Windows NT. - Seattle Times
