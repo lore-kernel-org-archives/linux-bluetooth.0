@@ -1,108 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v1 14/18] test: Add signal handling for gatt-service
-Date: Mon, 20 Jan 2014 15:04:59 -0300
-Message-Id: <1390241103-808-15-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v1 02/18] gatt: Register Manager D-Bus Interface
+Date: Mon, 20 Jan 2014 15:04:47 -0300
+Message-Id: <1390241103-808-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1389285503-19348-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390241103-808-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements signal handling to run cleanup tasks before
-exiting.
----
- test/gatt-service.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/test/gatt-service.c b/test/gatt-service.c
-index 16e2cea..c076588 100644
---- a/test/gatt-service.c
-+++ b/test/gatt-service.c
-@@ -27,12 +27,14 @@
+This patch registers the Service Manager D-Bus Interface. This
+interface implements the methods to allow external application register
+and unregister GATT Services.
+---
+ Makefile.am     |  1 +
+ src/gatt-dbus.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt-dbus.h | 25 +++++++++++++++++++
+ src/gatt.c      |  9 +++++++
+ 4 files changed, 110 insertions(+)
+ create mode 100644 src/gatt-dbus.c
+ create mode 100644 src/gatt-dbus.h
+
+diff --git a/Makefile.am b/Makefile.am
+index 1444f0e..c395874 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/adapter.h src/adapter.c \
+ 			src/profile.h src/profile.c \
+ 			src/service.h src/service.c \
++			src/gatt-dbus.h src/gatt-dbus.c \
+ 			src/gatt.h src/gatt.c \
+ 			src/device.h src/device.c src/attio.h \
+ 			src/dbus-common.c src/dbus-common.h \
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+new file mode 100644
+index 0000000..90a321b
+--- /dev/null
++++ b/src/gatt-dbus.c
+@@ -0,0 +1,75 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++
++#include <glib.h>
++#include <dbus/dbus.h>
++#include <gdbus/gdbus.h>
++
++#include "dbus-common.h"
++#include "log.h"
++
++#include "gatt-dbus.h"
++
++#define SERVICE_MGR_IFACE			"org.bluez.ServiceManager1"
++
++static DBusMessage *register_service(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	return dbus_message_new_method_return(msg);
++}
++
++static DBusMessage *unregister_service(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	return dbus_message_new_method_return(msg);
++}
++
++static const GDBusMethodTable methods[] = {
++	{ GDBUS_EXPERIMENTAL_METHOD("RegisterService",
++				GDBUS_ARGS({ "service", "o"},
++						{ "options", "a{sv}"}),
++				NULL, register_service) },
++	{ GDBUS_EXPERIMENTAL_METHOD("UnregisterService",
++				GDBUS_ARGS({"service", "o"}),
++				NULL, unregister_service) },
++	{ }
++};
++
++gboolean gatt_dbus_manager_register(void)
++{
++	return g_dbus_register_interface(btd_get_dbus_connection(),
++					"/org/bluez", SERVICE_MGR_IFACE,
++					methods, NULL, NULL, NULL, NULL);
++}
++
++void gatt_dbus_manager_unregister(void)
++{
++	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
++							SERVICE_MGR_IFACE);
++}
+diff --git a/src/gatt-dbus.h b/src/gatt-dbus.h
+new file mode 100644
+index 0000000..310cfa9
+--- /dev/null
++++ b/src/gatt-dbus.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++gboolean gatt_dbus_manager_register(void);
++void gatt_dbus_manager_unregister(void);
+diff --git a/src/gatt.c b/src/gatt.c
+index 06619f0..e8b691a 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -25,14 +25,23 @@
+ #include <config.h>
+ #endif
  
- #include <errno.h>
- #include <stdio.h>
-+#include <sys/signalfd.h>
++#include <glib.h>
++
++#include "log.h"
++
++#include "gatt-dbus.h"
+ #include "gatt.h"
  
- #include <glib.h>
- #include <dbus/dbus.h>
- #include <gdbus/gdbus.h>
+ void gatt_init(void)
+ {
++	DBG("Starting GATT server");
  
- #define SERVICE_IFACE			"org.bluez.Service1"
-+#define SERVICE_MGR_IFACE		"org.bluez.ServiceManager1"
- 
- /* Immediate Alert Service UUID */
- #define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
-@@ -112,9 +114,57 @@ static void create_services(DBusConnection *conn)
- 	printf("Registered service: %s\n", service_path);
++	gatt_dbus_manager_register();
  }
  
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
-+							gpointer user_data)
-+{
-+	g_main_loop_quit(main_loop);
-+
-+	return FALSE;
-+}
-+
-+static guint setup_signalfd(void)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
-+		perror("Failed to set signal mask");
-+		return 0;
-+	}
-+
-+	fd = signalfd(-1, &mask, 0);
-+	if (fd < 0) {
-+		perror("Failed to create signal descriptor");
-+		return 0;
-+	}
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, NULL);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
- int main(int argc, char *argv[])
+ void gatt_cleanup(void)
  {
- 	DBusConnection *dbus_conn;
-+	guint signal;
-+
-+	signal = setup_signalfd();
-+	if (signal == 0)
-+		return -errno;
++	DBG("Stopping GATT server");
  
- 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
- 
-@@ -129,6 +179,8 @@ int main(int argc, char *argv[])
- 
- 	g_main_loop_run(main_loop);
- 
-+	g_source_remove(signal);
-+
- 	g_slist_free_full(services, g_free);
- 	dbus_connection_unref(dbus_conn);
- 
++	gatt_dbus_manager_unregister();
+ }
 -- 
 1.8.3.1
 
