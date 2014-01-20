@@ -1,100 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <649bfd2b8da26f5cf4b19f59d40d26fc.squirrel@mungewell.org>
-In-Reply-To: <1390177914-13529-1-git-send-email-szymon.janc@gmail.com>
-References: <1390177914-13529-1-git-send-email-szymon.janc@gmail.com>
-Date: Mon, 20 Jan 2014 12:31:14 -0500
-Subject: Re: [PATCH 1/5] lib: Add flag to double L2CAP IMTU size used for SDP
- connection
-From: simon@mungewell.org
-To: "Szymon Janc" <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	"Szymon Janc" <szymon.janc@gmail.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed;boundary="----=_20140120123114_93055"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <06DCDA5B-0724-489D-8039-1CD8E8CC62E8@holtmann.org>
+References: <CAHrH25SjO5Bgdjnu6YjwKSQEiwvP+p8bfqcjJO9WEMDvG1A3PQ@mail.gmail.com>
+	<06DCDA5B-0724-489D-8039-1CD8E8CC62E8@holtmann.org>
+Date: Mon, 20 Jan 2014 14:54:34 -0200
+Message-ID: <CAKT1EBe9ZJb3q0DqsUOKqynCV=Kb5euUE8S5vy1kM+1+2+Cu+w@mail.gmail.com>
+Subject: Re: Status of BlueZ GATT APIs
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Arman Uguray <armansito@google.com>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>, Andre Guedes <andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_20140120123114_93055
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
+Hi Arman/Marcel:
 
-> This will allow to workaround Dualshock4 not respecting L2CAP MTU
-> size while sending SDP response.
+On Sat, Jan 18, 2014 at 5:42 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
+> Hi Arman,
+>
+>> I was wondering what the current plans are for the GATT D-Bus API in
+>> BlueZ. Can anyone give a rough estimate of when these APIs will be
+>> available in BlueZ upstream and approximately when they could make to
+>> into a release?
+>
+> I think the best person to answer this is Claudio. INdT has been working =
+on these patches and we have discussed the APIs during the Plumbers Conf.
+>
+> Maybe they just need to re-submit a new version and we could include them=
+. I honestly don=E2=80=99t know until I see an updated set of the patches.
+>
+> Regards
+>
+> Marcel
 
-Maybe a little late (I see that there's a V2 of this patch series), but I
-can confirm that I was able to get my 'crappy' laptop to connect to the
-DS4 and stream the basic joystick data.
+Ok. I will rebase and re-submit the patchset "[PATCH BlueZ v0 00/18]
+GATT API: External Services".
 
-The connection was sensitive to technique, ie. it wouldn't 'pair then
-connect' or allow pairing initiated by DS4.
---
-[liveuser@localhost ~]$ bluetoothctl
-[NEW] Controller 00:0F:B3:99:6B:CC localhost [default]
-[bluetooth]# power on
-[CHG] Controller 00:0F:B3:99:6B:CC Class: 0x00010c
-Changing power on succeeded
-[CHG] Controller 00:0F:B3:99:6B:CC Powered: yes
-[bluetooth]# agent on
-Agent registered
-[bluetooth]# default-agent
-Default agent request successful
-[bluetooth]# scan on
-Discovery started
-[CHG] Controller 00:0F:B3:99:6B:CC Discovering: yes
-[NEW] Device 1C:66:6D:07:C3:E0 1C-66-6D-07-C3-E0
-[CHG] Device 1C:66:6D:07:C3:E0 LegacyPairing: no
-[CHG] Device 1C:66:6D:07:C3:E0 Name: Wireless Controller
-[CHG] Device 1C:66:6D:07:C3:E0 Alias: Wireless Controller
-[CHG] Device 1C:66:6D:07:C3:E0 LegacyPairing: yes <--------- wait for this!!
-[bluetooth]# connect 1C:66:6D:07:C3:E0
-Attempting to connect to 1C:66:6D:07:C3:E0
-[CHG] Device 1C:66:6D:07:C3:E0 Connected: yes
-[CHG] Device 1C:66:6D:07:C3:E0 Modalias: usb:v054Cp05C4d0100
-[CHG] Device 1C:66:6D:07:C3:E0 Modalias: usb:v054Cp05C4d0100
-[CHG] Device 1C:66:6D:07:C3:E0 UUIDs has unsupported type
-Request PIN code
-[agent] Enter PIN code: 0000
-[CHG] Device 1C:66:6D:07:C3:E0 Paired: yes
-Connection successful
-[bluetooth]#
---
+Considering that some groups are interested in the GATT API again we
+can start a task force to upstream the code that we have.
 
-I also noticed a weird log at one point, although only saw this once and
-don't know what triggered it.
---
-[bluetooth]#
-[CHG] Device 1C:66:6D:07:C3:E0 Class: 0x200404
-[CHG] Device 1C:66:6D:07:C3:E0 Icon: audio-card <--------!!
-[CHG] Device 1C:66:6D:07:C3:E0 Class: 0x002508
-[CHG] Device 1C:66:6D:07:C3:E0 Icon: input-gaming
---
+IMO, the GATT Server API will be more simple to upstream. We can keep
+a completely separated implementation using unix socket to avoid
+breaking the current implementation, and switch to the new attribute
+server when we achieve a common sense.
 
-I will try with the V2 patch series.
-Simon
+However, before starting the Client implementation, the kernel patches
+related connection and scanning sent from Andre are essential to have
+a stable implementation. The GATT Client implementation needs to be
+re-written from scratch, our old code was based on another "auto
+connect" kernel patch approach.
 
-------=_20140120123114_93055
-Content-Type: text/plain; name="crappy_hciconfig.txt"
-Content-Transfer-Encoding: 8bit
-Content-Disposition: attachment; filename="crappy_hciconfig.txt"
+Roughly speaking, our up-streaming plan is:
+* GATT Server: External Services =3D> "[PATCH BlueZ v0 00/18] GATT API:
+External Services"
+* GATT Server: External Characteristics (Server) =3D> Ready to be submitted
+* GATT Server: External Descriptors (Server) =3D> Copy from our old branch
+* Replace attribute server
+* Client:  Remove ATTIO and automatic connection mechanism from
+userspace =3D> Requires kernel patches
+* Client: Fix all GATT internal plugins
+* Client: Remote Services API
+* ...
 
-root@atom:/home/simon# hciconfig -a
-hci0:	Type: BR/EDR  Bus: USB
-	BD Address: 00:0F:B3:99:6B:CC  ACL MTU: 192:8  SCO MTU: 64:8
-	UP RUNNING PSCAN 
-	RX bytes:672 acl:0 sco:0 events:22 errors:0
-	TX bytes:337 acl:0 sco:0 commands:21 errors:0
-	Features: 0xff 0xff 0x0f 0x00 0x00 0x00 0x00 0x00
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3 
-	Link policy: 
-	Link mode: SLAVE ACCEPT 
-	Name: 'atom-0'
-	Class: 0x520100
-	Service Classes: Networking, Object Transfer, Telephony
-	Device Class: Computer, Uncategorized
-	HCI Version: 1.1 (0x1)  Revision: 0x222
-	LMP Version: 1.1 (0x1)  Subversion: 0x222
-	Manufacturer: Cambridge Silicon Radio (10)
-
-------=_20140120123114_93055--
-
-
+Regards,
+Claudio
