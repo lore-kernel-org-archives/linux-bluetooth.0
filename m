@@ -1,118 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 05/11] android/ipc-tester: Add sending test data with ipc
-Date: Mon, 20 Jan 2014 10:36:04 +0100
-Message-Id: <1390210570-28260-6-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv5 02/11] android/ipc-tester: Run daemon in separate process
+Date: Mon, 20 Jan 2014 10:36:01 +0100
+Message-Id: <1390210570-28260-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1390210570-28260-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds some data structures used to send data with ipc during
-test setup and run stage. Test execution macro is extended for easy
-data preparation.
+This patch adds new process waiting to run daemon when needed.
 ---
- android/ipc-tester.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 58 insertions(+), 4 deletions(-)
+ android/ipc-tester.c | 123 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 123 insertions(+)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index b6f8131..7cd50f5 100644
+index 021919e..c8d1f0b 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -55,6 +55,23 @@ struct test_data {
- 	bool setup_done;
+@@ -21,8 +21,14 @@
+  *
+  */
+ 
++#include <stdlib.h>
+ #include <unistd.h>
+ 
++#include <sys/socket.h>
++#include <sys/types.h>
++#include <sys/wait.h>
++#include <sys/un.h>
++#include <libgen.h>
+ #include <glib.h>
+ 
+ #include "lib/bluetooth.h"
+@@ -33,13 +39,19 @@
+ #include "src/shared/hciemu.h"
+ 
+ 
++#define WAIT_FOR_SIGNAL_TIME 2 /* in seconds */
++#define EMULATOR_SIGNAL "emulator_started"
++
+ struct test_data {
+ 	struct mgmt *mgmt;
+ 	uint16_t mgmt_index;
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
++	pid_t bluetoothd_pid;
  };
  
-+struct ipc_data {
-+	void *buffer;
-+	size_t len;
-+};
++static char exec_dir[PATH_MAX + 1];
 +
-+struct generic_data {
-+	struct ipc_data ipc_data;
-+
-+	unsigned int num_services;
-+	int init_services[];
-+};
-+
-+struct regmod_msg {
-+	struct hal_hdr header;
-+	struct hal_cmd_register_module cmd;
-+} __attribute__((packed));
-+
- #define CONNECT_TIMEOUT (5 * 1000)
- #define SERVICE_NAME "bluetoothd"
- 
-@@ -460,27 +477,64 @@ static void teardown(const void *data)
- 
- static void ipc_send_tc(const void *data)
+ static void read_info_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
-+	const struct generic_data *generic_data = data;
-+	const struct ipc_data *ipc_data = &generic_data->ipc_data;
-+
-+	if (ipc_data->len) {
-+		if (write(cmd_sk, ipc_data->buffer, ipc_data->len) < 0)
-+			tester_test_failed();
-+	}
+@@ -170,14 +182,123 @@ static void test_post_teardown(const void *data)
+ 	}
  }
  
--#define test_generic(name, data, test_setup, test, test_teardown) \
-+#define service_data(args...) { args }
++static void bluetoothd_start(int hci_index)
++{
++	char prg_name[PATH_MAX + 1];
++	char index[8];
++	char *prg_argv[4];
 +
-+#define gen_data(writelen, writebuf, servicelist...) \
-+	{								\
-+		.ipc_data = {						\
-+			.buffer = writebuf,				\
-+			.len = writelen,				\
-+		},							\
-+		.init_services = service_data(servicelist),		\
-+		.num_services = sizeof((const int[])			\
-+					service_data(servicelist)) /	\
-+					sizeof(int),			\
++	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
++	snprintf(index, sizeof(index), "%d", hci_index);
++
++	prg_argv[0] = prg_name;
++	prg_argv[1] = "-i";
++	prg_argv[2] = index;
++	prg_argv[3] = NULL;
++
++	if (!tester_use_debug())
++		fclose(stderr);
++
++	execve(prg_argv[0], prg_argv, NULL);
++}
++
++static void emulator(int pipe, int hci_index)
++{
++	static const char SYSTEM_SOCKET_PATH[] = "\0android_system";
++	char buf[1024];
++	struct sockaddr_un addr;
++	struct timeval tv;
++	int fd;
++	ssize_t len;
++
++	fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
++	if (fd < 0)
++		goto failed;
++
++	tv.tv_sec = WAIT_FOR_SIGNAL_TIME;
++	tv.tv_usec = 0;
++	setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO, (char *)&tv, sizeof(tv));
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++	memcpy(addr.sun_path, SYSTEM_SOCKET_PATH, sizeof(SYSTEM_SOCKET_PATH));
++
++	if (bind(fd, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		perror("Failed to bind system socket");
++		goto failed;
 +	}
 +
-+#define test_generic(name, test, setup, teardown, buffer, writelen, \
-+							services...) \
- 	do {								\
- 		struct test_data *user;					\
-+		static const struct generic_data data =			\
-+				gen_data(writelen, buffer, services);	\
- 		user = g_malloc0(sizeof(struct test_data));		\
- 		if (!user)						\
- 			break;						\
- 		user->hciemu_type = HCIEMU_TYPE_BREDRLE;		\
--		tester_add_full(name, data, test_pre_setup, test_setup,	\
--				test, test_teardown, test_post_teardown,\
-+		tester_add_full(name, &data, test_pre_setup, setup,	\
-+				test, teardown, test_post_teardown,	\
- 				3, user, g_free);			\
- 	} while (0)
- 
-+struct regmod_msg register_bt_msg = {
-+	.header = {
-+		.service_id = HAL_SERVICE_ID_CORE,
-+		.opcode = HAL_OP_REGISTER_MODULE,
-+		.len = sizeof(struct hal_cmd_register_module),
-+		},
-+	.cmd = {
-+		.service_id = HAL_SERVICE_ID_BLUETOOTH,
-+		},
-+};
++	len = write(pipe, EMULATOR_SIGNAL, sizeof(EMULATOR_SIGNAL));
 +
++	if (len != sizeof(EMULATOR_SIGNAL))
++		goto failed;
++
++	memset(buf, 0, sizeof(buf));
++
++	len = read(fd, buf, sizeof(buf));
++	if (len <= 0 || (strcmp(buf, "ctl.start=bluetoothd")))
++		goto failed;
++
++	close(pipe);
++	close(fd);
++	bluetoothd_start(hci_index);
++
++failed:
++	close(pipe);
++	close(fd);
++}
++
+ static void setup(const void *data)
+ {
++	struct test_data *test_data = tester_get_data();
++	int signal_fd[2];
++	char buf[1024];
++	pid_t pid;
++	int len;
++
++	if (pipe(signal_fd))
++		goto failed;
++
++	pid = fork();
++
++	if (pid < 0) {
++		close(signal_fd[0]);
++		close(signal_fd[1]);
++		goto failed;
++	}
++
++	if (pid == 0) {
++		if (!tester_use_debug())
++			fclose(stderr);
++
++		close(signal_fd[0]);
++		emulator(signal_fd[1], test_data->mgmt_index);
++		exit(0);
++	}
++
++	close(signal_fd[1]);
++	test_data->bluetoothd_pid = pid;
++
++	len = read(signal_fd[0], buf, sizeof(buf));
++	if (len <= 0 || (strcmp(buf, EMULATOR_SIGNAL))) {
++		close(signal_fd[0]);
++		goto failed;
++	}
++
++	return;
++
++failed:
+ 	tester_setup_failed();
+ 	test_post_teardown(data);
+ }
+ 
+ static void teardown(const void *data)
+ {
++	struct test_data *test_data = tester_get_data();
++
++	if (test_data->bluetoothd_pid)
++		waitpid(test_data->bluetoothd_pid, NULL, 0);
++
+ 	tester_teardown_complete();
+ }
+ 
+@@ -199,6 +320,8 @@ static void ipc_send_tc(const void *data)
+ 
  int main(int argc, char *argv[])
  {
- 	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
- 
++	snprintf(exec_dir, sizeof(exec_dir), "%s", dirname(argv[0]));
++
  	tester_init(&argc, &argv);
  
--	test_generic("Test Dummy", NULL, setup, ipc_send_tc, teardown);
-+	test_generic("Too small data",
-+				ipc_send_tc, setup, teardown,
-+				&register_bt_msg, 1);
- 
- 	return tester_run();
- }
+ 	test_generic("Test Dummy", NULL, setup, ipc_send_tc, teardown);
 -- 
 1.8.5.2
 
