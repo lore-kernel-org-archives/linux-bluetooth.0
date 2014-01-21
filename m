@@ -1,67 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5ddfeed2ae259064d50f6b08eb15cf5f.squirrel@mungewell.org>
-References: <5ddfeed2ae259064d50f6b08eb15cf5f.squirrel@mungewell.org>
-Date: Tue, 21 Jan 2014 09:26:59 +0100
-Message-ID: <CANq1E4Ruo6C9gFbv=ZdtmVmvYC61UFW1AR+C_LVUEA3xj9iO9A@mail.gmail.com>
+Message-ID: <5ddfeed2ae259064d50f6b08eb15cf5f.squirrel@mungewell.org>
+Date: Mon, 20 Jan 2014 21:00:26 -0500
 Subject: Re: [PATCH 0/1] HIDP: Add a special case for the Dualshock 4
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Simon Wood <simon@mungewell.org>
-Cc: Frank Praznik <frank.praznik@oh.rr.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: simon@mungewell.org
+To: "Frank Praznik" <frank.praznik@oh.rr.com>
+Cc: linux-bluetooth@vger.kernel.org, dh.herrmann@gmail.com,
+	simon@mungewell.org
+MIME-Version: 1.0
+Content-Type: multipart/mixed;boundary="----=_20140120210026_26256"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+------=_20140120210026_26256
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 21, 2014 at 3:00 AM,  <simon@mungewell.org> wrote:
->> This adds a special case in the HIDP core for the Dualshock 4
-> controller.
->> The controller only recognizes output reports with the report type 0x52
-> and only accepts reports sent via the ctrl channel.
->
-> Which part of the system is 'at fault' here, is it simply the DS4 behaving
-> incorrectly or that Bluez is not picking up some data or that 'we' are
-> just the incorrect method to send the data (in the hid-sony kernel
-> driver)?
+> This adds a special case in the HIDP core for the Dualshock 4
+controller.
+> The controller only recognizes output reports with the report type 0x52
+and only accepts reports sent via the ctrl channel.
 
-No-one is at fault. Well, strictly speaking the DS4 is, as it has to
-accept SET_REPORT and asynchronous OUTPUT_REPORTs, but it doesn't.
-That's quite common. What we actually want is HIDP to provide to
-functions, one to call SET_REPORT and one to do the async
-OUTPUT_REPORT is currently does.
+Which part of the system is 'at fault' here, is it simply the DS4 behaving
+incorrectly or that Bluez is not picking up some data or that 'we' are
+just the incorrect method to send the data (in the hid-sony kernel
+driver)?
 
-I implemented this some time ago here:
-  http://cgit.freedesktop.org/~dvdhrm/linux/log/?h=hid
 
-Maybe it's time to get that merged. But that hack here is ugly and not
-the way to go.
+I noticed that the BT HID spec notes a 'HID control' channel in the
+example descriptor in table 5.3.3 as 'Parameter 0'.
 
-Thanks
-David
+The DS4 gives this in it's SDP report
+--
+	Attribute 0x0004 - ProtocolDescriptorList
+		Sequence
+			Sequence
+				UUID16 0x0100 - L2CAP
+				UINT16 0x0011 <---------- 'HDI Control' PSM 17
+			Sequence
+				UUID16 0x0011 - HIDP
+--
 
->
-> I noticed that the BT HID spec notes a 'HID control' channel in the
-> example descriptor in table 5.3.3 as 'Parameter 0'.
->
-> The DS4 gives this in it's SDP report
-> --
->         Attribute 0x0004 - ProtocolDescriptorList
->                 Sequence
->                         Sequence
->                                 UUID16 0x0100 - L2CAP
->                                 UINT16 0x0011 <---------- 'HDI Control' PSM 17
->                         Sequence
->                                 UUID16 0x0011 - HIDP
-> --
->
-> Shouldn't Bluez be remembering this and sending accesses to this PSM in
-> the appropriate mode?
->
-> Just looking to fix the problem where it really exists, without just
-> working around specifically for the DS4.
->
-> Simon
->
->
+Shouldn't Bluez be remembering this and sending accesses to this PSM in
+the appropriate mode?
+
+Just looking to fix the problem where it really exists, without just
+working around specifically for the DS4.
+
+Simon
+
+
+
+------=_20140120210026_26256
+Content-Type: text/plain; name="records_raw.txt"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="records_raw.txt"
+
+U2VxdWVuY2UKCUF0dHJpYnV0ZSAweDAwMDAgLSBTZXJ2aWNlUmVjb3JkSGFuZGxlCgkJVUlOVDMy
+IDB4MDAwMTAwMDEKCUF0dHJpYnV0ZSAweDAwMDEgLSBTZXJ2aWNlQ2xhc3NJRExpc3QKCQlTZXF1
+ZW5jZQoJCQlVVUlEMTYgMHgxMTI0IC0gSHVtYW5JbnRlcmZhY2VEZXZpY2VTZXJ2aWNlIChISUQp
+CglBdHRyaWJ1dGUgMHgwMDA0IC0gUHJvdG9jb2xEZXNjcmlwdG9yTGlzdAoJCVNlcXVlbmNlCgkJ
+CVNlcXVlbmNlCgkJCQlVVUlEMTYgMHgwMTAwIC0gTDJDQVAKCQkJCVVJTlQxNiAweDAwMTEKCQkJ
+U2VxdWVuY2UKCQkJCVVVSUQxNiAweDAwMTEgLSBISURQCglBdHRyaWJ1dGUgMHgwMDA2IC0gTGFu
+Z3VhZ2VCYXNlQXR0cmlidXRlSURMaXN0CgkJU2VxdWVuY2UKCQkJVUlOVDE2IDB4NjU2ZQoJCQlV
+SU5UMTYgMHgwMDZhCgkJCVVJTlQxNiAweDAxMDAKCUF0dHJpYnV0ZSAweDAwMDkgLSBCbHVldG9v
+dGhQcm9maWxlRGVzY3JpcHRvckxpc3QKCQlTZXF1ZW5jZQoJCQlTZXF1ZW5jZQoJCQkJVVVJRDE2
+IDB4MTEyNCAtIEh1bWFuSW50ZXJmYWNlRGV2aWNlU2VydmljZSAoSElEKQoJCQkJVUlOVDE2IDB4
+MDEwMAoJQXR0cmlidXRlIDB4MDAwZCAtIEFkZGl0aW9uYWxQcm90b2NvbERlc2NyaXB0b3JMaXN0
+cwoJCVNlcXVlbmNlCgkJCVNlcXVlbmNlCgkJCQlTZXF1ZW5jZQoJCQkJCVVVSUQxNiAweDAxMDAg
+LSBMMkNBUAoJCQkJCVVJTlQxNiAweDAwMTMKCQkJCVNlcXVlbmNlCgkJCQkJVVVJRDE2IDB4MDAx
+MSAtIEhJRFAKCUF0dHJpYnV0ZSAweDAxMDAKCQlTdHJpbmcgV2lyZWxlc3MgQ29udHJvbGxlcgAK
+CUF0dHJpYnV0ZSAweDAxMDEKCQlTdHJpbmcgR2FtZSBDb250cm9sbGVyAAoJQXR0cmlidXRlIDB4
+MDEwMgoJCVN0cmluZyBTb255IENvbXB1dGVyIEVudGVydGFpbm1lbnQACglBdHRyaWJ1dGUgMHgw
+MjAwCQkJCTw9PT09PSA/Pz8/PwoJCVVJTlQxNiAweDAxMDAKCUF0dHJpYnV0ZSAweDAyMDEJCQkJ
+PD09PT09IEhJRFBhcnNlclZlcnNpb24gCgkJVUlOVDE2IDB4MDExMQoJQXR0cmlidXRlIDB4MDIw
+MgkJCQk8PT09PT0gSElERGV2aWNlU3ViY2xhc3MgCgkJVUlOVDggMHgwOAoJQXR0cmlidXRlIDB4
+MDIwMwkJCQk8PT09PT0gSElEQ291bnRyeUNvZGUgCgkJVUlOVDggMHgwMAoJQXR0cmlidXRlIDB4
+MDIwNAkJCQk8PT09PT0gSElEVmlydHVhbENhYmxlCgkJQm9vbCBGYWxzZQoJQXR0cmlidXRlIDB4
+MDIwNQkJCQk8PT09PT0gSElEUmVjb25uZWN0SW5pdGlhdGUKCQlCb29sIFRydWUKCUF0dHJpYnV0
+ZSAweDAyMDYJCQkJPD09PT09IEhJRERlc2NyaXB0b3JMaXN0CgkJU2VxdWVuY2UKCQkJU2VxdWVu
+Y2UKCQkJCVVJTlQ4IDB4MjIKCQkJCURhdGEgMDUgMDEgMDkgMDUgYTEgMDEgODUgMDEgMDkgMzAg
+MDkgMzEgMDkgMzIgMDkgMzUgMTUgMDAgMjYgZmYgMDAgNzUgMDggOTUgMDQgODEgMDIgMDkgMzkg
+MTUgMDAgMjUgMDcgNzUgMDQgOTUgMDEgODEgNDIgMDUgMDkgMTkgMDEgMjkgMGUgMTUgMDAgMjUg
+MDEgNzUgMDEgOTUgMGUgODEgMDIgNzUgMDYgOTUgMDEgODEgMDEgMDUgMDEgMDkgMzMgMDkgMzQg
+MTUgMDAgMjYgZmYgMDAgNzUgMDggOTUgMDIgODEgMDIgMDYgMDQgZmYgODUgMDIgMDkgMjQgOTUg
+MjQgYjEgMDIgODUgYTMgMDkgMjUgOTUgMzAgYjEgMDIgODUgMDUgMDkgMjYgOTUgMjggYjEgMDIg
+ODUgMDYgMDkgMjcgOTUgMzQgYjEgMDIgODUgMDcgMDkgMjggOTUgMzAgYjEgMDIgODUgMDggMDkg
+MjkgOTUgMmYgYjEgMDIgMDYgMDMgZmYgODUgMDMgMDkgMjEgOTUgMjYgYjEgMDIgODUgMDQgMDkg
+MjIgOTUgMmUgYjEgMDIgODUgZjAgMDkgNDcgOTUgM2YgYjEgMDIgODUgZjEgMDkgNDggOTUgM2Yg
+YjEgMDIgODUgZjIgMDkgNDkgOTUgMGYgYjEgMDIgMDYgMDAgZmYgODUgMTEgMDkgMjAgMTUgMDAg
+MjYgZmYgMDAgNzUgMDggOTUgNGQgODEgMDIgMDkgMjEgOTEgMDIgODUgMTIgMDkgMjIgOTUgOGQg
+ODEgMDIgMDkgMjMgOTEgMDIgODUgMTMgMDkgMjQgOTUgY2QgODEgMDIgMDkgMjUgOTEgMDIgODUg
+MTQgMDkgMjYgOTYgMGQgMDEgODEgMDIgMDkgMjcgOTEgMDIgODUgMTUgMDkgMjggOTYgNGQgMDEg
+ODEgMDIgMDkgMjkgOTEgMDIgODUgMTYgMDkgMmEgOTYgOGQgMDEgODEgMDIgMDkgMmIgOTEgMDIg
+ODUgMTcgMDkgMmMgOTYgY2QgMDEgODEgMDIgMDkgMmQgOTEgMDIgODUgMTggMDkgMmUgOTYgMGQg
+MDIgODEgMDIgMDkgMmYgOTEgMDIgODUgMTkgMDkgMzAgOTYgMjIgMDIgODEgMDIgMDkgMzEgOTEg
+MDIgMDYgODAgZmYgODUgODIgMDkgMjIgOTUgM2YgYjEgMDIgODUgODMgMDkgMjMgYjEgMDIgODUg
+ODQgMDkgMjQgYjEgMDIgODUgOTAgMDkgMzAgYjEgMDIgODUgOTEgMDkgMzEgYjEgMDIgODUgOTIg
+MDkgMzIgYjEgMDIgODUgOTMgMDkgMzMgYjEgMDIgODUgYTAgMDkgNDAgYjEgMDIgODUgYTQgMDkg
+NDQgYjEgMDIgYzAgMDAKU2VxdWVuY2UKCUF0dHJpYnV0ZSAweDAwMDAgLSBTZXJ2aWNlUmVjb3Jk
+SGFuZGxlCgkJVUlOVDMyIDB4MDAwMTAwMDIKCUF0dHJpYnV0ZSAweDAwMDEgLSBTZXJ2aWNlQ2xh
+c3NJRExpc3QKCQlTZXF1ZW5jZQoJCQlVVUlEMTYgMHgxMjAwIC0gUG5QSW5mb3JtYXRpb24KCUF0
+dHJpYnV0ZSAweDAwMDQgLSBQcm90b2NvbERlc2NyaXB0b3JMaXN0CgkJU2VxdWVuY2UKCQkJU2Vx
+dWVuY2UKCQkJCVVVSUQxNiAweDAxMDAgLSBMMkNBUAoJCQkJVUlOVDE2IDB4MDAwMQoJCQlTZXF1
+ZW5jZQoJCQkJVVVJRDE2IDB4MDAwMSAtIFNEUAoJQXR0cmlidXRlIDB4MDAwOSAtIEJsdWV0b290
+aFByb2ZpbGVEZXNjcmlwdG9yTGlzdAoJCVNlcXVlbmNlCgkJCVNlcXVlbmNlCgkJCQlVVUlEMTYg
+MHgxMjAwIC0gUG5QSW5mb3JtYXRpb24KCQkJCVVJTlQxNiAweDAxMDMKCUF0dHJpYnV0ZSAweDAy
+MDAKCQlVSU5UMTYgMHgwMTAzCglBdHRyaWJ1dGUgMHgwMjAxCgkJVUlOVDE2IDB4MDU0YwoJQXR0
+cmlidXRlIDB4MDIwMgoJCVVJTlQxNiAweDA1YzQKCUF0dHJpYnV0ZSAweDAyMDMKCQlVSU5UMTYg
+MHgwMTAwCglBdHRyaWJ1dGUgMHgwMjA0CgkJQm9vbCBUcnVlCglBdHRyaWJ1dGUgMHgwMjA1CgkJ
+VUlOVDE2IDB4MDAwMgo=
+------=_20140120210026_26256--
+
+
