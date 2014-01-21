@@ -1,31 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] android/A2DP: Add retry logic to Audio IPC
-Date: Tue, 21 Jan 2014 16:24:29 +0100
-Message-ID: <12198760.CxVh8o9kqd@uw000953>
-In-Reply-To: <1390312859-27349-1-git-send-email-luiz.dentz@gmail.com>
-References: <1390312859-27349-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH_v2 1/2] android/hidhost: Fix miscalculation of get report event notification length
+Date: Tue, 21 Jan 2014 16:20:12 +0100
+Message-ID: <3134335.xIcFuNRt7s@uw000953>
+In-Reply-To: <1390307059-7772-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1390307059-7772-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Ravi,
 
-On Tuesday 21 of January 2014 16:00:58 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> In case the audio HAL disconnects without cleaning up its endpoints treat
-> it as unclean disconnection and attempt to reconnect.
+On Tuesday 21 of January 2014 14:24:18 Ravi kumar Veeramally wrote:
+> Event length is size of struct + data len (if any). It is miscalulated.
 > ---
->  android/a2dp.c      | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++---
->  android/audio-ipc.c | 13 +++++++---
->  android/audio-ipc.h |  2 +-
->  android/ipc.c       |  9 +++----
->  android/ipc.h       |  3 ++-
->  5 files changed, 83 insertions(+), 12 deletions(-)
+>  android/hidhost.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/hidhost.c b/android/hidhost.c
+> index 3da77c8..108493a 100644
+> --- a/android/hidhost.c
+> +++ b/android/hidhost.c
+> @@ -371,7 +371,7 @@ static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
+>  	ba2str(&dev->dst, address);
+>  	DBG("device %s", address);
+>  
+> -	ev_len = sizeof(*ev) + sizeof(struct hal_ev_hidhost_get_report) + 1;
+> +	ev_len = sizeof(*ev);
+>  
+>  	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
+>  			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
+> 
 
 Both patches applied, thanks.
 
