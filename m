@@ -1,37 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52DE5ADD.2050904@ahsoftware.de>
-Date: Tue, 21 Jan 2014 12:32:45 +0100
-From: Alexander Holler <holler@ahsoftware.de>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Christopher Rosell <chrippa@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: Unable to use Sony Dualshock 4 game controller
+Date: Tue, 21 Jan 2014 12:06:11 +0100
+Message-ID: <3313233.9YFPX6k2tB@uw000953>
+In-Reply-To: <CAPk--xzV9n5-RnAhPhbM2hCnftvJxeCm9E0Wgkj+zzdqNqseVQ@mail.gmail.com>
+References: <CAPk--xzV9n5-RnAhPhbM2hCnftvJxeCm9E0Wgkj+zzdqNqseVQ@mail.gmail.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: unknown main item tag 0x0
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Christopher,
 
-I can't remember since when I'm seeing the kernel message "unknown main 
-item tag 0x0" for many Bluetooth input devices, but it is since quiet 
-some time.
+On Friday 20 of December 2013 16:43:17 Christopher Rosell wrote:
+> Hello there,
+> 
+> I'm attempting to use a Sony Dualshock 4 game controller with bluez,
+> but have run into some problems. I'm running Linux kernel 3.12.4 on
+> Arch Linux with bluez 5.12.
+> 
+> The DS4 is a standard bluetooth device, unlike the DS3 and I was able
+> to pair and use it without any problems in Windows 7, but in Linux I
+> have not been able to get it working correctly. The controller can be
+> started in two modes, a pairing mode by pressing the buttons Share and
+> PS at the same time and a normal mode by pressing the PS button only.
 
-Has someone already tried to find out where that does come from?
+Please check BlueZ 5.14.
 
-My first guess would be that bluez misses one or more bytes a connection 
-startup, which is based on the fact that, since ever, it misses the 
-first keystroke of BT-keyboards too (the keystroke which wakes up the 
-keyboard and initiates the connection). And I'm pretty sure my keyboard 
-does transmit that initiating keystroke, because Windows receives it. ;)
-
-Besides that, that guess isn't based on anything. I neither have tried 
-to search through the source nor did I run some tests.
-
-But because I'm curious I can't completely ignore that kernel message, 
-even if I haven't experienced any obvious problems. So here is the 
-question if someone else has a pointer or has already searched what the 
-reason for that message is. I don't think it's a fault of the used 
-device(s), as I see this message for multiple bt-input-devices.
-
-Regards,
-
-Alexander Holler
+-- 
+Best regards, 
+Szymon Janc
