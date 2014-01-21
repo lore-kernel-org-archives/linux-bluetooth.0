@@ -3,9 +3,9 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
 	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v2 02/18] gatt: Add stub for gatt.{c, h} files
-Date: Tue, 21 Jan 2014 10:26:38 -0300
-Message-Id: <1390310814-19880-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 03/18] gatt: Register Manager D-Bus Interface
+Date: Tue, 21 Jan 2014 10:26:39 -0300
+Message-Id: <1390310814-19880-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,35 +13,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-These files implement functions to manipulate ATT transactions, and expose
-functions to allow other entities to manage GATT based services.
+This patch registers the Service Manager D-Bus Interface. This
+interface implements the methods to allow external application register
+and unregister GATT Services.
 ---
- Makefile.am |  1 +
- src/gatt.c  | 38 ++++++++++++++++++++++++++++++++++++++
- src/gatt.h  | 26 ++++++++++++++++++++++++++
- src/main.c  |  4 ++++
- 4 files changed, 69 insertions(+)
- create mode 100644 src/gatt.c
- create mode 100644 src/gatt.h
+ Makefile.am     |  1 +
+ src/gatt-dbus.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt-dbus.h | 25 +++++++++++++++++++
+ src/gatt.c      |  9 +++++++
+ 4 files changed, 110 insertions(+)
+ create mode 100644 src/gatt-dbus.c
+ create mode 100644 src/gatt-dbus.h
 
 diff --git a/Makefile.am b/Makefile.am
-index f68e1ec..45c9f16 100644
+index 45c9f16..ed9083e 100644
 --- a/Makefile.am
 +++ b/Makefile.am
 @@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
  			src/adapter.h src/adapter.c \
  			src/profile.h src/profile.c \
  			src/service.h src/service.c \
-+			src/gatt.h src/gatt.c \
++			src/gatt-dbus.h src/gatt-dbus.c \
+ 			src/gatt.h src/gatt.c \
  			src/device.h src/device.c src/attio.h \
  			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c \
-diff --git a/src/gatt.c b/src/gatt.c
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
 new file mode 100644
-index 0000000..06619f0
+index 0000000..95c47de
 --- /dev/null
-+++ b/src/gatt.c
-@@ -0,0 +1,38 @@
++++ b/src/gatt-dbus.c
+@@ -0,0 +1,75 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -69,23 +70,60 @@ index 0000000..06619f0
 +#include <config.h>
 +#endif
 +
-+#include "gatt.h"
++#include <stdint.h>
 +
-+void gatt_init(void)
++#include <glib.h>
++#include <dbus/dbus.h>
++#include <gdbus/gdbus.h>
++
++#include "dbus-common.h"
++#include "log.h"
++
++#include "gatt-dbus.h"
++
++#define SERVICE_MGR_IFACE		"org.bluez.GattServiceManager1"
++
++static DBusMessage *register_service(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
 +{
-+
++	return dbus_message_new_method_return(msg);
 +}
 +
-+void gatt_cleanup(void)
++static DBusMessage *unregister_service(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
 +{
-+
++	return dbus_message_new_method_return(msg);
 +}
-diff --git a/src/gatt.h b/src/gatt.h
++
++static const GDBusMethodTable methods[] = {
++	{ GDBUS_EXPERIMENTAL_METHOD("RegisterService",
++				GDBUS_ARGS({ "service", "o"},
++						{ "options", "a{sv}"}),
++				NULL, register_service) },
++	{ GDBUS_EXPERIMENTAL_METHOD("UnregisterService",
++				GDBUS_ARGS({"service", "o"}),
++				NULL, unregister_service) },
++	{ }
++};
++
++gboolean gatt_dbus_manager_register(void)
++{
++	return g_dbus_register_interface(btd_get_dbus_connection(),
++					"/org/bluez", SERVICE_MGR_IFACE,
++					methods, NULL, NULL, NULL, NULL);
++}
++
++void gatt_dbus_manager_unregister(void)
++{
++	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
++							SERVICE_MGR_IFACE);
++}
+diff --git a/src/gatt-dbus.h b/src/gatt-dbus.h
 new file mode 100644
-index 0000000..3a320b4
+index 0000000..310cfa9
 --- /dev/null
-+++ b/src/gatt.h
-@@ -0,0 +1,26 @@
++++ b/src/gatt-dbus.h
+@@ -0,0 +1,25 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -109,38 +147,36 @@ index 0000000..3a320b4
 + *
 + */
 +
-+void gatt_init(void);
++gboolean gatt_dbus_manager_register(void);
++void gatt_dbus_manager_unregister(void);
+diff --git a/src/gatt.c b/src/gatt.c
+index 06619f0..e8b691a 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -25,14 +25,23 @@
+ #include <config.h>
+ #endif
+ 
++#include <glib.h>
 +
-+void gatt_cleanup(void);
-diff --git a/src/main.c b/src/main.c
-index 91d90b4..fccc838 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -55,6 +55,7 @@
- #include "dbus-common.h"
- #include "agent.h"
- #include "profile.h"
-+#include "gatt.h"
- #include "systemd.h"
- 
- #define BLUEZ_NAME "org.bluez"
-@@ -545,6 +546,8 @@ int main(int argc, char *argv[])
- 
- 	g_dbus_set_flags(gdbus_flags);
- 
-+	gatt_init();
++#include "log.h"
 +
- 	if (option_compat == TRUE)
- 		sdp_flags |= SDP_SERVER_COMPAT;
++#include "gatt-dbus.h"
+ #include "gatt.h"
  
-@@ -595,6 +598,7 @@ int main(int argc, char *argv[])
- 	btd_profile_cleanup();
- 	btd_agent_cleanup();
- 	btd_device_cleanup();
-+	gatt_cleanup();
+ void gatt_init(void)
+ {
++	DBG("Starting GATT server");
  
- 	adapter_cleanup();
++	gatt_dbus_manager_register();
+ }
  
+ void gatt_cleanup(void)
+ {
++	DBG("Stopping GATT server");
+ 
++	gatt_dbus_manager_unregister();
+ }
 -- 
 1.8.3.1
 
