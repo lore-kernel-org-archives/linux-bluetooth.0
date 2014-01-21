@@ -1,102 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v2 00/18] GATT API: External Services
-Date: Tue, 21 Jan 2014 10:26:36 -0300
-Message-Id: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 21 Jan 2014 14:56:06 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/2] android: Add btmgmt to debug builds
+Message-ID: <20140121125606.GA22342@x220.p-661hnu-f1>
+References: <1389883945-10707-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <BE345789-E478-4C6C-B192-4DAB782CE135@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BE345789-E478-4C6C-B192-4DAB782CE135@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset implements the minimal support for adding local services
-declarations.
+Hi Marcel,
 
-Limitation: Remove services and multiple services exported by the same
-remote will be implemented the next series.
+On Thu, Jan 16, 2014, Marcel Holtmann wrote:
+> > android/Android.mk | 36 ++++++++++++++++++++++++++++++++++++
+> > 1 file changed, 36 insertions(+)
+> > 
+> > diff --git a/android/Android.mk b/android/Android.mk
+> > index 7e97ec8..b3e6a50 100644
+> > --- a/android/Android.mk
+> > +++ b/android/Android.mk
+> > @@ -282,3 +282,39 @@ LOCAL_MODULE_TAGS := optional
+> > LOCAL_MODULE := bluetoothd-snoop
+> > 
+> > include $(BUILD_EXECUTABLE)
+> > +
+> > +#
+> > +# btmgmt
+> > +#
+> > +
+> > +include $(CLEAR_VARS)
+> > +
+> > +LOCAL_SRC_FILES := \
+> > +	../tools/btmgmt.c \
+> > +	../monitor/mainloop.c \
+> > +	../lib/bluetooth.c \
+> > +	../lib/sdp.c \
+> > +	../src/eir.c \
+> > +	../src/glib-helper.c \
+> > +	../src/shared/io-mainloop.c \
+> > +	../src/shared/mgmt.c \
+> > +	../src/shared/queue.c \
+> > +	../src/shared/util.c \
+> > +
+> > +LOCAL_C_INCLUDES := \
+> > +	$(call include-path-for, glib) \
+> > +	$(call include-path-for, glib)/glib \
+> > +	$(LOCAL_PATH)/.. \
+> > +	$(LOCAL_PATH)/../src \
+> > +	$(LOCAL_PATH)/../lib \
+> > +
+> > +LOCAL_SHARED_LIBRARIES := \
+> > +	libglib \
+> 
+> have Johan fix the dependency on GLib instead. It should not be needed anymore.
 
-Changes from PATCH v1 to PATCH v2:
-* Rebase
-* Included patch "doc: Add GATT API"
-* Interfaces renamed: s/Service1/GattService1, and
-  s/ServiceManager1/GattServiceManager1
-* Removed patch "gatt: Implement UnregisterService" from this patchset
+btmgmt is now free of GLib so Andrzej is free to send a new patch for
+the Android build.
 
-Changes from PATCH v0 to PATCH v1:
-* Rebase
-
-Changes from RFC v0 to PATCH v0:
-* Changed copyright year : s/2013/2014
-* Fixed coding style
-* Added gatt-service binary to gitignore
-* Added extra comment in the source code
-
-Features:
-* API for internal and external services declaration
-* Unix socket for testing purpose: services are exported
-through unix sockets to avoid breaking the current attribute
-server.
-
-How to test:
-Run bluetoothd with EXPERIMENTAL flag (-E)
-Replace /etc/dbus-1/system.d/bluetooth.conf and reload DBus settings
-$gatttool -L --primary (or interactive mode)
-
-Roughly upstreaming plan (steps):
-* GATT Server: External Services
-* GATT Server: External Characteristics (Server)
-* GATT Server: External Descriptors (Server)
-* Replace attribute server
-
-Alvaro Silva (6):
-  gatt: Add stub for gatt.{c, h} files
-  gatt: Register Manager D-Bus Interface
-  gatt: Add registering external service
-  gatt: Add external services tracking
-  gatt: Register ATT command/event handler
-  gatt: Add Discover All Primary Services
-
-Andre Guedes (1):
-  gatt: Add helper for creating GATT services
-
-Claudio Takahasi (11):
-  doc: Add GATT API
-  lib: Move GATT UUID to uuid.h
-  gatt: Add server unix socket
-  gattrib: Use default ATT LE MTU for non-standard sockets
-  test: Add external service GATT skeleton
-  gitignore: Add test/gatt-service
-  test: Add signal handling for gatt-service
-  test: Add registering external service
-  gatttool: Add unix socket connect
-  gatttool: Add unix socket support for interactive mode
-  bluetooth.conf: Add ObjectManager interface
-
- .gitignore           |   1 +
- Makefile.am          |   2 +
- Makefile.tools       |   5 +
- attrib/gatt.h        |  25 ----
- attrib/gattrib.c     |  16 +--
- attrib/gatttool.c    |  27 +++-
- attrib/gatttool.h    |   1 +
- attrib/interactive.c |  19 +--
- attrib/utils.c       |  54 ++++++++
- doc/gatt-api.txt     | 145 +++++++++++++++++++
- lib/uuid.h           |  30 ++++
- src/bluetooth.conf   |   1 +
- src/gatt-dbus.c      | 271 ++++++++++++++++++++++++++++++++++++
- src/gatt-dbus.h      |  25 ++++
- src/gatt.c           | 383 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h           |  36 +++++
- src/main.c           |   4 +
- test/gatt-service.c  | 254 ++++++++++++++++++++++++++++++++++
- 18 files changed, 1251 insertions(+), 48 deletions(-)
- create mode 100644 doc/gatt-api.txt
- create mode 100644 src/gatt-dbus.c
- create mode 100644 src/gatt-dbus.h
- create mode 100644 src/gatt.c
- create mode 100644 src/gatt.h
- create mode 100644 test/gatt-service.c
-
--- 
-1.8.3.1
-
+Johan
