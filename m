@@ -1,114 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5ddfeed2ae259064d50f6b08eb15cf5f.squirrel@mungewell.org>
-Date: Mon, 20 Jan 2014 21:00:26 -0500
-Subject: Re: [PATCH 0/1] HIDP: Add a special case for the Dualshock 4
-From: simon@mungewell.org
-To: "Frank Praznik" <frank.praznik@oh.rr.com>
-Cc: linux-bluetooth@vger.kernel.org, dh.herrmann@gmail.com,
-	simon@mungewell.org
-MIME-Version: 1.0
-Content-Type: multipart/mixed;boundary="----=_20140120210026_26256"
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] emulator: Fix unaligned memory access compilation errors
+Date: Mon, 20 Jan 2014 21:46:09 -0400
+Message-Id: <1390268769-30209-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-------=_20140120210026_26256
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: 8bit
+The u128_xor() function does proper aligned access and accepts void *
+arguments, therefore the casts are unnecessary and trigger clang errors.
+---
+ emulator/smp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-> This adds a special case in the HIDP core for the Dualshock 4
-controller.
-> The controller only recognizes output reports with the report type 0x52
-and only accepts reports sent via the ctrl channel.
-
-Which part of the system is 'at fault' here, is it simply the DS4 behaving
-incorrectly or that Bluez is not picking up some data or that 'we' are
-just the incorrect method to send the data (in the hid-sony kernel
-driver)?
-
-
-I noticed that the BT HID spec notes a 'HID control' channel in the
-example descriptor in table 5.3.3 as 'Parameter 0'.
-
-The DS4 gives this in it's SDP report
---
-	Attribute 0x0004 - ProtocolDescriptorList
-		Sequence
-			Sequence
-				UUID16 0x0100 - L2CAP
-				UINT16 0x0011 <---------- 'HDI Control' PSM 17
-			Sequence
-				UUID16 0x0011 - HIDP
---
-
-Shouldn't Bluez be remembering this and sending accesses to this PSM in
-the appropriate mode?
-
-Just looking to fix the problem where it really exists, without just
-working around specifically for the DS4.
-
-Simon
-
-
-
-------=_20140120210026_26256
-Content-Type: text/plain; name="records_raw.txt"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="records_raw.txt"
-
-U2VxdWVuY2UKCUF0dHJpYnV0ZSAweDAwMDAgLSBTZXJ2aWNlUmVjb3JkSGFuZGxlCgkJVUlOVDMy
-IDB4MDAwMTAwMDEKCUF0dHJpYnV0ZSAweDAwMDEgLSBTZXJ2aWNlQ2xhc3NJRExpc3QKCQlTZXF1
-ZW5jZQoJCQlVVUlEMTYgMHgxMTI0IC0gSHVtYW5JbnRlcmZhY2VEZXZpY2VTZXJ2aWNlIChISUQp
-CglBdHRyaWJ1dGUgMHgwMDA0IC0gUHJvdG9jb2xEZXNjcmlwdG9yTGlzdAoJCVNlcXVlbmNlCgkJ
-CVNlcXVlbmNlCgkJCQlVVUlEMTYgMHgwMTAwIC0gTDJDQVAKCQkJCVVJTlQxNiAweDAwMTEKCQkJ
-U2VxdWVuY2UKCQkJCVVVSUQxNiAweDAwMTEgLSBISURQCglBdHRyaWJ1dGUgMHgwMDA2IC0gTGFu
-Z3VhZ2VCYXNlQXR0cmlidXRlSURMaXN0CgkJU2VxdWVuY2UKCQkJVUlOVDE2IDB4NjU2ZQoJCQlV
-SU5UMTYgMHgwMDZhCgkJCVVJTlQxNiAweDAxMDAKCUF0dHJpYnV0ZSAweDAwMDkgLSBCbHVldG9v
-dGhQcm9maWxlRGVzY3JpcHRvckxpc3QKCQlTZXF1ZW5jZQoJCQlTZXF1ZW5jZQoJCQkJVVVJRDE2
-IDB4MTEyNCAtIEh1bWFuSW50ZXJmYWNlRGV2aWNlU2VydmljZSAoSElEKQoJCQkJVUlOVDE2IDB4
-MDEwMAoJQXR0cmlidXRlIDB4MDAwZCAtIEFkZGl0aW9uYWxQcm90b2NvbERlc2NyaXB0b3JMaXN0
-cwoJCVNlcXVlbmNlCgkJCVNlcXVlbmNlCgkJCQlTZXF1ZW5jZQoJCQkJCVVVSUQxNiAweDAxMDAg
-LSBMMkNBUAoJCQkJCVVJTlQxNiAweDAwMTMKCQkJCVNlcXVlbmNlCgkJCQkJVVVJRDE2IDB4MDAx
-MSAtIEhJRFAKCUF0dHJpYnV0ZSAweDAxMDAKCQlTdHJpbmcgV2lyZWxlc3MgQ29udHJvbGxlcgAK
-CUF0dHJpYnV0ZSAweDAxMDEKCQlTdHJpbmcgR2FtZSBDb250cm9sbGVyAAoJQXR0cmlidXRlIDB4
-MDEwMgoJCVN0cmluZyBTb255IENvbXB1dGVyIEVudGVydGFpbm1lbnQACglBdHRyaWJ1dGUgMHgw
-MjAwCQkJCTw9PT09PSA/Pz8/PwoJCVVJTlQxNiAweDAxMDAKCUF0dHJpYnV0ZSAweDAyMDEJCQkJ
-PD09PT09IEhJRFBhcnNlclZlcnNpb24gCgkJVUlOVDE2IDB4MDExMQoJQXR0cmlidXRlIDB4MDIw
-MgkJCQk8PT09PT0gSElERGV2aWNlU3ViY2xhc3MgCgkJVUlOVDggMHgwOAoJQXR0cmlidXRlIDB4
-MDIwMwkJCQk8PT09PT0gSElEQ291bnRyeUNvZGUgCgkJVUlOVDggMHgwMAoJQXR0cmlidXRlIDB4
-MDIwNAkJCQk8PT09PT0gSElEVmlydHVhbENhYmxlCgkJQm9vbCBGYWxzZQoJQXR0cmlidXRlIDB4
-MDIwNQkJCQk8PT09PT0gSElEUmVjb25uZWN0SW5pdGlhdGUKCQlCb29sIFRydWUKCUF0dHJpYnV0
-ZSAweDAyMDYJCQkJPD09PT09IEhJRERlc2NyaXB0b3JMaXN0CgkJU2VxdWVuY2UKCQkJU2VxdWVu
-Y2UKCQkJCVVJTlQ4IDB4MjIKCQkJCURhdGEgMDUgMDEgMDkgMDUgYTEgMDEgODUgMDEgMDkgMzAg
-MDkgMzEgMDkgMzIgMDkgMzUgMTUgMDAgMjYgZmYgMDAgNzUgMDggOTUgMDQgODEgMDIgMDkgMzkg
-MTUgMDAgMjUgMDcgNzUgMDQgOTUgMDEgODEgNDIgMDUgMDkgMTkgMDEgMjkgMGUgMTUgMDAgMjUg
-MDEgNzUgMDEgOTUgMGUgODEgMDIgNzUgMDYgOTUgMDEgODEgMDEgMDUgMDEgMDkgMzMgMDkgMzQg
-MTUgMDAgMjYgZmYgMDAgNzUgMDggOTUgMDIgODEgMDIgMDYgMDQgZmYgODUgMDIgMDkgMjQgOTUg
-MjQgYjEgMDIgODUgYTMgMDkgMjUgOTUgMzAgYjEgMDIgODUgMDUgMDkgMjYgOTUgMjggYjEgMDIg
-ODUgMDYgMDkgMjcgOTUgMzQgYjEgMDIgODUgMDcgMDkgMjggOTUgMzAgYjEgMDIgODUgMDggMDkg
-MjkgOTUgMmYgYjEgMDIgMDYgMDMgZmYgODUgMDMgMDkgMjEgOTUgMjYgYjEgMDIgODUgMDQgMDkg
-MjIgOTUgMmUgYjEgMDIgODUgZjAgMDkgNDcgOTUgM2YgYjEgMDIgODUgZjEgMDkgNDggOTUgM2Yg
-YjEgMDIgODUgZjIgMDkgNDkgOTUgMGYgYjEgMDIgMDYgMDAgZmYgODUgMTEgMDkgMjAgMTUgMDAg
-MjYgZmYgMDAgNzUgMDggOTUgNGQgODEgMDIgMDkgMjEgOTEgMDIgODUgMTIgMDkgMjIgOTUgOGQg
-ODEgMDIgMDkgMjMgOTEgMDIgODUgMTMgMDkgMjQgOTUgY2QgODEgMDIgMDkgMjUgOTEgMDIgODUg
-MTQgMDkgMjYgOTYgMGQgMDEgODEgMDIgMDkgMjcgOTEgMDIgODUgMTUgMDkgMjggOTYgNGQgMDEg
-ODEgMDIgMDkgMjkgOTEgMDIgODUgMTYgMDkgMmEgOTYgOGQgMDEgODEgMDIgMDkgMmIgOTEgMDIg
-ODUgMTcgMDkgMmMgOTYgY2QgMDEgODEgMDIgMDkgMmQgOTEgMDIgODUgMTggMDkgMmUgOTYgMGQg
-MDIgODEgMDIgMDkgMmYgOTEgMDIgODUgMTkgMDkgMzAgOTYgMjIgMDIgODEgMDIgMDkgMzEgOTEg
-MDIgMDYgODAgZmYgODUgODIgMDkgMjIgOTUgM2YgYjEgMDIgODUgODMgMDkgMjMgYjEgMDIgODUg
-ODQgMDkgMjQgYjEgMDIgODUgOTAgMDkgMzAgYjEgMDIgODUgOTEgMDkgMzEgYjEgMDIgODUgOTIg
-MDkgMzIgYjEgMDIgODUgOTMgMDkgMzMgYjEgMDIgODUgYTAgMDkgNDAgYjEgMDIgODUgYTQgMDkg
-NDQgYjEgMDIgYzAgMDAKU2VxdWVuY2UKCUF0dHJpYnV0ZSAweDAwMDAgLSBTZXJ2aWNlUmVjb3Jk
-SGFuZGxlCgkJVUlOVDMyIDB4MDAwMTAwMDIKCUF0dHJpYnV0ZSAweDAwMDEgLSBTZXJ2aWNlQ2xh
-c3NJRExpc3QKCQlTZXF1ZW5jZQoJCQlVVUlEMTYgMHgxMjAwIC0gUG5QSW5mb3JtYXRpb24KCUF0
-dHJpYnV0ZSAweDAwMDQgLSBQcm90b2NvbERlc2NyaXB0b3JMaXN0CgkJU2VxdWVuY2UKCQkJU2Vx
-dWVuY2UKCQkJCVVVSUQxNiAweDAxMDAgLSBMMkNBUAoJCQkJVUlOVDE2IDB4MDAwMQoJCQlTZXF1
-ZW5jZQoJCQkJVVVJRDE2IDB4MDAwMSAtIFNEUAoJQXR0cmlidXRlIDB4MDAwOSAtIEJsdWV0b290
-aFByb2ZpbGVEZXNjcmlwdG9yTGlzdAoJCVNlcXVlbmNlCgkJCVNlcXVlbmNlCgkJCQlVVUlEMTYg
-MHgxMjAwIC0gUG5QSW5mb3JtYXRpb24KCQkJCVVJTlQxNiAweDAxMDMKCUF0dHJpYnV0ZSAweDAy
-MDAKCQlVSU5UMTYgMHgwMTAzCglBdHRyaWJ1dGUgMHgwMjAxCgkJVUlOVDE2IDB4MDU0YwoJQXR0
-cmlidXRlIDB4MDIwMgoJCVVJTlQxNiAweDA1YzQKCUF0dHJpYnV0ZSAweDAyMDMKCQlVSU5UMTYg
-MHgwMTAwCglBdHRyaWJ1dGUgMHgwMjA0CgkJQm9vbCBUcnVlCglBdHRyaWJ1dGUgMHgwMjA1CgkJ
-VUlOVDE2IDB4MDAwMgo=
-------=_20140120210026_26256--
-
+diff --git a/emulator/smp.c b/emulator/smp.c
+index 2b4f9a5..cb7cda0 100644
+--- a/emulator/smp.c
++++ b/emulator/smp.c
+@@ -248,7 +248,7 @@ static int smp_c1(struct smp_conn *conn, uint8_t rnd[16], uint8_t res[16])
+ 	baswap((bdaddr_t *) (p2 + 10), (bdaddr_t *) conn->ra);
+ 
+ 	/* res = r XOR p1 */
+-	u128_xor((u128 *) res, (u128 *) rnd, (u128 *) p1);
++	u128_xor(res, rnd, p1);
+ 
+ 	/* res = e(k, res) */
+ 	err = smp_e(conn->smp->alg_sk, conn->tk, res, res);
+@@ -256,7 +256,7 @@ static int smp_c1(struct smp_conn *conn, uint8_t rnd[16], uint8_t res[16])
+ 		return err;
+ 
+ 	/* res = res XOR p2 */
+-	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
++	u128_xor(res, res, p2);
+ 
+ 	/* res = e(k, res) */
+ 	return smp_e(conn->smp->alg_sk, conn->tk, res, res);
+-- 
+1.8.3.2
 
