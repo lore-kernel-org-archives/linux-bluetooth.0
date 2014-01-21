@@ -1,50 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 60/73] drivers/bluetooth: delete non-required instances of include <linux/init.h>
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1390339396-3479-61-git-send-email-paul.gortmaker@windriver.com>
-Date: Tue, 21 Jan 2014 13:55:01 -0800
-Cc: linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-arch@vger.kernel.org,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <8861C0F9-FF68-47B8-B9EB-E52BF6A72A6F@holtmann.org>
-References: <1390339396-3479-1-git-send-email-paul.gortmaker@windriver.com> <1390339396-3479-61-git-send-email-paul.gortmaker@windriver.com>
-To: Paul Gortmaker <paul.gortmaker@windriver.com>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Paul Gortmaker <paul.gortmaker@windriver.com>
+To: <linux-kernel@vger.kernel.org>
+CC: <linux-arch@vger.kernel.org>,
+        Paul Gortmaker
+	<paul.gortmaker@windriver.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg
+	<johan.hedberg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH 60/73] drivers/bluetooth: delete non-required instances of include <linux/init.h>
+Date: Tue, 21 Jan 2014 16:23:03 -0500
+Message-ID: <1390339396-3479-61-git-send-email-paul.gortmaker@windriver.com>
+In-Reply-To: <1390339396-3479-1-git-send-email-paul.gortmaker@windriver.com>
+References: <1390339396-3479-1-git-send-email-paul.gortmaker@windriver.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Paul,
+None of these files are actually using any __init type directives
+and hence don't need to include <linux/init.h>.  Most are just a
+left over from __devinit and __cpuinit removal, or simply due to
+code getting copied from one driver to the next.
 
-> None of these files are actually using any __init type directives
-> and hence don't need to include <linux/init.h>.  Most are just a
-> left over from __devinit and __cpuinit removal, or simply due to
-> code getting copied from one driver to the next.
-> 
-> Cc: Marcel Holtmann <marcel@holtmann.org>
-> Cc: Gustavo Padovan <gustavo@padovan.org>
-> Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> Cc: linux-bluetooth@vger.kernel.org
-> Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
-> ---
-> drivers/bluetooth/ath3k.c       | 1 -
-> drivers/bluetooth/bcm203x.c     | 1 -
-> drivers/bluetooth/bfusb.c       | 1 -
-> drivers/bluetooth/bluecard_cs.c | 1 -
-> drivers/bluetooth/bpa10x.c      | 1 -
-> drivers/bluetooth/bt3c_cs.c     | 1 -
-> drivers/bluetooth/btuart_cs.c   | 1 -
-> drivers/bluetooth/dtl1_cs.c     | 1 -
-> 8 files changed, 8 deletions(-)
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Paul Gortmaker <paul.gortmaker@windriver.com>
+---
+ drivers/bluetooth/ath3k.c       | 1 -
+ drivers/bluetooth/bcm203x.c     | 1 -
+ drivers/bluetooth/bfusb.c       | 1 -
+ drivers/bluetooth/bluecard_cs.c | 1 -
+ drivers/bluetooth/bpa10x.c      | 1 -
+ drivers/bluetooth/bt3c_cs.c     | 1 -
+ drivers/bluetooth/btuart_cs.c   | 1 -
+ drivers/bluetooth/dtl1_cs.c     | 1 -
+ 8 files changed, 8 deletions(-)
 
-I can take this single patch via bluetooth-next tree or if Linus for example wants to take the whole series, then that is fine with me as well.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 41ec6f9..427f280 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -20,7 +20,6 @@
+ 
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/errno.h>
+diff --git a/drivers/bluetooth/bcm203x.c b/drivers/bluetooth/bcm203x.c
+index 364f82b..40db9a9 100644
+--- a/drivers/bluetooth/bcm203x.c
++++ b/drivers/bluetooth/bcm203x.c
+@@ -26,7 +26,6 @@
+ 
+ #include <linux/atomic.h>
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/errno.h>
+diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
+index 3138699..48b71f0 100644
+--- a/drivers/bluetooth/bfusb.c
++++ b/drivers/bluetooth/bfusb.c
+@@ -24,7 +24,6 @@
+ #include <linux/module.h>
+ 
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/errno.h>
+diff --git a/drivers/bluetooth/bluecard_cs.c b/drivers/bluetooth/bluecard_cs.c
+index 57427de..0aae563 100644
+--- a/drivers/bluetooth/bluecard_cs.c
++++ b/drivers/bluetooth/bluecard_cs.c
+@@ -23,7 +23,6 @@
+ #include <linux/module.h>
+ 
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/sched.h>
+diff --git a/drivers/bluetooth/bpa10x.c b/drivers/bluetooth/bpa10x.c
+index 8a31991..40281c0 100644
+--- a/drivers/bluetooth/bpa10x.c
++++ b/drivers/bluetooth/bpa10x.c
+@@ -23,7 +23,6 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/sched.h>
+diff --git a/drivers/bluetooth/bt3c_cs.c b/drivers/bluetooth/bt3c_cs.c
+index 73d8799..f3508fe 100644
+--- a/drivers/bluetooth/bt3c_cs.c
++++ b/drivers/bluetooth/bt3c_cs.c
+@@ -24,7 +24,6 @@
+ #include <linux/module.h>
+ 
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/delay.h>
+diff --git a/drivers/bluetooth/btuart_cs.c b/drivers/bluetooth/btuart_cs.c
+index a03ecc2..057104e 100644
+--- a/drivers/bluetooth/btuart_cs.c
++++ b/drivers/bluetooth/btuart_cs.c
+@@ -23,7 +23,6 @@
+ #include <linux/module.h>
+ 
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/delay.h>
+diff --git a/drivers/bluetooth/dtl1_cs.c b/drivers/bluetooth/dtl1_cs.c
+index 52eed1f..5bb80e4 100644
+--- a/drivers/bluetooth/dtl1_cs.c
++++ b/drivers/bluetooth/dtl1_cs.c
+@@ -23,7 +23,6 @@
+ #include <linux/module.h>
+ 
+ #include <linux/kernel.h>
+-#include <linux/init.h>
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/delay.h>
+-- 
+1.8.4.1
