@@ -1,99 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/5] android/bluetooth: Always store device info
-Date: Tue, 21 Jan 2014 16:01:35 +0100
-Message-Id: <1390316497-18451-4-git-send-email-szymon.janc@tieto.com>
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 1/5] android/bluetooth: Split devices list to devices and bonded_devices
+Date: Tue, 21 Jan 2014 16:01:33 +0100
+Message-Id: <1390316497-18451-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1390316497-18451-1-git-send-email-szymon.janc@tieto.com>
 References: <1390316497-18451-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to cache remote device informations.
+From: Szymon Janc <szymon.janc@gmail.com>
+
+Bonded devices are permament until unbondedn. Non-bonded devices will
+be held in (size limited) cache based on timestamp property so split
+list to ease separation.
 ---
- android/bluetooth.c | 42 +++++++++++++++++++++++++++++-------------
- 1 file changed, 29 insertions(+), 13 deletions(-)
+ android/bluetooth.c | 47 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 35 insertions(+), 12 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 3314267..f32dd91 100644
+index 4849dab..8f08122 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -207,23 +207,11 @@ static void store_device_info(struct device *dev)
- 	char **uuids = NULL;
- 	char *str;
+@@ -132,6 +132,8 @@ static const uint16_t uuid_list[] = {
  
--	/* We only store bonded devices and need to modify the storage
--	 * if the state is either NONE or BONDED.
--	 */
--	if (dev->bond_state != HAL_BOND_STATE_BONDED &&
--					dev->bond_state != HAL_BOND_STATE_NONE)
--		return;
--
- 	ba2str(&dev->bdaddr, addr);
+ static uint16_t option_index = MGMT_INDEX_NONE;
+ static struct mgmt *mgmt_if = NULL;
++
++static GSList *bonded_devices = NULL;
+ static GSList *devices = NULL;
  
- 	key_file = g_key_file_new();
- 	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
- 
--	if (dev->bond_state == HAL_BOND_STATE_NONE) {
--		g_key_file_remove_group(key_file, addr, NULL);
--		goto done;
--	}
--
- 	g_key_file_set_integer(key_file, addr, "Type", dev->bdaddr_type);
- 
- 	g_key_file_set_string(key_file, addr, "Name", dev->name);
-@@ -264,7 +252,6 @@ static void store_device_info(struct device *dev)
- 		g_key_file_remove_key(key_file, addr, "Services", NULL);
- 	}
- 
--done:
- 	str = g_key_file_to_data(key_file, &length, NULL);
- 	g_file_set_contents(DEVICES_FILE, str, length, NULL);
- 	g_free(str);
-@@ -542,6 +529,33 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
- 	g_key_file_free(key_file);
- }
- 
-+static void remove_stored_link_key(const bdaddr_t *dst)
-+{
-+	GKeyFile *key_file;
-+	gsize length = 0;
-+	char addr[18];
-+	char *data;
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL))
-+		return;
-+
-+	ba2str(dst, addr);
-+
-+	DBG("%s", addr);
-+
-+	g_key_file_remove_key(key_file, addr, "LinkKey", NULL);
-+	g_key_file_remove_key(key_file, addr, "LinkKeyType", NULL);
-+	g_key_file_remove_key(key_file, addr, "LinkKeyPinLength", NULL);
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(DEVICES_FILE, data, length, NULL);
-+	g_free(data);
-+
-+	g_key_file_free(key_file);
-+}
-+
- static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
- 								uint8_t state)
+ /* This list contains addresses which are asked for records */
+@@ -283,6 +285,10 @@ static struct device *find_device(const bdaddr_t *bdaddr)
  {
-@@ -2443,6 +2457,8 @@ static void unpair_device_complete(uint8_t status, uint16_t length,
- 	if (status != MGMT_STATUS_SUCCESS)
+ 	GSList *l;
+ 
++	l = g_slist_find_custom(bonded_devices, bdaddr, device_match);
++	if (l)
++		return l->data;
++
+ 	l = g_slist_find_custom(devices, bdaddr, device_match);
+ 	if (l)
+ 		return l->data;
+@@ -559,12 +565,30 @@ static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
+ 	if (!dev)
  		return;
  
-+	remove_stored_link_key(&rp->addr.bdaddr);
+-	if (dev->bond_state != state) {
+-		dev->bond_state = state;
+-		send_bond_state_change(&dev->bdaddr, status, state);
++	if (dev->bond_state == state)
++		return;
+ 
+-		store_device_info(dev);
++	switch (state) {
++	case HAL_BOND_STATE_NONE:
++		if (dev->bond_state == HAL_BOND_STATE_BONDED) {
++			bonded_devices = g_slist_remove(bonded_devices, dev);
++			devices = g_slist_prepend(devices, dev);
++		}
++		break;
++	case HAL_BOND_STATE_BONDED:
++		devices = g_slist_remove(devices, dev);
++		bonded_devices = g_slist_prepend(bonded_devices, dev);
++		break;
++	case HAL_BOND_STATE_BONDING:
++	default:
++		break;
+ 	}
 +
- 	set_device_bond_state(&rp->addr.bdaddr, HAL_STATUS_SUCCESS,
- 							HAL_BOND_STATE_NONE);
++	dev->bond_state = state;
++
++	store_device_info(dev);
++
++	send_bond_state_change(&dev->bdaddr, status, state);
  }
+ 
+ static  void send_device_property(const bdaddr_t *bdaddr, uint8_t type,
+@@ -2128,18 +2152,15 @@ static uint8_t get_adapter_scan_mode(void)
+ 
+ static uint8_t get_adapter_bonded_devices(void)
+ {
+-	uint8_t buf[sizeof(bdaddr_t) * g_slist_length(devices)];
++	uint8_t buf[sizeof(bdaddr_t) * g_slist_length(bonded_devices)];
+ 	int i = 0;
+ 	GSList *l;
+ 
+ 	DBG("");
+ 
+-	for (l = devices; l; l = g_slist_next(l)) {
++	for (l = bonded_devices; l; l = g_slist_next(l)) {
+ 		struct device *dev = l->data;
+ 
+-		if (dev->bond_state != HAL_BOND_STATE_BONDED)
+-			continue;
+-
+ 		bdaddr2android(&dev->bdaddr, buf + (i * sizeof(bdaddr_t)));
+ 		i++;
+ 	}
+@@ -2691,11 +2712,10 @@ static void send_bonded_devices_props(void)
+ {
+ 	GSList *l;
+ 
+-	for (l = devices; l; l = g_slist_next(l)) {
++	for (l = bonded_devices; l; l = g_slist_next(l)) {
+ 		struct device *dev = l->data;
+ 
+-		if (dev->bond_state == HAL_BOND_STATE_BONDED)
+-			get_remote_device_props(dev);
++		get_remote_device_props(dev);
+ 	}
+ }
+ 
+@@ -3093,6 +3113,9 @@ void bt_bluetooth_unregister(void)
+ {
+ 	DBG("");
+ 
++	g_slist_free_full(bonded_devices, (GDestroyNotify) free_device);
++	bonded_devices = NULL;
++
+ 	g_slist_free_full(devices, (GDestroyNotify) free_device);
+ 	devices = NULL;
+ 
 -- 
 1.8.3.2
 
