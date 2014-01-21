@@ -1,112 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 2/5] android/bluetooth: Use defines for settings and devices files paths
-Date: Tue, 21 Jan 2014 16:01:34 +0100
-Message-Id: <1390316497-18451-3-git-send-email-szymon.janc@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/5] android/bluetooth: Always store device info
+Date: Tue, 21 Jan 2014 16:01:35 +0100
+Message-Id: <1390316497-18451-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1390316497-18451-1-git-send-email-szymon.janc@tieto.com>
 References: <1390316497-18451-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@gmail.com>
-
+This allows to cache remote device informations.
 ---
- android/bluetooth.c | 24 +++++++++++-------------
- 1 file changed, 11 insertions(+), 13 deletions(-)
+ android/bluetooth.c | 42 +++++++++++++++++++++++++++++-------------
+ 1 file changed, 29 insertions(+), 13 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 8f08122..3314267 100644
+index 3314267..f32dd91 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -54,6 +54,9 @@
- 
- #define DUT_MODE_FILE "/sys/kernel/debug/bluetooth/hci%u/dut_mode"
- 
-+#define SETTINGS_FILE ANDROID_STORAGEDIR"/settings"
-+#define DEVICES_FILE ANDROID_STORAGEDIR"/devices"
-+
- #define DEVICE_ID_SOURCE	0x0002	/* USB */
- #define DEVICE_ID_VENDOR	0x1d6b	/* Linux Foundation */
- #define DEVICE_ID_PRODUCT	0x0247	/* BlueZ for Android */
-@@ -148,8 +151,7 @@ static void store_adapter_config(void)
- 
- 	key_file = g_key_file_new();
- 
--	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/settings", 0,
--									NULL);
-+	g_key_file_load_from_file(key_file, SETTINGS_FILE, 0, NULL);
- 
- 	ba2str(&adapter.bdaddr, addr);
- 
-@@ -160,7 +162,7 @@ static void store_adapter_config(void)
- 
- 	data = g_key_file_to_data(key_file, &length, NULL);
- 
--	g_file_set_contents(ANDROID_STORAGEDIR"/settings", data, length, NULL);
-+	g_file_set_contents(SETTINGS_FILE, data, length, NULL);
- 
- 	g_free(data);
- 	g_key_file_free(key_file);
-@@ -173,8 +175,7 @@ static void load_adapter_config(void)
+@@ -207,23 +207,11 @@ static void store_device_info(struct device *dev)
+ 	char **uuids = NULL;
  	char *str;
  
- 	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/settings", 0,
--									NULL);
-+	g_key_file_load_from_file(key_file, SETTINGS_FILE, 0, NULL);
- 
- 	str = g_key_file_get_string(key_file, "General", "Address", NULL);
- 	if (!str) {
-@@ -216,8 +217,7 @@ static void store_device_info(struct device *dev)
+-	/* We only store bonded devices and need to modify the storage
+-	 * if the state is either NONE or BONDED.
+-	 */
+-	if (dev->bond_state != HAL_BOND_STATE_BONDED &&
+-					dev->bond_state != HAL_BOND_STATE_NONE)
+-		return;
+-
  	ba2str(&dev->bdaddr, addr);
  
  	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices", 0,
--									NULL);
-+	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
+ 	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
  
- 	if (dev->bond_state == HAL_BOND_STATE_NONE) {
- 		g_key_file_remove_group(key_file, addr, NULL);
-@@ -266,7 +266,7 @@ static void store_device_info(struct device *dev)
+-	if (dev->bond_state == HAL_BOND_STATE_NONE) {
+-		g_key_file_remove_group(key_file, addr, NULL);
+-		goto done;
+-	}
+-
+ 	g_key_file_set_integer(key_file, addr, "Type", dev->bdaddr_type);
  
- done:
+ 	g_key_file_set_string(key_file, addr, "Name", dev->name);
+@@ -264,7 +252,6 @@ static void store_device_info(struct device *dev)
+ 		g_key_file_remove_key(key_file, addr, "Services", NULL);
+ 	}
+ 
+-done:
  	str = g_key_file_to_data(key_file, &length, NULL);
--	g_file_set_contents(ANDROID_STORAGEDIR"/devices", str, length, NULL);
-+	g_file_set_contents(DEVICES_FILE, str, length, NULL);
+ 	g_file_set_contents(DEVICES_FILE, str, length, NULL);
  	g_free(str);
- 
+@@ -542,6 +529,33 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
  	g_key_file_free(key_file);
-@@ -521,8 +521,7 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ }
  
- 	key_file = g_key_file_new();
- 
--	if (!g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices",
--								0, NULL))
++static void remove_stored_link_key(const bdaddr_t *dst)
++{
++	GKeyFile *key_file;
++	gsize length = 0;
++	char addr[18];
++	char *data;
++
++	key_file = g_key_file_new();
++
 +	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL))
++		return;
++
++	ba2str(dst, addr);
++
++	DBG("%s", addr);
++
++	g_key_file_remove_key(key_file, addr, "LinkKey", NULL);
++	g_key_file_remove_key(key_file, addr, "LinkKeyType", NULL);
++	g_key_file_remove_key(key_file, addr, "LinkKeyPinLength", NULL);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(DEVICES_FILE, data, length, NULL);
++	g_free(data);
++
++	g_key_file_free(key_file);
++}
++
+ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+ 								uint8_t state)
+ {
+@@ -2443,6 +2457,8 @@ static void unpair_device_complete(uint8_t status, uint16_t length,
+ 	if (status != MGMT_STATUS_SUCCESS)
  		return;
  
- 	ba2str(dst, addr);
-@@ -537,7 +536,7 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
- 	g_key_file_set_integer(key_file, addr, "LinkKeyPinLength", pin_length);
- 
- 	data = g_key_file_to_data(key_file, &length, NULL);
--	g_file_set_contents(ANDROID_STORAGEDIR"/devices", data, length, NULL);
-+	g_file_set_contents(DEVICES_FILE, data, length, NULL);
- 	g_free(data);
- 
- 	g_key_file_free(key_file);
-@@ -1726,8 +1725,7 @@ static void load_devices_info(bt_bluetooth_ready cb)
- 
- 	key_file = g_key_file_new();
- 
--	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices", 0,
--									NULL);
-+	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
- 
- 	devs = g_key_file_get_groups(key_file, &len);
- 
++	remove_stored_link_key(&rp->addr.bdaddr);
++
+ 	set_device_bond_state(&rp->addr.bdaddr, HAL_STATUS_SUCCESS,
+ 							HAL_BOND_STATE_NONE);
+ }
 -- 
 1.8.3.2
 
