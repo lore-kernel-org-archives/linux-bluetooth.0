@@ -3,9 +3,9 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
 	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v2 11/18] gatt: Add Discover All Primary Services
-Date: Tue, 21 Jan 2014 10:26:47 -0300
-Message-Id: <1390310814-19880-12-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 10/18] gatt: Register ATT command/event handler
+Date: Tue, 21 Jan 2014 10:26:46 -0300
+Message-Id: <1390310814-19880-11-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,164 +13,123 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-This patch adds ATT Read By Group request handling to the attribute
-server. It is the primitive to implement Discover All Primary Services
-procedure.
+This patch registers the ATT channel handler to manage incoming ATT
+commands and events.
 ---
- src/gatt.c | 129 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 128 insertions(+), 1 deletion(-)
+ src/gatt.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 80 insertions(+)
 
 diff --git a/src/gatt.c b/src/gatt.c
-index 33c3b6a..b204f9c 100644
+index 4806205..33c3b6a 100644
 --- a/src/gatt.c
 +++ b/src/gatt.c
-@@ -112,6 +112,130 @@ static void send_error(GAttrib *attrib, uint8_t opcode, uint16_t handle,
- 	g_attrib_send(attrib, 0, pdu, plen, NULL, NULL, NULL);
+@@ -38,6 +38,7 @@
+ #include "log.h"
+ #include "lib/uuid.h"
+ #include "attrib/att.h"
++#include "attrib/gattrib.h"
+ 
+ #include "gatt-dbus.h"
+ #include "gatt.h"
+@@ -100,12 +101,83 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	return attr;
  }
  
-+static void read_by_group_resp(GAttrib *attrib, uint16_t start,
-+					uint16_t end, bt_uuid_t *pattern)
++static void send_error(GAttrib *attrib, uint8_t opcode, uint16_t handle,
++								uint8_t ecode)
 +{
-+	uint8_t opdu[ATT_DEFAULT_LE_MTU];
-+	GList *list;
-+	struct btd_attribute *last = NULL;
-+	uint8_t *group_start, *group_end = NULL, *group_uuid;
-+	unsigned int uuid_type = BT_UUID_UNSPEC;
-+	size_t group_len = 0, plen = 0;
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	size_t plen;
 +
-+	/*
-+	 * Read By Group Type Response format:
-+	 *    Attribute Opcode: 1 byte
-+	 *    Length: 1 byte (size of each group)
-+	 *    Group: start | end | <<UUID>>
-+	 */
++	plen = enc_error_resp(opcode, handle, ecode, pdu, sizeof(pdu));
 +
-+	opdu[0] = ATT_OP_READ_BY_GROUP_RESP;
-+	group_start = &opdu[2];
-+	group_uuid = &opdu[6];
-+
-+	for (list = local_attribute_db; list;
-+			last = list->data, list = g_list_next(list)) {
-+		struct btd_attribute *attr = list->data;
-+
-+		if (attr->handle < start)
-+			continue;
-+
-+		if (attr->handle > end)
-+			break;
-+
-+		if (bt_uuid_cmp(&attr->type, pattern) != 0)
-+			continue;
-+
-+		if (uuid_type != BT_UUID_UNSPEC &&
-+						uuid_type != attr->type.type) {
-+			/*
-+			 * Groups should contain the same length: UUID16 and
-+			 * UUID128 should be sent on different ATT PDUs
-+			 */
-+			break;
-+		}
-+
-+		/*
-+		 * MTU checking should not be shifted up, otherwise the
-+		 * handle of last end group will not be set properly.
-+		 */
-+		if ((plen + group_len) >= ATT_DEFAULT_LE_MTU)
-+			break;
-+
-+		/* Start Grouping handle */
-+		att_put_u16(attr->handle, group_start);
-+
-+		/* Grouping <<UUID>>: Value is little endian */
-+		memcpy(group_uuid, attr->value, attr->value_len);
-+
-+		if (last && group_end) {
-+			att_put_u16(last->handle, group_end);
-+			group_end += group_len;
-+			plen += group_len;
-+		}
-+
-+		/* Grouping initial settings: First grouping */
-+		if (uuid_type == BT_UUID_UNSPEC) {
-+			uuid_type = attr->type.type;
-+
-+			/* start(0xXXXX) | end(0xXXXX) | <<UUID>> */
-+			group_len = 2 + 2 + bt_uuid_len(&attr->type);
-+
-+			/* 2: ATT Opcode and Length */
-+			plen = 2 + group_len;
-+
-+			/* Size of each Attribute Data */
-+			opdu[1] = group_len;
-+
-+			group_end = &opdu[4];
-+		}
-+
-+		group_start += group_len;
-+		group_uuid += group_len;
-+	}
-+
-+	if (plen == 0) {
-+		send_error(attrib, ATT_OP_READ_BY_GROUP_REQ, start,
-+						ATT_ECODE_ATTR_NOT_FOUND);
-+		return;
-+	}
-+
-+	if (group_end)
-+		att_put_u16(last->handle, group_end);
-+
-+	g_attrib_send(attrib, 0, opdu, plen, NULL, NULL, NULL);
++	g_attrib_send(attrib, 0, pdu, plen, NULL, NULL, NULL);
 +}
 +
-+static void read_by_group(GAttrib *attrib, const uint8_t *ipdu, size_t ilen)
++static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
++							gpointer user_data)
 +{
-+	uint16_t decoded, start, end;
-+	bt_uuid_t pattern;
++	GAttrib *attrib = user_data;
 +
-+	decoded = dec_read_by_grp_req(ipdu, ilen, &start, &end, &pattern);
-+	if (decoded == 0) {
-+		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_INVALID_PDU);
-+		return;
-+	}
-+
-+	if (start > end || start == 0x0000) {
-+		send_error(attrib, ipdu[0], start, ATT_ECODE_INVALID_HANDLE);
-+		return;
-+	}
-+
-+	 /*
-+	  * Restricting Read By Group Type to <<Primary>>.
-+	  * Removing the checking below requires changes to support
-+	  * dynamic values(defined in the upper layer) and additional
-+	  * security verification.
-+	  */
-+	if (bt_uuid_cmp(&pattern, &primary_uuid) != 0) {
-+		send_error(attrib, ipdu[0], start, ATT_ECODE_UNSUPP_GRP_TYPE);
-+		return;
-+	}
-+
-+	read_by_group_resp(attrib, start, end, &pattern);
-+}
-+
- static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
- 							gpointer user_data)
- {
-@@ -133,11 +257,14 @@ static void channel_handler_cb(const uint8_t *ipdu, uint16_t ilen,
- 	case ATT_OP_READ_MULTI_REQ:
- 	case ATT_OP_PREP_WRITE_REQ:
- 	case ATT_OP_EXEC_WRITE_REQ:
--	case ATT_OP_READ_BY_GROUP_REQ:
- 	case ATT_OP_SIGNED_WRITE_CMD:
- 		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
- 		break;
- 
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+		read_by_group(attrib, ipdu, ilen);
++	switch (ipdu[0]) {
++	case ATT_OP_ERROR:
 +		break;
 +
- 	/* Responses */
- 	case ATT_OP_MTU_RESP:
- 	case ATT_OP_FIND_INFO_RESP:
++	/* Requests */
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_SIGNED_WRITE_CMD:
++		send_error(attrib, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
++		break;
++
++	/* Responses */
++	case ATT_OP_MTU_RESP:
++	case ATT_OP_FIND_INFO_RESP:
++	case ATT_OP_FIND_BY_TYPE_RESP:
++	case ATT_OP_READ_BY_TYPE_RESP:
++	case ATT_OP_READ_RESP:
++	case ATT_OP_READ_BLOB_RESP:
++	case ATT_OP_READ_MULTI_RESP:
++	case ATT_OP_READ_BY_GROUP_RESP:
++	case ATT_OP_WRITE_RESP:
++	case ATT_OP_PREP_WRITE_RESP:
++	case ATT_OP_EXEC_WRITE_RESP:
++	case ATT_OP_HANDLE_CNF:
++		break;
++
++	/* Notification & Indication */
++	case ATT_OP_HANDLE_NOTIFY:
++	case ATT_OP_HANDLE_IND:
++		break;
++	}
++}
++
++static gboolean unix_hup_cb(GIOChannel *io, GIOCondition cond,
++						gpointer user_data)
++{
++	GAttrib *attrib = user_data;
++
++	g_attrib_unregister_all(attrib);
++	g_attrib_unref(attrib);
++
++	return FALSE;
++}
++
+ static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+ 	struct sockaddr_un uaddr;
+ 	socklen_t len = sizeof(uaddr);
+ 	GIOChannel *nio;
++	GAttrib *attrib;
+ 	int err, nsk, sk;
+ 
+ 	sk = g_io_channel_unix_get_fd(io);
+@@ -120,6 +192,14 @@ static gboolean unix_accept_cb(GIOChannel *io, GIOCondition cond,
+ 	nio = g_io_channel_unix_new(nsk);
+ 	g_io_channel_set_close_on_unref(nio, TRUE);
+ 	DBG("ATT UNIX socket: %p new client", nio);
++
++	attrib = g_attrib_new(nio);
++
++	g_attrib_register(attrib, GATTRIB_ALL_EVENTS, GATTRIB_ALL_HANDLES,
++					channel_handler_cb, attrib, NULL);
++
++	g_io_add_watch(nio, G_IO_HUP, unix_hup_cb, attrib);
++
+ 	g_io_channel_unref(nio);
+ 
+ 	return TRUE;
 -- 
 1.8.3.1
 
