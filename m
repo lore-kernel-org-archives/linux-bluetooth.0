@@ -1,35 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/pan: Fix possible NULL dereference
-Date: Wed, 22 Jan 2014 18:03:58 +0200
-Message-Id: <1390406638-16783-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1390406638-16783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1390406638-16783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] android/ipc: trivial: Remove empty line
+Date: Wed, 22 Jan 2014 18:03:57 +0200
+Message-Id: <1390406638-16783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-It is better to return here since dev is not allocated and assigned NULL
-value.
 ---
- android/pan.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/hal-msg.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index 4e04da0..adc5df7 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -439,7 +439,7 @@ static void nap_confirm_cb(GIOChannel *chan, gpointer data)
- 	if (err) {
- 		error("%s", err->message);
- 		g_error_free(err);
--		goto failed;
-+		return;
- 	}
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index cfb5460..d46b428 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -391,7 +391,6 @@ struct hal_cmd_pan_disconnect {
  
- 	DBG("incoming connect request from %s", address);
+ /* Notifications and confirmations */
+ 
+-
+ #define HAL_POWER_OFF			0x00
+ #define HAL_POWER_ON			0x01
+ 
 -- 
 1.8.3.2
 
