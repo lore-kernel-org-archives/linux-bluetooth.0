@@ -1,89 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/9] android/ipc-tester: Add case for BT Set adapter prop
-Date: Wed, 22 Jan 2014 09:25:23 +0100
-Message-Id: <1390379124-16426-8-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 6/9] android/ipc-tester: Add cases for PAN msg size
+Date: Wed, 22 Jan 2014 09:25:21 +0100
+Message-Id: <1390379124-16426-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1390379124-16426-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1390379124-16426-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds test for verifying data length inside
-hal_cmd_set_adapter_prop struct.
+Add cases testing message size verification for PAN opcodes.
 ---
- android/ipc-tester.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ android/ipc-tester.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
 diff --git a/android/ipc-tester.c b/android/ipc-tester.c
-index c621167..e44afb3 100644
+index b161049..11239e7 100644
 --- a/android/ipc-tester.c
 +++ b/android/ipc-tester.c
-@@ -650,6 +650,43 @@ struct hal_hdr enable_bt_service_hdr = {
- 	.len = 0,
- };
+@@ -1103,5 +1103,35 @@ int main(int argc, char *argv[])
+ 				sizeof(send_data_data)),
+ 			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_HIDHOST);
  
-+struct bt_set_adapter_prop_data {
-+	struct hal_hdr hdr;
-+	struct hal_cmd_set_adapter_prop prop;
++	/* check for valid data size for PAN */
++	test_datasize_valid("PAN Enable+", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_ENABLE,
++			sizeof(struct hal_cmd_pan_enable), 1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
++	test_datasize_valid("PAN Enable-", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_ENABLE,
++			sizeof(struct hal_cmd_pan_enable), -1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
++	test_datasize_valid("PAN Get Role+", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_GET_ROLE,
++			0, 1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
++	test_datasize_valid("PAN Connect+", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_CONNECT,
++			sizeof(struct hal_cmd_pan_connect), 1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
++	test_datasize_valid("PAN Connect-", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_CONNECT,
++			sizeof(struct hal_cmd_pan_connect), -1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
++	test_datasize_valid("PAN Disconnect+", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_DISCONNECT,
++			sizeof(struct hal_cmd_pan_disconnect), 1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
++	test_datasize_valid("PAN Disconnect-", HAL_SERVICE_ID_PAN,
++			HAL_OP_PAN_DISCONNECT,
++			sizeof(struct hal_cmd_pan_disconnect), -1,
++			HAL_SERVICE_ID_BLUETOOTH, HAL_SERVICE_ID_PAN);
 +
-+	/* data placeholder for hal_cmd_set_adapter_prop.val[0] */
-+	uint8_t buf[BLUEZ_HAL_MTU - sizeof(struct hal_hdr) -
-+				sizeof(struct hal_cmd_set_adapter_prop)];
-+} __attribute__((packed));
-+
-+#define set_name "new name"
-+
-+static struct bt_set_adapter_prop_data bt_set_adapter_prop_data_overs = {
-+	.hdr.service_id = HAL_SERVICE_ID_BLUETOOTH,
-+	.hdr.opcode = HAL_OP_SET_ADAPTER_PROP,
-+	.hdr.len = sizeof(struct hal_cmd_set_adapter_prop) +
-+						sizeof(set_name),
-+
-+	.prop.type = HAL_PROP_ADAPTER_NAME,
-+	/* declare wrong descriptor length */
-+	.prop.len = sizeof(set_name) + 1,
-+	/* init prop.val[0] */
-+	.buf = set_name,
-+};
-+
-+static struct bt_set_adapter_prop_data bt_set_adapter_prop_data_unders = {
-+	.hdr.service_id = HAL_SERVICE_ID_BLUETOOTH,
-+	.hdr.opcode = HAL_OP_SET_ADAPTER_PROP,
-+	.hdr.len = sizeof(struct hal_cmd_set_adapter_prop) +
-+						sizeof(set_name),
-+
-+	.prop.type = HAL_PROP_ADAPTER_NAME,
-+	/* declare wrong descriptor length */
-+	.prop.len = sizeof(set_name) - 1,
-+	/* init prop.val[0] */
-+	.buf = set_name,
-+};
-+
- struct hidhost_set_info_data {
- 	struct hal_hdr hdr;
- 	struct hal_cmd_hidhost_set_info info;
-@@ -856,6 +893,20 @@ int main(int argc, char *argv[])
- 			HAL_OP_SET_ADAPTER_PROP,
- 			sizeof(struct hal_cmd_set_adapter_prop), -1,
- 			HAL_SERVICE_ID_BLUETOOTH);
-+	test_generic("Data size BT Set Adapter Prop Vardata+",
-+			ipc_send_tc, setup, teardown,
-+			&bt_set_adapter_prop_data_overs,
-+			(sizeof(struct hal_hdr) +
-+				sizeof(struct hal_cmd_set_adapter_prop) +
-+				sizeof(set_name)),
-+			HAL_SERVICE_ID_BLUETOOTH);
-+	test_generic("Data size BT Set Adapter Prop Vardata+",
-+			ipc_send_tc, setup, teardown,
-+			&bt_set_adapter_prop_data_unders,
-+			(sizeof(struct hal_hdr) +
-+				sizeof(struct hal_cmd_set_adapter_prop) +
-+				sizeof(set_name)),
-+			HAL_SERVICE_ID_BLUETOOTH);
- 	test_datasize_valid("BT Get Remote Props+", HAL_SERVICE_ID_BLUETOOTH,
- 			HAL_OP_GET_REMOTE_DEVICE_PROPS,
- 			sizeof(struct hal_cmd_get_remote_device_props), 1,
+ 	return tester_run();
+ }
 -- 
 1.8.5.2
 
