@@ -2,82 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 04/10] android/hal-audio: Initialize SBC encoder
-Date: Wed, 22 Jan 2014 11:34:47 +0100
-Message-ID: <1390386893-8212-5-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 00/10] android: Add SBC encoding
+Date: Wed, 22 Jan 2014 11:34:43 +0100
+Message-ID: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-audio.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+Hi,
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index f53dba0..8d604db 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -32,6 +32,7 @@
- #include "hal-log.h"
- #include "hal-msg.h"
- #include "../profiles/audio/a2dp-codecs.h"
-+#include <sbc/sbc.h>
- 
- static const uint8_t a2dp_src_uuid[] = {
- 		0x00, 0x00, 0x11, 0x0a, 0x00, 0x00, 0x10, 0x00,
-@@ -53,6 +54,8 @@ struct audio_input_config {
- 
- struct sbc_data {
- 	a2dp_sbc_t sbc;
-+
-+	sbc_t enc;
- };
- 
- static int sbc_get_presets(struct audio_preset *preset, size_t *len);
-@@ -184,6 +187,19 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
- 	return i;
- }
- 
-+static void sbc_init_encoder(struct sbc_data *sbc_data)
-+{
-+	a2dp_sbc_t *in = &sbc_data->sbc;
-+	sbc_t *out = &sbc_data->enc;
-+
-+	DBG("");
-+
-+	sbc_init_a2dp(out, 0L, in, sizeof(*in));
-+
-+	out->endian = SBC_LE;
-+	out->bitpool = in->max_bitpool;
-+}
-+
- static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
- {
- 	struct sbc_data *sbc_data;
-@@ -199,6 +215,8 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
- 
- 	memcpy(&sbc_data->sbc, preset->data, preset->len);
- 
-+	sbc_init_encoder(sbc_data);
-+
- 	*codec_data = sbc_data;
- 
- 	return AUDIO_STATUS_SUCCESS;
-@@ -206,8 +224,11 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
- 
- static int sbc_cleanup(void *codec_data)
- {
-+	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
-+
- 	DBG("");
- 
-+	sbc_finish(&sbc_data->enc);
- 	free(codec_data);
- 
- 	return AUDIO_STATUS_SUCCESS;
+v1 -> v2
+- fixed comments
+- added dependency to libsbc shared library on Android
+
+v2 -> v3
+- added comment explaining why we need to sleep in out_write
+- updated to new SBC API
+- libsbc shared library is now built from our Android.mk
+- implemented proper get_latency callback
+
+
+
+Andrzej Kaczmarek (10):
+  android: Add MTU data to Open Stream Audio IPC
+  android: Build Audio HAL with SBC
+  android/hal-audio: Rename sbc_init to avoid collision with libsbc
+  android/hal-audio: Initialize SBC encoder
+  android/hal-audio: Calculate SBC stream parameters
+  android/hal-audio: Add resume to codec callbacks
+  android/hal-audio: Return proper buffer size to AudioFlinger
+  android/hal-audio: Read fd from Output Stream response
+  android/hal-audio: Add proper SBC encoding
+  android/hal-audio: Return proper latency for stream
+
+ android/Android.mk  |  37 ++++++-
+ android/Makefile.am |   2 +
+ android/a2dp.c      |   8 +-
+ android/audio-msg.h |   1 +
+ android/hal-audio.c | 301 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ configure.ac        |   7 ++
+ 6 files changed, 338 insertions(+), 18 deletions(-)
+
 -- 
 1.8.5.2
 
