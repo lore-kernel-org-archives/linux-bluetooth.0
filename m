@@ -1,53 +1,209 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Jan 2014 10:58:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v5 05/14] Bluetooth: Introduce fail_conn_attempt() helper
-Message-ID: <20140122085842.GA9532@x220.p-661hnu-f1>
-References: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
- <1387540675-2466-6-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1387540675-2466-6-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1390295313-5951-1-git-send-email-luiz.dentz@gmail.com>
+References: <1390295313-5951-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 22 Jan 2014 10:51:02 +0200
+Message-ID: <CABBYNZLPRmsKkmiwUTt2SxOLGfwmB-yPdvxOdWFYyDN4q5dugg@mail.gmail.com>
+Subject: Re: [PATCH SBC v5 1/2] sbc: Add sbc_init_a2dp
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi,
 
-On Fri, Dec 20, 2013, Andre Guedes wrote:
-> This patch moves connection attempt failure code to its own function
-> so it can be reused in the next patch.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+On Tue, Jan 21, 2014 at 11:08 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds sbc_init_a2dp that can be used to convert A2DP configuration to
+> the internal representation since they are not binary compatible.
 > ---
->  net/bluetooth/hci_conn.c | 24 ++++++++++++++++--------
->  1 file changed, 16 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index b5c3ebff..870bc31 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -514,6 +514,21 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
+>  sbc/sbc.c | 144 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  sbc/sbc.h |   2 +
+>  2 files changed, 146 insertions(+)
+>
+> diff --git a/sbc/sbc.c b/sbc/sbc.c
+> index c589217..ee6a2ab 100644
+> --- a/sbc/sbc.c
+> +++ b/sbc/sbc.c
+> @@ -57,6 +57,55 @@
+>  #define MSBC_SYNCWORD  0xAD
+>  #define MSBC_BLOCKS    15
+>
+> +#define A2DP_SAMPLING_FREQ_16000               (1 << 3)
+> +#define A2DP_SAMPLING_FREQ_32000               (1 << 2)
+> +#define A2DP_SAMPLING_FREQ_44100               (1 << 1)
+> +#define A2DP_SAMPLING_FREQ_48000               (1 << 0)
+> +
+> +#define A2DP_CHANNEL_MODE_MONO                 (1 << 3)
+> +#define A2DP_CHANNEL_MODE_DUAL_CHANNEL         (1 << 2)
+> +#define A2DP_CHANNEL_MODE_STEREO               (1 << 1)
+> +#define A2DP_CHANNEL_MODE_JOINT_STEREO         (1 << 0)
+> +
+> +#define A2DP_BLOCK_LENGTH_4                    (1 << 3)
+> +#define A2DP_BLOCK_LENGTH_8                    (1 << 2)
+> +#define A2DP_BLOCK_LENGTH_12                   (1 << 1)
+> +#define A2DP_BLOCK_LENGTH_16                   (1 << 0)
+> +
+> +#define A2DP_SUBBANDS_4                                (1 << 1)
+> +#define A2DP_SUBBANDS_8                                (1 << 0)
+> +
+> +#define A2DP_ALLOCATION_SNR                    (1 << 1)
+> +#define A2DP_ALLOCATION_LOUDNESS               (1 << 0)
+> +
+> +#if __BYTE_ORDER == __LITTLE_ENDIAN
+> +
+> +struct a2dp_sbc {
+> +       uint8_t channel_mode:4;
+> +       uint8_t frequency:4;
+> +       uint8_t allocation_method:2;
+> +       uint8_t subbands:2;
+> +       uint8_t block_length:4;
+> +       uint8_t min_bitpool;
+> +       uint8_t max_bitpool;
+> +} __attribute__ ((packed));
+> +
+> +#elif __BYTE_ORDER == __BIG_ENDIAN
+> +
+> +struct a2dp_sbc {
+> +       uint8_t frequency:4;
+> +       uint8_t channel_mode:4;
+> +       uint8_t block_length:4;
+> +       uint8_t subbands:2;
+> +       uint8_t allocation_method:2;
+> +       uint8_t min_bitpool;
+> +       uint8_t max_bitpool;
+> +} __attribute__ ((packed));
+> +
+> +#else
+> +#error "Unknown byte order"
+> +#endif
+> +
+>  /* This structure contains an unpacked SBC frame.
+>     Yes, there is probably quite some unused space herein */
+>  struct sbc_frame {
+> @@ -1046,6 +1095,101 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
+>         return 0;
 >  }
->  EXPORT_SYMBOL(hci_get_route);
->  
-> +/* This function requires the caller holds hdev->lock */
-> +static void fail_conn_attempt(struct hci_conn *conn, u8 status)
+>
+> +SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+> +                                       const void *conf, size_t conf_len)
 > +{
-> +	struct hci_dev *hdev = conn->hdev;
+> +       const struct a2dp_sbc *a2dp;
+> +       int err;
 > +
-> +	conn->state = BT_CLOSED;
+> +       if (conf_len != sizeof(*a2dp))
+> +               return -EINVAL;
 > +
-> +	mgmt_connect_failed(hdev, &conn->dst, conn->type, conn->dst_type,
-> +			    status);
+> +       err = sbc_init(sbc, flags);
+> +       if (err < 0)
+> +               return err;
 > +
-> +	hci_proto_connect_cfm(conn, status);
+> +       a2dp = conf;
 > +
-> +	hci_conn_del(conn);
+> +       switch (a2dp->frequency) {
+> +       case A2DP_SAMPLING_FREQ_16000:
+> +               sbc->frequency = SBC_FREQ_16000;
+> +               break;
+> +       case A2DP_SAMPLING_FREQ_32000:
+> +               sbc->frequency = SBC_FREQ_32000;
+> +               break;
+> +       case A2DP_SAMPLING_FREQ_44100:
+> +               sbc->frequency = SBC_FREQ_44100;
+> +               break;
+> +       case A2DP_SAMPLING_FREQ_48000:
+> +               sbc->frequency = SBC_FREQ_48000;
+> +               break;
+> +       default:
+> +               goto failed;
+> +       }
+> +
+> +       switch (a2dp->channel_mode) {
+> +       case A2DP_CHANNEL_MODE_MONO:
+> +               sbc->mode = SBC_MODE_MONO;
+> +               break;
+> +       case A2DP_CHANNEL_MODE_DUAL_CHANNEL:
+> +               sbc->mode = SBC_MODE_DUAL_CHANNEL;
+> +               break;
+> +       case A2DP_CHANNEL_MODE_STEREO:
+> +               sbc->mode = SBC_MODE_STEREO;
+> +               break;
+> +       case A2DP_CHANNEL_MODE_JOINT_STEREO:
+> +               sbc->mode = SBC_MODE_JOINT_STEREO;
+> +               break;
+> +       default:
+> +               goto failed;
+> +       }
+> +
+> +       switch (a2dp->allocation_method) {
+> +       case A2DP_ALLOCATION_SNR:
+> +               sbc->allocation = SBC_AM_SNR;
+> +               break;
+> +       case A2DP_ALLOCATION_LOUDNESS:
+> +               sbc->allocation = SBC_AM_LOUDNESS;
+> +               break;
+> +       default:
+> +               goto failed;
+> +       }
+> +
+> +       switch (a2dp->subbands) {
+> +       case A2DP_SUBBANDS_4:
+> +               sbc->subbands = SBC_SB_4;
+> +               break;
+> +       case A2DP_SUBBANDS_8:
+> +               sbc->subbands = SBC_SB_8;
+> +               break;
+> +       default:
+> +               goto failed;
+> +       }
+> +
+> +       switch (a2dp->block_length) {
+> +       case A2DP_BLOCK_LENGTH_4:
+> +               sbc->blocks = SBC_BLK_4;
+> +               break;
+> +       case A2DP_BLOCK_LENGTH_8:
+> +               sbc->blocks = SBC_BLK_8;
+> +               break;
+> +       case A2DP_BLOCK_LENGTH_12:
+> +               sbc->blocks = SBC_BLK_12;
+> +               break;
+> +       case A2DP_BLOCK_LENGTH_16:
+> +               sbc->blocks = SBC_BLK_16;
+> +               break;
+> +       default:
+> +               goto failed;
+> +       }
+> +
+> +       return 0;
+> +
+> +failed:
+> +       sbc_finish(sbc);
+> +       return -EINVAL;
 > +}
+> +
+>  SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
+>  {
+>         return sbc_decode(sbc, input, input_len, NULL, 0, NULL);
+> diff --git a/sbc/sbc.h b/sbc/sbc.h
+> index 5f8a1fc..32eb2e9 100644
+> --- a/sbc/sbc.h
+> +++ b/sbc/sbc.h
+> @@ -84,6 +84,8 @@ typedef struct sbc_struct sbc_t;
+>  int sbc_init(sbc_t *sbc, unsigned long flags);
+>  int sbc_reinit(sbc_t *sbc, unsigned long flags);
+>  int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
+> +int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+> +                                       const void *conf, size_t conf_len);
+>
+>  ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
+>
+> --
+> 1.8.4.2
 
-Looks otherwise good, but could we call this le_conn_failed instead of
-fail_conn_attempt? It would sound less awkward to me.
+Pushed.
 
-Johan
+
+-- 
+Luiz Augusto von Dentz
