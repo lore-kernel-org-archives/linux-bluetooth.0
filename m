@@ -1,53 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 22 Jan 2014 17:07:30 +0100
-From: Natanael Copa <natanael.copa@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Natanael Copa <ncopa@alpinelinux.org>
-Subject: Re: [PATCH v2 1/3] various header include fixes for building with
- musl libc
-Message-ID: <20140122170730.35ecc008@ncopa-desktop.alpinelinux.org>
-In-Reply-To: <CAJdJm_Mo=hGHMYFhurEO2+L_UPpT3YPy-is020d1_CMrXzDeRw@mail.gmail.com>
-References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
-	<1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
-	<1390398620-1916-2-git-send-email-ncopa@alpinelinux.org>
-	<CAJdJm_Mo=hGHMYFhurEO2+L_UPpT3YPy-is020d1_CMrXzDeRw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/pan: Fix possible NULL dereference
+Date: Wed, 22 Jan 2014 18:03:58 +0200
+Message-Id: <1390406638-16783-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1390406638-16783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1390406638-16783-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 22 Jan 2014 11:16:20 -0400
-Anderson Lizardo <anderson.lizardo@openbossa.org> wrote:
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Hi Natanael,
-> 
-> On Wed, Jan 22, 2014 at 9:50 AM, Natanael Copa <natanael.copa@gmail.com> wrote:
-> > diff --git a/src/textfile.h b/src/textfile.h
-> > index b779bd2..e26da5d 100644
-> > --- a/src/textfile.h
-> > +++ b/src/textfile.h
-> > @@ -24,6 +24,8 @@
-> >  #ifndef __TEXTFILE_H
-> >  #define __TEXTFILE_H
-> >
-> > +#include <sys/stat.h>
-> > +
-> 
-> I believe the correct approach here is to include sys/stat.h on all
-> files that include textfile.h. We (usually) don't #include system
-> headers inside internal headers.
+It is better to return here since dev is not allocated and assigned NULL
+value.
+---
+ android/pan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The header itself uses mode_t:
-./src/textfile.h:27:1: error: unknown type name 'mode_t'
+diff --git a/android/pan.c b/android/pan.c
+index 4e04da0..adc5df7 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -439,7 +439,7 @@ static void nap_confirm_cb(GIOChannel *chan, gpointer data)
+ 	if (err) {
+ 		error("%s", err->message);
+ 		g_error_free(err);
+-		goto failed;
++		return;
+ 	}
+ 
+ 	DBG("incoming connect request from %s", address);
+-- 
+1.8.3.2
 
-So all the files that include textfiles.h needs to include sys/stat.h
-*before* the include textfile.h in that case.
-
-I'd say that all filesm that uses mode_t including textfile.h should
-include sys/stat.h.
-
-I can make a new patch for either. Just let me know what you want.
-
-
--nc
