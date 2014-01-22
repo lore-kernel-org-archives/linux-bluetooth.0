@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Natanael Copa <natanael.copa@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH v2 0/3] Various fixes for building bluez with musl libc
-Date: Wed, 22 Jan 2014 13:50:17 +0000
-Message-Id: <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
-In-Reply-To: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
-References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v3 18/18] bluetooth.conf: Add ObjectManager interface
+Date: Wed, 22 Jan 2014 10:40:25 -0300
+Message-Id: <1390398025-28340-19-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Changes since v1:
-- Add the compile errors in commit message
-- Build unit testing with log support
+---
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-Natanael Copa (3):
-  various header include fixes for building with musl libc
-  bnep: avoid use of caddr_t
-  unit: prevent use of glibc's error(3)
-
- Makefile.am             | 1 +
- profiles/network/bnep.c | 4 ++--
- src/textfile.h          | 2 ++
- tools/csr_usb.c         | 1 +
- tools/hid2hci.c         | 1 +
- unit/test-sdp.c         | 9 +++------
- 6 files changed, 10 insertions(+), 8 deletions(-)
-
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 0495200..ad8891a 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -18,6 +18,7 @@
+     <allow send_interface="org.bluez.Profile1"/>
+     <allow send_interface="org.bluez.HeartRateWatcher1"/>
+     <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
++    <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+   </policy>
+ 
+   <policy at_console="true">
 -- 
-1.8.5.3
+1.8.3.1
 
