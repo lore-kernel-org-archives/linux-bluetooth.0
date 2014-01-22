@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 02/10] android: Build Audio HAL with SBC
-Date: Wed, 22 Jan 2014 11:34:45 +0100
-Message-ID: <1390386893-8212-3-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 04/10] android/hal-audio: Initialize SBC encoder
+Date: Wed, 22 Jan 2014 11:34:47 +0100
+Message-ID: <1390386893-8212-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,108 +12,72 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Build for Android requires libsbc sources to be available in
-external/bluetooth/sbc. Build for host requires libsbc package to be
-installed.
 ---
- android/Android.mk  | 37 +++++++++++++++++++++++++++++++++++--
- android/Makefile.am |  2 ++
- configure.ac        |  7 +++++++
- 3 files changed, 44 insertions(+), 2 deletions(-)
+ android/hal-audio.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 43e6036..c274295 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -3,8 +3,9 @@ LOCAL_PATH := external/bluetooth
- # Retrieve BlueZ version from configure.ac file
- BLUEZ_VERSION := $(shell grep ^AC_INIT $(LOCAL_PATH)/bluez/configure.ac | cpp -P -D'AC_INIT(_,v)=v')
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index f53dba0..8d604db 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -32,6 +32,7 @@
+ #include "hal-log.h"
+ #include "hal-msg.h"
+ #include "../profiles/audio/a2dp-codecs.h"
++#include <sbc/sbc.h>
  
--# Specify pathmap for glib
--pathmap_INCL += glib:external/bluetooth/glib
-+# Specify pathmap for glib and sbc
-+pathmap_INCL += glib:external/bluetooth/glib \
-+	sbc:external/bluetooth/sbc
+ static const uint8_t a2dp_src_uuid[] = {
+ 		0x00, 0x00, 0x11, 0x0a, 0x00, 0x00, 0x10, 0x00,
+@@ -53,6 +54,8 @@ struct audio_input_config {
  
- # Specify common compiler flags
- BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
-@@ -225,9 +226,11 @@ LOCAL_SRC_FILES := bluez/android/hal-audio.c
- LOCAL_C_INCLUDES = \
- 	$(call include-path-for, system-core) \
- 	$(call include-path-for, libhardware) \
-+	$(call include-path-for, sbc) \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-+	libsbc \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
- 
-@@ -348,3 +351,33 @@ LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := l2ping
- 
- include $(BUILD_EXECUTABLE)
+ struct sbc_data {
+ 	a2dp_sbc_t sbc;
 +
-+#
-+# libsbc
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES:= \
-+	sbc/sbc/sbc.c \
-+	sbc/sbc/sbc_primitives.c \
-+	sbc/sbc/sbc_primitives_mmx.c \
-+	sbc/sbc/sbc_primitives_neon.c \
-+	sbc/sbc/sbc_primitives_armv6.c \
-+	sbc/sbc/sbc_primitives_iwmmxt.c \
-+
-+LOCAL_C_INCLUDES:= \
-+	$(LOCAL_PATH)/sbc/ \
-+	$(LOCAL_PATH)/sbc/sbc/ \
-+
-+LOCAL_CFLAGS:= \
-+	-Os \
-+	-Wno-sign-compare \
-+	-Wno-missing-field-initializers \
-+	-Wno-unused-parameter \
-+	-Wno-type-limits \
-+	-Wno-empty-body \
-+
-+LOCAL_MODULE := libsbc
-+
-+include $(BUILD_SHARED_LIBRARY)
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 910beb5..9045a99 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -149,6 +149,8 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
++	sbc_t enc;
+ };
  
- android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+ static int sbc_get_presets(struct audio_preset *preset, size_t *len);
+@@ -184,6 +187,19 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
+ 	return i;
+ }
  
-+android_audio_a2dp_default_la_LIBADD = @SBC_LIBS@
++static void sbc_init_encoder(struct sbc_data *sbc_data)
++{
++	a2dp_sbc_t *in = &sbc_data->sbc;
++	sbc_t *out = &sbc_data->enc;
 +
- android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
- 					-no-undefined -pthread
- 
-diff --git a/configure.ac b/configure.ac
-index b5c87cc..f607d7a 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -252,6 +252,13 @@ AC_ARG_ENABLE(android, AC_HELP_STRING([--enable-android],
- 					[enable_android=${enableval}])
- AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
- 
-+if (test "${enable_android}" = "yes"); then
-+	PKG_CHECK_MODULES(SBC, sbc >= 1.2, dummy=yes,
-+					AC_MSG_ERROR(SBC library >= 1.2 is required))
-+	AC_SUBST(SBC_CFLAGS)
-+	AC_SUBST(SBC_LIBS)
-+fi
++	DBG("");
 +
- AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
- 			[Directory for the Android daemon storage files])
++	sbc_init_a2dp(out, 0L, in, sizeof(*in));
++
++	out->endian = SBC_LE;
++	out->bitpool = in->max_bitpool;
++}
++
+ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
+ {
+ 	struct sbc_data *sbc_data;
+@@ -199,6 +215,8 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
  
+ 	memcpy(&sbc_data->sbc, preset->data, preset->len);
+ 
++	sbc_init_encoder(sbc_data);
++
+ 	*codec_data = sbc_data;
+ 
+ 	return AUDIO_STATUS_SUCCESS;
+@@ -206,8 +224,11 @@ static int sbc_codec_init(struct audio_preset *preset, void **codec_data)
+ 
+ static int sbc_cleanup(void *codec_data)
+ {
++	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
++
+ 	DBG("");
+ 
++	sbc_finish(&sbc_data->enc);
+ 	free(codec_data);
+ 
+ 	return AUDIO_STATUS_SUCCESS;
 -- 
 1.8.5.2
 
