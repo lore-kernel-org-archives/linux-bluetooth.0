@@ -2,122 +2,100 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v3 15/18] test: Add registering external service
-Date: Wed, 22 Jan 2014 10:40:22 -0300
-Message-Id: <1390398025-28340-16-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v3 14/18] test: Add signal handling for gatt-service
+Date: Wed, 22 Jan 2014 10:40:21 -0300
+Message-Id: <1390398025-28340-15-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390310814-19880-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends gatt-service to call RegisterService() when org.bluez
-service gets connected to the system bus.
+This patch implements signal handling to run cleanup tasks before
+exiting.
 ---
- test/gatt-service.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 67 insertions(+)
+ test/gatt-service.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/test/gatt-service.c b/test/gatt-service.c
-index ea801de..380f56b 100644
+index 1cb0913..ea801de 100644
 --- a/test/gatt-service.c
 +++ b/test/gatt-service.c
-@@ -33,6 +33,7 @@
+@@ -27,6 +27,7 @@
+ 
+ #include <errno.h>
+ #include <stdio.h>
++#include <sys/signalfd.h>
+ 
+ #include <glib.h>
  #include <dbus/dbus.h>
- #include <gdbus/gdbus.h>
- 
-+#define GATT_MGR_IFACE			"org.bluez.GattManager1"
- #define SERVICE_IFACE			"org.bluez.GattService1"
- 
- /* Immediate Alert Service UUID */
-@@ -113,6 +114,65 @@ static void create_services(DBusConnection *conn)
+@@ -112,9 +113,57 @@ static void create_services(DBusConnection *conn)
  	printf("Registered service: %s\n", service_path);
  }
  
-+static void register_external_service_reply(DBusPendingCall *call,
-+							void *user_data)
++static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
++							gpointer user_data)
 +{
-+	DBusMessage *reply = dbus_pending_call_steal_reply(call);
-+	DBusError derr;
++	g_main_loop_quit(main_loop);
 +
-+	dbus_error_init(&derr);
-+	dbus_set_error_from_message(&derr, reply);
-+
-+	if (dbus_error_is_set(&derr))
-+		printf("RegisterService: %s\n", derr.message);
-+	else
-+		printf("RegisterService: OK\n");
-+
-+	dbus_message_unref(reply);
-+	dbus_error_free(&derr);
++	return FALSE;
 +}
 +
-+static void register_external_service(gpointer a, gpointer b)
++static guint setup_signalfd(void)
 +{
-+	DBusConnection *conn = b;
-+	const char *path = a;
-+	DBusMessage *msg;
-+	DBusPendingCall *call;
-+	DBusMessageIter iter, dict;
++	GIOChannel *channel;
++	guint source;
++	sigset_t mask;
++	int fd;
 +
-+	msg = dbus_message_new_method_call("org.bluez", "/org/bluez",
-+					GATT_MGR_IFACE, "RegisterService");
-+	if (msg == NULL) {
-+		printf("Couldn't allocate D-Bus message\n");
-+		return;
++	sigemptyset(&mask);
++	sigaddset(&mask, SIGINT);
++	sigaddset(&mask, SIGTERM);
++
++	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
++		perror("Failed to set signal mask");
++		return 0;
 +	}
 +
-+	dbus_message_iter_init_append(msg, &iter);
-+
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY, "{sv}", &dict);
-+
-+	/* TODO: Add options dictionary */
-+
-+	dbus_message_iter_close_container(&iter, &dict);
-+
-+	if (g_dbus_send_message_with_reply(conn, msg, &call, -1) == FALSE) {
-+		dbus_message_unref(msg);
-+		return;
++	fd = signalfd(-1, &mask, 0);
++	if (fd < 0) {
++		perror("Failed to create signal descriptor");
++		return 0;
 +	}
 +
-+	dbus_pending_call_set_notify(call, register_external_service_reply,
-+								NULL, NULL);
++	channel = g_io_channel_unix_new(fd);
 +
-+	dbus_pending_call_unref(call);
++	g_io_channel_set_close_on_unref(channel, TRUE);
++
++	source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				signal_handler, NULL);
++
++	g_io_channel_unref(channel);
++
++	return source;
 +}
 +
-+static void connect_handler(DBusConnection *conn, void *user_data)
-+{
-+	g_slist_foreach(services, register_external_service, conn);
-+}
-+
- static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
- 							gpointer user_data)
- {
-@@ -158,6 +218,7 @@ static guint setup_signalfd(void)
- 
  int main(int argc, char *argv[])
  {
-+	GDBusClient *client;
  	DBusConnection *dbus_conn;
- 	guint signal;
- 
-@@ -176,8 +237,14 @@ int main(int argc, char *argv[])
- 
- 	create_services(dbus_conn);
- 
-+	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
++	guint signal;
 +
-+	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
-+
++	signal = setup_signalfd();
++	if (signal == 0)
++		return -errno;
+ 
+ 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+ 
+@@ -129,6 +178,8 @@ int main(int argc, char *argv[])
+ 
  	g_main_loop_run(main_loop);
  
-+	g_dbus_client_unref(client);
++	g_source_remove(signal);
 +
- 	g_source_remove(signal);
- 
  	g_slist_free_full(services, g_free);
+ 	dbus_connection_unref(dbus_conn);
+ 
 -- 
 1.8.3.1
 
