@@ -2,48 +2,71 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 00/10] android: Add SBC encoding
-Date: Wed, 22 Jan 2014 11:34:43 +0100
-Message-ID: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 01/10] android: Add MTU data to Open Stream Audio IPC
+Date: Wed, 22 Jan 2014 11:34:44 +0100
+Message-ID: <1390386893-8212-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+MTU value for transport channel is sent in Open Stream response, which
+is required to calculate number of frames which can be packed into
+single media packet.
 
-v1 -> v2
-- fixed comments
-- added dependency to libsbc shared library on Android
+This is to avoid including GPLv2 licensed headers in Audio HAL
+implementation.
+---
+ android/a2dp.c      | 8 ++++++--
+ android/audio-msg.h | 1 +
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-v2 -> v3
-- added comment explaining why we need to sleep in out_write
-- updated to new SBC API
-- libsbc shared library is now built from our Android.mk
-- implemented proper get_latency callback
-
-
-
-Andrzej Kaczmarek (10):
-  android: Add MTU data to Open Stream Audio IPC
-  android: Build Audio HAL with SBC
-  android/hal-audio: Rename sbc_init to avoid collision with libsbc
-  android/hal-audio: Initialize SBC encoder
-  android/hal-audio: Calculate SBC stream parameters
-  android/hal-audio: Add resume to codec callbacks
-  android/hal-audio: Return proper buffer size to AudioFlinger
-  android/hal-audio: Read fd from Output Stream response
-  android/hal-audio: Add proper SBC encoding
-  android/hal-audio: Return proper latency for stream
-
- android/Android.mk  |  37 ++++++-
- android/Makefile.am |   2 +
- android/a2dp.c      |   8 +-
- android/audio-msg.h |   1 +
- android/hal-audio.c | 301 +++++++++++++++++++++++++++++++++++++++++++++++++---
- configure.ac        |   7 ++
- 6 files changed, 338 insertions(+), 18 deletions(-)
-
+diff --git a/android/a2dp.c b/android/a2dp.c
+index a996f79..95ecf9b 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -1304,6 +1304,7 @@ static void bt_stream_open(const void *buf, uint16_t len)
+ 	struct audio_rsp_open_stream *rsp;
+ 	struct a2dp_setup *setup;
+ 	int fd;
++	uint16_t omtu;
+ 
+ 	DBG("");
+ 
+@@ -1314,14 +1315,17 @@ static void bt_stream_open(const void *buf, uint16_t len)
+ 		return;
+ 	}
+ 
+-	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, NULL, NULL)) {
++	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, &omtu,
++						NULL)) {
+ 		error("avdtp_stream_get_transport: failed");
+ 		audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
+ 		return;
+ 	}
+ 
+-	len = sizeof(struct audio_preset) + setup->preset->len;
++	len = sizeof(struct audio_rsp_open_stream) +
++			sizeof(struct audio_preset) + setup->preset->len;
+ 	rsp = g_malloc0(len);
++	rsp->mtu = omtu;
+ 	rsp->preset->len = setup->preset->len;
+ 	memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
+ 
+diff --git a/android/audio-msg.h b/android/audio-msg.h
+index 8f03274..17cde09 100644
+--- a/android/audio-msg.h
++++ b/android/audio-msg.h
+@@ -63,6 +63,7 @@ struct audio_cmd_open_stream {
+ } __attribute__((packed));
+ 
+ struct audio_rsp_open_stream {
++	uint16_t mtu;
+ 	struct audio_preset preset[0];
+ } __attribute__((packed));
+ 
 -- 
 1.8.5.2
 
