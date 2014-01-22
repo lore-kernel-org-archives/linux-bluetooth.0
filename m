@@ -1,36 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] btproxy: Fix resource leak
-Date: Wed, 22 Jan 2014 13:00:42 +0200
-Message-Id: <1390388442-1192-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/pan: Fix wrong freeing dev
+Date: Wed, 22 Jan 2014 12:48:57 +0200
+Message-Id: <1390387737-324-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Close file descriptors if setup_proxy fails.
+It does make sense free() dev after it is used. g_free() is not needed
+here since it will be already executed in bt_pan_notify_conn_state().
 ---
- tools/btproxy.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/pan.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/tools/btproxy.c b/tools/btproxy.c
-index 4429a16..9f409c3 100644
---- a/tools/btproxy.c
-+++ b/tools/btproxy.c
-@@ -330,8 +330,11 @@ static bool setup_proxy(int host_fd, bool host_shutdown,
- 	struct proxy *proxy;
+diff --git a/android/pan.c b/android/pan.c
+index bfba128..4e04da0 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -463,7 +463,6 @@ static void nap_confirm_cb(GIOChannel *chan, gpointer data)
+ 	return;
  
- 	proxy = new0(struct proxy, 1);
--	if (!proxy)
-+	if (!proxy) {
-+		close(host_fd);
-+		close(dev_fd);
- 		return NULL;
-+	}
+ failed:
+-	g_free(dev);
+ 	bt_pan_notify_conn_state(dev, HAL_PAN_STATE_DISCONNECTED);
+ }
  
- 	proxy->host_fd = host_fd;
- 	proxy->host_shutdown = host_shutdown;
 -- 
 1.8.3.2
 
