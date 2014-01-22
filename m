@@ -2,72 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Natanael Copa <natanael.copa@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH v2 1/3] various header include fixes for building with musl libc
-Date: Wed, 22 Jan 2014 13:50:18 +0000
-Message-Id: <1390398620-1916-2-git-send-email-ncopa@alpinelinux.org>
-In-Reply-To: <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
+Subject: [PATCH v2 0/3] Various fixes for building bluez with musl libc
+Date: Wed, 22 Jan 2014 13:50:17 +0000
+Message-Id: <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
+In-Reply-To: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
 References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
- <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-we need:
- sys/stat.h for mode_t
- limits.h for PATH_MAX
+Changes since v1:
+- Add the compile errors in commit message
+- Build unit testing with log support
 
-Fixes compile errors:
-In file included from tools/hciconfig.c:45:0:
-./src/textfile.h:27:1: error: unknown type name 'mode_t'
- int create_file(const char *filename, const mode_t mode);
- ^
+Natanael Copa (3):
+  various header include fixes for building with musl libc
+  bnep: avoid use of caddr_t
+  unit: prevent use of glibc's error(3)
 
-tools/csr_usb.c: In function 'read_value':
-tools/csr_usb.c:71:12: error: 'PATH_MAX' undeclared (first use in this function)
-  char path[PATH_MAX];
-            ^
----
- src/textfile.h  | 2 ++
- tools/csr_usb.c | 1 +
- tools/hid2hci.c | 1 +
- 3 files changed, 4 insertions(+)
+ Makefile.am             | 1 +
+ profiles/network/bnep.c | 4 ++--
+ src/textfile.h          | 2 ++
+ tools/csr_usb.c         | 1 +
+ tools/hid2hci.c         | 1 +
+ unit/test-sdp.c         | 9 +++------
+ 6 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/src/textfile.h b/src/textfile.h
-index b779bd2..e26da5d 100644
---- a/src/textfile.h
-+++ b/src/textfile.h
-@@ -24,6 +24,8 @@
- #ifndef __TEXTFILE_H
- #define __TEXTFILE_H
- 
-+#include <sys/stat.h>
-+
- int create_file(const char *filename, const mode_t mode);
- int create_name(char *buf, size_t size, const char *path,
- 				const char *address, const char *name);
-diff --git a/tools/csr_usb.c b/tools/csr_usb.c
-index a483bc1..5fb6bdc 100644
---- a/tools/csr_usb.c
-+++ b/tools/csr_usb.c
-@@ -33,6 +33,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <dirent.h>
-+#include <limits.h>
- #include <sys/ioctl.h>
- 
- #include "csr.h"
-diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-index 95b4abf..2dbfca7 100644
---- a/tools/hid2hci.c
-+++ b/tools/hid2hci.c
-@@ -35,6 +35,7 @@
- #include <string.h>
- #include <dirent.h>
- #include <getopt.h>
-+#include <limits.h>
- #include <sys/ioctl.h>
- #include <linux/types.h>
- #include <linux/hiddev.h>
 -- 
 1.8.5.3
 
