@@ -1,39 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v2 1/3] various header include fixes for building with musl libc
+Subject: Re: [PATCH] btproxy: Fix resource leak
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJdJm_Mo=hGHMYFhurEO2+L_UPpT3YPy-is020d1_CMrXzDeRw@mail.gmail.com>
-Date: Wed, 22 Jan 2014 08:03:49 -0800
-Cc: Natanael Copa <natanael.copa@gmail.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Natanael Copa <ncopa@alpinelinux.org>
-Message-Id: <9A9E726B-46AD-4AE6-82B7-77A50B5204AD@holtmann.org>
-References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com> <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org> <1390398620-1916-2-git-send-email-ncopa@alpinelinux.org> <CAJdJm_Mo=hGHMYFhurEO2+L_UPpT3YPy-is020d1_CMrXzDeRw@mail.gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+In-Reply-To: <1390388442-1192-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 22 Jan 2014 07:54:56 -0800
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <66C847F1-1E17-43C8-AFE0-2AB1BB6431B0@holtmann.org>
+References: <1390388442-1192-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Andrei,
 
->> diff --git a/src/textfile.h b/src/textfile.h
->> index b779bd2..e26da5d 100644
->> --- a/src/textfile.h
->> +++ b/src/textfile.h
->> @@ -24,6 +24,8 @@
->> #ifndef __TEXTFILE_H
->> #define __TEXTFILE_H
->> 
->> +#include <sys/stat.h>
->> +
+> Close file descriptors if setup_proxy fails.
+> ---
+> tools/btproxy.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> I believe the correct approach here is to include sys/stat.h on all
-> files that include textfile.h. We (usually) don't #include system
-> headers inside internal headers.
+> diff --git a/tools/btproxy.c b/tools/btproxy.c
+> index 4429a16..9f409c3 100644
+> --- a/tools/btproxy.c
+> +++ b/tools/btproxy.c
+> @@ -330,8 +330,11 @@ static bool setup_proxy(int host_fd, bool host_shutdown,
+> 	struct proxy *proxy;
+> 
+> 	proxy = new0(struct proxy, 1);
+> -	if (!proxy)
+> +	if (!proxy) {
+> +		close(host_fd);
+> +		close(dev_fd);
+> 		return NULL;
+> +	}
 
-with code in src/shared/*.h we started to include the system headers that are required from the header, but you are correct, we don’t do that for internal src/*.h headers.
+this is the wrong fix for this.
 
-Also we do not use circular inclusion protection from internal headers. So I ripped the stupid __TEXTFILE_H stuff out now.
+You are returning an error with side effects of closing the file descriptors. You need to leave the error handling of the parameters that got handed in to the caller. I fixed that upstream now.
 
 Regards
 
