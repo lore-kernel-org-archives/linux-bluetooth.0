@@ -1,45 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH] btproxy: Fix resource leak
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1390388442-1192-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 22 Jan 2014 07:54:56 -0800
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <66C847F1-1E17-43C8-AFE0-2AB1BB6431B0@holtmann.org>
-References: <1390388442-1192-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1390398620-1916-2-git-send-email-ncopa@alpinelinux.org>
+References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
+	<1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
+	<1390398620-1916-2-git-send-email-ncopa@alpinelinux.org>
+Date: Wed, 22 Jan 2014 11:16:20 -0400
+Message-ID: <CAJdJm_Mo=hGHMYFhurEO2+L_UPpT3YPy-is020d1_CMrXzDeRw@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] various header include fixes for building with
+ musl libc
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Natanael Copa <natanael.copa@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Natanael Copa <ncopa@alpinelinux.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Natanael,
 
-> Close file descriptors if setup_proxy fails.
-> ---
-> tools/btproxy.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/btproxy.c b/tools/btproxy.c
-> index 4429a16..9f409c3 100644
-> --- a/tools/btproxy.c
-> +++ b/tools/btproxy.c
-> @@ -330,8 +330,11 @@ static bool setup_proxy(int host_fd, bool host_shutdown,
-> 	struct proxy *proxy;
-> 
-> 	proxy = new0(struct proxy, 1);
-> -	if (!proxy)
-> +	if (!proxy) {
-> +		close(host_fd);
-> +		close(dev_fd);
-> 		return NULL;
-> +	}
+On Wed, Jan 22, 2014 at 9:50 AM, Natanael Copa <natanael.copa@gmail.com> wrote:
+> diff --git a/src/textfile.h b/src/textfile.h
+> index b779bd2..e26da5d 100644
+> --- a/src/textfile.h
+> +++ b/src/textfile.h
+> @@ -24,6 +24,8 @@
+>  #ifndef __TEXTFILE_H
+>  #define __TEXTFILE_H
+>
+> +#include <sys/stat.h>
+> +
 
-this is the wrong fix for this.
+I believe the correct approach here is to include sys/stat.h on all
+files that include textfile.h. We (usually) don't #include system
+headers inside internal headers.
 
-You are returning an error with side effects of closing the file descriptors. You need to leave the error handling of the parameters that got handed in to the caller. I fixed that upstream now.
+>  int create_file(const char *filename, const mode_t mode);
+>  int create_name(char *buf, size_t size, const char *path,
+>                                 const char *address, const char *name);
 
-Regards
-
-Marcel
-
+Best Regards,
+-- 
+Anderson Lizardo
+Instituto Nokia de Tecnologia - INdT
+Manaus - Brazil
