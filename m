@@ -1,72 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 01/10] android: Add MTU data to Open Stream Audio IPC
-Date: Wed, 22 Jan 2014 11:34:44 +0100
-Message-ID: <1390386893-8212-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1390386893-8212-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Wed, 22 Jan 2014 11:08:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v5 00/14] LE auto connection and connection parameters
+Message-ID: <20140122090834.GC9532@x220.p-661hnu-f1>
+References: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1387540675-2466-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MTU value for transport channel is sent in Open Stream response, which
-is required to calculate number of frames which can be packed into
-single media packet.
+Hi Andre,
 
-This is to avoid including GPLv2 licensed headers in Audio HAL
-implementation.
----
- android/a2dp.c      | 8 ++++++--
- android/audio-msg.h | 1 +
- 2 files changed, 7 insertions(+), 2 deletions(-)
+On Fri, Dec 20, 2013, Andre Guedes wrote:
+> This patch set is pretty much the same of previous one, except it implements
+> a different approach to handle discovery and LE connection (as discussed on
+> "[RFC v4 05/12] Bluetooth: Stop scanning on LE connection").
+> 
+> Regards,
+> 
+> Andre
+> 
+> 
+> Andre Guedes (14):
+>   Bluetooth: Save connection interval parameters in hci_conn
+>   Bluetooth: Group list_head fields from strcut hci_dev together
+>   Bluetooth: Introduce connection parameters list
+>   Bluetooth: Use connection parameters if any
+>   Bluetooth: Introduce fail_conn_attempt() helper
+>   Bluetooth: Stop scanning on LE connection
+>   Bluetooth: Remove unused function
+>   Bluetooth: Introduce hdev->pend_le_conn list
+>   Bluetooth: Introduce LE auto connection infrastructure
+>   Bluetooth: Re-enable background scan in case of error
+>   Bluetooth: Temporarily stop background scanning on discovery
+>   Bluetooth: Auto connection and power on
+>   Bleutooth: Add support for auto connect options
+>   Bluetooth: Add le_auto_conn file on debugfs
+> 
+>  include/net/bluetooth/hci.h      |   1 +
+>  include/net/bluetooth/hci_core.h |  43 +++++-
+>  net/bluetooth/hci_conn.c         | 111 +++++++++++---
+>  net/bluetooth/hci_core.c         | 318 +++++++++++++++++++++++++++++++++++++++
+>  net/bluetooth/hci_event.c        |  60 ++++++++
+>  net/bluetooth/mgmt.c             |  25 ++-
+>  6 files changed, 530 insertions(+), 28 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index a996f79..95ecf9b 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -1304,6 +1304,7 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 	struct audio_rsp_open_stream *rsp;
- 	struct a2dp_setup *setup;
- 	int fd;
-+	uint16_t omtu;
- 
- 	DBG("");
- 
-@@ -1314,14 +1315,17 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 		return;
- 	}
- 
--	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, NULL, NULL)) {
-+	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, &omtu,
-+						NULL)) {
- 		error("avdtp_stream_get_transport: failed");
- 		audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
- 		return;
- 	}
- 
--	len = sizeof(struct audio_preset) + setup->preset->len;
-+	len = sizeof(struct audio_rsp_open_stream) +
-+			sizeof(struct audio_preset) + setup->preset->len;
- 	rsp = g_malloc0(len);
-+	rsp->mtu = omtu;
- 	rsp->preset->len = setup->preset->len;
- 	memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
- 
-diff --git a/android/audio-msg.h b/android/audio-msg.h
-index 8f03274..17cde09 100644
---- a/android/audio-msg.h
-+++ b/android/audio-msg.h
-@@ -63,6 +63,7 @@ struct audio_cmd_open_stream {
- } __attribute__((packed));
- 
- struct audio_rsp_open_stream {
-+	uint16_t mtu;
- 	struct audio_preset preset[0];
- } __attribute__((packed));
- 
--- 
-1.8.5.2
+Besides the couple of minor things I just pointed out I didn't find
+anything else obviously wrong with this patch set. It might be worth to
+send a rebased non-RFC version of it (with the changes I suggested if
+you agree with them) so we get this moving forward.
 
+Johan
+.
