@@ -1,46 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] android/hidhost: Fix vid and pid information
+Date: Wed, 22 Jan 2014 18:46:37 +0100
+Message-ID: <1390412797-23093-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20140122170730.35ecc008@ncopa-desktop.alpinelinux.org>
-References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
-	<1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
-	<1390398620-1916-2-git-send-email-ncopa@alpinelinux.org>
-	<CAJdJm_Mo=hGHMYFhurEO2+L_UPpT3YPy-is020d1_CMrXzDeRw@mail.gmail.com>
-	<20140122170730.35ecc008@ncopa-desktop.alpinelinux.org>
-Date: Wed, 22 Jan 2014 14:06:42 -0400
-Message-ID: <CAJdJm_MB5gAK2-9--n=P-Mni1WBRK8o-zaLSkA=_+0Bc6cCVjQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] various header include fixes for building with
- musl libc
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Natanael Copa <natanael.copa@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Natanael Copa <ncopa@alpinelinux.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Natanael,
+For HID device vendor, product and version numbers should be retrieved
+using Device ID profile which is mandatory for devices implementing
+HIDP.
+---
+ android/hidhost.c | 74 +++++++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 56 insertions(+), 18 deletions(-)
 
-On Wed, Jan 22, 2014 at 12:07 PM, Natanael Copa <natanael.copa@gmail.com> wrote:
-> The header itself uses mode_t:
-> ./src/textfile.h:27:1: error: unknown type name 'mode_t'
->
-> So all the files that include textfiles.h needs to include sys/stat.h
-> *before* the include textfile.h in that case.
->
-> I'd say that all filesm that uses mode_t including textfile.h should
-> include sys/stat.h.
->
-> I can make a new patch for either. Just let me know what you want.
-
-This is how we have done so far for files in src/* (for src/shared/ as
-Marcel mentioned this is being done differently). So I suggest you do
-this way.
-
-Note that several files (about 5 out of 10) already include
-sys/stat.h, according to a quick grep I did. Maybe they are just not
-in the right order.
-
-Best Regards,
+diff --git a/android/hidhost.c b/android/hidhost.c
+index bb55f5e..23935da 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -648,18 +648,6 @@ static void hid_sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 		sdp_record_t *rec = list->data;
+ 		sdp_data_t *data;
+ 
+-		data = sdp_data_get(rec, SDP_ATTR_VENDOR_ID);
+-		if (data)
+-			dev->vendor = data->val.uint16;
+-
+-		data = sdp_data_get(rec, SDP_ATTR_PRODUCT_ID);
+-		if (data)
+-			dev->product = data->val.uint16;
+-
+-		data = sdp_data_get(rec, SDP_ATTR_VERSION);
+-		if (data)
+-			dev->version = data->val.uint16;
+-
+ 		data = sdp_data_get(rec, SDP_ATTR_HID_COUNTRY_CODE);
+ 		if (data)
+ 			dev->country = data->val.uint8;
+@@ -722,6 +710,56 @@ fail:
+ 	hid_device_free(dev);
+ }
+ 
++static void hid_sdp_did_search_cb(sdp_list_t *recs, int err, gpointer data)
++{
++	struct hid_device *dev = data;
++	sdp_list_t *list;
++	GError *gerr = NULL;
++	uuid_t uuid;
++
++	DBG("");
++
++	if (err < 0) {
++		error("Unable to get Device ID SDP record: %s", strerror(-err));
++		goto fail;
++	}
++
++	if (!recs || !recs->data) {
++		error("No SDP records found");
++		goto fail;
++	}
++
++	for (list = recs; list != NULL; list = list->next) {
++		sdp_record_t *rec = list->data;
++		sdp_data_t *data;
++
++		data = sdp_data_get(rec, SDP_ATTR_VENDOR_ID);
++		if (data)
++			dev->vendor = data->val.uint16;
++
++		data = sdp_data_get(rec, SDP_ATTR_PRODUCT_ID);
++		if (data)
++			dev->product = data->val.uint16;
++
++		data = sdp_data_get(rec, SDP_ATTR_VERSION);
++		if (data)
++			dev->version = data->val.uint16;
++	}
++
++	bt_string2uuid(&uuid, HID_UUID);
++	if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
++				hid_sdp_search_cb, dev, NULL, 0) < 0) {
++		error("failed to search sdp details");
++		goto fail;
++	}
++
++	return;
++
++fail:
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
++	hid_device_free(dev);
++}
++
+ static void bt_hid_connect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_hidhost_connect *cmd = buf;
+@@ -749,10 +787,10 @@ static void bt_hid_connect(const void *buf, uint16_t len)
+ 	ba2str(&dev->dst, addr);
+ 	DBG("connecting to %s", addr);
+ 
+-	bt_string2uuid(&uuid, HID_UUID);
++	bt_string2uuid(&uuid, PNP_UUID);
+ 	if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
+-					hid_sdp_search_cb, dev, NULL, 0) < 0) {
+-		error("Failed to search sdp details");
++					hid_sdp_did_search_cb, dev, NULL, 0) < 0) {
++		error("Failed to search did sdp details");
+ 		hid_device_free(dev);
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+@@ -1242,10 +1280,10 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 		dev->ctrl_io = g_io_channel_ref(chan);
+ 		dev->uhid_fd = -1;
+ 
+-		bt_string2uuid(&uuid, HID_UUID);
++		bt_string2uuid(&uuid, PNP_UUID);
+ 		if (bt_search_service(&src, &dev->dst, &uuid,
+-					hid_sdp_search_cb, dev, NULL, 0) < 0) {
+-			error("failed to search sdp details");
++					hid_sdp_did_search_cb, dev, NULL, 0) < 0) {
++			error("failed to search did sdp details");
+ 			hid_device_free(dev);
+ 			return;
+ 		}
 -- 
-Anderson Lizardo
-INdT - Manaus - Brazil
+1.8.5.2
+
