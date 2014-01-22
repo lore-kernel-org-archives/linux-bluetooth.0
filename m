@@ -2,47 +2,72 @@ Return-Path: <cyrus@holtmann.org>
 From: Natanael Copa <natanael.copa@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH v2 2/3] bnep: avoid use of caddr_t
-Date: Wed, 22 Jan 2014 13:50:19 +0000
-Message-Id: <1390398620-1916-3-git-send-email-ncopa@alpinelinux.org>
+Subject: [PATCH v2 1/3] various header include fixes for building with musl libc
+Date: Wed, 22 Jan 2014 13:50:18 +0000
+Message-Id: <1390398620-1916-2-git-send-email-ncopa@alpinelinux.org>
 In-Reply-To: <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
 References: <CABBYNZLmpK51xe80XxAwT7rBRkUGsZNhcmMWSnHSyuY--meu_w@mail.gmail.com>
  <1390398620-1916-1-git-send-email-ncopa@alpinelinux.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-caddr_t is legacy BSD and should be avoided.
+we need:
+ sys/stat.h for mode_t
+ limits.h for PATH_MAX
 
-This fixes the following compile error with musl libc:
-profiles/network/bnep.c: In function 'bnep_if_up':
-profiles/network/bnep.c:205:33: error: 'caddr_t' undeclared (first use in this function)
-  err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
+Fixes compile errors:
+In file included from tools/hciconfig.c:45:0:
+./src/textfile.h:27:1: error: unknown type name 'mode_t'
+ int create_file(const char *filename, const mode_t mode);
+ ^
+
+tools/csr_usb.c: In function 'read_value':
+tools/csr_usb.c:71:12: error: 'PATH_MAX' undeclared (first use in this function)
+  char path[PATH_MAX];
+            ^
 ---
- profiles/network/bnep.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ src/textfile.h  | 2 ++
+ tools/csr_usb.c | 1 +
+ tools/hid2hci.c | 1 +
+ 3 files changed, 4 insertions(+)
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 2a74016..4f9b801 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -202,7 +202,7 @@ static int bnep_if_up(const char *devname)
- 	ifr.ifr_flags |= IFF_UP;
- 	ifr.ifr_flags |= IFF_MULTICAST;
+diff --git a/src/textfile.h b/src/textfile.h
+index b779bd2..e26da5d 100644
+--- a/src/textfile.h
++++ b/src/textfile.h
+@@ -24,6 +24,8 @@
+ #ifndef __TEXTFILE_H
+ #define __TEXTFILE_H
  
--	err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
-+	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
++#include <sys/stat.h>
++
+ int create_file(const char *filename, const mode_t mode);
+ int create_name(char *buf, size_t size, const char *path,
+ 				const char *address, const char *name);
+diff --git a/tools/csr_usb.c b/tools/csr_usb.c
+index a483bc1..5fb6bdc 100644
+--- a/tools/csr_usb.c
++++ b/tools/csr_usb.c
+@@ -33,6 +33,7 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <dirent.h>
++#include <limits.h>
+ #include <sys/ioctl.h>
  
- 	close(sk);
- 
-@@ -227,7 +227,7 @@ static int bnep_if_down(const char *devname)
- 	ifr.ifr_flags &= ~IFF_UP;
- 
- 	/* Bring down the interface */
--	err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
-+	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
- 
- 	close(sk);
- 
+ #include "csr.h"
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 95b4abf..2dbfca7 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -35,6 +35,7 @@
+ #include <string.h>
+ #include <dirent.h>
+ #include <getopt.h>
++#include <limits.h>
+ #include <sys/ioctl.h>
+ #include <linux/types.h>
+ #include <linux/hiddev.h>
 -- 
 1.8.5.3
 
