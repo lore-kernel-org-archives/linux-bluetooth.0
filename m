@@ -1,31 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/8] android: Add copy of current AVCTP implemention
-Date: Thu, 23 Jan 2014 18:39:51 +0200
-Message-Id: <1390495198-28400-1-git-send-email-luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/audio: Fix for loading audio lib
+Date: Thu, 23 Jan 2014 17:16:31 +0100
+Message-ID: <1390493791-23043-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Issue visible when haltest loads audio.a2dp.default.so
 
-These files are not added to any makefile on purpose because they still
-have external dependencies.
+> HAL E: load:
+> module=/home/rymanluk/devel/kitkat/external/bluetooth/bluez/android/.libs/audio.a2dp.default.so
+/home/rymanluk/devel/kitkat/external/bluetooth/bluez/android/.libs/audio.a2dp.default.so:
+undefined symbol: clock_gettime
+hw_get_module_by_class returned -22
+
 ---
- {profiles/audio => android}/avctp.c | 0
- {profiles/audio => android}/avctp.h | 0
- 2 files changed, 0 insertions(+), 0 deletions(-)
- copy {profiles/audio => android}/avctp.c (100%)
- copy {profiles/audio => android}/avctp.h (100%)
+ android/Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/avctp.c b/android/avctp.c
-similarity index 100%
-copy from profiles/audio/avctp.c
-copy to android/avctp.c
-diff --git a/profiles/audio/avctp.h b/android/avctp.h
-similarity index 100%
-copy from profiles/audio/avctp.h
-copy to android/avctp.h
+diff --git a/android/Makefile.am b/android/Makefile.am
+index e9d9db1..f85de20 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -152,7 +152,7 @@ android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+ android_audio_a2dp_default_la_LIBADD = @SBC_LIBS@
+ 
+ android_audio_a2dp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
+-					-no-undefined -pthread
++					-no-undefined -pthread -lrt
+ 
+ endif
+ 
 -- 
-1.8.4.2
+1.8.4
 
