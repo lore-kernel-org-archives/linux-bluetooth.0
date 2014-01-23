@@ -2,114 +2,109 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH v3 5/5] android/bluetooth: Rename devices list to cached_devices
-Date: Thu, 23 Jan 2014 23:18:10 +0100
-Message-Id: <1390515490-29538-6-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH v3 2/5] android/bluetooth: Use defines for settings and devices files paths
+Date: Thu, 23 Jan 2014 23:18:07 +0100
+Message-Id: <1390515490-29538-3-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1390515490-29538-1-git-send-email-szymon.janc@gmail.com>
 References: <1390515490-29538-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes it clear what is the purpose of this list.
 ---
- android/bluetooth.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ android/bluetooth.c | 24 +++++++++++-------------
+ 1 file changed, 11 insertions(+), 13 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 126b26a..a9e529f 100644
+index 5d222e1..f5ac0e4 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -140,7 +140,7 @@ static uint16_t option_index = MGMT_INDEX_NONE;
- static struct mgmt *mgmt_if = NULL;
+@@ -54,6 +54,9 @@
  
- static GSList *bonded_devices = NULL;
--static GSList *devices = NULL;
-+static GSList *cached_devices = NULL;
+ #define DUT_MODE_FILE "/sys/kernel/debug/bluetooth/hci%u/dut_mode"
  
- /* This list contains addresses which are asked for records */
- static GSList *browse_reqs;
-@@ -300,7 +300,7 @@ static struct device *find_device(const bdaddr_t *bdaddr)
- 	if (l)
- 		return l->data;
++#define SETTINGS_FILE ANDROID_STORAGEDIR"/settings"
++#define DEVICES_FILE ANDROID_STORAGEDIR"/devices"
++
+ #define DEVICE_ID_SOURCE	0x0002	/* USB */
+ #define DEVICE_ID_VENDOR	0x1d6b	/* Linux Foundation */
+ #define DEVICE_ID_PRODUCT	0x0247	/* BlueZ for Android */
+@@ -148,8 +151,7 @@ static void store_adapter_config(void)
  
--	l = g_slist_find_custom(devices, bdaddr, device_match);
-+	l = g_slist_find_custom(cached_devices, bdaddr, device_match);
- 	if (l)
- 		return l->data;
+ 	key_file = g_key_file_new();
  
-@@ -320,24 +320,24 @@ static void cache_device(struct device *new_dev)
- 	struct device *dev;
- 	GSList *l;
+-	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/settings", 0,
+-									NULL);
++	g_key_file_load_from_file(key_file, SETTINGS_FILE, 0, NULL);
  
--	l = g_slist_find(devices, new_dev);
-+	l = g_slist_find(cached_devices, new_dev);
- 	if (l) {
--		devices = g_slist_remove(devices, new_dev);
-+		cached_devices = g_slist_remove(cached_devices, new_dev);
- 		goto cache;
- 	}
+ 	ba2str(&adapter.bdaddr, addr);
  
--	if (g_slist_length(devices) < DEVICES_CACHE_MAX)
-+	if (g_slist_length(cached_devices) < DEVICES_CACHE_MAX)
- 		goto cache;
+@@ -160,7 +162,7 @@ static void store_adapter_config(void)
  
--	l = g_slist_last(devices);
-+	l = g_slist_last(cached_devices);
- 	dev = l->data;
+ 	data = g_key_file_to_data(key_file, &length, NULL);
  
--	devices = g_slist_remove(devices, dev);
-+	cached_devices = g_slist_remove(cached_devices, dev);
- 	remove_device_info(dev, CACHE_FILE);
- 	free_device(dev);
+-	g_file_set_contents(ANDROID_STORAGEDIR"/settings", data, length, NULL);
++	g_file_set_contents(SETTINGS_FILE, data, length, NULL);
  
- cache:
--	devices = g_slist_prepend(devices, new_dev);
-+	cached_devices = g_slist_prepend(cached_devices, new_dev);
- 	new_dev->timestamp = time(NULL);
- 	store_device_info(new_dev, CACHE_FILE);
- }
-@@ -617,7 +617,7 @@ static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
- 		}
- 		break;
- 	case HAL_BOND_STATE_BONDED:
--		devices = g_slist_remove(devices, dev);
-+		cached_devices = g_slist_remove(cached_devices, dev);
- 		bonded_devices = g_slist_prepend(bonded_devices, dev);
- 		remove_device_info(dev, CACHE_FILE);
- 		store_device_info(dev, DEVICES_FILE);
-@@ -1004,7 +1004,7 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 		cp.state = HAL_DISCOVERY_STATE_STARTED;
- 	} else {
- 		g_slist_foreach(bonded_devices, clear_device_found, NULL);
--		g_slist_foreach(devices, clear_device_found, NULL);
-+		g_slist_foreach(cached_devices, clear_device_found, NULL);
- 		cp.state = HAL_DISCOVERY_STATE_STOPPED;
- 	}
- 
-@@ -1794,10 +1794,10 @@ static void load_devices_cache(void)
- 		struct device *dev;
- 
- 		dev = create_device_from_info(key_file, devs[i]);
--		devices = g_slist_prepend(devices, dev);
-+		cached_devices = g_slist_prepend(cached_devices, dev);
- 	}
- 
--	devices = g_slist_sort(devices, device_timestamp_cmp);
-+	cached_devices = g_slist_sort(cached_devices, device_timestamp_cmp);
- 
- 	g_strfreev(devs);
+ 	g_free(data);
  	g_key_file_free(key_file);
-@@ -3213,8 +3213,8 @@ void bt_bluetooth_unregister(void)
- 	g_slist_free_full(bonded_devices, (GDestroyNotify) free_device);
- 	bonded_devices = NULL;
+@@ -173,8 +175,7 @@ static void load_adapter_config(void)
+ 	char *str;
  
--	g_slist_free_full(devices, (GDestroyNotify) free_device);
--	devices = NULL;
-+	g_slist_free_full(cached_devices, (GDestroyNotify) free_device);
-+	cached_devices = NULL;
+ 	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/settings", 0,
+-									NULL);
++	g_key_file_load_from_file(key_file, SETTINGS_FILE, 0, NULL);
  
- 	ipc_unregister(HAL_SERVICE_ID_CORE);
- }
+ 	str = g_key_file_get_string(key_file, "General", "Address", NULL);
+ 	if (!str) {
+@@ -216,8 +217,7 @@ static void store_device_info(struct device *dev)
+ 	ba2str(&dev->bdaddr, addr);
+ 
+ 	key_file = g_key_file_new();
+-	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices", 0,
+-									NULL);
++	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
+ 
+ 	if (dev->bond_state == HAL_BOND_STATE_NONE) {
+ 		g_key_file_remove_group(key_file, addr, NULL);
+@@ -266,7 +266,7 @@ static void store_device_info(struct device *dev)
+ 
+ done:
+ 	str = g_key_file_to_data(key_file, &length, NULL);
+-	g_file_set_contents(ANDROID_STORAGEDIR"/devices", str, length, NULL);
++	g_file_set_contents(DEVICES_FILE, str, length, NULL);
+ 	g_free(str);
+ 
+ 	g_key_file_free(key_file);
+@@ -521,8 +521,7 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ 
+ 	key_file = g_key_file_new();
+ 
+-	if (!g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices",
+-								0, NULL))
++	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL))
+ 		return;
+ 
+ 	ba2str(dst, addr);
+@@ -537,7 +536,7 @@ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ 	g_key_file_set_integer(key_file, addr, "LinkKeyPinLength", pin_length);
+ 
+ 	data = g_key_file_to_data(key_file, &length, NULL);
+-	g_file_set_contents(ANDROID_STORAGEDIR"/devices", data, length, NULL);
++	g_file_set_contents(DEVICES_FILE, data, length, NULL);
+ 	g_free(data);
+ 
+ 	g_key_file_free(key_file);
+@@ -1727,8 +1726,7 @@ static void load_devices_info(bt_bluetooth_ready cb)
+ 
+ 	key_file = g_key_file_new();
+ 
+-	g_key_file_load_from_file(key_file, ANDROID_STORAGEDIR"/devices", 0,
+-									NULL);
++	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
+ 
+ 	devs = g_key_file_get_groups(key_file, &len);
+ 
 -- 
 1.8.5.3
 
