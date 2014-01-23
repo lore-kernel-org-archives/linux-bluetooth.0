@@ -1,77 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/a2dp: Free device outside of notify function
-Date: Thu, 23 Jan 2014 17:26:19 +0200
-Message-Id: <1390490779-28954-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] android/hal-audio: Workaround AudioFlinger issues
+Date: Thu, 23 Jan 2014 16:25:12 +0100
+Message-ID: <1390490712-25124-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Audio HAL code calculates accurate input stream buffer size which
+allows to fill media packets with as much data as possible. However,
+in most cases calculated buffer size does not work well with Android
+audio code which causes glitches when playing simultaneously to
+different audio output (like notification) or crashes mediaserver
+when disconnecting with headset.
 
-device_free() was used inside notify_state() function based on parameter
-which makes it complex to follow. Change logic so that notify_state()
-only notifies and the other code makes device_free().
+This patch changes input buffer size to fixed magic value 20*512 which
+is used in Bluedroid Audio HAL. Such change requires that we need to
+drop assumption that each input buffer can be used to fill exactly one
+media packet and need to use it to fill multiple media packets. To
+avoid buffering in Audio HAL, we allow that last media packet can be
+filled in non-optimal way, i.e. has less data that can fit.
 ---
- android/a2dp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ android/hal-audio.c | 86 ++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 56 insertions(+), 30 deletions(-)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 572e0d1..d043c04 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -189,11 +189,6 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
- 
- 	ipc_send_notif(HAL_SERVICE_ID_A2DP, HAL_EV_A2DP_CONN_STATE, sizeof(ev),
- 									&ev);
--
--	if (state != HAL_A2DP_STATE_DISCONNECTED)
--		return;
--
--	a2dp_device_free(dev);
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 4326ccd..f4a4ee1 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -413,6 +413,42 @@ static void sbc_resume(void *codec_data)
+ 	sbc_data->frames_sent = 0;
  }
  
- static void bt_audio_notify_state(struct a2dp_setup *setup, uint8_t state)
-@@ -221,6 +216,7 @@ static void disconnect_cb(void *user_data)
- 	struct a2dp_device *dev = user_data;
++static void write_media_packet(int fd, struct sbc_data *sbc_data,
++				struct media_packet *mp, size_t data_len)
++{
++	struct timespec cur;
++	struct timespec diff;
++	unsigned expected_frames;
++	int ret;
++
++	ret = write(fd, mp, sizeof(*mp) + data_len);
++	if (ret < 0) {
++		int err = errno;
++		DBG("error writing data: %d (%s)", err,
++						strerror(err));
++	}
++
++	sbc_data->frames_sent += mp->payload.frame_count;
++
++	clock_gettime(CLOCK_MONOTONIC, &cur);
++	timespec_diff(&cur, &sbc_data->start, &diff);
++	expected_frames = (diff.tv_sec * 1000000 + diff.tv_nsec / 1000) /
++						sbc_data->frame_duration;
++
++	/* AudioFlinger does not seem to provide any *working*
++	 * API to provide data in some interval and will just
++	 * send another buffer as soon as we process current
++	 * one. To prevent overflowing L2CAP socket, we need to
++	 * introduce some artificial delay here base on how many
++	 * audio frames were sent so far, i.e. if we're not
++	 * lagging behind audio stream, we can sleep for
++	 * duration of single media packet.
++	 */
++	if (sbc_data->frames_sent >= expected_frames)
++		usleep(sbc_data->frame_duration *
++				mp->payload.frame_count);
++}
++
+ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
+ 				size_t bytes, int fd)
+ {
+@@ -421,9 +457,6 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
+ 	size_t encoded = 0;
+ 	struct media_packet *mp = (struct media_packet *) sbc_data->out_buf;
+ 	size_t free_space = sbc_data->out_buf_size - sizeof(*mp);
+-	struct timespec cur;
+-	struct timespec diff;
+-	unsigned expected_frames;
+ 	int ret;
  
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+	a2dp_device_free(dev);
- }
+ 	mp->hdr.v = 2;
+@@ -450,39 +483,28 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
+ 		consumed += ret;
+ 		encoded += written;
+ 		free_space -= written;
+-	}
  
- static int sbc_check_config(void *caps, uint8_t caps_len, void *conf,
-@@ -460,6 +456,7 @@ static gboolean idle_timeout(gpointer user_data)
- 
- 	error("avdtp_discover: %s", strerror(-err));
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+	a2dp_device_free(dev);
- 
- 	return FALSE;
- }
-@@ -474,6 +471,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
- 
- 	if (err) {
- 		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+		a2dp_device_free(dev);
- 		error("%s", err->message);
- 		return;
+-	ret = write(fd, mp, sizeof(*mp) + encoded);
+-	if (ret < 0) {
+-		int err = errno;
+-		DBG("error writing data: %d (%s)", err, strerror(err));
++		/* write data if we either filled media packed or encoded all
++		 * input data
++		 */
++		if (mp->payload.frame_count == sbc_data->frames_per_packet ||
++				bytes == consumed) {
++			write_media_packet(fd, sbc_data, mp, encoded);
++
++			encoded = 0;
++			free_space = sbc_data->out_buf_size - sizeof(*mp);
++			mp->payload.frame_count = 0;
++		}
  	}
-@@ -519,6 +517,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
  
- failed:
- 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+	a2dp_device_free(dev);
- }
- 
- static void bt_a2dp_connect(const void *buf, uint16_t len)
-@@ -581,6 +580,7 @@ static void bt_a2dp_disconnect(const void *buf, uint16_t len)
- 
- 	if (dev->io) {
- 		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-+		a2dp_device_free(dev);
- 		goto failed;
+-	if (consumed != bytes || free_space != 0) {
+-		/* we should encode all input data and fill output buffer
++	if (consumed != bytes) {
++		/* we should encode all input data
+ 		 * if we did not, something went wrong but we can't really
+ 		 * handle this so this is just sanity check
+ 		 */
+ 		DBG("some data were not encoded");
  	}
  
+-	sbc_data->frames_sent += mp->payload.frame_count;
+-
+-	clock_gettime(CLOCK_MONOTONIC, &cur);
+-	timespec_diff(&cur, &sbc_data->start, &diff);
+-	expected_frames = (diff.tv_sec * 1000000 + diff.tv_nsec / 1000) /
+-				sbc_data->frame_duration;
+-
+-	/* AudioFlinger does not seem to provide any *working* API to provide
+-	 * data in some interval and will just send another buffer as soon as
+-	 * we process current one. To prevent overflowing L2CAP socket, we need
+-	 * to introduce some artificial delay here base on how many audio frames
+-	 * were sent so far, i.e. if we're not lagging behind audio stream, we
+-	 * can sleep for duration of single media packet.
+-	 */
+-	if (sbc_data->frames_sent >= expected_frames)
+-		usleep(sbc_data->frame_duration * mp->payload.frame_count);
+-
+ 	/* we always assume that all data was processed and sent */
+ 	return bytes;
+ }
+@@ -853,11 +875,15 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+ 
+ static size_t out_get_buffer_size(const struct audio_stream *stream)
+ {
+-	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+-
+ 	DBG("");
+ 
+-	return out->ep->codec->get_buffer_size(out->ep->codec_data);
++	/* We should return proper buffer size calculated by codec (so each
++	 * input buffer is encoded into single media packed) but this does not
++	 * work well with AudioFlinger and causes problems. For this reason we
++	 * use magic value here and out_write code takes care of splitting
++	 * input buffer into multiple media packets.
++	 */
++	return 20 * 512;
+ }
+ 
+ static uint32_t out_get_channels(const struct audio_stream *stream)
 -- 
-1.8.3.2
+1.8.5.2
 
