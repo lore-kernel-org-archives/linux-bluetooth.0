@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/2] android/hal-audio: Simplify and fix locking
-Date: Thu, 23 Jan 2014 16:22:27 +0100
-Message-Id: <1390490548-19697-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] android/hal-audio: Simplify and fix locking
+Date: Thu, 23 Jan 2014 15:21:25 +0100
+Message-Id: <1390486886-12350-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -13,13 +13,11 @@ audio_ipc_cmd() return or accesing audio_sk without holding lock.
 close_thread is removed to simplify code and shutdown on listen_sk is
 used to indicate that that handler thread should stop.
 ---
-v2: fix missing unregister_endpoints() on audio_close
-
- android/hal-audio.c | 70 +++++++++++++++++++++++++++++------------------------
- 1 file changed, 38 insertions(+), 32 deletions(-)
+ android/hal-audio.c | 68 ++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 36 insertions(+), 32 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 4326ccd..52f8894 100644
+index 4326ccd..11b0767 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
 @@ -44,10 +44,8 @@ static const uint8_t a2dp_src_uuid[] = {
@@ -107,7 +105,7 @@ index 4326ccd..52f8894 100644
  	return AUDIO_STATUS_FAILED;
  }
  
-@@ -1311,10 +1302,10 @@ static int audio_close(hw_device_t *device)
+@@ -1311,10 +1302,8 @@ static int audio_close(hw_device_t *device)
  
  	DBG("");
  
@@ -115,14 +113,12 @@ index 4326ccd..52f8894 100644
 -	audio_ipc_cleanup();
 -	close_thread = true;
 -	pthread_mutex_unlock(&close_mutex);
-+	unregister_endpoints();
-+
 +	shutdown(listen_sk, SHUT_RDWR);
 +	shutdown(audio_sk, SHUT_RDWR);
  
  	pthread_join(ipc_th, NULL);
  
-@@ -1329,19 +1320,31 @@ static void *ipc_handler(void *data)
+@@ -1329,19 +1318,31 @@ static void *ipc_handler(void *data)
  {
  	bool done = false;
  	struct pollfd pfd;
@@ -159,7 +155,7 @@ index 4326ccd..52f8894 100644
  		DBG("Audio IPC: Connected");
  
  		if (register_endpoints() != AUDIO_STATUS_SUCCESS) {
-@@ -1349,7 +1352,12 @@ static void *ipc_handler(void *data)
+@@ -1349,7 +1350,12 @@ static void *ipc_handler(void *data)
  
  			unregister_endpoints();
  
@@ -172,7 +168,7 @@ index 4326ccd..52f8894 100644
  			continue;
  		}
  
-@@ -1362,14 +1370,12 @@ static void *ipc_handler(void *data)
+@@ -1362,14 +1368,12 @@ static void *ipc_handler(void *data)
  
  		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
  			info("Audio HAL: Socket closed");
