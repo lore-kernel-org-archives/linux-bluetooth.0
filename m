@@ -1,208 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [RFC] android: Add support for Valgrind in debug variants
+Date: Thu, 23 Jan 2014 18:54:04 +0100
+Message-ID: <1390499644-8027-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1390499644-8027-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1390499644-8027-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1390490548-19697-1-git-send-email-szymon.janc@tieto.com>
-References: <1390490548-19697-1-git-send-email-szymon.janc@tieto.com>
-Date: Thu, 23 Jan 2014 20:08:07 +0200
-Message-ID: <CABBYNZ+yJWDij=yoOn2-HXoLEEFjMd5JAF5zzBvjQqKbQiDybA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] android/hal-audio: Simplify and fix locking
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+This patch automatically builds BlueZ in a way it can be easily run
+with Valgrind which is available in AOSP tree.
 
-On Thu, Jan 23, 2014 at 5:22 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> This fix various issues with locking like missing unlock on
-> audio_ipc_cmd() return or accesing audio_sk without holding lock.
-> close_thread is removed to simplify code and shutdown on listen_sk is
-> used to indicate that that handler thread should stop.
-> ---
-> v2: fix missing unregister_endpoints() on audio_close
->
->  android/hal-audio.c | 70 +++++++++++++++++++++++++++++------------------------
->  1 file changed, 38 insertions(+), 32 deletions(-)
->
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 4326ccd..52f8894 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -44,10 +44,8 @@ static const uint8_t a2dp_src_uuid[] = {
->
->  static int listen_sk = -1;
->  static int audio_sk = -1;
-> -static bool close_thread = false;
->
->  static pthread_t ipc_th = 0;
-> -static pthread_mutex_t close_mutex = PTHREAD_MUTEX_INITIALIZER;
->  static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
->
->  #if __BYTE_ORDER == __LITTLE_ENDIAN
-> @@ -487,14 +485,6 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
->         return bytes;
->  }
->
-> -static void audio_ipc_cleanup(void)
-> -{
-> -       if (audio_sk >= 0) {
-> -               shutdown(audio_sk, SHUT_RDWR);
-> -               audio_sk = -1;
-> -       }
-> -}
-> -
->  static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
->                         void *param, size_t *rsp_len, void *rsp, int *fd)
->  {
-> @@ -506,6 +496,8 @@ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
->         struct hal_status s;
->         size_t s_len = sizeof(s);
->
-> +       pthread_mutex_lock(&sk_mutex);
-> +
->         if (audio_sk < 0) {
->                 error("audio: Invalid cmd socket passed to audio_ipc_cmd");
->                 goto failed;
-> @@ -533,12 +525,9 @@ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
->         msg.msg_iov = iv;
->         msg.msg_iovlen = 2;
->
-> -       pthread_mutex_lock(&sk_mutex);
-> -
->         ret = sendmsg(audio_sk, &msg, 0);
->         if (ret < 0) {
->                 error("audio: Sending command failed:%s", strerror(errno));
-> -               pthread_mutex_unlock(&sk_mutex);
->                 goto failed;
->         }
->
-> @@ -570,12 +559,9 @@ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
->         if (ret < 0) {
->                 error("audio: Receiving command response failed:%s",
->                                                         strerror(errno));
-> -               pthread_mutex_unlock(&sk_mutex);
->                 goto failed;
->         }
->
-> -       pthread_mutex_unlock(&sk_mutex);
-> -
->         if (ret < (ssize_t) sizeof(cmd)) {
->                 error("audio: Too small response received(%zd bytes)", ret);
->                 goto failed;
-> @@ -611,9 +597,13 @@ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
->                         goto failed;
->                 }
->
-> +               pthread_mutex_unlock(&sk_mutex);
-> +
->                 return s->code;
->         }
->
-> +       pthread_mutex_unlock(&sk_mutex);
-> +
->         /* Receive auxiliary data in msg */
->         if (fd) {
->                 struct cmsghdr *cmsg;
-> @@ -638,7 +628,8 @@ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
->  failed:
->         /* Some serious issue happen on IPC - recover */
->         shutdown(audio_sk, SHUT_RDWR);
-> -       audio_sk = -1;
-> +       pthread_mutex_unlock(&sk_mutex);
-> +
->         return AUDIO_STATUS_FAILED;
->  }
->
-> @@ -1311,10 +1302,10 @@ static int audio_close(hw_device_t *device)
->
->         DBG("");
->
-> -       pthread_mutex_lock(&close_mutex);
-> -       audio_ipc_cleanup();
-> -       close_thread = true;
-> -       pthread_mutex_unlock(&close_mutex);
-> +       unregister_endpoints();
-> +
-> +       shutdown(listen_sk, SHUT_RDWR);
-> +       shutdown(audio_sk, SHUT_RDWR);
->
->         pthread_join(ipc_th, NULL);
->
-> @@ -1329,19 +1320,31 @@ static void *ipc_handler(void *data)
->  {
->         bool done = false;
->         struct pollfd pfd;
-> +       int sk;
->
->         DBG("");
->
->         while (!done) {
->                 DBG("Waiting for connection ...");
-> -               audio_sk = accept(listen_sk, NULL, NULL);
-> -               if (audio_sk < 0) {
-> +
-> +               sk = accept(listen_sk, NULL, NULL);
-> +               if (sk < 0) {
->                         int err = errno;
-> -                       error("audio: Failed to accept socket: %d (%s)", err,
-> -                                                               strerror(err));
-> -                       continue;
-> +
-> +                       if (err == EINTR)
-> +                               continue;
-> +
-> +                       if (err != ECONNABORTED && err != EINVAL)
-> +                               error("audio: Failed to accept socket: %d (%s)",
-> +                                                       err, strerror(err));
-> +
-> +                       break;
->                 }
->
-> +               pthread_mutex_lock(&sk_mutex);
-> +               audio_sk = sk;
-> +               pthread_mutex_unlock(&sk_mutex);
-> +
->                 DBG("Audio IPC: Connected");
->
->                 if (register_endpoints() != AUDIO_STATUS_SUCCESS) {
-> @@ -1349,7 +1352,12 @@ static void *ipc_handler(void *data)
->
->                         unregister_endpoints();
->
-> +                       pthread_mutex_lock(&sk_mutex);
->                         shutdown(audio_sk, SHUT_RDWR);
-> +                       close(audio_sk);
-> +                       audio_sk = -1;
-> +                       pthread_mutex_unlock(&sk_mutex);
-> +
->                         continue;
->                 }
->
-> @@ -1362,14 +1370,12 @@ static void *ipc_handler(void *data)
->
->                 if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
->                         info("Audio HAL: Socket closed");
-> +
-> +                       pthread_mutex_lock(&sk_mutex);
-> +                       close(audio_sk);
->                         audio_sk = -1;
-> +                       pthread_mutex_unlock(&sk_mutex);
->                 }
-> -
-> -               /*Check if audio_dev is closed */
-> -               pthread_mutex_lock(&close_mutex);
-> -               done = close_thread;
-> -               close_thread = false;
-> -               pthread_mutex_unlock(&close_mutex);
->         }
->
->         unregister_endpoints();
-> --
-> 1.8.3.2
+For userdebug and eng variant, bluetoothd will have additional
+dependency to necessary Valgrind modules and bluetoothd binary will not
+be stripped. Special version of init.bluetooth.rc is also provided
+which defines bluetoothd service to be run using Valgrind with proper
+environment and it will be installed automatically as well.
+---
+ android/Android.mk              | 13 +++++++++++++
+ android/init.bluetooth.rc-debug | 39 +++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 52 insertions(+)
+ create mode 100644 android/init.bluetooth.rc-debug
 
-Pushed, thanks.
-
-
+diff --git a/android/Android.mk b/android/Android.mk
+index c274295..55093d2 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -80,6 +80,15 @@ $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/bluez/lib
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE := bluetoothd
+ 
++ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
++LOCAL_STRIP_MODULE := false
++LOCAL_REQUIRED_MODULES := valgrind \
++	memcheck-$(TARGET_ARCH)-linux \
++	vgpreload_core-$(TARGET_ARCH)-linux \
++	vgpreload_memcheck-$(TARGET_ARCH)-linux \
++	default.supp
++endif
++
+ include $(BUILD_EXECUTABLE)
+ 
+ #
+@@ -294,7 +303,11 @@ include $(CLEAR_VARS)
+ 
+ LOCAL_MODULE := init.bluetooth.rc
+ LOCAL_MODULE_CLASS := ETC
++ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
++LOCAL_SRC_FILES := bluez/android/$(LOCAL_MODULE)-debug
++else
+ LOCAL_SRC_FILES := bluez/android/$(LOCAL_MODULE)
++endif
+ LOCAL_MODULE_TAGS := optional
+ LOCAL_MODULE_PATH := $(TARGET_ROOT_OUT)
+ 
+diff --git a/android/init.bluetooth.rc-debug b/android/init.bluetooth.rc-debug
+new file mode 100644
+index 0000000..c6c382c
+--- /dev/null
++++ b/android/init.bluetooth.rc-debug
+@@ -0,0 +1,39 @@
++# required permissions
++on boot
++    chown bluetooth bluetooth /data/misc/bluetooth
++    chown bluetooth bluetooth /dev/uhid
++
++# services
++on property:bluetooth.start=daemon
++    setprop bluetooth.start none
++    start bluetoothd
++
++on property:bluetooth.stop=daemon
++    setprop bluetooth.stop none
++    stop bluetoothd
++
++on property:bluetooth.start=snoop
++    setprop bluetooth.start none
++    start bluetoothd-snoop
++
++on property:bluetooth.stop=snoop
++    setprop bluetooth.stop none
++    stop bluetoothd-snoop
++
++service bluetoothd /system/bin/logwrapper /system/bin/valgrind --leak-check=full /system/bin/bluetoothd
++    setenv G_SLICE always-malloc
++    setenv G_DEBUG gc-friendly
++    class main
++    # init does not yet support setting capabilities so run as root,
++    # bluetoothd drop uid to bluetooth with the right linux capabilities
++    group bluetooth
++    disabled
++    oneshot
++
++service bluetoothd-snoop /system/bin/logwrapper /system/bin/bluetoothd-snoop
++    class main
++    # init does not yet support setting capabilities so run as root,
++    # bluetoothd-snoop drops unneeded linux capabilities
++    group nobody
++    disabled
++    oneshot
 -- 
-Luiz Augusto von Dentz
+1.8.5.2
+
