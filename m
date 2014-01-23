@@ -1,36 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] btproxy: Fix resource leak
-Date: Thu, 23 Jan 2014 11:07:28 +0200
-Message-Id: <1390468048-8526-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 22 Jan 2014 21:59:44 -0800 (PST)
+Message-Id: <20140122.215944.1857286066071533638.davem@davemloft.net>
+To: ydroneaud@opteya.com
+Cc: alex.bluesman.smirnov@gmail.com, dbaryshkov@gmail.com,
+	marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, jukka.rissanen@linux.intel.com,
+	alex.aring@gmail.com
+Subject: Re: [PATCH] 6lowpan: add a license to 6lowpan_iphc module
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <1390418724-9804-1-git-send-email-ydroneaud@opteya.com>
+References: <1390418724-9804-1-git-send-email-ydroneaud@opteya.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Yann Droneaud <ydroneaud@opteya.com>
+Date: Wed, 22 Jan 2014 20:25:24 +0100
 
-Close file descriptors before leaving.
----
- tools/btproxy.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+> Since commit 8df8c56a5abc, 6lowpan_iphc is a module of its own.
+> 
+> Unfortunately, it lacks some infrastructure to behave like a
+> good kernel citizen:
+> 
+>   kernel: 6lowpan_iphc: module license 'unspecified' taints kernel.
+>   kernel: Disabling lock debugging due to kernel taint
+> 
+> This patch adds the basic MODULE_LICENSE(); with GPL license:
+> the code was copied from net/ieee802154/6lowpan.c which is GPL
+> and the module exports symbol with EXPORT_SYMBOL_GPL();.
+> 
+> Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> Cc: Alexander Aring <alex.aring@gmail.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Yann Droneaud <ydroneaud@opteya.com>
 
-diff --git a/tools/btproxy.c b/tools/btproxy.c
-index be81bae..3503148 100644
---- a/tools/btproxy.c
-+++ b/tools/btproxy.c
-@@ -680,8 +680,11 @@ int main(int argc, char *argv[])
- 			return EXIT_FAILURE;
- 		}
- 
--		if (!setup_proxy(host_fd, false, dev_fd, true))
-+		if (!setup_proxy(host_fd, false, dev_fd, true)) {
-+			close(dev_fd);
-+			close(host_fd);
- 			return EXIT_FAILURE;
-+		}
- 	} else {
- 		int server_fd;
- 
--- 
-1.8.3.2
-
+Applied.
