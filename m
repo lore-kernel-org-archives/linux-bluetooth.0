@@ -1,153 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1390479624-5858-1-git-send-email-luiz.dentz@gmail.com>
-References: <1390479624-5858-1-git-send-email-luiz.dentz@gmail.com>
-Date: Thu, 23 Jan 2014 17:32:14 +0200
-Message-ID: <CABBYNZLxnFts_BAK-0jwy_m_5Q-V_s92oUzysRmJwRJEN8WXDQ@mail.gmail.com>
-Subject: Re: [PATCH SBC 1/2] sbc: Add sbc_reinit_a2dp
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/a2dp: Free device outside of notify function
+Date: Thu, 23 Jan 2014 17:26:19 +0200
+Message-Id: <1390490779-28954-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Jan 23, 2014 at 2:20 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This adds sbc_reinit_a2dp that can be used to reconfigure a previous
-> initialized sbc_t with new A2DP configuration.
-> ---
->  sbc/sbc.c | 49 +++++++++++++++++++++++++++++++++++--------------
->  sbc/sbc.h |  2 ++
->  2 files changed, 37 insertions(+), 14 deletions(-)
->
-> diff --git a/sbc/sbc.c b/sbc/sbc.c
-> index 51bca55..534027e 100644
-> --- a/sbc/sbc.c
-> +++ b/sbc/sbc.c
-> @@ -1087,19 +1087,14 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
->         return 0;
->  }
->
-> -SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
-> +static int sbc_set_a2dp(sbc_t *sbc, unsigned long flags,
->                                         const void *conf, size_t conf_len)
->  {
->         const struct a2dp_sbc *a2dp;
-> -       int err;
->
->         if (conf_len != sizeof(*a2dp))
->                 return -EINVAL;
->
-> -       err = sbc_init(sbc, flags);
-> -       if (err < 0)
-> -               return err;
-> -
->         a2dp = conf;
->
->         switch (a2dp->frequency) {
-> @@ -1116,7 +1111,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
->                 sbc->frequency = SBC_FREQ_48000;
->                 break;
->         default:
-> -               goto failed;
-> +               return -EINVAL;
->         }
->
->         switch (a2dp->channel_mode) {
-> @@ -1133,7 +1128,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
->                 sbc->mode = SBC_MODE_JOINT_STEREO;
->                 break;
->         default:
-> -               goto failed;
-> +               return -EINVAL;
->         }
->
->         switch (a2dp->allocation_method) {
-> @@ -1144,7 +1139,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
->                 sbc->allocation = SBC_AM_LOUDNESS;
->                 break;
->         default:
-> -               goto failed;
-> +               return -EINVAL;
->         }
->
->         switch (a2dp->subbands) {
-> @@ -1155,7 +1150,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
->                 sbc->subbands = SBC_SB_8;
->                 break;
->         default:
-> -               goto failed;
-> +               return -EINVAL;
->         }
->
->         switch (a2dp->block_length) {
-> @@ -1172,14 +1167,40 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
->                 sbc->blocks = SBC_BLK_16;
->                 break;
->         default:
-> -               goto failed;
-> +               return -EINVAL;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
-> +                                       const void *conf, size_t conf_len)
-> +{
-> +       int err;
-> +
-> +       err = sbc_init(sbc, flags);
-> +       if (err < 0)
-> +               return err;
-> +
-> +       err = sbc_set_a2dp(sbc, flags, conf, conf_len);
-> +       if (err < 0) {
-> +               sbc_finish(sbc);
-> +               return err;
->         }
->
->         return 0;
-> +}
-> +
-> +int sbc_reinit_a2dp(sbc_t *sbc, unsigned long flags,
-> +                                       const void *conf, size_t conf_len)
-> +{
-> +       int err;
-> +
-> +       err = sbc_reinit(sbc, flags);
-> +       if (err < 0)
-> +               return err;
->
-> -failed:
-> -       sbc_finish(sbc);
-> -       return -EINVAL;
-> +       return sbc_set_a2dp(sbc, flags, conf, conf_len);
->  }
->
->  SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
-> diff --git a/sbc/sbc.h b/sbc/sbc.h
-> index a542845..d6f123e 100644
-> --- a/sbc/sbc.h
-> +++ b/sbc/sbc.h
-> @@ -87,6 +87,8 @@ int sbc_reinit(sbc_t *sbc, unsigned long flags);
->  int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
->  int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
->                                         const void *conf, size_t conf_len);
-> +int sbc_reinit_a2dp(sbc_t *sbc, unsigned long flags,
-> +                                       const void *conf, size_t conf_len);
->
->  ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
->
-> --
-> 1.8.4.2
+device_free() was used inside notify_state() function based on parameter
+which makes it complex to follow. Change logic so that notify_state()
+only notifies and the other code makes device_free().
+---
+ android/a2dp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Pushed.
-
-
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 572e0d1..d043c04 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -189,11 +189,6 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
+ 
+ 	ipc_send_notif(HAL_SERVICE_ID_A2DP, HAL_EV_A2DP_CONN_STATE, sizeof(ev),
+ 									&ev);
+-
+-	if (state != HAL_A2DP_STATE_DISCONNECTED)
+-		return;
+-
+-	a2dp_device_free(dev);
+ }
+ 
+ static void bt_audio_notify_state(struct a2dp_setup *setup, uint8_t state)
+@@ -221,6 +216,7 @@ static void disconnect_cb(void *user_data)
+ 	struct a2dp_device *dev = user_data;
+ 
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++	a2dp_device_free(dev);
+ }
+ 
+ static int sbc_check_config(void *caps, uint8_t caps_len, void *conf,
+@@ -460,6 +456,7 @@ static gboolean idle_timeout(gpointer user_data)
+ 
+ 	error("avdtp_discover: %s", strerror(-err));
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++	a2dp_device_free(dev);
+ 
+ 	return FALSE;
+ }
+@@ -474,6 +471,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+ 
+ 	if (err) {
+ 		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++		a2dp_device_free(dev);
+ 		error("%s", err->message);
+ 		return;
+ 	}
+@@ -519,6 +517,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
+ 
+ failed:
+ 	bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++	a2dp_device_free(dev);
+ }
+ 
+ static void bt_a2dp_connect(const void *buf, uint16_t len)
+@@ -581,6 +580,7 @@ static void bt_a2dp_disconnect(const void *buf, uint16_t len)
+ 
+ 	if (dev->io) {
+ 		bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
++		a2dp_device_free(dev);
+ 		goto failed;
+ 	}
+ 
 -- 
-Luiz Augusto von Dentz
+1.8.3.2
+
