@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 3/5] android/bluetooth: Add support for caching remote device info
-Date: Thu, 23 Jan 2014 23:18:08 +0100
-Message-Id: <1390515490-29538-4-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH v3 4/5] android/bluetooth: Add support for loading caches devices from storage
+Date: Thu, 23 Jan 2014 23:18:09 +0100
+Message-Id: <1390515490-29538-5-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1390515490-29538-1-git-send-email-szymon.janc@gmail.com>
 References: <1390515490-29538-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,248 +12,123 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Szymon Janc <szymon.janc@tieto.com>
 
-Cache is limited to DEVICES_CACHE_MAX. Devices are sorted with
-timestamp so if cache is full olderst device is removed.
+Info is now stored for all devices and bond state depends on file.
+Based on that devices loaded from storage are put either to cache
+or to bonded_devices list.
 ---
- android/bluetooth.c | 115 +++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 82 insertions(+), 33 deletions(-)
+ android/bluetooth.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 54 insertions(+), 5 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index f5ac0e4..cf2dc83 100644
+index cf2dc83..126b26a 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -56,6 +56,7 @@
- 
- #define SETTINGS_FILE ANDROID_STORAGEDIR"/settings"
- #define DEVICES_FILE ANDROID_STORAGEDIR"/devices"
-+#define CACHE_FILE ANDROID_STORAGEDIR"/cache"
- 
- #define DEVICE_ID_SOURCE	0x0002	/* USB */
- #define DEVICE_ID_VENDOR	0x1d6b	/* Linux Foundation */
-@@ -70,6 +71,8 @@
- /* Default discoverable timeout 120sec as in Android */
- #define DEFAULT_DISCOVERABLE_TIMEOUT 120
- 
-+#define DEVICES_CACHE_MAX 300
-+
- #define BASELEN_PROP_CHANGED (sizeof(struct hal_ev_adapter_props_changed) \
- 					+ (sizeof(struct hal_property)))
- 
-@@ -199,7 +202,7 @@ static void load_adapter_config(void)
- 	g_key_file_free(key_file);
+@@ -1679,7 +1679,8 @@ static void clear_uuids(void)
+ 					sizeof(cp), &cp, NULL, NULL, NULL);
  }
  
--static void store_device_info(struct device *dev)
-+static void store_device_info(struct device *dev, const char *path)
+-static void create_device_from_info(GKeyFile *key_file, const char *peer)
++static struct device *create_device_from_info(GKeyFile *key_file,
++							const char *peer)
  {
- 	GKeyFile *key_file;
- 	char addr[18];
-@@ -207,22 +210,10 @@ static void store_device_info(struct device *dev)
- 	char **uuids = NULL;
- 	char *str;
+ 	struct device *dev;
+ 	uint8_t type;
+@@ -1694,7 +1695,11 @@ static void create_device_from_info(GKeyFile *key_file, const char *peer)
+ 	str2ba(peer, &bdaddr);
+ 	dev = create_device(&bdaddr, type);
  
--	/* We only store bonded devices and need to modify the storage
--	 * if the state is either NONE or BONDED.
--	 */
--	if (dev->bond_state != HAL_BOND_STATE_BONDED &&
--					dev->bond_state != HAL_BOND_STATE_NONE)
--		return;
--
- 	ba2str(&dev->bdaddr, addr);
- 
- 	key_file = g_key_file_new();
--	g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL);
--
--	if (dev->bond_state == HAL_BOND_STATE_NONE) {
--		g_key_file_remove_group(key_file, addr, NULL);
--		goto done;
--	}
-+	g_key_file_load_from_file(key_file, path, 0, NULL);
- 
- 	g_key_file_set_integer(key_file, addr, "Type", dev->bdaddr_type);
- 
-@@ -264,15 +255,35 @@ static void store_device_info(struct device *dev)
- 		g_key_file_remove_key(key_file, addr, "Services", NULL);
- 	}
- 
--done:
- 	str = g_key_file_to_data(key_file, &length, NULL);
--	g_file_set_contents(DEVICES_FILE, str, length, NULL);
-+	g_file_set_contents(path, str, length, NULL);
- 	g_free(str);
- 
- 	g_key_file_free(key_file);
- 	g_strfreev(uuids);
- }
- 
-+static void remove_device_info(struct device *dev, const char *path)
-+{
-+	GKeyFile *key_file;
-+	gsize length = 0;
-+	char addr[18];
-+	char *str;
-+
-+	ba2str(&dev->bdaddr, addr);
-+
-+	key_file = g_key_file_new();
-+	g_key_file_load_from_file(key_file, path, 0, NULL);
-+
-+	g_key_file_remove_group(key_file, addr, NULL);
-+
-+	str = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(path, str, length, NULL);
-+	g_free(str);
-+
-+	g_key_file_free(key_file);
-+}
-+
- static int device_match(gconstpointer a, gconstpointer b)
- {
- 	const struct device *dev = a;
-@@ -296,6 +307,41 @@ static struct device *find_device(const bdaddr_t *bdaddr)
- 	return NULL;
- }
- 
-+static void free_device(struct device *dev)
-+{
-+	g_free(dev->name);
-+	g_free(dev->friendly_name);
-+	g_slist_free_full(dev->uuids, g_free);
-+	g_free(dev);
-+}
-+
-+static void cache_device(struct device *new_dev)
-+{
-+	struct device *dev;
-+	GSList *l;
-+
-+	l = g_slist_find(devices, new_dev);
-+	if (l) {
-+		devices = g_slist_remove(devices, new_dev);
-+		goto cache;
+-	dev->bond_state = HAL_BOND_STATE_BONDED;
++	str = g_key_file_get_string(key_file, peer, "LinkKey", NULL);
++	if (str) {
++		g_free(str);
++		dev->bond_state = HAL_BOND_STATE_BONDED;
 +	}
-+
-+	if (g_slist_length(devices) < DEVICES_CACHE_MAX)
-+		goto cache;
-+
-+	l = g_slist_last(devices);
-+	dev = l->data;
-+
-+	devices = g_slist_remove(devices, dev);
-+	remove_device_info(dev, CACHE_FILE);
-+	free_device(dev);
-+
-+cache:
-+	devices = g_slist_prepend(devices, new_dev);
-+	new_dev->timestamp = time(NULL);
-+	store_device_info(new_dev, CACHE_FILE);
-+}
-+
- static struct device *create_device(const bdaddr_t *bdaddr, uint8_t type)
- {
- 	struct device *dev;
-@@ -314,19 +360,10 @@ static struct device *create_device(const bdaddr_t *bdaddr, uint8_t type)
- 	/* use address for name, will be change if one is present
- 	 * eg. in EIR or set by set_property. */
- 	dev->name = g_strdup(addr);
--	devices = g_slist_prepend(devices, dev);
  
- 	return dev;
- }
+ 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
+ 	if (str) {
+@@ -1730,6 +1735,8 @@ static void create_device_from_info(GKeyFile *key_file, const char *peer)
  
--static void free_device(struct device *dev)
--{
--	g_free(dev->name);
--	g_free(dev->friendly_name);
--	g_slist_free_full(dev->uuids, g_free);
--	g_free(dev);
--}
--
- static struct device *get_device(const bdaddr_t *bdaddr, uint8_t type)
- {
- 	struct device *dev;
-@@ -335,7 +372,11 @@ static struct device *get_device(const bdaddr_t *bdaddr, uint8_t type)
- 	if (dev)
- 		return dev;
- 
--	return create_device(bdaddr, type);
-+	dev = create_device(bdaddr, type);
-+
-+	cache_device(dev);
+ 		g_strfreev(uuids);
+ 	}
 +
 +	return dev;
  }
  
- static  void send_adapter_property(uint8_t type, uint16_t len, const void *val)
-@@ -571,12 +612,15 @@ static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
- 	case HAL_BOND_STATE_NONE:
- 		if (dev->bond_state == HAL_BOND_STATE_BONDED) {
- 			bonded_devices = g_slist_remove(bonded_devices, dev);
--			devices = g_slist_prepend(devices, dev);
-+			remove_device_info(dev, DEVICES_FILE);
-+			cache_device(dev);
- 		}
- 		break;
- 	case HAL_BOND_STATE_BONDED:
- 		devices = g_slist_remove(devices, dev);
- 		bonded_devices = g_slist_prepend(bonded_devices, dev);
-+		remove_device_info(dev, CACHE_FILE);
-+		store_device_info(dev, DEVICES_FILE);
- 		break;
- 	case HAL_BOND_STATE_BONDING:
- 	default:
-@@ -585,8 +629,6 @@ static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
- 
- 	dev->bond_state = state;
- 
--	store_device_info(dev);
--
- 	send_bond_state_change(&dev->bdaddr, status, state);
+ static struct mgmt_link_key_info *get_key_info(GKeyFile *key_file, const char *peer)
+@@ -1762,6 +1769,40 @@ failed:
+ 	return info;
  }
  
-@@ -627,7 +669,10 @@ static void set_device_uuids(struct device *dev, GSList *uuids)
- 	g_slist_free_full(dev->uuids, g_free);
- 	dev->uuids = uuids;
- 
--	store_device_info(dev);
-+	if (dev->bond_state == HAL_BOND_STATE_BONDED)
-+		store_device_info(dev, DEVICES_FILE);
-+	else
-+		store_device_info(dev, CACHE_FILE);
- 
- 	send_device_uuids_notif(dev);
- }
-@@ -1058,8 +1103,6 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 
- 		ev->status = HAL_STATUS_SUCCESS;
- 		bdaddr2android(bdaddr, ev->bdaddr);
--
--		dev->timestamp = time(NULL);
- 	}
- 
- 	if (eir.class) {
-@@ -1087,6 +1130,9 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 		(*num_prop)++;
- 	}
- 
-+	if (dev->bond_state != HAL_BOND_STATE_BONDED)
-+		cache_device(dev);
++static int device_timestamp_cmp(gconstpointer  a, gconstpointer  b)
++{
++	const struct device *deva = a;
++	const struct device *devb = b;
 +
- 	if (*num_prop)
- 		ipc_send_notif(HAL_SERVICE_ID_BLUETOOTH, opcode, size, buf);
++	return deva->timestamp < devb->timestamp;
++}
++
++static void load_devices_cache(void)
++{
++	GKeyFile *key_file;
++	gchar **devs;
++	gsize len = 0;
++	unsigned int i;
++
++	key_file = g_key_file_new();
++
++	g_key_file_load_from_file(key_file, CACHE_FILE, 0, NULL);
++
++	devs = g_key_file_get_groups(key_file, &len);
++
++	for (i = 0; i < len; i++) {
++		struct device *dev;
++
++		dev = create_device_from_info(key_file, devs[i]);
++		devices = g_slist_prepend(devices, dev);
++	}
++
++	devices = g_slist_sort(devices, device_timestamp_cmp);
++
++	g_strfreev(devs);
++	g_key_file_free(key_file);
++}
++
+ static void load_devices_info(bt_bluetooth_ready cb)
+ {
+ 	GKeyFile *key_file;
+@@ -1778,14 +1819,21 @@ static void load_devices_info(bt_bluetooth_ready cb)
  
-@@ -2860,7 +2906,10 @@ static uint8_t set_device_friendly_name(struct device *dev, const uint8_t *val,
- 	g_free(dev->friendly_name);
- 	dev->friendly_name = g_strndup((const char *) val, len);
+ 	for (i = 0; i < len; i++) {
+ 		struct mgmt_link_key_info *key_info;
++		struct device *dev;
  
--	store_device_info(dev);
-+	if (dev->bond_state == HAL_BOND_STATE_BONDED)
-+		store_device_info(dev, DEVICES_FILE);
-+	else
-+		store_device_info(dev, CACHE_FILE);
+-		create_device_from_info(key_file, devs[i]);
++		dev = create_device_from_info(key_file, devs[i]);
  
- 	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_FRIENDLY_NAME,
- 				strlen(dev->friendly_name), dev->friendly_name);
+ 		key_info = get_key_info(key_file, devs[i]);
+-		if (key_info)
+-			keys = g_slist_prepend(keys, key_info);
++		if (!key_info) {
++			error("Failed to load linkkey for %s, skipping",
++								devs[i]);
++			continue;
++		}
+ 
+ 		/* TODO ltk */
++
++		keys = g_slist_prepend(keys, key_info);
++		bonded_devices = g_slist_prepend(bonded_devices, dev);
+ 	}
+ 
+ 	load_link_keys(keys, cb);
+@@ -1873,6 +1921,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	clear_uuids();
+ 
+ 	load_devices_info(cb);
++	load_devices_cache();
+ 
+ 	set_io_capability();
+ 	set_device_id();
 -- 
 1.8.5.3
 
