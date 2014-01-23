@@ -1,32 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/hal-audio: Check calloc return value
-Date: Thu, 23 Jan 2014 17:43:26 +0200
-Message-Id: <1390491807-11095-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1390479624-5858-1-git-send-email-luiz.dentz@gmail.com>
+References: <1390479624-5858-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 23 Jan 2014 17:32:14 +0200
+Message-ID: <CABBYNZLxnFts_BAK-0jwy_m_5Q-V_s92oUzysRmJwRJEN8WXDQ@mail.gmail.com>
+Subject: Re: [PATCH SBC 1/2] sbc: Add sbc_reinit_a2dp
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-calloc() might return NULL and is usually checked for NULL in BlueZ.
----
- android/hal-audio.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, Jan 23, 2014 at 2:20 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds sbc_reinit_a2dp that can be used to reconfigure a previous
+> initialized sbc_t with new A2DP configuration.
+> ---
+>  sbc/sbc.c | 49 +++++++++++++++++++++++++++++++++++--------------
+>  sbc/sbc.h |  2 ++
+>  2 files changed, 37 insertions(+), 14 deletions(-)
+>
+> diff --git a/sbc/sbc.c b/sbc/sbc.c
+> index 51bca55..534027e 100644
+> --- a/sbc/sbc.c
+> +++ b/sbc/sbc.c
+> @@ -1087,19 +1087,14 @@ SBC_EXPORT int sbc_init_msbc(sbc_t *sbc, unsigned long flags)
+>         return 0;
+>  }
+>
+> -SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+> +static int sbc_set_a2dp(sbc_t *sbc, unsigned long flags,
+>                                         const void *conf, size_t conf_len)
+>  {
+>         const struct a2dp_sbc *a2dp;
+> -       int err;
+>
+>         if (conf_len != sizeof(*a2dp))
+>                 return -EINVAL;
+>
+> -       err = sbc_init(sbc, flags);
+> -       if (err < 0)
+> -               return err;
+> -
+>         a2dp = conf;
+>
+>         switch (a2dp->frequency) {
+> @@ -1116,7 +1111,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+>                 sbc->frequency = SBC_FREQ_48000;
+>                 break;
+>         default:
+> -               goto failed;
+> +               return -EINVAL;
+>         }
+>
+>         switch (a2dp->channel_mode) {
+> @@ -1133,7 +1128,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+>                 sbc->mode = SBC_MODE_JOINT_STEREO;
+>                 break;
+>         default:
+> -               goto failed;
+> +               return -EINVAL;
+>         }
+>
+>         switch (a2dp->allocation_method) {
+> @@ -1144,7 +1139,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+>                 sbc->allocation = SBC_AM_LOUDNESS;
+>                 break;
+>         default:
+> -               goto failed;
+> +               return -EINVAL;
+>         }
+>
+>         switch (a2dp->subbands) {
+> @@ -1155,7 +1150,7 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+>                 sbc->subbands = SBC_SB_8;
+>                 break;
+>         default:
+> -               goto failed;
+> +               return -EINVAL;
+>         }
+>
+>         switch (a2dp->block_length) {
+> @@ -1172,14 +1167,40 @@ SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+>                 sbc->blocks = SBC_BLK_16;
+>                 break;
+>         default:
+> -               goto failed;
+> +               return -EINVAL;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+> +SBC_EXPORT int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+> +                                       const void *conf, size_t conf_len)
+> +{
+> +       int err;
+> +
+> +       err = sbc_init(sbc, flags);
+> +       if (err < 0)
+> +               return err;
+> +
+> +       err = sbc_set_a2dp(sbc, flags, conf, conf_len);
+> +       if (err < 0) {
+> +               sbc_finish(sbc);
+> +               return err;
+>         }
+>
+>         return 0;
+> +}
+> +
+> +int sbc_reinit_a2dp(sbc_t *sbc, unsigned long flags,
+> +                                       const void *conf, size_t conf_len)
+> +{
+> +       int err;
+> +
+> +       err = sbc_reinit(sbc, flags);
+> +       if (err < 0)
+> +               return err;
+>
+> -failed:
+> -       sbc_finish(sbc);
+> -       return -EINVAL;
+> +       return sbc_set_a2dp(sbc, flags, conf, conf_len);
+>  }
+>
+>  SBC_EXPORT ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len)
+> diff --git a/sbc/sbc.h b/sbc/sbc.h
+> index a542845..d6f123e 100644
+> --- a/sbc/sbc.h
+> +++ b/sbc/sbc.h
+> @@ -87,6 +87,8 @@ int sbc_reinit(sbc_t *sbc, unsigned long flags);
+>  int sbc_init_msbc(sbc_t *sbc, unsigned long flags);
+>  int sbc_init_a2dp(sbc_t *sbc, unsigned long flags,
+>                                         const void *conf, size_t conf_len);
+> +int sbc_reinit_a2dp(sbc_t *sbc, unsigned long flags,
+> +                                       const void *conf, size_t conf_len);
+>
+>  ssize_t sbc_parse(sbc_t *sbc, const void *input, size_t input_len);
+>
+> --
+> 1.8.4.2
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 4326ccd..2fbb956 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -320,6 +320,8 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
- 	}
- 
- 	sbc_data = calloc(sizeof(struct sbc_data), 1);
-+	if (!sbc_data)
-+		return AUDIO_STATUS_FAILED;
- 
- 	memcpy(&sbc_data->sbc, preset->data, preset->len);
- 
+Pushed.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
