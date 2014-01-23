@@ -2,51 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 2/3] android/pan: Handle error case properly in NAP registration
-Date: Thu, 23 Jan 2014 15:39:26 +0200
-Message-Id: <1390484367-6332-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1390484367-6332-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1390484367-6332-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 1/3] android/pan: Fix control state change callback parameters order
+Date: Thu, 23 Jan 2014 15:39:25 +0200
+Message-Id: <1390484367-6332-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pan.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Callback declared in bt_pan.h is
+'typedef void (*btpan_control_state_callback)
+(btpan_control_state_t state, bt_status_t error, int local_role,
+const char* ifname);
 
-diff --git a/android/pan.c b/android/pan.c
-index 67c7556..67b62f2 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -471,8 +471,10 @@ static int set_forward_delay(void)
- 	int fd, ret;
+But PanService.Java defined it wrong way.
+private void onControlStateChanged(int local_role, int state,
+int error, String ifname).
+First and third parameters are misplaced, so sending data according
+to PanService.Java, discard this fix if issue fixed in PanService.Java.
+---
+ android/hal-pan.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/android/hal-pan.c b/android/hal-pan.c
+index 8c0f8d8..a596ffd 100644
+--- a/android/hal-pan.c
++++ b/android/hal-pan.c
+@@ -45,9 +45,18 @@ static void handle_ctrl_state(void *buf, uint16_t len)
+ {
+ 	struct hal_ev_pan_ctrl_state *ev = buf;
  
- 	fd = open(FORWARD_DELAY_PATH, O_RDWR);
--	if (fd < 0)
-+	if (fd < 0) {
-+		error("open forward delay path : %s", strerror(errno));
- 		return -errno;
-+	}
++	/* FIXME: Callback declared in bt_pan.h is 'typedef void
++	 * (*btpan_control_state_callback)(btpan_control_state_t state,
++	 * bt_status_t error, int local_role, const char* ifname);
++	 * But PanService.Java defined it wrong way.
++	 * private void onControlStateChanged(int local_role, int state,
++	 * int error, String ifname).
++	 * First and third parameters are misplaced, so sending data according
++	 * to PanService.Java, fix this if issue fixed in PanService.Java.
++	 */
+ 	if (cbs->control_state_cb)
+-		cbs->control_state_cb(ev->state, ev->status,
+-					ev->local_role, (char *)ev->name);
++		cbs->control_state_cb(ev->local_role, ev->state, ev->status,
++							(char *)ev->name);
+ }
  
- 	ret = write(fd, "0", sizeof("0"));
- 	close(fd);
-@@ -728,7 +730,7 @@ bool bt_pan_register(const bdaddr_t *addr)
- 	}
- 
- 	err = bnep_init();
--	if (err) {
-+	if (err < 0) {
- 		error("bnep init failed");
- 		bt_adapter_remove_record(rec->handle);
- 		return false;
-@@ -736,6 +738,7 @@ bool bt_pan_register(const bdaddr_t *addr)
- 
- 	err = register_nap_server();
- 	if (err < 0) {
-+		error("Failed to register NAP");
- 		bt_adapter_remove_record(rec->handle);
- 		bnep_cleanup();
- 		return false;
+ /* handlers will be called from notification thread context,
 -- 
 1.8.3.2
 
