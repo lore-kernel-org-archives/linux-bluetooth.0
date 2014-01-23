@@ -1,93 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1390490779-28954-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1390490779-28954-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 23 Jan 2014 18:43:20 +0200
-Message-ID: <CABBYNZLwQpsOt4jkoFryXrOUOU04fm6nxCj3U+=yPnEbOVAGgw@mail.gmail.com>
-Subject: Re: [PATCH] android/a2dp: Free device outside of notify function
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 6/8] android/AVRCP: Add implementation of SDP record
+Date: Thu, 23 Jan 2014 18:39:56 +0200
+Message-Id: <1390495198-28400-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1390495198-28400-1-git-send-email-luiz.dentz@gmail.com>
+References: <1390495198-28400-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Jan 23, 2014 at 5:26 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> device_free() was used inside notify_state() function based on parameter
-> which makes it complex to follow. Change logic so that notify_state()
-> only notifies and the other code makes device_free().
-> ---
->  android/a2dp.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->
-> diff --git a/android/a2dp.c b/android/a2dp.c
-> index 572e0d1..d043c04 100644
-> --- a/android/a2dp.c
-> +++ b/android/a2dp.c
-> @@ -189,11 +189,6 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
->
->         ipc_send_notif(HAL_SERVICE_ID_A2DP, HAL_EV_A2DP_CONN_STATE, sizeof(ev),
->                                                                         &ev);
-> -
-> -       if (state != HAL_A2DP_STATE_DISCONNECTED)
-> -               return;
-> -
-> -       a2dp_device_free(dev);
->  }
->
->  static void bt_audio_notify_state(struct a2dp_setup *setup, uint8_t state)
-> @@ -221,6 +216,7 @@ static void disconnect_cb(void *user_data)
->         struct a2dp_device *dev = user_data;
->
->         bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-> +       a2dp_device_free(dev);
->  }
->
->  static int sbc_check_config(void *caps, uint8_t caps_len, void *conf,
-> @@ -460,6 +456,7 @@ static gboolean idle_timeout(gpointer user_data)
->
->         error("avdtp_discover: %s", strerror(-err));
->         bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-> +       a2dp_device_free(dev);
->
->         return FALSE;
->  }
-> @@ -474,6 +471,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
->
->         if (err) {
->                 bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-> +               a2dp_device_free(dev);
->                 error("%s", err->message);
->                 return;
->         }
-> @@ -519,6 +517,7 @@ static void signaling_connect_cb(GIOChannel *chan, GError *err,
->
->  failed:
->         bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-> +       a2dp_device_free(dev);
->  }
->
->  static void bt_a2dp_connect(const void *buf, uint16_t len)
-> @@ -581,6 +580,7 @@ static void bt_a2dp_disconnect(const void *buf, uint16_t len)
->
->         if (dev->io) {
->                 bt_a2dp_notify_state(dev, HAL_A2DP_STATE_DISCONNECTED);
-> +               a2dp_device_free(dev);
->                 goto failed;
->         }
->
-> --
-> 1.8.3.2
+This adds the following record:
 
-It used to be like that and we changed because now you have to call
-a2dp_device_free in all places where bt_a2dp_notify_state(dev,
-HAL_A2DP_STATE_DISCONNECTED); is called.
+Service Name: AVRCP TG
+Service RecHandle: 0x10002
+Service Class ID List:
+  "AV Remote Target" (0x110c)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 23
+  "AVCTP" (0x0017)
+    uint16: 0x103
+Profile Descriptor List:
+  "AV Remote" (0x110e)
+    Version: 0x0100
+---
+ android/avrcp.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
 
-
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 707506b..02dbb68 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -29,22 +29,116 @@
+ #include <glib.h>
+ 
+ #include "lib/bluetooth.h"
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
+ #include "log.h"
++#include "bluetooth.h"
+ #include "avrcp.h"
+ #include "hal-msg.h"
+ #include "ipc.h"
+ 
++#define L2CAP_PSM_AVCTP 0x17
++
++#define AVRCP_FEATURE_CATEGORY_1	0x0001
++#define AVRCP_FEATURE_CATEGORY_2	0x0002
++#define AVRCP_FEATURE_CATEGORY_3	0x0004
++#define AVRCP_FEATURE_CATEGORY_4	0x0008
++
+ static bdaddr_t adapter_addr;
++static uint32_t record_id = 0;
+ 
+ static const struct ipc_handler cmd_handlers[] = {
+ };
+ 
++static sdp_record_t *avrcp_record(void)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, l2cap, avctp, avrtg;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *aproto_control, *proto_control[2];
++	sdp_record_t *record;
++	sdp_data_t *psm, *version, *features;
++	uint16_t lp = L2CAP_PSM_AVCTP;
++	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
++	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
++					AVRCP_FEATURE_CATEGORY_2 |
++					AVRCP_FEATURE_CATEGORY_3 |
++					AVRCP_FEATURE_CATEGORY_4);
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(0, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	/* Service Class ID List */
++	sdp_uuid16_create(&avrtg, AV_REMOTE_TARGET_SVCLASS_ID);
++	svclass_id = sdp_list_append(0, &avrtg);
++	sdp_set_service_classes(record, svclass_id);
++
++	/* Protocol Descriptor List */
++	sdp_uuid16_create(&l2cap, L2CAP_UUID);
++	proto_control[0] = sdp_list_append(0, &l2cap);
++	psm = sdp_data_alloc(SDP_UINT16, &lp);
++	proto_control[0] = sdp_list_append(proto_control[0], psm);
++	apseq = sdp_list_append(0, proto_control[0]);
++
++	sdp_uuid16_create(&avctp, AVCTP_UUID);
++	proto_control[1] = sdp_list_append(0, &avctp);
++	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
++	proto_control[1] = sdp_list_append(proto_control[1], version);
++	apseq = sdp_list_append(apseq, proto_control[1]);
++
++	aproto_control = sdp_list_append(0, apseq);
++	sdp_set_access_protos(record, aproto_control);
++
++	/* Bluetooth Profile Descriptor List */
++	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
++	profile[0].version = avrcp_ver;
++	pfseq = sdp_list_append(0, &profile[0]);
++	sdp_set_profile_descs(record, pfseq);
++
++	features = sdp_data_alloc(SDP_UINT16, &feat);
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++
++	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
++
++	sdp_data_free(psm);
++	sdp_data_free(version);
++	sdp_list_free(proto_control[0], NULL);
++	sdp_list_free(proto_control[1], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(aproto_control, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
++}
++
+ bool bt_avrcp_register(const bdaddr_t *addr)
+ {
++	sdp_record_t *rec;
++
+ 	DBG("");
+ 
+ 	bacpy(&adapter_addr, addr);
+ 
++	rec = avrcp_record();
++	if (!rec) {
++		error("Failed to allocate AVRCP record");
++		return false;
++	}
++
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("Failed to register AVRCP record");
++		sdp_record_free(rec);
++		return false;
++	}
++	record_id = rec->handle;
++
+ 	ipc_register(HAL_SERVICE_ID_AVRCP, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
+@@ -56,4 +150,7 @@ void bt_avrcp_unregister(void)
+ 	DBG("");
+ 
+ 	ipc_unregister(HAL_SERVICE_ID_AVRCP);
++
++	bt_adapter_remove_record(record_id);
++	record_id = 0;
+ }
 -- 
-Luiz Augusto von Dentz
+1.8.4.2
+
