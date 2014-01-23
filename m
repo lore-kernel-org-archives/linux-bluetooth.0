@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 6/8] android/AVRCP: Add implementation of SDP record
-Date: Thu, 23 Jan 2014 18:39:56 +0200
-Message-Id: <1390495198-28400-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 8/8] android/AVRCP: Add initial socket handling
+Date: Thu, 23 Jan 2014 18:39:58 +0200
+Message-Id: <1390495198-28400-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390495198-28400-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390495198-28400-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,152 +11,187 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the following record:
-
-Service Name: AVRCP TG
-Service RecHandle: 0x10002
-Service Class ID List:
-  "AV Remote Target" (0x110c)
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-    PSM: 23
-  "AVCTP" (0x0017)
-    uint16: 0x103
-Profile Descriptor List:
-  "AV Remote" (0x110e)
-    Version: 0x0100
+This adds the initial socket listening and handling incoming connections.
 ---
- android/avrcp.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 97 insertions(+)
+ android/avrcp.c | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
 
 diff --git a/android/avrcp.c b/android/avrcp.c
-index 707506b..02dbb68 100644
+index 02dbb68..a230ab8 100644
 --- a/android/avrcp.c
 +++ b/android/avrcp.c
-@@ -29,22 +29,116 @@
+@@ -28,6 +28,7 @@
+ #include <stdbool.h>
  #include <glib.h>
  
++#include "btio/btio.h"
  #include "lib/bluetooth.h"
-+#include "lib/sdp.h"
-+#include "lib/sdp_lib.h"
- #include "log.h"
-+#include "bluetooth.h"
+ #include "lib/sdp.h"
+ #include "lib/sdp_lib.h"
+@@ -36,6 +37,7 @@
  #include "avrcp.h"
  #include "hal-msg.h"
  #include "ipc.h"
++#include "avctp.h"
  
-+#define L2CAP_PSM_AVCTP 0x17
-+
-+#define AVRCP_FEATURE_CATEGORY_1	0x0001
-+#define AVRCP_FEATURE_CATEGORY_2	0x0002
-+#define AVRCP_FEATURE_CATEGORY_3	0x0004
-+#define AVRCP_FEATURE_CATEGORY_4	0x0008
-+
+ #define L2CAP_PSM_AVCTP 0x17
+ 
+@@ -46,6 +48,13 @@
+ 
  static bdaddr_t adapter_addr;
-+static uint32_t record_id = 0;
+ static uint32_t record_id = 0;
++static GSList *devices = NULL;
++static GIOChannel *server = NULL;
++
++struct avrcp_device {
++	bdaddr_t	dst;
++	struct avctp	*session;
++};
  
  static const struct ipc_handler cmd_handlers[] = {
  };
+@@ -118,14 +127,124 @@ static sdp_record_t *avrcp_record(void)
+ 	return record;
+ }
  
-+static sdp_record_t *avrcp_record(void)
++static void avrcp_device_free(void *data)
 +{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-+	uuid_t root_uuid, l2cap, avctp, avrtg;
-+	sdp_profile_desc_t profile[1];
-+	sdp_list_t *aproto_control, *proto_control[2];
-+	sdp_record_t *record;
-+	sdp_data_t *psm, *version, *features;
-+	uint16_t lp = L2CAP_PSM_AVCTP;
-+	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
-+	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-+					AVRCP_FEATURE_CATEGORY_2 |
-+					AVRCP_FEATURE_CATEGORY_3 |
-+					AVRCP_FEATURE_CATEGORY_4);
++	struct avrcp_device *dev = data;
 +
-+	record = sdp_record_alloc();
-+	if (!record)
-+		return NULL;
++	if (dev->session)
++		avctp_shutdown(dev->session);
 +
-+	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-+	root = sdp_list_append(0, &root_uuid);
-+	sdp_set_browse_groups(record, root);
++	devices = g_slist_remove(devices, dev);
++	g_free(dev);
++}
 +
-+	/* Service Class ID List */
-+	sdp_uuid16_create(&avrtg, AV_REMOTE_TARGET_SVCLASS_ID);
-+	svclass_id = sdp_list_append(0, &avrtg);
-+	sdp_set_service_classes(record, svclass_id);
++static struct avrcp_device *avrcp_device_new(const bdaddr_t *dst)
++{
++	struct avrcp_device *dev;
 +
-+	/* Protocol Descriptor List */
-+	sdp_uuid16_create(&l2cap, L2CAP_UUID);
-+	proto_control[0] = sdp_list_append(0, &l2cap);
-+	psm = sdp_data_alloc(SDP_UINT16, &lp);
-+	proto_control[0] = sdp_list_append(proto_control[0], psm);
-+	apseq = sdp_list_append(0, proto_control[0]);
++	dev = g_new0(struct avrcp_device, 1);
++	bacpy(&dev->dst, dst);
++	devices = g_slist_prepend(devices, dev);
 +
-+	sdp_uuid16_create(&avctp, AVCTP_UUID);
-+	proto_control[1] = sdp_list_append(0, &avctp);
-+	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
-+	proto_control[1] = sdp_list_append(proto_control[1], version);
-+	apseq = sdp_list_append(apseq, proto_control[1]);
++	return dev;
++}
 +
-+	aproto_control = sdp_list_append(0, apseq);
-+	sdp_set_access_protos(record, aproto_control);
++static int device_cmp(gconstpointer s, gconstpointer user_data)
++{
++	const struct avrcp_device *dev = s;
++	const bdaddr_t *dst = user_data;
 +
-+	/* Bluetooth Profile Descriptor List */
-+	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-+	profile[0].version = avrcp_ver;
-+	pfseq = sdp_list_append(0, &profile[0]);
-+	sdp_set_profile_descs(record, pfseq);
++	return bacmp(&dev->dst, dst);
++}
 +
-+	features = sdp_data_alloc(SDP_UINT16, &feat);
-+	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++static void disconnect_cb(void *data)
++{
++	struct avrcp_device *dev = data;
 +
-+	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
++	DBG("");
 +
-+	sdp_data_free(psm);
-+	sdp_data_free(version);
-+	sdp_list_free(proto_control[0], NULL);
-+	sdp_list_free(proto_control[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(aproto_control, NULL);
-+	sdp_list_free(pfseq, NULL);
-+	sdp_list_free(root, NULL);
-+	sdp_list_free(svclass_id, NULL);
++	dev->session = NULL;
 +
-+	return record;
++	avrcp_device_free(dev);
++}
++
++static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
++{
++	struct avrcp_device *dev;
++	bdaddr_t src, dst;
++	char address[18];
++	uint16_t imtu, omtu;
++	GError *gerr = NULL;
++	GSList *l;
++	int fd;
++
++	if (err) {
++		error("%s", err->message);
++		return;
++	}
++
++	bt_io_get(chan, &gerr,
++			BT_IO_OPT_SOURCE_BDADDR, &src,
++			BT_IO_OPT_DEST_BDADDR, &dst,
++			BT_IO_OPT_IMTU, &imtu,
++			BT_IO_OPT_OMTU, &omtu,
++			BT_IO_OPT_INVALID);
++	if (gerr) {
++		error("%s", gerr->message);
++		g_error_free(gerr);
++		g_io_channel_shutdown(chan, TRUE, NULL);
++		return;
++	}
++
++	ba2str(&dst, address);
++	DBG("Incoming connection from %s", address);
++
++	l = g_slist_find_custom(devices, &dst, device_cmp);
++	if (l) {
++		error("Unexpected connection");
++		return;
++	}
++
++	fd = g_io_channel_unix_get_fd(chan);
++
++	dev = avrcp_device_new(&dst);
++	dev->session = avctp_new(fd, imtu, omtu, 0x0100);
++
++	if (!dev->session) {
++		avrcp_device_free(dev);
++		return;
++	}
++
++	avctp_set_destroy_cb(dev->session, disconnect_cb, dev);
++
++	/* FIXME: get the real name of the device */
++	avctp_init_uinput(dev->session, "bluetooth", address);
++
++	g_io_channel_set_close_on_unref(chan, FALSE);
++
++	DBG("%s connected", address);
 +}
 +
  bool bt_avrcp_register(const bdaddr_t *addr)
  {
-+	sdp_record_t *rec;
-+
++	GError *err = NULL;
+ 	sdp_record_t *rec;
+ 
  	DBG("");
  
  	bacpy(&adapter_addr, addr);
  
-+	rec = avrcp_record();
-+	if (!rec) {
-+		error("Failed to allocate AVRCP record");
++	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++				BT_IO_OPT_PSM, L2CAP_PSM_AVCTP,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++				BT_IO_OPT_INVALID);
++	if (!server) {
++		error("Failed to listen on AVDTP channel: %s", err->message);
++		g_error_free(err);
 +		return false;
 +	}
 +
-+	if (bt_adapter_add_record(rec, 0) < 0) {
-+		error("Failed to register AVRCP record");
-+		sdp_record_free(rec);
-+		return false;
-+	}
-+	record_id = rec->handle;
-+
- 	ipc_register(HAL_SERVICE_ID_AVRCP, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
- 
-@@ -56,4 +150,7 @@ void bt_avrcp_unregister(void)
+ 	rec = avrcp_record();
+ 	if (!rec) {
+ 		error("Failed to allocate AVRCP record");
+@@ -149,8 +268,17 @@ void bt_avrcp_unregister(void)
+ {
  	DBG("");
  
- 	ipc_unregister(HAL_SERVICE_ID_AVRCP);
++	g_slist_free_full(devices, avrcp_device_free);
++	devices = NULL;
 +
-+	bt_adapter_remove_record(record_id);
-+	record_id = 0;
+ 	ipc_unregister(HAL_SERVICE_ID_AVRCP);
+ 
+ 	bt_adapter_remove_record(record_id);
+ 	record_id = 0;
++
++	if (server) {
++		g_io_channel_shutdown(server, TRUE, NULL);
++		g_io_channel_unref(server);
++		server = NULL;
++	}
  }
 -- 
 1.8.4.2
