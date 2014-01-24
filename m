@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Jan 2014 13:27:41 +0200
+Date: Fri, 24 Jan 2014 13:22:48 +0200
 From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
 Subject: Re: [PATCH BlueZ 6/8] android/AVRCP: Add implementation of SDP record
-Message-ID: <20140124112703.GC1671@aemeltch-MOBL1>
+Message-ID: <20140124112245.GB1671@aemeltch-MOBL1>
 References: <1390495198-28400-1-git-send-email-luiz.dentz@gmail.com>
  <1390495198-28400-6-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
@@ -53,41 +53,9 @@ On Thu, Jan 23, 2014 at 06:39:56PM +0200, Luiz Augusto von Dentz wrote:
 >  #include "ipc.h"
 >  
 > +#define L2CAP_PSM_AVCTP 0x17
-> +
-> +#define AVRCP_FEATURE_CATEGORY_1	0x0001
-> +#define AVRCP_FEATURE_CATEGORY_2	0x0002
-> +#define AVRCP_FEATURE_CATEGORY_3	0x0004
-> +#define AVRCP_FEATURE_CATEGORY_4	0x0008
-> +
->  static bdaddr_t adapter_addr;
-> +static uint32_t record_id = 0;
->  
->  static const struct ipc_handler cmd_handlers[] = {
->  };
->  
-> +static sdp_record_t *avrcp_record(void)
-> +{
-> +	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-> +	uuid_t root_uuid, l2cap, avctp, avrtg;
-> +	sdp_profile_desc_t profile[1];
-> +	sdp_list_t *aproto_control, *proto_control[2];
-> +	sdp_record_t *record;
-> +	sdp_data_t *psm, *version, *features;
-> +	uint16_t lp = L2CAP_PSM_AVCTP;
-> +	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
-> +	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
-> +					AVRCP_FEATURE_CATEGORY_2 |
-> +					AVRCP_FEATURE_CATEGORY_3 |
-> +					AVRCP_FEATURE_CATEGORY_4);
-> +
-> +	record = sdp_record_alloc();
-> +	if (!record)
-> +		return NULL;
-> +
-> +	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-> +	root = sdp_list_append(0, &root_uuid);
 
-Should be NULL here and below.
+Can we use the same name like in profiles?
+AVCTP_CONTROL_PSM
 
 Best regards 
 Andrei Emeltchenko 
