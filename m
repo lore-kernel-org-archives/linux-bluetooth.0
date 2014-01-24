@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Update Audio IPC documentation
-Date: Fri, 24 Jan 2014 23:01:22 +0100
-Message-ID: <1917306.MU3pdafINL@athlon>
-In-Reply-To: <1390575029-6800-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1390575029-6800-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: Re: [PATCH] android/a2dp: Fix audio resume on started stream
+Date: Fri, 24 Jan 2014 23:00:51 +0100
+Message-ID: <2586637.blSzzQcaJy@athlon>
+In-Reply-To: <1390496392-22826-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1390496392-22826-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,25 +14,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrzej,
 
-On Friday 24 January 2014 15:50:29 Andrzej Kaczmarek wrote:
-> Open Stream commands now also returns outoging MTU for returned socket.
+On Thursday 23 January 2014 17:59:52 Andrzej Kaczmarek wrote:
+> In case stream is started from remote we'll receive Resume Stream IPC
+> when audio is already considered as started (i.e. on first write from
+> AudioFlinger). In such case we should not try to send AVDTP_START since
+> this will fail but just reply success over IPC instead.
 > ---
->  android/audio-ipc-api.txt | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  android/a2dp.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 > 
-> diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
-> index 4aff92c..f4a497d 100644
-> --- a/android/audio-ipc-api.txt
-> +++ b/android/audio-ipc-api.txt
-> @@ -66,7 +66,8 @@ Audio Service (ID 0)
->  	Opcode 0x03 - Open Stream command
+> diff --git a/android/a2dp.c b/android/a2dp.c
+> index 572e0d1..10e43b1 100644
+> --- a/android/a2dp.c
+> +++ b/android/a2dp.c
+> @@ -1376,10 +1376,12 @@ static void bt_stream_resume(const void *buf,
+> uint16_t len) goto failed;
+>  	}
 > 
->  		Command parameters: Endpoint ID (1 octet)
-> -		Response parameters: Codec configuration length (1 octet)
-> +		Response parameters: Outgoing MTU (2 octets)
-> +				     Codec configuration length (1 octet)
->  				     Codec configuration (1 octet)
->  				     File descriptor (inline)
+> -	err = avdtp_start(setup->dev->session, setup->stream);
+> -	if (err < 0) {
+> -		error("avdtp_start: %s", strerror(-err));
+> -		goto failed;
+> +	if (setup->state != HAL_AUDIO_STARTED) {
+> +		err = avdtp_start(setup->dev->session, setup->stream);
+> +		if (err < 0) {
+> +			error("avdtp_start: %s", strerror(-err));
+> +			goto failed;
+> +		}
+>  	}
+> 
+>  	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_SUCCESS);
 
 Applied, thanks.
 
