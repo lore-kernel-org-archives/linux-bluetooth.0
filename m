@@ -1,56 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Sebastian Chlad <sebastianchlad@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Add PTS test results for PBAP
-Date: Fri, 24 Jan 2014 23:04:04 +0100
-Message-ID: <1735794.0uTCM4qm3f@athlon>
-In-Reply-To: <1390593376-4905-1-git-send-email-sebastianchlad@gmail.com>
-References: <1390593376-4905-1-git-send-email-sebastianchlad@gmail.com>
+Subject: Re: [PATCH 1/2] android/hal-audio: Refactor error messages
+Date: Fri, 24 Jan 2014 23:02:05 +0100
+Message-ID: <1695667.SbKHULbW7C@athlon>
+In-Reply-To: <1390579604-14748-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1390579604-14748-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Andrzej,
 
-On Friday 24 January 2014 14:56:16 Sebastian Chlad wrote:
+On Friday 24 January 2014 17:06:43 Andrzej Kaczmarek wrote:
 > ---
->  android/pts-pbap.txt | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  android/hal-audio.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 > 
-> diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
-> index 3bf682f..843b7cf 100644
-> --- a/android/pts-pbap.txt
-> +++ b/android/pts-pbap.txt
-> @@ -1,6 +1,6 @@
->  PTS test results for PBAP
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index 8271647..974bedf 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -313,7 +313,7 @@ static int sbc_codec_init(struct audio_preset *preset,
+> uint16_t mtu, DBG("");
 > 
-> -PTS version: 4.9
-> +PTS version: 5.0
->  Tested: 14.11.2013
+>  	if (preset->len != sizeof(a2dp_sbc_t)) {
+> -		DBG("preset size mismatch");
+> +		error("SBC: preset size mismatch");
+>  		return AUDIO_STATUS_FAILED;
+>  	}
 > 
->  Results:
-> @@ -30,7 +30,7 @@ TC_PCE_PDF_BV_04_I	N/A
->  TC_PSE_SSM_BV_03_C	PASS
->  TC_PSE_SSM_BV_05_C	PASS
->  TC_PSE_SSM_BV_07_C	PASS
-> -TC_PSE_SSM_BI_02_C	INC
-> +TC_PSE_SSM_BI_02_C	PASS
->  TC_PSE_SSM_BI_03_C	N/A
->  TC_PSE_SSM_BV_08_I	PASS
->  TC_PSE_PBD_BV_02_C	PASS
-> @@ -48,7 +48,7 @@ TC_PSE_PBB_BV_07_C	PASS
->  TC_PSE_PBB_BV_08_C	PASS
->  TC_PSE_PBB_BV_09_C	PASS
->  TC_PSE_PBB_BV_10_C	PASS
-> -TC_PSE_PBB_BV_11_C	INC
-> +TC_PSE_PBB_BV_11_C	PASS
->  TC_PSE_PBB_BI_01_C	PASS
->  TC_PSE_PBB_BI_07_C	PASS
->  TC_PSE_PBF_BV_01_I	PASS
+> @@ -422,8 +422,7 @@ static void write_media_packet(int fd, struct sbc_data
+> *sbc_data, ret = write(fd, mp, sizeof(*mp) + data_len);
+>  	if (ret < 0) {
+>  		int err = errno;
+> -		DBG("error writing data: %d (%s)", err,
+> -						strerror(err));
+> +		error("SBC: failed to write data: %d (%s)", err, strerror(err));
+>  	}
+> 
+>  	sbc_data->frames_sent += mp->payload.frame_count;
+> @@ -472,7 +471,7 @@ static ssize_t sbc_write_data(void *codec_data, const
+> void *buffer, &written);
+> 
+>  		if (ret < 0) {
+> -			DBG("failed to encode block");
+> +			error("SBC: failed to encode block");
+>  			break;
+>  		}
+> 
+> @@ -500,7 +499,7 @@ static ssize_t sbc_write_data(void *codec_data, const
+> void *buffer, * if we did not, something went wrong but we can't really
+>  		 * handle this so this is just sanity check
+>  		 */
+> -		DBG("some data were not encoded");
+> +		error("SBC: failed to encode complete input buffer");
+>  	}
+> 
+>  	/* we always assume that all data was processed and sent */
+> @@ -828,12 +827,12 @@ static ssize_t out_write(struct audio_stream_out
+> *stream, const void *buffer, }
+> 
+>  	if (out->audio_state != AUDIO_A2DP_STATE_STARTED) {
+> -		DBG("stream not started");
+> +		error("audio: stream not started");
+>  		return -1;
+>  	}
+> 
+>  	if (out->ep->fd < 0) {
+> -		DBG("no transport");
+> +		error("audio: no transport socket");
+>  		return -1;
+>  	}
+> 
+> @@ -857,7 +856,7 @@ static int out_set_sample_rate(struct audio_stream
+> *stream, uint32_t rate) DBG("");
+> 
+>  	if (rate != out->cfg.rate) {
+> -		DBG("cannot set sample rate to %d", rate);
+> +		warn("audio: cannot set sample rate to %d", rate);
+>  		return -1;
+>  	}
+> 
+> @@ -1182,6 +1181,7 @@ static int audio_open_output_stream(struct
+> audio_hw_device *dev, return 0;
+> 
+>  fail:
+> +	error("audio: cannot open output stream");
+>  	free(out);
+>  	*stream_out = NULL;
+>  	return -EIO;
 
-Applied, thanks.
+Both patches applied, thanks.
 
 -- 
 Szymon K. Janc
