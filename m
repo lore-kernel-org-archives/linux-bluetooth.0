@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 5/8] android/haltest: Add init and cleanup calls to rc methods
-Date: Fri, 24 Jan 2014 15:24:32 +0200
-Message-Id: <1390569875-29436-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 6/8] android/AVRCP: Add implementation of SDP record
+Date: Fri, 24 Jan 2014 15:24:33 +0200
+Message-Id: <1390569875-29436-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390569875-29436-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390569875-29436-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,166 +11,153 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
----
- android/Android.mk                     |  1 +
- android/Makefile.am                    |  1 +
- android/client/haltest.c               |  2 ++
- android/client/if-bt.c                 |  2 +-
- android/client/if-main.h               |  2 ++
- android/client/{if-audio.c => if-rc.c} | 44 +++++++++++++---------------------
- 6 files changed, 23 insertions(+), 29 deletions(-)
- copy android/client/{if-audio.c => if-rc.c} (57%)
+This adds the following record:
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 160a1d4..b83d1fe 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -131,6 +131,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/client/tabcompletion.c \
- 	bluez/android/client/if-audio.c \
- 	bluez/android/client/if-av.c \
-+	bluez/android/client/if-rc.c \
- 	bluez/android/client/if-bt.c \
- 	bluez/android/client/if-hf.c \
- 	bluez/android/client/if-hh.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 664524f..e065c0c 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -85,6 +85,7 @@ android_haltest_SOURCES = android/client/haltest.c \
- 				android/client/tabcompletion.c \
- 				android/client/if-main.h \
- 				android/client/if-av.c \
-+				android/client/if-rc.c \
- 				android/client/if-bt.c \
- 				android/client/if-gatt.c \
- 				android/client/if-hf.c \
-diff --git a/android/client/haltest.c b/android/client/haltest.c
-index f4d1ade..114fe31 100644
---- a/android/client/haltest.c
-+++ b/android/client/haltest.c
-@@ -34,6 +34,7 @@ const struct interface *interfaces[] = {
- 	&audio_if,
- 	&bluetooth_if,
- 	&av_if,
-+	&rc_if,
- 	&gatt_if,
- 	&gatt_client_if,
- 	&gatt_server_if,
-@@ -382,6 +383,7 @@ static void init(void)
- 	static const char * const inames[] = {
- 		BT_PROFILE_HANDSFREE_ID,
- 		BT_PROFILE_ADVANCED_AUDIO_ID,
-+		BT_PROFILE_AV_RC_ID,
- 		BT_PROFILE_HEALTH_ID,
- 		BT_PROFILE_HIDHOST_ID,
- 		BT_PROFILE_PAN_ID,
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 6bfb439..8dcffea 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -760,7 +760,7 @@ static void get_profile_interface_p(int argc, const char **argv)
- 	else if (strcmp(BT_PROFILE_PAN_ID, id) == 0)
- 		pif = (const void **) &if_pan;
- 	else if (strcmp(BT_PROFILE_AV_RC_ID, id) == 0)
--		pif = &dummy; /* TODO: change when if_rc is there */
-+		pif = (const void **) &if_rc;
- 	else if (strcmp(BT_PROFILE_GATT_ID, id) == 0)
- 		pif = (const void **) &if_gatt;
- 	else
-diff --git a/android/client/if-main.h b/android/client/if-main.h
-index 2b22fc4..d82358e 100644
---- a/android/client/if-main.h
-+++ b/android/client/if-main.h
-@@ -48,6 +48,7 @@ extern audio_hw_device_t *if_audio;
- /* Interfaces from hal that can be populated during application lifetime */
- extern const bt_interface_t *if_bluetooth;
- extern const btav_interface_t *if_av;
-+extern const btrc_interface_t *if_rc;
- extern const bthf_interface_t *if_hf;
- extern const bthh_interface_t *if_hh;
- extern const btpan_interface_t *if_pan;
-@@ -68,6 +69,7 @@ struct interface {
- extern const struct interface audio_if;
- extern const struct interface bluetooth_if;
- extern const struct interface av_if;
-+extern const struct interface rc_if;
- extern const struct interface gatt_if;
- extern const struct interface gatt_client_if;
- extern const struct interface gatt_server_if;
-diff --git a/android/client/if-audio.c b/android/client/if-rc.c
-similarity index 57%
-copy from android/client/if-audio.c
-copy to android/client/if-rc.c
-index 203e088..58fb892 100644
---- a/android/client/if-audio.c
-+++ b/android/client/if-rc.c
-@@ -18,41 +18,29 @@
- #include "if-main.h"
- #include "../hal-utils.h"
+Service Name: AVRCP TG
+Service RecHandle: 0x10002
+Service Class ID List:
+  "AV Remote Target" (0x110c)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+    PSM: 23
+  "AVCTP" (0x0017)
+    uint16: 0x103
+Profile Descriptor List:
+  "AV Remote" (0x110e)
+    Version: 0x0100
+---
+ android/avrcp.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
+
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 707506b..e06d136 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -29,22 +29,116 @@
+ #include <glib.h>
  
--audio_hw_device_t *if_audio = NULL;
-+const btrc_interface_t *if_rc = NULL;
+ #include "lib/bluetooth.h"
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
+ #include "log.h"
++#include "bluetooth.h"
+ #include "avrcp.h"
+ #include "hal-msg.h"
+ #include "ipc.h"
  
--static void init_p(int argc, const char **argv)
--{
--	int err;
--	const hw_module_t *module;
--	audio_hw_device_t *device;
-+static btrc_callbacks_t rc_cbacks = {
-+	.size = sizeof(rc_cbacks),
-+};
- 
--	err = hw_get_module_by_class(AUDIO_HARDWARE_MODULE_ID,
--					AUDIO_HARDWARE_MODULE_ID_A2DP, &module);
--	if (err) {
--		haltest_error("hw_get_module_by_class returned %d\n", err);
--		return;
--	}
-+/* init */
- 
--	err = audio_hw_device_open(module, &device);
--	if (err)
--		haltest_error("audio_hw_device_open returned %d\n", err);
-+static void init_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_rc);
- 
--	if_audio = device;
-+	EXEC(if_rc->init, &rc_cbacks);
- }
- 
-+/* cleanup */
++#define L2CAP_PSM_AVCTP 0x17
 +
- static void cleanup_p(int argc, const char **argv)
++#define AVRCP_FEATURE_CATEGORY_1	0x0001
++#define AVRCP_FEATURE_CATEGORY_2	0x0002
++#define AVRCP_FEATURE_CATEGORY_3	0x0004
++#define AVRCP_FEATURE_CATEGORY_4	0x0008
++
+ static bdaddr_t adapter_addr;
++static uint32_t record_id = 0;
+ 
+ static const struct ipc_handler cmd_handlers[] = {
+ };
+ 
++static sdp_record_t *avrcp_record(void)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, l2cap, avctp, avrtg;
++	sdp_profile_desc_t profile[1];
++	sdp_list_t *aproto_control, *proto_control[2];
++	sdp_record_t *record;
++	sdp_data_t *psm, *version, *features;
++	uint16_t lp = L2CAP_PSM_AVCTP;
++	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
++	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
++					AVRCP_FEATURE_CATEGORY_2 |
++					AVRCP_FEATURE_CATEGORY_3 |
++					AVRCP_FEATURE_CATEGORY_4);
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(NULL, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	/* Service Class ID List */
++	sdp_uuid16_create(&avrtg, AV_REMOTE_TARGET_SVCLASS_ID);
++	svclass_id = sdp_list_append(NULL, &avrtg);
++	sdp_set_service_classes(record, svclass_id);
++
++	/* Protocol Descriptor List */
++	sdp_uuid16_create(&l2cap, L2CAP_UUID);
++	proto_control[0] = sdp_list_append(NULL, &l2cap);
++	psm = sdp_data_alloc(SDP_UINT16, &lp);
++	proto_control[0] = sdp_list_append(proto_control[0], psm);
++	apseq = sdp_list_append(NULL, proto_control[0]);
++
++	sdp_uuid16_create(&avctp, AVCTP_UUID);
++	proto_control[1] = sdp_list_append(NULL, &avctp);
++	version = sdp_data_alloc(SDP_UINT16, &avctp_ver);
++	proto_control[1] = sdp_list_append(proto_control[1], version);
++	apseq = sdp_list_append(apseq, proto_control[1]);
++
++	aproto_control = sdp_list_append(NULL, apseq);
++	sdp_set_access_protos(record, aproto_control);
++
++	/* Bluetooth Profile Descriptor List */
++	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
++	profile[0].version = avrcp_ver;
++	pfseq = sdp_list_append(NULL, &profile[0]);
++	sdp_set_profile_descs(record, pfseq);
++
++	features = sdp_data_alloc(SDP_UINT16, &feat);
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++
++	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
++
++	sdp_data_free(psm);
++	sdp_data_free(version);
++	sdp_list_free(proto_control[0], NULL);
++	sdp_list_free(proto_control[1], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(aproto_control, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
++}
++
+ bool bt_avrcp_register(const bdaddr_t *addr)
  {
--	int err;
--
--	RETURN_IF_NULL(if_audio);
--
--	err = audio_hw_device_close(if_audio);
--	if (err < 0) {
--		haltest_error("audio_hw_device_close returned %d\n", err);
--		return;
--	}
-+	RETURN_IF_NULL(if_rc);
++	sdp_record_t *rec;
++
+ 	DBG("");
  
--	if_audio = NULL;
-+	EXECV(if_rc->cleanup);
-+	if_rc = NULL;
+ 	bacpy(&adapter_addr, addr);
+ 
++	rec = avrcp_record();
++	if (!rec) {
++		error("Failed to allocate AVRCP record");
++		return false;
++	}
++
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("Failed to register AVRCP record");
++		sdp_record_free(rec);
++		return false;
++	}
++	record_id = rec->handle;
++
+ 	ipc_register(HAL_SERVICE_ID_AVRCP, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
+@@ -56,4 +150,7 @@ void bt_avrcp_unregister(void)
+ 	DBG("");
+ 
+ 	ipc_unregister(HAL_SERVICE_ID_AVRCP);
++
++	bt_adapter_remove_record(record_id);
++	record_id = 0;
  }
- 
- static struct method methods[] = {
-@@ -61,7 +49,7 @@ static struct method methods[] = {
- 	END_METHOD
- };
- 
--const struct interface audio_if = {
--	.name = "audio",
-+const struct interface rc_if = {
-+	.name = "rc",
- 	.methods = methods
- };
 -- 
 1.8.4.2
 
