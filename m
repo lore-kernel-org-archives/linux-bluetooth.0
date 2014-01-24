@@ -1,41 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
+From: Sebastian Chlad <sebastianchlad@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
-Subject: [RFC BlueZ 0/2] Print bluetoothd messages in btmon
-Date: Fri, 24 Jan 2014 19:41:50 -0200
-Message-Id: <1390599712-1609-1-git-send-email-vcgomes@gmail.com>
+Cc: Sebastian Chlad <sebastianchlad@gmail.com>
+Subject: [PATCH] android/pts: Add PTS test results for A2DP
+Date: Fri, 24 Jan 2014 15:24:49 -0500
+Message-Id: <1390595089-5314-1-git-send-email-sebastianchlad@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ android/pts-a2dp.txt | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-It is very common when debugging issues, specially users' problems to
-ask for btmon logs and the accompaining bluetoothd logs. And depending
-on the issue, it takes some time to relate the HCI/MGMT commands to
-bluetoothd messages that help narrow down the problem.
-
-This is just a proof of concept, to know if this will be generally
-helpful. And so, it needs some improvements: sending bluetoothd the USR2
-signal so debug is enabled, color support and better formatting.
-
-
-Cheers,
-
-
-Vinicius Costa Gomes (2):
-  monitor: Add stubs for monitoring bluetoothd's journal entries
-  monitor: Add support for printing bluetoothd messages
-
- Makefile.tools    |   3 +-
- configure.ac      |   7 +++
- monitor/journal.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- monitor/journal.h |  24 +++++++++++
- monitor/main.c    |  13 +++++-
- 5 files changed, 171 insertions(+), 2 deletions(-)
- create mode 100644 monitor/journal.c
- create mode 100644 monitor/journal.h
-
-
---
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+index a269ec1..c6eee62 100644
+--- a/android/pts-a2dp.txt
++++ b/android/pts-a2dp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for A2DP
+ 
+ PTS version: 5.0
+-Tested: --not yet tested--
++Tested: 24.01.2014
+ 
+ Results:
+ PASS	test passed
+@@ -15,17 +15,17 @@ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+ TC_SRC_CC_BV_09_I	INC
+ TC_SRC_CC_BV_10_I	N/A
+-TC_SRC_REL_BV_01_I	INC
+-TC_SRC_REL_BV_02_I	INC
+-TC_SRC_SET_BV_01_I	INC
+-TC_SRC_SET_BV_02_I	INC
+-TC_SRC_SET_BV_03_I	INC
++TC_SRC_REL_BV_01_I	PASS
++TC_SRC_REL_BV_02_I	PASS
++TC_SRC_SET_BV_01_I	PASS
++TC_SRC_SET_BV_02_I	PASS
++TC_SRC_SET_BV_03_I	PASS
+ TC_SRC_SET_BV_04_I	INC
+ TC_SRC_SET_BV_05_I	INC
+ TC_SRC_SET_BV_06_I	INC
+ TC_SRC_SUS_BV_01_I	INC
+ TC_SRC_SUS_BV_02_I	INC
+-TC_SRC_SDP_BV_01_I	INC
++TC_SRC_SDP_BV_01_I	PASS
+ TC_SRC_AS_BV_01_I	INC
+ -------------------------------------------------------------------------------
+ 
+-- 
 1.8.5.3
+
