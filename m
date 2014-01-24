@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] avctp: Fix unchecked return value
-Date: Fri, 24 Jan 2014 16:56:43 +0200
-Message-Id: <1390575403-30860-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/3] android/avdtp: Retry send on EAGAIN as well
+Date: Fri, 24 Jan 2014 16:56:42 +0200
+Message-Id: <1390575403-30860-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1390575403-30860-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1390575403-30860-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Refactor code so that ioctl() return value is checked.
 ---
- profiles/audio/avctp.c | 43 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 34 insertions(+), 9 deletions(-)
+ android/avdtp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 6669ddc..4d0f906 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1026,27 +1026,52 @@ static int uinput_create(char *name)
- 		err = -errno;
- 		error("Can't write device information: %s (%d)",
- 						strerror(-err), -err);
--		close(fd);
--		return err;
-+		goto fail;
-+	}
-+
-+	if (ioctl(fd, UI_SET_EVBIT, EV_KEY) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
-+
-+	if (ioctl(fd, UI_SET_EVBIT, EV_REL) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
-+
-+	if (ioctl(fd, UI_SET_EVBIT, EV_REP) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
- 	}
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 5da1206..1055bc1 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -444,7 +444,7 @@ static gboolean try_send(int sk, void *data, size_t len)
  
--	ioctl(fd, UI_SET_EVBIT, EV_KEY);
--	ioctl(fd, UI_SET_EVBIT, EV_REL);
--	ioctl(fd, UI_SET_EVBIT, EV_REP);
--	ioctl(fd, UI_SET_EVBIT, EV_SYN);
-+	if (ioctl(fd, UI_SET_EVBIT, EV_SYN) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
+ 	do {
+ 		err = send(sk, data, len, 0);
+-	} while (err < 0 && errno == EINTR);
++	} while (err < 0 && (errno == EINTR || errno == EAGAIN));
  
--	for (i = 0; key_map[i].name != NULL; i++)
-+	for (i = 0; key_map[i].name != NULL; i++) {
- 		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
-+		err = -errno;
-+		error("ioctl UI_SET_KEYBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
- 
- 	if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
- 		err = -errno;
- 		error("Can't create uinput device: %s (%d)",
- 						strerror(-err), -err);
--		close(fd);
--		return err;
-+		goto fail;
- 	}
- 
- 	return fd;
-+
-+fail:
-+	close(fd);
-+	return err;
- }
- 
- static void init_uinput(struct avctp *session)
+ 	if (err < 0) {
+ 		error("send: %s (%d)", strerror(errno), errno);
 -- 
 1.8.3.2
 
