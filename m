@@ -1,44 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Jan 2014 10:29:50 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 1/2] Bluetooth: Rename L2CAP_CHAN_CONN_FIX_A2MP to
- L2CAP_CHAN_FIXED_CID
-Message-ID: <20140124082950.GA8546@x220.p-661hnu-f1>
-References: <1390483368-21321-1-git-send-email-johan.hedberg@gmail.com>
- <9D839443-6517-49AA-81E4-F4D744F82635@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <9D839443-6517-49AA-81E4-F4D744F82635@holtmann.org>
+Date: Thu, 23 Jan 2014 21:21:04 -0800
+Message-ID: <CAGXr9JEPv+onq6+WZTJ46oRtnrOJBPVQToKA82E84Sg9eSOP5A@mail.gmail.com>
+Subject: Paired LE HoG devices are unable to reconnect to BlueZ host when
+ discovery is active
+From: Petri Gynther <pgynther@google.com>
+To: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+With BlueZ 5.13, I've noticed that previously paired LE HoG devices
+are unable to reconnect to the host when device discovery is active on
+the BT interface.
 
-On Thu, Jan 23, 2014, Marcel Holtmann wrote:
-> > There's no reason why A2DP should need or deserve its on channel type.
-> 
-> I assume you mean A2MP here?
-> 
-> > Instead we should be able to group all fixed CID users under a single
-> > channel type and reuse as much code as possible for them. Where CID
-> > specific exceptions are needed the chan-scid value can be used.
-> > 
-> > This patch renames the current A2DP channel type to a generic one and
-> 
-> Same here.
+Steps to reproduce:
+1. Pair LE HoG device with BlueZ 5.13 host.
+2. Verify that keypresses from HoG device are delivered to uHID input pipeline.
+3. Let HoG device disconnect from host (due to inactivity timeout).
+4. Press key on HoG device. At this point, it reconnects to host fine.
+5. Let HoG device disconnect from host again.
+6. Start "test-discovery" script.
+7. Press key on HoG device => it does not reconnect to host.
+8. Kill "test-discovery" script.
+9. Press key on HoG device => it now reconnects to host successfully.
 
-Yep. Seems like typing A2DP is somehow hardwired into my brain after so
-many years.
+It looks to me that the root cause is in src/adapter.c:update_found_devices()
 
-> > -#define L2CAP_CHAN_CONN_FIX_A2MP	4
-> > +#define L2CAP_CHAN_FIXED_CID		4
-> 
-> You want to use FIXED_CID instead of just FIXED. I am fine with
-> FIXED_CID, just double checking here.
+        /*
+         * Only if at least one client has requested discovery, maintain
+         * list of found devices and name confirming for legacy devices.
+         * Otherwise, this is an event from passive discovery and we
+         * should check if the device needs connecting to.
+         */
+        if (!adapter->discovery_list)
+                goto connect_le;
 
-I was thinking of it as "channel with a fixed CID", however now that I
-re-read the Core Spec it talks about "Fixed Channels", so I'll change
-this simply to CHAN_FIXED.
+        if (g_slist_find(adapter->discovery_found, dev))
+                return;
 
-Johan
+When (active) discovery is on, adapter->discovery_list != NULL, and
+g_slist_find(adapter->discovery_found, dev) will obviously find this
+device since it is already paired. So, we end up returning from the
+function without an attempt to reconnect to the previously paired LE
+device.
+
+What would be the right fix here? Stop discovery before attempting to
+reconnect to the LE device?
