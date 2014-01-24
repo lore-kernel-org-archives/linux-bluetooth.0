@@ -1,87 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: Switch ATT channels to use L2CAP_CHAN_FIXED
-Date: Fri, 24 Jan 2014 10:35:41 +0200
-Message-Id: <1390552541-11729-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1390552541-11729-1-git-send-email-johan.hedberg@gmail.com>
-References: <1390552541-11729-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/2] Bluetooth: Rename L2CAP_CHAN_CONN_FIX_A2MP to L2CAP_CHAN_FIXED
+Date: Fri, 24 Jan 2014 10:35:40 +0200
+Message-Id: <1390552541-11729-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-ATT channels are not connection oriented so having them use
-L2CAP_CHAN_CONN_ORIENTED is quite confusing. Instead, use the new
-L2CAP_CHAN_FIXED type and ensure that the MTU and CID values get
-properly set.
+There's no reason why A2MP should need or deserve its on channel type.
+Instead we should be able to group all fixed CID users under a single
+channel type and reuse as much code as possible for them. Where CID
+specific exceptions are needed the chan-scid value can be used.
+
+This patch renames the current A2MP channel type to a generic one and
+thereby paves the way to allow converting ATT and SMP (and any future
+fixed channel protocols) to use the new channel type.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/l2cap_core.c | 21 +++++++++------------
- net/bluetooth/l2cap_sock.c |  9 +++++++++
- 2 files changed, 18 insertions(+), 12 deletions(-)
+ include/net/bluetooth/l2cap.h |  2 +-
+ net/bluetooth/a2mp.c          |  8 ++++++--
+ net/bluetooth/l2cap_core.c    | 15 ++++++---------
+ 3 files changed, 13 insertions(+), 12 deletions(-)
 
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 85cf40acc47e..ae482f41594a 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -651,7 +651,7 @@ struct l2cap_user {
+ #define L2CAP_CHAN_RAW			1
+ #define L2CAP_CHAN_CONN_LESS		2
+ #define L2CAP_CHAN_CONN_ORIENTED	3
+-#define L2CAP_CHAN_CONN_FIX_A2MP	4
++#define L2CAP_CHAN_FIXED		4
+ 
+ /* ----- L2CAP socket info ----- */
+ #define l2cap_pi(sk) ((struct l2cap_pinfo *) sk)
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index efcd108822c4..f986b9968bdb 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -235,7 +235,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
+ 			BT_DBG("chan %p state %s", chan,
+ 			       state_to_string(chan->state));
+ 
+-			if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP)
++			if (chan->scid == L2CAP_CID_A2MP)
+ 				continue;
+ 
+ 			l2cap_chan_lock(chan);
+@@ -726,7 +726,11 @@ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
+ 
+ 	BT_DBG("chan %p", chan);
+ 
+-	chan->chan_type = L2CAP_CHAN_CONN_FIX_A2MP;
++	chan->chan_type = L2CAP_CHAN_FIXED;
++	chan->scid = L2CAP_CID_A2MP;
++	chan->dcid = L2CAP_CID_A2MP;
++	chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
++	chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
+ 	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
+ 
+ 	chan->ops = &a2mp_chan_ops;
 diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cd28057d2903..e5c5c7427c41 100644
+index 138394ad3e51..cd28057d2903 100644
 --- a/net/bluetooth/l2cap_core.c
 +++ b/net/bluetooth/l2cap_core.c
-@@ -498,18 +498,10 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
- 
- 	switch (chan->chan_type) {
- 	case L2CAP_CHAN_CONN_ORIENTED:
--		if (conn->hcon->type == LE_LINK) {
--			if (chan->dcid == L2CAP_CID_ATT) {
--				chan->omtu = L2CAP_DEFAULT_MTU;
--				chan->scid = L2CAP_CID_ATT;
--			} else {
--				chan->scid = l2cap_alloc_cid(conn);
--			}
--		} else {
--			/* Alloc CID for connection-oriented socket */
--			chan->scid = l2cap_alloc_cid(conn);
-+		/* Alloc CID for connection-oriented socket */
-+		chan->scid = l2cap_alloc_cid(conn);
-+		if (conn->hcon->type == ACL_LINK)
- 			chan->omtu = L2CAP_DEFAULT_MTU;
--		}
+@@ -519,11 +519,8 @@ void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan)
+ 		chan->omtu = L2CAP_DEFAULT_MTU;
  		break;
  
- 	case L2CAP_CHAN_CONN_LESS:
-@@ -7025,7 +7017,12 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		goto done;
+-	case L2CAP_CHAN_CONN_FIX_A2MP:
+-		chan->scid = L2CAP_CID_A2MP;
+-		chan->dcid = L2CAP_CID_A2MP;
+-		chan->omtu = L2CAP_A2MP_DEFAULT_MTU;
+-		chan->imtu = L2CAP_A2MP_DEFAULT_MTU;
++	case L2CAP_CHAN_FIXED:
++		/* Caller will set CID and CID specific MTU values */
+ 		break;
+ 
+ 	default:
+@@ -571,7 +568,7 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
+ 
+ 		chan->conn = NULL;
+ 
+-		if (chan->chan_type != L2CAP_CHAN_CONN_FIX_A2MP)
++		if (chan->scid != L2CAP_CID_A2MP)
+ 			hci_conn_drop(conn->hcon);
+ 
+ 		if (mgr && mgr->bredr_chan == chan)
+@@ -1310,7 +1307,7 @@ static void l2cap_send_disconn_req(struct l2cap_chan *chan, int err)
+ 		__clear_ack_timer(chan);
  	}
  
--	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && !(psm || cid)) {
-+	if (chan->chan_type == L2CAP_CHAN_CONN_ORIENTED && !psm) {
-+		err = -EINVAL;
-+		goto done;
-+	}
-+
-+	if (chan->chan_type == L2CAP_CHAN_FIXED && !cid) {
- 		err = -EINVAL;
- 		goto done;
+-	if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
++	if (chan->scid == L2CAP_CID_A2MP) {
+ 		l2cap_state_change(chan, BT_DISCONN);
+ 		return;
  	}
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 4aa6704f0b33..3f8e2a223474 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -101,6 +101,15 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
- 		return -EINVAL;
+@@ -1508,7 +1505,7 @@ static void l2cap_conn_ready(struct l2cap_conn *conn)
  
-+	if (la.l2_cid) {
-+		/* When the socket gets created it defaults to
-+		 * CHAN_CONN_ORIENTED, so we need to overwrite the
-+		 * default here.
-+		 */
-+		chan->chan_type = L2CAP_CHAN_FIXED;
-+		chan->omtu = L2CAP_DEFAULT_MTU;
-+	}
-+
- 	if (bdaddr_type_is_le(la.l2_bdaddr_type)) {
- 		if (!enable_lecoc && la.l2_psm)
- 			return -EINVAL;
+ 		l2cap_chan_lock(chan);
+ 
+-		if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
++		if (chan->scid == L2CAP_CID_A2MP) {
+ 			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
+@@ -7245,7 +7242,7 @@ int l2cap_security_cfm(struct hci_conn *hcon, u8 status, u8 encrypt)
+ 		BT_DBG("chan %p scid 0x%4.4x state %s", chan, chan->scid,
+ 		       state_to_string(chan->state));
+ 
+-		if (chan->chan_type == L2CAP_CHAN_CONN_FIX_A2MP) {
++		if (chan->scid == L2CAP_CID_A2MP) {
+ 			l2cap_chan_unlock(chan);
+ 			continue;
+ 		}
 -- 
 1.8.5.3
 
