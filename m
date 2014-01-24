@@ -1,35 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/8] android: Add copy of current AVCTP implemention
-Date: Fri, 24 Jan 2014 15:24:28 +0200
-Message-Id: <1390569875-29436-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 24 Jan 2014 13:58:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] avrcp: Use NULL for zero pointers
+Message-ID: <20140124115824.GA21607@x220.p-661hnu-f1>
+References: <1390563743-18889-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1390563743-18889-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
-These files are not added to any makefile on purpose because they still
-have external dependencies.
----
-v2: Fix issues with dependencies in Android, adds proper reject for messages
-that cannot be handled, fix avctp_new not initializing the handlers properly
-and finally fixes using 0 instead of NULL in various places.
+On Fri, Jan 24, 2014, Andrei Emeltchenko wrote:
+> ---
+>  profiles/audio/avrcp.c | 92 +++++++++++++++++++++++++-------------------------
+>  1 file changed, 46 insertions(+), 46 deletions(-)
 
- {profiles/audio => android}/avctp.c | 0
- {profiles/audio => android}/avctp.h | 0
- 2 files changed, 0 insertions(+), 0 deletions(-)
- copy {profiles/audio => android}/avctp.c (100%)
- copy {profiles/audio => android}/avctp.h (100%)
+Applied. Thanks.
 
-diff --git a/profiles/audio/avctp.c b/android/avctp.c
-similarity index 100%
-copy from profiles/audio/avctp.c
-copy to android/avctp.c
-diff --git a/profiles/audio/avctp.h b/android/avctp.h
-similarity index 100%
-copy from profiles/audio/avctp.h
-copy to android/avctp.h
--- 
-1.8.4.2
-
+Johan
