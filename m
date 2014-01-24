@@ -1,39 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] bnep: Calculate ifindex after NULL check
-Date: Fri, 24 Jan 2014 16:56:41 +0200
-Message-Id: <1390575403-30860-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH] android: Update Audio IPC documentation
+Date: Fri, 24 Jan 2014 15:50:29 +0100
+Message-ID: <1390575029-6800-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
+Open Stream commands now also returns outoging MTU for returned socket.
 ---
- profiles/network/bnep.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ android/audio-ipc-api.txt | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 2a74016..0ef85d5 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -518,13 +518,15 @@ static int bnep_add_to_bridge(const char *devname, const char *bridge)
+diff --git a/android/audio-ipc-api.txt b/android/audio-ipc-api.txt
+index 4aff92c..f4a497d 100644
+--- a/android/audio-ipc-api.txt
++++ b/android/audio-ipc-api.txt
+@@ -66,7 +66,8 @@ Audio Service (ID 0)
+ 	Opcode 0x03 - Open Stream command
  
- static int bnep_del_from_bridge(const char *devname, const char *bridge)
- {
--	int ifindex = if_nametoindex(devname);
-+	int ifindex;
- 	struct ifreq ifr;
- 	int sk, err;
+ 		Command parameters: Endpoint ID (1 octet)
+-		Response parameters: Codec configuration length (1 octet)
++		Response parameters: Outgoing MTU (2 octets)
++				     Codec configuration length (1 octet)
+ 				     Codec configuration (1 octet)
+ 				     File descriptor (inline)
  
- 	if (!devname || !bridge)
- 		return -EINVAL;
- 
-+	ifindex = if_nametoindex(devname);
-+
- 	sk = socket(AF_INET, SOCK_STREAM, 0);
- 	if (sk < 0)
- 		return -1;
 -- 
-1.8.3.2
+1.8.5.2
 
