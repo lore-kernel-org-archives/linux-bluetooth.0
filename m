@@ -1,34 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 0/5] Remote device cache support
+Date: Fri, 24 Jan 2014 15:21:42 +0100
+Message-ID: <7560453.1MOtNrpKXW@uw000953>
+In-Reply-To: <1390515490-29538-1-git-send-email-szymon.janc@gmail.com>
+References: <1390515490-29538-1-git-send-email-szymon.janc@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <41458C64-3510-481A-92F4-1296C06600CC@warski.org>
-References: <41458C64-3510-481A-92F4-1296C06600CC@warski.org>
-Date: Fri, 24 Jan 2014 10:38:58 -0400
-Message-ID: <CAJdJm_PFAWLvBQFXOntGu+sA7-vGuVRx5956OL3CD8QjmqZiEA@mail.gmail.com>
-Subject: Re: Discovering LE advertisements programatically
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Adam Warski <adam@warski.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
+Hi,
 
-On Fri, Jan 24, 2014 at 10:15 AM, Adam Warski <adam@warski.org> wrote:
-> I’m trying to find a good way to discover and retrieve LE advertisements programatically.
->
-> My first shot was to try to use DBus. I was trying to extend what the test/test-discovery script is doing, but it seems using DBus I can only get notified of new devices being discovered. Is there a way to get the actual LE advertisement via DBus? The device properties seem not to contain the info from the advertisement PDU.
->
-> If that’s not possible using DBus, is the way to go just using C?
->
-> I also tried using command line, a combination of “hcitool lescan” and “hcidump”/“hcidump -R" gives what I need more or less (plain hcidump gives me the RSSI, hcidump -R gives me the raw packet that I need). Still, I guess there must be a better way.
+On Thursday 23 of January 2014 23:18:05 Szymon Janc wrote:
+> V3:
+>  - bugfixes in cache handling
+> 
+> V2:
+>  - keep cache in separate file
+>  - patch 3/5 and 4/5 from V1 squashed to 3/4
+> 
+> V1:
+>  - set cache limit to 300
+>  - update timestamp of cached device
+>  - rebased to master
+>  - other minor fixes
+> 
+> Szymon Janc (5):
+>   android/bluetooth: Split devices list to devices and bonded_devices
+>   android/bluetooth: Use defines for settings and devices files paths
+>   android/bluetooth: Add support for caching remote device info
+>   android/bluetooth: Add support for loading caches devices from storage
+>   android/bluetooth: Rename devices list to cached_devices
+> 
+>  android/bluetooth.c | 246 ++++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 183 insertions(+), 63 deletions(-)
+> 
 
-My suggestion would be to take a look at "hcitool lescan" for how it
-is done using C sockets. Or you can modify hcitool lescan to dump the
-full advertising report instead of just the name.
+This is now pushed upstream. 
 
-Best Regards,
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-Manaus - Brazil
+Best regards, 
+Szymon Janc
