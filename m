@@ -1,47 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianchlad@gmail.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianchlad@gmail.com>
-Subject: [PATCH] android/pts: Add PTS test results for PBAP
-Date: Fri, 24 Jan 2014 14:56:16 -0500
-Message-Id: <1390593376-4905-1-git-send-email-sebastianchlad@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] attrib: Fix crash if g_attrib_new() fails
+Date: Fri, 24 Jan 2014 15:57:49 -0400
+Message-Id: <1390593469-18511-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-pbap.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+If g_attrib_new() fails for some reason (e.g. bt_io_get() fails), it
+will return NULL.
 
-diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
-index 3bf682f..843b7cf 100644
---- a/android/pts-pbap.txt
-+++ b/android/pts-pbap.txt
-@@ -1,6 +1,6 @@
- PTS test results for PBAP
+Crash reported by Valgrind:
+
+==2845== Invalid read of size 4
+==2845==    at 0x40C6CC4: g_io_channel_unix_get_fd (giounix.c:655)
+==2845==  Address 0x3c is not stack'd, malloc'd or (recently) free'd
+---
+ src/attrib-server.c |    3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 3b94120..61395a5 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1235,6 +1235,9 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ 	}
  
--PTS version: 4.9
-+PTS version: 5.0
- Tested: 14.11.2013
- 
- Results:
-@@ -30,7 +30,7 @@ TC_PCE_PDF_BV_04_I	N/A
- TC_PSE_SSM_BV_03_C	PASS
- TC_PSE_SSM_BV_05_C	PASS
- TC_PSE_SSM_BV_07_C	PASS
--TC_PSE_SSM_BI_02_C	INC
-+TC_PSE_SSM_BI_02_C	PASS
- TC_PSE_SSM_BI_03_C	N/A
- TC_PSE_SSM_BV_08_I	PASS
- TC_PSE_PBD_BV_02_C	PASS
-@@ -48,7 +48,7 @@ TC_PSE_PBB_BV_07_C	PASS
- TC_PSE_PBB_BV_08_C	PASS
- TC_PSE_PBB_BV_09_C	PASS
- TC_PSE_PBB_BV_10_C	PASS
--TC_PSE_PBB_BV_11_C	INC
-+TC_PSE_PBB_BV_11_C	PASS
- TC_PSE_PBB_BI_01_C	PASS
- TC_PSE_PBB_BI_07_C	PASS
- TC_PSE_PBF_BV_01_I	PASS
+ 	attrib = g_attrib_new(io);
++	if (!attrib)
++		return;
++
+ 	attrib_channel_attach(attrib);
+ 	g_attrib_unref(attrib);
+ }
 -- 
-1.8.5.3
+1.7.9.5
 
