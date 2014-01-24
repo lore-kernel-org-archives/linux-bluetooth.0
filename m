@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 8/8] android/AVRCP: Add initial socket handling
-Date: Fri, 24 Jan 2014 15:24:35 +0200
-Message-Id: <1390569875-29436-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 5/8] android/haltest: Add init and cleanup calls to rc methods
+Date: Fri, 24 Jan 2014 15:24:32 +0200
+Message-Id: <1390569875-29436-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390569875-29436-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390569875-29436-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,205 +11,166 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the initial socket listening and handling incoming connections.
 ---
- android/avctp.c |   5 +--
- android/avrcp.c | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 129 insertions(+), 4 deletions(-)
+ android/Android.mk                     |  1 +
+ android/Makefile.am                    |  1 +
+ android/client/haltest.c               |  2 ++
+ android/client/if-bt.c                 |  2 +-
+ android/client/if-main.h               |  2 ++
+ android/client/{if-audio.c => if-rc.c} | 44 +++++++++++++---------------------
+ 6 files changed, 23 insertions(+), 29 deletions(-)
+ copy android/client/{if-audio.c => if-rc.c} (57%)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index a88b7f7..80513e6 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -860,10 +860,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 	handler = find_handler(control->handlers, avc->opcode);
- 	if (!handler) {
- 		DBG("handler not found for 0x%02x", avc->opcode);
--		/* FIXME:
--		 * packet_size += avrcp_handle_vendor_reject(&code, operands);
--		 */
--		avc->code = code;
-+		avc->code = AVC_CTYPE_REJECTED;
- 		goto done;
- 	}
+diff --git a/android/Android.mk b/android/Android.mk
+index 160a1d4..b83d1fe 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -131,6 +131,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/client/tabcompletion.c \
+ 	bluez/android/client/if-audio.c \
+ 	bluez/android/client/if-av.c \
++	bluez/android/client/if-rc.c \
+ 	bluez/android/client/if-bt.c \
+ 	bluez/android/client/if-hf.c \
+ 	bluez/android/client/if-hh.c \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 664524f..e065c0c 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -85,6 +85,7 @@ android_haltest_SOURCES = android/client/haltest.c \
+ 				android/client/tabcompletion.c \
+ 				android/client/if-main.h \
+ 				android/client/if-av.c \
++				android/client/if-rc.c \
+ 				android/client/if-bt.c \
+ 				android/client/if-gatt.c \
+ 				android/client/if-hf.c \
+diff --git a/android/client/haltest.c b/android/client/haltest.c
+index f4d1ade..114fe31 100644
+--- a/android/client/haltest.c
++++ b/android/client/haltest.c
+@@ -34,6 +34,7 @@ const struct interface *interfaces[] = {
+ 	&audio_if,
+ 	&bluetooth_if,
+ 	&av_if,
++	&rc_if,
+ 	&gatt_if,
+ 	&gatt_client_if,
+ 	&gatt_server_if,
+@@ -382,6 +383,7 @@ static void init(void)
+ 	static const char * const inames[] = {
+ 		BT_PROFILE_HANDSFREE_ID,
+ 		BT_PROFILE_ADVANCED_AUDIO_ID,
++		BT_PROFILE_AV_RC_ID,
+ 		BT_PROFILE_HEALTH_ID,
+ 		BT_PROFILE_HIDHOST_ID,
+ 		BT_PROFILE_PAN_ID,
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 6bfb439..8dcffea 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -760,7 +760,7 @@ static void get_profile_interface_p(int argc, const char **argv)
+ 	else if (strcmp(BT_PROFILE_PAN_ID, id) == 0)
+ 		pif = (const void **) &if_pan;
+ 	else if (strcmp(BT_PROFILE_AV_RC_ID, id) == 0)
+-		pif = &dummy; /* TODO: change when if_rc is there */
++		pif = (const void **) &if_rc;
+ 	else if (strcmp(BT_PROFILE_GATT_ID, id) == 0)
+ 		pif = (const void **) &if_gatt;
+ 	else
+diff --git a/android/client/if-main.h b/android/client/if-main.h
+index 2b22fc4..d82358e 100644
+--- a/android/client/if-main.h
++++ b/android/client/if-main.h
+@@ -48,6 +48,7 @@ extern audio_hw_device_t *if_audio;
+ /* Interfaces from hal that can be populated during application lifetime */
+ extern const bt_interface_t *if_bluetooth;
+ extern const btav_interface_t *if_av;
++extern const btrc_interface_t *if_rc;
+ extern const bthf_interface_t *if_hf;
+ extern const bthh_interface_t *if_hh;
+ extern const btpan_interface_t *if_pan;
+@@ -68,6 +69,7 @@ struct interface {
+ extern const struct interface audio_if;
+ extern const struct interface bluetooth_if;
+ extern const struct interface av_if;
++extern const struct interface rc_if;
+ extern const struct interface gatt_if;
+ extern const struct interface gatt_client_if;
+ extern const struct interface gatt_server_if;
+diff --git a/android/client/if-audio.c b/android/client/if-rc.c
+similarity index 57%
+copy from android/client/if-audio.c
+copy to android/client/if-rc.c
+index 203e088..58fb892 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-rc.c
+@@ -18,41 +18,29 @@
+ #include "if-main.h"
+ #include "../hal-utils.h"
  
-diff --git a/android/avrcp.c b/android/avrcp.c
-index e06d136..807c109 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -28,6 +28,7 @@
- #include <stdbool.h>
- #include <glib.h>
+-audio_hw_device_t *if_audio = NULL;
++const btrc_interface_t *if_rc = NULL;
  
-+#include "btio/btio.h"
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
-@@ -36,6 +37,7 @@
- #include "avrcp.h"
- #include "hal-msg.h"
- #include "ipc.h"
-+#include "avctp.h"
- 
- #define L2CAP_PSM_AVCTP 0x17
- 
-@@ -46,6 +48,13 @@
- 
- static bdaddr_t adapter_addr;
- static uint32_t record_id = 0;
-+static GSList *devices = NULL;
-+static GIOChannel *server = NULL;
-+
-+struct avrcp_device {
-+	bdaddr_t	dst;
-+	struct avctp	*session;
+-static void init_p(int argc, const char **argv)
+-{
+-	int err;
+-	const hw_module_t *module;
+-	audio_hw_device_t *device;
++static btrc_callbacks_t rc_cbacks = {
++	.size = sizeof(rc_cbacks),
 +};
  
- static const struct ipc_handler cmd_handlers[] = {
+-	err = hw_get_module_by_class(AUDIO_HARDWARE_MODULE_ID,
+-					AUDIO_HARDWARE_MODULE_ID_A2DP, &module);
+-	if (err) {
+-		haltest_error("hw_get_module_by_class returned %d\n", err);
+-		return;
+-	}
++/* init */
+ 
+-	err = audio_hw_device_open(module, &device);
+-	if (err)
+-		haltest_error("audio_hw_device_open returned %d\n", err);
++static void init_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_rc);
+ 
+-	if_audio = device;
++	EXEC(if_rc->init, &rc_cbacks);
+ }
+ 
++/* cleanup */
++
+ static void cleanup_p(int argc, const char **argv)
+ {
+-	int err;
+-
+-	RETURN_IF_NULL(if_audio);
+-
+-	err = audio_hw_device_close(if_audio);
+-	if (err < 0) {
+-		haltest_error("audio_hw_device_close returned %d\n", err);
+-		return;
+-	}
++	RETURN_IF_NULL(if_rc);
+ 
+-	if_audio = NULL;
++	EXECV(if_rc->cleanup);
++	if_rc = NULL;
+ }
+ 
+ static struct method methods[] = {
+@@ -61,7 +49,7 @@ static struct method methods[] = {
+ 	END_METHOD
  };
-@@ -118,14 +127,124 @@ static sdp_record_t *avrcp_record(void)
- 	return record;
- }
  
-+static void avrcp_device_free(void *data)
-+{
-+	struct avrcp_device *dev = data;
-+
-+	if (dev->session)
-+		avctp_shutdown(dev->session);
-+
-+	devices = g_slist_remove(devices, dev);
-+	g_free(dev);
-+}
-+
-+static struct avrcp_device *avrcp_device_new(const bdaddr_t *dst)
-+{
-+	struct avrcp_device *dev;
-+
-+	dev = g_new0(struct avrcp_device, 1);
-+	bacpy(&dev->dst, dst);
-+	devices = g_slist_prepend(devices, dev);
-+
-+	return dev;
-+}
-+
-+static int device_cmp(gconstpointer s, gconstpointer user_data)
-+{
-+	const struct avrcp_device *dev = s;
-+	const bdaddr_t *dst = user_data;
-+
-+	return bacmp(&dev->dst, dst);
-+}
-+
-+static void disconnect_cb(void *data)
-+{
-+	struct avrcp_device *dev = data;
-+
-+	DBG("");
-+
-+	dev->session = NULL;
-+
-+	avrcp_device_free(dev);
-+}
-+
-+static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	struct avrcp_device *dev;
-+	bdaddr_t src, dst;
-+	char address[18];
-+	uint16_t imtu, omtu;
-+	GError *gerr = NULL;
-+	GSList *l;
-+	int fd;
-+
-+	if (err) {
-+		error("%s", err->message);
-+		return;
-+	}
-+
-+	bt_io_get(chan, &gerr,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_IMTU, &imtu,
-+			BT_IO_OPT_OMTU, &omtu,
-+			BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("%s", gerr->message);
-+		g_error_free(gerr);
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+		return;
-+	}
-+
-+	ba2str(&dst, address);
-+	DBG("Incoming connection from %s", address);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (l) {
-+		error("Unexpected connection");
-+		return;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(chan);
-+
-+	dev = avrcp_device_new(&dst);
-+	dev->session = avctp_new(fd, imtu, omtu, 0x0100);
-+
-+	if (!dev->session) {
-+		avrcp_device_free(dev);
-+		return;
-+	}
-+
-+	avctp_set_destroy_cb(dev->session, disconnect_cb, dev);
-+
-+	/* FIXME: get the real name of the device */
-+	avctp_init_uinput(dev->session, "bluetooth", address);
-+
-+	g_io_channel_set_close_on_unref(chan, FALSE);
-+
-+	DBG("%s connected", address);
-+}
-+
- bool bt_avrcp_register(const bdaddr_t *addr)
- {
-+	GError *err = NULL;
- 	sdp_record_t *rec;
- 
- 	DBG("");
- 
- 	bacpy(&adapter_addr, addr);
- 
-+	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_PSM, L2CAP_PSM_AVCTP,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_INVALID);
-+	if (!server) {
-+		error("Failed to listen on AVDTP channel: %s", err->message);
-+		g_error_free(err);
-+		return false;
-+	}
-+
- 	rec = avrcp_record();
- 	if (!rec) {
- 		error("Failed to allocate AVRCP record");
-@@ -149,8 +268,17 @@ void bt_avrcp_unregister(void)
- {
- 	DBG("");
- 
-+	g_slist_free_full(devices, avrcp_device_free);
-+	devices = NULL;
-+
- 	ipc_unregister(HAL_SERVICE_ID_AVRCP);
- 
- 	bt_adapter_remove_record(record_id);
- 	record_id = 0;
-+
-+	if (server) {
-+		g_io_channel_shutdown(server, TRUE, NULL);
-+		g_io_channel_unref(server);
-+		server = NULL;
-+	}
- }
+-const struct interface audio_if = {
+-	.name = "audio",
++const struct interface rc_if = {
++	.name = "rc",
+ 	.methods = methods
+ };
 -- 
 1.8.4.2
 
