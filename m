@@ -2,81 +2,91 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 2/2] android/hal-audio: Remove DBG from SBC functions
-Date: Fri, 24 Jan 2014 17:06:44 +0100
-Message-ID: <1390579604-14748-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1390579604-14748-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1390579604-14748-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 1/2] android/hal-audio: Refactor error messages
+Date: Fri, 24 Jan 2014 17:06:43 +0100
+Message-ID: <1390579604-14748-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These are redundant since callers will always print some information
-which can be used to see what was actually called so no need to flood
-output.
 ---
- android/hal-audio.c | 12 ------------
- 1 file changed, 12 deletions(-)
+ android/hal-audio.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 974bedf..8d737ad 100644
+index 8271647..974bedf 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -266,8 +266,6 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
- 	uint8_t *ptr = (uint8_t *) preset;
- 	size_t preset_size = sizeof(*preset) + sizeof(a2dp_sbc_t);
+@@ -313,7 +313,7 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+ 	DBG("");
  
--	DBG("");
--
- 	count = sizeof(sbc_presets) / sizeof(sbc_presets[0]);
- 
- 	for (i = 0; i < count; i++) {
-@@ -293,8 +291,6 @@ static void sbc_init_encoder(struct sbc_data *sbc_data)
- 	a2dp_sbc_t *in = &sbc_data->sbc;
- 	sbc_t *out = &sbc_data->enc;
- 
--	DBG("");
--
- 	sbc_init_a2dp(out, 0L, in, sizeof(*in));
- 
- 	out->endian = SBC_LE;
-@@ -310,8 +306,6 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
- 	size_t out_frame_len;
- 	size_t num_frames;
- 
--	DBG("");
--
  	if (preset->len != sizeof(a2dp_sbc_t)) {
- 		error("SBC: preset size mismatch");
+-		DBG("preset size mismatch");
++		error("SBC: preset size mismatch");
  		return AUDIO_STATUS_FAILED;
-@@ -345,8 +339,6 @@ static int sbc_cleanup(void *codec_data)
- {
- 	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
+ 	}
  
--	DBG("");
--
- 	sbc_finish(&sbc_data->enc);
- 	free(sbc_data->out_buf);
- 	free(codec_data);
-@@ -386,8 +378,6 @@ static size_t sbc_get_buffer_size(void *codec_data)
- {
- 	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
+@@ -422,8 +422,7 @@ static void write_media_packet(int fd, struct sbc_data *sbc_data,
+ 	ret = write(fd, mp, sizeof(*mp) + data_len);
+ 	if (ret < 0) {
+ 		int err = errno;
+-		DBG("error writing data: %d (%s)", err,
+-						strerror(err));
++		error("SBC: failed to write data: %d (%s)", err, strerror(err));
+ 	}
  
--	DBG("");
--
- 	return sbc_data->in_buf_size;
- }
+ 	sbc_data->frames_sent += mp->payload.frame_count;
+@@ -472,7 +471,7 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
+ 					&written);
  
-@@ -395,8 +385,6 @@ static size_t sbc_get_mediapacket_duration(void *codec_data)
- {
- 	struct sbc_data *sbc_data = (struct sbc_data *) codec_data;
+ 		if (ret < 0) {
+-			DBG("failed to encode block");
++			error("SBC: failed to encode block");
+ 			break;
+ 		}
  
--	DBG("");
--
- 	return sbc_data->frame_duration * sbc_data->frames_per_packet;
- }
+@@ -500,7 +499,7 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
+ 		 * if we did not, something went wrong but we can't really
+ 		 * handle this so this is just sanity check
+ 		 */
+-		DBG("some data were not encoded");
++		error("SBC: failed to encode complete input buffer");
+ 	}
  
+ 	/* we always assume that all data was processed and sent */
+@@ -828,12 +827,12 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 	}
+ 
+ 	if (out->audio_state != AUDIO_A2DP_STATE_STARTED) {
+-		DBG("stream not started");
++		error("audio: stream not started");
+ 		return -1;
+ 	}
+ 
+ 	if (out->ep->fd < 0) {
+-		DBG("no transport");
++		error("audio: no transport socket");
+ 		return -1;
+ 	}
+ 
+@@ -857,7 +856,7 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+ 	DBG("");
+ 
+ 	if (rate != out->cfg.rate) {
+-		DBG("cannot set sample rate to %d", rate);
++		warn("audio: cannot set sample rate to %d", rate);
+ 		return -1;
+ 	}
+ 
+@@ -1182,6 +1181,7 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	return 0;
+ 
+ fail:
++	error("audio: cannot open output stream");
+ 	free(out);
+ 	*stream_out = NULL;
+ 	return -EIO;
 -- 
 1.8.5.2
 
