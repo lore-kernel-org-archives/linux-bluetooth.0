@@ -1,32 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 24 Jan 2014 23:57:04 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] attrib: Fix crash if g_attrib_new() fails
-Message-ID: <20140124215704.GA15197@x220.p-661hnu-f1>
-References: <1390593469-18511-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1390593469-18511-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Vinicius Costa Gomes <vcgomes@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Vinicius Costa Gomes <vcgomes@gmail.com>
+Subject: [RFC BlueZ 2/2] monitor: Add support for printing bluetoothd messages
+Date: Fri, 24 Jan 2014 19:41:52 -0200
+Message-Id: <1390599712-1609-3-git-send-email-vcgomes@gmail.com>
+In-Reply-To: <1390599712-1609-1-git-send-email-vcgomes@gmail.com>
+References: <1390599712-1609-1-git-send-email-vcgomes@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+In many cases when debugging bluetoothd behaviour, it is useful
+to associate bluetooth debug outputs with HCI/MGMT commands and
+events.
+---
+ monitor/journal.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 94 insertions(+), 1 deletion(-)
 
-On Fri, Jan 24, 2014, Anderson Lizardo wrote:
-> If g_attrib_new() fails for some reason (e.g. bt_io_get() fails), it
-> will return NULL.
-> 
-> Crash reported by Valgrind:
-> 
-> ==2845== Invalid read of size 4
-> ==2845==    at 0x40C6CC4: g_io_channel_unix_get_fd (giounix.c:655)
-> ==2845==  Address 0x3c is not stack'd, malloc'd or (recently) free'd
-> ---
->  src/attrib-server.c |    3 +++
->  1 file changed, 3 insertions(+)
+diff --git a/monitor/journal.c b/monitor/journal.c
+index ecc7dac..1b04f02 100644
+--- a/monitor/journal.c
++++ b/monitor/journal.c
+@@ -22,12 +22,105 @@
+  */
+ 
+ #include <errno.h>
++#include <stdio.h>
+ 
+ #include <systemd/sd-journal.h>
+ 
++#include "mainloop.h"
+ #include "journal.h"
+ 
++static sd_journal *journal;
++
++static void journal_destroy(void *user_data)
++{
++	sd_journal *j = user_data;
++	sd_journal_close(j);
++}
++
++static void journal_event(int fd, uint32_t events, void *user_data)
++{
++	sd_journal *j = user_data;
++	const void *d;
++	const char *msg;
++	size_t l;
++	int err, prefix = strlen("MESSAGE=");
++
++	err = sd_journal_process(j);
++	if (err < 0) {
++		printf("Could not process journal: %s (%d)\n",
++				strerror(-err), err);
++		goto failed;
++	}
++
++	err = sd_journal_next(j);
++	if (err == 0) {
++		/* No more events in the journal, let's wait. */
++		return;
++	} else if (err < 0) {
++		printf("Failed to iterate to the next entry: %s (%d)\n",
++				strerror(-err), err);
++		goto failed;
++	}
++
++	err = sd_journal_get_data(j, "MESSAGE", &d, &l);
++	if (err < 0) {
++		printf("Could not get journal messages: %s (%d)",
++				strerror(-err), err);
++		goto failed;
++	}
++
++	msg = d;
++
++	/* TODO: better formatting, perhaps colors. */
++	/* msg is prefixed with 'MESSAGE=', remove it. */
++	printf("# %.*s\n", (int) l - prefix, msg + prefix);
++
++	return;
++
++failed:
++	mainloop_remove_fd(fd);
++}
++
+ int journal_monitor(void)
+ {
+-	return -ENOSYS;
++	int err, events, fd;
++
++	err = sd_journal_open(&journal, SD_JOURNAL_SYSTEM |
++					SD_JOURNAL_RUNTIME_ONLY |
++					SD_JOURNAL_LOCAL_ONLY);
++	if (err < 0)
++		goto failed;
++
++	err = sd_journal_add_match(journal, "_SYSTEMD_UNIT=bluetooth.service", 0);
++	if (err < 0)
++		goto failed;
++
++	err = sd_journal_add_disjunction(journal);
++	if (err < 0)
++		goto failed;
++
++	err = sd_journal_seek_tail(journal);
++	if (err < 0)
++		goto failed;
++
++	fd = sd_journal_get_fd(journal);
++	if (fd < 0) {
++		err = fd;
++		goto failed;
++	}
++
++	events = sd_journal_get_events(journal);
++	if (events < 0) {
++		err = events;
++		goto failed;
++	}
++
++	return mainloop_add_fd(fd, events, journal_event, journal,
++				journal_destroy);
++
++failed:
++	printf("Failed to listen for journal messages: %s (%d)\n",
++			strerror(-err), err);
++	journal_destroy(journal);
++	return err;
+ }
+-- 
+1.8.5.3
 
-Applied. Thanks.
-
-Johan
