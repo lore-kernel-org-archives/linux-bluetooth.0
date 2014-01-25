@@ -1,37 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 1/2] tools/l2cap-tester: Test setsockopt(BT_SECURITY) on LE client
+Date: Fri, 24 Jan 2014 21:54:01 -0400
+Message-Id: <1390614842-28379-2-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1390614842-28379-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1390614842-28379-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Fri, 24 Jan 2014 22:00:26 -0400
-Message-ID: <CAJdJm_NYECBW1hH+PmYtQqoBL-_279_hjfgqWD8i85bi9nHJiw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/2] Basic [sg]etsockopt() testing in l2cap-tester
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Although setting a security level using setsockopt(BT_SECURITY) is
+optional for LE sockets (it will default to doing
+unencrypted/unauthenticated connection), it is a common operation and it
+is done by BlueZ daemon and some tools.
+---
+ tools/l2cap-tester.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-On Fri, Jan 24, 2014 at 9:54 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> PS: For some reason, the following tests are failing on my system, even using
-> an older kernel:
->
-> L2CAP LE Client - Success
-> L2CAP LE Client SMP - Success
-> L2CAP LE Client - Command Reject
-> L2CAP LE Client - Invalid PSM
-> L2CAP LE Server - Success
->
-> connect() is returning EINVAL.  Any ideas for why this may be happening?
-
-Actually I know why they fail: the tests try to use a PSM (and not
-CID) on a single mode LE adapter. I just don't understand why this is
-expected to work.
-
-Best Regards,
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 05202bd..d541f1b 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -461,6 +461,7 @@ static const struct l2cap_data le_server_success_test = {
+ 
+ static const struct l2cap_data le_att_client_connect_success_test_1 = {
+ 	.cid = 0x0004,
++	.sec_level = BT_SECURITY_LOW,
+ };
+ 
+ static const struct l2cap_data le_att_server_success_test_1 = {
 -- 
-Anderson Lizardo
-INdT - Manaus - Brazil
+1.8.3.2
+
