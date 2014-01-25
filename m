@@ -1,38 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sat, 25 Jan 2014 17:13:29 -0500
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Petri Gynther <pgynther@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Rename adapter_remove_device to btd_adapter_remove_device
+Message-ID: <20140125221329.GB14531@x220.p-661hnu-f1>
+References: <20140125005506.7AD85100900@puck.mtv.corp.google.com>
 MIME-Version: 1.0
-In-Reply-To: <20140125221203.GA14531@x220.p-661hnu-f1>
-References: <1390614842-28379-1-git-send-email-anderson.lizardo@openbossa.org>
-	<20140125221203.GA14531@x220.p-661hnu-f1>
-Date: Sat, 25 Jan 2014 18:48:01 -0400
-Message-ID: <CAJdJm_PPeA-DHfFPKi=iwjb_Kc4rrU8zY6SgX-G_O9ts3wCaZw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 0/2] Basic [sg]etsockopt() testing in l2cap-tester
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140125005506.7AD85100900@puck.mtv.corp.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Petri,
 
-On Sat, Jan 25, 2014 at 6:12 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> I pushed your first patch and a slightly different version of the
-> second one which is more thorough in its checks. I also sent fixes for
-> the kernel side so you don't need to spend more time on that (unless you
-> disagree with the fixes I sent).
+On Fri, Jan 24, 2014, Petri Gynther wrote:
+> Allow this symbol to be exported and usable from external plugins.
+> ---
+>  src/adapter.c | 14 +++++++-------
+>  src/adapter.h |  3 +++
+>  2 files changed, 10 insertions(+), 7 deletions(-)
 
-Thanks! I looked at the patches and I have no comments. Will do tests
-and report problems (if any).
+The patch looks fine, but we usually don't export symbols without
+knowing that there exists a valid use case for it. So could you perhaps
+give some background (or even a follow-up patch) to explain what you
+need this for?
 
-What about the suggestion to make l2cap-tester check if LE CoC is
-enabled on the kernel and skip the the tests that depend on it? Right
-now, the tests simply fail which is misleading (at first I thought it
-was a regression).
-
-Another option is to change the test name to mention that they require
-enabling LE CoC.
-
-Best Regards,
--- 
-Anderson Lizardo
-INdT - Manaus - Brazil
+Johan
