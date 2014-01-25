@@ -1,44 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Fix BT_SECURITY socket option for fixed channels (ATT)
-Date: Sat, 25 Jan 2014 17:10:07 -0500
-Message-Id: <1390687809-14408-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_NYECBW1hH+PmYtQqoBL-_279_hjfgqWD8i85bi9nHJiw@mail.gmail.com>
+References: <1390614842-28379-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CAJdJm_NYECBW1hH+PmYtQqoBL-_279_hjfgqWD8i85bi9nHJiw@mail.gmail.com>
+Date: Fri, 24 Jan 2014 22:50:23 -0400
+Message-ID: <CAJdJm_Ns_gNUuwQXOxXXe5pvnrHrwpq=ApD-Ee37Kjx3N=XaZw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 0/2] Basic [sg]etsockopt() testing in l2cap-tester
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi again,
 
-The BT_SECURITY option should also be allowed for fixed channels, so
-punch the appropriate hole for it when checking for the channel type.
-The main user of fixed CID user space sockets is right now ATT (which is
-broken without this patch).
+On Fri, Jan 24, 2014 at 10:00 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Actually I know why they fail: the tests try to use a PSM (and not
+> CID) on a single mode LE adapter. I just don't understand why this is
+> expected to work.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_sock.c | 2 ++
- 1 file changed, 2 insertions(+)
+I now realise that this has to do with LE CoC. Would it be okay to
+make l2cap-tester check for
+/sys/module/bluetooth/parameters/enable_lecoc at test setup and if it
+contains "N", skip the test?
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 3f8e2a223474..588d43b1c18e 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -513,6 +513,7 @@ static int l2cap_sock_getsockopt(struct socket *sock, int level, int optname,
- 	switch (optname) {
- 	case BT_SECURITY:
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
-+		    chan->chan_type != L2CAP_CHAN_FIXED &&
- 		    chan->chan_type != L2CAP_CHAN_RAW) {
- 			err = -EINVAL;
- 			break;
-@@ -769,6 +770,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
- 	switch (optname) {
- 	case BT_SECURITY:
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED &&
-+		    chan->chan_type != L2CAP_CHAN_FIXED &&
- 		    chan->chan_type != L2CAP_CHAN_RAW) {
- 			err = -EINVAL;
- 			break;
+Best Regards,
 -- 
-1.8.5.3
-
+Anderson Lizardo
+INdT - Manaus - Brazil
