@@ -1,99 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Rename adapter_remove_device to btd_adapter_remove_device
-Message-Id: <20140125005506.7AD85100900@puck.mtv.corp.google.com>
-Date: Fri, 24 Jan 2014 16:55:06 -0800 (PST)
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <347F2184-6CA1-4BCF-AC42-0A9E1FB9F9C9@holtmann.org>
+References: <1390595089-5314-1-git-send-email-sebastianchlad@gmail.com>
+	<347F2184-6CA1-4BCF-AC42-0A9E1FB9F9C9@holtmann.org>
+Date: Fri, 24 Jan 2014 19:03:44 -0500
+Message-ID: <CAJCsO8dTQSORkfN8vWB6n-PdSp_=E_A3NoBjf05a3XC5s6ep6g@mail.gmail.com>
+Subject: Re: [PATCH] android/pts: Add PTS test results for A2DP
+From: Sebastian Chlad <sebastianchlad@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: multipart/alternative; boundary=14dae9399ab93e233e04f0c035b2
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Allow this symbol to be exported and usable from external plugins.
----
- src/adapter.c | 14 +++++++-------
- src/adapter.h |  3 +++
- 2 files changed, 10 insertions(+), 7 deletions(-)
+--14dae9399ab93e233e04f0c035b2
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 570a5bf..649fc7a 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -1036,8 +1036,8 @@ static void service_auth_cancel(struct service_auth *auth)
- 	g_free(auth);
- }
- 
--static void adapter_remove_device(struct btd_adapter *adapter,
--						struct btd_device *dev)
-+void btd_adapter_remove_device(struct btd_adapter *adapter,
-+				struct btd_device *dev)
- {
- 	GList *l;
- 
-@@ -1531,7 +1531,7 @@ static gboolean remove_temp_devices(gpointer user_data)
- 		next = g_slist_next(l);
- 
- 		if (device_is_temporary(dev))
--			adapter_remove_device(adapter, dev);
-+			btd_adapter_remove_device(adapter, dev);
- 	}
- 
- 	return FALSE;
-@@ -2159,7 +2159,7 @@ static DBusMessage *remove_device(DBusConnection *conn,
- 	btd_device_set_temporary(device, TRUE);
- 
- 	if (!btd_device_is_connected(device)) {
--		adapter_remove_device(adapter, device);
-+		btd_adapter_remove_device(adapter, device);
- 		return dbus_message_new_method_return(msg);
- 	}
- 
-@@ -4268,7 +4268,7 @@ static void adapter_remove_connection(struct btd_adapter *adapter,
- 		const char *path = device_get_path(device);
- 
- 		DBG("Removing temporary device %s", path);
--		adapter_remove_device(adapter, device);
-+		btd_adapter_remove_device(adapter, device);
- 	}
- }
- 
-@@ -5834,7 +5834,7 @@ static void connect_failed_callback(uint16_t index, uint16_t length,
- 	 * when it is temporary. */
- 	if (device && !device_is_bonding(device, NULL)
- 						&& device_is_temporary(device))
--		adapter_remove_device(adapter, device);
-+		btd_adapter_remove_device(adapter, device);
- }
- 
- static void unpaired_callback(uint16_t index, uint16_t length,
-@@ -5865,7 +5865,7 @@ static void unpaired_callback(uint16_t index, uint16_t length,
- 	if (btd_device_is_connected(device))
- 		device_request_disconnect(device, NULL);
- 	else
--		adapter_remove_device(adapter, device);
-+		btd_adapter_remove_device(adapter, device);
- }
- 
- static void read_info_complete(uint8_t status, uint16_t length,
-diff --git a/src/adapter.h b/src/adapter.h
-index de5b07d..e2e73dc 100644
---- a/src/adapter.h
-+++ b/src/adapter.h
-@@ -36,6 +36,7 @@
- #define INVALID_PASSKEY		0xffffffff
- 
- struct btd_adapter;
-+struct btd_device;
- 
- struct btd_adapter *btd_adapter_get_default(void);
- bool btd_adapter_is_default(struct btd_adapter *adapter);
-@@ -90,6 +91,8 @@ bool btd_adapter_get_connectable(struct btd_adapter *adapter);
- 
- uint32_t btd_adapter_get_class(struct btd_adapter *adapter);
- const char *btd_adapter_get_name(struct btd_adapter *adapter);
-+void btd_adapter_remove_device(struct btd_adapter *adapter,
-+				struct btd_device *dev);
- struct btd_device *btd_adapter_get_device(struct btd_adapter *adapter,
- 					const bdaddr_t *addr,
- 					uint8_t addr_type);
--- 
-1.8.5.3
+On Saturday, January 25, 2014, Marcel Holtmann <marcel@holtmann.org> wrote:
 
+> Hi Sebastian,
+>
+> > ---
+> > android/pts-a2dp.txt | 14 +++++++-------
+> > 1 file changed, 7 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+> > index a269ec1..c6eee62 100644
+> > --- a/android/pts-a2dp.txt
+> > +++ b/android/pts-a2dp.txt
+> > @@ -1,7 +1,7 @@
+> > PTS test results for A2DP
+> >
+> > PTS version: 5.0
+> > -Tested: --not yet tested--
+> > +Tested: 24.01.2014
+> >
+> > Results:
+> > PASS  test passed
+> > @@ -15,17 +15,17 @@ Test Name         Result  Notes
+> >
+> -------------------------------------------------------------------------=
+------
+> > TC_SRC_CC_BV_09_I     INC
+> > TC_SRC_CC_BV_10_I     N/A
+> > -TC_SRC_REL_BV_01_I   INC
+> > -TC_SRC_REL_BV_02_I   INC
+> > -TC_SRC_SET_BV_01_I   INC
+> > -TC_SRC_SET_BV_02_I   INC
+> > -TC_SRC_SET_BV_03_I   INC
+> > +TC_SRC_REL_BV_01_I   PASS
+> > +TC_SRC_REL_BV_02_I   PASS
+> > +TC_SRC_SET_BV_01_I   PASS
+> > +TC_SRC_SET_BV_02_I   PASS
+> > +TC_SRC_SET_BV_03_I   PASS
+> > TC_SRC_SET_BV_04_I    INC
+> > TC_SRC_SET_BV_05_I    INC
+> > TC_SRC_SET_BV_06_I    INC
+> > TC_SRC_SUS_BV_01_I    INC
+> > TC_SRC_SUS_BV_02_I    INC
+> > -TC_SRC_SDP_BV_01_I   INC
+> > +TC_SRC_SDP_BV_01_I   PASS
+> > TC_SRC_AS_BV_01_I     INC
+> > =97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=
+=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97
+>
+> can we extend the notes section with some sort of instructions that we
+> have to do on the IUT side. Even it is something simple like Play music o=
+r
+> just wait for incoming connections. This applies to all of out PTS
+> documentation of course.
+>
+> Regards
+>
+> Marcel
+
+
+ Sure. I'll keep adding such notes over next couple of weeks.
+
+Br,
+Sebastian
+
+
+--=20
+Seb/
+
+--14dae9399ab93e233e04f0c035b2
+Content-Type: text/html; charset=windows-1252
+Content-Transfer-Encoding: quoted-printable
+
+<br>On Saturday, January 25, 2014, Marcel Holtmann &lt;<a href=3D"mailto:ma=
+rcel@holtmann.org">marcel@holtmann.org</a>&gt; wrote:<br><blockquote class=
+=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
+ing-left:1ex">
+Hi Sebastian,<br>
+<br>
+&gt; ---<br>
+&gt; android/pts-a2dp.txt | 14 +++++++-------<br>
+&gt; 1 file changed, 7 insertions(+), 7 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt<br>
+&gt; index a269ec1..c6eee62 100644<br>
+&gt; --- a/android/pts-a2dp.txt<br>
+&gt; +++ b/android/pts-a2dp.txt<br>
+&gt; @@ -1,7 +1,7 @@<br>
+&gt; PTS test results for A2DP<br>
+&gt;<br>
+&gt; PTS version: 5.0<br>
+&gt; -Tested: --not yet tested--<br>
+&gt; +Tested: 24.01.2014<br>
+&gt;<br>
+&gt; Results:<br>
+&gt; PASS =A0test passed<br>
+&gt; @@ -15,17 +15,17 @@ Test Name =A0 =A0 =A0 =A0 Result =A0Notes<br>
+&gt; ----------------------------------------------------------------------=
+---------<br>
+&gt; TC_SRC_CC_BV_09_I =A0 =A0 INC<br>
+&gt; TC_SRC_CC_BV_10_I =A0 =A0 N/A<br>
+&gt; -TC_SRC_REL_BV_01_I =A0 INC<br>
+&gt; -TC_SRC_REL_BV_02_I =A0 INC<br>
+&gt; -TC_SRC_SET_BV_01_I =A0 INC<br>
+&gt; -TC_SRC_SET_BV_02_I =A0 INC<br>
+&gt; -TC_SRC_SET_BV_03_I =A0 INC<br>
+&gt; +TC_SRC_REL_BV_01_I =A0 PASS<br>
+&gt; +TC_SRC_REL_BV_02_I =A0 PASS<br>
+&gt; +TC_SRC_SET_BV_01_I =A0 PASS<br>
+&gt; +TC_SRC_SET_BV_02_I =A0 PASS<br>
+&gt; +TC_SRC_SET_BV_03_I =A0 PASS<br>
+&gt; TC_SRC_SET_BV_04_I =A0 =A0INC<br>
+&gt; TC_SRC_SET_BV_05_I =A0 =A0INC<br>
+&gt; TC_SRC_SET_BV_06_I =A0 =A0INC<br>
+&gt; TC_SRC_SUS_BV_01_I =A0 =A0INC<br>
+&gt; TC_SRC_SUS_BV_02_I =A0 =A0INC<br>
+&gt; -TC_SRC_SDP_BV_01_I =A0 INC<br>
+&gt; +TC_SRC_SDP_BV_01_I =A0 PASS<br>
+&gt; TC_SRC_AS_BV_01_I =A0 =A0 INC<br>
+&gt; =97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=
+=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97=97<br>
+<br>
+can we extend the notes section with some sort of instructions that we have=
+ to do on the IUT side. Even it is something simple like Play music or just=
+ wait for incoming connections. This applies to all of out PTS documentatio=
+n of course.<br>
+
+<br>
+Regards<br>
+<br>
+Marcel</blockquote><div><br></div><div>=A0Sure. I&#39;ll keep adding such n=
+otes over next couple of weeks.=A0</div><div><br></div><div>Br,=A0</div><di=
+v>Sebastian=A0</div><br><br>-- <br><div dir=3D"ltr">Seb/<br></div><br>
+
+--14dae9399ab93e233e04f0c035b2--
