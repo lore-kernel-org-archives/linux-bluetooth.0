@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 8/8] android/AVRCP: Add initial socket handling
-Date: Sun, 26 Jan 2014 15:55:46 -0800
-Message-Id: <1390780546-18402-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 7/8] android/AVCTP: Add avctp_set_destroy_cb
+Date: Sun, 26 Jan 2014 15:55:45 -0800
+Message-Id: <1390780546-18402-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390780546-18402-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390780546-18402-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,205 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds the initial socket listening and handling incoming connections.
+This adds avctp_set_destroy_cb that can be use to set a callback when
+the AVCTP has been disconnected.
 ---
- android/avctp.c |   5 +--
- android/avrcp.c | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 129 insertions(+), 4 deletions(-)
+ android/avctp.c | 13 +++++++++++++
+ android/avctp.h |  3 +++
+ 2 files changed, 16 insertions(+)
 
 diff --git a/android/avctp.c b/android/avctp.c
-index aaf9442..615fecf 100644
+index d7f047a..aaf9442 100644
 --- a/android/avctp.c
 +++ b/android/avctp.c
-@@ -861,10 +861,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
- 	handler = find_handler(control->handlers, avc->opcode);
- 	if (!handler) {
- 		DBG("handler not found for 0x%02x", avc->opcode);
--		/* FIXME:
--		 * packet_size += avrcp_handle_vendor_reject(&code, operands);
--		 */
--		avc->code = code;
-+		avc->code = AVC_CTYPE_REJECTED;
- 		goto done;
- 	}
- 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index a699865..485b485 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -28,6 +28,7 @@
- #include <stdbool.h>
- #include <glib.h>
- 
-+#include "btio/btio.h"
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
-@@ -36,6 +37,7 @@
- #include "avrcp.h"
- #include "hal-msg.h"
- #include "ipc.h"
-+#include "avctp.h"
- 
- #define L2CAP_PSM_AVCTP 0x17
- 
-@@ -46,6 +48,13 @@
- 
- static bdaddr_t adapter_addr;
- static uint32_t record_id = 0;
-+static GSList *devices = NULL;
-+static GIOChannel *server = NULL;
+@@ -175,6 +175,9 @@ struct avctp {
+ 	uint8_t key_quirks[256];
+ 	struct key_pressed key;
+ 	uint16_t version;
 +
-+struct avrcp_device {
-+	bdaddr_t	dst;
-+	struct avctp	*session;
-+};
- 
- static const struct ipc_handler cmd_handlers[] = {
++	avctp_destroy_cb_t destroy;
++	void *data;
  };
-@@ -118,14 +127,124 @@ static sdp_record_t *avrcp_record(void)
- 	return record;
+ 
+ struct avctp_passthrough_handler {
+@@ -1446,6 +1449,13 @@ int avctp_connect_browsing(struct avctp *session, int fd, size_t imtu,
+ 	return 0;
  }
  
-+static void avrcp_device_free(void *data)
++void avctp_set_destroy_cb(struct avctp *session, avctp_destroy_cb_t cb,
++							void *user_data)
 +{
-+	struct avrcp_device *dev = data;
-+
-+	if (dev->session)
-+		avctp_shutdown(dev->session);
-+
-+	devices = g_slist_remove(devices, dev);
-+	g_free(dev);
++	session->destroy = cb;
++	session->data = user_data;
 +}
 +
-+static struct avrcp_device *avrcp_device_new(const bdaddr_t *dst)
-+{
-+	struct avrcp_device *dev;
-+
-+	dev = g_new0(struct avrcp_device, 1);
-+	bacpy(&dev->dst, dst);
-+	devices = g_slist_prepend(devices, dev);
-+
-+	return dev;
-+}
-+
-+static int device_cmp(gconstpointer s, gconstpointer user_data)
-+{
-+	const struct avrcp_device *dev = s;
-+	const bdaddr_t *dst = user_data;
-+
-+	return bacmp(&dev->dst, dst);
-+}
-+
-+static void disconnect_cb(void *data)
-+{
-+	struct avrcp_device *dev = data;
-+
-+	DBG("");
-+
-+	dev->session = NULL;
-+
-+	avrcp_device_free(dev);
-+}
-+
-+static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	struct avrcp_device *dev;
-+	bdaddr_t src, dst;
-+	char address[18];
-+	uint16_t imtu, omtu;
-+	GError *gerr = NULL;
-+	GSList *l;
-+	int fd;
-+
-+	if (err) {
-+		error("%s", err->message);
-+		return;
-+	}
-+
-+	bt_io_get(chan, &gerr,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
-+			BT_IO_OPT_IMTU, &imtu,
-+			BT_IO_OPT_OMTU, &omtu,
-+			BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("%s", gerr->message);
-+		g_error_free(gerr);
-+		g_io_channel_shutdown(chan, TRUE, NULL);
-+		return;
-+	}
-+
-+	ba2str(&dst, address);
-+	DBG("Incoming connection from %s", address);
-+
-+	l = g_slist_find_custom(devices, &dst, device_cmp);
-+	if (l) {
-+		error("Unexpected connection");
-+		return;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(chan);
-+
-+	dev = avrcp_device_new(&dst);
-+	dev->session = avctp_new(fd, imtu, omtu, 0x0100);
-+
-+	if (!dev->session) {
-+		avrcp_device_free(dev);
-+		return;
-+	}
-+
-+	avctp_set_destroy_cb(dev->session, disconnect_cb, dev);
-+
-+	/* FIXME: get the real name of the device */
-+	avctp_init_uinput(dev->session, "bluetooth", address);
-+
-+	g_io_channel_set_close_on_unref(chan, FALSE);
-+
-+	DBG("%s connected", address);
-+}
-+
- bool bt_avrcp_register(const bdaddr_t *addr)
+ void avctp_shutdown(struct avctp *session)
  {
-+	GError *err = NULL;
- 	sdp_record_t *rec;
+ 	if (!session)
+@@ -1457,6 +1467,9 @@ void avctp_shutdown(struct avctp *session)
+ 	if (session->control)
+ 		avctp_channel_destroy(session->control);
  
- 	DBG("");
- 
- 	bacpy(&adapter_addr, addr);
- 
-+	server = bt_io_listen(connect_cb, NULL, NULL, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_PSM, L2CAP_PSM_AVCTP,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_INVALID);
-+	if (!server) {
-+		error("Failed to listen on AVDTP channel: %s", err->message);
-+		g_error_free(err);
-+		return false;
-+	}
++	if (session->destroy)
++		session->destroy(session->data);
 +
- 	rec = avrcp_record();
- 	if (!rec) {
- 		error("Failed to allocate AVRCP record");
-@@ -149,8 +268,17 @@ void bt_avrcp_unregister(void)
- {
- 	DBG("");
+ 	if (session->key.timer > 0)
+ 		g_source_remove(session->key.timer);
  
-+	g_slist_free_full(devices, avrcp_device_free);
-+	devices = NULL;
-+
- 	ipc_unregister(HAL_SERVICE_ID_AVRCP);
+diff --git a/android/avctp.h b/android/avctp.h
+index 99aaf95..a22bf13 100644
+--- a/android/avctp.h
++++ b/android/avctp.h
+@@ -103,6 +103,9 @@ typedef size_t (*avctp_browsing_pdu_cb) (struct avctp *session,
+ typedef void (*avctp_destroy_cb_t) (void *user_data);
  
- 	bt_adapter_remove_record(record_id);
- 	record_id = 0;
+ struct avctp *avctp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
++void avctp_set_destroy_cb(struct avctp *session, avctp_destroy_cb_t cb,
++							void *user_data);
 +
-+	if (server) {
-+		g_io_channel_shutdown(server, TRUE, NULL);
-+		g_io_channel_unref(server);
-+		server = NULL;
-+	}
- }
+ int avctp_init_uinput(struct avctp *session, const char *name,
+ 							const char *address);
+ int avctp_connect_browsing(struct avctp *session, int fd, size_t imtu,
 -- 
 1.8.4.2
 
