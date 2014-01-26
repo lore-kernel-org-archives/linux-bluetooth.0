@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 7/8] android/AVCTP: Add avctp_set_destroy_cb
-Date: Sun, 26 Jan 2014 15:55:45 -0800
-Message-Id: <1390780546-18402-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 3/8] android: Add initial skeleton for AVRCP in the daemon
+Date: Sun, 26 Jan 2014 15:55:41 -0800
+Message-Id: <1390780546-18402-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390780546-18402-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390780546-18402-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,160 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds avctp_set_destroy_cb that can be use to set a callback when
-the AVCTP has been disconnected.
 ---
- android/avctp.c | 13 +++++++++++++
- android/avctp.h |  3 +++
- 2 files changed, 16 insertions(+)
+ android/Android.mk                          |  1 +
+ android/Makefile.am                         |  1 +
+ plugins/external-dummy.c => android/avrcp.c | 32 ++++++++++++++++++++++-------
+ android/{hidhost.h => avrcp.h}              |  6 +++---
+ android/main.c                              | 11 ++++++++++
+ 5 files changed, 41 insertions(+), 10 deletions(-)
+ copy plugins/external-dummy.c => android/avrcp.c (62%)
+ copy android/{hidhost.h => avrcp.h} (84%)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index d7f047a..aaf9442 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -175,6 +175,9 @@ struct avctp {
- 	uint8_t key_quirks[256];
- 	struct key_pressed key;
- 	uint16_t version;
-+
-+	avctp_destroy_cb_t destroy;
-+	void *data;
- };
+diff --git a/android/Android.mk b/android/Android.mk
+index 5f2c1d4..169eba8 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -30,6 +30,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/avdtp.c \
+ 	bluez/android/a2dp.c \
+ 	bluez/android/avctp.c \
++	bluez/android/avrcp.c \
+ 	bluez/android/pan.c \
+ 	bluez/src/log.c \
+ 	bluez/src/shared/mgmt.c \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 88fe667..d4a76bb 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -34,6 +34,7 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				android/avdtp.h android/avdtp.c \
+ 				android/a2dp.h android/a2dp.c \
+ 				android/avctp.h android/avctp.c \
++				android/avrcp.h android/avrcp.c \
+ 				android/socket.h android/socket.c \
+ 				android/pan.h android/pan.c \
+ 				btio/btio.h btio/btio.c \
+diff --git a/plugins/external-dummy.c b/android/avrcp.c
+similarity index 62%
+copy from plugins/external-dummy.c
+copy to android/avrcp.c
+index 536ad06..a6fb5f5 100644
+--- a/plugins/external-dummy.c
++++ b/android/avrcp.c
+@@ -2,6 +2,9 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
+  *  This program is free software; you can redistribute it and/or modify
+  *  it under the terms of the GNU General Public License as published by
+  *  the Free Software Foundation; either version 2 of the License, or
+@@ -22,20 +25,35 @@
+ #include <config.h>
+ #endif
  
- struct avctp_passthrough_handler {
-@@ -1446,6 +1449,13 @@ int avctp_connect_browsing(struct avctp *session, int fd, size_t imtu,
- 	return 0;
+-#include "src/plugin.h"
++#include <stdbool.h>
++#include <glib.h>
++
++#include "lib/bluetooth.h"
+ #include "src/log.h"
++#include "avrcp.h"
++#include "hal-msg.h"
++#include "ipc.h"
++
++static bdaddr_t adapter_addr;
++
++static const struct ipc_handler cmd_handlers[] = {
++};
+ 
+-static int dummy_init(void)
++bool bt_avrcp_register(const bdaddr_t *addr)
+ {
+ 	DBG("");
+ 
+-	return 0;
++	bacpy(&adapter_addr, addr);
++
++	ipc_register(HAL_SERVICE_ID_AVRCP, cmd_handlers,
++						G_N_ELEMENTS(cmd_handlers));
++
++	return true;
  }
  
-+void avctp_set_destroy_cb(struct avctp *session, avctp_destroy_cb_t cb,
-+							void *user_data)
-+{
-+	session->destroy = cb;
-+	session->data = user_data;
-+}
-+
- void avctp_shutdown(struct avctp *session)
+-static void dummy_exit(void)
++void bt_avrcp_unregister(void)
  {
- 	if (!session)
-@@ -1457,6 +1467,9 @@ void avctp_shutdown(struct avctp *session)
- 	if (session->control)
- 		avctp_channel_destroy(session->control);
+ 	DBG("");
+-}
  
-+	if (session->destroy)
-+		session->destroy(session->data);
+-BLUETOOTH_PLUGIN_DEFINE(external_dummy, VERSION,
+-		BLUETOOTH_PLUGIN_PRIORITY_LOW, dummy_init, dummy_exit)
++	ipc_unregister(HAL_SERVICE_ID_AVRCP);
++}
+diff --git a/android/hidhost.h b/android/avrcp.h
+similarity index 84%
+copy from android/hidhost.h
+copy to android/avrcp.h
+index ea14446..6fe7fbf 100644
+--- a/android/hidhost.h
++++ b/android/avrcp.h
+@@ -2,7 +2,7 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
+- *  Copyright (C) 2013  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+  *
+  *
+  *  This program is free software; you can redistribute it and/or modify
+@@ -21,5 +21,5 @@
+  *
+  */
+ 
+-bool bt_hid_register(const bdaddr_t *addr);
+-void bt_hid_unregister(void);
++bool bt_avrcp_register(const bdaddr_t *addr);
++void bt_avrcp_unregister(void);
+diff --git a/android/main.c b/android/main.c
+index cdeb420..c6ada62 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -55,6 +55,7 @@
+ #include "ipc.h"
+ #include "a2dp.h"
+ #include "pan.h"
++#include "avrcp.h"
+ 
+ #define STARTUP_GRACE_SECONDS 5
+ #define SHUTDOWN_GRACE_SECONDS 10
+@@ -107,6 +108,13 @@ static void service_register(const void *buf, uint16_t len)
+ 		}
+ 
+ 		break;
++	case HAL_SERVICE_ID_AVRCP:
++		if (!bt_avrcp_register(&adapter_bdaddr)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
 +
- 	if (session->key.timer > 0)
- 		g_source_remove(session->key.timer);
- 
-diff --git a/android/avctp.h b/android/avctp.h
-index 99aaf95..a22bf13 100644
---- a/android/avctp.h
-+++ b/android/avctp.h
-@@ -103,6 +103,9 @@ typedef size_t (*avctp_browsing_pdu_cb) (struct avctp *session,
- typedef void (*avctp_destroy_cb_t) (void *user_data);
- 
- struct avctp *avctp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
-+void avctp_set_destroy_cb(struct avctp *session, avctp_destroy_cb_t cb,
-+							void *user_data);
-+
- int avctp_init_uinput(struct avctp *session, const char *name,
- 							const char *address);
- int avctp_connect_browsing(struct avctp *session, int fd, size_t imtu,
++		break;
+ 	default:
+ 		DBG("service %u not supported", m->service_id);
+ 		status = HAL_STATUS_FAILED;
+@@ -149,6 +157,9 @@ static void service_unregister(const void *buf, uint16_t len)
+ 	case HAL_SERVICE_ID_PAN:
+ 		bt_pan_unregister();
+ 		break;
++	case HAL_SERVICE_ID_AVRCP:
++		bt_avrcp_unregister();
++		break;
+ 	default:
+ 		/* This would indicate bug in HAL, as unregister should not be
+ 		 * called in init failed */
 -- 
 1.8.4.2
 
