@@ -2,51 +2,46 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ 4/4] emulator: Fix crash if socket(AF_ALG) is not supported by the kernel
-Date: Sat, 25 Jan 2014 21:44:02 -0400
-Message-Id: <1390700642-10482-5-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 3/4] android: Trivial replacement of tabs where spaces are expected
+Date: Sat, 25 Jan 2014 21:44:01 -0400
+Message-Id: <1390700642-10482-4-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1390700642-10482-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1390512281-26541-1-git-send-email-anderson.lizardo@openbossa.org>
  <1390700642-10482-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In this situation, smp_stop() was being called with NULL pointer.
-
-Crash detected by valgrind:
-
-==7925== Invalid read of size 4
-==7925==    at 0x8052F18: smp_stop (smp.c:480)
-==7925==    by 0x8052542: bthost_stop (bthost.c:2073)
-==7925==    by 0x805521D: hciemu_unref (hciemu.c:372)
-==7925==    by 0x8058C65: test_post_teardown (android-tester.c:464)
-==7925==    by 0x8055DE7: tester_teardown_complete (tester.c:533)
-==7925==    by 0x8055501: teardown_callback (tester.c:312)
-==7925==    by 0x408348F: g_idle_dispatch (gmain.c:5250)
-==7925==    by 0x4086A75: g_main_context_dispatch (gmain.c:3065)
-==7925==    by 0x4086E14: g_main_context_iterate.isra.23 (gmain.c:3712)
-==7925==    by 0x40872FA: g_main_loop_run (gmain.c:3906)
-==7925==    by 0x41744D2: (below main) (libc-start.c:226)
-==7925==  Address 0x8 is not stack'd, malloc'd or (recently) free'd
 ---
- emulator/bthost.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ android/android-tester.c | 2 +-
+ android/hidhost.c        | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index c4603ae..3ff2a36 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -2070,6 +2070,8 @@ bool bthost_connect_rfcomm(struct bthost *bthost, uint16_t handle,
- 
- void bthost_stop(struct bthost *bthost)
- {
--	smp_stop(bthost->smp_data);
--	bthost->smp_data = NULL;
-+	if (bthost->smp_data) {
-+		smp_stop(bthost->smp_data);
-+		bthost->smp_data = NULL;
-+	}
+diff --git a/android/android-tester.c b/android/android-tester.c
+index ba9137a..870ad8d 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -3459,7 +3459,7 @@ static void setup_hidhost_connect(const void *test_data)
+ 	bthost_write_scan_enable(bthost, 0x03);
  }
+ 
+-static void hid_discon_cb(bt_bdaddr_t *bd_addr,	bthh_connection_state_t state)
++static void hid_discon_cb(bt_bdaddr_t *bd_addr, bthh_connection_state_t state)
+ {
+ 	if (state == BTHH_CONN_STATE_DISCONNECTED)
+ 		tester_test_passed();
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 37b28a6..6d1088a 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -375,7 +375,7 @@ static void bt_hid_notify_get_report(struct hid_device *dev, uint8_t *buf,
+ 
+ 	if (!((buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_INPUT)) ||
+ 			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_OUTPUT)) ||
+-			(buf[0]	== (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
++			(buf[0] == (HID_MSG_DATA | HID_DATA_TYPE_FEATURE)))) {
+ 		ev = g_malloc0(ev_len);
+ 		ev->status = buf[0];
+ 		bdaddr2android(&dev->dst, ev->bdaddr);
 -- 
 1.8.3.2
 
