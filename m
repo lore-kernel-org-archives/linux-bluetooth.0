@@ -1,53 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3119819.bMHWn5I4f0@athlon>
-References: <1390575403-30860-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1390575403-30860-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<3119819.bMHWn5I4f0@athlon>
-Date: Sun, 26 Jan 2014 06:29:00 +0200
-Message-ID: <CABBYNZLzyQqZ+LQoB+C7A2UA2GiZQOMfjqvNsuCLRMtqHfgMMg@mail.gmail.com>
-Subject: Re: [PATCH 2/3] android/avdtp: Retry send on EAGAIN as well
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 4/4] emulator: Fix crash if socket(AF_ALG) is not supported by the kernel
+Date: Sat, 25 Jan 2014 21:44:02 -0400
+Message-Id: <1390700642-10482-5-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1390700642-10482-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1390512281-26541-1-git-send-email-anderson.lizardo@openbossa.org>
+ <1390700642-10482-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+In this situation, smp_stop() was being called with NULL pointer.
 
-On Sat, Jan 25, 2014 at 12:16 AM, Szymon Janc <szymon.janc@gmail.com> wrote:
-> Hi Andrei,
->
-> On Friday 24 January 2014 16:56:42 Andrei Emeltchenko wrote:
->> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->>
->> ---
->>  android/avdtp.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/android/avdtp.c b/android/avdtp.c
->> index 5da1206..1055bc1 100644
->> --- a/android/avdtp.c
->> +++ b/android/avdtp.c
->> @@ -444,7 +444,7 @@ static gboolean try_send(int sk, void *data, size_t len)
->>
->>       do {
->>               err = send(sk, data, len, 0);
->> -     } while (err < 0 && errno == EINTR);
->> +     } while (err < 0 && (errno == EINTR || errno == EAGAIN));
->>
->
-> This makes try_send() blocking, if this is ok then at least some explanation
-> in commit message would be welcome.
+Crash detected by valgrind:
 
-And if we want to block we should not set the socket as non-blocking
-in first place, Im not even sure this is easy to currently reproduce
-any case that would block since the command are quite small we would
-have to schedule several in a sequence but normally we can only have
-one command outstanding.
+==7925== Invalid read of size 4
+==7925==    at 0x8052F18: smp_stop (smp.c:480)
+==7925==    by 0x8052542: bthost_stop (bthost.c:2073)
+==7925==    by 0x805521D: hciemu_unref (hciemu.c:372)
+==7925==    by 0x8058C65: test_post_teardown (android-tester.c:464)
+==7925==    by 0x8055DE7: tester_teardown_complete (tester.c:533)
+==7925==    by 0x8055501: teardown_callback (tester.c:312)
+==7925==    by 0x408348F: g_idle_dispatch (gmain.c:5250)
+==7925==    by 0x4086A75: g_main_context_dispatch (gmain.c:3065)
+==7925==    by 0x4086E14: g_main_context_iterate.isra.23 (gmain.c:3712)
+==7925==    by 0x40872FA: g_main_loop_run (gmain.c:3906)
+==7925==    by 0x41744D2: (below main) (libc-start.c:226)
+==7925==  Address 0x8 is not stack'd, malloc'd or (recently) free'd
+---
+ emulator/bthost.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index c4603ae..3ff2a36 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -2070,6 +2070,8 @@ bool bthost_connect_rfcomm(struct bthost *bthost, uint16_t handle,
+ 
+ void bthost_stop(struct bthost *bthost)
+ {
+-	smp_stop(bthost->smp_data);
+-	bthost->smp_data = NULL;
++	if (bthost->smp_data) {
++		smp_stop(bthost->smp_data);
++		bthost->smp_data = NULL;
++	}
+ }
 -- 
-Luiz Augusto von Dentz
+1.8.3.2
+
