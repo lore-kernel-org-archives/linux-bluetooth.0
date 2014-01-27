@@ -1,30 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 27 Jan 2014 11:45:24 -0800
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Petri Gynther <pgynther@google.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Rename adapter_remove_device to btd_adapter_remove_device
+Message-ID: <20140127194524.GA12181@x220.p-661hnu-f1>
+References: <20140125005506.7AD85100900@puck.mtv.corp.google.com>
+ <20140125221329.GB14531@x220.p-661hnu-f1>
+ <CAGXr9JHEe+9gu-giUF=iH4LAv=FAAutYPeFY483DQU2r40wmkg@mail.gmail.com>
+ <20140127181307.GB7831@x220.p-661hnu-f1>
+ <CAGXr9JGm1OUnPHdM=m6nH66xQVjUgL=P3zmwJp-aj2f9whbEpQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20140127175956.GB2452@x220.p-661hnu-f1>
-References: <1390512281-26541-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1390700642-10482-1-git-send-email-anderson.lizardo@openbossa.org>
-	<1390700642-10482-5-git-send-email-anderson.lizardo@openbossa.org>
-	<20140127175956.GB2452@x220.p-661hnu-f1>
-Date: Mon, 27 Jan 2014 16:03:59 -0400
-Message-ID: <CAJdJm_MHvakZpy_j_X3ACOS9EegKyO8WKL45w5u4t_h2LOBXww@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/4] emulator: Fix crash if socket(AF_ALG) is not
- supported by the kernel
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CAGXr9JGm1OUnPHdM=m6nH66xQVjUgL=P3zmwJp-aj2f9whbEpQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Petri,
 
-On Mon, Jan 27, 2014 at 1:59 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> This patch has been applied. Thanks.
+On Mon, Jan 27, 2014, Petri Gynther wrote:
+> Once BlueZ host and the remote have been paired successfully the first
+> time, the remote has a key combination available that allows it to be
+> unpaired and reset to initial state. But, BlueZ won't know about that.
+> It still considers the remote paired. Thus, when the BD address
+> arrives to the IR-assist plugin again, the plugin needs to clear all
+> old state from BlueZ side and start over as if the device had never
+> been discovered before.
+> 
+> The old device removal and new device creation are handled in the
+> plugin, since the device creation part is not possible over D-Bus.
+> However, once the device is created, the pairing is handled in a
+> separate Python script.
 
-Any comments on the other patches that touch android/* files?
+Fair enough. I've now applied the patch.
 
-Best Regards,
--- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+Btw, please don't use top-posting on this list. It makes it difficult to
+track the discussion when we've got inline quoting and top posting mixed
+together.
+
+Johan
