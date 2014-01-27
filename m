@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] android/AVDTP: Make stream channel priority 5
-Date: Mon, 27 Jan 2014 15:41:48 -0800
-Message-Id: <1390866110-16184-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1390866110-16184-1-git-send-email-luiz.dentz@gmail.com>
-References: <1390866110-16184-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/4] android/AVDTP: Make signalling channel priority 6
+Date: Mon, 27 Jan 2014 15:41:47 -0800
+Message-Id: <1390866110-16184-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes channel priority 5 so it has higher priority than regular
-traffic but less than signalling channel.
+This makes signalling priority 6 so it can push commands before the
+stream channel, without this the stream channel may be schedule
+first and cause the signalling commands to timeout while waiting a slot.
 ---
  android/avdtp.c | 9 +++++++++
  1 file changed, 9 insertions(+)
 
 diff --git a/android/avdtp.c b/android/avdtp.c
-index 4cfffc8..23fe519 100644
+index 4abcd75..4cfffc8 100644
 --- a/android/avdtp.c
 +++ b/android/avdtp.c
-@@ -2833,10 +2833,19 @@ gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, int fd,
- 						size_t imtu, size_t omtu)
- {
- 	GIOChannel *io;
+@@ -2057,6 +2057,7 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+ 	struct avdtp *session;
+ 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+ 	int new_fd;
 +	int priority;
  
- 	if (stream != stream->session->pending_open)
- 		return FALSE;
+ 	new_fd = dup(fd);
+ 	if (new_fd < 0) {
+@@ -2064,6 +2065,14 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+ 		return NULL;
+ 	}
  
-+	priority = 5;
-+	if (setsockopt(fd, SOL_SOCKET, SO_PRIORITY, &priority,
-+						sizeof(priority)) < 0) {
++	priority = 6;
++	if (setsockopt(new_fd, SOL_SOCKET, SO_PRIORITY,
++			(const void *) &priority, sizeof(priority)) < 0) {
 +		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
 +									errno);
-+		return FALSE;
++		return NULL;
 +	}
 +
- 	io = g_io_channel_unix_new(fd);
- 
- 	handle_transport_connect(stream->session, io, imtu, omtu);
+ 	session = g_new0(struct avdtp, 1);
+ 	session->io = g_io_channel_unix_new(new_fd);
+ 	session->version = version;
 -- 
 1.8.4.2
 
