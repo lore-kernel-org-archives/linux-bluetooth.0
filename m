@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] android/hal-audio: Fix not handling EINTR errors
-Date: Mon, 27 Jan 2014 15:41:49 -0800
-Message-Id: <1390866110-16184-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] android/AVDTP: Make stream channel priority 5
+Date: Mon, 27 Jan 2014 15:41:48 -0800
+Message-Id: <1390866110-16184-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390866110-16184-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390866110-16184-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the kernel interrupts us while writting just try again.
+This makes channel priority 5 so it has higher priority than regular
+traffic but less than signalling channel.
 ---
- android/hal-audio.c | 22 ++++++++++++++++------
- 1 file changed, 16 insertions(+), 6 deletions(-)
+ android/avdtp.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 8d737ad..8a0737b 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -399,7 +399,7 @@ static void sbc_resume(void *codec_data)
- 	sbc_data->frames_sent = 0;
- }
- 
--static void write_media_packet(int fd, struct sbc_data *sbc_data,
-+static int write_media_packet(int fd, struct sbc_data *sbc_data,
- 				struct media_packet *mp, size_t data_len)
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 4cfffc8..23fe519 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2833,10 +2833,19 @@ gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, int fd,
+ 						size_t imtu, size_t omtu)
  {
- 	struct timespec cur;
-@@ -407,10 +407,13 @@ static void write_media_packet(int fd, struct sbc_data *sbc_data,
- 	unsigned expected_frames;
- 	int ret;
+ 	GIOChannel *io;
++	int priority;
  
--	ret = write(fd, mp, sizeof(*mp) + data_len);
--	if (ret < 0) {
--		int err = errno;
--		error("SBC: failed to write data: %d (%s)", err, strerror(err));
-+	while (true) {
-+		ret = write(fd, mp, sizeof(*mp) + data_len);
-+		if (ret >= 0)
-+			break;
+ 	if (stream != stream->session->pending_open)
+ 		return FALSE;
+ 
++	priority = 5;
++	if (setsockopt(fd, SOL_SOCKET, SO_PRIORITY, &priority,
++						sizeof(priority)) < 0) {
++		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
++									errno);
++		return FALSE;
++	}
 +
-+		if (errno != EINTR)
-+			return -errno;
- 	}
+ 	io = g_io_channel_unix_new(fd);
  
- 	sbc_data->frames_sent += mp->payload.frame_count;
-@@ -432,6 +435,8 @@ static void write_media_packet(int fd, struct sbc_data *sbc_data,
- 	if (sbc_data->frames_sent >= expected_frames)
- 		usleep(sbc_data->frame_duration *
- 				mp->payload.frame_count);
-+
-+	return ret;
- }
- 
- static ssize_t sbc_write_data(void *codec_data, const void *buffer,
-@@ -474,7 +479,12 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
- 		 */
- 		if (mp->payload.frame_count == sbc_data->frames_per_packet ||
- 				bytes == consumed) {
--			write_media_packet(fd, sbc_data, mp, encoded);
-+			ret = write_media_packet(fd, sbc_data, mp, encoded);
-+			if (ret < 0) {
-+				error("SBC: failed to write data: %d (%s)", ret,
-+								strerror(ret));
-+				break;
-+			}
- 
- 			encoded = 0;
- 			free_space = sbc_data->out_buf_size - sizeof(*mp);
+ 	handle_transport_connect(stream->session, io, imtu, omtu);
 -- 
 1.8.4.2
 
