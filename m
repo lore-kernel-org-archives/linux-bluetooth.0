@@ -1,30 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 4/4] emulator: Fix crash if socket(AF_ALG) is not supported by the kernel
-Date: Mon, 27 Jan 2014 21:52:52 +0100
-Message-ID: <57954003.qHnYYJdjKE@leonov>
-In-Reply-To: <CAJdJm_MHvakZpy_j_X3ACOS9EegKyO8WKL45w5u4t_h2LOBXww@mail.gmail.com>
-References: <1390512281-26541-1-git-send-email-anderson.lizardo@openbossa.org> <20140127175956.GB2452@x220.p-661hnu-f1> <CAJdJm_MHvakZpy_j_X3ACOS9EegKyO8WKL45w5u4t_h2LOBXww@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <7AF5DE79-4CEA-453C-895C-EF03DE9205B8@holtmann.org>
+References: <1390854261-5325-1-git-send-email-luiz.dentz@gmail.com>
+	<7AF5DE79-4CEA-453C-895C-EF03DE9205B8@holtmann.org>
+Date: Mon, 27 Jan 2014 12:44:22 -0800
+Message-ID: <CABBYNZKttkV3X+7M4QB6oZCx1F_jfRZ+aZKpmngw=A57uKAOWw@mail.gmail.com>
+Subject: Re: [RFC BlueZ] android/AVDTP: Make signalling channel high priority
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On Monday 27 of January 2014 16:03:59 Anderson Lizardo wrote:
-> Hi Johan,
-> 
-> On Mon, Jan 27, 2014 at 1:59 PM, Johan Hedberg <johan.hedberg@gmail.com> 
-wrote:
-> > This patch has been applied. Thanks.
-> 
-> Any comments on the other patches that touch android/* files?
+On Mon, Jan 27, 2014 at 12:40 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Luiz,
+>
+>> This makes signalling high priority (6) so it can push commands before
+>> the stream channel, without this the stream channel may be schedule
+>> first and cause the signalling commands to timeout while waiting a slot.
+>> ---
+>> android/avdtp.c | 9 +++++++++
+>> 1 file changed, 9 insertions(+)
+>>
+>> diff --git a/android/avdtp.c b/android/avdtp.c
+>> index 4abcd75..4cfffc8 100644
+>> --- a/android/avdtp.c
+>> +++ b/android/avdtp.c
+>> @@ -2057,6 +2057,7 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>>       struct avdtp *session;
+>>       GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+>>       int new_fd;
+>> +     int priority;
+>>
+>>       new_fd = dup(fd);
+>>       if (new_fd < 0) {
+>> @@ -2064,6 +2065,14 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>>               return NULL;
+>>       }
+>>
+>> +     priority = 6;
+>> +     if (setsockopt(new_fd, SOL_SOCKET, SO_PRIORITY,
+>> +                     (const void *) &priority, sizeof(priority)) < 0) {
+>> +             error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
+>> +                                                                     errno);
+>> +             return NULL;
+>> +     }
+>> +
+>
+> I think we should make it one higher than the media channel. If we are currently using priority 6 on the media channel than this should be 7. If 7 is not possible, then we might degrade the media channel to 5.
 
-Applied as well, thanks.
+Setting anything bigger than 6 requires CAP_NET_ADMIN so it would
+requires unit tests to run with it, perhaps we can do some logic that
+checks if we can over 6 or not depending on what capabilities we have.
+
 
 -- 
-BR
-Szymon Janc
+Luiz Augusto von Dentz
