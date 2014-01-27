@@ -1,69 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: Paired LE HoG devices are unable to reconnect to BlueZ host when discovery is active
+Subject: Re: [PATCH BlueZ v4 01/18] doc: Add GATT API
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAGXr9JEPv+onq6+WZTJ46oRtnrOJBPVQToKA82E84Sg9eSOP5A@mail.gmail.com>
-Date: Mon, 27 Jan 2014 19:35:51 +0100
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <0917292A-A70F-44FB-ABBD-1C0F52A1FC15@holtmann.org>
-References: <CAGXr9JEPv+onq6+WZTJ46oRtnrOJBPVQToKA82E84Sg9eSOP5A@mail.gmail.com>
-To: Petri Gynther <pgynther@google.com>
+In-Reply-To: <1390845656-29880-2-git-send-email-claudio.takahasi@openbossa.org>
+Date: Mon, 27 Jan 2014 19:15:15 +0100
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <FC28B407-F3B2-4969-A5FD-35AB73316DF5@holtmann.org>
+References: <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org> <1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org> <1390845656-29880-2-git-send-email-claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi Claudio,
 
-> With BlueZ 5.13, I've noticed that previously paired LE HoG devices
-> are unable to reconnect to the host when device discovery is active on
-> the BT interface.
+> This patch proposes an unified GATT API for local and remote services.
+> ---
+> doc/gatt-api.txt | 145 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 145 insertions(+)
+> create mode 100644 doc/gatt-api.txt
 > 
-> Steps to reproduce:
-> 1. Pair LE HoG device with BlueZ 5.13 host.
-> 2. Verify that keypresses from HoG device are delivered to uHID input pipeline.
-> 3. Let HoG device disconnect from host (due to inactivity timeout).
-> 4. Press key on HoG device. At this point, it reconnects to host fine.
-> 5. Let HoG device disconnect from host again.
-> 6. Start "test-discovery" script.
-> 7. Press key on HoG device => it does not reconnect to host.
-> 8. Kill "test-discovery" script.
-> 9. Press key on HoG device => it now reconnects to host successfully.
-> 
-> It looks to me that the root cause is in src/adapter.c:update_found_devices()
-> 
->        /*
->         * Only if at least one client has requested discovery, maintain
->         * list of found devices and name confirming for legacy devices.
->         * Otherwise, this is an event from passive discovery and we
->         * should check if the device needs connecting to.
->         */
->        if (!adapter->discovery_list)
->                goto connect_le;
-> 
->        if (g_slist_find(adapter->discovery_found, dev))
->                return;
-> 
-> When (active) discovery is on, adapter->discovery_list != NULL, and
-> g_slist_find(adapter->discovery_found, dev) will obviously find this
-> device since it is already paired. So, we end up returning from the
-> function without an attempt to reconnect to the previously paired LE
-> device.
-> 
-> What would be the right fix here? Stop discovery before attempting to
-> reconnect to the LE device?
+> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+> new file mode 100644
+> index 0000000..2d92f03
+> --- /dev/null
+> +++ b/doc/gatt-api.txt
+> @@ -0,0 +1,145 @@
+> +BlueZ D-Bus GATT API description
+> +********************************
+> +
+> +GATT local and remote services share the same high-level D-Bus API. Local
+> +refers to GATT based service exported by a BlueZ plugin or an external
+> +application. Remote refers to GATT services exported by the peer.
+> +
+> +BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
+> +Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
+> +external services to allow seamless GATT declarations (Service, Characteristic
+> +and Descriptors) discovery.
+> +
+> +Service hierarchy
+> +=================
+> +
+> +GATT remote and local service representation. Object path for local services
+> +is freely definable.
+> +
+> +External applications implementing local services must register the services
+> +using GattManager1 registration method and must implement the methods and
+> +properties defined in GattService1 interface.
+> +
+> +Service		org.bluez
+> +Interface	org.bluez.GattService1 [Experimental]
+> +Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
+> +
+> +Methods		void Release()
+> +
+> +			Release this service. At this point, it will not be
+> +			used by BlueZ anymore and can be destroyed by the
+> +			owner. Method applicable to external GATT services
+> +			implementations only (GATT servers).
 
-I think that the intention was to allow the active discovery complete before we try to connect to any known devices. You are obviously correct that a known device is as good when it is found during active discovery as when found during background scan.
+so this is the part I do not like that much. We should not define an interface that has a method that is valid and used only when this is a GATT server.
 
-So I get the feeling that what should happen is that if we find a known device during the discovery phase (I am talking about the phase from mgmt in the kernel), put it on the list of to be connected devices. Once the kernel completes its discovery, then attempt to connect that found devices. After that continue with the discovery.
+What I am thinking right now (and might need to discuss this a bit further), we leave GattService1 without any methods and use it for both GATT client and server.
 
-Remember that the kernel discovery phase it one-time shot and the one triggered from D-Bus is continues. I think that is why you are seeing this problem in the first place.
+Then we create some GattServiceAgent1 or GattServiceCollection1 or maybe even GattServer1 that we can register with GattManager1 for the purpose of providing a Release method so that bluetoothd stays in control and can inform applications if it decided to remove a service.
 
-This is something that the auto-connect patches for the kernel would obviously fix. Since that is the right place to get this fixed. Inside bluetoothd this gets a bit messy, but we should do our best to interrupt the discovery phase to allow auto-connections.
-
-Just a small warning that this of course only possible for controllers that support scanning and connections at the same time. For some controllers this would be clearly limited. Not that I have seen these controllers used, but potentially they could exist.
-
-That is the best answer I have right now. So yes, we should get this fixed since that behavior is just not helpful for general usage.
+I am even fine with allowing to provide multiple services in a collection/server registration. Thoughts?
 
 Regards
 
