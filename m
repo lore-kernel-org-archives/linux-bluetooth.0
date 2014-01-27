@@ -3,9 +3,9 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
 	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v5 07/18] gatt: Add external services tracking
-Date: Mon, 27 Jan 2014 17:35:13 -0300
-Message-Id: <1390854924-31904-8-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v5 10/18] gatt: Register ATT command/event handler
+Date: Mon, 27 Jan 2014 17:35:16 -0300
+Message-Id: <1390854924-31904-11-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
@@ -14,179 +14,122 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-All primary services declarations provided by an external application
-will be automatically inserted in the attribute database.
+This patch registers the ATT channel handler to manage incoming ATT
+commands and events.
 ---
- src/gatt-dbus.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+ src/gatt.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 82 insertions(+), 2 deletions(-)
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index fd614f9..000d7ae 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -39,15 +39,21 @@
- #include "log.h"
- 
- #include "error.h"
-+#include "gatt.h"
- #include "gatt-dbus.h"
- 
- #define GATT_MGR_IFACE			"org.bluez.GattManager1"
-+#define SERVICE_IFACE			"org.bluez.GattService1"
-+
-+#define REGISTER_TIMER         1
- 
- struct external_app {
- 	char *owner;
- 	char *path;
- 	GDBusClient *client;
-+	GSList *proxies;
- 	unsigned int watch;
-+	guint register_timer;
- };
- 
- static GSList *external_apps;
-@@ -60,6 +66,36 @@ static int external_app_path_cmp(gconstpointer a, gconstpointer b)
- 	return g_strcmp0(eapp->path, path);
+diff --git a/src/gatt.c b/src/gatt.c
+index 7a595c6..f5c1df7 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -98,10 +98,85 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	return attr;
  }
  
-+static void proxy_added(GDBusProxy *proxy, void *user_data)
++static int send_error(int sk, uint8_t opcode, uint16_t handle, uint8_t ecode)
 +{
-+	struct external_app *eapp = user_data;
-+	const char *interface, *path;
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	size_t plen;
 +
-+	interface = g_dbus_proxy_get_interface(proxy);
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	DBG("path %s iface %s", path, interface);
-+
-+	if (g_strcmp0(interface, SERVICE_IFACE) != 0)
-+		return;
-+
-+	eapp->proxies = g_slist_append(eapp->proxies, proxy);
++	plen = enc_error_resp(opcode, handle, ecode, pdu, sizeof(pdu));
++	return write(sk, pdu, plen);
 +}
 +
-+static void proxy_removed(GDBusProxy *proxy, void *user_data)
++static bool channel_handler_cb(struct io *io, void *user_data)
 +{
-+	struct external_app *eapp = user_data;
-+	const char *interface, *path;
++	uint8_t ipdu[ATT_DEFAULT_LE_MTU];
++	ssize_t ilen;
++	int sk = io_get_fd(io);
 +
-+	interface = g_dbus_proxy_get_interface(proxy);
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	DBG("path %s iface %s", path, interface);
-+
-+	eapp->proxies = g_slist_remove(eapp->proxies, proxy);
-+}
-+
-+
- static void external_app_watch_destroy(gpointer user_data)
- {
- 	struct external_app *eapp = user_data;
-@@ -70,6 +106,9 @@ static void external_app_watch_destroy(gpointer user_data)
- 
- 	g_dbus_client_unref(eapp->client);
- 
-+	if (eapp->register_timer)
-+		g_source_remove(eapp->register_timer);
-+
- 	g_free(eapp->owner);
- 	g_free(eapp->path);
- 	g_free(eapp);
-@@ -99,9 +138,75 @@ static struct external_app *new_external_app(DBusConnection *conn,
- 	eapp->client = client;
- 	eapp->path = g_strdup(path);
- 
-+	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
-+								NULL, eapp);
-+
- 	return eapp;
- }
- 
-+static int register_external_service(GDBusProxy *proxy)
-+{
-+	DBusMessageIter iter;
-+	const char *uuid;
-+	bt_uuid_t btuuid;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-+		return -EINVAL;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return -EINVAL;
-+
-+	dbus_message_iter_get_basic(&iter, &uuid);
-+
-+	if (bt_string_to_uuid(&btuuid, uuid) < 0)
-+		return -EINVAL;
-+
-+	if (btd_gatt_add_service(&btuuid) == NULL)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static gboolean finish_register(gpointer user_data)
-+{
-+	struct external_app *eapp = user_data;
-+	GSList *list;
-+
-+	/*
-+	 * It is not possible to detect when the last proxy object
-+	 * was reported. "Proxy added" handler reports objects
-+	 * added on demand or returned by GetManagedObjects().
-+	 * This timer helps to register all the GATT declarations
-+	 * (services, characteristics and descriptors) after fetching
-+	 * all the D-Bus objects.
-+	 */
-+
-+	eapp->register_timer = 0;
-+
-+	for (list = eapp->proxies; list; list = g_slist_next(list)) {
-+		const char *interface, *path;
-+		GDBusProxy *proxy = list->data;
-+
-+		interface = g_dbus_proxy_get_interface(proxy);
-+		path = g_dbus_proxy_get_path(proxy);
-+
-+		if (g_strcmp0(SERVICE_IFACE, interface) != 0)
-+			continue;
-+
-+		if (g_strcmp0(path, eapp->path) != 0)
-+			continue;
-+
-+		if (register_external_service(proxy) < 0) {
-+			DBG("Inconsistent external service: %s", path);
-+			continue;
-+		}
-+
-+		DBG("External service: %s", path);
++	ilen = read(sk, ipdu, sizeof(ipdu));
++	if (ilen < 0) {
++		int err = errno;
++		DBG("ATT channel read: %s(%d)", strerror(err), err);
++		return false;
 +	}
 +
-+	return FALSE;
++	switch (ipdu[0]) {
++	case ATT_OP_ERROR:
++		break;
++
++	/* Requests */
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_SIGNED_WRITE_CMD:
++		send_error(sk, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
++		break;
++
++	/* Responses */
++	case ATT_OP_MTU_RESP:
++	case ATT_OP_FIND_INFO_RESP:
++	case ATT_OP_FIND_BY_TYPE_RESP:
++	case ATT_OP_READ_BY_TYPE_RESP:
++	case ATT_OP_READ_RESP:
++	case ATT_OP_READ_BLOB_RESP:
++	case ATT_OP_READ_MULTI_RESP:
++	case ATT_OP_READ_BY_GROUP_RESP:
++	case ATT_OP_WRITE_RESP:
++	case ATT_OP_PREP_WRITE_RESP:
++	case ATT_OP_EXEC_WRITE_RESP:
++	case ATT_OP_HANDLE_CNF:
++		break;
++
++	/* Notification & Indication */
++	case ATT_OP_HANDLE_NOTIFY:
++	case ATT_OP_HANDLE_IND:
++		break;
++	}
++
++	return true;
 +}
 +
- static DBusMessage *register_service(DBusConnection *conn,
- 					DBusMessage *msg, void *user_data)
- {
-@@ -109,6 +214,8 @@ static DBusMessage *register_service(DBusConnection *conn,
- 	DBusMessageIter iter;
- 	const char *path;
- 
-+	DBG("Registering GATT Service");
++static void channel_watch_destroy(void *user_data)
++{
++	struct io *io = user_data;
 +
- 	if (!dbus_message_iter_init(msg, &iter))
- 		return btd_error_invalid_args(msg);
++	io_destroy(io);
++}
++
+ static bool unix_accept_cb(struct io *io, void *user_data)
+ {
+ 	struct sockaddr_un uaddr;
+ 	socklen_t len = sizeof(uaddr);
++	struct io *nio;
+ 	int err, nsk, sk;
  
-@@ -127,6 +234,8 @@ static DBusMessage *register_service(DBusConnection *conn,
- 	external_apps = g_slist_prepend(external_apps, eapp);
+ 	sk = io_get_fd(io);
+@@ -110,12 +185,17 @@ static bool unix_accept_cb(struct io *io, void *user_data)
+ 	if (nsk < 0) {
+ 		err = errno;
+ 		error("ATT UNIX socket accept: %s(%d)", strerror(err), err);
+-		return TRUE;
++		return true;
+ 	}
  
- 	DBG("New app %p: %s", eapp, path);
-+	eapp->register_timer = g_timeout_add_seconds(REGISTER_TIMER,
-+							finish_register, eapp);
+ 	DBG("ATT UNIX socket: %d", nsk);
++	nio = io_new(nsk);
++
++	io_set_close_on_destroy(nio, true);
++	io_set_read_handler(nio, channel_handler_cb, nio,
++						channel_watch_destroy);
  
- 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+-	return TRUE;
++	return true;
  }
+ 
+ void gatt_init(void)
 -- 
 1.8.3.1
 
