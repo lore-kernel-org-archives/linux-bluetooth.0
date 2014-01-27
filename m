@@ -1,37 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Fix respecting le_default_mps value
-Date: Mon, 27 Jan 2014 15:11:33 -0800
-Message-Id: <1390864295-4259-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 4/4] emulator: Fix crash if socket(AF_ALG) is not supported by the kernel
+Date: Mon, 27 Jan 2014 21:52:52 +0100
+Message-ID: <57954003.qHnYYJdjKE@leonov>
+In-Reply-To: <CAJdJm_MHvakZpy_j_X3ACOS9EegKyO8WKL45w5u4t_h2LOBXww@mail.gmail.com>
+References: <1390512281-26541-1-git-send-email-anderson.lizardo@openbossa.org> <20140127175956.GB2452@x220.p-661hnu-f1> <CAJdJm_MHvakZpy_j_X3ACOS9EegKyO8WKL45w5u4t_h2LOBXww@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-There's a le_default_mps variable that can be modified through debugfs
-but it was never actually used for determining our MPS value. This patch
-fixes the MPS initialization to use the variable instead of a fixed
-value.
+On Monday 27 of January 2014 16:03:59 Anderson Lizardo wrote:
+> Hi Johan,
+> 
+> On Mon, Jan 27, 2014 at 1:59 PM, Johan Hedberg <johan.hedberg@gmail.com> 
+wrote:
+> > This patch has been applied. Thanks.
+> 
+> Any comments on the other patches that touch android/* files?
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Applied as well, thanks.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index cc340700573e..5a30fc72f4ba 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -482,7 +482,7 @@ static void l2cap_le_flowctl_init(struct l2cap_chan *chan)
- 	chan->sdu_len = 0;
- 	chan->tx_credits = 0;
- 	chan->rx_credits = le_max_credits;
--	chan->mps = min_t(u16, chan->imtu, L2CAP_LE_DEFAULT_MPS);
-+	chan->mps = min_t(u16, chan->imtu, le_default_mps);
- 
- 	skb_queue_head_init(&chan->tx_q);
- }
 -- 
-1.8.5.3
-
+BR
+Szymon Janc
