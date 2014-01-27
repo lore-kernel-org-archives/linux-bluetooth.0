@@ -2,137 +2,182 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v5 06/18] gatt: Add helper for creating GATT services
-Date: Mon, 27 Jan 2014 17:35:12 -0300
-Message-Id: <1390854924-31904-7-git-send-email-claudio.takahasi@openbossa.org>
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v5 03/18] gatt: Register Manager D-Bus Interface
+Date: Mon, 27 Jan 2014 17:35:09 -0300
+Message-Id: <1390854924-31904-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-This patch adds the btd_gatt_add_service() helper which adds a
-GATT Service declaration to the local attribute database.
+This patch registers GATT Service Manager D-Bus Interface. This
+interface implements the methods to allow external application register
+and unregister GATT Services.
 ---
- lib/uuid.h |  5 +++++
- src/gatt.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h | 10 ++++++++++
- 3 files changed, 74 insertions(+)
+ Makefile.am     |  1 +
+ src/gatt-dbus.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt-dbus.h | 25 +++++++++++++++++++
+ src/gatt.c      |  9 +++++++
+ 4 files changed, 110 insertions(+)
+ create mode 100644 src/gatt-dbus.c
+ create mode 100644 src/gatt-dbus.h
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index c24cee5..237145b 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -158,6 +158,11 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
- int bt_uuid_to_string(const bt_uuid_t *uuid, char *str, size_t n);
- int bt_string_to_uuid(bt_uuid_t *uuid, const char *string);
- 
-+static inline int bt_uuid_len(const bt_uuid_t *uuid)
+diff --git a/Makefile.am b/Makefile.am
+index 101d5de..fbae2c8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/adapter.h src/adapter.c \
+ 			src/profile.h src/profile.c \
+ 			src/service.h src/service.c \
++			src/gatt-dbus.h src/gatt-dbus.c \
+ 			src/gatt.h src/gatt.c \
+ 			src/device.h src/device.c src/attio.h \
+ 			src/dbus-common.c src/dbus-common.h \
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+new file mode 100644
+index 0000000..183c611
+--- /dev/null
++++ b/src/gatt-dbus.c
+@@ -0,0 +1,75 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdint.h>
++
++#include <glib.h>
++#include <dbus/dbus.h>
++#include <gdbus/gdbus.h>
++
++#include "dbus-common.h"
++#include "log.h"
++
++#include "gatt-dbus.h"
++
++#define GATT_MGR_IFACE			"org.bluez.GattManager1"
++
++static DBusMessage *register_service(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
 +{
-+	return uuid->type / 8;
++	return dbus_message_new_method_return(msg);
 +}
 +
- #ifdef __cplusplus
- }
- #endif
-diff --git a/src/gatt.c b/src/gatt.c
-index e8b691a..f7b74d6 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -28,10 +28,69 @@
- #include <glib.h>
- 
- #include "log.h"
-+#include "lib/uuid.h"
-+#include "attrib/att.h"
- 
- #include "gatt-dbus.h"
- #include "gatt.h"
- 
-+/* Common GATT UUIDs */
-+static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
-+					.value.u16 = GATT_PRIM_SVC_UUID };
++static DBusMessage *unregister_service(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	return dbus_message_new_method_return(msg);
++}
 +
-+struct btd_attribute {
-+	uint16_t handle;
-+	bt_uuid_t type;
-+	uint16_t value_len;
-+	uint8_t value[0];
++static const GDBusMethodTable methods[] = {
++	{ GDBUS_EXPERIMENTAL_METHOD("RegisterService",
++				GDBUS_ARGS({ "service", "o"},
++						{ "options", "a{sv}"}),
++				NULL, register_service) },
++	{ GDBUS_EXPERIMENTAL_METHOD("UnregisterService",
++				GDBUS_ARGS({"service", "o"}),
++				NULL, unregister_service) },
++	{ }
 +};
 +
-+static GList *local_attribute_db;
-+static uint16_t next_handle = 0x0001;
-+
-+static int local_database_add(uint16_t handle, struct btd_attribute *attr)
++gboolean gatt_dbus_manager_register(void)
 +{
-+	attr->handle = handle;
-+
-+	local_attribute_db = g_list_append(local_attribute_db, attr);
-+
-+	return 0;
++	return g_dbus_register_interface(btd_get_dbus_connection(),
++					"/org/bluez", GATT_MGR_IFACE,
++					methods, NULL, NULL, NULL, NULL);
 +}
 +
-+struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
++void gatt_dbus_manager_unregister(void)
 +{
-+	uint16_t len = bt_uuid_len(uuid);
-+	struct btd_attribute *attr = g_malloc0(sizeof(struct btd_attribute) +
-+									len);
-+
-+	/*
-+	 * Service DECLARATION
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +-------+---------------------------------+
-+	 * |0x2800 | 0xYYYY...                       |
-+	 * | (1)   | (2)                             |
-+	 * +------+----------------------------------+
-+	 * (1) - 2 octets: Primary/Secondary Service UUID
-+	 * (2) - 2 or 16 octets: Service UUID
-+	 */
-+
-+	attr->type = primary_uuid;
-+
-+	att_put_uuid(*uuid, attr->value);
-+	attr->value_len = len;
-+
-+	if (local_database_add(next_handle, attr) < 0) {
-+		g_free(attr);
-+		return NULL;
-+	}
-+
-+	/* TODO: missing overflow checking */
-+	next_handle = next_handle + 1;
-+
-+	return attr;
++	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
++							GATT_MGR_IFACE);
 +}
+diff --git a/src/gatt-dbus.h b/src/gatt-dbus.h
+new file mode 100644
+index 0000000..310cfa9
+--- /dev/null
++++ b/src/gatt-dbus.h
+@@ -0,0 +1,25 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
++gboolean gatt_dbus_manager_register(void);
++void gatt_dbus_manager_unregister(void);
+diff --git a/src/gatt.c b/src/gatt.c
+index 06619f0..e8b691a 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -25,14 +25,23 @@
+ #include <config.h>
+ #endif
+ 
++#include <glib.h>
++
++#include "log.h"
++
++#include "gatt-dbus.h"
+ #include "gatt.h"
+ 
  void gatt_init(void)
  {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 3a320b4..8dd1312 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -21,6 +21,16 @@
-  *
-  */
++	DBG("Starting GATT server");
  
-+struct btd_attribute;
-+
- void gatt_init(void);
++	gatt_dbus_manager_register();
+ }
  
- void gatt_cleanup(void);
-+
-+/* btd_gatt_add_service - Add a service declaration to local attribute database.
-+ * @uuid:	Service UUID.
-+ *
-+ * Returns a reference to service declaration attribute. In case of error,
-+ * NULL is returned.
-+ */
-+struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
+ void gatt_cleanup(void)
+ {
++	DBG("Stopping GATT server");
+ 
++	gatt_dbus_manager_unregister();
+ }
 -- 
 1.8.3.1
 
