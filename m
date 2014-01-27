@@ -1,107 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <FC28B407-F3B2-4969-A5FD-35AB73316DF5@holtmann.org>
-References: <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1390845656-29880-2-git-send-email-claudio.takahasi@openbossa.org>
-	<FC28B407-F3B2-4969-A5FD-35AB73316DF5@holtmann.org>
-Date: Mon, 27 Jan 2014 16:54:37 -0200
-Message-ID: <CAKT1EBfkLuwMgQbm0TQfuGvWf=w7TN5LnzmMwdP+_zU86e6wmA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v4 01/18] doc: Add GATT API
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1390838375-25264-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <CAJdJm_P5JwjNhRuqz0gFYJ7QZMPmcHNVSvSa+SAQ11ftM8z0WQ@mail.gmail.com>
+	<1390838375-25264-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 27 Jan 2014 10:41:41 -0800
+Message-ID: <CABBYNZKvqzGQ_HcD3ZtSxMDz5SOvtphFSJ-5G70TposwoDjYcA@mail.gmail.com>
+Subject: Re: [PATCHv2] avctp: Fix unchecked return value
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel:
+Hi Andrei,
 
-On Mon, Jan 27, 2014 at 3:15 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
-> Hi Claudio,
+On Mon, Jan 27, 2014 at 7:59 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
->> This patch proposes an unified GATT API for local and remote services.
->> ---
->> doc/gatt-api.txt | 145 +++++++++++++++++++++++++++++++++++++++++++++++++=
-++++++
->> 1 file changed, 145 insertions(+)
->> create mode 100644 doc/gatt-api.txt
->>
->> diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
->> new file mode 100644
->> index 0000000..2d92f03
->> --- /dev/null
->> +++ b/doc/gatt-api.txt
->> @@ -0,0 +1,145 @@
->> +BlueZ D-Bus GATT API description
->> +********************************
->> +
->> +GATT local and remote services share the same high-level D-Bus API. Loc=
-al
->> +refers to GATT based service exported by a BlueZ plugin or an external
->> +application. Remote refers to GATT services exported by the peer.
->> +
->> +BlueZ acts as a proxy, translating ATT operations to D-Bus method calls=
- and
->> +Properties (or the opposite). Support for D-Bus Object Manager is manda=
-tory for
->> +external services to allow seamless GATT declarations (Service, Charact=
-eristic
->> +and Descriptors) discovery.
->> +
->> +Service hierarchy
->> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> +
->> +GATT remote and local service representation. Object path for local ser=
-vices
->> +is freely definable.
->> +
->> +External applications implementing local services must register the ser=
-vices
->> +using GattManager1 registration method and must implement the methods a=
-nd
->> +properties defined in GattService1 interface.
->> +
->> +Service              org.bluez
->> +Interface    org.bluez.GattService1 [Experimental]
->> +Object path  [variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/se=
-rviceXX
->> +
->> +Methods              void Release()
->> +
->> +                     Release this service. At this point, it will not b=
-e
->> +                     used by BlueZ anymore and can be destroyed by the
->> +                     owner. Method applicable to external GATT services
->> +                     implementations only (GATT servers).
+> Refactor code so that ioctl() return value is checked.
+> ---
+>  profiles/audio/avctp.c | 47 +++++++++++++++++++++++++++++++++++++----------
+>  1 file changed, 37 insertions(+), 10 deletions(-)
 >
-> so this is the part I do not like that much. We should not define an inte=
-rface that has a method that is valid and used only when this is a GATT ser=
-ver.
+> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+> index 6fd1454..bf44f9c 100644
+> --- a/profiles/audio/avctp.c
+> +++ b/profiles/audio/avctp.c
+> @@ -1027,27 +1027,54 @@ static int uinput_create(char *name)
+>                 err = -errno;
+>                 error("Can't write device information: %s (%d)",
+>                                                 strerror(-err), -err);
+> -               close(fd);
+> -               return err;
+> +               goto fail;
+> +       }
+> +
+> +       if (ioctl(fd, UI_SET_EVBIT, EV_KEY) < 0) {
+> +               err = -errno;
+> +               error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
+> +               goto fail;
+>         }
 >
-> What I am thinking right now (and might need to discuss this a bit furthe=
-r), we leave GattService1 without any methods and use it for both GATT clie=
-nt and server.
+> -       ioctl(fd, UI_SET_EVBIT, EV_KEY);
+> -       ioctl(fd, UI_SET_EVBIT, EV_REL);
+> -       ioctl(fd, UI_SET_EVBIT, EV_REP);
+> -       ioctl(fd, UI_SET_EVBIT, EV_SYN);
+> +       if (ioctl(fd, UI_SET_EVBIT, EV_REL) < 0) {
+> +               err = -errno;
+> +               error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
+> +               goto fail;
+> +       }
 >
-> Then we create some GattServiceAgent1 or GattServiceCollection1 or maybe =
-even GattServer1 that we can register with GattManager1 for the purpose of =
-providing a Release method so that bluetoothd stays in control and can info=
-rm applications if it decided to remove a service.
+> -       for (i = 0; key_map[i].name != NULL; i++)
+> -               ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
+> +       if (ioctl(fd, UI_SET_EVBIT, EV_REP) < 0) {
+> +               err = -errno;
+> +               error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
+> +               goto fail;
+> +       }
+> +
+> +       if (ioctl(fd, UI_SET_EVBIT, EV_SYN) < 0) {
+> +               err = -errno;
+> +               error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
+> +               goto fail;
+> +       }
+> +
+> +       for (i = 0; key_map[i].name != NULL; i++) {
+> +               if (ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput) < 0) {
+> +                       err = -errno;
+> +                       error("ioctl UI_SET_KEYBIT: %s (%d)", strerror(-err),
+> +                                                                       -err);
+> +                       goto fail;
+> +               }
+> +       }
 >
-> I am even fine with allowing to provide multiple services in a collection=
-/server registration. Thoughts?
+>         if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
+>                 err = -errno;
+>                 error("Can't create uinput device: %s (%d)",
+>                                                 strerror(-err), -err);
+> -               close(fd);
+> -               return err;
+> +               goto fail;
+>         }
 >
-> Regards
+>         return fd;
+> +
+> +fail:
+> +       close(fd);
+> +       return err;
+>  }
 >
-> Marcel
+>  static void init_uinput(struct avctp *session)
+> --
+> 1.8.3.2
 
-The "Service Agent" approach was suggested in beginning of our
-discussion. I don't remember anymore why we decided to change it.
+I start to wonder if there is a better way to set those bits...
 
-Unless you think that it is essential, we could implement the
-Release() method later. When we start the client implementation we
-will have a better understanding of our needs.
-Can I remove the Release() and re-send the patchset?
 
-Regards,
-Claudio.
+-- 
+Luiz Augusto von Dentz
