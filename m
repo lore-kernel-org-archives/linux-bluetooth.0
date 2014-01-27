@@ -1,148 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v5 02/18] gatt: Add stub for gatt.{c, h} files
-Date: Mon, 27 Jan 2014 17:35:08 -0300
-Message-Id: <1390854924-31904-3-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v5 05/18] lib: Move GATT UUID to uuid.h
+Date: Mon, 27 Jan 2014 17:35:11 -0300
+Message-Id: <1390854924-31904-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org>
  <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
-
-These files implement functions to handle ATT transactions, and expose
-functions to allow other entities to manage GATT based services. It
-is a replacement for src/attrib-server.c.
+This patch moves GATT UUIDs definitions to a common header. uuid.h contains
+helper functions to manipulate Bluetooth UUIDs and some common BR/EDR services
+UUIDs.
 ---
- Makefile.am |  1 +
- src/gatt.c  | 38 ++++++++++++++++++++++++++++++++++++++
- src/gatt.h  | 26 ++++++++++++++++++++++++++
- src/main.c  |  4 ++++
- 4 files changed, 69 insertions(+)
- create mode 100644 src/gatt.c
- create mode 100644 src/gatt.h
+ attrib/gatt.h | 25 -------------------------
+ lib/uuid.h    | 25 +++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 25 deletions(-)
 
-diff --git a/Makefile.am b/Makefile.am
-index 3a1e6dc..101d5de 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/adapter.h src/adapter.c \
- 			src/profile.h src/profile.c \
- 			src/service.h src/service.c \
-+			src/gatt.h src/gatt.c \
- 			src/device.h src/device.c src/attio.h \
- 			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c \
-diff --git a/src/gatt.c b/src/gatt.c
-new file mode 100644
-index 0000000..06619f0
---- /dev/null
-+++ b/src/gatt.c
-@@ -0,0 +1,38 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include "gatt.h"
-+
-+void gatt_init(void)
-+{
-+
-+}
-+
-+void gatt_cleanup(void)
-+{
-+
-+}
-diff --git a/src/gatt.h b/src/gatt.h
-new file mode 100644
-index 0000000..3a320b4
---- /dev/null
-+++ b/src/gatt.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+void gatt_init(void);
-+
-+void gatt_cleanup(void);
-diff --git a/src/main.c b/src/main.c
-index 91d90b4..fccc838 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -55,6 +55,7 @@
- #include "dbus-common.h"
- #include "agent.h"
- #include "profile.h"
-+#include "gatt.h"
- #include "systemd.h"
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 0f113e7..4fea3eb 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -24,31 +24,6 @@
  
- #define BLUEZ_NAME "org.bluez"
-@@ -545,6 +546,8 @@ int main(int argc, char *argv[])
+ #include <bluetooth/sdp.h>
  
- 	g_dbus_set_flags(gdbus_flags);
+-/* GATT Profile Attribute types */
+-#define GATT_PRIM_SVC_UUID		0x2800
+-#define GATT_SND_SVC_UUID		0x2801
+-#define GATT_INCLUDE_UUID		0x2802
+-#define GATT_CHARAC_UUID		0x2803
+-
+-/* GATT Characteristic Types */
+-#define GATT_CHARAC_DEVICE_NAME			0x2A00
+-#define GATT_CHARAC_APPEARANCE			0x2A01
+-#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG	0x2A02
+-#define GATT_CHARAC_RECONNECTION_ADDRESS	0x2A03
+-#define GATT_CHARAC_PERIPHERAL_PREF_CONN	0x2A04
+-#define GATT_CHARAC_SERVICE_CHANGED		0x2A05
+-
+-/* GATT Characteristic Descriptors */
+-#define GATT_CHARAC_EXT_PROPER_UUID	0x2900
+-#define GATT_CHARAC_USER_DESC_UUID	0x2901
+-#define GATT_CLIENT_CHARAC_CFG_UUID	0x2902
+-#define GATT_SERVER_CHARAC_CFG_UUID	0x2903
+-#define GATT_CHARAC_FMT_UUID		0x2904
+-#define GATT_CHARAC_AGREG_FMT_UUID	0x2905
+-#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
+-#define GATT_EXTERNAL_REPORT_REFERENCE	0x2907
+-#define GATT_REPORT_REFERENCE		0x2908
+-
+ /* Client Characteristic Configuration bit field */
+ #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
+ #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 95e5a9a..c24cee5 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -105,6 +105,31 @@ extern "C" {
+ #define OBEX_MNS_UUID		"00001133-0000-1000-8000-00805f9b34fb"
+ #define OBEX_MAP_UUID		"00001134-0000-1000-8000-00805f9b34fb"
  
-+	gatt_init();
++/* GATT UUIDs section */
++#define GATT_PRIM_SVC_UUID				0x2800
++#define GATT_SND_SVC_UUID				0x2801
++#define GATT_INCLUDE_UUID				0x2802
++#define GATT_CHARAC_UUID				0x2803
 +
- 	if (option_compat == TRUE)
- 		sdp_flags |= SDP_SERVER_COMPAT;
- 
-@@ -595,6 +598,7 @@ int main(int argc, char *argv[])
- 	btd_profile_cleanup();
- 	btd_agent_cleanup();
- 	btd_device_cleanup();
-+	gatt_cleanup();
- 
- 	adapter_cleanup();
- 
++/* GATT Characteristic Types */
++#define GATT_CHARAC_DEVICE_NAME				0x2A00
++#define GATT_CHARAC_APPEARANCE				0x2A01
++#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG		0x2A02
++#define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
++#define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
++#define GATT_CHARAC_SERVICE_CHANGED			0x2A05
++
++/* GATT Characteristic Descriptors */
++#define GATT_CHARAC_EXT_PROPER_UUID			0x2900
++#define GATT_CHARAC_USER_DESC_UUID			0x2901
++#define GATT_CLIENT_CHARAC_CFG_UUID			0x2902
++#define GATT_SERVER_CHARAC_CFG_UUID			0x2903
++#define GATT_CHARAC_FMT_UUID				0x2904
++#define GATT_CHARAC_AGREG_FMT_UUID			0x2905
++#define GATT_CHARAC_VALID_RANGE_UUID			0x2906
++#define GATT_EXTERNAL_REPORT_REFERENCE			0x2907
++#define GATT_REPORT_REFERENCE				0x2908
++
+ typedef struct {
+ 	enum {
+ 		BT_UUID_UNSPEC = 0,
 -- 
 1.8.3.1
 
