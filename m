@@ -1,25 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <52E67664.7020702@gmail.com>
+Date: Mon, 27 Jan 2014 15:08:20 +0000
+From: Robert <r.harle.groups@gmail.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Initial avctp test
-Date: Mon, 27 Jan 2014 17:56:26 +0200
-Message-Id: <1390838187-25006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Getting channel info for LE scan
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hello,
 
-This is initial invalid packet size test, sent as RFC since I am not
-sure what might be tested for avctp. 
+I'm looking to extract the channel information for each lescan result 
+but this isn't obviously available to me.  Is such information held in 
+the hci event
+  perhaps?
 
-Andrei Emeltchenko (1):
-  unit/avctp: Add initial AVCTP test setup
-
- Makefile.am       |   8 ++
- unit/test-avctp.c | 262 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 270 insertions(+)
- create mode 100644 unit/test-avctp.c
-
--- 
-1.8.3.2
-
+Thanks for any help,
+Rob.
