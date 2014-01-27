@@ -1,24 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Jan 2014 09:56:11 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] unit/test-ringbuf: Fix indentation
-Message-ID: <20140127175611.GA2452@x220.p-661hnu-f1>
-References: <1390700061-18666-1-git-send-email-anderson.lizardo@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1390700061-18666-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v4 18/18] bluetooth.conf: Add ObjectManager interface
+Date: Mon, 27 Jan 2014 15:00:56 -0300
+Message-Id: <1390845656-29880-19-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1390398025-28340-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1390845656-29880-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+---
+ src/bluetooth.conf | 1 +
+ 1 file changed, 1 insertion(+)
 
-On Sat, Jan 25, 2014, Anderson Lizardo wrote:
-> ---
->  unit/test-ringbuf.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+diff --git a/src/bluetooth.conf b/src/bluetooth.conf
+index 0495200..ad8891a 100644
+--- a/src/bluetooth.conf
++++ b/src/bluetooth.conf
+@@ -18,6 +18,7 @@
+     <allow send_interface="org.bluez.Profile1"/>
+     <allow send_interface="org.bluez.HeartRateWatcher1"/>
+     <allow send_interface="org.bluez.CyclingSpeedWatcher1"/>
++    <allow send_interface="org.freedesktop.DBus.ObjectManager"/>
+   </policy>
+ 
+   <policy at_console="true">
+-- 
+1.8.3.1
 
-Both patches have been applied. Thanks.
-
-Johan
