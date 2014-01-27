@@ -1,48 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] android/AVDTP: Make signalling channel priority 6
-Date: Mon, 27 Jan 2014 15:41:47 -0800
-Message-Id: <1390866110-16184-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 3/3] Bluetooth: Fix disconnecting L2CAP when a credits overflow occurs
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1390864295-4259-3-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 28 Jan 2014 00:36:04 +0100
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <014FE307-5EE8-402D-A261-57EBD8CC73F6@holtmann.org>
+References: <1390864295-4259-1-git-send-email-johan.hedberg@gmail.com> <1390864295-4259-3-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
-This makes signalling priority 6 so it can push commands before the
-stream channel, without this the stream channel may be schedule
-first and cause the signalling commands to timeout while waiting a slot.
----
- android/avdtp.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+> The L2CAP specification requires us to disconnect an L2CAP channel if
+> the remote side gives us credits beyond 65535. This patch makes sure we
+> disconnect the channel in such a situation.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_core.c | 15 ++++++++++++++-
+> 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 4abcd75..4cfffc8 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -2057,6 +2057,7 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
- 	struct avdtp *session;
- 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
- 	int new_fd;
-+	int priority;
- 
- 	new_fd = dup(fd);
- 	if (new_fd < 0) {
-@@ -2064,6 +2065,14 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
- 		return NULL;
- 	}
- 
-+	priority = 6;
-+	if (setsockopt(new_fd, SOL_SOCKET, SO_PRIORITY,
-+			(const void *) &priority, sizeof(priority)) < 0) {
-+		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
-+									errno);
-+		return NULL;
-+	}
-+
- 	session = g_new0(struct avdtp, 1);
- 	session->io = g_io_channel_unix_new(new_fd);
- 	session->version = version;
--- 
-1.8.4.2
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
