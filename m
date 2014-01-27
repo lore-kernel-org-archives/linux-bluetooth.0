@@ -1,41 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 27 Jan 2014 11:45:24 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petri Gynther <pgynther@google.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Rename adapter_remove_device to btd_adapter_remove_device
-Message-ID: <20140127194524.GA12181@x220.p-661hnu-f1>
-References: <20140125005506.7AD85100900@puck.mtv.corp.google.com>
- <20140125221329.GB14531@x220.p-661hnu-f1>
- <CAGXr9JHEe+9gu-giUF=iH4LAv=FAAutYPeFY483DQU2r40wmkg@mail.gmail.com>
- <20140127181307.GB7831@x220.p-661hnu-f1>
- <CAGXr9JGm1OUnPHdM=m6nH66xQVjUgL=P3zmwJp-aj2f9whbEpQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAGXr9JGm1OUnPHdM=m6nH66xQVjUgL=P3zmwJp-aj2f9whbEpQ@mail.gmail.com>
+In-Reply-To: <1390838504-25456-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1390838504-25456-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 27 Jan 2014 11:32:28 -0800
+Message-ID: <CABBYNZ+QQ81d7r6o=BbFYXAxxsQRWctGeAcF86OhbBBGK4Temw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] unit/avdtp: trivial: Remove empty line
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi Andrei,
 
-On Mon, Jan 27, 2014, Petri Gynther wrote:
-> Once BlueZ host and the remote have been paired successfully the first
-> time, the remote has a key combination available that allows it to be
-> unpaired and reset to initial state. But, BlueZ won't know about that.
-> It still considers the remote paired. Thus, when the BD address
-> arrives to the IR-assist plugin again, the plugin needs to clear all
-> old state from BlueZ side and start over as if the device had never
-> been discovered before.
-> 
-> The old device removal and new device creation are handled in the
-> plugin, since the device creation part is not possible over D-Bus.
-> However, once the device is created, the pairing is handled in a
-> separate Python script.
+On Mon, Jan 27, 2014 at 8:01 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> ---
+>  unit/test-avdtp.c | 1 -
+>  1 file changed, 1 deletion(-)
+>
+> diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+> index 4726c4b..8fe5ce3 100644
+> --- a/unit/test-avdtp.c
+> +++ b/unit/test-avdtp.c
+> @@ -216,7 +216,6 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+>         return TRUE;
+>  }
+>
+> -
+>  static struct context *context_new(uint16_t version, uint16_t imtu,
+>                                         uint16_t omtu, gconstpointer data)
+>  {
+> --
+> 1.8.3.2
 
-Fair enough. I've now applied the patch.
+Applied, thanks.
 
-Btw, please don't use top-posting on this list. It makes it difficult to
-track the discussion when we've got inline quoting and top posting mixed
-together.
 
-Johan
+-- 
+Luiz Augusto von Dentz
