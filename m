@@ -1,51 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastianx.chlad@intel.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: PTS test results for HID
-Date: Tue, 28 Jan 2014 16:39:31 +0100
-Message-ID: <3964416.LD5rIGGQ5E@leonov>
-In-Reply-To: <1390916262-8022-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1390916262-8022-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: Re: [PATCH 1/3] android/pan: Fix control state change callback parameters order
+Date: Tue, 28 Jan 2014 16:30:09 +0100
+Message-ID: <5971297.PVpESGBjT3@leonov>
+In-Reply-To: <1390484367-6332-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1390484367-6332-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Ravi,
 
-On Tuesday 28 of January 2014 15:37:42 Sebastian Chlad wrote:
+On Thursday 23 of January 2014 15:39:25 Ravi kumar Veeramally wrote:
+> Callback declared in bt_pan.h is
+> 'typedef void (*btpan_control_state_callback)
+> (btpan_control_state_t state, bt_status_t error, int local_role,
+> const char* ifname);
+> 
+> But PanService.Java defined it wrong way.
+> private void onControlStateChanged(int local_role, int state,
+> int error, String ifname).
+> First and third parameters are misplaced, so sending data according
+> to PanService.Java, discard this fix if issue fixed in PanService.Java.
 > ---
->  android/pts-hid.txt | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
+>  android/hal-pan.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/pts-hid.txt b/android/pts-hid.txt
-> index 7e9f986..5208d92 100644
-> --- a/android/pts-hid.txt
-> +++ b/android/pts-hid.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for DID
+> diff --git a/android/hal-pan.c b/android/hal-pan.c
+> index 8c0f8d8..a596ffd 100644
+> --- a/android/hal-pan.c
+> +++ b/android/hal-pan.c
+> @@ -45,9 +45,18 @@ static void handle_ctrl_state(void *buf, uint16_t len)
+>  {
+>  	struct hal_ev_pan_ctrl_state *ev = buf;
 > 
-> -PTS version: 4.9
-> -Tested: 14.11.2013
-> +PTS version: 5.0
-> +Tested: 28.01.2014
+> +	/* FIXME: Callback declared in bt_pan.h is 'typedef void
+> +	 * (*btpan_control_state_callback)(btpan_control_state_t state,
+> +	 * bt_status_t error, int local_role, const char* ifname);
+> +	 * But PanService.Java defined it wrong way.
+> +	 * private void onControlStateChanged(int local_role, int state,
+> +	 * int error, String ifname).
+> +	 * First and third parameters are misplaced, so sending data according
+> +	 * to PanService.Java, fix this if issue fixed in PanService.Java.
+> +	 */
+>  	if (cbs->control_state_cb)
+> -		cbs->control_state_cb(ev->state, ev->status,
+> -					ev->local_role, (char *)ev->name);
+> +		cbs->control_state_cb(ev->local_role, ev->state, ev->status,
+> +							(char *)ev->name);
+>  }
 > 
->  Results:
->  PASS	test passed
-> @@ -13,7 +13,8 @@ N/A	test is disabled due to PICS setup
->  Test Name		Result	Notes
->  ---------------------------------------------------------------------------
-> ---- TC_HOS_HCE_BV_01_I	PASS
-> -TC_HOS_HCE_BV_02_I	PASS
-> +TC_HOS_HCE_BV_02_I	PASS	IUT must be connectable
-> +					(i.e. btmgmt connectable on)
+>  /* handlers will be called from notification thread context,
 
-Isn't enabling BT enough for this test to pass?
-
->  TC_HOS_HCE_BV_03_I	PASS
->  TC_HOS_HCE_BV_04_I	PASS
->  TC_HOS_HCR_BV_01_I	PASS
+Patch 1 and 2 applied after errno handling fixes, but 3rd should be split to 
+network and android part.
 
 -- 
 BR
