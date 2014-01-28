@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/6] avctp: Use already calculated avc header
-Date: Tue, 28 Jan 2014 15:22:42 +0200
-Message-Id: <1390915365-4335-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/6] android/avctp: Fix wrong error message
+Date: Tue, 28 Jan 2014 15:22:41 +0200
+Message-Id: <1390915365-4335-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1390915365-4335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1390915365-4335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,24 +11,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This removes long (81 characters) line as a side effect.
 ---
- profiles/audio/avctp.c | 2 +-
+ android/avctp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 6fd1454..78bf1fd 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -942,7 +942,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
+diff --git a/android/avctp.c b/android/avctp.c
+index 4ebf2ff..d308ec1 100644
+--- a/android/avctp.c
++++ b/android/avctp.c
+@@ -827,7 +827,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
  
- 	ret -= sizeof(struct avc_header);
+ 	ret -= AVCTP_HEADER_LENGTH;
+ 	if (ret < AVC_HEADER_LENGTH) {
+-		error("Too small AVCTP packet");
++		error("Too small AVC packet");
+ 		goto failed;
+ 	}
  
--	operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
-+	operands = (uint8_t *) avc + sizeof(struct avc_header);
- 	operand_count = ret;
- 
- 	if (avctp->cr == AVCTP_RESPONSE) {
 -- 
 1.8.3.2
 
