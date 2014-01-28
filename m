@@ -1,51 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android/bluetooth: Add threashold to RSSI change
-Date: Wed, 29 Jan 2014 00:47:14 +0100
-Message-Id: <1390952835-23251-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Remove unnecessary check for chan->psm
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1390951684-3225-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 28 Jan 2014 15:35:10 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <DF71A641-43A9-4415-BF2D-EC59DE21112C@holtmann.org>
+References: <1390951684-3225-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There is no need to report very small RSSI changes.
----
- android/bluetooth.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+Hi Johan,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index b105ac8..b95023c 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1045,6 +1045,19 @@ static uint8_t bdaddr_type2android(uint8_t type)
- 	return HAL_TYPE_LE;
- }
- 
-+static bool rssi_threashold(int old, int new)
-+{
-+	int delta;
-+
-+	if (old > new)
-+		delta = old - new;
-+	else
-+		delta = new - old;
-+
-+	/* only 8 dBm or more */
-+	return delta >= 8;
-+}
-+
- static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 					int8_t rssi, bool confirm,
- 					const uint8_t *data, uint8_t data_len)
-@@ -1113,7 +1126,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 		(*num_prop)++;
- 	}
- 
--	if (rssi) {
-+	if (rssi && rssi_threashold(dev->rssi, rssi)) {
- 		dev->rssi = rssi;
- 
- 		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_RSSI,
--- 
-1.8.5.3
+> Now that ATT sockets have been converted to use the new L2CAP_CHAN_FIXED
+> type there is no need to have an extra check for chan->psm in the
+> l2cap_chan_close function.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/l2cap_core.c | 5 +----
+> 1 file changed, 1 insertion(+), 4 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
