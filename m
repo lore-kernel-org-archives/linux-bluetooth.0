@@ -1,56 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Jan 2014 12:36:44 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] Initial avctp test
-Message-ID: <20140128103641.GB9043@aemeltch-MOBL1>
-References: <1390838187-25006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CABBYNZKusSmbTTEVLmU2Xa4+L5dOaKCHt8dFaeT2jP_==uL+jw@mail.gmail.com>
+Date: Tue, 28 Jan 2014 09:31:54 +0100
+From: Gianluca Anzolin <gianluca@sottospazio.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Alexander Holler <holler@ahsoftware.de>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	peter@hurleysoftware.com,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+	Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
+	stable@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
+Message-ID: <20140128083154.GA29060@sottospazio.it>
+References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it>
+ <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org>
+ <52DCDF84.1040902@ahsoftware.de>
+ <E0DDC796-EECF-46B6-8EDF-801CF8EFD456@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZKusSmbTTEVLmU2Xa4+L5dOaKCHt8dFaeT2jP_==uL+jw@mail.gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <E0DDC796-EECF-46B6-8EDF-801CF8EFD456@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
-
-On Mon, Jan 27, 2014 at 10:36:42AM -0800, Luiz Augusto von Dentz wrote:
-> Hi Andrei,
+On Mon, Jan 20, 2014 at 09:37:14AM -0800, Marcel Holtmann wrote:
+> Hi Alexander,
 > 
-> On Mon, Jan 27, 2014 at 7:56 AM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> > This is initial invalid packet size test, sent as RFC since I am not
-> > sure what might be tested for avctp.
-> >
-> > Andrei Emeltchenko (1):
-> >   unit/avctp: Add initial AVCTP test setup
-> >
-> >  Makefile.am       |   8 ++
-> >  unit/test-avctp.c | 262 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  2 files changed, 270 insertions(+)
-> >  create mode 100644 unit/test-avctp.c
-> >
-> > --
-> > 1.8.3.2
+> >> all 4 patches have been applied to bluetooth-next tree.
+> > 
+> > Maybe a bit late, but I've just seen they miss a Cc: stable@vger.kernel.org to automatically end up in 3.12 and 3.13 too.
 > 
-> You should follow the testing spec:
-> https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=40404
+> we can always promote them to stable. On Purpose I wanted them to cycle through bluetooth-next for a while to make sure they do not cause any other regressions.
 > 
-> Please follow the same name convention that is used by the testing
-> spec and for now do not introduce any other test that is not part of
-> the testing spec.
+> Regards
+> 
+> Marcel
+> 
 
-I have this AVCTP.TS spec but what might be tested for example with test
-case "TP/CCM/BV-01-C"?
+Unfortunately it seems I overlooked the fact that rfcomm_dev_activate() is
+called with the port->mutex held. So patches 2/3/4 cause a regression I missed
+because I didn't turn on the appropriate debug options (circular locking
+dependency, a bug report already appeared on this list).
 
-Even looking at session_cb() for AVCTP there seems to be only packet
-length check. In contrast for AVDTP there is command parser so you might
-be able to test something.
+I'm afraid this all stems from my partial knowledge of the tty_port code and
+unfortunately I don't know how to solve the problem right now.
 
-Shall we test AVRCP instead?
+I think it's better to revert those patches for the moment.
 
-Best regards 
-Andrei Emeltchenko 
+Regards,
+
+Gianluca
