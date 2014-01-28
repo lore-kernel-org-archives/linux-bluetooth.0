@@ -2,83 +2,90 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 1/3] attrib-server: Remove unnecessary fields from struct gatt_channel
-Date: Tue, 28 Jan 2014 11:51:36 -0400
-Message-Id: <1390924298-13804-2-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 2/3] core: Fix associating a GAttrib to a device on incoming connections
+Date: Tue, 28 Jan 2014 11:51:37 -0400
+Message-Id: <1390924298-13804-3-git-send-email-anderson.lizardo@openbossa.org>
 In-Reply-To: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
 References: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These fields are only used internally by attrib_channel_attach(). The
-"No GATT server found..." error message was also removed as it is also
-displayed by find_gatt_server().
+If BlueZ is running as slave, incoming connections using ATT CID will
+have a GAttrib created for them. But this GAttrib will not be assigned
+to the underlying device (whose struct btd_device instance was created
+in response to the Device Connected mgmt event).
+
+This patch fixes this by assigning the GAttrib to the btd_device as soon
+as a connection is first requested, which is done using attio callbacks.
+
+Note that a new GAttrib reference is taken because attio callbacks "own"
+device->attrib and thus need their own reference.
 ---
- src/attrib-server.c | 23 +++++++----------------
- 1 file changed, 7 insertions(+), 16 deletions(-)
+ src/attrib-server.c | 22 ++++++++++++++++++++++
+ src/attrib-server.h |  1 +
+ src/device.c        |  5 +++++
+ 3 files changed, 28 insertions(+)
 
 diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 1c088df..13b86e1 100644
+index 13b86e1..7a50022 100644
 --- a/src/attrib-server.c
 +++ b/src/attrib-server.c
-@@ -71,8 +71,6 @@ struct gatt_server {
- };
+@@ -1100,6 +1100,28 @@ done:
+ 	g_attrib_send(channel->attrib, 0, opdu, length, NULL, NULL, NULL);
+ }
  
- struct gatt_channel {
--	bdaddr_t src;
--	bdaddr_t dst;
- 	GAttrib *attrib;
- 	guint mtu;
- 	gboolean le;
-@@ -1107,6 +1105,7 @@ guint attrib_channel_attach(GAttrib *attrib)
++GAttrib *attrib_from_device(struct btd_device *device)
++{
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct gatt_server *server;
++	GSList *l;
++
++	l = g_slist_find_custom(servers, adapter, adapter_cmp);
++	if (!l)
++		return NULL;
++
++	server = l->data;
++
++	for (l = server->clients; l; l = l->next) {
++		struct gatt_channel *channel = l->data;
++
++		if (channel->device == device)
++			return g_attrib_ref(channel->attrib);
++	}
++
++	return NULL;
++}
++
+ guint attrib_channel_attach(GAttrib *attrib)
+ {
  	struct gatt_server *server;
- 	struct btd_device *device;
- 	struct gatt_channel *channel;
-+	bdaddr_t src, dst;
- 	GIOChannel *io;
- 	GError *gerr = NULL;
- 	uint16_t cid;
-@@ -1114,34 +1113,26 @@ guint attrib_channel_attach(GAttrib *attrib)
+diff --git a/src/attrib-server.h b/src/attrib-server.h
+index 90ba17c..063cb66 100644
+--- a/src/attrib-server.h
++++ b/src/attrib-server.h
+@@ -37,5 +37,6 @@ int attrib_gap_set(struct btd_adapter *adapter, uint16_t uuid,
+ uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
+ 							const char *name);
+ void attrib_free_sdp(struct btd_adapter *adapter, uint32_t sdp_handle);
++GAttrib *attrib_from_device(struct btd_device *device);
+ guint attrib_channel_attach(GAttrib *attrib);
+ gboolean attrib_channel_detach(GAttrib *attrib, guint id);
+diff --git a/src/device.c b/src/device.c
+index 41a6fc8..f771b63 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -4470,6 +4470,11 @@ guint btd_device_add_attio_callback(struct btd_device *device,
  
- 	io = g_attrib_get_channel(attrib);
+ 	device_set_auto_connect(device, TRUE);
  
--	channel = g_new0(struct gatt_channel, 1);
--
- 	bt_io_get(io, &gerr,
--			BT_IO_OPT_SOURCE_BDADDR, &channel->src,
--			BT_IO_OPT_DEST_BDADDR, &channel->dst,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
-+			BT_IO_OPT_DEST_BDADDR, &dst,
- 			BT_IO_OPT_CID, &cid,
- 			BT_IO_OPT_IMTU, &mtu,
- 			BT_IO_OPT_INVALID);
- 	if (gerr) {
- 		error("bt_io_get: %s", gerr->message);
- 		g_error_free(gerr);
--		g_free(channel);
- 		return 0;
- 	}
- 
--	server = find_gatt_server(&channel->src);
--	if (server == NULL) {
--		char src[18];
--
--		ba2str(&channel->src, src);
--		error("No GATT server found in %s", src);
--		g_free(channel);
-+	server = find_gatt_server(&src);
-+	if (server == NULL)
- 		return 0;
--	}
- 
-+	channel = g_new0(struct gatt_channel, 1);
- 	channel->server = server;
- 
--	device = btd_adapter_find_device(server->adapter, &channel->dst);
-+	device = btd_adapter_find_device(server->adapter, &dst);
- 	if (device == NULL) {
- 		error("Device object not found for attrib server");
- 		g_free(channel);
++	/* Check if there is no GAttrib associated to the device created by a
++	 * incoming connection */
++	if (!device->attrib)
++		device->attrib = attrib_from_device(device);
++
+ 	if (device->attrib && cfunc) {
+ 		device->attios_offline = g_slist_append(device->attios_offline,
+ 									attio);
 -- 
 1.8.3.2
 
