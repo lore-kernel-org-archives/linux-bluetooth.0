@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 4/4] android/hal-audio: Set stream fd to blocking
-Date: Tue, 28 Jan 2014 09:14:46 -0800
-Message-Id: <1390929286-30206-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 2/4] android/AVDTP: Make stream channel priority 5
+Date: Tue, 28 Jan 2014 09:14:44 -0800
+Message-Id: <1390929286-30206-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
 References: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,61 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes the stream to block on io operation so it does not return
-EAGAIN on syscall such as write.
+This makes channel priority 5 so it has higher priority than regular
+traffic but less than signalling channel.
 ---
- android/hal-audio.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ android/avdtp.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 2ca6289..b1323b0 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -25,6 +25,7 @@
- #include <sys/un.h>
- #include <unistd.h>
- #include <arpa/inet.h>
-+#include <fcntl.h>
+diff --git a/android/avdtp.c b/android/avdtp.c
+index e93ff70..1783555 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2832,10 +2832,19 @@ gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, int fd,
+ 						size_t imtu, size_t omtu)
+ {
+ 	GIOChannel *io;
++	int priority;
  
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
-@@ -1108,6 +1109,24 @@ static int in_remove_audio_effect(const struct audio_stream *stream,
- 	return -ENOSYS;
- }
+ 	if (stream != stream->session->pending_open)
+ 		return FALSE;
  
-+static int set_blocking(int fd)
-+{
-+	int flags;
-+
-+	flags = fcntl(fd, F_GETFL, 0);
-+	if (flags < 0) {
-+		error("fcntl(F_GETFL): %s (%d)", strerror(errno), errno);
-+		return -errno;
++	priority = 5;
++	if (setsockopt(fd, SOL_SOCKET, SO_PRIORITY, &priority,
++						sizeof(priority)) < 0) {
++		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
++									errno);
++		return FALSE;
 +	}
 +
-+	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
-+		error("fcntl(F_SETFL): %s (%d)", strerror(errno), errno);
-+		return -errno;
-+	}
-+
-+	return 0;
-+}
-+
- static int audio_open_output_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
-@@ -1156,8 +1175,10 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	if (!preset || fd < 0)
- 		goto fail;
+ 	io = g_io_channel_unix_new(fd);
  
--	out->ep->fd = fd;
-+	if (set_blocking(fd) < 0)
-+		goto fail;
- 
-+	out->ep->fd = fd;
- 	codec = out->ep->codec;
- 
- 	codec->init(preset, mtu, &out->ep->codec_data);
+ 	handle_transport_connect(stream->session, io, imtu, omtu);
 -- 
 1.8.4.2
 
