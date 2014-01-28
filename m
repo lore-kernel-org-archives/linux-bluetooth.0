@@ -1,64 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH BlueZ v2 1/4] android/AVDTP: Make signalling channel priority 6
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1390889820-24709-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 28 Jan 2014 04:05:04 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <12AE93C8-7EBA-458E-AD05-B1D7888F3ECC@holtmann.org>
-References: <1390889820-24709-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 28 Jan 2014 12:36:44 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] Initial avctp test
+Message-ID: <20140128103641.GB9043@aemeltch-MOBL1>
+References: <1390838187-25006-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZKusSmbTTEVLmU2Xa4+L5dOaKCHt8dFaeT2jP_==uL+jw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZKusSmbTTEVLmU2Xa4+L5dOaKCHt8dFaeT2jP_==uL+jw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-> This makes signalling priority 6 so it can push commands before the
-> stream channel, without this the stream channel may be schedule
-> first and cause the signalling commands to timeout while waiting a slot.
-> ---
-> v2: Return error if writes fails since that probably means the socket has been
-> disconnected, also makes code setting socket to blocking a bit cleaner.
+On Mon, Jan 27, 2014 at 10:36:42AM -0800, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
 > 
-> android/avdtp.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
+> On Mon, Jan 27, 2014 at 7:56 AM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > This is initial invalid packet size test, sent as RFC since I am not
+> > sure what might be tested for avctp.
+> >
+> > Andrei Emeltchenko (1):
+> >   unit/avctp: Add initial AVCTP test setup
+> >
+> >  Makefile.am       |   8 ++
+> >  unit/test-avctp.c | 262 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  2 files changed, 270 insertions(+)
+> >  create mode 100644 unit/test-avctp.c
+> >
+> > --
+> > 1.8.3.2
 > 
-> diff --git a/android/avdtp.c b/android/avdtp.c
-> index 4abcd75..4cfffc8 100644
-> --- a/android/avdtp.c
-> +++ b/android/avdtp.c
-> @@ -2057,6 +2057,7 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
-> 	struct avdtp *session;
-> 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-> 	int new_fd;
-> +	int priority;
-
-make it “int new_fd, priority;”.
-
+> You should follow the testing spec:
+> https://www.bluetooth.org/docman/handlers/DownloadDoc.ashx?doc_id=40404
 > 
-> 	new_fd = dup(fd);
-> 	if (new_fd < 0) {
-> @@ -2064,6 +2065,14 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
-> 		return NULL;
-> 	}
-> 
-> +	priority = 6;
-> +	if (setsockopt(new_fd, SOL_SOCKET, SO_PRIORITY,
-> +			(const void *) &priority, sizeof(priority)) < 0) {
+> Please follow the same name convention that is used by the testing
+> spec and for now do not introduce any other test that is not part of
+> the testing spec.
 
-What is this (const void *) cast for. That should not be needed.
+I have this AVCTP.TS spec but what might be tested for example with test
+case "TP/CCM/BV-01-C"?
 
-> +		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
-> +									errno);
-> +		return NULL;
-> +	}
-> +
-> 	session = g_new0(struct avdtp, 1);
-> 	session->io = g_io_channel_unix_new(new_fd);
-> 	session->version = version;
+Even looking at session_cb() for AVCTP there seems to be only packet
+length check. In contrast for AVDTP there is command parser so you might
+be able to test something.
 
-Regards
+Shall we test AVRCP instead?
 
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
