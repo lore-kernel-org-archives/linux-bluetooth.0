@@ -2,90 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 2/3] core: Fix associating a GAttrib to a device on incoming connections
-Date: Tue, 28 Jan 2014 11:51:37 -0400
-Message-Id: <1390924298-13804-3-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
+Subject: [RFC BlueZ 0/3] Fix GATT server issues with BlueZ as LE peripheral
+Date: Tue, 28 Jan 2014 11:51:35 -0400
+Message-Id: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If BlueZ is running as slave, incoming connections using ATT CID will
-have a GAttrib created for them. But this GAttrib will not be assigned
-to the underlying device (whose struct btd_device instance was created
-in response to the Device Connected mgmt event).
+Hi,
 
-This patch fixes this by assigning the GAttrib to the btd_device as soon
-as a connection is first requested, which is done using attio callbacks.
+Currently, we do not officially support running BlueZ as LE peripheral. But
+there is already enough support from the kernel to support this. For instance,
+there is the "Set Advertising" mgmt command to keep LE advertising enabled
+after each connection.
 
-Note that a new GAttrib reference is taken because attio callbacks "own"
-device->attrib and thus need their own reference.
----
- src/attrib-server.c | 22 ++++++++++++++++++++++
- src/attrib-server.h |  1 +
- src/device.c        |  5 +++++
- 3 files changed, 28 insertions(+)
+The current tracking of connections in BlueZ does not fully work for peripheral
+role. These patches are a first attempt to improve the situation. Other fixes
+are necessary to have full LE Peripheral support.
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 13b86e1..7a50022 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -1100,6 +1100,28 @@ done:
- 	g_attrib_send(channel->attrib, 0, opdu, length, NULL, NULL, NULL);
- }
- 
-+GAttrib *attrib_from_device(struct btd_device *device)
-+{
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct gatt_server *server;
-+	GSList *l;
-+
-+	l = g_slist_find_custom(servers, adapter, adapter_cmp);
-+	if (!l)
-+		return NULL;
-+
-+	server = l->data;
-+
-+	for (l = server->clients; l; l = l->next) {
-+		struct gatt_channel *channel = l->data;
-+
-+		if (channel->device == device)
-+			return g_attrib_ref(channel->attrib);
-+	}
-+
-+	return NULL;
-+}
-+
- guint attrib_channel_attach(GAttrib *attrib)
- {
- 	struct gatt_server *server;
-diff --git a/src/attrib-server.h b/src/attrib-server.h
-index 90ba17c..063cb66 100644
---- a/src/attrib-server.h
-+++ b/src/attrib-server.h
-@@ -37,5 +37,6 @@ int attrib_gap_set(struct btd_adapter *adapter, uint16_t uuid,
- uint32_t attrib_create_sdp(struct btd_adapter *adapter, uint16_t handle,
- 							const char *name);
- void attrib_free_sdp(struct btd_adapter *adapter, uint32_t sdp_handle);
-+GAttrib *attrib_from_device(struct btd_device *device);
- guint attrib_channel_attach(GAttrib *attrib);
- gboolean attrib_channel_detach(GAttrib *attrib, guint id);
-diff --git a/src/device.c b/src/device.c
-index 41a6fc8..f771b63 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4470,6 +4470,11 @@ guint btd_device_add_attio_callback(struct btd_device *device,
- 
- 	device_set_auto_connect(device, TRUE);
- 
-+	/* Check if there is no GAttrib associated to the device created by a
-+	 * incoming connection */
-+	if (!device->attrib)
-+		device->attrib = attrib_from_device(device);
-+
- 	if (device->attrib && cfunc) {
- 		device->attios_offline = g_slist_append(device->attios_offline,
- 									attio);
+In particular, with these patches, notifications for PASP and ANP profiles
+(implemented in profiles/alert/*) should work when BlueZ is on the peripheral
+role. Other GATT server profiles will need fixing as well.
+
+I'm sending as RFC because I only did minimal testing. I hope that people
+having issues with GATT server profiles running on peripheral role can tests
+these patches. Otherwise, I'll do more tests later today and send a final
+version by tomorrow.
+
+Notes: 
+* The first patch is just cleanup, so can be applied as is.
+* For testing, make sure to enable advertising on the machine running as
+  peripheral (I use btmgmt tool for this).
+
+Best Regards,
+Anderson Lizardo
+
+Anderson Lizardo (3):
+  attrib-server: Remove unnecessary fields from struct gatt_channel
+  core: Fix associating a GAttrib to a device on incoming connections
+  alert: Only remove attio callback after ATT request was sent
+
+ profiles/alert/server.c | 18 +++++++++++++++++-
+ src/attrib-server.c     | 45 +++++++++++++++++++++++++++++----------------
+ src/attrib-server.h     |  1 +
+ src/device.c            |  5 +++++
+ 4 files changed, 52 insertions(+), 17 deletions(-)
+
 -- 
 1.8.3.2
 
