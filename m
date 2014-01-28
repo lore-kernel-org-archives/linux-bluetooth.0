@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] android/avctp: Use predefined HEADER_LENGTH instead of sizeof
-Date: Tue, 28 Jan 2014 15:22:40 +0200
-Message-Id: <1390915365-4335-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/6] avctp: Use already calculated avc header
+Date: Tue, 28 Jan 2014 15:22:42 +0200
+Message-Id: <1390915365-4335-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1390915365-4335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1390915365-4335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,44 +11,21 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Make code consistent with using HEADER_LENGTH defined. Remove also type
-conversion.
+This removes long (81 characters) line as a side effect.
 ---
- android/avctp.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ profiles/audio/avctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index 6f9b33b..4ebf2ff 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -818,24 +818,24 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
- 	if (ret <= 0)
- 		goto failed;
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 6fd1454..78bf1fd 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -942,7 +942,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
  
--	if ((unsigned int) ret < sizeof(struct avctp_header)) {
-+	if (ret < AVCTP_HEADER_LENGTH) {
- 		error("Too small AVCTP packet");
- 		goto failed;
- 	}
+ 	ret -= sizeof(struct avc_header);
  
- 	avctp = (struct avctp_header *) buf;
- 
--	ret -= sizeof(struct avctp_header);
--	if ((unsigned int) ret < sizeof(struct avc_header)) {
-+	ret -= AVCTP_HEADER_LENGTH;
-+	if (ret < AVC_HEADER_LENGTH) {
- 		error("Too small AVCTP packet");
- 		goto failed;
- 	}
- 
--	avc = (struct avc_header *) (buf + sizeof(struct avctp_header));
-+	avc = (struct avc_header *) (buf + AVCTP_HEADER_LENGTH);
- 
--	ret -= sizeof(struct avc_header);
-+	ret -= AVC_HEADER_LENGTH;
- 
--	operands = (uint8_t *) avc + sizeof(struct avc_header);
-+	operands = (uint8_t *) avc + AVC_HEADER_LENGTH;
+-	operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
++	operands = (uint8_t *) avc + sizeof(struct avc_header);
  	operand_count = ret;
  
  	if (avctp->cr == AVCTP_RESPONSE) {
