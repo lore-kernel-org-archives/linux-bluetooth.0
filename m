@@ -2,92 +2,159 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pts: PTS test results for OPP
-Date: Tue, 28 Jan 2014 19:59:47 +0200
-Message-Id: <1390931987-10904-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCH] android/pts: PTS test results for PBAP
+Date: Tue, 28 Jan 2014 19:25:31 +0200
+Message-Id: <1390929931-10447-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pts-opp.txt | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+ android/pts-pbap.txt | 103 +++++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 88 insertions(+), 15 deletions(-)
 
-diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-index b9329b9..3c4ab47 100644
---- a/android/pts-opp.txt
-+++ b/android/pts-opp.txt
+diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
+index 843b7cf..4312921 100644
+--- a/android/pts-pbap.txt
++++ b/android/pts-pbap.txt
 @@ -1,7 +1,7 @@
- PTS test results for OPP
+ PTS test results for PBAP
  
--PTS version: 4.9
+ PTS version: 5.0
 -Tested: 14.11.2013
-+PTS version: 5.0
 +Tested: 28.01.2014
  
  Results:
  PASS	test passed
-@@ -14,9 +14,9 @@ Test Name		Result	Notes
+@@ -17,32 +17,82 @@ TC_PCE_SSM_BV_02_C	N/A
+ TC_PCE_SSM_BV_06_C	N/A
+ TC_PCE_SSM_BV_08_C	N/A
+ TC_PCE_SSM_BI_01_C	N/A
++TC_PCE_SSM_BV_09_C	N/A
++TC_PCE_SSM_BV_10_C	N/A
+ TC_PCE_PBD_BV_01_C	N/A
+ TC_PCE_PBD_BV_04_C	N/A
++TC_PCE_PBD_BV_38_C	N/A
++TC_PCE_PBD_BV_29_C	N/A
++TC_PCE_PBD_BV_40_C	N/A
++TC_PCE_PBD_BV_41_C	N/A
++TC_PCE_PBD_BV_42_C	N/A
++TC_PCE_PBD_BV_43_C	N/A
++TC_PCE_PBD_BV_44_C	N/A
++TC_PCE_PBD_BV_45_C	N/A
++TC_PCE_PBD_BV_46_C	N/A
++TC_PCE_PBD_BV_47_C	N/A
++TC_PCE_PBD_BV_48_C	N/A
+ TC_PCE_PBB_BV_01_C	N/A
+ TC_PCE_PBB_BV_02_C	N/A
+ TC_PCE_PBB_BV_03_C	N/A
+ TC_PCE_PBB_BV_05_C	N/A
++TC_PCE_PBB_BV_39_C	N/A
++TC_PCE_PBB_BV_40_C	N/A
++TC_PCE_PBB_BV_41_C	N/A
++TC_PCE_PBB_BV_42_C	N/A
++TC_PCE_PBB_BV_33_C	N/A
++TC_PCE_PBB_BV_34_C	N/A
++TC_PCE_PBB_BV_35_C	N/A
++TC_PCE_PBB_BV_36_C	N/A
++TC_PCE_PBB_BV_43_C	N/A
++TC_PCE_PBB_BV_37_C	N/A
++TC_PCE_PBB_BV_38_C	N/A
+ TC_PCE_PBF_BV_01_I	N/A
+ TC_PCE_PBF_BV_02_I	N/A
++TC_PCE_PBF_BV_03_I	N/A
+ TC_PCE_PDF_BV_01_I	N/A
+-TC_PCE_PDF_BV_04_I	N/A
++TC_PCE_PDF_BV_06_I	N/A
+ TC_PSE_SSM_BV_03_C	PASS
+ TC_PSE_SSM_BV_05_C	PASS
+-TC_PSE_SSM_BV_07_C	PASS
++TC_PSE_SSM_BV_07_C	PASS	Tester must accept obex request with
++					TSPX_auth_password set in PIXITs
+ TC_PSE_SSM_BI_02_C	PASS
+ TC_PSE_SSM_BI_03_C	N/A
+-TC_PSE_SSM_BV_08_I	PASS
+-TC_PSE_PBD_BV_02_C	PASS
+-TC_PSE_PBD_BV_03_C	PASS
++TC_PSE_SSM_BV_08_I	PASS	Tester must compare passkey on IUT and PTS
++TC_PSE_SSM_BV_11_C	N/A
++
++TC_PSE_PBD_BV_02_C	PASS	Tester must compare phone book size with the value
++					given by PTS
++TC_PSE_PBD_BV_03_C	PASS	Tester must compare phone book size with the value
++					given by PTS
+ TC_PSE_PBD_BV_05_C	N/A
+ TC_PSE_PBD_BI_01_C	FAIL
+-TC_PSE_PBD_BV_11_C	N/A
+-TC_PSE_PBD_BV_12_C	N/A
+-TC_PSE_PBD_BV_13_C	N/A
+-TC_PSE_PBD_BV_14_C	N/A
+-TC_PSE_PBD_BV_15_C	N/A
+-TC_PSE_PBD_BV_16_C	N/A
++TC_PSE_PBD_BV_06_C	N/A
++TC_PSE_PBD_BV_07_C	N/A
++TC_PSE_PBD_BV_08_C	N/A
++TC_PSE_PBD_BV_09_C	N/A
++TC_PSE_PBD_BV_10_C	N/A
++TC_PSE_PBD_BV_17_C	FAIL
++TC_PSE_PBD_BV_18_C	N/A
++TC_PSE_PBD_BV_19_C	N/A
++TC_PSE_PBD_BV_20_C	N/A
++TC_PSE_PBD_BV_21_C	N/A
++TC_PSE_PBD_BV_22_C	N/A
++TC_PSE_PBD_BV_23_C	N/A
++TC_PSE_PBD_BV_24_C	N/A
++TC_PSE_PBD_BV_25_C	N/A
++TC_PSE_PBD_BV_26_C	N/A
++TC_PSE_PBD_BV_27_C	N/A
++TC_PSE_PBD_BV_28_C	N/A
++TC_PSE_PBD_BV_29_C	N/A
++TC_PSE_PBD_BV_30_C	N/A
++TC_PSE_PBD_BV_31_C	N/A
++TC_PSE_PBD_BV_32_C	N/A
++TC_PSE_PBD_BV_33_C	N/A
++TC_PSE_PBD_BV_34_C	N/A
++TC_PSE_PBD_BV_35_C	N/A
++TC_PSE_PBD_BV_36_C	PASS
++TC_PSE_PBD_BV_37_C	N/A
+ TC_PSE_PBB_BV_06_C	PASS
+ TC_PSE_PBB_BV_07_C	PASS
+ TC_PSE_PBB_BV_08_C	PASS
+@@ -51,9 +101,32 @@ TC_PSE_PBB_BV_10_C	PASS
+ TC_PSE_PBB_BV_11_C	PASS
+ TC_PSE_PBB_BI_01_C	PASS
+ TC_PSE_PBB_BI_07_C	PASS
++TC_PSE_PBB_BV_12_C	PASS
++TC_PSE_PBB_BV_13_C	N/A
++TC_PSE_PBB_BV_14_C	N/A
++TC_PSE_PBB_BV_15_C	N/A
++TC_PSE_PBB_BV_16_C	N/A
++TC_PSE_PBB_BV_17_C	N/A
++TC_PSE_PBB_BV_18_C	N/A
++TC_PSE_PBB_BV_19_C	N/A
++TC_PSE_PBB_BV_20_C	N/A
++TC_PSE_PBB_BV_21_C	N/A
++TC_PSE_PBB_BV_22_C	N/A
++TC_PSE_PBB_BV_23_C	N/A
++TC_PSE_PBB_BV_24_C	N/A
++TC_PSE_PBB_BV_25_C	N/A
++TC_PSE_PBB_BV_26_C	N/A
++TC_PSE_PBB_BV_27_C	N/A
++TC_PSE_PBB_BV_44_C	N/A
++TC_PSE_PBB_BV_45_C	N/A
++TC_PSE_PBB_BV_46_C	N/A
++TC_PSE_PBB_BV_28_C	N/A
++TC_PSE_PBB_BV_29_C	N/A
++TC_PSE_PBB_BV_30_C	N/A
++TC_PSE_PBB_BV_31_C	PASS
++TC_PSE_PBB_BV_32_C	N/A
+ TC_PSE_PBF_BV_01_I	PASS
+ TC_PSE_PBF_BV_02_I	PASS
+-TC_PSE_PDF_BV_01_I	PASS
+-TC_PSE_PDF_BV_03_I	N/A
+-TC_PSE_PDF_BV_05_I	N/A
++TC_PSE_PDF_BV_01_I	PASS	Tester must compare phone book size with the value
++					given by PTS
  -------------------------------------------------------------------------------
- TC_CLIENT_OPH_BV_01_I	PASS
- TC_CLIENT_OPH_BV_02_I	N/A
--TC_CLIENT_OPH_BV_03_I	PASS
-+TC_CLIENT_OPH_BV_03_I	PASS	Tester must send a contact to PTS
- TC_CLIENT_OPH_BV_04_I	N/A
--TC_CLIENT_OPH_BV_05_I	PASS
-+TC_CLIENT_OPH_BV_05_I	PASS	Tester must send a contact to PTS
- TC_CLIENT_OPH_BV_07_I	N/A
- TC_CLIENT_OPH_BV_08_I	N/A
- TC_CLIENT_OPH_BV_09_I	N/A
-@@ -49,33 +49,36 @@ TC_CLIENT_BCE_BV_04_I	N/A
- TC_CLIENT_BCE_BV_05_I	N/A
- TC_CLIENT_BCE_BV_06_I	N/A
- TC_CLIENT_BCE_BV_07_I	N/A
--TC_SERVER_OPH_BV_01_I	PASS
--TC_SERVER_OPH_BV_02_I	PASS
--TC_SERVER_OPH_BV_03_I	PASS
--TC_SERVER_OPH_BV_04_I	PASS
--TC_SERVER_OPH_BV_05_I	PASS
-+TC_SERVER_OPH_BV_01_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_02_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_03_I	PASS	IUT must be in the connectable mode. Tester must
-+					accept incoming file
-+TC_SERVER_OPH_BV_04_I	PASS	IUT must be in the connectable mode. Tester must
-+					accept incoming file
-+TC_SERVER_OPH_BV_05_I	PASS	IUT must be in the connectable mode. Tester must
-+					reject incoming file
- TC_SERVER_OPH_BV_07_I	N/A
- TC_SERVER_OPH_BV_08_I	N/A
- TC_SERVER_OPH_BV_09_I	N/A
--TC_SERVER_OPH_BV_10_I	PASS
-+TC_SERVER_OPH_BV_10_I	PASS	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_11_I	N/A
- TC_SERVER_OPH_BV_12_I	N/A
- TC_SERVER_OPH_BV_13_I	N/A
--TC_SERVER_OPH_BV_14_I	PASS
-+TC_SERVER_OPH_BV_14_I	PASS	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_15_I	N/A
- TC_SERVER_OPH_BV_16_I	N/A
- TC_SERVER_OPH_BV_17_I	N/A
--TC_SERVER_OPH_BV_18_I	PASS
--TC_SERVER_OPH_BV_19_I	PASS
-+TC_SERVER_OPH_BV_18_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_19_I	PASS	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_21_I	N/A
--TC_SERVER_OPH_BV_22_I	PASS
--TC_SERVER_OPH_BV_23_I	PASS
-+TC_SERVER_OPH_BV_22_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_23_I	PASS	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_24_I	N/A
- TC_SERVER_OPH_BV_25_I	N/A
- TC_SERVER_OPH_BV_26_I	N/A
--TC_SERVER_OPH_BV_34_I	PASS
-+TC_SERVER_OPH_BV_34_I	PASS	IUT must be in the connectable mode
- TC_SERVER_BCP_BV_01_I	N/A
--TC_SERVER_BCP_BV_02_I	PASS
-+TC_SERVER_BCP_BV_02_I	PASS	IUT must be in the connectable mode
- TC_SERVER_BCP_BV_03_I	N/A
- TC_SERVER_BCP_BV_04_I	N/A
- TC_SERVER_BCP_BV_05_I	N/A
 -- 
 1.8.3.2
 
