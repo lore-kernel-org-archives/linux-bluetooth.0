@@ -1,72 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 3/4] android/hal-audio: Fix not handling EINTR errors
-Date: Tue, 28 Jan 2014 09:14:45 -0800
-Message-Id: <1390929286-30206-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
-References: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 1/4] android/AVDTP: Make signalling channel priority 6
+Date: Tue, 28 Jan 2014 09:14:43 -0800
+Message-Id: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the kernel interrupts us while writting just try again.
+This makes signalling priority 6 so it can push commands before the
+stream channel, without this the stream channel may be schedule
+first and cause the signalling commands to timeout while waiting a slot.
 ---
- android/hal-audio.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
+v2: Return error if writes fails since that probably means the socket has been
+disconnected, also makes code setting socket to blocking a bit cleaner.
+v3: Remove cast as suggested by Marcel, make code setting stream fd to block a
+separate function.
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 8d737ad..2ca6289 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -399,7 +399,7 @@ static void sbc_resume(void *codec_data)
- 	sbc_data->frames_sent = 0;
- }
- 
--static void write_media_packet(int fd, struct sbc_data *sbc_data,
-+static int write_media_packet(int fd, struct sbc_data *sbc_data,
- 				struct media_packet *mp, size_t data_len)
+ android/avdtp.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/android/avdtp.c b/android/avdtp.c
+index 4abcd75..e93ff70 100644
+--- a/android/avdtp.c
++++ b/android/avdtp.c
+@@ -2056,7 +2056,7 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
  {
- 	struct timespec cur;
-@@ -407,10 +407,13 @@ static void write_media_packet(int fd, struct sbc_data *sbc_data,
- 	unsigned expected_frames;
- 	int ret;
+ 	struct avdtp *session;
+ 	GIOCondition cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+-	int new_fd;
++	int new_fd, priority;
  
--	ret = write(fd, mp, sizeof(*mp) + data_len);
--	if (ret < 0) {
--		int err = errno;
--		error("SBC: failed to write data: %d (%s)", err, strerror(err));
-+	while (true) {
-+		ret = write(fd, mp, sizeof(*mp) + data_len);
-+		if (ret >= 0)
-+			break;
-+
-+		if (errno != EINTR)
-+			return -errno;
+ 	new_fd = dup(fd);
+ 	if (new_fd < 0) {
+@@ -2064,6 +2064,14 @@ struct avdtp *avdtp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+ 		return NULL;
  	}
  
- 	sbc_data->frames_sent += mp->payload.frame_count;
-@@ -432,6 +435,8 @@ static void write_media_packet(int fd, struct sbc_data *sbc_data,
- 	if (sbc_data->frames_sent >= expected_frames)
- 		usleep(sbc_data->frame_duration *
- 				mp->payload.frame_count);
++	priority = 6;
++	if (setsockopt(new_fd, SOL_SOCKET, SO_PRIORITY, &priority,
++						sizeof(priority)) < 0) {
++		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
++									errno);
++		return NULL;
++	}
 +
-+	return ret;
- }
- 
- static ssize_t sbc_write_data(void *codec_data, const void *buffer,
-@@ -474,7 +479,9 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
- 		 */
- 		if (mp->payload.frame_count == sbc_data->frames_per_packet ||
- 				bytes == consumed) {
--			write_media_packet(fd, sbc_data, mp, encoded);
-+			ret = write_media_packet(fd, sbc_data, mp, encoded);
-+			if (ret < 0)
-+				return ret;
- 
- 			encoded = 0;
- 			free_space = sbc_data->out_buf_size - sizeof(*mp);
+ 	session = g_new0(struct avdtp, 1);
+ 	session->io = g_io_channel_unix_new(new_fd);
+ 	session->version = version;
 -- 
 1.8.4.2
 
