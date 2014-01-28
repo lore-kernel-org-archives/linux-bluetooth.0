@@ -1,46 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 2/4] android/AVDTP: Make stream channel priority 5
-Date: Tue, 28 Jan 2014 09:14:44 -0800
-Message-Id: <1390929286-30206-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
-References: <1390929286-30206-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianx.chlad@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: PTS test results for DID
+Date: Tue, 28 Jan 2014 16:58:07 +0100
+Message-ID: <5372036.DNxjlmi3cW@leonov>
+In-Reply-To: <1390916438-8190-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1390916438-8190-1-git-send-email-sebastianx.chlad@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sebastian,
 
-This makes channel priority 5 so it has higher priority than regular
-traffic but less than signalling channel.
----
- android/avdtp.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On Tuesday 28 of January 2014 15:40:38 Sebastian Chlad wrote:
+> ---
+>  android/pts-did.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/pts-did.txt b/android/pts-did.txt
+> index c44f56c..d764f09 100644
+> --- a/android/pts-did.txt
+> +++ b/android/pts-did.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for DID
+> 
+>  PTS version: 5.0
+> -Tested: 11.12.2013
+> +Tested: 28.01.2014
+> 
+>  Results:
+>  PASS	test passed
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index e93ff70..1783555 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -2832,10 +2832,19 @@ gboolean avdtp_stream_set_transport(struct avdtp_stream *stream, int fd,
- 						size_t imtu, size_t omtu)
- {
- 	GIOChannel *io;
-+	int priority;
- 
- 	if (stream != stream->session->pending_open)
- 		return FALSE;
- 
-+	priority = 5;
-+	if (setsockopt(fd, SOL_SOCKET, SO_PRIORITY, &priority,
-+						sizeof(priority)) < 0) {
-+		error("setsockopt(SO_PRIORITY): %s (%d)", strerror(errno),
-+									errno);
-+		return FALSE;
-+	}
-+
- 	io = g_io_channel_unix_new(fd);
- 
- 	handle_transport_connect(stream->session, io, imtu, omtu);
+Applied, thanks.
+
 -- 
-1.8.4.2
-
+BR
+Szymon Janc
