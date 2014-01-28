@@ -1,52 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianx.chlad@intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pts: PTS test results for HID
-Date: Tue, 28 Jan 2014 15:37:42 +0200
-Message-Id: <1390916262-8022-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCH 5/6] avctp: Use predefined HEADER_LENGTH instead of sizeof
+Date: Tue, 28 Jan 2014 15:22:44 +0200
+Message-Id: <1390915365-4335-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1390915365-4335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1390915365-4335-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-hid.txt | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/pts-hid.txt b/android/pts-hid.txt
-index 7e9f986..5208d92 100644
---- a/android/pts-hid.txt
-+++ b/android/pts-hid.txt
-@@ -1,7 +1,7 @@
- PTS test results for DID
+Make code consistent with using HEADER_LENGTH already defined and used
+instead of sizeof(). Remove also ugly type conversion.
+---
+ profiles/audio/avctp.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 570d609..0a1a457 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -924,24 +924,24 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ 	if (ret <= 0)
+ 		goto failed;
  
--PTS version: 4.9
--Tested: 14.11.2013
-+PTS version: 5.0
-+Tested: 28.01.2014
+-	if ((unsigned int) ret < sizeof(struct avctp_header)) {
++	if (ret < AVCTP_HEADER_LENGTH) {
+ 		error("Too small AVCTP packet");
+ 		goto failed;
+ 	}
  
- Results:
- PASS	test passed
-@@ -13,7 +13,8 @@ N/A	test is disabled due to PICS setup
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
- TC_HOS_HCE_BV_01_I	PASS
--TC_HOS_HCE_BV_02_I	PASS
-+TC_HOS_HCE_BV_02_I	PASS	IUT must be connectable
-+					(i.e. btmgmt connectable on)
- TC_HOS_HCE_BV_03_I	PASS
- TC_HOS_HCE_BV_04_I	PASS
- TC_HOS_HCR_BV_01_I	PASS
+ 	avctp = (struct avctp_header *) buf;
+ 
+-	ret -= sizeof(struct avctp_header);
+-	if ((unsigned int) ret < sizeof(struct avc_header)) {
++	ret -= AVCTP_HEADER_LENGTH;
++	if (ret < AVC_HEADER_LENGTH) {
+ 		error("Too small AVCTP packet");
+ 		goto failed;
+ 	}
+ 
+-	avc = (struct avc_header *) (buf + sizeof(struct avctp_header));
++	avc = (struct avc_header *) (buf + AVCTP_HEADER_LENGTH);
+ 
+-	ret -= sizeof(struct avc_header);
++	ret -= AVC_HEADER_LENGTH;
+ 
+-	operands = (uint8_t *) avc + sizeof(struct avc_header);
++	operands = (uint8_t *) avc + AVC_HEADER_LENGTH;
+ 	operand_count = ret;
+ 
+ 	if (avctp->cr == AVCTP_RESPONSE) {
 -- 
 1.8.3.2
-
----------------------------------------------------------------------
-Intel Finland Oy
-Registered Address: PL 281, 00181 Helsinki 
-Business Identity Code: 0357606 - 4 
-Domiciled in Helsinki 
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
 
