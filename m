@@ -2,53 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pts: Add PTS test results for AVRCP
-Date: Tue, 28 Jan 2014 14:25:56 +0200
-Message-Id: <1390911956-6714-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCH] android/pts: PTS test results for A2DP
+Date: Tue, 28 Jan 2014 14:11:23 +0200
+Message-Id: <1390911083-6188-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pts-avrcp.txt | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ android/pts-a2dp.txt | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-index f2533b4..6ad97f7 100644
---- a/android/pts-avrcp.txt
-+++ b/android/pts-avrcp.txt
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+index c6eee62..67f9183 100644
+--- a/android/pts-a2dp.txt
++++ b/android/pts-a2dp.txt
 @@ -1,7 +1,7 @@
- PTS test results for AVRCP
+ PTS test results for A2DP
  
  PTS version: 5.0
--Tested: --not yet tested--
+-Tested: 24.01.2014
 +Tested: 28.01.2014
  
  Results:
  PASS	test passed
-@@ -91,17 +91,17 @@ Test Name		Result	Notes
+@@ -15,18 +15,20 @@ Test Name		Result	Notes
  -------------------------------------------------------------------------------
- TC_TG_BGN_BV_01_I	N/A
- TC_TG_BGN_BV_02_I	N/A
--TC_TG_CEC_BV_01_I	INC
--TC_TG_CEC_BV_02_I	INC
-+TC_TG_CEC_BV_01_I	PASS
-+TC_TG_CEC_BV_02_I	INC	Initiate a control chanenel connection
- TC_TG_CFG_BI_01_C	INC
- TC_TG_CFG_BV_02_C	INC
- TC_TG_CON_BV_02_C	N/A
- TC_TG_CON_BV_04_C	N/A
- TC_TG_CON_BV_05_C	N/A
--TC_TG_CRC_BV_01_I	INC
--TC_TG_CRC_BV_02_I	INC
--TC_TG_ICC_BV_01_I	INC
--TC_TG_ICC_BV_02_I	INC
-+TC_TG_CRC_BV_01_I	PASS
-+TC_TG_CRC_BV_02_I	PASS	Disconnect from PTS
-+TC_TG_ICC_BV_01_I	PASS
-+TC_TG_ICC_BV_02_I	PASS
- TC_TG_INV_BI_01_C	INC
- TC_TG_INV_BI_02_C	N/A
- TC_TG_MCN_CB_BI_01_C	N/A
+ TC_SRC_CC_BV_09_I	INC
+ TC_SRC_CC_BV_10_I	N/A
+-TC_SRC_REL_BV_01_I	PASS
++TC_SRC_REL_BV_01_I	PASS	Connect to PTS from IUT. When requested
++					disconnect from IUT
+ TC_SRC_REL_BV_02_I	PASS
+-TC_SRC_SET_BV_01_I	PASS
++TC_SRC_SET_BV_01_I	PASS	Connect to PTS (open a2dp)
+ TC_SRC_SET_BV_02_I	PASS
+-TC_SRC_SET_BV_03_I	PASS
+-TC_SRC_SET_BV_04_I	INC
+-TC_SRC_SET_BV_05_I	INC
+-TC_SRC_SET_BV_06_I	INC
+-TC_SRC_SUS_BV_01_I	INC
++TC_SRC_SET_BV_03_I	PASS	Start streaming
++TC_SRC_SET_BV_04_I	INC	Start streaming
++TC_SRC_SET_BV_05_I	INC	IUT must be moved out of range
++TC_SRC_SET_BV_06_I	INC	IUT must be moved out of range
++TC_SRC_SUS_BV_01_I	PASS	Stop streaming
+ TC_SRC_SUS_BV_02_I	INC
+ TC_SRC_SDP_BV_01_I	PASS
+-TC_SRC_AS_BV_01_I	INC
++TC_SRC_AS_BV_01_I	PASS	Requires checking if the output on the IUT is
++					correct
+ -------------------------------------------------------------------------------
+ 
+ 
 -- 
 1.8.3.2
 
