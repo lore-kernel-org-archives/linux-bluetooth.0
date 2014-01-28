@@ -1,46 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 28 Jan 2014 21:53:00 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@gmail.com>
-cc: Marcel Holtmann <marcel@holtmann.org>,
-    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
-    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-    "Gustavo F. Padovan" <gustavo@padovan.org>
-Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
- enough
-In-Reply-To: <alpine.LNX.2.00.1401071811530.4962@pobox.suse.cz>
-Message-ID: <alpine.LNX.2.00.1401282152140.22492@pobox.suse.cz>
-References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com> <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
- <CANq1E4SxrDnbOCsohZXYoYL-HQjEc-xcOnXfAm=npHG2QfMS9A@mail.gmail.com> <alpine.LNX.2.00.1401071811530.4962@pobox.suse.cz>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] audio/AVRCP: Fix sending invalid response to GetCapabilities
+Date: Tue, 28 Jan 2014 12:05:34 -0800
+Message-Id: <1390939534-15699-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 7 Jan 2014, Jiri Kosina wrote:
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-> > > So doing kzalloc(rsize, GFP_ATOMIC) in the HID-core for now, and copying
-> > > the buffer around, seems like only viable solution for now, with the
-> > > outlook of removing this ugliness once hid-core honors 'size' properly.
-> > 
-> > Should I resend the patches and move it to hid_input_report() for now?
-> > Or are you getting something in yourself?
-> 
-> Due to various reasons I will not have access to any testing HW for the 
-> upcoming 2-3 days, so if you can cook something up in that timeframe, it'd 
-> be appreciated.
-> 
-> Otherwise I'll be working on it by the end of this week.
+The attribute count has to be initialized with 0 since we reuse the same
+buffer for both command and responses it may be already be set causing
+invalid response to be generated.
+---
+ profiles/audio/avrcp.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-David,
-
-just got back to this, finally ... did you have time to work on this at 
-all, or should I just start from scratch?
-
-> > Given the amount of reports on the list and bugzilla, I think we should 
-> > get this fix in asap. We can always fix it properly in -next.
-> 
-> Agreed.
-
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 59a966e..ad5dc34 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -921,6 +921,7 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
+ 
+ 		return AVC_CTYPE_STABLE;
+ 	case CAP_EVENTS_SUPPORTED:
++		pdu->params[1] = 0;
+ 		for (i = 1; i <= AVRCP_EVENT_LAST; i++) {
+ 			if (session->supported_events & (1 << i)) {
+ 				pdu->params[1]++;
 -- 
-Jiri Kosina
-SUSE Labs
+1.8.4.2
+
