@@ -1,52 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [RFC BlueZ 0/3] Fix GATT server issues with BlueZ as LE peripheral
-Date: Tue, 28 Jan 2014 11:51:35 -0400
-Message-Id: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianx.chlad@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: PTS test results for HID
+Date: Tue, 28 Jan 2014 16:39:31 +0100
+Message-ID: <3964416.LD5rIGGQ5E@leonov>
+In-Reply-To: <1390916262-8022-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1390916262-8022-1-git-send-email-sebastianx.chlad@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Sebastian,
 
-Currently, we do not officially support running BlueZ as LE peripheral. But
-there is already enough support from the kernel to support this. For instance,
-there is the "Set Advertising" mgmt command to keep LE advertising enabled
-after each connection.
+On Tuesday 28 of January 2014 15:37:42 Sebastian Chlad wrote:
+> ---
+>  android/pts-hid.txt | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/pts-hid.txt b/android/pts-hid.txt
+> index 7e9f986..5208d92 100644
+> --- a/android/pts-hid.txt
+> +++ b/android/pts-hid.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for DID
+> 
+> -PTS version: 4.9
+> -Tested: 14.11.2013
+> +PTS version: 5.0
+> +Tested: 28.01.2014
+> 
+>  Results:
+>  PASS	test passed
+> @@ -13,7 +13,8 @@ N/A	test is disabled due to PICS setup
+>  Test Name		Result	Notes
+>  ---------------------------------------------------------------------------
+> ---- TC_HOS_HCE_BV_01_I	PASS
+> -TC_HOS_HCE_BV_02_I	PASS
+> +TC_HOS_HCE_BV_02_I	PASS	IUT must be connectable
+> +					(i.e. btmgmt connectable on)
 
-The current tracking of connections in BlueZ does not fully work for peripheral
-role. These patches are a first attempt to improve the situation. Other fixes
-are necessary to have full LE Peripheral support.
+Isn't enabling BT enough for this test to pass?
 
-In particular, with these patches, notifications for PASP and ANP profiles
-(implemented in profiles/alert/*) should work when BlueZ is on the peripheral
-role. Other GATT server profiles will need fixing as well.
-
-I'm sending as RFC because I only did minimal testing. I hope that people
-having issues with GATT server profiles running on peripheral role can tests
-these patches. Otherwise, I'll do more tests later today and send a final
-version by tomorrow.
-
-Notes: 
-* The first patch is just cleanup, so can be applied as is.
-* For testing, make sure to enable advertising on the machine running as
-  peripheral (I use btmgmt tool for this).
-
-Best Regards,
-Anderson Lizardo
-
-Anderson Lizardo (3):
-  attrib-server: Remove unnecessary fields from struct gatt_channel
-  core: Fix associating a GAttrib to a device on incoming connections
-  alert: Only remove attio callback after ATT request was sent
-
- profiles/alert/server.c | 18 +++++++++++++++++-
- src/attrib-server.c     | 45 +++++++++++++++++++++++++++++----------------
- src/attrib-server.h     |  1 +
- src/device.c            |  5 +++++
- 4 files changed, 52 insertions(+), 17 deletions(-)
+>  TC_HOS_HCE_BV_03_I	PASS
+>  TC_HOS_HCE_BV_04_I	PASS
+>  TC_HOS_HCR_BV_01_I	PASS
 
 -- 
-1.8.3.2
-
+BR
+Szymon Janc
