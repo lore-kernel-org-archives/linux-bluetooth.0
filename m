@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/8] avctp: trivial: Do not break short line
-Date: Wed, 29 Jan 2014 14:36:03 +0200
-Message-Id: <1390998967-24610-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/8] avctp: Use already calculated avc header
+Date: Wed, 29 Jan 2014 14:36:02 +0200
+Message-Id: <1390998967-24610-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1390998967-24610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1390998967-24610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,24 +11,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+This removes long (81 characters) line as a side effect.
 ---
- profiles/audio/avctp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ profiles/audio/avctp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 78bf1fd..570d609 100644
+index 6fd1454..78bf1fd 100644
 --- a/profiles/audio/avctp.c
 +++ b/profiles/audio/avctp.c
-@@ -904,8 +904,7 @@ failed:
- 	return FALSE;
- }
+@@ -942,7 +942,7 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
  
--static gboolean session_cb(GIOChannel *chan, GIOCondition cond,
--				gpointer data)
-+static gboolean session_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
- {
- 	struct avctp *session = data;
- 	struct avctp_channel *control = session->control;
+ 	ret -= sizeof(struct avc_header);
+ 
+-	operands = buf + sizeof(struct avctp_header) + sizeof(struct avc_header);
++	operands = (uint8_t *) avc + sizeof(struct avc_header);
+ 	operand_count = ret;
+ 
+ 	if (avctp->cr == AVCTP_RESPONSE) {
 -- 
 1.8.3.2
 
