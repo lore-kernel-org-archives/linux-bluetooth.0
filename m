@@ -1,57 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/3] unit/avctp: Add TP/NFR/BV-02-C test
-Date: Wed, 29 Jan 2014 14:41:13 +0200
-Message-Id: <1390999274-15631-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: [PATCH] android: Add avtest to debug builds
+Date: Wed, 29 Jan 2014 14:40:19 +0200
+Message-Id: <1390999219-15012-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-To verify that the IUT (TG) formats correctly the following fields of
-the AVCTP response message: “transaction label”, "message type(R)", PID,
-“packet type”, IPID and “message information”. Check that AVCTP send
-response packet along with other information. Payload is out of scope of
-this test (AVC_CTYPE_REJECTED is OK).
 ---
- unit/test-avctp.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ android/Android.mk | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-index 49bd640..8c97a82 100644
---- a/unit/test-avctp.c
-+++ b/unit/test-avctp.c
-@@ -244,6 +244,15 @@ static void test_client(gconstpointer data)
- 	execute_context(context);
- }
+diff --git a/android/Android.mk b/android/Android.mk
+index 1d12da5..238bb7c 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -354,6 +354,34 @@ LOCAL_MODULE := l2ping
+ include $(BUILD_EXECUTABLE)
  
-+static void test_server(gconstpointer data)
-+{
-+	struct context *context = create_context(0x0100, data);
+ #
++# avtest
++#
 +
-+	g_idle_add(send_pdu, context);
++include $(CLEAR_VARS)
 +
-+	execute_context(context);
-+}
++LOCAL_SRC_FILES := \
++	bluez/tools/avtest.c \
++	bluez/lib/bluetooth.c \
++	bluez/lib/hci.c \
 +
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -254,5 +263,9 @@ int main(int argc, char *argv[])
- 	define_test("/TP/NFR/BV-01-C", test_client,
- 				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00));
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/bluez/lib \
++
++lib_headers := \
++	bluetooth.h \
++	hci.h \
++
++$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/bluez/lib/bluetooth/$(file)))
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := debug
++LOCAL_MODULE := avtest
++
++include $(BUILD_EXECUTABLE)
++
++#
+ # libsbc
+ #
  
-+	define_test("/TP/NFR/BV-02-C", test_server,
-+				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
-+				raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x00, 0x00));
-+
- 	return g_test_run();
- }
 -- 
 1.8.3.2
+
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
