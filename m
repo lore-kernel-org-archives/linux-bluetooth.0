@@ -1,63 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastianx.chlad@intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH 1/2] android/pts: PTS test results for AVCTP
-Date: Wed, 29 Jan 2014 15:27:04 +0200
-Message-Id: <1391002025-15997-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCHv2 3/3] unit/avctp: Add TP/NFR/BI-01-C test
+Date: Wed, 29 Jan 2014 14:41:14 +0200
+Message-Id: <1390999274-15631-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-avctp.txt | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
-index c057a10..a57ecee 100644
---- a/android/pts-avctp.txt
-+++ b/android/pts-avctp.txt
-@@ -1,7 +1,7 @@
- PTS test results for AVCTP
+To verify that the IUT (TG) reports to the test system (CT) the
+reception of a control message intended for an invalid PID (PID not
+registered for reception of messages).
+---
+ unit/test-avctp.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+index 8c97a82..041e0c0 100644
+--- a/unit/test-avctp.c
++++ b/unit/test-avctp.c
+@@ -267,5 +267,9 @@ int main(int argc, char *argv[])
+ 				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
+ 				raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x00, 0x00));
  
- PTS version: 5.0
--Tested: --not yet tested--
-+Tested: 29.01.2014
- 
- Results:
- PASS	test passed
-@@ -29,13 +29,13 @@ TC_CT_FRA_BV_04_C	N/A
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_TG_CCM_BV_01_C	INC
--TC_TG_CCM_BV_02_C	INC
--TC_TG_CCM_BV_03_C	INC
--TC_TG_CCM_BV_04_C	INC
--TC_TG_NFR_BV_02_C	INC
--TC_TG_NFR_BV_03_C	INC
--TC_TG_NFR_BI_01_C	INC
--TC_TG_FRA_BV_02_C	INC
-+TC_TG_CCM_BV_01_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
-+TC_TG_CCM_BV_02_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
-+TC_TG_CCM_BV_03_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
-+TC_TG_CCM_BV_04_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
-+TC_TG_NFR_BV_02_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
-+TC_TG_NFR_BV_03_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
-+TC_TG_NFR_BI_01_C	PASS
-+TC_TG_FRA_BV_02_C	FAIL
- TC_TG_FRA_BV_03_C	INC
- -------------------------------------------------------------------------------
++	define_test("/TP/NFR/BI-01-C", test_server,
++				raw_pdu(0x00, 0xff, 0xff, 0x00, 0x00, 0x00),
++				raw_pdu(0x03, 0xff, 0xff));
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
-
----------------------------------------------------------------------
-Intel Finland Oy
-Registered Address: PL 281, 00181 Helsinki 
-Business Identity Code: 0357606 - 4 
-Domiciled in Helsinki 
-
-This e-mail and any attachments may contain confidential material for
-the sole use of the intended recipient(s). Any review or distribution
-by others is strictly prohibited. If you are not the intended
-recipient, please contact the sender and delete all copies.
 
