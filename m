@@ -1,124 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391010302-13231-1-git-send-email-szymon.janc@tieto.com>
-References: <1391010302-13231-1-git-send-email-szymon.janc@tieto.com>
-Date: Wed, 29 Jan 2014 10:38:07 -0800
-Message-ID: <CABBYNZJ8OkaKqymhu4JxMM+ypZhuXnE=epVNYmUB_LShw308Gw@mail.gmail.com>
-Subject: Re: [PATCH] android/a2dp: Fix crash on remote disconnection
+In-Reply-To: <1390939534-15699-1-git-send-email-luiz.dentz@gmail.com>
+References: <1390939534-15699-1-git-send-email-luiz.dentz@gmail.com>
+Date: Wed, 29 Jan 2014 09:07:45 -0800
+Message-ID: <CABBYNZ+qhc-i_h5T+uzfDD6jnfFTZbFNSjXbinbhJUSWLm5_Ug@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] audio/AVRCP: Fix sending invalid response to GetCapabilities
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi,
 
-On Wed, Jan 29, 2014 at 7:45 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Remove setups when a2dp device is removed. This fix following:
+On Tue, Jan 28, 2014 at 12:05 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Invalid read of size 4
->    at 0x115E32: bt_stream_close (a2dp.c:1352)
->    by 0x111DFB: ipc_handle_msg (ipc.c:95)
->    by 0x11234B: audio_watch_cb (audio-ipc.c:67)
->    by 0x48BD9C7: ??? (in /system/lib/libglib.so)
->  Address 0x4a590f4 is 12 bytes inside a block of size 20 free'd
->    at 0x4897E6C: free (in
->        /system/lib/valgrind/vgpreload_memcheck-arm-linux.so)
->    by 0x48C5E2B: g_free (in /system/lib/libglib.so)
->
-> Invalid read of size 4
->    at 0x113638: avdtp_close (avdtp.c:3201)
->    by 0x115E39: bt_stream_close (a2dp.c:1352)
->    by 0x111DFB: ipc_handle_msg (ipc.c:95)
->    by 0x11234B: audio_watch_cb (audio-ipc.c:67)
->    by 0x48BD9C7: ??? (in /system/lib/libglib.so)
->  Address 0x4a594a4 is 28 bytes inside a block of size 1,100 free'd
->    at 0x4897E6C: free (in
->        /system/lib/valgrind/vgpreload_memcheck-arm-linux.so)
->    by 0x48C5E2B: g_free (in /system/lib/libglib.so)
+> The attribute count has to be initialized with 0 since we reuse the same
+> buffer for both command and responses it may be already be set causing
+> invalid response to be generated.
 > ---
->  android/a2dp.c | 49 +++++++++++++++++++++++++++++++++----------------
->  1 file changed, 33 insertions(+), 16 deletions(-)
+>  profiles/audio/avrcp.c | 1 +
+>  1 file changed, 1 insertion(+)
 >
-> diff --git a/android/a2dp.c b/android/a2dp.c
-> index 8d8fa7d..a215ce2 100644
-> --- a/android/a2dp.c
-> +++ b/android/a2dp.c
-> @@ -122,6 +122,37 @@ static void unregister_endpoint(void *data)
->         g_free(endpoint);
->  }
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 59a966e..ad5dc34 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -921,6 +921,7 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
 >
-> +static void setup_free(void *data)
-> +{
-> +       struct a2dp_setup *setup = data;
-> +
-> +       if (!g_slist_find(setup->endpoint->presets, setup->preset))
-> +               preset_free(setup->preset);
-> +
-> +       g_free(setup);
-> +}
-> +
-> +static void setup_remove(struct a2dp_setup *setup)
-> +{
-> +       setups = g_slist_remove(setups, setup);
-> +       setup_free(setup);
-> +}
-> +
-> +static void setup_remove_all_by_dev(struct a2dp_device *dev)
-> +{
-> +       GSList *l = setups;
-> +
-> +       while (l) {
-> +               struct a2dp_setup *setup = l->data;
-> +               GSList *next = g_slist_next(l);
-> +
-> +               if (setup->dev == dev)
-> +                       setup_remove(setup);
-> +
-> +               l = next;
-> +       }
-> +}
-> +
->  static void a2dp_device_free(void *data)
->  {
->         struct a2dp_device *dev = data;
-> @@ -137,6 +168,8 @@ static void a2dp_device_free(void *data)
->                 g_io_channel_unref(dev->io);
->         }
->
-> +       setup_remove_all_by_dev(dev);
-> +
->         devices = g_slist_remove(devices, dev);
->         g_free(dev);
->  }
-> @@ -828,22 +861,6 @@ static struct a2dp_device *find_device_by_session(struct avdtp *session)
->         return NULL;
->  }
->
-> -static void setup_free(void *data)
-> -{
-> -       struct a2dp_setup *setup = data;
-> -
-> -       if (!g_slist_find(setup->endpoint->presets, setup->preset))
-> -               preset_free(setup->preset);
-> -
-> -       g_free(setup);
-> -}
-> -
-> -static void setup_remove(struct a2dp_setup *setup)
-> -{
-> -       setups = g_slist_remove(setups, setup);
-> -       setup_free(setup);
-> -}
-> -
->  static struct a2dp_setup *find_setup(uint8_t id)
->  {
->         GSList *l;
+>                 return AVC_CTYPE_STABLE;
+>         case CAP_EVENTS_SUPPORTED:
+> +               pdu->params[1] = 0;
+>                 for (i = 1; i <= AVRCP_EVENT_LAST; i++) {
+>                         if (session->supported_events & (1 << i)) {
+>                                 pdu->params[1]++;
 > --
-> 1.8.5.3
+> 1.8.4.2
 
-Pushed, thanks.
+Applied.
 
 
 -- 
