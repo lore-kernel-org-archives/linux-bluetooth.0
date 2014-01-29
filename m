@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 8/8] avctp: Fix unchecked return value
-Date: Wed, 29 Jan 2014 14:36:07 +0200
-Message-Id: <1390998967-24610-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 1/8] android/avctp: Use predefined HEADER_LENGTH instead of sizeof
+Date: Wed, 29 Jan 2014 14:36:00 +0200
+Message-Id: <1390998967-24610-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1390998967-24610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1390998967-24610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,80 +11,47 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Refactor code so that ioctl() return value is checked.
+Make code consistent with using HEADER_LENGTH defined. Remove also type
+conversion.
 ---
- profiles/audio/avctp.c | 47 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 37 insertions(+), 10 deletions(-)
+ android/avctp.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 9f87859..a77aa9d 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1026,27 +1026,54 @@ static int uinput_create(char *name)
- 		err = -errno;
- 		error("Can't write device information: %s (%d)",
- 						strerror(-err), -err);
--		close(fd);
--		return err;
-+		goto fail;
-+	}
-+
-+	if (ioctl(fd, UI_SET_EVBIT, EV_KEY) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
+diff --git a/android/avctp.c b/android/avctp.c
+index 6f9b33b..4ebf2ff 100644
+--- a/android/avctp.c
++++ b/android/avctp.c
+@@ -818,24 +818,24 @@ static gboolean session_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+ 	if (ret <= 0)
+ 		goto failed;
+ 
+-	if ((unsigned int) ret < sizeof(struct avctp_header)) {
++	if (ret < AVCTP_HEADER_LENGTH) {
+ 		error("Too small AVCTP packet");
+ 		goto failed;
  	}
  
--	ioctl(fd, UI_SET_EVBIT, EV_KEY);
--	ioctl(fd, UI_SET_EVBIT, EV_REL);
--	ioctl(fd, UI_SET_EVBIT, EV_REP);
--	ioctl(fd, UI_SET_EVBIT, EV_SYN);
-+	if (ioctl(fd, UI_SET_EVBIT, EV_REL) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
+ 	avctp = (struct avctp_header *) buf;
  
--	for (i = 0; key_map[i].name != NULL; i++)
--		ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput);
-+	if (ioctl(fd, UI_SET_EVBIT, EV_REP) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
-+
-+	if (ioctl(fd, UI_SET_EVBIT, EV_SYN) < 0) {
-+		err = -errno;
-+		error("ioctl UI_SET_EVBIT: %s (%d)", strerror(-err), -err);
-+		goto fail;
-+	}
-+
-+	for (i = 0; key_map[i].name != NULL; i++) {
-+		if (ioctl(fd, UI_SET_KEYBIT, key_map[i].uinput) < 0) {
-+			err = -errno;
-+			error("ioctl UI_SET_KEYBIT: %s (%d)", strerror(-err),
-+									-err);
-+			goto fail;
-+		}
-+	}
- 
- 	if (ioctl(fd, UI_DEV_CREATE, NULL) < 0) {
- 		err = -errno;
- 		error("Can't create uinput device: %s (%d)",
- 						strerror(-err), -err);
--		close(fd);
--		return err;
-+		goto fail;
+-	ret -= sizeof(struct avctp_header);
+-	if ((unsigned int) ret < sizeof(struct avc_header)) {
++	ret -= AVCTP_HEADER_LENGTH;
++	if (ret < AVC_HEADER_LENGTH) {
+ 		error("Too small AVCTP packet");
+ 		goto failed;
  	}
  
- 	return fd;
-+
-+fail:
-+	close(fd);
-+	return err;
- }
+-	avc = (struct avc_header *) (buf + sizeof(struct avctp_header));
++	avc = (struct avc_header *) (buf + AVCTP_HEADER_LENGTH);
  
- static void init_uinput(struct avctp *session)
+-	ret -= sizeof(struct avc_header);
++	ret -= AVC_HEADER_LENGTH;
+ 
+-	operands = (uint8_t *) avc + sizeof(struct avc_header);
++	operands = (uint8_t *) avc + AVC_HEADER_LENGTH;
+ 	operand_count = ret;
+ 
+ 	if (avctp->cr == AVCTP_RESPONSE) {
 -- 
 1.8.3.2
 
