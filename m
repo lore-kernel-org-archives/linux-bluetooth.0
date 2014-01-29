@@ -1,41 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 29 Jan 2014 15:29:34 -0800
-Message-ID: <CABBYNZKX1exqL=KpB=KUw2r+oezP+ikkWSJsM=jg-uCAYAc7hw@mail.gmail.com>
-Subject: Re: [PATCHv2 0/3] AVCTP test cases
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Enable LTK distribution to slave devices
+Date: Wed, 29 Jan 2014 13:55:59 -0800
+Message-Id: <1391032559-25183-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Wed, Jan 29, 2014 at 4:41 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Set of test cases which are feasible to implement with socketpair.
-> Fragmentation of AVCTP is not supported yet.
->
-> Andrei Emeltchenko (3):
->   unit/avctp: Add AVCTP unit test skeleton and first test
->   unit/avctp: Add TP/NFR/BV-02-C test
->   unit/avctp: Add TP/NFR/BI-01-C test
->
->  Makefile.am       |   8 ++
->  unit/test-avctp.c | 275 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 283 insertions(+)
->  create mode 100644 unit/test-avctp.c
->
-> --
-> 1.8.3.2
+So far we've only been requesting the LTK to be distributed to the
+master (initiator) of pairing, which is usually enough since it's the
+master that will establish future connections and initiate encryption.
+However, in the case that both devices support switching to the opposing
+role (which seems to be increasingly common) pairing will have to
+performed again since the "new" master will not have all information.
 
-Applied, thanks.
+As there is no real harm in it, this patch updates the code to always
+try distributing the LTK also to the slave device, thereby enabling role
+switches for future connections.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 45007362683b..9b1167007653 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -216,7 +216,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 		req->io_capability = conn->hcon->io_capability;
+ 		req->oob_flag = SMP_OOB_NOT_PRESENT;
+ 		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+-		req->init_key_dist = 0;
++		req->init_key_dist = dist_keys;
+ 		req->resp_key_dist = dist_keys;
+ 		req->auth_req = (authreq & AUTH_REQ_MASK);
+ 		return;
+@@ -225,7 +225,7 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 	rsp->io_capability = conn->hcon->io_capability;
+ 	rsp->oob_flag = SMP_OOB_NOT_PRESENT;
+ 	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
+-	rsp->init_key_dist = 0;
++	rsp->init_key_dist = req->init_key_dist & dist_keys;
+ 	rsp->resp_key_dist = req->resp_key_dist & dist_keys;
+ 	rsp->auth_req = (authreq & AUTH_REQ_MASK);
+ }
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
