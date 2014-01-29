@@ -1,42 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140129053008.829BC100AC4@puck.mtv.corp.google.com>
-References: <20140129053008.829BC100AC4@puck.mtv.corp.google.com>
-Date: Wed, 29 Jan 2014 18:50:39 -0800
-Message-ID: <CAGXr9JG51WZbXc6kxEjAEXUjwoOkBDBByP71-U2BqdN2tWhb7g@mail.gmail.com>
-Subject: Re: [PATCH] hog: Use HoG device name as uHID input device name
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1390999274-15631-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 29 Jan 2014 15:29:34 -0800
+Message-ID: <CABBYNZKX1exqL=KpB=KUw2r+oezP+ikkWSJsM=jg-uCAYAc7hw@mail.gmail.com>
+Subject: Re: [PATCHv2 0/3] AVCTP test cases
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jan 28, 2014 at 9:30 PM, Petri Gynther <pgynther@google.com> wrote:
-> If HoG BLE device name is known, use it when creating uHID input device.
-> ---
->  profiles/input/hog.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-> index ded6303..3af0406 100644
-> --- a/profiles/input/hog.c
-> +++ b/profiles/input/hog.c
-> @@ -392,7 +392,12 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
->         /* create uHID device */
->         memset(&ev, 0, sizeof(ev));
->         ev.type = UHID_CREATE;
-> -       strcpy((char *) ev.u.create.name, "bluez-hog-device");
-> +       if (device_name_known(hogdev->device)) {
-> +               device_get_name(hogdev->device, (char *) ev.u.create.name,
-> +                               sizeof(ev.u.create.name) - 1);
-> +       } else {
-> +               strcpy((char *) ev.u.create.name, "bluez-hog-device");
-> +       }
->         ev.u.create.vendor = vendor;
->         ev.u.create.product = product;
->         ev.u.create.version = version;
-> --
-> 1.8.5.3
->
+Hi Andrei,
 
-I'll add the BLE device address to ev.u.create.phys. New patch coming soon.
+On Wed, Jan 29, 2014 at 4:41 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Set of test cases which are feasible to implement with socketpair.
+> Fragmentation of AVCTP is not supported yet.
+>
+> Andrei Emeltchenko (3):
+>   unit/avctp: Add AVCTP unit test skeleton and first test
+>   unit/avctp: Add TP/NFR/BV-02-C test
+>   unit/avctp: Add TP/NFR/BI-01-C test
+>
+>  Makefile.am       |   8 ++
+>  unit/test-avctp.c | 275 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 283 insertions(+)
+>  create mode 100644 unit/test-avctp.c
+>
+> --
+> 1.8.3.2
+
+Applied, thanks.
+
+
+-- 
+Luiz Augusto von Dentz
