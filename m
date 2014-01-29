@@ -1,35 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hog: Use HoG device name as uHID input device name
-Message-Id: <20140129053008.829BC100AC4@puck.mtv.corp.google.com>
-Date: Tue, 28 Jan 2014 21:30:08 -0800 (PST)
+Content-Type: text/plain; charset=iso-8859-1
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 1/2] android/bluetooth: Add threashold to RSSI change
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAJdJm_MEjCN4ooe4OSym4CLN1JLS4FrnO-n5_ZVQzrVuuZ3Sfw@mail.gmail.com>
+Date: Tue, 28 Jan 2014 17:02:50 -0800
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <755599B7-D32C-424C-B2B8-E0E8539C31EE@holtmann.org>
+References: <1390952835-23251-1-git-send-email-szymon.janc@tieto.com> <46CB790A-A0DF-47A4-ACD1-DD7C0F0A9D2D@holtmann.org> <CAJdJm_MEjCN4ooe4OSym4CLN1JLS4FrnO-n5_ZVQzrVuuZ3Sfw@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If HoG BLE device name is known, use it when creating uHID input device.
----
- profiles/input/hog.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Hi Anderson,
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index ded6303..3af0406 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -392,7 +392,12 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	/* create uHID device */
- 	memset(&ev, 0, sizeof(ev));
- 	ev.type = UHID_CREATE;
--	strcpy((char *) ev.u.create.name, "bluez-hog-device");
-+	if (device_name_known(hogdev->device)) {
-+		device_get_name(hogdev->device, (char *) ev.u.create.name,
-+				sizeof(ev.u.create.name) - 1);
-+	} else {
-+		strcpy((char *) ev.u.create.name, "bluez-hog-device");
-+	}
- 	ev.u.create.vendor = vendor;
- 	ev.u.create.product = product;
- 	ev.u.create.version = version;
--- 
-1.8.5.3
+>>> +{
+>>> +     int delta;
+>>> +
+>>> +     if (old > new)
+>>> +             delta = old - new;
+>>> +     else
+>>> +             delta = new - old;
+>>> +
+>>> +     /* only 8 dBm or more */
+>>> +     return delta >= 8;
+>> 
+>>        int delta = old > new ? old - new : new - old;
+> 
+> And why not:
+> 
+> int delta = abs(old - new);
+> 
+> (unless there is no abs() in bionic)
+
+I remember that abs() needs -lm or something stupid.
+
+Regards
+
+Marcel
 
