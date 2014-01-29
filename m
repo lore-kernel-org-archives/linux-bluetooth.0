@@ -2,120 +2,66 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pts: Add android version to PTS test
-Date: Wed, 29 Jan 2014 13:15:39 +0200
-Message-Id: <1390994139-14743-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCH] android/pts: PTS test results for L2CAP
+Date: Wed, 29 Jan 2014 12:33:26 +0200
+Message-Id: <1390991606-13576-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Trivial patch helping tracking pts tests results' status
 ---
- android/pts-a2dp.txt  | 1 +
- android/pts-avrcp.txt | 1 +
- android/pts-did.txt   | 1 +
- android/pts-gap.txt   | 1 +
- android/pts-hid.txt   | 1 +
- android/pts-l2cap.txt | 1 +
- android/pts-opp.txt   | 1 +
- android/pts-pbap.txt  | 1 +
- 8 files changed, 8 insertions(+)
+ android/pts-l2cap.txt | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
-index 67f9183..22fe166 100644
---- a/android/pts-a2dp.txt
-+++ b/android/pts-a2dp.txt
-@@ -2,6 +2,7 @@ PTS test results for A2DP
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-index 6ad97f7..934197b 100644
---- a/android/pts-avrcp.txt
-+++ b/android/pts-avrcp.txt
-@@ -2,6 +2,7 @@ PTS test results for AVRCP
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
-diff --git a/android/pts-did.txt b/android/pts-did.txt
-index d764f09..5c03974 100644
---- a/android/pts-did.txt
-+++ b/android/pts-did.txt
-@@ -2,6 +2,7 @@ PTS test results for DID
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
-diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-index 1c0feec..b424543 100644
---- a/android/pts-gap.txt
-+++ b/android/pts-gap.txt
-@@ -2,6 +2,7 @@ PTS test results for GAP
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
-diff --git a/android/pts-hid.txt b/android/pts-hid.txt
-index 5208d92..9d135e2 100644
---- a/android/pts-hid.txt
-+++ b/android/pts-hid.txt
-@@ -2,6 +2,7 @@ PTS test results for DID
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
 diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
-index 3e46309..b0a195f 100644
+index 51eedf5..3e46309 100644
 --- a/android/pts-l2cap.txt
 +++ b/android/pts-l2cap.txt
-@@ -2,6 +2,7 @@ PTS test results for L2CAP
+@@ -1,7 +1,7 @@
+ PTS test results for L2CAP
  
  PTS version: 5.0
- Tested: 29.01.2014
-+Android version: 4.4
+-Tested: 10.01.2014
++Tested: 29.01.2014
  
  Results:
  PASS   test passed
-diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-index 3c4ab47..9222288 100644
---- a/android/pts-opp.txt
-+++ b/android/pts-opp.txt
-@@ -2,6 +2,7 @@ PTS test results for OPP
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
-diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
-index 4312921..c74370a 100644
---- a/android/pts-pbap.txt
-+++ b/android/pts-pbap.txt
-@@ -2,6 +2,7 @@ PTS test results for PBAP
- 
- PTS version: 5.0
- Tested: 28.01.2014
-+Android version: 4.4
- 
- Results:
- PASS	test passed
+@@ -87,16 +87,18 @@ TC_ERM_BV_06_C         PASS
+ TC_ERM_BV_07_C         PASS    l2test -X ertm -P 33 &
+ TC_ERM_BV_08_C         PASS
+ TC_ERM_BV_09_C         PASS    l2test -X ertm -P 33 &
+-TC_ERM_BV_10_C         INC
+-TC_ERM_BV_11_C         INC
+-TC_ERM_BV_12_C         INC
++TC_ERM_BV_10_C         PASS    l2test -x -X ertm -P 33 -D 35000 -Q 1 -R -N 1 &
++				btmgmt disconnect
++TC_ERM_BV_11_C         PASS    l2test -x -X ertm -P 33 -D 35000 -Q 1 -R -N 1 &
++				btmgmt disconnect
++TC_ERM_BV_12_C         PASS    l2test -x -X ertm -P 33 -R -N 1
+ TC_ERM_BV_13_C         PASS
+ TC_ERM_BV_14_C         PASS
+ TC_ERM_BV_15_C         PASS
+ TC_ERM_BV_16_C         PASS
+ TC_ERM_BV_17_C         PASS
+-TC_ERM_BV_18_C         INC
+-TC_ERM_BV_19_C         INC
++TC_ERM_BV_18_C         PASS    l2test -x -X ertm -P 33 -R -N 1
++TC_ERM_BV_19_C         PASS    l2test -x -X ertm -P 33 -R -N 1
+ TC_ERM_BV_20_C         PASS
+ TC_ERM_BV_21_C         PASS
+ TC_ERM_BV_22_C         PASS
+@@ -106,9 +108,9 @@ TC_ERM_BI_02_C         PASS
+ TC_ERM_BI_03_C         PASS
+ TC_ERM_BI_04_C         PASS
+ TC_ERM_BI_05_C         PASS
+-TC_STM_BV_01_C         INC
+-TC_STM_BV_02_C         INC
+-TC_STM_BV_03_C         INC
++TC_STM_BV_01_C         PASS    l2test -x -X ertm -P 33 -R -N 1 -Y 3 &
++TC_STM_BV_02_C         PASS    l2test -x -X ertm -P 33 -R -N 1 -Y 3 &
++TC_STM_BV_03_C         PASS    l2test -x -X ertm -P 33 -R -N 1 -Y 3 &
+ TC_STM_BV_11_C         N/A
+ TC_STM_BV_12_C         N/A
+ TC_STM_BV_13_C         N/A
 -- 
 1.8.3.2
 
