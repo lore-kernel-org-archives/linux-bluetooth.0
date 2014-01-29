@@ -1,49 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1390998967-24610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1390998967-24610-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 29 Jan 2014 09:07:02 -0800
-Message-ID: <CABBYNZL3H88gj04q0bdaKCBAwYeo6M4ejhUmwLNx=J8s2g0jEw@mail.gmail.com>
-Subject: Re: [PATCHv2 0/8] Set of AVCTP fixes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <755599B7-D32C-424C-B2B8-E0E8539C31EE@holtmann.org>
+References: <1390952835-23251-1-git-send-email-szymon.janc@tieto.com>
+	<46CB790A-A0DF-47A4-ACD1-DD7C0F0A9D2D@holtmann.org>
+	<CAJdJm_MEjCN4ooe4OSym4CLN1JLS4FrnO-n5_ZVQzrVuuZ3Sfw@mail.gmail.com>
+	<755599B7-D32C-424C-B2B8-E0E8539C31EE@holtmann.org>
+Date: Wed, 29 Jan 2014 12:12:08 -0400
+Message-ID: <CAJdJm_Pxex7RpLh_NjtBA_5P69cfE83bUdbD31euAWaU5kCsCg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] android/bluetooth: Add threashold to RSSI change
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On Wed, Jan 29, 2014 at 4:35 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Tue, Jan 28, 2014 at 9:02 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> And why not:
+>>
+>> int delta = abs(old - new);
+>>
+>> (unless there is no abs() in bionic)
 >
-> AVCTP issues found during writing test cases.
->
-> Changes:
->         * v2: Added last 2 patches to series.
->
-> Andrei Emeltchenko (8):
->   android/avctp: Use predefined HEADER_LENGTH instead of sizeof
->   android/avctp: Fix wrong error message
->   avctp: Use already calculated avc header
->   avctp: trivial: Do not break short line
->   avctp: Use predefined HEADER_LENGTH instead of sizeof
->   avctp: Fix wrong error message
->   android/avctp: Move AVC_HEADER_LENGTH from avctp header
->   avctp: Fix unchecked return value
->
->  android/avctp.c        | 16 +++++++------
->  android/avctp.h        |  1 -
->  profiles/audio/avctp.c | 64 +++++++++++++++++++++++++++++++++++---------------
->  3 files changed, 54 insertions(+), 27 deletions(-)
->
-> --
-> 1.8.3.2
+> I remember that abs() needs -lm or something stupid.
 
-Patches 1-7 applied, patch 8 needs some investigation if we can reduce
-that many ioctl in a row.
+>From my tests, it does not require any extra libraries other than
+libc6 (at least in recent versions). It seems that at least for x86 it
+is even optimized to a few machine instructions (as I could not find
+the library call when using objdump on code that does
+"abs(atoi(argv[1]))").
 
-
+Best Regards,
 -- 
-Luiz Augusto von Dentz
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
