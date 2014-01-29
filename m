@@ -1,113 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/a2dp: Fix crash on remote disconnection
-Date: Wed, 29 Jan 2014 16:45:02 +0100
-Message-Id: <1391010302-13231-1-git-send-email-szymon.janc@tieto.com>
+Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: [PATCH 2/2] android/pts: Add android version to PTS test
+Date: Wed, 29 Jan 2014 15:27:05 +0200
+Message-Id: <1391002025-15997-2-git-send-email-sebastianx.chlad@intel.com>
+In-Reply-To: <1391002025-15997-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1391002025-15997-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remove setups when a2dp device is removed. This fix following:
-
-Invalid read of size 4
-   at 0x115E32: bt_stream_close (a2dp.c:1352)
-   by 0x111DFB: ipc_handle_msg (ipc.c:95)
-   by 0x11234B: audio_watch_cb (audio-ipc.c:67)
-   by 0x48BD9C7: ??? (in /system/lib/libglib.so)
- Address 0x4a590f4 is 12 bytes inside a block of size 20 free'd
-   at 0x4897E6C: free (in
-       /system/lib/valgrind/vgpreload_memcheck-arm-linux.so)
-   by 0x48C5E2B: g_free (in /system/lib/libglib.so)
-
-Invalid read of size 4
-   at 0x113638: avdtp_close (avdtp.c:3201)
-   by 0x115E39: bt_stream_close (a2dp.c:1352)
-   by 0x111DFB: ipc_handle_msg (ipc.c:95)
-   by 0x11234B: audio_watch_cb (audio-ipc.c:67)
-   by 0x48BD9C7: ??? (in /system/lib/libglib.so)
- Address 0x4a594a4 is 28 bytes inside a block of size 1,100 free'd
-   at 0x4897E6C: free (in
-       /system/lib/valgrind/vgpreload_memcheck-arm-linux.so)
-   by 0x48C5E2B: g_free (in /system/lib/libglib.so)
 ---
- android/a2dp.c | 49 +++++++++++++++++++++++++++++++++----------------
- 1 file changed, 33 insertions(+), 16 deletions(-)
+ android/pts-avctp.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index 8d8fa7d..a215ce2 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -122,6 +122,37 @@ static void unregister_endpoint(void *data)
- 	g_free(endpoint);
- }
+diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+index a57ecee..efd525e 100644
+--- a/android/pts-avctp.txt
++++ b/android/pts-avctp.txt
+@@ -2,6 +2,7 @@ PTS test results for AVCTP
  
-+static void setup_free(void *data)
-+{
-+	struct a2dp_setup *setup = data;
-+
-+	if (!g_slist_find(setup->endpoint->presets, setup->preset))
-+		preset_free(setup->preset);
-+
-+	g_free(setup);
-+}
-+
-+static void setup_remove(struct a2dp_setup *setup)
-+{
-+	setups = g_slist_remove(setups, setup);
-+	setup_free(setup);
-+}
-+
-+static void setup_remove_all_by_dev(struct a2dp_device *dev)
-+{
-+	GSList *l = setups;
-+
-+	while (l) {
-+		struct a2dp_setup *setup = l->data;
-+		GSList *next = g_slist_next(l);
-+
-+		if (setup->dev == dev)
-+			setup_remove(setup);
-+
-+		l = next;
-+	}
-+}
-+
- static void a2dp_device_free(void *data)
- {
- 	struct a2dp_device *dev = data;
-@@ -137,6 +168,8 @@ static void a2dp_device_free(void *data)
- 		g_io_channel_unref(dev->io);
- 	}
+ PTS version: 5.0
+ Tested: 29.01.2014
++Android version: 4.4
  
-+	setup_remove_all_by_dev(dev);
-+
- 	devices = g_slist_remove(devices, dev);
- 	g_free(dev);
- }
-@@ -828,22 +861,6 @@ static struct a2dp_device *find_device_by_session(struct avdtp *session)
- 	return NULL;
- }
- 
--static void setup_free(void *data)
--{
--	struct a2dp_setup *setup = data;
--
--	if (!g_slist_find(setup->endpoint->presets, setup->preset))
--		preset_free(setup->preset);
--
--	g_free(setup);
--}
--
--static void setup_remove(struct a2dp_setup *setup)
--{
--	setups = g_slist_remove(setups, setup);
--	setup_free(setup);
--}
--
- static struct a2dp_setup *find_setup(uint8_t id)
- {
- 	GSList *l;
+ Results:
+ PASS	test passed
 -- 
-1.8.5.3
+1.8.3.2
+
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
