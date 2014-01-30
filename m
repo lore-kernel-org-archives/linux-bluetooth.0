@@ -1,159 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v6 06/14] Bluetooth: Stop scanning on LE connection
-Date: Thu, 30 Jan 2014 18:22:09 -0300
-Message-Id: <1391116937-28217-7-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v6 13/14] Bleutooth: Add support for auto connect options
+Date: Thu, 30 Jan 2014 18:22:16 -0300
+Message-Id: <1391116937-28217-14-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some LE controllers don't support scanning and creating a connection
-at the same time. So we should always stop scanning in order to
-establish the connection.
+This patch adds support for the HCI_AUTO_CONN_ALWAYS and HCI_AUTO_
+CONN_LINK_LOSS options from struct hci_conn_params.
 
-Since we may prematurely stop the discovery procedure in favor of
-the connection establishment, we should also cancel hdev->le_scan_
-disable delayed work and set the discovery state to DISCOVERY_STOPPED.
+The HCI_AUTO_CONN_ALWAYS option configures the kernel to always re-
+establish the connection, no matter the reason the connection was
+terminated. This feature is required by some LE profiles such as
+HID over GATT, Health Thermometer and Blood Pressure. These profiles
+require the host autonomously connect to the device as soon as it
+enters in connectable mode (start advertising) so the device is able
+to delivery notifications or indications.
 
-This change does a small improvement since it is not mandatory the
-user stops scanning before connecting anymore. Moreover, this change
-is required by upcoming LE auto connection mechanism in order to work
-properly with controllers that don't support background scanning and
-connection establishment at the same time.
-
-In future, we might want to do a small optimization by checking if
-controller is able to scan and connect at the same time. For now,
-we want the simplest approach so we always stop scanning (even if
-the controller is able to carry out both operations).
+The BT_AUTO_CONN_LINK_LOSS option configures the kernel to re-
+establish the connection in case the connection was terminated due
+to a link loss. This feature is required by the majority of LE
+profiles such as Proximity, Find Me, Cycling Speed and Cadence and
+Time.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_conn.c    | 84 +++++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 83 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 232c078..1e486a9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -348,6 +348,7 @@ enum {
- 
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
-+#define HCI_ERROR_MEMORY_EXCEEDED	0x07
- #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
- #define HCI_ERROR_REJ_BAD_ADDR		0x0f
- #define HCI_ERROR_REMOTE_USER_TERM	0x13
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 914d7f5..66f77a2 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -583,11 +583,71 @@ static int hci_create_le_conn(struct hci_conn *conn)
- 	return 0;
- }
- 
-+static void create_le_conn_req(struct hci_request *req, struct hci_conn *conn)
-+{
-+	struct hci_cp_le_create_conn cp;
-+	struct hci_dev *hdev = conn->hdev;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
-+	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
-+	bacpy(&cp.peer_addr, &conn->dst);
-+	cp.peer_addr_type = conn->dst_type;
-+	cp.own_address_type = conn->src_type;
-+	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
-+	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
-+	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
-+	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
-+	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
-+
-+	hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
-+}
-+
-+static void stop_scan_complete(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_request req;
-+	struct hci_conn *conn;
-+	int err;
-+
-+	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-+	if (!conn)
-+		return;
-+
-+	if (status) {
-+		BT_DBG("HCI request failed to stop scanning: status 0x%2.2x",
-+		       status);
-+
-+		hci_dev_lock(hdev);
-+		le_conn_failed(conn, status);
-+		hci_dev_unlock(hdev);
-+		return;
-+	}
-+
-+	/* Since we may have prematurely stopped discovery procedure, we should
-+	 * update discovery state.
-+	 */
-+	cancel_delayed_work(&hdev->le_scan_disable);
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+
-+	hci_req_init(&req, hdev);
-+
-+	create_le_conn_req(&req, conn);
-+
-+	err = hci_req_run(&req, create_le_conn_complete);
-+	if (err) {
-+		hci_dev_lock(hdev);
-+		le_conn_failed(conn, HCI_ERROR_MEMORY_EXCEEDED);
-+		hci_dev_unlock(hdev);
-+		return;
-+	}
-+}
-+
- static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				    u8 dst_type, u8 sec_level, u8 auth_type)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8f4686a..020fd9f 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1825,6 +1825,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  {
- 	struct hci_conn_params *params;
+ 	struct hci_ev_disconn_complete *ev = (void *) skb->data;
+ 	u8 reason = hci_to_mgmt_reason(ev->reason);
++	struct hci_conn_params *params;
  	struct hci_conn *conn;
-+	struct hci_request req;
- 	int err;
+ 	u8 type;
  
- 	if (test_bit(HCI_ADVERTISING, &hdev->flags))
-@@ -643,9 +703,29 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
- 	}
+@@ -1851,6 +1852,23 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (conn->type == ACL_LINK && conn->flush_key)
+ 		hci_remove_link_key(hdev, &conn->dst);
  
--	err = hci_create_le_conn(conn);
--	if (err)
-+	hci_req_init(&req, hdev);
++	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
++	if (params) {
++		switch (params->auto_connect) {
++		case HCI_AUTO_CONN_LINK_LOSS:
++			if (ev->reason != HCI_ERROR_CONNECTION_TIMEOUT)
++				break;
++			/* Fall through */
 +
-+	/* If controller is scanning, we stop it since some controllers are
-+	 * not able to scan and connect at the same time.
-+	 */
-+	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
-+		struct hci_cp_le_set_scan_enable cp;
++		case HCI_AUTO_CONN_ALWAYS:
++			hci_pend_le_conn_add(hdev, &conn->dst, conn->dst_type);
++			break;
 +
-+		memset(&cp, 0, sizeof(cp));
-+		cp.enable = LE_SCAN_DISABLE;
-+		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+
-+		err = hci_req_run(&req, stop_scan_complete);
-+	} else {
-+		create_le_conn_req(&req, conn);
-+
-+		err = hci_req_run(&req, create_le_conn_complete);
++		default:
++			break;
++		}
 +	}
 +
-+	if (err) {
-+		hci_conn_del(conn);
- 		return ERR_PTR(err);
-+	}
+ 	type = conn->type;
  
- done:
- 	hci_conn_hold(conn);
+ 	hci_proto_disconn_cfm(conn, ev->reason);
 -- 
 1.8.5.3
 
