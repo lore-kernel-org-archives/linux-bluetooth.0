@@ -1,80 +1,175 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52EA8D88.8050306@mousecar.com>
-Date: Thu, 30 Jan 2014 12:36:08 -0500
-From: ken <gebser@mousecar.com>
-Reply-To: gebser@mousecar.com
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianx.chlad@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: PTS test results for PBAP
+Date: Thu, 30 Jan 2014 17:28:54 +0100
+Message-ID: <8044925.XYFnA2xgn6@leonov>
+In-Reply-To: <1390929931-10447-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1390929931-10447-1-git-send-email-sebastianx.chlad@intel.com>
 MIME-Version: 1.0
-To: bluetooth list <linux-bluetooth@vger.kernel.org>
-Subject: "retail" config question OT???
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I signed up for this list, not because I'm a bluetooth developer, but 
-for help configuring my system.  Reading all the messages on development 
-passing here the past week or so, I'm thinking I might have the wrong 
-list.  If so, please ignore my query below (or respond if you care to) 
-and direct me to the appropriate list.
+Hi Sebastian,
 
-For several weeks I've been trying to use bluetooth to connect my 
-Android phone (running BlueTerm) to a terminal on a Raspberry Pi.  I've 
-somehow gotten them paired and connected and have transferred a file 
-from the Pi to the phone.  But when attempting to connect from BlueTerm, 
-it says "Connected" just for a second, then a second message appears 
-saying, "Device connection was lost".
+On Tuesday 28 of January 2014 19:25:31 Sebastian Chlad wrote:
+> ---
+>  android/pts-pbap.txt | 103
+> +++++++++++++++++++++++++++++++++++++++++++-------- 1 file changed, 88
+> insertions(+), 15 deletions(-)
+> 
+> diff --git a/android/pts-pbap.txt b/android/pts-pbap.txt
+> index 843b7cf..4312921 100644
+> --- a/android/pts-pbap.txt
+> +++ b/android/pts-pbap.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for PBAP
+> 
+>  PTS version: 5.0
+> -Tested: 14.11.2013
+> +Tested: 28.01.2014
+> 
+>  Results:
+>  PASS	test passed
+> @@ -17,32 +17,82 @@ TC_PCE_SSM_BV_02_C	N/A
+>  TC_PCE_SSM_BV_06_C	N/A
+>  TC_PCE_SSM_BV_08_C	N/A
+>  TC_PCE_SSM_BI_01_C	N/A
+> +TC_PCE_SSM_BV_09_C	N/A
+> +TC_PCE_SSM_BV_10_C	N/A
+>  TC_PCE_PBD_BV_01_C	N/A
+>  TC_PCE_PBD_BV_04_C	N/A
+> +TC_PCE_PBD_BV_38_C	N/A
+> +TC_PCE_PBD_BV_29_C	N/A
+> +TC_PCE_PBD_BV_40_C	N/A
+> +TC_PCE_PBD_BV_41_C	N/A
+> +TC_PCE_PBD_BV_42_C	N/A
+> +TC_PCE_PBD_BV_43_C	N/A
+> +TC_PCE_PBD_BV_44_C	N/A
+> +TC_PCE_PBD_BV_45_C	N/A
+> +TC_PCE_PBD_BV_46_C	N/A
+> +TC_PCE_PBD_BV_47_C	N/A
+> +TC_PCE_PBD_BV_48_C	N/A
+>  TC_PCE_PBB_BV_01_C	N/A
+>  TC_PCE_PBB_BV_02_C	N/A
+>  TC_PCE_PBB_BV_03_C	N/A
+>  TC_PCE_PBB_BV_05_C	N/A
+> +TC_PCE_PBB_BV_39_C	N/A
+> +TC_PCE_PBB_BV_40_C	N/A
+> +TC_PCE_PBB_BV_41_C	N/A
+> +TC_PCE_PBB_BV_42_C	N/A
+> +TC_PCE_PBB_BV_33_C	N/A
+> +TC_PCE_PBB_BV_34_C	N/A
+> +TC_PCE_PBB_BV_35_C	N/A
+> +TC_PCE_PBB_BV_36_C	N/A
+> +TC_PCE_PBB_BV_43_C	N/A
+> +TC_PCE_PBB_BV_37_C	N/A
+> +TC_PCE_PBB_BV_38_C	N/A
+>  TC_PCE_PBF_BV_01_I	N/A
+>  TC_PCE_PBF_BV_02_I	N/A
+> +TC_PCE_PBF_BV_03_I	N/A
+>  TC_PCE_PDF_BV_01_I	N/A
+> -TC_PCE_PDF_BV_04_I	N/A
+> +TC_PCE_PDF_BV_06_I	N/A
+>  TC_PSE_SSM_BV_03_C	PASS
+>  TC_PSE_SSM_BV_05_C	PASS
+> -TC_PSE_SSM_BV_07_C	PASS
+> +TC_PSE_SSM_BV_07_C	PASS	Tester must accept obex request with
+> +					TSPX_auth_password set in PIXITs
+>  TC_PSE_SSM_BI_02_C	PASS
+>  TC_PSE_SSM_BI_03_C	N/A
+> -TC_PSE_SSM_BV_08_I	PASS
+> -TC_PSE_PBD_BV_02_C	PASS
+> -TC_PSE_PBD_BV_03_C	PASS
+> +TC_PSE_SSM_BV_08_I	PASS	Tester must compare passkey on IUT and PTS
+> +TC_PSE_SSM_BV_11_C	N/A
+> +
+> +TC_PSE_PBD_BV_02_C	PASS	Tester must compare phone book size with the 
+value
+> +					given by PTS
+> +TC_PSE_PBD_BV_03_C	PASS	Tester must compare phone book size with the 
+value
+> +					given by PTS
+>  TC_PSE_PBD_BV_05_C	N/A
+>  TC_PSE_PBD_BI_01_C	FAIL
+> -TC_PSE_PBD_BV_11_C	N/A
+> -TC_PSE_PBD_BV_12_C	N/A
+> -TC_PSE_PBD_BV_13_C	N/A
+> -TC_PSE_PBD_BV_14_C	N/A
+> -TC_PSE_PBD_BV_15_C	N/A
+> -TC_PSE_PBD_BV_16_C	N/A
+> +TC_PSE_PBD_BV_06_C	N/A
+> +TC_PSE_PBD_BV_07_C	N/A
+> +TC_PSE_PBD_BV_08_C	N/A
+> +TC_PSE_PBD_BV_09_C	N/A
+> +TC_PSE_PBD_BV_10_C	N/A
+> +TC_PSE_PBD_BV_17_C	FAIL
+> +TC_PSE_PBD_BV_18_C	N/A
+> +TC_PSE_PBD_BV_19_C	N/A
+> +TC_PSE_PBD_BV_20_C	N/A
+> +TC_PSE_PBD_BV_21_C	N/A
+> +TC_PSE_PBD_BV_22_C	N/A
+> +TC_PSE_PBD_BV_23_C	N/A
+> +TC_PSE_PBD_BV_24_C	N/A
+> +TC_PSE_PBD_BV_25_C	N/A
+> +TC_PSE_PBD_BV_26_C	N/A
+> +TC_PSE_PBD_BV_27_C	N/A
+> +TC_PSE_PBD_BV_28_C	N/A
+> +TC_PSE_PBD_BV_29_C	N/A
+> +TC_PSE_PBD_BV_30_C	N/A
+> +TC_PSE_PBD_BV_31_C	N/A
+> +TC_PSE_PBD_BV_32_C	N/A
+> +TC_PSE_PBD_BV_33_C	N/A
+> +TC_PSE_PBD_BV_34_C	N/A
+> +TC_PSE_PBD_BV_35_C	N/A
+> +TC_PSE_PBD_BV_36_C	PASS
+> +TC_PSE_PBD_BV_37_C	N/A
+>  TC_PSE_PBB_BV_06_C	PASS
+>  TC_PSE_PBB_BV_07_C	PASS
+>  TC_PSE_PBB_BV_08_C	PASS
+> @@ -51,9 +101,32 @@ TC_PSE_PBB_BV_10_C	PASS
+>  TC_PSE_PBB_BV_11_C	PASS
+>  TC_PSE_PBB_BI_01_C	PASS
+>  TC_PSE_PBB_BI_07_C	PASS
+> +TC_PSE_PBB_BV_12_C	PASS
+> +TC_PSE_PBB_BV_13_C	N/A
+> +TC_PSE_PBB_BV_14_C	N/A
+> +TC_PSE_PBB_BV_15_C	N/A
+> +TC_PSE_PBB_BV_16_C	N/A
+> +TC_PSE_PBB_BV_17_C	N/A
+> +TC_PSE_PBB_BV_18_C	N/A
+> +TC_PSE_PBB_BV_19_C	N/A
+> +TC_PSE_PBB_BV_20_C	N/A
+> +TC_PSE_PBB_BV_21_C	N/A
+> +TC_PSE_PBB_BV_22_C	N/A
+> +TC_PSE_PBB_BV_23_C	N/A
+> +TC_PSE_PBB_BV_24_C	N/A
+> +TC_PSE_PBB_BV_25_C	N/A
+> +TC_PSE_PBB_BV_26_C	N/A
+> +TC_PSE_PBB_BV_27_C	N/A
+> +TC_PSE_PBB_BV_44_C	N/A
+> +TC_PSE_PBB_BV_45_C	N/A
+> +TC_PSE_PBB_BV_46_C	N/A
+> +TC_PSE_PBB_BV_28_C	N/A
+> +TC_PSE_PBB_BV_29_C	N/A
+> +TC_PSE_PBB_BV_30_C	N/A
+> +TC_PSE_PBB_BV_31_C	PASS
+> +TC_PSE_PBB_BV_32_C	N/A
+>  TC_PSE_PBF_BV_01_I	PASS
+>  TC_PSE_PBF_BV_02_I	PASS
+> -TC_PSE_PDF_BV_01_I	PASS
+> -TC_PSE_PDF_BV_03_I	N/A
+> -TC_PSE_PDF_BV_05_I	N/A
+> +TC_PSE_PDF_BV_01_I	PASS	Tester must compare phone book size with the 
+value
+> +					given by PTS
+>  ---------------------------------------------------------------------------
+> ----
 
-"grep -i blue /var/log/*" yields a lot, among which is:
+Applied, thanks.
 
-messages:Jan 27 02:17:18 rpi kernel: [   18.926436] Bluetooth: Core ver 2.16
-messages:Jan 27 02:17:18 rpi kernel: [   20.888582] Bluetooth: HCI 
-device and connection manager initialized
-messages:Jan 27 02:17:18 rpi kernel: [   21.307016] Bluetooth: HCI 
-socket layer initialized
-messages:Jan 27 02:17:18 rpi kernel: [   21.371930] Bluetooth: L2CAP 
-socket layer initialized
-messages:Jan 27 02:17:18 rpi kernel: [   21.438767] Bluetooth: SCO 
-socket layer initialized
-messages:Jan 27 02:17:20 rpi kernel: [   40.992246] Bluetooth: BNEP 
-(Ethernet Emulation) ver 1.3
-messages:Jan 27 02:17:20 rpi kernel: [   40.992284] Bluetooth: BNEP 
-filters: protocol multicast
-messages:Jan 27 02:17:20 rpi kernel: [   40.992345] Bluetooth: BNEP 
-socket layer initialized
-messages:Jan 27 02:17:20 rpi kernel: [   41.042231] Bluetooth: RFCOMM 
-TTY layer initialized
-messages:Jan 27 02:17:20 rpi kernel: [   41.042346] Bluetooth: RFCOMM 
-socket layer initialized
-messages:Jan 27 02:17:20 rpi kernel: [   41.042368] Bluetooth: RFCOMM 
-ver 1.11
-syslog:Jan 30 12:00:38 rpi bluetoothd[2042]: Unable to spawn pnatd: 
-Failed to execute child process "/usr/bin/phonet-at" (No such file or 
-directory)
-...
-
-I haven't been able to get blueTerm to output any logs.
-
-Perhaps helpful:
-
-# hciconfig hci0 -a
-hci0:   Type: BR/EDR  Bus: USB
-         BD Address: 00:1F:81:00:08:30  ACL MTU: 1021:4  SCO MTU: 180:1
-         UP RUNNING PSCAN
-         RX bytes:6034 acl:90 sco:0 events:242 errors:0
-         TX bytes:3253 acl:102 sco:0 commands:77 errors:0
-         Features: 0xff 0x3e 0x09 0x76 0x80 0x01 0x00 0x80
-         Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-         Link policy: RSWITCH HOLD SNIFF
-         Link mode: SLAVE ACCEPT
-         Name: 'rpi-0'
-         Class: 0x520100
-         Service Classes: Networking, Object Transfer, Telephony
-         Device Class: Computer, Uncategorized
-         HCI Version: 2.0 (0x3)  Revision: 0x44
-         LMP Version: 2.0 (0x3)  Subversion: 0x3
-         Manufacturer: Cambridge Silicon Radio (10)
-
-Running "rfcomm -a" returns nothing at all.  Not knowing or finding 
-anywhere what to put in any of the /etc/bluetooth/* files, that may not 
-be surprising.
-
-TIA for any help you can provide.
+-- 
+BR
+Szymon Janc
