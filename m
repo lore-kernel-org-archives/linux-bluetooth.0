@@ -1,52 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/avrcp: Close AVRCP channel on error
-Date: Thu, 30 Jan 2014 15:23:43 +0200
-Message-Id: <1391088223-2586-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <52EA4EF5.5000007@ahsoftware.de>
+Date: Thu, 30 Jan 2014 14:09:09 +0100
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Gianluca Anzolin <gianluca@sottospazio.it>,
+ Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>, peter@hurleysoftware.com,
+ "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
+ Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
+ stable@vger.kernel.org
+Subject: Re: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
+References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it> <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org> <52DCDF84.1040902@ahsoftware.de> <E0DDC796-EECF-46B6-8EDF-801CF8EFD456@holtmann.org> <20140128083154.GA29060@sottospazio.it>
+In-Reply-To: <20140128083154.GA29060@sottospazio.it>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Am 28.01.2014 09:31, schrieb Gianluca Anzolin:
 
-This fixes resource leak.
----
- android/avrcp.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+> Unfortunately it seems I overlooked the fact that rfcomm_dev_activate() is
+> called with the port->mutex held. So patches 2/3/4 cause a regression I missed
+> because I didn't turn on the appropriate debug options (circular locking
+> dependency, a bug report already appeared on this list).
+>
+> I'm afraid this all stems from my partial knowledge of the tty_port code and
+> unfortunately I don't know how to solve the problem right now.
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 485b485..ef833df 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -248,13 +248,13 @@ bool bt_avrcp_register(const bdaddr_t *addr)
- 	rec = avrcp_record();
- 	if (!rec) {
- 		error("Failed to allocate AVRCP record");
--		return false;
-+		goto fail;
- 	}
- 
- 	if (bt_adapter_add_record(rec, 0) < 0) {
- 		error("Failed to register AVRCP record");
- 		sdp_record_free(rec);
--		return false;
-+		goto fail;
- 	}
- 	record_id = rec->handle;
- 
-@@ -262,6 +262,12 @@ bool bt_avrcp_register(const bdaddr_t *addr)
- 						G_N_ELEMENTS(cmd_handlers));
- 
- 	return true;
-+fail:
-+	g_io_channel_shutdown(server, TRUE, NULL);
-+	g_io_channel_unref(server);
-+	server = NULL;
-+
-+	return false;
- }
- 
- void bt_avrcp_unregister(void)
--- 
-1.8.3.2
+Understandable, it's like a mine field. ;) Maybe it might make sense to 
+add Alan Cox to Cc, I think he's active again and knows a lot about 
+tty_port.
 
+> I think it's better to revert those patches for the moment.
+
+I prefer to still use those patches because without them, I have a more 
+serious problem (at least for my use cases, which happily haven't run 
+into that deadlock).
+
+But thanks for notifying me/us about the possibility of a deadlock when 
+using your patches.
+
+Regards,
+
+Alexander Holler
