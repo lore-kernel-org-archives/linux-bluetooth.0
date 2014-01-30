@@ -1,29 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 30 Jan 2014 14:01:19 -0800
-Message-ID: <CAD-ALXKinmbiAaH3FMA-b4byXo0CMEm1H0Dfc=bCDBwONqsfTA@mail.gmail.com>
-Subject: BLE Peripheral on Ubuntu
-From: Prashant R <ramapra@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Enable LTK distribution to slave devices
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1391032559-25183-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 30 Jan 2014 13:39:06 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <7AA3B141-D2F8-4D1B-AC1A-FB359D358178@holtmann.org>
+References: <1391032559-25183-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-My goal is to be able to use a USB-BT adapter and make it behave like
-a BLE peripheral.
+Hi Johan,
 
-So far I have been able to do LE advertising on it but would want to
-add GATT services for this device.
-I am unable to find documentation on how to control this as a BLE
-Peripheral.Can someone point me to this?
+> So far we've only been requesting the LTK to be distributed to the
+> master (initiator) of pairing, which is usually enough since it's the
+> master that will establish future connections and initiate encryption.
+> However, in the case that both devices support switching to the opposing
+> role (which seems to be increasingly common) pairing will have to
+> performed again since the "new" master will not have all information.
+> 
+> As there is no real harm in it, this patch updates the code to always
+> try distributing the LTK also to the slave device, thereby enabling role
+> switches for future connections.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 
-- Is there currently a tool (opposite of  gatttool) that I can use to
-publish services and characteristics ?
+patch has been applied to bluetooth-next tree.
 
-- My version of bluez is4.98-2ubuntu7 . I tried to upgrade to the
-latest but it complains about D-BUS version being <Ver 1.6. My version
-of DBUS  is  1.4.18
-My question is if the GATT server support is present at the user level
-using my version of 4.98-2ubuntu7?
+Regards
 
-Thanks for your help.
+Marcel
+
