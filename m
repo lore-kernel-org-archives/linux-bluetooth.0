@@ -1,64 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v6 07/14] Bluetooth: Remove unused function
-Date: Thu, 30 Jan 2014 18:22:10 -0300
-Message-Id: <1391116937-28217-8-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v6 11/14] Bluetooth: Temporarily stop background scanning on discovery
+Date: Thu, 30 Jan 2014 18:22:14 -0300
+Message-Id: <1391116937-28217-12-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes hci_create_le_conn() since it is not used anymore.
+If the user sends a mgmt start discovery command while the background
+scanning is running, we should temporarily stop it. Once the discovery
+finishes, we start the background scanning again.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 32 --------------------------------
- 1 file changed, 32 deletions(-)
+ net/bluetooth/hci_core.c |  2 ++
+ net/bluetooth/mgmt.c     | 12 ++++++++----
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 66f77a2..573b28d 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -551,38 +551,6 @@ done:
- 	hci_dev_unlock(hdev);
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c3ebd51..cc9053d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1629,6 +1629,8 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
  
--static int hci_create_le_conn(struct hci_conn *conn)
--{
--	struct hci_dev *hdev = conn->hdev;
--	struct hci_cp_le_create_conn cp;
--	struct hci_request req;
--	int err;
--
--	hci_req_init(&req, hdev);
--
--	memset(&cp, 0, sizeof(cp));
--	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
--	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
--	bacpy(&cp.peer_addr, &conn->dst);
--	cp.peer_addr_type = conn->dst_type;
--	cp.own_address_type = conn->src_type;
--	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
--	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
--	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
--	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
--	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
--
--	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
--
--	err = hci_req_run(&req, create_le_conn_complete);
--	if (err) {
--		hci_conn_del(conn);
--		return err;
--	}
--
--	return 0;
--}
--
- static void create_le_conn_req(struct hci_request *req, struct hci_conn *conn)
- {
- 	struct hci_cp_le_create_conn cp;
+ 	switch (state) {
+ 	case DISCOVERY_STOPPED:
++		hci_update_background_scan(hdev);
++
+ 		if (hdev->discovery.state != DISCOVERY_STARTING)
+ 			mgmt_discovering(hdev, 0);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bde8e67..8026e5f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3316,11 +3316,15 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			goto failed;
+ 		}
+ 
++		/* If controller is scanning, it means the background scanning
++		 * is running. Thus, we should temporarily stop it in order to
++		 * set the discovery scanning parameters.
++		 */
+ 		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+-			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+-					 MGMT_STATUS_BUSY);
+-			mgmt_pending_remove(cmd);
+-			goto failed;
++			memset(&enable_cp, 0, sizeof(enable_cp));
++			enable_cp.enable = LE_SCAN_DISABLE;
++			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
++				    sizeof(enable_cp), &enable_cp);
+ 		}
+ 
+ 		memset(&param_cp, 0, sizeof(param_cp));
 -- 
 1.8.5.3
 
