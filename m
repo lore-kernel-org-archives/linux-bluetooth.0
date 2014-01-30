@@ -1,43 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 13/15] android/client-audio: Add init_check
-Date: Thu, 30 Jan 2014 12:23:19 +0100
-Message-Id: <1391081001-30723-14-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [RFC 11/15] android/client-audio: Add set_parameters
+Date: Thu, 30 Jan 2014 12:23:17 +0100
+Message-Id: <1391081001-30723-12-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1391081001-30723-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1391081001-30723-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add calling init check for audio device.
+Add seting output stream parameters using key=value pairs string
+(key1=value1;key2=value2).
 
 ---
- android/client/if-audio.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ android/client/if-audio.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/android/client/if-audio.c b/android/client/if-audio.c
-index 48b973b..b481461 100644
+index 0746124..bbd6a8c 100644
 --- a/android/client/if-audio.c
 +++ b/android/client/if-audio.c
-@@ -431,6 +431,13 @@ static void set_sample_rate_p(int argc, const char **argv)
- 	stream_out->common.set_sample_rate(&stream_out->common, atoi(argv[2]));
+@@ -407,6 +407,19 @@ static void get_parameters_p(int argc, const char **argv)
+ 								keystr));
  }
  
-+static void init_check_p(int argc, const char **argv)
++static void set_parameters_p(int argc, const char **argv)
 +{
 +	RETURN_IF_NULL(if_audio);
++	RETURN_IF_NULL(stream_out);
 +
-+	haltest_info("Init check result: %d\n", if_audio->init_check(if_audio));
++	if (argc < 3) {
++		haltest_error("No key=value; pairs given.\n");
++		return;
++	}
++
++	stream_out->common.set_parameters(&stream_out->common, argv[2]);
 +}
 +
  static struct method methods[] = {
  	STD_METHOD(init),
  	STD_METHOD(cleanup),
-@@ -448,6 +455,7 @@ static struct method methods[] = {
+@@ -422,6 +435,7 @@ static struct method methods[] = {
+ 	STD_METHOD(get_format),
+ 	STD_METHOD(get_sample_rate),
  	STD_METHODH(get_parameters, "<A2dpSuspended;closing>"),
- 	STD_METHODH(set_parameters, "<A2dpSuspended=value;closing=value>"),
- 	STD_METHODH(set_sample_rate, "<sample rate>"),
-+	STD_METHOD(init_check),
++	STD_METHODH(set_parameters, "<A2dpSuspended=value;closing=value>"),
  	END_METHOD
  };
  
