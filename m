@@ -1,34 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] avrcp: Fix using incorrect buffer for SetVolume
-Date: Thu, 30 Jan 2014 18:12:55 +0200
-Message-Id: <1391098376-26834-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 30 Jan 2014 14:14:28 -0200
+From: Vinicius Costa Gomes <vcgomes@gmail.com>
+To: johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Enable LTK distribution to slave devices
+Message-ID: <20140130161428.GA26840@molly>
+References: <1391032559-25183-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1391032559-25183-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-The command requires one parameter.
----
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 13:55 Wed 29 Jan, johan.hedberg@gmail.com wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
+>
+> So far we've only been requesting the LTK to be distributed to the
+> master (initiator) of pairing, which is usually enough since it's the
+> master that will establish future connections and initiate encryption.
+> However, in the case that both devices support switching to the opposing
+> role (which seems to be increasingly common) pairing will have to
+> performed again since the "new" master will not have all information.
+>
+> As there is no real harm in it, this patch updates the code to always
+> try distributing the LTK also to the slave device, thereby enabling role
+> switches for future connections.
+>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 2e1a940..128f7d3 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -3706,7 +3706,7 @@ int avrcp_set_volume(struct btd_device *dev, uint8_t volume)
- {
- 	struct avrcp_server *server;
- 	struct avrcp *session;
--	uint8_t buf[AVRCP_HEADER_LENGTH + 2];
-+	uint8_t buf[AVRCP_HEADER_LENGTH + 1];
- 	struct avrcp_header *pdu = (void *) buf;
- 
- 	server = find_server(servers, device_get_adapter(dev));
--- 
-1.8.3.2
+Looks good. Ack.
 
+
+Cheers,
+--
+Vinicius
