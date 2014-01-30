@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Sebastian Chlad <sebastianx.chlad@intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: PTS test results for OPP
-Date: Thu, 30 Jan 2014 17:28:29 +0100
-Message-ID: <1527546.Ru8CWtTvf4@leonov>
-In-Reply-To: <1390931987-10904-1-git-send-email-sebastianx.chlad@intel.com>
-References: <1390931987-10904-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: Re: [PATCH 1/2] android/pts: PTS test results for AVCTP
+Date: Thu, 30 Jan 2014 17:28:09 +0100
+Message-ID: <2111615.yXGGy1ROm3@leonov>
+In-Reply-To: <1391002025-15997-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1391002025-15997-1-git-send-email-sebastianx.chlad@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,92 +14,55 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
 
-On Tuesday 28 of January 2014 19:59:47 Sebastian Chlad wrote:
+On Wednesday 29 of January 2014 15:27:04 Sebastian Chlad wrote:
 > ---
->  android/pts-opp.txt | 37 ++++++++++++++++++++-----------------
->  1 file changed, 20 insertions(+), 17 deletions(-)
+>  android/pts-avctp.txt | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
 > 
-> diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-> index b9329b9..3c4ab47 100644
-> --- a/android/pts-opp.txt
-> +++ b/android/pts-opp.txt
+> diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+> index c057a10..a57ecee 100644
+> --- a/android/pts-avctp.txt
+> +++ b/android/pts-avctp.txt
 > @@ -1,7 +1,7 @@
->  PTS test results for OPP
+>  PTS test results for AVCTP
 > 
-> -PTS version: 4.9
-> -Tested: 14.11.2013
-> +PTS version: 5.0
-> +Tested: 28.01.2014
+>  PTS version: 5.0
+> -Tested: --not yet tested--
+> +Tested: 29.01.2014
 > 
 >  Results:
 >  PASS	test passed
-> @@ -14,9 +14,9 @@ Test Name		Result	Notes
+> @@ -29,13 +29,13 @@ TC_CT_FRA_BV_04_C	N/A
 >  ---------------------------------------------------------------------------
-> ---- TC_CLIENT_OPH_BV_01_I	PASS
->  TC_CLIENT_OPH_BV_02_I	N/A
-> -TC_CLIENT_OPH_BV_03_I	PASS
-> +TC_CLIENT_OPH_BV_03_I	PASS	Tester must send a contact to PTS
->  TC_CLIENT_OPH_BV_04_I	N/A
-> -TC_CLIENT_OPH_BV_05_I	PASS
-> +TC_CLIENT_OPH_BV_05_I	PASS	Tester must send a contact to PTS
->  TC_CLIENT_OPH_BV_07_I	N/A
->  TC_CLIENT_OPH_BV_08_I	N/A
->  TC_CLIENT_OPH_BV_09_I	N/A
-> @@ -49,33 +49,36 @@ TC_CLIENT_BCE_BV_04_I	N/A
->  TC_CLIENT_BCE_BV_05_I	N/A
->  TC_CLIENT_BCE_BV_06_I	N/A
->  TC_CLIENT_BCE_BV_07_I	N/A
-> -TC_SERVER_OPH_BV_01_I	PASS
-> -TC_SERVER_OPH_BV_02_I	PASS
-> -TC_SERVER_OPH_BV_03_I	PASS
-> -TC_SERVER_OPH_BV_04_I	PASS
-> -TC_SERVER_OPH_BV_05_I	PASS
-> +TC_SERVER_OPH_BV_01_I	PASS	IUT must be in the connectable mode
-> +TC_SERVER_OPH_BV_02_I	PASS	IUT must be in the connectable mode
-> +TC_SERVER_OPH_BV_03_I	PASS	IUT must be in the connectable mode. Tester 
-must
-> +					accept incoming file
-> +TC_SERVER_OPH_BV_04_I	PASS	IUT must be in the connectable mode. Tester 
-must
-> +					accept incoming file
-> +TC_SERVER_OPH_BV_05_I	PASS	IUT must be in the connectable mode. Tester 
-must
-> +					reject incoming file
->  TC_SERVER_OPH_BV_07_I	N/A
->  TC_SERVER_OPH_BV_08_I	N/A
->  TC_SERVER_OPH_BV_09_I	N/A
-> -TC_SERVER_OPH_BV_10_I	PASS
-> +TC_SERVER_OPH_BV_10_I	PASS	IUT must be in the connectable mode
->  TC_SERVER_OPH_BV_11_I	N/A
->  TC_SERVER_OPH_BV_12_I	N/A
->  TC_SERVER_OPH_BV_13_I	N/A
-> -TC_SERVER_OPH_BV_14_I	PASS
-> +TC_SERVER_OPH_BV_14_I	PASS	IUT must be in the connectable mode
->  TC_SERVER_OPH_BV_15_I	N/A
->  TC_SERVER_OPH_BV_16_I	N/A
->  TC_SERVER_OPH_BV_17_I	N/A
-> -TC_SERVER_OPH_BV_18_I	PASS
-> -TC_SERVER_OPH_BV_19_I	PASS
-> +TC_SERVER_OPH_BV_18_I	PASS	IUT must be in the connectable mode
-> +TC_SERVER_OPH_BV_19_I	PASS	IUT must be in the connectable mode
->  TC_SERVER_OPH_BV_21_I	N/A
-> -TC_SERVER_OPH_BV_22_I	PASS
-> -TC_SERVER_OPH_BV_23_I	PASS
-> +TC_SERVER_OPH_BV_22_I	PASS	IUT must be in the connectable mode
-> +TC_SERVER_OPH_BV_23_I	PASS	IUT must be in the connectable mode
->  TC_SERVER_OPH_BV_24_I	N/A
->  TC_SERVER_OPH_BV_25_I	N/A
->  TC_SERVER_OPH_BV_26_I	N/A
-> -TC_SERVER_OPH_BV_34_I	PASS
-> +TC_SERVER_OPH_BV_34_I	PASS	IUT must be in the connectable mode
->  TC_SERVER_BCP_BV_01_I	N/A
-> -TC_SERVER_BCP_BV_02_I	PASS
-> +TC_SERVER_BCP_BV_02_I	PASS	IUT must be in the connectable mode
->  TC_SERVER_BCP_BV_03_I	N/A
->  TC_SERVER_BCP_BV_04_I	N/A
->  TC_SERVER_BCP_BV_05_I	N/A
+> ---- Test Name		Result	Notes
+>  ---------------------------------------------------------------------------
+> ---- -TC_TG_CCM_BV_01_C	INC
+> -TC_TG_CCM_BV_02_C	INC
+> -TC_TG_CCM_BV_03_C	INC
+> -TC_TG_CCM_BV_04_C	INC
+> -TC_TG_NFR_BV_02_C	INC
+> -TC_TG_NFR_BV_03_C	INC
+> -TC_TG_NFR_BI_01_C	INC
+> -TC_TG_FRA_BV_02_C	INC
+> +TC_TG_CCM_BV_01_C	PASS	avtest --device hci0 --avctp --send x 
+<bdaddr>
+> +TC_TG_CCM_BV_02_C	PASS	avtest --device hci0 --avctp --send x 
+<bdaddr>
+> +TC_TG_CCM_BV_03_C	PASS	avtest --device hci0 --avctp --send x 
+<bdaddr>
+> +TC_TG_CCM_BV_04_C	PASS	avtest --device hci0 --avctp --send x 
+<bdaddr>
+> +TC_TG_NFR_BV_02_C	PASS	avtest --device hci0 --avctp --send x 
+<bdaddr>
+> +TC_TG_NFR_BV_03_C	PASS	avtest --device hci0 --avctp --send x 
+<bdaddr>
+> +TC_TG_NFR_BI_01_C	PASS
+> +TC_TG_FRA_BV_02_C	FAIL
+>  TC_TG_FRA_BV_03_C	INC
+>  ---------------------------------------------------------------------------
+> ----
 
-Applied, thanks.
+Patch 1/2 pushed, for 2/2 please mark version as 4.4.2 as discussed. Thanks.
 
 -- 
 BR
