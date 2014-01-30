@@ -1,40 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Petri Gynther <pgynther@google.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 01/15] android/client-av: Fix checking for a2dp interface
-Date: Thu, 30 Jan 2014 12:23:07 +0100
-Message-Id: <1391081001-30723-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1391081001-30723-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1391081001-30723-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3] hog: Use HoG device name as uHID input device name
+Message-Id: <20140130035506.2A034100F4B@puck.mtv.corp.google.com>
+Date: Wed, 29 Jan 2014 19:55:06 -0800 (PST)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If HoG BLE device name is known, use it when creating uHID input device.
+Pass adapter and device addresses to uHID as well.
 ---
- android/client/if-av.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ profiles/input/hog.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/android/client/if-av.c b/android/client/if-av.c
-index 0470e0d..8d1f69b 100644
---- a/android/client/if-av.c
-+++ b/android/client/if-av.c
-@@ -80,7 +80,7 @@ static void connect_p(int argc, const char **argv)
- {
- 	bt_bdaddr_t addr;
- 
--	RETURN_IF_NULL(if_hh);
-+	RETURN_IF_NULL(if_av);
- 	VERIFY_ADDR_ARG(2, &addr);
- 
- 	EXEC(if_av->connect, &addr);
-@@ -101,7 +101,7 @@ static void disconnect_p(int argc, const char **argv)
- {
- 	bt_bdaddr_t addr;
- 
--	RETURN_IF_NULL(if_hh);
-+	RETURN_IF_NULL(if_av);
- 	VERIFY_ADDR_ARG(2, &addr);
- 
- 	EXEC(if_av->disconnect, &addr);
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index ded6303..030dc91 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -392,7 +392,15 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	/* create uHID device */
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_CREATE;
+-	strcpy((char *) ev.u.create.name, "bluez-hog-device");
++	if (device_name_known(hogdev->device)) {
++		device_get_name(hogdev->device, (char *) ev.u.create.name,
++				sizeof(ev.u.create.name) - 1);
++	} else {
++		strcpy((char *) ev.u.create.name, "bluez-hog-device");
++	}
++	ba2str(btd_adapter_get_address(device_get_adapter(hogdev->device)),
++		(char *) ev.u.create.phys);
++	ba2str(device_get_address(hogdev->device), (char *) ev.u.create.uniq);
+ 	ev.u.create.vendor = vendor;
+ 	ev.u.create.product = product;
+ 	ev.u.create.version = version;
 -- 
-1.8.5.2
+1.8.5.3
 
