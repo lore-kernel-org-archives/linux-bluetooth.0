@@ -1,43 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52EA4EF5.5000007@ahsoftware.de>
-Date: Thu, 30 Jan 2014 14:09:09 +0100
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Gianluca Anzolin <gianluca@sottospazio.it>,
- Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, peter@hurleysoftware.com,
- "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
- Greg KH <gregkh@linuxfoundation.org>, jslaby@suse.cz,
- stable@vger.kernel.org
-Subject: Re: [PATCH v3 0/4] Regression fixes for rfcomm/tty.c
-References: <1389039834-24491-1-git-send-email-gianluca@sottospazio.it> <53C8DDF7-94EA-4E01-A2A9-C366F9F85530@holtmann.org> <52DCDF84.1040902@ahsoftware.de> <E0DDC796-EECF-46B6-8EDF-801CF8EFD456@holtmann.org> <20140128083154.GA29060@sottospazio.it>
-In-Reply-To: <20140128083154.GA29060@sottospazio.it>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC 15/15] android/client-audio: Fix getting audio module on Android
+Date: Thu, 30 Jan 2014 12:23:21 +0100
+Message-Id: <1391081001-30723-16-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1391081001-30723-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1391081001-30723-1-git-send-email-jakub.tyszkowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 28.01.2014 09:31, schrieb Gianluca Anzolin:
+Getting audio module results with -EADDRINUSE on socket binding when
+running on Android. Therefore we need to stop mediaserver for
+successfull connection.
+---
+ android/client/if-audio.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-> Unfortunately it seems I overlooked the fact that rfcomm_dev_activate() is
-> called with the port->mutex held. So patches 2/3/4 cause a regression I missed
-> because I didn't turn on the appropriate debug options (circular locking
-> dependency, a bug report already appeared on this list).
->
-> I'm afraid this all stems from my partial knowledge of the tty_port code and
-> unfortunately I don't know how to solve the problem right now.
+diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+index 66f8364..71f9dad 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-audio.c
+@@ -99,6 +99,9 @@ static void init_p(int argc, const char **argv)
+ 	int err;
+ 	const hw_module_t *module;
+ 	audio_hw_device_t *device;
++	int timeout = 1500; /* in ms */
++	int t = 300;
++
+ 
+ 	err = hw_get_module_by_class(AUDIO_HARDWARE_MODULE_ID,
+ 					AUDIO_HARDWARE_MODULE_ID_A2DP, &module);
+@@ -107,8 +110,27 @@ static void init_p(int argc, const char **argv)
+ 		return;
+ 	}
+ 
++init_audio:
+ 	err = audio_hw_device_open(module, &device);
+ 	if (err) {
++		if (err == -EADDRINUSE && t < timeout) {
++			int err2;
++
++			/* We need to Stop media server to bind to socket. */
++			haltest_info("Trying to stop media server...\n");
++
++			err2 = system("/system/bin/setprop ctl.stop media");
++			if (err2) {
++				haltest_error("audio_hw_device_open returned",
++								" %d\n", err);
++				return;
++			}
++
++			usleep(t);
++			t += t;
++			goto init_audio;
++		}
++
+ 		haltest_error("audio_hw_device_open returned %d\n", err);
+ 		return;
+ 	}
+@@ -358,6 +380,9 @@ static void cleanup_p(int argc, const char **argv)
+ 	}
+ 
+ 	if_audio = NULL;
++
++	/* get the media server back up and running */
++	err = system("/system/bin/setprop ctl.start media");
+ }
+ 
+ static void suspend_p(int argc, const char **argv)
+-- 
+1.8.5.2
 
-Understandable, it's like a mine field. ;) Maybe it might make sense to 
-add Alan Cox to Cc, I think he's active again and knows a lot about 
-tty_port.
-
-> I think it's better to revert those patches for the moment.
-
-I prefer to still use those patches because without them, I have a more 
-serious problem (at least for my use cases, which happily haven't run 
-into that deadlock).
-
-But thanks for notifying me/us about the possibility of a deadlock when 
-using your patches.
-
-Regards,
-
-Alexander Holler
