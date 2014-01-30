@@ -1,34 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Date: Thu, 30 Jan 2014 14:01:19 -0800
+Message-ID: <CAD-ALXKinmbiAaH3FMA-b4byXo0CMEm1H0Dfc=bCDBwONqsfTA@mail.gmail.com>
+Subject: BLE Peripheral on Ubuntu
+From: Prashant R <ramapra@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] audio/AVRCP: Fix using the wrong octet for folder type
-Date: Thu, 30 Jan 2014 15:03:26 -0800
-Message-Id: <1391123008-26767-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1391123008-26767-1-git-send-email-luiz.dentz@gmail.com>
-References: <1391123008-26767-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+My goal is to be able to use a USB-BT adapter and make it behave like
+a BLE peripheral.
 
-Folder type is the 9 octet not the 10.
----
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+So far I have been able to do LE advertising on it but would want to
+add GATT services for this device.
+I am unable to find documentation on how to control this as a BLE
+Peripheral.Can someone point me to this?
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 63a6f7e..2cf6b41 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2150,7 +2150,7 @@ static struct media_item *parse_media_folder(struct avrcp *session,
- 		return NULL;
- 
- 	uid = bt_get_be64(&operands[0]);
--	type = operands[9];
-+	type = operands[8];
- 
- 	namelen = MIN(bt_get_be16(&operands[12]), sizeof(name) - 1);
- 	if (namelen > 0) {
--- 
-1.8.4.2
+- Is there currently a tool (opposite of  gatttool) that I can use to
+publish services and characteristics ?
 
+- My version of bluez is4.98-2ubuntu7 . I tried to upgrade to the
+latest but it complains about D-BUS version being <Ver 1.6. My version
+of DBUS  is  1.4.18
+My question is if the GATT server support is present at the user level
+using my version of 4.98-2ubuntu7?
+
+Thanks for your help.
