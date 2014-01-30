@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v6 10/14] Bluetooth: Re-enable background scan in case of error
-Date: Thu, 30 Jan 2014 18:22:13 -0300
-Message-Id: <1391116937-28217-11-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v6 04/14] Bluetooth: Use connection parameters if any
+Date: Thu, 30 Jan 2014 18:22:07 -0300
+Message-Id: <1391116937-28217-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since we temporarily stop the background scanning in favor of
-connection, we should re-enable it in case something goes wrong
-with connection establishment. So this patch adds a hci_update_
-background_scan() call in fail_conn_attempt() and hci_le_conn_
-complete_evt() error flow.
+This patch changes hci_connect_le() so it uses the connection
+parameters specified for the certain device. If no parameters
+were configured, we use the default values.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c  | 2 ++
- net/bluetooth/hci_event.c | 1 +
- 2 files changed, 3 insertions(+)
+ net/bluetooth/hci_conn.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 573b28d..6bdc349 100644
+index 7f148c9..4d1ce74 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -527,6 +527,8 @@ static void le_conn_failed(struct hci_conn *conn, u8 status)
- 	hci_proto_connect_cfm(conn, status);
+@@ -578,6 +578,7 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				    u8 dst_type, u8 sec_level, u8 auth_type)
+ {
++	struct hci_conn_params *params;
+ 	struct hci_conn *conn;
+ 	int err;
  
- 	hci_conn_del(conn);
+@@ -624,8 +625,15 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->auth_type = auth_type;
+-	conn->le_conn_min_interval = hdev->le_conn_min_interval;
+-	conn->le_conn_max_interval = hdev->le_conn_max_interval;
 +
-+	hci_update_background_scan(hdev);
- }
++	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
++	if (params) {
++		conn->le_conn_min_interval = params->conn_min_interval;
++		conn->le_conn_max_interval = params->conn_max_interval;
++	} else {
++		conn->le_conn_min_interval = hdev->le_conn_min_interval;
++		conn->le_conn_max_interval = hdev->le_conn_max_interval;
++	}
  
- static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f9633ac..8f4686a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3595,6 +3595,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_proto_connect_cfm(conn, ev->status);
- 		conn->state = BT_CLOSED;
- 		hci_conn_del(conn);
-+		hci_update_background_scan(hdev);
- 		goto unlock;
- 	}
- 
+ 	err = hci_create_le_conn(conn);
+ 	if (err)
 -- 
 1.8.5.3
 
