@@ -1,33 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] avrcp: Fix printing order for browsing avrcp header
-Date: Fri, 31 Jan 2014 14:36:17 +0200
-Message-Id: <1391171777-27512-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1391171777-27512-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1391171777-27512-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
+Subject: [PATCH] android: Add avtest to debug builds
+Date: Fri, 31 Jan 2014 11:31:12 +0200
+Message-Id: <1391160672-9088-1-git-send-email-sebastianx.chlad@intel.com>
+In-Reply-To: <1390999219-15012-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1390999219-15012-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
 ---
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/Android.mk | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index bc5cab3..4ece4af 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1730,7 +1730,7 @@ static size_t handle_browsing_pdu(struct avctp *conn,
- 	struct avrcp_browsing_header *pdu = (void *) operands;
+diff --git a/android/Android.mk b/android/Android.mk
+index 1d12da5..09ed32d 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -354,6 +354,28 @@ LOCAL_MODULE := l2ping
+ include $(BUILD_EXECUTABLE)
  
- 	DBG("AVRCP Browsing PDU 0x%02X, len 0x%04X", pdu->pdu_id,
--							pdu->param_len);
-+							ntohs(pdu->param_len));
+ #
++# avtest
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++        bluez/tools/avtest.c \
++        bluez/lib/bluetooth.c \
++        bluez/lib/hci.c \
++
++LOCAL_C_INCLUDES := \
++        $(LOCAL_PATH)/bluez/lib \
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := debug
++LOCAL_MODULE := avtest
++
++include $(BUILD_EXECUTABLE)
++
++#
+ # libsbc
+ #
  
- 	for (handler = browsing_handlers; handler->pdu_id; handler++) {
- 		if (handler->pdu_id == pdu->pdu_id)
 -- 
 1.8.3.2
+
+---------------------------------------------------------------------
+Intel Finland Oy
+Registered Address: PL 281, 00181 Helsinki 
+Business Identity Code: 0357606 - 4 
+Domiciled in Helsinki 
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
 
