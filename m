@@ -1,49 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140131075447.GB18867@aemeltch-MOBL1>
-References: <1391123008-26767-1-git-send-email-luiz.dentz@gmail.com>
-	<1391123008-26767-4-git-send-email-luiz.dentz@gmail.com>
-	<20140131075447.GB18867@aemeltch-MOBL1>
-Date: Fri, 31 Jan 2014 09:14:41 -0800
-Message-ID: <CABBYNZKQEyvtfOpsdypLHenORsOGDvNEe+JS5=BEooiPu4JXOA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 4/4] audio/AVRCP: Fix coding style
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/4] android/hal-audio: Fix memory leak
+Date: Fri, 31 Jan 2014 16:18:48 +0200
+Message-Id: <1391177929-31416-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1391177929-31416-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1391177929-31416-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Jan 30, 2014 at 11:55 PM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Luiz,
->
-> On Thu, Jan 30, 2014 at 03:03:28PM -0800, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> ---
->>  profiles/audio/avrcp.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
->> index ac861d2..4521bc4 100644
->> --- a/profiles/audio/avrcp.c
->> +++ b/profiles/audio/avrcp.c
->> @@ -2161,7 +2161,7 @@ static struct media_item *parse_media_folder(struct avrcp *session,
->>               name[namelen] = '\0';
->>       }
->>
->> -     item =  media_player_create_folder(mp, name, type, uid);
->> +     item = media_player_create_folder(mp, name, type, uid);
->
-> what is the point creating this patch instead of merging with previous one
-> which introduced this style issue?
+Free preset if set_blocking() fails.
+---
+ android/hal-audio.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Just a honest mistake, will fix it.
-
-
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 4b80da8..dfe8b68 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -1176,8 +1176,10 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	if (!preset || fd < 0)
+ 		goto fail;
+ 
+-	if (set_blocking(fd) < 0)
++	if (set_blocking(fd) < 0) {
++		free(preset);
+ 		goto fail;
++	}
+ 
+ 	out->ep->fd = fd;
+ 	codec = out->ep->codec;
 -- 
-Luiz Augusto von Dentz
+1.8.3.2
+
