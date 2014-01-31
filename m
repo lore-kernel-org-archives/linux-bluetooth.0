@@ -1,34 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Bluetooth: SMP LTK fixes
-Date: Thu, 30 Jan 2014 19:39:56 -0800
-Message-Id: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Remove Simultaneous LE & BR/EDR flags from AD
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1391109410-8595-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 30 Jan 2014 19:12:52 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <57F1BF45-B9B4-4C6D-AE7E-A5BAE2262175@holtmann.org>
+References: <1391109410-8595-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Johan,
 
-Now that my LTK key distribution patch is already applied I
-unfortunately uncovered several bugs due to it. The main issue is that
-the kernel code was not accounting for the possibility of there being
-two LTKs for the same remote device in the hdev->long_term_keys list.
+> Starting with the 4.1 Core Specification these flags are no longer used
+> and should always be cleared. From volume 3, part C, section 13.1.1:
+> 
+> "The 'Simultaneous LE and BR/EDR to Same Device Capable (Controller)'
+> and ‘Simultaneous LE and BR/EDR to Same Device Capable (Host)’ bits in
+> the Flags AD type shall be set to ‘0’."
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c | 8 +-------
+> 1 file changed, 1 insertion(+), 7 deletions(-)
 
-There are still fixes needed on the user space side which I haven't
-completely sorted out yet (to pushable form - it's more or less working
-already through). Right now the storage format doesn't allow storing two
-LTKs for the same device.
+patch has been applied to bluetooth-next tree.
 
-----------------------------------------------------------------
-Johan Hedberg (4):
-      Bluetooth: Fix long_term_keys debugfs output
-      Bluetooth: Make LTK key type check more readable
-      Bluetooth: Remove unnecessary LTK type check from hci_add_ltk
-      Bluetooth: Fix differentiating stored master vs slave LTK types
+Regards
 
- include/net/bluetooth/hci_core.h |  5 +++--
- net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++----------
- net/bluetooth/hci_event.c        |  2 +-
- net/bluetooth/smp.c              |  3 ++-
- 4 files changed, 27 insertions(+), 14 deletions(-)
+Marcel
 
