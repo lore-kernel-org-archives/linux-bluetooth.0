@@ -1,27 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1391198123-55506-3-git-send-email-marcel@holtmann.org>
-References: <1391198123-55506-3-git-send-email-marcel@holtmann.org>
-Date: Fri, 31 Jan 2014 17:18:02 -0400
-Message-ID: <CAJdJm_NaPjDdZfNXbPu-z1OBkwq89hfvN-eg6_mDDpkOMswT1g@mail.gmail.com>
-Subject: Re: [PATCH 3/3] Bluetooth: Remove use_debug_keys debugfs entry
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] doc: Describe the new debug keys command and setting
+Date: Fri, 31 Jan 2014 12:19:28 -0800
+Message-Id: <1391199568-55855-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ doc/mgmt-api.txt | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-On Fri, Jan 31, 2014 at 3:55 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Since the use of debug keys can not be identified from the current
-> settings information, this debugfs entry is no longer.
-
-I believe you meant "debug keys can be identified..."  and "is no
-longer necessary."
-
-Best Regards,
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 44ff12676180..a32237ae26b3 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -212,6 +212,7 @@ Read Controller Information Command
+ 		10	Low Energy
+ 		11	Advertising
+ 		12	Secure Connections
++		13	Debug Keys
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -1423,6 +1424,28 @@ Set Secure Connections Command
+ 				Invalid Index
+ 
+ 
++Set Debug Keys Command
++======================
++
++	Command Code:		0x002E
++	Controller Index:	<controller id>
++	Command Parameters:	Debug_Keys (1 Octet)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command is  used to tell the kernel whether to accept the
++	usage of debug keys or not. The allowed values for this parameter
++	are 0x00 and 0x01. All other values will return an Invalid Parameters
++	response.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Busy
++				Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+1.8.5.3
+
