@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] Bluetooth: Make LTK key type check more readable
-Date: Thu, 30 Jan 2014 19:39:58 -0800
-Message-Id: <1391139600-15366-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/4] Bluetooth: Fix long_term_keys debugfs output
+Date: Thu, 30 Jan 2014 19:39:57 -0800
+Message-Id: <1391139600-15366-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
 References: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Instead of magic bitwise operations simply compare with the two possible
-type values that we are interested in.
+The code was previously iterating the wrong list (and what's worse
+casting entries to a type which they were not) and also missing a proper
+line terminator when printing each entry. The code now also prints the
+LTK type in hex for easier comparison with the kernel-defined values.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8094a41c9a26..754a59079de9 100644
+index 369d30750417..8094a41c9a26 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2717,7 +2717,7 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
- 	if (!new_key)
- 		return 0;
+@@ -620,9 +620,9 @@ static int long_term_keys_show(struct seq_file *f, void *ptr)
+ 	struct list_head *p, *n;
  
--	if (type & HCI_SMP_LTK)
-+	if (type == HCI_SMP_LTK || type == HCI_SMP_LTK_SLAVE)
- 		mgmt_new_ltk(hdev, key, 1);
- 
- 	return 0;
+ 	hci_dev_lock(hdev);
+-	list_for_each_safe(p, n, &hdev->link_keys) {
++	list_for_each_safe(p, n, &hdev->long_term_keys) {
+ 		struct smp_ltk *ltk = list_entry(p, struct smp_ltk, list);
+-		seq_printf(f, "%pMR (type %u) %u %u %u %.4x %*phN %*phN\\n",
++		seq_printf(f, "%pMR (type %u) %u 0x%02x %u %.4x %*phN %*phN\n",
+ 			   &ltk->bdaddr, ltk->bdaddr_type, ltk->authenticated,
+ 			   ltk->type, ltk->enc_size, __le16_to_cpu(ltk->ediv),
+ 			   8, ltk->rand, 16, ltk->val);
 -- 
 1.8.5.3
 
