@@ -1,51 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 31 Jan 2014 09:55:26 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 4/4] audio/AVRCP: Fix coding style
-Message-ID: <20140131075447.GB18867@aemeltch-MOBL1>
-References: <1391123008-26767-1-git-send-email-luiz.dentz@gmail.com>
- <1391123008-26767-4-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391123008-26767-4-git-send-email-luiz.dentz@gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 0/4] Bluetooth: SMP LTK fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 30 Jan 2014 19:51:11 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <F5456509-57D4-43E6-BA8F-125B40BA8378@holtmann.org>
+References: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On Thu, Jan 30, 2014 at 03:03:28PM -0800, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Now that my LTK key distribution patch is already applied I
+> unfortunately uncovered several bugs due to it. The main issue is that
+> the kernel code was not accounting for the possibility of there being
+> two LTKs for the same remote device in the hdev->long_term_keys list.
 > 
-> ---
->  profiles/audio/avrcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> There are still fixes needed on the user space side which I haven't
+> completely sorted out yet (to pushable form - it's more or less working
+> already through). Right now the storage format doesn't allow storing two
+> LTKs for the same device.
 > 
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index ac861d2..4521bc4 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -2161,7 +2161,7 @@ static struct media_item *parse_media_folder(struct avrcp *session,
->  		name[namelen] = '\0';
->  	}
->  
-> -	item =  media_player_create_folder(mp, name, type, uid);
-> +	item = media_player_create_folder(mp, name, type, uid);
-
-what is the point creating this patch instead of merging with previous one
-which introduced this style issue?
-
-Best regards 
-Andrei Emeltchenko 
-
->  	if (!item)
->  		return NULL;
->  
-> -- 
-> 1.8.4.2
+> ----------------------------------------------------------------
+> Johan Hedberg (4):
+>      Bluetooth: Fix long_term_keys debugfs output
+>      Bluetooth: Make LTK key type check more readable
+>      Bluetooth: Remove unnecessary LTK type check from hci_add_ltk
+>      Bluetooth: Fix differentiating stored master vs slave LTK types
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> include/net/bluetooth/hci_core.h |  5 +++--
+> net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++----------
+> net/bluetooth/hci_event.c        |  2 +-
+> net/bluetooth/smp.c              |  3 ++-
+> 4 files changed, 27 insertions(+), 14 deletions(-)
+
+all 4 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
+
