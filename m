@@ -1,49 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1391177929-31416-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1391177929-31416-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1391177929-31416-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 31 Jan 2014 12:11:12 -0800
-Message-ID: <CABBYNZ+i8voC8XSSfgjwo3VUOzimn6wA7mMNCLX6mFp+tc2PTg@mail.gmail.com>
-Subject: Re: [PATCH 2/4] android/hal-audio: Do not allocate memory if fd < 0
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: Add management setting for use of debug keys
+Date: Fri, 31 Jan 2014 11:55:21 -0800
+Message-Id: <1391198123-55506-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+When the controller has been enabled to allow usage of debug keys, then
+clearly identify that in the current settings information.
 
-On Fri, Jan 31, 2014 at 6:18 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Fixes memory leak when returning bad fd we still allocate memory which
-> is not freed in the caller function audio_open_output_stream().
-> ---
->  android/hal-audio.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 35bafe7..4b80da8 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -713,8 +713,7 @@ static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu, int *fd,
->
->         result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
->                                 sizeof(cmd), &cmd, &rsp_len, rsp, fd);
-> -
-> -       if (result == AUDIO_STATUS_SUCCESS) {
-> +       if (result == AUDIO_STATUS_SUCCESS && *fd >= 0) {
->                 size_t buf_len = sizeof(struct audio_preset) +
->                                         rsp->preset[0].len;
->                 *mtu = rsp->mtu;
-> --
-> 1.8.3.2
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/mgmt.h |  1 +
+ net/bluetooth/mgmt.c         | 12 ++++++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
 
-We should check if the fd is valid on audio_ipc_cmd.
-
-
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index e19049fb6c46..f87f5d784c3b 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -95,6 +95,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_LE			0x00000200
+ #define MGMT_SETTING_ADVERTISING	0x00000400
+ #define MGMT_SETTING_SECURE_CONN	0x00000800
++#define MGMT_SETTING_DEBUG_KEYS		0x00001000
+ 
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 111b1296a2b8..91ffecd1727e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -364,6 +364,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
+ 
+ 	settings |= MGMT_SETTING_POWERED;
+ 	settings |= MGMT_SETTING_PAIRABLE;
++	settings |= MGMT_SETTING_DEBUG_KEYS;
+ 
+ 	if (lmp_bredr_capable(hdev)) {
+ 		settings |= MGMT_SETTING_CONNECTABLE;
+@@ -431,6 +432,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
+ 	if (test_bit(HCI_SC_ENABLED, &hdev->dev_flags))
+ 		settings |= MGMT_SETTING_SECURE_CONN;
+ 
++	if (test_bit(HCI_DEBUG_KEYS, &hdev->dev_flags))
++		settings |= MGMT_SETTING_DEBUG_KEYS;
++
+ 	return settings;
+ }
+ 
+@@ -2207,6 +2211,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_load_link_keys *cp = data;
+ 	u16 key_count, expected_len;
++	bool changed;
+ 	int i;
+ 
+ 	BT_DBG("request for %s", hdev->name);
+@@ -2246,9 +2251,12 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	hci_link_keys_clear(hdev);
+ 
+ 	if (cp->debug_keys)
+-		set_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
++		changed = !test_and_set_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
+ 	else
+-		clear_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
++		changed = test_and_clear_bit(HCI_DEBUG_KEYS, &hdev->dev_flags);
++
++	if (changed)
++		new_settings(hdev, NULL);
+ 
+ 	for (i = 0; i < key_count; i++) {
+ 		struct mgmt_link_key_info *key = &cp->keys[i];
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
