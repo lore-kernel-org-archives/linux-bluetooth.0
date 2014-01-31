@@ -1,57 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Describe the new debug keys command and setting
-Date: Fri, 31 Jan 2014 12:19:28 -0800
-Message-Id: <1391199568-55855-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1391177929-31416-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1391177929-31416-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1391177929-31416-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 31 Jan 2014 12:11:12 -0800
+Message-ID: <CABBYNZ+i8voC8XSSfgjwo3VUOzimn6wA7mMNCLX6mFp+tc2PTg@mail.gmail.com>
+Subject: Re: [PATCH 2/4] android/hal-audio: Do not allocate memory if fd < 0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+Hi Andrei,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 44ff12676180..a32237ae26b3 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -212,6 +212,7 @@ Read Controller Information Command
- 		10	Low Energy
- 		11	Advertising
- 		12	Secure Connections
-+		13	Debug Keys
- 
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -1423,6 +1424,28 @@ Set Secure Connections Command
- 				Invalid Index
- 
- 
-+Set Debug Keys Command
-+======================
-+
-+	Command Code:		0x002E
-+	Controller Index:	<controller id>
-+	Command Parameters:	Debug_Keys (1 Octet)
-+	Return Parameters:	Current_Settings (4 Octets)
-+
-+	This command is  used to tell the kernel whether to accept the
-+	usage of debug keys or not. The allowed values for this parameter
-+	are 0x00 and 0x01. All other values will return an Invalid Parameters
-+	response.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Busy
-+				Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
+On Fri, Jan 31, 2014 at 6:18 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Fixes memory leak when returning bad fd we still allocate memory which
+> is not freed in the caller function audio_open_output_stream().
+> ---
+>  android/hal-audio.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index 35bafe7..4b80da8 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -713,8 +713,7 @@ static int ipc_open_stream_cmd(uint8_t endpoint_id, uint16_t *mtu, int *fd,
+>
+>         result = audio_ipc_cmd(AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
+>                                 sizeof(cmd), &cmd, &rsp_len, rsp, fd);
+> -
+> -       if (result == AUDIO_STATUS_SUCCESS) {
+> +       if (result == AUDIO_STATUS_SUCCESS && *fd >= 0) {
+>                 size_t buf_len = sizeof(struct audio_preset) +
+>                                         rsp->preset[0].len;
+>                 *mtu = rsp->mtu;
+> --
+> 1.8.3.2
+
+We should check if the fd is valid on audio_ipc_cmd.
+
+
 -- 
-1.8.5.3
-
+Luiz Augusto von Dentz
