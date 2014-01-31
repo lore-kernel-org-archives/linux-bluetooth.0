@@ -1,45 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 0/4] Bluetooth: SMP LTK fixes
-From: Marcel Holtmann <marcel@holtmann.org>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/4] Bluetooth: Remove unnecessary LTK type check from hci_add_ltk
+Date: Thu, 30 Jan 2014 19:39:59 -0800
+Message-Id: <1391139600-15366-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 30 Jan 2014 19:51:11 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <F5456509-57D4-43E6-BA8F-125B40BA8378@holtmann.org>
 References: <1391139600-15366-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> Now that my LTK key distribution patch is already applied I
-> unfortunately uncovered several bugs due to it. The main issue is that
-> the kernel code was not accounting for the possibility of there being
-> two LTKs for the same remote device in the hdev->long_term_keys list.
-> 
-> There are still fixes needed on the user space side which I haven't
-> completely sorted out yet (to pushable form - it's more or less working
-> already through). Right now the storage format doesn't allow storing two
-> LTKs for the same device.
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (4):
->      Bluetooth: Fix long_term_keys debugfs output
->      Bluetooth: Make LTK key type check more readable
->      Bluetooth: Remove unnecessary LTK type check from hci_add_ltk
->      Bluetooth: Fix differentiating stored master vs slave LTK types
-> 
-> include/net/bluetooth/hci_core.h |  5 +++--
-> net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++----------
-> net/bluetooth/hci_event.c        |  2 +-
-> net/bluetooth/smp.c              |  3 ++-
-> 4 files changed, 27 insertions(+), 14 deletions(-)
+All callers of hci_add_ltk pass a valid value to it. There are no places
+where e.g. user space, the controller or the remote peer would be able
+to cause invalid values to be passed. Therefore, just remove the
+potentially confusing check from the beginning of the function.
 
-all 4 patches have been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 754a59079de9..180473d965f6 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2692,9 +2692,6 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+ {
+ 	struct smp_ltk *key, *old_key;
+ 
+-	if (!(type & HCI_SMP_STK) && !(type & HCI_SMP_LTK))
+-		return 0;
+-
+ 	old_key = hci_find_ltk_by_addr(hdev, bdaddr, addr_type);
+ 	if (old_key)
+ 		key = old_key;
+-- 
+1.8.5.3
 
