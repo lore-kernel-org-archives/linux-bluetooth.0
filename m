@@ -1,56 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [RFC v6 00/14] LE auto connection and connection parameters
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Rename authentication to key_type in mgmt_ltk_info
-Date: Fri, 31 Jan 2014 18:42:17 -0800
-Message-Id: <1391222538-34065-2-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 31 Jan 2014 17:17:32 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <186F0AA5-AF57-4590-B145-E142F0724126@holtmann.org>
+References: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The field is not a boolean, it is actually a field for a key type. So
-name it properly.
+Hi Andre,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h | 2 +-
- net/bluetooth/mgmt.c         | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+> This patch set implements the minor changes suggested by Johan on the
+> previous version.
+> 
+> The changes are:
+>    - Rename fail_conn_attempt() to le_conn_failed()
+>    - Create create_le_conn_req() helper to avoid duplicated code
+> 
+> Regards,
+> 
+> Andre
+> 
+> 
+> Andre Guedes (14):
+>  Bluetooth: Save connection interval parameters in hci_conn
+>  Bluetooth: Group list_head fields from strcut hci_dev together
+>  Bluetooth: Introduce connection parameters list
+>  Bluetooth: Use connection parameters if any
+>  Bluetooth: Introduce le_conn_failed() helper
+>  Bluetooth: Stop scanning on LE connection
+>  Bluetooth: Remove unused function
+>  Bluetooth: Introduce hdev->pend_le_conn list
+>  Bluetooth: Introduce LE auto connection infrastructure
+>  Bluetooth: Re-enable background scan in case of error
+>  Bluetooth: Temporarily stop background scanning on discovery
+>  Bluetooth: Auto connection and power on
+>  Bleutooth: Add support for auto connect options
+>  Bluetooth: Add le_auto_conn file on debugfs
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index dfab094fab73..4303fa90b7c1 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -182,7 +182,7 @@ struct mgmt_cp_load_link_keys {
- 
- struct mgmt_ltk_info {
- 	struct mgmt_addr_info addr;
--	__u8	authenticated;
-+	__u8	type;
- 	__u8	master;
- 	__u8	enc_size;
- 	__le16	ediv;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8030eeb44382..8c94841072a8 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4207,7 +4207,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
- 			type = HCI_SMP_LTK_SLAVE;
- 
- 		hci_add_ltk(hdev, &key->addr.bdaddr, addr_type,
--			    type, 0, key->authenticated, key->val,
-+			    type, 0, key->type, key->val,
- 			    key->enc_size, key->ediv, key->rand);
- 	}
- 
-@@ -4648,7 +4648,7 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, u8 persistent)
- 	ev.store_hint = persistent;
- 	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
- 	ev.key.addr.type = link_to_bdaddr(LE_LINK, key->bdaddr_type);
--	ev.key.authenticated = key->authenticated;
-+	ev.key.type = key->authenticated;
- 	ev.key.enc_size = key->enc_size;
- 	ev.key.ediv = key->ediv;
- 
--- 
-1.8.5.3
+I applied patch 1, 2 and 5 out of this series to make some progress and make the overall set of patches smaller.
+
+Regards
+
+Marcel
 
