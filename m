@@ -1,35 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Track if link is using P-256 authenticated combination key
-Date: Sat,  1 Feb 2014 11:52:02 -0800
-Message-Id: <1391284322-29778-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Include security level 4 in connections check
+Date: Sat,  1 Feb 2014 11:32:25 -0800
+Message-Id: <1391283145-21148-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the ACL link is using P-256 authenticated combination key, mark
-the link mode as HCI_LM_FIPS.
+This check is only used for RFCOMM connections and most likely no
+RFCOMM based profile will require security level 4 secure connection
+security policy. In case it ever does make sure that seucrity level 4
+is treated as sufficient security level.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ net/bluetooth/hci_conn.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 36c9a488ac56..d2c6878a9d6a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1998,6 +1998,10 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			conn->link_mode |= HCI_LM_ENCRYPT;
- 			conn->sec_level = conn->pending_sec_level;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 7ef5bffb61aa..801820f12226 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -860,13 +860,17 @@ int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level)
+ {
+ 	BT_DBG("hcon %p", conn);
  
-+			/* P-256 authentication key implies FIPS */
-+			if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
-+				conn->link_mode |= HCI_LM_FIPS;
-+
- 			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
- 			    conn->type == LE_LINK)
- 				set_bit(HCI_CONN_AES_CCM, &conn->flags);
+-	if (sec_level != BT_SECURITY_HIGH)
+-		return 1; /* Accept if non-secure is required */
++	/* Accept if non-secure or higher security level is required */
++	if (sec_level != BT_SECURITY_HIGH && sec_level != BT_SECURITY_FIPS)
++		return 1;
+ 
+-	if (conn->sec_level == BT_SECURITY_HIGH)
++	/* Accept if secure or higher security level is already present */
++	if (conn->sec_level == BT_SECURITY_HIGH ||
++	    conn->sec_level == BT_SECURITY_FIPS)
+ 		return 1;
+ 
+-	return 0; /* Reject not secure link */
++	/* Reject not secure link */
++	return 0;
+ }
+ EXPORT_SYMBOL(hci_conn_check_secure);
+ 
 -- 
 1.8.5.3
 
