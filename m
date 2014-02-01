@@ -1,33 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 1 Feb 2014 17:48:50 -0800
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 3/3] Bluetooth: Remove use_debug_keys debugfs entry
-Message-ID: <20140202014850.GA5133@x220.p-661hnu-f1>
-References: <1391198123-55506-3-git-send-email-marcel@holtmann.org>
- <CAJdJm_NaPjDdZfNXbPu-z1OBkwq89hfvN-eg6_mDDpkOMswT1g@mail.gmail.com>
- <9CDEAC4F-17D1-4CB4-BB5F-91D1D793791B@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <9CDEAC4F-17D1-4CB4-BB5F-91D1D793791B@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Track if link is using P-256 authenticated combination key
+Date: Sat,  1 Feb 2014 11:52:02 -0800
+Message-Id: <1391284322-29778-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+When the ACL link is using P-256 authenticated combination key, mark
+the link mode as HCI_LM_FIPS.
 
-On Fri, Jan 31, 2014, Marcel Holtmann wrote:
-> >> Since the use of debug keys can not be identified from the current
-> >> settings information, this debugfs entry is no longer.
-> > 
-> > I believe you meant "debug keys can be identified..."  and "is no
-> > longer necessary.”
-> 
-> indeed I did.
-> 
-> Johan, in case you go ahead with applying this patch, please fix this up.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Done. All three patches in the set are now in the bluetooth-next tree.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 36c9a488ac56..d2c6878a9d6a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1998,6 +1998,10 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 			conn->link_mode |= HCI_LM_ENCRYPT;
+ 			conn->sec_level = conn->pending_sec_level;
+ 
++			/* P-256 authentication key implies FIPS */
++			if (conn->key_type == HCI_LK_AUTH_COMBINATION_P256)
++				conn->link_mode |= HCI_LM_FIPS;
++
+ 			if ((conn->type == ACL_LINK && ev->encrypt == 0x02) ||
+ 			    conn->type == LE_LINK)
+ 				set_bit(HCI_CONN_AES_CCM, &conn->flags);
+-- 
+1.8.5.3
 
-Johan
