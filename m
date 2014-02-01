@@ -1,63 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] core: Rename authentication to key_type in mgmt_ltk_info
-Date: Fri, 31 Jan 2014 18:46:23 -0800
-Message-Id: <1391222783-36848-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Remove check for valid LTK authenticated parameter
+Date: Fri, 31 Jan 2014 18:42:16 -0800
+Message-Id: <1391222538-34065-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/mgmt.h    | 2 +-
- src/adapter.c | 8 ++++----
- 2 files changed, 5 insertions(+), 5 deletions(-)
+The LTK authenticated parameter is the key type of the LTK and similar
+to link keys there is no need to check the currently supported values.
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 58a651c1b10e..afd4e8b29ea3 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -177,7 +177,7 @@ struct mgmt_cp_load_link_keys {
+For possible future improvements, the kernel will only use key types
+it knows about and just ignore all the other ones.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 70a3a7e917b7..8030eeb44382 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4146,8 +4146,6 @@ unlock:
  
- struct mgmt_ltk_info {
- 	struct mgmt_addr_info addr;
--	uint8_t authenticated;
-+	uint8_t type;
- 	uint8_t master;
- 	uint8_t enc_size;
- 	uint16_t ediv;
-diff --git a/src/adapter.c b/src/adapter.c
-index 649fc7a957cf..18601eaa13dd 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -2444,7 +2444,7 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
- 		memcpy(key->val, info->val, sizeof(info->val));
- 		memcpy(key->rand, info->rand, sizeof(info->rand));
- 		memcpy(&key->ediv, &info->ediv, sizeof(key->ediv));
--		key->authenticated = info->authenticated;
-+		key->type = info->authenticated;
- 		key->master = info->master;
- 		key->enc_size = info->enc_size;
- 	}
-@@ -5371,8 +5371,8 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 
- 	ba2str(&addr->bdaddr, dst);
- 
--	DBG("hci%u new LTK for %s authenticated %u enc_size %u",
--		adapter->dev_id, dst, ev->key.authenticated, ev->key.enc_size);
-+	DBG("hci%u new LTK for %s type %u enc_size %u",
-+		adapter->dev_id, dst, ev->key.type, ev->key.enc_size);
- 
- 	device = btd_adapter_get_device(adapter, &addr->bdaddr, addr->type);
- 	if (!device) {
-@@ -5386,7 +5386,7 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 
- 		store_longtermkey(bdaddr, &key->addr.bdaddr,
- 					key->addr.type, key->val, key->master,
--					key->authenticated, key->enc_size,
-+					key->type, key->enc_size,
- 					key->ediv, key->rand);
- 
- 		device_set_bonded(device, TRUE);
+ static bool ltk_is_valid(struct mgmt_ltk_info *key)
+ {
+-	if (key->authenticated != 0x00 && key->authenticated != 0x01)
+-		return false;
+ 	if (key->master != 0x00 && key->master != 0x01)
+ 		return false;
+ 	if (!bdaddr_type_is_le(key->addr.type))
 -- 
 1.8.5.3
 
