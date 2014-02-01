@@ -1,76 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC v6 03/14] Bluetooth: Introduce connection parameters list
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1391116937-28217-4-git-send-email-andre.guedes@openbossa.org>
-Date: Fri, 31 Jan 2014 17:11:40 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <94043278-430F-4EAE-A4F1-36AB1FB614A6@holtmann.org>
-References: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org> <1391116937-28217-4-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Remove one level of indentation from hci_encrypt_change_evt
+Date: Fri, 31 Jan 2014 16:24:27 -0800
+Message-Id: <1391214268-13443-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+The function already has an unlock label which means the one extra level
+on indentation is not useful and just makes the code more complex. So
+remove it.
 
-> This patch adds to hdev the connection parameters list (hdev->le_
-> conn_params). The elements from this list (struct hci_conn_params)
-> contains the connection parameters (for now, minimum and maximum
-> connection interval) that should be used during the connection
-> establishment.
-> 
-> The struct hci_conn_params also defines the 'auto_connect' field
-> which will be used to implement the auto connection mechanism.
-> 
-> Moreover, this patch adds helper functions to manipulate hdev->le_
-> conn_params list. Some of these functions are also declared in
-> hci_core.h since they will be used outside hci_core.c in upcoming
-> patches.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> include/net/bluetooth/hci_core.h | 25 +++++++++++++
-> net/bluetooth/hci_core.c         | 80 ++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 105 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 197413b..f757b3f 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -269,6 +269,7 @@ struct hci_dev {
-> 	struct list_head	link_keys;
-> 	struct list_head	long_term_keys;
-> 	struct list_head	remote_oob_data;
-> +	struct list_head	le_conn_params;
-> 
-> 	struct hci_dev_stats	stat;
-> 
-> @@ -373,6 +374,22 @@ struct hci_chan {
-> 	__u8		state;
-> };
-> 
-> +struct hci_conn_params {
-> +	struct list_head list;
-> +
-> +	bdaddr_t addr;
-> +	u8 addr_type;
-> +
-> +	enum {
-> +		HCI_AUTO_CONN_DISABLED,
-> +		HCI_AUTO_CONN_ALWAYS,
-> +		HCI_AUTO_CONN_LINK_LOSS,
-> +	} auto_connect;
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c | 49 ++++++++++++++++++++++++-----------------------
+ 1 file changed, 25 insertions(+), 24 deletions(-)
 
-actually I would not include the auto_connect mode in the this stage of the patch set. We could have made more progress with this patch set and get things applied if things are not intermixed. So lets leave this out and only introduce it once we need it.
-
-> +
-> +	u16 conn_min_interval;
-> +	u16 conn_max_interval;
-> +};
-> 
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7bb8094a3ff2..62aea2edc231 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1988,35 +1988,36 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_dev_lock(hdev);
+ 
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->handle));
+-	if (conn) {
+-		if (!ev->status) {
+-			if (ev->encrypt) {
+-				/* Encryption implies authentication */
+-				conn->link_mode |= HCI_LM_AUTH;
+-				conn->link_mode |= HCI_LM_ENCRYPT;
+-				conn->sec_level = conn->pending_sec_level;
+-			} else
+-				conn->link_mode &= ~HCI_LM_ENCRYPT;
+-		}
+-
+-		clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
++	if (!conn)
++		goto unlock;
+ 
+-		if (ev->status && conn->state == BT_CONNECTED) {
+-			hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
+-			hci_conn_drop(conn);
+-			goto unlock;
+-		}
++	if (!ev->status) {
++		if (ev->encrypt) {
++			/* Encryption implies authentication */
++			conn->link_mode |= HCI_LM_AUTH;
++			conn->link_mode |= HCI_LM_ENCRYPT;
++			conn->sec_level = conn->pending_sec_level;
++		} else
++			conn->link_mode &= ~HCI_LM_ENCRYPT;
++	}
+ 
+-		if (conn->state == BT_CONFIG) {
+-			if (!ev->status)
+-				conn->state = BT_CONNECTED;
++	clear_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 
+-			hci_proto_connect_cfm(conn, ev->status);
+-			hci_conn_drop(conn);
+-		} else
+-			hci_encrypt_cfm(conn, ev->status, ev->encrypt);
++	if (ev->status && conn->state == BT_CONNECTED) {
++		hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
++		hci_conn_drop(conn);
++		goto unlock;
+ 	}
+ 
++	if (conn->state == BT_CONFIG) {
++		if (!ev->status)
++			conn->state = BT_CONNECTED;
++
++		hci_proto_connect_cfm(conn, ev->status);
++		hci_conn_drop(conn);
++	} else
++		hci_encrypt_cfm(conn, ev->status, ev->encrypt);
++
+ unlock:
+ 	hci_dev_unlock(hdev);
+ }
+-- 
+1.8.5.3
 
