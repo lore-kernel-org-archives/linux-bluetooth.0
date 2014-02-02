@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Subject: [PATCH 10/11] android/tester: Add remove bond bad addr dev test case
-Date: Sun, 2 Feb 2014 12:16:40 +0100
-Message-ID: <1391339801-587-11-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 05/11] android/tester: Add create bond with SSP fail test case
+Date: Sun, 2 Feb 2014 12:16:35 +0100
+Message-ID: <1391339801-587-6-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1391339801-587-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1391339801-587-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -14,75 +14,79 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 
-This adds remove bond fail test case. Bad addres is given as a parametr
-for remove bond hal function.
+This adds create bond with SSP fail test case. Confirm is set as SSP
+pairing mode.
 ---
- android/android-tester.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ android/android-tester.c | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index a6ec9a4..417fd22 100644
+index bfa23e9..ba3b812 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -984,6 +984,15 @@ static void bond_remove_success_state_changed_cb(bt_status_t status,
- 	}
+@@ -1071,6 +1071,16 @@ static void bond_create_ssp_success_request_cb(bt_bdaddr_t *remote_bd_addr,
+ 	bond_create_ssp_request_cb(remote_bd_addr, pairing_variant, accept);
  }
  
-+static void bond_remove_bad_addr_state_changed_cb(bt_status_t status,
-+			bt_bdaddr_t *remote_bd_addr, bt_bond_state_t state)
++static void bond_create_ssp_fail_request_cb(bt_bdaddr_t *remote_bd_addr,
++					bt_bdname_t *bd_name, uint32_t cod,
++					bt_ssp_variant_t pairing_variant,
++					uint32_t pass_key)
 +{
-+	struct test_data *data = tester_get_data();
++	bool accept = false;
 +
-+	if (state == BT_BOND_STATE_NONE)
-+		data->cb_count--;
++	bond_create_ssp_request_cb(remote_bd_addr, pairing_variant, accept);
 +}
 +
- static void bond_state_changed_cb(bt_status_t status,
- 			bt_bdaddr_t *remote_bd_addr, bt_bond_state_t state)
- {
-@@ -2217,6 +2226,13 @@ static const struct generic_data bt_bond_remove_success_test = {
+ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 				uint32_t cod, bt_ssp_variant_t pairing_variant,
+ 				uint32_t pass_key)
+@@ -2130,6 +2140,14 @@ static const struct generic_data bt_bond_create_ssp_success_test = {
  	.expected_adapter_status = BT_STATUS_SUCCESS,
  };
  
-+static const struct generic_data bt_bond_remove_bad_addr_test = {
-+	.expected_hal_cb.bond_state_changed_cb =
-+					bond_remove_bad_addr_state_changed_cb,
-+	.expected_cb_count = 1,
-+	.expected_adapter_status = BT_STATUS_SUCCESS,
++static const struct generic_data bt_bond_create_ssp_fail_test = {
++	.expected_hal_cb.device_found_cb = bond_nostatus_device_found_cb,
++	.expected_hal_cb.bond_state_changed_cb = bond_test_state_changed_cb,
++	.expected_hal_cb.ssp_request_cb = bond_create_ssp_fail_request_cb,
++	.expected_cb_count = 4,
++	.expected_adapter_status = MGMT_STATUS_AUTH_FAILED,
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -3087,6 +3103,20 @@ static void test_bond_remove_success(const void *test_data)
+@@ -2925,6 +2943,22 @@ static void test_bond_create_ssp_success(const void *test_data)
  	data->if_bluetooth->start_discovery();
  }
  
-+static void test_bond_remove_bad_addr(const void *test_data)
++static void test_bond_create_ssp_fail(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
-+	bt_status_t status;
-+	bt_bdaddr_t bad_addr = {
-+		.address = { 0x12, 0x34, 0x56, 0x78, 0x90, 0x12 }
-+	};
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
 +
 +	init_test_conditions(data);
 +
-+	status = data->if_bluetooth->remove_bond(&bad_addr);
-+	check_expected_status(status);
++	mgmt_register(data->mgmt, MGMT_EV_AUTH_FAILED, data->mgmt_index,
++					bond_device_auth_fail_callback, data,
++					NULL);
++
++	bthost_write_ssp_mode(bthost, 0x01);
++
++	data->if_bluetooth->start_discovery();
 +}
 +
  /* Test Socket HAL */
  
  static void adapter_socket_state_changed_cb(bt_state_t state)
-@@ -4359,6 +4389,11 @@ int main(int argc, char *argv[])
+@@ -4172,6 +4206,11 @@ int main(int argc, char *argv[])
  					setup_enabled_adapter,
- 					test_bond_remove_success, teardown);
+ 					test_bond_create_ssp_success, teardown);
  
-+	test_bredrle("Bluetooth Remove Bond - Bad Address",
-+					&bt_bond_remove_bad_addr_test,
++	test_bredrle("Bluetooth Create Bond SSP - Negative reply",
++					&bt_bond_create_ssp_fail_test,
 +					setup_enabled_adapter,
-+					test_bond_remove_bad_addr, teardown);
++					test_bond_create_ssp_fail, teardown);
 +
  	test_bredrle("Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
