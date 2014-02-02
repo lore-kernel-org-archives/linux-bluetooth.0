@@ -2,119 +2,161 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 11/13] android/handsfree: Add AT+BRSF command support
-Date: Sun,  2 Feb 2014 22:09:22 +0100
-Message-Id: <1391375364-27106-12-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 06/13] android/handsfree: Add SDP record for AG
+Date: Sun,  2 Feb 2014 22:09:17 +0100
+Message-Id: <1391375364-27106-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
 References: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Service Name: Hands-Free Audio GatewayService RecHandle: 0x10001
+Service Class ID List:
+  "Handsfree Audio Gateway" (0x111f)
+  "Generic Audio" (0x1203)
+Protocol Descriptor List:
+  "L2CAP" (0x0100)
+  "RFCOMM" (0x0003)
+    Channel: 13
+Profile Descriptor List:
+  "Handsfree" (0x111e)
+    Version: 0x0106
 ---
- android/handsfree.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 65 insertions(+), 1 deletion(-)
+ android/handsfree.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 97 insertions(+)
 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 5fe7638..990ba2f 100644
+index 3c0d52b..d2dc543 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -49,12 +49,16 @@
- #define HFP_AG_CHANNEL 13
- #define HFP_AG_FEATURES 0
+@@ -29,12 +29,19 @@
+ #include <glib.h>
  
-+#define AG_FEATURES 0
-+
- static struct {
- 	bdaddr_t bdaddr;
- 	uint8_t state;
- 	GIOChannel *io;
- 	guint watch;
- 	struct hfp_gw *gw;
-+
-+	uint32_t features;
- } device;
+ #include "lib/bluetooth.h"
++#include "lib/sdp.h"
++#include "lib/sdp_lib.h"
+ #include "handsfree.h"
++#include "bluetooth.h"
+ #include "src/log.h"
+ #include "hal-msg.h"
+ #include "ipc.h"
  
++#define HFP_AG_CHANNEL 13
++#define HFP_AG_FEATURES 0
++
  static bdaddr_t adapter_addr;
-@@ -123,11 +127,69 @@ static gboolean watch_cb(GIOChannel *chan, GIOCondition cond,
- 	return FALSE;
- }
++static uint32_t record_id = 0;
  
-+static bool at_brsf(const char *at)
+ static void handle_connect(const void *buf, uint16_t len)
+ {
+@@ -189,12 +196,99 @@ static const struct ipc_handler cmd_handlers[] = {
+ 			sizeof(struct hal_cmd_handsfree_phone_state_change)},
+ };
+ 
++static sdp_record_t *handsfree_ag_record(void)
 +{
-+	uint32_t feat;
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
++	uuid_t l2cap_uuid, rfcomm_uuid;
++	sdp_profile_desc_t profile;
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t *record;
++	sdp_data_t *channel, *features;
++	uint8_t netid = 0x01;
++	uint16_t sdpfeat;
++	sdp_data_t *network;
++	uint8_t ch = HFP_AG_CHANNEL;
 +
-+	if (sscanf(at, " = %u", &feat) != 1) {
-+		hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	network = sdp_data_alloc(SDP_UINT8, &netid);
++	if (!network) {
++		sdp_record_free(record);
++		return NULL;
++	}
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(0, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&svclass_uuid, HANDSFREE_AGW_SVCLASS_ID);
++	svclass_id = sdp_list_append(0, &svclass_uuid);
++	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
++	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
++	sdp_set_service_classes(record, svclass_id);
++
++	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
++	profile.version = 0x0106;
++	pfseq = sdp_list_append(0, &profile);
++	sdp_set_profile_descs(record, pfseq);
++
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	proto[0] = sdp_list_append(0, &l2cap_uuid);
++	apseq = sdp_list_append(0, proto[0]);
++
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[1] = sdp_list_append(0, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &ch);
++	proto[1] = sdp_list_append(proto[1], channel);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	sdpfeat = HFP_AG_FEATURES;
++	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
++	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
++
++	aproto = sdp_list_append(0, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	sdp_set_info_attr(record, "Hands-Free Audio Gateway", 0, 0);
++
++	sdp_attr_add(record, SDP_ATTR_EXTERNAL_NETWORK, network);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], 0);
++	sdp_list_free(proto[1], 0);
++	sdp_list_free(apseq, 0);
++	sdp_list_free(pfseq, 0);
++	sdp_list_free(aproto, 0);
++	sdp_list_free(root, 0);
++	sdp_list_free(svclass_id, 0);
++
++	return record;
++}
++
+ bool bt_handsfree_register(const bdaddr_t *addr)
+ {
++	sdp_record_t *rec;
++
+ 	DBG("");
+ 
+ 	bacpy(&adapter_addr, addr);
+ 
++	rec = handsfree_ag_record();
++	if (!rec) {
++		error("Failed to allocate Handsfree record");
 +		return false;
 +	}
 +
-+	/* TODO verify features */
-+	device.features = feat;
-+
-+	hfp_gw_send_info(device.gw, "+BRSF=%u", AG_FEATURES);
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_OK);
-+
-+	return true;
-+}
-+
-+static const struct {
-+	const char *prefix;
-+	int prefix_len;
-+	bool (*func)(const char *at_cmds);
-+} at_cmds[] = {
-+	{ "+BRSF", sizeof("+BRSF") - 1, at_brsf },
-+};
-+
- static void at_command_handler(const char *command, void *user_data)
- {
-+	unsigned int i;
-+
-+	if (strlen(command) < 3)
-+		goto error;
-+
-+	if (strncmp(command, "AT", sizeof("AT") - 1))
-+		goto error;
-+
-+	command += sizeof("AT") - 1;
-+
-+	for (i = 0; i < G_N_ELEMENTS(at_cmds); i++) {
-+		if (strncmp(command, at_cmds[i].prefix, at_cmds[i].prefix_len))
-+			continue;
-+
-+		command += at_cmds[i].prefix_len;
-+
-+		if (at_cmds[i].func(command))
-+			return;
-+
-+		goto check_slc;
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("Failed to register Handsfree record");
++		sdp_record_free(rec);
++		return false;
 +	}
++	record_id = rec->handle;
 +
-+error:
- 	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
+ 	ipc_register(HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
  
--	g_io_channel_shutdown(device.io, TRUE, NULL);
-+check_slc:
-+	/* Error while establishing SLC */
-+	if (device.state != HAL_EV_HANDSFREE_CONNECTION_STATE_SLC_CONNECTED)
-+		g_io_channel_shutdown(device.io, TRUE, NULL);
-+}
+@@ -206,4 +300,7 @@ void bt_handsfree_unregister(void)
+ 	DBG("");
+ 
+ 	ipc_unregister(HAL_SERVICE_ID_HANDSFREE);
 +
-+static void hfp_gw_debug(const char *str, void *user_data)
-+{
-+	DBG("%s", str);
++	bt_adapter_remove_record(record_id);
++	record_id = 0;
  }
- 
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-@@ -148,6 +210,8 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	hfp_gw_set_close_on_unref(device.gw, true);
- 	hfp_gw_set_command_handler(device.gw, at_command_handler, NULL, NULL);
- 
-+	hfp_gw_set_debug(device.gw, hfp_gw_debug, NULL, NULL);
-+
- 	device.watch = g_io_add_watch(chan,
- 					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 					watch_cb, NULL);
 -- 
 1.8.5.3
 
