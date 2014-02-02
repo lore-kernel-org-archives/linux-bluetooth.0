@@ -2,250 +2,241 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 07/13] android/handsfree: Add support for RFCOMM connection handling
-Date: Sun,  2 Feb 2014 22:09:18 +0100
-Message-Id: <1391375364-27106-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 02/13] android/handsfree: Add commands and events definition to IPC header
+Date: Sun,  2 Feb 2014 22:09:13 +0100
+Message-Id: <1391375364-27106-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
 References: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds incoming connection handling and initial connection state
-tracking. Only one device is allowed to be connected at the same time.
 ---
- android/handsfree.c | 167 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 165 insertions(+), 2 deletions(-)
+ android/hal-msg.h | 208 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 208 insertions(+)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index d2dc543..ad4c0ff 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -25,24 +25,162 @@
- #include <config.h>
- #endif
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index d46b428..56e1116 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -389,6 +389,130 @@ struct hal_cmd_pan_disconnect {
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
  
-+#include <stdlib.h>
- #include <stdbool.h>
-+#include <errno.h>
-+#include <unistd.h>
- #include <glib.h>
- 
- #include "lib/bluetooth.h"
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
-+#include "lib/uuid.h"
-+#include "src/sdp-client.h"
-+#include "src/uuid-helper.h"
-+#include "btio/btio.h"
- #include "handsfree.h"
- #include "bluetooth.h"
- #include "src/log.h"
- #include "hal-msg.h"
- #include "ipc.h"
-+#include "utils.h"
- 
- #define HFP_AG_CHANNEL 13
- #define HFP_AG_FEATURES 0
- 
-+static struct {
-+	bdaddr_t bdaddr;
++/* Handsfree HAL API */
++
++#define HAL_OP_HANDSFREE_CONNECT		0x01
++struct hal_cmd_handsfree_connect {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
++
++#define HAL_OP_HANDSFREE_DISCONNECT		0x02
++struct hal_cmd_handsfree_disconnect {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
++
++#define HAL_OP_HANDSFREE_CONNECT_AUDIO		0x03
++struct hal_cmd_handsfree_connect_audio {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
++
++#define HAL_OP_HANDSFREE_DISCONNECT_AUDIO	0x04
++struct hal_cmd_handsfree_disconnect_audio {
++	uint8_t bdaddr[6];
++} __attribute__((packed));
++
++#define HAL_OP_HANDSFREE_START_VR		0x05
++
++#define HAL_OP_HANDSFREE_STOP_VR		0x06
++
++#define HAL_HANDSFREE_VOLUME_TYPE_SPEAKER	0x00
++#define HAL_HANDSFREE_VOLUME_TYPE_MIC		0x01
++
++#define HAL_OP_HANDSFREE_VOLUME_CONTROL		0x07
++struct hal_cmd_handsfree_volume_control {
++	uint8_t type;
++	uint32_t volume;
++} __attribute__((packed));
++
++#define HAL_HANDSFREE_NETWORK_STATE_NOT_AVAILABLE	0x00
++#define HAL_HANDSFREE_NETWORK_STATE_AVAILABLE		0x01
++
++#define HAL_HANDSFREE_SERVICE_TYPE_HOME		0x00
++#define HAL_HANDSFREE_SERVICE_TYPE_ROAMING	0x01
++
++#define HAL_OP_HANDSFREE_DEVICE_STATUS_NOTIF	0x08
++struct hal_cmd_handsfree_device_status_notif {
 +	uint8_t state;
-+	GIOChannel *io;
-+	guint watch;
-+} device;
++	uint8_t type;
++	uint32_t signal;
++	uint32_t battery;
++} __attribute__((packed));
 +
- static bdaddr_t adapter_addr;
- static uint32_t record_id = 0;
++#define HAL_OP_HANDSFREE_COPS_RESPONSE		0x09
++struct hal_cmd_handsfree_cops_response {
++	uint32_t len;
++	uint8_t buf[0];
++} __attribute__((packed));
++
++#define HAL_HANDSFREE_CALL_STATE_ACTIVE		0x00
++#define HAL_HANDSFREE_CALL_STATE_HELD		0x01
++#define HAL_HANDSFREE_CALL_STATE_DIALING	0x02
++#define HAL_HANDSFREE_CALL_STATE_ALERTING	0x03
++#define HAL_HANDSFREE_CALL_STATE_INCOMING	0x04
++#define HAL_HANDSFREE_CALL_STATE_WAITING	0x05
++#define HAL_HANDSFREE_CALL_STATE_IDLE		0x06
++
++#define HAL_OP_HANDSFREE_CIND_RESPONSE		0x0A
++struct hal_cmd_handsfree_cind_response {
++	uint32_t svc;
++	uint32_t num_active;
++	uint32_t num_held;
++	uint8_t state;
++	uint32_t signal;
++	uint32_t roam;
++	uint32_t batt_chg;
++} __attribute__((packed));
++
++#define HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE	0x0B
++struct hal_cmd_handsfree_formatted_at_response {
++	uint32_t len;
++	uint8_t buf[0];
++} __attribute__((packed));
++
++#define HAL_HANDSFREE_AT_RESPONSE_ERROR		0x00
++#define HAL_HANDSFREE_AT_RESPONSE_OK		0x01
++
++#define HAL_OP_HANDSFREE_AT_RESPONSE		0x0C
++struct hal_cmd_handsfree_at_response {
++	uint8_t response;
++	uint32_t error;
++} __attribute__((packed));
++
++#define HAL_HANDSFREE_CALL_DIRECTION_OUTGOING	0x00
++#define HAL_HANDSFREE_CALL_DIRECTION_INCOMING	0x01
++
++#define HAL_HANDSFREE_CALL_TYPE_VOICE		0x00
++#define HAL_HANDSFREE_CALL_TYPE_DATA		0x01
++#define HAL_HANDSFREE_CALL_TYPE_FAX		0x02
++
++#define HAL_HANDSFREE_CALL_MPTY_TYPE_SINGLE	0x00
++#define HAL_HANDSFREE_CALL_MPTY_TYPE_MULTI	0x01
++
++#define HAL_HANDSFREE_CALL_ADDRTYPE_UNKNOWN	0x81
++#define HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL	0x91
++
++#define HAL_OP_HANDSFREE_CLCC_RESPONSE		0x0D
++struct hal_cmd_handsfree_clcc_response {
++	uint32_t index;
++	uint8_t dir;
++	uint8_t state;
++	uint8_t mode;
++	uint8_t mpty;
++	uint8_t type;
++	uint32_t number_len;
++	uint8_t number[0];
++} __attribute__((packed));
++
++#define HAL_OP_HANDSFREE_PHONE_STATE_CHANGE	0x0E
++struct hal_cmd_handsfree_phone_state_change {
++	uint32_t num_active;
++	uint32_t num_held;
++	uint8_t state;
++	uint8_t type;
++	uint32_t number_len;
++	uint8_t number[0];
++} __attribute__((packed));
++
+ /* Notifications and confirmations */
  
-+static GIOChannel *server = NULL;
+ #define HAL_POWER_OFF			0x00
+@@ -572,3 +696,87 @@ struct hal_ev_a2dp_audio_state {
+ 	uint8_t state;
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
 +
-+static void device_set_state(uint8_t state)
-+{
-+	struct hal_ev_handsfree_conn_state ev;
-+	char address[18];
++#define HAL_EV_HANDSFREE_CONNECTION_STATE_DISCONNECTED	0x00
++#define HAL_EV_HANDSFREE_CONNECTION_STATE_CONNECTING	0x01
++#define HAL_EV_HANDSFREE_CONNECTION_STATE_CONNECTED	0x02
++#define HAL_EV_HANDSFREE_CONNECTION_STATE_SLC_CONNECTED	0x03
++#define HAL_EV_HANDSFREE_CONNECTION_STATE_DISCONNECTING	0x04
 +
-+	if (device.state == state)
-+		return;
++#define HAL_EV_HANDSFREE_CONN_STATE		0x81
++struct hal_ev_handsfree_conn_state {
++	uint8_t state;
++	uint8_t bdaddr[6];
++} __attribute__((packed));
 +
-+	device.state = state;
++#define HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED	0x00
++#define HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING		0x01
++#define HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED		0x02
++#define HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTING	0x03
 +
-+	ba2str(&device.bdaddr, address);
-+	DBG("device %s state %u", address, state);
++#define HAL_EV_HANDSFREE_AUDIO_STATE		0x82
++struct hal_ev_handsfree_audio_state {
++	uint8_t state;
++	uint8_t bdaddr[6];
++} __attribute__((packed));
 +
-+	bdaddr2android(&device.bdaddr, ev.bdaddr);
-+	ev.state = state;
++#define HAL_EV_HANDSFREE_VR		0x83
++struct hal_ev_handsfree_vr_state {
++	uint8_t state;
++} __attribute__((packed));
 +
-+	ipc_send_notif(HAL_SERVICE_ID_HANDSFREE, HAL_EV_HANDSFREE_CONN_STATE,
-+							sizeof(ev), &ev);
-+}
++#define HAL_EV_HANDSFREE_ANSWER		0x84
 +
-+static void device_init(const bdaddr_t *bdaddr)
-+{
-+	bacpy(&device.bdaddr, bdaddr);
++#define HAL_EV_HANDSFREE_HANGUP		0x85
 +
-+	device_set_state(HAL_EV_HANDSFREE_CONNECTION_STATE_CONNECTING);
-+}
++#define HAL_EV_HANDSFREE_VOLUME		0x86
++struct hal_ev_handsfree_volume {
++	uint8_t type;
++	uint32_t volume;
++} __attribute__((packed));
 +
-+static void device_cleanup(void)
-+{
-+	if (device.watch) {
-+		g_source_remove(device.watch);
-+		device.watch = 0;
-+	}
++#define HAL_EV_HANDSFREE_DIAL		0x87
++struct hal_ev_handsfree_dial {
++	uint32_t number_len;
++	uint8_t number[0];
++} __attribute__((packed));
 +
-+	if (device.io) {
-+		g_io_channel_unref(device.io);
-+		device.io = NULL;
-+	}
++#define HAL_EV_HANDSFREE_DTMF		0x88
++struct hal_ev_handsfree_dtmf {
++	uint8_t tone;
++} __attribute__((packed));
 +
-+	device_set_state(HAL_EV_HANDSFREE_CONNECTION_STATE_DISCONNECTED);
++#define HAL_HANDSFREE_NREC_STOP		0x00
++#define HAL_HANDSFREE_NREC_STart	0x01
 +
-+	memset(&device, 0, sizeof(device));
-+}
++#define HAL_EV_HANDSFREE_NREC		0x89
++struct hal_ev_handsfree_nrec {
++	uint8_t nrec;
++} __attribute__((packed));
 +
-+static gboolean watch_cb(GIOChannel *chan, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	DBG("");
++#define HAL_HANDSFREE_CHLD_TYPE_RELEASEHELD			0x00
++#define HAL_HANDSFREE_CHLD_TYPE_RELEASEACTIVE_ACCEPTHELD	0x01
++#define HAL_HANDSFREE_CHLD_TYPE_HOLDACTIVE_ACCEPTHELD		0x02
++#define HAL_HANDSFREE_CHLD_TYPE_ADDHELDTOCONF			0x03
 +
-+	device.watch = 0;
++#define HAL_EV_HANDSFREE_CHLD		0x8A
++struct hal_ev_handsfree_chld {
++	uint8_t chld;
++} __attribute__((packed));
 +
-+	device_cleanup();
 +
-+	return FALSE;
-+}
++#define HAL_EV_HANDSFREE_CNUM		0x8B
 +
-+static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
-+{
-+	DBG("");
++#define HAL_EV_HANDSFREE_CIND		0x8C
 +
-+	if (err) {
-+		error("handsfree: connect failed (%s)", err->message);
-+		goto failed;
-+	}
++#define HAL_EV_HANDSFREE_COPS		0x8D
 +
-+	g_io_channel_set_close_on_unref(chan, TRUE);
++#define HAL_EV_HANDSFREE_CLCC		0x8E
 +
-+	device.watch = g_io_add_watch(chan,
-+					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+					watch_cb, NULL);
-+	if (device.watch == 0)
-+		goto failed;
++#define HAL_EV_HANDSFREE_UNKNOWN_AT	0x8F
++struct hal_ev_handsfree_unknown_at {
++	uint32_t len;
++	uint8_t buf[0];
++} __attribute__((packed));
 +
-+	device.io = g_io_channel_ref(chan);
-+
-+	device_set_state(HAL_EV_HANDSFREE_CONNECTION_STATE_CONNECTED);
-+
-+	return;
-+
-+failed:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
-+	device_cleanup();
-+}
-+
-+static void confirm_cb(GIOChannel *chan, gpointer data)
-+{
-+	char address[18];
-+	bdaddr_t bdaddr;
-+	GError *err = NULL;
-+
-+	bt_io_get(chan, &err,
-+			BT_IO_OPT_DEST, address,
-+			BT_IO_OPT_DEST_BDADDR, &bdaddr,
-+			BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("handsfree: confirm failed (%s)", err->message);
-+		g_error_free(err);
-+		goto drop;
-+	}
-+
-+	DBG("incoming connect from %s", address);
-+
-+	if (device.state != HAL_EV_HANDSFREE_CONNECTION_STATE_DISCONNECTED) {
-+		info("handsfree: refusing connection from %s", address);
-+		goto drop;
-+	}
-+
-+	device_init(&bdaddr);
-+
-+	if (!bt_io_accept(chan, connect_cb, NULL, NULL, NULL)) {
-+		error("handsfree: failed to accept connection");
-+		device_cleanup();
-+		goto drop;
-+	}
-+
-+	return;
-+
-+drop:
-+	g_io_channel_shutdown(chan, TRUE, NULL);
-+}
-+
- static void handle_connect(const void *buf, uint16_t len)
- {
- 	DBG("");
-@@ -271,21 +409,33 @@ static sdp_record_t *handsfree_ag_record(void)
- bool bt_handsfree_register(const bdaddr_t *addr)
- {
- 	sdp_record_t *rec;
-+	GError *err = NULL;
- 
- 	DBG("");
- 
- 	bacpy(&adapter_addr, addr);
- 
-+	server =  bt_io_listen( NULL, confirm_cb, NULL, NULL, &err,
-+				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+				BT_IO_OPT_CHANNEL, HFP_AG_CHANNEL,
-+				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+				BT_IO_OPT_INVALID);
-+	if (!server) {
-+		error("Failed to listen on Handsfree rfcomm: %s", err->message);
-+		g_error_free(err);
-+		return false;
-+	}
-+
- 	rec = handsfree_ag_record();
- 	if (!rec) {
- 		error("Failed to allocate Handsfree record");
--		return false;
-+		goto failed;
- 	}
- 
- 	if (bt_adapter_add_record(rec, 0) < 0) {
- 		error("Failed to register Handsfree record");
- 		sdp_record_free(rec);
--		return false;
-+		goto failed;
- 	}
- 	record_id = rec->handle;
- 
-@@ -293,6 +443,13 @@ bool bt_handsfree_register(const bdaddr_t *addr)
- 						G_N_ELEMENTS(cmd_handlers));
- 
- 	return true;
-+
-+failed:
-+	g_io_channel_shutdown(server, TRUE, NULL);
-+	g_io_channel_unref(server);
-+	server = NULL;
-+
-+	return false;
- }
- 
- void bt_handsfree_unregister(void)
-@@ -301,6 +458,12 @@ void bt_handsfree_unregister(void)
- 
- 	ipc_unregister(HAL_SERVICE_ID_HANDSFREE);
- 
-+	if (server) {
-+		g_io_channel_shutdown(server, TRUE, NULL);
-+		g_io_channel_unref(server);
-+		server = NULL;
-+	}
-+
- 	bt_adapter_remove_record(record_id);
- 	record_id = 0;
- }
++#define HAL_EV_HANDSFREE_HSP_KEY_PRESS	0x90
 -- 
 1.8.5.3
 
