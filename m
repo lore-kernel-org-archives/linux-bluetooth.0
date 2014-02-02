@@ -1,48 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391123008-26767-1-git-send-email-luiz.dentz@gmail.com>
-References: <1391123008-26767-1-git-send-email-luiz.dentz@gmail.com>
-Date: Sun, 2 Feb 2014 07:40:18 -0800
-Message-ID: <CABBYNZ+JxRFpYnuv65XbT82vs41swzpLRrjsRoRwjMwU2pF60A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] audio/player: Fix using invalid end index
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1391339801-587-12-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1391339801-587-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1391339801-587-12-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Sun, 2 Feb 2014 09:27:30 -0400
+Message-ID: <CAJdJm_OCbUjZVEoNL1y7911zk3QgsQKmQjAJfQh15fhLeTGutA@mail.gmail.com>
+Subject: Re: [PATCH 11/11] android/tester: Make bt_callbacks thread-safe
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrzej,
 
-On Thu, Jan 30, 2014 at 3:03 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> When the End index is not set in ListItems the code automatically pick
-> the number of items as end index but the start index start with 0 so
-> the correct is to use number of items - 1.
-> ---
->  profiles/audio/player.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-> index e6d24eb..2bd2d6e 100644
-> --- a/profiles/audio/player.c
-> +++ b/profiles/audio/player.c
-> @@ -808,7 +808,8 @@ static int parse_filters(struct media_player *player, DBusMessageIter *iter,
->         int ctype;
->
->         *start = 0;
-> -       *end = folder->number_of_items ? folder->number_of_items : UINT32_MAX;
-> +       *end = folder->number_of_items ? folder->number_of_items - 1 :
-> +                                                               UINT32_MAX;
->
->         ctype = dbus_message_iter_get_arg_type(iter);
->         if (ctype != DBUS_TYPE_ARRAY)
-> --
-> 1.8.4.2
+On Sun, Feb 2, 2014 at 7:16 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> This patch adds wrappers for BT HAL callback which execute them in main
+> thread instead of notification_handler() thread. Otherwise test
+> execution is prone to race conditions since we do not provide any
+> locking mechanism for tester.
 
-Pushed after fixing patch 4/4.
+In my opinion, this is becoming too messy. I'm getting races even
+inside the emulator code: sometimes bthost->ncmd becomes zero before a
+HCI command is sent by the emulated host because the Command Status /
+Command Complete comes after the command is written to the socket, but
+before bthost->ncmd is decremented.
 
+Also try running android-tester under valgrind. At least for me, I get
+a few failures that I don't have when running without valgrind (at
+least one in HIDHost apparently due to if_bluetooth->enable() not
+being called on test setup and thus the tests rely on finishing before
+the controller is powered off by the kernel after initialization).
 
+IMHO, the best approach would be to keep all HAL API usage in a
+separate process, and keep android-tester single-threaded. Of course,
+this could extra complexity for the required IPC between
+android-tester and this new process...
+
+Again, I'm not familiar with how HAL API works, all this is just based
+on my failed attempt to make android-tester run reliably under
+valgrind.
+
+Best Regards,
 -- 
-Luiz Augusto von Dentz
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
