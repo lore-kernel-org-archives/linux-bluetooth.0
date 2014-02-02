@@ -2,93 +2,114 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 08/13] android/handsfree: Add initial code for AT commands processing
-Date: Sun,  2 Feb 2014 22:09:19 +0100
-Message-Id: <1391375364-27106-9-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 12/13] android/handsfree: Add support for AT+CIND command
+Date: Sun,  2 Feb 2014 22:09:23 +0100
+Message-Id: <1391375364-27106-13-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
 References: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently always reply with error and disconnect connection.
+Android supports only fixed number of indicators so this is all static
+for now.
 ---
- android/Makefile.am |  2 ++
- android/handsfree.c | 21 +++++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ android/handsfree.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 23e30c9..41bbbcb 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -27,6 +27,8 @@ android_bluetoothd_SOURCES = android/main.c \
- 				src/shared/queue.h src/shared/queue.c \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
-+				src/shared/ringbuf.h src/shared/ringbuf.c \
-+				src/shared/hfp.h src/shared/hfp.c \
- 				android/bluetooth.h android/bluetooth.c \
- 				android/hidhost.h android/hidhost.c \
- 				android/ipc.h android/ipc.c \
 diff --git a/android/handsfree.c b/android/handsfree.c
-index ad4c0ff..a4ce398 100644
+index 990ba2f..02135cb 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -37,6 +37,7 @@
- #include "lib/uuid.h"
- #include "src/sdp-client.h"
- #include "src/uuid-helper.h"
-+#include "src/shared/hfp.h"
- #include "btio/btio.h"
- #include "handsfree.h"
- #include "bluetooth.h"
-@@ -53,6 +54,7 @@ static struct {
- 	uint8_t state;
- 	GIOChannel *io;
- 	guint watch;
-+	struct hfp_gw *gw;
- } device;
+@@ -51,6 +51,10 @@
  
- static bdaddr_t adapter_addr;
-@@ -89,6 +91,11 @@ static void device_init(const bdaddr_t *bdaddr)
+ #define AG_FEATURES 0
  
- static void device_cleanup(void)
- {
-+	if (device.gw) {
-+		hfp_gw_unref(device.gw);
-+		device.gw = NULL;
-+	}
++#define CIND_SUPPORT_STR "+CIND: (\"service\",(0,1)),(\"call\",(0,1)),\
++			(\"callsetup\",(0-3)),(\"callheld\",(0-2)),\
++			(\"signal\",(0-5)),(\"roam\",(0,1)),(\"battchg\",(0,1))"
 +
- 	if (device.watch) {
- 		g_source_remove(device.watch);
- 		device.watch = 0;
-@@ -116,6 +123,13 @@ static gboolean watch_cb(GIOChannel *chan, GIOCondition cond,
- 	return FALSE;
+ static struct {
+ 	bdaddr_t bdaddr;
+ 	uint8_t state;
+@@ -146,12 +150,35 @@ static bool at_brsf(const char *at)
+ 	return true;
  }
  
-+static void at_command_handler(const char *command, void *user_data)
++static bool at_cind(const char *at)
 +{
++	if (strcmp(at, "?")) {
++		ipc_send_notif(HAL_SERVICE_ID_HANDSFREE, HAL_EV_HANDSFREE_CIND,
++								0, NULL);
++
++		return true;
++	}
++
++	if (strcmp(at, "=?")) {
++		hfp_gw_send_info(device.gw, "%s", CIND_SUPPORT_STR);
++
++		hfp_gw_send_result(device.gw, HFP_RESULT_OK);
++
++		return true;
++	}
++
 +	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
 +
-+	g_io_channel_shutdown(device.io, TRUE, NULL);
++	return false;
 +}
 +
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ static const struct {
+ 	const char *prefix;
+ 	int prefix_len;
+ 	bool (*func)(const char *at_cmds);
+ } at_cmds[] = {
+ 	{ "+BRSF", sizeof("+BRSF") - 1, at_brsf },
++	{ "+CIND", sizeof("+CIND") - 1, at_cind },
+ };
+ 
+ static void at_command_handler(const char *command, void *user_data)
+@@ -466,12 +493,41 @@ static void handle_cops(const void *buf, uint16_t len)
+ 							HAL_STATUS_FAILED);
+ }
+ 
++static unsigned int get_callsetup(uint8_t state)
++{
++	switch (state) {
++	case HAL_HANDSFREE_CALL_STATE_INCOMING:
++		return 1;
++	case HAL_HANDSFREE_CALL_STATE_DIALING:
++		return 2;
++	case HAL_HANDSFREE_CALL_STATE_ALERTING:
++		return 3;
++	default:
++		return 0;
++	}
++}
++
+ static void handle_cind(const void *buf, uint16_t len)
  {
++	const struct hal_cmd_handsfree_cind_response *cmd = buf;
++
  	DBG("");
-@@ -127,6 +141,13 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
  
- 	g_io_channel_set_close_on_unref(chan, TRUE);
++	/* HAL doesn't provide CIND values directly so need to convert here */
++
++	hfp_gw_send_info(device.gw, "+CIND: %u,%u,%u,%u,%u,%u,%u",
++				cmd->svc,
++				!!(cmd->num_active + cmd->num_held),
++				get_callsetup(cmd->state),
++				cmd->num_held ? (cmd->num_active ? 1 : 2) : 0,
++				cmd->signal,
++				cmd->roam,
++				cmd->batt_chg);
++
++	hfp_gw_send_result(device.gw, HFP_RESULT_OK);
++
+ 	ipc_send_rsp(HAL_SERVICE_ID_HANDSFREE, HAL_OP_HANDSFREE_CIND_RESPONSE,
+-							HAL_STATUS_FAILED);
++							HAL_STATUS_SUCCESS);
+ }
  
-+	device.gw = hfp_gw_new(g_io_channel_unix_get_fd(chan));
-+	if (!device.gw)
-+		goto failed;
-+
-+	hfp_gw_set_close_on_unref(device.gw, true);
-+	hfp_gw_set_command_handler(device.gw, at_command_handler, NULL, NULL);
-+
- 	device.watch = g_io_add_watch(chan,
- 					G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 					watch_cb, NULL);
+ static void handle_formatted_at_resp(const void *buf, uint16_t len)
 -- 
 1.8.5.3
 
