@@ -1,55 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 00/13] Initial code for handsfree support
-Date: Sun,  2 Feb 2014 22:09:11 +0100
-Message-Id: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <EF441CC3-EFCF-4A2A-8ADF-D9F6FF262E4D@holtmann.org>
+References: <1391339801-587-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1391339801-587-12-git-send-email-andrzej.kaczmarek@tieto.com>
+	<CAJdJm_OCbUjZVEoNL1y7911zk3QgsQKmQjAJfQh15fhLeTGutA@mail.gmail.com>
+	<EF441CC3-EFCF-4A2A-8ADF-D9F6FF262E4D@holtmann.org>
+Date: Sun, 2 Feb 2014 16:12:29 -0400
+Message-ID: <CAJdJm_MOuYKxtotn1XSqwdsHUUSs8cBuXTRRJ9f6L=U7DS---w@mail.gmail.com>
+Subject: Re: [PATCH 11/11] android/tester: Make bt_callbacks thread-safe
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-This adds initial support for HFP. HAL library is complete, for daemon
-only support for RFCOMM connection handling.
+On Sun, Feb 2, 2014 at 12:55 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> I have to agree. We might better spawn processes for this. Our emulator code was never designed to be thread safe and never will be. We are just hiding the real problem here and it will break somewhere else later on.
 
-There is also minimal set of AT handling needed for SLC establishment
-(proper AT parsing code is still missing).
+One thing I've been experimenting with is to use android/haltest to
+"script" the tests. It is not as fine grained as implementing your own
+HAL interfaces, but I believe it will allow me to implement most tests
+I want (I just started writing the tests).
 
-Comments are welcome.
+(BTW, if anyone is doing something similar with haltest, let me know!)
 
-BR
-Szymon Janc
-
-Szymon Janc (13):
-  android/handsfree: Add initial files
-  android/handsfree: Add commands and events definition to IPC header
-  android/handsfree: Add stubs for commands handlers
-  android/hal-handsfree: Implement notifications handling
-  android/hal-handsfree: Implement sending commands
-  android/handsfree: Add SDP record for AG
-  android/handsfree: Add support for RFCOMM connection handling
-  android/handsfree: Add initial code for AT commands processing
-  android/handsfree: Add connect command handling
-  android/handsfree: Add disconnect command handling
-  android/handsfree: Add AT+BRSF command support
-  android/handsfree: Add support for AT+CIND command
-  android/handsfree: Add support for AT+CMER command
-
- android/Android.mk      |   2 +
- android/Makefile.am     |   4 +
- android/hal-bluetooth.c |   3 +
- android/hal-handsfree.c | 598 +++++++++++++++++++++++++++++++++++++
- android/hal-msg.h       | 208 +++++++++++++
- android/hal.h           |   2 +
- android/handsfree.c     | 763 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/handsfree.h     |  25 ++
- android/main.c          |  14 +
- 9 files changed, 1619 insertions(+)
- create mode 100644 android/hal-handsfree.c
- create mode 100644 android/handsfree.c
- create mode 100644 android/handsfree.h
-
+Best Regards,
 -- 
-1.8.5.3
-
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
