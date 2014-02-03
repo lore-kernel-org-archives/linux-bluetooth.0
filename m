@@ -1,344 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/5] android/unit: Add android IPC unit tests
-Date: Mon, 03 Feb 2014 15:33:02 +0100
-Message-ID: <2689170.MSuu7Prboj@uw000953>
-In-Reply-To: <1389866702-30697-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1389866702-30697-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1391436370.1075.3.camel@bali>
+Subject: Re: [RFC v6 03/14] Bluetooth: Introduce connection parameters list
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Mon, 03 Feb 2014 11:06:10 -0300
+In-Reply-To: <94043278-430F-4EAE-A4F1-36AB1FB614A6@holtmann.org>
+References: <1391116937-28217-1-git-send-email-andre.guedes@openbossa.org>
+	 <1391116937-28217-4-git-send-email-andre.guedes@openbossa.org>
+	 <94043278-430F-4EAE-A4F1-36AB1FB614A6@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
 
-On Thursday 16 of January 2014 11:04:58 Marcin Kraglak wrote:
-> It will test ipc library. First test case will check
-> ipc_init() call.
-> ---
->  .gitignore          |   1 +
->  android/Makefile.am |   8 ++
->  android/test-ipc.c  | 277 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 286 insertions(+)
->  create mode 100644 android/test-ipc.c
+Hi Marcel,
+
+On Fri, 2014-01-31 at 17:11 -0800, Marcel Holtmann wrote:
+> Hi Andre,
 > 
-> diff --git a/.gitignore b/.gitignore
-> index ac76fe2..ddd562a 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -114,3 +114,4 @@ android/bluetoothd
->  android/haltest
->  android/android-tester
->  android/bluetoothd-snoop
-> +android/test-ipc
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index cd4a526..0c61317 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -117,6 +117,14 @@ android_android_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
->  
->  android_android_tester_LDFLAGS = -pthread -ldl
->  
-> +noinst_PROGRAMS += android/test-ipc
-> +
-> +android_test_ipc_SOURCES = android/test-ipc.c \
-> +				src/shared/util.h src/shared/util.c \
-> +				src/log.h src/log.c \
-> +				android/ipc.c android/ipc.h
-> +android_test_ipc_LDADD = @GLIB_LIBS@
-> +
->  plugin_LTLIBRARIES += android/audio.a2dp.default.la
->  
->  android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
-> diff --git a/android/test-ipc.c b/android/test-ipc.c
-> new file mode 100644
-> index 0000000..6ac1175
-> --- /dev/null
-> +++ b/android/test-ipc.c
-> @@ -0,0 +1,277 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License
-> + *  along with this program; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +#include <stdio.h>
-> +#include <errno.h>
-> +#include <unistd.h>
-> +#include <stdlib.h>
-> +#include <stdbool.h>
-> +#include <inttypes.h>
-> +#include <string.h>
-> +#include <fcntl.h>
-> +#include <sys/socket.h>
-> +#include <sys/un.h>
-> +#include <sys/signalfd.h>
-> +
-> +#include <glib.h>
-> +#include "src/shared/util.h"
-> +#include "src/log.h"
-> +#include "android/hal-msg.h"
-> +#include "android/ipc.h"
-> +
-> +struct test_data {
-> +	uint32_t expected_signal;
-> +};
-> +
-> +struct context {
-> +	GMainLoop *main_loop;
-> +
-> +	int sk;
-> +
-> +	guint source;
-> +	guint cmd_source;
-> +	guint notif_source;
-> +
-> +	GIOChannel *cmd_io;
-> +	GIOChannel *notif_io;
-> +	GIOChannel *signal_io;
-> +
-> +	guint signal_source;
-> +
-> +	const struct test_data *data;
-> +};
-> +
-> +static void context_quit(struct context *context)
-> +{
-> +	g_main_loop_quit(context->main_loop);
-> +}
-> +
-> +static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
-> +						gpointer user_data)
-> +{
-> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-> +		g_assert(FALSE);
-> +		return FALSE;
-> +	}
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
-> +							gpointer user_data)
-> +{
-> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-> +		g_assert(FALSE);
-> +		return FALSE;
-> +	}
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
-> +						gpointer user_data)
-> +{
-> +	struct context *context = user_data;
-> +	GIOChannel *new_io;
-> +	GIOCondition watch_cond;
-> +	int sk;
-> +
-> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
-> +		g_assert(FALSE);
-> +		return FALSE;
-> +	}
-> +
-> +	g_assert(!context->cmd_source || !context->notif_source);
-> +
-> +	sk = accept(context->sk, NULL, NULL);
-> +	g_assert(sk >= 0);
-> +
-> +	new_io = g_io_channel_unix_new(sk);
-> +
-> +	watch_cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-> +
-> +	if (context->cmd_source && !context->notif_source) {
-> +		context->notif_source = g_io_add_watch(new_io, watch_cond,
-> +							notif_watch, context);
-> +		g_assert(context->notif_source > 0);
-> +		context->notif_io = new_io;
-> +	}
-> +
-> +	if (!context->cmd_source) {
-> +		context->cmd_source = g_io_add_watch(new_io, watch_cond,
-> +							cmd_watch, context);
-> +		context->cmd_io = new_io;
-> +	}
-> +
-> +	if (context->cmd_source && context->notif_source)
-> +		context_quit(context);
-> +
-> +	return TRUE;
-> +}
-> +
-> +static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
-> +							gpointer user_data)
-> +{
-> +	struct context *context = user_data;
-> +	const struct test_data *test_data = context->data;
-> +	struct signalfd_siginfo si;
-> +	ssize_t result;
-> +	int fd;
-> +
-> +	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
-> +		return FALSE;
-> +
-> +	fd = g_io_channel_unix_get_fd(channel);
-> +
-> +	result = read(fd, &si, sizeof(si));
-> +	if (result != sizeof(si))
-> +		return FALSE;
-> +
-> +	g_assert(test_data->expected_signal == si.ssi_signo);
-> +	context_quit(context);
-> +	return TRUE;
-> +}
-> +
-> +static guint setup_signalfd(gpointer user_data)
-> +{
-> +	GIOChannel *channel;
-> +	guint source;
-> +	sigset_t mask;
-> +	int ret;
-> +	int fd;
-> +
-> +	sigemptyset(&mask);
-> +	sigaddset(&mask, SIGINT);
-> +	sigaddset(&mask, SIGTERM);
-> +
-> +	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
-> +	g_assert(ret == 0);
-> +
-> +	fd = signalfd(-1, &mask, 0);
-> +	g_assert(fd >= 0);
-> +
-> +	channel = g_io_channel_unix_new(fd);
-> +
-> +	g_io_channel_set_close_on_unref(channel, TRUE);
-> +	g_io_channel_set_encoding(channel, NULL, NULL);
-> +	g_io_channel_set_buffered(channel, FALSE);
-> +
-> +	source = g_io_add_watch(channel,
-> +				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-> +				signal_handler, user_data);
-> +
-> +	g_io_channel_unref(channel);
-> +
-> +	return source;
-> +}
-> +
-> +static struct context *create_context(gconstpointer data)
-> +{
-> +	struct context *context = g_new0(struct context, 1);
-> +	struct sockaddr_un addr;
-> +	GIOChannel *io;
-> +	int ret, sk;
-> +
-> +	context->main_loop = g_main_loop_new(NULL, FALSE);
-> +	g_assert(context->main_loop);
-> +
-> +	context->signal_source = setup_signalfd(context);
-> +	g_assert(context->signal_source);
-> +
-> +	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
-> +	g_assert(sk >= 0);
-> +
-> +	memset(&addr, 0, sizeof(addr));
-> +	addr.sun_family = AF_UNIX;
-> +
-> +	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-> +
-> +	ret = bind(sk, (struct sockaddr *) &addr, sizeof(addr));
-> +	g_assert(ret == 0);
-> +
-> +	ret = listen(sk, 5);
-> +	g_assert(ret == 0);
-> +
-> +	io = g_io_channel_unix_new(sk);
-> +
-> +	g_io_channel_set_close_on_unref(io, TRUE);
-> +
-> +	context->source = g_io_add_watch(io,
-> +				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-> +				connect_handler, context);
-> +	g_assert(context->source > 0);
-> +
-> +	g_io_channel_unref(io);
-> +
-> +	context->sk = sk;
-> +	context->data = data;
-> +
-> +	return context;
-> +}
-> +
-> +static void execute_context(struct context *context)
-> +{
-> +	g_main_loop_run(context->main_loop);
-> +
-> +	g_io_channel_shutdown(context->notif_io, true, NULL);
-> +	g_io_channel_shutdown(context->cmd_io, true, NULL);
-> +	g_io_channel_unref(context->cmd_io);
-> +	g_io_channel_unref(context->notif_io);
-> +
-> +	g_source_remove(context->notif_source);
-> +	g_source_remove(context->signal_source);
-> +	g_source_remove(context->cmd_source);
-> +	g_source_remove(context->source);
-> +
-> +	g_main_loop_unref(context->main_loop);
-> +
-> +	g_free(context);
-> +}
-> +
-> +static void test_init(gconstpointer data)
-> +{
-> +	struct context *context = create_context(data);
-> +
-> +	ipc_init();
-> +
-> +	execute_context(context);
-> +
-> +	ipc_cleanup();
-> +}
-> +
-> +static const struct test_data test_init_1 = {};
-> +
-> +int main(int argc, char *argv[])
-> +{
-> +	g_test_init(&argc, &argv, NULL);
-> +
-> +	if (g_test_verbose())
-> +		__btd_log_init("*", 0);
-> +
-> +	g_test_add_data_func("/android_ipc/init", &test_init_1, test_init);
-> +
-> +	return g_test_run();
-> +}
+> > This patch adds to hdev the connection parameters list (hdev->le_
+> > conn_params). The elements from this list (struct hci_conn_params)
+> > contains the connection parameters (for now, minimum and maximum
+> > connection interval) that should be used during the connection
+> > establishment.
+> > 
+> > The struct hci_conn_params also defines the 'auto_connect' field
+> > which will be used to implement the auto connection mechanism.
+> > 
+> > Moreover, this patch adds helper functions to manipulate hdev->le_
+> > conn_params list. Some of these functions are also declared in
+> > hci_core.h since they will be used outside hci_core.c in upcoming
+> > patches.
+> > 
+> > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> > ---
+> > include/net/bluetooth/hci_core.h | 25 +++++++++++++
+> > net/bluetooth/hci_core.c         | 80 ++++++++++++++++++++++++++++++++++++++++
+> > 2 files changed, 105 insertions(+)
+> > 
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index 197413b..f757b3f 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -269,6 +269,7 @@ struct hci_dev {
+> > 	struct list_head	link_keys;
+> > 	struct list_head	long_term_keys;
+> > 	struct list_head	remote_oob_data;
+> > +	struct list_head	le_conn_params;
+> > 
+> > 	struct hci_dev_stats	stat;
+> > 
+> > @@ -373,6 +374,22 @@ struct hci_chan {
+> > 	__u8		state;
+> > };
+> > 
+> > +struct hci_conn_params {
+> > +	struct list_head list;
+> > +
+> > +	bdaddr_t addr;
+> > +	u8 addr_type;
+> > +
+> > +	enum {
+> > +		HCI_AUTO_CONN_DISABLED,
+> > +		HCI_AUTO_CONN_ALWAYS,
+> > +		HCI_AUTO_CONN_LINK_LOSS,
+> > +	} auto_connect;
 > 
+> actually I would not include the auto_connect mode in the this stage of the patch set. We could have made more progress with this patch set and get things applied if things are not intermixed. So lets leave this out and only introduce it once we need it.
 
-This is now applied (with some cleanups), thanks.
+All right, I'll introduce this auto_connect mode in patch 13/14. It
+clearly makes more sense.
 
--- 
-Best regards, 
-Szymon Janc
+Thanks,
+
+Andre
