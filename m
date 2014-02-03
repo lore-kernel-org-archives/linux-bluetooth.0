@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/6] android/hal-audio: Remove unsupported mono channel mode
-Date: Mon, 3 Feb 2014 16:44:47 +0100
-Message-ID: <1391442292-4668-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Date: Mon, 3 Feb 2014 10:38:02 -0400
+Message-ID: <CAPm3yA3BzSHVG42RFp2U0m0DY5vKHVOY0gRwSOrZz8-qdsdzfQ@mail.gmail.com>
+Subject: Working with the gatt-example.c plugin
+From: Sandy Chapman <schapman@lixar.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-AudioFlinger can only provide PCM 16bit Stereo data for A2DP track so
-we should not advertise mono channel mode in capabilities since we
-can't downmix this internally.
----
- android/hal-audio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hi All,
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 8ef5bff..4578c53 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -227,8 +227,7 @@ struct a2dp_audio_dev {
- static const a2dp_sbc_t sbc_presets[] = {
- 	{
- 		.frequency = SBC_SAMPLING_FREQ_44100 | SBC_SAMPLING_FREQ_48000,
--		.channel_mode = SBC_CHANNEL_MODE_MONO |
--				SBC_CHANNEL_MODE_DUAL_CHANNEL |
-+		.channel_mode = SBC_CHANNEL_MODE_DUAL_CHANNEL |
- 				SBC_CHANNEL_MODE_STEREO |
- 				SBC_CHANNEL_MODE_JOINT_STEREO,
- 		.subbands = SBC_SUBBANDS_4 | SBC_SUBBANDS_8,
+I'm having some difficulties getting the gatt-example plugin working.
+I've checked out the latest tag (5.14) from git and have built it
+using the --enable-maintainer-mode configure flag so that
+gatt-example.c is compiled into a static plugin that is loaded at
+runtime. I've confirmed that the plugin is compiled and is loaded at
+runtime when I run bluetoothd.
+
+My problem is with making modifications to the plugin. I've tried
+something as simple as changing the UUID for the battery service,
+however, every time I scan the services (using an iPhone), the same
+list of UUIDs is returned (0xA002 , 0xA004, and 0xFEEE... for the
+services, which match up with what's defined in the gatt-example.c
+file). Any modifications I make to the file don't seem to have any
+effect on the services advertised. I've even rebuilt it without
+maintainer mode and have confirmed the plugin isn't loaded, but still,
+the same set of services and characteristics are loaded. Is there some
+sort of cache where the advertisement is loaded from that can be
+cleared? It looks like a bunch of HCI Commands are sent every time I
+"hciconfig hci0 up" which didn't happen when I initially ran the
+hciconfig tool prior to compiling and running bluetoothd.
+
+Some additional details:
+Bluetooth adapter is a Broadcom (in a MacBook Pro) that is running
+through a Linux VM (VirtualBox). Additional diagnostics can be
+provided on request.
+
+Thanks for any help you guys can provide,
+Sandy
+
 -- 
-1.8.5.3
 
