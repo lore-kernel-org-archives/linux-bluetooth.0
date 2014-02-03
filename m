@@ -1,74 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Feb 2014 16:36:06 -0200
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: Alejandro Exojo <aexojo@modpow.es>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: How do you install bluez for development?
-Message-ID: <20140203183606.GA12511@molly>
-References: <CACMtdhhCecEWiK33A6uNSQr-=iRJSehfbJCqb0Maxpq-8WjkPA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CACMtdhhCecEWiK33A6uNSQr-=iRJSehfbJCqb0Maxpq-8WjkPA@mail.gmail.com>
+In-Reply-To: <CAJdJm_PCW5DQ3-qbp75F1uMryX7hoJedzE1CD-AT2tNbvwT=NA@mail.gmail.com>
+References: <CAPm3yA3BzSHVG42RFp2U0m0DY5vKHVOY0gRwSOrZz8-qdsdzfQ@mail.gmail.com>
+	<CAJdJm_PCW5DQ3-qbp75F1uMryX7hoJedzE1CD-AT2tNbvwT=NA@mail.gmail.com>
+Date: Mon, 3 Feb 2014 14:11:56 -0400
+Message-ID: <CAPm3yA2T=CT5nv0NrcZz+wXVeW3Xk499fCjZ=bRvLLesqDHU4g@mail.gmail.com>
+Subject: Re: Working with the gatt-example.c plugin
+From: Sandy Chapman <schapman@lixar.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alejandro,
+Hi Anderson,
 
-On 17:21 Mon 03 Feb, Alejandro Exojo wrote:
-> Hi.
+On Mon, Feb 3, 2014 at 11:51 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Sandy,
 >
-> I want to build a recent bluez, since I need the DualShock support.
-> I'm used to play with PATH, LD_LIBRARY_PATH and other stuff, so I tend
-> to install what I've built in /opt/foo or even in a subdirectory in my
-> /home, but I'm missing something, maybe obvious, to start bluetoothd.
+> On Mon, Feb 3, 2014 at 10:38 AM, Sandy Chapman <schapman@lixar.com> wrote:
+>> Hi All,
+>>
+>> I'm having some difficulties getting the gatt-example plugin working.
+>> I've checked out the latest tag (5.14) from git and have built it
+>> using the --enable-maintainer-mode configure flag so that
+>> gatt-example.c is compiled into a static plugin that is loaded at
+>> runtime. I've confirmed that the plugin is compiled and is loaded at
+>> runtime when I run bluetoothd.
+>>
+>> My problem is with making modifications to the plugin. I've tried
+>> something as simple as changing the UUID for the battery service,
+>> however, every time I scan the services (using an iPhone), the same
+>> list of UUIDs is returned (0xA002 , 0xA004, and 0xFEEE... for the
+>> services, which match up with what's defined in the gatt-example.c
+>> file). Any modifications I make to the file don't seem to have any
+>> effect on the services advertised. I've even rebuilt it without
+>> maintainer mode and have confirmed the plugin isn't loaded, but still,
+>> the same set of services and characteristics are loaded. Is there some
+>> sort of cache where the advertisement is loaded from that can be
+>> cleared? It looks like a bunch of HCI Commands are sent every time I
+>> "hciconfig hci0 up" which didn't happen when I initially ran the
+>> hciconfig tool prior to compiling and running bluetoothd.
 >
-> I've built fine with   ./configure --prefix=/ --enable-sixaxis &&
-> DESTDIR=/opt/bluez5 make install.
+> Most likely iPhone is caching the attribute database and thus not
+> redoing any discovery. If this is the case, it is because we don't
+> provide a Service Changed characteristic on the GATT service,
+> therefore the iPhone thinks the database is static.
 >
-> Then I've configured everything I saw that bluez installs:
+> BTW this is a bug/limitation on the current BlueZ. While working on
+> the new GATT API we are also implementing a Service Changed service
+> that notifies changes to the entire database on every connection. This
+> is suboptimal (may trigger service discovery on every connection) but
+> at least will avoid stale cache on the client side. In future we need
+> to implement tracking of added / removed services and notify only
+> those that change.
 >
-> * /opt/bluez5/etc/dbus-1/system.d/bluetooth.conf  (sourced from the
-> stuff in /etc)
-> * /lib/udev  (I've symlinked the two files, just in case)
-> * /etc/systemd/system/bluetooth.service  (points to the service file
-> provided by bluez, with the proper path for bluetoothd).
+> Please use "btmon" while iphone connects to bluez and check if there
+> is any ATT traffic for GATT service discovery.
 >
-> With that the service starts, but stops immediately. This is what I've
-> get in the log when plugging the adapter (or forcing a manual
-> startup):
+> If this is the case, you need to find out how to clear the cache on the iPhone.
 >
-> Feb 03 17:14:38 PC-MW03 systemd[1]: Starting Bluetooth service...
-> Feb 03 17:14:38 PC-MW03 bluetoothd[22571]: Bluetooth daemon 5.14
-> Feb 03 17:14:38 PC-MW03 systemd[1]: Started Bluetooth service.
-> Feb 03 17:14:38 PC-MW03 systemd[1]: Starting Bluetooth.
-> Feb 03 17:14:38 PC-MW03 systemd[1]: Reached target Bluetooth.
-> Feb 03 17:14:38 PC-MW03 bluetoothd[22571]: Failed to access management interface
-
-Two probable causes, your kernel is older than 3.4, or the user that is running
-bluetoothd doesn't have the CAP_NET_ADMIN capability.
-
-> Feb 03 17:14:38 PC-MW03 bluetoothd[22571]: Adapter handling
-> initialization failed
-> Feb 03 17:14:38 PC-MW03 systemd[1]: bluetooth.service: main process
-> exited, code=exited, status=1/FAILURE
->
->
-> Any hints? Or should I just give up and install everything in /usr,
-> possibly clashing files from other installations like packages?
->
-> Thank you.
->
+> Best Regards,
 > --
-> Alejandro Exojo Piqueras
->
-> ModpoW, S.L.
-> Technova LaSalle | Sant Joan de la Salle 42 | 08022 Barcelona | www.modpow.es
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Anderson Lizardo
+> http://www.indt.org/?lang=en
+> INdT - Manaus - Brazil
 
+This was exactly the problem. Apple doesn't provide any API to reset
+the GATT cache and neglects to mention that fact. Turns out, disabling
+and re-enabling Bluetooth on iOS clears the cache. After doing this,
+my updated UUIDs are shown on the phone correctly. For reference, this
+is the stack overflow link that points this out:
+http://stackoverflow.com/q/17090949/1270148
 
-Cheers,
---
-Vinicius
+Thanks,
+Sandy
+
+-- 
+
