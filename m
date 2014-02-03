@@ -1,64 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v7 04/11] Bluetooth: Remove unused function
-Date: Mon,  3 Feb 2014 13:56:21 -0300
-Message-Id: <1391446588-18729-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v7 05/11] Bluetooth: Introduce hdev->pend_le_conn list
+Date: Mon,  3 Feb 2014 13:56:22 -0300
+Message-Id: <1391446588-18729-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391446588-18729-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391446588-18729-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes hci_create_le_conn() since it is not used anymore.
+This patch introduces the hdev->pend_le_conn list which holds the
+device addresses the kernel should autonomously connect. It also
+introduces some helper functions to manipulate the list.
+
+The list and helper functions will be used by the next patch which
+implements the LE auto connection infrastructure.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 32 --------------------------------
- 1 file changed, 32 deletions(-)
+ include/net/bluetooth/hci_core.h |  7 +++++
+ net/bluetooth/hci_core.c         | 68 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 63c1e4f..127465f 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -551,38 +551,6 @@ done:
- 	hci_dev_unlock(hdev);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 92fa75f..97f758a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -270,6 +270,7 @@ struct hci_dev {
+ 	struct list_head	long_term_keys;
+ 	struct list_head	remote_oob_data;
+ 	struct list_head	le_conn_params;
++	struct list_head	pend_le_conns;
+ 
+ 	struct hci_dev_stats	stat;
+ 
+@@ -769,6 +770,12 @@ void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_clear(struct hci_dev *hdev);
+ 
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conns_clear(struct hci_dev *hdev);
++
+ int hci_uuids_clear(struct hci_dev *hdev);
+ 
+ int hci_link_keys_clear(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e774669..f353a71 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2999,6 +2999,72 @@ void hci_conn_params_clear(struct hci_dev *hdev)
+ 	BT_DBG("All LE connection parameters were removed");
  }
  
--static int hci_create_le_conn(struct hci_conn *conn)
--{
--	struct hci_dev *hdev = conn->hdev;
--	struct hci_cp_le_create_conn cp;
--	struct hci_request req;
--	int err;
--
--	hci_req_init(&req, hdev);
--
--	memset(&cp, 0, sizeof(cp));
--	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
--	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
--	bacpy(&cp.peer_addr, &conn->dst);
--	cp.peer_addr_type = conn->dst_type;
--	cp.own_address_type = conn->src_type;
--	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
--	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
--	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
--	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
--	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
--
--	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
--
--	err = hci_req_run(&req, create_le_conn_complete);
--	if (err) {
--		hci_conn_del(conn);
--		return err;
--	}
--
--	return 0;
--}
--
- static void create_le_conn_req(struct hci_request *req, struct hci_conn *conn)
++/* This function requires the caller holds hdev->lock */
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	list_for_each_entry(entry, &hdev->pend_le_conns, list) {
++		if (bacmp(&entry->bdaddr, addr) == 0 &&
++		    entry->bdaddr_type == addr_type)
++			return entry;
++	}
++
++	return NULL;
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (entry)
++		return;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry) {
++		BT_ERR("Out of memory");
++		return;
++	}
++
++	bacpy(&entry->bdaddr, addr);
++	entry->bdaddr_type = addr_type;
++
++	list_add(&entry->list, &hdev->pend_le_conns);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (!entry)
++		return;
++
++	list_del(&entry->list);
++	kfree(entry);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conns_clear(struct hci_dev *hdev)
++{
++	struct bdaddr_list *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->pend_le_conns, list) {
++		list_del(&entry->list);
++		kfree(entry);
++	}
++
++	BT_DBG("All LE pending connections cleared");
++}
++
+ static void inquiry_complete(struct hci_dev *hdev, u8 status)
  {
- 	struct hci_cp_le_create_conn cp;
+ 	if (status) {
+@@ -3110,6 +3176,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+ 	INIT_LIST_HEAD(&hdev->le_conn_params);
++	INIT_LIST_HEAD(&hdev->pend_le_conns);
+ 	INIT_LIST_HEAD(&hdev->conn_hash.list);
+ 
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+@@ -3296,6 +3363,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_conn_params_clear(hdev);
++	hci_pend_le_conns_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
 -- 
 1.8.5.3
 
