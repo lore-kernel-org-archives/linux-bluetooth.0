@@ -1,174 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v7 01/11] Bluetooth: Introduce connection parameters list
-Date: Mon,  3 Feb 2014 13:56:18 -0300
-Message-Id: <1391446588-18729-1-git-send-email-andre.guedes@openbossa.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 5/6] android/hal-audio: Fix RTP sequence numbers
+Date: Mon, 3 Feb 2014 17:55:48 +0100
+Message-ID: <1391446549-31455-6-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1391446549-31455-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1391446549-31455-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to hdev the connection parameters list (hdev->le_
-conn_params). The elements from this list (struct hci_conn_params)
-contains the connection parameters (for now, minimum and maximum
-connection interval) that should be used during the connection
-establishment.
-
-Moreover, this patch adds helper functions to manipulate hdev->le_
-conn_params list. Some of these functions are also declared in
-hci_core.h since they will be used outside hci_core.c in upcoming
-patches.
-
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h | 18 ++++++++++
- net/bluetooth/hci_core.c         | 77 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 95 insertions(+)
+ android/hal-audio.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4e87878..92fa75f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -269,6 +269,7 @@ struct hci_dev {
- 	struct list_head	link_keys;
- 	struct list_head	long_term_keys;
- 	struct list_head	remote_oob_data;
-+	struct list_head	le_conn_params;
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index be17c76..6439880 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -458,7 +458,6 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
  
- 	struct hci_dev_stats	stat;
+ 	mp->hdr.v = 2;
+ 	mp->hdr.pt = 1;
+-	mp->hdr.sequence_number = htons(sbc_data->seq++);
+ 	mp->hdr.ssrc = htonl(1);
+ 	mp->payload.frame_count = 0;
  
-@@ -373,6 +374,16 @@ struct hci_chan {
- 	__u8		state;
- };
- 
-+struct hci_conn_params {
-+	struct list_head list;
+@@ -488,6 +487,8 @@ static ssize_t sbc_write_data(void *codec_data, const void *buffer,
+ 				bytes == consumed ||
+ 				mp->payload.frame_count ==
+ 							MAX_FRAMES_IN_PAYLOAD) {
++			mp->hdr.sequence_number = htons(sbc_data->seq++);
 +
-+	bdaddr_t addr;
-+	u8 addr_type;
-+
-+	u16 conn_min_interval;
-+	u16 conn_max_interval;
-+};
-+
- extern struct list_head hci_dev_list;
- extern struct list_head hci_cb_list;
- extern rwlock_t hci_dev_list_lock;
-@@ -751,6 +762,13 @@ int hci_blacklist_clear(struct hci_dev *hdev);
- int hci_blacklist_add(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- 
-+struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
-+					       bdaddr_t *addr, u8 addr_type);
-+void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
-+			 u16 conn_min_interval, u16 conn_max_interval);
-+void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
-+void hci_conn_params_clear(struct hci_dev *hdev);
-+
- int hci_uuids_clear(struct hci_dev *hdev);
- 
- int hci_link_keys_clear(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 7a44c8c..e774669 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2924,6 +2924,81 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
- 	return mgmt_device_unblocked(hdev, bdaddr, type);
- }
- 
-+/* This function requires the caller holds hdev->lock */
-+struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
-+					       bdaddr_t *addr, u8 addr_type)
-+{
-+	struct hci_conn_params *params;
-+
-+	list_for_each_entry(params, &hdev->le_conn_params, list) {
-+		if (bacmp(&params->addr, addr) == 0 &&
-+		    params->addr_type == addr_type) {
-+			return params;
-+		}
-+	}
-+
-+	return NULL;
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
-+			 u16 conn_min_interval, u16 conn_max_interval)
-+{
-+	struct hci_conn_params *params;
-+
-+	params = hci_conn_params_lookup(hdev, addr, addr_type);
-+	if (params) {
-+		params->conn_min_interval = conn_min_interval;
-+		params->conn_max_interval = conn_max_interval;
-+		return;
-+	}
-+
-+	params = kzalloc(sizeof(*params), GFP_KERNEL);
-+	if (!params) {
-+		BT_ERR("Out of memory");
-+		return;
-+	}
-+
-+	bacpy(&params->addr, addr);
-+	params->addr_type = addr_type;
-+	params->conn_min_interval = conn_min_interval;
-+	params->conn_max_interval = conn_max_interval;
-+
-+	list_add(&params->list, &hdev->le_conn_params);
-+
-+	BT_DBG("addr %pMR (type %u) conn_min_interval 0x%.4x "
-+	       "conn_max_interval 0x%.4x", addr, addr_type, conn_min_interval,
-+	       conn_max_interval);
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-+{
-+	struct hci_conn_params *params;
-+
-+	params = hci_conn_params_lookup(hdev, addr, addr_type);
-+	if (!params)
-+		return;
-+
-+	list_del(&params->list);
-+	kfree(params);
-+
-+	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_conn_params_clear(struct hci_dev *hdev)
-+{
-+	struct hci_conn_params *params, *tmp;
-+
-+	list_for_each_entry_safe(params, tmp, &hdev->le_conn_params, list) {
-+		list_del(&params->list);
-+		kfree(params);
-+	}
-+
-+	BT_DBG("All LE connection parameters were removed");
-+}
-+
- static void inquiry_complete(struct hci_dev *hdev, u8 status)
- {
- 	if (status) {
-@@ -3034,6 +3109,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->link_keys);
- 	INIT_LIST_HEAD(&hdev->long_term_keys);
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
-+	INIT_LIST_HEAD(&hdev->le_conn_params);
- 	INIT_LIST_HEAD(&hdev->conn_hash.list);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
-@@ -3219,6 +3295,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_link_keys_clear(hdev);
- 	hci_smp_ltks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
-+	hci_conn_params_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
+ 			ret = write_media_packet(fd, sbc_data, mp, encoded);
+ 			if (ret < 0)
+ 				return ret;
 -- 
 1.8.5.3
 
