@@ -1,81 +1,154 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_PCW5DQ3-qbp75F1uMryX7hoJedzE1CD-AT2tNbvwT=NA@mail.gmail.com>
-References: <CAPm3yA3BzSHVG42RFp2U0m0DY5vKHVOY0gRwSOrZz8-qdsdzfQ@mail.gmail.com>
-	<CAJdJm_PCW5DQ3-qbp75F1uMryX7hoJedzE1CD-AT2tNbvwT=NA@mail.gmail.com>
-Date: Mon, 3 Feb 2014 14:11:56 -0400
-Message-ID: <CAPm3yA2T=CT5nv0NrcZz+wXVeW3Xk499fCjZ=bRvLLesqDHU4g@mail.gmail.com>
-Subject: Re: Working with the gatt-example.c plugin
-From: Sandy Chapman <schapman@lixar.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=US-ASCII
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v7 11/11] Bluetooth: Add le_auto_conn file on debugfs
+Date: Mon,  3 Feb 2014 13:56:28 -0300
+Message-Id: <1391446588-18729-11-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1391446588-18729-1-git-send-email-andre.guedes@openbossa.org>
+References: <1391446588-18729-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+This patch adds to debugfs the le_auto_conn file. This file will be
+used to test LE auto connection infrastructure.
 
-On Mon, Feb 3, 2014 at 11:51 AM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Sandy,
->
-> On Mon, Feb 3, 2014 at 10:38 AM, Sandy Chapman <schapman@lixar.com> wrote:
->> Hi All,
->>
->> I'm having some difficulties getting the gatt-example plugin working.
->> I've checked out the latest tag (5.14) from git and have built it
->> using the --enable-maintainer-mode configure flag so that
->> gatt-example.c is compiled into a static plugin that is loaded at
->> runtime. I've confirmed that the plugin is compiled and is loaded at
->> runtime when I run bluetoothd.
->>
->> My problem is with making modifications to the plugin. I've tried
->> something as simple as changing the UUID for the battery service,
->> however, every time I scan the services (using an iPhone), the same
->> list of UUIDs is returned (0xA002 , 0xA004, and 0xFEEE... for the
->> services, which match up with what's defined in the gatt-example.c
->> file). Any modifications I make to the file don't seem to have any
->> effect on the services advertised. I've even rebuilt it without
->> maintainer mode and have confirmed the plugin isn't loaded, but still,
->> the same set of services and characteristics are loaded. Is there some
->> sort of cache where the advertisement is loaded from that can be
->> cleared? It looks like a bunch of HCI Commands are sent every time I
->> "hciconfig hci0 up" which didn't happen when I initially ran the
->> hciconfig tool prior to compiling and running bluetoothd.
->
-> Most likely iPhone is caching the attribute database and thus not
-> redoing any discovery. If this is the case, it is because we don't
-> provide a Service Changed characteristic on the GATT service,
-> therefore the iPhone thinks the database is static.
->
-> BTW this is a bug/limitation on the current BlueZ. While working on
-> the new GATT API we are also implementing a Service Changed service
-> that notifies changes to the entire database on every connection. This
-> is suboptimal (may trigger service discovery on every connection) but
-> at least will avoid stale cache on the client side. In future we need
-> to implement tracking of added / removed services and notify only
-> those that change.
->
-> Please use "btmon" while iphone connects to bluez and check if there
-> is any ATT traffic for GATT service discovery.
->
-> If this is the case, you need to find out how to clear the cache on the iPhone.
->
-> Best Regards,
-> --
-> Anderson Lizardo
-> http://www.indt.org/?lang=en
-> INdT - Manaus - Brazil
+To add a new auto connection address we write on le_auto_conn file
+following the format <address> <address type> <auto_connect>.
 
-This was exactly the problem. Apple doesn't provide any API to reset
-the GATT cache and neglects to mention that fact. Turns out, disabling
-and re-enabling Bluetooth on iOS clears the cache. After doing this,
-my updated UUIDs are shown on the phone correctly. For reference, this
-is the stack overflow link that points this out:
-http://stackoverflow.com/q/17090949/1270148
+The <address type> values are:
+  * 0 for public address
+  * 1 for random address
 
-Thanks,
-Sandy
+The <auto_connect> values are (for more details see struct hci_
+conn_params):
+  * 0 for disabled
+  * 1 for always
+  * 2 for link loss
 
+So for instance, if you want the kernel autonomously establishes
+connections with device AA:BB:CC:DD:EE:FF (public address) every
+time the device enters in connectable mode (starts advertising),
+you should run the command:
+$ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+
+To get the list of connection parameters configured in kernel, read
+the le_auto_conn file:
+$ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+
+Finally, to clear the connection parameters list, write an empty
+string:
+$ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+
+This file is created only if LE is enabled.
+
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ net/bluetooth/hci_core.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 246a2ff..3ae3f7d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -725,6 +725,89 @@ static const struct file_operations lowpan_debugfs_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static int le_auto_conn_show(struct seq_file *sf, void *ptr)
++{
++	struct hci_dev *hdev = sf->private;
++	struct hci_conn_params *p;
++
++	hci_dev_lock(hdev);
++
++	list_for_each_entry(p, &hdev->le_conn_params, list) {
++		seq_printf(sf, "%pMR %u %u\n", &p->addr, p->addr_type,
++			   p->auto_connect);
++	}
++
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int le_auto_conn_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, le_auto_conn_show, inode->i_private);
++}
++
++static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
++				  size_t count, loff_t *offset)
++{
++	struct seq_file *sf = file->private_data;
++	struct hci_dev *hdev = sf->private;
++	u8 auto_connect;
++	bdaddr_t addr;
++	u8 addr_type;
++	char *buf;
++	int n;
++
++	/* Don't allow partial write */
++	if (*offset != 0)
++		return -EINVAL;
++
++	/* If empty string, clear the connection parameters and pending LE
++	 * connection list.
++	 */
++	if (count == 1) {
++		hci_dev_lock(hdev);
++		hci_conn_params_clear(hdev);
++		hci_pend_le_conns_clear(hdev);
++		hci_dev_unlock(hdev);
++		return count;
++	}
++
++	buf = kzalloc(count, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	if (copy_from_user(buf, data, count)) {
++		kfree(buf);
++		return -EFAULT;
++	}
++
++	n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu %hhu", &addr.b[5],
++		   &addr.b[4], &addr.b[3], &addr.b[2], &addr.b[1], &addr.b[0],
++		   &addr_type, &auto_connect);
++	if (n != 8) {
++		kfree(buf);
++		return -EINVAL;
++	}
++
++	hci_dev_lock(hdev);
++	hci_conn_params_add(hdev, &addr, addr_type, auto_connect,
++			    hdev->le_conn_min_interval,
++			    hdev->le_conn_max_interval);
++	hci_dev_unlock(hdev);
++
++	kfree(buf);
++	return count;
++}
++
++static const struct file_operations le_auto_conn_fops = {
++	.open		= le_auto_conn_open,
++	.read		= seq_read,
++	.write		= le_auto_conn_write,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
+ /* ---- HCI requests ---- */
+ 
+ static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
+@@ -1517,6 +1600,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &conn_max_interval_fops);
+ 		debugfs_create_file("6lowpan", 0644, hdev->debugfs, hdev,
+ 				    &lowpan_debugfs_fops);
++		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
++				    &le_auto_conn_fops);
+ 	}
+ 
+ 	return 0;
 -- 
+1.8.5.3
 
