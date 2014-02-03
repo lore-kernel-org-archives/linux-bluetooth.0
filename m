@@ -1,129 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Feb 2014 09:56:18 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 06/13] android/handsfree: Add SDP record for AG
-Message-ID: <20140203075616.GB2930@aemeltch-MOBL1>
-References: <1391375364-27106-1-git-send-email-szymon.janc@tieto.com>
- <1391375364-27106-7-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 3 Feb 2014 09:51:07 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] avrcp: Fix wrong pointer check
+Message-ID: <20140203074920.GA2930@aemeltch-MOBL1>
+References: <1391157222-24504-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZ+-mc_u+ihj_FB5e89TNmBgZvyWxW4vwMCuFDh1_TjCJg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391375364-27106-7-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <CABBYNZ+-mc_u+ihj_FB5e89TNmBgZvyWxW4vwMCuFDh1_TjCJg@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Luiz,
 
-On Sun, Feb 02, 2014 at 10:09:17PM +0100, Szymon Janc wrote:
-> Service Name: Hands-Free Audio GatewayService RecHandle: 0x10001
-> Service Class ID List:
->   "Handsfree Audio Gateway" (0x111f)
->   "Generic Audio" (0x1203)
-> Protocol Descriptor List:
->   "L2CAP" (0x0100)
->   "RFCOMM" (0x0003)
->     Channel: 13
-> Profile Descriptor List:
->   "Handsfree" (0x111e)
->     Version: 0x0106
-> ---
->  android/handsfree.c | 97 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 97 insertions(+)
+On Sun, Feb 02, 2014 at 08:03:34AM -0800, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
 > 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index 3c0d52b..d2dc543 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -29,12 +29,19 @@
->  #include <glib.h>
->  
->  #include "lib/bluetooth.h"
-> +#include "lib/sdp.h"
-> +#include "lib/sdp_lib.h"
->  #include "handsfree.h"
-> +#include "bluetooth.h"
->  #include "src/log.h"
->  #include "hal-msg.h"
->  #include "ipc.h"
->  
-> +#define HFP_AG_CHANNEL 13
-> +#define HFP_AG_FEATURES 0
-> +
->  static bdaddr_t adapter_addr;
-> +static uint32_t record_id = 0;
->  
->  static void handle_connect(const void *buf, uint16_t len)
->  {
-> @@ -189,12 +196,99 @@ static const struct ipc_handler cmd_handlers[] = {
->  			sizeof(struct hal_cmd_handsfree_phone_state_change)},
->  };
->  
-> +static sdp_record_t *handsfree_ag_record(void)
-> +{
-> +	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
-> +	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
-> +	uuid_t l2cap_uuid, rfcomm_uuid;
-> +	sdp_profile_desc_t profile;
-> +	sdp_list_t *aproto, *proto[2];
-> +	sdp_record_t *record;
-> +	sdp_data_t *channel, *features;
-> +	uint8_t netid = 0x01;
-> +	uint16_t sdpfeat;
-> +	sdp_data_t *network;
-> +	uint8_t ch = HFP_AG_CHANNEL;
-> +
-> +	record = sdp_record_alloc();
-> +	if (!record)
-> +		return NULL;
-> +
-> +	network = sdp_data_alloc(SDP_UINT8, &netid);
-> +	if (!network) {
-> +		sdp_record_free(record);
-> +		return NULL;
-> +	}
-> +
-> +	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
-> +	root = sdp_list_append(0, &root_uuid);
-> +	sdp_set_browse_groups(record, root);
-> +
-> +	sdp_uuid16_create(&svclass_uuid, HANDSFREE_AGW_SVCLASS_ID);
-> +	svclass_id = sdp_list_append(0, &svclass_uuid);
-> +	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
-> +	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
-> +	sdp_set_service_classes(record, svclass_id);
-> +
-> +	sdp_uuid16_create(&profile.uuid, HANDSFREE_PROFILE_ID);
-> +	profile.version = 0x0106;
-> +	pfseq = sdp_list_append(0, &profile);
-> +	sdp_set_profile_descs(record, pfseq);
-> +
-> +	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-> +	proto[0] = sdp_list_append(0, &l2cap_uuid);
-> +	apseq = sdp_list_append(0, proto[0]);
-> +
-> +	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
-> +	proto[1] = sdp_list_append(0, &rfcomm_uuid);
-> +	channel = sdp_data_alloc(SDP_UINT8, &ch);
-> +	proto[1] = sdp_list_append(proto[1], channel);
-> +	apseq = sdp_list_append(apseq, proto[1]);
-> +
-> +	sdpfeat = HFP_AG_FEATURES;
-> +	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
-> +	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
-> +
-> +	aproto = sdp_list_append(0, apseq);
-> +	sdp_set_access_protos(record, aproto);
-> +
-> +	sdp_set_info_attr(record, "Hands-Free Audio Gateway", 0, 0);
-> +
-> +	sdp_attr_add(record, SDP_ATTR_EXTERNAL_NETWORK, network);
-> +
-> +	sdp_data_free(channel);
-> +	sdp_list_free(proto[0], 0);
+> On Fri, Jan 31, 2014 at 12:33 AM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > There is wrong assumption that handler might be NULL while it is a
+> > pointer to a struct table so check instead for struct members. This
+> > fixes accessing wrong memory.
+> > ---
+> >  profiles/audio/avrcp.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> > index df88138..5030ce1 100644
+> > --- a/profiles/audio/avrcp.c
+> > +++ b/profiles/audio/avrcp.c
+> > @@ -1673,7 +1673,7 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+> >                         break;
+> >         }
+> >
+> > -       if (!handler || handler->code != *code) {
+> > +       if (!handler->code || handler->code != *code) {
+> 
+> The code checks if  session->control_handlers is initialized and Im
+> not sure what is the invalid memory access you are talking about since
+> handle->code is no a pointer, I do agree that we should probably drop
+> the second check for the handler in the lines bellow.
 
-We have agreed to use NULL for zero pointers.
+handler is a pointer, and it points to
+
+static const struct control_pdu_handler control_handlers[] 
+table with the last element:
+
+...
+		{ },
+};
+...
+
+So checking for !handler is pointless.
 
 Best regards 
 Andrei Emeltchenko 
-
