@@ -1,95 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Feb 2014 13:53:49 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] unit/avctp: Add connection establishment dummy tests
-Message-ID: <20140204115347.GL2930@aemeltch-MOBL1>
-References: <1391430198-26823-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/hal-audio: Add simple downmix to mono
+Date: Tue, 04 Feb 2014 12:49:37 +0100
+Message-ID: <9469082.LestBIZf2H@uw000953>
+In-Reply-To: <1391513842-9548-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1391513842-9548-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391430198-26823-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Feb 03, 2014 at 02:23:18PM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrzej,
 
-ping
-
-> 
-> Add some tests checking that L2CAP connection is established, so they
-> are basically dummy tests.
+On Tuesday 04 of February 2014 12:37:22 Andrzej Kaczmarek wrote:
+> This patch adds simple downmix support from stereo to mono in order to
+> support mono channel mode as it's mandatory for SBC codec. It uses
+> simple (L+R)/2 calculation which should be good enough.
 > ---
->  unit/test-avctp.c | 30 +++++++++++++++++++++++++++---
->  1 file changed, 27 insertions(+), 3 deletions(-)
+>  android/hal-audio.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 46 insertions(+), 5 deletions(-)
 > 
-> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-> index 041e0c0..c0d16a4 100644
-> --- a/unit/test-avctp.c
-> +++ b/unit/test-avctp.c
-> @@ -220,10 +220,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
->  	return context;
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index efdf823..b5b75d3 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -39,6 +39,8 @@
+>  
+>  #define FIXED_A2DP_PLAYBACK_LATENCY_MS 25
+>  
+> +#define FIXED_BUFFER_SIZE (20 * 512)
+> +
+>  #define MAX_FRAMES_IN_PAYLOAD 15
+>  
+>  static const uint8_t a2dp_src_uuid[] = {
+> @@ -220,6 +222,8 @@ struct a2dp_stream_out {
+>  	struct audio_endpoint *ep;
+>  	enum a2dp_state_t audio_state;
+>  	struct audio_input_config cfg;
+> +
+> +	uint8_t *downmix_buf;
+>  };
+>  
+>  struct a2dp_audio_dev {
+> @@ -230,7 +234,8 @@ struct a2dp_audio_dev {
+>  static const a2dp_sbc_t sbc_presets[] = {
+>  	{
+>  		.frequency = SBC_SAMPLING_FREQ_44100 | SBC_SAMPLING_FREQ_48000,
+> -		.channel_mode = SBC_CHANNEL_MODE_DUAL_CHANNEL |
+> +		.channel_mode = SBC_CHANNEL_MODE_MONO |
+> +				SBC_CHANNEL_MODE_DUAL_CHANNEL |
+>  				SBC_CHANNEL_MODE_STEREO |
+>  				SBC_CHANNEL_MODE_JOINT_STEREO,
+>  		.subbands = SBC_SUBBANDS_4 | SBC_SUBBANDS_8,
+> @@ -826,6 +831,19 @@ static void unregister_endpoints(void)
+>  	}
 >  }
 >  
-> -static void execute_context(struct context *context)
-> +static void destroy_context(struct context *context)
+> +static void prepare_downmix_buf(struct a2dp_stream_out *out,
+> +					const uint8_t *buffer, size_t bytes)
+
+I'd name it something like downmix_to_mono() or mono_downmix().
+
+> +{
+> +	size_t i;
+> +	int16_t *input = (int16_t *) buffer;
+> +	int16_t *output = (int16_t *) out->downmix_buf;
+
+This might cause unaligned memory access.
+
+> +
+> +	for (i = 0; i < bytes / 2; i++) {
+> +		int sum = ((int) input[i * 2] + input[i * 2 + 1]);
+> +		output[i] = sum >> 1;
+
+I'd just divide by 2 here.
+
+> +	}
+> +}
+> +
+>  static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+>  								size_t bytes)
 >  {
-> -	g_main_loop_run(context->main_loop);
+> @@ -853,6 +871,18 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+>  		return -1;
+>  	}
+>  
+> +	if (out->cfg.channels == AUDIO_CHANNEL_OUT_MONO) {
+> +		if (!out->downmix_buf) {
+> +			error("audio: downmix buffer not initialized");
+> +			return -1;
+> +		}
+> +
+> +		prepare_downmix_buf(out, buffer, bytes);
+> +
+> +		return out->ep->codec->write_data(out->ep->codec_data,
+> +				out->downmix_buf, bytes / 2, out->ep->fd) * 2;
+> +	}
+> +
+>  	return out->ep->codec->write_data(out->ep->codec_data, buffer,
+>  							bytes, out->ep->fd);
+>  }
+> @@ -890,16 +920,18 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
+>  	 * use magic value here and out_write code takes care of splitting
+>  	 * input buffer into multiple media packets.
+>  	 */
+> -	return 20 * 512;
+> +	return FIXED_BUFFER_SIZE;
+>  }
+>  
+>  static uint32_t out_get_channels(const struct audio_stream *stream)
+>  {
+> -	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
 > -
->  	if (context->source > 0)
->  		g_source_remove(context->source);
+>  	DBG("");
 >  
-> @@ -235,6 +233,13 @@ static void execute_context(struct context *context)
->  	g_free(context);
->  }
->  
-> +static void execute_context(struct context *context)
-> +{
-> +	g_main_loop_run(context->main_loop);
-> +
-> +	destroy_context(context);
-> +}
-> +
->  static void test_client(gconstpointer data)
->  {
->  	struct context *context = create_context(0x0100, data);
-> @@ -253,6 +258,13 @@ static void test_server(gconstpointer data)
->  	execute_context(context);
->  }
->  
-> +static void test_dummy(gconstpointer data)
-> +{
-> +	struct context *context = create_context(0x0100, data);
-> +
-> +	destroy_context(context);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->  	g_test_init(&argc, &argv, NULL);
-> @@ -260,6 +272,18 @@ int main(int argc, char *argv[])
->  	if (g_test_verbose())
->  		__btd_log_init("*", 0);
->  
-> +	/* Connection Channel Management tests */
-> +
-> +	/*
-> +	 * Tests are checking that IUT is able to request establishing
-> +	 * channels, since we already have connection through socketpair
-> +	 * the tests are dummy.
+> -	return out->cfg.channels;
+> +	/* AudioFlinger can only provide stereo stream, so we return it here and
+> +	 * later we'll downmix this to mono in case codec requires it
 > +	 */
-> +	define_test("/TP/CCM/BV-01-C", test_dummy, raw_pdu(0x00));
-> +	define_test("/TP/CCM/BV-02-C", test_dummy, raw_pdu(0x00));
-> +	define_test("/TP/CCM/BV-03-C", test_dummy, raw_pdu(0x00));
-> +	define_test("/TP/CCM/BV-04-C", test_dummy, raw_pdu(0x00));
 > +
->  	define_test("/TP/NFR/BV-01-C", test_client,
->  				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00));
+> +	return AUDIO_CHANNEL_OUT_STEREO;
+>  }
 >  
-> -- 
-> 1.8.3.2
+>  static audio_format_t out_get_format(const struct audio_stream *stream)
+> @@ -1212,6 +1244,12 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+>  
+>  	free(preset);
+>  
+> +	if (out->cfg.channels == AUDIO_CHANNEL_OUT_MONO) {
+> +		out->downmix_buf = malloc(FIXED_BUFFER_SIZE / 2);
+> +		if (!out->downmix_buf)
+> +			goto fail;
+> +	}
+> +
+>  	*stream_out = &out->stream;
+>  	a2dp_dev->out = out;
+>  
+> @@ -1230,6 +1268,7 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+>  					struct audio_stream_out *stream)
+>  {
+>  	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
+> +	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+>  	struct audio_endpoint *ep = a2dp_dev->out->ep;
+>  
+>  	DBG("");
+> @@ -1243,6 +1282,8 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+>  	ep->codec->cleanup(ep->codec_data);
+>  	ep->codec_data = NULL;
+>  
+> +	free(out->downmix_buf);
+> +
+>  	free(stream);
+>  	a2dp_dev->out = NULL;
+>  }
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+-- 
+Best regards, 
+Szymon Janc
