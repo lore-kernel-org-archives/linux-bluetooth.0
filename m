@@ -1,126 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v6 00/18] GATT API: External Services
-Date: Tue,  4 Feb 2014 14:53:31 -0300
-Message-Id: <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v2 1/3] android/bluetooth: Add threshold to RSSI change
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1391531663-13143-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 4 Feb 2014 08:43:41 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <6CC640A0-21E5-47D8-BD5C-F266DC8223CC@holtmann.org>
+References: <1391531663-13143-1-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset implements the minimal support for adding local services
-declarations.
+Hi Szymon,
 
-Limitation: Remove services and multiple services exported by the same
-remote will be implemented the next series.
+> There is no need to report very small RSSI changes.
+> ---
+> v2: Fix name and use abs()
+> 
+> android/bluetooth.c | 8 +++++++-
+> 1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index d74d792..5aed4af 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1045,6 +1045,12 @@ static uint8_t bdaddr_type2android(uint8_t type)
+> 	return HAL_TYPE_LE;
+> }
+> 
+> +static bool rssi_above_threshold(int old, int new)
+> +{
+> +	/* only 8 dBm or more */
+> +	return abs(old - new) >= 8;
+> +}
+> +
+> static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+> 					int8_t rssi, bool confirm,
+> 					const uint8_t *data, uint8_t data_len)
+> @@ -1113,7 +1119,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+> 		(*num_prop)++;
+> 	}
+> 
+> -	if (rssi) {
+> +	if (rssi && rssi_above_threshold(dev->rssi, rssi)) {
 
-Changes from PATCH v6 to PATCH v5:
-* Rebase
-* Fixed warning (gcc 4.6.3/32-bits): "ignoring return value of ‘write’"
+this is a good first step, but I think we should additionally work on handling pathloss via the TX power EIR element in combination with RSSI. Since that really gives a good idea of the distance of a device and if it has moved or not.
 
-Changes from PATCH v4 to PATCH v5:
-* Removed Release() method of GattService1 interface
+The 3D glasses for example rely on this for proximity association.
 
-Changes from PATCH v3 to PATCH v4:
-* Rebase
-* src/gatt.c: Replaced GIOChannel/GAttrib by "io".
+Regards
 
-Changes from PATCH v2 to PATCH v3:
-* Rebase
-* Interfaces renamed: s/GattServiceManager1/GattManager1,
-  s/Characteristic1/GattCharacteristic1, s/Descriptor/GattDescriptor1
-* test/gatt-service.c: s/fprintf/printf
-
-Changes from PATCH v1 to PATCH v2:
-* Rebase
-* Included patch "doc: Add GATT API"
-* Interfaces renamed: s/Service1/GattService1, and
-  s/ServiceManager1/GattServiceManager1
-* Removed patch "gatt: Implement UnregisterService" from this patchset
-
-Changes from PATCH v0 to PATCH v1:
-* Rebase
-
-Changes from RFC v0 to PATCH v0:
-* Changed copyright year : s/2013/2014
-* Fixed coding style
-* Added gatt-service binary to gitignore
-* Added extra comment in the source code
-
-Features:
-* API for internal and external services declaration
-* Unix socket for testing purpose: services are exported through unix
-  sockets to avoid breaking the current attribute server.
-
-How to test:
-  Run bluetoothd with EXPERIMENTAL flag (-E)
-  Replace /etc/dbus-1/system.d/bluetooth.conf and reload DBus settings
-  $gatttool -L --primary (or interactive mode)
-
-Roughly upstreaming plan (steps):
- * GATT Server: External Services -> pathset GATT API: External Services
- * GATT Server: External Characteristics (Server)
- * GATT Server: External Descriptors (Server)
- * Replacement for GAttrib: use "io"
- * Replace attribute server
- * Remove ATTIO and automatic connection mechanism from userspace
- * Fix all GATT internal plugins
- * GATT Client: Remote Services
-
-Alvaro Silva (6):
-  gatt: Add stub for gatt.{c, h} files
-  gatt: Register Manager D-Bus Interface
-  gatt: Add registering external service
-  gatt: Add external services tracking
-  gatt: Register ATT command/event handler
-  gatt: Add Discover All Primary Services
-
-Andre Guedes (1):
-  gatt: Add helper for creating GATT services
-
-Claudio Takahasi (11):
-  doc: Add experimental GATT API
-  lib: Move GATT UUID to uuid.h
-  gatt: Add server unix socket
-  gattrib: Use default ATT LE MTU for non-standard sockets
-  test: Add external service GATT skeleton
-  gitignore: Add test/gatt-service
-  test: Add signal handling for gatt-service
-  test: Add registering external service
-  gatttool: Add unix socket connect
-  gatttool: Add unix socket support for interactive mode
-  bluetooth.conf: Add ObjectManager interface
-
- .gitignore           |   1 +
- Makefile.am          |   2 +
- Makefile.tools       |   5 +
- attrib/gatt.h        |  25 ----
- attrib/gattrib.c     |  16 +--
- attrib/gatttool.c    |  27 +++-
- attrib/gatttool.h    |   1 +
- attrib/interactive.c |  19 +--
- attrib/utils.c       |  54 ++++++++
- doc/gatt-api.txt     | 142 +++++++++++++++++++
- lib/uuid.h           |  30 ++++
- src/bluetooth.conf   |   1 +
- src/gatt-dbus.c      | 271 ++++++++++++++++++++++++++++++++++++
- src/gatt-dbus.h      |  25 ++++
- src/gatt.c           | 379 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h           |  36 +++++
- src/main.c           |   4 +
- test/gatt-service.c  | 267 ++++++++++++++++++++++++++++++++++++
- 18 files changed, 1257 insertions(+), 48 deletions(-)
- create mode 100644 doc/gatt-api.txt
- create mode 100644 src/gatt-dbus.c
- create mode 100644 src/gatt-dbus.h
- create mode 100644 src/gatt.c
- create mode 100644 src/gatt.h
- create mode 100644 test/gatt-service.c
-
--- 
-1.8.3.1
+Marcel
 
