@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3] android/hal-audio: Add simple downmix to mono
-Date: Tue, 4 Feb 2014 14:38:45 +0100
-Message-ID: <1391521125-2465-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2] android/hal-audio: Add simple downmix to mono
+Date: Tue, 4 Feb 2014 14:16:16 +0100
+Message-ID: <1391519776-28304-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -18,7 +18,7 @@ simple (L+R)/2 calculation which should be good enough.
  1 file changed, 49 insertions(+), 5 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index efdf823..f90265b 100644
+index efdf823..cef70aa 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
 @@ -36,9 +36,12 @@
@@ -60,15 +60,15 @@ index efdf823..f90265b 100644
 +static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
 +								size_t bytes)
 +{
-+	const int16_t *input = (const void *) buffer;
-+	int16_t *output = (void *) out->downmix_buf;
 +	size_t i;
++	int16_t *input = (int16_t *) buffer;
++	int16_t *output = (int16_t *) out->downmix_buf;
 +
 +	for (i = 0; i < bytes / 2; i++) {
 +		int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
 +		int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
 +
-+		put_unaligned(cpu_to_le16((l + r) / 2), &output[i]);
++		output[i] = (l + r) / 2;
 +	}
 +}
 +
