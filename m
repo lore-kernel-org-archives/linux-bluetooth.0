@@ -1,49 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Feb 2014 14:46:47 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: David Herrmann <dh.herrmann@gmail.com>
-cc: Marcel Holtmann <marcel@holtmann.org>,
-    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
-    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>,
-    "Gustavo F. Padovan" <gustavo@padovan.org>
-Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
- enough
-In-Reply-To: <CANq1E4S++uqMzQue_0jC3N=Lm8Os5V-48Hw5M4vWvM+2Vx91yA@mail.gmail.com>
-Message-ID: <alpine.LNX.2.00.1402041446130.14066@pobox.suse.cz>
-References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com> <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
- <CANq1E4SxrDnbOCsohZXYoYL-HQjEc-xcOnXfAm=npHG2QfMS9A@mail.gmail.com> <alpine.LNX.2.00.1401071811530.4962@pobox.suse.cz> <alpine.LNX.2.00.1401282152140.22492@pobox.suse.cz> <CANq1E4TW+GU=oaW0tXb=Tun9HMtr26u-PC3H6BsLot560ANgog@mail.gmail.com>
- <alpine.LNX.2.00.1402031107310.14066@pobox.suse.cz> <CANq1E4S++uqMzQue_0jC3N=Lm8Os5V-48Hw5M4vWvM+2Vx91yA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+In-Reply-To: <20140204115347.GL2930@aemeltch-MOBL1>
+References: <1391430198-26823-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<20140204115347.GL2930@aemeltch-MOBL1>
+Date: Tue, 4 Feb 2014 15:46:17 +0200
+Message-ID: <CABBYNZJ23q4S8Bj8fAa6rCCz4D8CF761_TKAG-wJbLFaCSfhGA@mail.gmail.com>
+Subject: Re: [PATCH] unit/avctp: Add connection establishment dummy tests
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 3 Feb 2014, David Herrmann wrote:
+Hi Andrei,
 
-> >> >> Due to various reasons I will not have access to any testing HW for the
-> >> >> upcoming 2-3 days, so if you can cook something up in that timeframe, it'd
-> >> >> be appreciated.
-> >> >>
-> >> >> Otherwise I'll be working on it by the end of this week.
-> >> >
-> >> > David,
-> >> >
-> >> > just got back to this, finally ... did you have time to work on this at
-> >> > all, or should I just start from scratch?
-> >>
-> >> Sorry, no. Fosdem is this weekend and I needed to get my code ready
-> >> for that. But I'll finally have time again next week.
-> >
-> > Okay, thanks. I then guess we should proceed with this bandaid (double
-> > allocation) for 3.14
-> 
-> It would be really nice if we could get the HIDP patch into 3.14-rc2
-> and backported to stable. There have been quite a bunch of reports now
-> and I dislike adding a GFP_ATOMIC allocation in HID core. 
+On Tue, Feb 4, 2014 at 1:53 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> On Mon, Feb 03, 2014 at 02:23:18PM +0200, Andrei Emeltchenko wrote:
+>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> ping
+>
+>>
+>> Add some tests checking that L2CAP connection is established, so they
+>> are basically dummy tests.
+>> ---
+>>  unit/test-avctp.c | 30 +++++++++++++++++++++++++++---
+>>  1 file changed, 27 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+>> index 041e0c0..c0d16a4 100644
+>> --- a/unit/test-avctp.c
+>> +++ b/unit/test-avctp.c
+>> @@ -220,10 +220,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
+>>       return context;
+>>  }
+>>
+>> -static void execute_context(struct context *context)
+>> +static void destroy_context(struct context *context)
+>>  {
+>> -     g_main_loop_run(context->main_loop);
+>> -
+>>       if (context->source > 0)
+>>               g_source_remove(context->source);
+>>
+>> @@ -235,6 +233,13 @@ static void execute_context(struct context *context)
+>>       g_free(context);
+>>  }
+>>
+>> +static void execute_context(struct context *context)
+>> +{
+>> +     g_main_loop_run(context->main_loop);
+>> +
+>> +     destroy_context(context);
+>> +}
+>> +
+>>  static void test_client(gconstpointer data)
+>>  {
+>>       struct context *context = create_context(0x0100, data);
+>> @@ -253,6 +258,13 @@ static void test_server(gconstpointer data)
+>>       execute_context(context);
+>>  }
+>>
+>> +static void test_dummy(gconstpointer data)
+>> +{
+>> +     struct context *context = create_context(0x0100, data);
+>> +
+>> +     destroy_context(context);
+>> +}
+>> +
+>>  int main(int argc, char *argv[])
+>>  {
+>>       g_test_init(&argc, &argv, NULL);
+>> @@ -260,6 +272,18 @@ int main(int argc, char *argv[])
+>>       if (g_test_verbose())
+>>               __btd_log_init("*", 0);
+>>
+>> +     /* Connection Channel Management tests */
+>> +
+>> +     /*
+>> +      * Tests are checking that IUT is able to request establishing
+>> +      * channels, since we already have connection through socketpair
+>> +      * the tests are dummy.
+>> +      */
+>> +     define_test("/TP/CCM/BV-01-C", test_dummy, raw_pdu(0x00));
+>> +     define_test("/TP/CCM/BV-02-C", test_dummy, raw_pdu(0x00));
+>> +     define_test("/TP/CCM/BV-03-C", test_dummy, raw_pdu(0x00));
+>> +     define_test("/TP/CCM/BV-04-C", test_dummy, raw_pdu(0x00));
+>> +
+>>       define_test("/TP/NFR/BV-01-C", test_client,
+>>                               raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00));
+>>
+>> --
+>> 1.8.3.2
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
 
-I agree with David; Gustavo, what is your take on this, please?
+Applied, thanks.
 
-Thanks,
 
 -- 
-Jiri Kosina
-SUSE Labs
+Luiz Augusto von Dentz
