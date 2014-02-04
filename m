@@ -1,164 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v6 12/18] test: Add external service GATT skeleton
-Date: Tue,  4 Feb 2014 14:53:43 -0300
-Message-Id: <1391536429-8345-13-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v6 10/18] gatt: Register ATT command/event handler
+Date: Tue,  4 Feb 2014 14:53:41 -0300
+Message-Id: <1391536429-8345-11-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
  <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the initial code for an external GATT service example.
-It implements the API defined at doc/gatt-api.txt
----
- Makefile.tools      |   5 +++
- test/gatt-service.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 126 insertions(+)
- create mode 100644 test/gatt-service.c
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 9199222..a468272 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -374,3 +374,8 @@ test_scripts += test/sap_client.py test/bluezutils.py \
- 		test/test-heartrate test/test-alert test/test-hfp \
- 		test/test-cyclingspeed test/opp-client test/ftp-client \
- 		test/pbap-client test/map-client
-+
-+noinst_PROGRAMS += test/gatt-service
-+
-+test_gatt_service_SOURCES = test/gatt-service.c
-+test_gatt_service_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ gdbus/libgdbus-internal.la
-diff --git a/test/gatt-service.c b/test/gatt-service.c
-new file mode 100644
-index 0000000..769fd37
---- /dev/null
-+++ b/test/gatt-service.c
-@@ -0,0 +1,121 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2013  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <stdio.h>
-+
-+#include <glib.h>
-+#include <dbus/dbus.h>
-+#include <gdbus/gdbus.h>
-+
-+#define SERVICE_IFACE			"org.bluez.GattService1"
-+
-+/* Immediate Alert Service UUID */
-+#define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
-+
-+static GMainLoop *main_loop;
-+static GSList *services;
-+
-+static gboolean service_get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
+This patch registers the ATT channel handler to manage incoming ATT
+commands and events.
+---
+ src/gatt.c | 91 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 89 insertions(+), 2 deletions(-)
+
+diff --git a/src/gatt.c b/src/gatt.c
+index 7a595c6..ec8f381 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -55,6 +55,13 @@ static struct io *server_io;
+ static GList *local_attribute_db;
+ static uint16_t next_handle = 0x0001;
+ 
++static void write_pdu(int sk, const uint8_t *pdu, size_t plen)
 +{
-+	const char *uuid = user_data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+
-+	return TRUE;
++	if (write(sk, pdu, plen) < 0)
++		error("Error sending ATT PDU (0x%02X): %s (%d)", pdu[0],
++						strerror(errno), errno);
 +}
 +
-+static gboolean service_get_includes(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
+ static int local_database_add(uint16_t handle, struct btd_attribute *attr)
+ {
+ 	attr->handle = handle;
+@@ -98,10 +105,85 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	return attr;
+ }
+ 
++static void send_error(int sk, uint8_t opcode, uint16_t handle, uint8_t ecode)
 +{
-+	return TRUE;
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	size_t plen;
++
++	plen = enc_error_resp(opcode, handle, ecode, pdu, sizeof(pdu));
++	write_pdu(sk, pdu, plen);
 +}
 +
-+static gboolean service_exist_includes(const GDBusPropertyTable *property,
-+							void *user_data)
++static bool channel_handler_cb(struct io *io, void *user_data)
 +{
-+	return FALSE;
-+}
++	uint8_t ipdu[ATT_DEFAULT_LE_MTU];
++	ssize_t ilen;
++	int sk = io_get_fd(io);
 +
-+static const GDBusPropertyTable service_properties[] = {
-+	{ "UUID", "s", service_get_uuid },
-+	{ "Includes", "ao", service_get_includes, NULL,
-+					service_exist_includes },
-+	{ }
-+};
-+
-+static char *register_service(DBusConnection *conn, const char *uuid)
-+{
-+	static int id = 1;
-+	char *path;
-+
-+	path = g_strdup_printf("/service%d", id++);
-+	if (g_dbus_register_interface(conn, path, SERVICE_IFACE,
-+				NULL, NULL, service_properties,
-+				g_strdup(uuid), g_free) == FALSE) {
-+		printf("Couldn't register service interface\n");
-+		g_free(path);
-+		return NULL;
++	ilen = read(sk, ipdu, sizeof(ipdu));
++	if (ilen < 0) {
++		int err = errno;
++		DBG("ATT channel read: %s(%d)", strerror(err), err);
++		return false;
 +	}
 +
-+	return path;
++	switch (ipdu[0]) {
++	case ATT_OP_ERROR:
++		break;
++
++	/* Requests */
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_SIGNED_WRITE_CMD:
++		send_error(sk, ipdu[0], 0x0000, ATT_ECODE_REQ_NOT_SUPP);
++		break;
++
++	/* Responses */
++	case ATT_OP_MTU_RESP:
++	case ATT_OP_FIND_INFO_RESP:
++	case ATT_OP_FIND_BY_TYPE_RESP:
++	case ATT_OP_READ_BY_TYPE_RESP:
++	case ATT_OP_READ_RESP:
++	case ATT_OP_READ_BLOB_RESP:
++	case ATT_OP_READ_MULTI_RESP:
++	case ATT_OP_READ_BY_GROUP_RESP:
++	case ATT_OP_WRITE_RESP:
++	case ATT_OP_PREP_WRITE_RESP:
++	case ATT_OP_EXEC_WRITE_RESP:
++	case ATT_OP_HANDLE_CNF:
++		break;
++
++	/* Notification & Indication */
++	case ATT_OP_HANDLE_NOTIFY:
++	case ATT_OP_HANDLE_IND:
++		break;
++	}
++
++	return true;
 +}
 +
-+static void create_services(DBusConnection *conn)
++static void channel_watch_destroy(void *user_data)
 +{
-+	char *service_path;
++	struct io *io = user_data;
 +
-+	service_path = register_service(conn, IAS_UUID);
-+
-+	services = g_slist_prepend(services, service_path);
-+
-+	printf("Registered service: %s\n", service_path);
++	io_destroy(io);
 +}
 +
-+int main(int argc, char *argv[])
-+{
-+	DBusConnection *dbus_conn;
+ static bool unix_accept_cb(struct io *io, void *user_data)
+ {
+ 	struct sockaddr_un uaddr;
+ 	socklen_t len = sizeof(uaddr);
++	struct io *nio;
+ 	int err, nsk, sk;
+ 
+ 	sk = io_get_fd(io);
+@@ -110,12 +192,17 @@ static bool unix_accept_cb(struct io *io, void *user_data)
+ 	if (nsk < 0) {
+ 		err = errno;
+ 		error("ATT UNIX socket accept: %s(%d)", strerror(err), err);
+-		return TRUE;
++		return true;
+ 	}
+ 
+ 	DBG("ATT UNIX socket: %d", nsk);
++	nio = io_new(nsk);
 +
-+	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+
-+	main_loop = g_main_loop_new(NULL, FALSE);
-+
-+	g_dbus_attach_object_manager(dbus_conn);
-+
-+	printf("gatt-service unique name: %s\n",
-+				dbus_bus_get_unique_name(dbus_conn));
-+
-+	create_services(dbus_conn);
-+
-+	g_main_loop_run(main_loop);
-+
-+	g_slist_free_full(services, g_free);
-+	dbus_connection_unref(dbus_conn);
-+
-+	return 0;
-+}
++	io_set_close_on_destroy(nio, true);
++	io_set_read_handler(nio, channel_handler_cb, nio,
++						channel_watch_destroy);
+ 
+-	return TRUE;
++	return true;
+ }
+ 
+ void gatt_init(void)
 -- 
 1.8.3.1
 
