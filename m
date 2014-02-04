@@ -1,39 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140203183606.GA12511@molly>
-References: <CACMtdhhCecEWiK33A6uNSQr-=iRJSehfbJCqb0Maxpq-8WjkPA@mail.gmail.com>
-	<20140203183606.GA12511@molly>
-Date: Tue, 4 Feb 2014 08:28:53 +0100
-Message-ID: <CACMtdhhnvG_PopNn185npxi2nSqzFSLXthoh6PPPTh4SGj_uiA@mail.gmail.com>
-Subject: Re: How do you install bluez for development?
-From: Alejandro Exojo <aexojo@modpow.es>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [RFC v7 08/11] Bluetooth: Temporarily stop background scanning on discovery
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1391446588-18729-8-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 3 Feb 2014 20:25:26 -0800
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <9BB5F5F9-6828-491B-B918-B0909BCA2408@holtmann.org>
+References: <1391446588-18729-1-git-send-email-andre.guedes@openbossa.org> <1391446588-18729-8-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-2014-02-03 Vinicius Costa Gomes <vcgomes@gmail.com>:
->> Feb 03 17:14:38 PC-MW03 systemd[1]: Starting Bluetooth service...
->> Feb 03 17:14:38 PC-MW03 bluetoothd[22571]: Bluetooth daemon 5.14
->> Feb 03 17:14:38 PC-MW03 systemd[1]: Started Bluetooth service.
->> Feb 03 17:14:38 PC-MW03 systemd[1]: Starting Bluetooth.
->> Feb 03 17:14:38 PC-MW03 systemd[1]: Reached target Bluetooth.
->> Feb 03 17:14:38 PC-MW03 bluetoothd[22571]: Failed to access management interface
->
-> Two probable causes, your kernel is older than 3.4, or the user that is running
-> bluetoothd doesn't have the CAP_NET_ADMIN capability.
+Hi Andre,
 
-True! I was running 3.2. I've installed a more recent one, and I got
-it working. Thank you very much, I would not have thought of the
-kernel at all.
+> If the user sends a mgmt start discovery command while the background
+> scanning is running, we should temporarily stop it. Once the discovery
+> finishes, we start the background scanning again.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> net/bluetooth/hci_core.c |  2 ++
+> net/bluetooth/mgmt.c     | 12 ++++++++----
+> 2 files changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 388a453..222bd07 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1609,6 +1609,8 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+> 
+> 	switch (state) {
+> 	case DISCOVERY_STOPPED:
+> +		hci_update_background_scan(hdev);
+> +
+> 		if (hdev->discovery.state != DISCOVERY_STARTING)
+> 			mgmt_discovering(hdev, 0);
+> 		break;
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index ce7ef33..83af8de 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3319,11 +3319,15 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+> 			goto failed;
+> 		}
+> 
+> +		/* If controller is scanning, it means the background scanning
+> +		 * is running. Thus, we should temporarily stop it in order to
+> +		 * set the discovery scanning parameters.
+> +		 */
+> 		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+> -			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+> -					 MGMT_STATUS_BUSY);
+> -			mgmt_pending_remove(cmd);
+> -			goto failed;
+> +			memset(&enable_cp, 0, sizeof(enable_cp));
+> +			enable_cp.enable = LE_SCAN_DISABLE;
+> +			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
+> +				    sizeof(enable_cp), &enable_cp);
+> 		}
 
-How come that at least 3.4 is needed?
+is the start_discovery protected enough by itself so that we do not accidentally stop some discovery that got triggered which is actually not a background scan.
 
-Thank you again.
+Regards
 
-Cheers.
--- 
-Alejandro Exojo Piqueras
+Marcel
 
-ModpoW, S.L.
-Technova LaSalle | Sant Joan de la Salle 42 | 08022 Barcelona | www.modpow.es
