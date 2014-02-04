@@ -1,96 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v6 05/18] lib: Move GATT UUID to uuid.h
-Date: Tue,  4 Feb 2014 14:53:36 -0300
-Message-Id: <1391536429-8345-6-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v6 04/18] gatt: Add registering external service
+Date: Tue,  4 Feb 2014 14:53:35 -0300
+Message-Id: <1391536429-8345-5-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org>
  <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves GATT UUIDs definitions to a common header. uuid.h contains
-helper functions to manipulate Bluetooth UUIDs and some common BR/EDR services
-UUIDs.
----
- attrib/gatt.h | 25 -------------------------
- lib/uuid.h    | 25 +++++++++++++++++++++++++
- 2 files changed, 25 insertions(+), 25 deletions(-)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index 0f113e7..4fea3eb 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -24,31 +24,6 @@
+This patch allows external applications register a given service on
+Bluez. Applications must provide an object path and a dictionary of
+options. Options dictionary will be used later to provide additional
+service information.
+---
+ src/gatt-dbus.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 88 insertions(+), 1 deletion(-)
+
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 183c611..fd614f9 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -26,22 +26,109 @@
+ #endif
  
- #include <bluetooth/sdp.h>
+ #include <stdint.h>
++#include <errno.h>
  
--/* GATT Profile Attribute types */
--#define GATT_PRIM_SVC_UUID		0x2800
--#define GATT_SND_SVC_UUID		0x2801
--#define GATT_INCLUDE_UUID		0x2802
--#define GATT_CHARAC_UUID		0x2803
--
--/* GATT Characteristic Types */
--#define GATT_CHARAC_DEVICE_NAME			0x2A00
--#define GATT_CHARAC_APPEARANCE			0x2A01
--#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG	0x2A02
--#define GATT_CHARAC_RECONNECTION_ADDRESS	0x2A03
--#define GATT_CHARAC_PERIPHERAL_PREF_CONN	0x2A04
--#define GATT_CHARAC_SERVICE_CHANGED		0x2A05
--
--/* GATT Characteristic Descriptors */
--#define GATT_CHARAC_EXT_PROPER_UUID	0x2900
--#define GATT_CHARAC_USER_DESC_UUID	0x2901
--#define GATT_CLIENT_CHARAC_CFG_UUID	0x2902
--#define GATT_SERVER_CHARAC_CFG_UUID	0x2903
--#define GATT_CHARAC_FMT_UUID		0x2904
--#define GATT_CHARAC_AGREG_FMT_UUID	0x2905
--#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
--#define GATT_EXTERNAL_REPORT_REFERENCE	0x2907
--#define GATT_REPORT_REFERENCE		0x2908
--
- /* Client Characteristic Configuration bit field */
- #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
- #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 95e5a9a..c24cee5 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -105,6 +105,31 @@ extern "C" {
- #define OBEX_MNS_UUID		"00001133-0000-1000-8000-00805f9b34fb"
- #define OBEX_MAP_UUID		"00001134-0000-1000-8000-00805f9b34fb"
+ #include <glib.h>
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
  
-+/* GATT UUIDs section */
-+#define GATT_PRIM_SVC_UUID				0x2800
-+#define GATT_SND_SVC_UUID				0x2801
-+#define GATT_INCLUDE_UUID				0x2802
-+#define GATT_CHARAC_UUID				0x2803
++#include "adapter.h"
++#include "device.h"
++#include "lib/uuid.h"
+ #include "dbus-common.h"
+ #include "log.h"
+ 
++#include "error.h"
+ #include "gatt-dbus.h"
+ 
+ #define GATT_MGR_IFACE			"org.bluez.GattManager1"
+ 
++struct external_app {
++	char *owner;
++	char *path;
++	GDBusClient *client;
++	unsigned int watch;
++};
 +
-+/* GATT Characteristic Types */
-+#define GATT_CHARAC_DEVICE_NAME				0x2A00
-+#define GATT_CHARAC_APPEARANCE				0x2A01
-+#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG		0x2A02
-+#define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
-+#define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
-+#define GATT_CHARAC_SERVICE_CHANGED			0x2A05
++static GSList *external_apps;
 +
-+/* GATT Characteristic Descriptors */
-+#define GATT_CHARAC_EXT_PROPER_UUID			0x2900
-+#define GATT_CHARAC_USER_DESC_UUID			0x2901
-+#define GATT_CLIENT_CHARAC_CFG_UUID			0x2902
-+#define GATT_SERVER_CHARAC_CFG_UUID			0x2903
-+#define GATT_CHARAC_FMT_UUID				0x2904
-+#define GATT_CHARAC_AGREG_FMT_UUID			0x2905
-+#define GATT_CHARAC_VALID_RANGE_UUID			0x2906
-+#define GATT_EXTERNAL_REPORT_REFERENCE			0x2907
-+#define GATT_REPORT_REFERENCE				0x2908
++static int external_app_path_cmp(gconstpointer a, gconstpointer b)
++{
++	const struct external_app *eapp = a;
++	const char *path = b;
 +
- typedef struct {
- 	enum {
- 		BT_UUID_UNSPEC = 0,
++	return g_strcmp0(eapp->path, path);
++}
++
++static void external_app_watch_destroy(gpointer user_data)
++{
++	struct external_app *eapp = user_data;
++
++	/* TODO: Remove from the database */
++
++	external_apps = g_slist_remove(external_apps, eapp);
++
++	g_dbus_client_unref(eapp->client);
++
++	g_free(eapp->owner);
++	g_free(eapp->path);
++	g_free(eapp);
++}
++
++static struct external_app *new_external_app(DBusConnection *conn,
++					const char *sender, const char *path)
++{
++	struct external_app *eapp;
++	GDBusClient *client;
++
++	client = g_dbus_client_new(conn, sender, "/");
++	if (client == NULL)
++		return NULL;
++
++	eapp = g_new0(struct external_app, 1);
++
++	eapp->watch = g_dbus_add_disconnect_watch(btd_get_dbus_connection(),
++			sender, NULL, eapp, external_app_watch_destroy);
++	if (eapp->watch == 0) {
++		g_dbus_client_unref(client);
++		g_free(eapp);
++		return NULL;
++	}
++
++	eapp->owner = g_strdup(sender);
++	eapp->client = client;
++	eapp->path = g_strdup(path);
++
++	return eapp;
++}
++
+ static DBusMessage *register_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+-	return dbus_message_new_method_return(msg);
++	struct external_app *eapp;
++	DBusMessageIter iter;
++	const char *path;
++
++	if (!dbus_message_iter_init(msg, &iter))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++
++	dbus_message_iter_get_basic(&iter, &path);
++
++	if (g_slist_find_custom(external_apps, path, external_app_path_cmp))
++		return btd_error_already_exists(msg);
++
++	eapp = new_external_app(conn, dbus_message_get_sender(msg), path);
++	if (eapp == NULL)
++		return btd_error_failed(msg, "Not enough resources");
++
++	external_apps = g_slist_prepend(external_apps, eapp);
++
++	DBG("New app %p: %s", eapp, path);
++
++	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
+ 
+ static DBusMessage *unregister_service(DBusConnection *conn,
 -- 
 1.8.3.1
 
