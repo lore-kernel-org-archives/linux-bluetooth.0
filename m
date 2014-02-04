@@ -1,52 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/11] android/unit: Add another case for variable sized data
-Date: Tue,  4 Feb 2014 15:39:05 +0100
-Message-Id: <1391524749-2518-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 08/11] android/unit: Add case for out of range service
+Date: Tue,  4 Feb 2014 15:39:06 +0100
+Message-Id: <1391524749-2518-8-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1391524749-2518-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1391524749-2518-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds test for variable length data handling. Handlers struct
-have static values representing minimum payload. It cannot be predicted
-how large data will be sent so they should accept data larger than
-declared inside ipc_handler array, which holds the minimum size of such
-message.
+Check reaction for sending message to services not listed inside
+hal-msg.h
 ---
- android/test-ipc.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ android/test-ipc.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/android/test-ipc.c b/android/test-ipc.c
-index 523011e..2120d15 100644
+index 2120d15..6bb6cd6 100644
 --- a/android/test-ipc.c
 +++ b/android/test-ipc.c
-@@ -487,6 +487,18 @@ static const struct test_data test_cmd_vardata_valid = {
+@@ -499,6 +499,21 @@ static const struct test_data test_cmd_vardata_valid_2 = {
  	.handlers_size = 1,
  };
  
-+static const struct ipc_handler cmd_vardata_handlers_valid2[] = {
-+	{ test_cmd_handler_1, true, sizeof(VARDATA_EX1) - 1 }
++static const struct hal_hdr test_cmd_service_offrange_hdr = {
++	.service_id = HAL_SERVICE_ID_MAX + 1,
++	.opcode = 1,
++	.len = 0
 +};
 +
-+static const struct test_data test_cmd_vardata_valid_2 = {
-+	.cmd = &test_cmd_vardata,
-+	.cmd_size = sizeof(struct hal_hdr) + sizeof(VARDATA_EX1),
-+	.service = 0,
-+	.handlers = cmd_vardata_handlers_valid2,
++static const struct test_data test_cmd_service_offrange = {
++	.cmd = &test_cmd_service_offrange_hdr,
++	.cmd_size = sizeof(struct hal_hdr),
++	.service = HAL_SERVICE_ID_MAX + 1,
++	.handlers = cmd_handlers,
 +	.handlers_size = 1,
++	.expected_signal = SIGTERM
 +};
 +
  int main(int argc, char *argv[])
  {
  	g_test_init(&argc, &argv, NULL);
-@@ -511,6 +523,9 @@ int main(int argc, char *argv[])
- 	g_test_add_data_func("/android_ipc/test_cmd_vardata_valid",
- 					&test_cmd_vardata_valid,
+@@ -526,6 +541,9 @@ int main(int argc, char *argv[])
+ 	g_test_add_data_func("/android_ipc/test_cmd_vardata_valid_2",
+ 					&test_cmd_vardata_valid_2,
  					test_cmd_reg);
-+	g_test_add_data_func("/android_ipc/test_cmd_vardata_valid_2",
-+					&test_cmd_vardata_valid_2,
++	g_test_add_data_func("/android_ipc/test_cmd_service_offrange",
++					&test_cmd_service_offrange,
 +					test_cmd_reg);
  
  	return g_test_run();
