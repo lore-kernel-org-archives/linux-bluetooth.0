@@ -1,54 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] android/bluetooth: Add threshold to RSSI change
-Date: Wed, 05 Feb 2014 09:48:30 +0100
-Message-ID: <1566581.VDkPYqL0kT@uw000953>
-In-Reply-To: <1391531663-13143-1-git-send-email-szymon.janc@tieto.com>
-References: <1391531663-13143-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <000201cf21ed$d18f02d0$74ad0870$@lampreynetworks.com>
+References: <000201cf21ed$d18f02d0$74ad0870$@lampreynetworks.com>
+Date: Tue, 4 Feb 2014 19:05:36 -0400
+Message-ID: <CAJdJm_PEQEmCz1owo8MZ+29R-O5u8qm8x85WgeuKy9U1x74zGw@mail.gmail.com>
+Subject: Re: possible bug in blueZ 5.8 gatt tool or library
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Caleb Reinhold <creinhold@lampreynetworks.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 04 of February 2014 17:34:21 Szymon Janc wrote:
-> There is no need to report very small RSSI changes.
-> ---
-> v2: Fix name and use abs()
-> 
->  android/bluetooth.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index d74d792..5aed4af 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -1045,6 +1045,12 @@ static uint8_t bdaddr_type2android(uint8_t type)
->  	return HAL_TYPE_LE;
->  }
->  
-> +static bool rssi_above_threshold(int old, int new)
-> +{
-> +	/* only 8 dBm or more */
-> +	return abs(old - new) >= 8;
-> +}
-> +
->  static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
->  					int8_t rssi, bool confirm,
->  					const uint8_t *data, uint8_t data_len)
-> @@ -1113,7 +1119,7 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
->  		(*num_prop)++;
->  	}
->  
-> -	if (rssi) {
-> +	if (rssi && rssi_above_threshold(dev->rssi, rssi)) {
->  		dev->rssi = rssi;
->  
->  		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_RSSI,
-> 
+Hi Caleb,
 
-Pushed.
+On Tue, Feb 4, 2014 at 5:12 PM, Caleb Reinhold
+<creinhold@lampreynetworks.com> wrote:
+> We are working with the 5.8 version of the library, kernel version 3.12.9,
+> bluetoothctl, and gatttool when we encountered a possible error.
+> We expected on the reconnection of two bonded devices, one of which had
+> stored measurements, that data would transfer. When running gatt tool in
+> medium security the first measurement to be indicated was lost.
 
+First of all, gatttool is a developer tool, and it is far from being a
+compliant GATT endpoint (e.g. it does not report to requests, which is
+mandatory by the spec). With moderate effort though, the missing
+features can be added.
+
+> However upon attempting to reconnect to the simulated agent device with
+> medium security two unexpected behaviors occurred. First, and more
+> immediately apparent was that the simulated agent did not receive a
+> confirmation of the indication. A slightly closer look using the hcidump,
+> trying to find what had happened, showed that the indication had arrived at
+> the hci layer but was not received at events_handler.
+
+Are you using gatttool in interactive mode (i.e. the -I option) ? If
+yes, try first connecting to the device with "connect" followed by
+setting the security level to medium with "sec-level medium". This
+will imitate the behavior of the BlueZ daemon when connecting to LE
+devices. Also be sure to use the "--listen" option so the confirmation
+is sent by gatttool.
+
+Let us know if it works :)
+
+> While the indication
+> is sent very swiftly upon the reconnection of the devices we understand this
+> to be the manner in which low energy devices are supposed to behave given
+> stored measurements and a bonded device.
+
+You are correct that this is the expected behavior. But gatttool is
+far from perfect. Did you try implementing a BlueZ plugin?
+
+Best Regards,
 -- 
-Best regards, 
-Szymon Janc
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
