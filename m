@@ -1,33 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Date: Tue, 4 Feb 2014 16:08:58 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/11] android/unit: Fix checking for expected termination
-Date: Tue,  4 Feb 2014 15:38:59 +0100
-Message-Id: <1391524749-2518-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 3/3] avrcp: Fix possible buffer overflow and correct
+ length
+Message-ID: <20140204140856.GR2930@aemeltch-MOBL1>
+References: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1391098376-26834-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1391098376-26834-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix makes sure that when signalled termination is expected,
-it actually happens. If IPC termination is expected no response will be
-sent, so cmd_watch will never be executed. But if it is executed when
-expecting termination, its a failure.
----
- android/test-ipc.c | 2 ++
- 1 file changed, 2 insertions(+)
+On Thu, Jan 30, 2014 at 06:12:56PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Wrong length was given and it was also possible to crash.
 
-diff --git a/android/test-ipc.c b/android/test-ipc.c
-index 8af5739..d0f3f6b 100644
---- a/android/test-ipc.c
-+++ b/android/test-ipc.c
-@@ -82,6 +82,8 @@ static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
- 	uint8_t buf[128];
- 	int sk;
- 
-+	g_assert(test_data->expected_signal == 0);
-+
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
- 		g_assert(FALSE);
- 		return FALSE;
--- 
-1.8.5.2
+ping
 
+> ---
+>  profiles/audio/avrcp.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index 128f7d3..f9fce5c 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -1899,8 +1899,12 @@ static void avrcp_get_current_player_value(struct avrcp *session,
+>  {
+>  	uint8_t buf[AVRCP_HEADER_LENGTH + 5];
+>  	struct avrcp_header *pdu = (void *) buf;
+> +	uint16_t length = AVRCP_HEADER_LENGTH + count + 1;
+>  	int i;
+>  
+> +	if (count + 1 > 5)
+> +		return;
+> +
+>  	memset(buf, 0, sizeof(buf));
+>  
+>  	set_company_id(pdu->company_id, IEEEID_BTSIG);
+> @@ -1913,7 +1917,7 @@ static void avrcp_get_current_player_value(struct avrcp *session,
+>  		pdu->params[i + 1] = attrs[i];
+>  
+>  	avctp_send_vendordep_req(session->conn, AVC_CTYPE_STATUS,
+> -					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
+> +					AVC_SUBUNIT_PANEL, buf, length,
+>  					avrcp_player_value_rsp, session);
+>  }
+>  
+> -- 
+> 1.8.3.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
