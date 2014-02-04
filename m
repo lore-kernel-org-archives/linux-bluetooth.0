@@ -1,96 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3] android/hal-audio: Add simple downmix to mono
+Date: Tue, 4 Feb 2014 14:38:45 +0100
+Message-ID: <1391521125-2465-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1391514294-25337-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1391514294-25337-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 4 Feb 2014 15:45:55 +0200
-Message-ID: <CABBYNZ+faTa_quDagjhNkkCmqcZ2tjwojN9x0xgK8dSrjzn3eg@mail.gmail.com>
-Subject: Re: [PATCH] unit/avctp: Add test TP/NFR/BV-03-C
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+This patch adds simple downmix support from stereo to mono in order to
+support mono channel mode as it's mandatory for SBC codec. It uses
+simple (L+R)/2 calculation which should be good enough.
+---
+ android/hal-audio.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 49 insertions(+), 5 deletions(-)
 
-On Tue, Feb 4, 2014 at 1:44 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> The test verifies that IUT (TG) correctly reports the parameters of the
-> incoming command in the handler callback.
-> ---
->  unit/test-avctp.c | 31 +++++++++++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
->
-> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-> index c0d16a4..6d7e34a 100644
-> --- a/unit/test-avctp.c
-> +++ b/unit/test-avctp.c
-> @@ -249,10 +249,35 @@ static void test_client(gconstpointer data)
->         execute_context(context);
->  }
->
-> +static size_t handler(struct avctp *session,
-> +                                       uint8_t transaction, uint8_t *code,
-> +                                       uint8_t *subunit, uint8_t *operands,
-> +                                       size_t operand_count, void *user_data)
-> +{
-> +       DBG("transaction %d code %d subunit %d operand_count %zu",
-> +               transaction, *code, *subunit, operand_count);
-> +
-> +       g_assert_cmpint(transaction, ==, 0);
-> +       g_assert_cmpint(*code, ==, 0);
-> +       g_assert_cmpint(*subunit, ==, 0);
-> +       g_assert_cmpint(operand_count, ==, 0);
-> +
-> +       return operand_count;
-> +}
-> +
->  static void test_server(gconstpointer data)
->  {
->         struct context *context = create_context(0x0100, data);
->
-> +       if (g_str_equal(context->data->test_name, "/TP/NFR/BV-03-C")) {
-> +               int ret;
-> +
-> +               ret = avctp_register_pdu_handler(context->session, 0x00,
-> +                                                               handler, NULL);
-> +               DBG("ret %d", ret);
-> +               g_assert_cmpint(ret, !=, 0);
-> +       }
-> +
->         g_idle_add(send_pdu, context);
->
->         execute_context(context);
-> @@ -284,6 +309,8 @@ int main(int argc, char *argv[])
->         define_test("/TP/CCM/BV-03-C", test_dummy, raw_pdu(0x00));
->         define_test("/TP/CCM/BV-04-C", test_dummy, raw_pdu(0x00));
->
-> +       /* Non-Fragmented Messages tests */
-> +
->         define_test("/TP/NFR/BV-01-C", test_client,
->                                 raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00));
->
-> @@ -291,6 +318,10 @@ int main(int argc, char *argv[])
->                                 raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
->                                 raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x00, 0x00));
->
-> +       define_test("/TP/NFR/BV-03-C", test_server,
-> +                               raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
-> +                               raw_pdu(0x02, 0x11, 0x0e, 0x00, 0x00, 0x00));
-> +
->         define_test("/TP/NFR/BI-01-C", test_server,
->                                 raw_pdu(0x00, 0xff, 0xff, 0x00, 0x00, 0x00),
->                                 raw_pdu(0x03, 0xff, 0xff));
-> --
-> 1.8.3.2
->
-> --
-
-Applied, thanks.
-
-
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index efdf823..f90265b 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -36,9 +36,12 @@
+ #include "hal-log.h"
+ #include "hal-msg.h"
+ #include "../profiles/audio/a2dp-codecs.h"
++#include "../src/shared/util.h"
+ 
+ #define FIXED_A2DP_PLAYBACK_LATENCY_MS 25
+ 
++#define FIXED_BUFFER_SIZE (20 * 512)
++
+ #define MAX_FRAMES_IN_PAYLOAD 15
+ 
+ static const uint8_t a2dp_src_uuid[] = {
+@@ -220,6 +223,8 @@ struct a2dp_stream_out {
+ 	struct audio_endpoint *ep;
+ 	enum a2dp_state_t audio_state;
+ 	struct audio_input_config cfg;
++
++	uint8_t *downmix_buf;
+ };
+ 
+ struct a2dp_audio_dev {
+@@ -230,7 +235,8 @@ struct a2dp_audio_dev {
+ static const a2dp_sbc_t sbc_presets[] = {
+ 	{
+ 		.frequency = SBC_SAMPLING_FREQ_44100 | SBC_SAMPLING_FREQ_48000,
+-		.channel_mode = SBC_CHANNEL_MODE_DUAL_CHANNEL |
++		.channel_mode = SBC_CHANNEL_MODE_MONO |
++				SBC_CHANNEL_MODE_DUAL_CHANNEL |
+ 				SBC_CHANNEL_MODE_STEREO |
+ 				SBC_CHANNEL_MODE_JOINT_STEREO,
+ 		.subbands = SBC_SUBBANDS_4 | SBC_SUBBANDS_8,
+@@ -826,6 +832,21 @@ static void unregister_endpoints(void)
+ 	}
+ }
+ 
++static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
++								size_t bytes)
++{
++	const int16_t *input = (const void *) buffer;
++	int16_t *output = (void *) out->downmix_buf;
++	size_t i;
++
++	for (i = 0; i < bytes / 2; i++) {
++		int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
++		int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
++
++		put_unaligned(cpu_to_le16((l + r) / 2), &output[i]);
++	}
++}
++
+ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 								size_t bytes)
+ {
+@@ -853,6 +874,18 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 		return -1;
+ 	}
+ 
++	if (out->cfg.channels == AUDIO_CHANNEL_OUT_MONO) {
++		if (!out->downmix_buf) {
++			error("audio: downmix buffer not initialized");
++			return -1;
++		}
++
++		downmix_to_mono(out, buffer, bytes);
++
++		return out->ep->codec->write_data(out->ep->codec_data,
++				out->downmix_buf, bytes / 2, out->ep->fd) * 2;
++	}
++
+ 	return out->ep->codec->write_data(out->ep->codec_data, buffer,
+ 							bytes, out->ep->fd);
+ }
+@@ -890,16 +923,18 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
+ 	 * use magic value here and out_write code takes care of splitting
+ 	 * input buffer into multiple media packets.
+ 	 */
+-	return 20 * 512;
++	return FIXED_BUFFER_SIZE;
+ }
+ 
+ static uint32_t out_get_channels(const struct audio_stream *stream)
+ {
+-	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+-
+ 	DBG("");
+ 
+-	return out->cfg.channels;
++	/* AudioFlinger can only provide stereo stream, so we return it here and
++	 * later we'll downmix this to mono in case codec requires it
++	 */
++
++	return AUDIO_CHANNEL_OUT_STEREO;
+ }
+ 
+ static audio_format_t out_get_format(const struct audio_stream *stream)
+@@ -1212,6 +1247,12 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 
+ 	free(preset);
+ 
++	if (out->cfg.channels == AUDIO_CHANNEL_OUT_MONO) {
++		out->downmix_buf = malloc(FIXED_BUFFER_SIZE / 2);
++		if (!out->downmix_buf)
++			goto fail;
++	}
++
+ 	*stream_out = &out->stream;
+ 	a2dp_dev->out = out;
+ 
+@@ -1230,6 +1271,7 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_out *stream)
+ {
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
++	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+ 	struct audio_endpoint *ep = a2dp_dev->out->ep;
+ 
+ 	DBG("");
+@@ -1243,6 +1285,8 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+ 	ep->codec->cleanup(ep->codec_data);
+ 	ep->codec_data = NULL;
+ 
++	free(out->downmix_buf);
++
+ 	free(stream);
+ 	a2dp_dev->out = NULL;
+ }
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
