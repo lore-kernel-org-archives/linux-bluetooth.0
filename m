@@ -1,84 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] unit/avctp: Add TP/NFR/BV-04-C test
-Date: Tue,  4 Feb 2014 15:47:38 +0200
-Message-Id: <1391521658-28893-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1391506089-23985-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1391506089-23985-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 4 Feb 2014 15:47:17 +0200
+Message-ID: <CABBYNZJyUPsn1qZ5V-KSmEU0cMN=m0o+Qp8rCyKo_5M1wRdDmw@mail.gmail.com>
+Subject: Re: [PATCH] android/avctp: Fix memory leak: unregister pdu handler
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Add test TP/NFR/BV-04-C for AVCTP.
----
- unit/test-avctp.c | 40 +++++++++++++++++++++++++++++++---------
- 1 file changed, 31 insertions(+), 9 deletions(-)
+On Tue, Feb 4, 2014 at 11:28 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Unregister pdu handlers on shutdown.
+> ---
+>  android/avctp.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/android/avctp.c b/android/avctp.c
+> index 8f35403..8681cb0 100644
+> --- a/android/avctp.c
+> +++ b/android/avctp.c
+> @@ -1462,6 +1462,15 @@ void avctp_shutdown(struct avctp *session)
+>         if (session->browsing)
+>                 avctp_channel_destroy(session->browsing);
+>
+> +       if (session->passthrough_id > 0)
+> +               avctp_unregister_pdu_handler(session, session->passthrough_id);
+> +
+> +       if (session->unit_id > 0)
+> +               avctp_unregister_pdu_handler(session, session->unit_id);
+> +
+> +       if (session->subunit_id > 0)
+> +               avctp_unregister_pdu_handler(session, session->subunit_id);
+> +
+>         if (session->control)
+>                 avctp_channel_destroy(session->control);
+>
+> --
+> 1.8.3.2
 
-diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-index 6d7e34a..581f88c 100644
---- a/unit/test-avctp.c
-+++ b/unit/test-avctp.c
-@@ -240,15 +240,6 @@ static void execute_context(struct context *context)
- 	destroy_context(context);
- }
- 
--static void test_client(gconstpointer data)
--{
--	struct context *context = create_context(0x0100, data);
--
--	avctp_send_vendordep_req(context->session, 0, 0, NULL, 0, NULL, NULL);
--
--	execute_context(context);
--}
--
- static size_t handler(struct avctp *session,
- 					uint8_t transaction, uint8_t *code,
- 					uint8_t *subunit, uint8_t *operands,
-@@ -265,6 +256,33 @@ static size_t handler(struct avctp *session,
- 	return operand_count;
- }
- 
-+static gboolean handler_response(struct avctp *session,
-+					uint8_t code, uint8_t subunit,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	DBG("code 0x%02x subunit %d operand_count %zu", code, subunit,
-+								operand_count);
-+
-+	g_assert_cmpint(code, ==, 0x0a);
-+	g_assert_cmpint(subunit, ==, 0);
-+	g_assert_cmpint(operand_count, ==, 0);
-+
-+	return context_quit(context);
-+}
-+
-+static void test_client(gconstpointer data)
-+{
-+	struct context *context = create_context(0x0100, data);
-+
-+	avctp_send_vendordep_req(context->session, 0, 0, NULL, 0,
-+						handler_response, context);
-+
-+	execute_context(context);
-+}
-+
- static void test_server(gconstpointer data)
- {
- 	struct context *context = create_context(0x0100, data);
-@@ -322,6 +340,10 @@ int main(int argc, char *argv[])
- 				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
- 				raw_pdu(0x02, 0x11, 0x0e, 0x00, 0x00, 0x00));
- 
-+	define_test("/TP/NFR/BV-04-C", test_client,
-+				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
-+				raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x00, 0x00));
-+
- 	define_test("/TP/NFR/BI-01-C", test_server,
- 				raw_pdu(0x00, 0xff, 0xff, 0x00, 0x00, 0x00),
- 				raw_pdu(0x03, 0xff, 0xff));
+There is no leak, avctp_channel_destroy cleanup all the registered handlers.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
