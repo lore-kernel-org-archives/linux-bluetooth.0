@@ -1,49 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 4 Feb 2014 13:55:51 +0200
+Date: Tue, 4 Feb 2014 13:53:49 +0200
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] avrcp: Avoid unneeded calculation
-Message-ID: <20140204115549.GM2930@aemeltch-MOBL1>
-References: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] unit/avctp: Add connection establishment dummy tests
+Message-ID: <20140204115347.GL2930@aemeltch-MOBL1>
+References: <1391430198-26823-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1391430198-26823-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jan 30, 2014 at 06:12:54PM +0200, Andrei Emeltchenko wrote:
+On Mon, Feb 03, 2014 at 02:23:18PM +0200, Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> There no need to calculate those values
 
 ping
 
-> ---
->  profiles/audio/avrcp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index fa5adab..2e1a940 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -3177,7 +3177,7 @@ static void avrcp_register_notification(struct avrcp *session, uint8_t event)
->  	pdu->params[0] = event;
->  	pdu->params_len = htons(AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH);
+> Add some tests checking that L2CAP connection is established, so they
+> are basically dummy tests.
+> ---
+>  unit/test-avctp.c | 30 +++++++++++++++++++++++++++---
+>  1 file changed, 27 insertions(+), 3 deletions(-)
+> 
+> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+> index 041e0c0..c0d16a4 100644
+> --- a/unit/test-avctp.c
+> +++ b/unit/test-avctp.c
+> @@ -220,10 +220,8 @@ static struct context *create_context(uint16_t version, gconstpointer data)
+>  	return context;
+>  }
 >  
-> -	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-> +	length = AVRCP_HEADER_LENGTH + AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH;
+> -static void execute_context(struct context *context)
+> +static void destroy_context(struct context *context)
+>  {
+> -	g_main_loop_run(context->main_loop);
+> -
+>  	if (context->source > 0)
+>  		g_source_remove(context->source);
 >  
->  	avctp_send_vendordep_req(session->conn, AVC_CTYPE_NOTIFY,
->  					AVC_SUBUNIT_PANEL, buf, length,
-> @@ -3250,7 +3250,7 @@ static void avrcp_get_capabilities(struct avrcp *session)
->  	pdu->params[0] = CAP_EVENTS_SUPPORTED;
->  	pdu->params_len = htons(AVRCP_GET_CAPABILITIES_PARAM_LENGTH);
+> @@ -235,6 +233,13 @@ static void execute_context(struct context *context)
+>  	g_free(context);
+>  }
 >  
-> -	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-> +	length = AVRCP_HEADER_LENGTH + AVRCP_GET_CAPABILITIES_PARAM_LENGTH;
+> +static void execute_context(struct context *context)
+> +{
+> +	g_main_loop_run(context->main_loop);
+> +
+> +	destroy_context(context);
+> +}
+> +
+>  static void test_client(gconstpointer data)
+>  {
+>  	struct context *context = create_context(0x0100, data);
+> @@ -253,6 +258,13 @@ static void test_server(gconstpointer data)
+>  	execute_context(context);
+>  }
 >  
->  	avctp_send_vendordep_req(session->conn, AVC_CTYPE_STATUS,
->  					AVC_SUBUNIT_PANEL, buf, length,
+> +static void test_dummy(gconstpointer data)
+> +{
+> +	struct context *context = create_context(0x0100, data);
+> +
+> +	destroy_context(context);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	g_test_init(&argc, &argv, NULL);
+> @@ -260,6 +272,18 @@ int main(int argc, char *argv[])
+>  	if (g_test_verbose())
+>  		__btd_log_init("*", 0);
+>  
+> +	/* Connection Channel Management tests */
+> +
+> +	/*
+> +	 * Tests are checking that IUT is able to request establishing
+> +	 * channels, since we already have connection through socketpair
+> +	 * the tests are dummy.
+> +	 */
+> +	define_test("/TP/CCM/BV-01-C", test_dummy, raw_pdu(0x00));
+> +	define_test("/TP/CCM/BV-02-C", test_dummy, raw_pdu(0x00));
+> +	define_test("/TP/CCM/BV-03-C", test_dummy, raw_pdu(0x00));
+> +	define_test("/TP/CCM/BV-04-C", test_dummy, raw_pdu(0x00));
+> +
+>  	define_test("/TP/NFR/BV-01-C", test_client,
+>  				raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00));
+>  
 > -- 
 > 1.8.3.2
 > 
