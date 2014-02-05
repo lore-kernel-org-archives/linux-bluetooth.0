@@ -1,95 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391521658-28893-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1391521658-28893-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 5 Feb 2014 13:40:07 +0200
-Message-ID: <CABBYNZLutDMC++6hZUv10qjs9Fdza4oFkLnEzck+d4f5EDNGTg@mail.gmail.com>
-Subject: Re: [PATCH] unit/avctp: Add TP/NFR/BV-04-C test
+In-Reply-To: <1391413669-10534-1-git-send-email-hannu.mallat@jollamobile.com>
+References: <1391413669-10534-1-git-send-email-hannu.mallat@jollamobile.com>
+Date: Wed, 5 Feb 2014 13:39:15 +0200
+Message-ID: <CABBYNZKgNcy+K7wqRicBmuACKaRr+nfbbLT++mHxrwcTZDDo1A@mail.gmail.com>
+Subject: Re: [PATCH] pbap: Fix PhonebookSize endianness
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Hannu Mallat <hannu.mallat@jollamobile.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Hannu,
 
-On Tue, Feb 4, 2014 at 3:47 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Add test TP/NFR/BV-04-C for AVCTP.
+On Mon, Feb 3, 2014 at 9:47 AM, Hannu Mallat
+<hannu.mallat@jollamobile.com> wrote:
+> As g_obex_apparam_set_uint16() converts data to big-endian format
+> internally, do not call htons() prior to it.
 > ---
->  unit/test-avctp.c | 40 +++++++++++++++++++++++++++++++---------
->  1 file changed, 31 insertions(+), 9 deletions(-)
+>  obexd/plugins/pbap.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
-> index 6d7e34a..581f88c 100644
-> --- a/unit/test-avctp.c
-> +++ b/unit/test-avctp.c
-> @@ -240,15 +240,6 @@ static void execute_context(struct context *context)
->         destroy_context(context);
->  }
+> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
+> index 4740188..acac3aa 100644
+> --- a/obexd/plugins/pbap.c
+> +++ b/obexd/plugins/pbap.c
+> @@ -188,7 +188,7 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
 >
-> -static void test_client(gconstpointer data)
-> -{
-> -       struct context *context = create_context(0x0100, data);
-> -
-> -       avctp_send_vendordep_req(context->session, 0, 0, NULL, 0, NULL, NULL);
-> -
-> -       execute_context(context);
-> -}
-> -
->  static size_t handler(struct avctp *session,
->                                         uint8_t transaction, uint8_t *code,
->                                         uint8_t *subunit, uint8_t *operands,
-> @@ -265,6 +256,33 @@ static size_t handler(struct avctp *session,
->         return operand_count;
->  }
+>         DBG("vcards %d", vcards);
 >
-> +static gboolean handler_response(struct avctp *session,
-> +                                       uint8_t code, uint8_t subunit,
-> +                                       uint8_t *operands, size_t operand_count,
-> +                                       void *user_data)
-> +{
-> +       struct context *context = user_data;
-> +
-> +       DBG("code 0x%02x subunit %d operand_count %zu", code, subunit,
-> +                                                               operand_count);
-> +
-> +       g_assert_cmpint(code, ==, 0x0a);
-> +       g_assert_cmpint(subunit, ==, 0);
-> +       g_assert_cmpint(operand_count, ==, 0);
-> +
-> +       return context_quit(context);
-> +}
-> +
-> +static void test_client(gconstpointer data)
-> +{
-> +       struct context *context = create_context(0x0100, data);
-> +
-> +       avctp_send_vendordep_req(context->session, 0, 0, NULL, 0,
-> +                                               handler_response, context);
-> +
-> +       execute_context(context);
-> +}
-> +
->  static void test_server(gconstpointer data)
->  {
->         struct context *context = create_context(0x0100, data);
-> @@ -322,6 +340,10 @@ int main(int argc, char *argv[])
->                                 raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
->                                 raw_pdu(0x02, 0x11, 0x0e, 0x00, 0x00, 0x00));
+> -       phonebooksize = htons(vcards);
+> +       phonebooksize = vcards;
 >
-> +       define_test("/TP/NFR/BV-04-C", test_client,
-> +                               raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
-> +                               raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x00, 0x00));
-> +
->         define_test("/TP/NFR/BI-01-C", test_server,
->                                 raw_pdu(0x00, 0xff, 0xff, 0x00, 0x00, 0x00),
->                                 raw_pdu(0x03, 0xff, 0xff));
+>         pbap->obj->apparam = g_obex_apparam_set_uint16(NULL, PHONEBOOKSIZE_TAG,
+>                                                                 phonebooksize);
+> @@ -365,7 +365,7 @@ static int generate_response(void *user_data)
+>
+>         if (max == 0) {
+>                 /* Ignore all other parameter and return PhoneBookSize */
+> -               uint16_t size = htons(g_slist_length(pbap->cache.entries));
+> +               uint16_t size = g_slist_length(pbap->cache.entries);
+>
+>                 pbap->obj->apparam = g_obex_apparam_set_uint16(
+>                                                         pbap->obj->apparam,
 > --
-> 1.8.3.2
+> 1.8.5.3
 
 Applied, thanks.
 
