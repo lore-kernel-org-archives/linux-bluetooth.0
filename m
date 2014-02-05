@@ -1,48 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Feb 2014 16:49:25 +0100 (CET)
-From: Jiri Kosina <jkosina@suse.cz>
-To: Marcel Holtmann <marcel@holtmann.org>,
-    "Gustavo F. Padovan" <gustavo@padovan.org>
-cc: David Herrmann <dh.herrmann@gmail.com>,
-    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
-    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
- enough
-In-Reply-To: <20573666-E2A0-4D6B-986A-09DAFC0FB64B@holtmann.org>
-Message-ID: <alpine.LNX.2.00.1402051648470.8614@pobox.suse.cz>
-References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com> <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
- <CANq1E4SxrDnbOCsohZXYoYL-HQjEc-xcOnXfAm=npHG2QfMS9A@mail.gmail.com> <alpine.LNX.2.00.1401071811530.4962@pobox.suse.cz> <alpine.LNX.2.00.1401282152140.22492@pobox.suse.cz> <CANq1E4TW+GU=oaW0tXb=Tun9HMtr26u-PC3H6BsLot560ANgog@mail.gmail.com>
- <alpine.LNX.2.00.1402031107310.14066@pobox.suse.cz> <CANq1E4S++uqMzQue_0jC3N=Lm8Os5V-48Hw5M4vWvM+2Vx91yA@mail.gmail.com> <alpine.LNX.2.00.1402041446130.14066@pobox.suse.cz> <20573666-E2A0-4D6B-986A-09DAFC0FB64B@holtmann.org>
-MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/haltest: Remove unneeded assignment
+Date: Wed,  5 Feb 2014 17:45:53 +0200
+Message-Id: <1391615153-22744-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 4 Feb 2014, Marcel Holtmann wrote:
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> >>>>> just got back to this, finally ... did you have time to work on this at
-> >>>>> all, or should I just start from scratch?
-> >>>> 
-> >>>> Sorry, no. Fosdem is this weekend and I needed to get my code ready
-> >>>> for that. But I'll finally have time again next week.
-> >>> 
-> >>> Okay, thanks. I then guess we should proceed with this bandaid (double
-> >>> allocation) for 3.14
-> >> 
-> >> It would be really nice if we could get the HIDP patch into 3.14-rc2
-> >> and backported to stable. There have been quite a bunch of reports now
-> >> and I dislike adding a GFP_ATOMIC allocation in HID core. 
-> > 
-> > I agree with David; Gustavo, what is your take on this, please?
-> 
-> I leave this up to Gustavo to get this into wireless tree for 3.14-rc2.
-> 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ android/client/if-audio.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Thanks a lot.
-
-Gustavo, what is your take on this please? I can take it through hid.git 
-in case you don't have anything else queued for -rc2.
-
+diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+index bb8f51b..72fea98 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-audio.c
+@@ -227,7 +227,6 @@ static void *playback_thread(void *data)
+ 
+ 	if (in) {
+ 		fclose(in);
+-		in = NULL;
+ 	}
+ 
+ 	pthread_cleanup_pop(1);
 -- 
-Jiri Kosina
-SUSE Labs
+1.8.3.2
+
