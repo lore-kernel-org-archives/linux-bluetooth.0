@@ -1,94 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v8 01/10] Bluetooth: Create hci_stop_le_scan_req() helper
-Date: Wed,  5 Feb 2014 19:23:17 -0300
-Message-Id: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v8 03/10] Bluetooth: Stop scanning on LE connection
+Date: Wed,  5 Feb 2014 19:23:19 -0300
+Message-Id: <1391639006-26311-3-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
+References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves stop LE scanning duplicate code to one single
-place and reuses it. This will avoid more duplicate code in
-upcoming patches.
+Some LE controllers don't support scanning and creating a connection
+at the same time. So we should always stop scanning in order to
+establish the connection.
+
+Since we may prematurely stop the discovery procedure in favor of
+the connection establishment, we should also cancel hdev->le_scan_
+disable delayed work and set the discovery state to DISCOVERY_STOPPED.
+
+This change does a small improvement since it is not mandatory the
+user stops scanning before connecting anymore. Moreover, this change
+is required by upcoming LE auto connection mechanism in order to work
+properly with controllers that don't support background scanning and
+connection establishment at the same time.
+
+In future, we might want to do a small optimization by checking if
+controller is able to scan and connect at the same time. For now,
+we want the simplest approach so we always stop scanning (even if
+the controller is able to carry out both operations).
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  2 ++
- net/bluetooth/hci_core.c         | 14 ++++++++++----
- net/bluetooth/mgmt.c             |  6 +-----
- 3 files changed, 13 insertions(+), 9 deletions(-)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_conn.c    | 78 +++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 77 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 92fa75f..8aff7f9 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1212,4 +1212,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
- #define SCO_AIRMODE_CVSD       0x0000
- #define SCO_AIRMODE_TRANSP     0x0003
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 352d3d7..a0d5262 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -352,6 +352,7 @@ enum {
  
-+void hci_stop_le_scan_req(struct hci_request *req);
-+
- #endif /* __HCI_CORE_H */
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e774669..6529f4a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3058,7 +3058,6 @@ static void le_scan_disable_work(struct work_struct *work)
- {
- 	struct hci_dev *hdev = container_of(work, struct hci_dev,
- 					    le_scan_disable.work);
--	struct hci_cp_le_set_scan_enable cp;
- 	struct hci_request req;
- 	int err;
- 
-@@ -3066,9 +3065,7 @@ static void le_scan_disable_work(struct work_struct *work)
- 
- 	hci_req_init(&req, hdev);
- 
--	memset(&cp, 0, sizeof(cp));
--	cp.enable = LE_SCAN_DISABLE;
--	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-+	hci_stop_le_scan_req(&req);
- 
- 	err = hci_req_run(&req, le_scan_disable_work_complete);
- 	if (err)
-@@ -4523,3 +4520,12 @@ static void hci_cmd_work(struct work_struct *work)
- 		}
- 	}
+ /* ---- HCI Error Codes ---- */
+ #define HCI_ERROR_AUTH_FAILURE		0x05
++#define HCI_ERROR_MEMORY_EXCEEDED	0x07
+ #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
+ #define HCI_ERROR_REJ_BAD_ADDR		0x0f
+ #define HCI_ERROR_REMOTE_USER_TERM	0x13
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 4f5029c..166d7a5 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -583,11 +583,71 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 	return 0;
  }
-+
-+void hci_stop_le_scan_req(struct hci_request *req)
+ 
++static void create_le_conn_req(struct hci_request *req, struct hci_conn *conn)
 +{
-+	struct hci_cp_le_set_scan_enable cp;
++	struct hci_cp_le_create_conn cp;
++	struct hci_dev *hdev = conn->hdev;
 +
 +	memset(&cp, 0, sizeof(cp));
-+	cp.enable = LE_SCAN_DISABLE;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
++	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
++	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
++	bacpy(&cp.peer_addr, &conn->dst);
++	cp.peer_addr_type = conn->dst_type;
++	cp.own_address_type = conn->src_type;
++	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
++	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
++	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
++	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
++	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
++
++	hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
 +}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ce7ef33..5c0d55d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3400,7 +3400,6 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct hci_cp_remote_name_req_cancel cp;
- 	struct inquiry_entry *e;
- 	struct hci_request req;
--	struct hci_cp_le_set_scan_enable enable_cp;
++
++static void stop_scan_complete(struct hci_dev *hdev, u8 status)
++{
++	struct hci_request req;
++	struct hci_conn *conn;
++	int err;
++
++	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++	if (!conn)
++		return;
++
++	if (status) {
++		BT_DBG("HCI request failed to stop scanning: status 0x%2.2x",
++		       status);
++
++		hci_dev_lock(hdev);
++		hci_le_conn_failed(conn, status);
++		hci_dev_unlock(hdev);
++		return;
++	}
++
++	/* Since we may have prematurely stopped discovery procedure, we should
++	 * update discovery state.
++	 */
++	cancel_delayed_work(&hdev->le_scan_disable);
++	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++
++	hci_req_init(&req, hdev);
++
++	create_le_conn_req(&req, conn);
++
++	err = hci_req_run(&req, create_le_conn_complete);
++	if (err) {
++		hci_dev_lock(hdev);
++		hci_le_conn_failed(conn, HCI_ERROR_MEMORY_EXCEEDED);
++		hci_dev_unlock(hdev);
++		return;
++	}
++}
++
+ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				    u8 dst_type, u8 sec_level, u8 auth_type)
+ {
+ 	struct hci_conn_params *params;
+ 	struct hci_conn *conn;
++	struct hci_request req;
  	int err;
  
- 	BT_DBG("%s", hdev->name);
-@@ -3436,10 +3435,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
- 		} else {
- 			cancel_delayed_work(&hdev->le_scan_disable);
+ 	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+@@ -643,9 +703,23 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
+ 	}
  
--			memset(&enable_cp, 0, sizeof(enable_cp));
--			enable_cp.enable = LE_SCAN_DISABLE;
--			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
--				    sizeof(enable_cp), &enable_cp);
-+			hci_stop_le_scan_req(&req);
- 		}
+-	err = hci_create_le_conn(conn);
+-	if (err)
++	hci_req_init(&req, hdev);
++
++	/* If controller is scanning, we stop it since some controllers are
++	 * not able to scan and connect at the same time.
++	 */
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
++		hci_stop_le_scan_req(&req);
++		err = hci_req_run(&req, stop_scan_complete);
++	} else {
++		create_le_conn_req(&req, conn);
++		err = hci_req_run(&req, create_le_conn_complete);
++	}
++
++	if (err) {
++		hci_conn_del(conn);
+ 		return ERR_PTR(err);
++	}
  
- 		break;
+ done:
+ 	hci_conn_hold(conn);
 -- 
 1.8.5.3
 
