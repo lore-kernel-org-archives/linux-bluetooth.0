@@ -1,54 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1391413669-10534-1-git-send-email-hannu.mallat@jollamobile.com>
-References: <1391413669-10534-1-git-send-email-hannu.mallat@jollamobile.com>
-Date: Wed, 5 Feb 2014 13:39:15 +0200
-Message-ID: <CABBYNZKgNcy+K7wqRicBmuACKaRr+nfbbLT++mHxrwcTZDDo1A@mail.gmail.com>
-Subject: Re: [PATCH] pbap: Fix PhonebookSize endianness
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Hannu Mallat <hannu.mallat@jollamobile.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/handsfree: Fix memory leak
+Date: Wed,  5 Feb 2014 12:50:59 +0200
+Message-Id: <1391597459-3791-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Hannu,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Feb 3, 2014 at 9:47 AM, Hannu Mallat
-<hannu.mallat@jollamobile.com> wrote:
-> As g_obex_apparam_set_uint16() converts data to big-endian format
-> internally, do not call htons() prior to it.
-> ---
->  obexd/plugins/pbap.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/obexd/plugins/pbap.c b/obexd/plugins/pbap.c
-> index 4740188..acac3aa 100644
-> --- a/obexd/plugins/pbap.c
-> +++ b/obexd/plugins/pbap.c
-> @@ -188,7 +188,7 @@ static void phonebook_size_result(const char *buffer, size_t bufsize,
->
->         DBG("vcards %d", vcards);
->
-> -       phonebooksize = htons(vcards);
-> +       phonebooksize = vcards;
->
->         pbap->obj->apparam = g_obex_apparam_set_uint16(NULL, PHONEBOOKSIZE_TAG,
->                                                                 phonebooksize);
-> @@ -365,7 +365,7 @@ static int generate_response(void *user_data)
->
->         if (max == 0) {
->                 /* Ignore all other parameter and return PhoneBookSize */
-> -               uint16_t size = htons(g_slist_length(pbap->cache.entries));
-> +               uint16_t size = g_slist_length(pbap->cache.entries);
->
->                 pbap->obj->apparam = g_obex_apparam_set_uint16(
->                                                         pbap->obj->apparam,
-> --
-> 1.8.5.3
+Free classes if sdp_get_access_protos fails.
+---
+ android/handsfree.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Applied, thanks.
-
-
+diff --git a/android/handsfree.c b/android/handsfree.c
+index edf3d27..9482b2e 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -229,6 +229,7 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 
+ 	if (sdp_get_access_protos(recs->data, &protos) < 0) {
+ 		error("handsfree: unable to get access protocols from record");
++		sdp_list_free(classes, free);
+ 		goto fail;
+ 	}
+ 
 -- 
-Luiz Augusto von Dentz
+1.8.3.2
+
