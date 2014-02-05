@@ -1,126 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] android/AVRCP: Add bt_avrcp_connect
-Date: Wed,  5 Feb 2014 12:26:57 +0200
-Message-Id: <1391596020-27679-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianx.chlad@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update PICS and PTS for AVCTP
+Date: Wed, 05 Feb 2014 10:55:38 +0100
+Message-ID: <7444676.oQVWzMdvAq@uw000953>
+In-Reply-To: <1391505632-5306-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1391505632-5306-1-git-send-email-sebastianx.chlad@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sebastian,
 
-This adds bt_avrcp_connect function which can be used to request AVRCP
-connections.
----
- android/avrcp.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++++++-----
- android/avrcp.h |  2 ++
- 2 files changed, 57 insertions(+), 5 deletions(-)
+On Tuesday 04 of February 2014 11:20:32 Sebastian Chlad wrote:
+> Since we do not support AVCTP fragmentation for now we shell set PICS
+> settings for AVCTP accordingly as well as set respective PTS test cases
+> as N/A
+> ---
+>  android/pics-avctp.txt | 2 +-
+>  android/pts-avctp.txt  | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/pics-avctp.txt b/android/pics-avctp.txt
+> index 939ffdb..269bf08 100644
+> --- a/android/pics-avctp.txt
+> +++ b/android/pics-avctp.txt
+> @@ -58,7 +58,7 @@ TSPC_AVCTP_2_14	False		Support for multiple AVCTP channel establishment
+>  -------------------------------------------------------------------------------
+>  Parameter Name	Selected	Description
+>  -------------------------------------------------------------------------------
+> -TSPC_AVCTP_3_1	True (*)	Message fragmentation (O)
+> +TSPC_AVCTP_3_1	False		Message fragmentation (O)
+>  TSPC_AVCTP_3_2	True		Transaction label management (M)
+>  TSPC_AVCTP_3_3	True		Packet type field management (M)
+>  TSPC_AVCTP_3_4	True		Message type field management (M)
+> diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+> index 4090ec0..72a6373 100644
+> --- a/android/pts-avctp.txt
+> +++ b/android/pts-avctp.txt
+> @@ -37,6 +37,6 @@ TC_TG_CCM_BV_04_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
+>  TC_TG_NFR_BV_02_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
+>  TC_TG_NFR_BV_03_C	PASS	avtest --device hci0 --avctp --send x <bdaddr>
+>  TC_TG_NFR_BI_01_C	PASS
+> -TC_TG_FRA_BV_02_C	FAIL
+> -TC_TG_FRA_BV_03_C	INC
+> +TC_TG_FRA_BV_02_C	N/A	Fragmentation not supported
+> +TC_TG_FRA_BV_03_C	N/A	Fragmentation not supported
+>  -------------------------------------------------------------------------------
+> 
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index ef833df..8600d98 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -54,6 +54,7 @@ static GIOChannel *server = NULL;
- struct avrcp_device {
- 	bdaddr_t	dst;
- 	struct avctp	*session;
-+	GIOChannel	*io;
- };
- 
- static const struct ipc_handler cmd_handlers[] = {
-@@ -197,17 +198,20 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	}
- 
- 	ba2str(&dst, address);
--	DBG("Incoming connection from %s", address);
- 
- 	l = g_slist_find_custom(devices, &dst, device_cmp);
- 	if (l) {
--		error("Unexpected connection");
--		return;
-+		dev = l->data;
-+		if (dev->session) {
-+			error("Unexpected connection");
-+			return;
-+		}
-+	} else {
-+		DBG("Incoming connection from %s", address);
-+		dev = avrcp_device_new(&dst);
- 	}
- 
- 	fd = g_io_channel_unix_get_fd(chan);
--
--	dev = avrcp_device_new(&dst);
- 	dev->session = avctp_new(fd, imtu, omtu, 0x0100);
- 
- 	if (!dev->session) {
-@@ -222,6 +226,11 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 
- 	g_io_channel_set_close_on_unref(chan, FALSE);
- 
-+	if (dev->io) {
-+		g_io_channel_unref(dev->io);
-+		dev->io = NULL;
-+	}
-+
- 	DBG("%s connected", address);
- }
- 
-@@ -288,3 +297,44 @@ void bt_avrcp_unregister(void)
- 		server = NULL;
- 	}
- }
-+
-+static bool avrcp_device_connect(struct avrcp_device *dev, BtIOConnect cb)
-+{
-+	GError *err = NULL;
-+
-+	dev->io = bt_io_connect(cb, dev, NULL, &err,
-+					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+					BT_IO_OPT_DEST_BDADDR, &dev->dst,
-+					BT_IO_OPT_PSM, L2CAP_PSM_AVCTP,
-+					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
-+					BT_IO_OPT_INVALID);
-+	if (err) {
-+		error("%s", err->message);
-+		g_error_free(err);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+void bt_avrcp_connect(const bdaddr_t *dst)
-+{
-+	struct avrcp_device *dev;
-+	char addr[18];
-+	GSList *l;
-+
-+	DBG("");
-+
-+	l = g_slist_find_custom(devices, dst, device_cmp);
-+	if (l)
-+		return;
-+
-+	dev = avrcp_device_new(dst);
-+	if (!avrcp_device_connect(dev, connect_cb)) {
-+		avrcp_device_free(dev);
-+		return;
-+	}
-+
-+	ba2str(&dev->dst, addr);
-+	DBG("connecting to %s", addr);
-+}
-diff --git a/android/avrcp.h b/android/avrcp.h
-index 6fe7fbf..7b0a5ed 100644
---- a/android/avrcp.h
-+++ b/android/avrcp.h
-@@ -23,3 +23,5 @@
- 
- bool bt_avrcp_register(const bdaddr_t *addr);
- void bt_avrcp_unregister(void);
-+
-+void bt_avrcp_connect(const bdaddr_t *dst);
+Pushed, thanks.
+
 -- 
-1.8.5.3
-
+Best regards, 
+Szymon Janc
