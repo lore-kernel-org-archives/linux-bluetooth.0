@@ -1,50 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Feb 2014 13:45:54 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv2] android/avrcp: Decouple AVRCP logic from btio
-Message-ID: <20140205114552.GA25435@aemeltch-MOBL1>
-References: <1391092704-24806-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1391418977-24811-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20140204115622.GN2930@aemeltch-MOBL1>
- <CABBYNZKLwPzEsLCLDGr6cMgYQRobcfQ7W_EqqUpSSvBp4=hGVg@mail.gmail.com>
- <20140204130331.GO2930@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140204130331.GO2930@aemeltch-MOBL1>
+In-Reply-To: <1391521658-28893-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1391521658-28893-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 5 Feb 2014 13:40:07 +0200
+Message-ID: <CABBYNZLutDMC++6hZUv10qjs9Fdza4oFkLnEzck+d4f5EDNGTg@mail.gmail.com>
+Subject: Re: [PATCH] unit/avctp: Add TP/NFR/BV-04-C test
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andrei,
 
-On Tue, Feb 04, 2014 at 03:03:33PM +0200, Andrei Emeltchenko wrote:
-> Hi Luiz,
-> 
-> On Tue, Feb 04, 2014 at 02:50:11PM +0200, Luiz Augusto von Dentz wrote:
-> > Hi Andrei,
-> > 
-> > On Tue, Feb 4, 2014 at 1:56 PM, Andrei Emeltchenko
-> > <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > > On Mon, Feb 03, 2014 at 11:16:17AM +0200, Andrei Emeltchenko wrote:
-> > >> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > >>
-> > >> The patch makes AVRCP to be channel-agnostic so that it might be used in
-> > >> unit tests. The idea is that all AVRCP logic would come to avrcp-lib and
-> > >> channel stuff got to avrcp.
-> > 
-> > I think we discussed this offline and decided not to have a separate
-> > file for now.
-> 
-> So is the idea is to have unit-avrcp to be compiled with btio, etc? 
-> I will then just to link everything what android/avrcp needs.
+On Tue, Feb 4, 2014 at 3:47 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Add test TP/NFR/BV-04-C for AVCTP.
+> ---
+>  unit/test-avctp.c | 40 +++++++++++++++++++++++++++++++---------
+>  1 file changed, 31 insertions(+), 9 deletions(-)
+>
+> diff --git a/unit/test-avctp.c b/unit/test-avctp.c
+> index 6d7e34a..581f88c 100644
+> --- a/unit/test-avctp.c
+> +++ b/unit/test-avctp.c
+> @@ -240,15 +240,6 @@ static void execute_context(struct context *context)
+>         destroy_context(context);
+>  }
+>
+> -static void test_client(gconstpointer data)
+> -{
+> -       struct context *context = create_context(0x0100, data);
+> -
+> -       avctp_send_vendordep_req(context->session, 0, 0, NULL, 0, NULL, NULL);
+> -
+> -       execute_context(context);
+> -}
+> -
+>  static size_t handler(struct avctp *session,
+>                                         uint8_t transaction, uint8_t *code,
+>                                         uint8_t *subunit, uint8_t *operands,
+> @@ -265,6 +256,33 @@ static size_t handler(struct avctp *session,
+>         return operand_count;
+>  }
+>
+> +static gboolean handler_response(struct avctp *session,
+> +                                       uint8_t code, uint8_t subunit,
+> +                                       uint8_t *operands, size_t operand_count,
+> +                                       void *user_data)
+> +{
+> +       struct context *context = user_data;
+> +
+> +       DBG("code 0x%02x subunit %d operand_count %zu", code, subunit,
+> +                                                               operand_count);
+> +
+> +       g_assert_cmpint(code, ==, 0x0a);
+> +       g_assert_cmpint(subunit, ==, 0);
+> +       g_assert_cmpint(operand_count, ==, 0);
+> +
+> +       return context_quit(context);
+> +}
+> +
+> +static void test_client(gconstpointer data)
+> +{
+> +       struct context *context = create_context(0x0100, data);
+> +
+> +       avctp_send_vendordep_req(context->session, 0, 0, NULL, 0,
+> +                                               handler_response, context);
+> +
+> +       execute_context(context);
+> +}
+> +
+>  static void test_server(gconstpointer data)
+>  {
+>         struct context *context = create_context(0x0100, data);
+> @@ -322,6 +340,10 @@ int main(int argc, char *argv[])
+>                                 raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
+>                                 raw_pdu(0x02, 0x11, 0x0e, 0x00, 0x00, 0x00));
+>
+> +       define_test("/TP/NFR/BV-04-C", test_client,
+> +                               raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x00, 0x00),
+> +                               raw_pdu(0x02, 0x11, 0x0e, 0x0a, 0x00, 0x00));
+> +
+>         define_test("/TP/NFR/BI-01-C", test_server,
+>                                 raw_pdu(0x00, 0xff, 0xff, 0x00, 0x00, 0x00),
+>                                 raw_pdu(0x03, 0xff, 0xff));
+> --
+> 1.8.3.2
 
-It looks like together with btio it also needs android/bluetooth.c for
-bt_adapter_add_record() and we have source almost all files in android
-subfolder. I believe that this is not the desired behaviour and we would
-be better with separating AVRCP packet processing logic from the other code.
+Applied, thanks.
 
-So what is wrong with the proposed approach? Maybe rename avctp-lib?
 
-Best regards 
-Andrei Emeltchenko 
+-- 
+Luiz Augusto von Dentz
