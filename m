@@ -1,31 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/handsfree: Fix memory leak
-Date: Wed,  5 Feb 2014 12:50:59 +0200
-Message-Id: <1391597459-3791-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ 4/4] android: Disconnect AVRCP once A2DP is disconnected
+Date: Wed,  5 Feb 2014 12:27:00 +0200
+Message-Id: <1391596020-27679-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1391596020-27679-1-git-send-email-luiz.dentz@gmail.com>
+References: <1391596020-27679-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Free classes if sdp_get_access_protos fails.
+If A2DP is disconnected also disconnect AVRCP.
 ---
- android/handsfree.c | 1 +
- 1 file changed, 1 insertion(+)
+ android/a2dp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index edf3d27..9482b2e 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -229,6 +229,7 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 962e7f5..731fa16 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -227,6 +227,8 @@ static void bt_a2dp_notify_state(struct a2dp_device *dev, uint8_t state)
+ 	if (state != HAL_A2DP_STATE_DISCONNECTED)
+ 		return;
  
- 	if (sdp_get_access_protos(recs->data, &protos) < 0) {
- 		error("handsfree: unable to get access protocols from record");
-+		sdp_list_free(classes, free);
- 		goto fail;
- 	}
++	bt_avrcp_disconnect(&dev->dst);
++
+ 	a2dp_device_free(dev);
+ }
  
 -- 
-1.8.3.2
+1.8.5.3
 
