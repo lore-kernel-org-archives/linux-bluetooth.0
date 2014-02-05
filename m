@@ -1,60 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v8 07/10] Bluetooth: Temporarily stop background scanning on discovery
-Date: Wed,  5 Feb 2014 19:23:23 -0300
-Message-Id: <1391639006-26311-7-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v8 05/10] Bluetooth: Introduce hdev->pend_le_conn list
+Date: Wed,  5 Feb 2014 19:23:21 -0300
+Message-Id: <1391639006-26311-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the user sends a mgmt start discovery command while the background
-scanning is running, we should temporarily stop it. Once the discovery
-finishes, we start the background scanning again.
+This patch introduces the hdev->pend_le_conn list which holds the
+device addresses the kernel should autonomously connect. It also
+introduces some helper functions to manipulate the list.
+
+The list and helper functions will be used by the next patch which
+implements the LE auto connection infrastructure.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c |  2 ++
- net/bluetooth/mgmt.c     | 12 ++++++------
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci_core.h |  7 +++++
+ net/bluetooth/hci_core.c         | 68 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 6e5062c..7b9c4ed 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -270,6 +270,7 @@ struct hci_dev {
+ 	struct list_head	long_term_keys;
+ 	struct list_head	remote_oob_data;
+ 	struct list_head	le_conn_params;
++	struct list_head	pend_le_conns;
+ 
+ 	struct hci_dev_stats	stat;
+ 
+@@ -771,6 +772,12 @@ void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_clear(struct hci_dev *hdev);
+ 
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conns_clear(struct hci_dev *hdev);
++
+ int hci_uuids_clear(struct hci_dev *hdev);
+ 
+ int hci_link_keys_clear(struct hci_dev *hdev);
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ff85205..8ddb332 100644
+index 6529f4a..0f670bc 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1609,6 +1609,8 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
+@@ -2999,6 +2999,72 @@ void hci_conn_params_clear(struct hci_dev *hdev)
+ 	BT_DBG("All LE connection parameters were removed");
+ }
  
- 	switch (state) {
- 	case DISCOVERY_STOPPED:
-+		hci_update_background_scan(hdev);
++/* This function requires the caller holds hdev->lock */
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
 +
- 		if (hdev->discovery.state != DISCOVERY_STARTING)
- 			mgmt_discovering(hdev, 0);
- 		break;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5c0d55d..9996516 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3319,12 +3319,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
++	list_for_each_entry(entry, &hdev->pend_le_conns, list) {
++		if (bacmp(&entry->bdaddr, addr) == 0 &&
++		    entry->bdaddr_type == addr_type)
++			return entry;
++	}
++
++	return NULL;
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (entry)
++		return;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry) {
++		BT_ERR("Out of memory");
++		return;
++	}
++
++	bacpy(&entry->bdaddr, addr);
++	entry->bdaddr_type = addr_type;
++
++	list_add(&entry->list, &hdev->pend_le_conns);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (!entry)
++		return;
++
++	list_del(&entry->list);
++	kfree(entry);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conns_clear(struct hci_dev *hdev)
++{
++	struct bdaddr_list *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->pend_le_conns, list) {
++		list_del(&entry->list);
++		kfree(entry);
++	}
++
++	BT_DBG("All LE pending connections cleared");
++}
++
+ static void inquiry_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	if (status) {
+@@ -3107,6 +3173,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->long_term_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+ 	INIT_LIST_HEAD(&hdev->le_conn_params);
++	INIT_LIST_HEAD(&hdev->pend_le_conns);
+ 	INIT_LIST_HEAD(&hdev->conn_hash.list);
  
--		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--					 MGMT_STATUS_BUSY);
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
-+		/* If controller is scanning, it means the background scanning
-+		 * is running. Thus, we should temporarily stop it in order to
-+		 * set the discovery scanning parameters.
-+		 */
-+		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+			hci_stop_le_scan_req(&req);
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+@@ -3293,6 +3360,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_smp_ltks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_conn_params_clear(hdev);
++	hci_pend_le_conns_clear(hdev);
+ 	hci_dev_unlock(hdev);
  
- 		memset(&param_cp, 0, sizeof(param_cp));
- 		param_cp.type = LE_SCAN_ACTIVE;
+ 	hci_dev_put(hdev);
 -- 
 1.8.5.3
 
