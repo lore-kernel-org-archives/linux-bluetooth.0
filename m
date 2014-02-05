@@ -1,37 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 0/5] Android PAN fixes
-Date: Wed,  5 Feb 2014 17:00:29 +0100
-Message-Id: <1391616034-23312-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 5 Feb 2014 16:49:25 +0100 (CET)
+From: Jiri Kosina <jkosina@suse.cz>
+To: Marcel Holtmann <marcel@holtmann.org>,
+    "Gustavo F. Padovan" <gustavo@padovan.org>
+cc: David Herrmann <dh.herrmann@gmail.com>,
+    "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
+    "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: hidp: make sure input buffers are big
+ enough
+In-Reply-To: <20573666-E2A0-4D6B-986A-09DAFC0FB64B@holtmann.org>
+Message-ID: <alpine.LNX.2.00.1402051648470.8614@pobox.suse.cz>
+References: <1387451372-6881-1-git-send-email-dh.herrmann@gmail.com> <3109C2D8-E01C-4728-A593-1978BB3D202D@holtmann.org> <CANq1E4TOHvb3--H6SoRhB09sUwuYkrvSAXCNN2Y0PaVSOEte=w@mail.gmail.com> <alpine.LNX.2.00.1401071308020.4962@pobox.suse.cz>
+ <CANq1E4SxrDnbOCsohZXYoYL-HQjEc-xcOnXfAm=npHG2QfMS9A@mail.gmail.com> <alpine.LNX.2.00.1401071811530.4962@pobox.suse.cz> <alpine.LNX.2.00.1401282152140.22492@pobox.suse.cz> <CANq1E4TW+GU=oaW0tXb=Tun9HMtr26u-PC3H6BsLot560ANgog@mail.gmail.com>
+ <alpine.LNX.2.00.1402031107310.14066@pobox.suse.cz> <CANq1E4S++uqMzQue_0jC3N=Lm8Os5V-48Hw5M4vWvM+2Vx91yA@mail.gmail.com> <alpine.LNX.2.00.1402041446130.14066@pobox.suse.cz> <20573666-E2A0-4D6B-986A-09DAFC0FB64B@holtmann.org>
+MIME-Version: 1.0
+Content-Type: TEXT/PLAIN; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Tue, 4 Feb 2014, Marcel Holtmann wrote:
 
-This is based on patch from Ravi (sent 23.01.2013). Changes include
-patch split and some bugfixes.
+> >>>>> just got back to this, finally ... did you have time to work on this at
+> >>>>> all, or should I just start from scratch?
+> >>>> 
+> >>>> Sorry, no. Fosdem is this weekend and I needed to get my code ready
+> >>>> for that. But I'll finally have time again next week.
+> >>> 
+> >>> Okay, thanks. I then guess we should proceed with this bandaid (double
+> >>> allocation) for 3.14
+> >> 
+> >> It would be really nice if we could get the HIDP patch into 3.14-rc2
+> >> and backported to stable. There have been quite a bunch of reports now
+> >> and I dislike adding a GFP_ATOMIC allocation in HID core. 
+> > 
+> > I agree with David; Gustavo, what is your take on this, please?
+> 
+> I leave this up to Gustavo to get this into wireless tree for 3.14-rc2.
+> 
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-BR
-Szymon Janc
+Thanks a lot.
 
-Ravi kumar Veeramally (1):
-  android/pan: Fix bnep interface name
-
-Szymon Janc (4):
-  profiles/network: Use interface name passed to bnep_connadd
-  profiles/network: Allow to pass interface name to bnep_new
-  android/pan: Move functions up to avoid forward declarations
-  android/pan: Fix unregistering NAP bridge
-
- android/pan.c                 | 174 ++++++++++++++++++++++++------------------
- profiles/network/bnep.c       |  10 ++-
- profiles/network/bnep.h       |   3 +-
- profiles/network/connection.c |   6 +-
- profiles/network/server.c     |   4 +
- 5 files changed, 116 insertions(+), 81 deletions(-)
+Gustavo, what is your take on this please? I can take it through hid.git 
+in case you don't have anything else queued for -rc2.
 
 -- 
-1.8.3.2
-
+Jiri Kosina
+SUSE Labs
