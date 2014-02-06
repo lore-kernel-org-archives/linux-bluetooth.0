@@ -2,89 +2,117 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 6/8] android/pan: Use ioctl instead of sysfs for setting forward delay
-Date: Thu,  6 Feb 2014 16:28:40 +0100
-Message-Id: <1391700522-9036-7-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 4/8] android/pan: Fix unregistering NAP bridge
+Date: Thu,  6 Feb 2014 16:28:38 +0100
+Message-Id: <1391700522-9036-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
 References: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using sysfs is causing problems due to filesystem permissions
-(bluetoothd is running as bluetooth user) and bluetoothd already has
-required capabilities for setting forward delay through ioctl.
+This fix not removing NAP bridge in case of error or last device
+disconnect.
 ---
- android/pan.c | 31 +++++++++++++++----------------
- 1 file changed, 15 insertions(+), 16 deletions(-)
+ android/pan.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
 diff --git a/android/pan.c b/android/pan.c
-index 83def53..1cb82a1 100644
+index d010e09..0d6adaf 100644
 --- a/android/pan.c
 +++ b/android/pan.c
-@@ -33,6 +33,9 @@
- #include <sys/wait.h>
- #include <net/if.h>
- #include <linux/sockios.h>
-+#include <netinet/in.h>
-+#include <netinet/ip6.h>
-+#include <linux/if_bridge.h>
- 
- #include "btio/btio.h"
- #include "lib/bluetooth.h"
-@@ -54,7 +57,6 @@
- #define BNEP_BRIDGE "bt-pan"
- #define BNEP_PANU_INTERFACE "bt-pan"
- #define BNEP_NAP_INTERFACE "bt-pan%d"
--#define FORWARD_DELAY_PATH "/sys/class/net/"BNEP_BRIDGE"/bridge/forward_delay"
- 
- static bdaddr_t adapter_addr;
- GSList *devices = NULL;
-@@ -80,25 +82,22 @@ static struct {
- 	.bridge = false,
+@@ -72,11 +72,14 @@ struct pan_device {
+ static struct {
+ 	uint32_t	record_id;
+ 	GIOChannel	*io;
++	bool		bridge;
+ } nap_dev = {
+ 	.record_id = 0,
+ 	.io = NULL,
++	.bridge = false,
  };
  
--
--static int set_forward_delay(void)
-+static int set_forward_delay(int sk)
++
+ static int set_forward_delay(void)
  {
--	int fd, ret;
--
--	fd = open(FORWARD_DELAY_PATH, O_RDWR);
--	if (fd < 0) {
--		int err = -errno;
-+	unsigned long args[4] = { BRCTL_SET_BRIDGE_FORWARD_DELAY, 0 ,0, 0 };
-+	struct ifreq ifr;
+ 	int fd, ret;
+@@ -103,6 +106,9 @@ static int nap_create_bridge(void)
  
--		error("pan: open forward delay file failed: %d (%s)",
--							-err, strerror(-err));
-+	memset(&ifr, 0, sizeof(ifr));
-+	strncpy(ifr.ifr_name, BNEP_BRIDGE, IFNAMSIZ);
-+	ifr.ifr_data = (char *) args;
+ 	DBG("%s", BNEP_BRIDGE);
  
--		return err;
-+	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
-+		error("pan: setting forward delay failed: %d (%s)",
-+							errno, strerror(errno));
-+		return -1;
- 	}
++	if (nap_dev.bridge)
++		return 0;
++
+ 	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+ 	if (sk < 0)
+ 		return -EOPNOTSUPP;
+@@ -121,6 +127,8 @@ static int nap_create_bridge(void)
  
--	ret = write(fd, "0", sizeof("0"));
--	close(fd);
--
--	return ret;
-+	return 0;
+ 	close(sk);
+ 
++	nap_dev.bridge = err == 0;
++
+ 	return err;
  }
  
- static int nap_create_bridge(void)
-@@ -122,7 +121,7 @@ static int nap_create_bridge(void)
- 		}
+@@ -130,6 +138,9 @@ static int nap_remove_bridge(void)
+ 
+ 	DBG("%s", BNEP_BRIDGE);
+ 
++	if (!nap_dev.bridge)
++		return 0;
++
+ 	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
+ 	if (sk < 0)
+ 		return -EOPNOTSUPP;
+@@ -140,6 +151,8 @@ static int nap_remove_bridge(void)
+ 	if (err < 0)
+ 		return -EOPNOTSUPP;
+ 
++	nap_dev.bridge = false;
++
+ 	return 0;
+ }
+ 
+@@ -175,8 +188,10 @@ static void pan_device_remove(struct pan_device *dev)
+ {
+ 	devices = g_slist_remove(devices, dev);
+ 
+-	if (g_slist_length(devices) == 0)
++	if (g_slist_length(devices) == 0) {
+ 		local_role = HAL_PAN_ROLE_NONE;
++		nap_remove_bridge();
++	}
+ 
+ 	pan_device_free(dev);
+ }
+@@ -455,8 +470,12 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
+ 		goto failed;
  	}
  
--	err = set_forward_delay();
-+	err = set_forward_delay(sk);
- 	if (err < 0)
- 		ioctl(sk, SIOCBRDELBR, BNEP_BRIDGE);
++	if (nap_create_bridge() < 0)
++		goto failed;
++
+ 	if (bnep_server_add(sk, dst_role, BNEP_BRIDGE, dev->iface,
+ 							&dev->dst) < 0) {
++		nap_remove_bridge();
+ 		error("server_connadd failed");
+ 		rsp = BNEP_CONN_NOT_ALLOWED;
+ 		goto failed;
+@@ -557,14 +576,9 @@ static void destroy_nap_device(void)
+ static int register_nap_server(void)
+ {
+ 	GError *gerr = NULL;
+-	int err;
  
+ 	DBG("");
+ 
+-	err = nap_create_bridge();
+-	if (err < 0)
+-		return err;
+-
+ 	nap_dev.io = bt_io_listen(NULL, nap_confirm_cb, NULL, NULL, &gerr,
+ 					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 					BT_IO_OPT_PSM, BNEP_PSM,
 -- 
 1.8.3.2
 
