@@ -1,90 +1,169 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/pan: Use ioctl instead of sysfs for setting forward delay
-Date: Thu,  6 Feb 2014 11:55:15 +0100
-Message-Id: <1391684115-16870-1-git-send-email-szymon.janc@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3] android: Add support for Valgrind in debug variants
+Date: Thu, 6 Feb 2014 10:50:39 +0100
+Message-ID: <1391680239-5396-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Using sysfs is causing problems due to filesystem permissions
-(bluetoothd is running as bluetooth user) and bluetoothd already has
-required capabilities for setting forward delay through ioctl.
+This patch allows bluetoothd to be run with Valgrind easily in debug
+variants.
+
+For userdebug and eng variants bluetoothd is renamed to bluetoothd-main
+and bluetoothd acts a wrapper to launch it either with or without
+Valgrind (this is decided by value of persist.sys.bluetooth.valgrind
+property).
 ---
-This should be applied on top of "[PATCH v2 0/5] Android PAN fixes"
+ android/Android.mk           | 42 ++++++++++++++++++++++++
+ android/bluetoothd-wrapper.c | 76 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 118 insertions(+)
+ create mode 100644 android/bluetoothd-wrapper.c
 
- android/pan.c | 31 +++++++++++++++----------------
- 1 file changed, 15 insertions(+), 16 deletions(-)
-
-diff --git a/android/pan.c b/android/pan.c
-index eeeadeb..ae4079a 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -33,6 +33,9 @@
- #include <sys/wait.h>
- #include <net/if.h>
- #include <linux/sockios.h>
-+#include <netinet/in.h>
-+#include <netinet/ip6.h>
-+#include <linux/if_bridge.h>
+diff --git a/android/Android.mk b/android/Android.mk
+index 20105e6..52745fe 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -82,7 +82,15 @@ $(shell mkdir -p $(LOCAL_PATH)/bluez/lib/bluetooth)
+ $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/bluez/lib/bluetooth/$(file)))
  
- #include "btio/btio.h"
- #include "lib/bluetooth.h"
-@@ -54,7 +57,6 @@
- #define BNEP_BRIDGE "bt-pan"
- #define BNEP_PANU_INTERFACE "bt-pan"
- #define BNEP_NAP_INTERFACE "bt-pan%d"
--#define FORWARD_DELAY_PATH "/sys/class/net/"BNEP_BRIDGE"/bridge/forward_delay"
+ LOCAL_MODULE_TAGS := optional
++
++# for userdebug/eng this module is bluetoothd-main since bluetoothd is used as
++# wrapper to launch bluetooth with Valgrind
++ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
++LOCAL_MODULE := bluetoothd-main
++LOCAL_STRIP_MODULE := false
++else
+ LOCAL_MODULE := bluetoothd
++endif
  
- static bdaddr_t adapter_addr;
- GSList *devices = NULL;
-@@ -80,25 +82,22 @@ static struct {
- 	.bridge = false,
- };
+ include $(BUILD_EXECUTABLE)
  
--
--static int set_forward_delay(void)
-+static int set_forward_delay(int sk)
- {
--	int fd, ret;
--
--	fd = open(FORWARD_DELAY_PATH, O_RDWR);
--	if (fd < 0) {
--		int err = -errno;
-+	unsigned long args[4] = { BRCTL_SET_BRIDGE_FORWARD_DELAY, 0 ,0, 0 };
-+	struct ifreq ifr;
+@@ -406,3 +414,37 @@ LOCAL_CFLAGS:= \
+ LOCAL_MODULE := libsbc
  
--		error("pan: open forward delay file failed: %d (%s)",
--							-err, strerror(-err));
-+	memset(&ifr, 0, sizeof(ifr));
-+	strncpy(ifr.ifr_name, BNEP_BRIDGE, IFNAMSIZ);
-+	ifr.ifr_data = (char *) args;
- 
--		return err;
-+	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
-+		error("pan: setting forward delay failed: %d (%s)",
-+						-errno, strerror(-errno));
-+		return -1;
- 	}
- 
--	ret = write(fd, "0", sizeof("0"));
--	close(fd);
--
--	return ret;
+ include $(BUILD_SHARED_LIBRARY)
++
++ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
++
++#
++# bluetoothd (debug)
++# this is just a wrapper used in userdebug/eng to launch bluetoothd-main
++# with/without Valgrind
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := \
++	bluez/android/bluetoothd-wrapper.c
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_SHARED_LIBRARIES := \
++	libcutils \
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE := bluetoothd
++
++LOCAL_REQUIRED_MODULES := \
++	bluetoothd-main \
++	valgrind \
++	memcheck-$(TARGET_ARCH)-linux \
++	vgpreload_core-$(TARGET_ARCH)-linux \
++	vgpreload_memcheck-$(TARGET_ARCH)-linux \
++	default.supp
++
++include $(BUILD_EXECUTABLE)
++
++endif
+\ No newline at end of file
+diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
+new file mode 100644
+index 0000000..e90277f
+--- /dev/null
++++ b/android/bluetoothd-wrapper.c
+@@ -0,0 +1,76 @@
++/*
++ * Copyright (C) 2014 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <unistd.h>
++
++#include <cutils/properties.h>
++
++#define PROPERTY_NAME "persist.sys.bluetooth.valgrind"
++
++#define VALGRIND_BIN "/system/bin/valgrind"
++
++#define BLUETOOTHD_BIN "/system/bin/bluetoothd-main"
++
++void run_valgrind(void)
++{
++	char *prg_argv[4];
++	char *prg_envp[3];
++
++	prg_argv[0] = VALGRIND_BIN;
++	prg_argv[1] = "--leak-check=full";
++	prg_argv[2] = BLUETOOTHD_BIN;
++	prg_argv[3] = NULL;
++
++	prg_envp[0] = "G_SLICE=always-malloc";
++	prg_envp[1] = "G_DEBUG=gc-friendly";
++	prg_envp[2] = NULL;
++
++	execve(prg_argv[0], prg_argv, prg_envp);
++}
++
++void run_bluetoothd(void)
++{
++	char *prg_argv[2];
++	char *prg_envp[1];
++
++	prg_argv[0] = BLUETOOTHD_BIN;
++	prg_argv[1] = NULL;
++
++	prg_envp[0] = NULL;
++
++	execve(prg_argv[0], prg_argv, prg_envp);
++}
++
++int main(int argc, char *argv[])
++{
++	char value[PROPERTY_VALUE_MAX];
++
++	if (property_get(PROPERTY_NAME, value, "") > 0 &&
++			(!strcasecmp(value, "true") || atoi(value) > 0))
++		run_valgrind();
++
++	/* In case we failed to execute Valgrind, try to run bluetoothd
++	 * without it
++	 */
++
++	run_bluetoothd();
++
 +	return 0;
- }
- 
- static int nap_create_bridge(void)
-@@ -122,7 +121,7 @@ static int nap_create_bridge(void)
- 		}
- 	}
- 
--	err = set_forward_delay();
-+	err = set_forward_delay(sk);
- 	if (err < 0)
- 		ioctl(sk, SIOCBRDELBR, BNEP_BRIDGE);
- 
++}
 -- 
-1.8.3.2
+1.8.5.3
 
