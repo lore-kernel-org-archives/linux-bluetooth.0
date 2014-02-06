@@ -1,62 +1,263 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Feb 2014 16:13:07 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/haltest: Close file in case of error
-Message-ID: <20140206141259.GA11005@aemeltch-MOBL1>
-References: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1391610272-12991-1-git-send-email-luiz.dentz@gmail.com>
+References: <1391610272-12991-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 6 Feb 2014 16:08:22 +0200
+Message-ID: <CABBYNZ+ztOL8aBv6C=5HpaaAjtazuOEdFx-HnBMtBE4nimdG1w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/2] audio/AVCTP: Add keys that can be mapped to uinput
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Feb 05, 2014 at 05:44:02PM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+Hi,
+
+On Wed, Feb 5, 2014 at 4:24 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This adds the remaining AV/C keys that can be mapped to uinput.
 > ---
->  android/client/if-audio.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/client/if-audio.c b/android/client/if-audio.c
-> index 66f8364..bb8f51b 100644
-> --- a/android/client/if-audio.c
-> +++ b/android/client/if-audio.c
-> @@ -258,6 +258,7 @@ static void play_p(int argc, const char **argv)
->  
->  	if (buffer_size == 0) {
->  		haltest_error("Invalid buffer size. Was stream_out opened?\n");
-> +		fclose(in);
-
-sorry, need to check for NULL here and below.
-
-Best regards 
-Andrei Emeltchenko 
-
->  		return;
->  	}
->  
-> @@ -265,12 +266,15 @@ static void play_p(int argc, const char **argv)
->  	if (current_state != STATE_STOPPED) {
->  		haltest_error("Already playing or stream suspended!\n");
->  		pthread_mutex_unlock(&state_mutex);
-> +		fclose(in);
->  		return;
->  	}
->  	pthread_mutex_unlock(&state_mutex);
->  
-> -	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0)
-> +	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
->  		haltest_error("Cannot create playback thread!\n");
-> +		fclose(in);
-> +	}
->  }
->  
->  static void stop_p(int argc, const char **argv)
-> -- 
-> 1.8.3.2
-> 
+>  android/avctp.c        | 28 ++++++++++++++++++++++++++++
+>  android/avctp.h        | 29 +++++++++++++++++++++++++++++
+>  profiles/audio/avctp.c | 28 ++++++++++++++++++++++++++++
+>  profiles/audio/avctp.h | 29 +++++++++++++++++++++++++++++
+>  4 files changed, 114 insertions(+)
+>
+> diff --git a/android/avctp.c b/android/avctp.c
+> index 8f35403..f7544a2 100644
+> --- a/android/avctp.c
+> +++ b/android/avctp.c
+> @@ -215,25 +215,53 @@ static struct {
+>         { "ROOT MENU",          AVC_ROOT_MENU,          KEY_MENU },
+>         { "CONTENTS MENU",      AVC_CONTENTS_MENU,      KEY_PROGRAM },
+>         { "FAVORITE MENU",      AVC_FAVORITE_MENU,      KEY_FAVORITES },
+> +       { "EXIT",               AVC_EXIT,               KEY_EXIT },
+> +       { "ON DEMAND MENU",     AVC_ON_DEMAND_MENU,     KEY_MENU },
+> +       { "APPS MENU",          AVC_APPS_MENU,          KEY_MENU },
+> +       { "0",                  AVC_0,                  KEY_0 },
+> +       { "1",                  AVC_1,                  KEY_1 },
+> +       { "2",                  AVC_2,                  KEY_2 },
+> +       { "3",                  AVC_3,                  KEY_3 },
+> +       { "4",                  AVC_4,                  KEY_4 },
+> +       { "5",                  AVC_5,                  KEY_5 },
+> +       { "6",                  AVC_6,                  KEY_6 },
+> +       { "7",                  AVC_7,                  KEY_7 },
+> +       { "8",                  AVC_8,                  KEY_8 },
+> +       { "9",                  AVC_9,                  KEY_9 },
+> +       { "DOT",                AVC_DOT,                KEY_DOT },
+>         { "ENTER",              AVC_ENTER,              KEY_ENTER },
+>         { "CHANNEL UP",         AVC_CHANNEL_UP,         KEY_CHANNELUP },
+>         { "CHANNEL DOWN",       AVC_CHANNEL_DOWN,       KEY_CHANNELDOWN },
+> +       { "CHANNEL PREVIOUS",   AVC_CHANNEL_PREVIOUS,   KEY_LAST },
+>         { "INPUT SELECT",       AVC_INPUT_SELECT,       KEY_CONFIG },
+> +       { "INFO",               AVC_INFO,               KEY_INFO },
+>         { "HELP",               AVC_HELP,               KEY_HELP },
+>         { "POWER",              AVC_POWER,              KEY_POWER2 },
+>         { "VOLUME UP",          AVC_VOLUME_UP,          KEY_VOLUMEUP },
+>         { "VOLUME DOWN",        AVC_VOLUME_DOWN,        KEY_VOLUMEDOWN },
+> +       { "MUTE",               AVC_MUTE,               KEY_MUTE },
+>         { "PLAY",               AVC_PLAY,               KEY_PLAYCD },
+>         { "STOP",               AVC_STOP,               KEY_STOPCD },
+>         { "PAUSE",              AVC_PAUSE,              KEY_PAUSECD },
+>         { "FORWARD",            AVC_FORWARD,            KEY_NEXTSONG },
+>         { "BACKWARD",           AVC_BACKWARD,           KEY_PREVIOUSSONG },
+> +       { "RECORD",             AVC_RECORD,             KEY_RECORD },
+>         { "REWIND",             AVC_REWIND,             KEY_REWIND },
+>         { "FAST FORWARD",       AVC_FAST_FORWARD,       KEY_FASTFORWARD },
+> +       { "LIST",               AVC_LIST,               KEY_LIST },
+>         { "F1",                 AVC_F1,                 KEY_F1 },
+>         { "F2",                 AVC_F2,                 KEY_F2 },
+>         { "F3",                 AVC_F3,                 KEY_F3 },
+>         { "F4",                 AVC_F4,                 KEY_F4 },
+> +       { "F5",                 AVC_F5,                 KEY_F5 },
+> +       { "F6",                 AVC_F6,                 KEY_F6 },
+> +       { "F7",                 AVC_F7,                 KEY_F7 },
+> +       { "F8",                 AVC_F8,                 KEY_F8 },
+> +       { "F9",                 AVC_F9,                 KEY_F9 },
+> +       { "RED",                AVC_RED,                KEY_RED },
+> +       { "GREEN",              AVC_GREEN,              KEY_GREEN },
+> +       { "BLUE",               AVC_BLUE,               KEY_BLUE },
+> +       { "YELLOW",             AVC_YELLOW,             KEY_YELLOW },
+>         { NULL }
+>  };
+>
+> diff --git a/android/avctp.h b/android/avctp.h
+> index e7e0277..dfa0ca6 100644
+> --- a/android/avctp.h
+> +++ b/android/avctp.h
+> @@ -56,11 +56,30 @@
+>  #define AVC_ROOT_MENU                  0x09
+>  #define AVC_CONTENTS_MENU              0x0b
+>  #define AVC_FAVORITE_MENU              0x0c
+> +#define AVC_EXIT                       0x0d
+> +#define AVC_ON_DEMAND_MENU             0x0e
+> +#define AVC_APPS_MENU                  0x0f
+> +#define AVC_0                          0x20
+> +#define AVC_1                          0x21
+> +#define AVC_2                          0x22
+> +#define AVC_3                          0x23
+> +#define AVC_4                          0x24
+> +#define AVC_5                          0x25
+> +#define AVC_6                          0x26
+> +#define AVC_7                          0x27
+> +#define AVC_8                          0x28
+> +#define AVC_9                          0x29
+> +#define AVC_DOT                                0x2a
+>  #define AVC_ENTER                      0x2b
+>  #define AVC_CHANNEL_UP                 0x30
+>  #define AVC_CHANNEL_DOWN               0x31
+> +#define AVC_CHANNEL_PREVIOUS           0x32
+>  #define AVC_INPUT_SELECT               0x34
+> +#define AVC_INFO                       0x35
+>  #define AVC_HELP                       0x36
+> +#define AVC_PAGE_UP                    0x37
+> +#define AVC_PAGE_DOWN                  0x38
+> +#define AVC_LOCK                       0x3a
+>  #define AVC_POWER                      0x40
+>  #define AVC_VOLUME_UP                  0x41
+>  #define AVC_VOLUME_DOWN                        0x42
+> @@ -74,10 +93,20 @@
+>  #define AVC_EJECT                      0x4a
+>  #define AVC_FORWARD                    0x4b
+>  #define AVC_BACKWARD                   0x4c
+> +#define AVC_LIST                       0x4d
+>  #define AVC_F1                         0x71
+>  #define AVC_F2                         0x72
+>  #define AVC_F3                         0x73
+>  #define AVC_F4                         0x74
+> +#define AVC_F5                         0x75
+> +#define AVC_F6                         0x76
+> +#define AVC_F7                         0x77
+> +#define AVC_F8                         0x78
+> +#define AVC_F9                         0x79
+> +#define AVC_RED                                0x7a
+> +#define AVC_GREEN                      0x7b
+> +#define AVC_BLUE                       0x7c
+> +#define AVC_YELLOW                     0x7c
+>
+>  struct avctp;
+>
+> diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+> index 9f87859..ae142bd 100644
+> --- a/profiles/audio/avctp.c
+> +++ b/profiles/audio/avctp.c
+> @@ -238,25 +238,53 @@ static struct {
+>         { "ROOT MENU",          AVC_ROOT_MENU,          KEY_MENU },
+>         { "CONTENTS MENU",      AVC_CONTENTS_MENU,      KEY_PROGRAM },
+>         { "FAVORITE MENU",      AVC_FAVORITE_MENU,      KEY_FAVORITES },
+> +       { "EXIT",               AVC_EXIT,               KEY_EXIT },
+> +       { "ON DEMAND MENU",     AVC_ON_DEMAND_MENU,     KEY_MENU },
+> +       { "APPS MENU",          AVC_APPS_MENU,          KEY_MENU },
+> +       { "0",                  AVC_0,                  KEY_0 },
+> +       { "1",                  AVC_1,                  KEY_1 },
+> +       { "2",                  AVC_2,                  KEY_2 },
+> +       { "3",                  AVC_3,                  KEY_3 },
+> +       { "4",                  AVC_4,                  KEY_4 },
+> +       { "5",                  AVC_5,                  KEY_5 },
+> +       { "6",                  AVC_6,                  KEY_6 },
+> +       { "7",                  AVC_7,                  KEY_7 },
+> +       { "8",                  AVC_8,                  KEY_8 },
+> +       { "9",                  AVC_9,                  KEY_9 },
+> +       { "DOT",                AVC_DOT,                KEY_DOT },
+>         { "ENTER",              AVC_ENTER,              KEY_ENTER },
+>         { "CHANNEL UP",         AVC_CHANNEL_UP,         KEY_CHANNELUP },
+>         { "CHANNEL DOWN",       AVC_CHANNEL_DOWN,       KEY_CHANNELDOWN },
+> +       { "CHANNEL PREVIOUS",   AVC_CHANNEL_PREVIOUS,   KEY_LAST },
+>         { "INPUT SELECT",       AVC_INPUT_SELECT,       KEY_CONFIG },
+> +       { "INFO",               AVC_INFO,               KEY_INFO },
+>         { "HELP",               AVC_HELP,               KEY_HELP },
+>         { "POWER",              AVC_POWER,              KEY_POWER2 },
+>         { "VOLUME UP",          AVC_VOLUME_UP,          KEY_VOLUMEUP },
+>         { "VOLUME DOWN",        AVC_VOLUME_DOWN,        KEY_VOLUMEDOWN },
+> +       { "MUTE",               AVC_MUTE,               KEY_MUTE },
+>         { "PLAY",               AVC_PLAY,               KEY_PLAYCD },
+>         { "STOP",               AVC_STOP,               KEY_STOPCD },
+>         { "PAUSE",              AVC_PAUSE,              KEY_PAUSECD },
+>         { "FORWARD",            AVC_FORWARD,            KEY_NEXTSONG },
+>         { "BACKWARD",           AVC_BACKWARD,           KEY_PREVIOUSSONG },
+> +       { "RECORD",             AVC_RECORD,             KEY_RECORD },
+>         { "REWIND",             AVC_REWIND,             KEY_REWIND },
+>         { "FAST FORWARD",       AVC_FAST_FORWARD,       KEY_FASTFORWARD },
+> +       { "LIST",               AVC_LIST,               KEY_LIST },
+>         { "F1",                 AVC_F1,                 KEY_F1 },
+>         { "F2",                 AVC_F2,                 KEY_F2 },
+>         { "F3",                 AVC_F3,                 KEY_F3 },
+>         { "F4",                 AVC_F4,                 KEY_F4 },
+> +       { "F5",                 AVC_F5,                 KEY_F5 },
+> +       { "F6",                 AVC_F6,                 KEY_F6 },
+> +       { "F7",                 AVC_F7,                 KEY_F7 },
+> +       { "F8",                 AVC_F8,                 KEY_F8 },
+> +       { "F9",                 AVC_F9,                 KEY_F9 },
+> +       { "RED",                AVC_RED,                KEY_RED },
+> +       { "GREEN",              AVC_GREEN,              KEY_GREEN },
+> +       { "BLUE",               AVC_BLUE,               KEY_BLUE },
+> +       { "YELLOW",             AVC_YELLOW,             KEY_YELLOW },
+>         { NULL }
+>  };
+>
+> diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
+> index f9c665e..05fceb4 100644
+> --- a/profiles/audio/avctp.h
+> +++ b/profiles/audio/avctp.h
+> @@ -57,11 +57,30 @@
+>  #define AVC_ROOT_MENU                  0x09
+>  #define AVC_CONTENTS_MENU              0x0b
+>  #define AVC_FAVORITE_MENU              0x0c
+> +#define AVC_EXIT                       0x0d
+> +#define AVC_ON_DEMAND_MENU             0x0e
+> +#define AVC_APPS_MENU                  0x0f
+> +#define AVC_0                          0x20
+> +#define AVC_1                          0x21
+> +#define AVC_2                          0x22
+> +#define AVC_3                          0x23
+> +#define AVC_4                          0x24
+> +#define AVC_5                          0x25
+> +#define AVC_6                          0x26
+> +#define AVC_7                          0x27
+> +#define AVC_8                          0x28
+> +#define AVC_9                          0x29
+> +#define AVC_DOT                                0x2a
+>  #define AVC_ENTER                      0x2b
+>  #define AVC_CHANNEL_UP                 0x30
+>  #define AVC_CHANNEL_DOWN               0x31
+> +#define AVC_CHANNEL_PREVIOUS           0x32
+>  #define AVC_INPUT_SELECT               0x34
+> +#define AVC_INFO                       0x35
+>  #define AVC_HELP                       0x36
+> +#define AVC_PAGE_UP                    0x37
+> +#define AVC_PAGE_DOWN                  0x38
+> +#define AVC_LOCK                       0x3a
+>  #define AVC_POWER                      0x40
+>  #define AVC_VOLUME_UP                  0x41
+>  #define AVC_VOLUME_DOWN                        0x42
+> @@ -75,10 +94,20 @@
+>  #define AVC_EJECT                      0x4a
+>  #define AVC_FORWARD                    0x4b
+>  #define AVC_BACKWARD                   0x4c
+> +#define AVC_LIST                       0x4d
+>  #define AVC_F1                         0x71
+>  #define AVC_F2                         0x72
+>  #define AVC_F3                         0x73
+>  #define AVC_F4                         0x74
+> +#define AVC_F5                         0x75
+> +#define AVC_F6                         0x76
+> +#define AVC_F7                         0x77
+> +#define AVC_F8                         0x78
+> +#define AVC_F9                         0x79
+> +#define AVC_RED                                0x7a
+> +#define AVC_GREEN                      0x7b
+> +#define AVC_BLUE                       0x7c
+> +#define AVC_YELLOW                     0x7c
+>
+>  struct avctp;
+>
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.8.5.3
+
+Pushed.
+
+
+-- 
+Luiz Augusto von Dentz
