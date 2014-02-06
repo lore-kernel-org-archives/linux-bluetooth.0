@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH V2] android/pan: Use ioctl instead of sysfs for setting forward delay
-Date: Thu,  6 Feb 2014 12:24:13 +0100
-Message-Id: <1391685853-19102-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] android/pan: Use ioctl instead of sysfs for setting forward delay
+Date: Thu,  6 Feb 2014 11:55:15 +0100
+Message-Id: <1391684115-16870-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,13 +14,11 @@ required capabilities for setting forward delay through ioctl.
 ---
 This should be applied on top of "[PATCH v2 0/5] Android PAN fixes"
 
-V2: fixed passing negative value to strerror()
-
  android/pan.c | 31 +++++++++++++++----------------
  1 file changed, 15 insertions(+), 16 deletions(-)
 
 diff --git a/android/pan.c b/android/pan.c
-index eeeadeb..faab0b0 100644
+index eeeadeb..ae4079a 100644
 --- a/android/pan.c
 +++ b/android/pan.c
 @@ -33,6 +33,9 @@
@@ -66,7 +64,7 @@ index eeeadeb..faab0b0 100644
 -		return err;
 +	if (ioctl(sk, SIOCDEVPRIVATE, &ifr) < 0) {
 +		error("pan: setting forward delay failed: %d (%s)",
-+							errno, strerror(errno));
++						-errno, strerror(-errno));
 +		return -1;
  	}
  
