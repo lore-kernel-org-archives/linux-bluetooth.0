@@ -1,90 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Feb 2014 14:02:09 -0200
-From: Vinicius Costa Gomes <vcgomes@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v8 06/10] Bluetooth: Introduce LE auto connection
- infrastructure
-Message-ID: <20140206160209.GA26623@molly>
-References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
- <1391639006-26311-6-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391639006-26311-6-git-send-email-andre.guedes@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH v3 5/8] android/pan: Fix bnep interface name
+Date: Thu,  6 Feb 2014 16:28:39 +0100
+Message-Id: <1391700522-9036-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
+References: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 
-On 19:23 Wed 05 Feb, Andre Guedes wrote:
-> This patch introduces the LE auto connection infrastructure which
-> will be used to implement the LE auto connection options.
->
-> In summary, the auto connection mechanism works as follows: Once the
-> first pending LE connection is created, the background scanning is
-> started. When the target device is found in range, the kernel
-> autonomously starts the connection attempt. If connection is
-> established successfully, that pending LE connection is deleted and
-> the background is stopped.
->
-> To achieve that, this patch introduces the hci_update_background_scan()
-> which controls the background scanning state. This function starts or
-> stops the background scanning based on the hdev->pend_le_conns list. If
-> there is no pending LE connection, the background scanning is stopped.
-> Otherwise, we start the background scanning.
->
-> Then, every time a pending LE connection is added we call hci_update_
-> background_scan() so the background scanning is started (in case it is
-> not already running). Likewise, every time a pending LE connection is
-> deleted we call hci_update_background_scan() so the background scanning
-> is stopped (in case this was the last pending LE connection) or it is
-> started again (in case we have more pending LE connections). Finally,
-> we also call hci_update_background_scan() in hci_le_conn_failed() so
-> the background scan is restarted in case the connection establishment
-> fails. This way the background scanning keeps running until all pending
-> LE connection are established.
->
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
+Android uses bt-pan static interface in PAN profile. In server role
+it uses it as bridge name. But current implementaion passes interface
+names like bnep0, bnep1... Android Framework is unaware of this name
+and unable to allocate IP address after profile connection setup.
+---
+ android/pan.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-[snip]
+diff --git a/android/pan.c b/android/pan.c
+index 0d6adaf..83def53 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -51,8 +51,9 @@
+ 
+ #define SVC_HINT_NETWORKING 0x02
+ 
+-#define BNEP_BRIDGE "bnep"
++#define BNEP_BRIDGE "bt-pan"
+ #define BNEP_PANU_INTERFACE "bt-pan"
++#define BNEP_NAP_INTERFACE "bt-pan%d"
+ #define FORWARD_DELAY_PATH "/sys/class/net/"BNEP_BRIDGE"/bridge/forward_delay"
+ 
+ static bdaddr_t adapter_addr;
+@@ -229,8 +230,13 @@ static void bt_pan_notify_ctrl_state(struct pan_device *dev, uint8_t state)
+ 	ev.state = state;
+ 	ev.local_role = local_role;
+ 	ev.status = HAL_STATUS_SUCCESS;
++
+ 	memset(ev.name, 0, sizeof(ev.name));
+-	memcpy(ev.name, dev->iface, sizeof(dev->iface));
++
++	if (local_role == HAL_PAN_ROLE_NAP)
++		memcpy(ev.name, BNEP_BRIDGE, sizeof(BNEP_BRIDGE));
++	else
++		memcpy(ev.name, dev->iface, sizeof(dev->iface));
+ 
+ 	ipc_send_notif(HAL_SERVICE_ID_PAN, HAL_EV_PAN_CTRL_STATE, sizeof(ev),
+ 									&ev);
+@@ -542,6 +548,9 @@ static void nap_confirm_cb(GIOChannel *chan, gpointer data)
+ 	local_role = HAL_PAN_ROLE_NAP;
+ 	dev->role = HAL_PAN_ROLE_PANU;
+ 
++	strncpy(dev->iface, BNEP_NAP_INTERFACE, 16);
++	dev->iface[15] = '\0';
++
+ 	dev->io = g_io_channel_ref(chan);
+ 	g_io_channel_set_close_on_unref(dev->io, TRUE);
+ 
+-- 
+1.8.3.2
 
->  static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  {
->  	u8 num_reports = skb->data[0];
->  	void *ptr = &skb->data[1];
->  	s8 rssi;
->
-> +	hci_dev_lock(hdev);
-> +
->  	while (num_reports--) {
->  		struct hci_ev_le_advertising_info *ev = ptr;
->
-> +		check_pending_le_conn(hdev, &ev->bdaddr, ev->bdaddr_type);
-> +
-
-Shouldn't the event type be checked to see if it is a connectable event?
-
->  		rssi = ev->data[ev->length];
->  		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
->  				  NULL, rssi, 0, 1, ev->data, ev->length);
->
->  		ptr += sizeof(*ev) + ev->length + 1;
->  	}
-> +
-> +	hci_dev_unlock(hdev);
->  }
->
->  static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> --
-> 1.8.5.3
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-Cheers,
---
-Vinicius
