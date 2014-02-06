@@ -1,53 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/client-av: Close audio output stream on a2dp disconnection
-Date: Thu, 06 Feb 2014 15:12:49 +0100
-Message-ID: <1919933.3vRk5J1SY2@uw000953>
-In-Reply-To: <1391677561-5522-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1391677561-5522-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Thu, 6 Feb 2014 16:13:07 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/haltest: Close file in case of error
+Message-ID: <20140206141259.GA11005@aemeltch-MOBL1>
+References: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
-
-On Thursday 06 of February 2014 10:06:01 Jakub Tyszkowski wrote:
-> This patch makes haltest's audio part aware of a2dp disconnection and
-> closes audio output stream. This fixes the issue with CPU cycles being
-> eaten up by playback thread still trying to send audio data after
-> disconnection.
-> ---
->  android/client/if-av.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+On Wed, Feb 05, 2014 at 05:44:02PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> diff --git a/android/client/if-av.c b/android/client/if-av.c
-> index 8d1f69b..ef1d997 100644
-> --- a/android/client/if-av.c
-> +++ b/android/client/if-av.c
-> @@ -41,6 +41,13 @@ static void connection_state(btav_connection_state_t state,
->  	haltest_info("%s: connection_state=%s remote_bd_addr=%s\n", __func__,
->  					btav_connection_state_t2str(state),
->  					bt_bdaddr_t2str(bd_addr, last_addr));
-> +
-> +	if (state == BTAV_CONNECTION_STATE_DISCONNECTED) {
-> +		const struct method *m = get_interface_method("audio",
-> +							"close_output_stream");
-> +		if (m)
-> +			m->func(0, NULL);
+> ---
+>  android/client/if-audio.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+> index 66f8364..bb8f51b 100644
+> --- a/android/client/if-audio.c
+> +++ b/android/client/if-audio.c
+> @@ -258,6 +258,7 @@ static void play_p(int argc, const char **argv)
+>  
+>  	if (buffer_size == 0) {
+>  		haltest_error("Invalid buffer size. Was stream_out opened?\n");
+> +		fclose(in);
+
+sorry, need to check for NULL here and below.
+
+Best regards 
+Andrei Emeltchenko 
+
+>  		return;
+>  	}
+>  
+> @@ -265,12 +266,15 @@ static void play_p(int argc, const char **argv)
+>  	if (current_state != STATE_STOPPED) {
+>  		haltest_error("Already playing or stream suspended!\n");
+>  		pthread_mutex_unlock(&state_mutex);
+> +		fclose(in);
+>  		return;
+>  	}
+>  	pthread_mutex_unlock(&state_mutex);
+>  
+> -	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0)
+> +	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
+>  		haltest_error("Cannot create playback thread!\n");
+> +		fclose(in);
 > +	}
 >  }
-
-I think haltest should not be that smart and interaction of audio and av should
-be handled by user (it is 'emulating' mediaserver, right?). I pushed fix for CPU
-eating myself.
-
 >  
->  static void audio_state(btav_audio_state_t state, bt_bdaddr_t *bd_addr)
+>  static void stop_p(int argc, const char **argv)
+> -- 
+> 1.8.3.2
 > 
-
--- 
-Best regards, 
-Szymon Janc
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
