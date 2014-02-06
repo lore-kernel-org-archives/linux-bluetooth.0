@@ -2,117 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 4/8] android/pan: Fix unregistering NAP bridge
-Date: Thu,  6 Feb 2014 16:28:38 +0100
-Message-Id: <1391700522-9036-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 1/8] profiles/network: Use interface name passed to bnep_connadd
+Date: Thu,  6 Feb 2014 16:28:35 +0100
+Message-Id: <1391700522-9036-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
 References: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix not removing NAP bridge in case of error or last device
-disconnect.
 ---
- android/pan.c | 26 ++++++++++++++++++++------
- 1 file changed, 20 insertions(+), 6 deletions(-)
+ profiles/network/bnep.c   | 5 +++--
+ profiles/network/server.c | 4 ++++
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/android/pan.c b/android/pan.c
-index d010e09..0d6adaf 100644
---- a/android/pan.c
-+++ b/android/pan.c
-@@ -72,11 +72,14 @@ struct pan_device {
- static struct {
- 	uint32_t	record_id;
- 	GIOChannel	*io;
-+	bool		bridge;
- } nap_dev = {
- 	.record_id = 0,
- 	.io = NULL,
-+	.bridge = false,
- };
- 
-+
- static int set_forward_delay(void)
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index 0d57056..82d0d99 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -174,9 +174,10 @@ static int bnep_connadd(int sk, uint16_t role, char *dev)
  {
- 	int fd, ret;
-@@ -103,6 +106,9 @@ static int nap_create_bridge(void)
+ 	struct bnep_connadd_req req;
  
- 	DBG("%s", BNEP_BRIDGE);
- 
-+	if (nap_dev.bridge)
-+		return 0;
+-	memset(dev, 0, 16);
+ 	memset(&req, 0, sizeof(req));
+-	strcpy(req.device, "bnep%d");
++	strncpy(req.device, dev, 16);
++	req.device[15] = '\0';
 +
- 	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
- 	if (sk < 0)
- 		return -EOPNOTSUPP;
-@@ -121,6 +127,8 @@ static int nap_create_bridge(void)
+ 	req.sock = sk;
+ 	req.role = role;
+ 	if (ioctl(ctl, BNEPCONNADD, &req) < 0) {
+diff --git a/profiles/network/server.c b/profiles/network/server.c
+index f14d688..3fb031f 100644
+--- a/profiles/network/server.c
++++ b/profiles/network/server.c
+@@ -51,6 +51,7 @@
+ #include "server.h"
  
- 	close(sk);
+ #define NETWORK_SERVER_INTERFACE "org.bluez.NetworkServer1"
++#define BNEP_INTERFACE "bnep%d"
+ #define SETUP_TIMEOUT		1
  
-+	nap_dev.bridge = err == 0;
-+
- 	return err;
- }
- 
-@@ -130,6 +138,9 @@ static int nap_remove_bridge(void)
- 
- 	DBG("%s", BNEP_BRIDGE);
- 
-+	if (!nap_dev.bridge)
-+		return 0;
-+
- 	sk = socket(AF_INET, SOCK_STREAM | SOCK_CLOEXEC, 0);
- 	if (sk < 0)
- 		return -EOPNOTSUPP;
-@@ -140,6 +151,8 @@ static int nap_remove_bridge(void)
- 	if (err < 0)
- 		return -EOPNOTSUPP;
- 
-+	nap_dev.bridge = false;
-+
- 	return 0;
- }
- 
-@@ -175,8 +188,10 @@ static void pan_device_remove(struct pan_device *dev)
- {
- 	devices = g_slist_remove(devices, dev);
- 
--	if (g_slist_length(devices) == 0)
-+	if (g_slist_length(devices) == 0) {
- 		local_role = HAL_PAN_ROLE_NONE;
-+		nap_remove_bridge();
-+	}
- 
- 	pan_device_free(dev);
- }
-@@ -455,8 +470,12 @@ static gboolean nap_setup_cb(GIOChannel *chan, GIOCondition cond,
- 		goto failed;
+ /* Pending Authorization */
+@@ -347,6 +348,9 @@ static gboolean bnep_setup(GIOChannel *chan,
+ 		goto reply;
  	}
  
-+	if (nap_create_bridge() < 0)
-+		goto failed;
++	strncpy(na->setup->dev, BNEP_INTERFACE, 16);
++	na->setup->dev[15] = '\0';
 +
- 	if (bnep_server_add(sk, dst_role, BNEP_BRIDGE, dev->iface,
- 							&dev->dst) < 0) {
-+		nap_remove_bridge();
- 		error("server_connadd failed");
- 		rsp = BNEP_CONN_NOT_ALLOWED;
- 		goto failed;
-@@ -557,14 +576,9 @@ static void destroy_nap_device(void)
- static int register_nap_server(void)
- {
- 	GError *gerr = NULL;
--	int err;
- 
- 	DBG("");
- 
--	err = nap_create_bridge();
--	if (err < 0)
--		return err;
--
- 	nap_dev.io = bt_io_listen(NULL, nap_confirm_cb, NULL, NULL, &gerr,
- 					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
- 					BT_IO_OPT_PSM, BNEP_PSM,
+ 	if (bnep_server_add(sk, dst_role, ns->bridge, na->setup->dev,
+ 							&na->setup->dst) < 0)
+ 		goto reply;
 -- 
 1.8.3.2
 
