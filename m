@@ -1,41 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 0/8] Android PAN fixes
-Date: Thu,  6 Feb 2014 16:28:34 +0100
-Message-Id: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCHv2 1/2] android/haltest: Close file in case of error
+Date: Thu,  6 Feb 2014 16:22:42 +0200
+Message-Id: <1391696563-7478-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-V3:
- - fixed not bringing bridge if down
- - add forward_delay with ioctl patch
- - other minor bugfixes
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-V2:
-This is based on patch from Ravi (sent 23.01.2013). Changes include
-patch split and some bugfixes.
+---
+ android/client/if-audio.c | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-Ravi kumar Veeramally (1):
-  android/pan: Fix bnep interface name
-
-Szymon Janc (7):
-  profiles/network: Use interface name passed to bnep_connadd
-  profiles/network: Allow to pass interface name to bnep_new
-  android/pan: Move functions up to avoid forward declarations
-  android/pan: Fix unregistering NAP bridge
-  android/pan: Use ioctl instead of sysfs for setting forward delay
-  android/pan: Pass error in nap_remove_bridge
-  android/pan: Bring bridge interface down before removing it
-
- android/pan.c                 | 205 ++++++++++++++++++++++++++----------------
- profiles/network/bnep.c       |  10 ++-
- profiles/network/bnep.h       |   3 +-
- profiles/network/connection.c |   6 +-
- profiles/network/server.c     |   4 +
- 5 files changed, 146 insertions(+), 82 deletions(-)
-
+diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+index 66f8364..3b34c95 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-audio.c
+@@ -258,19 +258,26 @@ static void play_p(int argc, const char **argv)
+ 
+ 	if (buffer_size == 0) {
+ 		haltest_error("Invalid buffer size. Was stream_out opened?\n");
+-		return;
++		goto fail;
+ 	}
+ 
+ 	pthread_mutex_lock(&state_mutex);
+ 	if (current_state != STATE_STOPPED) {
+ 		haltest_error("Already playing or stream suspended!\n");
+ 		pthread_mutex_unlock(&state_mutex);
+-		return;
++		goto fail;
+ 	}
+ 	pthread_mutex_unlock(&state_mutex);
+ 
+-	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0)
++	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
+ 		haltest_error("Cannot create playback thread!\n");
++		goto fail;
++	}
++
++	return;
++fail:
++	if (in)
++		fclose(in);
+ }
+ 
+ static void stop_p(int argc, const char **argv)
 -- 
 1.8.3.2
 
