@@ -1,58 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391709250-8047-5-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1391709250-8047-1-git-send-email-andrzej.kaczmarek@tieto.com>
-	<1391709250-8047-5-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Fri, 7 Feb 2014 11:45:18 +0200
-Message-ID: <CABBYNZKZGX54FnUPEZWM_4A+5otRHk+wyA-xhppfD8FeZckMjg@mail.gmail.com>
-Subject: Re: [PATCH 5/6] android/a2dp: Disconnect headset on IPC failure
+In-Reply-To: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
+References: <1391700522-9036-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 7 Feb 2014 11:37:19 +0200
+Message-ID: <CABBYNZ+=s=-N+NKwKiuuytSULvbQbnz7Rc_p5sob3Tajso9+Ww@mail.gmail.com>
+Subject: Re: [PATCH v3 0/8] Android PAN fixes
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Szymon,
 
-On Thu, Feb 6, 2014 at 7:54 PM, Andrzej Kaczmarek
-<andrzej.kaczmarek@tieto.com> wrote:
-> In case audio IPC is suddenly disconnected (most likely due to crash of
-> mediaserver process) we should disconnect headset since it is no longer
-> associated with valid setup and cannot be used properly.
-> ---
->  android/a2dp.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+On Thu, Feb 6, 2014 at 5:28 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> V3:
+>  - fixed not bringing bridge if down
+>  - add forward_delay with ioctl patch
+>  - other minor bugfixes
 >
-> diff --git a/android/a2dp.c b/android/a2dp.c
-> index 8eabfeb..f67a593 100644
-> --- a/android/a2dp.c
-> +++ b/android/a2dp.c
-> @@ -1515,6 +1515,7 @@ static gboolean audio_retry_register(void *data)
+> V2:
+> This is based on patch from Ravi (sent 23.01.2013). Changes include
+> patch split and some bugfixes.
 >
->  static void audio_disconnected(void *data)
->  {
-> +       GSList *l;
->         bool restart;
+> Ravi kumar Veeramally (1):
+>   android/pan: Fix bnep interface name
 >
->         DBG("");
-> @@ -1526,6 +1527,12 @@ static void audio_disconnected(void *data)
+> Szymon Janc (7):
+>   profiles/network: Use interface name passed to bnep_connadd
+>   profiles/network: Allow to pass interface name to bnep_new
+>   android/pan: Move functions up to avoid forward declarations
+>   android/pan: Fix unregistering NAP bridge
+>   android/pan: Use ioctl instead of sysfs for setting forward delay
+>   android/pan: Pass error in nap_remove_bridge
+>   android/pan: Bring bridge interface down before removing it
 >
->         bt_audio_unregister();
+>  android/pan.c                 | 205 ++++++++++++++++++++++++++----------------
+>  profiles/network/bnep.c       |  10 ++-
+>  profiles/network/bnep.h       |   3 +-
+>  profiles/network/connection.c |   6 +-
+>  profiles/network/server.c     |   4 +
+>  5 files changed, 146 insertions(+), 82 deletions(-)
 >
-> +       for (l = devices; l; l = g_slist_next(l)) {
-> +               struct a2dp_device *dev = l->data;
-> +
-> +               avdtp_shutdown(dev->session);
-> +       }
-> +
->         if (!restart)
->                 return;
+> --
+> 1.8.3.2
 
-If we are unregistering the endpoints properly this should not happen,
-perhaps what is wrong is avdtp_unregister_sep is not aborting existing
-streams properly. Btw we should probably add a unit test if this is
-happening in practice because otherwise the remote won't notice.
+Applied, thanks.
 
 
 -- 
