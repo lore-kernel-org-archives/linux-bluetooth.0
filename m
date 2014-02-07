@@ -1,31 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] health: Fix HealthDevice dbus registration
-Date: Fri,  7 Feb 2014 19:27:58 -0300
-Message-Id: <1391812080-19529-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ 3/3] lib/sdp: Fix printing of multiple record fields
+Date: Fri,  7 Feb 2014 16:14:46 -0400
+Message-Id: <1391804086-14428-3-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1391804086-14428-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1391804086-14428-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For some reason, HealthDevice property table wasn't been registered.
+If there are multiple fields to print, sdp_record_print() was missing a
+newline between entries.
 ---
- profiles/health/hdp.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ lib/sdp.c |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-index 622d95b..48dad52 100644
---- a/profiles/health/hdp.c
-+++ b/profiles/health/hdp.c
-@@ -2145,7 +2145,8 @@ static struct hdp_device *create_health_device(struct btd_device *device)
- 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
- 					path, HEALTH_DEVICE,
- 					health_device_methods,
--					health_device_signals, NULL,
-+					health_device_signals,
-+					health_device_properties,
- 					dev, health_device_destroy)) {
- 		error("D-Bus failed to register %s interface", HEALTH_DEVICE);
- 		goto fail;
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 0a7cb6f..e5e4622 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -1605,13 +1605,13 @@ void sdp_record_print(const sdp_record_t *rec)
+ {
+ 	sdp_data_t *d = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
+ 	if (d && SDP_IS_TEXT_STR(d->dtd))
+-		printf("Service Name: %.*s", d->unitSize, d->val.str);
++		printf("Service Name: %.*s\n", d->unitSize, d->val.str);
+ 	d = sdp_data_get(rec, SDP_ATTR_SVCDESC_PRIMARY);
+ 	if (d && SDP_IS_TEXT_STR(d->dtd))
+-		printf("Service Description: %.*s", d->unitSize, d->val.str);
++		printf("Service Description: %.*s\n", d->unitSize, d->val.str);
+ 	d = sdp_data_get(rec, SDP_ATTR_PROVNAME_PRIMARY);
+ 	if (d && SDP_IS_TEXT_STR(d->dtd))
+-		printf("Service Provider: %.*s", d->unitSize, d->val.str);
++		printf("Service Provider: %.*s\n", d->unitSize, d->val.str);
+ }
+ 
+ #ifdef SDP_DEBUG
 -- 
-1.8.5.3
+1.7.9.5
 
