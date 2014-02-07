@@ -1,61 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 0/2] Add hci_smd driver
-Date: Fri, 7 Feb 2014 12:35:35 +0100
-Message-ID: <1391772937-12802-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 1/2] android/haltest: Close file in case of error
+Date: Fri, 07 Feb 2014 11:05:01 +0100
+Message-ID: <6446365.iLMeAT5gVN@uw000953>
+In-Reply-To: <1391696563-7478-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1391615042-22677-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1391696563-7478-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Andrei,
 
-This is a try (long shoot) to upstream hci shared memory driver (hci_smd)
-which is used on Qualcomm platforms and BT chips.
+On Thursday 06 of February 2014 16:22:42 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/client/if-audio.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+> index 66f8364..3b34c95 100644
+> --- a/android/client/if-audio.c
+> +++ b/android/client/if-audio.c
+> @@ -258,19 +258,26 @@ static void play_p(int argc, const char **argv)
+>  
+>  	if (buffer_size == 0) {
+>  		haltest_error("Invalid buffer size. Was stream_out opened?\n");
+> -		return;
+> +		goto fail;
+>  	}
+>  
+>  	pthread_mutex_lock(&state_mutex);
+>  	if (current_state != STATE_STOPPED) {
+>  		haltest_error("Already playing or stream suspended!\n");
+>  		pthread_mutex_unlock(&state_mutex);
+> -		return;
+> +		goto fail;
+>  	}
+>  	pthread_mutex_unlock(&state_mutex);
+>  
+> -	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0)
+> +	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
+>  		haltest_error("Cannot create playback thread!\n");
+> +		goto fail;
+> +	}
+> +
+> +	return;
+> +fail:
+> +	if (in)
+> +		fclose(in);
+>  }
+>  
+>  static void stop_p(int argc, const char **argv)
+> 
 
-To make it build with upstream tree I had to introduce some simple SMD API.
-The idea here is that since SMD channel is represented by platform device
-(as it is done in mach-msm),
-then platfrom_data contains smd_data which contains API for that channel.
- 
-Writing this SMD API I was inspired with MSM-SMD and since I'm not an expert 
-in this area I'm asking for comments here.
-
-Maybe instead of SMD API I made, I should expose functions like smd_open(), smd_write()
-etc. something similar how sdio does, and  just deliver to upstream dummy device
-implementing this SMD API?
-
-Other options I was considering is to implement  module inside mach-msm which
-would handle registering SMD BT Channels and when it is done, it would register 
-new platform device like "smd-bt". Then I could move smd.h to some bluetooth includes
-(althought don't now where at the moment) and hci_smd would register driver for "smd-bt"
-In this case I would also could rid of one static variable I have now in hci_smd
-
-Comments on those options are welcome.
-
-Anyway, Hci_smd is based on one of the older version of this driver found in msm kernel
-branch, so there are no wakelocks as in new version and also workqueues are used
-instead of takslet.
-
-Since SMD expose two channels, one for CMD/EVENT and one for ACL Data I decide to
-do separate worqueues for this. This is to make sure that ACL data never blocks EVENT
-packages
-
-Lukasz Rymanowski (2):
-  Add basic API for shared memory driver
-  bluetooth: Add initial support for BT chip over SMD
-
- drivers/bluetooth/Kconfig   |   9 +
- drivers/bluetooth/Makefile  |   1 +
- drivers/bluetooth/hci_smd.c | 461 ++++++++++++++++++++++++++++++++++++++++++++
- include/linux/smd.h         |  68 +++++++
- include/net/bluetooth/hci.h |   1 +
- 5 files changed, 540 insertions(+)
- create mode 100644 drivers/bluetooth/hci_smd.c
- create mode 100644 include/linux/smd.h
+This patch is now upstream, thanks.
 
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
