@@ -1,32 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1391935987.4666.5.camel@belkin5>
-Subject: Some patches applied on Fedora that maybe should be considered for
- being applied upstream
-From: Pacho Ramos <pacho@gentoo.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Sun, 09 Feb 2014 09:53:07 +0100
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: "Caleb Reinhold" <creinhold@lampreynetworks.com>
+To: "'Anderson Lizardo'" <anderson.lizardo@openbossa.org>
+Cc: "'BlueZ development'" <linux-bluetooth@vger.kernel.org>
+References: <000201cf21ed$d18f02d0$74ad0870$@lampreynetworks.com>	<CAJdJm_PEQEmCz1owo8MZ+29R-O5u8qm8x85WgeuKy9U1x74zGw@mail.gmail.com>	<000001cf238d$a774e310$f65ea930$@lampreynetworks.com> <CAJdJm_OeMUO5Qj3Amg7ADtkJRsRBpoixD2MEBBWHUA3V1M1OqA@mail.gmail.com>
+In-Reply-To: <CAJdJm_OeMUO5Qj3Amg7ADtkJRsRBpoixD2MEBBWHUA3V1M1OqA@mail.gmail.com>
+Subject: RE: possible bug in blueZ 5.8 gatt tool or library
+Date: Fri, 7 Feb 2014 18:34:18 -0500
+Message-ID: <000601cf245d$26769da0$7363d8e0$@lampreynetworks.com>
+MIME-Version: 1.0
+Content-Type: text/plain;
+	charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello
+Hi Anderson,
 
-I was looking at bluez package and found some patches that maybe could
-be upstreamed. Also, I would like to know the reasons for not accepting
-them to ensure they are safe to be applied downstream by us too :)
+>If I remember correctly, the issue is in the kernel: if connect() is called
+when security level is medium, 
+>the socket only gets POLLOUT once SMP pairing finishes, and any ATT PDU
+received during that time is lost.
 
-http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch -> Does this cause any issues with systemd --user setups?
+This is useful and interesting to know.
 
+>Note that it's almost certain that your device is sending the indication
+without requiring encryption. 
+>Otherwise, it would have sent a Security Request (which triggers a Pairing
+Request from the Linux side) 
+>and wait for the encryption to be enabled before sending the indication. If
+that was the case, 
+>the kernel would deliver the ATT PDU to gatttool after encryption is
+enabled and it would work as expected.
 
-http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch
-http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0002-autopair-Don-t-handle-the-iCade.patch
-http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0004-agent-Assert-possible-infinite-loop.patch
--> Any reason for not applying it upstream too?
+It seems our device is indeed sending the indication without requiring
+encryption. The suggestion of updating the central device to start with low
+security and then change to medium security is producing the desired
+behavior. Thank you for your time and assistance.
 
-http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-work-around-Logitech-diNovo-Edge-keyboard-firmware-i.patch
--> Taking care this looks to be a really old issue, maybe using the
-workaround would be the only option for now :/
+Regards,
 
-Thanks a lot for your thoughts :)
+Caleb Reinhold
 
