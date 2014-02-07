@@ -1,41 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] cltest: Fix memory leak
-Date: Fri,  7 Feb 2014 19:28:43 -0300
-Message-Id: <1391812125-19594-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 4/5] amptest: Fix memory leak
+Date: Fri,  7 Feb 2014 19:28:44 -0300
+Message-Id: <1391812125-19594-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- tools/cltest.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ tools/amptest.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/tools/cltest.c b/tools/cltest.c
-index 16b7553..4ddb98a 100644
---- a/tools/cltest.c
-+++ b/tools/cltest.c
-@@ -205,8 +205,8 @@ static bool find_controllers(void)
- 	dl = malloc(HCI_MAX_DEV * sizeof(struct hci_dev_req) + sizeof(uint16_t));
- 	if (!dl) {
- 		perror("Failed allocate HCI device request memory");
--		result = false;
--		goto done;
-+		close(fd);
-+		return false;
+diff --git a/tools/amptest.c b/tools/amptest.c
+index 16f15bc..6192f7e 100644
+--- a/tools/amptest.c
++++ b/tools/amptest.c
+@@ -496,6 +496,7 @@ static bool find_amp_controller(void)
+ 	struct hci_dev_list_req *dl;
+ 	struct hci_dev_req *dr;
+ 	int fd, i;
++	bool result;
+ 
+ 	fd = socket(AF_BLUETOOTH, SOCK_RAW, BTPROTO_HCI);
+ 	if (fd < 0) {
+@@ -515,8 +516,8 @@ static bool find_amp_controller(void)
+ 
+ 	if (ioctl(fd, HCIGETDEVLIST, (void *) dl) < 0) {
+ 		perror("Failed to get HCI device list");
+-		close(fd);
+-		return false;
++		result = false;
++		goto done;
  	}
  
- 	dl->dev_num = HCI_MAX_DEV;
-@@ -243,6 +243,7 @@ static bool find_controllers(void)
+ 	for (i = 0; i< dl->dev_num; i++) {
+@@ -541,9 +542,12 @@ static bool find_amp_controller(void)
+ 		}
  	}
  
- done:
+-	close(fd);
++	result = true;
+ 
+-	return true;
++done:
 +	free(dl);
- 	close(fd);
- 	return result;
++	close(fd);
++	return result;
  }
+ 
+ int main(int argc ,char *argv[])
 -- 
 1.8.5.3
 
