@@ -1,56 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/5] hcidump: Fix memory leak
-Date: Fri,  7 Feb 2014 19:28:42 -0300
-Message-Id: <1391812125-19594-3-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 1/5] hcitool: Fix memory leak in cmd_info
+Date: Fri,  7 Feb 2014 19:28:41 -0300
+Message-Id: <1391812125-19594-2-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
 References: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Memory pointed by frm.data variable was not freed in both failure and
-success flows.
+Free memory pointed by cr variable after it is used.
 ---
- tools/hcidump.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ tools/hcitool.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/tools/hcidump.c b/tools/hcidump.c
-index 50123d2..2bbc207 100644
---- a/tools/hcidump.c
-+++ b/tools/hcidump.c
-@@ -309,7 +309,7 @@ static void read_dump(int fd)
- 		if (err < 0)
- 			goto failed;
- 		if (!err)
--			return;
-+			goto done;
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index 8a92067..c2df8e3 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -961,6 +961,7 @@ static void cmd_info(int dev_id, int argc, char **argv)
+ 					htobs(di.pkt_type & ACL_PTYPE_MASK),
+ 					0, 0x01, &handle, 25000) < 0) {
+ 			perror("Can't create connection");
++			free(cr);
+ 			close(dd);
+ 			exit(1);
+ 		}
+@@ -969,6 +970,8 @@ static void cmd_info(int dev_id, int argc, char **argv)
+ 	} else
+ 		handle = htobs(cr->conn_info->handle);
  
- 		if (parser.flags & DUMP_PKTLOG) {
- 			switch (ph.type) {
-@@ -407,7 +407,7 @@ static void read_dump(int fd)
- 		if (err < 0)
- 			goto failed;
- 		if (!err)
--			return;
-+			goto done;
- 
- 		frm.ptr = frm.data;
- 		frm.len = frm.data_len;
-@@ -432,8 +432,13 @@ static void read_dump(int fd)
- 		parse(&frm);
- 	}
- 
-+done:
-+	free(frm.data);
-+	return;
++	free(cr);
 +
- failed:
- 	perror("Read failed");
-+	free(frm.data);
- 	exit(1);
- }
+ 	printf("\tBD Address:  %s\n", argv[0]);
  
+ 	comp = batocomp(&bdaddr);
 -- 
 1.8.5.3
 
