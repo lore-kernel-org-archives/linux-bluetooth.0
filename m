@@ -1,48 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] avrcp: Avoids unneeded memory allocation
-Date: Fri,  7 Feb 2014 15:27:54 +0200
-Message-Id: <1391779674-9410-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/4] android/haltest: Remove unneeded assignment
+Date: Fri,  7 Feb 2014 14:11:15 +0200
+Message-Id: <1391775078-25010-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Allocate as much memory as we need since we know this in advance.
-Simplifies also length calculation.
 ---
- profiles/audio/avrcp.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ android/client/if-audio.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index be67fe5..7c7de38 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -2263,11 +2263,9 @@ done:
- static void avrcp_list_items(struct avrcp *session, uint32_t start,
- 								uint32_t end)
- {
--	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 10 +
--			AVRCP_MEDIA_ATTRIBUTE_LAST * sizeof(uint32_t)];
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 10 + sizeof(uint32_t)];
- 	struct avrcp_player *player = session->controller->player;
- 	struct avrcp_browsing_header *pdu = (void *) buf;
--	uint16_t length = AVRCP_BROWSING_HEADER_LENGTH + 10;
- 	uint32_t attribute;
+diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+index 8c640a1..5ab11a6 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-audio.c
+@@ -225,10 +225,8 @@ static void *playback_thread(void *data)
+ 		pthread_mutex_unlock(&outstream_mutex);
+ 	} while (len && w_len > 0);
  
- 	memset(buf, 0, sizeof(buf));
-@@ -2287,9 +2285,7 @@ static void avrcp_list_items(struct avrcp *session, uint32_t start,
- 	attribute = htonl(AVRCP_MEDIA_ATTRIBUTE_TITLE);
- 	memcpy(&pdu->params[10], &attribute, sizeof(uint32_t));
+-	if (in) {
++	if (in)
+ 		fclose(in);
+-		in = NULL;
+-	}
  
--	length += sizeof(uint32_t);
--
--	avctp_send_browsing_req(session->conn, buf, length,
-+	avctp_send_browsing_req(session->conn, buf, sizeof(buf),
- 					avrcp_list_items_rsp, session);
- }
- 
+ 	pthread_cleanup_pop(1);
+ 	return NULL;
 -- 
 1.8.3.2
 
