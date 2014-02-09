@@ -1,25 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Pavel Volkov <negaipub@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Bluez 5, A2DP headphones
-Date: Sun, 09 Feb 2014 12:37:02 -0800 (PST)
-Message-ID: <1481471.Fs3M2bYstJ@melforce>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <1391935987.4666.5.camel@belkin5>
+Subject: Some patches applied on Fedora that maybe should be considered for
+ being applied upstream
+From: Pacho Ramos <pacho@gentoo.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Sun, 09 Feb 2014 09:53:07 +0100
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm having trouble connecting to my headphones after upgrading from Bluez 4 to 
-Bluez 5 with a few more people.
-Link to Gentoo Bugzilla: https://bugs.gentoo.org/show_bug.cgi?id=499908
+Hello
 
-Summary: 
-I'm not using PulseAudio and this is the error from system journal:
+I was looking at bluez package and found some patches that maybe could
+be upstreamed. Also, I would like to know the reasons for not accepting
+them to ensure they are safe to be applied downstream by us too :)
 
-2月 09 15:01:54 melforce bluetoothd[12825]: a2dp-sink profile connect failed for 
-00:02:3C:31:96:12: Protocol not available
+http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch -> Does this cause any issues with systemd --user setups?
 
-It appears when I try to connect to it from bluedevil (KDE's Bluetooth stack) 
-or when mplayer2 tries to open the ALSA device.
 
-Do you have any clues?
+http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch
+http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0002-autopair-Don-t-handle-the-iCade.patch
+http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0004-agent-Assert-possible-infinite-loop.patch
+-> Any reason for not applying it upstream too?
+
+http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-work-around-Logitech-diNovo-Edge-keyboard-firmware-i.patch
+-> Taking care this looks to be a really old issue, maybe using the
+workaround would be the only option for now :/
+
+Thanks a lot for your thoughts :)
+
