@@ -10,63 +10,71 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 13/24] Bluetooth: Refactor dlc disconnect logic in rfcomm_dlc_close()
-Date: Sun,  9 Feb 2014 20:59:13 -0500
-Message-Id: <1391997564-1805-14-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 24/24] Bluetooth: Fix write_room() calculation
+Date: Sun,  9 Feb 2014 20:59:24 -0500
+Message-Id: <1391997564-1805-25-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Prepare for directly closing dlc if the RFCOMM session has not
-yet been started; refactor the dlc disconnect logic into a separate
-local function, __rfcomm_dlc_disconn(). Retains functional
-equivalence.
+The skb truesize of a 12-byte payload with a 10-byte head/tail
+reserve is 768 bytes. Consequently, even with 40 tx_credits, at
+most 6 packets could be queued at any one time:
+
+  40 tx_credits * 127-byte mtu < 768-byte truesize * 7
+
+This error could also cause the tx queue to apparently stall if
+credit flow control is disabled (where tx_credits is fixed at 5),
+or if the receiver only granted a limited number of tx credits
+(eg., less than 7).
+
+Instead, track the outstanding number of queued packets not yet sent
+in wmem_alloc and allow for a maximum of 40 queued packets. Report
+the space avail for a single write() as the mtu * number of packets
+left before reaching the maximum.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/core.c | 23 +++++++++++++++--------
- 1 file changed, 15 insertions(+), 8 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 797b7e1..88f0edc 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -430,6 +430,20 @@ int rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 chann
- 	return r;
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index 3f44195..403ec09 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -352,20 +352,16 @@ static inline unsigned int rfcomm_room(struct rfcomm_dev *dev)
+ {
+ 	struct rfcomm_dlc *dlc = dev->dlc;
+ 
+-	/* The limit is bogus; the number of packets which can
+-	 * currently be sent by the krfcommd thread has no relevance
+-	 * to the number of packets which can be queued on the dlc's
+-	 * tx queue.
+-	 */
+-	int limit = dlc->mtu * (dlc->tx_credits?:1);
++	/* Limit the outstanding number of packets not yet sent to 40 */
++	int pending = 40 - atomic_read(&dev->wmem_alloc);
+ 
+-	return max(0, limit - atomic_read(&dev->wmem_alloc));
++	return max(0, pending) * dlc->mtu;
  }
  
-+static void __rfcomm_dlc_disconn(struct rfcomm_dlc *d)
-+{
-+	struct rfcomm_session *s = d->session;
-+
-+	d->state = BT_DISCONN;
-+	if (skb_queue_empty(&d->tx_queue)) {
-+		rfcomm_send_disc(s, d->dlci);
-+		rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT);
-+	} else {
-+		rfcomm_queue_disc(d);
-+		rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT * 2);
-+	}
-+}
-+
- static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ static void rfcomm_wfree(struct sk_buff *skb)
  {
- 	struct rfcomm_session *s = d->session;
-@@ -457,14 +471,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 		/* Fall through */
- 
- 	case BT_CONNECTED:
--		d->state = BT_DISCONN;
--		if (skb_queue_empty(&d->tx_queue)) {
--			rfcomm_send_disc(s, d->dlci);
--			rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT);
--		} else {
--			rfcomm_queue_disc(d);
--			rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT * 2);
--		}
-+		__rfcomm_dlc_disconn(d);
- 		break;
- 
- 	default:
+ 	struct rfcomm_dev *dev = (void *) skb->sk;
+-	atomic_sub(skb->truesize, &dev->wmem_alloc);
++	atomic_dec(&dev->wmem_alloc);
+ 	if (test_bit(RFCOMM_TTY_ATTACHED, &dev->flags))
+ 		tty_port_tty_wakeup(&dev->port);
+ 	tty_port_put(&dev->port);
+@@ -374,7 +370,7 @@ static void rfcomm_wfree(struct sk_buff *skb)
+ static void rfcomm_set_owner_w(struct sk_buff *skb, struct rfcomm_dev *dev)
+ {
+ 	tty_port_get(&dev->port);
+-	atomic_add(skb->truesize, &dev->wmem_alloc);
++	atomic_inc(&dev->wmem_alloc);
+ 	skb->sk = (void *) dev;
+ 	skb->destructor = rfcomm_wfree;
+ }
 -- 
 1.8.1.2
