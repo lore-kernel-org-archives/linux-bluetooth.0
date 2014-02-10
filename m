@@ -10,87 +10,49 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 07/24] Bluetooth: Release rfcomm_dev only once
-Date: Sun,  9 Feb 2014 20:59:07 -0500
-Message-Id: <1391997564-1805-8-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 06/24] Bluetooth: Exclude released devices from RFCOMMGETDEVLIST ioctl
+Date: Sun,  9 Feb 2014 20:59:06 -0500
+Message-Id: <1391997564-1805-7-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No logic prevents an rfcomm_dev from being released multiple
-times. For example, if the rfcomm_dev ref count is large due
-to pending tx, then multiple RFCOMMRELEASEDEV ioctls may
-mistakenly release the rfcomm_dev too many times. Note that
-concurrent ioctls are not required to create this condition.
+When enumerating RFCOMM devices in the rfcomm_dev_list, holding
+the rfcomm_dev_lock only guarantees the existence of the enumerated
+rfcomm_dev in memory, and not safe access to its state. Testing
+the device state (such as RFCOMM_TTY_RELEASED) does not guarantee
+the device will remain in that state for the subsequent access
+to the rfcomm_dev's fields, nor guarantee that teardown has not
+commenced.
 
-Introduce RFCOMM_DEV_RELEASED status bit which guarantees the
-rfcomm_dev can only be released once.
-
-NB: Since the flags are exported to userspace, introduce the status
-field to track state for which userspace should not be aware.
+Obtain an rfcomm_dev reference for the duration of rfcomm_dev
+access.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- include/net/bluetooth/rfcomm.h |  6 +++++-
- net/bluetooth/rfcomm/tty.c     | 11 +++++++++--
- 2 files changed, 14 insertions(+), 3 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 486213a..29d9727 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -323,11 +323,15 @@ int  rfcomm_connect_ind(struct rfcomm_session *s, u8 channel,
- #define RFCOMMGETDEVINFO	_IOR('R', 211, int)
- #define RFCOMMSTEALDLC		_IOW('R', 220, int)
- 
-+/* rfcomm_dev.flags bit definitions */
- #define RFCOMM_REUSE_DLC      0
- #define RFCOMM_RELEASE_ONHUP  1
- #define RFCOMM_HANGUP_NOW     2
- #define RFCOMM_TTY_ATTACHED   3
--#define RFCOMM_TTY_RELEASED   4
-+#define RFCOMM_DEFUNCT_BIT4   4	  /* don't reuse this bit - userspace visible */
-+
-+/* rfcomm_dev.status bit definitions */
-+#define RFCOMM_DEV_RELEASED   0
- 
- struct rfcomm_dev_req {
- 	s16      dev_id;
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index b385d99..d9d4bc8 100644
+index 7cf193f..b385d99 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -51,6 +51,8 @@ struct rfcomm_dev {
- 	unsigned long		flags;
- 	int			err;
+@@ -468,7 +468,7 @@ static int rfcomm_get_dev_list(void __user *arg)
+ 	spin_lock(&rfcomm_dev_lock);
  
-+	unsigned long		status;		/* don't export to userspace */
-+
- 	bdaddr_t		src;
- 	bdaddr_t		dst;
- 	u8			channel;
-@@ -423,6 +425,12 @@ static int rfcomm_release_dev(void __user *arg)
- 		return -EPERM;
- 	}
- 
-+	/* only release once */
-+	if (test_and_set_bit(RFCOMM_DEV_RELEASED, &dev->status)) {
+ 	list_for_each_entry(dev, &rfcomm_dev_list, list) {
+-		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
++		if (!tty_port_get(&dev->port))
+ 			continue;
+ 		(di + n)->id      = dev->id;
+ 		(di + n)->flags   = dev->flags;
+@@ -476,6 +476,7 @@ static int rfcomm_get_dev_list(void __user *arg)
+ 		(di + n)->channel = dev->channel;
+ 		bacpy(&(di + n)->src, &dev->src);
+ 		bacpy(&(di + n)->dst, &dev->dst);
 +		tty_port_put(&dev->port);
-+		return -EALREADY;
-+	}
-+
- 	if (req.flags & (1 << RFCOMM_HANGUP_NOW))
- 		rfcomm_dlc_close(dev->dlc, 0);
- 
-@@ -433,8 +441,7 @@ static int rfcomm_release_dev(void __user *arg)
- 		tty_kref_put(tty);
+ 		if (++n >= dev_num)
+ 			break;
  	}
- 
--	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags) &&
--	    !test_and_set_bit(RFCOMM_TTY_RELEASED, &dev->flags))
-+	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
- 		tty_port_put(&dev->port);
- 
- 	tty_port_put(&dev->port);
 -- 
 1.8.1.2
