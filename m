@@ -12,52 +12,63 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	Peter Hurley <peter@hurleysoftware.com>,
 	Jiri Slaby <jslaby@suse.cz>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 04/24] tty: Fix ref counting for port krefs
-Date: Sun,  9 Feb 2014 20:59:04 -0500
-Message-Id: <1391997564-1805-5-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 05/24] Bluetooth: Fix racy acquire of rfcomm_dev reference
+Date: Sun,  9 Feb 2014 20:59:05 -0500
+Message-Id: <1391997564-1805-6-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The tty core supports two models for handling tty_port lifetimes;
-the tty_port can use the kref supplied by tty_port (which will
-automatically destruct the tty_port when the ref count drops to
-zero) or it can destruct the tty_port manually.
+rfcomm_dev_get() can return a rfcomm_dev reference for a
+device for which destruction may be commencing. This can happen
+on tty destruction, which calls rfcomm_tty_cleanup(), the last
+port reference may have been released but RFCOMM_TTY_RELEASED
+was not set. The following race is also possible:
 
-For tty drivers that choose to use the port kref to manage the
-tty_port lifetime, it is not possible to safely acquire a port
-reference conditionally. If the last reference is released after
-evaluating the condition but before acquiring the reference, a
-bogus reference will be held while the tty_port destruction
-commences.
+CPU 0                            | CPU 1
+                                 | rfcomm_release_dev
+rfcomm_dev_get                   |   .
+  spin_lock                      |   .
+    dev  = __rfcomm_dev_get      |   .
+    if dev                       |   .
+      if test_bit(TTY_RELEASED)  |   .
+                                 |   !test_and_set_bit(TTY_RELEASED)
+                                 |     tty_port_put   <<<< last reference
+      else                       |
+        tty_port_get             |
 
-Rather, only acquire a port reference if the ref count is non-zero
-and allow the caller to distinguish if a reference has successfully
-been acquired.
+The reference acquire is bogus because destruction will commence
+with the release of the last reference.
+
+Ignore the external state change of TTY_RELEASED and instead rely
+on the reference acquire itself to determine if the reference is
+valid.
 
 Cc: Jiri Slaby <jslaby@suse.cz>
 Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- include/linux/tty.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-diff --git a/include/linux/tty.h b/include/linux/tty.h
-index 90b4fdc..4781d7b 100644
---- a/include/linux/tty.h
-+++ b/include/linux/tty.h
-@@ -518,9 +518,9 @@ extern void tty_port_put(struct tty_port *port);
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index a535ef1..7cf193f 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -157,12 +157,8 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
  
- static inline struct tty_port *tty_port_get(struct tty_port *port)
- {
--	if (port)
--		kref_get(&port->kref);
--	return port;
-+	if (port && kref_get_unless_zero(&port->kref))
-+		return port;
-+	return NULL;
- }
+ 	dev = __rfcomm_dev_get(id);
  
- /* If the cts flow control is enabled, return true. */
+-	if (dev) {
+-		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
+-			dev = NULL;
+-		else
+-			tty_port_get(&dev->port);
+-	}
++	if (dev && !tty_port_get(&dev->port))
++		dev = NULL;
+ 
+ 	spin_unlock(&rfcomm_dev_lock);
+ 
 -- 
 1.8.1.2
