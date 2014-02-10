@@ -1,49 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 11 Feb 2014 09:13:22 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Viswanatham, RaviTeja" <RaviTeja.Viswanatham.EDUCATION@eberspaecher.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
-Subject: Re: 
-Message-ID: <20140211071321.GB8980@aemeltch-MOBL1>
-References: <9BC883E0D59F6B4DBD525D460025714B08AE336F@deessmx03.dees.eberspaecher.com>
- <BE8107B5-0F83-47C5-ADC6-345CFD24BE21@holtmann.org>
+Message-ID: <52F95A10.5010507@hurleysoftware.com>
+Date: Mon, 10 Feb 2014 18:00:32 -0500
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BE8107B5-0F83-47C5-ADC6-345CFD24BE21@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Gianluca Anzolin <gianluca@sottospazio.it>,
+ Alexander Holler <holler@ahsoftware.de>,
+ Andrey Vihrov <andrey.vihrov@gmail.com>,
+ Sander Eikelenboom <linux@eikelenboom.it>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/24] rfcomm fixes
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org>
+In-Reply-To: <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi All,
+Hi Marcel,
 
-On Mon, Feb 10, 2014 at 10:35:24AM -0800, Marcel Holtmann wrote:
-> Hi Ravi,
-> 
-> > I am working on Ubuntu 12.04 with a Bluetooth 3.0 +HS + wifi combo USB
-> > dongle. 
-> > 
-> > I want to reach a data transfer speed of up to 24 Mbit/s. 
-> > 
-> > My Questions: Does Bluez support high speed data transfer rates up to
-> > 24 Mbit/s (Bluetooth 3.0+HS) ? 
-> > 
-> > If it does, is there any user configuration involved to achieve that?
-> > What other requirements need to be met?  Does, Bluetooth enables AMP
-> > function to communicate 802.11n channel to support high speed or it
-> > has to be configure with any other drivers? 
-> > 
-> > I am new to Linux a detail explanation would be really appreciated.
-> > Thank you in advance for your support.
-> 
-> we do support Bluetooth HS operation. However your WiFi device needs to
-> be exposed as AMP Controller. Most WiFi hardware needs a special driver
-> to expose itself as AMP Controller. There is no generic driver for
-> mac80211 subsystem in the kernel.
+On 02/10/2014 05:09 PM, Marcel Holtmann wrote:
+> Hi Peter,
+>
+>> This patch series addresses a number of previously unknown issues
+>> with the RFCOMM tty device implementation, in addition to
+>> addressing the locking regression recently reported [1].
+>>
+>> As Gianluca suggested and I agree, this series first reverts
+>> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
+>
+> so for 3.14 we should revert 3 patches. And then the other 21 are
+ > intended for 3.15 merge window.
 
-Some devices have AMP Controller implemented in firmware.
-I was using Marvell SD8787, probably newer Marvell devices also works.
+Yep, this is probably best. At least 3.13 & 3.14 will behave the
+same wrt rfcomm.
 
-You may check drivers/bluetooth/btmrvl_main.c to see how HCI dev_type
-HCI_AMP is assigned.
+> I realize that we still have to deal with some breakage, but we
+ > do not want regressions and I clearly not going to take 24 patches
+ > for 3.14 at this point in time.
 
-Best regards 
-Andrei Emeltchenko 
+Yeah, I wasn't expecting you to.
+
+> What I can do is take all 24 patches into bluetooth-next and let
+ > them sit for 1 week and have people test them. And then we go ahead
+ > with reverting 3 patches from 3.14. Does that make sense?
+
+Yep, that's fine with me. Thanks.
+
+Regards,
+Peter Hurley
