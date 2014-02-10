@@ -1,58 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1392031617.5601.11.camel@develbox>
-Subject: [PATCH] btusb.c add IMC Networks id 13d3:3404 (bcm20702A0)
-From: Jurgen Kramer <gtmkramer@xs4all.nl>
-To: linux-bluetooth@vger.kernel.org
-Date: Mon, 10 Feb 2014 12:26:57 +0100
-Content-Type: multipart/mixed; boundary="=-0AQF4brshzl00bnnwc0a"
-Mime-Version: 1.0
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 4/6] android/hal-audio: Write SBC parameters to logcat
+Date: Mon, 10 Feb 2014 11:45:43 +0100
+Message-ID: <1392029145-7954-4-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1392029145-7954-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1392029145-7954-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+---
+ android/hal-audio.c | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 81 insertions(+)
 
---=-0AQF4brshzl00bnnwc0a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-Attached patch adds support for IMC Networks (13d3:3404) to BCM20702A0
-in btusb.c. This device is used on the Asrock Z87E-ITX motherboard.
-Tested against 3.12.9.
-
-diff -uNrp
-linux-3.12.9-301.jk1.fc20.x86_64.orig/drivers/bluetooth/btusb.c
-linux-3.12.9-301.jk1.fc20.x86_64.new/drivers/bluetooth/btusb.c
---- a/drivers/bluetooth/btusb.c	2014-02-10 11:35:08.976975562 +0100
-+++ b/drivers/bluetooth/btusb.c	2014-02-10 11:37:03.864921122 +0100
-@@ -106,6 +106,7 @@ static struct usb_device_id btusb_table[
- 	{ USB_DEVICE(0x04ca, 0x2003) },
- 	{ USB_DEVICE(0x0489, 0xe042) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
-+	{ USB_DEVICE(0x13d3, 0x3404) },
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 766327b..9312659 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -289,6 +289,78 @@ static int sbc_get_presets(struct audio_preset *preset, size_t *len)
+ 	return i;
+ }
  
- 	/* Foxconn - Hon Hai */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
-
-Signed-off-by: Jurgen Kramer <gtm.kramer@xs4all.nl>
-
-Jurgen
-
---=-0AQF4brshzl00bnnwc0a
-Content-Disposition: attachment; filename="btusb-bcm20702a0-add-imc-networks.patch"
-Content-Type: text/x-patch; name="btusb-bcm20702a0-add-imc-networks.patch";
-	charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-
-diff -uNrp linux-3.12.9-301.jk1.fc20.x86_64.orig/drivers/bluetooth/btusb.c linux-3.12.9-301.jk1.fc20.x86_64.new/drivers/bluetooth/btusb.c
---- a/drivers/bluetooth/btusb.c	2014-02-10 11:35:08.976975562 +0100
-+++ b/drivers/bluetooth/btusb.c	2014-02-10 11:37:03.864921122 +0100
-@@ -106,6 +106,7 @@ static struct usb_device_id btusb_table[
- 	{ USB_DEVICE(0x04ca, 0x2003) },
- 	{ USB_DEVICE(0x0489, 0xe042) },
- 	{ USB_DEVICE(0x413c, 0x8197) },
-+	{ USB_DEVICE(0x13d3, 0x3404) },
++static int sbc_freq2int(uint8_t freq)
++{
++	switch (freq) {
++	case SBC_SAMPLING_FREQ_16000:
++		return 16000;
++	case SBC_SAMPLING_FREQ_32000:
++		return 32000;
++	case SBC_SAMPLING_FREQ_44100:
++		return 44100;
++	case SBC_SAMPLING_FREQ_48000:
++		return 48000;
++	default:
++		return 0;
++	}
++}
++
++static const char *sbc_mode2str(uint8_t mode)
++{
++	switch (mode) {
++	case SBC_CHANNEL_MODE_MONO:
++		return "Mono";
++	case SBC_CHANNEL_MODE_DUAL_CHANNEL:
++		return "DualChannel";
++	case SBC_CHANNEL_MODE_STEREO:
++		return "Stereo";
++	case SBC_CHANNEL_MODE_JOINT_STEREO:
++		return "JointStereo";
++	default:
++		return "(unknown)";
++	}
++}
++
++static int sbc_blocks2int(uint8_t blocks)
++{
++	switch (blocks) {
++	case SBC_BLOCK_LENGTH_4:
++		return 4;
++	case SBC_BLOCK_LENGTH_8:
++		return 8;
++	case SBC_BLOCK_LENGTH_12:
++		return 12;
++	case SBC_BLOCK_LENGTH_16:
++		return 16;
++	default:
++		return 0;
++	}
++}
++
++static int sbc_subbands2int(uint8_t subbands)
++{
++	switch (subbands) {
++	case SBC_SUBBANDS_4:
++		return 4;
++	case SBC_SUBBANDS_8:
++		return 8;
++	default:
++		return 0;
++	}
++}
++
++static const char *sbc_allocation2str(uint8_t allocation)
++{
++	switch (allocation) {
++	case SBC_ALLOCATION_SNR:
++		return "SNR";
++	case SBC_ALLOCATION_LOUDNESS:
++		return "Loudness";
++	default:
++		return "(unknown)";
++	}
++}
++
+ static void sbc_init_encoder(struct sbc_data *sbc_data)
+ {
+ 	a2dp_sbc_t *in = &sbc_data->sbc;
+@@ -298,6 +370,15 @@ static void sbc_init_encoder(struct sbc_data *sbc_data)
  
- 	/* Foxconn - Hon Hai */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
-
---=-0AQF4brshzl00bnnwc0a--
+ 	out->endian = SBC_LE;
+ 	out->bitpool = in->max_bitpool;
++
++	DBG("frequency=%d channel_mode=%s block_length=%d subbands=%d "
++			"allocation=%s bitpool=%d-%d",
++			sbc_freq2int(in->frequency),
++			sbc_mode2str(in->channel_mode),
++			sbc_blocks2int(in->block_length),
++			sbc_subbands2int(in->subbands),
++			sbc_allocation2str(in->allocation_method),
++			in->min_bitpool, in->max_bitpool);
+ }
+ 
+ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+-- 
+1.8.5.3
 
