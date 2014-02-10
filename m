@@ -10,50 +10,127 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 01/24] Revert "Bluetooth: Remove rfcomm_carrier_raised()"
-Date: Sun,  9 Feb 2014 20:59:01 -0500
-Message-Id: <1391997564-1805-2-git-send-email-peter@hurleysoftware.com>
-In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
-References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 00/24] rfcomm fixes
+Date: Sun,  9 Feb 2014 20:59:00 -0500
+Message-Id: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reverts commit f86772af6a0f643d3e13eb3f4f9213ae0c333ee4.
+Marcel,
 
-This is the first of a 3-patch revert, together with
-Revert "Bluetooth: Always wait for a connection on RFCOMM open()" and
-Revert "Bluetooth: Move rfcomm_get_device() before rfcomm_dev_activate()".
+This patch series addresses a number of previously unknown issues
+with the RFCOMM tty device implementation, in addition to
+addressing the locking regression recently reported [1].
 
-Commit 4a2fb3ecc7467c775b154813861f25a0ddc11aa0,
-"Bluetooth: Always wait for a connection on RFCOMM open()" open-codes
-blocking on tty open(), rather than using the default behavior
-implemented by the tty port.
+As Gianluca suggested and I agree, this series first reverts
+3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
 
-The reasons for reverting that patch are detailed in that changelog;
-this patch restores required functionality for that revert.
+The reasoning is detailed in the changelog for
+  Revert "Bluetooth: Always wait for a connection on RFCOMM open()"
+but the short answer is that it re-implements a long-standing
+bug by blocking on a non-blocking open.
 
-Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
----
- net/bluetooth/rfcomm/tty.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+This patch series corrects the reported regressions from 3.13
+(to the extent that correction is required). Specifically,
+the ModemManager regression reported by Gianluca Anzolin [2]
+and the rfcomm bind with wvdial reported by Andrey Vihrov [3].
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index f9c0980a..aeabade 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -160,6 +160,14 @@ static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
- 	return err;
- }
- 
-+/* we block the open until the dlc->state becomes BT_CONNECTED */
-+static int rfcomm_dev_carrier_raised(struct tty_port *port)
-+{
-+	struct rfcomm_dev *dev = container_of(port, struct rfcomm_dev, port);
-+
-+	return (dev->dlc->state == BT_CONNECTED);
-+}
-+
- /* device-specific cleanup: close the dlc */
- static void rfcomm_dev_shutdown(struct tty_port *port)
- {
+tty: Fix ref counting for port krefs
+Bluetooth: Fix racy acquire of rfcomm_dev reference
+Bluetooth: Exclude released devices from RFCOMMGETDEVLIST ioctl
+Bluetooth: Release rfcomm_dev only once
+Bluetooth: Fix unreleased rfcomm_dev reference
+   These first 5 patches after the reverts
+   fix 4 different rfcomm_dev ref count mishandling bugs.
+
+Bluetooth: Fix RFCOMM tty teardown race and
+Bluetooth: Serialize RFCOMMCREATEDEV and RFCOMMRELEASEDEV ioctls
+   Fix races which occur due to the design of the rfcomm ioctls
+   (note that buses don't have these kinds of races).
+
+Bluetooth: Verify dlci not in use before rfcomm_dev create
+Bluetooth: Simplify RFCOMM session state eval
+Bluetooth: Refactor deferred setup test in rfcomm_dlc_close()
+Bluetooth: Refactor dlc disconnect logic in rfcomm_dlc_close()
+Bluetooth: Directly close dlc for not yet started RFCOMM session
+   These 5 patches fix issues with reusing the dlci after
+   closing the tty (found by unit test).
+
+Bluetooth: Fix unsafe RFCOMM device parenting
+Bluetooth: Fix RFCOMM parent device for reused dlc
+   These 2 patches fix the ModemManager regression.
+
+Bluetooth: Refactor rfcomm_dev_add()
+Bluetooth: Cleanup RFCOMM device registration error handling
+   These 2 patches fix an unreleased module reference while
+   error handling.
+
+Bluetooth: Rename __rfcomm_dev_get() to __rfcomm_dev_lookup()
+   This is a trivial naming patch with no functional impact.
+
+Bluetooth: Force -EIO from tty read/write if .activate() fails
+   The tty core provides an existing mechanism for failing
+   reads/writes if device activation fails (like an error
+   allocating the dlc).
+
+Bluetooth: Don't fail RFCOMM tty writes
+   This patch implements buffered writes even if the device
+   is not connected.
+
+While unit testing this, I discovered a serious defect in
+the way available space is computed that under-utilizes
+rfcomm i/o and may even halt further tx on that link, which
+is fixed by:
+  Bluetooth: Refactor write_room() calculation
+  Bluetooth: Fix write_room() calculation
+
+
+Note that this series does not fix the naively inefficient
+method of packetizing tty output; packetizing should be
+done on the krfcommd thread to take advantage of aggregating
+multiple tty writes into 1 or more packets. Look at any
+line-by-line console output to realize how under-utilized
+the rfcomm tty packeting is.
+
+[1] http://www.spinics.net/lists/linux-wireless/msg117818.html
+[2] http://www.spinics.net/lists/linux-bluetooth/msg42075.html
+[3] http://www.spinics.net/lists/linux-bluetooth/msg42057.html
+
+
+Regards,
+
+
+Peter Hurley (24):
+  Revert "Bluetooth: Remove rfcomm_carrier_raised()"
+  Revert "Bluetooth: Always wait for a connection on RFCOMM open()"
+  Revert "Bluetooth: Move rfcomm_get_device() before
+    rfcomm_dev_activate()"
+  tty: Fix ref counting for port krefs
+  Bluetooth: Fix racy acquire of rfcomm_dev reference
+  Bluetooth: Exclude released devices from RFCOMMGETDEVLIST ioctl
+  Bluetooth: Release rfcomm_dev only once
+  Bluetooth: Fix unreleased rfcomm_dev reference
+  Bluetooth: Fix RFCOMM tty teardown race
+  Bluetooth: Verify dlci not in use before rfcomm_dev create
+  Bluetooth: Simplify RFCOMM session state eval
+  Bluetooth: Refactor deferred setup test in rfcomm_dlc_close()
+  Bluetooth: Refactor dlc disconnect logic in rfcomm_dlc_close()
+  Bluetooth: Directly close dlc for not yet started RFCOMM session
+  Bluetooth: Fix unsafe RFCOMM device parenting
+  Bluetooth: Fix RFCOMM parent device for reused dlc
+  Bluetooth: Rename __rfcomm_dev_get() to __rfcomm_dev_lookup()
+  Bluetooth: Serialize RFCOMMCREATEDEV and RFCOMMRELEASEDEV ioctls
+  Bluetooth: Refactor rfcomm_dev_add()
+  Bluetooth: Cleanup RFCOMM device registration error handling
+  Bluetooth: Force -EIO from tty read/write if .activate() fails
+  Bluetooth: Don't fail RFCOMM tty writes
+  Bluetooth: Refactor write_room() calculation
+  Bluetooth: Fix write_room() calculation
+
+ include/linux/tty.h            |   6 +-
+ include/net/bluetooth/rfcomm.h |   9 +-
+ net/bluetooth/rfcomm/core.c    |  88 ++++++++++----
+ net/bluetooth/rfcomm/tty.c     | 262 ++++++++++++++++++++++-------------------
+ 4 files changed, 223 insertions(+), 142 deletions(-)
+
 -- 
 1.8.1.2
