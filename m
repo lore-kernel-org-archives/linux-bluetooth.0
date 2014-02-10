@@ -10,62 +10,70 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 09/24] Bluetooth: Fix RFCOMM tty teardown race
-Date: Sun,  9 Feb 2014 20:59:09 -0500
-Message-Id: <1391997564-1805-10-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 08/24] Bluetooth: Fix unreleased rfcomm_dev reference
+Date: Sun,  9 Feb 2014 20:59:08 -0500
+Message-Id: <1391997564-1805-9-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-RFCOMM tty device teardown can race with new tty device registration
-for the same device id:
+When RFCOMM_RELEASE_ONHUP is set, the rfcomm tty driver 'takes over'
+the initial rfcomm_dev reference created by the RFCOMMCREATEDEV ioctl.
+The assumption is that the rfcomm tty driver will release the
+rfcomm_dev reference when the tty is freed (in rfcomm_tty_cleanup()).
+However, if the tty is never opened, the 'take over' never occurs,
+so when RFCOMMRELEASEDEV ioctl is called, the reference is not
+released.
 
-CPU 0                           | CPU 1
-rfcomm_dev_add                  | rfcomm_dev_destruct
-                                |   spin_lock
-                                |   list_del   <== dev_id no longer used
-                                |   spin_unlock
-  spin_lock                     |     .
-  [search rfcomm_dev_list]      |     .
-  [dev_id not in use]           |     .
-  [initialize new rfcomm_dev]   |     .
-  spin_unlock                   |     .
-                                |     .
-  tty_port_register_device      |   tty_unregister_device
+Track the state of the reference 'take over' so that the release
+is guaranteed by either the RFCOMMRELEASEDEV ioctl or the rfcomm tty
+driver.
 
-Don't remove rfcomm_dev from the device list until after tty device
-unregistration has completed.
+Note that the synchronous hangup in rfcomm_release_dev() ensures
+that rfcomm_tty_install() cannot race with the RFCOMMRELEASEDEV ioctl.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/tty.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/net/bluetooth/rfcomm.h | 1 +
+ net/bluetooth/rfcomm/tty.c     | 6 ++++--
+ 2 files changed, 5 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
+index 29d9727..6f3fbc5 100644
+--- a/include/net/bluetooth/rfcomm.h
++++ b/include/net/bluetooth/rfcomm.h
+@@ -332,6 +332,7 @@ int  rfcomm_connect_ind(struct rfcomm_session *s, u8 channel,
+ 
+ /* rfcomm_dev.status bit definitions */
+ #define RFCOMM_DEV_RELEASED   0
++#define RFCOMM_TTY_OWNED      1
+ 
+ struct rfcomm_dev_req {
+ 	s16      dev_id;
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index bb570d9..6ea08b0 100644
+index d9d4bc8..bb570d9 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -84,10 +84,6 @@ static void rfcomm_dev_destruct(struct tty_port *port)
+@@ -441,7 +441,7 @@ static int rfcomm_release_dev(void __user *arg)
+ 		tty_kref_put(tty);
+ 	}
  
- 	BT_DBG("dev %p dlc %p", dev, dlc);
+-	if (!test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
++	if (!test_bit(RFCOMM_TTY_OWNED, &dev->status))
+ 		tty_port_put(&dev->port);
  
--	spin_lock(&rfcomm_dev_lock);
--	list_del(&dev->list);
--	spin_unlock(&rfcomm_dev_lock);
--
- 	rfcomm_dlc_lock(dlc);
- 	/* Detach DLC if it's owned by this dev */
- 	if (dlc->owner == dev)
-@@ -98,6 +94,10 @@ static void rfcomm_dev_destruct(struct tty_port *port)
+ 	tty_port_put(&dev->port);
+@@ -685,8 +685,10 @@ static int rfcomm_tty_install(struct tty_driver *driver, struct tty_struct *tty)
+ 	 * when the last process closes the tty. The behaviour is expected by
+ 	 * userspace.
+ 	 */
+-	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags))
++	if (test_bit(RFCOMM_RELEASE_ONHUP, &dev->flags)) {
++		set_bit(RFCOMM_TTY_OWNED, &dev->status);
+ 		tty_port_put(&dev->port);
++	}
  
- 	tty_unregister_device(rfcomm_tty_driver, dev->id);
- 
-+	spin_lock(&rfcomm_dev_lock);
-+	list_del(&dev->list);
-+	spin_unlock(&rfcomm_dev_lock);
-+
- 	kfree(dev);
- 
- 	/* It's safe to call module_put() here because socket still
+ 	return 0;
+ }
 -- 
 1.8.1.2
