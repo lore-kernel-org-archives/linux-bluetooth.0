@@ -9,66 +9,82 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	Sander Eikelenboom <linux@eikelenboom.it>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Jiri Slaby <jslaby@suse.cz>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH 05/24] Bluetooth: Fix racy acquire of rfcomm_dev reference
-Date: Sun,  9 Feb 2014 20:59:05 -0500
-Message-Id: <1391997564-1805-6-git-send-email-peter@hurleysoftware.com>
+	Peter Hurley <peter@hurleysoftware.com>
+Subject: [PATCH 03/24] Revert "Bluetooth: Move rfcomm_get_device() before rfcomm_dev_activate()"
+Date: Sun,  9 Feb 2014 20:59:03 -0500
+Message-Id: <1391997564-1805-4-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rfcomm_dev_get() can return a rfcomm_dev reference for a
-device for which destruction may be commencing. This can happen
-on tty destruction, which calls rfcomm_tty_cleanup(), the last
-port reference may have been released but RFCOMM_TTY_RELEASED
-was not set. The following race is also possible:
+This reverts commit e228b63390536f5b737056059a9a04ea016b1abf.
 
-CPU 0                            | CPU 1
-                                 | rfcomm_release_dev
-rfcomm_dev_get                   |   .
-  spin_lock                      |   .
-    dev  = __rfcomm_dev_get      |   .
-    if dev                       |   .
-      if test_bit(TTY_RELEASED)  |   .
-                                 |   !test_and_set_bit(TTY_RELEASED)
-                                 |     tty_port_put   <<<< last reference
-      else                       |
-        tty_port_get             |
+This is the third of a 3-patch revert, together with
+Revert "Bluetooth: Remove rfcomm_carrier_raised()" and
+Revert "Bluetooth: Always wait for a connection on RFCOMM open()".
 
-The reference acquire is bogus because destruction will commence
-with the release of the last reference.
+Commit 4a2fb3ecc7467c775b154813861f25a0ddc11aa0,
+"Bluetooth: Always wait for a connection on RFCOMM open()" open-codes
+blocking on tty open(), rather than using the default behavior
+implemented by the tty port.
 
-Ignore the external state change of TTY_RELEASED and instead rely
-on the reference acquire itself to determine if the reference is
-valid.
+The reasons for reverting that patch are detailed in that changelog;
+this patch restores required functionality for that revert.
 
-Cc: Jiri Slaby <jslaby@suse.cz>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/tty.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index a535ef1..7cf193f 100644
+index 32ef9f9..a535ef1 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -157,12 +157,8 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
+@@ -103,22 +103,6 @@ static void rfcomm_dev_destruct(struct tty_port *port)
+ 	module_put(THIS_MODULE);
+ }
  
- 	dev = __rfcomm_dev_get(id);
+-static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
+-{
+-	struct hci_dev *hdev;
+-	struct hci_conn *conn;
+-
+-	hdev = hci_get_route(&dev->dst, &dev->src);
+-	if (!hdev)
+-		return NULL;
+-
+-	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
+-
+-	hci_dev_put(hdev);
+-
+-	return conn ? &conn->dev : NULL;
+-}
+-
+ /* device-specific initialization: open the dlc */
+ static int rfcomm_dev_activate(struct tty_port *port, struct tty_struct *tty)
+ {
+@@ -185,6 +169,22 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
+ 	return dev;
+ }
  
--	if (dev) {
--		if (test_bit(RFCOMM_TTY_RELEASED, &dev->flags))
--			dev = NULL;
--		else
--			tty_port_get(&dev->port);
--	}
-+	if (dev && !tty_port_get(&dev->port))
-+		dev = NULL;
- 
- 	spin_unlock(&rfcomm_dev_lock);
- 
++static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
++{
++	struct hci_dev *hdev;
++	struct hci_conn *conn;
++
++	hdev = hci_get_route(&dev->dst, &dev->src);
++	if (!hdev)
++		return NULL;
++
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
++
++	hci_dev_put(hdev);
++
++	return conn ? &conn->dev : NULL;
++}
++
+ static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
+ {
+ 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
 -- 
 1.8.1.2
