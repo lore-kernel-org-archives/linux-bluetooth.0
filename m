@@ -10,62 +10,62 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 12/24] Bluetooth: Refactor deferred setup test in rfcomm_dlc_close()
-Date: Sun,  9 Feb 2014 20:59:12 -0500
-Message-Id: <1391997564-1805-13-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 09/24] Bluetooth: Fix RFCOMM tty teardown race
+Date: Sun,  9 Feb 2014 20:59:09 -0500
+Message-Id: <1391997564-1805-10-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Prepare for directly closing dlc if the RFCOMM session has not
-yet been started; refactor the deferred setup test for only those
-dlc states to which the test applies. Retains functional
-equivalence.
+RFCOMM tty device teardown can race with new tty device registration
+for the same device id:
+
+CPU 0                           | CPU 1
+rfcomm_dev_add                  | rfcomm_dev_destruct
+                                |   spin_lock
+                                |   list_del   <== dev_id no longer used
+                                |   spin_unlock
+  spin_lock                     |     .
+  [search rfcomm_dev_list]      |     .
+  [dev_id not in use]           |     .
+  [initialize new rfcomm_dev]   |     .
+  spin_unlock                   |     .
+                                |     .
+  tty_port_register_device      |   tty_unregister_device
+
+Don't remove rfcomm_dev from the device list until after tty device
+unregistration has completed.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/core.c | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index b5a3785..797b7e1 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -442,11 +442,18 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 	switch (d->state) {
- 	case BT_CONNECT:
- 	case BT_CONFIG:
-+	case BT_OPEN:
-+	case BT_CONNECT2:
- 		if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
- 			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
- 			rfcomm_schedule();
--			break;
-+			return 0;
- 		}
-+	}
-+
-+	switch (d->state) {
-+	case BT_CONNECT:
-+	case BT_CONFIG:
- 		/* Fall through */
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index bb570d9..6ea08b0 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -84,10 +84,6 @@ static void rfcomm_dev_destruct(struct tty_port *port)
  
- 	case BT_CONNECTED:
-@@ -460,15 +467,6 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
- 		}
- 		break;
+ 	BT_DBG("dev %p dlc %p", dev, dlc);
  
--	case BT_OPEN:
--	case BT_CONNECT2:
--		if (test_and_clear_bit(RFCOMM_DEFER_SETUP, &d->flags)) {
--			set_bit(RFCOMM_AUTH_REJECT, &d->flags);
--			rfcomm_schedule();
--			break;
--		}
--		/* Fall through */
+-	spin_lock(&rfcomm_dev_lock);
+-	list_del(&dev->list);
+-	spin_unlock(&rfcomm_dev_lock);
 -
- 	default:
- 		rfcomm_dlc_clear_timer(d);
+ 	rfcomm_dlc_lock(dlc);
+ 	/* Detach DLC if it's owned by this dev */
+ 	if (dlc->owner == dev)
+@@ -98,6 +94,10 @@ static void rfcomm_dev_destruct(struct tty_port *port)
  
+ 	tty_unregister_device(rfcomm_tty_driver, dev->id);
+ 
++	spin_lock(&rfcomm_dev_lock);
++	list_del(&dev->list);
++	spin_unlock(&rfcomm_dev_lock);
++
+ 	kfree(dev);
+ 
+ 	/* It's safe to call module_put() here because socket still
 -- 
 1.8.1.2
