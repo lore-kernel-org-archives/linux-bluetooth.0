@@ -10,85 +10,43 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 18/24] Bluetooth: Serialize RFCOMMCREATEDEV and RFCOMMRELEASEDEV ioctls
-Date: Sun,  9 Feb 2014 20:59:18 -0500
-Message-Id: <1391997564-1805-19-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 16/24] Bluetooth: Fix RFCOMM parent device for reused dlc
+Date: Sun,  9 Feb 2014 20:59:16 -0500
+Message-Id: <1391997564-1805-17-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-At least two different race conditions exist with multiple concurrent
-RFCOMMCREATEDEV and RFCOMMRELEASEDEV ioctls:
-* Multiple concurrent RFCOMMCREATEDEVs with RFCOMM_REUSE_DLC can
-  mistakenly share the same DLC.
-* RFCOMMRELEASEDEV can destruct the rfcomm_dev still being
-  constructed by RFCOMMCREATEDEV.
+The RFCOMM tty device is parented to the acl link device when
+the dlc state_change(BT_CONNECTED) notification is received.
+However, if the dlc from the RFCOMM socket is being reused
+(RFCOMM_REUSE_DLC is set), then the dlc may already be connected,
+and no notification will occur.
 
-Introduce rfcomm_ioctl_mutex to serialize these add/remove operations.
+Instead, always parent the RFCOMM tty device to the acl link
+device at registration time. If the acl link device is not available
+(eg, because the dlc is not connected) then the tty will remain
+unparented until the BT_CONNECTED notification is received.
+
+Fixes regression with ModemManager when the rfcomm device is
+created with the flag RFCOMM_REUSE_DLC.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/tty.c | 27 +++++++++++++++++++++++++--
- 1 file changed, 25 insertions(+), 2 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 4a38b54..ef27695 100644
+index 2975bc4..fa1226f 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -40,6 +40,7 @@
- #define RFCOMM_TTY_MAJOR 216		/* device node major id of the usb/bluetooth.c driver */
- #define RFCOMM_TTY_MINOR 0
+@@ -316,6 +316,7 @@ out:
+ 		goto free;
+ 	}
  
-+static DEFINE_MUTEX(rfcomm_ioctl_mutex);
- static struct tty_driver *rfcomm_tty_driver;
++	rfcomm_reparent_device(dev);
+ 	dev_set_drvdata(dev->tty_dev, dev);
  
- struct rfcomm_dev {
-@@ -373,7 +374,7 @@ static struct sk_buff *rfcomm_wmalloc(struct rfcomm_dev *dev, unsigned long size
- 
- #define NOCAP_FLAGS ((1 << RFCOMM_REUSE_DLC) | (1 << RFCOMM_RELEASE_ONHUP))
- 
--static int rfcomm_create_dev(struct sock *sk, void __user *arg)
-+static int __rfcomm_create_dev(struct sock *sk, void __user *arg)
- {
- 	struct rfcomm_dev_req req;
- 	struct rfcomm_dlc *dlc;
-@@ -423,7 +424,7 @@ static int rfcomm_create_dev(struct sock *sk, void __user *arg)
- 	return id;
- }
- 
--static int rfcomm_release_dev(void __user *arg)
-+static int __rfcomm_release_dev(void __user *arg)
- {
- 	struct rfcomm_dev_req req;
- 	struct rfcomm_dev *dev;
-@@ -466,6 +467,28 @@ static int rfcomm_release_dev(void __user *arg)
- 	return 0;
- }
- 
-+static int rfcomm_create_dev(struct sock *sk, void __user *arg)
-+{
-+	int ret;
-+
-+	mutex_lock(&rfcomm_ioctl_mutex);
-+	ret = __rfcomm_create_dev(sk, arg);
-+	mutex_unlock(&rfcomm_ioctl_mutex);
-+
-+	return ret;
-+}
-+
-+static int rfcomm_release_dev(void __user *arg)
-+{
-+	int ret;
-+
-+	mutex_lock(&rfcomm_ioctl_mutex);
-+	ret = __rfcomm_release_dev(arg);
-+	mutex_unlock(&rfcomm_ioctl_mutex);
-+
-+	return ret;
-+}
-+
- static int rfcomm_get_dev_list(void __user *arg)
- {
- 	struct rfcomm_dev *dev;
+ 	if (device_create_file(dev->tty_dev, &dev_attr_address) < 0)
 -- 
 1.8.1.2
