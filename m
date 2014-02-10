@@ -10,43 +10,52 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 17/24] Bluetooth: Rename __rfcomm_dev_get() to __rfcomm_dev_lookup()
-Date: Sun,  9 Feb 2014 20:59:17 -0500
-Message-Id: <1391997564-1805-18-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 14/24] Bluetooth: Directly close dlc for not yet started RFCOMM session
+Date: Sun,  9 Feb 2014 20:59:14 -0500
+Message-Id: <1391997564-1805-15-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Functions which search lists for matching id's are more
-commonly named *_lookup, which is the convention in the
-bluetooth core as well.
+If the RFCOMM session has not yet been started (ie., session is
+still in BT_BOUND state) when a dlc is closed, directly close and
+unlink the dlc rather than sending a DISC frame that is never
+sent.
+
+This allows the dlci to be immediately reused rather than waiting
+for a 20 second timeout.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/tty.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/rfcomm/core.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index fa1226f..4a38b54 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -140,7 +140,7 @@ static const struct tty_port_operations rfcomm_port_ops = {
- 	.carrier_raised = rfcomm_dev_carrier_raised,
- };
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 88f0edc..8e14df6 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -467,13 +467,19 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
  
--static struct rfcomm_dev *__rfcomm_dev_get(int id)
-+static struct rfcomm_dev *__rfcomm_dev_lookup(int id)
- {
- 	struct rfcomm_dev *dev;
+ 	switch (d->state) {
+ 	case BT_CONNECT:
+-	case BT_CONFIG:
+-		/* Fall through */
+-
+ 	case BT_CONNECTED:
+ 		__rfcomm_dlc_disconn(d);
+ 		break;
  
-@@ -157,7 +157,7 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
++	case BT_CONFIG:
++		if (s->state != BT_BOUND) {
++			__rfcomm_dlc_disconn(d);
++			break;
++		}
++		/* if closing a dlc in a session that hasn't been started,
++		 * just close and unlink the dlc
++		 */
++
+ 	default:
+ 		rfcomm_dlc_clear_timer(d);
  
- 	spin_lock(&rfcomm_dev_lock);
- 
--	dev = __rfcomm_dev_get(id);
-+	dev = __rfcomm_dev_lookup(id);
- 
- 	if (dev && !tty_port_get(&dev->port))
- 		dev = NULL;
 -- 
 1.8.1.2
