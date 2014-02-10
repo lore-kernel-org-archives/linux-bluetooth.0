@@ -1,49 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1391775078-25010-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1391775078-25010-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 10 Feb 2014 14:16:09 +0200
-Message-ID: <CABBYNZJq3wWht-Jk7BP=dkEnsTG2o8fXiF8JycJr_prMvQe0NA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] android/haltest: Remove unneeded assignment
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/README: Update with implementation status summary
+Date: Mon, 10 Feb 2014 12:50:59 +0100
+Message-Id: <1392033059-3346-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+This will give a better overview of implemented features.
+---
+ android/README | 37 ++++++++++++++++++++++++++++++++-----
+ 1 file changed, 32 insertions(+), 5 deletions(-)
 
-On Fri, Feb 7, 2014 at 2:11 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> ---
->  android/client/if-audio.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
->
-> diff --git a/android/client/if-audio.c b/android/client/if-audio.c
-> index 8c640a1..5ab11a6 100644
-> --- a/android/client/if-audio.c
-> +++ b/android/client/if-audio.c
-> @@ -225,10 +225,8 @@ static void *playback_thread(void *data)
->                 pthread_mutex_unlock(&outstream_mutex);
->         } while (len && w_len > 0);
->
-> -       if (in) {
-> +       if (in)
->                 fclose(in);
-> -               in = NULL;
-> -       }
->
->         pthread_cleanup_pop(1);
->         return NULL;
-> --
-> 1.8.3.2
-
-Pushed, note that I did move the changes from audio to android since
-the audio code will be dropped as it is not unit tested.
-
-
+diff --git a/android/README b/android/README
+index e3c314f..49536e2 100644
+--- a/android/README
++++ b/android/README
+@@ -132,15 +132,42 @@ automatically on HAL library initialization. To deinitialize HAL library and
+ stop daemon type 'bluetooth cleanup'. Type 'help' for more information. Tab
+ completion is also supported.
+ 
++=====================
++Implementation status
++=====================
++
++Summary of HALs implementation status.
++
++complete    - implementation is feature complete and Android Framework is able
++              to use it normally
++partial     - implementation is in progress and not all required features are
++              present, Android Framework is able to use some of features
++initial     - only initial implementations is present, Android Framework is
++              able to initialize but most likely not able to use it
++not started - no implementation, Android Framework is not able to initialize it
++
++profile ID    HAL header         status
++core          bluetooth.h        complete
++a2dp          bt_av.h            complete
++gatt          bt_gatt.h          not started
++              bt_gatt_client.h   not started
++              bt_gatt_server.h   not started
++handsfree     bt_hf.h            initial
++hidhost       bt_hh.h            complete
++health        bt_hl.h            not started
++pan           bt_pan.h           complete
++avrcp         bt_rc.h            partial
++socket        bt_sock.h          complete
++
+ ===========================
+ Implementation shortcomings
+ ===========================
+ 
+-It is possible that some of HAL functionality is missing implementation due to
+-reasons like feature feasibility or necessity for latest Android Framework.
+-This sections provides list of such deficiencies. Note that HAL library is
+-always expected to fully implement HAL API so missing implementation might
+-happen only in daemon.
++It is possible that some of HAL functionality (although being marked as
++complete) is missing implementation due to reasons like feature feasibility or
++necessity for latest Android Framework. This sections provides list of such
++deficiencies. Note that HAL library is always expected to fully implement HAL
++API so missing implementation might happen only in daemon.
+ 
+ HAL Bluetooth
+ =============
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
