@@ -10,39 +10,43 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 11/24] Bluetooth: Simplify RFCOMM session state eval
-Date: Sun,  9 Feb 2014 20:59:11 -0500
-Message-Id: <1391997564-1805-12-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 17/24] Bluetooth: Rename __rfcomm_dev_get() to __rfcomm_dev_lookup()
+Date: Sun,  9 Feb 2014 20:59:17 -0500
+Message-Id: <1391997564-1805-18-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Merge conditional test for BT_LISTEN session state into following
-switch statement (which is functionally equivalent).
+Functions which search lists for matching id's are more
+commonly named *_lookup, which is the convention in the
+bluetooth core as well.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/core.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 646b6ff..b5a3785 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1967,12 +1967,11 @@ static void rfcomm_process_sessions(void)
- 			continue;
- 		}
+diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
+index fa1226f..4a38b54 100644
+--- a/net/bluetooth/rfcomm/tty.c
++++ b/net/bluetooth/rfcomm/tty.c
+@@ -140,7 +140,7 @@ static const struct tty_port_operations rfcomm_port_ops = {
+ 	.carrier_raised = rfcomm_dev_carrier_raised,
+ };
  
--		if (s->state == BT_LISTEN) {
-+		switch (s->state) {
-+		case BT_LISTEN:
- 			rfcomm_accept_connection(s);
- 			continue;
--		}
+-static struct rfcomm_dev *__rfcomm_dev_get(int id)
++static struct rfcomm_dev *__rfcomm_dev_lookup(int id)
+ {
+ 	struct rfcomm_dev *dev;
  
--		switch (s->state) {
- 		case BT_BOUND:
- 			s = rfcomm_check_connection(s);
- 			break;
+@@ -157,7 +157,7 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
+ 
+ 	spin_lock(&rfcomm_dev_lock);
+ 
+-	dev = __rfcomm_dev_get(id);
++	dev = __rfcomm_dev_lookup(id);
+ 
+ 	if (dev && !tty_port_get(&dev->port))
+ 		dev = NULL;
 -- 
 1.8.1.2
