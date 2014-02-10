@@ -10,91 +10,100 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 15/24] Bluetooth: Fix unsafe RFCOMM device parenting
-Date: Sun,  9 Feb 2014 20:59:15 -0500
-Message-Id: <1391997564-1805-16-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 19/24] Bluetooth: Refactor rfcomm_dev_add()
+Date: Sun,  9 Feb 2014 20:59:19 -0500
+Message-Id: <1391997564-1805-20-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Accessing the results of hci_conn_hash_lookup_ba() is unsafe without
-holding the hci_dev_lock() during the lookup. For example:
-
-CPU 0                             | CPU 1
-hci_conn_hash_lookup_ba           | hci_conn_del
-  rcu_read_lock                   |   hci_conn_hash_del
-  list_for_each_entry_rcu         |     list_del_rcu
-    if (.....)                    |       synchronize_rcu
-      rcu_read_unlock             |
-                                  |   hci_conn_del_sysfs
-                                  |   hci_dev_put
-                                  |   hci_conn_put
-                                  |     put_device (last reference)
-                                  |       bt_link_release
-                                  |         kfree(conn)
-      return p  << just freed     |
-
-Even if a hci_conn reference were taken (via hci_conn_get), would
-not guarantee the lifetime of the sysfs device, but only safe
-access to the in-memory structure.
-
-Ensure the hci_conn device stays valid while the rfcomm device
-is reparented; rename rfcomm_get_device() to rfcomm_reparent_device()
-and perform the reparenting within the function while holding the
-hci_dev_lock.
+Move rfcomm_dev allocation and initialization into new function,
+__rfcomm_dev_add(), to simplify resource release in error handling.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/tty.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ net/bluetooth/rfcomm/tty.c | 38 ++++++++++++++++++++++++--------------
+ 1 file changed, 24 insertions(+), 14 deletions(-)
 
 diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index a58d693..2975bc4 100644
+index ef27695..0537a05 100644
 --- a/net/bluetooth/rfcomm/tty.c
 +++ b/net/bluetooth/rfcomm/tty.c
-@@ -167,20 +167,29 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
- 	return dev;
- }
+@@ -208,17 +208,16 @@ static ssize_t show_channel(struct device *tty_dev, struct device_attribute *att
+ static DEVICE_ATTR(address, S_IRUGO, show_address, NULL);
+ static DEVICE_ATTR(channel, S_IRUGO, show_channel, NULL);
  
--static struct device *rfcomm_get_device(struct rfcomm_dev *dev)
-+static void rfcomm_reparent_device(struct rfcomm_dev *dev)
+-static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
++static struct rfcomm_dev *__rfcomm_dev_add(struct rfcomm_dev_req *req,
++					   struct rfcomm_dlc *dlc)
  {
- 	struct hci_dev *hdev;
- 	struct hci_conn *conn;
+ 	struct rfcomm_dev *dev, *entry;
+ 	struct list_head *head = &rfcomm_dev_list;
+ 	int err = 0;
  
- 	hdev = hci_get_route(&dev->dst, &dev->src);
- 	if (!hdev)
--		return NULL;
-+		return;
+-	BT_DBG("id %d channel %d", req->dev_id, req->channel);
+-
+ 	dev = kzalloc(sizeof(struct rfcomm_dev), GFP_KERNEL);
+ 	if (!dev)
+-		return -ENOMEM;
++		return ERR_PTR(-ENOMEM);
  
-+	/* The lookup results are unsafe to access without the
-+	 * hci device lock (FIXME: why is this not documented?)
-+	 */
-+	hci_dev_lock(hdev);
- 	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &dev->dst);
+ 	spin_lock(&rfcomm_dev_lock);
  
--	hci_dev_put(hdev);
-+	/* Just because the acl link is in the hash table is no
-+	 * guarantee the sysfs device has been added ...
-+	 */
-+	if (conn && device_is_registered(&conn->dev))
-+		device_move(dev->tty_dev, &conn->dev, DPM_ORDER_DEV_AFTER_PARENT);
+@@ -301,22 +300,37 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+ 	   holds reference to this module. */
+ 	__module_get(THIS_MODULE);
  
--	return conn ? &conn->dev : NULL;
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
++	spin_unlock(&rfcomm_dev_lock);
++	return dev;
++
+ out:
+ 	spin_unlock(&rfcomm_dev_lock);
++	kfree(dev);
++	return ERR_PTR(err);
++}
+ 
+-	if (err < 0)
+-		goto free;
++static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
++{
++	struct rfcomm_dev *dev;
++	struct device *tty;
++
++	BT_DBG("id %d channel %d", req->dev_id, req->channel);
+ 
+-	dev->tty_dev = tty_port_register_device(&dev->port, rfcomm_tty_driver,
++	dev = __rfcomm_dev_add(req, dlc);
++	if (IS_ERR(dev))
++		return PTR_ERR(dev);
++
++	tty = tty_port_register_device(&dev->port, rfcomm_tty_driver,
+ 			dev->id, NULL);
+-	if (IS_ERR(dev->tty_dev)) {
+-		err = PTR_ERR(dev->tty_dev);
++	if (IS_ERR(tty)) {
+ 		spin_lock(&rfcomm_dev_lock);
+ 		list_del(&dev->list);
+ 		spin_unlock(&rfcomm_dev_lock);
+-		goto free;
++		kfree(dev);
++		return PTR_ERR(tty);
+ 	}
+ 
++	dev->tty_dev = tty;
+ 	rfcomm_reparent_device(dev);
+ 	dev_set_drvdata(dev->tty_dev, dev);
+ 
+@@ -327,10 +341,6 @@ out:
+ 		BT_ERR("Failed to create channel attribute");
+ 
+ 	return dev->id;
+-
+-free:
+-	kfree(dev);
+-	return err;
  }
  
- static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
-@@ -589,8 +598,7 @@ static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err)
- 
- 	dev->err = err;
- 	if (dlc->state == BT_CONNECTED) {
--		device_move(dev->tty_dev, rfcomm_get_device(dev),
--			    DPM_ORDER_DEV_AFTER_PARENT);
-+		rfcomm_reparent_device(dev);
- 
- 		wake_up_interruptible(&dev->port.open_wait);
- 	} else if (dlc->state == BT_CLOSED)
+ /* ---- Send buffer ---- */
 -- 
 1.8.1.2
