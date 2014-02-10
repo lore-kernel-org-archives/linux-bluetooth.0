@@ -10,71 +10,63 @@ Cc: Gustavo Padovan <gustavo@padovan.org>,
 	linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 23/24] Bluetooth: Refactor write_room() calculation
-Date: Sun,  9 Feb 2014 20:59:23 -0500
-Message-Id: <1391997564-1805-24-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 13/24] Bluetooth: Refactor dlc disconnect logic in rfcomm_dlc_close()
+Date: Sun,  9 Feb 2014 20:59:13 -0500
+Message-Id: <1391997564-1805-14-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Compute the amount of space available for a single write()
-within rfcomm_room(); clamp to 0 for negative values. Note
-this patch does not change the result of the computation.
-
-Report the amount of room returned in the debug printk.
+Prepare for directly closing dlc if the RFCOMM session has not
+yet been started; refactor the dlc disconnect logic into a separate
+local function, __rfcomm_dlc_disconn(). Retains functional
+equivalence.
 
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/tty.c | 27 +++++++++++++++------------
- 1 file changed, 15 insertions(+), 12 deletions(-)
+ net/bluetooth/rfcomm/core.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index af775f3..3f44195 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -348,11 +348,18 @@ static int rfcomm_dev_add(struct rfcomm_dev_req *req, struct rfcomm_dlc *dlc)
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index 797b7e1..88f0edc 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -430,6 +430,20 @@ int rfcomm_dlc_open(struct rfcomm_dlc *d, bdaddr_t *src, bdaddr_t *dst, u8 chann
+ 	return r;
  }
  
- /* ---- Send buffer ---- */
--static inline unsigned int rfcomm_room(struct rfcomm_dlc *dlc)
-+static inline unsigned int rfcomm_room(struct rfcomm_dev *dev)
- {
--	/* We can't let it be zero, because we don't get a callback
--	   when tx_credits becomes nonzero, hence we'd never wake up */
--	return dlc->mtu * (dlc->tx_credits?:1);
-+	struct rfcomm_dlc *dlc = dev->dlc;
++static void __rfcomm_dlc_disconn(struct rfcomm_dlc *d)
++{
++	struct rfcomm_session *s = d->session;
 +
-+	/* The limit is bogus; the number of packets which can
-+	 * currently be sent by the krfcommd thread has no relevance
-+	 * to the number of packets which can be queued on the dlc's
-+	 * tx queue.
-+	 */
-+	int limit = dlc->mtu * (dlc->tx_credits?:1);
++	d->state = BT_DISCONN;
++	if (skb_queue_empty(&d->tx_queue)) {
++		rfcomm_send_disc(s, d->dlci);
++		rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT);
++	} else {
++		rfcomm_queue_disc(d);
++		rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT * 2);
++	}
++}
 +
-+	return max(0, limit - atomic_read(&dev->wmem_alloc));
- }
- 
- static void rfcomm_wfree(struct sk_buff *skb)
-@@ -809,16 +816,12 @@ static int rfcomm_tty_write(struct tty_struct *tty, const unsigned char *buf, in
- static int rfcomm_tty_write_room(struct tty_struct *tty)
+ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
  {
- 	struct rfcomm_dev *dev = (struct rfcomm_dev *) tty->driver_data;
--	int room;
-+	int room = 0;
+ 	struct rfcomm_session *s = d->session;
+@@ -457,14 +471,7 @@ static int __rfcomm_dlc_close(struct rfcomm_dlc *d, int err)
+ 		/* Fall through */
  
--	BT_DBG("tty %p", tty);
--
--	if (!dev || !dev->dlc)
--		return 0;
-+	if (dev && dev->dlc)
-+		room = rfcomm_room(dev);
+ 	case BT_CONNECTED:
+-		d->state = BT_DISCONN;
+-		if (skb_queue_empty(&d->tx_queue)) {
+-			rfcomm_send_disc(s, d->dlci);
+-			rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT);
+-		} else {
+-			rfcomm_queue_disc(d);
+-			rfcomm_dlc_set_timer(d, RFCOMM_DISC_TIMEOUT * 2);
+-		}
++		__rfcomm_dlc_disconn(d);
+ 		break;
  
--	room = rfcomm_room(dev->dlc) - atomic_read(&dev->wmem_alloc);
--	if (room < 0)
--		room = 0;
-+	BT_DBG("tty %p room %d", tty, room);
- 
- 	return room;
- }
+ 	default:
 -- 
 1.8.1.2
