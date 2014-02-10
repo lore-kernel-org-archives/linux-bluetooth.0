@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 6/6] android/a2dp: Fix audio deregistration
-Date: Mon, 10 Feb 2014 11:45:45 +0100
-Message-ID: <1392029145-7954-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 3/6] android/hal-audio: Ignore write call when closing
+Date: Mon, 10 Feb 2014 11:45:42 +0100
+Message-ID: <1392029145-7954-3-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1392029145-7954-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1392029145-7954-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,33 +12,28 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Unregistering a SEP can trigger abort_cfm callback if some device is
-connected thus we should free setups list after all endpoints are
-unregistered to avoid error in abort_cfm due to non-existing setup.
+We should not try to neither auto-resume nor write when state is set to
+NONE as this is case when we're being closed and it's ok do ignore
+write request.
 ---
- android/a2dp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ android/hal-audio.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/a2dp.c b/android/a2dp.c
-index bef037d..838ade8 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -1481,12 +1481,12 @@ static void bt_audio_unregister(void)
- 	if (audio_retry_id > 0)
- 		g_source_remove(audio_retry_id);
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index efdf823..766327b 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -831,6 +831,10 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ {
+ 	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
  
--	g_slist_free_full(setups, setup_free);
--	setups = NULL;
--
- 	g_slist_free_full(endpoints, unregister_endpoint);
- 	endpoints = NULL;
- 
-+	g_slist_free_full(setups, setup_free);
-+	setups = NULL;
++	/* just return in case we're closing */
++	if (out->audio_state == AUDIO_A2DP_STATE_NONE)
++		return -1;
 +
- 	audio_ipc_cleanup();
- }
- 
+ 	/* We can auto-start only from standby */
+ 	if (out->audio_state == AUDIO_A2DP_STATE_STANDBY) {
+ 		DBG("stream in standby, auto-start");
 -- 
 1.8.5.3
 
