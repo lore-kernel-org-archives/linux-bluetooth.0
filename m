@@ -1,90 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/5] emulator/bthost: Check length of received RFCOMM UIH frames
-Date: Tue, 11 Feb 2014 11:51:02 +0100
-Message-Id: <1392115862-19752-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 4/5] emulator/bthost: Check length of received RFCOMM UA frames
+Date: Tue, 11 Feb 2014 11:51:01 +0100
+Message-Id: <1392115862-19752-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1392115862-19752-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1392115862-19752-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add correct calculation of frame length. If frame is too short, ignore it.
+Check length of RFCOMM UA frames and ignore if frame is too short.
 ---
- emulator/bthost.c | 38 ++++++++++++++++++++++++++++++--------
- 1 file changed, 30 insertions(+), 8 deletions(-)
+ emulator/bthost.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/emulator/bthost.c b/emulator/bthost.c
-index ab90f4c..8447817 100644
+index 33a0544..ab90f4c 100644
 --- a/emulator/bthost.c
 +++ b/emulator/bthost.c
-@@ -1760,17 +1760,30 @@ static void rfcomm_mcc_recv(struct bthost *bthost, struct btconn *conn,
- 			struct l2conn *l2conn, const void *data, uint16_t len)
- {
- 	const struct rfcomm_mcc *mcc = data;
-+	const struct rfcomm_msc *msc;
-+	const struct rfcomm_pn *pn;
-+
-+	if (len < sizeof(*mcc))
-+		return;
- 
- 	switch (RFCOMM_GET_MCC_TYPE(mcc->type)) {
- 	case RFCOMM_MSC:
-+		if (len - sizeof(*mcc) < sizeof(*msc))
-+			break;
-+
-+		msc = data + sizeof(*mcc);
-+
- 		rfcomm_msc_recv(bthost, conn, l2conn,
--						RFCOMM_TEST_CR(mcc->type) / 2,
--						data + sizeof(*mcc));
-+				RFCOMM_TEST_CR(mcc->type) / 2, msc);
- 		break;
- 	case RFCOMM_PN:
-+		if (len - sizeof(*mcc) < sizeof(*pn))
-+			break;
-+
-+		pn = data + sizeof(*mcc);
-+
- 		rfcomm_pn_recv(bthost, conn, l2conn,
--					RFCOMM_TEST_CR(mcc->type) / 2,
--					data + sizeof(*mcc));
-+				RFCOMM_TEST_CR(mcc->type) / 2, pn);
- 		break;
- 	default:
- 		break;
-@@ -1781,18 +1794,27 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
- 				struct l2conn *l2conn, const void *data,
+@@ -1619,14 +1619,20 @@ static void rfcomm_ua_recv(struct bthost *bthost, struct btconn *conn,
  				uint16_t len)
  {
--	const struct rfcomm_cmd *hdr = data;
-+	const struct rfcomm_hdr *hdr = data;
-+	uint16_t hdr_len;
- 	const void *p;
+ 	const struct rfcomm_cmd *ua_hdr = data;
+-	uint8_t channel = RFCOMM_GET_CHANNEL(ua_hdr->address);
++	uint8_t channel;
+ 	struct rfcomm_connection_data *conn_data = bthost->rfcomm_conn_data;
+-	uint8_t type = RFCOMM_GET_TYPE(ua_hdr->control);
++	uint8_t type;
+ 	uint8_t buf[14];
+ 	struct rfcomm_hdr *hdr;
+ 	struct rfcomm_mcc *mcc;
+ 	struct rfcomm_pn *pn_cmd;
  
-+	if (len < sizeof(*hdr))
++	if (len < sizeof(*ua_hdr))
 +		return;
 +
- 	if (RFCOMM_GET_DLCI(hdr->address))
- 		return;
- 
- 	if (RFCOMM_TEST_EA(hdr->length))
--		p = data + sizeof(struct rfcomm_hdr);
-+		hdr_len = sizeof(*hdr);
- 	else
--		p = data + sizeof(struct rfcomm_hdr) + sizeof(uint8_t);
-+		hdr_len = sizeof(*hdr) + sizeof(uint8_t);
++	channel = RFCOMM_GET_CHANNEL(ua_hdr->address);
++	type = RFCOMM_GET_TYPE(ua_hdr->control);
 +
-+	if (len - hdr_len < 0)
-+		return;
-+
-+	p = data + hdr_len;
- 
--	rfcomm_mcc_recv(bthost, conn, l2conn, p, p - data);
-+	rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
- }
- 
- static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
+ 	if (channel && conn_data && conn_data->channel == channel) {
+ 		if (conn_data->cb)
+ 			conn_data->cb(conn->handle, l2conn->scid,
 -- 
 1.8.3.1
 
