@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391772937-12802-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1391772937-12802-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1391772937-12802-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1391772937-12802-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Tue, 11 Feb 2014 17:23:48 +0100
-Message-ID: <CAMudyAvgG-zjxFS0xjshKOQ7qfkMo=3L4rXnrgOGpqJp_narAQ@mail.gmail.com>
-Subject: Re: [RFC 1/2] Add basic API for shared memory driver
+Date: Tue, 11 Feb 2014 17:23:37 +0100
+Message-ID: <CAMudyAsomuEjkpnj_2Dmqikx_t+nYsEcv_Ai0e6xzuFjG7vGbw@mail.gmail.com>
+Subject: Re: [RFC 0/2] Add hci_smd driver
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-arm-msm@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
@@ -17,96 +16,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi
 
 On 7 February 2014 12:35, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> This patch adds simple API to shared memory driver based on msm-smd.h
-> This is required in order to add support for support Qualcomm BT chips
-> via SMD
+> Hello,
 >
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> ---
->  include/linux/smd.h | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 69 insertions(+)
->  create mode 100644 include/linux/smd.h
+> This is a try (long shoot) to upstream hci shared memory driver (hci_smd)
+> which is used on Qualcomm platforms and BT chips.
 >
-> diff --git a/include/linux/smd.h b/include/linux/smd.h
-> new file mode 100644
-> index 0000000..58de0d4
-> --- /dev/null
-> +++ b/include/linux/smd.h
-> @@ -0,0 +1,69 @@
-> +/*
-> +* smd.h - API for Shared Memory Driver
-> +*
-> +* Copyright (c) 2014 Intel Corporation
-> +*
-> +* This program is free software; you can redistribute it and/or modify
-> +* it under the terms of the GNU General Public License version 2 as
-> +* published by the Free Software Foundation.
-> +*/
-> +
-> +#ifndef _SMD_H_
-> +#define _SMD_H_
-> +
-> +#include <linux/platform_device.h>
-> +
-> +/**
-> +* Events from smd device.
-> +*/
-> +#define SMD_EVENT_DATA 1
-> +#define SMD_EVENT_OPEN 2
-> +#define SMD_EVENT_CLOSE 3
-> +
-> +struct smd_channel;
-> +struct smd_notify_data;
-> +struct smd_data;
-> +
-> +/**
-> +* struct smd_ops - specific operation for smd channel
-> +*
-> +* @open:       Open SMD channel. It should return zero once device is opened.
-> +*              On open there is need to pass notification cb which is used
-> +*              for notifications form SMD device.
-> +* @close       Close SMD channel
-> +* @write:      Write data to SMD channel. It should return number of written
-> +*              bytes or negative value in case of error.
-> +* @read:       Read data from SMD channel.It should return number of written
-> +*              bytes or negative value in case of error.
-> +*@read_avail:  Returns number of bytes ready to be read. This should be called
-> +*              before read in order to allocate enought skb
-> +*
-> +*/
-> +struct smd_ops {
-> +       int (*open)(struct smd_data *s,
-> +               void (*notify)(struct platform_device *pdev,
-> +                                                       unsigned int event));
-> +       int (*close)(struct smd_data *s);
-> +       int (*write)(struct smd_data *s, const void *data, int len);
-> +       int (*read)(struct smd_data *s, void *buf, int len);
-> +       int (*read_avail)(struct smd_data *s);
-> +};
-> +/**
-> +* struct smd_data - smd device data for shared memory channel
-> +*
-> +* @pdev:       Platform device for given smd channel.
-> +* @ops:                SMD specific operations for this smd channel.
-> +* @ch:         SMD channel which is used by SMD device. Should not be
-> +*              used by the driver
-> +* @notifier:   SMD notifier data. Shall not be used by driver.
-> +*
-> +* smd_data are initialized by the platform and are available for driver
-> +* in platform_data.
-> +*/
-> +struct smd_data {
-> +       struct platform_device *pdev;
-> +       struct smd_ops ops;
-> +       struct smd_channel *ch;
-> +       struct smd_notify_data *notify_data;
-> +};
-> +#endif
-> --
+> To make it build with upstream tree I had to introduce some simple SMD API.
+> The idea here is that since SMD channel is represented by platform device
+> (as it is done in mach-msm),
+> then platfrom_data contains smd_data which contains API for that channel.
+>
+> Writing this SMD API I was inspired with MSM-SMD and since I'm not an expert
+> in this area I'm asking for comments here.
+>
+> Maybe instead of SMD API I made, I should expose functions like smd_open(), smd_write()
+> etc. something similar how sdio does, and  just deliver to upstream dummy device
+> implementing this SMD API?
+>
+> Other options I was considering is to implement  module inside mach-msm which
+> would handle registering SMD BT Channels and when it is done, it would register
+> new platform device like "smd-bt". Then I could move smd.h to some bluetooth includes
+> (althought don't now where at the moment) and hci_smd would register driver for "smd-bt"
+> In this case I would also could rid of one static variable I have now in hci_smd
+>
+> Comments on those options are welcome.
+>
+> Anyway, Hci_smd is based on one of the older version of this driver found in msm kernel
+> branch, so there are no wakelocks as in new version and also workqueues are used
+> instead of takslet.
+>
+> Since SMD expose two channels, one for CMD/EVENT and one for ACL Data I decide to
+> do separate worqueues for this. This is to make sure that ACL data never blocks EVENT
+> packages
+>
 
-Adding linux-arm-msm group for comments on SMD API
+Adding linux-arm-msm group for comments on SMD API.
 
 BR
 Lukasz
+
+
+> Lukasz Rymanowski (2):
+>   Add basic API for shared memory driver
+>   bluetooth: Add initial support for BT chip over SMD
+>
+>  drivers/bluetooth/Kconfig   |   9 +
+>  drivers/bluetooth/Makefile  |   1 +
+>  drivers/bluetooth/hci_smd.c | 461 ++++++++++++++++++++++++++++++++++++++++++++
+>  include/linux/smd.h         |  68 +++++++
+>  include/net/bluetooth/hci.h |   1 +
+>  5 files changed, 540 insertions(+)
+>  create mode 100644 drivers/bluetooth/hci_smd.c
+>  create mode 100644 include/linux/smd.h
+>
+> --
 > 1.8.4
 >
