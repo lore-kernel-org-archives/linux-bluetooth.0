@@ -1,60 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH] Bluetooth: Fix channel check when binding RFCOMM sock
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392119413-26341-1-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Tue, 11 Feb 2014 07:58:27 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <52F8F4E9-BCAF-4137-B21C-101F11DE1519@holtmann.org>
-References: <1392119413-26341-1-git-send-email-andrzej.kaczmarek@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android/avrcp: Decouple AVRCP logic from btio
+Date: Tue, 11 Feb 2014 15:37:12 +0100
+Message-ID: <5637916.N4zjDhQ0cI@leonov>
+In-Reply-To: <20140211130306.GG8980@aemeltch-MOBL1>
+References: <1391702774-18972-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <20140211130306.GG8980@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Andrei,
 
-> When binding RFCOMM socket we should only check if there is another
-> socket bound or listening on the same channel number. In other case,
-> it won't be possible to bind/listen on a channel in case we have
-> connection made to remote device on the same channel number.
-
-since this has been used for years now, you need to be more specific on when this fails.
-
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> ---
-> net/bluetooth/rfcomm/sock.c | 5 ++++-
-> 1 file changed, 4 insertions(+), 1 deletion(-)
+On Tuesday 11 of February 2014 15:03:07 Andrei Emeltchenko wrote:
+> Hi All
 > 
-> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-> index 00573fb..9912e23 100644
-> --- a/net/bluetooth/rfcomm/sock.c
-> +++ b/net/bluetooth/rfcomm/sock.c
-> @@ -331,6 +331,7 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
-> {
-> 	struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
-> 	struct sock *sk = sock->sk;
-> +	struct sock *sk1;
-> 	int err = 0;
+> On Thu, Feb 06, 2014 at 06:06:11PM +0200, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > The patch makes AVRCP to be channel-agnostic so that it might be used in
+> > unit tests. The idea is that all AVRCP logic would come to avrcp-lib and
+> > channel stuff got to avrcp.
 > 
-> 	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
-> @@ -352,7 +353,9 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
-> 
-> 	write_lock(&rfcomm_sk_list.lock);
-> 
-> -	if (sa->rc_channel && __rfcomm_get_sock_by_addr(sa->rc_channel, &sa->rc_bdaddr)) {
-> +	sk1 = __rfcomm_get_sock_by_addr(sa->rc_channel, &sa->rc_bdaddr);
-> +	if (sa->rc_channel && sk1 && (sk1->sk_state == BT_BOUND ||
-> +						sk1->sk_state == BT_LISTEN)) {
-> 		err = -EADDRINUSE;
+> Any comments regarding this patch?
 
-can we find a better name than sk1 here.
+Waiting for V2 as discussed offline.
 
-> 	} else {
-> 		/* Save source address */
-
-Regards
-
-Marcel
-
+-- 
+BR
+Szymon Janc
