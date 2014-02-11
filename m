@@ -1,74 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1391772937-12802-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1391772937-12802-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Tue, 11 Feb 2014 17:23:37 +0100
-Message-ID: <CAMudyAsomuEjkpnj_2Dmqikx_t+nYsEcv_Ai0e6xzuFjG7vGbw@mail.gmail.com>
-Subject: Re: [RFC 0/2] Add hci_smd driver
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-arm-msm@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1392134411.2625.1.camel@develbox>
+Subject: Re: [PATCH] btusb.c add IMC Networks id 13d3:3404 (bcm20702A0)
+From: Jurgen Kramer <gtmkramer@xs4all.nl>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Tue, 11 Feb 2014 17:00:11 +0100
+In-Reply-To: <F0885393-70B7-483B-8F97-C4AB73B451E6@holtmann.org>
+References: <1392031617.5601.11.camel@develbox>
+	 <F0885393-70B7-483B-8F97-C4AB73B451E6@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+Hi Marcel,
 
-On 7 February 2014 12:35, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> Hello,
->
-> This is a try (long shoot) to upstream hci shared memory driver (hci_smd)
-> which is used on Qualcomm platforms and BT chips.
->
-> To make it build with upstream tree I had to introduce some simple SMD API.
-> The idea here is that since SMD channel is represented by platform device
-> (as it is done in mach-msm),
-> then platfrom_data contains smd_data which contains API for that channel.
->
-> Writing this SMD API I was inspired with MSM-SMD and since I'm not an expert
-> in this area I'm asking for comments here.
->
-> Maybe instead of SMD API I made, I should expose functions like smd_open(), smd_write()
-> etc. something similar how sdio does, and  just deliver to upstream dummy device
-> implementing this SMD API?
->
-> Other options I was considering is to implement  module inside mach-msm which
-> would handle registering SMD BT Channels and when it is done, it would register
-> new platform device like "smd-bt". Then I could move smd.h to some bluetooth includes
-> (althought don't now where at the moment) and hci_smd would register driver for "smd-bt"
-> In this case I would also could rid of one static variable I have now in hci_smd
->
-> Comments on those options are welcome.
->
-> Anyway, Hci_smd is based on one of the older version of this driver found in msm kernel
-> branch, so there are no wakelocks as in new version and also workqueues are used
-> instead of takslet.
->
-> Since SMD expose two channels, one for CMD/EVENT and one for ACL Data I decide to
-> do separate worqueues for this. This is to make sure that ACL data never blocks EVENT
-> packages
->
+On Mon, 2014-02-10 at 10:33 -0800, Marcel Holtmann wrote:
+> HI Jurgen,
+> 
+> > Attached patch adds support for IMC Networks (13d3:3404) to BCM20702A0
+> > in btusb.c. This device is used on the Asrock Z87E-ITX motherboard.
+> > Tested against 3.12.9.
+> > 
+> > diff -uNrp
+> > linux-3.12.9-301.jk1.fc20.x86_64.orig/drivers/bluetooth/btusb.c
+> > linux-3.12.9-301.jk1.fc20.x86_64.new/drivers/bluetooth/btusb.c
+> > --- a/drivers/bluetooth/btusb.c	2014-02-10 11:35:08.976975562 +0100
+> > +++ b/drivers/bluetooth/btusb.c	2014-02-10 11:37:03.864921122 +0100
+> > @@ -106,6 +106,7 @@ static struct usb_device_id btusb_table[
+> > 	{ USB_DEVICE(0x04ca, 0x2003) },
+> > 	{ USB_DEVICE(0x0489, 0xe042) },
+> > 	{ USB_DEVICE(0x413c, 0x8197) },
+> > +	{ USB_DEVICE(0x13d3, 0x3404) },
+> > 
+> > 	/* Foxconn - Hon Hai */
+> > 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
+> > 
+> > Signed-off-by: Jurgen Kramer <gtm.kramer@xs4all.nl>
+> > 
+> > Jurgen
+> > <btusb-bcm20702a0-add-imc-networks.patch>
+> 
+> please send patches inline created from git-format-patch and include /sys/kernel/debug/usb/devices details for this device.
+OK. I'll resend in a couple of days.
 
-Adding linux-arm-msm group for comments on SMD API.
-
-BR
-Lukasz
-
-
-> Lukasz Rymanowski (2):
->   Add basic API for shared memory driver
->   bluetooth: Add initial support for BT chip over SMD
->
->  drivers/bluetooth/Kconfig   |   9 +
->  drivers/bluetooth/Makefile  |   1 +
->  drivers/bluetooth/hci_smd.c | 461 ++++++++++++++++++++++++++++++++++++++++++++
->  include/linux/smd.h         |  68 +++++++
->  include/net/bluetooth/hci.h |   1 +
->  5 files changed, 540 insertions(+)
->  create mode 100644 drivers/bluetooth/hci_smd.c
->  create mode 100644 include/linux/smd.h
->
-> --
-> 1.8.4
->
+Regards,
+Jurgen
