@@ -1,71 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2] android/README: Update with implementation status summary
-Date: Tue, 11 Feb 2014 11:40:07 +0100
-Message-Id: <1392115207-14297-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 11 Feb 2014 09:13:22 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Viswanatham, RaviTeja" <RaviTeja.Viswanatham.EDUCATION@eberspaecher.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Subject: Re: 
+Message-ID: <20140211071321.GB8980@aemeltch-MOBL1>
+References: <9BC883E0D59F6B4DBD525D460025714B08AE336F@deessmx03.dees.eberspaecher.com>
+ <BE8107B5-0F83-47C5-ADC6-345CFD24BE21@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <BE8107B5-0F83-47C5-ADC6-345CFD24BE21@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will give a better overview of implemented features.
----
- android/README | 38 +++++++++++++++++++++++++++++++++-----
- 1 file changed, 33 insertions(+), 5 deletions(-)
+Hi All,
 
-diff --git a/android/README b/android/README
-index e3c314f..b987dc9 100644
---- a/android/README
-+++ b/android/README
-@@ -132,15 +132,43 @@ automatically on HAL library initialization. To deinitialize HAL library and
- stop daemon type 'bluetooth cleanup'. Type 'help' for more information. Tab
- completion is also supported.
- 
-+=====================
-+Implementation status
-+=====================
-+
-+Summary of HALs implementation status.
-+
-+complete    - implementation is feature complete and Android Framework is able
-+              to use it normally
-+partial     - implementation is in progress and not all required features are
-+              present, Android Framework is able to use some of features
-+initial     - only initial implementations is present, Android Framework is
-+              able to initialize but most likely not able to use it
-+not started - no implementation, Android Framework is not able to initialize it
-+
-+Profile ID    HAL header         Status
-+---------------------------------------
-+core          bluetooth.h        complete
-+a2dp          bt_av.h            complete
-+gatt          bt_gatt.h          not started
-+              bt_gatt_client.h   not started
-+              bt_gatt_server.h   not started
-+handsfree     bt_hf.h            initial
-+hidhost       bt_hh.h            complete
-+health        bt_hl.h            not started
-+pan           bt_pan.h           complete
-+avrcp         bt_rc.h            partial
-+socket        bt_sock.h          partial
-+
- ===========================
- Implementation shortcomings
- ===========================
- 
--It is possible that some of HAL functionality is missing implementation due to
--reasons like feature feasibility or necessity for latest Android Framework.
--This sections provides list of such deficiencies. Note that HAL library is
--always expected to fully implement HAL API so missing implementation might
--happen only in daemon.
-+It is possible that some of HAL functionality (although being marked as
-+complete) is missing implementation due to reasons like feature feasibility or
-+necessity for latest Android Framework. This sections provides list of such
-+deficiencies. Note that HAL library is always expected to fully implement HAL
-+API so missing implementation might happen only in daemon.
- 
- HAL Bluetooth
- =============
--- 
-1.8.5.3
+On Mon, Feb 10, 2014 at 10:35:24AM -0800, Marcel Holtmann wrote:
+> Hi Ravi,
+> 
+> > I am working on Ubuntu 12.04 with a Bluetooth 3.0 +HS + wifi combo USB
+> > dongle. 
+> > 
+> > I want to reach a data transfer speed of up to 24 Mbit/s. 
+> > 
+> > My Questions: Does Bluez support high speed data transfer rates up to
+> > 24 Mbit/s (Bluetooth 3.0+HS) ? 
+> > 
+> > If it does, is there any user configuration involved to achieve that?
+> > What other requirements need to be met?  Does, Bluetooth enables AMP
+> > function to communicate 802.11n channel to support high speed or it
+> > has to be configure with any other drivers? 
+> > 
+> > I am new to Linux a detail explanation would be really appreciated.
+> > Thank you in advance for your support.
+> 
+> we do support Bluetooth HS operation. However your WiFi device needs to
+> be exposed as AMP Controller. Most WiFi hardware needs a special driver
+> to expose itself as AMP Controller. There is no generic driver for
+> mac80211 subsystem in the kernel.
 
+Some devices have AMP Controller implemented in firmware.
+I was using Marvell SD8787, probably newer Marvell devices also works.
+
+You may check drivers/bluetooth/btmrvl_main.c to see how HCI dev_type
+HCI_AMP is assigned.
+
+Best regards 
+Andrei Emeltchenko 
