@@ -1,169 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4] android: Add support for Valgrind in debug variants
-Date: Tue, 11 Feb 2014 15:28:54 +0100
-Message-ID: <1392128934-11906-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: "Viswanatham, RaviTeja"
+	<RaviTeja.Viswanatham.EDUCATION@eberspaecher.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+CC: Marcel Holtmann <marcel@holtmann.org>, "bluez mailin list
+ (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	"bzhao@marvell.com" <bzhao@marvell.com>
+Subject: AW: Bluetooth with full AMP
+Date: Tue, 11 Feb 2014 13:38:46 +0000
+Message-ID: <9BC883E0D59F6B4DBD525D460025714B08AE368D@deessmx03.dees.eberspaecher.com>
+References: <9BC883E0D59F6B4DBD525D460025714B08AE363D@deessmx03.dees.eberspaecher.com>
+ <20140211122616.GF8980@aemeltch-MOBL1>
+In-Reply-To: <20140211122616.GF8980@aemeltch-MOBL1>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch allows bluetoothd to be run with Valgrind easily in debug
-variants.
 
-For userdebug and eng variants bluetoothd is renamed to bluetoothd-main
-and bluetoothd acts a wrapper to launch it either with or without
-Valgrind (this is decided by value of persist.sys.bluetooth.valgrind
-property).
----
- android/Android.mk           | 42 ++++++++++++++++++++++++
- android/bluetoothd-wrapper.c | 76 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 118 insertions(+)
- create mode 100644 android/bluetoothd-wrapper.c
 
-diff --git a/android/Android.mk b/android/Android.mk
-index b82ef84..84e96fe 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -91,7 +91,15 @@ $(shell mkdir -p $(LOCAL_PATH)/bluez/lib/bluetooth)
- $(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/bluez/lib/bluetooth/$(file)))
- 
- LOCAL_MODULE_TAGS := optional
-+
-+# for userdebug/eng this module is bluetoothd-main since bluetoothd is used as
-+# wrapper to launch bluetooth with Valgrind
-+ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
-+LOCAL_MODULE := bluetoothd-main
-+LOCAL_STRIP_MODULE := false
-+else
- LOCAL_MODULE := bluetoothd
-+endif
- 
- include $(BUILD_EXECUTABLE)
- 
-@@ -415,3 +423,37 @@ LOCAL_CFLAGS:= \
- LOCAL_MODULE := libsbc
- 
- include $(BUILD_SHARED_LIBRARY)
-+
-+ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
-+
-+#
-+# bluetoothd (debug)
-+# this is just a wrapper used in userdebug/eng to launch bluetoothd-main
-+# with/without Valgrind
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/android/bluetoothd-wrapper.c
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libcutils \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
-+LOCAL_MODULE_TAGS := optional
-+LOCAL_MODULE := bluetoothd
-+
-+LOCAL_REQUIRED_MODULES := \
-+	bluetoothd-main \
-+	valgrind \
-+	memcheck-$(TARGET_ARCH)-linux \
-+	vgpreload_core-$(TARGET_ARCH)-linux \
-+	vgpreload_memcheck-$(TARGET_ARCH)-linux \
-+	default.supp
-+
-+include $(BUILD_EXECUTABLE)
-+
-+endif
-\ No newline at end of file
-diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
-new file mode 100644
-index 0000000..122e6b0
---- /dev/null
-+++ b/android/bluetoothd-wrapper.c
-@@ -0,0 +1,76 @@
-+/*
-+ * Copyright (C) 2014 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+
-+#include <cutils/properties.h>
-+
-+#define PROPERTY_NAME "persist.sys.bluetooth.valgrind"
-+
-+#define VALGRIND_BIN "/system/bin/valgrind"
-+
-+#define BLUETOOTHD_BIN "/system/bin/bluetoothd-main"
-+
-+static void run_valgrind(void)
-+{
-+	char *prg_argv[4];
-+	char *prg_envp[3];
-+
-+	prg_argv[0] = VALGRIND_BIN;
-+	prg_argv[1] = "--leak-check=full";
-+	prg_argv[2] = BLUETOOTHD_BIN;
-+	prg_argv[3] = NULL;
-+
-+	prg_envp[0] = "G_SLICE=always-malloc";
-+	prg_envp[1] = "G_DEBUG=gc-friendly";
-+	prg_envp[2] = NULL;
-+
-+	execve(prg_argv[0], prg_argv, prg_envp);
-+}
-+
-+static void run_bluetoothd(void)
-+{
-+	char *prg_argv[2];
-+	char *prg_envp[1];
-+
-+	prg_argv[0] = BLUETOOTHD_BIN;
-+	prg_argv[1] = NULL;
-+
-+	prg_envp[0] = NULL;
-+
-+	execve(prg_argv[0], prg_argv, prg_envp);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	char value[PROPERTY_VALUE_MAX];
-+
-+	if (property_get(PROPERTY_NAME, value, "") > 0 &&
-+			(!strcasecmp(value, "true") || atoi(value) > 0))
-+		run_valgrind();
-+
-+	/* In case we failed to execute Valgrind, try to run bluetoothd
-+	 * without it
-+	 */
-+
-+	run_bluetoothd();
-+
-+	return 0;
-+}
--- 
-1.8.5.3
+-----Urspr=FCngliche Nachricht-----
+Von: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vg=
+er.kernel.org] Im Auftrag von Andrei Emeltchenko
+Gesendet: Dienstag, 11. Februar 2014 13:27
+An: Viswanatham, RaviTeja
+Cc: Marcel Holtmann; bluez mailin list (linux-bluetooth@vger.kernel.org); b=
+zhao@marvell.com
+Betreff: Re: Bluetooth with full AMP
 
+Hi Raviteja,
+
+> On Mon, Feb 10, 2014 at 10:35:24AM -0800, Marcel Holtmann wrote:
+> > Hi Ravi,
+> >=20
+> > > I am working on Ubuntu 12.04 with a Bluetooth 3.0 +HS + wifi combo=20
+> > > USB dongle.
+> > >=20
+> > > I want to reach a data transfer speed of up to 24 Mbit/s.=20
+> > >=20
+> > > My Questions: Does Bluez support high speed data transfer rates up=20
+> > > to
+> > > 24 Mbit/s (Bluetooth 3.0+HS) ?=20
+> > >=20
+> > > If it does, is there any user configuration involved to achieve that?
+> > > What other requirements need to be met?  Does, Bluetooth enables=20
+> > > AMP function to communicate 802.11n channel to support high speed=20
+> > > or it has to be configure with any other drivers?
+> > >=20
+> > > I am new to Linux a detail explanation would be really appreciated.
+> > > Thank you in advance for your support.
+> >=20
+> > we do support Bluetooth HS operation. However your WiFi device needs=20
+> > to be exposed as AMP Controller. Most WiFi hardware needs a special=20
+> > driver to expose itself as AMP Controller. There is no generic=20
+> > driver for mac80211 subsystem in the kernel.
+>=20
+> Some devices have AMP Controller implemented in firmware.  I was using=20
+> Marvell SD8787, probably newer Marvell devices also works.
+>=20
+> You may check drivers/bluetooth/btmrvl_main.c to see how HCI dev_type=20
+> HCI_AMP is assigned.
+>=20
+> Thanks for replying me. I would like to know some more information=20
+> about the Bluetooth dongle. As you said the Marvell SD8787 is kind of=20
+> a SoC chipset. Is there any USB Bluetooth  device available in the=20
+> market which supports out of the box.
+
+The only possibility I know is Marvell development board like:
+http://avnetexpress.avnet.com/store/em/EMController/Development-Kits/Marvel=
+l/RD-88W-SD-8787-A0/_/R-10001817/A-10001817/An-0?action=3Dpart&catalogId=3D=
+500201&langId=3D-1&storeId=3D500201
+
+
+> I am running 3.11 kernel and I already build the Marvell option inside=20
+> the kernel.
+>=20
+> Is there any dongles available in the market which supports full AMP.=20
+
+At least I couldn't find one. If you find it let us know ;)
+
+> If
+> not are there any other possibilities to fix the Marvell driver with=20
+> the existing dongle. Please any hints as I am working on ARM board I=20
+> need to fix the USB Bluetooth device which can transfer with high speed.
+>=20
+
+Try to contact Marvell and ask which one supports FullAMP.
+
+Thanks for the reply. I will try to find out about the hardware while conta=
+cting Marvell. :)
+
+I bought a USB Bluetooth 3.0 HS + wlan combo dongle. The wlan driver is bas=
+ed on realtek8192cu  in the mailing list they mentioned it is based on soft=
+ AMP. I found that the realtek they didn't upgrade new driver which support=
+s new kernel (3.11 and above). =20
+
+As I understood that Marvell they developed the driver with the FullAMP so =
+that the device can run  with high speed. In the same way is there any othe=
+r possibilities drivers or else patches available. Any suggestion or hint c=
+ould be really appreciated.=20
+
+Thanks in advance,
+=20
+Regards,
+Raviteja
