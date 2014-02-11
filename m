@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 03/11] android/socket: Improve logging
-Date: Tue, 11 Feb 2014 17:58:13 +0100
-Message-ID: <1392137901-3403-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 11/11] android/socket: Fix sockets security
+Date: Tue, 11 Feb 2014 17:58:21 +0100
+Message-ID: <1392137901-3403-12-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1392137901-3403-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1392137901-3403-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,205 +12,110 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch makes logging more consistent by including rfsock pointer in
-most messages which identifies socket structure unambigously (instead
-of using bunch of file descriptors for the same purpose) and puts other
-parameters in order in some cases.
+Socket security shall be based on flags passed from HAL.
 
-Additionally, some new logs are introduced to better track socket
-structures and connections lifetime.
+Android public API uses both encrypt and auth flags for "secure"
+sockets which should be mapped to high security on our side, but since
+this would also trigger requirement for 16-digits pin code (which is
+not used in Android) we'll ignore auth flag and use either low or
+medium security based on encrypt flag value only.
 ---
- android/socket.c | 71 ++++++++++++++++++++++++++++++++++----------------------
- 1 file changed, 43 insertions(+), 28 deletions(-)
+ android/hal-msg.h |  3 +++
+ android/socket.c  | 29 +++++++++++++++++++----------
+ 2 files changed, 22 insertions(+), 10 deletions(-)
 
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index aba98ed..6ef00f9 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -235,6 +235,9 @@ struct hal_cmd_le_test_mode {
+ #define HAL_SOCK_SCO		0x02
+ #define HAL_SOCK_L2CAP		0x03
+ 
++#define HAL_SOCK_FLAG_ENCRYPT	0x01
++#define HAL_SOCK_FLAG_AUTH	0x02
++
+ #define HAL_OP_SOCK_LISTEN		0x01
+ struct hal_cmd_sock_listen {
+ 	uint8_t type;
 diff --git a/android/socket.c b/android/socket.c
-index 107042e..5045911 100644
+index c790c24..4e9121d 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -121,8 +121,8 @@ static void cleanup_rfsock(gpointer data)
- {
- 	struct rfcomm_sock *rfsock = data;
+@@ -70,6 +70,7 @@ GList *connections = NULL;
  
--	DBG("rfsock: %p jv_sock %d bt_sock %d chan %u",
--		rfsock, rfsock->jv_sock, rfsock->bt_sock, rfsock->channel);
-+	DBG("rfsock %p bt_sock %d jv_sock %d", rfsock, rfsock->bt_sock,
-+							rfsock->jv_sock);
+ struct rfcomm_sock {
+ 	int channel;	/* RFCOMM channel */
++	BtIOSecLevel sec_level;
  
- 	if (rfsock->jv_sock >= 0)
- 		if (close(rfsock->jv_sock) < 0)
-@@ -167,6 +167,8 @@ static struct rfcomm_sock *create_rfsock(int bt_sock, int *hal_sock)
- 	*hal_sock = fds[1];
- 	rfsock->bt_sock = bt_sock;
+ 	/* for socket to BT */
+ 	int bt_sock;
+@@ -84,8 +85,6 @@ struct rfcomm_sock {
  
-+	DBG("rfsock %p", rfsock);
-+
- 	if (bt_sock < 0)
- 		return rfsock;
- 
-@@ -619,8 +621,7 @@ static gboolean jv_sock_client_event_cb(GIOChannel *io, GIOCondition cond,
- 	}
- 
- 	if (cond & (G_IO_ERR | G_IO_NVAL)) {
--		error("Socket error: sock %d cond %d",
--					g_io_channel_unix_get_fd(io), cond);
-+		error("Socket %d error", g_io_channel_unix_get_fd(io));
- 		goto fail;
- 	}
- 
-@@ -639,6 +640,8 @@ static gboolean jv_sock_client_event_cb(GIOChannel *io, GIOCondition cond,
- 
- 	return TRUE;
- fail:
-+	DBG("rfsock %p jv_sock %d cond %d", rfsock, rfsock->jv_sock, cond);
-+
- 	connections = g_list_remove(connections, rfsock);
- 	cleanup_rfsock(rfsock);
- 
-@@ -657,8 +660,7 @@ static gboolean bt_sock_event_cb(GIOChannel *io, GIOCondition cond,
- 	}
- 
- 	if (cond & (G_IO_ERR | G_IO_NVAL)) {
--		error("Socket error: sock %d cond %d",
--					g_io_channel_unix_get_fd(io), cond);
-+		error("Socket %d error", g_io_channel_unix_get_fd(io));
- 		goto fail;
- 	}
- 
-@@ -677,6 +679,8 @@ static gboolean bt_sock_event_cb(GIOChannel *io, GIOCondition cond,
- 
- 	return TRUE;
- fail:
-+	DBG("rfsock %p bt_sock %d cond %d", rfsock, rfsock->bt_sock, cond);
-+
- 	connections = g_list_remove(connections, rfsock);
- 	cleanup_rfsock(rfsock);
- 
-@@ -710,7 +714,7 @@ static gboolean jv_sock_server_event_cb(GIOChannel *io, GIOCondition cond,
- {
- 	struct rfcomm_sock *rfsock = data;
- 
--	DBG("sock %d cond %d", g_io_channel_unix_get_fd(io), cond);
-+	DBG("rfsock %p jv_sock %d cond %d", rfsock, rfsock->jv_sock, cond);
- 
- 	if (cond & G_IO_NVAL)
- 		return FALSE;
-@@ -752,7 +756,8 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	}
- 
- 	ba2str(&dst, address);
--	DBG("Incoming connection from %s rfsock %p", address, rfsock);
-+	DBG("Incoming connection from %s on channel %d (rfsock %p)", address,
-+						rfsock->channel, rfsock);
- 
- 	new_sock = g_io_channel_unix_get_fd(io);
- 	new_rfsock = create_rfsock(new_sock, &hal_sock);
-@@ -761,9 +766,8 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- 		return;
- 	}
- 
--	DBG("rfsock: jv_sock %d bt_sock %d chan %u new_sock %d",
--		rfsock->jv_sock, rfsock->bt_sock, rfsock->channel,
--		new_sock);
-+	DBG("new rfsock %p bt_sock %d jv_sock %d hal_sock %d", new_rfsock,
-+			new_rfsock->bt_sock, new_rfsock->jv_sock, hal_sock);
- 
- 	if (!sock_send_accept(rfsock, &dst, hal_sock)) {
- 		cleanup_rfsock(new_rfsock);
-@@ -786,10 +790,6 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	g_io_channel_set_close_on_unref(io, FALSE);
- 
- 	new_rfsock->bt_watch = id;
+ 	uint8_t *buf;
+ 	int buf_size;
 -
--	DBG("rfsock %p rfsock_acc %p jv_watch %d bt_watch %d",
--		rfsock, new_rfsock, new_rfsock->jv_watch,
--		new_rfsock->bt_watch);
+-	const struct profile_info *profile;
+ };
+ 
+ struct rfcomm_channel {
+@@ -721,6 +720,19 @@ static int find_free_channel(void)
+ 	return 0;
  }
  
++static BtIOSecLevel get_sec_level(uint8_t flags)
++{
++	/* HAL_SOCK_FLAG_AUTH should require MITM but in our case setting
++	 * security to BT_IO_SEC_HIGH would also require 16-digits PIN code
++	 * for pre-2.1 devices which is not what Android expects. For this
++	 * reason we ignore this flag to not break apps which use "secure"
++	 * sockets (have both auth and encrypt flags set, there is no public
++	 * API in Android which should provide proper high security socket).
++	 */
++	return flags & HAL_SOCK_FLAG_ENCRYPT ? BT_IO_SEC_MEDIUM :
++							BT_IO_SEC_LOW;
++}
++
  static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
-@@ -802,8 +802,14 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
- 	GIOCondition cond;
- 	GError *err = NULL;
- 	guint id;
-+	uuid_t uu;
-+	char uuid_str[32];
+ 						uint8_t flags, int *hal_sock)
+ {
+@@ -748,7 +760,7 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
  
--	DBG("");
-+	sdp_uuid128_create(&uu, uuid);
-+	sdp_uuid2strn(&uu, uuid_str, sizeof(uuid_str));
-+
-+	DBG("chan %d flags 0x%02x uuid %s name %s", chan, flags, uuid_str,
-+									name);
+ 	profile = get_profile_by_uuid(uuid);
+ 	if (!profile) {
+-		sec_level = BT_IO_SEC_MEDIUM;
++		sec_level = get_sec_level(flags);
+ 	} else {
+ 		if (!profile->create_record)
+ 			return HAL_STATUS_INVALID;
+@@ -931,20 +943,16 @@ fail:
  
- 	if (!memcmp(uuid, zero_uuid, sizeof(zero_uuid)) && chan <= 0) {
- 		error("Invalid rfcomm listen params");
-@@ -821,7 +827,7 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
- 		sec_level = profile->sec_level;
- 	}
+ static bool do_rfcomm_connect(struct rfcomm_sock *rfsock, int chan)
+ {
+-	BtIOSecLevel sec_level = BT_IO_SEC_MEDIUM;
+ 	GIOChannel *io;
+ 	GError *gerr = NULL;
  
--	DBG("rfcomm channel %d svc_name %s", chan, name);
-+	DBG("chan %d sec_level %d", chan, sec_level);
- 
- 	rfsock = create_rfsock(-1, hal_sock);
- 	if (!rfsock)
-@@ -853,8 +859,10 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
- 
- 	rfsock->jv_watch = id;
- 
--	DBG("bt_sock %d jv_sock %d hal_sock %d", rfsock->bt_sock,
--						rfsock->jv_sock, *hal_sock);
-+	DBG("rfsock %p bt_sock %d jv_sock %d hal_sock %d", rfsock,
-+								rfsock->bt_sock,
-+								rfsock->jv_sock,
-+								*hal_sock);
- 
- 	if (write(rfsock->jv_sock, &chan, sizeof(chan)) != sizeof(chan)) {
- 		error("Error sending RFCOMM channel");
-@@ -948,11 +956,8 @@ static void connect_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	}
- 
- 	ba2str(dst, address);
--	DBG("Connected to %s", address);
+-	if (rfsock->profile)
+-		sec_level = rfsock->profile->sec_level;
 -
--	DBG("rfsock: jv_sock %d bt_sock %d chan %u sock %d",
--		rfsock->jv_sock, rfsock->bt_sock, rfsock->channel,
--		g_io_channel_unix_get_fd(io));
-+	DBG("Connected to %s on channel %d (rfsock %p)", address,
-+						rfsock->channel, rfsock);
+-	DBG("rfsock %p sec_level %d chan %d", rfsock, sec_level, chan);
++	DBG("rfsock %p sec_level %d chan %d", rfsock, rfsock->sec_level, chan);
  
- 	if (!sock_send_connect(rfsock, dst))
- 		goto fail;
-@@ -987,6 +992,8 @@ static bool do_rfcomm_connect(struct rfcomm_sock *rfsock, int chan)
- 	if (rfsock->profile)
- 		sec_level = rfsock->profile->sec_level;
- 
-+	DBG("rfsock %p sec_level %d chan %d", rfsock, sec_level, chan);
-+
  	io = bt_io_connect(connect_cb, rfsock, NULL, &gerr,
  				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
  				BT_IO_OPT_DEST_BDADDR, &rfsock->dst,
-@@ -1070,7 +1077,16 @@ static uint8_t connect_rfcomm(const bdaddr_t *addr, int chan,
- 					int *hal_sock)
- {
- 	struct rfcomm_sock *rfsock;
-+	char address[18];
- 	uuid_t uu;
-+	char uuid_str[32];
-+
-+	sdp_uuid128_create(&uu, uuid);
-+	sdp_uuid2strn(&uu, uuid_str, sizeof(uuid_str));
-+	ba2str(addr, address);
-+
-+	DBG("addr %s chan %d flags 0x%02x uuid %s", address, chan, flags,
-+								uuid_str);
+ 				BT_IO_OPT_CHANNEL, chan,
+-				BT_IO_OPT_SEC_LEVEL, sec_level,
++				BT_IO_OPT_SEC_LEVEL, rfsock->sec_level,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("Failed connect: %s", gerr->message);
+@@ -1047,13 +1055,14 @@ static uint8_t connect_rfcomm(const bdaddr_t *addr, int chan,
+ 	DBG("rfsock %p jv_sock %d hal_sock %d", rfsock, rfsock->jv_sock,
+ 							*hal_sock);
  
- 	if ((!memcmp(uuid, zero_uuid, sizeof(zero_uuid)) && chan <= 0) ||
- 						!bacmp(addr, BDADDR_ANY)) {
-@@ -1082,16 +1098,15 @@ static uint8_t connect_rfcomm(const bdaddr_t *addr, int chan,
- 	if (!rfsock)
- 		return HAL_STATUS_FAILED;
- 
-+	DBG("rfsock %p jv_sock %d hal_sock %d", rfsock, rfsock->jv_sock,
-+							*hal_sock);
++	rfsock->sec_level = get_sec_level(flags);
 +
  	bacpy(&rfsock->dst, addr);
  
@@ -218,13 +123,10 @@ index 107042e..5045911 100644
  		if (!do_rfcomm_connect(rfsock, chan))
  			goto failed;
  	} else {
--		memset(&uu, 0, sizeof(uu));
--		uu.type = SDP_UUID128;
--		memcpy(&uu.value.uuid128, uuid, sizeof(uint128_t));
--
- 		rfsock->profile = get_profile_by_uuid(uuid);
+-		rfsock->profile = get_profile_by_uuid(uuid);
  
  		if (bt_search_service(&adapter_addr, &rfsock->dst, &uu,
+ 					sdp_search_cb, rfsock, NULL, 0) < 0) {
 -- 
 1.8.5.3
 
