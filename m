@@ -2,146 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/6] shared: Add support for disconnect handler in HFP
-Date: Tue, 11 Feb 2014 17:49:03 +0100
-Message-Id: <1392137346-26272-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/6] shared: Add support for disonnect handler to mainloop based IO handling
+Date: Tue, 11 Feb 2014 17:49:02 +0100
+Message-Id: <1392137346-26272-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com>
 References: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is no longer possible to send any data after disconnection.
-Extra reference is taken for disconnect watch to allow users to drop
-own reference in disconnect callback.
 ---
- src/shared/hfp.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
- src/shared/hfp.h |  6 ++++++
- 2 files changed, 63 insertions(+), 3 deletions(-)
+ src/shared/io-mainloop.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 43e88a6..3944e97 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -51,6 +51,9 @@ struct hfp_gw {
- 	hfp_debug_func_t debug_callback;
- 	hfp_destroy_func_t debug_destroy;
- 	void *debug_data;
-+	hfp_disconnect_func_t disconnect_callback;
-+	hfp_destroy_func_t disconnect_destroy;
+diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
+index 981ab17..14ab128 100644
+--- a/src/shared/io-mainloop.c
++++ b/src/shared/io-mainloop.c
+@@ -42,6 +42,9 @@ struct io {
+ 	io_callback_func_t write_callback;
+ 	io_destroy_func_t write_destroy;
+ 	void *write_data;
++	io_callback_func_t disconnect_callback;
++	io_destroy_func_t disconnect_destroy;
 +	void *disconnect_data;
  };
  
- static void write_watch_destroy(void *user_data)
-@@ -227,6 +230,7 @@ void hfp_gw_unref(struct hfp_gw *hfp)
+ static struct io *io_ref(struct io *io)
+@@ -75,6 +78,9 @@ static void io_cleanup(void *user_data)
+ 	if (io->read_destroy)
+ 		io->read_destroy(io->read_data);
  
- 	io_set_write_handler(hfp->io, NULL, NULL, NULL);
- 	io_set_read_handler(hfp->io, NULL, NULL, NULL);
-+	io_set_disconnect_handler(hfp->io, NULL, NULL, NULL);
++	if (io->disconnect_destroy)
++		io->disconnect_destroy(io->disconnect_data);
++
+ 	if (io->close_on_destroy)
+ 		close(io->fd);
  
- 	io_destroy(hfp->io);
- 	hfp->io = NULL;
-@@ -307,7 +311,7 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
- {
- 	const char *str;
- 
--	if (!hfp)
-+	if (!hfp || !hfp->io)
- 		return false;
- 
- 	switch (result) {
-@@ -333,7 +337,7 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
- 
- bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
- {
--	if (!hfp)
-+	if (!hfp || !hfp->io)
- 		return false;
- 
- 	if (ringbuf_printf(hfp->write_buf, "\r\n+CME ERROR: %u\r\n", error) < 0)
-@@ -352,7 +356,7 @@ bool hfp_gw_send_info(struct hfp_gw *hfp, const char *format, ...)
- 	char *fmt;
- 	int len;
- 
--	if (!hfp || !format)
-+	if (!hfp || !hfp->io || !format)
- 		return false;
- 
- 	if (asprintf(&fmt, "\r\n%s\r\n", format) < 0)
-@@ -391,3 +395,53 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
- 
- 	return true;
- }
+@@ -122,6 +128,21 @@ static void io_callback(int fd, uint32_t events, void *user_data)
+ 			mainloop_modify_fd(io->fd, io->events);
+ 		}
+ 	}
 +
-+static void disconnect_watch_destroy(void *user_data)
-+{
-+	struct hfp_gw *hfp = user_data;
++	if ((events & EPOLLRDHUP) && io->disconnect_callback) {
++		if (!io->disconnect_callback(io, io->disconnect_data)) {
++			if (io->disconnect_destroy)
++				io->disconnect_destroy(io->disconnect_data);
 +
-+	if (hfp->disconnect_destroy)
-+		hfp->disconnect_destroy(hfp->disconnect_data);
++			io->disconnect_callback = NULL;
++			io->disconnect_destroy = NULL;
++			io->disconnect_data = NULL;
 +
-+	hfp_gw_unref(hfp);
-+}
++			io->events &= ~EPOLLRDHUP;
 +
-+static bool io_disconnected(struct io *io, void *user_data)
-+{
-+	struct hfp_gw *hfp = user_data;
-+
-+	io_destroy(hfp->io);
-+	hfp->io = NULL;
-+
-+	if (hfp->disconnect_callback)
-+		hfp->disconnect_callback(hfp->disconnect_data);
-+
-+	return false;
-+}
-+
-+bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
-+					hfp_disconnect_func_t callback,
-+					void *user_data,
-+					hfp_destroy_func_t destroy)
-+{
-+	if (!hfp)
-+		return false;
-+
-+	if (hfp->disconnect_destroy)
-+		hfp->disconnect_destroy(hfp->disconnect_data);
-+
-+	if (!io_set_disconnect_handler(hfp->io, io_disconnected,
-+						hfp_gw_ref(hfp),
-+						disconnect_watch_destroy)) {
-+		hfp->disconnect_callback = NULL;
-+		hfp->disconnect_destroy = NULL;
-+		hfp->disconnect_data = NULL;
-+		return false;
++			mainloop_modify_fd(io->fd, io->events);
++		}
 +	}
+ }
+ 
+ struct io *io_new(int fd)
+@@ -246,5 +267,30 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
+ bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
+ 				void *user_data, io_destroy_func_t destroy)
+ {
+-	return false;
++	uint32_t events;
 +
-+	hfp->disconnect_callback = callback;
-+	hfp->disconnect_destroy = destroy;
-+	hfp->disconnect_data = user_data;
++	if (!io || io->fd < 0)
++		return false;
++
++	if (io->disconnect_destroy)
++		io->disconnect_destroy(io->disconnect_data);
++
++	if (callback)
++		events = io->events | EPOLLRDHUP;
++	else
++		events = io->events & ~EPOLLRDHUP;
++
++	io->disconnect_callback = callback;
++	io->disconnect_destroy = destroy;
++	io->disconnect_data = user_data;
++
++	if (events == io->events)
++		return true;
++
++	if (mainloop_modify_fd(io->fd, events) < 0)
++		return false;
++
++	io->events = events;
 +
 +	return true;
-+}
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index 2eca6d8..75ec484 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -64,6 +64,7 @@ typedef void (*hfp_destroy_func_t)(void *user_data);
- typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
- 
- typedef void (*hfp_command_func_t)(const char *command, void *user_data);
-+typedef void (*hfp_disconnect_func_t)(void *user_data);
- 
- struct hfp_gw;
- 
-@@ -86,3 +87,8 @@ bool hfp_gw_send_info(struct hfp_gw *hfp, const char *format, ...)
- bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
- 				hfp_command_func_t callback,
- 				void *user_data, hfp_destroy_func_t destroy);
-+
-+bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
-+					hfp_disconnect_func_t callback,
-+					void *user_data,
-+					hfp_destroy_func_t destroy);
+ }
 -- 
 1.8.5.3
 
