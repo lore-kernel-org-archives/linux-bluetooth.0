@@ -1,51 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ] unit: Fix memory leaks in gobex tests
-Date: Tue, 11 Feb 2014 14:16:31 -0400
-Message-Id: <1392142591-10150-1-git-send-email-anderson.lizardo@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 4/6] shared: Add support for shutdown to IO
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1392137346-26272-4-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 11 Feb 2014 09:02:15 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <301FB290-56A1-404A-9A79-62F360D9DA9A@holtmann.org>
+References: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com> <1392137346-26272-4-git-send-email-szymon.janc@tieto.com>
+To: Szymon Janc <szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- unit/test-gobex-apparam.c  |    2 ++
- unit/test-gobex-transfer.c |    2 ++
- 2 files changed, 4 insertions(+)
+Hi Szymon,
 
-diff --git a/unit/test-gobex-apparam.c b/unit/test-gobex-apparam.c
-index e6a42cc..976c541 100644
---- a/unit/test-gobex-apparam.c
-+++ b/unit/test-gobex-apparam.c
-@@ -250,6 +250,8 @@ static void test_apparam_get_multi(void)
- 	g_assert(string != NULL);
- 	g_assert_cmpstr(string, ==, "ABC");
- 
-+	g_free(string);
-+
- 	g_obex_apparam_free(apparam);
- }
- 
-diff --git a/unit/test-gobex-transfer.c b/unit/test-gobex-transfer.c
-index 128a467..7c9fd43 100644
---- a/unit/test-gobex-transfer.c
-+++ b/unit/test-gobex-transfer.c
-@@ -511,6 +511,7 @@ static void test_stream_put_req_abort(void)
- 	g_obex_unref(obex);
- 
- 	g_assert_error(d.err, G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED);
-+	g_error_free(d.err);
- }
- 
- static void test_stream_put_rsp_abort(void)
-@@ -556,6 +557,7 @@ static void test_stream_put_rsp_abort(void)
- 	g_obex_unref(obex);
- 
- 	g_assert_error(d.err, G_OBEX_ERROR, G_OBEX_ERROR_CANCELLED);
-+	g_error_free(d.err);
- }
- 
- static void handle_put_seq_wait(GObex *obex, GObexPacket *req,
--- 
-1.7.9.5
+> This allows to locally shutdown IO.
+> ---
+> src/shared/io-glib.c     | 9 +++++++++
+> src/shared/io-mainloop.c | 9 +++++++++
+> src/shared/io.h          | 2 ++
+> 3 files changed, 20 insertions(+)
+> 
+> diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
+> index a4f982d..8290745 100644
+> --- a/src/shared/io-glib.c
+> +++ b/src/shared/io-glib.c
+> @@ -320,3 +320,12 @@ done:
+> 
+> 	return true;
+> }
+> +
+> +bool io_shutdown(struct io *io)
+> +{
+> +	if (!io || !io->channel)
+> +		return false;
+> +
+> +	return g_io_channel_shutdown(io->channel, TRUE, NULL)
+> +							== G_IO_STATUS_NORMAL;
+> +}
+> diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
+> index 14ab128..f1e3b3b 100644
+> --- a/src/shared/io-mainloop.c
+> +++ b/src/shared/io-mainloop.c
+> @@ -26,6 +26,7 @@
+> #endif
+> 
+> #include <unistd.h>
+> +#include <sys/socket.h>
+> 
+> #include "monitor/mainloop.h"
+> #include "src/shared/util.h"
+> @@ -294,3 +295,11 @@ bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
+> 
+> 	return true;
+> }
+> +
+> +bool io_shutdown(struct io *io)
+> +{
+> +	if (!io || io->fd < 0)
+> +		return false;
+> +
+> +	return shutdown(io->fd, SHUT_RDWR) == 0;
+> +}
+
+I have no problem doing this, but why is this actually needed? Is not closing the socket good enough? Or would be better also add a shutdown_on_unref option?
+
+Regards
+
+Marcel
 
