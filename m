@@ -1,180 +1,332 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3] android: Add support for Valgrind in debug variants
-Date: Tue, 11 Feb 2014 14:25:36 +0100
-Message-ID: <4521651.4ebCpGjpVB@leonov>
-In-Reply-To: <1391680239-5396-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1391680239-5396-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 11 Feb 2014 15:03:07 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android/avrcp: Decouple AVRCP logic from btio
+Message-ID: <20140211130306.GG8980@aemeltch-MOBL1>
+References: <1391702774-18972-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1391702774-18972-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi All
 
-On Thursday 06 of February 2014 10:50:39 Andrzej Kaczmarek wrote:
-> This patch allows bluetoothd to be run with Valgrind easily in debug
-> variants.
+On Thu, Feb 06, 2014 at 06:06:11PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> For userdebug and eng variants bluetoothd is renamed to bluetoothd-main
-> and bluetoothd acts a wrapper to launch it either with or without
-> Valgrind (this is decided by value of persist.sys.bluetooth.valgrind
-> property).
+> The patch makes AVRCP to be channel-agnostic so that it might be used in
+> unit tests. The idea is that all AVRCP logic would come to avrcp-lib and
+> channel stuff got to avrcp.
+
+Any comments regarding this patch?
+
+Best regards 
+Andrei Emeltchenko 
+
+
 > ---
->  android/Android.mk           | 42 ++++++++++++++++++++++++
->  android/bluetoothd-wrapper.c | 76
-> ++++++++++++++++++++++++++++++++++++++++++++ 2 files changed, 118
-> insertions(+)
->  create mode 100644 android/bluetoothd-wrapper.c
+>  android/Android.mk  |  1 +
+>  android/Makefile.am |  1 +
+>  android/avrcp-lib.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/avrcp-lib.h | 34 +++++++++++++++++++++++
+>  android/avrcp.c     | 60 ++++++----------------------------------
+>  5 files changed, 125 insertions(+), 51 deletions(-)
+>  create mode 100644 android/avrcp-lib.c
+>  create mode 100644 android/avrcp-lib.h
 > 
 > diff --git a/android/Android.mk b/android/Android.mk
-> index 20105e6..52745fe 100644
+> index 20105e6..9b10cfe 100644
 > --- a/android/Android.mk
 > +++ b/android/Android.mk
-> @@ -82,7 +82,15 @@ $(shell mkdir -p $(LOCAL_PATH)/bluez/lib/bluetooth)
->  $(foreach file,$(lib_headers), $(shell ln -sf ../$(file)
-> $(LOCAL_PATH)/bluez/lib/bluetooth/$(file)))
-> 
->  LOCAL_MODULE_TAGS := optional
-> +
-> +# for userdebug/eng this module is bluetoothd-main since bluetoothd is used
-> as +# wrapper to launch bluetooth with Valgrind
-> +ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
-> +LOCAL_MODULE := bluetoothd-main
-> +LOCAL_STRIP_MODULE := false
-> +else
->  LOCAL_MODULE := bluetoothd
-> +endif
-> 
->  include $(BUILD_EXECUTABLE)
-> 
-> @@ -406,3 +414,37 @@ LOCAL_CFLAGS:= \
->  LOCAL_MODULE := libsbc
-> 
->  include $(BUILD_SHARED_LIBRARY)
-> +
-> +ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
-> +
-> +#
-> +# bluetoothd (debug)
-> +# this is just a wrapper used in userdebug/eng to launch bluetoothd-main
-> +# with/without Valgrind
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES := \
-> +	bluez/android/bluetoothd-wrapper.c
-> +
-> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-> +
-> +LOCAL_SHARED_LIBRARIES := \
-> +	libcutils \
-> +
-> +LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
-> +LOCAL_MODULE_TAGS := optional
-> +LOCAL_MODULE := bluetoothd
-> +
-> +LOCAL_REQUIRED_MODULES := \
-> +	bluetoothd-main \
-> +	valgrind \
-> +	memcheck-$(TARGET_ARCH)-linux \
-> +	vgpreload_core-$(TARGET_ARCH)-linux \
-> +	vgpreload_memcheck-$(TARGET_ARCH)-linux \
-> +	default.supp
-> +
-> +include $(BUILD_EXECUTABLE)
-> +
-> +endif
-> \ No newline at end of file
-> diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
+> @@ -30,6 +30,7 @@ LOCAL_SRC_FILES := \
+>  	bluez/android/avdtp.c \
+>  	bluez/android/a2dp.c \
+>  	bluez/android/avctp.c \
+> +	bluez/android/avrcp-lib.c \
+>  	bluez/android/avrcp.c \
+>  	bluez/android/pan.c \
+>  	bluez/android/handsfree.c \
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 5baa8db..3032940 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -36,6 +36,7 @@ android_bluetoothd_SOURCES = android/main.c \
+>  				android/avdtp.h android/avdtp.c \
+>  				android/a2dp.h android/a2dp.c \
+>  				android/avctp.h android/avctp.c \
+> +				android/avrcp-lib.h android/avrcp-lib.c \
+>  				android/avrcp.h android/avrcp.c \
+>  				android/socket.h android/socket.c \
+>  				android/pan.h android/pan.c \
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
 > new file mode 100644
-> index 0000000..e90277f
+> index 0000000..6dcc8ac
 > --- /dev/null
-> +++ b/android/bluetoothd-wrapper.c
-> @@ -0,0 +1,76 @@
+> +++ b/android/avrcp-lib.c
+> @@ -0,0 +1,80 @@
 > +/*
-> + * Copyright (C) 2014 Intel Corporation
 > + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
+> + *  BlueZ - Bluetooth protocol stack for Linux
 > + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
 > + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-> + * See the License for the specific language governing permissions and + *
-> limitations under the License.
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 > + *
 > + */
 > +
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +#include <unistd.h>
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
 > +
-> +#include <cutils/properties.h>
+> +#include <stdbool.h>
+> +#include <glib.h>
 > +
-> +#define PROPERTY_NAME "persist.sys.bluetooth.valgrind"
+> +#include "lib/bluetooth.h"
 > +
-> +#define VALGRIND_BIN "/system/bin/valgrind"
+> +#include "src/log.h"
 > +
-> +#define BLUETOOTHD_BIN "/system/bin/bluetoothd-main"
+> +#include "avctp.h"
+> +#include "avrcp-lib.h"
 > +
-> +void run_valgrind(void)
+> +static GSList *devices = NULL;
+> +
+> +void avrcp_device_remove(struct avrcp_device *dev)
 > +{
-> +	char *prg_argv[4];
-> +	char *prg_envp[3];
-> +
-> +	prg_argv[0] = VALGRIND_BIN;
-> +	prg_argv[1] = "--leak-check=full";
-> +	prg_argv[2] = BLUETOOTHD_BIN;
-> +	prg_argv[3] = NULL;
-> +
-> +	prg_envp[0] = "G_SLICE=always-malloc";
-> +	prg_envp[1] = "G_DEBUG=gc-friendly";
-> +	prg_envp[2] = NULL;
-> +
-> +	execve(prg_argv[0], prg_argv, prg_envp);
+> +	devices = g_slist_remove(devices, dev);
+> +	avrcp_device_free(dev);
 > +}
 > +
-> +void run_bluetoothd(void)
+> +void avrcp_free_all(void)
 > +{
-> +	char *prg_argv[2];
-> +	char *prg_envp[1];
-> +
-> +	prg_argv[0] = BLUETOOTHD_BIN;
-> +	prg_argv[1] = NULL;
-> +
-> +	prg_envp[0] = NULL;
-> +
-> +	execve(prg_argv[0], prg_argv, prg_envp);
+> +	g_slist_free_full(devices, avrcp_device_free);
+> +	devices = NULL;
 > +}
 > +
-> +int main(int argc, char *argv[])
+> +struct avrcp_device *avrcp_device_new(const bdaddr_t *dst)
 > +{
-> +	char value[PROPERTY_VALUE_MAX];
+> +	struct avrcp_device *dev;
 > +
-> +	if (property_get(PROPERTY_NAME, value, "") > 0 &&
-> +			(!strcasecmp(value, "true") || atoi(value) > 0))
-> +		run_valgrind();
+> +	dev = g_new0(struct avrcp_device, 1);
+> +	bacpy(&dev->dst, dst);
+> +	devices = g_slist_prepend(devices, dev);
 > +
-> +	/* In case we failed to execute Valgrind, try to run bluetoothd
-> +	 * without it
-> +	 */
-> +
-> +	run_bluetoothd();
-> +
-> +	return 0;
+> +	return dev;
 > +}
-
-run_valgrind() and run_bluetooth() should be static.
-Other than that this looks good to me.
-
--- 
-BR
-Szymon Janc
+> +
+> +static int device_cmp(gconstpointer s, gconstpointer user_data)
+> +{
+> +	const struct avrcp_device *dev = s;
+> +	const bdaddr_t *dst = user_data;
+> +
+> +	return bacmp(&dev->dst, dst);
+> +}
+> +
+> +struct avrcp_device *avrcp_find(const bdaddr_t *dst)
+> +{
+> +	GSList *l;
+> +
+> +	l = g_slist_find_custom(devices, dst, device_cmp);
+> +	if (!l)
+> +		return NULL;
+> +
+> +	return l->data;
+> +}
+> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> new file mode 100644
+> index 0000000..bf6872e
+> --- /dev/null
+> +++ b/android/avrcp-lib.h
+> @@ -0,0 +1,34 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU General Public License
+> + *  along with this program; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +struct avrcp_device {
+> +	bdaddr_t	dst;
+> +	struct avctp	*session;
+> +	GIOChannel      *io;
+> +};
+> +
+> +struct avrcp_device *avrcp_device_new(const bdaddr_t *dst);
+> +void avrcp_device_free(void *data);
+> +void avrcp_device_remove(struct avrcp_device *dev);
+> +void avrcp_free_all(void);
+> +struct avrcp_device *avrcp_find(const bdaddr_t *dst);
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index 7ee5a8a..22f0a04 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -38,6 +38,7 @@
+>  #include "hal-msg.h"
+>  #include "ipc.h"
+>  #include "avctp.h"
+> +#include "avrcp-lib.h"
+>  
+>  #define L2CAP_PSM_AVCTP 0x17
+>  
+> @@ -48,15 +49,8 @@
+>  
+>  static bdaddr_t adapter_addr;
+>  static uint32_t record_id = 0;
+> -static GSList *devices = NULL;
+>  static GIOChannel *server = NULL;
+>  
+> -struct avrcp_device {
+> -	bdaddr_t	dst;
+> -	struct avctp	*session;
+> -	GIOChannel	*io;
+> -};
+> -
+>  static const struct ipc_handler cmd_handlers[] = {
+>  };
+>  
+> @@ -128,7 +122,7 @@ static sdp_record_t *avrcp_record(void)
+>  	return record;
+>  }
+>  
+> -static void avrcp_device_free(void *data)
+> +void avrcp_device_free(void *data)
+>  {
+>  	struct avrcp_device *dev = data;
+>  
+> @@ -143,31 +137,6 @@ static void avrcp_device_free(void *data)
+>  	g_free(dev);
+>  }
+>  
+> -static void avrcp_device_remove(struct avrcp_device *dev)
+> -{
+> -	devices = g_slist_remove(devices, dev);
+> -	avrcp_device_free(dev);
+> -}
+> -
+> -static struct avrcp_device *avrcp_device_new(const bdaddr_t *dst)
+> -{
+> -	struct avrcp_device *dev;
+> -
+> -	dev = g_new0(struct avrcp_device, 1);
+> -	bacpy(&dev->dst, dst);
+> -	devices = g_slist_prepend(devices, dev);
+> -
+> -	return dev;
+> -}
+> -
+> -static int device_cmp(gconstpointer s, gconstpointer user_data)
+> -{
+> -	const struct avrcp_device *dev = s;
+> -	const bdaddr_t *dst = user_data;
+> -
+> -	return bacmp(&dev->dst, dst);
+> -}
+> -
+>  static void disconnect_cb(void *data)
+>  {
+>  	struct avrcp_device *dev = data;
+> @@ -186,7 +155,6 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>  	char address[18];
+>  	uint16_t imtu, omtu;
+>  	GError *gerr = NULL;
+> -	GSList *l;
+>  	int fd;
+>  
+>  	if (err) {
+> @@ -209,13 +177,9 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>  
+>  	ba2str(&dst, address);
+>  
+> -	l = g_slist_find_custom(devices, &dst, device_cmp);
+> -	if (l) {
+> -		dev = l->data;
+> -		if (dev->session) {
+> -			error("Unexpected connection");
+> -			return;
+> -		}
+> +	if (avrcp_find(&dst)) {
+> +		error("Unexpected connection");
+> +		return;
+>  	} else {
+>  		DBG("Incoming connection from %s", address);
+>  		dev = avrcp_device_new(&dst);
+> @@ -293,8 +257,7 @@ void bt_avrcp_unregister(void)
+>  {
+>  	DBG("");
+>  
+> -	g_slist_free_full(devices, avrcp_device_free);
+> -	devices = NULL;
+> +	avrcp_free_all();
+>  
+>  	ipc_unregister(HAL_SERVICE_ID_AVRCP);
+>  
+> @@ -331,12 +294,10 @@ void bt_avrcp_connect(const bdaddr_t *dst)
+>  {
+>  	struct avrcp_device *dev;
+>  	char addr[18];
+> -	GSList *l;
+>  
+>  	DBG("");
+>  
+> -	l = g_slist_find_custom(devices, dst, device_cmp);
+> -	if (l)
+> +	if (avrcp_find(dst))
+>  		return;
+>  
+>  	dev = avrcp_device_new(dst);
+> @@ -352,16 +313,13 @@ void bt_avrcp_connect(const bdaddr_t *dst)
+>  void bt_avrcp_disconnect(const bdaddr_t *dst)
+>  {
+>  	struct avrcp_device *dev;
+> -	GSList *l;
+>  
+>  	DBG("");
+>  
+> -	l = g_slist_find_custom(devices, dst, device_cmp);
+> -	if (!l)
+> +	dev = avrcp_find(dst);
+> +	if (!dev)
+>  		return;
+>  
+> -	dev = l->data;
+> -
+>  	if (dev->session) {
+>  		avctp_shutdown(dev->session);
+>  		return;
+> -- 
+> 1.8.3.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
