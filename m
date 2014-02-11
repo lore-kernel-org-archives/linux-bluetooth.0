@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 07/11] android/socket: Add support for dynamic channel numbers
-Date: Tue, 11 Feb 2014 17:58:17 +0100
-Message-ID: <1392137901-3403-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 08/11] android/socket: Register SDP record for application service
+Date: Tue, 11 Feb 2014 17:58:18 +0100
+Message-ID: <1392137901-3403-9-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1392137901-3403-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1392137901-3403-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,63 +12,82 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to register server with channel number assigned
-dynamically, i.e. first free number is assigned. Channels which are
-reserved for built-in services are not assigned for other services.
+This patch adds SDP record for services registered from application
+(other than built-in services).
 ---
- android/socket.c | 26 +++++++++++++++++++++++---
- 1 file changed, 23 insertions(+), 3 deletions(-)
+ android/socket.c | 40 +++++++++++++++++++++++++++++++---------
+ 1 file changed, 31 insertions(+), 9 deletions(-)
 
 diff --git a/android/socket.c b/android/socket.c
-index 4e823dd..e560609 100644
+index e560609..9175bf3 100644
 --- a/android/socket.c
 +++ b/android/socket.c
-@@ -677,6 +677,21 @@ static void accept_cb(GIOChannel *io, GError *err, gpointer user_data)
- 	new_rfsock->bt_watch = id;
+@@ -350,6 +350,22 @@ static sdp_record_t *create_spp_record(uint8_t chan, const char *svc_name)
+ 	return record;
  }
  
-+static int find_free_channel(void)
++static sdp_record_t *create_app_record(uint8_t chan,
++						const uint8_t *app_uuid,
++						const char *svc_name)
 +{
-+	int ch;
++	sdp_record_t *record;
++	uuid_t uuid;
 +
-+	/* channel 0 is reserver so we don't use it */
-+	for (ch = 1; ch <= RFCOMM_CHANNEL_MAX; ch++) {
-+		struct rfcomm_channel *srv = &servers[ch];
++	sdp_uuid128_create(&uuid, app_uuid);
 +
-+		if (!srv->reserved && srv->rfsock == NULL)
-+			return ch;
-+	}
++	record = create_rfcomm_record(chan, &uuid, svc_name, false);
++	if (!record)
++		return NULL;
 +
-+	return 0;
++	return record;
 +}
 +
- static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
- 						uint8_t flags, int *hal_sock)
- {
-@@ -704,15 +719,20 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
+ static const struct profile_info {
+ 	uint8_t		uuid[16];
+ 	uint8_t		channel;
+@@ -396,19 +412,24 @@ static const struct profile_info {
+ 	},
+ };
  
- 	profile = get_profile_by_uuid(uuid);
- 	if (!profile) {
--		if (chan <= 0)
--			return HAL_STATUS_INVALID;
+-static uint32_t sdp_service_register(const struct profile_info *profile,
+-							const void *svc_name)
++static uint32_t sdp_service_register(uint8_t channel, const uint8_t *uuid,
++					const struct profile_info *profile,
++					const void *svc_name)
+ {
+-	sdp_record_t *record;
 -
- 		sec_level = BT_IO_SEC_MEDIUM;
- 	} else {
- 		chan = profile->channel;
- 		sec_level = profile->sec_level;
+-	if (!profile || !profile->create_record)
+-		return 0;
++	sdp_record_t *record = NULL;
++	uint8_t svc_hint = 0;
++
++	if (profile && profile->create_record) {
++		record = profile->create_record(channel, svc_name);
++		svc_hint = profile->svc_hint;
++	} else if (uuid) {
++		record = create_app_record(channel, uuid, svc_name);
++	}
+ 
+-	record = profile->create_record(profile->channel, svc_name);
+ 	if (!record)
+ 		return 0;
+ 
+-	if (bt_adapter_add_record(record, profile->svc_hint) < 0) {
++	if (bt_adapter_add_record(record, svc_hint) < 0) {
+ 		error("Failed to register on SDP record");
+ 		sdp_record_free(record);
+ 		return 0;
+@@ -782,7 +803,8 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
+ 		goto failed;
  	}
  
-+	if (chan <= 0)
-+		chan = find_free_channel();
-+
-+	if (!chan) {
-+		error("No free channels");
-+		return HAL_STATUS_BUSY;
-+	}
-+
- 	if (servers[chan].rfsock != NULL) {
- 		error("Channel already registered (%d)", chan);
- 		return HAL_STATUS_BUSY;
+-	rfsock->service_handle = sdp_service_register(profile, name);
++	rfsock->service_handle = sdp_service_register(chan, uuid, profile,
++									name);
+ 
+ 	servers[chan].rfsock = rfsock;
+ 
 -- 
 1.8.5.3
 
