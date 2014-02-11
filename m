@@ -1,116 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] android/ipc: Add AVRCP HAL message definitions
-Date: Tue, 11 Feb 2014 17:59:42 +0100
-Message-ID: <1519908.bKHxqeH89a@leonov>
-In-Reply-To: <1390406788-17152-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1390406788-17152-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 05/11] android/socket: Make servers list as static array
+Date: Tue, 11 Feb 2014 17:58:15 +0100
+Message-ID: <1392137901-3403-6-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1392137901-3403-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1392137901-3403-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Since there is only small, fixed number of channels to allocate for
+RFCOMM servers we can store them in static array. This will make
+lookup for free channel simpler once we add support to assign channel
+numbers dynamically.
 
-On Wednesday 22 of January 2014 18:06:28 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> ---
->  android/hal-msg.h | 71
-> +++++++++++++++++++++++++++++++++++++++++++++++++++++++ 1 file changed, 71
-> insertions(+)
-> 
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index d46b428..3937f07 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -338,6 +338,77 @@ struct hal_cmd_a2dp_disconnect {
->  	uint8_t bdaddr[6];
->  } __attribute__((packed));
-> 
-> +/* AVRCP HAL API */
-> +
-> +#define HAL_OP_AVRCP_GET_PLAY_STATUS_RSP		0x01
-> +struct hal_cmd_avrcp_get_play_status_rsp {
-> +	uint8_t  status;
+At startup, channels reserved for built-in services which have static
+channel number are marked as reserved so they cannot be assigned for
+other service.
+---
+ android/socket.c | 44 +++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 37 insertions(+), 7 deletions(-)
 
-defines for enums should be added as well (this goes for all enums)
-
-> +	uint32_t len;
-> +	uint32_t pos;
-> +} __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_LIST_PLAYER_APP_ATTR_RSP		0x02
-> +struct hal_cmd_avrcp_list_player_app_attr_rsp {
-> +	uint16_t len;
-> +	uint8_t  data[0];
-> +} __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_LIST_PLAYER_APP_VAL_RSP		0x03
-> +struct hal_cmd_avrcp_list_player_app_val_rsp {
-> +	uint16_t len;
-> +	uint8_t  data[0];
-> +} __attribute__((packed));
-> +
-> +#define MAX_APP_SETTINGS 8
-> +struct player_setting {
-> +	uint8_t num_attr;
-> +	uint8_t attr_ids[MAX_APP_SETTINGS];
-> +	uint8_t attr_vals[MAX_APP_SETTINGS];
-> +} __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_GET_PLAYER_APP_VAL_RSP		0x04
-> +struct hal_cmd_avrcp_get_player_app_val_rsp {
-> +	struct player_setting settings;
-> +} __attribute__((packed));
-> +
-> +#define MAX_ATTR_STR_LEN 255
-> +struct player_text {
-> +	uint32_t id;
-> +	uint8_t text[MAX_ATTR_STR_LEN];
-> +}  __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_GET_PLAYER_APP_ATTR_TEXT_RSP	0x05
-> +#define HAL_OP_AVRCP_GET_PLAYER_APP_VAL_TEXT_RSP	0x06
-> +#define HAL_OP_AVRCP_GET_ELEMENT_ATTR_RSP		0x07
-> +struct hal_cmd_avrcp_get_text_rsp {
-> +	uint16_t len;
-> +	struct player_text data[0];
-> +} __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_SET_PLAYER_APP_VAL_RSP		0x08
-> +struct hal_cmd_avrcp_set_player_app_val_rsp {
-> +	uint8_t status;
-> +} __attribute__((packed));
-> +
-> +union notification {
-> +	uint8_t  status;
-> +	uint8_t  uid[8];
-> +	uint32_t pos;
-> +	struct player_setting player_settings;
-> +} __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_REGISTER_NOTIFICATION_RSP		0x09
-> +struct hal_cmd_avrcp_register_notification_rsp {
-> +	uint8_t id;
-> +	uint8_t type;
-> +	union notification param;
-> +}  __attribute__((packed));
-> +
-> +#define HAL_OP_AVRCP_SET_VOLUME				0x0a
-> +struct hal_cmd_avrcp_set_volume {
-> +	uint8_t volume;
-> +}  __attribute__((packed));
-> +
->  /* PAN HAL API */
-> 
->  /* PAN Roles */
-
-Please add structures for notifications. Also hal-ipc-api.txt needs to be 
-updated before this can go in.
-
+diff --git a/android/socket.c b/android/socket.c
+index 32de91a..4e823dd 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -45,6 +45,8 @@
+ #include "utils.h"
+ #include "socket.h"
+ 
++#define RFCOMM_CHANNEL_MAX 30
++
+ #define SPP_DEFAULT_CHANNEL	3
+ #define OPP_DEFAULT_CHANNEL	9
+ #define PBAP_DEFAULT_CHANNEL	15
+@@ -64,9 +66,6 @@ static bdaddr_t adapter_addr;
+ 
+ static const uint8_t zero_uuid[16] = { 0 };
+ 
+-/* Simple list of RFCOMM server sockets */
+-GList *servers = NULL;
+-
+ /* Simple list of RFCOMM connected sockets */
+ GList *connections = NULL;
+ 
+@@ -90,6 +89,13 @@ struct rfcomm_sock {
+ 	const struct profile_info *profile;
+ };
+ 
++struct rfcomm_channel {
++	bool reserved;
++	struct rfcomm_sock *rfsock;
++};
++
++static struct rfcomm_channel servers[RFCOMM_CHANNEL_MAX + 1];
++
+ static int rfsock_set_buffer(struct rfcomm_sock *rfsock)
+ {
+ 	socklen_t len = sizeof(int);
+@@ -599,7 +605,7 @@ static gboolean jv_sock_server_event_cb(GIOChannel *io, GIOCondition cond,
+ 		return FALSE;
+ 
+ 	if (cond & (G_IO_ERR | G_IO_HUP )) {
+-		servers = g_list_remove(servers, rfsock);
++		servers[rfsock->channel].rfsock = NULL;
+ 		cleanup_rfsock(rfsock);
+ 	}
+ 
+@@ -690,7 +696,8 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
+ 	DBG("chan %d flags 0x%02x uuid %s name %s", chan, flags, uuid_str,
+ 									name);
+ 
+-	if (!memcmp(uuid, zero_uuid, sizeof(zero_uuid)) && chan <= 0) {
++	if ((!memcmp(uuid, zero_uuid, sizeof(zero_uuid)) && chan <= 0) ||
++			(chan > RFCOMM_CHANNEL_MAX)) {
+ 		error("Invalid rfcomm listen params");
+ 		return HAL_STATUS_INVALID;
+ 	}
+@@ -706,12 +713,19 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
+ 		sec_level = profile->sec_level;
+ 	}
+ 
++	if (servers[chan].rfsock != NULL) {
++		error("Channel already registered (%d)", chan);
++		return HAL_STATUS_BUSY;
++	}
++
+ 	DBG("chan %d sec_level %d", chan, sec_level);
+ 
+ 	rfsock = create_rfsock(-1, hal_sock);
+ 	if (!rfsock)
+ 		return HAL_STATUS_FAILED;
+ 
++	rfsock->channel = chan;
++
+ 	io = bt_io_listen(accept_cb, NULL, rfsock, NULL, &err,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 				BT_IO_OPT_CHANNEL, chan,
+@@ -750,7 +764,7 @@ static uint8_t rfcomm_listen(int chan, const uint8_t *name, const uint8_t *uuid,
+ 
+ 	rfsock->service_handle = sdp_service_register(profile, name);
+ 
+-	servers = g_list_append(servers, rfsock);
++	servers[chan].rfsock = rfsock;
+ 
+ 	return HAL_STATUS_SUCCESS;
+ 
+@@ -1050,8 +1064,17 @@ static const struct ipc_handler cmd_handlers[] = {
+ 
+ void bt_socket_register(const bdaddr_t *addr)
+ {
++	size_t i;
++
+ 	DBG("");
+ 
++	/* make sure channels assigned for profiles are reserved and not used
++	 * for app services
++	 */
++	for (i = 0; i < G_N_ELEMENTS(profiles); i++)
++		if (profiles[i].channel)
++			servers[profiles[i].channel].reserved = true;
++
+ 	bacpy(&adapter_addr, addr);
+ 	ipc_register(HAL_SERVICE_ID_SOCK, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+@@ -1059,10 +1082,17 @@ void bt_socket_register(const bdaddr_t *addr)
+ 
+ void bt_socket_unregister(void)
+ {
++	int ch;
++
+ 	DBG("");
+ 
+ 	g_list_free_full(connections, cleanup_rfsock);
+-	g_list_free_full(servers, cleanup_rfsock);
++
++	for (ch = 0; ch <= RFCOMM_CHANNEL_MAX; ch++)
++		if (servers[ch].rfsock)
++			cleanup_rfsock(&servers[ch]);
++
++	memset(servers, 0, sizeof(servers));
+ 
+ 	ipc_unregister(HAL_SERVICE_ID_SOCK);
+ }
 -- 
-BR
-Szymon Janc
+1.8.5.3
+
