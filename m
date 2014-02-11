@@ -1,68 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC 0/2] Add hci_smd driver
-From: Kumar Gala <galak@codeaurora.org>
-In-Reply-To: <CAMudyAsomuEjkpnj_2Dmqikx_t+nYsEcv_Ai0e6xzuFjG7vGbw@mail.gmail.com>
-Date: Tue, 11 Feb 2014 14:00:13 -0600
-Cc: linux-arm-msm@vger.kernel.org,
+MIME-Version: 1.0
+In-Reply-To: <20140211111504.GE8980@aemeltch-MOBL1>
+References: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1391098376-26834-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<20140204140815.GQ2930@aemeltch-MOBL1>
+	<20140211111504.GE8980@aemeltch-MOBL1>
+Date: Tue, 11 Feb 2014 20:37:22 +0200
+Message-ID: <CABBYNZ+EABkj167NUx66p0kVU6mASDR2xYWH-Y2_sCZBiDB_+g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] avrcp: Fix using incorrect buffer for SetVolume
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <2AA076F5-9C40-4449-84FB-FC68809197DF@codeaurora.org>
-References: <1391772937-12802-1-git-send-email-lukasz.rymanowski@tieto.com> <CAMudyAsomuEjkpnj_2Dmqikx_t+nYsEcv_Ai0e6xzuFjG7vGbw@mail.gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
-On Feb 11, 2014, at 10:23 AM, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+On Tue, Feb 11, 2014 at 1:15 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> On Tue, Feb 04, 2014 at 04:08:17PM +0200, Andrei Emeltchenko wrote:
+>> On Thu, Jan 30, 2014 at 06:12:55PM +0200, Andrei Emeltchenko wrote:
+>> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>> >
+>> > The command requires one parameter.
+>>
+>> ping
+>
+> ping
+>
+>>
+>> > ---
+>> >  profiles/audio/avrcp.c | 2 +-
+>> >  1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+>> > index 2e1a940..128f7d3 100644
+>> > --- a/profiles/audio/avrcp.c
+>> > +++ b/profiles/audio/avrcp.c
+>> > @@ -3706,7 +3706,7 @@ int avrcp_set_volume(struct btd_device *dev, uint8_t volume)
+>> >  {
+>> >     struct avrcp_server *server;
+>> >     struct avrcp *session;
+>> > -   uint8_t buf[AVRCP_HEADER_LENGTH + 2];
+>> > +   uint8_t buf[AVRCP_HEADER_LENGTH + 1];
+>> >     struct avrcp_header *pdu = (void *) buf;
+>> >
+>> >     server = find_server(servers, device_get_adapter(dev));
+>> > --
+>> > 1.8.3.2
 
-> Hi
-> 
-> On 7 February 2014 12:35, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->> Hello,
->> 
->> This is a try (long shoot) to upstream hci shared memory driver (hci_smd)
->> which is used on Qualcomm platforms and BT chips.
->> 
->> To make it build with upstream tree I had to introduce some simple SMD API.
->> The idea here is that since SMD channel is represented by platform device
->> (as it is done in mach-msm),
->> then platfrom_data contains smd_data which contains API for that channel.
->> 
->> Writing this SMD API I was inspired with MSM-SMD and since I'm not an expert
->> in this area I'm asking for comments here.
->> 
->> Maybe instead of SMD API I made, I should expose functions like smd_open(), smd_write()
->> etc. something similar how sdio does, and  just deliver to upstream dummy device
->> implementing this SMD API?
->> 
->> Other options I was considering is to implement  module inside mach-msm which
->> would handle registering SMD BT Channels and when it is done, it would register
->> new platform device like "smd-bt". Then I could move smd.h to some bluetooth includes
->> (althought don't now where at the moment) and hci_smd would register driver for "smd-bt"
->> In this case I would also could rid of one static variable I have now in hci_smd
->> 
->> Comments on those options are welcome.
->> 
->> Anyway, Hci_smd is based on one of the older version of this driver found in msm kernel
->> branch, so there are no wakelocks as in new version and also workqueues are used
->> instead of takslet.
->> 
->> Since SMD expose two channels, one for CMD/EVENT and one for ACL Data I decide to
->> do separate worqueues for this. This is to make sure that ACL data never blocks EVENT
->> packages
->> 
-> 
-> Adding linux-arm-msm group for comments on SMD API.
-> 
-> BR
-> Lukasz
+Ive applied this one, I leave 1/3 for when we have the code properly
+decoupled and patch 3/3 I end up redoing most of it to check for
+invalid attributes.
 
-What chip/SoC/board are you trying to get bluetooth support on?
-
-- k
 
 -- 
-Employee of Qualcomm Innovation Center, Inc.
-Qualcomm Innovation Center, Inc. is a member of Code Aurora Forum, hosted by The Linux Foundation
-
+Luiz Augusto von Dentz
