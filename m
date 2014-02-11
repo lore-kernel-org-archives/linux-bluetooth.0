@@ -1,44 +1,180 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1392125277.22732.1.camel@nuvo>
-Subject: Re: Some patches applied on Fedora that maybe should be considered
- for being applied upstream
-From: Bastien Nocera <hadess@hadess.net>
-To: Pacho Ramos <pacho@gentoo.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Tue, 11 Feb 2014 14:27:57 +0100
-In-Reply-To: <1392062509.4911.0.camel@belkin5>
-References: <1391935987.4666.5.camel@belkin5>
-	 <1392039609.4417.14.camel@nuvo> <1392062509.4911.0.camel@belkin5>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3] android: Add support for Valgrind in debug variants
+Date: Tue, 11 Feb 2014 14:25:36 +0100
+Message-ID: <4521651.4ebCpGjpVB@leonov>
+In-Reply-To: <1391680239-5396-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1391680239-5396-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, 2014-02-10 at 21:01 +0100, Pacho Ramos wrote:
-> El lun, 10-02-2014 a las 14:40 +0100, Bastien Nocera escribió:
-> > On Sun, 2014-02-09 at 09:53 +0100, Pacho Ramos wrote:
-> > > Hello
-> > > 
-> > > I was looking at bluez package and found some patches that maybe could
-> > > be upstreamed. Also, I would like to know the reasons for not accepting
-> > > them to ensure they are safe to be applied downstream by us too :)
-> > > 
-> > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch -> Does this cause any issues with systemd --user setups?
-> > 
-> > Giovanni already posted this patch earlier. There's no distribution
-> > using systemd sessions, so this doesn't work yet.
-> > 
-> > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch
-> > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0002-autopair-Don-t-handle-the-iCade.patch
-> > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0004-agent-Assert-possible-infinite-loop.patch
-> > > -> Any reason for not applying it upstream too?
-> > 
-> > I've posted those patches to the list as well.
+Hi Andrzej,
+
+On Thursday 06 of February 2014 10:50:39 Andrzej Kaczmarek wrote:
+> This patch allows bluetoothd to be run with Valgrind easily in debug
+> variants.
 > 
-> And, do you know why they weren't accepted? (it's for trying to get them
-> merged and not needing to carry them forever)
+> For userdebug and eng variants bluetoothd is renamed to bluetoothd-main
+> and bluetoothd acts a wrapper to launch it either with or without
+> Valgrind (this is decided by value of persist.sys.bluetooth.valgrind
+> property).
+> ---
+>  android/Android.mk           | 42 ++++++++++++++++++++++++
+>  android/bluetoothd-wrapper.c | 76
+> ++++++++++++++++++++++++++++++++++++++++++++ 2 files changed, 118
+> insertions(+)
+>  create mode 100644 android/bluetoothd-wrapper.c
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 20105e6..52745fe 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -82,7 +82,15 @@ $(shell mkdir -p $(LOCAL_PATH)/bluez/lib/bluetooth)
+>  $(foreach file,$(lib_headers), $(shell ln -sf ../$(file)
+> $(LOCAL_PATH)/bluez/lib/bluetooth/$(file)))
+> 
+>  LOCAL_MODULE_TAGS := optional
+> +
+> +# for userdebug/eng this module is bluetoothd-main since bluetoothd is used
+> as +# wrapper to launch bluetooth with Valgrind
+> +ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
+> +LOCAL_MODULE := bluetoothd-main
+> +LOCAL_STRIP_MODULE := false
+> +else
+>  LOCAL_MODULE := bluetoothd
+> +endif
+> 
+>  include $(BUILD_EXECUTABLE)
+> 
+> @@ -406,3 +414,37 @@ LOCAL_CFLAGS:= \
+>  LOCAL_MODULE := libsbc
+> 
+>  include $(BUILD_SHARED_LIBRARY)
+> +
+> +ifneq (,$(filter userdebug eng,$(TARGET_BUILD_VARIANT)))
+> +
+> +#
+> +# bluetoothd (debug)
+> +# this is just a wrapper used in userdebug/eng to launch bluetoothd-main
+> +# with/without Valgrind
+> +#
+> +
+> +include $(CLEAR_VARS)
+> +
+> +LOCAL_SRC_FILES := \
+> +	bluez/android/bluetoothd-wrapper.c
+> +
+> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+> +
+> +LOCAL_SHARED_LIBRARIES := \
+> +	libcutils \
+> +
+> +LOCAL_MODULE_PATH := $(TARGET_OUT_EXECUTABLES)
+> +LOCAL_MODULE_TAGS := optional
+> +LOCAL_MODULE := bluetoothd
+> +
+> +LOCAL_REQUIRED_MODULES := \
+> +	bluetoothd-main \
+> +	valgrind \
+> +	memcheck-$(TARGET_ARCH)-linux \
+> +	vgpreload_core-$(TARGET_ARCH)-linux \
+> +	vgpreload_memcheck-$(TARGET_ARCH)-linux \
+> +	default.supp
+> +
+> +include $(BUILD_EXECUTABLE)
+> +
+> +endif
+> \ No newline at end of file
+> diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
+> new file mode 100644
+> index 0000000..e90277f
+> --- /dev/null
+> +++ b/android/bluetoothd-wrapper.c
+> @@ -0,0 +1,76 @@
+> +/*
+> + * Copyright (C) 2014 Intel Corporation
+> + *
+> + * Licensed under the Apache License, Version 2.0 (the "License");
+> + * you may not use this file except in compliance with the License.
+> + * You may obtain a copy of the License at
+> + *
+> + *      http://www.apache.org/licenses/LICENSE-2.0
+> + *
+> + * Unless required by applicable law or agreed to in writing, software
+> + * distributed under the License is distributed on an "AS IS" BASIS,
+> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+> + * See the License for the specific language governing permissions and + *
+> limitations under the License.
+> + *
+> + */
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +
+> +#include <cutils/properties.h>
+> +
+> +#define PROPERTY_NAME "persist.sys.bluetooth.valgrind"
+> +
+> +#define VALGRIND_BIN "/system/bin/valgrind"
+> +
+> +#define BLUETOOTHD_BIN "/system/bin/bluetoothd-main"
+> +
+> +void run_valgrind(void)
+> +{
+> +	char *prg_argv[4];
+> +	char *prg_envp[3];
+> +
+> +	prg_argv[0] = VALGRIND_BIN;
+> +	prg_argv[1] = "--leak-check=full";
+> +	prg_argv[2] = BLUETOOTHD_BIN;
+> +	prg_argv[3] = NULL;
+> +
+> +	prg_envp[0] = "G_SLICE=always-malloc";
+> +	prg_envp[1] = "G_DEBUG=gc-friendly";
+> +	prg_envp[2] = NULL;
+> +
+> +	execve(prg_argv[0], prg_argv, prg_envp);
+> +}
+> +
+> +void run_bluetoothd(void)
+> +{
+> +	char *prg_argv[2];
+> +	char *prg_envp[1];
+> +
+> +	prg_argv[0] = BLUETOOTHD_BIN;
+> +	prg_argv[1] = NULL;
+> +
+> +	prg_envp[0] = NULL;
+> +
+> +	execve(prg_argv[0], prg_argv, prg_envp);
+> +}
+> +
+> +int main(int argc, char *argv[])
+> +{
+> +	char value[PROPERTY_VALUE_MAX];
+> +
+> +	if (property_get(PROPERTY_NAME, value, "") > 0 &&
+> +			(!strcasecmp(value, "true") || atoi(value) > 0))
+> +		run_valgrind();
+> +
+> +	/* In case we failed to execute Valgrind, try to run bluetoothd
+> +	 * without it
+> +	 */
+> +
+> +	run_bluetoothd();
+> +
+> +	return 0;
+> +}
 
-Read the threads for the various patches?
+run_valgrind() and run_bluetooth() should be static.
+Other than that this looks good to me.
 
-Mailing-lists, awful at tracking patches since forever...
-
+-- 
+BR
+Szymon Janc
