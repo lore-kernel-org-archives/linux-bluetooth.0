@@ -1,95 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/6] shared: Add support for disonnect handler to GLib based IO handling
-Date: Tue, 11 Feb 2014 17:49:01 +0100
-Message-Id: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/README: Add Valgrind description
+Date: Tue, 11 Feb 2014 17:34:15 +0100
+Message-ID: <8190802.H0AKWduXNq@leonov>
+In-Reply-To: <1392119033-23035-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1392119033-23035-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/shared/io-glib.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 58 insertions(+), 1 deletion(-)
+Hi Andrzej,
 
-diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-index 77ba19e..a4f982d 100644
---- a/src/shared/io-glib.c
-+++ b/src/shared/io-glib.c
-@@ -40,6 +40,10 @@ struct io {
- 	io_callback_func_t write_callback;
- 	io_destroy_func_t write_destroy;
- 	void *write_data;
-+	guint disconnect_watch;
-+	io_callback_func_t disconnect_callback;
-+	io_destroy_func_t disconnect_destroy;
-+	void *disconnect_data;
- };
- 
- static struct io *io_ref(struct io *io)
-@@ -258,8 +262,61 @@ done:
- 	return true;
- }
- 
-+static void disconnect_watch_destroy(gpointer user_data)
-+{
-+	struct io *io = user_data;
-+
-+	if (io->disconnect_destroy)
-+		io->disconnect_destroy(io->disconnect_data);
-+
-+	io->disconnect_watch = 0;
-+	io->disconnect_callback = NULL;
-+	io->disconnect_destroy = NULL;
-+	io->disconnect_data = NULL;
-+
-+	io_unref(io);
-+}
-+
-+static gboolean disconnect_callback(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct io *io = user_data;
-+	bool result;
-+
-+	if (io->disconnect_callback)
-+		result = io->disconnect_callback(io, io->disconnect_data);
-+	else
-+		result = false;
-+
-+	return result ? TRUE : FALSE;
-+}
-+
- bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
- 				void *user_data, io_destroy_func_t destroy)
- {
--	return false;
-+	if (!io)
-+		return false;
-+
-+	if (io->disconnect_watch > 0) {
-+		g_source_remove(io->disconnect_watch);
-+		io->disconnect_watch = 0;
-+	}
-+
-+	if (!callback)
-+		goto done;
-+
-+	io->disconnect_watch = g_io_add_watch_full(io->channel,
-+				G_PRIORITY_DEFAULT,
-+				G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				disconnect_callback, io_ref(io),
-+				disconnect_watch_destroy);
-+	if (io->disconnect_watch == 0)
-+		return false;
-+
-+	io->disconnect_destroy = destroy;
-+	io->disconnect_data = user_data;
-+done:
-+	io->disconnect_callback = callback;
-+
-+	return true;
- }
+On Tuesday 11 of February 2014 12:43:53 Andrzej Kaczmarek wrote:
+> ---
+>  android/README | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/android/README b/android/README
+> index e3c314f..c7145d5 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -108,6 +108,22 @@ be found at https://backports.wiki.kernel.org. Sample
+> kernels using backports for running BlueZ on Android are available at
+>  https://code.google.com/p/aosp-bluez.
+> 
+> +Running with Valgrind
+> +=====================
+> +
+> +BlueZ for Android is preconfigured to be easily run under Valgrind
+> memcheck. +Appropriate configuration and required modules are automatically
+> included when +building either userdebug or eng variant of Android
+> platform.
+> +
+> +Valgrind can be enabled in runtime by setting
+> "persist.sys.bluetooth.valgrind" +property to either literal "true" or any
+> numeric value >0. For example: +adb root
+> +adb shell setprop persist.sys.bluetooth.valgrind true
+> +
+> +After changing property value Bluetooth need to be restarted to apply
+> changes +(this can be done using UI, just disable and enable it again).
+> Property is +persistent, i.e. there's no need to enable Valgrind again
+> after reboot. +
+>  =============================
+>  Building and running on Linux
+>  =============================
+
+Pushed, thanks.
+
 -- 
-1.8.5.3
-
+BR
+Szymon Janc
