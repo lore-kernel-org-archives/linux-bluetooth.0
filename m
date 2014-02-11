@@ -1,47 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1392134411.2625.1.camel@develbox>
-Subject: Re: [PATCH] btusb.c add IMC Networks id 13d3:3404 (bcm20702A0)
-From: Jurgen Kramer <gtmkramer@xs4all.nl>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Tue, 11 Feb 2014 17:00:11 +0100
-In-Reply-To: <F0885393-70B7-483B-8F97-C4AB73B451E6@holtmann.org>
-References: <1392031617.5601.11.camel@develbox>
-	 <F0885393-70B7-483B-8F97-C4AB73B451E6@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Fix channel check when binding RFCOMM sock
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1392119413-26341-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 11 Feb 2014 07:58:27 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <52F8F4E9-BCAF-4137-B21C-101F11DE1519@holtmann.org>
+References: <1392119413-26341-1-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrzej,
 
-On Mon, 2014-02-10 at 10:33 -0800, Marcel Holtmann wrote:
-> HI Jurgen,
-> 
-> > Attached patch adds support for IMC Networks (13d3:3404) to BCM20702A0
-> > in btusb.c. This device is used on the Asrock Z87E-ITX motherboard.
-> > Tested against 3.12.9.
-> > 
-> > diff -uNrp
-> > linux-3.12.9-301.jk1.fc20.x86_64.orig/drivers/bluetooth/btusb.c
-> > linux-3.12.9-301.jk1.fc20.x86_64.new/drivers/bluetooth/btusb.c
-> > --- a/drivers/bluetooth/btusb.c	2014-02-10 11:35:08.976975562 +0100
-> > +++ b/drivers/bluetooth/btusb.c	2014-02-10 11:37:03.864921122 +0100
-> > @@ -106,6 +106,7 @@ static struct usb_device_id btusb_table[
-> > 	{ USB_DEVICE(0x04ca, 0x2003) },
-> > 	{ USB_DEVICE(0x0489, 0xe042) },
-> > 	{ USB_DEVICE(0x413c, 0x8197) },
-> > +	{ USB_DEVICE(0x13d3, 0x3404) },
-> > 
-> > 	/* Foxconn - Hon Hai */
-> > 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
-> > 
-> > Signed-off-by: Jurgen Kramer <gtm.kramer@xs4all.nl>
-> > 
-> > Jurgen
-> > <btusb-bcm20702a0-add-imc-networks.patch>
-> 
-> please send patches inline created from git-format-patch and include /sys/kernel/debug/usb/devices details for this device.
-OK. I'll resend in a couple of days.
+> When binding RFCOMM socket we should only check if there is another
+> socket bound or listening on the same channel number. In other case,
+> it won't be possible to bind/listen on a channel in case we have
+> connection made to remote device on the same channel number.
 
-Regards,
-Jurgen
+since this has been used for years now, you need to be more specific on when this fails.
+
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> ---
+> net/bluetooth/rfcomm/sock.c | 5 ++++-
+> 1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index 00573fb..9912e23 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -331,6 +331,7 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
+> {
+> 	struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
+> 	struct sock *sk = sock->sk;
+> +	struct sock *sk1;
+> 	int err = 0;
+> 
+> 	BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
+> @@ -352,7 +353,9 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
+> 
+> 	write_lock(&rfcomm_sk_list.lock);
+> 
+> -	if (sa->rc_channel && __rfcomm_get_sock_by_addr(sa->rc_channel, &sa->rc_bdaddr)) {
+> +	sk1 = __rfcomm_get_sock_by_addr(sa->rc_channel, &sa->rc_bdaddr);
+> +	if (sa->rc_channel && sk1 && (sk1->sk_state == BT_BOUND ||
+> +						sk1->sk_state == BT_LISTEN)) {
+> 		err = -EADDRINUSE;
+
+can we find a better name than sk1 here.
+
+> 	} else {
+> 		/* Save source address */
+
+Regards
+
+Marcel
+
