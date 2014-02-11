@@ -1,46 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] android/README: Add Valgrind description
-Date: Tue, 11 Feb 2014 12:43:53 +0100
-Message-ID: <1392119033-23035-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 11 Feb 2014 13:15:06 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/3] avrcp: Fix using incorrect buffer for SetVolume
+Message-ID: <20140211111504.GE8980@aemeltch-MOBL1>
+References: <1391098376-26834-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1391098376-26834-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20140204140815.GQ2930@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140204140815.GQ2930@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/README | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+On Tue, Feb 04, 2014 at 04:08:17PM +0200, Andrei Emeltchenko wrote:
+> On Thu, Jan 30, 2014 at 06:12:55PM +0200, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > The command requires one parameter.
+> 
+> ping
 
-diff --git a/android/README b/android/README
-index e3c314f..c7145d5 100644
---- a/android/README
-+++ b/android/README
-@@ -108,6 +108,22 @@ be found at https://backports.wiki.kernel.org. Sample kernels using backports
- for running BlueZ on Android are available at
- https://code.google.com/p/aosp-bluez.
- 
-+Running with Valgrind
-+=====================
-+
-+BlueZ for Android is preconfigured to be easily run under Valgrind memcheck.
-+Appropriate configuration and required modules are automatically included when
-+building either userdebug or eng variant of Android platform.
-+
-+Valgrind can be enabled in runtime by setting "persist.sys.bluetooth.valgrind"
-+property to either literal "true" or any numeric value >0. For example:
-+adb root
-+adb shell setprop persist.sys.bluetooth.valgrind true
-+
-+After changing property value Bluetooth need to be restarted to apply changes
-+(this can be done using UI, just disable and enable it again). Property is
-+persistent, i.e. there's no need to enable Valgrind again after reboot.
-+
- =============================
- Building and running on Linux
- =============================
--- 
-1.8.5.3
+ping
 
+> 
+> > ---
+> >  profiles/audio/avrcp.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> > index 2e1a940..128f7d3 100644
+> > --- a/profiles/audio/avrcp.c
+> > +++ b/profiles/audio/avrcp.c
+> > @@ -3706,7 +3706,7 @@ int avrcp_set_volume(struct btd_device *dev, uint8_t volume)
+> >  {
+> >  	struct avrcp_server *server;
+> >  	struct avrcp *session;
+> > -	uint8_t buf[AVRCP_HEADER_LENGTH + 2];
+> > +	uint8_t buf[AVRCP_HEADER_LENGTH + 1];
+> >  	struct avrcp_header *pdu = (void *) buf;
+> >  
+> >  	server = find_server(servers, device_get_adapter(dev));
+> > -- 
+> > 1.8.3.2
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
