@@ -1,85 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 4/6] shared: Add support for shutdown to IO
-Date: Wed, 12 Feb 2014 19:38:10 +0100
-Message-ID: <4170119.cK3WpejJYp@leonov>
-In-Reply-To: <301FB290-56A1-404A-9A79-62F360D9DA9A@holtmann.org>
-References: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com> <1392137346-26272-4-git-send-email-szymon.janc@tieto.com> <301FB290-56A1-404A-9A79-62F360D9DA9A@holtmann.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/9] android/hal-ipc-api: Add Get Play Status Response
+Date: Wed, 12 Feb 2014 19:29:05 +0100
+Message-ID: <7446843.dRdmMMYOsq@leonov>
+In-Reply-To: <1392216494-30885-1-git-send-email-luiz.dentz@gmail.com>
+References: <1392216494-30885-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On Tuesday 11 of February 2014 09:02:15 Marcel Holtmann wrote:
-> Hi Szymon,
+On Wednesday 12 of February 2014 16:48:06 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> > This allows to locally shutdown IO.
-> > ---
-> > src/shared/io-glib.c     | 9 +++++++++
-> > src/shared/io-mainloop.c | 9 +++++++++
-> > src/shared/io.h          | 2 ++
-> > 3 files changed, 20 insertions(+)
-> > 
-> > diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
-> > index a4f982d..8290745 100644
-> > --- a/src/shared/io-glib.c
-> > +++ b/src/shared/io-glib.c
-> > 
-> > @@ -320,3 +320,12 @@ done:
-> > 	return true;
-> > 
-> > }
-> > +
-> > +bool io_shutdown(struct io *io)
-> > +{
-> > +	if (!io || !io->channel)
-> > +		return false;
-> > +
-> > +	return g_io_channel_shutdown(io->channel, TRUE, NULL)
-> > +							== G_IO_STATUS_NORMAL;
-> > +}
-> > diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
-> > index 14ab128..f1e3b3b 100644
-> > --- a/src/shared/io-mainloop.c
-> > +++ b/src/shared/io-mainloop.c
-> > @@ -26,6 +26,7 @@
-> > #endif
-> > 
-> > #include <unistd.h>
-> > +#include <sys/socket.h>
-> > 
-> > #include "monitor/mainloop.h"
-> > #include "src/shared/util.h"
-> > @@ -294,3 +295,11 @@ bool io_set_disconnect_handler(struct io *io,
-> > io_callback_func_t callback,> 
-> > 	return true;
-> > 
-> > }
-> > +
-> > +bool io_shutdown(struct io *io)
-> > +{
-> > +	if (!io || io->fd < 0)
-> > +		return false;
-> > +
-> > +	return shutdown(io->fd, SHUT_RDWR) == 0;
-> > +}
+> ---
+>  android/hal-ipc-api.txt | 30 +++++++++++++++++++++++++++++-
+>  android/hal-msg.h       | 16 ++++++++++++++++
+>  2 files changed, 45 insertions(+), 1 deletion(-)
 > 
-> I have no problem doing this, but why is this actually needed? Is not
-> closing the socket good enough? Or would be better also add a
-> shutdown_on_unref option?
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index ad5d192..01c2e81 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -1174,7 +1174,35 @@ Bluetooth Remote Control HAL (ID 8)
+>  Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
+> 
+>  	Opcode 0x00 - Error response
+> -	Opcode 0x01 - Get Play Status command/response
+> +
+> +		Response parameters: Status (1 octet)
+> +
+> +		Valid status values: 0x01 = Fail
+> +		                     0x02 = Not ready
+> +		                     0x03 = No memory
+> +		                     0x04 = Busy
+> +		                     0x05 = Done (already completed)
+> +		                     0x06 = Unsupported
+> +		                     0x07 = Parameter invalid
+> +		                     0x08 = Unhandled
+> +		                     0x09 = Authentication failure
+> +		                     0x0a = Remote device down
+> +
+> +	Opcode 0x01 - Get Play Status Response command/response
+> +
+> +		Command parameters: Status (1 octet)
+> +		                    Duration (4 octets)
+> +		                    Position (4 octets)
+> +
+> +		In case of an error, the error response will be returned.
+> +
+> +		Valid status values: 0x00 = Stopped
+> +		                     0x01 = Playing
+> +		                     0x02 = Paused
+> +		                     0x03 = Fwd seek
+> +		                     0x04 = Rev seek
+> +		                     0xff = Error
+> +
+>  	Opcode 0x02 - List Player Application Attributes command/response
+>  	Opcode 0x03 - List Player Application Values command/response
+>  	Opcode 0x04 - Get Player Application Values command/response
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index 6ef00f9..82cd3f5 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -783,3 +783,19 @@ struct hal_ev_handsfree_unknown_at {
+>  } __attribute__((packed));
+> 
+>  #define HAL_EV_HANDSFREE_HSP_KEY_PRESS	0x90
+> +
+> +/* AVRCP HAL API */
+> +
+> +#define HAL_AVRCP_PLAY_STATUS_STOPPED	0x00
+> +#define HAL_AVRCP_PLAY_STATUS_PLAYING	0x01
+> +#define HAL_AVRCP_PLAY_STATUS_PAUSED	0x02
+> +#define HAL_AVRCP_PLAY_STATUS_FWD_SEEK	0x03
+> +#define HAL_AVRCP_PLAY_STATUS_REV_SEEK	0x04
+> +#define HAL_AVRCP_PLAY_STATUS_ERROR	0xff
+> +
+> +#define HAL_OP_AVRCP_GET_PLAY_STATUS	0x01
+> +struct hal_cmd_avrcp_get_play_status {
+> +	uint8_t status;
+> +	uint32_t duration;
+> +	uint32_t position;
+> +} __attribute__((packed));
 
-This is to allow to read from the socket in case there is some data already 
-received (FWIW). I also plan to add 'flush' or similar flag to it to allow 
-graceful disconnect i.e. make something like this work as expected
-
-hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-hfp_gw_disconnect(device.gw);
-
-but this can be added later on if needed and we could go with close() for now 
-as you suggested.
+All patches in this set have been applied, thanks.
 
 -- 
 BR
