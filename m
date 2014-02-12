@@ -1,248 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCV2] android/avrcp: Decouple AVRCP logic from btio
-Date: Wed, 12 Feb 2014 15:13:23 +0200
-Message-Id: <1392210803-12286-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <5637916.N4zjDhQ0cI@leonov>
-References: <5637916.N4zjDhQ0cI@leonov>
+Subject: Re: [PATCH v2] android/README: Update with implementation status summary
+Date: Wed, 12 Feb 2014 14:00:59 +0100
+Message-ID: <2902202.eLTXuOKvvK@leonov>
+In-Reply-To: <1392115207-14297-1-git-send-email-szymon.janc@tieto.com>
+References: <1392115207-14297-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-The patch makes AVRCP to be channel-agnostic so that it might be used in
-unit tests. The idea is that all AVRCP logic would come to avrcp-lib and
-channel stuff got to avrcp.
----
- android/Android.mk  |  1 +
- android/Makefile.am |  1 +
- android/avrcp-lib.c | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/avrcp-lib.h | 29 +++++++++++++++++++++++++
- android/avrcp.c     | 28 ++++++++++++++++--------
- 5 files changed, 112 insertions(+), 9 deletions(-)
- create mode 100644 android/avrcp-lib.c
- create mode 100644 android/avrcp-lib.h
+On Tuesday 11 of February 2014 11:40:07 Szymon Janc wrote:
+> This will give a better overview of implemented features.
+> ---
+>  android/README | 38 +++++++++++++++++++++++++++++++++-----
+>  1 file changed, 33 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/README b/android/README
+> index e3c314f..b987dc9 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -132,15 +132,43 @@ automatically on HAL library initialization. To
+> deinitialize HAL library and stop daemon type 'bluetooth cleanup'. Type
+> 'help' for more information. Tab completion is also supported.
+> 
+> +=====================
+> +Implementation status
+> +=====================
+> +
+> +Summary of HALs implementation status.
+> +
+> +complete    - implementation is feature complete and Android Framework is
+> able +              to use it normally
+> +partial     - implementation is in progress and not all required features
+> are +              present, Android Framework is able to use some of
+> features +initial     - only initial implementations is present, Android
+> Framework is +              able to initialize but most likely not able to
+> use it +not started - no implementation, Android Framework is not able to
+> initialize it +
+> +Profile ID    HAL header         Status
+> +---------------------------------------
+> +core          bluetooth.h        complete
+> +a2dp          bt_av.h            complete
+> +gatt          bt_gatt.h          not started
+> +              bt_gatt_client.h   not started
+> +              bt_gatt_server.h   not started
+> +handsfree     bt_hf.h            initial
+> +hidhost       bt_hh.h            complete
+> +health        bt_hl.h            not started
+> +pan           bt_pan.h           complete
+> +avrcp         bt_rc.h            partial
+> +socket        bt_sock.h          partial
+> +
+>  ===========================
+>  Implementation shortcomings
+>  ===========================
+> 
+> -It is possible that some of HAL functionality is missing implementation due
+> to -reasons like feature feasibility or necessity for latest Android
+> Framework. -This sections provides list of such deficiencies. Note that HAL
+> library is -always expected to fully implement HAL API so missing
+> implementation might -happen only in daemon.
+> +It is possible that some of HAL functionality (although being marked as
+> +complete) is missing implementation due to reasons like feature feasibility
+> or +necessity for latest Android Framework. This sections provides list of
+> such +deficiencies. Note that HAL library is always expected to fully
+> implement HAL +API so missing implementation might happen only in daemon.
+> 
+>  HAL Bluetooth
+>  =============
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 71d678b..fa9a86e 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -39,6 +39,7 @@ LOCAL_SRC_FILES := \
- 	bluez/android/avdtp.c \
- 	bluez/android/a2dp.c \
- 	bluez/android/avctp.c \
-+	bluez/android/avrcp-lib.c \
- 	bluez/android/avrcp.c \
- 	bluez/android/pan.c \
- 	bluez/android/handsfree.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 1913b42..07cc851 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -36,6 +36,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/avdtp.h android/avdtp.c \
- 				android/a2dp.h android/a2dp.c \
- 				android/avctp.h android/avctp.c \
-+				android/avrcp-lib.h android/avrcp-lib.c \
- 				android/avrcp.h android/avrcp.c \
- 				android/socket.h android/socket.c \
- 				android/pan.h android/pan.c \
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-new file mode 100644
-index 0000000..080e37a
---- /dev/null
-+++ b/android/avrcp-lib.c
-@@ -0,0 +1,62 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <stdbool.h>
-+#include <glib.h>
-+
-+#include "lib/bluetooth.h"
-+
-+#include "src/log.h"
-+
-+#include "avctp.h"
-+#include "avrcp-lib.h"
-+
-+void avrcp_free(void *data)
-+{
-+	struct avrcp *session = data;
-+
-+	if (session->session)
-+		avctp_shutdown(session->session);
-+
-+	g_free(session);
-+}
-+
-+struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu,
-+							uint16_t version)
-+{
-+	struct avrcp *session;
-+
-+	session = g_new0(struct avrcp, 1);
-+
-+	session->session = avctp_new(fd, imtu, omtu, version);
-+	if (!session->session) {
-+		g_free(session);
-+		return NULL;
-+	}
-+
-+	return session;
-+}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-new file mode 100644
-index 0000000..f1dbf0d
---- /dev/null
-+++ b/android/avrcp-lib.h
-@@ -0,0 +1,29 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+struct avrcp {
-+	struct avctp	*session;
-+};
-+
-+struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
-+void avrcp_free(void *data);
-diff --git a/android/avrcp.c b/android/avrcp.c
-index b8304f5..3d3e323 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -38,6 +38,7 @@
- #include "hal-msg.h"
- #include "ipc.h"
- #include "avctp.h"
-+#include "avrcp-lib.h"
- 
- #define L2CAP_PSM_AVCTP 0x17
- 
-@@ -53,7 +54,7 @@ static GIOChannel *server = NULL;
- 
- struct avrcp_device {
- 	bdaddr_t	dst;
--	struct avctp	*session;
-+	struct avrcp	*session;
- 	GIOChannel	*io;
- };
- 
-@@ -133,7 +134,7 @@ static void avrcp_device_free(void *data)
- 	struct avrcp_device *dev = data;
- 
- 	if (dev->session)
--		avctp_shutdown(dev->session);
-+		avrcp_free(dev->session);
- 
- 	if (dev->io) {
- 		g_io_channel_shutdown(dev->io, FALSE, NULL);
-@@ -168,6 +169,17 @@ static int device_cmp(gconstpointer s, gconstpointer user_data)
- 	return bacmp(&dev->dst, dst);
- }
- 
-+static struct avrcp_device *avrcp_find(const bdaddr_t *dst)
-+{
-+	GSList *l;
-+
-+	l = g_slist_find_custom(devices, dst, device_cmp);
-+	if (!l)
-+		return NULL;
-+
-+	return l->data;
-+}
-+
- static void disconnect_cb(void *data)
- {
- 	struct avrcp_device *dev = data;
-@@ -222,17 +234,17 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	}
- 
- 	fd = g_io_channel_unix_get_fd(chan);
--	dev->session = avctp_new(fd, imtu, omtu, 0x0100);
- 
-+	dev->session = avrcp_new(fd, imtu, omtu, 0x0100);
- 	if (!dev->session) {
- 		avrcp_device_free(dev);
- 		return;
- 	}
- 
--	avctp_set_destroy_cb(dev->session, disconnect_cb, dev);
-+	avctp_set_destroy_cb(dev->session->session, disconnect_cb, dev);
- 
- 	/* FIXME: get the real name of the device */
--	avctp_init_uinput(dev->session, "bluetooth", address);
-+	avctp_init_uinput(dev->session->session, "bluetooth", address);
- 
- 	g_io_channel_set_close_on_unref(chan, FALSE);
- 
-@@ -331,12 +343,10 @@ void bt_avrcp_connect(const bdaddr_t *dst)
- {
- 	struct avrcp_device *dev;
- 	char addr[18];
--	GSList *l;
- 
- 	DBG("");
- 
--	l = g_slist_find_custom(devices, dst, device_cmp);
--	if (l)
-+	if (avrcp_find(dst))
- 		return;
- 
- 	dev = avrcp_device_new(dst);
-@@ -363,7 +373,7 @@ void bt_avrcp_disconnect(const bdaddr_t *dst)
- 	dev = l->data;
- 
- 	if (dev->session) {
--		avctp_shutdown(dev->session);
-+		avrcp_free(dev->session);
- 		return;
- 	}
- 
+Pushed.
+
 -- 
-1.8.3.2
-
+BR
+Szymon Janc
