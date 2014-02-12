@@ -1,69 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/7] android: Use 16-bit UUID for SDP search
-Date: Wed, 12 Feb 2014 13:17:27 +0100
-Message-ID: <9537432.Rvi7jDRuau@leonov>
-In-Reply-To: <CAJdJm_P3caDzXXttQUvkoeo3pSaWaiuJ4G0B1gbwfw0uwfDD3A@mail.gmail.com>
-References: <1392143552-11395-1-git-send-email-anderson.lizardo@openbossa.org> <1458044.bhGCHJKobi@leonov> <CAJdJm_P3caDzXXttQUvkoeo3pSaWaiuJ4G0B1gbwfw0uwfDD3A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/6] tools/rfcomm-tester: Add RFCOMM client read test case
+Date: Wed, 12 Feb 2014 12:41:40 +0100
+Message-Id: <1392205301-4204-6-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+This will test reading data passed to RFCOMM socket on client side.
+---
+ tools/rfcomm-tester.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 50 insertions(+), 1 deletion(-)
 
-On Wednesday 12 of February 2014 07:28:24 Anderson Lizardo wrote:
-> Hi Szymon,
-> 
-> On Wed, Feb 12, 2014 at 6:59 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> >> Applied all except 6/7, I think we should probably return an error if
-> >> there is an attempt to register a service out of range, then the
-> >> caller can assert so we can have a proper test for it that expect an
-> >> error in such case.
-> > 
-> > Well, currently IPC depends on hal-msg.h which defines max allowed service
-> > ID and using something bigger is a code bug. We could have make IPC
-> > independent of hal-msg.h and just verify registered ID in runtime but
-> > that would add extra code for each caller with no profit as IDs are fixed
-> > anyway.
-> 
-> Personally, I don't have strong opinions on using assert() versus
-> raise(SIGTERM) (which is how runtime error conditions seem to be
-> handled). Initially I went with raise(SIGTERM), but then I noticed the
-> IDs are statically defined, and there is no way to give a invalid ID
-> to ipc_register(),  unless due to programming error (for which
-> assert() is ideal, due to low overhead and no introduction of dead
-> code).
-> 
-> That said, this patch is not critical, but only a check so future
-> users of ipc_register() don't reintroduce a similar crash fixed by the
-> other commit.
-> 
-> > That test fix is invalid as we actually want to test if IPC handles
-> > out-of-
-> > bound service ID correctly (when receiving register command).
-> > And I'm not sure why this actually was causing any problems since that
-> > test is not registering handlers for out-of-bound service ID, just sends
-> > ipc message with such ID.
-> 
-> I forgot to clarify this on the commit message: the "out of bound"
-> service ID is still passed on the IPC message. What I fixed is the
-> service ID field used solely for registering the handlers (i.e. passed
-> to ipc_register()). If you check the changed struct, there is another
-> field for the IPC headers where there is still the expected (out of
-> bound) ID.
-> 
-> In the current format, ipc_register() must not receive an "out of
-> bound" ID otherwise memory corruptions occur, which introduces subtle
-> bugs (in my case the crash happened in very specific compilation
-> parameters and valgrind didn't help because the corrupted structures
-> were static).
-
-Yes, I was looking at service ID in wrong line. This seems ok now.
-
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 1c2563d..b46f95a 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -51,6 +51,8 @@ struct test_data {
+ 	enum hciemu_type hciemu_type;
+ 	const void *test_data;
+ 	unsigned int io_id;
++	uint16_t conn_handle;
++	uint16_t cid;
+ };
+ 
+ struct rfcomm_client_data {
+@@ -309,6 +311,13 @@ const struct rfcomm_client_data connect_send_success = {
+ 	.send_data = data
+ };
+ 
++const struct rfcomm_client_data connect_read_success = {
++	.server_channel = 0x0c,
++	.client_channel = 0x0c,
++	.data_len = sizeof(data),
++	.read_data = data
++};
++
+ const struct rfcomm_client_data connect_nval = {
+ 	.server_channel = 0x0c,
+ 	.client_channel = 0x0e,
+@@ -389,6 +398,30 @@ static int connect_rfcomm_sock(int sk, const bdaddr_t *bdaddr, uint8_t channel)
+ 	return 0;
+ }
+ 
++static gboolean client_received_data(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct rfcomm_client_data *client_data = data->test_data;
++	int sk;
++	char buf[248];
++
++	sk = g_io_channel_unix_get_fd(io);
++
++
++	if (client_data->data_len != read(sk, buf, client_data->data_len)) {
++		tester_test_failed();
++		return false;
++	}
++
++	if (memcmp(client_data->read_data, buf, client_data->data_len))
++		tester_test_failed();
++	else
++		tester_test_passed();
++
++	return false;
++}
++
+ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		gpointer user_data)
+ {
+@@ -417,6 +450,15 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
+ 							client_data->data_len))
+ 			tester_test_failed();
+ 		return false;
++	} else if (client_data->read_data) {
++		g_io_add_watch(io, G_IO_IN, client_received_data,
++									NULL);
++		bthost_send_uih(hciemu_client_get_host(data->hciemu),
++						data->conn_handle, data->cid,
++						client_data->client_channel,
++						client_data->read_data,
++						client_data->data_len);
++		return false;
+ 	}
+ 
+ 	if (err < 0)
+@@ -457,10 +499,14 @@ static void rfcomm_connect_cb(uint16_t handle, uint16_t cid,
+ 	struct test_data *data = tester_get_data();
+ 	const struct rfcomm_client_data *client_data = data->test_data;
+ 
+-	if (client_data->send_data)
++	if (client_data->send_data) {
+ 		bthost_add_channel_hook(hciemu_client_get_host(data->hciemu),
+ 					handle,	client_data->client_channel,
+ 					client_hook_func, NULL);
++	} else if (client_data->read_data) {
++		data->conn_handle = handle;
++		data->cid = cid;
++	}
+ }
+ 
+ static void test_connect(const void *test_data)
+@@ -625,6 +671,9 @@ int main(int argc, char *argv[])
+ 	test_rfcomm("Basic RFCOMM Socket Client - Write Success",
+ 			&connect_send_success, setup_powered_client,
+ 			test_connect);
++	test_rfcomm("Basic RFCOMM Socket Client - Read Success",
++			&connect_read_success, setup_powered_client,
++			test_connect);
+ 	test_rfcomm("Basic RFCOMM Socket Client - Conn Refused",
+ 			&connect_nval, setup_powered_client, test_connect);
+ 	test_rfcomm("Basic RFCOMM Socket Server - Success", &listen_success,
 -- 
-BR
-Szymon Janc
+1.8.3.1
+
