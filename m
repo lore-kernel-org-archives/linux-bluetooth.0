@@ -1,88 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 4/6] shared: Add support for shutdown to IO
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <4170119.cK3WpejJYp@leonov>
-Date: Wed, 12 Feb 2014 10:45:30 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <2005B143-6E22-43D8-B3AE-0D0A7E651B4B@holtmann.org>
-References: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com> <1392137346-26272-4-git-send-email-szymon.janc@tieto.com> <301FB290-56A1-404A-9A79-62F360D9DA9A@holtmann.org> <4170119.cK3WpejJYp@leonov>
-To: Szymon Janc <szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/6] shared: Add support for disonnect handler to GLib based IO handling
+Date: Wed, 12 Feb 2014 19:42:09 +0100
+Message-ID: <1410905.4MB1ZWjKzY@leonov>
+In-Reply-To: <D4957F12-AE54-43F2-A9EE-859676DE055E@holtmann.org>
+References: <1392137346-26272-1-git-send-email-szymon.janc@tieto.com> <D4957F12-AE54-43F2-A9EE-859676DE055E@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Marcel,
 
->>> This allows to locally shutdown IO.
->>> ---
->>> src/shared/io-glib.c     | 9 +++++++++
->>> src/shared/io-mainloop.c | 9 +++++++++
->>> src/shared/io.h          | 2 ++
->>> 3 files changed, 20 insertions(+)
->>> 
->>> diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
->>> index a4f982d..8290745 100644
->>> --- a/src/shared/io-glib.c
->>> +++ b/src/shared/io-glib.c
->>> 
->>> @@ -320,3 +320,12 @@ done:
->>> 	return true;
->>> 
->>> }
->>> +
->>> +bool io_shutdown(struct io *io)
->>> +{
->>> +	if (!io || !io->channel)
->>> +		return false;
->>> +
->>> +	return g_io_channel_shutdown(io->channel, TRUE, NULL)
->>> +							== G_IO_STATUS_NORMAL;
->>> +}
->>> diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
->>> index 14ab128..f1e3b3b 100644
->>> --- a/src/shared/io-mainloop.c
->>> +++ b/src/shared/io-mainloop.c
->>> @@ -26,6 +26,7 @@
->>> #endif
->>> 
->>> #include <unistd.h>
->>> +#include <sys/socket.h>
->>> 
->>> #include "monitor/mainloop.h"
->>> #include "src/shared/util.h"
->>> @@ -294,3 +295,11 @@ bool io_set_disconnect_handler(struct io *io,
->>> io_callback_func_t callback,> 
->>> 	return true;
->>> 
->>> }
->>> +
->>> +bool io_shutdown(struct io *io)
->>> +{
->>> +	if (!io || io->fd < 0)
->>> +		return false;
->>> +
->>> +	return shutdown(io->fd, SHUT_RDWR) == 0;
->>> +}
->> 
->> I have no problem doing this, but why is this actually needed? Is not
->> closing the socket good enough? Or would be better also add a
->> shutdown_on_unref option?
+On Tuesday 11 of February 2014 08:57:25 Marcel Holtmann wrote:
+> Hi Szymon,
 > 
-> This is to allow to read from the socket in case there is some data already 
-> received (FWIW). I also plan to add 'flush' or similar flag to it to allow 
-> graceful disconnect i.e. make something like this work as expected
+> > ---
+> > src/shared/io-glib.c | 59
+> > +++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed, 58
+> > insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
+> > index 77ba19e..a4f982d 100644
+> > --- a/src/shared/io-glib.c
+> > +++ b/src/shared/io-glib.c
+> > @@ -40,6 +40,10 @@ struct io {
+> > 
+> > 	io_callback_func_t write_callback;
+> > 	io_destroy_func_t write_destroy;
+> > 	void *write_data;
+> > 
+> > +	guint disconnect_watch;
+> > +	io_callback_func_t disconnect_callback;
+> > +	io_destroy_func_t disconnect_destroy;
+> > +	void *disconnect_data;
+> > };
+> > 
+> > static struct io *io_ref(struct io *io)
+> > 
+> > @@ -258,8 +262,61 @@ done:
+> > 	return true;
+> > 
+> > }
+> > 
+> > +static void disconnect_watch_destroy(gpointer user_data)
+> > +{
+> > +	struct io *io = user_data;
+> > +
+> > +	if (io->disconnect_destroy)
+> > +		io->disconnect_destroy(io->disconnect_data);
+> > +
+> > +	io->disconnect_watch = 0;
+> > +	io->disconnect_callback = NULL;
+> > +	io->disconnect_destroy = NULL;
+> > +	io->disconnect_data = NULL;
+> > +
+> > +	io_unref(io);
+> > +}
+> > +
+> > +static gboolean disconnect_callback(GIOChannel *channel, GIOCondition
+> > cond, +							gpointer user_data)
+> > +{
+> > +	struct io *io = user_data;
+> > +	bool result;
+> > +
+> > +	if (io->disconnect_callback)
+> > +		result = io->disconnect_callback(io, io->disconnect_data);
+> > +	else
+> > +		result = false;
+> > +
+> > +	return result ? TRUE : FALSE;
+> > +}
+> > +
+> > bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
+> > 
+> > 				void *user_data, io_destroy_func_t destroy)
+> > 
+> > {
+> > -	return false;
+> > +	if (!io)
+> > +		return false;
+> > +
+> > +	if (io->disconnect_watch > 0) {
+> > +		g_source_remove(io->disconnect_watch);
+> > +		io->disconnect_watch = 0;
+> > +	}
+> > +
+> > +	if (!callback)
+> > +		goto done;
+> > +
+> > +	io->disconnect_watch = g_io_add_watch_full(io->channel,
+> > +				G_PRIORITY_DEFAULT,
+> > +				G_IO_HUP | G_IO_ERR | G_IO_NVAL,
 > 
-> hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-> hfp_gw_disconnect(device.gw);
+> If we are using G_IO_HUP here, we should remove it from the other callback
+> handling?
+
+We should, will fix that in next version.
+
+> > +				disconnect_callback, io_ref(io),
+> > +				disconnect_watch_destroy);
+> > +	if (io->disconnect_watch == 0)
+> > +		return false;
+> > +
+> > +	io->disconnect_destroy = destroy;
+> > +	io->disconnect_data = user_data;
 > 
-> but this can be added later on if needed and we could go with close() for now 
-> as you suggested.
+> we normally have an extra empty line here. You might also fix the previous
+> patch then.
 
-then lets just go with io_shutdown() for now. We can change this at any time once we know what other users really need. In the long run I want everything in android/ use the IO framework.
+I'll fix that as well.
 
-Regards
+> > +done:
+> > +	io->disconnect_callback = callback;
+> > +
+> > +	return true;
+> > }
 
-Marcel
-
+-- 
+BR
+Szymon Janc
