@@ -1,34 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] android/README: Add note on libglib under Valgrind
-Date: Wed, 12 Feb 2014 20:23:47 +0100
-Message-Id: <1392233027-3201-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] android/test-ipc: Use correct boolean values for glib functions
+Date: Wed, 12 Feb 2014 20:21:02 +0100
+Message-ID: <2318292.vcUTG61T5m@leonov>
+In-Reply-To: <1392232401-26119-1-git-send-email-anderson.lizardo@openbossa.org>
+References: <1392232401-26119-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/README | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi Anderson,
 
-diff --git a/android/README b/android/README
-index 75b0a83..3095383 100644
---- a/android/README
-+++ b/android/README
-@@ -124,6 +124,12 @@ After changing property value Bluetooth need to be restarted to apply changes
- (this can be done using UI, just disable and enable it again). Property is
- persistent, i.e. there's no need to enable Valgrind again after reboot.
- 
-+It's recommended to have unstripped libglib.so installed which will enable
-+complete backtraces in Valgrind output. Otherwise, in many cases backtrace
-+will break at e.g. g_free() function without prior callers. It's possible to
-+have proper library installed automatically by appropriate entry in Android.mk,
-+see https://code.google.com/p/aosp-bluez.glib/ for an example.
-+
- =============================
- Building and running on Linux
- =============================
+On Wednesday 12 of February 2014 15:13:21 Anderson Lizardo wrote:
+> ---
+>  android/test-ipc.c |    4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/test-ipc.c b/android/test-ipc.c
+> index 3a0729e..2def97b 100644
+> --- a/android/test-ipc.c
+> +++ b/android/test-ipc.c
+> @@ -263,8 +263,8 @@ static void execute_context(struct context *context)
+>  {
+>  	g_main_loop_run(context->main_loop);
+> 
+> -	g_io_channel_shutdown(context->notif_io, true, NULL);
+> -	g_io_channel_shutdown(context->cmd_io, true, NULL);
+> +	g_io_channel_shutdown(context->notif_io, TRUE, NULL);
+> +	g_io_channel_shutdown(context->cmd_io, TRUE, NULL);
+>  	g_io_channel_unref(context->cmd_io);
+>  	g_io_channel_unref(context->notif_io);
+
+Applied, thanks.
+
 -- 
-1.8.5.4
-
+BR
+Szymon Janc
