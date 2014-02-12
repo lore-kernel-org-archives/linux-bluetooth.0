@@ -1,74 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH] Bluetooth: Fix channel check when binding RFCOMM sock
+Subject: Re: [PATCH 00/24] rfcomm fixes
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAF3PWx0PkL8fQ2ypsU24xM1HveQAia19OFDLcX9D=90_Oo9Vig@mail.gmail.com>
-Date: Wed, 12 Feb 2014 15:01:56 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <7E549E73-52F4-432E-8B71-FC2F9E862772@holtmann.org>
-References: <1392119413-26341-1-git-send-email-andrzej.kaczmarek@tieto.com> <52F8F4E9-BCAF-4137-B21C-101F11DE1519@holtmann.org> <CAF3PWx0PkL8fQ2ypsU24xM1HveQAia19OFDLcX9D=90_Oo9Vig@mail.gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <52F95A10.5010507@hurleysoftware.com>
+Date: Wed, 12 Feb 2014 14:58:08 -0800
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gianluca Anzolin <gianluca@sottospazio.it>,
+	Alexander Holler <holler@ahsoftware.de>,
+	Andrey Vihrov <andrey.vihrov@gmail.com>,
+	Sander Eikelenboom <linux@eikelenboom.it>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Message-Id: <433F6D97-A126-4F9F-96AC-4385575E005E@holtmann.org>
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <52F95A10.5010507@hurleysoftware.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Peter,
 
->>> When binding RFCOMM socket we should only check if there is another
->>> socket bound or listening on the same channel number. In other case,
->>> it won't be possible to bind/listen on a channel in case we have
->>> connection made to remote device on the same channel number.
+>>> This patch series addresses a number of previously unknown issues
+>>> with the RFCOMM tty device implementation, in addition to
+>>> addressing the locking regression recently reported [1].
+>>> 
+>>> As Gianluca suggested and I agree, this series first reverts
+>>> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
 >> 
->> since this has been used for years now, you need to be more specific on when this fails.
+>> so for 3.14 we should revert 3 patches. And then the other 21 are
+> > intended for 3.15 merge window.
 > 
-> It's quite simple: create one socket and connect on channel X, then
-> create another socket and try to bind on channel X. Event though we
-> don't have listening socket on channel X yet, it will fail with
-> EADDRINUSE since rfcomm_sock_bind looks for *any* socket on specified
-> channel and doesn't care if it's bound/listening on local channel or
-> just connected to remote channel (in which case it should not fail).
+> Yep, this is probably best. At least 3.13 & 3.14 will behave the
+> same wrt rfcomm.
 > 
-> Is it specific enough?
-
-can we add a test case to rfcomm-tester for this first.
-
->>> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
->>> ---
->>> net/bluetooth/rfcomm/sock.c | 5 ++++-
->>> 1 file changed, 4 insertions(+), 1 deletion(-)
->>> 
->>> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
->>> index 00573fb..9912e23 100644
->>> --- a/net/bluetooth/rfcomm/sock.c
->>> +++ b/net/bluetooth/rfcomm/sock.c
->>> @@ -331,6 +331,7 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
->>> {
->>>      struct sockaddr_rc *sa = (struct sockaddr_rc *) addr;
->>>      struct sock *sk = sock->sk;
->>> +     struct sock *sk1;
->>>      int err = 0;
->>> 
->>>      BT_DBG("sk %p %pMR", sk, &sa->rc_bdaddr);
->>> @@ -352,7 +353,9 @@ static int rfcomm_sock_bind(struct socket *sock, struct sockaddr *addr, int addr
->>> 
->>>      write_lock(&rfcomm_sk_list.lock);
->>> 
->>> -     if (sa->rc_channel && __rfcomm_get_sock_by_addr(sa->rc_channel, &sa->rc_bdaddr)) {
->>> +     sk1 = __rfcomm_get_sock_by_addr(sa->rc_channel, &sa->rc_bdaddr);
->>> +     if (sa->rc_channel && sk1 && (sk1->sk_state == BT_BOUND ||
->>> +                                             sk1->sk_state == BT_LISTEN)) {
->>>              err = -EADDRINUSE;
->> 
->> can we find a better name than sk1 here.
+>> I realize that we still have to deal with some breakage, but we
+> > do not want regressions and I clearly not going to take 24 patches
+> > for 3.14 at this point in time.
 > 
-> Something like 'existing_sk'? Or just 'oldsk'? I have no clue how to
-> make a meaningful name here.
+> Yeah, I wasn't expecting you to.
+> 
+>> What I can do is take all 24 patches into bluetooth-next and let
+> > them sit for 1 week and have people test them. And then we go ahead
+> > with reverting 3 patches from 3.14. Does that make sense?
+> 
+> Yep, that's fine with me. Thanks.
 
-I wonder if you should not just fix __rfcomm_get_sock_by_addr to check only for BT_BOUND and BT_LISTEN.
+we might also want to add some end-to-end test cases to rfcomm-tester that covers this behavior.
 
 Regards
 
 Marcel
-
 
