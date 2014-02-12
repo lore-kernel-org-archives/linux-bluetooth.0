@@ -1,64 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/9] android/hal-ipc-api: Add List Player Attributes Response
-Date: Wed, 12 Feb 2014 16:48:07 +0200
-Message-Id: <1392216494-30885-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1392216494-30885-1-git-send-email-luiz.dentz@gmail.com>
-References: <1392216494-30885-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/9] android/hal-ipc-api: Add Get Play Status Response
+Date: Wed, 12 Feb 2014 16:48:06 +0200
+Message-Id: <1392216494-30885-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/hal-ipc-api.txt | 14 +++++++++++++-
- android/hal-msg.h       | 11 +++++++++++
- 2 files changed, 24 insertions(+), 1 deletion(-)
+ android/hal-ipc-api.txt | 30 +++++++++++++++++++++++++++++-
+ android/hal-msg.h       | 16 ++++++++++++++++
+ 2 files changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 01c2e81..ae58fda 100644
+index ad5d192..01c2e81 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1203,7 +1203,19 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
- 		                     0x04 = Rev seek
- 		                     0xff = Error
+@@ -1174,7 +1174,35 @@ Bluetooth Remote Control HAL (ID 8)
+ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
  
--	Opcode 0x02 - List Player Application Attributes command/response
-+	Opcode 0x02 - List Player Attributes Response command/response
+ 	Opcode 0x00 - Error response
+-	Opcode 0x01 - Get Play Status command/response
 +
-+		Command parameters: Number of attributes (1 octet)
-+		                    Attribute # (1 octet)
-+		                    ...
++		Response parameters: Status (1 octet)
++
++		Valid status values: 0x01 = Fail
++		                     0x02 = Not ready
++		                     0x03 = No memory
++		                     0x04 = Busy
++		                     0x05 = Done (already completed)
++		                     0x06 = Unsupported
++		                     0x07 = Parameter invalid
++		                     0x08 = Unhandled
++		                     0x09 = Authentication failure
++		                     0x0a = Remote device down
++
++	Opcode 0x01 - Get Play Status Response command/response
++
++		Command parameters: Status (1 octet)
++		                    Duration (4 octets)
++		                    Position (4 octets)
 +
 +		In case of an error, the error response will be returned.
 +
-+		Valid attributes: 0x01 = Equalizer
-+		                  0x02 = Repead
-+		                  0x03 = Shuffle
-+		                  0x04 = Scan
++		Valid status values: 0x00 = Stopped
++		                     0x01 = Playing
++		                     0x02 = Paused
++		                     0x03 = Fwd seek
++		                     0x04 = Rev seek
++		                     0xff = Error
 +
+ 	Opcode 0x02 - List Player Application Attributes command/response
  	Opcode 0x03 - List Player Application Values command/response
  	Opcode 0x04 - Get Player Application Values command/response
- 	Opcode 0x05 - Get Player Application Attributes Text command/response
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 82cd3f5..4a438d1 100644
+index 6ef00f9..82cd3f5 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -799,3 +799,14 @@ struct hal_cmd_avrcp_get_play_status {
- 	uint32_t duration;
- 	uint32_t position;
+@@ -783,3 +783,19 @@ struct hal_ev_handsfree_unknown_at {
  } __attribute__((packed));
+ 
+ #define HAL_EV_HANDSFREE_HSP_KEY_PRESS	0x90
 +
-+#define HAL_AVRCP_PLAYER_ATTR_EQUALIZER	0x01
-+#define HAL_AVRCP_PLAYER_ATTR_REPEAT	0x02
-+#define HAL_AVRCP_PLAYER_ATTR_SHUFFLE	0x03
-+#define HAL_AVRCP_PLAYER_ATTR_SCAN	0x04
++/* AVRCP HAL API */
 +
-+#define HAL_OP_AVRCP_LIST_PLAYER_ATTRS	0x02
-+struct hal_cmd_avrcp_list_player_attrs {
-+	uint8_t number;
-+	uint8_t attrs[0];
++#define HAL_AVRCP_PLAY_STATUS_STOPPED	0x00
++#define HAL_AVRCP_PLAY_STATUS_PLAYING	0x01
++#define HAL_AVRCP_PLAY_STATUS_PAUSED	0x02
++#define HAL_AVRCP_PLAY_STATUS_FWD_SEEK	0x03
++#define HAL_AVRCP_PLAY_STATUS_REV_SEEK	0x04
++#define HAL_AVRCP_PLAY_STATUS_ERROR	0xff
++
++#define HAL_OP_AVRCP_GET_PLAY_STATUS	0x01
++struct hal_cmd_avrcp_get_play_status {
++	uint8_t status;
++	uint32_t duration;
++	uint32_t position;
 +} __attribute__((packed));
 -- 
 1.8.5.3
