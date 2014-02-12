@@ -1,162 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] emulator/bthost: Add api to handle RFCOMM data on bthost
-Date: Wed, 12 Feb 2014 12:41:36 +0100
-Message-Id: <1392205301-4204-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 0/6] RFCOMM data transfer support in bthost
+Date: Wed, 12 Feb 2014 12:41:35 +0100
+Message-Id: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this change user can handle data received on RFCOMM connection.
----
- emulator/bthost.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- emulator/bthost.h |  8 +++++++
- 2 files changed, 74 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 8447817..92ae08a 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -126,6 +126,13 @@ struct cid_hook {
- 	struct cid_hook *next;
- };
- 
-+struct channel_hook {
-+	uint8_t channel;
-+	bthost_channel_hook_func_t func;
-+	void *user_data;
-+	struct channel_hook *next;
-+};
-+
- struct btconn {
- 	uint16_t handle;
- 	uint8_t bdaddr[6];
-@@ -134,6 +141,7 @@ struct btconn {
- 	uint16_t next_cid;
- 	struct l2conn *l2conns;
- 	struct cid_hook *cid_hooks;
-+	struct channel_hook *channel_hooks;
- 	struct btconn *next;
- 	void *smp_data;
- };
-@@ -232,6 +240,12 @@ static void btconn_free(struct btconn *conn)
- 		conn->cid_hooks = hook->next;
- 		free(hook);
- 	}
-+	while (conn->channel_hooks) {
-+		struct channel_hook *hook = conn->channel_hooks;
-+
-+		conn->channel_hooks = hook->next;
-+		free(hook);
-+	}
- 
- 	free(conn);
- }
-@@ -1547,6 +1561,19 @@ static struct cid_hook *find_cid_hook(struct btconn *conn, uint16_t cid)
- 	return NULL;
- }
- 
-+static struct channel_hook *find_channel_hook(struct btconn *conn,
-+							uint16_t channel)
-+{
-+	struct channel_hook *hook;
-+
-+	for (hook = conn->channel_hooks; hook != NULL; hook = hook->next) {
-+		if (hook->channel == channel)
-+			return hook;
-+	}
-+
-+	return NULL;
-+}
-+
- static void rfcomm_ua_send(struct bthost *bthost, struct btconn *conn,
- 			struct l2conn *l2conn, uint8_t cr, uint8_t dlci)
- {
-@@ -1801,9 +1828,6 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
- 	if (len < sizeof(*hdr))
- 		return;
- 
--	if (RFCOMM_GET_DLCI(hdr->address))
--		return;
--
- 	if (RFCOMM_TEST_EA(hdr->length))
- 		hdr_len = sizeof(*hdr);
- 	else
-@@ -1814,7 +1838,19 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
- 
- 	p = data + hdr_len;
- 
--	rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
-+	if (RFCOMM_GET_DLCI(hdr->address)) {
-+		struct channel_hook *hook;
-+
-+		hook = find_channel_hook(conn,
-+					RFCOMM_GET_CHANNEL(hdr->address));
-+		if (!hook)
-+			return;
-+
-+		hook->func(p, len - hdr_len - sizeof(uint8_t),
-+							hook->user_data);
-+	} else {
-+		rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
-+	}
- }
- 
- static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
-@@ -2112,6 +2148,32 @@ bool bthost_connect_rfcomm(struct bthost *bthost, uint16_t handle,
- 					&req, sizeof(req), NULL, NULL);
- }
- 
-+void bthost_add_channel_hook(struct bthost *bthost, uint16_t handle,
-+					uint8_t channel,
-+					bthost_channel_hook_func_t func,
-+					void *user_data)
-+{
-+	struct channel_hook *hook;
-+	struct btconn *conn;
-+
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn)
-+		return;
-+
-+	hook = malloc(sizeof(*hook));
-+	if (!hook)
-+		return;
-+
-+	memset(hook, 0, sizeof(*hook));
-+
-+	hook->channel = channel;
-+	hook->func = func;
-+	hook->user_data = user_data;
-+
-+	hook->next = conn->channel_hooks;
-+	conn->channel_hooks = hook;
-+}
-+
- void bthost_stop(struct bthost *bthost)
- {
- 	if (bthost->smp_data) {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index a3c26a1..730d004 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -99,6 +99,14 @@ bool bthost_connect_rfcomm(struct bthost *bthost, uint16_t handle,
- 				uint8_t channel, bthost_rfcomm_connect_cb func,
- 				void *user_data);
- 
-+typedef void (*bthost_channel_hook_func_t) (const void *data, uint16_t len,
-+							void *user_data);
-+
-+void bthost_add_channel_hook(struct bthost *bthost, uint16_t handle,
-+					uint8_t channel,
-+					bthost_channel_hook_func_t func,
-+					void *user_data);
-+
- void bthost_start(struct bthost *bthost);
- void bthost_stop(struct bthost *bthost);
- 
+Below changes allow to test RFCOMM data transfer and add
+simple test to check it. Two new functions are added
+to bthost API: bthost_add_channel_hook(), which handles
+data received on bthost on specific channel and connection
+handle and bthost_send_uih(), which forms RFCOMM UIH frame
+and send it.
+These changes depends on previous fixes with frame length checks.
+
+Comments are welcome
+
+Regards
+
+Marcin Kraglak (6):
+  emulator/bthost: Add api to handle RFCOMM data on bthost
+  tools/rfcomm-tester: Add RFCOMM client write test case
+  tools/rfcomm-tester: Add RFCOMM server write test case
+  emulator/bthost: Add function to send RFCOMM UIH frames from bthost
+  tools/rfcomm-tester: Add RFCOMM client read test case
+  tools/rfcomm-tester: Add RFCOMM server read test case
+
+ emulator/bthost.c     | 113 +++++++++++++++++++++++++++--
+ emulator/bthost.h     |  11 +++
+ tools/rfcomm-tester.c | 194 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 313 insertions(+), 5 deletions(-)
+
 -- 
 1.8.3.1
 
