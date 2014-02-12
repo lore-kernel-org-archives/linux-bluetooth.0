@@ -1,88 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] emulator/bthost: Add function to send RFCOMM UIH frames from bthost
-Date: Wed, 12 Feb 2014 12:41:39 +0100
-Message-Id: <1392205301-4204-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/6] tools/rfcomm-tester: Add RFCOMM client write test case
+Date: Wed, 12 Feb 2014 12:41:37 +0100
+Message-Id: <1392205301-4204-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will make RFCOMM UIH frame and fill with data passed by user.
+This will test sending data through RFCOMM socket from client to server.
 ---
- emulator/bthost.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- emulator/bthost.h |  3 +++
- 2 files changed, 46 insertions(+)
+ tools/rfcomm-tester.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 92ae08a..6f3e538 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -2174,6 +2174,49 @@ void bthost_add_channel_hook(struct bthost *bthost, uint16_t handle,
- 	conn->channel_hooks = hook;
- }
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 44df7e7..80448cb 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -57,6 +57,9 @@ struct rfcomm_client_data {
+ 	uint8_t server_channel;
+ 	uint8_t client_channel;
+ 	int expected_connect_err;
++	const uint8_t *send_data;
++	const uint8_t *read_data;
++	uint16_t data_len;
+ };
  
-+void bthost_send_uih(struct bthost *bthost, uint16_t handle, uint16_t cid,
-+			uint8_t channel, const void *data, uint16_t len)
-+{
-+	struct btconn *conn;
-+	struct l2conn *l2conn;
-+	struct rfcomm_hdr *hdr;
-+	uint8_t *uih_frame;
-+	uint16_t uih_len;
+ struct rfcomm_server_data {
+@@ -294,6 +297,15 @@ const struct rfcomm_client_data connect_success = {
+ 	.client_channel = 0x0c
+ };
+ 
++const uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
 +
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn)
-+		return;
++const struct rfcomm_client_data connect_send_success = {
++	.server_channel = 0x0c,
++	.client_channel = 0x0c,
++	.data_len = sizeof(data),
++	.send_data = data
++};
 +
-+	l2conn = btconn_find_l2cap_conn_by_scid(conn, cid);
-+	if (!l2conn || l2conn->psm != 0x0003)
-+		return;
-+
-+	if (len > 127)
-+		uih_len = len + sizeof(struct rfcomm_cmd) + sizeof(uint8_t);
-+	else
-+		uih_len = len + sizeof(struct rfcomm_cmd);
-+
-+	uih_frame = malloc(uih_len);
-+	if (!uih_frame)
-+		return;
-+
-+	hdr = (struct rfcomm_hdr *)uih_frame;
-+	hdr->address = RFCOMM_ADDR(1, channel * 2);
-+	hdr->control = RFCOMM_CTRL(RFCOMM_UIH, 0);
-+	if (len > 127) {
-+		hdr->length  = RFCOMM_LEN16(cpu_to_le16(sizeof(*hdr) + len));
-+		memcpy(uih_frame + sizeof(*hdr) + 1, data, len);
-+	} else {
-+		hdr->length  = RFCOMM_LEN8(sizeof(*hdr) + len);
-+		memcpy(uih_frame + sizeof(*hdr), data, len);
+ const struct rfcomm_client_data connect_nval = {
+ 	.server_channel = 0x0c,
+ 	.client_channel = 0x0e,
+@@ -389,6 +401,13 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
+ 		return false;
+ 	}
+ 
++	if (client_data->send_data) {
++		if (client_data->data_len != write(sk, client_data->send_data,
++							client_data->data_len))
++			tester_test_failed();
++		return false;
 +	}
 +
-+	uih_frame[uih_len - 1] = rfcomm_fcs((void *)hdr);
-+	send_acl(bthost, handle, cid, uih_frame, uih_len);
+ 	if (err < 0)
+ 		tester_test_failed();
+ 	else
+@@ -397,6 +416,30 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
+ 	return false;
+ }
+ 
++static void client_hook_func(const void *data, uint16_t len,
++							void *user_data)
++{
++	struct test_data *test_data = tester_get_data();
++	const struct rfcomm_client_data *client_data = test_data->test_data;
 +
-+	free(uih_frame);
++	if (memcmp(client_data->send_data, data, len))
++		tester_test_failed();
++	else
++		tester_test_passed();
 +}
 +
- void bthost_stop(struct bthost *bthost)
- {
- 	if (bthost->smp_data) {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index 730d004..e278517 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -107,6 +107,9 @@ void bthost_add_channel_hook(struct bthost *bthost, uint16_t handle,
- 					bthost_channel_hook_func_t func,
- 					void *user_data);
- 
-+void bthost_send_uih(struct bthost *bthost, uint16_t handle, uint16_t cid,
-+			uint8_t channel, const void *data, uint16_t len);
++static void rfcomm_connect_cb(uint16_t handle, uint16_t cid,
++						void *user_data, bool status)
++{
++	struct test_data *data = tester_get_data();
++	const struct rfcomm_client_data *client_data = data->test_data;
 +
- void bthost_start(struct bthost *bthost);
- void bthost_stop(struct bthost *bthost);
++	if (client_data->send_data)
++		bthost_add_channel_hook(hciemu_client_get_host(data->hciemu),
++					handle,	client_data->client_channel,
++					client_hook_func, NULL);
++}
++
+ static void test_connect(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -408,7 +451,7 @@ static void test_connect(const void *test_data)
  
+ 	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
+ 	bthost_add_rfcomm_server(bthost, client_data->server_channel,
+-								NULL, NULL);
++						rfcomm_connect_cb, NULL);
+ 
+ 	master_addr = hciemu_get_master_bdaddr(data->hciemu);
+ 	client_addr = hciemu_get_client_bdaddr(data->hciemu);
+@@ -540,6 +583,9 @@ int main(int argc, char *argv[])
+ 					setup_powered_client, test_basic);
+ 	test_rfcomm("Basic RFCOMM Socket Client - Success", &connect_success,
+ 					setup_powered_client, test_connect);
++	test_rfcomm("Basic RFCOMM Socket Client - Write Success",
++			&connect_send_success, setup_powered_client,
++			test_connect);
+ 	test_rfcomm("Basic RFCOMM Socket Client - Conn Refused",
+ 			&connect_nval, setup_powered_client, test_connect);
+ 	test_rfcomm("Basic RFCOMM Socket Server - Success", &listen_success,
 -- 
 1.8.3.1
 
