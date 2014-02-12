@@ -1,67 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 12 Feb 2014 12:06:44 +0100
+From: Sander Eikelenboom <linux@eikelenboom.it>
+Message-ID: <1259174563.20140212120644@eikelenboom.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Peter Hurley <peter@hurleysoftware.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gianluca Anzolin <gianluca@sottospazio.it>,
+	Alexander Holler <holler@ahsoftware.de>,
+	Andrey Vihrov <andrey.vihrov@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/24] rfcomm fixes
+In-Reply-To: <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org>
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1458044.bhGCHJKobi@leonov>
-References: <1392143552-11395-1-git-send-email-anderson.lizardo@openbossa.org>
-	<CABBYNZ+V-pg6sGO7yK1gsFnu+6pxDJhBq6QUdW_RyP6+YSMnUg@mail.gmail.com>
-	<1458044.bhGCHJKobi@leonov>
-Date: Wed, 12 Feb 2014 07:28:24 -0400
-Message-ID: <CAJdJm_P3caDzXXttQUvkoeo3pSaWaiuJ4G0B1gbwfw0uwfDD3A@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/7] android: Use 16-bit UUID for SDP search
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
 
-On Wed, Feb 12, 2014 at 6:59 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
->> Applied all except 6/7, I think we should probably return an error if
->> there is an attempt to register a service out of range, then the
->> caller can assert so we can have a proper test for it that expect an
->> error in such case.
->
-> Well, currently IPC depends on hal-msg.h which defines max allowed service ID
-> and using something bigger is a code bug. We could have make IPC independent
-> of hal-msg.h and just verify registered ID in runtime but that would add extra
-> code for each caller with no profit as IDs are fixed anyway.
+Monday, February 10, 2014, 11:09:38 PM, you wrote:
 
-Personally, I don't have strong opinions on using assert() versus
-raise(SIGTERM) (which is how runtime error conditions seem to be
-handled). Initially I went with raise(SIGTERM), but then I noticed the
-IDs are statically defined, and there is no way to give a invalid ID
-to ipc_register(),  unless due to programming error (for which
-assert() is ideal, due to low overhead and no introduction of dead
-code).
+> Hi Peter,
 
-That said, this patch is not critical, but only a check so future
-users of ipc_register() don't reintroduce a similar crash fixed by the
-other commit.
+>> This patch series addresses a number of previously unknown issues
+>> with the RFCOMM tty device implementation, in addition to
+>> addressing the locking regression recently reported [1].
+>> 
+>> As Gianluca suggested and I agree, this series first reverts
+>> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
 
->
-> That test fix is invalid as we actually want to test if IPC handles out-of-
-> bound service ID correctly (when receiving register command).
-> And I'm not sure why this actually was causing any problems since that test is
-> not registering handlers for out-of-bound service ID, just sends ipc message
-> with such ID.
+> so for 3.14 we should revert 3 patches. And then the other 21 are intended for 3.15 merge window.
 
-I forgot to clarify this on the commit message: the "out of bound"
-service ID is still passed on the IPC message. What I fixed is the
-service ID field used solely for registering the handlers (i.e. passed
-to ipc_register()). If you check the changed struct, there is another
-field for the IPC headers where there is still the expected (out of
-bound) ID.
+> I realize that we still have to deal with some breakage, but we do not want regressions and I clearly not going to take 24 patches for 3.14 at this point in time.
 
-In the current format, ipc_register() must not receive an "out of
-bound" ID otherwise memory corruptions occur, which introduces subtle
-bugs (in my case the crash happened in very specific compilation
-parameters and valgrind didn't help because the corrupted structures
-were static).
+> What I can do is take all 24 patches into bluetooth-next and let them sit for 1 week and have people test them. And then we go ahead with reverting 3 patches from 3.14. Does that make sense?
 
-Best Regards,
--- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+Reverting those 3 patches works for me.
+
+--
+Sander
+
+> Regards
+
+> Marcel
