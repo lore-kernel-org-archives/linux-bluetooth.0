@@ -1,39 +1,163 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] RFCOMM data transfer support in bthost
-Date: Wed, 12 Feb 2014 12:41:35 +0100
-Message-Id: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1458044.bhGCHJKobi@leonov>
+References: <1392143552-11395-1-git-send-email-anderson.lizardo@openbossa.org>
+	<CABBYNZ+V-pg6sGO7yK1gsFnu+6pxDJhBq6QUdW_RyP6+YSMnUg@mail.gmail.com>
+	<1458044.bhGCHJKobi@leonov>
+Date: Wed, 12 Feb 2014 13:29:38 +0200
+Message-ID: <CABBYNZL+GnKJhckOrrrRY_EepJXvfZ5DS-cu4+TLDr9WpfiZhQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/7] android: Use 16-bit UUID for SDP search
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-Below changes allow to test RFCOMM data transfer and add
-simple test to check it. Two new functions are added
-to bthost API: bthost_add_channel_hook(), which handles
-data received on bthost on specific channel and connection
-handle and bthost_send_uih(), which forms RFCOMM UIH frame
-and send it.
-These changes depends on previous fixes with frame length checks.
+On Wed, Feb 12, 2014 at 12:59 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi,
+>
+> On Wednesday 12 of February 2014 11:58:16 Luiz Augusto von Dentz wrote:
+>> Hi Anderson,
+>>
+>> On Tue, Feb 11, 2014 at 8:32 PM, Anderson Lizardo
+>>
+>> <anderson.lizardo@openbossa.org> wrote:
+>> > These UUIDs are assigned by BT-SIG and therefore there is no need to
+>> > use full 128-bit UUIDs. This also avoids unnecessary conversion from
+>> > string representation.
+>> > ---
+>> >
+>> >  android/handsfree.c |    3 +--
+>> >  android/hidhost.c   |    7 +++----
+>> >  2 files changed, 4 insertions(+), 6 deletions(-)
+>> >
+>> > diff --git a/android/handsfree.c b/android/handsfree.c
+>> > index 9482b2e..a869d58 100644
+>> > --- a/android/handsfree.c
+>> > +++ b/android/handsfree.c
+>> > @@ -34,7 +34,6 @@
+>> >
+>> >  #include "lib/bluetooth.h"
+>> >  #include "lib/sdp.h"
+>> >  #include "lib/sdp_lib.h"
+>> >
+>> > -#include "lib/uuid.h"
+>> >
+>> >  #include "src/sdp-client.h"
+>> >  #include "src/uuid-helper.h"
+>> >  #include "src/shared/hfp.h"
+>> >
+>> > @@ -294,7 +293,7 @@ static void handle_connect(const void *buf, uint16_t
+>> > len)>
+>> >         device_init(&bdaddr);
+>> >
+>> > -       bt_string2uuid(&uuid, HFP_HS_UUID);
+>> > +       sdp_uuid16_create(&uuid, HANDSFREE_SVCLASS_ID);
+>> >
+>> >         if (bt_search_service(&adapter_addr, &device.bdaddr, &uuid,
+>> >
+>> >                                         sdp_search_cb, NULL, NULL, 0) < 0)
+>> >                                         {
+>> >
+>> >                 error("handsfree: SDP search failed");
+>> >
+>> > diff --git a/android/hidhost.c b/android/hidhost.c
+>> > index 8bd3455..45fe14f 100644
+>> > --- a/android/hidhost.c
+>> > +++ b/android/hidhost.c
+>> > @@ -37,7 +37,6 @@
+>> >
+>> >  #include "lib/bluetooth.h"
+>> >  #include "lib/sdp.h"
+>> >  #include "lib/sdp_lib.h"
+>> >
+>> > -#include "lib/uuid.h"
+>> >
+>> >  #include "src/shared/mgmt.h"
+>> >  #include "src/sdp-client.h"
+>> >  #include "src/uuid-helper.h"
+>> >
+>> > @@ -751,7 +750,7 @@ static void hid_sdp_did_search_cb(sdp_list_t *recs,
+>> > int err, gpointer data)>
+>> >                         dev->version = data->val.uint16;
+>> >
+>> >         }
+>> >
+>> > -       bt_string2uuid(&uuid, HID_UUID);
+>> > +       sdp_uuid16_create(&uuid, HID_SVCLASS_ID);
+>> >
+>> >         if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
+>> >
+>> >                                 hid_sdp_search_cb, dev, NULL, 0) < 0) {
+>> >
+>> >                 error("failed to search sdp details");
+>> >
+>> > @@ -792,7 +791,7 @@ static void bt_hid_connect(const void *buf, uint16_t
+>> > len)>
+>> >         ba2str(&dev->dst, addr);
+>> >         DBG("connecting to %s", addr);
+>> >
+>> > -       bt_string2uuid(&uuid, PNP_UUID);
+>> > +       sdp_uuid16_create(&uuid, PNP_INFO_SVCLASS_ID);
+>> >
+>> >         if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
+>> >
+>> >                                         hid_sdp_did_search_cb, dev, NULL,
+>> >                                         0) < 0) {
+>> >
+>> >                 error("Failed to search DeviceID SDP details");
+>> >
+>> > @@ -1293,7 +1292,7 @@ static void connect_cb(GIOChannel *chan, GError
+>> > *err, gpointer user_data)>
+>> >                 dev->ctrl_io = g_io_channel_ref(chan);
+>> >                 dev->uhid_fd = -1;
+>> >
+>> > -               bt_string2uuid(&uuid, PNP_UUID);
+>> > +               sdp_uuid16_create(&uuid, PNP_INFO_SVCLASS_ID);
+>> >
+>> >                 if (bt_search_service(&src, &dev->dst, &uuid,
+>> >
+>> >                                         hid_sdp_did_search_cb, dev, NULL,
+>> >                                         0) < 0) {
+>> >
+>> >                         error("failed to search did sdp details");
+>> >
+>> > --
+>> > 1.7.9.5
+>>
+>> Applied all except 6/7, I think we should probably return an error if
+>> there is an attempt to register a service out of range, then the
+>> caller can assert so we can have a proper test for it that expect an
+>> error in such case.
+>
+> Well, currently IPC depends on hal-msg.h which defines max allowed service ID
+> and using something bigger is a code bug. We could have make IPC independent
+> of hal-msg.h and just verify registered ID in runtime but that would add extra
+> code for each caller with no profit as IDs are fixed anyway.
 
-Comments are welcome
+Perhaps we should ignore and not register service is initialized with
+e.g. -1 just skip ipc_register.
 
-Regards
+> That test fix is invalid as we actually want to test if IPC handles out-of-
+> bound service ID correctly (when receiving register command).
+> And I'm not sure why this actually was causing any problems since that test is
+> not registering handlers for out-of-bound service ID, just sends ipc message
+> with such ID.
 
-Marcin Kraglak (6):
-  emulator/bthost: Add api to handle RFCOMM data on bthost
-  tools/rfcomm-tester: Add RFCOMM client write test case
-  tools/rfcomm-tester: Add RFCOMM server write test case
-  emulator/bthost: Add function to send RFCOMM UIH frames from bthost
-  tools/rfcomm-tester: Add RFCOMM client read test case
-  tools/rfcomm-tester: Add RFCOMM server read test case
+Im not sure we have the array of HAL_SERVICE_ID_MAX + 1 I thought that
+would be HAL_SERVICE_ID_MAX, nevertheless every test seems to be
+calling test_cmd_reg which does call ipc_register which IMO should be
+invalid for HAL_SERVICE_ID_MAX + 1.
 
- emulator/bthost.c     | 113 +++++++++++++++++++++++++++--
- emulator/bthost.h     |  11 +++
- tools/rfcomm-tester.c | 194 +++++++++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 313 insertions(+), 5 deletions(-)
+> (BTW I think we should pass max service id on ipc_init, as currently audio ipc
+> is using max service id from bt ipc)
+
+Im did not get the comment above.
+
 
 -- 
-1.8.3.1
-
+Luiz Augusto von Dentz
