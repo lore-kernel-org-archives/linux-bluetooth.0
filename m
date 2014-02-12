@@ -1,84 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/9] android/hal-ipc-api: Add Get Play Status Response
-Date: Wed, 12 Feb 2014 16:48:06 +0200
-Message-Id: <1392216494-30885-1-git-send-email-luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/socket: Fix wrong memory access
+Date: Wed, 12 Feb 2014 15:24:45 +0100
+Message-ID: <2280349.UgpCoNr8dQ@leonov>
+In-Reply-To: <1392214396-2576-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1392214396-2576-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
----
- android/hal-ipc-api.txt | 30 +++++++++++++++++++++++++++++-
- android/hal-msg.h       | 16 ++++++++++++++++
- 2 files changed, 45 insertions(+), 1 deletion(-)
+On Wednesday 12 of February 2014 16:13:16 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> This fixes accessing proto[2] in the code.
+> ---
+>  android/socket.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/socket.c b/android/socket.c
+> index c62ca61..1551e9b 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -190,7 +190,7 @@ static sdp_record_t *create_rfcomm_record(uint8_t chan,
+> uuid_t *uuid, {
+>  	sdp_list_t *svclass_id;
+>  	sdp_list_t *seq, *proto_seq, *pbg_seq;
+> -	sdp_list_t *proto[2];
+> +	sdp_list_t *proto[3];
+>  	uuid_t l2cap_uuid, rfcomm_uuid, obex_uuid, pbg_uuid;
+>  	sdp_data_t *channel;
+>  	sdp_record_t *record;
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index ad5d192..01c2e81 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1174,7 +1174,35 @@ Bluetooth Remote Control HAL (ID 8)
- Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
- 
- 	Opcode 0x00 - Error response
--	Opcode 0x01 - Get Play Status command/response
-+
-+		Response parameters: Status (1 octet)
-+
-+		Valid status values: 0x01 = Fail
-+		                     0x02 = Not ready
-+		                     0x03 = No memory
-+		                     0x04 = Busy
-+		                     0x05 = Done (already completed)
-+		                     0x06 = Unsupported
-+		                     0x07 = Parameter invalid
-+		                     0x08 = Unhandled
-+		                     0x09 = Authentication failure
-+		                     0x0a = Remote device down
-+
-+	Opcode 0x01 - Get Play Status Response command/response
-+
-+		Command parameters: Status (1 octet)
-+		                    Duration (4 octets)
-+		                    Position (4 octets)
-+
-+		In case of an error, the error response will be returned.
-+
-+		Valid status values: 0x00 = Stopped
-+		                     0x01 = Playing
-+		                     0x02 = Paused
-+		                     0x03 = Fwd seek
-+		                     0x04 = Rev seek
-+		                     0xff = Error
-+
- 	Opcode 0x02 - List Player Application Attributes command/response
- 	Opcode 0x03 - List Player Application Values command/response
- 	Opcode 0x04 - Get Player Application Values command/response
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 6ef00f9..82cd3f5 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -783,3 +783,19 @@ struct hal_ev_handsfree_unknown_at {
- } __attribute__((packed));
- 
- #define HAL_EV_HANDSFREE_HSP_KEY_PRESS	0x90
-+
-+/* AVRCP HAL API */
-+
-+#define HAL_AVRCP_PLAY_STATUS_STOPPED	0x00
-+#define HAL_AVRCP_PLAY_STATUS_PLAYING	0x01
-+#define HAL_AVRCP_PLAY_STATUS_PAUSED	0x02
-+#define HAL_AVRCP_PLAY_STATUS_FWD_SEEK	0x03
-+#define HAL_AVRCP_PLAY_STATUS_REV_SEEK	0x04
-+#define HAL_AVRCP_PLAY_STATUS_ERROR	0xff
-+
-+#define HAL_OP_AVRCP_GET_PLAY_STATUS	0x01
-+struct hal_cmd_avrcp_get_play_status {
-+	uint8_t status;
-+	uint32_t duration;
-+	uint32_t position;
-+} __attribute__((packed));
+Pushed, thanks.
+
 -- 
-1.8.5.3
-
+BR
+Szymon Janc
