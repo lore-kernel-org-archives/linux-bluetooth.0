@@ -1,49 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Feb 2014 11:19:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petri Gynther <pgynther@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3] hog: Use HoG device name as uHID input device name
-Message-ID: <20140213091902.GA2754@x220.p-661hnu-f1>
-References: <20140130035506.2A034100F4B@puck.mtv.corp.google.com>
+Date: Thu, 13 Feb 2014 10:21:32 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 1/4] android/haltest: Remove unneeded assignment
+Message-ID: <20140213081922.GC25950@aemeltch-MOBL1>
+References: <1391775078-25010-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZJq3wWht-Jk7BP=dkEnsTG2o8fXiF8JycJr_prMvQe0NA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140130035506.2A034100F4B@puck.mtv.corp.google.com>
+In-Reply-To: <CABBYNZJq3wWht-Jk7BP=dkEnsTG2o8fXiF8JycJr_prMvQe0NA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi Luiz,
 
-On Wed, Jan 29, 2014, Petri Gynther wrote:
-> If HoG BLE device name is known, use it when creating uHID input device.
-> Pass adapter and device addresses to uHID as well.
+On Mon, Feb 10, 2014 at 02:16:09PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
+> 
+> On Fri, Feb 7, 2014 at 2:11 PM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > ---
+> >  android/client/if-audio.c | 4 +---
+> >  1 file changed, 1 insertion(+), 3 deletions(-)
+> >
+> > diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+> > index 8c640a1..5ab11a6 100644
+> > --- a/android/client/if-audio.c
+> > +++ b/android/client/if-audio.c
+> > @@ -225,10 +225,8 @@ static void *playback_thread(void *data)
+> >                 pthread_mutex_unlock(&outstream_mutex);
+> >         } while (len && w_len > 0);
+> >
+> > -       if (in) {
+> > +       if (in)
+> >                 fclose(in);
+> > -               in = NULL;
+> > -       }
+> >
+> >         pthread_cleanup_pop(1);
+> >         return NULL;
+> > --
+> > 1.8.3.2
+> 
+> Pushed, note that I did move the changes from audio to android since
+> the audio code will be dropped as it is not unit tested.
 
-Could you perhaps elaborate a bit what exactly the "uniq" and "phys"
-members are in the request (possibly with a reference to the uHID
-documentation). That would make it easier to verify that the content
-you're adding to them makes sense.
+I still think that those patches needs to applied otherwise we have
+following warnings:
 
-> +	if (device_name_known(hogdev->device)) {
-> +		device_get_name(hogdev->device, (char *) ev.u.create.name,
-> +				sizeof(ev.u.create.name) - 1);
-> +	} else {
-> +		strcpy((char *) ev.u.create.name, "bluez-hog-device");
-> +	}
+...
+  CC       profiles/audio/bluetoothd-avdtp.o
+profiles/audio/avdtp.c:2735:2: warning: Null pointer passed as an argument
+to a 'nonnull' parameter
+        memcpy(req->data, buffer, size);
+        ^                 ~~~~~~
+profiles/audio/avdtp.c:3290:2: warning: Null pointer passed as an argument
+to a 'nonnull' parameter
+        memcpy(cap->data, data, length);
+        ^                 ~~~~
+2 warnings generated.
+...
 
-We don't use { } for single line branches, so you can drop these here.
+You may choose to fix those warns other ways though.
 
-> +	ba2str(btd_adapter_get_address(device_get_adapter(hogdev->device)),
-> +		(char *) ev.u.create.phys);
+Best regards 
+Andrei Emeltchenko 
 
-This is getting a bit messy with the nested function calls. I'd add
-separate adapter variable here to make this a bit more readable.
-
-Also note our coding style wrt split lines: indent the continuation
-lines as much as you can (with tabs) as long as it's under 80 chars.
-
-Also, it might be good to split this up into two patches since you've
-essentially got two independent improvements here. One is making sure
-the name member contains something more useful and the other is adding
-some content to the uniq and phys members.
-
-Johan
