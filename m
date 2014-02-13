@@ -1,60 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] adapter: Handle MGMT_SETTING_LE change
-Message-Id: <20140213014521.59803100423@puck.mtv.corp.google.com>
-Date: Wed, 12 Feb 2014 17:45:21 -0800 (PST)
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <52FC13F0.8040809@hurleysoftware.com>
+Date: Wed, 12 Feb 2014 19:38:08 -0500
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Gianluca Anzolin <gianluca@sottospazio.it>,
+ Alexander Holler <holler@ahsoftware.de>,
+ Andrey Vihrov <andrey.vihrov@gmail.com>,
+ Sander Eikelenboom <linux@eikelenboom.it>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/24] rfcomm fixes
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <52F95A10.5010507@hurleysoftware.com> <433F6D97-A126-4F9F-96AC-4385575E005E@holtmann.org>
+In-Reply-To: <433F6D97-A126-4F9F-96AC-4385575E005E@holtmann.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On some BLE-capable adapters, BLE is not enabled by default. When BLE is
-enabled after the adapter is already powered up, we need to call
-trigger_passive_scanning() so that paired BLE devices (e.g. HoG devices)
-are able to reconnect back to host.
+Hi Marcel,
 
-bluetoothd[1087]: src/adapter.c:adapter_start() adapter /org/bluez/hci0 has been enabled
-bluetoothd[1087]: src/adapter.c:load_link_keys_complete() link keys loaded for hci0
-bluetoothd[1087]: src/adapter.c:load_ltks_complete() LTKs loaded for hci0
-bluetoothd[1087]: src/adapter.c:get_connections_complete() Connection count: 0
-bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000000c1
-bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000040
-bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002c1
-bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000200
- => BLE got enabled, adapter already up, need to call trigger_passive_scanning()
-bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002d1
-bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000010
-bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002d3
-bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000002
----
- src/adapter.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+On 02/12/2014 05:58 PM, Marcel Holtmann wrote:
+> we might also want to add some end-to-end test cases to rfcomm-tester that covers this behavior.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 18601ea..01006f2 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -405,6 +405,7 @@ static void store_adapter_info(struct btd_adapter *adapter)
- static void trigger_pairable_timeout(struct btd_adapter *adapter);
- static void adapter_start(struct btd_adapter *adapter);
- static void adapter_stop(struct btd_adapter *adapter);
-+static void trigger_passive_scanning(struct btd_adapter *adapter);
- 
- static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
- {
-@@ -434,6 +435,13 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
- 		}
- 	}
- 
-+	if (changed_mask & MGMT_SETTING_LE) {
-+		if ((adapter->current_settings & MGMT_SETTING_POWERED) &&
-+		    (adapter->current_settings & MGMT_SETTING_LE)) {
-+			trigger_passive_scanning(adapter);
-+		}
-+	}
-+
- 	if (changed_mask & MGMT_SETTING_CONNECTABLE)
- 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
- 					ADAPTER_INTERFACE, "Connectable");
--- 
-1.9.0.rc1.175.g0b1dcb5
+Are there some docs for the linux-bluetooth test harness?
 
+I have some unit tests that I can port but I should probably understand
+the bluetooth test framework first. A lot of my unit tests are designed
+to test races with the ioctl interface, device creation and initialization,
+teardown, tty open, close, etc.
+
+Would that kind of unit test fit in the test harness design?
+
+Regards,
+Peter Hurley
