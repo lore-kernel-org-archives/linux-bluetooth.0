@@ -1,91 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] tools/rfcomm-tester: Add bind after connected test case
-Date: Thu, 13 Feb 2014 15:11:23 +0100
-Message-ID: <1392300683-13835-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 13 Feb 2014 14:41:34 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Petri Gynther <pgynther@google.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] adapter: Handle MGMT_SETTING_LE change
+Message-ID: <20140213124134.GA13866@x220.p-661hnu-f1>
+References: <20140213014521.59803100423@puck.mtv.corp.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140213014521.59803100423@puck.mtv.corp.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This testcase will check if it's possible to bind socket on the same
-channel number as used by some other socket connected to remote device.
----
- tools/rfcomm-tester.c | 29 +++++++++++++++++++++++++++--
- 1 file changed, 27 insertions(+), 2 deletions(-)
+Hi Petri,
 
-diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-index 44df7e7..c6aa8c7 100644
---- a/tools/rfcomm-tester.c
-+++ b/tools/rfcomm-tester.c
-@@ -56,6 +56,7 @@ struct test_data {
- struct rfcomm_client_data {
- 	uint8_t server_channel;
- 	uint8_t client_channel;
-+	uint8_t bind_channel;
- 	int expected_connect_err;
- };
- 
-@@ -300,6 +301,12 @@ const struct rfcomm_client_data connect_nval = {
- 	.expected_connect_err = -ECONNREFUSED
- };
- 
-+const struct rfcomm_client_data connect_bind_success = {
-+	.server_channel = 0x0c,
-+	.client_channel = 0x0c,
-+	.bind_channel = 0x0c
-+};
-+
- const struct rfcomm_server_data listen_success = {
- 	.server_channel = 0x0c,
- 	.client_channel = 0x0c,
-@@ -371,6 +378,7 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
- {
- 	struct test_data *data = tester_get_data();
- 	const struct rfcomm_client_data *client_data = data->test_data;
-+	const uint8_t *master_addr;
- 	socklen_t len = sizeof(int);
- 	int sk, err, sk_err;
- 
-@@ -389,10 +397,24 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return false;
- 	}
- 
--	if (err < 0)
-+	if (!client_data->bind_channel) {
-+		if (err < 0)
-+			tester_test_failed();
-+		else
-+			tester_test_passed();
-+		return false;
-+	}
-+
-+	master_addr = hciemu_get_master_bdaddr(data->hciemu);
-+	sk = create_rfcomm_sock((bdaddr_t *) master_addr,
-+						client_data->bind_channel);
-+	if (sk < 0) {
- 		tester_test_failed();
--	else
-+	} else {
-+		close(sk);
- 		tester_test_passed();
-+	}
-+
- 
- 	return false;
- }
-@@ -546,6 +568,9 @@ int main(int argc, char *argv[])
- 					setup_powered_server, test_server);
- 	test_rfcomm("Basic RFCOMM Socket Server - Conn Refused", &listen_nval,
- 					setup_powered_server, test_server);
-+	test_rfcomm("Basic RFCOMM Socket Server - Bind Connected",
-+			&connect_bind_success, setup_powered_client,
-+								test_connect);
- 
- 	return tester_run();
- }
--- 
-1.8.5.4
+On Wed, Feb 12, 2014, Petri Gynther wrote:
+> On some BLE-capable adapters, BLE is not enabled by default. When BLE is
+> enabled after the adapter is already powered up, we need to call
+> trigger_passive_scanning() so that paired BLE devices (e.g. HoG devices)
+> are able to reconnect back to host.
 
+No dual-mode adapter should have LE enabled by default and we do have
+the following piece of code that gets run for any newly discovered
+adapter:
+
+        if ((adapter->supported_settings & MGMT_SETTING_LE) &&
+                        !(adapter->current_settings & MGMT_SETTING_LE))
+                set_mode(adapter, MGMT_OP_SET_LE, 0x01);
+
+So the commit message is a bit confusing to me. How exactly do you end
+up reproducing this scenario? I could imagine this maybe happening if
+bluetoothd crashes and gets restarted when the adapter state is already
+powered on. Either way you should explain this in the commit message.
+
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -405,6 +405,7 @@ static void store_adapter_info(struct btd_adapter *adapter)
+>  static void trigger_pairable_timeout(struct btd_adapter *adapter);
+>  static void adapter_start(struct btd_adapter *adapter);
+>  static void adapter_stop(struct btd_adapter *adapter);
+> +static void trigger_passive_scanning(struct btd_adapter *adapter);
+
+Since we try to avoid forward declarations like this whenever possible, did you
+investigate what would be needed to not need it here. I.e. is it really
+a lot of dependent functions that would need to be moved further up
+together with trigger_passive_scanning() or is there even a circular
+dependency somewhere that makes the forward declaration inevitable?
+
+> +	if (changed_mask & MGMT_SETTING_LE) {
+> +		if ((adapter->current_settings & MGMT_SETTING_POWERED) &&
+> +		    (adapter->current_settings & MGMT_SETTING_LE)) {
+> +			trigger_passive_scanning(adapter);
+> +		}
+> +	}
+
+The { } isn't needed for the internal if-statement.
+
+Johan
