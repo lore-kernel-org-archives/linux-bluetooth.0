@@ -1,44 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Feb 2014 10:36:16 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gianluca Anzolin <gianluca@sottospazio.it>,
-	Alexander Holler <holler@ahsoftware.de>,
-	Andrey Vihrov <andrey.vihrov@gmail.com>,
-	Sander Eikelenboom <linux@eikelenboom.it>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Jiri Slaby <jslaby@suse.cz>
-Subject: Re: [PATCH 04/24] tty: Fix ref counting for port krefs
-Message-ID: <20140213183616.GA13509@kroah.com>
-References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
- <1391997564-1805-5-git-send-email-peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1391997564-1805-5-git-send-email-peter@hurleysoftware.com>
+In-Reply-To: <201401082236.25135@pali>
+References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
+ <201312301531.29768@pali> <20131230145250.GA16904@earth.universe> <201401082236.25135@pali>
+From: =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali.rohar@gmail.com>
+Date: Thu, 13 Feb 2014 16:33:28 +0100
+Message-ID: <CAHYPw2EJC9RwgzXmGuQgh5_L6EMtS7MW8N3u2dR8KeVc0kb43g@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
+To: Pavel Machek <pavel@ucw.cz>, Marcel Holtmann <marcel@holtmann.org>, Sebastian Reichel <sre@ring0.de>
+Cc: =?UTF-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?= <freemangordon@abv.bg>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Feb 09, 2014 at 08:59:04PM -0500, Peter Hurley wrote:
-> The tty core supports two models for handling tty_port lifetimes;
-> the tty_port can use the kref supplied by tty_port (which will
-> automatically destruct the tty_port when the ref count drops to
-> zero) or it can destruct the tty_port manually.
-> 
-> For tty drivers that choose to use the port kref to manage the
-> tty_port lifetime, it is not possible to safely acquire a port
-> reference conditionally. If the last reference is released after
-> evaluating the condition but before acquiring the reference, a
-> bogus reference will be held while the tty_port destruction
-> commences.
-> 
-> Rather, only acquire a port reference if the ref count is non-zero
-> and allow the caller to distinguish if a reference has successfully
-> been acquired.
-> 
-> Cc: Jiri Slaby <jslaby@suse.cz>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
+2014-01-08 22:36 GMT+01:00 Pali Roh=C3=A1r <pali.rohar@gmail.com>:
+> On Monday 30 December 2013 15:52:51 Sebastian Reichel wrote:
+>> > > > +MODULE_DESCRIPTION("Bluetooth h4 driver with nokia
+>> > > > extensions"); +MODULE_LICENSE("GPL");
+>> > > > +MODULE_AUTHOR("Ville Tervo");
+>> > > > +MODULE_FIRMWARE(FW_NAME_TI1271_PRELE);
+>> > > > +MODULE_FIRMWARE(FW_NAME_TI1271_LE);
+>> > > > +MODULE_FIRMWARE(FW_NAME_TI1271);
+>> > > > +MODULE_FIRMWARE(FW_NAME_BCM2048);
+>> > > > +MODULE_FIRMWARE(FW_NAME_CSR);
+>> > >
+>> > > Do we actually have all these firmware files still
+>> > > available. If not, then focus on the ones we have.
+>> >
+>> > Firmware files are available for download from nemo project:
+>> >
+>> > https://api.merproject.org/public/source/nemo:devel:hw:ti:om
+>> > ap3:n900/bcm-bt-firmware/bcm-bt-firmware-0.21rc3.tar.bz2
+>> > https://api.merproject.org/public/source/nemo:devel:hw:ti:o
+>> > map3:n950-n9/ti-wl1273-bt-firmware/bt-firmware-ti1273_0.23+0
+>> > m6.tar.gz
+>>
+>> Would be nice to have them added to the linux-firmware.git.
+>>
+>> -- Sebastian
+>
+> Can somebody send firmware files for inclusion to linux-firmware?
+>
+> --
+> Pali Roh=C3=A1r
+> pali.rohar@gmail.com
 
-Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Now when driver is queued for staging, can somebody add firmware files
+to linux-firmware repository? Note that without firmware files, driver
+not working...
+
+--=20
+Pali Roh=C3=A1r
+pali.rohar@gmail.com
