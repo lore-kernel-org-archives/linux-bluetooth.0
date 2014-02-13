@@ -1,63 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52FD205F.7030704@convergeddevices.net>
-Date: Thu, 13 Feb 2014 19:43:27 +0000
-From: tony <tony.makkiel@convergeddevices.net>
+Date: Thu, 13 Feb 2014 10:36:16 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gianluca Anzolin <gianluca@sottospazio.it>,
+	Alexander Holler <holler@ahsoftware.de>,
+	Andrey Vihrov <andrey.vihrov@gmail.com>,
+	Sander Eikelenboom <linux@eikelenboom.it>,
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jiri Slaby <jslaby@suse.cz>
+Subject: Re: [PATCH 04/24] tty: Fix ref counting for port krefs
+Message-ID: <20140213183616.GA13509@kroah.com>
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+ <1391997564-1805-5-git-send-email-peter@hurleysoftware.com>
 MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Help in getting  BlueZ version - 5.14 running please
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1391997564-1805-5-git-send-email-peter@hurleysoftware.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-         I am trying to familiarize with blueZ commands. I can scan 
-devices and see HCI commands and events using hcidump. But am having 
-some problems which I have been trying to figure out the past two days. 
-Any suggestions or pointers will be much appreciated.
+On Sun, Feb 09, 2014 at 08:59:04PM -0500, Peter Hurley wrote:
+> The tty core supports two models for handling tty_port lifetimes;
+> the tty_port can use the kref supplied by tty_port (which will
+> automatically destruct the tty_port when the ref count drops to
+> zero) or it can destruct the tty_port manually.
+> 
+> For tty drivers that choose to use the port kref to manage the
+> tty_port lifetime, it is not possible to safely acquire a port
+> reference conditionally. If the last reference is released after
+> evaluating the condition but before acquiring the reference, a
+> bogus reference will be held while the tty_port destruction
+> commences.
+> 
+> Rather, only acquire a port reference if the ref count is non-zero
+> and allow the caller to distinguish if a reference has successfully
+> been acquired.
+> 
+> Cc: Jiri Slaby <jslaby@suse.cz>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 
-1) I found a lot of forums talking about creating connection. But 
-couldn't find any which says how to accept connection. I am trying to 
-accept an A2DP connection. The peer device is sending an AVDTP Connect 
-request but don't know how to make blueZ respond. Can somebody please help?
-
-2) I tried to start bluetooth daemon by running
-> ../src/bluetoothd -n -d
-> bluetoothd[4440]: Bluetooth daemon 5.14
-> bluetoothd[4440]: Failed to access management interface
-> bluetoothd[4440]: Adapter handling initialization failed
-
-The kernel modules I have are
-
-> lsmod | grep blue
-> bluetooth             158447  7 rfcomm,bnep,btusb
-
-Should I be running any other command before bluetoothd?
-
-3) I am get problem in getting the python scripts in the test folder.
-For example when I try to run simple-agent it throws up dbus error as 
-below. I tried googling from which I understand some people had the same 
-error with 5.13 as well. The dbus version I have is 1.6.4 (I had to 
-upgrade from 1.4 to build blueZ)
-
-
-> ./simple-agent hci0 00:1B:DC:07:2E:95
-> Traceback (most recent call last):
->   File "./simple-agent", line 158, in <module>
->     obj = bus.get_object(BUS_NAME, "/org/bluez");
->   File "/usr/lib/python2.7/dist-packages/dbus/bus.py", line 241, in get_object
->     follow_name_owner_changes=follow_name_owner_changes)
->   File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 248, in __init__
->     self._named_service = conn.activate_name_owner(bus_name)
->   File "/usr/lib/python2.7/dist-packages/dbus/bus.py", line 180, in activate_name_owner
->     self.start_service_by_name(bus_name)
->   File "/usr/lib/python2.7/dist-packages/dbus/bus.py", line 278, in start_service_by_name
->     'su', (bus_name, flags)))
->   File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in call_blocking
->     message, timeout)
-> dbus.exceptions.DBusException: org.freedesktop.DBus.Error.Spawn.ChildExited: Launch helper exited with unknown return code 1
-
-Thank you for any suggestions or pointers in advance.
-
-Tony
-
-
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
