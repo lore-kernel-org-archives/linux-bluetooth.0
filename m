@@ -1,34 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52FD3DB5.303@ahsoftware.de>
-Date: Thu, 13 Feb 2014 22:48:37 +0100
+Message-ID: <52FD3BF7.9000009@ahsoftware.de>
+Date: Thu, 13 Feb 2014 22:41:11 +0100
 From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
 To: Peter Hurley <peter@hurleysoftware.com>,
  Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>,
+CC: Gustavo Padovan <gustavo@padovan.org>,
  Johan Hedberg <johan.hedberg@gmail.com>,
  Gianluca Anzolin <gianluca@sottospazio.it>,
  Andrey Vihrov <andrey.vihrov@gmail.com>,
  Sander Eikelenboom <linux@eikelenboom.it>,
- "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>
+ linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 00/24] rfcomm fixes
-References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <52F95A10.5010507@hurleysoftware.com> <433F6D97-A126-4F9F-96AC-4385575E005E@holtmann.org> <52FC13F0.8040809@hurleysoftware.com>
-In-Reply-To: <52FC13F0.8040809@hurleysoftware.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 13.02.2014 01:38, schrieb Peter Hurley:
-> Hi Marcel,
+Am 10.02.2014 02:59, schrieb Peter Hurley:
+> Marcel,
 >
-> On 02/12/2014 05:58 PM, Marcel Holtmann wrote:
->> we might also want to add some end-to-end test cases to rfcomm-tester
->> that covers this behavior.
+> This patch series addresses a number of previously unknown issues
+> with the RFCOMM tty device implementation, in addition to
+> addressing the locking regression recently reported [1].
+>
+> As Gianluca suggested and I agree, this series first reverts
+> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
 
-Sounds great. Such would have found the problem with disappearing remote 
-bt (rfcomm) devices since 3.8 likely earlier than I did (which was 
-around 3.10 if I remember correctly).
+Oh, looks like you've spend quiet some time to fix rfcomm.
 
-Regards,
+Thanks a lot for that!
+
+I've just tested this series on top of 3.13.2 where I already have 
+Gianluca 4 patches applied. Test machines were one AMD (x86_64) (bluez 
+4.x) and one ARM(v5) (bluez 5.x) box and I could not find any problems 
+during my short tests (disconnecting/turning of both local and remote 
+and reconnecting).
+
+I haven't had any debug options turned on and haven't looked at the 
+patches at all, but maybe this is already enough to add a
+
+Tested-By: Alexander Holler <holler@ahsoftware.de>
+
+So feel free to add that if someone thinks it makes sense based on my 
+short test description above and it isn't already too late.
+
+Thanks again,
 
 Alexander Holler
