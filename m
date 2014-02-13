@@ -1,69 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrea <mariofutire@gmail.com>
+Date: Thu, 13 Feb 2014 11:19:02 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Petri Gynther <pgynther@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: partial success with PS3 sixaxis
-Date: Thu, 13 Feb 2014 10:25:43 +0100
-Message-ID: <2534491.XllyezJg3g@uw000953>
-In-Reply-To: <52FBE820.6050701@gmail.com>
-References: <52FBE820.6050701@gmail.com>
+Subject: Re: [PATCHv3] hog: Use HoG device name as uHID input device name
+Message-ID: <20140213091902.GA2754@x220.p-661hnu-f1>
+References: <20140130035506.2A034100F4B@puck.mtv.corp.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140130035506.2A034100F4B@puck.mtv.corp.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrea,
+Hi Petri,
 
-On Wednesday 12 of February 2014 21:31:12 Andrea wrote:
-> Hi,
-> 
-> I've been trying to pair a PS3 sixaxis controller using bluez 5.14
-> I've had so far only partial success.
-> 
-> It connects, creates js0 and event0 devices, but after a few seconds it removes them.
-> 
-> The lights are always flashing.
-> 
-> I am on a Raspberry running ArchLinux.
-> 
-> This is the output of bluetoothctl
-> 
-> ...
-> [bluetooth]# disconnect
-> [CHG] Device 00:0B:EB:63:F2:62 Connected: yes
-> [bluetooth]# disconnect show
-> [bluetooth]# disconnect 00:0B:EB:63:F2:62
-> Attempting to disconnect from 00:0B:EB:63:F2:62
-> Successful disconnected
-> [CHG] Device 00:0B:EB:63:F2:62 Connected: no
-> [CHG] Device 00:0B:EB:63:F2:62 Connected: yes
-> 
-> then in dmesg I can see
-> 
-> [ 2745.435967] sony 0005:054C:0268.0008: Fixing up Sony Sixaxis report descriptor
-> [ 2745.452105] sony 0005:054C:0268.0008: unknown main item tag 0x0
-> [ 2745.471504] input: PLAYSTATION(R)3 Controller as
-> /devices/platform/bcm2708_usb/usb1/1-1/1-1.3/1-1.3.1/1-1.3.1:1.0/bluetooth/hci0/hci0:11/input7
-> [ 2745.472795] sony 0005:054C:0268.0008: input,hidraw0: BLUETOOTH HID v1.00 Joystick
-> [PLAYSTATION(R)3 Controller] on 00:0b:0d:4c:94:a6
-> [ 2755.472242] sony: probe of 0005:054C:0268.0008 failed with error -5
-> 
-> the hardware should be ok as it works using sixad & sixpair.
-> 
-> any idea what could be going wrong?
-> I am not even sure if I am doing the right thing to pair, trust, connect etc... as I cannot google
-> anything using bluez 5 + ps3. All the howtos are for sixad.
+On Wed, Jan 29, 2014, Petri Gynther wrote:
+> If HoG BLE device name is known, use it when creating uHID input device.
+> Pass adapter and device addresses to uHID as well.
 
-This should "just work". Since 5.14 there is authorization needed when DS3 is
-connecting (device is not marked as trusted when connected on USB) so please
-make sure you have default agent registered.
+Could you perhaps elaborate a bit what exactly the "uniq" and "phys"
+members are in the request (possibly with a reference to the uHID
+documentation). That would make it easier to verify that the content
+you're adding to them makes sense.
 
-I assume you are using bluetoothctl so do:
-agent on
-default-agent
+> +	if (device_name_known(hogdev->device)) {
+> +		device_get_name(hogdev->device, (char *) ev.u.create.name,
+> +				sizeof(ev.u.create.name) - 1);
+> +	} else {
+> +		strcpy((char *) ev.u.create.name, "bluez-hog-device");
+> +	}
 
-Then you should get authorization request in bluetoothctl when DS3 is connecting.
+We don't use { } for single line branches, so you can drop these here.
 
--- 
-Best regards, 
-Szymon Janc
+> +	ba2str(btd_adapter_get_address(device_get_adapter(hogdev->device)),
+> +		(char *) ev.u.create.phys);
+
+This is getting a bit messy with the nested function calls. I'd add
+separate adapter variable here to make this a bit more readable.
+
+Also note our coding style wrt split lines: indent the continuation
+lines as much as you can (with tabs) as long as it's under 80 chars.
+
+Also, it might be good to split this up into two patches since you've
+essentially got two independent improvements here. One is making sure
+the name member contains something more useful and the other is adding
+some content to the uniq and phys members.
+
+Johan
