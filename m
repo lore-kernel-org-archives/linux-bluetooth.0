@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/12] android/hal-ipc-api: Add Passthrough Command notification
-Date: Thu, 13 Feb 2014 17:18:48 +0200
-Message-Id: <1392304728-5061-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 10/12] android/hal-ipc-api: Add Register Notification notification
+Date: Thu, 13 Feb 2014 17:18:46 +0200
+Message-Id: <1392304728-5061-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1392304728-5061-1-git-send-email-luiz.dentz@gmail.com>
 References: <1392304728-5061-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,39 +12,41 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/hal-ipc-api.txt | 5 +++++
+ android/hal-ipc-api.txt | 7 +++++++
  android/hal-msg.h       | 6 ++++++
- 2 files changed, 11 insertions(+)
+ 2 files changed, 13 insertions(+)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 99ecede..ee3bd76 100644
+index f2427e1..535e880 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1380,6 +1380,11 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
+@@ -1366,6 +1366,13 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
  
- 		Valid type values: Same as in Register Notification
+ 		Valid attribute values: Same as in Get Element Attribute
  
-+	Opcode 0x8c - Passthrough Command notification
++	Opcode 0x8a - Register Notification notification
 +
-+		Notification parameters: ID (1 octet)
-+		                         State (1 octet)
++		Notification parameters: Event (1 octet)
++		                         Parameter (4 octets)
++
++		Valid event values: Same as in Register Notification
 +
  Bluetooth GATT HAL (ID 9)
  =========================
  
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 0561894..6504408 100644
+index 9bc2d2a..a7df71a 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -938,3 +938,9 @@ struct hal_ev_avrcp_volume_changed {
- 	uint8_t volume;
- 	uint8_t type;
+@@ -926,3 +926,9 @@ struct hal_ev_avrcp_get_element_attrs {
+ 	uint8_t number;
+ 	uint8_t attrs[0];
  } __attribute__((packed));
 +
-+#define HAL_EV_AVRCP_PASSTHROUGH_CMD		0x8c
-+struct hal_ev_avrcp_passthrough_cmd {
-+	uint8_t id;
-+	uint8_t state;
++#define HAL_EV_AVRCP_REGISTER_NOTIFICATION	0x8a
++struct hal_ev_avrcp_register_notification {
++	uint8_t event;
++	uint32_t param;
 +} __attribute__((packed));
 -- 
 1.8.5.3
