@@ -1,98 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52FE19C4.1070702@convergeddevices.net>
-Date: Fri, 14 Feb 2014 13:27:32 +0000
-From: tony <tony.makkiel@convergeddevices.net>
+Message-ID: <1392379810.5384.34.camel@tkhai>
+Subject: Re: [PATCH] bluetooth: Do not free priv until timer handler hasn't
+ actually stopped using it
+From: Kirill Tkhai <ktkhai@parallels.com>
+To: Michael Knudsen <m.knudsen@samsung.com>
+CC: <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>
+Date: Fri, 14 Feb 2014 16:10:10 +0400
+In-Reply-To: <52FE0582.3010702@samsung.com>
+References: <1392377748.5384.28.camel@tkhai> <52FE0582.3010702@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-To: <linux-bluetooth@vger.kernel.org>
-Subject: Re: Help in getting BlueZ version - 5.14 running please
-References: <52FD205F.7030704@convergeddevices.net> <CABBYNZKTveir=GZ0VjPt=WmpbDUCk9MzVH+R-5cvd=NGS7TxCQ@mail.gmail.com>
-In-Reply-To: <CABBYNZKTveir=GZ0VjPt=WmpbDUCk9MzVH+R-5cvd=NGS7TxCQ@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thank you for the information.  Yes, my kernel is 3.2. I shall try blueZ 
-4.101. Hopefully that wont have any dependency on the kernel version?
+В Птн, 14/02/2014 в 13:01 +0100, Michael Knudsen пишет:
+> On 02/14/2014 12:35 PM, Kirill Tkhai wrote:
+> > Function del_timer() does not guarantee that timer was really deleted.
+> > If the timer handler is beeing executed at the moment, the function
+> > just returns. So, it's possible to use already freed memory in the handler:
+> 
+> This is not enough.  The timer must be deleted in bcsp_close() before
+> hu->priv is set to NULL as the timer code dereferences hu->priv.
+> 
+> There is a similar issue in hci_h5.c where the timer must be stopped
+> before purging h5->unack.
+> 
+> -m.
 
-Thanks,
-Tony
+Good, consider my email as reported-by. Please, fix that if you get on
+well with bluetooth stack. I am far from it.
 
-On 14/02/14 11:59, Luiz Augusto von Dentz wrote:
->
-> On Feb 13, 2014 10:13 PM, "tony" <tony.makkiel@convergeddevices.net
-> <mailto:tony.makkiel@convergeddevices.net>> wrote:
->  >
->  > Hi,
->  >         I am trying to familiarize with blueZ commands. I can scan
-> devices and see HCI commands and events using hcidump. But am having
-> some problems which I have been trying to figure out the past two days.
-> Any suggestions or pointers will be much appreciated.
->  >
->  > 1) I found a lot of forums talking about creating connection. But
-> couldn't find any which says how to accept connection. I am trying to
-> accept an A2DP connection. The peer device is sending an AVDTP Connect
-> request but don't know how to make blueZ respond. Can somebody please help?
->  >
->  > 2) I tried to start bluetooth daemon by running
->  >>
->  >> ../src/bluetoothd -n -d
->  >> bluetoothd[4440]: Bluetooth daemon 5.14
->  >> bluetoothd[4440]: Failed to access management interface
->  >> bluetoothd[4440]: Adapter handling initialization failed
->
-> Looks like you don't have mgmt interface enabled in your kernel,
-> probably because it is too old for using with BlueZ 5 which require at
-> least 3.4 but nowadays it is probably recommended to use 3.10 or latter.
->
->  >
->  > The kernel modules I have are
->  >
->  >> lsmod | grep blue
->  >> bluetooth             158447  7 rfcomm,bnep,btusb
->  >
->  >
->  > Should I be running any other command before bluetoothd?
->  >
->  > 3) I am get problem in getting the python scripts in the test folder.
->  > For example when I try to run simple-agent it throws up dbus error as
-> below. I tried googling from which I understand some people had the same
-> error with 5.13 as well. The dbus version I have is 1.6.4 (I had to
-> upgrade from 1.4 to build blueZ)
->  >
->  >
->  >> ./simple-agent hci0 00:1B:DC:07:2E:95
->  >> Traceback (most recent call last):
->  >>   File "./simple-agent", line 158, in <module>
->  >>     obj = bus.get_object(BUS_NAME, "/org/bluez");
->  >>   File "/usr/lib/python2.7/dist-packages/dbus/bus.py", line 241, in
-> get_object
->  >>     follow_name_owner_changes=follow_name_owner_changes)
->  >>   File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 248,
-> in __init__
->  >>     self._named_service = conn.activate_name_owner(bus_name)
->  >>   File "/usr/lib/python2.7/dist-packages/dbus/bus.py", line 180, in
-> activate_name_owner
->  >>     self.start_service_by_name(bus_name)
->  >>   File "/usr/lib/python2.7/dist-packages/dbus/bus.py", line 278, in
-> start_service_by_name
->  >>     'su', (bus_name, flags)))
->  >>   File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line
-> 651, in call_blocking
->  >>     message, timeout)
->  >> dbus.exceptions.DBusException:
-> org.freedesktop.DBus.Error.Spawn.ChildExited: Launch helper exited with
-> unknown return code 1
->  >
->  >
->  > Thank you for any suggestions or pointers in advance.
->  >
->  > Tony
->  >
->  >
->  > --
->  > To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
->  > the body of a message to majordomo@vger.kernel.org
-> <mailto:majordomo@vger.kernel.org>
->  > More majordomo info at http://vger.kernel.org/majordomo-info.html
->
+Kirill
