@@ -1,120 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [RFC v8 04/10] Bluetooth: Remove unused function
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] doc: Add management commands and events for privacy support
-Date: Sat, 15 Feb 2014 02:53:15 -0800
-Message-Id: <1392461595-30515-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1391639006-26311-4-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 14 Feb 2014 14:28:29 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <B1545869-A8B6-4E2B-83AA-EF425235F79E@holtmann.org>
+References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org> <1391639006-26311-4-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 82 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 82 insertions(+)
+Hi Andre,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index c5c84291a044..004d2f2965ad 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -213,6 +213,7 @@ Read Controller Information Command
- 		11	Advertising
- 		12	Secure Connections
- 		13	Debug Keys
-+		14	Privacy
- 
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -1468,6 +1469,68 @@ Set Debug Keys Command
- 				Invalid Index
- 
- 
-+Set Privacy Command
-+===================
-+
-+	Command Code:		0x002F
-+	Controller Index:	<controller id>
-+	Command Parameters:	Privacy (1 Octet)
-+				Identity_Address_Type (1 Octet)
-+				Identity_Resolving_Key (16 Octets)
-+	Return Parameters:	Current_Settings (4 Octets)
-+
-+	This command is used to enable Low Energy Privacy feature using
-+	resolvable private addresses.
-+
-+	The value 0x00 disables privacy mode, the value 0x01 enables
-+	privacy mode.
-+
-+	Possible values for the Identity_Address_Type parameter:
-+		1	LE Public
-+		2	LE Random
-+
-+	With LE Public, the controller's public address will be used as
-+	identity address. With LE Random, the configured static address
-+	will be used as identity address.
-+
-+	The Identity_Resolving_Key is the local key assigned for the local
-+	resolvable private address.
-+
-+	Possible errors:	Busy
-+				Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
-+Load Identity Resolving Keys Command
-+====================================
-+
-+	Command Code:		0x0030
-+	Controller Index:	<controller id>
-+	Command Parameters:	Key_Count (2 Octets)
-+				Key1 {
-+					Address (6 Octets)
-+					Address_Type (1 Octet)
-+					Value (16 Octets)
-+				}
-+				Key2 {  }
-+				...
-+	Return Parameters:
-+
-+	This command is used to feed the kernel with currently known
-+	Identity Resolving Keys. The command does not need to be called
-+	again upon the receiption of new Identity Resolving Key events
-+	since the kernel updates its list automatically.
-+
-+	This command can be used when the controller is not powered.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
-@@ -1884,3 +1947,22 @@ Event Parameters	Address (6 Octets)
- 	The Passkey parameter indicates the passkey to be shown to the
- 	user whereas the Entered parameter indicates how many characters
- 	the user has entered on the remote side.
-+
-+
-+New Identity Resolving Key Event
-+================================
-+
-+Event Code		0x0018
-+Controller Index	<controller id>
-+Event Parameters	Store_Hint (1 Octet)
-+			Key {
-+				Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Value (16 Octets)
-+			}
-+
-+	This event indicates that a new identity resolving key has been
-+	generated for a remote device.
-+
-+	The Store_Hint parameter indicates whether the host is expected
-+	to store the key persistently or not.
--- 
-1.8.5.3
+> This patch removes hci_create_le_conn() since it is not used anymore.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> net/bluetooth/hci_conn.c | 32 --------------------------------
+> 1 file changed, 32 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 166d7a5..70f4226 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -551,38 +551,6 @@ done:
+> 	hci_dev_unlock(hdev);
+> }
+> 
+> -static int hci_create_le_conn(struct hci_conn *conn)
+> -{
+> -	struct hci_dev *hdev = conn->hdev;
+> -	struct hci_cp_le_create_conn cp;
+> -	struct hci_request req;
+> -	int err;
+> -
+> -	hci_req_init(&req, hdev);
+> -
+> -	memset(&cp, 0, sizeof(cp));
+> -	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+> -	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+> -	bacpy(&cp.peer_addr, &conn->dst);
+> -	cp.peer_addr_type = conn->dst_type;
+> -	cp.own_address_type = conn->src_type;
+> -	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+> -	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+> -	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+> -	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+> -	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+> -
+> -	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+> -
+> -	err = hci_req_run(&req, create_le_conn_complete);
+> -	if (err) {
+> -		hci_conn_del(conn);
+> -		return err;
+> -	}
+> -
+> -	return 0;
+> -}
+> -
+> static void create_le_conn_req(struct hci_request *req, struct hci_conn *conn)
+> {
+> 	struct hci_cp_le_create_conn cp;
+
+not about this patch, but with my other comment, this one might be better renamed into hci_req_add_le_create_conn at some point. Not urgent though.
+
+Regards
+
+Marcel
 
