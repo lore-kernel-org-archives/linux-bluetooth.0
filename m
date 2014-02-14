@@ -1,108 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC v8 01/10] Bluetooth: Create hci_stop_le_scan_req() helper
+Subject: Re: [PATCH 00/24] rfcomm fixes
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
-Date: Fri, 14 Feb 2014 14:21:01 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <FCE4645F-A564-46FC-AA36-A265BB9CC35C@holtmann.org>
-References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+Date: Fri, 14 Feb 2014 13:45:49 -0800
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gianluca Anzolin <gianluca@sottospazio.it>,
+	Alexander Holler <holler@ahsoftware.de>,
+	Andrey Vihrov <andrey.vihrov@gmail.com>,
+	Sander Eikelenboom <linux@eikelenboom.it>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Message-Id: <316ACAE4-B98C-4396-8121-DCFC20BEC448@holtmann.org>
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Peter,
 
-> This patch moves stop LE scanning duplicate code to one single
-> place and reuses it. This will avoid more duplicate code in
-> upcoming patches.
+> This patch series addresses a number of previously unknown issues
+> with the RFCOMM tty device implementation, in addition to
+> addressing the locking regression recently reported [1].
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> include/net/bluetooth/hci_core.h |  2 ++
-> net/bluetooth/hci_core.c         | 14 ++++++++++----
-> net/bluetooth/mgmt.c             |  6 +-----
-> 3 files changed, 13 insertions(+), 9 deletions(-)
+> As Gianluca suggested and I agree, this series first reverts
+> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 92fa75f..8aff7f9 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1212,4 +1212,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
-> #define SCO_AIRMODE_CVSD       0x0000
-> #define SCO_AIRMODE_TRANSP     0x0003
+> The reasoning is detailed in the changelog for
+>  Revert "Bluetooth: Always wait for a connection on RFCOMM open()"
+> but the short answer is that it re-implements a long-standing
+> bug by blocking on a non-blocking open.
 > 
-> +void hci_stop_le_scan_req(struct hci_request *req);
-> +
+> This patch series corrects the reported regressions from 3.13
+> (to the extent that correction is required). Specifically,
+> the ModemManager regression reported by Gianluca Anzolin [2]
+> and the rfcomm bind with wvdial reported by Andrey Vihrov [3].
+> 
+> tty: Fix ref counting for port krefs
+> Bluetooth: Fix racy acquire of rfcomm_dev reference
+> Bluetooth: Exclude released devices from RFCOMMGETDEVLIST ioctl
+> Bluetooth: Release rfcomm_dev only once
+> Bluetooth: Fix unreleased rfcomm_dev reference
+>   These first 5 patches after the reverts
+>   fix 4 different rfcomm_dev ref count mishandling bugs.
+> 
+> Bluetooth: Fix RFCOMM tty teardown race and
+> Bluetooth: Serialize RFCOMMCREATEDEV and RFCOMMRELEASEDEV ioctls
+>   Fix races which occur due to the design of the rfcomm ioctls
+>   (note that buses don't have these kinds of races).
+> 
+> Bluetooth: Verify dlci not in use before rfcomm_dev create
+> Bluetooth: Simplify RFCOMM session state eval
+> Bluetooth: Refactor deferred setup test in rfcomm_dlc_close()
+> Bluetooth: Refactor dlc disconnect logic in rfcomm_dlc_close()
+> Bluetooth: Directly close dlc for not yet started RFCOMM session
+>   These 5 patches fix issues with reusing the dlci after
+>   closing the tty (found by unit test).
+> 
+> Bluetooth: Fix unsafe RFCOMM device parenting
+> Bluetooth: Fix RFCOMM parent device for reused dlc
+>   These 2 patches fix the ModemManager regression.
+> 
+> Bluetooth: Refactor rfcomm_dev_add()
+> Bluetooth: Cleanup RFCOMM device registration error handling
+>   These 2 patches fix an unreleased module reference while
+>   error handling.
+> 
+> Bluetooth: Rename __rfcomm_dev_get() to __rfcomm_dev_lookup()
+>   This is a trivial naming patch with no functional impact.
+> 
+> Bluetooth: Force -EIO from tty read/write if .activate() fails
+>   The tty core provides an existing mechanism for failing
+>   reads/writes if device activation fails (like an error
+>   allocating the dlc).
+> 
+> Bluetooth: Don't fail RFCOMM tty writes
+>   This patch implements buffered writes even if the device
+>   is not connected.
+> 
+> While unit testing this, I discovered a serious defect in
+> the way available space is computed that under-utilizes
+> rfcomm i/o and may even halt further tx on that link, which
+> is fixed by:
+>  Bluetooth: Refactor write_room() calculation
+>  Bluetooth: Fix write_room() calculation
+> 
+> 
+> Note that this series does not fix the naively inefficient
+> method of packetizing tty output; packetizing should be
+> done on the krfcommd thread to take advantage of aggregating
+> multiple tty writes into 1 or more packets. Look at any
+> line-by-line console output to realize how under-utilized
+> the rfcomm tty packeting is.
+> 
+> [1] http://www.spinics.net/lists/linux-wireless/msg117818.html
+> [2] http://www.spinics.net/lists/linux-bluetooth/msg42075.html
+> [3] http://www.spinics.net/lists/linux-bluetooth/msg42057.html
+> 
+> 
+> Regards,
+> 
+> 
+> Peter Hurley (24):
+>  Revert "Bluetooth: Remove rfcomm_carrier_raised()"
+>  Revert "Bluetooth: Always wait for a connection on RFCOMM open()"
+>  Revert "Bluetooth: Move rfcomm_get_device() before
+>    rfcomm_dev_activate()”
 
-this should be close to hci_req_add definition.
+these 3 patches are in bluetooth-next to give them extra testing. We will get them into 3.14-rc4 after an extra week of them being in linux-next.
 
-> #endif /* __HCI_CORE_H */
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index e774669..6529f4a 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3058,7 +3058,6 @@ static void le_scan_disable_work(struct work_struct *work)
-> {
-> 	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> 					    le_scan_disable.work);
-> -	struct hci_cp_le_set_scan_enable cp;
-> 	struct hci_request req;
-> 	int err;
-> 
-> @@ -3066,9 +3065,7 @@ static void le_scan_disable_work(struct work_struct *work)
-> 
-> 	hci_req_init(&req, hdev);
-> 
-> -	memset(&cp, 0, sizeof(cp));
-> -	cp.enable = LE_SCAN_DISABLE;
-> -	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> +	hci_stop_le_scan_req(&req);
-> 
-> 	err = hci_req_run(&req, le_scan_disable_work_complete);
-> 	if (err)
-> @@ -4523,3 +4520,12 @@ static void hci_cmd_work(struct work_struct *work)
-> 		}
-> 	}
-> }
-> +
-> +void hci_stop_le_scan_req(struct hci_request *req)
-> +{
-> +	struct hci_cp_le_set_scan_enable cp;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	cp.enable = LE_SCAN_DISABLE;
-> +	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> +}
+>  tty: Fix ref counting for port krefs
 
-Can we call this function hci_req_add_le_scan_disable. We should be explicit on what functions are doing. Helpers are just helpers.
+I am taking this one with Greg’s ack through bluetooth-next. Unless someone objects.
 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index ce7ef33..5c0d55d 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3400,7 +3400,6 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
-> 	struct hci_cp_remote_name_req_cancel cp;
-> 	struct inquiry_entry *e;
-> 	struct hci_request req;
-> -	struct hci_cp_le_set_scan_enable enable_cp;
-> 	int err;
+>  Bluetooth: Fix racy acquire of rfcomm_dev reference
+>  Bluetooth: Exclude released devices from RFCOMMGETDEVLIST ioctl
+>  Bluetooth: Release rfcomm_dev only once
+>  Bluetooth: Fix unreleased rfcomm_dev reference
+>  Bluetooth: Fix RFCOMM tty teardown race
+>  Bluetooth: Verify dlci not in use before rfcomm_dev create
+>  Bluetooth: Simplify RFCOMM session state eval
+>  Bluetooth: Refactor deferred setup test in rfcomm_dlc_close()
+>  Bluetooth: Refactor dlc disconnect logic in rfcomm_dlc_close()
+>  Bluetooth: Directly close dlc for not yet started RFCOMM session
+>  Bluetooth: Fix unsafe RFCOMM device parenting
+>  Bluetooth: Fix RFCOMM parent device for reused dlc
+>  Bluetooth: Rename __rfcomm_dev_get() to __rfcomm_dev_lookup()
+>  Bluetooth: Serialize RFCOMMCREATEDEV and RFCOMMRELEASEDEV ioctls
+>  Bluetooth: Refactor rfcomm_dev_add()
+>  Bluetooth: Cleanup RFCOMM device registration error handling
+>  Bluetooth: Force -EIO from tty read/write if .activate() fails
+>  Bluetooth: Don't fail RFCOMM tty writes
+>  Bluetooth: Refactor write_room() calculation
+>  Bluetooth: Fix write_room() calculation
 > 
-> 	BT_DBG("%s", hdev->name);
-> @@ -3436,10 +3435,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
-> 		} else {
-> 			cancel_delayed_work(&hdev->le_scan_disable);
-> 
-> -			memset(&enable_cp, 0, sizeof(enable_cp));
-> -			enable_cp.enable = LE_SCAN_DISABLE;
-> -			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
-> -				    sizeof(enable_cp), &enable_cp);
-> +			hci_stop_le_scan_req(&req);
-> 		}
-> 
-> 		break;
+> include/linux/tty.h            |   6 +-
+> include/net/bluetooth/rfcomm.h |   9 +-
+> net/bluetooth/rfcomm/core.c    |  88 ++++++++++----
+> net/bluetooth/rfcomm/tty.c     | 262 ++++++++++++++++++++++-------------------
+> 4 files changed, 223 insertions(+), 142 deletions(-)
+
+all patches have been applied to bluetooth-next tree.
 
 Regards
 
