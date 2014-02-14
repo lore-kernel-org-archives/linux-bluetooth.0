@@ -1,57 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH] btusb.c add IMC Networks id 13d3:3404 (bcm20702A0) - retry
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392370354.2437.2.camel@develbox>
-Date: Fri, 14 Feb 2014 13:02:51 -0800
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <ABD36217-AC0A-4585-B591-9DD5796A3AE9@holtmann.org>
-References: <1392370354.2437.2.camel@develbox>
-To: Jurgen Kramer <gtmkramer@xs4all.nl>
+MIME-Version: 1.0
+In-Reply-To: <20140213091902.GA2754@x220.p-661hnu-f1>
+References: <20140130035506.2A034100F4B@puck.mtv.corp.google.com>
+	<20140213091902.GA2754@x220.p-661hnu-f1>
+Date: Fri, 14 Feb 2014 12:49:15 -0800
+Message-ID: <CAGXr9JFEaEbzLNi8tiECBnHG-vcak+cV3CoSaPn0+B4p3eEn+w@mail.gmail.com>
+Subject: Re: [PATCHv3] hog: Use HoG device name as uHID input device name
+From: Petri Gynther <pgynther@google.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jurgen,
+Hi Johan,
 
-> From 343f62050b33972929db749aee296e98332600d6 Mon Sep 17 00:00:00 2001
-> From: Jurgen Kramer <gtmkramer@xs4all.nl>
-> Date: Fri, 14 Feb 2014 10:22:51 +0100
-> Subject: [PATCH] btusb.c add IMC Networks id 13d3:3404 (bcm20702A0)
-> 
-> ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3980fd1..5dce16d 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -106,6 +106,7 @@ static const struct usb_device_id btusb_table[] = {
-> 	{ USB_DEVICE(0x04ca, 0x2003) },
-> 	{ USB_DEVICE(0x0489, 0xe042) },
-> 	{ USB_DEVICE(0x413c, 0x8197) },
-> +	{ USB_DEVICE(0x13d3, 0x3404) },
-> 
-> 	/* Foxconn - Hon Hai */
-> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
-> -- 
-> 1.8.5.3
-> 
-> Signed-off-by: Jurgen Kramer <gtm.kramer@xs4all.nl>
-> 
-> Retry. I've included the relevant part of the
-> requested /sys/kernel/debug/usb/devices output.
-> 
-> Jurgen
-> <sys-kernel-debug-usb-devices-0x13d3-0x3404.txt>
+On Thu, Feb 13, 2014 at 1:19 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Petri,
+>
+> On Wed, Jan 29, 2014, Petri Gynther wrote:
+>> If HoG BLE device name is known, use it when creating uHID input device.
+>> Pass adapter and device addresses to uHID as well.
+>
+> Could you perhaps elaborate a bit what exactly the "uniq" and "phys"
+> members are in the request (possibly with a reference to the uHID
+> documentation). That would make it easier to verify that the content
+> you're adding to them makes sense.
+>
 
-can please create a proper patch with git-format-patch and send it with git-send-email. Look at how others have done it. I want the debug/usb/devices part as part of the commit message.
+>From linux/include/linux/hid.h:
+struct hid_device {
+  ...
+  char name[128];    /* Device name */
+  char phys[64];        /* Device physical location */
+  char uniq[64];         /* Device unique identifier (serial #) */
 
-Also since the vendor id 13d3 belongs to IMC networks, you might want to add a comment saying “IMC Networks (Broadcom based)”. Alternative using USB_VENDOR_AND_INTERFACE_INFO might be an option as well.
+So, for a Bluetooth HID or HoG device, BT adapter MAC address is good
+fit for "phys" and device MAC address is good for "uniq". This is what
+hidp module in kernel already does. But, we can be more descriptive
+here if we want. These values are readable in sysfs under
+/sys/devices/virtual/input/<input-device>.
 
-Regards
+>> +     if (device_name_known(hogdev->device)) {
+>> +             device_get_name(hogdev->device, (char *) ev.u.create.name,
+>> +                             sizeof(ev.u.create.name) - 1);
+>> +     } else {
+>> +             strcpy((char *) ev.u.create.name, "bluez-hog-device");
+>> +     }
+>
+> We don't use { } for single line branches, so you can drop these here.
+>
 
-Marcel
+I'll fix this.
 
+>> +     ba2str(btd_adapter_get_address(device_get_adapter(hogdev->device)),
+>> +             (char *) ev.u.create.phys);
+>
+> This is getting a bit messy with the nested function calls. I'd add
+> separate adapter variable here to make this a bit more readable.
+>
+> Also note our coding style wrt split lines: indent the continuation
+> lines as much as you can (with tabs) as long as it's under 80 chars.
+>
+> Also, it might be good to split this up into two patches since you've
+> essentially got two independent improvements here. One is making sure
+> the name member contains something more useful and the other is adding
+> some content to the uniq and phys members.
 
+I'll add name, phys, and uniq variables in struct hog_device, so that
+they are easy to pass to uHID when it is time to create the uHID
+device.
+
+>
+> Johan
