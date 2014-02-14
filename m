@@ -1,56 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1392377748.5384.28.camel@tkhai>
-Subject: [PATCH] bluetooth: Do not free priv until timer handler hasn't
- actually stopped using it
-From: Kirill Tkhai <ktkhai@parallels.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>, Gustavo Padovan
-	<gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
-Date: Fri, 14 Feb 2014 15:35:48 +0400
-Content-Type: text/plain; charset="UTF-8"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Fix memory leak: uuid free
+Date: Fri, 14 Feb 2014 11:36:28 +0100
+Message-ID: <2445828.LJE0Spnr79@uw000953>
+In-Reply-To: <1392214927-2715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1392214927-2715-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Function del_timer() does not guarantee that timer was really deleted.
-If the timer handler is beeing executed at the moment, the function
-just returns. So, it's possible to use already freed memory in the handler:
+Hi Andrei,
 
-[ref: Documentation/DocBook/kernel-locking.tmpl]
+On Wednesday 12 of February 2014 16:22:07 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Free uuid before exiting.
+> ---
+>  android/bluetooth.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 5de3401..b818e88 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1557,6 +1557,8 @@ int bt_adapter_add_record(sdp_record_t *rec, uint8_t svc_hint)
+>  
+>  		sdp_uuid2strn(uuid, uuid_str, sizeof(uuid_str));
+>  		DBG("UUID %s already added", uuid_str);
+> +
+> +		bt_free(uuid);
+>  		return -EALREADY;
+>  	}
 
-This was found using grep and compile-tested only.
+Applied, thanks.
 
-Signed-off-by: Kirill Tkhai <ktkhai@parallels.com>
-CC: Marcel Holtmann <marcel@holtmann.org>
-CC: Gustavo Padovan <gustavo@padovan.org>
-CC: Johan Hedberg <johan.hedberg@gmail.com>
----
- drivers/bluetooth/hci_bcsp.c |    2 +-
- drivers/bluetooth/hci_h5.c   |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 0bc87f7..d796a6d 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -722,7 +722,7 @@ static int bcsp_close(struct hci_uart *hu)
- 	skb_queue_purge(&bcsp->unack);
- 	skb_queue_purge(&bcsp->rel);
- 	skb_queue_purge(&bcsp->unrel);
--	del_timer(&bcsp->tbcsp);
-+	del_timer_sync(&bcsp->tbcsp);
- 
- 	kfree(bcsp);
- 	return 0;
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index f6f4974..9f007f6 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -210,7 +210,7 @@ static int h5_close(struct hci_uart *hu)
- 	skb_queue_purge(&h5->rel);
- 	skb_queue_purge(&h5->unrel);
- 
--	del_timer(&h5->timer);
-+	del_timer_sync(&h5->timer);
- 
- 	kfree(h5);
- 
+-- 
+Best regards, 
+Szymon Janc
