@@ -1,85 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC v8 02/10] Bluetooth: Declare le_conn_failed in hci_core.h
+Subject: Re: [RFC v8 01/10] Bluetooth: Create hci_stop_le_scan_req() helper
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1391639006-26311-2-git-send-email-andre.guedes@openbossa.org>
-Date: Fri, 14 Feb 2014 14:26:36 -0800
+In-Reply-To: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
+Date: Fri, 14 Feb 2014 14:21:01 -0800
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <A8310D59-06E5-4AEF-AA28-13D421DA8323@holtmann.org>
-References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org> <1391639006-26311-2-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <FCE4645F-A564-46FC-AA36-A265BB9CC35C@holtmann.org>
+References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch adds the "hci_" prefix to le_conn_failed() helper and
-> declares it in hci_core.h so it can be reused in hci_event.c.
+> This patch moves stop LE scanning duplicate code to one single
+> place and reuses it. This will avoid more duplicate code in
+> upcoming patches.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h | 2 ++
-> net/bluetooth/hci_conn.c         | 4 ++--
-> net/bluetooth/hci_event.c        | 6 +-----
-> 3 files changed, 5 insertions(+), 7 deletions(-)
+> include/net/bluetooth/hci_core.h |  2 ++
+> net/bluetooth/hci_core.c         | 14 ++++++++++----
+> net/bluetooth/mgmt.c             |  6 +-----
+> 3 files changed, 13 insertions(+), 9 deletions(-)
 > 
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 8aff7f9..6e5062c 100644
+> index 92fa75f..8aff7f9 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -627,6 +627,8 @@ int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
+> @@ -1212,4 +1212,6 @@ void hci_le_start_enc(struct hci_conn *conn, __le16 ediv, __u8 rand[8],
+> #define SCO_AIRMODE_CVSD       0x0000
+> #define SCO_AIRMODE_TRANSP     0x0003
 > 
-> void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
-> 
-> +void hci_le_conn_failed(struct hci_conn *conn, u8 status);
+> +void hci_stop_le_scan_req(struct hci_request *req);
 > +
-> /*
->  * hci_conn_get() and hci_conn_put() are used to control the life-time of an
->  * "hci_conn" object. They do not guarantee that the hci_conn object is running,
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 6797292..4f5029c 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -515,7 +515,7 @@ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src)
-> EXPORT_SYMBOL(hci_get_route);
-> 
-> /* This function requires the caller holds hdev->lock */
-> -static void le_conn_failed(struct hci_conn *conn, u8 status)
-> +void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+
+this should be close to hci_req_add definition.
+
+> #endif /* __HCI_CORE_H */
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index e774669..6529f4a 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3058,7 +3058,6 @@ static void le_scan_disable_work(struct work_struct *work)
 > {
-> 	struct hci_dev *hdev = conn->hdev;
+> 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+> 					    le_scan_disable.work);
+> -	struct hci_cp_le_set_scan_enable cp;
+> 	struct hci_request req;
+> 	int err;
 > 
-> @@ -545,7 +545,7 @@ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
-> 	if (!conn)
-> 		goto done;
+> @@ -3066,9 +3065,7 @@ static void le_scan_disable_work(struct work_struct *work)
 > 
-> -	le_conn_failed(conn, status);
-> +	hci_le_conn_failed(conn, status);
+> 	hci_req_init(&req, hdev);
 > 
-> done:
-> 	hci_dev_unlock(hdev);
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index d2c6878..df58cde 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3601,11 +3601,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> -	memset(&cp, 0, sizeof(cp));
+> -	cp.enable = LE_SCAN_DISABLE;
+> -	hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+> +	hci_stop_le_scan_req(&req);
+> 
+> 	err = hci_req_run(&req, le_scan_disable_work_complete);
+> 	if (err)
+> @@ -4523,3 +4520,12 @@ static void hci_cmd_work(struct work_struct *work)
+> 		}
 > 	}
+> }
+> +
+> +void hci_stop_le_scan_req(struct hci_request *req)
+> +{
+> +	struct hci_cp_le_set_scan_enable cp;
+> +
+> +	memset(&cp, 0, sizeof(cp));
+> +	cp.enable = LE_SCAN_DISABLE;
+> +	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+> +}
+
+Can we call this function hci_req_add_le_scan_disable. We should be explicit on what functions are doing. Helpers are just helpers.
+
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index ce7ef33..5c0d55d 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3400,7 +3400,6 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+> 	struct hci_cp_remote_name_req_cancel cp;
+> 	struct inquiry_entry *e;
+> 	struct hci_request req;
+> -	struct hci_cp_le_set_scan_enable enable_cp;
+> 	int err;
 > 
-> 	if (ev->status) {
-> -		mgmt_connect_failed(hdev, &conn->dst, conn->type,
-> -				    conn->dst_type, ev->status);
-> -		hci_proto_connect_cfm(conn, ev->status);
-> -		conn->state = BT_CLOSED;
-> -		hci_conn_del(conn);
-> +		hci_le_conn_failed(conn, ev->status);
-> 		goto unlock;
-> 	}
-
-what is the difference between a le_conn_failed and a generic conn_failed.
-
-I am not sure about the naming of this function if we make it non-static. Not that I have a better name at the moment. So we might just go ahead with it.
+> 	BT_DBG("%s", hdev->name);
+> @@ -3436,10 +3435,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+> 		} else {
+> 			cancel_delayed_work(&hdev->le_scan_disable);
+> 
+> -			memset(&enable_cp, 0, sizeof(enable_cp));
+> -			enable_cp.enable = LE_SCAN_DISABLE;
+> -			hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
+> -				    sizeof(enable_cp), &enable_cp);
+> +			hci_stop_le_scan_req(&req);
+> 		}
+> 
+> 		break;
 
 Regards
 
