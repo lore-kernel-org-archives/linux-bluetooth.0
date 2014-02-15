@@ -1,64 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 15 Feb 2014 23:30:06 +0100
-From: Pavel Machek <pavel@denx.de>
-To: Sebastian Reichel <sre@debian.org>
-Cc: Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-	Ben Hutchings <ben@decadent.org.uk>,
-	=?utf-8?B?0JjQstCw0LnQu9C+INCU0LjQvNC40YLRgNC+0LI=?=
-	<freemangordon@abv.bg>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	"linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: Add hci_h4p driver
-Message-ID: <20140215223006.GA19186@amd.pavel.ucw.cz>
-References: <1379703710-5757-1-git-send-email-pali.rohar@gmail.com>
- <201312301531.29768@pali>
- <20131230145250.GA16904@earth.universe>
- <201401082236.25135@pali>
- <CAHYPw2EJC9RwgzXmGuQgh5_L6EMtS7MW8N3u2dR8KeVc0kb43g@mail.gmail.com>
- <20140214172802.GA26969@earth.universe>
+Message-ID: <52FFD2DE.90709@gmail.com>
+Date: Sat, 15 Feb 2014 20:49:34 +0000
+From: Andrea <mariofutire@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140214172802.GA26969@earth.universe>
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: partial success with PS3 sixaxis
+References: <52FBE820.6050701@gmail.com> <2534491.XllyezJg3g@uw000953> <52FFD116.2080902@gmail.com>
+In-Reply-To: <52FFD116.2080902@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi!
-
-> > >> > Firmware files are available for download from nemo project:
-> > >> >
-> > >> > https://api.merproject.org/public/source/nemo:devel:hw:ti:om
-> > >> > ap3:n900/bcm-bt-firmware/bcm-bt-firmware-0.21rc3.tar.bz2
-> > >> > https://api.merproject.org/public/source/nemo:devel:hw:ti:o
-> > >> > map3:n950-n9/ti-wl1273-bt-firmware/bt-firmware-ti1273_0.23+0
-> > >> > m6.tar.gz
-> > >>
-> > >> Would be nice to have them added to the linux-firmware.git.
-> > >
-> > Now when driver is queued for staging, can somebody add firmware files
-> > to linux-firmware repository? Note that without firmware files, driver
-> > not working...
+On 15/02/14 20:41, Andrea wrote:
+> On 13/02/14 09:25, Szymon Janc wrote:
+>> Hi Andrea,
+>>
+>>
+>> I assume you are using bluetoothctl so do:
+>> agent on
+>> default-agent
+>>
+>> Then you should get authorization request in bluetoothctl when DS3 is connecting.
+>>
 > 
-> I just had a look at the file for the Nokia N900
-> (bcm-bt-firmware-0.21rc3.tar.bz2) and I think the license is too
-> restrictive for linux-firmware.git. Actually I can't see any
-> statement allowing redistribution. For reference this is the license
-> text:
+> Hi,
 > 
-> Copyright (c) Nokia Corporation 2010
-> All Rights Reserved.
+> I have tried on a different laptop (no more the raspberry pi, where I still have the issues I
+> reported in the other email), running Fedora 19.
 > 
-> This material, including documentation and any related computer programs, is
-> protected by copyright controlled by Nokia Corporation. All rights are
-> reserved. Modifying, adapting and/or translating, any or all of this material
-> requires the prior written consent of Nokia. Distribution for commercial
-> purposes not allowed without prior written approval from Nokia.
+> I compiled bluez 5.14 and run it.
+> It is more stable and /dev/input/js0 is usable.
+> 
+> It is still not able to set the LEDs. This gets written in the output
+> 
+> Feb 15 16:55:02 localhost.localdomain bluetoothd[24620]: sixaxis: compatible device connected:
+> PLAYSTATION(R)3 Contr
+> Feb 15 16:55:02 localhost.localdomain kernel: input: PLAYSTATION(R)3 Controller as
+> /devices/pci0000:00/0000:00:1d.1/
+> Feb 15 16:55:02 localhost.localdomain kernel: sony 0005:054C:0268.000E: input,hidraw0: BLUETOOTH HID
+> v1.00 Joystick
+> Feb 15 16:55:02 localhost.localdomain bluetoothd[24620]: sixaxis: failed to set LEDS (0 bytes written)
+> 
+> I have tried to log the traffic for bluez and sixad (where the LEDs work), to see you can find any
+> difference.
+> 
+> http://pastebin.com/pExywtUk  (this is the log from bluez where LEDs keep flashing)
+> http://pastebin.com/BgRUnamS  (log from sixad where LEDs are set)
+> 
+> Happy to provide more if it can be of any help.
+> 
+> Andrea
+> 
 
-With my lingvistics hat on, this says "distribution for non-commercial
-purposes is ok". (Because otherwise, they would say "Distribution not
-allowed without ...") 
-									Pavel
+and this is the log from bluez 5.14 running on raspberry pi
+where /dev/input/js0 disappears after a few seconds.
 
--- 
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blog.html
+http://pastebin.com/Rxsv3php
+
+Andrea
+
