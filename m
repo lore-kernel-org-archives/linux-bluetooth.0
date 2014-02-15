@@ -1,53 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52FFD116.2080902@gmail.com>
-Date: Sat, 15 Feb 2014 20:41:58 +0000
-From: Andrea <mariofutire@gmail.com>
-MIME-Version: 1.0
-To: Szymon Janc <szymon.janc@tieto.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: partial success with PS3 sixaxis
-References: <52FBE820.6050701@gmail.com> <2534491.XllyezJg3g@uw000953>
-In-Reply-To: <2534491.XllyezJg3g@uw000953>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v3] btusb.c - Add IMC Networks (Broadcom based)
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1392462069-3093-1-git-send-email-gtmkramer@xs4all.nl>
+Date: Sat, 15 Feb 2014 11:54:19 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <5A7ECA4A-ADC4-4587-8DC1-20784328A5F0@holtmann.org>
+References: <1392462069-3093-1-git-send-email-gtmkramer@xs4all.nl>
+To: Jurgen Kramer <gtmkramer@xs4all.nl>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 13/02/14 09:25, Szymon Janc wrote:
-> Hi Andrea,
+Hi Jurgen,
+
+the subject should start with Bluetooth: for patches.
+
+> Add support for IMC Networks (Broadcom based) to btusb.c.
 > 
+> v3: Switch to using USB_VENDOR_AND_INTERFACE_INFO.
+
+This belong after --- in git patches.
+
 > 
-> I assume you are using bluetoothctl so do:
-> agent on
-> default-agent
+> Below the output of /sys/kernel/debug/usb/devices for this device:
 > 
-> Then you should get authorization request in bluetoothctl when DS3 is connecting.
+> T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=13d3 ProdID=3404 Rev= 1.12
+> S:  Manufacturer=Broadcom Corp
+> S:  Product=BCM20702A0
+> S:  SerialNumber=240A649F8246
+> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
+> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
+> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
 > 
+> Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
+> ---
+> drivers/bluetooth/btusb.c | 3 +++
+> 1 file changed, 3 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 3980fd1..a372df8 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -116,6 +116,9 @@ static const struct usb_device_id btusb_table[] = {
+> 	/* Belkin F8065bf - Broadcom based */
+> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x050d, 0xff, 0x01, 0x01) },
+> 
+> +	/* IMC Networks - Broadcom based */
+> +	{ USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01 },
+> +
 
-Hi,
+  CC      drivers/bluetooth/btusb.o
+drivers/bluetooth/btusb.c:1716:0: error: unterminated argument list invoking macro "USB_VENDOR_AND_INTERFACE_INFO"
+ MODULE_LICENSE("GPL");
+ ^
+drivers/bluetooth/btusb.c:120:4: error: ‘USB_VENDOR_AND_INTERFACE_INFO’ undeclared here (not in a function)
+  { USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01 },
+    ^
+drivers/bluetooth/btusb.c:120:2: error: expected ‘}’ at end of input
+  { USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01 },
+  ^
 
-I have tried on a different laptop (no more the raspberry pi, where I still have the issues I
-reported in the other email), running Fedora 19.
+> 	{ }	/* Terminating entry */
+> };
 
-I compiled bluez 5.14 and run it.
-It is more stable and /dev/input/js0 is usable.
+I fixed this all up for you now and applied the patch to bluetooth-next tree.
 
-It is still not able to set the LEDs. This gets written in the output
+However next time, at least compile test the patch before sending it. Otherwise you are wasting everyones time.
 
-Feb 15 16:55:02 localhost.localdomain bluetoothd[24620]: sixaxis: compatible device connected:
-PLAYSTATION(R)3 Contr
-Feb 15 16:55:02 localhost.localdomain kernel: input: PLAYSTATION(R)3 Controller as
-/devices/pci0000:00/0000:00:1d.1/
-Feb 15 16:55:02 localhost.localdomain kernel: sony 0005:054C:0268.000E: input,hidraw0: BLUETOOTH HID
-v1.00 Joystick
-Feb 15 16:55:02 localhost.localdomain bluetoothd[24620]: sixaxis: failed to set LEDS (0 bytes written)
+Regards
 
-I have tried to log the traffic for bluez and sixad (where the LEDs work), to see you can find any
-difference.
-
-http://pastebin.com/pExywtUk  (this is the log from bluez where LEDs keep flashing)
-http://pastebin.com/BgRUnamS  (log from sixad where LEDs are set)
-
-Happy to provide more if it can be of any help.
-
-Andrea
+Marcel
 
