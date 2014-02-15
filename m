@@ -1,101 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v3] btusb.c - Add IMC Networks (Broadcom based)
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392462069-3093-1-git-send-email-gtmkramer@xs4all.nl>
-Date: Sat, 15 Feb 2014 11:54:19 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <5A7ECA4A-ADC4-4587-8DC1-20784328A5F0@holtmann.org>
-References: <1392462069-3093-1-git-send-email-gtmkramer@xs4all.nl>
-To: Jurgen Kramer <gtmkramer@xs4all.nl>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v2] doc: Add management commands and events for privacy support
+Date: Sat, 15 Feb 2014 10:06:01 -0800
+Message-Id: <1392487561-33729-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jurgen,
+---
+ doc/mgmt-api.txt | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-the subject should start with Bluetooth: for patches.
-
-> Add support for IMC Networks (Broadcom based) to btusb.c.
-> 
-> v3: Switch to using USB_VENDOR_AND_INTERFACE_INFO.
-
-This belong after --- in git patches.
-
-> 
-> Below the output of /sys/kernel/debug/usb/devices for this device:
-> 
-> T:  Bus=01 Lev=02 Prnt=02 Port=04 Cnt=01 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3404 Rev= 1.12
-> S:  Manufacturer=Broadcom Corp
-> S:  Product=BCM20702A0
-> S:  SerialNumber=240A649F8246
-> C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-> E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-> I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
-> 
-> Signed-off-by: Jurgen Kramer <gtmkramer@xs4all.nl>
-> ---
-> drivers/bluetooth/btusb.c | 3 +++
-> 1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 3980fd1..a372df8 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -116,6 +116,9 @@ static const struct usb_device_id btusb_table[] = {
-> 	/* Belkin F8065bf - Broadcom based */
-> 	{ USB_VENDOR_AND_INTERFACE_INFO(0x050d, 0xff, 0x01, 0x01) },
-> 
-> +	/* IMC Networks - Broadcom based */
-> +	{ USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01 },
-> +
-
-  CC      drivers/bluetooth/btusb.o
-drivers/bluetooth/btusb.c:1716:0: error: unterminated argument list invoking macro "USB_VENDOR_AND_INTERFACE_INFO"
- MODULE_LICENSE("GPL");
- ^
-drivers/bluetooth/btusb.c:120:4: error: ‘USB_VENDOR_AND_INTERFACE_INFO’ undeclared here (not in a function)
-  { USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01 },
-    ^
-drivers/bluetooth/btusb.c:120:2: error: expected ‘}’ at end of input
-  { USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01 },
-  ^
-
-> 	{ }	/* Terminating entry */
-> };
-
-I fixed this all up for you now and applied the patch to bluetooth-next tree.
-
-However next time, at least compile test the patch before sending it. Otherwise you are wasting everyones time.
-
-Regards
-
-Marcel
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index c5c84291a044..b21ddfbb7e78 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -213,6 +213,7 @@ Read Controller Information Command
+ 		11	Advertising
+ 		12	Secure Connections
+ 		13	Debug Keys
++		14	Privacy
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -1379,6 +1380,15 @@ Set Static Address Command
+ 	The special BDADDR_ANY address (00:00:00:00:00:00) can be used
+ 	to disable the static address.
+ 
++	When a controller has a public address (which is required for
++	all dual-mode controllers), this address is not used. Only when
++	the controller information reports BDADDR_ANY (00:00:00:00:00:00),
++	it is required to configure a static address first.
++
++	If privacy mode is enabled and the controller is single mode
++	LE only without a public address, the static random address is
++	used as identity address.
++
+ 	This command generates a Command Complete event on success or a
+ 	Command Status event on failure.
+ 
+@@ -1468,6 +1478,65 @@ Set Debug Keys Command
+ 				Invalid Index
+ 
+ 
++Set Privacy Command
++===================
++
++	Command Code:		0x002F
++	Controller Index:	<controller id>
++	Command Parameters:	Privacy (1 Octet)
++				Identity_Resolving_Key (16 Octets)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command is used to enable Low Energy Privacy feature using
++	resolvable private addresses.
++
++	The value 0x00 disables privacy mode, the value 0x01 enables
++	privacy mode.
++
++	When the controller has a public address (mandatory for dual-mode
++	controllers) it is used as identity address. In case the controller
++	is single mode LE only without a public address, it is required
++	to configure a static random andress first. The privacy mode can
++	only be enabled when an identity address is available.
++
++	The Identity_Resolving_Key is the local key assigned for the local
++	resolvable private address.
++
++	Possible errors:	Busy
++				Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
++Load Identity Resolving Keys Command
++====================================
++
++	Command Code:		0x0030
++	Controller Index:	<controller id>
++	Command Parameters:	Key_Count (2 Octets)
++				Key1 {
++					Address (6 Octets)
++					Address_Type (1 Octet)
++					Value (16 Octets)
++				}
++				Key2 {  }
++				...
++	Return Parameters:
++
++	This command is used to feed the kernel with currently known
++	Identity Resolving Keys. The command does not need to be called
++	again upon the receiption of new Identity Resolving Key events
++	since the kernel updates its list automatically.
++
++	This command can be used when the controller is not powered.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -1884,3 +1953,22 @@ Event Parameters	Address (6 Octets)
+ 	The Passkey parameter indicates the passkey to be shown to the
+ 	user whereas the Entered parameter indicates how many characters
+ 	the user has entered on the remote side.
++
++
++New Identity Resolving Key Event
++================================
++
++Event Code		0x0018
++Controller Index	<controller id>
++Event Parameters	Store_Hint (1 Octet)
++			Key {
++				Address (6 Octets)
++				Address_Type (1 Octet)
++				Value (16 Octets)
++			}
++
++	This event indicates that a new identity resolving key has been
++	generated for a remote device.
++
++	The Store_Hint parameter indicates whether the host is expected
++	to store the key persistently or not.
+-- 
+1.8.5.3
 
