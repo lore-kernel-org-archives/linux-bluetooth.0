@@ -1,248 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v5] doc: Add management commands and events for privacy support
-Date: Sun, 16 Feb 2014 13:06:35 -0800
-Message-Id: <1392584795-548-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>, BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 11/11] android/tester: Make bt_callbacks thread-safe
+Date: Sun, 16 Feb 2014 22:04:05 +0100
+Message-ID: <1607843.bDDYSRAnNN@leonov>
+In-Reply-To: <EF441CC3-EFCF-4A2A-8ADF-D9F6FF262E4D@holtmann.org>
+References: <1391339801-587-1-git-send-email-andrzej.kaczmarek@tieto.com> <CAJdJm_OCbUjZVEoNL1y7911zk3QgsQKmQjAJfQh15fhLeTGutA@mail.gmail.com> <EF441CC3-EFCF-4A2A-8ADF-D9F6FF262E4D@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
+Hi Marcel and Anderson,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ed9618b877fd..5a4172dfa004 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -213,6 +213,7 @@ Read Controller Information Command
- 		11	Advertising
- 		12	Secure Connections
- 		13	Debug Keys
-+		14	Privacy
- 
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -730,6 +731,17 @@ Load Long Term Keys Command
- 	again upon the receiption of New Long Term Key events since the
- 	kernel updates its list automatically.
- 
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	Unresolvable random addresses and resolvable random addresses are
-+	not valid and will be rejected.
-+
- 	Currently defined Key_Type values are:
- 
- 		0x00	Unauthenticated key
-@@ -1386,6 +1398,15 @@ Set Static Address Command
- 	The special BDADDR_ANY address (00:00:00:00:00:00) can be used
- 	to disable the static address.
- 
-+	When a controller has a public address (which is required for
-+	all dual-mode controllers), this address is not used. Only when
-+	the controller information reports BDADDR_ANY (00:00:00:00:00:00),
-+	it is required to configure a static address first.
-+
-+	If privacy mode is enabled and the controller is single mode
-+	LE only without a public address, the static random address is
-+	used as identity address.
-+
- 	This command generates a Command Complete event on success or a
- 	Command Status event on failure.
- 
-@@ -1475,6 +1496,76 @@ Set Debug Keys Command
- 				Invalid Index
- 
- 
-+Set Privacy Command
-+===================
-+
-+	Command Code:		0x002F
-+	Controller Index:	<controller id>
-+	Command Parameters:	Privacy (1 Octet)
-+				Identity_Resolving_Key (16 Octets)
-+	Return Parameters:	Current_Settings (4 Octets)
-+
-+	This command is used to enable Low Energy Privacy feature using
-+	resolvable private addresses.
-+
-+	The value 0x00 disables privacy mode, the value 0x01 enables
-+	privacy mode.
-+
-+	When the controller has a public address (mandatory for dual-mode
-+	controllers) it is used as identity address. In case the controller
-+	is single mode LE only without a public address, it is required
-+	to configure a static random andress first. The privacy mode can
-+	only be enabled when an identity address is available.
-+
-+	The Identity_Resolving_Key is the local key assigned for the local
-+	resolvable private address.
-+
-+	Possible errors:	Busy
-+				Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
-+Load Identity Resolving Keys Command
-+====================================
-+
-+	Command Code:		0x0030
-+	Controller Index:	<controller id>
-+	Command Parameters:	Key_Count (2 Octets)
-+				Key1 {
-+					Address (6 Octets)
-+					Address_Type (1 Octet)
-+					Value (16 Octets)
-+				}
-+				Key2 {  }
-+				...
-+	Return Parameters:
-+
-+	This command is used to feed the kernel with currently known
-+	identity resolving keys. The command does not need to be called
-+	again upon the receiption of New Identity Resolving Key events
-+	since the kernel updates its list automatically.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	Unresolvable random addresses and resolvable random addresses are
-+	not valid and will be rejected.
-+
-+	This command can be used when the controller is not powered.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
-@@ -1643,6 +1734,18 @@ Event Parameters	Store_Hint (1 Octet)
- 	to store the key persistently or not (e.g. this would not be set
- 	if the authentication requirement was "No Bonding").
- 
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	For unresolvable random addresses and resolvable random addresses
-+	without identity information and identity resolving key, the
-+	Store_Hint will be set to not store the long term key.
-+
- 	Currently defined Key_Type values are:
- 
- 		0x00	Unauthenticated key
-@@ -1675,6 +1778,11 @@ Event Parameters	Address (6 Octets)
- 	This event indicates that a successful baseband connection has
- 	been created to the remote device.
- 
-+	The EIR_Data might contain the LE Bluetooth Device Address type
-+	providing the identity address and identity address type. For
-+	random resolvable address where the identity resolving key is
-+	known, the identity information will be provided this way.
-+
- 
- Device Disconnected Event
- =========================
-@@ -1828,6 +1936,11 @@ Event Parameters	Address (6 Octets)
- 	false-positives for this flag so user space should be able to
- 	handle getting something else as a PIN Request when pairing.
- 
-+	The EIR_Data might contain the LE Bluetooth Device Address type
-+	providing the identity address and identity address type. For
-+	random resolvable address where the identity resolving key is
-+	known, the identity information will be provided this way.
-+
- 
- Discovering Event
- =================
-@@ -1904,3 +2017,65 @@ Event Parameters	Address (6 Octets)
- 	The Passkey parameter indicates the passkey to be shown to the
- 	user whereas the Entered parameter indicates how many characters
- 	the user has entered on the remote side.
-+
-+
-+Device Resolved Event
-+=====================
-+
-+Event Code		0x0018
-+Controller Index:	<controller id>
-+Event Parameters	Address (6 Octets)
-+			Address_Type (1 Octet)
-+			Flags (4 Octets)
-+			EIR_Data_Length (2 Octets)
-+			EIR_Data (0-65535 Octets)
-+
-+	This event indicates that a random resolvable address has been
-+	resolved into an identity of the device.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	Reserved (not in use)
-+		2	LE Random
-+
-+	The following bits are defined for the Flags parameter:
-+		0	Reserved (not in use)
-+		1	Reserved (not in use)
-+
-+	During pairing the remote device can provide identity information
-+	and identity resolving key. In that case this event will provide
-+	the new identity information matching the random resolvable address.
-+
-+	This event can also be send at any time a new random resolvable
-+	address has been found and during scanning and then successfully
-+	resolved into an identity.
-+
-+	The EIR_Data contains the LE Bluetooth Device Address type
-+	providing the identity address and identity address type.
-+
-+
-+New Identity Resolving Key Event
-+================================
-+
-+Event Code		0x0019
-+Controller Index	<controller id>
-+Event Parameters	Store_Hint (1 Octet)
-+			Key {
-+				Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Value (16 Octets)
-+			}
-+
-+	This event indicates that a new identity resolving key has been
-+	generated for a remote device.
-+
-+	The Store_Hint parameter indicates whether the host is expected
-+	to store the key persistently or not.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
+On Sunday 02 of February 2014 08:55:49 Marcel Holtmann wrote:
+> Hi Anderson,
+> 
+> >> This patch adds wrappers for BT HAL callback which execute them in main
+> >> thread instead of notification_handler() thread. Otherwise test
+> >> execution is prone to race conditions since we do not provide any
+> >> locking mechanism for tester.
+> > 
+> > In my opinion, this is becoming too messy. I'm getting races even
+> > inside the emulator code: sometimes bthost->ncmd becomes zero before a
+> > HCI command is sent by the emulated host because the Command Status /
+> > Command Complete comes after the command is written to the socket, but
+> > before bthost->ncmd is decremented.
+> > 
+> > Also try running android-tester under valgrind. At least for me, I get
+> > a few failures that I don't have when running without valgrind (at
+> > least one in HIDHost apparently due to if_bluetooth->enable() not
+> > being called on test setup and thus the tests rely on finishing before
+> > the controller is powered off by the kernel after initialization).
+> > 
+> > IMHO, the best approach would be to keep all HAL API usage in a
+> > separate process, and keep android-tester single-threaded. Of course,
+> > this could extra complexity for the required IPC between
+> > android-tester and this new process...
+> > 
+> > Again, I'm not familiar with how HAL API works, all this is just based
+> > on my failed attempt to make android-tester run reliably under
+> > valgrind.
+> 
+> I have to agree. We might better spawn processes for this. Our emulator code
+> was never designed to be thread safe and never will be. We are just hiding
+> the real problem here and it will break somewhere else later on.
+
+I think using g_idle_add to have checks executes in right thread context 
+pretty clear and easy to follow. Spawning processes will require dedicated IPC 
+that will wrap either HAL or emulator and that will be quite complicated 
+comparing to using g_idle_add. Jakub did some initial implementation for this 
+and it adds ~800 sloc (and will be more in future...).
+
+So I would go with using g_idle_add but refactor propose patch to emphasize 
+that those are tests checks that execute in mainloop context, not HAL 
+callbacks.
+
 -- 
-1.8.5.3
-
+BR
+Szymon Janc
