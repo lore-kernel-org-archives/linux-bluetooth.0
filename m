@@ -1,198 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2] doc: Add management commands and events for privacy support
-Date: Sun, 16 Feb 2014 11:48:14 -0800
-Message-Id: <1392580094-50492-1-git-send-email-marcel@holtmann.org>
+Message-ID: <1392577563.18051.140.camel@belkin5>
+Subject: Re: Some patches applied on Fedora that maybe should be considered
+ for being applied upstream
+From: Pacho Ramos <pacho@gentoo.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Sun, 16 Feb 2014 20:06:03 +0100
+In-Reply-To: <1392125277.22732.1.camel@nuvo>
+References: <1391935987.4666.5.camel@belkin5>
+	 <1392039609.4417.14.camel@nuvo> <1392062509.4911.0.camel@belkin5>
+	 <1392125277.22732.1.camel@nuvo>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 139 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 139 insertions(+)
+El mar, 11-02-2014 a las 14:27 +0100, Bastien Nocera escribió:
+> On Mon, 2014-02-10 at 21:01 +0100, Pacho Ramos wrote:
+> > El lun, 10-02-2014 a las 14:40 +0100, Bastien Nocera escribió:
+> > > On Sun, 2014-02-09 at 09:53 +0100, Pacho Ramos wrote:
+> > > > Hello
+> > > > 
+> > > > I was looking at bluez package and found some patches that maybe could
+> > > > be upstreamed. Also, I would like to know the reasons for not accepting
+> > > > them to ensure they are safe to be applied downstream by us too :)
+> > > > 
+> > > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch -> Does this cause any issues with systemd --user setups?
+> > > 
+> > > Giovanni already posted this patch earlier. There's no distribution
+> > > using systemd sessions, so this doesn't work yet.
+> > > 
+> > > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0001-obex-Use-GLib-helper-function-to-manipulate-paths.patch
+> > > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0002-autopair-Don-t-handle-the-iCade.patch
+> > > > http://pkgs.fedoraproject.org/cgit/bluez.git/tree/0004-agent-Assert-possible-infinite-loop.patch
+> > > > -> Any reason for not applying it upstream too?
+> > > 
+> > > I've posted those patches to the list as well.
+> > 
+> > And, do you know why they weren't accepted? (it's for trying to get them
+> > merged and not needing to carry them forever)
+> 
+> Read the threads for the various patches?
+> 
+> Mailing-lists, awful at tracking patches since forever...
+> 
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 73c560692dce..cc20e7031ea2 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -213,6 +213,7 @@ Read Controller Information Command
- 		11	Advertising
- 		12	Secure Connections
- 		13	Debug Keys
-+		14	Privacy
- 
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -1379,6 +1380,15 @@ Set Static Address Command
- 	The special BDADDR_ANY address (00:00:00:00:00:00) can be used
- 	to disable the static address.
- 
-+	When a controller has a public address (which is required for
-+	all dual-mode controllers), this address is not used. Only when
-+	the controller information reports BDADDR_ANY (00:00:00:00:00:00),
-+	it is required to configure a static address first.
-+
-+	If privacy mode is enabled and the controller is single mode
-+	LE only without a public address, the static random address is
-+	used as identity address.
-+
- 	This command generates a Command Complete event on success or a
- 	Command Status event on failure.
- 
-@@ -1468,6 +1478,68 @@ Set Debug Keys Command
- 				Invalid Index
- 
- 
-+Set Privacy Command
-+===================
-+
-+	Command Code:		0x002F
-+	Controller Index:	<controller id>
-+	Command Parameters:	Privacy (1 Octet)
-+				Identity_Resolving_Key (16 Octets)
-+	Return Parameters:	Current_Settings (4 Octets)
-+
-+	This command is used to enable Low Energy Privacy feature using
-+	resolvable private addresses.
-+
-+	The value 0x00 disables privacy mode, the value 0x01 enables
-+	privacy mode.
-+
-+	When the controller has a public address (mandatory for dual-mode
-+	controllers) it is used as identity address. In case the controller
-+	is single mode LE only without a public address, it is required
-+	to configure a static random andress first. The privacy mode can
-+	only be enabled when an identity address is available.
-+
-+	The Identity_Resolving_Key is the local key assigned for the local
-+	resolvable private address.
-+
-+	Possible errors:	Busy
-+				Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
-+Load Identity Resolving Keys Command
-+====================================
-+
-+	Command Code:		0x0030
-+	Controller Index:	<controller id>
-+	Command Parameters:	Key_Count (2 Octets)
-+				Key1 {
-+					Address (6 Octets)
-+					Address_Type (1 Octet)
-+					Value (16 Octets)
-+				}
-+				Key2 {  }
-+				...
-+	Return Parameters:
-+
-+	This command is used to feed the kernel with currently known
-+	identity resolving keys. The command does not need to be called
-+	again upon the receiption of New Identity Resolving Key events
-+	since the kernel updates its list automatically.
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	This command can be used when the controller is not powered.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
-@@ -1655,6 +1727,11 @@ Event Parameters	Address (6 Octets)
- 	This event indicates that a successful baseband connection has
- 	been created to the remote device.
- 
-+	The EIR_Data might contain the LE Bluetooth Device Address type
-+	providing the identity address and identity address type. For
-+	random resolvable address where the identity resolving key is
-+	known, the identity information will be provided this way.
-+
- 
- Device Disconnected Event
- =========================
-@@ -1808,6 +1885,11 @@ Event Parameters	Address (6 Octets)
- 	false-positives for this flag so user space should be able to
- 	handle getting something else as a PIN Request when pairing.
- 
-+	The EIR_Data might contain the LE Bluetooth Device Address type
-+	providing the identity address and identity address type. For
-+	random resolvable address where the identity resolving key is
-+	known, the identity information will be provided this way.
-+
- 
- Discovering Event
- =================
-@@ -1884,3 +1966,60 @@ Event Parameters	Address (6 Octets)
- 	The Passkey parameter indicates the passkey to be shown to the
- 	user whereas the Entered parameter indicates how many characters
- 	the user has entered on the remote side.
-+
-+
-+Device Resolved Event
-+=====================
-+
-+Event Code		0x0018
-+Controller Index:	<controller id>
-+Event Parameters	Address (6 Octets)
-+			Address_Type (1 Octet)
-+			Flags (4 Octets)
-+			EIR_Data_Length (2 Octets)
-+			EIR_Data (0-65535 Octets)
-+
-+	This event indicates that a random resolvable address has been
-+	resolved into an identity of the device.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	Reserved (not in use)
-+		2	LE Random
-+
-+	The following bits are defined for the Flags parameter:
-+		0	Reserved (not in use)
-+		1	Reserved (not in use)
-+
-+	During pairing the remote device can provide identity information
-+	and identity resolving key. In that case this event will provide
-+	the new identity information matching the random resolvable address.
-+
-+	This event can also be send at any time a new random resolvable
-+	address has been found and during scanning and then successfully
-+	resolved into an identity.
-+
-+	The EIR_Data contains the LE Bluetooth Device Address type
-+	providing the identity address and identity address type.
-+
-+
-+New Identity Resolving Key Event
-+================================
-+
-+Event Code		0x0019
-+Controller Index	<controller id>
-+Event Parameters	Store_Hint (1 Octet)
-+			Key {
-+				Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Value (16 Octets)
-+			}
-+
-+	This event indicates that a new identity resolving key has been
-+	generated for a remote device.
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	The Store_Hint parameter indicates whether the host is expected
-+	to store the key persistently or not.
--- 
-1.8.5.3
+But, for example for the patch allowing to run without systemd --user:
+http://marc.info/?t=138159296100001&r=1&w=2
+
+What is the point in providing a "--disable-systemd" configure flag that
+needs this patches to be applied to be really working? Looks like
+"--enable-systemd" will be needed if we don't apply that patches
+downstream...
+
+
+Also:
+http://www.spinics.net/lists/linux-bluetooth/msg40136.html
+http://www.spinics.net/lists/linux-bluetooth/msg41264.html
+
+Look to have no reply at all
+
+And for 0004-agent-Assert-possible-infinite-loop.patch I can't find the
+relevant thread :(
+
 
