@@ -1,61 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>, BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 11/11] android/tester: Make bt_callbacks thread-safe
-Date: Sun, 16 Feb 2014 22:04:05 +0100
-Message-ID: <1607843.bDDYSRAnNN@leonov>
-In-Reply-To: <EF441CC3-EFCF-4A2A-8ADF-D9F6FF262E4D@holtmann.org>
-References: <1391339801-587-1-git-send-email-andrzej.kaczmarek@tieto.com> <CAJdJm_OCbUjZVEoNL1y7911zk3QgsQKmQjAJfQh15fhLeTGutA@mail.gmail.com> <EF441CC3-EFCF-4A2A-8ADF-D9F6FF262E4D@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Fix sending wrong store hint for new long term keys
+Date: Sun, 16 Feb 2014 12:59:06 -0800
+Message-Id: <1392584346-64921-2-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel and Anderson,
+The long term keys should only be stored when they belong to an
+indentity address. The identity address can either be a public
+address or a random static address.
 
-On Sunday 02 of February 2014 08:55:49 Marcel Holtmann wrote:
-> Hi Anderson,
-> 
-> >> This patch adds wrappers for BT HAL callback which execute them in main
-> >> thread instead of notification_handler() thread. Otherwise test
-> >> execution is prone to race conditions since we do not provide any
-> >> locking mechanism for tester.
-> > 
-> > In my opinion, this is becoming too messy. I'm getting races even
-> > inside the emulator code: sometimes bthost->ncmd becomes zero before a
-> > HCI command is sent by the emulated host because the Command Status /
-> > Command Complete comes after the command is written to the socket, but
-> > before bthost->ncmd is decremented.
-> > 
-> > Also try running android-tester under valgrind. At least for me, I get
-> > a few failures that I don't have when running without valgrind (at
-> > least one in HIDHost apparently due to if_bluetooth->enable() not
-> > being called on test setup and thus the tests rely on finishing before
-> > the controller is powered off by the kernel after initialization).
-> > 
-> > IMHO, the best approach would be to keep all HAL API usage in a
-> > separate process, and keep android-tester single-threaded. Of course,
-> > this could extra complexity for the required IPC between
-> > android-tester and this new process...
-> > 
-> > Again, I'm not familiar with how HAL API works, all this is just based
-> > on my failed attempt to make android-tester run reliably under
-> > valgrind.
-> 
-> I have to agree. We might better spawn processes for this. Our emulator code
-> was never designed to be thread safe and never will be. We are just hiding
-> the real problem here and it will break somewhere else later on.
+For all other addresses (unresovable or resolvable) tell userspace
+that the long term key is not persistent.
 
-I think using g_idle_add to have checks executes in right thread context 
-pretty clear and easy to follow. Spawning processes will require dedicated IPC 
-that will wrap either HAL or emulator and that will be quite complicated 
-comparing to using g_idle_add. Jakub did some initial implementation for this 
-and it adds ~800 sloc (and will be more in future...).
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-So I would go with using g_idle_add but refactor propose patch to emphasize 
-that those are tests checks that execute in mainloop context, not HAL 
-callbacks.
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e7746690d620..58d2f9bf241f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2685,6 +2685,7 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+ {
+ 	struct smp_ltk *key, *old_key;
+ 	bool master = ltk_type_master(type);
++	u8 persistent;
+ 
+ 	old_key = hci_find_ltk_by_addr(hdev, bdaddr, addr_type, master);
+ 	if (old_key)
+@@ -2708,8 +2709,13 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+ 	if (!new_key)
+ 		return 0;
+ 
++	if (addr_type == ADDR_LE_DEV_RANDOM && (bdaddr->b[5] & 0xc0) != 0xc0)
++		persistent = 0;
++	else
++		persistent = 1;
++
+ 	if (type == HCI_SMP_LTK || type == HCI_SMP_LTK_SLAVE)
+-		mgmt_new_ltk(hdev, key, 1);
++		mgmt_new_ltk(hdev, key, persistent);
+ 
+ 	return 0;
+ }
 -- 
-BR
-Szymon Janc
+1.8.5.3
+
