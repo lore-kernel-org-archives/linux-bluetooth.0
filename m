@@ -1,72 +1,248 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Feb 2014 09:24:41 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, patrick.ohly@intel.com
-Subject: Re: [PATCH BlueZ 8/8] doc/obex-api: Update documentation
-Message-ID: <20140217072439.GA27868@aemeltch-MOBL1>
-References: <1392393184-15266-1-git-send-email-luiz.dentz@gmail.com>
- <1392393184-15266-8-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1392393184-15266-8-git-send-email-luiz.dentz@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v5] doc: Add management commands and events for privacy support
+Date: Sun, 16 Feb 2014 13:06:35 -0800
+Message-Id: <1392584795-548-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ doc/mgmt-api.txt | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 175 insertions(+)
 
-On Fri, Feb 14, 2014 at 05:53:04PM +0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds Suspend and Resume methods and 'suspended' value as status in
-> the Transfer interface documentation.
-> ---
->  doc/obex-api.txt | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
-> 
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index 1f22fea..0f57ce1 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -90,12 +90,26 @@ Methods		void Cancel()
->  					 org.bluez.obex.Error.InProgress
->  					 org.bluez.obex.Error.Failed
->  
-> +		void Suspend()
-> +
-> +			Suspend transference.
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index ed9618b877fd..5a4172dfa004 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -213,6 +213,7 @@ Read Controller Information Command
+ 		11	Advertising
+ 		12	Secure Connections
+ 		13	Debug Keys
++		14	Privacy
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -730,6 +731,17 @@ Load Long Term Keys Command
+ 	again upon the receiption of New Long Term Key events since the
+ 	kernel updates its list automatically.
+ 
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	Unresolvable random addresses and resolvable random addresses are
++	not valid and will be rejected.
++
+ 	Currently defined Key_Type values are:
+ 
+ 		0x00	Unauthenticated key
+@@ -1386,6 +1398,15 @@ Set Static Address Command
+ 	The special BDADDR_ANY address (00:00:00:00:00:00) can be used
+ 	to disable the static address.
+ 
++	When a controller has a public address (which is required for
++	all dual-mode controllers), this address is not used. Only when
++	the controller information reports BDADDR_ANY (00:00:00:00:00:00),
++	it is required to configure a static address first.
++
++	If privacy mode is enabled and the controller is single mode
++	LE only without a public address, the static random address is
++	used as identity address.
++
+ 	This command generates a Command Complete event on success or a
+ 	Command Status event on failure.
+ 
+@@ -1475,6 +1496,76 @@ Set Debug Keys Command
+ 				Invalid Index
+ 
+ 
++Set Privacy Command
++===================
++
++	Command Code:		0x002F
++	Controller Index:	<controller id>
++	Command Parameters:	Privacy (1 Octet)
++				Identity_Resolving_Key (16 Octets)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command is used to enable Low Energy Privacy feature using
++	resolvable private addresses.
++
++	The value 0x00 disables privacy mode, the value 0x01 enables
++	privacy mode.
++
++	When the controller has a public address (mandatory for dual-mode
++	controllers) it is used as identity address. In case the controller
++	is single mode LE only without a public address, it is required
++	to configure a static random andress first. The privacy mode can
++	only be enabled when an identity address is available.
++
++	The Identity_Resolving_Key is the local key assigned for the local
++	resolvable private address.
++
++	Possible errors:	Busy
++				Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
++Load Identity Resolving Keys Command
++====================================
++
++	Command Code:		0x0030
++	Controller Index:	<controller id>
++	Command Parameters:	Key_Count (2 Octets)
++				Key1 {
++					Address (6 Octets)
++					Address_Type (1 Octet)
++					Value (16 Octets)
++				}
++				Key2 {  }
++				...
++	Return Parameters:
++
++	This command is used to feed the kernel with currently known
++	identity resolving keys. The command does not need to be called
++	again upon the receiption of New Identity Resolving Key events
++	since the kernel updates its list automatically.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	Unresolvable random addresses and resolvable random addresses are
++	not valid and will be rejected.
++
++	This command can be used when the controller is not powered.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -1643,6 +1734,18 @@ Event Parameters	Store_Hint (1 Octet)
+ 	to store the key persistently or not (e.g. this would not be set
+ 	if the authentication requirement was "No Bonding").
+ 
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	For unresolvable random addresses and resolvable random addresses
++	without identity information and identity resolving key, the
++	Store_Hint will be set to not store the long term key.
++
+ 	Currently defined Key_Type values are:
+ 
+ 		0x00	Unauthenticated key
+@@ -1675,6 +1778,11 @@ Event Parameters	Address (6 Octets)
+ 	This event indicates that a successful baseband connection has
+ 	been created to the remote device.
+ 
++	The EIR_Data might contain the LE Bluetooth Device Address type
++	providing the identity address and identity address type. For
++	random resolvable address where the identity resolving key is
++	known, the identity information will be provided this way.
++
+ 
+ Device Disconnected Event
+ =========================
+@@ -1828,6 +1936,11 @@ Event Parameters	Address (6 Octets)
+ 	false-positives for this flag so user space should be able to
+ 	handle getting something else as a PIN Request when pairing.
+ 
++	The EIR_Data might contain the LE Bluetooth Device Address type
++	providing the identity address and identity address type. For
++	random resolvable address where the identity resolving key is
++	known, the identity information will be provided this way.
++
+ 
+ Discovering Event
+ =================
+@@ -1904,3 +2017,65 @@ Event Parameters	Address (6 Octets)
+ 	The Passkey parameter indicates the passkey to be shown to the
+ 	user whereas the Entered parameter indicates how many characters
+ 	the user has entered on the remote side.
++
++
++Device Resolved Event
++=====================
++
++Event Code		0x0018
++Controller Index:	<controller id>
++Event Parameters	Address (6 Octets)
++			Address_Type (1 Octet)
++			Flags (4 Octets)
++			EIR_Data_Length (2 Octets)
++			EIR_Data (0-65535 Octets)
++
++	This event indicates that a random resolvable address has been
++	resolved into an identity of the device.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	Reserved (not in use)
++		2	LE Random
++
++	The following bits are defined for the Flags parameter:
++		0	Reserved (not in use)
++		1	Reserved (not in use)
++
++	During pairing the remote device can provide identity information
++	and identity resolving key. In that case this event will provide
++	the new identity information matching the random resolvable address.
++
++	This event can also be send at any time a new random resolvable
++	address has been found and during scanning and then successfully
++	resolved into an identity.
++
++	The EIR_Data contains the LE Bluetooth Device Address type
++	providing the identity address and identity address type.
++
++
++New Identity Resolving Key Event
++================================
++
++Event Code		0x0019
++Controller Index	<controller id>
++Event Parameters	Store_Hint (1 Octet)
++			Key {
++				Address (6 Octets)
++				Address_Type (1 Octet)
++				Value (16 Octets)
++			}
++
++	This event indicates that a new identity resolving key has been
++	generated for a remote device.
++
++	The Store_Hint parameter indicates whether the host is expected
++	to store the key persistently or not.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
+-- 
+1.8.5.3
 
-would transfer sound better then transference ?
-
-Best regards 
-Andrei Emeltchenko 
-
-> +
-> +			Possible errors: org.bluez.obex.Error.NotAuthorized
-> +					 org.bluez.obex.Error.NotInProgress
-> +
-> +		void Resume()
-> +
-> +			Resume transference.
-> +
-> +			Possible errors: org.bluez.obex.Error.NotAuthorized
-> +					 org.bluez.obex.Error.NotInProgress
-> +
->  Properties	string Status [readonly]
->  
->  			Inform the current status of the transfer.
->  
-> -			Possible values: "queued", "active", "complete" or
-> -					"error"
-> +			Possible values: "queued", "active", "suspended",
-> +					"complete" or "error"
->  
->  		object Session [readonly]
->  
-> -- 
-> 1.8.5.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
