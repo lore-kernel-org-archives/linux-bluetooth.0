@@ -1,51 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix sending wrong store hint for new long term keys
-Date: Sun, 16 Feb 2014 12:59:06 -0800
-Message-Id: <1392584346-64921-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Restrict long term keys to public and static addresses
+Date: Sun, 16 Feb 2014 12:59:05 -0800
+Message-Id: <1392584346-64921-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The long term keys should only be stored when they belong to an
-indentity address. The identity address can either be a public
-address or a random static address.
-
-For all other addresses (unresovable or resolvable) tell userspace
-that the long term key is not persistent.
+The long term keys should be associated with an identity address. Valid
+identity addresses are public addresses or static addresses. So only
+allow these two as valid address information for long term keys.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e7746690d620..58d2f9bf241f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2685,6 +2685,7 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ce7ef339b1c4..70bef3d5db57 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4162,9 +4162,19 @@ static bool ltk_is_valid(struct mgmt_ltk_info *key)
  {
- 	struct smp_ltk *key, *old_key;
- 	bool master = ltk_type_master(type);
-+	u8 persistent;
- 
- 	old_key = hci_find_ltk_by_addr(hdev, bdaddr, addr_type, master);
- 	if (old_key)
-@@ -2708,8 +2709,13 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
- 	if (!new_key)
- 		return 0;
- 
-+	if (addr_type == ADDR_LE_DEV_RANDOM && (bdaddr->b[5] & 0xc0) != 0xc0)
-+		persistent = 0;
-+	else
-+		persistent = 1;
+ 	if (key->master != 0x00 && key->master != 0x01)
+ 		return false;
+-	if (!bdaddr_type_is_le(key->addr.type))
+-		return false;
+-	return true;
 +
- 	if (type == HCI_SMP_LTK || type == HCI_SMP_LTK_SLAVE)
--		mgmt_new_ltk(hdev, key, 1);
-+		mgmt_new_ltk(hdev, key, persistent);
- 
- 	return 0;
++	switch (key->addr.type) {
++	case BDADDR_LE_PUBLIC:
++		return true;
++
++	case BDADDR_LE_RANDOM:
++		/* Two most significant bits shall be set */
++		if ((key->addr.bdaddr.b[5] & 0xc0) != 0xc0)
++			return false;
++		return true;
++	}
++
++	return false;
  }
+ 
+ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
 -- 
 1.8.5.3
 
