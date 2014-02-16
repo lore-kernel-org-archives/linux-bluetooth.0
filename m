@@ -1,18 +1,18 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v4] doc: Add management commands and events for privacy support
-Date: Sun, 16 Feb 2014 12:13:14 -0800
-Message-Id: <1392581594-51086-1-git-send-email-marcel@holtmann.org>
+Subject: [RFC v2] doc: Add management commands and events for privacy support
+Date: Sun, 16 Feb 2014 11:48:14 -0800
+Message-Id: <1392580094-50492-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 175 insertions(+)
+ doc/mgmt-api.txt | 139 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 139 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 697336092798..554ff2b706cd 100644
+index 73c560692dce..cc20e7031ea2 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
 @@ -213,6 +213,7 @@ Read Controller Information Command
@@ -23,25 +23,7 @@ index 697336092798..554ff2b706cd 100644
  
  	This command generates a Command Complete event on success or
  	a Command Status event on failure.
-@@ -730,6 +731,17 @@ Load Long Term Keys Command
- 	again upon the receiption of New Long Term Key events since the
- 	kernel updates its list automatically.
- 
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	Unresolvable random addresses and resolvable random addresses are
-+	not valid and will be rejected.
-+
- 	Currently defined Key_Type values are:
- 
- 		0x00	Unauthenticated key
-@@ -1386,6 +1398,15 @@ Set Static Address Command
+@@ -1379,6 +1380,15 @@ Set Static Address Command
  	The special BDADDR_ANY address (00:00:00:00:00:00) can be used
  	to disable the static address.
  
@@ -57,7 +39,7 @@ index 697336092798..554ff2b706cd 100644
  	This command generates a Command Complete event on success or a
  	Command Status event on failure.
  
-@@ -1475,6 +1496,76 @@ Set Debug Keys Command
+@@ -1468,6 +1478,68 @@ Set Debug Keys Command
  				Invalid Index
  
  
@@ -111,16 +93,8 @@ index 697336092798..554ff2b706cd 100644
 +	again upon the receiption of New Identity Resolving Key events
 +	since the kernel updates its list automatically.
 +
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
 +	The provided Address and Address_Type are the identity of
 +	a device. So either its public address or static random address.
-+
-+	Unresolvable random addresses and resolvable random addresses are
-+	not valid and will be rejected.
 +
 +	This command can be used when the controller is not powered.
 +
@@ -134,26 +108,7 @@ index 697336092798..554ff2b706cd 100644
  Command Complete Event
  ======================
  
-@@ -1640,6 +1731,18 @@ Event Parameters	Store_Hint (1 Octet)
- 	to store the key persistently or not (e.g. this would not be set
- 	if the authentication requirement was "No Bonding").
- 
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The provided Address and Address_Type are the identity of
-+	a device. So either its public address or static random address.
-+
-+	For unresolvable random addresses and resolvable random addresses
-+	without identity information and identity resolving key, the
-+	long term key will not be provided.
-+
- 	Currently defined Key_Type values are:
- 
- 		0x00	Unauthenticated key
-@@ -1669,6 +1772,11 @@ Event Parameters	Address (6 Octets)
+@@ -1655,6 +1727,11 @@ Event Parameters	Address (6 Octets)
  	This event indicates that a successful baseband connection has
  	been created to the remote device.
  
@@ -165,7 +120,7 @@ index 697336092798..554ff2b706cd 100644
  
  Device Disconnected Event
  =========================
-@@ -1822,6 +1930,11 @@ Event Parameters	Address (6 Octets)
+@@ -1808,6 +1885,11 @@ Event Parameters	Address (6 Octets)
  	false-positives for this flag so user space should be able to
  	handle getting something else as a PIN Request when pairing.
  
@@ -177,7 +132,7 @@ index 697336092798..554ff2b706cd 100644
  
  Discovering Event
  =================
-@@ -1898,3 +2011,65 @@ Event Parameters	Address (6 Octets)
+@@ -1884,3 +1966,60 @@ Event Parameters	Address (6 Octets)
  	The Passkey parameter indicates the passkey to be shown to the
  	user whereas the Entered parameter indicates how many characters
  	the user has entered on the remote side.
@@ -233,16 +188,11 @@ index 697336092798..554ff2b706cd 100644
 +	This event indicates that a new identity resolving key has been
 +	generated for a remote device.
 +
-+	The Store_Hint parameter indicates whether the host is expected
-+	to store the key persistently or not.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
 +	The provided Address and Address_Type are the identity of
 +	a device. So either its public address or static random address.
++
++	The Store_Hint parameter indicates whether the host is expected
++	to store the key persistently or not.
 -- 
 1.8.5.3
 
