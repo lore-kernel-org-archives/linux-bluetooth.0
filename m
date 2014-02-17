@@ -1,26 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Feb 2014 15:51:11 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2] emulator/bthost: Check length of received RFCOMM UIH
- frames
-Message-ID: <20140217135111.GA25478@x220.p-661hnu-f1>
-References: <1392643682-12370-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] android: Fix for BT Turn off while pairing
+Date: Mon, 17 Feb 2014 14:46:04 +0100
+Message-ID: <3736763.bny4WZ95Dz@uw000953>
+In-Reply-To: <1392288692-5917-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1392288692-5917-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1392643682-12370-1-git-send-email-marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Łukasz,
 
-On Mon, Feb 17, 2014, Marcin Kraglak wrote:
-> Add correct calculation of frame length. If frame is too short, ignore it.
+On Thursday 13 of February 2014 11:51:32 Lukasz Rymanowski wrote:
+> This patch fix an issue when Android disables BT during ongoing
+> paring. In this case mgmt did not accept any commands and BT gets
+> in some unknown state.
+> Since Android turns off BT anyway, it is ok to just cancel all
+> the mgmt requests before send power off command.
 > ---
->  emulator/bthost.c | 38 ++++++++++++++++++++++++++++++--------
->  1 file changed, 30 insertions(+), 8 deletions(-)
+>  android/bluetooth.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index ff41627..ad8cfec 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -2907,6 +2907,9 @@ static void handle_disable_cmd(const void *buf, uint16_t len)
+>  		goto reply;
+>  	}
+>  
+> +	/* Cancel all pending requests. Need it in case of ongoing paring */
+> +	mgmt_cancel_index(mgmt_if, adapter.index);
+> +
+>  	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
+>  		status = HAL_STATUS_FAILED;
+>  		goto reply;
 
-Applied. Thanks.
+Applied, thanks. 
 
-Johan
+-- 
+Best regards, 
+Szymon Janc
