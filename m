@@ -1,46 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Fix for BT Turn off while pairing
-Date: Mon, 17 Feb 2014 14:46:04 +0100
-Message-ID: <3736763.bny4WZ95Dz@uw000953>
-In-Reply-To: <1392288692-5917-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1392288692-5917-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] emulator/bthost: Check length of received RFCOMM UIH frames
+Date: Mon, 17 Feb 2014 14:28:02 +0100
+Message-Id: <1392643682-12370-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Add correct calculation of frame length. If frame is too short, ignore it.
+---
+ emulator/bthost.c | 38 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 30 insertions(+), 8 deletions(-)
 
-On Thursday 13 of February 2014 11:51:32 Lukasz Rymanowski wrote:
-> This patch fix an issue when Android disables BT during ongoing
-> paring. In this case mgmt did not accept any commands and BT gets
-> in some unknown state.
-> Since Android turns off BT anyway, it is ok to just cancel all
-> the mgmt requests before send power off command.
-> ---
->  android/bluetooth.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index ff41627..ad8cfec 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -2907,6 +2907,9 @@ static void handle_disable_cmd(const void *buf, uint16_t len)
->  		goto reply;
->  	}
->  
-> +	/* Cancel all pending requests. Need it in case of ongoing paring */
-> +	mgmt_cancel_index(mgmt_if, adapter.index);
-> +
->  	if (!set_mode(MGMT_OP_SET_POWERED, 0x00)) {
->  		status = HAL_STATUS_FAILED;
->  		goto reply;
-
-Applied, thanks. 
-
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index ab90f4c..6fbabe8 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -1760,17 +1760,30 @@ static void rfcomm_mcc_recv(struct bthost *bthost, struct btconn *conn,
+ 			struct l2conn *l2conn, const void *data, uint16_t len)
+ {
+ 	const struct rfcomm_mcc *mcc = data;
++	const struct rfcomm_msc *msc;
++	const struct rfcomm_pn *pn;
++
++	if (len < sizeof(*mcc))
++		return;
+ 
+ 	switch (RFCOMM_GET_MCC_TYPE(mcc->type)) {
+ 	case RFCOMM_MSC:
++		if (len - sizeof(*mcc) < sizeof(*msc))
++			break;
++
++		msc = data + sizeof(*mcc);
++
+ 		rfcomm_msc_recv(bthost, conn, l2conn,
+-						RFCOMM_TEST_CR(mcc->type) / 2,
+-						data + sizeof(*mcc));
++				RFCOMM_TEST_CR(mcc->type) / 2, msc);
+ 		break;
+ 	case RFCOMM_PN:
++		if (len - sizeof(*mcc) < sizeof(*pn))
++			break;
++
++		pn = data + sizeof(*mcc);
++
+ 		rfcomm_pn_recv(bthost, conn, l2conn,
+-					RFCOMM_TEST_CR(mcc->type) / 2,
+-					data + sizeof(*mcc));
++				RFCOMM_TEST_CR(mcc->type) / 2, pn);
+ 		break;
+ 	default:
+ 		break;
+@@ -1781,18 +1794,27 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
+ 				struct l2conn *l2conn, const void *data,
+ 				uint16_t len)
+ {
+-	const struct rfcomm_cmd *hdr = data;
++	const struct rfcomm_hdr *hdr = data;
++	uint16_t hdr_len;
+ 	const void *p;
+ 
++	if (len < sizeof(*hdr))
++		return;
++
+ 	if (RFCOMM_GET_DLCI(hdr->address))
+ 		return;
+ 
+ 	if (RFCOMM_TEST_EA(hdr->length))
+-		p = data + sizeof(struct rfcomm_hdr);
++		hdr_len = sizeof(*hdr);
+ 	else
+-		p = data + sizeof(struct rfcomm_hdr) + sizeof(uint8_t);
++		hdr_len = sizeof(*hdr) + sizeof(uint8_t);
++
++	if (len < hdr_len)
++		return;
++
++	p = data + hdr_len;
+ 
+-	rfcomm_mcc_recv(bthost, conn, l2conn, p, p - data);
++	rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
+ }
+ 
+ static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.1
+
