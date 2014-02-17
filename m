@@ -1,80 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Feb 2014 16:01:25 -0300
-From: Lucas De Marchi <lucas.demarchi@intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Lucas De Marchi <lucas.demarchi@profusion.mobi>, "bluez mailin list
- (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	<kay.sievers@vrfy.org>, <gregkh@linuxfoundation.org>
-Subject: Re: [PATCH] Bluetooth: allocate static minor for vhci
-Message-ID: <20140217190125.GA1851@intel.com>
-References: <1392649945-2338-1-git-send-email-lucas.demarchi@intel.com>
- <6D43DF5A-CFA0-4867-8518-ECDA167BDB71@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-In-Reply-To: <6D43DF5A-CFA0-4867-8518-ECDA167BDB71@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v6] doc: Add management commands and events for privacy support
+Date: Mon, 17 Feb 2014 09:59:53 -0800
+Message-Id: <1392659993-34618-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-[ CC'ing Kay and Greg ]
+---
+ doc/mgmt-api.txt | 161 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 161 insertions(+)
 
-On Mon, Feb 17, 2014 at 08:34:32AM -0800, Marcel Holtmann wrote:
-> Hi Lucas,
-> 
-> > Commit bfacbb9 (Bluetooth: Use devname:vhci module alias for virtual HCI
-> > driver) added the module alias to hci_vhci module so it's possible to
-> > create the /dev/vhci node. However creating an alias without
-> > specifying the minor doesn't allow us to create the node ahead,
-> > triggerring module auto-load when it's first accessed.
-> > 
-> > Starting with depmod from kmod 16 we started to warn if there's a
-> > devname alias without specifying the major and minor.
-> > 
-> > Let's do the same done for uhid, kvm, fuse and others, specifying a
-> > fixed minor. In systems with systemd as the init the following will
-> > happen: on early boot systemd will call "kmod static-nodes" to read
-> > /lib/modules/$(uname -r)/modules.devname and then create the nodes. When
-> > first accessed these "dead" nodes will trigger the module loading.
-> > 
-> > Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
-> > ---
-> > drivers/bluetooth/hci_vhci.c | 3 ++-
-> > include/linux/miscdevice.h   | 1 +
-> > 2 files changed, 3 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-> > index 1ef6990..add1c6a 100644
-> > --- a/drivers/bluetooth/hci_vhci.c
-> > +++ b/drivers/bluetooth/hci_vhci.c
-> > @@ -359,7 +359,7 @@ static const struct file_operations vhci_fops = {
-> > static struct miscdevice vhci_miscdev= {
-> > 	.name	= "vhci",
-> > 	.fops	= &vhci_fops,
-> > -	.minor	= MISC_DYNAMIC_MINOR,
-> > +	.minor	= VHCI_MINOR,
-> > };
-> > 
-> > static int __init vhci_init(void)
-> > @@ -385,3 +385,4 @@ MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
-> > MODULE_VERSION(VERSION);
-> > MODULE_LICENSE("GPL");
-> > MODULE_ALIAS("devname:vhci");
-> > +MODULE_ALIAS_MISCDEV(VHCI_MINOR);
-> > diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
-> > index 3737f72..846a317 100644
-> > --- a/include/linux/miscdevice.h
-> > +++ b/include/linux/miscdevice.h
-> > @@ -48,6 +48,7 @@
-> > #define LOOP_CTRL_MINOR		237
-> > #define VHOST_NET_MINOR		238
-> > #define UHID_MINOR		239
-> > +#define VHCI_MINOR		240
-> > #define MISC_DYNAMIC_MINOR	255
-> 
-> you have read Documentation/devices.txt where it states that 240-254 is reserved for local use.
-
-I haven't seen that. So, are we out of minors or.. can I use e.g.
-142, 129 or the ones below 128?
-
-Kay? Greg?
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 5a8073f6493e..663529effe4d 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -213,6 +213,7 @@ Read Controller Information Command
+ 		11	Advertising
+ 		12	Secure Connections
+ 		13	Debug Keys
++		14	Privacy
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -730,6 +731,17 @@ Load Long Term Keys Command
+ 	again upon the receiption of New Long Term Key events since the
+ 	kernel updates its list automatically.
+ 
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	Unresolvable random addresses and resolvable random addresses are
++	not valid and will be rejected.
++
+ 	Currently defined Key_Type values are:
+ 
+ 		0x00	Unauthenticated key
+@@ -1456,6 +1468,15 @@ Set Static Address Command
+ 	The special BDADDR_ANY address (00:00:00:00:00:00) can be used
+ 	to disable the static address.
+ 
++	When a controller has a public address (which is required for
++	all dual-mode controllers), this address is not used. Only when
++	the controller information reports BDADDR_ANY (00:00:00:00:00:00),
++	it is required to configure a static address first.
++
++	If privacy mode is enabled and the controller is single mode
++	LE only without a public address, the static random address is
++	used as identity address.
++
+ 	This command generates a Command Complete event on success or a
+ 	Command Status event on failure.
+ 
+@@ -1545,6 +1566,76 @@ Set Debug Keys Command
+ 				Invalid Index
+ 
+ 
++Set Privacy Command
++===================
++
++	Command Code:		0x002F
++	Controller Index:	<controller id>
++	Command Parameters:	Privacy (1 Octet)
++				Identity_Resolving_Key (16 Octets)
++	Return Parameters:	Current_Settings (4 Octets)
++
++	This command is used to enable Low Energy Privacy feature using
++	resolvable private addresses.
++
++	The value 0x00 disables privacy mode, the value 0x01 enables
++	privacy mode.
++
++	When the controller has a public address (mandatory for dual-mode
++	controllers) it is used as identity address. In case the controller
++	is single mode LE only without a public address, it is required
++	to configure a static random andress first. The privacy mode can
++	only be enabled when an identity address is available.
++
++	The Identity_Resolving_Key is the local key assigned for the local
++	resolvable private address.
++
++	Possible errors:	Busy
++				Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
++Load Identity Resolving Keys Command
++====================================
++
++	Command Code:		0x0030
++	Controller Index:	<controller id>
++	Command Parameters:	Key_Count (2 Octets)
++				Key1 {
++					Address (6 Octets)
++					Address_Type (1 Octet)
++					Value (16 Octets)
++				}
++				Key2 {  }
++				...
++	Return Parameters:
++
++	This command is used to feed the kernel with currently known
++	identity resolving keys. The command does not need to be called
++	again upon the receiption of New Identity Resolving Key events
++	since the kernel updates its list automatically.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	Unresolvable random addresses and resolvable random addresses are
++	not valid and will be rejected.
++
++	This command can be used when the controller is not powered.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+@@ -1713,6 +1804,18 @@ Event Parameters	Store_Hint (1 Octet)
+ 	to store the key persistently or not (e.g. this would not be set
+ 	if the authentication requirement was "No Bonding").
+ 
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	For unresolvable random addresses and resolvable random addresses
++	without identity information and identity resolving key, the
++	Store_Hint will be set to not store the long term key.
++
+ 	Currently defined Key_Type values are:
+ 
+ 		0x00	Unauthenticated key
+@@ -2020,3 +2123,61 @@ Event Parameters	Address (6 Octets)
+ 	The Passkey parameter indicates the passkey to be shown to the
+ 	user whereas the Entered parameter indicates how many characters
+ 	the user has entered on the remote side.
++
++
++Device Resolved Event
++=====================
++
++Event Code		0x0018
++Controller Index:	<controller id>
++Event Parameters	Address (6 Octets)
++			Address_Type (1 Octet)
++			Random_Address (6 Octets)
++
++	This event indicates that a random resolvable address has been
++	resolved into an identity of the device.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
++
++	The Random_Address provides the resolvable random address that
++	was resolved into an identity.
++
++	Once this event was send all resolvable random address that are
++	known will from now on use the identity. This affects events
++	like Device Found, Device Connected, New Long Term key etc.
++
++	When using commands like Unpair Device, Disconnect etc., the
++	identity can be used from now on.
++
++
++New Identity Resolving Key Event
++================================
++
++Event Code		0x0019
++Controller Index	<controller id>
++Event Parameters	Store_Hint (1 Octet)
++			Key {
++				Address (6 Octets)
++				Address_Type (1 Octet)
++				Value (16 Octets)
++			}
++
++	This event indicates that a new identity resolving key has been
++	generated for a remote device.
++
++	The Store_Hint parameter indicates whether the host is expected
++	to store the key persistently or not.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	The provided Address and Address_Type are the identity of
++	a device. So either its public address or static random address.
 -- 
-Lucas De Marchi
+1.8.5.3
+
