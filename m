@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
-References: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
-Date: Mon, 17 Feb 2014 14:02:04 +0200
-Message-ID: <CABBYNZJwKnmVuD0WNqBO4tVhdHs6Z-Qf9ErLnUpmpiss7bwN-A@mail.gmail.com>
-Subject: Re: [PATCH 0/5] Fixes for memory leaks
+In-Reply-To: <1391812080-19529-1-git-send-email-andre.guedes@openbossa.org>
+References: <1391812080-19529-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 17 Feb 2014 14:01:38 +0200
+Message-ID: <CABBYNZ+4Fiii937Y2Sa+zUaO7wb4bzPnuAdv=d5VoR+mQnJRjw@mail.gmail.com>
+Subject: Re: [PATCH] health: Fix HealthDevice dbus registration
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -14,33 +14,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-On Sat, Feb 8, 2014 at 12:28 AM, Andre Guedes
+On Sat, Feb 8, 2014 at 12:27 AM, Andre Guedes
 <andre.guedes@openbossa.org> wrote:
-> Hi all,
+> For some reason, HealthDevice property table wasn't been registered.
+> ---
+>  profiles/health/hdp.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> This patch set fixes some memory leaks reported by clang static analyzer.
-> There is no relation between patches of this set so they can be applied
-> independently.
->
-> BR,
->
-> Andre
->
->
-> Andre Guedes (5):
->   hcitool: Fix memory leak in cmd_info
->   hcidump: Fix memory leak
->   cltest: Fix memory leak
->   amptest: Fix memory leak
->   rctest: Fix memory leak
->
->  tools/amptest.c | 12 ++++++++----
->  tools/cltest.c  |  5 +++--
->  tools/hcidump.c |  9 +++++++--
->  tools/hcitool.c |  3 +++
->  tools/rctest.c  |  5 ++++-
->  5 files changed, 25 insertions(+), 9 deletions(-)
->
+> diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
+> index 622d95b..48dad52 100644
+> --- a/profiles/health/hdp.c
+> +++ b/profiles/health/hdp.c
+> @@ -2145,7 +2145,8 @@ static struct hdp_device *create_health_device(struct btd_device *device)
+>         if (!g_dbus_register_interface(btd_get_dbus_connection(),
+>                                         path, HEALTH_DEVICE,
+>                                         health_device_methods,
+> -                                       health_device_signals, NULL,
+> +                                       health_device_signals,
+> +                                       health_device_properties,
+>                                         dev, health_device_destroy)) {
+>                 error("D-Bus failed to register %s interface", HEALTH_DEVICE);
+>                 goto fail;
 > --
 > 1.8.5.3
 
