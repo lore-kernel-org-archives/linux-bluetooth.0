@@ -1,87 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 17 Feb 2014 14:52:09 -0800
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Lucas De Marchi <lucas.demarchi@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Lucas De Marchi <lucas.demarchi@profusion.mobi>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	kay.sievers@vrfy.org
-Subject: Re: [PATCH] Bluetooth: allocate static minor for vhci
-Message-ID: <20140217225209.GC17047@kroah.com>
-References: <1392649945-2338-1-git-send-email-lucas.demarchi@intel.com>
- <6D43DF5A-CFA0-4867-8518-ECDA167BDB71@holtmann.org>
- <20140217190125.GA1851@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140217190125.GA1851@intel.com>
+In-Reply-To: <B1545869-A8B6-4E2B-83AA-EF425235F79E@holtmann.org>
+References: <1391639006-26311-1-git-send-email-andre.guedes@openbossa.org>
+ <1391639006-26311-4-git-send-email-andre.guedes@openbossa.org> <B1545869-A8B6-4E2B-83AA-EF425235F79E@holtmann.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Mon, 17 Feb 2014 17:24:53 -0300
+Message-ID: <CACJA=fXqQL5TwKfOWj-PaHSLvZb-3EbPUnpcUMWXM8rU07zQUQ@mail.gmail.com>
+Subject: Re: [RFC v8 04/10] Bluetooth: Remove unused function
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Feb 17, 2014 at 04:01:25PM -0300, Lucas De Marchi wrote:
-> [ CC'ing Kay and Greg ]
-> 
-> On Mon, Feb 17, 2014 at 08:34:32AM -0800, Marcel Holtmann wrote:
-> > Hi Lucas,
-> > 
-> > > Commit bfacbb9 (Bluetooth: Use devname:vhci module alias for virtual HCI
-> > > driver) added the module alias to hci_vhci module so it's possible to
-> > > create the /dev/vhci node. However creating an alias without
-> > > specifying the minor doesn't allow us to create the node ahead,
-> > > triggerring module auto-load when it's first accessed.
-> > > 
-> > > Starting with depmod from kmod 16 we started to warn if there's a
-> > > devname alias without specifying the major and minor.
-> > > 
-> > > Let's do the same done for uhid, kvm, fuse and others, specifying a
-> > > fixed minor. In systems with systemd as the init the following will
-> > > happen: on early boot systemd will call "kmod static-nodes" to read
-> > > /lib/modules/$(uname -r)/modules.devname and then create the nodes. When
-> > > first accessed these "dead" nodes will trigger the module loading.
-> > > 
-> > > Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
-> > > ---
-> > > drivers/bluetooth/hci_vhci.c | 3 ++-
-> > > include/linux/miscdevice.h   | 1 +
-> > > 2 files changed, 3 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-> > > index 1ef6990..add1c6a 100644
-> > > --- a/drivers/bluetooth/hci_vhci.c
-> > > +++ b/drivers/bluetooth/hci_vhci.c
-> > > @@ -359,7 +359,7 @@ static const struct file_operations vhci_fops = {
-> > > static struct miscdevice vhci_miscdev= {
-> > > 	.name	= "vhci",
-> > > 	.fops	= &vhci_fops,
-> > > -	.minor	= MISC_DYNAMIC_MINOR,
-> > > +	.minor	= VHCI_MINOR,
-> > > };
-> > > 
-> > > static int __init vhci_init(void)
-> > > @@ -385,3 +385,4 @@ MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
-> > > MODULE_VERSION(VERSION);
-> > > MODULE_LICENSE("GPL");
-> > > MODULE_ALIAS("devname:vhci");
-> > > +MODULE_ALIAS_MISCDEV(VHCI_MINOR);
-> > > diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
-> > > index 3737f72..846a317 100644
-> > > --- a/include/linux/miscdevice.h
-> > > +++ b/include/linux/miscdevice.h
-> > > @@ -48,6 +48,7 @@
-> > > #define LOOP_CTRL_MINOR		237
-> > > #define VHOST_NET_MINOR		238
-> > > #define UHID_MINOR		239
-> > > +#define VHCI_MINOR		240
-> > > #define MISC_DYNAMIC_MINOR	255
-> > 
-> > you have read Documentation/devices.txt where it states that 240-254 is reserved for local use.
-> 
-> I haven't seen that. So, are we out of minors or.. can I use e.g.
-> 142, 129 or the ones below 128?
+Hi Marcel,
 
-As Kay said, larger than 255 should be fine, but you should test this,
-and also provide a patch for the devices.txt file to ensure you reserve
-the minor number properly.  Looks like someone forgot to do that for the
-UHID minor number :(
+On Fri, Feb 14, 2014 at 7:28 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andre,
+>
+>> This patch removes hci_create_le_conn() since it is not used anymore.
+>>
+>> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+>> ---
+>> net/bluetooth/hci_conn.c | 32 --------------------------------
+>> 1 file changed, 32 deletions(-)
+>>
+>> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+>> index 166d7a5..70f4226 100644
+>> --- a/net/bluetooth/hci_conn.c
+>> +++ b/net/bluetooth/hci_conn.c
+>> @@ -551,38 +551,6 @@ done:
+>>       hci_dev_unlock(hdev);
+>> }
+>>
+>> -static int hci_create_le_conn(struct hci_conn *conn)
+>> -{
+>> -     struct hci_dev *hdev = conn->hdev;
+>> -     struct hci_cp_le_create_conn cp;
+>> -     struct hci_request req;
+>> -     int err;
+>> -
+>> -     hci_req_init(&req, hdev);
+>> -
+>> -     memset(&cp, 0, sizeof(cp));
+>> -     cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+>> -     cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+>> -     bacpy(&cp.peer_addr, &conn->dst);
+>> -     cp.peer_addr_type = conn->dst_type;
+>> -     cp.own_address_type = conn->src_type;
+>> -     cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+>> -     cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+>> -     cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+>> -     cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+>> -     cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+>> -
+>> -     hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+>> -
+>> -     err = hci_req_run(&req, create_le_conn_complete);
+>> -     if (err) {
+>> -             hci_conn_del(conn);
+>> -             return err;
+>> -     }
+>> -
+>> -     return 0;
+>> -}
+>> -
+>> static void create_le_conn_req(struct hci_request *req, struct hci_conn *conn)
+>> {
+>>       struct hci_cp_le_create_conn cp;
+>
+> not about this patch, but with my other comment, this one might be better renamed into hci_req_add_le_create_conn at some point. Not urgent though.
 
-thanks,
+I'll rename it.
 
-greg k-h
+BR,
+
+Andre
