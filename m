@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1391812080-19529-2-git-send-email-andre.guedes@openbossa.org>
-References: <1391812080-19529-1-git-send-email-andre.guedes@openbossa.org>
-	<1391812080-19529-2-git-send-email-andre.guedes@openbossa.org>
-Date: Mon, 17 Feb 2014 14:02:35 +0200
-Message-ID: <CABBYNZKbemvbzKNkbd5+tg_w=T1tVKe2OKs3yPJw19jHdz6HLQ@mail.gmail.com>
-Subject: Re: [PATCH] btsnoop: Remove unused local function and macro
+In-Reply-To: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
+References: <1391812125-19594-1-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 17 Feb 2014 14:02:04 +0200
+Message-ID: <CABBYNZJwKnmVuD0WNqBO4tVhdHs6Z-Qf9ErLnUpmpiss7bwN-A@mail.gmail.com>
+Subject: Re: [PATCH 0/5] Fixes for memory leaks
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -15,36 +14,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-On Sat, Feb 8, 2014 at 12:27 AM, Andre Guedes
+On Sat, Feb 8, 2014 at 12:28 AM, Andre Guedes
 <andre.guedes@openbossa.org> wrote:
-> ---
->  tools/btsnoop.c | 13 -------------
->  1 file changed, 13 deletions(-)
+> Hi all,
 >
-> diff --git a/tools/btsnoop.c b/tools/btsnoop.c
-> index a65d8c5..260dfdb 100644
-> --- a/tools/btsnoop.c
-> +++ b/tools/btsnoop.c
-> @@ -40,19 +40,6 @@
+> This patch set fixes some memory leaks reported by clang static analyzer.
+> There is no relation between patches of this set so they can be applied
+> independently.
 >
->  #include "monitor/btsnoop.h"
+> BR,
 >
-> -static inline uint64_t ntoh64(uint64_t n)
-> -{
-> -       uint64_t h;
-> -       uint64_t tmp = ntohl(n & 0x00000000ffffffff);
-> -
-> -       h = ntohl(n >> 32);
-> -       h |= tmp << 32;
-> -
-> -       return h;
-> -}
-> -
-> -#define hton64(x)     ntoh64(x)
-> -
->  struct btsnoop_hdr {
->         uint8_t         id[8];          /* Identification Pattern */
->         uint32_t        version;        /* Version Number = 1 */
+> Andre
+>
+>
+> Andre Guedes (5):
+>   hcitool: Fix memory leak in cmd_info
+>   hcidump: Fix memory leak
+>   cltest: Fix memory leak
+>   amptest: Fix memory leak
+>   rctest: Fix memory leak
+>
+>  tools/amptest.c | 12 ++++++++----
+>  tools/cltest.c  |  5 +++--
+>  tools/hcidump.c |  9 +++++++--
+>  tools/hcitool.c |  3 +++
+>  tools/rctest.c  |  5 ++++-
+>  5 files changed, 25 insertions(+), 9 deletions(-)
+>
 > --
 > 1.8.5.3
 
