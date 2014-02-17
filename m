@@ -1,30 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 17 Feb 2014 13:32:08 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 5/6] tools/rfcomm-tester: Add RFCOMM client read test case
+Message-ID: <20140217113208.GE4004@x220.p-661hnu-f1>
+References: <1392205301-4204-1-git-send-email-marcin.kraglak@tieto.com>
+ <1392205301-4204-6-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1391804086-14428-1-git-send-email-anderson.lizardo@openbossa.org>
-References: <1391804086-14428-1-git-send-email-anderson.lizardo@openbossa.org>
-Date: Mon, 17 Feb 2014 07:55:59 -0400
-Message-ID: <CAJdJm_MNNC9iTjibrm7ajmoeqmoCMwfC2oq1DtErA=RX70Ey_w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] lib/sdp: Add missing Service Class ID for GAP
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1392205301-4204-6-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-On Fri, Feb 7, 2014 at 4:14 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Also reorder last ID so the list remains ordered.
-> ---
->  lib/sdp.c |    3 ++-
->  lib/sdp.h |    7 ++++---
->  2 files changed, 6 insertions(+), 4 deletions(-)
+On Wed, Feb 12, 2014, Marcin Kraglak wrote:
+> +	sk = g_io_channel_unix_get_fd(io);
+> +
+> +
+> +	if (client_data->data_len != read(sk, buf, client_data->data_len)) {
 
-ping.
+Coding style with the two consecutive empty lines above. Also consider a
+separate ssize_t ret variable before the length comparison.
 
--- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+Johan
