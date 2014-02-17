@@ -1,88 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] emulator/bthost: Check length of received RFCOMM UIH frames
-Date: Mon, 17 Feb 2014 14:28:02 +0100
-Message-Id: <1392643682-12370-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1391812080-19529-2-git-send-email-andre.guedes@openbossa.org>
+References: <1391812080-19529-1-git-send-email-andre.guedes@openbossa.org>
+	<1391812080-19529-2-git-send-email-andre.guedes@openbossa.org>
+Date: Mon, 17 Feb 2014 14:02:35 +0200
+Message-ID: <CABBYNZKbemvbzKNkbd5+tg_w=T1tVKe2OKs3yPJw19jHdz6HLQ@mail.gmail.com>
+Subject: Re: [PATCH] btsnoop: Remove unused local function and macro
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add correct calculation of frame length. If frame is too short, ignore it.
----
- emulator/bthost.c | 38 ++++++++++++++++++++++++++++++--------
- 1 file changed, 30 insertions(+), 8 deletions(-)
+Hi Andre,
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index ab90f4c..6fbabe8 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -1760,17 +1760,30 @@ static void rfcomm_mcc_recv(struct bthost *bthost, struct btconn *conn,
- 			struct l2conn *l2conn, const void *data, uint16_t len)
- {
- 	const struct rfcomm_mcc *mcc = data;
-+	const struct rfcomm_msc *msc;
-+	const struct rfcomm_pn *pn;
-+
-+	if (len < sizeof(*mcc))
-+		return;
- 
- 	switch (RFCOMM_GET_MCC_TYPE(mcc->type)) {
- 	case RFCOMM_MSC:
-+		if (len - sizeof(*mcc) < sizeof(*msc))
-+			break;
-+
-+		msc = data + sizeof(*mcc);
-+
- 		rfcomm_msc_recv(bthost, conn, l2conn,
--						RFCOMM_TEST_CR(mcc->type) / 2,
--						data + sizeof(*mcc));
-+				RFCOMM_TEST_CR(mcc->type) / 2, msc);
- 		break;
- 	case RFCOMM_PN:
-+		if (len - sizeof(*mcc) < sizeof(*pn))
-+			break;
-+
-+		pn = data + sizeof(*mcc);
-+
- 		rfcomm_pn_recv(bthost, conn, l2conn,
--					RFCOMM_TEST_CR(mcc->type) / 2,
--					data + sizeof(*mcc));
-+				RFCOMM_TEST_CR(mcc->type) / 2, pn);
- 		break;
- 	default:
- 		break;
-@@ -1781,18 +1794,27 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
- 				struct l2conn *l2conn, const void *data,
- 				uint16_t len)
- {
--	const struct rfcomm_cmd *hdr = data;
-+	const struct rfcomm_hdr *hdr = data;
-+	uint16_t hdr_len;
- 	const void *p;
- 
-+	if (len < sizeof(*hdr))
-+		return;
-+
- 	if (RFCOMM_GET_DLCI(hdr->address))
- 		return;
- 
- 	if (RFCOMM_TEST_EA(hdr->length))
--		p = data + sizeof(struct rfcomm_hdr);
-+		hdr_len = sizeof(*hdr);
- 	else
--		p = data + sizeof(struct rfcomm_hdr) + sizeof(uint8_t);
-+		hdr_len = sizeof(*hdr) + sizeof(uint8_t);
-+
-+	if (len < hdr_len)
-+		return;
-+
-+	p = data + hdr_len;
- 
--	rfcomm_mcc_recv(bthost, conn, l2conn, p, p - data);
-+	rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
- }
- 
- static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
+On Sat, Feb 8, 2014 at 12:27 AM, Andre Guedes
+<andre.guedes@openbossa.org> wrote:
+> ---
+>  tools/btsnoop.c | 13 -------------
+>  1 file changed, 13 deletions(-)
+>
+> diff --git a/tools/btsnoop.c b/tools/btsnoop.c
+> index a65d8c5..260dfdb 100644
+> --- a/tools/btsnoop.c
+> +++ b/tools/btsnoop.c
+> @@ -40,19 +40,6 @@
+>
+>  #include "monitor/btsnoop.h"
+>
+> -static inline uint64_t ntoh64(uint64_t n)
+> -{
+> -       uint64_t h;
+> -       uint64_t tmp = ntohl(n & 0x00000000ffffffff);
+> -
+> -       h = ntohl(n >> 32);
+> -       h |= tmp << 32;
+> -
+> -       return h;
+> -}
+> -
+> -#define hton64(x)     ntoh64(x)
+> -
+>  struct btsnoop_hdr {
+>         uint8_t         id[8];          /* Identification Pattern */
+>         uint32_t        version;        /* Version Number = 1 */
+> --
+> 1.8.5.3
+
+Applied, thanks.
+
+
 -- 
-1.8.3.1
-
+Luiz Augusto von Dentz
