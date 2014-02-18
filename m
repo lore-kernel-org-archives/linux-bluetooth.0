@@ -1,141 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 02/13] android/avrcp: Add command handlers stubs
-Date: Tue, 18 Feb 2014 16:24:19 +0200
-Message-Id: <1392733470-22736-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1392733470-22736-1-git-send-email-luiz.dentz@gmail.com>
-References: <1392733470-22736-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 01/13] android/hal-ipc-api: Add Set Volume command
+Date: Tue, 18 Feb 2014 16:24:18 +0200
+Message-Id: <1392733470-22736-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/avrcp.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+ android/hal-ipc-api.txt | 6 ++++++
+ android/hal-msg.h       | 5 +++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index b8304f5..2cca64a 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -57,7 +57,116 @@ struct avrcp_device {
- 	GIOChannel	*io;
- };
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index ee3bd76..ea26d0d 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1300,6 +1300,12 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
+ 		Valid type values : 0x00 = Interim
+ 		                    0x01 = Changed
  
-+static void handle_get_play_status(const void *buf, uint16_t len)
-+{
-+	DBG("");
++	Opcode 0x0a - Set Volume command/response
 +
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAY_STATUS,
-+							HAL_STATUS_FAILED);
-+}
++		Command parameters: Value (1 octet)
 +
-+static void handle_list_player_attrs(const void *buf, uint16_t len)
-+{
-+	DBG("");
++		In case of an error, the error response will be returned.
 +
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_LIST_PLAYER_ATTRS,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_list_player_values(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_LIST_PLAYER_VALUES,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_player_attrs(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_ATTRS,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_player_attrs_text(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_player_values_text(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_element_attrs_text(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_ELEMENT_ATTRS_TEXT,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_set_player_attrs_value(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_PLAYER_ATTRS_VALUE,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_register_notification(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_REGISTER_NOTIFICATION,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_set_volume(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_VOLUME,
-+							HAL_STATUS_FAILED);
-+}
-+
- static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_AVRCP_GET_PLAY_STATUS */
-+	{ handle_get_play_status, false,
-+			sizeof(struct hal_cmd_avrcp_get_play_status) },
-+	/* HAL_OP_AVRCP_LIST_PLAYER_ATTRS */
-+	{ handle_list_player_attrs, true,
-+			sizeof(struct hal_cmd_avrcp_list_player_attrs) },
-+	/* HAL_OP_AVRCP_LIST_PLAYER_VALUES */
-+	{ handle_list_player_values, true,
-+			sizeof(struct hal_cmd_avrcp_list_player_values) },
-+	/* HAL_OP_AVRCP_GET_PLAYER_ATTRS */
-+	{ handle_get_player_attrs, true,
-+			sizeof(struct hal_cmd_avrcp_get_player_attrs) },
-+	/* HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT */
-+	{ handle_get_player_attrs_text, true,
-+			sizeof(struct hal_cmd_avrcp_get_player_attrs_text) },
-+	/* HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT */
-+	{ handle_get_player_values_text, true,
-+			sizeof(struct hal_cmd_avrcp_get_player_values_text) },
-+	/* HAL_OP_AVRCP_GET_ELEMENT_ATTRS_TEXT */
-+	{ handle_get_element_attrs_text, true,
-+			sizeof(struct hal_cmd_avrcp_get_element_attrs_text) },
-+	/* HAL_OP_AVRCP_SET_PLAYER_ATTRS_VALUE */
-+	{ handle_set_player_attrs_value, true,
-+			sizeof(struct hal_cmd_avrcp_set_player_attrs_value) },
-+	/* HAL_OP_AVRCP_REGISTER_NOTIFICATION */
-+	{ handle_register_notification, true,
-+			sizeof(struct hal_cmd_avrcp_register_notification) },
-+	/* HAL_OP_AVRCP_SET_VOLUME */
-+	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
- };
+ 	Opcode 0x81 - Remote Features notification
  
- static sdp_record_t *avrcp_record(void)
+ 		Notification parameters: Remote address (6 octets)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 6504408..9d396a1 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -882,6 +882,11 @@ struct hal_cmd_avrcp_register_notification {
+ 	uint8_t data[0];
+ } __attribute__((packed));
+ 
++#define HAL_OP_AVRCP_SET_VOLUME			0x0a
++struct hal_cmd_avrcp_set_volume {
++	uint8_t value;
++};
++
+ #define HAL_EV_AVRCP_REMOTE_FEATURES		0x81
+ struct hal_ev_avrcp_remote_features {
+ 	uint8_t bdaddr[6];
 -- 
 1.8.5.3
 
