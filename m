@@ -1,38 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] sdptool: Fix sdptool output
-Message-Id: <20140218213509.EB15A1005F0@puck.mtv.corp.google.com>
-Date: Tue, 18 Feb 2014 13:35:09 -0800 (PST)
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [RFC v10 09/10] Bluetooth: Auto connection and power on
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1392754534-12747-9-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 18 Feb 2014 12:55:12 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <66746AF2-08CF-4E22-95D0-1ADB649BBED8@holtmann.org>
+References: <1392754534-12747-1-git-send-email-andre.guedes@openbossa.org> <1392754534-12747-9-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add missing newlines to sdp_record_print().
----
- lib/sdp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Andre,
 
-diff --git a/lib/sdp.c b/lib/sdp.c
-index 3b26ec3..f957c46 100644
---- a/lib/sdp.c
-+++ b/lib/sdp.c
-@@ -1604,13 +1604,13 @@ void sdp_record_print(const sdp_record_t *rec)
- {
- 	sdp_data_t *d = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
- 	if (d && SDP_IS_TEXT_STR(d->dtd))
--		printf("Service Name: %.*s", d->unitSize, d->val.str);
-+		printf("Service Name: %.*s\n", d->unitSize, d->val.str);
- 	d = sdp_data_get(rec, SDP_ATTR_SVCDESC_PRIMARY);
- 	if (d && SDP_IS_TEXT_STR(d->dtd))
--		printf("Service Description: %.*s", d->unitSize, d->val.str);
-+		printf("Service Description: %.*s\n", d->unitSize, d->val.str);
- 	d = sdp_data_get(rec, SDP_ATTR_PROVNAME_PRIMARY);
- 	if (d && SDP_IS_TEXT_STR(d->dtd))
--		printf("Service Provider: %.*s", d->unitSize, d->val.str);
-+		printf("Service Provider: %.*s\n", d->unitSize, d->val.str);
- }
- 
- #ifdef SDP_DEBUG
--- 
-1.9.0.rc1.175.g0b1dcb5
+> When hdev is closed (e.g. Mgmt power off command, RFKILL or controller
+> is reset), the ongoing active connections are silently dropped by the
+> controller (no Disconnection Complete Event is sent to host). For that
+> reason, the devices that require HCI_AUTO_CONN_ALWAYS are not added to
+> hdev->pend_le_conns list and they won't auto connect.
+> 
+> So to fix this issue, during hdev closing, we remove all pending LE
+> connections. After adapter is powered on, we add a pending LE connection
+> for each HCI_AUTO_CONN_ALWAYS address.
+> 
+> This way, the auto connection mechanism works propely after a power
+> off and power on sequence as well as RFKILL block/unblock.
+
+and when background scan is running, you might want to make sure to disable LE scan first before doing the actual power down. I just crashed my controller.
+
+Regards
+
+Marcel
 
