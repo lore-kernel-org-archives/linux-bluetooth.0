@@ -1,55 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Pradeep Vivekanandan <vivekanandanp@hcl.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Bluetooth: Help need on RegisterPlayer in simpleagent python script
- on bluez 5.7
-Date: Tue, 18 Feb 2014 06:10:14 +0000
-Message-ID: <A4B1A1B79EB08444A5B867A4254F4B88409189D4@chn-hclt-mbs05.HCLT.CORP.HCL.IN>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Lucas De Marchi <lucas.de.marchi@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	kay.sievers@vrfy.org,
+	linux-kernel@vger.kernel.org,
+	Lucas De Marchi <lucas.demarchi@intel.com>
+Subject: [PATCH v2] Bluetooth: allocate static minor for vhci
+Date: Tue, 18 Feb 2014 02:19:26 -0300
+Message-Id: <1392700766-4374-1-git-send-email-lucas.demarchi@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Lucas De Marchi <lucas.demarchi@intel.com>
 
-Hi,
+Commit bfacbb9 (Bluetooth: Use devname:vhci module alias for virtual HCI
+driver) added the module alias to hci_vhci module so it's possible to
+create the /dev/vhci node. However creating an alias without
+specifying the minor doesn't allow us to create the node ahead,
+triggerring module auto-load when it's first accessed.
 
-I am running the bluetoothd in bluez 5.7.
+Starting with depmod from kmod 16 we started to warn if there's a
+devname alias without specifying the major and minor.
 
-I have execute test folder scripts i python.
+Let's do the same done for uhid, kvm, fuse and others, specifying a
+fixed minor. In systems with systemd as the init the following will
+happen: on early boot systemd will call "kmod static-nodes" to read
+/lib/modules/$(uname -r)/modules.devname and then create the nodes. When
+first accessed these "dead" nodes will trigger the module loading.
 
-For getting metadata information i run simple-player python script.
+Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
+---
 
-But i got the below error could please help on that how to get metadata information.
-error:
-File "./simple-player", line 149, in <module>
-    media.RegisterPlayer(dbus.ObjectPath(path), player.properties)
-  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 70, in __call__
-    return self._proxy_method(*args, **keywords)
-  File "/usr/lib/python2.7/dist-packages/dbus/proxies.py", line 145, in __call__
-    **keywords)
-  File "/usr/lib/python2.7/dist-packages/dbus/connection.py", line 651, in call_blocking
-    message, timeout)
-dbus.exceptions.DBusException: org.freedesktop.DBus.Error.UnknownMethod: Method "RegisterPlayer" with signature "oa{sv}" on interface "org.bluez.Media1" doesn't exist
+Changes from v1:
+ - use minor=137, since 240 is reserved for local use
 
-Also I could not found  the method RegisterPlayer  in org.bluez.Media1 using d-feet.
+We talked about using 197, but that's being used by pxa3xx-gcu, too.
 
-Thanks and Regards,
-Pradeep V
-end
+ Documentation/devices.txt    | 1 +
+ drivers/bluetooth/hci_vhci.c | 3 ++-
+ include/linux/miscdevice.h   | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
 
-
-::DISCLAIMER::
-----------------------------------------------------------------------------------------------------------------------------------------------------
-
-The contents of this e-mail and any attachment(s) are confidential and intended for the named recipient(s) only.
-E-mail transmission is not guaranteed to be secure or error-free as information could be intercepted, corrupted,
-lost, destroyed, arrive late or incomplete, or may contain viruses in transmission. The e mail and its contents
-(with or without referred errors) shall therefore not attach any liability on the originator or HCL or its affiliates.
-Views or opinions, if any, presented in this email are solely those of the author and may not necessarily reflect the
-views or opinions of HCL or its affiliates. Any form of reproduction, dissemination, copying, disclosure, modification,
-distribution and / or publication of this message without the prior written consent of authorized representative of
-HCL is strictly prohibited. If you have received this email in error please delete it and notify the sender immediately.
-Before opening any email and/or attachments, please check them for viruses and other defects.
-
-----------------------------------------------------------------------------------------------------------------------------------------------------
-
+diff --git a/Documentation/devices.txt b/Documentation/devices.txt
+index 10378cc..04356f5 100644
+--- a/Documentation/devices.txt
++++ b/Documentation/devices.txt
+@@ -353,6 +353,7 @@ Your cooperation is appreciated.
+ 		133 = /dev/exttrp	External device trap
+ 		134 = /dev/apm_bios	Advanced Power Management BIOS
+ 		135 = /dev/rtc		Real Time Clock
++		137 = /dev/vhci		Bluetooth virtual HCI driver
+ 		139 = /dev/openprom	SPARC OpenBoot PROM
+ 		140 = /dev/relay8	Berkshire Products Octal relay card
+ 		141 = /dev/relay16	Berkshire Products ISO-16 relay card
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 1ef6990..add1c6a 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -359,7 +359,7 @@ static const struct file_operations vhci_fops = {
+ static struct miscdevice vhci_miscdev= {
+ 	.name	= "vhci",
+ 	.fops	= &vhci_fops,
+-	.minor	= MISC_DYNAMIC_MINOR,
++	.minor	= VHCI_MINOR,
+ };
+ 
+ static int __init vhci_init(void)
+@@ -385,3 +385,4 @@ MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+ MODULE_ALIAS("devname:vhci");
++MODULE_ALIAS_MISCDEV(VHCI_MINOR);
+diff --git a/include/linux/miscdevice.h b/include/linux/miscdevice.h
+index 3737f72..7bb6148 100644
+--- a/include/linux/miscdevice.h
++++ b/include/linux/miscdevice.h
+@@ -23,6 +23,7 @@
+ #define TEMP_MINOR		131	/* Temperature Sensor */
+ #define RTC_MINOR		135
+ #define EFI_RTC_MINOR		136	/* EFI Time services */
++#define VHCI_MINOR		137
+ #define SUN_OPENPROM_MINOR	139
+ #define DMAPI_MINOR		140	/* DMAPI */
+ #define NVRAM_MINOR		144
+-- 
+1.9.0
