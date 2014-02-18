@@ -1,29 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 1/2] Bluetooth: sort the list of IDs in the source code
+Subject: Re: [PATCH v2] Bluetooth: allocate static minor for vhci
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392740780-27372-1-git-send-email-andriy.shevchenko@linux.intel.com>
-Date: Tue, 18 Feb 2014 09:54:36 -0800
-Cc: linux-bluetooth@vger.kernel.org,
-	Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Message-Id: <EA55B3EE-4A65-4197-9222-95EC418003B4@holtmann.org>
-References: <1392740780-27372-1-git-send-email-andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20140218173308.GB17368@kroah.com>
+Date: Tue, 18 Feb 2014 09:49:41 -0800
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	Kay Sievers <kay.sievers@vrfy.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>
+Message-Id: <C4D6B9EB-D2F4-4A29-9445-B724BFD30F80@holtmann.org>
+References: <1392700766-4374-1-git-send-email-lucas.demarchi@intel.com> <BD98E109-FE9C-4F67-84AC-3CEA048641BE@holtmann.org> <20140218173308.GB17368@kroah.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andy,
+Hi Lucas,
 
-> This will help to manage table of supported IDs.
+>>> Commit bfacbb9 (Bluetooth: Use devname:vhci module alias for virtual HCI
+>>> driver) added the module alias to hci_vhci module so it's possible to
+>>> create the /dev/vhci node. However creating an alias without
+>>> specifying the minor doesn't allow us to create the node ahead,
+>>> triggerring module auto-load when it's first accessed.
+>>> 
+>>> Starting with depmod from kmod 16 we started to warn if there's a
+>>> devname alias without specifying the major and minor.
+>>> 
+>>> Let's do the same done for uhid, kvm, fuse and others, specifying a
+>>> fixed minor. In systems with systemd as the init the following will
+>>> happen: on early boot systemd will call "kmod static-nodes" to read
+>>> /lib/modules/$(uname -r)/modules.devname and then create the nodes. When
+>>> first accessed these "dead" nodes will trigger the module loading.
+>>> 
+>>> Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
+>>> ---
+>>> 
+>>> Changes from v1:
+>>> - use minor=137, since 240 is reserved for local use
+>>> 
+>>> We talked about using 197, but that's being used by pxa3xx-gcu, too.
+>> 
+>> looks fine to me. If Kay and/or Greg want to ack it, then I take it through bluetooth-next tree.
 > 
-> There is no functional change.
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 > 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
-> drivers/bluetooth/ath3k.c | 78 +++++++++++++++++++++++------------------------
-> drivers/bluetooth/btusb.c | 52 +++++++++++++++----------------
-> 2 files changed, 65 insertions(+), 65 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
