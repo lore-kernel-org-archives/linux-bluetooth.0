@@ -1,53 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <5303720B.4090902@convergeddevices.net>
-References: <53026C2F.4010705@convergeddevices.net>
-	<5303720B.4090902@convergeddevices.net>
-Date: Tue, 18 Feb 2014 18:27:08 +0200
-Message-ID: <CABBYNZL_+TUf22wApCgb40a-bPWtUZq2jKUT9eVZ9KAOz8MfQw@mail.gmail.com>
-Subject: Re: Help with AVDTP Connection accept
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: tony <tony.makkiel@convergeddevices.net>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org,
+	Heikki Krogerus <heikki.krogerus@linux.intel.com>,
+	Marcel Holtmann <marcel@holtmann.org>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH 2/2] Bluetooth: append new supported device to the list [0b05:17d0]
+Date: Tue, 18 Feb 2014 18:26:20 +0200
+Message-Id: <1392740780-27372-2-git-send-email-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <1392740780-27372-1-git-send-email-andriy.shevchenko@linux.intel.com>
+References: <1392740780-27372-1-git-send-email-andriy.shevchenko@linux.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tony,
+The device found on Asus Z87 Expert motherboard requires firmware to work
+correctly.
 
-On Tue, Feb 18, 2014 at 4:45 PM, tony <tony.makkiel@convergeddevices.net> wrote:
-> A2DP sdp record is not enabled by default. Once I added the source service
-> using sdptool, I can get past the 'AVDTP CONNECT'. But now it cribs at AVDTP
-> DISCOVER. Any ideas?
->
-> Thanks,
-> Tony
->
->
->
-> On 17/02/14 20:08, tony wrote:
->>
->> Hi,
->>          I have BlueZ 4.101 and the daemon is running(log file
->> daemon.txt). I am trying to initiate an AVDTP connection from PTS suite.
->> But couldn't get(or not sure how) the BlueZ side accept the connection.
->>  From the log I can see the device reply with no Link key message. But
->> the connection gets dropped quickly.
->>
->> 1) From browsing the SDP entries (log :- sdptool.txt ), I don't see an
->> entry for A2DP. I ran the configure file with --enable audio and can see
->> from the daemon.txt audio plugin is loaded. Should I be adding SDP
->> record manually? How can I do that?
->>
->> 2) Am I right in understanding, I should be using test/simple-agent to
->> manage SSP? At present I don't see anything. From forums, I understand,
->> the script would prompt for PIN or any security as required. But in my
->> case nothing happens.  I have attached the btmon log as well.
->>
->> Thank you for any pointers or suggestions.
+T:  Bus=03 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0b05 ProdID=17d0 Rev=00.02
+C:  #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
 
-I suspect you don't have a endpoint registered in your system, you can
-either use test/simple-endpoint or PulseAudio as endpoint or create
-one yourself. The so called endpoint is required since bluetoothd
-don't deal with the audio streams so normally this is part of the
-platform integration where the audio/media server need to take over.
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 1 +
+ 2 files changed, 3 insertions(+)
+
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index fc93ade..4f78a9d 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -86,6 +86,7 @@ static const struct usb_device_id ath3k_table[] = {
+ 	{ USB_DEVICE(0x04CA, 0x300b) },
+ 	{ USB_DEVICE(0x0930, 0x0219) },
+ 	{ USB_DEVICE(0x0930, 0x0220) },
++	{ USB_DEVICE(0x0b05, 0x17d0) },
+ 	{ USB_DEVICE(0x0CF3, 0x0036) },
+ 	{ USB_DEVICE(0x0CF3, 0x3004) },
+ 	{ USB_DEVICE(0x0CF3, 0x3008) },
+@@ -133,6 +134,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+ 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0CF3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 46640e9..199b9d4 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -156,6 +156,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x04ca, 0x300b), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0930, 0x0220), .driver_info = BTUSB_ATH3012 },
++	{ USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
+ 	{ USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+-- 
+1.9.0.rc3
