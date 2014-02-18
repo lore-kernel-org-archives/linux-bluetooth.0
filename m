@@ -1,93 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 09/10] Bluetooth: Fix updating Identity Address in L2CAP channels
+Subject: Re: [PATCH BlueZ v6 00/18] GATT API: External Services
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392736479-8808-10-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 18 Feb 2014 10:25:03 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B6358E46-5EC0-4E9F-9658-C5E820C15FC1@holtmann.org>
-References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com> <1392736479-8808-10-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <CAKT1EBdeyQDXbgu5iv3CC=XAE0j-dKVTOp8HMNuA7=xyK8ri0g@mail.gmail.com>
+Date: Tue, 18 Feb 2014 10:17:50 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <1B88D85B-35F3-47BB-ACAD-872E6C4F0A79@holtmann.org>
+References: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org> <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org> <B6CE0C86-8DC9-45D1-8022-78ED9D83B96F@holtmann.org> <CAKT1EBdeyQDXbgu5iv3CC=XAE0j-dKVTOp8HMNuA7=xyK8ri0g@mail.gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Claudio,
 
-> When we receive a remote identity address during SMP key distribution we
-> should ensure that any associated L2CAP channel instances get their
-> address information correspondingly updated (so that e.g. doing
-> getpeername on associated sockets returns the correct address).
+>>> This patchset implements the minimal support for adding local services
+>>> declarations.
+>>> 
+>>> Limitation: Remove services and multiple services exported by the same
+>>> remote will be implemented the next series.
+>> 
+>> what is the deal with this unix socket you are using for local access? I think we should remove that functionality and keep it simple in the beginning.
 > 
-> This patch adds a new L2CAP core function l2cap_conn_update_id_addr()
-> which is used to iterate through all L2CAP channels associated with a
-> connection and update their address information.
+> Testing purpose only to avoid breaking the current attribute server.
+> The fact is, the current attribute server "architecture" is not
+> flexible enough to support external services properly.
+> The idea is to get rid of the "old" attribute server when we finish
+> the new implementation.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/l2cap.h |  1 +
-> net/bluetooth/l2cap_core.c    | 17 +++++++++++++++++
-> net/bluetooth/smp.c           |  2 ++
-> 3 files changed, 20 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 13bec91785f4..4abdcb220e3a 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -881,6 +881,7 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
-> void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
-> void l2cap_chan_del(struct l2cap_chan *chan, int err);
-> +void l2cap_conn_update_id_addr(struct hci_conn *hcon);
-> void l2cap_send_conn_req(struct l2cap_chan *chan);
-> void l2cap_move_start(struct l2cap_chan *chan);
-> void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 6e6b3a9c8e6d..d25fefcc0bb5 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -609,6 +609,23 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
-> 	return;
-> }
-> 
-> +void l2cap_conn_update_id_addr(struct hci_conn *hcon)
-> +{
-> +	struct l2cap_conn *conn = hcon->l2cap_data;
-> +	struct l2cap_chan *chan;
-> +
-> +	mutex_lock(&conn->chan_lock);
-> +
-> +	list_for_each_entry(chan, &conn->chan_l, list) {
-> +		l2cap_chan_lock(chan);
-> +		bacpy(&chan->dst, &hcon->dst);
-> +		chan->dst_type = hcon->dst_type;
+> Lizardo has some patches allowing compatibility between the two
+> versions. We will send new patchsets to remove the unix socket, and
+> introduce this compatibility.
 
-this should use bdaddr_type(conn->hcon, conn->hcon->dst_type);
-
-Remember that the L2CAP address type matches the mgmt one. While on hci_dev and hci_conn level we have the one from HCI specification.
-
-> +		l2cap_chan_unlock(chan);
-> +	}
-> +
-> +	mutex_unlock(&conn->chan_lock);
-> +}
-> +
-> static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
-> {
-> 	struct l2cap_conn *conn = chan->conn;
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index 4d14ccc7b330..faf04bd4263a 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -976,6 +976,8 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
-> 	bacpy(&hcon->dst, &smp->id_addr);
-> 	hcon->dst_type = smp->id_addr_type;
-> 
-> +	l2cap_conn_update_id_addr(hcon);
-> +
-> 	smp_distribute_keys(conn, 1);
-> 
-> 	return 0;
+that sounds better. I rather not have an extra unix socket based API around. We are still having a heard time to get rid of the SDP unix socket.
 
 Regards
 
