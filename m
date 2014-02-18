@@ -1,124 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/6] tools/rfcomm-tester: Add RFCOMM client write test case
-Date: Tue, 18 Feb 2014 08:50:51 +0100
-Message-Id: <1392709855-32600-3-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1392709855-32600-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1392709855-32600-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 0/6] RFCOMM data transfer support in bthost
+Date: Tue, 18 Feb 2014 08:50:49 +0100
+Message-Id: <1392709855-32600-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will test sending data through RFCOMM socket from client to server.
----
- tools/rfcomm-tester.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 58 insertions(+), 1 deletion(-)
+v2:
+ - Added rfcomm prefixes in API functions and internal structs
+ - Values returned by read() and write stored in local variables
+for clarity
+ - Few coding style fixes
 
-diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
-index 44df7e7..42355cf 100644
---- a/tools/rfcomm-tester.c
-+++ b/tools/rfcomm-tester.c
-@@ -57,6 +57,9 @@ struct rfcomm_client_data {
- 	uint8_t server_channel;
- 	uint8_t client_channel;
- 	int expected_connect_err;
-+	const uint8_t *send_data;
-+	const uint8_t *read_data;
-+	uint16_t data_len;
- };
- 
- struct rfcomm_server_data {
-@@ -294,6 +297,15 @@ const struct rfcomm_client_data connect_success = {
- 	.client_channel = 0x0c
- };
- 
-+const uint8_t data[] = {0, 1, 2, 3, 4, 5, 6, 7, 8};
-+
-+const struct rfcomm_client_data connect_send_success = {
-+	.server_channel = 0x0c,
-+	.client_channel = 0x0c,
-+	.data_len = sizeof(data),
-+	.send_data = data
-+};
-+
- const struct rfcomm_client_data connect_nval = {
- 	.server_channel = 0x0c,
- 	.client_channel = 0x0e,
-@@ -389,6 +401,16 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
- 		return false;
- 	}
- 
-+	if (client_data->send_data) {
-+		ssize_t ret;
-+
-+		ret = write(sk, client_data->send_data, client_data->data_len);
-+		if (client_data->data_len != ret)
-+			tester_test_failed();
-+
-+		return false;
-+	}
-+
- 	if (err < 0)
- 		tester_test_failed();
- 	else
-@@ -397,6 +419,38 @@ static gboolean rc_connect_cb(GIOChannel *io, GIOCondition cond,
- 	return false;
- }
- 
-+static void client_hook_func(const void *data, uint16_t len,
-+							void *user_data)
-+{
-+	struct test_data *test_data = tester_get_data();
-+	const struct rfcomm_client_data *client_data = test_data->test_data;
-+	ssize_t ret;
-+
-+	if (client_data->data_len != len) {
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	ret = memcmp(client_data->send_data, data, len);
-+	if (ret)
-+		tester_test_failed();
-+	else
-+		tester_test_passed();
-+}
-+
-+static void rfcomm_connect_cb(uint16_t handle, uint16_t cid,
-+						void *user_data, bool status)
-+{
-+	struct test_data *data = tester_get_data();
-+	const struct rfcomm_client_data *client_data = data->test_data;
-+	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
-+
-+	if (client_data->send_data)
-+		bthost_add_rfcomm_channel_hook(bthost, handle,
-+						client_data->client_channel,
-+						client_hook_func, NULL);
-+}
-+
- static void test_connect(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -408,7 +462,7 @@ static void test_connect(const void *test_data)
- 
- 	bthost_add_l2cap_server(bthost, 0x0003, NULL, NULL);
- 	bthost_add_rfcomm_server(bthost, client_data->server_channel,
--								NULL, NULL);
-+						rfcomm_connect_cb, NULL);
- 
- 	master_addr = hciemu_get_master_bdaddr(data->hciemu);
- 	client_addr = hciemu_get_client_bdaddr(data->hciemu);
-@@ -540,6 +594,9 @@ int main(int argc, char *argv[])
- 					setup_powered_client, test_basic);
- 	test_rfcomm("Basic RFCOMM Socket Client - Success", &connect_success,
- 					setup_powered_client, test_connect);
-+	test_rfcomm("Basic RFCOMM Socket Client - Write Success",
-+				&connect_send_success, setup_powered_client,
-+				test_connect);
- 	test_rfcomm("Basic RFCOMM Socket Client - Conn Refused",
- 			&connect_nval, setup_powered_client, test_connect);
- 	test_rfcomm("Basic RFCOMM Socket Server - Success", &listen_success,
+Marcin Kraglak (6):
+  emulator/bthost: Add api to handle RFCOMM data on bthost
+  tools/rfcomm-tester: Add RFCOMM client write test case
+  tools/rfcomm-tester: Add RFCOMM server write test case
+  emulator/bthost: Add function to send RFCOMM UIH frames from bthost
+  tools/rfcomm-tester: Add RFCOMM client read test case
+  tools/rfcomm-tester: Add RFCOMM server read test case
+
+ emulator/bthost.c     | 167 ++++++++++++++++++++++++++++++++++++++-
+ emulator/bthost.h     |  13 ++++
+ tools/rfcomm-tester.c | 212 +++++++++++++++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 387 insertions(+), 5 deletions(-)
+
 -- 
 1.8.3.1
 
