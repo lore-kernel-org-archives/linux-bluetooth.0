@@ -1,67 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4] hog: Use HoG device name as uHID input device name
-Message-Id: <20140218195807.023621005C1@puck.mtv.corp.google.com>
-Date: Tue, 18 Feb 2014 11:58:06 -0800 (PST)
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [RFC v9 01/10] Bluetooth: Create hci_req_add_le_scan_disable helper
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1392746101-5981-1-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 18 Feb 2014 11:50:11 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C2424B4D-6165-4D37-870A-0A2E1A061D96@holtmann.org>
+References: <1392746101-5981-1-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/input/hog.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+Hi Andre,
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index ded6303..7a54aa1 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -91,6 +91,7 @@ struct hog_device {
- 	uint16_t		proto_mode_handle;
- 	uint16_t		ctrlpt_handle;
- 	uint8_t			flags;
-+	char			*name;
- };
- 
- struct report {
-@@ -392,7 +393,8 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	/* create uHID device */
- 	memset(&ev, 0, sizeof(ev));
- 	ev.type = UHID_CREATE;
--	strcpy((char *) ev.u.create.name, "bluez-hog-device");
-+	strncpy((char *) ev.u.create.name, hogdev->name,
-+						sizeof(ev.u.create.name) - 1);
- 	ev.u.create.vendor = vendor;
- 	ev.u.create.product = product;
- 	ev.u.create.version = version;
-@@ -722,6 +724,7 @@ static struct hog_device *hog_new_device(struct btd_device *device,
- 								uint16_t id)
- {
- 	struct hog_device *hogdev;
-+	char name[HCI_MAX_NAME_LENGTH + 1];
- 
- 	hogdev = g_try_new0(struct hog_device, 1);
- 	if (!hogdev)
-@@ -729,6 +732,12 @@ static struct hog_device *hog_new_device(struct btd_device *device,
- 
- 	hogdev->id = id;
- 	hogdev->device = btd_device_ref(device);
-+	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
-+	name[HCI_MAX_NAME_LENGTH] = '\0';
-+	if (strlen(name) > 0)
-+		hogdev->name = g_strdup(name);
-+	else
-+		hogdev->name = g_strdup("bluez-hog-device");
- 
- 	return hogdev;
- }
-@@ -751,6 +760,7 @@ static void hog_free_device(struct hog_device *hogdev)
- 	g_slist_free_full(hogdev->reports, report_free);
- 	g_attrib_unref(hogdev->attrib);
- 	g_free(hogdev->hog_primary);
-+	g_free(hogdev->name);
- 	g_free(hogdev);
- }
- 
--- 
-1.9.0.rc1.175.g0b1dcb5
+> This patch moves stop LE scanning duplicate code to one single
+> place and reuses it. This will avoid more duplicate code in
+> upcoming patches.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/hci_core.c         | 14 ++++++++++----
+> net/bluetooth/mgmt.c             |  6 +-----
+> 3 files changed, 12 insertions(+), 9 deletions(-)
+
+can you please rebase this against bluetooth-next. Unfortunately you are conflicting with Johan’s work for resolving private addresses.
+
+Regards
+
+Marcel
 
