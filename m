@@ -1,33 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC v9 01/10] Bluetooth: Create hci_req_add_le_scan_disable helper
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392746101-5981-1-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 18 Feb 2014 11:50:11 -0800
+Date: Tue, 18 Feb 2014 21:49:54 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Petri Gynther <pgynther@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C2424B4D-6165-4D37-870A-0A2E1A061D96@holtmann.org>
-References: <1392746101-5981-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+Subject: Re: [PATCHv2] adapter: Handle MGMT_SETTING_LE change
+Message-ID: <20140218194954.GB9146@x220.p-661hnu-f1>
+References: <20140218185506.C44B81005C1@puck.mtv.corp.google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140218185506.C44B81005C1@puck.mtv.corp.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Petri,
 
-> This patch moves stop LE scanning duplicate code to one single
-> place and reuses it. This will avoid more duplicate code in
-> upcoming patches.
+On Tue, Feb 18, 2014, Petri Gynther wrote:
+> On dual-mode Bluetooth adapters, BLE is not enabled by default. When bluetoothd
+> starts, BLE is enabled in read_info_complete(), but this management action does
+> not always complete before adapter_start() is called. Therefore, bluetoothd
+> needs to handle the MGMT_SETTING_LE change correctly in settings_changed().
+> Specifically, trigger_passive_scanning() needs to be called so that paired BLE
+> devices (e.g. HoG devices) are able to reconnect back to host.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> The trace below shows this case:
+> bluetoothd[1087]: src/adapter.c:adapter_start() adapter /org/bluez/hci0 has been enabled
+>  => adapter_start() is called, but BLE is not yet enabled
+> bluetoothd[1087]: src/adapter.c:load_link_keys_complete() link keys loaded for hci0
+> bluetoothd[1087]: src/adapter.c:load_ltks_complete() LTKs loaded for hci0
+> bluetoothd[1087]: src/adapter.c:get_connections_complete() Connection count: 0
+> bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000000c1
+> bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000040
+> bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002c1
+> bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000200
+>  => BLE got enabled, so need to call trigger_passive_scanning()
+> bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002d1
+> bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000010
+> bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002d3
+> bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000002
+> 
+> The issue is easily reproducible with this init sequence:
+> hciconfig hci0 up
+> bluetoothd -n -d
 > ---
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         | 14 ++++++++++----
-> net/bluetooth/mgmt.c             |  6 +-----
-> 3 files changed, 12 insertions(+), 9 deletions(-)
+>  src/adapter.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-can you please rebase this against bluetooth-next. Unfortunately you are conflicting with Johan’s work for resolving private addresses.
+Applied (after reformatting the commit message a bit to follow the "less
+than 76 chars wide" rule). Thanks.
 
-Regards
-
-Marcel
-
+Johan
