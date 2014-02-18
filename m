@@ -1,39 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Petri Gynther <pgynther@google.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Report identity address when remote device connects
-Date: Tue, 18 Feb 2014 14:22:19 -0800
-Message-Id: <1392762140-18655-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] sdptool: Fix sdptool output
+Message-Id: <20140218213509.EB15A1005F0@puck.mtv.corp.google.com>
+Date: Tue, 18 Feb 2014 13:35:09 -0800 (PST)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the remote device has been successfully connected, report the
-identity address (public address or static random address).
-
-Currently the address from the HCI_LE_Connection_Complete event is
-used. This was no problem so far, but since now known resolvable
-random addresses are converted into identities, it is important to
-use the identity of the connection and not the address report by
-HCI event.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Add missing newlines to sdp_record_print().
 ---
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ lib/sdp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 49a2d4d841df..d7c709519e31 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3618,7 +3618,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	}
+diff --git a/lib/sdp.c b/lib/sdp.c
+index 3b26ec3..f957c46 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -1604,13 +1604,13 @@ void sdp_record_print(const sdp_record_t *rec)
+ {
+ 	sdp_data_t *d = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
+ 	if (d && SDP_IS_TEXT_STR(d->dtd))
+-		printf("Service Name: %.*s", d->unitSize, d->val.str);
++		printf("Service Name: %.*s\n", d->unitSize, d->val.str);
+ 	d = sdp_data_get(rec, SDP_ATTR_SVCDESC_PRIMARY);
+ 	if (d && SDP_IS_TEXT_STR(d->dtd))
+-		printf("Service Description: %.*s", d->unitSize, d->val.str);
++		printf("Service Description: %.*s\n", d->unitSize, d->val.str);
+ 	d = sdp_data_get(rec, SDP_ATTR_PROVNAME_PRIMARY);
+ 	if (d && SDP_IS_TEXT_STR(d->dtd))
+-		printf("Service Provider: %.*s", d->unitSize, d->val.str);
++		printf("Service Provider: %.*s\n", d->unitSize, d->val.str);
+ }
  
- 	if (!test_and_set_bit(HCI_CONN_MGMT_CONNECTED, &conn->flags))
--		mgmt_device_connected(hdev, &ev->bdaddr, conn->type,
-+		mgmt_device_connected(hdev, &conn->dst, conn->type,
- 				      conn->dst_type, 0, NULL, 0, NULL);
- 
- 	conn->sec_level = BT_SECURITY_LOW;
+ #ifdef SDP_DEBUG
 -- 
-1.8.5.3
+1.9.0.rc1.175.g0b1dcb5
 
