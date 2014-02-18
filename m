@@ -1,53 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v2] Bluetooth: allocate static minor for vhci
+Subject: Re: [PATCH BlueZ v6 00/18] GATT API: External Services
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140218173308.GB17368@kroah.com>
-Date: Tue, 18 Feb 2014 09:49:41 -0800
-Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>,
-	Kay Sievers <kay.sievers@vrfy.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	Lucas De Marchi <lucas.demarchi@intel.com>
-Message-Id: <C4D6B9EB-D2F4-4A29-9445-B724BFD30F80@holtmann.org>
-References: <1392700766-4374-1-git-send-email-lucas.demarchi@intel.com> <BD98E109-FE9C-4F67-84AC-3CEA048641BE@holtmann.org> <20140218173308.GB17368@kroah.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Tue, 18 Feb 2014 09:44:51 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <B6CE0C86-8DC9-45D1-8022-78ED9D83B96F@holtmann.org>
+References: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org> <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lucas,
+Hi Claudio,
 
->>> Commit bfacbb9 (Bluetooth: Use devname:vhci module alias for virtual HCI
->>> driver) added the module alias to hci_vhci module so it's possible to
->>> create the /dev/vhci node. However creating an alias without
->>> specifying the minor doesn't allow us to create the node ahead,
->>> triggerring module auto-load when it's first accessed.
->>> 
->>> Starting with depmod from kmod 16 we started to warn if there's a
->>> devname alias without specifying the major and minor.
->>> 
->>> Let's do the same done for uhid, kvm, fuse and others, specifying a
->>> fixed minor. In systems with systemd as the init the following will
->>> happen: on early boot systemd will call "kmod static-nodes" to read
->>> /lib/modules/$(uname -r)/modules.devname and then create the nodes. When
->>> first accessed these "dead" nodes will trigger the module loading.
->>> 
->>> Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
->>> ---
->>> 
->>> Changes from v1:
->>> - use minor=137, since 240 is reserved for local use
->>> 
->>> We talked about using 197, but that's being used by pxa3xx-gcu, too.
->> 
->> looks fine to me. If Kay and/or Greg want to ack it, then I take it through bluetooth-next tree.
+> This patchset implements the minimal support for adding local services
+> declarations.
 > 
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> 
+> Limitation: Remove services and multiple services exported by the same
+> remote will be implemented the next series.
 
-patch has been applied to bluetooth-next tree.
+what is the deal with this unix socket you are using for local access? I think we should remove that functionality and keep it simple in the beginning.
 
 Regards
 
