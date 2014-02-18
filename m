@@ -1,40 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Petri Gynther <pgynther@google.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] Bluetooth: More privacy related patches
-Date: Tue, 18 Feb 2014 21:41:30 +0200
-Message-Id: <1392752497-8696-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCHv2] adapter: Handle MGMT_SETTING_LE change
+Message-Id: <20140218185506.C44B81005C1@puck.mtv.corp.google.com>
+Date: Tue, 18 Feb 2014 10:55:06 -0800 (PST)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On dual-mode Bluetooth adapters, BLE is not enabled by default. When bluetoothd
+starts, BLE is enabled in read_info_complete(), but this management action does
+not always complete before adapter_start() is called. Therefore, bluetoothd
+needs to handle the MGMT_SETTING_LE change correctly in settings_changed().
+Specifically, trigger_passive_scanning() needs to be called so that paired BLE
+devices (e.g. HoG devices) are able to reconnect back to host.
 
-Here are some updated patches from the previous set that still didn't
-make it upstream as well as some new ones. I'm now starting to be at the
-point where the next inevitable step is to add the New IRK mgmt event
-(which I've been postponing so far).
+The trace below shows this case:
+bluetoothd[1087]: src/adapter.c:adapter_start() adapter /org/bluez/hci0 has been enabled
+ => adapter_start() is called, but BLE is not yet enabled
+bluetoothd[1087]: src/adapter.c:load_link_keys_complete() link keys loaded for hci0
+bluetoothd[1087]: src/adapter.c:load_ltks_complete() LTKs loaded for hci0
+bluetoothd[1087]: src/adapter.c:get_connections_complete() Connection count: 0
+bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000000c1
+bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000040
+bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002c1
+bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000200
+ => BLE got enabled, so need to call trigger_passive_scanning()
+bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002d1
+bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000010
+bluetoothd[1087]: src/adapter.c:new_settings_callback() Settings: 0x000002d3
+bluetoothd[1087]: src/adapter.c:settings_changed() Changed settings: 0x00000002
 
-Johan
+The issue is easily reproducible with this init sequence:
+hciconfig hci0 up
+bluetoothd -n -d
+---
+ src/adapter.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-----------------------------------------------------------------
-Johan Hedberg (7):
-      Bluetooth: Remove SMP data specific crypto context
-      Bluetooth: Track the LE Identity Address in struct hci_conn
-      Bluetooth: Fix updating Identity Address in L2CAP channels
-      Bluetooth: Wait for SMP key distribution completion when pairing
-      Bluetooth: Don't try to look up private addresses as Identity Address
-      Bluetooth: Look up RPA for connection requests with Identity Address
-      Bluetooth: Use Identity Address in Device Found event
-
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/l2cap.h    |  1 +
- net/bluetooth/hci_conn.c         | 19 +++++++++++++-----
- net/bluetooth/hci_core.c         |  4 ++++
- net/bluetooth/hci_event.c        |  8 ++++++++
- net/bluetooth/l2cap_core.c       | 17 +++++++++++++++++
- net/bluetooth/mgmt.c             | 37 ++++++++++++++++++++++++++++--------
- net/bluetooth/smp.c              | 36 ++++++++++++++++++++++++-----------
- net/bluetooth/smp.h              |  2 +-
- 9 files changed, 100 insertions(+), 25 deletions(-)
-
+diff --git a/src/adapter.c b/src/adapter.c
+index 08296bd..596e1eb 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -405,6 +405,7 @@ static void store_adapter_info(struct btd_adapter *adapter)
+ static void trigger_pairable_timeout(struct btd_adapter *adapter);
+ static void adapter_start(struct btd_adapter *adapter);
+ static void adapter_stop(struct btd_adapter *adapter);
++static void trigger_passive_scanning(struct btd_adapter *adapter);
+ 
+ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+ {
+@@ -434,6 +435,12 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
+ 		}
+ 	}
+ 
++	if (changed_mask & MGMT_SETTING_LE) {
++		if ((adapter->current_settings & MGMT_SETTING_POWERED) &&
++				(adapter->current_settings & MGMT_SETTING_LE))
++			trigger_passive_scanning(adapter);
++	}
++
+ 	if (changed_mask & MGMT_SETTING_CONNECTABLE)
+ 		g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "Connectable");
+-- 
+1.9.0.rc1.175.g0b1dcb5
 
