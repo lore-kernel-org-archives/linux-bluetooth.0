@@ -1,59 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1392714551.5951.275.camel@pohly-mobl1.fritz.box>
-Subject: Re: [PATCH BlueZ 8/8] doc/obex-api: Update documentation
-From: Patrick Ohly <patrick.ohly@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 18 Feb 2014 10:09:11 +0100
-In-Reply-To: <1392393184-15266-8-git-send-email-luiz.dentz@gmail.com>
-References: <1392393184-15266-1-git-send-email-luiz.dentz@gmail.com>
-	 <1392393184-15266-8-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v2] Bluetooth: Add AES crypto context for each HCI device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1392712807-4565-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 18 Feb 2014 00:54:36 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <B49F7AB2-0C1B-4C8A-8FB9-84E9874AD845@holtmann.org>
+References: <1392711577-31431-4-git-send-email-johan.hedberg@gmail.com> <1392712807-4565-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, 2014-02-14 at 17:53 +0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
+
+> Previously the crypto context has only been available for LE SMP
+> sessions, but now that we'll need to perform operations also during
+> discovery it makes sense to have this context part of the hci_dev
+> struct. Later, the context can be removed from the SMP context.
 > 
-> This adds Suspend and Resume methods and 'suspended' value as status in
-> the Transfer interface documentation.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  doc/obex-api.txt | 18 ++++++++++++++++--
->  1 file changed, 16 insertions(+), 2 deletions(-)
+> v2: Properly initialize "error" if crypto init fails
 > 
-> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-> index 1f22fea..0f57ce1 100644
-> --- a/doc/obex-api.txt
-> +++ b/doc/obex-api.txt
-> @@ -90,12 +90,26 @@ Methods		void Cancel()
->  					 org.bluez.obex.Error.InProgress
->  					 org.bluez.obex.Error.Failed
->  
-> +		void Suspend()
-> +
-> +			Suspend transference.
-> +
-> +			Possible errors: org.bluez.obex.Error.NotAuthorized
-> +					 org.bluez.obex.Error.NotInProgress
-> +
-> +		void Resume()
-> +
-> +			Resume transference.
-> +
-> +			Possible errors: org.bluez.obex.Error.NotAuthorized
-> +					 org.bluez.obex.Error.NotInProgress
-                                                                ^^^^^^^^^^^^^
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/hci_core.c         | 17 ++++++++++++++++-
+> 2 files changed, 17 insertions(+), 1 deletion(-)
 
-Should this be a NotSuspended error? Or is it not an error to resume a
-transfer which is currently not suspended?
+all 9 patches have been applied to bluetooth-next tree.
 
--- 
-Best Regards, Patrick Ohly
+Regards
 
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
-
+Marcel
 
