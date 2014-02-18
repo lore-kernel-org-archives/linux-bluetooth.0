@@ -1,154 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v10 10/10] Bluetooth: Add le_auto_conn file on debugfs
-Date: Tue, 18 Feb 2014 17:15:34 -0300
-Message-Id: <1392754534-12747-10-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v10 07/10] Bluetooth: Temporarily stop background scanning on discovery
+Date: Tue, 18 Feb 2014 17:15:31 -0300
+Message-Id: <1392754534-12747-7-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1392754534-12747-1-git-send-email-andre.guedes@openbossa.org>
 References: <1392754534-12747-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds to debugfs the le_auto_conn file. This file will be
-used to test LE auto connection infrastructure.
-
-To add a new auto connection address we write on le_auto_conn file
-following the format <address> <address type> <auto_connect>.
-
-The <address type> values are:
-  * 0 for public address
-  * 1 for random address
-
-The <auto_connect> values are (for more details see struct hci_
-conn_params):
-  * 0 for disabled
-  * 1 for always
-  * 2 for link loss
-
-So for instance, if you want the kernel autonomously establishes
-connections with device AA:BB:CC:DD:EE:FF (public address) every
-time the device enters in connectable mode (starts advertising),
-you should run the command:
-$ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-To get the list of connection parameters configured in kernel, read
-the le_auto_conn file:
-$ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-Finally, to clear the connection parameters list, write an empty
-string:
-$ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
-
-This file is created only if LE is enabled.
+If the user sends a mgmt start discovery command while the background
+scanning is running, we should temporarily stop it. Once the discovery
+finishes, we start the background scanning again.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 85 insertions(+)
+ net/bluetooth/hci_core.c |  2 ++
+ net/bluetooth/mgmt.c     | 12 ++++++------
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5d5d38b..3fd6a6f 100644
+index 18ef960..9434d1c 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -728,6 +728,89 @@ static const struct file_operations lowpan_debugfs_fops = {
- 	.llseek		= default_llseek,
- };
+@@ -1612,6 +1612,8 @@ void hci_discovery_set_state(struct hci_dev *hdev, int state)
  
-+static int le_auto_conn_show(struct seq_file *sf, void *ptr)
-+{
-+	struct hci_dev *hdev = sf->private;
-+	struct hci_conn_params *p;
+ 	switch (state) {
+ 	case DISCOVERY_STOPPED:
++		hci_update_background_scan(hdev);
 +
-+	hci_dev_lock(hdev);
-+
-+	list_for_each_entry(p, &hdev->le_conn_params, list) {
-+		seq_printf(sf, "%pMR %u %u\n", &p->addr, p->addr_type,
-+			   p->auto_connect);
-+	}
-+
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int le_auto_conn_open(struct inode *inode, struct file *file)
-+{
-+	return single_open(file, le_auto_conn_show, inode->i_private);
-+}
-+
-+static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
-+				  size_t count, loff_t *offset)
-+{
-+	struct seq_file *sf = file->private_data;
-+	struct hci_dev *hdev = sf->private;
-+	u8 auto_connect;
-+	bdaddr_t addr;
-+	u8 addr_type;
-+	char *buf;
-+	int n;
-+
-+	/* Don't allow partial write */
-+	if (*offset != 0)
-+		return -EINVAL;
-+
-+	/* If empty string, clear the connection parameters and pending LE
-+	 * connection list.
-+	 */
-+	if (count == 1) {
-+		hci_dev_lock(hdev);
-+		hci_conn_params_clear(hdev);
-+		hci_pend_le_conns_clear(hdev);
-+		hci_dev_unlock(hdev);
-+		return count;
-+	}
-+
-+	buf = kzalloc(count, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	if (copy_from_user(buf, data, count)) {
-+		kfree(buf);
-+		return -EFAULT;
-+	}
-+
-+	n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu %hhu", &addr.b[5],
-+		   &addr.b[4], &addr.b[3], &addr.b[2], &addr.b[1], &addr.b[0],
-+		   &addr_type, &auto_connect);
-+	if (n != 8) {
-+		kfree(buf);
-+		return -EINVAL;
-+	}
-+
-+	hci_dev_lock(hdev);
-+	hci_conn_params_add(hdev, &addr, addr_type, auto_connect,
-+			    hdev->le_conn_min_interval,
-+			    hdev->le_conn_max_interval);
-+	hci_dev_unlock(hdev);
-+
-+	kfree(buf);
-+	return count;
-+}
-+
-+static const struct file_operations le_auto_conn_fops = {
-+	.open		= le_auto_conn_open,
-+	.read		= seq_read,
-+	.write		= le_auto_conn_write,
-+	.llseek		= seq_lseek,
-+	.release	= single_release,
-+};
-+
- /* ---- HCI requests ---- */
+ 		if (hdev->discovery.state != DISCOVERY_STARTING)
+ 			mgmt_discovering(hdev, 0);
+ 		break;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 98396f9..70ca1a7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3343,12 +3343,12 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 			goto failed;
+ 		}
  
- static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
-@@ -1520,6 +1603,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &conn_max_interval_fops);
- 		debugfs_create_file("6lowpan", 0644, hdev->debugfs, hdev,
- 				    &lowpan_debugfs_fops);
-+		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
-+				    &le_auto_conn_fops);
- 	}
+-		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
+-			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+-					 MGMT_STATUS_BUSY);
+-			mgmt_pending_remove(cmd);
+-			goto failed;
+-		}
++		/* If controller is scanning, it means the background scanning
++		 * is running. Thus, we should temporarily stop it in order to
++		 * set the discovery scanning parameters.
++		 */
++		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
++			hci_req_add_le_scan_disable(&req);
  
- 	return 0;
+ 		memset(&param_cp, 0, sizeof(param_cp));
+ 		param_cp.type = LE_SCAN_ACTIVE;
 -- 
 1.8.5.4
 
