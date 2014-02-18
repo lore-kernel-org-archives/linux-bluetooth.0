@@ -1,36 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 18 Feb 2014 09:33:08 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Lucas De Marchi <lucas.de.marchi@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	Kay Sievers <kay.sievers@vrfy.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	Lucas De Marchi <lucas.demarchi@intel.com>
+Subject: Re: [PATCH v2] Bluetooth: allocate static minor for vhci
+Message-ID: <20140218173308.GB17368@kroah.com>
+References: <1392700766-4374-1-git-send-email-lucas.demarchi@intel.com>
+ <BD98E109-FE9C-4F67-84AC-3CEA048641BE@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 01/10] Bluetooth: Remove SMP data specific crypto context
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140218162926.GB13953@x220.p-661hnu-f1>
-Date: Tue, 18 Feb 2014 09:34:52 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <9C127AAF-9ED4-4D34-8604-A113005AEB60@holtmann.org>
-References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com> <1392736479-8808-2-git-send-email-johan.hedberg@gmail.com> <596B741F-5844-4C49-BE66-5413510692C4@holtmann.org> <20140218162438.GA13953@x220.p-661hnu-f1> <20140218162926.GB13953@x220.p-661hnu-f1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <BD98E109-FE9C-4F67-84AC-3CEA048641BE@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
->>> so I am curious now to what happens if we are running SMP and at the
->>> same time are doing RPA resolving. Can the same crypto context be used
->>> that way?
->> 
->> That's a fair point, and after a quick look through the crypto API it
->> seems like this might not be safe. A simple fix would be to ensure that
->> any access is between hci_dev_lock & hci_dev_unlock.
+On Mon, Feb 17, 2014 at 11:01:11PM -0800, Marcel Holtmann wrote:
+> Hi Lucas,
 > 
-> A quick check shows that all access external to smp.c is already done
-> under the hdev lock but the two places internal to smp.c are not (both
-> of which are from within workqueue callbacks, so taking the lock there
-> should be safe). Do you agree that this is the simplest/best solution?
+> > Commit bfacbb9 (Bluetooth: Use devname:vhci module alias for virtual HCI
+> > driver) added the module alias to hci_vhci module so it's possible to
+> > create the /dev/vhci node. However creating an alias without
+> > specifying the minor doesn't allow us to create the node ahead,
+> > triggerring module auto-load when it's first accessed.
+> > 
+> > Starting with depmod from kmod 16 we started to warn if there's a
+> > devname alias without specifying the major and minor.
+> > 
+> > Let's do the same done for uhid, kvm, fuse and others, specifying a
+> > fixed minor. In systems with systemd as the init the following will
+> > happen: on early boot systemd will call "kmod static-nodes" to read
+> > /lib/modules/$(uname -r)/modules.devname and then create the nodes. When
+> > first accessed these "dead" nodes will trigger the module loading.
+> > 
+> > Signed-off-by: Lucas De Marchi <lucas.demarchi@intel.com>
+> > ---
+> > 
+> > Changes from v1:
+> > - use minor=137, since 240 is reserved for local use
+> > 
+> > We talked about using 197, but that's being used by pxa3xx-gcu, too.
+> 
+> looks fine to me. If Kay and/or Greg want to ack it, then I take it through bluetooth-next tree.
 
-since we always do only one AES round anyway, that seems to be a good solution to this.
-
-Regards
-
-Marcel
-
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
