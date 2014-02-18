@@ -1,162 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/6] emulator/bthost: Add api to handle RFCOMM data on bthost
-Date: Tue, 18 Feb 2014 08:50:50 +0100
-Message-Id: <1392709855-32600-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 6/6] tools/rfcomm-tester: Add RFCOMM server read test case
+Date: Tue, 18 Feb 2014 08:50:55 +0100
+Message-Id: <1392709855-32600-7-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1392709855-32600-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1392709855-32600-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this change user can handle data received on RFCOMM connection.
+It will test reading data passed to RFCOMM socket on server side.
 ---
- emulator/bthost.c | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- emulator/bthost.h |  9 +++++++
- 2 files changed, 75 insertions(+), 4 deletions(-)
+ tools/rfcomm-tester.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 6fbabe8..9bf9ad3 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -126,6 +126,13 @@ struct cid_hook {
- 	struct cid_hook *next;
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 4066553..71c1cf1 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -337,6 +337,14 @@ const struct rfcomm_server_data listen_send_success = {
+ 	.send_data = data
  };
  
-+struct rfcomm_channel_hook {
-+	uint8_t channel;
-+	bthost_rfcomm_channel_hook_func_t func;
-+	void *user_data;
-+	struct rfcomm_channel_hook *next;
++const struct rfcomm_server_data listen_read_success = {
++	.server_channel = 0x0c,
++	.client_channel = 0x0c,
++	.expected_status = true,
++	.data_len = sizeof(data),
++	.read_data = data
 +};
 +
- struct btconn {
- 	uint16_t handle;
- 	uint8_t bdaddr[6];
-@@ -134,6 +141,7 @@ struct btconn {
- 	uint16_t next_cid;
- 	struct l2conn *l2conns;
- 	struct cid_hook *cid_hooks;
-+	struct rfcomm_channel_hook *rfcomm_channel_hooks;
- 	struct btconn *next;
- 	void *smp_data;
- };
-@@ -233,6 +241,13 @@ static void btconn_free(struct btconn *conn)
- 		free(hook);
+ const struct rfcomm_server_data listen_nval = {
+ 	.server_channel = 0x0c,
+ 	.client_channel = 0x0e,
+@@ -559,6 +567,31 @@ static void test_connect(const void *test_data)
+ 	tester_print("Connect in progress %d", sk);
+ }
+ 
++static gboolean server_received_data(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct rfcomm_server_data *server_data = data->test_data;
++	char buf[1024];
++	ssize_t ret;
++	int sk;
++
++	sk = g_io_channel_unix_get_fd(io);
++
++	ret = read(sk, buf, server_data->data_len);
++	if (ret != server_data->data_len) {
++		tester_test_failed();
++		return false;
++	}
++
++	if (memcmp(buf, server_data->read_data, server_data->data_len))
++		tester_test_failed();
++	else
++		tester_test_passed();
++
++	return false;
++}
++
+ static gboolean rfcomm_listen_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -585,6 +618,17 @@ static gboolean rfcomm_listen_cb(GIOChannel *io, GIOCondition cond,
+ 
+ 		close(new_sk);
+ 		return false;
++	} else if (server_data->read_data) {
++		GIOChannel *new_io;
++
++		new_io = g_io_channel_unix_new(new_sk);
++		g_io_channel_set_close_on_unref(new_io, TRUE);
++
++		data->io_id = g_io_add_watch(new_io, G_IO_IN,
++						server_received_data, NULL);
++
++		g_io_channel_unref(new_io);
++		return false;
  	}
  
-+	while (conn->rfcomm_channel_hooks) {
-+		struct rfcomm_channel_hook *hook = conn->rfcomm_channel_hooks;
-+
-+		conn->rfcomm_channel_hooks = hook->next;
-+		free(hook);
-+	}
-+
- 	free(conn);
- }
- 
-@@ -1547,6 +1562,18 @@ static struct cid_hook *find_cid_hook(struct btconn *conn, uint16_t cid)
- 	return NULL;
- }
- 
-+static struct rfcomm_channel_hook *find_rfcomm_channel_hook(struct btconn *conn,
-+							uint16_t channel)
-+{
-+	struct rfcomm_channel_hook *hook;
-+
-+	for (hook = conn->rfcomm_channel_hooks; hook != NULL; hook = hook->next)
-+		if (hook->channel == channel)
-+			return hook;
-+
-+	return NULL;
-+}
-+
- static void rfcomm_ua_send(struct bthost *bthost, struct btconn *conn,
- 			struct l2conn *l2conn, uint8_t cr, uint8_t dlci)
+ 	close(new_sk);
+@@ -599,9 +643,18 @@ static void connection_cb(uint16_t handle, uint16_t cid, void *user_data,
  {
-@@ -1801,9 +1828,6 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
- 	if (len < sizeof(*hdr))
+ 	struct test_data *data = tester_get_data();
+ 	const struct rfcomm_server_data *server_data = data->test_data;
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
+ 
+-	if (server_data->data_len)
++	if (server_data->read_data) {
++		data->conn_handle = handle;
++		bthost_send_rfcomm_data(bthost, data->conn_handle,
++						server_data->client_channel,
++						server_data->read_data,
++						server_data->data_len);
++		return;
++	} else if (server_data->data_len) {
  		return;
- 
--	if (RFCOMM_GET_DLCI(hdr->address))
--		return;
--
- 	if (RFCOMM_TEST_EA(hdr->length))
- 		hdr_len = sizeof(*hdr);
- 	else
-@@ -1814,7 +1838,19 @@ static void rfcomm_uih_recv(struct bthost *bthost, struct btconn *conn,
- 
- 	p = data + hdr_len;
- 
--	rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
-+	if (RFCOMM_GET_DLCI(hdr->address)) {
-+		struct rfcomm_channel_hook *hook;
-+
-+		hook = find_rfcomm_channel_hook(conn,
-+					RFCOMM_GET_CHANNEL(hdr->address));
-+		if (!hook)
-+			return;
-+
-+		hook->func(p, len - hdr_len - sizeof(uint8_t),
-+							hook->user_data);
-+	} else {
-+		rfcomm_mcc_recv(bthost, conn, l2conn, p, len - hdr_len);
 +	}
- }
  
- static void process_rfcomm(struct bthost *bthost, struct btconn *conn,
-@@ -2112,6 +2148,32 @@ bool bthost_connect_rfcomm(struct bthost *bthost, uint16_t handle,
- 					&req, sizeof(req), NULL, NULL);
- }
- 
-+void bthost_add_rfcomm_channel_hook(struct bthost *bthost, uint16_t handle,
-+					uint8_t channel,
-+					bthost_rfcomm_channel_hook_func_t func,
-+					void *user_data)
-+{
-+	struct rfcomm_channel_hook *hook;
-+	struct btconn *conn;
-+
-+	conn = bthost_find_conn(bthost, handle);
-+	if (!conn)
-+		return;
-+
-+	hook = malloc(sizeof(*hook));
-+	if (!hook)
-+		return;
-+
-+	memset(hook, 0, sizeof(*hook));
-+
-+	hook->channel = channel;
-+	hook->func = func;
-+	hook->user_data = user_data;
-+
-+	hook->next = conn->rfcomm_channel_hooks;
-+	conn->rfcomm_channel_hooks = hook;
-+}
-+
- void bthost_stop(struct bthost *bthost)
- {
- 	if (bthost->smp_data) {
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index a3c26a1..e922f0b 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -99,6 +99,15 @@ bool bthost_connect_rfcomm(struct bthost *bthost, uint16_t handle,
- 				uint8_t channel, bthost_rfcomm_connect_cb func,
- 				void *user_data);
- 
-+typedef void (*bthost_rfcomm_channel_hook_func_t) (const void *data,
-+							uint16_t len,
-+							void *user_data);
-+
-+void bthost_add_rfcomm_channel_hook(struct bthost *bthost, uint16_t handle,
-+					uint8_t channel,
-+					bthost_rfcomm_channel_hook_func_t func,
-+					void *user_data);
-+
- void bthost_start(struct bthost *bthost);
- void bthost_stop(struct bthost *bthost);
+ 	if (server_data->expected_status == status)
+ 		tester_test_passed();
+@@ -698,6 +751,9 @@ int main(int argc, char *argv[])
+ 	test_rfcomm("Basic RFCOMM Socket Server - Write Success",
+ 				&listen_send_success, setup_powered_server,
+ 				test_server);
++	test_rfcomm("Basic RFCOMM Socket Server - Read Success",
++				&listen_read_success, setup_powered_server,
++				test_server);
+ 	test_rfcomm("Basic RFCOMM Socket Server - Conn Refused", &listen_nval,
+ 					setup_powered_server, test_server);
  
 -- 
 1.8.3.1
