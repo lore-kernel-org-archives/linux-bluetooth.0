@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 10/10] Bluetooth: Wait for SMP key distribution completion when pairing
-Date: Tue, 18 Feb 2014 17:44:45 +0200
-Message-Id: <1392738285-12143-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1392736479-8808-11-git-send-email-johan.hedberg@gmail.com>
-References: <1392736479-8808-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 10/10] Bluetooth: Wait for SMP key distribution completion when pairing
+Date: Tue, 18 Feb 2014 17:14:39 +0200
+Message-Id: <1392736479-8808-11-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
+References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -30,8 +30,6 @@ completed.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Fix passing correct status value to pairing_complete()
-
  include/net/bluetooth/hci_core.h |  1 +
  net/bluetooth/mgmt.c             | 27 +++++++++++++++++++++------
  net/bluetooth/smp.c              |  5 +++++
@@ -51,7 +49,7 @@ index 4461c0051228..64c4e3f0a515 100644
  /* HCI info for socket */
  #define hci_pi(sk) ((struct hci_pinfo *) sk)
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 90aac905a98b..f9ae72ca556d 100644
+index 90aac905a98b..58d7cc39f035 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
 @@ -2655,6 +2655,18 @@ static void pairing_complete(struct pending_cmd *cmd, u8 status)
@@ -67,7 +65,7 @@ index 90aac905a98b..f9ae72ca556d 100644
 +	if (!cmd)
 +		BT_DBG("Unable to find a pending command");
 +	else
-+		pairing_complete(cmd, status);
++		pairing_complete(cmd, mgmt_status(status));
 +}
 +
  static void pairing_complete_cb(struct hci_conn *conn, u8 status)
