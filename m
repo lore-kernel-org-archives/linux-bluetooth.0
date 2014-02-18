@@ -1,103 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: [PATCH BlueZ v2] gdbus: Fix incorrect DBusConnection reference counting
-Date: Tue, 18 Feb 2014 12:45:17 -0400
-Message-Id: <1392741917-1145-1-git-send-email-anderson.lizardo@openbossa.org>
-In-Reply-To: <1392052498-9229-2-git-send-email-anderson.lizardo@openbossa.org>
-References: <1392052498-9229-2-git-send-email-anderson.lizardo@openbossa.org>
+Date: Tue, 18 Feb 2014 18:29:26 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH 01/10] Bluetooth: Remove SMP data specific crypto context
+Message-ID: <20140218162926.GB13953@x220.p-661hnu-f1>
+References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
+ <1392736479-8808-2-git-send-email-johan.hedberg@gmail.com>
+ <596B741F-5844-4C49-BE66-5413510692C4@holtmann.org>
+ <20140218162438.GA13953@x220.p-661hnu-f1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140218162438.GA13953@x220.p-661hnu-f1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit abfc2b0dd5c3e33abfdf1a815b16d492c1751c06 attempted to fix a crash
-related to improper reference counting, but the main issue was that the
-reference was taken only during the function call (which is usually
-unnecessary for single thread), but still passed a pointer to
-DBusConnection to a function that is called by the mainloop. This left a
-window where the DBusConnection can be destroyed.
+Hi Marcel,
 
-Fixes this crash on unit/test-gdbus-client:
+On Tue, Feb 18, 2014, Johan Hedberg wrote:
+> > so I am curious now to what happens if we are running SMP and at the
+> > same time are doing RPA resolving. Can the same crypto context be used
+> > that way?
+> 
+> That's a fair point, and after a quick look through the crypto API it
+> seems like this might not be safe. A simple fix would be to ensure that
+> any access is between hci_dev_lock & hci_dev_unlock.
 
-==32642== Invalid read of size 4
-==32642==    at 0x690D0A6: dbus_connection_ref (in
-/lib/i386-linux-gnu/libdbus-1.so.3.7.6)
-==32642==    by 0x804CEDB: message_dispatch (mainloop.c:73)
-==32642==    by 0x684580E: g_timeout_dispatch (gmain.c:4450)
-==32642==    by 0x6844A75: g_main_context_dispatch (gmain.c:3065)
-==32642==    by 0x6844E14: g_main_context_iterate.isra.23 (gmain.c:3712)
-==32642==    by 0x68452FA: g_main_loop_run (gmain.c:3906)
-==32642==    by 0x804C7D3: client_connect_disconnect
-(test-gdbus-client.c:188)
-==32642==    by 0x6868DB2: g_test_run_suite_internal (gtestutils.c:2067)
-==32642==    by 0x6868F8D: g_test_run_suite_internal (gtestutils.c:2138)
-==32642==    by 0x6869320: g_test_run_suite (gtestutils.c:2189)
-==32642==    by 0x686936B: g_test_run (gtestutils.c:1508)
-==32642==    by 0x696D4D2: (below main) (libc-start.c:226)
-==32642==  Address 0x709c6e4 is 140 bytes inside a block of size 144
-free'd
-==32642==    at 0x67E806C: free (in
-/usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-==32642==    by 0x692D62E: dbus_free (in
-/lib/i386-linux-gnu/libdbus-1.so.3.7.6)
-==32642==    by 0x690E1C2: ??? (in
-/lib/i386-linux-gnu/libdbus-1.so.3.7.6)
-==32642==    by 0x804AAEC: destroy_context (test-gdbus-client.c:104)
-==32642==    by 0x6868DB2: g_test_run_suite_internal (gtestutils.c:2067)
-==32642==    by 0x6868F8D: g_test_run_suite_internal (gtestutils.c:2138)
-==32642==    by 0x6869320: g_test_run_suite (gtestutils.c:2189)
-==32642==    by 0x686936B: g_test_run (gtestutils.c:1508)
-==32642==    by 0x696D4D2: (below main) (libc-start.c:226)
----
- gdbus/mainloop.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+A quick check shows that all access external to smp.c is already done
+under the hdev lock but the two places internal to smp.c are not (both
+of which are from within workqueue callbacks, so taking the lock there
+should be safe). Do you agree that this is the simplest/best solution?
 
-diff --git a/gdbus/mainloop.c b/gdbus/mainloop.c
-index 099b67f..ec52554 100644
---- a/gdbus/mainloop.c
-+++ b/gdbus/mainloop.c
-@@ -70,8 +70,6 @@ static gboolean message_dispatch(void *data)
- {
- 	DBusConnection *conn = data;
- 
--	dbus_connection_ref(conn);
--
- 	/* Dispatch messages */
- 	while (dbus_connection_dispatch(conn) == DBUS_DISPATCH_DATA_REMAINS);
- 
-@@ -84,7 +82,8 @@ static inline void queue_dispatch(DBusConnection *conn,
- 						DBusDispatchStatus status)
- {
- 	if (status == DBUS_DISPATCH_DATA_REMAINS)
--		g_timeout_add(DISPATCH_TIMEOUT, message_dispatch, conn);
-+		g_timeout_add(DISPATCH_TIMEOUT, message_dispatch,
-+						dbus_connection_ref(conn));
- }
- 
- static gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
-@@ -92,9 +91,6 @@ static gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- 	struct watch_info *info = data;
- 	unsigned int flags = 0;
- 	DBusDispatchStatus status;
--	DBusConnection *conn;
--
--	conn = dbus_connection_ref(info->conn);
- 
- 	if (cond & G_IO_IN)  flags |= DBUS_WATCH_READABLE;
- 	if (cond & G_IO_OUT) flags |= DBUS_WATCH_WRITABLE;
-@@ -103,10 +99,8 @@ static gboolean watch_func(GIOChannel *chan, GIOCondition cond, gpointer data)
- 
- 	dbus_watch_handle(info->watch, flags);
- 
--	status = dbus_connection_get_dispatch_status(conn);
--	queue_dispatch(conn, status);
--
--	dbus_connection_unref(conn);
-+	status = dbus_connection_get_dispatch_status(info->conn);
-+	queue_dispatch(info->conn, status);
- 
- 	return TRUE;
- }
--- 
-1.8.5.3
-
+Johan
