@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/10] Bluetooth: Fix hci_remove_ltk failure when no match is found
-Date: Tue, 18 Feb 2014 17:14:33 +0200
-Message-Id: <1392736479-8808-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 02/10] Bluetooth: Fix missing address type check for removing LTKs
+Date: Tue, 18 Feb 2014 17:14:31 +0200
+Message-Id: <1392736479-8808-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
 References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,40 +11,76 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There is code (in mgmt.c) that depends on the hci_remove_ltk function to
-fail if no match is found. This patch adds tracking of removed LTKs
-(there can be up to two: one for master and another for slave) in the
-hci_remove_ltk function and returns -ENOENT of no matches were found.
+When removing Long Term Keys we should also be checking that the given
+address type (public vs random) matches. This patch updates the
+hci_remove_ltk function to take an extra parameter and uses it for
+address type matching.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_core.c         |  4 ++--
+ net/bluetooth/mgmt.c             | 14 +++++++++++---
+ 3 files changed, 14 insertions(+), 6 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 86ea4bab9e77..ab94abdeb3c1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -792,7 +792,7 @@ int hci_add_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type, u8 type,
+ 		__le16 ediv, u8 rand[8]);
+ struct smp_ltk *hci_find_ltk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 				     u8 addr_type, bool master);
+-int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr);
++int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type);
+ int hci_smp_ltks_clear(struct hci_dev *hdev);
+ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fd5bb4086613..69b7145bfce2 100644
+index 59a76b2566eb..957c8f4cc4c7 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2807,6 +2807,7 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
- int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
- {
- 	struct smp_ltk *k, *tmp;
-+	int removed = 0;
- 
- 	list_for_each_entry_safe(k, tmp, &hdev->long_term_keys, list) {
- 		if (bacmp(bdaddr, &k->bdaddr) || k->bdaddr_type != bdaddr_type)
-@@ -2816,9 +2817,10 @@ int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
- 
- 		list_del(&k->list);
- 		kfree(k);
-+		removed++;
- 	}
- 
--	return 0;
-+	return removed ? 0 : -ENOENT;
+@@ -2810,12 +2810,12 @@ int hci_remove_link_key(struct hci_dev *hdev, bdaddr_t *bdaddr)
+ 	return 0;
  }
  
- /* HCI command timer function */
+-int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr)
++int hci_remove_ltk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 bdaddr_type)
+ {
+ 	struct smp_ltk *k, *tmp;
+ 
+ 	list_for_each_entry_safe(k, tmp, &hdev->long_term_keys, list) {
+-		if (bacmp(bdaddr, &k->bdaddr))
++		if (bacmp(bdaddr, &k->bdaddr) || k->bdaddr_type != bdaddr_type)
+ 			continue;
+ 
+ 		BT_DBG("%s removing %pMR", hdev->name, bdaddr);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 782e2bb10881..473f8687b28b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2318,10 +2318,18 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	if (cp->addr.type == BDADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR) {
+ 		err = hci_remove_link_key(hdev, &cp->addr.bdaddr);
+-	else
+-		err = hci_remove_ltk(hdev, &cp->addr.bdaddr);
++	} else {
++		u8 addr_type;
++
++		if (cp->addr.type == BDADDR_LE_PUBLIC)
++			addr_type = ADDR_LE_DEV_PUBLIC;
++		else
++			addr_type = ADDR_LE_DEV_RANDOM;
++
++		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
++	}
+ 
+ 	if (err < 0) {
+ 		err = cmd_complete(sk, hdev->id, MGMT_OP_UNPAIR_DEVICE,
 -- 
 1.8.5.3
 
