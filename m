@@ -1,27 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH BlueZ v6 00/18] GATT API: External Services
+Subject: Re: [PATCH 01/10] Bluetooth: Remove SMP data specific crypto context
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Tue, 18 Feb 2014 09:44:51 -0800
+In-Reply-To: <20140218162926.GB13953@x220.p-661hnu-f1>
+Date: Tue, 18 Feb 2014 09:34:52 -0800
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <B6CE0C86-8DC9-45D1-8022-78ED9D83B96F@holtmann.org>
-References: <1390854924-31904-1-git-send-email-claudio.takahasi@openbossa.org> <1391536429-8345-1-git-send-email-claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Message-Id: <9C127AAF-9ED4-4D34-8604-A113005AEB60@holtmann.org>
+References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com> <1392736479-8808-2-git-send-email-johan.hedberg@gmail.com> <596B741F-5844-4C49-BE66-5413510692C4@holtmann.org> <20140218162438.GA13953@x220.p-661hnu-f1> <20140218162926.GB13953@x220.p-661hnu-f1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Johan,
 
-> This patchset implements the minimal support for adding local services
-> declarations.
+>>> so I am curious now to what happens if we are running SMP and at the
+>>> same time are doing RPA resolving. Can the same crypto context be used
+>>> that way?
+>> 
+>> That's a fair point, and after a quick look through the crypto API it
+>> seems like this might not be safe. A simple fix would be to ensure that
+>> any access is between hci_dev_lock & hci_dev_unlock.
 > 
-> Limitation: Remove services and multiple services exported by the same
-> remote will be implemented the next series.
+> A quick check shows that all access external to smp.c is already done
+> under the hdev lock but the two places internal to smp.c are not (both
+> of which are from within workqueue callbacks, so taking the lock there
+> should be safe). Do you agree that this is the simplest/best solution?
 
-what is the deal with this unix socket you are using for local access? I think we should remove that functionality and keep it simple in the beginning.
+since we always do only one AES round anyway, that seems to be a good solution to this.
 
 Regards
 
