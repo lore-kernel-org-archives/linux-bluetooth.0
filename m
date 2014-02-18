@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/9] Bluetooth: Enable support for remote IRK distribution
-Date: Tue, 18 Feb 2014 10:19:36 +0200
-Message-Id: <1392711577-31431-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 7/9] Bluetooth: Implement mgmt_load_irks command
+Date: Tue, 18 Feb 2014 10:19:35 +0200
+Message-Id: <1392711577-31431-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1392711577-31431-1-git-send-email-johan.hedberg@gmail.com>
 References: <1392711577-31431-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,163 +11,157 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch does the necessary changes to request the remote device to
-distribute its IRK to us during the SMP pairing procedure. This includes
-setting the right key distribution values in the pairing
-request/response and handling of the two related SMP PDUs, i.e. Identity
-Information and Identity Address Information.
+This patch implements the Load IRKs command for the management
+interface. The command is used to load the kernel with the initial set
+of IRKs. It also sets a HCI_RPA_RESOLVING flag to indicate that we can
+start requesting devices to distribute their IRK to us.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++-----
- net/bluetooth/smp.h |  4 +++
- 2 files changed, 77 insertions(+), 7 deletions(-)
+ include/net/bluetooth/hci.h  |  1 +
+ include/net/bluetooth/mgmt.h | 12 +++++++
+ net/bluetooth/mgmt.c         | 79 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 92 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 5f500b479f45..024baa789eb9 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -249,31 +249,42 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 			      struct smp_cmd_pairing *req,
- 			      struct smp_cmd_pairing *rsp, __u8 authreq)
- {
--	u8 dist_keys = 0;
-+	struct smp_chan *smp = conn->smp_chan;
-+	struct hci_conn *hcon = conn->hcon;
-+	struct hci_dev *hdev = hcon->hdev;
-+	u8 local_dist = 0, remote_dist = 0;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 352d3d7d06bb..d3a8fff50f69 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -125,6 +125,7 @@ enum {
+ 	HCI_SSP_ENABLED,
+ 	HCI_SC_ENABLED,
+ 	HCI_SC_ONLY,
++	HCI_RPA_RESOLVING,
+ 	HCI_HS_ENABLED,
+ 	HCI_LE_ENABLED,
+ 	HCI_ADVERTISING,
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 4303fa90b7c1..e4fa13e559e2 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -389,6 +389,18 @@ struct mgmt_cp_set_scan_params {
  
- 	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags)) {
--		dist_keys = SMP_DIST_ENC_KEY;
-+		local_dist = SMP_DIST_ENC_KEY;
-+		remote_dist = SMP_DIST_ENC_KEY;
- 		authreq |= SMP_AUTH_BONDING;
- 	} else {
- 		authreq &= ~SMP_AUTH_BONDING;
- 	}
+ #define MGMT_OP_SET_DEBUG_KEYS		0x002E
  
-+	if (test_bit(HCI_RPA_RESOLVING, &hdev->dev_flags))
-+		remote_dist |= SMP_DIST_ID_KEY;
++struct mgmt_irk_info {
++	struct mgmt_addr_info addr;
++	__u8 val[16];
++} __packed;
 +
- 	if (rsp == NULL) {
- 		req->io_capability = conn->hcon->io_capability;
- 		req->oob_flag = SMP_OOB_NOT_PRESENT;
- 		req->max_key_size = SMP_MAX_ENC_KEY_SIZE;
--		req->init_key_dist = dist_keys;
--		req->resp_key_dist = dist_keys;
-+		req->init_key_dist = local_dist;
-+		req->resp_key_dist = remote_dist;
- 		req->auth_req = (authreq & AUTH_REQ_MASK);
++#define MGMT_OP_LOAD_IRKS		0x0030
++struct mgmt_cp_load_irks {
++	__le16 irk_count;
++	struct mgmt_irk_info irks[0];
++} __packed;
++#define MGMT_LOAD_IRKS_SIZE		2
 +
-+		smp->remote_key_dist = remote_dist;
- 		return;
- 	}
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 70bef3d5db57..782e2bb10881 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -81,6 +81,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_SCAN_PARAMS,
+ 	MGMT_OP_SET_SECURE_CONN,
+ 	MGMT_OP_SET_DEBUG_KEYS,
++	MGMT_OP_LOAD_IRKS,
+ };
  
- 	rsp->io_capability = conn->hcon->io_capability;
- 	rsp->oob_flag = SMP_OOB_NOT_PRESENT;
- 	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
--	rsp->init_key_dist = req->init_key_dist & dist_keys;
--	rsp->resp_key_dist = req->resp_key_dist & dist_keys;
-+	rsp->init_key_dist = req->init_key_dist & remote_dist;
-+	rsp->resp_key_dist = req->resp_key_dist & local_dist;
- 	rsp->auth_req = (authreq & AUTH_REQ_MASK);
-+
-+	smp->remote_key_dist = rsp->init_key_dist;
+ static const u16 mgmt_events[] = {
+@@ -4158,6 +4159,82 @@ unlock:
+ 	return err;
  }
  
- static u8 check_enc_key_size(struct l2cap_conn *conn, __u8 max_key_size)
-@@ -907,12 +918,61 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
- 	hci_add_ltk(hdev, &hcon->dst, hcon->dst_type, HCI_SMP_LTK, 1,
- 		    authenticated, smp->tk, smp->enc_key_size,
- 		    rp->ediv, rp->rand);
--	smp_distribute_keys(conn, 1);
-+	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
-+		smp_distribute_keys(conn, 1);
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
- }
- 
-+static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
++static bool irk_is_valid(struct mgmt_irk_info *irk)
 +{
-+	struct smp_cmd_ident_info *info = (void *) skb->data;
-+	struct smp_chan *smp = conn->smp_chan;
++	switch (irk->addr.type) {
++	case BDADDR_LE_PUBLIC:
++		return true;
 +
-+	BT_DBG("");
++	case BDADDR_LE_RANDOM:
++		/* Two most significant bits shall be set */
++		if ((irk->addr.bdaddr.b[5] & 0xc0) != 0xc0)
++			return false;
++		return true;
++	}
 +
-+	if (skb->len < sizeof(*info))
-+		return SMP_UNSPECIFIED;
-+
-+	skb_pull(skb, sizeof(*info));
-+
-+	memcpy(smp->irk, info->irk, 16);
-+
-+	return 0;
++	return false;
 +}
 +
-+static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
-+				   struct sk_buff *skb)
++static int load_irks(struct sock *sk, struct hci_dev *hdev, void *cp_data,
++		     u16 len)
 +{
-+	struct smp_cmd_ident_addr_info *info = (void *) skb->data;
-+	struct smp_chan *smp = conn->smp_chan;
-+	struct hci_conn *hcon = conn->hcon;
-+	bdaddr_t rpa;
++	struct mgmt_cp_load_irks *cp = cp_data;
++	u16 irk_count, expected_len;
++	int i, err;
 +
-+	BT_DBG("");
++	BT_DBG("request for %s", hdev->name);
 +
-+	if (skb->len < sizeof(*info))
-+		return SMP_UNSPECIFIED;
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_LOAD_IRKS,
++				  MGMT_STATUS_NOT_SUPPORTED);
 +
-+	skb_pull(skb, sizeof(*info));
++	irk_count = __le16_to_cpu(cp->irk_count);
 +
-+	bacpy(&smp->id_addr, &info->bdaddr);
-+	smp->id_addr_type = info->addr_type;
++	expected_len = sizeof(*cp) + irk_count * sizeof(struct mgmt_irk_info);
++	if (expected_len != len) {
++		BT_ERR("load_irks: expected %u bytes, got %u bytes",
++		       len, expected_len);
++		return cmd_status(sk, hdev->id, MGMT_OP_LOAD_IRKS,
++				  MGMT_STATUS_INVALID_PARAMS);
++	}
 +
-+	if (hci_bdaddr_is_rpa(&hcon->dst, hcon->dst_type))
-+		bacpy(&rpa, &hcon->dst);
-+	else
-+		bacpy(&rpa, BDADDR_ANY);
++	BT_DBG("%s irk_count %u", hdev->name, irk_count);
 +
-+	hci_add_irk(conn->hcon->hdev, &smp->id_addr, smp->id_addr_type,
-+		    smp->irk, &rpa);
++	for (i = 0; i < irk_count; i++) {
++		struct mgmt_irk_info *key = &cp->irks[i];
 +
-+	smp_distribute_keys(conn, 1);
++		if (!irk_is_valid(key))
++			return cmd_status(sk, hdev->id,
++					  MGMT_OP_LOAD_IRKS,
++					  MGMT_STATUS_INVALID_PARAMS);
++	}
 +
-+	return 0;
++	hci_dev_lock(hdev);
++
++	hci_smp_irks_clear(hdev);
++
++	for (i = 0; i < irk_count; i++) {
++		struct mgmt_irk_info *irk = &cp->irks[i];
++		u8 addr_type;
++
++		if (irk->addr.type == BDADDR_LE_PUBLIC)
++			addr_type = ADDR_LE_DEV_PUBLIC;
++		else
++			addr_type = ADDR_LE_DEV_RANDOM;
++
++		hci_add_irk(hdev, &irk->addr.bdaddr, addr_type, irk->val,
++			    BDADDR_ANY);
++	}
++
++	set_bit(HCI_RPA_RESOLVING, &hdev->dev_flags);
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_LOAD_IRKS, 0, NULL, 0);
++
++	hci_dev_unlock(hdev);
++
++	return err;
 +}
 +
- int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
+ static bool ltk_is_valid(struct mgmt_ltk_info *key)
  {
- 	struct hci_conn *hcon = conn->hcon;
-@@ -987,7 +1047,13 @@ int smp_sig_channel(struct l2cap_conn *conn, struct sk_buff *skb)
- 		break;
+ 	if (key->master != 0x00 && key->master != 0x01)
+@@ -4296,6 +4373,8 @@ static const struct mgmt_handler {
+ 	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
+ 	{ set_secure_conn,        false, MGMT_SETTING_SIZE },
+ 	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
++	{ },
++	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
+ };
  
- 	case SMP_CMD_IDENT_INFO:
-+		reason = smp_cmd_ident_info(conn, skb);
-+		break;
-+
- 	case SMP_CMD_IDENT_ADDR_INFO:
-+		reason = smp_cmd_ident_addr_info(conn, skb);
-+		break;
-+
- 	case SMP_CMD_SIGN_INFO:
- 		/* Just ignored */
- 		reason = 0;
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index 950d039c2ea2..4f373bc56ad7 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -128,6 +128,10 @@ struct smp_chan {
- 	u8		pcnf[16]; /* SMP Pairing Confirm */
- 	u8		tk[16]; /* SMP Temporary Key */
- 	u8		enc_key_size;
-+	u8		remote_key_dist;
-+	bdaddr_t	id_addr;
-+	u8		id_addr_type;
-+	u8		irk[16];
- 	unsigned long	smp_flags;
- 	struct crypto_blkcipher	*tfm;
- 	struct work_struct confirm;
+ 
 -- 
 1.8.5.3
 
