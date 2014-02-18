@@ -1,208 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC v10 06/10] Bluetooth: Introduce LE auto connection infrastructure
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392754534-12747-6-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 18 Feb 2014 12:52:06 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <9E70336A-B971-4FBB-A185-0F28BE27A5F5@holtmann.org>
-References: <1392754534-12747-1-git-send-email-andre.guedes@openbossa.org> <1392754534-12747-6-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 04/13] android/hal-avrcp: Add .list_player_app_attr_rsp implementation
+Date: Tue, 18 Feb 2014 21:36:42 +0100
+Message-ID: <2008771.ZWhGLGZVZA@athlon>
+In-Reply-To: <1392733470-22736-4-git-send-email-luiz.dentz@gmail.com>
+References: <1392733470-22736-1-git-send-email-luiz.dentz@gmail.com> <1392733470-22736-4-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Luiz,
 
-> This patch introduces the LE auto connection infrastructure which
-> will be used to implement the LE auto connection options.
+On Tuesday 18 February 2014 16:24:21 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> In summary, the auto connection mechanism works as follows: Once the
-> first pending LE connection is created, the background scanning is
-> started. When the target device is found in range, the kernel
-> autonomously starts the connection attempt. If connection is
-> established successfully, that pending LE connection is deleted and
-> the background is stopped.
-> 
-> To achieve that, this patch introduces the hci_update_background_scan()
-> which controls the background scanning state. This function starts or
-> stops the background scanning based on the hdev->pend_le_conns list. If
-> there is no pending LE connection, the background scanning is stopped.
-> Otherwise, we start the background scanning.
-> 
-> Then, every time a pending LE connection is added we call hci_update_
-> background_scan() so the background scanning is started (in case it is
-> not already running). Likewise, every time a pending LE connection is
-> deleted we call hci_update_background_scan() so the background scanning
-> is stopped (in case this was the last pending LE connection) or it is
-> started again (in case we have more pending LE connections). Finally,
-> we also call hci_update_background_scan() in hci_le_conn_failed() so
-> the background scan is restarted in case the connection establishment
-> fails. This way the background scanning keeps running until all pending
-> LE connection are established.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h |  2 +
-> net/bluetooth/hci_conn.c         |  5 +++
-> net/bluetooth/hci_core.c         | 83 +++++++++++++++++++++++++++++++++++++++-
-> net/bluetooth/hci_event.c        | 44 +++++++++++++++++++++
-> 4 files changed, 132 insertions(+), 2 deletions(-)
+>  android/hal-avrcp.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index f0617ab..297b954 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -788,6 +788,8 @@ void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
-> void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
-> void hci_pend_le_conns_clear(struct hci_dev *hdev);
+> diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
+> index 9937a11..244f77a 100644
+> --- a/android/hal-avrcp.c
+> +++ b/android/hal-avrcp.c
+> @@ -18,6 +18,7 @@
+>  #include <stdbool.h>
+>  #include <stddef.h>
+>  #include <string.h>
+> +#include <stdlib.h>
 > 
-> +void hci_update_background_scan(struct hci_dev *hdev);
-> +
-> void hci_uuids_clear(struct hci_dev *hdev);
+>  #include "hal-log.h"
+>  #include "hal.h"
+> @@ -74,6 +75,36 @@ static bt_status_t get_play_status_rsp(btrc_play_status_t
+> status, sizeof(cmd), &cmd, 0, NULL, NULL);
+>  }
 > 
-> void hci_link_keys_clear(struct hci_dev *hdev);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 0ae7692..e291d68 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -527,6 +527,11 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
-> 	hci_proto_connect_cfm(conn, status);
-> 
-> 	hci_conn_del(conn);
-> +
-> +	/* Since we may have temporarily stopped the background scanning in
-> +	 * favor of connection establishment, we should restart it.
-> +	 */
-> +	hci_update_background_scan(hdev);
-> }
-> 
-> static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 992f9ea..18ef960 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3114,7 +3114,7 @@ void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-> 
-> 	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
-> 	if (entry)
-> -		return;
-> +		goto done;
-> 
-> 	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-> 	if (!entry) {
-> @@ -3128,6 +3128,9 @@ void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-> 	list_add(&entry->list, &hdev->pend_le_conns);
-> 
-> 	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-> +
-> +done:
-> +	hci_update_background_scan(hdev);
-> }
-> 
-> /* This function requires the caller holds hdev->lock */
-> @@ -3137,12 +3140,15 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-> 
-> 	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
-> 	if (!entry)
-> -		return;
-> +		goto done;
-> 
-> 	list_del(&entry->list);
-> 	kfree(entry);
-> 
-> 	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-> +
-> +done:
-> +	hci_update_background_scan(hdev);
-> }
-> 
-> /* This function requires the caller holds hdev->lock */
-> @@ -4706,3 +4712,76 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
-> 	cp.enable = LE_SCAN_DISABLE;
-> 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
-> }
-> +
-> +static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
+> +static bt_status_t list_player_app_attr_rsp(int num_attr,
+> +						btrc_player_attr_t *p_attrs)
 > +{
-> +	if (status)
-> +		BT_DBG("HCI request failed to update background scanning: "
-> +		       "status 0x%2.2x", status);
+> +	struct hal_cmd_avrcp_list_player_attrs *cmd;
+> +	bt_status_t status;
+> +	size_t len;
+> +
+> +	DBG("");
+> +
+> +	if (!interface_ready())
+> +		return BT_STATUS_NOT_READY;
+> +
+> +	if (num_attr < 0)
+> +		return BT_STATUS_PARM_INVALID;
+> +
+> +	len = sizeof(*cmd) + num_attr;
+> +	cmd = malloc(len);
+> +
+
+We should check for allocation error (highly unlikely though) here and return 
+error status. Other option would be to use VLA or fixed size array for buffer.
+
+(same goes for other HAL functions implementations in this serie)
+
+> +	cmd->number = num_attr;
+> +	memcpy(cmd->attrs, p_attrs, num_attr);
+> +
+> +	status =  hal_ipc_cmd(HAL_SERVICE_ID_AVRCP,
+> +					HAL_OP_AVRCP_LIST_PLAYER_ATTRS,
+> +					len, cmd, 0, NULL, NULL);
+> +
+> +	free(cmd);
+> +
+> +	return status;
 > +}
 > +
-> +/* This function controls the background scanning based on hdev->pend_le_conns
-> + * list. If there are pending LE connection we start the background scanning,
-> + * otherwise we stop it.
-> + *
-> + * This function requires the caller holds hdev->lock.
-> + */
-> +void hci_update_background_scan(struct hci_dev *hdev)
-> +{
-> +	struct hci_cp_le_set_scan_param param_cp;
-> +	struct hci_cp_le_set_scan_enable enable_cp;
-> +	struct hci_request req;
-> +	struct hci_conn *conn;
-> +	int err;
-> +
-> +	hci_req_init(&req, hdev);
-> +
-> +	if (list_empty(&hdev->pend_le_conns)) {
-> +		/* If there is no pending LE connections, we should stop
-> +		 * the background scanning.
-> +		 */
-> +
-> +		/* If controller is not scanning we are done. */
-> +		if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-> +			return;
-> +
-> +		hci_req_add_le_scan_disable(&req);
-> +
-> +		BT_DBG("%s stopping background scanning", hdev->name);
-> +	} else {
-> +		/* If there is at least one pending LE connection, we should
-> +		 * keep the background scan running.
-> +		 */
-> +
-> +		/* If controller is already scanning we are done. */
-> +		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-> +			return;
-> +
-> +		/* If controller is connecting, we should not start scanning
-> +		 * since some controllers are not able to scan and connect at
-> +		 * the same time.
-> +		 */
-> +		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-> +		if (conn)
-> +			return;
-> +
-> +		memset(&param_cp, 0, sizeof(param_cp));
-> +		param_cp.type = LE_SCAN_PASSIVE;
-> +		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
-> +		param_cp.window = cpu_to_le16(hdev->le_scan_window);
-> +		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-> +			    &param_cp);
-> +
-> +		memset(&enable_cp, 0, sizeof(enable_cp));
-> +		enable_cp.enable = LE_SCAN_ENABLE;
-> +		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
-> +		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-> +			    &enable_cp);
-> +
-> +		BT_DBG("%s starting background scanning", hdev->name);
-> +	}
+>  static void cleanup()
+>  {
+>  	struct hal_cmd_unregister_module cmd;
+> @@ -97,6 +128,7 @@ static btrc_interface_t iface = {
+>  	.size = sizeof(iface),
+>  	.init = init,
+>  	.get_play_status_rsp = get_play_status_rsp,
+> +	.list_player_app_attr_rsp = list_player_app_attr_rsp,
+>  	.cleanup = cleanup
+>  };
 
-so I was inclined to take the whole patch set as it is, but this code is not useful at all at the moment.
-
-Disabling the duplicate filter is a horrible idea. I just have my controller going crazy. I rather background scan with the filter enabled and then from time to time disable scanning and start it again to make sure that new devices are captured. This idea of reporting everything up to the host every single time is insane.
-
-Also we need to fine tune the scan_interval and scan_window we use for connection attempts for background scanning. This is just crazy. We have a mgmt command that lets us configure these values. So please make sure that it integrates with the background scanning and allows us to change these parameters on the fly. I want to see what kind of difference different values make.
-
-There is a difference between we lost our link and want to reconnect as quickly as possible. And hey, we have some devices that we might want to connect to. When you find it, go ahead and connect, but no hurry type of connection establishment.
-
-And most importantly. Make sure this works with the RPA resolving work that we just merged. I am testing this against my iPhone and auto-connect is not picking up my public identity address.
-
-Regards
-
-Marcel
-
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
