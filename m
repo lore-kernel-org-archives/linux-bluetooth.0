@@ -1,88 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/9] Bluetooth: Add AES crypto context for each HCI device
-Date: Tue, 18 Feb 2014 10:19:32 +0200
-Message-Id: <1392711577-31431-4-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1392711577-31431-1-git-send-email-johan.hedberg@gmail.com>
-References: <1392711577-31431-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/9] Bluetooth: Fix missing PDU length checks for SMP
+Date: Tue, 18 Feb 2014 10:19:29 +0200
+Message-Id: <1392711577-31431-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Previously the crypto context has only been available for LE SMP
-sessions, but now that we'll need to perform operations also during
-discovery it makes sense to have this context part of the hci_dev
-struct. Later, the context can be removed from the SMP context.
+For each received SMP PDU we need to check that we have enough data to
+fit the specified size of the PDU. This patch adds the necessary checks
+for each SMP PDU handler and ensures that buffer overflows do not occur
+if to little data has been received.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 15 ++++++++++++++-
- 2 files changed, 15 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 92fa75fce29d..b344890b18f5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -259,6 +259,7 @@ struct hci_dev {
- 	__u32			req_status;
- 	__u32			req_result;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index efe51ccdc615..1730bb2b6259 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -565,6 +565,9 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
  
-+	struct crypto_blkcipher	*tfm_aes;
+ 	BT_DBG("conn %p", conn);
  
- 	struct discovery_state	discovery;
- 	struct hci_conn_hash	conn_hash;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b40d52446f8f..cd1cd7da3235 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -29,6 +29,7 @@
- #include <linux/idr.h>
- #include <linux/rfkill.h>
- #include <linux/debugfs.h>
-+#include <linux/crypto.h>
- #include <asm/unaligned.h>
- 
- #include <net/bluetooth/bluetooth.h>
-@@ -3205,9 +3206,16 @@ int hci_register_dev(struct hci_dev *hdev)
- 
- 	dev_set_name(&hdev->dev, "%s", hdev->name);
- 
-+	hdev->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0,
-+					       CRYPTO_ALG_ASYNC);
-+	if (IS_ERR(hdev->tfm_aes)) {
-+		BT_ERR("Unable to create crypto context");
-+		goto err_wqueue;
-+	}
++	if (skb->len < sizeof(*req))
++		return SMP_UNSPECIFIED;
 +
- 	error = device_add(&hdev->dev);
- 	if (error < 0)
--		goto err_wqueue;
-+		goto err_tfm;
+ 	if (conn->hcon->link_mode & HCI_LM_MASTER)
+ 		return SMP_CMD_NOTSUPP;
  
- 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
- 				    RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops,
-@@ -3243,6 +3251,8 @@ int hci_register_dev(struct hci_dev *hdev)
+@@ -617,6 +620,9 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
  
- 	return id;
+ 	BT_DBG("conn %p", conn);
  
-+err_tfm:
-+	crypto_free_blkcipher(hdev->tfm_aes);
- err_wqueue:
- 	destroy_workqueue(hdev->workqueue);
- 	destroy_workqueue(hdev->req_workqueue);
-@@ -3293,6 +3303,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 		rfkill_destroy(hdev->rfkill);
- 	}
- 
-+	if (hdev->tfm_aes)
-+		crypto_free_blkcipher(hdev->tfm_aes);
++	if (skb->len < sizeof(*rsp))
++		return SMP_UNSPECIFIED;
 +
- 	device_del(&hdev->dev);
+ 	if (!(conn->hcon->link_mode & HCI_LM_MASTER))
+ 		return SMP_CMD_NOTSUPP;
  
- 	debugfs_remove_recursive(hdev->debugfs);
+@@ -661,6 +667,9 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
+ 
++	if (skb->len < sizeof(smp->pcnf))
++		return SMP_UNSPECIFIED;
++
+ 	memcpy(smp->pcnf, skb->data, sizeof(smp->pcnf));
+ 	skb_pull(skb, sizeof(smp->pcnf));
+ 
+@@ -686,6 +695,9 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	BT_DBG("conn %p", conn);
+ 
++	if (skb->len < sizeof(smp->rrnd))
++		return SMP_UNSPECIFIED;
++
+ 	swap128(skb->data, smp->rrnd);
+ 	skb_pull(skb, sizeof(smp->rrnd));
+ 
+@@ -725,6 +737,9 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	BT_DBG("conn %p", conn);
+ 
++	if (skb->len < sizeof(*rp))
++		return SMP_UNSPECIFIED;
++
+ 	if (!(conn->hcon->link_mode & HCI_LM_MASTER))
+ 		return SMP_CMD_NOTSUPP;
+ 
+@@ -814,6 +829,11 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct smp_cmd_encrypt_info *rp = (void *) skb->data;
+ 	struct smp_chan *smp = conn->smp_chan;
+ 
++	BT_DBG("conn %p", conn);
++
++	if (skb->len < sizeof(*rp))
++		return SMP_UNSPECIFIED;
++
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	memcpy(smp->tk, rp->ltk, sizeof(smp->tk));
+@@ -829,6 +849,11 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct hci_conn *hcon = conn->hcon;
+ 	u8 authenticated;
+ 
++	BT_DBG("conn %p", conn);
++
++	if (skb->len < sizeof(*rp))
++		return SMP_UNSPECIFIED;
++
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	hci_dev_lock(hdev);
 -- 
 1.8.5.3
 
