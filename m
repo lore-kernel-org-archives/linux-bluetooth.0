@@ -1,66 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Michael Knudsen <m.knudsen@samsung.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Michael Knudsen <m.knudsen@samsung.com>
-Subject: [PATCH] Bluetooth:  Stop BCSP/H5 timer before cleaning up
-Date: Tue, 18 Feb 2014 09:48:08 +0100
-Message-id: <1392713288-12227-1-git-send-email-m.knudsen@samsung.com>
+Subject: [PATCH v2] Bluetooth: Add AES crypto context for each HCI device
+Date: Tue, 18 Feb 2014 10:40:07 +0200
+Message-Id: <1392712807-4565-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1392711577-31431-4-git-send-email-johan.hedberg@gmail.com>
+References: <1392711577-31431-4-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When stopping BCSP/H5, stop the retransmission timer before proceeding
-to clean up packet queues.  The previous code had a race condition where
-the timer could trigger after the packet lists and protocol structure
-had been removed which lead to dereferencing NULL or use-after-free bugs.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Signed-off-by: Michael Knudsen <m.knudsen@samsung.com>
-Reported-by: Kirill Tkhai <ktkhai@parallels.com>
+Previously the crypto context has only been available for LE SMP
+sessions, but now that we'll need to perform operations also during
+discovery it makes sense to have this context part of the hci_dev
+struct. Later, the context can be removed from the SMP context.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- drivers/bluetooth/hci_bcsp.c |    4 +++-
- drivers/bluetooth/hci_h5.c   |    4 ++--
- 2 files changed, 5 insertions(+), 3 deletions(-)
+v2: Properly initialize "error" if crypto init fails
 
-diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 0bc87f7..eee2fb2 100644
---- a/drivers/bluetooth/hci_bcsp.c
-+++ b/drivers/bluetooth/hci_bcsp.c
-@@ -715,6 +715,9 @@ static int bcsp_open(struct hci_uart *hu)
- static int bcsp_close(struct hci_uart *hu)
- {
- 	struct bcsp_struct *bcsp = hu->priv;
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 17 ++++++++++++++++-
+ 2 files changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 92fa75fce29d..b344890b18f5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -259,6 +259,7 @@ struct hci_dev {
+ 	__u32			req_status;
+ 	__u32			req_result;
+ 
++	struct crypto_blkcipher	*tfm_aes;
+ 
+ 	struct discovery_state	discovery;
+ 	struct hci_conn_hash	conn_hash;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b40d52446f8f..df25af5502ef 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -29,6 +29,7 @@
+ #include <linux/idr.h>
+ #include <linux/rfkill.h>
+ #include <linux/debugfs.h>
++#include <linux/crypto.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -3205,9 +3206,18 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	dev_set_name(&hdev->dev, "%s", hdev->name);
+ 
++	hdev->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0,
++					       CRYPTO_ALG_ASYNC);
++	if (IS_ERR(hdev->tfm_aes)) {
++		BT_ERR("Unable to create crypto context");
++		error = PTR_ERR(hdev->tfm_aes);
++		hdev->tfm_aes = NULL;
++		goto err_wqueue;
++	}
 +
-+	del_timer_sync(&bcsp->tbcsp);
+ 	error = device_add(&hdev->dev);
+ 	if (error < 0)
+-		goto err_wqueue;
++		goto err_tfm;
+ 
+ 	hdev->rfkill = rfkill_alloc(hdev->name, &hdev->dev,
+ 				    RFKILL_TYPE_BLUETOOTH, &hci_rfkill_ops,
+@@ -3243,6 +3253,8 @@ int hci_register_dev(struct hci_dev *hdev)
+ 
+ 	return id;
+ 
++err_tfm:
++	crypto_free_blkcipher(hdev->tfm_aes);
+ err_wqueue:
+ 	destroy_workqueue(hdev->workqueue);
+ 	destroy_workqueue(hdev->req_workqueue);
+@@ -3293,6 +3305,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 		rfkill_destroy(hdev->rfkill);
+ 	}
+ 
++	if (hdev->tfm_aes)
++		crypto_free_blkcipher(hdev->tfm_aes);
 +
- 	hu->priv = NULL;
+ 	device_del(&hdev->dev);
  
- 	BT_DBG("hu %p", hu);
-@@ -722,7 +725,6 @@ static int bcsp_close(struct hci_uart *hu)
- 	skb_queue_purge(&bcsp->unack);
- 	skb_queue_purge(&bcsp->rel);
- 	skb_queue_purge(&bcsp->unrel);
--	del_timer(&bcsp->tbcsp);
- 
- 	kfree(bcsp);
- 	return 0;
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index f6f4974..afd759e 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -206,12 +206,12 @@ static int h5_close(struct hci_uart *hu)
- {
- 	struct h5 *h5 = hu->priv;
- 
-+	del_timer_sync(&h5->timer);
-+
- 	skb_queue_purge(&h5->unack);
- 	skb_queue_purge(&h5->rel);
- 	skb_queue_purge(&h5->unrel);
- 
--	del_timer(&h5->timer);
--
- 	kfree(h5);
- 
- 	return 0;
+ 	debugfs_remove_recursive(hdev->debugfs);
 -- 
-1.7.9.5
+1.8.5.3
 
