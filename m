@@ -1,36 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v2] Bluetooth: Add AES crypto context for each HCI device
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392712807-4565-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 18 Feb 2014 00:54:36 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <B49F7AB2-0C1B-4C8A-8FB9-84E9874AD845@holtmann.org>
-References: <1392711577-31431-4-git-send-email-johan.hedberg@gmail.com> <1392712807-4565-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Michael Knudsen <m.knudsen@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Michael Knudsen <m.knudsen@samsung.com>
+Subject: [PATCH] Bluetooth:  Stop BCSP/H5 timer before cleaning up
+Date: Tue, 18 Feb 2014 09:48:08 +0100
+Message-id: <1392713288-12227-1-git-send-email-m.knudsen@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+When stopping BCSP/H5, stop the retransmission timer before proceeding
+to clean up packet queues.  The previous code had a race condition where
+the timer could trigger after the packet lists and protocol structure
+had been removed which lead to dereferencing NULL or use-after-free bugs.
 
-> Previously the crypto context has only been available for LE SMP
-> sessions, but now that we'll need to perform operations also during
-> discovery it makes sense to have this context part of the hci_dev
-> struct. Later, the context can be removed from the SMP context.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> v2: Properly initialize "error" if crypto init fails
-> 
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         | 17 ++++++++++++++++-
-> 2 files changed, 17 insertions(+), 1 deletion(-)
+Signed-off-by: Michael Knudsen <m.knudsen@samsung.com>
+Reported-by: Kirill Tkhai <ktkhai@parallels.com>
+---
+ drivers/bluetooth/hci_bcsp.c |    4 +++-
+ drivers/bluetooth/hci_h5.c   |    4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-all 9 patches have been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
+index 0bc87f7..eee2fb2 100644
+--- a/drivers/bluetooth/hci_bcsp.c
++++ b/drivers/bluetooth/hci_bcsp.c
+@@ -715,6 +715,9 @@ static int bcsp_open(struct hci_uart *hu)
+ static int bcsp_close(struct hci_uart *hu)
+ {
+ 	struct bcsp_struct *bcsp = hu->priv;
++
++	del_timer_sync(&bcsp->tbcsp);
++
+ 	hu->priv = NULL;
+ 
+ 	BT_DBG("hu %p", hu);
+@@ -722,7 +725,6 @@ static int bcsp_close(struct hci_uart *hu)
+ 	skb_queue_purge(&bcsp->unack);
+ 	skb_queue_purge(&bcsp->rel);
+ 	skb_queue_purge(&bcsp->unrel);
+-	del_timer(&bcsp->tbcsp);
+ 
+ 	kfree(bcsp);
+ 	return 0;
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index f6f4974..afd759e 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -206,12 +206,12 @@ static int h5_close(struct hci_uart *hu)
+ {
+ 	struct h5 *h5 = hu->priv;
+ 
++	del_timer_sync(&h5->timer);
++
+ 	skb_queue_purge(&h5->unack);
+ 	skb_queue_purge(&h5->rel);
+ 	skb_queue_purge(&h5->unrel);
+ 
+-	del_timer(&h5->timer);
+-
+ 	kfree(h5);
+ 
+ 	return 0;
+-- 
+1.7.9.5
 
