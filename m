@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/7] Bluetooth: Use Identity Address in Device Found event
-Date: Tue, 18 Feb 2014 21:41:37 +0200
-Message-Id: <1392752497-8696-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 5/7] Bluetooth: Don't try to look up private addresses as Identity Address
+Date: Tue, 18 Feb 2014 21:41:35 +0200
+Message-Id: <1392752497-8696-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1392752497-8696-1-git-send-email-johan.hedberg@gmail.com>
 References: <1392752497-8696-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,46 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Whenever a device uses an RPA we want to have user space identify it by
-its Identity Address if we've got an IRK available for it. This patch
-updates the Device Found mgmt event to contain the Identity Address if
-an IRK is available for the device in question.
+Identity Addresses are either public or static random. When looking up
+addresses based on the Identity Address it doesn't make sense to go
+through the IRK list if we're given a private random address. This patch
+fixes (or rather improves) the hci_find_irk_by_addr function to bail out
+early if given a private random address.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 12 ++++++++++--
- 1 file changed, 10 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 24a85fe76cd8..747cb9bbc331 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5325,6 +5325,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cdba4709f012..e4c5b9d6083c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2662,6 +2662,10 @@ struct smp_irk *hci_find_irk_by_addr(struct hci_dev *hdev, bdaddr_t *bdaddr,
  {
- 	char buf[512];
- 	struct mgmt_ev_device_found *ev = (void *) buf;
-+	struct smp_irk *irk;
- 	size_t ev_size;
+ 	struct smp_irk *irk;
  
- 	if (!hci_discovery_active(hdev))
-@@ -5336,8 +5337,15 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 
- 	memset(buf, 0, sizeof(buf));
- 
--	bacpy(&ev->addr.bdaddr, bdaddr);
--	ev->addr.type = link_to_bdaddr(link_type, addr_type);
-+	irk = hci_get_irk(hdev, bdaddr, addr_type);
-+	if (irk) {
-+		bacpy(&ev->addr.bdaddr, &irk->bdaddr);
-+		ev->addr.type = link_to_bdaddr(link_type, irk->addr_type);
-+	} else {
-+		bacpy(&ev->addr.bdaddr, bdaddr);
-+		ev->addr.type = link_to_bdaddr(link_type, addr_type);
-+	}
++	/* Identity Address must be public or static random */
++	if (addr_type == ADDR_LE_DEV_RANDOM && (bdaddr->b[5] & 0xc0) != 0xc0)
++		return NULL;
 +
- 	ev->rssi = rssi;
- 	if (cfm_name)
- 		ev->flags |= __constant_cpu_to_le32(MGMT_DEV_FOUND_CONFIRM_NAME);
+ 	list_for_each_entry(irk, &hdev->identity_resolving_keys, list) {
+ 		if (addr_type == irk->addr_type &&
+ 		    bacmp(bdaddr, &irk->bdaddr) == 0)
 -- 
 1.8.5.3
 
