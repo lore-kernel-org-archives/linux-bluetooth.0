@@ -1,41 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH] Bluetooth: Print error when dropping L2CAP data
-Date: Tue, 18 Feb 2014 20:48:34 +0100
-Message-Id: <1392752914-15392-1-git-send-email-szymon.janc@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 18 Feb 2014 21:48:04 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 10/10] Bluetooth: Wait for SMP key distribution
+ completion when pairing
+Message-ID: <20140218194804.GA9146@x220.p-661hnu-f1>
+References: <1392736479-8808-11-git-send-email-johan.hedberg@gmail.com>
+ <1392738285-12143-1-git-send-email-johan.hedberg@gmail.com>
+ <64342F55-7059-49C3-92FF-7ED23AB904D1@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <64342F55-7059-49C3-92FF-7ED23AB904D1@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Silently dropping L2CAP data (i.e. due to remote device not obeying
-negotiated MTU) is confusing and makes debugging harder.
+Hi Marcel,
 
-Signed-off-by: Szymon Janc <szymon.janc@gmail.com>
----
+On Tue, Feb 18, 2014, Marcel Holtmann wrote:
+> > +	cmd = find_pairing(conn);
+> > +	if (!cmd)
+> > +		BT_DBG("Unable to find a pending command”);
+> 
+> why do we bother with the debug print here?
+> 
+> > +	else
+> > +		pairing_complete(cmd, status);
+> 
+> I would just do this:
+> 
+> 	if (cmd)
+> 		pairing_complete(cmd, status);
+> 
+> Unless you have future patches that do more work here.
 
-I also wonder if kernel shouldn't just disconnect if data would be
-dropped. This is reliable connection after all...
+The main reason was to get some idea how frequently this function gets
+called unnecessarily, but you're right in that it's kind of useless.
+I've removed it in my latest set.
 
- net/bluetooth/l2cap_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6e6b3a9..7e0c51a 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6759,8 +6759,10 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
- 		 * But we don't have any other choice. L2CAP doesn't
- 		 * provide flow control mechanism. */
- 
--		if (chan->imtu < skb->len)
-+		if (chan->imtu < skb->len) {
-+			BT_ERR("Dropping L2CAP data: receive buffer overflow");
- 			goto drop;
-+		}
- 
- 		if (!chan->ops->recv(chan, skb))
- 			goto done;
--- 
-1.9.0.rc3
-
+Johan
