@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/10] Bluetooth: Fix updating Identity Address in L2CAP channels
-Date: Tue, 18 Feb 2014 17:14:38 +0200
-Message-Id: <1392736479-8808-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 08/10] Bluetooth: Track the LE Identity Address in struct hci_conn
+Date: Tue, 18 Feb 2014 17:14:37 +0200
+Message-Id: <1392736479-8808-9-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
 References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,71 +11,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When we receive a remote identity address during SMP key distribution we
-should ensure that any associated L2CAP channel instances get their
-address information correspondingly updated (so that e.g. doing
-getpeername on associated sockets returns the correct address).
-
-This patch adds a new L2CAP core function l2cap_conn_update_id_addr()
-which is used to iterate through all L2CAP channels associated with a
-connection and update their address information.
+Since we want user space to see and use the LE Identity Address whenever
+interfacing with the kernel it makes sense to track that instead of the
+real address (the two will only be different in the case of an RPA).
+This patch adds the necessary updates to when an LE connection gets
+established and when receiving the Identity Address from a remote
+device.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/l2cap.h |  1 +
- net/bluetooth/l2cap_core.c    | 17 +++++++++++++++++
- net/bluetooth/smp.c           |  2 ++
- 3 files changed, 20 insertions(+)
+ net/bluetooth/hci_event.c | 7 +++++++
+ net/bluetooth/smp.c       | 3 +++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 13bec91785f4..4abdcb220e3a 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -881,6 +881,7 @@ int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void __l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
- void l2cap_chan_del(struct l2cap_chan *chan, int err);
-+void l2cap_conn_update_id_addr(struct hci_conn *hcon);
- void l2cap_send_conn_req(struct l2cap_chan *chan);
- void l2cap_move_start(struct l2cap_chan *chan);
- void l2cap_logical_cfm(struct l2cap_chan *chan, struct hci_chan *hchan,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 6e6b3a9c8e6d..d25fefcc0bb5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -609,6 +609,23 @@ void l2cap_chan_del(struct l2cap_chan *chan, int err)
- 	return;
- }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d2c6878a9d6a..f31410a071b5 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3568,6 +3568,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+ 	struct hci_conn *conn;
++	struct smp_irk *irk;
  
-+void l2cap_conn_update_id_addr(struct hci_conn *hcon)
-+{
-+	struct l2cap_conn *conn = hcon->l2cap_data;
-+	struct l2cap_chan *chan;
-+
-+	mutex_lock(&conn->chan_lock);
-+
-+	list_for_each_entry(chan, &conn->chan_l, list) {
-+		l2cap_chan_lock(chan);
-+		bacpy(&chan->dst, &hcon->dst);
-+		chan->dst_type = hcon->dst_type;
-+		l2cap_chan_unlock(chan);
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 
+@@ -3600,6 +3601,12 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		}
+ 	}
+ 
++	irk = hci_get_irk(hdev, &ev->bdaddr, ev->bdaddr_type);
++	if (irk) {
++		bacpy(&conn->dst, &irk->bdaddr);
++		conn->dst_type = irk->addr_type;
 +	}
 +
-+	mutex_unlock(&conn->chan_lock);
-+}
-+
- static void l2cap_chan_le_connect_reject(struct l2cap_chan *chan)
- {
- 	struct l2cap_conn *conn = chan->conn;
+ 	if (ev->status) {
+ 		mgmt_connect_failed(hdev, &conn->dst, conn->type,
+ 				    conn->dst_type, ev->status);
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 4d14ccc7b330..faf04bd4263a 100644
+index 54672c9ab6a5..4d14ccc7b330 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -976,6 +976,8 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
- 	bacpy(&hcon->dst, &smp->id_addr);
- 	hcon->dst_type = smp->id_addr_type;
+@@ -973,6 +973,9 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
+ 	hci_add_irk(conn->hcon->hdev, &smp->id_addr, smp->id_addr_type,
+ 		    smp->irk, &rpa);
  
-+	l2cap_conn_update_id_addr(hcon);
++	bacpy(&hcon->dst, &smp->id_addr);
++	hcon->dst_type = smp->id_addr_type;
 +
  	smp_distribute_keys(conn, 1);
  
