@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] Bluetooth: Track the LE Identity Address in struct hci_conn
-Date: Tue, 18 Feb 2014 21:41:32 +0200
-Message-Id: <1392752497-8696-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 6/7] Bluetooth: Look up RPA for connection requests with Identity Address
+Date: Tue, 18 Feb 2014 21:41:36 +0200
+Message-Id: <1392752497-8696-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1392752497-8696-1-git-send-email-johan.hedberg@gmail.com>
 References: <1392752497-8696-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since we want user space to see and use the LE Identity Address whenever
-interfacing with the kernel it makes sense to track that instead of the
-real address (the two will only be different in the case of an RPA).
-This patch adds the necessary updates to when an LE connection gets
-established and when receiving the Identity Address from a remote
-device.
+We need to check whether there's a matching IRK and RPA when we're
+requested to connect to a remote LE device based on its Identity
+Address. This patch updates the hci_connect_le function to do an extra
+call to hci_find_irk_by_addr and uses the RPA if it's cached. This is
+particularly important once we start exposing the Identity Address to
+user space instead of the RPA in events such as Device Connected and
+Device Found.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 8 ++++++++
- net/bluetooth/smp.c       | 4 ++++
- 2 files changed, 12 insertions(+)
+ net/bluetooth/hci_conn.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d2c6878a9d6a..49a2d4d841df 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3568,6 +3568,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 67972928a623..40ec37355d6f 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -588,6 +588,7 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
  {
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
+ 	struct hci_conn_params *params;
  	struct hci_conn *conn;
 +	struct smp_irk *irk;
+ 	int err;
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+@@ -616,15 +617,23 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (conn)
+ 		return ERR_PTR(-EBUSY);
  
-@@ -3600,6 +3601,13 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 	}
- 
-+	/* Track the connection based on the Identity Address from now on */
-+	irk = hci_get_irk(hdev, &ev->bdaddr, ev->bdaddr_type);
-+	if (irk) {
-+		bacpy(&conn->dst, &irk->bdaddr);
-+		conn->dst_type = irk->addr_type;
++	/* Convert from L2CAP channel address type to HCI address type */
++	if (dst_type == BDADDR_LE_PUBLIC)
++		dst_type = ADDR_LE_DEV_PUBLIC;
++	else
++		dst_type = ADDR_LE_DEV_RANDOM;
++
++	irk = hci_find_irk_by_addr(hdev, dst, dst_type);
++	if (irk && bacmp(&irk->rpa, BDADDR_ANY)) {
++		dst = &irk->rpa;
++		dst_type = ADDR_LE_DEV_RANDOM;
 +	}
 +
- 	if (ev->status) {
- 		mgmt_connect_failed(hdev, &conn->dst, conn->type,
- 				    conn->dst_type, ev->status);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8517d1f0984d..af29afed0cca 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -987,6 +987,10 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
- 	hci_add_irk(conn->hcon->hdev, &smp->id_addr, smp->id_addr_type,
- 		    smp->irk, &rpa);
+ 	conn = hci_conn_add(hdev, LE_LINK, dst);
+ 	if (!conn)
+ 		return ERR_PTR(-ENOMEM);
  
-+	/* Track the connection based on the Identity Address from now on */
-+	bacpy(&hcon->dst, &smp->id_addr);
-+	hcon->dst_type = smp->id_addr_type;
-+
- 	smp_distribute_keys(conn, 1);
+-	if (dst_type == BDADDR_LE_PUBLIC)
+-		conn->dst_type = ADDR_LE_DEV_PUBLIC;
+-	else
+-		conn->dst_type = ADDR_LE_DEV_RANDOM;
+-
++	conn->dst_type = dst_type;
+ 	conn->src_type = hdev->own_addr_type;
  
- 	return 0;
+ 	conn->state = BT_CONNECT;
 -- 
 1.8.5.3
 
