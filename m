@@ -1,35 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Feb 2014 18:29:26 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 01/10] Bluetooth: Remove SMP data specific crypto context
-Message-ID: <20140218162926.GB13953@x220.p-661hnu-f1>
-References: <1392736479-8808-1-git-send-email-johan.hedberg@gmail.com>
- <1392736479-8808-2-git-send-email-johan.hedberg@gmail.com>
- <596B741F-5844-4C49-BE66-5413510692C4@holtmann.org>
- <20140218162438.GA13953@x220.p-661hnu-f1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140218162438.GA13953@x220.p-661hnu-f1>
+In-Reply-To: <5303720B.4090902@convergeddevices.net>
+References: <53026C2F.4010705@convergeddevices.net>
+	<5303720B.4090902@convergeddevices.net>
+Date: Tue, 18 Feb 2014 18:27:08 +0200
+Message-ID: <CABBYNZL_+TUf22wApCgb40a-bPWtUZq2jKUT9eVZ9KAOz8MfQw@mail.gmail.com>
+Subject: Re: Help with AVDTP Connection accept
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: tony <tony.makkiel@convergeddevices.net>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Tony,
 
-On Tue, Feb 18, 2014, Johan Hedberg wrote:
-> > so I am curious now to what happens if we are running SMP and at the
-> > same time are doing RPA resolving. Can the same crypto context be used
-> > that way?
-> 
-> That's a fair point, and after a quick look through the crypto API it
-> seems like this might not be safe. A simple fix would be to ensure that
-> any access is between hci_dev_lock & hci_dev_unlock.
+On Tue, Feb 18, 2014 at 4:45 PM, tony <tony.makkiel@convergeddevices.net> wrote:
+> A2DP sdp record is not enabled by default. Once I added the source service
+> using sdptool, I can get past the 'AVDTP CONNECT'. But now it cribs at AVDTP
+> DISCOVER. Any ideas?
+>
+> Thanks,
+> Tony
+>
+>
+>
+> On 17/02/14 20:08, tony wrote:
+>>
+>> Hi,
+>>          I have BlueZ 4.101 and the daemon is running(log file
+>> daemon.txt). I am trying to initiate an AVDTP connection from PTS suite.
+>> But couldn't get(or not sure how) the BlueZ side accept the connection.
+>>  From the log I can see the device reply with no Link key message. But
+>> the connection gets dropped quickly.
+>>
+>> 1) From browsing the SDP entries (log :- sdptool.txt ), I don't see an
+>> entry for A2DP. I ran the configure file with --enable audio and can see
+>> from the daemon.txt audio plugin is loaded. Should I be adding SDP
+>> record manually? How can I do that?
+>>
+>> 2) Am I right in understanding, I should be using test/simple-agent to
+>> manage SSP? At present I don't see anything. From forums, I understand,
+>> the script would prompt for PIN or any security as required. But in my
+>> case nothing happens.  I have attached the btmon log as well.
+>>
+>> Thank you for any pointers or suggestions.
 
-A quick check shows that all access external to smp.c is already done
-under the hdev lock but the two places internal to smp.c are not (both
-of which are from within workqueue callbacks, so taking the lock there
-should be safe). Do you agree that this is the simplest/best solution?
-
-Johan
+I suspect you don't have a endpoint registered in your system, you can
+either use test/simple-endpoint or PulseAudio as endpoint or create
+one yourself. The so called endpoint is required since bluetoothd
+don't deal with the audio streams so normally this is part of the
+platform integration where the audio/media server need to take over.
