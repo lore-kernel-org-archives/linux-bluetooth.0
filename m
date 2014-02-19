@@ -1,48 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140218213509.EB15A1005F0@puck.mtv.corp.google.com>
-References: <20140218213509.EB15A1005F0@puck.mtv.corp.google.com>
-Date: Tue, 18 Feb 2014 17:02:56 -0800
-Message-ID: <CAGXr9JFtWLxcipUktj-PPkdfVNpY_HsjOc+USRT9QiWOB-FikQ@mail.gmail.com>
-Subject: Re: [PATCH] sdptool: Fix sdptool output
 From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] core: Fix device_get_name()
+Message-Id: <20140219004413.4361A1005F0@puck.mtv.corp.google.com>
+Date: Tue, 18 Feb 2014 16:44:13 -0800 (PST)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Please discard this patch. Anderson has already submitted identical
-patch in "[PATCH BlueZ 3/3] lib/sdp: Fix printing of multiple record
-fields".
+Fix device_get_name() to null-terminate the name string it returns.
+Modify all callers as needed.
+---
+ plugins/wiimote.c       | 1 -
+ profiles/input/device.c | 2 +-
+ src/device.c            | 5 ++++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
 
-On Tue, Feb 18, 2014 at 1:35 PM, Petri Gynther <pgynther@google.com> wrote:
-> Add missing newlines to sdp_record_print().
-> ---
->  lib/sdp.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
->
-> diff --git a/lib/sdp.c b/lib/sdp.c
-> index 3b26ec3..f957c46 100644
-> --- a/lib/sdp.c
-> +++ b/lib/sdp.c
-> @@ -1604,13 +1604,13 @@ void sdp_record_print(const sdp_record_t *rec)
->  {
->         sdp_data_t *d = sdp_data_get(rec, SDP_ATTR_SVCNAME_PRIMARY);
->         if (d && SDP_IS_TEXT_STR(d->dtd))
-> -               printf("Service Name: %.*s", d->unitSize, d->val.str);
-> +               printf("Service Name: %.*s\n", d->unitSize, d->val.str);
->         d = sdp_data_get(rec, SDP_ATTR_SVCDESC_PRIMARY);
->         if (d && SDP_IS_TEXT_STR(d->dtd))
-> -               printf("Service Description: %.*s", d->unitSize, d->val.str);
-> +               printf("Service Description: %.*s\n", d->unitSize, d->val.str);
->         d = sdp_data_get(rec, SDP_ATTR_PROVNAME_PRIMARY);
->         if (d && SDP_IS_TEXT_STR(d->dtd))
-> -               printf("Service Provider: %.*s", d->unitSize, d->val.str);
-> +               printf("Service Provider: %.*s\n", d->unitSize, d->val.str);
->  }
->
->  #ifdef SDP_DEBUG
-> --
-> 1.9.0.rc1.175.g0b1dcb5
->
+diff --git a/plugins/wiimote.c b/plugins/wiimote.c
+index c23607f..bd8820e 100644
+--- a/plugins/wiimote.c
++++ b/plugins/wiimote.c
+@@ -90,7 +90,6 @@ static ssize_t wii_pincb(struct btd_adapter *adapter, struct btd_device *device,
+ 	product = btd_device_get_product(device);
+ 
+ 	device_get_name(device, name, sizeof(name));
+-	name[sizeof(name) - 1] = 0;
+ 
+ 	for (i = 0; i < G_N_ELEMENTS(wii_ids); ++i) {
+ 		if (vendor == wii_ids[i][0] && product == wii_ids[i][1])
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 10c3d5c..d6e97c7 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -822,7 +822,7 @@ static struct input_device *input_device_new(struct btd_service *service)
+ 	idev->handle = rec->handle;
+ 	idev->disable_sdp = is_device_sdp_disable(rec);
+ 
+-	device_get_name(device, name, HCI_MAX_NAME_LENGTH);
++	device_get_name(device, name, sizeof(name));
+ 	if (strlen(name) > 0)
+ 		idev->name = g_strdup(name);
+ 
+diff --git a/src/device.c b/src/device.c
+index 41a6fc8..eabbe0a 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -2272,7 +2272,10 @@ void btd_device_device_set_name(struct btd_device *device, const char *name)
+ 
+ void device_get_name(struct btd_device *device, char *name, size_t len)
+ {
+-	strncpy(name, device->name, len);
++	if (name != NULL && len > 0) {
++		strncpy(name, device->name, len - 1);
++		name[len - 1] = '\0';
++	}
+ }
+ 
+ bool device_name_known(struct btd_device *device)
+-- 
+1.9.0.rc1.175.g0b1dcb5
+
