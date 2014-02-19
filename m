@@ -2,94 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS test results for PAN
-Date: Wed, 19 Feb 2014 15:10:38 +0100
-Message-Id: <1392819038-19608-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pixit: correct PIXIT value
+Date: Wed, 19 Feb 2014 15:04:18 +0100
+Message-Id: <1392818658-18623-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds initial PTS test results for PAN profile.
+It is important for NAP role to set proper PTS btaddr in PIXIT
 ---
- android/pts-pan.txt | 70 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
- create mode 100644 android/pts-pan.txt
+ android/pixit-pan.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/pts-pan.txt b/android/pts-pan.txt
-new file mode 100644
-index 0000000..8e8ae41
---- /dev/null
-+++ b/android/pts-pan.txt
-@@ -0,0 +1,70 @@
-+PTS test results for PAN
-+
-+PTS version: 5.0
-+Tested: 19.02.2014
-+Android version: 4.4.2
-+
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
-+
-+-------------------------------------------------------------------------------
-+Test Name				Result	Notes
-+-------------------------------------------------------------------------------
-+TC_BNEP_GN_BROADCAST_0_BV_03_C		N/A
-+TC_GN_Ipv4_Autonet_BV_01_I		N/A
-+TC_GN_Ipv6_Autonet_BV_02_I		N/A
-+TC_GN_IP_DHCP_BV_03_I			N/A
-+TC_GN_IP_LLMNR_BV_01_I			N/A
-+TC_GN_IP_LLMNR_BV_02_I			N/A
-+TC_GN_IP_DNS_BV_01_I			N/A
-+TC_GN_IP_APP_BV_01_I			N/A
-+TC_GN_IP_APP_BV_02_I			N/A
-+TC_GN_IP_APP_BV_03_I			N/A
-+TC_GN_IP_APP_BV_04_I			N/A
-+TC_GN_IP_APP_BV_05_I			N/A
-+TC_SDP_GN_BV_02_C			N/A
-+TC_MISC_GN_UUID_BV_01_C			N/A
-+TC_MISC_GN_UUID_BV_02_C			N/A
-+TC_BNEP_NAP_BROADCAST_0_BV_01_C		N/A
-+TC_BNEP_NAP_BROADCAST_0_BV_02_C		N/A
-+TC_BNEP_NAP_FORWARD_UNICAST_BV_05_C	N/A
-+TC_BNEP_NAP_FORWARD_UNICAST_BV_06_C	N/A
-+TC_BNEP_NAP_MULTICAST_0_BV_03_C		N/A
-+TC_BNEP_NAP_MULTICAST_0_BV_04_C		N/A
-+TC_BNEP_BRIDGE_RX_BV_02_I		INC
-+TC_BNEP_BRIDGE_TX_BV_01_I		PASS
-+TC_NAP_Ipv4_Autonet_BV_01_I		N/A
-+TC_NAP_Ipv6_Autonet_BV_02_I		N/A
-+TC_NAP_IP_DHCP_BV_03_I			N/A
-+TC_NAP_IP_LLMNR_BV_01_I			INC
-+TC_NAP_IP_LLMNR_BV_02_I			N/A
-+TC_NAP_IP_DNS_BV_01_I			N/A
-+TC_NAP_IP_APP_BV_01_I			N/A
-+TC_NAP_IP_APP_BV_02_I			N/A
-+TC_NAP_IP_APP_BV_03_I			N/A
-+TC_NAP_IP_APP_BV_04_I			N/A
-+TC_NAP_IP_APP_BV_05_I			PASS
-+TC_SDP_NAP_BV_01_C			PASS
-+TC_MISC_NAP_UUID_BV_01_C		PASS
-+TC_MISC_NAP_UUID_BV_02_C		PASS
-+TC_BNEP_PANU_BROADCAST_0_BV_04_C	N/A
-+TC_PANU_Ipv4_Autonet_BV_01_I		INC
-+TC_PANU_Ipv6_Autonet_BV_02_I		N/A
-+TC_PANU_IP_LLMNR_BV_01_I		INC
-+TC_PANU_IP_LLMNR_BV_02_I		N/A
-+TC_PANU_IP_DHCP_BV_03_I			PASS
-+TC_PANU_IP_DNS_BV_01_I			N/A
-+TC_PANU_IP_APP_BV_01_I			N/A
-+TC_PANU_IP_APP_BV_02_I			N/A
-+TC_PANU_IP_APP_BV_03_I			INC
-+TC_PANU_IP_APP_BV_04_I			INC
-+TC_PANU_IP_APP_BV_05_I			PASS
-+TC_SDP_PANU_BV_01_C			N/A
-+TC_MISC_PANU_UUID_BV_01_C		N/A
-+TC_MISC_PANU_UUID_BV_02_C		N/A
-+TC_MISC_ROLE_BV_01_C			N/A
-+TC_MISC_ROLE_BV_BV_02_C			N/A
-+-------------------------------------------------------------------------------
+diff --git a/android/pixit-pan.txt b/android/pixit-pan.txt
+index 6544a9c..21434fb 100644
+--- a/android/pixit-pan.txt
++++ b/android/pixit-pan.txt
+@@ -3,7 +3,7 @@ PAN PIXIT for the PTS tool.
+ PTS version: 5.0
+ 
+ * - different than PTS defaults
+-& - should be set to IUT Bluetooth address
++& - should be set to IUT or PTS Bluetooth address respectively
+ 
+ 		Required PIXIT settings
+ -------------------------------------------------------------------------------
+@@ -22,7 +22,7 @@ TSPX_iut_ip_address					192.168.167.152
+ TSPX_iut_port_number					4242
+ TSPX_PTS_ip_address					192.168.168.100
+ TSPX_PTS_port_number					4242
+-TSPX_bd_addr_PTS					000000000000
++TSPX_bd_addr_PTS					112233445566 (*&)
+ TSPX_checksum						E851
+ TSPX_secure_simple_pairing_pass_key_confirmation	False
+ TSPX_iut_friendly_bt_name				gprs-pc
 -- 
 1.8.5.3
 
