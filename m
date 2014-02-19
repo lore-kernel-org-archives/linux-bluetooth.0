@@ -1,56 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 01/14] android/hal-ipc-api: Add Set Volume command
-Date: Wed, 19 Feb 2014 18:58:45 +0200
-Message-Id: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <724E8886-CDAC-4EE8-AA00-184A247E89AA@holtmann.org>
+References: <1392754534-12747-1-git-send-email-andre.guedes@openbossa.org>
+ <1392754534-12747-10-git-send-email-andre.guedes@openbossa.org> <724E8886-CDAC-4EE8-AA00-184A247E89AA@holtmann.org>
+From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Wed, 19 Feb 2014 13:37:58 -0300
+Message-ID: <CACJA=fUhkmraMLLRgQpT2PPZgTLThJ=1bWK0wDcC+ADk8Cwzrg@mail.gmail.com>
+Subject: Re: [RFC v10 10/10] Bluetooth: Add le_auto_conn file on debugfs
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
----
-v2: Use fixed buffers instead of allocating memory for ipc commands, also
-change to use variable length for text attributes to avoid having to define a
-huge MTU which in most cases would be filled with 0.
+On Tue, Feb 18, 2014 at 5:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andre,
+>
+>> This patch adds to debugfs the le_auto_conn file. This file will be
+>> used to test LE auto connection infrastructure.
+>>
+>> To add a new auto connection address we write on le_auto_conn file
+>> following the format <address> <address type> <auto_connect>.
+>>
+>> The <address type> values are:
+>>  * 0 for public address
+>>  * 1 for random address
+>>
+>> The <auto_connect> values are (for more details see struct hci_
+>> conn_params):
+>>  * 0 for disabled
+>>  * 1 for always
+>>  * 2 for link loss
+>>
+>> So for instance, if you want the kernel autonomously establishes
+>> connections with device AA:BB:CC:DD:EE:FF (public address) every
+>> time the device enters in connectable mode (starts advertising),
+>> you should run the command:
+>> $ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>>
+>> To get the list of connection parameters configured in kernel, read
+>> the le_auto_conn file:
+>> $ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>>
+>> Finally, to clear the connection parameters list, write an empty
+>> string:
+>> $ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>
+> adding the first entry to this list should start scanning and deleting the last entry should stop scanning.
 
- android/hal-ipc-api.txt | 6 ++++++
- android/hal-msg.h       | 5 +++++
- 2 files changed, 11 insertions(+)
+Ok, I'll do it.
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index ee3bd76..ea26d0d 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1300,6 +1300,12 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
- 		Valid type values : 0x00 = Interim
- 		                    0x01 = Changed
- 
-+	Opcode 0x0a - Set Volume command/response
-+
-+		Command parameters: Value (1 octet)
-+
-+		In case of an error, the error response will be returned.
-+
- 	Opcode 0x81 - Remote Features notification
- 
- 		Notification parameters: Remote address (6 octets)
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 6504408..9d396a1 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -882,6 +882,11 @@ struct hal_cmd_avrcp_register_notification {
- 	uint8_t data[0];
- } __attribute__((packed));
- 
-+#define HAL_OP_AVRCP_SET_VOLUME			0x0a
-+struct hal_cmd_avrcp_set_volume {
-+	uint8_t value;
-+};
-+
- #define HAL_EV_AVRCP_REMOTE_FEATURES		0x81
- struct hal_ev_avrcp_remote_features {
- 	uint8_t bdaddr[6];
--- 
-1.8.5.3
+BR,
 
+Andre
