@@ -1,118 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/5] android/hidhost: Add idle time callback implementation
-Date: Wed, 19 Feb 2014 19:00:19 +0100
-Message-ID: <10094897.jKIQkT7il4@athlon>
-In-Reply-To: <1392717924-7712-1-git-send-email-szymon.janc@tieto.com>
-References: <1392717924-7712-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1392742461.6118.25.camel@pohly-mobl1.fritz.box>
+References: <1392393184-15266-1-git-send-email-luiz.dentz@gmail.com>
+	<1392393184-15266-8-git-send-email-luiz.dentz@gmail.com>
+	<1392714551.5951.275.camel@pohly-mobl1.fritz.box>
+	<CABBYNZ+-hu0G6cja-uBWPFuywj7S+bBDhitNoBhUnFnTFjYDcA@mail.gmail.com>
+	<1392742461.6118.25.camel@pohly-mobl1.fritz.box>
+Date: Wed, 19 Feb 2014 19:11:41 +0200
+Message-ID: <CABBYNZL82SJPZws+b0syb0nx8OVHCwfB4Tr3cDem9JWBvy5oCQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 8/8] doc/obex-api: Update documentation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Patrick Ohly <patrick.ohly@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 18 February 2014 11:05:20 Szymon Janc wrote:
-> Although this callback is for deprecated functionality and
-> corresponding notification is never send by daemon it should be
-> implemented for library and IPC completeness.
-> ---
->  android/hal-hidhost.c   | 14 ++++++++++++++
->  android/hal-ipc-api.txt | 10 ++++++++--
->  android/hal-msg.h       | 11 +++++++++--
->  3 files changed, 31 insertions(+), 4 deletions(-)
-> 
-> diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-> index fd3ad2d..dcaf996 100644
-> --- a/android/hal-hidhost.c
-> +++ b/android/hal-hidhost.c
-> @@ -69,6 +69,15 @@ static void handle_proto_mode(void *buf, uint16_t len)
->  							ev->status, ev->mode);
->  }
-> 
-> +static void handle_idle_time(void *buf, uint16_t len)
-> +{
-> +	struct hal_ev_hidhost_idle_time *ev = buf;
-> +
-> +	if (cbacks->idle_time_cb)
-> +		cbacks->idle_time_cb((bt_bdaddr_t *) ev->bdaddr, ev->status,
-> +								ev->idle_rate);
-> +}
-> +
->  static void handle_get_report(void *buf, uint16_t len)
->  {
->  	struct hal_ev_hidhost_get_report *ev = buf;
-> @@ -110,6 +119,11 @@ static const struct hal_ipc_handler ev_handlers[] = {
->  		.var_len = false,
->  		.data_len = sizeof(struct hal_ev_hidhost_proto_mode),
->  	},
-> +	{	/* HAL_EV_HIDHOST_IDLE_TIME */
-> +		.handler = handle_idle_time,
-> +		.var_len = false,
-> +		.data_len = sizeof(struct hal_ev_hidhost_idle_time),
-> +	},
->  	{	/* HAL_EV_HIDHOST_GET_REPORT */
->  		.handler = handle_get_report,
->  		.var_len = true,
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index ee3bd76..22dd50d 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -614,14 +614,20 @@ Notifications:
->  		                      0x01 = Boot
->  		                      0xff = Unsupported
-> 
-> -	Opcode 0x84 - Get Report notification
-> +	Opcode 0x84 - Idle Time notification
-> +
-> +		Notification parameters: Remote address (6 octets)
-> +		                         Status (1 octet)
-> +		                         Idle time (2 octets)
-> +
-> +	Opcode 0x85 - Get Report notification
-> 
->  		Notification parameters: Remote address (6 octets)
->  		                         Status (1 octet)
->  		                         Report length (2 octets)
->  		                         Report data (variable)
-> 
-> -	Opcode 0x85 - Virtual Unplug notification
-> +	Opcode 0x86 - Virtual Unplug notification
-> 
->  		Notification parameters: Remote address (6 octets)
->  		                         Status (1 octet)
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 6504408..15c7ebe 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -648,7 +648,14 @@ struct hal_ev_hidhost_proto_mode {
->  	uint8_t mode;
->  } __attribute__((packed));
-> 
-> -#define HAL_EV_HIDHOST_GET_REPORT		0x84
-> +#define HAL_EV_HIDHOST_IDLE_TIME		0x84
-> +struct hal_ev_hidhost_idle_time {
-> +	uint8_t bdaddr[6];
-> +	uint8_t status;
-> +	uint32_t idle_rate;
-> +} __attribute__((packed));
-> +
-> +#define HAL_EV_HIDHOST_GET_REPORT		0x85
->  struct hal_ev_hidhost_get_report {
->  	uint8_t  bdaddr[6];
->  	uint8_t  status;
-> @@ -656,7 +663,7 @@ struct hal_ev_hidhost_get_report {
->  	uint8_t  data[0];
->  } __attribute__((packed));
-> 
-> -#define HAL_EV_HIDHOST_VIRTUAL_UNPLUG		0x85
-> +#define HAL_EV_HIDHOST_VIRTUAL_UNPLUG		0x86
->  struct hal_ev_hidhost_virtual_unplug {
->  	uint8_t  bdaddr[6];
->  	uint8_t  status;
+Hi Patrick,
 
-All five patches are now upstream.
+On Tue, Feb 18, 2014 at 6:54 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+> On Tue, 2014-02-18 at 11:30 +0200, Luiz Augusto von Dentz wrote:
+>> Hi Patrick,
+>>
+>> On Tue, Feb 18, 2014 at 11:09 AM, Patrick Ohly <patrick.ohly@intel.com> wrote:
+>> > On Fri, 2014-02-14 at 17:53 +0200, Luiz Augusto von Dentz wrote:
+>> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>> >>
+>> >> This adds Suspend and Resume methods and 'suspended' value as status in
+>> >> the Transfer interface documentation.
+>> >> ---
+>> >>  doc/obex-api.txt | 18 ++++++++++++++++--
+>> >>  1 file changed, 16 insertions(+), 2 deletions(-)
+>> >>
+>> >> diff --git a/doc/obex-api.txt b/doc/obex-api.txt
+>> >> index 1f22fea..0f57ce1 100644
+>> >> --- a/doc/obex-api.txt
+>> >> +++ b/doc/obex-api.txt
+>> >> @@ -90,12 +90,26 @@ Methods           void Cancel()
+>> >>                                        org.bluez.obex.Error.InProgress
+>> >>                                        org.bluez.obex.Error.Failed
+>> >>
+>> >> +             void Suspend()
+>> >> +
+>> >> +                     Suspend transference.
+>> >> +
+>> >> +                     Possible errors: org.bluez.obex.Error.NotAuthorized
+>> >> +                                      org.bluez.obex.Error.NotInProgress
+>> >> +
+>> >> +             void Resume()
+>> >> +
+>> >> +                     Resume transference.
+>> >> +
+>> >> +                     Possible errors: org.bluez.obex.Error.NotAuthorized
+>> >> +                                      org.bluez.obex.Error.NotInProgress
+>> >                                                                 ^^^^^^^^^^^^^
+>> >
+>> > Should this be a NotSuspended error? Or is it not an error to resume a
+>> > transfer which is currently not suspended?
+>>
+>> Hmm, I would go for InProgress like in Cancel although now that you
+>> mentioned we could perhaps ignore such errors if you don't see any
+>> value on those.
+>
+> I think I would prefer to *not* get errors when Suspend() is called on
+> an already suspended transfer or when Resume() is called on a running
+> transfer. The rationale is that the caller will typically only care
+> about the end result and not so much whether it was the one who
+> triggered the change. If we remove NotInProgress resp. InProgress errors
+> from the API, then such a caller can treat all errors as fatal problem,
+> without having to check the exact error.
+
+Actually the NotInProgress error is for transfer queued, I guess for
+this case it makes sense to return an error since otherwise we would
+have to queue commands to be send when the transfer becomes active I
+believe this should probably be considered an error.
+
 
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Luiz Augusto von Dentz
