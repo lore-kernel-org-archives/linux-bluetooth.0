@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 03/14] android/avrcp: Add command handlers stubs
-Date: Wed, 19 Feb 2014 18:58:47 +0200
-Message-Id: <1392829138-10346-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 02/14] android/hal-ipc-api: Use variable length for text attributes
+Date: Wed, 19 Feb 2014 18:58:46 +0200
+Message-Id: <1392829138-10346-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
 References: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,131 +11,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This prevent having to increase the MTU size just to fit all attributes
+when in fact some attributes are numbers (3 out of 8) in text format
+which should not get even close to use 256 bytes defined by bt_rc.h.
 ---
- android/avrcp.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 109 insertions(+)
+ android/hal-ipc-api.txt | 6 ++++--
+ android/hal-msg.h       | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 65b3417..b1b6dbe 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -57,7 +57,116 @@ struct avrcp_device {
- 	GIOChannel	*io;
- };
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index ea26d0d..02355dc 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1251,7 +1251,8 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
  
-+static void handle_get_play_status(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAY_STATUS,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_list_player_attrs(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_LIST_PLAYER_ATTRS,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_list_player_values(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_LIST_PLAYER_VALUES,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_player_attrs(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_ATTRS,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_player_attrs_text(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_player_values_text(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_get_element_attrs_text(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_ELEMENT_ATTRS_TEXT,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_set_player_attrs_value(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_PLAYER_ATTRS_VALUE,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_register_notification(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_REGISTER_NOTIFICATION,
-+							HAL_STATUS_FAILED);
-+}
-+
-+static void handle_set_volume(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_VOLUME,
-+							HAL_STATUS_FAILED);
-+}
-+
- static const struct ipc_handler cmd_handlers[] = {
-+	/* HAL_OP_AVRCP_GET_PLAY_STATUS */
-+	{ handle_get_play_status, false,
-+			sizeof(struct hal_cmd_avrcp_get_play_status) },
-+	/* HAL_OP_AVRCP_LIST_PLAYER_ATTRS */
-+	{ handle_list_player_attrs, true,
-+			sizeof(struct hal_cmd_avrcp_list_player_attrs) },
-+	/* HAL_OP_AVRCP_LIST_PLAYER_VALUES */
-+	{ handle_list_player_values, true,
-+			sizeof(struct hal_cmd_avrcp_list_player_values) },
-+	/* HAL_OP_AVRCP_GET_PLAYER_ATTRS */
-+	{ handle_get_player_attrs, true,
-+			sizeof(struct hal_cmd_avrcp_get_player_attrs) },
-+	/* HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT */
-+	{ handle_get_player_attrs_text, true,
-+			sizeof(struct hal_cmd_avrcp_get_player_attrs_text) },
-+	/* HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT */
-+	{ handle_get_player_values_text, true,
-+			sizeof(struct hal_cmd_avrcp_get_player_values_text) },
-+	/* HAL_OP_AVRCP_GET_ELEMENT_ATTRS_TEXT */
-+	{ handle_get_element_attrs_text, true,
-+			sizeof(struct hal_cmd_avrcp_get_element_attrs_text) },
-+	/* HAL_OP_AVRCP_SET_PLAYER_ATTRS_VALUE */
-+	{ handle_set_player_attrs_value, true,
-+			sizeof(struct hal_cmd_avrcp_set_player_attrs_value) },
-+	/* HAL_OP_AVRCP_REGISTER_NOTIFICATION */
-+	{ handle_register_notification, true,
-+			sizeof(struct hal_cmd_avrcp_register_notification) },
-+	/* HAL_OP_AVRCP_SET_VOLUME */
-+	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
- };
+ 		Command parameters: Number of values (1 octet)
+ 		                    Value # (1 octet)
+-		                    Value # text (255 octets)
++		                    Value # text length (1 octet)
++		                    Value # text (variable)
+ 		                    ...
  
- static sdp_record_t *avrcp_record(void)
+ 		In case of an error, the error response will be returned.
+@@ -1260,7 +1261,8 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
+ 
+ 		Command parameters: Number of elements (1 octet)
+ 		                    Element # (1 octet)
+-		                    Element # text (255 octets)
++		                    Element # text length (1 octet)
++		                    Element # text (variable)
+ 		                    ...
+ 
+ 		In case of an error, the error response will be returned.
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 9d396a1..55ffd08 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -830,7 +830,8 @@ struct hal_cmd_avrcp_get_player_attrs {
+ 
+ struct hal_avrcp_player_setting_text {
+ 	uint8_t id;
+-	uint8_t text[255];
++	uint8_t len;
++	uint8_t text[0];
+ } __attribute__((packed));
+ 
+ #define HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT	0x05
 -- 
 1.8.5.3
 
