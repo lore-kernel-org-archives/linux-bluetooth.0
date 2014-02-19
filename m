@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 06/14] android/hal-avrcp: Add .list_player_app_value_rsp implementation
-Date: Wed, 19 Feb 2014 18:58:50 +0200
-Message-Id: <1392829138-10346-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 03/14] android/avrcp: Add command handlers stubs
+Date: Wed, 19 Feb 2014 18:58:47 +0200
+Message-Id: <1392829138-10346-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
 References: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,55 +12,130 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/hal-avrcp.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ android/avrcp.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 109 insertions(+)
 
-diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
-index 9735c22..42b1dad 100644
---- a/android/hal-avrcp.c
-+++ b/android/hal-avrcp.c
-@@ -102,6 +102,33 @@ static bt_status_t list_player_app_attr_rsp(int num_attr,
- 					len, cmd, 0, NULL, NULL);
- }
- 
-+static bt_status_t list_player_app_value_rsp(int num_val, uint8_t *p_vals)
-+{
-+	char buf[BLUEZ_HAL_MTU];
-+	struct hal_cmd_avrcp_list_player_values *cmd = (void *) buf;
-+	size_t len;
-+
-+	DBG("");
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (num_val < 0)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	len = sizeof(*cmd) + num_val;
-+
-+	if (len > BLUEZ_HAL_MTU)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	cmd->number = num_val;
-+	memcpy(cmd->values, p_vals, num_val);
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_AVRCP,
-+					HAL_OP_AVRCP_LIST_PLAYER_VALUES,
-+					len, cmd, 0, NULL, NULL);
-+}
-+
- static void cleanup()
- {
- 	struct hal_cmd_unregister_module cmd;
-@@ -126,6 +153,7 @@ static btrc_interface_t iface = {
- 	.init = init,
- 	.get_play_status_rsp = get_play_status_rsp,
- 	.list_player_app_attr_rsp = list_player_app_attr_rsp,
-+	.list_player_app_value_rsp = list_player_app_value_rsp,
- 	.cleanup = cleanup
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 65b3417..b1b6dbe 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -57,7 +57,116 @@ struct avrcp_device {
+ 	GIOChannel	*io;
  };
  
++static void handle_get_play_status(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAY_STATUS,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_list_player_attrs(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_LIST_PLAYER_ATTRS,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_list_player_values(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_LIST_PLAYER_VALUES,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_get_player_attrs(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_ATTRS,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_get_player_attrs_text(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_get_player_values_text(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_get_element_attrs_text(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_GET_ELEMENT_ATTRS_TEXT,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_set_player_attrs_value(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_PLAYER_ATTRS_VALUE,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_register_notification(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_REGISTER_NOTIFICATION,
++							HAL_STATUS_FAILED);
++}
++
++static void handle_set_volume(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	ipc_send_rsp(HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_VOLUME,
++							HAL_STATUS_FAILED);
++}
++
+ static const struct ipc_handler cmd_handlers[] = {
++	/* HAL_OP_AVRCP_GET_PLAY_STATUS */
++	{ handle_get_play_status, false,
++			sizeof(struct hal_cmd_avrcp_get_play_status) },
++	/* HAL_OP_AVRCP_LIST_PLAYER_ATTRS */
++	{ handle_list_player_attrs, true,
++			sizeof(struct hal_cmd_avrcp_list_player_attrs) },
++	/* HAL_OP_AVRCP_LIST_PLAYER_VALUES */
++	{ handle_list_player_values, true,
++			sizeof(struct hal_cmd_avrcp_list_player_values) },
++	/* HAL_OP_AVRCP_GET_PLAYER_ATTRS */
++	{ handle_get_player_attrs, true,
++			sizeof(struct hal_cmd_avrcp_get_player_attrs) },
++	/* HAL_OP_AVRCP_GET_PLAYER_ATTRS_TEXT */
++	{ handle_get_player_attrs_text, true,
++			sizeof(struct hal_cmd_avrcp_get_player_attrs_text) },
++	/* HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT */
++	{ handle_get_player_values_text, true,
++			sizeof(struct hal_cmd_avrcp_get_player_values_text) },
++	/* HAL_OP_AVRCP_GET_ELEMENT_ATTRS_TEXT */
++	{ handle_get_element_attrs_text, true,
++			sizeof(struct hal_cmd_avrcp_get_element_attrs_text) },
++	/* HAL_OP_AVRCP_SET_PLAYER_ATTRS_VALUE */
++	{ handle_set_player_attrs_value, true,
++			sizeof(struct hal_cmd_avrcp_set_player_attrs_value) },
++	/* HAL_OP_AVRCP_REGISTER_NOTIFICATION */
++	{ handle_register_notification, true,
++			sizeof(struct hal_cmd_avrcp_register_notification) },
++	/* HAL_OP_AVRCP_SET_VOLUME */
++	{ handle_set_volume, false, sizeof(struct hal_cmd_avrcp_set_volume) },
+ };
+ 
+ static sdp_record_t *avrcp_record(void)
 -- 
 1.8.5.3
 
