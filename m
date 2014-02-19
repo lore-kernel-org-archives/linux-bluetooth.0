@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/14] android/hal-avrcp: Add .get_player_app_value_text_rsp implementation
-Date: Wed, 19 Feb 2014 18:58:53 +0200
-Message-Id: <1392829138-10346-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 07/14] android/hal-avrcp: Add .get_player_app_value_rsp implementation
+Date: Wed, 19 Feb 2014 18:58:51 +0200
+Message-Id: <1392829138-10346-7-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
 References: <1392829138-10346-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,50 +12,59 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/hal-avrcp.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ android/hal-avrcp.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
 diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
-index 5d1bb94..df32e2f 100644
+index 42b1dad..c9e1be2 100644
 --- a/android/hal-avrcp.c
 +++ b/android/hal-avrcp.c
-@@ -231,6 +231,31 @@ static bt_status_t get_player_app_attr_text_rsp(int num_attr,
+@@ -129,6 +129,40 @@ static bt_status_t list_player_app_value_rsp(int num_val, uint8_t *p_vals)
  					len, cmd, 0, NULL, NULL);
  }
  
-+static bt_status_t get_player_app_value_text_rsp(int num_val,
-+					btrc_player_setting_text_t *p_vals)
++static bt_status_t get_player_app_value_rsp(btrc_player_settings_t *p_vals)
 +{
 +	char buf[BLUEZ_HAL_MTU];
-+	struct hal_cmd_avrcp_get_player_values_text *cmd = (void *) buf;
-+	uint8_t *ptr;
-+	size_t len;
++	struct hal_cmd_avrcp_get_player_attrs *cmd = (void *) buf;
++	size_t len, attrs_len;
++	int i;
 +
 +	DBG("");
 +
 +	if (!interface_ready())
 +		return BT_STATUS_NOT_READY;
 +
-+	if (num_val < 0)
++	if (!p_vals)
 +		return BT_STATUS_PARM_INVALID;
 +
-+	len = sizeof(*cmd);
-+	ptr = (uint8_t *) &cmd->values[0];
-+	cmd->number = write_player_setting_text(ptr, num_val, p_vals, &len);
++	attrs_len = p_vals->num_attr *
++				sizeof(struct hal_avrcp_player_attr_value);
++	len = sizeof(*cmd) + attrs_len;
++
++	if (len > BLUEZ_HAL_MTU)
++		return BT_STATUS_PARM_INVALID;
++
++	cmd->number = p_vals->num_attr;
++
++	for (i = 0; i < p_vals->num_attr; i++) {
++		cmd->attrs[i].attr = p_vals->attr_ids[i];
++		cmd->attrs[i].value = p_vals->attr_values[i];
++	}
 +
 +	return hal_ipc_cmd(HAL_SERVICE_ID_AVRCP,
-+					HAL_OP_AVRCP_GET_PLAYER_VALUES_TEXT,
++					HAL_OP_AVRCP_GET_PLAYER_ATTRS,
 +					len, cmd, 0, NULL, NULL);
 +}
 +
  static void cleanup()
  {
  	struct hal_cmd_unregister_module cmd;
-@@ -258,6 +283,7 @@ static btrc_interface_t iface = {
+@@ -154,6 +188,7 @@ static btrc_interface_t iface = {
+ 	.get_play_status_rsp = get_play_status_rsp,
+ 	.list_player_app_attr_rsp = list_player_app_attr_rsp,
  	.list_player_app_value_rsp = list_player_app_value_rsp,
- 	.get_player_app_value_rsp = get_player_app_value_rsp,
- 	.get_player_app_attr_text_rsp = get_player_app_attr_text_rsp,
-+	.get_player_app_value_text_rsp = get_player_app_value_text_rsp,
++	.get_player_app_value_rsp = get_player_app_value_rsp,
  	.cleanup = cleanup
  };
  
