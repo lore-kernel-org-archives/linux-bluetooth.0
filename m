@@ -1,138 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v7 06/11] gatt: Add helper for creating GATT services
-Date: Wed, 19 Feb 2014 15:51:28 -0300
-Message-Id: <1392835893-6723-7-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v7 05/11] lib: Move GATT UUID to uuid.h
+Date: Wed, 19 Feb 2014 15:51:27 -0300
+Message-Id: <1392835893-6723-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1B88D85B-35F3-47BB-ACAD-872E6C4F0A79@holtmann.org>
  <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Guedes <andre.guedes@openbossa.org>
-
-This patch adds the btd_gatt_add_service() helper which adds a
-GATT Service declaration to the local attribute database.
+This patch moves GATT UUIDs definitions to a common header. uuid.h contains
+helper functions to manipulate Bluetooth UUIDs and some common BR/EDR services
+UUIDs.
 ---
- lib/uuid.h |  5 +++++
- src/gatt.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h | 10 ++++++++++
- 3 files changed, 74 insertions(+)
+ attrib/gatt.h | 25 -------------------------
+ lib/uuid.h    | 25 +++++++++++++++++++++++++
+ 2 files changed, 25 insertions(+), 25 deletions(-)
 
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 0f113e7..4fea3eb 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -24,31 +24,6 @@
+ 
+ #include <bluetooth/sdp.h>
+ 
+-/* GATT Profile Attribute types */
+-#define GATT_PRIM_SVC_UUID		0x2800
+-#define GATT_SND_SVC_UUID		0x2801
+-#define GATT_INCLUDE_UUID		0x2802
+-#define GATT_CHARAC_UUID		0x2803
+-
+-/* GATT Characteristic Types */
+-#define GATT_CHARAC_DEVICE_NAME			0x2A00
+-#define GATT_CHARAC_APPEARANCE			0x2A01
+-#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG	0x2A02
+-#define GATT_CHARAC_RECONNECTION_ADDRESS	0x2A03
+-#define GATT_CHARAC_PERIPHERAL_PREF_CONN	0x2A04
+-#define GATT_CHARAC_SERVICE_CHANGED		0x2A05
+-
+-/* GATT Characteristic Descriptors */
+-#define GATT_CHARAC_EXT_PROPER_UUID	0x2900
+-#define GATT_CHARAC_USER_DESC_UUID	0x2901
+-#define GATT_CLIENT_CHARAC_CFG_UUID	0x2902
+-#define GATT_SERVER_CHARAC_CFG_UUID	0x2903
+-#define GATT_CHARAC_FMT_UUID		0x2904
+-#define GATT_CHARAC_AGREG_FMT_UUID	0x2905
+-#define GATT_CHARAC_VALID_RANGE_UUID	0x2906
+-#define GATT_EXTERNAL_REPORT_REFERENCE	0x2907
+-#define GATT_REPORT_REFERENCE		0x2908
+-
+ /* Client Characteristic Configuration bit field */
+ #define GATT_CLIENT_CHARAC_CFG_NOTIF_BIT	0x0001
+ #define GATT_CLIENT_CHARAC_CFG_IND_BIT		0x0002
 diff --git a/lib/uuid.h b/lib/uuid.h
-index c24cee5..237145b 100644
+index 95e5a9a..c24cee5 100644
 --- a/lib/uuid.h
 +++ b/lib/uuid.h
-@@ -158,6 +158,11 @@ void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
- int bt_uuid_to_string(const bt_uuid_t *uuid, char *str, size_t n);
- int bt_string_to_uuid(bt_uuid_t *uuid, const char *string);
+@@ -105,6 +105,31 @@ extern "C" {
+ #define OBEX_MNS_UUID		"00001133-0000-1000-8000-00805f9b34fb"
+ #define OBEX_MAP_UUID		"00001134-0000-1000-8000-00805f9b34fb"
  
-+static inline int bt_uuid_len(const bt_uuid_t *uuid)
-+{
-+	return uuid->type / 8;
-+}
++/* GATT UUIDs section */
++#define GATT_PRIM_SVC_UUID				0x2800
++#define GATT_SND_SVC_UUID				0x2801
++#define GATT_INCLUDE_UUID				0x2802
++#define GATT_CHARAC_UUID				0x2803
 +
- #ifdef __cplusplus
- }
- #endif
-diff --git a/src/gatt.c b/src/gatt.c
-index e8b691a..f7b74d6 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -28,10 +28,69 @@
- #include <glib.h>
- 
- #include "log.h"
-+#include "lib/uuid.h"
-+#include "attrib/att.h"
- 
- #include "gatt-dbus.h"
- #include "gatt.h"
- 
-+/* Common GATT UUIDs */
-+static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
-+					.value.u16 = GATT_PRIM_SVC_UUID };
++/* GATT Characteristic Types */
++#define GATT_CHARAC_DEVICE_NAME				0x2A00
++#define GATT_CHARAC_APPEARANCE				0x2A01
++#define GATT_CHARAC_PERIPHERAL_PRIV_FLAG		0x2A02
++#define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
++#define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
++#define GATT_CHARAC_SERVICE_CHANGED			0x2A05
 +
-+struct btd_attribute {
-+	uint16_t handle;
-+	bt_uuid_t type;
-+	uint16_t value_len;
-+	uint8_t value[0];
-+};
++/* GATT Characteristic Descriptors */
++#define GATT_CHARAC_EXT_PROPER_UUID			0x2900
++#define GATT_CHARAC_USER_DESC_UUID			0x2901
++#define GATT_CLIENT_CHARAC_CFG_UUID			0x2902
++#define GATT_SERVER_CHARAC_CFG_UUID			0x2903
++#define GATT_CHARAC_FMT_UUID				0x2904
++#define GATT_CHARAC_AGREG_FMT_UUID			0x2905
++#define GATT_CHARAC_VALID_RANGE_UUID			0x2906
++#define GATT_EXTERNAL_REPORT_REFERENCE			0x2907
++#define GATT_REPORT_REFERENCE				0x2908
 +
-+static GList *local_attribute_db;
-+static uint16_t next_handle = 0x0001;
-+
-+static int local_database_add(uint16_t handle, struct btd_attribute *attr)
-+{
-+	attr->handle = handle;
-+
-+	local_attribute_db = g_list_append(local_attribute_db, attr);
-+
-+	return 0;
-+}
-+
-+struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
-+{
-+	uint16_t len = bt_uuid_len(uuid);
-+	struct btd_attribute *attr = g_malloc0(sizeof(struct btd_attribute) +
-+									len);
-+
-+	/*
-+	 * Service DECLARATION
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +-------+---------------------------------+
-+	 * |0x2800 | 0xYYYY...                       |
-+	 * | (1)   | (2)                             |
-+	 * +------+----------------------------------+
-+	 * (1) - 2 octets: Primary/Secondary Service UUID
-+	 * (2) - 2 or 16 octets: Service UUID
-+	 */
-+
-+	attr->type = primary_uuid;
-+
-+	att_put_uuid(*uuid, attr->value);
-+	attr->value_len = len;
-+
-+	if (local_database_add(next_handle, attr) < 0) {
-+		g_free(attr);
-+		return NULL;
-+	}
-+
-+	/* TODO: missing overflow checking */
-+	next_handle = next_handle + 1;
-+
-+	return attr;
-+}
-+
- void gatt_init(void)
- {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 3a320b4..8dd1312 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -21,6 +21,16 @@
-  *
-  */
- 
-+struct btd_attribute;
-+
- void gatt_init(void);
- 
- void gatt_cleanup(void);
-+
-+/* btd_gatt_add_service - Add a service declaration to local attribute database.
-+ * @uuid:	Service UUID.
-+ *
-+ * Returns a reference to service declaration attribute. In case of error,
-+ * NULL is returned.
-+ */
-+struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
+ typedef struct {
+ 	enum {
+ 		BT_UUID_UNSPEC = 0,
 -- 
 1.8.3.1
 
