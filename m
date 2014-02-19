@@ -1,67 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv2 03/11] android/tester: Execute device properties cbacks in main loop
-Date: Wed, 19 Feb 2014 14:54:54 +0100
-Message-Id: <1392818102-19189-4-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [RFCv2 02/11] android/tester: Execute discovery state cbacks in main loop
+Date: Wed, 19 Feb 2014 14:54:53 +0100
+Message-Id: <1392818102-19189-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1392818102-19189-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1392818102-19189-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Execute generic remote_device_properties_cb in tester's main loop.
+Execute generic discovery_state_changed_cb in tester's main loop.
 ---
- android/android-tester.c | 32 +++++++++++++++++++++++++-------
- 1 file changed, 25 insertions(+), 7 deletions(-)
+ android/android-tester.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index a3b7ead..d909390 100644
+index 9966a6f..a3b7ead 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -963,18 +963,36 @@ static void remote_setprop_device_properties_cb(bt_status_t status,
+@@ -695,14 +695,27 @@ static void remote_setprop_disc_state_changed_cb(bt_discovery_state_t state)
  	}
  }
  
--static void remote_device_properties_cb(bt_status_t status,
--				bt_bdaddr_t *bd_addr, int num_properties,
--				bt_property_t *properties)
-+static gboolean remote_device_properties(gpointer user_data)
+-static void discovery_state_changed_cb(bt_discovery_state_t state)
++static gboolean discovery_state_changed(gpointer user_data)
  {
  	struct test_data *data = tester_get_data();
  	const struct generic_data *test = data->test_data;
 +	struct bt_cb_data *cb_data = user_data;
  
- 	if (data->test_init_done &&
--			test->expected_hal_cb.remote_device_properties_cb) {
--		test->expected_hal_cb.remote_device_properties_cb(status,
--					bd_addr, num_properties, properties);
+-	if (test && test->expected_hal_cb.discovery_state_changed_cb) {
+-		test->expected_hal_cb.discovery_state_changed_cb(state);
 -	}
-+			test->expected_hal_cb.remote_device_properties_cb)
-+		test->expected_hal_cb.remote_device_properties_cb(
-+					cb_data->status, &cb_data->bdaddr,
-+					cb_data->num, cb_data->props);
++	if (test && test->expected_hal_cb.discovery_state_changed_cb)
++		test->expected_hal_cb.discovery_state_changed_cb(
++								cb_data->state);
 +
-+	free_properties(cb_data->num, cb_data->props);
 +	g_free(cb_data);
 +
 +	return FALSE;
 +}
 +
-+static void remote_device_properties_cb(bt_status_t status,
-+				bt_bdaddr_t *bd_addr, int num_properties,
-+				bt_property_t *properties)
++static void discovery_state_changed_cb(bt_discovery_state_t state)
 +{
 +	struct bt_cb_data *cb_data = g_new0(struct bt_cb_data, 1);
 +
-+	cb_data->status = status;
-+	cb_data->bdaddr = *bd_addr;
-+	cb_data->num = num_properties;
-+	cb_data->props = copy_properties(num_properties, properties);
-+
-+	g_idle_add(remote_device_properties, cb_data);
++	cb_data->state = state;
++	g_idle_add(discovery_state_changed, cb_data);
  }
  
- static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
+ static bt_property_t *copy_properties(int num_properties,
 -- 
 1.8.5.2
 
