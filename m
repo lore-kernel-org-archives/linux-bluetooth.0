@@ -1,129 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v7 09/11] test: Add signal handling for gatt-service
-Date: Wed, 19 Feb 2014 15:51:31 -0300
-Message-Id: <1392835893-6723-10-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v7 07/11] gatt: Add external services tracking
+Date: Wed, 19 Feb 2014 15:51:29 -0300
+Message-Id: <1392835893-6723-8-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1B88D85B-35F3-47BB-ACAD-872E6C4F0A79@holtmann.org>
  <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements signal handling to run cleanup tasks before
-exiting.
----
- test/gatt-service.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/test/gatt-service.c b/test/gatt-service.c
-index 769fd37..4059336 100644
---- a/test/gatt-service.c
-+++ b/test/gatt-service.c
-@@ -27,6 +27,9 @@
+All primary services declarations provided by an external application
+will be automatically inserted in the attribute database.
+---
+ src/gatt-dbus.c | 109 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 109 insertions(+)
+
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index fd614f9..000d7ae 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -39,15 +39,21 @@
+ #include "log.h"
  
- #include <errno.h>
- #include <stdio.h>
-+#include <stdbool.h>
-+#include <unistd.h>
-+#include <sys/signalfd.h>
+ #include "error.h"
++#include "gatt.h"
+ #include "gatt-dbus.h"
  
- #include <glib.h>
- #include <dbus/dbus.h>
-@@ -97,9 +100,83 @@ static void create_services(DBusConnection *conn)
- 	printf("Registered service: %s\n", service_path);
+ #define GATT_MGR_IFACE			"org.bluez.GattManager1"
++#define SERVICE_IFACE			"org.bluez.GattService1"
++
++#define REGISTER_TIMER         1
+ 
+ struct external_app {
+ 	char *owner;
+ 	char *path;
+ 	GDBusClient *client;
++	GSList *proxies;
+ 	unsigned int watch;
++	guint register_timer;
+ };
+ 
+ static GSList *external_apps;
+@@ -60,6 +66,36 @@ static int external_app_path_cmp(gconstpointer a, gconstpointer b)
+ 	return g_strcmp0(eapp->path, path);
  }
  
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
++static void proxy_added(GDBusProxy *proxy, void *user_data)
 +{
-+	static bool __terminated = false;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
++	struct external_app *eapp = user_data;
++	const char *interface, *path;
 +
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
-+		return FALSE;
++	interface = g_dbus_proxy_get_interface(proxy);
++	path = g_dbus_proxy_get_path(proxy);
 +
-+	fd = g_io_channel_unix_get_fd(channel);
++	DBG("path %s iface %s", path, interface);
 +
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return FALSE;
++	if (g_strcmp0(interface, SERVICE_IFACE) != 0)
++		return;
 +
-+	switch (si.ssi_signo) {
-+	case SIGINT:
-+	case SIGTERM:
-+		if (!__terminated) {
-+			printf("Terminating\n");
-+			g_main_loop_quit(main_loop);
++	eapp->proxies = g_slist_append(eapp->proxies, proxy);
++}
++
++static void proxy_removed(GDBusProxy *proxy, void *user_data)
++{
++	struct external_app *eapp = user_data;
++	const char *interface, *path;
++
++	interface = g_dbus_proxy_get_interface(proxy);
++	path = g_dbus_proxy_get_path(proxy);
++
++	DBG("path %s iface %s", path, interface);
++
++	eapp->proxies = g_slist_remove(eapp->proxies, proxy);
++}
++
++
+ static void external_app_watch_destroy(gpointer user_data)
+ {
+ 	struct external_app *eapp = user_data;
+@@ -70,6 +106,9 @@ static void external_app_watch_destroy(gpointer user_data)
+ 
+ 	g_dbus_client_unref(eapp->client);
+ 
++	if (eapp->register_timer)
++		g_source_remove(eapp->register_timer);
++
+ 	g_free(eapp->owner);
+ 	g_free(eapp->path);
+ 	g_free(eapp);
+@@ -99,9 +138,75 @@ static struct external_app *new_external_app(DBusConnection *conn,
+ 	eapp->client = client;
+ 	eapp->path = g_strdup(path);
+ 
++	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
++								NULL, eapp);
++
+ 	return eapp;
+ }
+ 
++static int register_external_service(GDBusProxy *proxy)
++{
++	DBusMessageIter iter;
++	const char *uuid;
++	bt_uuid_t btuuid;
++
++	if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
++		return -EINVAL;
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++		return -EINVAL;
++
++	dbus_message_iter_get_basic(&iter, &uuid);
++
++	if (bt_string_to_uuid(&btuuid, uuid) < 0)
++		return -EINVAL;
++
++	if (btd_gatt_add_service(&btuuid) == NULL)
++		return -EINVAL;
++
++	return 0;
++}
++
++static gboolean finish_register(gpointer user_data)
++{
++	struct external_app *eapp = user_data;
++	GSList *list;
++
++	/*
++	 * It is not possible to detect when the last proxy object
++	 * was reported. "Proxy added" handler reports objects
++	 * added on demand or returned by GetManagedObjects().
++	 * This timer helps to register all the GATT declarations
++	 * (services, characteristics and descriptors) after fetching
++	 * all the D-Bus objects.
++	 */
++
++	eapp->register_timer = 0;
++
++	for (list = eapp->proxies; list; list = g_slist_next(list)) {
++		const char *interface, *path;
++		GDBusProxy *proxy = list->data;
++
++		interface = g_dbus_proxy_get_interface(proxy);
++		path = g_dbus_proxy_get_path(proxy);
++
++		if (g_strcmp0(SERVICE_IFACE, interface) != 0)
++			continue;
++
++		if (g_strcmp0(path, eapp->path) != 0)
++			continue;
++
++		if (register_external_service(proxy) < 0) {
++			DBG("Inconsistent external service: %s", path);
++			continue;
 +		}
 +
-+		__terminated = true;
-+		break;
++		DBG("External service: %s", path);
 +	}
 +
-+	return TRUE;
++	return FALSE;
 +}
 +
-+static guint setup_signalfd(void)
-+{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
-+		perror("Failed to set signal mask");
-+		return 0;
-+	}
-+
-+	fd = signalfd(-1, &mask, 0);
-+	if (fd < 0) {
-+		perror("Failed to create signal descriptor");
-+		return 0;
-+	}
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, NULL);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
-+}
-+
- int main(int argc, char *argv[])
+ static DBusMessage *register_service(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
  {
- 	DBusConnection *dbus_conn;
-+	guint signal;
+@@ -109,6 +214,8 @@ static DBusMessage *register_service(DBusConnection *conn,
+ 	DBusMessageIter iter;
+ 	const char *path;
+ 
++	DBG("Registering GATT Service");
 +
-+	signal = setup_signalfd();
-+	if (signal == 0)
-+		return -errno;
+ 	if (!dbus_message_iter_init(msg, &iter))
+ 		return btd_error_invalid_args(msg);
  
- 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+@@ -127,6 +234,8 @@ static DBusMessage *register_service(DBusConnection *conn,
+ 	external_apps = g_slist_prepend(external_apps, eapp);
  
-@@ -114,6 +191,8 @@ int main(int argc, char *argv[])
+ 	DBG("New app %p: %s", eapp, path);
++	eapp->register_timer = g_timeout_add_seconds(REGISTER_TIMER,
++							finish_register, eapp);
  
- 	g_main_loop_run(main_loop);
- 
-+	g_source_remove(signal);
-+
- 	g_slist_free_full(services, g_free);
- 	dbus_connection_unref(dbus_conn);
- 
+ 	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
+ }
 -- 
 1.8.3.1
 
