@@ -1,24 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Feb 2014 17:25:15 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petri Gynther <pgynther@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv5] hog: Use HoG device name as uHID input device name
-Message-ID: <20140219152515.GB12683@x220.p-661hnu-f1>
-References: <20140219074018.B736F1005F0@puck.mtv.corp.google.com>
+From: "Viswanatham, RaviTeja"
+	<RaviTeja.Viswanatham.EDUCATION@eberspaecher.com>
+To: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Marvell 88W8787 Bluetooth highh speed
+Date: Wed, 19 Feb 2014 15:24:48 +0000
+Message-ID: <9BC883E0D59F6B4DBD525D460025714B08AE47D6@deessmx03.dees.eberspaecher.com>
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140219074018.B736F1005F0@puck.mtv.corp.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hello ,
 
-On Tue, Feb 18, 2014, Petri Gynther wrote:
-> ---
->  profiles/input/hog.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+First of all, I thank you for your guidance on regarding Bluetooth high speed. I found the Marvell 88W8787 device which can support Bluetooth high speed with your suggested help.  
 
-Applied. Thanks.
+The Marvell 88W8787 supports host interfaces like  SDIO, I²C, SPI,  and UART. I would like to know on which interface did you worked to get an Bluetooth high Speed ?
 
-Johan
+I am presently working on  Altera SoCfpga Cyclone V evaluation board, where it can support all the available host interfaces from Marvell 88w8787. Please could you suggest me to get some idea to work on Bluetooth high speed. 
+
+I am expecting that SDIO would work this is just a guess.  
+
+Thanks in advance,
+
+Best Regards
+Raviteja
+
+
+
