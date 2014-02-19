@@ -1,65 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5] hog: Use HoG device name as uHID input device name
-Message-Id: <20140219074018.B736F1005F0@puck.mtv.corp.google.com>
-Date: Tue, 18 Feb 2014 23:40:18 -0800 (PST)
+From: Pradeep Vivekanandan <vivekanandanp@hcl.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Reg: simple-player issue
+Date: Wed, 19 Feb 2014 07:37:38 +0000
+Message-ID: <A4B1A1B79EB08444A5B867A4254F4B8840918E28@chn-hclt-mbs05.HCLT.CORP.HCL.IN>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- profiles/input/hog.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+Hi,
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index ded6303..b9a14b9 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -91,6 +91,7 @@ struct hog_device {
- 	uint16_t		proto_mode_handle;
- 	uint16_t		ctrlpt_handle;
- 	uint8_t			flags;
-+	char			*name;
- };
- 
- struct report {
-@@ -392,7 +393,9 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	/* create uHID device */
- 	memset(&ev, 0, sizeof(ev));
- 	ev.type = UHID_CREATE;
--	strcpy((char *) ev.u.create.name, "bluez-hog-device");
-+	strncpy((char *) ev.u.create.name, hogdev->name ?
-+					hogdev->name : "bluez-hog-device",
-+					sizeof(ev.u.create.name) - 1);
- 	ev.u.create.vendor = vendor;
- 	ev.u.create.product = product;
- 	ev.u.create.version = version;
-@@ -722,6 +725,7 @@ static struct hog_device *hog_new_device(struct btd_device *device,
- 								uint16_t id)
- {
- 	struct hog_device *hogdev;
-+	char name[HCI_MAX_NAME_LENGTH + 1];
- 
- 	hogdev = g_try_new0(struct hog_device, 1);
- 	if (!hogdev)
-@@ -729,6 +733,9 @@ static struct hog_device *hog_new_device(struct btd_device *device,
- 
- 	hogdev->id = id;
- 	hogdev->device = btd_device_ref(device);
-+	device_get_name(device, name, sizeof(name));
-+	if (strlen(name) > 0)
-+		hogdev->name = g_strdup(name);
- 
- 	return hogdev;
- }
-@@ -751,6 +758,7 @@ static void hog_free_device(struct hog_device *hogdev)
- 	g_slist_free_full(hogdev->reports, report_free);
- 	g_attrib_unref(hogdev->attrib);
- 	g_free(hogdev->hog_primary);
-+	g_free(hogdev->name);
- 	g_free(hogdev);
- }
- 
--- 
-1.9.0.rc1.175.g0b1dcb5
+
+I need to get bluetooth metadata  information from phone.
+
+I have used RegisterPlayer method in the interface org.bluez.Media1.
+
+But I did not find any signal in the org.bluez.MeidaPlayer1 to get the track information.
+
+Please help me how to get the metadata.
+
+I am using iphone 5 and bluez 5.7 to get the metadata.
+
+Is there any specail package to be install in the iphone to make it work.
+
+Thanks and Regards,
+
+Pradeep V
+end
+
+
+::DISCLAIMER::
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+The contents of this e-mail and any attachment(s) are confidential and intended for the named recipient(s) only.
+E-mail transmission is not guaranteed to be secure or error-free as information could be intercepted, corrupted,
+lost, destroyed, arrive late or incomplete, or may contain viruses in transmission. The e mail and its contents
+(with or without referred errors) shall therefore not attach any liability on the originator or HCL or its affiliates.
+Views or opinions, if any, presented in this email are solely those of the author and may not necessarily reflect the
+views or opinions of HCL or its affiliates. Any form of reproduction, dissemination, copying, disclosure, modification,
+distribution and / or publication of this message without the prior written consent of authorized representative of
+HCL is strictly prohibited. If you have received this email in error please delete it and notify the sender immediately.
+Before opening any email and/or attachments, please check them for viruses and other defects.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
 
