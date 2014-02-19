@@ -1,40 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pixit: correct PIXIT value
-Date: Wed, 19 Feb 2014 15:04:18 +0100
-Message-Id: <1392818658-18623-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [RFCv2 10/11] android/tester: Execute hh report cbacks in main loop
+Date: Wed, 19 Feb 2014 14:55:01 +0100
+Message-Id: <1392818102-19189-11-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1392818102-19189-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1392818102-19189-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is important for NAP role to set proper PTS btaddr in PIXIT
+Execute HIDHost generic get_report_cb in tester's main loop.
 ---
- android/pixit-pan.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/android-tester.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/android/pixit-pan.txt b/android/pixit-pan.txt
-index 6544a9c..21434fb 100644
---- a/android/pixit-pan.txt
-+++ b/android/pixit-pan.txt
-@@ -3,7 +3,7 @@ PAN PIXIT for the PTS tool.
- PTS version: 5.0
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 4789844..feddd8f 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -3319,17 +3319,34 @@ static void hidhost_protocol_mode_cb(bt_bdaddr_t *bd_addr,
+ 	g_idle_add(hidhost_protocol_mode, cb_data);
+ }
  
- * - different than PTS defaults
--& - should be set to IUT Bluetooth address
-+& - should be set to IUT or PTS Bluetooth address respectively
+-static void hidhost_get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t status,
+-						uint8_t *report, int size)
++static gboolean hidhost_get_report(gpointer user_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 	const struct hidhost_generic_data *test = data->test_data;
++	struct hh_cb_data *cb_data = user_data;
  
- 		Required PIXIT settings
- -------------------------------------------------------------------------------
-@@ -22,7 +22,7 @@ TSPX_iut_ip_address					192.168.167.152
- TSPX_iut_port_number					4242
- TSPX_PTS_ip_address					192.168.168.100
- TSPX_PTS_port_number					4242
--TSPX_bd_addr_PTS					000000000000
-+TSPX_bd_addr_PTS					112233445566 (*&)
- TSPX_checksum						E851
- TSPX_secure_simple_pairing_pass_key_confirmation	False
- TSPX_iut_friendly_bt_name				gprs-pc
+ 	data->cb_count++;
+ 
+ 	if (test && test->expected_hal_cb.get_report_cb)
+-		test->expected_hal_cb.get_report_cb(bd_addr, status, report,
+-									size);
++		test->expected_hal_cb.get_report_cb(&cb_data->bdaddr,
++			cb_data->status, cb_data->report, cb_data->size);
++
++	g_free(cb_data->report);
++	g_free(cb_data);
++	return FALSE;
++}
++
++static void hidhost_get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t status,
++						uint8_t *report, int size)
++{
++	struct hh_cb_data *cb_data = g_new0(struct hh_cb_data, 1);
++
++	cb_data->bdaddr = *bd_addr;
++	cb_data->status = status;
++	cb_data->report = g_memdup(report, size);
++	cb_data->size = size;
++
++	g_idle_add(hidhost_get_report, cb_data);
+ }
+ 
+ static bthh_callbacks_t bthh_callbacks = {
 -- 
-1.8.5.3
+1.8.5.2
 
