@@ -1,93 +1,194 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <3638568.rUrzPLdPh8@athlon>
-References: <20140219201545.4D13D1007E0@puck.mtv.corp.google.com>
-	<3638568.rUrzPLdPh8@athlon>
-Date: Wed, 19 Feb 2014 13:15:32 -0800
-Message-ID: <CAGXr9JGz-B6yLHsDMKZrp3iuWP4Uaj78kqiGtNUytnku+wczAA@mail.gmail.com>
-Subject: Re: [PATCH] hog: Fill ev.u.create.{phys,uniq} for UHID_CREATE
-From: Petri Gynther <pgynther@google.com>
-To: Szymon Janc <szymon.janc@gmail.com>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 2/2] android/hal-handsfree: Use fixed size buffers for commands
+Date: Wed, 19 Feb 2014 21:49:38 +0100
+Message-Id: <1392842978-29373-2-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1392842978-29373-1-git-send-email-szymon.janc@gmail.com>
+References: <1392842978-29373-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I used hogdev->device directly in:
-http://marc.info/?l=linux-bluetooth&m=139105411019568&w=2
+This make code follow same conventions for all commands and simplify
+code.
+---
+ android/hal-handsfree.c | 90 +++++++++++++++----------------------------------
+ 1 file changed, 27 insertions(+), 63 deletions(-)
 
-But Johan commented on that:
-http://marc.info/?l=linux-bluetooth&m=139228316405777&w=2
+diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+index 601c14f..7964c7d 100644
+--- a/android/hal-handsfree.c
++++ b/android/hal-handsfree.c
+@@ -360,9 +360,9 @@ static bt_status_t device_status_notification(bthf_network_state_t state,
+ 
+ static bt_status_t cops_response(const char *cops)
+ {
+-	struct hal_cmd_handsfree_cops_response *cmd;
+-	bt_status_t status;
+-	int len;
++	char buf[BLUEZ_HAL_MTU];
++	struct hal_cmd_handsfree_cops_response *cmd = (void *) buf;
++	size_t len;
+ 
+ 	DBG("");
+ 
+@@ -372,22 +372,14 @@ static bt_status_t cops_response(const char *cops)
+ 	if (!cops)
+ 		return BT_STATUS_PARM_INVALID;
+ 
+-	len = sizeof(*cmd) + strlen(cops);
+-
+-	cmd = malloc(len);
+-	if (!cmd)
+-		return BT_STATUS_NOMEM;
+-
+ 	cmd->len = strlen(cops);
+ 	memcpy(cmd->buf, cops, cmd->len);
+ 
+-	status = hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
+-				HAL_OP_HANDSFREE_COPS_RESPONSE, len, cmd, 0,
+-				NULL, NULL);
+-
+-	free(cmd);
++	len = sizeof(*cmd) + cmd->len;
+ 
+-	return status;
++	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
++						HAL_OP_HANDSFREE_COPS_RESPONSE,
++						len, cmd, 0, NULL, NULL);
+ }
+ 
+ static bt_status_t cind_response(int svc, int num_active, int num_held,
+@@ -416,9 +408,9 @@ static bt_status_t cind_response(int svc, int num_active, int num_held,
+ 
+ static bt_status_t formatted_at_response(const char *rsp)
+ {
+-	struct hal_cmd_handsfree_formatted_at_response *cmd;
+-	bt_status_t status;
+-	int len;
++	char buf[BLUEZ_HAL_MTU];
++	struct hal_cmd_handsfree_formatted_at_response *cmd = (void *) buf;
++	size_t len;
+ 
+ 	DBG("");
+ 
+@@ -428,22 +420,14 @@ static bt_status_t formatted_at_response(const char *rsp)
+ 	if (!rsp)
+ 		return BT_STATUS_PARM_INVALID;
+ 
+-	len = sizeof(*cmd) + strlen(rsp);
+-
+-	cmd = malloc(len);
+-	if (!cmd)
+-		return BT_STATUS_NOMEM;
+-
+ 	cmd->len = strlen(rsp);
+ 	memcpy(cmd->buf, rsp, cmd->len);
+ 
+-	status = hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
+-				HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE, len,
+-				cmd, 0, NULL, NULL);
+-
+-	free(cmd);
++	len = sizeof(*cmd) + cmd->len;
+ 
+-	return status;
++	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
++					HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE,
++					len, cmd, 0, NULL, NULL);
+ }
+ 
+ static bt_status_t at_response(bthf_at_response_t response, int error)
+@@ -470,23 +454,15 @@ static bt_status_t clcc_response(int index, bthf_call_direction_t dir,
+ 					const char *number,
+ 					bthf_call_addrtype_t type)
+ {
+-	struct hal_cmd_handsfree_clcc_response *cmd;
+-	bt_status_t status;
+-	int len;
++	char buf[BLUEZ_HAL_MTU];
++	struct hal_cmd_handsfree_clcc_response *cmd = (void *) buf;
++	size_t len;
+ 
+ 	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	len = sizeof(*cmd);
+-	if (number)
+-		len += strlen(number);
+-
+-	cmd = malloc(len);
+-	if (!cmd)
+-		return BT_STATUS_NOMEM;
+-
+ 	cmd->index = index;
+ 	cmd->dir = dir;
+ 	cmd->state = state;
+@@ -501,13 +477,11 @@ static bt_status_t clcc_response(int index, bthf_call_direction_t dir,
+ 		cmd->number_len = 0;
+ 	}
+ 
+-	status = hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
+-					HAL_OP_HANDSFREE_CLCC_RESPONSE, len,
+-					cmd, 0, NULL, NULL);
+-
+-	free(cmd);
++	len = sizeof(*cmd) + cmd->number_len;
+ 
+-	return status;
++	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
++						HAL_OP_HANDSFREE_CLCC_RESPONSE,
++						len, cmd, 0, NULL, NULL);
+ }
+ 
+ static bt_status_t phone_state_change(int num_active, int num_held,
+@@ -515,23 +489,15 @@ static bt_status_t phone_state_change(int num_active, int num_held,
+ 					const char *number,
+ 					bthf_call_addrtype_t type)
+ {
+-	struct hal_cmd_handsfree_phone_state_change *cmd;
+-	bt_status_t status;
+-	int len;
++	char buf[BLUEZ_HAL_MTU];
++	struct hal_cmd_handsfree_phone_state_change *cmd = (void *) buf;
++	size_t len;
+ 
+ 	DBG("");
+ 
+ 	if (!interface_ready())
+ 		return BT_STATUS_NOT_READY;
+ 
+-	len = sizeof(*cmd);
+-	if (number)
+-		len += strlen(number);
+-
+-	cmd = malloc(len);
+-	if (!cmd)
+-		return BT_STATUS_NOMEM;
+-
+ 	cmd->num_active = num_active;
+ 	cmd->num_held = num_held;
+ 	cmd->state = state;
+@@ -544,13 +510,11 @@ static bt_status_t phone_state_change(int num_active, int num_held,
+ 		cmd->number_len = 0;
+ 	}
+ 
+-	status = hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
++	len = sizeof(*cmd) + cmd->number_len;
++
++	return hal_ipc_cmd(HAL_SERVICE_ID_HANDSFREE,
+ 					HAL_OP_HANDSFREE_PHONE_STATE_CHANGE,
+ 					len, cmd, 0, NULL, NULL);
+-
+-	free(cmd);
+-
+-	return status;
+ }
+ 
+ static void cleanup(void)
+-- 
+1.9.0
 
-So that's why I went this route and added name, src, dst.
-
--- Petri
-
-On Wed, Feb 19, 2014 at 12:30 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
-> Hi Petri,
->
-> On Wednesday 19 February 2014 12:15:45 Petri Gynther wrote:
->> Fill ev.u.create.{phys,uniq} fields when uHID device is created.
->> These values are copied to kernel hid_device structure.
->>
->> linux/include/linux/hid.h:
->> struct hid_device {
->>   ...
->>   char name[128];  /* Device name */
->>   char phys[64];   /* Device physical location */
->>   char uniq[64];   /* Device unique identifier (serial #) */
->> ---
->>  profiles/input/hog.c | 7 +++++++
->>  1 file changed, 7 insertions(+)
->>
->> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->> index b9a14b9..35b973b 100644
->> --- a/profiles/input/hog.c
->> +++ b/profiles/input/hog.c
->> @@ -92,6 +92,8 @@ struct hog_device {
->>       uint16_t                ctrlpt_handle;
->>       uint8_t                 flags;
->>       char                    *name;
->> +     bdaddr_t                src;
->> +     bdaddr_t                dst;
->>  };
->>
->
-> struct hog_device already holds reference to btd_device and both src and dst
-> can be taken from it where needed. No need to extend struct hog_device.
->
-> BTW same goes with name member which could be removed.
->
->>  struct report {
->> @@ -396,6 +398,8 @@ static void report_map_read_cb(guint8 status, const
->> guint8 *pdu, guint16 plen, strncpy((char *) ev.u.create.name, hogdev->name
->> ?
->>                                       hogdev->name : "bluez-hog-device",
->>                                       sizeof(ev.u.create.name) - 1);
->> +     ba2str(&hogdev->src, (char *) ev.u.create.phys);
->> +     ba2str(&hogdev->dst, (char *) ev.u.create.uniq);
->>       ev.u.create.vendor = vendor;
->>       ev.u.create.product = product;
->>       ev.u.create.version = version;
->> @@ -724,6 +728,7 @@ static void attio_disconnected_cb(gpointer user_data)
->>  static struct hog_device *hog_new_device(struct btd_device *device,
->>                                                               uint16_t id)
->>  {
->> +     struct btd_adapter *adapter = device_get_adapter(device);
->>       struct hog_device *hogdev;
->>       char name[HCI_MAX_NAME_LENGTH + 1];
->>
->> @@ -736,6 +741,8 @@ static struct hog_device *hog_new_device(struct
->> btd_device *device, device_get_name(device, name, sizeof(name));
->>       if (strlen(name) > 0)
->>               hogdev->name = g_strdup(name);
->> +     bacpy(&hogdev->src, btd_adapter_get_address(adapter));
->> +     bacpy(&hogdev->dst, device_get_address(device));
->>
->>       return hogdev;
->>  }
->
-> --
-> Szymon K. Janc
-> szymon.janc@gmail.com
