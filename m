@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/6] Bluetooth: Add support for sending New IRK event
-Date: Wed, 19 Feb 2014 14:57:48 +0200
-Message-Id: <1392814668-4830-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 4/6] Bluetooth: Track SMP keys in the SMP context
+Date: Wed, 19 Feb 2014 14:57:46 +0200
+Message-Id: <1392814668-4830-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1392814668-4830-1-git-send-email-johan.hedberg@gmail.com>
 References: <1392814668-4830-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,86 +11,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds the necessary helper function to send the New IRK mgmt
-event and makes sure that the function is called at when SMP key
-distribution has completed. The event is sent before the New LTK event
-so user space knows which remote device to associate with the keys.
+As preparation to do mgmt notification in a single place at the end of
+the key distribution, store the keys that need to be notified within the
+SMP context.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/mgmt.h     |  7 +++++++
- net/bluetooth/mgmt.c             | 15 +++++++++++++++
- net/bluetooth/smp.c              |  3 +++
- 4 files changed, 26 insertions(+)
+ net/bluetooth/smp.c | 21 +++++++++++++--------
+ net/bluetooth/smp.h |  3 +++
+ 2 files changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 59ae04c2684f..3be2905010cd 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1211,6 +1211,7 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
- int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key);
-+void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
- void mgmt_reenable_advertising(struct hci_dev *hdev);
- void mgmt_smp_complete(struct hci_conn *conn, bool complete);
- 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index e4fa13e559e2..2e46251e8aec 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -536,3 +536,10 @@ struct mgmt_ev_passkey_notify {
- 	__le32	passkey;
- 	__u8	entered;
- } __packed;
-+
-+#define MGMT_EV_NEW_IRK			0x0018
-+struct mgmt_ev_new_irk {
-+	__u8     store_hint;
-+	bdaddr_t rpa;
-+	struct mgmt_irk_info irk;
-+} __packed;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index bcfc6da67a5c..1daa837da091 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4792,6 +4792,21 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key)
- 	mgmt_event(MGMT_EV_NEW_LONG_TERM_KEY, hdev, &ev, sizeof(ev), NULL);
- }
- 
-+void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk)
-+{
-+	struct mgmt_ev_new_irk ev;
-+
-+	memset(&ev, 0, sizeof(ev));
-+
-+	ev.store_hint = 0x01;
-+	bacpy(&ev.rpa, &irk->rpa);
-+	bacpy(&ev.irk.addr.bdaddr, &irk->bdaddr);
-+	ev.irk.addr.type = link_to_bdaddr(LE_LINK, irk->addr_type);
-+	memcpy(ev.irk.val, irk->val, sizeof(irk->val));
-+
-+	mgmt_event(MGMT_EV_NEW_IRK, hdev, &ev, sizeof(ev), NULL);
-+}
-+
- static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
- 				  u8 data_len)
- {
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index f05c1b71d99a..e3794592fa66 100644
+index 27eebca260fa..eaac54be91b1 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -1112,6 +1112,9 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+@@ -915,6 +915,7 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	struct smp_chan *smp = conn->smp_chan;
+ 	struct hci_dev *hdev = conn->hcon->hdev;
  	struct hci_conn *hcon = conn->hcon;
- 	struct hci_dev *hdev = hcon->hdev;
++	struct smp_ltk *ltk;
+ 	u8 authenticated;
  
-+	if (smp->irk)
-+		mgmt_new_irk(hdev, smp->remote_irk);
-+
- 	if (smp->ltk) {
- 		smp->ltk->bdaddr_type = hcon->dst_type;
- 		bacpy(&smp->ltk->bdaddr, &hcon->dst);
+ 	BT_DBG("conn %p", conn);
+@@ -930,9 +931,10 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	hci_dev_lock(hdev);
+ 	authenticated = (hcon->sec_level == BT_SECURITY_HIGH);
+-	hci_add_ltk(hdev, &hcon->dst, hcon->dst_type, HCI_SMP_LTK, 1,
+-		    authenticated, smp->tk, smp->enc_key_size,
+-		    rp->ediv, rp->rand);
++	ltk = hci_add_ltk(hdev, &hcon->dst, hcon->dst_type, HCI_SMP_LTK, 1,
++			  authenticated, smp->tk, smp->enc_key_size,
++			  rp->ediv, rp->rand);
++	smp->ltk = ltk;
+ 	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
+ 		smp_distribute_keys(conn, 1);
+ 	hci_dev_unlock(hdev);
+@@ -988,8 +990,8 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
+ 	else
+ 		bacpy(&rpa, BDADDR_ANY);
+ 
+-	hci_add_irk(conn->hcon->hdev, &smp->id_addr, smp->id_addr_type,
+-		    smp->irk, &rpa);
++	smp->remote_irk = hci_add_irk(conn->hcon->hdev, &smp->id_addr,
++				      smp->id_addr_type, smp->irk, &rpa);
+ 
+ 	/* Track the connection based on the Identity Address from now on */
+ 	bacpy(&hcon->dst, &smp->id_addr);
+@@ -1137,6 +1139,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 		struct smp_cmd_encrypt_info enc;
+ 		struct smp_cmd_master_ident ident;
+ 		struct hci_conn *hcon = conn->hcon;
++		struct smp_ltk *ltk;
+ 		u8 authenticated;
+ 		__le16 ediv;
+ 
+@@ -1147,9 +1150,11 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+ 		smp_send_cmd(conn, SMP_CMD_ENCRYPT_INFO, sizeof(enc), &enc);
+ 
+ 		authenticated = hcon->sec_level == BT_SECURITY_HIGH;
+-		hci_add_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+-			    HCI_SMP_LTK_SLAVE, 1, authenticated,
+-			    enc.ltk, smp->enc_key_size, ediv, ident.rand);
++		ltk = hci_add_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
++				  HCI_SMP_LTK_SLAVE, 1, authenticated,
++				  enc.ltk, smp->enc_key_size, ediv,
++				  ident.rand);
++		smp->slave_ltk = ltk;
+ 
+ 		ident.ediv = ediv;
+ 
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 675fd3b21d2c..d8cc543f523c 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -133,6 +133,9 @@ struct smp_chan {
+ 	bdaddr_t	id_addr;
+ 	u8		id_addr_type;
+ 	u8		irk[16];
++	struct smp_ltk	*ltk;
++	struct smp_ltk	*slave_ltk;
++	struct smp_irk	*remote_irk;
+ 	unsigned long	smp_flags;
+ 	struct work_struct confirm;
+ 	struct work_struct random;
 -- 
 1.8.5.3
 
