@@ -1,166 +1,170 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v7 02/11] gatt: Add stub for gatt.{c, h} files
-Date: Wed, 19 Feb 2014 15:51:24 -0300
-Message-Id: <1392835893-6723-3-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v7 01/11] doc: Add experimental GATT API
+Date: Wed, 19 Feb 2014 15:51:23 -0300
+Message-Id: <1392835893-6723-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1B88D85B-35F3-47BB-ACAD-872E6C4F0A79@holtmann.org>
  <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
-
-These files implement functions to handle ATT transactions, and expose
-functions to allow other entities to manage GATT based services. It
-is a replacement for src/attrib-server.c.
+This patch proposes an unified GATT API for local and remote services.
 ---
- Makefile.am |  1 +
- src/gatt.c  | 38 ++++++++++++++++++++++++++++++++++++++
- src/gatt.h  | 26 ++++++++++++++++++++++++++
- src/main.c  | 15 ++++++++++-----
- 4 files changed, 75 insertions(+), 5 deletions(-)
- create mode 100644 src/gatt.c
- create mode 100644 src/gatt.h
+ doc/gatt-api.txt | 142 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 142 insertions(+)
+ create mode 100644 doc/gatt-api.txt
 
-diff --git a/Makefile.am b/Makefile.am
-index 11f2aa1..6bbf63b 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -146,6 +146,7 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
- 			src/adapter.h src/adapter.c \
- 			src/profile.h src/profile.c \
- 			src/service.h src/service.c \
-+			src/gatt.h src/gatt.c \
- 			src/device.h src/device.c src/attio.h \
- 			src/dbus-common.c src/dbus-common.h \
- 			src/eir.h src/eir.c \
-diff --git a/src/gatt.c b/src/gatt.c
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
 new file mode 100644
-index 0000000..06619f0
+index 0000000..0f6b084
 --- /dev/null
-+++ b/src/gatt.c
-@@ -0,0 +1,38 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++++ b/doc/gatt-api.txt
+@@ -0,0 +1,142 @@
++BlueZ D-Bus GATT API description
++********************************
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++GATT local and remote services share the same high-level D-Bus API. Local
++refers to GATT based service exported by a BlueZ plugin or an external
++application. Remote refers to GATT services exported by the peer.
 +
-+#include "gatt.h"
++BlueZ acts as a proxy, translating ATT operations to D-Bus method calls and
++Properties (or the opposite). Support for D-Bus Object Manager is mandatory for
++external services to allow seamless GATT declarations (Service, Characteristic
++and Descriptors) discovery.
 +
-+void gatt_init(void)
-+{
++Releasing a registered GATT service is not defined yet. Any API extension
++should avoid breaking the defined API, and if possible keep an unified GATT
++remote and local services representation.
 +
-+}
++Service hierarchy
++=================
 +
-+void gatt_cleanup(void)
-+{
++GATT remote and local service representation. Object path for local services
++is freely definable.
 +
-+}
-diff --git a/src/gatt.h b/src/gatt.h
-new file mode 100644
-index 0000000..3a320b4
---- /dev/null
-+++ b/src/gatt.h
-@@ -0,0 +1,26 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++External applications implementing local services must register the services
++using GattManager1 registration method and must implement the methods and
++properties defined in GattService1 interface.
 +
-+void gatt_init(void);
++Service		org.bluez
++Interface	org.bluez.GattService1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX
 +
-+void gatt_cleanup(void);
-diff --git a/src/main.c b/src/main.c
-index 91d90b4..b3136fc 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -55,6 +55,7 @@
- #include "dbus-common.h"
- #include "agent.h"
- #include "profile.h"
-+#include "gatt.h"
- #include "systemd.h"
- 
- #define BLUEZ_NAME "org.bluez"
-@@ -531,6 +532,13 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
-+	if (option_experimental)
-+		gdbus_flags = G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
++Properties	string UUID [read-only]
 +
-+	g_dbus_set_flags(gdbus_flags);
++			128-bit service UUID.
 +
-+	gatt_init();
++		array{object} Includes [read-only]: Not implemented
 +
- 	if (adapter_init() < 0) {
- 		error("Adapter handling initialization failed");
- 		exit(1);
-@@ -540,11 +548,6 @@ int main(int argc, char *argv[])
- 	btd_agent_init();
- 	btd_profile_init();
- 
--	if (option_experimental)
--		gdbus_flags = G_DBUS_FLAG_ENABLE_EXPERIMENTAL;
--
--	g_dbus_set_flags(gdbus_flags);
--
- 	if (option_compat == TRUE)
- 		sdp_flags |= SDP_SERVER_COMPAT;
- 
-@@ -598,6 +601,8 @@ int main(int argc, char *argv[])
- 
- 	adapter_cleanup();
- 
-+	gatt_cleanup();
++			Array of object paths representing the included
++			services of this service.
 +
- 	rfkill_exit();
- 
- 	stop_sdp_server();
++
++Characteristic hierarchy
++========================
++
++For local GATT defined services, the object paths need to follow the service
++path hierarchy and are freely definable.
++
++Service		org.bluez
++Interface	org.bluez.GattCharacteristic1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
++
++Properties	string UUID [read-only]
++
++			128-bit characteristic UUID.
++
++		object Service [read-only]
++
++			Object path of the GATT service the characteristc
++			belongs to.
++
++		array{byte} Value [read-write]
++
++			Value read from the remote Bluetooth device or from
++			the external application implementing GATT services.
++
++		array{string} Flags [read-only, optional]
++
++			Defines how the characteristic value can be used. See
++			Core spec page 1898, "Table 3.5: Characteristic
++			Properties bit field" and page 1900, "Table 3.8:
++			Characteristic Extended Properties bit field". Allowed
++			values: "broadcast", "read", "write-without-response",
++			"write", "notify", "indicate",
++			"authenticated-signed-writes", "reliable-write", and
++			"writable-auxiliaries".
++
++
++Characteristic Descriptors hierarchy
++====================================
++
++Local or remote GATT characteristic descriptors hierarchy.
++
++Service		org.bluez
++Interface	org.bluez.GattDescriptor1 [Experimental]
++Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
++
++Properties	string UUID [read-only]
++
++			128-bit descriptor UUID.
++
++		object Characteristic [read-only]
++
++			Object path of the GATT characteristc the descriptor
++			belongs to.
++
++		array{byte} Value [read-write]
++
++			Raw characteristic descriptor value read from the
++			remote Bluetooth device or from the external
++			application implementing GATT services.
++
++		string Permissions [read-only]: To be defined
++
++			Defines read/write authentication and authorization
++			requirements.
++
++Service Manager hierarchy
++=============================
++
++Service Manager allows external applications to register GATT based
++services. Services must follow the API for Service and Characteristic
++described above.
++
++Local GATT services, characteristics and characteristic descriptors are
++discovered automatically using the D-Bus Object Manager interface.
++
++Service		org.bluez
++Interface	org.bluez.GattManager1 [Experimental]
++Object path	/org/bluez
++
++Methods		RegisterService(object service, dict options)
++
++			Registers remote application service exported under
++			interface GattService1. Characteristic objects must
++			be hierarchical to their service and must use the
++			interface GattCharacteristic1. D-Bus Object Manager
++			is used to fetch the exported objects.
++
++			"service" object path together with the D-Bus system
++			bus connection ID define the identification of the
++			application registering a GATT based service.
++
++			Possible errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.AlreadyExists
++
++		UnregisterService(object service)
++
++			This unregisters the service that has been
++			previously registered. The object path parameter
++			must match the same value that has been used
++			on registration.
++
++			Possible errors: org.bluez.Error.DoesNotExist
 -- 
 1.8.3.1
 
