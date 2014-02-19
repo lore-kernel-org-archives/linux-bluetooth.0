@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <724E8886-CDAC-4EE8-AA00-184A247E89AA@holtmann.org>
+In-Reply-To: <66746AF2-08CF-4E22-95D0-1ADB649BBED8@holtmann.org>
 References: <1392754534-12747-1-git-send-email-andre.guedes@openbossa.org>
- <1392754534-12747-10-git-send-email-andre.guedes@openbossa.org> <724E8886-CDAC-4EE8-AA00-184A247E89AA@holtmann.org>
+ <1392754534-12747-9-git-send-email-andre.guedes@openbossa.org> <66746AF2-08CF-4E22-95D0-1ADB649BBED8@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Wed, 19 Feb 2014 13:37:58 -0300
-Message-ID: <CACJA=fUhkmraMLLRgQpT2PPZgTLThJ=1bWK0wDcC+ADk8Cwzrg@mail.gmail.com>
-Subject: Re: [RFC v10 10/10] Bluetooth: Add le_auto_conn file on debugfs
+Date: Wed, 19 Feb 2014 13:37:49 -0300
+Message-ID: <CACJA=fVutrsq43ce+6aWStdjHuFTeEd=nU4wEFSzaQxf4j6oJw@mail.gmail.com>
+Subject: Re: [RFC v10 09/10] Bluetooth: Auto connection and power on
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -14,42 +14,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Tue, Feb 18, 2014 at 5:53 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Tue, Feb 18, 2014 at 5:55 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Andre,
 >
->> This patch adds to debugfs the le_auto_conn file. This file will be
->> used to test LE auto connection infrastructure.
+>> When hdev is closed (e.g. Mgmt power off command, RFKILL or controller
+>> is reset), the ongoing active connections are silently dropped by the
+>> controller (no Disconnection Complete Event is sent to host). For that
+>> reason, the devices that require HCI_AUTO_CONN_ALWAYS are not added to
+>> hdev->pend_le_conns list and they won't auto connect.
 >>
->> To add a new auto connection address we write on le_auto_conn file
->> following the format <address> <address type> <auto_connect>.
+>> So to fix this issue, during hdev closing, we remove all pending LE
+>> connections. After adapter is powered on, we add a pending LE connection
+>> for each HCI_AUTO_CONN_ALWAYS address.
 >>
->> The <address type> values are:
->>  * 0 for public address
->>  * 1 for random address
->>
->> The <auto_connect> values are (for more details see struct hci_
->> conn_params):
->>  * 0 for disabled
->>  * 1 for always
->>  * 2 for link loss
->>
->> So for instance, if you want the kernel autonomously establishes
->> connections with device AA:BB:CC:DD:EE:FF (public address) every
->> time the device enters in connectable mode (starts advertising),
->> you should run the command:
->> $ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->>
->> To get the list of connection parameters configured in kernel, read
->> the le_auto_conn file:
->> $ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->>
->> Finally, to clear the connection parameters list, write an empty
->> string:
->> $ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>> This way, the auto connection mechanism works propely after a power
+>> off and power on sequence as well as RFKILL block/unblock.
 >
-> adding the first entry to this list should start scanning and deleting the last entry should stop scanning.
+> and when background scan is running, you might want to make sure to disable LE scan first before doing the actual power down. I just crashed my controller.
 
-Ok, I'll do it.
+Hum, I didn't get any crash with my controllers. Could you send your kernel log?
 
 BR,
 
