@@ -1,77 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] emulator/bthost: Fix command queue
-Date: Wed, 19 Feb 2014 14:39:38 +0100
-Message-Id: <1392817178-15022-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH v2 6/6] Bluetooth: Add support for sending New IRK event
+Date: Wed, 19 Feb 2014 15:18:31 +0200
+Message-Id: <1392815911-11699-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1392814668-4830-7-git-send-email-johan.hedberg@gmail.com>
+References: <1392814668-4830-7-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now new commands will be pushed to tail. Queue will be consumed
-from head, firstly added commands will be sent. It repairs this
-warning from android-tester:
-==20561== 1,904 bytes in 7 blocks are definitely
-lost in loss record 30 of 31
-==20561==    at 0x4006AB1: malloc (in /usr/lib/valgrind/
-vgpreload_memcheck-x86-linux.so)
-==20561==    by 0x8050293: send_command (bthost.c:389)
-==20561==    by 0x80543E1: start_stack (hciemu.c:299)
-==20561==    by 0x41043D00: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
-==20561==    by 0x410470E5: g_main_context_dispatch (in
-/usr/lib/libglib-2.0.so.0.3600.4)
-==20561==    by 0x41047497: ??? (in
-/usr/lib/libglib-2.0.so.0.3600.4)
-==20561==    by 0x41047912: g_main_loop_run (in
-/usr/lib/libglib-2.0.so.0.3600.4)
-==20561==    by 0x8055870: tester_run (tester.c:798)
-==20561==    by 0x804B980: main (android-tester.c:3984)
----
- emulator/bthost.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index fe78ec5..2f338f7 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -395,7 +395,7 @@ void bthost_destroy(struct bthost *bthost)
- 	while (bthost->cmd_q.tail) {
- 		struct cmd *cmd = bthost->cmd_q.tail;
+This patch adds the necessary helper function to send the New IRK mgmt
+event and makes sure that the function is called at when SMP key
+distribution has completed. The event is sent before the New LTK event
+so user space knows which remote device to associate with the keys.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Fix checking for correct irk variable before calling mgmt_new_irk
+
+ include/net/bluetooth/hci_core.h |  1 +
+ include/net/bluetooth/mgmt.h     |  7 +++++++
+ net/bluetooth/mgmt.c             | 15 +++++++++++++++
+ net/bluetooth/smp.c              |  3 +++
+ 4 files changed, 26 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 59ae04c2684f..3be2905010cd 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1211,6 +1211,7 @@ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
+ int mgmt_device_blocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ int mgmt_device_unblocked(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key);
++void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
+ void mgmt_reenable_advertising(struct hci_dev *hdev);
+ void mgmt_smp_complete(struct hci_conn *conn, bool complete);
  
--		bthost->cmd_q.tail = cmd->next;
-+		bthost->cmd_q.tail = cmd->prev;
- 		free(cmd);
- 	}
- 
-@@ -461,6 +461,8 @@ static void queue_command(struct bthost *bthost, const void *data,
- 
- 	if (cmd_q->tail)
- 		cmd_q->tail->next = cmd;
-+	else
-+		cmd_q->head = cmd;
- 
- 	cmd->prev = cmd_q->tail;
- 	cmd_q->tail = cmd;
-@@ -662,7 +664,7 @@ static void send_command(struct bthost *bthost, uint16_t opcode,
- static void next_cmd(struct bthost *bthost)
- {
- 	struct cmd_queue *cmd_q = &bthost->cmd_q;
--	struct cmd *cmd = cmd_q->tail;
-+	struct cmd *cmd = cmd_q->head;
- 	struct cmd *next;
- 
- 	if (!cmd)
-@@ -678,8 +680,10 @@ static void next_cmd(struct bthost *bthost)
- 
- 	if (next)
- 		next->prev = NULL;
-+	else
-+		cmd_q->tail = NULL;
- 
--	cmd_q->tail = next;
-+	cmd_q->head = next;
- 
- 	free(cmd);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index e4fa13e559e2..2e46251e8aec 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -536,3 +536,10 @@ struct mgmt_ev_passkey_notify {
+ 	__le32	passkey;
+ 	__u8	entered;
+ } __packed;
++
++#define MGMT_EV_NEW_IRK			0x0018
++struct mgmt_ev_new_irk {
++	__u8     store_hint;
++	bdaddr_t rpa;
++	struct mgmt_irk_info irk;
++} __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index bcfc6da67a5c..1daa837da091 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4792,6 +4792,21 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key)
+ 	mgmt_event(MGMT_EV_NEW_LONG_TERM_KEY, hdev, &ev, sizeof(ev), NULL);
  }
+ 
++void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk)
++{
++	struct mgmt_ev_new_irk ev;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.store_hint = 0x01;
++	bacpy(&ev.rpa, &irk->rpa);
++	bacpy(&ev.irk.addr.bdaddr, &irk->bdaddr);
++	ev.irk.addr.type = link_to_bdaddr(LE_LINK, irk->addr_type);
++	memcpy(ev.irk.val, irk->val, sizeof(irk->val));
++
++	mgmt_event(MGMT_EV_NEW_IRK, hdev, &ev, sizeof(ev), NULL);
++}
++
+ static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+ 				  u8 data_len)
+ {
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index f05c1b71d99a..f06068072bdd 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1112,6 +1112,9 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
+ 
++	if (smp->remote_irk)
++		mgmt_new_irk(hdev, smp->remote_irk);
++
+ 	if (smp->ltk) {
+ 		smp->ltk->bdaddr_type = hcon->dst_type;
+ 		bacpy(&smp->ltk->bdaddr, &hcon->dst);
 -- 
-1.8.3.1
+1.8.5.3
 
