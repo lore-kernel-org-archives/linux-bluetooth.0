@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 0/6] Bluetooth: Add support for New IRK mgmt event
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1392814668-4830-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 19 Feb 2014 08:03:37 -0800
+Date: Wed, 19 Feb 2014 17:44:03 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: "Viswanatham, RaviTeja"
+	<RaviTeja.Viswanatham.EDUCATION@eberspaecher.com>
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <3D46989E-527C-46DB-B8FF-03C1AB261664@holtmann.org>
-References: <1392814668-4830-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: Marvell 88W8787 Bluetooth highh speed
+Message-ID: <20140219154400.GB2654@aemeltch-MOBL1>
+References: <9BC883E0D59F6B4DBD525D460025714B08AE47D6@deessmx03.dees.eberspaecher.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <9BC883E0D59F6B4DBD525D460025714B08AE47D6@deessmx03.dees.eberspaecher.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Raviteja,
 
-> This patch set adds support for the New IRK mgmt event and moves the
-> sending of New LTK events after that event (ensuring they all contain
-> the Identity Address insted of the RPA).
+On Wed, Feb 19, 2014 at 03:24:48PM +0000, Viswanatham, RaviTeja wrote:
+> Hello ,
 > 
-> Johan
+> First of all, I thank you for your guidance on regarding Bluetooth high
+> speed. I found the Marvell 88W8787 device which can support Bluetooth
+> high speed with your suggested help.  
 > 
-> ----------------------------------------------------------------
-> Johan Hedberg (6):
->      Bluetooth: Avoid using GFP_ATOMIC where not necessary
->      Bluetooth: Return added key when adding LTKs and IRKs
->      Bluetooth: Move New LTK store hint evaluation into mgmt_new_ltk
->      Bluetooth: Track SMP keys in the SMP context
->      Bluetooth: Move SMP LTK notification after key distribution
->      Bluetooth: Add support for sending New IRK event
-> 
-> include/net/bluetooth/hci_core.h | 13 ++++++-----
-> include/net/bluetooth/mgmt.h     |  7 ++++++
-> net/bluetooth/hci_core.c         | 38 +++++++++++--------------------
-> net/bluetooth/mgmt.c             | 30 ++++++++++++++++++++-----
-> net/bluetooth/smp.c              | 45 +++++++++++++++++++++++++++++--------
-> net/bluetooth/smp.h              |  3 +++
-> 6 files changed, 91 insertions(+), 45 deletions(-)
+> The Marvell 88W8787 supports host interfaces like  SDIO, I²C, SPI,  and
+> UART. I would like to know on which interface did you worked to get an
+> Bluetooth high Speed ?
 
-all 6 patches have been applied to bluetooth-next tree.
+SDIO was working, some newer boards have USB interface which is better.
 
-Regards
-
-Marcel
+Best regards 
+Andrei Emeltchenko 
 
