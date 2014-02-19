@@ -1,57 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1392805549-28152-8-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1392805549-28152-1-git-send-email-jakub.tyszkowski@tieto.com>
-	<1392805549-28152-8-git-send-email-jakub.tyszkowski@tieto.com>
-Date: Wed, 19 Feb 2014 07:25:36 -0400
-Message-ID: <CAJdJm_Mh-vZ2ieKJq_CWao43ticSu++JTdvDwraHODFB_U76dA@mail.gmail.com>
-Subject: Re: [RFC 07/11] android/tester: Execute hh connection state cbacks in
- main loop
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] emulator/bthost: Fix command queue
+Date: Wed, 19 Feb 2014 11:26:48 +0100
+Message-Id: <1392805608-24544-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Now new commands will be pushed to tail. Queue will be consumed
+from head, firstly added commands will be sent. In previous solution
+some queued commands were not freed. It repairs this warning
+from android-tester:
 
-On Wed, Feb 19, 2014 at 6:25 AM, Jakub Tyszkowski
-<jakub.tyszkowski@tieto.com> wrote:
-> Execute generic HIDHost connection_state_cb in tester's main loop.
-> ---
->  android/android-tester.c | 23 +++++++++++++++++++----
->  1 file changed, 19 insertions(+), 4 deletions(-)
->
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 0115943..664f381 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -3212,19 +3212,34 @@ clean:
->                 close(sock_fd);
->  }
->
-> -static void hidhost_connection_state_cb(bt_bdaddr_t *bd_addr,
-> -                                               bthh_connection_state_t state)
-> +static gboolean hidhost_connection_state(gpointer user_data)
->  {
->         struct test_data *data = tester_get_data();
->         const struct hidhost_generic_data *test = data->test_data;
-> +       struct generic_cb_data *cb_data = user_data;
->
->         data->cb_count++;
->
-> -       if (state == BTHH_CONN_STATE_CONNECTED)
-> +       if ((int) cb_data->state == BTHH_CONN_STATE_CONNECTED)
+==20561== 1,904 bytes in 7 blocks are definitely
+lost in loss record 30 of 31
+==20561==    at 0x4006AB1: malloc (in /usr/lib/valgrind/
+vgpreload_memcheck-x86-linux.so)
+==20561==    by 0x8050293: send_command (bthost.c:389)
+==20561==    by 0x80543E1: start_stack (hciemu.c:299)
+==20561==    by 0x41043D00: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
+==20561==    by 0x410470E5: g_main_context_dispatch (in
+/usr/lib/libglib-2.0.so.0.3600.4)
+==20561==    by 0x41047497: ??? (in
+/usr/lib/libglib-2.0.so.0.3600.4)
+==20561==    by 0x41047912: g_main_loop_run (in
+/usr/lib/libglib-2.0.so.0.3600.4)
+==20561==    by 0x8055870: tester_run (tester.c:798)
+==20561==    by 0x804B980: main (android-tester.c:3984)
+---
+ emulator/bthost.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-You are reusing a variable of different type (bt_state_t vs.
-bthh_connection_state_t), so I believe it's why you are casting above.
-
-My suggestion (if that works) is to declare the state field in
-generic_cb_data as int, so it should work without any casting.
-
-Best Regards,
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 6fbabe8..aa8cc79 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -331,7 +331,7 @@ void bthost_destroy(struct bthost *bthost)
+ 	while (bthost->cmd_q.tail) {
+ 		struct cmd *cmd = bthost->cmd_q.tail;
+ 
+-		bthost->cmd_q.tail = cmd->next;
++		bthost->cmd_q.tail = cmd->prev;
+ 		free(cmd);
+ 	}
+ 
+@@ -397,6 +397,8 @@ static void queue_command(struct bthost *bthost, const void *data,
+ 
+ 	if (cmd_q->tail)
+ 		cmd_q->tail->next = cmd;
++	else
++		cmd_q->head = cmd;
+ 
+ 	cmd->prev = cmd_q->tail;
+ 	cmd_q->tail = cmd;
+@@ -598,7 +600,7 @@ static void send_command(struct bthost *bthost, uint16_t opcode,
+ static void next_cmd(struct bthost *bthost)
+ {
+ 	struct cmd_queue *cmd_q = &bthost->cmd_q;
+-	struct cmd *cmd = cmd_q->tail;
++	struct cmd *cmd = cmd_q->head;
+ 	struct cmd *next;
+ 
+ 	if (!cmd)
+@@ -614,8 +616,10 @@ static void next_cmd(struct bthost *bthost)
+ 
+ 	if (next)
+ 		next->prev = NULL;
++	else
++		cmd_q->tail = NULL;
+ 
+-	cmd_q->tail = next;
++	cmd_q->head = next;
+ 
+ 	free(cmd);
+ }
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+1.8.3.1
+
