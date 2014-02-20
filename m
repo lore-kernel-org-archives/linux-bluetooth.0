@@ -1,58 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1392893523.5772.2.camel@pohly-mobl1.fritz.box>
-Subject: Re: [PATCH BlueZ 8/8] doc/obex-api: Update documentation
-From: Patrick Ohly <patrick.ohly@intel.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date: Thu, 20 Feb 2014 11:52:03 +0100
-In-Reply-To: <CABBYNZL82SJPZws+b0syb0nx8OVHCwfB4Tr3cDem9JWBvy5oCQ@mail.gmail.com>
-References: <1392393184-15266-1-git-send-email-luiz.dentz@gmail.com>
-	 <1392393184-15266-8-git-send-email-luiz.dentz@gmail.com>
-	 <1392714551.5951.275.camel@pohly-mobl1.fritz.box>
-	 <CABBYNZ+-hu0G6cja-uBWPFuywj7S+bBDhitNoBhUnFnTFjYDcA@mail.gmail.com>
-	 <1392742461.6118.25.camel@pohly-mobl1.fritz.box>
-	 <CABBYNZL82SJPZws+b0syb0nx8OVHCwfB4Tr3cDem9JWBvy5oCQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrea <mariofutire@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: partial success with PS3 sixaxis
+Date: Thu, 20 Feb 2014 10:47:44 +0100
+Message-ID: <1484977.kC8PK9znGI@uw000953>
+In-Reply-To: <52FFD116.2080902@gmail.com>
+References: <52FBE820.6050701@gmail.com> <2534491.XllyezJg3g@uw000953> <52FFD116.2080902@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, 2014-02-19 at 19:11 +0200, Luiz Augusto von Dentz wrote:
-> Hi Patrick,
-> 
-> On Tue, Feb 18, 2014 at 6:54 PM, Patrick Ohly <patrick.ohly@intel.com> wrote:
-> > On Tue, 2014-02-18 at 11:30 +0200, Luiz Augusto von Dentz wrote:
-> >> Hi Patrick,
-> >>
-> >> On Tue, Feb 18, 2014 at 11:09 AM, Patrick Ohly <patrick.ohly@intel.com> wrote:
-> > I think I would prefer to *not* get errors when Suspend() is called on
-> > an already suspended transfer or when Resume() is called on a running
-> > transfer. The rationale is that the caller will typically only care
-> > about the end result and not so much whether it was the one who
-> > triggered the change. If we remove NotInProgress resp. InProgress errors
-> > from the API, then such a caller can treat all errors as fatal problem,
-> > without having to check the exact error.
-> 
-> Actually the NotInProgress error is for transfer queued, I guess for
-> this case it makes sense to return an error since otherwise we would
-> have to queue commands to be send when the transfer becomes active I
-> believe this should probably be considered an error.
+Hi Andrea,
 
-Agreed, if suspending can't be done, then an error needs to be returned.
+On Saturday 15 of February 2014 20:41:58 Andrea wrote:
+> On 13/02/14 09:25, Szymon Janc wrote:
+> > Hi Andrea,
+> > 
+> > 
+> > I assume you are using bluetoothctl so do:
+> > agent on
+> > default-agent
+> > 
+> > Then you should get authorization request in bluetoothctl when DS3 is connecting.
+> > 
+> 
+> Hi,
+> 
+> I have tried on a different laptop (no more the raspberry pi, where I still have the issues I
+> reported in the other email), running Fedora 19.
+> 
+> I compiled bluez 5.14 and run it.
+> It is more stable and /dev/input/js0 is usable.
+> 
+> It is still not able to set the LEDs. This gets written in the output
+> 
+> Feb 15 16:55:02 localhost.localdomain bluetoothd[24620]: sixaxis: compatible device connected:
+> PLAYSTATION(R)3 Contr
+> Feb 15 16:55:02 localhost.localdomain kernel: input: PLAYSTATION(R)3 Controller as
+> /devices/pci0000:00/0000:00:1d.1/
+> Feb 15 16:55:02 localhost.localdomain kernel: sony 0005:054C:0268.000E: input,hidraw0: BLUETOOTH HID
+> v1.00 Joystick
+> Feb 15 16:55:02 localhost.localdomain bluetoothd[24620]: sixaxis: failed to set LEDS (0 bytes written)
+> 
+> I have tried to log the traffic for bluez and sixad (where the LEDs work), to see you can find any
+> difference.
 
-It would be good to add information about the error to the
-documentation, so that apps get at least some hint what they are
-supposed to do in case of such an error (like aborting the queued
-transfer (most likely) or waiting for it to start before suspending it
-(seems a bit odd, but perhaps it is useful sometimes)).
+This is a known regression on kernels >3.9. Should be fixed in 3.15 AFAIR.
+
+> http://pastebin.com/pExywtUk  (this is the log from bluez where LEDs keep flashing)
+> http://pastebin.com/BgRUnamS  (log from sixad where LEDs are set)
+> 
+> Happy to provide more if it can be of any help.
+> 
+> Andrea
+> 
 
 -- 
-Best Regards, Patrick Ohly
-
-The content of this message is my personal opinion only and although
-I am an employee of Intel, the statements I make here in no way
-represent Intel's position on the issue, nor am I authorized to speak
-on behalf of Intel on this matter.
-
-
-
+Best regards, 
+Szymon Janc
