@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 3/4] unit/avrcp: Add TP/MPS/BV-03-C test case
-Date: Thu, 20 Feb 2014 15:22:38 +0200
-Message-Id: <1392902559-23987-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 1/4] unit/avrcp: First unit test for AVRCP profile
+Date: Thu, 20 Feb 2014 15:22:36 +0200
+Message-Id: <1392902559-23987-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1392902559-23987-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1392902559-23987-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,105 +11,395 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that the Set Browsed Player command issued by the
-AVRCP controller.
+Test TP/MPS/BV-01-C [SetAddressedPlayer - CT] verifies
+SetAddressedPlayer command.
 ---
- android/avrcp-lib.c | 37 +++++++++++++++++++++++++++++++++++++
- android/avrcp-lib.h |  1 +
- unit/test-avrcp.c   |  6 ++++++
- 3 files changed, 44 insertions(+)
+ Makefile.am         |   9 ++
+ android/avrcp-lib.c |  59 ++++++++++++
+ android/avrcp-lib.h |   1 +
+ unit/test-avrcp.c   | 270 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 339 insertions(+)
+ create mode 100644 unit/test-avrcp.c
 
+diff --git a/Makefile.am b/Makefile.am
+index 11f2aa1..5fe58eb 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -282,6 +282,15 @@ unit_test_avctp_SOURCES = unit/test-avctp.c \
+ 				android/avctp.c android/avctp.h
+ unit_test_avctp_LDADD = @GLIB_LIBS@
+ 
++unit_tests += unit/test-avrcp
++
++unit_test_avrcp_SOURCES = unit/test-avrcp.c \
++				src/shared/util.h src/shared/util.c \
++				src/log.h src/log.c \
++				android/avctp.c android/avctp.h \
++				android/avrcp-lib.c android/avrcp-lib.h
++unit_test_avrcp_LDADD = @GLIB_LIBS@ lib/libbluetooth-internal.la
++
+ unit_tests += unit/test-gdbus-client
+ 
+ unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 13bfd79..92d2ac8 100644
+index ef48fa7..adb42be 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -38,6 +38,7 @@
- #define IEEEID_BTSIG		0x001958
+@@ -35,6 +35,38 @@
+ #include "avctp.h"
+ #include "avrcp-lib.h"
  
- #define AVRCP_SET_ADDRESSED_PLAYER	0x60
-+#define AVRCP_SET_BROWSED_PLAYER	0x70
- 
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- 
-@@ -67,6 +68,13 @@ struct avrcp_header {
- #error "Unknown byte order"
- #endif
- 
-+struct avrcp_browsing_header {
++#define IEEEID_BTSIG		0x001958
++
++#define AVRCP_SET_ADDRESSED_PLAYER	0x60
++
++#if __BYTE_ORDER == __LITTLE_ENDIAN
++
++struct avrcp_header {
++	uint8_t company_id[3];
 +	uint8_t pdu_id;
-+	uint16_t param_len;
++	uint8_t packet_type:2;
++	uint8_t rsvd:6;
++	uint16_t params_len;
 +	uint8_t params[0];
 +} __attribute__ ((packed));
-+#define AVRCP_BROWSING_HEADER_LENGTH 3
++#define AVRCP_HEADER_LENGTH 7
++
++#elif __BYTE_ORDER == __BIG_ENDIAN
++
++struct avrcp_header {
++	uint8_t company_id[3];
++	uint8_t pdu_id;
++	uint8_t rsvd:6;
++	uint8_t packet_type:2;
++	uint16_t params_len;
++	uint8_t params[0];
++} __attribute__ ((packed));
++#define AVRCP_HEADER_LENGTH 7
++
++#else
++#error "Unknown byte order"
++#endif
 +
  struct avrcp {
  	struct avctp	*session;
  };
-@@ -138,3 +146,32 @@ int avrcp_set_addr_player(struct avrcp *avrcp_session, uint16_t id)
- 					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
- 					NULL, NULL);
+@@ -73,3 +105,30 @@ int avrcp_init_uinput(struct avrcp *session, const char *name,
+ {
+ 	return avctp_init_uinput(session->session, name, address);
  }
 +
-+static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
-+						uint8_t *operands,
-+						size_t operand_count,
-+						void *user_data)
++static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
 +{
-+	DBG("");
++	cid[0] = cid_in >> 16;
++	cid[1] = cid_in >> 8;
++	cid[2] = cid_in;
++}
++
++int avrcp_set_addr_player(struct avrcp *avrcp_session, uint16_t id)
++{
++	uint8_t buf[AVRCP_HEADER_LENGTH + 2];
++	struct avrcp_header *pdu = (void *) buf;
++	struct avctp *session = avrcp_session->session;
++
++	memset(buf, 0, sizeof(buf));
++
++	set_company_id(pdu->company_id, IEEEID_BTSIG);
++
++	pdu->pdu_id = AVRCP_SET_ADDRESSED_PLAYER;
++
++	bt_put_be16(id, &pdu->params[0]);
++	pdu->params_len = htons(sizeof(id));
++
++	return avctp_send_vendordep_req(session, AVC_CTYPE_CONTROL,
++					AVC_SUBUNIT_PANEL, buf, sizeof(buf),
++					NULL, NULL);
++}
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 7955d56..4207cce 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -29,3 +29,4 @@ void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+ 							void *user_data);
+ int avrcp_init_uinput(struct avrcp *session, const char *name,
+ 							const char *address);
++int avrcp_set_addr_player(struct avrcp *avrcp_session, uint16_t id);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+new file mode 100644
+index 0000000..9491631
+--- /dev/null
++++ b/unit/test-avrcp.c
+@@ -0,0 +1,270 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <unistd.h>
++#include <stdlib.h>
++#include <stdbool.h>
++#include <inttypes.h>
++#include <string.h>
++#include <fcntl.h>
++#include <sys/socket.h>
++
++#include <glib.h>
++
++#include "src/shared/util.h"
++#include "src/log.h"
++#include "lib/bluetooth.h"
++
++#include "android/avctp.h"
++#include "android/avrcp-lib.h"
++
++struct test_pdu {
++	bool valid;
++	bool fragmented;
++	const uint8_t *data;
++	size_t size;
++};
++
++struct test_data {
++	char *test_name;
++	struct test_pdu *pdu_list;
++};
++
++struct context {
++	GMainLoop *main_loop;
++	struct avrcp *session;
++	guint source;
++	guint process;
++	int fd;
++	unsigned int pdu_offset;
++	const struct test_data *data;
++};
++
++#define data(args...) ((const unsigned char[]) { args })
++
++#define raw_pdu(args...)					\
++	{							\
++		.valid = true,					\
++		.data = data(args),				\
++		.size = sizeof(data(args)),			\
++	}
++
++#define frg_pdu(args...)					\
++	{							\
++		.valid = true,					\
++		.fragmented = true,				\
++		.data = data(args),				\
++		.size = sizeof(data(args)),			\
++	}
++
++#define define_test(name, function, args...)				\
++	do {								\
++		const struct test_pdu pdus[] = {			\
++			args, { }					\
++		};							\
++		static struct test_data data;				\
++		data.test_name = g_strdup(name);			\
++		data.pdu_list = g_malloc(sizeof(pdus));			\
++		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
++		g_test_add_data_func(name, &data, function);		\
++	} while (0)
++
++static void test_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
++
++	g_print("%s%s\n", prefix, str);
++}
++
++static void test_free(gconstpointer user_data)
++{
++	const struct test_data *data = user_data;
++
++	g_free(data->test_name);
++	g_free(data->pdu_list);
++}
++
++static gboolean context_quit(gpointer user_data)
++{
++	struct context *context = user_data;
++
++	if (context->process > 0)
++		g_source_remove(context->process);
++
++	g_main_loop_quit(context->main_loop);
 +
 +	return FALSE;
 +}
 +
-+int avrcp_set_browsed_player(struct avrcp *avrcp_session, uint16_t id)
++static gboolean send_pdu(gpointer user_data)
 +{
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 2];
-+	struct avrcp_browsing_header *pdu = (void *) buf;
-+	struct avctp *session = avrcp_session->session;
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	ssize_t len;
 +
-+	DBG("");
++	pdu = &context->data->pdu_list[context->pdu_offset++];
 +
-+	memset(buf, 0, sizeof(buf));
++	len = write(context->fd, pdu->data, pdu->size);
 +
-+	pdu->pdu_id = AVRCP_SET_BROWSED_PLAYER;
++	if (g_test_verbose())
++		util_hexdump('<', pdu->data, len, test_debug, "AVCTP: ");
 +
-+	bt_put_be16(id, &pdu->params[0]);
-+	pdu->param_len = htons(sizeof(id));
++	g_assert_cmpint(len, ==, pdu->size);
 +
-+	return avctp_send_browsing_req(session, buf, sizeof(buf),
-+					avrcp_set_browsed_player_rsp, session);
++	if (pdu->fragmented)
++		return send_pdu(user_data);
++
++	context->process = 0;
++	return FALSE;
 +}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 7b0aaef..2eb020b 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -32,3 +32,4 @@ int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
- int avrcp_init_uinput(struct avrcp *session, const char *name,
- 							const char *address);
- int avrcp_set_addr_player(struct avrcp *avrcp_session, uint16_t id);
-+int avrcp_set_browsed_player(struct avrcp *avrcp_session, uint16_t id);
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 9d4eede..692652c 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -329,6 +329,9 @@ static void test_client(gconstpointer data)
- 	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-01-C"))
- 		ret = avrcp_set_addr_player(context->session, 0xabcd);
- 
-+	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-03-C"))
-+		ret = avrcp_set_browsed_player(context->session, 0xabcd);
 +
- 	DBG("ret = %d", ret);
- 
- 	g_assert(!ret);
-@@ -350,5 +353,8 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, 0x60, 0x00, 0x00,
- 				0x02, 0xab, 0xcd));
- 
-+	define_test("/TP/MPS/BV-03-C", test_client,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
-+				0xab, 0xcd));
- 	return g_test_run();
- }
++static void context_process(struct context *context)
++{
++	if (!context->data->pdu_list[context->pdu_offset].valid) {
++		context_quit(context);
++		return;
++	}
++
++	context->process = g_idle_add(send_pdu, context);
++}
++
++static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	unsigned char buf[512];
++	ssize_t len;
++	int fd;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
++		context->source = 0;
++		g_print("%s: cond %x\n", __func__, cond);
++		return FALSE;
++	}
++
++	fd = g_io_channel_unix_get_fd(channel);
++
++	len = read(fd, buf, sizeof(buf));
++
++	g_assert(len > 0);
++
++	if (g_test_verbose())
++		util_hexdump('>', buf, len, test_debug, "AVCTP: ");
++
++	g_assert_cmpint(len, ==, pdu->size);
++
++	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
++
++	if (!pdu->fragmented)
++		context_process(context);
++
++	return TRUE;
++}
++
++static struct context *create_context(uint16_t version, gconstpointer data)
++{
++	struct context *context = g_new0(struct context, 1);
++	GIOChannel *channel;
++	int err, sv[2];
++
++	context->main_loop = g_main_loop_new(NULL, FALSE);
++	g_assert(context->main_loop);
++
++	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
++	g_assert(err == 0);
++
++	context->session = avrcp_new(sv[0], 672, 672, version);
++	g_assert(context->session != NULL);
++
++	channel = g_io_channel_unix_new(sv[1]);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++	g_io_channel_set_encoding(channel, NULL, NULL);
++	g_io_channel_set_buffered(channel, FALSE);
++
++	context->source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				test_handler, context);
++	g_assert(context->source > 0);
++
++	g_io_channel_unref(channel);
++
++	context->fd = sv[1];
++	context->data = data;
++
++	return context;
++}
++
++static void execute_context(struct context *context)
++{
++	g_main_loop_run(context->main_loop);
++
++	if (context->source > 0)
++		g_source_remove(context->source);
++
++	avrcp_shutdown(context->session);
++
++	g_main_loop_unref(context->main_loop);
++
++	test_free(context->data);
++	g_free(context);
++}
++
++static void test_client(gconstpointer data)
++{
++	struct context *context = create_context(0x0100, data);
++	int ret = 0;
++
++	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-01-C"))
++		ret = avrcp_set_addr_player(context->session, 0xabcd);
++
++	DBG("ret = %d", ret);
++
++	g_assert(!ret);
++
++	execute_context(context);
++}
++
++int main(int argc, char *argv[])
++{
++	g_test_init(&argc, &argv, NULL);
++
++	if (g_test_verbose())
++		__btd_log_init("*", 0);
++
++	/* Media Player Selection Commands and Notifications tests */
++
++	define_test("/TP/MPS/BV-01-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
++				0x00, 0x19, 0x58, 0x60, 0x00, 0x00,
++				0x02, 0xab, 0xcd));
++
++	return g_test_run();
++}
 -- 
 1.8.3.2
 
