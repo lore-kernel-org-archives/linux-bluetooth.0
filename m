@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Feb 2014 06:22:53 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Provide option for changing LE advertising
- channel map
-Message-ID: <20140221042253.GA17039@x220.p-661hnu-f1>
-References: <1392926156-4599-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1392926156-4599-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Increase minor version of core module
+Date: Thu, 20 Feb 2014 12:44:20 -0800
+Message-Id: <1392929060-4999-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+With the addition of Resolvable Private Address (RPA) resolution
+support for Bluetooth Low Energy connections, it makes sense to
+increase the minor version of the Bluetooth core module.
 
-On Thu, Feb 20, 2014, Marcel Holtmann wrote:
-> For testing purposes it is useful to provide an option to change the
-> advertising channel map. So add a debugfs option to allow this.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         | 31 +++++++++++++++++++++++++++++++
->  net/bluetooth/mgmt.c             |  2 +-
->  3 files changed, 33 insertions(+), 1 deletion(-)
+The module version is not used anywhere, but it gives a nice extra
+hint for debugging purposes.
 
-Applied to bluetooth-next. Thanks.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/af_bluetooth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Johan
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 0c5866bb49b6..2021c481cdb6 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -31,7 +31,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <linux/proc_fs.h>
+ 
+-#define VERSION "2.18"
++#define VERSION "2.19"
+ 
+ /* Bluetooth sockets */
+ #define BT_MAX_PROTO	8
+-- 
+1.8.5.3
+
