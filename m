@@ -1,42 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] android/bluetooth: Don't set remote name to empty string
-Date: Fri, 21 Feb 2014 17:49:52 +0100
-Message-Id: <1393001393-1160-1-git-send-email-szymon.janc@tieto.com>
+To: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/tester: Fix slang "never used" warning
+Date: Fri, 21 Feb 2014 17:00:26 +0100
+Message-ID: <1480378.m0ANBe2P0I@uw000953>
+In-Reply-To: <1392997607-21896-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1392997607-21896-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If remote device has name but it is empty (0 bytes) just ignore it and
-continue using address as name. This will avoid sending remote device
-property notification with empty name.
----
- android/bluetooth.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Andrei,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 31092e3..e225264 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1096,7 +1096,7 @@ static void update_new_device(struct device *dev, int8_t rssi,
- 		ev->num_props++;
- 	}
- 
--	if (eir->name) {
-+	if (eir->name && strlen(eir->name)) {
- 		g_free(dev->name);
- 		dev->name = g_strdup(eir->name);
- 		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_NAME,
-@@ -1136,7 +1136,7 @@ static void update_device(struct device *dev, int8_t rssi,
- 		ev->num_props++;
- 	}
- 
--	if (eir->name && strcmp(dev->name, eir->name)) {
-+	if (eir->name && strlen(eir->name) && strcmp(dev->name, eir->name)) {
- 		g_free(dev->name);
- 		dev->name = g_strdup(eir->name);
- 		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_NAME,
+On Friday 21 of February 2014 17:46:47 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> The patch fixes following warning:
+> ...
+> android/android-tester.c:2185:2: warning: Value stored to
+> 'adapter_status' is never read
+>         adapter_status = data->if_bluetooth->set_adapter_property(prop);
+>         ^                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> ...
+> ---
+>  android/android-tester.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index 84c6ca9..47f918c 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -2190,6 +2190,10 @@ static void test_getprop_bdname_success(const void *test_data)
+>  	init_test_conditions(data);
+>  
+>  	adapter_status = data->if_bluetooth->set_adapter_property(prop);
+> +	if (adapter_status != BT_STATUS_SUCCESS) {
+> +		tester_setup_failed();
+
+This should be tester_test_failed().
+
+> +		return;
+> +	}
+>  
+>  	adapter_status = data->if_bluetooth->get_adapter_property((*prop).type);
+>  	check_expected_status(adapter_status);
+> 
+
 -- 
-1.8.5.3
-
+Best regards, 
+Szymon Janc
