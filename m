@@ -1,55 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/13] android/tester: Execute discovery state cbacks in main loop
-Date: Fri, 21 Feb 2014 13:57:42 +0100
-Message-Id: <1392987473-19994-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 07/13] android/tester: Execute hh connection state cbacks in main loop
+Date: Fri, 21 Feb 2014 13:57:47 +0100
+Message-Id: <1392987473-19994-8-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1392987473-19994-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1392987473-19994-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Execute generic discovery_state_changed_cb in tester's main loop.
+Execute generic HIDHost connection_state_cb in tester's main loop.
 ---
- android/android-tester.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
+ android/android-tester.c | 35 +++++++++++++++++++++++++++++++----
+ 1 file changed, 31 insertions(+), 4 deletions(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index d609323..0976081 100644
+index c8496af..d756dfc 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -695,14 +695,27 @@ static void remote_setprop_disc_state_changed_cb(bt_discovery_state_t state)
- 	}
+@@ -127,6 +127,18 @@ struct bt_cb_data {
+ 	bt_property_t *props;
+ };
+ 
++struct hh_cb_data {
++	bt_bdaddr_t bdaddr;
++
++	bthh_status_t status;
++	bthh_hid_info_t hid_info;
++	bthh_protocol_mode_t mode;
++	bthh_connection_state_t state;
++
++	uint8_t *report;
++	int size;
++};
++
+ static char exec_dir[PATH_MAX + 1];
+ 
+ static void mgmt_debug(const char *str, void *user_data)
+@@ -3210,19 +3222,34 @@ clean:
+ 		close(sock_fd);
  }
  
--static void discovery_state_changed_cb(bt_discovery_state_t state)
-+static gboolean discovery_state_changed(gpointer user_data)
+-static void hidhost_connection_state_cb(bt_bdaddr_t *bd_addr,
+-						bthh_connection_state_t state)
++static gboolean hidhost_connection_state(gpointer user_data)
  {
  	struct test_data *data = tester_get_data();
- 	const struct generic_data *test = data->test_data;
-+	struct bt_cb_data *cb_data = user_data;
+ 	const struct hidhost_generic_data *test = data->test_data;
++	struct hh_cb_data *cb_data = user_data;
  
--	if (test && test->expected_hal_cb.discovery_state_changed_cb) {
--		test->expected_hal_cb.discovery_state_changed_cb(state);
--	}
-+	if (test && test->expected_hal_cb.discovery_state_changed_cb)
-+		test->expected_hal_cb.discovery_state_changed_cb(
+ 	data->cb_count++;
+ 
+-	if (state == BTHH_CONN_STATE_CONNECTED)
++	if (cb_data->state == BTHH_CONN_STATE_CONNECTED)
+ 		tester_setup_complete();
+ 
+ 	if (test && test->expected_hal_cb.connection_state_cb)
+-		test->expected_hal_cb.connection_state_cb(bd_addr, state);
++		test->expected_hal_cb.connection_state_cb(&cb_data->bdaddr,
 +								cb_data->state);
 +
 +	g_free(cb_data);
-+
 +	return FALSE;
 +}
 +
-+static void discovery_state_changed_cb(bt_discovery_state_t state)
++static void hidhost_connection_state_cb(bt_bdaddr_t *bd_addr,
++						bthh_connection_state_t state)
 +{
-+	struct bt_cb_data *cb_data = g_new0(struct bt_cb_data, 1);
++	struct hh_cb_data *cb_data = g_new0(struct hh_cb_data, 1);
 +
 +	cb_data->state = state;
-+	g_idle_add(discovery_state_changed, cb_data);
++	cb_data->bdaddr = *bd_addr;
++
++	g_idle_add(hidhost_connection_state, cb_data);
  }
  
- static bt_property_t *copy_properties(int num_properties,
+ static void hidhost_virual_unplug_cb(bt_bdaddr_t *bd_addr, bthh_status_t status)
 -- 
 1.8.5.2
 
