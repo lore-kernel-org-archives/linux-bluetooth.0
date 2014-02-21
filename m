@@ -2,49 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android/hal-ipc: Fix race condition when closing IPC
-Date: Fri, 21 Feb 2014 17:49:53 +0100
-Message-Id: <1393001393-1160-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1393001393-1160-1-git-send-email-szymon.janc@tieto.com>
-References: <1393001393-1160-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] android/bluetooth: Don't set remote name to empty string
+Date: Fri, 21 Feb 2014 17:49:52 +0100
+Message-Id: <1393001393-1160-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Protect command socket cleanup with mutex to avoid bogus exit when
-stopping notification thread.
+If remote device has name but it is empty (0 bytes) just ignore it and
+continue using address as name. This will avoid sending remote device
+property notification with empty name.
 ---
- android/hal-ipc.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index 99ba38e..1ba03f5 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -159,8 +159,12 @@ static void *notification_handler(void *data)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 31092e3..e225264 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1096,7 +1096,7 @@ static void update_new_device(struct device *dev, int8_t rssi,
+ 		ev->num_props++;
+ 	}
  
- 		/* socket was shutdown */
- 		if (ret == 0) {
--			if (cmd_sk == -1)
-+			pthread_mutex_lock(&cmd_sk_mutex);
-+			if (cmd_sk == -1) {
-+				pthread_mutex_unlock(&cmd_sk_mutex);
- 				break;
-+			}
-+			pthread_mutex_unlock(&cmd_sk_mutex);
+-	if (eir->name) {
++	if (eir->name && strlen(eir->name)) {
+ 		g_free(dev->name);
+ 		dev->name = g_strdup(eir->name);
+ 		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_NAME,
+@@ -1136,7 +1136,7 @@ static void update_device(struct device *dev, int8_t rssi,
+ 		ev->num_props++;
+ 	}
  
- 			error("Notification socket closed, aborting");
- 			exit(EXIT_FAILURE);
-@@ -299,8 +303,10 @@ bool hal_ipc_init(void)
- 
- void hal_ipc_cleanup(void)
- {
-+	pthread_mutex_lock(&cmd_sk_mutex);
- 	close(cmd_sk);
- 	cmd_sk = -1;
-+	pthread_mutex_unlock(&cmd_sk_mutex);
- 
- 	shutdown(notif_sk, SHUT_RD);
- 
+-	if (eir->name && strcmp(dev->name, eir->name)) {
++	if (eir->name && strlen(eir->name) && strcmp(dev->name, eir->name)) {
+ 		g_free(dev->name);
+ 		dev->name = g_strdup(eir->name);
+ 		size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_NAME,
 -- 
 1.8.5.3
 
