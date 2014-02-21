@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/6] android/avrcp: Use NULL for zero pointers
-Date: Fri, 21 Feb 2014 17:23:48 +0200
-Message-Id: <1392996230-11789-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/6] android/avrcp: Implement avrcp_get_avctp
+Date: Fri, 21 Feb 2014 17:23:47 +0200
+Message-Id: <1392996230-11789-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1392996230-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1392996230-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,22 +12,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/avrcp-lib.c | 5 +++++
+ android/avrcp-lib.h | 3 +++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 8ac9e2f..acffd56 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -222,7 +222,7 @@ static sdp_record_t *avrcp_record(void)
- 	features = sdp_data_alloc(SDP_UINT16, &feat);
- 	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index ef48fa7..9180abd 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -39,6 +39,11 @@ struct avrcp {
+ 	struct avctp	*session;
+ };
  
--	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
-+	sdp_set_info_attr(record, "AVRCP TG", NULL, NULL);
++struct avctp *avrcp_get_avctp(struct avrcp *session)
++{
++	return session->session;
++}
++
+ void avrcp_shutdown(struct avrcp *session)
+ {
+ 	if (session->session)
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 7955d56..7bd8b25 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -21,8 +21,11 @@
+  *
+  */
  
- 	sdp_data_free(psm);
- 	sdp_data_free(version);
++struct avrcp;
++
+ typedef void (*avrcp_destroy_cb_t) (void *user_data);
+ 
++struct avctp *avrcp_get_avctp(struct avrcp *session);
+ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
+ void avrcp_shutdown(struct avrcp *session);
+ void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
 -- 
 1.8.3.2
 
