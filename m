@@ -1,62 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 10/13] android/tester: Execute hh report cbacks in main loop
-Date: Fri, 21 Feb 2014 13:57:50 +0100
-Message-Id: <1392987473-19994-11-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 05/13] android/tester: Execute adapter state changed cbacks in main loop
+Date: Fri, 21 Feb 2014 13:57:45 +0100
+Message-Id: <1392987473-19994-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1392987473-19994-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1392987473-19994-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Execute HIDHost generic get_report_cb in tester's main loop.
+Execute generic adapter_state_changed_cb in tester's main loop.
 ---
- android/android-tester.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ android/android-tester.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index 137f171..d9f9a57 100644
+index 3c4bf6c..a941e9f 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -3318,17 +3318,34 @@ static void hidhost_protocol_mode_cb(bt_bdaddr_t *bd_addr,
- 	g_idle_add(hidhost_protocol_mode, cb_data);
+@@ -599,19 +599,33 @@ static void disable_success_cb(bt_state_t state)
+ 	}
  }
  
--static void hidhost_get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t status,
--						uint8_t *report, int size)
-+static gboolean hidhost_get_report(gpointer user_data)
+-static void adapter_state_changed_cb(bt_state_t state)
++static gboolean adapter_state_changed(gpointer user_data)
  {
  	struct test_data *data = tester_get_data();
- 	const struct hidhost_generic_data *test = data->test_data;
-+	struct hh_cb_data *cb_data = user_data;
+ 	const struct generic_data *test = data->test_data;
++	struct bt_cb_data *cb_data = user_data;
  
- 	data->cb_count++;
+ 	if (data->test_init_done &&
+ 			test->expected_hal_cb.adapter_state_changed_cb) {
+-		test->expected_hal_cb.adapter_state_changed_cb(state);
+-		return;
++		test->expected_hal_cb.adapter_state_changed_cb(cb_data->state);
++		goto cleanup;
+ 	}
  
- 	if (test && test->expected_hal_cb.get_report_cb)
--		test->expected_hal_cb.get_report_cb(bd_addr, status, report,
--									size);
-+		test->expected_hal_cb.get_report_cb(&cb_data->bdaddr,
-+			cb_data->status, cb_data->report, cb_data->size);
+-	if (!data->test_init_done && state == BT_STATE_ON)
++	if (!data->test_init_done && cb_data->state == BT_STATE_ON)
+ 		setup_powered_emulated_remote();
 +
-+	g_free(cb_data->report);
++cleanup:
 +	g_free(cb_data);
 +	return FALSE;
 +}
 +
-+static void hidhost_get_report_cb(bt_bdaddr_t *bd_addr, bthh_status_t status,
-+						uint8_t *report, int size)
++static void adapter_state_changed_cb(bt_state_t state)
 +{
-+	struct hh_cb_data *cb_data = g_new0(struct hh_cb_data, 1);
++	struct bt_cb_data *cb_data = g_new0(struct bt_cb_data, 1);
 +
-+	cb_data->bdaddr = *bd_addr;
-+	cb_data->status = status;
-+	cb_data->report = g_memdup(report, size);
-+	cb_data->size = size;
++	cb_data->state = state;
 +
-+	g_idle_add(hidhost_get_report, cb_data);
++	g_idle_add(adapter_state_changed, cb_data);
  }
  
- static bthh_callbacks_t bthh_callbacks = {
+ static void discovery_start_success_cb(bt_discovery_state_t state)
 -- 
 1.8.5.2
 
