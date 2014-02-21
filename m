@@ -1,31 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/avrcp: Use NULL for zero pointers
-Date: Fri, 21 Feb 2014 13:27:48 +0200
-Message-Id: <1392982068-23162-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android: Add resolve_name parameter to confirm_device_name
+Date: Fri, 21 Feb 2014 12:02:41 +0100
+Message-ID: <3205434.KKceAMNG0C@uw000953>
+In-Reply-To: <1392654390-19913-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1392654390-19913-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Łukasz,
 
----
- android/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Monday 17 of February 2014 17:26:29 Lukasz Rymanowski wrote:
+> ---
+>  android/bluetooth.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 525fd27..1827834 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1012,7 +1012,8 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
+>  			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
+>  }
+>  
+> -static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
+> +static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type,
+> +							bool resolve_name)
+>  {
+>  	struct mgmt_cp_confirm_name cp;
+>  
+> @@ -1020,6 +1021,9 @@ static void confirm_device_name(const bdaddr_t *addr, uint8_t addr_type)
+>  	bacpy(&cp.addr.bdaddr, addr);
+>  	cp.addr.type = addr_type;
+>  
+> +	if (!resolve_name)
+> +		cp.name_known = 1;
+> +
+>  	if (mgmt_reply(mgmt_if, MGMT_OP_CONFIRM_NAME, adapter.index,
+>  				sizeof(cp), &cp, NULL, NULL, NULL) == 0)
+>  		error("Failed to send confirm name request");
+> @@ -1179,10 +1183,12 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>  
+>  	if (confirm) {
+>  		char addr[18];
+> +		bool resolve_name = true;
+>  
+>  		ba2str(bdaddr, addr);
+> -		info("Device %s needs name confirmation.", addr);
+> -		confirm_device_name(bdaddr, bdaddr_type);
+> +		info("Device %s needs name confirmation (resolve_name=%d)",
+> +							addr, resolve_name);
+> +		confirm_device_name(bdaddr, bdaddr_type, resolve_name);
+>  	}
+>  }
+>  
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 8ac9e2f..acffd56 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -222,7 +222,7 @@ static sdp_record_t *avrcp_record(void)
- 	features = sdp_data_alloc(SDP_UINT16, &feat);
- 	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
- 
--	sdp_set_info_attr(record, "AVRCP TG", 0, 0);
-+	sdp_set_info_attr(record, "AVRCP TG", NULL, NULL);
- 
- 	sdp_data_free(psm);
- 	sdp_data_free(version);
+Both patches applied, thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
