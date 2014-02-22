@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 05/15] Bluetooth: Add Privacy lag to mgmt supported/current settings
-Date: Sat, 22 Feb 2014 19:06:35 +0200
-Message-Id: <1393088805-28658-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 04/15] Bluetooth: Add mgmt defines for privacy
+Date: Sat, 22 Feb 2014 19:06:34 +0200
+Message-Id: <1393088805-28658-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch makes sure that the Privacy flag is available in the mgmt
-supported settings for all LE capable controllers and in the current
-settings whenever the HCI_PRIVACY flag is set.
+This patch adds basic mgmt defines for enabling privacy. This includes a
+new setting flag as well as the Set Privacy command.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/net/bluetooth/mgmt.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 37a6c4eab881..301b18a1c6a0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -390,6 +390,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 	if (lmp_le_capable(hdev)) {
- 		settings |= MGMT_SETTING_LE;
- 		settings |= MGMT_SETTING_ADVERTISING;
-+		settings |= MGMT_SETTING_PRIVACY;
- 	}
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 2e46251e8aec..62d560624e3d 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -96,6 +96,7 @@ struct mgmt_rp_read_index_list {
+ #define MGMT_SETTING_ADVERTISING	0x00000400
+ #define MGMT_SETTING_SECURE_CONN	0x00000800
+ #define MGMT_SETTING_DEBUG_KEYS		0x00001000
++#define MGMT_SETTING_PRIVACY		0x00002000
  
- 	return settings;
-@@ -438,6 +439,9 @@ static u32 get_current_settings(struct hci_dev *hdev)
- 	if (test_bit(HCI_DEBUG_KEYS, &hdev->dev_flags))
- 		settings |= MGMT_SETTING_DEBUG_KEYS;
+ #define MGMT_OP_READ_INFO		0x0004
+ #define MGMT_READ_INFO_SIZE		0
+@@ -389,6 +390,13 @@ struct mgmt_cp_set_scan_params {
  
-+	if (test_bit(HCI_PRIVACY, &hdev->dev_flags))
-+		settings |= MGMT_SETTING_PRIVACY;
+ #define MGMT_OP_SET_DEBUG_KEYS		0x002E
+ 
++#define MGMT_OP_SET_PRIVACY		0x002F
++struct mgmt_cp_set_privacy {
++	__u8 privacy;
++	__u8 irk[16];
++} __packed;
++#define MGMT_SET_PRIVACY_SIZE		17
 +
- 	return settings;
- }
- 
+ struct mgmt_irk_info {
+ 	struct mgmt_addr_info addr;
+ 	__u8 val[16];
 -- 
 1.8.5.3
 
