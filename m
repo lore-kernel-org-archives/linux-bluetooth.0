@@ -1,46 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 08/15] Bluetooth: Don't write static address when privacy is enabled
+Subject: Re: [PATCH 00/15] Bluetooth: LE Privacy support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393088805-28658-9-git-send-email-johan.hedberg@gmail.com>
-Date: Sat, 22 Feb 2014 10:03:15 -0800
+In-Reply-To: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sat, 22 Feb 2014 10:00:36 -0800
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <7F302D57-1CB8-4D46-BCCF-A31C004F011B@holtmann.org>
-References: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com> <1393088805-28658-9-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <A0B4EB7B-3978-454C-959F-D60A402651E2@holtmann.org>
+References: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> If privacy is enabled we'll be using RPAs instead of the static address.
-> Therefore, only write the static address to HCI when the HCI_PRIVACY
-> flag is not set.
+> This set of patches implements support for the Set Privacy mgmt command,
+> i.e. the ability to have a local IRK and use it to generate a local RPA.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> I'm not expecting most of the patches to have too many points of
+> discussion, except for the last one: we might want to consider adding
+> some restrictions to when Set Privacy can be called in order to make the
+> command implementation simpler. We could e.g. reject the command
+> whenever advertising is enabled or possibly even when the adapter is
+> powered on.
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 145254f84975..21d059968c32 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -4609,7 +4609,8 @@ static int powered_update_hci(struct hci_dev *hdev)
+> Johan
 > 
-> 	if (lmp_le_capable(hdev)) {
-> 		/* Set random address to static address if configured */
-> -		if (bacmp(&hdev->static_addr, BDADDR_ANY))
-> +		if (!test_bit(HCI_PRIVACY, &hdev->dev_flags) &&
-> +		    bacmp(&hdev->static_addr, BDADDR_ANY))
-> 			hci_req_add(&req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
-> 				    &hdev->static_addr);
+> ----------------------------------------------------------------
+> Johan Hedberg (15):
+>      Bluetooth: Add helper variables to smp_distribute_keys()
+>      Bluetooth: Add initial code for distributing local IRK
+>      Bluetooth: Move enable/disable_advertising higher up in mgmt.c
+>      Bluetooth: Add mgmt defines for privacy
+>      Bluetooth: Add Privacy lag to mgmt supported/current settings
+>      Bluetooth: Add skeleton for Set Privacy command
+>      Bluetooth: Add SMP function for generating RPAs
+>      Bluetooth: Don't write static address when privacy is enabled
+>      Bluetooth: Fix hdev->own_addr_type value when privacy is set
+>      Bluetooth: Add mechanism for updating the local RPA
+>      Bluetooth: Update local RPA if necessary when connecting LE
+>      Bluetooth: Update local RPA if necessary before enabling advertising
+>      Bluetooth: Update local RPA if necessary before starting LE scan
+>      Bluetooth: Add debugfs entry for RPA regeneration timeout
+>      Bluetooth: Add full support for updating privacy state
+> 
+> include/net/bluetooth/hci.h      |   2 +
+> include/net/bluetooth/hci_core.h |   9 ++
+> include/net/bluetooth/mgmt.h     |   8 ++
+> net/bluetooth/hci_conn.c         |   3 +
+> net/bluetooth/hci_core.c         |  60 ++++++++++-
+> net/bluetooth/mgmt.c             | 198 +++++++++++++++++++++++++++--------
+> net/bluetooth/smp.c              |  40 +++++--
+> net/bluetooth/smp.h              |   1 +
+> 8 files changed, 262 insertions(+), 59 deletions(-)
 
-since we are changing to code to always write the random address before enabling scanning, before enabling advertising and before creating a connection, lets remove this support here completely.
-
-If we are not using privacy and have a static address, lets write it before it gets used. I added tracing of the currently configured random address. So we always know when we have to update the address itself or not. That makes it a bit more error free and gives us less headaches to figure static vs RPA.
+patches 1-5 have been applied to bluetooth-next tree.
 
 Regards
 
