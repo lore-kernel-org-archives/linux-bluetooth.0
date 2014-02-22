@@ -1,32 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix issue with missing management event opcode
-Date: Fri, 21 Feb 2014 21:35:30 -0800
-Message-Id: <1393047330-34334-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Date: Fri, 21 Feb 2014 20:42:41 -0800
+Message-ID: <CAHZ1yCkfUBYUSBMByCh8C1bbz0YFA6720cR8RF9zSB79gGcZMg@mail.gmail.com>
+Subject: Chrome OS (BlueZ 5.x) qualified as a Host Subsystem for Bluetooth 4.0
+ & Low Energy
+From: Scott James Remnant <keybuk@chromium.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The event opcode for New Identity Resolving Key event is missing from
-supported event list. Just add it there.
+I wanted to share with the rest of the community that the Chrome OS
+team have successfully completed qualification of BlueZ 5.x as a
+Bluetooth 4.0 & Low Energy Host Subsystem:
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 1 +
- 1 file changed, 1 insertion(+)
+https://www.bluetooth.org/tpg/QLI_viewQDL.cfm?qid=22333
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 12fa6399c796..bc329d911706 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -106,6 +106,7 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_DEVICE_UNBLOCKED,
- 	MGMT_EV_DEVICE_UNPAIRED,
- 	MGMT_EV_PASSKEY_NOTIFY,
-+	MGMT_EV_NEW_IRK,
- };
- 
- #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
--- 
-1.8.5.3
 
+The specific versions we qualified were BlueZ 5.4, plus patches, on
+Linux 3.8 and 3.4 with the entire Bluetooth stack backported to it.
+
+Scott
