@@ -1,99 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 3/7] shared: Add support for disconnect handler to mainloop based IO
-Date: Sat, 22 Feb 2014 22:09:21 +0100
-Message-Id: <1393103365-19908-3-git-send-email-szymon.janc@gmail.com>
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH v2 2/7] shared: Minor code style fixes in GLib based IO
+Date: Sat, 22 Feb 2014 22:09:20 +0100
+Message-Id: <1393103365-19908-2-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1393103365-19908-1-git-send-email-szymon.janc@gmail.com>
 References: <1393103365-19908-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Szymon Janc <szymon.janc@tieto.com>
-
 ---
- src/shared/io-mainloop.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+ src/shared/io-glib.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/shared/io-mainloop.c b/src/shared/io-mainloop.c
-index d84d8d2..3fe1a88 100644
---- a/src/shared/io-mainloop.c
-+++ b/src/shared/io-mainloop.c
-@@ -42,6 +42,9 @@ struct io {
- 	io_callback_func_t write_callback;
- 	io_destroy_func_t write_destroy;
- 	void *write_data;
-+	io_callback_func_t disconnect_callback;
-+	io_destroy_func_t disconnect_destroy;
-+	void *disconnect_data;
- };
+diff --git a/src/shared/io-glib.c b/src/shared/io-glib.c
+index 5490fc0..76f5a44 100644
+--- a/src/shared/io-glib.c
++++ b/src/shared/io-glib.c
+@@ -195,6 +195,7 @@ bool io_set_read_handler(struct io *io, io_callback_func_t callback,
  
- static struct io *io_ref(struct io *io)
-@@ -75,6 +78,9 @@ static void io_cleanup(void *user_data)
- 	if (io->read_destroy)
- 		io->read_destroy(io->read_data);
+ 	io->read_destroy = destroy;
+ 	io->read_data = user_data;
++
+ done:
+ 	io->read_callback = callback;
  
-+	if (io->disconnect_destroy)
-+		io->disconnect_destroy(io->disconnect_data);
-+
- 	if (io->close_on_destroy)
- 		close(io->fd);
+@@ -256,6 +257,7 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
  
-@@ -122,6 +128,21 @@ static void io_callback(int fd, uint32_t events, void *user_data)
- 			mainloop_modify_fd(io->fd, io->events);
- 		}
- 	}
+ 	io->write_destroy = destroy;
+ 	io->write_data = user_data;
 +
-+	if ((events & EPOLLRDHUP) && io->disconnect_callback) {
-+		if (!io->disconnect_callback(io, io->disconnect_data)) {
-+			if (io->disconnect_destroy)
-+				io->disconnect_destroy(io->disconnect_data);
-+
-+			io->disconnect_callback = NULL;
-+			io->disconnect_destroy = NULL;
-+			io->disconnect_data = NULL;
-+
-+			io->events &= ~EPOLLRDHUP;
-+
-+			mainloop_modify_fd(io->fd, io->events);
-+		}
-+	}
- }
+ done:
+ 	io->write_callback = callback;
  
- struct io *io_new(int fd)
-@@ -246,5 +267,30 @@ bool io_set_write_handler(struct io *io, io_callback_func_t callback,
- bool io_set_disconnect_handler(struct io *io, io_callback_func_t callback,
- 				void *user_data, io_destroy_func_t destroy)
- {
--	return false;
-+	uint32_t events;
-+
-+	if (!io || io->fd < 0)
-+		return false;
-+
-+	if (io->disconnect_destroy)
-+		io->disconnect_destroy(io->disconnect_data);
-+
-+	if (callback)
-+		events = io->events | EPOLLRDHUP;
-+	else
-+		events = io->events & ~EPOLLRDHUP;
-+
-+	io->disconnect_callback = callback;
-+	io->disconnect_destroy = destroy;
-+	io->disconnect_data = user_data;
-+
-+	if (events == io->events)
-+		return true;
-+
-+	if (mainloop_modify_fd(io->fd, events) < 0)
-+		return false;
-+
-+	io->events = events;
-+
-+	return true;
- }
 -- 
 1.9.0
 
