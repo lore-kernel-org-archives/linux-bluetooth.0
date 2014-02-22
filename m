@@ -1,34 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <53086B93.3080503@gmail.com>
+Date: Sat, 22 Feb 2014 09:19:15 +0000
+From: Andrea <mariofutire@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAHZ1yCkfUBYUSBMByCh8C1bbz0YFA6720cR8RF9zSB79gGcZMg@mail.gmail.com>
-References: <CAHZ1yCkfUBYUSBMByCh8C1bbz0YFA6720cR8RF9zSB79gGcZMg@mail.gmail.com>
-Date: Sat, 22 Feb 2014 15:16:51 +0200
-Message-ID: <CABBYNZJ6WDPu6y9Lqp4xJGMZiRzj1ScWtOL427qk+qPRtN7Mtg@mail.gmail.com>
-Subject: Re: Chrome OS (BlueZ 5.x) qualified as a Host Subsystem for Bluetooth
- 4.0 & Low Energy
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Scott James Remnant <keybuk@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: partial success with PS3 sixaxis
+References: <52FBE820.6050701@gmail.com> <2534491.XllyezJg3g@uw000953> <52FFD116.2080902@gmail.com> <1484977.kC8PK9znGI@uw000953>
+In-Reply-To: <1484977.kC8PK9znGI@uw000953>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+On 20/02/14 09:47, Szymon Janc wrote:
+> Hi Andrea,
+> 
+> 
+> This is a known regression on kernels >3.9. Should be fixed in 3.15 AFAIR.
+> 
 
-On Sat, Feb 22, 2014 at 6:42 AM, Scott James Remnant
-<keybuk@chromium.org> wrote:
-> I wanted to share with the rest of the community that the Chrome OS
-> team have successfully completed qualification of BlueZ 5.x as a
-> Bluetooth 4.0 & Low Energy Host Subsystem:
->
-> https://www.bluetooth.org/tpg/QLI_viewQDL.cfm?qid=22333
->
->
-> The specific versions we qualified were BlueZ 5.4, plus patches, on
-> Linux 3.8 and 3.4 with the entire Bluetooth stack backported to it.
+you really mean 3.15? not even 3.14?
 
-That is really great, thanks for sharing.
+then, my last issue is the following:
+
+on Fedora 19 x86 things work with a Bluetooth 4.0 dongle
+
+0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+
+running 3.12.11 (Fedora version)
 
 
--- 
-Luiz Augusto von Dentz
+
+unfortunately on a Raspberry Pi ARM6, Arch Linux with kernel 3.13.3 I get a strange kernel oops
+after a random time of successful usage (could be 1 minute or 2 days)
+
+I struggle to get a meaningful stack trace (the whole system dies, need to attach a serial console),
+would you know of any issues on this architecture? it seems to be a NULL pointer exception.
+The same crash happens with a different dongle (older bluetooth 2 from broadcom)
+
+
+thanks
+
