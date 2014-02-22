@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/15] Bluetooth: Add SMP function for generating RPAs
-Date: Sat, 22 Feb 2014 19:06:37 +0200
-Message-Id: <1393088805-28658-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 06/15] Bluetooth: Add skeleton for Set Privacy command
+Date: Sat, 22 Feb 2014 19:06:36 +0200
+Message-Id: <1393088805-28658-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,56 +11,83 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We need a function in smp.c to generate Resolvable Random Addresses in
-order to support privacy. The local RPA will need to be generated before
-advertising, scanning or connecting and regenerated at periodic
-intervals. This patch adds the necessary function for RPA generation.
+This patch adds the basic skeleton for handing the Set Privacy mgmt
+command, including copying the value to hdev->irk and toggling the
+HCI_PRIVACY flag. The patch does not yet add any kind of RPA generation
+and HCI command sending.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 17 +++++++++++++++++
- net/bluetooth/smp.h |  1 +
- 2 files changed, 18 insertions(+)
+ net/bluetooth/mgmt.c | 42 +++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 41 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8ef50c790b96..7ec48e3d6065 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -124,6 +124,23 @@ bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
- 	return !memcmp(bdaddr->b, hash, 3);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 301b18a1c6a0..145254f84975 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -81,6 +81,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_SCAN_PARAMS,
+ 	MGMT_OP_SET_SECURE_CONN,
+ 	MGMT_OP_SET_DEBUG_KEYS,
++	MGMT_OP_SET_PRIVACY,
+ 	MGMT_OP_LOAD_IRKS,
+ };
+ 
+@@ -4187,6 +4188,45 @@ unlock:
+ 	return err;
  }
  
-+int smp_generate_rpa(struct crypto_blkcipher *tfm, u8 irk[16], bdaddr_t *rpa)
++static int set_privacy(struct sock *sk, struct hci_dev *hdev, void *cp_data,
++		       u16 len)
 +{
++	struct mgmt_cp_set_privacy *cp = cp_data;
++	bool changed;
 +	int err;
 +
-+	get_random_bytes(&rpa->b[3], 3);
++	BT_DBG("request for %s", hdev->name);
 +
-+	rpa->b[5] &= 0x7f;
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
++				  MGMT_STATUS_NOT_SUPPORTED);
 +
-+	err = smp_ah(tfm, irk, &rpa->b[3], rpa->b);
++	if (cp->privacy != 0x00 && cp->privacy != 0x01)
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_DEBUG_KEYS,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	hci_dev_lock(hdev);
++
++	if (cp->privacy) {
++		changed = !test_and_set_bit(HCI_PRIVACY, &hdev->dev_flags);
++		memcpy(hdev->irk, cp->irk, sizeof(hdev->irk));
++	} else {
++		changed = test_and_clear_bit(HCI_PRIVACY, &hdev->dev_flags);
++		memset(hdev->irk, 0, sizeof(hdev->irk));
++	}
++
++	err = send_settings_rsp(sk, MGMT_OP_SET_PRIVACY, hdev);
 +	if (err < 0)
-+		return err;
++		goto unlock;
 +
-+	BT_DBG("RPA %pMR", rpa);
++	if (changed)
++		err = new_settings(hdev, sk);
 +
-+	return 0;
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
 +}
 +
- static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
- 		  u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
- 		  u8 _rat, bdaddr_t *ra, u8 res[16])
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index d8cc543f523c..f32f1212f650 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -152,5 +152,6 @@ void smp_chan_destroy(struct l2cap_conn *conn);
+ static bool irk_is_valid(struct mgmt_irk_info *irk)
+ {
+ 	switch (irk->addr.type) {
+@@ -4401,7 +4441,7 @@ static const struct mgmt_handler {
+ 	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
+ 	{ set_secure_conn,        false, MGMT_SETTING_SIZE },
+ 	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
+-	{ },
++	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
+ 	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
+ };
  
- bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
- 		     bdaddr_t *bdaddr);
-+int smp_generate_rpa(struct crypto_blkcipher *tfm, u8 irk[16], bdaddr_t *rpa);
- 
- #endif /* __SMP_H */
 -- 
 1.8.5.3
 
