@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/15] Bluetooth: Don't write static address when privacy is enabled
-Date: Sat, 22 Feb 2014 19:06:38 +0200
-Message-Id: <1393088805-28658-9-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 07/15] Bluetooth: Add SMP function for generating RPAs
+Date: Sat, 22 Feb 2014 19:06:37 +0200
+Message-Id: <1393088805-28658-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393088805-28658-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If privacy is enabled we'll be using RPAs instead of the static address.
-Therefore, only write the static address to HCI when the HCI_PRIVACY
-flag is not set.
+We need a function in smp.c to generate Resolvable Random Addresses in
+order to support privacy. The local RPA will need to be generated before
+advertising, scanning or connecting and regenerated at periodic
+intervals. This patch adds the necessary function for RPA generation.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 17 +++++++++++++++++
+ net/bluetooth/smp.h |  1 +
+ 2 files changed, 18 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 145254f84975..21d059968c32 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4609,7 +4609,8 @@ static int powered_update_hci(struct hci_dev *hdev)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 8ef50c790b96..7ec48e3d6065 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -124,6 +124,23 @@ bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
+ 	return !memcmp(bdaddr->b, hash, 3);
+ }
  
- 	if (lmp_le_capable(hdev)) {
- 		/* Set random address to static address if configured */
--		if (bacmp(&hdev->static_addr, BDADDR_ANY))
-+		if (!test_bit(HCI_PRIVACY, &hdev->dev_flags) &&
-+		    bacmp(&hdev->static_addr, BDADDR_ANY))
- 			hci_req_add(&req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
- 				    &hdev->static_addr);
++int smp_generate_rpa(struct crypto_blkcipher *tfm, u8 irk[16], bdaddr_t *rpa)
++{
++	int err;
++
++	get_random_bytes(&rpa->b[3], 3);
++
++	rpa->b[5] &= 0x7f;
++
++	err = smp_ah(tfm, irk, &rpa->b[3], rpa->b);
++	if (err < 0)
++		return err;
++
++	BT_DBG("RPA %pMR", rpa);
++
++	return 0;
++}
++
+ static int smp_c1(struct crypto_blkcipher *tfm, u8 k[16], u8 r[16],
+ 		  u8 preq[7], u8 pres[7], u8 _iat, bdaddr_t *ia,
+ 		  u8 _rat, bdaddr_t *ra, u8 res[16])
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index d8cc543f523c..f32f1212f650 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -152,5 +152,6 @@ void smp_chan_destroy(struct l2cap_conn *conn);
  
+ bool smp_irk_matches(struct crypto_blkcipher *tfm, u8 irk[16],
+ 		     bdaddr_t *bdaddr);
++int smp_generate_rpa(struct crypto_blkcipher *tfm, u8 irk[16], bdaddr_t *rpa);
+ 
+ #endif /* __SMP_H */
 -- 
 1.8.5.3
 
