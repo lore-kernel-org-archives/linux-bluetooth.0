@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 09/10] Bluetooth: Add debugfs entry for RPA regeneration timeout
-Date: Sun, 23 Feb 2014 16:23:57 +0200
-Message-Id: <1393165438-13610-10-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 10/10] Bluetooth: Add support for Set Privacy command
+Date: Sun, 23 Feb 2014 16:23:58 +0200
+Message-Id: <1393165438-13610-11-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,65 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds a rpa_timeout debugfs entry which can be used to set the
-RPA regeneration timeout to something else than the default 15 minutes.
+This patch adds support for handing the Set Privacy mgmt command,
+including copying the value to hdev->irk and toggling the HCI_PRIVACY
+flag.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_core.c | 33 +++++++++++++++++++++++++++++++++
- 1 file changed, 33 insertions(+)
+ net/bluetooth/mgmt.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 973145ad8bf0..73fe644949d5 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -492,6 +492,37 @@ static int idle_timeout_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
- 			idle_timeout_set, "%llu\n");
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9934441f7cf8..657ef654cfd9 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -81,6 +81,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_SCAN_PARAMS,
+ 	MGMT_OP_SET_SECURE_CONN,
+ 	MGMT_OP_SET_DEBUG_KEYS,
++	MGMT_OP_SET_PRIVACY,
+ 	MGMT_OP_LOAD_IRKS,
+ };
  
-+static int rpa_timeout_set(void *data, u64 val)
+@@ -4210,6 +4211,51 @@ unlock:
+ 	return err;
+ }
+ 
++static int set_privacy(struct sock *sk, struct hci_dev *hdev, void *cp_data,
++		       u16 len)
 +{
-+	struct hci_dev *hdev = data;
++	struct mgmt_cp_set_privacy *cp = cp_data;
++	bool changed;
++	int err;
 +
-+	/* Require the RPA timeout to be at least 30 seconds and at most
-+	 * 24 hours.
-+	 */
-+	if (val < 30 || val > (60 * 60 * 24))
-+		return -EINVAL;
++	BT_DBG("request for %s", hdev->name);
++
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	if (cp->privacy != 0x00 && cp->privacy != 0x01)
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	if (hdev_is_powered(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
++				  MGMT_STATUS_REJECTED);
 +
 +	hci_dev_lock(hdev);
-+	hdev->rpa_timeout = val;
-+	hci_dev_unlock(hdev);
 +
-+	return 0;
++	if (cp->privacy) {
++		changed = !test_and_set_bit(HCI_PRIVACY, &hdev->dev_flags);
++		memcpy(hdev->irk, cp->irk, sizeof(hdev->irk));
++		set_bit(HCI_RPA_EXPIRED, &hdev->dev_flags);
++	} else {
++		changed = test_and_clear_bit(HCI_PRIVACY, &hdev->dev_flags);
++		memset(hdev->irk, 0, sizeof(hdev->irk));
++		clear_bit(HCI_RPA_EXPIRED, &hdev->dev_flags);
++	}
++
++	err = send_settings_rsp(sk, MGMT_OP_SET_PRIVACY, hdev);
++	if (err < 0)
++		goto unlock;
++
++	if (changed)
++		err = new_settings(hdev, sk);
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
 +}
 +
-+static int rpa_timeout_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	hci_dev_lock(hdev);
-+	*val = hdev->rpa_timeout;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
-+			rpa_timeout_set, "%llu\n");
-+
- static int sniff_min_interval_set(void *data, u64 val)
+ static bool irk_is_valid(struct mgmt_irk_info *irk)
  {
- 	struct hci_dev *hdev = data;
-@@ -1612,6 +1643,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &random_address_fops);
- 		debugfs_create_file("static_address", 0444, hdev->debugfs,
- 				    hdev, &static_address_fops);
-+		debugfs_create_file("rpa_timeout", 0644, hdev->debugfs,
-+				    hdev, &rpa_timeout_fops);
+ 	switch (irk->addr.type) {
+@@ -4424,7 +4470,7 @@ static const struct mgmt_handler {
+ 	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
+ 	{ set_secure_conn,        false, MGMT_SETTING_SIZE },
+ 	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
+-	{ },
++	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
+ 	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
+ };
  
- 		/* For controllers with a public address, provide a debug
- 		 * option to force the usage of the configured static
 -- 
 1.8.5.3
 
