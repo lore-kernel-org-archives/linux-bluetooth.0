@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 07/10] Bluetooth: Use hci_get_own_address_type() for initiating LE scan
-Date: Sun, 23 Feb 2014 16:23:55 +0200
-Message-Id: <1393165438-13610-8-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 09/10] Bluetooth: Add debugfs entry for RPA regeneration timeout
+Date: Sun, 23 Feb 2014 16:23:57 +0200
+Message-Id: <1393165438-13610-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When we start LE scanning we need to update the local random address if
-necessary. This patch updates the code to use hci_get_own_address_type()
-for setting the own_address_type scan parameter and updating the local
-random address if necessary.
+This patch adds a rpa_timeout debugfs entry which can be used to set the
+RPA regeneration timeout to something else than the default 15 minutes.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e57dc93af331..467ca21e04d6 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3382,7 +3382,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 		param_cp.type = LE_SCAN_ACTIVE;
- 		param_cp.interval = cpu_to_le16(DISCOV_LE_SCAN_INT);
- 		param_cp.window = cpu_to_le16(DISCOV_LE_SCAN_WIN);
--		param_cp.own_address_type = hdev->own_addr_type;
-+		param_cp.own_address_type = hci_get_own_address_type(&req);
- 		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
- 			    &param_cp);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 973145ad8bf0..73fe644949d5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -492,6 +492,37 @@ static int idle_timeout_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
+ 			idle_timeout_set, "%llu\n");
  
++static int rpa_timeout_set(void *data, u64 val)
++{
++	struct hci_dev *hdev = data;
++
++	/* Require the RPA timeout to be at least 30 seconds and at most
++	 * 24 hours.
++	 */
++	if (val < 30 || val > (60 * 60 * 24))
++		return -EINVAL;
++
++	hci_dev_lock(hdev);
++	hdev->rpa_timeout = val;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int rpa_timeout_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
++
++	hci_dev_lock(hdev);
++	*val = hdev->rpa_timeout;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
++			rpa_timeout_set, "%llu\n");
++
+ static int sniff_min_interval_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+@@ -1612,6 +1643,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &random_address_fops);
+ 		debugfs_create_file("static_address", 0444, hdev->debugfs,
+ 				    hdev, &static_address_fops);
++		debugfs_create_file("rpa_timeout", 0644, hdev->debugfs,
++				    hdev, &rpa_timeout_fops);
+ 
+ 		/* For controllers with a public address, provide a debug
+ 		 * option to force the usage of the configured static
 -- 
 1.8.5.3
 
