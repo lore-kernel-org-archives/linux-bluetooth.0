@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1392996230-11789-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1392996230-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1392996230-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1392996230-11789-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Sun, 23 Feb 2014 14:06:59 +0200
-Message-ID: <CABBYNZKcpH-7QeYcFv3wV=sToyeeOBd19+4mTW2k8vzSfxaYVA@mail.gmail.com>
-Subject: Re: [PATCHv2 5/6] unit/avrcp: Add /TP/ICC/BV-01-I/CT test
+	<1392996230-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Sun, 23 Feb 2014 13:57:05 +0200
+Message-ID: <CABBYNZL9G3odx=Dgo_R9e0M0N8ZwewLqx1PPnnCrxTz8NuXFxw@mail.gmail.com>
+Subject: Re: [PATCHv2 2/6] android/avctp: Add UNIT INFO command request
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -13,81 +13,64 @@ Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Andrei,
+Hi Andrei,
 
 On Fri, Feb 21, 2014 at 5:23 PM, Andrei Emeltchenko
 <andrei.emeltchenko@gmail.com> wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> Test verifies that the Controller can collect information of Target
-> by UNIT INFO command.
 > ---
->  unit/test-avrcp.c | 37 +++++++++++++++++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
+>  android/avctp.c | 13 +++++++++++++
+>  android/avctp.h |  3 +++
+>  2 files changed, 16 insertions(+)
 >
-> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-> index f1c0f46..2cb28b1 100644
-> --- a/unit/test-avrcp.c
-> +++ b/unit/test-avrcp.c
-> @@ -242,6 +242,37 @@ static void test_dummy(gconstpointer data)
->         destroy_context(context);
+> diff --git a/android/avctp.c b/android/avctp.c
+> index 1e414d1..57a8c23 100644
+> --- a/android/avctp.c
+> +++ b/android/avctp.c
+> @@ -1266,6 +1266,19 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
+>                                                 func, user_data);
 >  }
 >
-> +static void execute_context(struct context *context)
+> +int avctp_send_unit_info_req(struct avctp *session, avctp_rsp_cb func,
+> +                                                               void *user_data)
 > +{
-> +       g_main_loop_run(context->main_loop);
+> +       uint8_t operands[5];
 > +
-> +       if (context->source > 0)
-> +               g_source_remove(context->source);
+> +       memset(operands, 0xFF, sizeof(operands));
 > +
-> +       avrcp_shutdown(context->session);
-> +
-> +       g_main_loop_unref(context->main_loop);
-> +
-> +       test_free(context->data);
-> +       g_free(context);
+> +       return avctp_send_req(session, AVC_CTYPE_STATUS,
+> +                               AVC_SUBUNIT_UNIT, AVC_OP_UNITINFO,
+> +                               operands, sizeof(operands),
+> +                               func, user_data);
 > +}
 > +
-> +static void test_client(gconstpointer data)
-> +{
-> +       struct context *context = create_context(0x0100, data);
-> +       struct avctp *session = avrcp_get_avctp(context->session);
-> +       int ret = 0;
-> +
-> +       if (g_str_equal(context->data->test_name, "/TP/ICC/BV-01-I/CT"))
-> +               ret = avctp_send_unit_info_req(session, NULL, NULL);
-> +
-> +       DBG("ret = %d", ret);
-> +
-> +       g_assert(!ret);
-> +
-> +       execute_context(context);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->         g_test_init(&argc, &argv, NULL);
-> @@ -261,5 +292,11 @@ int main(int argc, char *argv[])
->         define_test("/TP/CRC/BV-01-I", test_dummy, raw_pdu(0x00));
->         define_test("/TP/CRC/BV-02-I", test_dummy, raw_pdu(0x00));
+>  unsigned int avctp_register_passthrough_handler(struct avctp *session,
+>                                                 avctp_passthrough_cb cb,
+>                                                 void *user_data)
+> diff --git a/android/avctp.h b/android/avctp.h
+> index dfa0ca6..7496e53 100644
+> --- a/android/avctp.h
+> +++ b/android/avctp.h
+> @@ -46,6 +46,7 @@
 >
-> +       /* Information collection for control tests */
-> +
-> +       define_test("/TP/ICC/BV-01-I/CT", test_client,
-> +                       raw_pdu(0x00, 0x11, 0x0e, 0x01, 0xf8, 0x30,
-> +                               0xff, 0xff, 0xff, 0xff, 0xff));
-> +
->         return g_test_run();
->  }
+>  /* subunits of interest */
+>  #define AVC_SUBUNIT_PANEL              0x09
+> +#define AVC_SUBUNIT_UNIT               0x1f
+>
+>  /* operands in passthrough commands */
+>  #define AVC_SELECT                     0x00
+> @@ -170,3 +171,5 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
+>  int avctp_send_browsing_req(struct avctp *session,
+>                                 uint8_t *operands, size_t operand_count,
+>                                 avctp_browsing_rsp_cb func, void *user_data);
+> +int avctp_send_unit_info_req(struct avctp *session, avctp_rsp_cb func,
+> +                                                       void *user_data);
 > --
 > 1.8.3.2
 
-There is no such test in the test spec, there is only TP/ICC/BV-01-I,
-perhaps you adding CT yourself just to be able to define the same test
-for the TG but in that case I think it is better to separate with
-different macros e.g. define_test_ct prefixing with "CT" to make
-better distinction and don't mess with test names otherwise we may
-confuse people looking at those tests.
+This probably needs to be internal and sent automatically once
+connected specially if it is for a mandatory test.
 
 
 -- 
