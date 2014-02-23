@@ -1,55 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 01/13] Bluetooth: Ensure hci_conn always contains the local identity address
-Date: Sun, 23 Feb 2014 19:42:17 +0200
-Message-Id: <1393177349-361-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH v2 01/10] Bluetooth: Set the correct address type in Identity Address Information
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393165438-13610-2-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 23 Feb 2014 06:46:39 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <F148332F-574B-4308-9661-34AF592C84FE@holtmann.org>
+References: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com> <1393165438-13610-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-To be consistent with the remote address info in hci_conn we want it to
-also contain the local identity address information. This patch updates
-the code to use the hci_copy_identity_address function to copy the right
-values in place whenever an LE connection has been established.
+> The SMP Identity Address Information PDU contains our Identity Address.
+> The address type can either be static random or public and it is tracked
+> in the hdev->own_address_type variable.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index 8ef50c790b96..ce2c461d07e3 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -1196,8 +1196,7 @@ int smp_distribute_keys(struct l2cap_conn *conn, __u8 force)
+> 
+> 		smp_send_cmd(conn, SMP_CMD_IDENT_INFO, sizeof(idinfo), &idinfo);
+> 
+> -		/* Just public address */
+> -		memset(&addrinfo, 0, sizeof(addrinfo));
+> +		addrinfo.addr_type = hdev->own_addr_type;
+> 		bacpy(&addrinfo.bdaddr, &hcon->src);
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+why not use hcon->src_type here. Otherwise you have to track the difference between when the public address is used vs the static address and force_static_address debugfs.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4327b129d38e..84a475ac2e7f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3625,6 +3625,26 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 	}
- 
-+	/* Ensure that the hci_conn contains the identity address type
-+	 * regardless of which address the connection was made with.
-+	 *
-+	 * If the controller has a public BD_ADDR, then by default
-+	 * use that one. If this is a LE only controller without
-+	 * a public address, default to the random address.
-+	 *
-+	 * For debugging purposes it is possible to force
-+	 * controllers with a public address to use the
-+	 * random address instead.
-+	 */
-+	if (test_bit(HCI_FORCE_STATIC_ADDR, &hdev->dev_flags) ||
-+	    !bacmp(&hdev->bdaddr, BDADDR_ANY)) {
-+		bacpy(&conn->src, &hdev->static_addr);
-+		conn->src_type = ADDR_LE_DEV_RANDOM;
-+	} else {
-+		bacpy(&conn->src, &hdev->bdaddr);
-+		conn->src_type = ADDR_LE_DEV_PUBLIC;
-+	}
-+
- 	/* Lookup the identity address from the stored connection
- 	 * address and address type.
- 	 *
--- 
-1.8.5.3
+Regards
+
+Marcel
 
