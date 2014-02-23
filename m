@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] Bluetooth: Ensure hci_conn always contains the local identity address
-Date: Sun, 23 Feb 2014 22:07:00 +0200
-Message-Id: <1393186020-6383-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v3 10/13] Bluetooth: Add debugfs entry for RPA regeneration timeout
+Date: Sun, 23 Feb 2014 19:42:26 +0200
+Message-Id: <1393177349-361-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393177349-361-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393177349-361-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,55 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-To be consistent with the remote address info in hci_conn we want it to
-also contain the local identity address information. The struct will
-contain the actual address used for the connection while a connection
-process is in place but as soon as we have a successful connection the
-identity address should be tracked instead.
-
-This patch updates the code to set the src and src_type values to point
-at the identity address in the hci_le_conn_complete_evt function. The
-identity address can either be a public address or a static random
-address.
+This patch adds a rpa_timeout debugfs entry which can be used to set the
+RPA regeneration timeout to something else than the default 15 minutes.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v4: Fix commit message not to refer to non-existent functions
+ net/bluetooth/hci_core.c | 33 +++++++++++++++++++++++++++++++++
+ 1 file changed, 33 insertions(+)
 
- net/bluetooth/hci_event.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 4327b129d38e..84a475ac2e7f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3625,6 +3625,26 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 	}
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 7bc67b4e47a7..629919be071c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -492,6 +492,37 @@ static int idle_timeout_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
+ 			idle_timeout_set, "%llu\n");
  
-+	/* Ensure that the hci_conn contains the identity address type
-+	 * regardless of which address the connection was made with.
-+	 *
-+	 * If the controller has a public BD_ADDR, then by default
-+	 * use that one. If this is a LE only controller without
-+	 * a public address, default to the random address.
-+	 *
-+	 * For debugging purposes it is possible to force
-+	 * controllers with a public address to use the
-+	 * random address instead.
-+	 */
-+	if (test_bit(HCI_FORCE_STATIC_ADDR, &hdev->dev_flags) ||
-+	    !bacmp(&hdev->bdaddr, BDADDR_ANY)) {
-+		bacpy(&conn->src, &hdev->static_addr);
-+		conn->src_type = ADDR_LE_DEV_RANDOM;
-+	} else {
-+		bacpy(&conn->src, &hdev->bdaddr);
-+		conn->src_type = ADDR_LE_DEV_PUBLIC;
-+	}
++static int rpa_timeout_set(void *data, u64 val)
++{
++	struct hci_dev *hdev = data;
 +
- 	/* Lookup the identity address from the stored connection
- 	 * address and address type.
- 	 *
++	/* Require the RPA timeout to be at least 30 seconds and at most
++	 * 24 hours.
++	 */
++	if (val < 30 || val > (60 * 60 * 24))
++		return -EINVAL;
++
++	hci_dev_lock(hdev);
++	hdev->rpa_timeout = val;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int rpa_timeout_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
++
++	hci_dev_lock(hdev);
++	*val = hdev->rpa_timeout;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
++			rpa_timeout_set, "%llu\n");
++
+ static int sniff_min_interval_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+@@ -1612,6 +1643,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &random_address_fops);
+ 		debugfs_create_file("static_address", 0444, hdev->debugfs,
+ 				    hdev, &static_address_fops);
++		debugfs_create_file("rpa_timeout", 0644, hdev->debugfs,
++				    hdev, &rpa_timeout_fops);
+ 
+ 		/* For controllers with a public address, provide a debug
+ 		 * option to force the usage of the configured static
 -- 
 1.8.5.3
 
