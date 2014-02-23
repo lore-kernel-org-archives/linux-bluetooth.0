@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 10/10] Bluetooth: Add support for Set Privacy command
-Date: Sun, 23 Feb 2014 16:23:58 +0200
-Message-Id: <1393165438-13610-11-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 06/10] Bluetooth: Use hci_get_own_address_type() for enabling advertising
+Date: Sun, 23 Feb 2014 16:23:54 +0200
+Message-Id: <1393165438-13610-7-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393165438-13610-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-This patch adds support for handing the Set Privacy mgmt command,
-including copying the value to hdev->irk and toggling the HCI_PRIVACY
-flag.
+When we enable advertising we need to update the local random address if
+necessary. This patch takes advantage of the hci_get_own_address_type()
+function to set the own_address_type variable and to update the local
+random address if necessary.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 47 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9934441f7cf8..657ef654cfd9 100644
+index 09316dd2cce1..e57dc93af331 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -81,6 +81,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_SET_SCAN_PARAMS,
- 	MGMT_OP_SET_SECURE_CONN,
- 	MGMT_OP_SET_DEBUG_KEYS,
-+	MGMT_OP_SET_PRIVACY,
- 	MGMT_OP_LOAD_IRKS,
- };
+@@ -845,7 +845,7 @@ static void enable_advertising(struct hci_request *req)
+ 	cp.min_interval = __constant_cpu_to_le16(0x0800);
+ 	cp.max_interval = __constant_cpu_to_le16(0x0800);
+ 	cp.type = get_adv_type(hdev);
+-	cp.own_address_type = hdev->own_addr_type;
++	cp.own_address_type = hci_get_own_address_type(req);
+ 	cp.channel_map = hdev->le_adv_channel_map;
  
-@@ -4210,6 +4211,51 @@ unlock:
- 	return err;
- }
- 
-+static int set_privacy(struct sock *sk, struct hci_dev *hdev, void *cp_data,
-+		       u16 len)
-+{
-+	struct mgmt_cp_set_privacy *cp = cp_data;
-+	bool changed;
-+	int err;
-+
-+	BT_DBG("request for %s", hdev->name);
-+
-+	if (!lmp_le_capable(hdev))
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
-+				  MGMT_STATUS_NOT_SUPPORTED);
-+
-+	if (cp->privacy != 0x00 && cp->privacy != 0x01)
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
-+				  MGMT_STATUS_INVALID_PARAMS);
-+
-+	if (hdev_is_powered(hdev))
-+		return cmd_status(sk, hdev->id, MGMT_OP_SET_PRIVACY,
-+				  MGMT_STATUS_REJECTED);
-+
-+	hci_dev_lock(hdev);
-+
-+	if (cp->privacy) {
-+		changed = !test_and_set_bit(HCI_PRIVACY, &hdev->dev_flags);
-+		memcpy(hdev->irk, cp->irk, sizeof(hdev->irk));
-+		set_bit(HCI_RPA_EXPIRED, &hdev->dev_flags);
-+	} else {
-+		changed = test_and_clear_bit(HCI_PRIVACY, &hdev->dev_flags);
-+		memset(hdev->irk, 0, sizeof(hdev->irk));
-+		clear_bit(HCI_RPA_EXPIRED, &hdev->dev_flags);
-+	}
-+
-+	err = send_settings_rsp(sk, MGMT_OP_SET_PRIVACY, hdev);
-+	if (err < 0)
-+		goto unlock;
-+
-+	if (changed)
-+		err = new_settings(hdev, sk);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+	return err;
-+}
-+
- static bool irk_is_valid(struct mgmt_irk_info *irk)
- {
- 	switch (irk->addr.type) {
-@@ -4424,7 +4470,7 @@ static const struct mgmt_handler {
- 	{ set_scan_params,        false, MGMT_SET_SCAN_PARAMS_SIZE },
- 	{ set_secure_conn,        false, MGMT_SETTING_SIZE },
- 	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
--	{ },
-+	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
- 	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
- };
- 
+ 	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
 -- 
 1.8.5.3
 
