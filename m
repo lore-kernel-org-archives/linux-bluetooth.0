@@ -1,54 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1393248318-5188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393248318-5188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 24 Feb 2014 18:17:29 +0200
-Message-ID: <CABBYNZ+OmDt7QUaYf0ffv3cz-f-mM8Q1yjp7sKX=KZnXLUpj+Q@mail.gmail.com>
-Subject: Re: [PATCH 1/3] unit/avrcp: Refactor tests to use destroy_context()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pixit: Correct symbols in PIXIT
+Date: Mon, 24 Feb 2014 16:33:04 +0100
+Message-Id: <1393255984-6165-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Trivial patch correcting PIXIT files for HFP and HSP
+---
+ android/pixit-hfp.txt | 2 +-
+ android/pixit-hsp.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On Mon, Feb 24, 2014 at 3:25 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> ---
->  unit/test-avrcp.c | 10 +---------
->  1 file changed, 1 insertion(+), 9 deletions(-)
->
-> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-> index 381e7cb..e9fe7e3 100644
-> --- a/unit/test-avrcp.c
-> +++ b/unit/test-avrcp.c
-> @@ -246,15 +246,7 @@ static void execute_context(struct context *context)
->  {
->         g_main_loop_run(context->main_loop);
->
-> -       if (context->source > 0)
-> -               g_source_remove(context->source);
-> -
-> -       avrcp_shutdown(context->session);
-> -
-> -       g_main_loop_unref(context->main_loop);
-> -
-> -       test_free(context->data);
-> -       g_free(context);
-> +       destroy_context(context);
->  }
->
->  static void test_server(gconstpointer data)
-> --
-> 1.8.3.2
-
-Pushed with some changes to patch 2/3 to actually add a callback to
-handle AVC_PLAY.
-
-
+diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
+index aa50b1f..3134b26 100644
+--- a/android/pixit-hfp.txt
++++ b/android/pixit-hfp.txt
+@@ -11,7 +11,7 @@ PTS version: 5.0
+ Parameter Name						Value
+ -------------------------------------------------------------------------------
+ TSPX_security_enabled					TRUE
+-TSPX_bd_addr_iut					08606E414394 (&)
++TSPX_bd_addr_iut					08606E414394 (*&)
+ TSPX_hf_class_of_device					200408
+ TSPX_ag_class_of_device					400204
+ TSPX_packet_type_sco					00A0
+diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
+index 2bda4fa..62293a6 100644
+--- a/android/pixit-hsp.txt
++++ b/android/pixit-hsp.txt
+@@ -10,7 +10,7 @@ PTS version: 5.0
+ Parameter Name						Value
+ -------------------------------------------------------------------------------
+ TSPX_security_enabled					TRUE
+-TSPX_bd_addr_iut					08606E414394 (&)
++TSPX_bd_addr_iut					08606E414394 (*&)
+ TSPX_hs_class_of_device					200404
+ TSPX_ag_class_of_device					400204
+ TSPX_packet_type_sco					00A0
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
