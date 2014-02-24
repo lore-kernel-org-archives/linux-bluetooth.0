@@ -1,76 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools/btmgmt: Add command to set scan parameters
-Date: Mon, 24 Feb 2014 19:32:27 -0300
-Message-Id: <1393281147-14390-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v11 15/15] Bluetooth: Update background scan parameters
+Date: Mon, 24 Feb 2014 19:31:01 -0300
+Message-Id: <1393281061-14320-16-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
+References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btmgmt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+If new scanning parameters are set while background scan is running,
+we should restart background scanning so these parameters are updated.
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 9a5e971..dd90f34 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -2073,6 +2073,47 @@ static void cmd_debug_keys(struct mgmt *mgmt, uint16_t index,
- 	cmd_setting(mgmt, index, MGMT_OP_SET_DEBUG_KEYS, argc, argv);
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 26 ++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c             |  7 +++++++
+ 3 files changed, 34 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c81847e..2c5289d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -812,6 +812,7 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_pend_le_conns_clear(struct hci_dev *hdev);
+ 
+ void hci_update_background_scan(struct hci_dev *hdev);
++void hci_restart_background_scan(struct hci_dev *hdev);
+ 
+ void hci_uuids_clear(struct hci_dev *hdev);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e0ebbd9..55c01e9 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5179,3 +5179,29 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 	if (err)
+ 		BT_ERR("Failed to run HCI request: err %d", err);
  }
- 
-+static void set_scan_params_usage(void)
++
++static void restart_background_scan_complete(struct hci_dev *hdev, u8 status)
 +{
-+	printf("Usage: btmgmt set-scan-params <window> <interval>");
++	if (status)
++		BT_DBG("HCI request failed to restart background scan: "
++		       "status 0x%2.2x", status);
 +}
 +
-+static void set_scan_params_rsp(uint8_t status, uint16_t len, const void *param,
-+								void *user_data)
++void hci_restart_background_scan(struct hci_dev *hdev)
 +{
-+	if (status != 0)
-+		fprintf(stderr, "Set scan parameters failed "
-+						"with status 0x%02x (%s)\n",
-+						status, mgmt_errstr(status));
-+	else
-+		printf("Scan parameters successfully set\n");
++	struct hci_request req;
++	int err;
 +
-+	mainloop_quit();
-+}
++	hci_req_init(&req, hdev);
 +
-+static void cmd_set_scan_params(struct mgmt *mgmt, uint16_t index, int argc,
-+								char **argv)
-+{
-+	struct mgmt_cp_set_scan_params cp;
++	hci_req_add_le_scan_disable(&req);
++	hci_req_add_le_passive_scan(&req, hdev);
 +
-+	if (argc != 3) {
-+		set_scan_params_usage();
-+		exit(EXIT_FAILURE);
++	err = hci_req_run(&req, restart_background_scan_complete);
++	if (err) {
++		BT_ERR("Failed to run HCI request: err %d", err);
++		return;
 +	}
 +
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	cp.window = strtol(argv[1], NULL, 16);
-+	cp.interval = strtol(argv[2], NULL, 16);
-+
-+	if (mgmt_send(mgmt, MGMT_OP_SET_SCAN_PARAMS, index, sizeof(cp), &cp,
-+					set_scan_params_rsp, NULL, NULL) == 0) {
-+		fprintf(stderr, "Unable to send set_scan_params cmd\n");
-+		exit(EXIT_FAILURE);
-+	}
++	BT_DBG("%s re-starting background scanning", hdev->name);
 +}
-+
- static struct {
- 	char *cmd;
- 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
-@@ -2115,6 +2156,7 @@ static struct {
- 	{ "did",	cmd_did,	"Set Device ID"			},
- 	{ "static-addr",cmd_static_addr,"Set static address"		},
- 	{ "debug-keys",	cmd_debug_keys,	"Toogle debug keys"		},
-+	{ "set-scan-params", cmd_set_scan_params, "Set scan parameters"	},
- 	{ }
- };
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4745fb5..679670d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3917,6 +3917,13 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
  
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NULL, 0);
+ 
++	/* If background scan is running, restart it so new parameters are
++	 * loaded.
++	 */
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
++	    hdev->discovery.state == DISCOVERY_STOPPED)
++		hci_restart_background_scan(hdev);
++
+ 	hci_dev_unlock(hdev);
+ 
+ 	return err;
 -- 
 1.8.5.4
 
