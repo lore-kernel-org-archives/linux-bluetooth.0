@@ -1,145 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v11 05/15] Bluetooth: Introduce hdev->pend_le_conn list
-Date: Mon, 24 Feb 2014 19:30:51 -0300
-Message-Id: <1393281061-14320-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v11 04/15] Bluetooth: Remove unused function
+Date: Mon, 24 Feb 2014 19:30:50 -0300
+Message-Id: <1393281061-14320-5-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces the hdev->pend_le_conn list which holds the
-device addresses the kernel should autonomously connect. It also
-introduces some helper functions to manipulate the list.
-
-The list and helper functions will be used by the next patch which
-implements the LE auto connection infrastructure.
+This patch removes hci_create_le_conn() since it is not used anymore.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  7 +++++
- net/bluetooth/hci_core.c         | 68 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 75 insertions(+)
+ net/bluetooth/hci_conn.c | 43 -------------------------------------------
+ 1 file changed, 43 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ebc9c4f..b1ceaad 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -284,6 +284,7 @@ struct hci_dev {
- 	struct list_head	identity_resolving_keys;
- 	struct list_head	remote_oob_data;
- 	struct list_head	le_conn_params;
-+	struct list_head	pend_le_conns;
- 
- 	struct hci_dev_stats	stat;
- 
-@@ -797,6 +798,12 @@ void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
- void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
- void hci_conn_params_clear(struct hci_dev *hdev);
- 
-+struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
-+					    bdaddr_t *addr, u8 addr_type);
-+void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
-+void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
-+void hci_pend_le_conns_clear(struct hci_dev *hdev);
-+
- void hci_uuids_clear(struct hci_dev *hdev);
- 
- void hci_link_keys_clear(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 9a078cf..142ecd8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3259,6 +3259,72 @@ void hci_conn_params_clear(struct hci_dev *hdev)
- 	BT_DBG("All LE connection parameters were removed");
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ae2c3e1..a823d30 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -551,49 +551,6 @@ done:
+ 	hci_dev_unlock(hdev);
  }
  
-+/* This function requires the caller holds hdev->lock */
-+struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
-+					    bdaddr_t *addr, u8 addr_type)
-+{
-+	struct bdaddr_list *entry;
-+
-+	list_for_each_entry(entry, &hdev->pend_le_conns, list) {
-+		if (bacmp(&entry->bdaddr, addr) == 0 &&
-+		    entry->bdaddr_type == addr_type)
-+			return entry;
-+	}
-+
-+	return NULL;
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-+{
-+	struct bdaddr_list *entry;
-+
-+	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
-+	if (entry)
-+		return;
-+
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry) {
-+		BT_ERR("Out of memory");
-+		return;
-+	}
-+
-+	bacpy(&entry->bdaddr, addr);
-+	entry->bdaddr_type = addr_type;
-+
-+	list_add(&entry->list, &hdev->pend_le_conns);
-+
-+	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-+{
-+	struct bdaddr_list *entry;
-+
-+	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
-+	if (!entry)
-+		return;
-+
-+	list_del(&entry->list);
-+	kfree(entry);
-+
-+	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+}
-+
-+/* This function requires the caller holds hdev->lock */
-+void hci_pend_le_conns_clear(struct hci_dev *hdev)
-+{
-+	struct bdaddr_list *entry, *tmp;
-+
-+	list_for_each_entry_safe(entry, tmp, &hdev->pend_le_conns, list) {
-+		list_del(&entry->list);
-+		kfree(entry);
-+	}
-+
-+	BT_DBG("All LE pending connections cleared");
-+}
-+
- static void inquiry_complete(struct hci_dev *hdev, u8 status)
+-static int hci_create_le_conn(struct hci_conn *conn)
+-{
+-	struct hci_dev *hdev = conn->hdev;
+-	struct hci_cp_le_create_conn cp;
+-	struct hci_request req;
+-	u8 own_addr_type;
+-	int err;
+-
+-	hci_req_init(&req, hdev);
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	/* Update random address, but set require_privacy to false so
+-	 * that we never connect with an unresolvable address.
+-	 */
+-	err = hci_update_random_address(&req, false, &own_addr_type);
+-	if (err < 0)
+-		return err;
+-
+-	conn->src_type = own_addr_type;
+-
+-	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
+-	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
+-	bacpy(&cp.peer_addr, &conn->dst);
+-	cp.peer_addr_type = conn->dst_type;
+-	cp.own_address_type = own_addr_type;
+-	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+-	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+-	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
+-	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
+-	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
+-
+-	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+-
+-	err = hci_req_run(&req, create_le_conn_complete);
+-	if (err) {
+-		hci_conn_del(conn);
+-		return err;
+-	}
+-
+-	return 0;
+-}
+-
+ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 				       struct hci_conn *conn)
  {
- 	if (status) {
-@@ -3441,6 +3507,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->identity_resolving_keys);
- 	INIT_LIST_HEAD(&hdev->remote_oob_data);
- 	INIT_LIST_HEAD(&hdev->le_conn_params);
-+	INIT_LIST_HEAD(&hdev->pend_le_conns);
- 	INIT_LIST_HEAD(&hdev->conn_hash.list);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
-@@ -3642,6 +3709,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_smp_irks_clear(hdev);
- 	hci_remote_oob_data_clear(hdev);
- 	hci_conn_params_clear(hdev);
-+	hci_pend_le_conns_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
 -- 
 1.8.5.4
 
