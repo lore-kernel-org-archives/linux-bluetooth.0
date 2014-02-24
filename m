@@ -1,41 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/2] android: Change define name for valgrind prop 
-Date: Mon, 24 Feb 2014 13:39:10 +0100
-Message-ID: <1393245551-8145-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1392907255-29758-1-git-send-email-luiz.dentz@gmail.com>
+References: <1392907255-29758-1-git-send-email-luiz.dentz@gmail.com>
+Date: Mon, 24 Feb 2014 14:38:29 +0200
+Message-ID: <CABBYNZLTC31FrCdPt-1qSpTSPjHq4PXEH3wLLQT=HvnVwM9ikw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] android/avrcp-lib: Rename AVCTP session to conn
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/bluetoothd-wrapper.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
-index 122e6b0..3a9f32e 100644
---- a/android/bluetoothd-wrapper.c
-+++ b/android/bluetoothd-wrapper.c
-@@ -22,7 +22,7 @@
- 
- #include <cutils/properties.h>
- 
--#define PROPERTY_NAME "persist.sys.bluetooth.valgrind"
-+#define PROPERTY_VALGRIND_NAME "persist.sys.bluetooth.valgrind"
- 
- #define VALGRIND_BIN "/system/bin/valgrind"
- 
-@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
- {
- 	char value[PROPERTY_VALUE_MAX];
- 
--	if (property_get(PROPERTY_NAME, value, "") > 0 &&
-+	if (property_get(PROPERTY_VALGRIND_NAME, value, "") > 0 &&
- 			(!strcasecmp(value, "true") || atoi(value) > 0))
- 		run_valgrind();
- 
+On Thu, Feb 20, 2014 at 4:40 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> ---
+>  android/avrcp-lib.c | 14 +++++++-------
+>  1 file changed, 7 insertions(+), 7 deletions(-)
+>
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index ef48fa7..8450480 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -36,13 +36,13 @@
+>  #include "avrcp-lib.h"
+>
+>  struct avrcp {
+> -       struct avctp    *session;
+> +       struct avctp    *conn;
+>  };
+>
+>  void avrcp_shutdown(struct avrcp *session)
+>  {
+> -       if (session->session)
+> -               avctp_shutdown(session->session);
+> +       if (session->conn)
+> +               avctp_shutdown(session->conn);
+>
+>         g_free(session);
+>  }
+> @@ -53,8 +53,8 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>
+>         session = g_new0(struct avrcp, 1);
+>
+> -       session->session = avctp_new(fd, imtu, omtu, version);
+> -       if (!session->session) {
+> +       session->conn = avctp_new(fd, imtu, omtu, version);
+> +       if (!session->conn) {
+>                 g_free(session);
+>                 return NULL;
+>         }
+> @@ -65,11 +65,11 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>  void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+>                                                         void *user_data)
+>  {
+> -       avctp_set_destroy_cb(session->session, cb, user_data);
+> +       avctp_set_destroy_cb(session->conn, cb, user_data);
+>  }
+>
+>  int avrcp_init_uinput(struct avrcp *session, const char *name,
+>                                                         const char *address)
+>  {
+> -       return avctp_init_uinput(session->session, name, address);
+> +       return avctp_init_uinput(session->conn, name, address);
+>  }
+> --
+> 1.8.5.3
+
+Pushed.
+
+
 -- 
-1.8.4
-
+Luiz Augusto von Dentz
