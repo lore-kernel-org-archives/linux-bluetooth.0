@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Feb 2014 08:51:18 +0200
+Date: Mon, 24 Feb 2014 08:49:27 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Store current RPA and update it if needed
-Message-ID: <20140224065118.GC16823@x220.p-661hnu-f1>
-References: <1393216763-14836-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH 1/2] Bluetooth: Use unresolvable private address for
+ active scanning
+Message-ID: <20140224064927.GB16823@x220.p-661hnu-f1>
+References: <1393215955-3907-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1393216763-14836-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1393215955-3907-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Sun, Feb 23, 2014, Marcel Holtmann wrote:
-> The RPA needs to be stored to know which is the current one. Otherwise
-> it is impossible to ensure that always the correct RPA can be programmed
-> into the controller when it is needed.
+> When running active scanning during LE discovery, do not reveal the own
+> identity to the peer devices. In case LE privacy has been enabled, then
+> a resolvable private address is used. If the LE privacy option is off,
+> then use an unresolvable private address.
 > 
-> Current code checks if the address in the controller is a RPA, but that
-> can potentially lead to using a RPA that can not be resolved with the
-> IRK that has been distributed.
+> The public address or static random address is never used in active
+> scanning anymore. This ensures that scan request are send using a
+> random address.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         | 11 +++++------
->  2 files changed, 6 insertions(+), 6 deletions(-)
+>  include/net/bluetooth/hci_core.h |  3 ++-
+>  net/bluetooth/hci_conn.c         |  2 +-
+>  net/bluetooth/hci_core.c         | 18 +++++++++++++++++-
+>  net/bluetooth/mgmt.c             |  8 ++++++--
+>  4 files changed, 26 insertions(+), 5 deletions(-)
 
-Both patches have been applied to bluetooth-next. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
