@@ -1,56 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Date: Mon, 24 Feb 2014 08:38:30 -0800
-Message-ID: <CAOVeLGQe8FF0eGf0M0N2T34KsOK=HvPDDc5j+0TqSjToAdN4vQ@mail.gmail.com>
-Subject: [PATCH] Bluetooth: Fix bluetooth.h for inclusion in clang projects
-From: Donald Carr <sirspudd@gmail.com>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <1393248318-5188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393248318-5188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 24 Feb 2014 18:17:29 +0200
+Message-ID: <CABBYNZ+OmDt7QUaYf0ffv3cz-f-mM8Q1yjp7sKX=KZnXLUpj+Q@mail.gmail.com>
+Subject: Re: [PATCH 1/3] unit/avrcp: Refactor tests to use destroy_context()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
->From b12351dacb8e7fc44668ab4011db1d1b2b83e883 Mon Sep 17 00:00:00 2001
-From: Donald Carr <sirspudd@gmail.com>
-Date: Mon, 24 Feb 2014 08:34:46 -0800
-Subject: [PATCH] Move from typeof gcc intrinsic to __typeof__
+Hi Andrei,
 
-Change-Id: Ic3aa6ec1446876bfabdcc5e120ec327e177ffc74
----
- lib/bluetooth.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Mon, Feb 24, 2014 at 3:25 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> ---
+>  unit/test-avrcp.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+>
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index 381e7cb..e9fe7e3 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -246,15 +246,7 @@ static void execute_context(struct context *context)
+>  {
+>         g_main_loop_run(context->main_loop);
+>
+> -       if (context->source > 0)
+> -               g_source_remove(context->source);
+> -
+> -       avrcp_shutdown(context->session);
+> -
+> -       g_main_loop_unref(context->main_loop);
+> -
+> -       test_free(context->data);
+> -       g_free(context);
+> +       destroy_context(context);
+>  }
+>
+>  static void test_server(gconstpointer data)
+> --
+> 1.8.3.2
 
-diff --git a/lib/bluetooth.h b/lib/bluetooth.h
-index 61c1f9a..bc9b35e 100644
---- a/lib/bluetooth.h
-+++ b/lib/bluetooth.h
-@@ -158,16 +158,16 @@ enum {
- #define bt_get_unaligned(ptr)                  \
- ({                                             \
-        struct __attribute__((packed)) {        \
--               typeof(*(ptr)) __v;             \
--       } *__p = (typeof(__p)) (ptr);           \
-+               __typeof__(*(ptr)) __v;         \
-+       } *__p = (__typeof__(__p)) (ptr);               \
-        __p->__v;                               \
- })
+Pushed with some changes to patch 2/3 to actually add a callback to
+handle AVC_PLAY.
 
- #define bt_put_unaligned(val, ptr)             \
- do {                                           \
-        struct __attribute__((packed)) {        \
--               typeof(*(ptr)) __v;             \
--       } *__p = (typeof(__p)) (ptr);           \
-+               __typeof__(*(ptr)) __v;         \
-+       } *__p = (__typeof__(__p)) (ptr);               \
-        __p->__v = (val);                       \
- } while(0)
-
---
-1.9.0
 
 -- 
--------------------------------
- °v°  Donald Carr
-/(_)\ Vaguely Professional Penguin lover
- ^ ^
-
-Cave canem, te necet lingendo
+Luiz Augusto von Dentz
