@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/avctp: Set uinput to invalid fd when creating session
-Date: Mon, 24 Feb 2014 15:25:18 +0200
-Message-Id: <1393248318-5188-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1393248318-5188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393248318-5188-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/avctp: Set uinput to invalid fd when creating session
+Date: Mon, 24 Feb 2014 15:12:52 +0200
+Message-Id: <1393247572-1244-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
