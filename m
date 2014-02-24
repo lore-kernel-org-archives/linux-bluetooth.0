@@ -1,33 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/7] Bluetooth: Graceful power off procedure
-Date: Mon, 24 Feb 2014 14:52:15 +0200
-Message-Id: <1393246342-27980-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_OWfmjs2CbFxGP--nno0x5o+6R3FU5+nEP6VC7bjgNKJQ@mail.gmail.com>
+References: <1392835893-6723-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1392835893-6723-8-git-send-email-claudio.takahasi@openbossa.org>
+	<20140224083344.GA29475@x220.p-661hnu-f1>
+	<CAJdJm_OWfmjs2CbFxGP--nno0x5o+6R3FU5+nEP6VC7bjgNKJQ@mail.gmail.com>
+Date: Mon, 24 Feb 2014 08:51:15 -0400
+Message-ID: <CAJdJm_MhdZwHYuwNCJCvnfRN6DpivKLJi_hiV7icV69gFCne6Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v7 07/11] gatt: Add external services tracking
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-This set of patches updates the power off procedure (as triggered
-through mgmt) to perform a graceful power off by first cleaning up HCI
-state such as connections, scan modes and advertising before requesting
-the HCI driver to actually power off.
+On Mon, Feb 24, 2014 at 8:49 AM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Johan,
+>
+> On Mon, Feb 24, 2014 at 4:33 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+>> This whole timer thing seems too hackish to me.
+>>
+>> A better way to fix this might be to have something like
+>> g_dbus_client_set_proxies_complete_watch (or some better name) to let
+>> the code wait until GetManagedObjects has returned and the initial
+>> proxies added. Do you agree?
+>
+> We came up with this workaround during development, but we forgot to
+> highlight on the cover letter. Indeed a function like the one you
+> propose should be enough.
+>
+> Regarding the name for the function, I was thinking as
+> "g_dbus_client_proxies_ready_watch()". What do you think?
 
-Johan
+Or "g_dbus_client_set_proxies_ready_watch()" to be consistent.
 
-----------------------------------------------------------------
-Johan Hedberg (7):
-      Bluetooth: Add convenience function for getting total connection count
-      Bluetooth: Move HCI_ADVERTISING handling into mgmt.c
-      Bluetooth: Move check for MGMT_CONNECTED flag into mgmt.c
-      Bluetooth: Don't clear HCI_DISCOVERABLE when powering off
-      Bluetooth: Don't clear HCI_CONNECTABLE when powering off
-      Bluetooth: Don't clear HCI_ADVERTISING when powering off
-      Bluetooth: Clean up HCI state when doing power off
-
- include/net/bluetooth/hci_core.h | 11 ++++-
- net/bluetooth/hci_event.c        | 15 +++---
- net/bluetooth/mgmt.c             | 96 ++++++++++++++++++++++++++++++++++--
- 3 files changed, 107 insertions(+), 15 deletions(-)
-
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
