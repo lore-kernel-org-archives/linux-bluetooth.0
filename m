@@ -1,40 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix canceling RPA expiry timer
-Date: Mon, 24 Feb 2014 20:35:07 +0200
-Message-Id: <1393266907-25867-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] android/pics: Add PICS and PIXIT for HSP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393242895-19447-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Mon, 24 Feb 2014 09:57:14 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <6632C143-D06A-48DC-A403-FDE4B40AB1B5@holtmann.org>
+References: <1393242895-19447-1-git-send-email-sebastian.chlad@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Sebastian,
 
-The RPA expiry timer is only initialized inside mgmt.c when we receive
-the first command from user space. This action also involves setting the
-HCI_MGMT flag for the first time so that flag acts as a good indicator
-of whether the delayed work variable can be touched or not. This patch
-fixes hci_dev_do_close to first check the flag.
+> Added PICS and PIXIT target Android 4.4
+> ---
+> android/Makefile.am   |   2 +
+> android/pics-hsp.txt  | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> android/pixit-hsp.txt |  30 +++++++++++++++
+> 3 files changed, 135 insertions(+)
+> create mode 100644 android/pics-hsp.txt
+> create mode 100644 android/pixit-hsp.txt
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+so we are doing Headset profile (HSP) and also Handsfree profile (HFP). I am fine with also doing HSP since it seems that is what Android uses on tablets.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 4bb4f4e7bbbe..669c76ec659a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2257,7 +2257,9 @@ static int hci_dev_do_close(struct hci_dev *hdev)
- 		cancel_delayed_work(&hdev->service_cache);
- 
- 	cancel_delayed_work_sync(&hdev->le_scan_disable);
--	cancel_delayed_work_sync(&hdev->rpa_expired);
-+
-+	if (test_bit(HCI_MGMT, &hdev->dev_flags))
-+		cancel_delayed_work_sync(&hdev->rpa_expired);
- 
- 	hci_dev_lock(hdev);
- 	hci_inquiry_cache_flush(hdev);
--- 
-1.8.5.3
+Regards
+
+Marcel
 
