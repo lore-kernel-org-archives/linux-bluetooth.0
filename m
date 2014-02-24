@@ -1,79 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v11 00/15] LE auto connection
-Date: Mon, 24 Feb 2014 19:30:46 -0300
-Message-Id: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <CAOVeLGQe8FF0eGf0M0N2T34KsOK=HvPDDc5j+0TqSjToAdN4vQ@mail.gmail.com>
+References: <CAOVeLGQe8FF0eGf0M0N2T34KsOK=HvPDDc5j+0TqSjToAdN4vQ@mail.gmail.com>
+Date: Mon, 24 Feb 2014 16:51:40 -0400
+Message-ID: <CAJdJm_MDhwB81Qb4aCLj8YJLOffroWqPZLzee6r=nejcoXgepA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix bluetooth.h for inclusion in clang projects
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Donald Carr <sirspudd@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+Hi Donald,
 
-This patch set takes in consideration Marcel's comments from previous revirew as
-well as introduces privacy feature support to LE auto connection mechanism.
+On Mon, Feb 24, 2014 at 12:38 PM, Donald Carr <sirspudd@gmail.com> wrote:
+> From b12351dacb8e7fc44668ab4011db1d1b2b83e883 Mon Sep 17 00:00:00 2001
+> From: Donald Carr <sirspudd@gmail.com>
+> Date: Mon, 24 Feb 2014 08:34:46 -0800
+> Subject: [PATCH] Move from typeof gcc intrinsic to __typeof__
+>
+> Change-Id: Ic3aa6ec1446876bfabdcc5e120ec327e177ffc74
 
-Below follows a summary to help the review process:
+I wonder why I'm not having any warnings when compiling BlueZ with
+clang. Can you confirm which clang parameters are causing problems?
 
-    * Patches from 1-10 are pretty much the same from previous version
-      (exception to Patch 8). They introduce the LE auto connection
-      infrastructure and auto connnection options.
+What I use is (when compiling bluez):
 
-    * Patch 8 modifies hci_conn_params_add() and hci_conn_params_del() so they
-      also add/delete pending LE connections according to the auto_connect
-      option. This way, background scan is automatically triggered/untriggered
-      when connection parameters are added/removed. This feature was requested
-      in "[RFC v10 10/10] Bluetooth: Add le_auto_conn file on debugfs" review.
+###
+CC=clang ./bootstrap-configure
+make
+###
 
-    * Patches 11-12 add resolvable addresses support for LE auto connection
-      mechanism.
+Regarding your patch, a few comments:
 
-    * Patches 14-15 change set_scan_params() so it restart background scan when
-      new scanning parameters are set. This allows us to update scanning
-      parameters on the fly.
+1) you should remove the "Change-Id" field (it is not used on BlueZ).
+2) Your e-mail seems badly formatted (like as if you just copied one
+email inside another). I suggest using "git send-email" for sending
+properly formatted patches to the list.
+3) The "Bluetooth:" subject prefix is only used for kernel patches.
+For userspace patches, add a prefix which describes which part of the
+code is affected (usually the subdirectory name is enough), in this
+case:
 
-This patch set don't filter duplicates on background scanning. The "time to
-time re-enable scan" approach suggested in previous review might not be good
-enough. Depending on how many time we wait to restart background scan, some
-low latency reconnection profiles, such as HID over GATT, can become
-impractical.
+lib: Move from typeof gcc intrinsic to __typeof__
 
-Moreover, just fine-tuning the scan parameters might be good enough. With
-patches 14-15, we can easily change background scan parameters and do lots
-experiments.
+4) A more verbose commit message would not hurt :)
 
-Finally, if enabling filter duplicates is really the way to go, I can write a
-small patch set improving the background scan routine.
-
-BR,
-
-Andre
-
-
-Andre Guedes (15):
-  Bluetooth: Create hci_req_add_le_scan_disable helper
-  Bluetooth: Declare le_conn_failed in hci_core.h
-  Bluetooth: Stop scanning on LE connection
-  Bluetooth: Remove unused function
-  Bluetooth: Introduce hdev->pend_le_conn list
-  Bluetooth: Introduce LE auto connection infrastructure
-  Bluetooth: Introduce LE auto connect options
-  Bluetooth: Connection parameters and auto connection
-  Bluetooth: Temporarily stop background scanning on discovery
-  Bluetooth: Auto connection and power on
-  Bluetooth: Connection parameters and resolvable address
-  Bluetooth: Support resolvable private addresses
-  Bluetooth: Add le_auto_conn file on debugfs
-  Bluetooth: Create hci_req_add_le_passive_scan helper
-  Bluetooth: Update background scan parameters
-
- include/net/bluetooth/hci.h      |   1 +
- include/net/bluetooth/hci_core.h |  36 +++-
- net/bluetooth/hci_conn.c         |  85 +++++++--
- net/bluetooth/hci_core.c         | 365 +++++++++++++++++++++++++++++++++++++--
- net/bluetooth/hci_event.c        |  78 ++++++++-
- net/bluetooth/mgmt.c             |  40 +++--
- 6 files changed, 552 insertions(+), 53 deletions(-)
-
+Best Regards,
 -- 
-1.8.5.4
-
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
