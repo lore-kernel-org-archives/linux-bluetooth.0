@@ -1,54 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>, "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] android/pics: Add PICS and PIXIT for HSP
+Date: Mon, 24 Feb 2014 21:31:19 +0100
+Message-ID: <2241923.8SUrdZlcfd@athlon>
+In-Reply-To: <781D8095-A034-40C5-904A-E56BB63870AC@holtmann.org>
+References: <1393242895-19447-1-git-send-email-sebastian.chlad@tieto.com> <1813726.pFGF1AVLyQ@athlon> <781D8095-A034-40C5-904A-E56BB63870AC@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAOVeLGQe8FF0eGf0M0N2T34KsOK=HvPDDc5j+0TqSjToAdN4vQ@mail.gmail.com>
-References: <CAOVeLGQe8FF0eGf0M0N2T34KsOK=HvPDDc5j+0TqSjToAdN4vQ@mail.gmail.com>
-Date: Mon, 24 Feb 2014 16:51:40 -0400
-Message-ID: <CAJdJm_MDhwB81Qb4aCLj8YJLOffroWqPZLzee6r=nejcoXgepA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix bluetooth.h for inclusion in clang projects
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Donald Carr <sirspudd@gmail.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Donald,
+Hi Marcel,
 
-On Mon, Feb 24, 2014 at 12:38 PM, Donald Carr <sirspudd@gmail.com> wrote:
-> From b12351dacb8e7fc44668ab4011db1d1b2b83e883 Mon Sep 17 00:00:00 2001
-> From: Donald Carr <sirspudd@gmail.com>
-> Date: Mon, 24 Feb 2014 08:34:46 -0800
-> Subject: [PATCH] Move from typeof gcc intrinsic to __typeof__
->
-> Change-Id: Ic3aa6ec1446876bfabdcc5e120ec327e177ffc74
+On Monday 24 February 2014 11:34:26 Marcel Holtmann wrote:
+> Hi Szymon,
+> 
+> >>> Added PICS and PIXIT target Android 4.4
+> >>> ---
+> >>> android/Makefile.am   |   2 +
+> >>> android/pics-hsp.txt  | 103
+> >>> ++++++++++++++++++++++++++++++++++++++++++++++++++ android/pixit-hsp.txt
+> >>> 
+> >>> |  30 +++++++++++++++
+> >>> 
+> >>> 3 files changed, 135 insertions(+)
+> >>> create mode 100644 android/pics-hsp.txt
+> >>> create mode 100644 android/pixit-hsp.txt
+> >> 
+> >> so we are doing Headset profile (HSP) and also Handsfree profile (HFP). I
+> >> am fine with also doing HSP since it seems that is what Android uses on
+> >> tablets.
+> > 
+> > Both HSP and HFP are handled by handsfree HAL sp we would probably need
+> > some extra argument in IPC to allow disabling HFP if not required. And
+> > some configuration (runtime/compile time?) flag for libhal.
+> 
+> I do not want a compile time option. Is that how Bluedroid handles it. For
+> examples Nexus 4 vs Nexus 7.
 
-I wonder why I'm not having any warnings when compiling BlueZ with
-clang. Can you confirm which clang parameters are causing problems?
+Yes, Bluedroid is compile-time configured, device that wants to use
+non-default options provides those in bdroid_buildcfg.h header eg.
 
-What I use is (when compiling bluez):
+this is defined for Nexus7 (flo), but not for Nexus4 (mako)
+#define BTIF_HF_SERVICES (BTA_HSP_SERVICE_MASK)
 
-###
-CC=clang ./bootstrap-configure
-make
-###
+> 
+> The easiest would be to have some IPC option to set HSP and HFP. Meaning
+> that we could have a property that the HAL sets and then just uses that to
+> tell the daemon what to enabled.
+> 
+> I am thinking we might just need a flags parameter to the Register module
+> command in the core service. Or alternatively, have a Set Option command.
+> 
+> Right now I would tend to do the Set Option command. So the HAL can
+> configure certain options.
 
-Regarding your patch, a few comments:
+I agree, for now we can provide such option command, if it turns out that more 
+profiles HALs need configuration we can move to flags in register commands.
 
-1) you should remove the "Change-Id" field (it is not used on BlueZ).
-2) Your e-mail seems badly formatted (like as if you just copied one
-email inside another). I suggest using "git send-email" for sending
-properly formatted patches to the list.
-3) The "Bluetooth:" subject prefix is only used for kernel patches.
-For userspace patches, add a prefix which describes which part of the
-code is affected (usually the subdirectory name is enough), in this
-case:
-
-lib: Move from typeof gcc intrinsic to __typeof__
-
-4) A more verbose commit message would not hurt :)
-
-Best Regards,
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+Szymon K. Janc
+szymon.janc@gmail.com
