@@ -1,16 +1,13 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140224065425.GA4133@aemeltch-MOBL1>
+In-Reply-To: <20140224070911.GD4133@aemeltch-MOBL1>
 References: <1392996230-11789-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1392996230-11789-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<CABBYNZL9G3odx=Dgo_R9e0M0N8ZwewLqx1PPnnCrxTz8NuXFxw@mail.gmail.com>
-	<20140224065425.GA4133@aemeltch-MOBL1>
-Date: Mon, 24 Feb 2014 10:28:04 +0200
-Message-ID: <CABBYNZK4mt0bhZ2Lgk6YM=umVZFL0=QGO41XBHOBv959-gEdcQ@mail.gmail.com>
-Subject: Re: [PATCHv2 2/6] android/avctp: Add UNIT INFO command request
+	<20140224070911.GD4133@aemeltch-MOBL1>
+Date: Mon, 24 Feb 2014 10:25:40 +0200
+Message-ID: <CABBYNZ+c63yfJObZ9h8OPtf6JraAXZZxpRC-=Zji58VAQ+nM8Q@mail.gmail.com>
+Subject: Re: [PATCHv2 1/6] unit/avrcp: First unit test for AVRCP profile
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andrei Emeltchenko <andrei.emeltchenko@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -18,75 +15,322 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Mon, Feb 24, 2014 at 8:54 AM, Andrei Emeltchenko
+On Mon, Feb 24, 2014 at 9:09 AM, Andrei Emeltchenko
 <andrei.emeltchenko@gmail.com> wrote:
-> Hi Luiz,
->
-> On Sun, Feb 23, 2014 at 01:57:05PM +0200, Luiz Augusto von Dentz wrote:
->> Hi Andrei,
+> On Fri, Feb 21, 2014 at 05:23:45PM +0200, Andrei Emeltchenko wrote:
+>> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >>
->> On Fri, Feb 21, 2014 at 5:23 PM, Andrei Emeltchenko
->> <andrei.emeltchenko@gmail.com> wrote:
->> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->> >
->> > ---
->> >  android/avctp.c | 13 +++++++++++++
->> >  android/avctp.h |  3 +++
->> >  2 files changed, 16 insertions(+)
->> >
->> > diff --git a/android/avctp.c b/android/avctp.c
->> > index 1e414d1..57a8c23 100644
->> > --- a/android/avctp.c
->> > +++ b/android/avctp.c
->> > @@ -1266,6 +1266,19 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
->> >                                                 func, user_data);
->> >  }
->> >
->> > +int avctp_send_unit_info_req(struct avctp *session, avctp_rsp_cb func,
->> > +                                                               void *user_data)
->> > +{
->> > +       uint8_t operands[5];
->> > +
->> > +       memset(operands, 0xFF, sizeof(operands));
->> > +
->> > +       return avctp_send_req(session, AVC_CTYPE_STATUS,
->> > +                               AVC_SUBUNIT_UNIT, AVC_OP_UNITINFO,
->> > +                               operands, sizeof(operands),
->> > +                               func, user_data);
->> > +}
->> > +
->> >  unsigned int avctp_register_passthrough_handler(struct avctp *session,
->> >                                                 avctp_passthrough_cb cb,
->> >                                                 void *user_data)
->> > diff --git a/android/avctp.h b/android/avctp.h
->> > index dfa0ca6..7496e53 100644
->> > --- a/android/avctp.h
->> > +++ b/android/avctp.h
->> > @@ -46,6 +46,7 @@
->> >
->> >  /* subunits of interest */
->> >  #define AVC_SUBUNIT_PANEL              0x09
->> > +#define AVC_SUBUNIT_UNIT               0x1f
->> >
->> >  /* operands in passthrough commands */
->> >  #define AVC_SELECT                     0x00
->> > @@ -170,3 +171,5 @@ int avctp_send_vendordep_req(struct avctp *session, uint8_t code,
->> >  int avctp_send_browsing_req(struct avctp *session,
->> >                                 uint8_t *operands, size_t operand_count,
->> >                                 avctp_browsing_rsp_cb func, void *user_data);
->> > +int avctp_send_unit_info_req(struct avctp *session, avctp_rsp_cb func,
->> > +                                                       void *user_data);
->> > --
->> > 1.8.3.2
->>
->> This probably needs to be internal and sent automatically once
->> connected specially if it is for a mandatory test.
+>> The tests verifies connection establishment for control.
 >
-> So what do you propose with this case? Make it private and send this
-> command in avrcp_new() ?
+> ping
+>
+>
+>> ---
+>>  Makefile.am       |   9 ++
+>>  unit/test-avrcp.c | 265 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 274 insertions(+)
+>>  create mode 100644 unit/test-avrcp.c
+>>
+>> diff --git a/Makefile.am b/Makefile.am
+>> index 11f2aa1..5fe58eb 100644
+>> --- a/Makefile.am
+>> +++ b/Makefile.am
+>> @@ -282,6 +282,15 @@ unit_test_avctp_SOURCES = unit/test-avctp.c \
+>>                               android/avctp.c android/avctp.h
+>>  unit_test_avctp_LDADD = @GLIB_LIBS@
+>>
+>> +unit_tests += unit/test-avrcp
+>> +
+>> +unit_test_avrcp_SOURCES = unit/test-avrcp.c \
+>> +                             src/shared/util.h src/shared/util.c \
+>> +                             src/log.h src/log.c \
+>> +                             android/avctp.c android/avctp.h \
+>> +                             android/avrcp-lib.c android/avrcp-lib.h
+>> +unit_test_avrcp_LDADD = @GLIB_LIBS@ lib/libbluetooth-internal.la
+>> +
+>>  unit_tests += unit/test-gdbus-client
+>>
+>>  unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
+>> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+>> new file mode 100644
+>> index 0000000..f1c0f46
+>> --- /dev/null
+>> +++ b/unit/test-avrcp.c
+>> @@ -0,0 +1,265 @@
+>> +/*
+>> + *
+>> + *  BlueZ - Bluetooth protocol stack for Linux
+>> + *
+>> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+>> + *
+>> + *
+>> + *  This program is free software; you can redistribute it and/or modify
+>> + *  it under the terms of the GNU General Public License as published by
+>> + *  the Free Software Foundation; either version 2 of the License, or
+>> + *  (at your option) any later version.
+>> + *
+>> + *  This program is distributed in the hope that it will be useful,
+>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+>> + *  GNU General Public License for more details.
+>> + *
+>> + *  You should have received a copy of the GNU General Public License
+>> + *  along with this program; if not, write to the Free Software
+>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+>> + *
+>> + */
+>> +
+>> +#ifdef HAVE_CONFIG_H
+>> +#include <config.h>
+>> +#endif
+>> +
+>> +#include <unistd.h>
+>> +#include <stdlib.h>
+>> +#include <stdbool.h>
+>> +#include <inttypes.h>
+>> +#include <string.h>
+>> +#include <fcntl.h>
+>> +#include <sys/socket.h>
+>> +
+>> +#include <glib.h>
+>> +
+>> +#include "src/shared/util.h"
+>> +#include "src/log.h"
+>> +#include "lib/bluetooth.h"
+>> +
+>> +#include "android/avctp.h"
+>> +#include "android/avrcp-lib.h"
+>> +
+>> +struct test_pdu {
+>> +     bool valid;
+>> +     bool fragmented;
+>> +     const uint8_t *data;
+>> +     size_t size;
+>> +};
+>> +
+>> +struct test_data {
+>> +     char *test_name;
+>> +     struct test_pdu *pdu_list;
+>> +};
+>> +
+>> +struct context {
+>> +     GMainLoop *main_loop;
+>> +     struct avrcp *session;
+>> +     guint source;
+>> +     guint process;
+>> +     int fd;
+>> +     unsigned int pdu_offset;
+>> +     const struct test_data *data;
+>> +};
+>> +
+>> +#define data(args...) ((const unsigned char[]) { args })
+>> +
+>> +#define raw_pdu(args...)                                     \
+>> +     {                                                       \
+>> +             .valid = true,                                  \
+>> +             .data = data(args),                             \
+>> +             .size = sizeof(data(args)),                     \
+>> +     }
+>> +
+>> +#define frg_pdu(args...)                                     \
+>> +     {                                                       \
+>> +             .valid = true,                                  \
+>> +             .fragmented = true,                             \
+>> +             .data = data(args),                             \
+>> +             .size = sizeof(data(args)),                     \
+>> +     }
+>> +
+>> +#define define_test(name, function, args...)                         \
+>> +     do {                                                            \
+>> +             const struct test_pdu pdus[] = {                        \
+>> +                     args, { }                                       \
+>> +             };                                                      \
+>> +             static struct test_data data;                           \
+>> +             data.test_name = g_strdup(name);                        \
+>> +             data.pdu_list = g_malloc(sizeof(pdus));                 \
+>> +             memcpy(data.pdu_list, pdus, sizeof(pdus));              \
+>> +             g_test_add_data_func(name, &data, function);            \
+>> +     } while (0)
+>> +
+>> +static void test_debug(const char *str, void *user_data)
+>> +{
+>> +     const char *prefix = user_data;
+>> +
+>> +     g_print("%s%s\n", prefix, str);
+>> +}
+>> +
+>> +static void test_free(gconstpointer user_data)
+>> +{
+>> +     const struct test_data *data = user_data;
+>> +
+>> +     g_free(data->test_name);
+>> +     g_free(data->pdu_list);
+>> +}
+>> +
+>> +static gboolean context_quit(gpointer user_data)
+>> +{
+>> +     struct context *context = user_data;
+>> +
+>> +     if (context->process > 0)
+>> +             g_source_remove(context->process);
+>> +
+>> +     g_main_loop_quit(context->main_loop);
+>> +
+>> +     return FALSE;
+>> +}
+>> +
+>> +static gboolean send_pdu(gpointer user_data)
+>> +{
+>> +     struct context *context = user_data;
+>> +     const struct test_pdu *pdu;
+>> +     ssize_t len;
+>> +
+>> +     pdu = &context->data->pdu_list[context->pdu_offset++];
+>> +
+>> +     len = write(context->fd, pdu->data, pdu->size);
+>> +
+>> +     if (g_test_verbose())
+>> +             util_hexdump('<', pdu->data, len, test_debug, "AVRCP: ");
+>> +
+>> +     g_assert_cmpint(len, ==, pdu->size);
+>> +
+>> +     if (pdu->fragmented)
+>> +             return send_pdu(user_data);
+>> +
+>> +     context->process = 0;
+>> +     return FALSE;
+>> +}
+>> +
+>> +static void context_process(struct context *context)
+>> +{
+>> +     if (!context->data->pdu_list[context->pdu_offset].valid) {
+>> +             context_quit(context);
+>> +             return;
+>> +     }
+>> +
+>> +     context->process = g_idle_add(send_pdu, context);
+>> +}
+>> +
+>> +static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+>> +                                                     gpointer user_data)
+>> +{
+>> +     struct context *context = user_data;
+>> +     const struct test_pdu *pdu;
+>> +     unsigned char buf[512];
+>> +     ssize_t len;
+>> +     int fd;
+>> +
+>> +     pdu = &context->data->pdu_list[context->pdu_offset++];
+>> +
+>> +     if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+>> +             context->source = 0;
+>> +             g_print("%s: cond %x\n", __func__, cond);
+>> +             return FALSE;
+>> +     }
+>> +
+>> +     fd = g_io_channel_unix_get_fd(channel);
+>> +
+>> +     len = read(fd, buf, sizeof(buf));
+>> +
+>> +     g_assert(len > 0);
+>> +
+>> +     if (g_test_verbose())
+>> +             util_hexdump('>', buf, len, test_debug, "AVRCP: ");
+>> +
+>> +     g_assert_cmpint(len, ==, pdu->size);
+>> +
+>> +     g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
+>> +
+>> +     if (!pdu->fragmented)
+>> +             context_process(context);
+>> +
+>> +     return TRUE;
+>> +}
+>> +
+>> +static struct context *create_context(uint16_t version, gconstpointer data)
+>> +{
+>> +     struct context *context = g_new0(struct context, 1);
+>> +     GIOChannel *channel;
+>> +     int err, sv[2];
+>> +
+>> +     context->main_loop = g_main_loop_new(NULL, FALSE);
+>> +     g_assert(context->main_loop);
+>> +
+>> +     err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+>> +     g_assert(err == 0);
+>> +
+>> +     context->session = avrcp_new(sv[0], 672, 672, version);
+>> +     g_assert(context->session != NULL);
+>> +
+>> +     channel = g_io_channel_unix_new(sv[1]);
+>> +
+>> +     g_io_channel_set_close_on_unref(channel, TRUE);
+>> +     g_io_channel_set_encoding(channel, NULL, NULL);
+>> +     g_io_channel_set_buffered(channel, FALSE);
+>> +
+>> +     context->source = g_io_add_watch(channel,
+>> +                             G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+>> +                             test_handler, context);
+>> +     g_assert(context->source > 0);
+>> +
+>> +     g_io_channel_unref(channel);
+>> +
+>> +     context->fd = sv[1];
+>> +     context->data = data;
+>> +
+>> +     return context;
+>> +}
+>> +
+>> +static void destroy_context(struct context *context)
+>> +{
+>> +     if (context->source > 0)
+>> +             g_source_remove(context->source);
+>> +
+>> +     avrcp_shutdown(context->session);
+>> +
+>> +     g_main_loop_unref(context->main_loop);
+>> +
+>> +     test_free(context->data);
+>> +     g_free(context);
+>> +}
+>> +
+>> +static void test_dummy(gconstpointer data)
+>> +{
+>> +     struct context *context =  create_context(0x0100, data);
+>> +
+>> +     destroy_context(context);
+>> +}
+>> +
+>> +int main(int argc, char *argv[])
+>> +{
+>> +     g_test_init(&argc, &argv, NULL);
+>> +
+>> +     if (g_test_verbose())
+>> +             __btd_log_init("*", 0);
+>> +
+>> +     /* Connection Establishment for Control tests */
+>> +
+>> +     /*
+>> +      * Tests are checking connection establishement and release
+>> +      * for control channel. Since we are connected through socketpair
+>> +      * the tests are dummy
+>> +      */
+>> +     define_test("/TP/CEC/BV-01-I", test_dummy, raw_pdu(0x00));
+>> +     define_test("/TP/CEC/BV-02-I", test_dummy, raw_pdu(0x00));
+>> +     define_test("/TP/CRC/BV-01-I", test_dummy, raw_pdu(0x00));
+>> +     define_test("/TP/CRC/BV-02-I", test_dummy, raw_pdu(0x00));
+>> +
+>> +     return g_test_run();
+>> +}
+>> --
+>> 1.8.3.2
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-If it is mandatory, yes we should do it automatically, perhaps we can
-trigger it with passthrough registration.
+Applied, thanks.
 
 
 -- 
