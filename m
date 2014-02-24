@@ -1,40 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>, "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] android/pics: Add PICS and PIXIT for HSP
-Date: Mon, 24 Feb 2014 20:17:47 +0100
-Message-ID: <1813726.pFGF1AVLyQ@athlon>
-In-Reply-To: <6632C143-D06A-48DC-A403-FDE4B40AB1B5@holtmann.org>
-References: <1393242895-19447-1-git-send-email-sebastian.chlad@tieto.com> <6632C143-D06A-48DC-A403-FDE4B40AB1B5@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH 0/7] Bluetooth: Graceful power off procedure
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393246342-27980-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 24 Feb 2014 11:12:33 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <8E5054F8-6301-4515-AF7E-FF561E009728@holtmann.org>
+References: <1393246342-27980-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Monday 24 February 2014 09:57:14 Marcel Holtmann wrote:
-> Hi Sebastian,
+> This set of patches updates the power off procedure (as triggered
+> through mgmt) to perform a graceful power off by first cleaning up HCI
+> state such as connections, scan modes and advertising before requesting
+> the HCI driver to actually power off.
 > 
-> > Added PICS and PIXIT target Android 4.4
-> > ---
-> > android/Makefile.am   |   2 +
-> > android/pics-hsp.txt  | 103
-> > ++++++++++++++++++++++++++++++++++++++++++++++++++ android/pixit-hsp.txt
-> > |  30 +++++++++++++++
-> > 3 files changed, 135 insertions(+)
-> > create mode 100644 android/pics-hsp.txt
-> > create mode 100644 android/pixit-hsp.txt
+> Johan
 > 
-> so we are doing Headset profile (HSP) and also Handsfree profile (HFP). I am
-> fine with also doing HSP since it seems that is what Android uses on
-> tablets.
+> ----------------------------------------------------------------
+> Johan Hedberg (7):
+>      Bluetooth: Add convenience function for getting total connection count
+>      Bluetooth: Move HCI_ADVERTISING handling into mgmt.c
+>      Bluetooth: Move check for MGMT_CONNECTED flag into mgmt.c
+>      Bluetooth: Don't clear HCI_DISCOVERABLE when powering off
+>      Bluetooth: Don't clear HCI_CONNECTABLE when powering off
+>      Bluetooth: Don't clear HCI_ADVERTISING when powering off
+>      Bluetooth: Clean up HCI state when doing power off
+> 
+> include/net/bluetooth/hci_core.h | 11 ++++-
+> net/bluetooth/hci_event.c        | 15 +++---
+> net/bluetooth/mgmt.c             | 96 ++++++++++++++++++++++++++++++++++--
+> 3 files changed, 107 insertions(+), 15 deletions(-)
 
-Both HSP and HFP are handled by handsfree HAL sp we would probably need some 
-extra argument in IPC to allow disabling HFP if not required. And some 
-configuration (runtime/compile time?) flag for libhal.
+all 7 patches have been applied to bluetooth-next tree.
 
+Regards
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Marcel
+
