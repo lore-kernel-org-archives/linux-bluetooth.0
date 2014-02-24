@@ -1,100 +1,131 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v11 14/15] Bluetooth: Create hci_req_add_le_passive_scan helper
-Date: Mon, 24 Feb 2014 19:31:00 -0300
-Message-Id: <1393281061-14320-15-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v11 11/15] Bluetooth: Connection parameters and resolvable address
+Date: Mon, 24 Feb 2014 19:30:57 -0300
+Message-Id: <1393281061-14320-12-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patches creates the hci_req_add_le_passive_scan helper so it can
-be re-used in the next patch.
+We should only add connection parameters for public, random static and
+random private resolvable with IRK. If we allow non-resolvable or
+resolvable without IRK, the background scan may run indefinitely. So, to
+avoid this undesired behavior, we should check the address type in
+hci_conn_params_add().
+
+Additionally, since the IRK is removed during unpair, we should also
+remove the connection parameters from that device.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 46 ++++++++++++++++++++++++++--------------------
- 1 file changed, 26 insertions(+), 20 deletions(-)
+ include/net/bluetooth/hci_core.h | 18 +++++++++++++++---
+ net/bluetooth/hci_core.c         | 24 ++++++++++++++++++++----
+ net/bluetooth/mgmt.c             |  2 ++
+ 3 files changed, 37 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5d51086..e0ebbd9 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5095,6 +5095,31 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 5539dea..c81847e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -799,9 +799,9 @@ int hci_blacklist_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
+ 
+ struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
+ 					       bdaddr_t *addr, u8 addr_type);
+-void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+-			 u8 auto_connect, u16 conn_min_interval,
+-			 u16 conn_max_interval);
++int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
++			u8 auto_connect, u16 conn_min_interval,
++			u16 conn_max_interval);
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_clear(struct hci_dev *hdev);
+ 
+@@ -1117,6 +1117,18 @@ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
+ 	return false;
  }
  
-+static void hci_req_add_le_passive_scan(struct hci_request *req,
-+					struct hci_dev *hdev)
++/* Check if address is "random private non-resolvable" type */
++static inline bool hci_bdaddr_is_non_rpa(bdaddr_t *bdaddr, u8 addr_type)
 +{
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	u8 own_addr_type;
++	if (addr_type != 0x01)
++		return false;
 +
-+	if (hci_update_random_address(req, true, &own_addr_type))
-+		return;
++	if ((bdaddr->b[5] & 0xc0) == 0x00)
++		return true;
 +
-+	memset(&param_cp, 0, sizeof(param_cp));
-+	param_cp.type = LE_SCAN_PASSIVE;
-+	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
-+	param_cp.window = cpu_to_le16(hdev->le_scan_window);
-+	param_cp.own_address_type = own_addr_type;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+		    &param_cp);
-+
-+	memset(&enable_cp, 0, sizeof(enable_cp));
-+	enable_cp.enable = LE_SCAN_ENABLE;
-+	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+		    &enable_cp);
++	return false;
 +}
 +
- static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
+ static inline struct smp_irk *hci_get_irk(struct hci_dev *hdev,
+ 					  bdaddr_t *bdaddr, u8 addr_type)
  {
- 	if (status)
-@@ -5110,8 +5135,6 @@ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
-  */
- void hci_update_background_scan(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e78e48e..a8baf9a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3221,12 +3221,26 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+-void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+-			 u8 auto_connect, u16 conn_min_interval,
+-			 u16 conn_max_interval)
++int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
++			u8 auto_connect, u16 conn_min_interval,
++			u16 conn_max_interval)
  {
--	struct hci_cp_le_set_scan_param param_cp;
--	struct hci_cp_le_set_scan_enable enable_cp;
- 	struct hci_request req;
- 	struct hci_conn *conn;
- 	int err;
-@@ -5131,8 +5154,6 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 	struct hci_conn_params *params;
  
- 		BT_DBG("%s stopping background scanning", hdev->name);
- 	} else {
--		u8 own_addr_type;
--
- 		/* If there is at least one pending LE connection, we should
- 		 * keep the background scan running.
- 		 */
-@@ -5149,22 +5170,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 		if (conn)
- 			return;
- 
--		if (hci_update_random_address(&req, false, &own_addr_type))
--			return;
--
--		memset(&param_cp, 0, sizeof(param_cp));
--		param_cp.type = LE_SCAN_PASSIVE;
--		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
--		param_cp.window = cpu_to_le16(hdev->le_scan_window);
--		param_cp.own_address_type = own_addr_type;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
--			    &param_cp);
--
--		memset(&enable_cp, 0, sizeof(enable_cp));
--		enable_cp.enable = LE_SCAN_ENABLE;
--		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
--			    &enable_cp);
-+		hci_req_add_le_passive_scan(&req, hdev);
- 
- 		BT_DBG("%s starting background scanning", hdev->name);
++	if (hci_bdaddr_is_non_rpa(addr, addr_type))
++		return -EINVAL;
++
++	if (hci_bdaddr_is_rpa(addr, addr_type)) {
++		struct smp_irk *irk;
++
++		irk = hci_get_irk(hdev, addr, addr_type);
++		if (!irk)
++			return -EINVAL;
++
++		addr = &irk->bdaddr;
++		addr_type = irk->addr_type;
++	}
++
+ 	params = hci_conn_params_lookup(hdev, addr, addr_type);
+ 	if (params)
+ 		goto update;
+@@ -3234,7 +3248,7 @@ void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ 	params = kzalloc(sizeof(*params), GFP_KERNEL);
+ 	if (!params) {
+ 		BT_ERR("Out of memory");
+-		return;
++		return -ENOMEM;
  	}
+ 
+ 	bacpy(&params->addr, addr);
+@@ -3261,6 +3275,8 @@ update:
+ 	BT_DBG("addr %pMR (type %u) auto_connect %u conn_min_interval 0x%.4x "
+ 	       "conn_max_interval 0x%.4x", addr, addr_type, auto_connect,
+ 	       conn_min_interval, conn_max_interval);
++
++	return 0;
+ }
+ 
+ /* This function requires the caller holds hdev->lock */
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a08c2bf..4745fb5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2419,6 +2419,8 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 		hci_remove_irk(hdev, &cp->addr.bdaddr, addr_type);
+ 
++		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
++
+ 		err = hci_remove_ltk(hdev, &cp->addr.bdaddr, addr_type);
+ 	}
+ 
 -- 
 1.8.5.4
 
