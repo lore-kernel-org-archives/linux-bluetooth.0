@@ -1,278 +1,145 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v11 06/15] Bluetooth: Introduce LE auto connection infrastructure
-Date: Mon, 24 Feb 2014 19:30:52 -0300
-Message-Id: <1393281061-14320-7-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v11 05/15] Bluetooth: Introduce hdev->pend_le_conn list
+Date: Mon, 24 Feb 2014 19:30:51 -0300
+Message-Id: <1393281061-14320-6-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch introduces the LE auto connection infrastructure which
-will be used to implement the LE auto connection options.
+This patch introduces the hdev->pend_le_conn list which holds the
+device addresses the kernel should autonomously connect. It also
+introduces some helper functions to manipulate the list.
 
-In summary, the auto connection mechanism works as follows: Once the
-first pending LE connection is created, the background scanning is
-started. When the target device is found in range, the kernel
-autonomously starts the connection attempt. If connection is
-established successfully, that pending LE connection is deleted and
-the background is stopped.
-
-To achieve that, this patch introduces the hci_update_background_scan()
-which controls the background scanning state. This function starts or
-stops the background scanning based on the hdev->pend_le_conns list. If
-there is no pending LE connection, the background scanning is stopped.
-Otherwise, we start the background scanning.
-
-Then, every time a pending LE connection is added we call hci_update_
-background_scan() so the background scanning is started (in case it is
-not already running). Likewise, every time a pending LE connection is
-deleted we call hci_update_background_scan() so the background scanning
-is stopped (in case this was the last pending LE connection) or it is
-started again (in case we have more pending LE connections). Finally,
-we also call hci_update_background_scan() in hci_le_conn_failed() so
-the background scan is restarted in case the connection establishment
-fails. This way the background scanning keeps running until all pending
-LE connection are established.
-
-At this point, resolvable addresses are not support by this
-infrastructure. The proper support is added in upcoming patches.
+The list and helper functions will be used by the next patch which
+implements the LE auto connection infrastructure.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  2 +
- net/bluetooth/hci_conn.c         |  5 +++
- net/bluetooth/hci_core.c         | 89 +++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c        | 44 ++++++++++++++++++++
- 4 files changed, 138 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h |  7 +++++
+ net/bluetooth/hci_core.c         | 68 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 75 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b1ceaad..950a7d8 100644
+index ebc9c4f..b1ceaad 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -804,6 +804,8 @@ void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
- void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
- void hci_pend_le_conns_clear(struct hci_dev *hdev);
+@@ -284,6 +284,7 @@ struct hci_dev {
+ 	struct list_head	identity_resolving_keys;
+ 	struct list_head	remote_oob_data;
+ 	struct list_head	le_conn_params;
++	struct list_head	pend_le_conns;
  
-+void hci_update_background_scan(struct hci_dev *hdev);
+ 	struct hci_dev_stats	stat;
+ 
+@@ -797,6 +798,12 @@ void hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ void hci_conn_params_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_conn_params_clear(struct hci_dev *hdev);
+ 
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
++void hci_pend_le_conns_clear(struct hci_dev *hdev);
 +
  void hci_uuids_clear(struct hci_dev *hdev);
  
  void hci_link_keys_clear(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index a823d30..d654a90 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -527,6 +527,11 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 	hci_proto_connect_cfm(conn, status);
- 
- 	hci_conn_del(conn);
-+
-+	/* Since we may have temporarily stopped the background scanning in
-+	 * favor of connection establishment, we should restart it.
-+	 */
-+	hci_update_background_scan(hdev);
- }
- 
- static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 142ecd8..b1c247f 100644
+index 9a078cf..142ecd8 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -3281,7 +3281,7 @@ void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 
- 	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
- 	if (entry)
--		return;
-+		goto done;
- 
- 	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry) {
-@@ -3295,6 +3295,9 @@ void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 	list_add(&entry->list, &hdev->pend_le_conns);
- 
- 	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+
-+done:
-+	hci_update_background_scan(hdev);
- }
- 
- /* This function requires the caller holds hdev->lock */
-@@ -3304,12 +3307,15 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 
- 	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
- 	if (!entry)
--		return;
-+		goto done;
- 
- 	list_del(&entry->list);
- 	kfree(entry);
- 
- 	BT_DBG("addr %pMR (type %u)", addr, addr_type);
-+
-+done:
-+	hci_update_background_scan(hdev);
- }
- 
- /* This function requires the caller holds hdev->lock */
-@@ -4946,3 +4952,82 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	cp.enable = LE_SCAN_DISABLE;
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
-+
-+static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
-+{
-+	if (status)
-+		BT_DBG("HCI request failed to update background scanning: "
-+		       "status 0x%2.2x", status);
-+}
-+
-+/* This function controls the background scanning based on hdev->pend_le_conns
-+ * list. If there are pending LE connection we start the background scanning,
-+ * otherwise we stop it.
-+ *
-+ * This function requires the caller holds hdev->lock.
-+ */
-+void hci_update_background_scan(struct hci_dev *hdev)
-+{
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	struct hci_request req;
-+	struct hci_conn *conn;
-+	int err;
-+
-+	hci_req_init(&req, hdev);
-+
-+	if (list_empty(&hdev->pend_le_conns)) {
-+		/* If there is no pending LE connections, we should stop
-+		 * the background scanning.
-+		 */
-+
-+		/* If controller is not scanning we are done. */
-+		if (!test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+			return;
-+
-+		hci_req_add_le_scan_disable(&req);
-+
-+		BT_DBG("%s stopping background scanning", hdev->name);
-+	} else {
-+		u8 own_addr_type;
-+
-+		/* If there is at least one pending LE connection, we should
-+		 * keep the background scan running.
-+		 */
-+
-+		/* If controller is already scanning we are done. */
-+		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+			return;
-+
-+		/* If controller is connecting, we should not start scanning
-+		 * since some controllers are not able to scan and connect at
-+		 * the same time.
-+		 */
-+		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-+		if (conn)
-+			return;
-+
-+		if (hci_update_random_address(&req, false, &own_addr_type))
-+			return;
-+
-+		memset(&param_cp, 0, sizeof(param_cp));
-+		param_cp.type = LE_SCAN_PASSIVE;
-+		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
-+		param_cp.window = cpu_to_le16(hdev->le_scan_window);
-+		param_cp.own_address_type = own_addr_type;
-+		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+			    &param_cp);
-+
-+		memset(&enable_cp, 0, sizeof(enable_cp));
-+		enable_cp.enable = LE_SCAN_ENABLE;
-+		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
-+		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+			    &enable_cp);
-+
-+		BT_DBG("%s starting background scanning", hdev->name);
-+	}
-+
-+	err = hci_req_run(&req, update_background_scan_complete);
-+	if (err)
-+		BT_ERR("Failed to run HCI request: err %d", err);
-+}
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index eaa6965..d5bf23d 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3677,25 +3677,69 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_proto_connect_cfm(conn, ev->status);
- 
-+	hci_pend_le_conn_del(hdev, &conn->dst, conn->dst_type);
-+
- unlock:
- 	hci_dev_unlock(hdev);
+@@ -3259,6 +3259,72 @@ void hci_conn_params_clear(struct hci_dev *hdev)
+ 	BT_DBG("All LE connection parameters were removed");
  }
  
 +/* This function requires the caller holds hdev->lock */
-+static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
-+				  u8 addr_type)
++struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
++					    bdaddr_t *addr, u8 addr_type)
 +{
-+	struct hci_conn *conn;
-+	u8 bdaddr_type;
++	struct bdaddr_list *entry;
 +
-+	if (!hci_pend_le_conn_lookup(hdev, addr, addr_type))
-+		return;
-+
-+	if (addr_type == ADDR_LE_DEV_PUBLIC)
-+		bdaddr_type = BDADDR_LE_PUBLIC;
-+	else
-+		bdaddr_type = BDADDR_LE_RANDOM;
-+
-+	conn = hci_connect(hdev, LE_LINK, addr, bdaddr_type, BT_SECURITY_LOW,
-+			   HCI_AT_NO_BONDING);
-+	if (!IS_ERR(conn))
-+		return;
-+
-+	switch (PTR_ERR(conn)) {
-+	case -EBUSY:
-+		/* If hci_connect() returns -EBUSY it means there is already
-+		 * an LE connection attempt going on. Since controllers don't
-+		 * support more than one connection attempt at the time, we
-+		 * don't consider this an error case.
-+		 */
-+		break;
-+	default:
-+		BT_DBG("Failed to connect: err %ld", PTR_ERR(conn));
++	list_for_each_entry(entry, &hdev->pend_le_conns, list) {
++		if (bacmp(&entry->bdaddr, addr) == 0 &&
++		    entry->bdaddr_type == addr_type)
++			return entry;
 +	}
++
++	return NULL;
 +}
 +
- static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (entry)
++		return;
++
++	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry) {
++		BT_ERR("Out of memory");
++		return;
++	}
++
++	bacpy(&entry->bdaddr, addr);
++	entry->bdaddr_type = addr_type;
++
++	list_add(&entry->list, &hdev->pend_le_conns);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
++{
++	struct bdaddr_list *entry;
++
++	entry = hci_pend_le_conn_lookup(hdev, addr, addr_type);
++	if (!entry)
++		return;
++
++	list_del(&entry->list);
++	kfree(entry);
++
++	BT_DBG("addr %pMR (type %u)", addr, addr_type);
++}
++
++/* This function requires the caller holds hdev->lock */
++void hci_pend_le_conns_clear(struct hci_dev *hdev)
++{
++	struct bdaddr_list *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->pend_le_conns, list) {
++		list_del(&entry->list);
++		kfree(entry);
++	}
++
++	BT_DBG("All LE pending connections cleared");
++}
++
+ static void inquiry_complete(struct hci_dev *hdev, u8 status)
  {
- 	u8 num_reports = skb->data[0];
- 	void *ptr = &skb->data[1];
- 	s8 rssi;
+ 	if (status) {
+@@ -3441,6 +3507,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_LIST_HEAD(&hdev->identity_resolving_keys);
+ 	INIT_LIST_HEAD(&hdev->remote_oob_data);
+ 	INIT_LIST_HEAD(&hdev->le_conn_params);
++	INIT_LIST_HEAD(&hdev->pend_le_conns);
+ 	INIT_LIST_HEAD(&hdev->conn_hash.list);
  
-+	hci_dev_lock(hdev);
-+
- 	while (num_reports--) {
- 		struct hci_ev_le_advertising_info *ev = ptr;
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+@@ -3642,6 +3709,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_smp_irks_clear(hdev);
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_conn_params_clear(hdev);
++	hci_pend_le_conns_clear(hdev);
+ 	hci_dev_unlock(hdev);
  
-+		if (ev->evt_type == LE_ADV_IND ||
-+		    ev->evt_type == LE_ADV_DIRECT_IND)
-+			check_pending_le_conn(hdev, &ev->bdaddr,
-+					      ev->bdaddr_type);
-+
- 		rssi = ev->data[ev->length];
- 		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
- 				  NULL, rssi, 0, 1, ev->data, ev->length);
- 
- 		ptr += sizeof(*ev) + ev->length + 1;
- 	}
-+
-+	hci_dev_unlock(hdev);
- }
- 
- static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_dev_put(hdev);
 -- 
 1.8.5.4
 
