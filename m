@@ -1,54 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <530C995C.3060201@tauria.ee>
+Date: Tue, 25 Feb 2014 15:23:40 +0200
+From: Peeter Vois <peeter@tauria.ee>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/avrcp: Fix passing wrong len
-Date: Tue, 25 Feb 2014 15:47:38 +0200
-Message-Id: <1393336058-431-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: BUG REPORT: Bluetooth LE HID keyboard key stays pressed when device
+ disappears
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi everybody !
 
-When handling vendor dependent pdus len was passed in wrong order to
-callback.
----
- android/avrcp-lib.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+First of all thanks for the bluez library and hid over gatt profile. I 
+am developping a special purpuse keyboard and am using Linux as test 
+platform. There is not much of the systems available for real life 
+testing and luckily Linux does work well.
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index c78881f..c280cf8 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -128,14 +128,14 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 	const struct avrcp_control_handler *handler;
- 	struct avrcp_header *pdu = (void *) operands;
- 	uint32_t company_id = ntoh24(pdu->company_id);
-+	uint16_t params_len = ntohs(pdu->params_len);
- 
- 	if (company_id != IEEEID_BTSIG) {
- 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
- 		return 0;
- 	}
- 
--	DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id,
--						ntohs(pdu->params_len));
-+	DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id, params_len);
- 
- 	pdu->packet_type = 0;
- 	pdu->rsvd = 0;
-@@ -163,10 +163,10 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 		goto reject;
- 	}
- 
--	*code = handler->func(session, transaction, &pdu->params_len,
-+	*code = handler->func(session, transaction, &params_len,
- 					pdu->params, session->control_data);
- 
--	return AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-+	return AVRCP_HEADER_LENGTH + params_len;
- 
- reject:
- 	pdu->params_len = htons(1);
+While developping, my firmware is ofcourse buggy and this helped me to 
+uncover one of the bluez HoG profile feature that will have unpleasant 
+result- the key stays pressed when bluetooth device disappears.
+
+1. My device is sending key press, release and/or anotherkey press 
+notification when something happens with the keyboard.
+2. It is possible that my device will disappear after sending key press 
+event. So far I have seen debug trap causing such thing- after the key 
+press is sent, the firmware stops working. I believe such situation can 
+happen even with firmware that does function correctly. I can imagine 
+sudden power loss / battery failure e.t.c.
+3. The result will be, that the key stays pressed and repeated entry 
+will run where ever the keyboard focus will be placed.
+4. By killing bluetoothd, the key will be released.
+
+I believe the situation is rather complex, as the keyboard is not the 
+only HID device possible. I will be available if needed.
+
+I am using bluez-5.14-1.fc20.x86_64
+and kernel-3.13.3-201.fc20.x86_64
+at the moment.
+
+Best Regards ...
+
 -- 
-1.8.3.2
+Lugupidamisega
+   Peeter Vois <tauria@tauria.ee>
+   mobiil: +372 55611689
+   Tauria OÜ
+   juhatuse liige
 
