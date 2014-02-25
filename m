@@ -1,38 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v3] Bluetooth: Fix advertising address type when toggling connectable
+Subject: Re: [PATCH v2] Bluetooth: Fix NULL pointer dereference when sending data
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393350991-8327-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 25 Feb 2014 10:04:37 -0800
+In-Reply-To: <1393344982-6756-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 25 Feb 2014 10:04:12 -0800
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <4127D13C-C6F9-4631-AACE-11CF69E6ADF2@holtmann.org>
-References: <1393350991-8327-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <16615F0F-B181-457A-8F74-59C8A3D6B671@holtmann.org>
+References: <1393344982-6756-1-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrzej,
 
-> When the connectable setting is toggled using mgmt_set_connectable the
-> HCI_CONNECTABLE flag will only be set once the related HCI commands
-> succeed. When determining what kind of advertising to do we need to
-> therefore also check whether there is a pending Set Connectable command
-> in addition to the current flag value.
+> When trying to allocate skb for new PDU, l2cap_chan is unlocked so we
+> can sleep waiting for memory as otherwise there's possible deadlock as
+> fixed in e454c84464. However, in a6a5568c03 lock was moved from socket
+> to channel level and it's no longer safe to just unlock and lock again
+> without checking l2cap_chan state since channel can be disconnected
+> when lock is not held.
 > 
-> The enable_advertising function was already taking care of this for the
-> advertising type with the help of the get_adv_type function, but was
-> failing to do the same for the address type selection. This patch
-> converts the get_adv_type function to be more generic in that it returns
-> the expected connectable state and updates the enable_advertising
-> function to use the return value both for the advertising type as well
-> as the advertising address type.
+> This patch adds missing checks for l2cap_chan state when returning from
+> call which allocates skb.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Scenario is easily reproducible by running rfcomm-tester in a loop.
+> 
+> BUG: unable to handle kernel NULL pointer dereference at         (null)
+> IP: [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
+> PGD 0
+> Oops: 0000 [#1] SMP
+> Modules linked in:
+> CPU: 7 PID: 4038 Comm: krfcommd Not tainted 3.14.0-rc2+ #15
+> Hardware name: Dell Inc. OptiPlex 790/0HY9JP, BIOS A10 11/24/2011
+> task: ffff8802bdd731c0 ti: ffff8801ec986000 task.ti: ffff8801ec986000
+> RIP: 0010:[<ffffffffa0442169>]  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120
+> RSP: 0018:ffff8801ec987ad8  EFLAGS: 00010202
+> RAX: 0000000000000000 RBX: ffff8800c5796800 RCX: 0000000000000000
+> RDX: ffff880410e7a800 RSI: ffff8802b6c1da00 RDI: ffff8800c5796800
+> RBP: ffff8801ec987af8 R08: 00000000000000c0 R09: 0000000000000300
+> R10: 000000000000573b R11: 000000000000573a R12: ffff8802b6c1da00
+> R13: 0000000000000000 R14: ffff8802b6c1da00 R15: 0000000000000000
+> FS:  0000000000000000(0000) GS:ffff88042dce0000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000000000000 CR3: 000000041257c000 CR4: 00000000000407e0
+> Stack:
+> ffff8801ec987d78 ffff8800c5796800 ffff8801ec987d78 0000000000000000
+> ffff8801ec987ba8 ffffffffa0449e37 0000000000000004 ffff8801ec987af0
+> ffff8801ec987d40 0000000000000282 0000000000000000 ffffffff00000004
+> Call Trace:
+> [<ffffffffa0449e37>] l2cap_chan_send+0xaa7/0x1120 [bluetooth]
+> [<ffffffff81770100>] ? _raw_spin_unlock_bh+0x20/0x40
+> [<ffffffffa045188b>] l2cap_sock_sendmsg+0xcb/0x110 [bluetooth]
+> [<ffffffff81652b0f>] sock_sendmsg+0xaf/0xc0
+> [<ffffffff810a8381>] ? update_curr+0x141/0x200
+> [<ffffffff810a8961>] ? dequeue_entity+0x181/0x520
+> [<ffffffff81652b60>] kernel_sendmsg+0x40/0x60
+> [<ffffffffa04a8505>] rfcomm_send_frame+0x45/0x70 [rfcomm]
+> [<ffffffff810766f0>] ? internal_add_timer+0x20/0x50
+> [<ffffffffa04a8564>] rfcomm_send_cmd+0x34/0x60 [rfcomm]
+> [<ffffffffa04a8605>] rfcomm_send_disc+0x75/0xa0 [rfcomm]
+> [<ffffffffa04aacec>] rfcomm_run+0x8cc/0x1a30 [rfcomm]
+> [<ffffffffa04aa420>] ? rfcomm_check_accept+0xc0/0xc0 [rfcomm]
+> [<ffffffff8108e3a9>] kthread+0xc9/0xe0
+> [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
+> [<ffffffff817795fc>] ret_from_fork+0x7c/0xb0
+> [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
+> Code: 00 00 66 66 66 66 90 55 48 89 e5 48 83 ec 20 f6 05 d6 a3 02 00 04
+> RIP  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
+> RSP <ffff8801ec987ad8>
+> CR2: 0000000000000000
+> 
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/mgmt.c | 21 +++++++++++----------
-> 1 file changed, 11 insertions(+), 10 deletions(-)
+> v2 added comment regarding why we need to check state again
+> 
+> net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
+> 1 file changed, 16 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
