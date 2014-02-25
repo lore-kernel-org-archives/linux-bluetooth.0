@@ -1,88 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 17/17] Bluetooth: Update background scan parameters
-Date: Tue, 25 Feb 2014 18:01:44 -0300
-Message-Id: <1393362104-12175-18-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 16/17] Bluetooth: Create hci_req_add_le_passive_scan helper
+Date: Tue, 25 Feb 2014 18:01:43 -0300
+Message-Id: <1393362104-12175-17-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If new scanning parameters are set while background scan is running,
-we should restart background scanning so these parameters are updated.
+This patches creates the hci_req_add_le_passive_scan helper so it can
+be re-used in the next patch.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 26 ++++++++++++++++++++++++++
- net/bluetooth/mgmt.c             |  7 +++++++
- 3 files changed, 34 insertions(+)
+ net/bluetooth/hci_core.c | 54 +++++++++++++++++++++++++++---------------------
+ 1 file changed, 30 insertions(+), 24 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e0e0eab..8f0ddc8 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -814,6 +814,7 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
- void hci_pend_le_conns_clear(struct hci_dev *hdev);
- 
- void hci_update_background_scan(struct hci_dev *hdev);
-+void hci_restart_background_scan(struct hci_dev *hdev);
- 
- void hci_uuids_clear(struct hci_dev *hdev);
- 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e776624..f5c0e97 100644
+index fb4c961..e776624 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -5183,3 +5183,29 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 	if (err)
- 		BT_ERR("Failed to run HCI request: err %d", err);
+@@ -5095,6 +5095,35 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  }
-+
-+static void restart_background_scan_complete(struct hci_dev *hdev, u8 status)
-+{
-+	if (status)
-+		BT_DBG("HCI request failed to restart background scan: "
-+		       "status 0x%2.2x", status);
-+}
-+
-+void hci_restart_background_scan(struct hci_dev *hdev)
-+{
-+	struct hci_request req;
-+	int err;
-+
-+	hci_req_init(&req, hdev);
-+
-+	hci_req_add_le_scan_disable(&req);
-+	hci_req_add_le_passive_scan(&req, hdev);
-+
-+	err = hci_req_run(&req, restart_background_scan_complete);
-+	if (err) {
-+		BT_ERR("Failed to run HCI request: err %d", err);
-+		return;
-+	}
-+
-+	BT_DBG("%s re-starting background scanning", hdev->name);
-+}
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 2e6564e..08d52f2 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3924,6 +3924,13 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
  
- 	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NULL, 0);
- 
-+	/* If background scan is running, restart it so new parameters are
-+	 * loaded.
++static void hci_req_add_le_passive_scan(struct hci_request *req,
++					struct hci_dev *hdev)
++{
++	struct hci_cp_le_set_scan_param param_cp;
++	struct hci_cp_le_set_scan_enable enable_cp;
++	u8 own_addr_type;
++
++	/* Use private address since remote doesn't need to identify us.
++	 * Strictly speaking, this is not required since no SCAN_REQ is
++	 * sent in passive scanning.
 +	 */
-+	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
-+	    hdev->discovery.state == DISCOVERY_STOPPED)
-+		hci_restart_background_scan(hdev);
++	if (hci_update_random_address(req, true, &own_addr_type))
++		return;
 +
- 	hci_dev_unlock(hdev);
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.type = LE_SCAN_PASSIVE;
++	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
++	param_cp.window = cpu_to_le16(hdev->le_scan_window);
++	param_cp.own_address_type = own_addr_type;
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
++		    &param_cp);
++
++	memset(&enable_cp, 0, sizeof(enable_cp));
++	enable_cp.enable = LE_SCAN_ENABLE;
++	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
++		    &enable_cp);
++}
++
+ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	if (status)
+@@ -5110,8 +5139,6 @@ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
+  */
+ void hci_update_background_scan(struct hci_dev *hdev)
+ {
+-	struct hci_cp_le_set_scan_param param_cp;
+-	struct hci_cp_le_set_scan_enable enable_cp;
+ 	struct hci_request req;
+ 	struct hci_conn *conn;
+ 	int err;
+@@ -5131,8 +5158,6 @@ void hci_update_background_scan(struct hci_dev *hdev)
  
- 	return err;
+ 		BT_DBG("%s stopping background scanning", hdev->name);
+ 	} else {
+-		u8 own_addr_type;
+-
+ 		/* If there is at least one pending LE connection, we should
+ 		 * keep the background scan running.
+ 		 */
+@@ -5149,26 +5174,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 		if (conn)
+ 			return;
+ 
+-		/* Use private address since remote doesn't need to identify us.
+-		 * Strictly speaking, this is not required since no SCAN_REQ is
+-		 * sent in passive scanning.
+-		 */
+-		if (hci_update_random_address(&req, true, &own_addr_type))
+-			return;
+-
+-		memset(&param_cp, 0, sizeof(param_cp));
+-		param_cp.type = LE_SCAN_PASSIVE;
+-		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
+-		param_cp.window = cpu_to_le16(hdev->le_scan_window);
+-		param_cp.own_address_type = own_addr_type;
+-		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+-			    &param_cp);
+-
+-		memset(&enable_cp, 0, sizeof(enable_cp));
+-		enable_cp.enable = LE_SCAN_ENABLE;
+-		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
+-		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+-			    &enable_cp);
++		hci_req_add_le_passive_scan(&req, hdev);
+ 
+ 		BT_DBG("%s starting background scanning", hdev->name);
+ 	}
 -- 
 1.8.5.4
 
