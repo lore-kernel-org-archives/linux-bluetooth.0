@@ -1,60 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140225042337.GA27803@localhost.P-661HNU-F1>
+In-Reply-To: <20140225055717.GA776@localhost.P-661HNU-F1>
 References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
- <1393281061-14320-7-git-send-email-andre.guedes@openbossa.org> <20140225042337.GA27803@localhost.P-661HNU-F1>
+ <1393281061-14320-2-git-send-email-andre.guedes@openbossa.org> <20140225055717.GA776@localhost.P-661HNU-F1>
 From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Tue, 25 Feb 2014 14:16:52 -0300
-Message-ID: <CACJA=fW-A8GbT55_W43Xk50bu5nzwkPjxDB7fuMBKf0h=mmD7Q@mail.gmail.com>
-Subject: Re: [RFC v11 06/15] Bluetooth: Introduce LE auto connection infrastructure
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 25 Feb 2014 14:16:22 -0300
+Message-ID: <CACJA=fVzF1n9DMmBnuPBvJOTuu_U6AWbbWg-yfRAj91pY2eudg@mail.gmail.com>
+Subject: Re: [RFC v11 01/15] Bluetooth: Create hci_req_add_le_scan_disable helper
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-On Tue, Feb 25, 2014 at 1:23 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+On Tue, Feb 25, 2014 at 2:57 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
 > Hi Andre,
 >
 > On Mon, Feb 24, 2014, Andre Guedes wrote:
->> +             if (hci_update_random_address(&req, false, &own_addr_type))
->> +                     return;
+>> --- a/include/net/bluetooth/hci_core.h
+>> +++ b/include/net/bluetooth/hci_core.h
+>> @@ -1128,6 +1128,7 @@ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
+>>  void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
+>>                   const void *param, u8 event);
+>>  void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
+>> +void hci_req_add_le_scan_disable(struct hci_request *req);
 >
-> Don't we want require_privacy = true here?
+> It doesn't feel right to put this straight next to the generic async
+> request API. I'd at least have an empty line between the generic API and
+> this new function.
 
-require_privacy = true enables non-resolvable address. Since this is a
-passive scanning (no SCAN_REQ is sent), I don't think this is
-required.
+I'll add an empty line then.
 
->> +     if (addr_type == ADDR_LE_DEV_PUBLIC)
->> +             bdaddr_type = BDADDR_LE_PUBLIC;
->> +     else
->> +             bdaddr_type = BDADDR_LE_RANDOM;
+>> --- a/net/bluetooth/hci_core.c
+>> +++ b/net/bluetooth/hci_core.c
+>> @@ -3318,7 +3318,6 @@ static void le_scan_disable_work(struct work_struct *work)
+>>  {
+>>       struct hci_dev *hdev = container_of(work, struct hci_dev,
+>>                                           le_scan_disable.work);
+>> -     struct hci_cp_le_set_scan_enable cp;
+>>       struct hci_request req;
+>>       int err;
+>>
+>> @@ -3326,9 +3325,7 @@ static void le_scan_disable_work(struct work_struct *work)
+>>
+>>       hci_req_init(&req, hdev);
+>>
+>> -     memset(&cp, 0, sizeof(cp));
+>> -     cp.enable = LE_SCAN_DISABLE;
+>> -     hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+>> +     hci_req_add_le_scan_disable(&req);
+>>
+>>       err = hci_req_run(&req, le_scan_disable_work_complete);
+>>       if (err)
+>> @@ -4872,3 +4869,12 @@ static void hci_cmd_work(struct work_struct *work)
+>>               }
+>>       }
+>>  }
 >> +
->> +     conn = hci_connect(hdev, LE_LINK, addr, bdaddr_type, BT_SECURITY_LOW,
->> +                        HCI_AT_NO_BONDING);
+>> +void hci_req_add_le_scan_disable(struct hci_request *req)
+>> +{
+>> +     struct hci_cp_le_set_scan_enable cp;
+>> +
+>> +     memset(&cp, 0, sizeof(cp));
+>> +     cp.enable = LE_SCAN_DISABLE;
+>> +     hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+>> +}
+>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+>> index 25b8b27..c722914 100644
+>> --- a/net/bluetooth/mgmt.c
+>> +++ b/net/bluetooth/mgmt.c
+>> @@ -3526,7 +3526,6 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+>>       struct hci_cp_remote_name_req_cancel cp;
+>>       struct inquiry_entry *e;
+>>       struct hci_request req;
+>> -     struct hci_cp_le_set_scan_enable enable_cp;
+>>       int err;
+>>
+>>       BT_DBG("%s", hdev->name);
+>> @@ -3562,10 +3561,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+>>               } else {
+>>                       cancel_delayed_work(&hdev->le_scan_disable);
+>>
+>> -                     memset(&enable_cp, 0, sizeof(enable_cp));
+>> -                     enable_cp.enable = LE_SCAN_DISABLE;
+>> -                     hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
+>> -                                 sizeof(enable_cp), &enable_cp);
+>> +                     hci_req_add_le_scan_disable(&req);
+>>               }
+>>
+>>               break;
 >
-> All hci_connect is is a very short wrapper to hci_connect_acl/le. The
-> hci_connect_le function in turn does the following:
->
->         /* Convert from L2CAP channel address type to HCI address type */
->         if (dst_type == BDADDR_LE_PUBLIC)
->                 dst_type = ADDR_LE_DEV_PUBLIC;
->         else
->                 dst_type = ADDR_LE_DEV_RANDOM;
->
-> So it seems a bit silly to do this kind of back and forth conversions.
-> Instead, I think the hci_connect API should take the address type that's
-> used for struct hci_conn, i.e. the HCI one (not the L2CAP/mgmt one).
->
-> Also, since pretty much all places that are calling hci_connect pass an
-> explicit value as the link type I think the most sensible thing to do
-> would be to completely remove this function and export hci_connect_le &
-> hci_connect_acl from hci_conn.c.
+> You've missed one place in clean_up_hci_state() in mgmt.c (which was
+> added by the recent "graceful power down" patch set.
 
-I agree. I can do this refactoring in the next version.
+I'll fix it.
 
-BR,
+Thanks,
 
 Andre
