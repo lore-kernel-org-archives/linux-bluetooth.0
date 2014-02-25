@@ -1,251 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH 3/9] shared/hfp_at: Add skeleton of hfp_at_process_data
+Subject: Re: [PATCH 1/9] shared: Add skeleton of hfp_at parser
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393320227-10931-4-git-send-email-marcin.kraglak@tieto.com>
-Date: Tue, 25 Feb 2014 10:56:14 -0800
+In-Reply-To: <1393320227-10931-2-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 25 Feb 2014 10:46:27 -0800
 Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <B8AE4DD9-3CD7-4CAE-9763-2734496D9BD7@holtmann.org>
-References: <1393320227-10931-1-git-send-email-marcin.kraglak@tieto.com> <1393320227-10931-4-git-send-email-marcin.kraglak@tieto.com>
+Message-Id: <616CD64E-79F8-4AC7-9696-A91DD7B43779@holtmann.org>
+References: <1393320227-10931-1-git-send-email-marcin.kraglak@tieto.com> <1393320227-10931-2-git-send-email-marcin.kraglak@tieto.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-> It will handle AT frames and recognize their commands. It will also
-> call proper callback. If no callback was found, default handler
-> will be called.
+> It will parse AT frames in HFP profile implementation. Use can register
+> handlers for specified prefixes. Callbacks will be called with one of
+> hfp_cmd_type. Default handler will have prefix NULL, and type passed
+> to callback will be always HFP_AT_UNKNOWN.
 > ---
-> src/shared/hfp_at.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++
-> src/shared/hfp_at.h |   3 +
-> 2 files changed, 178 insertions(+)
+> src/shared/hfp_at.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+> src/shared/hfp_at.h | 43 +++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 93 insertions(+)
+> create mode 100644 src/shared/hfp_at.c
+> create mode 100644 src/shared/hfp_at.h
 > 
 > diff --git a/src/shared/hfp_at.c b/src/shared/hfp_at.c
-> index bd1899b..eff0a38 100644
-> --- a/src/shared/hfp_at.c
+> new file mode 100644
+> index 0000000..bd1899b
+> --- /dev/null
 > +++ b/src/shared/hfp_at.c
-> @@ -29,8 +29,183 @@
-> 
-> struct hfp_at {
-> 	const struct hfp_at_handler *cmd_handlers;
-> +	int offset;
-> };
-> 
-> +/* Last cmd handler should have prefix NULL and will be returned if no other
-> + * will be found
+> @@ -0,0 +1,50 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
 > + */
-> +static const struct hfp_at_handler *hfp_at_find_cb(struct hfp_at *hfp_at,
-> +						char *pref, uint8_t len)
+> +#include <stdbool.h>
+> +#include <string.h>
+> +#include <ctype.h>
+> +
+> +#include "src/shared/util.h"
+> +#include "src/shared/hfp_at.h"
+> +
+> +struct hfp_at {
+> +	const struct hfp_at_handler *cmd_handlers;
+> +};
+> +
+> +struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers)
 > +{
-> +	const struct hfp_at_handler *handler = hfp_at->cmd_handlers;
+> +	struct hfp_at *hfp_at;
 > +
-> +	while (handler->prefix) {
-> +		if (strlen(handler->prefix) == len)
-> +			if (!memcmp(handler->prefix, pref, len))
-> +				break;
+> +	hfp_at = new0(struct hfp_at, 1);
+> +	if (!hfp_at)
+> +		return NULL;
 > +
-> +		handler++;
-> +	}
+> +	hfp_at->cmd_handlers = handlers;
 > +
-> +	return handler;
+> +	return hfp_at;
 > +}
 > +
-> +static void hfp_at_call_handler(struct hfp_at *hfp_at, char *prefix, int len,
-> +					const char *data, void *user_data,
-> +					enum hfp_cmd_type type)
+> +void hfp_at_free(struct hfp_at *hfp_at)
 > +{
-> +	const struct hfp_at_handler *handler;
-> +
-> +	handler = hfp_at_find_cb(hfp_at, prefix, len);
-> +
-> +	if (handler->prefix) {
-> +		handler->cb(hfp_at, type, data, user_data);
-> +		return;
-> +	}
-> +
-> +	/* We set offset to 0 because it is unknown command */
-> +	hfp_at->offset = 0;
-> +	handler->cb(hfp_at, HFP_AT_UNKNOWN, data, user_data);
+> +	free(hfp_at);
 > +}
-> +
-> +static bool hfp_at_process_basic(struct hfp_at *hfp_at, const char *data,
-> +								void *user_data)
-> +{
-> +	const char *prefix = data + hfp_at->offset;
-> +	enum hfp_cmd_type type;
-> +	char lookup_prefix[4];
-> +	uint8_t pref_len = 0;
-> +	bool equal = false;
-> +	int i;
-> +
-> +	/* Check if first sign is character */
-> +	if (isalpha(prefix[pref_len])) {
-> +		/* Handle S-parameter prefix */
-> +		if (toupper(prefix[pref_len]) == 'S') {
-> +			do {
-> +				pref_len++;
-> +			} while (isdigit(prefix[pref_len]));
-> +			/*S-parameter must be followed with number*/
-> +			if (pref_len == 1)
-> +				pref_len--;
-> +		} else {
-> +			/* It's just one-character prefix */
-> +			pref_len++;
-> +		}
-> +	} else if (prefix[pref_len] == '&' && isalpha(prefix[pref_len + 1])) {
-> +		/* Two-signed prefix starting with & */
-> +		pref_len = 2;
-> +	}
-
-I am not sure we actually need this. HFP is pretty much only a subset. I am fine with not bothering with any of the details of V250 if we do not have to. Let Java deal with it if they want to.
-
-> +
-> +	if (pref_len == 0 || pref_len > sizeof(lookup_prefix))
-> +		return false;
-> +
-> +	for (i = 0; i < pref_len; i++)
-> +		lookup_prefix[i] = toupper(prefix[i]);
-> +
-> +	hfp_at->offset += pref_len;
-> +
-> +	if (lookup_prefix[0] == 'D') {
-> +		type = HFP_AT_SET;
-> +
-> +		goto done;
-> +	}
-> +
-> +	if (data[hfp_at->offset] == '=') {
-> +		hfp_at->offset++;
-> +		equal = true;
-> +	}
-> +
-> +	if (data[hfp_at->offset] == '?') {
-> +		hfp_at->offset++;
-> +
-> +		if (equal)
-> +			type = HFP_AT_TEST;
-> +		else
-> +			type = HFP_AT_READ;
-> +	} else if (equal) {
-> +		type = HFP_AT_SET;
-> +	} else {
-> +		type = HFP_AT_COMMAND;
-> +	}
-> +
-> +done:
-> +	hfp_at_call_handler(hfp_at, lookup_prefix, pref_len, data, user_data,
-> +									type);
-> +
-> +	return true;
-> +}
-> +
-> +static bool hfp_at_process_extended(struct hfp_at *hfp_at, const char *data,
-> +								void *user_data)
-> +{
-> +	const char *prefix = data + hfp_at->offset;
-> +	const char *separators = ";?=";
-> +	enum hfp_cmd_type type;
-> +	char lookup_prefix[18];
-> +	bool equal = false;
-> +	uint8_t pref_len;
-> +	int i;
-> +
-> +	/* Lookup for first separator */
-> +	pref_len = strcspn(prefix, separators);
-> +
-> +	if (pref_len > 17 || pref_len < 2)
-> +		return false;
-> +
-> +	for (i = 0; i < pref_len; i++)
-> +		lookup_prefix[i] = toupper(prefix[i]);
-> +
-> +	hfp_at->offset += pref_len;
-> +
-> +	if (data[hfp_at->offset] == '=') {
-> +		hfp_at->offset++;
-> +		equal = true;
-> +	}
-> +
-> +	if (data[hfp_at->offset] == '?') {
-> +		hfp_at->offset++;
-> +
-> +		if (equal)
-> +			type = HFP_AT_TEST;
-> +		else
-> +			type = HFP_AT_READ;
-> +	} else if (equal) {
-> +		type = HFP_AT_SET;
-> +	} else {
-> +		type = HFP_AT_COMMAND;
-> +	}
-
-Still trying to figure out why we need a variable equal here. Might want to restructure the code a little bit. 
-
-Also do not forget to check the length of your string. Remote devices can send you garbage.
-
-I also fail to see what difference between basic and extended is. Seems like a lot of the basic code is shared.
-
-> +
-> +	hfp_at_call_handler(hfp_at, lookup_prefix, pref_len, data, user_data,
-> +									type);
-> +
-> +	return true;
-> +}
-> +
-> +static bool hfp_at_is_extended_cmd(struct hfp_at *hfp_at, const char *data)
-> +{
-> +	/* Extended commands names always begin with character "+" V250 5.4.1*/
-> +	return data[hfp_at->offset] == '+';
-> +}
-
-Lets not go overboard with functions that serve only a single purpose. Do that inline in the code.
-
-> +
-> +bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
-> +								void *user_data)
-> +{
-> +	if (strlen(data) < 3)
-> +		return false;
-> +
-> +	if (strncmp(data, "AT", 2))
-> +		return false;
-
-actually they way I read is that AT and at are valid. However not At and not aT. We would also need to strip any leading whitespaces. This should be done on level down if I have not already implemented it.
-
-> +
-> +	hfp_at->offset = 2;
-> +
-> +	if (hfp_at_is_extended_cmd(hfp_at, data))
-> +		return hfp_at_process_extended(hfp_at, data, user_data);
-> +	else
-> +		return hfp_at_process_basic(hfp_at, data, user_data);
-> +}
-> +
-> struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers)
-> {
-> 	struct hfp_at *hfp_at;
 > diff --git a/src/shared/hfp_at.h b/src/shared/hfp_at.h
-> index fe074f2..0b628b5 100644
-> --- a/src/shared/hfp_at.h
+> new file mode 100644
+> index 0000000..fe074f2
+> --- /dev/null
 > +++ b/src/shared/hfp_at.h
-> @@ -39,5 +39,8 @@ struct hfp_at_handler {
-> 	hfp_at_cmd_cb cb;
-> };
-> 
-> +bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
-> +							void *user_data);
+> @@ -0,0 +1,43 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
 > +
-> struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers);
-> void hfp_at_free(struct hfp_at *hfp_at);
-> -- 
-> 1.8.5.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
+> +struct hfp_at;
+> +
+> +enum hfp_cmd_type {
+> +	HFP_AT_READ,
+> +	HFP_AT_SET,
+> +	HFP_AT_TEST,
+> +	HFP_AT_COMMAND,
+> +	HFP_AT_UNKNOWN
+> +};
+> +
+> +typedef void (*hfp_at_cmd_cb)(struct hfp_at *hfp_at, enum hfp_cmd_type type,
+> +					const char *at, void *user_data);
+> +
+> +struct hfp_at_handler {
+> +	const char *prefix;
+> +	hfp_at_cmd_cb cb;
+> +};
+> +
+> +struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers);
+> +void hfp_at_free(struct hfp_at *hfp_at);
+
+so I rather see this integrated into hfp_gw natively. No need for new files or a new structure with all new resource allocation.
+
+Lets just use hfp_gw_set_command_handler for the default case where we have no specific handler to parse the data since that will be needed for unknown AT command callback anyway.
+
+And then add hfp_gw_register_command(hfp, prefix, callback, user_data, destroy) with a matching unregister function. Use a large table does not really makes sense to me. Individual commands similar to GAtServer works seems more reasonable and lot more flexible.
+
+Regards
+
+Marcel
 
