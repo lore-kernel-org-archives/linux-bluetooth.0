@@ -1,87 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH] Bluetooth: Fix advertising address type when toggling connectable
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393333842-8380-2-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 25 Feb 2014 09:26:34 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <84898D84-C149-4ABE-8CFE-55FB2E261CF6@holtmann.org>
-References: <1393333842-8380-1-git-send-email-johan.hedberg@gmail.com> <1393333842-8380-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20140225042337.GA27803@localhost.P-661HNU-F1>
+References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
+ <1393281061-14320-7-git-send-email-andre.guedes@openbossa.org> <20140225042337.GA27803@localhost.P-661HNU-F1>
+From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Tue, 25 Feb 2014 14:16:52 -0300
+Message-ID: <CACJA=fW-A8GbT55_W43Xk50bu5nzwkPjxDB7fuMBKf0h=mmD7Q@mail.gmail.com>
+Subject: Re: [RFC v11 06/15] Bluetooth: Introduce LE auto connection infrastructure
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> When the connectable setting is toggled using mgmt_set_connectable the
-> HCI_CONNECTABLE flag will only be set once the related HCI commands
-> succeed. When determining what kind of advertising to do we need to
-> therefore also check whether there is a pending Set Connectable command
-> in addition to the current flag value.
-> 
-> The enable_advertising function was already taking care of this for the
-> advertising type with the help of the get_adv_type function, but was
-> failing to do the same for the address type selection. This patch
-> converts the get_adv_type function to be more generic in that it returns
-> the expected connectable state and updates the enable_advertising
-> function to use the return value both for the advertising type as well
-> as the advertising address type.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 16 +++++++---------
-> 1 file changed, 7 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 25b8b278debd..a02828ad4c0e 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -817,10 +817,9 @@ static void update_class(struct hci_request *req)
-> 	hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
-> }
-> 
-> -static u8 get_adv_type(struct hci_dev *hdev)
-> +static bool get_connectable(struct hci_dev *hdev)
-> {
-> 	struct pending_cmd *cmd;
-> -	bool connectable;
-> 
-> 	/* If there's a pending mgmt command the flag will not yet have
-> 	 * it's final value, so check for this first.
-> @@ -828,12 +827,10 @@ static u8 get_adv_type(struct hci_dev *hdev)
-> 	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
-> 	if (cmd) {
-> 		struct mgmt_mode *cp = cmd->param;
-> -		connectable = !!cp->val;
-> -	} else {
-> -		connectable = test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-> +		return cp->val;
-> 	}
-> 
-> -	return connectable ? LE_ADV_IND : LE_ADV_NONCONN_IND;
-> +	return test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-> }
-> 
-> static void enable_advertising(struct hci_request *req)
-> @@ -841,9 +838,10 @@ static void enable_advertising(struct hci_request *req)
-> 	struct hci_dev *hdev = req->hdev;
-> 	struct hci_cp_le_set_adv_param cp;
-> 	u8 own_addr_type, enable = 0x01;
-> -	bool require_privacy;
-> +	bool connectable, require_privacy;
-> 
-> -	require_privacy = !test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-> +	connectable = get_connectable(hdev);
-> +	require_privacy = !connectable;
-> 
-> 	if (hci_update_random_address(req, require_privacy, &own_addr_type) < 0)
-> 		return;
+On Tue, Feb 25, 2014 at 1:23 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andre,
+>
+> On Mon, Feb 24, 2014, Andre Guedes wrote:
+>> +             if (hci_update_random_address(&req, false, &own_addr_type))
+>> +                     return;
+>
+> Don't we want require_privacy = true here?
 
-can we use a comment here to explain require_privacy like we do with the other time it is used. the two variables are too much. And then call it like this ..address(req, !connectable, &own..).
+require_privacy = true enables non-resolvable address. Since this is a
+passive scanning (no SCAN_REQ is sent), I don't think this is
+required.
 
-Regards
+>> +     if (addr_type == ADDR_LE_DEV_PUBLIC)
+>> +             bdaddr_type = BDADDR_LE_PUBLIC;
+>> +     else
+>> +             bdaddr_type = BDADDR_LE_RANDOM;
+>> +
+>> +     conn = hci_connect(hdev, LE_LINK, addr, bdaddr_type, BT_SECURITY_LOW,
+>> +                        HCI_AT_NO_BONDING);
+>
+> All hci_connect is is a very short wrapper to hci_connect_acl/le. The
+> hci_connect_le function in turn does the following:
+>
+>         /* Convert from L2CAP channel address type to HCI address type */
+>         if (dst_type == BDADDR_LE_PUBLIC)
+>                 dst_type = ADDR_LE_DEV_PUBLIC;
+>         else
+>                 dst_type = ADDR_LE_DEV_RANDOM;
+>
+> So it seems a bit silly to do this kind of back and forth conversions.
+> Instead, I think the hci_connect API should take the address type that's
+> used for struct hci_conn, i.e. the HCI one (not the L2CAP/mgmt one).
+>
+> Also, since pretty much all places that are calling hci_connect pass an
+> explicit value as the link type I think the most sensible thing to do
+> would be to completely remove this function and export hci_connect_le &
+> hci_connect_acl from hci_conn.c.
 
-Marcel
+I agree. I can do this refactoring in the next version.
 
+BR,
+
+Andre
