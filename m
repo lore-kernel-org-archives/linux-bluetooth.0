@@ -1,29 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [RFC v11 06/15] Bluetooth: Introduce LE auto connection infrastructure
+Subject: Re: [PATCH] Bluetooth: Fix NULL pointer dereference when sending data
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CACJA=fW-A8GbT55_W43Xk50bu5nzwkPjxDB7fuMBKf0h=mmD7Q@mail.gmail.com>
-Date: Tue, 25 Feb 2014 09:43:08 -0800
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <E89B584B-C292-4D4E-A92E-1F19A0CE0AD9@holtmann.org>
-References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org> <1393281061-14320-7-git-send-email-andre.guedes@openbossa.org> <20140225042337.GA27803@localhost.P-661HNU-F1> <CACJA=fW-A8GbT55_W43Xk50bu5nzwkPjxDB7fuMBKf0h=mmD7Q@mail.gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <20140225145226.GA13119@localhost.P-661HNU-F1>
+Date: Tue, 25 Feb 2014 09:41:09 -0800
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <2D31C233-A119-46E1-A382-DE6797923C4F@holtmann.org>
+References: <1393323371-13232-1-git-send-email-andrzej.kaczmarek@tieto.com> <20140225145226.GA13119@localhost.P-661HNU-F1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Johan,
 
->>> +             if (hci_update_random_address(&req, false, &own_addr_type))
->>> +                     return;
+>> When trying to allocate skb for new PDU, l2cap_chan is unlocked so we
+>> can sleep waiting for memory as otherwise there's possible deadlock as
+>> fixed in e454c84464. However, in a6a5568c03 lock was moved from socket
+>> to channel level and it's no longer safe to just unlock and lock again
+>> without checking l2cap_chan state since channel can be disconnected
+>> when lock is not held.
 >> 
->> Don't we want require_privacy = true here?
+>> This patch adds missing checks for l2cap_chan state when returning from
+>> call which allocates skb.
+>> 
+>> Scenario is easily reproducible by running rfcomm-tester in a loop.
+>> 
+>> BUG: unable to handle kernel NULL pointer dereference at         (null)
+>> IP: [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
+>> PGD 0
+>> Oops: 0000 [#1] SMP
+>> Modules linked in:
+>> CPU: 7 PID: 4038 Comm: krfcommd Not tainted 3.14.0-rc2+ #15
+>> Hardware name: Dell Inc. OptiPlex 790/0HY9JP, BIOS A10 11/24/2011
+>> task: ffff8802bdd731c0 ti: ffff8801ec986000 task.ti: ffff8801ec986000
+>> RIP: 0010:[<ffffffffa0442169>]  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120
+>> RSP: 0018:ffff8801ec987ad8  EFLAGS: 00010202
+>> RAX: 0000000000000000 RBX: ffff8800c5796800 RCX: 0000000000000000
+>> RDX: ffff880410e7a800 RSI: ffff8802b6c1da00 RDI: ffff8800c5796800
+>> RBP: ffff8801ec987af8 R08: 00000000000000c0 R09: 0000000000000300
+>> R10: 000000000000573b R11: 000000000000573a R12: ffff8802b6c1da00
+>> R13: 0000000000000000 R14: ffff8802b6c1da00 R15: 0000000000000000
+>> FS:  0000000000000000(0000) GS:ffff88042dce0000(0000) knlGS:0000000000000000
+>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> CR2: 0000000000000000 CR3: 000000041257c000 CR4: 00000000000407e0
+>> Stack:
+>> ffff8801ec987d78 ffff8800c5796800 ffff8801ec987d78 0000000000000000
+>> ffff8801ec987ba8 ffffffffa0449e37 0000000000000004 ffff8801ec987af0
+>> ffff8801ec987d40 0000000000000282 0000000000000000 ffffffff00000004
+>> Call Trace:
+>> [<ffffffffa0449e37>] l2cap_chan_send+0xaa7/0x1120 [bluetooth]
+>> [<ffffffff81770100>] ? _raw_spin_unlock_bh+0x20/0x40
+>> [<ffffffffa045188b>] l2cap_sock_sendmsg+0xcb/0x110 [bluetooth]
+>> [<ffffffff81652b0f>] sock_sendmsg+0xaf/0xc0
+>> [<ffffffff810a8381>] ? update_curr+0x141/0x200
+>> [<ffffffff810a8961>] ? dequeue_entity+0x181/0x520
+>> [<ffffffff81652b60>] kernel_sendmsg+0x40/0x60
+>> [<ffffffffa04a8505>] rfcomm_send_frame+0x45/0x70 [rfcomm]
+>> [<ffffffff810766f0>] ? internal_add_timer+0x20/0x50
+>> [<ffffffffa04a8564>] rfcomm_send_cmd+0x34/0x60 [rfcomm]
+>> [<ffffffffa04a8605>] rfcomm_send_disc+0x75/0xa0 [rfcomm]
+>> [<ffffffffa04aacec>] rfcomm_run+0x8cc/0x1a30 [rfcomm]
+>> [<ffffffffa04aa420>] ? rfcomm_check_accept+0xc0/0xc0 [rfcomm]
+>> [<ffffffff8108e3a9>] kthread+0xc9/0xe0
+>> [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
+>> [<ffffffff817795fc>] ret_from_fork+0x7c/0xb0
+>> [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
+>> Code: 00 00 66 66 66 66 90 55 48 89 e5 48 83 ec 20 f6 05 d6 a3 02 00 04
+>> RIP  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
+>> RSP <ffff8801ec987ad8>
+>> CR2: 0000000000000000
+>> 
+>> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+>> ---
+>> net/bluetooth/l2cap_core.c | 10 ++++++++++
+>> 1 file changed, 10 insertions(+)
+>> 
+>> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+>> index 6ace116..cfc7c69 100644
+>> --- a/net/bluetooth/l2cap_core.c
+>> +++ b/net/bluetooth/l2cap_core.c
+>> @@ -2434,6 +2434,11 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+>> 		if (IS_ERR(skb))
+>> 			return PTR_ERR(skb);
+>> 
+>> +		if (chan->state != BT_CONNECTED) {
+>> +			kfree_skb(skb);
+>> +			return -ENOTCONN;
+>> +		}
+>> +
+>> 		l2cap_do_send(chan, skb);
+>> 		return len;
+>> 	}
+>> @@ -2483,6 +2488,11 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+>> 		if (IS_ERR(skb))
+>> 			return PTR_ERR(skb);
+>> 
+>> +		if (chan->state != BT_CONNECTED) {
+>> +			kfree_skb(skb);
+>> +			return -ENOTCONN;
+>> +		}
+>> +
+>> 		l2cap_do_send(chan, skb);
+>> 		err = len;
+>> 		break;
 > 
-> require_privacy = true enables non-resolvable address. Since this is a
-> passive scanning (no SCAN_REQ is sent), I don't think this is
-> required.
+> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+> 
+> However, I'd consider adding code comment explaining the lock was
+> released and reacquired and the state needs to therefore be rechecked.
 
-that is correct, it is not strictly speaking needed. However I would prefer we set this to true anyway and add a proper comment for it like we do with the other places.
+I agree. This needs comments in both cases. Especially since we are doing the same for the other check when using ERTM.
 
 Regards
 
