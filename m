@@ -1,108 +1,161 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 16/17] Bluetooth: Create hci_req_add_le_passive_scan helper
-Date: Tue, 25 Feb 2014 18:01:43 -0300
-Message-Id: <1393362104-12175-17-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH 15/17] Bluetooth: Add le_auto_conn file on debugfs
+Date: Tue, 25 Feb 2014 18:01:42 -0300
+Message-Id: <1393362104-12175-16-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patches creates the hci_req_add_le_passive_scan helper so it can
-be re-used in the next patch.
+This patch adds to debugfs the le_auto_conn file. This file will be
+used to test LE auto connection infrastructure.
+
+To add a new auto connection address we write on le_auto_conn file
+following the format <address> <address type> <auto_connect>.
+
+The <address type> values are:
+  * 0 for public address
+  * 1 for random address
+
+The <auto_connect> values are (for more details see struct hci_
+conn_params):
+  * 0 for disabled
+  * 1 for always
+  * 2 for link loss
+
+So for instance, if you want the kernel autonomously establishes
+connections with device AA:BB:CC:DD:EE:FF (public address) every
+time the device enters in connectable mode (starts advertising),
+you should run the command:
+$ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+
+To get the list of connection parameters configured in kernel, read
+the le_auto_conn file:
+$ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+
+Finally, to clear the connection parameters list, write an empty
+string:
+$ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+
+This file is created only if LE is enabled.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 54 +++++++++++++++++++++++++++---------------------
- 1 file changed, 30 insertions(+), 24 deletions(-)
+ net/bluetooth/hci_core.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fb4c961..e776624 100644
+index e17ea87..fb4c961 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -5095,6 +5095,35 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
+@@ -896,6 +896,96 @@ static const struct file_operations lowpan_debugfs_fops = {
+ 	.llseek		= default_llseek,
+ };
  
-+static void hci_req_add_le_passive_scan(struct hci_request *req,
-+					struct hci_dev *hdev)
++static int le_auto_conn_show(struct seq_file *sf, void *ptr)
 +{
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	u8 own_addr_type;
++	struct hci_dev *hdev = sf->private;
++	struct hci_conn_params *p;
 +
-+	/* Use private address since remote doesn't need to identify us.
-+	 * Strictly speaking, this is not required since no SCAN_REQ is
-+	 * sent in passive scanning.
-+	 */
-+	if (hci_update_random_address(req, true, &own_addr_type))
-+		return;
++	hci_dev_lock(hdev);
 +
-+	memset(&param_cp, 0, sizeof(param_cp));
-+	param_cp.type = LE_SCAN_PASSIVE;
-+	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
-+	param_cp.window = cpu_to_le16(hdev->le_scan_window);
-+	param_cp.own_address_type = own_addr_type;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+		    &param_cp);
++	list_for_each_entry(p, &hdev->le_conn_params, list) {
++		seq_printf(sf, "%pMR %u %u\n", &p->addr, p->addr_type,
++			   p->auto_connect);
++	}
 +
-+	memset(&enable_cp, 0, sizeof(enable_cp));
-+	enable_cp.enable = LE_SCAN_ENABLE;
-+	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+		    &enable_cp);
++	hci_dev_unlock(hdev);
++
++	return 0;
 +}
 +
- static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
- {
- 	if (status)
-@@ -5110,8 +5139,6 @@ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
-  */
- void hci_update_background_scan(struct hci_dev *hdev)
- {
--	struct hci_cp_le_set_scan_param param_cp;
--	struct hci_cp_le_set_scan_enable enable_cp;
- 	struct hci_request req;
- 	struct hci_conn *conn;
- 	int err;
-@@ -5131,8 +5158,6 @@ void hci_update_background_scan(struct hci_dev *hdev)
++static int le_auto_conn_open(struct inode *inode, struct file *file)
++{
++	return single_open(file, le_auto_conn_show, inode->i_private);
++}
++
++static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
++				  size_t count, loff_t *offset)
++{
++	struct seq_file *sf = file->private_data;
++	struct hci_dev *hdev = sf->private;
++	u8 auto_connect;
++	bdaddr_t addr;
++	u8 addr_type;
++	char *buf;
++	int err;
++	int n;
++
++	/* Don't allow partial write */
++	if (*offset != 0)
++		return -EINVAL;
++
++	/* If empty string, clear the connection parameters and pending LE
++	 * connection list.
++	 */
++	if (count == 1) {
++		hci_dev_lock(hdev);
++		hci_conn_params_clear(hdev);
++		hci_pend_le_conns_clear(hdev);
++		hci_update_background_scan(hdev);
++		hci_dev_unlock(hdev);
++		return count;
++	}
++
++	buf = kzalloc(count, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	if (copy_from_user(buf, data, count)) {
++		kfree(buf);
++		return -EFAULT;
++	}
++
++	n = sscanf(buf, "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu %hhu", &addr.b[5],
++		   &addr.b[4], &addr.b[3], &addr.b[2], &addr.b[1], &addr.b[0],
++		   &addr_type, &auto_connect);
++	if (n != 8) {
++		kfree(buf);
++		return -EINVAL;
++	}
++
++	hci_dev_lock(hdev);
++	err = hci_conn_params_add(hdev, &addr, addr_type, auto_connect,
++				  hdev->le_conn_min_interval,
++				  hdev->le_conn_max_interval);
++	hci_dev_unlock(hdev);
++
++	if (err) {
++		kfree(buf);
++		return err;
++	}
++
++	kfree(buf);
++	return count;
++}
++
++static const struct file_operations le_auto_conn_fops = {
++	.open		= le_auto_conn_open,
++	.read		= seq_read,
++	.write		= le_auto_conn_write,
++	.llseek		= seq_lseek,
++	.release	= single_release,
++};
++
+ /* ---- HCI requests ---- */
  
- 		BT_DBG("%s stopping background scanning", hdev->name);
- 	} else {
--		u8 own_addr_type;
--
- 		/* If there is at least one pending LE connection, we should
- 		 * keep the background scan running.
- 		 */
-@@ -5149,26 +5174,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 		if (conn)
- 			return;
- 
--		/* Use private address since remote doesn't need to identify us.
--		 * Strictly speaking, this is not required since no SCAN_REQ is
--		 * sent in passive scanning.
--		 */
--		if (hci_update_random_address(&req, true, &own_addr_type))
--			return;
--
--		memset(&param_cp, 0, sizeof(param_cp));
--		param_cp.type = LE_SCAN_PASSIVE;
--		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
--		param_cp.window = cpu_to_le16(hdev->le_scan_window);
--		param_cp.own_address_type = own_addr_type;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
--			    &param_cp);
--
--		memset(&enable_cp, 0, sizeof(enable_cp));
--		enable_cp.enable = LE_SCAN_ENABLE;
--		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
--			    &enable_cp);
-+		hci_req_add_le_passive_scan(&req, hdev);
- 
- 		BT_DBG("%s starting background scanning", hdev->name);
+ static void hci_req_sync_complete(struct hci_dev *hdev, u8 result)
+@@ -1694,6 +1784,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &adv_channel_map_fops);
+ 		debugfs_create_file("6lowpan", 0644, hdev->debugfs, hdev,
+ 				    &lowpan_debugfs_fops);
++		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
++				    &le_auto_conn_fops);
  	}
+ 
+ 	return 0;
 -- 
 1.8.5.4
 
