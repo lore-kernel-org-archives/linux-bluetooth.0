@@ -1,36 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Feb 2014 19:32:42 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Fix advertising address type when toggling
- connectable
-Message-ID: <20140225173242.GA4779@localhost.P-661HNU-F1>
-References: <1393333842-8380-1-git-send-email-johan.hedberg@gmail.com>
- <1393333842-8380-2-git-send-email-johan.hedberg@gmail.com>
- <84898D84-C149-4ABE-8CFE-55FB2E261CF6@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <84898D84-C149-4ABE-8CFE-55FB2E261CF6@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
+Subject: Re: [PATCH] Bluetooth: Fix advertising address type when toggling connectable
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393333842-8380-2-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 25 Feb 2014 09:26:34 -0800
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <84898D84-C149-4ABE-8CFE-55FB2E261CF6@holtmann.org>
+References: <1393333842-8380-1-git-send-email-johan.hedberg@gmail.com> <1393333842-8380-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Tue, Feb 25, 2014, Marcel Holtmann wrote:
-> > -	bool require_privacy;
-> > +	bool connectable, require_privacy;
-> > 
-> > -	require_privacy = !test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-> > +	connectable = get_connectable(hdev);
-> > +	require_privacy = !connectable;
-> > 
-> > 	if (hci_update_random_address(req, require_privacy, &own_addr_type) < 0)
-> > 		return;
+> When the connectable setting is toggled using mgmt_set_connectable the
+> HCI_CONNECTABLE flag will only be set once the related HCI commands
+> succeed. When determining what kind of advertising to do we need to
+> therefore also check whether there is a pending Set Connectable command
+> in addition to the current flag value.
 > 
-> can we use a comment here to explain require_privacy like we do with
-> the other time it is used. the two variables are too much. And then
-> call it like this ..address(req, !connectable, &own..).
+> The enable_advertising function was already taking care of this for the
+> advertising type with the help of the get_adv_type function, but was
+> failing to do the same for the address type selection. This patch
+> converts the get_adv_type function to be more generic in that it returns
+> the expected connectable state and updates the enable_advertising
+> function to use the return value both for the advertising type as well
+> as the advertising address type.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/mgmt.c | 16 +++++++---------
+> 1 file changed, 7 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 25b8b278debd..a02828ad4c0e 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -817,10 +817,9 @@ static void update_class(struct hci_request *req)
+> 	hci_req_add(req, HCI_OP_WRITE_CLASS_OF_DEV, sizeof(cod), cod);
+> }
+> 
+> -static u8 get_adv_type(struct hci_dev *hdev)
+> +static bool get_connectable(struct hci_dev *hdev)
+> {
+> 	struct pending_cmd *cmd;
+> -	bool connectable;
+> 
+> 	/* If there's a pending mgmt command the flag will not yet have
+> 	 * it's final value, so check for this first.
+> @@ -828,12 +827,10 @@ static u8 get_adv_type(struct hci_dev *hdev)
+> 	cmd = mgmt_pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
+> 	if (cmd) {
+> 		struct mgmt_mode *cp = cmd->param;
+> -		connectable = !!cp->val;
+> -	} else {
+> -		connectable = test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
+> +		return cp->val;
+> 	}
+> 
+> -	return connectable ? LE_ADV_IND : LE_ADV_NONCONN_IND;
+> +	return test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
+> }
+> 
+> static void enable_advertising(struct hci_request *req)
+> @@ -841,9 +838,10 @@ static void enable_advertising(struct hci_request *req)
+> 	struct hci_dev *hdev = req->hdev;
+> 	struct hci_cp_le_set_adv_param cp;
+> 	u8 own_addr_type, enable = 0x01;
+> -	bool require_privacy;
+> +	bool connectable, require_privacy;
+> 
+> -	require_privacy = !test_bit(HCI_CONNECTABLE, &hdev->dev_flags);
+> +	connectable = get_connectable(hdev);
+> +	require_privacy = !connectable;
+> 
+> 	if (hci_update_random_address(req, require_privacy, &own_addr_type) < 0)
+> 		return;
 
-Sure. v2 coming in a few minutes.
+can we use a comment here to explain require_privacy like we do with the other time it is used. the two variables are too much. And then call it like this ..address(req, !connectable, &own..).
 
-Johan
+Regards
+
+Marcel
+
