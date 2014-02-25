@@ -2,10 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: Fix advertising address type when toggling connectable
-Date: Tue, 25 Feb 2014 15:10:42 +0200
-Message-Id: <1393333842-8380-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1393333842-8380-1-git-send-email-johan.hedberg@gmail.com>
-References: <1393333842-8380-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 25 Feb 2014 15:10:41 +0200
+Message-Id: <1393333842-8380-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
