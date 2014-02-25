@@ -1,223 +1,162 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/9] shared/hfp_at: Add skeleton of hfp_at_process_data
-Date: Tue, 25 Feb 2014 10:23:41 +0100
-Message-Id: <1393320227-10931-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/9] unit: Add hfp_at tester
+Date: Tue, 25 Feb 2014 10:23:40 +0100
+Message-Id: <1393320227-10931-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1393320227-10931-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1393320227-10931-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will handle AT frames and recognize their commands. It will also
-call proper callback. If no callback was found, default handler
-will be called.
+It will test hfp_at parser. Initial versione performs three test cases
+with hfp_at_new() calls.
 ---
- src/shared/hfp_at.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp_at.h |   3 +
- 2 files changed, 178 insertions(+)
+ .gitignore         |  1 +
+ Makefile.am        |  8 ++++-
+ unit/test-hfp-at.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 103 insertions(+), 1 deletion(-)
+ create mode 100644 unit/test-hfp-at.c
 
-diff --git a/src/shared/hfp_at.c b/src/shared/hfp_at.c
-index bd1899b..eff0a38 100644
---- a/src/shared/hfp_at.c
-+++ b/src/shared/hfp_at.c
-@@ -29,8 +29,183 @@
+diff --git a/.gitignore b/.gitignore
+index 94c0c78..fa34348 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -84,6 +84,7 @@ unit/test-gdbus-client
+ unit/test-sdp
+ unit/test-lib
+ unit/test-mgmt
++unit/test-hfp-at
+ tools/mgmt-tester
+ tools/smp-tester
+ tools/gap-tester
+diff --git a/Makefile.am b/Makefile.am
+index 0c79e58..c886ba8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -225,7 +225,8 @@ AM_CFLAGS += @DBUS_CFLAGS@ @GLIB_CFLAGS@
+ AM_CPPFLAGS = -I$(builddir)/lib -I$(srcdir)/gdbus
  
- struct hfp_at {
- 	const struct hfp_at_handler *cmd_handlers;
-+	int offset;
- };
  
-+/* Last cmd handler should have prefix NULL and will be returned if no other
-+ * will be found
+-unit_tests += unit/test-eir unit/test-uuid unit/test-textfile unit/test-crc
++unit_tests += unit/test-eir unit/test-uuid unit/test-textfile unit/test-crc \
++		unit/test-hfp-at
+ 
+ unit_test_eir_SOURCES = unit/test-eir.c src/eir.c src/uuid-helper.c
+ unit_test_eir_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+@@ -239,6 +240,11 @@ unit_test_textfile_LDADD = @GLIB_LIBS@
+ unit_test_crc_SOURCES = unit/test-crc.c monitor/crc.h monitor/crc.c
+ unit_test_crc_LDADD = @GLIB_LIBS@
+ 
++unit_test_hfp_at_SOURCES = unit/test-hfp-at.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/hfp_at.h src/shared/hfp_at.c
++unit_test_hfp_at_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
++
+ unit_tests += unit/test-ringbuf unit/test-queue
+ 
+ unit_test_ringbuf_SOURCES = unit/test-ringbuf.c \
+diff --git a/unit/test-hfp-at.c b/unit/test-hfp-at.c
+new file mode 100644
+index 0000000..4374a70
+--- /dev/null
++++ b/unit/test-hfp-at.c
+@@ -0,0 +1,95 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
 + */
-+static const struct hfp_at_handler *hfp_at_find_cb(struct hfp_at *hfp_at,
-+						char *pref, uint8_t len)
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
++#include <glib.h>
++#include <stdint.h>
++#include <stdbool.h>
++#include "src/shared/hfp_at.h"
++
++struct test_data {
++	const struct hfp_at_handler *handlers;
++};
++
++static void test_init(gconstpointer data)
 +{
-+	const struct hfp_at_handler *handler = hfp_at->cmd_handlers;
++	struct hfp_at *hfp_at;
++	const struct test_data *test_data = data;
 +
-+	while (handler->prefix) {
-+		if (strlen(handler->prefix) == len)
-+			if (!memcmp(handler->prefix, pref, len))
-+				break;
++	hfp_at = hfp_at_new(test_data->handlers);
++	g_assert(hfp_at != NULL);
 +
-+		handler++;
-+	}
-+
-+	return handler;
++	hfp_at_free(hfp_at);
 +}
 +
-+static void hfp_at_call_handler(struct hfp_at *hfp_at, char *prefix, int len,
-+					const char *data, void *user_data,
-+					enum hfp_cmd_type type)
++static void process_generic(struct hfp_at *hfp_at, enum hfp_cmd_type type,
++						const char *at, void *user_data)
 +{
-+	const struct hfp_at_handler *handler;
-+
-+	handler = hfp_at_find_cb(hfp_at, prefix, len);
-+
-+	if (handler->prefix) {
-+		handler->cb(hfp_at, type, data, user_data);
-+		return;
-+	}
-+
-+	/* We set offset to 0 because it is unknown command */
-+	hfp_at->offset = 0;
-+	handler->cb(hfp_at, HFP_AT_UNKNOWN, data, user_data);
 +}
 +
-+static bool hfp_at_process_basic(struct hfp_at *hfp_at, const char *data,
-+								void *user_data)
++const struct hfp_at_handler handlers_1[] = {};
++
++const struct hfp_at_handler handlers_2[] = {
++	{
++		.prefix = NULL,
++		.cb = process_generic
++	}
++};
++
++const struct hfp_at_handler handlers_3[] = {
++	{
++		.prefix = "+BRSF",
++		.cb = process_generic
++	},
++	{
++		.prefix = NULL,
++		.cb = process_generic
++	}
++};
++
++const struct test_data data_1 = {
++	.handlers = handlers_1,
++};
++
++const struct test_data data_2 = {
++	.handlers = handlers_2,
++};
++
++const struct test_data data_3 = {
++	.handlers = handlers_3,
++};
++
++int main(int argc, char *argv[])
 +{
-+	const char *prefix = data + hfp_at->offset;
-+	enum hfp_cmd_type type;
-+	char lookup_prefix[4];
-+	uint8_t pref_len = 0;
-+	bool equal = false;
-+	int i;
++	g_test_init(&argc, &argv, NULL);
++	/* Tests for hfp_at_new() */
++	g_test_add_data_func("/hfp_at/init_1", &data_1, test_init);
++	g_test_add_data_func("/hfp_at/init_2", &data_2, test_init);
++	g_test_add_data_func("/hfp_at/init_3", &data_3, test_init);
 +
-+	/* Check if first sign is character */
-+	if (isalpha(prefix[pref_len])) {
-+		/* Handle S-parameter prefix */
-+		if (toupper(prefix[pref_len]) == 'S') {
-+			do {
-+				pref_len++;
-+			} while (isdigit(prefix[pref_len]));
-+			/*S-parameter must be followed with number*/
-+			if (pref_len == 1)
-+				pref_len--;
-+		} else {
-+			/* It's just one-character prefix */
-+			pref_len++;
-+		}
-+	} else if (prefix[pref_len] == '&' && isalpha(prefix[pref_len + 1])) {
-+		/* Two-signed prefix starting with & */
-+		pref_len = 2;
-+	}
-+
-+	if (pref_len == 0 || pref_len > sizeof(lookup_prefix))
-+		return false;
-+
-+	for (i = 0; i < pref_len; i++)
-+		lookup_prefix[i] = toupper(prefix[i]);
-+
-+	hfp_at->offset += pref_len;
-+
-+	if (lookup_prefix[0] == 'D') {
-+		type = HFP_AT_SET;
-+
-+		goto done;
-+	}
-+
-+	if (data[hfp_at->offset] == '=') {
-+		hfp_at->offset++;
-+		equal = true;
-+	}
-+
-+	if (data[hfp_at->offset] == '?') {
-+		hfp_at->offset++;
-+
-+		if (equal)
-+			type = HFP_AT_TEST;
-+		else
-+			type = HFP_AT_READ;
-+	} else if (equal) {
-+		type = HFP_AT_SET;
-+	} else {
-+		type = HFP_AT_COMMAND;
-+	}
-+
-+done:
-+	hfp_at_call_handler(hfp_at, lookup_prefix, pref_len, data, user_data,
-+									type);
-+
-+	return true;
++	return g_test_run();
 +}
-+
-+static bool hfp_at_process_extended(struct hfp_at *hfp_at, const char *data,
-+								void *user_data)
-+{
-+	const char *prefix = data + hfp_at->offset;
-+	const char *separators = ";?=";
-+	enum hfp_cmd_type type;
-+	char lookup_prefix[18];
-+	bool equal = false;
-+	uint8_t pref_len;
-+	int i;
-+
-+	/* Lookup for first separator */
-+	pref_len = strcspn(prefix, separators);
-+
-+	if (pref_len > 17 || pref_len < 2)
-+		return false;
-+
-+	for (i = 0; i < pref_len; i++)
-+		lookup_prefix[i] = toupper(prefix[i]);
-+
-+	hfp_at->offset += pref_len;
-+
-+	if (data[hfp_at->offset] == '=') {
-+		hfp_at->offset++;
-+		equal = true;
-+	}
-+
-+	if (data[hfp_at->offset] == '?') {
-+		hfp_at->offset++;
-+
-+		if (equal)
-+			type = HFP_AT_TEST;
-+		else
-+			type = HFP_AT_READ;
-+	} else if (equal) {
-+		type = HFP_AT_SET;
-+	} else {
-+		type = HFP_AT_COMMAND;
-+	}
-+
-+	hfp_at_call_handler(hfp_at, lookup_prefix, pref_len, data, user_data,
-+									type);
-+
-+	return true;
-+}
-+
-+static bool hfp_at_is_extended_cmd(struct hfp_at *hfp_at, const char *data)
-+{
-+	/* Extended commands names always begin with character "+" V250 5.4.1*/
-+	return data[hfp_at->offset] == '+';
-+}
-+
-+bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
-+								void *user_data)
-+{
-+	if (strlen(data) < 3)
-+		return false;
-+
-+	if (strncmp(data, "AT", 2))
-+		return false;
-+
-+	hfp_at->offset = 2;
-+
-+	if (hfp_at_is_extended_cmd(hfp_at, data))
-+		return hfp_at_process_extended(hfp_at, data, user_data);
-+	else
-+		return hfp_at_process_basic(hfp_at, data, user_data);
-+}
-+
- struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers)
- {
- 	struct hfp_at *hfp_at;
-diff --git a/src/shared/hfp_at.h b/src/shared/hfp_at.h
-index fe074f2..0b628b5 100644
---- a/src/shared/hfp_at.h
-+++ b/src/shared/hfp_at.h
-@@ -39,5 +39,8 @@ struct hfp_at_handler {
- 	hfp_at_cmd_cb cb;
- };
- 
-+bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
-+							void *user_data);
-+
- struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers);
- void hfp_at_free(struct hfp_at *hfp_at);
 -- 
 1.8.5.3
 
