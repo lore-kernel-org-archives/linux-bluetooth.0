@@ -1,73 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1393322970-27451-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393322970-27451-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 25 Feb 2014 13:21:03 +0200
-Message-ID: <CABBYNZKm-eR2hN+BvdzYyAro5EoVd9mum5g2xCfzXobQWSMk_A@mail.gmail.com>
-Subject: Re: [PATCH 1/4] unit/avrcp: Add /TP/PTT/BV-02-I test
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 13/13] android/hal-gatt-api: Add Read Characteristic
+Date: Tue, 25 Feb 2014 12:08:32 +0100
+Message-Id: <1393326512-16373-13-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1393326512-16373-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1393326512-16373-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+---
+ android/hal-ipc-api.txt | 11 +++++++++++
+ android/hal-msg.h       |  8 ++++++++
+ 2 files changed, 19 insertions(+)
 
-On Tue, Feb 25, 2014 at 12:09 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Test verifies that the Target reacts to the PASS THROUGH command in
-> category 2 from the Controller. The command chosen is VOLUME_UP.
-> ---
->  unit/test-avrcp.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
->
-> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-> index 9bd27da..7308443 100644
-> --- a/unit/test-avrcp.c
-> +++ b/unit/test-avrcp.c
-> @@ -251,11 +251,21 @@ static void execute_context(struct context *context)
->
->  static bool handle_play(struct avrcp *session)
->  {
-> +       DBG("");
-> +
-> +       return true;
-> +}
-> +
-> +static bool handle_volume_up(struct avrcp *session)
-> +{
-> +       DBG("");
-> +
->         return true;
->  }
->
->  static const struct avrcp_passthrough_handler passthrough_handlers[] = {
->                 { AVC_PLAY, handle_play },
-> +               { AVC_VOLUME_UP, handle_volume_up },
->                 { },
->  };
->
-> @@ -310,5 +320,11 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
->                                 0x44, 0x00));
->
-> +       define_test("/TP/PTT/BV-02-I", test_server,
-> +                       raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x7c,
-> +                               AVC_VOLUME_UP, 0x00),
-> +                       raw_pdu(0x02, 0x11, 0x0e, 0x09, 0x48, 0x7c,
-> +                               AVC_VOLUME_UP, 0x00));
-> +
->         return g_test_run();
->  }
-> --
-> 1.8.3.2
-
-Patches 1-3 applied, not sure where is 4/4 so Im waiting to see it
-does show up otherwise you have to resend it.
-
-
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index a6d23dd..5349c53 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1531,6 +1531,17 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+ 		In case of an error, the error response will be returned.
+ 
+ 	Opcode 0x0c - Read Characteristic command/response
++
++		Command parameters: Connection ID (4 octets)
++		                    Service ID (18 octets)
++		                    GATT ID (17 octets)
++		                    Authorization (4 octets)
++		Valid Service ID: as described in Get Included Service
++		Valid GATT ID: as described in Get Included Service
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
+ 	Opcode 0x0d - Write Characteristic command/response
+ 	Opcode 0x0e - Read Descriptor command/response
+ 	Opcode 0x0f - Write Descriptor command/response
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 576d4d5..e7a5b6d 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1041,3 +1041,11 @@ struct hal_cmd_gatt_client_get_descroptor {
+ 	uint8_t number;
+ 	uint8_t gatt_id[0];
+ } __attribute__((packed));
++
++#define HAL_OP_GATT_CLIENT_READ_CHARACTERISTIC	0x0c
++struct hal_cmd_gatt_client_read_characteristic {
++	int32_t connection_id;
++	struct hal_gatt_srvc_id srvc_id;
++	struct hal_gatt_gatt_id gatt_id;
++	int32_t authorization;
++} __attribute__((packed));
 -- 
-Luiz Augusto von Dentz
+1.9.0
+
