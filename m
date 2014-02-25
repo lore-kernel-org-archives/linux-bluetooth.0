@@ -1,102 +1,114 @@
 Return-Path: <cyrus@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix NULL pointer dereference when sending data
+Date: Tue, 25 Feb 2014 17:16:22 +0100
+Message-ID: <1393344982-6756-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20140225055717.GA776@localhost.P-661HNU-F1>
-References: <1393281061-14320-1-git-send-email-andre.guedes@openbossa.org>
- <1393281061-14320-2-git-send-email-andre.guedes@openbossa.org> <20140225055717.GA776@localhost.P-661HNU-F1>
-From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Tue, 25 Feb 2014 14:16:22 -0300
-Message-ID: <CACJA=fVzF1n9DMmBnuPBvJOTuu_U6AWbbWg-yfRAj91pY2eudg@mail.gmail.com>
-Subject: Re: [RFC v11 01/15] Bluetooth: Create hci_req_add_le_scan_disable helper
-To: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+When trying to allocate skb for new PDU, l2cap_chan is unlocked so we
+can sleep waiting for memory as otherwise there's possible deadlock as
+fixed in e454c84464. However, in a6a5568c03 lock was moved from socket
+to channel level and it's no longer safe to just unlock and lock again
+without checking l2cap_chan state since channel can be disconnected
+when lock is not held.
 
-On Tue, Feb 25, 2014 at 2:57 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Andre,
->
-> On Mon, Feb 24, 2014, Andre Guedes wrote:
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -1128,6 +1128,7 @@ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
->>  void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
->>                   const void *param, u8 event);
->>  void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
->> +void hci_req_add_le_scan_disable(struct hci_request *req);
->
-> It doesn't feel right to put this straight next to the generic async
-> request API. I'd at least have an empty line between the generic API and
-> this new function.
+This patch adds missing checks for l2cap_chan state when returning from
+call which allocates skb.
 
-I'll add an empty line then.
+Scenario is easily reproducible by running rfcomm-tester in a loop.
 
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -3318,7 +3318,6 @@ static void le_scan_disable_work(struct work_struct *work)
->>  {
->>       struct hci_dev *hdev = container_of(work, struct hci_dev,
->>                                           le_scan_disable.work);
->> -     struct hci_cp_le_set_scan_enable cp;
->>       struct hci_request req;
->>       int err;
->>
->> @@ -3326,9 +3325,7 @@ static void le_scan_disable_work(struct work_struct *work)
->>
->>       hci_req_init(&req, hdev);
->>
->> -     memset(&cp, 0, sizeof(cp));
->> -     cp.enable = LE_SCAN_DISABLE;
->> -     hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
->> +     hci_req_add_le_scan_disable(&req);
->>
->>       err = hci_req_run(&req, le_scan_disable_work_complete);
->>       if (err)
->> @@ -4872,3 +4869,12 @@ static void hci_cmd_work(struct work_struct *work)
->>               }
->>       }
->>  }
->> +
->> +void hci_req_add_le_scan_disable(struct hci_request *req)
->> +{
->> +     struct hci_cp_le_set_scan_enable cp;
->> +
->> +     memset(&cp, 0, sizeof(cp));
->> +     cp.enable = LE_SCAN_DISABLE;
->> +     hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
->> +}
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 25b8b27..c722914 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -3526,7 +3526,6 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->>       struct hci_cp_remote_name_req_cancel cp;
->>       struct inquiry_entry *e;
->>       struct hci_request req;
->> -     struct hci_cp_le_set_scan_enable enable_cp;
->>       int err;
->>
->>       BT_DBG("%s", hdev->name);
->> @@ -3562,10 +3561,7 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
->>               } else {
->>                       cancel_delayed_work(&hdev->le_scan_disable);
->>
->> -                     memset(&enable_cp, 0, sizeof(enable_cp));
->> -                     enable_cp.enable = LE_SCAN_DISABLE;
->> -                     hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE,
->> -                                 sizeof(enable_cp), &enable_cp);
->> +                     hci_req_add_le_scan_disable(&req);
->>               }
->>
->>               break;
->
-> You've missed one place in clean_up_hci_state() in mgmt.c (which was
-> added by the recent "graceful power down" patch set.
+BUG: unable to handle kernel NULL pointer dereference at         (null)
+IP: [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
+PGD 0
+Oops: 0000 [#1] SMP
+Modules linked in:
+CPU: 7 PID: 4038 Comm: krfcommd Not tainted 3.14.0-rc2+ #15
+Hardware name: Dell Inc. OptiPlex 790/0HY9JP, BIOS A10 11/24/2011
+task: ffff8802bdd731c0 ti: ffff8801ec986000 task.ti: ffff8801ec986000
+RIP: 0010:[<ffffffffa0442169>]  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120
+RSP: 0018:ffff8801ec987ad8  EFLAGS: 00010202
+RAX: 0000000000000000 RBX: ffff8800c5796800 RCX: 0000000000000000
+RDX: ffff880410e7a800 RSI: ffff8802b6c1da00 RDI: ffff8800c5796800
+RBP: ffff8801ec987af8 R08: 00000000000000c0 R09: 0000000000000300
+R10: 000000000000573b R11: 000000000000573a R12: ffff8802b6c1da00
+R13: 0000000000000000 R14: ffff8802b6c1da00 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff88042dce0000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000041257c000 CR4: 00000000000407e0
+Stack:
+ ffff8801ec987d78 ffff8800c5796800 ffff8801ec987d78 0000000000000000
+ ffff8801ec987ba8 ffffffffa0449e37 0000000000000004 ffff8801ec987af0
+ ffff8801ec987d40 0000000000000282 0000000000000000 ffffffff00000004
+Call Trace:
+ [<ffffffffa0449e37>] l2cap_chan_send+0xaa7/0x1120 [bluetooth]
+ [<ffffffff81770100>] ? _raw_spin_unlock_bh+0x20/0x40
+ [<ffffffffa045188b>] l2cap_sock_sendmsg+0xcb/0x110 [bluetooth]
+ [<ffffffff81652b0f>] sock_sendmsg+0xaf/0xc0
+ [<ffffffff810a8381>] ? update_curr+0x141/0x200
+ [<ffffffff810a8961>] ? dequeue_entity+0x181/0x520
+ [<ffffffff81652b60>] kernel_sendmsg+0x40/0x60
+ [<ffffffffa04a8505>] rfcomm_send_frame+0x45/0x70 [rfcomm]
+ [<ffffffff810766f0>] ? internal_add_timer+0x20/0x50
+ [<ffffffffa04a8564>] rfcomm_send_cmd+0x34/0x60 [rfcomm]
+ [<ffffffffa04a8605>] rfcomm_send_disc+0x75/0xa0 [rfcomm]
+ [<ffffffffa04aacec>] rfcomm_run+0x8cc/0x1a30 [rfcomm]
+ [<ffffffffa04aa420>] ? rfcomm_check_accept+0xc0/0xc0 [rfcomm]
+ [<ffffffff8108e3a9>] kthread+0xc9/0xe0
+ [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
+ [<ffffffff817795fc>] ret_from_fork+0x7c/0xb0
+ [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
+Code: 00 00 66 66 66 66 90 55 48 89 e5 48 83 ec 20 f6 05 d6 a3 02 00 04
+RIP  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
+ RSP <ffff8801ec987ad8>
+CR2: 0000000000000000
 
-I'll fix it.
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Acked-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2 added comment regarding why we need to check state again
 
-Thanks,
+ net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Andre
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 6ace116..7bd78c5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2434,6 +2434,14 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
++		/* Channel lock is released before requesting new skb and then
++		 * reacquired thus we need to recheck channel state.
++		 */
++		if (chan->state != BT_CONNECTED) {
++			kfree_skb(skb);
++			return -ENOTCONN;
++		}
++
+ 		l2cap_do_send(chan, skb);
+ 		return len;
+ 	}
+@@ -2483,6 +2491,14 @@ int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len,
+ 		if (IS_ERR(skb))
+ 			return PTR_ERR(skb);
+ 
++		/* Channel lock is released before requesting new skb and then
++		 * reacquired thus we need to recheck channel state.
++		 */
++		if (chan->state != BT_CONNECTED) {
++			kfree_skb(skb);
++			return -ENOTCONN;
++		}
++
+ 		l2cap_do_send(chan, skb);
+ 		err = len;
+ 		break;
+-- 
+1.8.5.4
+
