@@ -1,309 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [v2] android/pics: Add PICS and PIXIT for HFP
-Date: Tue, 25 Feb 2014 15:27:31 +0100
-Message-Id: <1393338451-5761-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1393336605-2467-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393336605-2467-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1393336605-2467-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 25 Feb 2014 16:19:53 +0200
+Message-ID: <CABBYNZJGQJ9e7+0M_-kQGn=G3648ZRNuwULg+rKQ+tZXEehDkA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] android/avrcp: Add control handlers to avrcp-lib
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/Makefile.am   |   2 +
- android/pics-hfp.txt  | 217 ++++++++++++++++++++++++++++++++++++++++++++++++++
- android/pixit-hfp.txt |  37 +++++++++
- 3 files changed, 256 insertions(+)
- create mode 100644 android/pics-hfp.txt
- create mode 100644 android/pixit-hfp.txt
+Hi Andrei,
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 58cfbae..b944ca9 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -189,6 +189,7 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pics-avctp.txt \
- 				android/pics-avrcp.txt \
- 				android/pics-hsp.txt \
-+				android/pics-hfp.txt \
- 				android/pixit-l2cap.txt \
- 				android/pixit-gap.txt \
- 				android/pixit-did.txt \
-@@ -201,6 +202,7 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pixit-avctp.txt \
- 				android/pixit-avrcp.txt \
- 				android/pixit-hsp.txt \
-+				android/pixit-hfp.txt \
- 				android/pts-l2cap.txt \
- 				android/pts-gap.txt \
- 				android/pts-did.txt \
-diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
-new file mode 100644
-index 0000000..ae6d33e
---- /dev/null
-+++ b/android/pics-hfp.txt
-@@ -0,0 +1,217 @@
-+HFP PICS for the PTS tool.
-+
-+PTS version: 5.0
-+
-+* - different than PTS defaults
-+# - not yet implemented/supported
-+
-+M - mandatory
-+O - optional
-+
-+		Version
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HFP_0_1	False		Version: Hands-Free Profile v1.5 (O.1)
-+TSPC_HFP_0_2	True (*)	Version: Hands-Free Profile v1.6 (O.1)
-+-------------------------------------------------------------------------------
-+O.1: It is mandatory to support only one of the adopted versions.
-+-------------------------------------------------------------------------------
-+
-+
-+		Roles
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HFP_1_1	True (*)	Role: Audio Gateway (AG) (O.1)
-+TSPC_HFP_1_2	False		Role: Hands-Free (HF) (O.1)
-+-------------------------------------------------------------------------------
-+O.1: It is mandatory to support at least one of the defined roles.
-+-------------------------------------------------------------------------------
-+
-+
-+		Audio Gateway Role
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HFP_2_1	True		Connection management (M)
-+TSPC_HFP_2_1a	True (*)	SLC initiation during active ongoing call (O)
-+TSPC_HFP_2_2	True		Phone Status Information (M)
-+TSPC_HFP_2_3	True		Audio connection handling (M)
-+TSPC_HFP_2_3a	False		Audio connection establishment independent of
-+					call processing (O)
-+TSPC_HFP_2_3b	True (*)	eSCO support in Audio Connection (C.10)
-+TSPC_HFP_2_3c	False		Codec negotiation (C.7)
-+TSPC_HFP_2_4a	False		Accept an incoming voice call
-+					(in-band ring) (C.1)
-+TSPC_HFP_2_4b	True (*)	Accept an incoming voice call
-+					(no in-band ring) (C.1)
-+TSPC_HFP_2_4c	False		Capability to change the "in-band ring"
-+					settings (O)
-+TSPC_HFP_2_5	True (*)	Reject an incoming voice call (O)
-+TSPC_HFP_2_6	True		Terminate a call (M)
-+TSPC_HFP_2_7	True		Audio connection transfer during an ongoing
-+					call (M)
-+TSPC_HFP_2_7a	True (*)	HF-initiated Audio transfer to AG during
-+					ongoing call (O)
-+TSPC_HFP_2_8	True		Place a call with a phone number supplied by
-+					the HF (M)
-+TSPC_HFP_2_9	True		Place a call using memory dialing (M)
-+TSPC_HFP_2_10	True		Place a call to the last number dialed (M)
-+TSPC_HFP_2_11	True		Call waiting notification (M)
-+TSPC_HFP_2_12	True (*)	Three Way Calling (O)
-+TSPC_HFP_2_12a	True (*)	User Busy (AT+CHLD value 0) (C.3)
-+TSPC_HFP_2_12b	True (*)	Call Hold Handling (AT+CHLD value 1,2) (C.2)
-+TSPC_HFP_2_12c	True (*)	Three Way Call (AT+CHLD value 3) (C.3)
-+TSPC_HFP_2_12d	False		Explicit Call Transfer (AT+CHLD value 4) (C.3)
-+TSPC_HFP_2_13	True		Calling Line Identification (CLI) (M)
-+TSPC_HFP_2_14	True (*)	Echo canceling (EC) and Noise reduction (NR) (O)
-+TSPC_HFP_2_15	True (*)	Voice recognition activation (O)
-+TSPC_HFP_2_15a	False		Initiate voice recognition from AG (C.6)
-+TSPC_HFP_2_15b	False		Autonomous voice deactivation (C.6)
-+TSPC_HFP_2_16	False		Attach a phone number to a voice tag (O)
-+TSPC_HFP_2_17	True		Ability to transmit DTMF codes (M)
-+TSPC_HFP_2_18a	True (*)	Remote audio volume control – speaker (O)
-+TSPC_HFP_2_18b	False		Remote audio volume control – microphone (O)
-+TSPC_HFP_2_18c	True (*)	Volume Level Synchronization – speaker and
-+					microphone (C.5)
-+TSPC_HFP_2_19	False		Response and hold (O)
-+TSPC_HFP_2_20	True		Subscriber Number Information (M)
-+TSPC_HFP_2_21a	True		Enhanced Call Status (C.4)
-+TSPC_HFP_2_21b	False		Enhanced Call Control (C.3)
-+TSPC_HFP_2_21c	True (*)	Enhanced Call Status with limited network
-+					notification (C.4)
-+TSPC_HFP_2_22	False		Support for automatic link loss recovery (O)
-+TSPC_HFP_2_23	True (*)	Individual Indicator Activation (C.9)
-+TSPC_HFP_2_24	False		Wide Band Speech service (C.8)
-+TSPC_HFP_2_25	False		Support roaming function (O)
-+-------------------------------------------------------------------------------
-+C.1:  The AG must support one of item TSPC_HFP_2_4a or TSPC_HFP_2_4b
-+C.2:  Mandatory if TSPC_HFP_2_12is TRUE; otherwise excluded
-+C.3:  Optional if TSPC_HFP_2_12 is TRUE; otherwise excluded
-+C.4:  The AG must support one of item TSPC_HFP_2_21a or TSPC_HFP_2_21c
-+C.5:  Mandatory if TSPC_HFP_2_18a or TSPC_HFP_2_18b; otherwise optional
-+C.6:  Optional if TSPC_HFP_2_15 is supported, otherwise excluded
-+C.7:  Mandatory if TSPC_HFP_2_24 otherwise excluded
-+C.8:  Excluded if TSPC_HFP_0_1 otherwise optional
-+C.9:  Excluded if TSPC_HFP_0_1 otherwise mandatory
-+C.10: Mandatory if TSPC_HFP_2_24 otherwise optional
-+-------------------------------------------------------------------------------
-+
-+
-+		Hands-Free Role
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HFP_3_1	False (*)	Connection Management (M)
-+TSPC_HFP_3_2a	False (*)	Phone Status Information ("service" and "call"
-+					indicators) (M)
-+TSPC_HFP_3_2b	False		Phone Status Information ("callsetup"
-+					indicators) (O)
-+TSPC_HFP_3_2c	False		Accept indicator of signal strength (O)
-+TSPC_HFP_3_2d	False		Accept indicator of roaming state ("roam:") (O)
-+TSPC_HFP_3_2e	False		Accept indicator of battery level ("battchg") (O)
-+TSPC_HFP_3_2f	False		Accept indicator of operator selection (O)
-+TSPC_HFP_3_3	False (*)	Audio connection handling (M)
-+TSPC_HFP_3_3a	False		Audio connection establishment independent
-+					of call processing (O)
-+TSPC_HFP_3_3b	False		eSCO support in Audio Connection (C.7)
-+TSPC_HFP_3_3c	False		Codec negotiation (C.5)
-+TSPC_HFP_3_4a	False (*)	Accept an incoming voice call (in-band ring) (M)
-+TSPC_HFP_3_4b	False (*)	Accept an incoming voice call (no in-band
-+					ring) (M)
-+TSPC_HFP_3_4c	False		Accept an incoming voice call (in-band ring
-+					muting) (O)
-+TSPC_HFP_3_5	False (*)	Reject an incoming voice call (M)
-+TSPC_HFP_3_6	False (*)	Terminate a call (M)
-+
-+TSPC_HFP_3_7	False (*)	Audio connection transfer during an ongoing
-+					call (M)
-+TSPC_HFP_3_7a	False		HF-initiated Audio transfer to AG during
-+					ongoing call (O)
-+TSPC_HFP_3_8	False		Place a call with a phone number supplied by
-+					the HF (O)
-+TSPC_HFP_3_9	False		Place a call using memory dialing (O)
-+TSPC_HFP_3_10	False		Place a call to the last number dialed (O)
-+TSPC_HFP_3_11	False		Call waiting notification (O)
-+TSPC_HFP_3_12	False		Three Way Calling (O)
-+TSPC_HFP_3_12a	False		Three way calling (AT+CHLD values 0) (C.2)
-+TSPC_HFP_3_12b	False		Three way calling (AT+CHLD values 1 and 2) (C.1)
-+TSPC_HFP_3_12c	False		Three way calling (AT+CHLD value 3) (C.2)
-+TSPC_HFP_3_12d	False		Three way calling (AT+CHLD value 4) (C.2)
-+TSPC_HFP_3_12e	False		Originate new call with established call in
-+					progress (C.2)
-+TSPC_HFP_3_13	False		Calling Line Identification (CLI) (O)
-+TSPC_HFP_3_14	False		Echo cancelling (EC) and Noise reduction (NR) (O)
-+TSPC_HFP_3_15	False		Voice recognition activation/deactivation (O)
-+TSPC_HFP_3_16	False		Attach a phone number to a voice tag (O)
-+TSPC_HFP_3_17	False		Ability to transmit DTMF codes (O)
-+TSPC_HFP_3_18a	False		Remote audio volume control – speaker (O)
-+TSPC_HFP_3_18b	False		Remote audio volume control – microphone (O)
-+TSPC_HFP_3_18c	False		Volume Level Synchronization – speaker (C.3)
-+TSPC_HFP_3_18d	False		Volume Level Synchronization – microphone (C.4)
-+TSPC_HFP_3_18e	False		HF informs AG about local changes of audio
-+					volume (O)
-+TSPC_HFP_3_18f	False		HF informs AG about local changes of
-+					microphone gain (O)
-+TSPC_HFP_3_19	False		Response and hold (O)
-+TSPC_HFP_3_20	False		Subscriber Number Information (O)
-+TSPC_HFP_3_21a	False		Enhanced Call Status (O)
-+TSPC_HFP_3_21b	False		Enhanced Call Control (C.2)
-+TSPC_HFP_3_22	False		Support for automatic link loss recovery (O)
-+TSPC_HFP_3_23	False		Individual Indicator Activation (C.6)
-+TSPC_HFP_3_24	False		Wide Band Speech service (C.6)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_HFP_3_12; otherwise excluded
-+C.2: Optional if TSPC_HFP_3_12; otherwise excluded
-+C.3: Mandatory if TSPC_HFP_3_18a or TSPC_HFP_3_18b, otherwise optional
-+C.4: Mandatory if TSPC_HFP_3_18a, otherwise optional
-+C.5: Mandatory if TSPC_HFP_3_24 otherwise excluded
-+C.6: Excluded if TSPC_HFP_0_1 otherwise optional
-+C.7: Mandatory if TSPC_HFP_3_24 otherwise optional
-+-------------------------------------------------------------------------------
-+
-+
-+		Audio Coding Requirements
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HFP_4_1	True		CVSD audio coding over SCO (M)
-+TSPC_HFP_4_2	False		mSBC audio coding over eSCO (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if Wide band speech service is supported TSPC_HFP_2_24 or
-+	TSPC_HFP_3_24, otherwise excluded
-+-------------------------------------------------------------------------------
-+
-+
-+		Supplementary Interoperability Verification
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HFP_8_1	False		Multiple audio transfers during call –
-+					AG and HF initiated (C.1)
-+TSPC_HFP_8_2	False		Audio transfer by SLC release during
-+					an active call (C.1)
-+TSPC_HFP_8_3	False		Audio transfer by powering ON HF (O)
-+TSPC_HFP_8_4	False		SLC during SDP response (O)
-+TSPC_HFP_8_5	False		Handle dynamic server channel number for HFP
-+					service (O)
-+TSPC_HFP_8_6	False		HF disallows connections in non-discoverable
-+					mode (C.2)
-+TSPC_HFP_8_7	False		HF connects to AG during incoming call (O)
-+TSPC_HFP_8_8	False		Link loss during incoming call (C.3)
-+TSPC_HFP_8_9	False		SLC release during incoming call (C.3)
-+TSPC_HFP_8_10	False		Voice Recognition Activation (C.4)
-+TSPC_HFP_8_11	False		Place outgoing call by dialing number on
-+					the AG (O)
-+TSPC_HFP_8_12	False		Active call termination – NO CARRIER signal
-+					(C.5)
-+-------------------------------------------------------------------------------
-+C.1: Optional if TSPC_HFP_2_7a or TSPC_HFP_3_7a is supported,
-+	otherwise excluded
-+C.2: Optional if TSPC_HFP_1_2 is supported, otherwise excluded
-+C.3: Optional if TSPC_HFP_1_1 is supported, otherwise excluded
-+C.4: Optional if TSPC_HFP_2_15 or TSPC_HFP_3_15 is supported,
-+	otherwise excluded
-+C.5: Optional if TSPC_HFP_2_6 is supported, otherwise excluded
-+-------------------------------------------------------------------------------
-diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
-new file mode 100644
-index 0000000..c1b2503
---- /dev/null
-+++ b/android/pixit-hfp.txt
-@@ -0,0 +1,37 @@
-+HFP PIXIT for the PTS tool.
-+
-+PTS version: 5.0
-+
-+* - different than PTS defaults
-+& - should be set to IUT Bluetooth address
-+# - should be set to the respective phone numbers
-+
-+		Required PIXIT settings
-+-------------------------------------------------------------------------------
-+Parameter Name						Value
-+-------------------------------------------------------------------------------
-+TSPX_security_enabled					TRUE
-+TSPX_bd_addr_iut					012345678901 (*&)
-+TSPX_hf_class_of_device					200408
-+TSPX_ag_class_of_device					400204
-+TSPX_packet_type_sco					00A0
-+TSPX_phone_number					1234567 (#)
-+TSPX_second_phone_number				7654321 (#)
-+TSPX_phone_number_type					129
-+TSPX_second_phone_number_type				129
-+TSPX_phone_number_memory				1
-+TSPX_phone_number_memory_invalid_index			9999
-+TSPX_scan_all_memory_dial_locations			FALSE
-+TSPX_pin_code						0000
-+TSPX_time_guard						300000
-+TSPX_use_implicit_send					TRUE
-+TSPX_verbose_implicit_send				FALSE
-+TSPX_delete_link_key					FALSE
-+TSPX_server_channel_tester				01
-+TSPX_server_channel_iut					00
-+TSPX_verify_CLIP_information				TRUE
-+TSPX_no_fail_verdict					FALSE
-+TSPX_network_supports_correct_call_and_callstatus	TRUE
-+TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
-+TSPX_AG_match_tester_BRSF_codec_negotiation_bit		FALSE
-+-------------------------------------------------------------------------------
--- 
-1.8.5.3
+On Tue, Feb 25, 2014 at 3:56 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> ---
+>  android/avrcp-lib.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/avrcp-lib.h | 12 +++++++++++
+>  2 files changed, 72 insertions(+)
+>
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index 136801e..95e10f2 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -56,6 +56,15 @@
+>  #define AVRCP_PACKET_TYPE_CONTINUING   0x02
+>  #define AVRCP_PACKET_TYPE_END          0x03
+>
+> +/* Capabilities for AVRCP_GET_CAPABILITIES pdu */
+> +#define CAP_COMPANY_ID         0x02
+> +#define CAP_EVENTS_SUPPORTED   0x03
+> +
+> +/* Company IDs supported by this device */
+> +static uint32_t company_ids[] = {
+> +       IEEEID_BTSIG,
+> +};
+> +
+>  #if __BYTE_ORDER == __LITTLE_ENDIAN
+>
+>  struct avrcp_header {
+> @@ -108,6 +117,8 @@ struct avrcp {
+>         const struct avrcp_passthrough_handler *passthrough_handlers;
+>         void *passthrough_data;
+>         unsigned int passthrough_id;
+> +
+> +       uint16_t supported_events;
+>  };
+>
+>  void avrcp_shutdown(struct avrcp *session)
+> @@ -220,6 +231,53 @@ static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
+>         cid[2] = cid_in;
+>  }
+>
+> +static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
+> +                               uint8_t transaction, uint16_t *params_len,
+> +                               uint8_t *params, void *user_data)
+> +{
+> +       unsigned int i;
+> +
+> +       DBG("id %d params_len %d", params[0], *params_len);
+> +
+> +       if (*params_len != 1)
+> +               goto fail;
+> +
+> +       switch (params[0]) {
+> +       case CAP_COMPANY_ID:
+> +               for (i = 0; i < G_N_ELEMENTS(company_ids); i++)
+> +                       set_company_id(&params[2 + i * 3], company_ids[i]);
+> +
+> +               *params_len = 2 + (3 * G_N_ELEMENTS(company_ids));
+> +               params[1] = G_N_ELEMENTS(company_ids);
+> +
+> +               return AVC_CTYPE_STABLE;
+> +       case CAP_EVENTS_SUPPORTED:
+> +               params[1] = 0;
+> +               for (i = 1; i <= AVRCP_EVENT_LAST; i++) {
+> +                       if (session->supported_events & (1 << i)) {
+> +                               params[1]++;
+> +                               params[params[1] + 1] = i;
+> +                       }
+> +               }
+> +
+> +               *params_len = 2 + params[1];
+> +
+> +               return AVC_CTYPE_STABLE;
+> +       }
+> +
+> +fail:
+> +       *params_len = htons(1);
+> +       params[0] = AVRCP_STATUS_INVALID_PARAM;
+> +
+> +       return AVC_CTYPE_REJECTED;
+> +}
+> +
+> +static const struct avrcp_control_handler control_handlers[] = {
+> +               { AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+> +                                       avrcp_handle_get_capabilities },
+> +               { },
+> +};
+> +
+>  struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>  {
+>         struct avrcp *session;
+> @@ -241,6 +299,8 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>                                                         handle_vendordep_pdu,
+>                                                         session);
+>
+> +       avrcp_set_control_handlers(session, control_handlers, NULL);
+> +
+>         return session;
+>  }
+>
+> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> index 4f3a632..0821287 100644
+> --- a/android/avrcp-lib.h
+> +++ b/android/avrcp-lib.h
+> @@ -46,6 +46,18 @@
+>  #define AVRCP_ADD_TO_NOW_PLAYING       0x90
+>  #define AVRCP_GENERAL_REJECT           0xA0
+>
+> +/* Notification events */
+> +#define AVRCP_EVENT_STATUS_CHANGED             0x01
+> +#define AVRCP_EVENT_TRACK_CHANGED              0x02
+> +#define AVRCP_EVENT_TRACK_REACHED_END          0x03
+> +#define AVRCP_EVENT_TRACK_REACHED_START                0x04
+> +#define AVRCP_EVENT_SETTINGS_CHANGED           0x08
+> +#define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED  0x0a
+> +#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED   0x0b
+> +#define AVRCP_EVENT_UIDS_CHANGED               0x0c
+> +#define AVRCP_EVENT_VOLUME_CHANGED             0x0d
+> +#define AVRCP_EVENT_LAST                       AVRCP_EVENT_VOLUME_CHANGED
+> +
+>  struct avrcp;
+>
+>  struct avrcp_control_handler {
+> --
+> 1.8.3.2
 
+That is the actual AVRCP implementation not the library, the library
+only offer means to handle the commands but don't parse it there since
+we can't do anything with it. For unit tests you can implement dummy
+handlers as we did for passthrough.
