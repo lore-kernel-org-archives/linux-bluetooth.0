@@ -1,88 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 25 Feb 2014 19:56:43 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: Fix advertising address type when toggling
+ connectable
+Message-ID: <20140225175643.GA6452@localhost.P-661HNU-F1>
+References: <1393349802-5831-1-git-send-email-johan.hedberg@gmail.com>
+ <1700F292-DB01-4DA1-AF5D-445535741ACA@holtmann.org>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.1 \(1827\))
-Subject: Re: [PATCH v2] Bluetooth: Fix NULL pointer dereference when sending data
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393344982-6756-1-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Tue, 25 Feb 2014 10:04:12 -0800
-Cc: "bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <16615F0F-B181-457A-8F74-59C8A3D6B671@holtmann.org>
-References: <1393344982-6756-1-git-send-email-andrzej.kaczmarek@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1700F292-DB01-4DA1-AF5D-445535741ACA@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Marcel,
 
-> When trying to allocate skb for new PDU, l2cap_chan is unlocked so we
-> can sleep waiting for memory as otherwise there's possible deadlock as
-> fixed in e454c84464. However, in a6a5568c03 lock was moved from socket
-> to channel level and it's no longer safe to just unlock and lock again
-> without checking l2cap_chan state since channel can be disconnected
-> when lock is not held.
+On Tue, Feb 25, 2014, Marcel Holtmann wrote:
+> > -	if (hci_update_random_address(req, require_privacy, &own_addr_type) < 0)
+> > +	/* If we're connectable set require_privacy to false as we
+> > +	 * shouldn't use NRPAs in that case. If we're non-connectable
+> > +	 * however we can allow NRPAs to be used.
+> > +	 */
+> > +	if (hci_update_random_address(req, !connectable, &own_addr_type) < 0)
+> > 		return;
 > 
-> This patch adds missing checks for l2cap_chan state when returning from
-> call which allocates skb.
-> 
-> Scenario is easily reproducible by running rfcomm-tester in a loop.
-> 
-> BUG: unable to handle kernel NULL pointer dereference at         (null)
-> IP: [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
-> PGD 0
-> Oops: 0000 [#1] SMP
-> Modules linked in:
-> CPU: 7 PID: 4038 Comm: krfcommd Not tainted 3.14.0-rc2+ #15
-> Hardware name: Dell Inc. OptiPlex 790/0HY9JP, BIOS A10 11/24/2011
-> task: ffff8802bdd731c0 ti: ffff8801ec986000 task.ti: ffff8801ec986000
-> RIP: 0010:[<ffffffffa0442169>]  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120
-> RSP: 0018:ffff8801ec987ad8  EFLAGS: 00010202
-> RAX: 0000000000000000 RBX: ffff8800c5796800 RCX: 0000000000000000
-> RDX: ffff880410e7a800 RSI: ffff8802b6c1da00 RDI: ffff8800c5796800
-> RBP: ffff8801ec987af8 R08: 00000000000000c0 R09: 0000000000000300
-> R10: 000000000000573b R11: 000000000000573a R12: ffff8802b6c1da00
-> R13: 0000000000000000 R14: ffff8802b6c1da00 R15: 0000000000000000
-> FS:  0000000000000000(0000) GS:ffff88042dce0000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000000 CR3: 000000041257c000 CR4: 00000000000407e0
-> Stack:
-> ffff8801ec987d78 ffff8800c5796800 ffff8801ec987d78 0000000000000000
-> ffff8801ec987ba8 ffffffffa0449e37 0000000000000004 ffff8801ec987af0
-> ffff8801ec987d40 0000000000000282 0000000000000000 ffffffff00000004
-> Call Trace:
-> [<ffffffffa0449e37>] l2cap_chan_send+0xaa7/0x1120 [bluetooth]
-> [<ffffffff81770100>] ? _raw_spin_unlock_bh+0x20/0x40
-> [<ffffffffa045188b>] l2cap_sock_sendmsg+0xcb/0x110 [bluetooth]
-> [<ffffffff81652b0f>] sock_sendmsg+0xaf/0xc0
-> [<ffffffff810a8381>] ? update_curr+0x141/0x200
-> [<ffffffff810a8961>] ? dequeue_entity+0x181/0x520
-> [<ffffffff81652b60>] kernel_sendmsg+0x40/0x60
-> [<ffffffffa04a8505>] rfcomm_send_frame+0x45/0x70 [rfcomm]
-> [<ffffffff810766f0>] ? internal_add_timer+0x20/0x50
-> [<ffffffffa04a8564>] rfcomm_send_cmd+0x34/0x60 [rfcomm]
-> [<ffffffffa04a8605>] rfcomm_send_disc+0x75/0xa0 [rfcomm]
-> [<ffffffffa04aacec>] rfcomm_run+0x8cc/0x1a30 [rfcomm]
-> [<ffffffffa04aa420>] ? rfcomm_check_accept+0xc0/0xc0 [rfcomm]
-> [<ffffffff8108e3a9>] kthread+0xc9/0xe0
-> [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
-> [<ffffffff817795fc>] ret_from_fork+0x7c/0xb0
-> [<ffffffff8108e2e0>] ? flush_kthread_worker+0xb0/0xb0
-> Code: 00 00 66 66 66 66 90 55 48 89 e5 48 83 ec 20 f6 05 d6 a3 02 00 04
-> RIP  [<ffffffffa0442169>] l2cap_do_send+0x29/0x120 [bluetooth]
-> RSP <ffff8801ec987ad8>
-> CR2: 0000000000000000
-> 
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> Acked-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> v2 added comment regarding why we need to check state again
-> 
-> net/bluetooth/l2cap_core.c | 16 ++++++++++++++++
-> 1 file changed, 16 insertions(+)
+> I really do not want to be pedantic, but this comment is misleading.
+> It is a bit hard to understand. Also I am not sure if it NRPA or URPA.
 
-patch has been applied to bluetooth-next tree.
+It's "non-resolvable" according to the core specification.
 
-Regards
+> I think using an acronym here is confusing.
+> 
+> 	/* Set require_privacy to true only when non-connectable advertising
+> 	 * is used. In that case it is fine to use an unresolvable private
+> 	 * address.
+> 	 */ 
 
-Marcel
+v3 has been sent.
 
+Johan
