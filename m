@@ -1,53 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/9] shared/hfp_at: Add function to get string
-Date: Tue, 25 Feb 2014 10:23:46 +0100
-Message-Id: <1393320227-10931-9-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 5/9] shared/hfp_at: Add function for getting number
+Date: Tue, 25 Feb 2014 10:23:43 +0100
+Message-Id: <1393320227-10931-6-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1393320227-10931-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1393320227-10931-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will look for quoted sting and write it to buffer.
+It will fetch decimal value from AT command.
 ---
- src/shared/hfp_at.c | 32 ++++++++++++++++++++++++++++++++
+ src/shared/hfp_at.c | 40 ++++++++++++++++++++++++++++++++++++++++
  src/shared/hfp_at.h |  2 ++
- 2 files changed, 34 insertions(+)
+ 2 files changed, 42 insertions(+)
 
 diff --git a/src/shared/hfp_at.c b/src/shared/hfp_at.c
-index 2db40b2..750133f 100644
+index eff0a38..623dab3 100644
 --- a/src/shared/hfp_at.c
 +++ b/src/shared/hfp_at.c
-@@ -246,6 +246,38 @@ bool hfp_at_get_number(struct hfp_at *hfp_at, const char *data, int *val)
- 	return true;
+@@ -206,6 +206,46 @@ bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
+ 		return hfp_at_process_basic(hfp_at, data, user_data);
  }
  
-+bool hfp_at_get_string(struct hfp_at *hfp_at, const char *data, char *buf,
-+								uint8_t len)
++static void hfp_at_next_field(struct hfp_at *hfp_at, const char *data)
 +{
-+	int i = 0;
++	if (data[hfp_at->offset] == ',')
++		hfp_at->offset++;
++}
++
++static void hfp_at_skip_whitespace(struct hfp_at *hfp_at, const char *data)
++{
++	while (data[hfp_at->offset] == ' ')
++		hfp_at->offset++;
++}
++
++bool hfp_at_get_number(struct hfp_at *hfp_at, const char *data, int *val)
++{
++	int temp = 0;
++	int i;
 +
 +	hfp_at_skip_whitespace(hfp_at, data);
 +
-+	if (data[hfp_at->offset] != '"')
-+		return false;
++	i = hfp_at->offset;
 +
-+	hfp_at->offset++;
-+
-+	while (data[hfp_at->offset] != '\0' && data[hfp_at->offset] != '"') {
-+		if (i < len)
-+			buf[i++] = data[hfp_at->offset];
-+		hfp_at->offset++;
++	while (data[i] >= '0' && data[i] <= '9') {
++		temp *= 10;
++		temp += data[i++] - '0';
 +	}
 +
-+	if (i < len)
-+		buf[i++] = '\0';
-+
-+	if (data[hfp_at->offset] == '"')
-+		hfp_at->offset++;
-+	else
++	if (i == hfp_at->offset)
 +		return false;
++
++	if (val)
++		*val = temp;
++
++	hfp_at->offset = i;
 +
 +	hfp_at_skip_whitespace(hfp_at, data);
 +	hfp_at_next_field(hfp_at, data);
@@ -55,20 +63,19 @@ index 2db40b2..750133f 100644
 +	return true;
 +}
 +
- bool hfp_at_open_container(struct hfp_at *hfp_at, const char *data)
+ struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers)
  {
- 	hfp_at_skip_whitespace(hfp_at, data);
+ 	struct hfp_at *hfp_at;
 diff --git a/src/shared/hfp_at.h b/src/shared/hfp_at.h
-index e709acb..4da381b 100644
+index 0b628b5..2e2a757 100644
 --- a/src/shared/hfp_at.h
 +++ b/src/shared/hfp_at.h
-@@ -45,6 +45,8 @@ bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
- bool hfp_at_get_number(struct hfp_at *hfp_at, const char *data, int *val);
- bool hfp_at_open_container(struct hfp_at *hfp_at, const char *data);
- bool hfp_at_close_container(struct hfp_at *hfp_at, const char *data);
-+bool hfp_at_get_string(struct hfp_at *hfp_at, const char *data, char *buf,
-+								uint8_t len);
+@@ -42,5 +42,7 @@ struct hfp_at_handler {
+ bool hfp_at_process_data(struct hfp_at *hfp_at, const char *data,
+ 							void *user_data);
  
++bool hfp_at_get_number(struct hfp_at *hfp_at, const char *data, int *val);
++
  struct hfp_at *hfp_at_new(const struct hfp_at_handler *handlers);
  void hfp_at_free(struct hfp_at *hfp_at);
 -- 
