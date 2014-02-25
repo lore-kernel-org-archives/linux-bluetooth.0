@@ -2,299 +2,247 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 3/7] android/unit: Update test-ipc with failure handler support
-Date: Tue, 25 Feb 2014 11:50:15 +0100
-Message-Id: <1393325419-16544-3-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 2/7] android: Add support for registering failure callback in IPC
+Date: Tue, 25 Feb 2014 11:50:14 +0100
+Message-Id: <1393325419-16544-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1393325419-16544-1-git-send-email-szymon.janc@tieto.com>
 References: <1393325419-16544-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Allow to register callback which is called in case of IPC failure
+(eg malformed message) or disconnection. This makes caller responsible
+for performing expected action in such case.
 ---
- android/test-ipc.c | 117 +++++++++++++++++------------------------------------
- 1 file changed, 37 insertions(+), 80 deletions(-)
+ android/ipc.c  | 103 +++++++++++++++++++++++++++++++++++++--------------------
+ android/ipc.h  |   3 ++
+ android/main.c |   7 ++++
+ 3 files changed, 77 insertions(+), 36 deletions(-)
 
-diff --git a/android/test-ipc.c b/android/test-ipc.c
-index 054af84..84cb764 100644
---- a/android/test-ipc.c
-+++ b/android/test-ipc.c
-@@ -35,7 +35,6 @@
- #include <fcntl.h>
- #include <sys/socket.h>
- #include <sys/un.h>
--#include <sys/signalfd.h>
+diff --git a/android/ipc.c b/android/ipc.c
+index 3d6e2a3..4bddb58 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -52,8 +52,39 @@ struct ipc {
  
- #include <glib.h>
- #include "src/shared/util.h"
-@@ -43,10 +42,8 @@
- #include "android/hal-msg.h"
- #include "android/ipc.h"
- 
--static struct ipc *ipc = NULL;
--
- struct test_data {
--	uint32_t expected_signal;
-+	bool disconnect;
- 	const void *cmd;
- 	uint16_t cmd_size;
- 	uint8_t service;
-@@ -65,13 +62,13 @@ struct context {
- 
- 	GIOChannel *cmd_io;
  	GIOChannel *notif_io;
--	GIOChannel *signal_io;
--
--	guint signal_source;
- 
- 	const struct test_data *data;
+ 	guint notif_watch;
++
++	ipc_failed_cb failed_cb;
++	void *failed_cb_data;
  };
  
-+
-+static struct ipc *ipc = NULL;
-+
- static void context_quit(struct context *context)
- {
- 	g_main_loop_quit(context->main_loop);
-@@ -92,13 +89,13 @@ static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
- 		.len = 0,
- 	};
- 
--	g_assert(test_data->expected_signal == 0);
--
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
--		g_assert(FALSE);
-+		g_assert(test_data->disconnect);
- 		return FALSE;
- 	}
- 
-+	g_assert(!test_data->disconnect);
-+
- 	sk = g_io_channel_unix_get_fd(io);
- 
- 	g_assert(read(sk, buf, sizeof(buf)) == sizeof(struct hal_hdr));
-@@ -112,11 +109,16 @@ static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
- static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-+	struct context *context = user_data;
-+	const struct test_data *test_data = context->data;
-+
- 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
--		g_assert(FALSE);
-+		g_assert(test_data->disconnect);
- 		return FALSE;
- 	}
- 
-+	g_assert(!test_data->disconnect);
-+
- 	return TRUE;
- }
- 
-@@ -162,62 +164,6 @@ static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
- 	return TRUE;
- }
- 
--static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
--							gpointer user_data)
--{
--	struct context *context = user_data;
--	const struct test_data *test_data = context->data;
--	struct signalfd_siginfo si;
--	ssize_t result;
--	int fd;
--
--	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
--		return FALSE;
--
--	fd = g_io_channel_unix_get_fd(channel);
--
--	result = read(fd, &si, sizeof(si));
--	if (result != sizeof(si))
--		return FALSE;
--
--	g_assert(test_data->expected_signal == si.ssi_signo);
--	context_quit(context);
--	return TRUE;
--}
--
--static guint setup_signalfd(gpointer user_data)
--{
--	GIOChannel *channel;
--	guint source;
--	sigset_t mask;
--	int ret;
--	int fd;
--
--	sigemptyset(&mask);
--	sigaddset(&mask, SIGINT);
--	sigaddset(&mask, SIGTERM);
--
--	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
--	g_assert(ret == 0);
--
--	fd = signalfd(-1, &mask, 0);
--	g_assert(fd >= 0);
--
--	channel = g_io_channel_unix_new(fd);
--
--	g_io_channel_set_close_on_unref(channel, TRUE);
--	g_io_channel_set_encoding(channel, NULL, NULL);
--	g_io_channel_set_buffered(channel, FALSE);
--
--	source = g_io_add_watch(channel,
--				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
--				signal_handler, user_data);
--
--	g_io_channel_unref(channel);
--
--	return source;
--}
--
- static struct context *create_context(gconstpointer data)
- {
- 	struct context *context = g_new0(struct context, 1);
-@@ -228,9 +174,6 @@ static struct context *create_context(gconstpointer data)
- 	context->main_loop = g_main_loop_new(NULL, FALSE);
- 	g_assert(context->main_loop);
- 
--	context->signal_source = setup_signalfd(context);
--	g_assert(context->signal_source);
--
- 	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
- 	g_assert(sk >= 0);
- 
-@@ -272,7 +215,6 @@ static void execute_context(struct context *context)
- 	g_io_channel_unref(context->notif_io);
- 
- 	g_source_remove(context->notif_source);
--	g_source_remove(context->signal_source);
- 	g_source_remove(context->cmd_source);
- 	g_source_remove(context->source);
- 
-@@ -281,6 +223,15 @@ static void execute_context(struct context *context)
- 	g_free(context);
- }
- 
-+static void disconnected(void *data)
++static void ipc_disconnect(struct ipc *ipc, bool failed)
 +{
-+	struct context *context = data;
++	if (ipc->cmd_watch) {
++		g_source_remove(ipc->cmd_watch);
++		ipc->cmd_watch = 0;
++	}
 +
-+	g_assert(context->data->disconnect);
++	if (ipc->cmd_io) {
++		g_io_channel_shutdown(ipc->cmd_io, TRUE, NULL);
++		g_io_channel_unref(ipc->cmd_io);
++		ipc->cmd_io = NULL;
++	}
 +
-+	context_quit(context);
++	if (ipc->notif_watch) {
++		g_source_remove(ipc->notif_watch);
++		ipc->notif_watch = 0;
++	}
++
++	if (ipc->notif_io) {
++		g_io_channel_shutdown(ipc->notif_io, TRUE, NULL);
++		g_io_channel_unref(ipc->notif_io);
++		ipc->notif_io = NULL;
++	}
++
++	if (ipc->failed_cb && failed)
++		ipc->failed_cb(ipc->failed_cb_data);
 +}
 +
- static void test_init(gconstpointer data)
+ int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
+ 						const void *buf, ssize_t len)
  {
- 	struct context *context = create_context(data);
-@@ -341,6 +292,8 @@ static void test_cmd(gconstpointer data)
+@@ -116,7 +147,9 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
+ 	int fd, err;
  
- 	g_assert(ipc);
- 
-+	ipc_set_fail_handler(ipc, disconnected, context);
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+-		info("IPC: command socket closed, terminating");
++		info("IPC: command socket closed");
 +
- 	g_idle_add(send_cmd, context);
++		ipc->cmd_watch = 0;
+ 		goto fail;
+ 	}
  
- 	execute_context(context);
-@@ -359,6 +312,8 @@ static void test_cmd_reg(gconstpointer data)
+@@ -124,30 +157,34 @@ static gboolean cmd_watch_cb(GIOChannel *io, GIOCondition cond,
  
- 	g_assert(ipc);
+ 	ret = read(fd, buf, sizeof(buf));
+ 	if (ret < 0) {
+-		error("IPC: command read failed, terminating (%s)",
+-							strerror(errno));
++		error("IPC: command read failed (%s)", strerror(errno));
+ 		goto fail;
+ 	}
  
-+	ipc_set_fail_handler(ipc, disconnected, context);
-+
- 	g_idle_add(register_service, context);
- 	g_idle_add(send_cmd, context);
+ 	err = ipc_handle_msg(ipc->services, ipc->service_max, buf, ret);
+ 	if (err < 0) {
+-		error("IPC: failed to handle message, terminating (%s)",
+-							strerror(-err));
++		error("IPC: failed to handle message (%s)", strerror(-err));
+ 		goto fail;
+ 	}
  
-@@ -379,6 +334,8 @@ static void test_cmd_reg_1(gconstpointer data)
+ 	return TRUE;
  
- 	g_assert(ipc);
- 
-+	ipc_set_fail_handler(ipc, disconnected, context);
-+
- 	g_idle_add(register_service, context);
- 	g_idle_add(unregister_service, context);
- 	g_idle_add(send_cmd, context);
-@@ -401,7 +358,7 @@ static void test_cmd_handler_2(const void *buf, uint16_t len)
- 
- static void test_cmd_handler_invalid(const void *buf, uint16_t len)
- {
+ fail:
 -	raise(SIGTERM);
-+	g_assert(false);
++	ipc_disconnect(ipc, true);
++
+ 	return FALSE;
  }
  
- static const struct test_data test_init_1 = {};
-@@ -421,7 +378,7 @@ static const struct hal_hdr test_cmd_2_hdr = {
- static const struct test_data test_cmd_service_invalid_1 = {
- 	.cmd = &test_cmd_1_hdr,
- 	.cmd_size = sizeof(test_cmd_1_hdr),
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
+-	info("IPC: notification socket closed, terminating");
+-	raise(SIGTERM);
++	struct ipc *ipc = user_data;
++
++	info("IPC: notification socket closed");
++
++	ipc->notif_watch = 0;
++
++	ipc_disconnect(ipc, true);
  
- static const struct ipc_handler cmd_handlers[] = {
-@@ -442,7 +399,7 @@ static const struct test_data test_cmd_service_invalid_2 = {
- 	.service = 0,
- 	.handlers = cmd_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ 	return FALSE;
+ }
+@@ -194,8 +231,10 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
+ 	DBG("");
  
- static const struct ipc_handler cmd_handlers_invalid_2[] = {
-@@ -477,7 +434,7 @@ static const struct test_data test_cmd_opcode_invalid_1 = {
- 	.service = 0,
- 	.handlers = cmd_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+-		error("IPC: notification socket connect failed, terminating");
+-		raise(SIGTERM);
++		error("IPC: notification socket connect failed");
++
++		ipc_disconnect(ipc, true);
++
+ 		return FALSE;
+ 	}
  
- static const struct test_data test_cmd_hdr_invalid = {
-@@ -486,7 +443,7 @@ static const struct test_data test_cmd_hdr_invalid = {
- 	.service = 0,
- 	.handlers = cmd_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+@@ -220,15 +259,19 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
+ 	DBG("");
  
- #define VARDATA_EX1 "some data example"
-@@ -533,7 +490,7 @@ static const struct test_data test_cmd_vardata_invalid_1 = {
- 	.service = 0,
- 	.handlers = cmd_vardata_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+-		error("IPC: command socket connect failed, terminating");
+-		raise(SIGTERM);
+-		return FALSE;
++		error("IPC: command socket connect failed");
++		goto failed;
+ 	}
  
- static const struct hal_hdr test_cmd_service_offrange_hdr = {
-@@ -548,7 +505,7 @@ static const struct test_data test_cmd_service_offrange = {
- 	.service = 0,
- 	.handlers = cmd_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ 	ipc->notif_io = ipc_connect(ipc->path, ipc->size, notif_connect_cb,
+ 									ipc);
+ 	if (!ipc->notif_io)
+-		raise(SIGTERM);
++		goto failed;
++
++	return FALSE;
++
++failed:
++	ipc_disconnect(ipc, true);
  
- static const struct vardata test_cmd_invalid_data_1 = {
-@@ -564,7 +521,7 @@ static const struct test_data test_cmd_msg_invalid_1 = {
- 	.service = 0,
- 	.handlers = cmd_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ 	return FALSE;
+ }
+@@ -257,32 +300,18 @@ struct ipc *ipc_init(const char *path, size_t size, int max_service_id)
  
- static const struct vardata test_cmd_invalid_data_2 = {
-@@ -580,7 +537,7 @@ static const struct test_data test_cmd_msg_invalid_2 = {
- 	.service = 0,
- 	.handlers = cmd_handlers,
- 	.handlers_size = 1,
--	.expected_signal = SIGTERM
-+	.disconnect = true,
- };
+ void ipc_cleanup(struct ipc *ipc)
+ {
+-	if (ipc->cmd_watch) {
+-		g_source_remove(ipc->cmd_watch);
+-		ipc->cmd_watch = 0;
+-	}
+-
+-	if (ipc->cmd_io) {
+-		g_io_channel_shutdown(ipc->cmd_io, TRUE, NULL);
+-		g_io_channel_unref(ipc->cmd_io);
+-		ipc->cmd_io = NULL;
+-	}
+-
+-	if (ipc->notif_watch) {
+-		g_source_remove(ipc->notif_watch);
+-		ipc->notif_watch = 0;
+-	}
+-
+-	if (ipc->notif_io) {
+-		g_io_channel_shutdown(ipc->notif_io, TRUE, NULL);
+-		g_io_channel_unref(ipc->notif_io);
+-		ipc->notif_io = NULL;
+-	}
++	ipc_disconnect(ipc, false);
  
- int main(int argc, char *argv[])
+ 	g_free(ipc->services);
+ 	g_free(ipc);
+ }
+ 
++void ipc_set_fail_handler(struct ipc *ipc, ipc_failed_cb cb, void *data)
++{
++	ipc->failed_cb = cb;
++	ipc->failed_cb_data = data;
++}
++
+ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 							void *param, int fd)
+ {
+@@ -323,7 +352,9 @@ void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
+ 	}
+ 
+ 	if (sendmsg(sk, &msg, 0) < 0) {
+-		error("IPC send failed, terminating :%s", strerror(errno));
++		error("IPC send failed :%s", strerror(errno));
++
++		/* TODO disconnect IPC here when this function becomes static */
+ 		raise(SIGTERM);
+ 	}
+ }
+diff --git a/android/ipc.h b/android/ipc.h
+index 601301c..3a6adc8 100644
+--- a/android/ipc.h
++++ b/android/ipc.h
+@@ -37,6 +37,9 @@ struct ipc;
+ struct ipc *ipc_init(const char *path, size_t size, int max_service_id);
+ void ipc_cleanup(struct ipc *ipc);
+ 
++typedef void (*ipc_failed_cb) (void *data);
++void ipc_set_fail_handler(struct ipc *ipc, ipc_failed_cb cb, void *data);
++
+ GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb,
+ 							void *user_data);
+ int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
+diff --git a/android/main.c b/android/main.c
+index 9f22486..a821dfa 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -228,6 +228,11 @@ static void stop_bluetooth(void)
+ 	g_timeout_add_seconds(SHUTDOWN_GRACE_SECONDS, quit_eventloop, NULL);
+ }
+ 
++static void ipc_disconnected(void *data)
++{
++	stop_bluetooth();
++}
++
+ static void adapter_ready(int err, const bdaddr_t *addr)
+ {
+ 	if (err < 0) {
+@@ -251,6 +256,8 @@ static void adapter_ready(int err, const bdaddr_t *addr)
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
++	ipc_set_fail_handler(hal_ipc, ipc_disconnected, NULL);
++
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_CORE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ }
 -- 
 1.8.3.2
 
