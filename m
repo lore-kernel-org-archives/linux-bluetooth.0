@@ -1,36 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 01/17] monitor: Allow to modify epoll even events are the same
-Date: Wed, 26 Feb 2014 02:57:12 +0100
-Message-ID: <1393379848-4031-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 17/17] Bluetooth: Update background scan parameters
+Date: Tue, 25 Feb 2014 18:01:44 -0300
+Message-Id: <1393362104-12175-18-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
+References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is epsecially needed when we want to modify timer.
----
- monitor/mainloop.c | 3 ---
- 1 file changed, 3 deletions(-)
+If new scanning parameters are set while background scan is running,
+we should restart background scanning so these parameters are updated.
 
-diff --git a/monitor/mainloop.c b/monitor/mainloop.c
-index 8c94bfe..7f97e65 100644
---- a/monitor/mainloop.c
-+++ b/monitor/mainloop.c
-@@ -222,9 +222,6 @@ int mainloop_modify_fd(int fd, uint32_t events)
- 	if (!data)
- 		return -ENXIO;
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 26 ++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c             |  7 +++++++
+ 3 files changed, 34 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index e0e0eab..8f0ddc8 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -814,6 +814,7 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+ void hci_pend_le_conns_clear(struct hci_dev *hdev);
  
--	if (data->events == events)
--		return 0;
--
- 	memset(&ev, 0, sizeof(ev));
- 	ev.events = events;
- 	ev.data.ptr = data;
+ void hci_update_background_scan(struct hci_dev *hdev);
++void hci_restart_background_scan(struct hci_dev *hdev);
+ 
+ void hci_uuids_clear(struct hci_dev *hdev);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e776624..f5c0e97 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5183,3 +5183,29 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 	if (err)
+ 		BT_ERR("Failed to run HCI request: err %d", err);
+ }
++
++static void restart_background_scan_complete(struct hci_dev *hdev, u8 status)
++{
++	if (status)
++		BT_DBG("HCI request failed to restart background scan: "
++		       "status 0x%2.2x", status);
++}
++
++void hci_restart_background_scan(struct hci_dev *hdev)
++{
++	struct hci_request req;
++	int err;
++
++	hci_req_init(&req, hdev);
++
++	hci_req_add_le_scan_disable(&req);
++	hci_req_add_le_passive_scan(&req, hdev);
++
++	err = hci_req_run(&req, restart_background_scan_complete);
++	if (err) {
++		BT_ERR("Failed to run HCI request: err %d", err);
++		return;
++	}
++
++	BT_DBG("%s re-starting background scanning", hdev->name);
++}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2e6564e..08d52f2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3924,6 +3924,13 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NULL, 0);
+ 
++	/* If background scan is running, restart it so new parameters are
++	 * loaded.
++	 */
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
++	    hdev->discovery.state == DISCOVERY_STOPPED)
++		hci_restart_background_scan(hdev);
++
+ 	hci_dev_unlock(hdev);
+ 
+ 	return err;
 -- 
-1.8.4
+1.8.5.4
 
