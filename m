@@ -1,72 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <530E0AD3.7040909@hurleysoftware.com>
+Date: Wed, 26 Feb 2014 10:40:03 -0500
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-In-Reply-To: <1393418420-8461-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <CABBYNZK9sq8arr71uvUxSg654ke0uZNHQfXxNvyLRz-iRFy8wA@mail.gmail.com>
-	<1393418420-8461-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 26 Feb 2014 18:27:23 +0100
-Message-ID: <CABBYNZJ+JDt3Wqv-NedOEzaJgL2jLe2816RDKF+rucTJmxjXtw@mail.gmail.com>
-Subject: Re: [PATCHv2] android/avrcp: Fix passing wrong len
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Feng Tang <feng.79.tang@gmail.com>
+CC: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.cz>, linux-serial@vger.kernel.org,
+	Beat Bolli <bbolli@ewanet.ch>, Pavel Roskin <proski@gnu.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Jiri Kosina <jkosina@suse.cz>, David Sterba <dsterba@suse.cz>,
+	Felipe Balbi <balbi@ti.com>,
+	Grant Edwards <grant.b.edwards@gmail.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Hal Murray <murray+fedora@ip-64-139-1-69.sjc.megapath.net>,
+	Alan Cox <gnomes@lxorguk.ukuu.org.uk>, stable@vger.kernel.org,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] tty: Fix low_latency BUG
+References: <1393072281-5814-1-git-send-email-peter@hurleysoftware.com> <CA++bM2uq=vRo20FTMWvkDau+-X7h0+KU3n4Av7ef895mQKr5fA@mail.gmail.com>
+In-Reply-To: <CA++bM2uq=vRo20FTMWvkDau+-X7h0+KU3n4Av7ef895mQKr5fA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+[ +cc linux-bluetooth ]
 
-On Wed, Feb 26, 2014 at 1:40 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> When handling vendor dependent PDUs len was passed in wrong order to
-> callback function. It is really wrong to pass such a parameter and
-> expect that callbacks would handle it.
-> ---
->  android/avrcp-lib.c | 10 ++++++----
->  1 file changed, 6 insertions(+), 4 deletions(-)
->
-> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-> index c78881f..2e5a565 100644
-> --- a/android/avrcp-lib.c
-> +++ b/android/avrcp-lib.c
-> @@ -128,14 +128,14 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
->         const struct avrcp_control_handler *handler;
->         struct avrcp_header *pdu = (void *) operands;
->         uint32_t company_id = ntoh24(pdu->company_id);
-> +       uint16_t params_len = ntohs(pdu->params_len);
->
->         if (company_id != IEEEID_BTSIG) {
->                 *code = AVC_CTYPE_NOT_IMPLEMENTED;
->                 return 0;
->         }
->
-> -       DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id,
-> -                                               ntohs(pdu->params_len));
-> +       DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id, params_len);
->
->         pdu->packet_type = 0;
->         pdu->rsvd = 0;
-> @@ -163,10 +163,12 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
->                 goto reject;
->         }
->
-> -       *code = handler->func(session, transaction, &pdu->params_len,
-> +       *code = handler->func(session, transaction, &params_len,
->                                         pdu->params, session->control_data);
->
-> -       return AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
-> +       pdu->params_len = htons(params_len);
-> +
-> +       return AVRCP_HEADER_LENGTH + params_len;
->
->  reject:
->         pdu->params_len = htons(1);
-> --
-> 1.8.3.2
+Hi Feng,
 
-Applied, thanks.
+On 02/26/2014 12:11 AM, Feng Tang wrote:
+> Hi Peter,
+>
+> 2014-02-22 20:31 GMT+08:00 Peter Hurley <peter@hurleysoftware.com>:
+>> The user-settable knob, low_latency, has been the source of
+>> several BUG reports which stem from flush_to_ldisc() running
+>> in interrupt context. Since 3.12, which added several sleeping
+>> locks (termios_rwsem and buf->lock) to the input processing path,
+>> the frequency of these BUG reports has increased.
+>>
+>> Note that changes in 3.12 did not introduce this regression;
+>> sleeping locks were first added to the input processing path
+>> with the removal of the BKL from N_TTY in commit
+>> a88a69c91256418c5907c2f1f8a0ec0a36f9e6cc,
+>> 'n_tty: Fix loss of echoed characters and remove bkl from n_tty'
+>> and later in commit 38db89799bdf11625a831c5af33938dcb11908b6,
+>> 'tty: throttling race fix'. Since those changes, executing
+>> flush_to_ldisc() in interrupt_context (ie, low_latency set), is unsafe.
+>>
+>> However, since most devices do not validate if the low_latency
+>> setting is appropriate for the context (process or interrupt) in
+>> which they receive data, some reports are due to misconfiguration.
+>> Further, serial dma devices for which dma fails, resort to
+>> interrupt receiving as a backup without resetting low_latency.
+>>
+>> Historically, low_latency was used to force wake-up the reading
+>> process rather than wait for the next scheduler tick. The
+>> effect was to trim multiple milliseconds of latency from
+>> when the process would receive new data.
+>>
+>> Recent tests [1] have shown that the reading process now receives
+>> data with only 10's of microseconds latency without low_latency set.
+>
+> The 10's of miscroseconds is ok for 115200 bps like device, but it may
+> hurt the high speed device like Bluetooth which runs at 3M/4M bps or
+> higher.
 
+The tests were run at 400Mbps, so 3Mbps or 4Mbps is not a problem
+(but I think you may be confusing throughput with latency).
 
--- 
-Luiz Augusto von Dentz
+FWIW, two things affected the latency times of those particular tests;
+1) the kernel firewire subsystem handles rx data in a tasklet (so not
+    directly from IRQ) which negatively affected the latency reported, and
+2) the ftrace instrumentation is not free and there are several traces per rx.
+
+If you look carefully at the test trace data, you'll see that the timestamps
+from tty_flip_buffer_push() of the rx data to n_tty_write() of the
+response averages _~11us_; this is the measured latency from tty driver
+receiving the rx data to reading of that data *and* the process
+response (which comes back up through several tty locks).
+
+Naturally, in mainline kernel, the scheduler load will affect the
+measured latency *but that's true regardless of low_latency rx steering
+because the user-space process must still be woken to complete the read*.
+
+> More and more smartphones are using uart as the Bluetooth data
+> interface due to its low-pin, low-power feature, and many of them
+> are using HZ=100 kernel, I'm afraid this added delay may cause
+> some problem.
+
+Some hard data showing a real problem would help further this
+discussion; my belief is that 3.12+ w/o low_latency rx steering
+will outperform 3.11- w/ low_latency rx steering in every test.
+
+I'm glad to hear that the Bluetooth uart interface is getting
+some use; that means someone will soon be fixing the hard lockup
+in hci_uart_tx_wakeup() reported here:
+
+http://www.spinics.net/lists/linux-serial/msg11529.html
+
+Regards,
+Peter Hurley
