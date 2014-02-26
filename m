@@ -1,101 +1,168 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 06/17] Bluetooth: Move address type conversion to outside hci_connect_le
-Date: Wed, 26 Feb 2014 20:21:45 -0300
-Message-Id: <1393456916-22701-6-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 03/17] Bluetooth: Stop scanning on LE connection
+Date: Wed, 26 Feb 2014 20:21:42 -0300
+Message-Id: <1393456916-22701-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch moves address type conversion (L2CAP address type to HCI
-address type) to outside hci_connect_le. This way, we avoid back and
-forth address type conversion in a comming patch.
+Some LE controllers don't support scanning and creating a connection
+at the same time. So we should always stop scanning in order to
+establish the connection.
 
-So hci_connect_le() now expects 'dst_type' parameter in HCI address
-type convention.
+Since we may prematurely stop the discovery procedure in favor of
+the connection establishment, we should also cancel hdev->le_scan_
+disable delayed work and set the discovery state to DISCOVERY_STOPPED.
+
+This change does a small improvement since it is not mandatory the
+user stops scanning before connecting anymore. Moreover, this change
+is required by upcoming LE auto connection mechanism in order to work
+properly with controllers that don't support background scanning and
+connection establishment at the same time.
+
+In future, we might want to do a small optimization by checking if
+controller is able to scan and connect at the same time. For now,
+we want the simplest approach so we always stop scanning (even if
+the controller is able to carry out both operations).
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c   |  6 ------
- net/bluetooth/l2cap_core.c | 12 ++++++++++--
- net/bluetooth/mgmt.c       | 16 +++++++++++++---
- 3 files changed, 23 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_conn.c    | 92 ++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 91 insertions(+), 2 deletions(-)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 1bb45a4..c3834d3 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -356,6 +356,7 @@ enum {
+ 
+ /* ---- HCI Error Codes ---- */
+ #define HCI_ERROR_AUTH_FAILURE		0x05
++#define HCI_ERROR_MEMORY_EXCEEDED	0x07
+ #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
+ #define HCI_ERROR_REJ_BAD_ADDR		0x0f
+ #define HCI_ERROR_REMOTE_USER_TERM	0x13
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 5c392aa..46b2713 100644
+index dc8aad9..2b8bfda 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -659,12 +659,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (conn)
- 		return ERR_PTR(-EBUSY);
+@@ -594,12 +594,86 @@ static int hci_create_le_conn(struct hci_conn *conn)
+ 	return 0;
+ }
  
--	/* Convert from L2CAP channel address type to HCI address type */
--	if (dst_type == BDADDR_LE_PUBLIC)
--		dst_type = ADDR_LE_DEV_PUBLIC;
--	else
--		dst_type = ADDR_LE_DEV_RANDOM;
--
- 	/* When given an identity address with existing identity
- 	 * resolving key, the connection needs to be established
- 	 * to a resolvable random address.
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index ab5e2bd..9ed2168 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7108,11 +7108,19 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 
- 	auth_type = l2cap_get_auth_type(chan);
- 
--	if (bdaddr_type_is_le(dst_type))
-+	if (bdaddr_type_is_le(dst_type)) {
-+		/* Convert from L2CAP channel address type to HCI address type
-+		 */
-+		if (dst_type == BDADDR_LE_PUBLIC)
-+			dst_type = ADDR_LE_DEV_PUBLIC;
-+		else
-+			dst_type = ADDR_LE_DEV_RANDOM;
++static void hci_req_add_le_create_conn(struct hci_request *req,
++				       struct hci_conn *conn)
++{
++	struct hci_cp_le_create_conn cp;
++	struct hci_dev *hdev = conn->hdev;
++	u8 own_addr_type;
 +
- 		hcon = hci_connect_le(hdev, dst, dst_type, chan->sec_level,
- 				      auth_type);
--	else
++	memset(&cp, 0, sizeof(cp));
++
++	/* Update random address, but set require_privacy to false so
++	 * that we never connect with an unresolvable address.
++	 */
++	if (hci_update_random_address(req, false, &own_addr_type))
++		return;
++
++	/* Save the address type used for this connnection attempt so we able
++	 * to retrieve this information if we need it.
++	 */
++	conn->src_type = own_addr_type;
++
++	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
++	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
++	bacpy(&cp.peer_addr, &conn->dst);
++	cp.peer_addr_type = conn->dst_type;
++	cp.own_address_type = own_addr_type;
++	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
++	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
++	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
++	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
++	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
++
++	hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
++}
++
++static void stop_scan_complete(struct hci_dev *hdev, u8 status)
++{
++	struct hci_request req;
++	struct hci_conn *conn;
++	int err;
++
++	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++	if (!conn)
++		return;
++
++	if (status) {
++		BT_DBG("HCI request failed to stop scanning: status 0x%2.2x",
++		       status);
++
++		hci_dev_lock(hdev);
++		hci_le_conn_failed(conn, status);
++		hci_dev_unlock(hdev);
++		return;
++	}
++
++	/* Since we may have prematurely stopped discovery procedure, we should
++	 * update discovery state.
++	 */
++	cancel_delayed_work(&hdev->le_scan_disable);
++	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++
++	hci_req_init(&req, hdev);
++
++	hci_req_add_le_create_conn(&req, conn);
++
++	err = hci_req_run(&req, create_le_conn_complete);
++	if (err) {
++		hci_dev_lock(hdev);
++		hci_le_conn_failed(conn, HCI_ERROR_MEMORY_EXCEEDED);
++		hci_dev_unlock(hdev);
++		return;
++	}
++}
++
+ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				    u8 dst_type, u8 sec_level, u8 auth_type)
+ {
+ 	struct hci_conn_params *params;
+ 	struct hci_conn *conn;
+ 	struct smp_irk *irk;
++	struct hci_request req;
+ 	int err;
+ 
+ 	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+@@ -675,9 +749,23 @@ static struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
+ 	}
+ 
+-	err = hci_create_le_conn(conn);
+-	if (err)
++	hci_req_init(&req, hdev);
++
++	/* If controller is scanning, we stop it since some controllers are
++	 * not able to scan and connect at the same time.
++	 */
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
++		hci_req_add_le_scan_disable(&req);
++		err = hci_req_run(&req, stop_scan_complete);
 +	} else {
- 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
++		hci_req_add_le_create_conn(&req, conn);
++		err = hci_req_run(&req, create_le_conn_complete);
++	}
++
++	if (err) {
++		hci_conn_del(conn);
+ 		return ERR_PTR(err);
 +	}
  
- 	if (IS_ERR(hcon)) {
- 		err = PTR_ERR(hcon);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9fc7c1d..bad23d5 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2815,12 +2815,22 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	else
- 		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
- 
--	if (cp->addr.type == BDADDR_BREDR)
-+	if (cp->addr.type == BDADDR_BREDR) {
- 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
- 				       auth_type);
--	else
--		conn = hci_connect_le(hdev, &cp->addr.bdaddr, cp->addr.type,
-+	} else {
-+		u8 addr_type;
-+
-+		/* Convert from L2CAP channel address type to HCI address type
-+		 */
-+		if (cp->addr.type == BDADDR_LE_PUBLIC)
-+			addr_type = ADDR_LE_DEV_PUBLIC;
-+		else
-+			addr_type = ADDR_LE_DEV_RANDOM;
-+
-+		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
- 				      sec_level, auth_type);
-+	}
- 
- 	if (IS_ERR(conn)) {
- 		int status;
+ done:
+ 	hci_conn_hold(conn);
 -- 
 1.8.5.4
 
