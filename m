@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 09/17] emulator: Add handling inquiry number of responses
-Date: Wed, 26 Feb 2014 02:57:20 +0100
-Message-ID: <1393379848-4031-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 03/17] shared: Add header for timeout abstraction
+Date: Wed, 26 Feb 2014 02:57:14 +0100
+Message-ID: <1393379848-4031-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -12,92 +12,44 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Conflicts:
-	emulator/btdev.c
-
-Conflicts:
-	emulator/btdev.c
 ---
- emulator/btdev.c | 32 ++++++++++++++++++++++++--------
- 1 file changed, 24 insertions(+), 8 deletions(-)
+ src/shared/timeout.h | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
+ create mode 100644 src/shared/timeout.h
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 722c312..c74258b 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -128,6 +128,8 @@ struct btdev {
- 
- struct inquiry_data {
- 	struct btdev *btdev;
-+	int num_resp;
+diff --git a/src/shared/timeout.h b/src/shared/timeout.h
+new file mode 100644
+index 0000000..c13616f
+--- /dev/null
++++ b/src/shared/timeout.h
+@@ -0,0 +1,27 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
 +
- 	int sent_count;
- };
- 
-@@ -703,6 +705,7 @@ static bool inquiry_callback(void *user_data)
- {
- 	struct inquiry_data *data = user_data;
- 	struct btdev *btdev = data->btdev;
-+	struct bt_hci_evt_inquiry_complete ic;
- 	static int j;
- 	int sent = data->sent_count;
- 	int i;
-@@ -771,20 +774,31 @@ static bool inquiry_callback(void *user_data)
- 		}
- 	}
- 
--	if (i == MAX_BTDEV_ENTRIES) {
--		struct bt_hci_evt_inquiry_complete ic;
-+	/* Check if we sent already required amount of responses*/
-+	if (data->num_resp && data->sent_count == data->num_resp)
-+		goto finish;
- 
--		ic.status = BT_HCI_ERR_SUCCESS;
--		send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
-+	if (i == MAX_BTDEV_ENTRIES) {
-+		if (!data->num_resp)
-+			goto finish;
- 
--		/* reset */
--		btdev->inquiry_id = 0;
-+		/* Reset main iterator so we can start iterate btdev_list
-+		 * from the beggining */
- 		j = 0;
--
--		return false;
- 	}
- 
- 	return true;
++#include <stdbool.h>
 +
-+finish:
-+	/* Note that destroy will be called */
-+	ic.status = BT_HCI_ERR_SUCCESS;
-+	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
++typedef bool (*timeout_func_t)(void *user_data);
++typedef void (*timeout_destroy_func_t)(void *user_data);
 +
-+	/* reset */
-+	btdev->inquiry_id = 0;
-+	j = 0;
-+
-+	return false;
- }
- 
- static void inquiry_destroy(void *user_data)
-@@ -809,6 +823,7 @@ finish:
- 
- static void inquiry_cmd(struct btdev *btdev, const void *cmd)
- {
-+	const struct bt_hci_cmd_inquiry *inq_cmd = cmd;
- 	struct inquiry_data *data;
- 	struct bt_hci_evt_inquiry_complete ic;
- 
-@@ -821,6 +836,7 @@ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
- 
- 	memset(data, 0, sizeof(*data));
- 	data->btdev = btdev;
-+	data->num_resp = inq_cmd->num_resp;
- 
- 	btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
- 				inquiry_callback, data, inquiry_destroy);
++int timeout_add(unsigned int msec, timeout_func_t func, void *user_data,
++					timeout_destroy_func_t destroy);
++void timeout_remove(unsigned int id);
 -- 
 1.8.4
 
