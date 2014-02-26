@@ -1,123 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 16/17] Bluetooth: Create hci_req_add_le_passive_scan helper
-Date: Wed, 26 Feb 2014 20:21:55 -0300
-Message-Id: <1393456916-22701-16-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 17/17] Bluetooth: Update background scan parameters
+Date: Wed, 26 Feb 2014 20:21:56 -0300
+Message-Id: <1393456916-22701-17-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patches creates the public hci_req_add_le_passive_scan helper so
-it can be re-used outside hci_core.c in the next patch.
+If new scanning parameters are set while background scan is running,
+we should restart background scanning so these parameters are updated.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 56 ++++++++++++++++++++++------------------
- 2 files changed, 32 insertions(+), 25 deletions(-)
+ net/bluetooth/mgmt.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4b192d0..79a75ed 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1150,6 +1150,7 @@ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
- void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2e6564e..4c4912e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3924,6 +3924,21 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
  
- void hci_req_add_le_scan_disable(struct hci_request *req);
-+void hci_req_add_le_passive_scan(struct hci_request *req);
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NULL, 0);
  
- struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
- 			       const void *param, u32 timeout);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 0b96f20..bbd085d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5115,6 +5115,36 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
- 
-+void hci_req_add_le_passive_scan(struct hci_request *req)
-+{
-+	struct hci_cp_le_set_scan_param param_cp;
-+	struct hci_cp_le_set_scan_enable enable_cp;
-+	struct hci_dev *hdev = req->hdev;
-+	u8 own_addr_type;
-+
-+	/* Set require_privacy to true to avoid identification from
-+	 * unknown peer devices. Since this is passive scanning, no
-+	 * SCAN_REQ using the local identity should be sent. Mandating
-+	 * privacy is just an extra precaution.
++	/* If background scan is running, restart it so new parameters are
++	 * loaded.
 +	 */
-+	if (hci_update_random_address(req, true, &own_addr_type))
-+		return;
++	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
++	    hdev->discovery.state == DISCOVERY_STOPPED) {
++		struct hci_request req;
 +
-+	memset(&param_cp, 0, sizeof(param_cp));
-+	param_cp.type = LE_SCAN_PASSIVE;
-+	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
-+	param_cp.window = cpu_to_le16(hdev->le_scan_window);
-+	param_cp.own_address_type = own_addr_type;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
-+		    &param_cp);
++		hci_req_init(&req, hdev);
 +
-+	memset(&enable_cp, 0, sizeof(enable_cp));
-+	enable_cp.enable = LE_SCAN_ENABLE;
-+	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
-+	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
-+		    &enable_cp);
-+}
-+
- static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
- {
- 	if (status)
-@@ -5130,8 +5160,6 @@ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
-  */
- void hci_update_background_scan(struct hci_dev *hdev)
- {
--	struct hci_cp_le_set_scan_param param_cp;
--	struct hci_cp_le_set_scan_enable enable_cp;
- 	struct hci_request req;
- 	struct hci_conn *conn;
- 	int err;
-@@ -5151,8 +5179,6 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 
- 		BT_DBG("%s stopping background scanning", hdev->name);
- 	} else {
--		u8 own_addr_type;
--
- 		/* If there is at least one pending LE connection, we should
- 		 * keep the background scan running.
- 		 */
-@@ -5169,27 +5195,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 		if (conn)
- 			return;
- 
--		/* Set require_privacy to true to avoid identification from
--		 * unknown peer devices. Since this is passive scanning, no
--		 * SCAN_REQ using the local identity should be sent. Mandating
--		 * privacy is just an extra precaution.
--		 */
--		if (hci_update_random_address(&req, true, &own_addr_type))
--			return;
--
--		memset(&param_cp, 0, sizeof(param_cp));
--		param_cp.type = LE_SCAN_PASSIVE;
--		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
--		param_cp.window = cpu_to_le16(hdev->le_scan_window);
--		param_cp.own_address_type = own_addr_type;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
--			    &param_cp);
--
--		memset(&enable_cp, 0, sizeof(enable_cp));
--		enable_cp.enable = LE_SCAN_ENABLE;
--		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
--		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
--			    &enable_cp);
++		hci_req_add_le_scan_disable(&req);
 +		hci_req_add_le_passive_scan(&req);
++
++		hci_req_run(&req, NULL);
++	}
++
+ 	hci_dev_unlock(hdev);
  
- 		BT_DBG("%s starting background scanning", hdev->name);
- 	}
+ 	return err;
 -- 
 1.8.5.4
 
