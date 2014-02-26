@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <6A72DFF9-91F8-4207-9A3C-A33CD12383BF@holtmann.org>
+In-Reply-To: <A552BAE1-F573-4940-9E30-CA7AF189D3DD@holtmann.org>
 References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
- <1393362104-12175-18-git-send-email-andre.guedes@openbossa.org> <6A72DFF9-91F8-4207-9A3C-A33CD12383BF@holtmann.org>
+ <1393362104-12175-17-git-send-email-andre.guedes@openbossa.org> <A552BAE1-F573-4940-9E30-CA7AF189D3DD@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Wed, 26 Feb 2014 16:35:38 -0300
-Message-ID: <CACJA=fXtPhW8f6uj0A4uwsau7QMiL=_cuuJ=nJHu8ku9e-t8gw@mail.gmail.com>
-Subject: Re: [PATCH 17/17] Bluetooth: Update background scan parameters
+Date: Wed, 26 Feb 2014 16:35:26 -0300
+Message-ID: <CACJA=fXAhckOMvy+OuZP-+Lh4JGcr9VFq655jSt7G5N4TMNKTQ@mail.gmail.com>
+Subject: Re: [PATCH 16/17] Bluetooth: Create hci_req_add_le_passive_scan helper
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -14,95 +14,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Wed, Feb 26, 2014 at 3:47 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+On Wed, Feb 26, 2014 at 3:44 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Andre,
 >
->> If new scanning parameters are set while background scan is running,
->> we should restart background scanning so these parameters are updated.
+>> This patches creates the hci_req_add_le_passive_scan helper so it can
+>> be re-used in the next patch.
 >>
 >> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 >> ---
->> include/net/bluetooth/hci_core.h |  1 +
->> net/bluetooth/hci_core.c         | 26 ++++++++++++++++++++++++++
->> net/bluetooth/mgmt.c             |  7 +++++++
->> 3 files changed, 34 insertions(+)
->>
->> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hc=
-i_core.h
->> index e0e0eab..8f0ddc8 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -814,6 +814,7 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdad=
-dr_t *addr, u8 addr_type);
->> void hci_pend_le_conns_clear(struct hci_dev *hdev);
->>
->> void hci_update_background_scan(struct hci_dev *hdev);
->> +void hci_restart_background_scan(struct hci_dev *hdev);
->>
->> void hci_uuids_clear(struct hci_dev *hdev);
+>> net/bluetooth/hci_core.c | 54 +++++++++++++++++++++++++++---------------------
+>> 1 file changed, 30 insertions(+), 24 deletions(-)
 >>
 >> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index e776624..f5c0e97 100644
+>> index fb4c961..e776624 100644
 >> --- a/net/bluetooth/hci_core.c
 >> +++ b/net/bluetooth/hci_core.c
->> @@ -5183,3 +5183,29 @@ void hci_update_background_scan(struct hci_dev *h=
-dev)
->>       if (err)
->>               BT_ERR("Failed to run HCI request: err %d", err);
+>> @@ -5095,6 +5095,35 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+>>       hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
 >> }
->> +
->> +static void restart_background_scan_complete(struct hci_dev *hdev, u8 s=
-tatus)
->> +{
->> +     if (status)
->> +             BT_DBG("HCI request failed to restart background scan: "
->> +                    "status 0x%2.2x", status);
->> +}
->> +
->> +void hci_restart_background_scan(struct hci_dev *hdev)
->> +{
->> +     struct hci_request req;
->> +     int err;
->> +
->> +     hci_req_init(&req, hdev);
->> +
->> +     hci_req_add_le_scan_disable(&req);
->> +     hci_req_add_le_passive_scan(&req, hdev);
->> +
->> +     err =3D hci_req_run(&req, restart_background_scan_complete);
->> +     if (err) {
->> +             BT_ERR("Failed to run HCI request: err %d", err);
->> +             return;
->> +     }
->> +
->> +     BT_DBG("%s re-starting background scanning", hdev->name);
->> +}
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 2e6564e..08d52f2 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -3924,6 +3924,13 @@ static int set_scan_params(struct sock *sk, struc=
-t hci_dev *hdev,
 >>
->>       err =3D cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NUL=
-L, 0);
->>
->> +     /* If background scan is running, restart it so new parameters are
->> +      * loaded.
->> +      */
->> +     if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
->> +         hdev->discovery.state =3D=3D DISCOVERY_STOPPED)
->> +             hci_restart_background_scan(hdev);
->> +
+>> +static void hci_req_add_le_passive_scan(struct hci_request *req,
+>> +                                     struct hci_dev *hdev)
+>> +{
 >
-> unless there are some other plans, then put the hci_req directly into the=
- body of the if statement. No need to split this out into a public function=
-. And even you want to use this later, I rather see this confined right now=
- and keep public function to a minimum.
+>         struct hci_dev *hdev = req->hdev;
 
-I'll fix this.
+Sure, my bad.
 
-BR,
+Thanks,
 
 Andre
