@@ -1,75 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 04/17] Bluetooth: Remove unused function
-Date: Wed, 26 Feb 2014 20:21:43 -0300
-Message-Id: <1393456916-22701-4-git-send-email-andre.guedes@openbossa.org>
+Subject: [PATCH v2 06/17] Bluetooth: Move address type conversion to outside hci_connect_le
+Date: Wed, 26 Feb 2014 20:21:45 -0300
+Message-Id: <1393456916-22701-6-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
 References: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes hci_create_le_conn() since it is not used anymore.
+This patch moves address type conversion (L2CAP address type to HCI
+address type) to outside hci_connect_le. This way, we avoid back and
+forth address type conversion in a comming patch.
+
+So hci_connect_le() now expects 'dst_type' parameter in HCI address
+type convention.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_conn.c | 43 -------------------------------------------
- 1 file changed, 43 deletions(-)
+ net/bluetooth/hci_conn.c   |  6 ------
+ net/bluetooth/l2cap_core.c | 12 ++++++++++--
+ net/bluetooth/mgmt.c       | 16 +++++++++++++---
+ 3 files changed, 23 insertions(+), 11 deletions(-)
 
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2b8bfda..296b8ee 100644
+index 5c392aa..46b2713 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -551,49 +551,6 @@ done:
- 	hci_dev_unlock(hdev);
- }
+@@ -659,12 +659,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (conn)
+ 		return ERR_PTR(-EBUSY);
  
--static int hci_create_le_conn(struct hci_conn *conn)
--{
--	struct hci_dev *hdev = conn->hdev;
--	struct hci_cp_le_create_conn cp;
--	struct hci_request req;
--	u8 own_addr_type;
--	int err;
+-	/* Convert from L2CAP channel address type to HCI address type */
+-	if (dst_type == BDADDR_LE_PUBLIC)
+-		dst_type = ADDR_LE_DEV_PUBLIC;
+-	else
+-		dst_type = ADDR_LE_DEV_RANDOM;
 -
--	hci_req_init(&req, hdev);
--
--	memset(&cp, 0, sizeof(cp));
--
--	/* Update random address, but set require_privacy to false so
--	 * that we never connect with an unresolvable address.
--	 */
--	err = hci_update_random_address(&req, false, &own_addr_type);
--	if (err < 0)
--		return err;
--
--	conn->src_type = own_addr_type;
--
--	cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
--	cp.scan_window = cpu_to_le16(hdev->le_scan_window);
--	bacpy(&cp.peer_addr, &conn->dst);
--	cp.peer_addr_type = conn->dst_type;
--	cp.own_address_type = own_addr_type;
--	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
--	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
--	cp.supervision_timeout = __constant_cpu_to_le16(0x002a);
--	cp.min_ce_len = __constant_cpu_to_le16(0x0000);
--	cp.max_ce_len = __constant_cpu_to_le16(0x0000);
--
--	hci_req_add(&req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
--
--	err = hci_req_run(&req, create_le_conn_complete);
--	if (err) {
--		hci_conn_del(conn);
--		return err;
--	}
--
--	return 0;
--}
--
- static void hci_req_add_le_create_conn(struct hci_request *req,
- 				       struct hci_conn *conn)
- {
+ 	/* When given an identity address with existing identity
+ 	 * resolving key, the connection needs to be established
+ 	 * to a resolvable random address.
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ab5e2bd..9ed2168 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7108,11 +7108,19 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
+ 
+ 	auth_type = l2cap_get_auth_type(chan);
+ 
+-	if (bdaddr_type_is_le(dst_type))
++	if (bdaddr_type_is_le(dst_type)) {
++		/* Convert from L2CAP channel address type to HCI address type
++		 */
++		if (dst_type == BDADDR_LE_PUBLIC)
++			dst_type = ADDR_LE_DEV_PUBLIC;
++		else
++			dst_type = ADDR_LE_DEV_RANDOM;
++
+ 		hcon = hci_connect_le(hdev, dst, dst_type, chan->sec_level,
+ 				      auth_type);
+-	else
++	} else {
+ 		hcon = hci_connect_acl(hdev, dst, chan->sec_level, auth_type);
++	}
+ 
+ 	if (IS_ERR(hcon)) {
+ 		err = PTR_ERR(hcon);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 9fc7c1d..bad23d5 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2815,12 +2815,22 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	else
+ 		auth_type = HCI_AT_DEDICATED_BONDING_MITM;
+ 
+-	if (cp->addr.type == BDADDR_BREDR)
++	if (cp->addr.type == BDADDR_BREDR) {
+ 		conn = hci_connect_acl(hdev, &cp->addr.bdaddr, sec_level,
+ 				       auth_type);
+-	else
+-		conn = hci_connect_le(hdev, &cp->addr.bdaddr, cp->addr.type,
++	} else {
++		u8 addr_type;
++
++		/* Convert from L2CAP channel address type to HCI address type
++		 */
++		if (cp->addr.type == BDADDR_LE_PUBLIC)
++			addr_type = ADDR_LE_DEV_PUBLIC;
++		else
++			addr_type = ADDR_LE_DEV_RANDOM;
++
++		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
+ 				      sec_level, auth_type);
++	}
+ 
+ 	if (IS_ERR(conn)) {
+ 		int status;
 -- 
 1.8.5.4
 
