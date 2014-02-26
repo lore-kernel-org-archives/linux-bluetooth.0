@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <A552BAE1-F573-4940-9E30-CA7AF189D3DD@holtmann.org>
+In-Reply-To: <13751D39-57A3-4B04-9E1F-7BC4BE2DF4A7@holtmann.org>
 References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
- <1393362104-12175-17-git-send-email-andre.guedes@openbossa.org> <A552BAE1-F573-4940-9E30-CA7AF189D3DD@holtmann.org>
+ <1393362104-12175-16-git-send-email-andre.guedes@openbossa.org> <13751D39-57A3-4B04-9E1F-7BC4BE2DF4A7@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Wed, 26 Feb 2014 16:35:26 -0300
-Message-ID: <CACJA=fXAhckOMvy+OuZP-+Lh4JGcr9VFq655jSt7G5N4TMNKTQ@mail.gmail.com>
-Subject: Re: [PATCH 16/17] Bluetooth: Create hci_req_add_le_passive_scan helper
+Date: Wed, 26 Feb 2014 16:35:05 -0300
+Message-ID: <CACJA=fWG5CTkoU52wQu5UhGeOY3uVpuo6qj4itv5GVzTzdr2kw@mail.gmail.com>
+Subject: Re: [PATCH 15/17] Bluetooth: Add le_auto_conn file on debugfs
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -14,33 +14,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Wed, Feb 26, 2014 at 3:44 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Wed, Feb 26, 2014 at 3:41 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Andre,
 >
->> This patches creates the hci_req_add_le_passive_scan helper so it can
->> be re-used in the next patch.
+>> This patch adds to debugfs the le_auto_conn file. This file will be
+>> used to test LE auto connection infrastructure.
 >>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> net/bluetooth/hci_core.c | 54 +++++++++++++++++++++++++++---------------------
->> 1 file changed, 30 insertions(+), 24 deletions(-)
+>> To add a new auto connection address we write on le_auto_conn file
+>> following the format <address> <address type> <auto_connect>.
 >>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index fb4c961..e776624 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -5095,6 +5095,35 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
->>       hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
->> }
+>> The <address type> values are:
+>>  * 0 for public address
+>>  * 1 for random address
 >>
->> +static void hci_req_add_le_passive_scan(struct hci_request *req,
->> +                                     struct hci_dev *hdev)
->> +{
+>> The <auto_connect> values are (for more details see struct hci_
+>> conn_params):
+>>  * 0 for disabled
+>>  * 1 for always
+>>  * 2 for link loss
+>>
+>> So for instance, if you want the kernel autonomously establishes
+>> connections with device AA:BB:CC:DD:EE:FF (public address) every
+>> time the device enters in connectable mode (starts advertising),
+>> you should run the command:
+>> $ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>>
+>> To get the list of connection parameters configured in kernel, read
+>> the le_auto_conn file:
+>> $ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>>
+>> Finally, to clear the connection parameters list, write an empty
+>> string:
+>> $ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
+>>
+>> This file is created only if LE is enabled.
 >
->         struct hci_dev *hdev = req->hdev;
+> I wonder if this should be prefixed with a command. For example like this:
+>
+>         "add <address> <address_type> [auto_connect]"
+>         "del <address> <address_type>"
+>         "clr"
 
-Sure, my bad.
+Year, no problem. I'll do like that.
 
-Thanks,
+BR,
 
 Andre
