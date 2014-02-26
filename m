@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <13751D39-57A3-4B04-9E1F-7BC4BE2DF4A7@holtmann.org>
+In-Reply-To: <7BB46396-5302-407C-874A-1DE043378DDE@holtmann.org>
 References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
- <1393362104-12175-16-git-send-email-andre.guedes@openbossa.org> <13751D39-57A3-4B04-9E1F-7BC4BE2DF4A7@holtmann.org>
+ <1393362104-12175-14-git-send-email-andre.guedes@openbossa.org> <7BB46396-5302-407C-874A-1DE043378DDE@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Wed, 26 Feb 2014 16:35:05 -0300
-Message-ID: <CACJA=fWG5CTkoU52wQu5UhGeOY3uVpuo6qj4itv5GVzTzdr2kw@mail.gmail.com>
-Subject: Re: [PATCH 15/17] Bluetooth: Add le_auto_conn file on debugfs
+Date: Wed, 26 Feb 2014 16:34:54 -0300
+Message-ID: <CACJA=fWbr-tYQL9YHSgU=KSFoNWJ3xF=G5YEWBfOqGJO2=740Q@mail.gmail.com>
+Subject: Re: [PATCH 13/17] Bluetooth: Connection parameters and resolvable address
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -14,48 +14,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Wed, Feb 26, 2014 at 3:41 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Wed, Feb 26, 2014 at 3:37 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 > Hi Andre,
 >
->> This patch adds to debugfs the le_auto_conn file. This file will be
->> used to test LE auto connection infrastructure.
->>
->> To add a new auto connection address we write on le_auto_conn file
->> following the format <address> <address type> <auto_connect>.
->>
->> The <address type> values are:
->>  * 0 for public address
->>  * 1 for random address
->>
->> The <auto_connect> values are (for more details see struct hci_
->> conn_params):
->>  * 0 for disabled
->>  * 1 for always
->>  * 2 for link loss
->>
->> So for instance, if you want the kernel autonomously establishes
->> connections with device AA:BB:CC:DD:EE:FF (public address) every
->> time the device enters in connectable mode (starts advertising),
->> you should run the command:
->> $ echo "AA:BB:CC:DD:EE:FF 0 1" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->>
->> To get the list of connection parameters configured in kernel, read
->> the le_auto_conn file:
->> $ cat /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->>
->> Finally, to clear the connection parameters list, write an empty
->> string:
->> $ echo "" > /sys/kernel/debug/bluetooth/hci0/le_auto_conn
->>
->> This file is created only if LE is enabled.
+>> We should only add connection parameters for public, random static and
+>> random private resolvable with IRK. If we allow non-resolvable or
+>> resolvable without IRK, the background scan may run indefinitely. So, to
+>> avoid this undesired behavior, we should check the address type in
+>> hci_conn_params_add().
 >
-> I wonder if this should be prefixed with a command. For example like this:
+> this makes no sense. We should only allow auto-connection from public and=
+ static random addresses. These two are identity addresses.
 >
->         "add <address> <address_type> [auto_connect]"
->         "del <address> <address_type>"
->         "clr"
+> Every IRK has an identity address assigned to it. If you want to auto-con=
+nect a device using a resolvable private address, then the identity address=
+ needs to be programmed into our auto-connection list. The RPA should never=
+ ever go there.
+>
+> That is how connect() works actually. You give it the identity address an=
+d it will use the IRK to match it to the RPA in use. We need to do exactly =
+the same.
+>
+> In addition please keep in mind that userspace only knows about RPA as lo=
+ng as they are not identified. Once they are identified, the kernel will on=
+ly tell us about identity addresses. The RPA will be in all mgmt commands a=
+nd events automatically resolved.
 
-Year, no problem. I'll do like that.
+Ok, so I'll change hci_conn_params_add() to accept public and random
+static addresses only.
 
 BR,
 
