@@ -1,158 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Feb 2014 09:56:45 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH 2/3] android/avrcp: Add control handlers to avrcp-lib
-Message-ID: <20140226075632.GA29630@aemeltch-MOBL1>
-References: <1393336605-2467-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1393336605-2467-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CABBYNZJGQJ9e7+0M_-kQGn=G3648ZRNuwULg+rKQ+tZXEehDkA@mail.gmail.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJGQJ9e7+0M_-kQGn=G3648ZRNuwULg+rKQ+tZXEehDkA@mail.gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH 17/17] Bluetooth: Update background scan parameters
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393362104-12175-18-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 25 Feb 2014 22:47:35 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6A72DFF9-91F8-4207-9A3C-A33CD12383BF@holtmann.org>
+References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org> <1393362104-12175-18-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Andre,
 
-On Tue, Feb 25, 2014 at 04:19:53PM +0200, Luiz Augusto von Dentz wrote:
-> Hi Andrei,
+> If new scanning parameters are set while background scan is running,
+> we should restart background scanning so these parameters are updated.
 > 
-> On Tue, Feb 25, 2014 at 3:56 PM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> > ---
-> >  android/avrcp-lib.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  android/avrcp-lib.h | 12 +++++++++++
-> >  2 files changed, 72 insertions(+)
-> >
-> > diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-> > index 136801e..95e10f2 100644
-> > --- a/android/avrcp-lib.c
-> > +++ b/android/avrcp-lib.c
-> > @@ -56,6 +56,15 @@
-> >  #define AVRCP_PACKET_TYPE_CONTINUING   0x02
-> >  #define AVRCP_PACKET_TYPE_END          0x03
-> >
-> > +/* Capabilities for AVRCP_GET_CAPABILITIES pdu */
-> > +#define CAP_COMPANY_ID         0x02
-> > +#define CAP_EVENTS_SUPPORTED   0x03
-> > +
-> > +/* Company IDs supported by this device */
-> > +static uint32_t company_ids[] = {
-> > +       IEEEID_BTSIG,
-> > +};
-> > +
-> >  #if __BYTE_ORDER == __LITTLE_ENDIAN
-> >
-> >  struct avrcp_header {
-> > @@ -108,6 +117,8 @@ struct avrcp {
-> >         const struct avrcp_passthrough_handler *passthrough_handlers;
-> >         void *passthrough_data;
-> >         unsigned int passthrough_id;
-> > +
-> > +       uint16_t supported_events;
-> >  };
-> >
-> >  void avrcp_shutdown(struct avrcp *session)
-> > @@ -220,6 +231,53 @@ static void set_company_id(uint8_t cid[3], const uint32_t cid_in)
-> >         cid[2] = cid_in;
-> >  }
-> >
-> > +static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
-> > +                               uint8_t transaction, uint16_t *params_len,
-> > +                               uint8_t *params, void *user_data)
-> > +{
-> > +       unsigned int i;
-> > +
-> > +       DBG("id %d params_len %d", params[0], *params_len);
-> > +
-> > +       if (*params_len != 1)
-> > +               goto fail;
-> > +
-> > +       switch (params[0]) {
-> > +       case CAP_COMPANY_ID:
-> > +               for (i = 0; i < G_N_ELEMENTS(company_ids); i++)
-> > +                       set_company_id(&params[2 + i * 3], company_ids[i]);
-> > +
-> > +               *params_len = 2 + (3 * G_N_ELEMENTS(company_ids));
-> > +               params[1] = G_N_ELEMENTS(company_ids);
-> > +
-> > +               return AVC_CTYPE_STABLE;
-> > +       case CAP_EVENTS_SUPPORTED:
-> > +               params[1] = 0;
-> > +               for (i = 1; i <= AVRCP_EVENT_LAST; i++) {
-> > +                       if (session->supported_events & (1 << i)) {
-> > +                               params[1]++;
-> > +                               params[params[1] + 1] = i;
-> > +                       }
-> > +               }
-> > +
-> > +               *params_len = 2 + params[1];
-> > +
-> > +               return AVC_CTYPE_STABLE;
-> > +       }
-> > +
-> > +fail:
-> > +       *params_len = htons(1);
-> > +       params[0] = AVRCP_STATUS_INVALID_PARAM;
-> > +
-> > +       return AVC_CTYPE_REJECTED;
-> > +}
-> > +
-> > +static const struct avrcp_control_handler control_handlers[] = {
-> > +               { AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
-> > +                                       avrcp_handle_get_capabilities },
-> > +               { },
-> > +};
-> > +
-> >  struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
-> >  {
-> >         struct avrcp *session;
-> > @@ -241,6 +299,8 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
-> >                                                         handle_vendordep_pdu,
-> >                                                         session);
-> >
-> > +       avrcp_set_control_handlers(session, control_handlers, NULL);
-> > +
-> >         return session;
-> >  }
-> >
-> > diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-> > index 4f3a632..0821287 100644
-> > --- a/android/avrcp-lib.h
-> > +++ b/android/avrcp-lib.h
-> > @@ -46,6 +46,18 @@
-> >  #define AVRCP_ADD_TO_NOW_PLAYING       0x90
-> >  #define AVRCP_GENERAL_REJECT           0xA0
-> >
-> > +/* Notification events */
-> > +#define AVRCP_EVENT_STATUS_CHANGED             0x01
-> > +#define AVRCP_EVENT_TRACK_CHANGED              0x02
-> > +#define AVRCP_EVENT_TRACK_REACHED_END          0x03
-> > +#define AVRCP_EVENT_TRACK_REACHED_START                0x04
-> > +#define AVRCP_EVENT_SETTINGS_CHANGED           0x08
-> > +#define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED  0x0a
-> > +#define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED   0x0b
-> > +#define AVRCP_EVENT_UIDS_CHANGED               0x0c
-> > +#define AVRCP_EVENT_VOLUME_CHANGED             0x0d
-> > +#define AVRCP_EVENT_LAST                       AVRCP_EVENT_VOLUME_CHANGED
-> > +
-> >  struct avrcp;
-> >
-> >  struct avrcp_control_handler {
-> > --
-> > 1.8.3.2
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/hci_core.c         | 26 ++++++++++++++++++++++++++
+> net/bluetooth/mgmt.c             |  7 +++++++
+> 3 files changed, 34 insertions(+)
 > 
-> That is the actual AVRCP implementation not the library, the library
-> only offer means to handle the commands but don't parse it there since
-> we can't do anything with it. For unit tests you can implement dummy
-> handlers as we did for passthrough.
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e0e0eab..8f0ddc8 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -814,6 +814,7 @@ void hci_pend_le_conn_del(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
+> void hci_pend_le_conns_clear(struct hci_dev *hdev);
+> 
+> void hci_update_background_scan(struct hci_dev *hdev);
+> +void hci_restart_background_scan(struct hci_dev *hdev);
+> 
+> void hci_uuids_clear(struct hci_dev *hdev);
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index e776624..f5c0e97 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -5183,3 +5183,29 @@ void hci_update_background_scan(struct hci_dev *hdev)
+> 	if (err)
+> 		BT_ERR("Failed to run HCI request: err %d", err);
+> }
+> +
+> +static void restart_background_scan_complete(struct hci_dev *hdev, u8 status)
+> +{
+> +	if (status)
+> +		BT_DBG("HCI request failed to restart background scan: "
+> +		       "status 0x%2.2x", status);
+> +}
+> +
+> +void hci_restart_background_scan(struct hci_dev *hdev)
+> +{
+> +	struct hci_request req;
+> +	int err;
+> +
+> +	hci_req_init(&req, hdev);
+> +
+> +	hci_req_add_le_scan_disable(&req);
+> +	hci_req_add_le_passive_scan(&req, hdev);
+> +
+> +	err = hci_req_run(&req, restart_background_scan_complete);
+> +	if (err) {
+> +		BT_ERR("Failed to run HCI request: err %d", err);
+> +		return;
+> +	}
+> +
+> +	BT_DBG("%s re-starting background scanning", hdev->name);
+> +}
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 2e6564e..08d52f2 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3924,6 +3924,13 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+> 
+> 	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_SCAN_PARAMS, 0, NULL, 0);
+> 
+> +	/* If background scan is running, restart it so new parameters are
+> +	 * loaded.
+> +	 */
+> +	if (test_bit(HCI_LE_SCAN, &hdev->dev_flags) &&
+> +	    hdev->discovery.state == DISCOVERY_STOPPED)
+> +		hci_restart_background_scan(hdev);
+> +
 
-I can implement dummy handlers but this would mean that we are testing
-that dummy handlers. Is the idea to test actual production code?
+unless there are some other plans, then put the hci_req directly into the body of the if statement. No need to split this out into a public function. And even you want to use this later, I rather see this confined right now and keep public function to a minimum.
 
-Best regards 
-Andrei Emeltchenko 
+Regards
+
+Marcel
+
