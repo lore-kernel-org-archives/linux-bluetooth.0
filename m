@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 06/23] android/hal-gatt-api: Add Client Disconnect Remote
-Date: Wed, 26 Feb 2014 09:41:04 +0100
-Message-Id: <1393404081-1401-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 05/23] android/hal-gatt-api: Add Client Connect Remote
+Date: Wed, 26 Feb 2014 09:41:03 +0100
+Message-Id: <1393404081-1401-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,37 +16,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  2 files changed, 15 insertions(+)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index bbb94a9..ffc903a 100644
+index 51aaba1..bbb94a9 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1452,6 +1452,14 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+@@ -1443,6 +1443,14 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
  		In case of an error, the error response will be returned.
  
- 	Opcode 0x05 - Disconnect Device command/response
+ 	Opcode 0x04 - Connect Device command/response
 +
 +		Command parameters: Client Interface (4 octets)
 +		                    Remote address (6 octets)
-+		                    Connection ID (4 octets)
++		                    Is Direct (1 octet)
 +		Response parameters: <none>
 +
 +		In case of an error, the error response will be returned.
 +
+ 	Opcode 0x05 - Disconnect Device command/response
  	Opcode 0x06 - Listen command/response
  	Opcode 0x07 - Refresh command/response
- 	Opcode 0x08 - Search Service command/response
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 22b65c2..d8a990d 100644
+index 089c950..22b65c2 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -541,6 +541,13 @@ struct hal_cmd_gatt_client_connect {
- 	uint8_t is_direct;
+@@ -534,6 +534,13 @@ struct hal_cmd_gatt_client_scan {
+ 	uint8_t start;
  } __attribute__((packed));
  
-+#define HAL_OP_GATT_CLIENT_DISCONNECT		0x05
-+struct hal_cmd_gatt_client_disconnect {
++#define HAL_OP_GATT_CLIENT_CONNECT		0x04
++struct hal_cmd_gatt_client_connect {
 +	int32_t client_if;
 +	uint8_t bdaddr[6];
-+	int32_t conn_id;
++	uint8_t is_direct;
 +} __attribute__((packed));
 +
  /* Notifications and confirmations */
