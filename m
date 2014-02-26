@@ -1,105 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <C16121F0-C942-4E45-9D4A-089D22195D12@holtmann.org>
-References: <1393362104-12175-1-git-send-email-andre.guedes@openbossa.org>
- <1393362104-12175-4-git-send-email-andre.guedes@openbossa.org> <C16121F0-C942-4E45-9D4A-089D22195D12@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-Date: Wed, 26 Feb 2014 16:34:04 -0300
-Message-ID: <CACJA=fW8hNKv5i_uDMTGP258A9QDT0KFGZbDRZ0vxYqZNdKr_A@mail.gmail.com>
-Subject: Re: [PATCH 03/17] Bluetooth: Stop scanning on LE connection
-To: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393425134-12702-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393425134-12702-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 26 Feb 2014 18:31:08 +0100
+Message-ID: <CABBYNZLrtQY+THi7SEPH3uzf6sgFC14S2AFFJq8mPP5UM_wz3g@mail.gmail.com>
+Subject: Re: [PATCHv2] android/avrcp: Add avrcp_get_capabilities request
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On Wed, Feb 26, 2014 at 3:23 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andre,
+On Wed, Feb 26, 2014 at 3:32 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
->> Some LE controllers don't support scanning and creating a connection
->> at the same time. So we should always stop scanning in order to
->> establish the connection.
->>
->> Since we may prematurely stop the discovery procedure in favor of
->> the connection establishment, we should also cancel hdev->le_scan_
->> disable delayed work and set the discovery state to DISCOVERY_STOPPED.
->>
->> This change does a small improvement since it is not mandatory the
->> user stops scanning before connecting anymore. Moreover, this change
->> is required by upcoming LE auto connection mechanism in order to work
->> properly with controllers that don't support background scanning and
->> connection establishment at the same time.
->>
->> In future, we might want to do a small optimization by checking if
->> controller is able to scan and connect at the same time. For now,
->> we want the simplest approach so we always stop scanning (even if
->> the controller is able to carry out both operations).
->>
->> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
->> ---
->> include/net/bluetooth/hci.h |  1 +
->> net/bluetooth/hci_conn.c    | 89 ++++++++++++++++++++++++++++++++++++++++++++-
->> 2 files changed, 88 insertions(+), 2 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->> index 1bb45a4..c3834d3 100644
->> --- a/include/net/bluetooth/hci.h
->> +++ b/include/net/bluetooth/hci.h
->> @@ -356,6 +356,7 @@ enum {
->>
->> /* ---- HCI Error Codes ---- */
->> #define HCI_ERROR_AUTH_FAILURE                0x05
->> +#define HCI_ERROR_MEMORY_EXCEEDED    0x07
->> #define HCI_ERROR_CONNECTION_TIMEOUT  0x08
->> #define HCI_ERROR_REJ_BAD_ADDR                0x0f
->> #define HCI_ERROR_REMOTE_USER_TERM    0x13
->> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
->> index dc8aad9..ae2c3e1 100644
->> --- a/net/bluetooth/hci_conn.c
->> +++ b/net/bluetooth/hci_conn.c
->> @@ -594,12 +594,83 @@ static int hci_create_le_conn(struct hci_conn *conn)
->>       return 0;
->> }
->>
->> +static void hci_req_add_le_create_conn(struct hci_request *req,
->> +                                    struct hci_conn *conn)
->> +{
->> +     struct hci_cp_le_create_conn cp;
->> +     struct hci_dev *hdev = conn->hdev;
->> +     u8 own_addr_type;
->> +
->> +     memset(&cp, 0, sizeof(cp));
->> +
->> +     /* Update random address, but set require_privacy to false so
->> +      * that we never connect with an unresolvable address.
->> +      */
->> +     if (hci_update_random_address(req, false, &own_addr_type))
->> +             return;
->> +
->> +     conn->src_type = own_addr_type;
->> +
->> +     cp.scan_interval = cpu_to_le16(hdev->le_scan_interval);
->> +     cp.scan_window = cpu_to_le16(hdev->le_scan_window);
->> +     bacpy(&cp.peer_addr, &conn->dst);
->> +     cp.peer_addr_type = conn->dst_type;
->> +     cp.own_address_type = conn->src_type;
+> Implement avrcp_get_capabilities() request through
+> avrcp_send_vendordep_req(). avctp_send_req() is not exported so we use
+> the functions which are exported by AVCTP code.
+> ---
+>  android/avrcp-lib.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/avrcp-lib.h |  2 ++
+>  android/avrcp.c     |  1 +
+>  3 files changed, 51 insertions(+)
 >
-> the reason why you get the own_addr_type when setting the random address is to actually use it here.
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index 2e5a565..cf4cdaa 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -50,6 +50,18 @@
+>  #define AVRCP_STATUS_NO_AVAILABLE_PLAYERS      0x15
+>  #define AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED  0x16
 >
-> This is important since in cases where LE Privacy is enabled and we are using RPA, we want the random address used.
+> +/* Packet types */
+> +#define AVRCP_PACKET_TYPE_SINGLE               0x00
+> +#define AVRCP_PACKET_TYPE_START                        0x01
+> +#define AVRCP_PACKET_TYPE_CONTINUING           0x02
+> +#define AVRCP_PACKET_TYPE_END                  0x03
+> +
+> +/* Capabilities for AVRCP_GET_CAPABILITIES pdu */
+> +#define CAP_COMPANY_ID                         0x02
+> +#define CAP_EVENTS_SUPPORTED                   0x03
+> +
+> +#define AVRCP_GET_CAPABILITIES_PARAM_LENGTH    1
+> +
+>  #if __BYTE_ORDER == __LITTLE_ENDIAN
+>
+>  struct avrcp_header {
+> @@ -92,6 +104,13 @@ static inline uint32_t ntoh24(const uint8_t src[3])
+>  #error "Unknown byte order"
+>  #endif
+>
+> +static inline void hton24(uint8_t dst[3], uint32_t src)
+> +{
+> +       dst[0] = (src >> 16) & 0xff;
+> +       dst[1] = (src >> 8) & 0xff;
+> +       dst[2] = src & 0xff;
+> +}
+> +
+>  struct avrcp {
+>         struct avctp *conn;
+>
+> @@ -255,3 +274,32 @@ int avrcp_init_uinput(struct avrcp *session, const char *name,
+>  {
+>         return avctp_init_uinput(session->conn, name, address);
+>  }
+> +
+> +static int avrcp_send_vendordep_req(struct avrcp *session, uint8_t code,
+> +                                       uint8_t subunit, uint8_t *operands,
+> +                                       size_t operand_count,
+> +                                       avctp_rsp_cb func, void *user_data)
+> +{
+> +       return avctp_send_vendordep_req(session->conn, code, subunit, operands,
+> +                                               operand_count, func, user_data);
+> +}
+> +
+> +void avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func)
+> +{
+> +       uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_GET_CAPABILITIES_PARAM_LENGTH];
+> +       struct avrcp_header *pdu = (void *) buf;
+> +       uint8_t length;
+> +
+> +       memset(buf, 0, sizeof(buf));
+> +
+> +       hton24(pdu->company_id, IEEEID_BTSIG);
+> +       pdu->pdu_id = AVRCP_GET_CAPABILITIES;
+> +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+> +       pdu->params[0] = CAP_EVENTS_SUPPORTED;
+> +       pdu->params_len = htons(AVRCP_GET_CAPABILITIES_PARAM_LENGTH);
+> +
+> +       length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
+> +
+> +       avrcp_send_vendordep_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+> +                                               buf, length, func, session);
+> +}
+> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> index 2337429..4f3a632 100644
+> --- a/android/avrcp-lib.h
+> +++ b/android/avrcp-lib.h
+> @@ -74,3 +74,5 @@ void avrcp_set_passthrough_handlers(struct avrcp *session,
+>                         void *user_data);
+>  int avrcp_init_uinput(struct avrcp *session, const char *name,
+>                                                         const char *address);
+> +
+> +void avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func);
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index 48444a4..3d39d91 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -36,6 +36,7 @@
+>  #include "bluetooth.h"
+>  #include "hal-msg.h"
+>  #include "ipc.h"
+> +#include "avctp.h"
+>  #include "avrcp-lib.h"
+>  #include "avrcp.h"
+>
+> --
+> 1.8.3.2
 
-Year, I'm aware of it. 'own_addr_type' is assigned to
-'conn->src_type'. Then, 'conn->src_type' is used in
-'cp.own_address_type'.
+Applied after changing it quite a bit.
 
-IOW:
-        conn->src_type = own_addr_type;
-        ...
-        cp.own_address_type = conn->src_type;
 
-Or am I missing something?
-
-BR,
-
-Andre
+-- 
+Luiz Augusto von Dentz
