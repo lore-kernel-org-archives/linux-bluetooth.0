@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 06/17] emulator: Minor style fix
-Date: Wed, 26 Feb 2014 02:57:17 +0100
-Message-ID: <1393379848-4031-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 14/17] android/tester: Increase timeout for test failure
+Date: Wed, 26 Feb 2014 02:57:25 +0100
+Message-ID: <1393379848-4031-15-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -12,36 +12,26 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Inquiry command is sent with inquiry lenght 10.24 sec. There are
+testcases where that time is needed to end the test, therefore change
+timeout to 12 sec (number choosed based on strong feelings ;))
 ---
- emulator/btdev.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/android-tester.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index c7231dd..c6bf96c 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -708,8 +708,8 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
- 			ir.rssi = -60;
- 			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
+diff --git a/android/android-tester.c b/android/android-tester.c
+index 65516c1..b09834a 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -3707,7 +3707,7 @@ static void test_hidhost_get_report(const void *test_data)
+ 		user->test_data = data; \
+ 		tester_add_full(name, data, test_pre_setup, test_setup, \
+ 				test, test_teardown, test_post_teardown, \
+-							3, user, g_free); \
++							12, user, g_free); \
+ 	} while (0)
  
--			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
--							&ir, sizeof(ir));
-+			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT, &ir,
-+								sizeof(ir));
- 			continue;
- 		}
- 
-@@ -737,8 +737,8 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
- 			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
- 			ir.clock_offset = 0x0000;
- 
--			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
--							&ir, sizeof(ir));
-+			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT, &ir,
-+								sizeof(ir));
- 		}
-         }
- 
+ int main(int argc, char *argv[])
 -- 
 1.8.4
 
