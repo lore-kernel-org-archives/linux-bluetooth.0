@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 05/17] shared: Add timeout handling with mainloop support
-Date: Wed, 26 Feb 2014 02:57:16 +0100
-Message-ID: <1393379848-4031-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 06/17] emulator: Minor style fix
+Date: Wed, 26 Feb 2014 02:57:17 +0100
+Message-ID: <1393379848-4031-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,94 +13,35 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/shared/timeout-mainloop.c | 78 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
- create mode 100644 src/shared/timeout-mainloop.c
+ emulator/btdev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
-new file mode 100644
-index 0000000..bdc527a
---- /dev/null
-+++ b/src/shared/timeout-mainloop.c
-@@ -0,0 +1,78 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#include <stdlib.h>
-+
-+#include "timeout.h"
-+
-+#include "monitor/mainloop.h"
-+
-+struct timeout_data {
-+	int id;
-+	timeout_func_t func;
-+	timeout_destroy_func_t destroy;
-+	unsigned int timeout;
-+	void *user_data;
-+};
-+
-+static void timeout_callback(int id, void *user_data)
-+{
-+	struct timeout_data *data = user_data;
-+
-+	if (data->func(data->user_data) &&
-+		!mainloop_modify_timeout(data->id, data->timeout))
-+		return;
-+
-+	mainloop_remove_timeout(data->id);
-+}
-+
-+static void timeout_destroy(void *user_data)
-+{
-+	struct timeout_data *data = user_data;
-+
-+	if (data->destroy)
-+		data->destroy(data->user_data);
-+
-+	free(data);
-+}
-+
-+int timeout_add(unsigned int t, timeout_func_t func, void *user_data,
-+						timeout_destroy_func_t destroy)
-+{
-+	struct timeout_data *data = malloc(sizeof(*data));
-+
-+	data->func = func;
-+	data->user_data = user_data;
-+	data->timeout = t;
-+
-+	data->id = mainloop_add_timeout(t, timeout_callback, data,
-+							timeout_destroy);
-+	if (!data->id) {
-+		free(data);
-+		return 0;
-+	}
-+
-+	return data->id;
-+}
-+
-+void timeout_remove(unsigned int id)
-+{
-+	if (id)
-+		mainloop_remove_timeout(id);
-+}
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index c7231dd..c6bf96c 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -708,8 +708,8 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ 			ir.rssi = -60;
+ 			memcpy(ir.data, btdev_list[i]->ext_inquiry_rsp, 240);
+ 
+-			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
+-							&ir, sizeof(ir));
++			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT, &ir,
++								sizeof(ir));
+ 			continue;
+ 		}
+ 
+@@ -737,8 +737,8 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ 			memcpy(ir.dev_class, btdev_list[i]->dev_class, 3);
+ 			ir.clock_offset = 0x0000;
+ 
+-			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
+-							&ir, sizeof(ir));
++			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT, &ir,
++								sizeof(ir));
+ 		}
+         }
+ 
 -- 
 1.8.4
 
