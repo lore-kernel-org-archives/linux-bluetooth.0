@@ -2,51 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 05/23] android/hal-gatt-api: Add Client Connect Remote
-Date: Wed, 26 Feb 2014 09:41:03 +0100
-Message-Id: <1393404081-1401-6-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 04/23] android/hal-gatt-api: Add Client Scan
+Date: Wed, 26 Feb 2014 09:41:02 +0100
+Message-Id: <1393404081-1401-5-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-ipc-api.txt | 8 ++++++++
- android/hal-msg.h       | 7 +++++++
- 2 files changed, 15 insertions(+)
+ android/hal-ipc-api.txt | 7 +++++++
+ android/hal-msg.h       | 6 ++++++
+ 2 files changed, 13 insertions(+)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 51aaba1..bbb94a9 100644
+index 53fa5b9..51aaba1 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1443,6 +1443,14 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+@@ -1435,6 +1435,13 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
  		In case of an error, the error response will be returned.
  
- 	Opcode 0x04 - Connect Device command/response
+ 	Opcode 0x03 - Scan command/response
 +
 +		Command parameters: Client Interface (4 octets)
-+		                    Remote address (6 octets)
-+		                    Is Direct (1 octet)
++		                    Start (1 octet)
 +		Response parameters: <none>
 +
 +		In case of an error, the error response will be returned.
 +
+ 	Opcode 0x04 - Connect Device command/response
  	Opcode 0x05 - Disconnect Device command/response
  	Opcode 0x06 - Listen command/response
- 	Opcode 0x07 - Refresh command/response
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 089c950..22b65c2 100644
+index 856d694..089c950 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -534,6 +534,13 @@ struct hal_cmd_gatt_client_scan {
- 	uint8_t start;
+@@ -528,6 +528,12 @@ struct hal_cmd_gatt_client_unregister {
+ 	int32_t client_if;
  } __attribute__((packed));
  
-+#define HAL_OP_GATT_CLIENT_CONNECT		0x04
-+struct hal_cmd_gatt_client_connect {
++#define HAL_OP_GATT_CLIENT_SCAN			0x03
++struct hal_cmd_gatt_client_scan {
 +	int32_t client_if;
-+	uint8_t bdaddr[6];
-+	uint8_t is_direct;
++	uint8_t start;
 +} __attribute__((packed));
 +
  /* Notifications and confirmations */
