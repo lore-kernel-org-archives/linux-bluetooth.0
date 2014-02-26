@@ -1,44 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <63DA7E43-4B20-4CF9-8539-3BBE1A7EBD21@holtmann.org>
-References: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
- <1393404081-1401-2-git-send-email-jakub.tyszkowski@tieto.com> <63DA7E43-4B20-4CF9-8539-3BBE1A7EBD21@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Wed, 26 Feb 2014 12:34:29 +0100
-Message-ID: <CAF3PWx18FXpEN7wxn6v3hncD_8nYdHs1J0Fevd7pOhQr=YuNVw@mail.gmail.com>
-Subject: Re: [PATCHv2 01/23] android/hal-gatt-api: Add missing opcodes in GATT Service
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1393379848-4031-11-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1393379848-4031-11-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 26 Feb 2014 11:32:06 +0100
+Message-ID: <CAMudyAuuSjs8qgR__JTdVw57rZS_7y5CNnoS19+xDWt=ouPRdA@mail.gmail.com>
+Subject: Re: [PATCH 10/17] emulator: Add handling inquiry_lenght from inquiry command
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On 26 February 2014 09:51, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Jakub,
+On 26 February 2014 02:57, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> ---
+>  emulator/btdev.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
 >
->> Add missing Listen and Set Advertising Data opcodes and reorder them as
->> they appear in HAL's headers.
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index c74258b..bf0c9d2 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -129,8 +129,10 @@ struct btdev {
+>  struct inquiry_data {
+>         struct btdev *btdev;
+>         int num_resp;
+> +       int max_iter; /* Calculated from inquiry_lenght */
 >
-> I left this out originally since they are only useful for when we are a p=
-eripheral. Curious to know if Android APIs actually support this.
+>         int sent_count;
+> +       int iter;
+>  };
+>
+>  #define DEFAULT_INQUIRY_INTERVAL 2 /* 2 miliseconds */
+> @@ -778,8 +780,12 @@ static bool inquiry_callback(void *user_data)
+>         if (data->num_resp && data->sent_count == data->num_resp)
+>                 goto finish;
+>
+> +       /* Check if we already spent as much time as required */
+> +       if (data->max_iter && data->iter++ == data->max_iter)
+> +               goto finish;
+> +
+>         if (i == MAX_BTDEV_ENTRIES) {
+> -               if (!data->num_resp)
+> +               if (!data->max_iter && !data->num_resp)
+>                         goto finish;
+>
+>                 /* Reset main iterator so we can start iterate btdev_list
+> @@ -826,6 +832,7 @@ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+>         const struct bt_hci_cmd_inquiry *inq_cmd = cmd;
+>         struct inquiry_data *data;
+>         struct bt_hci_evt_inquiry_complete ic;
+> +       unsigned int inquiry_len_ms = 128 * inq_cmd->length;
+>
+>         if (btdev->inquiry_id)
+>                 return;
+> @@ -838,6 +845,9 @@ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+>         data->btdev = btdev;
+>         data->num_resp = inq_cmd->num_resp;
+>
+> +       if (inquiry_len_ms)
+> +               data->max_iter = inquiry_len_ms / DEFAULT_INQUIRY_INTERVAL;
+> +
+>         btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
+>                                 inquiry_callback, data, inquiry_destroy);
+>         /* Return if success */
+> --
+> 1.8.4
+>
 
-It does, but not as public API - internal apps can still use them but
-only if platform has config_bluetooth_le_peripheral_mode_supported
-flag set, so perhaps this is for some gadgets running Android.
+Do not review this one, I will change the approach here
 
-> GATT client and server are valid for central role. And the connect/discon=
-nect need to be turned into being one pair of commands. No point in duplica=
-ting them. There is really no difference between a GATT client and server c=
-onnect. The central will connect to the peripheral. Unless Android got full=
-y confused and uses the APIs wrongly.
-
-These commands are separated for client and server since they have
-either client or server app id as parameter which is later used to
-dispatch callbacks to proper application. So using one pair of
-commands (and single notification) we can still figure out which
-callback to use in HAL as long as we have 'type' parameter for app id.
-
-BR,
-Andrzej
+\Lukasz
