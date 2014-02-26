@@ -1,34 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 3/5] Bluetooth: Remove unneeded "force" parameter from smp_distribute_keys()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393450427-12438-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 26 Feb 2014 13:47:05 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A4D01643-329A-4CC2-BB30-C0EF8206C36F@holtmann.org>
-References: <1393450427-12438-1-git-send-email-johan.hedberg@gmail.com> <1393450427-12438-3-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5/5] Bluetooth: Fix disconnecting connections in non-connected states
+Date: Wed, 26 Feb 2014 23:33:47 +0200
+Message-Id: <1393450427-12438-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1393450427-12438-1-git-send-email-johan.hedberg@gmail.com>
+References: <1393450427-12438-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> Now that to-be-received keys are properly tracked we no-longer need the
-> "force" parameter to smp_distribute_keys(). It was essentially acting as
-> an indicator whether all keys have been received, but now it's just
-> redundant together with smp->remote_key_dist.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/l2cap_core.c |  2 +-
-> net/bluetooth/smp.c        | 10 +++++-----
-> net/bluetooth/smp.h        |  2 +-
-> 3 files changed, 7 insertions(+), 7 deletions(-)
+When powering off and disconnecting devices we should also consider
+connections which have not yet reached the BT_CONNECTED state. They may
+not have a valid handle yet and simply sending a HCI_Disconnect will not
+work.
 
-patches 1-3 have been applied to bluetooth-next tree.
+This patch updates the code to either disconnect, cancel connection
+creation or reject incoming connection creation based on the current
+conn->state value as well as the link type in question.
 
-Regards
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 32 ++++++++++++++++++++++++++++----
+ 1 file changed, 28 insertions(+), 4 deletions(-)
 
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index d6e269287cfc..d09e84fb7c3f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1061,10 +1061,34 @@ static int clean_up_hci_state(struct hci_dev *hdev)
+ 
+ 	list_for_each_entry(conn, &hdev->conn_hash.list, list) {
+ 		struct hci_cp_disconnect dc;
+-
+-		dc.handle = cpu_to_le16(conn->handle);
+-		dc.reason = 0x15; /* Terminated due to Power Off */
+-		hci_req_add(&req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
++		struct hci_cp_reject_conn_req rej;
++
++		switch (conn->state) {
++		case BT_CONNECTED:
++		case BT_CONFIG:
++			dc.handle = cpu_to_le16(conn->handle);
++			dc.reason = 0x15; /* Terminated due to Power Off */
++			hci_req_add(&req, HCI_OP_DISCONNECT, sizeof(dc), &dc);
++			break;
++		case BT_CONNECT:
++			if (conn->type == LE_LINK)
++				hci_req_add(&req, HCI_OP_LE_CREATE_CONN_CANCEL,
++					    0, NULL);
++			else if (conn->type == ACL_LINK)
++				hci_req_add(&req, HCI_OP_CREATE_CONN_CANCEL,
++					    6, &conn->dst);
++			break;
++		case BT_CONNECT2:
++			bacpy(&rej.bdaddr, &conn->dst);
++			rej.reason = 0x15; /* Terminated due to Power Off */
++			if (conn->type == ACL_LINK)
++				hci_req_add(&req, HCI_OP_REJECT_CONN_REQ,
++					    sizeof(rej), &rej);
++			else if (conn->type == SCO_LINK)
++				hci_req_add(&req, HCI_OP_REJECT_SYNC_CONN_REQ,
++					    sizeof(rej), &rej);
++			break;
++		}
+ 	}
+ 
+ 	return hci_req_run(&req, clean_up_hci_complete);
+-- 
+1.8.5.3
 
