@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] android/avrcp: Add avrcp_get_capabilities request
-Date: Wed, 26 Feb 2014 16:32:14 +0200
-Message-Id: <1393425134-12702-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/avrcp: Add avrcp_get_capabilities request
+Date: Wed, 26 Feb 2014 16:26:42 +0200
+Message-Id: <1393424802-11162-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -14,9 +14,8 @@ avrcp_send_vendordep_req(). avctp_send_req() is not exported so we use
 the functions which are exported by AVCTP code.
 ---
  android/avrcp-lib.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/avrcp-lib.h |  2 ++
  android/avrcp.c     |  1 +
- 3 files changed, 51 insertions(+)
+ 2 files changed, 49 insertions(+)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
 index 2e5a565..cf4cdaa 100644
@@ -88,16 +87,6 @@ index 2e5a565..cf4cdaa 100644
 +	avrcp_send_vendordep_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
 +						buf, length, func, session);
 +}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 2337429..4f3a632 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -74,3 +74,5 @@ void avrcp_set_passthrough_handlers(struct avrcp *session,
- 			void *user_data);
- int avrcp_init_uinput(struct avrcp *session, const char *name,
- 							const char *address);
-+
-+void avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func);
 diff --git a/android/avrcp.c b/android/avrcp.c
 index 48444a4..3d39d91 100644
 --- a/android/avrcp.c
