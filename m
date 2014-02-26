@@ -1,106 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <530E0AD3.7040909@hurleysoftware.com>
-References: <1393072281-5814-1-git-send-email-peter@hurleysoftware.com>
-	<CA++bM2uq=vRo20FTMWvkDau+-X7h0+KU3n4Av7ef895mQKr5fA@mail.gmail.com>
-	<530E0AD3.7040909@hurleysoftware.com>
-Date: Thu, 27 Feb 2014 11:28:59 +0800
-Message-ID: <CA++bM2vjzFOt5wmc=TQ1XMvRCwgnpq6=PKpex=GGZBK_-M6=mw@mail.gmail.com>
-Subject: Re: [PATCH] tty: Fix low_latency BUG
-From: Feng Tang <feng.79.tang@gmail.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.cz>, linux-serial@vger.kernel.org,
-	Beat Bolli <bbolli@ewanet.ch>, Pavel Roskin <proski@gnu.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Jiri Kosina <jkosina@suse.cz>, David Sterba <dsterba@suse.cz>,
-	Felipe Balbi <balbi@ti.com>,
-	Grant Edwards <grant.b.edwards@gmail.com>,
-	Stanislaw Gruszka <sgruszka@redhat.com>,
-	Hal Murray <murray+fedora@ip-64-139-1-69.sjc.megapath.net>,
-	Alan Cox <gnomes@lxorguk.ukuu.org.uk>, stable@vger.kernel.org,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	feng.tang@intel.com, bin.yang@intel.com, alek.du@intel.com
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 16/17] Bluetooth: Create hci_req_add_le_passive_scan helper
+Date: Wed, 26 Feb 2014 20:21:55 -0300
+Message-Id: <1393456916-22701-16-git-send-email-andre.guedes@openbossa.org>
+In-Reply-To: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
+References: <1393456916-22701-1-git-send-email-andre.guedes@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Peter,
+This patches creates the public hci_req_add_le_passive_scan helper so
+it can be re-used outside hci_core.c in the next patch.
 
-2014-02-26 23:40 GMT+08:00 Peter Hurley <peter@hurleysoftware.com>:
-> [ +cc linux-bluetooth ]
+Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 56 ++++++++++++++++++++++------------------
+ 2 files changed, 32 insertions(+), 25 deletions(-)
 
->>>
->>> Historically, low_latency was used to force wake-up the reading
->>> process rather than wait for the next scheduler tick. The
->>> effect was to trim multiple milliseconds of latency from
->>> when the process would receive new data.
->>>
->>> Recent tests [1] have shown that the reading process now receives
->>> data with only 10's of microseconds latency without low_latency set.
->>
->>
->> The 10's of miscroseconds is ok for 115200 bps like device, but it may
->> hurt the high speed device like Bluetooth which runs at 3M/4M bps or
->> higher.
->
->
-> The tests were run at 400Mbps, so 3Mbps or 4Mbps is not a problem
-> (but I think you may be confusing throughput with latency).
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4b192d0..79a75ed 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1150,6 +1150,7 @@ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
+ void hci_req_cmd_complete(struct hci_dev *hdev, u16 opcode, u8 status);
+ 
+ void hci_req_add_le_scan_disable(struct hci_request *req);
++void hci_req_add_le_passive_scan(struct hci_request *req);
+ 
+ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			       const void *param, u32 timeout);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0b96f20..bbd085d 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5115,6 +5115,36 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+ }
+ 
++void hci_req_add_le_passive_scan(struct hci_request *req)
++{
++	struct hci_cp_le_set_scan_param param_cp;
++	struct hci_cp_le_set_scan_enable enable_cp;
++	struct hci_dev *hdev = req->hdev;
++	u8 own_addr_type;
++
++	/* Set require_privacy to true to avoid identification from
++	 * unknown peer devices. Since this is passive scanning, no
++	 * SCAN_REQ using the local identity should be sent. Mandating
++	 * privacy is just an extra precaution.
++	 */
++	if (hci_update_random_address(req, true, &own_addr_type))
++		return;
++
++	memset(&param_cp, 0, sizeof(param_cp));
++	param_cp.type = LE_SCAN_PASSIVE;
++	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
++	param_cp.window = cpu_to_le16(hdev->le_scan_window);
++	param_cp.own_address_type = own_addr_type;
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
++		    &param_cp);
++
++	memset(&enable_cp, 0, sizeof(enable_cp));
++	enable_cp.enable = LE_SCAN_ENABLE;
++	enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
++	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
++		    &enable_cp);
++}
++
+ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
+ {
+ 	if (status)
+@@ -5130,8 +5160,6 @@ static void update_background_scan_complete(struct hci_dev *hdev, u8 status)
+  */
+ void hci_update_background_scan(struct hci_dev *hdev)
+ {
+-	struct hci_cp_le_set_scan_param param_cp;
+-	struct hci_cp_le_set_scan_enable enable_cp;
+ 	struct hci_request req;
+ 	struct hci_conn *conn;
+ 	int err;
+@@ -5151,8 +5179,6 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 
+ 		BT_DBG("%s stopping background scanning", hdev->name);
+ 	} else {
+-		u8 own_addr_type;
+-
+ 		/* If there is at least one pending LE connection, we should
+ 		 * keep the background scan running.
+ 		 */
+@@ -5169,27 +5195,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 		if (conn)
+ 			return;
+ 
+-		/* Set require_privacy to true to avoid identification from
+-		 * unknown peer devices. Since this is passive scanning, no
+-		 * SCAN_REQ using the local identity should be sent. Mandating
+-		 * privacy is just an extra precaution.
+-		 */
+-		if (hci_update_random_address(&req, true, &own_addr_type))
+-			return;
+-
+-		memset(&param_cp, 0, sizeof(param_cp));
+-		param_cp.type = LE_SCAN_PASSIVE;
+-		param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
+-		param_cp.window = cpu_to_le16(hdev->le_scan_window);
+-		param_cp.own_address_type = own_addr_type;
+-		hci_req_add(&req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+-			    &param_cp);
+-
+-		memset(&enable_cp, 0, sizeof(enable_cp));
+-		enable_cp.enable = LE_SCAN_ENABLE;
+-		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
+-		hci_req_add(&req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+-			    &enable_cp);
++		hci_req_add_le_passive_scan(&req);
+ 
+ 		BT_DBG("%s starting background scanning", hdev->name);
+ 	}
+-- 
+1.8.5.4
 
-I wrote the serial driver for intel mid platforms which are widely used
-in current smart phones, so I guess I know what I'm talking :)
-
-Our test and customer test cover both the performance and latency.
-say like transferring  2 GB file while using BT A2DP to playing music.
-
-Also I heard there is some app which will do real time void/data
-exchange with paired bluetooth, here microseconds really means
-something.
-
->
-> FWIW, two things affected the latency times of those particular tests;
-> 1) the kernel firewire subsystem handles rx data in a tasklet (so not
->    directly from IRQ) which negatively affected the latency reported, and
-> 2) the ftrace instrumentation is not free and there are several traces per
-> rx.
->
-> If you look carefully at the test trace data, you'll see that the timestamps
-> from tty_flip_buffer_push() of the rx data to n_tty_write() of the
-> response averages _~11us_; this is the measured latency from tty driver
-> receiving the rx data to reading of that data *and* the process
-> response (which comes back up through several tty locks).
->
-> Naturally, in mainline kernel, the scheduler load will affect the
-> measured latency *but that's true regardless of low_latency rx steering
-> because the user-space process must still be woken to complete the read*.
->
->
->> More and more smartphones are using uart as the Bluetooth data
->> interface due to its low-pin, low-power feature, and many of them
->> are using HZ=100 kernel, I'm afraid this added delay may cause
->> some problem.
->
->
-> Some hard data showing a real problem would help further this
-> discussion; my belief is that 3.12+ w/o low_latency rx steering
-> will outperform 3.11- w/ low_latency rx steering in every test.
-
-As for measurements, I guess it should cover 2 parts:
-1. the performance, like the BT file transfer data rate
-2. the latency, like the real time BT communication
-
-I'll try to get some test data soon. Also I'm wondering what devices
-have you tested? regarding these 2 points.
-
->
-> I'm glad to hear that the Bluetooth uart interface is getting
-> some use; that means someone will soon be fixing the hard lockup
-> in hci_uart_tx_wakeup() reported here:
-
-I'm not very familiar with the BT devices on our platforms, but most
-of them are not using the in-kernel BT driver, some just use the
-n_tty ldisc and the raw data, some use their own ldisc driver.
-
-Thanks,
-Feng
