@@ -2,65 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 23/23] android/hal-gatt-api: Add Client Test Command
-Date: Wed, 26 Feb 2014 09:41:21 +0100
-Message-Id: <1393404081-1401-24-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 22/23] android/hal-gatt-api: Add Client Set Advertising Data
+Date: Wed, 26 Feb 2014 09:41:20 +0100
+Message-Id: <1393404081-1401-23-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-ipc-api.txt | 13 +++++++++++++
- android/hal-msg.h       | 16 ++++++++++++++++
- 2 files changed, 29 insertions(+)
+ android/hal-ipc-api.txt | 14 ++++++++++++++
+ android/hal-msg.h       | 13 +++++++++++++
+ 2 files changed, 27 insertions(+)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index a7867f2..9b2c8ae 100644
+index 259aa69..a7867f2 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1647,6 +1647,19 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+@@ -1631,6 +1631,20 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+ 		In case of an error, the error response will be returned.
  
- 	Opcode 0x16 - Test Command command/response
- 
-+		Command parameters: Command (4 octets)
-+		                    Test Parameters (32 octets)
-+		Valid Test Parameter: Address (6 octets)
-+		                      UUID (16 octets)
-+		                      U1 (2 octets)
-+		                      U2 (2 octets)
-+		                      U3 (2 octets)
-+		                      U4 (2 octets)
-+		                      U5 (2 octets)
+ 	Opcode 0x15 - Set Advertising data command/response
++
++		Command parameters: Server Interface (4 octets)
++		                    Set Scan Resp. (1 octet)
++		                    Include Name (1 octet)
++		                    Include TX Power (1 octet)
++		                    Min. Interval (4 octets)
++		                    Max. Interval (4 octets)
++		                    Appearance (4 octets)
++		                    Manufacturer Len. (2 octets)
++		                    Manufacturer Data (variable)
 +		Response parameters: <none>
 +
 +		In case of an error, the error response will be returned.
 +
+ 	Opcode 0x16 - Test Command command/response
+ 
  	Opcode 0x17 - Register Server command/response
- 	Opcode 0x18 - Unregister Server command/response
- 	Opcode 0x19 - Connect Peripheral command/response
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 0820e3f..2d8e6b0 100644
+index 316ca62..0820e3f 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -686,6 +686,22 @@ struct hal_cmd_gatt_client_set_adv_data {
- 	uint8_t  manufacturer_data[0];
+@@ -673,6 +673,19 @@ struct hal_cmd_gatt_client_get_device_type {
+ 	uint8_t bdaddr[6];
  } __attribute__((packed));
  
-+#define HAL_OP_GATT_CLIENT_TEST_COMMAND		0x16
-+struct hal_gatt_test_params {
-+	uint8_t  bda1[6];
-+	uint8_t  uuid1[16];
-+	uint16_t u1;
-+	uint16_t u2;
-+	uint16_t u3;
-+	uint16_t u4;
-+	uint16_t u5;
-+} __attribute__((packed));
-+
-+struct hal_cmd_gatt_client_test_command {
-+	int32_t command;
-+	struct hal_gatt_test_params params;
++#define HAL_OP_GATT_CLIENT_SET_ADV_DATA		0x015
++struct hal_cmd_gatt_client_set_adv_data {
++	int32_t  server_if;
++	uint8_t  set_scan_rsp;
++	uint8_t  include_name;
++	uint8_t  include_txpower;
++	int32_t  min_interval;
++	int32_t  max_interval;
++	int32_t  appearance;
++	uint16_t manufacturer_len;
++	uint8_t  manufacturer_data[0];
 +} __attribute__((packed));
 +
  /* Notifications and confirmations */
