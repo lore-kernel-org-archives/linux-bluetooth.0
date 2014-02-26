@@ -1,109 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1393325419-16544-4-git-send-email-szymon.janc@tieto.com>
-References: <1393325419-16544-1-git-send-email-szymon.janc@tieto.com>
-	<1393325419-16544-4-git-send-email-szymon.janc@tieto.com>
-Date: Wed, 26 Feb 2014 13:46:36 +0100
-Message-ID: <CAN_7+YYtPMRorPN+nvLcYAbKR-x=MTktTB=eMhXs=yOk43P0_g@mail.gmail.com>
-Subject: Re: [RFC 4/7] android: Add support for disabling notifications in IPC
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2] android/avrcp: Fix passing wrong len
+Date: Wed, 26 Feb 2014 14:40:20 +0200
+Message-Id: <1393418420-8461-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CABBYNZK9sq8arr71uvUxSg654ke0uZNHQfXxNvyLRz-iRFy8wA@mail.gmail.com>
+References: <CABBYNZK9sq8arr71uvUxSg654ke0uZNHQfXxNvyLRz-iRFy8wA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tue, Feb 25, 2014 at 11:50 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
-> ---
->  android/ipc.c | 20 ++++++++++++++++++--
->  android/ipc.h |  2 ++
->  2 files changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/android/ipc.c b/android/ipc.c
-> index 4bddb58..e356439 100644
-> --- a/android/ipc.c
-> +++ b/android/ipc.c
-> @@ -50,6 +50,7 @@ struct ipc {
->         GIOChannel *cmd_io;
->         guint cmd_watch;
->
-> +       bool notif_disabled;
->         GIOChannel *notif_io;
->         guint notif_watch;
->
-> @@ -246,7 +247,7 @@ static gboolean notif_connect_cb(GIOChannel *io, GIOCondition cond,
->
->         ipc->cmd_watch = g_io_add_watch(ipc->cmd_io, cond, cmd_watch_cb, ipc);
->
-> -       info("IPC: successfully connected");
-> +       info("IPC: successfully connected (with notifications)");
->
->         return FALSE;
->  }
-> @@ -263,13 +264,23 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
->                 goto failed;
->         }
->
-> +       if (ipc->notif_disabled) {
-> +               cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
-> +
-> +               ipc->cmd_watch = g_io_add_watch(ipc->cmd_io, cond, cmd_watch_cb,
-> +                                                                       ipc);
-> +
-> +               info("IPC: successfully connected (without notifications)");
-> +
-> +               return FALSE;
-> +       }
-> +
->         ipc->notif_io = ipc_connect(ipc->path, ipc->size, notif_connect_cb,
->                                                                         ipc);
->         if (!ipc->notif_io)
->                 goto failed;
->
->         return FALSE;
-> -
->  failed:
->         ipc_disconnect(ipc, true);
->
-> @@ -312,6 +323,11 @@ void ipc_set_fail_handler(struct ipc *ipc, ipc_failed_cb cb, void *data)
->         ipc->failed_cb_data = data;
->  }
->
-> +void ipc_disable_notifications(struct ipc *ipc)
-> +{
-> +       ipc->notif_disabled = true;
-> +}
-> +
->  void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
->                                                         void *param, int fd)
->  {
-> diff --git a/android/ipc.h b/android/ipc.h
-> index 3a6adc8..c4f8c41 100644
-> --- a/android/ipc.h
-> +++ b/android/ipc.h
-> @@ -40,6 +40,8 @@ void ipc_cleanup(struct ipc *ipc);
->  typedef void (*ipc_failed_cb) (void *data);
->  void ipc_set_fail_handler(struct ipc *ipc, ipc_failed_cb cb, void *data);
->
-> +void ipc_disable_notifications(struct ipc *ipc);
-> +
+When handling vendor dependent PDUs len was passed in wrong order to
+callback function. It is really wrong to pass such a parameter and
+expect that callbacks would handle it.
+---
+ android/avrcp-lib.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Maybe it would be better to add disable_notification (or better
-enable_notification) as a parameter to ipc_init() ?  You want to set
-it once I guess.
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index c78881f..2e5a565 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -128,14 +128,14 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 	const struct avrcp_control_handler *handler;
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	uint32_t company_id = ntoh24(pdu->company_id);
++	uint16_t params_len = ntohs(pdu->params_len);
+ 
+ 	if (company_id != IEEEID_BTSIG) {
+ 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
+ 		return 0;
+ 	}
+ 
+-	DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id,
+-						ntohs(pdu->params_len));
++	DBG("AVRCP PDU 0x%02X, len 0x%04X", pdu->pdu_id, params_len);
+ 
+ 	pdu->packet_type = 0;
+ 	pdu->rsvd = 0;
+@@ -163,10 +163,12 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 		goto reject;
+ 	}
+ 
+-	*code = handler->func(session, transaction, &pdu->params_len,
++	*code = handler->func(session, transaction, &params_len,
+ 					pdu->params, session->control_data);
+ 
+-	return AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
++	pdu->params_len = htons(params_len);
++
++	return AVRCP_HEADER_LENGTH + params_len;
+ 
+ reject:
+ 	pdu->params_len = htons(1);
+-- 
+1.8.3.2
 
->  GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb,
->                                                         void *user_data);
->  int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
-> --
-> 1.8.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-BR
-Lukasz
