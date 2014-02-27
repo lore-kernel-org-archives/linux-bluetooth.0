@@ -1,75 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/8] shared/hfp: Fix parsing line with few commands
-Date: Thu, 27 Feb 2014 10:39:59 +0100
-Message-Id: <1393494006-20363-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 27 Feb 2014 09:22:23 +0000
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+To: Feng Tang <feng.79.tang@gmail.com>
+Cc: Peter Hurley <peter@hurleysoftware.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jiri Slaby <jslaby@suse.cz>, linux-serial@vger.kernel.org,
+	Beat Bolli <bbolli@ewanet.ch>, Pavel Roskin <proski@gnu.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Jiri Kosina <jkosina@suse.cz>, David Sterba <dsterba@suse.cz>,
+	Felipe Balbi <balbi@ti.com>,
+	Grant Edwards <grant.b.edwards@gmail.com>,
+	Stanislaw Gruszka <sgruszka@redhat.com>,
+	Hal Murray <murray+fedora@ip-64-139-1-69.sjc.megapath.net>,
+	stable@vger.kernel.org,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+	feng.tang@intel.com, bin.yang@intel.com, alek.du@intel.com
+Subject: Re: [PATCH] tty: Fix low_latency BUG
+Message-ID: <20140227092223.5b035f7f@alan.etchedpixels.co.uk>
+In-Reply-To: <CA++bM2vjzFOt5wmc=TQ1XMvRCwgnpq6=PKpex=GGZBK_-M6=mw@mail.gmail.com>
+References: <1393072281-5814-1-git-send-email-peter@hurleysoftware.com>
+	<CA++bM2uq=vRo20FTMWvkDau+-X7h0+KU3n4Av7ef895mQKr5fA@mail.gmail.com>
+	<530E0AD3.7040909@hurleysoftware.com>
+	<CA++bM2vjzFOt5wmc=TQ1XMvRCwgnpq6=PKpex=GGZBK_-M6=mw@mail.gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If hfp_gw received line with few commands, it called command
-handler one time, for first command. Next comamnd was processed
-only if next line was received.
-Now, after every response from gw, we call proces_input to be
-sure that all data has been be processed.
-It will process next command only if response for previous was sent.
----
- src/shared/hfp.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+> > I'm glad to hear that the Bluetooth uart interface is getting
+> > some use; that means someone will soon be fixing the hard lockup
+> > in hci_uart_tx_wakeup() reported here:
+> 
+> I'm not very familiar with the BT devices on our platforms, but most
+> of them are not using the in-kernel BT driver, some just use the
+> n_tty ldisc and the raw data, some use their own ldisc driver.
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 854cf46..0681b19 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -121,23 +121,21 @@ static void process_input(struct hfp_gw *hfp)
- 
- 		*ptr = '\0';
- 		count = asprintf(&ptr, "%s%s", str, str2);
--		str = ptr;
- 	} else {
--		count = ptr - str;
- 		*ptr = '\0';
-+		count = asprintf(&ptr, "%s", str);
- 	}
- 
- 	hfp->result_pending = true;
- 
-+	len = ringbuf_drain(hfp->read_buf, count + 1);
-+
- 	if (hfp->command_callback)
--		hfp->command_callback(str, hfp->command_data);
-+		hfp->command_callback(ptr, hfp->command_data);
- 	else
- 		hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
- 
--	len = ringbuf_drain(hfp->read_buf, count + 1);
--
--	if (str == ptr)
--		free(ptr);
-+	free(ptr);
- }
- 
- static void read_watch_destroy(void *user_data)
-@@ -341,6 +339,8 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
- 
- 	hfp->result_pending = false;
- 
-+	process_input(hfp);
-+
- 	return true;
- }
- 
-@@ -356,6 +356,8 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
- 
- 	hfp->result_pending = false;
- 
-+	process_input(hfp);
-+
- 	return true;
- }
- 
--- 
-1.8.3.1
+Outside of the world of phones/android the Bluetooth on quite a few of the
+Baytrail/T devices is on the LPSS serial so it probably will be getting
+tested sooner not later and there will actually be a common platform
+around that is using the bluetooth uart features.
 
+I'm not anticipating any problems though.
+
+Alan
