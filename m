@@ -1,35 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/13] Android HAL GATT Server API Commands
-Date: Thu, 27 Feb 2014 14:28:38 +0100
-Message-Id: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 1/2] Bluetooth: Re-encrypt link after receiving an LTK
+Date: Thu, 27 Feb 2014 14:35:11 +0200
+Message-Id: <1393504512-21877-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This serie of hal-gatt-api patches updates hal-ipc-api document and
-hal-msg header in parallel. Should be applied on top of GATT client
-patches.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Grzegorz Kolodziejczyk (13):
-  android/hal-gatt-api: Add Server Register
-  android/hal-gatt-api: Add Server Unregister
-  android/hal-gatt-api: Add Server Connect
-  android/hal-gatt-api: Add Server Disconnect
-  android/hal-gatt-api: Add Server Service
-  android/hal-gatt-api: Add Server Included Service
-  android/hal-gatt-api: Add Server Characteristic
-  android/hal-gatt-api: Add Server Descriptor
-  android/hal-gatt-api: Add Server Start Service
-  android/hal-gatt-api: Add Server Stop Service
-  android/hal-gatt-api: Add Server Delete Service
-  android/hal-gatt-api: Add Server Send Indication
-  android/hal-gatt-api: Add Server Send Response
+It's not strictly speaking required to re-encrypt a link once we receive
+an LTK since the connection is already encrypted with the STK. However,
+re-encrypting with the LTK allows us to verify that we've received an
+LTK that actually works.
 
- android/hal-ipc-api.txt | 119 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/hal-msg.h       |  93 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 212 insertions(+)
+This patch updates the SMP code to request encrypting with the LTK in
+case we're in master role and waits until the key refresh complete event
+before notifying user space of the distributed keys.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 23 ++++++++++++++++++-----
+ net/bluetooth/smp.h |  3 ++-
+ 2 files changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 0de98fe23330..f586728f6694 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1174,6 +1174,7 @@ int smp_distribute_keys(struct l2cap_conn *conn)
+ 	struct smp_chan *smp = conn->smp_chan;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
++	bool ltk_encrypt;
+ 	__u8 *keydist;
+ 
+ 	BT_DBG("conn %p", conn);
+@@ -1263,12 +1264,24 @@ int smp_distribute_keys(struct l2cap_conn *conn)
+ 	if ((smp->remote_key_dist & 0x07))
+ 		return 0;
+ 
+-	clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags);
+-	cancel_delayed_work_sync(&conn->security_timer);
+-	set_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
+-	smp_notify_keys(conn);
++	if (smp->ltk)
++		ltk_encrypt = !test_and_set_bit(SMP_FLAG_LTK_ENCRYPT,
++						&smp->smp_flags);
++	else
++		ltk_encrypt = false;
+ 
+-	smp_chan_destroy(conn);
++	/* Re-encrypt the link with LTK if possible */
++	if (ltk_encrypt && hcon->out) {
++		struct smp_ltk *ltk = smp->ltk;
++		hci_le_start_enc(hcon, ltk->ediv, ltk->rand, ltk->val);
++		hcon->enc_key_size = ltk->enc_size;
++	} else {
++		clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags);
++		cancel_delayed_work_sync(&conn->security_timer);
++		set_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
++		smp_notify_keys(conn);
++		smp_chan_destroy(conn);
++	}
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 1b8af35b292c..e079e8441682 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -118,7 +118,8 @@ struct smp_cmd_security_req {
+ #define SMP_FLAG_TK_VALID	1
+ #define SMP_FLAG_CFM_PENDING	2
+ #define SMP_FLAG_MITM_AUTH	3
+-#define SMP_FLAG_COMPLETE	4
++#define SMP_FLAG_LTK_ENCRYPT	4
++#define SMP_FLAG_COMPLETE	5
+ 
+ struct smp_chan {
+ 	struct l2cap_conn *conn;
 -- 
-1.8.5.2
+1.8.5.3
 
