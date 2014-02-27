@@ -1,56 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/13] Make android-tester callbacks thread safe
-Date: Thu, 27 Feb 2014 15:10:02 +0100
-Message-ID: <3495623.2knxJs63KX@uw000953>
-In-Reply-To: <1392987473-19994-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1392987473-19994-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 09/13] android/hal-gatt-api: Add Server Start Service
+Date: Thu, 27 Feb 2014 14:28:47 +0100
+Message-Id: <1393507731-1974-10-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+---
+ android/hal-ipc-api.txt | 8 ++++++++
+ android/hal-msg.h       | 7 +++++++
+ 2 files changed, 15 insertions(+)
 
-On Friday 21 of February 2014 13:57:40 Jakub Tyszkowski wrote:
-> 
-> This patch set makes all callbacks executions in HAL's notification thread being
-> transfered to tester's context. As test-specific callbacks are called by generic
-> callbacks, making the later executed in tester's main loop makes all custom
-> callbacks (and newly added) automatically executed in the right contex.
-> 
-> This is basically RFCv2 resend as PATCH with two follow-up patches.
-> 
-> Changes in relation to RFCv2:
->   * [PATCH 12/13]: Changed daemon termination checks to non-blocking
->   * [PATCH 13/13]: Added guard to execute all scheduled callbacks in current
->     test's context
-> 
-> Best regards,
-> 
-> Jakub Tyszkowski (13):
->   android/tester: Execute device found cbacks in main loop
->   android/tester: Execute discovery state cbacks in main loop
->   android/tester: Execute device properties cbacks in main loop
->   android/tester: Execute adapter props cbacks in main loop
->   android/tester: Execute adapter state changed cbacks in main loop
->   android/tester: Execute socket cbacks in main loop
->   android/tester: Execute hh connection state cbacks in main loop
->   android/tester: Execute hh info cbacks in main loop
->   android/tester: Execute hh protocol mode cbacks in main loop
->   android/tester: Execute hh report cbacks in main loop
->   android/tester: Execute hh virtual unplug cbacks in main loop
->   android/tester: Non-blocking check for daemon termination
->   android/tester: Add guard for late callback calls
-> 
->  android/android-tester.c | 375 ++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 326 insertions(+), 49 deletions(-)
-
-All patches except 12/13 are now applied. Thanks.
-For waiting for daemon I pushed fix that is using signalfd instead.
-
+diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+index 24ff5de..812aac2 100644
+--- a/android/hal-ipc-api.txt
++++ b/android/hal-ipc-api.txt
+@@ -1738,6 +1738,14 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+ 		In case of an error, the error response will be returned.
+ 
+ 	Opcode 0x1f - Start Service command/response
++
++		Command parameters: Server (4 octets)
++		                    Service handle (4 octets)
++		                    Transport (4 octets)
++		Response parameters: <none>
++
++		In case of an error, the error response will be returned.
++
+ 	Opcode 0x20 - Stop Service command/response
+ 	Opcode 0x21 - Delete Service command/response
+ 	Opcode 0x22 - Send Indication command/response
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index e42b0a5..d632911 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -757,6 +757,13 @@ struct hal_cmd_gatt_server_add_descriptor {
+ 	int32_t permissions;
+ } __attribute__((packed));
+ 
++#define HAL_OP_GATT_SERVER_START_SERVICE	0x1f
++struct hal_cmd_gatt_server_start_service {
++	int32_t server_if;
++	int32_t service_handle;
++	int32_t transport;
++} __attribute__((packed));
++
+ /* Notifications and confirmations */
+ 
+ #define HAL_POWER_OFF			0x00
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.2
+
