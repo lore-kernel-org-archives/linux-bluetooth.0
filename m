@@ -1,67 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 13/13] android/hal-gatt-api: Add Server Send Response
-Date: Thu, 27 Feb 2014 14:28:51 +0100
-Message-Id: <1393507731-1974-14-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 4/4] unit/avrcp: Add /TP/PAS/BV-04-C test
+Date: Thu, 27 Feb 2014 15:35:13 +0200
+Message-Id: <1393508113-18628-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1393508113-18628-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393508113-18628-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 17 +++++++++++++++++
- android/hal-msg.h       |  9 +++++++++
- 2 files changed, 26 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 18bf7ed..f3d5fd1 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1776,6 +1776,23 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+Test verifies that the Get Player Application Setting Attribute Text
+response issued from the Target.
+---
+ unit/test-avrcp.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
+
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index a75165b..db9cb92 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -343,11 +343,25 @@ static uint8_t avrcp_handle_list_attributes(struct avrcp *session,
+ 	return AVC_CTYPE_STABLE;
+ }
  
- 	Opcode 0x23 - Send Response command/response
++static uint8_t avrcp_handle_get_player_attr_text(struct avrcp *session,
++				uint8_t transaction, uint16_t *params_len,
++				uint8_t *params, void *user_data)
++{
++	DBG("");
++
++	*params_len = 1;
++	params[0] = 0;
++
++	return AVC_CTYPE_STABLE;
++}
++
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+ 		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_list_attributes },
++		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, AVC_CTYPE_STATUS,
++					avrcp_handle_get_player_attr_text },
+ 		{ },
+ };
  
-+		Command parameters: Connection ID (4 octets)
-+		                    Transaction ID (4 octets)
-+		                    Status (4 octets)
-+		                    GATT Response (4 octets)
-+
-+		Valid GATT Response: GATT Value (607 octets)
-+		                     Handle (2 octets)
-+
-+		Valid GATT Value: Value (600 octets)
-+		                  Handle (2 octets)
-+		                  Offset (2 octets)
-+		                  Length (2 octets)
-+		                  Authentication Request (1 octet)
-+		Response parameters: <none>
-+
-+		In case of an error, the error response will be returned.
-+
- 	Opcode 0x81 - Register Client notification
- 	Opcode 0x82 - Scan Result notification
- 	Opcode 0x83 - Connect Device notification
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index fd67fa1..100ba96 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -786,6 +786,15 @@ struct hal_cmd_gatt_server_send_indication {
- 	uint8_t value[0];
- } __attribute__((packed));
+@@ -494,5 +508,15 @@ int main(int argc, char *argv[])
+ 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+ 				0x00, 0x00, 0x00));
  
-+#define HAL_OP_GATT_SERVER_SEND_RESPONSE	0x23
-+struct hal_cmd_gatt_server_send_response {
-+	int32_t conn_id;
-+	int32_t trans_id;
-+	int32_t status;
-+	uint8_t len;
-+	uint8_t data[0];
-+} __attribute__((packed));
++	define_test("/TP/PAS/BV-04-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
++				0x00, 0x00, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
++				0x00, 0x00, 0x01, 0x00));
 +
- /* Notifications and confirmations */
- 
- #define HAL_POWER_OFF			0x00
+ 	return g_test_run();
+ }
 -- 
-1.8.5.2
+1.8.3.2
 
