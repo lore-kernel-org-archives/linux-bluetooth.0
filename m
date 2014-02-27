@@ -1,45 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <530FB0CA.4070309@gmail.com>
-Date: Thu, 27 Feb 2014 22:40:26 +0100
-From: Bela Hausmann <bela.hausmann@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 00/13] Android HAL GATT Server API Commands
+Date: Thu, 27 Feb 2014 22:16:47 +0100
+Message-ID: <2015721.pAqq9raOyp@athlon>
+In-Reply-To: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] bluetooth: ath3k: added Atheros AR3012 with ID 0x0b05:0x17d0
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for the Atheros AR3012 chipset on the ASUS Z87-Pro (C2) mainboard (ID 0x0b05:0x17d0).
+Hi Grzegorz,
 
-Signed-off-by: Bela Hausmann <bela.hausmann@gmail.com>
----
-diff -uprN -X linux-3.13.5-gentoo/Documentation/dontdiff linux-3.13.5-gentoo/drivers/bluetooth/ath3k.c linux-3.13.5-gentoo-bela/drivers/bluetooth/ath3k.c
---- linux-3.13.5-gentoo/drivers/bluetooth/ath3k.c    2014-01-20 03:40:07.000000000 +0100
-+++ linux-3.13.5-gentoo-bela/drivers/bluetooth/ath3k.c    2014-02-27 20:09:33.047878117 +0100
-@@ -97,6 +97,7 @@ static const struct usb_device_id ath3k_
-     { USB_DEVICE(0x13d3, 0x3402) },
-     { USB_DEVICE(0x0cf3, 0x3121) },
-     { USB_DEVICE(0x0cf3, 0xe003) },
-+    { USB_DEVICE(0x0b05, 0x17d0) },
+On Thursday 27 February 2014 14:28:38 Grzegorz Kolodziejczyk wrote:
+> This serie of hal-gatt-api patches updates hal-ipc-api document and
+> hal-msg header in parallel. Should be applied on top of GATT client
+> patches.
+> 
+> Grzegorz Kolodziejczyk (13):
+>   android/hal-gatt-api: Add Server Register
+>   android/hal-gatt-api: Add Server Unregister
+>   android/hal-gatt-api: Add Server Connect
+>   android/hal-gatt-api: Add Server Disconnect
+>   android/hal-gatt-api: Add Server Service
+>   android/hal-gatt-api: Add Server Included Service
+>   android/hal-gatt-api: Add Server Characteristic
+>   android/hal-gatt-api: Add Server Descriptor
+>   android/hal-gatt-api: Add Server Start Service
+>   android/hal-gatt-api: Add Server Stop Service
+>   android/hal-gatt-api: Add Server Delete Service
+>   android/hal-gatt-api: Add Server Send Indication
+>   android/hal-gatt-api: Add Server Send Response
+> 
+>  android/hal-ipc-api.txt | 119
+> ++++++++++++++++++++++++++++++++++++++++++++++++ android/hal-msg.h       | 
+> 93 +++++++++++++++++++++++++++++++++++++ 2 files changed, 212 insertions(+)
 
-     /* Atheros AR5BBU12 with sflash firmware */
-     { USB_DEVICE(0x0489, 0xE02C) },
-@@ -140,6 +141,7 @@ static const struct usb_device_id ath3k_
-     { USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
-     { USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
-     { USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
-+    { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+All patches applied, thanks.
 
-     /* Atheros AR5BBU22 with sflash firmware */
-     { USB_DEVICE(0x0489, 0xE03C), .driver_info = BTUSB_ATH3012 },
-diff -uprN -X linux-3.13.5-gentoo/Documentation/dontdiff linux-3.13.5-gentoo/drivers/bluetooth/btusb.c linux-3.13.5-gentoo-bela/drivers/bluetooth/btusb.c
---- linux-3.13.5-gentoo/drivers/bluetooth/btusb.c    2014-01-20 03:40:07.000000000 +0100
-+++ linux-3.13.5-gentoo-bela/drivers/bluetooth/btusb.c    2014-02-27 20:10:20.825905643 +0100
-@@ -164,6 +164,7 @@ static const struct usb_device_id blackl
-     { USB_DEVICE(0x13d3, 0x3402), .driver_info = BTUSB_ATH3012 },
-     { USB_DEVICE(0x0cf3, 0x3121), .driver_info = BTUSB_ATH3012 },
-     { USB_DEVICE(0x0cf3, 0xe003), .driver_info = BTUSB_ATH3012 },
-+    { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
-
-     /* Atheros AR5BBU12 with sflash firmware */
-     { USB_DEVICE(0x0489, 0xe02c), .driver_info = BTUSB_IGNORE },
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
