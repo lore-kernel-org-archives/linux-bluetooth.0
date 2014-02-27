@@ -1,119 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/9] android/tester: Add create bond with PIN fail test case
-Date: Thu, 27 Feb 2014 16:04:44 +0100
-Message-Id: <1393513490-18674-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 4/9] android/tester: Add create bond with SSP sucess test case
+Date: Thu, 27 Feb 2014 16:04:45 +0100
+Message-Id: <1393513490-18674-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1393513490-18674-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1393513490-18674-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds create bond with PIN fail test case.
+This adds create bond with SSP succes test case. Confirm is set as SSP
+pairing mode.
 ---
- android/android-tester.c | 73 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ android/android-tester.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 84 insertions(+), 1 deletion(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index cb08ec1..4db5722 100644
+index 4db5722..2bb895c 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -1037,6 +1037,21 @@ static void bond_device_found_cb(int num_properties, bt_property_t *properties)
- 	}
+@@ -127,6 +127,9 @@ struct bt_cb_data {
+ 	bt_bdname_t bdname;
+ 	uint32_t cod;
+ 
++	bt_ssp_variant_t ssp_variant;
++	uint32_t passkey;
++
+ 	int num;
+ 	bt_property_t *props;
+ };
+@@ -1292,6 +1295,61 @@ static void pin_request_cb(bt_bdaddr_t *remote_bd_addr,
+ 	g_idle_add(pin_request, cb_data);
  }
  
-+static void bond_nostatus_device_found_cb(int num_properties,
-+						bt_property_t *properties)
++static void bond_create_ssp_request_cb(const bt_bdaddr_t *remote_bd_addr,
++					bt_ssp_variant_t pairing_variant,
++					bool accept, uint32_t pass_key)
 +{
 +	struct test_data *data = tester_get_data();
-+	uint8_t *bdaddr = (uint8_t *)hciemu_get_client_bdaddr(data->hciemu);
-+	bt_bdaddr_t remote_addr;
 +
-+	bdaddr2android((const bdaddr_t *)bdaddr, &remote_addr.address);
-+
-+	if (data->cb_count == 4) {
-+		data->cb_count--;
-+		data->if_bluetooth->create_bond(&remote_addr);
-+	}
-+}
-+
- static gboolean device_found(gpointer user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1236,6 +1251,21 @@ static void bond_create_pin_success_request_cb(bt_bdaddr_t *remote_bd_addr,
- 	data->if_bluetooth->pin_reply(bdaddr, TRUE, pin_len, &pin_code);
- }
- 
-+static void bond_create_pin_fail_request_cb(bt_bdaddr_t *remote_bd_addr,
-+					bt_bdname_t *bd_name, uint32_t cod)
-+{
-+	struct test_data *data = tester_get_data();
-+	const bt_bdaddr_t *bdaddr = remote_bd_addr;
-+	bt_pin_code_t pin_code = {
-+	.pin = { 0x31, 0x31, 0x31, 0x31 },
-+	};
-+	uint8_t pin_len = 4;
++	data->if_bluetooth->ssp_reply(remote_bd_addr,
++					BT_SSP_VARIANT_PASSKEY_CONFIRMATION,
++					accept, pass_key);
 +
 +	data->cb_count--;
-+
-+	data->if_bluetooth->pin_reply(bdaddr, TRUE, pin_len, &pin_code);
 +}
 +
- static gboolean pin_request(gpointer user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -2292,6 +2322,14 @@ static const struct generic_data bt_bond_create_pin_success_test = {
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
++static void bond_create_ssp_success_request_cb(bt_bdaddr_t *remote_bd_addr,
++					bt_bdname_t *bd_name, uint32_t cod,
++					bt_ssp_variant_t pairing_variant,
++					uint32_t pass_key)
++{
++	bool accept = true;
++
++	bond_create_ssp_request_cb(remote_bd_addr, pairing_variant, accept,
++								pass_key);
++}
++
++static gboolean ssp_request(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	struct bt_cb_data *cb_data = user_data;
++
++	if (data->test_init_done &&
++				test->expected_hal_cb.ssp_request_cb)
++		test->expected_hal_cb.ssp_request_cb(&cb_data->bdaddr,
++					&cb_data->bdname, cb_data->cod,
++					cb_data->ssp_variant, cb_data->passkey);
++
++	g_free(cb_data);
++	return FALSE;
++}
++
++static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
++				uint32_t cod, bt_ssp_variant_t pairing_variant,
++				uint32_t pass_key)
++{
++	struct bt_cb_data *cb_data = g_new0(struct bt_cb_data, 1);
++
++	cb_data->bdaddr = *remote_bd_addr;
++	cb_data->bdname = *bd_name;
++	cb_data->cod = cod;
++	cb_data->ssp_variant = pairing_variant;
++	cb_data->passkey = pass_key;
++
++	g_idle_add(ssp_request, cb_data);
++}
++
+ static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
+ static const char enable_done_bdname_val[] = "BlueZ for Android";
+ static bt_uuid_t enable_done_uuids_val = {
+@@ -2330,6 +2388,14 @@ static const struct generic_data bt_bond_create_pin_fail_test = {
+ 	.expected_adapter_status = MGMT_STATUS_AUTH_FAILED,
  };
  
-+static const struct generic_data bt_bond_create_pin_fail_test = {
-+	.expected_hal_cb.device_found_cb = bond_nostatus_device_found_cb,
++static const struct generic_data bt_bond_create_ssp_success_test = {
++	.expected_hal_cb.device_found_cb = bond_device_found_cb,
 +	.expected_hal_cb.bond_state_changed_cb = bond_test_state_changed_cb,
-+	.expected_hal_cb.pin_request_cb = bond_create_pin_fail_request_cb,
++	.expected_hal_cb.ssp_request_cb = bond_create_ssp_success_request_cb,
 +	.expected_cb_count = 4,
-+	.expected_adapter_status = MGMT_STATUS_AUTH_FAILED,
++	.expected_adapter_status = BT_STATUS_SUCCESS,
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -3030,6 +3068,16 @@ static void test_dev_setprop_disctimeout_fail(const void *test_data)
- 
- 	data->if_bluetooth->start_discovery();
- }
-+
-+static void bond_device_auth_fail_callback(uint16_t index, uint16_t length,
-+							const void *param,
-+							void *user_data)
-+{
-+	const struct mgmt_ev_auth_failed *ev = param;
-+
-+	check_expected_status(ev->status);
-+}
-+
- static void test_bond_create_pin_success(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -3046,6 +3094,26 @@ static void test_bond_create_pin_success(const void *test_data)
+@@ -2338,7 +2404,7 @@ static bt_callbacks_t bt_callbacks = {
+ 	.device_found_cb = device_found_cb,
+ 	.discovery_state_changed_cb = discovery_state_changed_cb,
+ 	.pin_request_cb = pin_request_cb,
+-	.ssp_request_cb = NULL,
++	.ssp_request_cb = ssp_request_cb,
+ 	.bond_state_changed_cb = bond_state_changed_cb,
+ 	.acl_state_changed_cb = NULL,
+ 	.thread_evt_cb = NULL,
+@@ -3114,6 +3180,18 @@ static void test_bond_create_pin_fail(const void *test_data)
  	data->if_bluetooth->start_discovery();
  }
  
-+static void test_bond_create_pin_fail(const void *test_data)
++static void test_bond_create_ssp_success(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
 +	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
 +
-+	static uint8_t pair_device_pin[] = { 0x30, 0x30, 0x30, 0x30 };
-+	const void *pin = pair_device_pin;
-+	uint8_t pin_len = 4;
-+
 +	init_test_conditions(data);
 +
-+	mgmt_register(data->mgmt, MGMT_EV_AUTH_FAILED, data->mgmt_index,
-+					bond_device_auth_fail_callback, data,
-+					NULL);
-+
-+	bthost_set_pin_code(bthost, pin, pin_len);
++	bthost_write_ssp_mode(bthost, 0x01);
 +
 +	data->if_bluetooth->start_discovery();
 +}
@@ -121,14 +134,14 @@ index cb08ec1..4db5722 100644
  /* Test Socket HAL */
  
  static gboolean adapter_socket_state_changed(gpointer user_data)
-@@ -4389,6 +4457,11 @@ int main(int argc, char *argv[])
+@@ -4462,6 +4540,11 @@ int main(int argc, char *argv[])
  					setup_enabled_adapter,
- 					test_bond_create_pin_success, teardown);
+ 					test_bond_create_pin_fail, teardown);
  
-+	test_bredrle("Bluetooth Create Bond PIN - Bad PIN",
-+					&bt_bond_create_pin_fail_test,
++	test_bredrle("Bluetooth Create Bond SSP - Success",
++					&bt_bond_create_ssp_success_test,
 +					setup_enabled_adapter,
-+					test_bond_create_pin_fail, teardown);
++					test_bond_create_ssp_success, teardown);
 +
  	test_bredrle("Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
