@@ -1,50 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/5] unit/avrcp: Add /TP/CFG/BI-01-C test
-Date: Thu, 27 Feb 2014 11:11:29 +0200
-Message-Id: <1393492291-15099-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] doc: Update test coverage document
+Date: Thu, 27 Feb 2014 09:57:49 +0200
+Message-Id: <1393487869-11278-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies the get capabilities response issued from the Target when
-an invalid capability is requested (0x7f).
+Update AVRCP test numbers.
 ---
- unit/test-avrcp.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ doc/test-coverage.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a43985a..0924a7e 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -311,6 +311,8 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
- {
- 	uint32_t id = 0x001958;
- 
-+	DBG("params[0] %d params_len %d", params[0], *params_len);
-+
- 	if (*params_len != 1)
- 		goto fail;
- 
-@@ -441,5 +443,14 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, 0x10, 0x00, 0x00,
- 				0x05, 0x02, 0x01, 0x00, 0x19, 0x58));
- 
-+	define_test("/TP/CFG/BI-01-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58, 0x10, 0x00, 0x00,
-+				0x01, 0x7f),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
-+				0x48, 0x00, 0x00, 0x19, 0x58, 0x10,
-+				0x00, 0x00, 0x01,
-+				AVRCP_STATUS_INVALID_PARAM));
-+
- 	return g_test_run();
- }
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index d37bcb8..79cace9 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -18,7 +18,7 @@ test-ringbuf		   3	Ring buffer functionality
+ test-queue		   1	Queue handling functionality
+ test-avdtp		  60	AVDTP qualification test cases
+ test-avctp		   9	AVCTP qualification test cases
+-test-avrcp		   7	AVRCP qualification test cases
++test-avrcp		  13	AVRCP qualification test cases
+ test-gobex		  31	Generic OBEX functionality
+ test-gobex-packet	   9	OBEX packet handling
+ test-gobex-header	  28	OBEX header handling
 -- 
 1.8.3.2
 
