@@ -1,39 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] bluetooth: ath3k: added Atheros AR3012 with ID 0x0b05:0x17d0
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <530FB0CA.4070309@gmail.com>
-Date: Thu, 27 Feb 2014 14:43:46 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <613439C8-AFCE-4B23-81FE-AD4B91A27768@holtmann.org>
-References: <530FB0CA.4070309@gmail.com>
-To: Bela Hausmann <bela.hausmann@gmail.com>
+Message-ID: <530FBB6B.8080300@gmx.net>
+Date: Thu, 27 Feb 2014 23:25:47 +0100
+From: Tobias Jakobi <liquid.acid@gmx.net>
+MIME-Version: 1.0
+To: linux-bluetooth@vger.kernel.org
+Subject: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bela,
+Hello,
 
-> This adds support for the Atheros AR3012 chipset on the ASUS Z87-Pro (C2) mainboard (ID 0x0b05:0x17d0).
+I'm trying to establish a BT connection between two systems. The client
+is running bluez-5.14 and I'm using bluetoothctl to interface with the
+daemon.
 
-include the content of /sys/kernel/debug/usb/devices for this controller.
+The server system provides a NAP, plus dnsmasq, so that connecting
+clients receive an IP. For reference, this works perfectly on an Android
+smartphone. When connecting to the server system, the bnep device is
+created on the server and added to the bridge. The Android bluetooth
+stack then gets an IP via dnsmasq and voila... TCP/IP connection.
 
-> 
-> Signed-off-by: Bela Hausmann <bela.hausmann@gmail.com>
-> ---
-> diff -uprN -X linux-3.13.5-gentoo/Documentation/dontdiff linux-3.13.5-gentoo/drivers/bluetooth/ath3k.c linux-3.13.5-gentoo-bela/drivers/bluetooth/ath3k.c
-> --- linux-3.13.5-gentoo/drivers/bluetooth/ath3k.c    2014-01-20 03:40:07.000000000 +0100
-> +++ linux-3.13.5-gentoo-bela/drivers/bluetooth/ath3k.c    2014-02-27 20:09:33.047878117 +0100
-> @@ -97,6 +97,7 @@ static const struct usb_device_id ath3k_
->     { USB_DEVICE(0x13d3, 0x3402) },
->     { USB_DEVICE(0x0cf3, 0x3121) },
->     { USB_DEVICE(0x0cf3, 0xe003) },
-> +    { USB_DEVICE(0x0b05, 0x17d0) },
+On this client however, this doesn't work at all. Plus, I'm not getting
+any kind of meaningful error message.
 
-Make sure that you email client does not screw up tabs. This looks pretty much like it is messed up.
+That's the server:
+[bluetooth]# info 00:02:72:C6:43:11
+Device 00:02:72:C6:43:11
+	Name: chidori-bt
+	Alias: chidori-bt
+	Class: 0x020000
+	Paired: yes
+	Trusted: yes
+	Blocked: no
+	Connected: no
+	LegacyPairing: no
+	UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+	UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
+	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+	Modalias: usb:v1D6Bp0246d0509
 
-Regards
 
-Marcel
+And here's how connecting goes:
+[bluetooth]# connect 00:02:72:C6:43:11
+Attempting to connect to 00:02:72:C6:43:11
+[CHG] Device 00:02:72:C6:43:11 Connected: yes
+[CHG] Device 00:02:72:C6:43:11 Modalias: usb:v1D6Bp0246d0509
+Failed to connect: org.bluez.Error.NotAvailable
+[CHG] Device 00:02:72:C6:43:11 Connected: no
+
+So, it looks like that it briefly connect, but then drops the connection
+again. I haven't been able to figure out what exaclty is 'NotAvailable'
+at this moment. The server at least is.
 
 
+This is something from the bt daemon (client):
+leena bluetoothd[26910]: Bluetooth daemon 5.14
+leena bluetoothd[26910]: Starting SDP server
+leena bluetoothd[26910]: Bluetooth management interface 1.3 initialized
+leena bluetoothd[26910]: Sap driver initialization failed.
+leena bluetoothd[26910]: sap-server: Operation not permitted (1)
+leena bluetoothd[26910]: Can't add /org/bluez/hci0/dev_00_02_72_C6_43_11
+to non-LE capable adapter connect list
+
+I'm not sure if the 'non-LE' message has something to do with the issue.
+
+Any idea on how to proceed here?
+
+Greets,
+Tobias
+
+PS: More info:
+[bluetooth]# show
+Controller B4:82:FE:65:22:8E
+	Name: leena-bt
+	Alias: leena-bt
+	Class: 0x00010c
+	Powered: yes
+	Discoverable: no
+	Pairable: yes
+	UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+	UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+	UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+	Modalias: usb:v1D6Bp0246d050E
+	Discovering: no
