@@ -1,62 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 00/23] Add GATT Client Messages
-Date: Thu, 27 Feb 2014 22:15:58 +0100
-Message-ID: <33181363.PmHWBrojOB@athlon>
-In-Reply-To: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <1393379848-4031-15-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1393379848-4031-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1393379848-4031-15-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 27 Feb 2014 18:18:15 +0100
+Message-ID: <CAMudyAs4cjVnoHZgO=T+SJFU1b-_coXGRQ+CA9J_gkTAYKPoCw@mail.gmail.com>
+Subject: Re: [PATCH 14/17] android/tester: Increase timeout for test failure
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
 
-On Wednesday 26 February 2014 09:40:58 Jakub Tyszkowski wrote:
-> This patchset adds GATT's Client part of ipc messages data.
-> 
-> v2 changes:
->   * moved msg structs and opcodes up to message opcodes section of hal-msg.h
-> * fixed typo and renamed few struct members to better match those in HAL
-> hdrs * corrected tlv field types
->   * [PATCHES 14-23/23] added opcodes and structs for the rest of Client
-> messages
-> 
-> Regards,
-> Jakub Tyszkowski (23):
->   android/hal-gatt-api: Add missing opcodes in GATT Service
->   android/hal-gatt-api: Add Client Register
->   android/hal-gatt-api: Add Client Unregister
->   android/hal-gatt-api: Add Client Scan
->   android/hal-gatt-api: Add Client Connect Remote
->   android/hal-gatt-api: Add Client Disconnect Remote
->   android/hal-gatt-api: Add Client Listen
->   android/hal-gatt-api: Add Client Refresh Remote Cache
->   android/hal-gatt-api: Add Client Search Service
->   android/hal-gatt-api: Add Client Get Included Service
->   android/hal-gatt-api: Add Client Get Characteristic
->   android/hal-gatt-api: Add Client Get Descriptor
->   android/hal-gatt-api: Add Client Read Characteristic
->   android/hal-gatt-api: Add Client Write Characteristic
->   android/hal-gatt-api: Add Client Read Descriptor
->   android/hal-gatt-api: Add Client Write Descriptor
->   android/hal-gatt-api: Add Client Execute Write
->   android/hal-gatt-api: Add Client Register for Notification
->   android/hal-gatt-api: Add Client Deregister for Notification
->   android/hal-gatt-api: Add Client Read Remote RSSI
->   android/hal-gatt-api: Add Client Get Device Type
->   android/hal-gatt-api: Add Client Set Advertising Data
->   android/hal-gatt-api: Add Client Test Command
-> 
->  android/hal-ipc-api.txt | 324
-> +++++++++++++++++++++++++++++++++++++++++------- android/hal-msg.h       |
-> 186 +++++++++++++++++++++++++++
->  2 files changed, 466 insertions(+), 44 deletions(-)
+On 26 February 2014 02:57, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> Inquiry command is sent with inquiry lenght 10.24 sec. There are
+> testcases where that time is needed to end the test, therefore change
+> timeout to 12 sec (number choosed based on strong feelings ;))
+> ---
+>  android/android-tester.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index 65516c1..b09834a 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -3707,7 +3707,7 @@ static void test_hidhost_get_report(const void *test_data)
+>                 user->test_data = data; \
+>                 tester_add_full(name, data, test_pre_setup, test_setup, \
+>                                 test, test_teardown, test_post_teardown, \
+> -                                                       3, user, g_free); \
+> +                                                       12, user, g_free); \
+>         } while (0)
+>
+>  int main(int argc, char *argv[])
+> --
+> 1.8.4
+>
 
-All patches applied, thanks.
+Will not need this patch. Will fix it in v2
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+\Lukasz
