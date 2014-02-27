@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3] Bluetooth: Fix response on confirm_name
-Date: Thu, 27 Feb 2014 16:47:28 +0100
-Message-ID: <1393516048-10507-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] Bluetooth: Fix response on confirm_name
+Date: Thu, 27 Feb 2014 16:12:56 +0100
+Message-ID: <1393513976-5497-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -22,7 +22,7 @@ Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
  1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 4c4912e..78ac7c8 100644
+index 4c4912e..8b7a3c4 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
 @@ -3627,15 +3627,17 @@ static int confirm_name(struct sock *sk, struct hci_dev *hdev, void *data,
@@ -32,8 +32,8 @@ index 4c4912e..78ac7c8 100644
 -		err = cmd_status(sk, hdev->id, MGMT_OP_CONFIRM_NAME,
 -				 MGMT_STATUS_FAILED);
 +		err = cmd_complete(sk, hdev->id, MGMT_OP_CONFIRM_NAME,
-+				   MGMT_STATUS_FAILED, &cp->addr,
-+				   sizeof(cp->addr));
++						MGMT_STATUS_FAILED, &cp->addr,
++							sizeof(cp->addr));
  		goto failed;
  	}
  
@@ -42,8 +42,8 @@ index 4c4912e..78ac7c8 100644
 -		err = cmd_status(sk, hdev->id, MGMT_OP_CONFIRM_NAME,
 -				 MGMT_STATUS_INVALID_PARAMS);
 +		err = cmd_complete(sk, hdev->id, MGMT_OP_CONFIRM_NAME,
-+				   MGMT_STATUS_INVALID_PARAMS, &cp->addr,
-+				   sizeof(cp->addr));
++					MGMT_STATUS_INVALID_PARAMS, &cp->addr,
++							sizeof(cp->addr));
  		goto failed;
  	}
  
