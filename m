@@ -1,64 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] android/avrcp: Refactor get_caps() to allow parameter
-Date: Thu, 27 Feb 2014 11:11:26 +0200
-Message-Id: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/5] unit/avrcp: Add /TP/PAS/BV-01-C test
+Date: Thu, 27 Feb 2014 11:11:31 +0200
+Message-Id: <1393492291-15099-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Allow passing parameter specifying capability ID.
+Test verifies that the List Player Application Setting Attributes command
+issued from the Controller.
 ---
- android/avrcp-lib.c | 6 ++----
- android/avrcp-lib.h | 4 ++--
- unit/test-avrcp.c   | 3 ++-
- 3 files changed, 6 insertions(+), 7 deletions(-)
+ unit/test-avrcp.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 1b5a294..6ae8df8 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -297,11 +297,9 @@ static int avrcp_send_req(struct avrcp *session, uint8_t code, uint8_t subunit,
- 					session->tx_buf, len, func, user_data);
- }
- 
--int avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func,
--							void *user_data)
-+int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
-+					avctp_rsp_cb func, void *user_data)
- {
--	uint8_t param = CAP_EVENTS_SUPPORTED;
--
- 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
- 				AVRCP_GET_CAPABILITIES, &param, sizeof(param),
- 				func, user_data);
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 75802b9..e6e12c1 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -106,5 +106,5 @@ void avrcp_set_passthrough_handlers(struct avrcp *session,
- int avrcp_init_uinput(struct avrcp *session, const char *name,
- 							const char *address);
- 
--int avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func,
--							void *user_data);
-+int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
-+					avctp_rsp_cb func, void *user_data);
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index bcd8f88..f222df8 100644
+index 0924a7e..c65f743 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -353,7 +353,8 @@ static void test_client(gconstpointer data)
- 	struct context *context = create_context(0x0100, data);
+@@ -358,6 +358,9 @@ static void test_client(gconstpointer data)
+ 		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
+ 								NULL, NULL);
  
- 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
--		avrcp_get_capabilities(context->session, NULL, NULL);
-+		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
-+								NULL, NULL);
- 
++	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-01-C"))
++		avrcp_list_player_attributes(context->session, NULL, NULL);
++
  	execute_context(context);
+ }
+ 
+@@ -452,5 +455,12 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x01,
+ 				AVRCP_STATUS_INVALID_PARAM));
+ 
++	/* Player Application Settings tests */
++
++	define_test("/TP/PAS/BV-01-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
++				0x00));
++
+ 	return g_test_run();
  }
 -- 
 1.8.3.2
