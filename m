@@ -1,57 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/13] android/hal-gatt-api: Add Server Send Indication
-Date: Thu, 27 Feb 2014 14:28:50 +0100
-Message-Id: <1393507731-1974-13-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 07/13] android/hal-gatt-api: Add Server Characteristic
+Date: Thu, 27 Feb 2014 14:28:45 +0100
+Message-Id: <1393507731-1974-8-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-ipc-api.txt | 11 +++++++++++
- android/hal-msg.h       | 10 ++++++++++
- 2 files changed, 21 insertions(+)
+ android/hal-ipc-api.txt | 10 ++++++++++
+ android/hal-msg.h       |  9 +++++++++
+ 2 files changed, 19 insertions(+)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index fac614e..18bf7ed 100644
+index c6b573a..b5175ca 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -1763,6 +1763,17 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+@@ -1717,6 +1717,16 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
  		In case of an error, the error response will be returned.
  
- 	Opcode 0x22 - Send Indication command/response
+ 	Opcode 0x1d - Add Characteristic command/response
 +
 +		Command parameters: Server (4 octets)
-+		                    Attribute handle (4 octets)
-+		                    Connection ID (4 octets)
-+		                    Length (4 octets)
-+		                    Confirmation (4 octets)
-+		                    Value (variable)
++		                    Service handle (4 octets)
++		                    UUID (16 octets)
++		                    Properties (4 octets)
++		                    Permissions (4 octets)
 +		Response parameters: <none>
 +
 +		In case of an error, the error response will be returned.
 +
- 	Opcode 0x23 - Send Response command/response
- 
- 	Opcode 0x81 - Register Client notification
+ 	Opcode 0x1e - Add Descriptor command/response
+ 	Opcode 0x1f - Start Service command/response
+ 	Opcode 0x20 - Stop Service command/response
 diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 6598996..fd67fa1 100644
+index 4f0ae30..88228ad 100644
 --- a/android/hal-msg.h
 +++ b/android/hal-msg.h
-@@ -776,6 +776,16 @@ struct hal_cmd_gatt_server_delete_service {
- 	int32_t service_handle;
+@@ -740,6 +740,15 @@ struct hal_cmd_gatt_server_add_inc_service {
+ 	int32_t included_handle;
  } __attribute__((packed));
  
-+#define HAL_OP_GATT_SERVER_SEND_INDICATION	0x22
-+struct hal_cmd_gatt_server_send_indication {
++#define HAL_OP_GATT_SERVER_ADD_CHARACTERISTIC	0x1d
++struct hal_cmd_gatt_server_add_characteristic {
 +	int32_t server_if;
-+	int32_t attribute_handle;
-+	int32_t conn_id;
-+	int32_t len;
-+	int32_t confirm;
-+	uint8_t value[0];
++	int32_t service_handle;
++	uint8_t uuid[16];
++	int32_t properties;
++	int32_t permissions;
 +} __attribute__((packed));
 +
  /* Notifications and confirmations */
