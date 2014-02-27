@@ -1,45 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Feb 2014 09:22:23 +0000
-From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-To: Feng Tang <feng.79.tang@gmail.com>
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jiri Slaby <jslaby@suse.cz>, linux-serial@vger.kernel.org,
-	Beat Bolli <bbolli@ewanet.ch>, Pavel Roskin <proski@gnu.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Jiri Kosina <jkosina@suse.cz>, David Sterba <dsterba@suse.cz>,
-	Felipe Balbi <balbi@ti.com>,
-	Grant Edwards <grant.b.edwards@gmail.com>,
-	Stanislaw Gruszka <sgruszka@redhat.com>,
-	Hal Murray <murray+fedora@ip-64-139-1-69.sjc.megapath.net>,
-	stable@vger.kernel.org,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	feng.tang@intel.com, bin.yang@intel.com, alek.du@intel.com
-Subject: Re: [PATCH] tty: Fix low_latency BUG
-Message-ID: <20140227092223.5b035f7f@alan.etchedpixels.co.uk>
-In-Reply-To: <CA++bM2vjzFOt5wmc=TQ1XMvRCwgnpq6=PKpex=GGZBK_-M6=mw@mail.gmail.com>
-References: <1393072281-5814-1-git-send-email-peter@hurleysoftware.com>
-	<CA++bM2uq=vRo20FTMWvkDau+-X7h0+KU3n4Av7ef895mQKr5fA@mail.gmail.com>
-	<530E0AD3.7040909@hurleysoftware.com>
-	<CA++bM2vjzFOt5wmc=TQ1XMvRCwgnpq6=PKpex=GGZBK_-M6=mw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/5] android/avrcp: Refactor get_caps() to allow parameter
+Date: Thu, 27 Feb 2014 11:11:26 +0200
+Message-Id: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> > I'm glad to hear that the Bluetooth uart interface is getting
-> > some use; that means someone will soon be fixing the hard lockup
-> > in hci_uart_tx_wakeup() reported here:
-> 
-> I'm not very familiar with the BT devices on our platforms, but most
-> of them are not using the in-kernel BT driver, some just use the
-> n_tty ldisc and the raw data, some use their own ldisc driver.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Outside of the world of phones/android the Bluetooth on quite a few of the
-Baytrail/T devices is on the LPSS serial so it probably will be getting
-tested sooner not later and there will actually be a common platform
-around that is using the bluetooth uart features.
+Allow passing parameter specifying capability ID.
+---
+ android/avrcp-lib.c | 6 ++----
+ android/avrcp-lib.h | 4 ++--
+ unit/test-avrcp.c   | 3 ++-
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-I'm not anticipating any problems though.
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index 1b5a294..6ae8df8 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -297,11 +297,9 @@ static int avrcp_send_req(struct avrcp *session, uint8_t code, uint8_t subunit,
+ 					session->tx_buf, len, func, user_data);
+ }
+ 
+-int avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func,
+-							void *user_data)
++int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
++					avctp_rsp_cb func, void *user_data)
+ {
+-	uint8_t param = CAP_EVENTS_SUPPORTED;
+-
+ 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+ 				AVRCP_GET_CAPABILITIES, &param, sizeof(param),
+ 				func, user_data);
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 75802b9..e6e12c1 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -106,5 +106,5 @@ void avrcp_set_passthrough_handlers(struct avrcp *session,
+ int avrcp_init_uinput(struct avrcp *session, const char *name,
+ 							const char *address);
+ 
+-int avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func,
+-							void *user_data);
++int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
++					avctp_rsp_cb func, void *user_data);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index bcd8f88..f222df8 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -353,7 +353,8 @@ static void test_client(gconstpointer data)
+ 	struct context *context = create_context(0x0100, data);
+ 
+ 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
+-		avrcp_get_capabilities(context->session, NULL, NULL);
++		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
++								NULL, NULL);
+ 
+ 	execute_context(context);
+ }
+-- 
+1.8.3.2
 
-Alan
