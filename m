@@ -1,42 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/13] Android HAL GATT Server API Commands
-Date: Thu, 27 Feb 2014 22:16:47 +0100
-Message-ID: <2015721.pAqq9raOyp@athlon>
-In-Reply-To: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1393507731-1974-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCHv2 00/23] Add GATT Client Messages
+Date: Thu, 27 Feb 2014 22:15:58 +0100
+Message-ID: <33181363.PmHWBrojOB@athlon>
+In-Reply-To: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1393404081-1401-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Jakub,
 
-On Thursday 27 February 2014 14:28:38 Grzegorz Kolodziejczyk wrote:
-> This serie of hal-gatt-api patches updates hal-ipc-api document and
-> hal-msg header in parallel. Should be applied on top of GATT client
-> patches.
+On Wednesday 26 February 2014 09:40:58 Jakub Tyszkowski wrote:
+> This patchset adds GATT's Client part of ipc messages data.
 > 
-> Grzegorz Kolodziejczyk (13):
->   android/hal-gatt-api: Add Server Register
->   android/hal-gatt-api: Add Server Unregister
->   android/hal-gatt-api: Add Server Connect
->   android/hal-gatt-api: Add Server Disconnect
->   android/hal-gatt-api: Add Server Service
->   android/hal-gatt-api: Add Server Included Service
->   android/hal-gatt-api: Add Server Characteristic
->   android/hal-gatt-api: Add Server Descriptor
->   android/hal-gatt-api: Add Server Start Service
->   android/hal-gatt-api: Add Server Stop Service
->   android/hal-gatt-api: Add Server Delete Service
->   android/hal-gatt-api: Add Server Send Indication
->   android/hal-gatt-api: Add Server Send Response
+> v2 changes:
+>   * moved msg structs and opcodes up to message opcodes section of hal-msg.h
+> * fixed typo and renamed few struct members to better match those in HAL
+> hdrs * corrected tlv field types
+>   * [PATCHES 14-23/23] added opcodes and structs for the rest of Client
+> messages
 > 
->  android/hal-ipc-api.txt | 119
-> ++++++++++++++++++++++++++++++++++++++++++++++++ android/hal-msg.h       | 
-> 93 +++++++++++++++++++++++++++++++++++++ 2 files changed, 212 insertions(+)
+> Regards,
+> Jakub Tyszkowski (23):
+>   android/hal-gatt-api: Add missing opcodes in GATT Service
+>   android/hal-gatt-api: Add Client Register
+>   android/hal-gatt-api: Add Client Unregister
+>   android/hal-gatt-api: Add Client Scan
+>   android/hal-gatt-api: Add Client Connect Remote
+>   android/hal-gatt-api: Add Client Disconnect Remote
+>   android/hal-gatt-api: Add Client Listen
+>   android/hal-gatt-api: Add Client Refresh Remote Cache
+>   android/hal-gatt-api: Add Client Search Service
+>   android/hal-gatt-api: Add Client Get Included Service
+>   android/hal-gatt-api: Add Client Get Characteristic
+>   android/hal-gatt-api: Add Client Get Descriptor
+>   android/hal-gatt-api: Add Client Read Characteristic
+>   android/hal-gatt-api: Add Client Write Characteristic
+>   android/hal-gatt-api: Add Client Read Descriptor
+>   android/hal-gatt-api: Add Client Write Descriptor
+>   android/hal-gatt-api: Add Client Execute Write
+>   android/hal-gatt-api: Add Client Register for Notification
+>   android/hal-gatt-api: Add Client Deregister for Notification
+>   android/hal-gatt-api: Add Client Read Remote RSSI
+>   android/hal-gatt-api: Add Client Get Device Type
+>   android/hal-gatt-api: Add Client Set Advertising Data
+>   android/hal-gatt-api: Add Client Test Command
+> 
+>  android/hal-ipc-api.txt | 324
+> +++++++++++++++++++++++++++++++++++++++++------- android/hal-msg.h       |
+> 186 +++++++++++++++++++++++++++
+>  2 files changed, 466 insertions(+), 44 deletions(-)
 
 All patches applied, thanks.
 
