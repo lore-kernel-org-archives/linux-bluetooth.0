@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/5] android/avrcp: Add list player attributes command
-Date: Thu, 27 Feb 2014 11:11:30 +0200
-Message-Id: <1393492291-15099-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] doc: Update test coverage document
+Date: Thu, 27 Feb 2014 11:11:27 +0200
+Message-Id: <1393492291-15099-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Update AVRCP test numbers.
 ---
- android/avrcp-lib.c | 8 ++++++++
- android/avrcp-lib.h | 2 ++
- 2 files changed, 10 insertions(+)
+ doc/test-coverage.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 6ae8df8..3db5bda 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -304,3 +304,11 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
- 				AVRCP_GET_CAPABILITIES, &param, sizeof(param),
- 				func, user_data);
- }
-+
-+int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
-+								void *user_data)
-+{
-+	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
-+				AVRCP_LIST_PLAYER_ATTRIBUTES, NULL, 0,
-+				func, user_data);
-+}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index e6e12c1..7283203 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -108,3 +108,5 @@ int avrcp_init_uinput(struct avrcp *session, const char *name,
- 
- int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
- 					avctp_rsp_cb func, void *user_data);
-+int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
-+							void *user_data);
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index d37bcb8..79cace9 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -18,7 +18,7 @@ test-ringbuf		   3	Ring buffer functionality
+ test-queue		   1	Queue handling functionality
+ test-avdtp		  60	AVDTP qualification test cases
+ test-avctp		   9	AVCTP qualification test cases
+-test-avrcp		   7	AVRCP qualification test cases
++test-avrcp		  13	AVRCP qualification test cases
+ test-gobex		  31	Generic OBEX functionality
+ test-gobex-packet	   9	OBEX packet handling
+ test-gobex-header	  28	OBEX header handling
 -- 
 1.8.3.2
 
