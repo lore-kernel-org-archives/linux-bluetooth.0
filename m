@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Update test coverage document
-Date: Thu, 27 Feb 2014 11:11:27 +0200
-Message-Id: <1393492291-15099-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/5] unit/avrcp: Fix lengths byte order
+Date: Thu, 27 Feb 2014 11:11:28 +0200
+Message-Id: <1393492291-15099-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393492291-15099-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,24 +11,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Update AVRCP test numbers.
+params_len is passed as function argument and needs to be in host byte
+order.
 ---
- doc/test-coverage.txt | 2 +-
+ unit/test-avrcp.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-index d37bcb8..79cace9 100644
---- a/doc/test-coverage.txt
-+++ b/doc/test-coverage.txt
-@@ -18,7 +18,7 @@ test-ringbuf		   3	Ring buffer functionality
- test-queue		   1	Queue handling functionality
- test-avdtp		  60	AVDTP qualification test cases
- test-avctp		   9	AVCTP qualification test cases
--test-avrcp		   7	AVRCP qualification test cases
-+test-avrcp		  13	AVRCP qualification test cases
- test-gobex		  31	Generic OBEX functionality
- test-gobex-packet	   9	OBEX packet handling
- test-gobex-header	  28	OBEX header handling
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index f222df8..a43985a 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -323,7 +323,7 @@ static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
+ 	}
+ 
+ fail:
+-	*params_len = htons(1);
++	*params_len = 1;
+ 	params[0] = AVRCP_STATUS_INVALID_PARAM;
+ 
+ 	return AVC_CTYPE_REJECTED;
 -- 
 1.8.3.2
 
