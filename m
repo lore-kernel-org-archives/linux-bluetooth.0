@@ -1,40 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: Re-encrypt link after receiving an LTK
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393603803-19006-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 28 Feb 2014 08:19:21 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <31C1BB7E-9049-45D0-BA8F-1096F669B8FB@holtmann.org>
-References: <1393603803-19006-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
+Date: Fri, 28 Feb 2014 12:14:01 -0400
+Message-ID: <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com>
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Adam Warski <adam@warski.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Adam,
 
-> It's not strictly speaking required to re-encrypt a link once we receive
-> an LTK since the connection is already encrypted with the STK. However,
-> re-encrypting with the LTK allows us to verify that we've received an
-> LTK that actually works.
-> 
-> This patch updates the SMP code to request encrypting with the LTK in
-> case we're in master role and waits until the key refresh complete event
-> before notifying user space of the distributed keys.
-> 
-> A new flag is also added for the SMP context to ensure that we
-> re-encryption only once in case of multiple calls to smp_distribute_keys.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/smp.c | 32 +++++++++++++++++++++++++++-----
-> net/bluetooth/smp.h |  3 ++-
-> 2 files changed, 29 insertions(+), 6 deletions(-)
+On Fri, Feb 28, 2014 at 8:41 AM, Adam Warski <adam@warski.org> wrote:
+> But then I get:
+>
+>> HCI Event: LE Meta Event (0x3e) plen 42
+>     LE Advertising Report
+>       ADV_IND - Connectable undirected advertising (0)
+>       bdaddr FC:94:A8:6F:A8:10 (Random)
+>       Flags: 0x06
+>       Unknown type 0xff with 25 bytes data
+>       RSSI: -4
+>> HCI Event: QoS Violation (0x1e) plen 2
+>     handle 1537
+>> HCI Event: Data Buffer Overflow (0x1a) plen 255
+>     type Unknown
+>> HCI Event: code 0xa8 plen 148
+>> HCI Event: code 0xf8 plen 70
+>> HCI Event: Physical Link Complete (0x40) plen 127
+>     status 0x30 phy handle 0xf5
+>     Error: Parameter out of Mandatory Range
 
-patch has been applied to bluetooth-next tree.
+For me looks like something got confused on the HCI packet parsing:
+either the kernel, hcidump, or something else. The HCI events after
+the LE meta event make no sense (they seem garbage). Did you try with
+btmon instead of hcidump ?
 
-Regards
+Can you save the raw dump using "hcidump -w output.dump"  (or using
+btmon -w) and send to the list? It is easier to analyze, as the parser
+may be bogus.
 
-Marcel
-
+Best Regards,
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
