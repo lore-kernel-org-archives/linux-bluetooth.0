@@ -1,99 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5310A4A9.2000907@gmx.net>
-Date: Fri, 28 Feb 2014 15:00:57 +0000
-From: Benjamin Adler <benadler@gmx.net>
-MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Receiving data in BLE non-connectable undirected advertisements
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Delay LTK encryption to let remote receive all keys
+Date: Fri, 28 Feb 2014 16:37:34 +0200
+Message-Id: <1393598254-9609-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1393598254-9609-1-git-send-email-johan.hedberg@gmail.com>
+References: <1393598254-9609-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello bluez,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-as the subject notes, I'm trying to receive non-connectable undirected 
-advertisements from a bluetooth low energy device, namely TI's 
-SensorTag. Their SDK contains a sample app named SimpleBLEBroadcaster, 
-that, supposedly, sends those advertisements including some data. There 
-is an overview of TI's understanding of this mechanism for download at
+Some devices may refuse to re-encrypt with the LTK if they haven't
+received all our keys yet. This patch adds a 200ms delay before
+attempting re-encryption with the LTK.
 
-http://e2e.ti.com/support/low_power_rf/m/videos__files/653593/download.aspx
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 22 +++++++++++++++++++---
+ net/bluetooth/smp.h |  3 +++
+ 2 files changed, 22 insertions(+), 3 deletions(-)
 
-Is it possible to receive/display the *data* (up to 31 bytes, I believe) 
-that can be contained in those advertisements using bluez? I currently 
-don't care whether it's a commandline tool, C-based API, python, DBUS, 
-anything.
-
-When I start SimpleBLEBroadcaster, btmon alone doesn't show anything, 
-but "hcitool lescan" says.
-
-	LE Scan ...
-	90:59:AF:0B:8A:7D (unknown)
-
-The complete output of a btmon during lescan is attached below.
-
-https://github.com/bmpm/bcast-observer-demos and a script named 
-"test-bluetooth-observer" made me believe that there should be an 
-org.bluez.Observer interface for this, which I couldn't find using 
-qdbusviewer.
-
-I asked on #bluez before, but it seems noone knew.
-
-Thanks!
-ben
-
-###################################################################
-
-####### start "btmon"
-
-Bluetooth monitor ver 5.14
-= New Index: 00:02:72:33:29:55 (BR/EDR,USB,hci0)             [hci0] 0.377191
-
-####### start "hcitool lescan" in another shell
-
-< HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7   [hci0] 4.457403
-         Type: Active (0x01)
-         Interval: 10.000 msec (0x0010)
-         Window: 10.000 msec (0x0010)
-         Own address type: Public (0x00)
-         Filter policy: Accept all advertisement (0x00)
- > HCI Event: Command Complete (0x0e) plen 4                  [hci0] 
-4.458949
-       LE Set Scan Parameters (0x08|0x000b) ncmd 1
-         Status: Success (0x00)
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2       [hci0] 4.459094
-         Scanning: Enabled (0x01)
-         Filter duplicates: Enabled (0x01)
- > HCI Event: Command Complete (0x0e) plen 4                  [hci0] 
-4.459957
-       LE Set Scan Enable (0x08|0x000c) ncmd 1
-         Status: Success (0x00)
-
-####### Power-on the SensorTag
-
- > HCI Event: LE Meta Event (0x3e) plen 20                    [hci0] 
-9.481376
-       LE Advertising Report (0x02)
-         Num reports: 1
-         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-         Address type: Public (0x00)
-         Address: 90:59:AF:0B:8A:7D (Texas Instruments)
-         Data length: 8
-         Flags: 0x04
-           BR/EDR Not Supported
-         Company: not assigned (513)
-           Data: 03
-         RSSI: -80 dBm (0xb0)
-
-####### Quit hcitool
-
-< HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      [hci0] 20.647504
-         Scanning: Disabled (0x00)
-         Filter duplicates: Enabled (0x01)
- > HCI Event: Command Complete (0x0e) plen 4                 [hci0] 
-20.650124
-       LE Set Scan Enable (0x08|0x000c) ncmd 1
-         Status: Success (0x00)
-
-#
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 79b6c97f8303..cba0e0ddf332 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -549,6 +549,20 @@ error:
+ 	smp_failure(conn, reason);
+ }
+ 
++static void smp_reencrypt(struct work_struct *work)
++{
++	struct smp_chan *smp = container_of(work, struct smp_chan,
++					    reencrypt.work);
++	struct l2cap_conn *conn = smp->conn;
++	struct hci_conn *hcon = conn->hcon;
++	struct smp_ltk *ltk = smp->ltk;
++
++	BT_DBG("");
++
++	hci_le_start_enc(hcon, ltk->ediv, ltk->rand, ltk->val);
++	hcon->enc_key_size = ltk->enc_size;
++}
++
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ {
+ 	struct smp_chan *smp;
+@@ -559,6 +573,7 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 
+ 	INIT_WORK(&smp->confirm, confirm_work);
+ 	INIT_WORK(&smp->random, random_work);
++	INIT_DELAYED_WORK(&smp->reencrypt, smp_reencrypt);
+ 
+ 	smp->conn = conn;
+ 	conn->smp_chan = smp;
+@@ -576,6 +591,8 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ 
+ 	BUG_ON(!smp);
+ 
++	cancel_delayed_work_sync(&smp->reencrypt);
++
+ 	complete = test_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
+ 	mgmt_smp_complete(conn->hcon, complete);
+ 
+@@ -1282,9 +1299,8 @@ int smp_distribute_keys(struct l2cap_conn *conn)
+ 
+ 	/* Re-encrypt the link with LTK if possible */
+ 	if (ltk_encrypt && hcon->out) {
+-		struct smp_ltk *ltk = smp->ltk;
+-		hci_le_start_enc(hcon, ltk->ediv, ltk->rand, ltk->val);
+-		hcon->enc_key_size = ltk->enc_size;
++		queue_delayed_work(hdev->req_workqueue, &smp->reencrypt,
++				   SMP_REENCRYPT_TIMEOUT);
+ 	} else {
+ 		clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags);
+ 		cancel_delayed_work_sync(&conn->security_timer);
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 676395f93702..f95bf887a9f3 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -121,6 +121,8 @@ struct smp_cmd_security_req {
+ #define SMP_FLAG_LTK_ENCRYPT	4
+ #define SMP_FLAG_COMPLETE	5
+ 
++#define SMP_REENCRYPT_TIMEOUT	msecs_to_jiffies(200)
++
+ struct smp_chan {
+ 	struct l2cap_conn *conn;
+ 	u8		preq[7]; /* SMP Pairing Request */
+@@ -140,6 +142,7 @@ struct smp_chan {
+ 	unsigned long	smp_flags;
+ 	struct work_struct confirm;
+ 	struct work_struct random;
++	struct delayed_work reencrypt;
+ };
+ 
+ /* SMP Commands */
+-- 
+1.8.5.3
 
