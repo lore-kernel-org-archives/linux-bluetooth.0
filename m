@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 6/9] unit/avrcp: Add /TP/PAS/BV-02-C test
-Date: Fri, 28 Feb 2014 10:22:55 +0200
-Message-Id: <1393575778-28681-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 1/9] android/avrcp: Refactor get_caps() to allow parameter
+Date: Fri, 28 Feb 2014 10:22:50 +0200
+Message-Id: <1393575778-28681-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393575778-28681-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393575778-28681-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,53 +11,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that the List Player Application Setting Attributes
-response issued from the Target.
+Allow passing parameter specifying capability ID.
 ---
- unit/test-avrcp.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ android/avrcp-lib.c | 6 ++----
+ android/avrcp-lib.h | 4 ++--
+ unit/test-avrcp.c   | 3 ++-
+ 3 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index c65f743..c4faca3 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -331,9 +331,23 @@ fail:
- 	return AVC_CTYPE_REJECTED;
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index 1b5a294..6ae8df8 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -297,11 +297,9 @@ static int avrcp_send_req(struct avrcp *session, uint8_t code, uint8_t subunit,
+ 					session->tx_buf, len, func, user_data);
  }
  
-+static uint8_t avrcp_handle_list_attributes(struct avrcp *session,
-+				uint8_t transaction, uint16_t *params_len,
-+				uint8_t *params, void *user_data)
-+{
-+	DBG("");
-+
-+	*params_len = 1;
-+	params[0] = 0;
-+
-+	return AVC_CTYPE_STABLE;
-+}
-+
- static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
- 					avrcp_handle_get_capabilities },
-+		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
-+					avrcp_handle_list_attributes },
- 		{ },
- };
+-int avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func,
+-							void *user_data)
++int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
++					avctp_rsp_cb func, void *user_data)
+ {
+-	uint8_t param = CAP_EVENTS_SUPPORTED;
+-
+ 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+ 				AVRCP_GET_CAPABILITIES, &param, sizeof(param),
+ 				func, user_data);
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 75802b9..e6e12c1 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -106,5 +106,5 @@ void avrcp_set_passthrough_handlers(struct avrcp *session,
+ int avrcp_init_uinput(struct avrcp *session, const char *name,
+ 							const char *address);
  
-@@ -462,5 +476,13 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
- 				0x00));
+-int avrcp_get_capabilities(struct avrcp *session, avctp_rsp_cb func,
+-							void *user_data);
++int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
++					avctp_rsp_cb func, void *user_data);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index bcd8f88..f222df8 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -353,7 +353,8 @@ static void test_client(gconstpointer data)
+ 	struct context *context = create_context(0x0100, data);
  
-+	define_test("/TP/PAS/BV-02-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
-+				0x00),
-+			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
-+				0x01, 0x00));
-+
- 	return g_test_run();
+ 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
+-		avrcp_get_capabilities(context->session, NULL, NULL);
++		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
++								NULL, NULL);
+ 
+ 	execute_context(context);
  }
 -- 
 1.8.3.2
