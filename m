@@ -1,55 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/6] shared/hfp: Add get_number implementation
-Date: Fri, 28 Feb 2014 21:33:53 +0100
-Message-Id: <1393619636-23762-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 5/6] shared/hfp: Add function to get string
+Date: Fri, 28 Feb 2014 21:33:55 +0100
+Message-Id: <1393619636-23762-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1393619636-23762-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1393619636-23762-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-User can call this function with hfp_gw_result, which will
-be passed to prefix handler.
+It will look for quoted sting and write it to given buffer.
 ---
  src/shared/hfp.c | 33 +++++++++++++++++++++++++++++++++
  src/shared/hfp.h |  2 ++
  2 files changed, 35 insertions(+)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 8feaf16..d168ac4 100644
+index 807ddf2..4d3bdc9 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -218,6 +218,39 @@ done:
+@@ -277,6 +277,39 @@ bool hfp_gw_result_close_container(struct hfp_gw_result *result)
  	return true;
  }
  
-+static void next_field(struct hfp_gw_result *result)
++bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
++								uint8_t len)
 +{
-+	if (result->data[result->offset] == ',')
-+		result->offset++;
-+}
-+
-+bool hfp_gw_result_get_number(struct hfp_gw_result *result, int *val)
-+{
-+	int temp = 0;
-+	int i;
++	int i = 0;
++	const char *data = result->data;
 +
 +	skip_whitespace(result);
 +
-+	i = result->offset;
-+
-+	while (result->data[i] >= '0' && result->data[i] <= '9') {
-+		temp *= 10;
-+		temp += result->data[i++] - '0';
-+	}
-+
-+	if (i == result->offset)
++	if (data[result->offset] != '"')
 +		return false;
 +
-+	if (val)
-+		*val = temp;
-+	result->offset = i;
++	result->offset++;
++
++	while (data[result->offset] != '\0' && data[result->offset] != '"') {
++		if (i < len)
++			buf[i++] = data[result->offset];
++		result->offset++;
++	}
++
++	if (i < len)
++		buf[i++] = '\0';
++
++	if (data[result->offset] == '"')
++		result->offset++;
++	else
++		return false;
 +
 +	skip_whitespace(result);
 +	next_field(result);
@@ -61,15 +60,15 @@ index 8feaf16..d168ac4 100644
  {
  	char *str, *ptr;
 diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index dee80d9..37d5c9b 100644
+index dcde28f..96c6ef9 100644
 --- a/src/shared/hfp.h
 +++ b/src/shared/hfp.h
-@@ -113,3 +113,5 @@ bool hfp_gw_register_prefix_handler(struct hfp_gw *hfp,
- 						void *user_data,
- 						hfp_destroy_func_t destroy);
- bool hfp_gw_unregister_prefix_handler(struct hfp_gw *hfp, const char *prefix);
-+
-+bool hfp_gw_result_get_number(struct hfp_gw_result *result, int *val);
+@@ -117,3 +117,5 @@ bool hfp_gw_unregister_prefix_handler(struct hfp_gw *hfp, const char *prefix);
+ bool hfp_gw_result_get_number(struct hfp_gw_result *result, int *val);
+ bool hfp_gw_result_open_container(struct hfp_gw_result *result);
+ bool hfp_gw_result_close_container(struct hfp_gw_result *result);
++bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
++								uint8_t len);
 -- 
 1.8.3.1
 
