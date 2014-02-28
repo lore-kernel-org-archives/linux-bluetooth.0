@@ -1,31 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140228073113.GA3771@adam-laptop>
-References: <1393571362-27898-1-git-send-email-adam8157@gmail.com>
-	<04802ECE-6B8D-4DF4-BFFD-EABBD42BD30F@holtmann.org>
-	<20140228073113.GA3771@adam-laptop>
-Date: Fri, 28 Feb 2014 08:22:17 -0400
-Message-ID: <CAJdJm_OnnyvMvLmCtYuLGOvUL0igK22gOCAP1G5KBvcJseaayw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] core: retry connect_dbus() several times
+In-Reply-To: <530FBB6B.8080300@gmx.net>
+References: <530FBB6B.8080300@gmx.net>
+Date: Fri, 28 Feb 2014 08:16:45 -0400
+Message-ID: <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
+Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
 From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Adam Lee <adam8157@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+To: Tobias Jakobi <liquid.acid@gmx.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
+Hi Tobias,
 
-On Fri, Feb 28, 2014 at 3:31 AM, Adam Lee <adam8157@gmail.com> wrote:
-> connect_dbus() fails sometimes with Intel 7260 bluetooth, sleeping 0.5s
-> before executing bluetoothd workarounds it. I assume the firmware
-> patching slows down hardware initialization then fails to connect.
->
-> Any other possibility? I'm not a D-Bus guru :)
+On Thu, Feb 27, 2014 at 6:25 PM, Tobias Jakobi <liquid.acid@gmx.net> wrote:
+> That's the server:
+> [bluetooth]# info 00:02:72:C6:43:11
+> Device 00:02:72:C6:43:11
+>         Name: chidori-bt
+>         Alias: chidori-bt
+>         Class: 0x020000
+>         Paired: yes
+>         Trusted: yes
+>         Blocked: no
+>         Connected: no
+>         LegacyPairing: no
+>         UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+>         UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+>         UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
+>         UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+>         UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+>         UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+>         Modalias: usb:v1D6Bp0246d0509
 
-Please provide more details, e.g. the bluetoothd logs showing the
-problems, btmon output and which steps you are using to reproduce it.
-If you are using bluetoothctl, tell us which commands you are using.
+Looks like you are missing a "power on" on the server side. Notice
+that the client side shows "Powered: yes" on the info command.
 
 Best Regards,
 -- 
