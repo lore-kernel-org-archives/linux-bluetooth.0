@@ -1,84 +1,167 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 28 Feb 2014 16:38:19 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2014-02-28
+Message-ID: <20140228193819.GA1700@joana>
 MIME-Version: 1.0
-In-Reply-To: <0F2EE81A-0DB1-44DF-8EFD-F0835B090B7E@holtmann.org>
-References: <530FB0CA.4070309@gmail.com>
-	<613439C8-AFCE-4B23-81FE-AD4B91A27768@holtmann.org>
-	<530FC224.90305@gmail.com>
-	<0F2EE81A-0DB1-44DF-8EFD-F0835B090B7E@holtmann.org>
-Date: Fri, 28 Feb 2014 21:26:46 +0100
-Message-ID: <CAE5S2EnDWG28nraphCROhj7iWzMcLHBhFPbfaSCYYUzg0j1veQ@mail.gmail.com>
-Subject: Re: [PATCH] bluetooth: ath3k: added Atheros AR3012 with ID 0x0b05:0x17d0
-From: Bela Hausmann <bela.hausmann@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="+QahgC5+KEYLbs62"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-I would, but I just now noticed that you already added this device ID
-a few days ago in commit a735f9e22432899cee188d167966782c29246390 to
-linux-next [1]. Thank you!
+--+QahgC5+KEYLbs62
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Best wishes,
-Bela
+Hi John,
 
-[1] https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit=
-/drivers/bluetooth?id=3Da735f9e22432899cee188d167966782c29246390
+Another pull request to 3.15. Here we have the second part of the LE private
+feature, the LE auto-connect feature and improvements to the power off
+procedures. The rest are small improvements, clean up, and fixes.
 
-2014-02-28 0:19 GMT+01:00 Marcel Holtmann <marcel@holtmann.org>:
-> Hi Bela,
->
->> Hi Marcel,
->>
->> sorry for the messed up tabs.
->>
->> Here is /sys/kernel/debug/usb/devices:
->> T:  Bus=3D02 Lev=3D02 Prnt=3D02 Port=3D03 Cnt=3D02 Dev#=3D  4 Spd=3D12  =
- MxCh=3D 0
->> D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
->> P:  Vendor=3D0b05 ProdID=3D17d0 Rev=3D 0.02
->> C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
->> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
->> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
->> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
->> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
->> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
->> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
->> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
->> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
->> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
->> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
->> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
->> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
->> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
->> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
-r=3Dbtusb
->> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
->> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
->>
->> An again the patch.
->>
->> Best wishes,
->> Bela
->
-> why don=E2=80=99t you use git-format-patch and git-send-email. Just save =
-the email you send as raw text and see what happens if you apply it with gi=
-t-am and then look at git-log.
->
-> Regards
->
-> Marcel
->
+Please pull or let me know of any problem. Thanks.
+
+	Gustavo
+
+---
+
+The following changes since commit 668b7b19820b0801c425d31cc27fd6f499050e5c:
+
+  Bluetooth: Fix iterating wrong list in hci_remove_irk() (2014-02-21 11:07:46 -0300)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+
+for you to fetch changes up to 81ad6fd9698f659dbabdc6cd3e1667a98eb2be3b:
+
+  Bluetooth: Remove unnecessary stop_scan_complete function (2014-02-28 10:28:17 -0800)
+
+----------------------------------------------------------------
+Andre Guedes (17):
+      Bluetooth: Create hci_req_add_le_scan_disable helper
+      Bluetooth: Declare le_conn_failed in hci_core.h
+      Bluetooth: Stop scanning on LE connection
+      Bluetooth: Remove unused function
+      Bluetooth: Refactor HCI connection code
+      Bluetooth: Move address type conversion to outside hci_connect_le
+      Bluetooth: Introduce hdev->pend_le_conn list
+      Bluetooth: Introduce LE auto connection infrastructure
+      Bluetooth: Introduce LE auto connect options
+      Bluetooth: Connection parameters and auto connection
+      Bluetooth: Temporarily stop background scanning on discovery
+      Bluetooth: Auto connection and power on
+      Bluetooth: Connection parameters and resolvable address
+      Bluetooth: Support resolvable private addresses
+      Bluetooth: Add le_auto_conn file on debugfs
+      Bluetooth: Create hci_req_add_le_passive_scan helper
+      Bluetooth: Update background scan parameters
+
+Andrzej Kaczmarek (1):
+      Bluetooth: Fix NULL pointer dereference when sending data
+
+Johan Hedberg (47):
+      Bluetooth: Add helper variables to smp_distribute_keys()
+      Bluetooth: Add initial code for distributing local IRK
+      Bluetooth: Move enable/disable_advertising higher up in mgmt.c
+      Bluetooth: Add mgmt defines for privacy
+      Bluetooth: Add Privacy flag to mgmt supported/current settings
+      Bluetooth: Ensure hci_conn always contains the local identity address
+      Bluetooth: Set the correct values for Identity Address Information
+      Bluetooth: Add SMP function for generating RPAs
+      Bluetooth: Add timer for regenerating local RPA
+      Bluetooth: Add hci_update_random_address() convenience function
+      Bluetooth: Use hci_update_random_address() when connecting LE
+      Bluetooth: Use hci_update_random_address() for enabling advertising
+      Bluetooth: Use hci_update_random_address() for initiating LE scan
+      Bluetooth: Don't write static address during power on
+      Bluetooth: Add debugfs entry for RPA regeneration timeout
+      Bluetooth: Add support for Set Privacy command
+      Bluetooth: Fix setting correct src_type when connecting LE
+      Bluetooth: Remove unneeded hdev->own_addr_type
+      Bluetooth: Enable RPA resolving if mgmt_set_privacy is called
+      Bluetooth: Fix canceling RPA expiry timer
+      Bluetooth: Add convenience function for getting total connection count
+      Bluetooth: Move HCI_ADVERTISING handling into mgmt.c
+      Bluetooth: Move check for MGMT_CONNECTED flag into mgmt.c
+      Bluetooth: Don't clear HCI_DISCOVERABLE when powering off
+      Bluetooth: Don't clear HCI_CONNECTABLE when powering off
+      Bluetooth: Don't clear HCI_ADVERTISING when powering off
+      Bluetooth: Clean up HCI state when doing power off
+      Bluetooth: Fix advertising address type when toggling connectable
+      Bluetooth: Ignore IRKs with no Identity Address
+      Bluetooth: Track not yet received keys in SMP
+      Bluetooth: Simplify logic for checking for SMP completion
+      Bluetooth: Remove unneeded "force" parameter from smp_distribute_keys()
+      Bluetooth: Add tracking of advertising address type
+      Bluetooth: Add hci_copy_identity_address convenience function
+      Bluetooth: Fix disconnecting connections in non-connected states
+      Bluetooth: Add timer to force power off
+      Bluetooth: Fix clearing SMP keys if pairing fails
+      Bluetooth: Add protections for updating local random address
+      Bluetooth: Fix updating connection state to BT_CONNECT too early
+      Bluetooth: Track LE initiator and responder address information
+      Bluetooth: Use hdev->init/resp_addr values for smp_c1 function
+      Bluetooth: Add defines for LE initiator filter policy
+      Bluetooth: Add timeout for LE connection attempts
+      Bluetooth: Re-encrypt link after receiving an LTK
+      Bluetooth: Delay LTK encryption to let remote receive all keys
+      Bluetooth: Fix trying to disable scanning twice
+      Bluetooth: Remove unnecessary stop_scan_complete function
+
+Lukasz Rymanowski (1):
+      Bluetooth: Fix response on confirm_name
+
+Marcel Holtmann (12):
+      Bluetooth: Fix issue with missing management event opcode
+      Bluetooth: Expose current identity information in debugfs
+      Bluetooth: Use unresolvable private address for active scanning
+      Bluetooth: Use privacy mode for non-connectable advertising
+      Bluetooth: Store current RPA and update it if needed
+      Bluetooth: Export current local RPA with identity information
+      Bluetooth: Make hci_blacklist_clear function static
+      Bluetooth: Add definitions for LE white list HCI commands
+      Bluetooth: Clear all LE white list entries when powering controller
+      Bluetooth: Add support for storing LE white list entries
+      Bluetooth: Track LE white list modification via HCI commands
+      Bluetooth: Use __le64 type for LE random numbers
+
+ include/net/bluetooth/hci.h      |  27 +-
+ include/net/bluetooth/hci_core.h |  78 ++++-
+ include/net/bluetooth/mgmt.h     |  10 +-
+ net/bluetooth/hci_conn.c         | 116 ++++----
+ net/bluetooth/hci_core.c         | 679 ++++++++++++++++++++++++++++++++++++++++---
+ net/bluetooth/hci_event.c        | 274 ++++++++++++++++-
+ net/bluetooth/l2cap_core.c       |  37 ++-
+ net/bluetooth/mgmt.c             | 425 ++++++++++++++++++++++-----
+ net/bluetooth/smp.c              | 180 +++++++++---
+ net/bluetooth/smp.h              |  11 +-
+ 10 files changed, 1585 insertions(+), 252 deletions(-)
+
+
+--+QahgC5+KEYLbs62
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTEOWrAAoJEPs3PUX4s20o/ZkP/1GI1GZhhGTKcp+lnwd2Z2t1
+0LzZy5+N7mJx/TPCp2R6svyypSKGLOkwsDOHgDfOePYxbH+YgEH0FaLe22gM3dhX
+H4FsGXhNzJQtpP/rvW/Pzzx428hYC9jC8am2eqKTm4LqpdrxzBtic7/5ymf2g6vB
+K+V6ud+Inp+t/oU7KAZOFb3H0m63/2sb4bH4XrvrjokZYIyoQDR0tZzAAqfQIEuu
+wQkvl0gEDvM7H8152MmbuGv9FIGP+SK/0wO/ZUUiiPtfrZT24GZgLGf1Jzag41dC
+BeQrvNbpXSOSWFXbYqj2Tc4aVRx2HpEaiOkHWq7uutaN3I0Iygo13aH/OjbCllXK
+xzlPXHT6N83MRAxQ9mo3ZbfaNCn1awBB4kif/BJKf4x8/00wuK/HlnyyC5Fq8Xol
+E1Ivu3UFPYiSfXjFkOWgRdSh3by1bZfGcq89xa9kFPIvO1inB3HNfRrhDf7z3usO
+Ke+1eYMRG6BUOKTUspYJob3omLbmJBCWmJLOCH6QOgAhiJQq32RiIvZMNkVXKG5x
+84fdA14UXz5IiSNQUOGOq+WReR6Qw+5BGks+X99wWrBX8yXjrtRzcT9Tggv99FYg
+FhBkLVNMQkL8jDV2PugnVquj5AbnGPZ+7t6yM+jy6buejDBBIVbdDjSjXeqOvSIj
+fA2/ImQWpzVfIDxCulSh
+=2srC
+-----END PGP SIGNATURE-----
+
+--+QahgC5+KEYLbs62--
