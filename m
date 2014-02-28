@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] Bluetooth: Track LE initiator and responder address information
-Date: Fri, 28 Feb 2014 12:54:16 +0200
-Message-Id: <1393584857-30375-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/4] Bluetooth: Add protections for updating local random address
+Date: Fri, 28 Feb 2014 12:54:14 +0200
+Message-Id: <1393584857-30375-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
 References: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,141 +11,105 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-For SMP we need the local and remote addresses (and their types) that
-were used to establish the connection. These may be different from the
-Identity Addresses or even the current RPA. To guarantee that we have
-this information available and it is correct track these values
-separately from the very beginning of the connection.
+Different controllers behave differently when HCI_Set_Random_Address is
+called while they are advertising or have a HCI_LE_Create_Connection in
+progress. Some take the newly written address into use for the pending
+operation while others use the random address that we had at the time
+that the operation started.
 
-For outgoing connections we set the values as soon as we get a
-successful command status for HCI_LE_Create_Connection (for which the
-patch adds a command status handler function) and for incoming
-connections as soon as we get a LE Connection Complete HCI event.
+Due to this undefined behavior and for the fact that we want to reliably
+determine the initiator address of all connections for the sake of SMP
+it's best to simply prevent the random address update if we have these
+problematic operations in progress.
+
+This patch adds a set_random_addr() helper function for the use of
+hci_update_random_address which contains the necessary checks for
+advertising and ongoing LE connections.
+
+One extra thing we need to do is to clear the HCI_ADVERTISING flag in
+the enable_advertising() function before sending any commands. Since
+re-enabling advertising happens by calling first disable_advertising()
+and then enable_advertising() all while having the HCI_ADVERTISING flag
+set. Clearing the flag lets the set_random_addr() function know that
+it's safe to write a new address at least as far as advertising is
+concerned.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  4 +++
- net/bluetooth/hci_event.c        | 78 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 82 insertions(+)
+ net/bluetooth/hci_core.c | 27 +++++++++++++++++++++++++--
+ net/bluetooth/mgmt.c     |  7 +++++++
+ 2 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0c63a7e12d90..edf194679b7d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -332,6 +332,10 @@ struct hci_conn {
- 	__u8		dst_type;
- 	bdaddr_t	src;
- 	__u8		src_type;
-+	bdaddr_t	init_addr;
-+	__u8		init_addr_type;
-+	bdaddr_t	resp_addr;
-+	__u8		resp_addr_type;
- 	__u16		handle;
- 	__u16		state;
- 	__u8		mode;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e3d7151e808e..3ae8ae1a029c 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1641,6 +1641,47 @@ static void hci_cs_accept_phylink(struct hci_dev *hdev, u8 status)
- 	amp_write_remote_assoc(hdev, cp->phy_handle);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 32c0c2c58f66..8bbfdea9cbec 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3649,6 +3649,29 @@ static void le_scan_disable_work(struct work_struct *work)
+ 		BT_ERR("Disable LE scanning request failed: err %d", err);
  }
  
-+static void hci_cs_le_create_conn(struct hci_dev *hdev, u8 status)
++static void set_random_addr(struct hci_request *req, bdaddr_t *rpa)
 +{
-+	struct hci_cp_le_create_conn *cp;
-+	struct hci_conn *conn;
++	struct hci_dev *hdev = req->hdev;
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	/* All connection failure handling is taken care of by the
-+	 * hci_le_conn_failed function which is triggered by the HCI
-+	 * request completion callbacks used for connecting.
++	/* If we're advertising or initiating an LE connection we can't
++	 * go ahead and change the random address at this time. This is
++	 * because the eventual initiator address used for the
++	 * subsequently created connection will be undefined (some
++	 * controllers use the new address and others the one we had
++	 * when the operation started).
++	 *
++	 * In this kind of scenario skip the update and let the random
++	 * address be updated at the next cycle.
 +	 */
-+	if (status)
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags) ||
++	    hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT)) {
++		BT_DBG("Deferring random address update");
 +		return;
++	}
 +
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_CREATE_CONN);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->peer_addr);
-+	if (!conn)
-+		goto unlock;
-+
-+	/* Store the initiator and responder address information which
-+	 * is needed for SMP. These values will not change during the
-+	 * lifetime of the connection.
-+	 */
-+	conn->init_addr_type = cp->own_address_type;
-+	if (cp->own_address_type == ADDR_LE_DEV_RANDOM)
-+		bacpy(&conn->init_addr, &hdev->random_addr);
-+	else
-+		bacpy(&conn->init_addr, &hdev->bdaddr);
-+
-+	conn->resp_addr_type = cp->peer_addr_type;
-+	bacpy(&conn->resp_addr, &cp->peer_addr);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
++	hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6, rpa);
 +}
 +
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 			      u8 *own_addr_type)
  {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2532,6 +2573,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_accept_phylink(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_LE_CREATE_CONN:
-+		hci_cs_le_create_conn(hdev, ev->status);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
-@@ -3716,6 +3761,39 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			conn->out = true;
- 			conn->link_mode |= HCI_LM_MASTER;
+@@ -3674,7 +3697,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 			return err;
  		}
-+
-+		/* If we didn't have a hci_conn object previously
-+		 * but we're in master role this must be something
-+		 * initiated using a white list. Since white list based
-+		 * connections are not "first class citizens" we don't
-+		 * have full tracking of them. Therefore, we go ahead
-+		 * with a "best effort" approach of determining the
-+		 * initiator address based on the HCI_PRIVACY flag.
-+		 */
-+		if (conn->out) {
-+			conn->resp_addr_type = ev->bdaddr_type;
-+			bacpy(&conn->resp_addr, &ev->bdaddr);
-+			if (test_bit(HCI_PRIVACY, &hdev->dev_flags)) {
-+				conn->init_addr_type = ADDR_LE_DEV_RANDOM;
-+				bacpy(&conn->init_addr, &hdev->rpa);
-+			} else {
-+				hci_copy_identity_address(hdev,
-+							  &conn->init_addr,
-+							  &conn->init_addr_type);
-+			}
-+		} else {
-+			/* Set the responder (our side) address type based on
-+			 * the advertising address type.
-+			 */
-+			conn->resp_addr_type = hdev->adv_addr_type;
-+			if (hdev->adv_addr_type == ADDR_LE_DEV_RANDOM)
-+				bacpy(&conn->resp_addr, &hdev->random_addr);
-+			else
-+				bacpy(&conn->resp_addr, &hdev->bdaddr);
-+
-+			conn->init_addr_type = ev->bdaddr_type;
-+			bacpy(&conn->init_addr, &ev->bdaddr);
-+		}
+ 
+-		hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6, &hdev->rpa);
++		set_random_addr(req, &hdev->rpa);
+ 
+ 		to = msecs_to_jiffies(hdev->rpa_timeout * 1000);
+ 		queue_delayed_work(hdev->workqueue, &hdev->rpa_expired, to);
+@@ -3693,7 +3716,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 		urpa.b[5] &= 0x3f;	/* Clear two most significant bits */
+ 
+ 		*own_addr_type = ADDR_LE_DEV_RANDOM;
+-		hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6, &urpa);
++		set_random_addr(req, &urpa);
+ 		return 0;
  	}
  
- 	/* Ensure that the hci_conn contains the identity address type
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2d11c817d082..98e9df3556e7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -840,6 +840,13 @@ static void enable_advertising(struct hci_request *req)
+ 	u8 own_addr_type, enable = 0x01;
+ 	bool connectable;
+ 
++	/* Clear the HCI_ADVERTISING bit temporarily so that the
++	 * hci_update_random_address knows that it's safe to go ahead
++	 * and write a new random address. The flag will be set back on
++	 * as soon as the SET_ADV_ENABLE HCI command completes.
++	 */
++	clear_bit(HCI_ADVERTISING, &hdev->dev_flags);
++
+ 	connectable = get_connectable(hdev);
+ 
+ 	/* Set require_privacy to true only when non-connectable
 -- 
 1.8.5.3
 
