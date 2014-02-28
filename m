@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2 0/4] Bluetooth: Fix initiator/responder addresses for SMP
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 28 Feb 2014 07:54:35 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6558C1FD-C140-47FE-A70C-7AC4F934D5D1@holtmann.org>
-References: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <5310AF70.1000601@gmail.com>
+Date: Fri, 28 Feb 2014 09:46:56 -0600
+From: Denis Kenzior <denkenz@gmail.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Marcin Kraglak <marcin.kraglak@tieto.com>,
+ linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 3/8] shared/hfp: Add initial implementiation of processing
+ commands
+References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com> <1393494006-20363-4-git-send-email-marcin.kraglak@tieto.com> <BA9EB144-665E-4A51-81EF-EEEFAB18C822@holtmann.org>
+In-Reply-To: <BA9EB144-665E-4A51-81EF-EEEFAB18C822@holtmann.org>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> Here's a second attempt to fix the initiator/responder addresses when
-> using privacy. The main difference to the previous attempt is an added
-> protection to HCI_Set_Random_Address so we don't do that while
-> connecting or advertising, and a clarification for the white list corner
-> case in aptch 3/4 that we're taking a "best effort" approach while
-> lacking full tracking of white list initiated connections.
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (4):
->      Bluetooth: Add protections for updating local random address
->      Bluetooth: Fix updating connection state to BT_CONNECT too early
->      Bluetooth: Track LE initiator and responder address information
->      Bluetooth: Use hdev->init/resp_addr values for smp_c1 function
-> 
-> include/net/bluetooth/hci_core.h |  4 ++
-> net/bluetooth/hci_conn.c         |  3 +-
-> net/bluetooth/hci_core.c         | 27 ++++++++++++-
-> net/bluetooth/hci_event.c        | 78 ++++++++++++++++++++++++++++++++++++
-> net/bluetooth/mgmt.c             |  7 ++++
-> net/bluetooth/smp.c              | 22 +++-------
-> 6 files changed, 122 insertions(+), 19 deletions(-)
+ >> +	if (data[result.offset] == '+')
+>> +		return process_extended(hfp, &result);
+>> +	else
+>> +		return process_basic(hfp, &result);
+>
+> Please do not do this. I mentioned this before, this basic vs extended is pointless.
+>
+> Command matching should be either based on commands like “D” or “+BRSF” and not bother trying to treat the + any special. See how src/emulator.c in oFono registers all the handlers.
+>
 
-all 4 patches have been applied to bluetooth-next tree.
+There is a difference in syntax between basic commands and extended 
+commands.  HFP only uses two basic commands, namely ATD and ATA so they 
+might be simply handled as a special case.  Others are implicit, e.g. 
+ATE, ATV, etc.
 
-Regards
-
-Marcel
-
+Regards,
+-Denis
