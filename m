@@ -1,48 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 28 Feb 2014 13:17:14 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/13] android/hal-gatt-api: Add Server Register Notification
-Date: Fri, 28 Feb 2014 12:19:52 +0100
-Message-Id: <1393586404-25190-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH] avrcp: Fix buffer size
+Message-ID: <20140228111712.GC6861@aemeltch-mobl1.fi.intel.com>
+References: <1393584252-10947-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1393584252-10947-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 5 +++++
- android/hal-msg.h       | 7 +++++++
- 2 files changed, 12 insertions(+)
+On Fri, Feb 28, 2014 at 12:44:12PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> For avrcp_get_current_player_value() buffer size needs to be
+> AVRCP_ATTRIBUTE_LAST + 1 for all attributes + 1 for number of attributes
+> written first, not counting header.
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 04c0b7c..bed8caf 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1950,6 +1950,11 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 		                         Server Interface (4 octets)
- 
- 	Opcode 0x93 - Register Server notification
-+
-+		Notification parameters: Status (4 octets)
-+		                         Server (4 octets)
-+		                         UUID (16 octets)
-+
- 	Opcode 0x94 - Connection notification
- 	Opcode 0x95 - Service Added notification
- 	Opcode 0x96 - Included Service Added notification
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 95ce551..340f7ee 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1398,3 +1398,10 @@ struct hal_ev_gatt_client_listen {
- 	int32_t status;
- 	int32_t server_if;
- } __attribute__((packed));
-+
-+#define HAL_EV_GATT_SERVER_REGISTER		0x93
-+struct hal_ev_gatt_server_register {
-+	int32_t status;
-+	int32_t server_if;
-+	uint8_t uuid[16];
-+} __attribute__((packed));
--- 
-1.8.5.2
+Sorry, please disregard this, attribute 0 should not be used.
 
+> ---
+>  profiles/audio/avrcp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> index c0e5d07..8098c62 100644
+> --- a/profiles/audio/avrcp.c
+> +++ b/profiles/audio/avrcp.c
+> @@ -1905,7 +1905,7 @@ static gboolean avrcp_player_value_rsp(struct avctp *conn,
+>  static void avrcp_get_current_player_value(struct avrcp *session,
+>  						uint8_t *attrs, uint8_t count)
+>  {
+> -	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_ATTRIBUTE_LAST + 1];
+> +	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_ATTRIBUTE_LAST + 2];
+>  	struct avrcp_header *pdu = (void *) buf;
+>  	uint16_t length = AVRCP_HEADER_LENGTH + count + 1;
+>  
+> -- 
+> 1.8.3.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
