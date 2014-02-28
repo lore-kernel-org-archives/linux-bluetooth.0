@@ -1,31 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: a2dp codec selection
-Date: Fri, 28 Feb 2014 11:45:21 -0500
-From: tropp@Safe-mail.net
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Message-Id: <N1-WsLSYP_bQh@Safe-mail.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/socket: Use same RFCOMM channels for services as Linux daemon
+Date: Fri, 28 Feb 2014 22:23:28 +0100
+Message-Id: <1393622608-22965-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-hi, 
-i am using a2dp to connect my bluetooth headphones to my pc. the headphones are supporting the mandatory sbc codec and additionally the aac and aptX codecs. the following defines in profiles/audio/a2dp-codecs.h let me assume that at least sbc, mp3, aac and atrac are supported audio codecs by bluez: 
- 
-#define A2DP_CODEC_SBC         0x00 
-#define A2DP_CODEC_MPEG12    0x01 
-#define A2DP_CODEC_MPEG24    0x02 
-#define A2DP_CODEC_ATRAC      0x03 
-#define A2DP_CODEC_VENDOR    0xFF 
- 
-i want to use the aac codec for the best audio quality. therefore i added the following lines to my /etc/bluetooth/audio.conf 
- 
-[A2DP] 
-SBCSources=0 
-MPEG24Sources=1
- 
-is there any possibility to check which codec is currently used if a a2dp link is established? i want to confirm that aac is really used, or if i am using sbc, which bitrate is selected.
+Use numbers from doc/assigned-numbers.txt.
+---
+ android/socket.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-i am using ubuntu 12.10.
+diff --git a/android/socket.c b/android/socket.c
+index ee98b54..9aab345 100644
+--- a/android/socket.c
++++ b/android/socket.c
+@@ -47,9 +47,10 @@
+ 
+ #define RFCOMM_CHANNEL_MAX 30
+ 
+-#define OPP_DEFAULT_CHANNEL	12
++#define OPP_DEFAULT_CHANNEL	9
+ #define HFAG_DEFAULT_CHANNEL	13
+-#define PBAP_DEFAULT_CHANNEL	19
++#define PBAP_DEFAULT_CHANNEL	15
++#define MAP_MAS_DEFAULT_CHANNEL	16
+ 
+ #define SVC_HINT_OBEX 0x10
+ 
+@@ -403,7 +404,7 @@ static const struct profile_info {
+ 			0x00, 0x00, 0x11, 0x32, 0x00, 0x00, 0x10, 0x00,
+ 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+ 		},
+-		.channel = 0,
++		.channel = MAP_MAS_DEFAULT_CHANNEL,
+ 		.svc_hint = SVC_HINT_OBEX,
+ 		.sec_level = BT_IO_SEC_MEDIUM,
+ 		.create_record = create_mas_record
+-- 
+1.8.5.3
 
-regards, tropp
