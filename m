@@ -1,100 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Message-ID: <5310AD83.9030208@gmx.net>
+Date: Fri, 28 Feb 2014 15:38:43 +0000
+From: Benjamin Adler <benadler@gmx.net>
+MIME-Version: 1.0
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Subject: Re: Receiving data in BLE non-connectable undirected advertisements
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5310A4A9.2000907@gmx.net>
-Date: Fri, 28 Feb 2014 07:46:19 -0800
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <D7B9B661-DFF0-4AB7-8CAD-F2ACC8FDDBE8@holtmann.org>
-References: <5310A4A9.2000907@gmx.net>
-To: Benjamin Adler <benadler@gmx.net>
+References: <5310A4A9.2000907@gmx.net> <00B030ED-78C3-4C48-B738-4161348CD6E8@warski.org>
+In-Reply-To: <00B030ED-78C3-4C48-B738-4161348CD6E8@warski.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Benjamin,
+Adam,
 
-> as the subject notes, I'm trying to receive non-connectable undirected advertisements from a bluetooth low energy device, namely TI's SensorTag. Their SDK contains a sample app named SimpleBLEBroadcaster, that, supposedly, sends those advertisements including some data. There is an overview of TI's understanding of this mechanism for download at
-> 
-> http://e2e.ti.com/support/low_power_rf/m/videos__files/653593/download.aspx
-> 
-> Is it possible to receive/display the *data* (up to 31 bytes, I believe) that can be contained in those advertisements using bluez? I currently don't care whether it's a commandline tool, C-based API, python, DBUS, anything.
-> 
-> When I start SimpleBLEBroadcaster, btmon alone doesn't show anything, but "hcitool lescan" says.
-> 
-> 	LE Scan ...
-> 	90:59:AF:0B:8A:7D (unknown)
-> 
-> The complete output of a btmon during lescan is attached below.
-> 
-> https://github.com/bmpm/bcast-observer-demos and a script named "test-bluetooth-observer" made me believe that there should be an org.bluez.Observer interface for this, which I couldn't find using qdbusviewer.
-> 
-> I asked on #bluez before, but it seems noone knew.
-> 
-> Thanks!
-> ben
-> 
-> ###################################################################
-> 
-> ####### start "btmon"
-> 
-> Bluetooth monitor ver 5.14
-> = New Index: 00:02:72:33:29:55 (BR/EDR,USB,hci0)             [hci0] 0.377191
-> 
-> ####### start "hcitool lescan" in another shell
-> 
-> < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7   [hci0] 4.457403
->        Type: Active (0x01)
->        Interval: 10.000 msec (0x0010)
->        Window: 10.000 msec (0x0010)
->        Own address type: Public (0x00)
->        Filter policy: Accept all advertisement (0x00)
-> > HCI Event: Command Complete (0x0e) plen 4                  [hci0] 4.458949
->      LE Set Scan Parameters (0x08|0x000b) ncmd 1
->        Status: Success (0x00)
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2       [hci0] 4.459094
->        Scanning: Enabled (0x01)
->        Filter duplicates: Enabled (0x01)
-> > HCI Event: Command Complete (0x0e) plen 4                  [hci0] 4.459957
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> 
-> ####### Power-on the SensorTag
-> 
-> > HCI Event: LE Meta Event (0x3e) plen 20                    [hci0] 9.481376
->      LE Advertising Report (0x02)
->        Num reports: 1
->        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
->        Address type: Public (0x00)
->        Address: 90:59:AF:0B:8A:7D (Texas Instruments)
->        Data length: 8
->        Flags: 0x04
->          BR/EDR Not Supported
->        Company: not assigned (513)
->          Data: 03
+thanks for your answer!
 
-seems the TI engineers are as incapable of understanding little endian as the iOS engineers. Company identifiers are little endian, people ;)
+On 28.02.2014 15:13, Adam Warski wrote:
+> If you want to see the raw advertisement packets, run:
+> 1st terminal: hcidump -R
+> 2nd terminal: hcitool lescan
+> The raw dump will contain the advertisement data.
 
->        RSSI: -80 dBm (0xb0)
-> 
-> ####### Quit hcitool
-> 
-> < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2      [hci0] 20.647504
->        Scanning: Disabled (0x00)
->        Filter duplicates: Enabled (0x01)
-> > HCI Event: Command Complete (0x0e) plen 4                 [hci0] 20.650124
->      LE Set Scan Enable (0x08|0x000c) ncmd 1
->        Status: Success (0x00)
-> 
-> #
+# hcidump -R
+HCI sniffer - Bluetooth packet analyzer ver 5.14
+device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
 
-You can just write an advertising receiver by using Bluetooth HCI User Channel feature from the 3.13 kernel.  With the help of src/shared/hci.c (if that license is acceptable to you), this is trivial. If the license is not acceptable, then you have to write your own HCI handling.
+### start "hcitool lescan"
 
-The BlueZ source code contains samples in form of tools/ibeacon.c and others on how to write such small program for direct access of the HCI interface. If you use this sample code, then please comply with the license as well here.
+< 01 0B 20 07 01 10 00 10 00 00 00
+ > 04 0E 04 01 0B 20 00
+< 01 0C 20 02 01 01
+ > 04 0E 04 01 0C 20 00
 
-Our bluetoothd itself has zero interest in providing this functionality since we do have to look into the advertising data to make sense out of it.
+### power-on sensortag
 
-Regards
+ > 04 3E 14 02 01 03 00 7D 8A 0B AF 59 90 08 02 01 04 04 FF 01
+   02 03 B7
 
-Marcel
+### power-cycle sensortag
 
+<nothing>
+
+So it seems like hcitool must first tell bluez to listen for 
+advertisement packets. Is there documentation/samples on how to do this 
+with python or C? Any other programs that do this, so I can read their 
+source?
+
+Also, only the first advertisement of the SensorTag is shown. While that 
+probably makes sense for traditional advertisements, my use case 
+requires that all advertisements are shown, as I'm trying to transmit 
+low-rate data from the tag's sensors in the advertisements.
+
+Do you have some hints concerning the easiest way to receive and process 
+those advertisements, preferably without the hassle of user-interaction 
+and multiple terminals?
+
+Cheers,
+ben
