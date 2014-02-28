@@ -1,29 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5310BFEF.8010405@gmx.net>
-Date: Fri, 28 Feb 2014 17:57:19 +0100
-From: Tobias Jakobi <liquid.acid@gmx.net>
+Date: Fri, 28 Feb 2014 18:44:59 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 4/6] android/socket: Reserve channel for HSP AG
+Message-ID: <20140228164459.GA23792@localhost.P-661HNU-F1>
+References: <1393604374-10127-1-git-send-email-szymon.janc@tieto.com>
+ <1393604374-10127-4-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>
-Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
-References: <530FBB6B.8080300@gmx.net> <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
-In-Reply-To: <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1393604374-10127-4-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Anderson Lizardo wrote:
-> Looks like you are missing a "power on" on the server side. Notice
-> that the client side shows "Powered: yes" on the info command.
+Hi Szymon,
+
+On Fri, Feb 28, 2014, Szymon Janc wrote:
+> ---
+>  android/socket.c | 14 ++++++++++++--
+>  1 file changed, 12 insertions(+), 2 deletions(-)
 > 
-> Best Regards,
-> 
-Hello Anderson!
+> diff --git a/android/socket.c b/android/socket.c
+> index ee98b54..f6863c8 100644
+> --- a/android/socket.c
+> +++ b/android/socket.c
+> @@ -47,8 +47,9 @@
+>  
+>  #define RFCOMM_CHANNEL_MAX 30
+>  
+> +#define HSP_AG_DEFAULT_CHANNEL	11
+>  #define OPP_DEFAULT_CHANNEL	12
+> -#define HFAG_DEFAULT_CHANNEL	13
+> +#define HFP_AG_DEFAULT_CHANNEL	13
+>  #define PBAP_DEFAULT_CHANNEL	19
 
-Sadly this doesn't solve the issue. The BT device on the server side is
-already powered on. Otherwise I wouldn't be able to establish the
-connection with the Android smartphone in the first place.
+Wasn't our plan to mirror the BlueZ doc/assigned-numbers.txt here? At
+least the OPP and HSP channels don't match up with that.
 
-With best wishes,
-Tobias
-
+Johan
