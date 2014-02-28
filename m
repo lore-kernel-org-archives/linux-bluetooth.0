@@ -1,53 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 02/18] android/hal-gatt-api: Add Client Scan Result event
-Date: Fri, 28 Feb 2014 11:23:47 +0100
-Message-Id: <1393583043-23455-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1393583043-23455-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1393583043-23455-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] unit/avrcp: Add /TP/PAS/BV-06-C test
+Date: Fri, 28 Feb 2014 11:42:28 +0200
+Message-Id: <1393580549-9531-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-ipc-api.txt | 6 ++++++
- android/hal-msg.h       | 8 ++++++++
- 2 files changed, 14 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 58c05a9..ab9cbc5 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1803,6 +1803,12 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 		                         UUID (16 octets)
+Test verifies that the list player application setting values response
+issued from the Target.
+---
+ unit/test-avrcp.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
+
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index db9cb92..51fe064 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -355,6 +355,26 @@ static uint8_t avrcp_handle_get_player_attr_text(struct avrcp *session,
+ 	return AVC_CTYPE_STABLE;
+ }
  
- 	Opcode 0x82 - Scan Result notification
++static uint8_t avrcp_handle_list_player_values(struct avrcp *session,
++				uint8_t transaction, uint16_t *params_len,
++				uint8_t *params, void *user_data)
++{
++	DBG("params[0] %d params_len %d", params[0], *params_len);
 +
-+		Notification parameters: Address (6 octets)
-+		                         RSSI (4 octets)
-+		                         Length (2 octets)
-+		                         Data (variable)
++	if (*params_len != 1)
++		goto fail;
 +
- 	Opcode 0x83 - Connect Device notification
- 	Opcode 0x84 - Disconnect Device notification
- 	Opcode 0x85 - Search Complete notification
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 9f7f9e9..1dad9e1 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1243,3 +1243,11 @@ struct hal_ev_gatt_client_register_client {
- 	int32_t client_if;
- 	uint8_t app_uuid[16];
- } __attribute__((packed));
++	*params_len = 1;
++	params[0] = 0;
++	return AVC_CTYPE_STABLE;
 +
-+#define HAL_EV_GATT_CLIENT_SCAN_RESULT	0x82
-+struct hal_ev_gatt_client_scan_result {
-+	uint8_t  bda[6];
-+	int32_t  rssi;
-+	uint16_t len;
-+	uint8_t  adv_data[0];
-+} __attribute__((packed));
++fail:
++	*params_len = 1;
++	params[0] = AVRCP_STATUS_INVALID_PARAM;
++
++	return AVC_CTYPE_REJECTED;
++}
++
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+@@ -362,6 +382,8 @@ static const struct avrcp_control_handler control_handlers[] = {
+ 					avrcp_handle_list_attributes },
+ 		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_player_attr_text },
++		{ AVRCP_LIST_PLAYER_VALUES, AVC_CTYPE_STATUS,
++					avrcp_handle_list_player_values },
+ 		{ },
+ };
+ 
+@@ -518,5 +540,15 @@ int main(int argc, char *argv[])
+ 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+ 				0x00, 0x00, 0x01, 0x00));
+ 
++	define_test("/TP/PAS/BV-06-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_LIST_PLAYER_VALUES,
++				0x00, 0x00, 0x01, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_LIST_PLAYER_VALUES,
++				0x00, 0x00, 0x01, 0x00));
++
+ 	return g_test_run();
+ }
 -- 
-1.9.0
+1.8.3.2
 
