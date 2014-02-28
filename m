@@ -1,38 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Feb 2014 09:45:08 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Use __le64 type for LE random numbers
-Message-ID: <20140228074508.GA724@localhost.P-661HNU-F1>
-References: <1393545628-29566-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1393545628-29566-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] Bluetooth: Add timer to force power off
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393572824-663-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 27 Feb 2014 23:41:37 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7A0B1EDB-8C6F-47FE-877D-7319B44158CC@holtmann.org>
+References: <1393572824-663-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Thu, Feb 27, 2014, Marcel Holtmann wrote:
-> The random numbers in Bluetooth Low Energy are 64-bit numbers and should
-> also be little endian since the HCI specification is little endian.
+> If some of the cleanup commands caused by mgmt_set_powered(off) never
+> complete we should still force the adapter to be powered down. This is
+> rather easy to do since hdev->power_off is already a delayed work
+> struct. This patch schedules this delayed work if at least one HCI
+> command was sent by the cleanup procedure.
 > 
-> Change the whole Low Energy pairing to use __le64 instead of a byte
-> array.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  include/net/bluetooth/hci.h      |  4 ++--
->  include/net/bluetooth/hci_core.h |  8 ++++----
->  include/net/bluetooth/mgmt.h     |  2 +-
->  net/bluetooth/hci_conn.c         |  6 +++---
->  net/bluetooth/hci_core.c         | 13 ++++++-------
->  net/bluetooth/hci_event.c        |  2 +-
->  net/bluetooth/mgmt.c             |  2 +-
->  net/bluetooth/smp.c              | 22 ++++++++++------------
->  net/bluetooth/smp.h              |  2 +-
->  9 files changed, 29 insertions(+), 32 deletions(-)
+> include/net/bluetooth/hci.h |  1 +
+> net/bluetooth/mgmt.c        | 16 +++++++++++++---
+> 2 files changed, 14 insertions(+), 3 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
