@@ -1,216 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/6] shared/hfp: Add prefix handlers functionality
-Date: Fri, 28 Feb 2014 21:33:51 +0100
-Message-Id: <1393619636-23762-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <0F2EE81A-0DB1-44DF-8EFD-F0835B090B7E@holtmann.org>
+References: <530FB0CA.4070309@gmail.com>
+	<613439C8-AFCE-4B23-81FE-AD4B91A27768@holtmann.org>
+	<530FC224.90305@gmail.com>
+	<0F2EE81A-0DB1-44DF-8EFD-F0835B090B7E@holtmann.org>
+Date: Fri, 28 Feb 2014 21:26:46 +0100
+Message-ID: <CAE5S2EnDWG28nraphCROhj7iWzMcLHBhFPbfaSCYYUzg0j1veQ@mail.gmail.com>
+Subject: Re: [PATCH] bluetooth: ath3k: added Atheros AR3012 with ID 0x0b05:0x17d0
+From: Bela Hausmann <bela.hausmann@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add two functions: hfp_gw_register_prefix_handler() and
-hfp_gw_unregister_prefix_handler(). It will allow user to register for
-specific command. Current implementation just put/remove handler data
-from queue.
----
- Makefile.tools   |   1 +
- src/shared/hfp.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp.h |  19 +++++++++++
- 3 files changed, 120 insertions(+)
+Hi Marcel,
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 9f7ba9f..31e1093 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -63,6 +63,7 @@ emulator_hfp_SOURCES = emulator/hfp.c \
- 				monitor/mainloop.h monitor/mainloop.c \
- 				src/shared/io.h src/shared/io-mainloop.c \
- 				src/shared/util.h src/shared/util.c \
-+				src/shared/queue.h src/shared/queue.c \
- 				src/shared/ringbuf.h src/shared/ringbuf.c \
- 				src/shared/hfp.h src/shared/hfp.c
- 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 854cf46..aecd246 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -32,6 +32,7 @@
- 
- #include "src/shared/util.h"
- #include "src/shared/ringbuf.h"
-+#include "src/shared/queue.h"
- #include "src/shared/io.h"
- #include "src/shared/hfp.h"
- 
-@@ -42,6 +43,7 @@ struct hfp_gw {
- 	struct io *io;
- 	struct ringbuf *read_buf;
- 	struct ringbuf *write_buf;
-+	struct queue *prefix_handlers;
- 	bool writer_active;
- 	bool permissive_syntax;
- 	bool result_pending;
-@@ -60,6 +62,37 @@ struct hfp_gw {
- 	bool destroyed;
- };
- 
-+struct prefix_handler_data {
-+	char *prefix;
-+	void *user_data;
-+	hfp_destroy_func_t destroy;
-+	hfp_result_func_t callback;
-+};
-+
-+static void destroy_prefix_handler_data(void *data)
-+{
-+	struct prefix_handler_data *handler = data;
-+
-+	if (handler->destroy)
-+		handler->destroy(handler->user_data);
-+
-+	free(handler);
-+}
-+
-+static bool match_handler_prefix(const void *a, const void *b)
-+{
-+	const struct prefix_handler_data *handler = a;
-+	const char *prefix = b;
-+
-+	if (strlen(handler->prefix) != strlen(prefix))
-+		return false;
-+
-+	if (memcmp(handler->prefix, prefix, strlen(prefix)))
-+		return false;
-+
-+	return true;
-+}
-+
- static void write_watch_destroy(void *user_data)
- {
- 	struct hfp_gw *hfp = user_data;
-@@ -196,8 +229,19 @@ struct hfp_gw *hfp_gw_new(int fd)
- 		return NULL;
- 	}
- 
-+	hfp->prefix_handlers = queue_new();
-+	if (!hfp->prefix_handlers) {
-+		io_destroy(hfp->io);
-+		ringbuf_free(hfp->write_buf);
-+		ringbuf_free(hfp->read_buf);
-+		free(hfp);
-+		return NULL;
-+	}
-+
- 	if (!io_set_read_handler(hfp->io, can_read_data,
- 					hfp, read_watch_destroy)) {
-+		queue_destroy(hfp->prefix_handlers,
-+						destroy_prefix_handler_data);
- 		io_destroy(hfp->io);
- 		ringbuf_free(hfp->write_buf);
- 		ringbuf_free(hfp->read_buf);
-@@ -250,6 +294,9 @@ void hfp_gw_unref(struct hfp_gw *hfp)
- 	ringbuf_free(hfp->write_buf);
- 	hfp->write_buf = NULL;
- 
-+	queue_destroy(hfp->prefix_handlers, destroy_prefix_handler_data);
-+	hfp->prefix_handlers = NULL;
-+
- 	if (!hfp->in_disconnect) {
- 		free(hfp);
- 		return;
-@@ -405,6 +452,59 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
- 	return true;
- }
- 
-+bool hfp_gw_register_prefix_handler(struct hfp_gw *hfp,
-+						hfp_result_func_t callback,
-+						const char *prefix,
-+						void *user_data,
-+						hfp_destroy_func_t destroy)
-+{
-+	struct prefix_handler_data *handler;
-+
-+	handler = new0(struct prefix_handler_data, 1);
-+	if (!handler)
-+		return false;
-+
-+	handler->callback = callback;
-+	handler->user_data = user_data;
-+
-+	handler->prefix = strdup(prefix);
-+	if (!handler->prefix) {
-+		free(handler);
-+		return false;
-+	}
-+
-+	if (queue_find(hfp->prefix_handlers, match_handler_prefix,
-+							handler->prefix)) {
-+		destroy_prefix_handler_data(handler);
-+		return false;
-+	}
-+
-+	handler->destroy = destroy;
-+
-+	return queue_push_tail(hfp->prefix_handlers, handler);
-+}
-+
-+bool hfp_gw_unregister_prefix_handler(struct hfp_gw *hfp, const char *prefix)
-+{
-+	struct prefix_handler_data *handler;
-+	char *lookup_prefix;
-+
-+	lookup_prefix = strdup(prefix);
-+	if (!lookup_prefix)
-+		return false;
-+
-+	handler = queue_remove_if(hfp->prefix_handlers, match_handler_prefix,
-+								lookup_prefix);
-+	free(lookup_prefix);
-+
-+	if (!handler)
-+		return false;
-+
-+	destroy_prefix_handler_data(handler);
-+
-+	return true;
-+}
-+
- static void disconnect_watch_destroy(void *user_data)
- {
- 	struct hfp_gw *hfp = user_data;
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index b0bd934..dee80d9 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -60,6 +60,18 @@ enum hfp_error {
- 	HFP_ERROR_NETWORK_NOT_ALLOWED		= 32,
- };
- 
-+enum hfp_cmd_type {
-+	HFP_AT_READ,
-+	HFP_AT_SET,
-+	HFP_AT_TEST,
-+	HFP_AT_COMMAND
-+};
-+
-+struct hfp_gw_result;
-+
-+typedef void (*hfp_result_func_t)(struct hfp_gw_result *result,
-+				enum hfp_cmd_type type, void *user_data);
-+
- typedef void (*hfp_destroy_func_t)(void *user_data);
- typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
- 
-@@ -94,3 +106,10 @@ bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
- 					hfp_destroy_func_t destroy);
- 
- bool hfp_gw_disconnect(struct hfp_gw *hfp);
-+
-+bool hfp_gw_register_prefix_handler(struct hfp_gw *hfp,
-+						hfp_result_func_t callback,
-+						const char *prefix,
-+						void *user_data,
-+						hfp_destroy_func_t destroy);
-+bool hfp_gw_unregister_prefix_handler(struct hfp_gw *hfp, const char *prefix);
--- 
-1.8.3.1
+I would, but I just now noticed that you already added this device ID
+a few days ago in commit a735f9e22432899cee188d167966782c29246390 to
+linux-next [1]. Thank you!
 
+Best wishes,
+Bela
+
+[1] https://git.kernel.org/cgit/linux/kernel/git/next/linux-next.git/commit=
+/drivers/bluetooth?id=3Da735f9e22432899cee188d167966782c29246390
+
+2014-02-28 0:19 GMT+01:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Bela,
+>
+>> Hi Marcel,
+>>
+>> sorry for the messed up tabs.
+>>
+>> Here is /sys/kernel/debug/usb/devices:
+>> T:  Bus=3D02 Lev=3D02 Prnt=3D02 Port=3D03 Cnt=3D02 Dev#=3D  4 Spd=3D12  =
+ MxCh=3D 0
+>> D:  Ver=3D 1.10 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 MxPS=3D64 #Cfgs=3D  1
+>> P:  Vendor=3D0b05 ProdID=3D17d0 Rev=3D 0.02
+>> C:* #Ifs=3D 2 Cfg#=3D 1 Atr=3De0 MxPwr=3D100mA
+>> I:* If#=3D 0 Alt=3D 0 #EPs=3D 3 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D81(I) Atr=3D03(Int.) MxPS=3D  16 Ivl=3D1ms
+>> E:  Ad=3D82(I) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+>> E:  Ad=3D02(O) Atr=3D02(Bulk) MxPS=3D  64 Ivl=3D0ms
+>> I:* If#=3D 1 Alt=3D 0 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   0 Ivl=3D1ms
+>> I:  If#=3D 1 Alt=3D 1 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D   9 Ivl=3D1ms
+>> I:  If#=3D 1 Alt=3D 2 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  17 Ivl=3D1ms
+>> I:  If#=3D 1 Alt=3D 3 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  25 Ivl=3D1ms
+>> I:  If#=3D 1 Alt=3D 4 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  33 Ivl=3D1ms
+>> I:  If#=3D 1 Alt=3D 5 #EPs=3D 2 Cls=3De0(wlcon) Sub=3D01 Prot=3D01 Drive=
+r=3Dbtusb
+>> E:  Ad=3D83(I) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+>> E:  Ad=3D03(O) Atr=3D01(Isoc) MxPS=3D  49 Ivl=3D1ms
+>>
+>> An again the patch.
+>>
+>> Best wishes,
+>> Bela
+>
+> why don=E2=80=99t you use git-format-patch and git-send-email. Just save =
+the email you send as raw text and see what happens if you apply it with gi=
+t-am and then look at git-log.
+>
+> Regards
+>
+> Marcel
+>
