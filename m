@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] Bluetooth: Add timer to force power off
+Subject: Re: [PATCH BlueZ] core: retry connect_dbus() several times
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393572824-663-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 27 Feb 2014 23:41:37 -0800
+In-Reply-To: <20140228073113.GA3771@adam-laptop>
+Date: Thu, 27 Feb 2014 23:40:16 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7A0B1EDB-8C6F-47FE-877D-7319B44158CC@holtmann.org>
-References: <1393572824-663-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <8CBFABF2-2409-43DD-B870-7519901FE686@holtmann.org>
+References: <1393571362-27898-1-git-send-email-adam8157@gmail.com> <04802ECE-6B8D-4DF4-BFFD-EABBD42BD30F@holtmann.org> <20140228073113.GA3771@adam-laptop>
+To: Adam Lee <adam8157@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Adam,
 
-> If some of the cleanup commands caused by mgmt_set_powered(off) never
-> complete we should still force the adapter to be powered down. This is
-> rather easy to do since hdev->power_off is already a delayed work
-> struct. This patch schedules this delayed work if at least one HCI
-> command was sent by the cleanup procedure.
+>>> Sometimes the hardware, especially which needs firmware patching, is not
+>>> yet ready when connect_dbus().
+>> 
+>> this makes no sense. Connecting to D-Bus has nothing to do with
+>> firmware patching. What are you exactly fixing here?
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci.h |  1 +
-> net/bluetooth/mgmt.c        | 16 +++++++++++++---
-> 2 files changed, 14 insertions(+), 3 deletions(-)
+> connect_dbus() fails sometimes with Intel 7260 bluetooth, sleeping 0.5s
+> before executing bluetoothd workarounds it. I assume the firmware
+> patching slows down hardware initialization then fails to connect.
+> 
+> Any other possibility? I'm not a D-Bus guru :)
 
-patch has been applied to bluetooth-next tree.
+it has nothing to do with D-Bus. You need to find the root cause.
 
 Regards
 
