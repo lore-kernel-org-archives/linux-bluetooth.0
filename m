@@ -1,93 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Track LE white list modification via HCI commands
-Date: Thu, 27 Feb 2014 20:37:31 -0800
-Message-Id: <1393562251-7555-4-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/4] Bluetooth: Clear all LE white list entries when powering controller
+Date: Thu, 27 Feb 2014 20:37:29 -0800
+Message-Id: <1393562251-7555-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the LE white list gets changed via HCI commands make sure that
-the internal storage of the white list entries gets updated.
+When starting up a controller make sure that all LE white list entries
+are cleared. Normally the HCI Reset takes care of this. This is just
+in case no HCI Reset has been executed.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_event.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ net/bluetooth/hci_core.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 40e5bfebb484..e3d7151e808e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1038,6 +1038,49 @@ static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
- 		hdev->le_white_list_size = rp->size;
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b0aa4eaa4660..c6cbe78e685f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1346,14 +1346,17 @@ static void le_setup(struct hci_request *req)
+ 	/* Read LE Local Supported Features */
+ 	hci_req_add(req, HCI_OP_LE_READ_LOCAL_FEATURES, 0, NULL);
  
-+static void hci_cc_le_clear_white_list(struct hci_dev *hdev,
-+				       struct sk_buff *skb)
-+{
-+	__u8 status = *((__u8 *) skb->data);
++	/* Read LE Supported States */
++	hci_req_add(req, HCI_OP_LE_READ_SUPPORTED_STATES, 0, NULL);
 +
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (!status)
-+		hci_white_list_clear(hdev);
-+}
-+
-+static void hci_cc_le_add_to_white_list(struct hci_dev *hdev,
-+					struct sk_buff *skb)
-+{
-+	struct hci_cp_le_add_to_white_list *sent;
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_WHITE_LIST);
-+	if (!sent)
-+		return;
-+
-+	if (!status)
-+		hci_white_list_add(hdev, &sent->bdaddr, sent->bdaddr_type);
-+}
-+
-+static void hci_cc_le_del_from_white_list(struct hci_dev *hdev,
-+					  struct sk_buff *skb)
-+{
-+	struct hci_cp_le_del_from_white_list *sent;
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_WHITE_LIST);
-+	if (!sent)
-+		return;
-+
-+	if (!status)
-+		hci_white_list_del(hdev, &sent->bdaddr, sent->bdaddr_type);
-+}
-+
- static void hci_cc_le_read_supported_states(struct hci_dev *hdev,
- 					    struct sk_buff *skb)
- {
-@@ -2378,6 +2421,18 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_read_white_list_size(hdev, skb);
- 		break;
+ 	/* Read LE Advertising Channel TX Power */
+ 	hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
  
-+	case HCI_OP_LE_CLEAR_WHITE_LIST:
-+		hci_cc_le_clear_white_list(hdev, skb);
-+		break;
-+
-+	case HCI_OP_LE_ADD_TO_WHITE_LIST:
-+		hci_cc_le_add_to_white_list(hdev, skb);
-+		break;
-+
-+	case HCI_OP_LE_DEL_FROM_WHITE_LIST:
-+		hci_cc_le_del_from_white_list(hdev, skb);
-+		break;
-+
- 	case HCI_OP_LE_READ_SUPPORTED_STATES:
- 		hci_cc_le_read_supported_states(hdev, skb);
- 		break;
+ 	/* Read LE White List Size */
+ 	hci_req_add(req, HCI_OP_LE_READ_WHITE_LIST_SIZE, 0, NULL);
+ 
+-	/* Read LE Supported States */
+-	hci_req_add(req, HCI_OP_LE_READ_SUPPORTED_STATES, 0, NULL);
++	/* Clear LE White List */
++	hci_req_add(req, HCI_OP_LE_CLEAR_WHITE_LIST, 0, NULL);
+ 
+ 	/* LE-only controllers have LE implicitly enabled */
+ 	if (!lmp_bredr_capable(hdev))
 -- 
 1.8.5.3
 
