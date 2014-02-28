@@ -1,52 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-From: Adam Lee <adam8157@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Subject: [PATCH BlueZ] core: retry connect_dbus() several times
-Date: Fri, 28 Feb 2014 15:09:22 +0800
-Message-Id: <1393571362-27898-1-git-send-email-adam8157@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <AE23C6FB-1A02-4C3C-9E43-DE569BF3F90D@holtmann.org>
+References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com>
+	<1393494006-20363-2-git-send-email-marcin.kraglak@tieto.com>
+	<AE23C6FB-1A02-4C3C-9E43-DE569BF3F90D@holtmann.org>
+Date: Fri, 28 Feb 2014 08:08:56 +0100
+Message-ID: <CABD6X-Le1h83TvuxTTCKMmWajiHEw-Gu5FL_zRMfPGAwa3nTcA@mail.gmail.com>
+Subject: Re: [PATCHv2 1/8] shared/hfp: Fix parsing line with few commands
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sometimes the hardware, especially which needs firmware patching, is not
-yet ready when connect_dbus().
+Hi Marcel,
 
-Signed-off-by: Adam Lee <adam8157@gmail.com>
----
- src/main.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+On 28 February 2014 08:00, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Marcin,
+>
+>> If hfp_gw received line with few commands, it called command
+>> handler one time, for first command. Next comamnd was processed
+>> only if next line was received.
+>> Now, after every response from gw, we call proces_input to be
+>> sure that all data has been be processed.
+>> It will process next command only if response for previous was sent.
+>> ---
+>> src/shared/hfp.c | 16 +++++++++-------
+>> 1 file changed, 9 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+>> index 854cf46..0681b19 100644
+>> --- a/src/shared/hfp.c
+>> +++ b/src/shared/hfp.c
+>> @@ -121,23 +121,21 @@ static void process_input(struct hfp_gw *hfp)
+>>
+>>               *ptr = '\0';
+>>               count = asprintf(&ptr, "%s%s", str, str2);
+>> -             str = ptr;
+>>       } else {
+>> -             count = ptr - str;
+>>               *ptr = '\0';
+>> +             count = asprintf(&ptr, "%s", str);
+>>       }
+>
+> the whole point here is to not allocate a string if the command is not wrapped in the ring buffer. No idea what you are fixing here. And it is also not described in the commit message.
+>
+>>       hfp->result_pending = true;
+>>
+>> +     len = ringbuf_drain(hfp->read_buf, count + 1);
+>> +
+>>       if (hfp->command_callback)
+>> -             hfp->command_callback(str, hfp->command_data);
+>> +             hfp->command_callback(ptr, hfp->command_data);
+>>       else
+>>               hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
+>>
+>> -     len = ringbuf_drain(hfp->read_buf, count + 1);
+>> -
+>> -     if (str == ptr)
+>> -             free(ptr);
+>> +     free(ptr);
+>> }
+>>
+>> static void read_watch_destroy(void *user_data)
+>> @@ -341,6 +339,8 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
+>>
+>>       hfp->result_pending = false;
+>>
+>> +     process_input(hfp);
+>> +
+>>       return true;
+>> }
+>>
+>> @@ -356,6 +356,8 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
+>>
+>>       hfp->result_pending = false;
+>>
+>> +     process_input(hfp);
+>> +
+>>       return true;
+>> }
+>
+> We can certainly do this, but normally AT commands work that you get one, send a response and then get the next one. Except for unsolicited notification, but in HFP gateway case, we are the ones sending these and not the headset.
+>
+> What is this all fixing?
+>
+> Regards
+>
+> Marcel
+>
+If we can receive one command in time, lets just ignore this patch
 
-diff --git a/src/main.c b/src/main.c
-index b3136fc..cf1f8fa 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -491,6 +491,7 @@ int main(int argc, char *argv[])
- 	GKeyFile *config;
- 	guint signal, watchdog;
- 	const char *watchdog_usec;
-+	uint8_t reconnect_times = 3;
- 
- 	init_defaults();
- 
-@@ -527,9 +528,17 @@ int main(int argc, char *argv[])
- 
- 	parse_config(config);
- 
--	if (connect_dbus() < 0) {
--		error("Unable to get on D-Bus");
--		exit(1);
-+	/* Reconnect several times in case the hardware is not ready */
-+	while (reconnect_times--) {
-+		if (connect_dbus() == 0)
-+			break;
-+
-+		if (reconnect_times != 1) {
-+			usleep(500 * 1000);
-+		} else {
-+			error("Unable to get on D-Bus");
-+			exit(1);
-+		}
- 	}
- 
- 	if (option_experimental)
--- 
-1.9.0
+BR
+Marcin
