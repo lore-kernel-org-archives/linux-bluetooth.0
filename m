@@ -1,12 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <97847860-E690-4FC9-A631-16A0E4CE8486@holtmann.org>
+In-Reply-To: <6C75B4EB-5878-4EFB-AEBD-E1FE7BC7B7BF@holtmann.org>
 References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com>
-	<1393494006-20363-3-git-send-email-marcin.kraglak@tieto.com>
-	<97847860-E690-4FC9-A631-16A0E4CE8486@holtmann.org>
-Date: Fri, 28 Feb 2014 08:48:59 +0100
-Message-ID: <CABD6X-KtcgCHwNw8v-JohY=8eQVdDSyzU=+=cwQKkvWUYiBr2A@mail.gmail.com>
-Subject: Re: [PATCHv2 2/8] shared/hfp: Add prefix handlers functionality
+	<1393494006-20363-5-git-send-email-marcin.kraglak@tieto.com>
+	<6C75B4EB-5878-4EFB-AEBD-E1FE7BC7B7BF@holtmann.org>
+Date: Fri, 28 Feb 2014 08:46:15 +0100
+Message-ID: <CABD6X-LTN=JCnUV00wfQCViGq3Wo-QwAF=XBj1=K81fZz8YAhQ@mail.gmail.com>
+Subject: Re: [PATCHv2 4/8] shared/hfp: Add implementation of precessing commands
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
@@ -15,137 +15,93 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On 28 February 2014 08:06, Marcel Holtmann <marcel@holtmann.org> wrote:
+On 28 February 2014 08:13, Marcel Holtmann <marcel@holtmann.org> wrote:
 > Hi Marcin,
 >
->> Add two functions: hfp_gw_set_prefix_handler() and
->> hfp_gw_remove_prefix_handler(). It will allow user to register for
->> specific command. Current implementation just adds or removes data
->> from hfp_gw structure.
+>> It will process both extended and basic commands.
 >> ---
->> Makefile.tools   |  1 +
->> src/shared/hfp.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> src/shared/hfp.h | 17 ++++++++++++
->> 3 files changed, 102 insertions(+)
->>
->> diff --git a/Makefile.tools b/Makefile.tools
->> index 9f7ba9f..31e1093 100644
->> --- a/Makefile.tools
->> +++ b/Makefile.tools
->> @@ -63,6 +63,7 @@ emulator_hfp_SOURCES = emulator/hfp.c \
->>                               monitor/mainloop.h monitor/mainloop.c \
->>                               src/shared/io.h src/shared/io-mainloop.c \
->>                               src/shared/util.h src/shared/util.c \
->> +                             src/shared/queue.h src/shared/queue.c \
->>                               src/shared/ringbuf.h src/shared/ringbuf.c \
->>                               src/shared/hfp.h src/shared/hfp.c
+>> src/shared/hfp.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>> 1 file changed, 94 insertions(+), 2 deletions(-)
 >>
 >> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
->> index 0681b19..e164dd6 100644
+>> index cf54a8f..6a39a36 100644
 >> --- a/src/shared/hfp.c
 >> +++ b/src/shared/hfp.c
->> @@ -32,6 +32,7 @@
+>> @@ -29,6 +29,7 @@
+>> #include <unistd.h>
+>> #include <string.h>
+>> #include <stdarg.h>
+>> +#include <ctype.h>
 >>
 >> #include "src/shared/util.h"
 >> #include "src/shared/ringbuf.h"
->> +#include "src/shared/queue.h"
->> #include "src/shared/io.h"
->> #include "src/shared/hfp.h"
->>
->> @@ -42,6 +43,7 @@ struct hfp_gw {
->>       struct io *io;
->>       struct ringbuf *read_buf;
->>       struct ringbuf *write_buf;
->> +     struct queue *prefix_handlers;
->>       bool writer_active;
->>       bool permissive_syntax;
->>       bool result_pending;
->> @@ -60,6 +62,37 @@ struct hfp_gw {
->>       bool destroyed;
->> };
->>
->> +struct prefix_handler_data {
->> +     char *prefix;
->> +     void *user_data;
->> +     hfp_destroy_func_t destroy;
->> +     hfp_result_func_t callback;
->> +};
->> +
->> +static void destroy_prefix_handler_data(void *data)
->> +{
->> +     struct prefix_handler_data *handler = data;
->> +
->> +     if (handler->destroy)
->> +             handler->destroy(handler->user_data);
->> +
->> +     free(handler);
->> +}
->> +
->> +static bool match_handler_prefix(const void *a, const void *b)
->> +{
->> +     const struct prefix_handler_data *handler = a;
->> +     const char *prefix = b;
->> +
->> +     if (strlen(handler->prefix) != strlen(prefix))
->> +             return false;
->> +
->> +     if (memcmp(handler->prefix, prefix, strlen(prefix)))
->> +             return false;
->> +
->> +     return true;
->> +}
->> +
->> static void write_watch_destroy(void *user_data)
->> {
->>       struct hfp_gw *hfp = user_data;
->> @@ -194,8 +227,19 @@ struct hfp_gw *hfp_gw_new(int fd)
->>               return NULL;
->>       }
->>
->> +     hfp->prefix_handlers = queue_new();
->> +     if (!hfp->prefix_handlers) {
->> +             io_destroy(hfp->io);
->> +             ringbuf_free(hfp->write_buf);
->> +             ringbuf_free(hfp->read_buf);
->> +             free(hfp);
->> +             return NULL;
->> +     }
->> +
->>       if (!io_set_read_handler(hfp->io, can_read_data,
->>                                       hfp, read_watch_destroy)) {
->> +             queue_destroy(hfp->prefix_handlers,
->> +                                             destroy_prefix_handler_data);
->>               io_destroy(hfp->io);
->>               ringbuf_free(hfp->write_buf);
->>               ringbuf_free(hfp->read_buf);
->> @@ -248,6 +292,9 @@ void hfp_gw_unref(struct hfp_gw *hfp)
->>       ringbuf_free(hfp->write_buf);
->>       hfp->write_buf = NULL;
->>
->> +     queue_destroy(hfp->prefix_handlers, destroy_prefix_handler_data);
->> +     hfp->prefix_handlers = NULL;
->> +
->>       if (!hfp->in_disconnect) {
->>               free(hfp);
->>               return;
->> @@ -407,6 +454,43 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
->>       return true;
+>> @@ -135,14 +136,105 @@ static void wakeup_writer(struct hfp_gw *hfp)
+>>       hfp->writer_active = true;
 >> }
 >>
->> +bool hfp_gw_set_prefix_handler(struct hfp_gw *hfp, hfp_result_func_t callback,
->> +                                             char *prefix, void *user_data,
->> +                                             hfp_destroy_func_t destroy)
+>> +static enum hfp_cmd_type get_cmd_type(struct hfp_gw_result *result)
 >> +{
+>> +     if (result->data[result->offset] == '=') {
+>> +             result->offset++;
+>> +             if (result->data[result->offset] == '?') {
+>> +                     result->offset++;
+>> +                     return HFP_AT_TEST;
+>> +             } else {
+>> +                     return HFP_AT_SET;
+>> +             }
 >
-> it is either add and remove or register and unregister, but never set and remove. If you set something, the next call to set would overwrite it.
+> can we please keep the kernel coding style out of user space. And I hate it when both if parts use return.
+>
+>         if (blah) {
+>                 xxxx
+>                 return x;
+>         }
+>
+>         return y.
+>
+>> +     } else if (result->data[result->offset] == '?') {
+>
+> And this else if is pointless as well. You are leaving the function in the first if part no matter what.
+>
+>> +             result->offset++;
+>> +             return HFP_AT_READ;
+>> +     } else {
+>> +             return HFP_AT_COMMAND;
+>> +     }
+>
+> Same here.
+>
+>> +}
+>> +
+>> static bool process_basic(struct hfp_gw *hfp, struct hfp_gw_result *result)
+>> {
+>> -     return false;
+>> +     const char *prefix = result->data + result->offset;
+>> +     struct prefix_handler_data *handler;
+>> +     enum hfp_cmd_type type;
+>> +     char lookup_prefix[4];
+>> +     uint8_t pref_len = 0;
+>> +     int i;
+>> +
+>> +     /* Check if first sign is character */
+>> +     if (isalpha(prefix[pref_len])) {
+>> +             /* Handle S-parameter prefix */
+>> +             if (toupper(prefix[pref_len]) == 'S') {
+>> +                     do {
+>> +                             pref_len++;
+>> +                     } while (isdigit(prefix[pref_len]));
+>> +                     /*S-parameter must be followed with number*/
+>> +                     if (pref_len == 1)
+>> +                             pref_len--;
+>
+> Where is the S parameter stuff coming from? I did ask this before and never got an answer to it.
+
+V.250 5.3.2 S-parameters. If it is not used in HFP I can remove it. It
+was added just to be compatibile with V.250 spec.
 >
 > Regards
 >
 > Marcel
 >
-
-
-I'll change names
-
 BR
 Marcin
