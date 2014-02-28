@@ -1,53 +1,151 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix clearing SMP keys if pairing fails
-Date: Fri, 28 Feb 2014 10:10:16 +0200
-Message-Id: <1393575016-12166-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <97847860-E690-4FC9-A631-16A0E4CE8486@holtmann.org>
+References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com>
+	<1393494006-20363-3-git-send-email-marcin.kraglak@tieto.com>
+	<97847860-E690-4FC9-A631-16A0E4CE8486@holtmann.org>
+Date: Fri, 28 Feb 2014 08:48:59 +0100
+Message-ID: <CABD6X-KtcgCHwNw8v-JohY=8eQVdDSyzU=+=cwQKkvWUYiBr2A@mail.gmail.com>
+Subject: Re: [PATCHv2 2/8] shared/hfp: Add prefix handlers functionality
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-If SMP fails we should not leave any keys (LTKs or IRKs) hanging around
-the internal lists. This patch adds the necessary code to
-smp_chan_destroy to remove any keys we may have in case of pairing
-failure.
+On 28 February 2014 08:06, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Marcin,
+>
+>> Add two functions: hfp_gw_set_prefix_handler() and
+>> hfp_gw_remove_prefix_handler(). It will allow user to register for
+>> specific command. Current implementation just adds or removes data
+>> from hfp_gw structure.
+>> ---
+>> Makefile.tools   |  1 +
+>> src/shared/hfp.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> src/shared/hfp.h | 17 ++++++++++++
+>> 3 files changed, 102 insertions(+)
+>>
+>> diff --git a/Makefile.tools b/Makefile.tools
+>> index 9f7ba9f..31e1093 100644
+>> --- a/Makefile.tools
+>> +++ b/Makefile.tools
+>> @@ -63,6 +63,7 @@ emulator_hfp_SOURCES = emulator/hfp.c \
+>>                               monitor/mainloop.h monitor/mainloop.c \
+>>                               src/shared/io.h src/shared/io-mainloop.c \
+>>                               src/shared/util.h src/shared/util.c \
+>> +                             src/shared/queue.h src/shared/queue.c \
+>>                               src/shared/ringbuf.h src/shared/ringbuf.c \
+>>                               src/shared/hfp.h src/shared/hfp.c
+>>
+>> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+>> index 0681b19..e164dd6 100644
+>> --- a/src/shared/hfp.c
+>> +++ b/src/shared/hfp.c
+>> @@ -32,6 +32,7 @@
+>>
+>> #include "src/shared/util.h"
+>> #include "src/shared/ringbuf.h"
+>> +#include "src/shared/queue.h"
+>> #include "src/shared/io.h"
+>> #include "src/shared/hfp.h"
+>>
+>> @@ -42,6 +43,7 @@ struct hfp_gw {
+>>       struct io *io;
+>>       struct ringbuf *read_buf;
+>>       struct ringbuf *write_buf;
+>> +     struct queue *prefix_handlers;
+>>       bool writer_active;
+>>       bool permissive_syntax;
+>>       bool result_pending;
+>> @@ -60,6 +62,37 @@ struct hfp_gw {
+>>       bool destroyed;
+>> };
+>>
+>> +struct prefix_handler_data {
+>> +     char *prefix;
+>> +     void *user_data;
+>> +     hfp_destroy_func_t destroy;
+>> +     hfp_result_func_t callback;
+>> +};
+>> +
+>> +static void destroy_prefix_handler_data(void *data)
+>> +{
+>> +     struct prefix_handler_data *handler = data;
+>> +
+>> +     if (handler->destroy)
+>> +             handler->destroy(handler->user_data);
+>> +
+>> +     free(handler);
+>> +}
+>> +
+>> +static bool match_handler_prefix(const void *a, const void *b)
+>> +{
+>> +     const struct prefix_handler_data *handler = a;
+>> +     const char *prefix = b;
+>> +
+>> +     if (strlen(handler->prefix) != strlen(prefix))
+>> +             return false;
+>> +
+>> +     if (memcmp(handler->prefix, prefix, strlen(prefix)))
+>> +             return false;
+>> +
+>> +     return true;
+>> +}
+>> +
+>> static void write_watch_destroy(void *user_data)
+>> {
+>>       struct hfp_gw *hfp = user_data;
+>> @@ -194,8 +227,19 @@ struct hfp_gw *hfp_gw_new(int fd)
+>>               return NULL;
+>>       }
+>>
+>> +     hfp->prefix_handlers = queue_new();
+>> +     if (!hfp->prefix_handlers) {
+>> +             io_destroy(hfp->io);
+>> +             ringbuf_free(hfp->write_buf);
+>> +             ringbuf_free(hfp->read_buf);
+>> +             free(hfp);
+>> +             return NULL;
+>> +     }
+>> +
+>>       if (!io_set_read_handler(hfp->io, can_read_data,
+>>                                       hfp, read_watch_destroy)) {
+>> +             queue_destroy(hfp->prefix_handlers,
+>> +                                             destroy_prefix_handler_data);
+>>               io_destroy(hfp->io);
+>>               ringbuf_free(hfp->write_buf);
+>>               ringbuf_free(hfp->read_buf);
+>> @@ -248,6 +292,9 @@ void hfp_gw_unref(struct hfp_gw *hfp)
+>>       ringbuf_free(hfp->write_buf);
+>>       hfp->write_buf = NULL;
+>>
+>> +     queue_destroy(hfp->prefix_handlers, destroy_prefix_handler_data);
+>> +     hfp->prefix_handlers = NULL;
+>> +
+>>       if (!hfp->in_disconnect) {
+>>               free(hfp);
+>>               return;
+>> @@ -407,6 +454,43 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
+>>       return true;
+>> }
+>>
+>> +bool hfp_gw_set_prefix_handler(struct hfp_gw *hfp, hfp_result_func_t callback,
+>> +                                             char *prefix, void *user_data,
+>> +                                             hfp_destroy_func_t destroy)
+>> +{
+>
+> it is either add and remove or register and unregister, but never set and remove. If you set something, the next call to set would overwrite it.
+>
+> Regards
+>
+> Marcel
+>
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 6ace0b48dc6a..710f4e171bf1 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -589,6 +589,24 @@ void smp_chan_destroy(struct l2cap_conn *conn)
- 	complete = test_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
- 	mgmt_smp_complete(conn->hcon, complete);
- 
-+	/* If pairing failed clean up any keys we might have */
-+	if (!complete) {
-+		if (smp->ltk) {
-+			list_del(&smp->ltk->list);
-+			kfree(smp->ltk);
-+		}
-+
-+		if (smp->slave_ltk) {
-+			list_del(&smp->slave_ltk->list);
-+			kfree(smp->slave_ltk);
-+		}
-+
-+		if (smp->remote_irk) {
-+			list_del(&smp->remote_irk->list);
-+			kfree(smp->remote_irk);
-+		}
-+	}
-+
- 	kfree(smp);
- 	conn->smp_chan = NULL;
- 	conn->hcon->smp_conn = NULL;
--- 
-1.8.5.3
+I'll change names
 
+BR
+Marcin
