@@ -1,41 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 0/9] GATT API: Add Register Services Async
-Date: Fri, 28 Feb 2014 14:05:27 -0300
-Message-Id: <1393607136-16908-1-git-send-email-claudio.takahasi@openbossa.org>
+Message-ID: <5310BFEF.8010405@gmx.net>
+Date: Fri, 28 Feb 2014 17:57:19 +0100
+From: Tobias Jakobi <liquid.acid@gmx.net>
+MIME-Version: 1.0
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
+References: <530FBB6B.8080300@gmx.net> <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
+In-Reply-To: <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset is an extension of "[PATCH BlueZ v7 00/11] GATT API:
-External Services". It adds the following features:
-  * new gdbus helper to allow notifying the clients when
-    GetManagedObjects() reply is received and all proxies reported.
-  * reply for RegisterService() after validating the fetched objects
-  * adds the service declaration to the local GATT database
+Anderson Lizardo wrote:
+> Looks like you are missing a "power on" on the server side. Notice
+> that the client side shows "Powered: yes" on the info command.
+> 
+> Best Regards,
+> 
+Hello Anderson!
 
-Claudio Takahasi (9):
-  gdbus: Add g_dbus_client_set_proxies_ready_watch()
-  gatt: Add proxy added handler
-  gatt: Add proxy removed handler
-  gatt: Add GATT service to the local database
-  gatt: Make RegisterService() async
-  test: Add external service GATT skeleton
-  test: Add signal handling for gatt-service
-  test: Add registering external service
-  bluetooth.conf: Add ObjectManager interface
+Sadly this doesn't solve the issue. The BT device on the server side is
+already powered on. Otherwise I wouldn't be able to establish the
+connection with the Android smartphone in the first place.
 
- .gitignore          |   1 +
- Makefile.tools      |   5 +
- gdbus/client.c      |  18 ++++
- gdbus/gdbus.h       |   4 +
- src/bluetooth.conf  |   1 +
- src/gatt-dbus.c     | 135 +++++++++++++++++++++++++-
- test/gatt-service.c | 267 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 427 insertions(+), 4 deletions(-)
- create mode 100644 test/gatt-service.c
-
--- 
-1.8.3.1
+With best wishes,
+Tobias
 
