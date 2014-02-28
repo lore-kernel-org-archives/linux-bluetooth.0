@@ -1,85 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCHv2 1/8] shared/hfp: Fix parsing line with few commands
+Subject: Re: Background scanning and white list usage
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393494006-20363-2-git-send-email-marcin.kraglak@tieto.com>
-Date: Thu, 27 Feb 2014 23:00:12 -0800
+In-Reply-To: <20140228064422.GA28466@localhost.P-661HNU-F1>
+Date: Thu, 27 Feb 2014 22:51:52 -0800
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <AE23C6FB-1A02-4C3C-9E43-DE569BF3F90D@holtmann.org>
-References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com> <1393494006-20363-2-git-send-email-marcin.kraglak@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Message-Id: <B2E73B9C-3787-4B4B-802B-0C76302BF8F9@holtmann.org>
+References: <BFAEE1C5-E74F-40F0-A1A4-8F4907FBDCF4@holtmann.org> <20140228064422.GA28466@localhost.P-661HNU-F1>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Johan,
 
-> If hfp_gw received line with few commands, it called command
-> handler one time, for first command. Next comamnd was processed
-> only if next line was received.
-> Now, after every response from gw, we call proces_input to be
-> sure that all data has been be processed.
-> It will process next command only if response for previous was sent.
-> ---
-> src/shared/hfp.c | 16 +++++++++-------
-> 1 file changed, 9 insertions(+), 7 deletions(-)
+>> The complicated part comes into play when we have devices with LE
+>> Privacy enabled and when they are using resolvable private addresses.
+>> Meaning when our IRK list is populated with identity addresses and
+>> their IRKs. The only way to make this work with the current available
+>> controller features is if we program the RPA into the white list.
+>> Since that RPA is going to change over time, we need to stop scanning
+>> with the white list filter every now and then, scan for all devices
+>> and resolve the RPA. If we see a new RPA for a know IRK, we have to
+>> replace the old RPA in the white list with the new RPA. And then we go
+>> back to scanning with the white list filter policy.
+>> 
+>> Now the important question is what are good enough intervals to make
+>> this work smoothly. Devices using LE Privacy will take a hit in their
+>> re-connection time, but that is what we have to trade in for compared
+>> to waking up the host for every single advertising packet.
+>> 
+>> My initial idea is to scan 5 minutes using the white list, then scan
+>> 10 seconds without the white list, then back to 5 minutes using the
+>> white list and so on.
+>> 
+>> The default value for the PRA lifetime according to the specification
+>> is 15 minutes. I timed recent iOS devices which seem to be using 9
+>> minutes intervals. So we have to play a little bit with this and see
+>> what are good values.
+>> 
+>> Maybe 3 minutes white list scan and 5 seconds without white list is
+>> better. Things to try out.
 > 
-> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-> index 854cf46..0681b19 100644
-> --- a/src/shared/hfp.c
-> +++ b/src/shared/hfp.c
-> @@ -121,23 +121,21 @@ static void process_input(struct hfp_gw *hfp)
+> I don't think this is a good idea at all. With LE starting advertising
+> is typically seen as the initiating action of connection creation
+> (unlike with BR/EDR where HCI_Create_Connection is the initiating
+> action). Typically peripherals mean "connect to me now!" when they start
+> connectable advertising.
 > 
-> 		*ptr = '\0';
-> 		count = asprintf(&ptr, "%s%s", str, str2);
-> -		str = ptr;
-> 	} else {
-> -		count = ptr - str;
-> 		*ptr = '\0';
-> +		count = asprintf(&ptr, "%s", str);
-> 	}
+> Let's stay you switch on your peripheral device, or it comes into range
+> you haven't used it for some time (hours or even days). If it's using
+> RPAs it's pretty much guaranteed to have a different one than what we
+> know of and even if we're using 3 minutes white list scanning the user
+> is on average going to have to wait for 1.5 minutes for the device to
+> get connected which is not acceptable behavior (the extreme example
+> would be if this is a keyboard or a mouse which you start using for the
+> first time in the morning - moving the mouse or pressing a key on the
+> keyboard should certainly get you a connection in less than 1 second).
 
-the whole point here is to not allocate a string if the command is not wrapped in the ring buffer. No idea what you are fixing here. And it is also not described in the commit message.
+HID devices would suffer the most here. Fully agree here.
 
-> 	hfp->result_pending = true;
-> 
-> +	len = ringbuf_drain(hfp->read_buf, count + 1);
-> +
-> 	if (hfp->command_callback)
-> -		hfp->command_callback(str, hfp->command_data);
-> +		hfp->command_callback(ptr, hfp->command_data);
-> 	else
-> 		hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
-> 
-> -	len = ringbuf_drain(hfp->read_buf, count + 1);
-> -
-> -	if (str == ptr)
-> -		free(ptr);
-> +	free(ptr);
-> }
-> 
-> static void read_watch_destroy(void *user_data)
-> @@ -341,6 +339,8 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
-> 
-> 	hfp->result_pending = false;
-> 
-> +	process_input(hfp);
-> +
-> 	return true;
-> }
-> 
-> @@ -356,6 +356,8 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
-> 
-> 	hfp->result_pending = false;
-> 
-> +	process_input(hfp);
-> +
-> 	return true;
-> }
+However since neither Microsoft Windows nor OS X can deal with RPAs at the moment, I do not think we are entering a dangerous zone here from an interoperability point of view. Actually Windows 8.1 is not able to connect to any random address for that matter.
 
-We can certainly do this, but normally AT commands work that you get one, send a response and then get the next one. Except for unsolicited notification, but in HFP gateway case, we are the ones sending these and not the headset.
+My point is that we certainly not make it worse.
 
-What is this all fixing?
+> I fully understand the desire to use the white list as it's a very nice
+> power saving feature, but I don't think we can win here as long as we
+> don't have a way to have the controller do the resolving for us.
+> 
+> One thing we could potentially try to do (but which I doubt is really
+> worth it in the end) is to track the age of resolved RPAs. If we have an
+> RPA which was resolved say less than 5 minutes ago we consider it
+> appropriate to place into the white list. Otherwise we skip using the
+> white list.
+
+I was thinking about this as well. Over time we could learn the age of a RPA and thus schedule the scanning without white list times most efficient. Frankly, I want to get the white list usage going first. As long as you only have public or static addresses, it is the way to go. And then we optimize it when we have to deal with RPAs.
+
+We can not close our eyes to iOS devices using RPAs and I am not willing to take the power hit of getting flooded with advertising reports.
 
 Regards
 
