@@ -1,97 +1,141 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AE23C6FB-1A02-4C3C-9E43-DE569BF3F90D@holtmann.org>
-References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com>
-	<1393494006-20363-2-git-send-email-marcin.kraglak@tieto.com>
-	<AE23C6FB-1A02-4C3C-9E43-DE569BF3F90D@holtmann.org>
-Date: Fri, 28 Feb 2014 08:08:56 +0100
-Message-ID: <CABD6X-Le1h83TvuxTTCKMmWajiHEw-Gu5FL_zRMfPGAwa3nTcA@mail.gmail.com>
-Subject: Re: [PATCHv2 1/8] shared/hfp: Fix parsing line with few commands
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCHv2 2/8] shared/hfp: Add prefix handlers functionality
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393494006-20363-3-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 27 Feb 2014 23:06:48 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <97847860-E690-4FC9-A631-16A0E4CE8486@holtmann.org>
+References: <1393494006-20363-1-git-send-email-marcin.kraglak@tieto.com> <1393494006-20363-3-git-send-email-marcin.kraglak@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Marcin,
 
-On 28 February 2014 08:00, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Marcin,
->
->> If hfp_gw received line with few commands, it called command
->> handler one time, for first command. Next comamnd was processed
->> only if next line was received.
->> Now, after every response from gw, we call proces_input to be
->> sure that all data has been be processed.
->> It will process next command only if response for previous was sent.
->> ---
->> src/shared/hfp.c | 16 +++++++++-------
->> 1 file changed, 9 insertions(+), 7 deletions(-)
->>
->> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
->> index 854cf46..0681b19 100644
->> --- a/src/shared/hfp.c
->> +++ b/src/shared/hfp.c
->> @@ -121,23 +121,21 @@ static void process_input(struct hfp_gw *hfp)
->>
->>               *ptr = '\0';
->>               count = asprintf(&ptr, "%s%s", str, str2);
->> -             str = ptr;
->>       } else {
->> -             count = ptr - str;
->>               *ptr = '\0';
->> +             count = asprintf(&ptr, "%s", str);
->>       }
->
-> the whole point here is to not allocate a string if the command is not wrapped in the ring buffer. No idea what you are fixing here. And it is also not described in the commit message.
->
->>       hfp->result_pending = true;
->>
->> +     len = ringbuf_drain(hfp->read_buf, count + 1);
->> +
->>       if (hfp->command_callback)
->> -             hfp->command_callback(str, hfp->command_data);
->> +             hfp->command_callback(ptr, hfp->command_data);
->>       else
->>               hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
->>
->> -     len = ringbuf_drain(hfp->read_buf, count + 1);
->> -
->> -     if (str == ptr)
->> -             free(ptr);
->> +     free(ptr);
->> }
->>
->> static void read_watch_destroy(void *user_data)
->> @@ -341,6 +339,8 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
->>
->>       hfp->result_pending = false;
->>
->> +     process_input(hfp);
->> +
->>       return true;
->> }
->>
->> @@ -356,6 +356,8 @@ bool hfp_gw_send_error(struct hfp_gw *hfp, enum hfp_error error)
->>
->>       hfp->result_pending = false;
->>
->> +     process_input(hfp);
->> +
->>       return true;
->> }
->
-> We can certainly do this, but normally AT commands work that you get one, send a response and then get the next one. Except for unsolicited notification, but in HFP gateway case, we are the ones sending these and not the headset.
->
-> What is this all fixing?
->
-> Regards
->
-> Marcel
->
-If we can receive one command in time, lets just ignore this patch
+> Add two functions: hfp_gw_set_prefix_handler() and
+> hfp_gw_remove_prefix_handler(). It will allow user to register for
+> specific command. Current implementation just adds or removes data
+> from hfp_gw structure.
+> ---
+> Makefile.tools   |  1 +
+> src/shared/hfp.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> src/shared/hfp.h | 17 ++++++++++++
+> 3 files changed, 102 insertions(+)
+> 
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 9f7ba9f..31e1093 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -63,6 +63,7 @@ emulator_hfp_SOURCES = emulator/hfp.c \
+> 				monitor/mainloop.h monitor/mainloop.c \
+> 				src/shared/io.h src/shared/io-mainloop.c \
+> 				src/shared/util.h src/shared/util.c \
+> +				src/shared/queue.h src/shared/queue.c \
+> 				src/shared/ringbuf.h src/shared/ringbuf.c \
+> 				src/shared/hfp.h src/shared/hfp.c
+> 
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index 0681b19..e164dd6 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -32,6 +32,7 @@
+> 
+> #include "src/shared/util.h"
+> #include "src/shared/ringbuf.h"
+> +#include "src/shared/queue.h"
+> #include "src/shared/io.h"
+> #include "src/shared/hfp.h"
+> 
+> @@ -42,6 +43,7 @@ struct hfp_gw {
+> 	struct io *io;
+> 	struct ringbuf *read_buf;
+> 	struct ringbuf *write_buf;
+> +	struct queue *prefix_handlers;
+> 	bool writer_active;
+> 	bool permissive_syntax;
+> 	bool result_pending;
+> @@ -60,6 +62,37 @@ struct hfp_gw {
+> 	bool destroyed;
+> };
+> 
+> +struct prefix_handler_data {
+> +	char *prefix;
+> +	void *user_data;
+> +	hfp_destroy_func_t destroy;
+> +	hfp_result_func_t callback;
+> +};
+> +
+> +static void destroy_prefix_handler_data(void *data)
+> +{
+> +	struct prefix_handler_data *handler = data;
+> +
+> +	if (handler->destroy)
+> +		handler->destroy(handler->user_data);
+> +
+> +	free(handler);
+> +}
+> +
+> +static bool match_handler_prefix(const void *a, const void *b)
+> +{
+> +	const struct prefix_handler_data *handler = a;
+> +	const char *prefix = b;
+> +
+> +	if (strlen(handler->prefix) != strlen(prefix))
+> +		return false;
+> +
+> +	if (memcmp(handler->prefix, prefix, strlen(prefix)))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+> static void write_watch_destroy(void *user_data)
+> {
+> 	struct hfp_gw *hfp = user_data;
+> @@ -194,8 +227,19 @@ struct hfp_gw *hfp_gw_new(int fd)
+> 		return NULL;
+> 	}
+> 
+> +	hfp->prefix_handlers = queue_new();
+> +	if (!hfp->prefix_handlers) {
+> +		io_destroy(hfp->io);
+> +		ringbuf_free(hfp->write_buf);
+> +		ringbuf_free(hfp->read_buf);
+> +		free(hfp);
+> +		return NULL;
+> +	}
+> +
+> 	if (!io_set_read_handler(hfp->io, can_read_data,
+> 					hfp, read_watch_destroy)) {
+> +		queue_destroy(hfp->prefix_handlers,
+> +						destroy_prefix_handler_data);
+> 		io_destroy(hfp->io);
+> 		ringbuf_free(hfp->write_buf);
+> 		ringbuf_free(hfp->read_buf);
+> @@ -248,6 +292,9 @@ void hfp_gw_unref(struct hfp_gw *hfp)
+> 	ringbuf_free(hfp->write_buf);
+> 	hfp->write_buf = NULL;
+> 
+> +	queue_destroy(hfp->prefix_handlers, destroy_prefix_handler_data);
+> +	hfp->prefix_handlers = NULL;
+> +
+> 	if (!hfp->in_disconnect) {
+> 		free(hfp);
+> 		return;
+> @@ -407,6 +454,43 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
+> 	return true;
+> }
+> 
+> +bool hfp_gw_set_prefix_handler(struct hfp_gw *hfp, hfp_result_func_t callback,
+> +						char *prefix, void *user_data,
+> +						hfp_destroy_func_t destroy)
+> +{
 
-BR
-Marcin
+it is either add and remove or register and unregister, but never set and remove. If you set something, the next call to set would overwrite it.
+
+Regards
+
+Marcel
+
