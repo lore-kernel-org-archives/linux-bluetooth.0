@@ -1,76 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 5/9] android/avrcp: Add avrcp_get_current_player_value() function
-Date: Fri, 28 Feb 2014 16:18:41 +0200
-Message-Id: <1393597125-18176-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1393597125-18176-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393597125-18176-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_OnnyvMvLmCtYuLGOvUL0igK22gOCAP1G5KBvcJseaayw@mail.gmail.com>
+References: <1393571362-27898-1-git-send-email-adam8157@gmail.com>
+	<04802ECE-6B8D-4DF4-BFFD-EABBD42BD30F@holtmann.org>
+	<20140228073113.GA3771@adam-laptop>
+	<CAJdJm_OnnyvMvLmCtYuLGOvUL0igK22gOCAP1G5KBvcJseaayw@mail.gmail.com>
+Date: Fri, 28 Feb 2014 15:10:41 +0100
+Message-ID: <CABBYNZLP8oPywHhMDK1D9FATFi=gMAgdfde+SjwzCp=VSGy05A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] core: retry connect_dbus() several times
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: Adam Lee <adam8157@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Adam,
 
----
- android/avrcp-lib.c | 21 +++++++++++++++++++++
- android/avrcp-lib.h | 11 +++++++++++
- 2 files changed, 32 insertions(+)
+On Fri, Feb 28, 2014 at 1:22 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Adam,
+>
+> On Fri, Feb 28, 2014 at 3:31 AM, Adam Lee <adam8157@gmail.com> wrote:
+>> connect_dbus() fails sometimes with Intel 7260 bluetooth, sleeping 0.5s
+>> before executing bluetoothd workarounds it. I assume the firmware
+>> patching slows down hardware initialization then fails to connect.
+>>
+>> Any other possibility? I'm not a D-Bus guru :)
+>
+> Please provide more details, e.g. the bluetoothd logs showing the
+> problems, btmon output and which steps you are using to reproduce it.
+> If you are using bluetoothctl, tell us which commands you are using.
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 52074a7..053e9e1 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -321,3 +321,24 @@ int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
- 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, attributes,
- 				attr_len, func, user_data);
- }
-+
-+int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attributes,
-+					uint8_t attr_count, avctp_rsp_cb func,
-+					void *user_data)
-+
-+{
-+	uint8_t buf[AVRCP_ATTRIBUTE_LAST + 1];
-+
-+	if (attr_count > AVRCP_ATTRIBUTE_LAST)
-+		return -EINVAL;
-+
-+	if (attributes && attr_count) {
-+		buf[0] = attr_count;
-+		memcpy(buf + 1, attributes, attr_count);
-+	}
-+
-+	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
-+				AVRCP_GET_CURRENT_PLAYER_VALUE, buf,
-+				attr_count + 1, func, user_data);
-+
-+}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index da8c990..1f7eab0 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -74,6 +74,14 @@
- #define CAP_COMPANY_ID				0x02
- #define CAP_EVENTS_SUPPORTED			0x03
- 
-+/* Player Attributes */
-+#define AVRCP_ATTRIBUTE_ILEGAL			0x00
-+#define AVRCP_ATTRIBUTE_EQUALIZER		0x01
-+#define AVRCP_ATTRIBUTE_REPEAT_MODE		0x02
-+#define AVRCP_ATTRIBUTE_SHUFFLE			0x03
-+#define AVRCP_ATTRIBUTE_SCAN			0x04
-+#define AVRCP_ATTRIBUTE_LAST			AVRCP_ATTRIBUTE_SCAN
-+
- /* Company IDs for vendor dependent commands */
- #define IEEEID_BTSIG		0x001958
- 
-@@ -113,3 +121,6 @@ int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
- int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
- 					uint8_t attr_len, avctp_rsp_cb func,
- 					void *user_data);
-+int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attributes,
-+					uint8_t attr_count, avctp_rsp_cb func,
-+					void *user_data);
+My guess is that either your driver is not using .setup hook to do the
+firmware patching or it is returning before it has fully initialize
+the hardware, so please also add more information what is happening on
+the driver side.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
