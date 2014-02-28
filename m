@@ -1,200 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 1/6] shared/hfp: Add prefix handlers functionality
-Date: Fri, 28 Feb 2014 10:22:33 +0100
-Message-Id: <1393579358-11514-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 2/6] shared/hfp: Add implementiation of processing commands
+Date: Fri, 28 Feb 2014 10:22:34 +0100
+Message-Id: <1393579358-11514-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1393579358-11514-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1393579358-11514-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add two functions: hfp_gw_register_prefix_handler() and
-hfp_gw_unregister_prefix_handler(). It will allow user to register for
-specific command. Current implementation just adds or removes data
-from hfp_gw structure.
+It will look for prefix handler for given cammand.
 ---
- Makefile.tools   |  1 +
- src/shared/hfp.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/hfp.h | 18 ++++++++++++
- 3 files changed, 104 insertions(+)
+ src/shared/hfp.c | 98 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 94 insertions(+), 4 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 9f7ba9f..31e1093 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -63,6 +63,7 @@ emulator_hfp_SOURCES = emulator/hfp.c \
- 				monitor/mainloop.h monitor/mainloop.c \
- 				src/shared/io.h src/shared/io-mainloop.c \
- 				src/shared/util.h src/shared/util.c \
-+				src/shared/queue.h src/shared/queue.c \
- 				src/shared/ringbuf.h src/shared/ringbuf.c \
- 				src/shared/hfp.h src/shared/hfp.c
- 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 854cf46..12d0754 100644
+index 12d0754..e4cb011 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -32,6 +32,7 @@
+@@ -29,6 +29,7 @@
+ #include <unistd.h>
+ #include <string.h>
+ #include <stdarg.h>
++#include <ctype.h>
  
  #include "src/shared/util.h"
  #include "src/shared/ringbuf.h"
-+#include "src/shared/queue.h"
- #include "src/shared/io.h"
- #include "src/shared/hfp.h"
- 
-@@ -42,6 +43,7 @@ struct hfp_gw {
- 	struct io *io;
- 	struct ringbuf *read_buf;
- 	struct ringbuf *write_buf;
-+	struct queue *prefix_handlers;
- 	bool writer_active;
- 	bool permissive_syntax;
- 	bool result_pending;
-@@ -60,6 +62,37 @@ struct hfp_gw {
- 	bool destroyed;
+@@ -69,6 +70,11 @@ struct prefix_handler_data {
+ 	hfp_result_func_t callback;
  };
  
-+struct prefix_handler_data {
-+	char *prefix;
-+	void *user_data;
-+	hfp_destroy_func_t destroy;
-+	hfp_result_func_t callback;
++struct hfp_gw_result {
++	const char *data;
++	int offset;
 +};
 +
-+static void destroy_prefix_handler_data(void *data)
-+{
-+	struct prefix_handler_data *handler = data;
-+
-+	if (handler->destroy)
-+		handler->destroy(handler->user_data);
-+
-+	free(handler);
-+}
-+
-+static bool match_handler_prefix(const void *a, const void *b)
-+{
-+	const struct prefix_handler_data *handler = a;
-+	const char *prefix = b;
-+
-+	if (strlen(handler->prefix) != strlen(prefix))
-+		return false;
-+
-+	if (memcmp(handler->prefix, prefix, strlen(prefix)))
-+		return false;
-+
-+	return true;
-+}
-+
- static void write_watch_destroy(void *user_data)
+ static void destroy_prefix_handler_data(void *data)
  {
- 	struct hfp_gw *hfp = user_data;
-@@ -196,8 +229,19 @@ struct hfp_gw *hfp_gw_new(int fd)
- 		return NULL;
- 	}
- 
-+	hfp->prefix_handlers = queue_new();
-+	if (!hfp->prefix_handlers) {
-+		io_destroy(hfp->io);
-+		ringbuf_free(hfp->write_buf);
-+		ringbuf_free(hfp->read_buf);
-+		free(hfp);
-+		return NULL;
-+	}
-+
- 	if (!io_set_read_handler(hfp->io, can_read_data,
- 					hfp, read_watch_destroy)) {
-+		queue_destroy(hfp->prefix_handlers,
-+						destroy_prefix_handler_data);
- 		io_destroy(hfp->io);
- 		ringbuf_free(hfp->write_buf);
- 		ringbuf_free(hfp->read_buf);
-@@ -250,6 +294,9 @@ void hfp_gw_unref(struct hfp_gw *hfp)
- 	ringbuf_free(hfp->write_buf);
- 	hfp->write_buf = NULL;
- 
-+	queue_destroy(hfp->prefix_handlers, destroy_prefix_handler_data);
-+	hfp->prefix_handlers = NULL;
-+
- 	if (!hfp->in_disconnect) {
- 		free(hfp);
- 		return;
-@@ -405,6 +452,44 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
- 	return true;
+ 	struct prefix_handler_data *handler = data;
+@@ -130,6 +136,88 @@ static void wakeup_writer(struct hfp_gw *hfp)
+ 	hfp->writer_active = true;
  }
  
-+bool hfp_gw_register_prefix_handler(struct hfp_gw *hfp,
-+						hfp_result_func_t callback,
-+						char *prefix, void *user_data,
-+						hfp_destroy_func_t destroy)
++static void skip_whitespace(struct hfp_gw_result *result)
 +{
-+	struct prefix_handler_data *handler;
-+
-+	handler = queue_find(hfp->prefix_handlers, match_handler_prefix,
-+									prefix);
-+	if (handler)
-+		return false;
-+
-+	handler = new0(struct prefix_handler_data, 1);
-+	if (!handler)
-+		return false;
-+
-+	handler->callback = callback;
-+	handler->prefix = prefix;
-+	handler->destroy = destroy;
-+	handler->user_data = user_data;
-+
-+	return queue_push_tail(hfp->prefix_handlers, handler);
++	while (result->data[result->offset] == ' ')
++		result->offset++;
 +}
 +
-+bool hfp_gw_unregister_prefix_handler(struct hfp_gw *hfp, char *prefix)
++static bool call_prefix_handler(struct hfp_gw *hfp, const char *data)
 +{
 +	struct prefix_handler_data *handler;
++	const char *separators = ";?=\0";
++	struct hfp_gw_result result;
++	enum hfp_cmd_type type;
++	char lookup_prefix[18];
++	uint8_t pref_len = 0;
++	const char *prefix;
++	int i;
 +
-+	handler = queue_remove_if(hfp->prefix_handlers, match_handler_prefix,
-+									prefix);
++	result.offset = 0;
++	result.data = data;
++
++	skip_whitespace(&result);
++
++	if (strlen(data + result.offset) < 3)
++		return false;
++
++	if (strncmp(data + result.offset, "AT", 2))
++		if (strncmp(data + result.offset, "at", 2))
++			return false;
++
++	result.offset += 2;
++	prefix = data + result.offset;
++
++	if (isalpha(prefix[0])) {
++		lookup_prefix[pref_len++] = toupper(prefix[0]);
++	} else {
++		pref_len = strcspn(prefix, separators);
++		if (pref_len > 17 || pref_len < 2)
++			return false;
++
++		for (i = 0; i < pref_len; i++)
++			lookup_prefix[i] = toupper(prefix[i]);
++	}
++
++	lookup_prefix[pref_len] = '\0';
++	result.offset += pref_len;
++
++	if (lookup_prefix[0] == 'D') {
++		type = HFP_AT_SET;
++		goto done;
++	}
++
++	if (data[result.offset] == '=') {
++		result.offset++;
++		if (data[result.offset] == '?') {
++			result.offset++;
++			type = HFP_AT_TEST;
++		} else {
++			type = HFP_AT_SET;
++		}
++		goto done;
++	}
++
++	if (data[result.offset] == '?') {
++		result.offset++;
++		type = HFP_AT_READ;
++		goto done;
++	}
++
++	type = HFP_AT_COMMAND;
++
++done:
++
++	handler = queue_find(hfp->prefix_handlers, match_handler_prefix,
++								lookup_prefix);
 +	if (!handler)
 +		return false;
 +
-+	destroy_prefix_handler_data(handler);
++	handler->callback(&result, type, handler->user_data);
 +
 +	return true;
 +}
 +
- static void disconnect_watch_destroy(void *user_data)
+ static void process_input(struct hfp_gw *hfp)
  {
- 	struct hfp_gw *hfp = user_data;
-diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index b0bd934..4dc293f 100644
---- a/src/shared/hfp.h
-+++ b/src/shared/hfp.h
-@@ -60,6 +60,18 @@ enum hfp_error {
- 	HFP_ERROR_NETWORK_NOT_ALLOWED		= 32,
- };
+ 	char *str, *ptr;
+@@ -162,10 +250,12 @@ static void process_input(struct hfp_gw *hfp)
  
-+enum hfp_cmd_type {
-+	HFP_AT_READ,
-+	HFP_AT_SET,
-+	HFP_AT_TEST,
-+	HFP_AT_COMMAND
-+};
-+
-+struct hfp_gw_result;
-+
-+typedef void (*hfp_result_func_t)(struct hfp_gw_result *result,
-+				enum hfp_cmd_type type, void *user_data);
-+
- typedef void (*hfp_destroy_func_t)(void *user_data);
- typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
+ 	hfp->result_pending = true;
  
-@@ -94,3 +106,9 @@ bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
- 					hfp_destroy_func_t destroy);
+-	if (hfp->command_callback)
+-		hfp->command_callback(str, hfp->command_data);
+-	else
+-		hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
++	if (!call_prefix_handler(hfp, str)) {
++		if (hfp->command_callback)
++			hfp->command_callback(str, hfp->command_data);
++		else
++			hfp_gw_send_result(hfp, HFP_RESULT_ERROR);
++	}
  
- bool hfp_gw_disconnect(struct hfp_gw *hfp);
-+
-+bool hfp_gw_register_prefix_handler(struct hfp_gw *hfp,
-+						hfp_result_func_t callback,
-+						char *prefix, void *user_data,
-+						hfp_destroy_func_t destroy);
-+bool hfp_gw_unregister_prefix_handler(struct hfp_gw *hfp, char *prefix);
+ 	len = ringbuf_drain(hfp->read_buf, count + 1);
+ 
 -- 
 1.8.5.3
 
