@@ -2,94 +2,91 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 4/9] gatt: Add GATT service to the local database
-Date: Fri, 28 Feb 2014 14:05:31 -0300
-Message-Id: <1393607136-16908-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 2/9] gatt: Add proxy added handler
+Date: Fri, 28 Feb 2014 14:05:29 -0300
+Message-Id: <1393607136-16908-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1393607136-16908-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1393607136-16908-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch creates GATT service attribute based on its GDBusProxy
-object, and inserts the declaration to the local database.
+This patch creates a list of GATT objects sorting the entries based on
+the object path to allow inserting the attributes following hierarchical
+association.
 ---
- src/gatt-dbus.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+ src/gatt-dbus.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
 diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 28d7f78..93d5b7c 100644
+index fd614f9..f8486f3 100644
 --- a/src/gatt-dbus.c
 +++ b/src/gatt-dbus.c
-@@ -39,6 +39,7 @@
- #include "log.h"
- 
- #include "error.h"
-+#include "gatt.h"
+@@ -42,11 +42,15 @@
  #include "gatt-dbus.h"
  
  #define GATT_MGR_IFACE			"org.bluez.GattManager1"
-@@ -129,6 +130,56 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 	eapp->proxies = g_slist_remove(eapp->proxies, proxy);
++#define GATT_SERVICE_IFACE		"org.bluez.GattService1"
++#define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
++#define GATT_DESCRIPTOR_IFACE		"org.bluez.GattDescriptor1"
+ 
+ struct external_app {
+ 	char *owner;
+ 	char *path;
+ 	GDBusClient *client;
++	GSList *proxies;
+ 	unsigned int watch;
+ };
+ 
+@@ -75,6 +79,43 @@ static void external_app_watch_destroy(gpointer user_data)
+ 	g_free(eapp);
  }
  
-+static int register_external_service(const struct external_app *eapp,
-+							GDBusProxy *proxy)
++static int proxy_path_cmp(gconstpointer a, gconstpointer b)
 +{
-+	DBusMessageIter iter;
-+	const char *str, *path, *iface;
-+	bt_uuid_t uuid;
++	GDBusProxy *proxy1 = (GDBusProxy *) a;
++	GDBusProxy *proxy2 = (GDBusProxy *) b;
++	const char *path1 = g_dbus_proxy_get_path(proxy1);
++	const char *path2 = g_dbus_proxy_get_path(proxy2);
 +
-+	path = g_dbus_proxy_get_path(proxy);
-+	iface = g_dbus_proxy_get_interface(proxy);
-+	if (g_strcmp0(eapp->path, path) != 0 ||
-+			g_strcmp0(iface, GATT_SERVICE_IFACE) != 0)
-+		return -EINVAL;
-+
-+	if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-+		return -EINVAL;
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+		return -EINVAL;
-+
-+	dbus_message_iter_get_basic(&iter, &str);
-+
-+	if (bt_string_to_uuid(&uuid, str) < 0)
-+		return -EINVAL;
-+
-+	if (btd_gatt_add_service(&uuid) == NULL)
-+		return -EINVAL;
-+
-+	return 0;
++	return g_strcmp0(path1, path2);
 +}
 +
-+static void client_ready(void *user_data)
++static void proxy_added(GDBusProxy *proxy, void *user_data)
 +{
 +	struct external_app *eapp = user_data;
-+	GDBusProxy *proxy;
++	const char *interface, *path;
 +
-+	if (eapp->proxies == NULL)
-+		goto fail;
++	interface = g_dbus_proxy_get_interface(proxy);
++	path = g_dbus_proxy_get_path(proxy);
 +
-+	proxy = eapp->proxies->data;
-+	if (register_external_service(eapp, proxy) < 0)
-+		goto fail;
++	if (!g_str_has_prefix(path, eapp->path))
++		return;
 +
-+	DBG("Added GATT service %s", eapp->path);
++	if (g_strcmp0(interface, GATT_CHR_IFACE) != 0 &&
++			g_strcmp0(interface, GATT_SERVICE_IFACE) != 0 &&
++			g_strcmp0(interface, GATT_DESCRIPTOR_IFACE) != 0)
++		return;
 +
-+	return;
++	DBG("path %s iface %s", path, interface);
 +
-+fail:
-+	DBG("No proxies: inconsistent service (%s)!", eapp->path);
++	/*
++	 * Object path follows a hierarchical organization. Add the
++	 * proxies sorted by path helps the logic to register the
++	 * object path later.
++	 */
++	eapp->proxies = g_slist_insert_sorted(eapp->proxies, proxy,
++							proxy_path_cmp);
 +}
 +
  static struct external_app *new_external_app(DBusConnection *conn,
  					const char *sender, const char *path)
  {
-@@ -156,6 +207,8 @@ static struct external_app *new_external_app(DBusConnection *conn,
- 	g_dbus_client_set_proxy_handlers(client, proxy_added, proxy_removed,
- 								NULL, eapp);
+@@ -99,6 +140,9 @@ static struct external_app *new_external_app(DBusConnection *conn,
+ 	eapp->client = client;
+ 	eapp->path = g_strdup(path);
  
-+	g_dbus_client_set_proxies_ready_watch(client, client_ready, eapp);
++	g_dbus_client_set_proxy_handlers(client, proxy_added, NULL, NULL,
++								eapp);
 +
  	return eapp;
  }
