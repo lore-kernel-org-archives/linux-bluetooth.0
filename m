@@ -1,71 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Feb 2014 08:44:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: Background scanning and white list usage
-Message-ID: <20140228064422.GA28466@localhost.P-661HNU-F1>
-References: <BFAEE1C5-E74F-40F0-A1A4-8F4907FBDCF4@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <BFAEE1C5-E74F-40F0-A1A4-8F4907FBDCF4@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] Bluetooth: Track LE white list modification via HCI commands
+Date: Thu, 27 Feb 2014 20:37:31 -0800
+Message-Id: <1393562251-7555-4-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+When the LE white list gets changed via HCI commands make sure that
+the internal storage of the white list entries gets updated.
 
-On Thu, Feb 27, 2014, Marcel Holtmann wrote:
-> The complicated part comes into play when we have devices with LE
-> Privacy enabled and when they are using resolvable private addresses.
-> Meaning when our IRK list is populated with identity addresses and
-> their IRKs. The only way to make this work with the current available
-> controller features is if we program the RPA into the white list.
-> Since that RPA is going to change over time, we need to stop scanning
-> with the white list filter every now and then, scan for all devices
-> and resolve the RPA. If we see a new RPA for a know IRK, we have to
-> replace the old RPA in the white list with the new RPA. And then we go
-> back to scanning with the white list filter policy.
-> 
-> Now the important question is what are good enough intervals to make
-> this work smoothly. Devices using LE Privacy will take a hit in their
-> re-connection time, but that is what we have to trade in for compared
-> to waking up the host for every single advertising packet.
-> 
-> My initial idea is to scan 5 minutes using the white list, then scan
-> 10 seconds without the white list, then back to 5 minutes using the
-> white list and so on.
-> 
-> The default value for the PRA lifetime according to the specification
-> is 15 minutes. I timed recent iOS devices which seem to be using 9
-> minutes intervals. So we have to play a little bit with this and see
-> what are good values.
-> 
-> Maybe 3 minutes white list scan and 5 seconds without white list is
-> better. Things to try out.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_event.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-I don't think this is a good idea at all. With LE starting advertising
-is typically seen as the initiating action of connection creation
-(unlike with BR/EDR where HCI_Create_Connection is the initiating
-action). Typically peripherals mean "connect to me now!" when they start
-connectable advertising.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 40e5bfebb484..e3d7151e808e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1038,6 +1038,49 @@ static void hci_cc_le_read_white_list_size(struct hci_dev *hdev,
+ 		hdev->le_white_list_size = rp->size;
+ }
+ 
++static void hci_cc_le_clear_white_list(struct hci_dev *hdev,
++				       struct sk_buff *skb)
++{
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	if (!status)
++		hci_white_list_clear(hdev);
++}
++
++static void hci_cc_le_add_to_white_list(struct hci_dev *hdev,
++					struct sk_buff *skb)
++{
++	struct hci_cp_le_add_to_white_list *sent;
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_ADD_TO_WHITE_LIST);
++	if (!sent)
++		return;
++
++	if (!status)
++		hci_white_list_add(hdev, &sent->bdaddr, sent->bdaddr_type);
++}
++
++static void hci_cc_le_del_from_white_list(struct hci_dev *hdev,
++					  struct sk_buff *skb)
++{
++	struct hci_cp_le_del_from_white_list *sent;
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	sent = hci_sent_cmd_data(hdev, HCI_OP_LE_DEL_FROM_WHITE_LIST);
++	if (!sent)
++		return;
++
++	if (!status)
++		hci_white_list_del(hdev, &sent->bdaddr, sent->bdaddr_type);
++}
++
+ static void hci_cc_le_read_supported_states(struct hci_dev *hdev,
+ 					    struct sk_buff *skb)
+ {
+@@ -2378,6 +2421,18 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_le_read_white_list_size(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_LE_CLEAR_WHITE_LIST:
++		hci_cc_le_clear_white_list(hdev, skb);
++		break;
++
++	case HCI_OP_LE_ADD_TO_WHITE_LIST:
++		hci_cc_le_add_to_white_list(hdev, skb);
++		break;
++
++	case HCI_OP_LE_DEL_FROM_WHITE_LIST:
++		hci_cc_le_del_from_white_list(hdev, skb);
++		break;
++
+ 	case HCI_OP_LE_READ_SUPPORTED_STATES:
+ 		hci_cc_le_read_supported_states(hdev, skb);
+ 		break;
+-- 
+1.8.5.3
 
-Let's stay you switch on your peripheral device, or it comes into range
-you haven't used it for some time (hours or even days). If it's using
-RPAs it's pretty much guaranteed to have a different one than what we
-know of and even if we're using 3 minutes white list scanning the user
-is on average going to have to wait for 1.5 minutes for the device to
-get connected which is not acceptable behavior (the extreme example
-would be if this is a keyboard or a mouse which you start using for the
-first time in the morning - moving the mouse or pressing a key on the
-keyboard should certainly get you a connection in less than 1 second).
-
-I fully understand the desire to use the white list as it's a very nice
-power saving feature, but I don't think we can win here as long as we
-don't have a way to have the controller do the resolving for us.
-
-One thing we could potentially try to do (but which I doubt is really
-worth it in the end) is to track the age of resolved RPAs. If we have an
-RPA which was resolved say less than 5 minutes ago we consider it
-appropriate to place into the white list. Otherwise we skip using the
-white list.
-
-Johan
