@@ -1,34 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] doc: Update test coverage document
-Date: Fri, 28 Feb 2014 11:42:29 +0200
-Message-Id: <1393580549-9531-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1393580549-9531-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393580549-9531-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 6/6] shared/hfp: Add function to get unquoted string
+Date: Fri, 28 Feb 2014 10:22:38 +0100
+Message-Id: <1393579358-11514-6-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1393579358-11514-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1393579358-11514-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Update AVRCP test numbers.
 ---
- doc/test-coverage.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/hfp.c | 28 ++++++++++++++++++++++++++++
+ src/shared/hfp.h |  2 ++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-index d37bcb8..805af68 100644
---- a/doc/test-coverage.txt
-+++ b/doc/test-coverage.txt
-@@ -18,7 +18,7 @@ test-ringbuf		   3	Ring buffer functionality
- test-queue		   1	Queue handling functionality
- test-avdtp		  60	AVDTP qualification test cases
- test-avctp		   9	AVCTP qualification test cases
--test-avrcp		   7	AVRCP qualification test cases
-+test-avrcp		  19	AVRCP qualification test cases
- test-gobex		  31	Generic OBEX functionality
- test-gobex-packet	   9	OBEX packet handling
- test-gobex-header	  28	OBEX header handling
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 08b72a3..69ee6d8 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -310,6 +310,34 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+ 	return true;
+ }
+ 
++bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
++								uint8_t len)
++{
++	const char *data = result->data;
++	int i = 0;
++	char c;
++
++	skip_whitespace(result);
++
++	c = data[result->offset];
++	if (c == '"' || c == ')' || c == '(')
++		return false;
++
++	while (data[result->offset] != '\0' && data[result->offset] != ','
++					&& data[result->offset] != ')') {
++		if (i < len)
++			buf[i++] = data[result->offset];
++		result->offset++;
++	}
++
++	if (i < len)
++		buf[i++] = '\0';
++
++	next_field(result);
++
++	return true;
++}
++
+ static void process_input(struct hfp_gw *hfp)
+ {
+ 	char *str, *ptr;
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 84b5016..32c872d 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -118,3 +118,5 @@ bool hfp_gw_result_open_container(struct hfp_gw_result *result);
+ bool hfp_gw_result_close_container(struct hfp_gw_result *result);
+ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+ 								uint8_t len);
++bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
++								uint8_t len);
 -- 
-1.8.3.2
+1.8.5.3
 
