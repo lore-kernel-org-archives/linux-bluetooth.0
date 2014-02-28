@@ -1,40 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Feb 2014 18:44:59 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/6] android/socket: Reserve channel for HSP AG
-Message-ID: <20140228164459.GA23792@localhost.P-661HNU-F1>
-References: <1393604374-10127-1-git-send-email-szymon.janc@tieto.com>
- <1393604374-10127-4-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1393604374-10127-4-git-send-email-szymon.janc@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH v2 2/2] Bluetooth: Add timeout for LE connection attempts
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393602346-14676-2-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 28 Feb 2014 08:32:25 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <9E21B8E5-8A32-4BF3-9551-CE41F2536F05@holtmann.org>
+References: <1393602346-14676-1-git-send-email-johan.hedberg@gmail.com> <1393602346-14676-2-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Johan,
 
-On Fri, Feb 28, 2014, Szymon Janc wrote:
-> ---
->  android/socket.c | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+> LE connection attempts do not have a controller side timeout in the same
+> way as BR/EDR has (in form of the page timeout). Since we always do
+> scanning before initiating connections the attempts are always expected
+> to succeed in some reasonable time.
 > 
-> diff --git a/android/socket.c b/android/socket.c
-> index ee98b54..f6863c8 100644
-> --- a/android/socket.c
-> +++ b/android/socket.c
-> @@ -47,8 +47,9 @@
->  
->  #define RFCOMM_CHANNEL_MAX 30
->  
-> +#define HSP_AG_DEFAULT_CHANNEL	11
->  #define OPP_DEFAULT_CHANNEL	12
-> -#define HFAG_DEFAULT_CHANNEL	13
-> +#define HFP_AG_DEFAULT_CHANNEL	13
->  #define PBAP_DEFAULT_CHANNEL	19
+> This patch adds a timer which forces a cancellation of the connection
+> attempt within 20 seconds if it has not been successful by then. This
+> way we e.g. ensure that mgmt_pair_device times out eventually and gives
+> an error response.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci.h      |  1 +
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/hci_conn.c         | 13 +++++++++++++
+> net/bluetooth/hci_event.c        | 12 ++++++++++++
+> 4 files changed, 27 insertions(+)
 
-Wasn't our plan to mirror the BlueZ doc/assigned-numbers.txt here? At
-least the OPP and HSP channels don't match up with that.
+both patches have been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
