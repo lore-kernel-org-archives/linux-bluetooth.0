@@ -1,31 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Receiving data in BLE non-connectable undirected advertisements
-From: Adam Warski <adam@warski.org>
-In-Reply-To: <5310AD83.9030208@gmx.net>
-Date: Fri, 28 Feb 2014 16:54:59 +0100
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <E4D1FACB-475A-44B0-B20F-A9CBB250FF2C@warski.org>
-References: <5310A4A9.2000907@gmx.net> <00B030ED-78C3-4C48-B738-4161348CD6E8@warski.org> <5310AD83.9030208@gmx.net>
-To: Benjamin Adler <benadler@gmx.net>
+Subject: Re: [PATCH v2 0/4] Bluetooth: Fix initiator/responder addresses for SMP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 28 Feb 2014 07:54:35 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6558C1FD-C140-47FE-A70C-7AC4F934D5D1@holtmann.org>
+References: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
-> Also, only the first advertisement of the SensorTag is shown. While that probably makes sense for traditional advertisements, my use case requires that all advertisements are shown, as I'm trying to transmit low-rate data from the tag's sensors in the advertisements.
+> Here's a second attempt to fix the initiator/responder addresses when
+> using privacy. The main difference to the previous attempt is an added
+> protection to HCI_Set_Random_Address so we don't do that while
+> connecting or advertising, and a clarification for the white list corner
+> case in aptch 3/4 that we're taking a "best effort" approach while
+> lacking full tracking of white list initiated connections.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (4):
+>      Bluetooth: Add protections for updating local random address
+>      Bluetooth: Fix updating connection state to BT_CONNECT too early
+>      Bluetooth: Track LE initiator and responder address information
+>      Bluetooth: Use hdev->init/resp_addr values for smp_c1 function
+> 
+> include/net/bluetooth/hci_core.h |  4 ++
+> net/bluetooth/hci_conn.c         |  3 +-
+> net/bluetooth/hci_core.c         | 27 ++++++++++++-
+> net/bluetooth/hci_event.c        | 78 ++++++++++++++++++++++++++++++++++++
+> net/bluetooth/mgmt.c             |  7 ++++
+> net/bluetooth/smp.c              | 22 +++-------
+> 6 files changed, 122 insertions(+), 19 deletions(-)
 
-Try hcitool lescan --duplicates.
-By default duplicates are filtered out, so as all the advertisements are the same, you only see the first one after starting scanning.
+all 4 patches have been applied to bluetooth-next tree.
 
-However, see my post from 3 hours ago, I get into buffer overflows errors when using this option (but maybe it’s only me :) )
+Regards
 
-Adam
-
--- 
-Adam Warski
-
-http://twitter.com/#!/adamwarski
-http://www.softwaremill.com
-http://www.warski.org
+Marcel
 
