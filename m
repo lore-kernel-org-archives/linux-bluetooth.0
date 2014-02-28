@@ -1,46 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Feb 2014 13:17:14 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] avrcp: Fix buffer size
-Message-ID: <20140228111712.GC6861@aemeltch-mobl1.fi.intel.com>
-References: <1393584252-10947-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1393584252-10947-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH v2 4/4] Bluetooth: Use hdev->init/resp_addr values for smp_c1 function
+Date: Fri, 28 Feb 2014 12:54:17 +0200
+Message-Id: <1393584857-30375-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
+References: <1393584857-30375-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Feb 28, 2014 at 12:44:12PM +0200, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> For avrcp_get_current_player_value() buffer size needs to be
-> AVRCP_ATTRIBUTE_LAST + 1 for all attributes + 1 for number of attributes
-> written first, not counting header.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Sorry, please disregard this, attribute 0 should not be used.
+Now that we have nicely tracked values of the initiator and responder
+address information we can pass that directly to the smp_c1 function
+without worrying e.g. about who initiated the connection. This patch
+updates the two places in smp.c to use the new variables.
 
-> ---
->  profiles/audio/avrcp.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index c0e5d07..8098c62 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -1905,7 +1905,7 @@ static gboolean avrcp_player_value_rsp(struct avctp *conn,
->  static void avrcp_get_current_player_value(struct avrcp *session,
->  						uint8_t *attrs, uint8_t count)
->  {
-> -	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_ATTRIBUTE_LAST + 1];
-> +	uint8_t buf[AVRCP_HEADER_LENGTH + AVRCP_ATTRIBUTE_LAST + 2];
->  	struct avrcp_header *pdu = (void *) buf;
->  	uint16_t length = AVRCP_HEADER_LENGTH + count + 1;
->  
-> -- 
-> 1.8.3.2
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 22 ++++++----------------
+ 1 file changed, 6 insertions(+), 16 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index f1cb6a32e93f..4f4ff36f5f34 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -445,14 +445,9 @@ static void confirm_work(struct work_struct *work)
+ 	/* Prevent mutual access to hdev->tfm_aes */
+ 	hci_dev_lock(hdev);
+ 
+-	if (conn->hcon->out)
+-		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
+-			     conn->hcon->src_type, &conn->hcon->src,
+-			     conn->hcon->dst_type, &conn->hcon->dst, res);
+-	else
+-		ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
+-			     conn->hcon->dst_type, &conn->hcon->dst,
+-			     conn->hcon->src_type, &conn->hcon->src, res);
++	ret = smp_c1(tfm, smp->tk, smp->prnd, smp->preq, smp->prsp,
++		     conn->hcon->init_addr_type, &conn->hcon->init_addr,
++		     conn->hcon->resp_addr_type, &conn->hcon->resp_addr, res);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+@@ -492,14 +487,9 @@ static void random_work(struct work_struct *work)
+ 	/* Prevent mutual access to hdev->tfm_aes */
+ 	hci_dev_lock(hdev);
+ 
+-	if (hcon->out)
+-		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
+-			     hcon->src_type, &hcon->src,
+-			     hcon->dst_type, &hcon->dst, res);
+-	else
+-		ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
+-			     hcon->dst_type, &hcon->dst,
+-			     hcon->src_type, &hcon->src, res);
++	ret = smp_c1(tfm, smp->tk, smp->rrnd, smp->preq, smp->prsp,
++		     hcon->init_addr_type, &hcon->init_addr,
++		     hcon->resp_addr_type, &hcon->resp_addr, res);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+-- 
+1.8.5.3
+
