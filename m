@@ -2,527 +2,299 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 5/6] android/a2dp: Use common IPC for audio socket
-Date: Fri, 28 Feb 2014 14:09:28 +0100
-Message-Id: <1393592969-4451-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/6] android/unit: Update test-ipc with disconnect handler support
+Date: Fri, 28 Feb 2014 14:09:26 +0100
+Message-Id: <1393592969-4451-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1393592969-4451-1-git-send-email-szymon.janc@tieto.com>
 References: <1393592969-4451-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes audio HAL to use same code for IPC as BT HAL.
 ---
- android/Android.mk  |   1 -
- android/Makefile.am |   1 -
- android/a2dp.c      |  73 ++++++++++++++++---------
- android/audio-ipc.c | 155 ----------------------------------------------------
- android/audio-ipc.h |  31 -----------
- android/audio-msg.h |   1 +
- android/ipc.c       |   8 +--
- android/ipc.h       |   7 ---
- 8 files changed, 52 insertions(+), 225 deletions(-)
- delete mode 100644 android/audio-ipc.c
- delete mode 100644 android/audio-ipc.h
+ android/test-ipc.c | 117 ++++++++++++++++-------------------------------------
+ 1 file changed, 34 insertions(+), 83 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 82c834b..56b86ba 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -35,7 +35,6 @@ LOCAL_SRC_FILES := \
- 	bluez/android/hidhost.c \
- 	bluez/android/socket.c \
- 	bluez/android/ipc.c \
--	bluez/android/audio-ipc.c \
- 	bluez/android/avdtp.c \
- 	bluez/android/a2dp.c \
- 	bluez/android/avctp.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 232f3f3..05fe372 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -32,7 +32,6 @@ android_bluetoothd_SOURCES = android/main.c \
- 				android/bluetooth.h android/bluetooth.c \
- 				android/hidhost.h android/hidhost.c \
- 				android/ipc.h android/ipc.c \
--				android/audio-ipc.h android/audio-ipc.c \
- 				android/avdtp.h android/avdtp.c \
- 				android/a2dp.h android/a2dp.c \
- 				android/avctp.h android/avctp.c \
-diff --git a/android/a2dp.c b/android/a2dp.c
-index b05d4bd..8e27413 100644
---- a/android/a2dp.c
-+++ b/android/a2dp.c
-@@ -47,7 +47,6 @@
- #include "avdtp.h"
- #include "avrcp.h"
- #include "audio-msg.h"
--#include "audio-ipc.h"
+diff --git a/android/test-ipc.c b/android/test-ipc.c
+index 9b736a2..2f211fd 100644
+--- a/android/test-ipc.c
++++ b/android/test-ipc.c
+@@ -35,7 +35,6 @@
+ #include <fcntl.h>
+ #include <sys/socket.h>
+ #include <sys/un.h>
+-#include <sys/signalfd.h>
  
- #define L2CAP_PSM_AVDTP 0x19
- #define SVC_HINT_CAPTURING 0x08
-@@ -64,6 +63,7 @@ static guint audio_retry_id = 0;
- static bool audio_retrying = false;
+ #include <glib.h>
+ #include "src/shared/util.h"
+@@ -43,10 +42,8 @@
+ #include "android/hal-msg.h"
+ #include "android/ipc.h"
  
- static struct ipc *hal_ipc = NULL;
-+static struct ipc *audio_ipc = NULL;
+-static struct ipc *ipc = NULL;
+-
+ struct test_data {
+-	uint32_t expected_signal;
++	bool disconnect;
+ 	const void *cmd;
+ 	uint16_t cmd_size;
+ 	uint8_t service;
+@@ -65,13 +62,13 @@ struct context {
  
- struct a2dp_preset {
- 	void *data;
-@@ -1298,12 +1298,14 @@ static void bt_audio_open(const void *buf, uint16_t len)
+ 	GIOChannel *cmd_io;
+ 	GIOChannel *notif_io;
+-	GIOChannel *signal_io;
+-
+-	guint signal_source;
  
- 	g_slist_free(presets);
+ 	const struct test_data *data;
+ };
  
--	audio_ipc_send_rsp_full(AUDIO_OP_OPEN, sizeof(rsp), &rsp, -1);
-+	ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_OPEN,
-+							sizeof(rsp), &rsp, -1);
- 
- 	return;
- 
- failed:
--	audio_ipc_send_rsp(AUDIO_OP_OPEN, AUDIO_STATUS_FAILED);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_OPEN,
-+							AUDIO_STATUS_FAILED);
- }
- 
- static struct a2dp_endpoint *find_endpoint(uint8_t id)
-@@ -1330,14 +1332,16 @@ static void bt_audio_close(const void *buf, uint16_t len)
- 	endpoint = find_endpoint(cmd->id);
- 	if (!endpoint) {
- 		error("Unable to find endpoint %u", cmd->id);
--		audio_ipc_send_rsp(AUDIO_OP_CLOSE, AUDIO_STATUS_FAILED);
-+		ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_CLOSE,
-+							AUDIO_STATUS_FAILED);
- 		return;
- 	}
- 
- 	endpoints = g_slist_remove(endpoints, endpoint);
- 	unregister_endpoint(endpoint);
- 
--	audio_ipc_send_rsp(AUDIO_OP_CLOSE, AUDIO_STATUS_SUCCESS);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_CLOSE,
-+							AUDIO_STATUS_SUCCESS);
- }
- 
- static void bt_stream_open(const void *buf, uint16_t len)
-@@ -1353,14 +1357,16 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 	setup = find_setup(cmd->id);
- 	if (!setup) {
- 		error("Unable to find stream for endpoint %u", cmd->id);
--		audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
-+		ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
-+							AUDIO_STATUS_FAILED);
- 		return;
- 	}
- 
- 	if (!avdtp_stream_get_transport(setup->stream, &fd, NULL, &omtu,
- 								NULL)) {
- 		error("avdtp_stream_get_transport: failed");
--		audio_ipc_send_rsp(AUDIO_OP_OPEN_STREAM, AUDIO_STATUS_FAILED);
-+		ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
-+							AUDIO_STATUS_FAILED);
- 		return;
- 	}
- 
-@@ -1371,7 +1377,8 @@ static void bt_stream_open(const void *buf, uint16_t len)
- 	rsp->preset->len = setup->preset->len;
- 	memcpy(rsp->preset->data, setup->preset->data, setup->preset->len);
- 
--	audio_ipc_send_rsp_full(AUDIO_OP_OPEN_STREAM, len, rsp, fd);
-+	ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_OPEN_STREAM,
-+								len, rsp, fd);
- 
- 	g_free(rsp);
- }
-@@ -1396,12 +1403,14 @@ static void bt_stream_close(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_SUCCESS);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_CLOSE_STREAM,
-+							AUDIO_STATUS_SUCCESS);
- 
- 	return;
- 
- failed:
--	audio_ipc_send_rsp(AUDIO_OP_CLOSE_STREAM, AUDIO_STATUS_FAILED);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_CLOSE_STREAM,
-+							AUDIO_STATUS_FAILED);
- }
- 
- static void bt_stream_resume(const void *buf, uint16_t len)
-@@ -1426,12 +1435,14 @@ static void bt_stream_resume(const void *buf, uint16_t len)
- 		}
- 	}
- 
--	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_SUCCESS);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_RESUME_STREAM,
-+							AUDIO_STATUS_SUCCESS);
- 
- 	return;
- 
- failed:
--	audio_ipc_send_rsp(AUDIO_OP_RESUME_STREAM, AUDIO_STATUS_FAILED);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_RESUME_STREAM,
-+							AUDIO_STATUS_FAILED);
- }
- 
- static void bt_stream_suspend(const void *buf, uint16_t len)
-@@ -1454,12 +1465,14 @@ static void bt_stream_suspend(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	audio_ipc_send_rsp(AUDIO_OP_SUSPEND_STREAM, AUDIO_STATUS_SUCCESS);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_SUSPEND_STREAM,
-+							AUDIO_STATUS_SUCCESS);
- 
- 	return;
- 
- failed:
--	audio_ipc_send_rsp(AUDIO_OP_SUSPEND_STREAM, AUDIO_STATUS_FAILED);
-+	ipc_send_rsp(audio_ipc, AUDIO_SERVICE_ID, AUDIO_OP_SUSPEND_STREAM,
-+							AUDIO_STATUS_FAILED);
- }
- 
- static const struct ipc_handler audio_handlers[] = {
-@@ -1490,26 +1503,33 @@ static void bt_audio_unregister(void)
- 	g_slist_free_full(setups, setup_free);
- 	setups = NULL;
- 
--	audio_ipc_cleanup();
-+	ipc_cleanup(audio_ipc);
-+	audio_ipc = NULL;
- }
- 
--static void bt_audio_register(GDestroyNotify destroy)
-+static bool bt_audio_register(ipc_disconnect_cb disconnect)
- {
- 	DBG("");
- 
--	audio_ipc_init(destroy);
-+	audio_ipc = ipc_init(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
-+				AUDIO_SERVICE_ID_MAX, false, disconnect, NULL);
-+	if (!audio_ipc)
-+		return false;
 +
-+	ipc_register(audio_ipc, AUDIO_SERVICE_ID, audio_handlers,
-+						G_N_ELEMENTS(audio_handlers));
- 
--	audio_ipc_register(audio_handlers, G_N_ELEMENTS(audio_handlers));
-+	return true;
- }
- 
- static gboolean audio_retry_register(void *data)
++static struct ipc *ipc = NULL;
++
+ static void context_quit(struct context *context)
  {
--	GDestroyNotify destroy = data;
-+	ipc_disconnect_cb cb = data;
+ 	g_main_loop_quit(context->main_loop);
+@@ -92,13 +89,13 @@ static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
+ 		.len = 0,
+ 	};
  
- 	audio_retry_id = 0;
- 	audio_retrying = true;
- 
--	bt_audio_register(destroy);
-+	bt_audio_register(cb);
- 
- 	return FALSE;
- }
-@@ -1581,9 +1601,8 @@ bool bt_a2dp_register(struct ipc *ipc, const bdaddr_t *addr)
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_A2DP, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
- 
--	bt_audio_register(audio_disconnected);
+-	g_assert(test_data->expected_signal == 0);
 -
--	return true;
-+	if (bt_audio_register(audio_disconnected))
-+		return true;
- 
- fail:
- 	g_io_channel_shutdown(server, TRUE, NULL);
-@@ -1608,8 +1627,6 @@ void bt_a2dp_unregister(void)
- 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_A2DP);
- 	hal_ipc = NULL;
- 
--	audio_ipc_unregister();
--
- 	bt_adapter_remove_record(record_id);
- 	record_id = 0;
- 
-@@ -1619,5 +1636,9 @@ void bt_a2dp_unregister(void)
- 		server = NULL;
+ 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+-		g_assert(FALSE);
++		g_assert(test_data->disconnect);
+ 		return FALSE;
  	}
  
--	audio_ipc_cleanup();
-+	if (audio_ipc) {
-+		ipc_unregister(audio_ipc, AUDIO_SERVICE_ID);
-+		ipc_cleanup(audio_ipc);
-+		audio_ipc = NULL;
-+	}
++	g_assert(!test_data->disconnect);
++
+ 	sk = g_io_channel_unix_get_fd(io);
+ 
+ 	g_assert(read(sk, buf, sizeof(buf)) == sizeof(struct hal_hdr));
+@@ -112,11 +109,16 @@ static gboolean cmd_watch(GIOChannel *io, GIOCondition cond,
+ static gboolean notif_watch(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
++	struct context *context = user_data;
++	const struct test_data *test_data = context->data;
++
+ 	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL)) {
+-		g_assert(FALSE);
++		g_assert(test_data->disconnect);
+ 		return FALSE;
+ 	}
+ 
++	g_assert(!test_data->disconnect);
++
+ 	return TRUE;
  }
-diff --git a/android/audio-ipc.c b/android/audio-ipc.c
-deleted file mode 100644
-index ce2d86d..0000000
---- a/android/audio-ipc.c
-+++ /dev/null
-@@ -1,155 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2013-2014  Intel Corporation. All rights reserved.
-- *
-- *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--#ifdef HAVE_CONFIG_H
--#include <config.h>
--#endif
--
--#include <stddef.h>
--#include <errno.h>
--#include <stdint.h>
--#include <string.h>
--#include <signal.h>
--#include <stdbool.h>
--#include <unistd.h>
--#include <glib.h>
--
--#include "src/log.h"
--#include "ipc.h"
--#include "audio-msg.h"
--#include "audio-ipc.h"
--
--static GIOChannel *audio_io = NULL;
--
--static struct service_handler service;
--
--static gboolean audio_watch_cb(GIOChannel *io, GIOCondition cond,
+ 
+@@ -162,62 +164,6 @@ static gboolean connect_handler(GIOChannel *io, GIOCondition cond,
+ 	return TRUE;
+ }
+ 
+-static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
 -							gpointer user_data)
 -{
--	GDestroyNotify destroy = user_data;
--	char buf[BLUEZ_AUDIO_MTU];
--	ssize_t ret;
--	int fd, err;
+-	struct context *context = user_data;
+-	const struct test_data *test_data = context->data;
+-	struct signalfd_siginfo si;
+-	ssize_t result;
+-	int fd;
 -
--	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
--		info("Audio IPC: command socket closed");
--		goto fail;
--	}
--
--	fd = g_io_channel_unix_get_fd(io);
--
--	ret = read(fd, buf, sizeof(buf));
--	if (ret < 0) {
--		error("Audio IPC: command read failed (%s)", strerror(errno));
--		goto fail;
--	}
--
--	err = ipc_handle_msg(&service, AUDIO_SERVICE_ID, buf, ret);
--	if (err < 0) {
--		error("Audio IPC: failed to handle message (%s)",
--							strerror(-err));
--		goto fail;
--	}
--
--	return TRUE;
--
--fail:
--	audio_ipc_cleanup();
--	if (destroy)
--		destroy(NULL);
--	return FALSE;
--}
--
--static gboolean audio_connect_cb(GIOChannel *io, GIOCondition cond,
--							gpointer user_data)
--{
--	GDestroyNotify destroy = user_data;
--
--	DBG("");
--
--	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
--		error("Audio IPC: socket connect failed");
--		audio_ipc_cleanup();
--		if (destroy)
--			destroy(NULL);
+-	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
 -		return FALSE;
--	}
 -
--	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+-	fd = g_io_channel_unix_get_fd(channel);
 -
--	g_io_add_watch(audio_io, cond, audio_watch_cb, user_data);
+-	result = read(fd, &si, sizeof(si));
+-	if (result != sizeof(si))
+-		return FALSE;
 -
--	info("Audio IPC: successfully connected");
--
--	return FALSE;
+-	g_assert(test_data->expected_signal == si.ssi_signo);
+-	context_quit(context);
+-	return TRUE;
 -}
 -
--void audio_ipc_init(GDestroyNotify destroy)
+-static guint setup_signalfd(gpointer user_data)
 -{
--	audio_io = ipc_connect(BLUEZ_AUDIO_SK_PATH, sizeof(BLUEZ_AUDIO_SK_PATH),
--						audio_connect_cb, destroy);
+-	GIOChannel *channel;
+-	guint source;
+-	sigset_t mask;
+-	int ret;
+-	int fd;
+-
+-	sigemptyset(&mask);
+-	sigaddset(&mask, SIGINT);
+-	sigaddset(&mask, SIGTERM);
+-
+-	ret = sigprocmask(SIG_BLOCK, &mask, NULL);
+-	g_assert(ret == 0);
+-
+-	fd = signalfd(-1, &mask, 0);
+-	g_assert(fd >= 0);
+-
+-	channel = g_io_channel_unix_new(fd);
+-
+-	g_io_channel_set_close_on_unref(channel, TRUE);
+-	g_io_channel_set_encoding(channel, NULL, NULL);
+-	g_io_channel_set_buffered(channel, FALSE);
+-
+-	source = g_io_add_watch(channel,
+-				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+-				signal_handler, user_data);
+-
+-	g_io_channel_unref(channel);
+-
+-	return source;
 -}
 -
--void audio_ipc_cleanup(void)
--{
--	if (audio_io) {
--		g_io_channel_shutdown(audio_io, TRUE, NULL);
--		g_io_channel_unref(audio_io);
--		audio_io = NULL;
--	}
--}
--
--void audio_ipc_register(const struct ipc_handler *handlers, uint8_t size)
--{
--	service.handler = handlers;
--	service.size = size;
--}
--
--void audio_ipc_unregister(void)
--{
--	service.handler = NULL;
--	service.size = 0;
--}
--
--void audio_ipc_send_rsp(uint8_t opcode, uint8_t status)
--{
--	struct audio_status s;
--	int sk;
--
--	sk = g_io_channel_unix_get_fd(audio_io);
--
--	if (status == AUDIO_STATUS_SUCCESS) {
--		ipc_send(sk, AUDIO_SERVICE_ID, opcode, 0, NULL, -1);
--		return;
--	}
--
--	s.code = status;
--
--	ipc_send(sk, AUDIO_SERVICE_ID, AUDIO_OP_STATUS, sizeof(s), &s, -1);
--}
--
--void audio_ipc_send_rsp_full(uint8_t opcode, uint16_t len, void *param, int fd)
--{
--	ipc_send(g_io_channel_unix_get_fd(audio_io), AUDIO_SERVICE_ID, opcode,
--							len, param, fd);
--}
-diff --git a/android/audio-ipc.h b/android/audio-ipc.h
-deleted file mode 100644
-index 83207c8..0000000
---- a/android/audio-ipc.h
-+++ /dev/null
-@@ -1,31 +0,0 @@
--/*
-- *
-- *  BlueZ - Bluetooth protocol stack for Linux
-- *
-- *  Copyright (C) 2013-2014  Intel Corporation. All rights reserved.
-- *
-- *
-- *  This library is free software; you can redistribute it and/or
-- *  modify it under the terms of the GNU Lesser General Public
-- *  License as published by the Free Software Foundation; either
-- *  version 2.1 of the License, or (at your option) any later version.
-- *
-- *  This library is distributed in the hope that it will be useful,
-- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- *  Lesser General Public License for more details.
-- *
-- *  You should have received a copy of the GNU Lesser General Public
-- *  License along with this library; if not, write to the Free Software
-- *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-- *
-- */
--
--void audio_ipc_init(GDestroyNotify destroy);
--void audio_ipc_cleanup(void);
--
--void audio_ipc_register(const struct ipc_handler *handlers, uint8_t size);
--void audio_ipc_unregister(void);
--
--void audio_ipc_send_rsp(uint8_t opcode, uint8_t status);
--void audio_ipc_send_rsp_full(uint8_t opcode, uint16_t len, void *param, int fd);
-diff --git a/android/audio-msg.h b/android/audio-msg.h
-index 17cde09..d4fc68a 100644
---- a/android/audio-msg.h
-+++ b/android/audio-msg.h
-@@ -26,6 +26,7 @@
- static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
+ static struct context *create_context(gconstpointer data)
+ {
+ 	struct context *context = g_new0(struct context, 1);
+@@ -228,9 +174,6 @@ static struct context *create_context(gconstpointer data)
+ 	context->main_loop = g_main_loop_new(NULL, FALSE);
+ 	g_assert(context->main_loop);
  
- #define AUDIO_SERVICE_ID		0
-+#define AUDIO_SERVICE_ID_MAX		AUDIO_SERVICE_ID
+-	context->signal_source = setup_signalfd(context);
+-	g_assert(context->signal_source);
+-
+ 	sk = socket(AF_LOCAL, SOCK_SEQPACKET, 0);
+ 	g_assert(sk >= 0);
  
- #define AUDIO_STATUS_SUCCESS		0x00
- #define AUDIO_STATUS_FAILED		0x01
-diff --git a/android/ipc.c b/android/ipc.c
-index fa44e3f..6b14bbe 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -89,7 +89,7 @@ static void ipc_disconnect(struct ipc *ipc, bool in_cleanup)
- 		ipc->disconnect_cb(ipc->disconnect_cb_data);
+@@ -272,7 +215,6 @@ static void execute_context(struct context *context)
+ 	g_io_channel_unref(context->notif_io);
+ 
+ 	g_source_remove(context->notif_source);
+-	g_source_remove(context->signal_source);
+ 	g_source_remove(context->cmd_source);
+ 	g_source_remove(context->source);
+ 
+@@ -281,6 +223,15 @@ static void execute_context(struct context *context)
+ 	g_free(context);
  }
  
--int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
-+static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 						const void *buf, ssize_t len)
++static void disconnected(void *data)
++{
++	struct context *context = data;
++
++	g_assert(context->data->disconnect);
++
++	context_quit(context);
++}
++
+ static void test_init(gconstpointer data)
  {
- 	const struct hal_hdr *msg = buf;
-@@ -193,8 +193,8 @@ static gboolean notif_watch_cb(GIOChannel *io, GIOCondition cond,
- 	return FALSE;
+ 	struct context *context = create_context(data);
+@@ -337,7 +288,7 @@ static void test_cmd(gconstpointer data)
+ 	struct context *context = create_context(data);
+ 
+ 	ipc = ipc_init(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
+-						HAL_SERVICE_ID_MAX, NULL, NULL);
++				HAL_SERVICE_ID_MAX, disconnected, context);
+ 
+ 	g_assert(ipc);
+ 
+@@ -355,7 +306,7 @@ static void test_cmd_reg(gconstpointer data)
+ 	const struct test_data *test_data = context->data;
+ 
+ 	ipc = ipc_init(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
+-						HAL_SERVICE_ID_MAX, NULL, NULL);
++				HAL_SERVICE_ID_MAX, disconnected, context);
+ 
+ 	g_assert(ipc);
+ 
+@@ -375,7 +326,7 @@ static void test_cmd_reg_1(gconstpointer data)
+ 	struct context *context = create_context(data);
+ 
+ 	ipc = ipc_init(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH),
+-						HAL_SERVICE_ID_MAX, NULL, NULL);
++				HAL_SERVICE_ID_MAX, disconnected, context);
+ 
+ 	g_assert(ipc);
+ 
+@@ -401,7 +352,7 @@ static void test_cmd_handler_2(const void *buf, uint16_t len)
+ 
+ static void test_cmd_handler_invalid(const void *buf, uint16_t len)
+ {
+-	raise(SIGTERM);
++	g_assert(false);
  }
  
--GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb,
--							void *user_data)
-+static GIOChannel *ipc_connect(const char *path, size_t size,
-+					GIOFunc connect_cb, void *user_data)
- {
- 	struct sockaddr_un addr;
- 	GIOCondition cond;
-@@ -324,7 +324,7 @@ void ipc_cleanup(struct ipc *ipc)
- 	g_free(ipc);
- }
+ static const struct test_data test_init_1 = {};
+@@ -421,7 +372,7 @@ static const struct hal_hdr test_cmd_2_hdr = {
+ static const struct test_data test_cmd_service_invalid_1 = {
+ 	.cmd = &test_cmd_1_hdr,
+ 	.cmd_size = sizeof(test_cmd_1_hdr),
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
  
--void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
-+static void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
- 							void *param, int fd)
- {
- 	struct msghdr msg;
-diff --git a/android/ipc.h b/android/ipc.h
-index d46dbbf..cc4e92d 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -41,19 +41,12 @@ struct ipc *ipc_init(const char *path, size_t size, int max_service_id,
- 					ipc_disconnect_cb cb, void *cb_data);
- void ipc_cleanup(struct ipc *ipc);
+ static const struct ipc_handler cmd_handlers[] = {
+@@ -442,7 +393,7 @@ static const struct test_data test_cmd_service_invalid_2 = {
+ 	.service = 0,
+ 	.handlers = cmd_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
  
--GIOChannel *ipc_connect(const char *path, size_t size, GIOFunc connect_cb,
--							void *user_data);
--int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
--						const void *buf, ssize_t len);
--
- void ipc_send_rsp(struct ipc *ipc, uint8_t service_id, uint8_t opcode,
- 								uint8_t status);
- void ipc_send_rsp_full(struct ipc *ipc, uint8_t service_id, uint8_t opcode,
- 					uint16_t len, void *param, int fd);
- void ipc_send_notif(struct ipc *ipc, uint8_t service_id, uint8_t opcode,
- 						uint16_t len, void *param);
--void ipc_send(int sk, uint8_t service_id, uint8_t opcode, uint16_t len,
--							void *param, int fd);
- void ipc_register(struct ipc *ipc, uint8_t service,
- 			const struct ipc_handler *handlers, uint8_t size);
- void ipc_unregister(struct ipc *ipc, uint8_t service);
+ static const struct ipc_handler cmd_handlers_invalid_2[] = {
+@@ -477,7 +428,7 @@ static const struct test_data test_cmd_opcode_invalid_1 = {
+ 	.service = 0,
+ 	.handlers = cmd_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
+ 
+ static const struct test_data test_cmd_hdr_invalid = {
+@@ -486,7 +437,7 @@ static const struct test_data test_cmd_hdr_invalid = {
+ 	.service = 0,
+ 	.handlers = cmd_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
+ 
+ #define VARDATA_EX1 "some data example"
+@@ -533,7 +484,7 @@ static const struct test_data test_cmd_vardata_invalid_1 = {
+ 	.service = 0,
+ 	.handlers = cmd_vardata_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
+ 
+ static const struct hal_hdr test_cmd_service_offrange_hdr = {
+@@ -548,7 +499,7 @@ static const struct test_data test_cmd_service_offrange = {
+ 	.service = 0,
+ 	.handlers = cmd_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
+ 
+ static const struct vardata test_cmd_invalid_data_1 = {
+@@ -564,7 +515,7 @@ static const struct test_data test_cmd_msg_invalid_1 = {
+ 	.service = 0,
+ 	.handlers = cmd_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
+ 
+ static const struct vardata test_cmd_invalid_data_2 = {
+@@ -580,7 +531,7 @@ static const struct test_data test_cmd_msg_invalid_2 = {
+ 	.service = 0,
+ 	.handlers = cmd_handlers,
+ 	.handlers_size = 1,
+-	.expected_signal = SIGTERM
++	.disconnect = true,
+ };
+ 
+ int main(int argc, char *argv[])
 -- 
 1.8.3.2
 
