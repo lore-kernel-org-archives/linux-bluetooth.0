@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 7/9] android/avrcp: Implement get player attributes text
-Date: Fri, 28 Feb 2014 10:22:56 +0200
-Message-Id: <1393575778-28681-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 8/9] unit/avrcp: Add /TP/PAS/BV-03-C test
+Date: Fri, 28 Feb 2014 10:22:57 +0200
+Message-Id: <1393575778-28681-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393575778-28681-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393575778-28681-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,39 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies that the get player application settings attribute text
+command issued from the Controller.
 ---
- android/avrcp-lib.c | 9 +++++++++
- android/avrcp-lib.h | 3 +++
- 2 files changed, 12 insertions(+)
+ unit/test-avrcp.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 3db5bda..52074a7 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -312,3 +312,12 @@ int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
- 				AVRCP_LIST_PLAYER_ATTRIBUTES, NULL, 0,
- 				func, user_data);
- }
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index c4faca3..a75165b 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -375,6 +375,10 @@ static void test_client(gconstpointer data)
+ 	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-01-C"))
+ 		avrcp_list_player_attributes(context->session, NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-03-C"))
++		avrcp_get_player_attribute_text(context->session, NULL, 0,
++								NULL, NULL);
 +
-+int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
-+					uint8_t attr_len, avctp_rsp_cb func,
-+					void *user_data)
-+{
-+	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
-+				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, attributes,
-+				attr_len, func, user_data);
-+}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 7283203..da8c990 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -110,3 +110,6 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
- 					avctp_rsp_cb func, void *user_data);
- int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
-+int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
-+					uint8_t attr_len, avctp_rsp_cb func,
-+					void *user_data);
+ 	execute_context(context);
+ }
+ 
+@@ -484,5 +488,11 @@ int main(int argc, char *argv[])
+ 				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
+ 				0x01, 0x00));
+ 
++	define_test("/TP/PAS/BV-03-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
++				0x00, 0x00, 0x00));
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
