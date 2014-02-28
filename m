@@ -1,44 +1,318 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [v2] android/pics: Add PICS and PIXIT for HFP
+Date: Fri, 28 Feb 2014 13:12:17 +0100
+Message-ID: <1459346.kCKzzeocjC@uw000953>
+In-Reply-To: <1393338451-5761-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1393338451-5761-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <530FBB6B.8080300@gmx.net>
-References: <530FBB6B.8080300@gmx.net>
-Date: Fri, 28 Feb 2014 08:16:45 -0400
-Message-ID: <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
-Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Tobias Jakobi <liquid.acid@gmx.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Tobias,
+Hi Sebastian,
 
-On Thu, Feb 27, 2014 at 6:25 PM, Tobias Jakobi <liquid.acid@gmx.net> wrote:
-> That's the server:
-> [bluetooth]# info 00:02:72:C6:43:11
-> Device 00:02:72:C6:43:11
->         Name: chidori-bt
->         Alias: chidori-bt
->         Class: 0x020000
->         Paired: yes
->         Trusted: yes
->         Blocked: no
->         Connected: no
->         LegacyPairing: no
->         UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
->         UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
->         UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
->         UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
->         UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
->         UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
->         Modalias: usb:v1D6Bp0246d0509
+On Tuesday 25 of February 2014 15:27:31 Sebastian Chlad wrote:
+> ---
+>  android/Makefile.am   |   2 +
+>  android/pics-hfp.txt  | 217 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/pixit-hfp.txt |  37 +++++++++
+>  3 files changed, 256 insertions(+)
+>  create mode 100644 android/pics-hfp.txt
+>  create mode 100644 android/pixit-hfp.txt
+> 
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 58cfbae..b944ca9 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -189,6 +189,7 @@ EXTRA_DIST += android/Android.mk android/README \
+>  				android/pics-avctp.txt \
+>  				android/pics-avrcp.txt \
+>  				android/pics-hsp.txt \
+> +				android/pics-hfp.txt \
+>  				android/pixit-l2cap.txt \
+>  				android/pixit-gap.txt \
+>  				android/pixit-did.txt \
+> @@ -201,6 +202,7 @@ EXTRA_DIST += android/Android.mk android/README \
+>  				android/pixit-avctp.txt \
+>  				android/pixit-avrcp.txt \
+>  				android/pixit-hsp.txt \
+> +				android/pixit-hfp.txt \
+>  				android/pts-l2cap.txt \
+>  				android/pts-gap.txt \
+>  				android/pts-did.txt \
+> diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
+> new file mode 100644
+> index 0000000..ae6d33e
+> --- /dev/null
+> +++ b/android/pics-hfp.txt
+> @@ -0,0 +1,217 @@
+> +HFP PICS for the PTS tool.
+> +
+> +PTS version: 5.0
+> +
+> +* - different than PTS defaults
+> +# - not yet implemented/supported
+> +
+> +M - mandatory
+> +O - optional
+> +
+> +		Version
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_HFP_0_1	False		Version: Hands-Free Profile v1.5 (O.1)
+> +TSPC_HFP_0_2	True (*)	Version: Hands-Free Profile v1.6 (O.1)
+> +-------------------------------------------------------------------------------
+> +O.1: It is mandatory to support only one of the adopted versions.
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Roles
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_HFP_1_1	True (*)	Role: Audio Gateway (AG) (O.1)
+> +TSPC_HFP_1_2	False		Role: Hands-Free (HF) (O.1)
+> +-------------------------------------------------------------------------------
+> +O.1: It is mandatory to support at least one of the defined roles.
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Audio Gateway Role
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_HFP_2_1	True		Connection management (M)
+> +TSPC_HFP_2_1a	True (*)	SLC initiation during active ongoing call (O)
+> +TSPC_HFP_2_2	True		Phone Status Information (M)
+> +TSPC_HFP_2_3	True		Audio connection handling (M)
+> +TSPC_HFP_2_3a	False		Audio connection establishment independent of
+> +					call processing (O)
+> +TSPC_HFP_2_3b	True (*)	eSCO support in Audio Connection (C.10)
+> +TSPC_HFP_2_3c	False		Codec negotiation (C.7)
+> +TSPC_HFP_2_4a	False		Accept an incoming voice call
+> +					(in-band ring) (C.1)
+> +TSPC_HFP_2_4b	True (*)	Accept an incoming voice call
+> +					(no in-band ring) (C.1)
+> +TSPC_HFP_2_4c	False		Capability to change the "in-band ring"
+> +					settings (O)
+> +TSPC_HFP_2_5	True (*)	Reject an incoming voice call (O)
+> +TSPC_HFP_2_6	True		Terminate a call (M)
+> +TSPC_HFP_2_7	True		Audio connection transfer during an ongoing
+> +					call (M)
+> +TSPC_HFP_2_7a	True (*)	HF-initiated Audio transfer to AG during
+> +					ongoing call (O)
+> +TSPC_HFP_2_8	True		Place a call with a phone number supplied by
+> +					the HF (M)
+> +TSPC_HFP_2_9	True		Place a call using memory dialing (M)
+> +TSPC_HFP_2_10	True		Place a call to the last number dialed (M)
+> +TSPC_HFP_2_11	True		Call waiting notification (M)
+> +TSPC_HFP_2_12	True (*)	Three Way Calling (O)
+> +TSPC_HFP_2_12a	True (*)	User Busy (AT+CHLD value 0) (C.3)
+> +TSPC_HFP_2_12b	True (*)	Call Hold Handling (AT+CHLD value 1,2) (C.2)
+> +TSPC_HFP_2_12c	True (*)	Three Way Call (AT+CHLD value 3) (C.3)
+> +TSPC_HFP_2_12d	False		Explicit Call Transfer (AT+CHLD value 4) (C.3)
+> +TSPC_HFP_2_13	True		Calling Line Identification (CLI) (M)
+> +TSPC_HFP_2_14	True (*)	Echo canceling (EC) and Noise reduction (NR) (O)
+> +TSPC_HFP_2_15	True (*)	Voice recognition activation (O)
+> +TSPC_HFP_2_15a	False		Initiate voice recognition from AG (C.6)
+> +TSPC_HFP_2_15b	False		Autonomous voice deactivation (C.6)
+> +TSPC_HFP_2_16	False		Attach a phone number to a voice tag (O)
+> +TSPC_HFP_2_17	True		Ability to transmit DTMF codes (M)
+> +TSPC_HFP_2_18a	True (*)	Remote audio volume control – speaker (O)
+> +TSPC_HFP_2_18b	False		Remote audio volume control – microphone (O)
+> +TSPC_HFP_2_18c	True (*)	Volume Level Synchronization – speaker and
+> +					microphone (C.5)
+> +TSPC_HFP_2_19	False		Response and hold (O)
+> +TSPC_HFP_2_20	True		Subscriber Number Information (M)
+> +TSPC_HFP_2_21a	True		Enhanced Call Status (C.4)
+> +TSPC_HFP_2_21b	False		Enhanced Call Control (C.3)
+> +TSPC_HFP_2_21c	True (*)	Enhanced Call Status with limited network
+> +					notification (C.4)
+> +TSPC_HFP_2_22	False		Support for automatic link loss recovery (O)
+> +TSPC_HFP_2_23	True (*)	Individual Indicator Activation (C.9)
+> +TSPC_HFP_2_24	False		Wide Band Speech service (C.8)
+> +TSPC_HFP_2_25	False		Support roaming function (O)
+> +-------------------------------------------------------------------------------
+> +C.1:  The AG must support one of item TSPC_HFP_2_4a or TSPC_HFP_2_4b
+> +C.2:  Mandatory if TSPC_HFP_2_12is TRUE; otherwise excluded
+> +C.3:  Optional if TSPC_HFP_2_12 is TRUE; otherwise excluded
+> +C.4:  The AG must support one of item TSPC_HFP_2_21a or TSPC_HFP_2_21c
+> +C.5:  Mandatory if TSPC_HFP_2_18a or TSPC_HFP_2_18b; otherwise optional
+> +C.6:  Optional if TSPC_HFP_2_15 is supported, otherwise excluded
+> +C.7:  Mandatory if TSPC_HFP_2_24 otherwise excluded
+> +C.8:  Excluded if TSPC_HFP_0_1 otherwise optional
+> +C.9:  Excluded if TSPC_HFP_0_1 otherwise mandatory
+> +C.10: Mandatory if TSPC_HFP_2_24 otherwise optional
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Hands-Free Role
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_HFP_3_1	False (*)	Connection Management (M)
+> +TSPC_HFP_3_2a	False (*)	Phone Status Information ("service" and "call"
+> +					indicators) (M)
+> +TSPC_HFP_3_2b	False		Phone Status Information ("callsetup"
+> +					indicators) (O)
+> +TSPC_HFP_3_2c	False		Accept indicator of signal strength (O)
+> +TSPC_HFP_3_2d	False		Accept indicator of roaming state ("roam:") (O)
+> +TSPC_HFP_3_2e	False		Accept indicator of battery level ("battchg") (O)
+> +TSPC_HFP_3_2f	False		Accept indicator of operator selection (O)
+> +TSPC_HFP_3_3	False (*)	Audio connection handling (M)
+> +TSPC_HFP_3_3a	False		Audio connection establishment independent
+> +					of call processing (O)
+> +TSPC_HFP_3_3b	False		eSCO support in Audio Connection (C.7)
+> +TSPC_HFP_3_3c	False		Codec negotiation (C.5)
+> +TSPC_HFP_3_4a	False (*)	Accept an incoming voice call (in-band ring) (M)
+> +TSPC_HFP_3_4b	False (*)	Accept an incoming voice call (no in-band
+> +					ring) (M)
+> +TSPC_HFP_3_4c	False		Accept an incoming voice call (in-band ring
+> +					muting) (O)
+> +TSPC_HFP_3_5	False (*)	Reject an incoming voice call (M)
+> +TSPC_HFP_3_6	False (*)	Terminate a call (M)
+> +
+> +TSPC_HFP_3_7	False (*)	Audio connection transfer during an ongoing
+> +					call (M)
+> +TSPC_HFP_3_7a	False		HF-initiated Audio transfer to AG during
+> +					ongoing call (O)
+> +TSPC_HFP_3_8	False		Place a call with a phone number supplied by
+> +					the HF (O)
+> +TSPC_HFP_3_9	False		Place a call using memory dialing (O)
+> +TSPC_HFP_3_10	False		Place a call to the last number dialed (O)
+> +TSPC_HFP_3_11	False		Call waiting notification (O)
+> +TSPC_HFP_3_12	False		Three Way Calling (O)
+> +TSPC_HFP_3_12a	False		Three way calling (AT+CHLD values 0) (C.2)
+> +TSPC_HFP_3_12b	False		Three way calling (AT+CHLD values 1 and 2) (C.1)
+> +TSPC_HFP_3_12c	False		Three way calling (AT+CHLD value 3) (C.2)
+> +TSPC_HFP_3_12d	False		Three way calling (AT+CHLD value 4) (C.2)
+> +TSPC_HFP_3_12e	False		Originate new call with established call in
+> +					progress (C.2)
+> +TSPC_HFP_3_13	False		Calling Line Identification (CLI) (O)
+> +TSPC_HFP_3_14	False		Echo cancelling (EC) and Noise reduction (NR) (O)
+> +TSPC_HFP_3_15	False		Voice recognition activation/deactivation (O)
+> +TSPC_HFP_3_16	False		Attach a phone number to a voice tag (O)
+> +TSPC_HFP_3_17	False		Ability to transmit DTMF codes (O)
+> +TSPC_HFP_3_18a	False		Remote audio volume control – speaker (O)
+> +TSPC_HFP_3_18b	False		Remote audio volume control – microphone (O)
+> +TSPC_HFP_3_18c	False		Volume Level Synchronization – speaker (C.3)
+> +TSPC_HFP_3_18d	False		Volume Level Synchronization – microphone (C.4)
+> +TSPC_HFP_3_18e	False		HF informs AG about local changes of audio
+> +					volume (O)
+> +TSPC_HFP_3_18f	False		HF informs AG about local changes of
+> +					microphone gain (O)
+> +TSPC_HFP_3_19	False		Response and hold (O)
+> +TSPC_HFP_3_20	False		Subscriber Number Information (O)
+> +TSPC_HFP_3_21a	False		Enhanced Call Status (O)
+> +TSPC_HFP_3_21b	False		Enhanced Call Control (C.2)
+> +TSPC_HFP_3_22	False		Support for automatic link loss recovery (O)
+> +TSPC_HFP_3_23	False		Individual Indicator Activation (C.6)
+> +TSPC_HFP_3_24	False		Wide Band Speech service (C.6)
+> +-------------------------------------------------------------------------------
+> +C.1: Mandatory if TSPC_HFP_3_12; otherwise excluded
+> +C.2: Optional if TSPC_HFP_3_12; otherwise excluded
+> +C.3: Mandatory if TSPC_HFP_3_18a or TSPC_HFP_3_18b, otherwise optional
+> +C.4: Mandatory if TSPC_HFP_3_18a, otherwise optional
+> +C.5: Mandatory if TSPC_HFP_3_24 otherwise excluded
+> +C.6: Excluded if TSPC_HFP_0_1 otherwise optional
+> +C.7: Mandatory if TSPC_HFP_3_24 otherwise optional
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Audio Coding Requirements
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_HFP_4_1	True		CVSD audio coding over SCO (M)
+> +TSPC_HFP_4_2	False		mSBC audio coding over eSCO (C.1)
+> +-------------------------------------------------------------------------------
+> +C.1: Mandatory if Wide band speech service is supported TSPC_HFP_2_24 or
+> +	TSPC_HFP_3_24, otherwise excluded
+> +-------------------------------------------------------------------------------
+> +
+> +
+> +		Supplementary Interoperability Verification
+> +-------------------------------------------------------------------------------
+> +Parameter Name	Selected	Description
+> +-------------------------------------------------------------------------------
+> +TSPC_HFP_8_1	False		Multiple audio transfers during call –
+> +					AG and HF initiated (C.1)
+> +TSPC_HFP_8_2	False		Audio transfer by SLC release during
+> +					an active call (C.1)
+> +TSPC_HFP_8_3	False		Audio transfer by powering ON HF (O)
+> +TSPC_HFP_8_4	False		SLC during SDP response (O)
+> +TSPC_HFP_8_5	False		Handle dynamic server channel number for HFP
+> +					service (O)
+> +TSPC_HFP_8_6	False		HF disallows connections in non-discoverable
+> +					mode (C.2)
+> +TSPC_HFP_8_7	False		HF connects to AG during incoming call (O)
+> +TSPC_HFP_8_8	False		Link loss during incoming call (C.3)
+> +TSPC_HFP_8_9	False		SLC release during incoming call (C.3)
+> +TSPC_HFP_8_10	False		Voice Recognition Activation (C.4)
+> +TSPC_HFP_8_11	False		Place outgoing call by dialing number on
+> +					the AG (O)
+> +TSPC_HFP_8_12	False		Active call termination – NO CARRIER signal
+> +					(C.5)
+> +-------------------------------------------------------------------------------
+> +C.1: Optional if TSPC_HFP_2_7a or TSPC_HFP_3_7a is supported,
+> +	otherwise excluded
+> +C.2: Optional if TSPC_HFP_1_2 is supported, otherwise excluded
+> +C.3: Optional if TSPC_HFP_1_1 is supported, otherwise excluded
+> +C.4: Optional if TSPC_HFP_2_15 or TSPC_HFP_3_15 is supported,
+> +	otherwise excluded
+> +C.5: Optional if TSPC_HFP_2_6 is supported, otherwise excluded
+> +-------------------------------------------------------------------------------
+> diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
+> new file mode 100644
+> index 0000000..c1b2503
+> --- /dev/null
+> +++ b/android/pixit-hfp.txt
+> @@ -0,0 +1,37 @@
+> +HFP PIXIT for the PTS tool.
+> +
+> +PTS version: 5.0
+> +
+> +* - different than PTS defaults
+> +& - should be set to IUT Bluetooth address
+> +# - should be set to the respective phone numbers
+> +
+> +		Required PIXIT settings
+> +-------------------------------------------------------------------------------
+> +Parameter Name						Value
+> +-------------------------------------------------------------------------------
+> +TSPX_security_enabled					TRUE
+> +TSPX_bd_addr_iut					012345678901 (*&)
+> +TSPX_hf_class_of_device					200408
+> +TSPX_ag_class_of_device					400204
+> +TSPX_packet_type_sco					00A0
+> +TSPX_phone_number					1234567 (#)
+> +TSPX_second_phone_number				7654321 (#)
+> +TSPX_phone_number_type					129
+> +TSPX_second_phone_number_type				129
+> +TSPX_phone_number_memory				1
+> +TSPX_phone_number_memory_invalid_index			9999
+> +TSPX_scan_all_memory_dial_locations			FALSE
+> +TSPX_pin_code						0000
+> +TSPX_time_guard						300000
+> +TSPX_use_implicit_send					TRUE
+> +TSPX_verbose_implicit_send				FALSE
+> +TSPX_delete_link_key					FALSE
+> +TSPX_server_channel_tester				01
+> +TSPX_server_channel_iut					00
+> +TSPX_verify_CLIP_information				TRUE
+> +TSPX_no_fail_verdict					FALSE
+> +TSPX_network_supports_correct_call_and_callstatus	TRUE
+> +TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
+> +TSPX_AG_match_tester_BRSF_codec_negotiation_bit		FALSE
+> +-------------------------------------------------------------------------------
+> 
 
-Looks like you are missing a "power on" on the server side. Notice
-that the client side shows "Powered: yes" on the info command.
+Applied, thanks.
 
-Best Regards,
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+Best regards, 
+Szymon Janc
