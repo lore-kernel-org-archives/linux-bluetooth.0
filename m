@@ -1,46 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 6/9] unit/avrcp: Add /TP/PAS/BV-02-C test
+Date: Fri, 28 Feb 2014 10:22:55 +0200
+Message-Id: <1393575778-28681-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393575778-28681-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393575778-28681-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Fri, 28 Feb 2014 10:04:21 +0100
-Message-ID: <CABBYNZLxCXEQu0=7erRGdLCttCkPBKrzo4yZCUYNLgtJX8Nh8w@mail.gmail.com>
-Subject: Re: [PATCHv2 0/9] Combined set of AVRCP test patches
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Fri, Feb 28, 2014 at 9:22 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Combined set of AVRCP function implementation and unit tests.
->
-> Andrei Emeltchenko (9):
->   android/avrcp: Refactor get_caps() to allow parameter
->   unit/avrcp: Fix lengths byte order
->   unit/avrcp: Add /TP/CFG/BI-01-C test
->   android/avrcp: Add list player attributes command
->   unit/avrcp: Add /TP/PAS/BV-01-C test
->   unit/avrcp: Add /TP/PAS/BV-02-C test
->   android/avrcp: Implement get player attributes text
->   unit/avrcp: Add /TP/PAS/BV-03-C test
->   unit/avrcp: Add /TP/PAS/BV-04-C test
->
->  android/avrcp-lib.c | 23 ++++++++++++---
->  android/avrcp-lib.h |  7 ++++-
->  unit/test-avrcp.c   | 82 +++++++++++++++++++++++++++++++++++++++++++++++++++--
->  3 files changed, 105 insertions(+), 7 deletions(-)
->
-> --
-> 1.8.3.2
+Test verifies that the List Player Application Setting Attributes
+response issued from the Target.
+---
+ unit/test-avrcp.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-Applied, thanks.
-
-
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index c65f743..c4faca3 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -331,9 +331,23 @@ fail:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint8_t avrcp_handle_list_attributes(struct avrcp *session,
++				uint8_t transaction, uint16_t *params_len,
++				uint8_t *params, void *user_data)
++{
++	DBG("");
++
++	*params_len = 1;
++	params[0] = 0;
++
++	return AVC_CTYPE_STABLE;
++}
++
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
++		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
++					avrcp_handle_list_attributes },
+ 		{ },
+ };
+ 
+@@ -462,5 +476,13 @@ int main(int argc, char *argv[])
+ 				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
+ 				0x00));
+ 
++	define_test("/TP/PAS/BV-02-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
++				0x00),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58, 0x11, 0x00, 0x00,
++				0x01, 0x00));
++
+ 	return g_test_run();
+ }
 -- 
-Luiz Augusto von Dentz
+1.8.3.2
+
