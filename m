@@ -1,140 +1,226 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 1/7] android: Add flags parameter to register service command
-Date: Sat,  1 Mar 2014 22:28:03 +0100
-Message-Id: <1393709289-6395-1-git-send-email-szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv4 1/6] shared/hfp: Add prefix handlers functionality
+Date: Sat, 01 Mar 2014 21:37:12 +0100
+Message-ID: <2778228.8L27g4k6zG@leonov>
+In-Reply-To: <1393704046-4317-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1393704046-4317-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow to configure daemon services.
----
- android/hal-a2dp.c      | 1 +
- android/hal-avrcp.c     | 1 +
- android/hal-bluetooth.c | 1 +
- android/hal-handsfree.c | 1 +
- android/hal-hidhost.c   | 1 +
- android/hal-ipc-api.txt | 7 +++++++
- android/hal-msg.h       | 1 +
- android/hal-pan.c       | 1 +
- 8 files changed, 14 insertions(+)
+Hi Marcin,
 
-diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
-index c898995..87d89a2 100644
---- a/android/hal-a2dp.c
-+++ b/android/hal-a2dp.c
-@@ -109,6 +109,7 @@ static bt_status_t init(btav_callbacks_t *callbacks)
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
- 
- 	cmd.service_id = HAL_SERVICE_ID_A2DP;
-+	cmd.flags = 0;
- 
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
-diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
-index 46e25a0..4907f4a 100644
---- a/android/hal-avrcp.c
-+++ b/android/hal-avrcp.c
-@@ -220,6 +220,7 @@ static bt_status_t init(btrc_callbacks_t *callbacks)
- 				sizeof(ev_handlers) / sizeof(ev_handlers[0]));
- 
- 	cmd.service_id = HAL_SERVICE_ID_AVRCP;
-+	cmd.flags = 0;
- 
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 6871f5d..4b31ff1 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -442,6 +442,7 @@ static int init(bt_callbacks_t *callbacks)
- 	}
- 
- 	cmd.service_id = HAL_SERVICE_ID_SOCKET;
-+	cmd.flags = 0;
- 
- 	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
-diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 1b150c3..422f52c 100644
---- a/android/hal-handsfree.c
-+++ b/android/hal-handsfree.c
-@@ -212,6 +212,7 @@ static bt_status_t init(bthf_callbacks_t *callbacks)
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
- 
- 	cmd.service_id = HAL_SERVICE_ID_HANDSFREE;
-+	cmd.flags = 0;
- 
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
-diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
-index c758d2a..fe1b4df 100644
---- a/android/hal-hidhost.c
-+++ b/android/hal-hidhost.c
-@@ -354,6 +354,7 @@ static bt_status_t init(bthh_callbacks_t *callbacks)
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
- 
- 	cmd.service_id = HAL_SERVICE_ID_HIDHOST;
-+	cmd.flags = 0;
- 
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 1a19c80..f68324d 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -124,12 +124,16 @@ Core Service (ID 0)
- 	Opcode 0x01 - Register module command/response
- 
- 		Command parameters: Service id (1 octet)
-+		                    Flags (1 octet)
- 		Response parameters: <none>
- 
- 		In case a command is sent for an undeclared service ID, it will
- 		be rejected. Also there will be no notifications for undeclared
- 		service ID.
- 
-+		Flags parameter values should be defined as needed by
-+		respective services.
-+
- 		In case of an error, the error response will be returned.
- 
- 	Opcode 0x02 - Unregister module command/response
-@@ -749,6 +753,9 @@ Bluetooth Handsfree HAL (ID 5)
- 
- Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
- 
-+	Service flags:               0x01 = Disable HSP AG
-+	                             0x02 = Disable HFP AG
-+
- 	Opcode 0x00 - Error response
- 
- 		Response parameters: Status (1 octet)
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 1e12868..e66043e 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -57,6 +57,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
- #define HAL_OP_REGISTER_MODULE		0x01
- struct hal_cmd_register_module {
- 	uint8_t service_id;
-+	uint8_t flags;
- } __attribute__((packed));
- 
- #define HAL_OP_UNREGISTER_MODULE	0x02
-diff --git a/android/hal-pan.c b/android/hal-pan.c
-index 5ee49ef..e6a351d 100644
---- a/android/hal-pan.c
-+++ b/android/hal-pan.c
-@@ -157,6 +157,7 @@ static bt_status_t pan_init(const btpan_callbacks_t *callbacks)
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
- 
- 	cmd.service_id = HAL_SERVICE_ID_PAN;
-+	cmd.flags = 0;
- 
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
+On Saturday 01 of March 2014 21:00:41 Marcin Kraglak wrote:
+> Add two functions: hfp_gw_register_prefix_handler() and
+> hfp_gw_unregister_prefix_handler(). It will allow user to register for
+> specific command. Current implementation just put/remove handler data
+> from queue.
+> ---
+>  Makefile.tools   |  1 +
+>  src/shared/hfp.c | 99
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++ src/shared/hfp.h |
+> 18 +++++++++++
+>  3 files changed, 118 insertions(+)
+> 
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 9f7ba9f..31e1093 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -63,6 +63,7 @@ emulator_hfp_SOURCES = emulator/hfp.c \
+>  				monitor/mainloop.h monitor/mainloop.c \
+>  				src/shared/io.h src/shared/io-mainloop.c \
+>  				src/shared/util.h src/shared/util.c \
+> +				src/shared/queue.h src/shared/queue.c \
+>  				src/shared/ringbuf.h src/shared/ringbuf.c \
+>  				src/shared/hfp.h src/shared/hfp.c
+> 
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index 854cf46..4bf993d 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -32,6 +32,7 @@
+> 
+>  #include "src/shared/util.h"
+>  #include "src/shared/ringbuf.h"
+> +#include "src/shared/queue.h"
+>  #include "src/shared/io.h"
+>  #include "src/shared/hfp.h"
+> 
+> @@ -42,6 +43,7 @@ struct hfp_gw {
+>  	struct io *io;
+>  	struct ringbuf *read_buf;
+>  	struct ringbuf *write_buf;
+> +	struct queue *cmd_handlers;
+>  	bool writer_active;
+>  	bool permissive_syntax;
+>  	bool result_pending;
+> @@ -60,6 +62,37 @@ struct hfp_gw {
+>  	bool destroyed;
+>  };
+> 
+> +struct cmd_handler {
+> +	char *prefix;
+> +	void *user_data;
+> +	hfp_destroy_func_t destroy;
+> +	hfp_result_func_t callback;
+> +};
+> +
+> +static void destroy_cmd_handler(void *data)
+> +{
+> +	struct cmd_handler *handler = data;
+> +
+> +	if (handler->destroy)
+> +		handler->destroy(handler->user_data);
+> +
+> +	free(handler);
+> +}
+> +
+> +static bool match_handler_prefix(const void *a, const void *b)
+> +{
+> +	const struct cmd_handler *handler = a;
+> +	const char *prefix = b;
+> +
+> +	if (strlen(handler->prefix) != strlen(prefix))
+> +		return false;
+> +
+> +	if (memcmp(handler->prefix, prefix, strlen(prefix)))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +
+>  static void write_watch_destroy(void *user_data)
+>  {
+>  	struct hfp_gw *hfp = user_data;
+> @@ -196,8 +229,19 @@ struct hfp_gw *hfp_gw_new(int fd)
+>  		return NULL;
+>  	}
+> 
+> +	hfp->cmd_handlers = queue_new();
+> +	if (!hfp->cmd_handlers) {
+> +		io_destroy(hfp->io);
+> +		ringbuf_free(hfp->write_buf);
+> +		ringbuf_free(hfp->read_buf);
+> +		free(hfp);
+> +		return NULL;
+> +	}
+> +
+>  	if (!io_set_read_handler(hfp->io, can_read_data,
+>  					hfp, read_watch_destroy)) {
+> +		queue_destroy(hfp->cmd_handlers,
+> +						destroy_cmd_handler);
+>  		io_destroy(hfp->io);
+>  		ringbuf_free(hfp->write_buf);
+>  		ringbuf_free(hfp->read_buf);
+> @@ -250,6 +294,9 @@ void hfp_gw_unref(struct hfp_gw *hfp)
+>  	ringbuf_free(hfp->write_buf);
+>  	hfp->write_buf = NULL;
+> 
+> +	queue_destroy(hfp->cmd_handlers, destroy_cmd_handler);
+> +	hfp->cmd_handlers = NULL;
+> +
+>  	if (!hfp->in_disconnect) {
+>  		free(hfp);
+>  		return;
+> @@ -405,6 +452,58 @@ bool hfp_gw_set_command_handler(struct hfp_gw *hfp,
+>  	return true;
+>  }
+> 
+> +bool hfp_gw_register(struct hfp_gw *hfp, hfp_result_func_t callback,
+> +						const char *prefix,
+> +						void *user_data,
+> +						hfp_destroy_func_t destroy)
+> +{
+> +	struct cmd_handler *handler;
+> +
+> +	handler = new0(struct cmd_handler, 1);
+> +	if (!handler)
+> +		return false;
+> +
+> +	handler->callback = callback;
+> +	handler->user_data = user_data;
+> +
+> +	handler->prefix = strdup(prefix);
+> +	if (!handler->prefix) {
+> +		free(handler);
+> +		return false;
+> +	}
+> +
+> +	if (queue_find(hfp->cmd_handlers, match_handler_prefix,
+> +							handler->prefix)) {
+> +		destroy_cmd_handler(handler);
+> +		return false;
+> +	}
+> +
+> +	handler->destroy = destroy;
+> +
+> +	return queue_push_tail(hfp->cmd_handlers, handler);
+> +}
+> +
+> +bool hfp_gw_unregister(struct hfp_gw *hfp, const char *prefix)
+> +{
+> +	struct cmd_handler *handler;
+> +	char *lookup_prefix;
+> +
+> +	lookup_prefix = strdup(prefix);
+> +	if (!lookup_prefix)
+> +		return false;
+> +
+> +	handler = queue_remove_if(hfp->cmd_handlers, match_handler_prefix,
+> +								lookup_prefix);
+> +	free(lookup_prefix);
+> +
+> +	if (!handler)
+> +		return false;
+> +
+> +	destroy_cmd_handler(handler);
+> +
+> +	return true;
+> +}
+> +
+>  static void disconnect_watch_destroy(void *user_data)
+>  {
+>  	struct hfp_gw *hfp = user_data;
+> diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+> index b0bd934..0755a46 100644
+> --- a/src/shared/hfp.h
+> +++ b/src/shared/hfp.h
+> @@ -60,6 +60,18 @@ enum hfp_error {
+>  	HFP_ERROR_NETWORK_NOT_ALLOWED		= 32,
+>  };
+> 
+> +enum hfp_gw_cmd_type {
+> +	HFP_GW_CMD_TYPE_READ,
+> +	HFP_GW_CMD_TYPE_SET,
+> +	HFP_GW_CMD_TYPE_TEST,
+> +	HFP_GW_CMD_TYPE_COMMAND
+> +};
+> +
+> +struct hfp_gw_result;
+> +
+> +typedef void (*hfp_result_func_t)(struct hfp_gw_result *result,
+> +				enum hfp_gw_cmd_type type, void *user_data);
+> +
+>  typedef void (*hfp_destroy_func_t)(void *user_data);
+>  typedef void (*hfp_debug_func_t)(const char *str, void *user_data);
+> 
+> @@ -94,3 +106,9 @@ bool hfp_gw_set_disconnect_handler(struct hfp_gw *hfp,
+>  					hfp_destroy_func_t destroy);
+> 
+>  bool hfp_gw_disconnect(struct hfp_gw *hfp);
+> +
+> +bool hfp_gw_register(struct hfp_gw *hfp, hfp_result_func_t callback,
+> +						const char *prefix,
+> +						void *user_data,
+> +						hfp_destroy_func_t destroy);
+> +bool hfp_gw_unregister(struct hfp_gw *hfp, const char *prefix);
+
+All patches in this set are now applied, thanks.
+
 -- 
-1.8.5.3
-
+BR
+Szymon Janc
