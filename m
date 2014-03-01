@@ -1,114 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
-From: Adam Warski <adam@warski.org>
-In-Reply-To: <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com>
-Date: Sun, 2 Mar 2014 16:07:52 +0100
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org>
-References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/7] android: Add flags parameter to register service command
+Date: Sat, 01 Mar 2014 23:25:50 +0100
+Message-ID: <1615014.kasN2TjSTh@leonov>
+In-Reply-To: <A4A690E8-D8B1-4459-99B6-24A5D49B253F@holtmann.org>
+References: <1393709289-6395-1-git-send-email-szymon.janc@tieto.com> <A4A690E8-D8B1-4459-99B6-24A5D49B253F@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for the analysis :) I guess I’m more of a beginner in the area and moving slower.
-I also tried with bluez 5.13 (as .15 contains some LE changes), but same thing happens.
+Hi Marcel,
 
-> Maybe you already did your own investigation, but here goes my findings:
+On Saturday 01 of March 2014 13:45:15 Marcel Holtmann wrote:
+> Hi Szymon,
 > 
-> When opening the dump file on a hex editor, we can see that this first
-> bogus packet starts (skipping BTSnoop's own header) at offset 0x45a4
-> (with bytes "3E 2A 02 01 ..."). At offset 0x45b4 we can see that the
-> packet becomes truncated by missing these bytes (based on previous
-> correct packets):
+> > This will allow to configure daemon services.
+> > ---
+> > android/hal-a2dp.c      | 1 +
+> > android/hal-avrcp.c     | 1 +
+> > android/hal-bluetooth.c | 1 +
+> > android/hal-handsfree.c | 1 +
+> > android/hal-hidhost.c   | 1 +
+> > android/hal-ipc-api.txt | 7 +++++++
 > 
-> 1A FF 4C 00 02 15 B9 40 7F 30 F5 F8 46 6E AF F9
+> please do not mix code with API docs updates.
+
+OK.
+
 > 
-> From now on, the packets become garbage because they are "shifted" due
-> to these missing bytes.
+> > android/hal-msg.h       | 1 +
+> > android/hal-pan.c       | 1 +
+> > 8 files changed, 14 insertions(+)
+> > 
+> > diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
+> > index c898995..87d89a2 100644
+> > --- a/android/hal-a2dp.c
+> > +++ b/android/hal-a2dp.c
+> > @@ -109,6 +109,7 @@ static bt_status_t init(btav_callbacks_t *callbacks)
+> > 
+> > 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
+> > 	
+> > 	cmd.service_id = HAL_SERVICE_ID_A2DP;
+> > 
+> > +	cmd.flags = 0;
+> > 
+> > 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+> > 	
+> > 					sizeof(cmd), &cmd, 0, NULL, NULL);
+> > 
+> > diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
+> > index 46e25a0..4907f4a 100644
+> > --- a/android/hal-avrcp.c
+> > +++ b/android/hal-avrcp.c
+> > @@ -220,6 +220,7 @@ static bt_status_t init(btrc_callbacks_t *callbacks)
+> > 
+> > 				sizeof(ev_handlers) / sizeof(ev_handlers[0]));
+> > 	
+> > 	cmd.service_id = HAL_SERVICE_ID_AVRCP;
+> > 
+> > +	cmd.flags = 0;
+> > 
+> > 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+> > 	
+> > 					sizeof(cmd), &cmd, 0, NULL, NULL);
+> > 
+> > diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+> > index 6871f5d..4b31ff1 100644
+> > --- a/android/hal-bluetooth.c
+> > +++ b/android/hal-bluetooth.c
+> > @@ -442,6 +442,7 @@ static int init(bt_callbacks_t *callbacks)
+> > 
+> > 	}
+> > 	
+> > 	cmd.service_id = HAL_SERVICE_ID_SOCKET;
+> > 
+> > +	cmd.flags = 0;
+> > 
+> > 	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+> > 	
+> > 					sizeof(cmd), &cmd, NULL, NULL, NULL);
+> > 
+> > diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+> > index 1b150c3..422f52c 100644
+> > --- a/android/hal-handsfree.c
+> > +++ b/android/hal-handsfree.c
+> > @@ -212,6 +212,7 @@ static bt_status_t init(bthf_callbacks_t *callbacks)
+> > 
+> > 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
+> > 	
+> > 	cmd.service_id = HAL_SERVICE_ID_HANDSFREE;
+> > 
+> > +	cmd.flags = 0;
+> > 
+> > 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+> > 	
+> > 					sizeof(cmd), &cmd, 0, NULL, NULL);
+> > 
+> > diff --git a/android/hal-hidhost.c b/android/hal-hidhost.c
+> > index c758d2a..fe1b4df 100644
+> > --- a/android/hal-hidhost.c
+> > +++ b/android/hal-hidhost.c
+> > @@ -354,6 +354,7 @@ static bt_status_t init(bthh_callbacks_t *callbacks)
+> > 
+> > 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
+> > 	
+> > 	cmd.service_id = HAL_SERVICE_ID_HIDHOST;
+> > 
+> > +	cmd.flags = 0;
+> > 
+> > 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+> > 	
+> > 					sizeof(cmd), &cmd, 0, NULL, NULL);
+> > 
+> > diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> > index 1a19c80..f68324d 100644
+> > --- a/android/hal-ipc-api.txt
+> > +++ b/android/hal-ipc-api.txt
+> > @@ -124,12 +124,16 @@ Core Service (ID 0)
+> > 
+> > 	Opcode 0x01 - Register module command/response
+> > 	
+> > 		Command parameters: Service id (1 octet)
+> > 
+> > +		                    Flags (1 octet)
 > 
-> I think we can rule out any problems on the hcidump/btmon tools (as
-> the raw logs come directly from the kernel), so I see two
-> possibilities here:
+> We might better go with a Flags (4 octets) here. Otherwise you only have 8
+> options which might be enough or not. Your choice.
 > 
-> 1) There might be a bug in HCI packet reassembly logic (either in
-> hci_core.c or btusb.c).
+> Or instead of a bit mask, we do a Configuration (1 octet) were we have the
+> default configuration with 0x00 and then alternatives with all other
+> values. That might be actually a bit better.
+
+I'll see how it goes with configuration options, but flags could be used also 
+to enable eg. debug options which might be clumsy without flags.
+
+> > 		Response parameters: <none>
+> > 		
+> > 		In case a command is sent for an undeclared service ID, it will
+> > 		be rejected. Also there will be no notifications for undeclared
+> > 		service ID.
+> > 
+> > +		Flags parameter values should be defined as needed by
+> > +		respective services.
+> > +
+> > 
+> > 		In case of an error, the error response will be returned.
+> > 	
+> > 	Opcode 0x02 - Unregister module command/response
+> > 
+> > @@ -749,6 +753,9 @@ Bluetooth Handsfree HAL (ID 5)
+> > 
+> > Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
+> > 
+> > +	Service flags:               0x01 = Disable HSP AG
+> > +	                             0x02 = Disable HFP AG
+> > +
 > 
-> 2) (most likely) your BT dongle may be broken (i.e. generating
-> truncated USB packets from time to time)
+> If you do not want HSP and HFP, then there is no point in registering
+> handsfree ID at all. I am tending currently towards the configuration
+> option.
 
-The root cause seem to be the “--duplicates --passive” flags. According to the BLE spec the duplicates are filtered out in the Link Layer part. Do I understand correctly that that’s on the hardware side?
-
-If I just run “hcitool lescan --passive”, I see the advertisement only once, and nothing else happens - which includes no truncated packets. So the --duplicates flag seems to be the culprit.
-
-> So my suggestion would be to try with a different dongle, preferably
-> of a different chipset vendor. Note that "TP-Link" is just the brand
-> name, you can confirm the chipset using lsusb or (even better)
-> "hciconfig hci0 -a" (check "Manufacturer" field).
-
-I messed up the model number, looked at the wrong dongle, TP-Link is the WiFi one ;)
-The bluetooth one is an IOGear GBU521 (http://www.iogear.com/product/GBU521/).
-
-I don’t have another dongle right now (I tried a different IOGear, but same thing), but I’ll try setting a VM on my laptop/getting a different USB dongle.
-
-> Can you also provide the "lsusb" and "hciconfig hci0 -a" output (feel
-> free to modify the BT address for privacy reasons)? I think it is
-> important to have this archived so similar reports can be traced to
-> this hardware and firmware.
-
-Sure:
-$ sudo hciconfig hci0 -a
-hci0:	Type: BR/EDR  Bus: USB
-	BD Address: 00:01:81:C6:E8:82  ACL MTU: 1021:8  SCO MTU: 64:1
-	UP RUNNING
-	RX bytes:547 acl:0 sco:0 events:27 errors:0
-	TX bytes:384 acl:0 sco:0 commands:27 errors:0
-	Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
-	Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
-	Link policy: RSWITCH SNIFF
-	Link mode: SLAVE ACCEPT
-	Name: 'BCM20702A'
-	Class: 0x000000
-	Service Classes: Unspecified
-	Device Class: Miscellaneous,
-	HCI Version: 4.0 (0x6)  Revision: 0x1000
-	LMP Version: 4.0 (0x6)  Subversion: 0x220e
-	Manufacturer: Broadcom Corporation (15)
-
-$ lsusb
-Bus 001 Device 002: ID 0424:9512 Standard Microsystems Corp.
-Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
-Bus 001 Device 003: ID 0424:ec00 Standard Microsystems Corp.
-Bus 001 Device 004: ID 0bda:8179 Realtek Semiconductor Corp.
-Bus 001 Device 005: ID 0a5c:21e8 Broadcom Corp.
-
-> Another good source of information is the kernel debug logs. Collect
-> it by enabling dynamic debugging:
+> 	0x00 = Provide Handsfree profile
+> 	0x01 = Provide Headset profile
 > 
-> # dmesg -c  # just to clear the kernel log buffer
-> # echo 'module bluetooth +pf' | cat > /sys/kernel/debug/dynamic_debug/control
-> # echo 'module btusb +pf' | cat > /sys/kernel/debug/dynamic_debug/control
-> # btmon -w lescan.dump # So we can correlate the kernel log with the
-> actual packets
-> # hcitool lescan --duplicates # Run on another terminal, until packets
-> become corrupt
-> # dmesg > dmesg.txt
-> # echo 'module bluetooth -pf' | cat > /sys/kernel/debug/dynamic_debug/control
-> # echo 'module btusb -pf' | cat > /sys/kernel/debug/dynamic_debug/control
-> # gzip dmesg.txt (if it is too big)
-> 
-> Then send dmesg.txt.gz + lescan.dump to the list. You may want to mask
-> out your BT address on the log as well.
+> There is really no point in providing both? Or is there a case where you
+> would provide both?
 
-I mounted debugfs but as I don’t have dynamic_debug I guess I have to recompile the kernel with the appropriate flag. This will take a while ;)
+Android on phones provides both. On tablets HSP only. So we could go with
+0x00 = Provide HFP and HSP
+0x01 = Provide HSP only
 
-Adam
+or just with single flag to disable HFP.
 
 -- 
-Adam Warski
-
-http://twitter.com/#!/adamwarski
-http://www.softwaremill.com
-http://www.warski.org
-
+BR
+Szymon Janc
