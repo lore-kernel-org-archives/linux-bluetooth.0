@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 6/6] shared/hfp: Add function to get unquoted string
-Date: Sat,  1 Mar 2014 21:00:46 +0100
-Message-Id: <1393704046-4317-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 5/6] shared/hfp: Add function to get string
+Date: Sat,  1 Mar 2014 21:00:45 +0100
+Message-Id: <1393704046-4317-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1393704046-4317-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1393704046-4317-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+It will look for quoted sting and write it to given buffer.
 ---
- src/shared/hfp.c | 28 ++++++++++++++++++++++++++++
+ src/shared/hfp.c | 33 +++++++++++++++++++++++++++++++++
  src/shared/hfp.h |  2 ++
- 2 files changed, 30 insertions(+)
+ 2 files changed, 35 insertions(+)
 
 diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 10734fc..b10316e 100644
+index d7cca32..10734fc 100644
 --- a/src/shared/hfp.c
 +++ b/src/shared/hfp.c
-@@ -308,6 +308,34 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+@@ -275,6 +275,39 @@ bool hfp_gw_result_close_container(struct hfp_gw_result *result)
  	return true;
  }
  
-+bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
++bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
 +								uint8_t len)
 +{
-+	const char *data = result->data;
 +	int i = 0;
-+	char c;
++	const char *data = result->data;
 +
 +	skip_whitespace(result);
 +
-+	c = data[result->offset];
-+	if (c == '"' || c == ')' || c == '(')
++	if (data[result->offset] != '"')
 +		return false;
 +
-+	while (data[result->offset] != '\0' && data[result->offset] != ','
-+					&& data[result->offset] != ')') {
++	result->offset++;
++
++	while (data[result->offset] != '\0' && data[result->offset] != '"') {
 +		if (i < len)
 +			buf[i++] = data[result->offset];
 +		result->offset++;
@@ -45,6 +45,12 @@ index 10734fc..b10316e 100644
 +	if (i < len)
 +		buf[i++] = '\0';
 +
++	if (data[result->offset] == '"')
++		result->offset++;
++	else
++		return false;
++
++	skip_whitespace(result);
 +	next_field(result);
 +
 +	return true;
@@ -54,14 +60,14 @@ index 10734fc..b10316e 100644
  {
  	char *str, *ptr;
 diff --git a/src/shared/hfp.h b/src/shared/hfp.h
-index 3313d91..649b77e 100644
+index 00905de..3313d91 100644
 --- a/src/shared/hfp.h
 +++ b/src/shared/hfp.h
-@@ -118,3 +118,5 @@ bool hfp_gw_result_open_container(struct hfp_gw_result *result);
+@@ -116,3 +116,5 @@ bool hfp_gw_unregister(struct hfp_gw *hfp, const char *prefix);
+ bool hfp_gw_result_get_number(struct hfp_gw_result *result, unsigned int *val);
+ bool hfp_gw_result_open_container(struct hfp_gw_result *result);
  bool hfp_gw_result_close_container(struct hfp_gw_result *result);
- bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
- 								uint8_t len);
-+bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
++bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
 +								uint8_t len);
 -- 
 1.8.3.1
