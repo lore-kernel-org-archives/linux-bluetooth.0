@@ -1,46 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] android/avctp: Fix memory leak on disconnect
-Date: Sat,  1 Mar 2014 20:04:16 +0100
-Message-Id: <1393700658-14323-1-git-send-email-szymon.janc@tieto.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: [PATCH BlueZ] emulator/btdev: Add dummy support for clearing the LE white list
+Date: Sat,  1 Mar 2014 10:25:25 -0400
+Message-Id: <1393683925-1216-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Free passthrough handler if it was not unregistered.
+Add just enough support for being able to bring up LE capable virtual
+controllers using "btvirt".
 
-This fix following Valgrind report:
+Fixes this error on "btvirt -l2":
 
-943 (12 direct, 931 indirect) bytes in 1 blocks are definitely lost in
-     loss record 55 of 57
-   at 0x48993CC: malloc (in /system/lib/valgrind/
-     vgpreload_memcheck-arm-linux.so)
-   by 0x48C5D77: g_malloc (gmem.c:159)
-   by 0x1177E3: avctp_register_passthrough_handler (avctp.c:1293)
-   by 0x1186BF: avrcp_new (avrcp-lib.c:230)
-   by 0x117D67: connect_cb (avrcp.c:346)
-   by 0x1206DB: connect_cb (btio.c:232)
-   by 0x48BD9C7: g_io_unix_dispatch (giounix.c:166)
-   by 0x48C2CCB: g_main_context_dispatch (gmain.c:2539)
-   by 0x48C2ED9: g_main_context_iterate.isra.19 (gmain.c:3146)
-   by 0x48C3167: g_main_loop_run (gmain.c:3340)
-   by 0x10BA1F: main (main.c:491)
+Unsupported command 0x2010
+
+And on "hciconfig hci0 up":
+
+Can't init device hci0: Invalid request code (56)
 ---
- android/avctp.c | 1 +
- 1 file changed, 1 insertion(+)
+ emulator/btdev.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index bc1bd80..b901371 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -1501,5 +1501,6 @@ void avctp_shutdown(struct avctp *session)
- 		session->uinput = -1;
- 	}
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 4a54a23..b54f91e 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -2353,6 +2353,13 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 		cmd_complete(btdev, opcode, &lrwls, sizeof(lrwls));
+ 		break;
  
-+	g_free(session->handler);
- 	g_free(session);
- }
++	case BT_HCI_CMD_LE_CLEAR_WHITE_LIST:
++		if (btdev->type == BTDEV_TYPE_BREDR)
++			goto unsupported;
++		status = BT_HCI_ERR_SUCCESS;
++		cmd_complete(btdev, opcode, &status, sizeof(status));
++		break;
++
+ 	case BT_HCI_CMD_LE_READ_SUPPORTED_STATES:
+ 		if (btdev->type == BTDEV_TYPE_BREDR)
+ 			goto unsupported;
 -- 
-1.8.5.3
+1.8.3.2
 
