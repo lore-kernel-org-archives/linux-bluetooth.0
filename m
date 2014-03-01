@@ -1,62 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <52C3D309.2090909@thus.ch>
-Date: Wed, 01 Jan 2014 09:34:17 +0100
-From: Patrick Valsecchi <patrick@thus.ch>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: RFCOMM connection failing
-References: <52AF228D.1000608@thus.ch>
-In-Reply-To: <52AF228D.1000608@thus.ch>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCHv3 3/6] shared/hfp: Add get_number implementation
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393619636-23762-3-git-send-email-marcin.kraglak@tieto.com>
+Date: Fri, 28 Feb 2014 19:27:10 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FBA29747-DEFB-4420-9010-A01792933120@holtmann.org>
+References: <1393619636-23762-1-git-send-email-marcin.kraglak@tieto.com> <1393619636-23762-3-git-send-email-marcin.kraglak@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-Can somebody tell me if I should send this email on some other mailing list?
+> User can call this function with hfp_gw_result, which will
+> be passed to prefix handler.
+> ---
+> src/shared/hfp.c | 33 +++++++++++++++++++++++++++++++++
+> src/shared/hfp.h |  2 ++
+> 2 files changed, 35 insertions(+)
+> 
+> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+> index 8feaf16..d168ac4 100644
+> --- a/src/shared/hfp.c
+> +++ b/src/shared/hfp.c
+> @@ -218,6 +218,39 @@ done:
+> 	return true;
+> }
+> 
+> +static void next_field(struct hfp_gw_result *result)
+> +{
+> +	if (result->data[result->offset] == ',')
+> +		result->offset++;
+> +}
+> +
+> +bool hfp_gw_result_get_number(struct hfp_gw_result *result, int *val)
+> +{
+> +	int temp = 0;
+> +	int i;
 
-Thanks.
+	int i, tmp = 0;
 
-On 16. 12. 13 16:55, Patrick Valsecchi wrote:
-> Hi,
->
-> I'm trying to connect my PC:
->     Linux ... 3.11.0-14-generic #21-Ubuntu SMP ... x86_64 x86_64 
-> x86_64 GNU/Linux
->     0a5c:2198 Broadcom Corp. Bluetooth 3.0 Device
->
-> To connect with my bluetooth dive computer:
->     Shearwater Petrel
->
-> It fails with a "Transport endpoint is not connected (107)" most of 
-> the time or go further but seem to have corrupted RFCOMM payload.
->
-> If I pass the USB device to a W7 VM (virtualbox) and try from them, 
-> the communication works like charm.
->
-> So I went ahead and sniffed the USB communication in both cases using 
-> wireshark. The two dumps () can be found here (UsbDumpFrom*.pcapng, 
-> can be open using wireshark):
-> https://cloud.thus.ch/public.php?service=files&t=de2eabf30c82efa08cf546ff5045e585 
->
->
-> Basically the Linux one is just stopping at frame 203 where it sends a 
-> RFCOMM SABM, gets the answer and reports an error to the user. The 
-> windows dump show the same RFCOMM SABM command in frame 191 and gets 
-> the same answer but continues and everything works.
->
-> On IRC aholler told me you guys would prefer to get a btmon dump with 
-> bluez v5. So I went ahead, installed bluez 5.12 and generated a dump 
-> (yes, the comm still fails the same way) that you can find in the same 
-> location as the dumps.
->
-> I'm stuck there. Can somebody help me go further?
->
-> Thanks
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe 
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
+> +
+> +	skip_whitespace(result);
+> +
+> +	i = result->offset;
+> +
+> +	while (result->data[i] >= '0' && result->data[i] <= '9') {
+> +		temp *= 10;
+> +		temp += result->data[i++] - '0’;
+
+	tmp = (tmp * 10) + (result->data[i++] - ‘0’;
+
+This should be the cheaper operation since tmp does not need be reevaluated twice.
+
+Are we going to support negative number? I do not even remember if they are valid in AT commands. Has been too long. Might also go straight to unsigned int *val in that case.
+
+Regards
+
+Marcel
 
