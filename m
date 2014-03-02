@@ -1,41 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <53137E6E.7080305@gmx.net>
+Date: Sun, 02 Mar 2014 19:54:38 +0100
+From: Tobias Jakobi <liquid.acid@gmx.net>
 MIME-Version: 1.0
-In-Reply-To: <1393613928-22264-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1393613928-22264-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Date: Sun, 2 Mar 2014 20:57:05 +0200
-Message-ID: <CABBYNZLAt520ASue5Ba-BLpdp-+_H911H86fpZ9=qPSwfGkDRg@mail.gmail.com>
-Subject: Re: [PATCH 0/6] Initial HAL test AVRCP api support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
+References: <530FBB6B.8080300@gmx.net>	<CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>	<5310BFEF.8010405@gmx.net> <CAJdJm_PVX=97RPVUJ5qx9k-OFNt=xidLrwgL6qK9QTTRBJHd+Q@mail.gmail.com>
+In-Reply-To: <CAJdJm_PVX=97RPVUJ5qx9k-OFNt=xidLrwgL6qK9QTTRBJHd+Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Anderson Lizardo wrote:
+> I misunderstood the first output, it was actually the "info" command
+> for the server from the client side. I thought it was the "show"
+> command on the server side. That explains the missing "Powered"
+> property :)
+> 
+I see. Any idea how to isolate where the NotAvailable error origins from?
 
-On Fri, Feb 28, 2014 at 8:58 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
-> Patchset contains initial AVRCP api support for HAL test.
->
-> Ravi kumar Veeramally (6):
->   android/client: Add AVRCP get_play_status_rsp support
->   android/client: Add AVRCP get_element_attr_rsp support
->   android/client: Add AVRCP set_volume support
->   android/client: Add AVRCP get_play_status_cb support
->   android/client: Add AVRCP get_element_attr_cb support
->   android/client: Add AVRCP volume_change_cb support
->
->  android/client/if-rc.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 151 insertions(+)
->
-> --
-> 1.8.3.2
+With best wishes,
+Tobias
 
-This doesn't help much with AVRCP since the requests need to be
-responded rather quickly we might need to have them auto responded if
-we really want hal-tester to be usable.
-
-
--- 
-Luiz Augusto von Dentz
