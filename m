@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 13/16] android/avrcp: Add handler for RegisterNotification command
-Date: Sun,  2 Mar 2014 20:48:28 +0200
-Message-Id: <1393786109-6554-13-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 03/16] android/avrcp-lib: Rework handler callback parameters
+Date: Sun,  2 Mar 2014 20:48:18 +0200
+Message-Id: <1393786109-6554-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 References: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,122 +11,143 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This rework handler callback parameters to make it able to return
+proper error such as -EAGAIN to implement asynchronous responses.
 ---
- android/avrcp.c | 84 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 83 insertions(+), 1 deletion(-)
+ android/avrcp-lib.c | 12 +++++++++---
+ android/avrcp-lib.h |  5 +++--
+ unit/test-avrcp.c   | 42 +++++++++++++++++++++---------------------
+ 3 files changed, 33 insertions(+), 26 deletions(-)
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 6ef8d0a..875c6e2 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -252,10 +252,58 @@ static void handle_set_player_attrs_value(const void *buf, uint16_t len)
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index cdad6ac..339be16 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -125,6 +125,7 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 	struct avrcp_header *pdu = (void *) operands;
+ 	uint32_t company_id = ntoh24(pdu->company_id);
+ 	uint16_t params_len = ntohs(pdu->params_len);
++	ssize_t ret;
  
- static void handle_register_notification(const void *buf, uint16_t len)
- {
-+	struct hal_cmd_avrcp_register_notification *cmd = (void *) buf;
-+	uint8_t status;
-+	struct avrcp_request *req;
-+	uint8_t pdu[IPC_MTU];
-+	size_t pdu_len = 1;
-+	int ret;
-+
- 	DBG("");
+ 	if (company_id != IEEEID_BTSIG) {
+ 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
+@@ -159,12 +160,17 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+ 		goto reject;
+ 	}
  
-+	req = pop_request(AVRCP_REGISTER_NOTIFICATION);
-+	if (!req) {
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	pdu[0] = cmd->event;
-+
-+	switch (cmd->event) {
-+	case AVRCP_EVENT_STATUS_CHANGED:
-+	case AVRCP_EVENT_TRACK_CHANGED:
-+	case AVRCP_EVENT_TRACK_REACHED_END:
-+	case AVRCP_EVENT_TRACK_REACHED_START:
-+	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-+		if (cmd->len > 0) {
-+			memcpy(&pdu[1], cmd->data, cmd->len);
-+			pdu_len += cmd->len;
-+		}
-+		break;
-+	case AVRCP_EVENT_SETTINGS_CHANGED:
-+		pdu[1] = cmd->len / sizeof(struct hal_avrcp_player_attr_value);
-+		memcpy(&pdu[2], cmd->data, cmd->len);
-+		break;
-+	default:
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	ret = avrcp_send(req->dev->session, req->transaction, cmd->type,
-+					AVC_SUBUNIT_PANEL, req->pdu_id,
-+					pdu, pdu_len);
+-	*code = handler->func(session, transaction, &params_len,
++	ret = handler->func(session, transaction, code, params_len,
+ 					pdu->params, session->control_data);
 +	if (ret < 0) {
-+		status = HAL_STATUS_FAILED;
-+		g_free(req);
-+		goto done;
++		if (ret == -EAGAIN)
++			return ret;
++		goto reject;
 +	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+	g_free(req);
-+
-+done:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP,
--			HAL_OP_AVRCP_REGISTER_NOTIFICATION, HAL_STATUS_FAILED);
-+			HAL_OP_AVRCP_REGISTER_NOTIFICATION, status);
- }
  
- static void handle_set_volume(const void *buf, uint16_t len)
-@@ -568,6 +616,37 @@ static ssize_t handle_get_element_attrs_cmd(struct avrcp *session,
+-	pdu->params_len = htons(params_len);
++	pdu->params_len = htons(ret);
  
- }
+-	return AVRCP_HEADER_LENGTH + params_len;
++	return AVRCP_HEADER_LENGTH + ret;
  
-+static ssize_t handle_register_notification_cmd(struct avrcp *session,
-+						uint8_t transaction,
-+						uint16_t params_len,
-+						uint8_t *params,
-+						void *user_data)
-+{
-+	struct avrcp_device *dev = user_data;
-+	struct avrcp_request *req;
-+	struct hal_ev_avrcp_register_notification ev;
-+
-+	if (params_len != 5)
-+		return -EINVAL;
-+
-+	req = g_new0(struct avrcp_request, 1);
-+	req->dev = dev;
-+	req->pdu_id = AVRCP_REGISTER_NOTIFICATION;
-+	req->transaction = transaction;
-+
-+	g_queue_push_tail(dev->queue, req);
-+
-+	ev.event = params[0];
-+	ev.param = bt_get_be32(&params[1]);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
-+					HAL_EV_AVRCP_REGISTER_NOTIFICATION,
-+					sizeof(ev), &ev);
-+
-+	return -EAGAIN;
-+
-+}
-+
- static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
-@@ -578,6 +657,9 @@ static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_ELEMENT_ATTRIBUTES,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
- 					handle_get_element_attrs_cmd },
-+		{ AVRCP_REGISTER_NOTIFICATION,
-+					AVC_CTYPE_NOTIFY, AVC_CTYPE_INTERIM,
-+					handle_register_notification_cmd },
+ reject:
+ 	pdu->params_len = htons(1);
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index a33bdfe..d7a805b 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -79,8 +79,9 @@ struct avrcp;
+ struct avrcp_control_handler {
+ 	uint8_t id;
+ 	uint8_t code;
+-	uint8_t (*func) (struct avrcp *session, uint8_t transaction,
+-			uint16_t *params_len, uint8_t *params, void *user_data);
++	ssize_t (*func) (struct avrcp *session, uint8_t transaction,
++			uint8_t *code, uint16_t params_len, uint8_t *params,
++			void *user_data);
+ };
+ 
+ struct avrcp_passthrough_handler {
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 302c331..2d5711b 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -292,54 +292,54 @@ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
  		{ },
  };
  
+-static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
+-				uint8_t transaction, uint16_t *params_len,
+-				uint8_t *params, void *user_data)
++static ssize_t avrcp_handle_get_capabilities(struct avrcp *session,
++					uint8_t transaction, uint8_t *code,
++					uint16_t params_len, uint8_t *params,
++					void *user_data)
+ {
+ 	uint32_t id = 0x001958;
+ 
+-	DBG("params[0] %d params_len %d", params[0], *params_len);
+-
+-	if (*params_len != 1)
++	if (params_len != 1)
+ 		goto fail;
+ 
+ 	switch (params[0]) {
+ 	case CAP_COMPANY_ID:
+-		*params_len = 5;
+ 		params[1] = 1;
+ 		hton24(&params[2], id);
+-		return AVC_CTYPE_STABLE;
++		*code = AVC_CTYPE_STABLE;
++		return 5;
+ 	}
+ 
+ fail:
+-	*params_len = 1;
+ 	params[0] = AVRCP_STATUS_INVALID_PARAM;
+-
+-	return AVC_CTYPE_REJECTED;
++	*code = AVC_CTYPE_REJECTED;
++	return 1;
+ }
+ 
+-static uint8_t avrcp_handle_list_attributes(struct avrcp *session,
+-				uint8_t transaction, uint16_t *params_len,
+-				uint8_t *params, void *user_data)
++static ssize_t avrcp_handle_list_attributes(struct avrcp *session,
++					uint8_t transaction, uint8_t *code,
++					uint16_t params_len, uint8_t *params,
++					void *user_data)
+ {
+ 	DBG("");
+ 
+-	*params_len = 1;
+ 	params[0] = 0;
++	*code = AVC_CTYPE_STABLE;
+ 
+-	return AVC_CTYPE_STABLE;
++	return 1;
+ }
+ 
+-static uint8_t avrcp_handle_get_player_attr_text(struct avrcp *session,
+-				uint8_t transaction, uint16_t *params_len,
+-				uint8_t *params, void *user_data)
++static ssize_t avrcp_handle_get_player_attr_text(struct avrcp *session,
++					uint8_t transaction, uint8_t *code,
++					uint16_t params_len, uint8_t *params,
++					void *user_data)
+ {
+ 	DBG("");
+ 
+-	*params_len = 1;
+ 	params[0] = 0;
++	*code = AVC_CTYPE_STABLE;
+ 
+-	return AVC_CTYPE_STABLE;
++	return 1;
+ }
+ 
+ static const struct avrcp_control_handler control_handlers[] = {
 -- 
 1.8.5.3
 
