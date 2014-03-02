@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 09/16] android/avrcp-lib: Make hton24 and ntoh24 public
-Date: Sun,  2 Mar 2014 20:48:24 +0200
-Message-Id: <1393786109-6554-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 10/16] android/avrcp: Add handler for GetCapabilities command
+Date: Sun,  2 Mar 2014 20:48:25 +0200
+Message-Id: <1393786109-6554-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 References: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,90 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This avoids duplicating those function everytime.
 ---
- android/avrcp-lib.c | 12 ------------
- android/avrcp-lib.h | 12 ++++++++++++
- unit/test-avrcp.c   |  7 -------
- 3 files changed, 12 insertions(+), 19 deletions(-)
+ android/avrcp-lib.h |  1 +
+ android/avrcp.c     | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 40ff7b3..60c8ba3 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -73,18 +73,6 @@ struct avrcp_header {
- #error "Unknown byte order"
- #endif
- 
--static inline uint32_t ntoh24(const uint8_t src[3])
--{
--	return src[0] << 16 | src[1] << 8 | src[2];
--}
--
--static inline void hton24(uint8_t dst[3], uint32_t src)
--{
--	dst[0] = (src & 0xff0000) >> 16;
--	dst[1] = (src & 0x00ff00) >> 8;
--	dst[2] = (src & 0x0000ff);
--}
--
- struct avrcp {
- 	struct avctp *conn;
- 
 diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 3df5897..8625425 100644
+index 8625425..dda1d28 100644
 --- a/android/avrcp-lib.h
 +++ b/android/avrcp-lib.h
-@@ -91,6 +91,18 @@ struct avrcp_passthrough_handler {
+@@ -51,6 +51,7 @@
+ #define AVRCP_EVENT_TRACK_CHANGED		0x02
+ #define AVRCP_EVENT_TRACK_REACHED_END		0x03
+ #define AVRCP_EVENT_TRACK_REACHED_START		0x04
++#define AVRCP_EVENT_PLAYBACK_POS_CHANGED	0x05
+ #define AVRCP_EVENT_SETTINGS_CHANGED		0x08
+ #define AVRCP_EVENT_AVAILABLE_PLAYERS_CHANGED	0x0a
+ #define AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED	0x0b
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 9d86803..bcaa66c 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -26,6 +26,7 @@
+ #endif
  
- typedef void (*avrcp_destroy_cb_t) (void *user_data);
+ #include <stdbool.h>
++#include <errno.h>
+ #include <glib.h>
  
-+static inline uint32_t ntoh24(const uint8_t src[3])
+ #include "btio/btio.h"
+@@ -339,6 +340,46 @@ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
+ 		{ },
+ };
+ 
++static ssize_t handle_get_capabilities(struct avrcp *session,
++						uint8_t transaction,
++						uint16_t params_len,
++						uint8_t *params,
++						void *user_data)
 +{
-+	return src[0] << 16 | src[1] << 8 | src[2];
++	uint32_t id = 0x001958;
++
++	if (params_len != 1)
++		return -EINVAL;
++
++	switch (params[0]) {
++	case CAP_COMPANY_ID:
++		params[params_len++] = 1;
++		hton24(&params[params_len], id);
++		return params_len + 3;
++	case CAP_EVENTS_SUPPORTED:
++		/* Android do not provide this info via HAL so the list most
++		 * be hardcoded according to what RegisterNotification can
++		 * actually handle */
++		params[params_len++] = 6;
++		params[params_len++] = AVRCP_EVENT_STATUS_CHANGED;
++		params[params_len++] = AVRCP_EVENT_TRACK_CHANGED;
++		params[params_len++] = AVRCP_EVENT_TRACK_REACHED_END;
++		params[params_len++] = AVRCP_EVENT_TRACK_REACHED_START;
++		params[params_len++] = AVRCP_EVENT_PLAYBACK_POS_CHANGED;
++		params[params_len++] = AVRCP_EVENT_SETTINGS_CHANGED;
++		return params_len;
++	}
++
++	return -EINVAL;
 +}
 +
-+static inline void hton24(uint8_t dst[3], uint32_t src)
-+{
-+	dst[0] = (src & 0xff0000) >> 16;
-+	dst[1] = (src & 0x00ff00) >> 8;
-+	dst[2] = (src & 0x0000ff);
-+}
++static const struct avrcp_control_handler control_handlers[] = {
++		{ AVRCP_GET_CAPABILITIES,
++					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
++					handle_get_capabilities },
++		{ },
++};
 +
- struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
- void avrcp_shutdown(struct avrcp *session);
- void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 0294973..695f62c 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -94,13 +94,6 @@ struct context {
- 		g_test_add_data_func(name, &data, function);		\
- 	} while (0)
- 
--static inline void hton24(uint8_t dst[3], uint32_t src)
--{
--	dst[0] = (src & 0xff0000) >> 16;
--	dst[1] = (src & 0x00ff00) >> 8;
--	dst[2] = (src & 0x0000ff);
--}
--
- static void test_debug(const char *str, void *user_data)
+ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
  {
- 	const char *prefix = user_data;
+ 	struct avrcp_device *dev;
+@@ -390,6 +431,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	avrcp_set_destroy_cb(dev->session, disconnect_cb, dev);
+ 	avrcp_set_passthrough_handlers(dev->session, passthrough_handlers,
+ 									dev);
++	avrcp_set_control_handlers(dev->session, control_handlers, dev);
+ 
+ 	/* FIXME: get the real name of the device */
+ 	avrcp_init_uinput(dev->session, "bluetooth", address);
 -- 
 1.8.5.3
 
