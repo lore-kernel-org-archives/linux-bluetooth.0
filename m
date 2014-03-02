@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 08/16] android/avrcp: Add passthrough handler for rewind
-Date: Sun,  2 Mar 2014 20:48:23 +0200
-Message-Id: <1393786109-6554-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 14/16] android/avrcp: Bump version to 1.3
+Date: Sun,  2 Mar 2014 20:48:29 +0200
+Message-Id: <1393786109-6554-14-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 References: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Rewind should be send via HAL not handled directly by uinput otherwise
-Android media player might not interpret it correctly.
 ---
- android/avrcp.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ android/avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/avrcp.c b/android/avrcp.c
-index 3d56ccf..9d86803 100644
+index 875c6e2..268c1b1 100644
 --- a/android/avrcp.c
 +++ b/android/avrcp.c
-@@ -317,8 +317,25 @@ static bool handle_fast_forward(struct avrcp *session, bool pressed,
- 	return true;
- }
- 
-+static bool handle_rewind(struct avrcp *session, bool pressed,
-+							void *user_data)
-+{
-+	struct hal_ev_avrcp_passthrough_cmd ev;
-+
-+	DBG("pressed %s", pressed ? "true" : "false");
-+
-+	ev.id = AVC_REWIND;
-+	ev.state = pressed;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
-+			HAL_EV_AVRCP_PASSTHROUGH_CMD, sizeof(ev), &ev);
-+
-+	return true;
-+}
-+
- static const struct avrcp_passthrough_handler passthrough_handlers[] = {
- 		{ AVC_FAST_FORWARD, handle_fast_forward },
-+		{ AVC_REWIND, handle_rewind },
- 		{ },
- };
- 
+@@ -355,7 +355,7 @@ static sdp_record_t *avrcp_record(void)
+ 	sdp_record_t *record;
+ 	sdp_data_t *psm, *version, *features;
+ 	uint16_t lp = L2CAP_PSM_AVCTP;
+-	uint16_t avrcp_ver = 0x0100, avctp_ver = 0x0103;
++	uint16_t avrcp_ver = 0x0103, avctp_ver = 0x0103;
+ 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
+ 					AVRCP_FEATURE_CATEGORY_2 |
+ 					AVRCP_FEATURE_CATEGORY_3 |
 -- 
 1.8.5.3
 
