@@ -1,48 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+Date: Mon, 3 Mar 2014 00:41:21 +0200
+From: PhobosK <phobosk@kbfx.net>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 1/8] android/ipc: Add Mode parameter to register service command
-Date: Mon,  3 Mar 2014 00:50:42 +0100
-Message-Id: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
+Subject: PS3 BD Remote Control - always connected problem
+Message-ID: <20140303004121.32ac160f.phobosk@kbfx.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow to run daemon services in non-default mode.
----
- android/hal-ipc-api.txt | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hello,
+I have a problem with my PS3 BD Remote Control.
+I am running Gentoo with kernel 3.13.3 and bluez 5.15.
+I use the PS3 BD Remote Control in XBMC and it works fine, but it stays
+connected all the time and the battery is drained very fast... like for
+a week. 
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 0518c2f..6bf9af3 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -124,12 +124,16 @@ Core Service (ID 0)
- 	Opcode 0x01 - Register module command/response
- 
- 		Command parameters: Service id (1 octet)
-+		                    Mode (1 octet)
- 		Response parameters: <none>
- 
- 		In case a command is sent for an undeclared service ID, it will
- 		be rejected. Also there will be no notifications for undeclared
- 		service ID.
- 
-+		Valid Mode values: 0x00 = Default Mode
-+		                   0xXX = as defined by service
-+
- 		In case of an error, the error response will be returned.
- 
- 	Opcode 0x02 - Unregister module command/response
-@@ -749,6 +753,8 @@ Bluetooth Handsfree HAL (ID 5)
- 
- Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
- 
-+	Service modes:               0x01 = Headset Profile only mode
-+
- 	Opcode 0x00 - Error response
- 
- 		Response parameters: Status (1 octet)
+There used to be an option in bluez 4.x that helped in fixing the
+problem (PS3_REMOTE_TIMEOUT var in the src code) but not anymore.
+Now when I try using the IdleTimeout var in input.conf, when the timeout
+is reached the device is removed and it cannot be created again nor it
+can be used anymore without restarting the bluetooth service (I
+use systemd, not openrc if this matters at all).... 
+
+
+Can anyone help me with this please?
+
 -- 
-1.8.5.3
-
+PhobosK
