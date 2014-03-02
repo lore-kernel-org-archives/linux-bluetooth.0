@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 04/16] android/avrcp-lib: Embed response code into handler table
-Date: Sun,  2 Mar 2014 20:48:19 +0200
-Message-Id: <1393786109-6554-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/16] android/avrcp-lib: Fix not passing user data of passthrough callback
+Date: Sun,  2 Mar 2014 20:48:20 +0200
+Message-Id: <1393786109-6554-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 References: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,155 +11,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes the handlers code simpler as they don't need to care about
-the response or reject opcode.
 ---
- android/avrcp-lib.c | 16 ++++++++++++----
- android/avrcp-lib.h |  4 ++--
- unit/test-avrcp.c   | 41 +++++++++++++++++++++--------------------
- 3 files changed, 35 insertions(+), 26 deletions(-)
+ android/avrcp-lib.c | 2 +-
+ android/avrcp-lib.h | 2 +-
+ unit/test-avrcp.c   | 8 ++++----
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 339be16..7b89ee2 100644
+index 7b89ee2..8854263 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -160,14 +160,22 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 		goto reject;
- 	}
+@@ -209,7 +209,7 @@ static bool handle_passthrough_pdu(struct avctp *conn, uint8_t op,
+ 	if (!pressed)
+ 		return true;
  
--	ret = handler->func(session, transaction, code, params_len,
--					pdu->params, session->control_data);
-+	ret = handler->func(session, transaction, params_len, pdu->params,
-+							session->control_data);
- 	if (ret < 0) {
--		if (ret == -EAGAIN)
-+		switch (ret) {
-+		case -EAGAIN:
- 			return ret;
--		goto reject;
-+		case -EINVAL:
-+			pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
-+			goto reject;
-+		default:
-+			pdu->params[0] = AVRCP_STATUS_INTERNAL_ERROR;
-+			goto reject;
-+		}
- 	}
+-	return handler->func(session);
++	return handler->func(session, session->passthrough_data);
+ }
  
-+	*code = handler->rsp;
- 	pdu->params_len = htons(ret);
- 
- 	return AVRCP_HEADER_LENGTH + ret;
+ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
 diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index d7a805b..df9f1c6 100644
+index df9f1c6..430f545 100644
 --- a/android/avrcp-lib.h
 +++ b/android/avrcp-lib.h
-@@ -79,9 +79,9 @@ struct avrcp;
- struct avrcp_control_handler {
- 	uint8_t id;
- 	uint8_t code;
-+	uint8_t rsp;
- 	ssize_t (*func) (struct avrcp *session, uint8_t transaction,
--			uint8_t *code, uint16_t params_len, uint8_t *params,
--			void *user_data);
-+			uint16_t params_len, uint8_t *params, void *user_data);
- };
+@@ -86,7 +86,7 @@ struct avrcp_control_handler {
  
  struct avrcp_passthrough_handler {
+ 	uint8_t op;
+-	bool (*func) (struct avrcp *session);
++	bool (*func) (struct avrcp *session, void *user_data);
+ };
+ 
+ typedef void (*avrcp_destroy_cb_t) (void *user_data);
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 2d5711b..d8484cd 100644
+index d8484cd..ac267bb 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -31,6 +31,7 @@
- #include <inttypes.h>
- #include <string.h>
- #include <fcntl.h>
-+#include <errno.h>
- #include <sys/socket.h>
- 
- #include <glib.h>
-@@ -293,61 +294,61 @@ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
- };
- 
- static ssize_t avrcp_handle_get_capabilities(struct avrcp *session,
--					uint8_t transaction, uint8_t *code,
--					uint16_t params_len, uint8_t *params,
--					void *user_data)
-+						uint8_t transaction,
-+						uint16_t params_len,
-+						uint8_t *params,
-+						void *user_data)
- {
- 	uint32_t id = 0x001958;
- 
- 	if (params_len != 1)
--		goto fail;
-+		return -EINVAL;
- 
- 	switch (params[0]) {
- 	case CAP_COMPANY_ID:
- 		params[1] = 1;
- 		hton24(&params[2], id);
--		*code = AVC_CTYPE_STABLE;
- 		return 5;
- 	}
- 
--fail:
--	params[0] = AVRCP_STATUS_INVALID_PARAM;
--	*code = AVC_CTYPE_REJECTED;
--	return 1;
-+	return -EINVAL;
+@@ -257,28 +257,28 @@ static void execute_context(struct context *context)
+ 	destroy_context(context);
  }
  
- static ssize_t avrcp_handle_list_attributes(struct avrcp *session,
--					uint8_t transaction, uint8_t *code,
--					uint16_t params_len, uint8_t *params,
--					void *user_data)
-+						uint8_t transaction,
-+						uint16_t params_len,
-+						uint8_t *params,
-+						void *user_data)
+-static bool handle_play(struct avrcp *session)
++static bool handle_play(struct avrcp *session, void *user_data)
  {
  	DBG("");
  
- 	params[0] = 0;
--	*code = AVC_CTYPE_STABLE;
- 
- 	return 1;
+ 	return true;
  }
  
- static ssize_t avrcp_handle_get_player_attr_text(struct avrcp *session,
--					uint8_t transaction, uint8_t *code,
--					uint16_t params_len, uint8_t *params,
--					void *user_data)
-+						uint8_t transaction,
-+						uint16_t params_len,
-+						uint8_t *params,
-+						void *user_data)
+-static bool handle_volume_up(struct avrcp *session)
++static bool handle_volume_up(struct avrcp *session, void *user_data)
  {
  	DBG("");
  
- 	params[0] = 0;
--	*code = AVC_CTYPE_STABLE;
- 
- 	return 1;
+ 	return true;
  }
  
- static const struct avrcp_control_handler control_handlers[] = {
--		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
-+		{ AVRCP_GET_CAPABILITIES,
-+					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
- 					avrcp_handle_get_capabilities },
--		{ AVRCP_LIST_PLAYER_ATTRIBUTES, AVC_CTYPE_STATUS,
-+		{ AVRCP_LIST_PLAYER_ATTRIBUTES,
-+					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
- 					avrcp_handle_list_attributes },
--		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, AVC_CTYPE_STATUS,
-+		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
-+					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
- 					avrcp_handle_get_player_attr_text },
- 		{ },
- };
+-static bool handle_channel_up(struct avrcp *session)
++static bool handle_channel_up(struct avrcp *session, void *user_data)
+ {
+ 	DBG("");
+ 
+ 	return true;
+ }
+ 
+-static bool handle_select(struct avrcp *session)
++static bool handle_select(struct avrcp *session, void *user_data)
+ {
+ 	DBG("");
+ 
 -- 
 1.8.5.3
 
