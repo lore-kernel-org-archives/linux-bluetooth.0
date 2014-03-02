@@ -2,115 +2,182 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v3 8/8] android/handsfree: Add support for disabling HSP or HFP AGs
-Date: Mon,  3 Mar 2014 00:50:49 +0100
-Message-Id: <1393804249-12392-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v3 7/8] android/handsfree: Allow to connect to HSP or HFP handsfree unit
+Date: Mon,  3 Mar 2014 00:50:48 +0100
+Message-Id: <1393804249-12392-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
 References: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to tune what profiles are supported by handsfree HAL.
+This allows to connect to HSP (it HFP is not enabled) or fallback to
+HSP if HFP is not supported by remote device.
 ---
- android/cutils/properties.h |  8 ++++++++
- android/hal-handsfree.c     | 15 ++++++++++++++-
- android/hal-msg.h           |  2 ++
- android/handsfree.c         |  4 ++--
- 4 files changed, 26 insertions(+), 3 deletions(-)
+ android/handsfree.c | 113 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 106 insertions(+), 7 deletions(-)
 
-diff --git a/android/cutils/properties.h b/android/cutils/properties.h
-index dff812f..66a4a84 100644
---- a/android/cutils/properties.h
-+++ b/android/cutils/properties.h
-@@ -27,6 +27,14 @@
- #include <sys/socket.h>
- #include <sys/un.h>
- 
-+#define PROPERTY_VALUE_MAX 32
-+
-+static inline int property_get(const char *key, char *value,
-+						const char *default_value)
-+{
-+	return 0;
-+}
-+
- /* property_set: returns 0 on success, < 0 on failure
- */
- static inline int property_set(const char *key, const char *value)
-diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
-index 7a28e0f..4117ed0 100644
---- a/android/hal-handsfree.c
-+++ b/android/hal-handsfree.c
-@@ -20,6 +20,8 @@
- #include <string.h>
- #include <stdlib.h>
- 
-+#include <cutils/properties.h>
-+
- #include "hal-log.h"
- #include "hal.h"
- #include "hal-msg.h"
-@@ -196,6 +198,17 @@ static const struct hal_ipc_handler ev_handlers[] = {
- 	{handle_hsp_key_press, false, 0},
- };
- 
-+static uint8_t get_mode(void)
-+{
-+	char value[PROPERTY_VALUE_MAX];
-+
-+	if (property_get("bluetooth.handsfree_mode", value, "") > 0 &&
-+					(!strcasecmp(value, "hsp_only")))
-+		return HAL_MODE_HANDSFREE_HSP_ONLY;
-+
-+	return HAL_MODE_DEFAULT;
-+}
-+
- static bt_status_t init(bthf_callbacks_t *callbacks)
- {
- 	struct hal_cmd_register_module cmd;
-@@ -212,7 +225,7 @@ static bt_status_t init(bthf_callbacks_t *callbacks)
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
- 
- 	cmd.service_id = HAL_SERVICE_ID_HANDSFREE;
--	cmd.mode = HAL_MODE_DEFAULT;
-+	cmd.mode = get_mode();
- 
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 8eb97c3..dd25f6e 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -385,6 +385,8 @@ struct hal_cmd_pan_disconnect {
- 
- /* Handsfree HAL API */
- 
-+#define HAL_MODE_HANDSFREE_HSP_ONLY		0x01
-+
- #define HAL_OP_HANDSFREE_CONNECT		0x01
- struct hal_cmd_handsfree_connect {
- 	uint8_t bdaddr[6];
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 6149c62..4f69e68 100644
+index 0b97a5d..6149c62 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -820,14 +820,14 @@ static void cleanup_hfp_ag(void)
+@@ -184,7 +184,7 @@ drop:
+ 	g_io_channel_shutdown(chan, TRUE, NULL);
+ }
  
- bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+-static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
++static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
  {
--	DBG("");
-+	DBG("mode 0x%x", mode);
+ 	sdp_list_t *protos, *classes;
+ 	GError *gerr = NULL;
+@@ -195,12 +195,13 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	DBG("");
  
- 	bacpy(&adapter_addr, addr);
- 
- 	if (!enable_hsp_ag())
- 		return false;
- 
--	if (!enable_hfp_ag()) {
-+	if (mode != HAL_MODE_HANDSFREE_HSP_ONLY && !enable_hfp_ag()) {
- 		cleanup_hsp_ag();
- 		return false;
+ 	if (err < 0) {
+-		error("handsfree: unable to get SDP record: %s", strerror(-err));
++		error("handsfree: unable to get SDP record: %s",
++								strerror(-err));
+ 		goto fail;
  	}
+ 
+ 	if (!recs || !recs->data) {
+-		error("handsfree: no SDP records found");
++		info("handsfree: no HSP SDP records found");
+ 		goto fail;
+ 	}
+ 
+@@ -216,6 +217,94 @@ static void sdp_search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	}
+ 
+ 	/* TODO read remote version? */
++	/* TODO read volume control support */
++
++	memcpy(&uuid, classes->data, sizeof(uuid));
++	sdp_list_free(classes, free);
++
++	if (!sdp_uuid128_to_uuid(&uuid) || uuid.type != SDP_UUID16 ||
++			uuid.value.uuid16 != HEADSET_SVCLASS_ID) {
++		sdp_list_free(protos, NULL);
++		error("handsfree: invalid service record or not HSP");
++		goto fail;
++	}
++
++	channel = sdp_get_proto_port(protos, RFCOMM_UUID);
++	sdp_list_foreach(protos, (sdp_list_func_t) sdp_list_free, NULL);
++	sdp_list_free(protos, NULL);
++	if (channel <= 0) {
++		error("handsfree: unable to get RFCOMM channel from record");
++		goto fail;
++	}
++
++	io = bt_io_connect(connect_cb, NULL, NULL, &gerr,
++				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++				BT_IO_OPT_DEST_BDADDR, &device.bdaddr,
++				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++				BT_IO_OPT_CHANNEL, channel,
++				BT_IO_OPT_INVALID);
++	if (!io) {
++		error("handsfree: unable to connect: %s", gerr->message);
++		g_error_free(gerr);
++		goto fail;
++	}
++
++	g_io_channel_unref(io);
++	return;
++
++fail:
++	device_cleanup();
++}
++
++static int sdp_search_hsp(void)
++{
++	uuid_t uuid;
++
++	sdp_uuid16_create(&uuid, HEADSET_SVCLASS_ID);
++
++	return bt_search_service(&adapter_addr, &device.bdaddr, &uuid,
++					sdp_hsp_search_cb, NULL, NULL, 0);
++}
++
++static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
++{
++	sdp_list_t *protos, *classes;
++	GError *gerr = NULL;
++	GIOChannel *io;
++	uuid_t uuid;
++	int channel;
++
++	DBG("");
++
++	if (err < 0) {
++		error("handsfree: unable to get SDP record: %s",
++								strerror(-err));
++		goto fail;
++	}
++
++	if (!recs || !recs->data) {
++		info("handsfree: no HFP SDP records found, trying HSP");
++
++		if (sdp_search_hsp() < 0) {
++			error("handsfree: HSP SDP search failed");
++			goto fail;
++		}
++
++		return;
++	}
++
++	if (sdp_get_service_classes(recs->data, &classes) < 0) {
++		error("handsfree: unable to get service classes from record");
++		goto fail;
++	}
++
++	if (sdp_get_access_protos(recs->data, &protos) < 0) {
++		error("handsfree: unable to get access protocols from record");
++		sdp_list_free(classes, free);
++		goto fail;
++	}
++
++	/* TODO read remote version? */
+ 
+ 	memcpy(&uuid, classes->data, sizeof(uuid));
+ 	sdp_list_free(classes, free);
+@@ -254,13 +343,23 @@ fail:
+ 	device_cleanup();
+ }
+ 
++static int sdp_search_hfp(void)
++{
++	uuid_t uuid;
++
++	sdp_uuid16_create(&uuid, HANDSFREE_SVCLASS_ID);
++
++	return bt_search_service(&adapter_addr, &device.bdaddr, &uuid,
++					sdp_hfp_search_cb, NULL, NULL, 0);
++}
++
+ static void handle_connect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_handsfree_connect *cmd = buf;
+ 	char addr[18];
+ 	uint8_t status;
+-	uuid_t uuid;
+ 	bdaddr_t bdaddr;
++	int ret;
+ 
+ 	DBG("");
+ 
+@@ -276,9 +375,9 @@ static void handle_connect(const void *buf, uint16_t len)
+ 
+ 	device_init(&bdaddr);
+ 
+-	sdp_uuid16_create(&uuid, HANDSFREE_SVCLASS_ID);
+-	if (bt_search_service(&adapter_addr, &device.bdaddr, &uuid,
+-					sdp_search_cb, NULL, NULL, 0) < 0) {
++	/* prefer HFP over HSP */
++	ret = hfp_server ? sdp_search_hfp() : sdp_search_hsp();
++	if (ret < 0) {
+ 		error("handsfree: SDP search failed");
+ 		device_cleanup();
+ 		status = HAL_STATUS_FAILED;
 -- 
 1.8.5.3
 
