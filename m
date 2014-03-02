@@ -1,101 +1,195 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Correct PICS and PTS tests
-Date: Mon,  3 Mar 2014 07:48:46 +0100
-Message-Id: <1393829326-32221-1-git-send-email-sebastian.chlad@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v3 6/8] android/handsfree: Add support for HSP AG
+Date: Mon,  3 Mar 2014 00:50:47 +0100
+Message-Id: <1393804249-12392-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
+References: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adjusting some optional PICS settings effecting in disabling some
-PTS test cases.
 ---
- android/pics-pan.txt |  4 ++--
- android/pts-pan.txt  | 29 ++++++++++++++++++-----------
- 2 files changed, 20 insertions(+), 13 deletions(-)
+ android/handsfree.c | 136 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 135 insertions(+), 1 deletion(-)
 
-diff --git a/android/pics-pan.txt b/android/pics-pan.txt
-index 16457bf..21c16b2 100644
---- a/android/pics-pan.txt
-+++ b/android/pics-pan.txt
-@@ -121,8 +121,8 @@ Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_PAN_4_1	True (#)	PANU: Support BNEP (M)
- TSPC_PAN_4_2	True (*#)	PANU: Support IPv4 (C.1)
--TSPC_PAN_4_3	True (*#)	PANU: Support ping client for IPv4 (O)
--TSPC_PAN_4_4	True (*#)	PANU: Support DHCP client for  IPv4 (O)
-+TSPC_PAN_4_3	False		PANU: Support ping client for IPv4 (O)
-+TSPC_PAN_4_4	False		PANU: Support DHCP client for  IPv4 (O)
- TSPC_PAN_4_5	False		PANU: Support DNS/LLMNR Resolver for IPv4 (O)
- TSPC_PAN_4_5a	True (#)	PANU: Support LLMNR Sender for IPv4 (C.2)
- TSPC_PAN_4_5b	False		PANU: Support LLMNR Responder for IPv4 (O)
-diff --git a/android/pts-pan.txt b/android/pts-pan.txt
-index 8e8ae41..37c78fc 100644
---- a/android/pts-pan.txt
-+++ b/android/pts-pan.txt
-@@ -10,9 +10,9 @@ FAIL	test failed
- INC	test is inconclusive
- N/A	test is disabled due to PICS setup
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 7a1d697..0b97a5d 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -46,7 +46,9 @@
+ #include "src/log.h"
+ #include "utils.h"
  
---------------------------------------------------------------------------------
-+-------------------------------------------------------------------------------------------
- Test Name				Result	Notes
---------------------------------------------------------------------------------
-+-------------------------------------------------------------------------------------------
- TC_BNEP_GN_BROADCAST_0_BV_03_C		N/A
- TC_GN_Ipv4_Autonet_BV_01_I		N/A
- TC_GN_Ipv6_Autonet_BV_02_I		N/A
-@@ -34,12 +34,15 @@ TC_BNEP_NAP_FORWARD_UNICAST_BV_05_C	N/A
- TC_BNEP_NAP_FORWARD_UNICAST_BV_06_C	N/A
- TC_BNEP_NAP_MULTICAST_0_BV_03_C		N/A
- TC_BNEP_NAP_MULTICAST_0_BV_04_C		N/A
--TC_BNEP_BRIDGE_RX_BV_02_I		INC
-+TC_BNEP_BRIDGE_RX_BV_02_I		INC	Tester needs to send one forward-unicast
-+							BNEP packet with given data (5 times)
-+							0x00, 0x01, 0xFF followed by
-+							0x00, 0x01, 0x9E, 0x9F
- TC_BNEP_BRIDGE_TX_BV_01_I		PASS
- TC_NAP_Ipv4_Autonet_BV_01_I		N/A
- TC_NAP_Ipv6_Autonet_BV_02_I		N/A
- TC_NAP_IP_DHCP_BV_03_I			N/A
--TC_NAP_IP_LLMNR_BV_01_I			INC
-+TC_NAP_IP_LLMNR_BV_01_I			INC	From IUT: send LLMNR request command
- TC_NAP_IP_LLMNR_BV_02_I			N/A
- TC_NAP_IP_DNS_BV_01_I			N/A
- TC_NAP_IP_APP_BV_01_I			N/A
-@@ -51,20 +54,24 @@ TC_SDP_NAP_BV_01_C			PASS
- TC_MISC_NAP_UUID_BV_01_C		PASS
- TC_MISC_NAP_UUID_BV_02_C		PASS
- TC_BNEP_PANU_BROADCAST_0_BV_04_C	N/A
--TC_PANU_Ipv4_Autonet_BV_01_I		INC
-+TC_PANU_Ipv4_Autonet_BV_01_I		INC	When prompted connect to PTS. From IUT:
-+							issue ARP request
- TC_PANU_Ipv6_Autonet_BV_02_I		N/A
--TC_PANU_IP_LLMNR_BV_01_I		INC
-+TC_PANU_IP_LLMNR_BV_01_I		INC	When prompted connect to PTS. From IUT:
-+							send LLMNR request command
- TC_PANU_IP_LLMNR_BV_02_I		N/A
--TC_PANU_IP_DHCP_BV_03_I			PASS
-+TC_PANU_IP_DHCP_BV_03_I			N/A
- TC_PANU_IP_DNS_BV_01_I			N/A
- TC_PANU_IP_APP_BV_01_I			N/A
- TC_PANU_IP_APP_BV_02_I			N/A
--TC_PANU_IP_APP_BV_03_I			INC
--TC_PANU_IP_APP_BV_04_I			INC
--TC_PANU_IP_APP_BV_05_I			PASS
-+TC_PANU_IP_APP_BV_03_I			N/A
-+TC_PANU_IP_APP_BV_04_I			N/A
-+TC_PANU_IP_APP_BV_05_I			PASS	When prompted, connect to PTS and then
-+							when prompted terminate connection
-+							(IUT side)
- TC_SDP_PANU_BV_01_C			N/A
- TC_MISC_PANU_UUID_BV_01_C		N/A
- TC_MISC_PANU_UUID_BV_02_C		N/A
- TC_MISC_ROLE_BV_01_C			N/A
- TC_MISC_ROLE_BV_BV_02_C			N/A
---------------------------------------------------------------------------------
-+-------------------------------------------------------------------------------------------
++#define HSP_AG_CHANNEL 12
+ #define HFP_AG_CHANNEL 13
++
+ #define HFP_AG_FEATURES 0
+ 
+ static struct {
+@@ -61,6 +63,9 @@ static struct ipc *hal_ipc = NULL;
+ static uint32_t hfp_record_id = 0;
+ static GIOChannel *hfp_server = NULL;
+ 
++static uint32_t hsp_record_id = 0;
++static GIOChannel *hsp_server = NULL;
++
+ static void device_set_state(uint8_t state)
+ {
+ 	struct hal_ev_handsfree_conn_state ev;
+@@ -460,6 +465,129 @@ static const struct ipc_handler cmd_handlers[] = {
+ 			sizeof(struct hal_cmd_handsfree_phone_state_change)},
+ };
+ 
++static sdp_record_t *headset_ag_record(void)
++{
++	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
++	uuid_t root_uuid, svclass_uuid, ga_svclass_uuid;
++	uuid_t l2cap_uuid, rfcomm_uuid;
++	sdp_profile_desc_t profile;
++	sdp_list_t *aproto, *proto[2];
++	sdp_record_t *record;
++	sdp_data_t *channel;
++	uint8_t netid = 0x01;
++	sdp_data_t *network;
++	uint8_t ch = HSP_AG_CHANNEL;
++
++	record = sdp_record_alloc();
++	if (!record)
++		return NULL;
++
++	network = sdp_data_alloc(SDP_UINT8, &netid);
++	if (!network) {
++		sdp_record_free(record);
++		return NULL;
++	}
++
++	sdp_uuid16_create(&root_uuid, PUBLIC_BROWSE_GROUP);
++	root = sdp_list_append(0, &root_uuid);
++	sdp_set_browse_groups(record, root);
++
++	sdp_uuid16_create(&svclass_uuid, HEADSET_AGW_SVCLASS_ID);
++	svclass_id = sdp_list_append(0, &svclass_uuid);
++	sdp_uuid16_create(&ga_svclass_uuid, GENERIC_AUDIO_SVCLASS_ID);
++	svclass_id = sdp_list_append(svclass_id, &ga_svclass_uuid);
++	sdp_set_service_classes(record, svclass_id);
++
++	sdp_uuid16_create(&profile.uuid, HEADSET_PROFILE_ID);
++	profile.version = 0x0102;
++	pfseq = sdp_list_append(0, &profile);
++	sdp_set_profile_descs(record, pfseq);
++
++	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
++	proto[0] = sdp_list_append(0, &l2cap_uuid);
++	apseq = sdp_list_append(0, proto[0]);
++
++	sdp_uuid16_create(&rfcomm_uuid, RFCOMM_UUID);
++	proto[1] = sdp_list_append(0, &rfcomm_uuid);
++	channel = sdp_data_alloc(SDP_UINT8, &ch);
++	proto[1] = sdp_list_append(proto[1], channel);
++	apseq = sdp_list_append(apseq, proto[1]);
++
++	aproto = sdp_list_append(0, apseq);
++	sdp_set_access_protos(record, aproto);
++
++	sdp_set_info_attr(record, "Voice Gateway", 0, 0);
++
++	sdp_attr_add(record, SDP_ATTR_EXTERNAL_NETWORK, network);
++
++	sdp_data_free(channel);
++	sdp_list_free(proto[0], NULL);
++	sdp_list_free(proto[1], NULL);
++	sdp_list_free(apseq, NULL);
++	sdp_list_free(pfseq, NULL);
++	sdp_list_free(aproto, NULL);
++	sdp_list_free(root, NULL);
++	sdp_list_free(svclass_id, NULL);
++
++	return record;
++}
++
++static bool enable_hsp_ag(void)
++{
++	sdp_record_t *rec;
++	GError *err = NULL;
++
++	DBG("");
++
++	hsp_server =  bt_io_listen(NULL, confirm_cb, NULL, NULL, &err,
++					BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++					BT_IO_OPT_CHANNEL, HSP_AG_CHANNEL,
++					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
++					BT_IO_OPT_INVALID);
++	if (!hsp_server) {
++		error("Failed to listen on Headset rfcomm: %s", err->message);
++		g_error_free(err);
++		return false;
++	}
++
++	rec = headset_ag_record();
++	if (!rec) {
++		error("Failed to allocate Headset record");
++		goto failed;
++	}
++
++	if (bt_adapter_add_record(rec, 0) < 0) {
++		error("Failed to register Headset record");
++		sdp_record_free(rec);
++		goto failed;
++	}
++
++	hsp_record_id = rec->handle;
++
++	return true;
++
++failed:
++	g_io_channel_shutdown(hsp_server, TRUE, NULL);
++	g_io_channel_unref(hsp_server);
++	hsp_server = NULL;
++
++	return false;
++}
++
++static void cleanup_hsp_ag(void)
++{
++	if (hsp_server) {
++		g_io_channel_shutdown(hsp_server, TRUE, NULL);
++		g_io_channel_unref(hsp_server);
++		hsp_server = NULL;
++	}
++
++	if (hsp_record_id > 0) {
++		bt_adapter_remove_record(hsp_record_id);
++		hsp_record_id = 0;
++	}
++}
++
+ static sdp_record_t *hfp_ag_record(void)
+ {
+ 	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
+@@ -597,9 +725,14 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 
+ 	bacpy(&adapter_addr, addr);
+ 
+-	if (!enable_hfp_ag())
++	if (!enable_hsp_ag())
+ 		return false;
+ 
++	if (!enable_hfp_ag()) {
++		cleanup_hsp_ag();
++		return false;
++	}
++
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+@@ -615,4 +748,5 @@ void bt_handsfree_unregister(void)
+ 	hal_ipc = NULL;
+ 
+ 	cleanup_hfp_ag();
++	cleanup_hsp_ag();
+ }
 -- 
 1.8.5.3
 
