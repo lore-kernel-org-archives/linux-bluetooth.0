@@ -1,56 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 3 Mar 2014 15:15:18 +0800
+From: Adam Lee <adam8157@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ] core: retry connect_dbus() several times
+Message-ID: <20140303071518.GA3825@adam-laptop>
+References: <1393571362-27898-1-git-send-email-adam8157@gmail.com>
+ <04802ECE-6B8D-4DF4-BFFD-EABBD42BD30F@holtmann.org>
+ <20140228073113.GA3771@adam-laptop>
+ <CAJdJm_OnnyvMvLmCtYuLGOvUL0igK22gOCAP1G5KBvcJseaayw@mail.gmail.com>
+ <CABBYNZLP8oPywHhMDK1D9FATFi=gMAgdfde+SjwzCp=VSGy05A@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <1913683.ZfTpeeEFIY@leonov>
-References: <1393610480-5775-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1393610480-5775-2-git-send-email-andrzej.kaczmarek@tieto.com> <1913683.ZfTpeeEFIY@leonov>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Mon, 3 Mar 2014 09:32:13 +0100
-Message-ID: <CAF3PWx1fVjSnHOyu3e3zzw_m-Cxkc=2LSn_EXqf7ZdUFzjHj_A@mail.gmail.com>
-Subject: Re: [PATCH 1/5] android/hal-audio: Add open/close_endpoint helpers
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZLP8oPywHhMDK1D9FATFi=gMAgdfde+SjwzCp=VSGy05A@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+On Fri, Feb 28, 2014 at 03:10:41PM +0100, Luiz Augusto von Dentz wrote:
+> Hi Adam,
+> 
+> On Fri, Feb 28, 2014 at 1:22 PM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+> > Hi Adam,
+> >
+> > On Fri, Feb 28, 2014 at 3:31 AM, Adam Lee <adam8157@gmail.com> wrote:
+> >> connect_dbus() fails sometimes with Intel 7260 bluetooth, sleeping 0.5s
+> >> before executing bluetoothd workarounds it. I assume the firmware
+> >> patching slows down hardware initialization then fails to connect.
+> >>
+> >> Any other possibility? I'm not a D-Bus guru :)
+> >
+> > Please provide more details, e.g. the bluetoothd logs showing the
+> > problems, btmon output and which steps you are using to reproduce it.
+> > If you are using bluetoothctl, tell us which commands you are using.
+> 
+> My guess is that either your driver is not using .setup hook to do the
+> firmware patching or it is returning before it has fully initialize
+> the hardware, so please also add more information what is happening on
+> the driver side.
 
-On 1 March 2014 12:51, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Andrzej,
->
-> On Friday 28 of February 2014 19:01:16 Andrzej Kaczmarek wrote:
+Hi, all
 
-<snip>
+Please check https://bugs.launchpad.net/bugs/1221618
 
->> +     }
->> +
->> +     if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
->> +             error("fcntl(F_SETFL): %s (%d)", strerror(errno), errno);
->> +             return -errno;
->> +     }
->> +
->> +     return 0;
->> +}
->> +
->> +static bool open_endpoint(struct audio_endpoint *ep,
->> +                                             struct audio_input_config *cfg)
->> +{
->> +     struct audio_preset *preset;
->> +     const struct audio_codec *codec;
->> +     uint16_t mtu;
->> +     int fd;
->> +
->> +     if (ipc_open_stream_cmd(ep->id, &mtu, &fd, &preset) !=
->> +                                                     AUDIO_STATUS_SUCCESS)
->> +             return false;
->> +
->> +     if (!preset || fd < 0)
->
-> If this can happen despite ipc_open_stream_cmd() returned success then freeing
-> preset or closing fd should be handled here.
+It's already fixed in btusb. However, if it's related to initialization
+as Luiz and I guessed, maybe other hardwares have this issue too, that's
+the reason I submitted that harmless retry "workaround" into BlueZ.
+(have no objection to NAK)
 
-I'll remove this check since ipc_open_stream_cmd guarantees that both
-preset and fd are valid on success.
-
-BR,
-Andrzej
+-- 
+Adam Lee
+http://adam8157.info
