@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/9] android/avrcp: Add avrcp_set_player_value() function
-Date: Mon,  3 Mar 2014 14:53:45 +0200
-Message-Id: <1393851227-23483-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/9] unit/avrcp: Add /TP/PAS/BV-08-C test
+Date: Mon,  3 Mar 2014 14:53:40 +0200
+Message-Id: <1393851227-23483-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies that verify the get player application setting values
+response issued from the Target.
 ---
- android/avrcp-lib.c | 18 ++++++++++++++++++
- android/avrcp-lib.h |  3 +++
- 2 files changed, 21 insertions(+)
+ unit/test-avrcp.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 39d8d9a..63f87da 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -327,5 +327,23 @@ int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attributes,
- 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
- 				AVRCP_GET_CURRENT_PLAYER_VALUE, buf,
- 				attr_count + 1, func, user_data);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 44dc2f2..e45d995 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -362,6 +362,18 @@ fail:
+ 	return AVC_CTYPE_REJECTED;
+ }
+ 
++static uint8_t avrcp_handle_get_player_value_text(struct avrcp *session,
++				uint8_t transaction, uint16_t *params_len,
++				uint8_t *params, void *user_data)
++{
++	DBG("");
++
++	*params_len = 1;
++	params[0] = 0;
++
++	return AVC_CTYPE_STABLE;
 +}
 +
-+int avrcp_set_player_value(struct avrcp *session, uint8_t *attributes,
-+					uint8_t attr_count, uint8_t *values,
-+					avctp_rsp_cb func, void *user_data)
-+{
-+	uint8_t buf[2 * attr_count + 1];
-+	int i;
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+@@ -371,6 +383,8 @@ static const struct avrcp_control_handler control_handlers[] = {
+ 					avrcp_handle_get_player_attr_text },
+ 		{ AVRCP_LIST_PLAYER_VALUES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_list_player_values },
++		{ AVRCP_GET_PLAYER_VALUE_TEXT, AVC_CTYPE_STATUS,
++					avrcp_handle_get_player_value_text },
+ 		{ },
+ };
  
-+	buf[0] = attr_count;
+@@ -537,5 +551,15 @@ int main(int argc, char *argv[])
+ 				AVRCP_LIST_PLAYER_VALUES,
+ 				0x00, 0x00, 0x01, 0x00));
+ 
++	define_test("/TP/PAS/BV-08-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_PLAYER_VALUE_TEXT,
++				0x00, 0x00, 0x01, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_PLAYER_VALUE_TEXT,
++				0x00, 0x00, 0x01, 0x00));
 +
-+	for (i = 0; i < attr_count; i++) {
-+		buf[i * 2 + 1] = attributes[i];
-+		buf[i * 2 + 2] = values[i];
-+	}
-+
-+	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
-+				AVRCP_SET_PLAYER_VALUE, buf, 2 * attr_count + 1,
-+				func, user_data);
+ 	return g_test_run();
  }
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 1f7eab0..c6d61e4 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -124,3 +124,6 @@ int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
- int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attributes,
- 					uint8_t attr_count, avctp_rsp_cb func,
- 					void *user_data);
-+int avrcp_set_player_value(struct avrcp *session, uint8_t *attributes,
-+					uint8_t attr_count, uint8_t *values,
-+					avctp_rsp_cb func, void *user_data);
 -- 
 1.8.3.2
 
