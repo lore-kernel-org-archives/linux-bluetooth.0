@@ -1,45 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Mar 2014 15:34:44 -0500
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-02-28
-Message-ID: <20140303203444.GE26300@tuxdriver.com>
-References: <20140228193819.GA1700@joana>
+Date: Mon, 3 Mar 2014 20:38:53 +0100
+From: Sander Eikelenboom <linux@eikelenboom.it>
+Message-ID: <1335661753.20140303203853@eikelenboom.it>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Peter Hurley <peter@hurleysoftware.com>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Gianluca Anzolin <gianluca@sottospazio.it>,
+	Alexander Holler <holler@ahsoftware.de>,
+	Andrey Vihrov <andrey.vihrov@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/24] rfcomm fixes
+In-Reply-To: <1259174563.20140212120644@eikelenboom.it>
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <1259174563.20140212120644@eikelenboom.it>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140228193819.GA1700@joana>
-Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Feb 28, 2014 at 04:38:19PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Another pull request to 3.15. Here we have the second part of the LE private
-> feature, the LE auto-connect feature and improvements to the power off
-> procedures. The rest are small improvements, clean up, and fixes.
-> 
-> Please pull or let me know of any problem. Thanks.
-> 
-> 	Gustavo
-> 
-> ---
-> 
-> The following changes since commit 668b7b19820b0801c425d31cc27fd6f499050e5c:
-> 
->   Bluetooth: Fix iterating wrong list in hci_remove_irk() (2014-02-21 11:07:46 -0300)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to 81ad6fd9698f659dbabdc6cd3e1667a98eb2be3b:
-> 
->   Bluetooth: Remove unnecessary stop_scan_complete function (2014-02-28 10:28:17 -0800)
 
-Pulling now...
+Wednesday, February 12, 2014, 12:06:44 PM, you wrote:
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+> Monday, February 10, 2014, 11:09:38 PM, you wrote:
+
+>> Hi Peter,
+
+>>> This patch series addresses a number of previously unknown issues
+>>> with the RFCOMM tty device implementation, in addition to
+>>> addressing the locking regression recently reported [1].
+>>> 
+>>> As Gianluca suggested and I agree, this series first reverts
+>>> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
+
+>> so for 3.14 we should revert 3 patches. And then the other 21 are intended for 3.15 merge window.
+
+>> I realize that we still have to deal with some breakage, but we do not want regressions and I clearly not going to take 24 patches for 3.14 at this point in time.
+
+>> What I can do is take all 24 patches into bluetooth-next and let them sit for 1 week and have people test them. And then we go ahead with reverting 3 patches from 3.14. Does that make sense?
+
+> Reverting those 3 patches works for me.
+
+> --
+> Sander
+
+>> Regards
+
+>> Marcel
+
+Hi Marcel,
+
+Ping... it seems these 3 reverts are still not in 3.14-rc5 to fix the regressions ?
+
+--
+Sander
