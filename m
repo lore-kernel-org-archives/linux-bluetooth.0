@@ -1,35 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/9] avrcp: Fix buffer size check
-Date: Mon,  3 Mar 2014 14:53:41 +0200
-Message-Id: <1393851227-23483-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20140303095237.GB4999@aemeltch-MOBL1>
+References: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
+	<1393786109-6554-3-git-send-email-luiz.dentz@gmail.com>
+	<20140303095237.GB4999@aemeltch-MOBL1>
+Date: Mon, 3 Mar 2014 14:41:19 +0200
+Message-ID: <CABBYNZ+2AasvfUbm8US6izAR8O1Vv91rLXb2a4R3kuM-PEUF4g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 03/16] android/avrcp-lib: Rework handler callback parameters
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Fix size check taking into account that attributes starts from 1 (0 is
-illegal).
----
- profiles/audio/avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Mar 3, 2014 at 11:52 AM, Andrei Emeltchenko
+<andrei.emeltchenko.news@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Sun, Mar 02, 2014 at 08:48:18PM +0200, Luiz Augusto von Dentz wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This rework handler callback parameters to make it able to return
+>> proper error such as -EAGAIN to implement asynchronous responses.
+>> ---
+>>  android/avrcp-lib.c | 12 +++++++++---
+>>  android/avrcp-lib.h |  5 +++--
+>>  unit/test-avrcp.c   | 42 +++++++++++++++++++++---------------------
+>>  3 files changed, 33 insertions(+), 26 deletions(-)
+>>
+>> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+>> index cdad6ac..339be16 100644
+>> --- a/android/avrcp-lib.c
+>> +++ b/android/avrcp-lib.c
+>> @@ -125,6 +125,7 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+>>       struct avrcp_header *pdu = (void *) operands;
+>>       uint32_t company_id = ntoh24(pdu->company_id);
+>>       uint16_t params_len = ntohs(pdu->params_len);
+>> +     ssize_t ret;
+>>
+>>       if (company_id != IEEEID_BTSIG) {
+>>               *code = AVC_CTYPE_NOT_IMPLEMENTED;
+>> @@ -159,12 +160,17 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
+>>               goto reject;
+>>       }
+>>
+>> -     *code = handler->func(session, transaction, &params_len,
+>> +     ret = handler->func(session, transaction, code, params_len,
+>>                                       pdu->params, session->control_data);
+>> +     if (ret < 0) {
+>> +             if (ret == -EAGAIN)
+>> +                     return ret;
+>> +             goto reject;
+>> +     }
+>>
+>> -     pdu->params_len = htons(params_len);
+>> +     pdu->params_len = htons(ret);
+>>
+>> -     return AVRCP_HEADER_LENGTH + params_len;
+>> +     return AVRCP_HEADER_LENGTH + ret;
+>>
+>>  reject:
+>>       pdu->params_len = htons(1);
+>> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+>> index a33bdfe..d7a805b 100644
+>> --- a/android/avrcp-lib.h
+>> +++ b/android/avrcp-lib.h
+>> @@ -79,8 +79,9 @@ struct avrcp;
+>>  struct avrcp_control_handler {
+>>       uint8_t id;
+>>       uint8_t code;
+>> -     uint8_t (*func) (struct avrcp *session, uint8_t transaction,
+>> -                     uint16_t *params_len, uint8_t *params, void *user_data);
+>> +     ssize_t (*func) (struct avrcp *session, uint8_t transaction,
+>> +                     uint8_t *code, uint16_t params_len, uint8_t *params,
+>> +                     void *user_data);
+>>  };
+>>
+>>  struct avrcp_passthrough_handler {
+>> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+>> index 302c331..2d5711b 100644
+>> --- a/unit/test-avrcp.c
+>> +++ b/unit/test-avrcp.c
+>> @@ -292,54 +292,54 @@ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
+>>               { },
+>>  };
+>>
+>> -static uint8_t avrcp_handle_get_capabilities(struct avrcp *session,
+>> -                             uint8_t transaction, uint16_t *params_len,
+>> -                             uint8_t *params, void *user_data)
+>> +static ssize_t avrcp_handle_get_capabilities(struct avrcp *session,
+>> +                                     uint8_t transaction, uint8_t *code,
+>> +                                     uint16_t params_len, uint8_t *params,
+>> +                                     void *user_data)
+>>  {
+>>       uint32_t id = 0x001958;
+>>
+>> -     DBG("params[0] %d params_len %d", params[0], *params_len);
+>> -
+>> -     if (*params_len != 1)
+>> +     if (params_len != 1)
+>>               goto fail;
+>>
+>>       switch (params[0]) {
+>>       case CAP_COMPANY_ID:
+>> -             *params_len = 5;
+>>               params[1] = 1;
+>>               hton24(&params[2], id);
+>> -             return AVC_CTYPE_STABLE;
+>> +             *code = AVC_CTYPE_STABLE;
+>> +             return 5;
+>
+> What is 5? Shall we define constants or use formulas?
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index bea2dd2..aa932e0 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1909,7 +1909,7 @@ static void avrcp_get_current_player_value(struct avrcp *session,
- 	struct avrcp_header *pdu = (void *) buf;
- 	uint16_t length = AVRCP_HEADER_LENGTH + count + 1;
- 
--	if (count > AVRCP_ATTRIBUTE_LAST + 1)
-+	if (count > AVRCP_ATTRIBUTE_LAST)
- 		return;
- 
- 	memset(buf, 0, sizeof(buf));
+This is the param length, ideally we should define structs for all the PDUs.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
