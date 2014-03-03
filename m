@@ -1,55 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 3 Mar 2014 20:38:53 +0100
-From: Sander Eikelenboom <linux@eikelenboom.it>
-Message-ID: <1335661753.20140303203853@eikelenboom.it>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Peter Hurley <peter@hurleysoftware.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Gianluca Anzolin <gianluca@sottospazio.it>,
-	Alexander Holler <holler@ahsoftware.de>,
-	Andrey Vihrov <andrey.vihrov@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 00/24] rfcomm fixes
-In-Reply-To: <1259174563.20140212120644@eikelenboom.it>
-References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <1259174563.20140212120644@eikelenboom.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
+	<CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com>
+	<A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org>
+	<CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com>
+	<407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org>
+	<0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org>
+Date: Mon, 3 Mar 2014 14:02:42 -0400
+Message-ID: <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com>
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Adam Warski <adam@warski.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Adam,
 
-Wednesday, February 12, 2014, 12:06:44 PM, you wrote:
+On Mon, Mar 3, 2014 at 11:26 AM, Adam Warski <adam@warski.org> wrote:
+> I'm wondering what this might mean exactly :) I guess it could point to the
+> specific USB/bluetooth drivers present in the raspbian 3.10 and ubuntu 3.11
+> kernels, right?
 
-> Monday, February 10, 2014, 11:09:38 PM, you wrote:
+I didn't notice that you were using Raspberry PI... To rule out USB
+power issues, can you try attaching a powered USB hub on the RPi, and
+then attach your BT dongle on it?
 
->> Hi Peter,
+I always had strange/random problems on RPi with USB HW plugged
+directly on the USB port (except for pen drives, which work fine),
+even for devices which supposedly draw very little current.
 
->>> This patch series addresses a number of previously unknown issues
->>> with the RFCOMM tty device implementation, in addition to
->>> addressing the locking regression recently reported [1].
->>> 
->>> As Gianluca suggested and I agree, this series first reverts
->>> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
+Given that you are disabling duplicate filtering, every single
+Advertising packet is arriving at the host, so it is certainly using
+more power. Just not sure if that is the cause.
 
->> so for 3.14 we should revert 3 patches. And then the other 21 are intended for 3.15 merge window.
-
->> I realize that we still have to deal with some breakage, but we do not want regressions and I clearly not going to take 24 patches for 3.14 at this point in time.
-
->> What I can do is take all 24 patches into bluetooth-next and let them sit for 1 week and have people test them. And then we go ahead with reverting 3 patches from 3.14. Does that make sense?
-
-> Reverting those 3 patches works for me.
-
-> --
-> Sander
-
->> Regards
-
->> Marcel
-
-Hi Marcel,
-
-Ping... it seems these 3 reverts are still not in 3.14-rc5 to fix the regressions ?
-
---
-Sander
+Best Regards,
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
