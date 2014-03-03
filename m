@@ -2,92 +2,181 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 4/5] android/hal-audio: Use payload length for codec init
-Date: Mon, 3 Mar 2014 09:56:41 +0100
-Message-ID: <1393837002-29703-4-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1393837002-29703-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1393837002-29703-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 1/5] android/hal-audio: Add open/close_endpoint helpers
+Date: Mon, 3 Mar 2014 09:56:38 +0100
+Message-ID: <1393837002-29703-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It makes more sense to pass maximum payload length to codec since this
-is actually used for calculations. MTU value is used only to allocate
-proper buffer.
 ---
- android/hal-audio.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+ android/hal-audio.c | 117 +++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 66 insertions(+), 51 deletions(-)
 
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 78f89bd..5a69b52 100644
+index 79a74b8..f6bc998 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -387,11 +387,10 @@ static void sbc_init_encoder(struct sbc_data *sbc_data)
- 			in->min_bitpool, in->max_bitpool);
+@@ -914,6 +914,70 @@ static void unregister_endpoints(void)
+ 	}
  }
  
--static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
-+static int sbc_codec_init(struct audio_preset *preset, uint16_t payload_len,
- 							void **codec_data)
++static int set_blocking(int fd)
++{
++	int flags;
++
++	flags = fcntl(fd, F_GETFL, 0);
++	if (flags < 0) {
++		int err = -errno;
++		error("fcntl(F_GETFL): %s (%d)", strerror(-err), -err);
++		return err;
++	}
++
++	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
++		int err = -errno;
++		error("fcntl(F_SETFL): %s (%d)", strerror(-err), -err);
++		return err;
++	}
++
++	return 0;
++}
++
++static bool open_endpoint(struct audio_endpoint *ep,
++						struct audio_input_config *cfg)
++{
++	struct audio_preset *preset;
++	const struct audio_codec *codec;
++	uint16_t mtu;
++	int fd;
++
++	if (ipc_open_stream_cmd(ep->id, &mtu, &fd, &preset) !=
++							AUDIO_STATUS_SUCCESS)
++		return false;
++
++	if (set_blocking(fd) < 0)
++		goto failed;
++
++	ep->fd = fd;
++
++	codec = ep->codec;
++	codec->init(preset, mtu, &ep->codec_data);
++	codec->get_config(ep->codec_data, cfg);
++
++	free(preset);
++
++	return true;
++
++failed:
++	close(fd);
++	free(preset);
++
++	return false;
++}
++
++static void close_endpoint(struct audio_endpoint *ep)
++{
++	ipc_close_stream_cmd(ep->id);
++	if (ep->fd >= 0) {
++		close(ep->fd);
++		ep->fd = -1;
++	}
++
++	ep->codec->cleanup(ep->codec_data);
++	ep->codec_data = NULL;
++}
++
+ static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
+ 								size_t bytes)
  {
- 	struct sbc_data *sbc_data;
--	size_t hdr_len = sizeof(struct media_packet);
- 	size_t in_frame_len;
- 	size_t out_frame_len;
- 	size_t num_frames;
-@@ -411,7 +410,7 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
+@@ -1260,26 +1324,6 @@ static int in_remove_audio_effect(const struct audio_stream *stream,
+ 	return -ENOSYS;
+ }
  
- 	in_frame_len = sbc_get_codesize(&sbc_data->enc);
- 	out_frame_len = sbc_get_frame_length(&sbc_data->enc);
--	num_frames = (mtu - hdr_len) / out_frame_len;
-+	num_frames = payload_len / out_frame_len;
+-static int set_blocking(int fd)
+-{
+-	int flags;
+-
+-	flags = fcntl(fd, F_GETFL, 0);
+-	if (flags < 0) {
+-		int err = -errno;
+-		error("fcntl(F_GETFL): %s (%d)", strerror(-err), -err);
+-		return err;
+-	}
+-
+-	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
+-		int err = -errno;
+-		error("fcntl(F_SETFL): %s (%d)", strerror(-err), -err);
+-		return err;
+-	}
+-
+-	return 0;
+-}
+-
+ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 					audio_io_handle_t handle,
+ 					audio_devices_t devices,
+@@ -1290,10 +1334,6 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ {
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
+ 	struct a2dp_stream_out *out;
+-	struct audio_preset *preset;
+-	const struct audio_codec *codec;
+-	uint16_t mtu;
+-	int fd;
  
- 	sbc_data->in_frame_len = in_frame_len;
- 	sbc_data->in_buf_size = num_frames * in_frame_len;
-@@ -421,8 +420,8 @@ static int sbc_codec_init(struct audio_preset *preset, uint16_t mtu,
- 	sbc_data->frame_duration = sbc_get_frame_duration(&sbc_data->enc);
- 	sbc_data->frames_per_packet = num_frames;
+ 	out = calloc(1, sizeof(struct a2dp_stream_out));
+ 	if (!out)
+@@ -1321,29 +1361,12 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	/* TODO: for now we always use endpoint 0 */
+ 	out->ep = &audio_endpoints[0];
  
--	DBG("mtu=%u in_frame_len=%zu out_frame_len=%zu frames_per_packet=%zu",
--			mtu, in_frame_len, out_frame_len, num_frames);
-+	DBG("in_frame_len=%zu out_frame_len=%zu frames_per_packet=%zu",
-+				in_frame_len, out_frame_len, num_frames);
+-	if (ipc_open_stream_cmd(out->ep->id, &mtu, &fd, &preset) !=
+-							AUDIO_STATUS_SUCCESS)
+-		goto fail;
+-
+-	if (!preset || fd < 0)
+-		goto fail;
+-
+-	if (set_blocking(fd) < 0) {
+-		free(preset);
++	if (!open_endpoint(out->ep, &out->cfg))
+ 		goto fail;
+-	}
+-
+-	out->ep->fd = fd;
+-	codec = out->ep->codec;
+-
+-	codec->init(preset, mtu, &out->ep->codec_data);
+-	codec->get_config(out->ep->codec_data, &out->cfg);
  
- 	*codec_data = sbc_data;
+ 	DBG("rate=%d channels=%d format=%d", out->cfg.rate,
+ 					out->cfg.channels, out->cfg.format);
  
-@@ -887,6 +886,7 @@ static bool open_endpoint(struct audio_endpoint *ep,
- 	struct audio_preset *preset;
- 	const struct audio_codec *codec;
- 	uint16_t mtu;
-+	uint16_t payload_len;
- 	int fd;
+-	free(preset);
+-
+ 	if (out->cfg.channels == AUDIO_CHANNEL_OUT_MONO) {
+ 		out->downmix_buf = malloc(FIXED_BUFFER_SIZE / 2);
+ 		if (!out->downmix_buf)
+@@ -1369,18 +1392,10 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
+ {
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
+ 	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
+-	struct audio_endpoint *ep = a2dp_dev->out->ep;
  
- 	if (ipc_open_stream_cmd(ep->id, &mtu, &fd, &preset) !=
-@@ -896,10 +896,14 @@ static bool open_endpoint(struct audio_endpoint *ep,
- 	if (set_blocking(fd) < 0)
- 		goto failed;
+ 	DBG("");
  
-+	DBG("mtu=%u", mtu);
-+
-+	payload_len = mtu - sizeof(*ep->mp);
-+
- 	ep->fd = fd;
+-	ipc_close_stream_cmd(ep->id);
+-	if (ep->fd >= 0) {
+-		close(ep->fd);
+-		ep->fd = -1;
+-	}
+-
+-	ep->codec->cleanup(ep->codec_data);
+-	ep->codec_data = NULL;
++	close_endpoint(a2dp_dev->out->ep);
  
- 	codec = ep->codec;
--	codec->init(preset, mtu, &ep->codec_data);
-+	codec->init(preset, payload_len, &ep->codec_data);
- 	codec->get_config(ep->codec_data, cfg);
- 
- 	ep->mp = calloc(mtu, 1);
-@@ -909,7 +913,7 @@ static bool open_endpoint(struct audio_endpoint *ep,
- 	ep->mp->hdr.pt = 1;
- 	ep->mp->hdr.ssrc = htonl(1);
- 
--	ep->mp_data_len = mtu - sizeof(*ep->mp);
-+	ep->mp_data_len = payload_len;
- 
- 	free(preset);
+ 	free(out->downmix_buf);
  
 -- 
 1.8.5.4
