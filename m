@@ -1,33 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
-From: Adam Warski <adam@warski.org>
-In-Reply-To: <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org>
-Date: Mon, 3 Mar 2014 16:27:27 +0100
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <018DA7AF-5E7C-4E18-949C-E7EED9F9EB52@warski.org>
-References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com> <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: Re: [PATCH 7/7] Add /hfp/test_hfp_gw_register_3 and /hfp/test_hfp_gw_register_4
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393835812-24238-7-git-send-email-marcin.kraglak@tieto.com>
+Date: Mon, 3 Mar 2014 07:23:05 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <E6E2219B-6B0E-435F-AA12-4194885D0691@holtmann.org>
+References: <1393835812-24238-1-git-send-email-marcin.kraglak@tieto.com> <1393835812-24238-7-git-send-email-marcin.kraglak@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Marcin,
 
-> I messed up the model number, looked at the wrong dongle, TP-Link is the WiFi one ;)
-> The bluetooth one is an IOGear GBU521 (http://www.iogear.com/product/GBU521/).
+> unit/test-hfp.c | 31 +++++++++++++++++++++++++++++++
+> 1 file changed, 31 insertions(+)
 > 
-> I don’t have another dongle right now (I tried a different IOGear, but same thing), but I’ll try setting a VM on my laptop/getting a different USB dongle.
+> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+> index 5e4fc11..64ecc60 100644
+> --- a/unit/test-hfp.c
+> +++ b/unit/test-hfp.c
+> @@ -266,6 +266,33 @@ static const struct test_data test_register_2 = {
+> 	.prefix = prefix_brsf
+> };
+> 
+> +static const char atbrsf_read[] = {'A', 'T', '+', 'B', 'R', 'S', 'F', '?',
+> +									'\r'};
+> +
 
-I’ve setup an Ubuntu 13.10 VM (kernel 3.11.0-17), same dongle (IOGear), bluez 5.15, and it works without problems - at least for the past 15 minutes ;) (usually it work at most 2 minutes).
+	= “AT+BRSF?\r”;
 
-I’m wondering what this might mean exactly :) I guess it could point to the specific USB/bluetooth drivers present in the raspbian 3.10 and ubuntu 3.11 kernels, right? 
+> +static const struct test_data test_register_3 = {
+> +	.command_cb = cmd_handler,
+> +	.server_send = atbrsf_read,
+> +	.data_len = sizeof(atbrsf_read),
+> +	.expected_rsp = err_rsp,
+> +	.expected_rsp_len = sizeof(err_rsp),
+> +	.result_cb = prefix_handler,
+> +	.expected_cmd_type = HFP_GW_CMD_TYPE_READ,
+> +	.prefix = prefix_brsf
+> +};
+> +
+> +static const char prefix_d[] = "D”;
 
-Adam
+I wonder why here it is acceptable and above you are making the huge effort to give every character separately.
 
--- 
-Adam Warski
+Regards
 
-http://twitter.com/#!/adamwarski
-http://www.softwaremill.com
-http://www.warski.org
+Marcel
 
