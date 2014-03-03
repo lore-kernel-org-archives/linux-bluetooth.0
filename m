@@ -1,50 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/8] android/tester: Add create bond with PIN fail test case
-Date: Mon,  3 Mar 2014 11:44:12 +0100
-Message-Id: <1393843458-5237-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1393843458-5237-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1393843458-5237-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 1/8] android/tester: Add create bond with PIN success test case
+Date: Mon,  3 Mar 2014 11:44:11 +0100
+Message-Id: <1393843458-5237-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds create bond with PIN fail test case.
+This adds create bond with PIN success test case.
 ---
- android/android-tester.c | 93 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 93 insertions(+)
+ android/android-tester.c | 138 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 136 insertions(+), 2 deletions(-)
 
 diff --git a/android/android-tester.c b/android/android-tester.c
-index df89d82..a7f5f2d 100644
+index a94c536..df89d82 100644
 --- a/android/android-tester.c
 +++ b/android/android-tester.c
-@@ -1037,6 +1037,21 @@ static void bond_device_found_cb(int num_properties, bt_property_t *properties)
- 	}
+@@ -124,6 +124,8 @@ struct bt_cb_data {
+ 	bt_status_t status;
+ 
+ 	bt_bdaddr_t bdaddr;
++	bt_bdname_t bdname;
++	uint32_t cod;
+ 
+ 	int num;
+ 	bt_property_t *props;
+@@ -1019,6 +1021,22 @@ static void remote_setprop_fail_device_found_cb(int num_properties,
+ 	check_expected_status(status);
  }
  
-+static void bond_nostatus_device_found_cb(int num_properties,
-+						bt_property_t *properties)
++static void bond_device_found_cb(int num_properties, bt_property_t *properties)
 +{
 +	struct test_data *data = tester_get_data();
 +	uint8_t *bdaddr = (uint8_t *)hciemu_get_client_bdaddr(data->hciemu);
 +	bt_bdaddr_t remote_addr;
++	bt_status_t status;
 +
 +	bdaddr2android((const bdaddr_t *)bdaddr, &remote_addr.address);
 +
 +	if (data->cb_count == 4) {
 +		data->cb_count--;
-+		data->if_bluetooth->create_bond(&remote_addr);
++		status = data->if_bluetooth->create_bond(&remote_addr);
++		check_expected_status(status);
 +	}
 +}
 +
  static gboolean device_found(gpointer user_data)
  {
  	struct test_data *data = tester_get_data();
-@@ -1190,6 +1205,25 @@ static void bond_test_bonded_state_changed_cb(bt_status_t status,
- 	}
+@@ -1153,6 +1171,92 @@ static void remote_device_properties_cb(bt_status_t status,
+ 	g_idle_add(remote_device_properties, cb_data);
  }
  
-+static void bond_test_none_state_changed_cb(bt_status_t status,
++static void bond_test_bonded_state_changed_cb(bt_status_t status,
 +			bt_bdaddr_t *remote_bd_addr, bt_bond_state_t state)
 +{
 +	struct test_data *data = tester_get_data();
@@ -53,7 +61,7 @@ index df89d82..a7f5f2d 100644
 +	case BT_BOND_STATE_BONDING:
 +		data->cb_count--;
 +		break;
-+	case BT_BOND_STATE_NONE:
++	case BT_BOND_STATE_BONDED:
 +		data->cb_count--;
 +		check_cb_count();
 +		break;
@@ -63,20 +71,39 @@ index df89d82..a7f5f2d 100644
 +	}
 +}
 +
- static gboolean bond_state_changed(gpointer user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -1231,6 +1265,21 @@ static void bond_create_pin_success_request_cb(bt_bdaddr_t *remote_bd_addr,
- 	data->if_bluetooth->pin_reply(bdaddr, TRUE, pin_len, &pin_code);
- }
- 
-+static void bond_create_pin_fail_request_cb(bt_bdaddr_t *remote_bd_addr,
++static gboolean bond_state_changed(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	struct bt_cb_data *cb_data = user_data;
++
++	if (data->test_init_done && test->expected_hal_cb.bond_state_changed_cb)
++		test->expected_hal_cb.bond_state_changed_cb(cb_data->status,
++					&cb_data->bdaddr, cb_data->state);
++
++	g_free(cb_data);
++	return FALSE;
++}
++
++static void bond_state_changed_cb(bt_status_t status,
++			bt_bdaddr_t *remote_bd_addr, bt_bond_state_t state)
++{
++	struct bt_cb_data *cb_data = g_new0(struct bt_cb_data, 1);
++
++	cb_data->status = status;
++	cb_data->bdaddr = *remote_bd_addr;
++	cb_data->state = state;
++
++	g_idle_add(bond_state_changed, cb_data);
++}
++
++static void bond_create_pin_success_request_cb(bt_bdaddr_t *remote_bd_addr,
 +					bt_bdname_t *bd_name, uint32_t cod)
 +{
 +	struct test_data *data = tester_get_data();
 +	const bt_bdaddr_t *bdaddr = remote_bd_addr;
 +	bt_pin_code_t pin_code = {
-+	.pin = { 0x31, 0x31, 0x31, 0x31 },
++	.pin = { 0x30, 0x30, 0x30, 0x30 },
 +	};
 +	uint8_t pin_len = 4;
 +
@@ -85,47 +112,68 @@ index df89d82..a7f5f2d 100644
 +	data->if_bluetooth->pin_reply(bdaddr, TRUE, pin_len, &pin_code);
 +}
 +
- static gboolean pin_request(gpointer user_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -2288,6 +2337,15 @@ static const struct generic_data bt_bond_create_pin_success_test = {
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
++static gboolean pin_request(gpointer user_data)
++{
++	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
++	struct bt_cb_data *cb_data = user_data;
++
++	if (data->test_init_done && test->expected_hal_cb.pin_request_cb)
++		test->expected_hal_cb.pin_request_cb(&cb_data->bdaddr,
++						&cb_data->bdname, cb_data->cod);
++
++	g_free(cb_data);
++	return FALSE;
++}
++
++static void pin_request_cb(bt_bdaddr_t *remote_bd_addr,
++					bt_bdname_t *bd_name, uint32_t cod)
++{
++	struct bt_cb_data *cb_data = g_new0(struct bt_cb_data, 1);
++
++	cb_data->bdaddr = *remote_bd_addr;
++	cb_data->bdname = *bd_name;
++	cb_data->cod = cod;
++
++	g_idle_add(pin_request, cb_data);
++}
++
+ static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
+ static const char enable_done_bdname_val[] = "BlueZ for Android";
+ static bt_uuid_t enable_done_uuids_val = {
+@@ -2175,6 +2279,15 @@ static const struct generic_data bt_dev_setprop_disctimeout_fail_test = {
+ 	.expected_adapter_status = BT_STATUS_FAIL,
  };
  
-+static const struct generic_data bt_bond_create_pin_fail_test = {
-+	.expected_hal_cb.device_found_cb = bond_nostatus_device_found_cb,
++static const struct generic_data bt_bond_create_pin_success_test = {
++	.expected_hal_cb.device_found_cb = bond_device_found_cb,
 +	.expected_hal_cb.bond_state_changed_cb =
-+						bond_test_none_state_changed_cb,
-+	.expected_hal_cb.pin_request_cb = bond_create_pin_fail_request_cb,
++					bond_test_bonded_state_changed_cb,
++	.expected_hal_cb.pin_request_cb = bond_create_pin_success_request_cb,
 +	.expected_cb_count = 4,
-+	.expected_adapter_status = MGMT_STATUS_AUTH_FAILED,
++	.expected_adapter_status = BT_STATUS_SUCCESS,
 +};
 +
  static bt_callbacks_t bt_callbacks = {
  	.size = sizeof(bt_callbacks),
  	.adapter_state_changed_cb = adapter_state_changed_cb,
-@@ -3026,6 +3084,16 @@ static void test_dev_setprop_disctimeout_fail(const void *test_data)
+@@ -2182,9 +2295,9 @@ static bt_callbacks_t bt_callbacks = {
+ 	.remote_device_properties_cb = remote_device_properties_cb,
+ 	.device_found_cb = device_found_cb,
+ 	.discovery_state_changed_cb = discovery_state_changed_cb,
+-	.pin_request_cb = NULL,
++	.pin_request_cb = pin_request_cb,
+ 	.ssp_request_cb = NULL,
+-	.bond_state_changed_cb = NULL,
++	.bond_state_changed_cb = bond_state_changed_cb,
+ 	.acl_state_changed_cb = NULL,
+ 	.thread_evt_cb = NULL,
+ 	.dut_mode_recv_cb = NULL,
+@@ -2913,6 +3026,22 @@ static void test_dev_setprop_disctimeout_fail(const void *test_data)
  
  	data->if_bluetooth->start_discovery();
  }
-+
-+static void bond_device_auth_fail_callback(uint16_t index, uint16_t length,
-+							const void *param,
-+							void *user_data)
-+{
-+	const struct mgmt_ev_auth_failed *ev = param;
-+
-+	check_expected_status(ev->status);
-+}
-+
- static void test_bond_create_pin_success(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-@@ -3042,6 +3110,26 @@ static void test_bond_create_pin_success(const void *test_data)
- 	data->if_bluetooth->start_discovery();
- }
- 
-+static void test_bond_create_pin_fail(const void *test_data)
++static void test_bond_create_pin_success(const void *test_data)
 +{
 +	struct test_data *data = tester_get_data();
 +	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
@@ -136,10 +184,6 @@ index df89d82..a7f5f2d 100644
 +
 +	init_test_conditions(data);
 +
-+	mgmt_register(data->mgmt, MGMT_EV_AUTH_FAILED, data->mgmt_index,
-+					bond_device_auth_fail_callback, data,
-+					NULL);
-+
 +	bthost_set_pin_code(bthost, pin, pin_len);
 +
 +	data->if_bluetooth->start_discovery();
@@ -148,14 +192,14 @@ index df89d82..a7f5f2d 100644
  /* Test Socket HAL */
  
  static gboolean adapter_socket_state_changed(gpointer user_data)
-@@ -4385,6 +4473,11 @@ int main(int argc, char *argv[])
- 					setup_enabled_adapter,
- 					test_bond_create_pin_success, teardown);
+@@ -4251,6 +4380,11 @@ int main(int argc, char *argv[])
+ 				setup_enabled_adapter,
+ 				test_dev_setprop_disctimeout_fail, teardown);
  
-+	test_bredrle("Bluetooth Create Bond PIN - Bad PIN",
-+					&bt_bond_create_pin_fail_test,
++	test_bredrle("Bluetooth Create Bond PIN - Success",
++					&bt_bond_create_pin_success_test,
 +					setup_enabled_adapter,
-+					test_bond_create_pin_fail, teardown);
++					test_bond_create_pin_success, teardown);
 +
  	test_bredrle("Socket Init", NULL, setup_socket_interface,
  						test_dummy, teardown);
