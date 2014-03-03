@@ -1,189 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Add initial files
-Date: Mon, 03 Mar 2014 15:39:21 +0100
-Message-ID: <1799818.en5dJPZWQJ@uw000953>
-In-Reply-To: <1393838957-26880-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1393838957-26880-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1393842906-5883-1-git-send-email-szymon.janc@tieto.com>
+References: <1393842906-5883-1-git-send-email-szymon.janc@tieto.com>
+Date: Mon, 3 Mar 2014 16:16:42 +0200
+Message-ID: <CABBYNZLmc5AetBvuvO25dW1KBVDDSrou_1P2==yTqTfJftyjwQ@mail.gmail.com>
+Subject: Re: [PATCH v2] android/avrcp-lib: Fix destroy callback handling
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Szymon,
 
-On Monday 03 of March 2014 10:29:16 Grzegorz Kolodziejczyk wrote:
-> This adds initial daemon code for GATT profile.
+On Mon, Mar 3, 2014 at 12:35 PM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> AVRCP destroy callback was directly passed as AVCTP destroy callback
+> resulting in struct avrcp not being freed on remote disconnect.
+>
+> This fix following Valgrind report:
+>
+> 931 (36 direct, 895 indirect) bytes in 1 blocks are definitely lost in
+>      loss record 53 of 55
+>    at 0x4896DC8: calloc (in /system/lib/valgrind/
+>      vgpreload_memcheck-arm-linux.so)
+>    by 0x48C5DB7: g_malloc0 (gmem.c:189)
+>    by 0x118671: avrcp_new (avrcp-lib.c:219)
+>    by 0x117D4F: connect_cb (avrcp.c:346)
+>    by 0x12068B: connect_cb (btio.c:232)
+>    by 0x48BD9C7: g_io_unix_dispatch (giounix.c:166)
+>    by 0x48C2CCB: g_main_context_dispatch (gmain.c:2539)
+>    by 0x48C2ED9: g_main_context_iterate.isra.19 (gmain.c:3146)
+>    by 0x48C3167: g_main_loop_run (gmain.c:3340)
+>    by 0x10BA03: main (main.c:490)
 > ---
->  android/Android.mk  |  1 +
->  android/Makefile.am |  1 +
->  android/gatt.c      | 44 ++++++++++++++++++++++++++++++++++++++++++++
->  android/gatt.h      | 25 +++++++++++++++++++++++++
->  android/main.c      | 13 +++++++++++++
->  5 files changed, 84 insertions(+)
->  create mode 100644 android/gatt.c
->  create mode 100644 android/gatt.h
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 56b86ba..429a4b8 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -42,6 +42,7 @@ LOCAL_SRC_FILES := \
->  	bluez/android/avrcp-lib.c \
->  	bluez/android/pan.c \
->  	bluez/android/handsfree.c \
-> +	bluez/android/gatt.c
->  	bluez/src/log.c \
->  	bluez/src/shared/mgmt.c \
->  	bluez/src/shared/util.c \
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 31f905c..6be6cda 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -40,6 +40,7 @@ android_bluetoothd_SOURCES = android/main.c \
->  				android/socket.h android/socket.c \
->  				android/pan.h android/pan.c \
->  				android/handsfree.h android/handsfree.c \
-> +				android/gatt.h android/gatt.c \
->  				btio/btio.h btio/btio.c \
->  				src/sdp-client.h src/sdp-client.c \
->  				profiles/network/bnep.h profiles/network/bnep.c
-> diff --git a/android/gatt.c b/android/gatt.c
-> new file mode 100644
-> index 0000000..f577446
-> --- /dev/null
-> +++ b/android/gatt.c
-> @@ -0,0 +1,44 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
+>
+> v2: fix crash on local shutdown due to double call to avrcp_shutdown,
+>     now avctp destroy callback is cleared when shuting down localy.
+>
+>  android/avrcp-lib.c | 23 ++++++++++++++++++++++-
+>  1 file changed, 22 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index 26bcce1..c5cfa12 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -98,6 +98,9 @@ struct avrcp {
+>         const struct avrcp_passthrough_handler *passthrough_handlers;
+>         void *passthrough_data;
+>         unsigned int passthrough_id;
 > +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
+> +       avrcp_destroy_cb_t destroy;
+> +       void *destroy_data;
+>  };
+>
+>  void avrcp_shutdown(struct avrcp *session)
+> @@ -109,9 +112,15 @@ void avrcp_shutdown(struct avrcp *session)
+>                 if (session->passthrough_id > 0)
+>                         avctp_unregister_passthrough_handler(session->conn,
+>                                                 session->passthrough_id);
 > +
-> +#include <stdbool.h>
-> +#include <stdlib.h>
-> +#include <stdint.h>
+> +               /* clear destroy callback that would call shutdown again */
+> +               avctp_set_destroy_cb(session->conn, NULL, NULL);
+>                 avctp_shutdown(session->conn);
+>         }
+>
+> +       if (session->destroy)
+> +               session->destroy(session->destroy_data);
 > +
-> +#include "ipc.h"
-> +#include "lib/bluetooth.h"
-> +#include "gatt.h"
-> +
-> +bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+>         g_free(session->tx_buf);
+>         g_free(session);
+>  }
+> @@ -199,6 +208,15 @@ static bool handle_passthrough_pdu(struct avctp *conn, uint8_t op,
+>         return handler->func(session);
+>  }
+>
+> +static void disconnect_cb(void *data)
 > +{
-> +	return false;
-
-Indentation issue here.
-
+> +       struct avrcp *session = data;
+> +
+> +       session->conn = NULL;
+> +
+> +       avrcp_shutdown(session);
 > +}
 > +
-> +void bt_gatt_unregister(void)
-> +{
+>  struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>  {
+>         struct avrcp *session;
+> @@ -223,13 +241,16 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+>                                                         handle_vendordep_pdu,
+>                                                         session);
+>
+> +       avctp_set_destroy_cb(session->conn, disconnect_cb, session);
 > +
-> +}
-> diff --git a/android/gatt.h b/android/gatt.h
-> new file mode 100644
-> index 0000000..d4392d9
-> --- /dev/null
-> +++ b/android/gatt.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr);
-> +void bt_gatt_unregister(void);
-> diff --git a/android/main.c b/android/main.c
-> index a6742ef..7b5ca9c 100644
-> --- a/android/main.c
-> +++ b/android/main.c
-> @@ -58,6 +58,7 @@
->  #include "pan.h"
->  #include "avrcp.h"
->  #include "handsfree.h"
-> +#include "gatt.h"
->  
->  #define STARTUP_GRACE_SECONDS 5
->  #define SHUTDOWN_GRACE_SECONDS 10
-> @@ -125,6 +126,12 @@ static void service_register(const void *buf, uint16_t len)
->  			goto failed;
->  		}
->  
+>         return session;
+>  }
+>
+>  void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+>                                                         void *user_data)
+>  {
+> -       avctp_set_destroy_cb(session->conn, cb, user_data);
+> +       session->destroy = cb;
+> +       session->destroy_data = user_data;
+>  }
+>
+>  void avrcp_set_control_handlers(struct avrcp *session,
+> --
+> 1.8.5.3
 
-Break is missing here.
+Pushed, thanks.
 
-> +	case HAL_SERVICE_ID_GATT:
-> +		if (!bt_gatt_register(hal_ipc, &adapter_bdaddr)) {
-> +			status = HAL_STATUS_FAILED;
-> +			goto failed;
-> +		}
-> +
->  		break;
->  	default:
->  		DBG("service %u not supported", m->service_id);
-> @@ -175,6 +182,9 @@ static void service_unregister(const void *buf, uint16_t len)
->  	case HAL_SERVICE_ID_HANDSFREE:
->  		bt_handsfree_unregister();
->  		break;
-> +	case HAL_SERVICE_ID_GATT:
-> +		bt_gatt_unregister();
-> +		break;
->  	default:
->  		/* This would indicate bug in HAL, as unregister should not be
->  		 * called in init failed */
-> @@ -371,6 +381,9 @@ static void cleanup_services(void)
->  		case HAL_SERVICE_ID_HANDSFREE:
->  			bt_handsfree_unregister();
->  			break;
-> +		case HAL_SERVICE_ID_GATT:
-> +			bt_gatt_unregister();
-> +			break;
->  		}
->  
->  		services[i] = false;
-> 
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
