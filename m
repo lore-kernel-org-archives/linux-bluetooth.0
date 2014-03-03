@@ -1,164 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/9] android/tester: Coding style and syntax fix
-Date: Mon, 03 Mar 2014 13:54:40 +0100
-Message-ID: <35743386.hSUP0cAeZY@uw000953>
-In-Reply-To: <1393513490-18674-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1393513490-18674-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/9] unit/avrcp: Add /TP/PAS/BV-06-C test
+Date: Mon,  3 Mar 2014 14:53:39 +0200
+Message-Id: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thursday 27 of February 2014 16:04:42 Grzegorz Kolodziejczyk wrote:
-> Remove white spaces, break lines over 80 characters, redundand braces
-> for single statement blocks.
-> ---
->  android/android-tester.c | 44 ++++++++++++++++++++++++++------------------
->  1 file changed, 26 insertions(+), 18 deletions(-)
-> 
-> diff --git a/android/android-tester.c b/android/android-tester.c
-> index 79c8e47..a94c536 100644
-> --- a/android/android-tester.c
-> +++ b/android/android-tester.c
-> @@ -1154,7 +1154,7 @@ static void remote_device_properties_cb(bt_status_t status,
->  }
->  
->  static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
-> -static char enable_done_bdname_val[] = "BlueZ for Android";
-> +static const char enable_done_bdname_val[] = "BlueZ for Android";
->  static bt_uuid_t enable_done_uuids_val = {
->  	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
->  					0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-> @@ -1305,7 +1305,7 @@ static const struct generic_data bluetooth_getprop_bdaddr_success_test = {
->  	.expected_adapter_status = BT_STATUS_SUCCESS,
->  };
->  
-> -static char test_bdname[] = "test_bdname_setget";
-> +static const char test_bdname[] = "test_bdname_setget";
->  
->  static struct priority_property getprop_bdname_props[] = {
->  	{
-> @@ -1563,7 +1563,8 @@ static struct priority_property setprop_scanmode_none_props[] = {
->  	},
->  };
->  
-> -static const struct generic_data bluetooth_setprop_scanmode_none_success2_test = {
-> +static const struct generic_data
-> +			bluetooth_setprop_scanmode_none_success2_test = {
->  	.expected_hal_cb.adapter_properties_cb = check_count_properties_cb,
->  	.expected_properties_num = 1,
->  	.expected_properties = setprop_scanmode_none_props,
-> @@ -1601,7 +1602,7 @@ static const struct generic_data bluetooth_discovery_device_found_test = {
->  	.expected_adapter_status = BT_STATUS_NOT_EXPECTED,
->  };
->  
-> -static char remote_get_properties_bdname_val[] = "00:AA:01:01:00:00";
-> +static const char remote_get_properties_bdname_val[] = "00:AA:01:01:00:00";
->  static uint32_t remote_get_properties_cod_val = 0;
->  static bt_device_type_t remote_get_properties_tod_val = BT_DEVICE_DEVTYPE_BREDR;
->  static int32_t remote_get_properties_rssi_val = -60;
-> @@ -1657,7 +1658,7 @@ static const struct generic_data bt_dev_getprops_success_test = {
->  	.expected_adapter_status = BT_STATUS_NOT_EXPECTED,
->  };
->  
-> -static char remote_getprop_bdname_val[] = "00:AA:01:01:00:00";
-> +static const char remote_getprop_bdname_val[] = "00:AA:01:01:00:00";
->  
->  static struct priority_property remote_getprop_bdname_props[] = {
->  	{
-> @@ -1932,7 +1933,7 @@ static const struct generic_data bt_dev_getprop_fname_fail_test = {
->  	.expected_adapter_status = BT_STATUS_FAIL,
->  };
->  
-> -static char remote_setprop_fname_val[] = "set_fname_test";
-> +static const char remote_setprop_fname_val[] = "set_fname_test";
->  
->  static struct priority_property remote_setprop_fname_props[] = {
->  	{
-> @@ -1959,7 +1960,7 @@ static const struct generic_data bt_dev_setprop_fname_success_test = {
->  	.expected_adapter_status = BT_STATUS_SUCCESS,
->  };
->  
-> -static char remote_setprop_bdname_val[] = "setprop_bdname_fail";
-> +static const char remote_setprop_bdname_val[] = "setprop_bdname_fail";
->  
->  static struct priority_property remote_setprop_bdname_props[] = {
->  	{
-> @@ -2328,7 +2329,8 @@ static void test_enable(const void *test_data)
->  
->  	init_test_conditions(data);
->  
-> -	bdaddr2android((const bdaddr_t *)bdaddr, &enable_done_bdaddr_val.address);
-> +	bdaddr2android((const bdaddr_t *)bdaddr,
-> +					&enable_done_bdaddr_val.address);
->  
->  	adapter_status = data->if_bluetooth->enable();
->  	check_expected_status(adapter_status);
-> @@ -2343,7 +2345,8 @@ static void test_enable_done(const void *test_data)
->  
->  	init_test_conditions(data);
->  
-> -	bdaddr2android((const bdaddr_t *)bdaddr, &enable_done_bdaddr_val.address);
-> +	bdaddr2android((const bdaddr_t *)bdaddr,
-> +					&enable_done_bdaddr_val.address);
->  
->  	adapter_status = data->if_bluetooth->enable();
->  	check_expected_status(adapter_status);
-> @@ -2405,7 +2408,8 @@ static void test_getprop_bdaddr_success(const void *test_data)
->  
->  	init_test_conditions(data);
->  
-> -	bdaddr2android((const bdaddr_t *)bdaddr, &test_getprop_bdaddr_val.address);
-> +	bdaddr2android((const bdaddr_t *)bdaddr,
-> +					&test_getprop_bdaddr_val.address);
->  
->  	adapter_status = data->if_bluetooth->get_adapter_property(prop.type);
->  	check_expected_status(adapter_status);
-> @@ -3779,7 +3783,6 @@ static void emu_powered_complete(uint16_t opcode, uint8_t status,
->  	bt_status = data->if_hid->connect(&bdaddr);
->  	if (bt_status != BT_STATUS_SUCCESS)
->  		tester_setup_failed();
-> -
->  }
->  
->  static void setup_hidhost_connect(const void *test_data)
-> @@ -3978,15 +3981,20 @@ int main(int argc, char *argv[])
->  
->  	test_bredrle("Bluetooth Init", NULL, setup_base, test_dummy, teardown);
->  
-> -	test_bredrle("Bluetooth Enable - Success", &bluetooth_enable_success_test,
-> -					setup_base, test_enable, teardown);
-> +	test_bredrle("Bluetooth Enable - Success",
-> +						&bluetooth_enable_success_test,
-> +						setup_base, test_enable,
-> +						teardown);
->  
->  	test_bredrle("Bluetooth Enable - Success 2",
-> -			&bluetooth_enable_success2_test, setup_enabled_adapter,
-> -			test_enable_done, teardown);
-> -
-> -	test_bredrle("Bluetooth Disable - Success", &bluetooth_disable_success_test,
-> -			setup_enabled_adapter, test_disable, teardown);
-> +						&bluetooth_enable_success2_test,
-> +						setup_enabled_adapter,
-> +						test_enable_done, teardown);
-> +
-> +	test_bredrle("Bluetooth Disable - Success",
-> +						&bluetooth_disable_success_test,
-> +						setup_enabled_adapter,
-> +						test_disable, teardown);
->  
->  	test_bredrle("Bluetooth Set BDNAME - Success",
->  					&bluetooth_setprop_bdname_success_test,
-> 
+Test verifies that the list player application setting values response
+issued from the Target.
+---
+ unit/test-avrcp.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-This patch is now applied. Thnaks.
-
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 302c331..44dc2f2 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -342,6 +342,26 @@ static uint8_t avrcp_handle_get_player_attr_text(struct avrcp *session,
+ 	return AVC_CTYPE_STABLE;
+ }
+ 
++static uint8_t avrcp_handle_list_player_values(struct avrcp *session,
++				uint8_t transaction, uint16_t *params_len,
++				uint8_t *params, void *user_data)
++{
++	DBG("params[0] %d params_len %d", params[0], *params_len);
++
++	if (*params_len != 1)
++		goto fail;
++
++	*params_len = 1;
++	params[0] = 0;
++	return AVC_CTYPE_STABLE;
++
++fail:
++	*params_len = 1;
++	params[0] = AVRCP_STATUS_INVALID_PARAM;
++
++	return AVC_CTYPE_REJECTED;
++}
++
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_capabilities },
+@@ -349,6 +369,8 @@ static const struct avrcp_control_handler control_handlers[] = {
+ 					avrcp_handle_list_attributes },
+ 		{ AVRCP_GET_PLAYER_ATTRIBUTE_TEXT, AVC_CTYPE_STATUS,
+ 					avrcp_handle_get_player_attr_text },
++		{ AVRCP_LIST_PLAYER_VALUES, AVC_CTYPE_STATUS,
++					avrcp_handle_list_player_values },
+ 		{ },
+ };
+ 
+@@ -505,5 +527,15 @@ int main(int argc, char *argv[])
+ 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+ 				0x00, 0x00, 0x01, 0x00));
+ 
++	define_test("/TP/PAS/BV-06-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_LIST_PLAYER_VALUES,
++				0x00, 0x00, 0x01, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_LIST_PLAYER_VALUES,
++				0x00, 0x00, 0x01, 0x00));
++
+ 	return g_test_run();
+ }
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.2
+
