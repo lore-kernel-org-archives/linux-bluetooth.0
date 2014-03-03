@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/9] unit/avrcp: Add /TP/PAS/BV-09-C test
-Date: Mon,  3 Mar 2014 14:53:43 +0200
-Message-Id: <1393851227-23483-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 8/9] unit/avrcp: Add /TP/PAS/BV-11-C test
+Date: Mon,  3 Mar 2014 14:53:46 +0200
+Message-Id: <1393851227-23483-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that get current player application setting value command
+Test verifies that the set player application setting value command
 issued from the Controller.
 ---
- unit/test-avrcp.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ unit/test-avrcp.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index e45d995..823c750 100644
+index 2675bdf..359359b 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -416,6 +416,14 @@ static void test_client(gconstpointer data)
- 		avrcp_get_player_attribute_text(context->session, NULL, 0,
- 								NULL, NULL);
+@@ -450,6 +450,16 @@ static void test_client(gconstpointer data)
+ 						sizeof(attributes), NULL, NULL);
+ 	}
  
-+	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-09-C")) {
++	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-11-C")) {
 +		uint8_t attributes[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
 +						AVRCP_ATTRIBUTE_REPEAT_MODE };
++		uint8_t values[] = { 0xaa, 0xff };
 +
-+		avrcp_get_current_player_value(context->session, attributes,
-+						sizeof(attributes), NULL, NULL);
++		avrcp_set_player_value(context->session, attributes,
++						sizeof(attributes), values,
++						NULL, NULL);
 +	}
 +
  	execute_context(context);
  }
  
-@@ -561,5 +569,13 @@ int main(int argc, char *argv[])
- 				AVRCP_GET_PLAYER_VALUE_TEXT,
- 				0x00, 0x00, 0x01, 0x00));
+@@ -617,5 +627,13 @@ int main(int argc, char *argv[])
+ 				AVRCP_ATTRIBUTE_EQUALIZER, 0x00,
+ 				AVRCP_ATTRIBUTE_REPEAT_MODE, 0x00));
  
-+	define_test("/TP/PAS/BV-09-C", test_client,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++	define_test("/TP/PAS/BV-11-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
 +				0x00, 0x19, 0x58,
-+				AVRCP_GET_CURRENT_PLAYER_VALUE,
-+				0x00, 0x00, 0x03, 0x02,
-+				AVRCP_ATTRIBUTE_EQUALIZER,
-+				AVRCP_ATTRIBUTE_REPEAT_MODE));
++				AVRCP_SET_PLAYER_VALUE,
++				0x00, 0x00, 0x05, 0x02,
++				AVRCP_ATTRIBUTE_EQUALIZER, 0xaa,
++				AVRCP_ATTRIBUTE_REPEAT_MODE, 0xff));
 +
  	return g_test_run();
  }
