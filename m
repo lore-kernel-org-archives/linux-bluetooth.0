@@ -1,165 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] unit: Initial version of test-hfp
-Date: Mon,  3 Mar 2014 09:36:47 +0100
-Message-Id: <1393835812-24238-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 3/7] unit/test-hfp: Add /hfp/test_cmd_handler_1
+Date: Mon,  3 Mar 2014 09:36:48 +0100
+Message-Id: <1393835812-24238-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1393835812-24238-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1393835812-24238-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is skeleton of hfp unit tests with basic init test
-for hfp_gw_new().
-Basic test with hfp_gw_new() and hfp_gw_unref.
 ---
- .gitignore      |   1 +
- Makefile.am     |  12 ++++++
- unit/test-hfp.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 134 insertions(+)
- create mode 100644 unit/test-hfp.c
+ unit/test-hfp.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
-diff --git a/.gitignore b/.gitignore
-index 94c0c78..6719be8 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -84,6 +84,7 @@ unit/test-gdbus-client
- unit/test-sdp
- unit/test-lib
- unit/test-mgmt
-+unit/test-hfp
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
-diff --git a/Makefile.am b/Makefile.am
-index 0c79e58..0107cef 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -293,6 +293,18 @@ unit_test_avrcp_SOURCES = unit/test-avrcp.c \
- 				android/avrcp-lib.c android/avrcp-lib.h
- unit_test_avrcp_LDADD = @GLIB_LIBS@ lib/libbluetooth-internal.la
- 
-+unit_tests += unit/test-hfp
-+
-+unit_test_hfp_SOURCES = unit/test-hfp.c \
-+				src/shared/io.h src/shared/io-glib.c \
-+				src/shared/queue.h src/shared/queue.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				src/shared/ringbuf.h src/shared/ringbuf.c \
-+				src/shared/hfp.h src/shared/hfp.c
-+
-+unit_test_hfp_LDADD = @GLIB_LIBS@
-+
- unit_tests += unit/test-gdbus-client
- 
- unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
 diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-new file mode 100644
-index 0000000..092f255
---- /dev/null
+index 092f255..8cbb524 100644
+--- a/unit/test-hfp.c
 +++ b/unit/test-hfp.c
-@@ -0,0 +1,121 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <sys/socket.h>
-+#include <unistd.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <string.h>
-+
-+#include <glib.h>
-+#include "src/shared/hfp.h"
-+
-+struct context {
-+	GMainLoop *main_loop;
-+	guint watch_id;
-+	int fd_server;
-+	int fd_client;
-+	struct hfp_gw *hfp;
-+	const struct test_data *data;
+@@ -39,6 +39,14 @@ struct context {
+ 	const struct test_data *data;
+ };
+ 
++struct test_data {
++	hfp_command_func_t command_cb;
++	const char *server_send;
++	int data_len;
++	const char *expected_rsp;
++	int expected_rsp_len;
 +};
 +
-+static void context_quit(struct context *context)
-+{
-+	g_main_loop_quit(context->main_loop);
-+}
+ static void context_quit(struct context *context)
+ {
+ 	g_main_loop_quit(context->main_loop);
+@@ -49,11 +57,35 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ {
+ 	struct context *context = user_data;
+ 
++	if (context->data && context->data->expected_rsp) {
++		int fd = g_io_channel_unix_get_fd(channel);
++		char buf[1024];
++		int len;
 +
-+static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
++		len = read(fd, buf, sizeof(buf));
++		g_assert(context->data->expected_rsp_len == len);
++		g_assert(!memcmp(context->data->expected_rsp, buf, len));
++	}
++
+ 	context_quit(context);
+ 
+ 	return FALSE;
+ }
+ 
++static void cmd_handler(const char *command, void *user_data)
 +{
 +	struct context *context = user_data;
++	int cmd_len;
 +
-+	context_quit(context);
++	cmd_len = strlen(command);
 +
-+	return FALSE;
++	g_assert(cmd_len < context->data->data_len);
++
++	g_assert(!memcmp(command, context->data->server_send, cmd_len));
++
++	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
 +}
 +
-+static struct context *create_context(gconstpointer data)
-+{
-+	struct context *context = g_new0(struct context, 1);
-+	GIOChannel *channel;
-+	int err, sv[2];
+ static struct context *create_context(gconstpointer data)
+ {
+ 	struct context *context = g_new0(struct context, 1);
+@@ -94,6 +126,9 @@ static void execute_context(struct context *context)
+ 
+ 	g_main_loop_unref(context->main_loop);
+ 
++	if (context->hfp)
++		hfp_gw_unref(context->hfp);
 +
-+	context->main_loop = g_main_loop_new(NULL, FALSE);
-+	g_assert(context->main_loop);
+ 	g_free(context);
+ }
+ 
+@@ -107,15 +142,56 @@ static void test_init(gconstpointer data)
+ 	g_assert(hfp_gw_set_close_on_unref(context->hfp, true));
+ 
+ 	hfp_gw_unref(context->hfp);
++	context->hfp = NULL;
 +
-+	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
-+	g_assert(err == 0);
-+
-+	channel = g_io_channel_unix_new(sv[1]);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	context->watch_id = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				test_handler, context);
-+	g_assert(context->watch_id > 0);
-+
-+	g_io_channel_unref(channel);
-+
-+	context->fd_server = sv[1];
-+	context->fd_client = sv[0];
-+	context->data = data;
-+
-+	return context;
++	execute_context(context);
 +}
 +
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	g_source_remove(context->watch_id);
-+
-+	g_main_loop_unref(context->main_loop);
-+
-+	g_free(context);
-+}
-+
-+static void test_init(gconstpointer data)
++static void test_command_handler(gconstpointer data)
 +{
 +	struct context *context = create_context(data);
 +
@@ -168,19 +96,45 @@ index 0000000..092f255
 +	g_assert(context->hfp);
 +	g_assert(hfp_gw_set_close_on_unref(context->hfp, true));
 +
-+	hfp_gw_unref(context->hfp);
++	if (context->data->command_cb)
++		g_assert(hfp_gw_set_command_handler(context->hfp,
++						context->data->command_cb,
++						context, NULL));
 +
-+	execute_context(context);
-+}
++	if (context->data->server_send) {
++		ssize_t len;
++		len = write(context->fd_server, context->data->server_send,
++						context->data->data_len);
 +
-+int main(int argc, char *argv[])
-+{
-+	g_test_init(&argc, &argv, NULL);
++		g_assert(len);
++	}
+ 
+ 	execute_context(context);
+ }
+ 
++static const char err_rsp[] = {'\r', '\n', 'E', 'R', 'R', 'O', 'R', '\r', '\n'};
 +
-+	g_test_add_data_func("/hfp/test_init", NULL, test_init);
++static const char atbrsf[] = {'A', 'T', '+', 'B', 'R', 'S', 'F', '\r'};
 +
-+	return g_test_run();
-+}
++static const struct test_data test_cmd_handler_1 = {
++	.command_cb = cmd_handler,
++	.server_send = atbrsf,
++	.data_len = sizeof(atbrsf),
++	.expected_rsp = err_rsp,
++	.expected_rsp_len = sizeof(err_rsp)
++};
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+ 
+ 	g_test_add_data_func("/hfp/test_init", NULL, test_init);
+ 
++	g_test_add_data_func("/hfp/test_cmd_handler_1", &test_cmd_handler_1,
++							test_command_handler);
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.1
 
