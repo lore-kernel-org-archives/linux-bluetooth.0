@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 9/9] doc: Update test coverage document
-Date: Mon,  3 Mar 2014 14:53:47 +0200
-Message-Id: <1393851227-23483-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/9] unit/avrcp: Add /TP/PAS/BV-09-C test
+Date: Mon,  3 Mar 2014 14:53:43 +0200
+Message-Id: <1393851227-23483-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,24 +11,45 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Update AVRCP test numbers.
+Test verifies that get current player application setting value command
+issued from the Controller.
 ---
- doc/test-coverage.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ unit/test-avrcp.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-index 7965f8e..89d884f 100644
---- a/doc/test-coverage.txt
-+++ b/doc/test-coverage.txt
-@@ -18,7 +18,7 @@ test-ringbuf		   3	Ring buffer functionality
- test-queue		   1	Queue handling functionality
- test-avdtp		  60	AVDTP qualification test cases
- test-avctp		   9	AVCTP qualification test cases
--test-avrcp		   7	AVRCP qualification test cases
-+test-avrcp		  23	AVRCP qualification test cases
- test-gobex		  31	Generic OBEX functionality
- test-gobex-packet	   9	OBEX packet handling
- test-gobex-header	  28	OBEX header handling
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index e45d995..823c750 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -416,6 +416,14 @@ static void test_client(gconstpointer data)
+ 		avrcp_get_player_attribute_text(context->session, NULL, 0,
+ 								NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-09-C")) {
++		uint8_t attributes[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
++						AVRCP_ATTRIBUTE_REPEAT_MODE };
++
++		avrcp_get_current_player_value(context->session, attributes,
++						sizeof(attributes), NULL, NULL);
++	}
++
+ 	execute_context(context);
+ }
+ 
+@@ -561,5 +569,13 @@ int main(int argc, char *argv[])
+ 				AVRCP_GET_PLAYER_VALUE_TEXT,
+ 				0x00, 0x00, 0x01, 0x00));
+ 
++	define_test("/TP/PAS/BV-09-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_CURRENT_PLAYER_VALUE,
++				0x00, 0x00, 0x03, 0x02,
++				AVRCP_ATTRIBUTE_EQUALIZER,
++				AVRCP_ATTRIBUTE_REPEAT_MODE));
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
