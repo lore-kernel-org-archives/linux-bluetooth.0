@@ -1,96 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH BlueZ v0 1/9] gdbus: Add g_dbus_client_set_proxies_ready_watch()
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393607136-16908-2-git-send-email-claudio.takahasi@openbossa.org>
-Date: Tue, 4 Mar 2014 22:37:08 -0800
+Date: Tue, 4 Mar 2014 23:11:18 +0100
+From: Antonio Ospite <ao2@ao2.it>
+To: Andrea <mariofutire@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F4FB24C3-8BD8-4415-AF9D-E97FEBB06781@holtmann.org>
-References: <1393607136-16908-1-git-send-email-claudio.takahasi@openbossa.org> <1393607136-16908-2-git-send-email-claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: Re: Controlling LEDs and rumble on sixaxis
+Message-Id: <20140304231118.3500abb703a7c1a7679d01f1@ao2.it>
+In-Reply-To: <53164362.4060102@gmail.com>
+References: <53164362.4060102@gmail.com>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Andrea,
 
-> This patch adds a new gdbus helper to notify the clients that
-> GetManagedObjects reply was received and the last proxy has been
-> informed previously by the proxy_added callback.
-> ---
-> gdbus/client.c | 18 ++++++++++++++++++
-> gdbus/gdbus.h  |  4 ++++
-> 2 files changed, 22 insertions(+)
+On Tue, 04 Mar 2014 21:19:30 +0000
+Andrea <mariofutire@gmail.com> wrote:
+
+> Hi,
 > 
-> diff --git a/gdbus/client.c b/gdbus/client.c
-> index be8cc29..f479742 100644
-> --- a/gdbus/client.c
-> +++ b/gdbus/client.c
-> @@ -56,6 +56,8 @@ struct GDBusClient {
-> 	void *signal_data;
-> 	GDBusProxyFunction proxy_added;
-> 	GDBusProxyFunction proxy_removed;
-> +	GDBusClientReadyFunction ready;
-> +	void *ready_data;
-> 	GDBusPropertyFunction property_changed;
-> 	void *user_data;
-> 	GList *proxy_list;
-> @@ -982,6 +984,9 @@ static void parse_managed_objects(GDBusClient *client, DBusMessage *msg)
+> I would like to be able to control from a client app the LEDs and
+> rumble of the sixaxis PS3 controller.
 > 
-> 		dbus_message_iter_next(&dict);
-> 	}
-> +
-> +	if (client->ready)
-> +		client->ready(client->ready_data);
-> }
+> As far as I understand the kernel 3.15 will allow LEDs to be set by
+> bluez when the controller is connected.  If I wanted to change the
+> LEDs in my app, would this something that needs to be done by bluez?
+> Can I write to some device and bypass bluez?
+
+With older kernels you can already set LEDs and rumble by sending the
+HID output report 01 via hidraw (actually there is a regression
+preventing that via BT in some versions). See the code in the BlueZ
+sixaxis plugin or in the newer linux kernel for the report format.
+
+With recent/newer kernels you can use the sysfs leds class under
+/sys/class/leds/ to control the LEDs and the force feedback api[1] to
+control the rumble.
+
+No need to "bypass" BlueZ, the BlueZ sixaxis plugin sets the LEDs when
+it detects the controller in order to tell the user the controller
+number, but after that you are free to change the LEDs as you want.
+
+[1] https://www.kernel.org/doc/Documentation/input/ff.txt
+
+> Would this be a job for dbus?
+>
+
+dbus is not necessary, but depending on your application you may want to
+use libudev to add the hotplug detection of the controller.
+
+> I use the sixaxis to control an app on the Pi, and given the lack of
+> feedbacks from the Pi, the LEDs and rumble could help me on that
+> front.
 > 
-> static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
-> @@ -1261,3 +1266,16 @@ gboolean g_dbus_client_set_proxy_handlers(GDBusClient *client,
+> Does it make sense to do it?
 > 
-> 	return TRUE;
-> }
-> +
-> +gboolean g_dbus_client_set_proxies_ready_watch(GDBusClient *client,
-> +						GDBusClientReadyFunction ready,
-> +						void *user_data)
-> +{
-> +	if (client == NULL)
-> +		return FALSE;
-> +
-> +	client->ready = ready;
-> +	client->ready_data = user_data;
-> +
-> +	return TRUE;
-> +}
-> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-> index 9542109..aa407aa 100644
-> --- a/gdbus/gdbus.h
-> +++ b/gdbus/gdbus.h
-> @@ -337,6 +337,7 @@ gboolean g_dbus_proxy_method_call(GDBusProxy *proxy, const char *method,
-> 				GDBusReturnFunction function, void *user_data,
-> 				GDBusDestroyFunction destroy);
-> 
-> +typedef void (* GDBusClientReadyFunction) (void *user_data);
-> typedef void (* GDBusProxyFunction) (GDBusProxy *proxy, void *user_data);
-> typedef void (* GDBusPropertyFunction) (GDBusProxy *proxy, const char *name,
-> 					DBusMessageIter *iter, void *user_data);
-> @@ -365,6 +366,9 @@ gboolean g_dbus_client_set_proxy_handlers(GDBusClient *client,
-> 					GDBusProxyFunction proxy_removed,
-> 					GDBusPropertyFunction property_changed,
-> 					void *user_data);
-> +gboolean g_dbus_client_set_proxies_ready_watch(GDBusClient *client,
-> +						GDBusClientReadyFunction ready,
-> +						void *user_data);
 
-this names is a bit confusing. On one hand it is proxies ready on the other it is client ready. We need to be a bit specific here.
+Why not?
 
-My initial thinking is this should be
+Ciao,
+   Antonio
 
-	g_dbus_client_set_ready_watch()
+-- 
+Antonio Ospite
+http://ao2.it
 
-and then use GDBusClientFunction(GDBusClient, user_data) as callback function.
-
-Regards
-
-Marcel
-
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
