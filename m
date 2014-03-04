@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 06/10] unit/avrcp: Add /TP/PAS/BV-10-C test
-Date: Tue,  4 Mar 2014 16:02:11 +0200
-Message-Id: <1393941735-12187-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 04/10] android/avrcp: Add avrcp_get_current_player_value() function
+Date: Tue,  4 Mar 2014 16:02:09 +0200
+Message-Id: <1393941735-12187-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,78 +11,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that the get current player application setting value
-response issued from the Target.
 ---
- unit/test-avrcp.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ android/avrcp-lib.c | 20 ++++++++++++++++++++
+ android/avrcp-lib.h | 11 +++++++++++
+ 2 files changed, 31 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a849be3..e7d37e0 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -365,6 +365,31 @@ static ssize_t avrcp_handle_get_player_value_text(struct avrcp *session,
- 	return 1;
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index dfd6fa3..8f18b9c 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -384,3 +384,23 @@ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+ 				AVC_SUBUNIT_PANEL, AVRCP_REGISTER_NOTIFICATION,
+ 				params, params_len);
  }
- 
-+static ssize_t avrcp_handle_get_current_player_value(struct avrcp *session,
-+						uint8_t transaction,
-+						uint16_t params_len,
-+						uint8_t *params,
-+						void *user_data)
++
++int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attributes,
++					uint8_t attr_count, avctp_rsp_cb func,
++					void *user_data)
++
 +{
-+	uint8_t *attributes;
-+	int i;
++	uint8_t buf[AVRCP_ATTRIBUTE_LAST + 1];
 +
-+	DBG("params[0] %d params_len %d", params[0], params_len);
++	if (attr_count > AVRCP_ATTRIBUTE_LAST)
++		return -EINVAL;
 +
-+	attributes = g_memdup(&params[1], params[0]);
-+
-+	for (i = 0; i < params[0]; i++) {
-+		params[i * 2 + 1] = attributes[i];
-+		params[i * 2 + 2] = 0; /* value */
++	if (attributes && attr_count) {
++		buf[0] = attr_count;
++		memcpy(buf + 1, attributes, attr_count);
 +	}
 +
-+	g_free(attributes);
-+
-+	params[0] = i;
-+
-+	return params[0] * 2 + 1;
++	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
++				AVRCP_GET_CURRENT_PLAYER_VALUE, buf,
++				attr_count + 1, func, user_data);
 +}
-+
- static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
-@@ -381,6 +406,9 @@ static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_PLAYER_VALUE_TEXT,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
- 					avrcp_handle_get_player_value_text },
-+		{ AVRCP_GET_CURRENT_PLAYER_VALUE,
-+					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
-+					avrcp_handle_get_current_player_value },
- 		{ },
- };
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 7185fb6..5e396bb 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -75,6 +75,14 @@
+ #define CAP_COMPANY_ID				0x02
+ #define CAP_EVENTS_SUPPORTED			0x03
  
-@@ -573,5 +601,19 @@ int main(int argc, char *argv[])
- 				AVRCP_ATTRIBUTE_EQUALIZER,
- 				AVRCP_ATTRIBUTE_REPEAT_MODE));
- 
-+	define_test("/TP/PAS/BV-10-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58,
-+				AVRCP_GET_CURRENT_PLAYER_VALUE,
-+				0x00, 0x00, 0x03, 0x02,
-+				AVRCP_ATTRIBUTE_EQUALIZER,
-+				AVRCP_ATTRIBUTE_REPEAT_MODE),
-+			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58,
-+				AVRCP_GET_CURRENT_PLAYER_VALUE,
-+				0x00, 0x00, 0x05, 0x02,
-+				AVRCP_ATTRIBUTE_EQUALIZER, 0x00,
-+				AVRCP_ATTRIBUTE_REPEAT_MODE, 0x00));
++/* Player Attributes */
++#define AVRCP_ATTRIBUTE_ILEGAL			0x00
++#define AVRCP_ATTRIBUTE_EQUALIZER		0x01
++#define AVRCP_ATTRIBUTE_REPEAT_MODE		0x02
++#define AVRCP_ATTRIBUTE_SHUFFLE			0x03
++#define AVRCP_ATTRIBUTE_SCAN			0x04
++#define AVRCP_ATTRIBUTE_LAST			AVRCP_ATTRIBUTE_SCAN
 +
- 	return g_test_run();
- }
+ /* Company IDs for vendor dependent commands */
+ #define IEEEID_BTSIG		0x001958
+ 
+@@ -138,3 +146,6 @@ int avrcp_get_element_attrs_rsp(struct avrcp *session, uint8_t transaction,
+ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t code, uint8_t *params,
+ 					size_t params_len);
++int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attributes,
++					uint8_t attr_count, avctp_rsp_cb func,
++					void *user_data);
 -- 
 1.8.3.2
 
