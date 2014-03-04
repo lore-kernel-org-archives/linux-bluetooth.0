@@ -1,66 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] AVCTP: Fix sending wrong response format
-Date: Tue,  4 Mar 2014 15:08:17 +0200
-Message-Id: <1393938497-4522-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv2 11/11] shared/hfp: Don't try read uninitialized data in ringbuffer
+Date: Tue,  4 Mar 2014 13:28:26 +0100
+Message-Id: <1393936106-7493-11-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1393936106-7493-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1393936106-7493-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-Reject and Not Implemented responses of PASS THROUGH commands shall
-contain the data of the previous frame accourding to AVC Panel Subunit
-specification page 87.
+Don't try to read uninitialized value if '\r' was not found.
+This is call stack from valgrind:
+/hfp/test_fragmented_1: ==24869== Conditional jump or move depends on uninitialised value(s)
+==24869==    at 0x400A5E4: memchr (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==24869==    by 0x804D24D: can_read_data (hfp.c:359)
+==24869==    by 0x804A6E2: read_callback (io-glib.c:168)
+==24869==    by 0x4108BFD5: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x410470E5: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x41047497: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x41047912: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x8049EE0: execute_context (test-hfp.c:186)
+==24869==    by 0x4106CBC1: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x4106CD5B: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x4106D0E0: g_test_run_suite (in /usr/lib/libglib-2.0.so.0.3600.4)
+==24869==    by 0x4106D13C: g_test_run (in /usr/lib/libglib-2.0.so.0.3600.4)
 ---
- android/avctp.c        | 4 ++--
- profiles/audio/avctp.c | 4 ++--
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ src/shared/hfp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index abf9449..9232cfa 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -322,7 +322,7 @@ static ssize_t handle_panel_passthrough(struct avctp *session,
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 41973b7..2ca1272 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -352,6 +352,12 @@ static void process_input(struct hfp_gw *hfp)
+ 		char *str2;
+ 		size_t len2;
  
- 	if (*code != AVC_CTYPE_CONTROL || *subunit != AVC_SUBUNIT_PANEL) {
- 		*code = AVC_CTYPE_REJECTED;
--		return 0;
-+		return operand_count;
- 	}
- 
- 	if (operand_count == 0)
-@@ -394,7 +394,7 @@ static ssize_t handle_panel_passthrough(struct avctp *session,
- 		DBG("AV/C: unknown button 0x%02X %s",
- 						operands[0] & 0x7F, status);
- 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
--		return 0;
-+		return operand_count;
- 	}
- 
- done:
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 28c7685..f88e634 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -342,7 +342,7 @@ static size_t handle_panel_passthrough(struct avctp *session,
- 
- 	if (*code != AVC_CTYPE_CONTROL || *subunit != AVC_SUBUNIT_PANEL) {
- 		*code = AVC_CTYPE_REJECTED;
--		return 0;
-+		return operand_count;
- 	}
- 
- 	if (operand_count == 0)
-@@ -408,7 +408,7 @@ static size_t handle_panel_passthrough(struct avctp *session,
- 		DBG("AV/C: unknown button 0x%02X %s",
- 						operands[0] & 0x7F, status);
- 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
--		return 0;
-+		return operand_count;
- 	}
- 
- done:
++		/* If there is no more data in ringbuffer,
++		 * it's just an incomplete command.
++		 */
++		if (len == ringbuf_len(hfp->read_buf))
++			return;
++
+ 		str2 = ringbuf_peek(hfp->read_buf, len, &len2);
+ 		if (!str2)
+ 			return;
 -- 
-1.8.5.3
+1.8.3.1
 
