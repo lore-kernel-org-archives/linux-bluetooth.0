@@ -1,66 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 4 Mar 2014 09:14:56 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Michael Knudsen <m.knudsen@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth:  Stop BCSP/H5 timer before cleaning up
+Message-ID: <20140304071456.GA30165@localhost.P-661HNU-F1>
+References: <1392713288-12227-1-git-send-email-m.knudsen@samsung.com>
+ <531563D2.1060301@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <E6E2219B-6B0E-435F-AA12-4194885D0691@holtmann.org>
-References: <1393835812-24238-1-git-send-email-marcin.kraglak@tieto.com>
-	<1393835812-24238-7-git-send-email-marcin.kraglak@tieto.com>
-	<E6E2219B-6B0E-435F-AA12-4194885D0691@holtmann.org>
-Date: Tue, 4 Mar 2014 08:16:04 +0100
-Message-ID: <CABD6X-+-pUjd36JQ_wb+LKQWimB4_TwL+aqk7koZkiLz_k5FaA@mail.gmail.com>
-Subject: Re: [PATCH 7/7] Add /hfp/test_hfp_gw_register_3 and /hfp/test_hfp_gw_register_4
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <531563D2.1060301@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Michael,
 
-On 3 March 2014 16:23, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Marcin,
->
->> unit/test-hfp.c | 31 +++++++++++++++++++++++++++++++
->> 1 file changed, 31 insertions(+)
->>
->> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
->> index 5e4fc11..64ecc60 100644
->> --- a/unit/test-hfp.c
->> +++ b/unit/test-hfp.c
->> @@ -266,6 +266,33 @@ static const struct test_data test_register_2 = {
->>       .prefix = prefix_brsf
->> };
->>
->> +static const char atbrsf_read[] = {'A', 'T', '+', 'B', 'R', 'S', 'F', '?',
->> +                                                                     '\r'};
->> +
->
->         = "AT+BRSF?\r";
->
->> +static const struct test_data test_register_3 = {
->> +     .command_cb = cmd_handler,
->> +     .server_send = atbrsf_read,
->> +     .data_len = sizeof(atbrsf_read),
->> +     .expected_rsp = err_rsp,
->> +     .expected_rsp_len = sizeof(err_rsp),
->> +     .result_cb = prefix_handler,
->> +     .expected_cmd_type = HFP_GW_CMD_TYPE_READ,
->> +     .prefix = prefix_brsf
->> +};
->> +
->> +static const char prefix_d[] = "D";
->
-> I wonder why here it is acceptable and above you are making the huge effort to give every character separately.
->
-> Regards
->
-> Marcel
->
+On Tue, Mar 04, 2014, Michael Knudsen wrote:
+> On 02/18/2014 09:48 AM, Michael Knudsen wrote:
+> >When stopping BCSP/H5, stop the retransmission timer before proceeding
+> >to clean up packet queues.  The previous code had a race condition where
+> >the timer could trigger after the packet lists and protocol structure
+> >had been removed which lead to dereferencing NULL or use-after-free bugs.
+> 
+> No interest?
 
-I thought it will be more readable if raw data passed to socket will
-be declared as array, not string. Prefixes are passed as strings,
-because they are used in hfp_gw_register()  Anyway Luiz suggested to
-use common framework for this test like raw_pdu(args...) ,
-define_test(name, function, args...), (it is used in test-avctp and
-test-avrcp). Will it look better for you?
+I was just discussing this yesterday with Marcel (that we seem to have
+forgotten about this patch). The only concern is whether it's safe to
+sleep in the *_close callbacks (since you use del_timer_sync). Have you
+verified that this doesn't cause any issues?
 
-BR
-Marcin
+Johan
+
