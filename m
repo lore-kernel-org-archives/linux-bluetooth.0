@@ -1,191 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] android/hal-audio: Add open/close_endpoint helpers
-Date: Tue, 04 Mar 2014 10:27:12 +0100
-Message-ID: <1902690.WlBXYdsyBj@uw000953>
-In-Reply-To: <1393837002-29703-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1393837002-29703-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alexander Aring <alex.aring@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH bluetooth-next] bluetooth: make bluetooth 6lowpan as an option
+Date: Tue,  4 Mar 2014 10:23:02 +0100
+Message-Id: <1393924982-14001-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Currently you can have bluetooth 6lowpan without ipv6 enabled. This
+doesn't make any sense. With this patch you can disable/enable bluetooth
+6lowpan support at compile time.
 
-On Monday 03 of March 2014 09:56:38 Andrzej Kaczmarek wrote:
-> ---
->  android/hal-audio.c | 117 +++++++++++++++++++++++++++++-----------------------
->  1 file changed, 66 insertions(+), 51 deletions(-)
-> 
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 79a74b8..f6bc998 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -914,6 +914,70 @@ static void unregister_endpoints(void)
->  	}
->  }
->  
-> +static int set_blocking(int fd)
-> +{
-> +	int flags;
-> +
-> +	flags = fcntl(fd, F_GETFL, 0);
-> +	if (flags < 0) {
-> +		int err = -errno;
-> +		error("fcntl(F_GETFL): %s (%d)", strerror(-err), -err);
-> +		return err;
-> +	}
-> +
-> +	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
-> +		int err = -errno;
-> +		error("fcntl(F_SETFL): %s (%d)", strerror(-err), -err);
-> +		return err;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static bool open_endpoint(struct audio_endpoint *ep,
-> +						struct audio_input_config *cfg)
-> +{
-> +	struct audio_preset *preset;
-> +	const struct audio_codec *codec;
-> +	uint16_t mtu;
-> +	int fd;
-> +
-> +	if (ipc_open_stream_cmd(ep->id, &mtu, &fd, &preset) !=
-> +							AUDIO_STATUS_SUCCESS)
-> +		return false;
-> +
-> +	if (set_blocking(fd) < 0)
-> +		goto failed;
-> +
-> +	ep->fd = fd;
-> +
-> +	codec = ep->codec;
-> +	codec->init(preset, mtu, &ep->codec_data);
-> +	codec->get_config(ep->codec_data, cfg);
-> +
-> +	free(preset);
-> +
-> +	return true;
-> +
-> +failed:
-> +	close(fd);
-> +	free(preset);
-> +
-> +	return false;
-> +}
-> +
-> +static void close_endpoint(struct audio_endpoint *ep)
-> +{
-> +	ipc_close_stream_cmd(ep->id);
-> +	if (ep->fd >= 0) {
-> +		close(ep->fd);
-> +		ep->fd = -1;
-> +	}
-> +
-> +	ep->codec->cleanup(ep->codec_data);
-> +	ep->codec_data = NULL;
-> +}
-> +
->  static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
->  								size_t bytes)
->  {
-> @@ -1260,26 +1324,6 @@ static int in_remove_audio_effect(const struct audio_stream *stream,
->  	return -ENOSYS;
->  }
->  
-> -static int set_blocking(int fd)
-> -{
-> -	int flags;
-> -
-> -	flags = fcntl(fd, F_GETFL, 0);
-> -	if (flags < 0) {
-> -		int err = -errno;
-> -		error("fcntl(F_GETFL): %s (%d)", strerror(-err), -err);
-> -		return err;
-> -	}
-> -
-> -	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
-> -		int err = -errno;
-> -		error("fcntl(F_SETFL): %s (%d)", strerror(-err), -err);
-> -		return err;
-> -	}
-> -
-> -	return 0;
-> -}
-> -
->  static int audio_open_output_stream(struct audio_hw_device *dev,
->  					audio_io_handle_t handle,
->  					audio_devices_t devices,
-> @@ -1290,10 +1334,6 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
->  {
->  	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
->  	struct a2dp_stream_out *out;
-> -	struct audio_preset *preset;
-> -	const struct audio_codec *codec;
-> -	uint16_t mtu;
-> -	int fd;
->  
->  	out = calloc(1, sizeof(struct a2dp_stream_out));
->  	if (!out)
-> @@ -1321,29 +1361,12 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
->  	/* TODO: for now we always use endpoint 0 */
->  	out->ep = &audio_endpoints[0];
->  
-> -	if (ipc_open_stream_cmd(out->ep->id, &mtu, &fd, &preset) !=
-> -							AUDIO_STATUS_SUCCESS)
-> -		goto fail;
-> -
-> -	if (!preset || fd < 0)
-> -		goto fail;
-> -
-> -	if (set_blocking(fd) < 0) {
-> -		free(preset);
-> +	if (!open_endpoint(out->ep, &out->cfg))
->  		goto fail;
-> -	}
-> -
-> -	out->ep->fd = fd;
-> -	codec = out->ep->codec;
-> -
-> -	codec->init(preset, mtu, &out->ep->codec_data);
-> -	codec->get_config(out->ep->codec_data, &out->cfg);
->  
->  	DBG("rate=%d channels=%d format=%d", out->cfg.rate,
->  					out->cfg.channels, out->cfg.format);
->  
-> -	free(preset);
-> -
->  	if (out->cfg.channels == AUDIO_CHANNEL_OUT_MONO) {
->  		out->downmix_buf = malloc(FIXED_BUFFER_SIZE / 2);
->  		if (!out->downmix_buf)
-> @@ -1369,18 +1392,10 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
->  {
->  	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *) dev;
->  	struct a2dp_stream_out *out = (struct a2dp_stream_out *) stream;
-> -	struct audio_endpoint *ep = a2dp_dev->out->ep;
->  
->  	DBG("");
->  
-> -	ipc_close_stream_cmd(ep->id);
-> -	if (ep->fd >= 0) {
-> -		close(ep->fd);
-> -		ep->fd = -1;
-> -	}
-> -
-> -	ep->codec->cleanup(ep->codec_data);
-> -	ep->codec_data = NULL;
-> +	close_endpoint(a2dp_dev->out->ep);
->  
->  	free(out->downmix_buf);
->  
+The current bluetooth 6lowpan implementation doesn't check the return
+value of 6lowpan function. Nevertheless I added -EOPNOTSUPP as return value
+if 6lowpan bluetooth is disabled.
 
-All patches in this set are now upstream, thanks.
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/bluetooth/6lowpan.h | 21 +++++++++++++++++++++
+ net/bluetooth/Kconfig   |  8 +++++++-
+ net/bluetooth/Makefile  |  3 ++-
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/6lowpan.h b/net/bluetooth/6lowpan.h
+index 680eac8..5d281f1 100644
+--- a/net/bluetooth/6lowpan.h
++++ b/net/bluetooth/6lowpan.h
+@@ -14,13 +14,34 @@
+ #ifndef __6LOWPAN_H
+ #define __6LOWPAN_H
+ 
++#include <linux/errno.h>
+ #include <linux/skbuff.h>
+ #include <net/bluetooth/l2cap.h>
+ 
++#if IS_ENABLED(CONFIG_BT_6LOWPAN)
+ int bt_6lowpan_recv(struct l2cap_conn *conn, struct sk_buff *skb);
+ int bt_6lowpan_add_conn(struct l2cap_conn *conn);
+ int bt_6lowpan_del_conn(struct l2cap_conn *conn);
+ int bt_6lowpan_init(void);
+ void bt_6lowpan_cleanup(void);
++#else
++static int bt_6lowpan_recv(struct l2cap_conn *conn, struct sk_buff *skb)
++{
++	return -EOPNOTSUPP;
++}
++static int bt_6lowpan_add_conn(struct l2cap_conn *conn)
++{
++	return -EOPNOTSUPP;
++}
++int bt_6lowpan_del_conn(struct l2cap_conn *conn)
++{
++	return -EOPNOTSUPP;
++}
++static int bt_6lowpan_init(void)
++{
++	return -EOPNOTSUPP;
++}
++static void bt_6lowpan_cleanup(void) { }
++#endif
+ 
+ #endif /* __6LOWPAN_H */
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 985b560..10c752f 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -12,7 +12,6 @@ menuconfig BT
+ 	select CRYPTO_AES
+ 	select CRYPTO_ECB
+ 	select CRYPTO_SHA256
+-	select 6LOWPAN_IPHC
+ 	help
+ 	  Bluetooth is low-cost, low-power, short-range wireless technology.
+ 	  It was designed as a replacement for cables and other short-range
+@@ -40,6 +39,13 @@ menuconfig BT
+ 	  to Bluetooth kernel modules are provided in the BlueZ packages.  For
+ 	  more information, see <http://www.bluez.org/>.
+ 
++config BT_6LOWPAN
++	bool "Bluetooth 6LoWPAN support"
++	depends on BT && IPV6
++	select 6LOWPAN_IPHC
++	help
++	  IPv6 compression over Bluetooth.
++
+ source "net/bluetooth/rfcomm/Kconfig"
+ 
+ source "net/bluetooth/bnep/Kconfig"
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index 80cb215..ca51246 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -10,6 +10,7 @@ obj-$(CONFIG_BT_HIDP)	+= hidp/
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+-	a2mp.o amp.o 6lowpan.o
++	a2mp.o amp.o
++bluetooth-$(CONFIG_BT_6LOWPAN) += 6lowpan.o
+ 
+ subdir-ccflags-y += -D__CHECK_ENDIAN__
 -- 
-Best regards, 
-Szymon Janc
+1.9.0
