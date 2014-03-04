@@ -1,35 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 01/10] avrcp: Fix possible buffer overflow
-Date: Tue,  4 Mar 2014 16:02:06 +0200
-Message-Id: <1393941735-12187-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH BlueZ] AVCTP: Fix sending wrong response format
+Date: Tue,  4 Mar 2014 15:08:17 +0200
+Message-Id: <1393938497-4522-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes static analysers warnings.
+Reject and Not Implemented responses of PASS THROUGH commands shall
+contain the data of the previous frame accourding to AVC Panel Subunit
+specification page 87.
 ---
- profiles/audio/avrcp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ android/avctp.c        | 4 ++--
+ profiles/audio/avctp.c | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index bca2fc8..aa932e0 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1909,6 +1909,9 @@ static void avrcp_get_current_player_value(struct avrcp *session,
- 	struct avrcp_header *pdu = (void *) buf;
- 	uint16_t length = AVRCP_HEADER_LENGTH + count + 1;
+diff --git a/android/avctp.c b/android/avctp.c
+index abf9449..9232cfa 100644
+--- a/android/avctp.c
++++ b/android/avctp.c
+@@ -322,7 +322,7 @@ static ssize_t handle_panel_passthrough(struct avctp *session,
  
-+	if (count > AVRCP_ATTRIBUTE_LAST)
-+		return;
-+
- 	memset(buf, 0, sizeof(buf));
+ 	if (*code != AVC_CTYPE_CONTROL || *subunit != AVC_SUBUNIT_PANEL) {
+ 		*code = AVC_CTYPE_REJECTED;
+-		return 0;
++		return operand_count;
+ 	}
  
- 	set_company_id(pdu->company_id, IEEEID_BTSIG);
+ 	if (operand_count == 0)
+@@ -394,7 +394,7 @@ static ssize_t handle_panel_passthrough(struct avctp *session,
+ 		DBG("AV/C: unknown button 0x%02X %s",
+ 						operands[0] & 0x7F, status);
+ 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
+-		return 0;
++		return operand_count;
+ 	}
+ 
+ done:
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 28c7685..f88e634 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -342,7 +342,7 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 
+ 	if (*code != AVC_CTYPE_CONTROL || *subunit != AVC_SUBUNIT_PANEL) {
+ 		*code = AVC_CTYPE_REJECTED;
+-		return 0;
++		return operand_count;
+ 	}
+ 
+ 	if (operand_count == 0)
+@@ -408,7 +408,7 @@ static size_t handle_panel_passthrough(struct avctp *session,
+ 		DBG("AV/C: unknown button 0x%02X %s",
+ 						operands[0] & 0x7F, status);
+ 		*code = AVC_CTYPE_NOT_IMPLEMENTED;
+-		return 0;
++		return operand_count;
+ 	}
+ 
+ done:
 -- 
-1.8.3.2
+1.8.5.3
 
