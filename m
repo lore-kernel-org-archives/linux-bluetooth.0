@@ -1,32 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 0/8] Initial AT handling for handsfree
-Date: Tue,  4 Mar 2014 16:32:02 +0100
-Message-Id: <1393947130-11999-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCHv2 00/10] AVRCP test patches rebased
+Date: Tue,  4 Mar 2014 16:02:05 +0200
+Message-Id: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds initial minimal set of AT commands to establish SLC connection.
+This is rebased version of my previous patch set rebased after
+latest modifications of avrcp-lib.
 
-Szymon Janc (8):
-  android/handsfree: Add support for AT+BRSF command
-  android/handsfree: Add support for AT+CIND command
-  android/handsfree: Add support for AT+CMER command
-  android/handsfree: Distinguish between HSP and HFP connection
-  shared/hfp: Add function to check if reach end of command
-  shared/hfp: Add hfp_gw_result_get_number_default function
-  android/handsfree: Add support for AT+BIA command
-  android/handsfree: Make connection state constants name shorter
+Andrei Emeltchenko (10):
+  avrcp: Fix possible buffer overflow
+  unit/avrcp: Add /TP/PAS/BV-06-C test
+  unit/avrcp: Add /TP/PAS/BV-08-C test
+  android/avrcp: Add avrcp_get_current_player_value() function
+  unit/avrcp: Add /TP/PAS/BV-09-C test
+  unit/avrcp: Add /TP/PAS/BV-10-C test
+  android/avrcp: Add avrcp_set_player_value() function
+  unit/avrcp: Add /TP/PAS/BV-11-C test
+  unit/avrcp: Add /TP/PAS/BI-01-C test
+  doc: Update test coverage document
 
- android/hal-msg.h   |  10 +-
- android/handsfree.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++++---
- src/shared/hfp.c    |  20 ++++
- src/shared/hfp.h    |   4 +
- 4 files changed, 282 insertions(+), 18 deletions(-)
+ android/avrcp-lib.c    |  39 +++++++++++++
+ android/avrcp-lib.h    |  14 +++++
+ doc/test-coverage.txt  |   2 +-
+ profiles/audio/avrcp.c |   3 +
+ unit/test-avrcp.c      | 156 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 213 insertions(+), 1 deletion(-)
 
 -- 
 1.8.3.2
