@@ -1,56 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/8] android/ipc: Add Mode parameter to register service command
-Date: Tue, 04 Mar 2014 10:20:36 +0100
-Message-ID: <4359625.mvsyXnKOJC@uw000953>
-In-Reply-To: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
-References: <1393804249-12392-1-git-send-email-szymon.janc@tieto.com>
+Date: Tue, 4 Mar 2014 11:05:06 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Michael Knudsen <m.knudsen@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth:  Stop BCSP/H5 timer before cleaning up
+Message-ID: <20140304090506.GA5610@localhost.P-661HNU-F1>
+References: <1392713288-12227-1-git-send-email-m.knudsen@samsung.com>
+ <531563D2.1060301@samsung.com>
+ <20140304071456.GA30165@localhost.P-661HNU-F1>
+ <53158C89.9010200@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <53158C89.9010200@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 03 of March 2014 00:50:42 Szymon Janc wrote:
-> This will allow to run daemon services in non-default mode.
-> ---
->  android/hal-ipc-api.txt | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index 0518c2f..6bf9af3 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -124,12 +124,16 @@ Core Service (ID 0)
->  	Opcode 0x01 - Register module command/response
->  
->  		Command parameters: Service id (1 octet)
-> +		                    Mode (1 octet)
->  		Response parameters: <none>
->  
->  		In case a command is sent for an undeclared service ID, it will
->  		be rejected. Also there will be no notifications for undeclared
->  		service ID.
->  
-> +		Valid Mode values: 0x00 = Default Mode
-> +		                   0xXX = as defined by service
-> +
->  		In case of an error, the error response will be returned.
->  
->  	Opcode 0x02 - Unregister module command/response
-> @@ -749,6 +753,8 @@ Bluetooth Handsfree HAL (ID 5)
->  
->  Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
->  
-> +	Service modes:               0x01 = Headset Profile only mode
-> +
->  	Opcode 0x00 - Error response
->  
->  		Response parameters: Status (1 octet)
-> 
+Hi Michael,
 
-Pushed.
+On Tue, Mar 04, 2014, Michael Knudsen wrote:
+> On 03/04/2014 08:14 AM, Johan Hedberg wrote:
+> >>>When stopping BCSP/H5, stop the retransmission timer before proceeding
+> >>>to clean up packet queues.  The previous code had a race condition where
+> >>>the timer could trigger after the packet lists and protocol structure
+> >>>had been removed which lead to dereferencing NULL or use-after-free bugs.
+> >>
+> >>No interest?
+> >
+> >I was just discussing this yesterday with Marcel (that we seem to have
+> >forgotten about this patch). The only concern is whether it's safe to
+> >sleep in the *_close callbacks (since you use del_timer_sync). Have you
+> >verified that this doesn't cause any issues?
+> 
+> Our internal testing was reliably triggering the crash before and
+> has been stable since our fix went into local trees.  I expected
+> sleeping to be fine since the path is in process context, and I
+> found that slip uses the same approach:
+> 
+> 	drivers/net/slip/slip.c:slip_close()
+> 
+> I think I saw other line disciplines that did the same but I don't
+> recall which ones.
+> 
+> Btw. if this is committed, there is a small typo in the message I
+> used:  Instead of ``lead'' it should be ``led''.
 
--- 
-Best regards, 
-Szymon Janc
+Thanks for the confirmation. I've now pushed the patch to the
+bluetooth-next tree (with the typo fixed too).
+
+Johan
