@@ -1,48 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLAt520ASue5Ba-BLpdp-+_H911H86fpZ9=qPSwfGkDRg@mail.gmail.com>
-References: <1393613928-22264-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<CABBYNZLAt520ASue5Ba-BLpdp-+_H911H86fpZ9=qPSwfGkDRg@mail.gmail.com>
-Date: Tue, 4 Mar 2014 13:48:55 +0200
-Message-ID: <CABBYNZ+vVP9mMj8nq=ifpHdomacebuyP33Cb2QujgEeoTW171g@mail.gmail.com>
-Subject: Re: [PATCH 0/6] Initial HAL test AVRCP api support
+In-Reply-To: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
+References: <1393786109-6554-1-git-send-email-luiz.dentz@gmail.com>
+Date: Tue, 4 Mar 2014 13:47:57 +0200
+Message-ID: <CABBYNZ+Fo=QxK+Dvkqr46vJr973XvuUA3VJ1N6QUf2gm-14CmQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 01/16] android/avrcp-lib: Add avrcp_send function
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi,
 
-On Sun, Mar 2, 2014 at 8:57 PM, Luiz Augusto von Dentz
+On Sun, Mar 2, 2014 at 8:48 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
-> Hi Ravi,
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> On Fri, Feb 28, 2014 at 8:58 PM, Ravi kumar Veeramally
-> <ravikumar.veeramally@linux.intel.com> wrote:
->> Patchset contains initial AVRCP api support for HAL test.
->>
->> Ravi kumar Veeramally (6):
->>   android/client: Add AVRCP get_play_status_rsp support
->>   android/client: Add AVRCP get_element_attr_rsp support
->>   android/client: Add AVRCP set_volume support
->>   android/client: Add AVRCP get_play_status_cb support
->>   android/client: Add AVRCP get_element_attr_cb support
->>   android/client: Add AVRCP volume_change_cb support
->>
->>  android/client/if-rc.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 151 insertions(+)
->>
->> --
->> 1.8.3.2
+> This adds avrcp_send function which can be used to response to
+> outstanding requests.
+> ---
+>  android/avrcp-lib.c | 27 +++++++++++++++++++++++++++
+>  android/avrcp-lib.h |  4 +++-
+>  2 files changed, 30 insertions(+), 1 deletion(-)
 >
-> This doesn't help much with AVRCP since the requests need to be
-> responded rather quickly we might need to have them auto responded if
-> we really want hal-tester to be usable.
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index 34eea66..6fed825 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -253,6 +253,33 @@ int avrcp_init_uinput(struct avrcp *session, const char *name,
+>         return avctp_init_uinput(session->conn, name, address);
+>  }
+>
+> +int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
+> +                                       uint8_t subunit, uint8_t pdu_id,
+> +                                       uint8_t *params, size_t params_len)
+> +{
+> +       struct avrcp_header *pdu = (void *) session->tx_buf;
+> +       size_t len = sizeof(*pdu);
+> +
+> +       memset(pdu, 0, len);
+> +
+> +       hton24(pdu->company_id, IEEEID_BTSIG);
+> +       pdu->pdu_id = pdu_id;
+> +       pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+> +
+> +       if (params_len > 0) {
+> +               len += params_len;
+> +
+> +               if (len > session->tx_mtu)
+> +                       return -ENOBUFS;
+> +
+> +               memcpy(pdu->params, params, params_len);
+> +               pdu->params_len = htons(params_len);
+> +       }
+> +
+> +       return avctp_send_vendordep(session->conn, transaction, code, subunit,
+> +                                                       session->tx_buf, len);
+> +}
+> +
+>  static int avrcp_send_req(struct avrcp *session, uint8_t code, uint8_t subunit,
+>                                         uint8_t pdu_id, uint8_t *params,
+>                                         size_t params_len, avctp_rsp_cb func,
+> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> index 0407cb4..a33bdfe 100644
+> --- a/android/avrcp-lib.h
+> +++ b/android/avrcp-lib.h
+> @@ -102,7 +102,9 @@ void avrcp_set_passthrough_handlers(struct avrcp *session,
+>                         void *user_data);
+>  int avrcp_init_uinput(struct avrcp *session, const char *name,
+>                                                         const char *address);
+> -
+> +int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
+> +                                       uint8_t subunit, uint8_t pdu_id,
+> +                                       uint8_t *params, size_t params_len);
+>  int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
+>                                         avctp_rsp_cb func, void *user_data);
+>  int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
+> --
+> 1.8.5.3
 
-Applied, it turn out to be useful while testing but I did need to add
-\n in a few places.
+I went ahead and pushed this sets with a few fixes suggested.
 
 
 -- 
