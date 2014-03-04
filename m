@@ -1,97 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 03/11] unit/test-hfp: Add /hfp/test_cmd_handler_1
-Date: Tue,  4 Mar 2014 13:28:18 +0100
-Message-Id: <1393936106-7493-3-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1393936106-7493-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1393936106-7493-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLAt520ASue5Ba-BLpdp-+_H911H86fpZ9=qPSwfGkDRg@mail.gmail.com>
+References: <1393613928-22264-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+	<CABBYNZLAt520ASue5Ba-BLpdp-+_H911H86fpZ9=qPSwfGkDRg@mail.gmail.com>
+Date: Tue, 4 Mar 2014 13:48:55 +0200
+Message-ID: <CABBYNZ+vVP9mMj8nq=ifpHdomacebuyP33Cb2QujgEeoTW171g@mail.gmail.com>
+Subject: Re: [PATCH 0/6] Initial HAL test AVRCP api support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- unit/test-hfp.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+Hi Ravi,
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index f220569..5e16378 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -104,6 +104,20 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 	return FALSE;
- }
- 
-+static void cmd_handler(const char *command, void *user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_pdu *pdu;
-+	unsigned int cmd_len = strlen(command);
-+
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
-+
-+	g_assert(cmd_len == pdu->size);
-+	g_assert(!memcmp(command, pdu->data, cmd_len));
-+
-+	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
-+}
-+
- static struct context *create_context(gconstpointer data)
- {
- 	struct context *context = g_new0(struct context, 1);
-@@ -146,6 +160,9 @@ static void execute_context(struct context *context)
- 
- 	test_free(context->data);
- 
-+	if (context->hfp)
-+		hfp_gw_unref(context->hfp);
-+
- 	g_free(context);
- }
- 
-@@ -159,6 +176,32 @@ static void test_init(gconstpointer data)
- 	g_assert(hfp_gw_set_close_on_unref(context->hfp, true));
- 
- 	hfp_gw_unref(context->hfp);
-+	context->hfp = NULL;
-+
-+	execute_context(context);
-+}
-+
-+static void test_command_handler(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+	const struct test_pdu *pdu;
-+	ssize_t len;
-+	bool ret;
-+
-+	context->hfp = hfp_gw_new(context->fd_client);
-+	g_assert(context->hfp);
-+
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
-+
-+	ret = hfp_gw_set_close_on_unref(context->hfp, true);
-+	g_assert(ret);
-+
-+	ret = hfp_gw_set_command_handler(context->hfp, cmd_handler,
-+								context, NULL);
-+	g_assert(ret);
-+
-+	len = write(context->fd_server, pdu->data, pdu->size);
-+	g_assert_cmpint(len, ==, pdu->size);
- 
- 	execute_context(context);
- }
-@@ -168,6 +211,10 @@ int main(int argc, char *argv[])
- 	g_test_init(&argc, &argv, NULL);
- 
- 	define_test("/hfp/test_init", test_init, data_end());
-+	define_test("/hfp/test_cmd_handler_1", test_command_handler,
-+			raw_pdu('A', 'T', '+', 'B', 'R', 'S', 'F', '\r'),
-+			raw_pdu('A', 'T', '+', 'B', 'R', 'S', 'F'),
-+			data_end());
- 
- 	return g_test_run();
- }
+On Sun, Mar 2, 2014 at 8:57 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi Ravi,
+>
+> On Fri, Feb 28, 2014 at 8:58 PM, Ravi kumar Veeramally
+> <ravikumar.veeramally@linux.intel.com> wrote:
+>> Patchset contains initial AVRCP api support for HAL test.
+>>
+>> Ravi kumar Veeramally (6):
+>>   android/client: Add AVRCP get_play_status_rsp support
+>>   android/client: Add AVRCP get_element_attr_rsp support
+>>   android/client: Add AVRCP set_volume support
+>>   android/client: Add AVRCP get_play_status_cb support
+>>   android/client: Add AVRCP get_element_attr_cb support
+>>   android/client: Add AVRCP volume_change_cb support
+>>
+>>  android/client/if-rc.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++++
+>>  1 file changed, 151 insertions(+)
+>>
+>> --
+>> 1.8.3.2
+>
+> This doesn't help much with AVRCP since the requests need to be
+> responded rather quickly we might need to have them auto responded if
+> we really want hal-tester to be usable.
+
+Applied, it turn out to be useful while testing but I did need to add
+\n in a few places.
+
+
 -- 
-1.8.3.1
-
+Luiz Augusto von Dentz
