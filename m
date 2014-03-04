@@ -1,36 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 00/10] AVRCP test patches rebased
-Date: Tue,  4 Mar 2014 16:02:05 +0200
-Message-Id: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 05/10] unit/avrcp: Add /TP/PAS/BV-09-C test
+Date: Tue,  4 Mar 2014 16:02:10 +0200
+Message-Id: <1393941735-12187-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This is rebased version of my previous patch set rebased after
-latest modifications of avrcp-lib.
+Test verifies that get current player application setting value command
+issued from the Controller.
+---
+ unit/test-avrcp.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-Andrei Emeltchenko (10):
-  avrcp: Fix possible buffer overflow
-  unit/avrcp: Add /TP/PAS/BV-06-C test
-  unit/avrcp: Add /TP/PAS/BV-08-C test
-  android/avrcp: Add avrcp_get_current_player_value() function
-  unit/avrcp: Add /TP/PAS/BV-09-C test
-  unit/avrcp: Add /TP/PAS/BV-10-C test
-  android/avrcp: Add avrcp_set_player_value() function
-  unit/avrcp: Add /TP/PAS/BV-11-C test
-  unit/avrcp: Add /TP/PAS/BI-01-C test
-  doc: Update test coverage document
-
- android/avrcp-lib.c    |  39 +++++++++++++
- android/avrcp-lib.h    |  14 +++++
- doc/test-coverage.txt  |   2 +-
- profiles/audio/avrcp.c |   3 +
- unit/test-avrcp.c      | 156 +++++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 213 insertions(+), 1 deletion(-)
-
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index a2f554c..a849be3 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -412,6 +412,14 @@ static void test_client(gconstpointer data)
+ 		avrcp_get_player_attribute_text(context->session, NULL, 0,
+ 								NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-09-C")) {
++		uint8_t attributes[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
++						AVRCP_ATTRIBUTE_REPEAT_MODE };
++
++		avrcp_get_current_player_value(context->session, attributes,
++						sizeof(attributes), NULL, NULL);
++	}
++
+ 	execute_context(context);
+ }
+ 
+@@ -557,5 +565,13 @@ int main(int argc, char *argv[])
+ 				AVRCP_GET_PLAYER_VALUE_TEXT,
+ 				0x00, 0x00, 0x01, 0x00));
+ 
++	define_test("/TP/PAS/BV-09-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_GET_CURRENT_PLAYER_VALUE,
++				0x00, 0x00, 0x03, 0x02,
++				AVRCP_ATTRIBUTE_EQUALIZER,
++				AVRCP_ATTRIBUTE_REPEAT_MODE));
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
