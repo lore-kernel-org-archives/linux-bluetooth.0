@@ -1,88 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
-From: Adam Warski <adam@warski.org>
-In-Reply-To: <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com>
-Date: Wed, 5 Mar 2014 21:41:39 +0100
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <A6C5B873-6614-45B3-AD4C-B3E08831E6D8@warski.org>
-References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com> <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org> <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org> <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com> <A2B80C7C-697D-44E5-80EA-B398E62EE608@warski.org> <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com>
+Date: Wed, 5 Mar 2014 22:40:19 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC BlueZ 0/3] Fix GATT server issues with BlueZ as LE
+ peripheral
+Message-ID: <20140305204019.GA14755@localhost.P-661HNU-F1>
+References: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Lizardo,
 
-I recompiled the kernel with dynamic debug, and here are the two files as per your instructions:
-http://www.warski.org/ibeacons/dmesg.txt
-http://www.warski.org/ibeacons/lescan.dump
-
-I also tried another thing. I have two kinds of beacons: one coming from Estimote, the other from Qualcomm (Gimbal).
-
-The Estimote beacons broadcast the advertisement packets with the same source address (well, it changes, but rarely). Hence to get all the packets the --duplicates flag is needed.
-
-The Gimbal beacons broadcast with a different source address every time (random address). Hence to get all the packets the duplicate flag isn’t needed, as every packet is different.
-
-Both transmit at a similar rate (maybe the Gimbals are a bit slower, but I also tried decreasing the scanning interval in hcitool), and with the Gimbal beacons the are no problems. So I guess this puts more doubt on possible USB cause? (and I checked the USB hub, it works fine as far as I can tell)
-
-The root cause must be something with the usage of the --duplicates flag, no? Though I can’t find the code that it is handling the buffering - is it done on the dongle itself?
-
-Adam
-
-On 04 Mar 2014, at 00:07, Anderson Lizardo <anderson.lizardo@openbossa.org> wrote:
-
-> Hi Adam,
+On Tue, Jan 28, 2014, Anderson Lizardo wrote:
+> Currently, we do not officially support running BlueZ as LE peripheral. But
+> there is already enough support from the kernel to support this. For instance,
+> there is the "Set Advertising" mgmt command to keep LE advertising enabled
+> after each connection.
 > 
-> On Mon, Mar 3, 2014 at 5:25 PM, Adam Warski <adam@warski.org> wrote:
->> But I guess even if it was a USB issue, it would be caught earlier? The advertisement packets have a certain preamble, and a CRC, so the shifted data would be discarded? Anyway, that doesn't seem to be the cause.
+> The current tracking of connections in BlueZ does not fully work for peripheral
+> role. These patches are a first attempt to improve the situation. Other fixes
+> are necessary to have full LE Peripheral support.
 > 
-> There are are a few things that point out to USB issue (in my opinion):
+> In particular, with these patches, notifications for PASP and ANP profiles
+> (implemented in profiles/alert/*) should work when BlueZ is on the peripheral
+> role. Other GATT server profiles will need fixing as well.
 > 
-> 1) You said that having ethernet cable connected or not modifies the
-> behavior. on RPI, the ethernet chip is attached to the USB. As I said,
-> strange things happen to me as well when not using powered USB hub
-> (specially with WiFi dongles and USB cameras) :)
+> I'm sending as RFC because I only did minimal testing. I hope that people
+> having issues with GATT server profiles running on peripheral role can tests
+> these patches. Otherwise, I'll do more tests later today and send a final
+> version by tomorrow.
 > 
-> 2) As you noticed, the "truncated" adv. packet is not being discarded
-> by the controller as we would expect. This means that the BT
-> controller is actually receiving a correct packet, but it is being
-> "truncated" when being sent to the host. The CRC/preamble, after
-> parsed and verified by the BT controller, is removed before sending
-> the packet to the host, so there is no way for the host do detect
-> corruptions between the BT controller and the kernel.
-> 
-> The dynamic debug messages may help identify whether there are
-> missing/truncated USB packets (there is a debug message in
-> btusb_intr_complete() from drivers/bluetooth/btusb.c to help identify
-> HCI reassembly issues).
-> 
-> Did you try using only the BT dongle and removing the Wifi one (and
-> connecting through ethernet cable)? Wifi dongles tend to be very power
-> hungry.
-> 
-> Also check whether the power source for the USB hub is working
-> properly... unfortunately I don't know how to check from the RPi side,
-> so you have to rely on first attaching it to the outlet, checking some
-> LED, and then attaching to the RPi. Also make sure the RPi uses its
-> own power adapter (instead of powering from the hub itself).
-> 
-> Well, at least you found a workaround (attaching an ethernet cable) :)
+> Notes: 
+> * The first patch is just cleanup, so can be applied as is.
+> * For testing, make sure to enable advertising on the machine running as
+>   peripheral (I use btmgmt tool for this).
 > 
 > Best Regards,
-> -- 
 > Anderson Lizardo
-> http://www.indt.org/?lang=en
-> INdT - Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> Anderson Lizardo (3):
+>   attrib-server: Remove unnecessary fields from struct gatt_channel
+>   core: Fix associating a GAttrib to a device on incoming connections
+>   alert: Only remove attio callback after ATT request was sent
+> 
+>  profiles/alert/server.c | 18 +++++++++++++++++-
+>  src/attrib-server.c     | 45 +++++++++++++++++++++++++++++----------------
+>  src/attrib-server.h     |  1 +
+>  src/device.c            |  5 +++++
+>  4 files changed, 52 insertions(+), 17 deletions(-)
 
--- 
-Adam Warski
+These patches seem to have been forgotten about. They looked fairly good
+to me so I rebased and applied them finally.
 
-http://twitter.com/#!/adamwarski
-http://www.softwaremill.com
-http://www.warski.org
-
+Johan
