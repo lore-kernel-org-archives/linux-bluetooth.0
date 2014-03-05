@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 5/5] shared: Add timeout handling with mainloop support
-Date: Wed, 5 Mar 2014 10:22:41 +0100
-Message-ID: <1394011361-9469-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 4/5] shared: Add timeout handling with Glib support
+Date: Wed, 5 Mar 2014 10:22:40 +0100
+Message-ID: <1394011361-9469-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,16 +13,16 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/shared/timeout-mainloop.c | 78 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
- create mode 100644 src/shared/timeout-mainloop.c
+ src/shared/timeout-glib.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
+ create mode 100644 src/shared/timeout-glib.c
 
-diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
+diff --git a/src/shared/timeout-glib.c b/src/shared/timeout-glib.c
 new file mode 100644
-index 0000000..bdc527a
+index 0000000..c045efc
 --- /dev/null
-+++ b/src/shared/timeout-mainloop.c
-@@ -0,0 +1,78 @@
++++ b/src/shared/timeout-glib.c
+@@ -0,0 +1,73 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
@@ -42,64 +42,59 @@ index 0000000..bdc527a
 + *
 + */
 +
-+#include <stdlib.h>
-+
 +#include "timeout.h"
 +
-+#include "monitor/mainloop.h"
++#include <glib.h>
 +
 +struct timeout_data {
-+	int id;
 +	timeout_func_t func;
 +	timeout_destroy_func_t destroy;
-+	unsigned int timeout;
 +	void *user_data;
 +};
 +
-+static void timeout_callback(int id, void *user_data)
++static gboolean timeout_callback(gpointer user_data)
 +{
-+	struct timeout_data *data = user_data;
++	struct timeout_data *data  = user_data;
 +
-+	if (data->func(data->user_data) &&
-+		!mainloop_modify_timeout(data->id, data->timeout))
-+		return;
++	if (data->func(data->user_data))
++		return TRUE;
 +
-+	mainloop_remove_timeout(data->id);
++	return FALSE;
 +}
 +
-+static void timeout_destroy(void *user_data)
++static void timeout_destroy(gpointer user_data)
 +{
 +	struct timeout_data *data = user_data;
 +
 +	if (data->destroy)
 +		data->destroy(data->user_data);
 +
-+	free(data);
++	g_free(data);
 +}
 +
-+int timeout_add(unsigned int t, timeout_func_t func, void *user_data,
++int timeout_add(unsigned int ms, timeout_func_t func, void *user_data,
 +						timeout_destroy_func_t destroy)
 +{
-+	struct timeout_data *data = malloc(sizeof(*data));
++	guint id;
++	struct timeout_data *data = g_malloc0(sizeof(*data));
 +
 +	data->func = func;
++	data->destroy = destroy;
 +	data->user_data = user_data;
-+	data->timeout = t;
 +
-+	data->id = mainloop_add_timeout(t, timeout_callback, data,
++	id = g_timeout_add_full(G_PRIORITY_DEFAULT, ms, timeout_callback, data,
 +							timeout_destroy);
-+	if (!data->id) {
-+		free(data);
-+		return 0;
-+	}
++	if (!id)
++		g_free(data);
 +
-+	return data->id;
++	return id;
 +}
 +
 +void timeout_remove(unsigned int id)
 +{
-+	if (id)
-+		mainloop_remove_timeout(id);
++	GSource *source = g_main_context_find_source_by_id(NULL, id);
++	if (source)
++		g_source_destroy(source);
 +}
 -- 
 1.8.4
