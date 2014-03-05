@@ -1,24 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Mar 2014 14:03:19 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/sco-tester: Remove not used function argument
-Message-ID: <20140305120319.GA14172@localhost.P-661HNU-F1>
-References: <1394003747-23412-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1394003747-23412-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: =?UTF-8?q?Thomas=20B=C3=A4chler?= <thomas@archlinux.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	=?UTF-8?q?Thomas=20B=C3=A4chler?= <thomas@archlinux.org>
+Subject: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for virtual HCI driver"
+Date: Wed,  5 Mar 2014 12:59:12 +0100
+Message-Id: <1394020752-6186-1-git-send-email-thomas@archlinux.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Adding the devname:vhci alias and thus adding a static /dev/vhci device node
+only works when assigning a fixed major/minor number. However, the code
+currently uses a dynamically assigned minor number. It is therefore impossible
+to create a static device and to autoload the module when accessing it.
 
-On Wed, Mar 05, 2014, Marcin Kraglak wrote:
-> ---
->  tools/sco-tester.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Reverting this fixes the kmod error message
+ depmod: ERROR: Module 'hci_vhci' has devname (vhci) but lacks major and minor information. Ignoring.
 
-Applied. Thanks.
+This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
+---
+ drivers/bluetooth/hci_vhci.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Johan
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 1ef6990..cf05d70 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -384,4 +384,3 @@ MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
+ MODULE_DESCRIPTION("Bluetooth virtual HCI driver ver " VERSION);
+ MODULE_VERSION(VERSION);
+ MODULE_LICENSE("GPL");
+-MODULE_ALIAS("devname:vhci");
+-- 
+1.9.0
