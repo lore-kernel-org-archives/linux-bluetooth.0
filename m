@@ -1,238 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 02/11] unit: Initial version of test-hfp
-Date: Wed,  5 Mar 2014 20:22:47 +0100
-Message-Id: <1394047376-11495-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1394047376-11495-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1394047376-11495-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for virtual HCI driver"
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CA+5PVA6vkGHJGMgEYCTSdvqOuMb-fHURVvP-sHAofd6840TLOQ@mail.gmail.com>
+Date: Wed, 5 Mar 2014 11:02:30 -0800
+Cc: =?iso-8859-1?Q?Thomas_B=E4chler?= <thomas@archlinux.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
+	<linux-bluetooth@vger.kernel.org>,
+	"Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Message-Id: <6803E0AA-F0C1-45F4-A7B8-428F4C6EE14E@holtmann.org>
+References: <1394020752-6186-1-git-send-email-thomas@archlinux.org> <7E804DF3-E191-427E-8E20-FE6ECDC490EA@holtmann.org> <CA+5PVA56oO6FS2pG+D7yJtNrTqBGZ1CtPygjid4E0f3cPPi83g@mail.gmail.com> <424A74F3-7646-449C-9F72-A0F4E9A28551@holtmann.org> <53177187.3040009@archlinux.org> <CA+5PVA6vkGHJGMgEYCTSdvqOuMb-fHURVvP-sHAofd6840TLOQ@mail.gmail.com>
+To: Josh Boyer <jwboyer@fedoraproject.org>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is skeleton of hfp unit tests with basic init test
-for hfp_gw_new().
-Basic test with hfp_gw_new() and hfp_gw_unref.
----
- .gitignore      |   1 +
- Makefile.am     |  12 ++++
- unit/test-hfp.c | 173 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 186 insertions(+)
- create mode 100644 unit/test-hfp.c
+Hi Josh,
 
-diff --git a/.gitignore b/.gitignore
-index 94c0c78..6719be8 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -84,6 +84,7 @@ unit/test-gdbus-client
- unit/test-sdp
- unit/test-lib
- unit/test-mgmt
-+unit/test-hfp
- tools/mgmt-tester
- tools/smp-tester
- tools/gap-tester
-diff --git a/Makefile.am b/Makefile.am
-index 0c79e58..0107cef 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -293,6 +293,18 @@ unit_test_avrcp_SOURCES = unit/test-avrcp.c \
- 				android/avrcp-lib.c android/avrcp-lib.h
- unit_test_avrcp_LDADD = @GLIB_LIBS@ lib/libbluetooth-internal.la
- 
-+unit_tests += unit/test-hfp
-+
-+unit_test_hfp_SOURCES = unit/test-hfp.c \
-+				src/shared/io.h src/shared/io-glib.c \
-+				src/shared/queue.h src/shared/queue.c \
-+				src/shared/util.h src/shared/util.c \
-+				src/shared/mgmt.h src/shared/mgmt.c \
-+				src/shared/ringbuf.h src/shared/ringbuf.c \
-+				src/shared/hfp.h src/shared/hfp.c
-+
-+unit_test_hfp_LDADD = @GLIB_LIBS@
-+
- unit_tests += unit/test-gdbus-client
- 
- unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-new file mode 100644
-index 0000000..f220569
---- /dev/null
-+++ b/unit/test-hfp.c
-@@ -0,0 +1,173 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include <sys/socket.h>
-+#include <unistd.h>
-+#include <stdint.h>
-+#include <stdio.h>
-+#include <string.h>
-+
-+#include <glib.h>
-+#include "src/shared/hfp.h"
-+
-+struct context {
-+	GMainLoop *main_loop;
-+	guint watch_id;
-+	int fd_server;
-+	int fd_client;
-+	struct hfp_gw *hfp;
-+	const struct test_data *data;
-+	unsigned int pdu_offset;
-+};
-+
-+struct test_pdu {
-+	bool valid;
-+	const uint8_t *data;
-+	size_t size;
-+};
-+
-+struct test_data {
-+	char *test_name;
-+	struct test_pdu *pdu_list;
-+};
-+
-+#define data(args...) ((const unsigned char[]) { args })
-+
-+#define raw_pdu(args...)					\
-+	{							\
-+		.valid = true,					\
-+		.data = data(args),				\
-+		.size = sizeof(data(args)),			\
-+	}
-+
-+#define data_end()						\
-+	{							\
-+		.valid = false,					\
-+	}
-+
-+#define define_test(name, function, args...)				\
-+	do {								\
-+		const struct test_pdu pdus[] = {			\
-+			args, { }					\
-+		};							\
-+		static struct test_data data;				\
-+		data.test_name = g_strdup(name);			\
-+		data.pdu_list = g_malloc(sizeof(pdus));			\
-+		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
-+		g_test_add_data_func(name, &data, function);		\
-+	} while (0)
-+
-+static void context_quit(struct context *context)
-+{
-+	g_main_loop_quit(context->main_loop);
-+}
-+
-+static void test_free(gconstpointer user_data)
-+{
-+	const struct test_data *data = user_data;
-+
-+	g_free(data->test_name);
-+	g_free(data->pdu_list);
-+}
-+
-+static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
-+{
-+	struct context *context = user_data;
-+	const struct test_pdu *pdu;
-+
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
-+
-+	g_assert(!pdu->valid);
-+	context_quit(context);
-+
-+	return FALSE;
-+}
-+
-+static struct context *create_context(gconstpointer data)
-+{
-+	struct context *context = g_new0(struct context, 1);
-+	GIOChannel *channel;
-+	int err, sv[2];
-+
-+	context->main_loop = g_main_loop_new(NULL, FALSE);
-+	g_assert(context->main_loop);
-+
-+	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
-+	g_assert(err == 0);
-+
-+	channel = g_io_channel_unix_new(sv[1]);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	context->watch_id = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				test_handler, context);
-+	g_assert(context->watch_id > 0);
-+
-+	g_io_channel_unref(channel);
-+
-+	context->fd_server = sv[1];
-+	context->fd_client = sv[0];
-+	context->data = data;
-+
-+	return context;
-+}
-+
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	g_source_remove(context->watch_id);
-+
-+	g_main_loop_unref(context->main_loop);
-+
-+	test_free(context->data);
-+
-+	g_free(context);
-+}
-+
-+static void test_init(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+
-+	context->hfp = hfp_gw_new(context->fd_client);
-+
-+	g_assert(context->hfp);
-+	g_assert(hfp_gw_set_close_on_unref(context->hfp, true));
-+
-+	hfp_gw_unref(context->hfp);
-+
-+	execute_context(context);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	g_test_init(&argc, &argv, NULL);
-+
-+	define_test("/hfp/test_init", test_init, data_end());
-+
-+	return g_test_run();
-+}
--- 
-1.8.3.1
+>>>>>> This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
+>>>>> 
+>>>>> NAK. We allocated a static minor for this.
+>>>> 
+>>>> Johan mentioned that.  Commit b075dd40c95d11c2c8690f6c4d6232fc,
+>>>> correct?
+>> 
+>> I am sorry Marcel, I only looked at the Linus tree, not at bluetooth or
+>> bluetooth-next. This commit should indeed fix the problem. Disregard my
+>> patch.
+>> 
+>>> Why isn't that headed into 3.14 right now, and CC'd to
+>>>> stable?  Currently you have a somewhat broken driver in 3.13 and
+>>>> 3.14-rcX that seems to have a pretty clear fix.
+>>> 
+>>> somewhat broken? kmod prints this as an error, but it is not a regression in user functionality. The driver works just as before. The error message can be ignored.
+>> 
+>> It's a regression in my sanity, since numerous users blame all kernel
+>> bugs on this error message and I am tired of explaining the situation
+>> (problem + error message == problem found *sigh*). I only sent this
+>> patch since I hadn't found the correct fix.
+> 
+> Exactly.
+> 
+>>> So if anybody feels strongly that the static device node assignment should be put into -stable, then I am fine with it. However I do not see this as passing requirement for a -stable fix since it is really not affecting anyone (minus the misleading message from kmod).
+>> 
+>> Since b075dd4 will end up in the Linus tree eventually, I have no
+>> trouble backporting it myself.
+> 
+> I don't have any difficulty doing that either, but if it was in stable
+> every distro getting bugs about it wouldn't have to carry the fix on
+> their own.
+
+the patch is currently in wireless-next and will eventually end up in net-next. Maybe it is better to have it cherry picked once it reaches net-next.
+
+Regards
+
+Marcel
 
