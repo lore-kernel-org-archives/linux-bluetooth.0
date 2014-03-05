@@ -1,43 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 0/2] android: Enable debugs bluetoothd
-Date: Wed, 5 Mar 2014 13:56:04 +0100
-Message-ID: <1394024166-14102-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-ID: <53172F72.1050804@gmail.com>
+Date: Wed, 05 Mar 2014 14:06:42 +0000
+From: Andrea <mariofutire@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: Antonio Ospite <ao2@ao2.it>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: Controlling LEDs and rumble on sixaxis
+References: <53164362.4060102@gmail.com> <20140304231118.3500abb703a7c1a7679d01f1@ao2.it>
+In-Reply-To: <20140304231118.3500abb703a7c1a7679d01f1@ao2.it>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For user variant build of Android we should not print too much logs.
-Therefore we should have possibility to turn on/off logs.
+On 04/03/14 22:11, Antonio Ospite wrote:
+> 
+> With older kernels you can already set LEDs and rumble by sending the
+> HID output report 01 via hidraw (actually there is a regression
+> preventing that via BT in some versions). See the code in the BlueZ
 
-First patch adds simple on/off mechanism using android properties and
-bluetoothd-wrapper.
+I think the kernels I use have this regressions as the plugin does not set anything.
+(Szymon mentioned something like that)
+could you please give me a link to the fix so I can track if and when they are fixed for me.
 
-Bluetoothd-wrapper is used because:
-1. we can read android properties there
-2. We can get early logs from daemon startup
-3. bluetoothd-wrapper is not used in user variant build so debug logs
-should be off on that variant by default.
+> sixaxis plugin or in the newer linux kernel for the report format.
+> 
+> With recent/newer kernels you can use the sysfs leds class under
+> /sys/class/leds/ to control the LEDs and the force feedback api[1] to
+> control the rumble.
 
-Second patch gives us possibility to enable verbose logs and for now it
-is mgmt interface logs which also might be useful in some cases.
+sounds simple. is this functionality affected by the above regression?
 
-For now, when verbose debugs are ON then also debug is ON.
+> dbus is not necessary, but depending on your application you may want to
+> use libudev to add the hotplug detection of the controller.
+> 
 
-Lukasz Rymanowski (2):
-  android: Add possible to enable BlueZ debug logs
-  android: Add verbose debugs to BlueZ
+I only mentioned dbus as I found I can use it to disconnect the controller (Bluetooth).
+Happy to skip it altogether. If there is a better way?
 
- android/README               | 16 ++++++++++++++++
- android/bluetooth.c          | 11 ++++++++++-
- android/bluetooth.h          |  2 +-
- android/bluetoothd-wrapper.c | 27 ++++++++++++++++++++++-----
- android/main.c               | 14 ++++++++++++--
- 5 files changed, 61 insertions(+), 9 deletions(-)
-
--- 
-1.8.4
+Andrea
 
