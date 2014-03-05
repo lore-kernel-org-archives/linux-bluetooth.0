@@ -1,71 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/5] android/hal-gatt-api: Simplify GATT Test cmd struct
-Date: Wed,  5 Mar 2014 09:59:46 +0100
-Message-Id: <1394009990-5795-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1393965804-13866-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1393965804-13866-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Wed, 5 Mar 2014 10:42:21 +0200
+Message-ID: <CABBYNZJprM2WzcWotV20z7EzN2VONOxoKR2eqRSQbLOvZtSG8A@mail.gmail.com>
+Subject: Re: [PATCH 1/4] android/avrcp: Fix response for RegisterNotification
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make nested struct open coded for simplicity.
----
- android/hal-ipc-api.txt | 15 +++++++--------
- android/hal-msg.h       |  8 ++------
- 2 files changed, 9 insertions(+), 14 deletions(-)
+Hi Andrzej,
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 6bf9af3..6fa0d3b 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1657,14 +1657,13 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x16 - Test Command command/response
- 
- 		Command parameters: Command (4 octets)
--		                    Test Parameters (32 octets)
--		Valid Test Parameter: Address (6 octets)
--		                      UUID (16 octets)
--		                      U1 (2 octets)
--		                      U2 (2 octets)
--		                      U3 (2 octets)
--		                      U4 (2 octets)
--		                      U5 (2 octets)
-+		                    Address (6 octets)
-+		                    UUID (16 octets)
-+		                    U1 (2 octets)
-+		                    U2 (2 octets)
-+		                    U3 (2 octets)
-+		                    U4 (2 octets)
-+		                    U5 (2 octets)
- 		Response parameters: <none>
- 
- 		In case of an error, the error response will be returned.
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index dd25f6e..c3b1bc3 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -680,7 +680,8 @@ struct hal_cmd_gatt_client_set_adv_data {
- } __attribute__((packed));
- 
- #define HAL_OP_GATT_CLIENT_TEST_COMMAND		0x16
--struct hal_gatt_test_params {
-+struct hal_cmd_gatt_client_test_command {
-+	int32_t command;
- 	uint8_t  bda1[6];
- 	uint8_t  uuid1[16];
- 	uint16_t u1;
-@@ -690,11 +691,6 @@ struct hal_gatt_test_params {
- 	uint16_t u5;
- } __attribute__((packed));
- 
--struct hal_cmd_gatt_client_test_command {
--	int32_t command;
--	struct hal_gatt_test_params params;
--} __attribute__((packed));
--
- #define HAL_OP_GATT_SERVER_REGISTER		0x17
- struct hal_cmd_gatt_server_register {
- 	uint8_t uuid[16];
+On Tue, Mar 4, 2014 at 10:43 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> ---
+>  android/avrcp.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index 8eac4cd..f3427a3 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -255,6 +255,7 @@ static void handle_register_notification(const void *buf, uint16_t len)
+>         struct avrcp_request *req;
+>         uint8_t pdu[IPC_MTU];
+>         size_t pdu_len;
+> +       uint8_t code;
+>         int ret;
+>
+>         DBG("");
+> @@ -280,8 +281,20 @@ static void handle_register_notification(const void *buf, uint16_t len)
+>                 goto done;
+>         }
+>
+> +       switch (cmd->type) {
+> +       case HAL_AVRCP_EVENT_TYPE_INTERIM:
+> +               code = AVC_CTYPE_INTERIM;
+> +               break;
+> +       case HAL_AVRCP_EVENT_TYPE_CHANGED:
+> +               code = AVC_CTYPE_CHANGED;
+> +               break;
+> +       default:
+> +               status = HAL_STATUS_FAILED;
+> +               goto done;
+> +       }
+> +
+>         ret = avrcp_register_notification_rsp(req->dev->session,
+> -                                               req->transaction, cmd->type,
+> +                                               req->transaction, code,
+>                                                 pdu, pdu_len);
+>         if (ret < 0) {
+>                 status = HAL_STATUS_FAILED;
+> --
+> 1.9.0
+
+Applied, thanks.
+
+
 -- 
-1.9.0
-
+Luiz Augusto von Dentz
