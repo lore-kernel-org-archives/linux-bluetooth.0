@@ -1,51 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 11/11] shared/hfp: Don't try read uninitialized data in ringbuffer
-Date: Wed,  5 Mar 2014 20:22:56 +0100
-Message-Id: <1394047376-11495-11-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 10/11] unit/test-hfp: Add /hfp/test_fragmented_1
+Date: Wed,  5 Mar 2014 20:22:55 +0100
+Message-Id: <1394047376-11495-10-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1394047376-11495-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1394047376-11495-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Don't try to read uninitialized value if '\r' was not found.
-This is call stack from test-hfp run with valgrind:
-
-/hfp/test_fragmented_1: ==24869== Conditional jump or move depends on uninitialised value(s)
-==24869==    at 0x400A5E4: memchr (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-==24869==    by 0x804D24D: can_read_data (hfp.c:359)
-==24869==    by 0x804A6E2: read_callback (io-glib.c:168)
-==24869==    by 0x4108BFD5: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x410470E5: g_main_context_dispatch (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x41047497: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x41047912: g_main_loop_run (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x8049EE0: execute_context (test-hfp.c:186)
-==24869==    by 0x4106CBC1: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x4106CD5B: ??? (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x4106D0E0: g_test_run_suite (in /usr/lib/libglib-2.0.so.0.3600.4)
-==24869==    by 0x4106D13C: g_test_run (in /usr/lib/libglib-2.0.so.0.3600.4)
 ---
- src/shared/hfp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ unit/test-hfp.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 9523243..1be53fb 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -374,6 +374,12 @@ static void process_input(struct hfp_gw *hfp)
- 		char *str2;
- 		size_t len2;
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 546a239..5218a2b 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -45,6 +45,7 @@ struct test_pdu {
+ 	const uint8_t *data;
+ 	size_t size;
+ 	enum hfp_gw_cmd_type type;
++	bool fragmented;
+ };
  
-+		/* If there is no more data in ringbuffer,
-+		 * it's just an incomplete command.
-+		 */
-+		if (len == ringbuf_len(hfp->read_buf))
-+			return;
+ struct test_data {
+@@ -74,6 +75,14 @@ struct test_data {
+ 		.type = cmd_type,				\
+ 	}
+ 
++#define frg_pdu(args...)					\
++	{							\
++		.valid = true,					\
++		.data = data(args),				\
++		.size = sizeof(data(args)),			\
++		.fragmented = true,				\
++	}
 +
- 		str2 = ringbuf_peek(hfp->read_buf, len, &len2);
- 		if (!str2)
- 			return;
+ #define define_test(name, function, args...)				\
+ 	do {								\
+ 		const struct test_pdu pdus[] = {			\
+@@ -255,6 +264,40 @@ static void test_register(gconstpointer data)
+ 	execute_context(context);
+ }
+ 
++static gboolean send_pdu(gpointer user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	ssize_t len;
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	len = write(context->fd_server, pdu->data, pdu->size);
++	g_assert_cmpint(len, ==, pdu->size);
++
++	pdu = &context->data->pdu_list[context->pdu_offset];
++	if (pdu->fragmented)
++		g_idle_add(send_pdu, context);
++
++	return FALSE;
++}
++
++static void test_fragmented(gconstpointer data)
++{
++	struct context *context = create_context(data);
++	bool ret;
++
++	context->hfp = hfp_gw_new(context->fd_client);
++	g_assert(context->hfp);
++
++	ret = hfp_gw_set_close_on_unref(context->hfp, true);
++	g_assert(ret);
++
++	g_idle_add(send_pdu, context);
++
++	execute_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -294,6 +337,10 @@ int main(int argc, char *argv[])
+ 			raw_pdu('A', 'T', 'D', '1', '2', '3', '4', '5', '\r'),
+ 			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
+ 			data_end());
++	define_test("/hfp/test_fragmented_1", test_fragmented,
++			frg_pdu('A'), frg_pdu('T'), frg_pdu('+'), frg_pdu('B'),
++			frg_pdu('R'), frg_pdu('S'), frg_pdu('F'), frg_pdu('\r'),
++			data_end());
+ 
+ 	return g_test_run();
+ }
 -- 
 1.8.3.1
 
