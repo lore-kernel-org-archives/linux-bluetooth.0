@@ -1,48 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1394011361-9469-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1394011361-9469-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 5 Mar 2014 09:39:18 -0400
-Message-ID: <CAJdJm_P0r4KgudNz=83PT4YD+EKOLNsFpF7qhhMNsDGVuJZRLg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/5] monitor: Use miliseconds instead of seconds in the timeout
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Alexander Aring <alex.aring@gmail.com>
+To: marcel@holtmann.org
+Cc: gustavo@padovan.org,
+	johan.hedberg@gmail.com,
+	davem@davemloft.net,
+	alex.bluesman.smirnov@gmail.com,
+	dbaryshkov@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH net-next 1/2] 6lowpan: add missing include of net/ipv6.h
+Date: Wed,  5 Mar 2014 14:29:04 +0100
+Message-Id: <1394026145-18981-2-git-send-email-alex.aring@gmail.com>
+In-Reply-To: <1394026145-18981-1-git-send-email-alex.aring@gmail.com>
+References: <1394026145-18981-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+The 6lowpan.h file contains some static inline function which use
+internal ipv6 api structs. Add a include of ipv6.h to be sure that it's
+known before.
 
-On Wed, Mar 5, 2014 at 5:22 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> -static inline int timeout_set(int fd, unsigned int seconds)
-> +static inline int timeout_set(int fd, unsigned int msec)
->  {
->         struct itimerspec itimer;
-> +       unsigned int sec = msec / 1000;
->
->         memset(&itimer, 0, sizeof(itimer));
->         itimer.it_interval.tv_sec = 0;
->         itimer.it_interval.tv_nsec = 0;
-> -       itimer.it_value.tv_sec = seconds;
-> -       itimer.it_value.tv_nsec = 0;
-> +       itimer.it_value.tv_sec = sec;
-> +       itimer.it_value.tv_nsec = (msec - (sec * 1000)) * 1000;
+Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+---
+ net/ieee802154/6lowpan.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Would you not be multiplying by 1000000 (i.e. 10^6) instead?
-
-Also, why not use:
-
-itimer.it_value.tv_nsec = (msec % 1000) * 1000000;
-
->
->         return timerfd_settime(fd, 0, &itimer, NULL);
->  }
-
-Best Regards,
+diff --git a/net/ieee802154/6lowpan.h b/net/ieee802154/6lowpan.h
+index 0dccf62..f7d372b 100644
+--- a/net/ieee802154/6lowpan.h
++++ b/net/ieee802154/6lowpan.h
+@@ -53,6 +53,8 @@
+ #ifndef __6LOWPAN_H__
+ #define __6LOWPAN_H__
+ 
++#include <net/ipv6.h>
++
+ #define UIP_802154_SHORTADDR_LEN	2  /* compressed ipv6 address length */
+ #define UIP_IPH_LEN			40 /* ipv6 fixed header size */
+ #define UIP_PROTO_UDP			17 /* ipv6 next header value for UDP */
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+1.9.0
