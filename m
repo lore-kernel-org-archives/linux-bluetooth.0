@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 1/5] monitor: Allow to modify epoll even events are the same
-Date: Wed, 5 Mar 2014 10:22:37 +0100
-Message-ID: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 5/5] android/hal-gatt-api: Use proper type for length
+Date: Wed,  5 Mar 2014 09:59:50 +0100
+Message-Id: <1394009990-5795-5-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1394009990-5795-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1394009990-5795-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is epsecially needed when we want to modify timer.
+Length can be up to 600 thus 16bit value should be used.
 ---
- monitor/mainloop.c | 3 ---
- 1 file changed, 3 deletions(-)
+ android/hal-msg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/monitor/mainloop.c b/monitor/mainloop.c
-index 8c94bfe..7f97e65 100644
---- a/monitor/mainloop.c
-+++ b/monitor/mainloop.c
-@@ -222,9 +222,6 @@ int mainloop_modify_fd(int fd, uint32_t events)
- 	if (!data)
- 		return -ENXIO;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 677f450..8ac26ab 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -781,7 +781,7 @@ struct hal_cmd_gatt_server_send_response {
+ 	int32_t conn_id;
+ 	int32_t trans_id;
+ 	int32_t status;
+-	uint8_t len;
++	uint16_t len;
+ 	uint8_t data[0];
+ } __attribute__((packed));
  
--	if (data->events == events)
--		return 0;
--
- 	memset(&ev, 0, sizeof(ev));
- 	ev.events = events;
- 	ev.data.ptr = data;
 -- 
-1.8.4
+1.9.0
 
