@@ -1,53 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1393941735-12187-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 5 Mar 2014 10:24:36 +0200
-Message-ID: <CABBYNZ+taZtCf+OGZnYJ6jjBDT+p3FHKBv4Xy5h8o0USQMMMGQ@mail.gmail.com>
-Subject: Re: [PATCHv2 00/10] AVRCP test patches rebased
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] tools/sco-tester: Remove not used function argument
+Date: Wed,  5 Mar 2014 08:15:47 +0100
+Message-Id: <1394003747-23412-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+---
+ tools/sco-tester.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On Tue, Mar 4, 2014 at 4:02 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> This is rebased version of my previous patch set rebased after
-> latest modifications of avrcp-lib.
->
-> Andrei Emeltchenko (10):
->   avrcp: Fix possible buffer overflow
->   unit/avrcp: Add /TP/PAS/BV-06-C test
->   unit/avrcp: Add /TP/PAS/BV-08-C test
->   android/avrcp: Add avrcp_get_current_player_value() function
->   unit/avrcp: Add /TP/PAS/BV-09-C test
->   unit/avrcp: Add /TP/PAS/BV-10-C test
->   android/avrcp: Add avrcp_set_player_value() function
->   unit/avrcp: Add /TP/PAS/BV-11-C test
->   unit/avrcp: Add /TP/PAS/BI-01-C test
->   doc: Update test coverage document
->
->  android/avrcp-lib.c    |  39 +++++++++++++
->  android/avrcp-lib.h    |  14 +++++
->  doc/test-coverage.txt  |   2 +-
->  profiles/audio/avrcp.c |   3 +
->  unit/test-avrcp.c      | 156 +++++++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 213 insertions(+), 1 deletion(-)
->
-> --
-> 1.8.3.2
-
-Pushed, not that the first I did not apply since there already a check
-if attributes are within the valid range before calling that function,
-also change some parameter and code placement to be more consistent
-and don't use VLA for buffers.
-
-
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index 25e4af6..db45ef0 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -415,7 +415,7 @@ end:
+ 	close(sk);
+ }
+ 
+-static int create_sco_sock(struct test_data *data, uint16_t psm)
++static int create_sco_sock(struct test_data *data)
+ {
+ 	const uint8_t *master_bdaddr;
+ 	struct sockaddr_sco addr;
+@@ -514,7 +514,7 @@ static void test_connect(const void *test_data)
+ 	GIOChannel *io;
+ 	int sk;
+ 
+-	sk = create_sco_sock(data, 0);
++	sk = create_sco_sock(data);
+ 	if (sk < 0) {
+ 		tester_test_failed();
+ 		return;
+@@ -543,7 +543,7 @@ static void test_connect_transp(const void *test_data)
+ 	int sk, err;
+ 	struct bt_voice voice;
+ 
+-	sk = create_sco_sock(data, 0);
++	sk = create_sco_sock(data);
+ 	if (sk < 0) {
+ 		tester_test_failed();
+ 		return;
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
