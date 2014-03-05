@@ -1,59 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Mar 2014 22:40:19 +0200
+Date: Wed, 5 Mar 2014 22:32:37 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC BlueZ 0/3] Fix GATT server issues with BlueZ as LE
- peripheral
-Message-ID: <20140305204019.GA14755@localhost.P-661HNU-F1>
-References: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
+To: Natanael Copa <natanael.copa@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	Natanael Copa <ncopa@alpinelinux.org>
+Subject: Re: [PATCH v3] various header include fixes for building with musl
+ libc
+Message-ID: <20140305203237.GA13142@localhost.P-661HNU-F1>
+References: <CAJdJm_MB5gAK2-9--n=P-Mni1WBRK8o-zaLSkA=_+0Bc6cCVjQ@mail.gmail.com>
+ <1390425638-15241-1-git-send-email-ncopa@alpinelinux.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1390924298-13804-1-git-send-email-anderson.lizardo@openbossa.org>
+In-Reply-To: <1390425638-15241-1-git-send-email-ncopa@alpinelinux.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lizardo,
+Hi Natanael,
 
-On Tue, Jan 28, 2014, Anderson Lizardo wrote:
-> Currently, we do not officially support running BlueZ as LE peripheral. But
-> there is already enough support from the kernel to support this. For instance,
-> there is the "Set Advertising" mgmt command to keep LE advertising enabled
-> after each connection.
+On Wed, Jan 22, 2014, Natanael Copa wrote:
+> we need:
+>  sys/stat.h for mode_t
+>  limits.h for PATH_MAX
 > 
-> The current tracking of connections in BlueZ does not fully work for peripheral
-> role. These patches are a first attempt to improve the situation. Other fixes
-> are necessary to have full LE Peripheral support.
+> Fixes compile errors:
+> In file included from tools/hciconfig.c:45:0:
+> ./src/textfile.h:27:1: error: unknown type name 'mode_t'
+>  int create_file(const char *filename, const mode_t mode);
+>  ^
 > 
-> In particular, with these patches, notifications for PASP and ANP profiles
-> (implemented in profiles/alert/*) should work when BlueZ is on the peripheral
-> role. Other GATT server profiles will need fixing as well.
+> tools/csr_usb.c: In function 'read_value':
+> tools/csr_usb.c:71:12: error: 'PATH_MAX' undeclared (first use in this function)
+>   char path[PATH_MAX];
+>             ^
+> ---
+> Changes v2 -> v3:
+>  - include the sys/stat.h in hciconfig.c instead of textfile.h. This was
+>    the only needed change for defining mode_t everywhere.
 > 
-> I'm sending as RFC because I only did minimal testing. I hope that people
-> having issues with GATT server profiles running on peripheral role can tests
-> these patches. Otherwise, I'll do more tests later today and send a final
-> version by tomorrow.
-> 
-> Notes: 
-> * The first patch is just cleanup, so can be applied as is.
-> * For testing, make sure to enable advertising on the machine running as
->   peripheral (I use btmgmt tool for this).
-> 
-> Best Regards,
-> Anderson Lizardo
-> 
-> Anderson Lizardo (3):
->   attrib-server: Remove unnecessary fields from struct gatt_channel
->   core: Fix associating a GAttrib to a device on incoming connections
->   alert: Only remove attio callback after ATT request was sent
-> 
->  profiles/alert/server.c | 18 +++++++++++++++++-
->  src/attrib-server.c     | 45 +++++++++++++++++++++++++++++----------------
->  src/attrib-server.h     |  1 +
->  src/device.c            |  5 +++++
->  4 files changed, 52 insertions(+), 17 deletions(-)
+>  tools/csr_usb.c   | 1 +
+>  tools/hciconfig.c | 1 +
+>  tools/hid2hci.c   | 1 +
+>  3 files changed, 3 insertions(+)
 
-These patches seem to have been forgotten about. They looked fairly good
-to me so I rebased and applied them finally.
+Seems this patch was forgotten. It has now finally been applied
+upstream.
 
 Johan
