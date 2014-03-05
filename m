@@ -1,43 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] monitor: Allow to modify epoll even events are the same
-Date: Wed, 05 Mar 2014 14:24:25 +0100
-Message-ID: <8771068.vOHNjRSlbZ@uw000953>
-In-Reply-To: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/2] android/client: Add AVRCP remote_features_cb support
+Date: Wed,  5 Mar 2014 15:03:56 +0200
+Message-Id: <1394024636-20620-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1394024636-20620-1-git-send-email-luiz.dentz@gmail.com>
+References: <1394024636-20620-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wednesday 05 of March 2014 10:22:37 Lukasz Rymanowski wrote:
-> This is epsecially needed when we want to modify timer.
-> ---
->  monitor/mainloop.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
-> diff --git a/monitor/mainloop.c b/monitor/mainloop.c
-> index 8c94bfe..7f97e65 100644
-> --- a/monitor/mainloop.c
-> +++ b/monitor/mainloop.c
-> @@ -222,9 +222,6 @@ int mainloop_modify_fd(int fd, uint32_t events)
->  	if (!data)
->  		return -ENXIO;
->  
-> -	if (data->events == events)
-> -		return 0;
-> -
->  	memset(&ev, 0, sizeof(ev));
->  	ev.events = events;
->  	ev.data.ptr = data;
-> 
+---
+ android/client/if-rc.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-All patches applied. Thanks.
-
+diff --git a/android/client/if-rc.c b/android/client/if-rc.c
+index 55fdf1d..cd4c142 100644
+--- a/android/client/if-rc.c
++++ b/android/client/if-rc.c
+@@ -46,6 +46,15 @@ SINTMAP(btrc_media_attr_t, -1, "(unknown)")
+ 	DELEMENT(BTRC_MEDIA_ATTR_PLAYING_TIME),
+ ENDMAP
+ 
++static char last_addr[MAX_ADDR_STR_LEN];
++
++static void remote_features_cb(bt_bdaddr_t *bd_addr,
++					btrc_remote_features_t features)
++{
++	haltest_info("%s: remote_bd_addr=%S features=%u\n", __func__,
++				bt_bdaddr_t2str(bd_addr, last_addr), features);
++}
++
+ static void get_play_status_cb(void)
+ {
+ 	haltest_info("%s\n", __func__);
+@@ -73,6 +82,7 @@ static void volume_change_cb(uint8_t volume, uint8_t ctype)
+ 
+ static btrc_callbacks_t rc_cbacks = {
+ 	.size = sizeof(rc_cbacks),
++	.remote_features_cb = remote_features_cb,
+ 	.get_play_status_cb = get_play_status_cb,
+ 	.get_element_attr_cb = get_element_attr_cb,
+ 	.register_notification_cb = register_notification_cb,
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
