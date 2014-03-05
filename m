@@ -2,54 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 3/5] shared: Add header for timeout abstraction
-Date: Wed, 5 Mar 2014 10:22:39 +0100
-Message-ID: <1394011361-9469-3-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 1/5] monitor: Allow to modify epoll even events are the same
+Date: Wed, 5 Mar 2014 10:22:37 +0100
+Message-ID: <1394011361-9469-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is epsecially needed when we want to modify timer.
 ---
- src/shared/timeout.h | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
- create mode 100644 src/shared/timeout.h
+ monitor/mainloop.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/src/shared/timeout.h b/src/shared/timeout.h
-new file mode 100644
-index 0000000..c13616f
---- /dev/null
-+++ b/src/shared/timeout.h
-@@ -0,0 +1,27 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ */
-+
-+#include <stdbool.h>
-+
-+typedef bool (*timeout_func_t)(void *user_data);
-+typedef void (*timeout_destroy_func_t)(void *user_data);
-+
-+int timeout_add(unsigned int msec, timeout_func_t func, void *user_data,
-+					timeout_destroy_func_t destroy);
-+void timeout_remove(unsigned int id);
+diff --git a/monitor/mainloop.c b/monitor/mainloop.c
+index 8c94bfe..7f97e65 100644
+--- a/monitor/mainloop.c
++++ b/monitor/mainloop.c
+@@ -222,9 +222,6 @@ int mainloop_modify_fd(int fd, uint32_t events)
+ 	if (!data)
+ 		return -ENXIO;
+ 
+-	if (data->events == events)
+-		return 0;
+-
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.events = events;
+ 	ev.data.ptr = data;
 -- 
 1.8.4
 
