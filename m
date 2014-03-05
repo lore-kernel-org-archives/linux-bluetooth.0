@@ -2,161 +2,76 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 4/4] android/hal-ipc-api: Trivial typo fix in doc
-Date: Wed,  5 Mar 2014 15:43:59 +0100
-Message-Id: <1394030639-28134-4-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 3/4] android/hal-ipc-api: Add missing sections in doc
+Date: Wed,  5 Mar 2014 15:43:58 +0100
+Message-Id: <1394030639-28134-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1394030639-28134-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1394030639-28134-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-ipc-api.txt | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+ android/hal-ipc-api.txt | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index cd6bc92..1ecf75f 100644
+index 05bb4db..cd6bc92 100644
 --- a/android/hal-ipc-api.txt
 +++ b/android/hal-ipc-api.txt
-@@ -321,14 +321,14 @@ Notifications:
+@@ -758,6 +758,8 @@ Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
  
- 	Opcode 0x81 - Adapter State Changed notification
+ 	Service modes:               0x01 = Headset Profile only mode
  
--		Notifications parameters: State (1 octect)
-+		Notifications parameters: State (1 octet)
++Commands and responses:
++
+ 	Opcode 0x00 - Error response
  
- 		Valid state values: 0x00 = Off
- 		                    0x01 = On
+ 		Response parameters: Status (1 octet)
+@@ -1102,6 +1104,8 @@ Bluetooth Health HAL (ID 7)
  
- 	Opcode 0x82 - Adapter Properties Changed notification
+ Android HAL name: "health" (BT_PROFILE_HEALTH_ID)
  
--		Notification parameters: Status (1 octect)
-+		Notification parameters: Status (1 octet)
- 		                         Num properties (1 octet)
- 		                         Type # (1 octet)
- 		                         Length # (2 octets)
-@@ -337,7 +337,7 @@ Notifications:
++Commands and responses:
++
+ 	Opcode 0x00 - Error response
  
- 	Opcode 0x83 - Remote Device Properties notification
+ 		Response parameters: Status (1 octet)
+@@ -1189,6 +1193,8 @@ Bluetooth Remote Control HAL (ID 8)
  
--		Notification parameters: Status (1 octect)
-+		Notification parameters: Status (1 octet)
- 		                         Remote address (6 octets)
- 		                         Num properties (1 octet)
- 		                         Type # (1 octet)
-@@ -355,7 +355,7 @@ Notifications:
+ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
  
- 	Opcode 0x85 - Discovery State Changed notification
++Commands and responses:
++
+ 	Opcode 0x00 - Error response
  
--		Notifications parameters: State (1 octect)
-+		Notifications parameters: State (1 octet)
+ 		Response parameters: Status (1 octet)
+@@ -1324,6 +1330,8 @@ Android HAL name: "avrcp" (BT_PROFILE_AV_RC_ID)
  
- 	Opcode 0x86 - PIN Request notification
+ 		In case of an error, the error response will be returned.
  
-@@ -373,7 +373,7 @@ Notifications:
++Notifications:
++
+ 	Opcode 0x81 - Remote Features notification
  
- 	Opcode 0x88 - Bond State Changed notification
+ 		Notification parameters: Remote address (6 octets)
+@@ -1415,6 +1423,8 @@ Bluetooth GATT HAL (ID 9)
  
--		Notification parameters: Status (1 octect)
-+		Notification parameters: Status (1 octet)
- 		                         Remote address (6 octets)
- 		                         Bond state (1 octet)
+ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
  
-@@ -383,19 +383,19 @@ Notifications:
++Commands and responses:
++
+ 	Opcode 0x00 - Error response
  
- 	Opcode 0x89 - ACL State Changed notification
+ 		Response parameters: Status (1 octet)
+@@ -1855,6 +1865,8 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
  
--		Notification parameters: Status (1 octect)
-+		Notification parameters: Status (1 octet)
- 		                         Remote address (6 octets)
- 		                         ACL state (1 octet)
+ 		In case of an error, the error response will be returned.
  
- 	Opcode 0x8a - DUT Mode Receive notification
++Notifications:
++
+ 	Opcode 0x81 - Register Client notification
  
--		Notification parameters: Opcode (2 octects)
-+		Notification parameters: Opcode (2 octets)
- 		                         Length  (1 octet)
- 		                         Data (variable)
- 
- 	Opcode 0x8b - LE Test Mode notification
- 
--		Notification parameters: Status (1 octect)
-+		Notification parameters: Status (1 octet)
- 		                         Num packets (2 octets)
- 
- 
-@@ -722,7 +722,7 @@ Notifications:
- 
- 	Opcode 0x81 - Control State notification
- 
--		Notification parameters: Control state (1 octect)
-+		Notification parameters: Control state (1 octet)
- 		                         Status (1 octet)
- 		                         Local role (1 octet)
- 		                         Interface name (17 octet)
-@@ -736,7 +736,7 @@ Notifications:
- 
- 	Opcode 0x82 - Connection State notification
- 
--		Notification parameters: Connection state (1 octect)
-+		Notification parameters: Connection state (1 octet)
- 		                         Status (1 octet)
- 		                         Remote address (6 octets)
- 		                         Local role (1 octet)
-@@ -950,7 +950,7 @@ Notifications:
- 
- 	Opcode 0x81 - Connection State notification
- 
--		Notification parameters: Connection state (1 octect)
-+		Notification parameters: Connection state (1 octet)
- 		                         Remote address (6 octets)
- 
- 		Valid connection states: 0x00 = Disconnected
-@@ -961,7 +961,7 @@ Notifications:
- 
- 	Opcode 0x82 - Audio State notification
- 
--		Notification parameters: Audio state (1 octect)
-+		Notification parameters: Audio state (1 octet)
- 		                         Remote address (6 octets)
- 
- 		Valid audio states: 0x00 = Disconnected
-@@ -1081,7 +1081,7 @@ Notifications:
- 
- 	Opcode 0x81 - Connection State notification
- 
--		Notification parameters: Connection state (1 octect)
-+		Notification parameters: Connection state (1 octet)
- 		                         Remote address (6 octets)
- 
- 		Valid connection states: 0x00 = Disconnected
-@@ -1091,7 +1091,7 @@ Notifications:
- 
- 	Opcode 0x82 - Audio State notification
- 
--		Notification parameters: Audio state (1 octect)
-+		Notification parameters: Audio state (1 octet)
- 		                         Remote address (6 octets)
- 
- 		Valid connection states: 0x00 = Remote suspend
-@@ -1164,7 +1164,7 @@ Notifications:
- 
- 	Opcode 0x81 - Application Registration State notification
- 
--		Notification parameters: Application ID (2 octects)
-+		Notification parameters: Application ID (2 octets)
- 		                         Application state (1 octet)
- 
- 		Valid application states: 0x00 = Registration success
-@@ -1174,7 +1174,7 @@ Notifications:
- 
- 	Opcode 0x82 - Channel State notification
- 
--		Notification parameters: Application ID (2 octects)
-+		Notification parameters: Application ID (2 octets)
- 		                         Remote address (6 octets)
- 		                         MDEP index (1 octet)
- 		                         Channel ID (2 octets)
+ 		Notification parameters: Status (4 octets)
 -- 
 1.9.0
 
