@@ -1,47 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] tools/sco-tester: Remove not used function argument
-Date: Wed,  5 Mar 2014 08:15:47 +0100
-Message-Id: <1394003747-23412-1-git-send-email-marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH BlueZ v0 1/9] gdbus: Add g_dbus_client_set_proxies_ready_watch()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1393607136-16908-2-git-send-email-claudio.takahasi@openbossa.org>
+Date: Tue, 4 Mar 2014 22:37:08 -0800
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F4FB24C3-8BD8-4415-AF9D-E97FEBB06781@holtmann.org>
+References: <1393607136-16908-1-git-send-email-claudio.takahasi@openbossa.org> <1393607136-16908-2-git-send-email-claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/sco-tester.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Claudio,
 
-diff --git a/tools/sco-tester.c b/tools/sco-tester.c
-index 25e4af6..db45ef0 100644
---- a/tools/sco-tester.c
-+++ b/tools/sco-tester.c
-@@ -415,7 +415,7 @@ end:
- 	close(sk);
- }
- 
--static int create_sco_sock(struct test_data *data, uint16_t psm)
-+static int create_sco_sock(struct test_data *data)
- {
- 	const uint8_t *master_bdaddr;
- 	struct sockaddr_sco addr;
-@@ -514,7 +514,7 @@ static void test_connect(const void *test_data)
- 	GIOChannel *io;
- 	int sk;
- 
--	sk = create_sco_sock(data, 0);
-+	sk = create_sco_sock(data);
- 	if (sk < 0) {
- 		tester_test_failed();
- 		return;
-@@ -543,7 +543,7 @@ static void test_connect_transp(const void *test_data)
- 	int sk, err;
- 	struct bt_voice voice;
- 
--	sk = create_sco_sock(data, 0);
-+	sk = create_sco_sock(data);
- 	if (sk < 0) {
- 		tester_test_failed();
- 		return;
--- 
-1.8.5.3
+> This patch adds a new gdbus helper to notify the clients that
+> GetManagedObjects reply was received and the last proxy has been
+> informed previously by the proxy_added callback.
+> ---
+> gdbus/client.c | 18 ++++++++++++++++++
+> gdbus/gdbus.h  |  4 ++++
+> 2 files changed, 22 insertions(+)
+> 
+> diff --git a/gdbus/client.c b/gdbus/client.c
+> index be8cc29..f479742 100644
+> --- a/gdbus/client.c
+> +++ b/gdbus/client.c
+> @@ -56,6 +56,8 @@ struct GDBusClient {
+> 	void *signal_data;
+> 	GDBusProxyFunction proxy_added;
+> 	GDBusProxyFunction proxy_removed;
+> +	GDBusClientReadyFunction ready;
+> +	void *ready_data;
+> 	GDBusPropertyFunction property_changed;
+> 	void *user_data;
+> 	GList *proxy_list;
+> @@ -982,6 +984,9 @@ static void parse_managed_objects(GDBusClient *client, DBusMessage *msg)
+> 
+> 		dbus_message_iter_next(&dict);
+> 	}
+> +
+> +	if (client->ready)
+> +		client->ready(client->ready_data);
+> }
+> 
+> static void get_managed_objects_reply(DBusPendingCall *call, void *user_data)
+> @@ -1261,3 +1266,16 @@ gboolean g_dbus_client_set_proxy_handlers(GDBusClient *client,
+> 
+> 	return TRUE;
+> }
+> +
+> +gboolean g_dbus_client_set_proxies_ready_watch(GDBusClient *client,
+> +						GDBusClientReadyFunction ready,
+> +						void *user_data)
+> +{
+> +	if (client == NULL)
+> +		return FALSE;
+> +
+> +	client->ready = ready;
+> +	client->ready_data = user_data;
+> +
+> +	return TRUE;
+> +}
+> diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+> index 9542109..aa407aa 100644
+> --- a/gdbus/gdbus.h
+> +++ b/gdbus/gdbus.h
+> @@ -337,6 +337,7 @@ gboolean g_dbus_proxy_method_call(GDBusProxy *proxy, const char *method,
+> 				GDBusReturnFunction function, void *user_data,
+> 				GDBusDestroyFunction destroy);
+> 
+> +typedef void (* GDBusClientReadyFunction) (void *user_data);
+> typedef void (* GDBusProxyFunction) (GDBusProxy *proxy, void *user_data);
+> typedef void (* GDBusPropertyFunction) (GDBusProxy *proxy, const char *name,
+> 					DBusMessageIter *iter, void *user_data);
+> @@ -365,6 +366,9 @@ gboolean g_dbus_client_set_proxy_handlers(GDBusClient *client,
+> 					GDBusProxyFunction proxy_removed,
+> 					GDBusPropertyFunction property_changed,
+> 					void *user_data);
+> +gboolean g_dbus_client_set_proxies_ready_watch(GDBusClient *client,
+> +						GDBusClientReadyFunction ready,
+> +						void *user_data);
+
+this names is a bit confusing. On one hand it is proxies ready on the other it is client ready. We need to be a bit specific here.
+
+My initial thinking is this should be
+
+	g_dbus_client_set_ready_watch()
+
+and then use GDBusClientFunction(GDBusClient, user_data) as callback function.
+
+Regards
+
+Marcel
 
