@@ -1,48 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] android/client: Add AVRCP remote_features_cb support
-Date: Wed,  5 Mar 2014 15:03:56 +0200
-Message-Id: <1394024636-20620-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1394024636-20620-1-git-send-email-luiz.dentz@gmail.com>
-References: <1394024636-20620-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] android/avrcp: Add remote features notification
+Date: Wed,  5 Mar 2014 15:03:55 +0200
+Message-Id: <1394024636-20620-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/client/if-rc.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ android/avrcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/android/client/if-rc.c b/android/client/if-rc.c
-index 55fdf1d..cd4c142 100644
---- a/android/client/if-rc.c
-+++ b/android/client/if-rc.c
-@@ -46,6 +46,15 @@ SINTMAP(btrc_media_attr_t, -1, "(unknown)")
- 	DELEMENT(BTRC_MEDIA_ATTR_PLAYING_TIME),
- ENDMAP
+diff --git a/android/avrcp.c b/android/avrcp.c
+index cb46dcc..8795951 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -43,6 +43,7 @@
+ #include "ipc.h"
+ #include "bluetooth.h"
+ #include "avrcp.h"
++#include "utils.h"
  
-+static char last_addr[MAX_ADDR_STR_LEN];
-+
-+static void remote_features_cb(bt_bdaddr_t *bd_addr,
-+					btrc_remote_features_t features)
-+{
-+	haltest_info("%s: remote_bd_addr=%S features=%u\n", __func__,
-+				bt_bdaddr_t2str(bd_addr, last_addr), features);
-+}
-+
- static void get_play_status_cb(void)
+ #define L2CAP_PSM_AVCTP 0x17
+ 
+@@ -699,6 +700,7 @@ static const struct avrcp_control_handler control_handlers[] = {
+ static int avrcp_device_add_session(struct avrcp_device *dev, int fd,
+ 						uint16_t imtu, uint16_t omtu)
  {
- 	haltest_info("%s\n", __func__);
-@@ -73,6 +82,7 @@ static void volume_change_cb(uint8_t volume, uint8_t ctype)
++	struct hal_ev_avrcp_remote_features ev;
+ 	char address[18];
  
- static btrc_callbacks_t rc_cbacks = {
- 	.size = sizeof(rc_cbacks),
-+	.remote_features_cb = remote_features_cb,
- 	.get_play_status_cb = get_play_status_cb,
- 	.get_element_attr_cb = get_element_attr_cb,
- 	.register_notification_cb = register_notification_cb,
+ 	dev->session = avrcp_new(fd, imtu, omtu, dev->version);
+@@ -717,6 +719,18 @@ static int avrcp_device_add_session(struct avrcp_device *dev, int fd,
+ 	/* FIXME: get the real name of the device */
+ 	avrcp_init_uinput(dev->session, "bluetooth", address);
+ 
++	bdaddr2android(&dev->dst, ev.bdaddr);
++
++	if (dev->version < 0x0103)
++		goto done;
++
++	ev.features = HAL_AVRCP_FEATURE_METADATA;
++
++done:
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
++					HAL_EV_AVRCP_REMOTE_FEATURES,
++					sizeof(ev), &ev);
++
+ 	return 0;
+ }
+ 
 -- 
 1.8.5.3
 
