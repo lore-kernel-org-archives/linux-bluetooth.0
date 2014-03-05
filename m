@@ -1,101 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] input: Control HID encryption from input.conf
-Message-Id: <20140305221503.CBDCE100321@puck.mtv.corp.google.com>
-Date: Wed,  5 Mar 2014 14:15:03 -0800 (PST)
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+From: Adam Warski <adam@warski.org>
+In-Reply-To: <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com>
+Date: Wed, 5 Mar 2014 21:41:39 +0100
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <A6C5B873-6614-45B3-AD4C-B3E08831E6D8@warski.org>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com> <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org> <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org> <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com> <A2B80C7C-697D-44E5-80EA-B398E62EE608@warski.org> <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add support for optional config item "Encryption=<true|false>" in input.conf.
-Allows HID encryption to be disabled for keyboards and keyboard-like devices
-that don't work properly with encryption due to firmware bugs.
----
- profiles/input/device.c  |  8 +++++++-
- profiles/input/device.h  |  1 +
- profiles/input/manager.c | 21 ++++++++++++++++-----
- 3 files changed, 24 insertions(+), 6 deletions(-)
+Hello,
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index d6e97c7..e2f97dc 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -85,12 +85,18 @@ struct input_device {
- };
- 
- static int idle_timeout = 0;
-+static gboolean encryption_enabled = TRUE;
- 
- void input_set_idle_timeout(int timeout)
- {
- 	idle_timeout = timeout;
- }
- 
-+void input_enable_encryption(gboolean state)
-+{
-+	encryption_enabled = state;
-+}
-+
- static void input_device_enter_reconnect_mode(struct input_device *idev);
- 
- static void input_device_free(struct input_device *idev)
-@@ -424,7 +430,7 @@ static int hidp_add_connection(struct input_device *idev)
- 		strncpy(req->name, idev->name, sizeof(req->name) - 1);
- 
- 	/* Encryption is mandatory for keyboards */
--	if (req->subclass & 0x40) {
-+	if (encryption_enabled && (req->subclass & 0x40)) {
- 		if (!bt_io_set(idev->intr_io, &gerr,
- 					BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
- 					BT_IO_OPT_INVALID)) {
-diff --git a/profiles/input/device.h b/profiles/input/device.h
-index da2149c..af9f5ea 100644
---- a/profiles/input/device.h
-+++ b/profiles/input/device.h
-@@ -28,6 +28,7 @@ struct input_device;
- struct input_conn;
- 
- void input_set_idle_timeout(int timeout);
-+void input_enable_encryption(gboolean state);
- 
- int input_device_register(struct btd_service *service);
- void input_device_unregister(struct btd_service *service);
-diff --git a/profiles/input/manager.c b/profiles/input/manager.c
-index 6ef83f4..1a70391 100644
---- a/profiles/input/manager.c
-+++ b/profiles/input/manager.c
-@@ -97,15 +97,26 @@ static int input_init(void)
- 	config = load_config_file(CONFIGDIR "/input.conf");
- 	if (config) {
- 		int idle_timeout;
-+		gboolean encryption;
- 
- 		idle_timeout = g_key_file_get_integer(config, "General",
--						"IdleTimeout", &err);
--		if (err) {
--			DBG("input.conf: %s", err->message);
--			g_error_free(err);
-+							"IdleTimeout", &err);
-+		if (!err) {
-+			DBG("input.conf: IdleTimeout=%d", idle_timeout);
-+			input_set_idle_timeout(idle_timeout * 60);
-+		} else {
-+			g_clear_error(&err);
- 		}
- 
--		input_set_idle_timeout(idle_timeout * 60);
-+		encryption = g_key_file_get_boolean(config, "General",
-+							"Encryption", &err);
-+		if (!err) {
-+			DBG("input.conf: Encryption=%s", encryption ?
-+							"true" : "false");
-+			input_enable_encryption(encryption);
-+		} else {
-+			g_clear_error(&err);
-+		}
- 	}
- 
- 	btd_profile_register(&input_profile);
+I recompiled the kernel with dynamic debug, and here are the two files as per your instructions:
+http://www.warski.org/ibeacons/dmesg.txt
+http://www.warski.org/ibeacons/lescan.dump
+
+I also tried another thing. I have two kinds of beacons: one coming from Estimote, the other from Qualcomm (Gimbal).
+
+The Estimote beacons broadcast the advertisement packets with the same source address (well, it changes, but rarely). Hence to get all the packets the --duplicates flag is needed.
+
+The Gimbal beacons broadcast with a different source address every time (random address). Hence to get all the packets the duplicate flag isn’t needed, as every packet is different.
+
+Both transmit at a similar rate (maybe the Gimbals are a bit slower, but I also tried decreasing the scanning interval in hcitool), and with the Gimbal beacons the are no problems. So I guess this puts more doubt on possible USB cause? (and I checked the USB hub, it works fine as far as I can tell)
+
+The root cause must be something with the usage of the --duplicates flag, no? Though I can’t find the code that it is handling the buffering - is it done on the dongle itself?
+
+Adam
+
+On 04 Mar 2014, at 00:07, Anderson Lizardo <anderson.lizardo@openbossa.org> wrote:
+
+> Hi Adam,
+> 
+> On Mon, Mar 3, 2014 at 5:25 PM, Adam Warski <adam@warski.org> wrote:
+>> But I guess even if it was a USB issue, it would be caught earlier? The advertisement packets have a certain preamble, and a CRC, so the shifted data would be discarded? Anyway, that doesn't seem to be the cause.
+> 
+> There are are a few things that point out to USB issue (in my opinion):
+> 
+> 1) You said that having ethernet cable connected or not modifies the
+> behavior. on RPI, the ethernet chip is attached to the USB. As I said,
+> strange things happen to me as well when not using powered USB hub
+> (specially with WiFi dongles and USB cameras) :)
+> 
+> 2) As you noticed, the "truncated" adv. packet is not being discarded
+> by the controller as we would expect. This means that the BT
+> controller is actually receiving a correct packet, but it is being
+> "truncated" when being sent to the host. The CRC/preamble, after
+> parsed and verified by the BT controller, is removed before sending
+> the packet to the host, so there is no way for the host do detect
+> corruptions between the BT controller and the kernel.
+> 
+> The dynamic debug messages may help identify whether there are
+> missing/truncated USB packets (there is a debug message in
+> btusb_intr_complete() from drivers/bluetooth/btusb.c to help identify
+> HCI reassembly issues).
+> 
+> Did you try using only the BT dongle and removing the Wifi one (and
+> connecting through ethernet cable)? Wifi dongles tend to be very power
+> hungry.
+> 
+> Also check whether the power source for the USB hub is working
+> properly... unfortunately I don't know how to check from the RPi side,
+> so you have to rely on first attaching it to the outlet, checking some
+> LED, and then attaching to the RPi. Also make sure the RPi uses its
+> own power adapter (instead of powering from the hub itself).
+> 
+> Well, at least you found a workaround (attaching an ethernet cable) :)
+> 
+> Best Regards,
+> -- 
+> Anderson Lizardo
+> http://www.indt.org/?lang=en
+> INdT - Manaus - Brazil
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
 -- 
-1.9.0.279.gdc9e3eb
+Adam Warski
+
+http://twitter.com/#!/adamwarski
+http://www.softwaremill.com
+http://www.warski.org
 
