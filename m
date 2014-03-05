@@ -1,60 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=US-ASCII
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for virtual HCI driver"
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+5PVA6vkGHJGMgEYCTSdvqOuMb-fHURVvP-sHAofd6840TLOQ@mail.gmail.com>
-Date: Wed, 5 Mar 2014 11:02:30 -0800
-Cc: =?iso-8859-1?Q?Thomas_B=E4chler?= <thomas@archlinux.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>,
-	"Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
-Message-Id: <6803E0AA-F0C1-45F4-A7B8-428F4C6EE14E@holtmann.org>
-References: <1394020752-6186-1-git-send-email-thomas@archlinux.org> <7E804DF3-E191-427E-8E20-FE6ECDC490EA@holtmann.org> <CA+5PVA56oO6FS2pG+D7yJtNrTqBGZ1CtPygjid4E0f3cPPi83g@mail.gmail.com> <424A74F3-7646-449C-9F72-A0F4E9A28551@holtmann.org> <53177187.3040009@archlinux.org> <CA+5PVA6vkGHJGMgEYCTSdvqOuMb-fHURVvP-sHAofd6840TLOQ@mail.gmail.com>
-To: Josh Boyer <jwboyer@fedoraproject.org>
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Wed, 5 Mar 2014 20:59:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Peng Chen <pengchen@qti.qualcomm.com>
+Cc: gustavo@padovan.org, linux-bluetooth@vger.kernel.org,
+	marcel@holtmann.org, kumo@qca.qualcomm.com,
+	taowang@qti.qualcomm.com
+Subject: Re: [PATCH] Add a new PID/VID 0cf3/e005 for AR3012.
+Message-ID: <20140305185941.GA10298@localhost.P-661HNU-F1>
+References: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Josh,
+Hi,
 
->>>>>> This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
->>>>> 
->>>>> NAK. We allocated a static minor for this.
->>>> 
->>>> Johan mentioned that.  Commit b075dd40c95d11c2c8690f6c4d6232fc,
->>>> correct?
->> 
->> I am sorry Marcel, I only looked at the Linus tree, not at bluetooth or
->> bluetooth-next. This commit should indeed fix the problem. Disregard my
->> patch.
->> 
->>> Why isn't that headed into 3.14 right now, and CC'd to
->>>> stable?  Currently you have a somewhat broken driver in 3.13 and
->>>> 3.14-rcX that seems to have a pretty clear fix.
->>> 
->>> somewhat broken? kmod prints this as an error, but it is not a regression in user functionality. The driver works just as before. The error message can be ignored.
->> 
->> It's a regression in my sanity, since numerous users blame all kernel
->> bugs on this error message and I am tired of explaining the situation
->> (problem + error message == problem found *sigh*). I only sent this
->> patch since I hadn't found the correct fix.
+On Fri, Aug 30, 2013, Peng Chen wrote:
+> usb devices info:
 > 
-> Exactly.
+> T:  Bus=06 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 13 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0cf3 ProdID=e005 Rev= 0.02
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 > 
->>> So if anybody feels strongly that the static device node assignment should be put into -stable, then I am fine with it. However I do not see this as passing requirement for a -stable fix since it is really not affecting anyone (minus the misleading message from kmod).
->> 
->> Since b075dd4 will end up in the Linus tree eventually, I have no
->> trouble backporting it myself.
-> 
-> I don't have any difficulty doing that either, but if it was in stable
-> every distro getting bugs about it wouldn't have to carry the fix on
-> their own.
+> Signed-off-by: Peng Chen <pengchen@qca.qualcomm.com>
+> ---
+>  drivers/bluetooth/ath3k.c |    2 ++
+>  drivers/bluetooth/btusb.c |    1 +
+>  2 files changed, 3 insertions(+)
 
-the patch is currently in wireless-next and will eventually end up in net-next. Maybe it is better to have it cherry picked once it reaches net-next.
+Applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
-
+Johan
