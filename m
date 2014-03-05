@@ -1,48 +1,171 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Mar 2014 22:32:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Natanael Copa <natanael.copa@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Natanael Copa <ncopa@alpinelinux.org>
-Subject: Re: [PATCH v3] various header include fixes for building with musl
- libc
-Message-ID: <20140305203237.GA13142@localhost.P-661HNU-F1>
-References: <CAJdJm_MB5gAK2-9--n=P-Mni1WBRK8o-zaLSkA=_+0Bc6cCVjQ@mail.gmail.com>
- <1390425638-15241-1-git-send-email-ncopa@alpinelinux.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android/hal-gatt-api: Rename Service ID to GATT Service ID
+Date: Wed, 05 Mar 2014 20:53:49 +0100
+Message-ID: <2464886.hyoIbUaA8O@athlon>
+In-Reply-To: <1394030639-28134-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1394030639-28134-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1390425638-15241-1-git-send-email-ncopa@alpinelinux.org>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Natanael,
+Hi Jakub,
 
-On Wed, Jan 22, 2014, Natanael Copa wrote:
-> we need:
->  sys/stat.h for mode_t
->  limits.h for PATH_MAX
-> 
-> Fixes compile errors:
-> In file included from tools/hciconfig.c:45:0:
-> ./src/textfile.h:27:1: error: unknown type name 'mode_t'
->  int create_file(const char *filename, const mode_t mode);
->  ^
-> 
-> tools/csr_usb.c: In function 'read_value':
-> tools/csr_usb.c:71:12: error: 'PATH_MAX' undeclared (first use in this function)
->   char path[PATH_MAX];
->             ^
+On Wednesday 05 March 2014 15:43:56 Jakub Tyszkowski wrote:
+> Use "GATT Service ID" instead "Service ID" inside ipc documentation
+> which is used to describe Core services like HAL_SERVICE_ID_GATT
+> himself.
 > ---
-> Changes v2 -> v3:
->  - include the sys/stat.h in hciconfig.c instead of textfile.h. This was
->    the only needed change for defining mode_t everywhere.
+>  android/hal-ipc-api.txt | 46 ++++++++++++++++++++++------------------------
+> 1 file changed, 22 insertions(+), 24 deletions(-)
 > 
->  tools/csr_usb.c   | 1 +
->  tools/hciconfig.c | 1 +
->  tools/hid2hci.c   | 1 +
->  3 files changed, 3 insertions(+)
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index 43b79ec..4f1b74d 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -1496,15 +1496,13 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x09 - Get Included Service command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Number of Service ID Elements (1 octet)
+> -		                    Service ID Elements (variable)
+> +		                    Number of GATT Service ID Elements (1 octet)
+> +		                    GATT Service ID Elements (variable)
+>  		Valid Number of Service ID Elements: 0x01
+>  		                                     0x02
+> -		Valid Service ID Element: UUID (16 octets)
+> -		                          Instance ID (1 octet)
+> -		                          Is Primary (1 octet)
+> -		Valid GATT ID: UUID (16 octets)
+> -		               Instance ID (1 octet)
+> +		Valid GATT Service ID Element: UUID (16 octets)
+> +		                               Instance ID (1 octet)
+> +		                               Is Primary (1 octet)
+>  		Response parameters: <none>
+> 
+>  		In case of an error, the error response will be returned.
+> @@ -1512,10 +1510,10 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x0a - Get Characteristic command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    Number of GATT ID Elements (1 octet)
+>  		                    GATT ID Elements (variable)
+> -		Valid Service ID: as described in Get Included Service
+> +		Valid GATT Service ID: as described in Get Included Service
+>  		Valid Number of GATT ID Elements: 0x00
+>  		                                  0x01
+>  		Valid GATT ID Element: as described in Get Included Service
+> @@ -1526,10 +1524,10 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x0b - Get Descriptor command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    Number of GATT ID Elements (1 octet)
+>  		                    GATT ID Elements (variable)
+> -		Valid Service ID: as described in Get Included Service
+> +		Valid GATT Service ID: as described in Get Included Service
+>  		Valid Number of GATT ID Elements: 0x01
+>  		                                  0x02
+>  		Valid GATT ID Element: as described in Get Included Service
+> @@ -1540,10 +1538,10 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x0c - Read Characteristic command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    GATT ID (17 octets)
+>  		                    Authorization (4 octets)
+> -		Valid Service ID: as described in Get Included Service
+> +		Valid GATT Service ID: as described in Get Included Service
+>  		Valid GATT ID: as described in Get Included Service
+>  		Response parameters: <none>
+> 
+> @@ -1552,13 +1550,13 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x0d - Write Characteristic command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    GATT ID (17 octets)
+>  		                    Write Type (4 octets)
+>  		                    Length (4 octets)
+>  		                    Authorization Req. (4 octets)
+>  		                    Value (variable)
+> -		Valid Service ID: as described in Get Included Service
+> +		Valid GATT Service ID: as described in Get Included Service
+>  		Valid GATT ID: as described in Get Included Service
+>  		Response parameters: <none>
+> 
+> @@ -1567,11 +1565,11 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x0e - Read Descriptor command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    GATT ID (17 octets)
+>  		                    Descr. GATT ID (17 octets)
+>  		                    Authorization Req. (4 octets)
+> -		Valid Service ID: as described in Get Included Service
+> +		Valid GATT Service ID: as described in Get Included Service
+>  		Valid GATT ID: as described in Get Included Service
+>  		Response parameters: <none>
+> 
+> @@ -1580,14 +1578,14 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  	Opcode 0x0f - Write Descriptor command/response
+> 
+>  		Command parameters: Connection ID (4 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    GATT ID (17 octets)
+>  		                    Descr. GATT ID (17 octets)
+>  		                    Write Type (4 octets)
+>  		                    Length (4 octets)
+>  		                    Authorization Req. (4 octets)
+>  		                    Value (variable)
+> -		Valid Service ID: as described in Get Included Service
+> +		Valid GATT Service ID: as described in Get Included Service
+>  		Valid GATT ID: as described in Get Included Service
+>  		Response parameters: <none>
+> 
+> @@ -1605,7 +1603,7 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+> 
+>  		Command parameters: Client Interface (4 octets)
+>  		                    Remote address (6 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    GATT ID (17 octets)
+>  		Response parameters: <none>
+> 
+> @@ -1615,7 +1613,7 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+> 
+>  		Command parameters: Client Interface (4 octets)
+>  		                    Remote address (6 octets)
+> -		                    Service ID (18 octets)
+> +		                    GATT Service ID (18 octets)
+>  		                    GATT ID (17 octets)
+>  		Response parameters: <none>
+> 
+> @@ -1973,9 +1971,9 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
+>  		                         GATT Service ID (18 octets)
+>  		                         Service Handle (4 octets)
+> 
+> -		Valid Service ID: UUID (16 octets)
+> -		                  Instance ID (1 octet)
+> -		                  Is Primary (1 octet)
+> +		Valid GATT Service ID: UUID (16 octets)
+> +		                       Instance ID (1 octet)
+> +		                       Is Primary (1 octet)
+> 
+>  	Opcode 0x96 - Included Service Added notification
 
-Seems this patch was forgotten. It has now finally been applied
-upstream.
+All patches applied, thanks.
 
-Johan
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
