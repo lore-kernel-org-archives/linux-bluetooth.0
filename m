@@ -1,94 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 5 Mar 2014 20:58:13 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix removing Long Term Key
-Message-ID: <20140305185813.GA10094@localhost.P-661HNU-F1>
-References: <1374776057-2618-1-git-send-email-claudio.takahasi@openbossa.org>
- <1374780864-8529-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1374780864-8529-1-git-send-email-claudio.takahasi@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Sender: jwboyer@gmail.com
+In-Reply-To: <53177187.3040009@archlinux.org>
+References: <1394020752-6186-1-git-send-email-thomas@archlinux.org>
+	<7E804DF3-E191-427E-8E20-FE6ECDC490EA@holtmann.org>
+	<CA+5PVA56oO6FS2pG+D7yJtNrTqBGZ1CtPygjid4E0f3cPPi83g@mail.gmail.com>
+	<424A74F3-7646-449C-9F72-A0F4E9A28551@holtmann.org>
+	<53177187.3040009@archlinux.org>
+Date: Wed, 5 Mar 2014 13:53:14 -0500
+Message-ID: <CA+5PVA6vkGHJGMgEYCTSdvqOuMb-fHURVvP-sHAofd6840TLOQ@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for
+ virtual HCI driver"
+From: Josh Boyer <jwboyer@fedoraproject.org>
+To: =?ISO-8859-1?Q?Thomas_B=E4chler?= <thomas@archlinux.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, linux-bluetooth@vger.kernel.org,
+	"Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+On Wed, Mar 5, 2014 at 1:48 PM, Thomas B=E4chler <thomas@archlinux.org> wro=
+te:
+> Am 05.03.2014 19:36, schrieb Marcel Holtmann:
+>>>>> This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
+>>>>
+>>>> NAK. We allocated a static minor for this.
+>>>
+>>> Johan mentioned that.  Commit b075dd40c95d11c2c8690f6c4d6232fc,
+>>> correct?
+>
+> I am sorry Marcel, I only looked at the Linus tree, not at bluetooth or
+> bluetooth-next. This commit should indeed fix the problem. Disregard my
+> patch.
+>
+>>  Why isn't that headed into 3.14 right now, and CC'd to
+>>> stable?  Currently you have a somewhat broken driver in 3.13 and
+>>> 3.14-rcX that seems to have a pretty clear fix.
+>>
+>> somewhat broken? kmod prints this as an error, but it is not a regressio=
+n in user functionality. The driver works just as before. The error message=
+ can be ignored.
+>
+> It's a regression in my sanity, since numerous users blame all kernel
+> bugs on this error message and I am tired of explaining the situation
+> (problem + error message =3D=3D problem found *sigh*). I only sent this
+> patch since I hadn't found the correct fix.
 
-On Thu, Jul 25, 2013, Claudio Takahasi wrote:
-> This patch fixes authentication failure on LE link re-connection when
-> BlueZ acts as slave (peripheral). LTK is removed from the internal list
-> after its first use causing PIN or Key missing reply when re-connecting
-> the link. The LE Long Term Key Request event indicates that the master
-> is attempting to encrypt or re-encrypt the link.
-> 
-> Pre-condition: BlueZ host paired and running as slave.
-> How to reproduce(master):
->   1) Establish an ACL LE encrypted link
->   2) Disconnect the link
->   3) Try to re-establish the ACL LE encrypted link (fails)
-> 
-> > HCI Event: LE Meta Event (0x3e) plen 19
->       LE Connection Complete (0x01)
->         Status: Success (0x00)
->         Handle: 64
->         Role: Slave (0x01)
-> ...
-> @ Device Connected: 00:02:72:DC:29:C9 (1) flags 0x0000
-> > HCI Event: LE Meta Event (0x3e) plen 13
->       LE Long Term Key Request (0x05)
->         Handle: 64
->         Random number: 875be18439d9aa37
->         Encryption diversifier: 0x76ed
-> < HCI Command: LE Long Term Key Request Reply (0x08|0x001a) plen 18
->         Handle: 64
->         Long term key: 2aa531db2fce9f00a0569c7d23d17409
-> > HCI Event: Command Complete (0x0e) plen 6
->       LE Long Term Key Request Reply (0x08|0x001a) ncmd 1
->         Status: Success (0x00)
->         Handle: 64
-> > HCI Event: Encryption Change (0x08) plen 4
->         Status: Success (0x00)
->         Handle: 64
->         Encryption: Enabled with AES-CCM (0x01)
-> ...
-> @ Device Disconnected: 00:02:72:DC:29:C9 (1) reason 3
-> < HCI Command: LE Set Advertise Enable (0x08|0x000a) plen 1
->         Advertising: Enabled (0x01)
-> > HCI Event: Command Complete (0x0e) plen 4
->       LE Set Advertise Enable (0x08|0x000a) ncmd 1
->         Status: Success (0x00)
-> > HCI Event: LE Meta Event (0x3e) plen 19
->       LE Connection Complete (0x01)
->         Status: Success (0x00)
->         Handle: 64
->         Role: Slave (0x01)
-> ...
-> @ Device Connected: 00:02:72:DC:29:C9 (1) flags 0x0000
-> > HCI Event: LE Meta Event (0x3e) plen 13
->       LE Long Term Key Request (0x05)
->         Handle: 64
->         Random number: 875be18439d9aa37
->         Encryption diversifier: 0x76ed
-> < HCI Command: LE Long Term Key Request Neg Reply (0x08|0x001b) plen 2
->         Handle: 64
-> > HCI Event: Command Complete (0x0e) plen 6
->       LE Long Term Key Request Neg Reply (0x08|0x001b) ncmd 1
->         Status: Success (0x00)
->         Handle: 64
-> > HCI Event: Disconnect Complete (0x05) plen 4
->         Status: Success (0x00)
->         Handle: 64
->         Reason: Authentication Failure (0x05)
-> @ Device Disconnected: 00:02:72:DC:29:C9 (1) reason 0
-> 
-> Signed-off-by: Claudio Takahasi <claudio.takahasi@openbossa.org>
-> ---
->  net/bluetooth/hci_event.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+Exactly.
 
-The patch has now (finally) been applied to the bluetooth-next tree.
-I also added a Cc: stable flag to it since this is a fairly severe issue
-at least for any kernel with the advertising mgmt setting.
+>> So if anybody feels strongly that the static device node assignment shou=
+ld be put into -stable, then I am fine with it. However I do not see this a=
+s passing requirement for a -stable fix since it is really not affecting an=
+yone (minus the misleading message from kmod).
+>
+> Since b075dd4 will end up in the Linus tree eventually, I have no
+> trouble backporting it myself.
 
-Johan
+I don't have any difficulty doing that either, but if it was in stable
+every distro getting bugs about it wouldn't have to carry the fix on
+their own.
+
+josh
