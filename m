@@ -1,162 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/4] android/hal-gatt-api: Rename Service ID to GATT Service ID
-Date: Wed,  5 Mar 2014 15:43:56 +0100
-Message-Id: <1394030639-28134-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 07/10] unit/avrcp: Add /TP/PAS/BI-05-C test
+Date: Wed,  5 Mar 2014 16:32:29 +0200
+Message-Id: <1394029952-3319-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394029952-3319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1394029952-3319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use "GATT Service ID" instead "Service ID" inside ipc documentation
-which is used to describe Core services like HAL_SERVICE_ID_GATT
-himself.
----
- android/hal-ipc-api.txt | 46 ++++++++++++++++++++++------------------------
- 1 file changed, 22 insertions(+), 24 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 43b79ec..4f1b74d 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1496,15 +1496,13 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x09 - Get Included Service command/response
+Test verifies that Set player application setting value returns error on
+invalid attribute value.
+---
+ unit/test-avrcp.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 447f3af..b67b89c 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -431,6 +431,34 @@ static ssize_t avrcp_handle_get_current_player_value(struct avrcp *session,
+ 	return params[0] * 2 + 1;
+ }
  
- 		Command parameters: Connection ID (4 octets)
--		                    Number of Service ID Elements (1 octet)
--		                    Service ID Elements (variable)
-+		                    Number of GATT Service ID Elements (1 octet)
-+		                    GATT Service ID Elements (variable)
- 		Valid Number of Service ID Elements: 0x01
- 		                                     0x02
--		Valid Service ID Element: UUID (16 octets)
--		                          Instance ID (1 octet)
--		                          Is Primary (1 octet)
--		Valid GATT ID: UUID (16 octets)
--		               Instance ID (1 octet)
-+		Valid GATT Service ID Element: UUID (16 octets)
-+		                               Instance ID (1 octet)
-+		                               Is Primary (1 octet)
- 		Response parameters: <none>
++static ssize_t avrcp_handle_set_player_value(struct avrcp *session,
++						uint8_t transaction,
++						uint16_t params_len,
++						uint8_t *params,
++						void *user_data)
++{
++	int i;
++
++	DBG("params[0] %d params_len %d", params[0], params_len);
++
++	if (params_len != params[0] * 2 + 1)
++		return -EINVAL;
++
++	for (i = 0; i < params[0]; i++) {
++		uint8_t attr = params[i * 2 + 1];
++		uint8_t val = params[i * 2 + 2];
++
++		DBG("attr 0x%02x val 0x%02x", attr, val);
++		switch (attr) {
++		case AVRCP_ATTRIBUTE_REPEAT_MODE:
++			if (val < 0x01 || val > 0x05)
++				return -EINVAL;
++		}
++	}
++
++	return 1;
++}
++
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES,
+ 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+@@ -450,6 +478,9 @@ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CURRENT_PLAYER_VALUE,
+ 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+ 					avrcp_handle_get_current_player_value },
++		{ AVRCP_SET_PLAYER_VALUE,
++					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
++					avrcp_handle_set_player_value },
+ 		{ },
+ };
  
- 		In case of an error, the error response will be returned.
-@@ -1512,10 +1510,10 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x0a - Get Characteristic command/response
+@@ -728,5 +759,17 @@ int main(int argc, char *argv[])
+ 				AVRCP_GET_CURRENT_PLAYER_VALUE,
+ 				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
  
- 		Command parameters: Connection ID (4 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    Number of GATT ID Elements (1 octet)
- 		                    GATT ID Elements (variable)
--		Valid Service ID: as described in Get Included Service
-+		Valid GATT Service ID: as described in Get Included Service
- 		Valid Number of GATT ID Elements: 0x00
- 		                                  0x01
- 		Valid GATT ID Element: as described in Get Included Service
-@@ -1526,10 +1524,10 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x0b - Get Descriptor command/response
- 
- 		Command parameters: Connection ID (4 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    Number of GATT ID Elements (1 octet)
- 		                    GATT ID Elements (variable)
--		Valid Service ID: as described in Get Included Service
-+		Valid GATT Service ID: as described in Get Included Service
- 		Valid Number of GATT ID Elements: 0x01
- 		                                  0x02
- 		Valid GATT ID Element: as described in Get Included Service
-@@ -1540,10 +1538,10 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x0c - Read Characteristic command/response
- 
- 		Command parameters: Connection ID (4 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    GATT ID (17 octets)
- 		                    Authorization (4 octets)
--		Valid Service ID: as described in Get Included Service
-+		Valid GATT Service ID: as described in Get Included Service
- 		Valid GATT ID: as described in Get Included Service
- 		Response parameters: <none>
- 
-@@ -1552,13 +1550,13 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x0d - Write Characteristic command/response
- 
- 		Command parameters: Connection ID (4 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    GATT ID (17 octets)
- 		                    Write Type (4 octets)
- 		                    Length (4 octets)
- 		                    Authorization Req. (4 octets)
- 		                    Value (variable)
--		Valid Service ID: as described in Get Included Service
-+		Valid GATT Service ID: as described in Get Included Service
- 		Valid GATT ID: as described in Get Included Service
- 		Response parameters: <none>
- 
-@@ -1567,11 +1565,11 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x0e - Read Descriptor command/response
- 
- 		Command parameters: Connection ID (4 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    GATT ID (17 octets)
- 		                    Descr. GATT ID (17 octets)
- 		                    Authorization Req. (4 octets)
--		Valid Service ID: as described in Get Included Service
-+		Valid GATT Service ID: as described in Get Included Service
- 		Valid GATT ID: as described in Get Included Service
- 		Response parameters: <none>
- 
-@@ -1580,14 +1578,14 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 	Opcode 0x0f - Write Descriptor command/response
- 
- 		Command parameters: Connection ID (4 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    GATT ID (17 octets)
- 		                    Descr. GATT ID (17 octets)
- 		                    Write Type (4 octets)
- 		                    Length (4 octets)
- 		                    Authorization Req. (4 octets)
- 		                    Value (variable)
--		Valid Service ID: as described in Get Included Service
-+		Valid GATT Service ID: as described in Get Included Service
- 		Valid GATT ID: as described in Get Included Service
- 		Response parameters: <none>
- 
-@@ -1605,7 +1603,7 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 
- 		Command parameters: Client Interface (4 octets)
- 		                    Remote address (6 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    GATT ID (17 octets)
- 		Response parameters: <none>
- 
-@@ -1615,7 +1613,7 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 
- 		Command parameters: Client Interface (4 octets)
- 		                    Remote address (6 octets)
--		                    Service ID (18 octets)
-+		                    GATT Service ID (18 octets)
- 		                    GATT ID (17 octets)
- 		Response parameters: <none>
- 
-@@ -1973,9 +1971,9 @@ Android HAL name: "gatt" (BT_PROFILE_GATT_ID)
- 		                         GATT Service ID (18 octets)
- 		                         Service Handle (4 octets)
- 
--		Valid Service ID: UUID (16 octets)
--		                  Instance ID (1 octet)
--		                  Is Primary (1 octet)
-+		Valid GATT Service ID: UUID (16 octets)
-+		                       Instance ID (1 octet)
-+		                       Is Primary (1 octet)
- 
- 	Opcode 0x96 - Included Service Added notification
- 
++	/* Set player application setting value invalid behavior - TG */
++	define_test("/TP/PAS/BI-05-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
++				0x00, 0x19, 0x58,
++				AVRCP_SET_PLAYER_VALUE,
++				0x00, 0x00, 0x03, 0x01,
++				AVRCP_ATTRIBUTE_REPEAT_MODE, 0x7f),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
++				0x48, 0x00, 0x00, 0x19, 0x58,
++				AVRCP_SET_PLAYER_VALUE,
++				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
++
+ 	return g_test_run();
+ }
 -- 
-1.9.0
+1.8.3.2
 
