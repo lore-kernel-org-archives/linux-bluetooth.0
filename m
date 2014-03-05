@@ -1,39 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/8] Initial AT handling for handsfree
-Date: Wed, 05 Mar 2014 17:14:59 +0100
-Message-ID: <60613875.I24eeAVJF7@uw000953>
-In-Reply-To: <1393947130-11999-1-git-send-email-szymon.janc@tieto.com>
-References: <1393947130-11999-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 5 Mar 2014 18:11:23 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Josh Boyer <jwboyer@fedoraproject.org>
+Cc: Thomas =?iso-8859-1?Q?B=E4chler?= <thomas@archlinux.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for
+ virtual HCI driver"
+Message-ID: <20140305161123.GA31928@localhost.P-661HNU-F1>
+References: <1394020752-6186-1-git-send-email-thomas@archlinux.org>
+ <CA+5PVA5JuMLLG82YB8Z2FrOz3a0JrbeGzjamGYh1Qt89LtBEfA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <CA+5PVA5JuMLLG82YB8Z2FrOz3a0JrbeGzjamGYh1Qt89LtBEfA@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tuesday 04 of March 2014 16:32:02 Szymon Janc wrote:
-> Hi,
-> 
-> This adds initial minimal set of AT commands to establish SLC connection.
-> 
-> Szymon Janc (8):
->   android/handsfree: Add support for AT+BRSF command
->   android/handsfree: Add support for AT+CIND command
->   android/handsfree: Add support for AT+CMER command
->   android/handsfree: Distinguish between HSP and HFP connection
->   shared/hfp: Add function to check if reach end of command
->   shared/hfp: Add hfp_gw_result_get_number_default function
->   android/handsfree: Add support for AT+BIA command
->   android/handsfree: Make connection state constants name shorter
-> 
->  android/hal-msg.h   |  10 +-
->  android/handsfree.c | 266 +++++++++++++++++++++++++++++++++++++++++++++++++---
->  src/shared/hfp.c    |  20 ++++
->  src/shared/hfp.h    |   4 +
->  4 files changed, 282 insertions(+), 18 deletions(-)
+Hi,
 
-Updated version of those patches is now pushed upstream.
+On Wed, Mar 05, 2014, Josh Boyer wrote:
+> On Wed, Mar 5, 2014 at 6:59 AM, Thomas Bächler <thomas@archlinux.org> wrote:
+> > Adding the devname:vhci alias and thus adding a static /dev/vhci device node
+> > only works when assigning a fixed major/minor number. However, the code
+> > currently uses a dynamically assigned minor number. It is therefore impossible
+> > to create a static device and to autoload the module when accessing it.
+> >
+> > Reverting this fixes the kmod error message
+> >  depmod: ERROR: Module 'hci_vhci' has devname (vhci) but lacks major and minor information. Ignoring.
+> >
+> > This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
+> 
+> We've had several reports of this in Fedora as well.  I hadn't gotten
+> around to digging into it yet, so thanks for bringing this up Thomas.
 
--- 
-Best regards, 
-Szymon Janc
+How does this relate to the "Bluetooth: allocate static minor for vhci"
+patch that we have in the bluetooth-next tree (also in wireless-next,
+going to the 3.15 kernel). It's commit b075dd40c95d11c2c8690f6c4d6232fc.
+
+Johan
