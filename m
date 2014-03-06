@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] android/avrcp: Add avrcp_get_element_attributes() function
-Date: Thu,  6 Mar 2014 16:43:00 +0200
-Message-Id: <1394116985-28247-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/7] unit/avrcp: Add /TP/MDI/BV-03-C test
+Date: Thu,  6 Mar 2014 16:43:01 +0200
+Message-Id: <1394116985-28247-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,48 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies that Get element attributes issued correctly.
 ---
- android/avrcp-lib.c | 13 +++++++++++++
- android/avrcp-lib.h |  2 ++
- 2 files changed, 15 insertions(+)
+ unit/test-avrcp.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index cd39071..fbaa48d 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -403,6 +403,19 @@ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
- 				user_data);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 46ddde9..d50b1ad 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -553,6 +553,9 @@ static void test_client(gconstpointer data)
+ 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-01-C"))
+ 		avrcp_get_play_status(context->session, NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
++		avrcp_get_element_attributes(context->session, NULL, NULL);
++
+ 	execute_context(context);
  }
  
-+int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
-+								void *user_data)
-+{
-+	uint8_t buf[9];
-+
-+	/* This returns all attributes */
-+	memset(buf, 0, sizeof(buf));
-+
-+	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
-+				AVRCP_GET_ELEMENT_ATTRIBUTES, buf, sizeof(buf),
-+				func, user_data);
-+}
-+
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
- 				uint8_t status)
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index ba1d84a..5e90ea1 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -145,6 +145,8 @@ int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attrs,
- 					void *user_data);
- int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
-+int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
-+							void *user_data);
+@@ -812,6 +815,12 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x09, 0xaa, 0xaa, 0xaa,
+ 				0xaa, 0xbb, 0xbb, 0xbb, 0xbb, 0x00));
  
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
++	/* Get element attributes - CT */
++	define_test("/TP/MDI/BV-03-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
++				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+ 
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
