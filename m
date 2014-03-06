@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/4] android/avrcp: Fix warnings when freeing avrcp_device struct
-Date: Thu,  6 Mar 2014 15:45:27 +0200
-Message-Id: <1394113527-4398-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 3/4] android/arvrcp: Fix not parsing SDP record correctly
+Date: Thu,  6 Mar 2014 15:45:26 +0200
+Message-Id: <1394113527-4398-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1394113527-4398-1-git-send-email-luiz.dentz@gmail.com>
 References: <1394113527-4398-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,31 +11,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If the device does not yet have queue due to not have a session it cause
-the following warnings when avrcp_device_free is called:
-(bluetoothd:1102): GLib-CRITICAL **: g_queue_foreach: assertion 'queue != NULL' failed
-(bluetoothd:1102): GLib-CRITICAL **: g_queue_free: assertion 'queue != NULL' failed
 ---
- android/avrcp.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ android/avrcp.c | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
 diff --git a/android/avrcp.c b/android/avrcp.c
-index 911b1df..1d211ad 100644
+index d5eb31d..911b1df 100644
 --- a/android/avrcp.c
 +++ b/android/avrcp.c
-@@ -442,8 +442,10 @@ static void avrcp_device_free(void *data)
- {
- 	struct avrcp_device *dev = data;
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
  
--	g_queue_foreach(dev->queue, (GFunc) g_free, NULL);
--	g_queue_free(dev->queue);
-+	if (dev->queue) {
-+		g_queue_foreach(dev->queue, (GFunc) g_free, NULL);
-+		g_queue_free(dev->queue);
-+	}
++#include <stdlib.h>
+ #include <stdbool.h>
+ #include <errno.h>
+ #include <glib.h>
+@@ -817,15 +818,22 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
  
- 	if (dev->session)
- 		avrcp_shutdown(dev->session);
+ 	for (list = recs; list; list = list->next) {
+ 		sdp_record_t *rec = list->data;
+-		sdp_data_t *data;
++		sdp_list_t *l;
++		sdp_profile_desc_t *desc;
++		int features;
+ 
+-		data = sdp_data_get(rec, SDP_ATTR_VERSION);
+-		if (data)
+-			dev->version = data->val.uint16;
++		if (sdp_get_profile_descs(rec, &l) < 0)
++			continue;
+ 
+-		data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES);
+-		if (data)
+-			dev->features = data->val.uint16;
++		desc = l->data;
++		dev->version = desc->version;
++
++		if (sdp_get_int_attr(rec, SDP_ATTR_SUPPORTED_FEATURES,
++							&features) == 0)
++			dev->features = features;
++
++		sdp_list_free(l, free);
++		break;
+ 	}
+ 
+ 	if (dev->io) {
 -- 
 1.8.5.3
 
