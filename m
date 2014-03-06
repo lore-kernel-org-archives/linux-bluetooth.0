@@ -1,127 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5318E560.6050200@openbossa.org>
-Date: Thu, 06 Mar 2014 18:15:12 -0300
-From: Andre Guedes <andre.guedes@openbossa.org>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Background scanning and white list usage
-References: <BFAEE1C5-E74F-40F0-A1A4-8F4907FBDCF4@holtmann.org> <20140228064422.GA28466@localhost.P-661HNU-F1> <B2E73B9C-3787-4B4B-802B-0C76302BF8F9@holtmann.org>
-In-Reply-To: <B2E73B9C-3787-4B4B-802B-0C76302BF8F9@holtmann.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+In-Reply-To: <1394029952-3319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1394029952-3319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 6 Mar 2014 17:45:26 +0200
+Message-ID: <CABBYNZLNL3dJqFBj1AVJLx9AysnwyWjtpUpRG+hJDVrhX2wYBQ@mail.gmail.com>
+Subject: Re: [PATCH 01/10] unit/avrcp: Refactor check attributes code
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan/Marcel,
+Hi Andrei,
 
-On 02/28/2014 03:51 AM, Marcel Holtmann wrote:
-> Hi Johan,
+On Wed, Mar 5, 2014 at 4:32 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
->>> The complicated part comes into play when we have devices with
->>> LE Privacy enabled and when they are using resolvable private
->>> addresses. Meaning when our IRK list is populated with identity
->>> addresses and their IRKs. The only way to make this work with the
->>> current available controller features is if we program the RPA
->>> into the white list. Since that RPA is going to change over time,
->>> we need to stop scanning with the white list filter every now and
->>> then, scan for all devices and resolve the RPA. If we see a new
->>> RPA for a know IRK, we have to replace the old RPA in the white
->>> list with the new RPA. And then we go back to scanning with the
->>> white list filter policy.
->>>
->>> Now the important question is what are good enough intervals to
->>> make this work smoothly. Devices using LE Privacy will take a hit
->>> in their re-connection time, but that is what we have to trade in
->>> for compared to waking up the host for every single advertising
->>> packet.
->>>
->>> My initial idea is to scan 5 minutes using the white list, then
->>> scan 10 seconds without the white list, then back to 5 minutes
->>> using the white list and so on.
->>>
->>> The default value for the PRA lifetime according to the
->>> specification is 15 minutes. I timed recent iOS devices which
->>> seem to be using 9 minutes intervals. So we have to play a little
->>> bit with this and see what are good values.
->>>
->>> Maybe 3 minutes white list scan and 5 seconds without white list
->>> is better. Things to try out.
->>
->> I don't think this is a good idea at all. With LE starting
->> advertising is typically seen as the initiating action of
->> connection creation (unlike with BR/EDR where HCI_Create_Connection
->> is the initiating action). Typically peripherals mean "connect to
->> me now!" when they start connectable advertising.
->>
->> Let's stay you switch on your peripheral device, or it comes into
->> range you haven't used it for some time (hours or even days). If
->> it's using RPAs it's pretty much guaranteed to have a different one
->> than what we know of and even if we're using 3 minutes white list
->> scanning the user is on average going to have to wait for 1.5
->> minutes for the device to get connected which is not acceptable
->> behavior (the extreme example would be if this is a keyboard or a
->> mouse which you start using for the first time in the morning -
->> moving the mouse or pressing a key on the keyboard should certainly
->> get you a connection in less than 1 second).
+> Make check_attributes() function which would handle attributes check.
+> ---
+>  unit/test-avrcp.c | 24 ++++++++++++++++--------
+>  1 file changed, 16 insertions(+), 8 deletions(-)
 >
-> HID devices would suffer the most here. Fully agree here.
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index 803dd6b..7ce2801 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -288,6 +288,20 @@ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
+>                 { },
+>  };
 >
-> However since neither Microsoft Windows nor OS X can deal with RPAs
-> at the moment, I do not think we are entering a dangerous zone here
-> from an interoperability point of view. Actually Windows 8.1 is not
-> able to connect to any random address for that matter.
+> +static bool check_attributes(const uint8_t *params)
+> +{
+> +       int i;
+> +
+> +       for (i = 1; i <= params[0]; i++) {
+> +               DBG("params[%d] = 0x%02x", i, params[i]);
+> +               if (params[i] > AVRCP_ATTRIBUTE_LAST ||
+> +                   params[i] == AVRCP_ATTRIBUTE_ILEGAL)
+> +                       return false;
+> +       }
+> +
+> +       return true;
+> +}
+> +
+>  static ssize_t avrcp_handle_get_capabilities(struct avrcp *session,
+>                                                 uint8_t transaction,
+>                                                 uint16_t params_len,
+> @@ -326,16 +340,10 @@ static ssize_t avrcp_handle_get_player_attr_text(struct avrcp *session,
+>                                                 uint8_t *params,
+>                                                 void *user_data)
+>  {
+> -       int i;
+> -
+>         DBG("params[0] %d params_len %d", params[0], params_len);
 >
-> My point is that we certainly not make it worse.
-
-HoG is not the only problem. I'm afraid delaying re-connection 3-5
-minutes we might become others profiles impractical (e.g. Fob keeps
-beeping even if it is beside the cellphone).
-
->> I fully understand the desire to use the white list as it's a very
->> nice power saving feature, but I don't think we can win here as
->> long as we don't have a way to have the controller do the resolving
->> for us.
->>
->> One thing we could potentially try to do (but which I doubt is
->> really worth it in the end) is to track the age of resolved RPAs.
->> If we have an RPA which was resolved say less than 5 minutes ago we
->> consider it appropriate to place into the white list. Otherwise we
->> skip using the white list.
+> -       for (i = 1; i <= params[0]; i++) {
+> -               DBG("params[%d] = 0x%02x", i, params[i]);
+> -               if (params[i] > AVRCP_ATTRIBUTE_LAST ||
+> -                       params[i] == AVRCP_ATTRIBUTE_ILEGAL)
+> -                       return -EINVAL;
+> -       }
+> +       if (!check_attributes(params))
+> +               return -EINVAL;
 >
-> I was thinking about this as well. Over time we could learn the age
-> of a RPA and thus schedule the scanning without white list times most
-> efficient. Frankly, I want to get the white list usage going first.
-> As long as you only have public or static addresses, it is the way to
-> go. And then we optimize it when we have to deal with RPAs.
+>         params[0] = 0;
+>
+> --
+> 1.8.3.2
 
-I agree with Johan about this aging approach, I seems not worthy. 
-Honestly, I don't see how we would properly deal with white list and LE 
-Privacy issue by now.
+Pushed after some code style fixes, please do not mix spaces and tabs.
+Also the tests are starting to get logic outside of just testing the
+handler but the actual PDU handling so perhaps we need to think if the
+API of avrcp-lib.h is really a proper one or we should do create a
+different one as it is done for passthrough where the callback are not
+actually pure PDU handlers.
 
-> We can not close our eyes to iOS devices using RPAs and I am not
-> willing to take the power hit of getting flooded with advertising
-> reports.
 
-To fix this other issue (advertising flooding), filtering duplicates is 
-just fine.
-
-The problem with enabling filter duplicates in background scan happens 
-in the following scenario:
-   * Background scan is running.
-   * A device disconnects and starts advertising.
-   * Before host gets the disconnect event, the advertising is reported
-     to host. Since there is no pending LE connection at that time,
-     nothing happens.
-   * Host gets the disconnection event and adds a pending connection.
-   * No advertising is reported (since controller is filtering) and the
-     connection is never established.
-
-To address this scenario, all we have to do is: always restart 
-background scan when a new LE pending connection is added. This way, we 
-unsure that we don't miss the advertising report.
-
-If you guys agree with this approach I can write the patches.
-
-Regards,
-
-Andre
+-- 
+Luiz Augusto von Dentz
