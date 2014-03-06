@@ -2,187 +2,406 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PAN PICS and PTS results
-Date: Thu,  6 Mar 2014 08:07:21 +0100
-Message-Id: <1394089641-11398-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pics: Add PICS and PIXIT for GATT
+Date: Thu,  6 Mar 2014 07:27:39 +0100
+Message-Id: <1394087259-8909-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adjusting some optional PICS settings as well as updating PTS
-test's results
+Adding PICS and PIXIT for GATT targetting Android 4.4
 ---
- android/pics-pan.txt | 42 +++++++++++++++++++++---------------------
- android/pts-pan.txt  | 36 ++++++++++++++++++++++++------------
- 2 files changed, 45 insertions(+), 33 deletions(-)
+ android/Makefile.am    |   2 +
+ android/pics-gatt.txt  | 322 +++++++++++++++++++++++++++++++++++++++++++++++++
+ android/pixit-gatt.txt |  31 +++++
+ 3 files changed, 355 insertions(+)
+ create mode 100644 android/pics-gatt.txt
+ create mode 100644 android/pixit-gatt.txt
 
-diff --git a/android/pics-pan.txt b/android/pics-pan.txt
-index 16457bf..0caa629 100644
---- a/android/pics-pan.txt
-+++ b/android/pics-pan.txt
-@@ -12,14 +12,14 @@ O - optional
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_PAN_1_1	True (*#)	Role: Network Access Point (O.1)
-+TSPC_PAN_1_1	True (*)	Role: Network Access Point (O.1)
- TSPC_PAN_1_2	False		Role: Group Ad-hoc Network (O.1)
--TSPC_PAN_1_3	True (*#)	Role: PAN User (O.1)
--TSPC_PAN_1a_1	True (#)	BNEP: BNEP Connection Setup (M)
--TSPC_PAN_1a_2	True (#)	BNEP: BNEP Data Packet Reception (M)
--TSPC_PAN_1a_3	True (#)	BNEP: BNEP Data Packet Transmission (M)
--TSPC_PAN_1a_4	True (#)	BNEP: BNEP Control Message Processing (M)
--TSPC_PAN_1a_5	True (#)	BNEP: BNEP Extension Header Processing (M)
-+TSPC_PAN_1_3	True (*)	Role: PAN User (O.1)
-+TSPC_PAN_1a_1	True		BNEP: BNEP Connection Setup (M)
-+TSPC_PAN_1a_2	True		BNEP: BNEP Data Packet Reception (M)
-+TSPC_PAN_1a_3	True		BNEP: BNEP Data Packet Transmission (M)
-+TSPC_PAN_1a_4	True		BNEP: BNEP Control Message Processing (M)
-+TSPC_PAN_1a_5	True		BNEP: BNEP Extension Header Processing (M)
- TSPC_PAN_1a_6	False		BNEP: Network Protocol Filter Message
- 					Transmission (O)
- TSPC_PAN_1a_7	False		BNEP: Multicast Address Filter Message
-@@ -33,21 +33,21 @@ O.1: It is mandatory to support at least one of the defined roles.
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_PAN_2_1	True (#)	NAP: Support BNEP (M)
--TSPC_PAN_2_2	True (#)	NAP: Support BNEP Forwarding (M)
-+TSPC_PAN_2_1	True		NAP: Support BNEP (M)
-+TSPC_PAN_2_2	True		NAP: Support BNEP Forwarding (M)
- TSPC_PAN_2_3	False		NAP: Support Layer 2-Bridging between PAN and
- 					External Network (C.1)
--TSPC_PAN_2_4	True (*#)	NAP: Support IP forwarding between PAN and
-+TSPC_PAN_2_4	True (*)	NAP: Support IP forwarding between PAN and
- 					External Network (C.1)
- TSPC_PAN_2_5	False		NAP: Support BNEP Packet Filtering (O)
--TSPC_PAN_2_6	True (*#)	NAP: Support IPv4 (C.2)
--TSPC_PAN_2_6a	True (*#)	NAP: Supports operable routable IPv4 address (O)
-+TSPC_PAN_2_6	False		NAP: Support IPv4 (C.2)
-+TSPC_PAN_2_6a	False		NAP: Supports operable routable IPv4 address (O)
- TSPC_PAN_2_6b	False		NAP: Support link-local address configuration
- 					for IPv4 (C.4)
- TSPC_PAN_2_7	False		NAP: Support ping client for IPv4 (O)
- TSPC_PAN_2_8	False		NAP: Support DHCP Client for IPv4 (O)
- TSPC_PAN_2_9	False		NAP: Support DNS/LLMNR Resolver for IPv4 (O)
--TSPC_PAN_2_9a	True (#)	NAP: Support LLMNR Sender for IPv4 (C.5)
-+TSPC_PAN_2_9a	False		NAP: Support LLMNR Sender for IPv4 (C.5)
- TSPC_PAN_2_9b	False		NAP: Support LLMNR Responder for IPv4 (O)
- TSPC_PAN_2_10	False		NAP: Support HTTP Client for IPv4 (O)
- TSPC_PAN_2_11	False		NAP: Support WAP Client for IPv4 (O)
-@@ -58,8 +58,8 @@ TSPC_PAN_2_14a	False (*)	NAP: Support LLMNR Sender for IPv6 (C.6)
- TSPC_PAN_2_14b	False		NAP: Support LLMNR Responder for IPv6 (O)
- TSPC_PAN_2_15	False		NAP: Support HTTP Client for IPv6 (O)
- TSPC_PAN_2_16	False		NAP: Support WAP Client for IPv6 (O)
--TSPC_PAN_2_17	True (#)	NAP: Supports Connectable Mode (M)
--TSPC_PAN_2_18	True (#)	NAP: NAP Service Record (M)
-+TSPC_PAN_2_17	True		NAP: Supports Connectable Mode (M)
-+TSPC_PAN_2_18	True		NAP: NAP Service Record (M)
- TSPC_PAN_2_19	False		NAP: Support at least three PANUs (O)
- TSPC_PAN_2_20	False		NAP: Support at least two PANUs (O)
- -------------------------------------------------------------------------------
-@@ -73,7 +73,7 @@ C.3: Mandatory to support IF any IPv6-based transport protocol OR
- 	(TSPC_PAN_2_13-16) is supported, ELSE Optional.
- C.4: Mandatory if TSPC_PAN_2_6 is supported and TSPC_PAN_2_6a is not supported,
- 	otherwise optional.
--C.5: Mandatory if item (TSPC_PAN_2_6) or item supported.
-+C.5: Mandatory if item (TSPC_PAN_2_6) supported.
- C.6: Mandatory if item (TSPC_PAN_2_12) supported
- -------------------------------------------------------------------------------
- 
-@@ -119,12 +119,12 @@ C.4: Mandatory to support if (TSPC_PAN_3_10) is supported.
- -------------------------------------------------------------------------------
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
--TSPC_PAN_4_1	True (#)	PANU: Support BNEP (M)
--TSPC_PAN_4_2	True (*#)	PANU: Support IPv4 (C.1)
--TSPC_PAN_4_3	True (*#)	PANU: Support ping client for IPv4 (O)
--TSPC_PAN_4_4	True (*#)	PANU: Support DHCP client for  IPv4 (O)
-+TSPC_PAN_4_1	True		PANU: Support BNEP (M)
-+TSPC_PAN_4_2	True		PANU: Support IPv4 (C.1)
-+TSPC_PAN_4_3	False		PANU: Support ping client for IPv4 (O)
-+TSPC_PAN_4_4	False		PANU: Support DHCP client for  IPv4 (O)
- TSPC_PAN_4_5	False		PANU: Support DNS/LLMNR Resolver for IPv4 (O)
--TSPC_PAN_4_5a	True (#)	PANU: Support LLMNR Sender for IPv4 (C.2)
-+TSPC_PAN_4_5a	True		PANU: Support LLMNR Sender for IPv4 (C.2)
- TSPC_PAN_4_5b	False		PANU: Support LLMNR Responder for IPv4 (O)
- TSPC_PAN_4_6	False		PANU: Support HTTP Client for IPv4 (O)
- TSPC_PAN_4_7	False		PANU: Support WAP Client for IPv4 (O)
-diff --git a/android/pts-pan.txt b/android/pts-pan.txt
-index 8e8ae41..74c482a 100644
---- a/android/pts-pan.txt
-+++ b/android/pts-pan.txt
-@@ -10,9 +10,9 @@ FAIL	test failed
- INC	test is inconclusive
- N/A	test is disabled due to PICS setup
- 
---------------------------------------------------------------------------------
-+--------------------------------------------------------------------------------
- Test Name				Result	Notes
---------------------------------------------------------------------------------
-+--------------------------------------------------------------------------------
- TC_BNEP_GN_BROADCAST_0_BV_03_C		N/A
- TC_GN_Ipv4_Autonet_BV_01_I		N/A
- TC_GN_Ipv6_Autonet_BV_02_I		N/A
-@@ -34,37 +34,49 @@ TC_BNEP_NAP_FORWARD_UNICAST_BV_05_C	N/A
- TC_BNEP_NAP_FORWARD_UNICAST_BV_06_C	N/A
- TC_BNEP_NAP_MULTICAST_0_BV_03_C		N/A
- TC_BNEP_NAP_MULTICAST_0_BV_04_C		N/A
--TC_BNEP_BRIDGE_RX_BV_02_I		INC
-+TC_BNEP_BRIDGE_RX_BV_02_I		PASS	Tester needs to send one
-+						forward-unicast	BNEP packet
-+						with given data (5 times)
-+						0x00, 0x01, 0xFF followed by
-+						0x00, 0x01, 0x9E, 0x9F
-+						sendip -d <hexdata>
- TC_BNEP_BRIDGE_TX_BV_01_I		PASS
- TC_NAP_Ipv4_Autonet_BV_01_I		N/A
- TC_NAP_Ipv6_Autonet_BV_02_I		N/A
- TC_NAP_IP_DHCP_BV_03_I			N/A
--TC_NAP_IP_LLMNR_BV_01_I			INC
-+TC_NAP_IP_LLMNR_BV_01_I			N/A
- TC_NAP_IP_LLMNR_BV_02_I			N/A
- TC_NAP_IP_DNS_BV_01_I			N/A
- TC_NAP_IP_APP_BV_01_I			N/A
- TC_NAP_IP_APP_BV_02_I			N/A
- TC_NAP_IP_APP_BV_03_I			N/A
- TC_NAP_IP_APP_BV_04_I			N/A
--TC_NAP_IP_APP_BV_05_I			PASS
-+TC_NAP_IP_APP_BV_05_I			N/A
- TC_SDP_NAP_BV_01_C			PASS
- TC_MISC_NAP_UUID_BV_01_C		PASS
- TC_MISC_NAP_UUID_BV_02_C		PASS
- TC_BNEP_PANU_BROADCAST_0_BV_04_C	N/A
--TC_PANU_Ipv4_Autonet_BV_01_I		INC
-+TC_PANU_Ipv4_Autonet_BV_01_I		PASS	When prompted connect to PTS.
-+						From IUT: issue ARP request
-+						iperf -c <addr> -p <port#>
- TC_PANU_Ipv6_Autonet_BV_02_I		N/A
--TC_PANU_IP_LLMNR_BV_01_I		INC
-+TC_PANU_IP_LLMNR_BV_01_I		PASS	When prompted connect to PTS.
-+						From IUT: send LLMNR request
-+						command
-+						iperf -c <addr> -p <port#>
- TC_PANU_IP_LLMNR_BV_02_I		N/A
--TC_PANU_IP_DHCP_BV_03_I			PASS
-+TC_PANU_IP_DHCP_BV_03_I			N/A
- TC_PANU_IP_DNS_BV_01_I			N/A
- TC_PANU_IP_APP_BV_01_I			N/A
- TC_PANU_IP_APP_BV_02_I			N/A
--TC_PANU_IP_APP_BV_03_I			INC
--TC_PANU_IP_APP_BV_04_I			INC
--TC_PANU_IP_APP_BV_05_I			PASS
-+TC_PANU_IP_APP_BV_03_I			N/A
-+TC_PANU_IP_APP_BV_04_I			N/A
-+TC_PANU_IP_APP_BV_05_I			PASS	When prompted, connect to PTS
-+						and then when prompted terminate
-+						connection (IUT side)
- TC_SDP_PANU_BV_01_C			N/A
- TC_MISC_PANU_UUID_BV_01_C		N/A
- TC_MISC_PANU_UUID_BV_02_C		N/A
- TC_MISC_ROLE_BV_01_C			N/A
- TC_MISC_ROLE_BV_BV_02_C			N/A
---------------------------------------------------------------------------------
-+--------------------------------------------------------------------------------
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 31f905c..ca91eee 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -191,6 +191,7 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pics-avrcp.txt \
+ 				android/pics-hsp.txt \
+ 				android/pics-hfp.txt \
++				android/pics-gatt.txt \
+ 				android/pixit-l2cap.txt \
+ 				android/pixit-gap.txt \
+ 				android/pixit-did.txt \
+@@ -204,6 +205,7 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pixit-avrcp.txt \
+ 				android/pixit-hsp.txt \
+ 				android/pixit-hfp.txt \
++				android/pixit-gatt.txt \
+ 				android/pts-l2cap.txt \
+ 				android/pts-gap.txt \
+ 				android/pts-did.txt \
+diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
+new file mode 100644
+index 0000000..8abf8c2
+--- /dev/null
++++ b/android/pics-gatt.txt
+@@ -0,0 +1,322 @@
++GATT PICS for the PTS tool.
++
++PTS version: 5.0
++
++* - different than PTS defaults
++
++M - mandatory
++O - optional
++
++		Generic Attribute Profile Role
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_1_1	True		Generic Attribute Profile Client (C.1)
++TSPC_GATT_1_2	True		Generic Attribute Profile Server (C.2)
++TSPC_GATT_1A_1	False (*)	Complete GATT client (C.3)
++TSPC_GATT_1A_2	False (*)	Complete GATT server (C.4)
++-------------------------------------------------------------------------------
++C.1: Optional to support IF TSPC_GATT_2_2; else IF TSPC_GATT_2_1 it is mandatory
++	to support at least one of TSPC_GATT_1_1 OR TSPC_GATT_1_2
++C.2: Mandatory to support IF TSPC_GATT_2_2; else IF TSPC_GATT_2_1 it is
++	mandatory to support at least one of TSPC_GATT_1_1 OR TSPC_GATT_1_2
++C.3: Optional IF TSPC_GATT_1_1 is supported, otherwise Excluded
++C.4: Optional IF TSPC_GATT_1_2 is supported, otherwise Excluded
++-------------------------------------------------------------------------------
++
++
++		ATT Bearer Transport
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_2_1	True		Attribute Protocol Supported over BR/EDR
++					(L2CAP fixed channel support) (C.1)
++TSPC_GATT_2_2	True		Attribute Protocol Supported over LE (C.2)
++-------------------------------------------------------------------------------
++C.1: Mandatory IF (SUM ICS 12/2 OR SUM ICS 12/9) is supported, otherwise
++	Excluded
++C.2: Mandatory IF (SUM ICS 12/7 OR SUM ICS 12/9) is supported, otherwise
++	Excluded
++-------------------------------------------------------------------------------
++
++
++
++		Generic Attribute Profile Support
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_3_1	True		Client: Exchange MTU (C.1)
++TSPC_GATT_3_2	True		Client: Discover All Primary Services (C.1)
++TSPC_GATT_3_3	True		Client: Discover Primary Services Service
++					UUID (C.1)
++TSPC_GATT_3_4	True		Client: Find Included Services (C.1)
++TSPC_GATT_3_5	True		Client: Discover All characteristics of a
++					Service (C.1)
++TSPC_GATT_3_6	True		Client: Discover Characteristics by UUID (C.1)
++TSPC_GATT_3_7	True		Client: Discover All Characteristic Descriptors
++					(C.1)
++TSPC_GATT_3_8	True		Client: Read Characteristic Value (C.1)
++TSPC_GATT_3_9	True		Client: Read using Characteristic UUID (C.1)
++TSPC_GATT_3_10	True		Client: Read Long Characteristic Values (C.1)
++TSPC_GATT_3_11	True		Client: Read Multiple Characteristic
++					Values (C.1)
++TSPC_GATT_3_12	True		Client: Write without Response (C.1)
++TSPC_GATT_3_13	True		Client: Signed Write Without Response (C.1)
++TSPC_GATT_3_14	True		Client: Write Characteristic Value (C.1)
++TSPC_GATT_3_15	True		Client: Write Long Characteristic Values (C.1)
++TSPC_GATT_3_16	True		Client: Characteristic Value Reliable
++					Writes (C.1)
++TSPC_GATT_3_17	True		Client: Notifications (C.1)
++TSPC_GATT_3_18	True		Client: Indications (M)
++TSPC_GATT_3_19	True		Client: Read Characteristic Descriptors (C.1)
++TSPC_GATT_3_20	True		Client: Read long Characteristic Descriptors
++					(C.1)
++TSPC_GATT_3_21	True		Client: Write Characteristic Descriptors (C.1)
++TSPC_GATT_3_22	True		Client: Write Long Characteristic Descriptors
++					(C.1)
++TSPC_GATT_3_23	True		Client: Service Changed Characteristic (M)
++TSPC_GATT_3B_1	True		Client: Primary Service Declaration (M)
++TSPC_GATT_3B_2	True		Client: Secondary Service Declaration (M)
++TSPC_GATT_3B_3	True		Client: Include Declaration (M)
++TSPC_GATT_3B_4	True		Client: Characteristic Declaration (M)
++TSPC_GATT_3B_5	True		Client: Characteristic Value Declaration (M)
++TSPC_GATT_3B_6	True		Client: Characteristic Extended Properties (M)
++TSPC_GATT_3B_7	True		Client: Characteristic User Description
++					Descriptor (M)
++TSPC_GATT_3B_8	True		Client: Client Characteristic Configuration
++					Descriptor (M)
++TSPC_GATT_3B_9	True		Client: Server Characteristic Configuration
++					Descriptor (M)
++TSPC_GATT_3B_10	True		Client: Characteristic Format Descriptor (M)
++TSPC_GATT_3B_11	True		Client: Characteristic Aggregate Format
++					Descriptor (M)
++TSPC_GATT_3B_12	True		Client: Characteristic Format: Boolean (M)
++TSPC_GATT_3B_13	True		Client: Characteristic Format: 2Bit (M)
++TSPC_GATT_3B_14	True		Client: Characteristic Format: nibble (M)
++TSPC_GATT_3B_15	True		Client: Characteristic Format: Uint8 (M)
++TSPC_GATT_3B_16	True		Client: Characteristic Format: Uint12 (M)
++TSPC_GATT_3B_17	True		Client: Characteristic Format: Uint16 (M)
++TSPC_GATT_3B_18	True		Client: Characteristic Format: Uint24 (M)
++TSPC_GATT_3B_19	True		Client: Characteristic Format: Uint32 (M)
++TSPC_GATT_3B_20	True		Client: Characteristic Format: Uint48 (M)
++TSPC_GATT_3B_21	True		Client: Characteristic Format: Uint64 (M)
++TSPC_GATT_3B_22	True		Client: Characteristic Format: Uint128 (M)
++TSPC_GATT_3B_23	True		Client: Characteristic Format: Sint8 (M)
++TSPC_GATT_3B_24	True		Client: Characteristic Format: Sint12 (M)
++TSPC_GATT_3B_25	True		Client: Characteristic Format: Sint16 (M)
++TSPC_GATT_3B_26	True		Client: Characteristic Format: Sint24 (M)
++TSPC_GATT_3B_27	True		Client: Characteristic Format: Sint32 (M)
++TSPC_GATT_3B_28	True		Client: Characteristic Format: Sint48 (M)
++TSPC_GATT_3B_29	True		Client: Characteristic Format: Sint64 (M)
++TSPC_GATT_3B_30	True		Client: Characteristic Format: Sint128 (M)
++TSPC_GATT_3B_31	True		Client: Characteristic Format: Float32 (M)
++TSPC_GATT_3B_32	True		Client: Characteristic Format: Float64 (M)
++TSPC_GATT_3B_33	True		Client: Characteristic Format: SFLOAT (M)
++TSPC_GATT_3B_34	True		Client: Characteristic Format: FLOAT (M)
++TSPC_GATT_3B_35	True		Client: Characteristic Format: Duint16 (M)
++TSPC_GATT_3B_36	True		Client: Characteristic Format: utf8s (M)
++TSPC_GATT_3B_37	True		Client: Characteristic Format: utf16s (M)
++TSPC_GATT_3B_38	True		Client: Characteristic Format: struct (M)
++-------------------------------------------------------------------------------
++C.1: Mandatory IF TSPC_GATT_1A_1 is supported, otherwise Optional
++-------------------------------------------------------------------------------
++
++
++
++		Generic Attribute Profile Support, by Server
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_4_1	True		Server: Exchange MTU (C.4)
++TSPC_GATT_4_2	True		Server: Discover All Primary Services (M)
++TSPC_GATT_4_3	True		Server: Discover Primary Services Service
++					UUID (M)
++TSPC_GATT_4_4	True		Server: Find Included Services (M)
++TSPC_GATT_4_5	True		Server: Discover All characteristics of
++					a Service (M)
++TSPC_GATT_4_6	True		Server: Discover Characteristics by UUID (M)
++TSPC_GATT_4_7	True		Server: Discover All Characteristic
++					Descriptors (M)
++TSPC_GATT_4_8	True		Server: Read Characteristic Value (M)
++TSPC_GATT_4_9	True		Server: Read using Characteristic UUID (M)
++TSPC_GATT_4_10	True		Server: Read Long Characteristic Values (C.4)
++TSPC_GATT_4_11	True		Server: Read Multiple Characteristic
++					Values (C.4)
++TSPC_GATT_4_12	True		Server: Write without Response (C.2)
++TSPC_GATT_4_13	False (*)	Server: Signed Write Without Response (C.4)
++TSPC_GATT_4_14	True		Server: Write Characteristic Value (C.3)
++TSPC_GATT_4_15	True		Server: Write Long Characteristic Values (C.4)
++TSPC_GATT_4_16	True		Server: Characteristic Value Reliable
++					Writes (C.4)
++TSPC_GATT_4_17	True		Server: Notifications (C.4)
++TSPC_GATT_4_18	True		Server: Indications (C.1)
++TSPC_GATT_4_19	True		Server: Read Characteristic Descriptors (C.4)
++TSPC_GATT_4_20	True		Server: Read long Characteristic
++					Descriptors (C.4)
++TSPC_GATT_4_21	True		Server: Write Characteristic Descriptors (C.4)
++TSPC_GATT_4_22	True		Server: Write Long Characteristic
++					Descriptors (C.4)
++TSPC_GATT_4_23	True		Server: Service Changed Characteristic (C.1)
++-------------------------------------------------------------------------------
++C.1: Mandatory IF service definitions on the server can be added, changed, or
++	removed, otherwise Optional
++C.2: Mandatory IF GATT TSPC_GATT_4_13 is supported, otherwise Optional
++C.3: Mandatory IF GATT TSPC_GATT_4_15 is supported, otherwise Optional
++C.4: Mandatory IF GATT TSPC_GATT_1A_2 is supported, otherwise Optional
++-------------------------------------------------------------------------------
++
++
++		Profile Attribute Types and Characteristic Formats
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_4B_1	True		Server: Primary Service Declaration (M)
++TSPC_GATT_4B_2	True		Server: Secondary Service Declaration (M)
++TSPC_GATT_4B_3	True		Server: Include Declaration (M)
++TSPC_GATT_4B_4	True		Server: Characteristic Declaration (M)
++TSPC_GATT_4B_5	True		Server: Characteristic Value Declaration (M)
++TSPC_GATT_4B_6	True		Server: Characteristic Extended Properties (M)
++TSPC_GATT_4B_7	True		Server: Characteristic User Description
++					Descriptor (M)
++TSPC_GATT_4B_8	True		Server: Client Characteristic Configuration
++					Descriptor (M)
++TSPC_GATT_4B_9	True		Server: Server Characteristic Configuration
++					Descriptor (M)
++TSPC_GATT_4B_10	True		Server: Characteristic Format Descriptor (M)
++TSPC_GATT_4B_11	True		Server: Characteristic Aggregate Format
++					Descriptor (M)
++TSPC_GATT_4B_12	True		Server: Characteristic Format: Boolean (M)
++TSPC_GATT_4B_13	True		Server: Characteristic Format: 2Bit (M)
++TSPC_GATT_4B_14	True		Server: Characteristic Format: nibble (M)
++TSPC_GATT_4B_15	True		Server: Characteristic Format: Uint8 (M)
++TSPC_GATT_4B_16	True		Server: Characteristic Format: Uint12 (M)
++TSPC_GATT_4B_17	True		Server: Characteristic Format: Uint16 (M)
++TSPC_GATT_4B_18	True		Server: Characteristic Format: Uint24 (M)
++TSPC_GATT_4B_19	True		Server: Characteristic Format: Uint32 (M)
++TSPC_GATT_4B_20	True		Server: Characteristic Format: Uint48 (M)
++TSPC_GATT_4B_21	True		Server: Characteristic Format: Uint64 (M)
++TSPC_GATT_4B_22	True		Server: Characteristic Format: Uint128 (M)
++TSPC_GATT_4B_23	True		Server: Characteristic Format: Sint8 (M)
++TSPC_GATT_4B_24	True		Server: Characteristic Format: Sint12 (M)
++TSPC_GATT_4B_25	True		Server: Characteristic Format: Sint16 (M)
++TSPC_GATT_4B_26	True		Server: Characteristic Format: Sint24 (M)
++TSPC_GATT_4B_27	True		Server: Characteristic Format: Sint32 (M)
++TSPC_GATT_4B_28	True		Server: Characteristic Format: Sint48 (M)
++TSPC_GATT_4B_29	True		Server: Characteristic Format: Sint64 (M)
++TSPC_GATT_4B_30	True		Server: Characteristic Format: Sint128 (M)
++TSPC_GATT_4B_31	True		Server: Characteristic Format: Float32 (M)
++TSPC_GATT_4B_32	True		Server: Characteristic Format: Float64 (M)
++TSPC_GATT_4B_33	True		Server: Characteristic Format: SFLOAT (M)
++TSPC_GATT_4B_34	True		Server: Characteristic Format: FLOAT (M)
++TSPC_GATT_4B_35	True		Server: Characteristic Format: Duint16 (M)
++TSPC_GATT_4B_36	True		Server: Characteristic Format: utf8s (M)
++TSPC_GATT_4B_37	True		Server: Characteristic Format: utf16s (M)
++TSPC_GATT_4B_38	True		Server: Characteristic Format: struct (M)
++-------------------------------------------------------------------------------
++
++
++		Generic Attribute Profile Service
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_6_2	True		Discover GATT Services using Service Discovery
++					Profile (C.1)
++TSPC_GATT_6_3	True		Publish SDP record for GATT services support
++					via BR/EDR (C.2)
++-------------------------------------------------------------------------------
++C.1: Mandatory IF TSPC_GATT_1_1 is supported, otherwise Excluded
++C.2: Mandatory IF TSPC_GATT_1_2 is supported, otherwise Excluded
++-------------------------------------------------------------------------------
++
++
++		Attribute Protocol Transport Security
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GATT_7_1	True		Security Mode 4 (C.1)
++TSPC_GATT_7_2	True		LE Security Mode 1 (C.2)
++TSPC_GATT_7_3	True		LE Security Mode 2 (C.2)
++TSPC_GATT_7_4	True		LE Authentication Procedure (C.2)
++TSPC_GATT_7_5	True		LE connection data signing procedure (C.2)
++TSPC_GATT_7_6	True		LE Authenticate signed data procedure (C.2)
++TSPC_GATT_7_7	False (*)	LE Authorization Procedure (C.2)
++-------------------------------------------------------------------------------
++C.1: Mandatory IF TSPC_GATT_2_1 is supported, otherwise Excluded
++C.2: Optional IF TSPC_GATT_2_2 is supported, otherwise Excluded
++-------------------------------------------------------------------------------
++
++
++		Attribute Protocol Client Messages
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_ATT_3_1	True		Attribute Error Response (M)
++TSPC_ATT_3_2	False (*)	Exchange MTU Request (O)
++TSPC_ATT_3_4	False (*)	Find Information Request (O)
++TSPC_ATT_3_6	False (*)	Find by Type Value Request (O)
++TSPC_ATT_3_8	False (*)	Read by Type Request (O)
++TSPC_ATT_3_10	False (*)	Read Request (O)
++TSPC_ATT_3_12	False (*)	Read Blob Request (O)
++TSPC_ATT_3_14	False (*)	Read Multiple Request (O)
++TSPC_ATT_3_16	False (*)	Read by Group Type Request (O)
++TSPC_ATT_3_17	False (*)	Read by Group Type Response (C.6)
++TSPC_ATT_3_18	False (*)	Write Request (O)
++TSPC_ATT_3_20	False (*)	Write Command (O)
++TSPC_ATT_3_21	False (*)	Signed Write Command (O)
++TSPC_ATT_3_22	False (*)	Prepare Write Request (O)
++TSPC_ATT_3_24	False (*)	Execute Write Request (C.8)
++TSPC_ATT_3_26	True		Handle Value Notification (M)
++-------------------------------------------------------------------------------
++C.6: Mandatory IF TSPC_ATT_3_16 is supported, otherwise Excluded
++C.8: Mandatory IF TSPC_ATT_3_22 is supported, otherwise Excluded
++-------------------------------------------------------------------------------
++
++		Attribute Protocol Server Messages
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_ATT_4_1	True		Attribute Error Response (M)
++TSPC_ATT_4_3	True		Exchange MTU Response (M)
++TSPC_ATT_4_5	True		Find Information Response (M)
++TSPC_ATT_4_7	True		Find by Type Value Response (M)
++TSPC_ATT_4_8	True		Read by Type Request (M)
++TSPC_ATT_4_9	True		Read by Type Response (M)
++TSPC_ATT_4_11	True		Read Response (M)
++TSPC_ATT_4_15	False (*)	Read Multiple Response (C.2)
++TSPC_ATT_4_17	True		Read by Group Type Response (M)
++TSPC_ATT_4_19	False (*)	Write Response (C.3)
++TSPC_ATT_4_20	False (*)	Write Command (O)
++TSPC_ATT_4_21	False (*)	Signed Write Command (O)
++TSPC_ATT_4_23	False (*)	Prepare Write Response (C.4)
++TSPC_ATT_4_25	False (*)	Execute Write Response (C.5)
++TSPC_ATT_4_26	False (*)	Handle Value Notification (O)
++-------------------------------------------------------------------------------
++C.2: Mandatory IF TSPC_ATT_4_14 is supported, otherwise Excluded
++C.3: Mandatory IF TSPC_ATT_4_18 is supported, otherwise Excluded
++C.4: Mandatory IF TSPC_ATT_4_22 is supported, otherwise Excluded
++C.5: Mandatory IF TSPC_ATT_4_27 is supported, otherwise Excluded
++-------------------------------------------------------------------------------
++
++
++		Attribute Protocol Transport
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_ATT_5_2	False (*)	LE Security Mode 1 (C.2)
++TSPC_ATT_5_4	False (*)	LE Authentication Procedure (C.2)
++TSPC_ATT_5_7	False (*)	LE Authorization Procedure (C.2)
++-------------------------------------------------------------------------------
++C.2: Optional to support if 2/2 (Attribute Protocol Supported over LE),
++	otherwise Excluded
++-------------------------------------------------------------------------------
++
++
++		Device Configuration
++-------------------------------------------------------------------------------
++Parameter Name	Selected	Description
++-------------------------------------------------------------------------------
++TSPC_GAP_0_2	False (*)	LE (C.2)
++-------------------------------------------------------------------------------
++C.2: Mandatory IF (SUM ICS 34/2 (LE GAP) AND NOT SUM ICS 32/3 (BR/EDR GAP))
++	is supported, otherwise Excluded
++-------------------------------------------------------------------------------
+diff --git a/android/pixit-gatt.txt b/android/pixit-gatt.txt
+new file mode 100644
+index 0000000..7bb8a28
+--- /dev/null
++++ b/android/pixit-gatt.txt
+@@ -0,0 +1,31 @@
++GATT PIXIT for the PTS tool.
++
++PTS version: 5.0
++
++* - different than PTS defaults
++& - should be set to IUT Bluetooth address
++
++		Required PIXIT settings
++-------------------------------------------------------------------------------
++Parameter Name						Value
++-------------------------------------------------------------------------------
++TSPX_bd_addr_iut					112233445566 (*&)
++TSPX_security_enabled					FALSE
++TSPX_delete_link_key					TRUE
++TSPX_time_guard						180000
++TSPX_selected_handle					0012
++TSPX_use_implicit_send					TRUE
++TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
++TSPX_iut_use_dynamic_bd_addr				FALSE
++TSPX_iut_setup_att_over_br_edr				FALSE
++TSPX_tester_database_file				[Path to GATT Test
++								Database]
++TSPX_iut_is_client_periphral				FALSE
++TSPX_iut_is_server_central				FALSE
++TSPX_mtu_size						23
++TSPX_pin_code						0000
++TSPX_use_dynamic_pin					FALSE
++TSPX_delete_ltk						FALSE
++TSPX_characteristic_readable
++TSPX_tester_appearance					0000
++-------------------------------------------------------------------------------
 -- 
 1.8.5.3
 
