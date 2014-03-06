@@ -2,176 +2,118 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 6/9] test: Add external service GATT skeleton
-Date: Thu,  6 Mar 2014 10:44:24 -0300
-Message-Id: <1394113467-24331-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 5/9] gatt: Make RegisterService() async
+Date: Thu,  6 Mar 2014 10:44:23 -0300
+Message-Id: <1394113467-24331-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <CAKT1EBfVP_aYMDFdK+vqBxOKEZh2tdfasKkEks4v5H6h-ZXerw@mail.gmail.com>
  <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the initial code for an external GATT service example.
-It implements the API defined at doc/gatt-api.txt
+GDBusProxy objects consistency should be checked, and attributes
+declaration inserted in the local GATT database before replying
+the caller.
 ---
- .gitignore          |   1 +
- Makefile.tools      |   5 +++
- test/gatt-service.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 127 insertions(+)
- create mode 100644 test/gatt-service.c
+ src/gatt-dbus.c | 27 ++++++++++++++++++++++-----
+ 1 file changed, 22 insertions(+), 5 deletions(-)
 
-diff --git a/.gitignore b/.gitignore
-index 47ba9b8..f323080 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -76,6 +76,7 @@ test/sap_client.pyc
- test/bluezutils.pyc
- unit/test-ringbuf
- unit/test-queue
-+test/gatt-service
- unit/test-eir
- unit/test-uuid
- unit/test-crc
-diff --git a/Makefile.tools b/Makefile.tools
-index 31e1093..c589199 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -393,3 +393,8 @@ test_scripts += test/sap_client.py test/bluezutils.py \
- 		test/test-heartrate test/test-alert test/test-hfp \
- 		test/test-cyclingspeed test/opp-client test/ftp-client \
- 		test/pbap-client test/map-client
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index d62e2cf..3fbff87 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -50,6 +50,7 @@
+ struct external_app {
+ 	char *owner;
+ 	char *path;
++	DBusMessage *reg;
+ 	GDBusClient *client;
+ 	GSList *proxies;
+ 	unsigned int watch;
+@@ -74,6 +75,8 @@ static void external_app_watch_destroy(gpointer user_data)
+ 	external_apps = g_slist_remove(external_apps, eapp);
+ 
+ 	g_dbus_client_unref(eapp->client);
++	if (eapp->reg)
++		dbus_message_unref(eapp->reg);
+ 
+ 	g_free(eapp->owner);
+ 	g_free(eapp->path);
+@@ -164,6 +167,8 @@ static void client_ready(GDBusClient *client, void *user_data)
+ {
+ 	struct external_app *eapp = user_data;
+ 	GDBusProxy *proxy;
++	DBusConnection *conn = btd_get_dbus_connection();
++	DBusMessage *reply;
+ 
+ 	if (eapp->proxies == NULL)
+ 		goto fail;
+@@ -174,17 +179,28 @@ static void client_ready(GDBusClient *client, void *user_data)
+ 
+ 	DBG("Added GATT service %s", eapp->path);
+ 
+-	return;
++	reply = dbus_message_new_method_return(eapp->reg);
++	goto reply;
+ 
+ fail:
+ 	error("Could not register external service: %s", eapp->path);
 +
-+noinst_PROGRAMS += test/gatt-service
++	reply = btd_error_invalid_args(eapp->reg);
++	/* TODO: missing eapp cleanup */
 +
-+test_gatt_service_SOURCES = test/gatt-service.c
-+test_gatt_service_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ gdbus/libgdbus-internal.la
-diff --git a/test/gatt-service.c b/test/gatt-service.c
-new file mode 100644
-index 0000000..18ab7da
---- /dev/null
-+++ b/test/gatt-service.c
-@@ -0,0 +1,121 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
-+ *
-+ *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
-+ *
-+ *  This program is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++reply:
++	dbus_message_unref(eapp->reg);
++	eapp->reg = NULL;
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#include <errno.h>
-+#include <stdio.h>
-+
-+#include <glib.h>
-+#include <dbus/dbus.h>
-+#include <gdbus/gdbus.h>
-+
-+#define GATT_SERVICE_IFACE		"org.bluez.GattService1"
-+
-+/* Immediate Alert Service UUID */
-+#define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
-+
-+static GMainLoop *main_loop;
-+static GSList *services;
-+
-+static gboolean service_get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	const char *uuid = user_data;
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+
-+	return TRUE;
-+}
-+
-+static gboolean service_get_includes(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	return TRUE;
-+}
-+
-+static gboolean service_exist_includes(const GDBusPropertyTable *property,
-+							void *user_data)
-+{
-+	return FALSE;
-+}
-+
-+static const GDBusPropertyTable service_properties[] = {
-+	{ "UUID", "s", service_get_uuid },
-+	{ "Includes", "ao", service_get_includes, NULL,
-+					service_exist_includes },
-+	{ }
-+};
-+
-+static char *register_service(DBusConnection *conn, const char *uuid)
-+{
-+	static int id = 1;
-+	char *path;
-+
-+	path = g_strdup_printf("/service%d", id++);
-+	if (g_dbus_register_interface(conn, path, GATT_SERVICE_IFACE,
-+				NULL, NULL, service_properties,
-+				g_strdup(uuid), g_free) == FALSE) {
-+		printf("Couldn't register service interface\n");
-+		g_free(path);
-+		return NULL;
-+	}
-+
-+	return path;
-+}
-+
-+static void create_services(DBusConnection *conn)
-+{
-+	char *service_path;
-+
-+	service_path = register_service(conn, IAS_UUID);
-+
-+	services = g_slist_prepend(services, service_path);
-+
-+	printf("Registered service: %s\n", service_path);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	DBusConnection *dbus_conn;
-+
-+	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+
-+	main_loop = g_main_loop_new(NULL, FALSE);
-+
-+	g_dbus_attach_object_manager(dbus_conn);
-+
-+	printf("gatt-service unique name: %s\n",
-+				dbus_bus_get_unique_name(dbus_conn));
-+
-+	create_services(dbus_conn);
-+
-+	g_main_loop_run(main_loop);
-+
-+	g_slist_free_full(services, g_free);
-+	dbus_connection_unref(dbus_conn);
-+
-+	return 0;
-+}
++	g_dbus_send_message(conn, reply);
+ }
+ 
+ static struct external_app *new_external_app(DBusConnection *conn,
+-					const char *sender, const char *path)
++					DBusMessage *msg, const char *path)
+ {
+ 	struct external_app *eapp;
+ 	GDBusClient *client;
++	const char *sender = dbus_message_get_sender(msg);
+ 
+ 	client = g_dbus_client_new(conn, sender, "/");
+ 	if (client == NULL)
+@@ -201,6 +217,7 @@ static struct external_app *new_external_app(DBusConnection *conn,
+ 	}
+ 
+ 	eapp->owner = g_strdup(sender);
++	eapp->reg = dbus_message_ref(msg);
+ 	eapp->client = client;
+ 	eapp->path = g_strdup(path);
+ 
+@@ -230,7 +247,7 @@ static DBusMessage *register_service(DBusConnection *conn,
+ 	if (g_slist_find_custom(external_apps, path, external_app_path_cmp))
+ 		return btd_error_already_exists(msg);
+ 
+-	eapp = new_external_app(conn, dbus_message_get_sender(msg), path);
++	eapp = new_external_app(conn, msg, path);
+ 	if (eapp == NULL)
+ 		return btd_error_failed(msg, "Not enough resources");
+ 
+@@ -238,7 +255,7 @@ static DBusMessage *register_service(DBusConnection *conn,
+ 
+ 	DBG("New app %p: %s", eapp, path);
+ 
+-	return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
++	return NULL;
+ }
+ 
+ static DBusMessage *unregister_service(DBusConnection *conn,
+@@ -248,7 +265,7 @@ static DBusMessage *unregister_service(DBusConnection *conn,
+ }
+ 
+ static const GDBusMethodTable methods[] = {
+-	{ GDBUS_EXPERIMENTAL_METHOD("RegisterService",
++	{ GDBUS_EXPERIMENTAL_ASYNC_METHOD("RegisterService",
+ 				GDBUS_ARGS({ "service", "o"},
+ 						{ "options", "a{sv}"}),
+ 				NULL, register_service) },
 -- 
 1.8.3.1
 
