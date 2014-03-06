@@ -1,81 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1394029952-3319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1394029952-3319-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 6 Mar 2014 17:45:26 +0200
-Message-ID: <CABBYNZLNL3dJqFBj1AVJLx9AysnwyWjtpUpRG+hJDVrhX2wYBQ@mail.gmail.com>
-Subject: Re: [PATCH 01/10] unit/avrcp: Refactor check attributes code
+In-Reply-To: <1394113527-4398-1-git-send-email-luiz.dentz@gmail.com>
+References: <1394113527-4398-1-git-send-email-luiz.dentz@gmail.com>
+Date: Thu, 6 Mar 2014 17:38:43 +0200
+Message-ID: <CABBYNZJVR-Vn9t-_+KBk17ryejX16uK-aitc=8rpLtptdq++zg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] android/avrcp: Add remote features notification
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Wed, Mar 5, 2014 at 4:32 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, Mar 6, 2014 at 3:45 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> Make check_attributes() function which would handle attributes check.
 > ---
->  unit/test-avrcp.c | 24 ++++++++++++++++--------
->  1 file changed, 16 insertions(+), 8 deletions(-)
+> v2: Keep uint16_t as type of device features.
 >
-> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-> index 803dd6b..7ce2801 100644
-> --- a/unit/test-avrcp.c
-> +++ b/unit/test-avrcp.c
-> @@ -288,6 +288,20 @@ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
->                 { },
->  };
+>  android/avrcp.c | 17 +++++++++++++++++
+>  1 file changed, 17 insertions(+)
 >
-> +static bool check_attributes(const uint8_t *params)
-> +{
-> +       int i;
-> +
-> +       for (i = 1; i <= params[0]; i++) {
-> +               DBG("params[%d] = 0x%02x", i, params[i]);
-> +               if (params[i] > AVRCP_ATTRIBUTE_LAST ||
-> +                   params[i] == AVRCP_ATTRIBUTE_ILEGAL)
-> +                       return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
->  static ssize_t avrcp_handle_get_capabilities(struct avrcp *session,
->                                                 uint8_t transaction,
->                                                 uint16_t params_len,
-> @@ -326,16 +340,10 @@ static ssize_t avrcp_handle_get_player_attr_text(struct avrcp *session,
->                                                 uint8_t *params,
->                                                 void *user_data)
+> diff --git a/android/avrcp.c b/android/avrcp.c
+> index cb46dcc..d5eb31d 100644
+> --- a/android/avrcp.c
+> +++ b/android/avrcp.c
+> @@ -43,6 +43,7 @@
+>  #include "ipc.h"
+>  #include "bluetooth.h"
+>  #include "avrcp.h"
+> +#include "utils.h"
+>
+>  #define L2CAP_PSM_AVCTP 0x17
+>
+> @@ -699,6 +700,7 @@ static const struct avrcp_control_handler control_handlers[] = {
+>  static int avrcp_device_add_session(struct avrcp_device *dev, int fd,
+>                                                 uint16_t imtu, uint16_t omtu)
 >  {
-> -       int i;
-> -
->         DBG("params[0] %d params_len %d", params[0], params_len);
+> +       struct hal_ev_avrcp_remote_features ev;
+>         char address[18];
 >
-> -       for (i = 1; i <= params[0]; i++) {
-> -               DBG("params[%d] = 0x%02x", i, params[i]);
-> -               if (params[i] > AVRCP_ATTRIBUTE_LAST ||
-> -                       params[i] == AVRCP_ATTRIBUTE_ILEGAL)
-> -                       return -EINVAL;
-> -       }
-> +       if (!check_attributes(params))
-> +               return -EINVAL;
+>         dev->session = avrcp_new(fd, imtu, omtu, dev->version);
+> @@ -717,6 +719,21 @@ static int avrcp_device_add_session(struct avrcp_device *dev, int fd,
+>         /* FIXME: get the real name of the device */
+>         avrcp_init_uinput(dev->session, "bluetooth", address);
 >
->         params[0] = 0;
+> +       bdaddr2android(&dev->dst, ev.bdaddr);
+> +       ev.features = HAL_AVRCP_FEATURE_NONE;
+> +
+> +       DBG("version 0x%02x", dev->version);
+> +
+> +       if (dev->version < 0x0103)
+> +               goto done;
+> +
+> +       ev.features |= HAL_AVRCP_FEATURE_METADATA;
+> +
+> +done:
+> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
+> +                                       HAL_EV_AVRCP_REMOTE_FEATURES,
+> +                                       sizeof(ev), &ev);
+> +
+>         return 0;
+>  }
 >
 > --
-> 1.8.3.2
+> 1.8.5.3
 
-Pushed after some code style fixes, please do not mix spaces and tabs.
-Also the tests are starting to get logic outside of just testing the
-handler but the actual PDU handling so perhaps we need to think if the
-API of avrcp-lib.h is really a proper one or we should do create a
-different one as it is done for passthrough where the callback are not
-actually pure PDU handlers.
+Pushed.
 
 
 -- 
