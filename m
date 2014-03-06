@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] android/arvrcp: Fix not parsing SDP record correctly
-Date: Thu,  6 Mar 2014 15:03:22 +0200
-Message-Id: <1394111003-2396-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] android/avrcp: Fix warnings when freeing avrcp_device struct
+Date: Thu,  6 Mar 2014 15:03:23 +0200
+Message-Id: <1394111003-2396-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1394111003-2396-1-git-send-email-luiz.dentz@gmail.com>
 References: <1394111003-2396-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,58 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+If the device does not yet have queue due to not have a session it cause
+the following warnings when avrcp_device_free is called:
+(bluetoothd:1102): GLib-CRITICAL **: g_queue_foreach: assertion 'queue != NULL' failed
+(bluetoothd:1102): GLib-CRITICAL **: g_queue_free: assertion 'queue != NULL' failed
 ---
- android/avrcp.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ android/avrcp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/android/avrcp.c b/android/avrcp.c
-index d5eb31d..ce636c0 100644
+index ce636c0..1b99a9c 100644
 --- a/android/avrcp.c
 +++ b/android/avrcp.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
+@@ -442,8 +442,10 @@ static void avrcp_device_free(void *data)
+ {
+ 	struct avrcp_device *dev = data;
  
-+#include <stdlib.h>
- #include <stdbool.h>
- #include <errno.h>
- #include <glib.h>
-@@ -68,7 +69,7 @@ struct avrcp_request {
- struct avrcp_device {
- 	bdaddr_t	dst;
- 	uint16_t	version;
--	uint16_t	features;
-+	int		features;
- 	struct avrcp	*session;
- 	GIOChannel	*io;
- 	GQueue		*queue;
-@@ -817,15 +818,19 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
+-	g_queue_foreach(dev->queue, (GFunc) g_free, NULL);
+-	g_queue_free(dev->queue);
++	if (dev->queue) {
++		g_queue_foreach(dev->queue, (GFunc) g_free, NULL);
++		g_queue_free(dev->queue);
++	}
  
- 	for (list = recs; list; list = list->next) {
- 		sdp_record_t *rec = list->data;
--		sdp_data_t *data;
-+		sdp_list_t *l;
-+		sdp_profile_desc_t *desc;
- 
--		data = sdp_data_get(rec, SDP_ATTR_VERSION);
--		if (data)
--			dev->version = data->val.uint16;
-+		if (sdp_get_profile_descs(rec, &l) < 0)
-+			continue;
- 
--		data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES);
--		if (data)
--			dev->features = data->val.uint16;
-+		desc = l->data;
-+		dev->version = desc->version;
-+
-+		sdp_get_int_attr(rec, SDP_ATTR_SUPPORTED_FEATURES,
-+							&dev->features);
-+		sdp_list_free(l, free);
-+		break;
- 	}
- 
- 	if (dev->io) {
+ 	if (dev->session)
+ 		avrcp_shutdown(dev->session);
 -- 
 1.8.5.3
 
