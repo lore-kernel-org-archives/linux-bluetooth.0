@@ -1,54 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 6 Mar 2014 16:54:11 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v1 0/9] GATT API: Add Register Services Async
-Message-ID: <20140306145410.GA2435@localhost.P-661HNU-F1>
-References: <CAKT1EBfVP_aYMDFdK+vqBxOKEZh2tdfasKkEks4v5H6h-ZXerw@mail.gmail.com>
- <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 7/7] unit/avrcp: Add /TP/NFY/BV-01-C test
+Date: Thu,  6 Mar 2014 16:43:05 +0200
+Message-Id: <1394116985-28247-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thu, Mar 06, 2014, Claudio Takahasi wrote:
-> This patchset is an extension of "[PATCH BlueZ v7 00/11] GATT API:
-> External Services". It adds the following features:
->   * new gdbus helper to allow notifying the clients when
->     GetManagedObjects() reply is received and all proxies reported to
->     upper-layer.
->   * reply for RegisterService() after validating fetched objects
->   * adds the service declaration to the local GATT database
-> 
-> * Changes from v0 to v1:
->   - renames g_dbus_client_set_proxies_ready_watch() to
->     g_dbus_client_set_ready_watch()
-> 
-> Claudio Takahasi (9):
->   gdbus: Add g_dbus_client_set_ready_watch()
->   gatt: Add proxy added handler
->   gatt: Add proxy removed handler
->   gatt: Add GATT service to the local database
->   gatt: Make RegisterService() async
->   test: Add external service GATT skeleton
->   test: Add signal handling for gatt-service
->   test: Add registering external service
->   bluetooth.conf: Add ObjectManager interface
-> 
->  .gitignore          |   1 +
->  Makefile.tools      |   5 +
->  gdbus/client.c      |  17 ++++
->  gdbus/gdbus.h       |   4 +-
->  src/bluetooth.conf  |   1 +
->  src/gatt-dbus.c     | 135 +++++++++++++++++++++++++-
->  test/gatt-service.c | 267 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  7 files changed, 425 insertions(+), 5 deletions(-)
->  create mode 100644 test/gatt-service.c
+Test verifies that Register notification command is issued by
+Controller.
+---
+ unit/test-avrcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-All patches in the set have been applied. Thanks.
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 2df3d6c..baff66d 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -578,6 +578,11 @@ static void test_client(gconstpointer data)
+ 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
+ 		avrcp_get_element_attributes(context->session, NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
++		avrcp_register_notification(context->session,
++						AVRCP_EVENT_STATUS_CHANGED, 0,
++						NULL, NULL);
++
+ 	execute_context(context);
+ }
+ 
+@@ -865,5 +870,14 @@ int main(int argc, char *argv[])
+ 				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+ 				0x00, 0x00, 0x00));
+ 
++	/* Notification Commands */
++
++	/* Register notification - CT */
++	define_test("/TP/NFY/BV-01-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05, AVRCP_EVENT_STATUS_CHANGED,
++				0x00, 0x00, 0x00, 0x00));
++
+ 	return g_test_run();
+ }
+-- 
+1.8.3.2
 
-Johan
