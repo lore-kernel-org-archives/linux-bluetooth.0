@@ -1,48 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 0/9] GATT API: Add Register Services Async
-Date: Thu,  6 Mar 2014 10:44:18 -0300
-Message-Id: <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <CAKT1EBfVP_aYMDFdK+vqBxOKEZh2tdfasKkEks4v5H6h-ZXerw@mail.gmail.com>
-References: <CAKT1EBfVP_aYMDFdK+vqBxOKEZh2tdfasKkEks4v5H6h-ZXerw@mail.gmail.com>
+Subject: [PATCH BlueZ 3/4] android/arvrcp: Fix not parsing SDP record correctly
+Date: Thu,  6 Mar 2014 15:03:22 +0200
+Message-Id: <1394111003-2396-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1394111003-2396-1-git-send-email-luiz.dentz@gmail.com>
+References: <1394111003-2396-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset is an extension of "[PATCH BlueZ v7 00/11] GATT API:
-External Services". It adds the following features:
-  * new gdbus helper to allow notifying the clients when
-    GetManagedObjects() reply is received and all proxies reported to
-    upper-layer.
-  * reply for RegisterService() after validating fetched objects
-  * adds the service declaration to the local GATT database
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-* Changes from v0 to v1:
-  - renames g_dbus_client_set_proxies_ready_watch() to
-    g_dbus_client_set_ready_watch()
+---
+ android/avrcp.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-Claudio Takahasi (9):
-  gdbus: Add g_dbus_client_set_ready_watch()
-  gatt: Add proxy added handler
-  gatt: Add proxy removed handler
-  gatt: Add GATT service to the local database
-  gatt: Make RegisterService() async
-  test: Add external service GATT skeleton
-  test: Add signal handling for gatt-service
-  test: Add registering external service
-  bluetooth.conf: Add ObjectManager interface
-
- .gitignore          |   1 +
- Makefile.tools      |   5 +
- gdbus/client.c      |  17 ++++
- gdbus/gdbus.h       |   4 +-
- src/bluetooth.conf  |   1 +
- src/gatt-dbus.c     | 135 +++++++++++++++++++++++++-
- test/gatt-service.c | 267 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 7 files changed, 425 insertions(+), 5 deletions(-)
- create mode 100644 test/gatt-service.c
-
+diff --git a/android/avrcp.c b/android/avrcp.c
+index d5eb31d..ce636c0 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -25,6 +25,7 @@
+ #include <config.h>
+ #endif
+ 
++#include <stdlib.h>
+ #include <stdbool.h>
+ #include <errno.h>
+ #include <glib.h>
+@@ -68,7 +69,7 @@ struct avrcp_request {
+ struct avrcp_device {
+ 	bdaddr_t	dst;
+ 	uint16_t	version;
+-	uint16_t	features;
++	int		features;
+ 	struct avrcp	*session;
+ 	GIOChannel	*io;
+ 	GQueue		*queue;
+@@ -817,15 +818,19 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
+ 
+ 	for (list = recs; list; list = list->next) {
+ 		sdp_record_t *rec = list->data;
+-		sdp_data_t *data;
++		sdp_list_t *l;
++		sdp_profile_desc_t *desc;
+ 
+-		data = sdp_data_get(rec, SDP_ATTR_VERSION);
+-		if (data)
+-			dev->version = data->val.uint16;
++		if (sdp_get_profile_descs(rec, &l) < 0)
++			continue;
+ 
+-		data = sdp_data_get(rec, SDP_ATTR_SUPPORTED_FEATURES);
+-		if (data)
+-			dev->features = data->val.uint16;
++		desc = l->data;
++		dev->version = desc->version;
++
++		sdp_get_int_attr(rec, SDP_ATTR_SUPPORTED_FEATURES,
++							&dev->features);
++		sdp_list_free(l, free);
++		break;
+ 	}
+ 
+ 	if (dev->io) {
 -- 
-1.8.3.1
+1.8.5.3
 
