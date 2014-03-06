@@ -1,41 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 01/11] shared/hfp: Fix not freeing cmd_handler prefix
-Date: Thu, 06 Mar 2014 10:21:47 +0100
-Message-ID: <2289016.VB6flxH51s@uw000953>
-In-Reply-To: <1394047376-11495-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1394047376-11495-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCHv2] android/pics: Change AVRCP to 1.5
+Date: Thu,  6 Mar 2014 10:02:41 +0100
+Message-Id: <1394096561-18911-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Simple PICS switch from AVRCP 1.3 to 1.5
+---
+ android/pics-avrcp.txt | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-On Wednesday 05 of March 2014 20:22:46 Marcin Kraglak wrote:
-> It should be freed while destroy.
-> ---
->  src/shared/hfp.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-> index 08393d8..9523243 100644
-> --- a/src/shared/hfp.c
-> +++ b/src/shared/hfp.c
-> @@ -82,6 +82,8 @@ static void destroy_cmd_handler(void *data)
->  	if (handler->destroy)
->  		handler->destroy(handler->user_data);
->  
-> +	free(handler->prefix);
-> +
->  	free(handler);
->  }
->  
-
-All patches applied, thanks.
-
+diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
+index 2be0746..845ba33 100644
+--- a/android/pics-avrcp.txt
++++ b/android/pics-avrcp.txt
+@@ -336,7 +336,7 @@ TSPC_AVRCP_7_5    True		TG: Receiving UNIT INFO (M)
+ TSPC_AVRCP_7_6    True		TG: Receiving SUBUNIT INFO (M)
+ TSPC_AVRCP_7_7    True		TG: Receiving PASS THROUGH command category 1
+ 					(C.1)
+-TSPC_AVRCP_7_8    False		TG: Receiving PASS THROUGH command category 2
++TSPC_AVRCP_7_8    True (*)	TG: Receiving PASS THROUGH command category 2
+ 					(C.1)
+ TSPC_AVRCP_7_9    False		TG: Receiving PASS THROUGH command category 3
+ 					(C.1)
+@@ -405,9 +405,9 @@ TSPC_AVRCP_7_56   False		TG: PlayItem(NowPlayingList) (C.11)
+ TSPC_AVRCP_7_57   False		TG: AddToNowPlaying (O)
+ TSPC_AVRCP_7_58   False		TG: EVENT_NOW_PLAYING_CONTENT_CHANGED (C.11)
+ TSPC_AVRCP_7_59   False		TG: Playable Folders (O)
+-TSPC_AVRCP_7_60   False		TG: Absolute Volume (C.5)
+-TSPC_AVRCP_7_61   False		TG: SetAbsoluteVolume (C.5)
+-TSPC_AVRCP_7_62   False		TG: NotifyVolumeChange (C.5)
++TSPC_AVRCP_7_60   True (*)	TG: Absolute Volume (C.5)
++TSPC_AVRCP_7_61   True (*)	TG: SetAbsoluteVolume (C.5)
++TSPC_AVRCP_7_62   True (*)	TG: NotifyVolumeChange (C.5)
+ TSPC_AVRCP_7_63   False		TG: Error Response (O)
+ TSPC_AVRCP_7_64   False		TG: General Reject (C.13)
+ TSPC_AVRCP_7_65   True		TG: Discoverable Mode (M)
+@@ -448,9 +448,9 @@ C.15: Mandatory if Basic Group Navigation Feature supported. If any item
+ Parameter Name    Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_AVRCP_7b_1   False		TG: AVRCP v1.0 (C.1)
+-TSPC_AVRCP_7b_2   True (*)	TG: AVRCP v1.3 (C.1)
++TSPC_AVRCP_7b_2   False		TG: AVRCP v1.3 (C.1)
+ TSPC_AVRCP_7b_3   False		TG: AVRCP v1.4 (C.1)
+-TSPC_AVRCP_7b_4   False		TG: AVRCP v1.5 (C.1)
++TSPC_AVRCP_7b_4   True (*)	TG: AVRCP v1.5 (C.1)
+ TSPC_AVRCP_7b_5   False		TG: AVRCP v1.6 (C.1)
+ -------------------------------------------------------------------------------
+ C.1: It is mandatory to support at least one of the profile versions.
+@@ -523,8 +523,8 @@ TSPC_AVRCP_9_16   False		TG: category 2 - Operation id: display
+ 					information (O)
+ TSPC_AVRCP_9_17	  False		TG: category 2 - Operation id: help (O)
+ TSPC_AVRCP_9_18	  False		TG: category 2 - Operation id: power (O)
+-TSPC_AVRCP_9_19   False (*)	TG: category 2 - Operation id: volume up (C.2)
+-TSPC_AVRCP_9_20   False (*)	TG: category 2 - Operation id: volume down (C.2)
++TSPC_AVRCP_9_19   True		TG: category 2 - Operation id: volume up (C.2)
++TSPC_AVRCP_9_20   True		TG: category 2 - Operation id: volume down (C.2)
+ TSPC_AVRCP_9_21   False		TG: category 2 - Operation id: mute (O)
+ TSPC_AVRCP_9_24   False		TG: category 2 - Operation id: F1 (O)
+ TSPC_AVRCP_9_25   False		TG: category 2 - Operation id: F2 (O)
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
