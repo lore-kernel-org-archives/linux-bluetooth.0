@@ -2,128 +2,176 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 7/9] test: Add signal handling for gatt-service
-Date: Thu,  6 Mar 2014 10:44:25 -0300
-Message-Id: <1394113467-24331-8-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 6/9] test: Add external service GATT skeleton
+Date: Thu,  6 Mar 2014 10:44:24 -0300
+Message-Id: <1394113467-24331-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <CAKT1EBfVP_aYMDFdK+vqBxOKEZh2tdfasKkEks4v5H6h-ZXerw@mail.gmail.com>
  <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements signal handling to run cleanup tasks before
-exiting.
+This patch adds the initial code for an external GATT service example.
+It implements the API defined at doc/gatt-api.txt
 ---
- test/gatt-service.c | 79 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 79 insertions(+)
+ .gitignore          |   1 +
+ Makefile.tools      |   5 +++
+ test/gatt-service.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 127 insertions(+)
+ create mode 100644 test/gatt-service.c
 
+diff --git a/.gitignore b/.gitignore
+index 47ba9b8..f323080 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -76,6 +76,7 @@ test/sap_client.pyc
+ test/bluezutils.pyc
+ unit/test-ringbuf
+ unit/test-queue
++test/gatt-service
+ unit/test-eir
+ unit/test-uuid
+ unit/test-crc
+diff --git a/Makefile.tools b/Makefile.tools
+index 31e1093..c589199 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -393,3 +393,8 @@ test_scripts += test/sap_client.py test/bluezutils.py \
+ 		test/test-heartrate test/test-alert test/test-hfp \
+ 		test/test-cyclingspeed test/opp-client test/ftp-client \
+ 		test/pbap-client test/map-client
++
++noinst_PROGRAMS += test/gatt-service
++
++test_gatt_service_SOURCES = test/gatt-service.c
++test_gatt_service_LDADD = @GLIB_LIBS@ @DBUS_LIBS@ gdbus/libgdbus-internal.la
 diff --git a/test/gatt-service.c b/test/gatt-service.c
-index 18ab7da..ecb5cc3 100644
---- a/test/gatt-service.c
+new file mode 100644
+index 0000000..18ab7da
+--- /dev/null
 +++ b/test/gatt-service.c
-@@ -27,6 +27,9 @@
- 
- #include <errno.h>
- #include <stdio.h>
-+#include <stdbool.h>
-+#include <unistd.h>
-+#include <sys/signalfd.h>
- 
- #include <glib.h>
- #include <dbus/dbus.h>
-@@ -97,9 +100,83 @@ static void create_services(DBusConnection *conn)
- 	printf("Registered service: %s\n", service_path);
- }
- 
-+static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
+@@ -0,0 +1,121 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Instituto Nokia de Tecnologia - INdT
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++#include <stdio.h>
++
++#include <glib.h>
++#include <dbus/dbus.h>
++#include <gdbus/gdbus.h>
++
++#define GATT_SERVICE_IFACE		"org.bluez.GattService1"
++
++/* Immediate Alert Service UUID */
++#define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
++
++static GMainLoop *main_loop;
++static GSList *services;
++
++static gboolean service_get_uuid(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
 +{
-+	static bool __terminated = false;
-+	struct signalfd_siginfo si;
-+	ssize_t result;
-+	int fd;
++	const char *uuid = user_data;
 +
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
-+		return FALSE;
-+
-+	fd = g_io_channel_unix_get_fd(channel);
-+
-+	result = read(fd, &si, sizeof(si));
-+	if (result != sizeof(si))
-+		return FALSE;
-+
-+	switch (si.ssi_signo) {
-+	case SIGINT:
-+	case SIGTERM:
-+		if (!__terminated) {
-+			printf("Terminating\n");
-+			g_main_loop_quit(main_loop);
-+		}
-+
-+		__terminated = true;
-+		break;
-+	}
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
 +
 +	return TRUE;
 +}
 +
-+static guint setup_signalfd(void)
++static gboolean service_get_includes(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
 +{
-+	GIOChannel *channel;
-+	guint source;
-+	sigset_t mask;
-+	int fd;
-+
-+	sigemptyset(&mask);
-+	sigaddset(&mask, SIGINT);
-+	sigaddset(&mask, SIGTERM);
-+
-+	if (sigprocmask(SIG_BLOCK, &mask, NULL) < 0) {
-+		perror("Failed to set signal mask");
-+		return 0;
-+	}
-+
-+	fd = signalfd(-1, &mask, 0);
-+	if (fd < 0) {
-+		perror("Failed to create signal descriptor");
-+		return 0;
-+	}
-+
-+	channel = g_io_channel_unix_new(fd);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				signal_handler, NULL);
-+
-+	g_io_channel_unref(channel);
-+
-+	return source;
++	return TRUE;
 +}
 +
- int main(int argc, char *argv[])
- {
- 	DBusConnection *dbus_conn;
-+	guint signal;
++static gboolean service_exist_includes(const GDBusPropertyTable *property,
++							void *user_data)
++{
++	return FALSE;
++}
 +
-+	signal = setup_signalfd();
-+	if (signal == 0)
-+		return -errno;
- 
- 	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
- 
-@@ -114,6 +191,8 @@ int main(int argc, char *argv[])
- 
- 	g_main_loop_run(main_loop);
- 
-+	g_source_remove(signal);
++static const GDBusPropertyTable service_properties[] = {
++	{ "UUID", "s", service_get_uuid },
++	{ "Includes", "ao", service_get_includes, NULL,
++					service_exist_includes },
++	{ }
++};
 +
- 	g_slist_free_full(services, g_free);
- 	dbus_connection_unref(dbus_conn);
- 
++static char *register_service(DBusConnection *conn, const char *uuid)
++{
++	static int id = 1;
++	char *path;
++
++	path = g_strdup_printf("/service%d", id++);
++	if (g_dbus_register_interface(conn, path, GATT_SERVICE_IFACE,
++				NULL, NULL, service_properties,
++				g_strdup(uuid), g_free) == FALSE) {
++		printf("Couldn't register service interface\n");
++		g_free(path);
++		return NULL;
++	}
++
++	return path;
++}
++
++static void create_services(DBusConnection *conn)
++{
++	char *service_path;
++
++	service_path = register_service(conn, IAS_UUID);
++
++	services = g_slist_prepend(services, service_path);
++
++	printf("Registered service: %s\n", service_path);
++}
++
++int main(int argc, char *argv[])
++{
++	DBusConnection *dbus_conn;
++
++	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
++
++	main_loop = g_main_loop_new(NULL, FALSE);
++
++	g_dbus_attach_object_manager(dbus_conn);
++
++	printf("gatt-service unique name: %s\n",
++				dbus_bus_get_unique_name(dbus_conn));
++
++	create_services(dbus_conn);
++
++	g_main_loop_run(main_loop);
++
++	g_slist_free_full(services, g_free);
++	dbus_connection_unref(dbus_conn);
++
++	return 0;
++}
 -- 
 1.8.3.1
 
