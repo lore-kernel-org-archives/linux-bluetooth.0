@@ -1,74 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/7] unit/avrcp: Add /TP/MDI/BV-01-C test
-Date: Thu,  6 Mar 2014 16:42:59 +0200
-Message-Id: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 6/7] android/avrcp: Add avrcp_register_notification() function
+Date: Thu,  6 Mar 2014 16:43:04 +0200
+Message-Id: <1394116985-28247-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies Get play status.
 ---
- unit/test-avrcp.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ android/avrcp-lib.c | 14 ++++++++++++++
+ android/avrcp-lib.h |  6 ++++++
+ 2 files changed, 20 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 8682e63..46ddde9 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -459,6 +459,23 @@ static ssize_t avrcp_handle_set_player_value(struct avrcp *session,
- 	return 1;
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index fbaa48d..1663218 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -416,6 +416,20 @@ int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
+ 				func, user_data);
  }
  
-+static ssize_t avrcp_handle_get_play_status(struct avrcp *session,
-+						uint8_t transaction,
-+						uint16_t params_len,
-+						uint8_t *params,
-+						void *user_data)
++int avrcp_register_notification(struct avrcp *session, uint8_t event,
++				uint32_t interval, avctp_rsp_cb func,
++				void *user_data)
 +{
-+	DBG("");
++	uint8_t pdu[AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
 +
-+	if (params_len)
-+		return -EINVAL;
++	pdu[0] = event;
++	bt_put_be32(interval, &pdu[1]);
 +
-+	avrcp_get_play_status_rsp(session, transaction, 0xaaaaaaaa, 0xbbbbbbbb,
-+									0x00);
-+
-+	return -EAGAIN;
++	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
++				AVRCP_REGISTER_NOTIFICATION, pdu, sizeof(pdu),
++				func, user_data);
 +}
 +
- static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
-@@ -481,6 +498,9 @@ static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_SET_PLAYER_VALUE,
- 					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
- 					avrcp_handle_set_player_value },
-+		{ AVRCP_GET_PLAY_STATUS,
-+					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
-+					avrcp_handle_get_play_status },
- 		{ },
- };
+ int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+ 				uint32_t position, uint32_t duration,
+ 				uint8_t status)
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 5e90ea1..b0a1025 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -86,6 +86,9 @@
+ /* Company IDs for vendor dependent commands */
+ #define IEEEID_BTSIG		0x001958
  
-@@ -782,5 +802,16 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
- 				0x00, 0x00, 0x00));
++/* Parameters legths */
++#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH	5
++
+ struct avrcp;
  
-+	/* Get play status - TG */
-+	define_test("/TP/MDI/BV-02-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
-+				0x00, 0x00, 0x00),
-+			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
-+				0x00, 0x00, 0x09, 0xaa, 0xaa, 0xaa,
-+				0xaa, 0xbb, 0xbb, 0xbb, 0xbb, 0x00));
-+
-+
- 	return g_test_run();
- }
+ struct avrcp_control_handler {
+@@ -147,6 +150,9 @@ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
+ 							void *user_data);
+ int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
+ 							void *user_data);
++int avrcp_register_notification(struct avrcp *session, uint8_t event,
++				uint32_t interval, avctp_rsp_cb func,
++				void *user_data);
+ 
+ int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+ 				uint32_t position, uint32_t duration,
 -- 
 1.8.3.2
 
