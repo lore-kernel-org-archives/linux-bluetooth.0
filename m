@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/7] android/avrcp: Add avrcp_register_notification() function
-Date: Thu,  6 Mar 2014 16:43:04 +0200
-Message-Id: <1394116985-28247-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/7] unit/avrcp: Add /TP/MDI/BV-04-C test
+Date: Thu,  6 Mar 2014 16:43:02 +0200
+Message-Id: <1394116985-28247-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394116985-28247-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies Get element attributes responded by Target.
 ---
- android/avrcp-lib.c | 14 ++++++++++++++
- android/avrcp-lib.h |  6 ++++++
- 2 files changed, 20 insertions(+)
+ unit/test-avrcp.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index fbaa48d..1663218 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -416,6 +416,20 @@ int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
- 				func, user_data);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index d50b1ad..45ac798 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -476,6 +476,22 @@ static ssize_t avrcp_handle_get_play_status(struct avrcp *session,
+ 	return -EAGAIN;
  }
  
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+				uint32_t interval, avctp_rsp_cb func,
-+				void *user_data)
++static ssize_t avrcp_handle_get_element_attrs(struct avrcp *session,
++						uint8_t transaction,
++						uint16_t params_len,
++						uint8_t *params,
++						void *user_data)
 +{
-+	uint8_t pdu[AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
++	DBG("");
 +
-+	pdu[0] = event;
-+	bt_put_be32(interval, &pdu[1]);
++	if (params_len < 9)
++		return -EINVAL;
 +
-+	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
-+				AVRCP_REGISTER_NOTIFICATION, pdu, sizeof(pdu),
-+				func, user_data);
++	avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
++
++	return -EAGAIN;
 +}
 +
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
- 				uint8_t status)
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 5e90ea1..b0a1025 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -86,6 +86,9 @@
- /* Company IDs for vendor dependent commands */
- #define IEEEID_BTSIG		0x001958
+ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_CAPABILITIES,
+ 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+@@ -501,6 +517,9 @@ static const struct avrcp_control_handler control_handlers[] = {
+ 		{ AVRCP_GET_PLAY_STATUS,
+ 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+ 					avrcp_handle_get_play_status },
++		{  AVRCP_GET_ELEMENT_ATTRIBUTES,
++					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
++					avrcp_handle_get_element_attrs },
+ 		{ },
+ };
  
-+/* Parameters legths */
-+#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH	5
-+
- struct avrcp;
+@@ -822,5 +841,14 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
+ 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
  
- struct avrcp_control_handler {
-@@ -147,6 +150,9 @@ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
- int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+				uint32_t interval, avctp_rsp_cb func,
-+				void *user_data);
- 
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
++	/* Get element attributes - TG */
++	define_test("/TP/MDI/BV-04-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
++				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
++				0x00, 0x00, 0x00));
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
