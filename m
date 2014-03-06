@@ -1,97 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 2/9] gatt: Add proxy added handler
-Date: Thu,  6 Mar 2014 10:44:20 -0300
-Message-Id: <1394113467-24331-3-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <CAKT1EBfVP_aYMDFdK+vqBxOKEZh2tdfasKkEks4v5H6h-ZXerw@mail.gmail.com>
- <1394113467-24331-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 4/4] android/avrcp: Fix warnings when freeing avrcp_device struct
+Date: Thu,  6 Mar 2014 15:45:27 +0200
+Message-Id: <1394113527-4398-4-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1394113527-4398-1-git-send-email-luiz.dentz@gmail.com>
+References: <1394113527-4398-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch creates a list of GATT objects sorting the entries based on
-the object path to allow inserting the attributes following hierarchical
-association.
----
- src/gatt-dbus.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 44 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index fd614f9..f8486f3 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -42,11 +42,15 @@
- #include "gatt-dbus.h"
- 
- #define GATT_MGR_IFACE			"org.bluez.GattManager1"
-+#define GATT_SERVICE_IFACE		"org.bluez.GattService1"
-+#define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
-+#define GATT_DESCRIPTOR_IFACE		"org.bluez.GattDescriptor1"
- 
- struct external_app {
- 	char *owner;
- 	char *path;
- 	GDBusClient *client;
-+	GSList *proxies;
- 	unsigned int watch;
- };
- 
-@@ -75,6 +79,43 @@ static void external_app_watch_destroy(gpointer user_data)
- 	g_free(eapp);
- }
- 
-+static int proxy_path_cmp(gconstpointer a, gconstpointer b)
-+{
-+	GDBusProxy *proxy1 = (GDBusProxy *) a;
-+	GDBusProxy *proxy2 = (GDBusProxy *) b;
-+	const char *path1 = g_dbus_proxy_get_path(proxy1);
-+	const char *path2 = g_dbus_proxy_get_path(proxy2);
-+
-+	return g_strcmp0(path1, path2);
-+}
-+
-+static void proxy_added(GDBusProxy *proxy, void *user_data)
-+{
-+	struct external_app *eapp = user_data;
-+	const char *interface, *path;
-+
-+	interface = g_dbus_proxy_get_interface(proxy);
-+	path = g_dbus_proxy_get_path(proxy);
-+
-+	if (!g_str_has_prefix(path, eapp->path))
-+		return;
-+
-+	if (g_strcmp0(interface, GATT_CHR_IFACE) != 0 &&
-+			g_strcmp0(interface, GATT_SERVICE_IFACE) != 0 &&
-+			g_strcmp0(interface, GATT_DESCRIPTOR_IFACE) != 0)
-+		return;
-+
-+	DBG("path %s iface %s", path, interface);
-+
-+	/*
-+	 * Object path follows a hierarchical organization. Add the
-+	 * proxies sorted by path helps the logic to register the
-+	 * object path later.
-+	 */
-+	eapp->proxies = g_slist_insert_sorted(eapp->proxies, proxy,
-+							proxy_path_cmp);
-+}
-+
- static struct external_app *new_external_app(DBusConnection *conn,
- 					const char *sender, const char *path)
+If the device does not yet have queue due to not have a session it cause
+the following warnings when avrcp_device_free is called:
+(bluetoothd:1102): GLib-CRITICAL **: g_queue_foreach: assertion 'queue != NULL' failed
+(bluetoothd:1102): GLib-CRITICAL **: g_queue_free: assertion 'queue != NULL' failed
+---
+ android/avrcp.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 911b1df..1d211ad 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -442,8 +442,10 @@ static void avrcp_device_free(void *data)
  {
-@@ -99,6 +140,9 @@ static struct external_app *new_external_app(DBusConnection *conn,
- 	eapp->client = client;
- 	eapp->path = g_strdup(path);
+ 	struct avrcp_device *dev = data;
  
-+	g_dbus_client_set_proxy_handlers(client, proxy_added, NULL, NULL,
-+								eapp);
-+
- 	return eapp;
- }
+-	g_queue_foreach(dev->queue, (GFunc) g_free, NULL);
+-	g_queue_free(dev->queue);
++	if (dev->queue) {
++		g_queue_foreach(dev->queue, (GFunc) g_free, NULL);
++		g_queue_free(dev->queue);
++	}
  
+ 	if (dev->session)
+ 		avrcp_shutdown(dev->session);
 -- 
-1.8.3.1
+1.8.5.3
 
