@@ -1,111 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/9] unit/avrcp: Add /TP/NFY/BV-02-C test
-Date: Fri,  7 Mar 2014 15:23:11 +0200
-Message-Id: <1394198591-3366-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394193113-32347-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1394193113-32347-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0] unit: Add test for g_dbus_client_set_ready_watch()
+Date: Fri,  7 Mar 2014 10:14:32 -0300
+Message-Id: <1394198072-21522-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Test verifies that Target responds to Register notification command.
 ---
- unit/test-avrcp.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+ unit/test-gdbus-client.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index fa4870d..0e3bb51 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -162,6 +162,8 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 	ssize_t len;
- 	int fd;
- 
-+	DBG("");
-+
- 	pdu = &context->data->pdu_list[context->pdu_offset++];
- 
- 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-@@ -495,6 +497,43 @@ static ssize_t avrcp_handle_get_element_attrs(struct avrcp *session,
- 	return -EAGAIN;
- }
- 
-+static ssize_t avrcp_handle_register_notification(struct avrcp *session,
-+							uint8_t transaction,
-+							uint16_t params_len,
-+							uint8_t *params,
-+							void *user_data)
-+{
-+	uint8_t event;
-+	uint8_t pdu[1024];
-+	size_t pdu_len;
-+
-+	DBG("");
-+
-+	if (params_len != AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH)
-+		return -EINVAL;
-+
-+	event = params[0];
-+	pdu[0] = event;
-+	pdu_len = 1;
-+
-+	switch (event) {
-+	case AVRCP_EVENT_TRACK_CHANGED:
-+		memset(&pdu[1], 0xff, 8);
-+		pdu_len += 8;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_INTERIM,
-+						pdu, pdu_len);
-+
-+	avrcp_register_notification_rsp(session, transaction, AVC_CTYPE_CHANGED,
-+						pdu, pdu_len);
-+
-+	return -EAGAIN;
-+}
-+
- static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_CAPABILITIES,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
-@@ -523,6 +562,9 @@ static const struct avrcp_control_handler control_handlers[] = {
- 		{ AVRCP_GET_ELEMENT_ATTRIBUTES,
- 					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
- 					avrcp_handle_get_element_attrs },
-+		{ AVRCP_REGISTER_NOTIFICATION,
-+					AVC_CTYPE_NOTIFY, AVC_CTYPE_INTERIM,
-+					avrcp_handle_register_notification },
- 		{ },
+diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
+index ee8a760..d0b6ce7 100644
+--- a/unit/test-gdbus-client.c
++++ b/unit/test-gdbus-client.c
+@@ -38,6 +38,7 @@ struct context {
+ 	GDBusClient *dbus_client;
+ 	GDBusProxy *proxy;
+ 	void *data;
++	gboolean client_ready;
+ 	guint timeout_source;
  };
  
-@@ -879,5 +921,22 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x05, AVRCP_EVENT_STATUS_CHANGED,
- 				0x00, 0x00, 0x00, 0x00));
+@@ -85,6 +86,7 @@ static struct context *create_context(void)
+ 	dbus_connection_set_exit_on_disconnect(context->dbus_conn, FALSE);
  
-+	/* Register notification - TG */
-+	define_test("/TP/NFY/BV-02-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
-+				0x00, 0x00, 0x00, 0x00),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
-+				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
-+				0xff, 0xff));
+ 	g_dbus_attach_object_manager(context->dbus_conn);
++	context->client_ready = FALSE;
+ 
+ 	return context;
+ }
+@@ -964,6 +966,56 @@ static void client_force_disconnect(void)
+ 	destroy_context(context);
+ }
+ 
++static void client_ready_watch(GDBusClient *client, void *user_data)
++{
++	struct context *context = user_data;
++
++	context->client_ready = TRUE;
++}
++
++static void proxy_added(GDBusProxy *proxy, void *user_data)
++{
++	struct context *context = user_data;
++
++	/*
++	 * Proxy added callback should not be called after Client ready
++	 * watch. Ready means that all objects has been reported to the
++	 * upper-layer.
++	 */
++	g_assert(context->client_ready == FALSE);
++
++	g_main_loop_quit(context->main_loop);
++}
++
++static void client_ready(void)
++{
++	struct context *context = create_context();
++	static const GDBusPropertyTable string_properties[] = {
++		{ "String", "s", get_string, set_string, string_exists },
++		{ },
++	};
++
++	if (context == NULL)
++		return;
++
++	g_dbus_register_interface(context->dbus_conn,
++				SERVICE_PATH, SERVICE_NAME,
++				methods, signals, string_properties,
++				context, NULL);
++
++	context->dbus_client = g_dbus_client_new(context->dbus_conn,
++						SERVICE_NAME, SERVICE_PATH);
++
++	g_dbus_client_set_ready_watch(context->dbus_client, client_ready_watch,
++								context);
++	g_dbus_client_set_proxy_handlers(context->dbus_client,
++						proxy_added, NULL, NULL, context);
++
++	g_main_loop_run(context->main_loop);
++
++	destroy_context(context);
++}
++
+ int main(int argc, char *argv[])
+ {
+ 	g_test_init(&argc, &argv, NULL);
+@@ -1001,5 +1053,7 @@ int main(int argc, char *argv[])
+ 	g_test_add_func("/gdbus/client_force_disconnect",
+ 						client_force_disconnect);
+ 
++	g_test_add_func("/gdbus/client_ready", client_ready);
 +
  	return g_test_run();
  }
 -- 
-1.8.3.2
+1.8.3.1
 
