@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/9] android/avrcp: Add avrcp_register_notification() function
-Date: Fri,  7 Mar 2014 13:51:50 +0200
-Message-Id: <1394193113-32347-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 7/9] unit/avrcp: Add /TP/NFY/BV-01-C test
+Date: Fri,  7 Mar 2014 13:51:51 +0200
+Message-Id: <1394193113-32347-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies that Register notification command is issued by
+Controller.
 ---
- android/avrcp-lib.c | 14 ++++++++++++++
- android/avrcp-lib.h |  6 ++++++
- 2 files changed, 20 insertions(+)
+ unit/test-avrcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index fbaa48d..1663218 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -416,6 +416,20 @@ int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
- 				func, user_data);
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 496dd1b..fa4870d 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -578,6 +578,11 @@ static void test_client(gconstpointer data)
+ 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
+ 		avrcp_get_element_attributes(context->session, NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
++		avrcp_register_notification(context->session,
++						AVRCP_EVENT_STATUS_CHANGED, 0,
++						NULL, NULL);
++
+ 	execute_context(context);
  }
  
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+				uint32_t interval, avctp_rsp_cb func,
-+				void *user_data)
-+{
-+	uint8_t pdu[AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
-+
-+	pdu[0] = event;
-+	bt_put_be32(interval, &pdu[1]);
-+
-+	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
-+				AVRCP_REGISTER_NOTIFICATION, pdu, sizeof(pdu),
-+				func, user_data);
-+}
-+
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
- 				uint8_t status)
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 5e90ea1..b0a1025 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -86,6 +86,9 @@
- /* Company IDs for vendor dependent commands */
- #define IEEEID_BTSIG		0x001958
+@@ -865,5 +870,14 @@ int main(int argc, char *argv[])
+ 				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+ 				0x00, 0x00, 0x00));
  
-+/* Parameters legths */
-+#define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH	5
++	/* Notification Commands */
 +
- struct avrcp;
- 
- struct avrcp_control_handler {
-@@ -147,6 +150,9 @@ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
- int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+				uint32_t interval, avctp_rsp_cb func,
-+				void *user_data);
- 
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
++	/* Register notification - CT */
++	define_test("/TP/NFY/BV-01-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05, AVRCP_EVENT_STATUS_CHANGED,
++				0x00, 0x00, 0x00, 0x00));
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
