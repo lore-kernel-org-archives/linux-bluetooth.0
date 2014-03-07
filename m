@@ -1,77 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] bluetooth: Fix aborting eSCO connection in case of error 0x20
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1394199005-28369-1-git-send-email-andrewx.earl@intel.com>
-Date: Fri, 7 Mar 2014 09:53:50 -0800
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <AF985C9B-3C8D-40BD-96F2-42EF32F28EF6@holtmann.org>
-References: <1394199005-28369-1-git-send-email-andrewx.earl@intel.com>
-To: Andrew Earl <andrewx.earl@intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] unit/avrcp: Add /TP/NFY/BV-03-C test
+Date: Fri,  7 Mar 2014 17:38:30 +0200
+Message-Id: <1394206711-5508-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Add additional error case to attempt alternative configuration for SCO. Error
-> occurs with Intel BT controller where fallback is not attempted as the error
-> 0x020 Unsupported LMP Parameter value is not included in the list of errors
+Test verifies that Target responds Register notification command with
+parameter AVRCP_EVENT_SETTINGS_CHANGED.
+---
+ unit/test-avrcp.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
-status is only 1 octet and not 1.5 octets ;)
-
-> where a retry should be attempted.
-> The problem also affects PTS test case TC_HF_ACS_BV_05_I.
-> 
-> See the HCI log below for details:
-> < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->    handle 256 voice setting 0x0060 ptype 0x0380
->> HCI Event: Command Status (0x0f) plen 4
->    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
->> HCI Event: Max Slots Change (0x1b) plen 3
->    handle 256 slots 1
->> HCI Event: Synchronous Connect Complete (0x2c) plen 17
->    status 0x20 handle 0 bdaddr 00:80:98:09:0B:19 type eSCO
->    Error: Unsupported LMP Parameter Value
-> < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->    handle 256 voice setting 0x0060 ptype 0x0380
->> HCI Event: Command Status (0x0f) plen 4
->    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
->> HCI Event: Max Slots Change (0x1b) plen 3
->    handle 256 slots 5
->> HCI Event: Synchronous Connect Complete (0x2c) plen 17
->    status 0x20 handle 0 bdaddr 00:80:98:09:0B:19 type eSCO
->    Error: Unsupported LMP Parameter Value
-> < HCI Command: Setup Synchronous Connection (0x01|0x0028) plen 17
->    handle 256 voice setting 0x0060 ptype 0x03c8
->> HCI Event: Command Status (0x0f) plen 4
->    Setup Synchronous Connection (0x01|0x0028) status 0x00 ncmd 1
->> HCI Event: Max Slots Change (0x1b) plen 3
->    handle 256 slots 1
->> HCI Event: Synchronous Connect Complete (0x2c) plen 17
->    status 0x00 handle 257 bdaddr 00:80:98:09:0B:19 type eSCO
->    Air mode: CVSD
-
-You need to sign off your patches. Do you mind actually including the btmon trace since that is a bit more verbose.
-
-> ---
-> net/bluetooth/hci_event.c | 1 +
-> 1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 5f81245..59e1b45 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2905,6 +2905,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
-> 	case 0x1c:	/* SCO interval rejected */
-> 	case 0x1a:	/* Unsupported Remote Feature */
-> 	case 0x1f:	/* Unspecified error */
-> +	case 0x20:	/* Unsupported LMP Parameter value */
-> 		if (conn->out) {
-> 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
-> 					(hdev->esco_type & EDR_ESCO_MASK);
-
-Regards
-
-Marcel
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 0e3bb51..c442001 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -521,6 +521,12 @@ static ssize_t avrcp_handle_register_notification(struct avrcp *session,
+ 		memset(&pdu[1], 0xff, 8);
+ 		pdu_len += 8;
+ 		break;
++	case AVRCP_EVENT_SETTINGS_CHANGED:
++		pdu[1] = 0x01;
++		pdu[2] = 0x01;
++		pdu[3] = 0x02;
++		pdu_len = 4;
++		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -938,5 +944,23 @@ int main(int argc, char *argv[])
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff));
+ 
++	/* Register notification - TG */
++	define_test("/TP/NFY/BV-03-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05,
++				AVRCP_EVENT_SETTINGS_CHANGED,
++				0x00, 0x00, 0x00, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x04,
++				AVRCP_EVENT_SETTINGS_CHANGED,
++				0x01, 0x01, 0x02),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_CHANGED, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x04,
++				AVRCP_EVENT_SETTINGS_CHANGED,
++				0x01, 0x01, 0x02));
++
+ 	return g_test_run();
+ }
+-- 
+1.8.3.2
 
