@@ -1,65 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/gatt: Handle Unregister gatt client command
-Date: Fri,  7 Mar 2014 14:04:59 +0100
-Message-Id: <1394197499-2207-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1394197499-2207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1394197499-2207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/2] android/gatt: Handle Register gatt client command
+Date: Fri,  7 Mar 2014 14:04:58 +0100
+Message-Id: <1394197499-2207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds unregister gatt client app command handling.
+This adds register gatt client app command handling.
 ---
- android/gatt.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ android/gatt.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 62 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f8f7208..1261c1f 100644
+index ce85af4..f8f7208 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -60,6 +60,13 @@ static int find_client_uuid(gconstpointer data, gconstpointer user_data)
- 	return 0;
- }
+@@ -31,6 +31,7 @@
+ #include <glib.h>
  
-+static int find_client_if(gconstpointer data, gconstpointer user_data)
-+{
-+	const int32_t exp_cif = *((int32_t *)user_data);
-+	const int32_t cur_cif = ((struct gatt_client *)data)->client_if;
+ #include "ipc.h"
++#include "ipc-common.h"
+ #include "lib/bluetooth.h"
+ #include "gatt.h"
+ #include "src/log.h"
+@@ -38,13 +39,73 @@
+ 
+ static struct ipc *hal_ipc = NULL;
+ static bdaddr_t adapter_addr;
++static int32_t client_if_counter;
 +
-+	return cur_cif != exp_cif;
++struct gatt_client {
++	int32_t client_if;
++	uint8_t uuid[16];
++};
++
++GList *gatt_client_list = NULL;
++
++static int find_client_uuid(gconstpointer data, gconstpointer user_data)
++{
++	const uint8_t *exp_uuid = user_data;
++	const uint8_t *cur_uuid = ((struct gatt_client *)data)->uuid;
++	struct gatt_client *client;
++
++	if (memcmp(exp_uuid, cur_uuid, sizeof(client->uuid)))
++		return 1;
++
++	return 0;
 +}
++
  
  static void handle_client_register(const void *buf, uint16_t len)
  {
-@@ -110,10 +117,26 @@ failed:
- 
- static void handle_client_unregister(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_unregister *cmd = buf;
-+	int32_t client_if = cmd->client_if;
-+	GList *found_client_if;
++	const struct hal_cmd_gatt_client_register *cmd = buf;
++	struct hal_ev_gatt_client_register_client ev;
++	struct gatt_client *client;
++	GList *found_client_uuid;
 +
  	DBG("");
  
--	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-+	found_client_if = g_list_find_custom(gatt_client_list, &client_if,
-+								find_client_if);
-+	if (!found_client_if) {
-+		error("client_if: %d not found", client_if);
-+		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 			HAL_OP_GATT_CLIENT_UNREGISTER, HAL_STATUS_FAILED);
-+		return;
++	if (!cmd->uuid) {
++		error("no uuid received");
++		goto failed;
 +	}
 +
-+	gatt_client_list = g_list_remove(gatt_client_list,
-+							found_client_if->data);
++	found_client_uuid = g_list_find_custom(gatt_client_list,
++					&cmd->uuid, find_client_uuid);
 +
++	if (found_client_uuid) {
++		error("client uuid is already on list");
++		goto failed;
++	}
++
++	client = g_new0(struct gatt_client, 1);
++	g_memmove(client->uuid, cmd->uuid, sizeof(client->uuid));
++
++	client->client_if = ++client_if_counter;
++
++	gatt_client_list = g_list_append(gatt_client_list, client);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
+-							HAL_STATUS_FAILED);
++							HAL_STATUS_SUCCESS);
++
++	ev.status = HAL_STATUS_SUCCESS;
++	ev.client_if = client->client_if;
++	g_memmove(ev.app_uuid, client->uuid, sizeof(client->uuid));
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_CLIENT_REGISTER_CLIENT, sizeof(ev), &ev);
++
++	return;
++
++failed:
 +	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_OP_GATT_CLIENT_UNREGISTER, HAL_STATUS_SUCCESS);
++				HAL_OP_GATT_CLIENT_REGISTER, HAL_STATUS_FAILED);
++
  }
  
- static void handle_client_scan(const void *buf, uint16_t len)
+ static void handle_client_unregister(const void *buf, uint16_t len)
 -- 
 1.8.5.2
 
