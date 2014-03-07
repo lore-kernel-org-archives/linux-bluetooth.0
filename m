@@ -1,48 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 7 Mar 2014 15:09:31 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH BlueZ 1/4] android/avrcp-lib: Add
- avrcp_register_notification function
-Message-ID: <20140307130929.GB4954@aemeltch-MOBL1>
-References: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
- <20140307122228.GA4954@aemeltch-MOBL1>
- <CABBYNZJN5AU6jqDSq9P-MxKL09wZiiX1MFwUesRhzj+dGxLW7w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZJN5AU6jqDSq9P-MxKL09wZiiX1MFwUesRhzj+dGxLW7w@mail.gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/gatt: Handle Unregister gatt client command
+Date: Fri,  7 Mar 2014 14:04:59 +0100
+Message-Id: <1394197499-2207-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1394197499-2207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1394197499-2207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+This adds unregister gatt client app command handling.
+---
+ android/gatt.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-On Fri, Mar 07, 2014 at 03:00:30PM +0200, Luiz Augusto von Dentz wrote:
-> Hi Andrei,
-> 
-> On Fri, Mar 7, 2014 at 2:22 PM, Andrei Emeltchenko
-> <andrei.emeltchenko.news@gmail.com> wrote:
-> > Hi Luiz,
-> >
-> > On Fri, Mar 07, 2014 at 02:15:40PM +0200, Luiz Augusto von Dentz wrote:
-> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >>
-> >> This adds avrcp_register_notification which can be used to send
-> >> RegisterNotification PDUs.
-> >
-> > Didn't I sent the same patch already? Why are we redoing the same work?
-> 
-> Im implementing the daemon side, this is the problem of sending big
-> patch sets it takes more time and I want to finish the AVRCP quickly
-> so we can have it tested. Btw, Im not sure why you are still defining
-> the PDU length public, 
+diff --git a/android/gatt.c b/android/gatt.c
+index f8f7208..1261c1f 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -60,6 +60,13 @@ static int find_client_uuid(gconstpointer data, gconstpointer user_data)
+ 	return 0;
+ }
+ 
++static int find_client_if(gconstpointer data, gconstpointer user_data)
++{
++	const int32_t exp_cif = *((int32_t *)user_data);
++	const int32_t cur_cif = ((struct gatt_client *)data)->client_if;
++
++	return cur_cif != exp_cif;
++}
+ 
+ static void handle_client_register(const void *buf, uint16_t len)
+ {
+@@ -110,10 +117,26 @@ failed:
+ 
+ static void handle_client_unregister(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_unregister *cmd = buf;
++	int32_t client_if = cmd->client_if;
++	GList *found_client_if;
++
+ 	DBG("");
+ 
+-	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
++	found_client_if = g_list_find_custom(gatt_client_list, &client_if,
++								find_client_if);
++	if (!found_client_if) {
++		error("client_if: %d not found", client_if);
++		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 			HAL_OP_GATT_CLIENT_UNREGISTER, HAL_STATUS_FAILED);
++		return;
++	}
++
++	gatt_client_list = g_list_remove(gatt_client_list,
++							found_client_if->data);
++
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_OP_GATT_CLIENT_UNREGISTER, HAL_STATUS_SUCCESS);
+ }
+ 
+ static void handle_client_scan(const void *buf, uint16_t len)
+-- 
+1.8.5.2
 
-The pdu lengths might be used in unit tests and avrcp-lib.
-
-Best regards 
-Andrei Emeltchenko 
-
-> this should probably be keep private until we
-> have proper struct defined, in fact I did mention that we might change
-> the way the handlers works in avrcp-lib to incorporate more logic and
-> do things like header checks that the unit test has been doing.
