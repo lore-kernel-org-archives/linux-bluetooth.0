@@ -1,102 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0] unit: Add test for g_dbus_client_set_ready_watch()
-Date: Fri,  7 Mar 2014 10:14:32 -0300
-Message-Id: <1394198072-21522-1-git-send-email-claudio.takahasi@openbossa.org>
+Date: Fri, 7 Mar 2014 15:09:31 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH BlueZ 1/4] android/avrcp-lib: Add
+ avrcp_register_notification function
+Message-ID: <20140307130929.GB4954@aemeltch-MOBL1>
+References: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
+ <20140307122228.GA4954@aemeltch-MOBL1>
+ <CABBYNZJN5AU6jqDSq9P-MxKL09wZiiX1MFwUesRhzj+dGxLW7w@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZJN5AU6jqDSq9P-MxKL09wZiiX1MFwUesRhzj+dGxLW7w@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- unit/test-gdbus-client.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+Hi Luiz,
 
-diff --git a/unit/test-gdbus-client.c b/unit/test-gdbus-client.c
-index ee8a760..d0b6ce7 100644
---- a/unit/test-gdbus-client.c
-+++ b/unit/test-gdbus-client.c
-@@ -38,6 +38,7 @@ struct context {
- 	GDBusClient *dbus_client;
- 	GDBusProxy *proxy;
- 	void *data;
-+	gboolean client_ready;
- 	guint timeout_source;
- };
- 
-@@ -85,6 +86,7 @@ static struct context *create_context(void)
- 	dbus_connection_set_exit_on_disconnect(context->dbus_conn, FALSE);
- 
- 	g_dbus_attach_object_manager(context->dbus_conn);
-+	context->client_ready = FALSE;
- 
- 	return context;
- }
-@@ -964,6 +966,56 @@ static void client_force_disconnect(void)
- 	destroy_context(context);
- }
- 
-+static void client_ready_watch(GDBusClient *client, void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	context->client_ready = TRUE;
-+}
-+
-+static void proxy_added(GDBusProxy *proxy, void *user_data)
-+{
-+	struct context *context = user_data;
-+
-+	/*
-+	 * Proxy added callback should not be called after Client ready
-+	 * watch. Ready means that all objects has been reported to the
-+	 * upper-layer.
-+	 */
-+	g_assert(context->client_ready == FALSE);
-+
-+	g_main_loop_quit(context->main_loop);
-+}
-+
-+static void client_ready(void)
-+{
-+	struct context *context = create_context();
-+	static const GDBusPropertyTable string_properties[] = {
-+		{ "String", "s", get_string, set_string, string_exists },
-+		{ },
-+	};
-+
-+	if (context == NULL)
-+		return;
-+
-+	g_dbus_register_interface(context->dbus_conn,
-+				SERVICE_PATH, SERVICE_NAME,
-+				methods, signals, string_properties,
-+				context, NULL);
-+
-+	context->dbus_client = g_dbus_client_new(context->dbus_conn,
-+						SERVICE_NAME, SERVICE_PATH);
-+
-+	g_dbus_client_set_ready_watch(context->dbus_client, client_ready_watch,
-+								context);
-+	g_dbus_client_set_proxy_handlers(context->dbus_client,
-+						proxy_added, NULL, NULL, context);
-+
-+	g_main_loop_run(context->main_loop);
-+
-+	destroy_context(context);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
-@@ -1001,5 +1053,7 @@ int main(int argc, char *argv[])
- 	g_test_add_func("/gdbus/client_force_disconnect",
- 						client_force_disconnect);
- 
-+	g_test_add_func("/gdbus/client_ready", client_ready);
-+
- 	return g_test_run();
- }
--- 
-1.8.3.1
+On Fri, Mar 07, 2014 at 03:00:30PM +0200, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
+> 
+> On Fri, Mar 7, 2014 at 2:22 PM, Andrei Emeltchenko
+> <andrei.emeltchenko.news@gmail.com> wrote:
+> > Hi Luiz,
+> >
+> > On Fri, Mar 07, 2014 at 02:15:40PM +0200, Luiz Augusto von Dentz wrote:
+> >> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>
+> >> This adds avrcp_register_notification which can be used to send
+> >> RegisterNotification PDUs.
+> >
+> > Didn't I sent the same patch already? Why are we redoing the same work?
+> 
+> Im implementing the daemon side, this is the problem of sending big
+> patch sets it takes more time and I want to finish the AVRCP quickly
+> so we can have it tested. Btw, Im not sure why you are still defining
+> the PDU length public, 
 
+The pdu lengths might be used in unit tests and avrcp-lib.
+
+Best regards 
+Andrei Emeltchenko 
+
+> this should probably be keep private until we
+> have proper struct defined, in fact I did mention that we might change
+> the way the handlers works in avrcp-lib to incorporate more logic and
+> do things like header checks that the unit test has been doing.
