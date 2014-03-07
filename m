@@ -1,58 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/9] android/avrcp: Add avrcp_get_element_attributes() function
-Date: Fri,  7 Mar 2014 13:51:46 +0200
-Message-Id: <1394193113-32347-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/2] android: Support LE discovery if adapter supports LE
+Date: Fri, 7 Mar 2014 11:28:30 +0100
+Message-ID: <1394188110-16336-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1394188110-16336-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1394188110-16336-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
 ---
- android/avrcp-lib.c | 13 +++++++++++++
- android/avrcp-lib.h |  2 ++
- 2 files changed, 15 insertions(+)
+ android/bluetooth.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index cd39071..fbaa48d 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -403,6 +403,19 @@ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
- 				user_data);
- }
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 6d08a50..c6e40ca 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2414,6 +2414,9 @@ static bool start_discovery(void)
+ 	else
+ 		cp.type = 0;
  
-+int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
-+								void *user_data)
-+{
-+	uint8_t buf[9];
++	if (adapter.current_settings & MGMT_SETTING_LE)
++		cp.type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
 +
-+	/* This returns all attributes */
-+	memset(buf, 0, sizeof(buf));
-+
-+	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
-+				AVRCP_GET_ELEMENT_ATTRIBUTES, buf, sizeof(buf),
-+				func, user_data);
-+}
-+
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
- 				uint8_t status)
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index ba1d84a..5e90ea1 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -145,6 +145,8 @@ int avrcp_get_current_player_value(struct avrcp *session, uint8_t *attrs,
- 					void *user_data);
- int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
-+int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
-+							void *user_data);
+ 	DBG("type=0x%x", cp.type);
  
- int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
- 				uint32_t position, uint32_t duration,
+ 	if (mgmt_send(mgmt_if, MGMT_OP_START_DISCOVERY, adapter.index,
+@@ -2433,6 +2436,9 @@ static bool stop_discovery(void)
+ 	else
+ 		cp.type = 0;
+ 
++	if (adapter.current_settings & MGMT_SETTING_LE)
++		cp.type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
++
+ 	DBG("type=0x%x", cp.type);
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_STOP_DISCOVERY, adapter.index,
 -- 
-1.8.3.2
+1.8.4
 
