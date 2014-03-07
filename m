@@ -1,38 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140307122228.GA4954@aemeltch-MOBL1>
+Date: Fri, 7 Mar 2014 14:22:30 +0200
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ 1/4] android/avrcp-lib: Add
+ avrcp_register_notification function
+Message-ID: <20140307122228.GA4954@aemeltch-MOBL1>
 References: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
-	<20140307122228.GA4954@aemeltch-MOBL1>
-Date: Fri, 7 Mar 2014 15:00:30 +0200
-Message-ID: <CABBYNZJN5AU6jqDSq9P-MxKL09wZiiX1MFwUesRhzj+dGxLW7w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] android/avrcp-lib: Add avrcp_register_notification
- function
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Luiz,
 
-On Fri, Mar 7, 2014 at 2:22 PM, Andrei Emeltchenko
-<andrei.emeltchenko.news@gmail.com> wrote:
-> Hi Luiz,
->
-> On Fri, Mar 07, 2014 at 02:15:40PM +0200, Luiz Augusto von Dentz wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This adds avrcp_register_notification which can be used to send
->> RegisterNotification PDUs.
->
-> Didn't I sent the same patch already? Why are we redoing the same work?
+On Fri, Mar 07, 2014 at 02:15:40PM +0200, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This adds avrcp_register_notification which can be used to send
+> RegisterNotification PDUs.
 
-Im implementing the daemon side, this is the problem of sending big
-patch sets it takes more time and I want to finish the AVRCP quickly
-so we can have it tested. Btw, Im not sure why you are still defining
-the PDU length public, this should probably be keep private until we
-have proper struct defined, in fact I did mention that we might change
-the way the handlers works in avrcp-lib to incorporate more logic and
-do things like header checks that the unit test has been doing.
+Didn't I sent the same patch already? Why are we redoing the same work?
+
+Best regards 
+Andrei Emeltchenko 
+
+> ---
+>  android/avrcp-lib.c | 15 +++++++++++++++
+>  android/avrcp-lib.h |  3 +++
+>  2 files changed, 18 insertions(+)
+> 
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index d66560b..a5530ec 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -334,6 +334,21 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
+>  				func, user_data);
+>  }
+>  
+> +int avrcp_register_notification(struct avrcp *session, uint8_t event,
+> +					uint32_t interval, avctp_rsp_cb func,
+> +					void *user_data)
+> +{
+> +	uint8_t params[5];
+> +
+> +	params[0] = event;
+> +	bt_put_be32(interval, &params[1]);
+> +
+> +	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
+> +					AVRCP_REGISTER_NOTIFICATION,
+> +					params, sizeof(params),
+> +					func, user_data);
+> +}
+> +
+>  int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
+>  								void *user_data)
+>  {
+> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> index ba1d84a..4a49fe7 100644
+> --- a/android/avrcp-lib.h
+> +++ b/android/avrcp-lib.h
+> @@ -132,6 +132,9 @@ int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
+>  					uint8_t *params, size_t params_len);
+>  int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
+>  					avctp_rsp_cb func, void *user_data);
+> +int avrcp_register_notification(struct avrcp *session, uint8_t event,
+> +					uint32_t interval, avctp_rsp_cb func,
+> +					void *user_data);
+>  int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
+>  							void *user_data);
+>  int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
+> -- 
+> 1.8.5.3
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
