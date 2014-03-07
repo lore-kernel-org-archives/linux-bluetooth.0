@@ -2,117 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 2/2] android/pts: Add AVRCP 1.5 PTS tests
-Date: Fri,  7 Mar 2014 19:42:47 +0100
-Message-Id: <1394217767-12242-2-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1394217767-12242-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1394217767-12242-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH 1/2] android/pics: Correct PICS for AbsoluteVolume
+Date: Fri,  7 Mar 2014 19:42:46 +0100
+Message-Id: <1394217767-12242-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adding PTS test results for AVRCP 1.5.
+As Specification for AVRCP 1.4+ requires, in case of Absolute
+Volume, roles are reveresed and IUT plays CT while PTS plays TG
+role (PTS acts as sink. See section 6.13.2 AVRCP 1.5 Spec)
 ---
- android/pts-avrcp.txt | 42 +++++++++++++++++++++---------------------
- 1 file changed, 21 insertions(+), 21 deletions(-)
+ android/pics-avrcp.txt | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-index 8bd0b4d..b2cecf3 100644
---- a/android/pts-avrcp.txt
-+++ b/android/pts-avrcp.txt
-@@ -1,7 +1,7 @@
- PTS test results for AVRCP
- 
- PTS version: 5.0
--Tested: 28.01.2014
-+Tested: 07.03.2014
- Android version: 4.4.2
- 
- Results:
-@@ -77,12 +77,12 @@ TC_CT_PTT_BV_04_I	N/A
- TC_CT_PTT_BV_05_I	N/A
- TC_CT_RCR_BV_01_C	N/A
- TC_CT_RCR_BV_03_C	N/A
--TC_CT_VLH_BI_03_C	N/A
--TC_CT_VLH_BI_04_C	N/A
--TC_CT_VLH_BV_01_C	N/A
--TC_CT_VLH_BV_01_I	N/A
--TC_CT_VLH_BV_02_I	N/A
--TC_CT_VLH_BV_03_C	N/A
-+TC_CT_VLH_BI_03_C	INC
-+TC_CT_VLH_BI_04_C	INC
-+TC_CT_VLH_BV_01_C	INC
-+TC_CT_VLH_BV_01_I	INC
-+TC_CT_VLH_BV_02_I	INC
-+TC_CT_VLH_BV_03_C	INC
+diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
+index 845ba33..bee22c8 100644
+--- a/android/pics-avrcp.txt
++++ b/android/pics-avrcp.txt
+@@ -12,7 +12,7 @@ O - optional
  -------------------------------------------------------------------------------
- 
- 
-@@ -93,9 +93,9 @@ Test Name		Result	Notes
- TC_TG_BGN_BV_01_I	N/A
- TC_TG_BGN_BV_02_I	N/A
- TC_TG_CEC_BV_01_I	PASS
--TC_TG_CEC_BV_02_I	INC	Initiate a control channel connection
--TC_TG_CFG_BI_01_C	INC
--TC_TG_CFG_BV_02_C	INC
-+TC_TG_CEC_BV_02_I	PASS
-+TC_TG_CFG_BI_01_C	PASS
-+TC_TG_CFG_BV_02_C	PASS
- TC_TG_CON_BV_02_C	N/A
- TC_TG_CON_BV_04_C	N/A
- TC_TG_CON_BV_05_C	N/A
-@@ -103,7 +103,7 @@ TC_TG_CRC_BV_01_I	PASS
- TC_TG_CRC_BV_02_I	PASS	Disconnect from PTS
- TC_TG_ICC_BV_01_I	PASS
- TC_TG_ICC_BV_02_I	PASS
--TC_TG_INV_BI_01_C	INC
-+TC_TG_INV_BI_01_C	PASS
- TC_TG_INV_BI_02_C	N/A
- TC_TG_MCN_CB_BI_01_C	N/A
- TC_TG_MCN_CB_BI_02_C	N/A
-@@ -146,9 +146,9 @@ TC_TG_MCN_SRC_BV_03_I	N/A
- TC_TG_MCN_SRC_BV_04_C	N/A
- TC_TG_MCN_SRC_BV_04_I	N/A
- TC_TG_MCN_SRC_BV_06_C	N/A
--TC_TG_MDI_BV_02_C	INC
--TC_TG_MDI_BV_04_C	INC
--TC_TG_MDI_BV_05_C	INC
-+TC_TG_MDI_BV_02_C	PASS
-+TC_TG_MDI_BV_04_C	FAIL
-+TC_TG_MDI_BV_05_C	PASS
- TC_TG_MPS_BI_01_C	N/A
- TC_TG_MPS_BI_02_C	N/A
- TC_TG_MPS_BV_01_I	N/A
-@@ -161,14 +161,14 @@ TC_TG_MPS_BV_06_C	N/A
- TC_TG_MPS_BV_07_C	N/A
- TC_TG_MPS_BV_09_C	N/A
- TC_TG_MPS_BV_10_C	N/A
--TC_TG_NFY_BI_01_C	INC
--TC_TG_NFY_BV_02_C	INC
-+TC_TG_NFY_BI_01_C	PASS
-+TC_TG_NFY_BV_02_C	PASS	Change track when requested
- TC_TG_NFY_BV_03_C	N/A
--TC_TG_NFY_BV_04_C	INC
--TC_TG_NFY_BV_05_C	INC
-+TC_TG_NFY_BV_04_C	PASS
-+TC_TG_NFY_BV_05_C	PASS
- TC_TG_NFY_BV_06_C	N/A
- TC_TG_NFY_BV_07_C	N/A
--TC_TG_NFY_BV_08_C	INC
-+TC_TG_NFY_BV_08_C	PASS
- TC_TG_PAS_BI_01_C	N/A
- TC_TG_PAS_BI_02_C	N/A
- TC_TG_PAS_BI_03_C	N/A
-@@ -179,8 +179,8 @@ TC_TG_PAS_BV_04_C	N/A
- TC_TG_PAS_BV_06_C	N/A
- TC_TG_PAS_BV_08_C	N/A
- TC_TG_PAS_BV_10_C	N/A
--TC_TG_PTT_BV_01_I	INC
--TC_TG_PTT_BV_02_I	N/A
-+TC_TG_PTT_BV_01_I	PASS
-+TC_TG_PTT_BV_02_I	PASS
- TC_TG_PTT_BV_03_I	N/A
- TC_TG_PTT_BV_04_I	N/A
- TC_TG_PTT_BV_05_I	N/A
+ Parameter Name    Selected	Description
+ -------------------------------------------------------------------------------
+-SPC_AVRCP_1_1     False (*)	Role: Controller (CT) (C.1)
++SPC_AVRCP_1_1     True		Role: Controller (CT) (C.1)
+ TSPC_AVRCP_1_2    True		Role: Target (TG) (C.1)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory to support at least one of the defined roles.
+@@ -82,9 +82,9 @@ TSPC_AVRCP_2_45   False		CT: PlayItem(NowPlayingList) (C.8)
+ TSPC_AVRCP_2_46   False		CT: AddToNowPlaying (O)
+ TSPC_AVRCP_2_47   False		CT: EVENT_NOW_PLAYING_CONTENT_CHANGED (O)
+ TSPC_AVRCP_2_48   False		CT: Playable Folders (O)
+-TSPC_AVRCP_2_49   False		CT: Absolute Volume (C.3)
+-TSPC_AVRCP_2_50   False		CT: SetAbsoluteVolume (C.3)
+-TSPC_AVRCP_2_51   False		CT: NotifyVolumeChange (C.3)
++TSPC_AVRCP_2_49   True (*)	CT: Absolute Volume (C.3)
++TSPC_AVRCP_2_50   True (*)	CT: SetAbsoluteVolume (C.3)
++TSPC_AVRCP_2_51   True (*)	CT: NotifyVolumeChange (C.3)
+ TSPC_AVRCP_2_52   False (*)	CT: Discoverable Mode (M)
+ TSPC_AVRCP_2_53   False		CT: PASSTHROUGH operation supporting press
+ 					and hold (O)
+@@ -405,9 +405,9 @@ TSPC_AVRCP_7_56   False		TG: PlayItem(NowPlayingList) (C.11)
+ TSPC_AVRCP_7_57   False		TG: AddToNowPlaying (O)
+ TSPC_AVRCP_7_58   False		TG: EVENT_NOW_PLAYING_CONTENT_CHANGED (C.11)
+ TSPC_AVRCP_7_59   False		TG: Playable Folders (O)
+-TSPC_AVRCP_7_60   True (*)	TG: Absolute Volume (C.5)
+-TSPC_AVRCP_7_61   True (*)	TG: SetAbsoluteVolume (C.5)
+-TSPC_AVRCP_7_62   True (*)	TG: NotifyVolumeChange (C.5)
++TSPC_AVRCP_7_60   False		TG: Absolute Volume (C.5)
++TSPC_AVRCP_7_61   False		TG: SetAbsoluteVolume (C.5)
++TSPC_AVRCP_7_62   False		TG: NotifyVolumeChange (C.5)
+ TSPC_AVRCP_7_63   False		TG: Error Response (O)
+ TSPC_AVRCP_7_64   False		TG: General Reject (C.13)
+ TSPC_AVRCP_7_65   True		TG: Discoverable Mode (M)
 -- 
 1.8.5.3
 
