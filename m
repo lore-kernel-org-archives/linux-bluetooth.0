@@ -1,61 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/2] android: Fix type of discovery on start/stop discovery
-Date: Fri, 7 Mar 2014 11:28:29 +0100
-Message-ID: <1394188110-16336-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/4] android: GATT HAL Implementation
+Date: Fri, 07 Mar 2014 10:52:42 +0100
+Message-ID: <1802559.DphrSMr2P2@uw000953>
+In-Reply-To: <1394105279-9165-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1394105279-9165-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Discovering type was confused with adapter settings. With this patch it
-is fixed
----
- android/bluetooth.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+Hi Jakub,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 1101b64..6d08a50 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2408,14 +2408,13 @@ static void get_adapter_properties(void)
- static bool start_discovery(void)
- {
- 	struct mgmt_cp_start_discovery cp;
--	uint8_t type = 1 << BDADDR_BREDR;
- 
--	if (adapter.current_settings & type)
--		cp.type = type;
-+	if (adapter.current_settings & MGMT_SETTING_BREDR)
-+		cp.type = 1 << BDADDR_BREDR;
- 	else
- 		cp.type = 0;
- 
--	DBG("type=0x%x", type);
-+	DBG("type=0x%x", cp.type);
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_START_DISCOVERY, adapter.index,
- 					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
-@@ -2428,14 +2427,13 @@ static bool start_discovery(void)
- static bool stop_discovery(void)
- {
- 	struct mgmt_cp_stop_discovery cp;
--	uint8_t type = 1 << BDADDR_BREDR;
- 
--	if (adapter.current_settings & type)
--		cp.type = type;
-+	if (adapter.current_settings & MGMT_SETTING_BREDR)
-+		cp.type = 1 << BDADDR_BREDR;
- 	else
- 		cp.type = 0;
- 
--	DBG("type=0x%x", type);
-+	DBG("type=0x%x", cp.type);
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_STOP_DISCOVERY, adapter.index,
- 					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
+On Thursday 06 of March 2014 12:27:55 Jakub Tyszkowski wrote:
+> Patchset adds the initial implementation of Android GATT HAL. This will allow
+> to start the actual GATT Service development inside the Android daemon.
+> 
+> Jakub Tyszkowski (4):
+>   android/hal-gatt: Add Client Event handlers
+>   android/hal-gatt: Add Client API calls
+>   android/hal-gatt: Add Server Event handlers
+>   android/hal-gatt: Add Server API calls
+> 
+>  android/hal-gatt.c | 689 ++++++++++++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 655 insertions(+), 34 deletions(-)
+
+All patches applied, thanks.
+
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
