@@ -1,104 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/gatt: Handle Register gatt client command
-Date: Fri,  7 Mar 2014 14:04:58 +0100
-Message-Id: <1394197499-2207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] Bluetooth: Fix expected key count debug logs
+Date: Fri,  7 Mar 2014 15:04:13 +0200
+Message-Id: <1394197453-7912-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds register gatt client app command handling.
----
- android/gatt.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 62 insertions(+), 1 deletion(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/android/gatt.c b/android/gatt.c
-index ce85af4..f8f7208 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -31,6 +31,7 @@
- #include <glib.h>
- 
- #include "ipc.h"
-+#include "ipc-common.h"
- #include "lib/bluetooth.h"
- #include "gatt.h"
- #include "src/log.h"
-@@ -38,13 +39,73 @@
- 
- static struct ipc *hal_ipc = NULL;
- static bdaddr_t adapter_addr;
-+static int32_t client_if_counter;
-+
-+struct gatt_client {
-+	int32_t client_if;
-+	uint8_t uuid[16];
-+};
-+
-+GList *gatt_client_list = NULL;
-+
-+static int find_client_uuid(gconstpointer data, gconstpointer user_data)
-+{
-+	const uint8_t *exp_uuid = user_data;
-+	const uint8_t *cur_uuid = ((struct gatt_client *)data)->uuid;
-+	struct gatt_client *client;
-+
-+	if (memcmp(exp_uuid, cur_uuid, sizeof(client->uuid)))
-+		return 1;
-+
-+	return 0;
-+}
-+
- 
- static void handle_client_register(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_register *cmd = buf;
-+	struct hal_ev_gatt_client_register_client ev;
-+	struct gatt_client *client;
-+	GList *found_client_uuid;
-+
- 	DBG("");
- 
-+	if (!cmd->uuid) {
-+		error("no uuid received");
-+		goto failed;
-+	}
-+
-+	found_client_uuid = g_list_find_custom(gatt_client_list,
-+					&cmd->uuid, find_client_uuid);
-+
-+	if (found_client_uuid) {
-+		error("client uuid is already on list");
-+		goto failed;
-+	}
-+
-+	client = g_new0(struct gatt_client, 1);
-+	g_memmove(client->uuid, cmd->uuid, sizeof(client->uuid));
-+
-+	client->client_if = ++client_if_counter;
-+
-+	gatt_client_list = g_list_append(gatt_client_list, client);
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
--							HAL_STATUS_FAILED);
-+							HAL_STATUS_SUCCESS);
-+
-+	ev.status = HAL_STATUS_SUCCESS;
-+	ev.client_if = client->client_if;
-+	g_memmove(ev.app_uuid, client->uuid, sizeof(client->uuid));
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_CLIENT_REGISTER_CLIENT, sizeof(ev), &ev);
-+
-+	return;
-+
-+failed:
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-+				HAL_OP_GATT_CLIENT_REGISTER, HAL_STATUS_FAILED);
-+
- }
- 
- static void handle_client_unregister(const void *buf, uint16_t len)
+The debug logs for reporting a discrepancy between the expected amount
+of keys and the actually received amount of keys got these value mixed
+up. This patch fixes the issue.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 98e9df3556e7..f2397e7ad385 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2351,7 +2351,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 					sizeof(struct mgmt_link_key_info);
+ 	if (expected_len != len) {
+ 		BT_ERR("load_link_keys: expected %u bytes, got %u bytes",
+-		       len, expected_len);
++		       expected_len, len);
+ 		return cmd_status(sk, hdev->id, MGMT_OP_LOAD_LINK_KEYS,
+ 				  MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -4427,7 +4427,7 @@ static int load_irks(struct sock *sk, struct hci_dev *hdev, void *cp_data,
+ 	expected_len = sizeof(*cp) + irk_count * sizeof(struct mgmt_irk_info);
+ 	if (expected_len != len) {
+ 		BT_ERR("load_irks: expected %u bytes, got %u bytes",
+-		       len, expected_len);
++		       expected_len, len);
+ 		return cmd_status(sk, hdev->id, MGMT_OP_LOAD_IRKS,
+ 				  MGMT_STATUS_INVALID_PARAMS);
+ 	}
+@@ -4507,7 +4507,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 					sizeof(struct mgmt_ltk_info);
+ 	if (expected_len != len) {
+ 		BT_ERR("load_keys: expected %u bytes, got %u bytes",
+-		       len, expected_len);
++		       expected_len, len);
+ 		return cmd_status(sk, hdev->id, MGMT_OP_LOAD_LONG_TERM_KEYS,
+ 				  MGMT_STATUS_INVALID_PARAMS);
+ 	}
 -- 
-1.8.5.2
+1.8.5.3
 
