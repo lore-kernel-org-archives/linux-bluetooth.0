@@ -1,80 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 7 Mar 2014 14:22:30 +0200
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/4] android/avrcp-lib: Add
- avrcp_register_notification function
-Message-ID: <20140307122228.GA4954@aemeltch-MOBL1>
-References: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 4/4] android/avrcp: Add support to set volume command
+Date: Fri,  7 Mar 2014 14:15:43 +0200
+Message-Id: <1394194543-3095-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
+References: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Mar 07, 2014 at 02:15:40PM +0200, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This adds avrcp_register_notification which can be used to send
-> RegisterNotification PDUs.
+---
+ android/avrcp.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-Didn't I sent the same patch already? Why are we redoing the same work?
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 978e6c0..11a2614 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -332,10 +332,35 @@ done:
+ 
+ static void handle_set_volume(const void *buf, uint16_t len)
+ {
++	struct hal_cmd_avrcp_set_volume *cmd = (void *) buf;
++	struct avrcp_device *dev;
++	uint8_t status;
++	int ret;
++
+ 	DBG("");
+ 
++	if (!devices) {
++		error("AVRCP: No device found to set volume");
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	/* Peek the first device since the HAL cannot really address a specific
++	 * device it might mean there could only be one connected.
++	 */
++	dev = devices->data;
++
++	ret = avrcp_set_volume(dev->session, cmd->value & 0x7f, NULL, NULL);
++	if (ret < 0) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_AVRCP, HAL_OP_AVRCP_SET_VOLUME,
+-							HAL_STATUS_FAILED);
++								status);
+ }
+ 
+ static const struct ipc_handler cmd_handlers[] = {
+-- 
+1.8.5.3
 
-Best regards 
-Andrei Emeltchenko 
-
-> ---
->  android/avrcp-lib.c | 15 +++++++++++++++
->  android/avrcp-lib.h |  3 +++
->  2 files changed, 18 insertions(+)
-> 
-> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-> index d66560b..a5530ec 100644
-> --- a/android/avrcp-lib.c
-> +++ b/android/avrcp-lib.c
-> @@ -334,6 +334,21 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
->  				func, user_data);
->  }
->  
-> +int avrcp_register_notification(struct avrcp *session, uint8_t event,
-> +					uint32_t interval, avctp_rsp_cb func,
-> +					void *user_data)
-> +{
-> +	uint8_t params[5];
-> +
-> +	params[0] = event;
-> +	bt_put_be32(interval, &params[1]);
-> +
-> +	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
-> +					AVRCP_REGISTER_NOTIFICATION,
-> +					params, sizeof(params),
-> +					func, user_data);
-> +}
-> +
->  int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
->  								void *user_data)
->  {
-> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-> index ba1d84a..4a49fe7 100644
-> --- a/android/avrcp-lib.h
-> +++ b/android/avrcp-lib.h
-> @@ -132,6 +132,9 @@ int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
->  					uint8_t *params, size_t params_len);
->  int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
->  					avctp_rsp_cb func, void *user_data);
-> +int avrcp_register_notification(struct avrcp *session, uint8_t event,
-> +					uint32_t interval, avctp_rsp_cb func,
-> +					void *user_data);
->  int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
->  							void *user_data);
->  int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
-> -- 
-> 1.8.5.3
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
