@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 7/9] unit/avrcp: Add /TP/NFY/BV-01-C test
-Date: Fri,  7 Mar 2014 13:51:51 +0200
-Message-Id: <1394193113-32347-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/9] unit/avrcp: Add /TP/MDI/BV-03-C test
+Date: Fri,  7 Mar 2014 13:51:47 +0200
+Message-Id: <1394193113-32347-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,41 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that Register notification command is issued by
-Controller.
+Test verifies that Get element attributes issued correctly.
 ---
- unit/test-avrcp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ unit/test-avrcp.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 496dd1b..fa4870d 100644
+index 4f81954..9b334e6 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -578,6 +578,11 @@ static void test_client(gconstpointer data)
- 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
- 		avrcp_get_element_attributes(context->session, NULL, NULL);
+@@ -553,6 +553,9 @@ static void test_client(gconstpointer data)
+ 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-01-C"))
+ 		avrcp_get_play_status(context->session, NULL, NULL);
  
-+	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
-+		avrcp_register_notification(context->session,
-+						AVRCP_EVENT_STATUS_CHANGED, 0,
-+						NULL, NULL);
++	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
++		avrcp_get_element_attributes(context->session, NULL, NULL);
 +
  	execute_context(context);
  }
  
-@@ -865,5 +870,14 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
- 				0x00, 0x00, 0x00));
+@@ -812,6 +815,12 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x09, 0xaa, 0xaa, 0xaa,
+ 				0xaa, 0xbb, 0xbb, 0xbb, 0xbb, 0x00));
  
-+	/* Notification Commands */
-+
-+	/* Register notification - CT */
-+	define_test("/TP/NFY/BV-01-C", test_client,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x05, AVRCP_EVENT_STATUS_CHANGED,
-+				0x00, 0x00, 0x00, 0x00));
-+
++	/* Get element attributes - CT */
++	define_test("/TP/MDI/BV-03-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
++				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
+ 
  	return g_test_run();
  }
 -- 
