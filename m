@@ -1,65 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Petri Gynther <pgynther@google.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 00/20] More Android Handsfree work
-Date: Sat,  8 Mar 2014 01:19:44 +0100
-Message-Id: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] bdaddr: Remove *_CP_SIZE defines
+Message-Id: <20140307225545.E2760100887@puck.mtv.corp.google.com>
+Date: Fri,  7 Mar 2014 14:55:45 -0800 (PST)
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Remove *_CP_SIZE defines and use sizeof(cp) instead.
+---
+ tools/bdaddr.c | 15 +++++----------
+ 1 file changed, 5 insertions(+), 10 deletions(-)
 
-This patchset adds support for basic handsfree functionality.
-
-What is done:
- - indicators (without callheld)
- - placing, accepting, cancelling calls etc.
- - vendor (unknown) AT command handling
- - extended error codes
- - DTMF codes
- - query current calls
- - voice recognition on/off
- - disabling echo cancellation
- - subscriber and operator identification
-
-Missing features:
- - proper three way calling support (AT+CHLD is supported but callheld
-   and CCWA are missing).
- - WBS and codec negotiation
- - audio
-
+diff --git a/tools/bdaddr.c b/tools/bdaddr.c
+index ee9c01c..8356a8d 100644
+--- a/tools/bdaddr.c
++++ b/tools/bdaddr.c
+@@ -57,7 +57,6 @@ static int generic_reset_device(int dd)
+ typedef struct {
+ 	bdaddr_t	bdaddr;
+ } __attribute__ ((packed)) ericsson_write_bd_addr_cp;
+-#define ERICSSON_WRITE_BD_ADDR_CP_SIZE 6
+ 
+ static int ericsson_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ {
+@@ -71,7 +70,7 @@ static int ericsson_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ 	rq.ogf    = OGF_VENDOR_CMD;
+ 	rq.ocf    = OCF_ERICSSON_WRITE_BD_ADDR;
+ 	rq.cparam = &cp;
+-	rq.clen   = ERICSSON_WRITE_BD_ADDR_CP_SIZE;
++	rq.clen   = sizeof(cp);
+ 	rq.rparam = NULL;
+ 	rq.rlen   = 0;
+ 
+@@ -87,7 +86,6 @@ typedef struct {
+ 	uint8_t		flash_length;
+ 	uint8_t		flash_data[253];
+ } __attribute__ ((packed)) ericsson_store_in_flash_cp;
+-#define ERICSSON_STORE_IN_FLASH_CP_SIZE 255
+ 
+ static int ericsson_store_in_flash(int dd, uint8_t user_id, uint8_t flash_length, uint8_t *flash_data)
+ {
+@@ -104,7 +102,7 @@ static int ericsson_store_in_flash(int dd, uint8_t user_id, uint8_t flash_length
+ 	rq.ogf    = OGF_VENDOR_CMD;
+ 	rq.ocf    = OCF_ERICSSON_STORE_IN_FLASH;
+ 	rq.cparam = &cp;
+-	rq.clen   = ERICSSON_STORE_IN_FLASH_CP_SIZE;
++	rq.clen   = sizeof(cp);
+ 	rq.rparam = NULL;
+ 	rq.rlen   = 0;
+ 
+@@ -199,7 +197,6 @@ static int csr_reset_device(int dd)
+ typedef struct {
+ 	bdaddr_t	bdaddr;
+ } __attribute__ ((packed)) ti_write_bd_addr_cp;
+-#define TI_WRITE_BD_ADDR_CP_SIZE 6
+ 
+ static int ti_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ {
+@@ -213,7 +210,7 @@ static int ti_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ 	rq.ogf    = OGF_VENDOR_CMD;
+ 	rq.ocf    = OCF_TI_WRITE_BD_ADDR;
+ 	rq.cparam = &cp;
+-	rq.clen   = TI_WRITE_BD_ADDR_CP_SIZE;
++	rq.clen   = sizeof(cp);
+ 	rq.rparam = NULL;
+ 	rq.rlen   = 0;
+ 
+@@ -227,7 +224,6 @@ static int ti_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ typedef struct {
+ 	bdaddr_t	bdaddr;
+ } __attribute__ ((packed)) bcm_write_bd_addr_cp;
+-#define BCM_WRITE_BD_ADDR_CP_SIZE 6
+ 
+ static int bcm_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ {
+@@ -241,7 +237,7 @@ static int bcm_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ 	rq.ogf    = OGF_VENDOR_CMD;
+ 	rq.ocf    = OCF_BCM_WRITE_BD_ADDR;
+ 	rq.cparam = &cp;
+-	rq.clen   = BCM_WRITE_BD_ADDR_CP_SIZE;
++	rq.clen   = sizeof(cp);
+ 	rq.rparam = NULL;
+ 	rq.rlen   = 0;
+ 
+@@ -255,7 +251,6 @@ static int bcm_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ typedef struct {
+ 	bdaddr_t	bdaddr;
+ } __attribute__ ((packed)) zeevo_write_bd_addr_cp;
+-#define ZEEVO_WRITE_BD_ADDR_CP_SIZE 6
+ 
+ static int zeevo_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ {
+@@ -269,7 +264,7 @@ static int zeevo_write_bd_addr(int dd, bdaddr_t *bdaddr)
+ 	rq.ogf    = OGF_VENDOR_CMD;
+ 	rq.ocf    = OCF_ZEEVO_WRITE_BD_ADDR;
+ 	rq.cparam = &cp;
+-	rq.clen   = ZEEVO_WRITE_BD_ADDR_CP_SIZE;
++	rq.clen   = sizeof(cp);
+ 	rq.rparam = NULL;
+ 	rq.rlen   = 0;
+ 
 -- 
-BR
-Szymon Janc
-
-Szymon Janc (20):
-  android/handsfree: Add AG and HF features masks
-  android/handsfree: Add stubs for all AT commands defines by spec
-  android/handsfree: Add support for unknown AT commands
-  android/handsfree: Add support for voice recognition function
-  android/handsfree: Add support for AT+NREC command
-  android/handsfree: Add support for AT+CLCC command
-  android/handsfree: Add support for AT+CHLD command
-  android/handsfree: Add support for AT+CMEE command
-  android/handsfree: Add support for AT+CKPD command
-  android/handsfree: Add support fot AT+CNUM command
-  android/handsfree: Add support for AT+VTS command
-  android/handsfree: Add support for ATA command
-  android/handsfree: Fix checking AT+COPS parameters
-  android/handsfree: Add support for ATD command
-  android/handsfree: Add support for AT+BLDN command
-  android/handsfree: Add support for AT+CHUP command
-  android/hal-handsfree: Fix handling of dial notification
-  android/handsfree: Add support for phone state change command
-  android/handsfree: Add support for AT+CLIP command
-  android/handsfree: Add comment for AT+VGS/AT+VGM result code
-
- android/hal-handsfree.c |   7 +-
- android/hal-msg.h       |   5 +-
- android/handsfree.c     | 889 ++++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 838 insertions(+), 63 deletions(-)
-
--- 
-1.8.5.3
+1.9.0.279.gdc9e3eb
 
