@@ -1,61 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] android/avrcp-lib: Add avrcp_register_notification function
-Date: Fri,  7 Mar 2014 14:15:40 +0200
-Message-Id: <1394194543-3095-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH 5/9] unit/avrcp: Add /TP/MDI/BV-05-C test
+Date: Fri,  7 Mar 2014 13:51:49 +0200
+Message-Id: <1394193113-32347-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds avrcp_register_notification which can be used to send
-RegisterNotification PDUs.
+Test verifies that Target responds to Get element attributes cmd.
 ---
- android/avrcp-lib.c | 15 +++++++++++++++
- android/avrcp-lib.h |  3 +++
- 2 files changed, 18 insertions(+)
+ unit/test-avrcp.c | 17 ++++++++++++++++-
+ 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index d66560b..a5530ec 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -334,6 +334,21 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
- 				func, user_data);
- }
- 
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+					uint32_t interval, avctp_rsp_cb func,
-+					void *user_data)
-+{
-+	uint8_t params[5];
-+
-+	params[0] = event;
-+	bt_put_be32(interval, &params[1]);
-+
-+	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
-+					AVRCP_REGISTER_NOTIFICATION,
-+					params, sizeof(params),
-+					func, user_data);
-+}
-+
- int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
- 								void *user_data)
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 393afee..496dd1b 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -482,11 +482,14 @@ static ssize_t avrcp_handle_get_element_attrs(struct avrcp *session,
+ 						uint8_t *params,
+ 						void *user_data)
  {
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index ba1d84a..4a49fe7 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -132,6 +132,9 @@ int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
- 					uint8_t *params, size_t params_len);
- int avrcp_get_capabilities(struct avrcp *session, uint8_t param,
- 					avctp_rsp_cb func, void *user_data);
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+					uint32_t interval, avctp_rsp_cb func,
-+					void *user_data);
- int avrcp_list_player_attributes(struct avrcp *session, avctp_rsp_cb func,
- 							void *user_data);
- int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t *attributes,
+-	DBG("");
++	DBG("params_len %d params[8] %d", params_len, params[8]);
+ 
+ 	if (params_len < 9)
+ 		return -EINVAL;
+ 
++	if (params_len != 9 + params[8] * 4)
++		return -EINVAL;
++
+ 	avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
+ 
+ 	return -EAGAIN;
+@@ -850,5 +853,17 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+ 				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+ 				0x00, 0x00, 0x00));
++
++	/* Get element attributes - TG */
++	define_test("/TP/MDI/BV-05-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
++				0x00, 0x00, 0x0d, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
++				0x00, 0x00, 0x00, 0x01),
++			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
++				0x00, 0x00, 0x00));
++
+ 	return g_test_run();
+ }
 -- 
-1.8.5.3
+1.8.3.2
 
