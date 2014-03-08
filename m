@@ -2,281 +2,125 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 02/20] android/handsfree: Add stubs for all AT commands defines by spec
-Date: Sat,  8 Mar 2014 01:19:46 +0100
-Message-Id: <1394238004-15691-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 03/20] android/handsfree: Add support for unknown AT commands
+Date: Sat,  8 Mar 2014 01:19:47 +0100
+Message-Id: <1394238004-15691-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
 References: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Those commands are passed to Framework without parsing.
 ---
- android/handsfree.c | 223 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 221 insertions(+), 2 deletions(-)
+ android/handsfree.c | 64 ++++++++++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 54 insertions(+), 10 deletions(-)
 
 diff --git a/android/handsfree.c b/android/handsfree.c
-index 3fc4487..c49a35b 100644
+index c49a35b..e104c4a 100644
 --- a/android/handsfree.c
 +++ b/android/handsfree.c
-@@ -287,10 +287,190 @@ failed:
- 	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
+@@ -161,19 +161,35 @@ static void device_cleanup(void)
+ 	memset(&device, 0, sizeof(device));
  }
  
-+static void at_cmd_a(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_d(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_ccwa(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_chup(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_clcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_cmee(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_clip(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_vts(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_cnum(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_binp(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_bldn(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_bvra(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_nrec(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_bsir(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_btrh(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_bcc(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_bcs(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_ckpd(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
- static void register_post_slc_at(void)
+-static void at_command_handler(const char *command, void *user_data)
++static void disconnect_watch(void *user_data)
  {
- 	if (device.hsp) {
--		/* TODO CKPD */
-+		hfp_gw_register(device.gw, at_cmd_ckpd, "+CKPD", NULL, NULL);
- 		hfp_gw_register(device.gw, at_cmd_vgs_vgm, "+VGS",
- 				GUINT_TO_POINTER(HAL_HANDSFREE_VOLUME_TYPE_SPEAKER),
- 				NULL);
-@@ -300,14 +480,31 @@ static void register_post_slc_at(void)
- 		return;
- 	}
+-	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
++	DBG("");
  
--	hfp_gw_register(device.gw, at_cmd_bia, "+BIA", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_a, "A", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_d, "D", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_ccwa, "+CCWA", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_chup, "+CHUP", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_clcc, "+CLCC", NULL, NULL);
- 	hfp_gw_register(device.gw, at_cmd_cops, "+COPS", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_cmee, "+CMEE", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_clip, "+CLIP", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_vts, "+VTS", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_cnum, "+CNUM", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_bia, "+BIA", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_binp, "+BINP", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_bldn, "+BLDN", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_bvra, "+BVRA", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_nrec, "+NREC", NULL, NULL);
- 	hfp_gw_register(device.gw, at_cmd_vgs_vgm, "+VGS",
- 			GUINT_TO_POINTER(HAL_HANDSFREE_VOLUME_TYPE_SPEAKER),
- 			NULL);
- 	hfp_gw_register(device.gw, at_cmd_vgs_vgm, "+VGM",
- 			GUINT_TO_POINTER(HAL_HANDSFREE_VOLUME_TYPE_MIC),
- 			NULL);
-+	hfp_gw_register(device.gw, at_cmd_bsir, "+BSIR", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_btrh, "+BTRH", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_bcc, "+BCC", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_bcs, "+BCS", NULL, NULL);
+-	if (device.state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED)
+-		hfp_gw_disconnect(device.gw);
++	device_cleanup();
  }
  
- static void at_cmd_cmer(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-@@ -432,11 +629,33 @@ static void at_cmd_brsf(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
- 	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
- }
- 
-+static void at_cmd_chld(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
-+static void at_cmd_bac(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
-+							void *user_data)
-+{
-+	DBG("");
-+
-+	/* TODO */
-+
-+	hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-+}
-+
- static void register_slc_at(void)
+-static void disconnect_watch(void *user_data)
++static void at_cmd_unknown(const char *command, void *user_data)
  {
- 	hfp_gw_register(device.gw, at_cmd_brsf, "+BRSF", NULL, NULL);
- 	hfp_gw_register(device.gw, at_cmd_cind, "+CIND", NULL, NULL);
- 	hfp_gw_register(device.gw, at_cmd_cmer, "+CMER", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_chld, "+CHLD", NULL, NULL);
-+	hfp_gw_register(device.gw, at_cmd_bac, "+BAC", NULL, NULL);
+-	DBG("");
++	uint8_t buf[IPC_MTU];
++	struct hal_ev_handsfree_unknown_at *ev = (void *) buf;
+ 
+-	device_cleanup();
++	if (device.state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED) {
++		hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
++		hfp_gw_disconnect(device.gw);
++		return;
++	}
++
++	/* copy while string including terminating NULL */
++	ev->len = strlen(command) + 1;
++	memcpy(ev->buf, command, ev->len);
++
++	if (ev->len > IPC_MTU - sizeof(*ev)) {
++		hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
++		return;
++	}
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
++			HAL_EV_HANDSFREE_UNKNOWN_AT, sizeof(*ev) + ev->len, ev);
  }
  
- static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ static void at_cmd_vgs_vgm(struct hfp_gw_result *result,
+@@ -674,7 +690,7 @@ static void connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	g_io_channel_set_close_on_unref(chan, FALSE);
+ 
+ 	hfp_gw_set_close_on_unref(device.gw, true);
+-	hfp_gw_set_command_handler(device.gw, at_command_handler, NULL, NULL);
++	hfp_gw_set_command_handler(device.gw, at_cmd_unknown, NULL, NULL);
+ 	hfp_gw_set_disconnect_handler(device.gw, disconnect_watch, NULL, NULL);
+ 
+ 
+@@ -1147,19 +1163,47 @@ static void handle_cind(const void *buf, uint16_t len)
+ 
+ static void handle_formatted_at_resp(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_handsfree_formatted_at_response *cmd = buf;
++	char *at;
++
+ 	DBG("");
+ 
++	if (len != sizeof(*cmd) + cmd->len) {
++		error("Invalid formatted AT response command, terminating");
++		raise(SIGTERM);
++		return;
++	}
++
++	DBG("");
++
++	at = g_malloc0(cmd->len + 1);
++
++	memcpy(at, cmd->buf, cmd->len);
++
++	hfp_gw_send_info(device.gw, "%s", at);
++
++	g_free(at);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+ 					HAL_OP_HANDSFREE_FORMATTED_AT_RESPONSE,
+-					HAL_STATUS_FAILED);
++					HAL_STATUS_SUCCESS);
+ }
+ 
+ static void handle_at_resp(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_handsfree_at_response *cmd = buf;
++
+ 	DBG("");
+ 
++	/* TODO handle +CME ERROR when AT+CMEE support is added */
++
++	if (cmd->response == HAL_HANDSFREE_AT_RESPONSE_OK)
++		hfp_gw_send_result(device.gw, HFP_RESULT_OK);
++	else
++		hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
+-			HAL_OP_HANDSFREE_AT_RESPONSE, HAL_STATUS_FAILED);
++			HAL_OP_HANDSFREE_AT_RESPONSE, HAL_STATUS_SUCCESS);
+ }
+ 
+ static void handle_clcc_resp(const void *buf, uint16_t len)
 -- 
 1.8.5.3
 
