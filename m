@@ -2,67 +2,64 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 01/20] android/handsfree: Add AG and HF features masks
-Date: Sat,  8 Mar 2014 01:19:45 +0100
-Message-Id: <1394238004-15691-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
-References: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 00/20] More Android Handsfree work
+Date: Sat,  8 Mar 2014 01:19:44 +0100
+Message-Id: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/handsfree.c | 31 +++++++++++++++++++++++++++++--
- 1 file changed, 29 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index dc5c73d..3fc4487 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -49,7 +49,28 @@
- #define HSP_AG_CHANNEL 12
- #define HFP_AG_CHANNEL 13
- 
--#define HFP_AG_FEATURES 0
-+#define HFP_AG_FEAT_3WAY	0x00000001
-+#define HFP_AG_FEAT_ECNR	0x00000002
-+#define HFP_AG_FEAT_VR		0x00000004
-+#define HFP_AG_FEAT_INBAND	0x00000008
-+#define HFP_AG_FEAT_VTAG	0x00000010
-+#define HFP_AG_FEAT_REJ_CALL	0x00000020
-+#define HFP_AG_FEAT_ECS		0x00000040
-+#define HFP_AG_FEAT_ECC		0x00000080
-+#define HFP_AG_FEAT_EXT_ERR	0x00000100
-+#define HFP_AG_FEAT_CODEC	0x00000200
-+
-+#define HFP_HF_FEAT_ECNR	0x00000001
-+#define HFP_HF_FEAT_3WAY	0x00000002
-+#define HFP_HF_FEAT_CLI		0x00000004
-+#define HFP_HF_FEAT_VR		0x00000008
-+#define HFP_HF_FEAT_ECS		0x00000010
-+#define HFP_HF_FEAT_ECC		0x00000020
-+#define HFP_HF_FEAT_CODEC	0x00000040
-+
-+#define HFP_AG_FEATURES ( HFP_AG_FEAT_3WAY | HFP_AG_FEAT_ECNR |\
-+			HFP_AG_FEAT_VR | HFP_AG_FEAT_REJ_CALL |\
-+			HFP_AG_FEAT_ECS | HFP_AG_FEAT_EXT_ERR )
- 
- /* offsets in indicators table, should be incremented when sending CIEV */
- #define IND_SERVICE	0
-@@ -1150,7 +1171,13 @@ static sdp_record_t *hfp_ag_record(void)
- 	proto[1] = sdp_list_append(proto[1], channel);
- 	apseq = sdp_list_append(apseq, proto[1]);
- 
--	sdpfeat = HFP_AG_FEATURES;
-+	/* Codec Negotiation bit in SDP feature is different then in BRSF */
-+	sdpfeat = HFP_AG_FEATURES & 0x0000003F;
-+	if (HFP_AG_FEATURES & HFP_AG_FEAT_CODEC)
-+		sdpfeat |= 0x00000020;
-+	else
-+		sdpfeat &= ~0x00000020;
-+
- 	features = sdp_data_alloc(SDP_UINT16, &sdpfeat);
- 	sdp_attr_add(record, SDP_ATTR_SUPPORTED_FEATURES, features);
- 
+This patchset adds support for basic handsfree functionality.
+
+What is done:
+ - indicators (without callheld)
+ - placing, accepting, cancelling calls etc.
+ - vendor (unknown) AT command handling
+ - extended error codes
+ - DTMF codes
+ - query current calls
+ - voice recognition on/off
+ - disabling echo cancellation
+ - subscriber and operator identification
+
+Missing features:
+ - proper three way calling support (AT+CHLD is supported but callheld
+   and CCWA are missing).
+ - WBS and codec negotiation
+ - audio
+
+-- 
+BR
+Szymon Janc
+
+Szymon Janc (20):
+  android/handsfree: Add AG and HF features masks
+  android/handsfree: Add stubs for all AT commands defines by spec
+  android/handsfree: Add support for unknown AT commands
+  android/handsfree: Add support for voice recognition function
+  android/handsfree: Add support for AT+NREC command
+  android/handsfree: Add support for AT+CLCC command
+  android/handsfree: Add support for AT+CHLD command
+  android/handsfree: Add support for AT+CMEE command
+  android/handsfree: Add support for AT+CKPD command
+  android/handsfree: Add support fot AT+CNUM command
+  android/handsfree: Add support for AT+VTS command
+  android/handsfree: Add support for ATA command
+  android/handsfree: Fix checking AT+COPS parameters
+  android/handsfree: Add support for ATD command
+  android/handsfree: Add support for AT+BLDN command
+  android/handsfree: Add support for AT+CHUP command
+  android/hal-handsfree: Fix handling of dial notification
+  android/handsfree: Add support for phone state change command
+  android/handsfree: Add support for AT+CLIP command
+  android/handsfree: Add comment for AT+VGS/AT+VGM result code
+
+ android/hal-handsfree.c |   7 +-
+ android/hal-msg.h       |   5 +-
+ android/handsfree.c     | 889 ++++++++++++++++++++++++++++++++++++++++++++----
+ 3 files changed, 838 insertions(+), 63 deletions(-)
+
 -- 
 1.8.5.3
 
