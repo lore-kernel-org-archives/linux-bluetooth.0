@@ -1,148 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 03/20] android/handsfree: Add support for unknown AT commands
-Date: Sat, 08 Mar 2014 13:29:31 +0100
-Message-ID: <2194376.c82FdKPhVv@leonov>
-In-Reply-To: <E54E58F0-0743-4000-883C-981E0B692728@holtmann.org>
-References: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com> <1394238004-15691-4-git-send-email-szymon.janc@tieto.com> <E54E58F0-0743-4000-883C-981E0B692728@holtmann.org>
+Date: Fri, 7 Mar 2014 23:19:49 -0800 (PST)
+From: Terry Hardie <terryh@orcas.net>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer
+ Overflow"
+Message-ID: <alpine.DEB.2.02.1403072307490.21384@orcas.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: TEXT/PLAIN; format=flowed; charset=US-ASCII
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi guys,
 
-On Friday 07 of March 2014 19:37:00 Marcel Holtmann wrote:
-> Hi Szymon,
->=20
-> > Those commands are passed to Framework without parsing.
-> > ---
-> > android/handsfree.c | 64
-> > ++++++++++++++++++++++++++++++++++++++++++++--------- 1 file change=
-d, 54
-> > insertions(+), 10 deletions(-)
-> >=20
-> > diff --git a/android/handsfree.c b/android/handsfree.c
-> > index c49a35b..e104c4a 100644
-> > --- a/android/handsfree.c
-> > +++ b/android/handsfree.c
-> > @@ -161,19 +161,35 @@ static void device_cleanup(void)
-> >=20
-> > =09memset(&device, 0, sizeof(device));
-> >=20
-> > }
-> >=20
-> > -static void at_command_handler(const char *command, void *user_dat=
-a)
-> > +static void disconnect_watch(void *user_data)
-> > {
-> > -=09hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-> > +=09DBG("");
-> >=20
-> > -=09if (device.state !=3D HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED=
-)
-> > -=09=09hfp_gw_disconnect(device.gw);
-> > +=09device_cleanup();
-> > }
-> >=20
-> > -static void disconnect_watch(void *user_data)
-> > +static void at_cmd_unknown(const char *command, void *user_data)
-> > {
-> > -=09DBG("");
-> > +=09uint8_t buf[IPC_MTU];
-> > +=09struct hal_ev_handsfree_unknown_at *ev =3D (void *) buf;
-> >=20
-> > -=09device_cleanup();
-> > +=09if (device.state !=3D HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED=
-) {
-> > +=09=09hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-> > +=09=09hfp_gw_disconnect(device.gw);
-> > +=09=09return;
-> > +=09}
-> > +
-> > +=09/* copy while string including terminating NULL */
-> > +=09ev->len =3D strlen(command) + 1;
-> > +=09memcpy(ev->buf, command, ev->len);
-> > +
-> > +=09if (ev->len > IPC_MTU - sizeof(*ev)) {
-> > +=09=09hfp_gw_send_result(device.gw, HFP_RESULT_ERROR);
-> > +=09=09return;
-> > +=09}
-> > +
-> > +=09ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
-> > +=09=09=09HAL_EV_HANDSFREE_UNKNOWN_AT, sizeof(*ev) + ev->len, ev);
-> > }
-> >=20
-> > static void at_cmd_vgs_vgm(struct hfp_gw_result *result,
-> > @@ -674,7 +690,7 @@ static void connect_cb(GIOChannel *chan, GError=
- *err,
-> > gpointer user_data)>=20
-> > =09g_io_channel_set_close_on_unref(chan, FALSE);
-> > =09
-> > =09hfp_gw_set_close_on_unref(device.gw, true);
-> >=20
-> > -=09hfp_gw_set_command_handler(device.gw, at_command_handler, NULL,=
- NULL);
-> > +=09hfp_gw_set_command_handler(device.gw, at_cmd_unknown, NULL, NUL=
-L);
-> >=20
-> > =09hfp_gw_set_disconnect_handler(device.gw, disconnect_watch, NULL,=
-=20
-NULL);
-> >=20
-> > @@ -1147,19 +1163,47 @@ static void handle_cind(const void *buf, ui=
-nt16_t
-> > len)
-> >=20
-> > static void handle_formatted_at_resp(const void *buf, uint16_t len)=
+I'm having something similar to what Adam is reporting. I'm running on a 
+BeagleBone Black, which uses a TI MUSB controller (I think it's different 
+to the Raspberry Pi USB controller?).
 
-> > {
-> > +=09const struct hal_cmd_handsfree_formatted_at_response *cmd =3D b=
-uf;
-> > +=09char *at;
-> > +
-> >=20
-> > =09DBG("");
-> >=20
-> > +=09if (len !=3D sizeof(*cmd) + cmd->len) {
-> > +=09=09error("Invalid formatted AT response command, terminating");=
+I have 2 vendor's USB bluetooth receivers.
 
-> > +=09=09raise(SIGTERM);
-> > +=09=09return;
-> > +=09}
-> > +
-> > +=09DBG("");
-> > +
-> > +=09at =3D g_malloc0(cmd->len + 1);
-> > +
-> > +=09memcpy(at, cmd->buf, cmd->len);
-> > +
-> > +=09hfp_gw_send_info(device.gw, "%s", at);
-> > +
-> > +=09g_free(at);
-> > +
->=20
-> is Android really passing AT commands around without \0 terminating t=
-hem.
-> That OS is really just plain silly.
+One is a Cambridge Silicon Radio (0a12:0001) and the other is a Broadcom 
+BCM20702A1 (0a5c:21e8). The Broadcom needs a RAM patch to behave slightly 
+better, but it outside the scope of this problem. BOTH exhibit the same 
+problem (so I seriously doubt it's a problem with the Bluetooth receivers)
 
-This is due to how we currently send strings overs IPC. There is string=
- type=20
-in our IPC doc, but not in hal-msg.h. I'll fix that.
+Both devices are operating in HCI mode. I'm running Ubuntu on my 
+BeagleBone Black.
 
->=20
-> Anyway, using strndupa seems more appropriate here.
->=20
-> I also wonder why not just using (.., =E2=80=9C%.*s=E2=80=9D, cmd->le=
-n, cmd->buf) here.
+I've also built the latest version of Bluez (5.15)
 
-I'll use that.
+The problem is when running a lescan (hcitool lescan) with a LE device in 
+paring mode, which is transmitting a lot of LE Advertising report packets, 
+the HCI drivers eventually loses sync. I've traced it down to a duplicate 
+USB fragment.
 
-> Regards
->=20
-> Marcel
+I've tested these USB receivers under Ubuntu on an Intel machine with the 
+same Bluez 5.15, and the problem is not present.
 
---=20
-BR
-Szymon Janc
+hcidump shows when things go crazy:
+
+2014-03-08 06:32:12.111970 > HCI Event: LE Meta Event (0x3e) plen 33
+     LE Advertising Report
+       ADV_IND - Connectable undirected advertising (0)
+       bdaddr E1:F9:7C:05:30:3C (Random)
+       Flags: 0x05
+       Complete local name: 'Scosche PROX'
+       Unknown type 0x19 with 2 bytes data
+       RSSI: -62
+2014-03-08 06:32:12.163087 > HCI Event: Unknown (0x00) plen 2
+   C7 3E
+2014-03-08 06:32:12.163136 > HCI Event: Flow Specification Complete (0x21) 
+plen 2
+     status 0x01 handle 0x0000 flags 1 incoming
+     Error: Unknown HCI Command
+2014-03-08 06:32:12.192009 > HCI Event: Inquiry Complete (0x01) plen 60
+     status 0x30
+     Error: Parameter out of Mandatory Range
+     05 7C F9 E1 15 02 01 05 0D 09 53 63 6F 73 63 68 65 20 50 52
+     4F 58 03 19 00 02 C5 3E 21 02 01 00 01 3C 30 05 7C F9 E1 15
+     02 01 05 0D 09 53 63 6F 73 63 68 65 20 50 52 4F 58 03 19
+2014-03-08 06:32:12.218055 > HCI Event: Unknown (0x00) plen 2
+   C5 3E
+
+I added some code to btusb_intr_complete to print each urb as it comes up 
+from the USB stack. Here's the output for the above problem. Note the 
+extra "00 02 c7" -- Should not be there...
+
+Mar  8 06:32:12 arm kernel: [  122.915094] hci1 urb df4a8540 status 0 count 16 flags 768
+Mar  8 06:32:12 arm kernel: [  122.915176] hci1 urb contents:  3e 21 02 01 00 01 3c 30 05 7c f9 e1 15 02 01 05
+Mar  8 06:32:12 arm kernel: [  122.916004] hci1 urb df4a8540 status 0 count 16 flags 768
+Mar  8 06:32:12 arm kernel: [  122.916085] hci1 urb contents:  0d 09 53 63 6f 73 63 68 65 20 50 52 4f 58 03 19
+Mar  8 06:32:12 arm kernel: [  122.916985] hci1 urb df4a8540 status 0 count 3 flags 768
+Mar  8 06:32:12 arm kernel: [  122.917018] hci1 urb contents:  00 02 c2
+Mar  8 06:32:12 arm kernel: [  122.942995] hci1 urb df4a8540 status 0 count 3 flags 768
+Mar  8 06:32:12 arm kernel: [  122.943028] hci1 urb contents:  00 02 c7
+
+I used usbmon to do a "sniff" of the USB traffic. Here's a snippet of a 
+correct HCI LE Advertising report event, followed by one where the middle 
+fragment is repeated (frame 1300 is a repeat) This is a different capture 
+from the above example. I can provide the pcap somewhere if needed
+
+No.     Time                       Source                Destination           Protocol Length Info
+    1291 2014-03-07 02:40:16.942573 host                  3.1                   USB      64     URB_INTERRUPT in
+    1292 2014-03-07 02:40:16.959480 3.1                   host                  HCI_USB  80     Rcvd Fragment
+3e21020100013c30057cf9e115020105
+    1293 2014-03-07 02:40:16.959624 host                  3.1                   USB      64     URB_INTERRUPT in
+    1294 2014-03-07 02:40:16.960449 3.1                   host                  HCI_USB  80     Rcvd Fragment
+0d0953636f736368652050524f580319
+    1295 2014-03-07 02:40:16.960546 host                  3.1                   USB      64     URB_INTERRUPT in
+    1296 2014-03-07 02:40:16.961455 3.1                   host                  HCI_EVT  67     Rcvd LE Meta (LE Advertising Report)
+0002ae
+    1297 2014-03-07 02:40:16.961560 host                  3.1                   USB      64     URB_INTERRUPT in
+    1298 2014-03-07 02:40:16.981627 3.1                   host                  HCI_USB  80     Rcvd Fragment
+3e21020100013c30057cf9e115020105
+    1299 2014-03-07 02:40:16.981696 host                  3.1                   USB      64     URB_INTERRUPT in
+    1300 2014-03-07 02:40:17.002651 3.1                   host                  HCI_USB  80     Rcvd Fragment
+3e21020100013c30057cf9e115020105
+    1301 2014-03-07 02:40:17.002720 host                  3.1                   USB      64     URB_INTERRUPT in
+    1302 2014-03-07 02:40:17.003560 3.1                   host                  HCI_USB  80     Rcvd Fragment
+0d0953636f736368652050524f580319
+    1303 2014-03-07 02:40:17.003649 host                  3.1                   USB      64     URB_INTERRUPT in
+    1304 2014-03-07 02:40:17.004567 3.1                   host                  HCI_USB  67     Rcvd Fragment
+0002b5
+
+
