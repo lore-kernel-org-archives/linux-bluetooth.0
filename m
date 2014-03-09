@@ -1,73 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] android/avrcp: Fix not handling SetAbsoluteVolume response
-Date: Sun,  9 Mar 2014 13:24:45 +0200
-Message-Id: <1394364285-684-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1394364285-684-1-git-send-email-luiz.dentz@gmail.com>
-References: <1394364285-684-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] android/hal-avrcp: Fill attributes in case of empty for GetElementAttributes
+Date: Sun,  9 Mar 2014 13:24:44 +0200
+Message-Id: <1394364285-684-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This follow what is stated in AVRCP specification 1.5 page 83:
-
-" When the volume is changed on the TG by this command the Volume Change
-notification shall not be completed."
-
-Therefore the only option is to treat the response and self generate
-changed notification.
+This has to be done since the upper layer to not interpret empty list as
+get all attributes.
 ---
- android/avrcp.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ android/hal-avrcp.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/android/avrcp.c b/android/avrcp.c
-index e26ddf2..7dfb661 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -330,6 +330,31 @@ done:
- 			HAL_OP_AVRCP_REGISTER_NOTIFICATION, status);
+diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
+index 5f98f5b..0a5f500 100644
+--- a/android/hal-avrcp.c
++++ b/android/hal-avrcp.c
+@@ -134,11 +134,19 @@ static void handle_get_element_attrs(void *buf, uint16_t len)
+ 	if (!cbs->get_element_attr_cb)
+ 		return;
+ 
++	/* Set everything in case of empty list */
++	if (ev->number == 0) {
++		for (i = 0; i < BTRC_MAX_APP_SETTINGS; i++)
++			attrs[i] = i;
++		goto done;
++	}
++
+ 	/* Convert uint8_t array to btrc_media_attr_t array */
+ 	for (i = 0; i < ev->number; i++)
+ 		attrs[i] = ev->attrs[i];
+ 
+-	cbs->get_element_attr_cb(ev->number, attrs);
++done:
++	cbs->get_element_attr_cb(i, attrs);
  }
  
-+static gboolean set_volume_rsp(struct avctp *conn,
-+					uint8_t code, uint8_t subunit,
-+					uint8_t *operands, size_t operand_count,
-+					void *user_data)
-+{
-+	struct hal_ev_avrcp_volume_changed ev;
-+	uint8_t *params;
-+
-+	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
-+		return FALSE;
-+
-+	if (operands == NULL || operand_count < 7)
-+		return FALSE;
-+
-+	params = &operands[7];
-+
-+	ev.volume = params[0] & 0x7F;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
-+					HAL_EV_AVRCP_VOLUME_CHANGED,
-+					sizeof(ev), &ev);
-+
-+	return FALSE;
-+}
-+
- static void handle_set_volume(const void *buf, uint16_t len)
- {
- 	struct hal_cmd_avrcp_set_volume *cmd = (void *) buf;
-@@ -350,7 +375,8 @@ static void handle_set_volume(const void *buf, uint16_t len)
- 	 */
- 	dev = devices->data;
- 
--	ret = avrcp_set_volume(dev->session, cmd->value & 0x7f, NULL, NULL);
-+	ret = avrcp_set_volume(dev->session, cmd->value & 0x7f, set_volume_rsp,
-+									dev);
- 	if (ret < 0) {
- 		status = HAL_STATUS_FAILED;
- 		goto done;
+ static void handle_register_notification(void *buf, uint16_t len)
 -- 
 1.8.5.3
 
