@@ -1,58 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Distribute configured signature resolving key over SMP
-Date: Sat,  8 Mar 2014 23:06:04 -0800
-Message-Id: <1394348764-6722-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Add management command for setting signature resolving key
+Date: Sat,  8 Mar 2014 23:06:03 -0800
+Message-Id: <1394348764-6722-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the connection signature resolving key (CSRK) is requested over
-SMP and it has been configured from userspace, then distribute it.
+The connection signature resolving key (CSRK) can be used to allow
+signed write requests over the attribute protocol. This command
+provides userspace with the ability to configure such a key that
+can be distributed over SMP if requested.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/smp.c | 6 ++++--
- net/bluetooth/smp.h | 2 ++
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ include/net/bluetooth/mgmt.h     |  6 ++++++
+ net/bluetooth/mgmt.c             | 28 ++++++++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index f886bcae1b7e..a98a902eadf1 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -298,6 +298,9 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 		return;
- 	}
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dbb788e4f265..dd6e58062e34 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -187,6 +187,7 @@ struct hci_dev {
+ 	__u16		le_conn_min_interval;
+ 	__u16		le_conn_max_interval;
+ 	__u8		ssp_debug_mode;
++	__u8		csrk[16];
  
-+	if (memcmp(hdev->csrk, SMP_KEY_NONE, 16))
-+		local_dist |= SMP_DIST_SIGN;
+ 	__u16		devid_source;
+ 	__u16		devid_vendor;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 0326648fd799..d79f81c04cb3 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -409,6 +409,12 @@ struct mgmt_cp_load_irks {
+ } __packed;
+ #define MGMT_LOAD_IRKS_SIZE		2
+ 
++#define MGMT_OP_SET_CSRK		0x0031
++struct mgmt_cp_set_csrk {
++	__u8 val[16];
++} __packed;
++#define MGMT_SET_CSRK_SIZE		16
 +
- 	rsp->io_capability = conn->hcon->io_capability;
- 	rsp->oob_flag = SMP_OOB_NOT_PRESENT;
- 	rsp->max_key_size = SMP_MAX_ENC_KEY_SIZE;
-@@ -1275,8 +1278,7 @@ int smp_distribute_keys(struct l2cap_conn *conn)
- 	if (*keydist & SMP_DIST_SIGN) {
- 		struct smp_cmd_sign_info sign;
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f2397e7ad385..4ccb3baaa4a2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -83,6 +83,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_DEBUG_KEYS,
+ 	MGMT_OP_SET_PRIVACY,
+ 	MGMT_OP_LOAD_IRKS,
++	MGMT_OP_SET_CSRK,
+ };
  
--		/* Send a dummy key */
--		get_random_bytes(sign.csrk, sizeof(sign.csrk));
-+		memcpy(sign.csrk, hdev->csrk, sizeof(sign.csrk));
+ static const u16 mgmt_events[] = {
+@@ -4554,6 +4555,32 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
  
- 		smp_send_cmd(conn, SMP_CMD_SIGN_INFO, sizeof(sign), &sign);
- 
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index f55d83617218..522e11aa73e8 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -123,6 +123,8 @@ struct smp_cmd_security_req {
- 
- #define SMP_REENCRYPT_TIMEOUT	msecs_to_jiffies(250)
- 
-+#define SMP_KEY_NONE (&(u8[16]) {0, })
++static int set_csrk(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
++{
++	struct mgmt_cp_set_csrk *cp = data;
++	int err;
 +
- struct smp_chan {
- 	struct l2cap_conn *conn;
- 	u8		preq[7]; /* SMP Pairing Request */
++	BT_DBG("%s", hdev->name);
++
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_CSRK,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	if (hdev_is_powered(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_SET_CSRK,
++				  MGMT_STATUS_REJECTED);
++
++	hci_dev_lock(hdev);
++
++	memcpy(hdev->csrk, cp->val, 16);
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_SET_CSRK, 0, NULL, 0);
++
++	hci_dev_unlock(hdev);
++
++	return err;
++}
++
+ static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+@@ -4609,6 +4636,7 @@ static const struct mgmt_handler {
+ 	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
+ 	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
+ 	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
++	{ set_csrk,               false, MGMT_SET_CSRK_SIZE },
+ };
+ 
+ 
 -- 
 1.8.5.3
 
