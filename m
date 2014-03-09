@@ -1,62 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 9 Mar 2014 21:35:16 -0500
-From: Ranjan Maitra <maitra.mbox.ignored@inbox.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: DUNS for GPRS/EDGE-enabled 2G phone under BlueZ5.14
-Message-Id: <20140309213516.771f26f90438fdcdea7efa8a@inbox.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/3] android: Cancel all pending confirm name before stop discovery
+Date: Mon, 10 Mar 2014 00:06:36 +0100
+Message-ID: <1394406397-6843-3-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1394406397-6843-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1394406397-6843-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+If user wants to cancel discovery we should remove all the confirm name 
+requests from mgmt queues.
 
-I am new to this list and I am writing because I am in urgent need of
-some pointers/help. I connect through a GPRS/EDGE-enabled 2G phone
-using Bluetooth which worked seamlessly under Bluez4. However, I am
-unable to get it to work under Bluez-5.14 (on Fedora 20). I tried using
-bluetoothctl but I am unable to even pair the device.
+It is in order to make sure that stop discovery have a free way to
+reach kernel.
 
-Here is what I get:
+This improves scenario when there is a big inflow of device found events and
+mgmt queues become full of confirm name requests. In such case stop discovery 
+might stack in the queue.
+---
+ android/bluetooth.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-$ bluetoothctl 
-[NEW] Controller B4:B6:76:57:B1:46 alakananda.stat.iastate.edu-0
-[default] [NEW] Device FC:A1:3E:B8:26:D4 SGH-T249
-[bluetooth]# power on
-Changing power on succeeded
-[bluetooth]# devices
-Device FC:A1:3E:B8:26:D4 SGH-T249
-[bluetooth]# pair FC:A1:3E:B8:26:D4 
-Attempting to pair with FC:A1:3E:B8:26:D4
-[CHG] Device FC:A1:3E:B8:26:D4 Paired: yes
-Pairing successful
-[CHG] Device FC:A1:3E:B8:26:D4 Connected: yes
-[CHG] Device FC:A1:3E:B8:26:D4 Paired: no
-[CHG] Device FC:A1:3E:B8:26:D4 Connected: no
-....
-
-I do not know how to get this to work. Is DUNS no longer there under
-Bluez5? Or am I missing some library?
-
-I am sorry if this is a simple question but it would be really nice to
-get some pointers. I am not afraid of reading manuals and going
-through the commandline.
-
-Please keep replies to the list.
-
-Many thanks for any help!
-
-Best wishes,
-Ranjan 
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 60ca17d..9286c67 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2467,6 +2467,14 @@ static bool start_discovery(void)
+ 	return false;
+ }
+ 
++static void cancel_pending_confirm_name(gpointer data, gpointer user_data)
++{
++	struct device *dev = data;
++
++	mgmt_cancel(mgmt_if, dev->confirm_id);
++	dev->confirm_id = 0;
++}
++
+ static bool stop_discovery(void)
+ {
+ 	struct mgmt_cp_stop_discovery cp;
+@@ -2481,6 +2489,9 @@ static bool stop_discovery(void)
+ 
+ 	DBG("type=0x%x", cp.type);
+ 
++	/* Lets drop all confirm name request as we don't need it anymore */
++	g_slist_foreach(cached_devices, cancel_pending_confirm_name, NULL);
++
+ 	if (mgmt_send(mgmt_if, MGMT_OP_STOP_DISCOVERY, adapter.index,
+ 					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
+ 		return true;
 -- 
-Important Notice: This mailbox is ignored: e-mails are set to be
-deleted on receipt. Please respond to the mailing list if appropriate.
-For those needing to send personal or professional e-mail, please use
-appropriate addresses.
-
-____________________________________________________________
-Send any screenshot to your friends in seconds...
-Works in all emails, instant messengers, blogs, forums and social networks.
-TRY IM TOOLPACK at http://www.imtoolpack.com/default.aspx?rc=if2 for FREE
-
+1.8.4
 
