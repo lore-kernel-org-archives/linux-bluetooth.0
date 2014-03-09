@@ -1,45 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] android/hal-avrcp: Fill attributes in case of empty for GetElementAttributes
-Date: Sun,  9 Mar 2014 13:24:44 +0200
-Message-Id: <1394364285-684-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: Export signature resolving key in debugfs
+Date: Sat,  8 Mar 2014 23:32:16 -0800
+Message-Id: <1394350336-10602-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Include the current connection signature resolving key (CSRK) as part
+of the identity debugfs information.
 
-This has to be done since the upper layer to not interpret empty list as
-get all attributes.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- android/hal-avrcp.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
-index 5f98f5b..0a5f500 100644
---- a/android/hal-avrcp.c
-+++ b/android/hal-avrcp.c
-@@ -134,11 +134,19 @@ static void handle_get_element_attrs(void *buf, uint16_t len)
- 	if (!cbs->get_element_attr_cb)
- 		return;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8bbfdea9cbec..1b2935c61b49 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -589,8 +589,8 @@ static int identity_show(struct seq_file *f, void *p)
  
-+	/* Set everything in case of empty list */
-+	if (ev->number == 0) {
-+		for (i = 0; i < BTRC_MAX_APP_SETTINGS; i++)
-+			attrs[i] = i;
-+		goto done;
-+	}
-+
- 	/* Convert uint8_t array to btrc_media_attr_t array */
- 	for (i = 0; i < ev->number; i++)
- 		attrs[i] = ev->attrs[i];
+ 	hci_copy_identity_address(hdev, &addr, &addr_type);
  
--	cbs->get_element_attr_cb(ev->number, attrs);
-+done:
-+	cbs->get_element_attr_cb(i, attrs);
- }
+-	seq_printf(f, "%pMR (type %u) %*phN %pMR\n", &addr, addr_type,
+-		   16, hdev->irk, &hdev->rpa);
++	seq_printf(f, "%pMR (type %u) %*phN %pMR %*phN\n", &addr, addr_type,
++		   16, hdev->irk, &hdev->rpa, 16, hdev->csrk);
  
- static void handle_register_notification(void *buf, uint16_t len)
+ 	hci_dev_unlock(hdev);
+ 
 -- 
 1.8.5.3
 
