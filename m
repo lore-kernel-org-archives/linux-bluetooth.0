@@ -2,42 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 07/10] tools/mgmt-tester: Fix for Stop discovery test
-Date: Mon, 10 Mar 2014 00:06:00 +0100
-Message-ID: <1394406363-6751-8-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1394406363-6751-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1394406363-6751-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 00/10] Change inquiry handling in btdev
+Date: Mon, 10 Mar 2014 00:05:53 +0100
+Message-ID: <1394406363-6751-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test "Stop Discovery - BR/EDR (Inquiry) Success 1" uses hciemu_type
-BREDR but uses power settings to enable LE and tries to set LE:
+This patch set introduce new way of handling inquiry in btdev.
 
-  mgmt: [0x0002] command 0x000d
-  mgmt: < 0d 00 02 00 01 00 01                             .......
-  mgmt: > 02 00 02 00 03 00 0d 00 0c                       .........
-  mgmt: [0x0002] command 0x0d status: 0x0c
+v2:
+* Changes in handling inquiry lenght
+* Changes in handling inquiry cancel
+* Updates in mgmt-tester
 
-This patch fixes this minor issue
----
- tools/mgmt-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Lukasz Rymanowski (10):
+  emulator: Minor style fix
+  emulator: Use timeout for sending inquiry results
+  emulator: Add inquiry cancel
+  emulator: Add handling inquiry number of responses
+  emulator: Add handling inquiry_lenght from inquiry command
+  android/tester: Fix handling inquiry by android tester
+  tools/mgmt-tester: Fix for Stop discovery test
+  tools/mgmt-tester: Update Stop Discovery-BR/EDR (Inquiry) Success 1
+  tools/mgmt-tester: Remove not used condition
+  tools/mgmt-tester: Refactor setup_start_discovery function
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index a3c1c72..9f71743 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1733,7 +1733,7 @@ static const struct generic_data stop_discovery_success_test_1 = {
- };
- 
- static const struct generic_data stop_discovery_bredr_success_test_1 = {
--	.setup_settings = settings_powered_le,
-+	.setup_settings = settings_powered,
- 	.setup_expect_hci_command = BT_HCI_CMD_INQUIRY,
- 	.setup_expect_hci_param = stop_discovery_inq_param,
- 	.setup_expect_hci_len = sizeof(stop_discovery_inq_param),
+ Makefile.tools           |  19 ++++--
+ android/Makefile.am      |   2 +
+ android/android-tester.c |  24 ++-----
+ emulator/btdev.c         | 166 +++++++++++++++++++++++++++++++++++++++++++----
+ tools/mgmt-tester.c      |  70 +++++---------------
+ 5 files changed, 194 insertions(+), 87 deletions(-)
+
 -- 
 1.8.4
 
