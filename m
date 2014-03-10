@@ -1,48 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 03/10] unit/avrcp: Add /TP/MDI/BV-03-C test
-Date: Mon, 10 Mar 2014 11:09:46 +0200
-Message-Id: <1394442593-4233-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394442593-4233-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1394442593-4233-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 9/9] doc: Update test coverage document
+Date: Mon, 10 Mar 2014 10:04:41 +0100
+Message-ID: <1412811.97BP5KGGEG@uw000953>
+In-Reply-To: <1393851227-23483-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1393851227-23483-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1393851227-23483-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Test verifies that Get element attributes issued correctly.
----
- unit/test-avrcp.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+On Monday 03 of March 2014 14:53:47 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Update AVRCP test numbers.
+> ---
+>  doc/test-coverage.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+> index 7965f8e..89d884f 100644
+> --- a/doc/test-coverage.txt
+> +++ b/doc/test-coverage.txt
+> @@ -18,7 +18,7 @@ test-ringbuf		   3	Ring buffer functionality
+>  test-queue		   1	Queue handling functionality
+>  test-avdtp		  60	AVDTP qualification test cases
+>  test-avctp		   9	AVCTP qualification test cases
+> -test-avrcp		   7	AVRCP qualification test cases
+> +test-avrcp		  23	AVRCP qualification test cases
+>  test-gobex		  31	Generic OBEX functionality
+>  test-gobex-packet	   9	OBEX packet handling
+>  test-gobex-header	  28	OBEX header handling
+> 
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 4f81954..9b334e6 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -553,6 +553,9 @@ static void test_client(gconstpointer data)
- 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-01-C"))
- 		avrcp_get_play_status(context->session, NULL, NULL);
- 
-+	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
-+		avrcp_get_element_attributes(context->session, NULL, NULL);
-+
- 	execute_context(context);
- }
- 
-@@ -812,6 +815,12 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x09, 0xaa, 0xaa, 0xaa,
- 				0xaa, 0xbb, 0xbb, 0xbb, 0xbb, 0x00));
- 
-+	/* Get element attributes - CT */
-+	define_test("/TP/MDI/BV-03-C", test_client,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
-+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00));
- 
- 	return g_test_run();
- }
+Total tests count should be updated as well.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
