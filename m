@@ -2,102 +2,96 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 6/7] shared/hfp: Don't update offset if string parsing failed
-Date: Tue, 11 Mar 2014 00:10:33 +0100
-Message-Id: <1394493034-2417-6-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 3/7] unit/test-hfp: Add initial tests for getting quoted string
+Date: Tue, 11 Mar 2014 00:10:30 +0100
+Message-Id: <1394493034-2417-3-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1394493034-2417-1-git-send-email-szymon.janc@gmail.com>
 References: <1394493034-2417-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- src/shared/hfp.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ unit/test-hfp.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-diff --git a/src/shared/hfp.c b/src/shared/hfp.c
-index 3256931..36c8c3e 100644
---- a/src/shared/hfp.c
-+++ b/src/shared/hfp.c
-@@ -299,20 +299,22 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
+diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+index 7837fc3..445fcb7 100644
+--- a/unit/test-hfp.c
++++ b/unit/test-hfp.c
+@@ -349,6 +349,54 @@ static void check_ustring_2(struct hfp_gw_result *result,
+ 	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
+ }
+ 
++static void check_string_1(struct hfp_gw_result *result,
++				enum hfp_gw_cmd_type type, void *user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	unsigned int i = 4, j = 0;
++	char str[10];
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	g_assert(type == pdu->type);
++
++	g_assert(hfp_gw_result_get_string(result, str, sizeof(str)));
++
++	while (context->data->pdu_list[1].data[i] != '\"') {
++		g_assert(j < sizeof(str));
++		g_assert(str[j] == context->data->pdu_list[1].data[i]);
++
++		i++;
++		j++;
++	}
++
++	g_assert(context->data->pdu_list[1].data[i] == '\"');
++	g_assert(str[j] == '\0');
++
++	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
++}
++
++static void check_string_2(struct hfp_gw_result *result,
++				enum hfp_gw_cmd_type type, void *user_data)
++{
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	char str[10];
++
++	memset(str, 'X', sizeof(str));
++
++	pdu = &context->data->pdu_list[context->pdu_offset++];
++
++	g_assert(type == pdu->type);
++
++	g_assert(!hfp_gw_result_get_string(result, str, 3));
++
++	g_assert(str[3] == 'X');
++
++	hfp_gw_send_result(context->hfp, HFP_RESULT_ERROR);
++}
++
+ int main(int argc, char *argv[])
  {
- 	int i = 0;
- 	const char *data = result->data;
-+	unsigned int offset;
+ 	g_test_init(&argc, &argv, NULL);
+@@ -402,6 +450,18 @@ int main(int argc, char *argv[])
+ 			raw_pdu('A', 'T', 'D', '0', '1', '2', '3', '\r'),
+ 			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
+ 			data_end());
++	define_test("/hfp/test_string_1", test_register, check_string_1,
++			raw_pdu('D', '\0'),
++			raw_pdu('A', 'T', 'D', '\"', '0', '1', '2', '3', '\"',
++									'\r'),
++			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
++			data_end());
++	define_test("/hfp/test_string_2", test_register, check_string_2,
++			raw_pdu('D', '\0'),
++			raw_pdu('A', 'T', 'D', '\"', '0', '1', '2', '3', '\"',
++									'\r'),
++			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
++			data_end());
  
- 	skip_whitespace(result);
- 
- 	if (data[result->offset] != '"')
- 		return false;
- 
--	result->offset++;
-+	offset = result->offset;
-+	offset++;
- 
--	while (data[result->offset] != '\0' && data[result->offset] != '"') {
-+	while (data[offset] != '\0' && data[offset] != '"') {
- 		if (i == len)
- 			return false;
- 
--		buf[i++] = data[result->offset];
--		result->offset++;
-+		buf[i++] = data[offset];
-+		offset++;
- 	}
- 
- 	if (i == len)
-@@ -320,11 +322,13 @@ bool hfp_gw_result_get_string(struct hfp_gw_result *result, char *buf,
- 
- 	buf[i] = '\0';
- 
--	if (data[result->offset] == '"')
--		result->offset++;
-+	if (data[offset] == '"')
-+		offset++;
- 	else
- 		return false;
- 
-+	result->offset = offset;
-+
- 	skip_whitespace(result);
- 	next_field(result);
- 
-@@ -335,6 +339,7 @@ bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
- 								uint8_t len)
- {
- 	const char *data = result->data;
-+	unsigned int offset;
- 	int i = 0;
- 	char c;
- 
-@@ -344,13 +349,15 @@ bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
- 	if (c == '"' || c == ')' || c == '(')
- 		return false;
- 
--	while (data[result->offset] != '\0' && data[result->offset] != ','
--					&& data[result->offset] != ')') {
-+	offset = result->offset;
-+
-+	while (data[offset] != '\0' && data[offset] != ',' &&
-+							data[offset] != ')') {
- 		if (i == len)
- 			return false;
- 
--		buf[i++] = data[result->offset];
--		result->offset++;
-+		buf[i++] = data[offset];
-+		offset++;
- 	}
- 
- 	if (i == len)
-@@ -358,6 +365,8 @@ bool hfp_gw_result_get_unquoted_string(struct hfp_gw_result *result, char *buf,
- 
- 	buf[i] = '\0';
- 
-+	result->offset = offset;
-+
- 	next_field(result);
- 
- 	return true;
+ 	return g_test_run();
+ }
 -- 
 1.9.0
 
