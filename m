@@ -1,248 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/5] android/handsfree: Add support for handling incoming SCO connections
-Date: Mon, 10 Mar 2014 12:48:02 +0100
-Message-ID: <1503694.zR9slxaStU@uw000953>
-In-Reply-To: <1394223800-11961-2-git-send-email-marcin.kraglak@tieto.com>
-References: <1394223800-11961-1-git-send-email-marcin.kraglak@tieto.com> <1394223800-11961-2-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 2/2] android/gatt: Handle Unregister gatt client command
+Date: Mon, 10 Mar 2014 12:19:04 +0100
+Message-Id: <1394450344-32472-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1394450344-32472-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1394450344-32472-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+This adds unregister gatt client app command handling.
+---
+ android/gatt.c | 29 ++++++++++++++++++++++++++++-
+ 1 file changed, 28 insertions(+), 1 deletion(-)
 
-On Friday 07 of March 2014 21:23:17 Marcin Kraglak wrote:
-> This adds support for accepting SCO connections from remote devices.
-> ---
->  android/handsfree.c | 148 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 148 insertions(+)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index fa27f10..40f3652 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -83,11 +83,14 @@ static const struct indicator inds_defaults[] = {
->  static struct {
->  	bdaddr_t bdaddr;
->  	uint8_t state;
-> +	uint8_t audio_state;
->  	uint32_t features;
->  	bool indicators_enabled;
->  	struct indicator inds[IND_COUNT];
->  	bool hsp;
->  	struct hfp_gw *gw;
-> +	GIOChannel *sco;
-> +	guint sco_watch;
->  } device;
->  
->  static bdaddr_t adapter_addr;
-> @@ -99,6 +102,8 @@ static GIOChannel *hfp_server = NULL;
->  static uint32_t hsp_record_id = 0;
->  static GIOChannel *hsp_server = NULL;
->  
-> +static GIOChannel *sco_server = NULL;
-> +
->  static void device_set_state(uint8_t state)
->  {
->  	struct hal_ev_handsfree_conn_state ev;
-> @@ -119,6 +124,26 @@ static void device_set_state(uint8_t state)
->  				HAL_EV_HANDSFREE_CONN_STATE, sizeof(ev), &ev);
->  }
->  
-> +static void device_set_audio_state(uint8_t state)
-> +{
-> +	struct hal_ev_handsfree_audio_state ev;
-> +	char address[18];
-> +
-> +	if (device.audio_state == state)
-> +		return;
-> +
-> +	device.audio_state = state;
-> +
-> +	ba2str(&device.bdaddr, address);
-> +	DBG("device %s audio state %u", address, state);
-> +
-> +	bdaddr2android(&device.bdaddr, ev.bdaddr);
-> +	ev.state = state;
-> +
-> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HANDSFREE,
-> +				HAL_EV_HANDSFREE_AUDIO_STATE, sizeof(ev), &ev);
-> +}
-> +
->  static void device_init(const bdaddr_t *bdaddr)
->  {
->  	bacpy(&device.bdaddr, bdaddr);
-> @@ -137,6 +162,19 @@ static void device_cleanup(void)
->  
->  	device_set_state(HAL_EV_HANDSFREE_CONN_STATE_DISCONNECTED);
->  
-> +	if (device.sco_watch) {
-> +		g_source_remove(device.sco_watch);
-> +		device.sco_watch = 0;
-> +	}
-> +
-> +	if (device.sco) {
-> +		g_io_channel_shutdown(device.sco, TRUE, NULL);
-> +		g_io_channel_unref(device.sco);
-> +		device.sco = NULL;
-> +	}
-> +
-> +	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-> +
->  	memset(&device, 0, sizeof(device));
->  }
->  
-> @@ -739,6 +777,42 @@ failed:
->  					HAL_OP_HANDSFREE_DISCONNECT, status);
->  }
->  
-> +static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
-> +							gpointer user_data)
-> +{
-> +	g_source_remove(device.sco_watch);
-> +	device.sco_watch = 0;
-> +
-> +	g_io_channel_shutdown(device.sco, TRUE, NULL);
-> +	g_io_channel_unref(device.sco);
-> +	device.sco = NULL;
-> +
-> +	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-> +
-> +	return FALSE;
-> +}
-> +
-> +static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
-> +{
-> +	if (err) {
-> +		uint8_t status;
-> +
-> +		error("SCO: connect failed (%s)", err->message);
-> +		status = HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED;
-> +		device_set_audio_state(status);
-> +
-> +		return;
-> +	}
-> +
-> +	g_io_channel_set_close_on_unref(chan, TRUE);
-> +
-> +	device.sco = g_io_channel_ref(chan);
-> +	device.sco_watch = g_io_add_watch(chan, G_IO_ERR | G_IO_HUP | G_IO_NVAL,
-> +							sco_watch_cb, NULL);
-> +
-> +	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
-> +}
-> +
->  static void handle_connect_audio(const void *buf, uint16_t len)
->  {
->  	DBG("");
-> @@ -1044,6 +1118,46 @@ static sdp_record_t *headset_ag_record(void)
->  	return record;
->  }
->  
-> +static void confirm_sco_cb(GIOChannel *chan, gpointer user_data)
-> +{
-> +	char address[18];
-> +	bdaddr_t bdaddr;
-> +	GError *err = NULL;
-> +
-> +	if (device.sco)
-> +		goto drop;
-> +
-> +	bt_io_get(chan, &err,
-> +			BT_IO_OPT_DEST, address,
-> +			BT_IO_OPT_DEST_BDADDR, &bdaddr,
-> +			BT_IO_OPT_INVALID);
-> +	if (err) {
-> +		error("SCO: confirm failed (%s)", err->message);
-> +		g_error_free(err);
-> +		goto drop;
-> +	}
-> +
-> +	DBG("incoming SCO connection from %s", address);
-> +
-> +	if (device.state != HAL_EV_HANDSFREE_CONN_STATE_SLC_CONNECTED ||
-> +			bacmp(&device.bdaddr, &bdaddr)) {
-> +		error("SCO: connection from %s rejected", address);
-> +		goto drop;
-> +	}
-> +
-> +	if (!bt_io_accept(chan, connect_sco_cb, NULL, NULL, NULL)) {
-> +		error("SCO: failed to accept connection");
-> +		goto drop;
-> +	}
-> +
-> +	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTING);
-> +
-> +	return;
-> +
-> +drop:
-> +	g_io_channel_shutdown(chan, TRUE, NULL);
-> +}
-> +
->  static bool enable_hsp_ag(void)
->  {
->  	sdp_record_t *rec;
-> @@ -1233,6 +1347,33 @@ static void cleanup_hfp_ag(void)
->  	}
->  }
->  
-> +static bool enable_sco_server(void)
-> +{
-> +	GError *err = NULL;
-> +
-> +	sco_server = bt_io_listen(NULL, confirm_sco_cb, NULL, NULL, &err,
-> +				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-> +				BT_IO_OPT_INVALID);
-> +	if (!sco_server) {
-> +		error("Failed to listen on SCO: %s", err->message);
-> +		g_error_free(err);
-> +		cleanup_hsp_ag();
-> +		cleanup_hfp_ag();
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static void disable_sco_server(void)
-> +{
-> +	if (sco_server) {
-> +		g_io_channel_shutdown(sco_server, TRUE, NULL);
-> +		g_io_channel_unref(sco_server);
-> +		sco_server = NULL;
-> +	}
-> +}
-> +
->  bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
->  {
->  	DBG("mode 0x%x", mode);
-> @@ -1247,6 +1388,12 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
->  		return false;
->  	}
->  
-> +	if (!enable_sco_server()) {
-> +		cleanup_hsp_ag();
-> +		cleanup_hfp_ag();
-> +		return false;
-> +	}
-> +
->  	hal_ipc = ipc;
->  	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
->  						G_N_ELEMENTS(cmd_handlers));
-> @@ -1263,4 +1410,5 @@ void bt_handsfree_unregister(void)
->  
->  	cleanup_hfp_ag();
->  	cleanup_hsp_ag();
-> +	disable_sco_server();
->  }
-> 
-
-Patches 2, 3 and 4 are now also upstream (with minor fixed we discussed
-offline), thanks.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 084ba7f..9ea82fb 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -54,6 +54,14 @@ static int find_client_uuid(gconstpointer data, gconstpointer user_data)
+ 	return memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
+ }
+ 
++static int find_client_if(gconstpointer data, gconstpointer user_data)
++{
++	int32_t exp_cif = GPOINTER_TO_INT(user_data);
++	const struct gatt_clients *client = data;
++
++	return client->client_if != exp_cif;
++}
++
+ static void handle_client_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_register *cmd = buf;
+@@ -100,10 +108,29 @@ failed:
+ 
+ static void handle_client_unregister(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_unregister *cmd = buf;
++	GSList *found_client_if;
++	uint8_t status;
++
+ 	DBG("");
+ 
++	found_client_if = g_slist_find_custom(gatt_clients_list,
++						GINT_TO_POINTER(cmd->client_if),
++						find_client_if);
++	if (!found_client_if) {
++		error("gatt: client_if=%d not found", cmd->client_if);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	gatt_clients_list = g_slist_remove(gatt_clients_list,
++							found_client_if->data);
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_CLIENT_UNREGISTER, HAL_STATUS_FAILED);
++					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+ }
+ 
+ static void handle_client_scan(const void *buf, uint16_t len)
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.2
+
