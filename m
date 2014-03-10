@@ -1,67 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 3/3] android/avrcp: Fix setting wrong type for volume changed event
+Date: Mon, 10 Mar 2014 14:05:16 +0200
+Message-Id: <1394453116-9354-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1394453116-9354-1-git-send-email-luiz.dentz@gmail.com>
 References: <1394453116-9354-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 10 Mar 2014 14:12:58 +0200
-Message-ID: <CABBYNZLqVah5iA39dijLc_Mzzabz9vu5Ed5dWsvVEC+LQOHncQ@mail.gmail.com>
-Subject: Re: [PATCH v4 1/3] android/avrcp: Fill attributes in case of empty
- for GetElementAttributes
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Mar 10, 2014 at 2:05 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->
-> This has to be done since Android do not interpret empty list as get all
-> attributes as it should.
-> ---
-> v2: Move empty list handling to daemon side and fix starting with attribute
-> 0x00 which is illegal.
-> v3: Fix not handling response code properly in set_volume_rsp
-> v4: Add fix to pass correct type to volume changed notification
->
->  android/avrcp.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->
-> diff --git a/android/avrcp.c b/android/avrcp.c
-> index e26ddf2..70266f7 100644
-> --- a/android/avrcp.c
-> +++ b/android/avrcp.c
-> @@ -655,11 +655,23 @@ static ssize_t handle_get_element_attrs_cmd(struct avrcp *session,
->                 return -EINVAL;
->
->         params += 9;
-> +
-> +       /* Set everything in case of empty list */
-> +       if (ev->number == 0) {
-> +               for (i = 0; i < HAL_AVRCP_MEDIA_ATTR_DURATION; i++) {
-> +                       /* Skip 0x00 as the attributes start with 0x01 */
-> +                       ev->attrs[i] = i + 1;
-> +               }
-> +               ev->number = i;
-> +               goto done;
-> +       }
-> +
->         for (i = 0; i < ev->number; i++) {
->                 ev->attrs[i] = bt_get_be32(params);
->                 params += 4;
->         }
->
-> +done:
->         ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
->                                         HAL_EV_AVRCP_GET_ELEMENT_ATTRS,
->                                         sizeof(*ev) + ev->number, ev);
-> --
-> 1.8.5.3
+Notification for volume changed should carry the original ctype and
+not translate to HAL_AVRCP_EVENT_TYPE_INTERIM or
+HAL_AVRCP_EVENT_TYPE_CHANGED which are only valid for register
+notification command.
+---
+ android/avrcp.c | 12 +-----------
+ 1 file changed, 1 insertion(+), 11 deletions(-)
 
-Pushed.
-
-
+diff --git a/android/avrcp.c b/android/avrcp.c
+index eab519a..f0a6d59 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -788,17 +788,7 @@ static gboolean register_notification_rsp(struct avctp *conn,
+ 	if (params == NULL || params[0] != AVRCP_EVENT_VOLUME_CHANGED)
+ 		return FALSE;
+ 
+-	switch (code) {
+-	case AVC_CTYPE_INTERIM:
+-		ev.type = HAL_AVRCP_EVENT_TYPE_INTERIM;
+-		break;
+-	case AVC_CTYPE_CHANGED:
+-		ev.type = HAL_AVRCP_EVENT_TYPE_CHANGED;
+-		break;
+-	default:
+-		return FALSE;
+-	}
+-
++	ev.type = code;
+ 	ev.volume = params[1] & 0x7F;
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
