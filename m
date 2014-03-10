@@ -2,81 +2,88 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 07/16] gatt: Add helper for reading characteristics
-Date: Mon, 10 Mar 2014 15:50:36 -0300
-Message-Id: <1394477445-8987-8-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 06/16] gatt: Assign read callback for external services
+Date: Mon, 10 Mar 2014 15:50:35 -0300
+Message-Id: <1394477445-8987-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the btd_gatt_read_attribute() helper. It reads the
-attribute value based on its read callback function. The callback can
-the an abstraction for reading an external object proxy or a remote
-attribute, acting as a helper function for server and client
-implementations.
+This patch adds the callback for reading the external characteristic
+Value. Internally, GDBusProxy implementation tracks all properties Value
+changes consequently Value can be ready directly from the proxy without
+additional method calls.
 ---
- src/gatt.c | 22 ++++++++++++++++++++++
- src/gatt.h |  9 +++++++++
- 2 files changed, 31 insertions(+)
+ src/gatt-dbus.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/src/gatt.c b/src/gatt.c
-index 059e085..0137123 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -25,6 +25,7 @@
- #include <config.h>
- #endif
- 
-+#include <errno.h>
- #include <glib.h>
- 
- #include "log.h"
-@@ -194,6 +195,27 @@ fail:
- 	return NULL;
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index a904a97..28604ea 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -139,6 +139,46 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 	eapp->proxies = g_slist_remove(eapp->proxies, proxy);
  }
  
-+void btd_gatt_read_attribute(struct btd_attribute *attr,
-+					btd_attr_read_result_t result,
-+					void *user_data)
++static void proxy_read_cb(struct btd_attribute *attr,
++				btd_attr_read_result_t result, void *user_data)
 +{
++	DBusMessageIter iter, array;
++	GDBusProxy *proxy;
++	uint8_t *value;
++	int len;
++
 +	/*
-+	 * When read_cb is available, it means that the attribute value
-+	 * is dynamic, and its value must be read from the external
-+	 * implementation. If "value_len" is set, the attribute value is
-+	 * constant. Additional checking are performed by the attribute server
-+	 * when the ATT Read request arrives based on the characteristic
-+	 * properties. At this point, properties bitmask doesn't need to be
-+	 * checked.
++	 * Remote device is trying to read the informed attribute,
++	 * "Value" should be read from the proxy. GDBusProxy tracks
++	 * properties changes automatically, it is not necessary to
++	 * get the value directly from the GATT server.
 +	 */
-+	if (attr->read_cb)
-+		attr->read_cb(attr, result, user_data);
-+	else if (attr->value_len > 0)
-+		result(0, attr->value, attr->value_len, user_data);
-+	else
++	proxy = g_hash_table_lookup(proxy_hash, attr);
++	if (proxy == NULL) {
++		result(ENOENT, NULL, 0, user_data);
++		return;
++	}
++
++	if (!g_dbus_proxy_get_property(proxy, "Value", &iter)) {
++		/* Unusual situation, read property will checked earlier */
 +		result(EPERM, NULL, 0, user_data);
++		return;
++	}
++
++	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
++		DBG("External service inconsistent!");
++		result(EPERM, NULL, 0, user_data);
++		return;
++	}
++
++	dbus_message_iter_recurse(&iter, &array);
++	dbus_message_iter_get_fixed_array(&array, &value, &len);
++
++	DBG("attribute: %p read %d bytes", attr, len);
++
++	result(0, value, len, user_data);
 +}
 +
- void gatt_init(void)
+ static int register_external_service(const struct external_app *eapp,
+ 							GDBusProxy *proxy)
  {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 0021076..4363769 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -62,3 +62,12 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
-  */
- struct btd_attribute *btd_gatt_add_char(bt_uuid_t *uuid, uint8_t properties,
- 						btd_attr_read_t read_cb);
-+
-+/* btd_gatt_read_attribute - Read the value of an attribute.
-+ * @attr:	Attribute to be read.
-+ * @result:	Callback function to be called with the result.
-+ * @user_data:	Data to be passed to the result callback function.
-+ */
-+void btd_gatt_read_attribute(struct btd_attribute *attr,
-+					btd_attr_read_result_t result,
-+					void *user_data);
+@@ -192,8 +232,12 @@ static int register_external_characteristics(GSList *proxies)
+ 		if (bt_string_to_uuid(&uuid, str) < 0)
+ 			return -EINVAL;
+ 
+-		/* TODO: Missing Flags/property */
+-		attr = btd_gatt_add_char(&uuid, 0x00, NULL);
++		/*
++		 * TODO: Missing Flags/property
++		 * Add properties according to Core SPEC 4.1 page 2183.
++		 * Reference table 3.5: Characteristic Properties bit field.
++		 */
++		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb);
+ 		if (attr == NULL)
+ 			return -EINVAL;
+ 
 -- 
 1.8.3.1
 
