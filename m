@@ -1,84 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 10 Mar 2014 09:38:43 +0100
-From: Sander Eikelenboom <linux@eikelenboom.it>
-Message-ID: <1295963563.20140310093843@eikelenboom.it>
-To: Sander Eikelenboom <linux@eikelenboom.it>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Peter Hurley <peter@hurleysoftware.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-CC: "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>
-Subject: [RC6 Bell Chime] Re: [PATCH 00/24] rfcomm fixes
-In-Reply-To: <1335661753.20140303203853@eikelenboom.it>
-References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <1259174563.20140212120644@eikelenboom.it> <1335661753.20140303203853@eikelenboom.it>
+Date: Mon, 10 Mar 2014 10:32:50 +0200
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/9] unit/avrcp: Add /TP/MDI/BV-01-C test
+Message-ID: <20140310083108.GB9620@aemeltch-MOBL1>
+References: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1394193113-32347-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+On Fri, Mar 07, 2014 at 01:51:45PM +0200, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Test verifies Get play status.
 
-Since:
-- 3.14-RC6 has been cut
-- this regression is known and reported since the merge window
-- the fix (revert of 3 patches) is known for over a month now
-- but it's still not in mainline
-- my polite ping request from last week seems to have provoked exactly 0 (zero) response.
+ping
 
-IT'S TIME TO CHIME SOME BELLS :-)
-
-Hope that WILL be heard somewhere ...
-
---
-Sander
-
-PS. on the informative side the 3 commits to be reverted are:
-
-f86772af6a0f643d3e13eb3f4f9213ae0c333ee4 Bluetooth: Remove rfcomm_carrier_raised()
-4a2fb3ecc7467c775b154813861f25a0ddc11aa0 Bluetooth: Always wait for a connection on RFCOMM open()
-e228b63390536f5b737056059a9a04ea016b1abf Bluetooth: Move rfcomm_get_device() before rfcomm_dev_activate()
-
-
-Monday, March 3, 2014, 8:38:53 PM, you wrote:
-
-
-> Wednesday, February 12, 2014, 12:06:44 PM, you wrote:
-
->> Monday, February 10, 2014, 11:09:38 PM, you wrote:
-
->>> Hi Peter,
-
->>>> This patch series addresses a number of previously unknown issues
->>>> with the RFCOMM tty device implementation, in addition to
->>>> addressing the locking regression recently reported [1].
->>>> 
->>>> As Gianluca suggested and I agree, this series first reverts
->>>> 3 of the 4 patches of 3.14-rc1 for bluetooth/rfcomm/tty.c.
-
->>> so for 3.14 we should revert 3 patches. And then the other 21 are intended for 3.15 merge window.
-
->>> I realize that we still have to deal with some breakage, but we do not want regressions and I clearly not going to take 24 patches for 3.14 at this point in time.
-
->>> What I can do is take all 24 patches into bluetooth-next and let them sit for 1 week and have people test them. And then we go ahead with reverting 3 patches from 3.14. Does that make sense?
-
->> Reverting those 3 patches works for me.
-
->> --
->> Sander
-
->>> Regards
-
->>> Marcel
-
-> Hi Marcel,
-
-> Ping... it seems these 3 reverts are still not in 3.14-rc5 to fix the regressions ?
-
+> ---
+>  unit/test-avrcp.c | 31 +++++++++++++++++++++++++++++++
+>  1 file changed, 31 insertions(+)
+> 
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index db1a67e..4f81954 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -459,6 +459,23 @@ static ssize_t avrcp_handle_set_player_value(struct avrcp *session,
+>  	return 1;
+>  }
+>  
+> +static ssize_t avrcp_handle_get_play_status(struct avrcp *session,
+> +						uint8_t transaction,
+> +						uint16_t params_len,
+> +						uint8_t *params,
+> +						void *user_data)
+> +{
+> +	DBG("");
+> +
+> +	if (params_len)
+> +		return -EINVAL;
+> +
+> +	avrcp_get_play_status_rsp(session, transaction, 0xaaaaaaaa, 0xbbbbbbbb,
+> +									0x00);
+> +
+> +	return -EAGAIN;
+> +}
+> +
+>  static const struct avrcp_control_handler control_handlers[] = {
+>  		{ AVRCP_GET_CAPABILITIES,
+>  					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+> @@ -481,6 +498,9 @@ static const struct avrcp_control_handler control_handlers[] = {
+>  		{ AVRCP_SET_PLAYER_VALUE,
+>  					AVC_CTYPE_CONTROL, AVC_CTYPE_STABLE,
+>  					avrcp_handle_set_player_value },
+> +		{ AVRCP_GET_PLAY_STATUS,
+> +					AVC_CTYPE_STATUS, AVC_CTYPE_STABLE,
+> +					avrcp_handle_get_play_status },
+>  		{ },
+>  };
+>  
+> @@ -782,5 +802,16 @@ int main(int argc, char *argv[])
+>  				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
+>  				0x00, 0x00, 0x00));
+>  
+> +	/* Get play status - TG */
+> +	define_test("/TP/MDI/BV-02-C", test_server,
+> +			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+> +				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
+> +				0x00, 0x00, 0x00),
+> +			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+> +				0x00, 0x19, 0x58, AVRCP_GET_PLAY_STATUS,
+> +				0x00, 0x00, 0x09, 0xaa, 0xaa, 0xaa,
+> +				0xaa, 0xbb, 0xbb, 0xbb, 0xbb, 0x00));
+> +
+> +
+>  	return g_test_run();
+>  }
+> -- 
+> 1.8.3.2
+> 
 > --
-> Sander
-
-
-
--- 
-Best regards,
- Sander                            mailto:linux@eikelenboom.it
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
