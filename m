@@ -3,9 +3,9 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
 	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v0 02/16] gatt: Add helper for creating GATT characteristics
-Date: Mon, 10 Mar 2014 15:50:31 -0300
-Message-Id: <1394477445-8987-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 01/16] gatt: Add function to create constant attributes
+Date: Mon, 10 Mar 2014 15:50:30 -0300
+Message-Id: <1394477445-8987-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,131 +13,81 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andre Guedes <andre.guedes@openbossa.org>
 
-This patch adds btd_gatt_add_char() helper. It creates and adds the
-Characteristic declaration, and Characteristic value attributes to the
-local attribute database.
+This patch adds a helper function to create attribute with static
+values. It is intended to be used to create GATT services, and
+characteristic declarations.
 ---
- src/gatt.c | 80 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h | 11 +++++++++
- 2 files changed, 91 insertions(+)
+ src/gatt.c | 32 ++++++++++++++++++++++++++------
+ 1 file changed, 26 insertions(+), 6 deletions(-)
 
 diff --git a/src/gatt.c b/src/gatt.c
-index 7882a91..7f7af80 100644
+index f7b74d6..7882a91 100644
 --- a/src/gatt.c
 +++ b/src/gatt.c
-@@ -39,6 +39,9 @@
- static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
- 					.value.u16 = GATT_PRIM_SVC_UUID };
+@@ -30,6 +30,7 @@
+ #include "log.h"
+ #include "lib/uuid.h"
+ #include "attrib/att.h"
++#include "src/shared/util.h"
  
-+static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
-+					.value.u16 = GATT_CHARAC_UUID };
-+
- struct btd_attribute {
- 	uint16_t handle;
- 	bt_uuid_t type;
-@@ -111,6 +114,83 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	return attr;
- }
+ #include "gatt-dbus.h"
+ #include "gatt.h"
+@@ -48,6 +49,25 @@ struct btd_attribute {
+ static GList *local_attribute_db;
+ static uint16_t next_handle = 0x0001;
  
-+struct btd_attribute *btd_gatt_add_char(bt_uuid_t *uuid, uint8_t properties)
++/*
++ * Helper function to create new attributes containing constant/static values.
++ * eg: declaration of services/characteristics, and characteristics with
++ * fixed values.
++ */
++static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
++							const uint8_t *value,
++							uint16_t len)
 +{
-+	struct btd_attribute *char_decl, *char_value = NULL;
++	struct btd_attribute *attr = malloc0(sizeof(struct btd_attribute) +
++									len);
 +
-+	/* Attribute value length */
-+	uint16_t len = 1 + 2 + bt_uuid_len(uuid);
-+	uint8_t value[len];
++	memcpy(&attr->type, type, sizeof(*type));
++	memcpy(&attr->value, value, len);
++	attr->value_len = len;
 +
-+	/*
-+	 * Characteristic DECLARATION
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +-------+---------------------------------+
-+	 * |0x2803 | 0xXX 0xYYYY 0xZZZZ...           |
-+	 * | (1)   |  (2)   (3)   (4)                |
-+	 * +------+----------------------------------+
-+	 * (1) - 2 octets: Characteristic declaration UUID
-+	 * (2) - 1 octet : Properties
-+	 * (3) - 2 octets: Handle of the characteristic Value
-+	 * (4) - 2 or 16 octets: Characteristic UUID
-+	 */
-+
-+	value[0] = properties;
-+
-+	/*
-+	 * Since we don't know yet the characteristic value attribute
-+	 * handle, we skip and set it later.
-+	 */
-+
-+	att_put_uuid(*uuid, &value[3]);
-+
-+	char_decl = new_const_attribute(&chr_uuid, value, len);
-+	if (local_database_add(next_handle, char_decl) < 0)
-+		goto fail;
-+
-+	next_handle = next_handle + 1;
-+
-+	/*
-+	 * Characteristic VALUE
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +----------+---------------------------------+
-+	 * |0xZZZZ... | 0x...                           |
-+	 * |  (1)     |  (2)                            |
-+	 * +----------+---------------------------------+
-+	 * (1) - 2 or 16 octets: Characteristic UUID
-+	 * (2) - N octets: Value is read dynamically from the service
-+	 * implementation (external entity).
-+	 */
-+
-+	char_value = new0(struct btd_attribute, 1);
-+	memcpy(&char_value->type, uuid, sizeof(char_value->type));
-+
-+	/* TODO: Read & Write callbacks */
-+
-+	if (local_database_add(next_handle, char_value) < 0)
-+		goto fail;
-+
-+	next_handle = next_handle + 1;
-+
-+	/*
-+	 * Update characteristic value handle in characteristic declaration
-+	 * attribute. For local attributes, we can assume that the handle
-+	 * representing the characteristic value will get the next available
-+	 * handle. However, for remote attribute this assumption is not valid.
-+	 */
-+	att_put_u16(char_value->handle, &char_decl->value[1]);
-+
-+	return char_value;
-+
-+fail:
-+	free(char_decl);
-+	free(char_value);
-+
-+	return NULL;
++	return attr;
 +}
 +
- void gatt_init(void)
+ static int local_database_add(uint16_t handle, struct btd_attribute *attr)
  {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 8dd1312..7df82cf 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -34,3 +34,14 @@ void gatt_cleanup(void);
-  * NULL is returned.
-  */
- struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
-+
-+/*
-+ * btd_gatt_add_char - Add a characteristic (declaration and value attributes)
-+ * to local attribute database.
-+ * @uuid:	Characteristic UUID (16-bits or 128-bits).
-+ * @properties:	Characteristic properties. See Core SPEC 4.1 page 2183.
-+ *
-+ * Returns a reference to characteristic value attribute. In case of error,
-+ * NULL is returned.
-+ */
-+struct btd_attribute *btd_gatt_add_char(bt_uuid_t *uuid, uint8_t properties);
+ 	attr->handle = handle;
+@@ -59,9 +79,9 @@ static int local_database_add(uint16_t handle, struct btd_attribute *attr)
+ 
+ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ {
++	struct btd_attribute *attr;
+ 	uint16_t len = bt_uuid_len(uuid);
+-	struct btd_attribute *attr = g_malloc0(sizeof(struct btd_attribute) +
+-									len);
++	uint8_t value[len];
+ 
+ 	/*
+ 	 * Service DECLARATION
+@@ -75,13 +95,13 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	 * (2) - 2 or 16 octets: Service UUID
+ 	 */
+ 
+-	attr->type = primary_uuid;
++	/* Set attribute value */
++	att_put_uuid(*uuid, value);
+ 
+-	att_put_uuid(*uuid, attr->value);
+-	attr->value_len = len;
++	attr = new_const_attribute(&primary_uuid, value, len);
+ 
+ 	if (local_database_add(next_handle, attr) < 0) {
+-		g_free(attr);
++		free(attr);
+ 		return NULL;
+ 	}
+ 
 -- 
 1.8.3.1
 
