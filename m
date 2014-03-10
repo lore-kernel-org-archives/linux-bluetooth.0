@@ -2,84 +2,155 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 03/16] gatt: Add characteristic to the database
-Date: Mon, 10 Mar 2014 15:50:32 -0300
-Message-Id: <1394477445-8987-4-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 16/16] tools: Emit property changed when Value changes
+Date: Mon, 10 Mar 2014 15:50:45 -0300
+Message-Id: <1394477445-8987-17-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial support for GATT characteristics. This patch adds the
-characteristic declaration attribute to the GATT local database based
-on the fetched GDBusProxy objects.
+This patch extends gatt-service tool, emitting PropertiesChanged for
+"Value" when a new value is set. This flow represents the handling of
+ATT Write Command or Write Request which is translated to a GDBusProxy
+set property. PropertiesChanged will be tracked by the characteristic
+GDBusProxy in order to detect "Value" changes.
 ---
- src/gatt-dbus.c | 38 +++++++++++++++++++++++++++++++++++++-
- 1 file changed, 37 insertions(+), 1 deletion(-)
+ tools/gatt-service.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 3fbff87..8cf222d 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -163,6 +163,39 @@ static int register_external_service(const struct external_app *eapp,
- 	return 0;
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 481495c..5878dc3 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -47,9 +47,11 @@
+ 
+ static GMainLoop *main_loop;
+ static GSList *services;
++static DBusConnection *connection;
+ 
+ struct characteristic {
+ 	char *uuid;
++	char *path;
+ 	uint8_t *value;
+ 	int vlen;
+ };
+@@ -110,6 +112,8 @@ static void chr_set_value(const GDBusPropertyTable *property,
+ 	chr->vlen = len;
+ 
+ 	g_dbus_pending_property_success(id);
++	g_dbus_emit_property_changed(connection, chr->path,
++						GATT_CHR_IFACE, "Value");
  }
  
-+static int register_external_characteristics(GSList *proxies)
-+
-+{
-+	GSList *list;
-+
-+	for (list = proxies; list; list = g_slist_next(proxies)) {
-+		DBusMessageIter iter;
-+		const char *str, *path;
-+		bt_uuid_t uuid;
-+		GDBusProxy *proxy = list->data;
-+
-+		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-+			return -EINVAL;
-+
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+			return -EINVAL;
-+
-+		dbus_message_iter_get_basic(&iter, &str);
-+
-+		if (bt_string_to_uuid(&uuid, str) < 0)
-+			return -EINVAL;
-+
-+		/* TODO: Missing Flags/property */
-+		if (btd_gatt_add_char(&uuid, 0x00) == NULL)
-+			return -EINVAL;
-+
-+		path = g_dbus_proxy_get_path(proxy);
-+		DBG("Added GATT CHR: %s (%s)", path, str);
-+	}
-+
-+	return 0;
-+}
-+
- static void client_ready(GDBusClient *client, void *user_data)
+ static const GDBusPropertyTable chr_properties[] = {
+@@ -163,6 +167,7 @@ static void chr_iface_destroy(gpointer user_data)
+ 
+ 	g_free(chr->uuid);
+ 	g_free(chr->value);
++	g_free(chr->path);
+ 	g_free(chr);
+ }
+ 
+@@ -183,6 +188,7 @@ static int register_characteristic(DBusConnection *conn, const char *uuid,
+ 
+ 	chr->value = g_memdup(value, vlen);
+ 	chr->vlen = vlen;
++	chr->path = path;
+ 
+ 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+ 					NULL, NULL, chr_properties,
+@@ -191,18 +197,16 @@ static int register_characteristic(DBusConnection *conn, const char *uuid,
+ 		ret = -EIO;
+ 	}
+ 
+-	g_free(path);
+-
+ 	return ret;
+ }
+ 
+-static char *register_service(DBusConnection *conn, const char *uuid)
++static char *register_service(const char *uuid)
  {
- 	struct external_app *eapp = user_data;
-@@ -177,6 +210,9 @@ static void client_ready(GDBusClient *client, void *user_data)
- 	if (register_external_service(eapp, proxy) < 0)
- 		goto fail;
+ 	static int id = 1;
+ 	char *path;
  
-+	if (register_external_characteristics(g_slist_next(eapp->proxies)) < 0)
-+		goto fail;
-+
- 	DBG("Added GATT service %s", eapp->path);
+ 	path = g_strdup_printf("/service%d", id++);
+-	if (g_dbus_register_interface(conn, path, GATT_SERVICE_IFACE,
++	if (g_dbus_register_interface(connection, path, GATT_SERVICE_IFACE,
+ 				NULL, NULL, service_properties,
+ 				g_strdup(uuid), g_free) == FALSE) {
+ 		printf("Couldn't register service interface\n");
+@@ -213,13 +217,13 @@ static char *register_service(DBusConnection *conn, const char *uuid)
+ 	return path;
+ }
  
- 	reply = dbus_message_new_method_return(eapp->reg);
-@@ -186,7 +222,7 @@ fail:
- 	error("Could not register external service: %s", eapp->path);
+-static void create_services(DBusConnection *conn)
++static void create_services()
+ {
+ 	char *service_path;
+ 	uint8_t level = 0;
+ 	int ret;
  
- 	reply = btd_error_invalid_args(eapp->reg);
--	/* TODO: missing eapp cleanup */
-+	/* TODO: missing eapp/database cleanup */
+-	service_path = register_service(conn, IAS_UUID);
++	service_path = register_service(IAS_UUID);
+ 	if (service_path == NULL)
+ 		return;
  
- reply:
- 	dbus_message_unref(eapp->reg);
+@@ -227,11 +231,11 @@ static void create_services(DBusConnection *conn)
+ 	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
+ 	 * "Value" is readable for testing purpose only.
+ 	 */
+-	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
++	ret = register_characteristic(connection, ALERT_LEVEL_CHR_UUID, &level,
+ 						sizeof(level), service_path);
+ 	if (ret < 0) {
+ 		printf("Couldn't register Alert Level characteristic (IAS)\n");
+-		g_dbus_unregister_interface(conn, service_path,
++		g_dbus_unregister_interface(connection, service_path,
+ 							GATT_SERVICE_IFACE);
+ 		g_free(service_path);
+ 		return;
+@@ -372,25 +376,24 @@ static guint setup_signalfd(void)
+ int main(int argc, char *argv[])
+ {
+ 	GDBusClient *client;
+-	DBusConnection *dbus_conn;
+ 	guint signal;
+ 
+ 	signal = setup_signalfd();
+ 	if (signal == 0)
+ 		return -errno;
+ 
+-	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
++	connection = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+ 
+ 	main_loop = g_main_loop_new(NULL, FALSE);
+ 
+-	g_dbus_attach_object_manager(dbus_conn);
++	g_dbus_attach_object_manager(connection);
+ 
+ 	printf("gatt-service unique name: %s\n",
+-				dbus_bus_get_unique_name(dbus_conn));
++				dbus_bus_get_unique_name(connection));
+ 
+-	create_services(dbus_conn);
++	create_services();
+ 
+-	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
++	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
+ 
+ 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
+ 
+@@ -401,7 +404,7 @@ int main(int argc, char *argv[])
+ 	g_source_remove(signal);
+ 
+ 	g_slist_free_full(services, g_free);
+-	dbus_connection_unref(dbus_conn);
++	dbus_connection_unref(connection);
+ 
+ 	return 0;
+ }
 -- 
 1.8.3.1
 
