@@ -1,54 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Date: Mon, 10 Mar 2014 17:54:17 -0700
-From: Terry Hardie <terryh@orcas.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-In-Reply-To: <CAJdJm_M=qHZFdGRd0B3DTNCJXyraj4+P4aDG6t7y_w76XCXYdA@mail.gmail.com>
-References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
- <alpine.DEB.2.02.1403072307490.21384@orcas.net>
- <CAJdJm_M=qHZFdGRd0B3DTNCJXyraj4+P4aDG6t7y_w76XCXYdA@mail.gmail.com>
-Message-ID: <9f497be2aad5f7dbe83aa1b38f7b92e7@orcas.net>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 7/7] doc: Update test-hfp coverage statistics
+Date: Tue, 11 Mar 2014 00:10:34 +0100
+Message-Id: <1394493034-2417-7-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1394493034-2417-1-git-send-email-szymon.janc@gmail.com>
+References: <1394493034-2417-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2014-03-10 06:21, Anderson Lizardo wrote:
-> Hi Terry,
-> 
-> On Sat, Mar 8, 2014 at 3:19 AM, Terry Hardie <terryh@orcas.net> wrote:
->> The problem is when running a lescan (hcitool lescan) with a LE device 
->> in
->> paring mode, which is transmitting a lot of LE Advertising report 
->> packets,
->> the HCI drivers eventually loses sync. I've traced it down to a 
->> duplicate
->> USB fragment.
-> 
-> I think your logs show missing USB packets (not duplicated)... More
-> details below.
+---
+ doc/test-coverage.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Interesting that it always loses 2 packets, and never 1, that's why I 
-assumed duplication...
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index b00ba1d..f6f2de0 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -16,7 +16,7 @@ test-mgmt		   2	Management interface handling
+ test-textfile		   4	Old textfile storage format
+ test-ringbuf		   3	Ring buffer functionality
+ test-queue		   1	Queue handling functionality
+-test-hfp		   9	HFP Audio Gateway functionality
++test-hfp		  13	HFP Audio Gateway functionality
+ test-avdtp		  60	AVDTP qualification test cases
+ test-avctp		   9	AVCTP qualification test cases
+ test-avrcp		  37	AVRCP qualification test cases
+@@ -27,7 +27,7 @@ test-gobex-apparam	  18	OBEX apparam handling
+ test-gobex-transfer	  36	OBEX transfer handling
+ test-gdbus-client	  12	D-Bus client handling
+ 			-----
+-			 442
++			 446
+ 
+ 
+ Automated end-to-end testing
+-- 
+1.9.0
 
-> In summary, it is expected that for devices that don't change address,
-> the only byte to change is the RSSI (last byte of the last fragment).
-> That's why the 2 first fragments are usually the same for all
-> advertising packets.
-
-You asked in another email if I tried a powered hub. Yes, I tried a 
-powered hub. I get the same results.
-
-Also, although it's not common, I also see these lost frames outside of 
-a scan. A scan is just the easiest way to reproduce it. If I leave a tag 
-broadcasting once per second, 2 receivers on the same USB bus, after an 
-hour or so, the same problem happens (and this is only 1 broadcast per 
-second from the PROX tag, received by 2 receivers simultaneously, 
-resulting in each receiver sending 3 USB transfers to the host - 6 USB 
-transfer total), so this is not just limited to high packet rates. I 
-think there's some problem with USB bus contention, especially since 
-both receivers try to send data to the host at EXACTLY the same time.
-
-Terry
