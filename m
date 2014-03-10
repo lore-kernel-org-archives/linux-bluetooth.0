@@ -2,118 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 12/16] gatt: Add Write Request handling for GDBusProxy
-Date: Mon, 10 Mar 2014 15:50:41 -0300
-Message-Id: <1394477445-8987-13-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 11/16] gatt: Add result callback for Write Request
+Date: Mon, 10 Mar 2014 15:50:40 -0300
+Message-Id: <1394477445-8987-12-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the characteristic requires Write Request, the ATT response should
-be sent after receiving the reply for the Set method call.
+This patch adds an extra callback to inform the result of the write
+operation on an external entity to allow the core to reply properly
+for the ATT request.
 ---
- src/gatt-dbus.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 61 insertions(+), 6 deletions(-)
+ src/gatt-dbus.c | 4 +++-
+ src/gatt.h      | 5 ++++-
+ 2 files changed, 7 insertions(+), 2 deletions(-)
 
 diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 7bc19c8..c5f1597 100644
+index d71d993..7bc19c8 100644
 --- a/src/gatt-dbus.c
 +++ b/src/gatt-dbus.c
-@@ -56,6 +56,11 @@ struct external_app {
- 	unsigned int watch;
- };
- 
-+struct proxy_write_data {
-+	btd_attr_write_result_t result_cb;
-+	void *user_data;
-+};
-+
- /*
-  * Attribute to Proxy hash table. Used to map incoming
-  * ATT operations to its external characteristic proxy.
-@@ -181,8 +186,30 @@ static void proxy_read_cb(struct btd_attribute *attr,
- 
- static void proxy_write_reply(const DBusError *derr, void *user_data)
- {
--	if (derr)
--		DBG("Write reply: %s", derr->message);
-+	struct proxy_write_data *wdata = user_data;
-+	int err = 0;
-+
-+	/*
-+	 * Security requirements shall be handled by the core. If external
-+	 * applications returns an error, the reasons will be restricted to
-+	 * invalid argument or application specific errors.
-+	 */
-+
-+	if (dbus_error_is_set(derr) == FALSE)
-+		goto done;
-+
-+	DBG("Write reply: %s", derr->message);
-+
-+	if (dbus_error_has_name(derr, DBUS_ERROR_NO_REPLY))
-+		err = ETIMEDOUT;
-+	else if (dbus_error_has_name(derr, ERROR_INTERFACE ".InvalidArguments"))
-+		err = EINVAL;
-+	else
-+		err = EPROTO;
-+
-+done:
-+	if (wdata && wdata->result_cb)
-+		wdata->result_cb(err, wdata->user_data);
+@@ -186,7 +186,9 @@ static void proxy_write_reply(const DBusError *derr, void *user_data)
  }
  
  static void proxy_write_cb(struct btd_attribute *attr,
-@@ -193,16 +220,44 @@ static void proxy_write_cb(struct btd_attribute *attr,
+-					const uint8_t *value, size_t len)
++					const uint8_t *value, size_t len,
++					btd_attr_write_result_t result,
++					void *user_data)
+ {
  	GDBusProxy *proxy;
  
- 	proxy = g_hash_table_lookup(proxy_hash, attr);
--	if (proxy == NULL)
--		/* FIXME: Attribute not found */
-+	if (proxy == NULL) {
-+		result(ENOENT, user_data);
- 		return;
-+	}
+diff --git a/src/gatt.h b/src/gatt.h
+index f6b4aca..296258e 100644
+--- a/src/gatt.h
++++ b/src/gatt.h
+@@ -48,8 +48,11 @@ typedef void (*btd_attr_read_t) (struct btd_attribute *attr,
+  * @err:	error in errno format.
+  * @user_data:	user_data passed in btd_attr_write_t callback
+  */
++typedef void (*btd_attr_write_result_t) (int err, void *user_data);
+ typedef void (*btd_attr_write_t) (struct btd_attribute *attr,
+-					const uint8_t *value, size_t len);
++					const uint8_t *value, size_t len,
++					btd_attr_write_result_t result,
++					void *user_data);
  
--	g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
-+	/*
-+	 * "result" callback defines if the core wants to receive the
-+	 * operation result, allowing to select ATT Write Request or Write
-+	 * Command. Descriptors requires Write Request operation. For
-+	 * Characteristics, the implementation will define which operations
-+	 * are allowed based on the properties/flags.
-+	 * TODO: Write Long Characteristics/Descriptors.
-+	 */
-+
-+	if (result) {
-+		struct proxy_write_data *wdata;
-+
-+		wdata = g_new0(struct proxy_write_data, 1);
-+		wdata->result_cb = result;
-+		wdata->user_data = user_data;
-+
-+		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
-+						value, len, proxy_write_reply,
-+						wdata, g_free);
-+	} else {
-+		/*
-+		 * Caller is not interested in the Set method call result.
-+		 * This flow implements the ATT Write Command scenario, where
-+		 * the remote doesn't receive ATT response.
-+		 */
-+		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
- 						value, len, proxy_write_reply,
- 						NULL, NULL);
-+	}
- 
--	DBG("Server: Write characteristic callback %s",
-+	DBG("Server: Write attribute callback %s",
- 					g_dbus_proxy_get_path(proxy));
-+
- }
- 
- static int register_external_service(const struct external_app *eapp,
+ /* btd_gatt_add_service - Add a service declaration to local attribute database.
+  * @uuid:	Service UUID.
 -- 
 1.8.3.1
 
