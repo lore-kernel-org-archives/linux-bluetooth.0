@@ -1,53 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/3] android/avrcp: Fill attributes in case of empty for GetElementAttributes
-Date: Mon, 10 Mar 2014 14:05:14 +0200
-Message-Id: <1394453116-9354-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH 00/20] More Android Handsfree work
+Date: Mon, 10 Mar 2014 12:50:27 +0100
+Message-ID: <4829378.fZmx4WoeCi@uw000953>
+In-Reply-To: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
+References: <1394238004-15691-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Saturday 08 of March 2014 01:19:44 Szymon Janc wrote:
+> Hi,
+> 
+> This patchset adds support for basic handsfree functionality.
+> 
+> What is done:
+>  - indicators (without callheld)
+>  - placing, accepting, cancelling calls etc.
+>  - vendor (unknown) AT command handling
+>  - extended error codes
+>  - DTMF codes
+>  - query current calls
+>  - voice recognition on/off
+>  - disabling echo cancellation
+>  - subscriber and operator identification
+> 
+> Missing features:
+>  - proper three way calling support (AT+CHLD is supported but callheld
+>    and CCWA are missing).
+>  - WBS and codec negotiation
+>  - audio
+> 
+> 
 
-This has to be done since Android do not interpret empty list as get all
-attributes as it should.
----
-v2: Move empty list handling to daemon side and fix starting with attribute
-0x00 which is illegal.
-v3: Fix not handling response code properly in set_volume_rsp
-v4: Add fix to pass correct type to volume changed notification
+Updated version of this patchset (fixing comments from Marcel) is now upstream.
 
- android/avrcp.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/android/avrcp.c b/android/avrcp.c
-index e26ddf2..70266f7 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -655,11 +655,23 @@ static ssize_t handle_get_element_attrs_cmd(struct avrcp *session,
- 		return -EINVAL;
- 
- 	params += 9;
-+
-+	/* Set everything in case of empty list */
-+	if (ev->number == 0) {
-+		for (i = 0; i < HAL_AVRCP_MEDIA_ATTR_DURATION; i++) {
-+			/* Skip 0x00 as the attributes start with 0x01 */
-+			ev->attrs[i] = i + 1;
-+		}
-+		ev->number = i;
-+		goto done;
-+	}
-+
- 	for (i = 0; i < ev->number; i++) {
- 		ev->attrs[i] = bt_get_be32(params);
- 		params += 4;
- 	}
- 
-+done:
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
- 					HAL_EV_AVRCP_GET_ELEMENT_ATTRS,
- 					sizeof(*ev) + ev->number, ev);
 -- 
-1.8.5.3
-
+Best regards, 
+Szymon Janc
