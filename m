@@ -3,9 +3,9 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
 	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v0 14/16] tools: Add reading Value property of gatt-service
-Date: Mon, 10 Mar 2014 15:50:43 -0300
-Message-Id: <1394477445-8987-15-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 13/16] tools: Add Alert Level characteristic to gatt-service
+Date: Mon, 10 Mar 2014 15:50:42 -0300
+Message-Id: <1394477445-8987-14-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,126 +13,101 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-This patch extends the gatt-service.c example adding the callback to
-allow reading the Value property. At the moment, it is a generic
-callback and it doesn't consider characteristic value property
-restrictions.
+This patch registers the Alert Level characteristic object related to
+Immediate Alert Service. It adds the characteristic UUID property only.
 ---
- tools/gatt-service.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 54 insertions(+), 6 deletions(-)
+ tools/gatt-service.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 52 insertions(+), 1 deletion(-)
 
 diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index d1606ad..25528ca 100644
+index cba0ff3..d1606ad 100644
 --- a/tools/gatt-service.c
 +++ b/tools/gatt-service.c
-@@ -46,18 +46,44 @@
+@@ -37,13 +37,30 @@
+ 
+ #define GATT_MGR_IFACE			"org.bluez.GattManager1"
+ #define GATT_SERVICE_IFACE		"org.bluez.GattService1"
++#define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
+ 
+ /* Immediate Alert Service UUID */
+ #define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
++#define ALERT_LEVEL_CHR_UUID		"00002a06-0000-1000-8000-00805f9b34fb"
+ 
  static GMainLoop *main_loop;
  static GSList *services;
  
-+struct characteristic {
-+	char *uuid;
-+	uint8_t *value;
-+	int vlen;
-+};
++static gboolean chr_get_uuid(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	const char *uuid = user_data;
 +
- static gboolean chr_get_uuid(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
- {
--	const char *uuid = user_data;
-+	struct characteristic *chr = user_data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &chr->uuid);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
 +
 +	return TRUE;
 +}
 +
-+static gboolean chr_get_value(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct characteristic *chr = user_data;
-+	DBusMessageIter array;
++static const GDBusPropertyTable chr_properties[] = {
++	{ "UUID",	"s",	chr_get_uuid },
++	{ }
++};
 +
-+	printf("Get(\"Value\")\n");
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+						&chr->value, chr->vlen);
-+
-+	dbus_message_iter_close_container(iter, &array);
- 
- 	return TRUE;
- }
- 
- static const GDBusPropertyTable chr_properties[] = {
- 	{ "UUID",	"s",	chr_get_uuid },
-+	{ "Value", "ay", chr_get_value, NULL, NULL },
+ static gboolean service_get_uuid(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
+ {
+@@ -83,6 +100,27 @@ static const GDBusPropertyTable service_properties[] = {
  	{ }
  };
  
-@@ -100,18 +126,36 @@ static const GDBusPropertyTable service_properties[] = {
- 	{ }
- };
- 
-+static void chr_iface_destroy(gpointer user_data)
++static int register_characteristic(DBusConnection *conn, const char *uuid,
++						const char *service_path)
 +{
-+	struct characteristic *chr = user_data;
++	static int id = 1;
++	char *path;
++	int ret = 0;
 +
-+	g_free(chr->uuid);
-+	g_free(chr->value);
-+	g_free(chr);
++	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
++
++	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
++					NULL, NULL, chr_properties,
++					g_strdup(uuid), g_free) == FALSE) {
++		printf("Couldn't register characteristic interface\n");
++		ret = -EIO;
++	}
++
++	g_free(path);
++
++	return ret;
 +}
 +
- static int register_characteristic(DBusConnection *conn, const char *uuid,
-+						const uint8_t *value, int vlen,
- 						const char *service_path)
+ static char *register_service(DBusConnection *conn, const char *uuid)
  {
-+	struct characteristic *chr;
  	static int id = 1;
- 	char *path;
- 	int ret = 0;
- 
- 	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
- 
-+	chr = g_new0(struct characteristic, 1);
-+
-+	chr->uuid = g_strdup(uuid);
-+
-+	chr->value = g_memdup(value, vlen);
-+	chr->vlen = vlen;
-+
- 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
- 					NULL, NULL, chr_properties,
--					g_strdup(uuid), g_free) == FALSE) {
-+					chr, chr_iface_destroy) == FALSE) {
- 		printf("Couldn't register characteristic interface\n");
- 		ret = -EIO;
- 	}
-@@ -141,15 +185,19 @@ static char *register_service(DBusConnection *conn, const char *uuid)
+@@ -103,11 +141,24 @@ static char *register_service(DBusConnection *conn, const char *uuid)
  static void create_services(DBusConnection *conn)
  {
  	char *service_path;
-+	uint8_t level = 0;
- 	int ret;
++	int ret;
  
  	service_path = register_service(conn, IAS_UUID);
- 	if (service_path == NULL)
- 		return;
++	if (service_path == NULL)
++		return;
  
--	/* Add Alert Level Characteristic to Immediate Alert Service */
--	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
--							service_path);
-+	/* Add Alert Level Characteristic to Immediate Alert Service
-+	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
-+	 * "Value" is readable for testing purpose only.
-+	 */
-+	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
-+						sizeof(level), service_path);
- 	if (ret < 0) {
- 		printf("Couldn't register Alert Level characteristic (IAS)\n");
- 		g_dbus_unregister_interface(conn, service_path,
+-	services = g_slist_prepend(services, service_path);
++	/* Add Alert Level Characteristic to Immediate Alert Service */
++	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
++							service_path);
++	if (ret < 0) {
++		printf("Couldn't register Alert Level characteristic (IAS)\n");
++		g_dbus_unregister_interface(conn, service_path,
++							GATT_SERVICE_IFACE);
++		g_free(service_path);
++		return;
++	}
+ 
++	services = g_slist_prepend(services, service_path);
+ 	printf("Registered service: %s\n", service_path);
+ }
+ 
 -- 
 1.8.3.1
 
