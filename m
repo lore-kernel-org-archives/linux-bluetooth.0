@@ -1,45 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] Bluetooth: Enable duplicates filter in background scan
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1394486784-5431-1-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 11 Mar 2014 13:00:24 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FBA14C5E-3757-479D-ADAA-64498CF7669B@holtmann.org>
-References: <1394486784-5431-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 11 Mar 2014 19:20:01 +0100
+From: Alexander Aring <alex.aring@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH bluetooth-next] bluetooth: make bluetooth 6lowpan as an
+ option
+Message-ID: <20140311182000.GA11022@omega>
+References: <1393924982-14001-1-git-send-email-alex.aring@gmail.com>
+ <5D79FB52-77AC-4391-9CAB-6F792388EFD8@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <5D79FB52-77AC-4391-9CAB-6F792388EFD8@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Marcel,
 
-> To avoid flooding the host with useless advertising reports during
-> background scan, we enable the duplicates filter from controller.
+On Tue, Mar 11, 2014 at 07:56:52AM -0700, Marcel Holtmann wrote:
+> Hi Alexander,
 > 
-> However, enabling duplicates filter requires a small change in
-> background scan routine in order to fix the following scenario:
->  1) Background scan is running.
->  2) A device disconnects and starts advertising.
->  3) Before host gets the disconnect event, the advertising is reported
->     to host. Since there is no pending LE connection at that time,
->     nothing happens.
->  4) Host gets the disconnection event and adds a pending connection.
->  5) No advertising is reported (since controller is filtering) and the
->     connection is never established.
+> > Currently you can have bluetooth 6lowpan without ipv6 enabled. This
+> > doesn't make any sense. With this patch you can disable/enable bluetooth
+> > 6lowpan support at compile time.
+> > 
+> > The current bluetooth 6lowpan implementation doesn't check the return
+> > value of 6lowpan function. Nevertheless I added -EOPNOTSUPP as return value
+> > if 6lowpan bluetooth is disabled.
+> > 
+> > Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+> > ---
+> > net/bluetooth/6lowpan.h | 21 +++++++++++++++++++++
+> > net/bluetooth/Kconfig   |  8 +++++++-
+> > net/bluetooth/Makefile  |  3 ++-
+> > 3 files changed, 30 insertions(+), 2 deletions(-)
 > 
-> So, to address this scenario, we should always restart background scan
-> to unsure we don't miss any advertising report (due to duplicates
-> filter).
+> patch has been applied to bluetooth-next tree.
 > 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> net/bluetooth/hci_core.c | 12 +++++++-----
-> 1 file changed, 7 insertions(+), 5 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+thanks and I see that next time I need to write:
 
-Regards
+"Bluetooth: ..." instead "bluetooth: ..."
 
-Marcel
+Sorry, about that!
 
+- Alex
