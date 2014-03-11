@@ -1,33 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 01/10] unit/avrcp: Pass context to control handlers
-Date: Tue, 11 Mar 2014 15:05:45 +0200
-Message-Id: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 04/10] unit/avrcp: Add /TP/NFY/BI-01-C test
+Date: Tue, 11 Mar 2014 15:05:48 +0200
+Message-Id: <1394543154-25355-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies that Target returns error on register for invalid event.
 ---
- unit/test-avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ unit/test-avrcp.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 9760420..fe7009a 100644
+index 0e65789..09d7689 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -578,7 +578,7 @@ static void test_server(gconstpointer data)
+@@ -1003,5 +1003,18 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+ 				0x00, 0x00));
  
- 	avrcp_set_passthrough_handlers(context->session, passthrough_handlers,
- 								context);
--	avrcp_set_control_handlers(context->session, control_handlers, NULL);
-+	avrcp_set_control_handlers(context->session, control_handlers, context);
- 
- 	g_idle_add(send_pdu, context);
- 
++	/* Register notification - Register for events invalid behavior - TG */
++	define_test("/TP/NFY/BI-01-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05,
++				/* Invalid event id */
++				0xff,
++				0x00, 0x00, 0x00, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
++				0x48, 0x00, 0x00, 0x19, 0x58,
++				AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
++
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
