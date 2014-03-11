@@ -1,41 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH bluetooth-next] bluetooth: make bluetooth 6lowpan as an option
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1393924982-14001-1-git-send-email-alex.aring@gmail.com>
-Date: Tue, 11 Mar 2014 07:56:52 -0700
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"bluez mailin list (linux-bluetooth@vger.kernel.org)"
-	<linux-bluetooth@vger.kernel.org>, netdev@vger.kernel.org
-Message-Id: <5D79FB52-77AC-4391-9CAB-6F792388EFD8@holtmann.org>
-References: <1393924982-14001-1-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: netdev-owner@vger.kernel.org
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] android: Enable LE if controller supports it
+Date: Tue, 11 Mar 2014 15:25:03 +0100
+Message-Id: <1394547904-19100-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1394547904-19100-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1394547904-19100-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+---
+ android/bluetooth.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-> Currently you can have bluetooth 6lowpan without ipv6 enabled. This
-> doesn't make any sense. With this patch you can disable/enable bluetooth
-> 6lowpan support at compile time.
-> 
-> The current bluetooth 6lowpan implementation doesn't check the return
-> value of 6lowpan function. Nevertheless I added -EOPNOTSUPP as return value
-> if 6lowpan bluetooth is disabled.
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/bluetooth/6lowpan.h | 21 +++++++++++++++++++++
-> net/bluetooth/Kconfig   |  8 +++++++-
-> net/bluetooth/Makefile  |  3 ++-
-> 3 files changed, 30 insertions(+), 2 deletions(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index ba4f14b..2732390 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2015,6 +2015,9 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 	if (missing_settings & MGMT_SETTING_PAIRABLE)
+ 		set_mode(MGMT_OP_SET_PAIRABLE, 0x01);
+ 
++	if (missing_settings & MGMT_SETTING_LE)
++		set_mode(MGMT_OP_SET_LE, 0x01);
++
+ 	return;
+ 
+ failed:
+-- 
+1.8.5.2
 
