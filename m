@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 03/10] unit/avrcp: Add /TP/NFY/BV-08-C test
-Date: Tue, 11 Mar 2014 15:05:47 +0200
-Message-Id: <1394543154-25355-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 10/10] unit/avrcp: Add /TP/BGN/BV-02-I TG test
+Date: Tue, 11 Mar 2014 15:05:54 +0200
+Message-Id: <1394543154-25355-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,42 +12,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that Target issued Track Changed INTERIM response when
-the track is SELECTED.
+Test verifies that the Target responds to Prev Group command.
 ---
- unit/test-avrcp.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+ unit/test-avrcp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index fa93b25..0e65789 100644
+index 5179c7b..08e07ac 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -517,7 +517,9 @@ static ssize_t avrcp_handle_register_notification(struct avrcp *session,
+@@ -1072,5 +1072,16 @@ int main(int argc, char *argv[])
+ 				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+ 				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
  
- 	switch (event) {
- 	case AVRCP_EVENT_TRACK_CHANGED:
--		if (g_str_equal(context->data->test_name, "/TP/NFY/BV-05-C"))
-+		if (g_str_equal(context->data->test_name, "/TP/NFY/BV-05-C") ||
-+			g_str_equal(context->data->test_name,
-+							"/TP/NFY/BV-08-C"))
- 			memset(&pdu[1], 0, 8);
- 		else
- 			memset(&pdu[1], 0xff, 8);
-@@ -989,5 +991,17 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 				0x00, 0x00));
- 
-+	/* Register notification - Track Changed - Selected Track - TG */
-+	define_test("/TP/NFY/BV-08-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
-+				0x00, 0x00, 0x00, 0x00),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
-+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+				0x00, 0x00));
++	/* Previous Group command transfer - TG */
++	define_test("/TP/BGN/BV-02-I", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
++				AVC_OP_PASSTHROUGH,
++				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
++				0x58, 0x00, AVC_VENDOR_PREV_GROUP),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
++				0x48, AVC_OP_PASSTHROUGH,
++				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
++				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
 +
  	return g_test_run();
  }
