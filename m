@@ -1,44 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] android/tester: Change hciemu type to bredr
-Date: Tue, 11 Mar 2014 11:09:31 +0100
-Message-Id: <1394532573-19278-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Mon, 10 Mar 2014 17:54:17 -0700
+From: Terry Hardie <terryh@orcas.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <CAJdJm_M=qHZFdGRd0B3DTNCJXyraj4+P4aDG6t7y_w76XCXYdA@mail.gmail.com>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
+ <alpine.DEB.2.02.1403072307490.21384@orcas.net>
+ <CAJdJm_M=qHZFdGRd0B3DTNCJXyraj4+P4aDG6t7y_w76XCXYdA@mail.gmail.com>
+Message-ID: <9f497be2aad5f7dbe83aa1b38f7b92e7@orcas.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Current test cases works on bredrle hciemu types. Now test cases
-don't require to support LE mode. Btdev support for LE devices have
-to be enhanced to behave correctly with mode set to LE. After enhancing
-support in bthost, hciemu type can be retyped to bredrle.
----
- android/android-tester.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+On 2014-03-10 06:21, Anderson Lizardo wrote:
+> Hi Terry,
+> 
+> On Sat, Mar 8, 2014 at 3:19 AM, Terry Hardie <terryh@orcas.net> wrote:
+>> The problem is when running a lescan (hcitool lescan) with a LE device 
+>> in
+>> paring mode, which is transmitting a lot of LE Advertising report 
+>> packets,
+>> the HCI drivers eventually loses sync. I've traced it down to a 
+>> duplicate
+>> USB fragment.
+> 
+> I think your logs show missing USB packets (not duplicated)... More
+> details below.
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index b762a2d..49a636f 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -4422,13 +4422,18 @@ static void test_hidhost_get_report(const void *test_data)
- 		tester_test_failed();
- }
- 
-+/* Changing hciemu type to bredr is a teporary fix while bthost don't handle
-+ * all LE commands. A lot of test cases - especially those which uses scan
-+ * (remote device tests) will fail. After enahancing bthost hciemu type can be
-+ * rechanged to BREDRLE.
-+ */
- #define test_bredrle(name, data, test_setup, test, test_teardown) \
- 	do { \
- 		struct test_data *user; \
- 		user = g_malloc0(sizeof(struct test_data)); \
- 		if (!user) \
- 			break; \
--		user->hciemu_type = HCIEMU_TYPE_BREDRLE; \
-+		user->hciemu_type = HCIEMU_TYPE_BREDR; \
- 		user->test_data = data; \
- 		tester_add_full(name, data, test_pre_setup, test_setup, \
- 				test, test_teardown, test_post_teardown, \
--- 
-1.8.5.2
+Interesting that it always loses 2 packets, and never 1, that's why I 
+assumed duplication...
 
+> In summary, it is expected that for devices that don't change address,
+> the only byte to change is the RSSI (last byte of the last fragment).
+> That's why the 2 first fragments are usually the same for all
+> advertising packets.
+
+You asked in another email if I tried a powered hub. Yes, I tried a 
+powered hub. I get the same results.
+
+Also, although it's not common, I also see these lost frames outside of 
+a scan. A scan is just the easiest way to reproduce it. If I leave a tag 
+broadcasting once per second, 2 receivers on the same USB bus, after an 
+hour or so, the same problem happens (and this is only 1 broadcast per 
+second from the PROX tag, received by 2 receivers simultaneously, 
+resulting in each receiver sending 3 USB transfers to the host - 6 USB 
+transfer total), so this is not just limited to high packet rates. I 
+think there's some problem with USB bus contention, especially since 
+both receivers try to send data to the host at EXACTLY the same time.
+
+Terry
