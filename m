@@ -1,65 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 02/10] unit/avrcp: Add /TP/NFY/BV-05-C test.
-Date: Tue, 11 Mar 2014 15:05:46 +0200
-Message-Id: <1394543154-25355-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 01/10] unit/avrcp: Pass context to control handlers
+Date: Tue, 11 Mar 2014 15:05:45 +0200
+Message-Id: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies Register notification - Track Changed - Track Playing.
 ---
- unit/test-avrcp.c | 19 ++++++++++++++++++-
- 1 file changed, 18 insertions(+), 1 deletion(-)
+ unit/test-avrcp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index fe7009a..fa93b25 100644
+index 9760420..fe7009a 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -501,6 +501,7 @@ static ssize_t avrcp_handle_register_notification(struct avrcp *session,
- 							uint8_t *params,
- 							void *user_data)
- {
-+	struct context *context = user_data;
- 	uint8_t event;
- 	uint8_t pdu[9];
- 	size_t pdu_len;
-@@ -516,7 +517,11 @@ static ssize_t avrcp_handle_register_notification(struct avrcp *session,
+@@ -578,7 +578,7 @@ static void test_server(gconstpointer data)
  
- 	switch (event) {
- 	case AVRCP_EVENT_TRACK_CHANGED:
--		memset(&pdu[1], 0xff, 8);
-+		if (g_str_equal(context->data->test_name, "/TP/NFY/BV-05-C"))
-+			memset(&pdu[1], 0, 8);
-+		else
-+			memset(&pdu[1], 0xff, 8);
-+
- 		pdu_len += 8;
- 		break;
- 	case AVRCP_EVENT_SETTINGS_CHANGED:
-@@ -972,5 +977,17 @@ int main(int argc, char *argv[])
- 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
- 				0xff, 0xff));
+ 	avrcp_set_passthrough_handlers(context->session, passthrough_handlers,
+ 								context);
+-	avrcp_set_control_handlers(context->session, control_handlers, NULL);
++	avrcp_set_control_handlers(context->session, control_handlers, context);
  
-+	/* Register notification - Track Changed - Track Playing - TG */
-+	define_test("/TP/NFY/BV-05-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
-+				0x00, 0x00, 0x00, 0x00),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
-+				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
-+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-+				0x00, 0x00));
-+
- 	return g_test_run();
- }
+ 	g_idle_add(send_pdu, context);
+ 
 -- 
 1.8.3.2
 
