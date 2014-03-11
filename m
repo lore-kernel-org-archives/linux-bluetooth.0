@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 09/10] unit/avrcp: Add /TP/BGN/BV-01-I TG test
-Date: Tue, 11 Mar 2014 15:05:53 +0200
-Message-Id: <1394543154-25355-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 02/10] unit/avrcp: Add /TP/NFY/BV-05-C test.
+Date: Tue, 11 Mar 2014 15:05:46 +0200
+Message-Id: <1394543154-25355-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,54 +12,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that the Target responds to Next Group command.
+Test verifies Register notification - Track Changed - Track Playing.
 ---
- unit/test-avrcp.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ unit/test-avrcp.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 923fd9f..5179c7b 100644
+index fe7009a..fa93b25 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -280,11 +280,20 @@ static bool handle_select(struct avrcp *session, bool pressed, void *user_data)
- 	return true;
+@@ -501,6 +501,7 @@ static ssize_t avrcp_handle_register_notification(struct avrcp *session,
+ 							uint8_t *params,
+ 							void *user_data)
+ {
++	struct context *context = user_data;
+ 	uint8_t event;
+ 	uint8_t pdu[9];
+ 	size_t pdu_len;
+@@ -516,7 +517,11 @@ static ssize_t avrcp_handle_register_notification(struct avrcp *session,
+ 
+ 	switch (event) {
+ 	case AVRCP_EVENT_TRACK_CHANGED:
+-		memset(&pdu[1], 0xff, 8);
++		if (g_str_equal(context->data->test_name, "/TP/NFY/BV-05-C"))
++			memset(&pdu[1], 0, 8);
++		else
++			memset(&pdu[1], 0xff, 8);
++
+ 		pdu_len += 8;
+ 		break;
+ 	case AVRCP_EVENT_SETTINGS_CHANGED:
+@@ -972,5 +977,17 @@ int main(int argc, char *argv[])
+ 				0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
+ 				0xff, 0xff));
+ 
++	/* Register notification - Track Changed - Track Playing - TG */
++	define_test("/TP/NFY/BV-05-C", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x05, AVRCP_EVENT_TRACK_CHANGED,
++				0x00, 0x00, 0x00, 0x00),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_INTERIM, 0x48, 0x00,
++				0x00, 0x19, 0x58, AVRCP_REGISTER_NOTIFICATION,
++				0x00, 0x00, 0x09, AVRCP_EVENT_TRACK_CHANGED,
++				0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++				0x00, 0x00));
++
+ 	return g_test_run();
  }
- 
-+static bool handle_vendor_uniq(struct avrcp *session, bool pressed,
-+								void *user_data)
-+{
-+	DBG("");
-+
-+	return true;
-+}
-+
- static const struct avrcp_passthrough_handler passthrough_handlers[] = {
- 		{ AVC_PLAY, handle_play },
- 		{ AVC_VOLUME_UP, handle_volume_up },
- 		{ AVC_CHANNEL_UP, handle_channel_up },
- 		{ AVC_SELECT, handle_select },
-+		{ AVC_VENDOR_UNIQUE, handle_vendor_uniq },
- 		{ },
- };
- 
-@@ -1045,6 +1054,17 @@ int main(int argc, char *argv[])
- 				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
- 				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
- 
-+	/* Next Group command transfer - TG */
-+	define_test("/TP/BGN/BV-01-I", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
-+				AVC_OP_PASSTHROUGH,
-+				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
-+				0x58, 0x00, AVC_VENDOR_NEXT_GROUP),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
-+				0x48, AVC_OP_PASSTHROUGH,
-+				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
-+				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
-+
- 	/* Previous Group command transfer - CT */
- 	define_test("/TP/BGN/BV-02-I", test_client,
- 			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
 -- 
 1.8.3.2
 
