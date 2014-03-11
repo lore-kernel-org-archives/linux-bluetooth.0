@@ -1,47 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 05/10] unit/avrcp: Add /TP/INV/BI-01-C test
-Date: Tue, 11 Mar 2014 15:05:49 +0200
-Message-Id: <1394543154-25355-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1394458798-13822-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1394543154-25355-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/handsfree: Fix list of HF features
+Date: Tue, 11 Mar 2014 12:22:30 +0100
+Message-ID: <8773861.L8v0dr7lW4@uw000953>
+In-Reply-To: <1394532999-15744-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1394532999-15744-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcin,
 
-Test verifies that AVRCP_STATUS_INVALID_COMMAND returned when received
-command with Invalid PDU ID.
----
- unit/test-avrcp.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+On Tuesday 11 of March 2014 11:16:39 Marcin Kraglak wrote:
+> Add missing Remote volume control feature
+> ---
+>  android/handsfree.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index 0828de8..4f999e1 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -64,9 +64,10 @@
+>  #define HFP_HF_FEAT_3WAY	0x00000002
+>  #define HFP_HF_FEAT_CLI		0x00000004
+>  #define HFP_HF_FEAT_VR		0x00000008
+> -#define HFP_HF_FEAT_ECS		0x00000010
+> -#define HFP_HF_FEAT_ECC		0x00000020
+> -#define HFP_HF_FEAT_CODEC	0x00000040
+> +#define HFP_HF_FEAT_RVC		0x00000010
+> +#define HFP_HF_FEAT_ECS		0x00000020
+> +#define HFP_HF_FEAT_ECC		0x00000040
+> +#define HFP_HF_FEAT_CODEC	0x00000080
+>  
+>  #define HFP_AG_FEATURES ( HFP_AG_FEAT_3WAY | HFP_AG_FEAT_ECNR |\
+>  			HFP_AG_FEAT_VR | HFP_AG_FEAT_REJ_CALL |\
+> 
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 09d7689..5d78a9a 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -1016,5 +1016,19 @@ int main(int argc, char *argv[])
- 				AVRCP_REGISTER_NOTIFICATION,
- 				0x00, 0x00, 0x01, AVRCP_STATUS_INVALID_PARAM));
- 
-+	/* Invalid commands */
-+
-+	/* Invalid PDU ID - TG */
-+	define_test("/TP/INV/BI-01-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x03, 0x48, 0x00,
-+				0x00, 0x19, 0x58,
-+				/* Invalid PDU ID */
-+				0xff,
-+				0x00, 0x00, 0x00),
-+			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_REJECTED,
-+				0x48, 0x00, 0x00, 0x19, 0x58,
-+				0xff, 0x00, 0x00, 0x01,
-+				AVRCP_STATUS_INVALID_COMMAND));
-+
- 	return g_test_run();
- }
+Applied, thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
