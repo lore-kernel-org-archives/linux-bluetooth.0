@@ -1,52 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 1/4] android/avrcp: Add avrcp_connect_browsing()
-Date: Wed, 12 Mar 2014 18:04:54 +0200
-Message-Id: <1394640297-27467-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394640297-27467-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1394640297-27467-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1394637058-586-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1394637058-586-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+ <1394637058-586-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Wed, 12 Mar 2014 16:57:28 +0100
+Message-ID: <CAF3PWx11bdQfjfGmVRBvVagfA0tn81arDKzWw_K8T9+MuK+v2A@mail.gmail.com>
+Subject: Re: [PATCH 06/15] android/hal-msg: Add HDP app channel state event struct
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Ravi,
 
-Add support for browsing channel
----
- android/avrcp-lib.c | 6 ++++++
- android/avrcp-lib.h | 2 ++
- 2 files changed, 8 insertions(+)
+On 12 March 2014 16:10, Ravi kumar Veeramally
+<ravikumar.veeramally@linux.intel.com> wrote:
+> ---
+>  android/hal-msg.h | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index 694529f..0139543 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -1001,12 +1001,28 @@ struct hal_ev_pan_conn_state {
+>  #define HAL_HEALTH_APP_DEREG_SUCCESS           0x02
+>  #define HAL_HEALTH_APP_DEREG_FAILED            0x03
+>
+> +#define HAL_HEALTH_CHANL_STATE_CONNECTING      0x00
+> +#define HAL_HEALTH_CHANL_STATE_CONNECTED       0x01
+> +#define HAL_HEALTH_CHANL_STATE_DISCONNECTING   0x02
+> +#define HAL_HEALTH_CHANL_STATE_DISCONNECTED    0x03
+> +#define HAL_HEALTH_CHANL_STATE_DESTROYED       0x04
+> +
+>  #define HAL_EV_HEALTH_APP_REG_STATE            0x81
+>  struct hal_ev_health_app_reg_state {
+>         uint16_t id;
+>         uint8_t  state;
+>  } __attribute__((packed));
+>
+> +#define HAL_EV_HEALTH_CHNL_STATE               0x82
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 68c2df4..8385b1b 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -244,6 +244,12 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
- 	return session;
- }
- 
-+int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
-+								size_t omtu)
-+{
-+	return avctp_connect_browsing(session->conn, fd, imtu, omtu);
-+}
-+
- void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
- 							void *user_data)
- {
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 17072fb..3f24a82 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -123,6 +123,8 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
- void avrcp_shutdown(struct avrcp *session);
- void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
- 							void *user_data);
-+int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
-+								size_t omtu);
- void avrcp_set_control_handlers(struct avrcp *session,
- 				const struct avrcp_control_handler *handlers,
- 				void *user_data);
--- 
-1.8.3.2
+You have CHNL here and CHANL in states definitions - better have them
+consistent. I guess either CHAN or CHANNEL would be actually better.
 
+> +struct hal_ev_health_chnl_state {
+> +       uint16_t app_id;
+> +       uint8_t  bdaddr[6];
+> +       uint8_t  mdep_index;
+> +       uint16_t chnl_id;
+> +       uint8_t  chnl_state;
+
+Same here - chan or channel.
+
+> +       uint32_t file_descr;
+
+fd shall be passed as auxiliary data - there's parameter for this in
+IPC calls. Now you just pass plain int value which is useless as fd.
+
+BR,
+Andrzej
