@@ -1,158 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v1 02/15] gatt: Add helper for creating GATT characteristics
-Date: Wed, 12 Mar 2014 13:26:58 -0300
-Message-Id: <1394641631-1534-3-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v1 03/15] gatt: Add characteristic to the database
+Date: Wed, 12 Mar 2014 13:26:59 -0300
+Message-Id: <1394641631-1534-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Guedes <andre.guedes@openbossa.org>
-
-This patch adds btd_gatt_add_char() helper. It creates and adds the
-Characteristic declaration, and Characteristic value attributes to the
-local attribute database.
+Initial support for GATT characteristics. This patch adds the
+characteristic declaration attribute to the GATT local database based
+on the fetched GDBusProxy objects.
 ---
- src/gatt.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/gatt.h | 12 +++++++++
- 2 files changed, 98 insertions(+)
+ src/gatt-dbus.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 42 insertions(+), 1 deletion(-)
 
-diff --git a/src/gatt.c b/src/gatt.c
-index eed4fae..669c716 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -40,6 +40,9 @@
- static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
- 					.value.u16 = GATT_PRIM_SVC_UUID };
- 
-+static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
-+					.value.u16 = GATT_CHARAC_UUID };
-+
- struct btd_attribute {
- 	uint16_t handle;
- 	bt_uuid_t type;
-@@ -50,6 +53,11 @@ struct btd_attribute {
- static GList *local_attribute_db;
- static uint16_t next_handle = 0x0001;
- 
-+static inline void put_le16(uint16_t val, void *dst)
-+{
-+	put_unaligned(cpu_to_le16(val), (uint16_t *) dst);
-+}
-+
- static inline void put_uuid(const bt_uuid_t *src, void *dst)
- {
- 	if (src->type == BT_UUID16)
-@@ -120,6 +128,84 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	return attr;
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 3fbff87..9f94c4f 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -163,6 +163,44 @@ static int register_external_service(const struct external_app *eapp,
+ 	return 0;
  }
  
-+struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
-+							uint8_t properties)
++static int register_external_characteristics(GSList *proxies)
++
 +{
-+	struct btd_attribute *char_decl, *char_value = NULL;
++	GSList *list;
 +
-+	/* Attribute value length */
-+	uint16_t len = 1 + 2 + bt_uuid_len(uuid);
-+	uint8_t value[len];
++	for (list = proxies; list; list = g_slist_next(proxies)) {
++		DBusMessageIter iter;
++		const char *str, *path;
++		bt_uuid_t uuid;
++		GDBusProxy *proxy = list->data;
 +
-+	/*
-+	 * Characteristic DECLARATION
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +-------+---------------------------------+
-+	 * |0x2803 | 0xXX 0xYYYY 0xZZZZ...           |
-+	 * | (1)   |  (2)   (3)   (4)                |
-+	 * +------+----------------------------------+
-+	 * (1) - 2 octets: Characteristic declaration UUID
-+	 * (2) - 1 octet : Properties
-+	 * (3) - 2 octets: Handle of the characteristic Value
-+	 * (4) - 2 or 16 octets: Characteristic UUID
-+	 */
++		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
++			return -EINVAL;
 +
-+	value[0] = properties;
++		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
++			return -EINVAL;
 +
-+	/*
-+	 * Since we don't know yet the characteristic value attribute
-+	 * handle, we skip and set it later.
-+	 */
++		dbus_message_iter_get_basic(&iter, &str);
 +
-+	put_uuid(uuid, &value[3]);
++		if (bt_string_to_uuid(&uuid, str) < 0)
++			return -EINVAL;
 +
-+	char_decl = new_const_attribute(&chr_uuid, value, len);
-+	if (local_database_add(next_handle, char_decl) < 0)
-+		goto fail;
++		/*
++		 * TODO: Missing Flags/property
++		 * Add properties according to Core SPEC 4.1 page 2183.
++		 * Reference table 3.5: Characteristic Properties bit field.
++		 */
 +
-+	next_handle = next_handle + 1;
++		if (btd_gatt_add_char(&uuid, 0x00) == NULL)
++			return -EINVAL;
 +
-+	/*
-+	 * Characteristic VALUE
-+	 *
-+	 *   TYPE         ATTRIBUTE VALUE
-+	 * +----------+---------------------------------+
-+	 * |0xZZZZ... | 0x...                           |
-+	 * |  (1)     |  (2)                            |
-+	 * +----------+---------------------------------+
-+	 * (1) - 2 or 16 octets: Characteristic UUID
-+	 * (2) - N octets: Value is read dynamically from the service
-+	 * implementation (external entity).
-+	 */
++		path = g_dbus_proxy_get_path(proxy);
++		DBG("Added GATT CHR: %s (%s)", path, str);
++	}
 +
-+	char_value = new0(struct btd_attribute, 1);
-+	char_value->type = *uuid;
-+
-+	/* TODO: Read & Write callbacks */
-+
-+	if (local_database_add(next_handle, char_value) < 0)
-+		goto fail;
-+
-+	next_handle = next_handle + 1;
-+
-+	/*
-+	 * Update characteristic value handle in characteristic declaration
-+	 * attribute. For local attributes, we can assume that the handle
-+	 * representing the characteristic value will get the next available
-+	 * handle. However, for remote attribute this assumption is not valid.
-+	 */
-+	put_le16(char_value->handle, &char_decl->value[1]);
-+
-+	return char_value;
-+
-+fail:
-+	free(char_decl);
-+	free(char_value);
-+
-+	return NULL;
++	return 0;
 +}
 +
- void gatt_init(void)
+ static void client_ready(GDBusClient *client, void *user_data)
  {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 8dd1312..d7acc5b 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -34,3 +34,15 @@ void gatt_cleanup(void);
-  * NULL is returned.
-  */
- struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
+ 	struct external_app *eapp = user_data;
+@@ -177,6 +215,9 @@ static void client_ready(GDBusClient *client, void *user_data)
+ 	if (register_external_service(eapp, proxy) < 0)
+ 		goto fail;
+ 
++	if (register_external_characteristics(g_slist_next(eapp->proxies)) < 0)
++		goto fail;
 +
-+/*
-+ * btd_gatt_add_char - Add a characteristic (declaration and value attributes)
-+ * to local attribute database.
-+ * @uuid:	Characteristic UUID (16-bits or 128-bits).
-+ * @properties:	Characteristic properties. See Core SPEC 4.1 page 2183.
-+ *
-+ * Returns a reference to characteristic value attribute. In case of error,
-+ * NULL is returned.
-+ */
-+struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
-+							uint8_t properties);
+ 	DBG("Added GATT service %s", eapp->path);
+ 
+ 	reply = dbus_message_new_method_return(eapp->reg);
+@@ -186,7 +227,7 @@ fail:
+ 	error("Could not register external service: %s", eapp->path);
+ 
+ 	reply = btd_error_invalid_args(eapp->reg);
+-	/* TODO: missing eapp cleanup */
++	/* TODO: missing eapp/database cleanup */
+ 
+ reply:
+ 	dbus_message_unref(eapp->reg);
 -- 
 1.8.3.1
 
