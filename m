@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 4/4] unit/avrcp: Add /TP/MPS/BV-03-C test
-Date: Wed, 12 Mar 2014 18:04:57 +0200
-Message-Id: <1394640297-27467-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 2/4] android/avrcp: Add avrcp_set_browsed_player() function
+Date: Wed, 12 Mar 2014 18:04:55 +0200
+Message-Id: <1394640297-27467-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394640297-27467-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394640297-27467-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,37 +11,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that SetBrowsedPlayer command issued by the Controller.
 ---
- unit/test-avrcp.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ android/avrcp-lib.c | 18 ++++++++++++++++++
+ android/avrcp-lib.h |  9 +++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 917945d..6a4a2e1 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -709,6 +709,9 @@ static void test_client(gconstpointer data)
- 	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-01-C"))
- 		avrcp_set_addr_player(context->session, 0xabcd, NULL, NULL);
- 
-+	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-03-C"))
-+		avrcp_set_browsed_player(context->session, 0xabcd, NULL, NULL);
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index 8385b1b..04cd88e 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -500,3 +500,21 @@ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
+ 	return avctp_send_passthrough(session->conn, AVC_VENDOR_UNIQUE, params,
+ 								sizeof(params));
+ }
 +
- 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
- 		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
- 								NULL, NULL);
-@@ -785,6 +788,11 @@ int main(int argc, char *argv[])
- 				AVRCP_SET_ADDRESSED_PLAYER,
- 				0x00, 0x00, 0x01, 0x00));
- 
-+	/* SetBrowsedPlayer - CT */
-+	define_test("/TP/MPS/BV-03-C", test_client,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
-+				0xab, 0xcd));
++int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id,
++				avctp_browsing_rsp_cb func, void *user_data)
++{
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 2];
++	struct avrcp_browsing_header *pdu = (void *) buf;
 +
- 	/* Connection Establishment for Control tests */
++	DBG("");
++
++	memset(buf, 0, sizeof(buf));
++
++	pdu->pdu_id = AVRCP_SET_BROWSED_PLAYER;
++	bt_put_be16(player_id, pdu->params);
++	pdu->param_len = htons(2);
++
++	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
++							func, user_data);
++}
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 3f24a82..3fabbbe 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -90,6 +90,13 @@
+ /* Parameters legths */
+ #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH       5
  
- 	/*
++struct avrcp_browsing_header {
++	uint8_t pdu_id;
++	uint16_t param_len;
++	uint8_t params[0];
++} __attribute__ ((packed));
++#define AVRCP_BROWSING_HEADER_LENGTH 3
++
+ struct avrcp;
+ 
+ struct avrcp_control_handler {
+@@ -170,3 +177,5 @@ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t code, uint8_t *params,
+ 					size_t params_len);
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
++int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id,
++				avctp_browsing_rsp_cb func, void *user_data);
 -- 
 1.8.3.2
 
