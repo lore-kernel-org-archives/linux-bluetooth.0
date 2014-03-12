@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 12/15] android/hal-health: Add HDP .connect_channel method
-Date: Wed, 12 Mar 2014 21:05:30 +0100
-Message-ID: <1451588.llZxefWAr7@athlon>
-In-Reply-To: <1394637058-586-13-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1394637058-586-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1394637058-586-13-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH 08/15] android/hal-health: Add HDP .init method
+Date: Wed, 12 Mar 2014 20:56:28 +0100
+Message-ID: <2140883.HtAK6ZQ936@athlon>
+In-Reply-To: <1394637058-586-9-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1394637058-586-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1394637058-586-9-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,69 +14,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ravi,
 
-On Wednesday 12 March 2014 17:10:55 Ravi kumar Veeramally wrote:
+On Wednesday 12 March 2014 17:10:51 Ravi kumar Veeramally wrote:
 > ---
->  android/hal-health.c | 31 ++++++++++++++++++++++++++++++-
->  1 file changed, 30 insertions(+), 1 deletion(-)
+>  android/hal-health.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 42 insertions(+), 1 deletion(-)
 > 
 > diff --git a/android/hal-health.c b/android/hal-health.c
-> index 007a37a..0d10d98 100644
+> index 55db7f6..649661e 100644
 > --- a/android/hal-health.c
 > +++ b/android/hal-health.c
-> @@ -106,6 +106,35 @@ static bt_status_t unregister_application(int app_id)
->  					sizeof(cmd), &cmd, 0, NULL, NULL);
->  }
+> @@ -26,9 +26,50 @@
+>  #include "ipc-common.h"
+>  #include "hal-ipc.h"
 > 
-> +static bt_status_t connect_channel(int app_id, bt_bdaddr_t *bd_addr,
-> +					int mdep_cfg_index, int *channel_id)
+> +static const bthl_callbacks_t *cbacks;
+
+Please explicitly initialize it to NULL.
+
+> +
+> +static bool interface_ready(void)
 > +{
-> +	struct hal_cmd_health_connect_channel cmd;
-> +	struct hal_rsp_health_connect_channel rsp;
-> +	size_t len = sizeof(rsp);
-> +	bt_status_t status;
+> +	return cbacks != NULL;
+> +}
+> +
+> +/* handlers will be called from notification thread context,
+> + * index in table equals to 'opcode - HAL_MINIMUM_EVENT' */
+> +static const struct hal_ipc_handler ev_handlers[] = {
+> +};
+> +
+> +static bt_status_t init(bthl_callbacks_t *callbacks)
+> +{
+> +	struct hal_cmd_register_module cmd;
+> +	int ret;
 > +
 > +	DBG("");
 > +
-> +	if (!interface_ready())
-> +		return BT_STATUS_NOT_READY;
+> +	if (interface_ready())
+> +		return BT_STATUS_DONE;
 > +
-> +	if (!bd_addr)
-> +		return BT_STATUS_PARM_INVALID;
-
-Verify channel_id pointer as well here.
-
+> +	/* store reference to user callbacks */
+> +	cbacks = callbacks;
 > +
-> +	cmd.app_id = app_id;
-> +	cmd.mdep_index = mdep_cfg_index;
-> +	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+> +	hal_ipc_register(HAL_SERVICE_ID_HEALTH, ev_handlers,
+> +				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
 > +
-> +	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH,
-> +					HAL_OP_HEALTH_CONNECT_CHANNEL,
-> +					sizeof(cmd), &cmd, &len, &rsp, NULL);
+> +	cmd.service_id = HAL_SERVICE_ID_HEALTH;
 > +
-> +	*channel_id = rsp.channel_id;
-
-if (status == HAL_STATUS_SUCCESS)
-    *channel_id = rsp.channel_id;
-
-Otherwise you might assign garbage.
-
+> +	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+> +					sizeof(cmd), &cmd, 0, NULL, NULL);
 > +
-> +	return status;
+> +	if (ret != BT_STATUS_SUCCESS) {
+> +		cbacks = NULL;
+> +		hal_ipc_unregister(HAL_SERVICE_ID_HEALTH);
+> +	}
+> +
+> +	return ret;
 > +}
 > +
->  static bt_status_t init(bthl_callbacks_t *callbacks)
->  {
->  	struct hal_cmd_register_module cmd;
-> @@ -159,7 +188,7 @@ static bthl_interface_t health_if = {
->  	.init = init,
->  	.register_application = register_application,
->  	.unregister_application = unregister_application,
-> -	.connect_channel = NULL,
-> +	.connect_channel = connect_channel,
->  	.destroy_channel = NULL,
->  	.cleanup = cleanup
->  };
+>  static bthl_interface_t health_if = {
+>  	.size = sizeof(health_if),
+> -	.init = NULL,
+> +	.init = init,
+>  	.register_application = NULL,
+>  	.unregister_application = NULL,
+>  	.connect_channel = NULL,
 
 -- 
 Szymon K. Janc
