@@ -1,51 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/5] unit/avrcp: Add /TP/BGN/BV-01-I test
-Date: Wed, 12 Mar 2014 12:54:30 +0200
-Message-Id: <1394621673-13718-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1394621673-13718-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <CABBYNZK6yEDvVwda3GBubgh2+J=SwE_Vmr5oEJ_hhqhOLd2CsA@mail.gmail.com>
- <1394621673-13718-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH v4 2/2] android/gatt: Handle Unregister gatt client command
+Date: Wed, 12 Mar 2014 10:27:38 +0100
+Message-Id: <1394616458-5212-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1394616458-5212-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1394616458-5212-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Test verifies that the Controller can send Next Group command to the
-Target.
+This adds unregister gatt client app command handling.
 ---
- unit/test-avrcp.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ android/gatt.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 3702d39..a5a7a38 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -636,6 +636,10 @@ static void test_client(gconstpointer data)
- 						AVRCP_EVENT_STATUS_CHANGED, 0,
- 						NULL, NULL);
+diff --git a/android/gatt.c b/android/gatt.c
+index 34549dd..a874737 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -36,6 +36,7 @@
+ #include "gatt.h"
+ #include "src/log.h"
+ #include "hal-msg.h"
++#include "src/shared/util.h"
  
-+	if (g_str_equal(context->data->test_name, "/TP/BGN/BV-01-I"))
-+		avrcp_send_passthrough_vendor(context->session,
-+						AVC_VENDOR_NEXT_GROUP,
-+						IEEEID_BTSIG);
- 	execute_context(context);
+ struct gatt_client {
+ 	int32_t id;
+@@ -54,6 +55,14 @@ static int find_client_by_uuid(gconstpointer data, gconstpointer user_data)
+ 	return memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
  }
  
-@@ -1030,5 +1034,12 @@ int main(int argc, char *argv[])
- 				0xff, 0x00, 0x00, 0x01,
- 				AVRCP_STATUS_INVALID_COMMAND));
- 
-+	/* Next Group command transfer - CT */
-+	define_test("/TP/BGN/BV-01-I", test_client,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
-+				AVC_OP_PASSTHROUGH,
-+				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
-+				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
++static int find_client_by_id(gconstpointer data, gconstpointer user_data)
++{
++	int32_t exp_id = PTR_TO_INT(user_data);
++	const struct gatt_client *client = data;
 +
- 	return g_test_run();
++	return client->id != exp_id;
++}
++
+ static void handle_client_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_register *cmd = buf;
+@@ -100,10 +109,27 @@ failed:
+ 
+ static void handle_client_unregister(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_unregister *cmd = buf;
++	GSList *l;
++	uint8_t status;
++
+ 	DBG("");
+ 
++	l = g_slist_find_custom(gatt_clients, INT_TO_PTR(cmd->client_if),
++							find_client_by_id);
++	if (!l) {
++		error("gatt: client_if=%d not found", cmd->client_if);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	gatt_clients = g_slist_remove(gatt_clients, l->data);
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_CLIENT_UNREGISTER, HAL_STATUS_FAILED);
++					HAL_OP_GATT_CLIENT_UNREGISTER, status);
  }
+ 
+ static void handle_client_scan(const void *buf, uint16_t len)
 -- 
-1.8.3.2
+1.8.5.2
 
