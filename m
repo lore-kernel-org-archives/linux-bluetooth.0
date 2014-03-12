@@ -1,57 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <531FE24D.9030005@hurleysoftware.com>
-Date: Wed, 12 Mar 2014 00:27:57 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
- Scott James Remnant <keybuk@chromium.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: rctest -c "Can't connect: Device or resource busy (16)"
-References: <CAHZ1yC=+XNxEx5ivA+ebGi_Cjui2Mcrx+q83b-eUPvt2J0XLPw@mail.gmail.com> <7C822ED2-E0F6-4CC7-AF1D-D909AD7C0B1F@holtmann.org> <CAHZ1yCnx_fbd_O5VLZ6TWpBbyT3vsx_1JB-qOR5NBYuGMwnA_g@mail.gmail.com> <15A2D205-97BC-4790-A998-52AD8941DB3F@holtmann.org> <531FCE03.4080704@hurleysoftware.com>
-In-Reply-To: <531FCE03.4080704@hurleysoftware.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: armansito@chromium.org
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [RFC BlueZ 2/2] gatt-dbus: Add remote GATT characteristic objects.
+Date: Tue, 11 Mar 2014 21:04:00 -0700
+Message-Id: <1394597040-4483-3-git-send-email-armansito@chromium.org>
+In-Reply-To: <1394597040-4483-1-git-send-email-armansito@chromium.org>
+References: <1394597040-4483-1-git-send-email-armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 03/11/2014 11:01 PM, Peter Hurley wrote:
-> On 03/11/2014 10:14 PM, Marcel Holtmann wrote:
->> Hi Scott,
->>
->>> 3.10 with bluetooth-next applied - btmon of both sides attached
->>
->> I am seeing the same with bluetooth-next on a 3.13 kernel. It even has a weird pattern for me.
->>
->> rctest[52844]: Connected [handle 11, class 0x000000, priority 0]
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Connection refused (111)
->> rctest[52844]: Can't connect: Connection reset by peer (104)
->> rctest[52844]: Can't connect: Connection reset by peer (104)
->> rctest[52844]: Connected [handle 11, class 0x000000, priority 0]
->>
->> Unfortunately I currently have no idea on why this happens. When using
->> SO_LINGER of 60 seconds with rctest -L 60 -c <bdaddr> I am getting some
->> really odd tracing behavior.
->>
->>> ACL Data RX: Handle 11 flags 0x02 dlen 14
->>        L2CAP: Command Reject (0x01) ident 7 len 6
->>          Reason: Invalid CID in request (0x0002)
->>          Destination CID: 64
->>          Source CID: 0
->>
->> This should never happen and makes me wonder if something is
->> even screwed up one down in L2CAP. Do you happen to have time
->> to bisect this and figure out which patch introduced this behavior.
+From: Arman Uguray <armansito@chromium.org>
 
-Sorry, I was wrong about the UA non-receipt; found it much further
-down in the kernel trace. There's quite a lag between sending
-the DISC and receiving the UA reply; about 12ms.
+This CL adds remote GATT characteristic objects to the D-Bus API. The
+API only exposes the UUID; the characteristic value and permissions have
+not yet been implemented.
+---
+ src/gatt-dbus.c | 165 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 164 insertions(+), 1 deletion(-)
+
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 60b87fa..db98137 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -52,8 +52,24 @@
+ 
+ struct btd_gatt_dbus_service {
+ 	bt_uuid_t uuid;
++	struct att_range range;
++	GAttrib *attrib;
++	guint attioid;
++	guint request;
++
+ 	struct btd_device *device;
+ 	char *path;
++	GSList *characteristics;
++};
++
++struct gatt_dbus_characteristic {
++	bt_uuid_t uuid;
++	uint8_t handle;
++	uint8_t value_handle;
++	uint8_t properties;
++
++	struct btd_gatt_dbus_service *service;
++	char *path;
+ };
+ 
+ struct external_app {
+@@ -491,19 +507,156 @@ static gboolean service_property_get_uuid(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static gboolean characteristic_property_get_uuid(
++		const GDBusPropertyTable *table,
++		DBusMessageIter *iter, void *data)
++{
++	char uuid[MAX_LEN_UUID_STR + 1];
++	const char *ptr = uuid;
++	struct gatt_dbus_characteristic *chr = data;
++
++	bt_uuid_to_string(&chr->uuid, uuid, sizeof(uuid));
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
++
++	return TRUE;
++}
++
+ static const GDBusPropertyTable service_properties[] = {
+ 	{ "UUID", "s", service_property_get_uuid },
+ 	{}
+ };
+ 
++static const GDBusPropertyTable characteristic_properties[] = {
++	{ "UUID", "s", characteristic_property_get_uuid },
++	{}
++};
++
++static void unregister_characteristic(gpointer user_data)
++{
++	struct gatt_dbus_characteristic *chr = user_data;
++	g_dbus_unregister_interface(btd_get_dbus_connection(),
++					chr->path, GATT_CHR_IFACE);
++}
++
++static void attio_cleanup(struct btd_gatt_dbus_service *service)
++{
++	if (!service->attrib)
++		return;
++	GAttrib *attrib = service->attrib;
++	service->attrib = NULL;
++	if (service->request) {
++		g_attrib_cancel(attrib, service->request);
++		service->request = 0;
++	}
++	g_attrib_unref(attrib);
++}
++
+ static void service_free(gpointer user_data)
+ {
+ 	struct btd_gatt_dbus_service *service = user_data;
+ 
++	g_slist_free_full(service->characteristics, unregister_characteristic);
++
++	if (service->attioid) {
++		btd_device_remove_attio_callback(service->device,
++						service->attioid);
++	}
++	attio_cleanup(service);
+ 	g_free(service->path);
+ 	g_free(service);
+ }
+ 
++static void characteristic_free(gpointer user_data)
++{
++	struct gatt_dbus_characteristic *characteristic = user_data;
++
++	g_free(characteristic->path);
++	g_free(characteristic);
++}
++
++static struct gatt_dbus_characteristic *characteristic_create(
++		struct btd_gatt_dbus_service *service,
++		struct gatt_char *chr)
++{
++	struct gatt_dbus_characteristic *characteristic;
++	bt_uuid_t uuid;
++
++	DBG("GATT characteristic UUID: %s", chr->uuid);
++
++	characteristic = g_try_malloc0(sizeof(struct gatt_dbus_characteristic));
++	if (characteristic == NULL)
++		return NULL;
++
++	characteristic->path = g_strdup_printf("%s/char%04X", service->path,
++						chr->handle);
++	characteristic->service = service;
++	characteristic->handle = chr->handle;
++	characteristic->value_handle = chr->value_handle;
++	characteristic->properties = chr->properties;
++
++	if (bt_string_to_uuid(&uuid, chr->uuid)) {
++		error("Characteristic has invalid UUID: %s", chr->uuid);
++		goto fail;
++	}
++
++	bt_uuid_to_uuid128(&uuid, &characteristic->uuid);
++
++	DBG("Creating GATT characteristic %s", characteristic->path);
++
++	if (g_dbus_register_interface(btd_get_dbus_connection(),
++					characteristic->path,
++					GATT_CHR_IFACE, NULL, NULL,
++					characteristic_properties,
++					characteristic,
++					characteristic_free) == FALSE) {
++		error("Unable to register GATT characteristic: %s", chr->uuid);
++		goto fail;
++	}
++
++	return characteristic;
++
++fail:
++	characteristic_free(characteristic);
++	return NULL;
++}
++
++static void discover_char_cb(uint8_t status, GSList *chars, void *user_data)
++{
++	struct btd_gatt_dbus_service *service = user_data;
++	service->request = 0;
++	if (status) {
++		error("Characteristic discovery failed.");
++		return;
++	}
++	for (; chars; chars = chars->next) {
++		struct gatt_char *chr = chars->data;
++		struct gatt_dbus_characteristic *dbus_chr =
++				characteristic_create(service, chr);
++		if (dbus_chr == NULL)
++			continue;
++		service->characteristics = g_slist_append(
++				service->characteristics, dbus_chr);
++	}
++	attio_cleanup(service);
++}
++
++static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
++{
++	struct btd_gatt_dbus_service *service = user_data;
++	service->attrib = g_attrib_ref(attrib);
++	service->request = gatt_discover_char(service->attrib,
++			service->range.start,
++			service->range.end,
++			NULL, discover_char_cb,
++			service);
++}
++
++static void attio_disconnected_cb(gpointer user_data)
++{
++	struct btd_gatt_dbus_service *service = user_data;
++	attio_cleanup(service);
++}
++
+ struct btd_gatt_dbus_service *btd_gatt_dbus_service_create(
+ 		struct btd_device *device, struct gatt_primary *primary)
+ {
+@@ -520,6 +673,12 @@ struct btd_gatt_dbus_service *btd_gatt_dbus_service_create(
+ 	service->path = g_strdup_printf("%s/service%04X", device_path,
+ 					primary->range.start);
+ 
++	service->device = device;
++	service->range = primary->range;
++	service->characteristics = NULL;
++	service->attrib = NULL;
++	service->request = 0;
++
+ 	if (bt_string_to_uuid(&uuid, primary->uuid)) {
+ 		error("Primary has invalid UUID: %s", primary->uuid);
+ 		goto fail;
+@@ -541,7 +700,11 @@ struct btd_gatt_dbus_service *btd_gatt_dbus_service_create(
+ 		goto fail;
+ 	}
+ 
+-	service->device = device;
++	service->attioid = service->attioid = btd_device_add_attio_callback(
++			service->device,
++			attio_connected_cb,
++			attio_disconnected_cb, service);
++
+ 	return service;
+ 
+ fail:
+-- 
+1.8.3.2
+
