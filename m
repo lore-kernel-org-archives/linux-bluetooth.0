@@ -1,163 +1,264 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android/avrcp-lib: Change API to register callbacks instead of PDU handlers
-Date: Wed, 12 Mar 2014 15:19:02 +0200
-Message-Id: <1394630342-32469-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH 2/2] android/pts: Add HFP PTS tests results
+Date: Wed, 12 Mar 2014 14:12:29 +0100
+Message-Id: <1394629949-13166-2-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1394629949-13166-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1394629949-13166-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This adds avrcp_register_player function to register callbacks for
-requests and responses, the fundamental difference is that the
-callbacks are called after the original PDU is parsed and the parameter
-are converted to host byte order making us able to unit test the
-parsing itself.
+Adding PTS test results for HFP 1.6
 ---
- android/avrcp-lib.c | 23 +++++++++++++++++
- android/avrcp-lib.h | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 96 insertions(+)
+ android/Makefile.am |   3 +-
+ android/pts-hfp.txt | 225 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 227 insertions(+), 1 deletion(-)
+ create mode 100644 android/pts-hfp.txt
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index befc404..953674b 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -73,6 +73,7 @@ struct avrcp_header {
- 
- struct avrcp {
- 	struct avctp *conn;
-+	struct avrcp_player *player;
- 
- 	size_t tx_mtu;
- 	uint8_t *tx_buf;
-@@ -89,6 +90,13 @@ struct avrcp {
- 	void *destroy_data;
- };
- 
-+struct avrcp_player {
-+	const struct avrcp_control_ind *ind;
-+	const struct avrcp_control_cfm *cfm;
+diff --git a/android/Makefile.am b/android/Makefile.am
+index bbd3d2f..330529f 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -218,4 +218,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-a2dp.txt \
+ 				android/pts-avrcp.txt \
+ 				android/pts-avctp.txt \
+-				android/pts-pbap.txt
++				android/pts-pbap.txt \
++				android/pts-hfp.txt
+diff --git a/android/pts-hfp.txt b/android/pts-hfp.txt
+new file mode 100644
+index 0000000..719039a
+--- /dev/null
++++ b/android/pts-hfp.txt
+@@ -0,0 +1,225 @@
++PTS test results for HFP
 +
-+	void *user_data;
-+};
++PTS version: 5.0
++Tested: 11-Mar-2014
++Android version: 4.4.2
 +
- void avrcp_shutdown(struct avrcp *session)
- {
- 	if (session->conn) {
-@@ -249,6 +257,21 @@ void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
- 	session->destroy_data = user_data;
- }
- 
-+void avrcp_register_player(struct avrcp *session,
-+				const struct avrcp_control_ind *ind,
-+				const struct avrcp_control_cfm *cfm,
-+				void *user_data)
-+{
-+	struct avrcp_player *player;
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
 +
-+	player = g_new0(struct avrcp_player, 1);
-+	player->ind = ind;
-+	player->cfm = cfm;
-+	player->user_data = user_data;
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_AG_OOR_BV_01_I	PASS
++TC_AG_OOR_BV_02_I	PASS
++TC_AG_TRS_BV_01_I	PASS
++TC_AG_PSI_BV_01_I	PASS
++TC_AG_PSI_BV_02_I	N/A
++TC_AG_PSI_BV_03_I	PASS
++TC_AG_PSI_BV_04_I	PASS
++TC_AG_PSI_BV_05_I	PASS
++TC_AG_ACS_BV_02_I	N/A
++TC_AG_ACS_BV_04_I	PASS
++TC_AG_ACS_BV_06_I	N/A
++TC_AG_ACS_BV_08_I	PASS
++TC_AG_ACS_BV_10_I	N/A
++TC_AG_ACS_BV_11_I	PASS
++TC_AG_ACS_BI_14_I	PASS
++TC_AG_ACR_BV_01_I	PASS
++TC_AG_ACR_BV_02_I	PASS
++TC_AG_CLI_BV_01_I	PASS
++TC_AG_ICA_BV_01_I	N/A
++TC_AG_ICA_BV_02_I	N/A
++TC_AG_ICA_BV_04_I	PASS
++TC_AG_ICA_BV_05_I	N/A
++TC_AG_ICA_BV_06_I	PASS
++TC_AG_ICR_BV_01_I	PASS
++TC_AG_ICR_BV_02_I	PASS
++TC_AG_TCA_BV_01_I	PASS
++TC_AG_TCA_BV_02_I	PASS
++TC_AG_TCA_BV_03_I	PASS
++TC_AG_TCA_BV_04_I	PASS
++TC_AG_TCA_BV_05_I	PASS
++TC_AG_ATH_BV_03_I	PASS
++TC_AG_ATH_BV_04_I	PASS
++TC_AG_ATH_BV_05_I	PASS
++TC_AG_ATH_BV_06_I	PASS
++TC_AG_ATA_BV_01_I	PASS
++TC_AG_ATA_BV_02_I	PASS
++TC_AG_OCN_BV_01_I	PASS
++TC_AG_OCM_BV_01_I	PASS
++TC_AG_OCM_BV_02_I	PASS
++TC_AG_OCL_BV_01_I	PASS
++TC_AG_OCL_BV_02_I	PASS
++TC_AG_TWC_BV_01_I	INC	Not yet implemented
++TC_AG_TWC_BV_02_I	INC	Not yet implemented
++TC_AG_TWC_BV_03_I	INC	Not yet implemented
++TC_AG_TWC_BV_04_I	INC	Not yet implemented
++TC_AG_TWC_BV_05_I	INC	Not yet implemented
++TC_AG_TWC_BV_06_I	N/A
++TC_AG_CIT_BV_01_I	PASS
++TC_AG_ENO_BV_01_I	PASS
++TC_AG_ENO_BV_02_I	N/A
++TC_AG_VRA_BV_01_I	PASS
++TC_AG_VRA_BV_02_I	N/A
++TC_AG_VRA_BI_01_I	N/A
++TC_AG_VRD_BV_01_I	PASS
++TC_AG_VTG_BV_01_I	N/A
++TC_AG_TDC_BV_01_I	PASS
++TC_AG_RSV_BV_01_I	PASS
++TC_AG_RSV_BV_02_I	PASS
++TC_AG_RSV_BV_03_I	PASS
++TC_AG_RMV_BV_01_I	N/A
++TC_AG_RMV_BV_02_I	N/A
++TC_AG_RMV_BV_03_I	N/A
++TC_AG_ECS_BV_01_I	PASS
++TC_AG_ECS_BV_02_I	PASS
++TC_AG_ECS_BV_03_I	PASS
++TC_AG_ECC_BV_01_I	N/A
++TC_AG_ECC_BV_02_I	N/A
++TC_AG_ECC_BI_03_I	PASS
++TC_AG_ECC_BI_04_I	PASS
++TC_AG_RHH_BV_01_I	N/A
++TC_AG_RHH_BV_02_I	N/A
++TC_AG_RHH_BV_03_I	N/A
++TC_AG_RHH_BV_04_I	N/A
++TC_AG_RHH_BV_05_I	N/A
++TC_AG_RHH_BV_06_I	N/A
++TC_AG_RHH_BV_07_I	N/A
++TC_AG_RHH_BV_08_I	N/A
++TC_AG_NUM_BV_01_I	PASS
++TC_AG_SLC_BV_01_C	PASS
++TC_AG_SLC_BV_02_C	PASS
++TC_AG_SLC_BV_03_C	PASS
++TC_AG_SLC_BV_04_C	PASS
++TC_AG_SLC_BV_05_I	N/A
++TC_AG_SLC_BV_06_I	N/A
++TC_AG_SLC_BV_07_I	N/A
++TC_AG_ACC_BV_08_I	N/A
++TC_AG_ACC_BV_09_I	N/A
++TC_AG_ACC_BV_10_I	N/A
++TC_AG_ACC_BV_11_I	N/A
++TC_AG_ACC_BI_12_I	N/A
++TC_AG_ACC_BI_13_I	N/A
++TC_AG_ACC_BI_14_I	N/A
++TC_AG_ACC_BV_15_I	N/A
++TC_AG_WBS_BV_01_I	N/A
++TC_AG_DIS_BV_01_I	PASS
++TC_AG_SDP_BV_01_I	PASS
++TC_AG_IIA_BV_01_I	PASS
++TC_AG_IIA_BV_02_I	PASS
++TC_AG_IIA_BV_03_I	N/A
++TC_AG_IIA_BV_05_I	PASS
++TC_AG_IID_BV_01_I	PASS
++TC_AG_IID_BV_02_I	N/A
++TC_AG_IID_BV_03_I	PASS
++TC_AG_IID_BV_04_I	PASS
++TC_AG_IIC_BV_01_I	PASS
++TC_AG_IIC_BV_02_I	PASS
++TC_AG_IIC_BV_03_I	PASS
 +
-+	session->player = player;
-+}
-+
- void avrcp_set_control_handlers(struct avrcp *session,
- 				const struct avrcp_control_handler *handlers,
- 				void *user_data)
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 91a7d47..62c989d 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -99,6 +99,74 @@ struct avrcp_control_handler {
- 			uint16_t params_len, uint8_t *params, void *user_data);
- };
- 
-+struct avrcp_control_ind {
-+	int (*get_capabilities) (struct avrcp *session,
-+					uint8_t transaction, void *user_data);
-+	int (*list_attributes) (struct avrcp *session,
-+					uint8_t transaction, void *user_data);
-+	int (*get_attribute_text) (struct avrcp *session, uint8_t transaction,
-+					uint16_t number, uint8_t *attrs,
-+					void *user_data);
-+	int (*list_values) (struct avrcp *session, uint8_t transaction,
-+					uint8_t attr, void *user_data);
-+	int (*get_value_text) (struct avrcp *session, uint8_t transaction,
-+					uint8_t attr, void *user_data);
-+	int (*get_value) (struct avrcp *session, uint8_t transaction,
-+					uint16_t number, uint8_t *attrs,
-+					void *user_data);
-+	int (*set_value) (struct avrcp *session, uint8_t transaction,
-+					uint16_t number, uint8_t *attrs,
-+					void *user_data);
-+	int (*get_play_status) (struct avrcp *session, uint8_t transaction,
-+					void *user_data);
-+	int (*get_element_attributes) (struct avrcp *session,
-+					uint8_t transaction, uint8_t number,
-+					uint32_t *attrs, void *user_data);
-+	int (*register_notification) (struct avrcp *session,
-+					uint8_t transaction, uint8_t event,
-+					uint32_t interval, void *user_data);
-+};
-+
-+struct avrcp_element {
-+	uint32_t attr;
-+	char *value;
-+};
-+
-+struct avrcp_control_cfm {
-+	void (*get_capabilities) (struct avrcp *session, int err,
-+					uint8_t *events, void *user_data);
-+	void (*list_attributes) (struct avrcp *session, int err,
-+					uint8_t number, uint8_t *attrs,
-+					void *user_data);
-+	void (*get_attribute_text) (struct avrcp *session, int err,
-+					uint16_t number, uint8_t *attrs,
-+					void *user_data);
-+	void (*list_values) (struct avrcp *session, int err,
-+					uint8_t number, uint8_t *values,
-+					void *user_data);
-+	void (*get_value_text) (struct avrcp *session, int err,
-+					const char *value, void *user_data);
-+	void (*get_value) (struct avrcp *session, int err,
-+					uint16_t number, uint8_t *attrs,
-+					void *user_data);
-+	void (*set_value) (struct avrcp *session, int err,
-+					uint16_t number, uint8_t *attrs,
-+					void *user_data);
-+	void (*get_play_status) (struct avrcp *session, int err,
-+					uint32_t position, uint32_t duration,
-+					void *user_data);
-+	void (*get_element_attributes) (struct avrcp *session, int err,
-+					const GSList *elements,
-+					void *user_data);
-+	void (*status_changed) (struct avrcp *session, int err,
-+					uint8_t status, void *user_data);
-+	void (*track_changed) (struct avrcp *session, int err,
-+					uint64_t uid, void *user_data);
-+	void (*settings_changed) (struct avrcp *session, int err,
-+					uint8_t number, uint8_t *attrs,
-+					void *user_data);
-+};
-+
- struct avrcp_passthrough_handler {
- 	uint8_t op;
- 	bool (*func) (struct avrcp *session, bool pressed, void *user_data);
-@@ -122,6 +190,11 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
- void avrcp_shutdown(struct avrcp *session);
- void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
- 							void *user_data);
-+
-+void avrcp_register_player(struct avrcp *session,
-+				const struct avrcp_control_ind *ind,
-+				const struct avrcp_control_cfm *cfm,
-+				void *user_data);
- void avrcp_set_control_handlers(struct avrcp *session,
- 				const struct avrcp_control_handler *handlers,
- 				void *user_data);
++TC_HF_OOR_BV_01_I	N/A
++TC_HF_OOR_BV_02_I	N/A
++TC_HF_TRS_BV_01_I	N/A
++TC_HF_PSI_BV_01_I	N/A
++TC_HF_PSI_BV_02_I	N/A
++TC_HF_PSI_BV_03_I	N/A
++TC_HF_PSI_BV_04_I	N/A
++TC_HF_ACS_BV_01_I	N/A
++TC_HF_ACS_BV_03_I	N/A
++TC_HF_ACS_BV_05_I	N/A
++TC_HF_ACS_BV_07_I	N/A
++TC_HF_ACS_BV_09_I	N/A
++TC_HF_ACS_BV_12_I	N/A
++TC_HF_ACS_BI_13_I	N/A
++TC_HF_ACR_BV_01_I	N/A
++TC_HF_ACR_BV_02_I	N/A
++TC_HF_CLI_BV_01_I	N/A
++TC_HF_ICA_BV_01_I	N/A
++TC_HF_ICA_BV_02_I	N/A
++TC_HF_ICA_BV_03_I	N/A
++TC_HF_ICA_BV_04_I	N/A
++TC_HF_ICA_BV_05_I	N/A
++TC_HF_ICA_BV_06_I	N/A
++TC_HF_ICA_BV_07_I	N/A
++TC_HF_ICR_BV_01_I	N/A
++TC_HF_ICR_BV_02_I	N/A
++TC_HF_TCA_BV_01_I	N/A
++TC_HF_TCA_BV_02_I	N/A
++TC_HF_TCA_BV_03_I	N/A
++TC_HF_TCA_BV_04_I	N/A
++TC_HF_ATH_BV_03_I	N/A
++TC_HF_ATH_BV_04_I	N/A
++TC_HF_ATH_BV_05_I	N/A
++TC_HF_ATH_BV_06_I	N/A
++TC_HF_ATH_BV_09_I	N/A
++TC_HF_ATA_BV_01_I	N/A
++TC_HF_ATA_BV_02_I	N/A
++TC_HF_ATA_BV_03_I	N/A
++TC_HF_OCN_BV_01_I	N/A
++TC_HF_OCM_BV_01_I	N/A
++TC_HF_OCM_BV_02_I	N/A
++TC_HF_OCL_BV_01_I	N/A
++TC_HF_OCL_BV_02_I	N/A
++TC_HF_TWC_BV_01_I	N/A
++TC_HF_TWC_BV_02_I	N/A
++TC_HF_TWC_BV_03_I	N/A
++TC_HF_TWC_BV_04_I	N/A
++TC_HF_TWC_BV_05_I	N/A
++TC_HF_TWC_BV_06_I	N/A
++TC_HF_CIT_BV_01_I	N/A
++TC_HF_ENO_BV_01_I	N/A
++TC_HF_VRA_BV_01_I	N/A
++TC_HF_VRA_BV_02_I	N/A
++TC_HF_VRA_BV_03_I	N/A
++TC_HF_VRD_BV_01_I	N/A
++TC_HF_VTG_BV_01_I	N/A
++TC_HF_TDC_BV_01_I	N/A
++TC_HF_RSV_BV_01_I	N/A
++TC_HF_RSV_BV_02_I	N/A
++TC_HF_RSV_BV_03_I	N/A
++TC_HF_RMV_BV_01_I	N/A
++TC_HF_RMV_BV_02_I	N/A
++TC_HF_RMV_BV_03_I	N/A
++TC_HF_ECS_BV_01_I	N/A
++TC_HF_ECS_BV_02_I	N/A
++TC_HF_ECS_BV_03_I	N/A
++TC_HF_ECC_BV_01_I	N/A
++TC_HF_ECC_BV_02_I	N/A
++TC_HF_RHH_BV_01_I	N/A
++TC_HF_RHH_BV_02_I	N/A
++TC_HF_RHH_BV_03_I	N/A
++TC_HF_RHH_BV_04_I	N/A
++TC_HF_RHH_BV_05_I	N/A
++TC_HF_RHH_BV_06_I	N/A
++TC_HF_RHH_BV_07_I	N/A
++TC_HF_RHH_BV_08_I	N/A
++TC_HF_NUM_BV_01_I	N/A
++TC_HF_NUM_BI_01_I	N/A
++TC_HF_SLC_BV_01_C	N/A
++TC_HF_SLC_BV_02_C	N/A
++TC_HF_SLC_BV_03_C	N/A
++TC_HF_SLC_BV_04_C	N/A
++TC_HF_SLC_BV_05_I	N/A
++TC_HF_SLC_BV_06_I	N/A
++TC_HF_SLC_BV_08_I	N/A
++TC_HF_ACC_BV_01_I	N/A
++TC_HF_ACC_BV_02_I	N/A
++TC_HF_ACC_BV_03_I	N/A
++TC_HF_ACC_BV_04_I	N/A
++TC_HF_ACC_BV_05_I	N/A
++TC_HF_ACC_BV_06_I	N/A
++TC_HF_ACC_BV_07_I	N/A
++TC_HF_WBS_BV_02_I	N/A
++TC_HF_WBS_BV_03_I	N/A
++TC_HF_DIS_BV_01_I	N/A
++TC_HF_DIS_BV_02_I	N/A
++TC_HF_SDP_BV_01_I	N/A
++TC_HF_SDP_BV_02_C	N/A
++TC_HF_SDP_BV_03_C	N/A
++TC_HF_ATAH_BV_01_I	N/A
++TC_HF_OCA_BV_01_I	N/A
++TC_HF_IIA_BV_04_I	N/A
 -- 
 1.8.5.3
 
