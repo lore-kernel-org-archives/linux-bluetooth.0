@@ -1,83 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <532096FA.5060008@hurleysoftware.com>
-Date: Wed, 12 Mar 2014 13:18:50 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>,
- Scott James Remnant <keybuk@chromium.org>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: rctest -c "Can't connect: Device or resource busy (16)"
-References: <CAHZ1yC=+XNxEx5ivA+ebGi_Cjui2Mcrx+q83b-eUPvt2J0XLPw@mail.gmail.com> <7C822ED2-E0F6-4CC7-AF1D-D909AD7C0B1F@holtmann.org> <CAHZ1yCnx_fbd_O5VLZ6TWpBbyT3vsx_1JB-qOR5NBYuGMwnA_g@mail.gmail.com> <15A2D205-97BC-4790-A998-52AD8941DB3F@holtmann.org> <531FCE03.4080704@hurleysoftware.com>
-In-Reply-To: <531FCE03.4080704@hurleysoftware.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/gatt: Use queue and stdlib instead of glib
+Date: Wed, 12 Mar 2014 18:07:44 +0100
+Message-Id: <1394644064-8223-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> On 03/11/2014 10:14 PM, Marcel Holtmann wrote:
->> Hi Scott,
->>
->>> 3.10 with bluetooth-next applied - btmon of both sides attached
->>
->> I am seeing the same with bluetooth-next on a 3.13 kernel. It even has a weird pattern for me.
->>
->> rctest[52844]: Connected [handle 11, class 0x000000, priority 0]
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Device or resource busy (16)
->> rctest[52844]: Can't connect: Connection refused (111)
->> rctest[52844]: Can't connect: Connection reset by peer (104)
->> rctest[52844]: Can't connect: Connection reset by peer (104)
->> rctest[52844]: Connected [handle 11, class 0x000000, priority 0]
->>
->> Unfortunately I currently have no idea on why this happens. When using
->> SO_LINGER of 60 seconds with rctest -L 60 -c <bdaddr> I am getting some
->> really odd tracing behavior.
->>
->>> ACL Data RX: Handle 11 flags 0x02 dlen 14
->>        L2CAP: Command Reject (0x01) ident 7 len 6
->>          Reason: Invalid CID in request (0x0002)
->>          Destination CID: 64
->>          Source CID: 0
->>
->> This should never happen and makes me wonder if something is
->> even screwed up one down in L2CAP. Do you happen to have time
->> to bisect this and figure out which patch introduced this behavior.
+This patch changes using glib to queues, stdlib operators.
+---
+ android/gatt.c | 38 +++++++++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 15 deletions(-)
 
-There are 2 separate problems going on here.
+diff --git a/android/gatt.c b/android/gatt.c
+index a874737..436f765 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -37,6 +37,7 @@
+ #include "src/log.h"
+ #include "hal-msg.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
+ 
+ struct gatt_client {
+ 	int32_t id;
+@@ -45,22 +46,22 @@ struct gatt_client {
+ 
+ static struct ipc *hal_ipc = NULL;
+ static bdaddr_t adapter_addr;
+-static GSList *gatt_clients = NULL;
++static struct queue *gatt_clients = NULL;
+ 
+-static int find_client_by_uuid(gconstpointer data, gconstpointer user_data)
++static bool find_client_by_uuid(const void *data, const void *user_data)
+ {
+ 	const uint8_t *exp_uuid = user_data;
+ 	const struct gatt_client *client = data;
+ 
+-	return memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
++	return !memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
+ }
+ 
+-static int find_client_by_id(gconstpointer data, gconstpointer user_data)
++static bool find_client_by_id(const void *data, const void *user_data)
+ {
+ 	int32_t exp_id = PTR_TO_INT(user_data);
+ 	const struct gatt_client *client = data;
+ 
+-	return client->id != exp_id;
++	return client->id == exp_id;
+ }
+ 
+ static void handle_client_register(const void *buf, uint16_t len)
+@@ -79,19 +80,19 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	if (g_slist_find_custom(gatt_clients, &cmd->uuid,
+-							find_client_by_uuid)) {
++	if (queue_find(gatt_clients, find_client_by_uuid, &cmd->uuid)) {
+ 		error("gatt: client uuid is already on list");
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	client = g_new0(struct gatt_client, 1);
++	client = (struct gatt_client *) malloc(sizeof(struct gatt_client));
++
+ 	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+ 
+ 	client->id = client_cnt++;
+ 
+-	gatt_clients = g_slist_prepend(gatt_clients, client);
++	queue_push_head(gatt_clients, client);
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+@@ -110,21 +111,17 @@ failed:
+ static void handle_client_unregister(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_unregister *cmd = buf;
+-	GSList *l;
+ 	uint8_t status;
+ 
+ 	DBG("");
+ 
+-	l = g_slist_find_custom(gatt_clients, INT_TO_PTR(cmd->client_if),
+-							find_client_by_id);
+-	if (!l) {
++	if (!queue_remove_if(gatt_clients, find_client_by_id,
++						INT_TO_PTR(cmd->client_if))) {
+ 		error("gatt: client_if=%d not found", cmd->client_if);
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	gatt_clients = g_slist_remove(gatt_clients, l->data);
+-
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+@@ -513,6 +510,13 @@ static const struct ipc_handler cmd_handlers[] = {
+ 			sizeof(struct hal_cmd_gatt_server_send_response)},
+ };
+ 
++static void destroy_gatt_clients(void *data)
++{
++	struct gatt_client *elem = data;
++
++	free(elem);
++}
++
+ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ {
+ 	DBG("");
+@@ -524,6 +528,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_GATT, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
++	gatt_clients = queue_new();
++
+ 	return true;
+ }
+ 
+@@ -531,6 +537,8 @@ void bt_gatt_unregister(void)
+ {
+ 	DBG("");
+ 
++	queue_destroy(gatt_clients, destroy_gatt_clients);
++
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_GATT);
+ 	hal_ipc = NULL;
+ }
+-- 
+1.8.5.2
 
-The failure to reconnect is happening because after sending DISC,
-the sender still replies to stale MCC packets, which the receiver
-(whose state now reflects the DISC) replies with a DM packet which
-gets received on the re-opened dlc, causing it to disconnect with
-error. This is trivially fixable, and AFAICT, is not a regression.
-
-The 2nd problem of not being able to reconnect in a reasonable
-number of times is due to the huge round-trip delays after receiving
-DISC and replying with UA.
-
-This is a result of the excessive number of execution contexts
-being used on the BT stack.
-
-1) from USB interrupt -> btusb_bulk_complete -> queue_work(rx_work)
-2) hci_rx_work -> l2cap_data_channel -> l2cap_sock_recv_cb -> sock_queue_rcv_skb
-3) -> rfcomm_l2data_ready -> rfcomm_schedule
-4) rfcomm_process_rx -> rfcomm_recv_disc -> rfcomm_send_ua -> l2cap_do_send -> hci_queue_acl
-5) hci_tx_work -> btusb_send_frame
-
-On a 8-core preempt workstation, this takes ~200us, which is a lot for
-receiving a 12-byte packet and replying with a 12-byte packet.
-Plus, it doesn't help that USB tacks on another 918us to actually
-complete the URB.
-
-On a 1-core non-preempt laptop, this takes 51ms!
-
-Regards,
-Peter Hurley
