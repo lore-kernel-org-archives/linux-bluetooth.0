@@ -1,209 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 1/9] android/avctp: Add parameters to avctp passthrough send
-Date: Wed, 12 Mar 2014 16:40:24 +0200
-Message-Id: <1394635232-23774-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <CABBYNZL5hjJzaxsnXtrHTzJSHSKYjemUnUr=YRE4Zq9qCmoj0g@mail.gmail.com>
+Subject: [PATCHv4 5/9] unit/avrcp: Add /TP/BGN/BV-01-I TG test
+Date: Wed, 12 Mar 2014 16:40:28 +0200
+Message-Id: <1394635232-23774-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1394635232-23774-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <CABBYNZL5hjJzaxsnXtrHTzJSHSKYjemUnUr=YRE4Zq9qCmoj0g@mail.gmail.com>
+ <1394635232-23774-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This allows to use vendor unique commands
+Test verifies that the Target responds to Next Group command.
 ---
- android/avctp.c | 74 ++++++++++++++++++++++++++++++++++++++++++++-------------
- android/avctp.h |  8 ++++++-
- 2 files changed, 65 insertions(+), 17 deletions(-)
+ unit/test-avrcp.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/android/avctp.c b/android/avctp.c
-index d970250..e9ba6db 100644
---- a/android/avctp.c
-+++ b/android/avctp.c
-@@ -159,6 +159,8 @@ struct avctp_channel {
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 3714c1a..7351a34 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -280,11 +280,20 @@ static bool handle_select(struct avrcp *session, bool pressed, void *user_data)
+ 	return true;
+ }
  
- struct key_pressed {
- 	uint8_t op;
-+	uint8_t *params;
-+	size_t params_len;
- 	guint timer;
++static bool handle_vendor_uniq(struct avrcp *session, bool pressed,
++								void *user_data)
++{
++	DBG("");
++
++	return true;
++}
++
+ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
+ 		{ AVC_PLAY, handle_play },
+ 		{ AVC_VOLUME_UP, handle_volume_up },
+ 		{ AVC_CHANNEL_UP, handle_channel_up },
+ 		{ AVC_SELECT, handle_select },
++		{ AVC_VENDOR_UNIQUE, handle_vendor_uniq },
+ 		{ },
  };
  
-@@ -1172,25 +1174,38 @@ static const char *op2str(uint8_t op)
- 	return "UNKNOWN";
- }
+@@ -1045,6 +1054,17 @@ int main(int argc, char *argv[])
+ 				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
+ 				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
  
--static int avctp_passthrough_press(struct avctp *session, uint8_t op)
-+static int avctp_passthrough_press(struct avctp *session, uint8_t op,
-+					uint8_t *params, size_t params_len)
- {
--	uint8_t operands[2];
-+	uint8_t operands[7];
-+	size_t len;
- 
--	DBG("%s", op2str(op));
-+	DBG("op 0x%02x %s params_len %zd", op, op2str(op), params_len);
- 
- 	/* Button pressed */
- 	operands[0] = op & 0x7f;
--	operands[1] = 0;
++	/* Next Group command transfer - TG */
++	define_test("/TP/BGN/BV-01-I", test_server,
++			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
++				AVC_OP_PASSTHROUGH,
++				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
++				0x58, 0x00, AVC_VENDOR_NEXT_GROUP),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
++				0x48, AVC_OP_PASSTHROUGH,
++				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
++				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
 +
-+	if (op == AVC_VENDOR_UNIQUE && params &&
-+				params_len == 5) {
-+		memcpy(&operands[2], params, params_len);
-+		len = params_len + 2;
-+		operands[1] = params_len;
-+	} else {
-+		len = 2;
-+		operands[1] = 0;
-+	}
- 
- 	return avctp_send_req(session, AVC_CTYPE_CONTROL,
- 				AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
--				operands, sizeof(operands),
-+				operands, len,
- 				avctp_passthrough_rsp, NULL);
- }
- 
--static int avctp_passthrough_release(struct avctp *session, uint8_t op)
-+static int avctp_passthrough_release(struct avctp *session, uint8_t op,
-+					uint8_t *params, size_t params_len)
- {
--	uint8_t operands[2];
-+	uint8_t operands[7];
-+	size_t len;
- 
- 	DBG("%s", op2str(op));
- 
-@@ -1198,9 +1213,16 @@ static int avctp_passthrough_release(struct avctp *session, uint8_t op)
- 	operands[0] = op | 0x80;
- 	operands[1] = 0;
- 
-+	if (op == AVC_VENDOR_UNIQUE && params &&
-+				params_len > sizeof(operands) - 2) {
-+		memcpy(&operands[2], params, params_len);
-+		len = params_len;
-+	} else
-+		len = 2;
-+
- 	return avctp_send_req(session, AVC_CTYPE_CONTROL,
- 				AVC_SUBUNIT_PANEL, AVC_OP_PASSTHROUGH,
--				operands, sizeof(operands),
-+				operands, len,
- 				NULL, NULL);
- }
- 
-@@ -1208,15 +1230,18 @@ static gboolean repeat_timeout(gpointer user_data)
- {
- 	struct avctp *session = user_data;
- 
--	avctp_passthrough_release(session, session->key.op);
--	avctp_passthrough_press(session, session->key.op);
-+	avctp_passthrough_release(session, session->key.op, session->key.params,
-+						session->key.params_len);
-+	avctp_passthrough_press(session, session->key.op, session->key.params,
-+						session->key.params_len);
- 
- 	return TRUE;
- }
- 
- static void release_pressed(struct avctp *session)
- {
--	avctp_passthrough_release(session, session->key.op);
-+	avctp_passthrough_release(session, session->key.op, session->key.params,
-+						session->key.params_len);
- 
- 	if (session->key.timer > 0)
- 		g_source_remove(session->key.timer);
-@@ -1224,7 +1249,8 @@ static void release_pressed(struct avctp *session)
- 	session->key.timer = 0;
- }
- 
--static bool set_pressed(struct avctp *session, uint8_t op)
-+static bool set_pressed(struct avctp *session, uint8_t op, uint8_t *params,
-+							size_t params_len)
- {
- 	if (session->key.timer > 0) {
- 		if (session->key.op == op)
-@@ -1236,6 +1262,8 @@ static bool set_pressed(struct avctp *session, uint8_t op)
- 		return FALSE;
- 
- 	session->key.op = op;
-+	session->key.params = params;
-+	session->key.params_len = params_len;
- 	session->key.timer = g_timeout_add_seconds(AVC_PRESS_TIMEOUT,
- 							repeat_timeout,
- 							session);
-@@ -1247,24 +1275,38 @@ static gboolean avctp_passthrough_rsp(struct avctp *session, uint8_t code,
- 					uint8_t subunit, uint8_t *operands,
- 					size_t operand_count, void *user_data)
- {
-+	uint8_t *params;
-+	size_t params_len;
-+
-+	DBG("code 0x%02x operand_count %zd", code, operand_count);
-+
- 	if (code != AVC_CTYPE_ACCEPTED)
- 		return FALSE;
- 
--	if (set_pressed(session, operands[0]))
-+	if (operands[0] == AVC_VENDOR_UNIQUE) {
-+		params = &operands[2];
-+		params_len = operand_count - 2;
-+	} else {
-+		params = NULL;
-+		params_len = 0;
-+	}
-+
-+	if (set_pressed(session, operands[0], params, params_len))
- 		return FALSE;
- 
--	avctp_passthrough_release(session, operands[0]);
-+	avctp_passthrough_release(session, operands[0], params, params_len);
- 
- 	return FALSE;
- }
- 
--int avctp_send_passthrough(struct avctp *session, uint8_t op)
-+int avctp_send_passthrough(struct avctp *session, uint8_t op, uint8_t *params,
-+							size_t params_len)
- {
- 	/* Auto release if key pressed */
- 	if (session->key.timer > 0)
- 		release_pressed(session);
- 
--	return avctp_passthrough_press(session, op);
-+	return avctp_passthrough_press(session, op, params, params_len);
- }
- 
- int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
-diff --git a/android/avctp.h b/android/avctp.h
-index 2f419a2..98c1142 100644
---- a/android/avctp.h
-+++ b/android/avctp.h
-@@ -108,6 +108,11 @@
- #define AVC_BLUE			0x7c
- #define AVC_YELLOW			0x7c
- 
-+#define AVC_VENDOR_UNIQUE		0x7e
-+
-+#define AVC_VENDOR_NEXT_GROUP		0x00
-+#define AVC_VENDOR_PREV_GROUP		0x01
-+
- struct avctp;
- 
- typedef bool (*avctp_passthrough_cb) (struct avctp *session,
-@@ -159,7 +164,8 @@ unsigned int avctp_register_browsing_pdu_handler(struct avctp *session,
- bool avctp_unregister_browsing_pdu_handler(struct avctp *session,
- 							unsigned int id);
- 
--int avctp_send_passthrough(struct avctp *session, uint8_t op);
-+int avctp_send_passthrough(struct avctp *session, uint8_t op, uint8_t *params,
-+							size_t params_len);
- int avctp_send_vendordep(struct avctp *session, uint8_t transaction,
- 				uint8_t code, uint8_t subunit,
- 				uint8_t *operands, size_t operand_count);
+ 	/* Previous Group command transfer - CT */
+ 	define_test("/TP/BGN/BV-02-I", test_client,
+ 			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
 -- 
 1.8.3.2
 
