@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 3/5] unit/avrcp: Add /TP/BGN/BV-02-I test
-Date: Wed, 12 Mar 2014 12:54:31 +0200
-Message-Id: <1394621673-13718-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 4/5] unit/avrcp: Add /TP/BGN/BV-01-I TG test
+Date: Wed, 12 Mar 2014 12:54:32 +0200
+Message-Id: <1394621673-13718-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394621673-13718-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <CABBYNZK6yEDvVwda3GBubgh2+J=SwE_Vmr5oEJ_hhqhOLd2CsA@mail.gmail.com>
  <1394621673-13718-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,42 +12,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that the Controller can send Prev Group command to the
-Target.
+Test verifies that the Target responds to Next Group command.
 ---
- unit/test-avrcp.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ unit/test-avrcp.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a5a7a38..fd95a7d 100644
+index fd95a7d..ea421b0 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -640,6 +640,12 @@ static void test_client(gconstpointer data)
- 		avrcp_send_passthrough_vendor(context->session,
- 						AVC_VENDOR_NEXT_GROUP,
- 						IEEEID_BTSIG);
-+
-+	if (g_str_equal(context->data->test_name, "/TP/BGN/BV-02-I"))
-+		avrcp_send_passthrough_vendor(context->session,
-+						AVC_VENDOR_PREV_GROUP,
-+						IEEEID_BTSIG);
-+
- 	execute_context(context);
+@@ -280,11 +280,20 @@ static bool handle_select(struct avrcp *session, bool pressed, void *user_data)
+ 	return true;
  }
  
-@@ -1041,5 +1047,12 @@ int main(int argc, char *argv[])
++static bool handle_vendor_uniq(struct avrcp *session, bool pressed,
++								void *user_data)
++{
++	DBG("");
++
++	return true;
++}
++
+ static const struct avrcp_passthrough_handler passthrough_handlers[] = {
+ 		{ AVC_PLAY, handle_play },
+ 		{ AVC_VOLUME_UP, handle_volume_up },
+ 		{ AVC_CHANNEL_UP, handle_channel_up },
+ 		{ AVC_SELECT, handle_select },
++		{ AVC_VENDOR_UNIQUE, handle_vendor_uniq },
+ 		{ },
+ };
+ 
+@@ -1047,6 +1056,17 @@ int main(int argc, char *argv[])
  				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
  				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
  
-+	/* Previous Group command transfer - CT */
-+	define_test("/TP/BGN/BV-02-I", test_client,
++	/* Next Group command transfer - TG */
++	define_test("/TP/BGN/BV-01-I", test_server,
 +			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
 +				AVC_OP_PASSTHROUGH,
 +				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
-+				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
++				0x58, 0x00, AVC_VENDOR_NEXT_GROUP),
++			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
++				0x48, AVC_OP_PASSTHROUGH,
++				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
++				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
 +
- 	return g_test_run();
- }
+ 	/* Previous Group command transfer - CT */
+ 	define_test("/TP/BGN/BV-02-I", test_client,
+ 			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
 -- 
 1.8.3.2
 
