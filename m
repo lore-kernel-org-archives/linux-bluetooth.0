@@ -1,73 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: armansito@chromium.org
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [RFC BlueZ 0/2] Initial D-Bus GATT client API implementation.
-Date: Tue, 11 Mar 2014 21:03:58 -0700
-Message-Id: <1394597040-4483-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <531FD421.8090504@hurleysoftware.com>
+Date: Tue, 11 Mar 2014 23:27:29 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>,
+ Scott James Remnant <keybuk@chromium.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: rctest -c "Can't connect: Device or resource busy (16)"
+References: <CAHZ1yC=+XNxEx5ivA+ebGi_Cjui2Mcrx+q83b-eUPvt2J0XLPw@mail.gmail.com> <7C822ED2-E0F6-4CC7-AF1D-D909AD7C0B1F@holtmann.org> <CAHZ1yCnx_fbd_O5VLZ6TWpBbyT3vsx_1JB-qOR5NBYuGMwnA_g@mail.gmail.com> <15A2D205-97BC-4790-A998-52AD8941DB3F@holtmann.org> <531FCE03.4080704@hurleysoftware.com>
+In-Reply-To: <531FCE03.4080704@hurleysoftware.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Arman Uguray <armansito@chromium.org>
+On 03/11/2014 11:01 PM, Peter Hurley wrote:
+> On 03/11/2014 10:14 PM, Marcel Holtmann wrote:
+>> Hi Scott,
+>>
+>>> 3.10 with bluetooth-next applied - btmon of both sides attached
+>>
+>> I am seeing the same with bluetooth-next on a 3.13 kernel. It even has a weird pattern for me.
 
-Hi everyone,
+The pattern occurs because this the dlc is not getting
+unlinked on this end until the watchdog timer goes off and
+closes it. [The listener is unlinking the dlc properly. ]
 
-I'm working on the GATT client API and I have an initial implementation that
-exposes basic GATT service and characteristic objects via D-Bus. Before I go
-any further in the implementation, I wanted to get some feedback on whether or
-not I've been taking the right approach so far. Also, since this is the first
-time I'm contributing to BlueZ, there might be some general style/convention
-issues that I would like to get corrected sooner than later :)
+>> rctest[52844]: Connected [handle 11, class 0x000000, priority 0]
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Device or resource busy (16)
+>> rctest[52844]: Can't connect: Connection refused (111)
+>> rctest[52844]: Can't connect: Connection reset by peer (104)
+>> rctest[52844]: Can't connect: Connection reset by peer (104)
+>> rctest[52844]: Connected [handle 11, class 0x000000, priority 0]
+>>
+>> Unfortunately I currently have no idea on why this happens. When using
+>> SO_LINGER of 60 seconds with rctest -L 60 -c <bdaddr> I am getting some
+>> really odd tracing behavior.
+>>
+>>> ACL Data RX: Handle 11 flags 0x02 dlen 14
+>>        L2CAP: Command Reject (0x01) ident 7 len 6
+>>          Reason: Invalid CID in request (0x0002)
+>>          Destination CID: 64
+>>          Source CID: 0
+>>
+>> This should never happen and makes me wonder if something is
+>> even screwed up one down in L2CAP. Do you happen to have time
+>> to bisect this and figure out which patch introduced this behavior.
+>
+> Marcel,
+>
+> I'm looking into this on the assumption I broke something in
+> the refactor of __rfcomm_dlc_close.
 
-This set includes two patches that add support for GATT service and
-characteristic objects. Characteristic descriptors, characteristic value
-read/write requests, characteristic value notifications and indications,
-characteristic properties (flags) and permissions, and included services are
-not yet implemented. The main implementation choices that I've made that I would
-especially like comments on are the following:
+Ok, it's nothing I broke. This is repeatable on 3.12 (sender and
+receiver). I'll keep looking this anyway since at least I know
+what's broken.
 
-  1. A GATT service is represented by instances of btd_gatt_dbus_service. A
-  btd_device directly creates and owns services. It might actually be better to
-  keep track of services and the devices that created them in src/gatt-dbus.c,
-  as the way I implemented it might make managing included services difficult.
+> I can reproduce this and looking at the kernel trace shows
+> that that UA reply of the dlc DISC is not being processed, because
+> the rfcomm thread is not getting scheduled, but I'm not sure where
+> that was supposed to happen.
+>
+> IOW,
+>
+> rctest -r                            |  rctest -c xx:xx:....
+>                                       |  ...
+>                                       |  rfcomm_sock_shutdown
+>                                       |    __rfcomm_sock_close
+>                                       |      rfcomm_dlc_close dlci 20
+>                                       |        __rfcomm_dlc_close
+>                                       |          rfcomm_send_disc dlci 20
+> rfcomm_recv_disc state 1 dlci 20     |
+>    rfcomm_send_ua dlci 20             |
+>    __rfcomm_dlc_close state 9         |
+>    rfcomm_dlc_unlink                  |
+>    ...                                |  UA never shows up here because
+>                                       |  rfcomm_process_sessions isn't run
+>                                       |  so rfcomm_recv_ua never happens
 
-  2. btd_gatt_dbus_service objects get created in
-  src/device.c:register_all_services. This may not be the right place to create
-  them, but every time register_all_services gets called, a btd_device removes
-  all GATT services that it created and reconstructs them. I took this route
-  to keep the initial implementation simple but there might be a smarter way to
-  go about it.
-
-  3. GATT service hierarchies are not cached and services are created only after
-  we connect to a remote device.
-
-  4. A btd_device creates a btd_gatt_dbus_service object for all GATT primary
-  services that it has created. Each service then individually does
-  characteristic discovery based on it's handle range.
-
-  5. GAttrib is used for discovery. GATT services obtain the GAttrib instance
-  from btd_device by using its attio callbacks. I did it this way solely based
-  on profiles (profiles/gatt/gas.c and profiles/gatt/heartrate.c) and for all I
-  know this might be an absolutely terrible way of managing the ATT connection
-  to the remote device, so please tell me whether or not this is the right
-  approach.
-
-  6. The first patch introduces a change to the way device_browse_primary gets
-  called in device.c:att_connect_cb; the existing code doesn't do primary
-  service discovery unless (as far as I understand) the connect request came
-  over D-Bus, so an auto-connect won't discover remote GATT services, for
-  example. I made a change here, not because I intended to change that code
-  path, but because I was curious why it was done the way it is.
-
-Arman Uguray (2):
-  gatt-dbus: Add remote GATT service objects.
-  gatt-dbus: Add remote GATT characteristic objects.
-
- src/device.c    |  47 ++++++++++-
- src/gatt-dbus.c | 255 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- src/gatt-dbus.h |  25 ++++++
- 3 files changed, 321 insertions(+), 6 deletions(-)
-
--- 
-1.8.3.2
-
+Regards,
+Peter Hurley
