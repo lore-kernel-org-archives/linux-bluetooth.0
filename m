@@ -1,54 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 12 Mar 2014 13:42:03 +0200
+Date: Wed, 12 Mar 2014 13:39:44 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 04/10] emulator: Add handling inquiry number of
- responses
-Message-ID: <20140312114203.GD7489@localhost.P-661HNU-F1>
+Subject: Re: [PATCH v2 03/10] emulator: Add inquiry cancel
+Message-ID: <20140312113944.GC7489@localhost.P-661HNU-F1>
 References: <1394406363-6751-1-git-send-email-lukasz.rymanowski@tieto.com>
- <1394406363-6751-5-git-send-email-lukasz.rymanowski@tieto.com>
+ <1394406363-6751-4-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1394406363-6751-5-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1394406363-6751-4-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukasz,
 
 On Mon, Mar 10, 2014, Lukasz Rymanowski wrote:
-> @@ -769,17 +772,22 @@ static bool inquiry_callback(void *user_data)
->  		}
->  	}
+> With this patch, scheduled inquiry session in btdev can be canceled
+> 
+> Conflicts:
+> 	emulator/btdev.c
+
+Seems like you forgot to clean up the commit message here.
+
+> @@ -70,6 +70,7 @@ struct btdev {
+>  	void *send_data;
 >  
-> -	if (i == MAX_BTDEV_ENTRIES) {
-> -		struct bt_hci_evt_inquiry_complete ic;
-> -
-> -		ic.status = BT_HCI_ERR_SUCCESS;
-> -		send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
-> +	/* Check if we sent already required amount of responses*/
-> +	if (data->num_resp && data->sent_count == data->num_resp)
+>  	int inquiry_id;
+> +	bool inquiry_cancel;
+>  
+>  	struct hook *hook_list[MAX_HOOK_ENTRIES];
+>  
+> @@ -784,10 +785,20 @@ static bool inquiry_callback(void *user_data)
+>  static void inquiry_destroy(void *user_data)
+>  {
+>  	struct inquiry_data *data = user_data;
+> +	struct btdev *btdev = data->btdev;
+> +	uint8_t status = BT_HCI_ERR_SUCCESS;
+> +
+> +	if (!btdev)
 > +		goto finish;
 >  
-> -		btdev->inquiry_id = 0;
-> -		return false;
-> -	}
-> +	if (i == MAX_BTDEV_ENTRIES)
-> +		goto finish;
+> -	if (data->btdev)
+> -		data->btdev->inquiry_id = 0;
+> +	if (btdev->inquiry_cancel)
+> +		cmd_complete(btdev, BT_HCI_CMD_INQUIRY_CANCEL, &status,
+> +							sizeof(status));
 >  
->  	return true;
+> +	btdev->inquiry_cancel = false;
+> +	btdev->inquiry_id = 0;
 > +
 > +finish:
-> +	/* Note that destroy will be called */
-> +	ic.status = BT_HCI_ERR_SUCCESS;
-> +	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
-> +
-> +	btdev->inquiry_id = 0;
-> +	return false;
+>  	free(data);
 >  }
+>  
+> @@ -820,6 +831,20 @@ error:
+>  	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
+>  }
+>  
+> +static void inquiry_cancel(struct btdev *btdev)
+> +{
+> +	uint8_t status = BT_HCI_ERR_COMMAND_DISALLOWED;
+> +
+> +	if (!btdev->inquiry_id) {
+> +		cmd_complete(btdev, BT_HCI_CMD_INQUIRY_CANCEL, &status,
+> +							sizeof(status));
+> +		return;
+> +	}
+> +
+> +	btdev->inquiry_cancel = true;
+> +	timeout_remove(btdev->inquiry_id);
 
-I know you're just moving it around from the first patch but isn't the
-btdev->inquiry_id = unnecessary here since you're doing the same in the
-destroy function which gets called as soon as you return false?
+This whole btdev->inquiry_cancel variable seems pointless to me. Why
+don't you simply send the cmd_complete for it after calling
+timeout_remove here in the inquiry_cancel function?
 
 Johan
