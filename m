@@ -1,107 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v1 01/15] gatt: Add function to create constant attributes
-Date: Wed, 12 Mar 2014 13:26:57 -0300
-Message-Id: <1394641631-1534-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v1 00/15] Add basic GATT characteristics
+Date: Wed, 12 Mar 2014 13:26:56 -0300
+Message-Id: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394477445-8987-1-git-send-email-claudio.takahasi@openbossa.org>
- <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Guedes <andre.guedes@openbossa.org>
+This patchset adds the following features:
+  * register external characteristics
+  * basic read or write external characteristics
 
-This patch adds a helper function to create attribute with static
-values. It is intended to be used to create GATT services, and
-characteristic declarations.
----
- src/gatt.c | 41 +++++++++++++++++++++++++++++++++++------
- 1 file changed, 35 insertions(+), 6 deletions(-)
+Usage of glib is being avoided inside src/gatt.c. Properties/flags and
+32-bit UUIDs are not implemented yet.
 
-diff --git a/src/gatt.c b/src/gatt.c
-index f7b74d6..eed4fae 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -26,10 +26,12 @@
- #endif
- 
- #include <glib.h>
-+#include <bluetooth/bluetooth.h>
- 
- #include "log.h"
- #include "lib/uuid.h"
- #include "attrib/att.h"
-+#include "src/shared/util.h"
- 
- #include "gatt-dbus.h"
- #include "gatt.h"
-@@ -48,6 +50,33 @@ struct btd_attribute {
- static GList *local_attribute_db;
- static uint16_t next_handle = 0x0001;
- 
-+static inline void put_uuid(const bt_uuid_t *src, void *dst)
-+{
-+	if (src->type == BT_UUID16)
-+		put_unaligned(cpu_to_le16(src->value.u16), (uint16_t *) dst);
-+	else
-+		htob128(&(src->value.u128), (uint128_t *) dst);
-+}
-+
-+/*
-+ * Helper function to create new attributes containing constant/static values.
-+ * eg: declaration of services/characteristics, and characteristics with
-+ * fixed values.
-+ */
-+static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
-+							const uint8_t *value,
-+							uint16_t len)
-+{
-+	struct btd_attribute *attr = malloc0(sizeof(struct btd_attribute) +
-+									len);
-+
-+	attr->type = *type;
-+	memcpy(&attr->value, value, len);
-+	attr->value_len = len;
-+
-+	return attr;
-+}
-+
- static int local_database_add(uint16_t handle, struct btd_attribute *attr)
- {
- 	attr->handle = handle;
-@@ -59,9 +88,9 @@ static int local_database_add(uint16_t handle, struct btd_attribute *attr)
- 
- struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- {
-+	struct btd_attribute *attr;
- 	uint16_t len = bt_uuid_len(uuid);
--	struct btd_attribute *attr = g_malloc0(sizeof(struct btd_attribute) +
--									len);
-+	uint8_t value[len];
- 
- 	/*
- 	 * Service DECLARATION
-@@ -75,13 +104,13 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	 * (2) - 2 or 16 octets: Service UUID
- 	 */
- 
--	attr->type = primary_uuid;
-+	/* Set attribute value */
-+	put_uuid(uuid, value);
- 
--	att_put_uuid(*uuid, attr->value);
--	attr->value_len = len;
-+	attr = new_const_attribute(&primary_uuid, value, len);
- 
- 	if (local_database_add(next_handle, attr) < 0) {
--		g_free(attr);
-+		free(attr);
- 		return NULL;
- 	}
- 
+Changes from v0 to v1:
+  * Use LE <-> CPU helpers defined in src/shared/util.h
+  * remove patch "gatt: Add helper for reading characteristics" from
+    this set.
+
+How to test:
+It is possible to test the implemented features using a modified
+gatttool version. Unix socket is used as transport to allow basic
+ATT operations:
+git://git.infradead.org/users/cktakahasi/bluez.git gatt-api-forupstream-group2-patchv1-testing
+
+$gatttool -I -L
+[LOCAL][LE]> connect
+Local connection
+Connection successful
+[LOCAL][LE]> primary
+attr handle: 0x0001, end grp handle: 0x0003 uuid: 000034fb-0000-1000-8000-00805f9b34fb
+[LOCAL][LE]> characteristics
+handle: 0x0002, char properties: 0x00, char value handle: 0x0003, uuid: 00002a06-0000-1000-8000-00805f9b34fb
+[LOCAL][LE]> char-read-hnd 0x0003
+Characteristic value/descriptor: 00
+[LOCAL][LE]> char-write-req 0x0003 02
+Characteristic value was written successfully
+[LOCAL][LE]> char-read-hnd 0x0003
+Characteristic value/descriptor: 02
+
+Alvaro Silva (3):
+  tools: Add Alert Level characteristic to gatt-service
+  tools: Add reading Value property of gatt-service
+  tools: Add setting Value property of gatt-service
+
+Andre Guedes (2):
+  gatt: Add function to create constant attributes
+  gatt: Add helper for creating GATT characteristics
+
+Claudio Takahasi (10):
+  gatt: Add characteristic to the database
+  gatt: Add hash table of GDBusProxy objects
+  gatt: Add read callback to btd_gatt_add_char helper
+  gatt: Assign read callback for external services
+  gatt: Add write callback to btd_gatt_add_char helper
+  gdbus: Add g_dbus_proxy_set_property_array
+  gatt: Assign write callback for external services
+  gatt: Add result callback for Write Request
+  gatt: Add Write Request handling for GDBusProxy
+  tools: Emit property changed when Value changes
+
+ gdbus/client.c       |  85 +++++++++++++++++++++++
+ gdbus/gdbus.h        |   5 ++
+ src/gatt-dbus.c      | 190 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ src/gatt.c           | 131 +++++++++++++++++++++++++++++++++--
+ src/gatt.h           |  44 ++++++++++++
+ tools/gatt-service.c | 156 ++++++++++++++++++++++++++++++++++++++----
+ 6 files changed, 589 insertions(+), 22 deletions(-)
+
 -- 
 1.8.3.1
 
