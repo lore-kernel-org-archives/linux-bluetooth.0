@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 4/5] unit/avrcp: Add /TP/BGN/BV-01-I TG test
-Date: Wed, 12 Mar 2014 12:54:32 +0200
-Message-Id: <1394621673-13718-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 5/5] unit/avrcp: Add /TP/BGN/BV-02-I TG test
+Date: Wed, 12 Mar 2014 12:54:33 +0200
+Message-Id: <1394621673-13718-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394621673-13718-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <CABBYNZK6yEDvVwda3GBubgh2+J=SwE_Vmr5oEJ_hhqhOLd2CsA@mail.gmail.com>
  <1394621673-13718-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,54 +12,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Test verifies that the Target responds to Next Group command.
+Test verifies that the Target responds to Prev Group command.
 ---
- unit/test-avrcp.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+ unit/test-avrcp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index fd95a7d..ea421b0 100644
+index ea421b0..31d17b9 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -280,11 +280,20 @@ static bool handle_select(struct avrcp *session, bool pressed, void *user_data)
- 	return true;
- }
- 
-+static bool handle_vendor_uniq(struct avrcp *session, bool pressed,
-+								void *user_data)
-+{
-+	DBG("");
-+
-+	return true;
-+}
-+
- static const struct avrcp_passthrough_handler passthrough_handlers[] = {
- 		{ AVC_PLAY, handle_play },
- 		{ AVC_VOLUME_UP, handle_volume_up },
- 		{ AVC_CHANNEL_UP, handle_channel_up },
- 		{ AVC_SELECT, handle_select },
-+		{ AVC_VENDOR_UNIQUE, handle_vendor_uniq },
- 		{ },
- };
- 
-@@ -1047,6 +1056,17 @@ int main(int argc, char *argv[])
+@@ -1074,5 +1074,16 @@ int main(int argc, char *argv[])
  				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
- 				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
+ 				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
  
-+	/* Next Group command transfer - TG */
-+	define_test("/TP/BGN/BV-01-I", test_server,
++	/* Previous Group command transfer - TG */
++	define_test("/TP/BGN/BV-02-I", test_server,
 +			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
 +				AVC_OP_PASSTHROUGH,
 +				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
-+				0x58, 0x00, AVC_VENDOR_NEXT_GROUP),
++				0x58, 0x00, AVC_VENDOR_PREV_GROUP),
 +			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_ACCEPTED,
 +				0x48, AVC_OP_PASSTHROUGH,
 +				AVC_VENDOR_UNIQUE, 0x05, 0x00, 0x19,
-+				0x58, 0x00, AVC_VENDOR_NEXT_GROUP));
++				0x58, 0x00, AVC_VENDOR_PREV_GROUP));
 +
- 	/* Previous Group command transfer - CT */
- 	define_test("/TP/BGN/BV-02-I", test_client,
- 			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48,
+ 	return g_test_run();
+ }
 -- 
 1.8.3.2
 
