@@ -2,74 +2,130 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 08/15] android/hal-health: Add HDP .init method
-Date: Thu, 13 Mar 2014 13:58:45 +0200
-Message-Id: <1394711932-16560-9-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 10/15] android/hal-health: Add HDP .register_application method
+Date: Thu, 13 Mar 2014 13:58:47 +0200
+Message-Id: <1394711932-16560-11-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1394711932-16560-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1394711932-16560-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-health.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+ android/hal-health.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 93 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-health.c b/android/hal-health.c
-index 59f8cca..d099ae2 100644
+index 918fb69..b4871ee 100644
 --- a/android/hal-health.c
 +++ b/android/hal-health.c
-@@ -26,9 +26,50 @@
- #include "ipc-common.h"
- #include "hal-ipc.h"
+@@ -38,6 +38,98 @@ static bool interface_ready(void)
+ static const struct hal_ipc_handler ev_handlers[] = {
+ };
  
-+static const bthl_callbacks_t *cbacks = NULL;
-+
-+static bool interface_ready(void)
++static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
 +{
-+	return cbacks != NULL;
-+}
-+
-+/* handlers will be called from notification thread context,
-+ * index in table equals to 'opcode - HAL_MINIMUM_EVENT' */
-+static const struct hal_ipc_handler ev_handlers[] = {
-+};
-+
-+static bt_status_t init(bthl_callbacks_t *callbacks)
-+{
-+	struct hal_cmd_register_module cmd;
-+	int ret;
++	char buf[IPC_MTU];
++	struct hal_cmd_health_reg_app *cmd = (void *) buf;
++	struct hal_rsp_health_reg_app rsp;
++	size_t len = sizeof(rsp);
++	bt_status_t status;
++	ssize_t cmd_len;
++	uint8_t i;
 +
 +	DBG("");
 +
-+	if (interface_ready())
-+		return BT_STATUS_DONE;
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
 +
-+	/* store reference to user callbacks */
-+	cbacks = callbacks;
++	if (!reg || !app_id)
++		return BT_STATUS_PARM_INVALID;
 +
-+	hal_ipc_register(HAL_SERVICE_ID_HEALTH, ev_handlers,
-+				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
 +
-+	cmd.service_id = HAL_SERVICE_ID_HEALTH;
++	cmd_len = sizeof(*cmd);
 +
-+	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
-+					sizeof(cmd), &cmd, 0, NULL, NULL);
++	if (reg->application_name)
++		cmd_len += strlen(reg->application_name);
 +
-+	if (ret != BT_STATUS_SUCCESS) {
-+		cbacks = NULL;
-+		hal_ipc_unregister(HAL_SERVICE_ID_HEALTH);
++	if (reg->provider_name)
++		cmd_len += strlen(reg->provider_name);
++
++	if (reg->srv_name)
++		cmd_len += strlen(reg->srv_name);
++
++	if (reg->srv_desp)
++		cmd_len += strlen(reg->srv_desp);
++
++	if (reg->number_of_mdeps > 0 && reg->mdep_cfg[0].mdep_description)
++			cmd_len += strlen(reg->mdep_cfg[0].mdep_description);
++
++	for (i = 1; i < reg->number_of_mdeps; i++)
++		cmd_len += sizeof(cmd->mdep_cfg) +
++				strlen(reg->mdep_cfg[i].mdep_description);
++
++	if (cmd_len > IPC_MTU)
++		return BT_STATUS_PARM_INVALID;
++
++	if (reg->application_name) {
++		cmd->app_name.len = strlen(reg->application_name);
++		memcpy(cmd->app_name.data, reg->application_name,
++						cmd->app_name.len);
 +	}
 +
-+	return ret;
++	if (reg->provider_name) {
++		cmd->provider_name.len = strlen(reg->provider_name);
++		memcpy(cmd->provider_name.data, reg->provider_name,
++						cmd->provider_name.len);
++	}
++
++	if (reg->srv_name) {
++		cmd->service_name.len = strlen(reg->srv_name);
++		memcpy(cmd->service_name.data, reg->srv_name,
++						cmd->service_name.len);
++	}
++
++	if (reg->srv_desp) {
++		cmd->service_descr.len = strlen(reg->srv_desp);
++		memcpy(cmd->service_descr.data, reg->srv_desp,
++						cmd->service_descr.len);
++	}
++
++	cmd->num_of_mdep = reg->number_of_mdeps;
++
++	if (reg->mdep_cfg && reg->number_of_mdeps > 0) {
++		for (i = 0; i < reg->number_of_mdeps; i++) {
++			cmd->mdep_cfg[i].role = reg->mdep_cfg[i].mdep_role;
++			cmd->mdep_cfg[i].data_type = reg->mdep_cfg[i].data_type;
++			cmd->mdep_cfg[i].channel_type =
++						reg->mdep_cfg[i].channel_type;
++			cmd->mdep_cfg[i].descr.len =
++				strlen(reg->mdep_cfg[i].mdep_description);
++			memcpy(cmd->mdep_cfg[i].descr.data,
++					reg->mdep_cfg[i].mdep_description,
++						cmd->mdep_cfg[i].descr.len);
++		}
++	}
++
++	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
++						cmd_len, cmd, &len, &rsp, NULL);
++
++	if (status == HAL_STATUS_SUCCESS)
++		*app_id = rsp.app_id;
++
++	return status;
 +}
 +
+ static bt_status_t init(bthl_callbacks_t *callbacks)
+ {
+ 	struct hal_cmd_register_module cmd;
+@@ -89,7 +181,7 @@ static void cleanup(void)
  static bthl_interface_t health_if = {
  	.size = sizeof(health_if),
--	.init = NULL,
-+	.init = init,
- 	.register_application = NULL,
+ 	.init = init,
+-	.register_application = NULL,
++	.register_application = register_application,
  	.unregister_application = NULL,
  	.connect_channel = NULL,
+ 	.destroy_channel = NULL,
 -- 
 1.8.3.2
 
