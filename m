@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [RFC 3/8] android/bluetooth: Refactor start/stop discovery
-Date: Thu, 13 Mar 2014 19:46:10 +0100
-Message-ID: <1394736375-22599-4-git-send-email-lukasz.rymanowski@tieto.com>
+CC: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Subject: [RFC 1/8] android/gatt: Use queue and stdlib instead of glib
+Date: Thu, 13 Mar 2014 19:46:08 +0100
+Message-ID: <1394736375-22599-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1394736375-22599-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1394736375-22599-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -12,99 +12,126 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 
-Pass discovery type to discovery stop/start routine so it can be used
-also for LE only scan.
+This patch changes using glib to queues, stdlib operators.
 ---
- android/bluetooth.c | 37 ++++++++++++++++++++++---------------
- 1 file changed, 22 insertions(+), 15 deletions(-)
+ android/gatt.c | 38 +++++++++++++++++++++++---------------
+ 1 file changed, 23 insertions(+), 15 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index acd2dd2..8f66dd1 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -80,6 +80,10 @@
- #define BASELEN_REMOTE_DEV_PROP (sizeof(struct hal_ev_remote_device_props) \
- 					+ sizeof(struct hal_property))
+diff --git a/android/gatt.c b/android/gatt.c
+index a874737..9ac89fb 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -37,6 +37,7 @@
+ #include "src/log.h"
+ #include "hal-msg.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
  
-+#define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
-+#define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
-+#define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
-+
- struct device {
- 	bdaddr_t bdaddr;
- 	uint8_t bdaddr_type;
-@@ -2448,17 +2452,26 @@ static void get_adapter_properties(void)
- 	get_adapter_discoverable_timeout();
+ struct gatt_client {
+ 	int32_t id;
+@@ -45,22 +46,22 @@ struct gatt_client {
+ 
+ static struct ipc *hal_ipc = NULL;
+ static bdaddr_t adapter_addr;
+-static GSList *gatt_clients = NULL;
++static struct queue *gatt_clients = NULL;
+ 
+-static int find_client_by_uuid(gconstpointer data, gconstpointer user_data)
++static bool find_client_by_uuid(const void *data, const void *user_data)
+ {
+ 	const uint8_t *exp_uuid = user_data;
+ 	const struct gatt_client *client = data;
+ 
+-	return memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
++	return !memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
  }
  
--static bool start_discovery(void)
-+static uint8_t get_adapter_discovering_type(void)
+-static int find_client_by_id(gconstpointer data, gconstpointer user_data)
++static bool find_client_by_id(const void *data, const void *user_data)
  {
--	struct mgmt_cp_start_discovery cp;
-+	uint8_t type;
+ 	int32_t exp_id = PTR_TO_INT(user_data);
+ 	const struct gatt_client *client = data;
  
- 	if (adapter.current_settings & MGMT_SETTING_BREDR)
--		cp.type = 1 << BDADDR_BREDR;
-+		type = SCAN_TYPE_BREDR;
- 	else
--		cp.type = 0;
-+		type = 0;
- 
- 	if (adapter.current_settings & MGMT_SETTING_LE)
--		cp.type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-+		type |= SCAN_TYPE_LE;
-+
-+	return type;
-+}
-+
-+static bool start_discovery(uint8_t type)
-+{
-+	struct mgmt_cp_start_discovery cp;
-+
-+	cp.type = get_adapter_discovering_type() & type;
- 
- 	DBG("type=0x%x", cp.type);
- 
-@@ -2478,17 +2491,11 @@ static void cancel_pending_confirm_name(gpointer data, gpointer user_data)
- 	dev->confirm_id = 0;
+-	return client->id != exp_id;
++	return client->id == exp_id;
  }
  
--static bool stop_discovery(void)
-+static bool stop_discovery(uint8_t type)
- {
- 	struct mgmt_cp_stop_discovery cp;
+ static void handle_client_register(const void *buf, uint16_t len)
+@@ -79,19 +80,19 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
  
--	if (adapter.current_settings & MGMT_SETTING_BREDR)
--		cp.type = 1 << BDADDR_BREDR;
--	else
--		cp.type = 0;
+-	if (g_slist_find_custom(gatt_clients, &cmd->uuid,
+-							find_client_by_uuid)) {
++	if (queue_find(gatt_clients, find_client_by_uuid, &cmd->uuid)) {
+ 		error("gatt: client uuid is already on list");
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	client = g_new0(struct gatt_client, 1);
++	client = (struct gatt_client *) new0(struct gatt_client, 1);
++
+ 	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+ 
+ 	client->id = client_cnt++;
+ 
+-	gatt_clients = g_slist_prepend(gatt_clients, client);
++	queue_push_head(gatt_clients, client);
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+@@ -110,21 +111,20 @@ failed:
+ static void handle_client_unregister(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_unregister *cmd = buf;
+-	GSList *l;
+ 	uint8_t status;
++	struct gatt_client *cl;
+ 
+ 	DBG("");
+ 
+-	l = g_slist_find_custom(gatt_clients, INT_TO_PTR(cmd->client_if),
+-							find_client_by_id);
+-	if (!l) {
++	cl = queue_remove_if(gatt_clients, find_client_by_id,
++						INT_TO_PTR(cmd->client_if));
++	if (!cl) {
+ 		error("gatt: client_if=%d not found", cmd->client_if);
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+ 	}
+ 
+-	gatt_clients = g_slist_remove(gatt_clients, l->data);
 -
--	if (adapter.current_settings & MGMT_SETTING_LE)
--		cp.type |= (1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM);
-+	cp.type = get_adapter_discovering_type() & type;
++	free(cl);
+ 	status = HAL_STATUS_SUCCESS;
  
- 	DBG("type=0x%x", cp.type);
+ failed:
+@@ -524,6 +524,12 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_GATT, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
  
-@@ -3182,7 +3189,7 @@ static void handle_start_discovery_cmd(const void *buf, uint16_t len)
- 		goto reply;
- 	}
++	gatt_clients = queue_new();
++	if (!gatt_clients) {
++		error("gatt: Cannot allocate gatt_clients");
++		return false;
++	}
++
+ 	return true;
+ }
  
--	if (!start_discovery()) {
-+	if (!start_discovery(SCAN_TYPE_DUAL)) {
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
- 	}
-@@ -3207,7 +3214,7 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
- 		goto reply;
- 	}
+@@ -531,6 +537,8 @@ void bt_gatt_unregister(void)
+ {
+ 	DBG("");
  
--	if (!stop_discovery()) {
-+	if (!stop_discovery(SCAN_TYPE_DUAL)) {
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
- 	}
++	queue_destroy(gatt_clients, free);
++
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_GATT);
+ 	hal_ipc = NULL;
+ }
 -- 
 1.8.4
 
