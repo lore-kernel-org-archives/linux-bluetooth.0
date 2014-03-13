@@ -1,124 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] doc/media-api: Include possible errors
-Date: Thu, 13 Mar 2014 15:32:29 +0200
-Message-Id: <1394717549-32065-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1394717549-32065-1-git-send-email-luiz.dentz@gmail.com>
-References: <1394717549-32065-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20140313083055.GA8329@localhost.P-661HNU-F1>
+References: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1394641631-1534-2-git-send-email-claudio.takahasi@openbossa.org>
+	<20140313083055.GA8329@localhost.P-661HNU-F1>
+Date: Thu, 13 Mar 2014 10:10:39 -0300
+Message-ID: <CAKT1EBeFRxvsQqmj-xi9_VasG9aE=1QXy65Tvmu-7AanAXWPeg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v1 01/15] gatt: Add function to create constant attributes
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	Claudio Takahasi <CLAUDIO.TAKAHASI@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Johan,
 
----
- doc/media-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
+On Thu, Mar 13, 2014 at 5:30 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Claudio,
+>
+> On Wed, Mar 12, 2014, Claudio Takahasi wrote:
+>> +static inline void put_uuid(const bt_uuid_t *src, void *dst)
+>> +{
+>> +     if (src->type == BT_UUID16)
+>> +             put_unaligned(cpu_to_le16(src->value.u16), (uint16_t *) dst);
+>
+> I thought you were going to add helpers like put_le16() to shared/util.h
+> first?
 
-diff --git a/doc/media-api.txt b/doc/media-api.txt
-index 05f90e3..07ea991 100644
---- a/doc/media-api.txt
-+++ b/doc/media-api.txt
-@@ -128,32 +128,53 @@ Methods		void Play()
- 
- 			Resume playback.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void Pause()
- 
- 			Pause playback.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void Stop()
- 
- 			Stop playback.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void Next()
- 
- 			Next item.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void Previous()
- 
- 			Previous item.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void FastForward()
- 
- 			Fast forward playback, this action is only stopped
- 			when another method in this interface is called.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void Rewind()
- 
- 			Rewind playback, this action is only stopped
- 			when another method in this interface is called.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- Properties	string Equalizer [readwrite]
- 
- 			Possible values: "off" or "on"
-@@ -300,10 +321,17 @@ Methods		object Search(string value, dict filter)
- 			To list the items found use the folder object returned
- 			and pass to ChangeFolder.
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		array{objects, properties} ListItems(dict filter)
- 
- 			Return a list of items found
- 
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void ChangeFolder(object folder)
- 
- 			Change current folder.
-@@ -313,6 +341,10 @@ Methods		object Search(string value, dict filter)
- 			exception is NowPlaying folder which should be always
- 			present while the player is active.
- 
-+			Possible Errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- Properties	uint32 NumberOfItems [readonly]
- 
- 			Number of items in the folder
-@@ -368,10 +400,16 @@ Methods		void Play()
- 
- 			Play item
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- 		void AddtoNowPlaying()
- 
- 			Add item to now playing list
- 
-+			Possible Errors: org.bluez.Error.NotSupported
-+					 org.bluez.Error.Failed
-+
- Properties	object Player [readonly]
- 
- 			Player object path the item belongs to
--- 
-1.8.5.3
+My understanding of our discussion in the IRC was that put_uuid()
+could be implemented inside src/gatt.c for now.
+Anyway, I will send a new patchset moving put_uuid() and put_le16() to
+src/shared/util.h
 
+Regarding the remaining put_leX(), get_leX() (and related helpers) we
+can start moving to src/shared/util.h after this patchset.
+
+>
+>> +static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
+>> +                                                     const uint8_t *value,
+>> +                                                     uint16_t len)
+>> +{
+>> +     struct btd_attribute *attr = malloc0(sizeof(struct btd_attribute) +
+>> +                                                                     len);
+>
+> First of all I think it'd be better (coding style consistency-wise) to
+> do the allocation separately from the declaration of the variable.
+> Secondly, malloc0 can return NULL (unlike g_malloc0) so you'd need to
+> check for that.
+
+OK. I will fix it.
+
+Claudio.
