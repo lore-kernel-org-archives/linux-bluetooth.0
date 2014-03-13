@@ -4,59 +4,46 @@ To: Marcel Holtmann <marcel@holtmann.org>,
 	Scott James Remnant <keybuk@chromium.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Peter Hurley <peter@hurleysoftware.com>
-Subject: [PATCH 3/3] bluetooth: rfcomm: Defer session teardown after last dlc
-Date: Thu, 13 Mar 2014 12:43:06 -0400
-Message-Id: <1394728986-5096-4-git-send-email-peter@hurleysoftware.com>
+Subject: [PATCH 2/3] bluetooth: rfcomm: Create new session if closing old session
+Date: Thu, 13 Mar 2014 12:43:05 -0400
+Message-Id: <1394728986-5096-3-git-send-email-peter@hurleysoftware.com>
 In-Reply-To: <1394728986-5096-1-git-send-email-peter@hurleysoftware.com>
 References: <15A2D205-97BC-4790-A998-52AD8941DB3F@holtmann.org>
  <1394728986-5096-1-git-send-email-peter@hurleysoftware.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Commit 9cf5b0ea3a7f1432c61029f7aaf4b8b338628884,
-[Bluetooth] Disconnect L2CAP connection after last RFCOMM DLC,
-immediately disconnects the session when closing the last dlc.
-This commit predates the later addition of a session timer [1]
-which sets up a timer to automatically close the session after the
-last dlc is closed. This automatic behavior was further noted
-noted in [2]:
+If the rfcomm session has already sent DISC (thus in BT_DISCONN
+state), allow dlc opens to create a new session instead of trying
+to open a dlc in a closing session (and instead of returning an
+error).
 
-    When the last RFCOMM data channel is closed, a timer is normally set
-    up to disconnect the control channel at a later time.  If the control
-    channel disconnect command is sent with the timer pending, the timer
-    needs to be cancelled.
+Allow multiple rfcomm sessions with the same endpoints as long as
+the existing sessions are either in BT_DISCONN or BT_CLOSED states.
 
-Rely on automatic session disconnect; this fulfills the responsibility
-of closing the multiplexer while allowing the last dlc to be closed and
-reopened without needing to handshake a new l2cap connection.
+Fixes multi-second delays when running rctest -c on one station
+and rctest -r on the other.
 
-[1] commit 9e726b17422bade75fba94e625cd35fd1353e682
-    Bluetooth: Fix rejected connection not disconnecting ACL link
-
-[2] commit 79e654787c67f6b05f73366ff8ccac72ba7249e6
-    Bluetooth: Clear RFCOMM session timer when disconnecting last channel
-
+Reported-by: Scott James Remnant <keybuk@chromium.org>
 Signed-off-by: Peter Hurley <peter@hurleysoftware.com>
 ---
- net/bluetooth/rfcomm/core.c | 7 -------
- 1 file changed, 7 deletions(-)
+ net/bluetooth/rfcomm/core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 292322c..062a96c 100644
+index 6aa90c0..292322c 100644
 --- a/net/bluetooth/rfcomm/core.c
 +++ b/net/bluetooth/rfcomm/core.c
-@@ -1193,13 +1193,6 @@ static struct rfcomm_session *rfcomm_recv_ua(struct rfcomm_session *s, u8 dlci)
- 		case BT_DISCONN:
- 			d->state = BT_CLOSED;
- 			__rfcomm_dlc_close(d, 0);
--
--			if (list_empty(&s->dlcs)) {
--				s->state = BT_DISCONN;
--				rfcomm_send_disc(s, 0);
--				rfcomm_session_clear_timer(s);
--			}
--
- 			break;
- 		}
- 	} else {
+@@ -695,6 +695,9 @@ static struct rfcomm_session *rfcomm_session_get(bdaddr_t *src, bdaddr_t *dst)
+ 		s = list_entry(p, struct rfcomm_session, list);
+ 		chan = l2cap_pi(s->sock->sk)->chan;
+ 
++		if (s->state == BT_DISCONN || s->state == BT_CLOSED)
++			continue;
++
+ 		if ((!bacmp(src, BDADDR_ANY) || !bacmp(&chan->src, src)) &&
+ 		    !bacmp(&chan->dst, dst))
+ 			return s;
 -- 
 1.8.1.2
+
