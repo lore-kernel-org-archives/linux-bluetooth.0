@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 13 Mar 2014 10:32:04 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	Andre Guedes <andre.guedes@openbossa.org>
+Subject: Re: [PATCH BlueZ v1 02/15] gatt: Add helper for creating GATT
+ characteristics
+Message-ID: <20140313083204.GB8329@localhost.P-661HNU-F1>
+References: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1394641631-1534-3-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-In-Reply-To: <A4B1A1B79EB08444A5B867A4254F4B884098EB5E@chn-hclt-mbs05.HCLT.CORP.HCL.IN>
-References: <A4B1A1B79EB08444A5B867A4254F4B884098EB5E@chn-hclt-mbs05.HCLT.CORP.HCL.IN>
-Date: Thu, 13 Mar 2014 10:55:56 +0200
-Message-ID: <CABBYNZ+ivHz0wfOJpKg_PGpcfUy1C84BnQKzv8=4s2DvOLJRkg@mail.gmail.com>
-Subject: Re: Reg: issue faced in MediaPlayer1 interface in bluez 5.7
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Pradeep Vivekanandan <vivekanandanp@hcl.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1394641631-1534-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Pradeep,
+Hi Claudio,
 
-On Thu, Mar 13, 2014 at 9:01 AM, Pradeep Vivekanandan
-<vivekanandanp@hcl.com> wrote:
->
-> Hi,
->
-> I have problem in getting the Track information from the interface org.bluez.MediaPlayer1.
->
-> In the Track information the Duration is giving 0 value for songs playing from mobile.
->
-> Also for the Position property from interface org.bluez.MediaPlayer1.
->  is also not correct if i puase and play a song.
->
-> Please let me know any solution is there for the mobile that support AVRCP 1.3.
+On Wed, Mar 12, 2014, Claudio Takahasi wrote:
+> --- a/src/gatt.c
+> +++ b/src/gatt.c
+> @@ -40,6 +40,9 @@
+>  static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
+>  					.value.u16 = GATT_PRIM_SVC_UUID };
+>  
+> +static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
+> +					.value.u16 = GATT_CHARAC_UUID };
+> +
+>  struct btd_attribute {
+>  	uint16_t handle;
+>  	bt_uuid_t type;
+> @@ -50,6 +53,11 @@ struct btd_attribute {
+>  static GList *local_attribute_db;
+>  static uint16_t next_handle = 0x0001;
+>  
+> +static inline void put_le16(uint16_t val, void *dst)
+> +{
+> +	put_unaligned(cpu_to_le16(val), (uint16_t *) dst);
+> +}
 
-If you can give us more information about what you are testing then
-perhaps we can help, what version of BlueZ are you using, what is the
-remote device and please provide logs when the problem happens.
+This helper should go to shared/util.h
 
--- 
-Luiz Augusto von Dentz
+Johan
