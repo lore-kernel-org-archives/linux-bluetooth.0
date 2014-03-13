@@ -1,99 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] audio/player: Use proper errors instead of using .Failed
-Date: Thu, 13 Mar 2014 15:32:28 +0200
-Message-Id: <1394717549-32065-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] doc/media-api: Include possible errors
+Date: Thu, 13 Mar 2014 15:32:29 +0200
+Message-Id: <1394717549-32065-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1394717549-32065-1-git-send-email-luiz.dentz@gmail.com>
+References: <1394717549-32065-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- profiles/audio/player.c | 29 ++++++++++-------------------
- 1 file changed, 10 insertions(+), 19 deletions(-)
+ doc/media-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-diff --git a/profiles/audio/player.c b/profiles/audio/player.c
-index 2bd2d6e..c76352e 100644
---- a/profiles/audio/player.c
-+++ b/profiles/audio/player.c
-@@ -778,19 +778,16 @@ static DBusMessage *media_folder_search(DBusConnection *conn, DBusMessage *msg,
- 	dbus_message_iter_init(msg, &iter);
+diff --git a/doc/media-api.txt b/doc/media-api.txt
+index 05f90e3..07ea991 100644
+--- a/doc/media-api.txt
++++ b/doc/media-api.txt
+@@ -128,32 +128,53 @@ Methods		void Play()
  
- 	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
--		return btd_error_failed(msg, strerror(EINVAL));
-+		return btd_error_invalid_args(msg);
+ 			Resume playback.
  
- 	dbus_message_iter_get_basic(&iter, &string);
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void Pause()
  
--	if (!mp->searchable || folder != mp->folder)
--		return btd_error_failed(msg, strerror(ENOTSUP));
-+	if (!mp->searchable || folder != mp->folder || !cb->cbs->search)
-+		return btd_error_not_supported(msg);
+ 			Pause playback.
  
- 	if (folder->msg != NULL)
- 		return btd_error_failed(msg, strerror(EINVAL));
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void Stop()
  
--	if (cb->cbs->search == NULL)
--		return btd_error_failed(msg, strerror(ENOTSUP));
--
- 	err = cb->cbs->search(mp, string, cb->user_data);
- 	if (err < 0)
- 		return btd_error_failed(msg, strerror(-err));
-@@ -998,14 +995,14 @@ static DBusMessage *media_folder_change_folder(DBusConnection *conn,
- 	if (!dbus_message_get_args(msg, NULL,
- 					DBUS_TYPE_OBJECT_PATH, &path,
- 					DBUS_TYPE_INVALID))
--		return btd_error_failed(msg, strerror(EINVAL));
-+		return btd_error_invalid_args(msg);
+ 			Stop playback.
  
- 	if (folder->msg != NULL)
- 		return btd_error_failed(msg, strerror(EBUSY));
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void Next()
  
- 	folder = media_player_find_folder(mp, path);
- 	if (folder == NULL)
--		return btd_error_failed(msg, strerror(EINVAL));
-+		return btd_error_invalid_args(msg);
+ 			Next item.
  
- 	if (mp->scope == folder)
- 		return g_dbus_create_reply(msg, DBUS_TYPE_INVALID);
-@@ -1017,7 +1014,7 @@ static DBusMessage *media_folder_change_folder(DBusConnection *conn,
- 	}
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void Previous()
  
- 	if (cb->cbs->change_folder == NULL)
--		return btd_error_failed(msg, strerror(ENOTSUP));
-+		return btd_error_not_supported(msg);
+ 			Previous item.
  
- 	err = cb->cbs->change_folder(mp, folder->item->name, folder->item->uid,
- 								cb->user_data);
-@@ -1473,11 +1470,8 @@ static DBusMessage *media_item_play(DBusConnection *conn, DBusMessage *msg,
- 	struct player_callback *cb = mp->cb;
- 	int err;
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void FastForward()
  
--	if (!item->playable)
--		return btd_error_failed(msg, strerror(ENOTSUP));
--
--	if (cb->cbs->play_item == NULL)
--		return btd_error_failed(msg, strerror(ENOTSUP));
-+	if (!item->playable || !cb->cbs->play_item)
-+		return btd_error_not_supported(msg);
+ 			Fast forward playback, this action is only stopped
+ 			when another method in this interface is called.
  
- 	err = cb->cbs->play_item(mp, item->path, item->uid, cb->user_data);
- 	if (err < 0)
-@@ -1494,11 +1488,8 @@ static DBusMessage *media_item_add_to_nowplaying(DBusConnection *conn,
- 	struct player_callback *cb = mp->cb;
- 	int err;
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void Rewind()
  
--	if (!item->playable)
--		return btd_error_failed(msg, strerror(ENOTSUP));
--
--	if (cb->cbs->play_item == NULL)
--		return btd_error_failed(msg, strerror(ENOTSUP));
-+	if (!item->playable || !cb->cbs->play_item)
-+		return btd_error_not_supported(msg);
+ 			Rewind playback, this action is only stopped
+ 			when another method in this interface is called.
  
- 	err = cb->cbs->add_to_nowplaying(mp, item->path, item->uid,
- 							cb->user_data);
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ Properties	string Equalizer [readwrite]
+ 
+ 			Possible values: "off" or "on"
+@@ -300,10 +321,17 @@ Methods		object Search(string value, dict filter)
+ 			To list the items found use the folder object returned
+ 			and pass to ChangeFolder.
+ 
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		array{objects, properties} ListItems(dict filter)
+ 
+ 			Return a list of items found
+ 
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void ChangeFolder(object folder)
+ 
+ 			Change current folder.
+@@ -313,6 +341,10 @@ Methods		object Search(string value, dict filter)
+ 			exception is NowPlaying folder which should be always
+ 			present while the player is active.
+ 
++			Possible Errors: org.bluez.Error.InvalidArguments
++					 org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ Properties	uint32 NumberOfItems [readonly]
+ 
+ 			Number of items in the folder
+@@ -368,10 +400,16 @@ Methods		void Play()
+ 
+ 			Play item
+ 
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ 		void AddtoNowPlaying()
+ 
+ 			Add item to now playing list
+ 
++			Possible Errors: org.bluez.Error.NotSupported
++					 org.bluez.Error.Failed
++
+ Properties	object Player [readonly]
+ 
+ 			Player object path the item belongs to
 -- 
 1.8.5.3
 
