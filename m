@@ -1,43 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Adjust uinput permissions
-Date: Thu, 13 Mar 2014 21:39:15 +0100
-Message-ID: <1832213.AdQL97zugQ@athlon>
-In-Reply-To: <1394705115-20738-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1394705115-20738-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v3 19/20] tools: Add setting Value property of gatt-service
+Date: Thu, 13 Mar 2014 17:22:47 -0300
+Message-Id: <1394742168-31073-20-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-On Thursday 13 March 2014 11:05:15 Andrzej Kaczmarek wrote:
-> We need to make sure /dev/uinput accessible for BlueZ in order for
-> AVRCP to work properly. On some devices (e.g. Nexus 7 a.k.a. flo)
-> permissions are set by default to 'system net_bt_stack' as thus we
-> need to change group to 'bluetooth'.
-> ---
->  android/init.bluetooth.rc | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/android/init.bluetooth.rc b/android/init.bluetooth.rc
-> index 8be869a..af62121 100644
-> --- a/android/init.bluetooth.rc
-> +++ b/android/init.bluetooth.rc
-> @@ -2,6 +2,7 @@
->  on boot
->      chown bluetooth bluetooth /data/misc/bluetooth
->      chown bluetooth bluetooth /dev/uhid
-> +    chown system    bluetooth /dev/uinput
-> 
->  # services
->  on property:bluetooth.start=daemon
+This patch extends the gatt-service.c example adding a generic callback
+to allow set the characteristic Value. It doesn't check for
+characteristic properties yet.
+---
+ tools/gatt-service.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-Pushed, thanks.
-
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 97dc8d4..ad5399b 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -35,6 +35,8 @@
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
+ 
++#include "src/error.h"
++
+ #define GATT_MGR_IFACE			"org.bluez.GattManager1"
+ #define GATT_SERVICE_IFACE		"org.bluez.GattService1"
+ #define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
+@@ -81,9 +83,38 @@ static gboolean chr_get_value(const GDBusPropertyTable *property,
+ 	return TRUE;
+ }
+ 
++static void chr_set_value(const GDBusPropertyTable *property,
++				DBusMessageIter *iter,
++				GDBusPendingPropertySet id, void *user_data)
++{
++	struct characteristic *chr = user_data;
++	DBusMessageIter array;
++	uint8_t *value;
++	int len;
++
++	printf("Set('Value', ...)\n");
++
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
++		printf("Invalid value for Set('Value'...)\n");
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
++	}
++
++	dbus_message_iter_recurse(iter, &array);
++	dbus_message_iter_get_fixed_array(&array, &value, &len);
++
++	g_free(chr->value);
++	chr->value = g_memdup(value, len);
++	chr->vlen = len;
++
++	g_dbus_pending_property_success(id);
++}
++
+ static const GDBusPropertyTable chr_properties[] = {
+ 	{ "UUID",	"s",	chr_get_uuid },
+-	{ "Value", "ay", chr_get_value, NULL, NULL },
++	{ "Value", "ay", chr_get_value, chr_set_value, NULL },
+ 	{ }
+ };
+ 
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+1.8.3.1
+
