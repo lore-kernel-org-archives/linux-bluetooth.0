@@ -2,83 +2,88 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v2 08/17] gatt: Assign read callback for external services
-Date: Thu, 13 Mar 2014 11:38:44 -0300
-Message-Id: <1394721533-6932-9-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2 06/17] gatt: Add hash table of GDBusProxy objects
+Date: Thu, 13 Mar 2014 11:38:42 -0300
+Message-Id: <1394721533-6932-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds the callback for reading the external characteristic
-Value. Internally, GDBusProxy implementation tracks all properties Value
-changes consequently Value can be ready directly from the proxy without
-additional method calls.
+This commits adds a hash table to map attributes into GDBusProxy,
+allowing to call remote objects for reading and writing values.
 ---
- src/gatt-dbus.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ src/gatt-dbus.c | 27 +++++++++++++++++++++++----
+ 1 file changed, 23 insertions(+), 4 deletions(-)
 
 diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 275b263..fff2d3a 100644
+index 9f94c4f..f60260e 100644
 --- a/src/gatt-dbus.c
 +++ b/src/gatt-dbus.c
-@@ -139,6 +139,46 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
- 	eapp->proxies = g_slist_remove(eapp->proxies, proxy);
- }
+@@ -56,6 +56,12 @@ struct external_app {
+ 	unsigned int watch;
+ };
  
-+static void proxy_read_cb(struct btd_attribute *attr,
-+				btd_attr_read_result_t result, void *user_data)
-+{
-+	DBusMessageIter iter, array;
-+	GDBusProxy *proxy;
-+	uint8_t *value;
-+	int len;
++/*
++ * Attribute to Proxy hash table. Used to map incoming
++ * ATT operations to its external characteristic proxy.
++ */
++static GHashTable *proxy_hash;
 +
-+	/*
-+	 * Remote device is trying to read the informed attribute,
-+	 * "Value" should be read from the proxy. GDBusProxy tracks
-+	 * properties changes automatically, it is not necessary to
-+	 * get the value directly from the GATT server.
-+	 */
-+	proxy = g_hash_table_lookup(proxy_hash, attr);
-+	if (proxy == NULL) {
-+		result(ENOENT, NULL, 0, user_data);
-+		return;
-+	}
-+
-+	if (!g_dbus_proxy_get_property(proxy, "Value", &iter)) {
-+		/* Unusual situation, read property will checked earlier */
-+		result(EPERM, NULL, 0, user_data);
-+		return;
-+	}
-+
-+	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
-+		DBG("External service inconsistent!");
-+		result(EPERM, NULL, 0, user_data);
-+		return;
-+	}
-+
-+	dbus_message_iter_recurse(&iter, &array);
-+	dbus_message_iter_get_fixed_array(&array, &value, &len);
-+
-+	DBG("attribute: %p read %d bytes", attr, len);
-+
-+	result(0, value, len, user_data);
-+}
-+
- static int register_external_service(const struct external_app *eapp,
- 							GDBusProxy *proxy)
- {
-@@ -198,7 +238,7 @@ static int register_external_characteristics(GSList *proxies)
+ static GSList *external_apps;
+ 
+ static int external_app_path_cmp(gconstpointer a, gconstpointer b)
+@@ -172,6 +178,7 @@ static int register_external_characteristics(GSList *proxies)
+ 		DBusMessageIter iter;
+ 		const char *str, *path;
+ 		bt_uuid_t uuid;
++		struct btd_attribute *attr;
+ 		GDBusProxy *proxy = list->data;
+ 
+ 		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
+@@ -191,11 +198,14 @@ static int register_external_characteristics(GSList *proxies)
  		 * Reference table 3.5: Characteristic Properties bit field.
  		 */
  
--		attr = btd_gatt_add_char(&uuid, 0x00, NULL);
-+		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb);
- 		if (attr == NULL)
+-		if (btd_gatt_add_char(&uuid, 0x00) == NULL)
++		attr = btd_gatt_add_char(&uuid, 0x00);
++		if (attr == NULL)
  			return -EINVAL;
  
+ 		path = g_dbus_proxy_get_path(proxy);
+ 		DBG("Added GATT CHR: %s (%s)", path, str);
++
++		g_hash_table_insert(proxy_hash, attr, g_dbus_proxy_ref(proxy));
+ 	}
+ 
+ 	return 0;
+@@ -318,13 +328,22 @@ static const GDBusMethodTable methods[] = {
+ 
+ gboolean gatt_dbus_manager_register(void)
+ {
+-	return g_dbus_register_interface(btd_get_dbus_connection(),
+-					"/org/bluez", GATT_MGR_IFACE,
+-					methods, NULL, NULL, NULL, NULL);
++	if (g_dbus_register_interface(btd_get_dbus_connection(),
++				"/org/bluez", GATT_MGR_IFACE,
++				methods, NULL, NULL, NULL, NULL) == FALSE)
++		return FALSE;
++
++	proxy_hash = g_hash_table_new_full(g_direct_hash, g_direct_equal,
++				NULL, (GDestroyNotify) g_dbus_proxy_unref);
++
++	return TRUE;
+ }
+ 
+ void gatt_dbus_manager_unregister(void)
+ {
++	g_hash_table_destroy(proxy_hash);
++	proxy_hash = NULL;
++
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
+ 							GATT_MGR_IFACE);
+ }
 -- 
 1.8.3.1
 
