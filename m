@@ -1,44 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 13 Mar 2014 10:32:04 +0200
+Date: Thu, 13 Mar 2014 10:30:55 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org,
 	Andre Guedes <andre.guedes@openbossa.org>
-Subject: Re: [PATCH BlueZ v1 02/15] gatt: Add helper for creating GATT
- characteristics
-Message-ID: <20140313083204.GB8329@localhost.P-661HNU-F1>
+Subject: Re: [PATCH BlueZ v1 01/15] gatt: Add function to create constant
+ attributes
+Message-ID: <20140313083055.GA8329@localhost.P-661HNU-F1>
 References: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
- <1394641631-1534-3-git-send-email-claudio.takahasi@openbossa.org>
+ <1394641631-1534-2-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1394641631-1534-3-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1394641631-1534-2-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Claudio,
 
 On Wed, Mar 12, 2014, Claudio Takahasi wrote:
-> --- a/src/gatt.c
-> +++ b/src/gatt.c
-> @@ -40,6 +40,9 @@
->  static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
->  					.value.u16 = GATT_PRIM_SVC_UUID };
->  
-> +static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
-> +					.value.u16 = GATT_CHARAC_UUID };
-> +
->  struct btd_attribute {
->  	uint16_t handle;
->  	bt_uuid_t type;
-> @@ -50,6 +53,11 @@ struct btd_attribute {
->  static GList *local_attribute_db;
->  static uint16_t next_handle = 0x0001;
->  
-> +static inline void put_le16(uint16_t val, void *dst)
+> +static inline void put_uuid(const bt_uuid_t *src, void *dst)
 > +{
-> +	put_unaligned(cpu_to_le16(val), (uint16_t *) dst);
-> +}
+> +	if (src->type == BT_UUID16)
+> +		put_unaligned(cpu_to_le16(src->value.u16), (uint16_t *) dst);
 
-This helper should go to shared/util.h
+I thought you were going to add helpers like put_le16() to shared/util.h
+first?
+
+> +static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
+> +							const uint8_t *value,
+> +							uint16_t len)
+> +{
+> +	struct btd_attribute *attr = malloc0(sizeof(struct btd_attribute) +
+> +									len);
+
+First of all I think it'd be better (coding style consistency-wise) to
+do the allocation separately from the declaration of the variable.
+Secondly, malloc0 can return NULL (unlike g_malloc0) so you'd need to
+check for that.
 
 Johan
