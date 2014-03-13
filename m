@@ -1,59 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 0/8] Add initial support for GATT Client
-Date: Fri, 14 Mar 2014 00:11:44 +0100
-Message-ID: <2769207.04ahbSiDyh@athlon>
-In-Reply-To: <1394736375-22599-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1394736375-22599-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 2/2] android/handsfree: Add support for enabling mSBC codec
+Date: Thu, 13 Mar 2014 23:52:15 +0100
+Message-Id: <1394751135-2747-2-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1394751135-2747-1-git-send-email-szymon.janc@gmail.com>
+References: <1394751135-2747-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+---
+ android/hal-handsfree.c |  4 ++++
+ android/handsfree.c     | 18 +++++++++++++++---
+ 2 files changed, 19 insertions(+), 3 deletions(-)
 
-On Thursday 13 March 2014 19:46:07 Lukasz Rymanowski wrote:
-> This patch set add GATT clien scan, connect/disconnect
-> functionality.
-> 
-> Some changes in handling discovery has been done as
-> there are two clients of discovery: HAL and GATT
-> 
-> For now daemon makes sure that device is available before
-> connecting it. It is because in case device is not available
-> we would block connect to other devices.
-> 
-> Once white list will be available we can simplify that code.
-> 
-> I'm sending also fixed Grzegorz and Jakub patches to avoid
-> rebasing.
-> 
-> Grzegorz Kolodziejczyk (1):
->   android/gatt: Use queue and stdlib instead of glib
-> 
-> Jakub Tyszkowski (5):
->   android/gatt: Change name of match functions
->   android/bluetooth: Refactor start/stop discovery
->   android/bluetooth: Move start discovery function up in the file
->   android/bluetooth: Add GATT notifications on LE discovery
->   android/gatt: Use Core profile for LE scan
-> 
-> Lukasz Rymanowski (2):
->   android/gatt: Add GATT Connect
->   android/gatt: Add disconnect GATT device
-> 
->  android/Android.mk  |   4 +
->  android/Makefile.am |   3 +
->  android/bluetooth.c | 195 ++++++++++++----
->  android/bluetooth.h |   7 +
->  android/gatt.c      | 623
-> ++++++++++++++++++++++++++++++++++++++++++++++++++-- 5 files changed, 773
-> insertions(+), 59 deletions(-)
-
-Patches 1-4 are now applied (with some small fixes).
-
+diff --git a/android/hal-handsfree.c b/android/hal-handsfree.c
+index 31793b0..1cdb447 100644
+--- a/android/hal-handsfree.c
++++ b/android/hal-handsfree.c
+@@ -214,6 +214,10 @@ static uint8_t get_mode(void)
+ 					(!strcasecmp(value, "hsp_only")))
+ 		return HAL_MODE_HANDSFREE_HSP_ONLY;
+ 
++	if (property_get("bluetooth.handsfree_mode", value, "") > 0 &&
++					(!strcasecmp(value, "esco_msbc")))
++		return HAL_MODE_HANDSFREE_ESCO_MSBC;
++
+ 	return HAL_MODE_DEFAULT;
+ }
+ 
+diff --git a/android/handsfree.c b/android/handsfree.c
+index e488859..319bf91 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -150,6 +150,8 @@ static struct {
+ 	guint sco_watch;
+ } device;
+ 
++static uint8_t hal_mode = HAL_MODE_DEFAULT;
++
+ static bdaddr_t adapter_addr;
+ static struct ipc *hal_ipc = NULL;
+ 
+@@ -181,6 +183,14 @@ static void device_set_state(uint8_t state)
+ 				HAL_EV_HANDSFREE_CONN_STATE, sizeof(ev), &ev);
+ }
+ 
++static void init_codecs(void)
++{
++	memcpy(device.codecs, codecs_defaults, sizeof(device.codecs));
++
++	if (hal_mode == HAL_MODE_HANDSFREE_ESCO_MSBC)
++		device.codecs[MSBC_OFFSET].local_supported = true;
++}
++
+ static void device_set_audio_state(uint8_t state)
+ {
+ 	struct hal_ev_handsfree_audio_state ev;
+@@ -207,7 +217,7 @@ static void device_init(const bdaddr_t *bdaddr)
+ 
+ 	memcpy(device.inds, inds_defaults, sizeof(device.inds));
+ 
+-	memcpy(device.codecs, codecs_defaults, sizeof(device.codecs));
++	init_codecs();
+ 
+ 	device_set_state(HAL_EV_HANDSFREE_CONN_STATE_CONNECTING);
+ }
+@@ -1252,8 +1262,8 @@ static void at_cmd_bac(struct hfp_gw_result *result, enum hfp_gw_cmd_type type,
+ 		if (!(device.features & HFP_HF_FEAT_CODEC))
+ 			goto failed;
+ 
+-		/* Clear list of codecs */
+-		memcpy(device.codecs, codecs_defaults, sizeof(device.codecs));
++		/* set codecs to defaults */
++		init_codecs();
+ 		device.negotiated_codec = 0;
+ 
+ 		/* At least CVSD mandatory codec must exist
+@@ -2487,6 +2497,8 @@ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
++	hal_mode = mode;
++
+ 	return true;
+ }
+ 
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+1.9.0
+
