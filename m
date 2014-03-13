@@ -1,134 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v2 10/17] gdbus: Add g_dbus_proxy_set_property_array
-Date: Thu, 13 Mar 2014 11:38:46 -0300
-Message-Id: <1394721533-6932-11-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v2 16/17] tools: Add setting Value property of gatt-service
+Date: Thu, 13 Mar 2014 11:38:52 -0300
+Message-Id: <1394721533-6932-17-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a new gdbus utility function to allow setting a property
-of fixed, and non-fixed values array.
----
- gdbus/client.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- gdbus/gdbus.h  |  5 ++++
- 2 files changed, 90 insertions(+)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index 5193b6c..6fea3d9 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -727,6 +727,91 @@ gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
+This patch extends the gatt-service.c example adding a generic callback
+to allow set the characteristic Value. It doesn't check for
+characteristic properties yet.
+---
+ tools/gatt-service.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 97dc8d4..ad5399b 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -35,6 +35,8 @@
+ #include <dbus/dbus.h>
+ #include <gdbus/gdbus.h>
+ 
++#include "src/error.h"
++
+ #define GATT_MGR_IFACE			"org.bluez.GattManager1"
+ #define GATT_SERVICE_IFACE		"org.bluez.GattService1"
+ #define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
+@@ -81,9 +83,38 @@ static gboolean chr_get_value(const GDBusPropertyTable *property,
  	return TRUE;
  }
  
-+gboolean g_dbus_proxy_set_property_array(GDBusProxy *proxy,
-+				const char *name, int type, const void *value,
-+				int size, GDBusResultFunction function,
-+				void *user_data, GDBusDestroyFunction destroy)
++static void chr_set_value(const GDBusPropertyTable *property,
++				DBusMessageIter *iter,
++				GDBusPendingPropertySet id, void *user_data)
 +{
-+	struct set_property_data *data;
-+	GDBusClient *client;
-+	DBusMessage *msg;
-+	DBusMessageIter iter, variant, array;
-+	DBusPendingCall *call;
-+	char array_sig[3];
-+	char type_sig[2];
++	struct characteristic *chr = user_data;
++	DBusMessageIter array;
++	uint8_t *value;
++	int len;
 +
-+	if (proxy == NULL || name == NULL || value == NULL)
-+		return FALSE;
++	printf("Set('Value', ...)\n");
 +
-+	if (dbus_type_is_basic(type) == FALSE)
-+		return FALSE;
-+
-+	client = proxy->client;
-+	if (client == NULL)
-+		return FALSE;
-+
-+	data = g_try_new0(struct set_property_data, 1);
-+	if (data == NULL)
-+		return FALSE;
-+
-+	data->function = function;
-+	data->user_data = user_data;
-+	data->destroy = destroy;
-+
-+	msg = dbus_message_new_method_call(client->service_name,
-+			proxy->obj_path, DBUS_INTERFACE_PROPERTIES, "Set");
-+	if (msg == NULL) {
-+		g_free(data);
-+		return FALSE;
++	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
++		printf("Invalid value for Set('Value'...)\n");
++		g_dbus_pending_property_error(id,
++					ERROR_INTERFACE ".InvalidArguments",
++					"Invalid arguments in method call");
++		return;
 +	}
 +
-+	array_sig[0] = DBUS_TYPE_ARRAY;
-+	array_sig[1] = (char) type;
-+	array_sig[2] = '\0';
++	dbus_message_iter_recurse(iter, &array);
++	dbus_message_iter_get_fixed_array(&array, &value, &len);
 +
-+	type_sig[0] = (char) type;
-+	type_sig[1] = '\0';
++	g_free(chr->value);
++	chr->value = g_memdup(value, len);
++	chr->vlen = len;
 +
-+	dbus_message_iter_init_append(msg, &iter);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
-+							&proxy->interface);
-+	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
-+
-+	dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT,
-+						array_sig, &variant);
-+
-+	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
-+						type_sig, &array);
-+
-+	if (dbus_type_is_fixed(type) == TRUE)
-+		dbus_message_iter_append_fixed_array(&array, type,
-+							&value, size);
-+	else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
-+		int i;
-+		const char **str = (const char **) value;
-+
-+		for (i = 0; i < size; i++)
-+			dbus_message_iter_append_basic(&array, type, &str[i]);
-+	}
-+
-+	dbus_message_iter_close_container(&variant, &array);
-+	dbus_message_iter_close_container(&iter, &variant);
-+
-+	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
-+							&call, -1) == FALSE) {
-+		dbus_message_unref(msg);
-+		g_free(data);
-+		return FALSE;
-+	}
-+
-+	dbus_pending_call_set_notify(call, set_property_reply, data, g_free);
-+	dbus_pending_call_unref(call);
-+
-+	dbus_message_unref(msg);
-+
-+	return TRUE;
++	g_dbus_pending_property_success(id);
 +}
 +
- struct method_call_data {
- 	GDBusReturnFunction function;
- 	void *user_data;
-diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
-index 8ada200..40a5abe 100644
---- a/gdbus/gdbus.h
-+++ b/gdbus/gdbus.h
-@@ -329,6 +329,11 @@ gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
- 				GDBusResultFunction function, void *user_data,
- 				GDBusDestroyFunction destroy);
- 
-+gboolean g_dbus_proxy_set_property_array(GDBusProxy *proxy,
-+				const char *name, int type, const void *value,
-+				int size, GDBusResultFunction function,
-+				void *user_data, GDBusDestroyFunction destroy);
-+
- typedef void (* GDBusSetupFunction) (DBusMessageIter *iter, void *user_data);
- typedef void (* GDBusReturnFunction) (DBusMessage *message, void *user_data);
+ static const GDBusPropertyTable chr_properties[] = {
+ 	{ "UUID",	"s",	chr_get_uuid },
+-	{ "Value", "ay", chr_get_value, NULL, NULL },
++	{ "Value", "ay", chr_get_value, chr_set_value, NULL },
+ 	{ }
+ };
  
 -- 
 1.8.3.1
