@@ -1,49 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v2 01/17] shared: Add put_uuid()
-Date: Thu, 13 Mar 2014 11:38:37 -0300
-Message-Id: <1394721533-6932-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1394641631-1534-1-git-send-email-claudio.takahasi@openbossa.org>
- <1394721533-6932-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] android: Improve of handling stop discovery
+Date: Thu, 13 Mar 2014 15:25:42 +0100
+Message-ID: <5989114.fhmm5T3hvb@uw000953>
+In-Reply-To: <1394406397-6843-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1394406397-6843-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add helper to put 16/32/128-bit UUID values to the given buffer using
-little-endian representation.
----
- src/shared/util.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Hi Łukasz,
 
-diff --git a/src/shared/util.h b/src/shared/util.h
-index d7d4a94..f614c99 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -26,6 +26,8 @@
- #include <alloca.h>
- #include <byteswap.h>
- 
-+#include "lib/uuid.h"
-+
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- #define le16_to_cpu(val) (val)
- #define le32_to_cpu(val) (val)
-@@ -90,3 +92,13 @@ void util_debug(util_debug_func_t function, void *user_data,
- 
- void util_hexdump(const char dir, const unsigned char *buf, size_t len,
- 				util_debug_func_t function, void *user_data);
-+
-+static inline void put_uuid(const bt_uuid_t *src, void *dst)
-+{
-+	if (src->type == BT_UUID16)
-+		put_unaligned(cpu_to_le16(src->value.u16), (uint16_t *) dst);
-+	else if (src->type == BT_UUID32)
-+		put_unaligned(cpu_to_le32(src->value.u32), (uint32_t *) dst);
-+	else
-+		htob128(&(src->value.u128), (uint128_t *) dst);
-+}
+On Monday 10 of March 2014 00:06:34 Lukasz Rymanowski wrote:
+> Following patches improves handling of stop discovery in scenario of
+> big inflow of device found events.
+> 
+> v2:
+> * Fix confirm name callback
+> 
+> Lukasz Rymanowski (3):
+>   android: Add tracking for pending confirm name command
+>   android: Cancel all pending confirm name before stop discovery
+>   android: Send confirm name request with mgmt_send
+> 
+>  android/bluetooth.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 46 insertions(+), 4 deletions(-)
+> 
+> 
+
+All patches applied, thanks.
+
 -- 
-1.8.3.1
-
+Best regards, 
+Szymon Janc
