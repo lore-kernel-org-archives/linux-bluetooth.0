@@ -1,60 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 00/15] Add HDP profile support at HAL side
-Date: Fri, 14 Mar 2014 13:37:23 +0100
-Message-ID: <1554669.5ZH3HDXFHT@uw000953>
-In-Reply-To: <1394711932-16560-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1394711932-16560-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Fri, 14 Mar 2014 13:30:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Natanael Copa <ncopa@alpinelinux.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 0/3] Various build fixes for building bluez with musl libc
+Message-ID: <20140314113031.GA15333@localhost.P-661HNU-F1>
+References: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
+ <20140314110719.GA11158@localhost.P-661HNU-F1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20140314110719.GA11158@localhost.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi,
 
-On Thursday 13 of March 2014 13:58:37 Ravi kumar Veeramally wrote:
-> v2: Solved Luiz, Szymon, Andrzej and Grzegorz comments.
+On Fri, Mar 14, 2014, Johan Hedberg wrote:
+> On Fri, Mar 14, 2014, Natanael Copa wrote:
+> > The following fixes are needed to make bluez build on Alpine Linuz with
+> > musl libc.
+> > 
+> > This is kind of a rebase of the previously posted patches:
+> > http://www.spinics.net/lists/linux-bluetooth/msg43070.html
+> > 
+> > Changes since then are:
+> > - mention Alpine Linux in commit message
+> > - rebase to current git
+> > - added fix for proper header include for be32toh, htobe32 and htobe64
+> > 
+> > Please note that "unit: prevent unintended use of glibc's error(3)"
+> > fixes a bug in the unit test that affects glibc too. I suppose that if
+> > you add a testcase that triggers any error logging from sdpd-request.c
+> > it will likely segfault instead of gracfully hande the error condition.
+> > (it only affects the unit test though)
+> > 
+> > Natanael Copa (3):
+> >   shared: include endian.h for be32toh, htobe32 and htobe64 functions
+> >   unit: prevent unintended use of glibc's error(3)
+> >   bnep: avoid use of caddr_t
+> > 
+> >  Makefile.am             | 1 +
+> >  profiles/network/bnep.c | 4 ++--
+> >  src/shared/btsnoop.c    | 1 +
+> >  unit/test-sdp.c         | 9 +++------
+> >  4 files changed, 7 insertions(+), 8 deletions(-)
 > 
-> v1: Patch set contains HDP profile support at HAL side and initial
-> profile registration support at daemon side.
+> I've applied patches 1 and 3, but am waiting for a v2 on patch 2 since
+> it breaks the build:
 > 
-> Ravi kumar Veeramally (15):
->   android/hal-msg: Add HDP app registration struct
->   android/hal-msg: Add HDP app unregistration struct
->   android/hal-msg: Add HDP connect channel struct
->   android/hal-msg: Add HDP destroy channel struct
->   android/hal-msg: Add HDP app registration state event struct
->   android/hal-msg: Add HDP app channel state event struct
->   android/hal-health: Add hal-health.c with initial get interface call
->   android/hal-health: Add HDP .init method
->   android/hal-health: Add HDP .cleanup method
->   android/hal-health: Add HDP .register_application method
->   android/hal-health: Add HDP .unregister_application method
->   android/hal-health: Add HDP .connect_channel method
->   android/hal-health: Add HDP .destroy_channel method
->   android/hal-health: Add app state and channel state event handlers
->   android/health: Add health.c|h file with basic calls
-> 
->  android/Android.mk      |   2 +
->  android/Makefile.am     |   2 +
->  android/hal-bluetooth.c |   3 +
->  android/hal-health.c    | 283 ++++++++++++++++++++++++++++++++++++++++++++++++
->  android/hal-msg.h       |  72 ++++++++++++
->  android/hal.h           |   2 +
->  android/health.c        | 115 ++++++++++++++++++++
->  android/health.h        |  25 +++++
->  android/main.c          |  11 ++
->  9 files changed, 515 insertions(+)
->  create mode 100644 android/hal-health.c
->  create mode 100644 android/health.c
->  create mode 100644 android/health.h
-> 
-> 
+> unit/test-sdp.c: In function ‘main’:
+> unit/test-sdp.c:795:3: error: implicit declaration of function ‘__btd_log_init’ [-Werror=implicit-function-declaration]
+>    __btd_log_init("*", 0);
 
-Patches 1-9 and 15 are now pushed (with changes we discussed on IRC). Thanks.
+I went ahead and fixed the missing include myself. The patch is now
+applied.
 
--- 
-Best regards, 
-Szymon Janc
+Johan
