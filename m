@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 05/16] android/avrcp: Use defined constant instead of magic number
-Date: Fri, 14 Mar 2014 17:17:47 +0200
-Message-Id: <1394810278-11013-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 15/16] android/avrcp: Add avrcp_search() function
+Date: Fri, 14 Mar 2014 17:17:57 +0200
+Message-Id: <1394810278-11013-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394810278-11013-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394810278-11013-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,22 +12,65 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/avrcp-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/avrcp-lib.c | 21 +++++++++++++++++++++
+ android/avrcp-lib.h |  4 ++++
+ 2 files changed, 25 insertions(+)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 0e9f0df..fe6d7b4 100644
+index b3f3975..ab7f915 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -346,7 +346,7 @@ int avrcp_register_notification(struct avrcp *session, uint8_t event,
- 					uint32_t interval, avctp_rsp_cb func,
- 					void *user_data)
- {
--	uint8_t params[5];
-+	uint8_t params[AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
+@@ -28,6 +28,7 @@
+ #include <stdbool.h>
+ #include <glib.h>
+ #include <errno.h>
++#include <string.h>
  
- 	params[0] = event;
- 	bt_put_be32(interval, &params[1]);
+ #include "lib/bluetooth.h"
+ 
+@@ -598,3 +599,23 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
+ 	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
+ 							func, user_data);
+ }
++
++int avrcp_search(struct avrcp *session, uint16_t charset, const char *string,
++				avctp_browsing_rsp_cb func, void *user_data)
++{
++	size_t str_len = strnlen(string, 255 - 4);
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + str_len + 4];
++	struct avrcp_browsing_header *pdu = (void *) buf;
++
++	memset(buf, 0, sizeof(buf));
++
++	pdu->pdu_id = AVRCP_SEARCH;
++	pdu->param_len = htons(str_len + 4);
++
++	bt_put_be16(charset, &pdu->params[0]);
++	bt_put_be16(str_len, &pdu->params[2]);
++	memcpy(&pdu->params[4], string, str_len);
++
++	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
++							func, user_data);
++}
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 8188dad..81e4ab1 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -93,6 +93,8 @@
+ /* Company IDs for vendor dependent commands */
+ #define IEEEID_BTSIG		0x001958
+ 
++#define AVRCP_CHARSET_UTF8	0x006a
++
+ /* Parameters legths */
+ #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH       5
+ 
+@@ -196,3 +198,5 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
+ 				uint64_t uid, uint16_t counter, uint32_t *attr,
+ 				size_t attr_count, avctp_browsing_rsp_cb func,
+ 				void *user_data);
++int avrcp_search(struct avrcp *session, uint16_t charset, const char *string,
++				avctp_browsing_rsp_cb func, void *user_data);
 -- 
 1.8.3.2
 
