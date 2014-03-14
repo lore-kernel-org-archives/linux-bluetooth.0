@@ -1,138 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v4 18/20] tools: Add reading Value property of gatt-service
-Date: Fri, 14 Mar 2014 10:13:18 -0300
-Message-Id: <1394802800-8424-19-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v4 16/20] gatt: Add Write Request handling for GDBusProxy
+Date: Fri, 14 Mar 2014 10:13:16 -0300
+Message-Id: <1394802800-8424-17-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
-
-This patch extends the gatt-service.c example adding the callback to
-allow reading the Value property. At the moment, it is a generic
-callback and it doesn't consider characteristic value property
-restrictions.
+When the characteristic requires Write Request, the ATT response should
+be sent after receiving the reply for the Set method call.
 ---
- tools/gatt-service.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 53 insertions(+), 6 deletions(-)
+ src/gatt-dbus.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 61 insertions(+), 6 deletions(-)
 
-diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index d1606ad..97dc8d4 100644
---- a/tools/gatt-service.c
-+++ b/tools/gatt-service.c
-@@ -46,18 +46,44 @@
- static GMainLoop *main_loop;
- static GSList *services;
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index d703355..2412e2d 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -56,6 +56,11 @@ struct external_app {
+ 	unsigned int watch;
+ };
  
-+struct characteristic {
-+	char *uuid;
-+	uint8_t *value;
-+	int vlen;
++struct proxy_write_data {
++	btd_attr_write_result_t result_cb;
++	void *user_data;
 +};
 +
- static gboolean chr_get_uuid(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
+ /*
+  * Attribute to Proxy hash table. Used to map incoming
+  * ATT operations to its external characteristic proxy.
+@@ -181,8 +186,30 @@ static void proxy_read_cb(struct btd_attribute *attr,
+ 
+ static void proxy_write_reply(const DBusError *derr, void *user_data)
  {
--	const char *uuid = user_data;
-+	struct characteristic *chr = user_data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &chr->uuid);
+-	if (derr)
+-		DBG("Write reply: %s", derr->message);
++	struct proxy_write_data *wdata = user_data;
++	int err = 0;
 +
-+	return TRUE;
-+}
++	/*
++	 * Security requirements shall be handled by the core. If external
++	 * applications returns an error, the reasons will be restricted to
++	 * invalid argument or application specific errors.
++	 */
 +
-+static gboolean chr_get_value(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct characteristic *chr = user_data;
-+	DBusMessageIter array;
++	if (dbus_error_is_set(derr) == FALSE)
++		goto done;
 +
-+	printf("Get(\"Value\")\n");
++	DBG("Write reply: %s", derr->message);
 +
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
++	if (dbus_error_has_name(derr, DBUS_ERROR_NO_REPLY))
++		err = ETIMEDOUT;
++	else if (dbus_error_has_name(derr, ERROR_INTERFACE ".InvalidArguments"))
++		err = EINVAL;
++	else
++		err = EPROTO;
 +
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+						&chr->value, chr->vlen);
-+
-+	dbus_message_iter_close_container(iter, &array);
- 
- 	return TRUE;
++done:
++	if (wdata && wdata->result_cb)
++		wdata->result_cb(err, wdata->user_data);
  }
  
- static const GDBusPropertyTable chr_properties[] = {
- 	{ "UUID",	"s",	chr_get_uuid },
-+	{ "Value", "ay", chr_get_value, NULL, NULL },
- 	{ }
- };
+ static void proxy_write_cb(struct btd_attribute *attr,
+@@ -193,16 +220,44 @@ static void proxy_write_cb(struct btd_attribute *attr,
+ 	GDBusProxy *proxy;
  
-@@ -100,18 +126,35 @@ static const GDBusPropertyTable service_properties[] = {
- 	{ }
- };
- 
-+static void chr_iface_destroy(gpointer user_data)
-+{
-+	struct characteristic *chr = user_data;
-+
-+	g_free(chr->uuid);
-+	g_free(chr->value);
-+	g_free(chr);
-+}
-+
- static int register_characteristic(DBusConnection *conn, const char *uuid,
-+						const uint8_t *value, int vlen,
- 						const char *service_path)
- {
-+	struct characteristic *chr;
- 	static int id = 1;
- 	char *path;
- 	int ret = 0;
- 
- 	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
- 
-+	chr = g_new0(struct characteristic, 1);
-+
-+	chr->uuid = g_strdup(uuid);
-+	chr->value = g_memdup(value, vlen);
-+	chr->vlen = vlen;
-+
- 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
- 					NULL, NULL, chr_properties,
--					g_strdup(uuid), g_free) == FALSE) {
-+					chr, chr_iface_destroy) == FALSE) {
- 		printf("Couldn't register characteristic interface\n");
- 		ret = -EIO;
- 	}
-@@ -141,15 +184,19 @@ static char *register_service(DBusConnection *conn, const char *uuid)
- static void create_services(DBusConnection *conn)
- {
- 	char *service_path;
-+	uint8_t level = 0;
- 	int ret;
- 
- 	service_path = register_service(conn, IAS_UUID);
- 	if (service_path == NULL)
+ 	proxy = g_hash_table_lookup(proxy_hash, attr);
+-	if (proxy == NULL)
+-		/* FIXME: Attribute not found */
++	if (proxy == NULL) {
++		result(ENOENT, user_data);
  		return;
++	}
  
--	/* Add Alert Level Characteristic to Immediate Alert Service */
--	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
--							service_path);
-+	/* Add Alert Level Characteristic to Immediate Alert Service
-+	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
-+	 * "Value" is readable for testing purpose only.
+-	g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
++	/*
++	 * "result" callback defines if the core wants to receive the
++	 * operation result, allowing to select ATT Write Request or Write
++	 * Command. Descriptors requires Write Request operation. For
++	 * Characteristics, the implementation will define which operations
++	 * are allowed based on the properties/flags.
++	 * TODO: Write Long Characteristics/Descriptors.
 +	 */
-+	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
-+						sizeof(level), service_path);
- 	if (ret < 0) {
- 		printf("Couldn't register Alert Level characteristic (IAS)\n");
- 		g_dbus_unregister_interface(conn, service_path,
++
++	if (result) {
++		struct proxy_write_data *wdata;
++
++		wdata = g_new0(struct proxy_write_data, 1);
++		wdata->result_cb = result;
++		wdata->user_data = user_data;
++
++		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
++						value, len, proxy_write_reply,
++						wdata, g_free);
++	} else {
++		/*
++		 * Caller is not interested in the Set method call result.
++		 * This flow implements the ATT Write Command scenario, where
++		 * the remote doesn't receive ATT response.
++		 */
++		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
+ 						value, len, proxy_write_reply,
+ 						NULL, NULL);
++	}
+ 
+-	DBG("Server: Write characteristic callback %s",
++	DBG("Server: Write attribute callback %s",
+ 					g_dbus_proxy_get_path(proxy));
++
+ }
+ 
+ static int register_external_service(const struct external_app *eapp,
 -- 
 1.8.3.1
 
