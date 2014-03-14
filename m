@@ -2,90 +2,110 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v4 08/20] gatt: Add characteristic to the database
-Date: Fri, 14 Mar 2014 10:13:08 -0300
-Message-Id: <1394802800-8424-9-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v4 10/20] gatt: Add read callback to btd_gatt_add_char helper
+Date: Fri, 14 Mar 2014 10:13:10 -0300
+Message-Id: <1394802800-8424-11-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Initial support for GATT characteristics. This patch adds the
-characteristic declaration attribute to the GATT local database based
-on the fetched GDBusProxy objects.
+This patch adds a function callback for read operations. When a remote
+device wants to reads a given attribute, the core calls the specified
+read callback to get the value from the external services.
 ---
- src/gatt-dbus.c | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 42 insertions(+), 1 deletion(-)
+ src/gatt-dbus.c |  2 +-
+ src/gatt.c      |  7 +++++--
+ src/gatt.h      | 20 +++++++++++++++++++-
+ 3 files changed, 25 insertions(+), 4 deletions(-)
 
 diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 3fbff87..9f94c4f 100644
+index f60260e..275b263 100644
 --- a/src/gatt-dbus.c
 +++ b/src/gatt-dbus.c
-@@ -163,6 +163,44 @@ static int register_external_service(const struct external_app *eapp,
- 	return 0;
+@@ -198,7 +198,7 @@ static int register_external_characteristics(GSList *proxies)
+ 		 * Reference table 3.5: Characteristic Properties bit field.
+ 		 */
+ 
+-		attr = btd_gatt_add_char(&uuid, 0x00);
++		attr = btd_gatt_add_char(&uuid, 0x00, NULL);
+ 		if (attr == NULL)
+ 			return -EINVAL;
+ 
+diff --git a/src/gatt.c b/src/gatt.c
+index 062460c..7d063a3 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -45,6 +45,7 @@ static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
+ struct btd_attribute {
+ 	uint16_t handle;
+ 	bt_uuid_t type;
++	btd_attr_read_t read_cb;
+ 	uint16_t value_len;
+ 	uint8_t value[0];
+ };
+@@ -130,7 +131,8 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
  }
  
-+static int register_external_characteristics(GSList *proxies)
-+
-+{
-+	GSList *list;
-+
-+	for (list = proxies; list; list = g_slist_next(proxies)) {
-+		DBusMessageIter iter;
-+		const char *str, *path;
-+		bt_uuid_t uuid;
-+		GDBusProxy *proxy = list->data;
-+
-+		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-+			return -EINVAL;
-+
-+		if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
-+			return -EINVAL;
-+
-+		dbus_message_iter_get_basic(&iter, &str);
-+
-+		if (bt_string_to_uuid(&uuid, str) < 0)
-+			return -EINVAL;
-+
-+		/*
-+		 * TODO: Missing Flags/property
-+		 * Add properties according to Core SPEC 4.1 page 2183.
-+		 * Reference table 3.5: Characteristic Properties bit field.
-+		 */
-+
-+		if (btd_gatt_add_char(&uuid, 0x00) == NULL)
-+			return -EINVAL;
-+
-+		path = g_dbus_proxy_get_path(proxy);
-+		DBG("Added GATT CHR: %s (%s)", path, str);
-+	}
-+
-+	return 0;
-+}
-+
- static void client_ready(GDBusClient *client, void *user_data)
+ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+-							uint8_t properties)
++						uint8_t properties,
++						btd_attr_read_t read_cb)
  {
- 	struct external_app *eapp = user_data;
-@@ -177,6 +215,9 @@ static void client_ready(GDBusClient *client, void *user_data)
- 	if (register_external_service(eapp, proxy) < 0)
- 		goto fail;
+ 	struct btd_attribute *char_decl, *char_value = NULL;
  
-+	if (register_external_characteristics(g_slist_next(eapp->proxies)) < 0)
-+		goto fail;
+@@ -188,8 +190,9 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+ 	 */
+ 
+ 	char_value->type = *uuid;
++	char_value->read_cb = read_cb;
+ 
+-	/* TODO: Read & Write callbacks */
++	/* TODO: Write callbacks */
+ 
+ 	if (local_database_add(next_handle, char_value) < 0)
+ 		/* TODO: remove declaration */
+diff --git a/src/gatt.h b/src/gatt.h
+index d7acc5b..e446fa0 100644
+--- a/src/gatt.h
++++ b/src/gatt.h
+@@ -27,6 +27,22 @@ void gatt_init(void);
+ 
+ void gatt_cleanup(void);
+ 
++/*
++ * Callbacks of this type are called once the value from the attribute is
++ * ready to be read from the service implementation. Result callback is
++ * the asynchronous function that should be used to inform the caller
++ * the read value.
++ * @err:	error in errno format.
++ * @value:	pointer to value
++ * @len:	length of value
++ * @user_data:	user_data passed in btd_attr_read_t callback
++ */
++typedef void (*btd_attr_read_result_t) (int err, uint8_t *value, size_t len,
++							void *user_data);
++typedef void (*btd_attr_read_t) (struct btd_attribute *attr,
++						btd_attr_read_result_t result,
++						void *user_data);
 +
- 	DBG("Added GATT service %s", eapp->path);
- 
- 	reply = dbus_message_new_method_return(eapp->reg);
-@@ -186,7 +227,7 @@ fail:
- 	error("Could not register external service: %s", eapp->path);
- 
- 	reply = btd_error_invalid_args(eapp->reg);
--	/* TODO: missing eapp cleanup */
-+	/* TODO: missing eapp/database cleanup */
- 
- reply:
- 	dbus_message_unref(eapp->reg);
+ /* btd_gatt_add_service - Add a service declaration to local attribute database.
+  * @uuid:	Service UUID.
+  *
+@@ -40,9 +56,11 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
+  * to local attribute database.
+  * @uuid:	Characteristic UUID (16-bits or 128-bits).
+  * @properties:	Characteristic properties. See Core SPEC 4.1 page 2183.
++ * @read_cb:	Callback used to provide the characteristic value.
+  *
+  * Returns a reference to characteristic value attribute. In case of error,
+  * NULL is returned.
+  */
+ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+-							uint8_t properties);
++						uint8_t properties,
++						btd_attr_read_t read_cb);
 -- 
 1.8.3.1
 
