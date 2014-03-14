@@ -1,72 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 2/4] Bluetooth: Fix LE responder/initiator address setting
-Date: Fri, 14 Mar 2014 19:22:31 +0200
-Message-Id: <1394817753-7430-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1394817753-7430-1-git-send-email-johan.hedberg@gmail.com>
-References: <1394817753-7430-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAJdJm_PE5U4ePHg7rb2Q1dxXKy0=5KH1tyjzif0tcuSQCcf6Fg@mail.gmail.com>
+References: <CALdY0K5NNrrWdY73e44kp+QNxF2dizEyU44ny9k5h1YFQDf21w@mail.gmail.com>
+	<CAJdJm_Myxh+i50v+0bMJgDCActz4Na_fZdVbNuNjwCE7Bss_kQ@mail.gmail.com>
+	<CALdY0K6u0ZrJM-z7YKd2zmDzPStX2azVO-v4LUa385Ziq4uzOA@mail.gmail.com>
+	<CAJdJm_PE5U4ePHg7rb2Q1dxXKy0=5KH1tyjzif0tcuSQCcf6Fg@mail.gmail.com>
+Date: Fri, 14 Mar 2014 17:18:22 +0000
+Message-ID: <CALdY0K7WAnRAoBWLrp2YsmpC35EixpqpByj7bvbL-EqxZkt6=Q@mail.gmail.com>
+Subject: Re: Bluetooth low energy with gatttool and jawbone
+From: Christian Bianchini <christian.bianchini@euservers.net>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+I would like to get the motion data, basically this device has an
+accelerometer inside and maybe a gyro, so I just want to receive these
+information on my pc :)
+I will do some more testing later, probably if I dont answer for a
+while... I will be back on Monday.
 
-Once directed advertising is brought into the picture simply the lack of
-an hci_conn object when an le_conn_complete event occurs is no longer a
-reliable indication that the responder & initiator values need to be
-set based on our advertising address type.
+In the meantime thanks for your helpful answers!
 
-This patch moves the code for setting these values outside of the
-"if (!conn)" branch and ensures that they get set for any connection
-where we are in the slave role.
+On Fri, Mar 14, 2014 at 5:07 PM, Anderson Lizardo
+<anderson.lizardo@openbossa.org> wrote:
+> Hi Christian,
+>
+> On Fri, Mar 14, 2014 at 12:19 PM, Christian Bianchini
+> <christian.bianchini@euservers.net> wrote:
+>> You were right!
+>> Something happened, but I am not sure how to continue now, even
+>> because after primary I get some data then the device disconnect
+>> itself.
+>>
+>> $ sudo gatttool -b DC:7A:F8:10:AF:A5 -t random -I
+>> [   ][DC:7A:F8:10:AF:A5][LE]> connect
+>> [CON][DC:7A:F8:10:AF:A5][LE]> primary
+>> [CON][DC:7A:F8:10:AF:A5][LE]>
+>> attr handle: 0x0001, end grp handle: 0x0007 uuid:
+>> 00001800-0000-1000-8000-00805f9b34fb
+>> attr handle: 0x0008, end grp handle: 0x0008 uuid:
+>> 00001801-0000-1000-8000-00805f9b34fb
+>> attr handle: 0x0009, end grp handle: 0x0012 uuid:
+>> f7c9ba7e-6658-4390-b53c-1de5e1453654
+>> attr handle: 0x0013, end grp handle: 0xffff uuid:
+>> 0000180a-0000-1000-8000-00805f9b34fb
+>>
+>> I dont have bluetoothctl, there is special package for ubuntu?
+>
+> To have btmon/bluetoothctl, I think you need a recent BlueZ 5.x, which
+> is not available on Ubuntu (I think even latest Ubuntu uses 4.101, not
+> sure about the development version). So you need to build BlueZ from
+> sources.
+>
+> If you see a disconnect after ~30 seconds, it may be because it is
+> issuing a GATT request which gatttool does not answer (as gatttool
+> does not implement a GATT server). To confirm this, use "hcidump -i
+> hci0 -w jawbone.dump" and send it here. This log will show whether the
+> device is attempting some ATT request (e.g. GATT service discovery).
+> You can also read this log using "hcidump -r jawbone.dump".
+>
+> Another reason for disconnect is a failed pairing attempt.
+>
+> If you can't use BlueZ 5 for some reason, you can try pairing using
+> "sudo bluez-simple-agent hci0 <addr>".
+>
+> All that said, which data specifically do you want to get from the
+> device? On the output above I see a proprietary service at handle
+> 0x0009 and the Device Information service at handle 0x0013 (which is
+> most likely firmware version, serial number etc.). Do you have
+> specifications for the proprietary service?
+>
+> Best Regards,
+> --
+> Anderson Lizardo
+> http://www.indt.org/?lang=en
+> INdT - Manaus - Brazil
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7346ebd4c7d9..7f5178ccae97 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3793,23 +3793,25 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 							  &conn->init_addr,
- 							  &conn->init_addr_type);
- 			}
--		} else {
--			/* Set the responder (our side) address type based on
--			 * the advertising address type.
--			 */
--			conn->resp_addr_type = hdev->adv_addr_type;
--			if (hdev->adv_addr_type == ADDR_LE_DEV_RANDOM)
--				bacpy(&conn->resp_addr, &hdev->random_addr);
--			else
--				bacpy(&conn->resp_addr, &hdev->bdaddr);
--
--			conn->init_addr_type = ev->bdaddr_type;
--			bacpy(&conn->init_addr, &ev->bdaddr);
- 		}
- 	} else {
- 		cancel_delayed_work(&conn->le_conn_timeout);
- 	}
- 
-+	if (!conn->out) {
-+		/* Set the responder (our side) address type based on
-+		 * the advertising address type.
-+		 */
-+		conn->resp_addr_type = hdev->adv_addr_type;
-+		if (hdev->adv_addr_type == ADDR_LE_DEV_RANDOM)
-+			bacpy(&conn->resp_addr, &hdev->random_addr);
-+		else
-+			bacpy(&conn->resp_addr, &hdev->bdaddr);
-+
-+		conn->init_addr_type = ev->bdaddr_type;
-+		bacpy(&conn->init_addr, &ev->bdaddr);
-+	}
-+
- 	/* Lookup the identity address from the stored connection
- 	 * address and address type.
- 	 *
+
 -- 
-1.8.5.3
-
+---------------------------
+Web/Mobile Developer
+Luiis Group
+christian@bianchini.ch
