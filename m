@@ -1,68 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+From: "Poulain, Loic" <loic.poulain@intel.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>
+CC: "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: ipc-common.h missing in bluez 5.16
+Date: Fri, 14 Mar 2014 16:59:54 +0000
+Message-ID: <50C3158CF44D924791C15F1437EF2EC65D29E4@HASMSX104.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
-In-Reply-To: <CALdY0K6u0ZrJM-z7YKd2zmDzPStX2azVO-v4LUa385Ziq4uzOA@mail.gmail.com>
-References: <CALdY0K5NNrrWdY73e44kp+QNxF2dizEyU44ny9k5h1YFQDf21w@mail.gmail.com>
-	<CAJdJm_Myxh+i50v+0bMJgDCActz4Na_fZdVbNuNjwCE7Bss_kQ@mail.gmail.com>
-	<CALdY0K6u0ZrJM-z7YKd2zmDzPStX2azVO-v4LUa385Ziq4uzOA@mail.gmail.com>
-Date: Fri, 14 Mar 2014 13:07:12 -0400
-Message-ID: <CAJdJm_PE5U4ePHg7rb2Q1dxXKy0=5KH1tyjzif0tcuSQCcf6Fg@mail.gmail.com>
-Subject: Re: Bluetooth low energy with gatttool and jawbone
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Christian Bianchini <christian.bianchini@euservers.net>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Christian,
+Hi,
 
-On Fri, Mar 14, 2014 at 12:19 PM, Christian Bianchini
-<christian.bianchini@euservers.net> wrote:
-> You were right!
-> Something happened, but I am not sure how to continue now, even
-> because after primary I get some data then the device disconnect
-> itself.
->
-> $ sudo gatttool -b DC:7A:F8:10:AF:A5 -t random -I
-> [   ][DC:7A:F8:10:AF:A5][LE]> connect
-> [CON][DC:7A:F8:10:AF:A5][LE]> primary
-> [CON][DC:7A:F8:10:AF:A5][LE]>
-> attr handle: 0x0001, end grp handle: 0x0007 uuid:
-> 00001800-0000-1000-8000-00805f9b34fb
-> attr handle: 0x0008, end grp handle: 0x0008 uuid:
-> 00001801-0000-1000-8000-00805f9b34fb
-> attr handle: 0x0009, end grp handle: 0x0012 uuid:
-> f7c9ba7e-6658-4390-b53c-1de5e1453654
-> attr handle: 0x0013, end grp handle: 0xffff uuid:
-> 0000180a-0000-1000-8000-00805f9b34fb
->
-> I dont have bluetoothctl, there is special package for ubuntu?
+I Downloaded bluez-5.16.tar.xz from bluez.org, but there is a compile issue=
+ for android target.
+ipc-common.h is missing (in /android). Adding this file from master make it=
+ works.
 
-To have btmon/bluetoothctl, I think you need a recent BlueZ 5.x, which
-is not available on Ubuntu (I think even latest Ubuntu uses 4.101, not
-sure about the development version). So you need to build BlueZ from
-sources.
+Regards,
+Loic Poulain
+---------------------------------------------------------------------
+Intel Corporation SAS (French simplified joint stock company)
+Registered headquarters: "Les Montalets"- 2, rue de Paris, =
 
-If you see a disconnect after ~30 seconds, it may be because it is
-issuing a GATT request which gatttool does not answer (as gatttool
-does not implement a GATT server). To confirm this, use "hcidump -i
-hci0 -w jawbone.dump" and send it here. This log will show whether the
-device is attempting some ATT request (e.g. GATT service discovery).
-You can also read this log using "hcidump -r jawbone.dump".
+92196 Meudon Cedex, France
+Registration Number:  302 456 199 R.C.S. NANTERRE
+Capital: 4,572,000 Euros
 
-Another reason for disconnect is a failed pairing attempt.
-
-If you can't use BlueZ 5 for some reason, you can try pairing using
-"sudo bluez-simple-agent hci0 <addr>".
-
-All that said, which data specifically do you want to get from the
-device? On the output above I see a proprietary service at handle
-0x0009 and the Device Information service at handle 0x0013 (which is
-most likely firmware version, serial number etc.). Do you have
-specifications for the proprietary service?
-
-Best Regards,
--- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
