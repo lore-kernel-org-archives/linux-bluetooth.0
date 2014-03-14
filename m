@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: Move local identity address setting to a central place
-Date: Fri, 14 Mar 2014 11:43:12 +0200
-Message-Id: <1394790195-4109-2-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/4] Bluetooth: Add error mapping for Directed Advertising Timeout
+Date: Fri, 14 Mar 2014 11:43:14 +0200
+Message-Id: <1394790195-4109-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1394790195-4109-1-git-send-email-johan.hedberg@gmail.com>
 References: <1394790195-4109-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,63 +11,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Any time hci_conn_add is used for an LE connection we need to ensure
-that the local identity address is correctly described in the src and
-src_type variables. This patch moves setting these values directly into
-hci_conn_add so that callers don't have to duplicate the effort
-themselves.
+When a timeout occurs using directed advertising a 0x3c error gets
+generated. Since the operation is analogous to conventional connection
+creation map this to the usual EHOSTDOWN error.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c  | 12 ++++++++++++
- net/bluetooth/hci_event.c | 11 -----------
- 2 files changed, 12 insertions(+), 11 deletions(-)
+ net/bluetooth/lib.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b4809e473a19..ef8a7394475a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -401,6 +401,18 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	case ACL_LINK:
- 		conn->pkt_type = hdev->pkt_type & ACL_PTYPE_MASK;
- 		break;
-+	case LE_LINK:
-+		/* conn->src should reflect the local identity address,
-+		 * so set it correctly if we don't have a public
-+		 * address.
-+		 */
-+		if (bacmp(&conn->src, BDADDR_ANY)) {
-+			conn->src_type = ADDR_LE_DEV_PUBLIC;
-+		} else {
-+			bacpy(&conn->src, &hdev->static_addr);
-+			conn->src_type = ADDR_LE_DEV_RANDOM;
-+		}
-+		break;
- 	case SCO_LINK:
- 		if (lmp_esco_capable(hdev))
- 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e97f1905aa5c..89dbcc5575a7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3769,17 +3769,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/lib.c b/net/bluetooth/lib.c
+index b3fbc73516c4..941ad7530eda 100644
+--- a/net/bluetooth/lib.c
++++ b/net/bluetooth/lib.c
+@@ -58,6 +58,7 @@ int bt_to_errno(__u16 code)
+ 		return EIO;
  
- 		conn->dst_type = ev->bdaddr_type;
+ 	case 0x04:
++	case 0x3c:
+ 		return EHOSTDOWN;
  
--		/* The advertising parameters for own address type
--		 * define which source address and source address
--		 * type this connections has.
--		 */
--		if (bacmp(&conn->src, BDADDR_ANY)) {
--			conn->src_type = ADDR_LE_DEV_PUBLIC;
--		} else {
--			bacpy(&conn->src, &hdev->static_addr);
--			conn->src_type = ADDR_LE_DEV_RANDOM;
--		}
--
- 		if (ev->role == LE_CONN_ROLE_MASTER) {
- 			conn->out = true;
- 			conn->link_mode |= HCI_LM_MASTER;
+ 	case 0x05:
 -- 
 1.8.5.3
 
