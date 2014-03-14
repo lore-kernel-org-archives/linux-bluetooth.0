@@ -2,10 +2,8 @@ Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: Fix updating SMP remote key distribution information
-Date: Fri, 14 Mar 2014 10:53:50 +0200
-Message-Id: <1394787230-26475-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1394787230-26475-1-git-send-email-johan.hedberg@gmail.com>
-References: <1394787230-26475-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 14 Mar 2014 10:53:49 +0200
+Message-Id: <1394787230-26475-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
