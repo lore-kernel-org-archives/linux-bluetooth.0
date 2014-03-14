@@ -1,126 +1,272 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140312112853.GB7489@localhost.P-661HNU-F1>
-References: <1394406363-6751-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1394406363-6751-3-git-send-email-lukasz.rymanowski@tieto.com>
-	<20140312112853.GB7489@localhost.P-661HNU-F1>
-Date: Fri, 14 Mar 2014 16:56:44 +0100
-Message-ID: <CAMudyAvQXyGQ9aw7REE3rdFRQbABiOEidhq+WLanL60wNuA+_A@mail.gmail.com>
-Subject: Re: [PATCH v2 02/10] emulator: Use timeout for sending inquiry results
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1394597040-4483-3-git-send-email-armansito@chromium.org>
+References: <1394597040-4483-1-git-send-email-armansito@chromium.org>
+	<1394597040-4483-3-git-send-email-armansito@chromium.org>
+Date: Fri, 14 Mar 2014 11:56:07 -0400
+Message-ID: <CAJdJm_Pz7wPDY7jLzfC5HSCRjwAzCOXXK7sbrcBWE8Oqs_WkfQ@mail.gmail.com>
+Subject: Re: [RFC BlueZ 2/2] gatt-dbus: Add remote GATT characteristic objects.
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: armansito@chromium.org
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Arman,
 
-On 12 March 2014 12:28, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lukasz,
+On Wed, Mar 12, 2014 at 12:04 AM,  <armansito@chromium.org> wrote:
+> From: Arman Uguray <armansito@chromium.org>
 >
-> On Mon, Mar 10, 2014, Lukasz Rymanowski wrote:
->> +#define DEFAULT_INQUIRY_INTERVAL 100 /* 100 miliseconds */
->> +
->>  #define MAX_BTDEV_ENTRIES 16
->>
->> +
->>  static const uint8_t LINK_KEY_NONE[16] = { 0 };
->
-> Seems like you're introducing an unnecessary empty line above.
+> This CL adds remote GATT characteristic objects to the D-Bus API. The
+> API only exposes the UUID; the characteristic value and permissions have
+> not yet been implemented.
 
-will fix
+Same general comments about coding style apply to this patch as well.
+A few other comments below.
 
+> ---
+>  src/gatt-dbus.c | 165 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 164 insertions(+), 1 deletion(-)
 >
->>  static const uint8_t LINK_KEY_DUMMY[16] = {  0, 1, 2, 3, 4, 5, 6, 7,
->>                                               8, 9, 0, 1, 2, 3, 4, 5 };
->> @@ -528,9 +540,13 @@ void btdev_destroy(struct btdev *btdev)
->>       if (!btdev)
->>               return;
->>
->> +     if (btdev->inquiry_id)
->> +             timeout_remove(btdev->inquiry_id);
+> diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+> index 60b87fa..db98137 100644
+> --- a/src/gatt-dbus.c
+> +++ b/src/gatt-dbus.c
+> @@ -52,8 +52,24 @@
 >
-> We usually check for valid timeout or GSource IDs with id > 0.
->
->> +
->>       del_btdev(btdev);
->>
->>       free(btdev);
->> +     btdev = NULL;
->>  }
->
-> This last btdev = NULL is pointless since you're leaving the function
-> and the variable goes out of scope.
+>  struct btd_gatt_dbus_service {
+>         bt_uuid_t uuid;
+> +       struct att_range range;
+> +       GAttrib *attrib;
+> +       guint attioid;
+> +       guint request;
+> +
+>         struct btd_device *device;
+>         char *path;
+> +       GSList *characteristics;
+> +};
+> +
+> +struct gatt_dbus_characteristic {
+> +       bt_uuid_t uuid;
+> +       uint8_t handle;
+> +       uint8_t value_handle;
 
-some trash - wll fix
->
->>
->> -     struct bt_hci_evt_inquiry_complete ic;
->> +     struct inquiry_data *data = user_data;
->> +     struct btdev *btdev = data->btdev;
->> +     int sent = data->sent_count;
->>       int i;
->>
->> -     for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
->> +     for (i = data->iter; i < MAX_BTDEV_ENTRIES; i++, data->iter++) {
->
-> Iterating data->iter and i++ throughout the entire loop seems overkill
-> I'd just assign the resulting value of i to data->iter once you've
-> exited to loop.
+I wonder why handle/value_handle are uint8_t and not uint16_t.
 
-sure
+> +       uint8_t properties;
+> +
+> +       struct btd_gatt_dbus_service *service;
+> +       char *path;
+>  };
 >
->> +             /*Lets sent 10 inquiry results at once */
->> +             if (sent + 10 == data->sent_count)
->> +                     break;
+>  struct external_app {
+> @@ -491,19 +507,156 @@ static gboolean service_property_get_uuid(const GDBusPropertyTable *property,
+>         return TRUE;
+>  }
 >
-> I'd prefer if we can make this so that you instead have the timeout
-> called as many times as necessary and send just one event each time.
-> I.e. upon reception of HCI_Inquiry you check the duration of the
-> inquiry, the maximum amount of responses, MAX_BTDEV_ENTRIES and
-> determine how frequently the timeout should be called in order to send
-> all events by the time the inquiry should complete.
+> +static gboolean characteristic_property_get_uuid(
+> +               const GDBusPropertyTable *table,
+> +               DBusMessageIter *iter, void *data)
+> +{
+> +       char uuid[MAX_LEN_UUID_STR + 1];
+> +       const char *ptr = uuid;
+> +       struct gatt_dbus_characteristic *chr = data;
+> +
+> +       bt_uuid_to_string(&chr->uuid, uuid, sizeof(uuid));
+> +       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static const GDBusPropertyTable service_properties[] = {
+>         { "UUID", "s", service_property_get_uuid },
+>         {}
+>  };
 >
-This approach would cause an issue at least in android-tester when we
-have usually 1 remote device emulated and 10sec of inquiry duration. I
-would expect timeouts in the tester.
-Maybe I could do configurable timeout on how often the inquiry result
-shall be sent ? It will be also easier to create stress scenarios.
+> +static const GDBusPropertyTable characteristic_properties[] = {
+> +       { "UUID", "s", characteristic_property_get_uuid },
+> +       {}
+> +};
+> +
+> +static void unregister_characteristic(gpointer user_data)
+> +{
+> +       struct gatt_dbus_characteristic *chr = user_data;
+> +       g_dbus_unregister_interface(btd_get_dbus_connection(),
+> +                                       chr->path, GATT_CHR_IFACE);
+> +}
+> +
+> +static void attio_cleanup(struct btd_gatt_dbus_service *service)
+> +{
+> +       if (!service->attrib)
+> +               return;
+> +       GAttrib *attrib = service->attrib;
 
-BTW. I put here 10 device per timeout, because I wanted to stress
-daemon when running android-tester (daemon and btdev runs in one
-mainloop)
-Actually I think there is no sense to create test for xxx-tester with
-scenario of tons of device so I will change it to send one inquiry
-result per timeout
-For the  test of inquiry of tons of devices I think it is better to
-run btvirt and deamon on vhci
+Declaration should be in the beginning of the function.
 
->> +static void inquiry_cmd(struct btdev *btdev, const void *cmd)
->> +{
->> +     struct inquiry_data *data;
->> +     struct bt_hci_evt_inquiry_complete ic;
->> +     int status = BT_HCI_ERR_HARDWARE_FAILURE;
->> +
->> +     if (btdev->inquiry_id) {
+> +       service->attrib = NULL;
+> +       if (service->request) {
+> +               g_attrib_cancel(attrib, service->request);
+> +               service->request = 0;
+> +       }
+> +       g_attrib_unref(attrib);
+> +}
+> +
+>  static void service_free(gpointer user_data)
+>  {
+>         struct btd_gatt_dbus_service *service = user_data;
 >
-> if (btdev->inquiry_id > 0)
->
->> +     data = malloc(sizeof(*data));
->> +     if (!data)
->> +             goto error;
->
-> We usually use "failed" for this kind of labels.
->
->> +     btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
->> +                             inquiry_callback, data, inquiry_destroy);
->
-> This looks like possibly incorrect indentation. The indentation should
-> go past the opening ( and then have more lines if necessary.
->
-Will fix
+> +       g_slist_free_full(service->characteristics, unregister_characteristic);
+> +
+> +       if (service->attioid) {
+> +               btd_device_remove_attio_callback(service->device,
+> +                                               service->attioid);
+> +       }
 
-> Johan
+As an exception to the "use kernel coding style" rule, if() blocks
+with a single statement should not have brackets ({}).
 
-\Lukasz
+> +       attio_cleanup(service);
+>         g_free(service->path);
+>         g_free(service);
+>  }
+>
+> +static void characteristic_free(gpointer user_data)
+> +{
+> +       struct gatt_dbus_characteristic *characteristic = user_data;
+> +
+> +       g_free(characteristic->path);
+> +       g_free(characteristic);
+> +}
+> +
+> +static struct gatt_dbus_characteristic *characteristic_create(
+> +               struct btd_gatt_dbus_service *service,
+> +               struct gatt_char *chr)
+> +{
+> +       struct gatt_dbus_characteristic *characteristic;
+> +       bt_uuid_t uuid;
+> +
+> +       DBG("GATT characteristic UUID: %s", chr->uuid);
+> +
+> +       characteristic = g_try_malloc0(sizeof(struct gatt_dbus_characteristic));
+
+We usually use g_new0() or g_try_new0() for structs.
+
+> +       if (characteristic == NULL)
+> +               return NULL;
+> +
+> +       characteristic->path = g_strdup_printf("%s/char%04X", service->path,
+> +                                               chr->handle);
+> +       characteristic->service = service;
+> +       characteristic->handle = chr->handle;
+> +       characteristic->value_handle = chr->value_handle;
+> +       characteristic->properties = chr->properties;
+> +
+> +       if (bt_string_to_uuid(&uuid, chr->uuid)) {
+> +               error("Characteristic has invalid UUID: %s", chr->uuid);
+> +               goto fail;
+> +       }
+> +
+> +       bt_uuid_to_uuid128(&uuid, &characteristic->uuid);
+> +
+> +       DBG("Creating GATT characteristic %s", characteristic->path);
+> +
+> +       if (g_dbus_register_interface(btd_get_dbus_connection(),
+> +                                       characteristic->path,
+> +                                       GATT_CHR_IFACE, NULL, NULL,
+> +                                       characteristic_properties,
+> +                                       characteristic,
+> +                                       characteristic_free) == FALSE) {
+> +               error("Unable to register GATT characteristic: %s", chr->uuid);
+> +               goto fail;
+> +       }
+> +
+> +       return characteristic;
+> +
+> +fail:
+> +       characteristic_free(characteristic);
+> +       return NULL;
+> +}
+> +
+> +static void discover_char_cb(uint8_t status, GSList *chars, void *user_data)
+> +{
+> +       struct btd_gatt_dbus_service *service = user_data;
+
+Add an empty line after variable declaration (at least for function level ones).
+
+> +       service->request = 0;
+> +       if (status) {
+> +               error("Characteristic discovery failed.");
+> +               return;
+> +       }
+> +       for (; chars; chars = chars->next) {
+> +               struct gatt_char *chr = chars->data;
+> +               struct gatt_dbus_characteristic *dbus_chr =
+> +                               characteristic_create(service, chr);
+> +               if (dbus_chr == NULL)
+> +                       continue;
+> +               service->characteristics = g_slist_append(
+> +                               service->characteristics, dbus_chr);
+> +       }
+> +       attio_cleanup(service);
+> +}
+> +
+> +static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+> +{
+> +       struct btd_gatt_dbus_service *service = user_data;
+
+Same as above.
+
+> +       service->attrib = g_attrib_ref(attrib);
+> +       service->request = gatt_discover_char(service->attrib,
+> +                       service->range.start,
+> +                       service->range.end,
+> +                       NULL, discover_char_cb,
+> +                       service);
+> +}
+> +
+> +static void attio_disconnected_cb(gpointer user_data)
+> +{
+> +       struct btd_gatt_dbus_service *service = user_data;
+> +       attio_cleanup(service);
+> +}
+> +
+>  struct btd_gatt_dbus_service *btd_gatt_dbus_service_create(
+>                 struct btd_device *device, struct gatt_primary *primary)
+>  {
+> @@ -520,6 +673,12 @@ struct btd_gatt_dbus_service *btd_gatt_dbus_service_create(
+>         service->path = g_strdup_printf("%s/service%04X", device_path,
+>                                         primary->range.start);
+>
+> +       service->device = device;
+> +       service->range = primary->range;
+> +       service->characteristics = NULL;
+> +       service->attrib = NULL;
+> +       service->request = 0;
+
+If you use g_try_new0(), there is no need to initialize pointers to
+NULL or integers to 0.
+
+> +
+>         if (bt_string_to_uuid(&uuid, primary->uuid)) {
+>                 error("Primary has invalid UUID: %s", primary->uuid);
+>                 goto fail;
+> @@ -541,7 +700,11 @@ struct btd_gatt_dbus_service *btd_gatt_dbus_service_create(
+>                 goto fail;
+>         }
+>
+> -       service->device = device;
+> +       service->attioid = service->attioid = btd_device_add_attio_callback(
+> +                       service->device,
+> +                       attio_connected_cb,
+> +                       attio_disconnected_cb, service);
+> +
+>         return service;
+>
+>  fail:
+
+Best Regards,
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
