@@ -1,71 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Natanael Copa <ncopa@alpinelinux.org>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Natanael Copa <ncopa@alpinelinux.org>
-Subject: [PATCH 2/3] unit: prevent unintended use of glibc's error(3)
-Date: Fri, 14 Mar 2014 09:59:26 +0000
-Message-Id: <1394791167-29933-3-git-send-email-ncopa@alpinelinux.org>
-In-Reply-To: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
-References: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/hsp: PTS tests results for HSP
+Date: Fri, 14 Mar 2014 11:01:14 +0100
+Message-Id: <1394791274-8216-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When building the test-sdp we don't want src/sdpd-request.c end up
-using the incompatible GNU libc's error(3) instead of the intended
-src/log.c's error().
-
-This also fixes the following compile error on Alpine Linux with musl
-libc which does not implement the error(3) GNU extension:
-
-src/sdpd-request.o: In function `extract_des':
-/home/ncopa/src/bluez/src/sdpd-request.c:126: undefined reference to `error'
-src/sdpd-request.o: In function `process_request':
-/home/ncopa/src/bluez/src/sdpd-request.c:1022: undefined reference to `error'
-/home/ncopa/src/bluez/src/sdpd-request.c:1045: undefined reference to `error'
 ---
- Makefile.am     | 1 +
- unit/test-sdp.c | 9 +++------
- 2 files changed, 4 insertions(+), 6 deletions(-)
+ android/Makefile.am |  3 ++-
+ android/pts-hsp.txt | 41 +++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 43 insertions(+), 1 deletion(-)
+ create mode 100644 android/pts-hsp.txt
 
-diff --git a/Makefile.am b/Makefile.am
-index fb11230..700b956 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -265,6 +265,7 @@ unit_tests += unit/test-sdp
- unit_test_sdp_SOURCES = unit/test-sdp.c \
- 				src/shared/util.h src/shared/util.c \
- 				src/sdpd.h src/sdpd-database.c \
-+				src/log.h src/log.c \
- 				src/sdpd-service.c src/sdpd-request.c
- unit_test_sdp_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
-diff --git a/unit/test-sdp.c b/unit/test-sdp.c
-index 9b82343..853576d 100644
---- a/unit/test-sdp.c
-+++ b/unit/test-sdp.c
-@@ -128,12 +128,6 @@ static void sdp_debug(const char *str, void *user_data)
- 	g_print("%s%s\n", prefix, str);
- }
- 
--void btd_debug(const char *format, ...);
--
--void btd_debug(const char *format, ...)
--{
--}
--
- static void context_quit(struct context *context)
- {
- 	g_main_loop_quit(context->main_loop);
-@@ -797,6 +791,9 @@ int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
- 
-+	if (g_test_verbose())
-+		__btd_log_init("*", 0);
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 330529f..5a97f4a 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -219,4 +219,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-avrcp.txt \
+ 				android/pts-avctp.txt \
+ 				android/pts-pbap.txt \
+-				android/pts-hfp.txt
++				android/pts-hfp.txt \
++				android/pts-hsp.txt
+diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
+new file mode 100644
+index 0000000..167fdb5
+--- /dev/null
++++ b/android/pts-hsp.txt
+@@ -0,0 +1,41 @@
++PTS test results for HSP
 +
- 	/*
- 	 * Service Search Request
- 	 *
++PTS version: 5.0
++Tested: 14-Mar-2014
++Android version: 4.4.2
++
++Results:
++PASS    test passed
++FAIL    test failed
++INC     test is inconclusive
++N/A     test is disabled due to PICS setup
++
++-------------------------------------------------------------------------------
++Test Name               Result  Notes
++-------------------------------------------------------------------------------
++TC_AG_IAC_BV_01_I	PASS
++TC_AG_IAC_BV_02_I	N/A
++TC_AG_OAC_BV_01_I	PASS
++HSP_TC_AG_ACR_BV_01_I	PASS
++HSP_TC_AG_ACR_BV_02_I	PASS
++TC_AG_ACT_BV_01_I	PASS
++TC_AG_ACT_BV_02_I	PASS
++TC_AG_RAV_BV_01_I	N/A
++TC_AG_RAV_BV_02_I	N/A
++TC_AG_RAV_BV_03_I	N/A
++TC_AG_RAV_BV_04_I	N/A
++TC_AG_RAV_BV_05_I	N/A
++TC_AG_RAV_BV_06_I	N/A
++TC_HS_IAC_BV_01_I	N/A
++TC_HS_IAC_BV_02_I	N/A
++TC_HS_OAC_BV_01_I	N/A
++TC_HS_ACR_BV_01_I	N/A
++TC_HS_ACR_BV_02_I	N/A
++TC_HS_ACT_BV_01_I	N/A
++TC_HS_ACT_BV_02_I	N/A
++TC_HS_RAV_BV_01_I	N/A
++TC_HS_RAV_BV_02_I	N/A
++TC_HS_RAV_BV_03_I	N/A
++TC_HS_RAV_BV_04_I	N/A
++TC_HS_RAV_BV_05_I	N/A
++TC_HS_RAV_BV_06_I	N/A
 -- 
-1.9.0
+1.8.5.3
 
