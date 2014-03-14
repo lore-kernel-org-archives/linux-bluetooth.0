@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 11/16] android/avrcp: Add avrcp_change_path() function
-Date: Fri, 14 Mar 2014 17:17:53 +0200
-Message-Id: <1394810278-11013-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 14/16] unit/avrcp: Add /TP/MCN/CB/BV-07-C test
+Date: Fri, 14 Mar 2014 17:17:56 +0200
+Message-Id: <1394810278-11013-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1394810278-11013-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1394810278-11013-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,50 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Test verifies that GetItemAttributes command issued by the Controller.
 ---
- android/avrcp-lib.c | 20 ++++++++++++++++++++
- android/avrcp-lib.h |  3 +++
- 2 files changed, 23 insertions(+)
+ unit/test-avrcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index e9220b7..cf4aeab 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -550,3 +550,23 @@ int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
- 	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
- 							func, user_data);
- }
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 171a44b..ddd20f7 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -732,6 +732,11 @@ static void test_client(gconstpointer data)
+ 		avrcp_change_path(context->session, 0x01, 0x01, 0xaabb,
+ 								NULL, NULL);
+ 
++	if (g_str_equal(context->data->test_name, "/TP/MCN/CB/BV-07-C"))
++		avrcp_get_item_attributes(context->session,
++					AVRCP_MEDIA_PLAYER_VFS, 0x01, 0xaabb,
++					NULL, 0, NULL, NULL);
 +
-+int avrcp_change_path(struct avrcp *session, uint8_t direction, uint64_t uid,
-+				uint16_t counter, avctp_browsing_rsp_cb func,
-+				void *user_data)
-+{
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 11];
-+	struct avrcp_browsing_header *pdu = (void *) buf;
+ 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
+ 		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
+ 								NULL, NULL);
+@@ -843,6 +848,15 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x00, 0x00,
+ 				0x00, 0x00, 0x00, 0x01	/* Folder UID */));
+ 
++	/* GetItemAttributes - CT */
++	define_test("/TP/MCN/CB/BV-07-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
++				0x00, 0x0c, AVRCP_MEDIA_PLAYER_VFS,
++				0x00, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x01,	/* uuid */
++				0xaa, 0xbb,		/* counter */
++				0x00));			/* num attr */
 +
-+	memset(buf, 0, sizeof(buf));
-+
-+	pdu->pdu_id = AVRCP_CHANGE_PATH;
-+	pdu->param_len = htons(11);
-+
-+	bt_put_be16(counter, &pdu->params[0]);
-+	pdu->params[2] = direction;
-+	bt_put_be64(uid, &pdu->params[3]);
-+
-+	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-+							func, user_data);
-+}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 72fd89a..575cd2d 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -189,3 +189,6 @@ int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
- 				uint32_t start, uint32_t end, uint32_t *attr,
- 				size_t attr_count, avctp_browsing_rsp_cb func,
- 				void *user_data);
-+int avrcp_change_path(struct avrcp *session, uint8_t direction, uint64_t uid,
-+				uint16_t counter, avctp_browsing_rsp_cb func,
-+				void *user_data);
+ 	/* Media Player Selection IOP tests */
+ 
+ 	/* Listing of available media players */
 -- 
 1.8.3.2
 
