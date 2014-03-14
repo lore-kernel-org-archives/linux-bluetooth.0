@@ -1,111 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v4 10/20] gatt: Add read callback to btd_gatt_add_char helper
-Date: Fri, 14 Mar 2014 10:13:10 -0300
-Message-Id: <1394802800-8424-11-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Andre Guedes <andre.guedes@openbossa.org>
+Subject: [PATCH BlueZ v4 07/20] gatt: Add helper for creating GATT characteristics
+Date: Fri, 14 Mar 2014 10:13:07 -0300
+Message-Id: <1394802800-8424-8-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a function callback for read operations. When a remote
-device wants to reads a given attribute, the core calls the specified
-read callback to get the value from the external services.
----
- src/gatt-dbus.c |  2 +-
- src/gatt.c      |  7 +++++--
- src/gatt.h      | 20 +++++++++++++++++++-
- 3 files changed, 25 insertions(+), 4 deletions(-)
+From: Andre Guedes <andre.guedes@openbossa.org>
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index f60260e..275b263 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -198,7 +198,7 @@ static int register_external_characteristics(GSList *proxies)
- 		 * Reference table 3.5: Characteristic Properties bit field.
- 		 */
- 
--		attr = btd_gatt_add_char(&uuid, 0x00);
-+		attr = btd_gatt_add_char(&uuid, 0x00, NULL);
- 		if (attr == NULL)
- 			return -EINVAL;
- 
+This patch adds btd_gatt_add_char() helper. It creates and adds the
+Characteristic declaration, and Characteristic value attributes to the
+local attribute database.
+---
+ src/gatt.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/gatt.h | 12 +++++++++
+ 2 files changed, 100 insertions(+)
+
 diff --git a/src/gatt.c b/src/gatt.c
-index 062460c..7d063a3 100644
+index 56a1db1..062460c 100644
 --- a/src/gatt.c
 +++ b/src/gatt.c
-@@ -45,6 +45,7 @@ static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
+@@ -39,6 +39,9 @@
+ static const bt_uuid_t primary_uuid  = { .type = BT_UUID16,
+ 					.value.u16 = GATT_PRIM_SVC_UUID };
+ 
++static const bt_uuid_t chr_uuid = { .type = BT_UUID16,
++					.value.u16 = GATT_CHARAC_UUID };
++
  struct btd_attribute {
  	uint16_t handle;
  	bt_uuid_t type;
-+	btd_attr_read_t read_cb;
- 	uint16_t value_len;
- 	uint8_t value[0];
- };
-@@ -130,7 +131,8 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+@@ -126,6 +129,91 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	return attr;
  }
  
- struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
--							uint8_t properties)
-+						uint8_t properties,
-+						btd_attr_read_t read_cb)
++struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
++							uint8_t properties)
++{
++	struct btd_attribute *char_decl, *char_value = NULL;
++
++	/* Attribute value length */
++	uint16_t len = 1 + 2 + bt_uuid_len(uuid);
++	uint8_t value[len];
++
++	/*
++	 * Characteristic DECLARATION
++	 *
++	 *   TYPE         ATTRIBUTE VALUE
++	 * +-------+---------------------------------+
++	 * |0x2803 | 0xXX 0xYYYY 0xZZZZ...           |
++	 * | (1)   |  (2)   (3)   (4)                |
++	 * +------+----------------------------------+
++	 * (1) - 2 octets: Characteristic declaration UUID
++	 * (2) - 1 octet : Properties
++	 * (3) - 2 octets: Handle of the characteristic Value
++	 * (4) - 2 or 16 octets: Characteristic UUID
++	 */
++
++	value[0] = properties;
++
++	/*
++	 * Since we don't know yet the characteristic value attribute
++	 * handle, we skip and set it later.
++	 */
++
++	put_uuid(uuid, &value[3]);
++
++	char_decl = new_const_attribute(&chr_uuid, value, len);
++	if (char_decl == NULL)
++		goto fail;
++
++	char_value = new0(struct btd_attribute, 1);
++	if (char_value == NULL)
++		goto fail;
++
++	if (local_database_add(next_handle, char_decl) < 0)
++		goto fail;
++
++	next_handle = next_handle + 1;
++
++	/*
++	 * Characteristic VALUE
++	 *
++	 *   TYPE         ATTRIBUTE VALUE
++	 * +----------+---------------------------------+
++	 * |0xZZZZ... | 0x...                           |
++	 * |  (1)     |  (2)                            |
++	 * +----------+---------------------------------+
++	 * (1) - 2 or 16 octets: Characteristic UUID
++	 * (2) - N octets: Value is read dynamically from the service
++	 * implementation (external entity).
++	 */
++
++	char_value->type = *uuid;
++
++	/* TODO: Read & Write callbacks */
++
++	if (local_database_add(next_handle, char_value) < 0)
++		/* TODO: remove declaration */
++		goto fail;
++
++	next_handle = next_handle + 1;
++
++	/*
++	 * Update characteristic value handle in characteristic declaration
++	 * attribute. For local attributes, we can assume that the handle
++	 * representing the characteristic value will get the next available
++	 * handle. However, for remote attribute this assumption is not valid.
++	 */
++	put_le16(char_value->handle, &char_decl->value[1]);
++
++	return char_value;
++
++fail:
++	free(char_decl);
++	free(char_value);
++
++	return NULL;
++}
++
+ void gatt_init(void)
  {
- 	struct btd_attribute *char_decl, *char_value = NULL;
- 
-@@ -188,8 +190,9 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
- 	 */
- 
- 	char_value->type = *uuid;
-+	char_value->read_cb = read_cb;
- 
--	/* TODO: Read & Write callbacks */
-+	/* TODO: Write callbacks */
- 
- 	if (local_database_add(next_handle, char_value) < 0)
- 		/* TODO: remove declaration */
+ 	DBG("Starting GATT server");
 diff --git a/src/gatt.h b/src/gatt.h
-index d7acc5b..e446fa0 100644
+index 8dd1312..d7acc5b 100644
 --- a/src/gatt.h
 +++ b/src/gatt.h
-@@ -27,6 +27,22 @@ void gatt_init(void);
- 
- void gatt_cleanup(void);
- 
-+/*
-+ * Callbacks of this type are called once the value from the attribute is
-+ * ready to be read from the service implementation. Result callback is
-+ * the asynchronous function that should be used to inform the caller
-+ * the read value.
-+ * @err:	error in errno format.
-+ * @value:	pointer to value
-+ * @len:	length of value
-+ * @user_data:	user_data passed in btd_attr_read_t callback
-+ */
-+typedef void (*btd_attr_read_result_t) (int err, uint8_t *value, size_t len,
-+							void *user_data);
-+typedef void (*btd_attr_read_t) (struct btd_attribute *attr,
-+						btd_attr_read_result_t result,
-+						void *user_data);
-+
- /* btd_gatt_add_service - Add a service declaration to local attribute database.
-  * @uuid:	Service UUID.
-  *
-@@ -40,9 +56,11 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
-  * to local attribute database.
-  * @uuid:	Characteristic UUID (16-bits or 128-bits).
-  * @properties:	Characteristic properties. See Core SPEC 4.1 page 2183.
-+ * @read_cb:	Callback used to provide the characteristic value.
-  *
-  * Returns a reference to characteristic value attribute. In case of error,
+@@ -34,3 +34,15 @@ void gatt_cleanup(void);
   * NULL is returned.
   */
- struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
--							uint8_t properties);
-+						uint8_t properties,
-+						btd_attr_read_t read_cb);
+ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
++
++/*
++ * btd_gatt_add_char - Add a characteristic (declaration and value attributes)
++ * to local attribute database.
++ * @uuid:	Characteristic UUID (16-bits or 128-bits).
++ * @properties:	Characteristic properties. See Core SPEC 4.1 page 2183.
++ *
++ * Returns a reference to characteristic value attribute. In case of error,
++ * NULL is returned.
++ */
++struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
++							uint8_t properties);
 -- 
 1.8.3.1
 
