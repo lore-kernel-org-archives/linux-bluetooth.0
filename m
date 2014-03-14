@@ -1,87 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/hsp: PTS tests results for HSP
-Date: Fri, 14 Mar 2014 14:48:56 +0100
-Message-ID: <3752642.bfBUTCfghf@uw000953>
-In-Reply-To: <1394791274-8216-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1394791274-8216-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/client: Fix segfault (invalid argv) for gatt scan
+Date: Fri, 14 Mar 2014 14:48:16 +0100
+Message-ID: <2088077.6xLvG5hkAH@uw000953>
+In-Reply-To: <1394801166-5860-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1394801166-5860-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Grzegorz,
 
-On Friday 14 of March 2014 11:01:14 Sebastian Chlad wrote:
+On Friday 14 of March 2014 13:46:06 Grzegorz Kolodziejczyk wrote:
+> This patch fix segfault driven by lack of 4 element in avrg array.
+> If user put only two arguments, reading of lacking (auto set to start=1)
+> third argument, will trigger segfault.
 > ---
->  android/Makefile.am |  3 ++-
->  android/pts-hsp.txt | 41 +++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 43 insertions(+), 1 deletion(-)
->  create mode 100644 android/pts-hsp.txt
+>  android/client/if-gatt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 330529f..5a97f4a 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -219,4 +219,5 @@ EXTRA_DIST += android/Android.mk android/README \
->  				android/pts-avrcp.txt \
->  				android/pts-avctp.txt \
->  				android/pts-pbap.txt \
-> -				android/pts-hfp.txt
-> +				android/pts-hfp.txt \
-> +				android/pts-hsp.txt
-> diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
-> new file mode 100644
-> index 0000000..167fdb5
-> --- /dev/null
-> +++ b/android/pts-hsp.txt
-> @@ -0,0 +1,41 @@
-> +PTS test results for HSP
-> +
-> +PTS version: 5.0
-> +Tested: 14-Mar-2014
-> +Android version: 4.4.2
-> +
-> +Results:
-> +PASS    test passed
-> +FAIL    test failed
-> +INC     test is inconclusive
-> +N/A     test is disabled due to PICS setup
-> +
-> +-------------------------------------------------------------------------------
-> +Test Name               Result  Notes
-> +-------------------------------------------------------------------------------
-> +TC_AG_IAC_BV_01_I	PASS
-> +TC_AG_IAC_BV_02_I	N/A
-> +TC_AG_OAC_BV_01_I	PASS
-> +HSP_TC_AG_ACR_BV_01_I	PASS
-> +HSP_TC_AG_ACR_BV_02_I	PASS
-> +TC_AG_ACT_BV_01_I	PASS
-> +TC_AG_ACT_BV_02_I	PASS
-> +TC_AG_RAV_BV_01_I	N/A
-> +TC_AG_RAV_BV_02_I	N/A
-> +TC_AG_RAV_BV_03_I	N/A
-> +TC_AG_RAV_BV_04_I	N/A
-> +TC_AG_RAV_BV_05_I	N/A
-> +TC_AG_RAV_BV_06_I	N/A
-> +TC_HS_IAC_BV_01_I	N/A
-> +TC_HS_IAC_BV_02_I	N/A
-> +TC_HS_OAC_BV_01_I	N/A
-> +TC_HS_ACR_BV_01_I	N/A
-> +TC_HS_ACR_BV_02_I	N/A
-> +TC_HS_ACT_BV_01_I	N/A
-> +TC_HS_ACT_BV_02_I	N/A
-> +TC_HS_RAV_BV_01_I	N/A
-> +TC_HS_RAV_BV_02_I	N/A
-> +TC_HS_RAV_BV_03_I	N/A
-> +TC_HS_RAV_BV_04_I	N/A
-> +TC_HS_RAV_BV_05_I	N/A
-> +TC_HS_RAV_BV_06_I	N/A
+> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+> index e8837ff..17a491e 100644
+> --- a/android/client/if-gatt.c
+> +++ b/android/client/if-gatt.c
+> @@ -854,7 +854,7 @@ static void scan_p(int argc, const char **argv)
+>  	VERIFY_CLIENT_IF(2, client_if);
+>  
+>  	/* start */
+> -	if (argc >= 3)
+> +	if (argc >= 4)
+>  		start = atoi(argv[3]);
+>  
+>  	EXEC(if_gatt->client->scan, client_if, start);
 > 
 
-Applied, thanks.
+Pushed, thanks.
 
 -- 
 Best regards, 
