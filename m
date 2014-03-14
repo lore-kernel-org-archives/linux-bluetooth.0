@@ -1,30 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/4] Bluetooth: Direct advertising support through connect()
-Date: Fri, 14 Mar 2014 11:43:11 +0200
-Message-Id: <1394790195-4109-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 8/8] android/client: Add AVRCP list_player_app_attr_cb support
+Date: Fri, 14 Mar 2014 11:16:47 +0200
+Message-Id: <1394788607-29075-8-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1394788607-29075-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1394788607-29075-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ android/client/if-rc.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-This patch set adds support for triggering direct advertising when the
-HCI_ADVERTISING flag is set and connect() is called on a socket.
-
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (4):
-      Bluetooth: Move local identity address setting to a central place
-      Bluetooth: Fix LE responder/initiator address setting
-      Bluetooth: Add error mapping for Directed Advertising Timeout
-      Bluetooth: Add directed advertising support through connect()
-
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_conn.c    | 87 +++++++++++++++++++++++++++++++++++++++----
- net/bluetooth/hci_event.c   | 54 ++++++++++++++-------------
- net/bluetooth/lib.c         |  1 +
- 4 files changed, 110 insertions(+), 33 deletions(-)
-
+diff --git a/android/client/if-rc.c b/android/client/if-rc.c
+index ede6214..c8f8c95 100644
+--- a/android/client/if-rc.c
++++ b/android/client/if-rc.c
+@@ -68,6 +68,11 @@ static void get_play_status_cb(void)
+ 	haltest_info("%s\n", __func__);
+ }
+ 
++static void list_player_app_attr_cb(void)
++{
++	haltest_info("%s\n", __func__);
++}
++
+ static void list_player_app_values_cb(btrc_player_attr_t attr_id)
+ {
+ 	haltest_info("%s, attr_id=%d\n", __func__, attr_id);
+@@ -126,6 +131,7 @@ static btrc_callbacks_t rc_cbacks = {
+ 	.size = sizeof(rc_cbacks),
+ 	.remote_features_cb = remote_features_cb,
+ 	.get_play_status_cb = get_play_status_cb,
++	.list_player_app_attr_cb = list_player_app_attr_cb,
+ 	.list_player_app_values_cb = list_player_app_values_cb,
+ 	.get_player_app_value_cb = get_player_app_value_cb,
+ 	.get_player_app_attrs_text_cb = get_player_app_attrs_text_cb,
+-- 
+1.8.3.2
 
