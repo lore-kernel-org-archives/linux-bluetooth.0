@@ -1,222 +1,208 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/handsfree: Add support for three-way calling
-Date: Fri, 14 Mar 2014 11:00:20 +0100
-Message-Id: <1394791220-7150-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/4] Bluetooth: Add directed advertising support through connect()
+Date: Fri, 14 Mar 2014 11:43:15 +0200
+Message-Id: <1394790195-4109-5-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1394790195-4109-1-git-send-email-johan.hedberg@gmail.com>
+References: <1394790195-4109-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds code needed for translating phone_state_change command to
-call, callsetup and callheld indicators. Android HAL specifcy common
-type for all calls state but only subset of values are valid for
-phone_state_change.
----
- android/handsfree.c | 123 +++++++++++++++++++++++++++++++++++-----------------
- 1 file changed, 84 insertions(+), 39 deletions(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index e488859..ff03660 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -136,6 +136,9 @@ static struct {
- 	bool ccwa_enabled;
- 	bool indicators_enabled;
- 	struct indicator inds[IND_COUNT];
-+	int num_active;
-+	int num_held;
-+	int setup_state;
+When we're in peripheral mode (HCI_ADVERTISING flag is set) the most
+natural mapping of connect() is to perform directed advertising to the
+peer device.
+
+This patch does the necessary changes to enable directed advertising and
+keeps the hci_conn state as BT_CONNECT in a similar way as is done for
+central or BR/EDR connection initiation.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_conn.c    | 75 ++++++++++++++++++++++++++++++++++++++++-----
+ net/bluetooth/hci_event.c   | 17 ++++++++--
+ 3 files changed, 83 insertions(+), 10 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index be150cf8cd43..4261a67682c0 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -367,6 +367,7 @@ enum {
+ #define HCI_ERROR_REMOTE_POWER_OFF	0x15
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+ #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
++#define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
  
- 	uint8_t negotiated_codec;
- 	uint8_t proposed_codec;
-@@ -1979,38 +1982,59 @@ static gboolean ring_cb(gpointer user_data)
- 	return TRUE;
- }
- 
--static void phone_state_active(int num_active, int num_held)
-+static void phone_state_dialing(int num_active, int num_held)
+ /* Flow control modes */
+ #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ef8a7394475a..65592a1f8316 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -367,9 +367,18 @@ static void le_conn_timeout(struct work_struct *work)
  {
-+	update_indicator(IND_CALLSETUP, 2);
+ 	struct hci_conn *conn = container_of(work, struct hci_conn,
+ 					     le_conn_timeout.work);
++	struct hci_dev *hdev = conn->hdev;
  
-+	if (num_active == 0 && num_held > 0)
-+		update_indicator(IND_CALLHELD, 2);
- }
+ 	BT_DBG("");
  
--static void phone_state_held(int num_active, int num_held)
-+static void phone_state_alerting(int num_active, int num_held)
- {
--
-+	update_indicator(IND_CALLSETUP, 3);
- }
- 
--static void phone_state_dialing(int num_active, int num_held)
-+static void phone_state_waiting(int num_active, int num_held, uint8_t type,
-+					const uint8_t *number, int number_len)
- {
--	update_indicator(IND_CALLSETUP, 2);
--}
-+	char *num;
- 
--static void phone_state_alerting(int num_active, int num_held)
--{
--	update_indicator(IND_CALLSETUP, 3);
-+	if (!device.ccwa_enabled)
-+		return;
-+
-+	num = number_len ? (char *) number : "";
-+
-+	if (type == HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL && num[0] != '+')
-+		hfp_gw_send_info(device.gw, "+CCWA: \"+%s\",%u", num, type );
-+	else
-+		hfp_gw_send_info(device.gw, "+CCWA: \"%s\",%u", num, type );
-+
-+	update_indicator(IND_CALLSETUP, 1);
- }
- 
- static void phone_state_incoming(int num_active, int num_held, uint8_t type,
--							const char *number)
-+					const uint8_t *number, int number_len)
- {
--	char *clip = NULL;
-+	char *clip, *num;
-+
-+	if (device.setup_state == HAL_HANDSFREE_CALL_STATE_INCOMING)
-+		return;
-+
-+	if (num_active > 0 || num_held > 0) {
-+		phone_state_waiting(num_active, num_held, type, number,
-+								number_len);
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
++		u8 enable = 0x00;
++		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
++			     &enable);
++		hci_le_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
 +		return;
 +	}
- 
- 	update_indicator(IND_CALLSETUP, 1);
- 
--	if (type == HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL &&
--							number[0] != '+')
--		clip = g_strdup_printf("+CLIP: \"+%s\",%u", number, type );
-+	num = number_len ? (char *) number : "";
 +
-+	if (type == HAL_HANDSFREE_CALL_ADDRTYPE_INTERNATIONAL && num[0] != '+')
-+		clip = g_strdup_printf("+CLIP: \"+%s\",%u", num, type );
- 	else
--		clip = g_strdup_printf("+CLIP: \"%s\",%u", number, type );
-+		clip = g_strdup_printf("+CLIP: \"%s\",%u", num, type );
- 
- 	/* send first RING */
- 	ring_cb(clip);
-@@ -2023,29 +2047,55 @@ static void phone_state_incoming(int num_active, int num_held, uint8_t type,
- 		g_free(clip);
+ 	hci_le_create_connection_cancel(conn);
  }
  
--static void phone_state_waiting(int num_active, int num_held, uint8_t type,
--							const char *number)
--{
--
--}
--
- static void phone_state_idle(int num_active, int num_held)
- {
--
--	update_indicator(IND_CALL, !!num_active);
--
- 	if (device.ring) {
- 		g_source_remove(device.ring);
- 		device.ring = 0;
- 	}
+@@ -557,6 +566,11 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+ 	 * favor of connection establishment, we should restart it.
+ 	 */
+ 	hci_update_background_scan(hdev);
++
++	/* Re-enable advertising in case this was a failed connection
++	 * attempt as a peripheral.
++	 */
++	mgmt_reenable_advertising(hdev);
+ }
  
--	update_indicator(IND_CALLSETUP, 0);
-+	switch (device.setup_state) {
-+	case HAL_HANDSFREE_CALL_STATE_INCOMING:
-+		if (num_active > device.num_active)
-+			update_indicator(IND_CALL, 1);
+ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+@@ -617,6 +631,48 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 	conn->state = BT_CONNECT;
+ }
+ 
++static void hci_req_directed_advertising(struct hci_request *req,
++					 struct hci_conn *conn)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_cp_le_set_adv_param cp;
++	u8 own_addr_type;
++	u8 enable;
 +
-+		if (num_held > device.num_held)
-+			update_indicator(IND_CALLHELD, 1);
++	enable = 0x00;
++	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
 +
-+		update_indicator(IND_CALLSETUP, 0);
-+		break;
-+	case HAL_HANDSFREE_CALL_STATE_DIALING:
-+	case HAL_HANDSFREE_CALL_STATE_ALERTING:
-+		if (num_active > device.num_active)
-+			update_indicator(IND_CALL, 1);
++	/* Clear the HCI_ADVERTISING bit temporarily so that the
++	 * hci_update_random_address knows that it's safe to go ahead
++	 * and write a new random address. The flag will be set back on
++	 * as soon as the SET_ADV_ENABLE HCI command completes.
++	 */
++	clear_bit(HCI_ADVERTISING, &hdev->dev_flags);
 +
-+		update_indicator(IND_CALLSETUP, 0);
-+		break;
-+	case HAL_HANDSFREE_CALL_STATE_IDLE:
-+		/* check if calls swapped */
-+		if (num_held != 0 && num_active != 0 &&
-+				device.num_active == num_held &&
-+				device.num_held == num_active) {
-+			/* TODO better way for forcing indicator */
-+			device.inds[IND_CALLHELD].val = 0;
-+			update_indicator(IND_CALLHELD, 1);
-+		} else {
-+			update_indicator(IND_CALLHELD,
-+					num_held ? (num_active ? 1 : 2) : 0);
-+		}
-+		update_indicator(IND_CALL, !!(num_active + num_held));
-+		update_indicator(IND_CALLSETUP, 0);
++	/* Set require_privacy to false so that the remote device has a
++	 * chance of identifying us.
++	 */
++	if (hci_update_random_address(req, false, &own_addr_type) < 0)
++		return;
 +
-+		break;
-+	default:
-+		DBG("unhandled state %u", device.setup_state);
-+		break;
++	memset(&cp, 0, sizeof(cp));
++
++	cp.min_interval = cpu_to_le16(0x0800);
++	cp.max_interval = cpu_to_le16(0x0800);
++	cp.type = 0x01;
++	cp.own_address_type = own_addr_type;
++	cp.direct_addr_type = conn->dst_type;
++	bacpy(&cp.direct_addr, &conn->dst);
++	cp.channel_map = hdev->le_adv_channel_map;
++
++	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
++
++	enable = 0x01;
++	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
++
++	conn->state = BT_CONNECT;
++}
++
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, u8 sec_level, u8 auth_type)
+ {
+@@ -626,9 +682,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	struct hci_request req;
+ 	int err;
+ 
+-	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+-		return ERR_PTR(-ENOTSUPP);
+-
+ 	/* Some devices send ATT messages as soon as the physical link is
+ 	 * established. To be able to handle these ATT messages, the user-
+ 	 * space first establishes the connection and then starts the pairing
+@@ -676,13 +729,20 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	conn->dst_type = dst_type;
+-
+-	conn->out = true;
+-	conn->link_mode |= HCI_LM_MASTER;
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->auth_type = auth_type;
+ 
++	hci_req_init(&req, hdev);
++
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
++		hci_req_directed_advertising(&req, conn);
++		goto create_conn;
 +	}
- }
- 
- static void handle_phone_state_change(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_handsfree_phone_state_change *cmd = buf;
--	const char *number;
- 	uint8_t status;
- 
- 	if (len != sizeof(*cmd) + cmd->number_len || (cmd->number_len != 0 &&
-@@ -2058,15 +2108,7 @@ static void handle_phone_state_change(const void *buf, uint16_t len)
- 	DBG("active=%u hold=%u state=%u", cmd->num_active, cmd->num_held,
- 								cmd->state);
- 
--	number = cmd->number_len ? (char *) cmd->number : "";
--
- 	switch (cmd->state) {
--	case HAL_HANDSFREE_CALL_STATE_ACTIVE:
--		phone_state_active(cmd->num_active, cmd->num_held);
--		break;
--	case HAL_HANDSFREE_CALL_STATE_HELD:
--		phone_state_held(cmd->num_active, cmd->num_held);
--		break;
- 	case HAL_HANDSFREE_CALL_STATE_DIALING:
- 		phone_state_dialing(cmd->num_active, cmd->num_held);
- 		break;
-@@ -2075,20 +2117,23 @@ static void handle_phone_state_change(const void *buf, uint16_t len)
- 		break;
- 	case HAL_HANDSFREE_CALL_STATE_INCOMING:
- 		phone_state_incoming(cmd->num_active, cmd->num_held, cmd->type,
--									number);
--		break;
--	case HAL_HANDSFREE_CALL_STATE_WAITING:
--		phone_state_waiting(cmd->num_active, cmd->num_held, cmd->type,
--									number);
-+						cmd->number, cmd->number_len);
- 		break;
- 	case HAL_HANDSFREE_CALL_STATE_IDLE:
- 		phone_state_idle(cmd->num_active, cmd->num_held);
- 		break;
- 	default:
-+		DBG("unhandled new state %u (current state %u)", cmd->state,
-+							device.setup_state);
 +
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
++	conn->out = true;
++	conn->link_mode |= HCI_LM_MASTER;
++
+ 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+ 	if (params) {
+ 		conn->le_conn_min_interval = params->conn_min_interval;
+@@ -692,8 +752,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
  	}
  
-+	device.num_active = cmd->num_active;
-+	device.num_held = cmd->num_held;
-+	device.setup_state = cmd->state;
-+
- 	status = HAL_STATUS_SUCCESS;
+-	hci_req_init(&req, hdev);
+-
+ 	/* If controller is scanning, we stop it since some controllers are
+ 	 * not able to scan and connect at the same time. Also set the
+ 	 * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
+@@ -707,6 +765,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
  
- failed:
+ 	hci_req_add_le_create_conn(&req, conn);
+ 
++create_conn:
+ 	err = hci_req_run(&req, create_le_conn_complete);
+ 	if (err) {
+ 		hci_conn_del(conn);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 810cdc759566..ce3c04d4d641 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -989,10 +989,23 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	if (status)
++		return;
++
+ 	hci_dev_lock(hdev);
+ 
+-	if (!status)
+-		mgmt_advertising(hdev, *sent);
++	/* Look for connection initation as peripheral */
++	if (*sent) {
++		struct hci_conn *conn;
++
++		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++		if (conn)
++			queue_delayed_work(hdev->workqueue,
++					   &conn->le_conn_timeout,
++					   HCI_LE_CONN_TIMEOUT);
++	}
++
++	mgmt_advertising(hdev, *sent);
+ 
+ 	hci_dev_unlock(hdev);
+ }
 -- 
-1.8.3.2
+1.8.5.3
 
