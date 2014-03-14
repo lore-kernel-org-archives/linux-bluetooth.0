@@ -1,53 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Mar 2014 13:07:19 +0200
+Date: Fri, 14 Mar 2014 12:23:40 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Natanael Copa <ncopa@alpinelinux.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/3] Various build fixes for building bluez with musl libc
-Message-ID: <20140314110719.GA11158@localhost.P-661HNU-F1>
-References: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
+Subject: Re: [PATCH BlueZ v3 02/20] lib: Remove bt_put_le16()
+Message-ID: <20140314102340.GA4683@localhost.P-661HNU-F1>
+References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1394742168-31073-3-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1394742168-31073-3-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Natanael,
+Hi Claudio,
 
-On Fri, Mar 14, 2014, Natanael Copa wrote:
-> The following fixes are needed to make bluez build on Alpine Linuz with
-> musl libc.
-> 
-> This is kind of a rebase of the previously posted patches:
-> http://www.spinics.net/lists/linux-bluetooth/msg43070.html
-> 
-> Changes since then are:
-> - mention Alpine Linux in commit message
-> - rebase to current git
-> - added fix for proper header include for be32toh, htobe32 and htobe64
-> 
-> Please note that "unit: prevent unintended use of glibc's error(3)"
-> fixes a bug in the unit test that affects glibc too. I suppose that if
-> you add a testcase that triggers any error logging from sdpd-request.c
-> it will likely segfault instead of gracfully hande the error condition.
-> (it only affects the unit test though)
-> 
-> Natanael Copa (3):
->   shared: include endian.h for be32toh, htobe32 and htobe64 functions
->   unit: prevent unintended use of glibc's error(3)
->   bnep: avoid use of caddr_t
-> 
->  Makefile.am             | 1 +
->  profiles/network/bnep.c | 4 ++--
->  src/shared/btsnoop.c    | 1 +
->  unit/test-sdp.c         | 9 +++------
->  4 files changed, 7 insertions(+), 8 deletions(-)
+On Thu, Mar 13, 2014, Claudio Takahasi wrote:
+> ---
+>  android/hidhost.c |  3 ++-
+>  lib/bluetooth.h   | 10 ----------
+>  src/eir.c         |  3 ++-
+>  tools/l2test.c    |  4 +++-
+>  tools/rctest.c    |  4 +++-
+>  tools/scotest.c   |  4 +++-
+>  6 files changed, 13 insertions(+), 15 deletions(-)
 
-I've applied patches 1 and 3, but am waiting for a v2 on patch 2 since
-it breaks the build:
+This would have to be split into two patches: one to convert all users
+and another for removing from lib. This is particularly important since
+I'm not sure Marcel is ok with removing symbols from the library (even
+though it now days defaults to not being installed by default), i.e. if
+it's not ok you wouldn't have to resend but I could just skip the
+removal patches.
 
-unit/test-sdp.c: In function ‘main’:
-unit/test-sdp.c:795:3: error: implicit declaration of function ‘__btd_log_init’ [-Werror=implicit-function-declaration]
-   __btd_log_init("*", 0);
+Same goes for any other patches you might have that mix lib removals
+with other changes.
 
 Johan
