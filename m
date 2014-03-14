@@ -1,108 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v4 00/20] Add basic GATT characteristics
-Date: Fri, 14 Mar 2014 10:13:00 -0300
-Message-Id: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+In-Reply-To: <1394597040-4483-1-git-send-email-armansito@chromium.org>
+References: <1394597040-4483-1-git-send-email-armansito@chromium.org>
+Date: Fri, 14 Mar 2014 09:07:22 -0400
+Message-ID: <CAJdJm_Pb4z66BNEJmOgPSOm88VSYq4UNSaNkxv2=iRUebPFYgA@mail.gmail.com>
+Subject: Re: [RFC BlueZ 0/2] Initial D-Bus GATT client API implementation.
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: armansito@chromium.org
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset adds the following features:
-  * register external characteristics
-  * basic read or write external characteristics
+Hi Arman,
 
-Usage of glib is being avoided inside src/gatt.c. Remaining
-put/get little-endian/big-endian helpers will be added in the
-next patchset.
+On Wed, Mar 12, 2014 at 12:03 AM,  <armansito@chromium.org> wrote:
+> From: Arman Uguray <armansito@chromium.org>
+>
+> Hi everyone,
+>
+> I'm working on the GATT client API and I have an initial implementation that
+> exposes basic GATT service and characteristic objects via D-Bus. Before I go
+> any further in the implementation, I wanted to get some feedback on whether or
+> not I've been taking the right approach so far. Also, since this is the first
+> time I'm contributing to BlueZ, there might be some general style/convention
+> issues that I would like to get corrected sooner than later :)
 
-TODO (missing features of this patchset and upstream code):
-  * Properties/flags: operations and security
-  * 32-bit UUIDs
-  * Remove/free services
-  * multiple services provided by the same client
-  * remove att_put_* att_get_* helpers
+First of all, sorry about the delay on reviewing your patches. Claudio
+and myself have been busy on our patches related to GATT server API
+which is taking most of our time available for BlueZ tasks.
 
-Changes from v3 to v4:
-  * keep LE <-> CPU helpers in lib/bluetooth.h (patches removing these
-    helpers are being shifted to next patchset)
+>   6. The first patch introduces a change to the way device_browse_primary gets
+>   called in device.c:att_connect_cb; the existing code doesn't do primary
+>   service discovery unless (as far as I understand) the connect request came
+>   over D-Bus, so an auto-connect won't discover remote GATT services, for
+>   example. I made a change here, not because I intended to change that code
+>   path, but because I was curious why it was done the way it is.
 
-Changes from v2 to v3:
-  * return put_uuid() definition to src/gatt.c
-  * add put_le16(), put_le32(), put_le128() to src/shared/util.h
+I will comment inline on the other two messages, but this last point
+is not clear to me. What do you mean by "auto-connect"? What are the
+exact steps to reproduce this?
 
-Changes from v1 to v2:
-  * move put_uuid() and put_le16() to src/shared/util.h
-  * check malloc0() and new0() return value
-
-Changes from v0 to v1:
-  * Use LE <-> CPU helpers defined in src/shared/util.h
-  * remove patch "gatt: Add helper for reading characteristics" from
-   this set.
-
-How to test:
-It is possible to test the implemented features using a modified
-gatttool version. Unix socket is used as transport to allow basic
-ATT operations:
-git://git.infradead.org/users/cktakahasi/bluez.git gatt-api-forupstream-group2-patchv3-testing
-
-$gatttool -I -L
-[LOCAL][LE]> connect
-Local connection
-Connection successful
-[LOCAL][LE]> primary
-attr handle: 0x0001, end grp handle: 0x0003 uuid: 000034fb-0000-1000-8000-00805f9b34fb
-[LOCAL][LE]> characteristics
-handle: 0x0002, char properties: 0x00, char value handle: 0x0003, uuid: 00002a06-0000-1000-8000-00805f9b34fb
-[LOCAL][LE]> char-read-hnd 0x0003
-Characteristic value/descriptor: 00
-[LOCAL][LE]> char-write-req 0x0003 02
-Characteristic value was written successfully
-[LOCAL][LE]> char-read-hnd 0x0003
-Characteristic value/descriptor: 02
-
-Alvaro Silva (3):
-  tools: Add Alert Level characteristic to gatt-service
-  tools: Add reading Value property of gatt-service
-  tools: Add setting Value property of gatt-service
-
-Andre Guedes (2):
-  gatt: Add function to create constant attributes
-  gatt: Add helper for creating GATT characteristics
-
-Claudio Takahasi (15):
-  shared: Add put_le16()
-  Replace bt_put_le16() by put_le16()
-  shared: Add put_le32()
-  Replace bt_put_le32() by put_le32()
-  shared: Add put_le128()
-  gatt: Add characteristic to the database
-  gatt: Add hash table of GDBusProxy objects
-  gatt: Add read callback to btd_gatt_add_char helper
-  gatt: Assign read callback for external services
-  gatt: Add write callback to btd_gatt_add_char helper
-  gdbus: Add g_dbus_proxy_set_property_array
-  gatt: Assign write callback for external services
-  gatt: Add result callback for Write Request
-  gatt: Add Write Request handling for GDBusProxy
-  tools: Emit property changed when Value changes
-
- android/hidhost.c    |   3 +-
- gdbus/client.c       |  85 +++++++++++++++++++++++
- gdbus/gdbus.h        |   5 ++
- src/eir.c            |   3 +-
- src/gatt-dbus.c      | 190 +++++++++++++++++++++++++++++++++++++++++++++++++--
- src/gatt.c           | 139 +++++++++++++++++++++++++++++++++++--
- src/gatt.h           |  44 ++++++++++++
- src/shared/util.h    |  33 +++++++++
- tools/gatt-service.c | 156 ++++++++++++++++++++++++++++++++++++++----
- tools/l2test.c       |   6 +-
- tools/rctest.c       |   6 +-
- tools/scotest.c      |   6 +-
- 12 files changed, 646 insertions(+), 30 deletions(-)
-
+Best Regards,
 -- 
-1.8.3.1
-
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
