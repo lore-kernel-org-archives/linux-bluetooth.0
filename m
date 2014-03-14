@@ -1,38 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 14 Mar 2014 12:23:40 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 02/20] lib: Remove bt_put_le16()
-Message-ID: <20140314102340.GA4683@localhost.P-661HNU-F1>
-References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
- <1394742168-31073-3-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1394742168-31073-3-git-send-email-claudio.takahasi@openbossa.org>
+From: Natanael Copa <ncopa@alpinelinux.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Natanael Copa <ncopa@alpinelinux.org>
+Subject: [PATCH 3/3] bnep: avoid use of caddr_t
+Date: Fri, 14 Mar 2014 09:59:27 +0000
+Message-Id: <1394791167-29933-4-git-send-email-ncopa@alpinelinux.org>
+In-Reply-To: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
+References: <1394791167-29933-1-git-send-email-ncopa@alpinelinux.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+caddr_t is legacy BSD and should be avoided.
 
-On Thu, Mar 13, 2014, Claudio Takahasi wrote:
-> ---
->  android/hidhost.c |  3 ++-
->  lib/bluetooth.h   | 10 ----------
->  src/eir.c         |  3 ++-
->  tools/l2test.c    |  4 +++-
->  tools/rctest.c    |  4 +++-
->  tools/scotest.c   |  4 +++-
->  6 files changed, 13 insertions(+), 15 deletions(-)
+This fixes the following compile error on Alpine Linux with musl libc:
+profiles/network/bnep.c: In function 'bnep_if_up':
+profiles/network/bnep.c:205:33: error: 'caddr_t' undeclared (first use in this function)
+  err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
+---
 
-This would have to be split into two patches: one to convert all users
-and another for removing from lib. This is particularly important since
-I'm not sure Marcel is ok with removing symbols from the library (even
-though it now days defaults to not being installed by default), i.e. if
-it's not ok you wouldn't have to resend but I could just skip the
-removal patches.
+For more details please see:
+http://stackoverflow.com/questions/6381526/what-is-the-significance-of-caddr-t-and-when-is-it-used
 
-Same goes for any other patches you might have that mix lib removals
-with other changes.
+ profiles/network/bnep.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Johan
+diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
+index ece979f..b93027a 100644
+--- a/profiles/network/bnep.c
++++ b/profiles/network/bnep.c
+@@ -204,7 +204,7 @@ static int bnep_if_up(const char *devname)
+ 	ifr.ifr_flags |= IFF_UP;
+ 	ifr.ifr_flags |= IFF_MULTICAST;
+ 
+-	err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
++	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
+ 
+ 	close(sk);
+ 
+@@ -229,7 +229,7 @@ static int bnep_if_down(const char *devname)
+ 	ifr.ifr_flags &= ~IFF_UP;
+ 
+ 	/* Bring down the interface */
+-	err = ioctl(sk, SIOCSIFFLAGS, (caddr_t) &ifr);
++	err = ioctl(sk, SIOCSIFFLAGS, (void *) &ifr);
+ 
+ 	close(sk);
+ 
+-- 
+1.9.0
+
