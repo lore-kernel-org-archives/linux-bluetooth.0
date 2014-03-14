@@ -1,47 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 1/2] android: Add "eSCO transparent data is mSBC" mode
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1394751135-2747-1-git-send-email-szymon.janc@gmail.com>
-Date: Thu, 13 Mar 2014 18:40:24 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <FAC34E2D-4197-48C0-A5BB-0C35467ECB7D@holtmann.org>
-References: <1394751135-2747-1-git-send-email-szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <53225B87.1030904@hurleysoftware.com>
+Date: Thu, 13 Mar 2014 21:29:43 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
+MIME-Version: 1.0
+To: Sander Eikelenboom <linux@eikelenboom.it>
+CC: Linus Torvalds <torvalds@linux-foundation.org>,
+ "John W. Linville" <linville@tuxdriver.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+ linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [RC6 Bell Chime] [PATCH 00/24] rfcomm fixes
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com> <3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org> <1259174563.20140212120644@eikelenboom.it> <1335661753.20140303203853@eikelenboom.it> <1295963563.20140310093843@eikelenboom.it> <20140310150858.GA25703@tuxdriver.com> <EE67811F-FA2E-4773-8852-CB79BD7CDF1C@holtmann.org> <1679354302.20140314014901@eikelenboom.it>
+In-Reply-To: <1679354302.20140314014901@eikelenboom.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Sander,
 
-> This is usefull for platforms that assume transparent eSCO data is
-> mSBC e.g. Nexus 4.
-> ---
-> android/hal-ipc-api.txt | 1 +
-> android/hal-msg.h       | 1 +
-> 2 files changed, 2 insertions(+)
-> 
-> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-> index e4a4e9c..acfb8a0 100644
-> --- a/android/hal-ipc-api.txt
-> +++ b/android/hal-ipc-api.txt
-> @@ -757,6 +757,7 @@ Bluetooth Handsfree HAL (ID 5)
-> Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
-> 
-> 	Service modes:               0x01 = Headset Profile only mode
-> +	                             0x02 = eSCO transparent data is mSBC mode
+On 03/13/2014 08:49 PM, Sander Eikelenboom wrote:
+> <sarcasm on>
+> Is it just me .. or is this going at the speed of about a bluetooth connection ..
+> and probably missing the boot for 3.14 ? (for no good reason IMHO)
+> <sarcasm off>
+>
+> (it was not in John's nor Dave's last pull request, although it seems to be reverted in the bluetooth tree now .. i didn't
+> see any formal pull request from that .. to get it even *starting* to traverse all the trees up to Linus ... )
 
-actually lets do them a little bit different here:
+Known bugs sometimes roll out into mainline release because the
+alternative can be worse.
 
-		0x00 = Headset Profile only mode
-		0x01 = Handsfree Profile (narrowband speech)
-		0x02 = Handsfree Profile (narrowband and wideband speech)
+As I explained in the follow-up to my patch series, I would
+not have expected Marcel to pick up any of the fixes for 3.14.
+There are a lot of moving parts in usb + bluetooth + rfcomm + tty,
+and the unfortunate reality is that -next doesn't get as much
+testing as it should.
 
-We should default to HSP only since that is the only safe default we can have here. The existence of a cellular modem is not always given.
+The fault is mine because Gianluca let me know about the
+problems with the conversion to tty_port, but the holidays really
+interfered with my ability to put this work first, and I'm sorry
+for that.
 
-Which means on a device like the Nexus 7 or any other WiFi only tablet, the defaults will work just fine.
+I know the breakage around RFCOMM is frustrating but I think the
+worst is behind us. After 3.15 gets some -rc testing, I will
+be happy to cherry-pick the critical fixes for -stable inclusion.
 
-Regards
-
-Marcel
-
+Regards,
+Peter Hurley
