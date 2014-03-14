@@ -2,62 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v4 05/20] shared: Add put_le128()
-Date: Fri, 14 Mar 2014 10:13:05 -0300
-Message-Id: <1394802800-8424-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v4 01/20] shared: Add put_le16()
+Date: Fri, 14 Mar 2014 10:13:01 -0300
+Message-Id: <1394802800-8424-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394742168-31073-1-git-send-email-claudio.takahasi@openbossa.org>
  <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add helper to put uint128 values to the given pointer using little-endian
-representation. This helper is only a wrapper of cpu_to_le128().
+Add helper to put uint16 values to the given pointer using little-endian
+representation.
 ---
- src/shared/util.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+ src/shared/util.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/src/shared/util.h b/src/shared/util.h
-index cc2dbcd..f3db8fb 100644
+index d7d4a94..e0a61c6 100644
 --- a/src/shared/util.h
 +++ b/src/shared/util.h
-@@ -26,6 +26,8 @@
- #include <alloca.h>
- #include <byteswap.h>
+@@ -90,3 +90,8 @@ void util_debug(util_debug_func_t function, void *user_data,
  
-+#include <bluetooth/bluetooth.h>
+ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
+ 				util_debug_func_t function, void *user_data);
 +
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- #define le16_to_cpu(val) (val)
- #define le32_to_cpu(val) (val)
-@@ -56,6 +58,27 @@
- #error "Unknown byte order"
- #endif
- 
-+#if __BYTE_ORDER == __BIG_ENDIAN
-+
-+static inline void cpu_to_le128(const uint128_t *src, uint128_t *dst)
++static inline void put_le16(uint16_t val, void *dst)
 +{
-+	int i;
-+
-+	for (i = 0; i < 16; i++)
-+		dst->data[15 - i] = src->data[i];
++	put_unaligned(cpu_to_le16(val), (uint16_t *) dst);
 +}
-+
-+#else
-+
-+static inline void cpu_to_le128(const uint128_t *src, uint128_t *dst)
-+{
-+	*dst = *src;
-+}
-+
-+#endif
-+
-+#define put_le128(val, dst) cpu_to_le128(val, dst)
-+
- #define get_unaligned(ptr)			\
- ({						\
- 	struct __attribute__((packed)) {	\
 -- 
 1.8.3.1
 
