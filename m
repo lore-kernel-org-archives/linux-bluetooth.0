@@ -1,74 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/handsfree: Connect audio when Android framemework expects it
-Date: Sat, 15 Mar 2014 20:54:14 +0100
-Message-Id: <1394913254-13737-1-git-send-email-marcin.kraglak@tieto.com>
+References: 
+Message-ID: <1394913186.89692.YahooMailNeo@web28801.mail.ir2.yahoo.com>
+Date: Sat, 15 Mar 2014 19:53:06 +0000 (GMT)
+From: Alessandro La Fauci <alafauci@yahoo.it>
+Reply-To: Alessandro La Fauci <alafauci@yahoo.it>
+Subject: Bluez+PulseAudio: creating audio sink
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There are few cases when framework doesn't call connect_audio method
-from HAL but we should do it internally. Call connect_audio if
-we started dialing or we accepted incoming call. Also if headset
-connects during active call, start SCO connection. We don't have to
-disconnect SCO internally, because Android always call disconect_audio
-when call has finished.
----
- android/handsfree.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+I have been struggling to send audio from my laptop (ubuntu) to my headless debian wheezy with 5.1 card via bluetooth.
+On debian bluez 4.9 and pulse 4.
+I got to the point where bluetooth connection is successfully bond but not audio connection (following an excerpt of pulseaudio log);
+org.bluez.AudioSource and AudioSink are connected, but nothing happens for org.bluez.Audio, thus pulse module-bluetooth doesn't see any source.
+The full pulse log may be found at this link https://bugs.freedesktop.org/attachment.cgi?id=95844
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index d4dc596..61a9816 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -1653,6 +1653,9 @@ static bool disconnect_sco(void)
- 
- static bool connect_audio(void)
- {
-+	if (device.audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED)
-+		return false;
-+
- 	/* we haven't negotiated codec, start selection */
- 	if ((device.features & HFP_HF_FEAT_CODEC) && !device.negotiated_codec) {
- 		select_codec(0);
-@@ -1989,6 +1992,8 @@ static void phone_state_dialing(int num_active, int num_held)
- 
- 	if (num_active == 0 && num_held > 0)
- 		update_indicator(IND_CALLHELD, 2);
-+
-+	connect_audio();
- }
- 
- static void phone_state_alerting(int num_active, int num_held)
-@@ -2057,13 +2062,16 @@ static void phone_state_idle(int num_active, int num_held)
- 
- 	switch (device.setup_state) {
- 	case HAL_HANDSFREE_CALL_STATE_INCOMING:
--		if (num_active > device.num_active)
-+		if (num_active > device.num_active) {
- 			update_indicator(IND_CALL, 1);
-+			connect_audio();
-+		}
- 
- 		if (num_held > device.num_held)
- 			update_indicator(IND_CALLHELD, 1);
- 
- 		update_indicator(IND_CALLSETUP, 0);
-+
- 		break;
- 	case HAL_HANDSFREE_CALL_STATE_DIALING:
- 	case HAL_HANDSFREE_CALL_STATE_ALERTING:
-@@ -2088,6 +2096,10 @@ static void phone_state_idle(int num_active, int num_held)
- 		update_indicator(IND_CALLSETUP, 0);
- 
- 		break;
-+	case HAL_HANDSFREE_CALL_STATE_ACTIVE:
-+		connect_audio();
-+
-+		break;
- 	default:
- 		DBG("unhandled state %u", device.setup_state);
- 		break;
--- 
-1.8.3.1
+At this point I'm very lost and I don't know how to proceed, it seems the problem comes from bluez and has nothing to do with pulse.
+Thank you in advance for any kind of help
 
+Cheers
+
+----------------------------------- (  20.582|  10.158) D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.Device, path=/org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E, member=PropertyChanged
+(  20.763|   0.180) D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSource, path=/org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E, member=PropertyChanged
+(  20.763|   0.000) D: [pulseaudio] bluetooth-util.c: Device /org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E interface org.bluez.AudioSource property 'State' changed to value 'connecting'
+(  20.765|   0.002) D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSink, path=/org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E, member=PropertyChanged
+(  20.766|   0.000) D: [pulseaudio] bluetooth-util.c: Device /org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E interface org.bluez.AudioSink property 'State' changed to value 'connecting'
+(  20.767|   0.000) D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.Audio, path=/org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E, member=PropertyChanged
+(  20.767|   0.000) D: [pulseaudio] bluetooth-util.c: Device /org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E interface org.bluez.Audio property 'State' changed to value 'connecting'
+(  20.900|   0.133) D: [pulseaudio] bluetooth-util.c: dbus: interface=org.bluez.AudioSource, path=/org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E, member=PropertyChanged
+(  20.901|   0.000) D: [pulseaudio] bluetooth-util.c: Device /org/bluez/2473/hci0/dev_88_53_2E_5C_F0_8E interface org.bluez.AudioSource property 'State' changed to value 'connected' -----------------------------------
