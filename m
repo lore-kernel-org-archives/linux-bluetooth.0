@@ -1,44 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5324BBCF.1090101@hurleysoftware.com>
-Date: Sat, 15 Mar 2014 16:45:03 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
-MIME-Version: 1.0
-To: Linus Torvalds <torvalds@linux-foundation.org>,
- Sander Eikelenboom <linux@eikelenboom.it>
-CC: "John W. Linville" <linville@tuxdriver.com>,
- "David S. Miller" <davem@davemloft.net>,
- Marcel Holtmann <marcel@holtmann.org>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- "bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
- linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [RC6 Bell Chime] [PATCH 00/24] rfcomm fixes
-References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>	<3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org>	<1259174563.20140212120644@eikelenboom.it>	<1335661753.20140303203853@eikelenboom.it>	<1295963563.20140310093843@eikelenboom.it>	<20140310150858.GA25703@tuxdriver.com>	<EE67811F-FA2E-4773-8852-CB79BD7CDF1C@holtmann.org>	<1679354302.20140314014901@eikelenboom.it>	<53225B87.1030904@hurleysoftware.com>	<164289036.20140315145146@eikelenboom.it> <CA+55aFzLGvLhF258vCWbyvXX0UOJ_tcnKaNRz_38mR5rnO6e_Q@mail.gmail.com>
-In-Reply-To: <CA+55aFzLGvLhF258vCWbyvXX0UOJ_tcnKaNRz_38mR5rnO6e_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/handsfree: Connect audio when Android framemework expects it
+Date: Sat, 15 Mar 2014 20:58:37 +0100
+Message-Id: <1394913517-14228-1-git-send-email-marcin.kraglak@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 03/15/2014 01:53 PM, Linus Torvalds wrote:
-> Guys, why is this being discussed?
+There are few cases when framework doesn't call connect_audio method
+from HAL but we should do it internally. Call connect_audio if
+we started dialing or we accepted incoming call. Also if headset
+connects during active call, start SCO connection. We don't have to
+disconnect SCO internally, because Android always call disconect_audio
+when call has finished.
+---
+ android/handsfree.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-FWIW, the 'known breakage' for 3.14 is a (valid) lockdep report.
+diff --git a/android/handsfree.c b/android/handsfree.c
+index d4dc596..ec59287 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -1653,6 +1653,9 @@ static bool disconnect_sco(void)
+ 
+ static bool connect_audio(void)
+ {
++	if (device.audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED)
++		return false;
++
+ 	/* we haven't negotiated codec, start selection */
+ 	if ((device.features & HFP_HF_FEAT_CODEC) && !device.negotiated_codec) {
+ 		select_codec(0);
+@@ -1989,6 +1992,8 @@ static void phone_state_dialing(int num_active, int num_held)
+ 
+ 	if (num_active == 0 && num_held > 0)
+ 		update_indicator(IND_CALLHELD, 2);
++
++	connect_audio();
+ }
+ 
+ static void phone_state_alerting(int num_active, int num_held)
+@@ -2057,8 +2062,10 @@ static void phone_state_idle(int num_active, int num_held)
+ 
+ 	switch (device.setup_state) {
+ 	case HAL_HANDSFREE_CALL_STATE_INCOMING:
+-		if (num_active > device.num_active)
++		if (num_active > device.num_active) {
+ 			update_indicator(IND_CALL, 1);
++			connect_audio();
++		}
+ 
+ 		if (num_held > device.num_held)
+ 			update_indicator(IND_CALLHELD, 1);
+@@ -2088,6 +2095,9 @@ static void phone_state_idle(int num_active, int num_held)
+ 		update_indicator(IND_CALLSETUP, 0);
+ 
+ 		break;
++	case HAL_HANDSFREE_CALL_STATE_ACTIVE:
++		connect_audio();
++		break;
+ 	default:
+ 		DBG("unhandled state %u", device.setup_state);
+ 		break;
+-- 
+1.8.3.1
 
-This regression was introduced by a small patchset added to -next
-over the holidays that was intended to address 2 bug reports
-stemming from a long-overdue overhaul of the RFCOMM tty driver by
-Gianluca Anzolin (which fixed numerous problems and several hangs
-reported since 3.8).
-
-It is the bulk of that small patchset which is being reverted.
-
-The point of this brief history is that:
-1) the 3.13 state of rfcomm is just as broken as 3.14-rcX, but
-    in a different way
-2) there are plenty of serious defects in both versions regardless.
-
-I mean for this to be informative and not argumentative --
-either outcome is ok with me. In fact, I'm ok if you want to
-pick my entire 24-patch series that addresses the bugs in 3.13
-and 3.14, plus a bunch of other problems that I found at the time.
-
-Regards,
-Peter Hurley
