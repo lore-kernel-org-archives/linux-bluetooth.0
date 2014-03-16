@@ -1,90 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1395003913.15764.118.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: linux-firmware: Update Intel BT devices firmware patch files
- (7260/3160)
-From: Ben Hutchings <ben@decadent.org.uk>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: dwmw2@infradead.org,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>,
-	Don Fry <don.fry@intel.com>
-Date: Sun, 16 Mar 2014 21:05:13 +0000
-In-Reply-To: <20140314135254.2edf9d2e@han1-desk-dev>
-References: <20140314135254.2edf9d2e@han1-desk-dev>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-gTRNPUaJL8iv7ze4G+S9"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+From: Adam Warski <adam@warski.org>
+In-Reply-To: <CAJdJm_MrjHy-fk-OQUeepxh2C_K=ap30ekR0U91e6kK+ov42HQ@mail.gmail.com>
+Date: Sun, 16 Mar 2014 20:53:50 +0100
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <C342F1F6-C4EB-4380-85D8-1F141CB06A83@warski.org>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com> <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org> <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org> <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com> <A2B80C7C-697D-44E5-80EA-B398E62EE608@warski.org> <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com> <A6C5B873-6614-45B3-AD4C-B3E08831E6D8@warski.org> <CAJdJm_MrjHy-fk-OQUeepxh2C_K=ap30ekR0U91e6kK+ov42HQ@mail.gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+I didn’t yet get to doing the wireshark investigations, but just for the record, I got another bluetooth dongle [1], and the --duplicates flag doesn’t seem to have any effect, I always get all the packets.
 
---=-gTRNPUaJL8iv7ze4G+S9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+And the same as before, after a short amount of time I start getting similar (not exactly the same [2]) errors. So it’s not the dongle :)
 
-On Fri, 2014-03-14 at 13:52 -0700, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->=20
-> This patch updates firmware patch files for following Intel Bluetooth Dev=
-ices:
-> - Intel Wireless Bluetooth 7260
-> - Intel Wireless Bluetooth 3160
->=20
-> This firmwares fixes
-> - No SCO data over EHCI
->=20
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
->  WHENCE                                  |   4 ++--
->  intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq  | Bin 18145 -> 21121 bytes
->  intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq | Bin 17917 -> 21001 bytes
->  3 files changed, 2 insertions(+), 2 deletions(-)
->=20
-> diff --git a/WHENCE b/WHENCE
-> index 4bcb3b5..7876548 100644
-> --- a/WHENCE
-> +++ b/WHENCE
-> @@ -2254,9 +2254,9 @@ Driver: btusb - Bluetooth USB driver
->  File: intel/ibt-hw-37.7.bseq
->  Version: 1316.02.00
->  File: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-> -Version: 1344.01.33
-> +Version: auto.WP_1303_02_patch_0.1.54.1 (0x36)=20
->  File: intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
-> -Version: 1344.01.33
-> +Version: auto.WP_1303_02_patch_0.1.54.1 (0x36)
-[...]
+Adam
 
-Why has the version format changed?  Are all the different parts
-actually significant?
+[1]
+http://www.adafruit.com/products/1327, which identifies itself as:
+Bus 001 Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
 
-Ben.
+[2]
+http://pastie.org/8936306
 
---=20
-Ben Hutchings
-Computers are not intelligent.	They only think they are.
+On 10 Mar 2014, at 14:09, Anderson Lizardo <anderson.lizardo@openbossa.org> wrote:
 
---=-gTRNPUaJL8iv7ze4G+S9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+> Hi Adam,
+> 
+> Duplicate filtering is done inside the controller. If you disable
+> filtering, the controller will receive a lot more packets (the
+> quantity will depend on device's advertising parameters, but it is
+> several times more packets).
+> 
+> Even if your Gimbal device changes address on every packet (which is
+> unusual, usually address changes are time based), what you actually
+> see without using --duplicate is still a small fraction of what the
+> controller receives over the air. Try comparing  Gimbal  on using
+> --duplicates versus not using (instead of comparing different devices
+> with different firmware and adv. parameters).   Try counting number of
+> adv. reports on both situations.  I expect to see a lot more when
+> --duplicate is enabled...
+> 
+> Regarding the logs, it seems your dmesg.txt seems only to show the
+> last lines of debugging... maybe the dmesg buffer is too short. Can
+> you check if there is a more complete log generated in one of the
+> /var/log/kern.log.* files ?
+> 
+> Fortunately, It contains one snippet showing problems with HCI
+> reassembly from USB packets:
+> 
+> [  878.184532] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
+> [  878.185499] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
+> [  878.186498] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 12
+> [  878.386548] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
+> [  878.387530] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
+> [  878.387664] hci_rx_work: hci0
+> [  878.387693] hci_send_to_monitor: hdev d9a4e000 len 64
+> [  878.387783] hci_send_to_sock: hdev d9a4e000 len 64
+> [  878.387803] hci_rx_work: hci0 Event packet
+> [  878.387822] hci_event_packet: hci0 event 0xbc
+> [  878.387847] hci_send_to_monitor: hdev d9a4e000 len 4
+> [  878.387896] hci_send_to_sock: hdev d9a4e000 len 4
+> [  878.387913] hci_rx_work: hci0 Event packet
+> [  878.387930] hci_req_cmd_complete: opcode 0x200c status 0x00
+> [  878.387945] hci_sent_cmd_data: hci0 opcode 0x200c
+> [  878.387959] hci_event_packet: hci0 event 0x00
+> [  878.388058] hci_sock_recvmsg: sock da567840, sk daa9c800
+> 
+> It contains 3  bogus events:
+> 
+>> HCI Event: Unknown (0xbc) plen 62
+>> HCI Event: Unknown (0x00) plen 2
+>> HCI Event: Physical Link Complete (0x40) plen 127
+> 
+> For me, it still points out to corrupted/truncated USB packets.
+> Unfortunately, it is just indirect evidence as the logs don't show raw
+> USB packets. But you can definitively confirm by using a USB sniffer
+> tool. I recommend using tshark (wireshark's command line interface).
+> It works just fine on raspberry. See this post for instructions:
+> http://nagaraj-embedded.blogspot.com.br/2012/03/capturing-usb-data-through-wireshark.html
+> 
+> Note that on raspberry there is just "usbmon1" (i.e. Bus 1), and
+> everything is attached to it. So the logs will get other unrelated
+> traffic (like ethernet packets), but wireshark GUI is powerful enough
+> to filter only traffic related to a specific device.
+> 
+> Best Regards,
+> -- 
+> Anderson Lizardo
+> http://www.indt.org/?lang=en
+> INdT - Manaus - Brazil
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+-- 
+Adam Warski
 
-iQIVAwUAUyYSCee/yOyVhhEJAQpf6Q/9HsFqXJd+2UZX4EwXWX0CnwALKMeg6VHK
-Tb7MmbjZJsZQrBvDsn+uZ7LuIymcQYuQ8q1B9fEU+YCJ3HkQWrN0E0jOaZS1xEJ/
-YH7Hq3W7Fte0PwfbULV5FZjoyPmwbGIpaiC485FToQ9RszZuXetIexoX6cMl4UbX
-bhllRNukcXKd23Idloucvn5K9PDp1m58dZmEqQEFIiADGsbY+F0FaXQxdiqTjpUK
-SF51BMz7vTuv+LPQtXb4C6iRk2xG499mddtVm2drxyZXb7Va1pjJRcHjhEKHLsTa
-Va3Be6Sfh5KcIdoNYaU9whO1UGg724RrryudhSW2KgCHobBZrGZVJD3XTRhS0HrV
-ZAyJkJF5D4JhZCpUKVk+HcMyUXAmsN4OzFQjJP6aW5BAoQPlzA1BJwlwsQhfqnTn
-p0PVM7jscKSxi5w3qY56BbgPM9CJkEUagzTrCzVo8NODKVtUHz5GAbsRWuxvY7LH
-JzeUa6NgC9Mlaea8+o8MPjYBvOyOoNQmeDSNoPKxQhv/euWxirq9HDa22G8RxhME
-3r9HeEg1s+4mAM598/Sl8E2k9s71Gv2kjQe5wJRjJcxtHloGvoAYzQDDE3dBSUWJ
-3dfvxv3XpWpXnsAe3myxVrW8dRKr3M7iiKZ1gL8qNGSwmsmUM5UyWsUs0VT1cc4y
-o8LRgs6WeWY=
-=Cpd6
------END PGP SIGNATURE-----
+http://twitter.com/#!/adamwarski
+http://www.softwaremill.com
+http://www.warski.org
 
---=-gTRNPUaJL8iv7ze4G+S9--
