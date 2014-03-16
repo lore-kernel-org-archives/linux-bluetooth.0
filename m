@@ -1,92 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] android/handsfree: Connect audio when Android framemework expects it
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1394913254-13737-1-git-send-email-marcin.kraglak@tieto.com>
-Date: Sat, 15 Mar 2014 17:35:28 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <89B9E5AE-F2A4-4178-8A4D-FCB8A3F77513@holtmann.org>
-References: <1394913254-13737-1-git-send-email-marcin.kraglak@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: linus971@gmail.com
+In-Reply-To: <5324BBCF.1090101@hurleysoftware.com>
+References: <1391997564-1805-1-git-send-email-peter@hurleysoftware.com>
+	<3E0F3723-029F-4B12-8D77-9790FDBD3227@holtmann.org>
+	<1259174563.20140212120644@eikelenboom.it>
+	<1335661753.20140303203853@eikelenboom.it>
+	<1295963563.20140310093843@eikelenboom.it>
+	<20140310150858.GA25703@tuxdriver.com>
+	<EE67811F-FA2E-4773-8852-CB79BD7CDF1C@holtmann.org>
+	<1679354302.20140314014901@eikelenboom.it>
+	<53225B87.1030904@hurleysoftware.com>
+	<164289036.20140315145146@eikelenboom.it>
+	<CA+55aFzLGvLhF258vCWbyvXX0UOJ_tcnKaNRz_38mR5rnO6e_Q@mail.gmail.com>
+	<5324BBCF.1090101@hurleysoftware.com>
+Date: Sat, 15 Mar 2014 17:16:41 -0700
+Message-ID: <CA+55aFy6xfK3ZAUA-HRx-SPi2b7ZWMonF-MHp=SdOa-gX2jthg@mail.gmail.com>
+Subject: Re: [RC6 Bell Chime] [PATCH 00/24] rfcomm fixes
+From: Linus Torvalds <torvalds@linux-foundation.org>
+To: Peter Hurley <peter@hurleysoftware.com>
+Cc: Sander Eikelenboom <linux@eikelenboom.it>, "John W. Linville" <linville@tuxdriver.com>,
+	"David S. Miller" <davem@davemloft.net>, Marcel Holtmann <marcel@holtmann.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	"bluez mailin list (linux-bluetooth@vger.kernel.org)" <linux-bluetooth@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+On Sat, Mar 15, 2014 at 1:45 PM, Peter Hurley <peter@hurleysoftware.com> wrote:
+>
+> FWIW, the 'known breakage' for 3.14 is a (valid) lockdep report.
 
-> There are few cases when framework doesn't call connect_audio method
-> from HAL but we should do it internally. Call connect_audio if
-> we started dialing or we accepted incoming call. Also if headset
-> connects during active call, start SCO connection. We don't have to
-> disconnect SCO internally, because Android always call disconect_audio
-> when call has finished.
-> ---
-> android/handsfree.c | 14 +++++++++++++-
-> 1 file changed, 13 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index d4dc596..61a9816 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -1653,6 +1653,9 @@ static bool disconnect_sco(void)
-> 
-> static bool connect_audio(void)
-> {
-> +	if (device.audio_state != HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED)
-> +		return false;
-> +
-> 	/* we haven't negotiated codec, start selection */
-> 	if ((device.features & HFP_HF_FEAT_CODEC) && !device.negotiated_codec) {
-> 		select_codec(0);
-> @@ -1989,6 +1992,8 @@ static void phone_state_dialing(int num_active, int num_held)
-> 
-> 	if (num_active == 0 && num_held > 0)
-> 		update_indicator(IND_CALLHELD, 2);
-> +
-> +	connect_audio();
-> }
-> 
-> static void phone_state_alerting(int num_active, int num_held)
-> @@ -2057,13 +2062,16 @@ static void phone_state_idle(int num_active, int num_held)
-> 
-> 	switch (device.setup_state) {
-> 	case HAL_HANDSFREE_CALL_STATE_INCOMING:
-> -		if (num_active > device.num_active)
-> +		if (num_active > device.num_active) {
-> 			update_indicator(IND_CALL, 1);
-> +			connect_audio();
-> +		}
-> 
-> 		if (num_held > device.num_held)
-> 			update_indicator(IND_CALLHELD, 1);
-> 
-> 		update_indicator(IND_CALLSETUP, 0);
-> +
+Ok, if it's just lockdep and unlikely to hit in real life and getting
+fixed later, I guess I don't really care all that deeply for 3.14
 
-lets not add an empty line here. It is fine to go straight to break;
-
-> 		break;
-> 	case HAL_HANDSFREE_CALL_STATE_DIALING:
-> 	case HAL_HANDSFREE_CALL_STATE_ALERTING:
-> @@ -2088,6 +2096,10 @@ static void phone_state_idle(int num_active, int num_held)
-> 		update_indicator(IND_CALLSETUP, 0);
-> 
-
-Lets remove this empty line.
-
-> 		break;
-> +	case HAL_HANDSFREE_CALL_STATE_ACTIVE:
-> +		connect_audio();
-> +
-
-And this empty line is also not needed.
-
-> +		break;
-> 	default:
-> 		DBG("unhandled state %u", device.setup_state);
-> 		break;
-
-Regards
-
-Marcel
-
+                  Linus
