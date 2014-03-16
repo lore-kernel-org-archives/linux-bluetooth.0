@@ -1,106 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
-From: Adam Warski <adam@warski.org>
-In-Reply-To: <CAJdJm_MrjHy-fk-OQUeepxh2C_K=ap30ekR0U91e6kK+ov42HQ@mail.gmail.com>
-Date: Sun, 16 Mar 2014 20:53:50 +0100
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <C342F1F6-C4EB-4380-85D8-1F141CB06A83@warski.org>
-References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com> <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org> <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org> <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com> <A2B80C7C-697D-44E5-80EA-B398E62EE608@warski.org> <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com> <A6C5B873-6614-45B3-AD4C-B3E08831E6D8@warski.org> <CAJdJm_MrjHy-fk-OQUeepxh2C_K=ap30ekR0U91e6kK+ov42HQ@mail.gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 4/4] android/gatt: Add disconnect GATT device
+Date: Sun, 16 Mar 2014 18:40:17 +0100
+Message-ID: <5305975.WNUtT4HXBi@leonov>
+In-Reply-To: <1394804979-7270-5-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1394804979-7270-1-git-send-email-lukasz.rymanowski@tieto.com> <1394804979-7270-5-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I didn’t yet get to doing the wireshark investigations, but just for the record, I got another bluetooth dongle [1], and the --duplicates flag doesn’t seem to have any effect, I always get all the packets.
+Hi,
 
-And the same as before, after a short amount of time I start getting similar (not exactly the same [2]) errors. So it’s not the dongle :)
+On Friday 14 of March 2014 14:49:39 Lukasz Rymanowski wrote:
+> Disconnect scenarios:
+> 
+> 1. If there is more then one client for a given gatt_device then
+> client id is removed from dev->clients, success response is sent
+> together with success disconnect event.
+> 
+> 2. If there is only one client for a given remote device then we
+> do what is decribed above plus clean of gattrib stuff
+> 
+> 3. In case client_if or conn_id is incorrect, response failed is sent
+> ---
+>  android/gatt.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 47 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 9afdf4b..ce72986 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -112,6 +112,14 @@ static bool match_dev_connect_ready(const void *data,
+> const void *user_data) return dev->connect_ready;
+>  }
+> 
+> +static bool match_dev_by_conn_id(const void *data, const void *user_data)
+> +{
+> +	const struct gatt_device *dev = data;
+> +	const int32_t conn_id = PTR_TO_INT(user_data);
+> +
+> +	return dev->conn_id == conn_id;
+> +}
+> +
+>  static void destroy_device(struct gatt_device *dev)
+>  {
+>  	queue_destroy(dev->clients, NULL);
+> @@ -661,10 +669,48 @@ reply:
+> 
+>  static void handle_client_disconnect(const void *buf, uint16_t len)
+>  {
+> +	const struct hal_cmd_gatt_client_disconnect *cmd = buf;
+> +	struct gatt_device *dev;
+> +	uint8_t status;
+> +
+>  	DBG("");
+> 
+> +	dev = queue_find(conn_list, match_dev_by_conn_id,
+> +						INT_TO_PTR(cmd->conn_id));
+> +	if (!dev) {
+> +		status = HAL_STATUS_FAILED;
+> +		goto reply;
+> +	}
+> +
+> +	/*Check if client owns this connection */
+> +	if (!queue_remove_if(dev->clients, match_by_value,
+> +						INT_TO_PTR(cmd->client_if)))
+> +		status = HAL_STATUS_FAILED;
+> +	else
+> +		status = HAL_STATUS_SUCCESS;
+> +
+> +reply:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> -			HAL_OP_GATT_CLIENT_DISCONNECT, HAL_STATUS_FAILED);
+> +			HAL_OP_GATT_CLIENT_DISCONNECT, status);
+> +
+> +	if (status == HAL_STATUS_FAILED)
+> +		return;
+> +
+> +	/* Just send disconnect event. If there is more clients on this
+> +	 * device then this is what we shall to do.
+> +	 * If this is last client, this is still OK to do because on connect
+> +	 * request we do le scan and wait until remote device start
+> +	 * advertisement */
+> +	send_disconnect_notify((void *)&cmd->client_if, (void *)dev);
 
-Adam
+This should be function with proper parameters type and if needed extra 
+wrapper for list iteration.
 
-[1]
-http://www.adafruit.com/products/1327, which identifies itself as:
-Bus 001 Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
-
-[2]
-http://pastie.org/8936306
-
-On 10 Mar 2014, at 14:09, Anderson Lizardo <anderson.lizardo@openbossa.org> wrote:
-
-> Hi Adam,
+> +
+> +	/* If there is more clients just return */
+> +	if (!queue_isempty(dev->clients))
+> +		return;
+> +
+> +	/* If this is last client do more cleaning */
+> +	connection_cleanup(dev);
+> +	dev = queue_remove_if(conn_list, match_dev_by_bdaddr, &dev->bdaddr);
+> +	destroy_device(dev);
+>  }
 > 
-> Duplicate filtering is done inside the controller. If you disable
-> filtering, the controller will receive a lot more packets (the
-> quantity will depend on device's advertising parameters, but it is
-> several times more packets).
-> 
-> Even if your Gimbal device changes address on every packet (which is
-> unusual, usually address changes are time based), what you actually
-> see without using --duplicate is still a small fraction of what the
-> controller receives over the air. Try comparing  Gimbal  on using
-> --duplicates versus not using (instead of comparing different devices
-> with different firmware and adv. parameters).   Try counting number of
-> adv. reports on both situations.  I expect to see a lot more when
-> --duplicate is enabled...
-> 
-> Regarding the logs, it seems your dmesg.txt seems only to show the
-> last lines of debugging... maybe the dmesg buffer is too short. Can
-> you check if there is a more complete log generated in one of the
-> /var/log/kern.log.* files ?
-> 
-> Fortunately, It contains one snippet showing problems with HCI
-> reassembly from USB packets:
-> 
-> [  878.184532] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
-> [  878.185499] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
-> [  878.186498] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 12
-> [  878.386548] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
-> [  878.387530] btusb_intr_complete: hci0 urb d9a8d300 status 0 count 16
-> [  878.387664] hci_rx_work: hci0
-> [  878.387693] hci_send_to_monitor: hdev d9a4e000 len 64
-> [  878.387783] hci_send_to_sock: hdev d9a4e000 len 64
-> [  878.387803] hci_rx_work: hci0 Event packet
-> [  878.387822] hci_event_packet: hci0 event 0xbc
-> [  878.387847] hci_send_to_monitor: hdev d9a4e000 len 4
-> [  878.387896] hci_send_to_sock: hdev d9a4e000 len 4
-> [  878.387913] hci_rx_work: hci0 Event packet
-> [  878.387930] hci_req_cmd_complete: opcode 0x200c status 0x00
-> [  878.387945] hci_sent_cmd_data: hci0 opcode 0x200c
-> [  878.387959] hci_event_packet: hci0 event 0x00
-> [  878.388058] hci_sock_recvmsg: sock da567840, sk daa9c800
-> 
-> It contains 3  bogus events:
-> 
->> HCI Event: Unknown (0xbc) plen 62
->> HCI Event: Unknown (0x00) plen 2
->> HCI Event: Physical Link Complete (0x40) plen 127
-> 
-> For me, it still points out to corrupted/truncated USB packets.
-> Unfortunately, it is just indirect evidence as the logs don't show raw
-> USB packets. But you can definitively confirm by using a USB sniffer
-> tool. I recommend using tshark (wireshark's command line interface).
-> It works just fine on raspberry. See this post for instructions:
-> http://nagaraj-embedded.blogspot.com.br/2012/03/capturing-usb-data-through-wireshark.html
-> 
-> Note that on raspberry there is just "usbmon1" (i.e. Bus 1), and
-> everything is attached to it. So the logs will get other unrelated
-> traffic (like ethernet packets), but wireshark GUI is powerful enough
-> to filter only traffic related to a specific device.
-> 
-> Best Regards,
-> -- 
-> Anderson Lizardo
-> http://www.indt.org/?lang=en
-> INdT - Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  static void handle_client_listen(const void *buf, uint16_t len)
 
 -- 
-Adam Warski
-
-http://twitter.com/#!/adamwarski
-http://www.softwaremill.com
-http://www.warski.org
-
+BR
+Szymon Janc
