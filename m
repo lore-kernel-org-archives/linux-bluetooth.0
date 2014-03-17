@@ -1,119 +1,644 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/12] android/avrcp-lib: Change API to register callbacks instead of PDU handlers
-Date: Mon, 17 Mar 2014 10:08:46 +0200
-Message-Id: <1395043737-8905-1-git-send-email-luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 3/5] android/gatt: Add GATT Connect
+Date: Mon, 17 Mar 2014 01:01:11 +0100
+Message-ID: <1395014473-7600-4-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This patch introduce connect LE device functionality.
 
-This adds avrcp_register_player function to register callbacks for
-requests and responses, the fundamental difference is that the
-callbacks are called after the original PDU is parsed and the parameter
-are converted to host byte order making us able to unit test the
-parsing itself.
+There is gatt_device representing remote le device. Each gatt device
+has a list own list of clients as it is possible that more apps
+would like to use same remote device.
+
+Possible connect scenarios:
+
+1.  There is no ACL connection to device:
+Then new dev is put on conn_wait_queue and le scan is enabled.
+Once device is found we do connect it.
+
+Once device is connected then device is moved form conn_wait_queue to
+conn_list and success event is sent to client(s) with conn_id
+
+2. Device is already connected:
+Then we update client list, reply with success and do send connect event.
+
+3. For unregisterd clients or uknown conn_id, failed response is sent.
 ---
- android/avrcp-lib.c | 27 +++++++++++++++++++++++++++
- android/avrcp-lib.h | 11 +++++++++++
- 2 files changed, 38 insertions(+)
+ android/Android.mk  |   4 +
+ android/Makefile.am |   3 +
+ android/gatt.c      | 494 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 3 files changed, 483 insertions(+), 18 deletions(-)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 7b043ce..ca01b50 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -73,6 +73,7 @@ struct avrcp_header {
+diff --git a/android/Android.mk b/android/Android.mk
+index 34e21ea..0e0932d 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -60,9 +60,13 @@ LOCAL_SRC_FILES := \
+ 	bluez/lib/sdp.c \
+ 	bluez/lib/bluetooth.c \
+ 	bluez/lib/hci.c \
++	bluez/lib/uuid.c \
+ 	bluez/btio/btio.c \
+ 	bluez/src/sdp-client.c \
+ 	bluez/profiles/network/bnep.c \
++	bluez/attrib/gattrib.c \
++	bluez/attrib/gatt.c \
++	bluez/attrib/att.c
  
- struct avrcp {
- 	struct avctp *conn;
-+	struct avrcp_player *player;
+ LOCAL_C_INCLUDES := \
+ 	$(call include-path-for, glib) \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index ff15682..3c503da 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -43,6 +43,9 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				android/handsfree.h android/handsfree.c \
+ 				android/gatt.h android/gatt.c \
+ 				android/health.h android/health.c \
++				attrib/att.c attrib/att.h \
++				attrib/gatt.c attrib/gatt.h \
++				attrib/gattrib.c attrib/gattrib.h \
+ 				btio/btio.h btio/btio.c \
+ 				src/sdp-client.h src/sdp-client.c \
+ 				profiles/network/bnep.h profiles/network/bnep.c
+diff --git a/android/gatt.c b/android/gatt.c
+index d5abbda..f2a1b07 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -29,10 +29,13 @@
+ #include <stdlib.h>
+ #include <stdint.h>
+ #include <glib.h>
++#include <errno.h>
++#include <sys/socket.h>
  
- 	size_t tx_mtu;
- 	uint8_t *tx_buf;
-@@ -89,6 +90,13 @@ struct avrcp {
- 	void *destroy_data;
+ #include "ipc.h"
+ #include "ipc-common.h"
+ #include "lib/sdp.h"
++#include "lib/uuid.h"
+ #include "bluetooth.h"
+ #include "gatt.h"
+ #include "src/log.h"
+@@ -40,16 +43,40 @@
+ #include "utils.h"
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
++#include "attrib/gattrib.h"
++#include "attrib/att.h"
++#include "attrib/gatt.h"
++#include "btio/btio.h"
+ 
+ struct gatt_client {
+ 	int32_t id;
+ 	uint8_t uuid[16];
  };
  
-+struct avrcp_player {
-+	const struct avrcp_control_ind *ind;
-+	const struct avrcp_control_cfm *cfm;
++struct gatt_device {
++	bdaddr_t bdaddr;
++	uint8_t bdaddr_type;
 +
-+	void *user_data;
++	struct queue *clients;
++
++	bool connect_ready;
++	int32_t conn_id;
++
++	GAttrib *attrib;
++	GIOChannel *att_io;
++
++	guint watch_id;
 +};
 +
- void avrcp_shutdown(struct avrcp *session)
+ static struct ipc *hal_ipc = NULL;
+ static bdaddr_t adapter_addr;
++
+ static struct queue *gatt_clients = NULL;
+ static struct queue *scan_clients = NULL;
++static struct queue *conn_list	= NULL;		/* Connected devices */
++static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
++
++static void bt_le_discovery_stop_cb(void);
+ 
+ static bool match_client_by_uuid(const void *data, const void *user_data)
  {
- 	if (session->conn) {
-@@ -107,6 +115,7 @@ void avrcp_shutdown(struct avrcp *session)
- 	if (session->destroy)
- 		session->destroy(session->destroy_data);
- 
-+	g_free(session->player);
- 	g_free(session->tx_buf);
- 	g_free(session);
- }
-@@ -162,6 +171,9 @@ static ssize_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 		switch (ret) {
- 		case -EAGAIN:
- 			return ret;
-+		case -ENOSYS:
-+			pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
-+			goto reject;
- 		case -EINVAL:
- 			pdu->params[0] = AVRCP_STATUS_INVALID_PARAM;
- 			goto reject;
-@@ -249,6 +261,21 @@ void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
- 	session->destroy_data = user_data;
+@@ -72,29 +99,27 @@ static bool match_by_value(const void *data, const void *user_data)
+ 	return data == user_data;
  }
  
-+void avrcp_register_player(struct avrcp *session,
-+				const struct avrcp_control_ind *ind,
-+				const struct avrcp_control_cfm *cfm,
-+				void *user_data)
+-static void le_device_found_handler(bdaddr_t *addr, uint8_t addr_type, int rssi,
+-					uint16_t eir_len, const void *eir)
++static bool match_dev_by_bdaddr(const void *data, const void *user_data)
+ {
+-	uint8_t buf[IPC_MTU];
+-	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
+-	char bda[18];
++	const struct gatt_device *dev = data;
++	const bdaddr_t *addr = user_data;
+ 
+-	if (queue_isempty(scan_clients))
+-		return;
++	return !bacmp(&dev->bdaddr, addr);
++}
+ 
+-	ba2str(addr, bda);
+-	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi,
+-							eir ? true : false);
++static bool match_dev_connect_ready(const void *data, const void *user_data)
 +{
-+	struct avrcp_player *player;
++	const struct gatt_device *dev = data;
+ 
+-	bdaddr2android(addr, ev->bda);
+-	ev->rssi = rssi;
+-	ev->len = eir_len;
++	return dev->connect_ready;
++}
+ 
+-	memcpy(ev->adv_data, eir, ev->len);
++static void destroy_device(void *data)
++{
++	struct gatt_device *dev = data;
+ 
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+-						HAL_EV_GATT_CLIENT_SCAN_RESULT,
+-						sizeof(ev) + ev->len, ev);
++	queue_destroy(dev->clients, NULL);
++	free(dev);
+ }
+ 
+ static void handle_client_register(const void *buf, uint16_t len)
+@@ -172,6 +197,264 @@ failed:
+ 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+ }
+ 
++static void connection_cleanup(struct gatt_device *device)
++{
++	if (device->watch_id) {
++		g_source_remove(device->watch_id);
++		device->watch_id = 0;
++	}
 +
-+	player = g_new0(struct avrcp_player, 1);
-+	player->ind = ind;
-+	player->cfm = cfm;
-+	player->user_data = user_data;
++	if (device->att_io) {
++		g_io_channel_shutdown(device->att_io, FALSE, NULL);
++		g_io_channel_unref(device->att_io);
++		device->att_io = NULL;
++	}
 +
-+	session->player = player;
++	if (device->attrib) {
++		GAttrib *attrib = device->attrib;
++		device->attrib = NULL;
++		g_attrib_cancel_all(attrib);
++		g_attrib_unref(attrib);
++	}
 +}
 +
- void avrcp_set_control_handlers(struct avrcp *session,
- 				const struct avrcp_control_handler *handlers,
- 				void *user_data)
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 4adf4bf..6e33a75 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -100,6 +100,12 @@ struct avrcp_control_handler {
- 			uint16_t params_len, uint8_t *params, void *user_data);
- };
++static void send_disconnect_notify(int32_t id, struct gatt_device *dev,
++								uint8_t status)
++{
++	struct hal_ev_gatt_client_disconnect ev;
++
++	ev.client_if = id;
++	ev.conn_id = dev->conn_id;
++	ev.status = status;
++	bdaddr2android(&dev->bdaddr, &ev.bda);
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
++}
++
++static void disconnect_notify(void *data, void *user_data)
++{
++	struct gatt_device *dev = user_data;
++	int32_t id = PTR_TO_INT(data);
++
++	send_disconnect_notify(id, dev, HAL_STATUS_SUCCESS);
++}
++
++static bool is_device_wating_for_connect(const bdaddr_t *addr,
++							uint8_t addr_type)
++{
++	struct gatt_device *dev;
++
++	DBG("");
++
++	dev = queue_find(conn_wait_queue, match_dev_by_bdaddr, (void *)addr);
++	if (!dev)
++		return false;
++
++	dev->bdaddr_type = addr_type;
++
++	/* Mark that this device is ready for connect.
++	 * Need it because will continue with connect after scan is stopped
++	 */
++	dev->connect_ready = true;
++
++	return true;
++}
++
++static void le_device_found_handler(bdaddr_t *addr, uint8_t addr_type,
++						int rssi, uint16_t eir_len,
++							const void *eir)
++{
++	uint8_t buf[IPC_MTU];
++	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
++	char bda[18];
++
++	if (queue_isempty(scan_clients))
++		goto connect;
++
++	ba2str(addr, bda);
++	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
++
++	bdaddr2android(addr, ev->bda);
++	ev->rssi = rssi;
++	ev->len = eir_len;
++
++	memcpy(ev->adv_data, eir, ev->len);
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++						HAL_EV_GATT_CLIENT_SCAN_RESULT,
++						sizeof(ev) + ev->len, ev);
++
++connect:
++	if (!is_device_wating_for_connect(addr, addr_type))
++		return;
++
++	/* We are ok to perform connect now. Stop discovery
++	* and once it is stopped continue with creating ACL
++	*/
++	bt_le_discovery_stop(bt_le_discovery_stop_cb);
++}
++
++static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
++							gpointer user_data)
++{
++	bdaddr_t *addr = user_data;
++	struct gatt_device *dev;
++	int sock, err = 0;
++	socklen_t len;
++
++	dev = queue_remove_if(conn_list, match_dev_by_bdaddr, addr);
++
++	sock = g_io_channel_unix_get_fd(io);
++	len = sizeof(err);
++	if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len) < 0)
++		goto done;
++
++	DBG("%s (%d)", strerror(err), err);
++
++	/* Keep scanning/re-connection active if disconnection reason
++	 * is connection timeout, remote user terminated connection or local
++	 * initiated disconnection.
++	 */
++	if (err == ETIMEDOUT || err == ECONNRESET || err == ECONNABORTED) {
++		if (!queue_push_tail(conn_wait_queue, dev)) {
++			error("gatt: Cannot push data");
++		} else {
++			bt_le_discovery_start(le_device_found_handler);
++			return FALSE;
++		}
++	}
++
++done:
++	connection_cleanup(dev);
++
++	queue_foreach(dev->clients, disconnect_notify, dev);
++	destroy_device(dev);
++
++	return FALSE;
++}
++
++static void send_client_connect_notify(void *data, void *user_data)
++{
++	struct hal_ev_gatt_client_connect *ev = user_data;
++	int32_t id = PTR_TO_INT(data);
++
++	ev->client_if = id;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++				HAL_EV_GATT_CLIENT_CONNECT, sizeof(*ev), ev);
++
++}
++
++static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
++{
++	bdaddr_t *addr = user_data;
++	struct gatt_device *dev;
++	struct hal_ev_gatt_client_connect ev;
++	GAttrib *attrib;
++	static uint32_t conn_id = 0;
++	uint8_t status;
++
++	/* Take device from conn waiting queue */
++	dev = queue_remove_if(conn_wait_queue, match_dev_by_bdaddr, addr);
++	if (!dev) {
++		error("gatt: Device not on the connect wait queue!?");
++		g_io_channel_shutdown(io, TRUE, NULL);
++		return;
++	}
++
++	g_io_channel_unref(dev->att_io);
++	dev->att_io = NULL;
++
++	/* Set address and client id in the event */
++	bdaddr2android(&dev->bdaddr, &ev.bda);
++
++	if (gerr) {
++		error("gatt: connection failed %s", gerr->message);
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	attrib = g_attrib_new(io);
++	if (!attrib) {
++		error("gatt: unable to create new GAttrib instance");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	dev->attrib = attrib;
++	dev->watch_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++							disconnected_cb, dev);
++	dev->conn_id = ++conn_id;
++
++	/* Move gatt device from connect queue to conn_list */
++	if (!queue_push_tail(conn_list, dev)) {
++		error("gatt: Cannot push dev on conn_list");
++		connection_cleanup(dev);
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++	goto reply;
++
++reply:
++	ev.conn_id = dev ? dev->conn_id : 0;
++	ev.status = status;
++
++	queue_foreach(dev->clients, send_client_connect_notify, &ev);
++
++	/* If connection did not succeed, destroy device */
++	if (status)
++		destroy_device(dev);
++}
++
++static int connect_le(struct gatt_device *dev)
++{
++	BtIOSecLevel sec_level;
++	GIOChannel *io;
++	GError *gerr = NULL;
++	char addr[18];
++
++	ba2str(&dev->bdaddr, addr);
++
++	/* There is one connection attempt going on */
++	if (dev->att_io) {
++		info("gatt: connection to dev %s is ongoing", addr);
++		return -EALREADY;
++	}
++
++	DBG("Connection attempt to: %s", addr);
++
++	/*TODO: If we are bonded then we should use higier sec level */
++	sec_level = BT_IO_SEC_LOW;
++
++	/*
++	 * This connection will help us catch any PDUs that comes before
++	 * pairing finishes
++	 */
++	io = bt_io_connect(connect_cb, dev, NULL, &gerr,
++			BT_IO_OPT_SOURCE_BDADDR,
++			&adapter_addr,
++			BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
++			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
++			BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
++			BT_IO_OPT_CID, ATT_CID,
++			BT_IO_OPT_SEC_LEVEL, sec_level,
++			BT_IO_OPT_INVALID);
++	if (!io) {
++		error("gatt: Failed bt_io_connect(%s): %s", addr,
++							gerr->message);
++		g_error_free(gerr);
++		return -EIO;
++	}
++
++	/* Keep this, so we can cancel the connection */
++	dev->att_io = io;
++
++	return 0;
++}
++
+ static void handle_client_scan(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_scan *cmd = buf;
+@@ -229,12 +512,168 @@ reply:
+ 									status);
+ }
  
-+struct avrcp_control_ind {
-+};
++static int connect_next_dev(void)
++{
++	struct gatt_device *dev;
 +
-+struct avrcp_control_cfm {
-+};
++	DBG("");
 +
- struct avrcp_passthrough_handler {
- 	uint8_t op;
- 	bool (*func) (struct avrcp *session, bool pressed, void *user_data);
-@@ -123,6 +129,11 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
- void avrcp_shutdown(struct avrcp *session);
- void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
- 							void *user_data);
++	if (queue_isempty(conn_wait_queue))
++		return 0;
 +
-+void avrcp_register_player(struct avrcp *session,
-+				const struct avrcp_control_ind *ind,
-+				const struct avrcp_control_cfm *cfm,
-+				void *user_data);
- void avrcp_set_control_handlers(struct avrcp *session,
- 				const struct avrcp_control_handler *handlers,
- 				void *user_data);
++	/* Discovery has been stopped because there is connection waiting */
++	dev = queue_find(conn_wait_queue, match_dev_connect_ready, NULL);
++	if (!dev)
++		/* Lets try again. */
++		return -1;
++
++	dev->connect_ready = false;
++
++	return connect_le(dev);
++}
++
++static void bt_le_discovery_stop_cb(void)
++{
++	DBG("");
++
++	/* Check now if there is any device ready to connect*/
++	if (connect_next_dev() < 0)
++		bt_le_discovery_start(le_device_found_handler);
++}
++
++static struct gatt_device *find_device(bdaddr_t *addr)
++{
++	struct gatt_device *dev;
++
++	dev = queue_find(conn_list, match_dev_by_bdaddr, addr);
++	if (dev)
++		return dev;
++
++	dev = queue_find(conn_wait_queue, match_dev_by_bdaddr, addr);
++	if (dev)
++		return dev;
++
++	return NULL;
++}
++
+ static void handle_client_connect(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_connect *cmd = buf;
++	struct gatt_device *dev = NULL;
++	void *l;
++	bdaddr_t addr;
++	uint8_t status;
++	bool send_notify = false;
++
+ 	DBG("");
+ 
++	/* Check if client is registered */
++	l = queue_find(gatt_clients, match_client_by_id,
++						INT_TO_PTR(cmd->client_if));
++	if (!l) {
++		error("gatt: Client id %d not found", cmd->client_if);
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	android2bdaddr(&cmd->bdaddr, &addr);
++
++	/* We do support many clients for one device connection so lets check
++	  * If device is connected or in connecting state just update list of
++	  * clients
++	  */
++	dev = find_device(&addr);
++	if (dev) {
++		/* Remeber to send dummy notification event  if we area
++		 * connected
++		 */
++		if (dev->conn_id)
++			send_notify = true;
++
++		if (queue_find(dev->clients, match_by_value,
++						INT_TO_PTR(cmd->client_if))) {
++			status = HAL_STATUS_SUCCESS;
++			goto reply;
++		}
++
++		/* Store another client */
++		if (!queue_push_tail(dev->clients,
++						INT_TO_PTR(cmd->client_if))) {
++			error("gatt: Cannot push client on gatt device list");
++			status = HAL_STATUS_FAILED;
++			goto reply;
++		}
++
++		status = HAL_STATUS_SUCCESS;
++		goto reply;
++	}
++
++	/* Lets create new gatt device and put it on conn_wait_queue.
++	  * Once it is connected we move it to conn_list
++	  */
++	dev = new0(struct gatt_device, 1);
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	memcpy(&dev->bdaddr, &addr, sizeof(bdaddr_t));
++
++	/* Create queue to keep list of clients for given device*/
++	dev->clients = queue_new();
++	if (!dev->clients) {
++		error("gatt: Cannot create client queue");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	/* Update client list of device */
++	if (!queue_push_tail(dev->clients, INT_TO_PTR(cmd->client_if))) {
++		error("gatt: Cannot push client on the client queue!?");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	/* Start le scan if not started */
++	if (queue_isempty(scan_clients)) {
++		if (!bt_le_discovery_start(le_device_found_handler)) {
++			error("gatt: Could not start scan");
++			status = HAL_STATUS_FAILED;
++			goto reply;
++		}
++	}
++
++	if (!queue_push_tail(conn_wait_queue, dev)) {
++		error("gatt: Cannot push device on conn_wait_queue");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++
++reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
+-							HAL_STATUS_FAILED);
++								status);
++
++	/* If there is an error here we should make sure dev is out.*/
++	if ((status != HAL_STATUS_SUCCESS) && dev) {
++		destroy_device(dev);
++		return;
++	}
++
++	/* Send dummy notification since ACL is already up*/
++	if (send_notify) {
++		struct hal_ev_gatt_client_connect ev;
++
++		ev.conn_id = dev->conn_id;
++		ev.status = HAL_STATUS_SUCCESS;
++		ev.client_if = cmd->client_if;
++		bdaddr2android(&addr, &ev.bda);
++
++		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++						HAL_EV_GATT_CLIENT_CONNECT,
++						sizeof(ev), &ev);
++	}
+ }
+ 
+ static void handle_client_disconnect(const void *buf, uint16_t len)
+@@ -610,6 +1049,18 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 
+ 	hal_ipc = ipc;
+ 
++	conn_list = queue_new();
++	if (!conn_list) {
++		error("gatt: Can not create conn queue");
++		return false;
++	}
++
++	conn_wait_queue = queue_new();
++	if (!conn_wait_queue) {
++		error("gatt: Can not create conn queue");
++		return false;
++	}
++
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_GATT, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
+ 
+@@ -637,4 +1088,11 @@ void bt_gatt_unregister(void)
+ 
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_GATT);
+ 	hal_ipc = NULL;
++
++	queue_destroy(conn_list, destroy_device);
++	conn_list = NULL;
++
++	queue_destroy(conn_wait_queue, destroy_device);
++	conn_wait_queue = NULL;
++
+ }
 -- 
-1.8.5.3
+1.8.4
 
