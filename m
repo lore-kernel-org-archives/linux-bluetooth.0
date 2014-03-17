@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 4/5] android/gatt: Add disconnect GATT device
-Date: Mon, 17 Mar 2014 01:01:12 +0100
-Message-ID: <1395014473-7600-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v0 5/5] android/gatt: Find primary services
+Date: Mon, 17 Mar 2014 01:01:13 +0100
+Message-ID: <1395014473-7600-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -12,96 +12,160 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Disconnect scenarios:
-
-1. If there is more then one client for a given gatt_device then
-client id is removed from dev->clients, success response is sent
-together with success disconnect event.
-
-2. If there is only one client for a given remote device then we
-do what is decribed above plus clean of gattrib stuff
-
-3. In case client_if or conn_id is incorrect, response failed is sent
+With this patch it is possible to search all primary services.
 ---
- android/gatt.c | 55 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 54 insertions(+), 1 deletion(-)
+ android/gatt.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 99 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f2a1b07..1081121 100644
+index 1081121..4f55d15 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -114,6 +114,14 @@ static bool match_dev_connect_ready(const void *data, const void *user_data)
- 	return dev->connect_ready;
+@@ -36,6 +36,7 @@
+ #include "ipc-common.h"
+ #include "lib/sdp.h"
+ #include "lib/uuid.h"
++
+ #include "bluetooth.h"
+ #include "gatt.h"
+ #include "src/log.h"
+@@ -64,6 +65,7 @@ struct gatt_device {
+ 
+ 	GAttrib *attrib;
+ 	GIOChannel *att_io;
++	struct queue *services;
+ 
+ 	guint watch_id;
+ };
+@@ -127,6 +129,7 @@ static void destroy_device(void *data)
+ 	struct gatt_device *dev = data;
+ 
+ 	queue_destroy(dev->clients, NULL);
++	queue_destroy(dev->services, free);
+ 	free(dev);
  }
  
-+static bool match_dev_by_conn_id(const void *data, const void *user_data)
+@@ -205,6 +208,71 @@ failed:
+ 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+ }
+ 
++static void primary_cb(uint8_t status, GSList *services, void *user_data)
 +{
-+	const struct gatt_device *dev = data;
-+	const int32_t conn_id = PTR_TO_INT(user_data);
++	GSList *l;
++	struct gatt_device *dev = user_data;
++	struct hal_ev_gatt_client_search_complete ev;
 +
-+	return dev->conn_id == conn_id;
++	DBG("Status %d", status);
++
++	if (status) {
++		error("Discover all primary services failed: %s\n",
++							att_ecode2str(status));
++		ev.status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	if (!services) {
++		info("gatt: no primary serivces found");
++		ev.status = HAL_STATUS_SUCCESS;
++		goto reply;
++	}
++
++	for (l = services; l; l = l->next) {
++		uint8_t buf[IPC_MTU];
++		struct hal_ev_gatt_client_search_result *ev_res = (void *)buf;
++		struct gatt_primary *prim = l->data;
++		struct gatt_primary *p = new0(struct gatt_primary, 1);
++		bt_uuid_t uuid;
++
++		memset(buf, 0, sizeof(buf));
++
++		/* Put primary service to our local list */
++		memcpy(p, prim, sizeof(*p));
++		if (!queue_push_tail(dev->services, p)) {
++			error("gatt: Cannot push primary service to the list");
++			free(p);
++		}
++
++		DBG("attr handle = 0x%04x, end grp handle = 0x%04x "
++			"uuid: %s\n", prim->range.start, prim->range.end,
++								prim->uuid);
++		/* Set event data */
++		ev_res->conn_id  = dev->conn_id;
++		ev_res->srvc_id.is_primary = 1;
++		ev_res->srvc_id.inst_id = 0;
++
++		if (bt_string_to_uuid(&uuid, prim->uuid) < 0) {
++			error("Can not convert string to uuid");
++			continue;
++		}
++		memcpy(&ev_res->srvc_id.uuid, &uuid.value, sizeof(uuid.value));
++
++		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
++					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
++						sizeof(*ev_res), ev_res);
++	}
++
++	ev.status = HAL_STATUS_SUCCESS;
++
++reply:
++	ev.conn_id = dev->conn_id;
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++					HAL_EV_GATT_CLIENT_SEARCH_COMPLETE,
++							sizeof(ev), &ev);
 +}
 +
- static void destroy_device(void *data)
+ static void connection_cleanup(struct gatt_device *device)
  {
- 	struct gatt_device *dev = data;
-@@ -678,10 +686,55 @@ reply:
+ 	if (device->watch_id) {
+@@ -635,6 +703,14 @@ static void handle_client_connect(const void *buf, uint16_t len)
+ 		goto reply;
+ 	}
  
- static void handle_client_disconnect(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_disconnect *cmd = buf;
-+	struct gatt_device *dev;
-+	uint8_t status;
-+	char addr[18];
-+
- 	DBG("");
- 
-+	ba2str((bdaddr_t *)&cmd->bdaddr, addr);
-+
-+	dev = queue_find(conn_list, match_dev_by_conn_id,
-+						INT_TO_PTR(cmd->conn_id));
-+	if (!dev) {
-+		error("gatt: dev %s with conn_id=%d not found",
-+							addr, cmd->conn_id);
++	dev->services = queue_new();
++	if (!dev->services) {
++		error("gatt: Cannot create services queue");
++		queue_destroy(dev->clients, NULL);
 +		status = HAL_STATUS_FAILED;
 +		goto reply;
 +	}
 +
-+	/*Check if client owns this connection */
-+	if (!queue_remove_if(dev->clients, match_by_value,
-+						INT_TO_PTR(cmd->client_if))) {
-+		error("gatt: cannot remove conn_id=%d", cmd->client_if);
+ 	/* Update client list of device */
+ 	if (!queue_push_tail(dev->clients, INT_TO_PTR(cmd->client_if))) {
+ 		error("gatt: Cannot push client on the client queue!?");
+@@ -755,10 +831,32 @@ static void handle_client_refresh(const void *buf, uint16_t len)
+ 
+ static void handle_client_search_service(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_search_service *cmd = buf;
++	struct gatt_device *dev;
++	uint8_t status;
++
+ 	DBG("");
+ 
++	dev = queue_find(conn_list, match_dev_by_conn_id,
++						INT_TO_PTR(cmd->conn_id));
++	if (!dev) {
++		error("gatt: dev with conn_id=%d not found", cmd->conn_id);
 +		status = HAL_STATUS_FAILED;
-+	} else {
-+		status = HAL_STATUS_SUCCESS;
++		goto reply;
 +	}
++
++	/*TODO:  Handle filter uuid */
++
++	if (!gatt_discover_primary(dev->attrib, NULL, primary_cb, dev)) {
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	status = HAL_STATUS_SUCCESS;
 +
 +reply:
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_CLIENT_DISCONNECT, HAL_STATUS_FAILED);
-+			HAL_OP_GATT_CLIENT_DISCONNECT, status);
-+
-+	if (status == HAL_STATUS_FAILED)
-+		return;
-+
-+	/* Just send disconnect event. If there is more clients on this
-+	 * device then this is what we shall to do.
-+	 * If this is last client, this is still OK to do because on connect
-+	 * request we do le scan and wait until remote device start
-+	 * advertisement */
-+	send_disconnect_notify(cmd->client_if, dev, HAL_STATUS_SUCCESS);
-+
-+	/* If there is more clients just return */
-+	if (!queue_isempty(dev->clients))
-+		return;
-+
-+	/* If this is last client do more cleaning */
-+	connection_cleanup(dev);
-+	dev = queue_remove_if(conn_list, match_dev_by_bdaddr, &dev->bdaddr);
-+	destroy_device(dev);
+-			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, HAL_STATUS_FAILED);
++			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
  }
  
- static void handle_client_listen(const void *buf, uint16_t len)
+ static void handle_client_get_included_service(const void *buf, uint16_t len)
 -- 
 1.8.4
 
