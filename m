@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/17] unit/test-avrcp: Fix invalid PDU for test /TP/PAS/BV-04-C
-Date: Mon, 17 Mar 2014 15:07:58 +0200
-Message-Id: <1395061683-17206-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 10/17] android/avrcp-lib: Add avrcp_get_player_values_text_rsp function
+Date: Mon, 17 Mar 2014 15:07:56 +0200
+Message-Id: <1395061683-17206-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1395061683-17206-1-git-send-email-luiz.dentz@gmail.com>
 References: <1395061683-17206-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,25 +11,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-GetPlayerAttributeText needs at least one parameter otherwise it can be
-considered invalid.
+This function can be used to generate GetPlayerValuesText response PDUs.
 ---
- unit/test-avrcp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/avrcp-lib.c | 33 +++++++++++++++++++++++++++++++++
+ android/avrcp-lib.h |  3 +++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index b443a40..a49a0a2 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -670,7 +670,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
- 				0x00, 0x19, 0x58,
- 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
--				0x00, 0x00, 0x00),
-+				0x00, 0x00, 0x01, 0x00),
- 			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
- 				0x00, 0x19, 0x58,
- 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index fe3205e..16636e6 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -895,6 +895,39 @@ int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+ 				pdu, sizeof(pdu));
+ }
+ 
++int avrcp_get_player_values_text_rsp(struct avrcp *session,
++					uint8_t transaction, uint8_t number,
++					uint8_t *values, const char **text)
++{
++	uint8_t pdu[AVRCP_ATTRIBUTE_LAST * (4 + 255)];
++	uint8_t *ptr;
++	uint16_t length;
++	int i;
++
++	if (number > AVRCP_ATTRIBUTE_LAST)
++		return -EINVAL;
++
++	pdu[0] = number;
++	length = 1;
++	for (i = 0, ptr = &pdu[1]; i < number; i++) {
++		uint8_t len = 0;
++
++		if (text[i])
++			len = strlen(text[i]);
++
++		ptr[0] = values[i];
++		bt_put_be16(AVRCP_CHARSET_UTF8, &ptr[1]);
++		ptr[3] = len;
++		memcpy(ptr, text[i], len);
++		ptr += 4 + len;
++		length += 4 + len;
++	}
++
++	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
++			AVC_SUBUNIT_PANEL, AVRCP_GET_PLAYER_VALUE_TEXT,
++			pdu, length);
++}
++
+ int avrcp_get_element_attrs_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t *params, size_t params_len)
+ {
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index a9485b2..181e7aa 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -240,6 +240,9 @@ int avrcp_list_player_values_rsp(struct avrcp *session, uint8_t transaction,
+ int avrcp_get_play_status_rsp(struct avrcp *session, uint8_t transaction,
+ 				uint32_t position, uint32_t duration,
+ 				uint8_t status);
++int avrcp_get_player_values_text_rsp(struct avrcp *session,
++					uint8_t transaction, uint8_t number,
++					uint8_t *values, const char **text);
+ int avrcp_get_element_attrs_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t *params, size_t params_len);
+ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
 -- 
 1.8.5.3
 
