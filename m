@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH v3 2/5] android/gatt: Use Core profile for LE scan
-Date: Mon, 17 Mar 2014 01:01:10 +0100
-Message-ID: <1395014473-7600-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 1/5] android/bluetooth: Add GATT notifications on LE discovery
+Date: Mon, 17 Mar 2014 01:01:09 +0100
+Message-ID: <1395014473-7600-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -14,166 +14,272 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 
-This makes gatt capable of triggering LE scan using functionality
-exposed by Core API. GATT registers its own callbacks for discovering
-events.
----
- android/gatt.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 99 insertions(+), 3 deletions(-)
+This patch introduce API which GATT can use to start/stop discovery
+and register for required events.
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b566470..d5abbda 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -32,10 +32,12 @@
+This is because GATT needs to get from GAP notifications about
+founded devices and also notification when discovery has been stopped.
+
+GATT will need it explicity when GATT client calls scan, and also in
+case of connect device, as before le connect is sent we do scan first
+to make sure that device is available.
+
+For now on adapter have two variables tracing discovery.
+1. cur_discovery_type which show type of ongoing discovery type.
+2. exp_discovery_type which shows type of next discovery session.
+
+We need this because of scenarion when GATT is interesting in scan and
+in the same time HAL wants to do scanning.
+---
+ android/bluetooth.c | 107 ++++++++++++++++++++++++++++++++++++++++++++++------
+ android/bluetooth.h |   7 ++++
+ 2 files changed, 103 insertions(+), 11 deletions(-)
+
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 3e2e547..a537507 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -80,10 +80,13 @@
+ #define BASELEN_REMOTE_DEV_PROP (sizeof(struct hal_ev_remote_device_props) \
+ 					+ sizeof(struct hal_property))
  
- #include "ipc.h"
- #include "ipc-common.h"
--#include "lib/bluetooth.h"
-+#include "lib/sdp.h"
-+#include "bluetooth.h"
- #include "gatt.h"
- #include "src/log.h"
- #include "hal-msg.h"
-+#include "utils.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
++#define SCAN_TYPE_NONE 0
+ #define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
+ #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
+ #define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
  
-@@ -47,6 +49,7 @@ struct gatt_client {
- static struct ipc *hal_ipc = NULL;
- static bdaddr_t adapter_addr;
- static struct queue *gatt_clients = NULL;
-+static struct queue *scan_clients = NULL;
++#define BDADDR_LE (BDADDR_LE_RANDOM | BDADDR_LE_PUBLIC)
++
+ struct device {
+ 	bdaddr_t bdaddr;
+ 	uint8_t bdaddr_type;
+@@ -122,7 +125,8 @@ static struct {
  
- static bool match_client_by_uuid(const void *data, const void *user_data)
+ 	uint32_t current_settings;
+ 
+-	bool discovering;
++	uint8_t cur_discovery_type;
++	uint8_t exp_discovery_type;
+ 	uint32_t discoverable_timeout;
+ 
+ 	GSList *uuids;
+@@ -131,7 +135,8 @@ static struct {
+ 	.dev_class = 0,
+ 	.name = NULL,
+ 	.current_settings = 0,
+-	.discovering = false,
++	.cur_discovery_type = 0,
++	.exp_discovery_type = 0,
+ 	.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT,
+ 	.uuids = NULL,
+ };
+@@ -149,6 +154,9 @@ static struct mgmt *mgmt_if = NULL;
+ static GSList *bonded_devices = NULL;
+ static GSList *cached_devices = NULL;
+ 
++static bt_le_device_found gatt_device_found_cb = NULL;
++static bt_le_discovery_stopped gatt_discovery_stopped_cb = NULL;
++
+ /* This list contains addresses which are asked for records */
+ static GSList *browse_reqs;
+ 
+@@ -509,7 +517,6 @@ static void settings_changed(uint32_t settings)
+ 	if (changed_mask & MGMT_SETTING_POWERED)
+ 		powered_changed();
+ 
+-
+ 	scan_mode_mask = MGMT_SETTING_CONNECTABLE |
+ 					MGMT_SETTING_DISCOVERABLE;
+ 
+@@ -1036,6 +1043,7 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
  {
-@@ -64,6 +67,36 @@ static bool match_client_by_id(const void *data, const void *user_data)
- 	return client->id == exp_id;
- }
+ 	const struct mgmt_ev_discovering *ev = param;
+ 	struct hal_ev_discovery_state_changed cp;
++	bool is_discovering = adapter.cur_discovery_type;
  
-+static bool match_by_value(const void *data, const void *user_data)
-+{
-+	return data == user_data;
-+}
+ 	if (length < sizeof(*ev)) {
+ 		error("Too small discovering event");
+@@ -1045,14 +1053,14 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
+ 	DBG("hci%u type %u discovering %u", index, ev->type,
+ 							ev->discovering);
+ 
+-	if (adapter.discovering == !!ev->discovering)
++	if (is_discovering == !!ev->discovering)
+ 		return;
+ 
+-	adapter.discovering = !!ev->discovering;
++	adapter.cur_discovery_type = ev->discovering ? ev->type : 0;
+ 
+ 	DBG("new discovering state %u", ev->discovering);
+ 
+-	if (adapter.discovering) {
++	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
+ 		cp.state = HAL_DISCOVERY_STATE_STARTED;
+ 	} else {
+ 		g_slist_foreach(bonded_devices, clear_device_found, NULL);
+@@ -1062,6 +1070,27 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
 +
-+static void le_device_found_handler(bdaddr_t *addr, uint8_t addr_type, int rssi,
-+					uint16_t eir_len, const void *eir)
-+{
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
-+	char bda[18];
++	if (gatt_discovery_stopped_cb &&
++			(adapter.cur_discovery_type == SCAN_TYPE_NONE)) {
++		/* One shot notification about discovery stopped send to gatt*/
++		gatt_discovery_stopped_cb();
++		gatt_discovery_stopped_cb = NULL;
++	}
 +
-+	if (queue_isempty(scan_clients))
++	/* If discovery is ON or there is no expected next discovery session
++	 * then just return
++	 */
++	if ((adapter.cur_discovery_type != SCAN_TYPE_NONE) ||
++		(adapter.exp_discovery_type == SCAN_TYPE_NONE))
 +		return;
 +
-+	ba2str(addr, bda);
-+	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi,
-+							eir ? true : false);
++	start_discovery(adapter.exp_discovery_type);
 +
-+	bdaddr2android(addr, ev->bda);
-+	ev->rssi = rssi;
-+	ev->len = eir_len;
++	/* Maintain expected discovery type if there is gatt client
++	 * registered
++	 */
++	adapter.exp_discovery_type = gatt_device_found_cb ? SCAN_TYPE_LE : 0;
+ }
+ 
+ static void confirm_device_name_cb(uint8_t status, uint16_t length,
+@@ -1143,7 +1172,7 @@ static void update_new_device(struct device *dev, int8_t rssi,
+ 
+ 	memset(buf, 0, sizeof(buf));
+ 
+-	if (adapter.discovering)
++	if (adapter.cur_discovery_type)
+ 		dev->found = true;
+ 
+ 	size = sizeof(*ev);
+@@ -1251,6 +1280,11 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 		update_device(dev, rssi, &eir);
+ 	}
+ 
++	/* Notify Gatt if its registered for LE events */
++	if (gatt_device_found_cb && (dev->bdaddr_type & BDADDR_LE))
++		gatt_device_found_cb(&dev->bdaddr, dev->bdaddr_type,
++						dev->rssi, sizeof(eir), &eir);
 +
-+	memcpy(ev->adv_data, eir, ev->len);
+ 	eir_data_free(&eir);
+ 
+ 	if (dev->bond_state != HAL_BOND_STATE_BONDED)
+@@ -2511,6 +2545,38 @@ static bool stop_discovery(uint8_t type)
+ 	return false;
+ }
+ 
++bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
++{
++	if (!adapter.cur_discovery_type) {
++		if (cb)
++			cb();
++		return true;
++	}
 +
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+						HAL_EV_GATT_CLIENT_SCAN_RESULT,
-+						sizeof(ev) + ev->len, ev);
++	gatt_discovery_stopped_cb = cb;
++	/* Remove device found callback */
++	gatt_device_found_cb = NULL;
++	adapter.exp_discovery_type &= ~SCAN_TYPE_LE;
++
++	return stop_discovery(adapter.cur_discovery_type);
 +}
 +
- static void handle_client_register(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_register *cmd = buf;
-@@ -124,6 +157,13 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
-+	queue_remove_if(scan_clients, match_by_value,
-+						INT_TO_PTR(cmd->client_if));
-+
-+	/* If there is no client interesting in scan, just stop it */
-+	if (queue_isempty(scan_clients))
-+		bt_le_discovery_stop(NULL);
-+
- 	free(cl);
- 	status = HAL_STATUS_SUCCESS;
- 
-@@ -134,10 +174,59 @@ failed:
- 
- static void handle_client_scan(const void *buf, uint16_t len)
- {
--	DBG("");
-+	const struct hal_cmd_gatt_client_scan *cmd = buf;
-+	uint8_t status;
-+	void *registered;
-+	void *l;
-+
-+	DBG("new state %d", cmd->start);
- 
-+	registered = queue_find(gatt_clients, match_client_by_id,
-+						INT_TO_PTR(cmd->client_if));
-+	/* Turn off scan */
-+	if (!cmd->start) {
-+		if (registered)
-+			queue_remove_if(scan_clients, match_by_value,
-+						INT_TO_PTR(cmd->client_if));
-+
-+		if (queue_isempty(scan_clients)) {
-+			DBG("Stopping LE SCAN");
-+			bt_le_discovery_stop(NULL);
-+		}
-+
-+		status = HAL_STATUS_SUCCESS;
-+		goto reply;
-+	}
-+
-+	/* If device already do scan, reply with success and avoid to add it
-+	 * again to the list
-+	 */
-+	l = queue_find(scan_clients, match_by_value,
-+						INT_TO_PTR(cmd->client_if));
-+	if (l) {
-+		status = HAL_STATUS_SUCCESS;
-+		goto reply;
-+	}
-+
-+	if (!bt_le_discovery_start(le_device_found_handler)) {
-+		error("gatt: LE scan switch failed");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
-+	/* Add scan client to the list if its registered */
-+	if (registered && !queue_push_tail(scan_clients,
-+						INT_TO_PTR(cmd->client_if))) {
-+		error("gatt: Cannot push scan client");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_SCAN,
--							HAL_STATUS_FAILED);
-+									status);
- }
- 
- static void handle_client_connect(const void *buf, uint16_t len)
-@@ -530,6 +619,13 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 		return false;
- 	}
- 
-+	scan_clients = queue_new();
-+	if (!scan_clients) {
-+		error("gatt: Cannot allocate scan_clients");
-+		queue_destroy(gatt_clients, NULL);
++bool bt_le_discovery_start(bt_le_device_found cb)
++{
++	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
 +		return false;
++
++	gatt_device_found_cb = cb;
++
++	adapter.exp_discovery_type |= SCAN_TYPE_LE;
++
++	/* If core is discovering, don't bother */
++	if (adapter.cur_discovery_type)
++		return true;
++
++	return start_discovery(adapter.exp_discovery_type);
++}
++
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
+ {
+ 	const uint8_t *mode = buf;
+@@ -3180,7 +3246,8 @@ static void handle_start_discovery_cmd(const void *buf, uint16_t len)
+ {
+ 	uint8_t status;
+ 
+-	if (adapter.discovering) {
++	/* Check if there is discovery with BREDR type */
++	if (adapter.cur_discovery_type & SCAN_TYPE_BREDR) {
+ 		status = HAL_STATUS_SUCCESS;
+ 		goto reply;
+ 	}
+@@ -3190,12 +3257,27 @@ static void handle_start_discovery_cmd(const void *buf, uint16_t len)
+ 		goto reply;
+ 	}
+ 
+-	if (!start_discovery(SCAN_TYPE_DUAL)) {
++	adapter.exp_discovery_type |= SCAN_TYPE_DUAL;
++
++	/* If there is no discovery ongoing, try to start discovery */
++	if (!adapter.cur_discovery_type) {
++		if (!start_discovery(adapter.exp_discovery_type))
++			status = HAL_STATUS_FAILED;
++		else
++			status = HAL_STATUS_SUCCESS;
++
++		goto reply;
 +	}
 +
- 	return true;
- }
++	/* Stop discovery here. Once it is stop we will restart it
++	 * with exp_discovery_settings */
++	if (!stop_discovery(adapter.cur_discovery_type)) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto reply;
+ 	}
  
+ 	status = HAL_STATUS_SUCCESS;
++
+ reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_START_DISCOVERY,
+ 									status);
+@@ -3205,7 +3287,7 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
+ {
+ 	uint8_t status;
+ 
+-	if (!adapter.discovering) {
++	if (!adapter.cur_discovery_type) {
+ 		status = HAL_STATUS_SUCCESS;
+ 		goto reply;
+ 	}
+@@ -3215,7 +3297,10 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
+ 		goto reply;
+ 	}
+ 
+-	if (!stop_discovery(SCAN_TYPE_DUAL)) {
++	/* Take into account that gatt might want to keep discover */
++	adapter.exp_discovery_type = gatt_device_found_cb ? SCAN_TYPE_LE : 0;
++
++	if (!stop_discovery(adapter.cur_discovery_type)) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto reply;
+ 	}
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index f436178..a03305d 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -34,3 +34,10 @@ void bt_bluetooth_unregister(void);
+ 
+ int bt_adapter_add_record(sdp_record_t *rec, uint8_t svc_hint);
+ void bt_adapter_remove_record(uint32_t handle);
++
++typedef void (*bt_le_device_found)(bdaddr_t *addr, uint8_t addr_type, int rssi,
++					uint16_t eir_len, const void *eir);
++bool bt_le_discovery_start(bt_le_device_found cb);
++
++typedef void (*bt_le_discovery_stopped)(void);
++bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
 -- 
 1.8.4
 
