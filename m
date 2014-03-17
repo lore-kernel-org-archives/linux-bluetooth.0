@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 05/10] android/tester: Fix handling inquiry by android tester
-Date: Mon, 17 Mar 2014 10:37:38 +0100
-Message-ID: <1395049064-9751-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 02/10] emulator: Add inquiry cancel
+Date: Mon, 17 Mar 2014 10:37:35 +0100
+Message-ID: <1395049064-9751-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395049064-9751-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395049064-9751-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,105 +13,67 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Previously btdev sent inquiry_complete in one mainloop iteration. Due to
-new way of handling it we need to make sure cancel_discovery is called
-if start_discovery has been used.
-There is also no need to hook before inquiry_complete_event in case of
-test for cancel_discovery.
-
-Conflicts:
-	android/android-tester.c
+With this patch, scheduled inquiry session in btdev can be canceled
 ---
- android/android-tester.c | 24 +++++++-----------------
- 1 file changed, 7 insertions(+), 17 deletions(-)
+ emulator/btdev.c | 29 +++++++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index bab92a1..375f30d 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -941,10 +941,13 @@ static void discovery_device_found_cb(int num_properties,
- 		}
- 
- 		if (!check_test_property(received_prop, expected_prop)) {
-+			data->if_bluetooth->cancel_discovery();
- 			tester_test_failed();
- 			return;
- 		}
- 	}
-+
-+	data->if_bluetooth->cancel_discovery();
- }
- 
- static void remote_getprops_device_found_cb(int num_properties,
-@@ -959,6 +962,7 @@ static void remote_getprops_device_found_cb(int num_properties,
- 	if (data->cb_count == 2)
- 		data->cb_count--;
- 
-+	data->if_bluetooth->cancel_discovery();
- 	data->if_bluetooth->get_remote_device_properties(&remote_addr);
- }
- 
-@@ -978,6 +982,7 @@ static void remote_get_property_device_found_cb(int num_properties,
- 	if (data->cb_count == 2)
- 		data->cb_count--;
- 
-+	data->if_bluetooth->cancel_discovery();
- 	status = data->if_bluetooth->get_remote_device_property(&remote_addr,
- 								prop.type);
- 	check_expected_status(status);
-@@ -999,6 +1004,7 @@ static void remote_setprop_device_found_cb(int num_properties,
- 	if (data->cb_count == 3)
- 		data->cb_count--;
- 
-+	data->if_bluetooth->cancel_discovery();
- 	status = data->if_bluetooth->set_remote_device_property(&remote_addr,
- 									&prop);
- 	check_expected_status(status);
-@@ -1020,6 +1026,7 @@ static void remote_setprop_fail_device_found_cb(int num_properties,
- 	if (data->cb_count == 2)
- 		data->cb_count--;
- 
-+	data->if_bluetooth->cancel_discovery();
- 	status = data->if_bluetooth->set_remote_device_property(&remote_addr,
- 									&prop);
- 	check_expected_status(status);
-@@ -2970,26 +2977,12 @@ static void test_discovery_stop_done(const void *test_data)
- 	check_expected_status(status);
- }
- 
--static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
--{
--	struct test_data *data = tester_get_data();
--
--	/* Make sure Inquiry Command Complete is not called */
--
--	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
--
--	return false;
--}
--
- static void test_discovery_stop_success(const void *test_data)
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index e427969..22ce7c5 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -792,10 +792,14 @@ static bool inquiry_callback(void *user_data)
+ static void inquiry_destroy(void *user_data)
  {
- 	struct test_data *data = tester_get_data();
+ 	struct inquiry_data *data = user_data;
++	struct btdev *btdev = data->btdev;
++
++	if (!btdev)
++		goto finish;
  
- 	init_test_conditions(data);
+-	if (data->btdev)
+-		data->btdev->inquiry_id = 0;
++	btdev->inquiry_id = 0;
  
--	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
--					pre_inq_compl_hook, data);
--
- 	data->if_bluetooth->start_discovery();
++finish:
+ 	free(data);
  }
  
-@@ -2999,9 +2992,6 @@ static void test_discovery_start_done(const void *test_data)
- 
- 	init_test_conditions(data);
- 
--	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
--					pre_inq_compl_hook, data);
--
- 	data->if_bluetooth->start_discovery();
+@@ -829,6 +833,24 @@ failed:
+ 	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
  }
  
++static void inquiry_cancel(struct btdev *btdev)
++{
++	uint8_t status = BT_HCI_ERR_COMMAND_DISALLOWED;
++
++	if (btdev->inquiry_id <= 0) {
++		cmd_complete(btdev, BT_HCI_CMD_INQUIRY_CANCEL, &status,
++							sizeof(status));
++		return;
++	}
++
++
++	timeout_remove(btdev->inquiry_id);
++	btdev->inquiry_id = 0;
++
++	status = BT_HCI_ERR_SUCCESS;
++	cmd_complete(btdev, BT_HCI_CMD_INQUIRY_CANCEL, &status,
++							sizeof(status));
++}
+ static void conn_complete(struct btdev *btdev,
+ 					const uint8_t *bdaddr, uint8_t status)
+ {
+@@ -1761,8 +1783,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
+ 	case BT_HCI_CMD_INQUIRY_CANCEL:
+ 		if (btdev->type == BTDEV_TYPE_LE)
+ 			goto unsupported;
+-		status = BT_HCI_ERR_SUCCESS;
+-		cmd_complete(btdev, opcode, &status, sizeof(status));
++		inquiry_cancel(btdev);
+ 		break;
+ 
+ 	case BT_HCI_CMD_CREATE_CONN:
 -- 
 1.8.4
 
