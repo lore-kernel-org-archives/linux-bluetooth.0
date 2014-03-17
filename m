@@ -1,159 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CALdY0K7WAnRAoBWLrp2YsmpC35EixpqpByj7bvbL-EqxZkt6=Q@mail.gmail.com>
-References: <CALdY0K5NNrrWdY73e44kp+QNxF2dizEyU44ny9k5h1YFQDf21w@mail.gmail.com>
-	<CAJdJm_Myxh+i50v+0bMJgDCActz4Na_fZdVbNuNjwCE7Bss_kQ@mail.gmail.com>
-	<CALdY0K6u0ZrJM-z7YKd2zmDzPStX2azVO-v4LUa385Ziq4uzOA@mail.gmail.com>
-	<CAJdJm_PE5U4ePHg7rb2Q1dxXKy0=5KH1tyjzif0tcuSQCcf6Fg@mail.gmail.com>
-	<CALdY0K7WAnRAoBWLrp2YsmpC35EixpqpByj7bvbL-EqxZkt6=Q@mail.gmail.com>
-Date: Mon, 17 Mar 2014 16:30:37 +0000
-Message-ID: <CALdY0K68bHDmg+7hpi3d_E5Ti+BJd2nCm+O8-DO1YukErFT+WA@mail.gmail.com>
-Subject: Re: Bluetooth low energy with gatttool and jawbone
-From: Christian Bianchini <christian.bianchini@euservers.net>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Date: Mon, 17 Mar 2014 11:26:14 -0400
+Message-ID: <CAN44aq3oaNextuhg-reSzXWdFq+CuKUc+EeqQN1TaNebhz9WAQ@mail.gmail.com>
+Subject: kernel 3.10.32 and rfcomm kernel oops bug status
+From: Alex Gal <a.gal@motsai.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Tried to connect with bluez:
-$ sudo bluez-simple-agent hci0 DC:7A:F8:10:AF:A5
-Creating device failed: org.bluez.Error.ConnectionAttemptFailed: Page Timeout
+Hello everyone,
 
+I have encountered a kernel panic triggered by a client(phone) rfcomm
+deconnection on my embedded board.
 
-Stupid question, how do I read the firmware version? Sorry to ask
-silly questions but this my first attempt to use this kind of "AT
-commands" via GATT
+Kernel version: 3.10.32
 
-Here is the dump:
+The kernel oops log:
+http://pastebin.com/7kENvaVS
 
-HCI sniffer - Bluetooth packet analyzer ver 2.5
-device: hci0 snap_len: 1500 filter: 0xffffffffffffffff
-< HCI Command: LE Create Connection (0x08|0x000d) plen 25
-    bdaddr DC:7A:F8:10:AF:A5 type 1
-    interval 96 window 48 initiator_filter 0
-    own_bdaddr_type 0 min_interval 40 max_interval 56
-    latency 0 supervision_to 42 min_ce 0 max_ce 0
-> HCI Event: Command Status (0x0f) plen 4
-    LE Create Connection (0x08|0x000d) status 0x00 ncmd 1
-> HCI Event: LE Meta Event (0x3e) plen 19
-    LE Connection Complete
-      status 0x00 handle 70, role master
-      bdaddr DC:7A:F8:10:AF:A5 (Random)
-< ACL data: handle 70 flags 0x00 dlen 11
-    ATT: Read By Group req (0x10)
-      start 0x0001, end 0xffff
-      type-uuid 0x2800
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 70 packets 1
-> ACL data: handle 70 flags 0x02 dlen 18
-    ATT: Read By Group resp (0x11)
-      attr handle 0x0001, end group handle 0x0007
-      value 0x00 0x18
-      attr handle 0x0008, end group handle 0x0008
-      value 0x01 0x18
-< ACL data: handle 70 flags 0x00 dlen 11
-    ATT: Read By Group req (0x10)
-      start 0x0009, end 0xffff
-      type-uuid 0x2800
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 70 packets 1
-> ACL data: handle 70 flags 0x02 dlen 26
-    ATT: Read By Group resp (0x11)
-      attr handle 0x0009, end group handle 0x0012
-      value 0x54 0x36 0x45 0xe1 0xe5 0x1d 0x3c 0xb5 0x90 0x43 0x58
-0x66 0x7e 0xba 0xc9 0xf7
-< ACL data: handle 70 flags 0x00 dlen 11
-    ATT: Read By Group req (0x10)
-      start 0x0013, end 0xffff
-      type-uuid 0x2800
-> HCI Event: Number of Completed Packets (0x13) plen 5
-    handle 70 packets 1
-> ACL data: handle 70 flags 0x02 dlen 12
-    ATT: Read By Group resp (0x11)
-      attr handle 0x0013, end group handle 0xffff
-      value 0x0a 0x18
-> HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 70 reason 0x08
-    Reason: Connection Timeout
+The revelant message:
+[<c0008f58>] (__dabt_svc+0x38/0x60) from [<c00977b0>]
+(__kmalloc_track_caller+0x6c/0x13c)
+[<c00977b0>] (__kmalloc_track_caller+0x6c/0x13c) from [<c03b6e18>]
+(__kmalloc_reserve.isra.21+0x24/0x70)
+[<c03b6e18>] (__kmalloc_reserve.isra.21+0x24/0x70) from [<c03b6ec4>]
+(__alloc_skb+0x60/0x144)
+[<c03b6ec4>] (__alloc_skb+0x60/0x144) from [<c04bd7a8>] (mgmt_event+0x2c/0xcc)
+[<c04bd7a8>] (mgmt_event+0x2c/0xcc) from [<c04c42e8>]
+(mgmt_discovering+0x5c/0xec)
+[<c04c42e8>] (mgmt_discovering+0x5c/0xec) from [<c04b13f8>]
+(hci_discovery_set_state+0x4c/0x50)
+[<c04b13f8>] (hci_discovery_set_state+0x4c/0x50) from [<c04bac28>]
+(hci_cmd_complete_evt+0x1748/0x17f0)
+[<c04bac28>] (hci_cmd_complete_evt+0x1748/0x17f0) from [<c04bbe74>]
+(hci_event_packet+0x10ac/0x2864)
+[<c04bbe74>] (hci_event_packet+0x10ac/0x2864) from [<c04b0b58>]
+(hci_rx_work+0x200/0x25c)
+[<c04b0b58>] (hci_rx_work+0x200/0x25c) from [<c002c804>]
+(process_one_work+0x124/0x384)
 
-On Fri, Mar 14, 2014 at 5:18 PM, Christian Bianchini
-<christian.bianchini@euservers.net> wrote:
-> I would like to get the motion data, basically this device has an
-> accelerometer inside and maybe a gyro, so I just want to receive these
-> information on my pc :)
-> I will do some more testing later, probably if I dont answer for a
-> while... I will be back on Monday.
->
-> In the meantime thanks for your helpful answers!
->
-> On Fri, Mar 14, 2014 at 5:07 PM, Anderson Lizardo
-> <anderson.lizardo@openbossa.org> wrote:
->> Hi Christian,
->>
->> On Fri, Mar 14, 2014 at 12:19 PM, Christian Bianchini
->> <christian.bianchini@euservers.net> wrote:
->>> You were right!
->>> Something happened, but I am not sure how to continue now, even
->>> because after primary I get some data then the device disconnect
->>> itself.
->>>
->>> $ sudo gatttool -b DC:7A:F8:10:AF:A5 -t random -I
->>> [   ][DC:7A:F8:10:AF:A5][LE]> connect
->>> [CON][DC:7A:F8:10:AF:A5][LE]> primary
->>> [CON][DC:7A:F8:10:AF:A5][LE]>
->>> attr handle: 0x0001, end grp handle: 0x0007 uuid:
->>> 00001800-0000-1000-8000-00805f9b34fb
->>> attr handle: 0x0008, end grp handle: 0x0008 uuid:
->>> 00001801-0000-1000-8000-00805f9b34fb
->>> attr handle: 0x0009, end grp handle: 0x0012 uuid:
->>> f7c9ba7e-6658-4390-b53c-1de5e1453654
->>> attr handle: 0x0013, end grp handle: 0xffff uuid:
->>> 0000180a-0000-1000-8000-00805f9b34fb
->>>
->>> I dont have bluetoothctl, there is special package for ubuntu?
->>
->> To have btmon/bluetoothctl, I think you need a recent BlueZ 5.x, which
->> is not available on Ubuntu (I think even latest Ubuntu uses 4.101, not
->> sure about the development version). So you need to build BlueZ from
->> sources.
->>
->> If you see a disconnect after ~30 seconds, it may be because it is
->> issuing a GATT request which gatttool does not answer (as gatttool
->> does not implement a GATT server). To confirm this, use "hcidump -i
->> hci0 -w jawbone.dump" and send it here. This log will show whether the
->> device is attempting some ATT request (e.g. GATT service discovery).
->> You can also read this log using "hcidump -r jawbone.dump".
->>
->> Another reason for disconnect is a failed pairing attempt.
->>
->> If you can't use BlueZ 5 for some reason, you can try pairing using
->> "sudo bluez-simple-agent hci0 <addr>".
->>
->> All that said, which data specifically do you want to get from the
->> device? On the output above I see a proprietary service at handle
->> 0x0009 and the Device Information service at handle 0x0013 (which is
->> most likely firmware version, serial number etc.). Do you have
->> specifications for the proprietary service?
->>
->> Best Regards,
->> --
->> Anderson Lizardo
->> http://www.indt.org/?lang=en
->> INdT - Manaus - Brazil
->
->
->
-> --
-> ---------------------------
-> Web/Mobile Developer
-> Luiis Group
-> christian@bianchini.ch
+I looked at posts on this mailing list and it seems there were some
+patches from Gianluca to fix this issue:
 
+[PATCH v5 0/6] rfcomm: Implement rfcomm as a proper tty_port
+to
+[PATCH v5 6/6] rfcomm: Purge the dlc->tx_queue to avoid circular dependency
 
+and
 
--- 
----------------------------
-Web/Mobile Developer
-Luiis Group
-christian@bianchini.ch
+[PATCH v3 1/4] rfcomm: release the port when the last user closes the tty
+to
+[PATCH v3 4/4] rfcomm: remove rfcomm_carrier_raised()
+
+Would these patches be sufficient for my 3.10 kernel branch ?
+
+Thank you,
+
+Alex
