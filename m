@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/17] unit/test-avrcp: Fix test /TP/MPS/BV-02-C
-Date: Mon, 17 Mar 2014 15:07:49 +0200
-Message-Id: <1395061683-17206-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 02/17] android/avrcp-lib: Add avrcp_set_addressed_player_rsp function
+Date: Mon, 17 Mar 2014 15:07:48 +0200
+Message-Id: <1395061683-17206-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1395061683-17206-1-git-send-email-luiz.dentz@gmail.com>
 References: <1395061683-17206-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The correct status should 0x04 not 0x00.
+This function can be used to generate SetAddressedPlayer response PDUs.
 ---
- unit/test-avrcp.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ android/avrcp-lib.c | 8 ++++++++
+ android/avrcp-lib.h | 2 ++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 9fdbe6d..ed0c3fc 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -435,7 +435,10 @@ static int set_addressed(struct avrcp *session, uint8_t transaction,
- {
- 	DBG("");
- 
--	return 1;
-+	avrcp_set_addressed_player_rsp(session, transaction,
-+							AVRCP_STATUS_SUCCESS);
-+
-+	return -EAGAIN;
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index 60d494f..dc0d516 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -839,6 +839,14 @@ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+ 				params, params_len);
  }
  
- static const struct avrcp_control_ind control_ind = {
-@@ -547,7 +550,7 @@ int main(int argc, char *argv[])
- 			raw_pdu(0x02, 0x11, 0x0e, AVC_CTYPE_STABLE,
- 				0x48, 0x00, 0x00, 0x19, 0x58,
- 				AVRCP_SET_ADDRESSED_PLAYER,
--				0x00, 0x00, 0x01, 0x00));
-+				0x00, 0x00, 0x01, 0x04));
- 
- 	/* Connection Establishment for Control tests */
- 
++int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
++							uint8_t status)
++{
++	return avrcp_send(session, transaction, AVC_CTYPE_STABLE,
++				AVC_SUBUNIT_PANEL, AVRCP_SET_ADDRESSED_PLAYER,
++				&status, sizeof(status));
++}
++
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
+ {
+ 	uint8_t params[5];
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 54bdf4f..2117838 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -238,4 +238,6 @@ int avrcp_get_element_attrs_rsp(struct avrcp *session, uint8_t transaction,
+ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+ 					uint8_t code, uint8_t *params,
+ 					size_t params_len);
++int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
++							uint8_t status);
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
 -- 
 1.8.5.3
 
