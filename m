@@ -1,205 +1,298 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Date: Mon, 17 Mar 2014 11:43:31 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Petri Gynther <pgynther@google.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v0 5/5] android/gatt: Find primary services
-Date: Mon, 17 Mar 2014 10:53:48 +0100
-Message-ID: <1962753.IqrKLseh09@leonov>
-In-Reply-To: <1395014473-7600-6-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com> <1395014473-7600-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH] uHIDP: HIDP in userspace
+Message-ID: <20140317094331.GA19520@localhost.P-661HNU-F1>
+References: <20140313030007.557A6100A6E@puck.mtv.corp.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140313030007.557A6100A6E@puck.mtv.corp.google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Petri,
 
-On Monday 17 of March 2014 01:01:13 Lukasz Rymanowski wrote:
-> With this patch it is possible to search all primary services.
+On Wed, Mar 12, 2014, Petri Gynther wrote:
+> Enable HID protocol handling in userspace when uHIDP=true in input.conf.
 > ---
->  android/gatt.c | 100
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
-> 99 insertions(+), 1 deletion(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 1081121..4f55d15 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -36,6 +36,7 @@
->  #include "ipc-common.h"
->  #include "lib/sdp.h"
->  #include "lib/uuid.h"
+>  Makefile.plugins           |   3 +-
+>  profiles/input/device.c    | 804 +++++++++++++++++++++++++++++++++++++++++----
+>  profiles/input/device.h    |   1 +
+>  profiles/input/hidp_defs.h |  77 +++++
+>  profiles/input/input.conf  |   4 +
+>  profiles/input/manager.c   |  22 +-
+>  6 files changed, 837 insertions(+), 74 deletions(-)
+>  create mode 100644 profiles/input/hidp_defs.h
+
+For such a large patch you'll really need a more thorough explanation of
+the background. Also, if possible consider if there's any way the patch
+could be split into smaller pieces.
+
+Particularly, I'm curious why this feature is desirable over HIDP in the
+kernel. Aren't you essentially introducing something that would cause
+user space (bluetoothd) to be scheduled for every single packet, unlike
+the kernel solution which lets user space stay idle most of the time?
+
+> @@ -81,16 +85,30 @@ struct input_device {
+>  	enum reconnect_mode_t	reconnect_mode;
+>  	guint			reconnect_timer;
+>  	uint32_t		reconnect_attempt;
+> +	gboolean		uhidp_enabled;
+> +	int			uhid_fd;
+> +	guint			uhid_watch;
+> +	gboolean		uhid_created;
+> +	unsigned char		report_req_pending;
+
+To be consistent with the code base, please use uint8_t for unsigned
+8-bit integers.
+
+In our efforts to eventually get rid of the GLib dependency, it'd be
+nice if you could try to use bool instead of gboolean whenever you're
+not directly interfacing with a GLib API (which expects gboolean).
+
+> +static gboolean hidp_send_message(GIOChannel *chan, const unsigned char hdr,
+
+The extra const declaration for hdr seems unnecessary here (it's also
+not consistent with the rest of the code base. Also, use uint8_t please.
+
+> +	msg[0] = hdr;
+> +	if (size > 0)
+> +		memcpy(&msg[1], data, size);
 > +
+> +	msgptr = msg;
+> +	++size;
+> +
+> +	fd = g_io_channel_unix_get_fd(chan);
+> +
+> +	while (size > 0) {
+> +		len = write(fd, msgptr, size);
+> +
+> +		if (len < 0) {
+> +			error("BT socket write failed: %s (%d)",
+> +							strerror(errno), errno);
+> +			return FALSE;
+> +		}
+> +
+> +		if (len == 0) {
+> +			error("BT socket write failed: wrote 0 bytes");
+> +			return FALSE;
+> +		}
+> +
+> +		msgptr += len;
+> +		size -= len;
+> +	}
 
-Not related change.
+Since this is a SEQPACKET L2CAP socket I don't think you can get this
+kind of partial writes, and hence the loop is unnecessary. Also, did
+you considered using a scatter/gather vector to avoid this extra buffer
+and memcpy in user space, i.e. use sendmsg() and keep hdr and data
+separate?
 
->  #include "bluetooth.h"
->  #include "gatt.h"
->  #include "src/log.h"
-> @@ -64,6 +65,7 @@ struct gatt_device {
-> 
->  	GAttrib *attrib;
->  	GIOChannel *att_io;
-> +	struct queue *services;
-> 
->  	guint watch_id;
->  };
-> @@ -127,6 +129,7 @@ static void destroy_device(void *data)
->  	struct gatt_device *dev = data;
-> 
->  	queue_destroy(dev->clients, NULL);
-> +	queue_destroy(dev->services, free);
->  	free(dev);
->  }
-> 
-> @@ -205,6 +208,71 @@ failed:
->  					HAL_OP_GATT_CLIENT_UNREGISTER, status);
->  }
-> 
-> +static void primary_cb(uint8_t status, GSList *services, void *user_data)
+> +static inline gboolean hidp_send_ctrl_message(struct input_device *idev,
+> +	const unsigned char hdr, const unsigned char *data, unsigned int size)
 > +{
-> +	GSList *l;
-> +	struct gatt_device *dev = user_data;
-> +	struct hal_ev_gatt_client_search_complete ev;
-> +
-> +	DBG("Status %d", status);
-> +
-> +	if (status) {
-> +		error("Discover all primary services failed: %s\n",
-
-No need to add '\n' at the end of error message.
-
-> +							att_ecode2str(status));
-> +		ev.status = HAL_STATUS_FAILED;
-> +		goto reply;
-
-minor: I'd call this label  "done" or "send_notif" as this is not a reply.
-
-> +	}
-> +
-> +	if (!services) {
-> +		info("gatt: no primary serivces found");
-
-typo: serivces -> services
-
-> +		ev.status = HAL_STATUS_SUCCESS;
-> +		goto reply;
-> +	}
-> +
-> +	for (l = services; l; l = l->next) {
-> +		uint8_t buf[IPC_MTU];
-> +		struct hal_ev_gatt_client_search_result *ev_res = (void *)buf;
-> +		struct gatt_primary *prim = l->data;
-> +		struct gatt_primary *p = new0(struct gatt_primary, 1);
-
-You should check for null from new0.
-
-> +		bt_uuid_t uuid;
-> +
-> +		memset(buf, 0, sizeof(buf));
-> +
-> +		/* Put primary service to our local list */
-> +		memcpy(p, prim, sizeof(*p));
-> +		if (!queue_push_tail(dev->services, p)) {
-> +			error("gatt: Cannot push primary service to the list");
-> +			free(p);
-> +		}
-
-continue here?
-
-> +
-> +		DBG("attr handle = 0x%04x, end grp handle = 0x%04x "
-> +			"uuid: %s\n", prim->range.start, prim->range.end,
-> +								prim->uuid);
-
-No '\n' is needed.  Also don't break format string.
-
-> +		/* Set event data */
-> +		ev_res->conn_id  = dev->conn_id;
-> +		ev_res->srvc_id.is_primary = 1;
-> +		ev_res->srvc_id.inst_id = 0;
-> +
-> +		if (bt_string_to_uuid(&uuid, prim->uuid) < 0) {
-> +			error("Can not convert string to uuid");
-> +			continue;
-> +		}
-> +		memcpy(&ev_res->srvc_id.uuid, &uuid.value, sizeof(uuid.value));
-> +
-> +		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
-> +					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
-> +						sizeof(*ev_res), ev_res);
-
-Indentation is broken here.
-
-> +	}
-> +
-> +	ev.status = HAL_STATUS_SUCCESS;
-> +
-> +reply:
-> +	ev.conn_id = dev->conn_id;
-> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-> +					HAL_EV_GATT_CLIENT_SEARCH_COMPLETE,
-> +							sizeof(ev), &ev);
-
-Indentation is broken here.
-
+> +	return hidp_send_message(idev->ctrl_io, hdr, data, size);
 > +}
 > +
->  static void connection_cleanup(struct gatt_device *device)
->  {
->  	if (device->watch_id) {
-> @@ -635,6 +703,14 @@ static void handle_client_connect(const void *buf,
-> uint16_t len) goto reply;
->  	}
-> 
-> +	dev->services = queue_new();
-> +	if (!dev->services) {
-> +		error("gatt: Cannot create services queue");
-> +		queue_destroy(dev->clients, NULL);
-> +		status = HAL_STATUS_FAILED;
-> +		goto reply;
-> +	}
-> +
->  	/* Update client list of device */
->  	if (!queue_push_tail(dev->clients, INT_TO_PTR(cmd->client_if))) {
->  		error("gatt: Cannot push client on the client queue!?");
-> @@ -755,10 +831,32 @@ static void handle_client_refresh(const void *buf,
-> uint16_t len)
-> 
->  static void handle_client_search_service(const void *buf, uint16_t len)
->  {
-> +	const struct hal_cmd_gatt_client_search_service *cmd = buf;
-> +	struct gatt_device *dev;
-> +	uint8_t status;
-> +
->  	DBG("");
-> 
-> +	dev = queue_find(conn_list, match_dev_by_conn_id,
-> +						INT_TO_PTR(cmd->conn_id));
-> +	if (!dev) {
-> +		error("gatt: dev with conn_id=%d not found", cmd->conn_id);
-> +		status = HAL_STATUS_FAILED;
-> +		goto reply;
-> +	}
-> +
-> +	/*TODO:  Handle filter uuid */
-> +
-> +	if (!gatt_discover_primary(dev->attrib, NULL, primary_cb, dev)) {
-> +		status = HAL_STATUS_FAILED;
-> +		goto reply;
-> +	}
-> +
-> +	status = HAL_STATUS_SUCCESS;
-> +
-> +reply:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-> -			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, HAL_STATUS_FAILED);
-> +			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
->  }
-> 
->  static void handle_client_get_included_service(const void *buf, uint16_t
-> len)
+> +static inline gboolean hidp_send_intr_message(struct input_device *idev,
+> +	const unsigned char hdr, const unsigned char *data, unsigned int size)
+> +{
+> +	return hidp_send_message(idev->intr_io, hdr, data, size);
+> +}
 
--- 
-BR
-Szymon Janc
+Again, no need for const with the non-pointer variables, and please use
+uint8_t. I'd also consider renaming this to hidp_ctrl_send/hidp_intr_send
+to make it easier to follow the coding style (you should indent the
+split lines past the '(' of the first line. Also drop the inline
+declaration as the compiler will optimize this anyway. I'd also consider
+using size_t as a more appropriate type for the size, or alternatively
+something that maps better to the limitations of the protocol such as
+uint8_t or uint16_t.
+
+> +static gboolean uhid_send_feature_answer(struct input_device *idev,
+> +				const unsigned char *data, unsigned int size,
+> +				const unsigned int id, const unsigned int err)
+
+Same thing here with const and uint8_t.
+
+> +	len = write(idev->uhid_fd, &ev, sizeof(ev));
+> +
+> +	if (len < 0) {
+
+You can remove the empty line above to be consistent with the coding
+style.
+
+> +static gboolean uhid_send_input_report(struct input_device *idev,
+> +				const unsigned char *data, unsigned int size)
+
+Same thing with the size variable type as mentioned earlier.
+
+> +	len = write(idev->uhid_fd, &ev, sizeof(ev));
+> +
+> +	if (len < 0) {
+
+You can remove the empty line above.
+
+> +static gboolean hidp_recv_intr_data(GIOChannel *chan,
+> +						struct input_device *idev)
+> +{
+> +	int fd;
+> +	ssize_t len;
+> +	unsigned char hdr;
+
+uint8_t hdr;
+
+> +	unsigned char data[UHID_DATA_MAX + 1];
+
+uint8_t data[...];
+
+> +
+> +	fd = g_io_channel_unix_get_fd(chan);
+> +	len = read(fd, data, sizeof(data));
+> +
+> +	if (len < 0) {
+
+Remove the empty line.
+
+>  static gboolean intr_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+>  {
+>  	struct input_device *idev = data;
+>  	char address[18];
+>  
+> +	if ((cond & G_IO_IN) && hidp_recv_intr_data(chan, idev) &&
+> +							(cond == G_IO_IN)) {
+> +		return TRUE;
+> +	}
+
+This is cramming a bit too many things into the same if-statement.
+Please split it up, e.g. something like:
+
+if ((cond & G_IO_IN) && !hidp_recv_intr_data(chan, idev))
+	goto failed;
+
+/* No exceptions just incoming data  */
+if (cond == G_IO_IN)
+	return TRUE;
+
+> +static void hidp_recv_ctrl_handshake(struct input_device *idev,
+> +							unsigned char param)
+
+uint8_t param
+
+> +	unsigned char pending_req_type;
+
+uint8_t
+
+> +static void hidp_recv_ctrl_hid_control(struct input_device *idev,
+> +							unsigned char param)
+> +{
+
+uint8_t param
+
+> +	DBG("");
+> +
+> +	if (param == HIDP_CTRL_VIRTUAL_CABLE_UNPLUG)
+> +		connection_disconnect(idev, 0);
+> +}
+> +
+> +static void hidp_recv_ctrl_data(struct input_device *idev, unsigned char param,
+> +					unsigned char *data, unsigned int len)
+
+Considering how much you made use of const in the previous functions I'm
+surprised you're not using it here. I suppose data should at least have
+it? Also, again, please use size_t or something else more appropriate
+than unsigned int for the len variable.
+
+> +{
+> +	unsigned char pending_req_type;
+> +	unsigned char pending_req_param;
+
+uint8_t
+
+> +	pending_req_type = idev->report_req_pending & HIDP_HEADER_TRANS_MASK;
+> +	pending_req_param = idev->report_req_pending & HIDP_HEADER_PARAM_MASK;
+> +
+> +	if (pending_req_type != HIDP_TRANS_GET_REPORT) {
+> +		DBG("Spurious DATA on control channel");
+> +		return;
+> +	}
+> +
+> +	if (pending_req_param != param) {
+> +		DBG("Received DATA RTYPE doesn't match pending request RTYPE");
+> +		return;
+> +	}
+
+This might look cleaner (and more consistent with coding style) if you
+do the assignments right before checking the resulting value:
+
+pending_req_type = ...
+if (panding_req_type != ...) {
+	...
+}
+
+pending_req_param = ...
+if (pending_req_param != ...) {
+	...
+}
+
+> +static gboolean hidp_recv_ctrl_message(GIOChannel *chan,
+> +						struct input_device *idev)
+> +{
+> +	int fd;
+> +	ssize_t len;
+> +	unsigned char hdr, type, param;
+> +	unsigned char data[UHID_DATA_MAX + 1];
+
+uint8_t
+
+> +
+> +	fd = g_io_channel_unix_get_fd(chan);
+> +	len = read(fd, data, sizeof(data));
+> +
+> +	if (len < 0) {
+
+You can remove the empty line above.
+
+>  static gboolean ctrl_watch_cb(GIOChannel *chan, GIOCondition cond, gpointer data)
+>  {
+>  	struct input_device *idev = data;
+>  	char address[18];
+>  
+> +	if ((cond & G_IO_IN) && hidp_recv_ctrl_message(chan, idev) &&
+> +							(cond == G_IO_IN)) {
+> +		return TRUE;
+> +	}
+
+Same thing as earlier, please split this up a bit.
+
+
+> +static gboolean hidp_report_req_timeout(gpointer data)
+> +{
+> +	struct input_device *idev = data;
+> +	unsigned char pending_req_type;
+> +	char *req_type_str;
+
+Should be const char * considering what you're later assigning to it.
+
+> +static void hidp_send_set_report(struct input_device *idev,
+> +							struct uhid_event *ev)
+> +{
+> +	unsigned char hdr;
+
+uint8_t
+
+> +	gboolean sent;
+
+bool
+
+> +static void hidp_send_get_report(struct input_device *idev,
+> +							struct uhid_event *ev)
+> +{
+> +	unsigned char hdr;
+> +	gboolean sent;
+
+Same here.
+
+Johan
