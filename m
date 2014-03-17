@@ -1,55 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 0/5] android:Add initial support for GATT Client
-Date: Mon, 17 Mar 2014 10:42:58 +0100
-Message-ID: <4968002.FIQ5bz6tYU@leonov>
-In-Reply-To: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 06/10] tools/mgmt-tester: Fix for Stop discovery test
+Date: Mon, 17 Mar 2014 10:37:39 +0100
+Message-ID: <1395049064-9751-7-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1395049064-9751-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1395049064-9751-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Test "Stop Discovery - BR/EDR (Inquiry) Success 1" uses hciemu_type
+BREDR but uses power settings to enable LE and tries to set LE:
 
-On Monday 17 of March 2014 01:01:08 Lukasz Rymanowski wrote:
-> This patch set add GATT clien scan, connect/disconnect
-> functionality.
-> 
-> Some changes in handling discovery has been done as
-> there are two clients of discovery: HAL and GATT
-> 
-> For now daemon makes sure that device is available before
-> connecting it. It is because in case device is not available
-> we would block connect to other devices.
-> 
-> Once white list will be available we can simplify that code.
-> 
-> ===
-> v2: Fixes in discovery handling
-> v3: Fixes Szymon comments + adding patch for search primary services
-> 
-> Jakub Tyszkowski (2):
->   android/bluetooth: Add GATT notifications on LE discovery
->   android/gatt: Use Core profile for LE scan
-> 
-> Lukasz Rymanowski (3):
->   android/gatt: Add GATT Connect
->   android/gatt: Add disconnect GATT device
->   android/gatt: Find primary services
-> 
->  android/Android.mk  |   4 +
->  android/Makefile.am |   3 +
->  android/bluetooth.c | 107 +++++++-
->  android/bluetooth.h |   7 +
->  android/gatt.c      | 717
-> +++++++++++++++++++++++++++++++++++++++++++++++++++- 5 files changed, 821
-> insertions(+), 17 deletions(-)
+  mgmt: [0x0002] command 0x000d
+  mgmt: < 0d 00 02 00 01 00 01                             .......
+  mgmt: > 02 00 02 00 03 00 0d 00 0c                       .........
+  mgmt: [0x0002] command 0x0d status: 0x0c
 
-Patches 1-4 are now pushed, thanks.
+This patch fixes this minor issue
+---
+ tools/mgmt-tester.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index a3c1c72..9f71743 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -1733,7 +1733,7 @@ static const struct generic_data stop_discovery_success_test_1 = {
+ };
+ 
+ static const struct generic_data stop_discovery_bredr_success_test_1 = {
+-	.setup_settings = settings_powered_le,
++	.setup_settings = settings_powered,
+ 	.setup_expect_hci_command = BT_HCI_CMD_INQUIRY,
+ 	.setup_expect_hci_param = stop_discovery_inq_param,
+ 	.setup_expect_hci_len = sizeof(stop_discovery_inq_param),
 -- 
-BR
-Szymon Janc
+1.8.4
+
