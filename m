@@ -1,285 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH v3 1/5] android/bluetooth: Add GATT notifications on LE discovery
-Date: Mon, 17 Mar 2014 01:01:09 +0100
-Message-ID: <1395014473-7600-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 0/5] android:Add initial support for GATT Client
+Date: Mon, 17 Mar 2014 01:01:08 +0100
+Message-ID: <1395014473-7600-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+This patch set add GATT clien scan, connect/disconnect
+functionality.
 
-This patch introduce API which GATT can use to start/stop discovery
-and register for required events.
+Some changes in handling discovery has been done as
+there are two clients of discovery: HAL and GATT
 
-This is because GATT needs to get from GAP notifications about
-founded devices and also notification when discovery has been stopped.
+For now daemon makes sure that device is available before
+connecting it. It is because in case device is not available
+we would block connect to other devices.
 
-GATT will need it explicity when GATT client calls scan, and also in
-case of connect device, as before le connect is sent we do scan first
-to make sure that device is available.
+Once white list will be available we can simplify that code.
 
-For now on adapter have two variables tracing discovery.
-1. cur_discovery_type which show type of ongoing discovery type.
-2. exp_discovery_type which shows type of next discovery session.
+===
+v2: Fixes in discovery handling
+v3: Fixes Szymon comments + adding patch for search primary services
 
-We need this because of scenarion when GATT is interesting in scan and
-in the same time HAL wants to do scanning.
----
- android/bluetooth.c | 107 ++++++++++++++++++++++++++++++++++++++++++++++------
- android/bluetooth.h |   7 ++++
- 2 files changed, 103 insertions(+), 11 deletions(-)
+Jakub Tyszkowski (2):
+  android/bluetooth: Add GATT notifications on LE discovery
+  android/gatt: Use Core profile for LE scan
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 3e2e547..a537507 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -80,10 +80,13 @@
- #define BASELEN_REMOTE_DEV_PROP (sizeof(struct hal_ev_remote_device_props) \
- 					+ sizeof(struct hal_property))
- 
-+#define SCAN_TYPE_NONE 0
- #define SCAN_TYPE_BREDR (1 << BDADDR_BREDR)
- #define SCAN_TYPE_LE ((1 << BDADDR_LE_PUBLIC) | (1 << BDADDR_LE_RANDOM))
- #define SCAN_TYPE_DUAL (SCAN_TYPE_BREDR | SCAN_TYPE_LE)
- 
-+#define BDADDR_LE (BDADDR_LE_RANDOM | BDADDR_LE_PUBLIC)
-+
- struct device {
- 	bdaddr_t bdaddr;
- 	uint8_t bdaddr_type;
-@@ -122,7 +125,8 @@ static struct {
- 
- 	uint32_t current_settings;
- 
--	bool discovering;
-+	uint8_t cur_discovery_type;
-+	uint8_t exp_discovery_type;
- 	uint32_t discoverable_timeout;
- 
- 	GSList *uuids;
-@@ -131,7 +135,8 @@ static struct {
- 	.dev_class = 0,
- 	.name = NULL,
- 	.current_settings = 0,
--	.discovering = false,
-+	.cur_discovery_type = 0,
-+	.exp_discovery_type = 0,
- 	.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT,
- 	.uuids = NULL,
- };
-@@ -149,6 +154,9 @@ static struct mgmt *mgmt_if = NULL;
- static GSList *bonded_devices = NULL;
- static GSList *cached_devices = NULL;
- 
-+static bt_le_device_found gatt_device_found_cb = NULL;
-+static bt_le_discovery_stopped gatt_discovery_stopped_cb = NULL;
-+
- /* This list contains addresses which are asked for records */
- static GSList *browse_reqs;
- 
-@@ -509,7 +517,6 @@ static void settings_changed(uint32_t settings)
- 	if (changed_mask & MGMT_SETTING_POWERED)
- 		powered_changed();
- 
--
- 	scan_mode_mask = MGMT_SETTING_CONNECTABLE |
- 					MGMT_SETTING_DISCOVERABLE;
- 
-@@ -1036,6 +1043,7 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- {
- 	const struct mgmt_ev_discovering *ev = param;
- 	struct hal_ev_discovery_state_changed cp;
-+	bool is_discovering = adapter.cur_discovery_type;
- 
- 	if (length < sizeof(*ev)) {
- 		error("Too small discovering event");
-@@ -1045,14 +1053,14 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 	DBG("hci%u type %u discovering %u", index, ev->type,
- 							ev->discovering);
- 
--	if (adapter.discovering == !!ev->discovering)
-+	if (is_discovering == !!ev->discovering)
- 		return;
- 
--	adapter.discovering = !!ev->discovering;
-+	adapter.cur_discovery_type = ev->discovering ? ev->type : 0;
- 
- 	DBG("new discovering state %u", ev->discovering);
- 
--	if (adapter.discovering) {
-+	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
- 		cp.state = HAL_DISCOVERY_STATE_STARTED;
- 	} else {
- 		g_slist_foreach(bonded_devices, clear_device_found, NULL);
-@@ -1062,6 +1070,27 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
- 			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
-+
-+	if (gatt_discovery_stopped_cb &&
-+			(adapter.cur_discovery_type == SCAN_TYPE_NONE)) {
-+		/* One shot notification about discovery stopped send to gatt*/
-+		gatt_discovery_stopped_cb();
-+		gatt_discovery_stopped_cb = NULL;
-+	}
-+
-+	/* If discovery is ON or there is no expected next discovery session
-+	 * then just return
-+	 */
-+	if ((adapter.cur_discovery_type != SCAN_TYPE_NONE) ||
-+		(adapter.exp_discovery_type == SCAN_TYPE_NONE))
-+		return;
-+
-+	start_discovery(adapter.exp_discovery_type);
-+
-+	/* Maintain expected discovery type if there is gatt client
-+	 * registered
-+	 */
-+	adapter.exp_discovery_type = gatt_device_found_cb ? SCAN_TYPE_LE : 0;
- }
- 
- static void confirm_device_name_cb(uint8_t status, uint16_t length,
-@@ -1143,7 +1172,7 @@ static void update_new_device(struct device *dev, int8_t rssi,
- 
- 	memset(buf, 0, sizeof(buf));
- 
--	if (adapter.discovering)
-+	if (adapter.cur_discovery_type)
- 		dev->found = true;
- 
- 	size = sizeof(*ev);
-@@ -1251,6 +1280,11 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 		update_device(dev, rssi, &eir);
- 	}
- 
-+	/* Notify Gatt if its registered for LE events */
-+	if (gatt_device_found_cb && (dev->bdaddr_type & BDADDR_LE))
-+		gatt_device_found_cb(&dev->bdaddr, dev->bdaddr_type,
-+						dev->rssi, sizeof(eir), &eir);
-+
- 	eir_data_free(&eir);
- 
- 	if (dev->bond_state != HAL_BOND_STATE_BONDED)
-@@ -2511,6 +2545,38 @@ static bool stop_discovery(uint8_t type)
- 	return false;
- }
- 
-+bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
-+{
-+	if (!adapter.cur_discovery_type) {
-+		if (cb)
-+			cb();
-+		return true;
-+	}
-+
-+	gatt_discovery_stopped_cb = cb;
-+	/* Remove device found callback */
-+	gatt_device_found_cb = NULL;
-+	adapter.exp_discovery_type &= ~SCAN_TYPE_LE;
-+
-+	return stop_discovery(adapter.cur_discovery_type);
-+}
-+
-+bool bt_le_discovery_start(bt_le_device_found cb)
-+{
-+	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
-+		return false;
-+
-+	gatt_device_found_cb = cb;
-+
-+	adapter.exp_discovery_type |= SCAN_TYPE_LE;
-+
-+	/* If core is discovering, don't bother */
-+	if (adapter.cur_discovery_type)
-+		return true;
-+
-+	return start_discovery(adapter.exp_discovery_type);
-+}
-+
- static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
- {
- 	const uint8_t *mode = buf;
-@@ -3180,7 +3246,8 @@ static void handle_start_discovery_cmd(const void *buf, uint16_t len)
- {
- 	uint8_t status;
- 
--	if (adapter.discovering) {
-+	/* Check if there is discovery with BREDR type */
-+	if (adapter.cur_discovery_type & SCAN_TYPE_BREDR) {
- 		status = HAL_STATUS_SUCCESS;
- 		goto reply;
- 	}
-@@ -3190,12 +3257,27 @@ static void handle_start_discovery_cmd(const void *buf, uint16_t len)
- 		goto reply;
- 	}
- 
--	if (!start_discovery(SCAN_TYPE_DUAL)) {
-+	adapter.exp_discovery_type |= SCAN_TYPE_DUAL;
-+
-+	/* If there is no discovery ongoing, try to start discovery */
-+	if (!adapter.cur_discovery_type) {
-+		if (!start_discovery(adapter.exp_discovery_type))
-+			status = HAL_STATUS_FAILED;
-+		else
-+			status = HAL_STATUS_SUCCESS;
-+
-+		goto reply;
-+	}
-+
-+	/* Stop discovery here. Once it is stop we will restart it
-+	 * with exp_discovery_settings */
-+	if (!stop_discovery(adapter.cur_discovery_type)) {
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
- 	}
- 
- 	status = HAL_STATUS_SUCCESS;
-+
- reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_START_DISCOVERY,
- 									status);
-@@ -3205,7 +3287,7 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
- {
- 	uint8_t status;
- 
--	if (!adapter.discovering) {
-+	if (!adapter.cur_discovery_type) {
- 		status = HAL_STATUS_SUCCESS;
- 		goto reply;
- 	}
-@@ -3215,7 +3297,10 @@ static void handle_cancel_discovery_cmd(const void *buf, uint16_t len)
- 		goto reply;
- 	}
- 
--	if (!stop_discovery(SCAN_TYPE_DUAL)) {
-+	/* Take into account that gatt might want to keep discover */
-+	adapter.exp_discovery_type = gatt_device_found_cb ? SCAN_TYPE_LE : 0;
-+
-+	if (!stop_discovery(adapter.cur_discovery_type)) {
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
- 	}
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index f436178..a03305d 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -34,3 +34,10 @@ void bt_bluetooth_unregister(void);
- 
- int bt_adapter_add_record(sdp_record_t *rec, uint8_t svc_hint);
- void bt_adapter_remove_record(uint32_t handle);
-+
-+typedef void (*bt_le_device_found)(bdaddr_t *addr, uint8_t addr_type, int rssi,
-+					uint16_t eir_len, const void *eir);
-+bool bt_le_discovery_start(bt_le_device_found cb);
-+
-+typedef void (*bt_le_discovery_stopped)(void);
-+bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
+Lukasz Rymanowski (3):
+  android/gatt: Add GATT Connect
+  android/gatt: Add disconnect GATT device
+  android/gatt: Find primary services
+
+ android/Android.mk  |   4 +
+ android/Makefile.am |   3 +
+ android/bluetooth.c | 107 +++++++-
+ android/bluetooth.h |   7 +
+ android/gatt.c      | 717 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 5 files changed, 821 insertions(+), 17 deletions(-)
+
 -- 
 1.8.4
 
