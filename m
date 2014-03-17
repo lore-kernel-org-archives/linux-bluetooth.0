@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 09/10] tools/mgmt-tester: Refactor setup_start_discovery function
-Date: Mon, 17 Mar 2014 10:37:42 +0100
-Message-ID: <1395049064-9751-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 05/10] android/tester: Fix handling inquiry by android tester
+Date: Mon, 17 Mar 2014 10:37:38 +0100
+Message-ID: <1395049064-9751-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395049064-9751-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395049064-9751-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,120 +13,105 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes handling hook register from this
-function and its callback as this is no longer necessary for any stop
-discovery tests.
+Previously btdev sent inquiry_complete in one mainloop iteration. Due to
+new way of handling it we need to make sure cancel_discovery is called
+if start_discovery has been used.
+There is also no need to hook before inquiry_complete_event in case of
+test for cancel_discovery.
 
-This patch also adds setup_send_param and setup_send_len  parameters to
-test data so it is easy to control start discovery command parameters.
-It is useful for tests:
-Stop Discovery - Invalid parameters 1
-Stop Discovery - BR/EDR (Inquiry) Success 1
+Conflicts:
+	android/android-tester.c
 ---
- tools/mgmt-tester.c | 62 ++++++++++++++---------------------------------------
- 1 file changed, 16 insertions(+), 46 deletions(-)
+ android/android-tester.c | 24 +++++++-----------------
+ 1 file changed, 7 insertions(+), 17 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index a711d0d..64188f1 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -362,6 +362,9 @@ struct generic_data {
- 	uint16_t setup_expect_hci_command;
- 	const void *setup_expect_hci_param;
- 	uint8_t setup_expect_hci_len;
-+	uint16_t setup_send_opcode;
-+	const void *setup_send_param;
-+	uint16_t setup_send_len;
- 	bool send_index_none;
- 	uint16_t send_opcode;
- 	const void *send_param;
-@@ -1734,6 +1737,8 @@ static const struct generic_data stop_discovery_success_test_1 = {
+diff --git a/android/android-tester.c b/android/android-tester.c
+index bab92a1..375f30d 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -941,10 +941,13 @@ static void discovery_device_found_cb(int num_properties,
+ 		}
  
- static const struct generic_data stop_discovery_bredr_success_test_1 = {
- 	.setup_settings = settings_powered,
-+	.setup_send_param = start_discovery_bredr_param,
-+	.setup_send_len = sizeof(start_discovery_bredr_param),
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredr_param,
- 	.send_len = sizeof(stop_discovery_bredr_param),
-@@ -1758,6 +1763,8 @@ static const struct generic_data stop_discovery_rejected_test_1 = {
- 
- static const struct generic_data stop_discovery_invalid_param_test_1 = {
- 	.setup_settings = settings_powered_le,
-+	.setup_send_param = start_discovery_bredrle_param,
-+	.setup_send_len = sizeof(start_discovery_bredrle_param),
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredrle_invalid_param,
- 	.send_len = sizeof(stop_discovery_bredrle_invalid_param),
-@@ -2824,59 +2831,22 @@ static void setup_discovery_callback(uint8_t status, uint16_t length,
- 	tester_setup_complete();
+ 		if (!check_test_property(received_prop, expected_prop)) {
++			data->if_bluetooth->cancel_discovery();
+ 			tester_test_failed();
+ 			return;
+ 		}
+ 	}
++
++	data->if_bluetooth->cancel_discovery();
  }
  
--static bool setup_command_hci_callback(const void *data, uint16_t len,
--								void *user_data)
+ static void remote_getprops_device_found_cb(int num_properties,
+@@ -959,6 +962,7 @@ static void remote_getprops_device_found_cb(int num_properties,
+ 	if (data->cb_count == 2)
+ 		data->cb_count--;
+ 
++	data->if_bluetooth->cancel_discovery();
+ 	data->if_bluetooth->get_remote_device_properties(&remote_addr);
+ }
+ 
+@@ -978,6 +982,7 @@ static void remote_get_property_device_found_cb(int num_properties,
+ 	if (data->cb_count == 2)
+ 		data->cb_count--;
+ 
++	data->if_bluetooth->cancel_discovery();
+ 	status = data->if_bluetooth->get_remote_device_property(&remote_addr,
+ 								prop.type);
+ 	check_expected_status(status);
+@@ -999,6 +1004,7 @@ static void remote_setprop_device_found_cb(int num_properties,
+ 	if (data->cb_count == 3)
+ 		data->cb_count--;
+ 
++	data->if_bluetooth->cancel_discovery();
+ 	status = data->if_bluetooth->set_remote_device_property(&remote_addr,
+ 									&prop);
+ 	check_expected_status(status);
+@@ -1020,6 +1026,7 @@ static void remote_setprop_fail_device_found_cb(int num_properties,
+ 	if (data->cb_count == 2)
+ 		data->cb_count--;
+ 
++	data->if_bluetooth->cancel_discovery();
+ 	status = data->if_bluetooth->set_remote_device_property(&remote_addr,
+ 									&prop);
+ 	check_expected_status(status);
+@@ -2970,26 +2977,12 @@ static void test_discovery_stop_done(const void *test_data)
+ 	check_expected_status(status);
+ }
+ 
+-static bool pre_inq_compl_hook(const void *dummy, uint16_t len, void *user_data)
 -{
--	struct test_data *tdata = tester_get_data();
--	const struct generic_data *test = tdata->test_data;
+-	struct test_data *data = tester_get_data();
 -
--	tester_print("HCI Command 0x%04x length %u (setup)",
--					test->setup_expect_hci_command, len);
+-	/* Make sure Inquiry Command Complete is not called */
 -
--	if (len != test->setup_expect_hci_len) {
--		tester_warn("Invalid parameter size for HCI command (setup)");
--		tester_setup_failed();
--		goto done;
--	}
--
--	if (memcmp(data, test->setup_expect_hci_param, len) != 0) {
--		tester_warn("Unexpected HCI command parameter value (setup)");
--		tester_setup_failed();
--		goto done;
--	}
--
--	tester_setup_complete();
--
--done:
--	hciemu_del_hook(tdata->hciemu, HCIEMU_HOOK_PRE_EVT,
--			test->setup_expect_hci_command);
+-	hciemu_del_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY);
 -
 -	return false;
 -}
 -
- static void setup_start_discovery(const void *test_data)
+ static void test_discovery_stop_success(const void *test_data)
  {
  	struct test_data *data = tester_get_data();
- 	const struct generic_data *test = data->test_data;
--	const void *send_param = test->send_param;
--	uint16_t send_len = test->send_len;
+ 
+ 	init_test_conditions(data);
+ 
+-	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
+-					pre_inq_compl_hook, data);
 -
--	if (test->setup_expect_hci_command) {
--		tester_print("Registering HCI command callback (setup)");
--		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT,
--				test->setup_expect_hci_command,
--				setup_command_hci_callback,
--				NULL);
-+	const void *send_param = test->setup_send_param;
-+	uint16_t send_len = test->setup_send_len;
-+	unsigned char disc_param[] = { 0x07 };
- 
--		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
--				send_len, send_param, NULL, NULL, NULL);
--	} else {
--		unsigned char disc_param[] = { 0x07 };
-+	if (!send_param) {
-+		send_param = disc_param;
-+		send_len = 1;
-+	}
- 
--		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
--					sizeof(disc_param), disc_param,
-+	mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
-+					send_len, send_param,
- 					setup_discovery_callback, NULL, NULL);
--	}
+ 	data->if_bluetooth->start_discovery();
  }
  
- static void setup_multi_uuid32(const void *test_data)
+@@ -2999,9 +2992,6 @@ static void test_discovery_start_done(const void *test_data)
+ 
+ 	init_test_conditions(data);
+ 
+-	hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT, BT_HCI_CMD_INQUIRY,
+-					pre_inq_compl_hook, data);
+-
+ 	data->if_bluetooth->start_discovery();
+ }
+ 
 -- 
 1.8.4
 
