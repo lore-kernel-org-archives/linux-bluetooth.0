@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix MITM flag when initiating SMP pairing
-Date: Tue, 18 Mar 2014 15:42:30 +0200
-Message-Id: <1395150150-31418-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] unit/avrcp: Fix possible buffer overflow
+Date: Tue, 18 Mar 2014 15:31:19 +0200
+Message-Id: <1395149479-14180-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The pairing process initiated through mgmt sets the conn->auth_type
-value regardless of BR/EDR or LE pairing. This value will contain the
-MITM flag if the local IO capability allows it. When sending the SMP
-pairing request we should check the value and ensure that the MITM bit
-gets correctly set in the bonding flags.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+values[] should be the same size as attr[].
 ---
- net/bluetooth/smp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ unit/test-avrcp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 6f29430c29c4..a0150033e797 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -909,6 +909,12 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index ec70da4..02f9949 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -439,10 +439,12 @@ static int get_value_text(struct avrcp *session, uint8_t transaction,
+ static int get_value(struct avrcp *session, uint8_t transaction,
+ 			uint8_t number, uint8_t *attrs, void *user_data)
+ {
+-	uint8_t values[2] = { 0x00, 0x00 };
++	uint8_t values[number];
  
- 	authreq = seclevel_to_authreq(sec_level);
+ 	DBG("");
  
-+	/* hcon->auth_type is set by pair_device in mgmt.c. If the MITM
-+	 * flag is set we should also set it for the SMP request.
-+	 */
-+	if ((hcon->auth_type & 0x01))
-+		authreq |= SMP_AUTH_MITM;
++	memset(values, 0, number);
 +
- 	if (hcon->link_mode & HCI_LM_MASTER) {
- 		struct smp_cmd_pairing cp;
+ 	avrcp_get_current_player_value_rsp(session, transaction, number, attrs,
+ 									values);
  
 -- 
-1.8.5.3
+1.8.3.2
 
