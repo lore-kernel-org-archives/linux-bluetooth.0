@@ -2,88 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v5 05/16] gatt: Add hash table of GDBusProxy objects
-Date: Tue, 18 Mar 2014 17:26:20 -0300
-Message-Id: <1395174391-27251-6-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v5 00/16] Add basic GATT characteristics
+Date: Tue, 18 Mar 2014 17:26:15 -0300
+Message-Id: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
- <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This commits adds a hash table to map attributes into GDBusProxy,
-allowing to call remote objects for reading and writing values.
----
- src/gatt-dbus.c | 27 +++++++++++++++++++++++----
- 1 file changed, 23 insertions(+), 4 deletions(-)
+This patchset adds the following features:
+  * register external characteristics
+  * basic read or write external characteristics
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 9f94c4f..f60260e 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -56,6 +56,12 @@ struct external_app {
- 	unsigned int watch;
- };
- 
-+/*
-+ * Attribute to Proxy hash table. Used to map incoming
-+ * ATT operations to its external characteristic proxy.
-+ */
-+static GHashTable *proxy_hash;
-+
- static GSList *external_apps;
- 
- static int external_app_path_cmp(gconstpointer a, gconstpointer b)
-@@ -172,6 +178,7 @@ static int register_external_characteristics(GSList *proxies)
- 		DBusMessageIter iter;
- 		const char *str, *path;
- 		bt_uuid_t uuid;
-+		struct btd_attribute *attr;
- 		GDBusProxy *proxy = list->data;
- 
- 		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-@@ -191,11 +198,14 @@ static int register_external_characteristics(GSList *proxies)
- 		 * Reference table 3.5: Characteristic Properties bit field.
- 		 */
- 
--		if (btd_gatt_add_char(&uuid, 0x00) == NULL)
-+		attr = btd_gatt_add_char(&uuid, 0x00);
-+		if (attr == NULL)
- 			return -EINVAL;
- 
- 		path = g_dbus_proxy_get_path(proxy);
- 		DBG("Added GATT CHR: %s (%s)", path, str);
-+
-+		g_hash_table_insert(proxy_hash, attr, g_dbus_proxy_ref(proxy));
- 	}
- 
- 	return 0;
-@@ -318,13 +328,22 @@ static const GDBusMethodTable methods[] = {
- 
- gboolean gatt_dbus_manager_register(void)
- {
--	return g_dbus_register_interface(btd_get_dbus_connection(),
--					"/org/bluez", GATT_MGR_IFACE,
--					methods, NULL, NULL, NULL, NULL);
-+	if (g_dbus_register_interface(btd_get_dbus_connection(),
-+				"/org/bluez", GATT_MGR_IFACE,
-+				methods, NULL, NULL, NULL, NULL) == FALSE)
-+		return FALSE;
-+
-+	proxy_hash = g_hash_table_new_full(g_direct_hash, g_direct_equal,
-+				NULL, (GDestroyNotify) g_dbus_proxy_unref);
-+
-+	return TRUE;
- }
- 
- void gatt_dbus_manager_unregister(void)
- {
-+	g_hash_table_destroy(proxy_hash);
-+	proxy_hash = NULL;
-+
- 	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
- 							GATT_MGR_IFACE);
- }
+Usage of glib is being avoided inside src/gatt.c. Remaining
+put/get little-endian/big-endian helpers will be added in the
+next patchset.
+
+No matter the system, bt_uuid_t must use big-endian byte order (similar
+to human-readable format). bt_string_to_uuid() & bt_uuid_to_string() are
+still changing byte order, this issue will be also fixed in the next
+patchsets.
+
+TODO (missing features of this patchset and upstream code):
+  * Properties/flags: operations and security
+  * 32-bit UUIDs
+  * Remove/free services
+  * multiple services provided by the same client
+  * remove att_put_* att_get_* helpers
+
+Changes from v4 to v5:
+  * avoid usage of uint128_t in the header util.h
+
+Changes from v3 to v4:
+  * keep LE <-> CPU helpers in lib/bluetooth.h (patches removing these
+    helpers are being shifted to next patchset)
+
+Changes from v2 to v3:
+  * return put_uuid() definition to src/gatt.c
+  * add put_le16(), put_le32(), put_le128() to src/shared/util.h
+
+Changes from v1 to v2:
+  * move put_uuid() and put_le16() to src/shared/util.h
+  * check malloc0() and new0() return value
+
+Changes from v0 to v1:
+  * Use LE <-> CPU helpers defined in src/shared/util.h
+  * remove patch "gatt: Add helper for reading characteristics" from
+   this set.
+
+Alvaro Silva (3):
+  tools: Add Alert Level characteristic to gatt-service
+  tools: Add reading Value property of gatt-service
+  tools: Add setting Value property of gatt-service
+
+Andre Guedes (2):
+  gatt: Add function to create constant attributes
+  gatt: Add helper for creating GATT characteristics
+
+Claudio Takahasi (11):
+  shared: Add bswap_128()
+  gatt: Add characteristic to the database
+  gatt: Add hash table of GDBusProxy objects
+  gatt: Add read callback to btd_gatt_add_char helper
+  gatt: Assign read callback for external services
+  gatt: Add write callback to btd_gatt_add_char helper
+  gdbus: Add g_dbus_proxy_set_property_array
+  gatt: Assign write callback for external services
+  gatt: Add result callback for Write Request
+  gatt: Add Write Request handling for GDBusProxy
+  tools: Emit property changed when Value changes
+
+ gdbus/client.c       |  85 +++++++++++++++++++++++
+ gdbus/gdbus.h        |   5 ++
+ src/gatt-dbus.c      | 190 +++++++++++++++++++++++++++++++++++++++++++++++++--
+ src/gatt.c           | 140 +++++++++++++++++++++++++++++++++++--
+ src/gatt.h           |  44 ++++++++++++
+ src/shared/util.h    |  10 +++
+ tools/gatt-service.c | 156 ++++++++++++++++++++++++++++++++++++++----
+ 7 files changed, 608 insertions(+), 22 deletions(-)
+
 -- 
 1.8.3.1
 
