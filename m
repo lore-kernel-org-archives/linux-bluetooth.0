@@ -1,138 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v5 14/16] tools: Add reading Value property of gatt-service
-Date: Tue, 18 Mar 2014 17:26:29 -0300
-Message-Id: <1395174391-27251-15-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org
+Subject: [PATCH BlueZ v5 10/16] gatt: Assign write callback for external services
+Date: Tue, 18 Mar 2014 17:26:25 -0300
+Message-Id: <1395174391-27251-11-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Alvaro Silva <alvaro.silva@openbossa.org>
+This patch adds the callback for writing the external characteristic
+value. Internally, GDBusProxy implementation calls Set method of the
+"Value" property. At the moment, potential errors returned by the
+external service implementation are being ignored.
 
-This patch extends the gatt-service.c example adding the callback to
-allow reading the Value property. At the moment, it is a generic
-callback and it doesn't consider characteristic value property
-restrictions.
+The ATT operation (Write Command or Request) is not exposed to the
+external service implementation. GATT/GDBusProxy handles possible
+DBus errors returned, and notify the core using the callbacks informed.
+Write Command doesn't have callback since it doesn't return ATT errors.
 ---
- tools/gatt-service.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 53 insertions(+), 6 deletions(-)
+ src/gatt-dbus.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index d1606ad..97dc8d4 100644
---- a/tools/gatt-service.c
-+++ b/tools/gatt-service.c
-@@ -46,18 +46,44 @@
- static GMainLoop *main_loop;
- static GSList *services;
- 
-+struct characteristic {
-+	char *uuid;
-+	uint8_t *value;
-+	int vlen;
-+};
-+
- static gboolean chr_get_uuid(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
- {
--	const char *uuid = user_data;
-+	struct characteristic *chr = user_data;
- 
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &chr->uuid);
-+
-+	return TRUE;
-+}
-+
-+static gboolean chr_get_value(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	struct characteristic *chr = user_data;
-+	DBusMessageIter array;
-+
-+	printf("Get(\"Value\")\n");
-+
-+	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-+					DBUS_TYPE_BYTE_AS_STRING, &array);
-+
-+	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
-+						&chr->value, chr->vlen);
-+
-+	dbus_message_iter_close_container(iter, &array);
- 
- 	return TRUE;
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index a02d565..7e81dc6 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -179,6 +179,30 @@ static void proxy_read_cb(struct btd_attribute *attr,
+ 	result(0, value, len, user_data);
  }
  
- static const GDBusPropertyTable chr_properties[] = {
- 	{ "UUID",	"s",	chr_get_uuid },
-+	{ "Value", "ay", chr_get_value, NULL, NULL },
- 	{ }
- };
- 
-@@ -100,18 +126,35 @@ static const GDBusPropertyTable service_properties[] = {
- 	{ }
- };
- 
-+static void chr_iface_destroy(gpointer user_data)
++static void proxy_write_reply(const DBusError *derr, void *user_data)
 +{
-+	struct characteristic *chr = user_data;
-+
-+	g_free(chr->uuid);
-+	g_free(chr->value);
-+	g_free(chr);
++	if (derr)
++		DBG("Write reply: %s", derr->message);
 +}
 +
- static int register_characteristic(DBusConnection *conn, const char *uuid,
-+						const uint8_t *value, int vlen,
- 						const char *service_path)
- {
-+	struct characteristic *chr;
- 	static int id = 1;
- 	char *path;
- 	int ret = 0;
- 
- 	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
- 
-+	chr = g_new0(struct characteristic, 1);
++static void proxy_write_cb(struct btd_attribute *attr,
++					const uint8_t *value, size_t len)
++{
++	GDBusProxy *proxy;
 +
-+	chr->uuid = g_strdup(uuid);
-+	chr->value = g_memdup(value, vlen);
-+	chr->vlen = vlen;
++	proxy = g_hash_table_lookup(proxy_hash, attr);
++	if (proxy == NULL)
++		/* FIXME: Attribute not found */
++		return;
 +
- 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
- 					NULL, NULL, chr_properties,
--					g_strdup(uuid), g_free) == FALSE) {
-+					chr, chr_iface_destroy) == FALSE) {
- 		printf("Couldn't register characteristic interface\n");
- 		ret = -EIO;
- 	}
-@@ -141,15 +184,19 @@ static char *register_service(DBusConnection *conn, const char *uuid)
- static void create_services(DBusConnection *conn)
++	g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
++						value, len, proxy_write_reply,
++						NULL, NULL);
++
++	DBG("Server: Write characteristic callback %s",
++					g_dbus_proxy_get_path(proxy));
++}
++
+ static int register_external_service(const struct external_app *eapp,
+ 							GDBusProxy *proxy)
  {
- 	char *service_path;
-+	uint8_t level = 0;
- 	int ret;
+@@ -238,7 +262,8 @@ static int register_external_characteristics(GSList *proxies)
+ 		 * Reference table 3.5: Characteristic Properties bit field.
+ 		 */
  
- 	service_path = register_service(conn, IAS_UUID);
- 	if (service_path == NULL)
- 		return;
+-		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb, NULL);
++		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb,
++							proxy_write_cb);
+ 		if (attr == NULL)
+ 			return -EINVAL;
  
--	/* Add Alert Level Characteristic to Immediate Alert Service */
--	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
--							service_path);
-+	/* Add Alert Level Characteristic to Immediate Alert Service
-+	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
-+	 * "Value" is readable for testing purpose only.
-+	 */
-+	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
-+						sizeof(level), service_path);
- 	if (ret < 0) {
- 		printf("Couldn't register Alert Level characteristic (IAS)\n");
- 		g_dbus_unregister_interface(conn, service_path,
 -- 
 1.8.3.1
 
