@@ -1,60 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1395144323-12283-1-git-send-email-luiz.dentz@gmail.com>
-References: <1395144323-12283-1-git-send-email-luiz.dentz@gmail.com>
-Date: Tue, 18 Mar 2014 14:54:47 +0200
-Message-ID: <CABBYNZ+v_xm5BC1VBaPc7xNrnEBzETmkb8WTOs7cnuNSViBNGw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/3] unit/test-avrcp: Fix using empty response to /TP/PAS/BV-08-C
+In-Reply-To: <1395145447-11205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1395145447-11205-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 18 Mar 2014 14:43:37 +0200
+Message-ID: <CABBYNZ+_QRkS3ffhxJ05ZnFV-Bj9iD0ToUZd9uL=8MrgyCs59Q@mail.gmail.com>
+Subject: Re: [PATCH] android/avrcp: Fix possible buffer overflow
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Tue, Mar 18, 2014 at 2:05 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Tue, Mar 18, 2014 at 2:24 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> The purpose of unit tests is to exercise the code as much as possible so
-> return non-empty when testing avrcp_get_player_values_text_rsp.
 > ---
->  unit/test-avrcp.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  android/avrcp-lib.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-> index 3235e48..dc22708 100644
-> --- a/unit/test-avrcp.c
-> +++ b/unit/test-avrcp.c
-> @@ -339,9 +339,12 @@ static int get_value_text(struct avrcp *session, uint8_t transaction,
->                                 uint8_t attr, uint8_t number, uint8_t *values,
->                                 void *user_data)
+> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> index 5bbc407..509b6c1 100644
+> --- a/android/avrcp-lib.c
+> +++ b/android/avrcp-lib.c
+> @@ -831,7 +831,7 @@ int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id,
+>  int avrcp_get_capabilities_rsp(struct avrcp *session, uint8_t transaction,
+>                                                 uint8_t number, uint8_t *events)
 >  {
-> +       const char *text[] = { "on" };
-> +
->         DBG("");
+> -       uint8_t pdu[AVRCP_EVENT_LAST];
+> +       uint8_t pdu[AVRCP_EVENT_LAST + 1];
 >
-> -       avrcp_get_player_values_text_rsp(session, transaction, 0, NULL, NULL);
-> +       avrcp_get_player_values_text_rsp(session, transaction, number,
-> +                                                               values, text);
->
->         return -EINVAL;
->  }
-> @@ -688,7 +691,8 @@ int main(int argc, char *argv[])
->                         raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
->                                 0x00, 0x19, 0x58,
->                                 AVRCP_GET_PLAYER_VALUE_TEXT,
-> -                               0x00, 0x00, 0x01, 0x00));
-> +                               0x00, 0x00, 0x07, 0x01, 0x01, 0x00,
-> +                               0x6a, 0x02, 0x6f, 0x6e));
->
->         define_test("/TP/PAS/BV-09-C", test_client,
->                         raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+>         if (number > AVRCP_EVENT_LAST)
+>                 return -EINVAL;
 > --
-> 1.8.5.3
+> 1.8.3.2
 
-Pushed.
+Applied.
 
 
 -- 
