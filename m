@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 15/16] android/avrcp: Add avrcp_search() function
-Date: Tue, 18 Mar 2014 11:20:46 +0200
-Message-Id: <1395134447-8957-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 03/16] unit/avrcp: Add browsing channel support in unit testing
+Date: Tue, 18 Mar 2014 11:20:34 +0200
+Message-Id: <1395134447-8957-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,74 +12,181 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/avrcp-lib.c | 23 +++++++++++++++++++++--
- android/avrcp-lib.h |  4 ++++
- 2 files changed, 25 insertions(+), 2 deletions(-)
+ .gitignore        |  2 ++
+ unit/test-avrcp.c | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 89 insertions(+), 2 deletions(-)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 7304b11..5bbc407 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -28,6 +28,7 @@
- #include <stdbool.h>
- #include <glib.h>
- #include <errno.h>
-+#include <string.h>
+diff --git a/.gitignore b/.gitignore
+index 7a2af5a..0a66fec 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -127,3 +127,5 @@ android/bluetoothd-snoop
+ android/test-ipc
+ android/test-*.log
+ android/test-*.trs
++
++patches/
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 3235e48..bd65637 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -46,6 +46,7 @@
+ struct test_pdu {
+ 	bool valid;
+ 	bool fragmented;
++	bool browse;
+ 	const uint8_t *data;
+ 	size_t size;
+ };
+@@ -59,8 +60,10 @@ struct context {
+ 	GMainLoop *main_loop;
+ 	struct avrcp *session;
+ 	guint source;
++	guint browse_source;
+ 	guint process;
+ 	int fd;
++	int browse_fd;
+ 	unsigned int pdu_offset;
+ 	const struct test_data *data;
+ };
+@@ -74,6 +77,14 @@ struct context {
+ 		.size = sizeof(data(args)),			\
+ 	}
  
- #include "lib/bluetooth.h"
++#define brs_pdu(args...)					\
++	{							\
++		.valid = true,					\
++		.browse = true,					\
++		.data = data(args),				\
++		.size = sizeof(data(args)),			\
++	}
++
+ #define frg_pdu(args...)					\
+ 	{							\
+ 		.valid = true,					\
+@@ -129,7 +140,10 @@ static gboolean send_pdu(gpointer user_data)
  
-@@ -43,8 +44,6 @@
- #define AVRCP_PACKET_TYPE_CONTINUING		0x02
- #define AVRCP_PACKET_TYPE_END			0x03
+ 	pdu = &context->data->pdu_list[context->pdu_offset++];
  
--#define AVRCP_CHARSET_UTF8			106
--
- #if __BYTE_ORDER == __LITTLE_ENDIAN
+-	len = write(context->fd, pdu->data, pdu->size);
++	if (pdu->browse)
++		len = write(context->browse_fd, pdu->data, pdu->size);
++	else
++		len = write(context->fd, pdu->data, pdu->size);
  
- struct avrcp_header {
-@@ -1123,3 +1122,23 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
- 	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
- 							func, user_data);
+ 	if (g_test_verbose())
+ 		util_hexdump('<', pdu->data, len, test_debug, "AVRCP: ");
+@@ -162,6 +176,8 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 	ssize_t len;
+ 	int fd;
+ 
++	DBG("");
++
+ 	pdu = &context->data->pdu_list[context->pdu_offset++];
+ 
+ 	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
+@@ -189,17 +205,59 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+ 	return TRUE;
  }
-+
-+int avrcp_search(struct avrcp *session, uint16_t charset, const char *string,
-+				avctp_browsing_rsp_cb func, void *user_data)
+ 
++static gboolean browse_test_handler(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
 +{
-+	size_t str_len = strnlen(string, 255 - 4);
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + str_len + 4];
-+	struct avrcp_browsing_header *pdu = (void *) buf;
++	struct context *context = user_data;
++	const struct test_pdu *pdu;
++	unsigned char buf[512];
++	ssize_t len;
++	int fd;
 +
-+	memset(buf, 0, sizeof(buf));
++	DBG("");
 +
-+	pdu->pdu_id = AVRCP_SEARCH;
-+	pdu->param_len = htons(str_len + 4);
++	pdu = &context->data->pdu_list[context->pdu_offset++];
 +
-+	bt_put_be16(charset, &pdu->params[0]);
-+	bt_put_be16(str_len, &pdu->params[2]);
-+	memcpy(&pdu->params[4], string, str_len);
++	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
++		context->browse_source = 0;
++		g_print("%s: cond %x\n", __func__, cond);
++		return FALSE;
++	}
 +
-+	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-+							func, user_data);
++	fd = g_io_channel_unix_get_fd(channel);
++
++	len = read(fd, buf, sizeof(buf));
++
++	g_assert(len > 0);
++
++	if (g_test_verbose())
++		util_hexdump('>', buf, len, test_debug, "AVCTP: ");
++
++	g_assert_cmpint(len, ==, pdu->size);
++
++	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
++
++	if (!pdu->fragmented)
++		context_process(context);
++
++	return TRUE;
 +}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 653a98e..3a452d5 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -124,6 +124,8 @@
- /* Company IDs for vendor dependent commands */
- #define IEEEID_BTSIG		0x001958
- 
-+#define AVRCP_CHARSET_UTF8	0x006a
 +
- /* Parameters legths */
- #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH       5
+ static struct context *create_context(uint16_t version, gconstpointer data)
+ {
+ 	struct context *context = g_new0(struct context, 1);
+ 	GIOChannel *channel;
+ 	int err, sv[2];
  
-@@ -269,3 +271,5 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
- 				uint64_t uid, uint16_t counter, uint32_t *attr,
- 				size_t attr_count, avctp_browsing_rsp_cb func,
- 				void *user_data);
-+int avrcp_search(struct avrcp *session, uint16_t charset, const char *string,
-+				avctp_browsing_rsp_cb func, void *user_data);
++	DBG("");
++
+ 	context->main_loop = g_main_loop_new(NULL, FALSE);
+ 	g_assert(context->main_loop);
+ 
++	/* Control channel setup */
++
+ 	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+-	g_assert(err == 0);
++	g_assert(!err);
+ 
+ 	context->session = avrcp_new(sv[0], 672, 672, version);
+ 	g_assert(context->session != NULL);
+@@ -218,6 +276,30 @@ static struct context *create_context(uint16_t version, gconstpointer data)
+ 	g_io_channel_unref(channel);
+ 
+ 	context->fd = sv[1];
++
++	/* Browsing channel setup */
++
++	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
++	g_assert(!err);
++
++	err = avrcp_connect_browsing(context->session, sv[0], 672, 672);
++	g_assert(!err);
++
++	channel = g_io_channel_unix_new(sv[1]);
++
++	g_io_channel_set_close_on_unref(channel, TRUE);
++	g_io_channel_set_encoding(channel, NULL, NULL);
++	g_io_channel_set_buffered(channel, FALSE);
++
++	context->browse_source = g_io_add_watch(channel,
++				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
++				browse_test_handler, context);
++	g_assert(context->browse_source > 0);
++
++	g_io_channel_unref(channel);
++
++	context->browse_fd = sv[1];
++
+ 	context->data = data;
+ 
+ 	return context;
+@@ -230,6 +312,9 @@ static void destroy_context(struct context *context)
+ 
+ 	avrcp_shutdown(context->session);
+ 
++	if (context->browse_source > 0)
++		g_source_remove(context->browse_source);
++
+ 	g_main_loop_unref(context->main_loop);
+ 
+ 	test_free(context->data);
 -- 
 1.8.3.2
 
