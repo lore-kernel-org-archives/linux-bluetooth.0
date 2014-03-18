@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 05/16] android/avrcp: Use defined constant instead of magic number
-Date: Tue, 18 Mar 2014 11:20:36 +0200
-Message-Id: <1395134447-8957-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 06/16] android/avrcp: Add avrcp_get_folder_items() function
+Date: Tue, 18 Mar 2014 11:20:37 +0200
+Message-Id: <1395134447-8957-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,22 +12,72 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/avrcp-lib.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/avrcp-lib.c | 29 +++++++++++++++++++++++++++++
+ android/avrcp-lib.h | 10 ++++++++++
+ 2 files changed, 39 insertions(+)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 75af49b..a075809 100644
+index a075809..db2057b 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -717,7 +717,7 @@ int avrcp_register_notification(struct avrcp *session, uint8_t event,
- 					uint32_t interval, avctp_rsp_cb func,
- 					void *user_data)
- {
--	uint8_t params[5];
-+	uint8_t params[AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH];
+@@ -1046,3 +1046,32 @@ int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id,
+ 	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
+ 							func, user_data);
+ }
++
++int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
++				uint32_t start, uint32_t end, uint32_t *attr,
++				size_t attr_count, avctp_browsing_rsp_cb func,
++				void *user_data)
++{
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 10 +
++						attr_count * sizeof(uint32_t)];
++	struct avrcp_browsing_header *pdu = (void *) buf;
++
++	memset(buf, 0, sizeof(buf));
++
++	pdu->pdu_id = AVRCP_GET_FOLDER_ITEMS;
++	pdu->param_len = htons(10 + attr_count * sizeof(uint32_t));
++
++	/* Scope */
++	pdu->params[0] = scope;
++
++	bt_put_be32(start, &pdu->params[1]);
++	bt_put_be32(end, &pdu->params[5]);
++
++	/* attr count */
++	pdu->params[9] = attr_count;
++
++	memcpy(&pdu->params[10], attr, attr_count);
++
++	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
++							func, user_data);
++}
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 3f557fc..b84f61c 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -115,6 +115,12 @@
+ #define AVRCP_MEDIA_ATTRIBUTE_DURATION	0x07
+ #define AVRCP_MEDIA_ATTRIBUTE_LAST	AVRCP_MEDIA_ATTRIBUTE_DURATION
  
- 	params[0] = event;
- 	bt_put_be32(interval, &params[1]);
++/* Media Scope */
++#define AVRCP_MEDIA_PLAYER_LIST			0x00
++#define AVRCP_MEDIA_PLAYER_VFS			0x01
++#define AVRCP_MEDIA_SEARCH			0x02
++#define AVRCP_MEDIA_NOW_PLAYING			0x03
++
+ /* Company IDs for vendor dependent commands */
+ #define IEEEID_BTSIG		0x001958
+ 
+@@ -252,3 +258,7 @@ int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
+ int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id,
+ 				avctp_browsing_rsp_cb func, void *user_data);
++int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
++				uint32_t start, uint32_t end, uint32_t *attr,
++				size_t attr_count, avctp_browsing_rsp_cb func,
++				void *user_data);
 -- 
 1.8.3.2
 
