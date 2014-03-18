@@ -1,112 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] android/bluetooth: Pass correct device type for bonding commands
-Date: Tue, 18 Mar 2014 16:18:09 +0100
-Message-Id: <1395155891-8745-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1395149479-14180-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1395149479-14180-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 18 Mar 2014 17:10:05 +0200
+Message-ID: <CABBYNZLKYToTagmUN=RhANVUTsK74EmHQxoSSsd0V+9Rf_Zdeg@mail.gmail.com>
+Subject: Re: [PATCH] unit/avrcp: Fix possible buffer overflow
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For create_bond we fallback to BDEDR if device is not known. This can
-happen eg. with OOB. For cancel_bond and remove_bond we require device
-to be known.
----
- android/bluetooth.c | 45 ++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 36 insertions(+), 9 deletions(-)
+Hi Andrei,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 1becdfb..000f595 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2697,13 +2697,18 @@ static void pair_device_complete(uint8_t status, uint16_t length,
- static void handle_create_bond_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_create_bond *cmd = buf;
-+	struct device *dev;
- 	uint8_t status;
- 	struct mgmt_cp_pair_device cp;
- 
- 	cp.io_cap = DEFAULT_IO_CAPABILITY;
--	cp.addr.type = BDADDR_BREDR;
- 	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
- 
-+	dev = find_device(&cp.addr.bdaddr);
-+
-+	/* Fallback to BREDR if device is unknown eg. OOB */
-+	cp.addr.type = dev ? dev->bdaddr_type : BDADDR_BREDR;
-+
- 	if (mgmt_send(mgmt_if, MGMT_OP_PAIR_DEVICE, adapter.index, sizeof(cp),
- 				&cp, pair_device_complete, NULL, NULL) == 0) {
- 		status = HAL_STATUS_FAILED;
-@@ -2724,17 +2729,28 @@ static void handle_cancel_bond_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_cancel_bond *cmd = buf;
- 	struct mgmt_addr_info cp;
-+	struct device *dev;
- 	uint8_t status;
- 
--	cp.type = BDADDR_BREDR;
- 	android2bdaddr(cmd->bdaddr, &cp.bdaddr);
- 
-+	dev = find_device(&cp.bdaddr);
-+	if (!dev) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	cp.type = dev->bdaddr_type;
-+
- 	if (mgmt_reply(mgmt_if, MGMT_OP_CANCEL_PAIR_DEVICE, adapter.index,
--					sizeof(cp), &cp, NULL, NULL, NULL) > 0)
--		status = HAL_STATUS_SUCCESS;
--	else
-+				sizeof(cp), &cp, NULL, NULL, NULL) == 0) {
- 		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
- 
-+failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CANCEL_BOND,
- 									status);
- }
-@@ -2757,19 +2773,30 @@ static void handle_remove_bond_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_remove_bond *cmd = buf;
- 	struct mgmt_cp_unpair_device cp;
-+	struct device *dev;
- 	uint8_t status;
- 
- 	cp.disconnect = 1;
--	cp.addr.type = BDADDR_BREDR;
- 	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
- 
-+	dev = find_device(&cp.addr.bdaddr);
-+	if (!dev) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	cp.addr.type = dev->bdaddr_type;
-+
- 	if (mgmt_send(mgmt_if, MGMT_OP_UNPAIR_DEVICE, adapter.index,
- 				sizeof(cp), &cp, unpair_device_complete,
--				NULL, NULL) > 0)
--		status = HAL_STATUS_SUCCESS;
--	else
-+				NULL, NULL) ==  0) {
- 		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
- 
-+failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_REMOVE_BOND,
- 									status);
- }
+On Tue, Mar 18, 2014 at 3:31 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> values[] should be the same size as attr[].
+> ---
+>  unit/test-avrcp.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index ec70da4..02f9949 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -439,10 +439,12 @@ static int get_value_text(struct avrcp *session, uint8_t transaction,
+>  static int get_value(struct avrcp *session, uint8_t transaction,
+>                         uint8_t number, uint8_t *attrs, void *user_data)
+>  {
+> -       uint8_t values[2] = { 0x00, 0x00 };
+> +       uint8_t values[number];
+>
+>         DBG("");
+>
+> +       memset(values, 0, number);
+> +
+>         avrcp_get_current_player_value_rsp(session, transaction, number, attrs,
+>                                                                         values);
+>
+> --
+> 1.8.3.2
+
+Applied, thanks.
+
+
 -- 
-1.8.5.3
-
+Luiz Augusto von Dentz
