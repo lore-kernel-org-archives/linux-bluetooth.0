@@ -1,41 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 18 Mar 2014 13:48:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v4] android/hal-health: Add HDP .register_application
- method
-Message-ID: <20140318114822.GA17578@johan-t440s.lan>
-References: <1395141776-14428-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395141776-14428-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <53177187.3040009@archlinux.org>
+References: <1394020752-6186-1-git-send-email-thomas@archlinux.org>
+ <7E804DF3-E191-427E-8E20-FE6ECDC490EA@holtmann.org> <CA+5PVA56oO6FS2pG+D7yJtNrTqBGZ1CtPygjid4E0f3cPPi83g@mail.gmail.com>
+ <424A74F3-7646-449C-9F72-A0F4E9A28551@holtmann.org> <53177187.3040009@archlinux.org>
+From: Lucas De Marchi <lucas.de.marchi@gmail.com>
+Date: Tue, 18 Mar 2014 08:34:33 -0300
+Message-ID: <CAKi4VA+W7BfhGDUTT0tgroO-YPAztAXy-K-b3jiC3BiNwwba8Q@mail.gmail.com>
+Subject: Re: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for
+ virtual HCI driver"
+To: =?UTF-8?Q?Thomas_B=C3=A4chler?= <thomas@archlinux.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Josh Boyer <jwboyer@fedoraproject.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org,
+	"Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Thomas
 
-On Tue, Mar 18, 2014, Ravi kumar Veeramally wrote:
-> +static bool string_to_hal(const char *str, struct hal_string *hstr,
-> +								ssize_t *len)
-> +{
-> +	if (!hstr || !len)
-> +		return false;
-> +
-> +	if (!str) {
-> +		hstr->len = 0;
-> +		return true;
-> +	}
-> +
-> +	hstr->len = strlen(str) + 1;
-> +	*len += hstr->len;
-> +	if (*len > IPC_MTU)
-> +		return false;
+On Wed, Mar 5, 2014 at 3:48 PM, Thomas B=C3=A4chler <thomas@archlinux.org> =
+wrote:
+> Am 05.03.2014 19:36, schrieb Marcel Holtmann:
+>>>>> This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
+>>>>
+>>>> NAK. We allocated a static minor for this.
+>>>
+>>> Johan mentioned that.  Commit b075dd40c95d11c2c8690f6c4d6232fc,
+>>> correct?
+>
+> I am sorry Marcel, I only looked at the Linus tree, not at bluetooth or
+> bluetooth-next. This commit should indeed fix the problem. Disregard my
+> patch.
+>
+>>  Why isn't that headed into 3.14 right now, and CC'd to
+>>> stable?  Currently you have a somewhat broken driver in 3.13 and
+>>> 3.14-rcX that seems to have a pretty clear fix.
+>>
+>> somewhat broken? kmod prints this as an error, but it is not a regressio=
+n in user functionality. The driver works just as before. The error message=
+ can be ignored.
+>
+> It's a regression in my sanity, since numerous users blame all kernel
+> bugs on this error message and I am tired of explaining the situation
+> (problem + error message =3D=3D problem found *sigh*). I only sent this
+> patch since I hadn't found the correct fix.
 
-Usually we design APIs so that a failure means the return parameters
-were left untouched. The way you've implemented this here the caller
-couldn't know if *len or hstr->len were modified in case false is
-returned. We should be more predictable than that. So please fix up the
-function so that it only touches the parameters if true is returned.
+Feel free to CC kmod mailing list in these cases
+(linux-modules@vger.kernel.org). We've added this message to kmod
+exactly to catch problems like this and help people doing the drivers.
+Once I found out the problem with vhci I sent the patch to fix it,
+which is heading to Linus tree.
 
-Johan
+--=20
+Lucas De Marchi
