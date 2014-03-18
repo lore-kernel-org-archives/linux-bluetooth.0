@@ -1,125 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v5] android/hal-health: Add HDP .register_application method
-Date: Tue, 18 Mar 2014 14:10:21 +0200
-Message-Id: <1395144621-15264-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH BlueZ 2/3] unit/test-avrcp: Fix using empty response to /TP/PAS/BV-04-C
+Date: Tue, 18 Mar 2014 14:05:22 +0200
+Message-Id: <1395144323-12283-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1395144323-12283-1-git-send-email-luiz.dentz@gmail.com>
+References: <1395144323-12283-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
-v5: Fixed Johan's comment.
-v4: Added utility to copy null termiated strings to hal_string.
----
- android/hal-health.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 79 insertions(+), 1 deletion(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/android/hal-health.c b/android/hal-health.c
-index e6fe65a..02358fd 100644
---- a/android/hal-health.c
-+++ b/android/hal-health.c
-@@ -28,6 +28,27 @@
- 
- static const bthl_callbacks_t *cbacks = NULL;
- 
-+static bool string_to_hal(const char *str, struct hal_string *hstr,
-+								ssize_t *len)
-+{
-+	if (!hstr || !len)
-+		return false;
-+
-+	if (!str) {
-+		hstr->len = 0;
-+		return true;
-+	}
-+
-+	if ((*len + strlen(str) + 1) > IPC_MTU)
-+		return false;
-+
-+	hstr->len = strlen(str) + 1;
-+	*len += hstr->len;
-+	memcpy(hstr->data, str, hstr->len);
-+
-+	return true;
-+}
-+
- static bool interface_ready(void)
+The purpose of unit tests is to exercise the code as much as possible so
+make the test request a valid number of attributes and return them when
+testing avrcp_get_player_attribute_text_rsp.
+---
+ unit/test-avrcp.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index dc22708..a2b3195 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -317,10 +317,12 @@ static int get_attribute_text(struct avrcp *session, uint8_t transaction,
+ 					uint8_t number, uint8_t *attrs,
+ 					void *user_data)
  {
- 	return cbacks != NULL;
-@@ -38,6 +59,63 @@ static bool interface_ready(void)
- static const struct hal_ipc_handler ev_handlers[] = {
- };
++	const char *text[] = { "equalizer" };
++
+ 	DBG("");
  
-+static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
-+{
-+	char buf[IPC_MTU];
-+	struct hal_cmd_health_reg_app *cmd = (void *) buf;
-+	struct hal_rsp_health_reg_app rsp;
-+	size_t len = sizeof(rsp);
-+	bt_status_t status;
-+	ssize_t cmd_len;
-+	uint8_t i;
-+
-+	DBG("");
-+
-+	if (!interface_ready())
-+		return BT_STATUS_NOT_READY;
-+
-+	if (!reg || !app_id)
-+		return BT_STATUS_PARM_INVALID;
-+
-+	cmd_len = sizeof(*cmd);
-+
-+	if (!string_to_hal(reg->application_name, &cmd->app_name, &cmd_len))
-+		return BT_STATUS_PARM_INVALID;
-+
-+	if (!string_to_hal(reg->provider_name, &cmd->provider_name, &cmd_len))
-+		return BT_STATUS_PARM_INVALID;
-+
-+	if (!string_to_hal(reg->srv_name, &cmd->service_name, &cmd_len))
-+		return BT_STATUS_PARM_INVALID;
-+
-+	if (!string_to_hal(reg->srv_desp, &cmd->service_descr, &cmd_len))
-+		return BT_STATUS_PARM_INVALID;
-+
-+	cmd->num_of_mdep = reg->number_of_mdeps;
-+
-+	for (i = 0; i < reg->number_of_mdeps; i++) {
-+		cmd_len += sizeof(cmd->mdep_cfg);
-+		if (cmd_len > IPC_MTU)
-+			return BT_STATUS_PARM_INVALID;
-+
-+		cmd->mdep_cfg[i].role = reg->mdep_cfg[i].mdep_role;
-+		cmd->mdep_cfg[i].data_type = reg->mdep_cfg[i].data_type;
-+		cmd->mdep_cfg[i].channel_type = reg->mdep_cfg[i].channel_type;
-+
-+		if (!string_to_hal(reg->mdep_cfg[i].mdep_description,
-+					&cmd->mdep_cfg[i].descr, &cmd_len))
-+			return BT_STATUS_PARM_INVALID;
-+	}
-+
-+	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
-+						cmd_len, cmd, &len, &rsp, NULL);
-+
-+	if (status == HAL_STATUS_SUCCESS)
-+		*app_id = rsp.app_id;
-+
-+	return status;
-+}
-+
- static bt_status_t unregister_application(int app_id)
- {
- 	struct hal_cmd_health_unreg_app cmd;
-@@ -149,7 +227,7 @@ static void cleanup(void)
- static bthl_interface_t health_if = {
- 	.size = sizeof(health_if),
- 	.init = init,
--	.register_application = NULL,
-+	.register_application = register_application,
- 	.unregister_application = unregister_application,
- 	.connect_channel = connect_channel,
- 	.destroy_channel = destroy_channel,
+-	avrcp_get_player_attribute_text_rsp(session, transaction, 0, NULL,
+-									NULL);
++	avrcp_get_player_attribute_text_rsp(session, transaction, number, attrs,
++									text);
+ 
+ 	return -EAGAIN;
+ }
+@@ -666,11 +668,13 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+ 				0x00, 0x19, 0x58,
+ 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x01, 0x00),
++				0x00, 0x00, 0x02, 0x01, 0x01),
+ 			raw_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+ 				0x00, 0x19, 0x58,
+ 				AVRCP_GET_PLAYER_ATTRIBUTE_TEXT,
+-				0x00, 0x00, 0x01, 0x00));
++				0x00, 0x00, 0x0e, 0x01, 0x01, 0x00,
++				0x6a, 0x09, 0x65, 0x71, 0x75, 0x61,
++				0x6c, 0x69, 0x7a, 0x65, 0x72));
+ 
+ 	define_test("/TP/PAS/BV-06-C", test_server,
+ 			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
 -- 
-1.8.3.2
+1.8.5.3
 
