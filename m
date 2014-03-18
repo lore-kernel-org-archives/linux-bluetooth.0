@@ -1,56 +1,124 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <53177187.3040009@archlinux.org>
-References: <1394020752-6186-1-git-send-email-thomas@archlinux.org>
- <7E804DF3-E191-427E-8E20-FE6ECDC490EA@holtmann.org> <CA+5PVA56oO6FS2pG+D7yJtNrTqBGZ1CtPygjid4E0f3cPPi83g@mail.gmail.com>
- <424A74F3-7646-449C-9F72-A0F4E9A28551@holtmann.org> <53177187.3040009@archlinux.org>
-From: Lucas De Marchi <lucas.de.marchi@gmail.com>
-Date: Tue, 18 Mar 2014 08:34:33 -0300
-Message-ID: <CAKi4VA+W7BfhGDUTT0tgroO-YPAztAXy-K-b3jiC3BiNwwba8Q@mail.gmail.com>
-Subject: Re: [PATCH] Revert "Bluetooth: Use devname:vhci module alias for
- virtual HCI driver"
-To: =?UTF-8?Q?Thomas_B=C3=A4chler?= <thomas@archlinux.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Josh Boyer <jwboyer@fedoraproject.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org,
-	"Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v4] android/hal-health: Add HDP .register_application method
+Date: Tue, 18 Mar 2014 13:22:56 +0200
+Message-Id: <1395141776-14428-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Thomas
+---
+v4: Added utility to copy null termiated strings to hal_string.
+---
+ android/hal-health.c | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 79 insertions(+), 1 deletion(-)
 
-On Wed, Mar 5, 2014 at 3:48 PM, Thomas B=C3=A4chler <thomas@archlinux.org> =
-wrote:
-> Am 05.03.2014 19:36, schrieb Marcel Holtmann:
->>>>> This reverts commit bfacbb9aec029b3200053d84c8cd5d7575f2d4a5.
->>>>
->>>> NAK. We allocated a static minor for this.
->>>
->>> Johan mentioned that.  Commit b075dd40c95d11c2c8690f6c4d6232fc,
->>> correct?
->
-> I am sorry Marcel, I only looked at the Linus tree, not at bluetooth or
-> bluetooth-next. This commit should indeed fix the problem. Disregard my
-> patch.
->
->>  Why isn't that headed into 3.14 right now, and CC'd to
->>> stable?  Currently you have a somewhat broken driver in 3.13 and
->>> 3.14-rcX that seems to have a pretty clear fix.
->>
->> somewhat broken? kmod prints this as an error, but it is not a regressio=
-n in user functionality. The driver works just as before. The error message=
- can be ignored.
->
-> It's a regression in my sanity, since numerous users blame all kernel
-> bugs on this error message and I am tired of explaining the situation
-> (problem + error message =3D=3D problem found *sigh*). I only sent this
-> patch since I hadn't found the correct fix.
+diff --git a/android/hal-health.c b/android/hal-health.c
+index e6fe65a..e7bb91c 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -28,6 +28,27 @@
+ 
+ static const bthl_callbacks_t *cbacks = NULL;
+ 
++static bool string_to_hal(const char *str, struct hal_string *hstr,
++								ssize_t *len)
++{
++	if (!hstr || !len)
++		return false;
++
++	if (!str) {
++		hstr->len = 0;
++		return true;
++	}
++
++	hstr->len = strlen(str) + 1;
++	*len += hstr->len;
++	if (*len > IPC_MTU)
++		return false;
++
++	memcpy(hstr->data, str, hstr->len);
++
++	return true;
++}
++
+ static bool interface_ready(void)
+ {
+ 	return cbacks != NULL;
+@@ -38,6 +59,63 @@ static bool interface_ready(void)
+ static const struct hal_ipc_handler ev_handlers[] = {
+ };
+ 
++static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
++{
++	char buf[IPC_MTU];
++	struct hal_cmd_health_reg_app *cmd = (void *) buf;
++	struct hal_rsp_health_reg_app rsp;
++	size_t len = sizeof(rsp);
++	bt_status_t status;
++	ssize_t cmd_len;
++	uint8_t i;
++
++	DBG("");
++
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
++
++	if (!reg || !app_id)
++		return BT_STATUS_PARM_INVALID;
++
++	cmd_len = sizeof(*cmd);
++
++	if (!string_to_hal(reg->application_name, &cmd->app_name, &cmd_len))
++		return BT_STATUS_PARM_INVALID;
++
++	if (!string_to_hal(reg->provider_name, &cmd->provider_name, &cmd_len))
++		return BT_STATUS_PARM_INVALID;
++
++	if (!string_to_hal(reg->srv_name, &cmd->service_name, &cmd_len))
++		return BT_STATUS_PARM_INVALID;
++
++	if (!string_to_hal(reg->srv_desp, &cmd->service_descr, &cmd_len))
++		return BT_STATUS_PARM_INVALID;
++
++	cmd->num_of_mdep = reg->number_of_mdeps;
++
++	for (i = 0; i < reg->number_of_mdeps; i++) {
++		cmd_len += sizeof(cmd->mdep_cfg);
++		if (cmd_len > IPC_MTU)
++			return BT_STATUS_PARM_INVALID;
++
++		cmd->mdep_cfg[i].role = reg->mdep_cfg[i].mdep_role;
++		cmd->mdep_cfg[i].data_type = reg->mdep_cfg[i].data_type;
++		cmd->mdep_cfg[i].channel_type = reg->mdep_cfg[i].channel_type;
++
++		if (!string_to_hal(reg->mdep_cfg[i].mdep_description,
++					&cmd->mdep_cfg[i].descr, &cmd_len))
++			return BT_STATUS_PARM_INVALID;
++	}
++
++	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
++						cmd_len, cmd, &len, &rsp, NULL);
++
++	if (status == HAL_STATUS_SUCCESS)
++		*app_id = rsp.app_id;
++
++	return status;
++}
++
+ static bt_status_t unregister_application(int app_id)
+ {
+ 	struct hal_cmd_health_unreg_app cmd;
+@@ -149,7 +227,7 @@ static void cleanup(void)
+ static bthl_interface_t health_if = {
+ 	.size = sizeof(health_if),
+ 	.init = init,
+-	.register_application = NULL,
++	.register_application = register_application,
+ 	.unregister_application = unregister_application,
+ 	.connect_channel = connect_channel,
+ 	.destroy_channel = destroy_channel,
+-- 
+1.8.3.2
 
-Feel free to CC kmod mailing list in these cases
-(linux-modules@vger.kernel.org). We've added this message to kmod
-exactly to catch problems like this and help people doing the drivers.
-Once I found out the problem with vhci I sent the patch to fix it,
-which is heading to Linus tree.
-
---=20
-Lucas De Marchi
