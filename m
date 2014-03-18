@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 09/16] unit/avrcp: Add Connection establishment and release tests
-Date: Tue, 18 Mar 2014 11:20:40 +0200
-Message-Id: <1395134447-8957-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 07/16] unit/avrcp: Add /TP/MPS/BV-08-C test
+Date: Tue, 18 Mar 2014 11:20:38 +0200
+Message-Id: <1395134447-8957-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,32 +11,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Tests are checking connection establishment and release for browsing
-channel. Since we are connected through socketpair the tests are dummy.
+Test verifies that GetFolderItems cmd for the Media Player List
+issued by the Controller.
 ---
  unit/test-avrcp.c | 13 +++++++++++++
  1 file changed, 13 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 46c10a3..602e4bb 100644
+index 401a50d..4336668 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -675,6 +675,19 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x00, 0x02, /* end */
- 				0x00));
+@@ -566,6 +566,11 @@ static void test_client(gconstpointer data)
+ 	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-03-C"))
+ 		avrcp_set_browsed_player(context->session, 0xabcd, NULL, NULL);
  
-+	/* Connection Establishment for Browsing tests */
++	if (g_str_equal(context->data->test_name, "/TP/MPS/BV-08-C"))
++		avrcp_get_folder_items(context->session,
++					AVRCP_MEDIA_PLAYER_LIST, 0, 2, NULL, 0,
++					NULL, NULL);
 +
-+	/*
-+	 * Tests are checking connection establishment and release
-+	 * for browsing channel. Since we are connected through socketpair
-+	 * the tests are dummy
-+	 */
-+	define_test("/TP/CON/BV-01-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-02-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-03-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-04-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-05-C", test_dummy, raw_pdu(0x00));
+ 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
+ 		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED,
+ 								NULL, NULL);
+@@ -647,6 +652,14 @@ int main(int argc, char *argv[])
+ 			raw_pdu(0x00, 0x11, 0x0e, 0x70, 0x00, 0x02,
+ 				0xab, 0xcd));
+ 
++	/* GetFolderItems - CT */
++	define_test("/TP/MPS/BV-08-C", test_client,
++			raw_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
++				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
++				0x00, 0x00, 0x00, 0x00, /* start */
++				0x00, 0x00, 0x00, 0x02, /* end */
++				0x00));
 +
  	/* Connection Establishment for Control tests */
  
