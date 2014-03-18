@@ -1,157 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v5 16/16] tools: Emit property changed when Value changes
-Date: Tue, 18 Mar 2014 17:26:31 -0300
-Message-Id: <1395174391-27251-17-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v5 14/16] tools: Add reading Value property of gatt-service
+Date: Tue, 18 Mar 2014 17:26:29 -0300
+Message-Id: <1395174391-27251-15-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends gatt-service tool, emitting PropertiesChanged for
-"Value" when a new value is set. This flow represents the handling of
-ATT Write Command or Write Request which is translated to a GDBusProxy
-set property. PropertiesChanged will be tracked by the characteristic
-GDBusProxy in order to detect "Value" changes.
+From: Alvaro Silva <alvaro.silva@openbossa.org>
+
+This patch extends the gatt-service.c example adding the callback to
+allow reading the Value property. At the moment, it is a generic
+callback and it doesn't consider characteristic value property
+restrictions.
 ---
- tools/gatt-service.c | 33 ++++++++++++++++++---------------
- 1 file changed, 18 insertions(+), 15 deletions(-)
+ tools/gatt-service.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 53 insertions(+), 6 deletions(-)
 
 diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index ad5399b..8dbecce 100644
+index d1606ad..97dc8d4 100644
 --- a/tools/gatt-service.c
 +++ b/tools/gatt-service.c
-@@ -47,9 +47,11 @@
- 
+@@ -46,18 +46,44 @@
  static GMainLoop *main_loop;
  static GSList *services;
-+static DBusConnection *connection;
  
- struct characteristic {
- 	char *uuid;
-+	char *path;
- 	uint8_t *value;
- 	int vlen;
- };
-@@ -110,6 +112,8 @@ static void chr_set_value(const GDBusPropertyTable *property,
- 	chr->vlen = len;
++struct characteristic {
++	char *uuid;
++	uint8_t *value;
++	int vlen;
++};
++
+ static gboolean chr_get_uuid(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
+ {
+-	const char *uuid = user_data;
++	struct characteristic *chr = user_data;
  
- 	g_dbus_pending_property_success(id);
-+	g_dbus_emit_property_changed(connection, chr->path,
-+						GATT_CHR_IFACE, "Value");
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &chr->uuid);
++
++	return TRUE;
++}
++
++static gboolean chr_get_value(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct characteristic *chr = user_data;
++	DBusMessageIter array;
++
++	printf("Get(\"Value\")\n");
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_BYTE_AS_STRING, &array);
++
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++						&chr->value, chr->vlen);
++
++	dbus_message_iter_close_container(iter, &array);
+ 
+ 	return TRUE;
  }
  
  static const GDBusPropertyTable chr_properties[] = {
-@@ -163,6 +167,7 @@ static void chr_iface_destroy(gpointer user_data)
+ 	{ "UUID",	"s",	chr_get_uuid },
++	{ "Value", "ay", chr_get_value, NULL, NULL },
+ 	{ }
+ };
  
- 	g_free(chr->uuid);
- 	g_free(chr->value);
-+	g_free(chr->path);
- 	g_free(chr);
- }
+@@ -100,18 +126,35 @@ static const GDBusPropertyTable service_properties[] = {
+ 	{ }
+ };
  
-@@ -182,6 +187,7 @@ static int register_characteristic(DBusConnection *conn, const char *uuid,
- 	chr->uuid = g_strdup(uuid);
- 	chr->value = g_memdup(value, vlen);
- 	chr->vlen = vlen;
-+	chr->path = path;
- 
- 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
- 					NULL, NULL, chr_properties,
-@@ -190,18 +196,16 @@ static int register_characteristic(DBusConnection *conn, const char *uuid,
- 		ret = -EIO;
- 	}
- 
--	g_free(path);
--
- 	return ret;
- }
- 
--static char *register_service(DBusConnection *conn, const char *uuid)
-+static char *register_service(const char *uuid)
++static void chr_iface_destroy(gpointer user_data)
++{
++	struct characteristic *chr = user_data;
++
++	g_free(chr->uuid);
++	g_free(chr->value);
++	g_free(chr);
++}
++
+ static int register_characteristic(DBusConnection *conn, const char *uuid,
++						const uint8_t *value, int vlen,
+ 						const char *service_path)
  {
++	struct characteristic *chr;
  	static int id = 1;
  	char *path;
+ 	int ret = 0;
  
- 	path = g_strdup_printf("/service%d", id++);
--	if (g_dbus_register_interface(conn, path, GATT_SERVICE_IFACE,
-+	if (g_dbus_register_interface(connection, path, GATT_SERVICE_IFACE,
- 				NULL, NULL, service_properties,
- 				g_strdup(uuid), g_free) == FALSE) {
- 		printf("Couldn't register service interface\n");
-@@ -212,13 +216,13 @@ static char *register_service(DBusConnection *conn, const char *uuid)
- 	return path;
- }
+ 	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
  
--static void create_services(DBusConnection *conn)
-+static void create_services()
++	chr = g_new0(struct characteristic, 1);
++
++	chr->uuid = g_strdup(uuid);
++	chr->value = g_memdup(value, vlen);
++	chr->vlen = vlen;
++
+ 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+ 					NULL, NULL, chr_properties,
+-					g_strdup(uuid), g_free) == FALSE) {
++					chr, chr_iface_destroy) == FALSE) {
+ 		printf("Couldn't register characteristic interface\n");
+ 		ret = -EIO;
+ 	}
+@@ -141,15 +184,19 @@ static char *register_service(DBusConnection *conn, const char *uuid)
+ static void create_services(DBusConnection *conn)
  {
  	char *service_path;
- 	uint8_t level = 0;
++	uint8_t level = 0;
  	int ret;
  
--	service_path = register_service(conn, IAS_UUID);
-+	service_path = register_service(IAS_UUID);
+ 	service_path = register_service(conn, IAS_UUID);
  	if (service_path == NULL)
  		return;
  
-@@ -226,11 +230,11 @@ static void create_services(DBusConnection *conn)
- 	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
- 	 * "Value" is readable for testing purpose only.
- 	 */
--	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
-+	ret = register_characteristic(connection, ALERT_LEVEL_CHR_UUID, &level,
- 						sizeof(level), service_path);
+-	/* Add Alert Level Characteristic to Immediate Alert Service */
+-	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
+-							service_path);
++	/* Add Alert Level Characteristic to Immediate Alert Service
++	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
++	 * "Value" is readable for testing purpose only.
++	 */
++	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
++						sizeof(level), service_path);
  	if (ret < 0) {
  		printf("Couldn't register Alert Level characteristic (IAS)\n");
--		g_dbus_unregister_interface(conn, service_path,
-+		g_dbus_unregister_interface(connection, service_path,
- 							GATT_SERVICE_IFACE);
- 		g_free(service_path);
- 		return;
-@@ -371,25 +375,24 @@ static guint setup_signalfd(void)
- int main(int argc, char *argv[])
- {
- 	GDBusClient *client;
--	DBusConnection *dbus_conn;
- 	guint signal;
- 
- 	signal = setup_signalfd();
- 	if (signal == 0)
- 		return -errno;
- 
--	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
-+	connection = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
- 
- 	main_loop = g_main_loop_new(NULL, FALSE);
- 
--	g_dbus_attach_object_manager(dbus_conn);
-+	g_dbus_attach_object_manager(connection);
- 
- 	printf("gatt-service unique name: %s\n",
--				dbus_bus_get_unique_name(dbus_conn));
-+				dbus_bus_get_unique_name(connection));
- 
--	create_services(dbus_conn);
-+	create_services();
- 
--	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
-+	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
- 
- 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
- 
-@@ -400,7 +403,7 @@ int main(int argc, char *argv[])
- 	g_source_remove(signal);
- 
- 	g_slist_free_full(services, g_free);
--	dbus_connection_unref(dbus_conn);
-+	dbus_connection_unref(connection);
- 
- 	return 0;
- }
+ 		g_dbus_unregister_interface(conn, service_path,
 -- 
 1.8.3.1
 
