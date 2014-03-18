@@ -2,119 +2,134 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v5 12/16] gatt: Add Write Request handling for GDBusProxy
-Date: Tue, 18 Mar 2014 17:26:27 -0300
-Message-Id: <1395174391-27251-13-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v5 09/16] gdbus: Add g_dbus_proxy_set_property_array
+Date: Tue, 18 Mar 2014 17:26:24 -0300
+Message-Id: <1395174391-27251-10-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the characteristic requires Write Request, the ATT response should
-be sent after receiving the reply for the Set method call.
+This patch adds a new gdbus utility function to allow setting a property
+of fixed, and non-fixed values array.
 ---
- src/gatt-dbus.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 61 insertions(+), 6 deletions(-)
+ gdbus/client.c | 85 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ gdbus/gdbus.h  |  5 ++++
+ 2 files changed, 90 insertions(+)
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index d703355..2412e2d 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -56,6 +56,11 @@ struct external_app {
- 	unsigned int watch;
- };
- 
-+struct proxy_write_data {
-+	btd_attr_write_result_t result_cb;
-+	void *user_data;
-+};
-+
- /*
-  * Attribute to Proxy hash table. Used to map incoming
-  * ATT operations to its external characteristic proxy.
-@@ -181,8 +186,30 @@ static void proxy_read_cb(struct btd_attribute *attr,
- 
- static void proxy_write_reply(const DBusError *derr, void *user_data)
- {
--	if (derr)
--		DBG("Write reply: %s", derr->message);
-+	struct proxy_write_data *wdata = user_data;
-+	int err = 0;
-+
-+	/*
-+	 * Security requirements shall be handled by the core. If external
-+	 * applications returns an error, the reasons will be restricted to
-+	 * invalid argument or application specific errors.
-+	 */
-+
-+	if (dbus_error_is_set(derr) == FALSE)
-+		goto done;
-+
-+	DBG("Write reply: %s", derr->message);
-+
-+	if (dbus_error_has_name(derr, DBUS_ERROR_NO_REPLY))
-+		err = ETIMEDOUT;
-+	else if (dbus_error_has_name(derr, ERROR_INTERFACE ".InvalidArguments"))
-+		err = EINVAL;
-+	else
-+		err = EPROTO;
-+
-+done:
-+	if (wdata && wdata->result_cb)
-+		wdata->result_cb(err, wdata->user_data);
+diff --git a/gdbus/client.c b/gdbus/client.c
+index 5193b6c..6fea3d9 100644
+--- a/gdbus/client.c
++++ b/gdbus/client.c
+@@ -727,6 +727,91 @@ gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
+ 	return TRUE;
  }
  
- static void proxy_write_cb(struct btd_attribute *attr,
-@@ -193,16 +220,44 @@ static void proxy_write_cb(struct btd_attribute *attr,
- 	GDBusProxy *proxy;
- 
- 	proxy = g_hash_table_lookup(proxy_hash, attr);
--	if (proxy == NULL)
--		/* FIXME: Attribute not found */
-+	if (proxy == NULL) {
-+		result(ENOENT, user_data);
- 		return;
++gboolean g_dbus_proxy_set_property_array(GDBusProxy *proxy,
++				const char *name, int type, const void *value,
++				int size, GDBusResultFunction function,
++				void *user_data, GDBusDestroyFunction destroy)
++{
++	struct set_property_data *data;
++	GDBusClient *client;
++	DBusMessage *msg;
++	DBusMessageIter iter, variant, array;
++	DBusPendingCall *call;
++	char array_sig[3];
++	char type_sig[2];
++
++	if (proxy == NULL || name == NULL || value == NULL)
++		return FALSE;
++
++	if (dbus_type_is_basic(type) == FALSE)
++		return FALSE;
++
++	client = proxy->client;
++	if (client == NULL)
++		return FALSE;
++
++	data = g_try_new0(struct set_property_data, 1);
++	if (data == NULL)
++		return FALSE;
++
++	data->function = function;
++	data->user_data = user_data;
++	data->destroy = destroy;
++
++	msg = dbus_message_new_method_call(client->service_name,
++			proxy->obj_path, DBUS_INTERFACE_PROPERTIES, "Set");
++	if (msg == NULL) {
++		g_free(data);
++		return FALSE;
 +	}
- 
--	g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
-+	/*
-+	 * "result" callback defines if the core wants to receive the
-+	 * operation result, allowing to select ATT Write Request or Write
-+	 * Command. Descriptors requires Write Request operation. For
-+	 * Characteristics, the implementation will define which operations
-+	 * are allowed based on the properties/flags.
-+	 * TODO: Write Long Characteristics/Descriptors.
-+	 */
 +
-+	if (result) {
-+		struct proxy_write_data *wdata;
++	array_sig[0] = DBUS_TYPE_ARRAY;
++	array_sig[1] = (char) type;
++	array_sig[2] = '\0';
 +
-+		wdata = g_new0(struct proxy_write_data, 1);
-+		wdata->result_cb = result;
-+		wdata->user_data = user_data;
++	type_sig[0] = (char) type;
++	type_sig[1] = '\0';
 +
-+		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
-+						value, len, proxy_write_reply,
-+						wdata, g_free);
-+	} else {
-+		/*
-+		 * Caller is not interested in the Set method call result.
-+		 * This flow implements the ATT Write Command scenario, where
-+		 * the remote doesn't receive ATT response.
-+		 */
-+		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
- 						value, len, proxy_write_reply,
- 						NULL, NULL);
++	dbus_message_iter_init_append(msg, &iter);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING,
++							&proxy->interface);
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_STRING, &name);
++
++	dbus_message_iter_open_container(&iter, DBUS_TYPE_VARIANT,
++						array_sig, &variant);
++
++	dbus_message_iter_open_container(&variant, DBUS_TYPE_ARRAY,
++						type_sig, &array);
++
++	if (dbus_type_is_fixed(type) == TRUE)
++		dbus_message_iter_append_fixed_array(&array, type,
++							&value, size);
++	else if (type == DBUS_TYPE_STRING || type == DBUS_TYPE_OBJECT_PATH) {
++		int i;
++		const char **str = (const char **) value;
++
++		for (i = 0; i < size; i++)
++			dbus_message_iter_append_basic(&array, type, &str[i]);
 +	}
- 
--	DBG("Server: Write characteristic callback %s",
-+	DBG("Server: Write attribute callback %s",
- 					g_dbus_proxy_get_path(proxy));
 +
- }
++	dbus_message_iter_close_container(&variant, &array);
++	dbus_message_iter_close_container(&iter, &variant);
++
++	if (g_dbus_send_message_with_reply(client->dbus_conn, msg,
++							&call, -1) == FALSE) {
++		dbus_message_unref(msg);
++		g_free(data);
++		return FALSE;
++	}
++
++	dbus_pending_call_set_notify(call, set_property_reply, data, g_free);
++	dbus_pending_call_unref(call);
++
++	dbus_message_unref(msg);
++
++	return TRUE;
++}
++
+ struct method_call_data {
+ 	GDBusReturnFunction function;
+ 	void *user_data;
+diff --git a/gdbus/gdbus.h b/gdbus/gdbus.h
+index 8ada200..40a5abe 100644
+--- a/gdbus/gdbus.h
++++ b/gdbus/gdbus.h
+@@ -329,6 +329,11 @@ gboolean g_dbus_proxy_set_property_basic(GDBusProxy *proxy,
+ 				GDBusResultFunction function, void *user_data,
+ 				GDBusDestroyFunction destroy);
  
- static int register_external_service(const struct external_app *eapp,
++gboolean g_dbus_proxy_set_property_array(GDBusProxy *proxy,
++				const char *name, int type, const void *value,
++				int size, GDBusResultFunction function,
++				void *user_data, GDBusDestroyFunction destroy);
++
+ typedef void (* GDBusSetupFunction) (DBusMessageIter *iter, void *user_data);
+ typedef void (* GDBusReturnFunction) (DBusMessage *message, void *user_data);
+ 
 -- 
 1.8.3.1
 
