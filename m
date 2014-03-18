@@ -1,47 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v5 01/16] shared: Add bswap_128()
-Date: Tue, 18 Mar 2014 17:26:16 -0300
-Message-Id: <1395174391-27251-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1394802800-8424-1-git-send-email-claudio.takahasi@openbossa.org>
- <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] Bluetooth: Fix MITM flag when initiating SMP pairing
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1395150150-31418-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 18 Mar 2014 10:19:00 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <DF2F6FC2-3FBE-4EB3-B598-46B08B22F1D4@holtmann.org>
+References: <1395150150-31418-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds a new helper to swap 128-bit values. It is intended to be used for
-GATT 128-bit UUID handling, converting 128-bit UUID from big-endian to
-little-endian (or the opposite).
+Hi Johan,
 
-No matter the system, bt_uuid_t should always store 128-bit UUID value
-using big-endian format (similar to human-readable format).
----
- src/shared/util.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> The pairing process initiated through mgmt sets the conn->auth_type
+> value regardless of BR/EDR or LE pairing. This value will contain the
+> MITM flag if the local IO capability allows it. When sending the SMP
+> pairing request we should check the value and ensure that the MITM bit
+> gets correctly set in the bonding flags.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
-diff --git a/src/shared/util.h b/src/shared/util.h
-index cc2dbcd..f9170bb 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -91,6 +91,16 @@ void util_debug(util_debug_func_t function, void *user_data,
- void util_hexdump(const char dir, const unsigned char *buf, size_t len,
- 				util_debug_func_t function, void *user_data);
- 
-+static inline void bswap_128(const void *src, void *dst)
-+{
-+	const uint8_t *s = src;
-+	uint8_t *d = dst;
-+	int i;
-+
-+	for (i = 0; i < 16; i++)
-+		d[15 - i] = s[i];
-+}
-+
- static inline void put_le16(uint16_t val, void *dst)
- {
- 	put_unaligned(cpu_to_le16(val), (uint16_t *) dst);
--- 
-1.8.3.1
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
