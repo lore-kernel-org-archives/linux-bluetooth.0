@@ -1,44 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Fix const declaration for swap function src parameter
-Date: Tue, 18 Mar 2014 12:58:23 +0200
-Message-Id: <1395140304-15747-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCHv3 11/16] android/avrcp: Add avrcp_change_path() function
+Date: Tue, 18 Mar 2014 11:20:42 +0200
+Message-Id: <1395134447-8957-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-To make it possible to (correctly) pass data declared as const as the
-src parameter to the swap56 and swap128 functions declare this parameter
-also as const.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/avrcp-lib.c | 20 ++++++++++++++++++++
+ android/avrcp-lib.h |  3 +++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8a1b1bf79555..4f3cde9dd1ea 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -35,14 +35,14 @@
- 
- #define AUTH_REQ_MASK   0x07
- 
--static inline void swap128(u8 src[16], u8 dst[16])
-+static inline void swap128(const u8 src[16], u8 dst[16])
- {
- 	int i;
- 	for (i = 0; i < 16; i++)
- 		dst[15 - i] = src[i];
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index db2057b..284ed10 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -1075,3 +1075,23 @@ int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
+ 	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
+ 							func, user_data);
  }
- 
--static inline void swap56(u8 src[7], u8 dst[7])
-+static inline void swap56(const u8 src[7], u8 dst[7])
- {
- 	int i;
- 	for (i = 0; i < 7; i++)
++
++int avrcp_change_path(struct avrcp *session, uint8_t direction, uint64_t uid,
++				uint16_t counter, avctp_browsing_rsp_cb func,
++				void *user_data)
++{
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 11];
++	struct avrcp_browsing_header *pdu = (void *) buf;
++
++	memset(buf, 0, sizeof(buf));
++
++	pdu->pdu_id = AVRCP_CHANGE_PATH;
++	pdu->param_len = htons(11);
++
++	bt_put_be16(counter, &pdu->params[0]);
++	pdu->params[2] = direction;
++	bt_put_be64(uid, &pdu->params[3]);
++
++	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
++							func, user_data);
++}
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index b84f61c..40e571a 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -262,3 +262,6 @@ int avrcp_get_folder_items(struct avrcp *session, uint8_t scope,
+ 				uint32_t start, uint32_t end, uint32_t *attr,
+ 				size_t attr_count, avctp_browsing_rsp_cb func,
+ 				void *user_data);
++int avrcp_change_path(struct avrcp *session, uint8_t direction, uint64_t uid,
++				uint16_t counter, avctp_browsing_rsp_cb func,
++				void *user_data);
 -- 
-1.8.5.3
+1.8.3.2
 
