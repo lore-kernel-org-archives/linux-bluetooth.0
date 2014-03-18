@@ -2,42 +2,77 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 2/8] android/client: Add AVRCP passthrough_cmd_cb support
-Date: Tue, 18 Mar 2014 15:29:53 +0200
-Message-Id: <1395149399-27531-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1395149399-27531-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1395149399-27531-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 1/8] android/client: Add AVRCP set_player_app_value_rsp support
+Date: Tue, 18 Mar 2014 15:29:52 +0200
+Message-Id: <1395149399-27531-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-rc.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ android/client/if-rc.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/android/client/if-rc.c b/android/client/if-rc.c
-index 2e93c02..f1cdbc5 100644
+index 60c3247..2e93c02 100644
 --- a/android/client/if-rc.c
 +++ b/android/client/if-rc.c
-@@ -88,6 +88,11 @@ static void volume_change_cb(uint8_t volume, uint8_t ctype)
- 	haltest_info("%s, volume=%d ctype=%d\n", __func__, volume, ctype);
+@@ -46,6 +46,14 @@ SINTMAP(btrc_media_attr_t, -1, "(unknown)")
+ 	DELEMENT(BTRC_MEDIA_ATTR_PLAYING_TIME),
+ ENDMAP
+ 
++SINTMAP(btrc_status_t, -1, "(unknown)")
++	DELEMENT(BTRC_STS_BAD_CMD),
++	DELEMENT(BTRC_STS_BAD_PARAM),
++	DELEMENT(BTRC_STS_NOT_FOUND),
++	DELEMENT(BTRC_STS_INTERNAL_ERR),
++	DELEMENT(BTRC_STS_NO_ERROR),
++ENDMAP
++
+ static char last_addr[MAX_ADDR_STR_LEN];
+ 
+ static void remote_features_cb(bt_bdaddr_t *bd_addr,
+@@ -196,6 +204,33 @@ static void set_volume_p(int argc, const char **argv)
+ 	EXEC(if_rc->set_volume, volume);
  }
  
-+static void passthrough_cmd_cb(int id, int key_state)
++/* set_player_app_value_rsp */
++
++static void set_player_app_value_rsp_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
 +{
-+	haltest_info("%s, id=%d key_state=%d\n", __func__, id, key_state);
++	if (argc == 3) {
++		*user = TYPE_ENUM(btrc_status_t);
++		*enum_func = enum_defines;
++	}
 +}
 +
- static btrc_callbacks_t rc_cbacks = {
- 	.size = sizeof(rc_cbacks),
- 	.remote_features_cb = remote_features_cb,
-@@ -95,6 +100,7 @@ static btrc_callbacks_t rc_cbacks = {
- 	.get_element_attr_cb = get_element_attr_cb,
- 	.register_notification_cb = register_notification_cb,
- 	.volume_change_cb = volume_change_cb,
-+	.passthrough_cmd_cb = passthrough_cmd_cb,
- };
++static void set_player_app_value_rsp_p(int argc, const char **argv)
++{
++	btrc_status_t rsp_status;
++
++	RETURN_IF_NULL(if_rc);
++
++	if (argc <= 2) {
++		haltest_error("No response status specified");
++		return;
++	}
++
++	rsp_status = str2btrc_status_t(argv[2]);
++
++	EXEC(if_rc->set_player_app_value_rsp, rsp_status);
++}
++
+ /* cleanup */
  
- /* init */
+ static void cleanup_p(int argc, const char **argv)
+@@ -211,6 +246,7 @@ static struct method methods[] = {
+ 	STD_METHODCH(get_play_status_rsp,
+ 					"<play_status> <song_len> <song_pos>"),
+ 	STD_METHODCH(get_element_attr_rsp, "<num_attr> <attrs_id> <value>"),
++	STD_METHODCH(set_player_app_value_rsp, "<rsp_status>"),
+ 	STD_METHODCH(set_volume, "<volume>"),
+ 	STD_METHOD(cleanup),
+ 	END_METHOD
 -- 
 1.8.3.2
 
