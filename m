@@ -1,68 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH v2 3/3] Bluetooth: Fix SMP user passkey notification mgmt event
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Enforce strict Secure Connections Only mode security
-Date: Wed, 19 Mar 2014 14:10:25 -0700
-Message-Id: <1395263425-5744-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1395231293-26581-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 19 Mar 2014 14:00:19 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4217CDF4-6CBC-49B9-8766-B46E35393F87@holtmann.org>
+References: <1395231293-26581-1-git-send-email-johan.hedberg@gmail.com> <1395231293-26581-3-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In Secure Connections Only mode, it is required that Secure Connections
-is used for pairing and that the link key is encrypted with AES-CCM using
-a P-256 authenticated combination key. If this is not the case, then new
-connection shall be refused or existing connections shall be dropped.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_conn.c  | 11 +++++++++++
- net/bluetooth/hci_event.c | 12 ++++++++++++
- 2 files changed, 23 insertions(+)
+> When performing SMP pairing with MITM protection one side needs to
+> enter the passkey while the other side displays to the user what needs
+> to be entered. Nowhere in the SMP specification does it say that the
+> displaying side needs to any kind of confirmation of the passkey, even
+> though a code comment in smp.c implies this.
+> 
+> This patch removes the misleading comment and converts the code to use
+> the passkey notification mgmt event instead of the passkey confirmation
+> mgmt event.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/smp.c | 5 +++--
+> 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b4809e473a19..d958e2dca52f 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -781,6 +781,17 @@ int hci_conn_check_link_mode(struct hci_conn *conn)
- {
- 	BT_DBG("hcon %p", conn);
- 
-+	/* In Secure Connections Only mode, it is required that Secure
-+	 * Connections is used and the link is encrypted with AES-CCM
-+	 * using a P-256 authenticated combination key.
-+	 */
-+	if (test_bit(HCI_SC_ONLY, &conn->hdev->flags)) {
-+		if (!hci_conn_sc_enabled(conn) ||
-+		    !test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
-+		    conn->key_type != HCI_LK_AUTH_COMBINATION_P256)
-+			return 0;
-+	}
-+
- 	if (hci_conn_ssp_enabled(conn) && !(conn->link_mode & HCI_LM_ENCRYPT))
- 		return 0;
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e97f1905aa5c..a6a3d32553c5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2183,6 +2183,18 @@ static void hci_encrypt_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (!ev->status)
- 			conn->state = BT_CONNECTED;
- 
-+		/* In Secure Connections Only mode, do not allow any
-+		 * connections that are not encrypted with AES-CCM
-+		 * using a P-256 authenticated combination key.
-+		 */
-+		if (test_bit(HCI_SC_ONLY, &hdev->dev_flags) &&
-+		    (!test_bit(HCI_CONN_AES_CCM, &conn->flags) ||
-+		     conn->key_type != HCI_LK_AUTH_COMBINATION_P256)) {
-+			hci_proto_connect_cfm(conn, HCI_ERROR_AUTH_FAILURE);
-+			hci_conn_drop(conn);
-+			goto unlock;
-+		}
-+
- 		hci_proto_connect_cfm(conn, ev->status);
- 		hci_conn_drop(conn);
- 	} else
--- 
-1.8.5.3
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
