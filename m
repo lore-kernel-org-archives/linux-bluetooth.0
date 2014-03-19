@@ -1,24 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 19 Mar 2014 14:05:21 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] test: Add missing import in cyclingspeed
-Message-ID: <20140319120521.GA23490@t440s.lan>
-References: <1395228873-32719-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android: Add WBS mode to handsfree HAL
+Date: Wed, 19 Mar 2014 13:01:11 +0100
+Message-ID: <10573341.Jl1hoRprdJ@leonov>
+In-Reply-To: <1395060022-478-1-git-send-email-szymon.janc@tieto.com>
+References: <1395060022-478-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395228873-32719-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
-
-On Wed, Mar 19, 2014, Andrzej Kaczmarek wrote:
+On Monday 17 of March 2014 13:40:21 Szymon Janc wrote:
+> This adds additional modes for Handsfree HAL:
+>   0x00 = Headset Profile only mode (default)
+>   0x01 = Handsfree Profile (narrowband speech)
+>   0x02 = Handsfree Profile (narrowband and wideband speech)
+> 
+> Currently wideband mode requires chip to assume that eSCO transparent
+> data is mSBC.
 > ---
->  test/test-cyclingspeed | 1 +
->  1 file changed, 1 insertion(+)
+>  android/hal-ipc-api.txt | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
+> index e4a4e9c..5613e85 100644
+> --- a/android/hal-ipc-api.txt
+> +++ b/android/hal-ipc-api.txt
+> @@ -756,7 +756,9 @@ Bluetooth Handsfree HAL (ID 5)
+> 
+>  Android HAL name: "handsfree" (BT_PROFILE_HANDSFREE_ID)
+> 
+> -	Service modes:               0x01 = Headset Profile only mode
+> +	Service modes: 0x00 = Headset Profile only mode (default)
+> +	               0x01 = Handsfree Profile (narrowband speech)
+> +	               0x02 = Handsfree Profile (narrowband and wideband speech)
+> 
+>  Commands and responses:
 
-Both patches have been applied. Thanks.
+Both patches are now upstream.
 
-Johan
+Our reference Nexus4 build was also updated to this change so make sure to 
+repo sync or after updating bleutoothd do:
+
+adb shell setprop persist.sys.bluetooth.handsfree hfp_wbs
+
+-- 
+BR
+Szymon Janc
