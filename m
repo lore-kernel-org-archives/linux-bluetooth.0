@@ -1,27 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2 1/3] Bluetooth: Simplify logic when checking SMP_FLAG_TK_VALID
+Subject: Re: [PATCH] Bluetooth: Fix Pair Device response parameters for pairing failure
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395231293-26581-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 19 Mar 2014 13:59:32 -0700
+In-Reply-To: <1395241249-8235-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 19 Mar 2014 13:57:46 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B15D0EC6-AF80-4A7D-ADDE-25CFDFAAAB47@holtmann.org>
-References: <1395231293-26581-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <67918204-0E66-4384-8C6F-D202A4C52A1F@holtmann.org>
+References: <1395241249-8235-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> This is a trivial coding style simplification by instead of having an
-> extra early return to instead revert the if condition and do the single
-> needed queue_work() call there.
+> It is possible that pairing fails after we've already received remote
+> identity information. One example of such a situation is when
+> re-encryption using the LTK fails. In this case the hci_conn object has
+> already been updated with the identity address but user space does not
+> yet know about it (since we didn't notify it of the new IRK yet).
+> 
+> To ensure user space doesn't get a Pair Device command response with an
+> unknown address always use the same address in the response as was used
+> for the original command.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/smp.c | 6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
+> net/bluetooth/mgmt.c | 16 ++++++++++++++--
+> 1 file changed, 14 insertions(+), 2 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
