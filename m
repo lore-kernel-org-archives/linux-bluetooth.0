@@ -1,71 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1395228873-32719-2-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1395228873-32719-1-git-send-email-andrzej.kaczmarek@tieto.com>
-	<1395228873-32719-2-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Wed, 19 Mar 2014 20:11:45 +0100
-Message-ID: <CAOJw-HYsep+gVgFyE77-hwyGzKFusE4wwr4W9gCASAeaGVTP6g@mail.gmail.com>
-Subject: Re: [PATCH 2/2] test: Fix cyclingspeed manager interface name
-From: Markus Roppelt <markus.roppelt@peus-testing.de>
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CALdY0K4spmU6SsCZM3bWevG_0cjHQmec8N7oe9mCbgRTGJAocQ@mail.gmail.com>
+References: <CALdY0K7bMd=kX1zZ-XiZe58G-fZ1X8rHNdsp05cZ8RwSiUc08A@mail.gmail.com>
+	<CAJdJm_N1-r=ncOd=u6BMXDUMhQocYxU_X-z1Wo=W5ah4Wf6bmw@mail.gmail.com>
+	<CALdY0K4spmU6SsCZM3bWevG_0cjHQmec8N7oe9mCbgRTGJAocQ@mail.gmail.com>
+Date: Wed, 19 Mar 2014 13:22:09 -0400
+Message-ID: <CAJdJm_OxZ0dKDPaPgsYX7UQDczEYgv+Ym6ZZK18h_Yv9zkH=vg@mail.gmail.com>
+Subject: Re: Bluetooth low energy with gatttool and jawbone
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Christian Bianchini <christian.bianchini@euservers.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Christian,
 
-How are you testing the cycling speed?
-I get an error like this (with watcher or manager interface):
-
-[markus@localhost test]$ ./test-cyclingspeed -b D1:83:15:3C:26:F0
-Traceback (most recent call last):
-  File "./test-cyclingspeed", line 153, in <module>
-    cscmanager.RegisterWatcher(
-watcher_path)
-  File "/usr/lib/python2.7/site-packages/dbus/proxies.py", line 70, in __call__
-    return self._proxy_method(*args, **keywords)
-  File "/usr/lib/python2.7/site-packages/dbus/proxies.py", line 145, in __call__
-    **keywords)
-  File "/usr/lib/python2.7/site-packages/dbus/connection.py", line
-651, in call_blocking
-    message, timeout)
-dbus.exceptions.DBusException:
-org.freedesktop.DBus.Error.UnknownMethod: Method "RegisterWatcher"
-with signature "s" on interface "org.bluez.CyclingSpeedManager1"
-doesn't exist
-
-I compiled with ./configure --enable-experimental
-and then changed in /usr/lib/systemd/system/bluetooth.service to start
-with the experimental flag:
-ExecStart=/usr/local/libexec/bluetooth/bluetoothd -E
-
-Is there anything else I need to do?
-
-Greetings
- Markus
-
-2014-03-19 12:34 GMT+01:00 Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>:
-> ---
->  test/test-cyclingspeed | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Mar 19, 2014 at 12:29 PM, Christian Bianchini
+<christian.bianchini@euservers.net> wrote:
+>> Can you try this instead:
+>>
+>> char-write-req 0x000c 0100
 >
-> diff --git a/test/test-cyclingspeed b/test/test-cyclingspeed
-> index 4b8d841..393f79c 100755
-> --- a/test/test-cyclingspeed
-> +++ b/test/test-cyclingspeed
-> @@ -144,7 +144,7 @@ if __name__ == "__main__":
->         device_path = device.object_path
+> OK this worked but didnt activate any input.
+
+It might be just that the device does not have any notification to
+send immediately. Also try reading the descriptor value back (using
+char-read-hnd 0x000c) to make sure the correct value was written.
+
+> I tried to get  characteristics for the 1° service and I found 3 of
+> them, this let me think I have 3 sensors. Can the vibrate motor be a
+> sensor as well?
+
+It's hard to guess here, as they are proprietary services (i.e. not
+defined by the Bluetooth SIG and not found on
+developer.bluetooth.org). Did you find any information about this
+device on the internet? I.e. whether someone already reverse
+engineered it, of if it is already documented somewhere. Or at least
+some sample code.
+
+>   The characteristics from this range are:
 >
->         cscmanager = dbus.Interface(bus.get_object(BUS_NAME, adapter_path),
-> -                                               CYCLINGSPEED_WATCHER_INTERFACE)
-> +                                               CYCLINGSPEED_MANAGER_INTERFACE)
+>   handle: 0x000a, char properties: 0x18, char value handle: 0x000b,
+> uuid: f7c9b162-6658-4390-b53c-1de5e1453654
+
+Note that this characteristic is also writable (the other two are only
+notifiable), as shown by the "char properties" value. It could be used
+to send commands to the device.
+
+>   handle: 0x000d, char properties: 0x10, char value handle: 0x000e,
+> uuid: f7c9ba82-6658-4390-b53c-1de5e1453654
+>   handle: 0x0010, char properties: 0x10, char value handle: 0x0011,
+> uuid: f7c9ba91-6658-4390-b53c-1de5e1453654
+
+>   I discovered that sending 01 to the 0x000f I get one notification
 >
->         watcher_path = "/test/watcher"
->         watcher = Watcher(bus, watcher_path)
-> --
-> 1.9.0
+> char-write-req  0x000f 01
+> [CON][DC:7A:F8:10:AF:A5][LE]> Characteristic value was written successfully
 >
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Notification handle = 0x000e value: 20 0f 1f aa f9 84 d5 e1 78 29 23
+> 2d 14 bc fb c4 ef 71
+
+You still need to figure out what those bits mean. They are not
+documented in developer.bluetooth.org.
+
+> Probably I need to do a custom activation, because pairing the device
+> with the specific app I get a vibration on the device.
+>
+> I might be on the right track, I would like to know if my discovery
+> are right and I am not floating around.
+
+Everything you described here makes sense. But you will need to figure
+out how to use those characteristics so you can do what you want.
+
+>> PS: When replying to e-mails on the mailing list, be sure to not
+>> top-post (i.e. write your reply before the original message) and
+>> remember to trim the original message to only show the relevant part
+>> of the original message (like I did above), otherwise it is difficult
+>> to follow discussion.
+>>
+>> Best Regards,
+>
+> thanks for the advice, I am not really expert on this maillist system :(
+
+No problem, it is just that your e-mails are more likely to be ignored
+by others if they get long due to top-posting and not trimming the
+original message.
+
+Best Regards,
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
