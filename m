@@ -1,91 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix passkey endianess in user_confirm and notify_passkey
-Date: Thu, 20 Mar 2014 08:18:14 +0200
-Message-Id: <1395296294-8686-1-git-send-email-johan.hedberg@gmail.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Date: Wed, 19 Mar 2014 16:47:07 -0700
+From: Terry Hardie <terryh@orcas.net>
+Cc: Adam Warski <adam@warski.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAJdJm_O6nF3NH7H+jZ8dZv=ED0VyP8-z4BqYnmxNqBcqOM8wNQ@mail.gmail.com>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org>
+ <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com>
+ <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org>
+ <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com>
+ <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org>
+ <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org>
+ <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com>
+ <A2B80C7C-697D-44E5-80EA-B398E62EE608@warski.org>
+ <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com>
+ <A6C5B873-6614-45B3-AD4C-B3E08831E6D8@warski.org>
+ <CAJdJm_MrjHy-fk-OQUeepxh2C_K=ap30ekR0U91e6kK+ov42HQ@mail.gmail.com>
+ <C342F1F6-C4EB-4380-85D8-1F141CB06A83@warski.org>
+ <CAJdJm_O6nF3NH7H+jZ8dZv=ED0VyP8-z4BqYnmxNqBcqOM8wNQ@mail.gmail.com>
+Message-ID: <59e67d6df57ced71c2e1c5c8901847da@orcas.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On 2014-03-18 07:07, Anderson Lizardo wrote:
+>> And the same as before, after a short amount of time I start getting 
+>> similar (not exactly the same [2]) errors. So it's not the dongle :)
+> 
+> The logs seem to show the same behaviour as the other dongle:
+> seemingly "random" packets with nonsense parameters (simply because
+> the HCI packet was assembled incorrectly).
+> 
+> I still blame the USB controller in RPi/Beaglebone for not feeding all
+> USB fragments to the bluetooth subsystem... at least is my
+> interpretation from Terry's logs (which are from USB sniffing).
+> 
+> What I have no clue is why this is happenning: both of you tried
+> powered USB hubs, and this was my only guess (insufficient power on
+> the bus). If you could find a kernel version for your boards that are
+> not causing any problems, then we can rule out HW related issues...
 
-The passkey_notify and user_confirm functions in mgmt.c were expecting
-different endianess for the passkey, leading to a big endian bug and
-sparse warning in recently added SMP code. This patch converts both
-functions to expect host endianess and do the conversion to little
-endian only when assigning to the mgmt event struct.
+I agree that it looks like the USB controller's fault. It seems highly 
+unlikely, though. A few reasons why I think so:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h | 2 +-
- net/bluetooth/hci_event.c        | 4 ++--
- net/bluetooth/mgmt.c             | 4 ++--
- net/bluetooth/smp.c              | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
+1. The 2 boards use completely different USB controllers.
+2. Both those platforms talk to other USB devices pushing much higher 
+data rates without any issue.
+3. The problem doesn't show up when the bus is forced to USB 1.1 (Full 
+speed instead of high speed)
+4. The problem doesn't only show up during non-duplicate-filtered scans. 
+I can reproduce it (although it takes a lot longer) with LE 
+Advertisement packets only coming in once per second.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b8cc39a4a9a5..afbea388eda1 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1236,7 +1236,7 @@ void mgmt_pin_code_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				      u8 status);
- int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			      u8 link_type, u8 addr_type, __le32 value,
-+			      u8 link_type, u8 addr_type, u32 value,
- 			      u8 confirm_hint);
- int mgmt_user_confirm_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 				     u8 link_type, u8 addr_type, u8 status);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a6a3d32553c5..1e386edc338f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3459,8 +3459,8 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 	}
- 
- confirm:
--	mgmt_user_confirm_request(hdev, &ev->bdaddr, ACL_LINK, 0, ev->passkey,
--				  confirm_hint);
-+	mgmt_user_confirm_request(hdev, &ev->bdaddr, ACL_LINK, 0,
-+				  le32_to_cpu(ev->passkey), confirm_hint);
- 
- unlock:
- 	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 96670f581bb0..739887c6b286 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5338,7 +5338,7 @@ void mgmt_pin_code_neg_reply_complete(struct hci_dev *hdev, bdaddr_t *bdaddr,
- }
- 
- int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
--			      u8 link_type, u8 addr_type, __le32 value,
-+			      u8 link_type, u8 addr_type, u32 value,
- 			      u8 confirm_hint)
- {
- 	struct mgmt_ev_user_confirm_request ev;
-@@ -5348,7 +5348,7 @@ int mgmt_user_confirm_request(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 	bacpy(&ev.addr.bdaddr, bdaddr);
- 	ev.addr.type = link_to_bdaddr(link_type, addr_type);
- 	ev.confirm_hint = confirm_hint;
--	ev.value = value;
-+	ev.value = cpu_to_le32(value);
- 
- 	return mgmt_event(MGMT_EV_USER_CONFIRM_REQUEST, hdev, &ev, sizeof(ev),
- 			  NULL);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 2a7ee7f6cd8b..13919ff82e05 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -425,7 +425,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 	else
- 		ret = mgmt_user_passkey_notify(hcon->hdev, &hcon->dst,
- 						hcon->type, hcon->dst_type,
--						cpu_to_le32(passkey), 0);
-+						passkey, 0);
- 
- 	hci_dev_unlock(hcon->hdev);
- 
--- 
-1.8.5.3
+Let me ask another question:
+
+Are there any other USB devices that ever send a bunch of data with no 
+polling from the host? IE, if the host has no buffer space to accept an 
+INT transaction, it will just be lost, and all other USB devices wait 
+for the INT to be processed by getting an acknowledgement before 
+generating another INT? Apologies for my lack of in-depth knowledge for 
+the workings of USB bus transactions.
+
+My suspicion is that if you follow the Bluetooth spec for HCI over USB 
+(which all of these vendors making these USB devices should) then if the 
+host USB controller is not fast enough, it can be overwhelmed. Forcing 
+the bus to full-speed mode, means the bluetooth receiver is forced to 
+buffer on its end, since it simply cannot transfer data to the host fast 
+enough to overwhelm it. If my suspicion is true, then that means any 
+packets of this type could overflow a host if it is busy enough, 
+although much less likely to happen if the host is more powerful (in 
+terms of processing power).
+
+Regards,
+
+Terry
 
