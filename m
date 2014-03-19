@@ -1,96 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAJdJm_N1-r=ncOd=u6BMXDUMhQocYxU_X-z1Wo=W5ah4Wf6bmw@mail.gmail.com>
-References: <CALdY0K7bMd=kX1zZ-XiZe58G-fZ1X8rHNdsp05cZ8RwSiUc08A@mail.gmail.com>
-	<CAJdJm_N1-r=ncOd=u6BMXDUMhQocYxU_X-z1Wo=W5ah4Wf6bmw@mail.gmail.com>
-Date: Wed, 19 Mar 2014 16:29:33 +0000
-Message-ID: <CALdY0K4spmU6SsCZM3bWevG_0cjHQmec8N7oe9mCbgRTGJAocQ@mail.gmail.com>
-Subject: Re: Bluetooth low energy with gatttool and jawbone
-From: Christian Bianchini <christian.bianchini@euservers.net>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix Pair Device response parameters for pairing failure
+Date: Wed, 19 Mar 2014 17:00:49 +0200
+Message-Id: <1395241249-8235-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> This error actually means "Write not permitted". One first error is
-> that you are trying to write to the characteristic declaration
-> attribute, which is always read-only. To enable notification, you
-> should write to the Client Characteristic Configuration (CCC)
-> descriptor, which for the first characteristic is probably 0x000c (you
-> can confirm by running "char-desc 0x000c 0x000c", if it appears one
-> attribute with UUID 0x2902, it is a CCC).
->
-> Can you try this instead:
->
-> char-write-req 0x000c 0100
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-OK this worked but didnt activate any input.
+It is possible that pairing fails after we've already received remote
+identity information. One example of such a situation is when
+re-encryption using the LTK fails. In this case the hci_conn object has
+already been updated with the identity address but user space does not
+yet know about it (since we didn't notify it of the new IRK yet).
 
->
-> By the way, I strongly suggest you read a bit more on GATT (there are
-> some good resources on bluetooth.org), so you understand better what
-> are notifications, descriptors, characteristics, services etc.
+To ensure user space doesn't get a Pair Device command response with an
+unknown address always use the same address in the response as was used
+for the original command.
 
-I read a lot about it. I understood that I have 2 services:
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
 
-1) Jawbone service where I should be able to read and active sensors
-2) Default service where I can read Firmware, model, etc...
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 75df93679276..96670f581bb0 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2762,11 +2762,23 @@ static struct pending_cmd *find_pairing(struct hci_conn *conn)
+ 
+ static void pairing_complete(struct pending_cmd *cmd, u8 status)
+ {
++	const struct mgmt_cp_pair_device *cp = cmd->param;
+ 	struct mgmt_rp_pair_device rp;
+ 	struct hci_conn *conn = cmd->user_data;
+ 
+-	bacpy(&rp.addr.bdaddr, &conn->dst);
+-	rp.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
++	/* If we had a pairing failure we might have already received
++	 * the remote Identity Address Information and updated the
++	 * hci_conn variables with it, however we would not yet have
++	 * notified user space of the resolved identity. Therefore, use
++	 * the address given in the Pair Device command in case the
++	 * pairing failed.
++	 */
++	if (status) {
++		memcpy(&rp.addr, &cp->addr, sizeof(rp.addr));
++	} else {
++		bacpy(&rp.addr.bdaddr, &conn->dst);
++		rp.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
++	}
+ 
+ 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_PAIR_DEVICE, status,
+ 		     &rp, sizeof(rp));
+-- 
+1.8.5.3
 
-I was able to read everything about the 2° service, and I am happy with that.
-I tried to get  characteristics for the 1° service and I found 3 of
-them, this let me think I have 3 sensors. Can the vibrate motor be a
-sensor as well?
-
-Doing char-desc of each of three ranges, I couldn't find something
-helpful, only UUID with 0x2803 and 0x2800
-I read about these two UUIDs are for the whole system to help the
-discovery of Characteristics or Descriptions, what I need is to
-discover on with 0x2902 (CCC) , am I right?
-
-Let do a summary, maybe you just give me some input:
-
-**First service ( Jawbone ) :
-   attr handle: 0x0009, end grp handle: 0x0012 uuid:
-f7c9ba7e-6658-4390-b53c-1de5e1453654
-   Range: 0x0009 - 0x0012
-
-  The characteristics from this range are:
-
-  handle: 0x000a, char properties: 0x18, char value handle: 0x000b,
-uuid: f7c9b162-6658-4390-b53c-1de5e1453654
-  handle: 0x000d, char properties: 0x10, char value handle: 0x000e,
-uuid: f7c9ba82-6658-4390-b53c-1de5e1453654
-  handle: 0x0010, char properties: 0x10, char value handle: 0x0011,
-uuid: f7c9ba91-6658-4390-b53c-1de5e1453654
-
-  So what I discovered from your last email is that my CCC are:
-
-  0x000c , 0x000f , 0x0012
-
-  also doing the char-desc I can see that the uuid is 0x2902
-
-  I discovered that sending 01 to the 0x000f I get one notification
-
-char-write-req  0x000f 01
-[CON][DC:7A:F8:10:AF:A5][LE]> Characteristic value was written successfully
-
-Notification handle = 0x000e value: 20 0f 1f aa f9 84 d5 e1 78 29 23
-2d 14 bc fb c4 ef 71
-
-Probably I need to do a custom activation, because pairing the device
-with the specific app I get a vibration on the device.
-
-I might be on the right track, I would like to know if my discovery
-are right and I am not floating around.
-
-
-> PS: When replying to e-mails on the mailing list, be sure to not
-> top-post (i.e. write your reply before the original message) and
-> remember to trim the original message to only show the relevant part
-> of the original message (like I did above), otherwise it is difficult
-> to follow discussion.
->
-> Best Regards,
-
-thanks for the advice, I am not really expert on this maillist system :(
