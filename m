@@ -1,69 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2 2/3] Bluetooth: Increase SMP re-encryption delay to 500ms
+Subject: Re: [PATCH v2 1/3] Bluetooth: Simplify logic when checking SMP_FLAG_TK_VALID
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395231293-26581-2-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 19 Mar 2014 13:59:57 -0700
+In-Reply-To: <1395231293-26581-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 19 Mar 2014 13:59:32 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <831B173F-70ED-460C-8023-1F657B18445C@holtmann.org>
-References: <1395231293-26581-1-git-send-email-johan.hedberg@gmail.com> <1395231293-26581-2-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <B15D0EC6-AF80-4A7D-ADDE-25CFDFAAAB47@holtmann.org>
+References: <1395231293-26581-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> In some cases the current 250ms delay is not enough for the remote to
-> receive the keys, as can be witnessed by the following log:
-> 
->> ACL Data RX: Handle 64 flags 0x02 dlen 21               [hci1] 231.414217
->      SMP: Signing Information (0x0a) len 16
->        Signature key: 555bb66b7ab3abc9d5c287c97fe6eb29
-> < ACL Data TX: Handle 64 flags 0x00 dlen 21               [hci1] 231.414414
->      SMP: Encryption Information (0x06) len 16
->        Long term key: 2a7cdc233c9a4b1f3ed31dd9843fea29
-> < ACL Data TX: Handle 64 flags 0x00 dlen 15               [hci1] 231.414466
->      SMP: Master Identification (0x07) len 10
->        EDIV: 0xeccc
->        Rand: 0x322e0ef50bd9308a
-> < ACL Data TX: Handle 64 flags 0x00 dlen 21               [hci1] 231.414505
->      SMP: Signing Information (0x0a) len 16
->        Signature key: bbda1b2076e2325aa66fbcdd5388f745
->> HCI Event: Number of Completed Packets (0x13) plen 5    [hci1] 231.483130
->        Num handles: 1
->        Handle: 64
->        Count: 2
-> < HCI Command: LE Start Encryption (0x08|0x0019) plen 28  [hci1] 231.664211
->        Handle: 64
->        Random number: 0x5052ad2b75fed54b
->        Encrypted diversifier: 0xb7c2
->        Long term key: a336ede66711b49a84bde9b41426692e
->> HCI Event: Command Status (0x0f) plen 4                 [hci1] 231.666937
->      LE Start Encryption (0x08|0x0019) ncmd 1
->        Status: Success (0x00)
->> HCI Event: Number of Completed Packets (0x13) plen 5    [hci1] 231.712646
->        Num handles: 1
->        Handle: 64
->        Count: 1
->> HCI Event: Disconnect Complete (0x05) plen 4            [hci1] 232.562587
->        Status: Success (0x00)
->        Handle: 64
->        Reason: Remote User Terminated Connection (0x13)
-> 
-> As can be seen, the last key (Signing Information) is sent at 231.414505
-> but the completed packets event for it comes only at 231.712646,
-> i.e. roughly 298ms later.
-> 
-> To have a better margin of error this patch increases the delay to
-> 500ms.
+> This is a trivial coding style simplification by instead of having an
+> extra early return to instead revert the if condition and do the single
+> needed queue_work() call there.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> v2: Update the right timeout
-> 
-> net/bluetooth/smp.h | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> net/bluetooth/smp.c | 6 ++----
+> 1 file changed, 2 insertions(+), 4 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
