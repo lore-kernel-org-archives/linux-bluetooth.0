@@ -1,59 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix Pair Device response parameters for pairing failure
-Date: Wed, 19 Mar 2014 17:00:49 +0200
-Message-Id: <1395241249-8235-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <532995D5.3030009@linux.intel.com>
+Date: Wed, 19 Mar 2014 15:04:21 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH_v6] android/hal-health: Add HDP .register_application
+ method
+References: <1395151108-28229-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1395151108-28229-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
 
-It is possible that pairing fails after we've already received remote
-identity information. One example of such a situation is when
-re-encryption using the LTK fails. In this case the hci_conn object has
-already been updated with the identity address but user space does not
-yet know about it (since we didn't notify it of the new IRK yet).
+ping.
 
-To ensure user space doesn't get a Pair Device command response with an
-unknown address always use the same address in the response as was used
-for the original command.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 75df93679276..96670f581bb0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2762,11 +2762,23 @@ static struct pending_cmd *find_pairing(struct hci_conn *conn)
- 
- static void pairing_complete(struct pending_cmd *cmd, u8 status)
- {
-+	const struct mgmt_cp_pair_device *cp = cmd->param;
- 	struct mgmt_rp_pair_device rp;
- 	struct hci_conn *conn = cmd->user_data;
- 
--	bacpy(&rp.addr.bdaddr, &conn->dst);
--	rp.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
-+	/* If we had a pairing failure we might have already received
-+	 * the remote Identity Address Information and updated the
-+	 * hci_conn variables with it, however we would not yet have
-+	 * notified user space of the resolved identity. Therefore, use
-+	 * the address given in the Pair Device command in case the
-+	 * pairing failed.
-+	 */
-+	if (status) {
-+		memcpy(&rp.addr, &cp->addr, sizeof(rp.addr));
-+	} else {
-+		bacpy(&rp.addr.bdaddr, &conn->dst);
-+		rp.addr.type = link_to_bdaddr(conn->type, conn->dst_type);
-+	}
- 
- 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_PAIR_DEVICE, status,
- 		     &rp, sizeof(rp));
--- 
-1.8.5.3
+On 03/18/2014 03:58 PM, Ravi kumar Veeramally wrote:
+> ---
+> v6: Fixed Szymon's comment.
+> v5: Fixed Johan's comment.
+> v4: Added utility to copy null termiated strings to hal_string.
+> ---
+>   android/hal-health.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 83 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/hal-health.c b/android/hal-health.c
+> index e6fe65a..ac5977f 100644
+> --- a/android/hal-health.c
+> +++ b/android/hal-health.c
+> @@ -28,6 +28,31 @@
+>   
+>   static const bthl_callbacks_t *cbacks = NULL;
+>   
+> +static bool string_to_hal(const char *str, struct hal_string *hstr,
+> +								ssize_t *len)
+> +{
+> +	uint8_t str_len;
+> +
+> +	if (!hstr || !len)
+> +		return false;
+> +
+> +	if (!str) {
+> +		hstr->len = 0;
+> +		return true;
+> +	}
+> +
+> +	str_len = strlen(str) + 1;
+> +
+> +	if ((*len + str_len) > IPC_MTU)
+> +		return false;
+> +
+> +	hstr->len = str_len;
+> +	*len += hstr->len;
+> +	memcpy(hstr->data, str, hstr->len);
+> +
+> +	return true;
+> +}
+> +
+>   static bool interface_ready(void)
+>   {
+>   	return cbacks != NULL;
+> @@ -38,6 +63,63 @@ static bool interface_ready(void)
+>   static const struct hal_ipc_handler ev_handlers[] = {
+>   };
+>   
+> +static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+> +{
+> +	char buf[IPC_MTU];
+> +	struct hal_cmd_health_reg_app *cmd = (void *) buf;
+> +	struct hal_rsp_health_reg_app rsp;
+> +	size_t len = sizeof(rsp);
+> +	bt_status_t status;
+> +	ssize_t cmd_len;
+> +	uint8_t i;
+> +
+> +	DBG("");
+> +
+> +	if (!interface_ready())
+> +		return BT_STATUS_NOT_READY;
+> +
+> +	if (!reg || !app_id)
+> +		return BT_STATUS_PARM_INVALID;
+> +
+> +	cmd_len = sizeof(*cmd);
+> +
+> +	if (!string_to_hal(reg->application_name, &cmd->app_name, &cmd_len))
+> +		return BT_STATUS_PARM_INVALID;
+> +
+> +	if (!string_to_hal(reg->provider_name, &cmd->provider_name, &cmd_len))
+> +		return BT_STATUS_PARM_INVALID;
+> +
+> +	if (!string_to_hal(reg->srv_name, &cmd->service_name, &cmd_len))
+> +		return BT_STATUS_PARM_INVALID;
+> +
+> +	if (!string_to_hal(reg->srv_desp, &cmd->service_descr, &cmd_len))
+> +		return BT_STATUS_PARM_INVALID;
+> +
+> +	cmd->num_of_mdep = reg->number_of_mdeps;
+> +
+> +	for (i = 0; i < reg->number_of_mdeps; i++) {
+> +		cmd_len += sizeof(cmd->mdep_cfg);
+> +		if (cmd_len > IPC_MTU)
+> +			return BT_STATUS_PARM_INVALID;
+> +
+> +		cmd->mdep_cfg[i].role = reg->mdep_cfg[i].mdep_role;
+> +		cmd->mdep_cfg[i].data_type = reg->mdep_cfg[i].data_type;
+> +		cmd->mdep_cfg[i].channel_type = reg->mdep_cfg[i].channel_type;
+> +
+> +		if (!string_to_hal(reg->mdep_cfg[i].mdep_description,
+> +					&cmd->mdep_cfg[i].descr, &cmd_len))
+> +			return BT_STATUS_PARM_INVALID;
+> +	}
+> +
+> +	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
+> +						cmd_len, cmd, &len, &rsp, NULL);
+> +
+> +	if (status == HAL_STATUS_SUCCESS)
+> +		*app_id = rsp.app_id;
+> +
+> +	return status;
+> +}
+> +
+>   static bt_status_t unregister_application(int app_id)
+>   {
+>   	struct hal_cmd_health_unreg_app cmd;
+> @@ -149,7 +231,7 @@ static void cleanup(void)
+>   static bthl_interface_t health_if = {
+>   	.size = sizeof(health_if),
+>   	.init = init,
+> -	.register_application = NULL,
+> +	.register_application = register_application,
+>   	.unregister_application = unregister_application,
+>   	.connect_channel = connect_channel,
+>   	.destroy_channel = destroy_channel,
 
