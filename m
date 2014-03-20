@@ -2,316 +2,340 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 15/62] Replace bt_get_be32() by get_be32()
-Date: Thu, 20 Mar 2014 11:42:40 -0300
-Message-Id: <1395326607-27068-16-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 17/62] Replace bt_put_be16() by put_be16()
+Date: Thu, 20 Mar 2014 11:42:42 -0300
+Message-Id: <1395326607-27068-18-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/avrcp-lib.c     |  4 ++--
- android/avrcp.c         |  1 +
- lib/sdp.c               | 10 +++++-----
- monitor/sdp.c           | 20 ++++++++++----------
- profiles/audio/avrcp.c  | 12 ++++++------
- profiles/network/bnep.c |  4 ++--
- src/sdpd-request.c      |  4 ++--
- src/sdpd-service.c      |  6 +++---
- 8 files changed, 31 insertions(+), 30 deletions(-)
+ android/avrcp-lib.c    |  8 ++++----
+ android/avrcp.c        |  4 ++--
+ lib/sdp.c              | 18 +++++++++---------
+ profiles/audio/avrcp.c | 12 ++++++------
+ profiles/sap/server.c  |  2 +-
+ src/sdpd-request.c     | 20 ++++++++++----------
+ src/sdpd-service.c     |  6 +++---
+ 7 files changed, 35 insertions(+), 35 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 06aa552..5e678ea 100644
+index 934106b..5e9bb1a 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -510,7 +510,7 @@ static ssize_t get_element_attributes(struct avrcp *session,
- 	number = params[8];
+@@ -815,7 +815,7 @@ int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id,
+ {
+ 	uint8_t params[2];
  
- 	for (i = 0; i < number; i++) {
--		attrs[i] = bt_get_be32(&params[9 + i * 4]);
-+		attrs[i] = get_be32(&params[9 + i * 4]);
+-	bt_put_be16(player_id, params);
++	put_be16(player_id, params);
  
- 		if (attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
- 				attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST)
-@@ -540,7 +540,7 @@ static ssize_t register_notification(struct avrcp *session, uint8_t transaction,
- 	if (!player->ind || !player->ind->register_notification)
- 		return -ENOSYS;
+ 	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+ 				AVRCP_SET_ADDRESSED_PLAYER, params,
+@@ -881,7 +881,7 @@ int avrcp_get_player_attribute_text_rsp(struct avrcp *session,
+ 			len = strlen(text[i]);
  
--	interval = bt_get_be32(&params[1]);
-+	interval = get_be32(&params[1]);
+ 		ptr[0] = attrs[i];
+-		bt_put_be16(AVRCP_CHARSET_UTF8, &ptr[1]);
++		put_be16(AVRCP_CHARSET_UTF8, &ptr[1]);
+ 		ptr[3] = len;
+ 		memcpy(&ptr[4], text[i], len);
+ 		ptr += 4 + len;
+@@ -945,7 +945,7 @@ int avrcp_get_player_values_text_rsp(struct avrcp *session,
+ 			len = strlen(text[i]);
  
- 	return player->ind->register_notification(session, transaction,
- 							params[0], interval,
+ 		ptr[0] = values[i];
+-		bt_put_be16(AVRCP_CHARSET_UTF8, &ptr[1]);
++		put_be16(AVRCP_CHARSET_UTF8, &ptr[1]);
+ 		ptr[3] = len;
+ 		memcpy(&ptr[4], text[i], len);
+ 		ptr += 4 + len;
+@@ -1016,7 +1016,7 @@ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
+ 		return avctp_send_passthrough(session->conn, op, NULL, 0);
+ 
+ 	hton24(params, vendor);
+-	bt_put_be16(op, &params[3]);
++	put_be16(op, &params[3]);
+ 
+ 	return avctp_send_passthrough(session->conn, AVC_VENDOR_UNIQUE, params,
+ 								sizeof(params));
 diff --git a/android/avrcp.c b/android/avrcp.c
-index 7d5f53f..a435594 100644
+index a435594..046a959 100644
 --- a/android/avrcp.c
 +++ b/android/avrcp.c
-@@ -35,6 +35,7 @@
- #include "lib/sdp.h"
- #include "lib/sdp_lib.h"
- #include "src/sdp-client.h"
-+#include "src/shared/util.h"
- #include "src/log.h"
+@@ -184,11 +184,11 @@ static size_t write_element_text(uint8_t id, uint8_t text_len, uint8_t *text,
+ 	pdu += 4;
+ 	len += 4;
  
- #include "avctp.h"
+-	bt_put_be16(charset, pdu);
++	put_be16(charset, pdu);
+ 	pdu += 2;
+ 	len += 2;
+ 
+-	bt_put_be16(text_len, pdu);
++	put_be16(text_len, pdu);
+ 	pdu += 2;
+ 	len += 2;
+ 
 diff --git a/lib/sdp.c b/lib/sdp.c
-index fec658a..e4b0d43 100644
+index 9fc2b92..4a1f69b 100644
 --- a/lib/sdp.c
 +++ b/lib/sdp.c
-@@ -1018,7 +1018,7 @@ int sdp_uuid_extract(const uint8_t *p, int bufsize, uuid_t *uuid, int *scanned)
- 			SDPERR("Not enough room for 32-bit UUID");
- 			return -1;
- 		}
--		sdp_uuid32_create(uuid, bt_get_be32(p));
-+		sdp_uuid32_create(uuid, get_be32(p));
- 		*scanned += sizeof(uint32_t);
- 	} else {
- 		if (bufsize < (int) sizeof(uint128_t)) {
-@@ -1083,7 +1083,7 @@ static sdp_data_t *extract_int(const void *p, int bufsize, int *len)
- 			return NULL;
- 		}
- 		*len += sizeof(uint32_t);
--		d->val.uint32 = bt_get_be32(p);
-+		d->val.uint32 = get_be32(p);
+@@ -627,7 +627,7 @@ void sdp_set_seq_len(uint8_t *ptr, uint32_t length)
+ 	case SDP_ALT16:
+ 	case SDP_TEXT_STR16:
+ 	case SDP_URL_STR16:
+-		bt_put_be16(length, ptr);
++		put_be16(length, ptr);
  		break;
- 	case SDP_INT64:
- 	case SDP_UINT64:
-@@ -1255,7 +1255,7 @@ int sdp_extract_seqtype(const uint8_t *buf, int bufsize, uint8_t *dtdp, int *siz
- 			SDPERR("Unexpected end of packet");
- 			return 0;
- 		}
--		*size = bt_get_be32(buf);
-+		*size = get_be32(buf);
- 		scanned += sizeof(uint32_t);
- 		break;
- 	default:
-@@ -2957,7 +2957,7 @@ int sdp_device_record_register_binary(sdp_session_t *session, bdaddr_t *device,
- 			goto end;
- 		}
- 		if (handle)
--			*handle  = bt_get_be32(p);
-+			*handle  = get_be32(p);
- 	}
+ 	case SDP_SEQ32:
+ 	case SDP_ALT32:
+@@ -673,7 +673,7 @@ void sdp_set_attrid(sdp_buf_t *buf, uint16_t attr)
+ 	/* data type for attr */
+ 	*p++ = SDP_UINT16;
+ 	buf->data_size = sizeof(uint8_t);
+-	bt_put_be16(attr, p);
++	put_be16(attr, p);
+ 	buf->data_size += sizeof(uint16_t);
+ }
  
- end:
-@@ -3259,7 +3259,7 @@ static void extract_record_handle_seq(uint8_t *pdu, int bufsize, sdp_list_t **se
- 		pSvcRec = malloc(sizeof(uint32_t));
- 		if (!pSvcRec)
- 			break;
--		*pSvcRec = bt_get_be32(pdata);
-+		*pSvcRec = get_be32(pdata);
- 		pSeq = sdp_list_append(pSeq, pSvcRec);
- 		pdata += sizeof(uint32_t);
- 		*scanned += sizeof(uint32_t);
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index a5e8ff4..d729e1f 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -94,7 +94,7 @@ static void print_uint(uint8_t indent, const uint8_t *data, uint32_t size)
- 		print_field("%*c0x%4.4x", indent, ' ', get_be16(data));
+@@ -2857,7 +2857,7 @@ void sdp_append_to_buf(sdp_buf_t *dst, uint8_t *data, uint32_t len)
+ 		*(uint8_t *) p = dst->data_size - sizeof(uint8_t) - sizeof(uint8_t);
  		break;
- 	case 4:
--		print_field("%*c0x%8.8x", indent, ' ', bt_get_be32(data));
-+		print_field("%*c0x%8.8x", indent, ' ', get_be32(data));
+ 	case SDP_SEQ16:
+-		bt_put_be16(dst->data_size - sizeof(uint8_t) - sizeof(uint16_t), p);
++		put_be16(dst->data_size - sizeof(uint8_t) - sizeof(uint16_t), p);
  		break;
- 	case 8:
- 		print_field("%*c0x%16.16" PRIx64, indent, ' ',
-@@ -120,22 +120,22 @@ static void print_uuid(uint8_t indent, const uint8_t *data, uint32_t size)
- 		break;
- 	case 4:
- 		print_field("%*c%s (0x%8.8x)", indent, ' ',
--			uuid32_to_str(bt_get_be32(data)), bt_get_be32(data));
-+			uuid32_to_str(get_be32(data)), get_be32(data));
- 		break;
- 	case 16:
- 		/* BASE_UUID = 00000000-0000-1000-8000-00805F9B34FB */
- 		print_field("%*c%8.8x-%4.4x-%4.4x-%4.4x-%4.4x%8.4x",
- 				indent, ' ',
--				bt_get_be32(data), get_be16(data + 4),
-+				get_be32(data), get_be16(data + 4),
- 				get_be16(data + 6), get_be16(data + 8),
--				get_be16(data + 10), bt_get_be32(data + 12));
-+				get_be16(data + 10), get_be32(data + 12));
- 		if (get_be16(data + 4) == 0x0000 &&
- 				get_be16(data + 6) == 0x1000 &&
- 				get_be16(data + 8) == 0x8000 &&
- 				get_be16(data + 10) == 0x0080 &&
--				bt_get_be32(data + 12) == 0x5F9B34FB)
-+				get_be32(data + 12) == 0x5F9B34FB)
- 			print_field("%*c%s", indent, ' ',
--				uuid32_to_str(bt_get_be32(data)));
-+				uuid32_to_str(get_be32(data)));
- 		break;
- 	default:
- 		packet_hexdump(data, size);
-@@ -237,7 +237,7 @@ static uint32_t get_size(const uint8_t *data, uint32_t size)
- 			case 16:
- 				return get_be16(data + 1);
- 			case 32:
--				return bt_get_be32(data + 1);
-+				return get_be32(data + 1);
- 			default:
- 				return 0;
- 			}
-@@ -323,7 +323,7 @@ static uint32_t get_bytes(const uint8_t *data, uint32_t size)
- 	case 6:
- 		return 3 + get_be16(data + 1);
- 	case 7:
--		return 5 + bt_get_be32(data + 1);
-+		return 5 + get_be32(data + 1);
- 	}
+ 	case SDP_SEQ32:
+ 		bt_put_be32(dst->data_size - sizeof(uint8_t) - sizeof(uint32_t), p);
+@@ -3430,7 +3430,7 @@ int sdp_service_search_req(sdp_session_t *session, const sdp_list_t *search,
+ 	pdata += seqlen;
  
- 	return 0;
-@@ -582,7 +582,7 @@ static void service_rsp(const struct l2cap_frame *frame, struct tid_data *tid)
+ 	/* specify the maximum svc rec count that client expects */
+-	bt_put_be16(max_rec_num, pdata);
++	put_be16(max_rec_num, pdata);
+ 	reqsize += sizeof(uint16_t);
+ 	pdata += sizeof(uint16_t);
  
- 	for (i = 0; i < count; i++)
- 		print_field("Record handle: 0x%4.4x",
--				bt_get_be32(frame->data + 4 + (i * 4)));
-+				get_be32(frame->data + 4 + (i * 4)));
+@@ -3597,7 +3597,7 @@ sdp_record_t *sdp_service_attr_req(sdp_session_t *session, uint32_t handle,
+ 	pdata += sizeof(uint32_t);
  
- 	print_continuation(frame->data + 4 + (count * 4),
- 					frame->size - 4 - (count * 4));
-@@ -598,7 +598,7 @@ static void attr_req(const struct l2cap_frame *frame, struct tid_data *tid)
- 		return;
- 	}
+ 	/* specify the response limit */
+-	bt_put_be16(65535, pdata);
++	put_be16(65535, pdata);
+ 	reqsize += sizeof(uint16_t);
+ 	pdata += sizeof(uint16_t);
  
--	print_field("Record handle: 0x%4.4x", bt_get_be32(frame->data));
-+	print_field("Record handle: 0x%4.4x", get_be32(frame->data));
- 	print_field("Max attribute bytes: %d", get_be16(frame->data + 4));
+@@ -3851,7 +3851,7 @@ int sdp_service_search_async(sdp_session_t *session, const sdp_list_t *search, u
+ 	t->reqsize += seqlen;
+ 	pdata += seqlen;
  
- 	attr_bytes = get_bytes(frame->data + 6, frame->size - 6);
+-	bt_put_be16(max_rec_num, pdata);
++	put_be16(max_rec_num, pdata);
+ 	t->reqsize += sizeof(uint16_t);
+ 	pdata += sizeof(uint16_t);
+ 
+@@ -3949,7 +3949,7 @@ int sdp_service_attr_async(sdp_session_t *session, uint32_t handle, sdp_attrreq_
+ 	pdata += sizeof(uint32_t);
+ 
+ 	/* specify the response limit */
+-	bt_put_be16(65535, pdata);
++	put_be16(65535, pdata);
+ 	t->reqsize += sizeof(uint16_t);
+ 	pdata += sizeof(uint16_t);
+ 
+@@ -4064,7 +4064,7 @@ int sdp_service_search_attr_async(sdp_session_t *session, const sdp_list_t *sear
+ 	t->reqsize += seqlen;
+ 	pdata += seqlen;
+ 
+-	bt_put_be16(SDP_MAX_ATTR_LEN, pdata);
++	put_be16(SDP_MAX_ATTR_LEN, pdata);
+ 	t->reqsize += sizeof(uint16_t);
+ 	pdata += sizeof(uint16_t);
+ 
+@@ -4444,7 +4444,7 @@ int sdp_service_search_attr_req(sdp_session_t *session, const sdp_list_t *search
+ 	reqsize += seqlen;
+ 	pdata += seqlen;
+ 
+-	bt_put_be16(SDP_MAX_ATTR_LEN, pdata);
++	put_be16(SDP_MAX_ATTR_LEN, pdata);
+ 	reqsize += sizeof(uint16_t);
+ 	pdata += sizeof(uint16_t);
+ 
 diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 8487682..6772984 100644
+index ebd10a9..913d2be 100644
 --- a/profiles/audio/avrcp.c
 +++ b/profiles/audio/avrcp.c
-@@ -1082,7 +1082,7 @@ static uint8_t avrcp_handle_get_element_attributes(struct avrcp *session,
- 		for (i = 0, len = 0, attr_ids = NULL; i < nattr; i++) {
- 			uint32_t id;
+@@ -2450,7 +2450,7 @@ static void avrcp_get_item_attributes(struct avrcp *session, uint64_t uid)
+ 	pdu->pdu_id = AVRCP_GET_ITEM_ATTRIBUTES;
+ 	pdu->params[0] = 0x03;
+ 	bt_put_be64(uid, &pdu->params[1]);
+-	bt_put_be16(player->uid_counter, &pdu->params[9]);
++	put_be16(player->uid_counter, &pdu->params[9]);
+ 	pdu->param_len = htons(12);
  
--			id = bt_get_be32(&pdu->params[9] + (i * sizeof(id)));
-+			id = get_be32(&pdu->params[9] + (i * sizeof(id)));
+ 	avctp_send_browsing_req(session->conn, buf, sizeof(buf),
+@@ -2634,7 +2634,7 @@ static void avrcp_change_path(struct avrcp *session, uint8_t direction,
+ 	struct avrcp_browsing_header *pdu = (void *) buf;
  
- 			/* Don't add invalid attributes */
- 			if (id == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
-@@ -1990,7 +1990,7 @@ static void avrcp_parse_attribute_list(struct avrcp_player *player,
- 		uint32_t id;
- 		uint16_t charset, len;
+ 	memset(buf, 0, sizeof(buf));
+-	bt_put_be16(player->uid_counter, &pdu->params[0]);
++	put_be16(player->uid_counter, &pdu->params[0]);
+ 	pdu->params[2] = direction;
+ 	bt_put_be64(uid, &pdu->params[3]);
+ 	pdu->pdu_id = AVRCP_CHANGE_PATH;
+@@ -2700,8 +2700,8 @@ static void avrcp_search(struct avrcp *session, const char *string)
+ 	stringlen = strnlen(string, sizeof(buf) - len);
+ 	len += stringlen;
  
--		id = bt_get_be32(&operands[i]);
-+		id = get_be32(&operands[i]);
- 		i += sizeof(uint32_t);
+-	bt_put_be16(AVRCP_CHARSET_UTF8, &pdu->params[0]);
+-	bt_put_be16(stringlen, &pdu->params[2]);
++	put_be16(AVRCP_CHARSET_UTF8, &pdu->params[0]);
++	put_be16(stringlen, &pdu->params[2]);
+ 	memcpy(&pdu->params[4], string, stringlen);
+ 	pdu->pdu_id = AVRCP_SEARCH;
+ 	pdu->param_len = htons(len - AVRCP_BROWSING_HEADER_LENGTH);
+@@ -2739,7 +2739,7 @@ static void avrcp_play_item(struct avrcp *session, uint64_t uid)
  
- 		charset = get_be16(&operands[i]);
-@@ -2319,7 +2319,7 @@ static gboolean avrcp_change_path_rsp(struct avctp *conn,
- 		goto done;
- 	}
+ 	pdu->params[0] = player->scope;
+ 	bt_put_be64(uid, &pdu->params[1]);
+-	bt_put_be16(player->uid_counter, &pdu->params[9]);
++	put_be16(player->uid_counter, &pdu->params[9]);
  
--	ret = bt_get_be32(&pdu->params[1]);
-+	ret = get_be32(&pdu->params[1]);
+ 	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
  
- done:
- 	if (ret < 0) {
-@@ -2357,7 +2357,7 @@ static gboolean avrcp_set_browsed_player_rsp(struct avctp *conn,
- 	player->uid_counter = get_be16(&pdu->params[1]);
- 	player->browsed = true;
+@@ -2785,7 +2785,7 @@ static void avrcp_add_to_nowplaying(struct avrcp *session, uint64_t uid)
  
--	items = bt_get_be32(&pdu->params[3]);
-+	items = get_be32(&pdu->params[3]);
+ 	pdu->params[0] = player->scope;
+ 	bt_put_be64(uid, &pdu->params[1]);
+-	bt_put_be16(player->uid_counter, &pdu->params[9]);
++	put_be16(player->uid_counter, &pdu->params[9]);
  
- 	depth = pdu->params[9];
+ 	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
  
-@@ -2681,7 +2681,7 @@ static gboolean avrcp_search_rsp(struct avctp *conn, uint8_t *operands,
- 	}
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index 6b27cfa..20c6cab 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -668,7 +668,7 @@ int sap_connect_rsp(void *sap_device, uint8_t status)
+ 		param = (struct sap_parameter *) &buf[size];
+ 		param->id = SAP_PARAM_ID_MAX_MSG_SIZE;
+ 		param->len = htons(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
+-		bt_put_be16(SAP_BUF_SIZE, &param->val);
++		put_be16(SAP_BUF_SIZE, &param->val);
+ 		size += PARAMETER_SIZE(SAP_PARAM_ID_MAX_MSG_SIZE_LEN);
  
- 	player->uid_counter = get_be16(&pdu->params[1]);
--	ret = bt_get_be32(&pdu->params[3]);
-+	ret = get_be32(&pdu->params[3]);
- 
- done:
- 	media_player_search_complete(mp, ret);
-@@ -2908,7 +2908,7 @@ avrcp_parse_media_player_item(struct avrcp *session, uint8_t *operands,
- 
- 	media_player_set_type(mp, type_to_string(operands[2]));
- 
--	subtype = bt_get_be32(&operands[3]);
-+	subtype = get_be32(&operands[3]);
- 
- 	media_player_set_subtype(mp, subtype_to_string(subtype));
- 
-diff --git a/profiles/network/bnep.c b/profiles/network/bnep.c
-index 8c95406..87304c5 100644
---- a/profiles/network/bnep.c
-+++ b/profiles/network/bnep.c
-@@ -650,13 +650,13 @@ uint16_t bnep_setup_decode(struct bnep_setup_conn_req *req, uint16_t *dst,
- 		/* Intentional no-break */
- 
- 	case 4: /* UUID32 */
--		val = bt_get_be32(dest);
-+		val = get_be32(dest);
- 		if (val > 0xffff)
- 			return BNEP_CONN_INVALID_DST;
- 
- 		*dst = val;
- 
--		val = bt_get_be32(source);
-+		val = get_be32(source);
- 		if (val > 0xffff)
- 			return BNEP_CONN_INVALID_SRC;
- 
+ 		/* fall */
 diff --git a/src/sdpd-request.c b/src/sdpd-request.c
-index d2ec9e1..a9d92a6 100644
+index a9d92a6..600237a 100644
 --- a/src/sdpd-request.c
 +++ b/src/sdpd-request.c
-@@ -203,7 +203,7 @@ static int extract_des(uint8_t *buf, int len, sdp_list_t **svcReqSeq, uint8_t *p
- 				struct attrid *aid;
- 				aid = malloc(sizeof(struct attrid));
- 				aid->dtd = dataType;
--				aid->uint32 = bt_get_be32(p);
-+				aid->uint32 = get_be32(p);
+@@ -184,7 +184,7 @@ static int extract_des(uint8_t *buf, int len, sdp_list_t **svcReqSeq, uint8_t *p
+ 				memcpy(&tmp, p, sizeof(tmp));
  
- 				pElem = (char *) aid;
- 			} else {
-@@ -648,7 +648,7 @@ static int service_attr_req(sdp_req_t *req, sdp_buf_t *buf)
- 		goto done;
+ 				pElem = malloc(sizeof(uint16_t));
+-				bt_put_be16(tmp, pElem);
++				put_be16(tmp, pElem);
+ 			}
+ 			p += sizeof(uint16_t);
+ 			seqlen += sizeof(uint16_t);
+@@ -419,13 +419,13 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+ 
+ 	/* total service record count = 0 */
+ 	pTotalRecordCount = pdata;
+-	bt_put_be16(0, pdata);
++	put_be16(0, pdata);
+ 	pdata += sizeof(uint16_t);
+ 	buf->data_size += sizeof(uint16_t);
+ 
+ 	/* current service record count = 0 */
+ 	pCurrentRecordCount = pdata;
+-	bt_put_be16(0, pdata);
++	put_be16(0, pdata);
+ 	pdata += sizeof(uint16_t);
+ 	buf->data_size += sizeof(uint16_t);
+ 
+@@ -451,8 +451,8 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+ 		SDPDBG("Match count: %d", rsp_count);
+ 
+ 		buf->data_size += handleSize;
+-		bt_put_be16(rsp_count, pTotalRecordCount);
+-		bt_put_be16(rsp_count, pCurrentRecordCount);
++		put_be16(rsp_count, pTotalRecordCount);
++		put_be16(rsp_count, pCurrentRecordCount);
+ 
+ 		if (rsp_count > actual) {
+ 			/* cache the rsp and generate a continuation state */
+@@ -517,8 +517,8 @@ static int service_search_req(sdp_req_t *req, sdp_buf_t *buf)
+ 		}
+ 
+ 		buf->data_size += handleSize;
+-		bt_put_be16(rsp_count, pTotalRecordCount);
+-		bt_put_be16(i - lastIndex, pCurrentRecordCount);
++		put_be16(rsp_count, pTotalRecordCount);
++		put_be16(i - lastIndex, pCurrentRecordCount);
+ 
+ 		if (i == rsp_count) {
+ 			/* set "null" continuationState */
+@@ -774,7 +774,7 @@ done:
+ 		return status;
+ 
+ 	/* set attribute list byte count */
+-	bt_put_be16(buf->data_size - cstate_size, buf->data);
++	put_be16(buf->data_size - cstate_size, buf->data);
+ 	buf->data_size += sizeof(uint16_t);
+ 	return 0;
+ }
+@@ -945,7 +945,7 @@ static int service_search_attr_req(sdp_req_t *req, sdp_buf_t *buf)
+ 
+ 	if (!status) {
+ 		/* set attribute list byte count */
+-		bt_put_be16(buf->data_size - cstate_size, buf->data);
++		put_be16(buf->data_size - cstate_size, buf->data);
+ 		buf->data_size += sizeof(uint16_t);
  	}
  
--	handle = bt_get_be32(pdata);
-+	handle = get_be32(pdata);
+@@ -1029,7 +1029,7 @@ static void process_request(sdp_req_t *req)
+ send_rsp:
+ 	if (status) {
+ 		rsphdr->pdu_id = SDP_ERROR_RSP;
+-		bt_put_be16(status, rsp.data);
++		put_be16(status, rsp.data);
+ 		rsp.data_size = sizeof(uint16_t);
+ 	}
  
- 	pdata += sizeof(uint32_t);
- 	data_left -= sizeof(uint32_t);
 diff --git a/src/sdpd-service.c b/src/sdpd-service.c
-index 06df94e..f763436 100644
+index f763436..e001c30 100644
 --- a/src/sdpd-service.c
 +++ b/src/sdpd-service.c
-@@ -331,7 +331,7 @@ static sdp_record_t *extract_pdu_server(bdaddr_t *device, uint8_t *p,
- 			SDPDBG("Unexpected end of packet");
- 			return NULL;
- 		}
--		handle = bt_get_be32(p + sizeof(uint8_t) + sizeof(uint16_t) +
-+		handle = get_be32(p + sizeof(uint8_t) + sizeof(uint16_t) +
- 							sizeof(uint8_t));
- 		SDPDBG("SvcRecHandle : 0x%x", handle);
- 		rec = sdp_record_find(handle);
-@@ -478,7 +478,7 @@ int service_update_req(sdp_req_t *req, sdp_buf_t *rsp)
- 	int status = 0, scanned = 0;
- 	uint8_t *p = req->buf + sizeof(sdp_pdu_hdr_t);
- 	int bufsize = req->len - sizeof(sdp_pdu_hdr_t);
--	uint32_t handle = bt_get_be32(p);
-+	uint32_t handle = get_be32(p);
+@@ -463,7 +463,7 @@ success:
+ 	return 0;
  
- 	SDPDBG("Svc Rec Handle: 0x%x", handle);
+ invalid:
+-	bt_put_be16(SDP_INVALID_SYNTAX, rsp->data);
++	put_be16(SDP_INVALID_SYNTAX, rsp->data);
+ 	rsp->data_size = sizeof(uint16_t);
  
-@@ -517,7 +517,7 @@ done:
- int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp)
- {
- 	uint8_t *p = req->buf + sizeof(sdp_pdu_hdr_t);
--	uint32_t handle = bt_get_be32(p);
-+	uint32_t handle = get_be32(p);
- 	sdp_record_t *rec;
- 	int status = 0;
+ 	return -1;
+@@ -506,7 +506,7 @@ int service_update_req(sdp_req_t *req, sdp_buf_t *rsp)
  
+ done:
+ 	p = rsp->data;
+-	bt_put_be16(status, p);
++	put_be16(status, p);
+ 	rsp->data_size = sizeof(uint16_t);
+ 	return status;
+ }
+@@ -536,7 +536,7 @@ int service_remove_req(sdp_req_t *req, sdp_buf_t *rsp)
+ 	}
+ 
+ 	p = rsp->data;
+-	bt_put_be16(status, p);
++	put_be16(status, p);
+ 	rsp->data_size = sizeof(uint16_t);
+ 
+ 	return status;
 -- 
 1.8.3.1
 
