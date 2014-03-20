@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v5 07/10] tools/mgmt-tester: Update Stop Discovery-BR/EDR (Inquiry) Success 1
-Date: Thu, 20 Mar 2014 12:25:10 +0100
-Message-ID: <1395314713-13104-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v5 10/10] shared: Fix missing destroy callback in timeout_add
+Date: Thu, 20 Mar 2014 12:25:13 +0100
+Message-ID: <1395314713-13104-11-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,26 +13,22 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With new way of handling inquiry in btdev there is no need to register
-inquiry event hook
 ---
- tools/mgmt-tester.c | 3 ---
- 1 file changed, 3 deletions(-)
+ src/shared/timeout-mainloop.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 9f71743..17d2bd2 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1734,9 +1734,6 @@ static const struct generic_data stop_discovery_success_test_1 = {
+diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
+index 37bb51c..77aaa63 100644
+--- a/src/shared/timeout-mainloop.c
++++ b/src/shared/timeout-mainloop.c
+@@ -65,6 +65,7 @@ unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
+ 	data->func = func;
+ 	data->user_data = user_data;
+ 	data->timeout = timeout;
++	data->destroy = destroy;
  
- static const struct generic_data stop_discovery_bredr_success_test_1 = {
- 	.setup_settings = settings_powered,
--	.setup_expect_hci_command = BT_HCI_CMD_INQUIRY,
--	.setup_expect_hci_param = stop_discovery_inq_param,
--	.setup_expect_hci_len = sizeof(stop_discovery_inq_param),
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredr_param,
- 	.send_len = sizeof(stop_discovery_bredr_param),
+ 	data->id = mainloop_add_timeout(timeout, timeout_callback, data,
+ 							timeout_destroy);
 -- 
 1.8.4
 
