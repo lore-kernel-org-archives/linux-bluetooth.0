@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v5 06/10] tools/mgmt-tester: Fix for Stop discovery test
-Date: Thu, 20 Mar 2014 12:25:09 +0100
-Message-ID: <1395314713-13104-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v5 03/10] emulator: Add handling inquiry number of responses
+Date: Thu, 20 Mar 2014 12:25:06 +0100
+Message-ID: <1395314713-13104-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,32 +13,76 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test "Stop Discovery - BR/EDR (Inquiry) Success 1" uses hciemu_type
-BREDR but uses power settings to enable LE and tries to set LE:
-
-  mgmt: [0x0002] command 0x000d
-  mgmt: < 0d 00 02 00 01 00 01                             .......
-  mgmt: > 02 00 02 00 03 00 0d 00 0c                       .........
-  mgmt: [0x0002] command 0x0d status: 0x0c
-
-This patch fixes this minor issue
 ---
- tools/mgmt-tester.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ emulator/btdev.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index a3c1c72..9f71743 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1733,7 +1733,7 @@ static const struct generic_data stop_discovery_success_test_1 = {
- };
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 5b8cc2f..ea08da6 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -136,6 +136,8 @@ struct btdev {
  
- static const struct generic_data stop_discovery_bredr_success_test_1 = {
--	.setup_settings = settings_powered_le,
-+	.setup_settings = settings_powered,
- 	.setup_expect_hci_command = BT_HCI_CMD_INQUIRY,
- 	.setup_expect_hci_param = stop_discovery_inq_param,
- 	.setup_expect_hci_len = sizeof(stop_discovery_inq_param),
+ struct inquiry_data {
+ 	struct btdev *btdev;
++	int num_resp;
++
+ 	int sent_count;
+ 	int iter;
+ };
+@@ -710,6 +712,7 @@ static bool inquiry_callback(void *user_data)
+ {
+ 	struct inquiry_data *data = user_data;
+ 	struct btdev *btdev = data->btdev;
++	struct bt_hci_evt_inquiry_complete ic;
+ 	int sent = data->sent_count;
+ 	int i;
+ 
+@@ -776,16 +779,21 @@ static bool inquiry_callback(void *user_data)
+ 
+ 	data->iter = i;
+ 
+-	if (i == MAX_BTDEV_ENTRIES) {
+-		struct bt_hci_evt_inquiry_complete ic;
+-
+-		ic.status = BT_HCI_ERR_SUCCESS;
+-		send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
++	/* Check if we sent already required amount of responses*/
++	if (data->num_resp && data->sent_count == data->num_resp)
++		goto finish;
+ 
+-		return false;
+-	}
++	if (i == MAX_BTDEV_ENTRIES)
++		goto finish;
+ 
+ 	return true;
++
++finish:
++	/* Note that destroy will be called */
++	ic.status = BT_HCI_ERR_SUCCESS;
++	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
++
++	return false;
+ }
+ 
+ static void inquiry_destroy(void *user_data)
+@@ -804,6 +812,7 @@ finish:
+ 
+ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+ {
++	const struct bt_hci_cmd_inquiry *inq_cmd = cmd;
+ 	struct inquiry_data *data;
+ 	struct bt_hci_evt_inquiry_complete ic;
+ 	int status = BT_HCI_ERR_HARDWARE_FAILURE;
+@@ -819,6 +828,7 @@ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+ 
+ 	memset(data, 0, sizeof(*data));
+ 	data->btdev = btdev;
++	data->num_resp = inq_cmd->num_resp;
+ 
+ 	btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
+ 							inquiry_callback, data,
 -- 
 1.8.4
 
