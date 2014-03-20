@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 09/10] tools/mgmt-tester: Refactor setup_start_discovery function
-Date: Thu, 20 Mar 2014 10:49:31 +0100
-Message-ID: <1395308972-4320-10-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 03/10] emulator: Add handling inquiry number of responses
+Date: Thu, 20 Mar 2014 10:49:25 +0100
+Message-ID: <1395308972-4320-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395308972-4320-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395308972-4320-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,120 +13,76 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes handling hook register from this
-function and its callback as this is no longer necessary for any stop
-discovery tests.
-
-This patch also adds setup_send_param and setup_send_len  parameters to
-test data so it is easy to control start discovery command parameters.
-It is useful for tests:
-Stop Discovery - Invalid parameters 1
-Stop Discovery - BR/EDR (Inquiry) Success 1
 ---
- tools/mgmt-tester.c | 62 ++++++++++++++---------------------------------------
- 1 file changed, 16 insertions(+), 46 deletions(-)
+ emulator/btdev.c | 24 +++++++++++++++++-------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index a711d0d..64188f1 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -362,6 +362,9 @@ struct generic_data {
- 	uint16_t setup_expect_hci_command;
- 	const void *setup_expect_hci_param;
- 	uint8_t setup_expect_hci_len;
-+	uint16_t setup_send_opcode;
-+	const void *setup_send_param;
-+	uint16_t setup_send_len;
- 	bool send_index_none;
- 	uint16_t send_opcode;
- 	const void *send_param;
-@@ -1734,6 +1737,8 @@ static const struct generic_data stop_discovery_success_test_1 = {
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 125ed35..e5e2956 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -136,6 +136,8 @@ struct btdev {
  
- static const struct generic_data stop_discovery_bredr_success_test_1 = {
- 	.setup_settings = settings_powered,
-+	.setup_send_param = start_discovery_bredr_param,
-+	.setup_send_len = sizeof(start_discovery_bredr_param),
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredr_param,
- 	.send_len = sizeof(stop_discovery_bredr_param),
-@@ -1758,6 +1763,8 @@ static const struct generic_data stop_discovery_rejected_test_1 = {
- 
- static const struct generic_data stop_discovery_invalid_param_test_1 = {
- 	.setup_settings = settings_powered_le,
-+	.setup_send_param = start_discovery_bredrle_param,
-+	.setup_send_len = sizeof(start_discovery_bredrle_param),
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredrle_invalid_param,
- 	.send_len = sizeof(stop_discovery_bredrle_invalid_param),
-@@ -2824,59 +2831,22 @@ static void setup_discovery_callback(uint8_t status, uint16_t length,
- 	tester_setup_complete();
- }
- 
--static bool setup_command_hci_callback(const void *data, uint16_t len,
--								void *user_data)
--{
--	struct test_data *tdata = tester_get_data();
--	const struct generic_data *test = tdata->test_data;
--
--	tester_print("HCI Command 0x%04x length %u (setup)",
--					test->setup_expect_hci_command, len);
--
--	if (len != test->setup_expect_hci_len) {
--		tester_warn("Invalid parameter size for HCI command (setup)");
--		tester_setup_failed();
--		goto done;
--	}
--
--	if (memcmp(data, test->setup_expect_hci_param, len) != 0) {
--		tester_warn("Unexpected HCI command parameter value (setup)");
--		tester_setup_failed();
--		goto done;
--	}
--
--	tester_setup_complete();
--
--done:
--	hciemu_del_hook(tdata->hciemu, HCIEMU_HOOK_PRE_EVT,
--			test->setup_expect_hci_command);
--
--	return false;
--}
--
- static void setup_start_discovery(const void *test_data)
+ struct inquiry_data {
+ 	struct btdev *btdev;
++	int num_resp;
++
+ 	int sent_count;
+ 	int iter;
+ };
+@@ -710,6 +712,7 @@ static bool inquiry_callback(void *user_data)
  {
- 	struct test_data *data = tester_get_data();
- 	const struct generic_data *test = data->test_data;
--	const void *send_param = test->send_param;
--	uint16_t send_len = test->send_len;
+ 	struct inquiry_data *data = user_data;
+ 	struct btdev *btdev = data->btdev;
++	struct bt_hci_evt_inquiry_complete ic;
+ 	int sent = data->sent_count;
+ 	int i;
+ 
+@@ -776,16 +779,21 @@ static bool inquiry_callback(void *user_data)
+ 
+ 	data->iter = i;
+ 
+-	if (i == MAX_BTDEV_ENTRIES) {
+-		struct bt_hci_evt_inquiry_complete ic;
 -
--	if (test->setup_expect_hci_command) {
--		tester_print("Registering HCI command callback (setup)");
--		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT,
--				test->setup_expect_hci_command,
--				setup_command_hci_callback,
--				NULL);
-+	const void *send_param = test->setup_send_param;
-+	uint16_t send_len = test->setup_send_len;
-+	unsigned char disc_param[] = { 0x07 };
+-		ic.status = BT_HCI_ERR_SUCCESS;
+-		send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
++	/* Check if we sent already required amount of responses*/
++	if (data->num_resp && data->sent_count == data->num_resp)
++		goto finish;
  
--		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
--				send_len, send_param, NULL, NULL, NULL);
--	} else {
--		unsigned char disc_param[] = { 0x07 };
-+	if (!send_param) {
-+		send_param = disc_param;
-+		send_len = 1;
-+	}
- 
--		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
--					sizeof(disc_param), disc_param,
-+	mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
-+					send_len, send_param,
- 					setup_discovery_callback, NULL, NULL);
+-		return false;
 -	}
++	if (i == MAX_BTDEV_ENTRIES)
++		goto finish;
+ 
+ 	return true;
++
++finish:
++	/* Note that destroy will be called */
++	ic.status = BT_HCI_ERR_SUCCESS;
++	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
++
++	return false;
  }
  
- static void setup_multi_uuid32(const void *test_data)
+ static void inquiry_destroy(void *user_data)
+@@ -804,6 +812,7 @@ finish:
+ 
+ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+ {
++	const struct bt_hci_cmd_inquiry *inq_cmd = cmd;
+ 	struct inquiry_data *data;
+ 	struct bt_hci_evt_inquiry_complete ic;
+ 	int status = BT_HCI_ERR_HARDWARE_FAILURE;
+@@ -819,6 +828,7 @@ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+ 
+ 	memset(data, 0, sizeof(*data));
+ 	data->btdev = btdev;
++	data->num_resp = inq_cmd->num_resp;
+ 
+ 	btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
+ 							inquiry_callback, data,
 -- 
 1.8.4
 
