@@ -7,9 +7,9 @@ CC: <linux-serial@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
 	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
 	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
 	Felipe Balbi <balbi@ti.com>
-Subject: [PATCH 07/11] tty: serial: omap: remove unneeded singlethread workqueue
-Date: Thu, 20 Mar 2014 14:30:03 -0500
-Message-ID: <1395343807-21618-7-git-send-email-balbi@ti.com>
+Subject: [PATCH 11/11] serial: fix UART_IIR_ID
+Date: Thu, 20 Mar 2014 14:30:07 -0500
+Message-ID: <1395343807-21618-11-git-send-email-balbi@ti.com>
 In-Reply-To: <1395343807-21618-1-git-send-email-balbi@ti.com>
 References: <1395343807-21618-1-git-send-email-balbi@ti.com>
 MIME-Version: 1.0
@@ -17,34 +17,28 @@ Content-Type: text/plain
 Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-it wasn't used by anything, just remove it.
+UART IRQ Identification bitfield is 3
+bits long (bits 3:1) but current mask only
+masks 2 bits. Fix it.
 
 Signed-off-by: Felipe Balbi <balbi@ti.com>
 ---
- drivers/tty/serial/omap-serial.c | 3 ---
- 1 file changed, 3 deletions(-)
+ include/uapi/linux/serial_reg.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/tty/serial/omap-serial.c b/drivers/tty/serial/omap-serial.c
-index c79d3e6..b092d3d 100644
---- a/drivers/tty/serial/omap-serial.c
-+++ b/drivers/tty/serial/omap-serial.c
-@@ -180,8 +180,6 @@ static struct uart_omap_port *ui[OMAP_MAX_HSUART_PORTS];
- /* Forward declaration of functions */
- static void serial_omap_mdr1_errataset(struct uart_omap_port *up, u8 mdr1);
+diff --git a/include/uapi/linux/serial_reg.h b/include/uapi/linux/serial_reg.h
+index e632260..99b4705 100644
+--- a/include/uapi/linux/serial_reg.h
++++ b/include/uapi/linux/serial_reg.h
+@@ -32,7 +32,7 @@
  
--static struct workqueue_struct *serial_omap_uart_wq;
--
- static inline unsigned int serial_in(struct uart_omap_port *up, int offset)
- {
- 	offset <<= up->port.regshift;
-@@ -1684,7 +1682,6 @@ static int serial_omap_probe(struct platform_device *pdev)
- 	up->calc_latency = PM_QOS_CPU_DMA_LAT_DEFAULT_VALUE;
- 	pm_qos_add_request(&up->pm_qos_request,
- 		PM_QOS_CPU_DMA_LATENCY, up->latency);
--	serial_omap_uart_wq = create_singlethread_workqueue(up->name);
- 	INIT_WORK(&up->qos_work, serial_omap_uart_qos_work);
- 
- 	platform_set_drvdata(pdev, up);
+ #define UART_IIR	2	/* In:  Interrupt ID Register */
+ #define UART_IIR_NO_INT		0x01 /* No interrupts pending */
+-#define UART_IIR_ID		0x06 /* Mask for the interrupt ID */
++#define UART_IIR_ID		0x0e /* Mask for the interrupt ID */
+ #define UART_IIR_MSI		0x00 /* Modem status interrupt */
+ #define UART_IIR_THRI		0x02 /* Transmitter holding register empty */
+ #define UART_IIR_RDI		0x04 /* Receiver data interrupt */
 -- 
 1.9.1.286.g5172cb3
 
