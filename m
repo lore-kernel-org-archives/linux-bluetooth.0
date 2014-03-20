@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v5 02/10] emulator: Add inquiry cancel
-Date: Thu, 20 Mar 2014 12:25:05 +0100
-Message-ID: <1395314713-13104-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v5 08/10] tools/mgmt-tester: Remove not used condition
+Date: Thu, 20 Mar 2014 12:25:11 +0100
+Message-ID: <1395314713-13104-9-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,67 +13,24 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch, scheduled inquiry session in btdev can be canceled
 ---
- emulator/btdev.c | 29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
+ tools/mgmt-tester.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index f959570..5b8cc2f 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -791,10 +791,14 @@ static bool inquiry_callback(void *user_data)
- static void inquiry_destroy(void *user_data)
- {
- 	struct inquiry_data *data = user_data;
-+	struct btdev *btdev = data->btdev;
-+
-+	if (!btdev)
-+		goto finish;
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 17d2bd2..a711d0d 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -2868,9 +2868,6 @@ static void setup_start_discovery(const void *test_data)
+ 				setup_command_hci_callback,
+ 				NULL);
  
--	if (data->btdev)
--		data->btdev->inquiry_id = 0;
-+	btdev->inquiry_id = 0;
- 
-+finish:
- 	free(data);
- }
- 
-@@ -828,6 +832,24 @@ failed:
- 	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
- }
- 
-+static void inquiry_cancel(struct btdev *btdev)
-+{
-+	uint8_t status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+
-+	if (!btdev->inquiry_id) {
-+		cmd_complete(btdev, BT_HCI_CMD_INQUIRY_CANCEL, &status,
-+							sizeof(status));
-+		return;
-+	}
-+
-+	timeout_remove(btdev->inquiry_id);
-+	btdev->inquiry_id = 0;
-+
-+	status = BT_HCI_ERR_SUCCESS;
-+	cmd_complete(btdev, BT_HCI_CMD_INQUIRY_CANCEL, &status,
-+							sizeof(status));
-+}
-+
- static void conn_complete(struct btdev *btdev,
- 					const uint8_t *bdaddr, uint8_t status)
- {
-@@ -1760,8 +1782,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	case BT_HCI_CMD_INQUIRY_CANCEL:
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			goto unsupported;
--		status = BT_HCI_ERR_SUCCESS;
--		cmd_complete(btdev, opcode, &status, sizeof(status));
-+		inquiry_cancel(btdev);
- 		break;
- 
- 	case BT_HCI_CMD_CREATE_CONN:
+-		if (test->send_func)
+-			send_param = test->send_func(&send_len);
+-
+ 		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
+ 				send_len, send_param, NULL, NULL, NULL);
+ 	} else {
 -- 
 1.8.4
 
