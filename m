@@ -1,171 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Mar 2014 14:03:57 -0500
-From: Felipe Balbi <balbi@ti.com>
-To: Felipe Balbi <balbi@ti.com>
-CC: Peter Hurley <peter@hurleysoftware.com>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Alan Cox <alan@linux.intel.com>, Greg KH
-	<gregkh@linuxfoundation.org>,
-        Muralidharan Karicheri <m-karicheri2@ti.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-        Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Huang Shijie
-	<b32955@freescale.com>
-Subject: Re: hci_ldsic nested locking problem
-Message-ID: <20140320190357.GG3959@saruman.home>
-Reply-To: <balbi@ti.com>
-References: <20140320163435.GH32692@saruman.home>
- <1395333736.22077.32.camel@acox1-desk.ger.corp.intel.com>
- <20140320171621.GA2827@saruman.home>
- <532B25FC.3070408@hurleysoftware.com>
- <20140320181145.GC3959@saruman.home>
- <532B319D.4090208@hurleysoftware.com>
- <20140320182528.GE3959@saruman.home>
- <20140320190154.GF3959@saruman.home>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Fnm8lRGFTVS/3GuM"
-In-Reply-To: <20140320190154.GF3959@saruman.home>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: RequireAuthentication doesn't require authentication
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHZ1yCmtYxwiQ0_dPJut83vFaOEQEBm2u6CvE0UGVd_u36qzkw@mail.gmail.com>
+Date: Thu, 20 Mar 2014 12:05:05 -0700
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <E8777DED-269B-4C31-9E87-6CBA1F3B1A26@holtmann.org>
+References: <CAHZ1yCmtYxwiQ0_dPJut83vFaOEQEBm2u6CvE0UGVd_u36qzkw@mail.gmail.com>
+To: Scott James Remnant <keybuk@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---Fnm8lRGFTVS/3GuM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Scott,
 
-Hi,
+> The org.bluez.ProfileManager1 API permits a RequireAuthentication
+> option to be specified when registering a profile implementation. This
+> is defined in the API documentation as:
+> 
+>    boolean RequireAuthentication
+> 
+>            Pairing is required before connections
+>            will be established. No devices will
+>            be connected if not paired.
+> 
+> This is a little bit hand-wavy, since devices can be paired with an
+> authenticated link key or with an unauthenticated link key, depending
+> on whether Just Works pairing was used or not.
+> 
+> Looking at the implementation this option adjusts the security level
+> of the socket, when false BT_IO_SEC_LOW is used and when true
+> BT_IO_SEC_MEDIUM is used:
+> 
+>    } else if (strcasecmp(key, "RequireAuthentication") == 0) {
+>            if (type != DBUS_TYPE_BOOLEAN)
+>                    return -EINVAL;
+> 
+>            dbus_message_iter_get_basic(value, &b);
+>            if (b)
+>                    ext->sec_level = BT_IO_SEC_MEDIUM;
+>            else
+>                    ext->sec_level = BT_IO_SEC_LOW;
+> 
+> When medium security is selected, an unauthenticated link key is
+> permitted to establish the connection:
+> 
+>    /* An unauthenticated combination key has sufficient security for
+>       security level 1 and 2. */
+>    if (conn->key_type == HCI_LK_UNAUTH_COMBINATION &&
+>        (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
+>            goto encrypt;
+> 
+> 
+> So RequireAuthentication doesn't require authentication at all, at
+> least not in the BT 2.1+ world of authenticated and unauthenticated
+> link keys.
 
-On Thu, Mar 20, 2014 at 02:01:54PM -0500, Felipe Balbi wrote:
-> > @@ -318,6 +326,8 @@ static void hci_uart_tty_close(struct tty_struct *t=
-ty)
-> >  	if (hdev)
-> >  		hci_uart_close(hdev);
-> > =20
-> > +	cancel_work_sync(&hy->write_work);
->=20
-> forgot to commit, darn it
+the Bluetooth core specification has a mapping table on how Simple Pairing security levels map to Legacy Pairing. The only time you should be requiring High security level is with SAP profile. All other profiles should be just use Medium security. Keep in mind that an unauthenticated link key is still stronger than a link key obtained through legacy pairing.
 
-here it is:
+The term authenticated vs unauthenticated when it comes to the link key means MITM protection or not. It is not the best terminology I might add.
 
-=46rom eaf7ff6f2d224f202369e4820b76a03fa664fab0 Mon Sep 17 00:00:00 2001
-=46rom: Felipe Balbi <balbi@ti.com>
-Date: Thu, 20 Mar 2014 13:20:10 -0500
-Subject: [PATCH] bluetooth: hci_ldisc: fix deadlock condition
+What we mean with the RequireAuthentication is that the connection is authenticated, meaning that you are actually paired.
 
-LDISCs shouldn't call tty->ops->write() from within
-->write_wakeup().
+> The option really means "Require Encryption”.
 
-->write_wakeup() is called with port lock taken and
-IRQs disabled, tty->ops->write() will try to acquire
-the same port lock and we will deadlock.
+Authenticated connections that are not encrypted are not really safe. So one comes with the other. And in Bluetooth the encryption is based on a previous authentication.
 
-Signed-off-by: Felipe Balbi <balbi@ti.com>
----
- drivers/bluetooth/hci_ldisc.c | 20 +++++++++++++++-----
- drivers/bluetooth/hci_uart.h  |  1 +
- 2 files changed, 16 insertions(+), 5 deletions(-)
+Also with Simple Pairing you are mandated that all connection oriented channels (with a few well documented exceptions like SDP) are required to be encrypted.
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 6e06f6f..5a53e50 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -118,10 +118,6 @@ static inline struct sk_buff *hci_uart_dequeue(struct =
-hci_uart *hu)
-=20
- int hci_uart_tx_wakeup(struct hci_uart *hu)
- {
--	struct tty_struct *tty =3D hu->tty;
--	struct hci_dev *hdev =3D hu->hdev;
--	struct sk_buff *skb;
--
- 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
- 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
- 		return 0;
-@@ -129,6 +125,18 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
-=20
- 	BT_DBG("");
-=20
-+	schedule_work(&hu->write_work);
-+
-+	return 0;
-+}
-+
-+static void hci_uart_write_work(struct work_struct *work)
-+{
-+	struct hci_uart *hu =3D container_of(work, struct hci_uart, init_ready);
-+	struct tty_struct *tty =3D hu->tty;
-+	struct hci_dev *hdev =3D hu->hdev;
-+	struct sk_buff *skb;
-+
- restart:
- 	clear_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
-=20
-@@ -153,7 +161,6 @@ restart:
- 		goto restart;
-=20
- 	clear_bit(HCI_UART_SENDING, &hu->tx_state);
--	return 0;
- }
-=20
- static void hci_uart_init_work(struct work_struct *work)
-@@ -281,6 +288,7 @@ static int hci_uart_tty_open(struct tty_struct *tty)
- 	tty->receive_room =3D 65536;
-=20
- 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
-+	INIT_WORK(&hu->write_work, hci_uart_write_work);
-=20
- 	spin_lock_init(&hu->rx_lock);
-=20
-@@ -318,6 +326,8 @@ static void hci_uart_tty_close(struct tty_struct *tty)
- 	if (hdev)
- 		hci_uart_close(hdev);
-=20
-+	cancel_work_sync(&hu->write_work);
-+
- 	if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
- 		if (hdev) {
- 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index fffa61f..12df101 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -68,6 +68,7 @@ struct hci_uart {
- 	unsigned long		hdev_flags;
-=20
- 	struct work_struct	init_ready;
-+	struct work_struct	write_work;
-=20
- 	struct hci_uart_proto	*proto;
- 	void			*priv;
---=20
-1.9.1.286.g5172cb3
+> A few questions:
+> 
+> 1) Is this as intended? I realize that this probably predates the
+>    2.1 security model in its intent, but the Profile API is newer.
 
+As commented above, there is a mapping between Legacy Pairing and Simple Pairing which we follow.
 
---=20
-balbi
+> 2) Would fixing this to use BT_IO_SEC_HIGH be a bad thing? Then the
+>    option would actually do what it says.
 
---Fnm8lRGFTVS/3GuM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Yes it would be. It is an interop nightmare since you require MITM. Best example are headsets that can neither confirm a passkey, nor display a passkey.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+We have been through this and it does not work in your favor at all. It causes tons of problems left and right. And since the unauthenticated link key is still stronger than legacy pairing derived link key, we left it at that.
 
-iQIcBAEBAgAGBQJTKzudAAoJEIaOsuA1yqRE4cwP/3pUTISIhQVOzyYIwCwwIEw/
-lWxnQjhaGuoYYlL1sFoAucj0vh9AHDH3zE74/ltSoBR5GT+mx2HxvrYmTRCpMVD8
-pD0bcRnVWx5j3tJbDVZVC/DuiL06TTTn/MRVcs36U4CRtXF2hurBqx3mAtalt1FO
-MzTf7pH6wpUEFEbnqnOY3lrfKrtATn8fP/GXSIcnButY3z4C/FiAwsDqOTdKb0+J
-zmVsdeRYv8HDMfOuLuNEttFcBIOMMW5p1UEvYmSksr1VNtEhm1pL7E7mGPW69Mr2
-VoSMkeSAyJosNs+4TCcvWkuOJrZjZTeTibf96C3uhILFM+sJOP9O+rCHRaveBphM
-Q5+0FmZ6bSC+/ZGhWQAeQjG0NocoSL6KEpMirABLhDQmvCyt+PBYLH6ztrV8wyZD
-0eFqqIqGiCnQL1rWgzNMlWCdqiBefc5trBAbTElTPcfOYRV3GnnUyi/CRV5WExg8
-zLPm5NaslZdD7/TCX6h2F4zkiTQe6LV3s7u6NPA8g1L8BNhqX/3Vs28ePi90Lluj
-qEe4SvO1fa5261EsipfmdRj6YzjIVE24TZY5SCUrpEWuCpaWAPPOUK3lb5+b7D2q
-HbvFsfTmIhsGefHqP5SoC3UfLrous67B7PZOovYLYDNQ64WZuF4+JwdZVuv8XaY0
-M2KFvQMahyVBnz19sgIi
-=sTPQ
------END PGP SIGNATURE-----
+> 2a) If no, would there be also scope for allowing a profile to select
+>     "require encryption" (unauthenticated link key okay)?
+> 
+> 2b) If yes, would there be scope for allowing a profile to require
+>     an authenticated link key in addition to encryption?
 
---Fnm8lRGFTVS/3GuM--
+Besides SAP, there should be no profile at the moment that requires an authenticated link key.
+
+The support for Secure Connections is not wildly deployed at the moment, but what might arise is something like RequireFIPS or RequireSecureConnection where the security level is actually not even High, it is FIPS level strong keys (at least that is how we named it internally in the kernel) which is level 4.
+
+Regards
+
+Marcel
+
