@@ -1,84 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] obexd/client: Fix not being able cancel GET requests
-Date: Thu, 20 Mar 2014 15:50:50 +0200
-Message-Id: <1395323451-31229-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1395323451-31229-1-git-send-email-luiz.dentz@gmail.com>
-References: <1395323451-31229-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] core: Wait for services to be resolved before doing authorization
+Date: Thu, 20 Mar 2014 15:50:49 +0200
+Message-Id: <1395323451-31229-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In case of GET operation the code does not use g_obex_get_req_pkt since
-the beggining to be able to read the header from the first response, this
-means that the request should be cancel with g_obex_cancel_req not with
-g_obex_cancel_transfer.
+This makes btd_request_authorization to wait until services are resolved
+before proceeding with authorization, if the services could not be
+resolved it still proceeds with authorization since some profile may not
+have a record to be resolved.
 ---
- obexd/client/transfer.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ src/adapter.c | 38 ++++++++++++++++++++++++++++++--------
+ 1 file changed, 30 insertions(+), 8 deletions(-)
 
-diff --git a/obexd/client/transfer.c b/obexd/client/transfer.c
-index 6295b83..3564a34 100644
---- a/obexd/client/transfer.c
-+++ b/obexd/client/transfer.c
-@@ -80,6 +80,7 @@ struct obc_transfer {
- 	char *name;		/* Transfer object name */
- 	char *type;		/* Transfer object type */
- 	int fd;
-+	guint req;
- 	guint xfer;
- 	gint64 size;
- 	gint64 transferred;
-@@ -158,6 +159,14 @@ static DBusMessage *obc_transfer_cancel(DBusConnection *connection,
- 				ERROR_INTERFACE ".InProgress",
- 				"Cancellation already in progress");
+diff --git a/src/adapter.c b/src/adapter.c
+index 56bee35..bc95136 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -138,6 +138,7 @@ struct watch_client {
  
-+	if (transfer->req > 0) {
-+		if (!g_obex_cancel_req(transfer->obex, transfer->req, TRUE))
-+			return g_dbus_create_error(message,
-+						ERROR_INTERFACE ".Failed",
-+						"Failed");
-+		transfer->req = 0;
-+	}
-+
- 	if (transfer->xfer == 0) {
- 		struct transfer_callback *callback = transfer->callback;
- 
-@@ -383,6 +392,9 @@ static void obc_transfer_free(struct obc_transfer *transfer)
+ struct service_auth {
+ 	guint id;
++	unsigned int svc_id;
+ 	service_auth_cb cb;
+ 	void *user_data;
+ 	const char *uuid;
+@@ -1056,6 +1057,10 @@ static void service_auth_cancel(struct service_auth *auth)
  {
- 	DBG("%p", transfer);
+ 	DBusError derr;
  
-+	if (transfer->req > 0)
-+		g_obex_cancel_req(transfer->obex, transfer->req, TRUE);
++	if (auth->svc_id > 0)
++		device_remove_svc_complete_callback(auth->device,
++								auth->svc_id);
 +
- 	if (transfer->xfer)
- 		g_obex_cancel_transfer(transfer->xfer, NULL, NULL);
+ 	dbus_error_init(&derr);
+ 	dbus_set_error_const(&derr, ERROR_INTERFACE ".Canceled", NULL);
  
-@@ -694,6 +706,8 @@ static void get_xfer_progress_first(GObex *obex, GError *err, GObexPacket *rsp,
- 				transfer->status == TRANSFER_STATUS_SUSPENDED)
- 		return;
+@@ -4607,6 +4612,10 @@ static gboolean process_auth_queue(gpointer user_data)
+ 		struct btd_device *device = auth->device;
+ 		const char *dev_path;
  
-+	transfer->req = 0;
++		/* Wait services to be resolved before asking authorization */
++		if (auth->svc_id > 0)
++			return TRUE;
 +
- 	req = g_obex_packet_new(G_OBEX_OP_GET, TRUE, G_OBEX_HDR_INVALID);
+ 		if (device_is_trusted(device) == TRUE) {
+ 			auth->cb(NULL, auth->user_data);
+ 			goto next;
+@@ -4643,6 +4652,22 @@ next:
+ 	return FALSE;
+ }
  
- 	transfer->xfer = g_obex_get_req_pkt(obex, req, get_xfer_progress,
-@@ -783,11 +797,11 @@ static gboolean transfer_start_get(struct obc_transfer *transfer, GError **err)
- 		g_obex_packet_add_header(req, hdr);
- 	}
++static void svc_complete(struct btd_device *dev, int err, void *user_data)
++{
++	struct service_auth *auth = user_data;
++	struct btd_adapter *adapter = auth->adapter;
++
++	auth->svc_id = 0;
++
++	if (adapter->auths->length != 1)
++		return;
++
++	if (adapter->auth_idle_id != 0)
++		return;
++
++	adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
++}
++
+ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
+ 					const char *uuid, service_auth_cb cb,
+ 					void *user_data)
+@@ -4669,17 +4694,10 @@ static int adapter_authorize(struct btd_adapter *adapter, const bdaddr_t *dst,
+ 	auth->device = device;
+ 	auth->adapter = adapter;
+ 	auth->id = ++id;
++	auth->svc_id = device_wait_for_svc_complete(device, svc_complete, auth);
  
--	transfer->xfer = g_obex_send_req(transfer->obex, req,
-+	transfer->req = g_obex_send_req(transfer->obex, req,
- 						FIRST_PACKET_TIMEOUT,
- 						get_xfer_progress_first,
- 						transfer, err);
--	if (transfer->xfer == 0)
-+	if (transfer->req == 0)
- 		return FALSE;
+ 	g_queue_push_tail(adapter->auths, auth);
  
- 	if (transfer->path == NULL)
+-	if (adapter->auths->length != 1)
+-		return auth->id;
+-
+-	if (adapter->auth_idle_id != 0)
+-		return auth->id;
+-
+-	adapter->auth_idle_id = g_idle_add(process_auth_queue, adapter);
+-
+ 	return auth->id;
+ }
+ 
+@@ -4738,6 +4756,10 @@ int btd_cancel_authorization(guint id)
+ 	if (auth == NULL)
+ 		return -EPERM;
+ 
++	if (auth->svc_id > 0)
++		device_remove_svc_complete_callback(auth->device,
++								auth->svc_id);
++
+ 	g_queue_remove(auth->adapter->auths, auth);
+ 
+ 	if (auth->agent)
 -- 
 1.8.5.3
 
