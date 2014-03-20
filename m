@@ -2,35 +2,34 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 48/62] attrib: Remove att_get_u32()
-Date: Thu, 20 Mar 2014 11:43:13 -0300
-Message-Id: <1395326607-27068-49-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 49/62] attrib: Remove att_put_u32()
+Date: Thu, 20 Mar 2014 11:43:14 -0300
+Message-Id: <1395326607-27068-50-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- attrib/att.h | 6 ------
- 1 file changed, 6 deletions(-)
+ attrib/att.h | 5 -----
+ 1 file changed, 5 deletions(-)
 
 diff --git a/attrib/att.h b/attrib/att.h
-index 4db015d..ad6bdf6 100644
+index ad6bdf6..89698dc 100644
 --- a/attrib/att.h
 +++ b/attrib/att.h
-@@ -118,12 +118,6 @@ static inline uint16_t att_get_u16(const void *ptr)
- 	return btohs(bt_get_unaligned(u16_ptr));
+@@ -133,11 +133,6 @@ static inline void att_put_u16(uint16_t src, void *dst)
+ 	bt_put_unaligned(htobs(src), (uint16_t *) dst);
  }
  
--static inline uint32_t att_get_u32(const void *ptr)
+-static inline void att_put_u32(uint32_t src, void *dst)
 -{
--	const uint32_t *u32_ptr = ptr;
--	return btohl(bt_get_unaligned(u32_ptr));
+-	bt_put_unaligned(htobl(src), (uint32_t *) dst);
 -}
 -
- static inline uint128_t att_get_u128(const void *ptr)
+ static inline void att_put_u128(uint128_t src, void *dst)
  {
- 	const uint128_t *u128_ptr = ptr;
+ 	uint128_t *d128 = dst;
 -- 
 1.8.3.1
 
