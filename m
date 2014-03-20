@@ -1,44 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Mar 2014 11:54:42 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-03-19
-Message-ID: <20140320155442.GB12987@tuxdriver.com>
-References: <20140319215143.GB9454@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140319215143.GB9454@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 26/62] lib: Remove bt_get_be16()
+Date: Thu, 20 Mar 2014 11:42:51 -0300
+Message-Id: <1395326607-27068-27-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 19, 2014 at 06:51:43PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> One more pull request to 3.15. This is mostly and bug fix pull request, it
-> contains several fixes and clean up all over the tree, plus some small new
-> features.
->  
-> Please pull or let me know of any problem. Thanks.
-> 
-> 	Gustavo
-> 
-> ---
-> The following changes since commit 81ad6fd9698f659dbabdc6cd3e1667a98eb2be3b:
-> 
->   Bluetooth: Remove unnecessary stop_scan_complete function (2014-02-28 10:28:17 -0800)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to 40b552aa5a0bfa785bc7ddb5c2d7965b1e0bb08d:
-> 
->   Bluetooth: Enforce strict Secure Connections Only mode security (2014-03-19 23:30:32 +0200)
+---
+ lib/bluetooth.h | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-Pulling now...
-
+diff --git a/lib/bluetooth.h b/lib/bluetooth.h
+index 37fa04d..3dcb049 100644
+--- a/lib/bluetooth.h
++++ b/lib/bluetooth.h
+@@ -182,11 +182,6 @@ static inline uint32_t bt_get_be32(const void *ptr)
+ 	return bswap_32(bt_get_unaligned((const uint32_t *) ptr));
+ }
+ 
+-static inline uint16_t bt_get_be16(const void *ptr)
+-{
+-	return bswap_16(bt_get_unaligned((const uint16_t *) ptr));
+-}
+-
+ static inline void bt_put_be64(uint64_t val, const void *ptr)
+ {
+ 	bt_put_unaligned(bswap_64(val), (uint64_t *) ptr);
+@@ -214,11 +209,6 @@ static inline uint32_t bt_get_be32(const void *ptr)
+ 	return bt_get_unaligned((const uint32_t *) ptr);
+ }
+ 
+-static inline uint16_t bt_get_be16(const void *ptr)
+-{
+-	return bt_get_unaligned((const uint16_t *) ptr);
+-}
+-
+ static inline void bt_put_be64(uint64_t val, const void *ptr)
+ {
+ 	bt_put_unaligned(val, (uint64_t *) ptr);
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.8.3.1
+
