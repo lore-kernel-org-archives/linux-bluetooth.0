@@ -1,128 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <532B3983.6040706@hurleysoftware.com>
-Date: Thu, 20 Mar 2014 14:54:59 -0400
-From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: Felipe Balbi <balbi@ti.com>, Alan Cox <alan@linux.intel.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- Muralidharan Karicheri <m-karicheri2@ti.com>,
- linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Huang Shijie <b32955@freescale.com>
-Subject: Re: hci_ldsic nested locking problem
-References: <20140320163435.GH32692@saruman.home> <1395333736.22077.32.camel@acox1-desk.ger.corp.intel.com> <20140320171621.GA2827@saruman.home> <20140320172920.GC2827@saruman.home> <532B26C1.8080806@hurleysoftware.com> <20140320173518.GD2827@saruman.home> <20140320184544.GA1113@kroah.com>
-In-Reply-To: <20140320184544.GA1113@kroah.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Date: Thu, 20 Mar 2014 11:50:53 -0700
+Message-ID: <CAHZ1yCmtYxwiQ0_dPJut83vFaOEQEBm2u6CvE0UGVd_u36qzkw@mail.gmail.com>
+Subject: RequireAuthentication doesn't require authentication
+From: Scott James Remnant <keybuk@chromium.org>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 03/20/2014 02:45 PM, Greg KH wrote:
-> On Thu, Mar 20, 2014 at 12:35:18PM -0500, Felipe Balbi wrote:
->> On Thu, Mar 20, 2014 at 01:34:57PM -0400, Peter Hurley wrote:
->>> [ +cc Huang Shijie ]
->>>
->>> On 03/20/2014 01:29 PM, Felipe Balbi wrote:
->>>> then we need updates to Documentation:
->>>>
->>>> Documentation/serial/tty.txt::
->>>>
->>>> |  Driver Side Interfaces:
->>>> |
->>>> |  receive_buf()	-	Hand buffers of bytes from the driver to the ldisc
->>>> |  			for processing. Semantics currently rather
->>>> |  			mysterious 8(
->>>> |
->>>> |  write_wakeup()	-	May be called at any point between open and close.
->>>> |  			The TTY_DO_WRITE_WAKEUP flag indicates if a call
->>>> |  			is needed but always races versus calls. Thus the
->>>> |  			ldisc must be careful about setting order and to
->>>> |  			handle unexpected calls. Must not sleep.
->>>> |
->>>> |  			The driver is forbidden from calling this directly
->>>> |  			from the ->write call from the ldisc as the ldisc
->>>> |  			is permitted to call the driver write method from
->>>> |  			this function. In such a situation defer it.
->>>>
->>>> documentation says ldisc is allowed to call ->write() from
->>>> ->write_wakeup(). huh ?
->>>
->>> Patch submitted but never applied.
->>>
->>> http://www.spinics.net/lists/linux-serial/msg11144.html
->>
->> Thank you. For that patch:
->>
->> Acked-by: Felipe Balbi <balbi@ti.com>
->
-> Can someone resend it, this is lost in my tree for some reason...
+The org.bluez.ProfileManager1 API permits a RequireAuthentication
+option to be specified when registering a profile implementation. This
+is defined in the API documentation as:
 
-Apologies if my mailer mangles this.
+    boolean RequireAuthentication
 
---- >% ---
-From: Huang Shijie <b32955@freescale.com>
+            Pairing is required before connections
+            will be established. No devices will
+            be connected if not paired.
 
-In the uart_handle_cts_change(), uart_write_wakeup() is called after
-we call @uart_port->ops->start_tx().
+This is a little bit hand-wavy, since devices can be paired with an
+authenticated link key or with an unauthenticated link key, depending
+on whether Just Works pairing was used or not.
 
-The Documentation/serial/driver tells us:
------------------------------------------------
-   start_tx(port)
-	Start transmitting characters.
+Looking at the implementation this option adjusts the security level
+of the socket, when false BT_IO_SEC_LOW is used and when true
+BT_IO_SEC_MEDIUM is used:
 
-	Locking: port->lock taken.
-	Interrupts: locally disabled.
------------------------------------------------
+    } else if (strcasecmp(key, "RequireAuthentication") == 0) {
+            if (type != DBUS_TYPE_BOOLEAN)
+                    return -EINVAL;
 
-So when the uart_write_wakeup() is called, the port->lock is taken by
-the upper. See the following callstack:
+            dbus_message_iter_get_basic(value, &b);
+            if (b)
+                    ext->sec_level = BT_IO_SEC_MEDIUM;
+            else
+                    ext->sec_level = BT_IO_SEC_LOW;
 
-	|_ uart_write_wakeup
-	   |_ tty_wakeup
-	      |_ ld->ops->write_wakeup
+When medium security is selected, an unauthenticated link key is
+permitted to establish the connection:
 
-With the port->lock held, we call the @write_wakeup. Some implemetation of
-the @write_wakeup does not notice that the port->lock is held, and it still
-tries to send data with uart_write() which will try to grab the prot->lock.
-A dead lock occurs, see the following log caught in the Bluetooth by uart:
+    /* An unauthenticated combination key has sufficient security for
+       security level 1 and 2. */
+    if (conn->key_type == HCI_LK_UNAUTH_COMBINATION &&
+        (sec_level == BT_SECURITY_MEDIUM || sec_level == BT_SECURITY_LOW))
+            goto encrypt;
 
---------------------------------------------------------------------
-BUG: spinlock lockup suspected on CPU#0, swapper/0/0
-  lock: 0xdc3f4410, .magic: dead4ead, .owner: swapper/0/0, .owner_cpu: 0
-CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W    3.10.17-16839-ge4a1bef #1320
-[<80014cbc>] (unwind_backtrace+0x0/0x138) from [<8001251c>] (show_stack+0x10/0x14)
-[<8001251c>] (show_stack+0x10/0x14) from [<802816ac>] (do_raw_spin_lock+0x108/0x184)
-[<802816ac>] (do_raw_spin_lock+0x108/0x184) from [<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60)
-[<806a22b0>] (_raw_spin_lock_irqsave+0x54/0x60) from [<802f5754>] (uart_write+0x38/0xe0)
-[<802f5754>] (uart_write+0x38/0xe0) from [<80455270>] (hci_uart_tx_wakeup+0xa4/0x168)
-[<80455270>] (hci_uart_tx_wakeup+0xa4/0x168) from [<802dab18>] (tty_wakeup+0x50/0x5c)
-[<802dab18>] (tty_wakeup+0x50/0x5c) from [<802f81a4>] (imx_rtsint+0x50/0x80)
-[<802f81a4>] (imx_rtsint+0x50/0x80) from [<802f88f4>] (imx_int+0x158/0x17c)
-[<802f88f4>] (imx_int+0x158/0x17c) from [<8007abe0>] (handle_irq_event_percpu+0x50/0x194)
-[<8007abe0>] (handle_irq_event_percpu+0x50/0x194) from [<8007ad60>] (handle_irq_event+0x3c/0x5c)
---------------------------------------------------------------------
 
-This patch adds more limits to the @write_wakeup, the one who wants to
-implemet the @write_wakeup should follow the limits which avoid the deadlock.
+So RequireAuthentication doesn't require authentication at all, at
+least not in the BT 2.1+ world of authenticated and unauthenticated
+link keys.
 
-Signed-off-by: Huang Shijie <b32955@freescale.com>
----
-  include/linux/tty_ldisc.h |    5 ++++-
-  1 files changed, 4 insertions(+), 1 deletions(-)
+The option really means "Require Encryption".
 
-diff --git a/include/linux/tty_ldisc.h b/include/linux/tty_ldisc.h
-index f15c898..539ccc5 100644
---- a/include/linux/tty_ldisc.h
-+++ b/include/linux/tty_ldisc.h
-@@ -91,7 +91,10 @@
-   *	This function is called by the low-level tty driver to signal
-   *	that line discpline should try to send more characters to the
-   *	low-level driver for transmission.  If the line discpline does
-- *	not have any more data to send, it can just return.
-+ *	not have any more data to send, it can just return. If the line
-+ *	discipline does have some data to send, please arise a tasklet
-+ *	or workqueue to do the real data transfer. Do not send data in
-+ *	this hook, it may leads to a deadlock.
-   *
-   * int (*hangup)(struct tty_struct *)
-   *
--- 1.7.2.rc3
+
+A few questions:
+
+ 1) Is this as intended? I realize that this probably predates the
+    2.1 security model in its intent, but the Profile API is newer.
+
+ 2) Would fixing this to use BT_IO_SEC_HIGH be a bad thing? Then the
+    option would actually do what it says.
+
+ 2a) If no, would there be also scope for allowing a profile to select
+     "require encryption" (unauthenticated link key okay)?
+
+ 2b) If yes, would there be scope for allowing a profile to require
+     an authenticated link key in addition to encryption?
+
+Scott
