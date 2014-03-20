@@ -1,43 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 20 Mar 2014 11:54:42 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-03-19
+Message-ID: <20140320155442.GB12987@tuxdriver.com>
+References: <20140319215143.GB9454@joana>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2] Bluetooth: Fix address value for early disconnection events
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395312856-1992-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 20 Mar 2014 09:15:41 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0ACF2210-9E51-46C4-A2BA-262FD444BD01@holtmann.org>
-References: <1395308865-27200-1-git-send-email-johan.hedberg@gmail.com> <1395312856-1992-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <20140319215143.GB9454@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
-
-> We need to ensure that we do not send events to user space with the
-> identity address if we have not yet notified user space of the IRK. The
-> code was previously trying to handle this for the mgmt_pair_device
-> response (which worked well enough) but this is not the only connection
-> related event that might be sent to user space before pairing is
-> successful: another important event is Device Disconnected.
+On Wed, Mar 19, 2014 at 06:51:43PM -0300, Gustavo Padovan wrote:
+> Hi John,
 > 
-> The issue can actually be solved more simply than the solution
-> previously used for mgmt_pair_device. Since we do have the identity
-> address tracked as part of the remote IRK struct we can just copy it
-> over from there to the hci_conn struct once we've for real sent the mgmt
-> event for the new IRK.
+> One more pull request to 3.15. This is mostly and bug fix pull request, it
+> contains several fixes and clean up all over the tree, plus some small new
+> features.
+>  
+> Please pull or let me know of any problem. Thanks.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> 	Gustavo
+> 
 > ---
-> v2: Move l2cap_conn_update_id_addr to the right place
+> The following changes since commit 81ad6fd9698f659dbabdc6cd3e1667a98eb2be3b:
 > 
-> net/bluetooth/mgmt.c | 16 ++--------------
-> net/bluetooth/smp.c  | 16 +++++++++-------
-> 2 files changed, 11 insertions(+), 21 deletions(-)
+>   Bluetooth: Remove unnecessary stop_scan_complete function (2014-02-28 10:28:17 -0800)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 40b552aa5a0bfa785bc7ddb5c2d7965b1e0bb08d:
+> 
+>   Bluetooth: Enforce strict Secure Connections Only mode security (2014-03-19 23:30:32 +0200)
 
-patch has been applied to bluetooth-next tree.
+Pulling now...
 
-Regards
-
-Marcel
-
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
