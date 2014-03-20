@@ -1,35 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <johan.hedberg@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/2] tools/mgmt-tester: Minor fix in Stop discovery Success 1 test
-Date: Thu, 20 Mar 2014 14:25:08 +0100
-Message-ID: <1395321909-27960-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 20 Mar 2014 15:06:14 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v6 09/11] tools/mgmt-tester: Refactor
+ setup_start_discovery function
+Message-ID: <20140320130614.GA11854@t440s.lan>
+References: <1395320369-18327-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1395320369-18327-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set directly setup_send params for start discovery. It will be easier to
-follow the test.
----
- tools/mgmt-tester.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hi Lukasz,
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 82952c7..24febf6 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -1722,6 +1722,8 @@ static const char stop_discovery_inq_param[] = { 0x33, 0x8b, 0x9e, 0x08, 0x00 };
- static const struct generic_data stop_discovery_success_test_1 = {
- 	.setup_settings = settings_powered_le,
- 	.setup_send_opcode = MGMT_OP_START_DISCOVERY,
-+	.setup_send_param = start_discovery_bredrle_param,
-+	.setup_send_len = sizeof(start_discovery_bredrle_param),
- 	.send_opcode = MGMT_OP_STOP_DISCOVERY,
- 	.send_param = stop_discovery_bredrle_param,
- 	.send_len = sizeof(stop_discovery_bredrle_param),
--- 
-1.8.4
+On Thu, Mar 20, 2014, Lukasz Rymanowski wrote:
+> This patch removes handling hook register from this
+> function and its callback as this is no longer necessary for any stop
+> discovery tests.
+> 
+> This patch also adds setup_send_param and setup_send_len  parameters to
+> test data so it is easy to control start discovery command parameters.
+> It is useful for tests:
+> Stop Discovery - Invalid parameters 1
+> Stop Discovery - BR/EDR (Inquiry) Success 1
+> ---
+>  tools/mgmt-tester.c | 65 ++++++++++++++++-------------------------------------
+>  1 file changed, 19 insertions(+), 46 deletions(-)
 
+Applied. Thanks.
+
+Johan
