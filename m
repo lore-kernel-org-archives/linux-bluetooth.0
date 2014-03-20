@@ -2,82 +2,141 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 34/62] lib: Fix UUID 16/32-bits to 128-bit conversion
-Date: Thu, 20 Mar 2014 11:42:59 -0300
-Message-Id: <1395326607-27068-35-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 44/62] Replace att_put_uuid() by util.h helpers
+Date: Thu, 20 Mar 2014 11:43:09 -0300
+Message-Id: <1395326607-27068-45-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-16 and 32-bit UUIDs are always created using host order. However,
-no matter the system type, 128-bit UUID must use big-endian byte
-order format (similar to human-readble format).
 ---
- lib/uuid.c | 29 +++++++++++++----------------
- 1 file changed, 13 insertions(+), 16 deletions(-)
+ attrib/att.c          | 13 +++++++++++--
+ attrib/gatt-service.c | 22 +++++++++++++---------
+ src/attrib-server.c   | 11 ++++++++++-
+ 3 files changed, 34 insertions(+), 12 deletions(-)
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index dbca330..0d3b204 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -30,9 +30,9 @@
- #include <stdlib.h>
- #include <errno.h>
+diff --git a/attrib/att.c b/attrib/att.c
+index bd23142..bdf7c00 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -38,6 +38,15 @@
+ #include "lib/uuid.h"
+ #include "att.h"
  
-+#include "src/shared/util.h"
- #include "uuid.h"
- 
--#if __BYTE_ORDER == __BIG_ENDIAN
- static uint128_t bluetooth_base_uuid = {
- 	.data = {	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
- 			0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB }
-@@ -41,24 +41,17 @@ static uint128_t bluetooth_base_uuid = {
- #define BASE_UUID16_OFFSET	2
- #define BASE_UUID32_OFFSET	0
- 
--#else
--static uint128_t bluetooth_base_uuid = {
--	.data = {	0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80,
--			0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 }
--};
--
--#define BASE_UUID16_OFFSET	12
--#define BASE_UUID32_OFFSET	BASE_UUID16_OFFSET
--
--#endif
--
- static void bt_uuid16_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
++static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
++{
++	if (src->type == BT_UUID16)
++		put_le16(src->value.u16, dst);
++	else
++		/* Convert from 128-bit BE to LE */
++		bswap_128(&src->value.u128, dst);
++}
++
+ const char *att_ecode2str(uint8_t status)
  {
- 	dst->value.u128 = bluetooth_base_uuid;
- 	dst->type = BT_UUID128;
+ 	switch (status)  {
+@@ -156,7 +165,7 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+ 	/* Ending Handle (2 octets) */
+ 	att_put_u16(end, &pdu[3]);
+ 	/* Attribute Group Type (2 or 16 octet UUID) */
+-	att_put_uuid(*uuid, &pdu[5]);
++	put_uuid_le(uuid, &pdu[5]);
  
--	memcpy(&dst->value.u128.data[BASE_UUID16_OFFSET],
--			&src->value.u16, sizeof(src->value.u16));
-+	/*
-+	 * No matter the system: 128-bit UUIDs should be stored
-+	 * as big-endian. 16-bit UUIDs are stored on host order.
-+	 */
-+
-+	put_be16(src->value.u16, &dst->value.u128.data[BASE_UUID16_OFFSET]);
+ 	return 5 + uuid_len;
  }
+@@ -401,7 +410,7 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+ 	/* Ending Handle (2 octets) */
+ 	att_put_u16(end, &pdu[3]);
+ 	/* Attribute Type (2 or 16 octet UUID) */
+-	att_put_uuid(*uuid, &pdu[5]);
++	put_uuid_le(uuid, &pdu[5]);
  
- static void bt_uuid32_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
-@@ -66,8 +59,12 @@ static void bt_uuid32_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
- 	dst->value.u128 = bluetooth_base_uuid;
- 	dst->type = BT_UUID128;
- 
--	memcpy(&dst->value.u128.data[BASE_UUID32_OFFSET],
--				&src->value.u32, sizeof(src->value.u32));
-+	/*
-+	 * No matter the system: 128-bit UUIDs should be stored
-+	 * as big-endian. 32-bit UUIDs are stored on host order.
-+	 */
-+
-+	put_be32(src->value.u32, &dst->value.u128.data[BASE_UUID32_OFFSET]);
+ 	return 5 + uuid_len;
  }
+diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
+index 227d4d4..699ac1e 100644
+--- a/attrib/gatt-service.c
++++ b/attrib/gatt-service.c
+@@ -30,6 +30,7 @@
+ #include <bluetooth/sdp.h>
  
- void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst)
+ #include "src/adapter.h"
++#include "src/shared/util.h"
+ #include "lib/uuid.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/att.h"
+@@ -56,6 +57,15 @@ struct attrib_cb {
+ 	void *user_data;
+ };
+ 
++static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
++{
++	if (src->type == BT_UUID16)
++		put_le16(src->value.u16, dst);
++	else
++		/* Convert from 128-bit BE to LE */
++		bswap_128(&src->value.u128, dst);
++}
++
+ static GSList *parse_opts(gatt_option opt1, va_list args)
+ {
+ 	gatt_option opt = opt1;
+@@ -130,14 +140,8 @@ static struct attribute *add_service_declaration(struct btd_adapter *adapter,
+ 	uint8_t atval[16];
+ 	int len;
+ 
+-	if (uuid->type == BT_UUID16) {
+-		att_put_u16(uuid->value.u16, &atval[0]);
+-		len = 2;
+-	} else if (uuid->type == BT_UUID128) {
+-		att_put_u128(uuid->value.u128, &atval[0]);
+-		len = 16;
+-	} else
+-		return NULL;
++	put_uuid_le(uuid, &atval[0]);
++	len = bt_uuid_len(uuid);
+ 
+ 	bt_uuid16_create(&bt_uuid, svc);
+ 
+@@ -229,7 +233,7 @@ static gboolean add_characteristic(struct btd_adapter *adapter,
+ 	bt_uuid16_create(&bt_uuid, GATT_CHARAC_UUID);
+ 	atval[0] = info->props;
+ 	att_put_u16(h + 1, &atval[1]);
+-	att_put_uuid(info->uuid, &atval[3]);
++	put_uuid_le(&info->uuid, &atval[3]);
+ 	if (attrib_db_add(adapter, h++, &bt_uuid, ATT_NONE, ATT_NOT_PERMITTED,
+ 				atval, 3 + info->uuid.type / 8) == NULL)
+ 		return FALSE;
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 5c6b1f8..e089c0d 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -102,6 +102,15 @@ static bt_uuid_t ccc_uuid = {
+ 			.value.u16 = GATT_CLIENT_CHARAC_CFG_UUID
+ };
+ 
++static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
++{
++	if (src->type == BT_UUID16)
++		put_le16(src->value.u16, dst);
++	else
++		/* Convert from 128-bit BE to LE */
++		bswap_128(&src->value.u128, dst);
++}
++
+ static void attrib_free(void *data)
+ {
+ 	struct attribute *a = data;
+@@ -676,7 +685,7 @@ static uint16_t find_info(struct gatt_channel *channel, uint16_t start,
+ 		att_put_u16(a->handle, value);
+ 
+ 		/* Attribute Value */
+-		att_put_uuid(a->uuid, &value[2]);
++		put_uuid_le(&a->uuid, &value[2]);
+ 	}
+ 
+ 	length = enc_find_info_resp(format, adl, pdu, len);
 -- 
 1.8.3.1
 
