@@ -1,74 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Mar 2014 11:14:39 +0200
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCHv3 00/16] AVRCP code and test cases
-Message-ID: <20140320091437.GA11610@aemeltch-MOBL1>
-References: <1395134447-8957-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <20140319091326.GB5215@aemeltch-MOBL1>
- <CABBYNZKveFRYL77tc46WkBzZFaKsKMNK=penzgUzrX7EPwe=HQ@mail.gmail.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZKveFRYL77tc46WkBzZFaKsKMNK=penzgUzrX7EPwe=HQ@mail.gmail.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] Bluetooth: Fix passkey endianess in user_confirm and notify_passkey
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1395296294-8686-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 19 Mar 2014 23:25:05 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C63D98CC-E283-4F2F-8A0A-33FB443F8DE7@holtmann.org>
+References: <1395296294-8686-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-On Wed, Mar 19, 2014 at 01:32:53PM +0200, Luiz Augusto von Dentz wrote:
-> Hi Andrei,
+> The passkey_notify and user_confirm functions in mgmt.c were expecting
+> different endianess for the passkey, leading to a big endian bug and
+> sparse warning in recently added SMP code. This patch converts both
+> functions to expect host endianess and do the conversion to little
+> endian only when assigning to the mgmt event struct.
 > 
-> On Wed, Mar 19, 2014 at 11:13 AM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > On Tue, Mar 18, 2014 at 11:20:31AM +0200, Andrei Emeltchenko wrote:
-> >> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >>
-> >> Set of unapplied test cases and code so far.
-> >
-> > ping
-> >
-> >
-> >>
-> >>
-> >> Changes:
-> >>       * v3: Rebased against new interface
-> >>
-> >> Andrei Emeltchenko (16):
-> >>   android/avrcp: Add avrcp_connect_browsing()
-> >>   android/avrcp: Add avrcp_set_browsed_player() function
-> >>   unit/avrcp: Add browsing channel support in unit testing
-> >>   unit/avrcp: Add /TP/MPS/BV-03-C test
-> >>   android/avrcp: Use defined constant instead of magic number
-> >>   android/avrcp: Add avrcp_get_folder_items() function
-> >>   unit/avrcp: Add /TP/MPS/BV-08-C test
-> >>   unit/avrcp: Add /TP/MPS/BV-01-I test
-> >>   unit/avrcp: Add Connection establishment and release tests
-> >>   unit/avrcp: Add /TP/MCN/CB/BV-01-C test
-> >>   android/avrcp: Add avrcp_change_path() function
-> >>   unit/avrcp: Add /TP/MCN/CB/BV-04-C test
-> >>   android/avrcp: Add avrcp_get_item_attributes() function
-> >>   unit/avrcp: Add /TP/MCN/CB/BV-07-C test
-> >>   android/avrcp: Add avrcp_search() function
-> >>   unit/avrcp: Add /TP/MCN/SRC/BV-01-C test
-> >>
-> >>  .gitignore          |   2 +
-> >>  android/avrcp-lib.c | 126 ++++++++++++++++++++++++++++++++-
-> >>  android/avrcp-lib.h |  32 +++++++++
-> >>  unit/test-avrcp.c   | 197 +++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>  4 files changed, 352 insertions(+), 5 deletions(-)
-> >>
-> >> --
-> >> 1.8.3.2
-> 
-> The idea was that we start using cfm callbacks for commands, so
-> instead of using avctp_rsp_cb or avctp_browsing_rsp_cb directly which
-> leads to receive raw PDU as response we would internally parse then
-> and only then call the respective cfm callback with the parameter in
-> host order.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci_core.h | 2 +-
+> net/bluetooth/hci_event.c        | 4 ++--
+> net/bluetooth/mgmt.c             | 4 ++--
+> net/bluetooth/smp.c              | 2 +-
+> 4 files changed, 6 insertions(+), 6 deletions(-)
 
-So will you create skeleton or example how you want interface to change?
+patch has been applied to bluetooth-next tree.
 
-Best regards 
-Andrei Emeltchenko 
+Regards
+
+Marcel
 
