@@ -1,51 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 20 Mar 2014 15:17:32 -0500
+From: Felipe Balbi <balbi@ti.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: Felipe Balbi <balbi@ti.com>, Greg KH <gregkh@linuxfoundation.org>,
+        <linux-serial@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+        Peter
+ Hurley <peter@hurleysoftware.com>, <m-karicheri2@ti.com>,
+        <b32955@freescale.com>,
+        Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 09/11] bluetooth: hci_ldisc: fix deadlock condition
+Message-ID: <20140320201732.GA23113@saruman.home>
+Reply-To: <balbi@ti.com>
+References: <1395343807-21618-1-git-send-email-balbi@ti.com>
+ <1395343807-21618-9-git-send-email-balbi@ti.com>
+ <95DFF994-1668-4F93-943B-06805FD5B20B@holtmann.org>
 MIME-Version: 1.0
-Date: Thu, 20 Mar 2014 15:13:55 -0700
-Message-ID: <CAHrH25QBL52xfM4Qnk=NE1xn3RX2Bwxq_i0osDDCoi4egO2tkg@mail.gmail.com>
-Subject: Removing GAttrib.
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="M9NhX3UHpAaciwkO"
+In-Reply-To: <95DFF994-1668-4F93-943B-06805FD5B20B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+--M9NhX3UHpAaciwkO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I've been working on adding the client-side GATT API to BlueZ
-src/gatt. It occurred to me (both as I delved into the code and after
-discussions with Claudio Takahasi) that combining the "struct io"
-based abstraction used by the new btd_attribute and the current
-connection management that depends on GAttrib gets a bit messy. For
-client mode alone, handling both incoming connections from a remote
-device, and issuing outgoing read/write and primary/characteristic
-discovery requests CAN be done with GAttrib, but the btd_attribute
-abstraction appears to be cleaner I would prefer to keep the client
-and server mode implementations consistent.
+On Thu, Mar 20, 2014 at 12:40:40PM -0700, Marcel Holtmann wrote:
+> Hi Felipe,
+>=20
+> > LDISCs shouldn't call tty->ops->write() from within
+> > ->write_wakeup().
+> >=20
+> > ->write_wakeup() is called with port lock taken and
+> > IRQs disabled, tty->ops->write() will try to acquire
+> > the same port lock and we will deadlock.
+> >=20
+> > Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
+> > Reported-by: Huang Shijie <b32955@freescale.com>
+> > Signed-off-by: Felipe Balbi <balbi@ti.com>
+> > ---
+> > drivers/bluetooth/hci_ldisc.c | 24 +++++++++++++++++++-----
+> > drivers/bluetooth/hci_uart.h  |  1 +
+> > 2 files changed, 20 insertions(+), 5 deletions(-)
+>=20
+> I hope these are not causing any conflicts with bluetooth-next /
+> linux-next. If not, then I can let Greg take it through tty-next tree.
+>=20
+> Acked-by: Marcel Holtmann <marcel@holtmann.org>
 
-To that end, I'd like to figure out what's the best way to approach
-this. Clearly, the GAttrib dependency runs deep: the API provided in
-attrib/gatt.h uses GAttrib and is used by src/device.c and pretty much
-all the GATT based profile implementations. The profiles seem to use
-the callback interface defined in src/attio.h which is how src/device
-allows the profiles to access it's internal GAttrib instance.
-attrib/gatt.h is also currently used by gatttool.
+tty-next is already closed, i'll rebase (if necessary) once -rc1 is out
+;-)
 
-Anderson Lizardo and I had some discussions about this and he
-mentioned that one of the earlier ideas was to simply replace GAttrib
-with struct io. Another thing that he mentioned is to keep the code in
-src/gatt restricted to handling client and server side read/write
-requests (i.e. attribute access abstraction) and put no discovery
-related logic there.
+cheers
 
-So my question is, how do we want to do this refactor? Do we basically
-want to have all references to GAttrib replaced with struct io,
-keeping the API in attrib/gatt and the callbacks in src/attio the same
-but using struct io instead of GAttrib? Or do we want a more revised
-API?
+--=20
+balbi
 
-Any input/suggestion will be appreciated. Once we know what exactly it
-is that we want with this code, we can come up with a plan to
-deprecate GAttrib.
+--M9NhX3UHpAaciwkO
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
 
-Thanks!
-Arman
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTK0zcAAoJEIaOsuA1yqREaYoQAKQrd/P/CKeb1ROSx0x7Bbol
+wjoUjUVab/tRHp5DYqJLr6xrB3Ns6FTHJ1sJNi+fou6k2FGfgjGUxRGxKqqNTSEj
+BUWrdENgphuZyLsXAiT057CX8NMO3q3pKHHcBNJrZpdedXY3iQYnSmEpzM1qy3Km
+blUzlEnlcVLPNsmurDccCM3GJQ5evfrEnZQn53hMTzKQnklJx6RC9K87h0U10jDy
+EzQZM7nCX5/ktJPdimVZw3ls9KsVZ4ffjBMPcNLhc6QuHSYPIouzFGPWEZk8AzLx
+uEq085A5dYU5wLBXODOLIzmw9spx10OzwHK9dpdVSgwkGXKl8g0cNq4RhZ0hBrln
+quil7WItwNROgUgZxk0gvo5966Hh8iXl3CZ+RyxjadOABrHo03gjrp30ttdzfLPC
+ajWzONIjufHb7+PvEIguNhQX39oNx6NvsneZu7hPcb2KHshGVVFUSDOezuHzn6Eg
+yYYGUhrTgmroGqi2QD3sHbv1DFehouBuP4bmNCTk0vmYGbRq23PvDWcBTxCFhRek
+gQ3RvVgcV8lwyAx6XZM1S6Y7WmbXmRHTsY3K1zh00BzzOmah9Dhx9dBA+qHLan8F
+23GIQjxF0427lVn/IuXU5SmoCdAy2+YasZ2P9xKWX0qt48MSjYxdfNwdjROmq/aj
+h0Ih3Sk6WmtpVDfkpdp4
+=o3Ee
+-----END PGP SIGNATURE-----
+
+--M9NhX3UHpAaciwkO--
