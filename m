@@ -1,36 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] gobex: Fix not resetting SRM setup
-Date: Thu, 20 Mar 2014 19:20:26 +0200
-Message-Id: <1395336027-30438-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 20 Mar 2014 12:16:22 -0500
+From: Felipe Balbi <balbi@ti.com>
+To: Alan Cox <alan@linux.intel.com>
+CC: <balbi@ti.com>, Marcel Holtmann <marcel@holtmann.org>,
+        Greg KH
+	<gregkh@linuxfoundation.org>,
+        Muralidharan Karicheri <m-karicheri2@ti.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+        Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: hci_ldsic nested locking problem
+Message-ID: <20140320171621.GA2827@saruman.home>
+Reply-To: <balbi@ti.com>
+References: <20140320163435.GH32692@saruman.home>
+ <1395333736.22077.32.camel@acox1-desk.ger.corp.intel.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="xHFwDpU9dbj6ez1V"
+In-Reply-To: <1395333736.22077.32.camel@acox1-desk.ger.corp.intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--xHFwDpU9dbj6ez1V
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-If SRM is not confirmed by both ends the setup should be disregarded and
-the data associated to it can be freed otherwise the next command may
-reuse the same setup assuming it is still valid and probably cause SRM
-to be enabled without remote consent.
----
- gobex/gobex.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Thu, Mar 20, 2014 at 04:42:16PM +0000, Alan Cox wrote:
+> On Thu, 2014-03-20 at 11:34 -0500, Felipe Balbi wrote:
+> > Hi,
+> >=20
+> > when 8250 driver calls uart_write_wakeup(), the tty port lock is already
+> > taken. hci_ldisc.c's implementation of ->write_wakeup() calls
+> > tty->ops->write() to actually send the characters, but that call will
+> > try to acquire the same port lock again.
+> >=20
+> > Looking at other line disciplines that looks like a bug in hci_ldisc.c.
+> > Am I correct to assume that ->write_wakeup() is supposed to *just*
+> > wakeup the bottom half so we handle ->write() in another context ?
+> >=20
+> > Is it legal to call tty->ops->write() from within ->write_wakeup() ?
+>=20
+> It isn't because you might send all the bytes and go
+>=20
+> 	write
+> 		write_wakeup
+> 			write
+> 				write wakeup
+> 					...
+>=20
+> and recurse
 
-diff --git a/gobex/gobex.c b/gobex/gobex.c
-index 0d9b449..d7d325b 100644
---- a/gobex/gobex.c
-+++ b/gobex/gobex.c
-@@ -400,7 +400,8 @@ static void setup_srm(GObex *obex, GObexPacket *pkt, gboolean outgoing)
- 		g_obex_header_get_uint8(hdr, &srm);
- 		g_obex_debug(G_OBEX_DEBUG_COMMAND, "srm 0x%02x", srm);
- 		set_srm(obex, op, srm);
--	}
-+	} else if (!g_obex_srm_enabled(obex))
-+		set_srm(obex, op, G_OBEX_SRM_DISABLE);
- 
- 	hdr = g_obex_packet_get_header(pkt, G_OBEX_HDR_SRMP);
- 	if (hdr != NULL) {
--- 
-1.8.5.3
+cool, so there really is a bug in hci_ldisc. Marcel, any tips on how do
+you want this to be sorted out ?
 
+--=20
+balbi
+
+--xHFwDpU9dbj6ez1V
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTKyJlAAoJEIaOsuA1yqRE2FwP/AmUoBnEl6k60x4X1R19LYYP
+Hcfqh96Or4Z0qA8+AxTWwK6gyOgTvU5l9VhR549x3lB3G5KIf/k2VffkjARtn94v
+gBahV14mpjA2AQRtidQwqAtqivf0UN9dcLC6vfVjkqfHOqma6nfjfP82P5KFI7aY
+G0bsnb62ojKTIDYtNmJor3mAKGzzL9LfZX3jShjFldoU01UTr8e0ONL2fRhyJ0l0
+1+5euw0GaGGnxAbZvVgulFZh7CECpmkDGspzUN9cjY45spwDOergGVH2lXPS7Hae
+a+rEwUI3F4fkARGST+cuKc4/VgG91E0IgyLW10paNwtdW8kgzcIjYqRzFepb/PMm
+cRbYj2XIRF2mekpvo2I8zm+6ZtWdS74PiBwLR14OvQJ1/YcFIN6cwlVjafZyyHuK
+7P+YCSzQLGKV9Ra+lW0UCe9BYUh1xMQztGFu7mRRSMIR6KTmF36fAzxsn6/eZlmG
+YGJaz90RbSutEZ9dhf1kclMvURrXkSZUFeWIEfLV6dpgTTZ35OrIyslFpvoRWEs4
+IkjKwQowwf1WJ7ow1k4KbAYz+wF9froG/F128y+408ks9kWrD33uOIaBewTM7Da8
+k5+vr2CWysQausGHZKAC+L9lmIo2DfmOdy8C+DzkCLgOH5WpxqXb5Vx5bw5sRO6N
+2PjQiY5IBPKzhcVpIobJ
+=+Ocl
+-----END PGP SIGNATURE-----
+
+--xHFwDpU9dbj6ez1V--
