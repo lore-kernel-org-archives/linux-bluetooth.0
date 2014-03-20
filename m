@@ -1,25 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Mar 2014 20:03:35 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v0] unit: Add test for
- g_dbus_client_set_ready_watch()
-Message-ID: <20140320180335.GA26245@t440s.P-661HNU-F1>
-References: <1394198072-21522-1-git-send-email-claudio.takahasi@openbossa.org>
+From: "An, Tedd" <tedd.an@intel.com>
+To: Ben Hutchings <ben@decadent.org.uk>
+CC: "dwmw2@infradead.org" <dwmw2@infradead.org>,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>,
+	"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>,
+	"Fry, Don" <don.fry@intel.com>
+Subject: RE: linux-firmware: Update Intel BT devices firmware patch files
+ (7260/3160)
+Date: Thu, 20 Mar 2014 17:44:48 +0000
+Message-ID: <BB52B9B497F0EE4EB05C192A0408F6602F27F4AD@ORSMSX104.amr.corp.intel.com>
+References: <20140314135254.2edf9d2e@han1-desk-dev>
+ <1395003913.15764.118.camel@deadeye.wl.decadent.org.uk>
+In-Reply-To: <1395003913.15764.118.camel@deadeye.wl.decadent.org.uk>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1394198072-21522-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
-
-On Fri, Mar 07, 2014, Claudio Takahasi wrote:
-> ---
->  unit/test-gdbus-client.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 54 insertions(+)
-
-Applied. Thanks.
-
-Johan
+SGkgQmVuDQoNCkR1ZSB0byBvdXIgaW50ZXJuYWwgY2hhbmdlIG9mIGJ1aWxkIHN5c3RlbSwgdGhl
+IHZlcnNpb24gZm9ybWF0IG5lZWRzIHRvIGJlIHVwZGF0ZWQgc28gSSBjYW4gdHJhY2sgaXQgbW9y
+ZSBlYXNpbHkuDQoNClRoYW5rcy4NCg0KVGVkZA0KDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
+LS0tLS0NCj4gRnJvbTogQmVuIEh1dGNoaW5ncyBbbWFpbHRvOmJlbkBkZWNhZGVudC5vcmcudWtd
+DQo+IFNlbnQ6IFN1bmRheSwgTWFyY2ggMTYsIDIwMTQgMjowNSBQTQ0KPiBUbzogQW4sIFRlZGQN
+Cj4gQ2M6IGR3bXcyQGluZnJhZGVhZC5vcmc7IExpbnV4IEJsdWV0b290aCBtYWlsaW5nIGxpc3Q7
+IEdydW1iYWNoLCBFbW1hbnVlbDsNCj4gRnJ5LCBEb24NCj4gU3ViamVjdDogUmU6IGxpbnV4LWZp
+cm13YXJlOiBVcGRhdGUgSW50ZWwgQlQgZGV2aWNlcyBmaXJtd2FyZSBwYXRjaCBmaWxlcw0KPiAo
+NzI2MC8zMTYwKQ0KPiANCj4gT24gRnJpLCAyMDE0LTAzLTE0IGF0IDEzOjUyIC0wNzAwLCBUZWRk
+IEhvLUplb25nIEFuIHdyb3RlOg0KPiA+IEZyb206IFRlZGQgSG8tSmVvbmcgQW4gPHRlZGQuYW5A
+aW50ZWwuY29tPg0KPiA+DQo+ID4gVGhpcyBwYXRjaCB1cGRhdGVzIGZpcm13YXJlIHBhdGNoIGZp
+bGVzIGZvciBmb2xsb3dpbmcgSW50ZWwgQmx1ZXRvb3RoIERldmljZXM6DQo+ID4gLSBJbnRlbCBX
+aXJlbGVzcyBCbHVldG9vdGggNzI2MA0KPiA+IC0gSW50ZWwgV2lyZWxlc3MgQmx1ZXRvb3RoIDMx
+NjANCj4gPg0KPiA+IFRoaXMgZmlybXdhcmVzIGZpeGVzDQo+ID4gLSBObyBTQ08gZGF0YSBvdmVy
+IEVIQ0kNCj4gPg0KPiA+IFNpZ25lZC1vZmYtYnk6IFRlZGQgSG8tSmVvbmcgQW4gPHRlZGQuYW5A
+aW50ZWwuY29tPg0KPiA+IC0tLQ0KPiA+ICBXSEVOQ0UgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgfCAgIDQgKystLQ0KPiA+ICBpbnRlbC9pYnQtaHctMzcuNy4xMC1mdy0xLjAuMi4z
+LmQuYnNlcSAgfCBCaW4gMTgxNDUgLT4gMjExMjEgYnl0ZXMNCj4gPiBpbnRlbC9pYnQtaHctMzcu
+Ny4xMC1mdy0xLjgwLjIuMy5kLmJzZXEgfCBCaW4gMTc5MTcgLT4gMjEwMDEgYnl0ZXMNCj4gPiAg
+MyBmaWxlcyBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+ID4NCj4g
+PiBkaWZmIC0tZ2l0IGEvV0hFTkNFIGIvV0hFTkNFDQo+ID4gaW5kZXggNGJjYjNiNS4uNzg3NjU0
+OCAxMDA2NDQNCj4gPiAtLS0gYS9XSEVOQ0UNCj4gPiArKysgYi9XSEVOQ0UNCj4gPiBAQCAtMjI1
+NCw5ICsyMjU0LDkgQEAgRHJpdmVyOiBidHVzYiAtIEJsdWV0b290aCBVU0IgZHJpdmVyDQo+ID4g
+IEZpbGU6IGludGVsL2lidC1ody0zNy43LmJzZXENCj4gPiAgVmVyc2lvbjogMTMxNi4wMi4wMA0K
+PiA+ICBGaWxlOiBpbnRlbC9pYnQtaHctMzcuNy4xMC1mdy0xLjgwLjIuMy5kLmJzZXENCj4gPiAt
+VmVyc2lvbjogMTM0NC4wMS4zMw0KPiA+ICtWZXJzaW9uOiBhdXRvLldQXzEzMDNfMDJfcGF0Y2hf
+MC4xLjU0LjEgKDB4MzYpDQo+ID4gIEZpbGU6IGludGVsL2lidC1ody0zNy43LjEwLWZ3LTEuMC4y
+LjMuZC5ic2VxDQo+ID4gLVZlcnNpb246IDEzNDQuMDEuMzMNCj4gPiArVmVyc2lvbjogYXV0by5X
+UF8xMzAzXzAyX3BhdGNoXzAuMS41NC4xICgweDM2KQ0KPiBbLi4uXQ0KPiANCj4gV2h5IGhhcyB0
+aGUgdmVyc2lvbiBmb3JtYXQgY2hhbmdlZD8gIEFyZSBhbGwgdGhlIGRpZmZlcmVudCBwYXJ0cyBh
+Y3R1YWxseQ0KPiBzaWduaWZpY2FudD8NCj4gDQo+IEJlbi4NCj4gDQo+IC0tDQo+IEJlbiBIdXRj
+aGluZ3MNCj4gQ29tcHV0ZXJzIGFyZSBub3QgaW50ZWxsaWdlbnQuCVRoZXkgb25seSB0aGluayB0
+aGV5IGFyZS4NCg==
