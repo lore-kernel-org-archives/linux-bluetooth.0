@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 01/10] emulator: Use timeout for sending inquiry results
-Date: Thu, 20 Mar 2014 10:49:23 +0100
-Message-ID: <1395308972-4320-2-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 04/10] emulator: Add handling inquiry_lenght from inquiry command
+Date: Thu, 20 Mar 2014 10:49:26 +0100
+Message-ID: <1395308972-4320-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395308972-4320-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395308972-4320-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,257 +13,125 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch btdev uses timeout to schedule inquiry results
-It also allows btdev to receive hci commands during inquiry.
-Previously btdev was blocked since all the inquiry result were sent in
-single loop
+With this patch, btdev is taking into accoung inquiry_lenght from hci
+inquiry command.
+Inquiry session will last that long unless number of devices parameter
+has been provided different then 0
 ---
- Makefile.tools      | 18 ++++++++----
- android/Makefile.am |  2 ++
- emulator/btdev.c    | 84 +++++++++++++++++++++++++++++++++++++++++++++++++----
- 3 files changed, 92 insertions(+), 12 deletions(-)
+ emulator/btdev.c | 42 +++++++++++++++++++++++++++++++++++++-----
+ 1 file changed, 37 insertions(+), 5 deletions(-)
 
-diff --git a/Makefile.tools b/Makefile.tools
-index 0583f3b..a5491ac 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -88,7 +88,8 @@ tools_mgmt_tester_SOURCES = tools/mgmt-tester.c monitor/bt.h \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
--				src/shared/tester.h src/shared/tester.c
-+				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c
- tools_mgmt_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
-@@ -101,7 +102,8 @@ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
--				src/shared/tester.h src/shared/tester.c
-+				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c
- tools_l2cap_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c monitor/bt.h \
-@@ -114,7 +116,8 @@ tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c monitor/bt.h \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
--				src/shared/tester.h src/shared/tester.c
-+				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c
- tools_rfcomm_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
-@@ -127,7 +130,8 @@ tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
--				src/shared/tester.h src/shared/tester.c
-+				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c
- tools_smp_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
-@@ -138,7 +142,8 @@ tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/queue.h src/shared/queue.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
--				src/shared/tester.h src/shared/tester.c
-+				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c
- tools_gap_tester_LDADD =  lib/libbluetooth-internal.la \
- 				gdbus/libgdbus-internal.la \
- 				@GLIB_LIBS@ @DBUS_LIBS@
-@@ -153,7 +158,8 @@ tools_sco_tester_SOURCES = tools/sco-tester.c monitor/bt.h \
- 				src/shared/util.h src/shared/util.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
--				src/shared/tester.h src/shared/tester.c
-+				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c
- tools_sco_tester_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
- 
- tools_hci_tester_SOURCES = tools/hci-tester.c monitor/bt.h \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 3c503da..58ee3c9 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -126,6 +126,7 @@ android_android_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
- 				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c \
- 				monitor/rfcomm.h \
- 				android/hardware/hardware.c \
- 				android/android-tester.c
-@@ -149,6 +150,7 @@ android_ipc_tester_SOURCES = emulator/btdev.h emulator/btdev.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/hciemu.h src/shared/hciemu.c \
- 				src/shared/tester.h src/shared/tester.c \
-+				src/shared/timeout.h src/shared/timeout-glib.c \
- 				android/hal-utils.h android/hal-utils.c \
- 				android/ipc-common.h android/ipc-tester.c
- 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 6a3b163..d0292a6 100644
+index e5e2956..a3c0371 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -33,6 +33,7 @@
- #include <alloca.h>
- 
- #include "src/shared/util.h"
-+#include "src/shared/timeout.h"
- #include "monitor/bt.h"
- #include "btdev.h"
- 
-@@ -68,6 +69,8 @@ struct btdev {
- 	btdev_send_func send_handler;
+@@ -70,6 +70,7 @@ struct btdev {
  	void *send_data;
  
-+	unsigned int inquiry_id;
-+
+ 	unsigned int inquiry_id;
++	unsigned int inquiry_timeout_id;
+ 
  	struct hook *hook_list[MAX_HOOK_ENTRIES];
  
-         uint16_t manufacturer;
-@@ -131,6 +134,14 @@ struct btdev {
- 	uint8_t  sync_train_service_data;
- };
- 
-+struct inquiry_data {
-+	struct btdev *btdev;
-+	int sent_count;
-+	int iter;
-+};
-+
-+#define DEFAULT_INQUIRY_INTERVAL 100 /* 100 miliseconds */
-+
- #define MAX_BTDEV_ENTRIES 16
- 
- static const uint8_t LINK_KEY_NONE[16] = { 0 };
-@@ -536,6 +547,9 @@ void btdev_destroy(struct btdev *btdev)
+@@ -549,7 +550,7 @@ void btdev_destroy(struct btdev *btdev)
  	if (!btdev)
  		return;
  
-+	if (btdev->inquiry_id)
-+		timeout_remove(btdev->inquiry_id);
-+
+-	if (btdev->inquiry_id)
++	if (btdev->inquiry_id > 0)
+ 		timeout_remove(btdev->inquiry_id);
+ 
  	del_btdev(btdev);
- 
- 	free(btdev);
-@@ -692,12 +706,18 @@ static void num_completed_packets(struct btdev *btdev)
- 	}
- }
- 
--static void inquiry_complete(struct btdev *btdev, uint8_t status)
-+static bool inquiry_callback(void *user_data)
- {
--	struct bt_hci_evt_inquiry_complete ic;
-+	struct inquiry_data *data = user_data;
-+	struct btdev *btdev = data->btdev;
-+	int sent = data->sent_count;
+@@ -716,6 +717,10 @@ static bool inquiry_callback(void *user_data)
+ 	int sent = data->sent_count;
  	int i;
  
--	for (i = 0; i < MAX_BTDEV_ENTRIES; i++) {
-+	for (i = data->iter; i < MAX_BTDEV_ENTRIES; i++) {
-+		/*Lets sent 10 inquiry results at once */
-+		if (sent + 10 == data->sent_count)
-+			break;
++	/*Report devices only once and wait for inquiry timeout*/
++	if (data->iter == MAX_BTDEV_ENTRIES)
++		return true;
 +
- 		if (!btdev_list[i] || btdev_list[i] == btdev)
- 			continue;
- 
-@@ -719,6 +739,7 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
- 
- 			send_event(btdev, BT_HCI_EVT_EXT_INQUIRY_RESULT,
- 							&ir, sizeof(ir));
-+			data->sent_count++;
- 			continue;
+ 	for (i = data->iter; i < MAX_BTDEV_ENTRIES; i++) {
+ 		/*Lets sent 10 inquiry results at once */
+ 		if (sent + 10 == data->sent_count)
+@@ -776,16 +781,12 @@ static bool inquiry_callback(void *user_data)
+ 			data->sent_count++;
  		}
+ 	}
+-
+ 	data->iter = i;
  
-@@ -735,6 +756,7 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ 	/* Check if we sent already required amount of responses*/
+ 	if (data->num_resp && data->sent_count == data->num_resp)
+ 		goto finish;
  
- 			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT_WITH_RSSI,
- 							&ir, sizeof(ir));
-+			data->sent_count++;
- 		} else {
- 			struct bt_hci_evt_inquiry_result ir;
+-	if (i == MAX_BTDEV_ENTRIES)
+-		goto finish;
+-
+ 	return true;
  
-@@ -748,11 +770,61 @@ static void inquiry_complete(struct btdev *btdev, uint8_t status)
+ finish:
+@@ -806,16 +807,38 @@ static void inquiry_destroy(void *user_data)
  
- 			send_event(btdev, BT_HCI_EVT_INQUIRY_RESULT,
- 							&ir, sizeof(ir));
-+			data->sent_count++;
- 		}
--        }
-+	}
+ 	btdev->inquiry_id = 0;
  
--	ic.status = status;
-+	data->iter = i;
++	if (btdev->inquiry_timeout_id)
++		timeout_remove(btdev->inquiry_timeout_id);
 +
-+	if (i == MAX_BTDEV_ENTRIES) {
-+		struct bt_hci_evt_inquiry_complete ic;
++	btdev->inquiry_timeout_id = 0;
 +
-+		ic.status = BT_HCI_ERR_SUCCESS;
-+		send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
-+
-+		return false;
-+	}
- 
-+	return true;
-+}
-+
-+static void inquiry_destroy(void *user_data)
-+{
-+	struct inquiry_data *data = user_data;
-+
-+	if (data->btdev)
-+		data->btdev->inquiry_id = 0;
-+
-+	free(data);
-+}
-+
-+static void inquiry_cmd(struct btdev *btdev, const void *cmd)
-+{
-+	struct inquiry_data *data;
-+	struct bt_hci_evt_inquiry_complete ic;
-+	int status = BT_HCI_ERR_HARDWARE_FAILURE;
-+
-+	if (btdev->inquiry_id > 0) {
-+		status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto failed;
-+	}
-+
-+	data = malloc(sizeof(*data));
-+	if (!data)
-+		goto failed;
-+
-+	memset(data, 0, sizeof(*data));
-+	data->btdev = btdev;
-+
-+	btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
-+							inquiry_callback, data,
-+							inquiry_destroy);
-+	/* Return if success */
-+	if (btdev->inquiry_id > 0)
-+		return;
-+
-+failed:
-+	ic.status = status;
- 	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
+ finish:
+ 	free(data);
  }
  
-@@ -2647,7 +2719,7 @@ static void default_cmd_completion(struct btdev *btdev, uint16_t opcode,
- 	case BT_HCI_CMD_INQUIRY:
- 		if (btdev->type == BTDEV_TYPE_LE)
- 			return;
--		inquiry_complete(btdev, BT_HCI_ERR_SUCCESS);
-+		inquiry_cmd(btdev, data);
- 		break;
++static bool inquiry_timeout(void *user_data)
++{
++	struct inquiry_data *data = user_data;
++	struct btdev *btdev = data->btdev;
++	struct bt_hci_evt_inquiry_complete ic;
++
++	timeout_remove(btdev->inquiry_id);
++	btdev->inquiry_timeout_id = 0;
++
++	/* Inquiry is stopped, send Inquiry complete event. */
++	ic.status = BT_HCI_ERR_SUCCESS;
++	send_event(btdev, BT_HCI_EVT_INQUIRY_COMPLETE, &ic, sizeof(ic));
++
++	return false;
++}
++
+ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+ {
+ 	const struct bt_hci_cmd_inquiry *inq_cmd = cmd;
+ 	struct inquiry_data *data;
+ 	struct bt_hci_evt_inquiry_complete ic;
+ 	int status = BT_HCI_ERR_HARDWARE_FAILURE;
++	unsigned int inquiry_len_ms;
  
- 	case BT_HCI_CMD_CREATE_CONN:
+ 	if (btdev->inquiry_id > 0) {
+ 		status = BT_HCI_ERR_COMMAND_DISALLOWED;
+@@ -830,6 +853,13 @@ static void inquiry_cmd(struct btdev *btdev, const void *cmd)
+ 	data->btdev = btdev;
+ 	data->num_resp = inq_cmd->num_resp;
+ 
++	/* Add timeout to cancel inquiry */
++	inquiry_len_ms = 1280 * inq_cmd->length;
++	if (inquiry_len_ms)
++		btdev->inquiry_timeout_id = timeout_add(inquiry_len_ms,
++							inquiry_timeout,
++								data, NULL);
++
+ 	btdev->inquiry_id = timeout_add(DEFAULT_INQUIRY_INTERVAL,
+ 							inquiry_callback, data,
+ 							inquiry_destroy);
+@@ -852,6 +882,8 @@ static void inquiry_cancel(struct btdev *btdev)
+ 		return;
+ 	}
+ 
++	timeout_remove(btdev->inquiry_timeout_id);
++	btdev->inquiry_timeout_id = 0;
+ 	timeout_remove(btdev->inquiry_id);
+ 	btdev->inquiry_id = 0;
+ 
 -- 
 1.8.4
 
