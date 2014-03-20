@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 51/62] attrib: Remove att_get_u16()
-Date: Thu, 20 Mar 2014 11:43:16 -0300
-Message-Id: <1395326607-27068-52-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 48/62] attrib: Remove att_get_u32()
+Date: Thu, 20 Mar 2014 11:43:13 -0300
+Message-Id: <1395326607-27068-49-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -15,17 +15,17 @@ List-ID: <linux-bluetooth.vger.kernel.org>
  1 file changed, 6 deletions(-)
 
 diff --git a/attrib/att.h b/attrib/att.h
-index 35281e5..46bd253 100644
+index 4db015d..ad6bdf6 100644
 --- a/attrib/att.h
 +++ b/attrib/att.h
-@@ -112,12 +112,6 @@ struct att_range {
- };
+@@ -118,12 +118,6 @@ static inline uint16_t att_get_u16(const void *ptr)
+ 	return btohs(bt_get_unaligned(u16_ptr));
+ }
  
- /* These functions do byte conversion */
--static inline uint16_t att_get_u16(const void *ptr)
+-static inline uint32_t att_get_u32(const void *ptr)
 -{
--	const uint16_t *u16_ptr = ptr;
--	return btohs(bt_get_unaligned(u16_ptr));
+-	const uint32_t *u32_ptr = ptr;
+-	return btohl(bt_get_unaligned(u32_ptr));
 -}
 -
  static inline uint128_t att_get_u128(const void *ptr)
