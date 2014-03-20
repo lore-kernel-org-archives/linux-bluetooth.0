@@ -1,42 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0] attrib: Remove unneeded sdp.h header include
-Date: Thu, 20 Mar 2014 14:25:59 -0300
-Message-Id: <1395336359-16138-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ 2/2] gobex/transfer: Keep request id for GET when SRM is active
+Date: Thu, 20 Mar 2014 19:20:27 +0200
+Message-Id: <1395336027-30438-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1395336027-30438-1-git-send-email-luiz.dentz@gmail.com>
+References: <1395336027-30438-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/gatt-service.c | 1 -
- attrib/utils.c        | 1 -
- 2 files changed, 2 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-index 227d4d4..d15536c 100644
---- a/attrib/gatt-service.c
-+++ b/attrib/gatt-service.c
-@@ -27,7 +27,6 @@
- #endif
+In case a GET operation is in progress with SRM the same request id is
+valid for the whole transfer otherwise it is not possible to cancel the
+transfer after the first response.
+---
+ gobex/gobex-transfer.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/gobex/gobex-transfer.c b/gobex/gobex-transfer.c
+index 09f56ba..8498177 100644
+--- a/gobex/gobex-transfer.c
++++ b/gobex/gobex-transfer.c
+@@ -195,9 +195,11 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 	struct transfer *transfer = user_data;
+ 	GObexPacket *req;
+ 	gboolean rspcode, final;
++	guint id;
  
- #include <glib.h>
--#include <bluetooth/sdp.h>
+ 	g_obex_debug(G_OBEX_DEBUG_TRANSFER, "transfer %u", transfer->id);
  
- #include "src/adapter.h"
- #include "lib/uuid.h"
-diff --git a/attrib/utils.c b/attrib/utils.c
-index 17f02be..8f9a4c07 100644
---- a/attrib/utils.c
-+++ b/attrib/utils.c
-@@ -31,7 +31,6 @@
- #include <bluetooth/bluetooth.h>
- #include <bluetooth/hci.h>
- #include <bluetooth/hci_lib.h>
--#include <bluetooth/sdp.h>
++	id = transfer->req_id;
+ 	transfer->req_id = 0;
  
- #include "lib/uuid.h"
- #include "btio/btio.h"
+ 	if (err != NULL) {
+@@ -230,8 +232,11 @@ static void transfer_response(GObex *obex, GError *err, GObexPacket *rsp,
+ 	} else if (!g_obex_srm_active(transfer->obex)) {
+ 		req = g_obex_packet_new(transfer->opcode, TRUE,
+ 							G_OBEX_HDR_INVALID);
+-	} else
++	} else {
++		/* Keep id since request still outstanting */
++		transfer->req_id = id;
+ 		return;
++	}
+ 
+ 	transfer->req_id = g_obex_send_req(obex, req, -1, transfer_response,
+ 							transfer, &err);
 -- 
-1.8.3.1
+1.8.5.3
 
