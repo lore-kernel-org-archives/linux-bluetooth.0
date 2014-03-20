@@ -1,77 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/handsfree: Improve audio connection handling
-Date: Thu, 20 Mar 2014 13:36:35 +0100
-Message-ID: <1706809.0fgfNfC4aM@uw000953>
-In-Reply-To: <1395213926-16351-1-git-send-email-szymon.janc@tieto.com>
-References: <1395213926-16351-1-git-send-email-szymon.janc@tieto.com>
+Date: Thu, 20 Mar 2014 14:32:24 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v5 09/10] tools/mgmt-tester: Refactor
+ setup_start_discovery function
+Message-ID: <20140320123224.GA7170@t440s.lan>
+References: <1395314713-13104-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1395314713-13104-10-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1395314713-13104-10-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 19 of March 2014 08:25:25 Szymon Janc wrote:
-> This add disconnecting SCO if last call was dropped (required by
-> Java 'virtual voice call'). Also make sure that SCO is connected
-> only there were no calls present before phone state change. This
-> makes sure SCO won't be re-connected in three way calling scenarios
-> when user choose to not use audio on BT headset.
+Hi Lukasz,
+
+On Thu, Mar 20, 2014, Lukasz Rymanowski wrote:
+> This patch removes handling hook register from this
+> function and its callback as this is no longer necessary for any stop
+> discovery tests.
+> 
+> This patch also adds setup_send_param and setup_send_len  parameters to
+> test data so it is easy to control start discovery command parameters.
+> It is useful for tests:
+> Stop Discovery - Invalid parameters 1
+> Stop Discovery - BR/EDR (Inquiry) Success 1
 > ---
->  android/handsfree.c | 19 ++++++++++++-------
->  1 file changed, 12 insertions(+), 7 deletions(-)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index c8e5f8a..ebeb751 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -1995,7 +1995,8 @@ static void phone_state_dialing(int num_active, int num_held)
->  	if (num_active == 0 && num_held > 0)
->  		update_indicator(IND_CALLHELD, 2);
->  
-> -	connect_audio();
-> +	if (device.num_active == 0 && device.num_held == 0)
-> +		connect_audio();
->  }
->  
->  static void phone_state_alerting(int num_active, int num_held)
-> @@ -2066,7 +2067,9 @@ static void phone_state_idle(int num_active, int num_held)
->  	case HAL_HANDSFREE_CALL_STATE_INCOMING:
->  		if (num_active > device.num_active) {
->  			update_indicator(IND_CALL, 1);
-> -			connect_audio();
-> +
-> +			if (device.num_active == 0 && device.num_held == 0)
-> +				connect_audio();
->  		}
->  
->  		if (num_held > device.num_held)
-> @@ -2089,14 +2092,16 @@ static void phone_state_idle(int num_active, int num_held)
->  			/* TODO better way for forcing indicator */
->  			device.inds[IND_CALLHELD].val = 0;
->  			update_indicator(IND_CALLHELD, 1);
-> -		} else if (num_active > 0 && device.num_active == 0) {
-> -			/* If number of active calls change but there was no
-> -			 * call setup change this means that there were active
-> +		} else if ((num_active > 0 || num_held > 0) &&
-> +						device.num_active == 0 &&
-> +						device.num_held == 0) {
-> +			/* If number of active or held calls change but there
-> +			 * was no call setup change this means that there were
->  			 * calls present when headset was connected.
-> -			 *
-> -			 * TODO should we care about held calls here as well?
->  			 */
->  			connect_audio();
-> +		} else if (num_active == 0 && num_held == 0) {
-> +			disconnect_sco();
->  		} else {
->  			update_indicator(IND_CALLHELD,
->  					num_held ? (num_active ? 1 : 2) : 0);
-> 
+>  tools/mgmt-tester.c | 62 ++++++++++++++---------------------------------------
+>  1 file changed, 16 insertions(+), 46 deletions(-)
 
-Pushed.
+I've applied all other patches in the set besides this one.
 
--- 
-Best regards, 
-Szymon Janc
+> --- a/tools/mgmt-tester.c
+> +++ b/tools/mgmt-tester.c
+> @@ -362,6 +362,9 @@ struct generic_data {
+>  	uint16_t setup_expect_hci_command;
+>  	const void *setup_expect_hci_param;
+>  	uint8_t setup_expect_hci_len;
+> +	uint16_t setup_send_opcode;
+> +	const void *setup_send_param;
+> +	uint16_t setup_send_len;
+>  	bool send_index_none;
+>  	uint16_t send_opcode;
+>  	const void *send_param;
+> @@ -1734,6 +1737,8 @@ static const struct generic_data stop_discovery_success_test_1 = {
+>  
+>  static const struct generic_data stop_discovery_bredr_success_test_1 = {
+>  	.setup_settings = settings_powered,
+> +	.setup_send_param = start_discovery_bredr_param,
+> +	.setup_send_len = sizeof(start_discovery_bredr_param),
+>  	.send_opcode = MGMT_OP_STOP_DISCOVERY,
+>  	.send_param = stop_discovery_bredr_param,
+>  	.send_len = sizeof(stop_discovery_bredr_param),
+
+Where's the setup_send_opcode which you added to the struct? Since
+you're calling these by generic names you really should be setting all
+of them.
+
+> @@ -1758,6 +1763,8 @@ static const struct generic_data stop_discovery_rejected_test_1 = {
+>  
+>  static const struct generic_data stop_discovery_invalid_param_test_1 = {
+>  	.setup_settings = settings_powered_le,
+> +	.setup_send_param = start_discovery_bredrle_param,
+> +	.setup_send_len = sizeof(start_discovery_bredrle_param),
+>  	.send_opcode = MGMT_OP_STOP_DISCOVERY,
+>  	.send_param = stop_discovery_bredrle_invalid_param,
+>  	.send_len = sizeof(stop_discovery_bredrle_invalid_param),
+
+Same here.
+
+>  static void setup_start_discovery(const void *test_data)
+>  {
+>  	struct test_data *data = tester_get_data();
+>  	const struct generic_data *test = data->test_data;
+> -	const void *send_param = test->send_param;
+> -	uint16_t send_len = test->send_len;
+> -
+> -	if (test->setup_expect_hci_command) {
+> -		tester_print("Registering HCI command callback (setup)");
+> -		hciemu_add_hook(data->hciemu, HCIEMU_HOOK_PRE_EVT,
+> -				test->setup_expect_hci_command,
+> -				setup_command_hci_callback,
+> -				NULL);
+> +	const void *send_param = test->setup_send_param;
+> +	uint16_t send_len = test->setup_send_len;
+> +	unsigned char disc_param[] = { 0x07 };
+>  
+> -		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
+> -				send_len, send_param, NULL, NULL, NULL);
+> -	} else {
+> -		unsigned char disc_param[] = { 0x07 };
+> +	if (!send_param) {
+> +		send_param = disc_param;
+> +		send_len = 1;
+> +	}
+>  
+> -		mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
+> -					sizeof(disc_param), disc_param,
+> +	mgmt_send(data->mgmt, MGMT_OP_START_DISCOVERY, data->mgmt_index,
+> +					send_len, send_param,
+>  					setup_discovery_callback, NULL, NULL);
+
+And here you shouldn't have a hard-coded MGMT_OP_START_DISCOVERY but use
+setup_send_opcode instead.
+
+Johan
