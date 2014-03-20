@@ -1,63 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 20 Mar 2014 11:34:35 -0500
-From: Felipe Balbi <balbi@ti.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Alan Cox <alan@linux.intel.com>,
-        Greg KH <gregkh@linuxfoundation.org>
-CC: Muralidharan Karicheri <m-karicheri2@ti.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-        Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: hci_ldsic nested locking problem
-Message-ID: <20140320163435.GH32692@saruman.home>
-Reply-To: <balbi@ti.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="RwGu8mu1E+uYXPWP"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH v2] Bluetooth: Fix address value for early disconnection events
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1395312856-1992-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 20 Mar 2014 09:15:41 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0ACF2210-9E51-46C4-A2BA-262FD444BD01@holtmann.org>
+References: <1395308865-27200-1-git-send-email-johan.hedberg@gmail.com> <1395312856-1992-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---RwGu8mu1E+uYXPWP
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Johan,
 
-Hi,
+> We need to ensure that we do not send events to user space with the
+> identity address if we have not yet notified user space of the IRK. The
+> code was previously trying to handle this for the mgmt_pair_device
+> response (which worked well enough) but this is not the only connection
+> related event that might be sent to user space before pairing is
+> successful: another important event is Device Disconnected.
+> 
+> The issue can actually be solved more simply than the solution
+> previously used for mgmt_pair_device. Since we do have the identity
+> address tracked as part of the remote IRK struct we can just copy it
+> over from there to the hci_conn struct once we've for real sent the mgmt
+> event for the new IRK.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> v2: Move l2cap_conn_update_id_addr to the right place
+> 
+> net/bluetooth/mgmt.c | 16 ++--------------
+> net/bluetooth/smp.c  | 16 +++++++++-------
+> 2 files changed, 11 insertions(+), 21 deletions(-)
 
-when 8250 driver calls uart_write_wakeup(), the tty port lock is already
-taken. hci_ldisc.c's implementation of ->write_wakeup() calls
-tty->ops->write() to actually send the characters, but that call will
-try to acquire the same port lock again.
+patch has been applied to bluetooth-next tree.
 
-Looking at other line disciplines that looks like a bug in hci_ldisc.c.
-Am I correct to assume that ->write_wakeup() is supposed to *just*
-wakeup the bottom half so we handle ->write() in another context ?
+Regards
 
-Is it legal to call tty->ops->write() from within ->write_wakeup() ?
+Marcel
 
-cheers
-
---=20
-balbi
-
---RwGu8mu1E+uYXPWP
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTKxibAAoJEIaOsuA1yqREQ6wP/Rki7213nleViEF4e2iQPoiX
-Phn2KyCf70Mbly1abtLR9ilIqs4iebRg+VOowU2/64d6+SiiOzPupDlJRIrikHvR
-BT4gZB7YTQiUgYteO21vlIEKUBxRTr8ntujA6p+v0NOZqJv/BNcLcGuR8e774+fe
-j97ZcFlx+hbEb9q608bD5XbkGXftXBhhFx+llbM5AAK/ffDzFwwp9EgYzjSO4M0I
-lpIInSuT7NvOShU63Jx642D5BG2n1F5A6NgZacKGhXIC0FSJjHPN6eo1vNYPcqGe
-ubM8MgF/RbDrqJS7c0BRnr3qFvYah0NYeS0sEkWKcTlmXK8JX8fIXw+7+e49WaE1
-fc2ccmfJWfNneB1/kRfTZgt3Pxi6iwS2GzMrXKEelpI2BLrnhpm2Ew5TQmMaIfw3
-WLySiAtZG6zWuqxHzbAOUu8vMdH+NRxFRvTUhYXiSSJhUxQIrYL2IeOG3vecTkYQ
-4bRXLnK0OOCPPKC95IA3RyFP26rb4uMOYU+t/lbU5OD24L0mzwFAGl7i8AfoYTAy
-s3BywhZA5joQTqDKXDVQ9agz4VmiIG5tLcp1WPEMXRwS6/BRM/DI4oRRfKfjKpLB
-jLcGurJjdt04I7irLBMksVdMPqMRWn3b3ZgEGlJffEcxC4V9r2IPH8Pi9C4ccKTH
-17CbvpZMUjSUZoDkbPZT
-=eLjS
------END PGP SIGNATURE-----
-
---RwGu8mu1E+uYXPWP--
