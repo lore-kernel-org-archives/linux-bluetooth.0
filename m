@@ -2,40 +2,38 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 35/62] unit: Use lower-case for 128-bit UUIDs
-Date: Thu, 20 Mar 2014 11:43:00 -0300
-Message-Id: <1395326607-27068-36-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 33/62] lib: Remove hton128() from bt_uuid_to_string()
+Date: Thu, 20 Mar 2014 11:42:58 -0300
+Message-Id: <1395326607-27068-34-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to ISO/IEC 9834-8: "It is recommended that the hexadecimal
-representation used in all human-readable formats be restricted to
-lower-case letters. Software processing this representation is, however,
-required to accept both upper and lower case letters as specified in
-6.5.2."
+bt_uuid_to_string() helper should get the raw UUID value. Caller should
+convert the 128-bit UUID before call this helper if necessary. bt_uuid_t
+stores 128-bit UUID on big-endian format (human-readable format), swap
+byte order is not necessary.
 ---
- unit/test-uuid.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ lib/uuid.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/unit/test-uuid.c b/unit/test-uuid.c
-index 79ab3e6..225a7b5 100644
---- a/unit/test-uuid.c
-+++ b/unit/test-uuid.c
-@@ -46,10 +46,10 @@ static unsigned char uuid_base_binary[] = {
- 			0x80, 0x00, 0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb };
+diff --git a/lib/uuid.c b/lib/uuid.c
+index aa2d0cf..dbca330 100644
+--- a/lib/uuid.c
++++ b/lib/uuid.c
+@@ -154,10 +154,7 @@ int bt_uuid_to_string(const bt_uuid_t *uuid, char *str, size_t n)
+ 		unsigned int   data4;
+ 		unsigned short data5;
  
- static struct uuid_test_data uuid_base = {
--	.str = "00000000-0000-1000-8000-00805F9B34FB",
-+	.str = "00000000-0000-1000-8000-00805f9b34fb",
- 	.binary = uuid_base_binary,
- 	.type = BT_UUID128,
--	.str128 = "00000000-0000-1000-8000-00805F9B34FB",
-+	.str128 = "00000000-0000-1000-8000-00805f9b34fb",
- 	.binary128 = uuid_base_binary,
- };
+-		uint128_t nvalue;
+-		const uint8_t *data = (uint8_t *) &nvalue;
+-
+-		hton128(&uuid->value.u128, &nvalue);
++		const uint8_t *data = (uint8_t *) &uuid->value.u128;
  
+ 		memcpy(&data0, &data[0], 4);
+ 		memcpy(&data1, &data[4], 2);
 -- 
 1.8.3.1
 
