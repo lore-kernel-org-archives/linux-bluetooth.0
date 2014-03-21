@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1395336027-30438-1-git-send-email-luiz.dentz@gmail.com>
-References: <1395336027-30438-1-git-send-email-luiz.dentz@gmail.com>
-Date: Fri, 21 Mar 2014 16:15:43 +0200
-Message-ID: <CABBYNZJOWQdG6Eh09UmbESfVA8E+nF-tW1w4uhuFBtzRJ9+gxw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] gobex: Fix not resetting SRM setup
+In-Reply-To: <1395403104-10344-1-git-send-email-luiz.dentz@gmail.com>
+References: <1395403104-10344-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 21 Mar 2014 16:15:16 +0200
+Message-ID: <CABBYNZ+Z=2Cyqs=__fdrL0P3cJAJ8MyZk08KOcg_Q9qBLGT0DQ@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/3] gobex: Add g_obex_disconnect
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
@@ -13,32 +13,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Thu, Mar 20, 2014 at 7:20 PM, Luiz Augusto von Dentz
+On Fri, Mar 21, 2014 at 1:58 PM, Luiz Augusto von Dentz
 <luiz.dentz@gmail.com> wrote:
 > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 >
-> If SRM is not confirmed by both ends the setup should be disregarded and
-> the data associated to it can be freed otherwise the next command may
-> reuse the same setup assuming it is still valid and probably cause SRM
-> to be enabled without remote consent.
+> This adds g_obex_disconnect function which can be used to send OBEX
+> Disconnect command.
 > ---
->  gobex/gobex.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  gobex/gobex.c | 12 ++++++++++++
+>  gobex/gobex.h |  3 +++
+>  2 files changed, 15 insertions(+)
 >
 > diff --git a/gobex/gobex.c b/gobex/gobex.c
-> index 0d9b449..d7d325b 100644
+> index d7d325b..ca15941 100644
 > --- a/gobex/gobex.c
 > +++ b/gobex/gobex.c
-> @@ -400,7 +400,8 @@ static void setup_srm(GObex *obex, GObexPacket *pkt, gboolean outgoing)
->                 g_obex_header_get_uint8(hdr, &srm);
->                 g_obex_debug(G_OBEX_DEBUG_COMMAND, "srm 0x%02x", srm);
->                 set_srm(obex, op, srm);
-> -       }
-> +       } else if (!g_obex_srm_enabled(obex))
-> +               set_srm(obex, op, G_OBEX_SRM_DISABLE);
+> @@ -1445,6 +1445,18 @@ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+>         return g_obex_send_req(obex, req, -1, func, user_data, err);
+>  }
 >
->         hdr = g_obex_packet_get_header(pkt, G_OBEX_HDR_SRMP);
->         if (hdr != NULL) {
+> +guint g_obex_disconnect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+> +                                                               GError **err)
+> +{
+> +       GObexPacket *req;
+> +
+> +       g_obex_debug(G_OBEX_DEBUG_COMMAND, "");
+> +
+> +       req = g_obex_packet_new(G_OBEX_OP_DISCONNECT, TRUE, G_OBEX_HDR_INVALID);
+> +
+> +       return g_obex_send_req(obex, req, -1, func, user_data, err);
+> +}
+> +
+>  guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+>                                         gpointer user_data, GError **err)
+>  {
+> diff --git a/gobex/gobex.h b/gobex/gobex.h
+> index 76a224e..7c47590 100644
+> --- a/gobex/gobex.h
+> +++ b/gobex/gobex.h
+> @@ -75,6 +75,9 @@ void g_obex_unref(GObex *obex);
+>  guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+>                                 GError **err, guint8 first_hdr_id, ...);
+>
+> +guint g_obex_disconnect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+> +                                                               GError **err);
+> +
+>  guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+>                                         gpointer user_data, GError **err);
+>
 > --
 > 1.8.5.3
 
