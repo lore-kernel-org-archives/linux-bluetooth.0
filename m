@@ -3,9 +3,9 @@ From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org,
 	Alvaro Silva <alvaro.silva@openbossa.org>
-Subject: [PATCH BlueZ v6 09/10] tools: Add setting Value property of gatt-service
-Date: Fri, 21 Mar 2014 11:58:49 -0300
-Message-Id: <1395413930-18292-10-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v6 08/10] tools: Add reading Value property of gatt-service
+Date: Fri, 21 Mar 2014 11:58:48 -0300
+Message-Id: <1395413930-18292-9-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395413930-18292-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395174391-27251-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395413930-18292-1-git-send-email-claudio.takahasi@openbossa.org>
@@ -14,66 +14,125 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-This patch extends the gatt-service.c example adding a generic callback
-to allow set the characteristic Value. It doesn't check for
-characteristic properties yet.
+This patch extends the gatt-service.c example adding the callback to
+allow reading the Value property. At the moment, it is a generic
+callback and it doesn't consider characteristic value property
+restrictions.
 ---
- tools/gatt-service.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ tools/gatt-service.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 53 insertions(+), 6 deletions(-)
 
 diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index 97dc8d4..ad5399b 100644
+index d1606ad..97dc8d4 100644
 --- a/tools/gatt-service.c
 +++ b/tools/gatt-service.c
-@@ -35,6 +35,8 @@
- #include <dbus/dbus.h>
- #include <gdbus/gdbus.h>
+@@ -46,18 +46,44 @@
+ static GMainLoop *main_loop;
+ static GSList *services;
  
-+#include "src/error.h"
++struct characteristic {
++	char *uuid;
++	uint8_t *value;
++	int vlen;
++};
 +
- #define GATT_MGR_IFACE			"org.bluez.GattManager1"
- #define GATT_SERVICE_IFACE		"org.bluez.GattService1"
- #define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
-@@ -81,9 +83,38 @@ static gboolean chr_get_value(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+ static gboolean chr_get_uuid(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
+ {
+-	const char *uuid = user_data;
++	struct characteristic *chr = user_data;
  
-+static void chr_set_value(const GDBusPropertyTable *property,
-+				DBusMessageIter *iter,
-+				GDBusPendingPropertySet id, void *user_data)
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &chr->uuid);
++
++	return TRUE;
++}
++
++static gboolean chr_get_value(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
 +{
 +	struct characteristic *chr = user_data;
 +	DBusMessageIter array;
-+	uint8_t *value;
-+	int len;
 +
-+	printf("Set('Value', ...)\n");
++	printf("Get(\"Value\")\n");
 +
-+	if (dbus_message_iter_get_arg_type(iter) != DBUS_TYPE_ARRAY) {
-+		printf("Invalid value for Set('Value'...)\n");
-+		g_dbus_pending_property_error(id,
-+					ERROR_INTERFACE ".InvalidArguments",
-+					"Invalid arguments in method call");
-+		return;
-+	}
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_BYTE_AS_STRING, &array);
 +
-+	dbus_message_iter_recurse(iter, &array);
-+	dbus_message_iter_get_fixed_array(&array, &value, &len);
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++						&chr->value, chr->vlen);
 +
-+	g_free(chr->value);
-+	chr->value = g_memdup(value, len);
-+	chr->vlen = len;
-+
-+	g_dbus_pending_property_success(id);
-+}
-+
++	dbus_message_iter_close_container(iter, &array);
+ 
+ 	return TRUE;
+ }
+ 
  static const GDBusPropertyTable chr_properties[] = {
  	{ "UUID",	"s",	chr_get_uuid },
--	{ "Value", "ay", chr_get_value, NULL, NULL },
-+	{ "Value", "ay", chr_get_value, chr_set_value, NULL },
++	{ "Value", "ay", chr_get_value, NULL, NULL },
  	{ }
  };
  
+@@ -100,18 +126,35 @@ static const GDBusPropertyTable service_properties[] = {
+ 	{ }
+ };
+ 
++static void chr_iface_destroy(gpointer user_data)
++{
++	struct characteristic *chr = user_data;
++
++	g_free(chr->uuid);
++	g_free(chr->value);
++	g_free(chr);
++}
++
+ static int register_characteristic(DBusConnection *conn, const char *uuid,
++						const uint8_t *value, int vlen,
+ 						const char *service_path)
+ {
++	struct characteristic *chr;
+ 	static int id = 1;
+ 	char *path;
+ 	int ret = 0;
+ 
+ 	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+ 
++	chr = g_new0(struct characteristic, 1);
++
++	chr->uuid = g_strdup(uuid);
++	chr->value = g_memdup(value, vlen);
++	chr->vlen = vlen;
++
+ 	if (g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+ 					NULL, NULL, chr_properties,
+-					g_strdup(uuid), g_free) == FALSE) {
++					chr, chr_iface_destroy) == FALSE) {
+ 		printf("Couldn't register characteristic interface\n");
+ 		ret = -EIO;
+ 	}
+@@ -141,15 +184,19 @@ static char *register_service(DBusConnection *conn, const char *uuid)
+ static void create_services(DBusConnection *conn)
+ {
+ 	char *service_path;
++	uint8_t level = 0;
+ 	int ret;
+ 
+ 	service_path = register_service(conn, IAS_UUID);
+ 	if (service_path == NULL)
+ 		return;
+ 
+-	/* Add Alert Level Characteristic to Immediate Alert Service */
+-	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
+-							service_path);
++	/* Add Alert Level Characteristic to Immediate Alert Service
++	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
++	 * "Value" is readable for testing purpose only.
++	 */
++	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
++						sizeof(level), service_path);
+ 	if (ret < 0) {
+ 		printf("Couldn't register Alert Level characteristic (IAS)\n");
+ 		g_dbus_unregister_interface(conn, service_path,
 -- 
 1.8.3.1
 
