@@ -1,78 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v7 00/10] Add basic GATT characteristics
-Date: Fri, 21 Mar 2014 16:16:33 -0300
-Message-Id: <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1395413930-18292-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1395413930-18292-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] eir: Use unsigned int for flags in struct eir_data
+Date: Fri, 21 Mar 2014 18:21:32 +0100
+Message-Id: <1395422492-21425-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remaining patches of "GATT basic characteristics" patchset.
+This adds assumption that if flags field is not present in EIR all
+flags are unset:
+"The Flags data type shall be included when any of the Flag bits are
+non-zero, otherwise the Flags data type may be omitted."
 
-This patchset adds the following features:
-  * basic read or write external characteristics
+This also fix reporting non-discoverable LE devices as limited
+discoverable due to no explicit check for flags == -1 as empty
+flags.
+---
+ src/eir.c       |  2 +-
+ src/eir.h       |  2 +-
+ unit/test-eir.c | 18 +++++++++---------
+ 3 files changed, 11 insertions(+), 11 deletions(-)
 
-TODO (missing features of this patchset and upstream code):
-  * Properties/flags: operations and security
-  * 32-bit UUIDs
-  * Remove/free services
-  * multiple services provided by the same client
-  * remove att_put_* att_get_* helpers
-
-Changes from v7 to v6:
-  * coding style: !foo and boolean
-
-Changes from v6 to v5:
-  * Use size_t instead of signed integer for
-    g_dbus_proxy_set_property_array
-  * Use negative value to denote an error (-ernno)
-
-Changes from v5 to v4:
-  * avoid usage of uint128_t in the header util.h
-
-Changes from v4 to v3:
-  * keep LE <-> CPU helpers in lib/bluetooth.h (patches removing these
-    helpers are being shifted to next patchset)
-
-Changes from v3 to v2:
-  * return put_uuid() definition to src/gatt.c
-  * add put_le16(), put_le32(), put_le128() to src/shared/util.h
-
-Changes from v2 to v1:
-  * move put_uuid() and put_le16() to src/shared/util.h
-  * check malloc0() and new0() return value
-
-Changes from v1 to v0:
-  * Use LE <-> CPU helpers defined in src/shared/util.h
-  * remove patch "gatt: Add helper for reading characteristics" from
-   this set.
-
-
-Alvaro Silva (3):
-  tools: Add Alert Level characteristic to gatt-service
-  tools: Add reading Value property of gatt-service
-  tools: Add setting Value property of gatt-service
-
-Claudio Takahasi (7):
-  gatt: Assign read callback for external services
-  gatt: Add write callback to btd_gatt_add_char helper
-  gdbus: Add g_dbus_proxy_set_property_array
-  gatt: Assign write callback for external services
-  gatt: Add result callback for Write Request
-  gatt: Add Write Request handling for GDBusProxy
-  tools: Emit property changed when Value changes
-
- gdbus/client.c       |  85 ++++++++++++++++++++++++++++
- gdbus/gdbus.h        |   5 ++
- src/gatt-dbus.c      | 124 +++++++++++++++++++++++++++++++++++++++-
- src/gatt.c           |   7 ++-
- src/gatt.h           |  18 +++++-
- tools/gatt-service.c | 156 +++++++++++++++++++++++++++++++++++++++++++++++----
- 6 files changed, 377 insertions(+), 18 deletions(-)
-
+diff --git a/src/eir.c b/src/eir.c
+index db9175b..d22ad91 100644
+--- a/src/eir.c
++++ b/src/eir.c
+@@ -141,7 +141,7 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+ {
+ 	uint16_t len = 0;
+ 
+-	eir->flags = -1;
++	eir->flags = 0;
+ 	eir->tx_power = 127;
+ 
+ 	/* No EIR data to parse */
+diff --git a/src/eir.h b/src/eir.h
+index 3fa1cb3..9e53983 100644
+--- a/src/eir.h
++++ b/src/eir.h
+@@ -40,7 +40,7 @@
+ 
+ struct eir_data {
+ 	GSList *services;
+-	int flags;
++	unsigned int flags;
+ 	char *name;
+ 	uint32_t class;
+ 	uint16_t appearance;
+diff --git a/unit/test-eir.c b/unit/test-eir.c
+index 2061a11..3960c0f 100644
+--- a/unit/test-eir.c
++++ b/unit/test-eir.c
+@@ -38,7 +38,7 @@
+ struct test_data {
+ 	const void *eir_data;
+ 	size_t eir_size;
+-	int flags;
++	unsigned int flags;
+ 	const char *name;
+ 	bool name_complete;
+ 	int8_t tx_power;
+@@ -93,7 +93,7 @@ static const char *macbookair_uuid[] = {
+ static const struct test_data macbookair_test = {
+ 	.eir_data = macbookair_data,
+ 	.eir_size = sizeof(macbookair_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Marcel’s MacBook Air",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+@@ -148,7 +148,7 @@ static const char *iphone5_uuid[] = {
+ static const struct test_data iphone5_test = {
+ 	.eir_data = iphone5_data,
+ 	.eir_size = sizeof(iphone5_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Marcel’s iPhone 5",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+@@ -201,7 +201,7 @@ static const char *ipadmini_uuid[] = {
+ static const struct test_data ipadmini_test = {
+ 	.eir_data = ipadmini_data,
+ 	.eir_size = sizeof(ipadmini_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Marcel's iPad mini",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+@@ -253,7 +253,7 @@ static const char *gigaset_sl400h_uuid[] = {
+ static const struct test_data gigaset_sl400h_test = {
+ 	.eir_data = gigaset_sl400h_data,
+ 	.eir_size = sizeof(gigaset_sl400h_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Marcel's SL400H",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+@@ -305,7 +305,7 @@ static const char *gigaset_sl910_uuid[] = {
+ static const struct test_data gigaset_sl910_test = {
+ 	.eir_data = gigaset_sl910_data,
+ 	.eir_size = sizeof(gigaset_sl910_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Marcel's SL910",
+ 	.name_complete = true,
+ 	.tx_power = 127,
+@@ -359,7 +359,7 @@ static const char *nokia_bh907_uuid[] = {
+ static const struct test_data nokia_bh907_test = {
+ 	.eir_data = nokia_bh907_data,
+ 	.eir_size = sizeof(nokia_bh907_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Nokia Reaction BH-907",
+ 	.name_complete = true,
+ 	.tx_power = 4,
+@@ -407,7 +407,7 @@ static const char *fuelband_uuid[] = {
+ static const struct test_data fuelband_test = {
+ 	.eir_data = fuelband_data,
+ 	.eir_size = sizeof(fuelband_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.name = "Nike+ FuelBand",
+ 	.name_complete = true,
+ 	.tx_power = 0,
+@@ -530,7 +530,7 @@ static const char *citizen_scan_uuid[] = {
+ static const struct test_data citizen_scan_test = {
+ 	.eir_data = citizen_scan_data,
+ 	.eir_size = sizeof(citizen_scan_data),
+-	.flags = -1,
++	.flags = 0,
+ 	.tx_power = 0,
+ 	.uuid = citizen_scan_uuid,
+ };
 -- 
-1.8.3.1
+1.8.3.2
 
