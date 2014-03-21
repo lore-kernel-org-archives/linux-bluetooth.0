@@ -1,30 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 21 Mar 2014 22:03:02 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Track current configured LE scan type
- parameter
-Message-ID: <20140321200302.GA15605@t440s.P-661HNU-F1>
-References: <1395429490-10884-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395429490-10884-1-git-send-email-marcel@holtmann.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 4/4] tools: Fix coding style checking boolean
+Date: Fri, 21 Mar 2014 16:20:33 -0300
+Message-Id: <1395429633-656-4-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This patch fixes tools/gatt-service.c coding style, using !foo instead
+of foo == FALSE.
+---
+ tools/gatt-service.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On Fri, Mar 21, 2014, Marcel Holtmann wrote:
-> The LE scan type paramter defines if active scanning or passive scanning
-> is in use. Track the currently set value so it can be used for decision
-> making from other pieces in the core.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_event.c        | 25 +++++++++++++++++++++++++
->  2 files changed, 26 insertions(+)
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 71f7a50..6933c05 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -205,9 +205,9 @@ static char *register_service(const char *uuid)
+ 	char *path;
+ 
+ 	path = g_strdup_printf("/service%d", id++);
+-	if (g_dbus_register_interface(connection, path, GATT_SERVICE_IFACE,
++	if (!g_dbus_register_interface(connection, path, GATT_SERVICE_IFACE,
+ 				NULL, NULL, service_properties,
+-				g_strdup(uuid), g_free) == FALSE) {
++				g_strdup(uuid), g_free)) {
+ 		printf("Couldn't register service interface\n");
+ 		g_free(path);
+ 		return NULL;
+@@ -287,7 +287,7 @@ static void register_external_service(gpointer a, gpointer b)
+ 
+ 	dbus_message_iter_close_container(&iter, &dict);
+ 
+-	if (g_dbus_send_message_with_reply(conn, msg, &call, -1) == FALSE) {
++	if (!g_dbus_send_message_with_reply(conn, msg, &call, -1)) {
+ 		dbus_message_unref(msg);
+ 		return;
+ 	}
+-- 
+1.8.3.1
 
-Applied to bluetooth-next. Thanks.
-
-Johan
