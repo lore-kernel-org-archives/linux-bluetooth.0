@@ -1,104 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0 1/4] gatt: Fix coding style when testing pointers
-Date: Fri, 21 Mar 2014 16:20:30 -0300
-Message-Id: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH] Bluetooth: Track current configured LE scan type parameter
+Date: Fri, 21 Mar 2014 12:18:10 -0700
+Message-Id: <1395429490-10884-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use !ptr instead of ptr == NULL
----
- src/gatt-dbus.c | 10 +++++-----
- src/gatt.c      |  8 ++++----
- 2 files changed, 9 insertions(+), 9 deletions(-)
+The LE scan type paramter defines if active scanning or passive scanning
+is in use. Track the currently set value so it can be used for decision
+making from other pieces in the core.
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 3c3b54c..896accf 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -284,7 +284,7 @@ static int register_external_service(const struct external_app *eapp,
- 	if (bt_string_to_uuid(&uuid, str) < 0)
- 		return -EINVAL;
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_event.c        | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index afbea388eda1..5f8bc05694ac 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -189,6 +189,7 @@ struct hci_dev {
+ 	__u16		page_scan_window;
+ 	__u8		page_scan_type;
+ 	__u8		le_adv_channel_map;
++	__u8		le_scan_type;
+ 	__u16		le_scan_interval;
+ 	__u16		le_scan_window;
+ 	__u16		le_conn_min_interval;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 1e386edc338f..9ee081b9c064 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -199,6 +199,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
+ 	memset(hdev->scan_rsp_data, 0, sizeof(hdev->scan_rsp_data));
+ 	hdev->scan_rsp_data_len = 0;
  
--	if (btd_gatt_add_service(&uuid) == NULL)
-+	if (!btd_gatt_add_service(&uuid))
- 		return -EINVAL;
++	hdev->le_scan_type = LE_SCAN_PASSIVE;
++
+ 	hdev->ssp_debug_mode = 0;
+ }
  
- 	return 0;
-@@ -321,7 +321,7 @@ static int register_external_characteristics(GSList *proxies)
+@@ -997,6 +999,25 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_dev_unlock(hdev);
+ }
  
- 		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb,
- 							proxy_write_cb);
--		if (attr == NULL)
-+		if (!attr)
- 			return -EINVAL;
++static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_cp_le_set_scan_param *cp;
++	__u8 status = *((__u8 *) skb->data);
++
++	BT_DBG("%s status 0x%2.2x", hdev->name, status);
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_PARAM);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	if (!status)
++		hdev->le_scan_type = cp->type;
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 				      struct sk_buff *skb)
+ {
+@@ -2488,6 +2509,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_le_set_adv_enable(hdev, skb);
+ 		break;
  
- 		path = g_dbus_proxy_get_path(proxy);
-@@ -340,7 +340,7 @@ static void client_ready(GDBusClient *client, void *user_data)
- 	DBusConnection *conn = btd_get_dbus_connection();
- 	DBusMessage *reply;
- 
--	if (eapp->proxies == NULL)
-+	if (!eapp->proxies)
- 		goto fail;
- 
- 	proxy = eapp->proxies->data;
-@@ -376,7 +376,7 @@ static struct external_app *new_external_app(DBusConnection *conn,
- 	const char *sender = dbus_message_get_sender(msg);
- 
- 	client = g_dbus_client_new(conn, sender, "/");
--	if (client == NULL)
-+	if (!client)
- 		return NULL;
- 
- 	eapp = g_new0(struct external_app, 1);
-@@ -421,7 +421,7 @@ static DBusMessage *register_service(DBusConnection *conn,
- 		return btd_error_already_exists(msg);
- 
- 	eapp = new_external_app(conn, msg, path);
--	if (eapp == NULL)
-+	if (!eapp)
- 		return btd_error_failed(msg, "Not enough resources");
- 
- 	external_apps = g_slist_prepend(external_apps, eapp);
-diff --git a/src/gatt.c b/src/gatt.c
-index 45b5e26..92092d3 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -77,7 +77,7 @@ static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
- 	struct btd_attribute *attr;
- 
- 	attr = malloc0(sizeof(struct btd_attribute) + len);
--	if (attr == NULL)
-+	if (!attr)
- 		return NULL;
- 
- 	attr->type = *type;
-@@ -118,7 +118,7 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	put_uuid_le(uuid, value);
- 
- 	attr = new_const_attribute(&primary_uuid, value, len);
--	if (attr == NULL)
-+	if (!attr)
- 		return NULL;
- 
- 	if (local_database_add(next_handle, attr) < 0) {
-@@ -167,11 +167,11 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
- 	put_uuid_le(uuid, &value[3]);
- 
- 	char_decl = new_const_attribute(&chr_uuid, value, len);
--	if (char_decl == NULL)
-+	if (!char_decl)
- 		goto fail;
- 
- 	char_value = new0(struct btd_attribute, 1);
--	if (char_value == NULL)
-+	if (!char_value)
- 		goto fail;
- 
- 	if (local_database_add(next_handle, char_decl) < 0)
++	case HCI_OP_LE_SET_SCAN_PARAM:
++		hci_cc_le_set_scan_param(hdev, skb);
++		break;
++
+ 	case HCI_OP_LE_SET_SCAN_ENABLE:
+ 		hci_cc_le_set_scan_enable(hdev, skb);
+ 		break;
 -- 
-1.8.3.1
+1.8.5.3
 
