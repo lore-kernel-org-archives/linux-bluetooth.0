@@ -1,86 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] unit/test-gobex: Add test for g_obex_disconnect
-Date: Fri, 21 Mar 2014 13:58:23 +0200
-Message-Id: <1395403104-10344-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1395403104-10344-1-git-send-email-luiz.dentz@gmail.com>
-References: <1395403104-10344-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/3] gobex: Add g_obex_disconnect
+Date: Fri, 21 Mar 2014 13:58:22 +0200
+Message-Id: <1395403104-10344-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This adds g_obex_disconnect function which can be used to send OBEX
+Disconnect command.
 ---
- unit/test-gobex.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ gobex/gobex.c | 12 ++++++++++++
+ gobex/gobex.h |  3 +++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/unit/test-gobex.c b/unit/test-gobex.c
-index ded83dd..2834c77 100644
---- a/unit/test-gobex.c
-+++ b/unit/test-gobex.c
-@@ -45,6 +45,10 @@ static uint8_t pkt_connect_req[] = { G_OBEX_OP_CONNECT | FINAL_BIT,
- static uint8_t pkt_connect_rsp[] = { 0x20 | FINAL_BIT, 0x00, 0x07,
- 					0x10, 0x00, 0x10, 0x00 };
- 
-+static uint8_t pkt_disconnect_req[] = { G_OBEX_OP_DISCONNECT | FINAL_BIT,
-+					0x00, 0x03 };
-+static uint8_t pkt_disconnect_rsp[] = { 0x20 | FINAL_BIT, 0x00, 0x03 };
-+
- static uint8_t pkt_setpath_req[] = { G_OBEX_OP_SETPATH | FINAL_BIT, 0x00, 0x10,
- 					0x02, 0x00,
- 					G_OBEX_HDR_NAME, 0x00, 0x0b,
-@@ -883,6 +887,42 @@ static void test_connect(void)
- 	g_assert_no_error(d.err);
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index d7d325b..ca15941 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -1445,6 +1445,18 @@ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+ 	return g_obex_send_req(obex, req, -1, func, user_data, err);
  }
  
-+static void test_obex_disconnect(void)
++guint g_obex_disconnect(GObex *obex, GObexResponseFunc func, gpointer user_data,
++								GError **err)
 +{
-+	GIOChannel *io;
-+	GIOCondition cond;
-+	guint io_id, timer_id;
-+	GObex *obex;
-+	struct test_data d = { 0, NULL, {
-+			{ pkt_disconnect_req, sizeof(pkt_disconnect_req) } }, {
-+			{ pkt_disconnect_rsp, sizeof(pkt_disconnect_rsp) } } };
++	GObexPacket *req;
 +
-+	create_endpoints(&obex, &io, SOCK_STREAM);
++	g_obex_debug(G_OBEX_DEBUG_COMMAND, "");
 +
-+	cond = G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL;
-+	io_id = g_io_add_watch(io, cond, test_io_cb, &d);
++	req = g_obex_packet_new(G_OBEX_OP_DISCONNECT, TRUE, G_OBEX_HDR_INVALID);
 +
-+	d.mainloop = g_main_loop_new(NULL, FALSE);
-+
-+	timer_id = g_timeout_add_seconds(1, test_timeout, &d);
-+
-+	g_obex_disconnect(obex, req_complete, &d, &d.err);
-+	g_assert_no_error(d.err);
-+
-+	g_main_loop_run(d.mainloop);
-+
-+	g_assert_cmpuint(d.count, ==, 1);
-+
-+	g_main_loop_unref(d.mainloop);
-+
-+	g_source_remove(timer_id);
-+	g_io_channel_unref(io);
-+	g_source_remove(io_id);
-+	g_obex_unref(obex);
-+
-+	g_assert_no_error(d.err);
++	return g_obex_send_req(obex, req, -1, func, user_data, err);
 +}
 +
- static void test_setpath(void)
+ guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+ 					gpointer user_data, GError **err)
  {
- 	GIOChannel *io;
-@@ -1188,6 +1228,7 @@ int main(int argc, char *argv[])
- 					test_cancel_req_delay_pkt);
+diff --git a/gobex/gobex.h b/gobex/gobex.h
+index 76a224e..7c47590 100644
+--- a/gobex/gobex.h
++++ b/gobex/gobex.h
+@@ -75,6 +75,9 @@ void g_obex_unref(GObex *obex);
+ guint g_obex_connect(GObex *obex, GObexResponseFunc func, gpointer user_data,
+ 				GError **err, guint8 first_hdr_id, ...);
  
- 	g_test_add_func("/gobex/test_connect", test_connect);
-+	g_test_add_func("/gobex/test_obex_disconnect", test_obex_disconnect);
++guint g_obex_disconnect(GObex *obex, GObexResponseFunc func, gpointer user_data,
++								GError **err);
++
+ guint g_obex_setpath(GObex *obex, const char *path, GObexResponseFunc func,
+ 					gpointer user_data, GError **err);
  
- 	g_test_add_func("/gobex/test_setpath", test_setpath);
- 	g_test_add_func("/gobex/test_setpath_up", test_setpath_up);
 -- 
 1.8.5.3
 
