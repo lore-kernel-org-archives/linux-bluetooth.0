@@ -1,84 +1,157 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Track current configured LE scan type parameter
-Date: Fri, 21 Mar 2014 12:18:10 -0700
-Message-Id: <1395429490-10884-1-git-send-email-marcel@holtmann.org>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v7 10/10] tools: Emit property changed when Value changes
+Date: Fri, 21 Mar 2014 16:16:43 -0300
+Message-Id: <1395429403-493-11-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1395413930-18292-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The LE scan type paramter defines if active scanning or passive scanning
-is in use. Track the currently set value so it can be used for decision
-making from other pieces in the core.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+This patch extends gatt-service tool, emitting PropertiesChanged for
+"Value" when a new value is set. This flow represents the handling of
+ATT Write Command or Write Request which is translated to a GDBusProxy
+set property. PropertiesChanged will be tracked by the characteristic
+GDBusProxy in order to detect "Value" changes.
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 25 +++++++++++++++++++++++++
- 2 files changed, 26 insertions(+)
+ tools/gatt-service.c | 33 ++++++++++++++++++---------------
+ 1 file changed, 18 insertions(+), 15 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index afbea388eda1..5f8bc05694ac 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -189,6 +189,7 @@ struct hci_dev {
- 	__u16		page_scan_window;
- 	__u8		page_scan_type;
- 	__u8		le_adv_channel_map;
-+	__u8		le_scan_type;
- 	__u16		le_scan_interval;
- 	__u16		le_scan_window;
- 	__u16		le_conn_min_interval;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1e386edc338f..9ee081b9c064 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -199,6 +199,8 @@ static void hci_cc_reset(struct hci_dev *hdev, struct sk_buff *skb)
- 	memset(hdev->scan_rsp_data, 0, sizeof(hdev->scan_rsp_data));
- 	hdev->scan_rsp_data_len = 0;
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index f01fd2a..255f3bb 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -47,9 +47,11 @@
  
-+	hdev->le_scan_type = LE_SCAN_PASSIVE;
-+
- 	hdev->ssp_debug_mode = 0;
+ static GMainLoop *main_loop;
+ static GSList *services;
++static DBusConnection *connection;
+ 
+ struct characteristic {
+ 	char *uuid;
++	char *path;
+ 	uint8_t *value;
+ 	int vlen;
+ };
+@@ -110,6 +112,8 @@ static void chr_set_value(const GDBusPropertyTable *property,
+ 	chr->vlen = len;
+ 
+ 	g_dbus_pending_property_success(id);
++	g_dbus_emit_property_changed(connection, chr->path,
++						GATT_CHR_IFACE, "Value");
  }
  
-@@ -997,6 +999,25 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_unlock(hdev);
+ static const GDBusPropertyTable chr_properties[] = {
+@@ -163,6 +167,7 @@ static void chr_iface_destroy(gpointer user_data)
+ 
+ 	g_free(chr->uuid);
+ 	g_free(chr->value);
++	g_free(chr->path);
+ 	g_free(chr);
  }
  
-+static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct hci_cp_le_set_scan_param *cp;
-+	__u8 status = *((__u8 *) skb->data);
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_SCAN_PARAM);
-+	if (!cp)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	if (!status)
-+		hdev->le_scan_type = cp->type;
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
- 				      struct sk_buff *skb)
+@@ -182,6 +187,7 @@ static int register_characteristic(DBusConnection *conn, const char *uuid,
+ 	chr->uuid = g_strdup(uuid);
+ 	chr->value = g_memdup(value, vlen);
+ 	chr->vlen = vlen;
++	chr->path = path;
+ 
+ 	if (!g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+ 					NULL, NULL, chr_properties,
+@@ -190,18 +196,16 @@ static int register_characteristic(DBusConnection *conn, const char *uuid,
+ 		ret = -EIO;
+ 	}
+ 
+-	g_free(path);
+-
+ 	return ret;
+ }
+ 
+-static char *register_service(DBusConnection *conn, const char *uuid)
++static char *register_service(const char *uuid)
  {
-@@ -2488,6 +2509,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_le_set_adv_enable(hdev, skb);
- 		break;
+ 	static int id = 1;
+ 	char *path;
  
-+	case HCI_OP_LE_SET_SCAN_PARAM:
-+		hci_cc_le_set_scan_param(hdev, skb);
-+		break;
-+
- 	case HCI_OP_LE_SET_SCAN_ENABLE:
- 		hci_cc_le_set_scan_enable(hdev, skb);
- 		break;
+ 	path = g_strdup_printf("/service%d", id++);
+-	if (g_dbus_register_interface(conn, path, GATT_SERVICE_IFACE,
++	if (g_dbus_register_interface(connection, path, GATT_SERVICE_IFACE,
+ 				NULL, NULL, service_properties,
+ 				g_strdup(uuid), g_free) == FALSE) {
+ 		printf("Couldn't register service interface\n");
+@@ -212,13 +216,13 @@ static char *register_service(DBusConnection *conn, const char *uuid)
+ 	return path;
+ }
+ 
+-static void create_services(DBusConnection *conn)
++static void create_services()
+ {
+ 	char *service_path;
+ 	uint8_t level = 0;
+ 	int ret;
+ 
+-	service_path = register_service(conn, IAS_UUID);
++	service_path = register_service(IAS_UUID);
+ 	if (!service_path)
+ 		return;
+ 
+@@ -226,11 +230,11 @@ static void create_services(DBusConnection *conn)
+ 	 * According to the IAS SPEC, reading <<Alert level>> is not alloweed.
+ 	 * "Value" is readable for testing purpose only.
+ 	 */
+-	ret = register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
++	ret = register_characteristic(connection, ALERT_LEVEL_CHR_UUID, &level,
+ 						sizeof(level), service_path);
+ 	if (ret < 0) {
+ 		printf("Couldn't register Alert Level characteristic (IAS)\n");
+-		g_dbus_unregister_interface(conn, service_path,
++		g_dbus_unregister_interface(connection, service_path,
+ 							GATT_SERVICE_IFACE);
+ 		g_free(service_path);
+ 		return;
+@@ -371,25 +375,24 @@ static guint setup_signalfd(void)
+ int main(int argc, char *argv[])
+ {
+ 	GDBusClient *client;
+-	DBusConnection *dbus_conn;
+ 	guint signal;
+ 
+ 	signal = setup_signalfd();
+ 	if (signal == 0)
+ 		return -errno;
+ 
+-	dbus_conn = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
++	connection = g_dbus_setup_bus(DBUS_BUS_SYSTEM, NULL, NULL);
+ 
+ 	main_loop = g_main_loop_new(NULL, FALSE);
+ 
+-	g_dbus_attach_object_manager(dbus_conn);
++	g_dbus_attach_object_manager(connection);
+ 
+ 	printf("gatt-service unique name: %s\n",
+-				dbus_bus_get_unique_name(dbus_conn));
++				dbus_bus_get_unique_name(connection));
+ 
+-	create_services(dbus_conn);
++	create_services();
+ 
+-	client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
++	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
+ 
+ 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
+ 
+@@ -400,7 +403,7 @@ int main(int argc, char *argv[])
+ 	g_source_remove(signal);
+ 
+ 	g_slist_free_full(services, g_free);
+-	dbus_connection_unref(dbus_conn);
++	dbus_connection_unref(connection);
+ 
+ 	return 0;
+ }
 -- 
-1.8.5.3
+1.8.3.1
 
