@@ -2,139 +2,116 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] eir: Use unsigned int for flags in struct eir_data
-Date: Fri, 21 Mar 2014 18:21:32 +0100
-Message-Id: <1395422492-21425-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH 2/3] android/bluetooth: Filter out not discoverable LE devices
+Date: Fri, 21 Mar 2014 17:34:08 +0100
+Message-Id: <1395419649-15647-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1395419649-15647-1-git-send-email-szymon.janc@tieto.com>
+References: <1395419649-15647-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds assumption that if flags field is not present in EIR all
-flags are unset:
-"The Flags data type shall be included when any of the Flag bits are
-non-zero, otherwise the Flags data type may be omitted."
+Filter out the LE devices that do not have Discoverable flag or Limited
+Discoverable flag set.
 
-This also fix reporting non-discoverable LE devices as limited
-discoverable due to no explicit check for flags == -1 as empty
-flags.
+Kernel is not adding flags field to EIR if none of flags is set so this
+is also treated as non-discoverable if device is LE. For devices that
+are connected flags are ignored and Android Framework is always
+notified on new device.
 ---
- src/eir.c       |  2 +-
- src/eir.h       |  2 +-
- unit/test-eir.c | 18 +++++++++---------
- 3 files changed, 11 insertions(+), 11 deletions(-)
+ android/bluetooth.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/src/eir.c b/src/eir.c
-index db9175b..d22ad91 100644
---- a/src/eir.c
-+++ b/src/eir.c
-@@ -141,7 +141,7 @@ void eir_parse(struct eir_data *eir, const uint8_t *eir_data, uint8_t eir_len)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index d2795e3..5c7ba59 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1164,8 +1164,16 @@ static bool rssi_above_threshold(int old, int new)
+ 	return abs(old - new) >= 8;
+ }
+ 
++static bool is_le_discoverable(int flags)
++{
++	if (flags < 0)
++		return false;
++
++	return flags & (EIR_FLAG_LIM_DISC | EIR_FLAG_GEN_DISC);
++}
++
+ static void update_new_device(struct device *dev, int8_t rssi,
+-						const struct eir_data *eir)
++				const struct eir_data *eir, bool connected)
  {
- 	uint16_t len = 0;
+ 	uint8_t buf[IPC_MTU];
+ 	struct hal_ev_device_found *ev = (void *) buf;
+@@ -1213,12 +1221,16 @@ static void update_new_device(struct device *dev, int8_t rssi,
+ 		ev->num_props++;
+ 	}
  
--	eir->flags = -1;
-+	eir->flags = 0;
- 	eir->tx_power = 127;
++	if (!connected && dev->bdaddr_type != BDADDR_BREDR &&
++					!is_le_discoverable(eir->flags))
++		return;
++
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_EV_DEVICE_FOUND,
+ 								size, buf);
+ }
  
- 	/* No EIR data to parse */
-diff --git a/src/eir.h b/src/eir.h
-index 3fa1cb3..9e53983 100644
---- a/src/eir.h
-+++ b/src/eir.h
-@@ -40,7 +40,7 @@
+ static void update_device(struct device *dev, int8_t rssi,
+-						const struct eir_data *eir)
++				const struct eir_data *eir, bool connected)
+ {
+ 	uint8_t buf[IPC_MTU];
+ 	struct hal_ev_remote_device_props *ev = (void *) buf;
+@@ -1253,6 +1265,10 @@ static void update_device(struct device *dev, int8_t rssi,
+ 		ev->num_props++;
+ 	}
  
- struct eir_data {
- 	GSList *services;
--	int flags;
-+	unsigned int flags;
- 	char *name;
- 	uint32_t class;
- 	uint16_t appearance;
-diff --git a/unit/test-eir.c b/unit/test-eir.c
-index 2061a11..3960c0f 100644
---- a/unit/test-eir.c
-+++ b/unit/test-eir.c
-@@ -38,7 +38,7 @@
- struct test_data {
- 	const void *eir_data;
- 	size_t eir_size;
--	int flags;
-+	unsigned int flags;
- 	const char *name;
- 	bool name_complete;
- 	int8_t tx_power;
-@@ -93,7 +93,7 @@ static const char *macbookair_uuid[] = {
- static const struct test_data macbookair_test = {
- 	.eir_data = macbookair_data,
- 	.eir_size = sizeof(macbookair_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Marcel’s MacBook Air",
- 	.name_complete = true,
- 	.tx_power = 127,
-@@ -148,7 +148,7 @@ static const char *iphone5_uuid[] = {
- static const struct test_data iphone5_test = {
- 	.eir_data = iphone5_data,
- 	.eir_size = sizeof(iphone5_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Marcel’s iPhone 5",
- 	.name_complete = true,
- 	.tx_power = 127,
-@@ -201,7 +201,7 @@ static const char *ipadmini_uuid[] = {
- static const struct test_data ipadmini_test = {
- 	.eir_data = ipadmini_data,
- 	.eir_size = sizeof(ipadmini_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Marcel's iPad mini",
- 	.name_complete = true,
- 	.tx_power = 127,
-@@ -253,7 +253,7 @@ static const char *gigaset_sl400h_uuid[] = {
- static const struct test_data gigaset_sl400h_test = {
- 	.eir_data = gigaset_sl400h_data,
- 	.eir_size = sizeof(gigaset_sl400h_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Marcel's SL400H",
- 	.name_complete = true,
- 	.tx_power = 127,
-@@ -305,7 +305,7 @@ static const char *gigaset_sl910_uuid[] = {
- static const struct test_data gigaset_sl910_test = {
- 	.eir_data = gigaset_sl910_data,
- 	.eir_size = sizeof(gigaset_sl910_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Marcel's SL910",
- 	.name_complete = true,
- 	.tx_power = 127,
-@@ -359,7 +359,7 @@ static const char *nokia_bh907_uuid[] = {
- static const struct test_data nokia_bh907_test = {
- 	.eir_data = nokia_bh907_data,
- 	.eir_size = sizeof(nokia_bh907_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Nokia Reaction BH-907",
- 	.name_complete = true,
- 	.tx_power = 4,
-@@ -407,7 +407,7 @@ static const char *fuelband_uuid[] = {
- static const struct test_data fuelband_test = {
- 	.eir_data = fuelband_data,
- 	.eir_size = sizeof(fuelband_data),
--	.flags = -1,
-+	.flags = 0,
- 	.name = "Nike+ FuelBand",
- 	.name_complete = true,
- 	.tx_power = 0,
-@@ -530,7 +530,7 @@ static const char *citizen_scan_uuid[] = {
- static const struct test_data citizen_scan_test = {
- 	.eir_data = citizen_scan_data,
- 	.eir_size = sizeof(citizen_scan_data),
--	.flags = -1,
-+	.flags = 0,
- 	.tx_power = 0,
- 	.uuid = citizen_scan_uuid,
- };
++	if (!connected && dev->bdaddr_type != BDADDR_BREDR &&
++					!is_le_discoverable(eir->flags))
++		return;
++
+ 	if (ev->num_props)
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 					HAL_EV_REMOTE_DEVICE_PROPS, size, buf);
+@@ -1260,7 +1276,8 @@ static void update_device(struct device *dev, int8_t rssi,
+ 
+ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 					int8_t rssi, bool confirm,
+-					const uint8_t *data, uint8_t data_len)
++					const uint8_t *data, uint8_t data_len,
++					bool connected)
+ {
+ 	struct eir_data eir;
+ 	struct device *dev;
+@@ -1278,9 +1295,9 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 		if (!dev)
+ 			dev = create_device(bdaddr, bdaddr_type);
+ 
+-		update_new_device(dev, rssi, &eir);
++		update_new_device(dev, rssi, &eir, connected);
+ 	} else {
+-		update_device(dev, rssi, &eir);
++		update_device(dev, rssi, &eir, connected);
+ 	}
+ 
+ 	/* Notify Gatt if its registered for LE events */
+@@ -1349,7 +1366,7 @@ static void mgmt_device_found_event(uint16_t index, uint16_t length,
+ 	confirm_name = flags & MGMT_DEV_FOUND_CONFIRM_NAME;
+ 
+ 	update_found_device(&ev->addr.bdaddr, ev->addr.type, ev->rssi,
+-						confirm_name, eir, eir_len);
++					confirm_name, eir, eir_len, false);
+ }
+ 
+ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+@@ -1364,7 +1381,7 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+ 	}
+ 
+ 	update_found_device(&ev->addr.bdaddr, ev->addr.type, 0, false,
+-					&ev->eir[0], btohs(ev->eir_len));
++					&ev->eir[0], btohs(ev->eir_len), true);
+ 
+ 	hal_ev.status = HAL_STATUS_SUCCESS;
+ 	hal_ev.state = HAL_ACL_STATE_CONNECTED;
 -- 
 1.8.3.2
 
