@@ -1,44 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Don't send device found events during passive scanning
-Date: Sat, 22 Mar 2014 18:48:34 +0200
-Message-Id: <1395506915-23058-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1395506915-23058-1-git-send-email-johan.hedberg@gmail.com>
-References: <1395506915-23058-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Refactor advertising report processing into its own function
+Date: Sat, 22 Mar 2014 18:48:33 +0200
+Message-Id: <1395506915-23058-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Passive LE scanning is only used by the kernel-internal connection
-establishment procedure. It makes therefore little sense to send device
-found events to user space.
+As preparation for merging adv_ind/adv_direct_ind and scan_rsp together
+into a single mgmt Device Found event refactor individual advertising
+report handling into a separate function. This will help keep the code
+more readable as more logic gets added.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 43872af20aa4..403c1d96331a 100644
+index 9ee081b9c064..43872af20aa4 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3944,8 +3944,12 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
- static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
- {
--	if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
--		check_pending_le_conn(hdev, bdaddr, bdaddr_type);
-+	/* Passive scanning shouldn't trigger any device found events */
-+	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
-+		if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
-+			check_pending_le_conn(hdev, bdaddr, bdaddr_type);
-+	    return;
-+	}
+@@ -3941,25 +3941,30 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+ 	}
+ }
  
- 	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
- 			  data, len);
++static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
++			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
++{
++	if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
++		check_pending_le_conn(hdev, bdaddr, bdaddr_type);
++
++	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
++			  data, len);
++}
++
+ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	u8 num_reports = skb->data[0];
+ 	void *ptr = &skb->data[1];
+-	s8 rssi;
+ 
+ 	hci_dev_lock(hdev);
+ 
+ 	while (num_reports--) {
+ 		struct hci_ev_le_advertising_info *ev = ptr;
+-
+-		if (ev->evt_type == LE_ADV_IND ||
+-		    ev->evt_type == LE_ADV_DIRECT_IND)
+-			check_pending_le_conn(hdev, &ev->bdaddr,
+-					      ev->bdaddr_type);
++		s8 rssi;
+ 
+ 		rssi = ev->data[ev->length];
+-		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
+-				  NULL, rssi, 0, 1, ev->data, ev->length);
++		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
++				   ev->bdaddr_type, rssi, ev->data, ev->length);
+ 
+ 		ptr += sizeof(*ev) + ev->length + 1;
+ 	}
 -- 
 1.8.5.3
 
