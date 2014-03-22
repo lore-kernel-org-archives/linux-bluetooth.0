@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Only report LE scan responses with data content
-Date: Fri, 21 Mar 2014 22:57:42 -0700
-Message-Id: <1395467862-29120-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Only report LE scan responses with data content
+Date: Fri, 21 Mar 2014 22:55:06 -0700
+Message-Id: <1395467706-26340-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -22,7 +22,7 @@ Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
  1 file changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9ee081b9c064..7e3b1b2559d5 100644
+index 9ee081b9c064..505220ce5deb 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -3945,7 +3945,6 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
@@ -40,7 +40,7 @@ index 9ee081b9c064..7e3b1b2559d5 100644
 -		rssi = ev->data[ev->length];
 -		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
 -				  NULL, rssi, 0, 1, ev->data, ev->length);
-+		if (ev->evt_type != LE_ADV_SCAN_RSP || ev->length > 0) {
++		if (ev->evt_type != LE_ADV_SCAN_IND || ev->length > 0) {
 +			s8 rssi = ev->data[ev->length];
 +			mgmt_device_found(hdev, &ev->bdaddr, LE_LINK,
 +					  ev->bdaddr_type, NULL, rssi,
