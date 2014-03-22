@@ -1,67 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Refactor advertising report processing into its own function
-Date: Sat, 22 Mar 2014 18:48:33 +0200
-Message-Id: <1395506915-23058-1-git-send-email-johan.hedberg@gmail.com>
+Message-ID: <1395488980.1364.5.camel@belkin5>
+Subject: Re: Cannot send files to PC from phone
+From: Pacho Ramos <pacho@gentoo.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Sat, 22 Mar 2014 12:49:40 +0100
+In-Reply-To: <1395488717.1364.4.camel@belkin5>
+References: <1395481944.1364.2.camel@belkin5>
+	 <1395487433.1597.60.camel@nuvo> <1395488717.1364.4.camel@belkin5>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+El sáb, 22-03-2014 a las 12:45 +0100, Pacho Ramos escribió:
+> El sáb, 22-03-2014 a las 12:23 +0100, Bastien Nocera escribió:
+> > On Sat, 2014-03-22 at 10:52 +0100, Pacho Ramos wrote:
+> > > We get this errors:
+> > > obexd[1944]: OBEX daemon 5.16
+> > > obexd[1944]: CONNECT(0x0), (null)(0xffffffff)
+> > > obexd[1944]: CONNECT(0x0), (null)(0x0)
+> > > obexd[1944]: PUT(0x2), (null)(0xffffffff)
+> > > obexd[1944]: PUT(0x2), FORBIDDEN(0x43)
+> > > obexd[1944]: DISCONNECT(0x1), (null)(0xffffffff)
+> > > obexd[1944]: DISCONNECT(0x1), SUCCESS(0x20)
+> > > obexd[1944]: disconnected: Transport got disconnected
+> > > 
+> > > Looks similar to:
+> > > https://bugzilla.novell.com/show_bug.cgi?id=842688
+> > > 
+> > > But we are applying Fedora patches to not need to use systemd --user and
+> > > still get the problems :/
+> > > 
+> > > http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/bluez/bluez-5.16.ebuild?view=markup
+> > > http://sources.gentoo.org/cgi-bin/viewvc.cgi/gentoo-x86/net-wireless/bluez/files/0001-Allow-using-obexd-without-systemd-in-the-user-sessio.patch?revision=1.1&view=markup
+> > 
+> > What are you using as the server (computer) side program? Is it
+> > gnome-user-share, or the obex test application in bluez?
+> > 
+> > Simply having obexd installed isn't enough, you need an application to
+> > control it and handle authorisation, etc.
+> > 
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> > the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> > 
+> 
+> I have gnome-user-share installed and I configured sharing options for
+> allowing bluetooth sharing (from gnome-control-center) but, as I was
+> only getting this error in journalctl output:
+> mar 22 12:43:24 belkin5 bluetoothd[233]: D-Bus failed to
+> register /org/bluez/hci0/dev_F8_E0_79_0C_CD_A3/player0 path
+> mar 22 12:43:24 belkin5 kernel: input: F8:E0:79:0C:CD:A3
+> as /devices/virtual/input/input9
+> 
+> I tried to manually run obexd in that way to try to get more info. My
+> kernel is 3.13.6, I have systemd-208 and I run Gnome 3.10 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-As preparation for merging adv_ind/adv_direct_ind and scan_rsp together
-into a single mgmt Device Found event refactor individual advertising
-report handling into a separate function. This will help keep the code
-more readable as more logic gets added.
+Umm, thanks for pointing out gnome-user-share, looks like for some
+reason we drop the obexpush autostart desktop file. Let me investigate
+it further
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9ee081b9c064..43872af20aa4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3941,25 +3941,30 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
- 	}
- }
- 
-+static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
-+			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
-+{
-+	if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
-+		check_pending_le_conn(hdev, bdaddr, bdaddr_type);
-+
-+	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
-+			  data, len);
-+}
-+
- static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	u8 num_reports = skb->data[0];
- 	void *ptr = &skb->data[1];
--	s8 rssi;
- 
- 	hci_dev_lock(hdev);
- 
- 	while (num_reports--) {
- 		struct hci_ev_le_advertising_info *ev = ptr;
--
--		if (ev->evt_type == LE_ADV_IND ||
--		    ev->evt_type == LE_ADV_DIRECT_IND)
--			check_pending_le_conn(hdev, &ev->bdaddr,
--					      ev->bdaddr_type);
-+		s8 rssi;
- 
- 		rssi = ev->data[ev->length];
--		mgmt_device_found(hdev, &ev->bdaddr, LE_LINK, ev->bdaddr_type,
--				  NULL, rssi, 0, 1, ev->data, ev->length);
-+		process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
-+				   ev->bdaddr_type, rssi, ev->data, ev->length);
- 
- 		ptr += sizeof(*ev) + ev->length + 1;
- 	}
--- 
-1.8.5.3
 
