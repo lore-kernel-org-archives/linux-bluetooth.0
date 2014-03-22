@@ -1,23 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?ISO-8859-1?Q?=C0lex?= Fiestas <afiestas@kde.org>
-To: BlueZ <linux-bluetooth@vger.kernel.org>
-Subject: Adapters power management
-Date: Sun, 23 Mar 2014 01:42:49 +0100
-Message-ID: <2963801.adpd6n3SPJ@minibad>
+Date: Sat, 22 Mar 2014 21:57:36 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] eir: Use unsigned int for flags in struct eir_data
+Message-ID: <20140322195736.GA31169@t440s.P-661HNU-F1>
+References: <1395422492-21425-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1395422492-21425-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm finishing the port of KDE's bluez interface to BlueZ5 and I am wondering a 
-few things about power management.
+Hi Szymon,
 
-First thing is, why is Adapter::powered not hook into rfkill? Is there any 
-difference power consumption-wise whether the power state is true or false?
-I look  into the source code and only saw code to monitor the rfkill state but 
-not for modifying it.
+On Fri, Mar 21, 2014, Szymon Janc wrote:
+> This adds assumption that if flags field is not present in EIR all
+> flags are unset:
+> "The Flags data type shall be included when any of the Flag bits are
+> non-zero, otherwise the Flags data type may be omitted."
+> 
+> This also fix reporting non-discoverable LE devices as limited
+> discoverable due to no explicit check for flags == -1 as empty
+> flags.
+> ---
+>  src/eir.c       |  2 +-
+>  src/eir.h       |  2 +-
+>  unit/test-eir.c | 18 +++++++++---------
+>  3 files changed, 11 insertions(+), 11 deletions(-)
 
-In the case that Adapter::powered has an impact on power consumption, then the 
-ideal state is to have it to false as much as possible. Are there any plans to 
-make that easy for frontend developers? In a sense this is very similar to 
-Inhibitions in systemd[1] so I was thinking 
+I applied a slightly modified version of this one, with the explicit
+assignments to 0 left out.
+
+Johan
