@@ -1,39 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 23 Mar 2014 17:08:42 +0200
+Date: Sun, 23 Mar 2014 17:04:05 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: =?iso-8859-1?Q?=C0lex?= Fiestas <afiestas@kde.org>
-Cc: BlueZ <linux-bluetooth@vger.kernel.org>
-Subject: Re: Adapters power management
-Message-ID: <20140323150842.GB20404@t440s.P-661HNU-F1>
-References: <2963801.adpd6n3SPJ@minibad>
- <1458063.fJ1RYS5iKm@minibad>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/3] Bluetooth: Merge adv_ind/adv_direct_ind ans scan_rsp
+ together
+Message-ID: <20140323150405.GA20404@t440s.P-661HNU-F1>
+References: <1395506915-23058-1-git-send-email-johan.hedberg@gmail.com>
+ <1395506915-23058-3-git-send-email-johan.hedberg@gmail.com>
+ <AFA78EB0-FC63-422A-9A62-69B2473DF163@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1458063.fJ1RYS5iKm@minibad>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <AFA78EB0-FC63-422A-9A62-69B2473DF163@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alex,
+Hi Marcel,
 
-On Sun, Mar 23, 2014, Àlex Fiestas wrote:
-> On Sunday 23 March 2014 01:42:49 you wrote:
-> > I'm finishing the port of KDE's bluez interface to BlueZ5 and I am wondering
-> > a few things about power management.
-> > 
-> > First thing is, why is Adapter::powered not hook into rfkill? Is there any
-> > difference power consumption-wise whether the power state is true or false?
-> > I look  into the source code and only saw code to monitor the rfkill state
-> > but not for modifying it.
-> > 
-> > In the case that Adapter::powered has an impact on power consumption, then
-> > the ideal state is to have it to false as much as possible. Are there any
-> > plans to make that easy for frontend developers? In a sense this is very
-> > similar to Inhibitions in systemd[1] so I was thinking
-> That bluez could implement something similar so when the application that 
-> changed Adapter::powered to true exists the state is set back to false.
+On Sat, Mar 22, 2014, Marcel Holtmann wrote:
+> > 	case LE_SCAN_DISABLE:
+> > +		if (hdev->pending_adv) {
+> > +			struct hci_adv_ind *p = hdev->pending_adv;
+> > +
+> > +			if (!ADV_CACHE_EMPTY(p))
+> > +				mgmt_device_found(hdev, &p->bdaddr, LE_LINK,
+> > +						  p->bdaddr_type, NULL,
+> > +						  p->rssi, 0, 1, p->data,
+> > +						  p->len);
+> > +
+> > +			hdev->pending_adv = NULL;
+> > +			kfree(p);
+> > +		}
+> > +
+> 
+> I wonder if this should not all be centralized in the discovery set_state function.
 
-How would you suggest to make this work together with Bluetooth mice and
-keyboards that need to be connected or at least able to initiate
-connections on demand (when you press a button or move the mouse).
+I'm fine with all your other suggestions (and have mostly completed
+implementing them), but since DISCOVERY_STOPPED is set only at the end
+of inquiry in the case of dual-mode discovery I think it's better to do
+the sending of the pending device found event here when LE scanning stops.
+
 
 Johan
