@@ -1,35 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-Id: <20140323150754.030657558@linutronix.de>
-Date: Sun, 23 Mar 2014 15:09:31 -0000
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Julia Lawall <Julia.Lawall@lip6.fr>,
- Andrew Morton <akpm@linux-foundation.org>,
- Marcel Holtmann <marcel@holtmann.org>, bt <linux-bluetooth@vger.kernel.org>
-Subject: [patch 13/16] bt: hci-bcsp: Use del_timer_sync() in teardown path
-References: <20140323150557.288925975@linutronix.de>
+Date: Sun, 23 Mar 2014 17:08:42 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: =?iso-8859-1?Q?=C0lex?= Fiestas <afiestas@kde.org>
+Cc: BlueZ <linux-bluetooth@vger.kernel.org>
+Subject: Re: Adapters power management
+Message-ID: <20140323150842.GB20404@t440s.P-661HNU-F1>
+References: <2963801.adpd6n3SPJ@minibad>
+ <1458063.fJ1RYS5iKm@minibad>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <1458063.fJ1RYS5iKm@minibad>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make sure no timer callback is running before freeing the
-datastructure which contains it.
+Hi Alex,
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: bt <linux-bluetooth@vger.kernel.org>
----
- drivers/bluetooth/hci_bcsp.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sun, Mar 23, 2014, Àlex Fiestas wrote:
+> On Sunday 23 March 2014 01:42:49 you wrote:
+> > I'm finishing the port of KDE's bluez interface to BlueZ5 and I am wondering
+> > a few things about power management.
+> > 
+> > First thing is, why is Adapter::powered not hook into rfkill? Is there any
+> > difference power consumption-wise whether the power state is true or false?
+> > I look  into the source code and only saw code to monitor the rfkill state
+> > but not for modifying it.
+> > 
+> > In the case that Adapter::powered has an impact on power consumption, then
+> > the ideal state is to have it to false as much as possible. Are there any
+> > plans to make that easy for frontend developers? In a sense this is very
+> > similar to Inhibitions in systemd[1] so I was thinking
+> That bluez could implement something similar so when the application that 
+> changed Adapter::powered to true exists the state is set back to false.
 
-Index: tip/drivers/bluetooth/hci_bcsp.c
-===================================================================
---- tip.orig/drivers/bluetooth/hci_bcsp.c
-+++ tip/drivers/bluetooth/hci_bcsp.c
-@@ -722,7 +722,7 @@ static int bcsp_close(struct hci_uart *h
- 	skb_queue_purge(&bcsp->unack);
- 	skb_queue_purge(&bcsp->rel);
- 	skb_queue_purge(&bcsp->unrel);
--	del_timer(&bcsp->tbcsp);
-+	del_timer_sync(&bcsp->tbcsp);
- 
- 	kfree(bcsp);
- 	return 0;
+How would you suggest to make this work together with Bluetooth mice and
+keyboards that need to be connected or at least able to initiate
+connections on demand (when you press a button or move the mouse).
+
+Johan
