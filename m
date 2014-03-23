@@ -1,95 +1,196 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] Bluetooth: Add new debugfs parameter
-Date: Sun, 23 Mar 2014 23:09:31 +0100
-Message-ID: <1395612571-5365-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH v2 3/5] android/bluetooth: Add support for loading LTKs
+Date: Sun, 23 Mar 2014 22:40:52 +0100
+Message-Id: <1395610854-30579-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1395610854-30579-1-git-send-email-szymon.janc@tieto.com>
+References: <1395610854-30579-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch it is possible to control discovery interleaved
-timeout value from debugfs. Default value is 5120 ms.
-
-It is useful to control it in case of automated testaces where bredrle
-controler is doing discovery and it is waiting for inquiry results. With
-this patch we can decrease le scan time and get inquiry results faster.
-
-It might be also useful in other test cases.
-
-Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 ---
- include/net/bluetooth/hci_core.h | 2 +-
- net/bluetooth/hci_core.c         | 6 ++++++
- net/bluetooth/mgmt.c             | 2 +-
- 3 files changed, 8 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 117 +++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 111 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5f8bc05..2d63ade 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -194,6 +194,7 @@ struct hci_dev {
- 	__u16		le_scan_window;
- 	__u16		le_conn_min_interval;
- 	__u16		le_conn_max_interval;
-+	__u32		discov_interl_timeout;
- 	__u8		ssp_debug_mode;
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 3c859e8..405ec55 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -28,6 +28,7 @@
+ #include <errno.h>
+ #include <stdlib.h>
+ #include <unistd.h>
++#include <inttypes.h>
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ #include <fcntl.h>
+@@ -1599,6 +1600,37 @@ static void load_link_keys(GSList *keys, bt_bluetooth_ready cb)
+ 	}
+ }
  
- 	__u16		devid_source;
-@@ -1205,7 +1206,6 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
- #define DISCOV_LE_SCAN_WIN		0x12
- #define DISCOV_LE_SCAN_INT		0x12
- #define DISCOV_LE_TIMEOUT		msecs_to_jiffies(10240)
--#define DISCOV_INTERLEAVED_TIMEOUT	msecs_to_jiffies(5120)
- #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
- #define DISCOV_BREDR_INQUIRY_LEN	0x08
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1c6ffaa..b2139f1 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -61,6 +61,9 @@ static void hci_notify(struct hci_dev *hdev, int event)
- 
- /* ---- HCI debugfs entries ---- */
- 
-+/* Discovery interleaved timeout */
-+static u16 discov_timeout_ms = 5120;
++static void load_ltks(GSList *ltks)
++{
++	struct mgmt_cp_load_long_term_keys *cp;
++	struct mgmt_ltk_info *ltk;
++	size_t ltk_count, cp_size;
++	GSList *l;
 +
- static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
- 			     size_t count, loff_t *ppos)
++	ltk_count = g_slist_length(ltks);
++
++	DBG("ltks %zu", ltk_count);
++
++	cp_size = sizeof(*cp) + (ltk_count * sizeof(*ltk));
++
++	cp = g_malloc0(cp_size);
++
++	/* Even if the list of stored keys is empty, it is important to load
++	 * an empty list into the kernel. That way it is ensured that no old
++	 * keys from a previous daemon are present.
++	 */
++	cp->key_count = htobs(ltk_count);
++
++	for (l = ltks, ltk = cp->keys; l != NULL; l = g_slist_next(l), ltk++)
++		memcpy(ltk, ltks->data, sizeof(*ltk));
++
++	if (mgmt_send(mgmt_if, MGMT_OP_LOAD_LONG_TERM_KEYS, adapter.index,
++					cp_size, cp, NULL, NULL, NULL) == 0)
++		error("Failed to load LTKs");
++
++	g_free(cp);
++}
++
+ static uint8_t get_adapter_uuids(void)
  {
-@@ -1828,6 +1831,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    &lowpan_debugfs_fops);
- 		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
- 				    &le_auto_conn_fops);
-+		debugfs_create_u16("discov_interleaved_timeout", 0644,
-+				   bt_debugfs, &discov_timeout_ms);
+ 	struct hal_ev_adapter_props_changed *ev;
+@@ -1896,6 +1928,18 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 		dev->bond_state = HAL_BOND_STATE_BONDED;
  	}
  
- 	return 0;
-@@ -3792,6 +3797,7 @@ struct hci_dev *hci_alloc_dev(void)
++	str = g_key_file_get_string(key_file, peer, "LongTermKey", NULL);
++	if (str) {
++		g_free(str);
++		dev->bond_state = HAL_BOND_STATE_BONDED;
++	}
++
++	str = g_key_file_get_string(key_file, peer, "SlaveLongTermKey", NULL);
++	if (str) {
++		g_free(str);
++		dev->bond_state = HAL_BOND_STATE_BONDED;
++	}
++
+ 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
+ 	if (str) {
+ 		g_free(dev->name);
+@@ -1965,6 +2009,51 @@ failed:
+ 	return info;
+ }
  
- 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
++static struct mgmt_ltk_info *get_ltk_info(GKeyFile *key_file, const char *peer,
++								bool master)
++{
++	const char *key_s, *keytype_s, *encsize_s, *ediv_s, *rand_s;
++	struct mgmt_ltk_info *info = NULL;
++	char *key;
++	unsigned int i;
++
++	key_s = master ? "LongTermKey" : "SlaveLongTermKey";
++	keytype_s = master ? "LongTermKeyType" : "SlaveLongTermKeyType";
++	encsize_s = master ? "LongTermKeyEncSize" : "SlaveLongTermKeyEncSize";
++	ediv_s = master ? "LongTermKeyEDiv" : "SlaveLongTermKeyEDiv";
++	rand_s = master ? "LongTermKeyRand" : "SlaveLongTermKeyRand";
++
++	key = g_key_file_get_string(key_file, peer, key_s, NULL);
++	if (!key || strlen(key) != 32)
++		goto failed;
++
++	info = g_new0(struct mgmt_ltk_info, 1);
++
++	str2ba(peer, &info->addr.bdaddr);
++
++	info->addr.type = g_key_file_get_integer(key_file, peer, "Type", NULL);
++
++	for (i = 0; i < sizeof(info->val); i++)
++		sscanf(key + (i * 2), "%02hhX", &info->val[i]);
++
++	info->type = g_key_file_get_integer(key_file, peer, keytype_s, NULL);
++
++	info->enc_size = g_key_file_get_integer(key_file, peer, encsize_s, NULL);
++
++	info->rand = g_key_file_get_uint64(key_file, peer, rand_s, NULL);
++	info->rand = cpu_to_le64(info->rand);
++
++	info->ediv = g_key_file_get_integer(key_file, peer, ediv_s, NULL);
++	info->ediv = cpu_to_le16(info->ediv);
++
++	info->master = master;
++
++failed:
++	g_free(key);
++
++	return info;
++}
++
+ static int device_timestamp_cmp(gconstpointer  a, gconstpointer  b)
+ {
+ 	const struct device *deva = a;
+@@ -2006,6 +2095,7 @@ static void load_devices_info(bt_bluetooth_ready cb)
+ 	gsize len = 0;
+ 	unsigned int i;
+ 	GSList *keys = NULL;
++	GSList *ltks = NULL;
  
-+	hdev->discov_interl_timeout = msecs_to_jiffies(discov_timeout_ms);
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
+ 	key_file = g_key_file_new();
  
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d2d4e0d..3eedb87 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3372,7 +3372,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+@@ -2015,26 +2105,41 @@ static void load_devices_info(bt_bluetooth_ready cb)
  
- 	case DISCOV_TYPE_INTERLEAVED:
- 		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
--				   DISCOV_INTERLEAVED_TIMEOUT);
-+				   hdev->discov_interl_timeout);
- 		break;
+ 	for (i = 0; i < len; i++) {
+ 		struct mgmt_link_key_info *key_info;
++		struct mgmt_ltk_info *ltk_info;
++		struct mgmt_ltk_info *slave_ltk_info;
+ 		struct device *dev;
  
- 	case DISCOV_TYPE_BREDR:
+ 		key_info = get_key_info(key_file, devs[i]);
+-		if (!key_info) {
+-			error("Failed to load linkkey for %s, skipping",
+-								devs[i]);
++		ltk_info = get_ltk_info(key_file, devs[i], true);
++		slave_ltk_info = get_ltk_info(key_file, devs[i], false);
++
++		if (!key_info && !ltk_info && !slave_ltk_info) {
++			error("Failed to load keys for %s, skipping", devs[i]);
++
+ 			continue;
+ 		}
+ 
+-		/* TODO ltk */
++		if (key_info)
++			keys = g_slist_prepend(keys, key_info);
++
++		if (ltk_info)
++			ltks = g_slist_prepend(ltks, ltk_info);
++
++		if (slave_ltk_info)
++			ltks = g_slist_prepend(ltks, slave_ltk_info);
+ 
+ 		dev = create_device_from_info(key_file, devs[i]);
+ 
+-		keys = g_slist_prepend(keys, key_info);
+ 		bonded_devices = g_slist_prepend(bonded_devices, dev);
+ 	}
+ 
++	load_ltks(ltks);
++	g_slist_free_full(ltks, g_free);
++
+ 	load_link_keys(keys, cb);
+-	g_strfreev(devs);
+ 	g_slist_free_full(keys, g_free);
++
++	g_strfreev(devs);
+ 	g_key_file_free(key_file);
+ }
+ 
 -- 
-1.8.4
+1.8.5.3
 
