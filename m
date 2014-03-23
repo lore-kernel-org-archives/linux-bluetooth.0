@@ -1,28 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <532F515A.3060809@gmail.com>
-Date: Sun, 23 Mar 2014 21:25:46 +0000
-From: Andrea <mariofutire@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/3] android/gatt: Restart scan after connection
+Date: Sun, 23 Mar 2014 21:20:09 +0100
+Message-ID: <1395606010-19807-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Help on connecting a PS3 headset
-References: <532CAAB8.5020403@gmail.com> <532F33BB.8050000@gmail.com>
-In-Reply-To: <532F33BB.8050000@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 23/03/14 19:19, Andrea wrote:
-> On 21/03/14 21:10, Andrea wrote:
->> Hi,
->>
-> 
-> any sort of traffic log I could provide to help resolving the issue?
+With this patch we make sure that scan is restarted if it was holded for
+connection purpose.
+---
+ android/gatt.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-I've logged a failed attempt using hcidump and wireshark.
-maybe it can be useful
-
-http://utente.xoom.it/depo/scambio/blue.log
-http://utente.xoom.it/depo/scambio/blue.pcapng
-
-andrea
+diff --git a/android/gatt.c b/android/gatt.c
+index 775adec..5384a72 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -481,6 +481,12 @@ reply:
+ 	/* If connection did not succeed, destroy device */
+ 	if (status)
+ 		destroy_device(dev);
++
++	/* Check if we should restart scan */
++	if (scanning)
++		bt_le_discovery_start(le_device_found_handler);
++
++	/*FIXME: What to do if discovery won't start here. */
+ }
+ 
+ static int connect_le(struct gatt_device *dev)
+-- 
+1.8.4
 
