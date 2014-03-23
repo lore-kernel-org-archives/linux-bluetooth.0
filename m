@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <szymon.janc@tieto.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/3] android/gatt: Restart scan after connection
-Date: Sun, 23 Mar 2014 21:20:09 +0100
-Message-ID: <1395606010-19807-2-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 3/3] android/gatt: Add info debug to connect function
+Date: Sun, 23 Mar 2014 21:20:10 +0100
+Message-ID: <1395606010-19807-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,29 +13,35 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch we make sure that scan is restarted if it was holded for
-connection purpose.
+Because we handle connect always in "auto connect" mode we want this
+info log to give us idea how BLE applications use that.
+
+Also add comment about we handle is_direct in this function.
 ---
- android/gatt.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ android/gatt.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 775adec..5384a72 100644
+index 5384a72..705a441 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -481,6 +481,12 @@ reply:
- 	/* If connection did not succeed, destroy device */
- 	if (status)
- 		destroy_device(dev);
-+
-+	/* Check if we should restart scan */
-+	if (scanning)
-+		bt_le_discovery_start(le_device_found_handler);
-+
-+	/*FIXME: What to do if discovery won't start here. */
- }
+@@ -636,8 +636,15 @@ static void handle_client_connect(const void *buf, uint16_t len)
+ 	bdaddr_t addr;
+ 	uint8_t status;
+ 	bool send_notify = false;
++	char a[18];
  
- static int connect_le(struct gatt_device *dev)
+-	DBG("");
++	/* For now we handle direct connect in the same way as auto.
++	 * connect. This is to avoid issues with broken applications which
++	 * might block HCI by calling connect to device not in range. However
++	 * we can consider later to change that.
++	*/
++	ba2str((bdaddr_t *)&cmd->bdaddr, a);
++	info("gatt: Connect to: %s(is_direct=%d)", a, cmd->is_direct);
+ 
+ 	/* Check if client is registered */
+ 	l = queue_find(gatt_clients, match_client_by_id,
 -- 
 1.8.4
 
