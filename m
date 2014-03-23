@@ -1,158 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <szymon.janc@tieto.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/3] android/gatt: Fix scan handling
-Date: Sun, 23 Mar 2014 21:20:08 +0100
-Message-ID: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
+Message-ID: <532F33BB.8050000@gmail.com>
+Date: Sun, 23 Mar 2014 19:19:23 +0000
+From: Andrea <mariofutire@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: Help on connecting a PS3 headset
+References: <532CAAB8.5020403@gmail.com>
+In-Reply-To: <532CAAB8.5020403@gmail.com>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android has its own ScanQueue which is used for tracking scanning
-clients which means we do not have to have this logic internally.
+On 21/03/14 21:10, Andrea wrote:
+> Hi,
+> 
+> I've been trying to manually connect a PS3 headset using bluez 5.16 without success.
+> It does work using KDE Bluetooth tools (still based on bluez 4), but as I would like to use it on a
+> headless box, I need to do it via CLI.
+> 
+> Using bluez 5.16 (both in Fedora 19 and on Arch on a Pi) I can pair the device but when I try to
+> connect I get
+> 
 
-Android will call Scan Off only when his scanQueue is empty.
----
- android/gatt.c | 62 ++++++++++++++++++----------------------------------------
- 1 file changed, 19 insertions(+), 43 deletions(-)
+I think it is a regression of 5.16 vs 4.xxx
+I've just installed Fedora 20 (using bluez 5.16) and the KDE Gui bluetooth tools can't connect
+either with a very similar log from bluetoothctl
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 0dfb90e..775adec 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -71,9 +71,9 @@ struct gatt_device {
- 
- static struct ipc *hal_ipc = NULL;
- static bdaddr_t adapter_addr;
-+static bool scanning = false;
- 
- static struct queue *gatt_clients = NULL;
--static struct queue *scan_clients = NULL;
- static struct queue *conn_list	= NULL;		/* Connected devices */
- static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
- 
-@@ -192,13 +192,6 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	queue_remove_if(scan_clients, match_by_value,
--						INT_TO_PTR(cmd->client_if));
--
--	/* If there is no client interesting in scan, just stop it */
--	if (queue_isempty(scan_clients))
--		bt_le_discovery_stop(NULL);
--
- 	free(cl);
- 	status = HAL_STATUS_SUCCESS;
- 
-@@ -350,7 +343,7 @@ static void le_device_found_handler(bdaddr_t *addr, uint8_t addr_type,
- 	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
- 	char bda[18];
- 
--	if (queue_isempty(scan_clients))
-+	if (!scanning)
- 		goto connect;
- 
- 	ba2str(addr, bda);
-@@ -541,51 +534,43 @@ static void handle_client_scan(const void *buf, uint16_t len)
- 	const struct hal_cmd_gatt_client_scan *cmd = buf;
- 	uint8_t status;
- 	void *registered;
--	void *l;
- 
- 	DBG("new state %d", cmd->start);
- 
- 	registered = queue_find(gatt_clients, match_client_by_id,
- 						INT_TO_PTR(cmd->client_if));
-+	if (!registered) {
-+		error("gatt: Client not registered");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
- 	/* Turn off scan */
- 	if (!cmd->start) {
--		if (registered)
--			queue_remove_if(scan_clients, match_by_value,
--						INT_TO_PTR(cmd->client_if));
-+		DBG("Stopping LE SCAN");
- 
--		if (queue_isempty(scan_clients)) {
--			DBG("Stopping LE SCAN");
-+		if (scanning) {
- 			bt_le_discovery_stop(NULL);
-+			scanning = false;
- 		}
- 
- 		status = HAL_STATUS_SUCCESS;
- 		goto reply;
- 	}
- 
--	/* If device already do scan, reply with success and avoid to add it
--	 * again to the list
--	 */
--	l = queue_find(scan_clients, match_by_value,
--						INT_TO_PTR(cmd->client_if));
--	if (l) {
-+	/* Reply success if we already do scan */
-+	if (scanning) {
- 		status = HAL_STATUS_SUCCESS;
- 		goto reply;
- 	}
- 
-+	/* Turn on scan */
- 	if (!bt_le_discovery_start(le_device_found_handler)) {
- 		error("gatt: LE scan switch failed");
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
- 	}
--
--	/* Add scan client to the list if its registered */
--	if (registered && !queue_push_tail(scan_clients,
--						INT_TO_PTR(cmd->client_if))) {
--		error("gatt: Cannot push scan client");
--		status = HAL_STATUS_FAILED;
--		goto reply;
--	}
--
-+	scanning = true;
- 	status = HAL_STATUS_SUCCESS;
- 
- reply:
-@@ -724,12 +709,10 @@ static void handle_client_connect(const void *buf, uint16_t len)
- 	}
- 
- 	/* Start le scan if not started */
--	if (queue_isempty(scan_clients)) {
--		if (!bt_le_discovery_start(le_device_found_handler)) {
--			error("gatt: Could not start scan");
--			status = HAL_STATUS_FAILED;
--			goto reply;
--		}
-+	if (!scanning && !bt_le_discovery_start(le_device_found_handler)) {
-+		error("gatt: Could not start scan");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
- 	}
- 
- 	if (!queue_push_tail(conn_wait_queue, dev)) {
-@@ -1226,13 +1209,6 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 		return false;
- 	}
- 
--	scan_clients = queue_new();
--	if (!scan_clients) {
--		error("gatt: Cannot allocate scan_clients");
--		queue_destroy(gatt_clients, NULL);
--		return false;
--	}
--
- 	return true;
- }
- 
--- 
-1.8.4
+this is the output while I was using the KDE Gui tools.
+it pairs well, connects, but the disconnect immediately.
+at the end I tried manually froom here, with no success
+
+I don't think the kernel version matters, as it is 3.13.6 in all cases.
+
+any sort of traffic log I could provide to help resolving the issue?
+
+andrea@thinkpad:~$ sudo bluetoothctl
+[NEW] Controller 00:15:83:0C:BF:EB thinkpad [default]
+[bluetooth]# devices
+[CHG] Controller 00:15:83:0C:BF:EB Discovering: yes
+[NEW] Device 00:22:A6:16:E3:F0 00-22-A6-16-E3-F0
+[CHG] Device 00:22:A6:16:E3:F0 LegacyPairing: no
+[CHG] Device 00:22:A6:16:E3:F0 Name: Wireless Headset
+[CHG] Device 00:22:A6:16:E3:F0 Alias: Wireless Headset
+[CHG] Device 00:22:A6:16:E3:F0 LegacyPairing: yes
+[CHG] Controller 00:15:83:0C:BF:EB Discovering: no
+[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
+[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
+[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
+[CHG] Device 00:22:A6:16:E3:F0 UUIDs has unsupported type
+[CHG] Device 00:22:A6:16:E3:F0 Paired: yes
+[CHG] Device 00:22:A6:16:E3:F0 Trusted: yes
+[CHG] Device 00:22:A6:16:E3:F0 Connected: no
+[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
+[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
+[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
+[CHG] Device 00:22:A6:16:E3:F0 Connected: no
+[bluetooth]# connect 00:22:A6:16:E3:F0
+Attempting to connect to 00:22:A6:16:E3:F0
+[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
+[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
+[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
+Failed to connect: org.bluez.Error.NotAvailable
+[CHG] Device 00:22:A6:16:E3:F0 Connected: no
+[CHG] Device 00:22:A6:16:E3:F0 Alias: Wireless Headset
+[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
+[CHG] Device 00:22:A6:16:E3:F0 Connected: no
+
 
