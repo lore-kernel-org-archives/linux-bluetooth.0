@@ -1,69 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <532F33BB.8050000@gmail.com>
-Date: Sun, 23 Mar 2014 19:19:23 +0000
-From: Andrea <mariofutire@gmail.com>
-MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: Help on connecting a PS3 headset
-References: <532CAAB8.5020403@gmail.com>
-In-Reply-To: <532CAAB8.5020403@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [patch 12/16] bt: bluecard: Use del_timer_sync() in teardown path
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140323150753.911346180@linutronix.de>
+Date: Sun, 23 Mar 2014 10:30:48 -0700
+Cc: LKML <linux-kernel@vger.kernel.org>,
+	Julia Lawall <Julia.Lawall@lip6.fr>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	bt <linux-bluetooth@vger.kernel.org>
+Message-Id: <84FB8EA6-57C6-498F-8A00-3F707C767235@holtmann.org>
+References: <20140323150557.288925975@linutronix.de> <20140323150753.911346180@linutronix.de>
+To: Thomas Gleixner <tglx@linutronix.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 21/03/14 21:10, Andrea wrote:
-> Hi,
+Hi Thomas,
+
+> Make sure no timer callback is running before releasing the
+> datastructure which contains it.
 > 
-> I've been trying to manually connect a PS3 headset using bluez 5.16 without success.
-> It does work using KDE Bluetooth tools (still based on bluez 4), but as I would like to use it on a
-> headless box, I need to do it via CLI.
-> 
-> Using bluez 5.16 (both in Fedora 19 and on Arch on a Pi) I can pair the device but when I try to
-> connect I get
-> 
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: bt <linux-bluetooth@vger.kernel.org>
+> ---
+> drivers/bluetooth/bluecard_cs.c |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I think it is a regression of 5.16 vs 4.xxx
-I've just installed Fedora 20 (using bluez 5.16) and the KDE Gui bluetooth tools can't connect
-either with a very similar log from bluetoothctl
+patch has been applied to bluetooth-next tree.
 
-this is the output while I was using the KDE Gui tools.
-it pairs well, connects, but the disconnect immediately.
-at the end I tried manually froom here, with no success
+Regards
 
-I don't think the kernel version matters, as it is 3.13.6 in all cases.
-
-any sort of traffic log I could provide to help resolving the issue?
-
-andrea@thinkpad:~$ sudo bluetoothctl
-[NEW] Controller 00:15:83:0C:BF:EB thinkpad [default]
-[bluetooth]# devices
-[CHG] Controller 00:15:83:0C:BF:EB Discovering: yes
-[NEW] Device 00:22:A6:16:E3:F0 00-22-A6-16-E3-F0
-[CHG] Device 00:22:A6:16:E3:F0 LegacyPairing: no
-[CHG] Device 00:22:A6:16:E3:F0 Name: Wireless Headset
-[CHG] Device 00:22:A6:16:E3:F0 Alias: Wireless Headset
-[CHG] Device 00:22:A6:16:E3:F0 LegacyPairing: yes
-[CHG] Controller 00:15:83:0C:BF:EB Discovering: no
-[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
-[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
-[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
-[CHG] Device 00:22:A6:16:E3:F0 UUIDs has unsupported type
-[CHG] Device 00:22:A6:16:E3:F0 Paired: yes
-[CHG] Device 00:22:A6:16:E3:F0 Trusted: yes
-[CHG] Device 00:22:A6:16:E3:F0 Connected: no
-[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
-[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
-[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
-[CHG] Device 00:22:A6:16:E3:F0 Connected: no
-[bluetooth]# connect 00:22:A6:16:E3:F0
-Attempting to connect to 00:22:A6:16:E3:F0
-[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
-[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
-[CHG] Device 00:22:A6:16:E3:F0 Modalias: usb:v12BAp0010d0140
-Failed to connect: org.bluez.Error.NotAvailable
-[CHG] Device 00:22:A6:16:E3:F0 Connected: no
-[CHG] Device 00:22:A6:16:E3:F0 Alias: Wireless Headset
-[CHG] Device 00:22:A6:16:E3:F0 Connected: yes
-[CHG] Device 00:22:A6:16:E3:F0 Connected: no
-
+Marcel
 
