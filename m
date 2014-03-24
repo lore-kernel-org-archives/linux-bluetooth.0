@@ -1,76 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/6] Bluetooth: Fix potential NULL pointer dereference in SMP
-Date: Mon, 24 Mar 2014 14:39:03 +0200
-Message-Id: <1395664748-13494-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
-References: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/6] Bluetooth: LE Security fixes/improvements
+Date: Mon, 24 Mar 2014 14:39:02 +0200
+Message-Id: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-If a sudden disconnection happens the l2cap_conn pointer may already
-have been cleaned up by the time hci_conn_security gets called,
-resulting in the following oops if we don't have a proper NULL check:
+Here's a set of patches I've ended up creating today due to various
+issues found with LE security handling. Most of the issues fixed have
+been in the three for a bit longer time, but the issue fixed by 3/6 was
+introduced (by me) by the change to use passkey notification instead of
+confirmation.
 
-BUG: unable to handle kernel NULL pointer dereference at 000000c8
-IP: [<c132e2ed>] smp_conn_security+0x26/0x151
-*pde = 00000000
-Oops: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC
-CPU: 1 PID: 673 Comm: memcheck-x86-li Not tainted 3.14.0-rc2+ #437
-Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-task: f0ef0520 ti: f0d6a000 task.ti: f0d6a000
-EIP: 0060:[<c132e2ed>] EFLAGS: 00010246 CPU: 1
-EIP is at smp_conn_security+0x26/0x151
-EAX: f0ec1770 EBX: f0ec1770 ECX: 00000002 EDX: 00000002
-ESI: 00000002 EDI: 00000000 EBP: f0d6bdc0 ESP: f0d6bda0
- DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-CR0: 80050033 CR2: 000000c8 CR3: 30f0f000 CR4: 00000690
-Stack:
- f4f55000 00000002 f0d6bdcc c1097a2b c1319f40 f0ec1770 00000002 f0d6bdd0
- f0d6bde8 c1312a82 f0d6bdfc c1312a82 c1319f84 00000008 f4d81c20 f0e5fd86
- f0ec1770 f0d6bdfc f0d6be28 c131be3b c131bdc1 f0d25270 c131be3b 00000008
-Call Trace:
- [<c1097a2b>] ? __kmalloc+0x118/0x128
- [<c1319f40>] ? mgmt_pending_add+0x49/0x9b
- [<c1312a82>] hci_conn_security+0x4a/0x1dd
- [<c1312a82>] ? hci_conn_security+0x4a/0x1dd
- [<c1319f84>] ? mgmt_pending_add+0x8d/0x9b
- [<c131be3b>] pair_device+0x1e1/0x206
- [<c131bdc1>] ? pair_device+0x167/0x206
- [<c131be3b>] ? pair_device+0x1e1/0x206
- [<c131ed44>] mgmt_control+0x275/0x2d6
+I've left the LTK re-encryption removal to be the last patch since it
+can be debated whether we want it or not. I've on occasion had quite
+many LTK re-encryption failures when testing against my iPhone, but
+mostly it works just fine. Removing the re-encryption drops the failures
+to 0. Today I kept getting local failures (Start Encrypt cmd_status)
+constantly with local Intel Bluetooth hardware and a Bluetooth mouse.
+Removing the re-encryption made this work again.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+Johan
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 8d618e4654a5..b8c31467a7ac 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -884,11 +884,17 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level)
- int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- {
- 	struct l2cap_conn *conn = hcon->l2cap_data;
--	struct smp_chan *smp = conn->smp_chan;
-+	struct smp_chan *smp;
- 	__u8 authreq;
- 
- 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, hcon, sec_level);
- 
-+	/* This may be NULL if there's an unexpected disconnection */
-+	if (!conn)
-+		return 1;
-+
-+	smp = conn->smp_chan;
-+
- 	if (!test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
- 		return 1;
- 
--- 
-1.8.5.3
+----------------------------------------------------------------
+Johan Hedberg (6):
+      Bluetooth: Fix potential NULL pointer dereference in SMP
+      Bluetooth: Add missing cmd_status handler for LE_Start_Encryption
+      Bluetooth: Fix SMP confirmation callback handling
+      Bluetooth: Add SMP flag to track which side is the initiator
+      Bluetooth: Don't try to confirm locally initiated SMP pairing
+      Bluetooth: Remove LTK re-encryption procedure
+
+ net/bluetooth/hci_event.c | 34 +++++++++++++++++++++
+ net/bluetooth/smp.c       | 71
+++++++++++++++++---------------------------
+ net/bluetooth/smp.h       |  7 ++---
+ 3 files changed, 63 insertions(+), 49 deletions(-)
 
