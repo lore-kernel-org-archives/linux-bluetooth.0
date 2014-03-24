@@ -2,295 +2,614 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v1 17/22] Replace att_get_uuid128() by bswap_128()
-Date: Mon, 24 Mar 2014 16:25:38 -0300
-Message-Id: <1395689143-11091-18-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v1 16/22] Replace att_get_u16() by get_le16()
+Date: Mon, 24 Mar 2014 16:25:37 -0300
+Message-Id: <1395689143-11091-17-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT/ATT use little-endian byte order format for 128-bit UUID. No matter
-the system byte order representation, internally the core will handle
-128-bit UUID on big-endian format.
 ---
- attrib/att.c         | 38 +++++++++++++++++++++--------
- attrib/gatt.c        | 69 +++++++++++++++++++++++++++++++++++-----------------
- attrib/gatttool.c    |  9 +++++--
- attrib/interactive.c |  9 +++++--
- 4 files changed, 89 insertions(+), 36 deletions(-)
+ attrib/att.c                         | 44 ++++++++++++++++++------------------
+ attrib/gatt.c                        | 14 ++++++------
+ attrib/gattrib.c                     |  3 ++-
+ attrib/gatttool.c                    |  6 ++---
+ attrib/interactive.c                 |  6 ++---
+ profiles/cyclingspeed/cyclingspeed.c | 12 +++++-----
+ profiles/deviceinfo/deviceinfo.c     |  5 ++--
+ profiles/gatt/gas.c                  | 11 +++++----
+ profiles/heartrate/heartrate.c       | 11 +++++----
+ profiles/input/hog.c                 |  9 ++++----
+ profiles/scanparam/scan.c            |  5 ++--
+ profiles/thermometer/thermometer.c   | 14 ++++++------
+ src/attrib-server.c                  |  5 ++--
+ 13 files changed, 76 insertions(+), 69 deletions(-)
 
 diff --git a/attrib/att.c b/attrib/att.c
-index 1df6190..bd23142 100644
+index b353499..1df6190 100644
 --- a/attrib/att.c
 +++ b/attrib/att.c
-@@ -121,6 +121,19 @@ struct att_data_list *att_data_list_alloc(uint16_t num, uint16_t len)
- 	return list;
- }
- 
-+static void get_uuid(uint8_t type, const void *val, bt_uuid_t *uuid)
-+{
-+	if (type == BT_UUID16)
-+		bt_uuid16_create(uuid, get_le16(val));
-+	else {
-+		uint128_t u128;
-+
-+		/* Convert from 128-bit LE to BE */
-+		bswap_128(val, &u128);
-+		bt_uuid128_create(uuid, u128);
-+	}
-+}
-+
- uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
- 						uint8_t *pdu, size_t len)
- {
-@@ -152,6 +165,7 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 						uint16_t *end, bt_uuid_t *uuid)
- {
- 	const size_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
-+	uint8_t type;
- 
- 	if (pdu == NULL)
- 		return 0;
-@@ -162,15 +176,17 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 	if (pdu[0] != ATT_OP_READ_BY_GROUP_REQ)
+@@ -165,8 +165,8 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 	if (len != (min_len + 2) && len != (min_len + 16))
  		return 0;
  
--	if (len != (min_len + 2) && len != (min_len + 16))
-+	if (len == (min_len + 2))
-+		type = BT_UUID16;
-+	else if (len == (min_len + 16))
-+		type = BT_UUID128;
-+	else
+-	*start = att_get_u16(&pdu[1]);
+-	*end = att_get_u16(&pdu[3]);
++	*start = get_le16(&pdu[1]);
++	*end = get_le16(&pdu[3]);
+ 	if (len == min_len + 2)
+ 		bt_uuid16_create(uuid, get_le16(&pdu[5]));
+ 	else
+@@ -293,9 +293,9 @@ uint16_t dec_find_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
  		return 0;
  
- 	*start = get_le16(&pdu[1]);
- 	*end = get_le16(&pdu[3]);
--	if (len == min_len + 2)
--		bt_uuid16_create(uuid, get_le16(&pdu[5]));
--	else
--		*uuid = att_get_uuid128(&pdu[5]);
-+
-+	get_uuid(type, &pdu[5], uuid);
+ 	/* First requested handle number (2 octets) */
+-	*start = att_get_u16(&pdu[1]);
++	*start = get_le16(&pdu[1]);
+ 	/* Last requested handle number (2 octets) */
+-	*end = att_get_u16(&pdu[3]);
++	*end = get_le16(&pdu[3]);
+ 	/* 16-bit UUID to find (2 octets) */
+ 	bt_uuid16_create(uuid, get_le16(&pdu[5]));
  
- 	return len;
- }
-@@ -394,6 +410,7 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 						uint16_t *end, bt_uuid_t *uuid)
- {
- 	const size_t min_len = sizeof(pdu[0]) + sizeof(*start) + sizeof(*end);
-+	uint8_t type;
+@@ -354,8 +354,8 @@ GSList *dec_find_by_type_resp(const uint8_t *pdu, size_t len)
+ 				len >= (offset + sizeof(uint16_t) * 2);
+ 				offset += sizeof(uint16_t) * 2) {
+ 		range = g_new0(struct att_range, 1);
+-		range->start = att_get_u16(&pdu[offset]);
+-		range->end = att_get_u16(&pdu[offset + 2]);
++		range->start = get_le16(&pdu[offset]);
++		range->end = get_le16(&pdu[offset + 2]);
  
- 	if (pdu == NULL)
- 		return 0;
-@@ -401,7 +418,11 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 	if (start == NULL || end == NULL || uuid == NULL)
- 		return 0;
- 
--	if (len != (min_len + 2) && len != (min_len + 16))
-+	if (len == (min_len + 2))
-+		type = BT_UUID16;
-+	else if (len == (min_len + 16))
-+		type = BT_UUID128;
-+	else
- 		return 0;
- 
+ 		matches = g_slist_append(matches, range);
+ 	}
+@@ -407,8 +407,8 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
  	if (pdu[0] != ATT_OP_READ_BY_TYPE_REQ)
-@@ -410,10 +431,7 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 	*start = get_le16(&pdu[1]);
- 	*end = get_le16(&pdu[3]);
+ 		return 0;
  
--	if (len == min_len + 2)
--		bt_uuid16_create(uuid, get_le16(&pdu[5]));
--	else
--		*uuid = att_get_uuid128(&pdu[5]);
-+	get_uuid(type, &pdu[5], uuid);
+-	*start = att_get_u16(&pdu[1]);
+-	*end = att_get_u16(&pdu[3]);
++	*start = get_le16(&pdu[1]);
++	*end = get_le16(&pdu[3]);
  
- 	return len;
+ 	if (len == min_len + 2)
+ 		bt_uuid16_create(uuid, get_le16(&pdu[5]));
+@@ -527,7 +527,7 @@ uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	if (pdu[0] != ATT_OP_WRITE_CMD)
+ 		return 0;
+ 
+-	*handle = att_get_u16(&pdu[1]);
++	*handle = get_le16(&pdu[1]);
+ 	memcpy(value, pdu + min_len, len - min_len);
+ 	*vlen = len - min_len;
+ 
+@@ -573,7 +573,7 @@ uint16_t dec_write_req(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	if (pdu[0] != ATT_OP_WRITE_REQ)
+ 		return 0;
+ 
+-	*handle = att_get_u16(&pdu[1]);
++	*handle = get_le16(&pdu[1]);
+ 	*vlen = len - min_len;
+ 	if (*vlen > 0)
+ 		memcpy(value, pdu + min_len, *vlen);
+@@ -647,7 +647,7 @@ uint16_t dec_read_req(const uint8_t *pdu, size_t len, uint16_t *handle)
+ 	if (pdu[0] != ATT_OP_READ_REQ)
+ 		return 0;
+ 
+-	*handle = att_get_u16(&pdu[1]);
++	*handle = get_le16(&pdu[1]);
+ 
+ 	return min_len;
  }
+@@ -673,8 +673,8 @@ uint16_t dec_read_blob_req(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	if (pdu[0] != ATT_OP_READ_BLOB_REQ)
+ 		return 0;
+ 
+-	*handle = att_get_u16(&pdu[1]);
+-	*offset = att_get_u16(&pdu[3]);
++	*handle = get_le16(&pdu[1]);
++	*offset = get_le16(&pdu[3]);
+ 
+ 	return min_len;
+ }
+@@ -782,8 +782,8 @@ uint16_t dec_find_info_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 	if (pdu[0] != ATT_OP_FIND_INFO_REQ)
+ 		return 0;
+ 
+-	*start = att_get_u16(&pdu[1]);
+-	*end = att_get_u16(&pdu[3]);
++	*start = get_le16(&pdu[1]);
++	*end = get_le16(&pdu[3]);
+ 
+ 	return min_len;
+ }
+@@ -910,7 +910,7 @@ uint16_t dec_indication(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	dlen = MIN(len - min_len, vlen);
+ 
+ 	if (handle)
+-		*handle = att_get_u16(&pdu[1]);
++		*handle = get_le16(&pdu[1]);
+ 
+ 	memcpy(value, &pdu[3], dlen);
+ 
+@@ -957,7 +957,7 @@ uint16_t dec_mtu_req(const uint8_t *pdu, size_t len, uint16_t *mtu)
+ 	if (pdu[0] != ATT_OP_MTU_REQ)
+ 		return 0;
+ 
+-	*mtu = att_get_u16(&pdu[1]);
++	*mtu = get_le16(&pdu[1]);
+ 
+ 	return min_len;
+ }
+@@ -991,7 +991,7 @@ uint16_t dec_mtu_resp(const uint8_t *pdu, size_t len, uint16_t *mtu)
+ 	if (pdu[0] != ATT_OP_MTU_RESP)
+ 		return 0;
+ 
+-	*mtu = att_get_u16(&pdu[1]);
++	*mtu = get_le16(&pdu[1]);
+ 
+ 	return min_len;
+ }
+@@ -1039,8 +1039,8 @@ uint16_t dec_prep_write_req(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	if (pdu[0] != ATT_OP_PREP_WRITE_REQ)
+ 		return 0;
+ 
+-	*handle = att_get_u16(&pdu[1]);
+-	*offset = att_get_u16(&pdu[3]);
++	*handle = get_le16(&pdu[1]);
++	*offset = get_le16(&pdu[3]);
+ 
+ 	*vlen = len - min_len;
+ 	if (*vlen > 0)
+@@ -1092,8 +1092,8 @@ uint16_t dec_prep_write_resp(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	if (pdu[0] != ATT_OP_PREP_WRITE_REQ)
+ 		return 0;
+ 
+-	*handle = att_get_u16(&pdu[1]);
+-	*offset = att_get_u16(&pdu[3]);
++	*handle = get_le16(&pdu[1]);
++	*offset = get_le16(&pdu[3]);
+ 	*vlen = len - min_len;
+ 	if (*vlen > 0)
+ 		memcpy(value, pdu + min_len, *vlen);
 diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 83692f4..f57d0bb 100644
+index 0d43913..83692f4 100644
 --- a/attrib/gatt.c
 +++ b/attrib/gatt.c
-@@ -148,6 +148,22 @@ static void put_uuid_le(const bt_uuid_t *uuid, void *dst)
- 		bswap_128(&uuid->value.u128, dst);
- }
- 
-+static void get_uuid128(uint8_t type, const void *val, bt_uuid_t *uuid)
-+{
-+	if (type == BT_UUID16) {
-+		bt_uuid_t uuid16;
-+
-+		bt_uuid16_create(&uuid16, get_le16(val));
-+		bt_uuid_to_uuid128(&uuid16, uuid);
-+	} else {
-+		uint128_t u128;
-+
-+		/* Convert from 128-bit LE to BE */
-+		bswap_128(val, &u128);
-+		bt_uuid128_create(uuid, u128);
-+	}
-+}
-+
- static guint16 encode_discover_primary(uint16_t start, uint16_t end,
- 				bt_uuid_t *uuid, uint8_t *pdu, size_t len)
- {
-@@ -225,6 +241,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	struct att_data_list *list;
- 	unsigned int i, err;
- 	uint16_t start, end;
-+	uint8_t type;
- 
- 	if (status) {
- 		err = status == ATT_ECODE_ATTR_NOT_FOUND ? 0 : status;
-@@ -240,23 +257,26 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	for (i = 0, end = 0; i < list->num; i++) {
- 		const uint8_t *data = list->data[i];
+@@ -242,8 +242,8 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
  		struct gatt_primary *primary;
--		bt_uuid_t uuid;
-+		bt_uuid_t uuid128;
+ 		bt_uuid_t uuid;
  
- 		start = get_le16(&data[0]);
- 		end = get_le16(&data[2]);
+-		start = att_get_u16(&data[0]);
+-		end = att_get_u16(&data[2]);
++		start = get_le16(&data[0]);
++		end = get_le16(&data[2]);
  
--		if (list->len == 6) {
--			bt_uuid_t uuid16;
--
--			bt_uuid16_create(&uuid16, get_le16(&data[4]));
--			bt_uuid_to_uuid128(&uuid16, &uuid);
--		} else if (list->len == 20) {
--			uuid = att_get_uuid128(&data[4]);
--		} else {
-+		/*
-+		 * FIXME: Check before "for". Elements in the Attribute
-+		 * Data List have the same length (list->len).
-+		 */
-+		if (list->len == 6)
-+			type = BT_UUID16;
-+		else if (list->len == 20)
-+			type = BT_UUID128;
-+		else {
- 			/* Skipping invalid data */
- 			continue;
- 		}
+ 		if (list->len == 6) {
+ 			bt_uuid_t uuid16;
+@@ -381,9 +381,9 @@ static struct gatt_included *included_from_buf(const uint8_t *buf, gsize len)
+ {
+ 	struct gatt_included *incl = g_new0(struct gatt_included, 1);
  
-+		get_uuid128(type, &data[4], &uuid128);
-+
- 		primary = g_try_new0(struct gatt_primary, 1);
- 		if (!primary) {
- 			att_data_list_free(list);
-@@ -265,7 +285,7 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 		}
- 		primary->range.start = start;
- 		primary->range.end = end;
--		bt_uuid_to_string(&uuid, primary->uuid, sizeof(primary->uuid));
-+		bt_uuid_to_string(&uuid128, primary->uuid, sizeof(primary->uuid));
- 		dp->primaries = g_slist_append(dp->primaries, primary);
- 	}
+-	incl->handle = att_get_u16(&buf[0]);
+-	incl->range.start = att_get_u16(&buf[2]);
+-	incl->range.end = att_get_u16(&buf[4]);
++	incl->handle = get_le16(&buf[0]);
++	incl->range.start = get_le16(&buf[2]);
++	incl->range.end = get_le16(&buf[4]);
  
-@@ -328,7 +348,7 @@ static void resolve_included_uuid_cb(uint8_t status, const uint8_t *pdu,
- 	struct included_discovery *isd = query->isd;
- 	struct gatt_included *incl = query->included;
- 	unsigned int err = status;
--	bt_uuid_t uuid;
-+	bt_uuid_t uuid128;
- 	size_t buflen;
- 	uint8_t *buf;
- 
-@@ -341,8 +361,9 @@ static void resolve_included_uuid_cb(uint8_t status, const uint8_t *pdu,
- 		goto done;
- 	}
- 
--	uuid = att_get_uuid128(buf);
--	bt_uuid_to_string(&uuid, incl->uuid, sizeof(incl->uuid));
-+	get_uuid128(BT_UUID128, buf, &uuid128);
-+
-+	bt_uuid_to_string(&uuid128, incl->uuid, sizeof(incl->uuid));
- 	isd->includes = g_slist_append(isd->includes, incl);
- 	query->included = NULL;
- 
-@@ -503,19 +524,23 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	for (i = 0; i < list->num; i++) {
- 		uint8_t *value = list->data[i];
+ 	if (len == 8) {
+ 		bt_uuid_t uuid128;
+@@ -505,7 +505,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
  		struct gatt_char *chars;
--		bt_uuid_t uuid;
-+		bt_uuid_t uuid128;
-+		uint8_t type;
+ 		bt_uuid_t uuid;
  
- 		last = get_le16(value);
+-		last = att_get_u16(value);
++		last = get_le16(value);
  
--		if (list->len == 7) {
--			bt_uuid_t uuid16;
-+		/*
-+		 * FIXME: Check before "for". Elements in the Attribute
-+		 * Data List have the same length (list->len).
-+		 */
-+		if (list->len == 7)
-+			type = BT_UUID16;
-+		else
-+			type = BT_UUID128;
+ 		if (list->len == 7) {
+ 			bt_uuid_t uuid16;
+@@ -526,7 +526,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
  
--			bt_uuid16_create(&uuid16, get_le16(&value[5]));
--			bt_uuid_to_uuid128(&uuid16, &uuid);
--		} else
--			uuid = att_get_uuid128(&value[5]);
-+		get_uuid128(type, &value[5], &uuid128);
- 
--		if (dc->uuid && bt_uuid_cmp(dc->uuid, &uuid))
-+		if (dc->uuid && bt_uuid_cmp(dc->uuid, &uuid128))
- 			continue;
- 
- 		chars = g_try_new0(struct gatt_char, 1);
-@@ -527,7 +552,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
  		chars->handle = last;
  		chars->properties = value[2];
- 		chars->value_handle = get_le16(&value[3]);
--		bt_uuid_to_string(&uuid, chars->uuid, sizeof(chars->uuid));
-+		bt_uuid_to_string(&uuid128, chars->uuid, sizeof(chars->uuid));
+-		chars->value_handle = att_get_u16(&value[3]);
++		chars->value_handle = get_le16(&value[3]);
+ 		bt_uuid_to_string(&uuid, chars->uuid, sizeof(chars->uuid));
  		dc->characteristics = g_slist_append(dc->characteristics,
  									chars);
- 	}
+diff --git a/attrib/gattrib.c b/attrib/gattrib.c
+index 31450a3..912dffb 100644
+--- a/attrib/gattrib.c
++++ b/attrib/gattrib.c
+@@ -37,6 +37,7 @@
+ 
+ #include "btio/btio.h"
+ #include "lib/uuid.h"
++#include "src/shared/util.h"
+ #include "src/log.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+@@ -381,7 +382,7 @@ static bool match_event(struct event *evt, const uint8_t *pdu, gsize len)
+ 	if (len < 3)
+ 		return false;
+ 
+-	handle = att_get_u16(&pdu[1]);
++	handle = get_le16(&pdu[1]);
+ 
+ 	if (evt->expected == pdu[0] && evt->handle == handle)
+ 		return true;
 diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index 4eb2528..ca178ce 100644
+index 10415a8..4eb2528 100644
 --- a/attrib/gatttool.c
 +++ b/attrib/gatttool.c
-@@ -428,8 +428,13 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+@@ -79,7 +79,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 	uint16_t handle, i, olen = 0;
+ 	size_t plen;
+ 
+-	handle = att_get_u16(&pdu[1]);
++	handle = get_le16(&pdu[1]);
+ 
+ 	switch (pdu[0]) {
+ 	case ATT_OP_HANDLE_NOTIFY:
+@@ -272,7 +272,7 @@ static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+ 		uint8_t *value = list->data[i];
+ 		int j;
+ 
+-		g_print("handle: 0x%04x \t value: ", att_get_u16(value));
++		g_print("handle: 0x%04x \t value: ", get_le16(value));
+ 		value += 2;
+ 		for (j = 0; j < list->len - 2; j++, value++)
+ 			g_print("%02x ", *value);
+@@ -424,7 +424,7 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		bt_uuid_t uuid;
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16(value);
++		handle = get_le16(value);
  
  		if (format == 0x01)
  			bt_uuid16_create(&uuid, get_le16(&value[2]));
--		else
--			uuid = att_get_uuid128(&value[2]);
-+		else {
-+			uint128_t u128;
-+
-+			/* Converts from LE to BE byte order */
-+			bswap_128(&value[2], &u128);
-+			bt_uuid128_create(&uuid, u128);
-+		}
- 
- 		bt_uuid_to_string(&uuid, uuidstr, MAX_LEN_UUID_STR);
- 		g_print("handle = 0x%04x, uuid = %s\n", handle, uuidstr);
 diff --git a/attrib/interactive.c b/attrib/interactive.c
-index 5dd47ec..4865944 100644
+index 38403dd..5dd47ec 100644
 --- a/attrib/interactive.c
 +++ b/attrib/interactive.c
-@@ -297,8 +297,13 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+@@ -114,7 +114,7 @@ static void events_handler(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 	size_t plen;
+ 	GString *s;
+ 
+-	handle = att_get_u16(&pdu[1]);
++	handle = get_le16(&pdu[1]);
+ 
+ 	switch (pdu[0]) {
+ 	case ATT_OP_HANDLE_NOTIFY:
+@@ -293,7 +293,7 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		bt_uuid_t uuid;
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16(value);
++		handle = get_le16(value);
  
  		if (format == 0x01)
  			bt_uuid16_create(&uuid, get_le16(&value[2]));
--		else
--			uuid = att_get_uuid128(&value[2]);
-+		else {
-+			uint128_t u128;
-+
-+			/* Converts from LE to BE byte order */
-+			bswap_128(&value[2], &u128);
-+			bt_uuid128_create(&uuid, u128);
-+		}
+@@ -362,7 +362,7 @@ static void char_read_by_uuid_cb(guint8 status, const guint8 *pdu,
+ 		int j;
  
- 		bt_uuid_to_string(&uuid, uuidstr, MAX_LEN_UUID_STR);
- 		rl_printf("handle: 0x%04x, uuid: %s\n", handle, uuidstr);
+ 		g_string_printf(s, "handle: 0x%04x \t value: ",
+-							att_get_u16(value));
++							get_le16(value));
+ 		value += 2;
+ 		for (j = 0; j < list->len - 2; j++, value++)
+ 			g_string_append_printf(s, "%02x ", *value);
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index 1222532..63e969a 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -381,7 +381,7 @@ static void read_feature_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		return;
+ 	}
+ 
+-	csc->feature = att_get_u16(value);
++	csc->feature = get_le16(value);
+ 
+ 	if ((csc->feature & MULTI_SENSOR_LOC_SUPPORT)
+ 						&& (csc->locations == NULL))
+@@ -447,8 +447,8 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu,
+ 		char *msg;
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16(value);
+-		uuid = att_get_u16(value + 2);
++		handle = get_le16(value);
++		uuid = get_le16(value + 2);
+ 
+ 		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
+ 			continue;
+@@ -575,7 +575,7 @@ static void process_measurement(struct csc *csc, const uint8_t *pdu,
+ 
+ 		m.has_wheel_rev = true;
+ 		m.wheel_rev = get_le32(pdu);
+-		m.last_wheel_time = att_get_u16(pdu + 4);
++		m.last_wheel_time = get_le16(pdu + 4);
+ 		pdu += 6;
+ 		len -= 6;
+ 	}
+@@ -587,8 +587,8 @@ static void process_measurement(struct csc *csc, const uint8_t *pdu,
+ 		}
+ 
+ 		m.has_crank_rev = true;
+-		m.crank_rev = att_get_u16(pdu);
+-		m.last_crank_time = att_get_u16(pdu + 2);
++		m.crank_rev = get_le16(pdu);
++		m.last_crank_time = get_le16(pdu + 2);
+ 		pdu += 4;
+ 		len -= 4;
+ 	}
+diff --git a/profiles/deviceinfo/deviceinfo.c b/profiles/deviceinfo/deviceinfo.c
+index 661a5dc..208598a 100644
+--- a/profiles/deviceinfo/deviceinfo.c
++++ b/profiles/deviceinfo/deviceinfo.c
+@@ -35,6 +35,7 @@
+ #include "src/device.h"
+ #include "src/profile.h"
+ #include "src/service.h"
++#include "src/shared/util.h"
+ #include "attrib/gattrib.h"
+ #include "src/attio.h"
+ #include "attrib/att.h"
+@@ -96,8 +97,8 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		return;
+ 	}
+ 
+-	btd_device_set_pnpid(ch->d->dev, value[0], att_get_u16(&value[1]),
+-				att_get_u16(&value[3]), att_get_u16(&value[5]));
++	btd_device_set_pnpid(ch->d->dev, value[0], get_le16(&value[1]),
++				get_le16(&value[3]), get_le16(&value[5]));
+ }
+ 
+ static void process_deviceinfo_char(struct characteristic *ch)
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index c0526e5..38f5e72 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -40,6 +40,7 @@
+ #include "src/device.h"
+ #include "src/profile.h"
+ #include "src/service.h"
++#include "src/shared/util.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+ #include "src/attio.h"
+@@ -165,7 +166,7 @@ static void gap_appearance_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	}
+ 
+ 	atval = list->data[0] + 2; /* skip handle value */
+-	app = att_get_u16(atval);
++	app = get_le16(atval);
+ 
+ 	DBG("GAP Appearance: 0x%04x", app);
+ 
+@@ -188,8 +189,8 @@ static void indication_cb(const uint8_t *pdu, uint16_t len, gpointer user_data)
+ 		return;
+ 	}
+ 
+-	start = att_get_u16(&pdu[3]);
+-	end = att_get_u16(&pdu[5]);
++	start = get_le16(&pdu[3]);
++	end = get_le16(&pdu[5]);
+ 
+ 	DBG("Service Changed start: 0x%04X end: 0x%04X", start, end);
+ 
+@@ -263,8 +264,8 @@ static void gatt_descriptors_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		uint8_t *value;
+ 
+ 		value = list->data[i];
+-		ccc = att_get_u16(value);
+-		uuid16 = att_get_u16(&value[2]);
++		ccc = get_le16(value);
++		uuid16 = get_le16(&value[2]);
+ 		DBG("CCC: 0x%04x UUID: 0x%04x", ccc, uuid16);
+ 		write_ccc(gas->attrib, ccc, user_data);
+ 	}
+diff --git a/profiles/heartrate/heartrate.c b/profiles/heartrate/heartrate.c
+index 97af02e..15ccdfd 100644
+--- a/profiles/heartrate/heartrate.c
++++ b/profiles/heartrate/heartrate.c
+@@ -35,6 +35,7 @@
+ #include "src/dbus-common.h"
+ #include "src/device.h"
+ #include "src/profile.h"
++#include "src/shared/util.h"
+ #include "src/service.h"
+ #include "src/error.h"
+ #include "attrib/gattrib.h"
+@@ -324,7 +325,7 @@ static void process_measurement(struct heartrate *hr, const uint8_t *pdu,
+ 			return;
+ 		}
+ 
+-		m.value = att_get_u16(pdu);
++		m.value = get_le16(pdu);
+ 		pdu += 2;
+ 		len -= 2;
+ 	} else {
+@@ -345,7 +346,7 @@ static void process_measurement(struct heartrate *hr, const uint8_t *pdu,
+ 		}
+ 
+ 		m.has_energy = TRUE;
+-		m.energy = att_get_u16(pdu);
++		m.energy = get_le16(pdu);
+ 		pdu += 2;
+ 		len -= 2;
+ 	}
+@@ -362,7 +363,7 @@ static void process_measurement(struct heartrate *hr, const uint8_t *pdu,
+ 		m.interval = g_new(uint16_t, m.num_interval);
+ 
+ 		for (i = 0; i < m.num_interval; pdu += 2, i++)
+-			m.interval[i] = att_get_u16(pdu);
++			m.interval[i] = get_le16(pdu);
+ 	}
+ 
+ 	if (flags & SENSOR_CONTACT_SUPPORT) {
+@@ -418,8 +419,8 @@ static void discover_ccc_cb(guint8 status, const guint8 *pdu,
+ 		uint8_t attr_val[2];
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16(value);
+-		uuid = att_get_u16(value + 2);
++		handle = get_le16(value);
++		uuid = get_le16(value + 2);
+ 
+ 		if (uuid != GATT_CLIENT_CHARAC_CFG_UUID)
+ 			continue;
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index fd72e36..25985ec 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -47,6 +47,7 @@
+ #include "src/device.h"
+ #include "src/profile.h"
+ #include "src/service.h"
++#include "src/shared/util.h"
+ 
+ #include "src/plugin.h"
+ 
+@@ -234,8 +235,8 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		uint8_t *value;
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16(value);
+-		uuid16 = att_get_u16(&value[2]);
++		handle = get_le16(value);
++		uuid16 = get_le16(&value[2]);
+ 
+ 		switch (uuid16) {
+ 		case GATT_CLIENT_CHARAC_CFG_UUID:
+@@ -336,7 +337,7 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ 		return;
+ 	}
+ 
+-	uuid16 = att_get_u16(&pdu[1]);
++	uuid16 = get_le16(&pdu[1]);
+ 	DBG("External report reference read, external report characteristic "
+ 						"UUID: 0x%04x", uuid16);
+ 	bt_uuid16_create(&uuid, uuid16);
+@@ -431,7 +432,7 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		return;
+ 	}
+ 
+-	hogdev->bcdhid = att_get_u16(&value[0]);
++	hogdev->bcdhid = get_le16(&value[0]);
+ 	hogdev->bcountrycode = value[2];
+ 	hogdev->flags = value[3];
+ 
+diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
+index 4fd8f53..d6e477e 100644
+--- a/profiles/scanparam/scan.c
++++ b/profiles/scanparam/scan.c
+@@ -36,6 +36,7 @@
+ #include "src/device.h"
+ #include "src/profile.h"
+ #include "src/service.h"
++#include "src/shared/util.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/gatt.h"
+@@ -119,8 +120,8 @@ static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
+ 		goto done;
+ 
+ 	ptr = list->data[0];
+-	handle = att_get_u16(ptr);
+-	uuid16 = att_get_u16(&ptr[2]);
++	handle = get_le16(ptr);
++	uuid16 = get_le16(&ptr[2]);
+ 
+ 	if (uuid16 != GATT_CLIENT_CHARAC_CFG_UUID)
+ 		goto done;
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index d2ea56b..5b90792 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -383,7 +383,7 @@ static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
+ 			return;
+ 		}
+ 
+-		ts.tm_year = att_get_u16(pdu) - 1900;
++		ts.tm_year = get_le16(pdu) - 1900;
+ 		ts.tm_mon = *(pdu + 2) - 1;
+ 		ts.tm_mday = *(pdu + 3);
+ 		ts.tm_hour = *(pdu + 4);
+@@ -467,7 +467,7 @@ static void interval_ind_handler(const uint8_t *pdu, uint16_t len,
+ 		return;
+ 	}
+ 
+-	interval = att_get_u16(pdu + 3);
++	interval = get_le16(pdu + 3);
+ 	change_property(t, "Interval", &interval);
+ 
+ 	opdu = g_attrib_get_buffer(t->attrib, &plen);
+@@ -502,8 +502,8 @@ static void valid_range_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		return;
+ 	}
+ 
+-	min = att_get_u16(&value[0]);
+-	max = att_get_u16(&value[2]);
++	min = get_le16(&value[0]);
++	max = get_le16(&value[2]);
+ 
+ 	if (min == 0 || min > max) {
+ 		DBG("Invalid range");
+@@ -600,8 +600,8 @@ static void discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		uint16_t handle, uuid;
+ 
+ 		value = list->data[i];
+-		handle = att_get_u16(value);
+-		uuid = att_get_u16(value + 2);
++		handle = get_le16(value);
++		uuid = get_le16(value + 2);
+ 
+ 		process_thermometer_desc(ch, uuid, handle);
+ 	}
+@@ -690,7 +690,7 @@ static void read_interval_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		return;
+ 	}
+ 
+-	interval = att_get_u16(&value[0]);
++	interval = get_le16(&value[0]);
+ 	change_property(t, "Interval", &interval);
+ }
+ 
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 889ef20..85e63a6 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -47,6 +47,7 @@
+ #include "hcid.h"
+ #include "adapter.h"
+ #include "device.h"
++#include "src/shared/util.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/att.h"
+ #include "attrib/gatt.h"
+@@ -307,7 +308,7 @@ static uint32_t attrib_create_sdp_new(struct gatt_server *server,
+ 		return 0;
+ 
+ 	if (a->len == 2)
+-		sdp_uuid16_create(&svc, att_get_u16(a->data));
++		sdp_uuid16_create(&svc, get_le16(a->data));
+ 	else if (a->len == 16)
+ 		sdp_uuid128_create(&svc, a->data);
+ 	else
+@@ -894,7 +895,7 @@ static uint16_t write_value(struct gatt_channel *channel, uint16_t handle,
+ 							status, pdu, len);
+ 		}
+ 	} else {
+-		uint16_t cccval = att_get_u16(value);
++		uint16_t cccval = get_le16(value);
+ 		char *filename;
+ 		GKeyFile *key_file;
+ 		char group[6], value[5];
 -- 
 1.8.3.1
 
