@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v1 14/22] Replace att_put_uuid16() by put_le16()
-Date: Mon, 24 Mar 2014 16:25:35 -0300
-Message-Id: <1395689143-11091-15-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v1 12/22] Replace att_get_u32() by get_le32()
+Date: Mon, 24 Mar 2014 16:25:33 -0300
+Message-Id: <1395689143-11091-13-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
@@ -12,30 +12,52 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- attrib/att.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ profiles/cyclingspeed/cyclingspeed.c | 3 ++-
+ profiles/thermometer/thermometer.c   | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/attrib/att.c b/attrib/att.c
-index e28be25..c408568 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -34,6 +34,7 @@
- 
- #include <glib.h>
- 
+diff --git a/profiles/cyclingspeed/cyclingspeed.c b/profiles/cyclingspeed/cyclingspeed.c
+index f78c224..918f237 100644
+--- a/profiles/cyclingspeed/cyclingspeed.c
++++ b/profiles/cyclingspeed/cyclingspeed.c
+@@ -36,6 +36,7 @@
+ #include "src/profile.h"
+ #include "src/service.h"
+ #include "src/dbus-common.h"
 +#include "src/shared/util.h"
- #include "lib/uuid.h"
- #include "att.h"
+ #include "src/error.h"
+ #include "attrib/gattrib.h"
+ #include "attrib/att.h"
+@@ -573,7 +574,7 @@ static void process_measurement(struct csc *csc, const uint8_t *pdu,
+ 		}
  
-@@ -267,7 +268,7 @@ uint16_t enc_find_by_type_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
- 	pdu[0] = ATT_OP_FIND_BY_TYPE_REQ;
- 	att_put_u16(start, &pdu[1]);
- 	att_put_u16(end, &pdu[3]);
--	att_put_uuid16(*uuid, &pdu[5]);
-+	put_le16(uuid->value.u16, &pdu[5]);
+ 		m.has_wheel_rev = true;
+-		m.wheel_rev = att_get_u32(pdu);
++		m.wheel_rev = get_le32(pdu);
+ 		m.last_wheel_time = att_get_u16(pdu + 4);
+ 		pdu += 6;
+ 		len -= 6;
+diff --git a/profiles/thermometer/thermometer.c b/profiles/thermometer/thermometer.c
+index c9ab759..d2ea56b 100644
+--- a/profiles/thermometer/thermometer.c
++++ b/profiles/thermometer/thermometer.c
+@@ -36,6 +36,7 @@
+ #include "src/device.h"
+ #include "src/profile.h"
+ #include "src/service.h"
++#include "src/shared/util.h"
+ #include "src/error.h"
+ #include "src/log.h"
+ #include "attrib/gattrib.h"
+@@ -361,7 +362,7 @@ static void proc_measurement(struct thermometer *t, const uint8_t *pdu,
+ 		return;
+ 	}
  
- 	if (vlen > 0) {
- 		memcpy(&pdu[7], value, vlen);
+-	raw = att_get_u32(pdu);
++	raw = get_le32(pdu);
+ 	m.mant = raw & 0x00FFFFFF;
+ 	m.exp = ((int32_t) raw) >> 24;
+ 
 -- 
 1.8.3.1
 
