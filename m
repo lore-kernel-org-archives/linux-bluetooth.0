@@ -1,44 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Fengguang Wu <fengguang.wu@intel.com>
-Subject: [PATCH] Bluetooth: Use memdup_user in le_auto_conn_write()
-Date: Mon, 24 Mar 2014 16:08:48 -0300
-Message-Id: <1395688128-30563-1-git-send-email-andre.guedes@openbossa.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC] android/handsfree: Send NO CARRIER if call was end due to carrier loss
+Date: Mon, 24 Mar 2014 19:48:32 +0100
+Message-Id: <1395686912-10919-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch does a small code simplification replacing the tipical
-kmalloc-copy_from_user sequence by memdup_user() helper.
-
-Cc: Fengguang Wu <fengguang.wu@intel.com>
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+This was affecting TC_AG_TCA_BV_06_I qualification test case.
 ---
- net/bluetooth/hci_core.c | 11 +++--------
- 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 1c6ffaa..bfc6f81 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -955,14 +955,9 @@ static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
- 	if (count < 3)
- 		return -EINVAL;
- 
--	buf = kzalloc(count, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
--
--	if (copy_from_user(buf, data, count)) {
--		err = -EFAULT;
--		goto done;
--	}
-+	buf = memdup_user(data, count);
-+	if (IS_ERR(buf))
-+		return PTR_ERR(buf);
- 
- 	if (memcmp(buf, "add", 3) == 0) {
- 		n = sscanf(&buf[4], "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu %hhu",
+I have an impression that this should be handled by telephony stack,
+not BT stack hence sending this as RFC.
+
+
+ android/handsfree.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/android/handsfree.c b/android/handsfree.c
+index e1bf563..9b98591 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -2093,6 +2093,13 @@ static void phone_state_idle(int num_active, int num_held)
+ 					num_held ? (num_active ? 1 : 2) : 0);
+ 		update_indicator(IND_CALL, !!(num_active + num_held));
+ 		update_indicator(IND_CALLSETUP, 0);
++
++		/* If call was terminated due to carrier lost send NO CARRIER */
++		if (num_active == 0 && num_held == 0 &&
++				device.inds[IND_SERVICE].val == 0 &&
++				(device.num_active > 0 || device.num_held > 0))
++				hfp_gw_send_info(device.gw, "NO CARRIER");
++
+ 		break;
+ 	default:
+ 		DBG("unhandled state %u", device.setup_state);
 -- 
-1.9.0
+1.8.5.3
 
