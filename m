@@ -1,106 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 1/2] gatt: Fix coding style when testing pointers
-Date: Mon, 24 Mar 2014 11:06:40 -0300
-Message-Id: <1395670001-4643-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v2 4/6] Bluetooth: Add SMP flag to track which side is the initiator
+Date: Mon, 24 Mar 2014 15:54:11 +0200
+Message-Id: <1395669251-20128-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1395664748-13494-5-git-send-email-johan.hedberg@gmail.com>
+References: <1395664748-13494-5-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Use !ptr instead of ptr == NULL
----
- src/gatt-dbus.c | 10 +++++-----
- src/gatt.c      |  8 ++++----
- 2 files changed, 9 insertions(+), 9 deletions(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index ff167c2..95d1243 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -286,7 +286,7 @@ static int register_external_service(const struct external_app *eapp,
- 	if (bt_string_to_uuid(&uuid, str) < 0)
- 		return -EINVAL;
+For remotely initiated just-works pairings we want to show the user a
+confirmation dialog for the pairing. However, we can only know which
+side was the initiator by tracking which side sends the first Security
+Request or Pairing Request PDU. This patch adds a new SMP flag to
+indicate whether our side was the initiator for the pairing.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Fix potential NULL dereference in smp_cmd_security_req()
+
+ net/bluetooth/smp.c | 6 ++++++
+ net/bluetooth/smp.h | 1 +
+ 2 files changed, 7 insertions(+)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 97e95c849fff..1b28f5fd798f 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -716,6 +716,8 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (ret)
+ 		return SMP_UNSPECIFIED;
  
--	if (btd_gatt_add_service(&uuid) == NULL)
-+	if (!btd_gatt_add_service(&uuid))
- 		return -EINVAL;
++	clear_bit(SMP_FLAG_INITIATOR, &smp->smp_flags);
++
+ 	return 0;
+ }
+ 
+@@ -871,6 +873,8 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 
+ 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
+ 
++	clear_bit(SMP_FLAG_INITIATOR, &smp->smp_flags);
++
+ 	return 0;
+ }
+ 
+@@ -939,6 +943,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 	}
+ 
+ done:
++	set_bit(SMP_FLAG_INITIATOR, &smp->smp_flags);
++
+ 	hcon->pending_sec_level = sec_level;
  
  	return 0;
-@@ -323,7 +323,7 @@ static int register_external_characteristics(GSList *proxies)
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index b6913471815a..0d536b8b3f9a 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -120,6 +120,7 @@ struct smp_cmd_security_req {
+ #define SMP_FLAG_MITM_AUTH	3
+ #define SMP_FLAG_LTK_ENCRYPT	4
+ #define SMP_FLAG_COMPLETE	5
++#define SMP_FLAG_INITIATOR	6
  
- 		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb,
- 							proxy_write_cb);
--		if (attr == NULL)
-+		if (!attr)
- 			return -EINVAL;
+ #define SMP_REENCRYPT_TIMEOUT	msecs_to_jiffies(500)
  
- 		path = g_dbus_proxy_get_path(proxy);
-@@ -342,7 +342,7 @@ static void client_ready(GDBusClient *client, void *user_data)
- 	DBusConnection *conn = btd_get_dbus_connection();
- 	DBusMessage *reply;
- 
--	if (eapp->proxies == NULL)
-+	if (!eapp->proxies)
- 		goto fail;
- 
- 	proxy = eapp->proxies->data;
-@@ -378,7 +378,7 @@ static struct external_app *new_external_app(DBusConnection *conn,
- 	const char *sender = dbus_message_get_sender(msg);
- 
- 	client = g_dbus_client_new(conn, sender, "/");
--	if (client == NULL)
-+	if (!client)
- 		return NULL;
- 
- 	eapp = g_new0(struct external_app, 1);
-@@ -423,7 +423,7 @@ static DBusMessage *register_service(DBusConnection *conn,
- 		return btd_error_already_exists(msg);
- 
- 	eapp = new_external_app(conn, msg, path);
--	if (eapp == NULL)
-+	if (!eapp)
- 		return btd_error_failed(msg, "Not enough resources");
- 
- 	external_apps = g_slist_prepend(external_apps, eapp);
-diff --git a/src/gatt.c b/src/gatt.c
-index 45b5e26..92092d3 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -77,7 +77,7 @@ static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
- 	struct btd_attribute *attr;
- 
- 	attr = malloc0(sizeof(struct btd_attribute) + len);
--	if (attr == NULL)
-+	if (!attr)
- 		return NULL;
- 
- 	attr->type = *type;
-@@ -118,7 +118,7 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
- 	put_uuid_le(uuid, value);
- 
- 	attr = new_const_attribute(&primary_uuid, value, len);
--	if (attr == NULL)
-+	if (!attr)
- 		return NULL;
- 
- 	if (local_database_add(next_handle, attr) < 0) {
-@@ -167,11 +167,11 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
- 	put_uuid_le(uuid, &value[3]);
- 
- 	char_decl = new_const_attribute(&chr_uuid, value, len);
--	if (char_decl == NULL)
-+	if (!char_decl)
- 		goto fail;
- 
- 	char_value = new0(struct btd_attribute, 1);
--	if (char_value == NULL)
-+	if (!char_value)
- 		goto fail;
- 
- 	if (local_database_add(next_handle, char_decl) < 0)
 -- 
-1.8.3.1
+1.8.5.3
 
