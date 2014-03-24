@@ -1,39 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <533092F1.3030008@gmail.com>
-Date: Mon, 24 Mar 2014 20:17:53 +0000
-From: Andrea <mariofutire@gmail.com>
+Date: Mon, 24 Mar 2014 22:17:29 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v1 20/22] tools: Use unaligned access macros from util.h
+Message-ID: <20140324201729.GB31654@t440s.P-661HNU-F1>
+References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1395689143-11091-21-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-To: Michal Labedzki <michal.labedzki@tieto.com>
-CC: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Subject: Re: Help on connecting a PS3 headset
-References: <532CAAB8.5020403@gmail.com>	<532F33BB.8050000@gmail.com>	<532F515A.3060809@gmail.com> <CALkxMhHjAhfZ4ade-o+ebtZMZB7o3m9YEzdecphsm1e2cB45bA@mail.gmail.com>
-In-Reply-To: <CALkxMhHjAhfZ4ade-o+ebtZMZB7o3m9YEzdecphsm1e2cB45bA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1395689143-11091-21-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 24/03/14 07:24, Michal Labedzki wrote:
-> Hello,
-> 
-> Wireshark is able to open both files. More interesting is "blue.log".
-> It seems that you want to connect via HSP or HFP (only supported by
-> headset). In "blue.log" headset asks (SDP) your bluez about "Handsfree
-> Audio Gateway" or "Headset Audio Gateway", but bluez return empty
-> records, so they must be disabled.
-> 
+Hi Claudio,
 
-sounds plausible, but as I have not touched anything,
-they must be disabled by default.
+On Mon, Mar 24, 2014, Claudio Takahasi wrote:
+> ---
+>  tools/parser/hci.c    | 1 -
+>  tools/parser/l2cap.c  | 1 -
+>  tools/parser/parser.h | 9 ++++-----
+>  tools/parser/ppp.c    | 2 +-
+>  4 files changed, 5 insertions(+), 8 deletions(-)
 
-cant find any configuration file that mentions anything similar.
-on Arch there is /etc/bluetooth/main.conf but it does not seem to help.
-In Fedora 20, not even that.
+I've applied all patches until this one.
 
-Do I need some extra package? kernel module? audio bluez plugin?
-Something like snd-usb-audio for usb sound cards.
+This patch has a quite severe bug in it (which to be honest makes me a
+bit nervous of the earlier ones I applied):
 
-thanks for your help
+>  static inline uint16_t get_u16(struct frame *frm)
+>  {
+> -	uint16_t *u16_ptr = frm->ptr;
+>  	frm->ptr += 2;
+>  	frm->len -= 2;
+> -	return ntohs(bt_get_unaligned(u16_ptr));
+> +	return get_be16(frm->ptr);
+>  }
+>  
+>  static inline uint32_t get_u32(struct frame *frm)
+>  {
+> -	uint32_t *u32_ptr = frm->ptr;
+>  	frm->ptr += 4;
+>  	frm->len -= 4;
+> -	return ntohl(bt_get_unaligned(u32_ptr));
+> +	return get_be32(frm->ptr);
+>  }
 
-Andrea
+Note that the value passed to ntohl before your patch is the pointer
+before it is incremented. However after your patch it's the pointer
+after it has been incremented, so you're changing the behavior of these
+two functions.
 
+Johan
