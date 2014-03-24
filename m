@@ -1,69 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 2/4] Bluetooth: Fix LE responder/initiator address setting
-Date: Mon, 24 Mar 2014 20:21:51 +0200
-Message-Id: <1395685313-26085-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1395685313-26085-1-git-send-email-johan.hedberg@gmail.com>
-References: <1395685313-26085-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v6 1/4] Bluetooth: Move local identity address setting to a central place
+Date: Mon, 24 Mar 2014 20:21:50 +0200
+Message-Id: <1395685313-26085-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Once directed advertising is brought into the picture simply the lack of
-an hci_conn object when an le_conn_complete event occurs is no longer a
-reliable indication that the responder & initiator values need to be
-set based on our advertising address type.
-
-This patch moves the code for setting these values outside of the
-"if (!conn)" branch and ensures that they get set for any connection
-where we are in the slave role.
+Any time hci_conn_add is used for an LE connection we need to ensure
+that the local identity address is correctly described in the src and
+src_type variables. This patch moves setting these values directly into
+hci_conn_add so that callers don't have to duplicate the effort
+themselves.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 26 ++++++++++++++------------
- 1 file changed, 14 insertions(+), 12 deletions(-)
+ net/bluetooth/hci_conn.c  |  4 ++++
+ net/bluetooth/hci_event.c | 16 ----------------
+ 2 files changed, 4 insertions(+), 16 deletions(-)
 
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index d958e2dca52f..129c22a85ccf 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -401,6 +401,10 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 	case ACL_LINK:
+ 		conn->pkt_type = hdev->pkt_type & ACL_PTYPE_MASK;
+ 		break;
++	case LE_LINK:
++		/* conn->src should reflect the local identity address */
++		hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
++		break;
+ 	case SCO_LINK:
+ 		if (lmp_esco_capable(hdev))
+ 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 15cc11965148..224eecfc0ecd 100644
+index 4ac8ee07bec3..15cc11965148 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3882,23 +3882,25 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 							  &conn->init_addr,
- 							  &conn->init_addr_type);
- 			}
+@@ -3858,17 +3858,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		conn->dst_type = ev->bdaddr_type;
+ 
+-		/* The advertising parameters for own address type
+-		 * define which source address and source address
+-		 * type this connections has.
+-		 */
+-		if (bacmp(&conn->src, BDADDR_ANY)) {
+-			conn->src_type = ADDR_LE_DEV_PUBLIC;
 -		} else {
--			/* Set the responder (our side) address type based on
--			 * the advertising address type.
--			 */
--			conn->resp_addr_type = hdev->adv_addr_type;
--			if (hdev->adv_addr_type == ADDR_LE_DEV_RANDOM)
--				bacpy(&conn->resp_addr, &hdev->random_addr);
--			else
--				bacpy(&conn->resp_addr, &hdev->bdaddr);
+-			bacpy(&conn->src, &hdev->static_addr);
+-			conn->src_type = ADDR_LE_DEV_RANDOM;
+-		}
 -
--			conn->init_addr_type = ev->bdaddr_type;
--			bacpy(&conn->init_addr, &ev->bdaddr);
- 		}
- 	} else {
+ 		if (ev->role == LE_CONN_ROLE_MASTER) {
+ 			conn->out = true;
+ 			conn->link_mode |= HCI_LM_MASTER;
+@@ -3910,11 +3899,6 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  		cancel_delayed_work(&conn->le_conn_timeout);
  	}
  
-+	if (!conn->out) {
-+		/* Set the responder (our side) address type based on
-+		 * the advertising address type.
-+		 */
-+		conn->resp_addr_type = hdev->adv_addr_type;
-+		if (hdev->adv_addr_type == ADDR_LE_DEV_RANDOM)
-+			bacpy(&conn->resp_addr, &hdev->random_addr);
-+		else
-+			bacpy(&conn->resp_addr, &hdev->bdaddr);
-+
-+		conn->init_addr_type = ev->bdaddr_type;
-+		bacpy(&conn->init_addr, &ev->bdaddr);
-+	}
-+
+-	/* Ensure that the hci_conn contains the identity address type
+-	 * regardless of which address the connection was made with.
+-	 */
+-	hci_copy_identity_address(hdev, &conn->src, &conn->src_type);
+-
  	/* Lookup the identity address from the stored connection
  	 * address and address type.
  	 *
