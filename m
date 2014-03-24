@@ -2,47 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v1 07/22] lib: Remove ntoh128() from bt_string_to_uuid128()
-Date: Mon, 24 Mar 2014 16:25:28 -0300
-Message-Id: <1395689143-11091-8-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v1 06/22] Replace bt_put_be64() by get_be64()
+Date: Mon, 24 Mar 2014 16:25:27 -0300
+Message-Id: <1395689143-11091-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No matter the system, 128-bit UUIDs should not be converted to any byte
-order when creating the UUID. Conversion to big/little endian should be
-performed when transfering the data over-the-air only. bt_uuid_t should
-handle 128-bit UUID on big-endian format (human-readable format).
 ---
- lib/uuid.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ profiles/audio/avrcp.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 4363aee..aa2d0cf 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -231,8 +231,8 @@ static int bt_string_to_uuid128(bt_uuid_t *uuid, const char *string)
- {
- 	uint32_t data0, data4;
- 	uint16_t data1, data2, data3, data5;
--	uint128_t n128, u128;
--	uint8_t *val = (uint8_t *) &n128;
-+	uint128_t u128;
-+	uint8_t *val = (uint8_t *) &u128;
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 1d439ec..da2a746 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -2449,7 +2449,7 @@ static void avrcp_get_item_attributes(struct avrcp *session, uint64_t uid)
  
- 	if (sscanf(string, "%08x-%04hx-%04hx-%04hx-%08x%04hx",
- 				&data0, &data1, &data2,
-@@ -253,8 +253,6 @@ static int bt_string_to_uuid128(bt_uuid_t *uuid, const char *string)
- 	memcpy(&val[10], &data4, 4);
- 	memcpy(&val[14], &data5, 2);
+ 	pdu->pdu_id = AVRCP_GET_ITEM_ATTRIBUTES;
+ 	pdu->params[0] = 0x03;
+-	bt_put_be64(uid, &pdu->params[1]);
++	put_be64(uid, &pdu->params[1]);
+ 	put_be16(player->uid_counter, &pdu->params[9]);
+ 	pdu->param_len = htons(12);
  
--	ntoh128(&n128, &u128);
--
- 	bt_uuid128_create(uuid, u128);
+@@ -2636,7 +2636,7 @@ static void avrcp_change_path(struct avrcp *session, uint8_t direction,
+ 	memset(buf, 0, sizeof(buf));
+ 	put_be16(player->uid_counter, &pdu->params[0]);
+ 	pdu->params[2] = direction;
+-	bt_put_be64(uid, &pdu->params[3]);
++	put_be64(uid, &pdu->params[3]);
+ 	pdu->pdu_id = AVRCP_CHANGE_PATH;
+ 	pdu->param_len = htons(11);
  
- 	return 0;
+@@ -2738,7 +2738,7 @@ static void avrcp_play_item(struct avrcp *session, uint64_t uid)
+ 	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+ 
+ 	pdu->params[0] = player->scope;
+-	bt_put_be64(uid, &pdu->params[1]);
++	put_be64(uid, &pdu->params[1]);
+ 	put_be16(player->uid_counter, &pdu->params[9]);
+ 
+ 	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
+@@ -2784,7 +2784,7 @@ static void avrcp_add_to_nowplaying(struct avrcp *session, uint64_t uid)
+ 	pdu->packet_type = AVRCP_PACKET_TYPE_SINGLE;
+ 
+ 	pdu->params[0] = player->scope;
+-	bt_put_be64(uid, &pdu->params[1]);
++	put_be64(uid, &pdu->params[1]);
+ 	put_be16(player->uid_counter, &pdu->params[9]);
+ 
+ 	length = AVRCP_HEADER_LENGTH + ntohs(pdu->params_len);
 -- 
 1.8.3.1
 
