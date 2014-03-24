@@ -2,75 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v8 0/8] Add basic GATT characteristics
-Date: Mon, 24 Mar 2014 10:30:01 -0300
-Message-Id: <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v8 2/8] gatt: Assign write callback for external services
+Date: Mon, 24 Mar 2014 10:30:03 -0300
+Message-Id: <1395667809-17602-3-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Remaining patches of "Add basic GATT characteristics" patchset.
+This patch adds the callback for writing the external characteristic
+value. Internally, GDBusProxy implementation calls Set method of the
+"Value" property. At the moment, potential errors returned by the
+external service implementation are being ignored.
 
-This patchset adds the following features:
-  * basic read or write external characteristics
+The ATT operation (Write Command or Request) is not exposed to the
+external service implementation. GATT/GDBusProxy handles possible
+DBus errors returned, and notify the core using the callbacks informed.
+Write Command doesn't have callback since it doesn't return ATT errors.
+---
+ src/gatt-dbus.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
-TODO (missing features of this patchset and upstream code):
-  * Properties/flags: operations and security
-  * 32-bit UUIDs
-  * Remove/free services
-  * multiple services provided by the same client
-  * remove att_put_* att_get_* helpers
-
-Changes from v8 to v7:
-  * fixed gatt.h write callback description
-
-Changes from v7 to v6:
-  * coding style: !foo and boolean
-
-Changes from v6 to v5:
-  * Use size_t instead of signed integer for
-    g_dbus_proxy_set_property_array
-  * Use negative value to denote an error (-ernno)
-
-Changes from v5 to v4:
-  * avoid usage of uint128_t in the header util.h
-
-Changes from v4 to v3:
-  * keep LE <-> CPU helpers in lib/bluetooth.h (patches removing these
-    helpers are being shifted to next patchset)
-
-Changes from v3 to v2:
-  * return put_uuid() definition to src/gatt.c
-  * add put_le16(), put_le32(), put_le128() to src/shared/util.h
-
-Changes from v2 to v1:
-  * move put_uuid() and put_le16() to src/shared/util.h
-  * check malloc0() and new0() return value
-
-Changes from v1 to v0:
-  * Use LE <-> CPU helpers defined in src/shared/util.h
-  * remove patch "gatt: Add helper for reading characteristics" from
-   this set.
-
-Alvaro Silva (3):
-  tools: Add Alert Level characteristic to gatt-service
-  tools: Add reading Value property of gatt-service
-  tools: Add setting Value property of gatt-service
-
-Claudio Takahasi (5):
-  gatt: Add write callback to btd_gatt_add_char helper
-  gatt: Assign write callback for external services
-  gatt: Add result callback for Write Request
-  gatt: Add Write Request handling for GDBusProxy
-  tools: Emit property changed when Value changes
-
- src/gatt-dbus.c      |  84 +++++++++++++++++++++++++++-
- src/gatt.c           |   7 ++-
- src/gatt.h           |  28 +++++++++-
- tools/gatt-service.c | 154 +++++++++++++++++++++++++++++++++++++++++++++++----
- 4 files changed, 256 insertions(+), 17 deletions(-)
-
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index ef137a8..cdb46c4 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -179,6 +179,30 @@ static void proxy_read_cb(struct btd_attribute *attr,
+ 	result(0, value, len, user_data);
+ }
+ 
++static void proxy_write_reply(const DBusError *derr, void *user_data)
++{
++	if (derr)
++		DBG("Write reply: %s", derr->message);
++}
++
++static void proxy_write_cb(struct btd_attribute *attr,
++					const uint8_t *value, size_t len)
++{
++	GDBusProxy *proxy;
++
++	proxy = g_hash_table_lookup(proxy_hash, attr);
++	if (!proxy)
++		/* FIXME: Attribute not found */
++		return;
++
++	g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
++						value, len, proxy_write_reply,
++						NULL, NULL);
++
++	DBG("Server: Write characteristic callback %s",
++					g_dbus_proxy_get_path(proxy));
++}
++
+ static int register_external_service(const struct external_app *eapp,
+ 							GDBusProxy *proxy)
+ {
+@@ -238,7 +262,8 @@ static int register_external_characteristics(GSList *proxies)
+ 		 * Reference table 3.5: Characteristic Properties bit field.
+ 		 */
+ 
+-		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb, NULL);
++		attr = btd_gatt_add_char(&uuid, 0x00, proxy_read_cb,
++							proxy_write_cb);
+ 		if (attr == NULL)
+ 			return -EINVAL;
+ 
 -- 
 1.8.3.1
 
