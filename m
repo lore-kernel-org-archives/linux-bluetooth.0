@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] Bluetooth: Add missing cmd_status handler for LE_Start_Encryption
-Date: Mon, 24 Mar 2014 14:39:04 +0200
-Message-Id: <1395664748-13494-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/6] Bluetooth: Fix potential NULL pointer dereference in SMP
+Date: Mon, 24 Mar 2014 14:39:03 +0200
+Message-Id: <1395664748-13494-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
 References: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,69 +11,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-It is possible that the HCI_LE_Start_Encryption command fails in an
-early stage and triggers a command status event with the failure code.
-In such a case we need to properly notify the hci_conn object and
-cleanly bring the connection down. This patch adds the missing command
-status handler for this HCI command.
+If a sudden disconnection happens the l2cap_conn pointer may already
+have been cleaned up by the time hci_conn_security gets called,
+resulting in the following oops if we don't have a proper NULL check:
+
+BUG: unable to handle kernel NULL pointer dereference at 000000c8
+IP: [<c132e2ed>] smp_conn_security+0x26/0x151
+*pde = 00000000
+Oops: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC
+CPU: 1 PID: 673 Comm: memcheck-x86-li Not tainted 3.14.0-rc2+ #437
+Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+task: f0ef0520 ti: f0d6a000 task.ti: f0d6a000
+EIP: 0060:[<c132e2ed>] EFLAGS: 00010246 CPU: 1
+EIP is at smp_conn_security+0x26/0x151
+EAX: f0ec1770 EBX: f0ec1770 ECX: 00000002 EDX: 00000002
+ESI: 00000002 EDI: 00000000 EBP: f0d6bdc0 ESP: f0d6bda0
+ DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+CR0: 80050033 CR2: 000000c8 CR3: 30f0f000 CR4: 00000690
+Stack:
+ f4f55000 00000002 f0d6bdcc c1097a2b c1319f40 f0ec1770 00000002 f0d6bdd0
+ f0d6bde8 c1312a82 f0d6bdfc c1312a82 c1319f84 00000008 f4d81c20 f0e5fd86
+ f0ec1770 f0d6bdfc f0d6be28 c131be3b c131bdc1 f0d25270 c131be3b 00000008
+Call Trace:
+ [<c1097a2b>] ? __kmalloc+0x118/0x128
+ [<c1319f40>] ? mgmt_pending_add+0x49/0x9b
+ [<c1312a82>] hci_conn_security+0x4a/0x1dd
+ [<c1312a82>] ? hci_conn_security+0x4a/0x1dd
+ [<c1319f84>] ? mgmt_pending_add+0x8d/0x9b
+ [<c131be3b>] pair_device+0x1e1/0x206
+ [<c131bdc1>] ? pair_device+0x167/0x206
+ [<c131be3b>] ? pair_device+0x1e1/0x206
+ [<c131ed44>] mgmt_control+0x275/0x2d6
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ net/bluetooth/smp.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index addc44f28c87..4ac8ee07bec3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1743,6 +1743,36 @@ unlock:
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_cs_le_start_enc(struct hci_dev *hdev, u8 status)
-+{
-+	struct hci_cp_le_start_enc *cp;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	if (!status)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_START_ENC);
-+	if (!cp)
-+		goto unlock;
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
-+	if (!conn)
-+		goto unlock;
-+
-+	if (conn->state != BT_CONNECTED)
-+		goto unlock;
-+
-+	hci_disconnect(conn, HCI_ERROR_AUTH_FAILURE);
-+	hci_conn_drop(conn);
-+
-+unlock:
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 8d618e4654a5..b8c31467a7ac 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -884,11 +884,17 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level)
+ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
  {
- 	__u8 status = *((__u8 *) skb->data);
-@@ -2654,6 +2684,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cs_le_create_conn(hdev, ev->status);
- 		break;
+ 	struct l2cap_conn *conn = hcon->l2cap_data;
+-	struct smp_chan *smp = conn->smp_chan;
++	struct smp_chan *smp;
+ 	__u8 authreq;
  
-+	case HCI_OP_LE_START_ENC:
-+		hci_cs_le_start_enc(hdev, ev->status);
-+		break;
+ 	BT_DBG("conn %p hcon %p level 0x%2.2x", conn, hcon, sec_level);
+ 
++	/* This may be NULL if there's an unexpected disconnection */
++	if (!conn)
++		return 1;
 +
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
++	smp = conn->smp_chan;
++
+ 	if (!test_bit(HCI_LE_ENABLED, &hcon->hdev->dev_flags))
+ 		return 1;
+ 
 -- 
 1.8.5.3
 
