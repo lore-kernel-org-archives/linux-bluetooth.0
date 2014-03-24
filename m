@@ -1,31 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 24 Mar 2014 11:08:24 +0200
+Date: Mon, 24 Mar 2014 11:03:41 +0200
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/5] core: Move EIR flags definitions to eir.h
-Message-ID: <20140324090824.GA30302@t440s.lan>
-References: <1395610854-30579-1-git-send-email-szymon.janc@tieto.com>
- <1395610854-30579-2-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH BlueZ v0 1/4] gatt: Fix coding style when testing pointers
+Message-ID: <20140324090341.GC26197@t440s.lan>
+References: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395610854-30579-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1395429633-656-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Claudio,
 
-On Sun, Mar 23, 2014, Szymon Janc wrote:
+On Fri, Mar 21, 2014, Claudio Takahasi wrote:
+> Use !ptr instead of ptr == NULL
 > ---
->  src/adapter.c | 15 ++++-----------
->  src/eir.h     |  9 +++++++++
->  2 files changed, 13 insertions(+), 11 deletions(-)
-> diff --git a/src/adapter.c b/src/adapter.c
+>  src/gatt-dbus.c | 10 +++++-----
+>  src/gatt.c      |  8 ++++----
+>  2 files changed, 9 insertions(+), 9 deletions(-)
 
-This patch is otherwise fine, but please don't rename the defines. The
-EIR prefix is good enough and keeps the usage of the readable enough.
-Also, even if we did want to rename them, it's misleading to hide that
-in a patch which you (in the commit message) claim to be only about
-moving stuff around.
+I've applied patches 2 and 3 from this set. The other two didn't apply
+cleanly.
 
 Johan
