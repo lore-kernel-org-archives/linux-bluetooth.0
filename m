@@ -1,56 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1395336359-16138-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1395336359-16138-1-git-send-email-claudio.takahasi@openbossa.org>
-Date: Mon, 24 Mar 2014 16:34:54 -0300
-Message-ID: <CAKT1EBcB90ZUE4Za3oxf5SCfUiQPr=YbHsTBq295ZNpKhL9GrQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0] attrib: Remove unneeded sdp.h header include
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>
+To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: [PATCH v1 22/22] attrib: Minor code optimization
+Date: Mon, 24 Mar 2014 16:25:43 -0300
+Message-Id: <1395689143-11091-23-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ attrib/gatt.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-On Thu, Mar 20, 2014 at 2:25 PM, Claudio Takahasi
-<claudio.takahasi@openbossa.org> wrote:
-> ---
->  attrib/gatt-service.c | 1 -
->  attrib/utils.c        | 1 -
->  2 files changed, 2 deletions(-)
->
-> diff --git a/attrib/gatt-service.c b/attrib/gatt-service.c
-> index 227d4d4..d15536c 100644
-> --- a/attrib/gatt-service.c
-> +++ b/attrib/gatt-service.c
-> @@ -27,7 +27,6 @@
->  #endif
->
->  #include <glib.h>
-> -#include <bluetooth/sdp.h>
->
->  #include "src/adapter.h"
->  #include "lib/uuid.h"
-> diff --git a/attrib/utils.c b/attrib/utils.c
-> index 17f02be..8f9a4c07 100644
-> --- a/attrib/utils.c
-> +++ b/attrib/utils.c
-> @@ -31,7 +31,6 @@
->  #include <bluetooth/bluetooth.h>
->  #include <bluetooth/hci.h>
->  #include <bluetooth/hci_lib.h>
-> -#include <bluetooth/sdp.h>
->
->  #include "lib/uuid.h"
->  #include "btio/btio.h"
-> --
-> 1.8.3.1
->
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index f57d0bb..7363b4b 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -408,10 +408,8 @@ static struct gatt_included *included_from_buf(const uint8_t *buf, gsize len)
+ 
+ 	if (len == 8) {
+ 		bt_uuid_t uuid128;
+-		bt_uuid_t uuid16;
+ 
+-		bt_uuid16_create(&uuid16, get_le16(&buf[6]));
+-		bt_uuid_to_uuid128(&uuid16, &uuid128);
++		get_uuid128(BT_UUID16, &buf[6], &uuid128);
+ 		bt_uuid_to_string(&uuid128, incl->uuid, sizeof(incl->uuid));
+ 	}
+ 
+-- 
+1.8.3.1
 
-
-ping ...
-
-Regards,
-Claudio
