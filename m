@@ -1,60 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140324085808.GA26197@t440s.lan>
-References: <1395413930-18292-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1395429403-493-3-git-send-email-claudio.takahasi@openbossa.org>
-	<20140324085808.GA26197@t440s.lan>
-Date: Mon, 24 Mar 2014 08:52:49 -0300
-Message-ID: <CAKT1EBdcZ3L0fPBEhyWGoqfNLunxWDQAH-KXdx=nVzNuwTXjiw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v7 02/10] gatt: Add write callback to
- btd_gatt_add_char helper
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <1395232018-25101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1395232018-25101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 24 Mar 2014 13:46:28 +0200
+Message-ID: <CABBYNZKmXd4WdmzAN+Jk7UP2VJ0ObNpC7kkP7DcyRjyotCFH3Q@mail.gmail.com>
+Subject: Re: [PATCH] unit/avrcp: Fix possible buffer overflow
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan:
+Hi Andrei,
 
-On Mon, Mar 24, 2014 at 5:58 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
+On Wed, Mar 19, 2014 at 2:26 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> On Fri, Mar 21, 2014, Claudio Takahasi wrote:
->> This patch adds a function callback for write operations. When a remote
->> device writes to a given attribute, the core calls the specified write
->> callback informing the attribute server the new characteristic value.
->> ---
->>  src/gatt-dbus.c |  2 +-
->>  src/gatt.c      |  7 ++++---
->>  src/gatt.h      | 13 ++++++++++++-
->>  3 files changed, 17 insertions(+), 5 deletions(-)
+> Parameter passed needs to be of size number otherwise there is buffer
+> overflow.
+> ---
+>  unit/test-avrcp.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
 >
-> I've applied the first patch but your change to the header file in this
-> patch is strange:
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index 02f9949..1368933 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -402,10 +402,15 @@ static int get_attribute_text(struct avrcp *session, uint8_t transaction,
+>                                         uint8_t number, uint8_t *attrs,
+>                                         void *user_data)
+>  {
+> -       const char *text[] = { "equalizer" };
+> +       const char *text[number];
 >
->> +/*
->> + * Callbacks from this type are called once the value from the attribute was
->> + * written.
->> + * @err:     error in -errno format.
->> + * @user_data:       user_data passed in btd_attr_write_t callback
->> + */
->> +typedef void (*btd_attr_write_t) (struct btd_attribute *attr,
->> +                                     const uint8_t *value, size_t len);
+>         DBG("");
 >
-> There's neither an err parameter nor a user_data parameter in this
-> callback, so I'm wondering what your code comment refers to? :)
+> +       if (number) {
+> +               memset(text, 0, number);
+> +               text[0] = "equalizer";
+> +       }
+> +
+>         avrcp_get_player_attribute_text_rsp(session, transaction, number, attrs,
+>                                                                         text);
 >
-> Johan
+> --
+> 1.8.3.2
+
+Pushed.
 
 
-It belongs to another patch that introduces Write Request handling:
-asynchronous support.
-It is a leftover issue of my approach of re-creating all the patches
-based on the code that I have.
-
-I will send another patchset moving this comment to the right patch.
-
-Regards,
-Claudio
+-- 
+Luiz Augusto von Dentz
