@@ -2,44 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH v1 21/22] core: Fix creating 128-bit uuid_t based on GATT service
-Date: Mon, 24 Mar 2014 16:25:42 -0300
-Message-Id: <1395689143-11091-22-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH v1 20/22] tools: Use unaligned access macros from util.h
+Date: Mon, 24 Mar 2014 16:25:41 -0300
+Message-Id: <1395689143-11091-21-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395689143-11091-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-sdp_uuid128_create() gets the 128-bit UUID on big-endian (human-readable
-format) byte order. Service declaration attributes puts the UUIDs in the
-attribute value field using little endian order. This patch converts the
-128-bit UUID from little-endian to big-endian before creating uuid_t.
 ---
- src/attrib-server.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ tools/parser/hci.c    | 1 -
+ tools/parser/l2cap.c  | 1 -
+ tools/parser/parser.h | 9 ++++-----
+ tools/parser/ppp.c    | 2 +-
+ 4 files changed, 5 insertions(+), 8 deletions(-)
 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 953a3f2..114c8a1 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -318,9 +318,13 @@ static uint32_t attrib_create_sdp_new(struct gatt_server *server,
+diff --git a/tools/parser/hci.c b/tools/parser/hci.c
+index b018e93..351f843 100644
+--- a/tools/parser/hci.c
++++ b/tools/parser/hci.c
+@@ -37,7 +37,6 @@
+ #include "lib/hci.h"
+ #include "lib/hci_lib.h"
+ #include "lib/amp.h"
+-#include "src/shared/util.h"
  
- 	if (a->len == 2)
- 		sdp_uuid16_create(&svc, get_le16(a->data));
--	else if (a->len == 16)
--		sdp_uuid128_create(&svc, a->data);
--	else
-+	else if (a->len == 16) {
-+		uint8_t be128[16];
-+
-+		/* Converting from LE to BE */
-+		bswap_128(a->data, be128);
-+		sdp_uuid128_create(&svc, be128);
-+	} else
- 		return 0;
+ static uint16_t manufacturer = DEFAULT_COMPID;
  
- 	record = server_record_new(&svc, handle, end);
+diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
+index 53dd726..a057964 100644
+--- a/tools/parser/l2cap.c
++++ b/tools/parser/l2cap.c
+@@ -39,7 +39,6 @@
+ #include "lib/hci.h"
+ #include "lib/a2mp.h"
+ #include "lib/amp.h"
+-#include "src/shared/util.h"
+ 
+ typedef struct {
+ 	uint16_t handle;
+diff --git a/tools/parser/parser.h b/tools/parser/parser.h
+index c65b4b5..dc49104 100644
+--- a/tools/parser/parser.h
++++ b/tools/parser/parser.h
+@@ -30,6 +30,7 @@
+ #include <netinet/in.h>
+ 
+ #include "lib/bluetooth.h"
++#include "src/shared/util.h"
+ 
+ struct frame {
+ 	void		*data;
+@@ -170,24 +171,22 @@ static inline uint8_t get_u8(struct frame *frm)
+ 
+ static inline uint16_t get_u16(struct frame *frm)
+ {
+-	uint16_t *u16_ptr = frm->ptr;
+ 	frm->ptr += 2;
+ 	frm->len -= 2;
+-	return ntohs(bt_get_unaligned(u16_ptr));
++	return get_be16(frm->ptr);
+ }
+ 
+ static inline uint32_t get_u32(struct frame *frm)
+ {
+-	uint32_t *u32_ptr = frm->ptr;
+ 	frm->ptr += 4;
+ 	frm->len -= 4;
+-	return ntohl(bt_get_unaligned(u32_ptr));
++	return get_be32(frm->ptr);
+ }
+ 
+ static inline uint64_t get_u64(struct frame *frm)
+ {
+ 	uint64_t *u64_ptr = frm->ptr;
+-	uint64_t u64 = bt_get_unaligned(u64_ptr), tmp;
++	uint64_t u64 = get_unaligned(u64_ptr), tmp;
+ 	frm->ptr += 8;
+ 	frm->len -= 8;
+ 	tmp = ntohl(u64 & 0xffffffff);
+diff --git a/tools/parser/ppp.c b/tools/parser/ppp.c
+index 947ca56..256e172 100644
+--- a/tools/parser/ppp.c
++++ b/tools/parser/ppp.c
+@@ -103,7 +103,7 @@ static void hdlc_dump(int level, struct frame *frm)
+ 	uint8_t ctrl = get_u8(frm);
+ 	uint16_t fcs, proto;
+ 
+-	fcs = bt_get_unaligned((uint16_t *) (frm->ptr + frm->len - 2));
++	fcs = get_unaligned((uint16_t *) (frm->ptr + frm->len - 2));
+ 	frm->len -= 2;
+ 
+ 	p_indent(level, frm);
 -- 
 1.8.3.1
 
