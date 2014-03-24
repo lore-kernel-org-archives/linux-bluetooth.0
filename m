@@ -1,52 +1,137 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0] gatt: Fix read callback description
-Date: Mon, 24 Mar 2014 10:34:18 -0300
-Message-Id: <1395668058-30311-1-git-send-email-claudio.takahasi@openbossa.org>
+Cc: claudio.takahasi@openbossa.org,
+	Alvaro Silva <alvaro.silva@openbossa.org>
+Subject: [PATCH BlueZ v8 6/8] tools: Add reading Value property of gatt-service
+Date: Mon, 24 Mar 2014 10:30:07 -0300
+Message-Id: <1395667809-17602-7-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/gatt.h | 20 +++++++++++++-------
- 1 file changed, 13 insertions(+), 7 deletions(-)
+From: Alvaro Silva <alvaro.silva@openbossa.org>
 
-diff --git a/src/gatt.h b/src/gatt.h
-index daa8d54..fafbddb 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -28,17 +28,23 @@ void gatt_init(void);
- void gatt_cleanup(void);
+This patch extends the gatt-service.c example adding the callback to
+allow reading the Value property. At the moment, it is a generic
+callback and it doesn't consider characteristic value property
+restrictions.
+---
+ tools/gatt-service.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 53 insertions(+), 6 deletions(-)
+
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 56d6e86..a5a64b5 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -46,18 +46,44 @@
+ static GMainLoop *main_loop;
+ static GSList *services;
  
- /*
-- * Callbacks of this type are called once the value from the attribute is
-- * ready to be read from the service implementation. Result callback is
-- * the asynchronous function that should be used to inform the caller
-- * the read value.
-+ * Read operation result callback. Called from the service implementation
-+ * informing the core (ATT layer) the result of read operation.
-  * @err:	error in -errno format.
-- * @value:	pointer to value
-- * @len:	length of value
-- * @user_data:	user_data passed in btd_attr_read_t callback
-+ * @value:	value of the attribute read.
-+ * @len:	length of value.
-+ * @user_data:	user_data passed in btd_attr_read_t callback.
-  */
- typedef void (*btd_attr_read_result_t) (int err, uint8_t *value, size_t len,
- 							void *user_data);
-+/*
-+ * Service implementation callback passed to core (ATT layer). It manages read
-+ * operations received from remote devices.
-+ * @attr:	reference of the attribute to be read.
-+ * @result:	callback called from the service implementation informing the
-+ *		value of attribute read.
-+ * @user_data:	user_data passed in btd_attr_read_result_t callback.
-+ */
- typedef void (*btd_attr_read_t) (struct btd_attribute *attr,
- 						btd_attr_read_result_t result,
- 						void *user_data);
++struct characteristic {
++	char *uuid;
++	uint8_t *value;
++	int vlen;
++};
++
+ static gboolean chr_get_uuid(const GDBusPropertyTable *property,
+ 					DBusMessageIter *iter, void *user_data)
+ {
+-	const char *uuid = user_data;
++	struct characteristic *chr = user_data;
+ 
+-	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &chr->uuid);
++
++	return TRUE;
++}
++
++static gboolean chr_get_value(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct characteristic *chr = user_data;
++	DBusMessageIter array;
++
++	printf("Get(\"Value\")\n");
++
++	dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
++					DBUS_TYPE_BYTE_AS_STRING, &array);
++
++	dbus_message_iter_append_fixed_array(&array, DBUS_TYPE_BYTE,
++						&chr->value, chr->vlen);
++
++	dbus_message_iter_close_container(iter, &array);
+ 
+ 	return TRUE;
+ }
+ 
+ static const GDBusPropertyTable chr_properties[] = {
+ 	{ "UUID",	"s",	chr_get_uuid },
++	{ "Value", "ay", chr_get_value, NULL, NULL },
+ 	{ }
+ };
+ 
+@@ -100,18 +126,35 @@ static const GDBusPropertyTable service_properties[] = {
+ 	{ }
+ };
+ 
++static void chr_iface_destroy(gpointer user_data)
++{
++	struct characteristic *chr = user_data;
++
++	g_free(chr->uuid);
++	g_free(chr->value);
++	g_free(chr);
++}
++
+ static gboolean register_characteristic(DBusConnection *conn, const char *uuid,
++						const uint8_t *value, int vlen,
+ 						const char *service_path)
+ {
++	struct characteristic *chr;
+ 	static int id = 1;
+ 	char *path;
+ 	gboolean ret = TRUE;
+ 
+ 	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+ 
++	chr = g_new0(struct characteristic, 1);
++
++	chr->uuid = g_strdup(uuid);
++	chr->value = g_memdup(value, vlen);
++	chr->vlen = vlen;
++
+ 	if (!g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+ 					NULL, NULL, chr_properties,
+-					g_strdup(uuid), g_free)) {
++					chr, chr_iface_destroy)) {
+ 		printf("Couldn't register characteristic interface\n");
+ 		ret = FALSE;
+ 	}
+@@ -141,14 +184,18 @@ static char *register_service(DBusConnection *conn, const char *uuid)
+ static void create_services(DBusConnection *conn)
+ {
+ 	char *service_path;
++	uint8_t level = 0;
+ 
+ 	service_path = register_service(conn, IAS_UUID);
+ 	if (!service_path)
+ 		return;
+ 
+-	/* Add Alert Level Characteristic to Immediate Alert Service */
+-	if (!register_characteristic(conn, ALERT_LEVEL_CHR_UUID,
+-							service_path)) {
++	/* Add Alert Level Characteristic to Immediate Alert Service
++	 * According to the IAS SPEC, reading <<Alert level>> is not allowed.
++	 * "Value" is readable for testing purpose only.
++	 */
++	if (!register_characteristic(conn, ALERT_LEVEL_CHR_UUID, &level,
++						sizeof(level), service_path)) {
+ 		printf("Couldn't register Alert Level characteristic (IAS)\n");
+ 		g_dbus_unregister_interface(conn, service_path,
+ 							GATT_SERVICE_IFACE);
 -- 
 1.8.3.1
 
