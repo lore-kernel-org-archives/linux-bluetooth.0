@@ -1,41 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix potential NULL pointer dereference in smp_conn_security
-Date: Mon, 24 Mar 2014 17:36:25 +0200
-Message-Id: <1395675385-4680-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <1395670497-12969-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1395670497-12969-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Mon, 24 Mar 2014 17:10:03 +0200
+Message-ID: <CABBYNZKAaehOxp7e0SiUvGAPe+z095hON-Qy34LHr79eLFTjoA@mail.gmail.com>
+Subject: Re: [PATCH 1/4] android/avctp: PTS tests results for AVCTP
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Sebastian Chlad <sebastianchlad@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Sebastian,
 
-The smp pointer might not be initialized for jumps to the "done" label
-in the smp_conn_security function. Furthermore doing the set_bit after
-done might "overwrite" a previous value of the flag in case pairing was
-already in progress. This patch moves the call to set_bit before the
-label so that it is only done for a newly created smp context (as
-returned by smp_chan_create).
+On Mon, Mar 24, 2014 at 4:14 PM, Sebastian Chlad
+<sebastianchlad@gmail.com> wrote:
+> From: Sebastian Chlad <sebastianchlad@gmail.com>
+>
+> ---
+>  android/pts-avctp.txt | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+> index 64fd5fc..e7b0ab9 100644
+> --- a/android/pts-avctp.txt
+> +++ b/android/pts-avctp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for AVCTP
+>
+>  PTS version: 5.0
+> -Tested: 18-Mar-2014
+> +Tested: 24-Mar-2014
+>  Android version: 4.4.2
+>
+>  Results:
+> @@ -20,7 +20,7 @@ TC_CT_CCM_BV_03_C     N/A
+>  TC_CT_CCM_BV_04_C      N/A
+>  TC_CT_CCM_BI_01_C      N/A
+>  TC_CT_NFR_BV_01_C      N/A
+> -TC_CT_NFR_BV_04_C      N/A
+> +TC_CT_NFR_BV_04_C      INC
+>  TC_CT_FRA_BV_01_C      N/A
+>  TC_CT_FRA_BV_04_C      N/A
+>  -------------------------------------------------------------------------------
+> @@ -30,12 +30,12 @@ TC_CT_FRA_BV_04_C   N/A
+>  -------------------------------------------------------------------------------
+>  Test Name              Result  Notes
+>  -------------------------------------------------------------------------------
+> -TC_TG_CCM_BV_01_C      PASS
+> +TC_TG_CCM_BV_01_C      INC
+>  TC_TG_CCM_BV_02_C      PASS
+>  TC_TG_CCM_BV_03_C      PASS
+> -TC_TG_CCM_BV_04_C      PASS
+> -TC_TG_NFR_BV_02_C      PASS
+> -TC_TG_NFR_BV_03_C      PASS
+> +TC_TG_CCM_BV_04_C      INC
+> +TC_TG_NFR_BV_02_C      INC
+> +TC_TG_NFR_BV_03_C      INC
+>  TC_TG_NFR_BI_01_C      PASS
+>  TC_TG_FRA_BV_02_C      N/A     Fragmentation not supported
+>  TC_TG_FRA_BV_03_C      N/A     Fragmentation not supported
+> --
+> 1.8.5.3
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+What is going one here? Is there a regression?
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 2c7370844731..dfb4e1161c10 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -928,9 +928,9 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
- 	}
- 
--done:
- 	set_bit(SMP_FLAG_INITIATOR, &smp->smp_flags);
- 
-+done:
- 	hcon->pending_sec_level = sec_level;
- 
- 	return 0;
+
 -- 
-1.8.5.3
-
+Luiz Augusto von Dentz
