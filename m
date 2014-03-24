@@ -1,122 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] Bluetooth: Add scan_rsp parameter to mgmt_device_found()
-Date: Mon, 24 Mar 2014 10:48:02 +0200
-Message-Id: <1395650883-25577-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1395650883-25577-1-git-send-email-johan.hedberg@gmail.com>
-References: <1395650883-25577-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <532F515A.3060809@gmail.com>
+References: <532CAAB8.5020403@gmail.com>
+	<532F33BB.8050000@gmail.com>
+	<532F515A.3060809@gmail.com>
+Date: Mon, 24 Mar 2014 08:24:38 +0100
+Message-ID: <CALkxMhHjAhfZ4ade-o+ebtZMZB7o3m9YEzdecphsm1e2cB45bA@mail.gmail.com>
+Subject: Re: Help on connecting a PS3 headset
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: Andrea <mariofutire@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hello,
 
-In preparation for being able to merge ADV_IND/ADV_SCAN_IND and SCAN_RSP
-together into a single device found event add a second parameter to the
-mgmt_device_found function. For now all callers pass NULL as this
-parameters since we don't yet have caching of the last received
-advertising report.
+Wireshark is able to open both files. More interesting is "blue.log".
+It seems that you want to connect via HSP or HFP (only supported by
+headset). In "blue.log" headset asks (SDP) your bluez about "Handsfree
+Audio Gateway" or "Headset Audio Gateway", but bluez return empty
+records, so they must be disabled.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  5 +++--
- net/bluetooth/hci_event.c        | 10 +++++-----
- net/bluetooth/mgmt.c             | 10 +++++++---
- 3 files changed, 15 insertions(+), 10 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5f8bc05694ac..a1b8eab8a47d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1264,8 +1264,9 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
- 				       u8 *randomizer192, u8 *hash256,
- 				       u8 *randomizer256, u8 status);
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
--		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name,
--		       u8 ssp, u8 *eir, u16 eir_len);
-+		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name, u8
-+		       ssp, u8 *eir, u16 eir_len, u8 *scan_rsp,
-+		       u8 scan_rsp_len);
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
- void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 403c1d96331a..e7e9c1688402 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1797,7 +1797,7 @@ static void hci_inquiry_result_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		name_known = hci_inquiry_cache_update(hdev, &data, false, &ssp);
- 		mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
- 				  info->dev_class, 0, !name_known, ssp, NULL,
--				  0);
-+				  0, NULL, 0);
- 	}
- 
- 	hci_dev_unlock(hdev);
-@@ -3068,7 +3068,7 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
- 							      false, &ssp);
- 			mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
- 					  info->dev_class, info->rssi,
--					  !name_known, ssp, NULL, 0);
-+					  !name_known, ssp, NULL, 0, NULL, 0);
- 		}
- 	} else {
- 		struct inquiry_info_with_rssi *info = (void *) (skb->data + 1);
-@@ -3086,7 +3086,7 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev,
- 							      false, &ssp);
- 			mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
- 					  info->dev_class, info->rssi,
--					  !name_known, ssp, NULL, 0);
-+					  !name_known, ssp, NULL, 0, NULL, 0);
- 		}
- 	}
- 
-@@ -3275,7 +3275,7 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
- 		eir_len = eir_get_length(info->data, sizeof(info->data));
- 		mgmt_device_found(hdev, &info->bdaddr, ACL_LINK, 0x00,
- 				  info->dev_class, info->rssi, !name_known,
--				  ssp, info->data, eir_len);
-+				  ssp, info->data, eir_len, NULL, 0);
- 	}
- 
- 	hci_dev_unlock(hdev);
-@@ -3952,7 +3952,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 	}
- 
- 	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
--			  data, len);
-+			  data, len, NULL, 0);
- }
- 
- static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d2d4e0d5aed0..360822554e07 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5669,7 +5669,8 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
- 
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name, u8
--		       ssp, u8 *eir, u16 eir_len)
-+		       ssp, u8 *eir, u16 eir_len, u8 *scan_rsp,
-+		       u8 scan_rsp_len)
- {
- 	char buf[512];
- 	struct mgmt_ev_device_found *ev = (void *) buf;
-@@ -5707,8 +5708,11 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		eir_len = eir_append_data(ev->eir, eir_len, EIR_CLASS_OF_DEV,
- 					  dev_class, 3);
- 
--	ev->eir_len = cpu_to_le16(eir_len);
--	ev_size = sizeof(*ev) + eir_len;
-+	if (scan_rsp_len > 0)
-+		memcpy(ev->eir + eir_len, scan_rsp, scan_rsp_len);
-+
-+	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
-+	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
- 
- 	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
- }
 -- 
-1.8.5.3
 
+Pozdrawiam / Best regards
+-------------------------------------------------------------------------------------------------------------
+Michał Łabędzki, Software Engineer
+Tieto Corporation
+
+Product Development Services
+
+http://www.tieto.com / http://www.tieto.pl
+---
+ASCII: Michal Labedzki
+location: Swobodna 1 Street, 50-088 Wrocław, Poland
+room: 5.01 (desk next to 5.08)
+---
+Please note: The information contained in this message may be legally
+privileged and confidential and protected from disclosure. If the
+reader of this message is not the intended recipient, you are hereby
+notified that any unauthorised use, distribution or copying of this
+communication is strictly prohibited. If you have received this
+communication in error, please notify us immediately by replying to
+the message and deleting it from your computer. Thank You.
+---
+Please consider the environment before printing this e-mail.
+---
+Tieto Poland spółka z ograniczoną odpowiedzialnością z siedzibą w
+Szczecinie, ul. Malczewskiego 26. Zarejestrowana w Sądzie Rejonowym
+Szczecin-Centrum w Szczecinie, XIII Wydział Gospodarczy Krajowego
+Rejestru Sądowego pod numerem 0000124858. NIP: 8542085557. REGON:
+812023656. Kapitał zakładowy: 4 271500 PLN
