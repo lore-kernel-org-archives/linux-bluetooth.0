@@ -2,119 +2,73 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v8 4/8] gatt: Add Write Request handling for GDBusProxy
-Date: Mon, 24 Mar 2014 10:30:05 -0300
-Message-Id: <1395667809-17602-5-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v8 3/8] gatt: Add result callback for Write Request
+Date: Mon, 24 Mar 2014 10:30:04 -0300
+Message-Id: <1395667809-17602-4-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395429403-493-1-git-send-email-claudio.takahasi@openbossa.org>
  <1395667809-17602-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the characteristic requires Write Request, the ATT response should
-be sent after receiving the reply for the Set method call.
+This patch adds a callback to allow the service implementation to inform
+the core (ATT layer) the result of the write operation. Used to handle
+ATT Write Request procedure, which requires ATT response.
 ---
- src/gatt-dbus.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 61 insertions(+), 6 deletions(-)
+ src/gatt-dbus.c |  4 +++-
+ src/gatt.h      | 16 +++++++++++++++-
+ 2 files changed, 18 insertions(+), 2 deletions(-)
 
 diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 9ab7b8b..1a1c6cc 100644
+index cdb46c4..9ab7b8b 100644
 --- a/src/gatt-dbus.c
 +++ b/src/gatt-dbus.c
-@@ -56,6 +56,11 @@ struct external_app {
- 	unsigned int watch;
- };
- 
-+struct proxy_write_data {
-+	btd_attr_write_result_t result_cb;
-+	void *user_data;
-+};
-+
- /*
-  * Attribute to Proxy hash table. Used to map incoming
-  * ATT operations to its external characteristic proxy.
-@@ -181,8 +186,30 @@ static void proxy_read_cb(struct btd_attribute *attr,
- 
- static void proxy_write_reply(const DBusError *derr, void *user_data)
- {
--	if (derr)
--		DBG("Write reply: %s", derr->message);
-+	struct proxy_write_data *wdata = user_data;
-+	int err = 0;
-+
-+	/*
-+	 * Security requirements shall be handled by the core. If external
-+	 * applications returns an error, the reasons will be restricted to
-+	 * invalid argument or application specific errors.
-+	 */
-+
-+	if (!dbus_error_is_set(derr))
-+		goto done;
-+
-+	DBG("Write reply: %s", derr->message);
-+
-+	if (dbus_error_has_name(derr, DBUS_ERROR_NO_REPLY))
-+		err = -ETIMEDOUT;
-+	else if (dbus_error_has_name(derr, ERROR_INTERFACE ".InvalidArguments"))
-+		err = -EINVAL;
-+	else
-+		err = -EPROTO;
-+
-+done:
-+	if (wdata && wdata->result_cb)
-+		wdata->result_cb(err, wdata->user_data);
+@@ -186,7 +186,9 @@ static void proxy_write_reply(const DBusError *derr, void *user_data)
  }
  
  static void proxy_write_cb(struct btd_attribute *attr,
-@@ -193,16 +220,44 @@ static void proxy_write_cb(struct btd_attribute *attr,
+-					const uint8_t *value, size_t len)
++					const uint8_t *value, size_t len,
++					btd_attr_write_result_t result,
++					void *user_data)
+ {
  	GDBusProxy *proxy;
  
- 	proxy = g_hash_table_lookup(proxy_hash, attr);
--	if (!proxy)
--		/* FIXME: Attribute not found */
-+	if (!proxy) {
-+		result(-ENOENT, user_data);
- 		return;
-+	}
+diff --git a/src/gatt.h b/src/gatt.h
+index d5dc7e6..8137e81 100644
+--- a/src/gatt.h
++++ b/src/gatt.h
+@@ -42,15 +42,29 @@ typedef void (*btd_attr_read_result_t) (int err, uint8_t *value, size_t len,
+ typedef void (*btd_attr_read_t) (struct btd_attribute *attr,
+ 						btd_attr_read_result_t result,
+ 						void *user_data);
++
++/*
++ * Write operation result callback. Called from the service implementation
++ * informing the core (ATT layer) the result of the write operation. It is used
++ * to manage Write Request operations.
++ * @err:	error in -errno format.
++ * @user_data:	user_data passed in btd_attr_write_t callback.
++ */
++typedef void (*btd_attr_write_result_t) (int err, void *user_data);
+ /*
+  * Service implementation callback passed to core (ATT layer). It manages write
+  * operations received from remote devices.
+  * @attr:	reference of the attribute to be changed.
+  * @value:	new attribute value.
+  * @len:	length of value.
++ * @result:	callback called from the service implementation informing the
++ *		result of the write operation.
++ * @user_data:	user_data passed in btd_attr_write_result_t callback.
+  */
+ typedef void (*btd_attr_write_t) (struct btd_attribute *attr,
+-					const uint8_t *value, size_t len);
++					const uint8_t *value, size_t len,
++					btd_attr_write_result_t result,
++					void *user_data);
  
--	g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
-+	/*
-+	 * "result" callback defines if the core wants to receive the
-+	 * operation result, allowing to select ATT Write Request or Write
-+	 * Command. Descriptors requires Write Request operation. For
-+	 * Characteristics, the implementation will define which operations
-+	 * are allowed based on the properties/flags.
-+	 * TODO: Write Long Characteristics/Descriptors.
-+	 */
-+
-+	if (result) {
-+		struct proxy_write_data *wdata;
-+
-+		wdata = g_new0(struct proxy_write_data, 1);
-+		wdata->result_cb = result;
-+		wdata->user_data = user_data;
-+
-+		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
-+						value, len, proxy_write_reply,
-+						wdata, g_free);
-+	} else {
-+		/*
-+		 * Caller is not interested in the Set method call result.
-+		 * This flow implements the ATT Write Command scenario, where
-+		 * the remote doesn't receive ATT response.
-+		 */
-+		g_dbus_proxy_set_property_array(proxy, "Value", DBUS_TYPE_BYTE,
- 						value, len, proxy_write_reply,
- 						NULL, NULL);
-+	}
- 
--	DBG("Server: Write characteristic callback %s",
-+	DBG("Server: Write attribute callback %s",
- 					g_dbus_proxy_get_path(proxy));
-+
- }
- 
- static int register_external_service(const struct external_app *eapp,
+ /* btd_gatt_add_service - Add a service declaration to local attribute database.
+  * @uuid:	Service UUID.
 -- 
 1.8.3.1
 
