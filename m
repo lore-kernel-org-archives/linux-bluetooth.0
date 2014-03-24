@@ -1,169 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/gatt: Fix scan handling
-Date: Mon, 24 Mar 2014 14:08:49 +0100
-Message-ID: <1630514.knIHJrarGt@uw000953>
-In-Reply-To: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395606010-19807-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] Bluetooth: Remove LTK re-encryption procedure
+Date: Mon, 24 Mar 2014 14:39:08 +0200
+Message-Id: <1395664748-13494-7-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
+References: <1395664748-13494-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Sunday 23 of March 2014 21:20:08 Lukasz Rymanowski wrote:
-> Android has its own ScanQueue which is used for tracking scanning
-> clients which means we do not have to have this logic internally.
-> 
-> Android will call Scan Off only when his scanQueue is empty.
-> ---
->  android/gatt.c | 62 ++++++++++++++++++----------------------------------------
->  1 file changed, 19 insertions(+), 43 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 0dfb90e..775adec 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -71,9 +71,9 @@ struct gatt_device {
->  
->  static struct ipc *hal_ipc = NULL;
->  static bdaddr_t adapter_addr;
-> +static bool scanning = false;
->  
->  static struct queue *gatt_clients = NULL;
-> -static struct queue *scan_clients = NULL;
->  static struct queue *conn_list	= NULL;		/* Connected devices */
->  static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
->  
-> @@ -192,13 +192,6 @@ static void handle_client_unregister(const void *buf, uint16_t len)
->  		goto failed;
->  	}
->  
-> -	queue_remove_if(scan_clients, match_by_value,
-> -						INT_TO_PTR(cmd->client_if));
-> -
-> -	/* If there is no client interesting in scan, just stop it */
-> -	if (queue_isempty(scan_clients))
-> -		bt_le_discovery_stop(NULL);
-> -
->  	free(cl);
->  	status = HAL_STATUS_SUCCESS;
->  
-> @@ -350,7 +343,7 @@ static void le_device_found_handler(bdaddr_t *addr, uint8_t addr_type,
->  	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
->  	char bda[18];
->  
-> -	if (queue_isempty(scan_clients))
-> +	if (!scanning)
->  		goto connect;
->  
->  	ba2str(addr, bda);
-> @@ -541,51 +534,43 @@ static void handle_client_scan(const void *buf, uint16_t len)
->  	const struct hal_cmd_gatt_client_scan *cmd = buf;
->  	uint8_t status;
->  	void *registered;
-> -	void *l;
->  
->  	DBG("new state %d", cmd->start);
->  
->  	registered = queue_find(gatt_clients, match_client_by_id,
->  						INT_TO_PTR(cmd->client_if));
-> +	if (!registered) {
-> +		error("gatt: Client not registered");
-> +		status = HAL_STATUS_FAILED;
-> +		goto reply;
-> +	}
-> +
->  	/* Turn off scan */
->  	if (!cmd->start) {
-> -		if (registered)
-> -			queue_remove_if(scan_clients, match_by_value,
-> -						INT_TO_PTR(cmd->client_if));
-> +		DBG("Stopping LE SCAN");
->  
-> -		if (queue_isempty(scan_clients)) {
-> -			DBG("Stopping LE SCAN");
-> +		if (scanning) {
->  			bt_le_discovery_stop(NULL);
-> +			scanning = false;
->  		}
->  
->  		status = HAL_STATUS_SUCCESS;
->  		goto reply;
->  	}
->  
-> -	/* If device already do scan, reply with success and avoid to add it
-> -	 * again to the list
-> -	 */
-> -	l = queue_find(scan_clients, match_by_value,
-> -						INT_TO_PTR(cmd->client_if));
-> -	if (l) {
-> +	/* Reply success if we already do scan */
-> +	if (scanning) {
->  		status = HAL_STATUS_SUCCESS;
->  		goto reply;
->  	}
->  
-> +	/* Turn on scan */
->  	if (!bt_le_discovery_start(le_device_found_handler)) {
->  		error("gatt: LE scan switch failed");
->  		status = HAL_STATUS_FAILED;
->  		goto reply;
->  	}
-> -
-> -	/* Add scan client to the list if its registered */
-> -	if (registered && !queue_push_tail(scan_clients,
-> -						INT_TO_PTR(cmd->client_if))) {
-> -		error("gatt: Cannot push scan client");
-> -		status = HAL_STATUS_FAILED;
-> -		goto reply;
-> -	}
-> -
-> +	scanning = true;
->  	status = HAL_STATUS_SUCCESS;
->  
->  reply:
-> @@ -724,12 +709,10 @@ static void handle_client_connect(const void *buf, uint16_t len)
->  	}
->  
->  	/* Start le scan if not started */
-> -	if (queue_isempty(scan_clients)) {
-> -		if (!bt_le_discovery_start(le_device_found_handler)) {
-> -			error("gatt: Could not start scan");
-> -			status = HAL_STATUS_FAILED;
-> -			goto reply;
-> -		}
-> +	if (!scanning && !bt_le_discovery_start(le_device_found_handler)) {
-> +		error("gatt: Could not start scan");
-> +		status = HAL_STATUS_FAILED;
-> +		goto reply;
->  	}
->  
->  	if (!queue_push_tail(conn_wait_queue, dev)) {
-> @@ -1226,13 +1209,6 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
->  		return false;
->  	}
->  
-> -	scan_clients = queue_new();
-> -	if (!scan_clients) {
-> -		error("gatt: Cannot allocate scan_clients");
-> -		queue_destroy(gatt_clients, NULL);
-> -		return false;
-> -	}
-> -
->  	return true;
->  }
->  
-> 
+Due to several devices being unable to handle this procedure reliably
+(resulting in forced disconnections before pairing completes) it's
+better to remove it altogether.
 
-As discussed offline, patches 1 and 2 are now pushed. Thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 48 +++++-------------------------------------------
+ net/bluetooth/smp.h |  8 ++------
+ 2 files changed, 7 insertions(+), 49 deletions(-)
 
-Also please remember to put that info into document describing gatt HAL
-when one will be created.
-
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 2ab1b3eb2bb7..98488be6dafa 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -556,20 +556,6 @@ error:
+ 	smp_failure(conn, reason);
+ }
+ 
+-static void smp_reencrypt(struct work_struct *work)
+-{
+-	struct smp_chan *smp = container_of(work, struct smp_chan,
+-					    reencrypt.work);
+-	struct l2cap_conn *conn = smp->conn;
+-	struct hci_conn *hcon = conn->hcon;
+-	struct smp_ltk *ltk = smp->ltk;
+-
+-	BT_DBG("");
+-
+-	hci_le_start_enc(hcon, ltk->ediv, ltk->rand, ltk->val);
+-	hcon->enc_key_size = ltk->enc_size;
+-}
+-
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ {
+ 	struct smp_chan *smp;
+@@ -580,7 +566,6 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 
+ 	INIT_WORK(&smp->confirm, confirm_work);
+ 	INIT_WORK(&smp->random, random_work);
+-	INIT_DELAYED_WORK(&smp->reencrypt, smp_reencrypt);
+ 
+ 	smp->conn = conn;
+ 	conn->smp_chan = smp;
+@@ -598,8 +583,6 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ 
+ 	BUG_ON(!smp);
+ 
+-	cancel_delayed_work_sync(&smp->reencrypt);
+-
+ 	complete = test_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
+ 	mgmt_smp_complete(conn->hcon, complete);
+ 
+@@ -1276,7 +1259,6 @@ int smp_distribute_keys(struct l2cap_conn *conn)
+ 	struct smp_chan *smp = conn->smp_chan;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
+-	bool ltk_encrypt;
+ 	__u8 *keydist;
+ 
+ 	BT_DBG("conn %p", conn);
+@@ -1376,32 +1358,12 @@ int smp_distribute_keys(struct l2cap_conn *conn)
+ 	if ((smp->remote_key_dist & 0x07))
+ 		return 0;
+ 
+-	/* Check if we should try to re-encrypt the link with the LTK.
+-	 * SMP_FLAG_LTK_ENCRYPT flag is used to track whether we've
+-	 * already tried this (in which case we shouldn't try again).
+-	 *
+-	 * The request will trigger an encryption key refresh event
+-	 * which will cause a call to auth_cfm and eventually lead to
+-	 * l2cap_core.c calling this smp_distribute_keys function again
+-	 * and thereby completing the process.
+-	 */
+-	if (smp->ltk)
+-		ltk_encrypt = !test_and_set_bit(SMP_FLAG_LTK_ENCRYPT,
+-						&smp->smp_flags);
+-	else
+-		ltk_encrypt = false;
++	clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags);
++	cancel_delayed_work_sync(&conn->security_timer);
++	set_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
++	smp_notify_keys(conn);
+ 
+-	/* Re-encrypt the link with LTK if possible */
+-	if (ltk_encrypt && hcon->out) {
+-		queue_delayed_work(hdev->req_workqueue, &smp->reencrypt,
+-				   SMP_REENCRYPT_TIMEOUT);
+-	} else {
+-		clear_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags);
+-		cancel_delayed_work_sync(&conn->security_timer);
+-		set_bit(SMP_FLAG_COMPLETE, &smp->smp_flags);
+-		smp_notify_keys(conn);
+-		smp_chan_destroy(conn);
+-	}
++	smp_chan_destroy(conn);
+ 
+ 	return 0;
+ }
+diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
+index 0d536b8b3f9a..1277147a9150 100644
+--- a/net/bluetooth/smp.h
++++ b/net/bluetooth/smp.h
+@@ -118,11 +118,8 @@ struct smp_cmd_security_req {
+ #define SMP_FLAG_TK_VALID	1
+ #define SMP_FLAG_CFM_PENDING	2
+ #define SMP_FLAG_MITM_AUTH	3
+-#define SMP_FLAG_LTK_ENCRYPT	4
+-#define SMP_FLAG_COMPLETE	5
+-#define SMP_FLAG_INITIATOR	6
+-
+-#define SMP_REENCRYPT_TIMEOUT	msecs_to_jiffies(500)
++#define SMP_FLAG_COMPLETE	4
++#define SMP_FLAG_INITIATOR	5
+ 
+ struct smp_chan {
+ 	struct l2cap_conn *conn;
+@@ -145,7 +142,6 @@ struct smp_chan {
+ 	unsigned long	smp_flags;
+ 	struct work_struct confirm;
+ 	struct work_struct random;
+-	struct delayed_work reencrypt;
+ };
+ 
+ /* SMP Commands */
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
