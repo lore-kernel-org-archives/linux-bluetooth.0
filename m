@@ -1,65 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Mar 2014 10:53:34 +0800
-From: guchaojie <chao.jie.gu@intel.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: issues on gatt dbus searching primary service
-Message-ID: <20140325025334.GA16017@guchaojie-HP>
-References: <20140324081445.GB6943@guchaojie-HP>
- <CAKT1EBeLnVaW2GSxQP8NRoiWjQL_5gJnrbe03kv6sKtDaNDg5A@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CAKT1EBeLnVaW2GSxQP8NRoiWjQL_5gJnrbe03kv6sKtDaNDg5A@mail.gmail.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] doc: Connection Parameters Command
+Date: Mon, 24 Mar 2014 20:17:27 -0300
+Message-Id: <1395703047-5743-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Mar 24, 2014 at 10:56:30AM -0300, Claudio Takahasi wrote:
-> Hi Chaojie Gu,
-> 
-> On Mon, Mar 24, 2014 at 5:14 AM, guchaojie <chao.jie.gu@intel.com> wrote:
-> > hi, claudio:
-> >     We are working on development of bluetooth LE gatt client feature in
-> >  bluetooth-frwk on Tizen platform.
-> >      We notice you have done a lot of work on this aspect and submit related
-> > patches. In the release of bluez version, gatt-api.txt told us we can reach
-> > the gatt service , characteristic and descriptor by th DBus export object
-> > path hierachy.
-> >     There is one issue when we develop the one feature about searching primary
-> > services, we notice under the interface of org.bluez.GattService1 under which
-> > there is only 128-bit UUID. This UUID should be attrbute value of service.
-> > One key point, how can we know service type is primary through attribute type?
-> 
-> Indeed, the API needs to be extended to expose the service type.
-> 
-> > In the release of DBus Hierachy in gatt-api.txt, we cannot judge whether the
-> > service type is primary or something like secondary, included service.
-> > We have to know the org.bluez.GattService under the object path of service
-> > defaultly refer to primary service or add a property of attribute type to
-> > help user to judge the service type.
-> >
-> > Thanks
-> > Chaojie Gu
-> 
-> 
-> A primary service can also include another primary service, so
-> "Includes" property is not enough to figure out if the service is
-> primary or secondary.
-> 
-> We need to propose an extension that makes Server and Client
-> consistent. Feel free to send a proposal in the ML.
-> 
-> Regards,
-> Claudio
+This patch introduces commands to add and remove connection parameters.
+---
+ doc/mgmt-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 83 insertions(+), 1 deletion(-)
 
-Hi Claudio,
-    Thanks for your reply sincerely. In my proposal, there are two properties need to be
- extended to org.bluez.GattService1.
-    One point you have figure out is service type, according to "Includes"
-property is not enough to judge the service type.
-    Another proposal is that maybe one device connect to multiple LE devices , so
-under the interface of org.bluezGattService1, it better to expose the object
-Device such as object Service exposed under the org.bluez.GattCharacteristic1.
-there will be clear GATT Dbus hierarchy and more easier for user to use.
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 78f0bd2..20e3e6c 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -995,7 +995,8 @@ Unpair Device Command
+ 	Return Parameters:	Address (6 Octets)
+ 				Address_Type (1 Octet)
+ 
+-	Removes all keys associated with the remote device.
++	Removes all keys and connection parameters associated with the remote
++	device.
+ 
+ 	Possible values for the Address_Type parameter:
+ 		0	BR/EDR
+@@ -1668,6 +1669,87 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
+ 
+ 
++Load Connection Parameters Command
++====================================
++
++	Command Code:		0x0031
++	Controller Index:	<controller id>
++	Command Parameters:	Params_Count (2 Octets)
++				Params1 {
++					Address (6 Octets)
++					Address_Type (1 Octet)
++					Auto_Connect_Option (1 Octet)
++					Min_Connection_Interval (2 Octets)
++					Max_Connection_Interval (2 Octes)
++				}
++				Params2 {  }
++				...
++	Return Parameters:
++
++	This command is used load connection parameters from several LE devices
++	into kernel. It is only supported on controllers with LE support.
++
++	The provided Address and Address_Type are the identity of a device. So
++	either its public address or static random address. Unresolvable random
++	addresses and resolvable random addresses are not valid and will be
++	rejected.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	Possible values for the Auto_Connect_Option parameter:
++		0	Disabled
++		1	Always
++		2	Link Loss
++
++	The 'Always' option configures the kernel to always re-establish the
++	connection, no matter the reason the connection was terminated. The
++	'Link Loss' option configures the kernel to re-establish the connection
++	only in case the connection was terminated due to a link loss.
++
++	The Min_Connection_Interval and Max_Connection_Interval parameters
++	should be configured as described in Core 4.1 spec, Vol 2, 7.8.12.
++
++	This command can be used when the controller is not powered.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++				Not Supported
++
++
++Add Connection Parameters Command
++====================================
++
++	Command Code:		0x0032
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Auto_Connect_Option (1 Octet)
++				Min_Connection_Interval (2 Octets)
++				Max_Connection_Interval (2 Octes)
++	Return Parameters:
++
++	This command is used add or update connection parameters from a given
++	LE device. It is only supported on controllers with LE support.
++
++	Parameters from this command are described in "Load Connection
++	Parameters Command".
++
++	This command can be used when the controller is not powered.
++
++	This command generates a Command Complete event on success or
++	a Command Status event on failure.
++
++	Possible errors:	Invalid Parameters
++				Invalid Index
++				Not Supported
++
++
+ Command Complete Event
+ ======================
+ 
+-- 
+1.9.0
 
-Thanks
-Chaojie Gu
