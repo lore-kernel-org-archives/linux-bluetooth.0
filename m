@@ -1,71 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1395670497-12969-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1395670497-12969-1-git-send-email-sebastian.chlad@tieto.com>
-Date: Mon, 24 Mar 2014 17:10:03 +0200
-Message-ID: <CABBYNZKAaehOxp7e0SiUvGAPe+z095hON-Qy34LHr79eLFTjoA@mail.gmail.com>
-Subject: Re: [PATCH 1/4] android/avctp: PTS tests results for AVCTP
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Sebastian Chlad <sebastianchlad@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] Bluetooth: Remove unnecessary assignment in SMP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1395673154-32409-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 24 Mar 2014 08:01:41 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <1D788D64-C61D-4C85-923B-611F14D8BDA0@holtmann.org>
+References: <1395673154-32409-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Johan,
 
-On Mon, Mar 24, 2014 at 4:14 PM, Sebastian Chlad
-<sebastianchlad@gmail.com> wrote:
-> From: Sebastian Chlad <sebastianchlad@gmail.com>
->
+> The smp variable in smp_conn_security is not used anywhere before the
+> smp = smp_chan_create() call in the smp_conn_security function so it
+> makes no sense to assign any other value to it before that.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  android/pts-avctp.txt | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
-> index 64fd5fc..e7b0ab9 100644
-> --- a/android/pts-avctp.txt
-> +++ b/android/pts-avctp.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for AVCTP
->
->  PTS version: 5.0
-> -Tested: 18-Mar-2014
-> +Tested: 24-Mar-2014
->  Android version: 4.4.2
->
->  Results:
-> @@ -20,7 +20,7 @@ TC_CT_CCM_BV_03_C     N/A
->  TC_CT_CCM_BV_04_C      N/A
->  TC_CT_CCM_BI_01_C      N/A
->  TC_CT_NFR_BV_01_C      N/A
-> -TC_CT_NFR_BV_04_C      N/A
-> +TC_CT_NFR_BV_04_C      INC
->  TC_CT_FRA_BV_01_C      N/A
->  TC_CT_FRA_BV_04_C      N/A
->  -------------------------------------------------------------------------------
-> @@ -30,12 +30,12 @@ TC_CT_FRA_BV_04_C   N/A
->  -------------------------------------------------------------------------------
->  Test Name              Result  Notes
->  -------------------------------------------------------------------------------
-> -TC_TG_CCM_BV_01_C      PASS
-> +TC_TG_CCM_BV_01_C      INC
->  TC_TG_CCM_BV_02_C      PASS
->  TC_TG_CCM_BV_03_C      PASS
-> -TC_TG_CCM_BV_04_C      PASS
-> -TC_TG_NFR_BV_02_C      PASS
-> -TC_TG_NFR_BV_03_C      PASS
-> +TC_TG_CCM_BV_04_C      INC
-> +TC_TG_NFR_BV_02_C      INC
-> +TC_TG_NFR_BV_03_C      INC
->  TC_TG_NFR_BI_01_C      PASS
->  TC_TG_FRA_BV_02_C      N/A     Fragmentation not supported
->  TC_TG_FRA_BV_03_C      N/A     Fragmentation not supported
-> --
-> 1.8.5.3
+> net/bluetooth/smp.c | 2 --
+> 1 file changed, 2 deletions(-)
 
-What is going one here? Is there a regression?
+patch has been applied to bluetooth-next tree.
 
+Regards
 
--- 
-Luiz Augusto von Dentz
+Marcel
+
