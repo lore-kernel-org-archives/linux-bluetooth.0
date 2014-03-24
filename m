@@ -1,171 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 24 Mar 2014 11:12:41 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] android/bluetooth: Filter out not discoverable LE
+ devices
+Message-ID: <20140324091241.GB30302@t440s.lan>
+References: <1395610854-30579-1-git-send-email-szymon.janc@tieto.com>
+ <1395610854-30579-3-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <532C2312.6060708@linux.intel.com>
-References: <1395233416-10951-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-	<532C2312.6060708@linux.intel.com>
-Date: Mon, 24 Mar 2014 13:41:06 +0200
-Message-ID: <CABBYNZJ_Ed0saV16T0XR5qXRx4XDj0zzJBWyqNb7Zm1o2hgcDA@mail.gmail.com>
-Subject: Re: [RFC] android/client: Add AVRCP register_notification_rsp support
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1395610854-30579-3-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Szymon,
 
-On Fri, Mar 21, 2014 at 1:31 PM, Ravi kumar Veeramally
-<ravikumar.veeramally@linux.intel.com> wrote:
->
-> ping.
->
->
-> On 03/19/2014 02:50 PM, Ravi kumar Veeramally wrote:
->>
->> Input for this call doesn't require all parameters of structure
->> to be filled at the same time. Input data depepnds on event_id
->> and type. Implemented this api support based on
->> android/hal_avrcp.c:register_notification_rsp.
->> ---
->>   android/client/if-rc.c | 91
->> ++++++++++++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 91 insertions(+)
->>
->> diff --git a/android/client/if-rc.c b/android/client/if-rc.c
->> index 31efc29..89f63dc 100644
->> --- a/android/client/if-rc.c
->> +++ b/android/client/if-rc.c
->> @@ -54,6 +54,20 @@ SINTMAP(btrc_status_t, -1, "(unknown)")
->>         DELEMENT(BTRC_STS_NO_ERROR),
->>   ENDMAP
->>   +SINTMAP(btrc_event_id_t, -1, "(unknown)")
->> +       DELEMENT(BTRC_EVT_PLAY_STATUS_CHANGED),
->> +       DELEMENT(BTRC_EVT_TRACK_CHANGE),
->> +       DELEMENT(BTRC_EVT_TRACK_REACHED_END),
->> +       DELEMENT(BTRC_EVT_TRACK_REACHED_START),
->> +       DELEMENT(BTRC_EVT_PLAY_POS_CHANGED),
->> +       DELEMENT(BTRC_EVT_APP_SETTINGS_CHANGED),
->> +ENDMAP
->> +
->> +SINTMAP(btrc_notification_type_t, -1, "(unknown)")
->> +       DELEMENT(BTRC_NOTIFICATION_TYPE_INTERIM),
->> +       DELEMENT(BTRC_NOTIFICATION_TYPE_CHANGED),
->> +ENDMAP
->> +
->>   static char last_addr[MAX_ADDR_STR_LEN];
->>     static void remote_features_cb(bt_bdaddr_t *bd_addr,
->> @@ -294,6 +308,74 @@ static void set_player_app_value_rsp_p(int argc,
->> const char **argv)
->>         EXEC(if_rc->set_player_app_value_rsp, rsp_status);
->>   }
->>   +/* register_notification_rsp */
->> +
->> +static void register_notification_rsp_c(int argc, const char **argv,
->> +                                       enum_func *enum_func, void **user)
->> +{
->> +       if (argc == 3) {
->> +               *user = TYPE_ENUM(btrc_event_id_t);
->> +               *enum_func = enum_defines;
->> +       }
->> +
->> +       if (argc == 4) {
->> +               *user = TYPE_ENUM(btrc_notification_type_t);
->> +               *enum_func = enum_defines;
->> +       }
->> +}
->> +
->> +static void register_notification_rsp_p(int argc, const char **argv)
->> +{
->> +       btrc_event_id_t event_id;
->> +       btrc_notification_type_t type;
->> +       btrc_register_notification_t reg;
->> +       uint8_t len, i;
->> +
->> +       RETURN_IF_NULL(if_rc);
->> +
->> +       memset(&reg, 0, sizeof(reg));
->> +       event_id = str2btrc_event_id_t(argv[2]);
->> +       type = str2btrc_notification_type_t(argv[3]);
->> +
->> +       switch (event_id) {
->> +       case BTRC_EVT_PLAY_STATUS_CHANGED:
->> +               reg.play_status = str2btrc_play_status_t(argv[4]);
->> +               break;
->> +
->> +       case BTRC_EVT_TRACK_CHANGE:
->> +               len = strlen(argv[4]) / 2;
->> +               for (i = 0; i < len; i++)
->> +                       sscanf((char *) &(argv[5])[i * 2], "%hhx",
->> +                                               &(reg.track + 1)[i]);
+On Sun, Mar 23, 2014, Szymon Janc wrote:
+> Filter out the LE devices that do not have Discoverable flag or Limited
+> Discoverable flag set.
+> ---
+>  android/bluetooth.c | 23 ++++++++++++++++++-----
+>  1 file changed, 18 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index d2795e3..3c859e8 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1258,6 +1258,11 @@ static void update_device(struct device *dev, int8_t rssi,
+>  					HAL_EV_REMOTE_DEVICE_PROPS, size, buf);
+>  }
+>  
+> +static bool is_le_dev_discoverable(unsigned int flags)
+> +{
+> +	return flags & (EIR_FLAG_LIM_DISC | EIR_FLAG_GEN_DISC);
+> +}
+> +
+>  static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>  					int8_t rssi, bool confirm,
+>  					const uint8_t *data, uint8_t data_len)
+> @@ -1271,6 +1276,19 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+>  
+>  	dev = find_device(bdaddr);
+>  
+> +	if (bdaddr_type != BDADDR_BREDR) {
+> +		/* Notify Gatt if its registered for LE events */
+> +		if (gatt_device_found_cb)
+> +			gatt_device_found_cb(bdaddr, bdaddr_type, rssi,
+> +							sizeof(eir), &eir);
+> +
+> +		if (adapter.cur_discovery_type != SCAN_TYPE_NONE &&
+> +					!is_le_dev_discoverable(eir.flags)) {
+> +			eir_data_free(&eir);
+> +			return;
+> +		}
+> +	}
 
-Im scratching my head here thinking why do we need to do strlen +
-sscanf? Perhaps we should be using strtoull?
+Do note the recent changes I had to do for the normal bluetoothd since
+it's not possible to distinguish ADV_IND/ADV_SCAN_IND from SCAN_RSP
+events. The flags field is not permitted to be in the SCAN_RSP so you'd
+not be able to take advantage of any data in such events if you discard
+the data when the flags are not around.
 
->> +               break;
->> +
->> +       case BTRC_EVT_TRACK_REACHED_END:
->> +       case BTRC_EVT_TRACK_REACHED_START:
->> +               break;
->> +
->> +       case BTRC_EVT_PLAY_POS_CHANGED:
->> +               reg.song_pos = (uint8_t) atoi(argv[4]);
+Also be aware of the recent kernel patch set I sent which merges these
+events into a single device found event and again makes it possible to
+do strict checking of the flags. That said, this all depends on what
+kind of kernel version we want to depend on. If we're going to rely also
+on the kernel-side passive for LE (which will probably land in 3.16)
+then it's probably fine to overlook this issue for now.
 
-Perhaps strtoul to be able to catch errors.
-
->> +               break;
->> +
->> +       case BTRC_EVT_APP_SETTINGS_CHANGED:
->> +               reg.player_setting.num_attr = (uint8_t) atoi(argv[4]);
->> +
->> +               len = strlen(argv[5]) / 2;
->> +               for (i = 0; i < len; i++)
->> +                       sscanf((char *) &(argv[5])[i * 2], "%hhx",
->> +                               &(reg.player_setting.attr_ids + 1)[i]);
->> +
->> +               len = strlen(argv[9]) / 2;
->> +               for (i = 0; i < len; i++)
->> +                       sscanf((char *) &(argv[6])[i * 2], "%hhx",
->> +                               &(reg.player_setting.attr_values + 1)[i]);
-
-BTRC_EVT_APP_SETTINGS_CHANGED is not really supported so perhaps we
-can skip it for now.
-
->> +               break;
->> +       }
->> +
->> +       EXEC(if_rc->register_notification_rsp, event_id, type, &reg);
->> +}
->> +
->>   /* cleanup */
->>     static void cleanup_p(int argc, const char **argv)
->> @@ -311,6 +393,15 @@ static struct method methods[] = {
->>         STD_METHODCH(get_element_attr_rsp, "<num_attr> <attrs_id>
->> <value>"),
->>         STD_METHODCH(set_player_app_value_rsp, "<rsp_status>"),
->>         STD_METHODCH(set_volume, "<volume>"),
->> +       STD_METHODCH(register_notification_rsp,
->> +                       "<event_id> <type> <respective_data...>\n"
->> +                       "BTRC_EVT_PLAY_STATUS_CHANGED <type>
->> <play_status>\n"
->> +                       "BTRC_EVT_TRACK_CHANGE <type> <track>\n"
->> +                       "BTRC_EVT_TRACK_REACHED_END <type>\n"
->> +                       "BTRC_EVT_TRACK_REACHED_START <type>\n"
->> +                       "BTRC_EVT_PLAY_POS_CHANGED <type> <song_pos>\n"
->> +                       "BTRC_EVT_APP_SETTINGS_CHANGED <type> "
->> +                               "<num_attr> <attr_ids> <attr_values>\n"),
->>         STD_METHOD(cleanup),
->>         END_METHOD
->>   };
->
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Johan
