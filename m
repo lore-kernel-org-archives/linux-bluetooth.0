@@ -1,30 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v6 1/4] Bluetooth: Move local identity address setting to a central place
+Subject: Re: [PATCH v6 2/4] Bluetooth: Fix LE responder/initiator address setting
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395685313-26085-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 24 Mar 2014 13:31:35 -0700
+In-Reply-To: <1395685313-26085-2-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 24 Mar 2014 13:31:31 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0ADEA46A-FAAD-4C68-BB34-2BA52E92046B@holtmann.org>
-References: <1395685313-26085-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <C2E036E1-A5F4-43E8-88A9-E26A08472C9C@holtmann.org>
+References: <1395685313-26085-1-git-send-email-johan.hedberg@gmail.com> <1395685313-26085-2-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> Any time hci_conn_add is used for an LE connection we need to ensure
-> that the local identity address is correctly described in the src and
-> src_type variables. This patch moves setting these values directly into
-> hci_conn_add so that callers don't have to duplicate the effort
-> themselves.
+> Once directed advertising is brought into the picture simply the lack of
+> an hci_conn object when an le_conn_complete event occurs is no longer a
+> reliable indication that the responder & initiator values need to be
+> set based on our advertising address type.
+> 
+> This patch moves the code for setting these values outside of the
+> "if (!conn)" branch and ensures that they get set for any connection
+> where we are in the slave role.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_conn.c  |  4 ++++
-> net/bluetooth/hci_event.c | 16 ----------------
-> 2 files changed, 4 insertions(+), 16 deletions(-)
+> net/bluetooth/hci_event.c | 26 ++++++++++++++------------
+> 1 file changed, 14 insertions(+), 12 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
