@@ -1,52 +1,212 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1395736353.3010.6.camel@joe-AO722>
-Subject: Re: [PATCH] drivers:bluetooth:ath3k.c: Fixed sparse warning for
- cast to restricted __le32
-From: Joe Perches <joe@perches.com>
-To: Surendra Patil <surendra.tux@gmail.com>
-Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Tue, 25 Mar 2014 01:32:33 -0700
-In-Reply-To: <1395735950-17968-1-git-send-email-surendra.tux@gmail.com>
-References: <1395735950-17968-1-git-send-email-surendra.tux@gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Mime-Version: 1.0
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] Bluetooth: Add directed advertising support through connect()
+Date: Tue, 25 Mar 2014 10:30:49 +0200
+Message-Id: <1395736249-11450-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com>
+References: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2014-03-25 at 01:25 -0700, Surendra Patil wrote:
-> This patch fixes below Sparse warnings -
-> drivers/bluetooth/ath3k.c:370:17: warning: cast to restricted __le32
-> drivers/bluetooth/ath3k.c:432:17: warning: cast to restricted __le32
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-You are changing output here.
+When we're in peripheral mode (HCI_ADVERTISING flag is set) the most
+natural mapping of connect() is to perform directed advertising to the
+peer device.
 
-I suspect rom_version should be marked __le32 instead
-of unsigned int in "struct ath3k_version" instead.
+This patch does the necessary changes to enable directed advertising and
+keeps the hci_conn state as BT_CONNECT in a similar way as is done for
+central or BR/EDR connection initiation.
 
-> Signed-off-by: Surendra Patil <surendra.tux@gmail.com>
-> ---
->  drivers/bluetooth/ath3k.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-> index be571fe..badacbc 100644
-> --- a/drivers/bluetooth/ath3k.c
-> +++ b/drivers/bluetooth/ath3k.c
-> @@ -367,7 +367,7 @@ static int ath3k_load_patch(struct usb_device *udev)
->  	}
->  
->  	snprintf(filename, ATH3K_NAME_LEN, "ar3k/AthrBT_0x%08x.dfu",
-> -		le32_to_cpu(fw_version.rom_version));
-> +		fw_version.rom_version);
->  
->  	ret = request_firmware(&firmware, filename, &udev->dev);
->  	if (ret < 0) {
-> @@ -429,7 +429,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
->  	}
->  
->  	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
-> -		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
-> +		 fw_version.rom_version, clk_value, ".dfu");
->  
->  	ret = request_firmware(&firmware, filename, &udev->dev);
->  	if (ret < 0) {
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_conn.c    | 77 ++++++++++++++++++++++++++++++++++++++++-----
+ net/bluetooth/hci_event.c   | 19 +++++++++--
+ 3 files changed, 87 insertions(+), 10 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index be150cf8cd43..4261a67682c0 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -367,6 +367,7 @@ enum {
+ #define HCI_ERROR_REMOTE_POWER_OFF	0x15
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+ #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
++#define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
+ 
+ /* Flow control modes */
+ #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 129c22a85ccf..55a174317925 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -367,9 +367,23 @@ static void le_conn_timeout(struct work_struct *work)
+ {
+ 	struct hci_conn *conn = container_of(work, struct hci_conn,
+ 					     le_conn_timeout.work);
++	struct hci_dev *hdev = conn->hdev;
+ 
+ 	BT_DBG("");
+ 
++	/* We could end up here due to having done directed advertising,
++	 * so clean up the state if necessary. This should however only
++	 * happen with broken hardware or if low duty cycle was used
++	 * (which doesn't have a timeout of its own).
++	 */
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
++		u8 enable = 0x00;
++		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
++			     &enable);
++		hci_le_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
++		return;
++	}
++
+ 	hci_le_create_connection_cancel(conn);
+ }
+ 
+@@ -549,6 +563,11 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+ 	 * favor of connection establishment, we should restart it.
+ 	 */
+ 	hci_update_background_scan(hdev);
++
++	/* Re-enable advertising in case this was a failed connection
++	 * attempt as a peripheral.
++	 */
++	mgmt_reenable_advertising(hdev);
+ }
+ 
+ static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
+@@ -609,6 +628,45 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
+ 	conn->state = BT_CONNECT;
+ }
+ 
++static void hci_req_directed_advertising(struct hci_request *req,
++					 struct hci_conn *conn)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_cp_le_set_adv_param cp;
++	u8 own_addr_type;
++	u8 enable;
++
++	enable = 0x00;
++	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
++
++	/* Clear the HCI_ADVERTISING bit temporarily so that the
++	 * hci_update_random_address knows that it's safe to go ahead
++	 * and write a new random address. The flag will be set back on
++	 * as soon as the SET_ADV_ENABLE HCI command completes.
++	 */
++	clear_bit(HCI_ADVERTISING, &hdev->dev_flags);
++
++	/* Set require_privacy to false so that the remote device has a
++	 * chance of identifying us.
++	 */
++	if (hci_update_random_address(req, false, &own_addr_type) < 0)
++		return;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.type = LE_ADV_DIRECT_IND;
++	cp.own_address_type = own_addr_type;
++	cp.direct_addr_type = conn->dst_type;
++	bacpy(&cp.direct_addr, &conn->dst);
++	cp.channel_map = hdev->le_adv_channel_map;
++
++	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
++
++	enable = 0x01;
++	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
++
++	conn->state = BT_CONNECT;
++}
++
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, u8 sec_level, u8 auth_type)
+ {
+@@ -618,9 +676,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	struct hci_request req;
+ 	int err;
+ 
+-	if (test_bit(HCI_ADVERTISING, &hdev->flags))
+-		return ERR_PTR(-ENOTSUPP);
+-
+ 	/* Some devices send ATT messages as soon as the physical link is
+ 	 * established. To be able to handle these ATT messages, the user-
+ 	 * space first establishes the connection and then starts the pairing
+@@ -668,13 +723,20 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		return ERR_PTR(-ENOMEM);
+ 
+ 	conn->dst_type = dst_type;
+-
+-	conn->out = true;
+-	conn->link_mode |= HCI_LM_MASTER;
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->pending_sec_level = sec_level;
+ 	conn->auth_type = auth_type;
+ 
++	hci_req_init(&req, hdev);
++
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
++		hci_req_directed_advertising(&req, conn);
++		goto create_conn;
++	}
++
++	conn->out = true;
++	conn->link_mode |= HCI_LM_MASTER;
++
+ 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+ 	if (params) {
+ 		conn->le_conn_min_interval = params->conn_min_interval;
+@@ -684,8 +746,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
+ 	}
+ 
+-	hci_req_init(&req, hdev);
+-
+ 	/* If controller is scanning, we stop it since some controllers are
+ 	 * not able to scan and connect at the same time. Also set the
+ 	 * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
+@@ -699,6 +759,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 
+ 	hci_req_add_le_create_conn(&req, conn);
+ 
++create_conn:
+ 	err = hci_req_run(&req, create_le_conn_complete);
+ 	if (err) {
+ 		hci_conn_del(conn);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b9f0b20c9a51..0181f368de42 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -991,10 +991,25 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (!sent)
+ 		return;
+ 
++	if (status)
++		return;
++
+ 	hci_dev_lock(hdev);
+ 
+-	if (!status)
+-		mgmt_advertising(hdev, *sent);
++	/* If we're doing connection initation as peripheral. Set a
++	 * timeout in case something goes wrong.
++	 */
++	if (*sent) {
++		struct hci_conn *conn;
++
++		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
++		if (conn)
++			queue_delayed_work(hdev->workqueue,
++					   &conn->le_conn_timeout,
++					   HCI_LE_CONN_TIMEOUT);
++	}
++
++	mgmt_advertising(hdev, *sent);
+ 
+ 	hci_dev_unlock(hdev);
+ }
+-- 
+1.8.5.3
+
