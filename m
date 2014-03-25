@@ -1,61 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Mar 2014 10:23:21 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Date: Tue, 25 Mar 2014 10:53:34 +0800
+From: guchaojie <chao.jie.gu@intel.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 4/4] Bluetooth: Merge ADV_IND/ADV_SCAN_IND and
- SCAN_RSP together
-Message-ID: <20140325082321.GA5490@t440s.lan>
-References: <1395650883-25577-1-git-send-email-johan.hedberg@gmail.com>
- <1395650883-25577-4-git-send-email-johan.hedberg@gmail.com>
- <713211EC-11CA-424C-93FD-AEF338D4FFD9@holtmann.org>
+Subject: Re: issues on gatt dbus searching primary service
+Message-ID: <20140325025334.GA16017@guchaojie-HP>
+References: <20140324081445.GB6943@guchaojie-HP>
+ <CAKT1EBeLnVaW2GSxQP8NRoiWjQL_5gJnrbe03kv6sKtDaNDg5A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <713211EC-11CA-424C-93FD-AEF338D4FFD9@holtmann.org>
+In-Reply-To: <CAKT1EBeLnVaW2GSxQP8NRoiWjQL_5gJnrbe03kv6sKtDaNDg5A@mail.gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Mon, Mar 24, 2014, Marcel Holtmann wrote:
-> > @@ -3944,6 +3962,8 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
-> > static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
-> > 			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
-> > {
-> > +	struct discovery_state *d = &hdev->discovery;
-> > +
-> > 	/* Passive scanning shouldn't trigger any device found events */
-> > 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
-> > 		if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
-> > @@ -3951,8 +3971,60 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
-> > 	    return;
-> > 	}
-> > 
-> > -	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
-> > -			  data, len, NULL, 0);
-> > +	/* If there's nothing cached either cache the data from this
-> > +	 * event or send an immediate device found event if the data is
-> > +	 * not cachable.
-> > +	 */
+On Mon, Mar 24, 2014 at 10:56:30AM -0300, Claudio Takahasi wrote:
+> Hi Chaojie Gu,
 > 
-> I would not use the word cache since it is not really a cache. It is
-> just a pending report.
+> On Mon, Mar 24, 2014 at 5:14 AM, guchaojie <chao.jie.gu@intel.com> wrote:
+> > hi, claudio:
+> >     We are working on development of bluetooth LE gatt client feature in
+> >  bluetooth-frwk on Tizen platform.
+> >      We notice you have done a lot of work on this aspect and submit related
+> > patches. In the release of bluez version, gatt-api.txt told us we can reach
+> > the gatt service , characteristic and descriptor by th DBus export object
+> > path hierachy.
+> >     There is one issue when we develop the one feature about searching primary
+> > services, we notice under the interface of org.bluez.GattService1 under which
+> > there is only 128-bit UUID. This UUID should be attrbute value of service.
+> > One key point, how can we know service type is primary through attribute type?
 > 
-> > +	if (ADV_CACHE_EMPTY(d)) {
+> Indeed, the API needs to be extended to expose the service type.
 > 
-> Do we really need to check if the pending report is empty here. It
-> will not match the bacmp() change anyway.
+> > In the release of DBus Hierachy in gatt-api.txt, we cannot judge whether the
+> > service type is primary or something like secondary, included service.
+> > We have to know the org.bluez.GattService under the object path of service
+> > defaultly refer to primary service or add a property of attribute type to
+> > help user to judge the service type.
+> >
+> > Thanks
+> > Chaojie Gu
+> 
+> 
+> A primary service can also include another primary service, so
+> "Includes" property is not enough to figure out if the service is
+> primary or secondary.
+> 
+> We need to propose an extension that makes Server and Client
+> consistent. Feel free to send a proposal in the ML.
+> 
+> Regards,
+> Claudio
 
-I agree with your other suggestions, but here I feel like the logic
-stays more understandable with keeping this separate. E.g. one
-difference between the two branches is the check for SCAN_RSP. It
-prevents the code from trying to merge together two consecutive ADV_IND
-from the same device. Furthermore, either way need to compare against
-BDADDR_ANY first to know if a mismatch of bdaddrs means we should send
-what's pending or not (if there's nothing pending).
+Hi Claudio,
+    Thanks for your reply sincerely. In my proposal, there are two properties need to be
+ extended to org.bluez.GattService1.
+    One point you have figure out is service type, according to "Includes"
+property is not enough to judge the service type.
+    Another proposal is that maybe one device connect to multiple LE devices , so
+under the interface of org.bluezGattService1, it better to expose the object
+Device such as object Service exposed under the org.bluez.GattCharacteristic1.
+there will be clear GATT Dbus hierarchy and more easier for user to use.
 
-I just have a hard time wrapping my head around a simpler solution
-that's both understandable and correct. Feel free to suggest your own
-solution, but this part of my patch will remain unchanged in the next
-revision.
-
-Johan
+Thanks
+Chaojie Gu
