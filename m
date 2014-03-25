@@ -1,28 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Mar 2014 13:48:33 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2] tools: Use unaligned access macros from util.h
-Message-ID: <20140325114833.GA27665@t440s.lan>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v2] tools: Use unaligned access macros from util.h
+Date: Tue, 25 Mar 2014 08:38:30 -0300
+Message-Id: <1395747510-8984-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395326607-27068-61-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395326607-27068-61-git-send-email-claudio.takahasi@openbossa.org>
- <1395747510-8984-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395747510-8984-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+---
+ tools/parser/hci.c    | 1 -
+ tools/parser/l2cap.c  | 1 -
+ tools/parser/parser.h | 7 ++++---
+ tools/parser/ppp.c    | 2 +-
+ 4 files changed, 5 insertions(+), 6 deletions(-)
 
-On Tue, Mar 25, 2014, Claudio Takahasi wrote:
-> ---
->  tools/parser/hci.c    | 1 -
->  tools/parser/l2cap.c  | 1 -
->  tools/parser/parser.h | 7 ++++---
->  tools/parser/ppp.c    | 2 +-
->  4 files changed, 5 insertions(+), 6 deletions(-)
+diff --git a/tools/parser/hci.c b/tools/parser/hci.c
+index b018e93..351f843 100644
+--- a/tools/parser/hci.c
++++ b/tools/parser/hci.c
+@@ -37,7 +37,6 @@
+ #include "lib/hci.h"
+ #include "lib/hci_lib.h"
+ #include "lib/amp.h"
+-#include "src/shared/util.h"
+ 
+ static uint16_t manufacturer = DEFAULT_COMPID;
+ 
+diff --git a/tools/parser/l2cap.c b/tools/parser/l2cap.c
+index 53dd726..a057964 100644
+--- a/tools/parser/l2cap.c
++++ b/tools/parser/l2cap.c
+@@ -39,7 +39,6 @@
+ #include "lib/hci.h"
+ #include "lib/a2mp.h"
+ #include "lib/amp.h"
+-#include "src/shared/util.h"
+ 
+ typedef struct {
+ 	uint16_t handle;
+diff --git a/tools/parser/parser.h b/tools/parser/parser.h
+index c65b4b5..62b8ac5 100644
+--- a/tools/parser/parser.h
++++ b/tools/parser/parser.h
+@@ -30,6 +30,7 @@
+ #include <netinet/in.h>
+ 
+ #include "lib/bluetooth.h"
++#include "src/shared/util.h"
+ 
+ struct frame {
+ 	void		*data;
+@@ -173,7 +174,7 @@ static inline uint16_t get_u16(struct frame *frm)
+ 	uint16_t *u16_ptr = frm->ptr;
+ 	frm->ptr += 2;
+ 	frm->len -= 2;
+-	return ntohs(bt_get_unaligned(u16_ptr));
++	return get_be16(u16_ptr);
+ }
+ 
+ static inline uint32_t get_u32(struct frame *frm)
+@@ -181,13 +182,13 @@ static inline uint32_t get_u32(struct frame *frm)
+ 	uint32_t *u32_ptr = frm->ptr;
+ 	frm->ptr += 4;
+ 	frm->len -= 4;
+-	return ntohl(bt_get_unaligned(u32_ptr));
++	return get_be32(u32_ptr);
+ }
+ 
+ static inline uint64_t get_u64(struct frame *frm)
+ {
+ 	uint64_t *u64_ptr = frm->ptr;
+-	uint64_t u64 = bt_get_unaligned(u64_ptr), tmp;
++	uint64_t u64 = get_unaligned(u64_ptr), tmp;
+ 	frm->ptr += 8;
+ 	frm->len -= 8;
+ 	tmp = ntohl(u64 & 0xffffffff);
+diff --git a/tools/parser/ppp.c b/tools/parser/ppp.c
+index 947ca56..256e172 100644
+--- a/tools/parser/ppp.c
++++ b/tools/parser/ppp.c
+@@ -103,7 +103,7 @@ static void hdlc_dump(int level, struct frame *frm)
+ 	uint8_t ctrl = get_u8(frm);
+ 	uint16_t fcs, proto;
+ 
+-	fcs = bt_get_unaligned((uint16_t *) (frm->ptr + frm->len - 2));
++	fcs = get_unaligned((uint16_t *) (frm->ptr + frm->len - 2));
+ 	frm->len -= 2;
+ 
+ 	p_indent(level, frm);
+-- 
+1.8.3.1
 
-Applied. Thanks.
-
-Johan
