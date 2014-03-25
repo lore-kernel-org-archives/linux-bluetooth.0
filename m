@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: Store also RSSI for pending advertising reports
-Date: Tue, 25 Mar 2014 14:40:52 +0200
-Message-Id: <1395751252-17196-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1395750900-10755-3-git-send-email-johan.hedberg@gmail.com>
-References: <1395750900-10755-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Store also RSSI for pending advertising reports
+Date: Tue, 25 Mar 2014 14:35:00 +0200
+Message-Id: <1395750900-10755-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1395750900-10755-1-git-send-email-johan.hedberg@gmail.com>
+References: <1395750900-10755-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -24,26 +24,24 @@ out the stored information to user space.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Use consistent last_adv prefix for the rssi variable
-
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 12 +++++++-----
- 2 files changed, 8 insertions(+), 5 deletions(-)
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_event.c        | 9 +++++----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0ba7617ceb27..c2a419c2c5c7 100644
+index 0ba7617ceb27..f5d665ff6111 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
 @@ -70,6 +70,7 @@ struct discovery_state {
  	__u32			timestamp;
  	bdaddr_t		last_adv_addr;
  	u8			last_adv_addr_type;
-+	s8			last_adv_rssi;
++	s8			rssi;
  	u8			last_adv_data[HCI_MAX_AD_LENGTH];
  	u8			last_adv_data_len;
  };
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1b2221d62007..aa6ff738eb2e 100644
+index 1b2221d62007..3ba783576879 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
 @@ -1049,12 +1049,13 @@ static void clear_pending_adv_report(struct hci_dev *hdev)
@@ -57,7 +55,7 @@ index 1b2221d62007..aa6ff738eb2e 100644
  
  	bacpy(&d->last_adv_addr, bdaddr);
  	d->last_adv_addr_type = bdaddr_type;
-+	d->last_adv_rssi = rssi;
++	d->rssi = rssi;
  	memcpy(d->last_adv_data, data, len);
  	d->last_adv_data_len = len;
  }
@@ -70,19 +68,16 @@ index 1b2221d62007..aa6ff738eb2e 100644
  			return;
  		}
  
-@@ -4061,8 +4062,9 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+@@ -4061,7 +4062,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
  		/* Send out whatever is in the cache, but skip duplicates */
  		if (!match)
  			mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
 -					  d->last_adv_addr_type, NULL, 0,
--					  0, 1, d->last_adv_data,
-+					  d->last_adv_addr_type, NULL,
-+					  d->last_adv_rssi, 0, 1,
-+					  d->last_adv_data,
++					  d->last_adv_addr_type, NULL, d->rssi,
+ 					  0, 1, d->last_adv_data,
  					  d->last_adv_data_len, NULL, 0);
  
- 		/* If the new report will trigger a SCAN_REQ store it for
-@@ -4070,7 +4072,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+@@ -4070,7 +4071,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
  		 */
  		if (type == LE_ADV_IND || type == LE_ADV_SCAN_IND) {
  			store_pending_adv_report(hdev, bdaddr, bdaddr_type,
