@@ -1,76 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Keep client notify functions names consistent
-Date: Tue, 25 Mar 2014 11:36:03 +0100
-Message-ID: <3482441.ZXxZf3j0fm@leonov>
-In-Reply-To: <1395671244-2053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1395671244-2053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Fix line splitting of mgmt_device_found parameters
+Date: Tue, 25 Mar 2014 12:06:19 +0200
+Message-Id: <1395741979-23319-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1395741979-23319-1-git-send-email-johan.hedberg@gmail.com>
+References: <1395741979-23319-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Monday 24 of March 2014 15:27:23 Grzegorz Kolodziejczyk wrote:
-> We should use consistent names for client notify functions.
-> ---
->  android/gatt.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 2189e8e..302a9b9 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -292,7 +292,7 @@ static void connection_cleanup(struct gatt_device
-> *device) }
->  }
-> 
-> -static void send_disconnect_notify(int32_t id, struct gatt_device *dev,
-> +static void send_client_disconnect_notify(int32_t id, struct gatt_device
-> *dev, uint8_t status)
->  {
->  	struct hal_ev_gatt_client_disconnect ev;
-> @@ -306,12 +306,12 @@ static void send_disconnect_notify(int32_t id, struct
-> gatt_device *dev, HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
->  }
-> 
-> -static void disconnect_notify(void *data, void *user_data)
-> +static void client_disconnect_notify(void *data, void *user_data)
->  {
->  	struct gatt_device *dev = user_data;
->  	int32_t id = PTR_TO_INT(data);
-> 
-> -	send_disconnect_notify(id, dev, HAL_STATUS_SUCCESS);
-> +	send_client_disconnect_notify(id, dev, HAL_STATUS_SUCCESS);
->  }
-> 
->  static bool is_device_wating_for_connect(const bdaddr_t *addr,
-> @@ -402,7 +402,7 @@ static gboolean disconnected_cb(GIOChannel *io,
-> GIOCondition cond, done:
->  	connection_cleanup(dev);
-> 
-> -	queue_foreach(dev->clients, disconnect_notify, dev);
-> +	queue_foreach(dev->clients, client_disconnect_notify, dev);
->  	destroy_device(dev);
-> 
->  	return FALSE;
-> @@ -802,7 +802,7 @@ reply:
->  	 * If this is last client, this is still OK to do because on connect
->  	 * request we do le scan and wait until remote device start
->  	 * advertisement */
-> -	send_disconnect_notify(cmd->client_if, dev, HAL_STATUS_SUCCESS);
-> +	send_client_disconnect_notify(cmd->client_if, dev, HAL_STATUS_SUCCESS);
-> 
->  	/* If there is more clients just return */
->  	if (!queue_isempty(dev->clients))
+The line was incorrectly split between the variable type and its name.
+This patch fixes the issue.
 
-Patch 1 is now applied, thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 4 ++--
+ net/bluetooth/mgmt.c             | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Patch 2 needs fixing as discussed offline.
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 59b112397d39..0ba7617ceb27 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1268,8 +1268,8 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ 				       u8 *randomizer192, u8 *hash256,
+ 				       u8 *randomizer256, u8 status);
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name, u8
+-		       ssp, u8 *eir, u16 eir_len, u8 *scan_rsp,
++		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name,
++		       u8 ssp, u8 *eir, u16 eir_len, u8 *scan_rsp,
+ 		       u8 scan_rsp_len);
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a0ef5c076880..37706e89af50 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5668,8 +5668,8 @@ void mgmt_read_local_oob_data_complete(struct hci_dev *hdev, u8 *hash192,
+ }
+ 
+ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+-		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name, u8
+-		       ssp, u8 *eir, u16 eir_len, u8 *scan_rsp,
++		       u8 addr_type, u8 *dev_class, s8 rssi, u8 cfm_name,
++		       u8 ssp, u8 *eir, u16 eir_len, u8 *scan_rsp,
+ 		       u8 scan_rsp_len)
+ {
+ 	char buf[512];
 -- 
-BR
-Szymon Janc
+1.8.5.3
+
