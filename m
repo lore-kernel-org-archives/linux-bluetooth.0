@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Store also RSSI for pending advertising reports
-Date: Tue, 25 Mar 2014 14:35:00 +0200
-Message-Id: <1395750900-10755-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Don't send device found events for duplicate reports
+Date: Tue, 25 Mar 2014 14:34:59 +0200
+Message-Id: <1395750900-10755-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1395750900-10755-1-git-send-email-johan.hedberg@gmail.com>
 References: <1395750900-10755-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,81 +11,57 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Especially in crowded environments it can become frequent that we have
-to send out whatever pending event there is stored. Since user space
-has its own filtering of small RSSI changes sending a 0 value will
-essentially force user space to wake up the higher layers (e.g. over
-D-Bus) even though the RSSI didn't actually change more than the
-threshold value.
-
-This patch adds storing also of the RSSI for pending advertising reports
-so that we report an as accurate RSSI as possible when we have to send
-out the stored information to user space.
+Occasionally, during active scanning we will receive duplicate ADV_IND
+reports from the same device before receiving the SCAN_RSP from them. In
+order to not wake up user space unnecessarily it's better not to send
+these extra events as they do not contain any new information.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_event.c        | 9 +++++----
- 2 files changed, 6 insertions(+), 4 deletions(-)
+ net/bluetooth/hci_event.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0ba7617ceb27..f5d665ff6111 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -70,6 +70,7 @@ struct discovery_state {
- 	__u32			timestamp;
- 	bdaddr_t		last_adv_addr;
- 	u8			last_adv_addr_type;
-+	s8			rssi;
- 	u8			last_adv_data[HCI_MAX_AD_LENGTH];
- 	u8			last_adv_data_len;
- };
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 1b2221d62007..3ba783576879 100644
+index 5816a13c5342..1b2221d62007 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1049,12 +1049,13 @@ static void clear_pending_adv_report(struct hci_dev *hdev)
- }
- 
- static void store_pending_adv_report(struct hci_dev *hdev, bdaddr_t *bdaddr,
--				     u8 bdaddr_type, u8 *data, u8 len)
-+				     s8 rssi, u8 bdaddr_type, u8 *data, u8 len)
+@@ -4021,6 +4021,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
  {
  	struct discovery_state *d = &hdev->discovery;
++	bool match;
  
- 	bacpy(&d->last_adv_addr, bdaddr);
- 	d->last_adv_addr_type = bdaddr_type;
-+	d->rssi = rssi;
- 	memcpy(d->last_adv_data, data, len);
- 	d->last_adv_data_len = len;
- }
-@@ -4040,7 +4041,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 		 */
- 		if (type == LE_ADV_IND || type == LE_ADV_SCAN_IND) {
- 			store_pending_adv_report(hdev, bdaddr, bdaddr_type,
--						 data, len);
-+						 rssi, data, len);
- 			return;
- 		}
+ 	/* Passive scanning shouldn't trigger any device found events */
+ 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
+@@ -4048,17 +4049,21 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 		return;
+ 	}
  
-@@ -4061,7 +4062,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 		/* Send out whatever is in the cache, but skip duplicates */
- 		if (!match)
- 			mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
--					  d->last_adv_addr_type, NULL, 0,
-+					  d->last_adv_addr_type, NULL, d->rssi,
- 					  0, 1, d->last_adv_data,
- 					  d->last_adv_data_len, NULL, 0);
++	/* Check if the pending report is for the same device as the new one */
++	match = (!bacmp(bdaddr, &d->last_adv_addr) &&
++		 bdaddr_type == d->last_adv_addr_type);
++
+ 	/* If the pending data doesn't match this report or this isn't a
+ 	 * scan response (e.g. we got a duplicate ADV_IND) then force
+ 	 * sending of the pending data.
+ 	 */
+-	if (type != LE_ADV_SCAN_RSP || bacmp(bdaddr, &d->last_adv_addr) ||
+-	    bdaddr_type != d->last_adv_addr_type) {
+-		/* Send out whatever is in the cache */
+-		mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
+-				  d->last_adv_addr_type, NULL, 0, 0, 1,
+-				  d->last_adv_data, d->last_adv_data_len,
+-				  NULL, 0);
++	if (type != LE_ADV_SCAN_RSP || !match) {
++		/* Send out whatever is in the cache, but skip duplicates */
++		if (!match)
++			mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
++					  d->last_adv_addr_type, NULL, 0,
++					  0, 1, d->last_adv_data,
++					  d->last_adv_data_len, NULL, 0);
  
-@@ -4070,7 +4071,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 		 */
- 		if (type == LE_ADV_IND || type == LE_ADV_SCAN_IND) {
- 			store_pending_adv_report(hdev, bdaddr, bdaddr_type,
--						 data, len);
-+						 rssi, data, len);
- 			return;
- 		}
- 
+ 		/* If the new report will trigger a SCAN_REQ store it for
+ 		 * later merging.
 -- 
 1.8.5.3
 
