@@ -1,42 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] Bluetooth: Don't send device found events during passive scanning
-Date: Tue, 25 Mar 2014 10:30:46 +0200
-Message-Id: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Surendra Patil <surendra.tux@gmail.com>
+To: marcel@holtmann.org,
+	gustavo@padovan.org,
+	johan.hedberg@gmail.com
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	surendra.tux@gmail.com
+Subject: [PATCH] drivers:bluetooth:ath3k.c: Fixed sparse warning for cast to restricted __le32
+Date: Tue, 25 Mar 2014 01:25:50 -0700
+Message-Id: <1395735950-17968-1-git-send-email-surendra.tux@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+This patch fixes below Sparse warnings -
+drivers/bluetooth/ath3k.c:370:17: warning: cast to restricted __le32
+drivers/bluetooth/ath3k.c:432:17: warning: cast to restricted __le32
 
-Passive LE scanning is only used by the kernel-internal connection
-establishment procedure. It makes therefore little sense to send device
-found events to user space.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Surendra Patil <surendra.tux@gmail.com>
 ---
- net/bluetooth/hci_event.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/bluetooth/ath3k.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0c393fbae6e9..2388f2c09887 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3964,8 +3964,12 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
- static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
- {
--	if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
--		check_pending_le_conn(hdev, bdaddr, bdaddr_type);
-+	/* Passive scanning shouldn't trigger any device found events */
-+	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
-+		if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
-+			check_pending_le_conn(hdev, bdaddr, bdaddr_type);
-+		return;
-+	}
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index be571fe..badacbc 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -367,7 +367,7 @@ static int ath3k_load_patch(struct usb_device *udev)
+ 	}
  
- 	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
- 			  data, len);
+ 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/AthrBT_0x%08x.dfu",
+-		le32_to_cpu(fw_version.rom_version));
++		fw_version.rom_version);
+ 
+ 	ret = request_firmware(&firmware, filename, &udev->dev);
+ 	if (ret < 0) {
+@@ -429,7 +429,7 @@ static int ath3k_load_syscfg(struct usb_device *udev)
+ 	}
+ 
+ 	snprintf(filename, ATH3K_NAME_LEN, "ar3k/ramps_0x%08x_%d%s",
+-		le32_to_cpu(fw_version.rom_version), clk_value, ".dfu");
++		 fw_version.rom_version, clk_value, ".dfu");
+ 
+ 	ret = request_firmware(&firmware, filename, &udev->dev);
+ 	if (ret < 0) {
 -- 
-1.8.5.3
-
+1.8.3.2
