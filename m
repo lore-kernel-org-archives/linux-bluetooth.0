@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Add directed advertising support through connect()
-Date: Tue, 25 Mar 2014 10:30:49 +0200
-Message-Id: <1395736249-11450-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/4] Bluetooth: Merge ADV_IND/ADV_SCAN_IND and SCAN_RSP together
+Date: Tue, 25 Mar 2014 10:30:48 +0200
+Message-Id: <1395736249-11450-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com>
 References: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,202 +11,182 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When we're in peripheral mode (HCI_ADVERTISING flag is set) the most
-natural mapping of connect() is to perform directed advertising to the
-peer device.
+To avoid too many events being sent to user space and to help parsing of
+all available remote device data it makes sense for us to wait for the
+scan response and send a single merged Device Found event to user space.
 
-This patch does the necessary changes to enable directed advertising and
-keeps the hci_conn state as BT_CONNECT in a similar way as is done for
-central or BR/EDR connection initiation.
+This patch adds a few new variables to hci_dev to track the last
+received ADV_IND/ADV_SCAN_IND, i.e. those which will cause a SCAN_REQ to
+be send in the case of active scanning. When the SCAN_RSP is received
+the pending data is passed together with the SCAN_RSP to the
+mgmt_device_found function which takes care of merging them into a
+single Device Found event.
+
+We also need a bit of extra logic to handle situations where we don't
+receive a SCAN_RSP after caching some data. In such a scenario we simply
+have to send out the pending data as it is and then operate on the new
+report as if there was no pending data.
+
+We also need to send out any pending data when scanning stops as
+well as ensure that the storage is empty at the start of a new active
+scanning session. These both cases are covered by the update to the
+hci_cc_le_set_scan_enable function in this patch.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_conn.c    | 77 ++++++++++++++++++++++++++++++++++++++++-----
- net/bluetooth/hci_event.c   | 19 +++++++++--
- 3 files changed, 87 insertions(+), 10 deletions(-)
+ include/net/bluetooth/hci_core.h |  4 ++
+ net/bluetooth/hci_event.c        | 99 +++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 101 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index be150cf8cd43..4261a67682c0 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -367,6 +367,7 @@ enum {
- #define HCI_ERROR_REMOTE_POWER_OFF	0x15
- #define HCI_ERROR_LOCAL_HOST_TERM	0x16
- #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
-+#define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a1b8eab8a47d..59b112397d39 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -68,6 +68,10 @@ struct discovery_state {
+ 	struct list_head	unknown;	/* Name state not known */
+ 	struct list_head	resolve;	/* Name needs to be resolved */
+ 	__u32			timestamp;
++	bdaddr_t		last_adv_addr;
++	u8			last_adv_addr_type;
++	u8			last_adv_data[HCI_MAX_AD_LENGTH];
++	u8			last_adv_data_len;
+ };
  
- /* Flow control modes */
- #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 129c22a85ccf..55a174317925 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -367,9 +367,23 @@ static void le_conn_timeout(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn,
- 					     le_conn_timeout.work);
-+	struct hci_dev *hdev = conn->hdev;
- 
- 	BT_DBG("");
- 
-+	/* We could end up here due to having done directed advertising,
-+	 * so clean up the state if necessary. This should however only
-+	 * happen with broken hardware or if low duty cycle was used
-+	 * (which doesn't have a timeout of its own).
-+	 */
-+	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
-+		u8 enable = 0x00;
-+		hci_send_cmd(hdev, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
-+			     &enable);
-+		hci_le_conn_failed(conn, HCI_ERROR_ADVERTISING_TIMEOUT);
-+		return;
-+	}
-+
- 	hci_le_create_connection_cancel(conn);
- }
- 
-@@ -549,6 +563,11 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 	 * favor of connection establishment, we should restart it.
- 	 */
- 	hci_update_background_scan(hdev);
-+
-+	/* Re-enable advertising in case this was a failed connection
-+	 * attempt as a peripheral.
-+	 */
-+	mgmt_reenable_advertising(hdev);
- }
- 
- static void create_le_conn_complete(struct hci_dev *hdev, u8 status)
-@@ -609,6 +628,45 @@ static void hci_req_add_le_create_conn(struct hci_request *req,
- 	conn->state = BT_CONNECT;
- }
- 
-+static void hci_req_directed_advertising(struct hci_request *req,
-+					 struct hci_conn *conn)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_cp_le_set_adv_param cp;
-+	u8 own_addr_type;
-+	u8 enable;
-+
-+	enable = 0x00;
-+	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
-+
-+	/* Clear the HCI_ADVERTISING bit temporarily so that the
-+	 * hci_update_random_address knows that it's safe to go ahead
-+	 * and write a new random address. The flag will be set back on
-+	 * as soon as the SET_ADV_ENABLE HCI command completes.
-+	 */
-+	clear_bit(HCI_ADVERTISING, &hdev->dev_flags);
-+
-+	/* Set require_privacy to false so that the remote device has a
-+	 * chance of identifying us.
-+	 */
-+	if (hci_update_random_address(req, false, &own_addr_type) < 0)
-+		return;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	cp.type = LE_ADV_DIRECT_IND;
-+	cp.own_address_type = own_addr_type;
-+	cp.direct_addr_type = conn->dst_type;
-+	bacpy(&cp.direct_addr, &conn->dst);
-+	cp.channel_map = hdev->le_adv_channel_map;
-+
-+	hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
-+
-+	enable = 0x01;
-+	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
-+
-+	conn->state = BT_CONNECT;
-+}
-+
- struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 				u8 dst_type, u8 sec_level, u8 auth_type)
- {
-@@ -618,9 +676,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	struct hci_request req;
- 	int err;
- 
--	if (test_bit(HCI_ADVERTISING, &hdev->flags))
--		return ERR_PTR(-ENOTSUPP);
--
- 	/* Some devices send ATT messages as soon as the physical link is
- 	 * established. To be able to handle these ATT messages, the user-
- 	 * space first establishes the connection and then starts the pairing
-@@ -668,13 +723,20 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		return ERR_PTR(-ENOMEM);
- 
- 	conn->dst_type = dst_type;
--
--	conn->out = true;
--	conn->link_mode |= HCI_LM_MASTER;
- 	conn->sec_level = BT_SECURITY_LOW;
- 	conn->pending_sec_level = sec_level;
- 	conn->auth_type = auth_type;
- 
-+	hci_req_init(&req, hdev);
-+
-+	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
-+		hci_req_directed_advertising(&req, conn);
-+		goto create_conn;
-+	}
-+
-+	conn->out = true;
-+	conn->link_mode |= HCI_LM_MASTER;
-+
- 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
- 	if (params) {
- 		conn->le_conn_min_interval = params->conn_min_interval;
-@@ -684,8 +746,6 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
- 	}
- 
--	hci_req_init(&req, hdev);
--
- 	/* If controller is scanning, we stop it since some controllers are
- 	 * not able to scan and connect at the same time. Also set the
- 	 * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
-@@ -699,6 +759,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	hci_req_add_le_create_conn(&req, conn);
- 
-+create_conn:
- 	err = hci_req_run(&req, create_le_conn_complete);
- 	if (err) {
- 		hci_conn_del(conn);
+ struct hci_conn_hash {
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b9f0b20c9a51..0181f368de42 100644
+index 4a2c919d5908..b9f0b20c9a51 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -991,10 +991,25 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (!sent)
- 		return;
- 
-+	if (status)
-+		return;
-+
- 	hci_dev_lock(hdev);
- 
--	if (!status)
--		mgmt_advertising(hdev, *sent);
-+	/* If we're doing connection initation as peripheral. Set a
-+	 * timeout in case something goes wrong.
-+	 */
-+	if (*sent) {
-+		struct hci_conn *conn;
-+
-+		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
-+		if (conn)
-+			queue_delayed_work(hdev->workqueue,
-+					   &conn->le_conn_timeout,
-+					   HCI_LE_CONN_TIMEOUT);
-+	}
-+
-+	mgmt_advertising(hdev, *sent);
- 
+@@ -1018,6 +1018,32 @@ static void hci_cc_le_set_scan_param(struct hci_dev *hdev, struct sk_buff *skb)
  	hci_dev_unlock(hdev);
  }
+ 
++static bool has_pending_adv_report(struct hci_dev *hdev)
++{
++	struct discovery_state *d = &hdev->discovery;
++
++	return bacmp(&d->last_adv_addr, BDADDR_ANY);
++}
++
++static void clear_pending_adv_report(struct hci_dev *hdev)
++{
++	struct discovery_state *d = &hdev->discovery;
++
++	bacpy(&d->last_adv_addr, BDADDR_ANY);
++	d->last_adv_data_len = 0;
++}
++
++static void store_pending_adv_report(struct hci_dev *hdev, bdaddr_t *bdaddr,
++				     u8 bdaddr_type, u8 *data, u8 len)
++{
++	struct discovery_state *d = &hdev->discovery;
++
++	bacpy(&d->last_adv_addr, bdaddr);
++	d->last_adv_addr_type = bdaddr_type;
++	memcpy(d->last_adv_data, data, len);
++	d->last_adv_data_len = len;
++}
++
+ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 				      struct sk_buff *skb)
+ {
+@@ -1036,9 +1062,25 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 	switch (cp->enable) {
+ 	case LE_SCAN_ENABLE:
+ 		set_bit(HCI_LE_SCAN, &hdev->dev_flags);
++		if (hdev->le_scan_type == LE_SCAN_ACTIVE)
++			clear_pending_adv_report(hdev);
+ 		break;
+ 
+ 	case LE_SCAN_DISABLE:
++		/* We do this here instead of when setting DISCOVERY_STOPPED
++		 * since the latter would potentially require waiting for
++		 * inquiry to stop too.
++		 */
++		if (has_pending_adv_report(hdev)) {
++			struct discovery_state *d = &hdev->discovery;
++
++			mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
++						  d->last_adv_addr_type, NULL,
++						  0, 0, 1, d->last_adv_data,
++						  d->last_adv_data_len,
++						  NULL, 0);
++		}
++
+ 		/* Cancel this timer so that we don't try to disable scanning
+ 		 * when it's already disabled.
+ 		 */
+@@ -3964,6 +4006,8 @@ static void check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
+ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
+ {
++	struct discovery_state *d = &hdev->discovery;
++
+ 	/* Passive scanning shouldn't trigger any device found events */
+ 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
+ 		if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
+@@ -3971,8 +4015,59 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 		return;
+ 	}
+ 
+-	mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL, rssi, 0, 1,
+-			  data, len, NULL, 0);
++	/* If there's nothing pending either store the data from this
++	 * event or send an immediate device found event if the data
++	 * should not be stored for later.
++	 */
++	if (!has_pending_adv_report(hdev)) {
++		if (type == LE_ADV_IND || type == LE_ADV_SCAN_IND) {
++			store_pending_adv_report(hdev, bdaddr, bdaddr_type,
++						 data, len);
++			return;
++		}
++
++		mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL,
++				  rssi, 0, 1, data, len, NULL, 0);
++		return;
++	}
++
++	/* If the pending data doesn't match this report or this isn't a
++	 * scan response (e.g. we got a duplicate ADV_IND) then force
++	 * sending of the pending data.
++	 */
++	if (type != LE_ADV_SCAN_RSP || bacmp(bdaddr, &d->last_adv_addr) ||
++	    bdaddr_type != d->last_adv_addr_type) {
++		/* Send out whatever is in the cache */
++		mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
++				  d->last_adv_addr_type, NULL, 0, 0, 1,
++				  d->last_adv_data, d->last_adv_data_len,
++				  NULL, 0);
++
++		/* If the new event should be cached store it there */
++		if (type == LE_ADV_IND || type == LE_ADV_SCAN_IND) {
++			store_pending_adv_report(hdev, bdaddr, bdaddr_type,
++						 data, len);
++			return;
++		}
++
++		/* The event can't be cached so clear the cache and send
++		 * an immediate event based on this report.
++		 */
++		clear_pending_adv_report(hdev);
++		mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
++				  d->last_adv_addr_type, NULL, rssi, 0, 1,
++				  data, len, NULL, 0);
++		return;
++	}
++
++	/* If we get here we've got a pending ADV_IND or ADV_SCAN_IND and
++	 * the new event is a SCAN_RSP. We can therefore proceed with
++	 * sending a merged device found event.
++	 */
++	mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
++			  d->last_adv_addr_type, NULL, rssi, 0, 1, data, len,
++			  d->last_adv_data, d->last_adv_data_len);
++	clear_pending_adv_report(hdev);
+ }
+ 
+ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
 -- 
 1.8.5.3
 
