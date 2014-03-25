@@ -2,82 +2,38 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [RFC 1/3] android/hal-ipc-api: Add extra command to Health HAL api document
-Date: Tue, 25 Mar 2014 16:34:39 +0200
-Message-Id: <1395758081-22005-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1395758081-22005-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1395758081-22005-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [RFC 0/3] Add HDP .register_application method
+Date: Tue, 25 Mar 2014 16:34:38 +0200
+Message-Id: <1395758081-22005-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Defined extra command for MDEP data which is required for Register
-Application command. Also updated Opcode for rest of the commands.
----
- android/hal-ipc-api.txt | 34 +++++++++++++++++++++-------------
- 1 file changed, 21 insertions(+), 13 deletions(-)
+Due to limited IPC_MTU and variable length of
+fields from 'bthl_reg_param_t *', it is difficult to put them
+in single command and send though IPC. So we split this command
+to multiple calls. First command will be called with opcode of
+HAL_OP_HEALTH_REG_APP with 'struct hal_cmd_health_reg_app' data.
+Later command will be called with opcode of
+HAL_OP_HEALTH_MDEP with 'struct hal_cmd_health_mdep' data for
+number_of_mdeps times. Daemon (android/health) side it will
+process after it received all data and response will be sent
+along with last call of HAL_OP_HEALTH_MDEP.
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 5613e85..08b035d 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1125,28 +1125,36 @@ Commands and responses:
- 
- 	Opcode 0x01 - Register Application command/response
- 
--		Command parameters: Application name (string)
--		                    Provider name (string)
--		                    Service name (string)
--		                    Service description (string)
--		                    Number of MDEP (1 octet)
--		                    MDEP Role # (1 octet)
--		                    Data type # (1 octet)
--		                    Channel type # (1 octet)
--		                    MDEP description # (string)
--		                    ...
-+		Command parameters: Number of MDEP (1 octet)
-+		                    Application name offset (2 octets)
-+		                    Provider name offset (2 octets)
-+		                    Service name offset (2 octets)
-+		                    Service description offset (2 octets)
-+		                    Data length (2 octets)
-+		                    Data (data length)
-+		Response parameters: <none>
-+
-+		In case of an error, the error response will be returned.
-+
-+	Opcode 0x02 - Register Application MDEP data command/response
-+
-+		Command parameters: MDEP Role (1 octet)
-+		                    Data type (1 octet)
-+		                    Channel type (1 octet)
-+		                    MDEP description length (2 octets)
-+		                    MDEP description (MDEP desciption length)
- 		Response parameters: Application ID (2 octets)
- 
- 		In case of an error, the error response will be returned.
- 
--	Opcode 0x02 - Unregister Application command/response
-+	Opcode 0x03 - Unregister Application command/response
- 
- 		Command parameters: Application ID (2 octets)
- 		Response parameters: <none>
- 
- 		In case of an error, the error response will be returned.
- 
--	Opcode 0x03 - Connect Channel command/response
-+	Opcode 0x04 - Connect Channel command/response
- 
- 		Command parameters: Application ID (2 octets)
- 		                    Remote address (6 octets)
-@@ -1155,7 +1163,7 @@ Commands and responses:
- 
- 		In case of an error, the error response will be returned.
- 
--	Opcode 0x04 - Destroy Channel command/response
-+	Opcode 0x05 - Destroy Channel command/response
- 
- 		Command parameters: Channel ID (2 octets)
- 		Response parameters: <none>
+This avoids increasing value of IPC_MTU and mainly because of
+optional parameters in 'bthl_reg_param_t'. Incase of unfilled
+optional parameters, fixed size arrays in hal commands will be
+empty.
+
+Ravi kumar Veeramally (3):
+  android/hal-ipc-api: Add extra command to Health HAL api document
+  android/hal-msg: Add extra struct for mdep data
+  android/hal-health: Add HDP .register_application method
+
+ android/hal-health.c    | 88 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ android/hal-ipc-api.txt | 34 +++++++++++--------
+ android/hal-msg.h       | 37 ++++++++++-----------
+ 3 files changed, 126 insertions(+), 33 deletions(-)
+
 -- 
 1.8.3.2
 
