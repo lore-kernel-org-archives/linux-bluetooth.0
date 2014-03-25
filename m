@@ -1,48 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Surendra Patil <surendra.tux@gmail.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com,
-	joe@perches.com
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	surendra.tux@gmail.com
-Subject: [PATCH] drivers:bluetooth:ath3k.c Fixed sparse warning for cast to restricted __le32
-Date: Tue, 25 Mar 2014 23:36:28 -0700
-Message-Id: <1395815788-24666-1-git-send-email-surendra.tux@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] android/handsfree: Send NO CARRIER if call was end due to carrier loss
+Date: Wed, 26 Mar 2014 00:16:33 +0100
+Message-ID: <2586579.MBIyHeOiKX@leonov>
+In-Reply-To: <1395686912-10919-1-git-send-email-szymon.janc@tieto.com>
+References: <1395686912-10919-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
- To fix the sparse warning "cast to restricted __le32" marked
- "rom_version"  to __le32 instead of unsigned int in "struct ath3k_version"
- and added cpu_to_le32() for the expression assigning int value to "rom_version".
- Successfully built the module without warnings and errors on x86 machine with sparse.
+On Monday 24 of March 2014 19:48:32 Szymon Janc wrote:
+> This was affecting TC_AG_TCA_BV_06_I qualification test case.
+> ---
+> 
+> I have an impression that this should be handled by telephony stack,
+> not BT stack hence sending this as RFC.
+> 
+> 
+>  android/handsfree.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index e1bf563..9b98591 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -2093,6 +2093,13 @@ static void phone_state_idle(int num_active, int
+> num_held) num_held ? (num_active ? 1 : 2) : 0);
+>  		update_indicator(IND_CALL, !!(num_active + num_held));
+>  		update_indicator(IND_CALLSETUP, 0);
+> +
+> +		/* If call was terminated due to carrier lost send NO CARRIER */
+> +		if (num_active == 0 && num_held == 0 &&
+> +				device.inds[IND_SERVICE].val == 0 &&
+> +				(device.num_active > 0 || device.num_held > 0))
+> +				hfp_gw_send_info(device.gw, "NO CARRIER");
+> +
+>  		break;
+>  	default:
+>  		DBG("unhandled state %u", device.setup_state);
 
-Signed-off-by: Surendra Patil <surendra.tux@gmail.com>
----
- drivers/bluetooth/ath3k.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Since PICS were updated to include affected test, this is now upstream.
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index be571fe..5564207 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -50,7 +50,7 @@
- #define ATH3K_NAME_LEN				0xFF
- 
- struct ath3k_version {
--	unsigned int	rom_version;
-+	__le32		rom_version;
- 	unsigned int	build_version;
- 	unsigned int	ram_version;
- 	unsigned char	ref_clock;
-@@ -375,7 +375,7 @@ static int ath3k_load_patch(struct usb_device *udev)
- 		return ret;
- 	}
- 
--	pt_version.rom_version = *(int *)(firmware->data + firmware->size - 8);
-+	pt_version.rom_version = cpu_to_le32(*(int *)(firmware->data + firmware->size - 8));
- 	pt_version.build_version = *(int *)
- 		(firmware->data + firmware->size - 4);
- 
 -- 
-1.8.3.2
+BR
+Szymon Janc
