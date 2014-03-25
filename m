@@ -1,39 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Mar 2014 17:24:57 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v0] gatt: Move Characteristic properties to
- attrib/gatt.h
-Message-ID: <20140325152457.GA22315@t440s.P-661HNU-F1>
-References: <1395758579-28846-1-git-send-email-claudio.takahasi@openbossa.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395758579-28846-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH] android/client: Add AVRCP register_notification_rsp support
+Date: Tue, 25 Mar 2014 17:05:55 +0200
+Message-Id: <1395759955-22900-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Input for this call doesn't require all parameters of structure
+to be filled at the same time. Input data depepnds on event_id
+and type. Implemented this api support based on
+android/hal_avrcp.c:register_notification_rsp.
+---
+ android/client/if-rc.c | 74 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
-On Tue, Mar 25, 2014, Claudio Takahasi wrote:
-> Properties are defined by GATT specification. This patch moves and
-> renames the defines related to Characteristic properties bits from
-> attrib/att.h to attrib/gatt.h
-> ---
->  attrib/att.h                       | 10 ----------
->  attrib/gatt-service.c              | 12 ++++++------
->  attrib/gatt.h                      | 18 ++++++++++++++++++
->  plugins/gatt-example.c             | 20 ++++++++++----------
->  profiles/alert/server.c            | 20 ++++++++++----------
->  profiles/input/hog.c               |  4 ++--
->  profiles/proximity/immalert.c      |  2 +-
->  profiles/proximity/linkloss.c      |  2 +-
->  profiles/proximity/reporter.c      |  2 +-
->  profiles/thermometer/thermometer.c |  4 ++--
->  profiles/time/server.c             | 10 +++++-----
->  src/attrib-server.c                |  4 ++--
->  12 files changed, 58 insertions(+), 50 deletions(-)
+diff --git a/android/client/if-rc.c b/android/client/if-rc.c
+index 31efc29..2bd7f6d 100644
+--- a/android/client/if-rc.c
++++ b/android/client/if-rc.c
+@@ -54,6 +54,20 @@ SINTMAP(btrc_status_t, -1, "(unknown)")
+ 	DELEMENT(BTRC_STS_NO_ERROR),
+ ENDMAP
+ 
++SINTMAP(btrc_event_id_t, -1, "(unknown)")
++	DELEMENT(BTRC_EVT_PLAY_STATUS_CHANGED),
++	DELEMENT(BTRC_EVT_TRACK_CHANGE),
++	DELEMENT(BTRC_EVT_TRACK_REACHED_END),
++	DELEMENT(BTRC_EVT_TRACK_REACHED_START),
++	DELEMENT(BTRC_EVT_PLAY_POS_CHANGED),
++	DELEMENT(BTRC_EVT_APP_SETTINGS_CHANGED),
++ENDMAP
++
++SINTMAP(btrc_notification_type_t, -1, "(unknown)")
++	DELEMENT(BTRC_NOTIFICATION_TYPE_INTERIM),
++	DELEMENT(BTRC_NOTIFICATION_TYPE_CHANGED),
++ENDMAP
++
+ static char last_addr[MAX_ADDR_STR_LEN];
+ 
+ static void remote_features_cb(bt_bdaddr_t *bd_addr,
+@@ -294,6 +308,59 @@ static void set_player_app_value_rsp_p(int argc, const char **argv)
+ 	EXEC(if_rc->set_player_app_value_rsp, rsp_status);
+ }
+ 
++/* register_notification_rsp */
++
++static void register_notification_rsp_c(int argc, const char **argv,
++					enum_func *enum_func, void **user)
++{
++	if (argc == 3) {
++		*user = TYPE_ENUM(btrc_event_id_t);
++		*enum_func = enum_defines;
++	}
++
++	if (argc == 4) {
++		*user = TYPE_ENUM(btrc_notification_type_t);
++		*enum_func = enum_defines;
++	}
++}
++
++static void register_notification_rsp_p(int argc, const char **argv)
++{
++	btrc_event_id_t event_id;
++	btrc_notification_type_t type;
++	btrc_register_notification_t reg;
++
++	RETURN_IF_NULL(if_rc);
++
++	memset(&reg, 0, sizeof(reg));
++	event_id = str2btrc_event_id_t(argv[2]);
++	type = str2btrc_notification_type_t(argv[3]);
++
++	switch (event_id) {
++	case BTRC_EVT_PLAY_STATUS_CHANGED:
++		reg.play_status = str2btrc_play_status_t(argv[4]);
++		break;
++
++	case BTRC_EVT_TRACK_CHANGE:
++		reg.track[0] = strtoull(argv[5], NULL, 10);
++		break;
++
++	case BTRC_EVT_TRACK_REACHED_END:
++	case BTRC_EVT_TRACK_REACHED_START:
++		break;
++
++	case BTRC_EVT_PLAY_POS_CHANGED:
++		reg.song_pos = (uint8_t) atoi(argv[4]);
++		break;
++
++	case BTRC_EVT_APP_SETTINGS_CHANGED:
++		haltest_error("not supported");
++		return;
++	}
++
++	EXEC(if_rc->register_notification_rsp, event_id, type, &reg);
++}
++
+ /* cleanup */
+ 
+ static void cleanup_p(int argc, const char **argv)
+@@ -311,6 +378,13 @@ static struct method methods[] = {
+ 	STD_METHODCH(get_element_attr_rsp, "<num_attr> <attrs_id> <value>"),
+ 	STD_METHODCH(set_player_app_value_rsp, "<rsp_status>"),
+ 	STD_METHODCH(set_volume, "<volume>"),
++	STD_METHODCH(register_notification_rsp,
++			"<event_id> <type> <respective_data...>\n"
++			"BTRC_EVT_PLAY_STATUS_CHANGED <type> <play_status>\n"
++			"BTRC_EVT_TRACK_CHANGE <type> <track>\n"
++			"BTRC_EVT_TRACK_REACHED_END <type>\n"
++			"BTRC_EVT_TRACK_REACHED_START <type>\n"
++			"BTRC_EVT_PLAY_POS_CHANGED <type> <song_pos>\n"),
+ 	STD_METHOD(cleanup),
+ 	END_METHOD
+ };
+-- 
+1.8.3.2
 
-Applied. Thanks.
-
-Johan
