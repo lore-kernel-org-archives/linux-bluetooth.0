@@ -1,25 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 25 Mar 2014 10:38:37 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
+Message-ID: <1395736353.3010.6.camel@joe-AO722>
+Subject: Re: [PATCH] drivers:bluetooth:ath3k.c: Fixed sparse warning for
+ cast to restricted __le32
+From: Joe Perches <joe@perches.com>
 To: Surendra Patil <surendra.tux@gmail.com>
-Cc: marcel@holtmann.org, gustavo@padovan.org,
+Cc: marcel@holtmann.org, gustavo@padovan.org, johan.hedberg@gmail.com,
 	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] drivers:bluetooth:ath3k.c: Fixed sparse warning for cast
- to restricted __le32
-Message-ID: <20140325083837.GB5490@t440s.lan>
-References: <1395735950-17968-1-git-send-email-surendra.tux@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Date: Tue, 25 Mar 2014 01:32:33 -0700
 In-Reply-To: <1395735950-17968-1-git-send-email-surendra.tux@gmail.com>
+References: <1395735950-17968-1-git-send-email-surendra.tux@gmail.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Tue, Mar 25, 2014, Surendra Patil wrote:
+On Tue, 2014-03-25 at 01:25 -0700, Surendra Patil wrote:
 > This patch fixes below Sparse warnings -
 > drivers/bluetooth/ath3k.c:370:17: warning: cast to restricted __le32
 > drivers/bluetooth/ath3k.c:432:17: warning: cast to restricted __le32
-> 
+
+You are changing output here.
+
+I suspect rom_version should be marked __le32 instead
+of unsigned int in "struct ath3k_version" instead.
+
 > Signed-off-by: Surendra Patil <surendra.tux@gmail.com>
 > ---
 >  drivers/bluetooth/ath3k.c | 4 ++--
@@ -47,11 +50,3 @@ On Tue, Mar 25, 2014, Surendra Patil wrote:
 >  
 >  	ret = request_firmware(&firmware, filename, &udev->dev);
 >  	if (ret < 0) {
-
-Are you sure this doesn't introduce a bug on big endian systems? We just
-recently applied commit b9e2535acad8f52a17e2aa843d45a6b756b59592 which
-adds this le32_to_cpu conversion. Probably the correct fix is to update
-this fw_version struct definition to use __le32 for any member that's
-expected to be in little endian format?
-
-Johan
