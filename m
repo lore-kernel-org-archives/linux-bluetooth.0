@@ -1,33 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 4/4] Bluetooth: Add directed advertising support through connect()
+Subject: Re: [PATCH 2/4] Bluetooth: Add scan_rsp parameter to mgmt_device_found()
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395736249-11450-4-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 25 Mar 2014 01:46:19 -0700
+In-Reply-To: <1395736249-11450-2-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 25 Mar 2014 01:43:25 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <37B501F3-AC38-4AD4-9800-69C580A3EAA4@holtmann.org>
-References: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com> <1395736249-11450-4-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <C506613C-CE89-4532-B78D-E274440F2859@holtmann.org>
+References: <1395736249-11450-1-git-send-email-johan.hedberg@gmail.com> <1395736249-11450-2-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> When we're in peripheral mode (HCI_ADVERTISING flag is set) the most
-> natural mapping of connect() is to perform directed advertising to the
-> peer device.
-> 
-> This patch does the necessary changes to enable directed advertising and
-> keeps the hci_conn state as BT_CONNECT in a similar way as is done for
-> central or BR/EDR connection initiation.
+> In preparation for being able to merge ADV_IND/ADV_SCAN_IND and SCAN_RSP
+> together into a single device found event add a second parameter to the
+> mgmt_device_found function. For now all callers pass NULL as this
+> parameters since we don't yet have storing of the last received
+> advertising report.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> include/net/bluetooth/hci.h |  1 +
-> net/bluetooth/hci_conn.c    | 77 ++++++++++++++++++++++++++++++++++++++++-----
-> net/bluetooth/hci_event.c   | 19 +++++++++--
-> 3 files changed, 87 insertions(+), 10 deletions(-)
+> include/net/bluetooth/hci_core.h |  5 +++--
+> net/bluetooth/hci_event.c        | 10 +++++-----
+> net/bluetooth/mgmt.c             | 16 +++++++++++-----
+> 3 files changed, 19 insertions(+), 12 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
