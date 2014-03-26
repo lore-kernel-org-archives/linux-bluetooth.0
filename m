@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 12/12] android/avrcp-lib: Add support for parsing RegisterNotification response
-Date: Wed, 26 Mar 2014 16:13:52 +0200
-Message-Id: <1395843232-26750-12-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 11/12] android/avrcp-lib: Add support for parsing GetElementAttributes response
+Date: Wed, 26 Mar 2014 16:13:51 +0200
+Message-Id: <1395843232-26750-11-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1395843232-26750-1-git-send-email-luiz.dentz@gmail.com>
 References: <1395843232-26750-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,48 +12,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/avrcp-lib.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++--
- android/avrcp-lib.h |  6 ++--
- android/avrcp.c     | 39 ++++++++++------------
- unit/test-avrcp.c   |  3 +-
- 4 files changed, 114 insertions(+), 28 deletions(-)
+ android/avrcp-lib.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++----
+ android/avrcp-lib.h |   6 ++--
+ unit/test-avrcp.c   |   2 +-
+ 3 files changed, 101 insertions(+), 9 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 33717e0..dc3fb34 100644
+index 3412354..33717e0 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -801,6 +801,7 @@ done:
- 	return FALSE;
+@@ -1265,17 +1265,107 @@ int avrcp_set_volume(struct avrcp *session, uint8_t volume, avctp_rsp_cb func,
+ 						func, user_data);
  }
  
-+
- int avrcp_get_capabilities(struct avrcp *session, uint8_t param)
+-int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
+-								void *user_data)
++static int parse_attribute_list(struct avrcp_header *pdu, uint8_t *number,
++						uint32_t *attrs, char **text)
  {
- 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
-@@ -808,10 +809,97 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param)
- 				get_capabilities_rsp, session);
- }
- 
--int avrcp_register_notification(struct avrcp *session, uint8_t event,
--					uint32_t interval, avctp_rsp_cb func,
-+static gboolean register_notification_rsp(struct avctp *conn,
+-	uint8_t buf[9];
++	uint8_t *ptr;
++	uint16_t params_len;
++	int i;
++
++	if (pdu->params_len < 1)
++		return -EPROTO;
++
++	*number = pdu->params[0];
++	if (*number > AVRCP_MEDIA_ATTRIBUTE_LAST) {
++		*number = 0;
++		return -EPROTO;
++	}
++
++	params_len = pdu->params_len - 1;
++	for (i = 0, ptr = &pdu->params[1]; i < *number && params_len > 0; i++) {
++		uint16_t len;
++
++		if (params_len < 8)
++			goto fail;
++
++		attrs[i] = bt_get_be32(&ptr[0]);
++		len = bt_get_be16(&ptr[6]);
++
++		params_len -= 8;
++		ptr += 8;
++
++		if (len > params_len)
++			goto fail;
++
++		if (len > 0) {
++			text[i] = g_strndup((const char *) &ptr[8], len);
++			params_len -= len;
++			ptr += len;
++		}
++	}
++
++	if (i != *number)
++		goto fail;
++
++	return 0;
++
++fail:
++	for (i -= 1; i >= 0; i--)
++		g_free(text[i]);
++
++	*number = 0;
++
++	return -EPROTO;
++}
++
++static gboolean get_element_attributes_rsp(struct avctp *conn,
 +					uint8_t code, uint8_t subunit,
 +					uint8_t *operands, size_t operand_count,
- 					void *user_data)
- {
++					void *user_data)
++{
 +	struct avrcp *session = user_data;
 +	struct avrcp_player *player = session->player;
 +	struct avrcp_header *pdu;
-+	uint8_t event = 0;
-+	uint16_t value16;
-+	uint32_t value32;
-+	uint64_t value64;
-+	uint8_t *params = NULL;
++	uint8_t number = 0;
++	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
++	char *text[AVRCP_MEDIA_ATTRIBUTE_LAST];
 +	int err;
 +
 +	DBG("");
 +
-+	if (!player || !player->cfm || !player->cfm->register_notification)
++	if (!player || !player->cfm || !player->cfm->get_element_attributes)
 +		return FALSE;
 +
 +	pdu = parse_pdu(operands, operand_count);
@@ -67,195 +110,68 @@ index 33717e0..dc3fb34 100644
 +		goto done;
 +	}
 +
-+	if (pdu->params_len < 1) {
-+		err = -EPROTO;
-+		goto done;
-+	}
-+
-+	event = pdu->params[0];
-+
-+	switch (event) {
-+	case AVRCP_EVENT_STATUS_CHANGED:
-+	case AVRCP_EVENT_VOLUME_CHANGED:
-+		if (pdu->params_len != 2) {
-+			err = -EPROTO;
-+			goto done;
-+		}
-+		params = &pdu->params[1];
-+		break;
-+	case AVRCP_EVENT_TRACK_CHANGED:
-+		if (pdu->params_len != 9) {
-+			err = -EPROTO;
-+			goto done;
-+		}
-+		value64 = bt_get_be64(&pdu->params[1]);
-+		params = (uint8_t *) &value64;
-+		break;
-+	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
-+		if (pdu->params_len != 5) {
-+			err = -EPROTO;
-+			goto done;
-+		}
-+		value32 = bt_get_be32(&pdu->params[1]);
-+		params = (uint8_t *) &value32;
-+		break;
-+	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
-+	case AVRCP_EVENT_SETTINGS_CHANGED:
-+		if (pdu->params_len < 2) {
-+			err = -EPROTO;
-+			goto done;
-+		}
-+		params = &pdu->params[1];
-+		break;
-+	case AVRCP_EVENT_UIDS_CHANGED:
-+		if (pdu->params_len != 3) {
-+			err = -EPROTO;
-+			goto done;
-+		}
-+		value16 = bt_get_be16(&pdu->params[1]);
-+		params = (uint8_t *) &value16;
-+		break;
-+	}
-+
-+	err = 0;
++	err = parse_attribute_list(pdu, &number, attrs, text);
 +
 +done:
-+	return player->cfm->register_notification(session, err, code, event,
-+						params, player->user_data);
++	player->cfm->get_element_attributes(session, err, number, attrs, text,
++							player->user_data);
++
++	return FALSE;
 +}
 +
-+int avrcp_register_notification(struct avrcp *session, uint8_t event,
-+							uint32_t interval)
++int avrcp_get_element_attributes(struct avrcp *session)
 +{
- 	uint8_t params[5];
++	uint8_t pdu[9];
  
- 	params[0] = event;
-@@ -820,7 +908,7 @@ int avrcp_register_notification(struct avrcp *session, uint8_t event,
- 	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
- 					AVRCP_REGISTER_NOTIFICATION,
- 					params, sizeof(params),
--					func, user_data);
-+					register_notification_rsp, session);
+ 	/* This returns all attributes */
+-	memset(buf, 0, sizeof(buf));
++	memset(pdu, 0, sizeof(pdu));
+ 
+ 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+-				AVRCP_GET_ELEMENT_ATTRIBUTES, buf, sizeof(buf),
+-				func, user_data);
++				AVRCP_GET_ELEMENT_ATTRIBUTES, pdu, sizeof(pdu),
++				get_element_attributes_rsp, session);
  }
  
- static gboolean list_attributes_rsp(struct avctp *conn,
+ int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id,
 diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 2f35e90..0b867aa 100644
+index f5666eb..2f35e90 100644
 --- a/android/avrcp-lib.h
 +++ b/android/avrcp-lib.h
-@@ -191,6 +191,9 @@ struct avrcp_control_cfm {
- 	void (*get_element_attributes) (struct avrcp *session, int err,
- 					uint8_t number, uint32_t *attrs,
- 					char **text, void *user_data);
-+	bool (*register_notification) (struct avrcp *session, int err,
-+					uint8_t code, uint8_t event,
-+					uint8_t *params, void *user_data);
+@@ -188,6 +188,9 @@ struct avrcp_control_cfm {
+ 	void (*get_play_status) (struct avrcp *session, int err,
+ 					uint8_t status, uint32_t position,
+ 					uint32_t duration, void *user_data);
++	void (*get_element_attributes) (struct avrcp *session, int err,
++					uint8_t number, uint32_t *attrs,
++					char **text, void *user_data);
  };
  
  struct avrcp_passthrough_handler {
-@@ -219,8 +222,7 @@ int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
- 					uint8_t *params, size_t params_len);
- int avrcp_get_capabilities(struct avrcp *session, uint8_t param);
- int avrcp_register_notification(struct avrcp *session, uint8_t event,
--					uint32_t interval, avctp_rsp_cb func,
--					void *user_data);
-+							uint32_t interval);
- int avrcp_list_player_attributes(struct avrcp *session);
- int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t number,
- 							uint8_t *attrs);
-diff --git a/android/avrcp.c b/android/avrcp.c
-index 0995a06..add069b 100644
---- a/android/avrcp.c
-+++ b/android/avrcp.c
-@@ -724,39 +724,37 @@ static const struct avrcp_control_ind control_ind = {
- 	.register_notification = handle_register_notification_cmd,
- };
+@@ -231,8 +234,7 @@ int avrcp_get_current_player_value(struct avrcp *session, uint8_t number,
+ int avrcp_get_play_status(struct avrcp *session);
+ int avrcp_set_volume(struct avrcp *session, uint8_t volume, avctp_rsp_cb func,
+ 							void *user_data);
+-int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
+-							void *user_data);
++int avrcp_get_element_attributes(struct avrcp *session);
+ int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id,
+ 					avctp_rsp_cb func, void *user_data);
  
--static gboolean register_notification_rsp(struct avctp *conn,
--					uint8_t code, uint8_t subunit,
--					uint8_t *operands, size_t operand_count,
--					void *user_data)
-+static bool handle_register_notification_rsp(struct avrcp *session, int err,
-+						uint8_t code, uint8_t event,
-+						uint8_t *params,
-+						void *user_data)
- {
- 	struct avrcp_device *dev = user_data;
- 	struct hal_ev_avrcp_volume_changed ev;
--	uint8_t *params;
- 
--	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
--		return FALSE;
--
--	if (operands == NULL || operand_count < 7)
--		return FALSE;
-+	if (err < 0) {
-+		error("AVRCP: %s", strerror(-err));
-+		return false;
-+	}
- 
--	params = &operands[7];
-+	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
-+		return false;
- 
--	if (params == NULL || params[0] != AVRCP_EVENT_VOLUME_CHANGED)
--		return FALSE;
-+	if (event != AVRCP_EVENT_VOLUME_CHANGED)
-+		return false;
- 
- 	ev.type = code;
--	ev.volume = params[1] & 0x7F;
-+	ev.volume = params[0] & 0x7f;
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
- 					HAL_EV_AVRCP_VOLUME_CHANGED,
- 					sizeof(ev), &ev);
- 
- 	if (code == AVC_CTYPE_INTERIM)
--		return TRUE;
-+		return true;
- 
--	avrcp_register_notification(dev->session, params[0], 0,
--					register_notification_rsp, dev);
--	return FALSE;
-+	avrcp_register_notification(dev->session, event, 0);
-+	return false;
- }
- 
- static void handle_get_capabilities_rsp(struct avrcp *session, int err,
-@@ -775,9 +773,7 @@ static void handle_get_capabilities_rsp(struct avrcp *session, int err,
- 		if (events[i] != AVRCP_EVENT_VOLUME_CHANGED)
- 			continue;
- 
--		avrcp_register_notification(dev->session, events[i], 0,
--						register_notification_rsp,
--						dev);
-+		avrcp_register_notification(dev->session, events[i], 0);
- 		break;
- 	}
- 
-@@ -786,6 +782,7 @@ static void handle_get_capabilities_rsp(struct avrcp *session, int err,
- 
- static const struct avrcp_control_cfm control_cfm = {
- 	.get_capabilities = handle_get_capabilities_rsp,
-+	.register_notification = handle_register_notification_rsp,
- };
- 
- static int avrcp_device_add_session(struct avrcp_device *dev, int fd,
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a0b009a..5b259bd 100644
+index ad15bb9..a0b009a 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -524,8 +524,7 @@ static void test_client(gconstpointer data)
+@@ -520,7 +520,7 @@ static void test_client(gconstpointer data)
+ 		avrcp_get_play_status(context->session);
+ 
+ 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
+-		avrcp_get_element_attributes(context->session, NULL, NULL);
++		avrcp_get_element_attributes(context->session);
  
  	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
  		avrcp_register_notification(context->session,
--						AVRCP_EVENT_STATUS_CHANGED, 0,
--						NULL, NULL);
-+						AVRCP_EVENT_STATUS_CHANGED, 0);
- 
- 	if (g_str_equal(context->data->test_name, "/TP/BGN/BV-01-I"))
- 		avrcp_send_passthrough(context->session, IEEEID_BTSIG,
 -- 
 1.8.5.3
 
