@@ -2,80 +2,112 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 5/7] android/gatt: Reduce callback data struct scope
-Date: Wed, 26 Mar 2014 18:00:57 +0100
-Message-Id: <1395853259-15618-5-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 6/7] android/gatt: Fix sendig wrong byte ordered uuids
+Date: Wed, 26 Mar 2014 18:00:58 +0100
+Message-Id: <1395853259-15618-6-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This saves us from redundant data (de)allocation if characteristics are
-already cached.
+We were sending wrong byte ordered uuids since the last gatt library
+changes. Two halpers were introduced for swapping uuids sent to and
+received from HAL.
 ---
- android/gatt.c | 34 +++++++++++++++++++---------------
- 1 file changed, 19 insertions(+), 15 deletions(-)
+ android/gatt.c | 45 ++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 32 insertions(+), 13 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index e97677d..fe8ba74 100644
+index fe8ba74..0b6b5a7 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -1054,7 +1054,6 @@ static bool find_service(int32_t conn_id, struct element_id *service_id,
- static void handle_client_get_characteristic(const void *buf, uint16_t len)
+@@ -96,6 +96,33 @@ static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
+ 
+ static void bt_le_discovery_stop_cb(void);
+ 
++static void android2uuid(const void *buf, bt_uuid_t *dst)
++{
++	uint8_t i;
++	char *uuid = (char *) buf;
++
++	dst->type = BT_UUID128;
++
++	for (i = 0; i < 16; i++)
++		dst->value.u128.data[i] = uuid[15-i];
++
++}
++
++static void uuid2android(const bt_uuid_t *src, void *buf)
++{
++	char *uuid = (char *) buf;
++	bt_uuid_t uu128;
++	uint8_t i;
++
++	if (src->type != BT_UUID128) {
++		bt_uuid_to_uuid128(src, &uu128);
++		src = &uu128;
++	}
++
++	for (i = 0; i < 16; i++)
++		uuid[15-i] = src->value.u128.data[i];
++}
++
+ static void destroy_service(void *data)
  {
- 	const struct hal_cmd_gatt_client_get_characteristic *cmd = buf;
--	struct discover_char_data *cb_data;
- 	struct characteristic *ch;
- 	struct element_id match_id;
- 	struct gatt_device *dev;
-@@ -1076,28 +1075,33 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
- 		goto done;
+ 	struct service *srvc = data;
+@@ -317,7 +344,7 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 			continue;
+ 		}
+ 
+-		memcpy(&ev_res.srvc_id.uuid, &uuid.value, sizeof(uuid.value));
++		uuid2android(&uuid, &ev_res.srvc_id.uuid);
+ 
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
+ 					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
+@@ -929,26 +956,22 @@ static void send_client_char_notify(const struct characteristic *ch,
+ 					uint8_t status)
+ {
+ 	struct hal_ev_gatt_client_get_characteristic ev;
+-	bt_uuid_t uuid;
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.status = status;
+ 
+ 	if (ch) {
+ 		ev.char_prop = ch->ch.properties;
++
+ 		ev.char_id.inst_id = ch->id.instance;
+-		bt_string_to_uuid(&uuid, ch->ch.uuid);
+-		memcpy(&ev.char_id.uuid, &uuid.value.u128.data,
+-						sizeof(ev.char_id.uuid));
++		uuid2android(&ch->id.uuid, &ev.char_id.uuid);
  	}
  
--	cb_data = new0(struct discover_char_data, 1);
--	if (!cb_data) {
--		error("gatt: Cannot allocate call data");
--		status = HAL_STATUS_FAILED;
--		goto done;
--	}
--
--	cb_data->service = srvc;
--	cb_data->conn_id = dev->conn_id;
--
- 	/* Discover all characteristics for services if not cached yet */
- 	if (queue_isempty(srvc->chars)) {
--		gatt_discover_char(dev->attrib, srvc->primary.range.start,
-+		struct discover_char_data *cb_data =
-+					new0(struct discover_char_data, 1);
-+
-+		if (!cb_data) {
-+			error("gatt: Cannot allocate cb data");
-+			status = HAL_STATUS_FAILED;
-+			goto done;
-+		}
-+
-+		cb_data->service = srvc;
-+		cb_data->conn_id = dev->conn_id;
-+
-+		if (!gatt_discover_char(dev->attrib, srvc->primary.range.start,
- 					srvc->primary.range.end, NULL,
--					discover_char_cb, cb_data);
-+					discover_char_cb, cb_data)) {
-+			free(cb_data);
-+
-+			status = HAL_STATUS_FAILED;
-+			goto done;
-+		}
+ 	ev.conn_id = conn_id;
+ 	/* TODO need to be handled for included services too */
+ 	ev.srvc_id.is_primary = 1;
+ 	ev.srvc_id.inst_id = service->id.instance;
+-	bt_string_to_uuid(&uuid, service->primary.uuid);
+-	memcpy(&ev.srvc_id.uuid, &uuid.value.u128.data,
+-					sizeof(ev.srvc_id.uuid));
++	uuid2android(&service->id.uuid, &ev.srvc_id.uuid);
  
- 		status = HAL_STATUS_SUCCESS;
- 		goto done;
- 	}
- 
--	free(cb_data);
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+ 					HAL_EV_GATT_CLIENT_GET_CHARACTERISTIC,
+@@ -1016,12 +1039,8 @@ static void discover_char_cb(uint8_t status, GSList *characteristics,
+ static void hal_srvc_id_to_element_id(const struct hal_gatt_srvc_id *from,
+ 							struct element_id *to)
+ {
+-	uint128_t uuid128;
 -
- 	if (cmd->number)
- 		ch = queue_find(srvc->chars, match_char_by_higher_inst_id,
- 					INT_TO_PTR(cmd->gatt_id[0].inst_id));
+ 	to->instance = from->inst_id;
+-
+-	memcpy(&uuid128.data, &from->uuid, sizeof(uuid128));
+-	bt_uuid128_create(&to->uuid, uuid128);
++	android2uuid(&from->uuid, &to->uuid);
+ }
+ 
+ static bool find_service(int32_t conn_id, struct element_id *service_id,
 -- 
 1.9.0
 
