@@ -1,108 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2] Bluetooth: Add new debugfs parameter
+Subject: Re: [PATCH] drivers:bluetooth:ath3k.c Fixed sparse warning for cast to restricted __le32
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395785961-4321-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 26 Mar 2014 02:01:25 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <530BDEEE-43F2-48E8-9B82-46BA0C9039A2@holtmann.org>
-References: <1395785961-4321-1-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1395815788-24666-1-git-send-email-surendra.tux@gmail.com>
+Date: Wed, 26 Mar 2014 00:21:22 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Joe Perches <joe@perches.com>,
+	bt <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <0154F030-52BE-4935-8150-1A96737E7413@holtmann.org>
+References: <1395815788-24666-1-git-send-email-surendra.tux@gmail.com>
+To: Surendra Patil <surendra.tux@gmail.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Surendra,
 
-> With this patch it is possible to control discovery interleaved
-> timeout value from debugfs. Default value is 5120 ms.
+> To fix the sparse warning "cast to restricted __le32" marked
+> "rom_version"  to __le32 instead of unsigned int in "struct ath3k_version"
+> and added cpu_to_le32() for the expression assigning int value to "rom_version".
+> Successfully built the module without warnings and errors on x86 machine with sparse.
 > 
-> It is for fine tuning of this timeout.
-> 
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+> Signed-off-by: Surendra Patil <surendra.tux@gmail.com>
 > ---
-> include/net/bluetooth/hci_core.h | 2 +-
-> net/bluetooth/hci_core.c         | 6 ++++++
-> net/bluetooth/mgmt.c             | 2 +-
-> 3 files changed, 8 insertions(+), 2 deletions(-)
+> drivers/bluetooth/ath3k.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index c2a419c..abd38a2 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -199,6 +199,7 @@ struct hci_dev {
-> 	__u16		le_scan_window;
-> 	__u16		le_conn_min_interval;
-> 	__u16		le_conn_max_interval;
-> +	__u32		discov_interl_timeout;
-
-are we using interl as abbreviation for interleaved anywhere else?
-
-> 	__u8		ssp_debug_mode;
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index be571fe..5564207 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -50,7 +50,7 @@
+> #define ATH3K_NAME_LEN				0xFF
 > 
-> 	__u16		devid_source;
-> @@ -1210,7 +1211,6 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
-> #define DISCOV_LE_SCAN_WIN		0x12
-> #define DISCOV_LE_SCAN_INT		0x12
-> #define DISCOV_LE_TIMEOUT		msecs_to_jiffies(10240)
-> -#define DISCOV_INTERLEAVED_TIMEOUT	msecs_to_jiffies(5120)
+> struct ath3k_version {
+> -	unsigned int	rom_version;
+> +	__le32		rom_version;
+> 	unsigned int	build_version;
+> 	unsigned int	ram_version;
+> 	unsigned char	ref_clock;
 
-Leave this here.
+so I think this struct should be __packed in the first place and use strictly typed variables.
 
-> #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
-> #define DISCOV_BREDR_INQUIRY_LEN	0x08
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index c6189d9..f51d572 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -61,6 +61,9 @@ static void hci_notify(struct hci_dev *hdev, int event)
-> 
-> /* ---- HCI debugfs entries ---- */
-> 
-> +/* Discovery interleaved timeout */
-> +static u16 discov_timeout_ms = 5120;
+Seems like all fields have an endian issue.
 
-The define is a lot better. Don’t do this extra variable.
-
-> +
-> static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
-> 			     size_t count, loff_t *ppos)
-> {
-> @@ -1823,6 +1826,8 @@ static int __hci_init(struct hci_dev *hdev)
-> 				    &lowpan_debugfs_fops);
-> 		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
-> 				    &le_auto_conn_fops);
-> +		debugfs_create_u16("discov_interleaved_timeout", 0644,
-> +				   hdev->debugfs, &discov_timeout_ms);
-
-I am not sure about the name. I think what this really is Interleaved Discovery Interval. Not sure if that is any better though.
-
+> @@ -375,7 +375,7 @@ static int ath3k_load_patch(struct usb_device *udev)
+> 		return ret;
 > 	}
 > 
-> 	return 0;
-> @@ -3786,6 +3791,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 
-> 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
-> 
-> +	hdev->discov_interl_timeout = msecs_to_jiffies(discov_timeout_ms);
+> -	pt_version.rom_version = *(int *)(firmware->data + firmware->size - 8);
+> +	pt_version.rom_version = cpu_to_le32(*(int *)(firmware->data + firmware->size - 8));
+> 	pt_version.build_version = *(int *)
+> 		(firmware->data + firmware->size - 4);
 
-Using the define here is a lot better than a global variable.
-
-> 	mutex_init(&hdev->lock);
-> 	mutex_init(&hdev->req_lock);
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 37706e8..6229d1f 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3372,7 +3372,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-> 
-> 	case DISCOV_TYPE_INTERLEAVED:
-> 		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
-> -				   DISCOV_INTERLEAVED_TIMEOUT);
-> +				   hdev->discov_interl_timeout);
-> 		break;
+I have no idea what this code is doing since that is just crazy. The variables are unsigned int and are now casted into int and not to mention that it is unaligned access. Has this code every been run on anything other than x86 at all. Does it happen to just work by pure luck.
 
 Regards
 
