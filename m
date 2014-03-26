@@ -2,58 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 7/7] android/gatt: Fix cached services having element_id uuid not set
-Date: Wed, 26 Mar 2014 18:00:59 +0100
-Message-Id: <1395853259-15618-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 5/7] android/gatt: Reduce callback data struct scope
+Date: Wed, 26 Mar 2014 18:00:57 +0100
+Message-Id: <1395853259-15618-5-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes temporary uuid as we already have uuid in services
-element_id, which now is properly filled.
+This saves us from redundant data (de)allocation if characteristics are
+already cached.
 ---
- android/gatt.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ android/gatt.c | 34 +++++++++++++++++++---------------
+ 1 file changed, 19 insertions(+), 15 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 0b6b5a7..d7c7c93 100644
+index e97677d..fe8ba74 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -306,7 +306,6 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 		struct hal_ev_gatt_client_search_result ev_res;
- 		struct gatt_primary *prim = l->data;
- 		struct service *p;
--		bt_uuid_t uuid;
+@@ -1054,7 +1054,6 @@ static bool find_service(int32_t conn_id, struct element_id *service_id,
+ static void handle_client_get_characteristic(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_get_characteristic *cmd = buf;
+-	struct discover_char_data *cb_data;
+ 	struct characteristic *ch;
+ 	struct element_id match_id;
+ 	struct gatt_device *dev;
+@@ -1076,28 +1075,33 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
+ 		goto done;
+ 	}
  
- 		p = new0(struct service, 1);
- 		if (!p) {
-@@ -323,6 +322,11 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 
- 		memset(&ev_res, 0, sizeof(ev_res));
- 
-+		if (bt_string_to_uuid(&p->id.uuid, prim->uuid) < 0) {
-+			error("gatt: Cannot convert string to uuid");
-+			continue;
+-	cb_data = new0(struct discover_char_data, 1);
+-	if (!cb_data) {
+-		error("gatt: Cannot allocate call data");
+-		status = HAL_STATUS_FAILED;
+-		goto done;
+-	}
+-
+-	cb_data->service = srvc;
+-	cb_data->conn_id = dev->conn_id;
+-
+ 	/* Discover all characteristics for services if not cached yet */
+ 	if (queue_isempty(srvc->chars)) {
+-		gatt_discover_char(dev->attrib, srvc->primary.range.start,
++		struct discover_char_data *cb_data =
++					new0(struct discover_char_data, 1);
++
++		if (!cb_data) {
++			error("gatt: Cannot allocate cb data");
++			status = HAL_STATUS_FAILED;
++			goto done;
 +		}
 +
- 		/* Put primary service to our local list */
- 		memcpy(&p->primary, prim, sizeof(p->primary));
- 		if (!queue_push_tail(dev->services, p)) {
-@@ -339,12 +343,7 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 		ev_res.srvc_id.is_primary = 1;
- 		ev_res.srvc_id.inst_id = 0;
++		cb_data->service = srvc;
++		cb_data->conn_id = dev->conn_id;
++
++		if (!gatt_discover_char(dev->attrib, srvc->primary.range.start,
+ 					srvc->primary.range.end, NULL,
+-					discover_char_cb, cb_data);
++					discover_char_cb, cb_data)) {
++			free(cb_data);
++
++			status = HAL_STATUS_FAILED;
++			goto done;
++		}
  
--		if (bt_string_to_uuid(&uuid, prim->uuid) < 0) {
--			error("gatt: Cannot convert string to uuid");
--			continue;
--		}
+ 		status = HAL_STATUS_SUCCESS;
+ 		goto done;
+ 	}
+ 
+-	free(cb_data);
 -
--		uuid2android(&uuid, &ev_res.srvc_id.uuid);
-+		uuid2android(&p->id.uuid, &ev_res.srvc_id.uuid);
- 
- 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
- 					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
+ 	if (cmd->number)
+ 		ch = queue_find(srvc->chars, match_char_by_higher_inst_id,
+ 					INT_TO_PTR(cmd->gatt_id[0].inst_id));
 -- 
 1.9.0
 
