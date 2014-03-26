@@ -1,259 +1,261 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/gatt: Add initial handling of register_for_notification
-Date: Wed, 26 Mar 2014 15:37:17 +0100
-Message-Id: <1395844640-11602-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH BlueZ 12/12] android/avrcp-lib: Add support for parsing RegisterNotification response
+Date: Wed, 26 Mar 2014 16:13:52 +0200
+Message-Id: <1395843232-26750-12-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1395843232-26750-1-git-send-email-luiz.dentz@gmail.com>
+References: <1395843232-26750-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This command will register for both notifications and indications for given
-characteristic and service. Notifications list will be stored in
-client struct.
----
- android/gatt.c | 187 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 185 insertions(+), 2 deletions(-)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 6354ac6..e98de48 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -51,6 +51,7 @@
- struct gatt_client {
- 	int32_t id;
- 	uint8_t uuid[16];
-+	struct queue *notifications;
- };
- 
- struct element_id {
-@@ -86,6 +87,16 @@ struct gatt_device {
- 	guint watch_id;
- };
- 
-+struct notification_data {
-+	struct hal_gatt_srvc_id service;
-+	struct hal_gatt_gatt_id ch;
-+	struct gatt_client *client;
-+	struct gatt_device *dev;
-+	guint notif_id;
-+	guint ind_id;
-+	int ref;
-+};
-+
- static struct ipc *hal_ipc = NULL;
- static bdaddr_t adapter_addr;
- static bool scanning = false;
-@@ -171,6 +182,61 @@ static bool match_char_by_higher_inst_id(const void *data,
- 	return inst_id < ch->id.instance;
+---
+ android/avrcp-lib.c | 94 +++++++++++++++++++++++++++++++++++++++++++++++++++--
+ android/avrcp-lib.h |  6 ++--
+ android/avrcp.c     | 39 ++++++++++------------
+ unit/test-avrcp.c   |  3 +-
+ 4 files changed, 114 insertions(+), 28 deletions(-)
+
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index 33717e0..dc3fb34 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -801,6 +801,7 @@ done:
+ 	return FALSE;
  }
  
-+static bool match_char_by_inst_id(const void *data, const void *user_data)
-+{
-+	const struct characteristic *ch = data;
-+	uint8_t inst_id = PTR_TO_INT(user_data);
 +
-+	return inst_id == ch->id.instance;
-+}
-+
-+static bool match_notification(const void *a, const void *b)
-+{
-+	const struct notification_data *a1 = a;
-+	const struct notification_data *b1 = b;
-+
-+	if (bacmp(&a1->dev->bdaddr, &b1->dev->bdaddr))
-+		return false;
-+	if (memcmp(&a1->ch, &b1->ch, sizeof(a1->ch)))
-+		return false;
-+	if (memcmp(&a1->service, &b1->service, sizeof(a1->service)))
-+		return false;
-+
-+	return true;
-+}
-+
-+static void destroy_notification(void *data)
-+{
-+	struct notification_data *notification = data;
-+
-+	if (--notification->ref)
-+		return;
-+
-+	queue_remove_if(notification->client->notifications, match_notification,
-+								notification);
-+	free(notification);
-+}
-+
-+static void unregister_notification(void *data)
-+{
-+	struct notification_data *notification = data;
-+
-+	g_attrib_unregister(notification->dev->attrib, notification->notif_id);
-+	g_attrib_unregister(notification->dev->attrib, notification->ind_id);
-+}
-+
-+static void free_gatt_client(void *data)
-+{
-+	struct gatt_client *client = data;
-+
-+	while (queue_peek_head(client->notifications))
-+		unregister_notification(queue_pop_head(client->notifications));
-+
-+	queue_destroy(client->notifications, free);
-+
-+	free(client);
-+}
-+
- static void destroy_device(void *data)
+ int avrcp_get_capabilities(struct avrcp *session, uint8_t param)
  {
- 	struct gatt_device *dev = data;
-@@ -208,6 +274,13 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
+@@ -808,10 +809,97 @@ int avrcp_get_capabilities(struct avrcp *session, uint8_t param)
+ 				get_capabilities_rsp, session);
+ }
  
- 	client->id = client_cnt++;
- 
-+	client->notifications = queue_new();
-+	if (!client->notifications) {
-+		error("gatt: couldn't allocate notifications queue");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
+-int avrcp_register_notification(struct avrcp *session, uint8_t event,
+-					uint32_t interval, avctp_rsp_cb func,
++static gboolean register_notification_rsp(struct avctp *conn,
++					uint8_t code, uint8_t subunit,
++					uint8_t *operands, size_t operand_count,
+ 					void *user_data)
+ {
++	struct avrcp *session = user_data;
++	struct avrcp_player *player = session->player;
++	struct avrcp_header *pdu;
++	uint8_t event = 0;
++	uint16_t value16;
++	uint32_t value32;
++	uint64_t value64;
++	uint8_t *params = NULL;
++	int err;
++
++	DBG("");
++
++	if (!player || !player->cfm || !player->cfm->register_notification)
++		return FALSE;
++
++	pdu = parse_pdu(operands, operand_count);
++	if (!pdu) {
++		err = -EPROTO;
++		goto done;
 +	}
 +
- 	queue_push_head(gatt_clients, client);
++	if (code == AVC_CTYPE_REJECTED) {
++		err = parse_status(pdu);
++		goto done;
++	}
++
++	if (pdu->params_len < 1) {
++		err = -EPROTO;
++		goto done;
++	}
++
++	event = pdu->params[0];
++
++	switch (event) {
++	case AVRCP_EVENT_STATUS_CHANGED:
++	case AVRCP_EVENT_VOLUME_CHANGED:
++		if (pdu->params_len != 2) {
++			err = -EPROTO;
++			goto done;
++		}
++		params = &pdu->params[1];
++		break;
++	case AVRCP_EVENT_TRACK_CHANGED:
++		if (pdu->params_len != 9) {
++			err = -EPROTO;
++			goto done;
++		}
++		value64 = bt_get_be64(&pdu->params[1]);
++		params = (uint8_t *) &value64;
++		break;
++	case AVRCP_EVENT_PLAYBACK_POS_CHANGED:
++		if (pdu->params_len != 5) {
++			err = -EPROTO;
++			goto done;
++		}
++		value32 = bt_get_be32(&pdu->params[1]);
++		params = (uint8_t *) &value32;
++		break;
++	case AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED:
++	case AVRCP_EVENT_SETTINGS_CHANGED:
++		if (pdu->params_len < 2) {
++			err = -EPROTO;
++			goto done;
++		}
++		params = &pdu->params[1];
++		break;
++	case AVRCP_EVENT_UIDS_CHANGED:
++		if (pdu->params_len != 3) {
++			err = -EPROTO;
++			goto done;
++		}
++		value16 = bt_get_be16(&pdu->params[1]);
++		params = (uint8_t *) &value16;
++		break;
++	}
++
++	err = 0;
++
++done:
++	return player->cfm->register_notification(session, err, code, event,
++						params, player->user_data);
++}
++
++int avrcp_register_notification(struct avrcp *session, uint8_t event,
++							uint32_t interval)
++{
+ 	uint8_t params[5];
  
- 	status = HAL_STATUS_SUCCESS;
-@@ -240,7 +313,7 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 		goto failed;
+ 	params[0] = event;
+@@ -820,7 +908,7 @@ int avrcp_register_notification(struct avrcp *session, uint8_t event,
+ 	return avrcp_send_req(session, AVC_CTYPE_NOTIFY, AVC_SUBUNIT_PANEL,
+ 					AVRCP_REGISTER_NOTIFICATION,
+ 					params, sizeof(params),
+-					func, user_data);
++					register_notification_rsp, session);
+ }
+ 
+ static gboolean list_attributes_rsp(struct avctp *conn,
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index 2f35e90..0b867aa 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -191,6 +191,9 @@ struct avrcp_control_cfm {
+ 	void (*get_element_attributes) (struct avrcp *session, int err,
+ 					uint8_t number, uint32_t *attrs,
+ 					char **text, void *user_data);
++	bool (*register_notification) (struct avrcp *session, int err,
++					uint8_t code, uint8_t event,
++					uint8_t *params, void *user_data);
+ };
+ 
+ struct avrcp_passthrough_handler {
+@@ -219,8 +222,7 @@ int avrcp_send(struct avrcp *session, uint8_t transaction, uint8_t code,
+ 					uint8_t *params, size_t params_len);
+ int avrcp_get_capabilities(struct avrcp *session, uint8_t param);
+ int avrcp_register_notification(struct avrcp *session, uint8_t event,
+-					uint32_t interval, avctp_rsp_cb func,
+-					void *user_data);
++							uint32_t interval);
+ int avrcp_list_player_attributes(struct avrcp *session);
+ int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t number,
+ 							uint8_t *attrs);
+diff --git a/android/avrcp.c b/android/avrcp.c
+index 0995a06..add069b 100644
+--- a/android/avrcp.c
++++ b/android/avrcp.c
+@@ -724,39 +724,37 @@ static const struct avrcp_control_ind control_ind = {
+ 	.register_notification = handle_register_notification_cmd,
+ };
+ 
+-static gboolean register_notification_rsp(struct avctp *conn,
+-					uint8_t code, uint8_t subunit,
+-					uint8_t *operands, size_t operand_count,
+-					void *user_data)
++static bool handle_register_notification_rsp(struct avrcp *session, int err,
++						uint8_t code, uint8_t event,
++						uint8_t *params,
++						void *user_data)
+ {
+ 	struct avrcp_device *dev = user_data;
+ 	struct hal_ev_avrcp_volume_changed ev;
+-	uint8_t *params;
+ 
+-	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
+-		return FALSE;
+-
+-	if (operands == NULL || operand_count < 7)
+-		return FALSE;
++	if (err < 0) {
++		error("AVRCP: %s", strerror(-err));
++		return false;
++	}
+ 
+-	params = &operands[7];
++	if (code != AVC_CTYPE_INTERIM && code != AVC_CTYPE_CHANGED)
++		return false;
+ 
+-	if (params == NULL || params[0] != AVRCP_EVENT_VOLUME_CHANGED)
+-		return FALSE;
++	if (event != AVRCP_EVENT_VOLUME_CHANGED)
++		return false;
+ 
+ 	ev.type = code;
+-	ev.volume = params[1] & 0x7F;
++	ev.volume = params[0] & 0x7f;
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_AVRCP,
+ 					HAL_EV_AVRCP_VOLUME_CHANGED,
+ 					sizeof(ev), &ev);
+ 
+ 	if (code == AVC_CTYPE_INTERIM)
+-		return TRUE;
++		return true;
+ 
+-	avrcp_register_notification(dev->session, params[0], 0,
+-					register_notification_rsp, dev);
+-	return FALSE;
++	avrcp_register_notification(dev->session, event, 0);
++	return false;
+ }
+ 
+ static void handle_get_capabilities_rsp(struct avrcp *session, int err,
+@@ -775,9 +773,7 @@ static void handle_get_capabilities_rsp(struct avrcp *session, int err,
+ 		if (events[i] != AVRCP_EVENT_VOLUME_CHANGED)
+ 			continue;
+ 
+-		avrcp_register_notification(dev->session, events[i], 0,
+-						register_notification_rsp,
+-						dev);
++		avrcp_register_notification(dev->session, events[i], 0);
+ 		break;
  	}
  
--	free(cl);
-+	free_gatt_client(cl);
- 	status = HAL_STATUS_SUCCESS;
+@@ -786,6 +782,7 @@ static void handle_get_capabilities_rsp(struct avrcp *session, int err,
  
- failed:
-@@ -1146,14 +1219,124 @@ static void handle_client_execute_write(const void *buf, uint16_t len)
- 			HAL_OP_GATT_CLIENT_EXECUTE_WRITE, HAL_STATUS_FAILED);
- }
+ static const struct avrcp_control_cfm control_cfm = {
+ 	.get_capabilities = handle_get_capabilities_rsp,
++	.register_notification = handle_register_notification_rsp,
+ };
  
-+static void client_register_for_notif_cb(int32_t conn_id, int32_t registered,
-+					int32_t status,
-+					const struct hal_gatt_srvc_id *srvc,
-+					const struct hal_gatt_gatt_id *ch)
-+{
-+}
-+
- static void handle_client_register_for_notification(const void *buf,
- 								uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_register_for_notification *cmd = buf;
-+	struct notification_data *notification;
-+	char uuid[MAX_LEN_UUID_STR];
-+	struct gatt_client *client;
-+	struct characteristic *c;
-+	struct element_id match_id;
-+	struct gatt_device *dev;
-+	struct service *service;
-+	int32_t conn_id = 0;
-+	char addr_str[18];
-+	uint8_t status;
-+	bdaddr_t addr;
-+
- 	DBG("");
+ static int avrcp_device_add_session(struct avrcp_device *dev, int fd,
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index a0b009a..5b259bd 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -524,8 +524,7 @@ static void test_client(gconstpointer data)
  
-+	client = queue_find(gatt_clients, match_client_by_id,
-+						INT_TO_PTR(cmd->client_if));
-+	if (!client) {
-+		error("gatt: client %d not registered", cmd->client_if);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	android2bdaddr((bdaddr_t *)&cmd->bdaddr, &addr);
-+	ba2str(&addr, addr_str);
-+
-+	dev = queue_find(conn_list, match_dev_by_bdaddr, &addr);
-+	if (!dev) {
-+		error("gatt: device %s not found in connected devices list",
-+								addr_str);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	conn_id = dev->conn_id;
-+
-+	hal_srvc_id_to_gatt_id(&cmd->srvc_id, &match_id);
-+	service = queue_find(dev->services, match_srvc_by_gatt_id, &match_id);
-+	bt_uuid_to_string(&match_id.uuid, uuid, MAX_LEN_UUID_STR);
-+	if (!service) {
-+		error("gatt: can't register notification, service not found");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	c = queue_find(service->chars, match_char_by_inst_id,
-+					INT_TO_PTR(cmd->char_id.inst_id));
-+	if (!c) {
-+		error("gatt: can't register notification: no characteristic");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	notification = new0(struct notification_data, 1);
-+	if (!notification) {
-+		error("gatt: failed to allocate memory for notification");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	memcpy(&notification->ch, &cmd->char_id, sizeof(notification->ch));
-+	memcpy(&notification->service, &cmd->srvc_id,
-+						sizeof(notification->service));
-+	notification->dev = dev;
-+	notification->client = client;
-+
-+	if (queue_find(client->notifications, match_notification,
-+			notification)) {
-+		DBG("can't register for notification, already registered");
-+		free(notification);
-+		status = HAL_STATUS_SUCCESS;
-+		goto failed;
-+	}
-+
-+	notification->notif_id = g_attrib_register(dev->attrib,
-+							ATT_OP_HANDLE_NOTIFY,
-+							c->ch.value_handle,
-+							NULL, notification,
-+							destroy_notification);
-+	if (!notification->notif_id) {
-+		free(notification);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	notification->ind_id = g_attrib_register(dev->attrib, ATT_OP_HANDLE_IND,
-+							c->ch.value_handle,
-+							NULL, notification,
-+							destroy_notification);
-+	if (!notification->ind_id) {
-+		g_attrib_unregister(dev->attrib, notification->notif_id);
-+		free(notification);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	notification->ref = 2;
-+
-+	queue_push_tail(client->notifications, notification);
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
-+	client_register_for_notif_cb(conn_id, 1, status, &cmd->srvc_id,
-+								&cmd->char_id);
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_OP_GATT_CLIENT_REGISTER_FOR_NOTIFICATION,
--				HAL_STATUS_FAILED);
-+				status);
- }
+ 	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
+ 		avrcp_register_notification(context->session,
+-						AVRCP_EVENT_STATUS_CHANGED, 0,
+-						NULL, NULL);
++						AVRCP_EVENT_STATUS_CHANGED, 0);
  
- static void handle_client_deregister_for_notification(const void *buf,
+ 	if (g_str_equal(context->data->test_name, "/TP/BGN/BV-01-I"))
+ 		avrcp_send_passthrough(context->session, IEEEID_BTSIG,
 -- 
-1.8.3.1
+1.8.5.3
 
