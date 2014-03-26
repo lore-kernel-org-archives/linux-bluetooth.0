@@ -2,42 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/7] android/gatt: Use better name for matching function
-Date: Wed, 26 Mar 2014 18:00:54 +0100
-Message-Id: <1395853259-15618-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/7] android/gatt: Unify destroy functions
+Date: Wed, 26 Mar 2014 18:00:53 +0100
+Message-Id: <1395853259-15618-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As there is no static type check for matching functions, we should keep
-their names more descriptive, like 'match_dev_by_conn_id' is.
+This patch unifies destroy function names. We should also keep destroy
+functions convention as it is in /src/shared/hci.c for example, and
+check passed pointer before dereferencing it.
 ---
- android/gatt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/gatt.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index aeb0585..2ea99e4 100644
+index 04e9729..aeb0585 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -151,7 +151,7 @@ static bool match_dev_by_conn_id(const void *data, const void *user_data)
- 	return dev->conn_id == conn_id;
+@@ -96,10 +96,13 @@ static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
+ 
+ static void bt_le_discovery_stop_cb(void);
+ 
+-static void free_gatt_service(void *data)
++static void destroy_service(void *data)
+ {
+ 	struct service *srvc = data;
+ 
++	if (!srvc)
++		return;
++
+ 	queue_destroy(srvc->chars, free);
+ 	free(srvc);
+ }
+@@ -175,8 +178,11 @@ static void destroy_device(void *data)
+ {
+ 	struct gatt_device *dev = data;
+ 
++	if (!dev)
++		return;
++
+ 	queue_destroy(dev->clients, NULL);
+-	queue_destroy(dev->services, free_gatt_service);
++	queue_destroy(dev->services, destroy_service);
+ 	free(dev);
  }
  
--static bool match_srvc_by_gatt_id(const void *data, const void *user_data)
-+static bool match_srvc_by_element_id(const void *data, const void *user_data)
- {
- 	const struct element_id *exp_id = user_data;
- 	const struct service *service = data;
-@@ -1052,7 +1052,7 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
- 	}
- 
- 	hal_srvc_id_to_gatt_id(&cmd->srvc_id, &match_id);
--	srvc = queue_find(dev->services, match_srvc_by_gatt_id, &match_id);
-+	srvc = queue_find(dev->services, match_srvc_by_element_id, &match_id);
- 	if (!srvc) {
- 		error("gatt: Service with inst_id: %d not found",
- 							match_id.instance);
 -- 
 1.9.0
 
