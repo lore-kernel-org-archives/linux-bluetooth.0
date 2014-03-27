@@ -1,61 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 26 Mar 2014 22:37:24 -0500
+From: Felipe Balbi <balbi@ti.com>
+To: Peter Hurley <peter@hurleysoftware.com>
+CC: <balbi@ti.com>, Tony Lindgren <tony@atomide.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	<linux-serial@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+	<m-karicheri2@ti.com>, <b32955@freescale.com>,
+	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 10/11] Revert "serial: omap: unlock the port lock"
+Message-ID: <20140327033724.GB13038@saruman.home>
+Reply-To: <balbi@ti.com>
+References: <1395343807-21618-1-git-send-email-balbi@ti.com>
+ <1395343807-21618-10-git-send-email-balbi@ti.com>
+ <20140325182856.GA31906@atomide.com>
+ <5333732F.6040803@hurleysoftware.com>
+ <20140327021043.GB11651@saruman.home>
+ <53338C81.3060600@hurleysoftware.com>
 MIME-Version: 1.0
-In-Reply-To: <53333511.6030102@gmail.com>
-References: <532CAAB8.5020403@gmail.com>
-	<532F33BB.8050000@gmail.com>
-	<532F515A.3060809@gmail.com>
-	<CALkxMhHjAhfZ4ade-o+ebtZMZB7o3m9YEzdecphsm1e2cB45bA@mail.gmail.com>
-	<53333511.6030102@gmail.com>
-Date: Thu, 27 Mar 2014 07:57:07 +0100
-Message-ID: <CALkxMhEryvHXe1Zm1BM2xLNYb_5X8JHbDWa_AFVxJF7CQGxs8A@mail.gmail.com>
-Subject: Re: Help on connecting a PS3 headset
-From: Michal Labedzki <michal.labedzki@tieto.com>
-To: Andrea <mariofutire@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="oC1+HKm2/end4ao3"
+In-Reply-To: <53338C81.3060600@hurleysoftware.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 26 March 2014 21:14, Andrea <mariofutire@gmail.com> wrote:
-> and we know that HSP and HFP have been dropped from Bluez 5
-> Could this explain why connection fails?
+--oC1+HKm2/end4ao3
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Yes, this is it.
+Hi,
 
-By the way:
-1. Why were those profiles removed?
-2. It seems that HSP is not supported :) (and never been?)
-http://www.bluez.org/profiles/
+On Wed, Mar 26, 2014 at 10:27:13PM -0400, Peter Hurley wrote:
+> On 03/26/2014 10:10 PM, Felipe Balbi wrote:
+> >Hi,
+> >
+> >On Wed, Mar 26, 2014 at 08:39:11PM -0400, Peter Hurley wrote:
+> >>On 03/25/2014 02:28 PM, Tony Lindgren wrote:
+> >>>* Felipe Balbi <balbi@ti.com> [140320 12:39]:
+> >>>>This reverts commit 0324a821029e1f54e7a7f8fed48693cfce42dc0e.
+> >>>>
+> >>>>That commit tried to fix a deadlock problem when using
+> >>>>hci_ldisc, but it turns out the bug was in hci_ldsic
+> >>>>all along where it was calling ->write() from within
+> >>>>->write_wakeup() callback.
+> >>>>
+> >>>>The problem is that ->write_wakeup() was called with
+> >>>>port lock held and ->write() tried to grab the same
+> >>>>port lock.
+> >>>
+> >>>Should this and the next patch be earlier in the series
+> >>>as a fix for the v3.15-rc cycle? Should they be cc: stable
+> >>>as well?
+> >>
+> >>Well, right now the other fix has had _zero_ testing
+> >>so not really a -stable candidate just yet.
+> >
+> >how can you even say that ?
+>=20
+> I misunderstood when you wrote:
+>=20
+> On 03/20/2014 02:11 PM, Felipe Balbi wrote:
+> > here's a build-tested only patch which is waiting for testing from other
+> > colleagues who've got a platform to reproduce the problem:
+>=20
+> and then the version I reviewed had no Tested-by: tags.
 
+I wouldn't add that tag myself, but Murali (in Cc) did help testing
+together with other colleagues.
 
--- 
+> >How else would we have found the issue to start with ?
+>=20
+> Bug report?
 
-Pozdrawiam / Best regards
--------------------------------------------------------------------------------------------------------------
-Michał Łabędzki, Software Engineer
-Tieto Corporation
+touch=E8 :-)
 
-Product Development Services
+--=20
+balbi
 
-http://www.tieto.com / http://www.tieto.pl
----
-ASCII: Michal Labedzki
-location: Swobodna 1 Street, 50-088 Wrocław, Poland
-room: 5.01 (desk next to 5.08)
----
-Please note: The information contained in this message may be legally
-privileged and confidential and protected from disclosure. If the
-reader of this message is not the intended recipient, you are hereby
-notified that any unauthorised use, distribution or copying of this
-communication is strictly prohibited. If you have received this
-communication in error, please notify us immediately by replying to
-the message and deleting it from your computer. Thank You.
----
-Please consider the environment before printing this e-mail.
----
-Tieto Poland spółka z ograniczoną odpowiedzialnością z siedzibą w
-Szczecinie, ul. Malczewskiego 26. Zarejestrowana w Sądzie Rejonowym
-Szczecin-Centrum w Szczecinie, XIII Wydział Gospodarczy Krajowego
-Rejestru Sądowego pod numerem 0000124858. NIP: 8542085557. REGON:
-812023656. Kapitał zakładowy: 4 271500 PLN
+--oC1+HKm2/end4ao3
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTM5z0AAoJEIaOsuA1yqRE0bsP/iCy3V/lwOh3OUogVRSs6ydK
+G6/20Me4nY/LQSanabXL7doAVY3QS7u/A8foiyeDvYplqyXy17F+hddxolenlvaD
+5azuIcAiamm4D4T78D7nWZMB6bZ0nhNcEsPcN3u0VHDtyXZwGG40aR4M6dBED+bb
+QnpF8w3alnnWGHOfp87dbDAYXbJVBqdozAbhTXs8teFGbfPxfvHuXF+0upt2cPux
+yS/PlO1T54H9BE2Wyitx4od28va+9MFre5xAs9ENzPrhzbyYwMtuY55zRahfobID
+qrNQvpKTsMhsPc7nHtTrpbNjZoguHVctKDDibsFhSco7Vr3Uct3/vLgUnqWf5pSH
+BeDe3bnPf3mQDctXidvzJ531wB6qn5gzRVnm61OagVAYl9hsqqvl2x+W1HtmdBat
+atChme2C+g38zizPNc3NW2TUVyHfu1g/soLi6oBu9gMWHOBk5VN7bdJznee2S5Zs
+r13UN7mGyYsak0piDDVBEAGCldIqx5PnbIJQN5RHqdwc74Se8Pfw+FsYEYKyctI3
+uomzTcQ4NANKOWB13agtz7EprZhicezMx1m7fRNxD6DJ18ic33nCj/0Imw750KqR
+ckg17OW+jzrKdISJ/9utvTL8yxdUa1N+4lRBn4rEPtIrnkZCvBqlKHG6UNWwq9y1
+vXBBRCzY/IO8zBLsjIVu
+=IGOa
+-----END PGP SIGNATURE-----
+
+--oC1+HKm2/end4ao3--
