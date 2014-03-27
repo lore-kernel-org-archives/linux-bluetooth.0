@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Refactor characteristic notify function
-Date: Thu, 27 Mar 2014 20:14:20 +0100
-Message-ID: <139596586.UBkxGm1SCv@athlon>
-In-Reply-To: <1395858216-26503-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1395858216-26503-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCHv2 1/2] android/gatt: Fix sendig wrong byte ordered uuids
+Date: Thu, 27 Mar 2014 20:03:46 +0100
+Message-ID: <1821829.gF6gCp4bkd@athlon>
+In-Reply-To: <1395936305-23188-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1395936305-23188-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,71 +14,106 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jakub,
 
-On Wednesday 26 March 2014 19:23:35 Jakub Tyszkowski wrote:
-> This removes redundant status from function parameter list, as sent
-> status is different than success only when there is no characteristic.
+On Thursday 27 March 2014 17:05:04 Jakub Tyszkowski wrote:
+> We were sending wrong byte ordered uuids since the last gatt library
+> changes. Two helpers were introduced for swapping uuids sent to, and
+> received from HAL.
 > ---
->  android/gatt.c | 18 +++++-------------
->  1 file changed, 5 insertions(+), 13 deletions(-)
+>  android/gatt.c | 43 ++++++++++++++++++++++++++++++-------------
+>  1 file changed, 30 insertions(+), 13 deletions(-)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index d7c7c93..cad7e1a 100644
+> index fe8ba74..0327d54 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -951,13 +951,12 @@ static void handle_client_get_included_service(const
-> void *buf, uint16_t len)
+> @@ -96,6 +96,31 @@ static struct queue *conn_wait_queue = NULL;	/* Devs
+> waiting to connect */
 > 
->  static void send_client_char_notify(const struct characteristic *ch,
->  					int32_t conn_id,
-> -					const struct service *service,
-> -					uint8_t status)
-> +					const struct service *service)
+>  static void bt_le_discovery_stop_cb(void);
+> 
+> +static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
+> +{
+> +	uint8_t i;
+> +
+> +	dst->type = BT_UUID128;
+> +
+> +	for (i = 0; i < 16; i++)
+> +		dst->value.u128.data[i] = uuid[15 - i];
+> +
+> +}
+> +
+> +static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
+> +{
+> +	bt_uuid_t uu128;
+> +	uint8_t i;
+> +
+> +	if (src->type != BT_UUID128) {
+> +		bt_uuid_to_uuid128(src, &uu128);
+> +		src = &uu128;
+> +	}
+> +
+> +	for (i = 0; i < 16; i++)
+> +		uuid[15 - i] = src->value.u128.data[i];
+> +}
+> +
+>  static void destroy_service(void *data)
+>  {
+>  	struct service *srvc = data;
+> @@ -317,7 +342,7 @@ static void primary_cb(uint8_t status, GSList *services,
+> void *user_data) continue;
+>  		}
+> 
+> -		memcpy(&ev_res.srvc_id.uuid, &uuid.value, sizeof(uuid.value));
+> +		uuid2android(&uuid, ev_res.srvc_id.uuid);
+> 
+>  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
+>  					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
+> @@ -929,26 +954,22 @@ static void send_client_char_notify(const struct
+> characteristic *ch, uint8_t status)
 >  {
 >  	struct hal_ev_gatt_client_get_characteristic ev;
+> -	bt_uuid_t uuid;
 > 
 >  	memset(&ev, 0, sizeof(ev));
-> -	ev.status = status;
-> +	ev.status = ch ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
+>  	ev.status = status;
 > 
 >  	if (ch) {
 >  		ev.char_prop = ch->ch.properties;
-> @@ -1026,11 +1025,9 @@ static void discover_char_cb(uint8_t status, GSList
-> *characteristics,
+> +
+>  		ev.char_id.inst_id = ch->id.instance;
+> -		bt_string_to_uuid(&uuid, ch->ch.uuid);
+> -		memcpy(&ev.char_id.uuid, &uuid.value.u128.data,
+> -						sizeof(ev.char_id.uuid));
+> +		uuid2android(&ch->id.uuid, ev.char_id.uuid);
+>  	}
 > 
->  	if (!queue_isempty(data->service->chars))
->  		send_client_char_notify(queue_peek_head(data->service->chars),
-> -						data->conn_id, data->service,
-> -						HAL_STATUS_SUCCESS);
-> +						data->conn_id, data->service);
->  	else
-> -		send_client_char_notify(NULL, data->conn_id, data->service,
-> -							HAL_STATUS_FAILED);
-> +		send_client_char_notify(NULL, data->conn_id, data->service);
+>  	ev.conn_id = conn_id;
+>  	/* TODO need to be handled for included services too */
+>  	ev.srvc_id.is_primary = 1;
+>  	ev.srvc_id.inst_id = service->id.instance;
+> -	bt_string_to_uuid(&uuid, service->primary.uuid);
+> -	memcpy(&ev.srvc_id.uuid, &uuid.value.u128.data,
+> -					sizeof(ev.srvc_id.uuid));
+> +	uuid2android(&service->id.uuid, ev.srvc_id.uuid);
 > 
->  	free(data);
+>  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+>  					HAL_EV_GATT_CLIENT_GET_CHARACTERISTIC,
+> @@ -1016,12 +1037,8 @@ static void discover_char_cb(uint8_t status, GSList
+> *characteristics, static void hal_srvc_id_to_element_id(const struct
+> hal_gatt_srvc_id *from, struct element_id *to)
+>  {
+> -	uint128_t uuid128;
+> -
+>  	to->instance = from->inst_id;
+> -
+> -	memcpy(&uuid128.data, &from->uuid, sizeof(uuid128));
+> -	bt_uuid128_create(&to->uuid, uuid128);
+> +	android2uuid(from->uuid, &to->uuid);
 >  }
-> @@ -1126,12 +1123,7 @@ static void handle_client_get_characteristic(const
-> void *buf, uint16_t len) else
->  		ch = queue_peek_head(srvc->chars);
 > 
-> -	if (ch)
-> -		send_client_char_notify(ch, dev->conn_id, srvc,
-> -							HAL_STATUS_SUCCESS);
-> -	else
-> -		send_client_char_notify(NULL, dev->conn_id, srvc,
-> -							HAL_STATUS_FAILED);
-> +	send_client_char_notify(ch, dev->conn_id, srvc);
-> 
->  	status = HAL_STATUS_SUCCESS;
+>  static bool find_service(int32_t conn_id, struct element_id *service_id,
 
-Both patches applied. Thanks.
-Although I had to manually fix whitespace issue:
-
-.git/rebase-apply/patch:19: space before tab in indent.
-                                                data->conn_id, data->service);
-fatal: 1 line adds whitespace errors.
-
-so please pay attention for this in future.
+Both patches applied, thanks.
 
 -- 
 Szymon K. Janc
