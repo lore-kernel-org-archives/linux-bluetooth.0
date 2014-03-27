@@ -1,97 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan
-	<gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Amitkumar
- Karwar <akarwar@marvell.com>, Bing Zhao <bzhao@marvell.com>
-Subject: [PATCH 1/2] Bluetooth: btmrvl: separate write-to-clear function from interrupt handler
-Date: Thu, 27 Mar 2014 21:30:42 -0700
-Message-ID: <1395981043-2541-1-git-send-email-bzhao@marvell.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 11/11] android/gatt: Add deregister_for_notification implementation
+Date: Thu, 27 Mar 2014 23:50:36 +0100
+Message-ID: <12465754.7v2VELycOU@athlon>
+In-Reply-To: <1395954789-32459-11-git-send-email-marcin.kraglak@tieto.com>
+References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com> <1395954789-32459-11-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch improves readability and makes future changes easier.
+Hi Marcin,
 
-Signed-off-by: Bing Zhao <bzhao@marvell.com>
----
- drivers/bluetooth/btmrvl_sdio.c | 53 +++++++++++++++++++++++++----------------
- 1 file changed, 32 insertions(+), 21 deletions(-)
+On Thursday 27 March 2014 22:13:09 Marcin Kraglak wrote:
+> This will unregister handlers for notification and indications
+> and remove notification_data from client's list.
+> ---
+>  android/gatt.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 51 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index d004e35..384dccf 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1573,11 +1573,61 @@ failed:
+>  static void handle_client_deregister_for_notification(const void *buf,
+>  								uint16_t len)
+>  {
+> +	const struct hal_cmd_gatt_client_deregister_for_notification *cmd = buf;
+> +	struct notification_data *notification, notif;
+> +	struct gatt_client *client;
+> +	struct gatt_device *dev;
+> +	int32_t conn_id = 0;
+> +	char addr_str[18];
+> +	uint8_t status;
+> +	bdaddr_t addr;
+> +
+>  	DBG("");
+> 
+> +	client = queue_find(gatt_clients, match_client_by_id,
+> +						INT_TO_PTR(cmd->client_if));
+> +	if (!client) {
+> +		error("gatt: couldn't deregister: client not registered");
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+> +	android2bdaddr((bdaddr_t *)&cmd->bdaddr, &addr);
 
-diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
-index 1b52c9f..7883793 100644
---- a/drivers/bluetooth/btmrvl_sdio.c
-+++ b/drivers/bluetooth/btmrvl_sdio.c
-@@ -667,6 +667,36 @@ static int btmrvl_sdio_process_int_status(struct btmrvl_private *priv)
- 	return 0;
- }
- 
-+static int btmrvl_sdio_write_to_clear(struct btmrvl_sdio_card *card, u8 *ireg)
-+{
-+	int ret;
-+
-+	*ireg = sdio_readb(card->func, card->reg->host_intstatus, &ret);
-+	if (ret) {
-+		BT_ERR("sdio_readb: read int status failed: %d", ret);
-+		return ret;
-+	}
-+
-+	if (*ireg) {
-+		/*
-+		 * DN_LD_HOST_INT_STATUS and/or UP_LD_HOST_INT_STATUS
-+		 * Clear the interrupt status register and re-enable the
-+		 * interrupt.
-+		 */
-+		BT_DBG("int_status = 0x%x", *ireg);
-+
-+		sdio_writeb(card->func, ~(*ireg) & (DN_LD_HOST_INT_STATUS |
-+						    UP_LD_HOST_INT_STATUS),
-+			    card->reg->host_intstatus, &ret);
-+		if (ret) {
-+			BT_ERR("sdio_writeb: clear int status failed: %d", ret);
-+			return ret;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static void btmrvl_sdio_interrupt(struct sdio_func *func)
- {
- 	struct btmrvl_private *priv;
-@@ -684,28 +714,9 @@ static void btmrvl_sdio_interrupt(struct sdio_func *func)
- 
- 	priv = card->priv;
- 
--	ireg = sdio_readb(card->func, card->reg->host_intstatus, &ret);
--	if (ret) {
--		BT_ERR("sdio_readb: read int status register failed");
-+	ret = btmrvl_sdio_write_to_clear(card, &ireg);
-+	if (ret)
- 		return;
--	}
--
--	if (ireg != 0) {
--		/*
--		 * DN_LD_HOST_INT_STATUS and/or UP_LD_HOST_INT_STATUS
--		 * Clear the interrupt status register and re-enable the
--		 * interrupt.
--		 */
--		BT_DBG("ireg = 0x%x", ireg);
--
--		sdio_writeb(card->func, ~(ireg) & (DN_LD_HOST_INT_STATUS |
--					UP_LD_HOST_INT_STATUS),
--				card->reg->host_intstatus, &ret);
--		if (ret) {
--			BT_ERR("sdio_writeb: clear int status register failed");
--			return;
--		}
--	}
- 
- 	spin_lock_irqsave(&priv->driver_lock, flags);
- 	sdio_ireg |= ireg;
+Casting is not needed here.
+
+> +	ba2str(&addr, addr_str);
+> +
+> +	dev = queue_find(conn_list, match_dev_by_bdaddr, &addr);
+> +	if (!dev) {
+> +		error("gatt: couldn't deregister: device %s not found",
+> +								addr_str);
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+> +	conn_id = dev->conn_id;
+> +	memcpy(&notif.ch, &cmd->char_id, sizeof(notif.ch));
+> +	memcpy(&notif.service, &cmd->srvc_id, sizeof(notif.service));
+> +	notif.dev = dev;
+> +
+> +	notification = queue_find(client->notifications,
+> +						match_notification, &notif);
+> +
+
+Do we need to check that? Wouldn't g_attrib_unregister() failed if id is 
+invalid?
+
+And empty line is not needed here.
+
+> +	if (!notification) {
+> +		error("gatt: couldn't deregister: notification not registered");
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+> +	unregister_notification(notification);
+> +
+> +	status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+> +	client_register_for_notif_cb(conn_id, 0, status, &cmd->srvc_id,
+> +								&cmd->char_id);
+> +
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+>  				HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION,
+> -				HAL_STATUS_FAILED);
+> +				status);
+>  }
+> 
+>  static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
+
 -- 
-1.8.0
+Szymon K. Janc
+szymon.janc@gmail.com
