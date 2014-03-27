@@ -1,142 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core/profile: Fix failing to accept connections without a service
-Date: Thu, 27 Mar 2014 10:34:19 +0200
-Message-Id: <1395909259-2154-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <53333511.6030102@gmail.com>
+References: <532CAAB8.5020403@gmail.com>
+	<532F33BB.8050000@gmail.com>
+	<532F515A.3060809@gmail.com>
+	<CALkxMhHjAhfZ4ade-o+ebtZMZB7o3m9YEzdecphsm1e2cB45bA@mail.gmail.com>
+	<53333511.6030102@gmail.com>
+Date: Thu, 27 Mar 2014 07:57:07 +0100
+Message-ID: <CALkxMhEryvHXe1Zm1BM2xLNYb_5X8JHbDWa_AFVxJF7CQGxs8A@mail.gmail.com>
+Subject: Re: Help on connecting a PS3 headset
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: Andrea <mariofutire@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 26 March 2014 21:14, Andrea <mariofutire@gmail.com> wrote:
+> and we know that HSP and HFP have been dropped from Bluez 5
+> Could this explain why connection fails?
 
-For incoming connections it is not mandatory to have a service since the
-profile may be a server only (enable_client is false) therefore it does
-not need to track connection status.
----
- src/profile.c | 40 +++++++++++++++++++++++++++++++---------
- 1 file changed, 31 insertions(+), 9 deletions(-)
+Yes, this is it.
 
-diff --git a/src/profile.c b/src/profile.c
-index f6aa970..7c2fe18 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -752,7 +752,9 @@ static gboolean ext_io_disconnected(GIOChannel *io, GIOCondition cond,
- 
- 	DBG("%s disconnected from %s", ext->name, addr);
- drop:
--	btd_service_disconnecting_complete(conn->service, 0);
-+	if (conn->service)
-+		btd_service_disconnecting_complete(conn->service, 0);
-+
- 	ext->conns = g_slist_remove(ext->conns, conn);
- 	ext_io_destroy(conn);
- 	return FALSE;
-@@ -774,7 +776,9 @@ static void new_conn_reply(DBusPendingCall *call, void *user_data)
- 	conn->pending = NULL;
- 
- 	if (!dbus_error_is_set(&err)) {
--		btd_service_connecting_complete(conn->service, 0);
-+		if (conn->service)
-+			btd_service_connecting_complete(conn->service, 0);
-+
- 		conn->connected = true;
- 		return;
- 	}
-@@ -782,7 +786,8 @@ static void new_conn_reply(DBusPendingCall *call, void *user_data)
- 	error("%s replied with an error: %s, %s", ext->name,
- 						err.name, err.message);
- 
--	btd_service_connecting_complete(conn->service, -ECONNREFUSED);
-+	if (conn->service)
-+		btd_service_connecting_complete(conn->service, -ECONNREFUSED);
- 
- 	dbus_error_free(&err);
- 
-@@ -806,14 +811,18 @@ static void disconn_reply(DBusPendingCall *call, void *user_data)
- 	conn->pending = NULL;
- 
- 	if (!dbus_error_is_set(&err)) {
--		btd_service_disconnecting_complete(conn->service, 0);
-+		if (conn->service)
-+			btd_service_disconnecting_complete(conn->service, 0);
-+
- 		goto disconnect;
- 	}
- 
- 	error("%s replied with an error: %s, %s", ext->name,
- 						err.name, err.message);
- 
--	btd_service_disconnecting_complete(conn->service, -ECONNREFUSED);
-+	if (conn->service)
-+		btd_service_disconnecting_complete(conn->service,
-+								-ECONNREFUSED);
- 
- 	dbus_error_free(&err);
- 
-@@ -986,9 +995,13 @@ static void ext_connect(GIOChannel *io, GError *err, gpointer user_data)
- 		return;
- 
- drop:
--	btd_service_connecting_complete(conn->service, err ? -err->code : -EIO);
-+	if (conn->service)
-+		btd_service_connecting_complete(conn->service,
-+						err ? -err->code : -EIO);
-+
- 	if (io_err)
- 		g_error_free(io_err);
-+
- 	ext->conns = g_slist_remove(ext->conns, conn);
- 	ext_io_destroy(conn);
- }
-@@ -1034,7 +1047,7 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 						bdaddr_t *src, bdaddr_t *dst)
- {
- 	struct btd_device *device;
--	struct btd_service *service;
-+	struct btd_service *service = NULL;
- 	struct ext_io *conn;
- 	GIOCondition cond;
- 	char addr[18];
-@@ -1046,6 +1059,10 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 		return NULL;
- 	}
- 
-+	/* Do not add UUID if client role is not enabled */
-+	if (!server->ext->enable_client)
-+		goto done;
-+
- 	btd_device_add_uuid(device, server->ext->remote_uuid);
- 	service = btd_device_get_service(device, server->ext->remote_uuid);
- 	if (service == NULL) {
-@@ -1055,13 +1072,16 @@ static struct ext_io *create_conn(struct ext_io *server, GIOChannel *io,
- 		return NULL;
- 	}
- 
-+done:
- 	conn = g_new0(struct ext_io, 1);
- 	conn->io = g_io_channel_ref(io);
- 	conn->proto = server->proto;
- 	conn->ext = server->ext;
- 	conn->adapter = btd_adapter_ref(server->adapter);
- 	conn->device = btd_device_ref(device);
--	conn->service = btd_service_ref(service);
-+
-+	if (service)
-+		conn->service = btd_service_ref(service);
- 
- 	cond = G_IO_HUP | G_IO_ERR | G_IO_NVAL;
- 	conn->io_id = g_io_add_watch(io, cond, ext_io_disconnected, conn);
-@@ -1537,7 +1557,9 @@ static void record_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	return;
- 
- failed:
--	btd_service_connecting_complete(conn->service, err);
-+	if (conn->service)
-+		btd_service_connecting_complete(conn->service, err);
-+
- 	ext->conns = g_slist_remove(ext->conns, conn);
- 	ext_io_destroy(conn);
- }
+By the way:
+1. Why were those profiles removed?
+2. It seems that HSP is not supported :) (and never been?)
+http://www.bluez.org/profiles/
+
+
 -- 
-1.8.5.3
 
+Pozdrawiam / Best regards
+-------------------------------------------------------------------------------------------------------------
+Michał Łabędzki, Software Engineer
+Tieto Corporation
+
+Product Development Services
+
+http://www.tieto.com / http://www.tieto.pl
+---
+ASCII: Michal Labedzki
+location: Swobodna 1 Street, 50-088 Wrocław, Poland
+room: 5.01 (desk next to 5.08)
+---
+Please note: The information contained in this message may be legally
+privileged and confidential and protected from disclosure. If the
+reader of this message is not the intended recipient, you are hereby
+notified that any unauthorised use, distribution or copying of this
+communication is strictly prohibited. If you have received this
+communication in error, please notify us immediately by replying to
+the message and deleting it from your computer. Thank You.
+---
+Please consider the environment before printing this e-mail.
+---
+Tieto Poland spółka z ograniczoną odpowiedzialnością z siedzibą w
+Szczecinie, ul. Malczewskiego 26. Zarejestrowana w Sądzie Rejonowym
+Szczecin-Centrum w Szczecinie, XIII Wydział Gospodarczy Krajowego
+Rejestru Sądowego pod numerem 0000124858. NIP: 8542085557. REGON:
+812023656. Kapitał zakładowy: 4 271500 PLN
