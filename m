@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 0/5] Add GATT Characteristic Flags
-Date: Thu, 27 Mar 2014 10:21:10 -0300
-Message-Id: <1395926475-8841-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH] Bluetooth: Remove unnecessary NULL check in hci_inquiry_cache_update
+Date: Thu, 27 Mar 2014 13:51:24 +0200
+Message-Id: <1395921084-13605-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patchset adds GattCharacteristic1 "Flags" property.
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Extended properties are not supported yet.
+The ssp parameter is supposed to be a mandatory one and there are no
+callers that would pass NULL to this function. Removing this unnecessary
+NULL check also makes (false positive) static analyzer warnings go away.
 
-Alvaro Silva (1):
-  test: Add permissions for Alert Level of gatt-service
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Claudio Takahasi (4):
-  gatt: Add parsing GattCharacteristic1 Flags
-  gatt: Set read and write callbacks based on Flags
-  gatt: Make Characteristic Flags optional
-  doc: Remove Core SPEC page number from gatt-api.txt
-
- doc/gatt-api.txt     | 13 ++++----
- src/gatt-dbus.c      | 93 +++++++++++++++++++++++++++++++++++++++++++++++++---
- tools/gatt-service.c | 43 ++++++++++++++++++++----
- 3 files changed, 131 insertions(+), 18 deletions(-)
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index c6189d9b6c09..7cf511cb1171 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2032,7 +2032,7 @@ bool hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
+ 
+ 	ie = hci_inquiry_cache_lookup(hdev, &data->bdaddr);
+ 	if (ie) {
+-		if (ie->data.ssp_mode && ssp)
++		if (ie->data.ssp_mode)
+ 			*ssp = true;
+ 
+ 		if (ie->name_state == NAME_NEEDED &&
 -- 
-1.8.3.1
+1.9.0
 
