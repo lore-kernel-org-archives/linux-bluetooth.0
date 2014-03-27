@@ -2,65 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] attrib: Use const source data pointer for write
-Date: Thu, 27 Mar 2014 15:03:28 +0100
-Message-Id: <1395929009-23366-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] attrib/gatttool: Use define for UUID format check
+Date: Thu, 27 Mar 2014 15:03:29 +0100
+Message-Id: <1395929009-23366-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1395929009-23366-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1395929009-23366-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Source buffer for write operations should be immutable.
 ---
- attrib/gatt.c | 6 +++---
- attrib/gatt.h | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ attrib/gatttool.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 7363b4b..5ae20f4 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -840,7 +840,7 @@ static guint prepare_write(struct write_long_data *long_write)
- 									NULL);
- }
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index ca178ce..5e0f820 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -426,7 +426,7 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		value = list->data[i];
+ 		handle = get_le16(value);
  
--guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
-+guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
- 			size_t vlen, GAttribResultFunc func, gpointer user_data)
- {
- 	uint8_t *buf;
-@@ -904,8 +904,8 @@ guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
- 	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
- }
- 
--guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
--				GDestroyNotify notify, gpointer user_data)
-+guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
-+			int vlen, GDestroyNotify notify, gpointer user_data)
- {
- 	uint8_t *buf;
- 	size_t buflen;
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index a11e473..c65bf6c 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -80,15 +80,15 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
- guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
- 							gpointer user_data);
- 
--guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
-+guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
- 					size_t vlen, GAttribResultFunc func,
- 					gpointer user_data);
- 
- guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
- 				GAttribResultFunc func, gpointer user_data);
- 
--guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
--				GDestroyNotify notify, gpointer user_data);
-+guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
-+			int vlen, GDestroyNotify notify, gpointer user_data);
- 
- guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
- 				bt_uuid_t *uuid, GAttribResultFunc func,
+-		if (format == 0x01)
++		if (format == ATT_FIND_INFO_RESP_FMT_16BIT)
+ 			bt_uuid16_create(&uuid, get_le16(&value[2]));
+ 		else {
+ 			uint128_t u128;
 -- 
 1.9.0
 
