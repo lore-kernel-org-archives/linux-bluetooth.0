@@ -1,35 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 03/11] android/gatt: Service error when client cannot be created
-Date: Thu, 27 Mar 2014 22:13:01 +0100
-Message-Id: <1395954789-32459-3-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 02/11] android/gatt: Add helper to get client by id
+Date: Thu, 27 Mar 2014 22:13:00 +0100
+Message-Id: <1395954789-32459-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If memory allocation failed, return error from handle_client_register.
+It will look for gatt_client by client_id.
 ---
- android/gatt.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ android/gatt.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 1af7e33..2e93ef7 100644
+index 7a3db27..1af7e33 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -239,6 +239,11 @@ static void handle_client_register(const void *buf, uint16_t len)
- 	}
+@@ -148,6 +148,11 @@ static bool match_client_by_id(const void *data, const void *user_data)
+ 	return client->id == exp_id;
+ }
  
- 	client = new0(struct gatt_client, 1);
-+	if (!client) {
-+		error("gatt: cannot allocate memory for registering client");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
++static struct gatt_client *find_client_by_id(int32_t id)
++{
++	return queue_find(gatt_clients, match_client_by_id, INT_TO_PTR(id));
++}
++
+ static bool match_by_value(const void *data, const void *user_data)
+ {
+ 	return data == user_data;
+@@ -628,8 +633,7 @@ static void handle_client_scan(const void *buf, uint16_t len)
  
- 	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+ 	DBG("new state %d", cmd->start);
  
+-	registered = queue_find(gatt_clients, match_client_by_id,
+-						INT_TO_PTR(cmd->client_if));
++	registered = find_client_by_id(cmd->client_if);
+ 	if (!registered) {
+ 		error("gatt: Client not registered");
+ 		status = HAL_STATUS_FAILED;
+@@ -736,8 +740,7 @@ static void handle_client_connect(const void *buf, uint16_t len)
+ 	DBG("");
+ 
+ 	/* Check if client is registered */
+-	l = queue_find(gatt_clients, match_client_by_id,
+-						INT_TO_PTR(cmd->client_if));
++	l = find_client_by_id(cmd->client_if);
+ 	if (!l) {
+ 		error("gatt: Client id %d not found", cmd->client_if);
+ 		status = HAL_STATUS_FAILED;
 -- 
 1.8.3.1
 
