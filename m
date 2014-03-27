@@ -2,56 +2,44 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 2/5] gatt: Set read and write callbacks based on Flags
-Date: Thu, 27 Mar 2014 10:21:12 -0300
-Message-Id: <1395926475-8841-3-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 5/5] doc: Remove Core SPEC page number from gatt-api.txt
+Date: Thu, 27 Mar 2014 10:21:15 -0300
+Message-Id: <1395926475-8841-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1395926475-8841-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1395926475-8841-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch checks the characteristic property bitmask before setting
-read and write callbacks. This approach avoids additional GDBusProxy
-calls and later verifications if the characteristic doesn't support
-read or write procedures.
+Remove Core SPEC page number from the API document to avoid wrong
+page reference when the SPEC changes.
 ---
- src/gatt-dbus.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ doc/gatt-api.txt | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 4eaf562..fbcbcfe 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -364,6 +364,8 @@ static int register_external_characteristics(GSList *proxies)
- 		bt_uuid_t uuid;
- 		struct btd_attribute *attr;
- 		GDBusProxy *proxy = list->data;
-+		btd_attr_write_t write_cb;
-+		btd_attr_read_t read_cb;
- 		uint8_t propmask = 0;
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 0f6b084..6c70679 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -65,13 +65,12 @@ Properties	string UUID [read-only]
+ 		array{string} Flags [read-only, optional]
  
- 		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
-@@ -384,8 +386,18 @@ static int register_external_characteristics(GSList *proxies)
- 		if (!propmask)
- 			return -EINVAL;
+ 			Defines how the characteristic value can be used. See
+-			Core spec page 1898, "Table 3.5: Characteristic
+-			Properties bit field" and page 1900, "Table 3.8:
+-			Characteristic Extended Properties bit field". Allowed
+-			values: "broadcast", "read", "write-without-response",
+-			"write", "notify", "indicate",
+-			"authenticated-signed-writes", "reliable-write", and
+-			"writable-auxiliaries".
++			Core spec page "Table 3.5: Characteristic Properties
++			bit field", and "Table 3.8: Characteristic Extended
++			Properties bit field". Allowed values: "broadcast",
++			"read", "write-without-response", "write", "notify",
++			"indicate", "authenticated-signed-writes",
++			"reliable-write", and "writable-auxiliaries".
  
--		attr = btd_gatt_add_char(&uuid, propmask, proxy_read_cb,
--							proxy_write_cb);
-+		if (propmask & GATT_CHR_PROP_READ)
-+			read_cb = proxy_read_cb;
-+		else
-+			read_cb = NULL;
-+
-+		if (propmask & (GATT_CHR_PROP_WRITE |
-+					GATT_CHR_PROP_WRITE_WITHOUT_RESP))
-+			write_cb = proxy_write_cb;
-+		else
-+			write_cb = NULL;
-+
-+		attr = btd_gatt_add_char(&uuid, propmask, read_cb, write_cb);
- 		if (!attr)
- 			return -EINVAL;
  
+ Characteristic Descriptors hierarchy
 -- 
 1.8.3.1
 
