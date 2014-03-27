@@ -1,32 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] attrib/gatttool: Use define for UUID format check
-Date: Thu, 27 Mar 2014 15:03:29 +0100
-Message-Id: <1395929009-23366-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1395929009-23366-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1395929009-23366-1-git-send-email-jakub.tyszkowski@tieto.com>
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 5/5] doc: Remove Core SPEC page number from gatt-api.txt
+Date: Thu, 27 Mar 2014 10:35:44 -0300
+Message-Id: <1395927344-9598-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395926475-8841-6-git-send-email-claudio.takahasi@openbossa.org>
+References: <1395926475-8841-6-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Remove Core SPEC page number from the API document to avoid wrong
+page reference when the SPEC changes.
 ---
- attrib/gatttool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ Changes from v0 to v1: Fixing typo.
 
-diff --git a/attrib/gatttool.c b/attrib/gatttool.c
-index ca178ce..5e0f820 100644
---- a/attrib/gatttool.c
-+++ b/attrib/gatttool.c
-@@ -426,7 +426,7 @@ static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 		value = list->data[i];
- 		handle = get_le16(value);
+ doc/gatt-api.txt | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
+
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 0f6b084..95603fc 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -65,13 +65,12 @@ Properties	string UUID [read-only]
+ 		array{string} Flags [read-only, optional]
  
--		if (format == 0x01)
-+		if (format == ATT_FIND_INFO_RESP_FMT_16BIT)
- 			bt_uuid16_create(&uuid, get_le16(&value[2]));
- 		else {
- 			uint128_t u128;
+ 			Defines how the characteristic value can be used. See
+-			Core spec page 1898, "Table 3.5: Characteristic
+-			Properties bit field" and page 1900, "Table 3.8:
+-			Characteristic Extended Properties bit field". Allowed
+-			values: "broadcast", "read", "write-without-response",
+-			"write", "notify", "indicate",
+-			"authenticated-signed-writes", "reliable-write", and
+-			"writable-auxiliaries".
++			Core spec "Table 3.5: Characteristic Properties bit
++			field", and "Table 3.8: Characteristic Extended
++			Properties bit field". Allowed values: "broadcast",
++			"read", "write-without-response", "write", "notify",
++			"indicate", "authenticated-signed-writes",
++			"reliable-write", and "writable-auxiliaries".
+ 
+ 
+ Characteristic Descriptors hierarchy
 -- 
-1.9.0
+1.8.3.1
 
