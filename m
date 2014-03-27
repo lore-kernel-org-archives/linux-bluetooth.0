@@ -1,55 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 02/11] android/gatt: Add helper to get client by id
-Date: Thu, 27 Mar 2014 22:13:00 +0100
-Message-Id: <1395954789-32459-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 07/11] android/gatt: Add notifications list to gatt_client
+Date: Thu, 27 Mar 2014 22:13:05 +0100
+Message-Id: <1395954789-32459-7-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will look for gatt_client by client_id.
+It will be used for storing informations about registered handlers.
+These handlers will be registered for both ATT_OP_HANDLE_NOTIFY
+and ATT_OP_HANDLE_IND. Added also new function to destroy gatt_client.
 ---
- android/gatt.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ android/gatt.c | 31 ++++++++++++++++++++++++++++++-
+ 1 file changed, 30 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 7a3db27..1af7e33 100644
+index e35b099..2cd0731 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -148,6 +148,11 @@ static bool match_client_by_id(const void *data, const void *user_data)
- 	return client->id == exp_id;
+@@ -51,6 +51,7 @@
+ struct gatt_client {
+ 	int32_t id;
+ 	uint8_t uuid[16];
++	struct queue *notifications;
+ };
+ 
+ struct element_id {
+@@ -70,6 +71,16 @@ struct service {
+ 	struct queue *chars;
+ };
+ 
++struct notification_data {
++	struct hal_gatt_srvc_id service;
++	struct hal_gatt_gatt_id ch;
++	struct gatt_client *client;
++	struct gatt_device *dev;
++	guint notif_id;
++	guint ind_id;
++	int ref;
++};
++
+ struct gatt_device {
+ 	bdaddr_t bdaddr;
+ 	uint8_t bdaddr_type;
+@@ -216,6 +227,16 @@ static void destroy_device(void *data)
+ 	free(dev);
  }
  
-+static struct gatt_client *find_client_by_id(int32_t id)
++static void destroy_gatt_client(void *data)
 +{
-+	return queue_find(gatt_clients, match_client_by_id, INT_TO_PTR(id));
++	struct gatt_client *client = data;
++
++	if (client->notifications)
++		queue_destroy(client->notifications, free);
++
++	free(client);
 +}
 +
- static bool match_by_value(const void *data, const void *user_data)
+ static void handle_client_register(const void *buf, uint16_t len)
  {
- 	return data == user_data;
-@@ -628,8 +633,7 @@ static void handle_client_scan(const void *buf, uint16_t len)
+ 	const struct hal_cmd_gatt_client_register *cmd = buf;
+@@ -247,6 +268,14 @@ static void handle_client_register(const void *buf, uint16_t len)
  
- 	DBG("new state %d", cmd->start);
+ 	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
  
--	registered = queue_find(gatt_clients, match_client_by_id,
--						INT_TO_PTR(cmd->client_if));
-+	registered = find_client_by_id(cmd->client_if);
- 	if (!registered) {
- 		error("gatt: Client not registered");
- 		status = HAL_STATUS_FAILED;
-@@ -736,8 +740,7 @@ static void handle_client_connect(const void *buf, uint16_t len)
- 	DBG("");
++	client->notifications = queue_new();
++	if (!client->notifications) {
++		error("gatt: couldn't allocate notifications queue");
++		destroy_gatt_client(client);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
+ 	client->id = client_cnt++;
  
- 	/* Check if client is registered */
--	l = queue_find(gatt_clients, match_client_by_id,
--						INT_TO_PTR(cmd->client_if));
-+	l = find_client_by_id(cmd->client_if);
- 	if (!l) {
- 		error("gatt: Client id %d not found", cmd->client_if);
- 		status = HAL_STATUS_FAILED;
+ 	queue_push_head(gatt_clients, client);
+@@ -281,7 +310,7 @@ static void handle_client_unregister(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	free(cl);
++	destroy_gatt_client(cl);
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
 -- 
 1.8.3.1
 
