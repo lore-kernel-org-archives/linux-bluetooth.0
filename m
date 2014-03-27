@@ -1,120 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/2] android/gatt: Fix sendig wrong byte ordered uuids
-Date: Thu, 27 Mar 2014 20:03:46 +0100
-Message-ID: <1821829.gF6gCp4bkd@athlon>
-In-Reply-To: <1395936305-23188-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1395936305-23188-1-git-send-email-jakub.tyszkowski@tieto.com>
+Message-ID: <5334720A.7090109@openbossa.org>
+Date: Thu, 27 Mar 2014 15:46:34 -0300
+From: Andre Guedes <andre.guedes@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] Bluetooth: Keep msec in DISCOV_INTERLEAVED_TIMEOUT
+References: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Lukasz,
 
-On Thursday 27 March 2014 17:05:04 Jakub Tyszkowski wrote:
-> We were sending wrong byte ordered uuids since the last gatt library
-> changes. Two helpers were introduced for swapping uuids sent to, and
-> received from HAL.
+On 03/27/2014 12:49 PM, Lukasz Rymanowski wrote:
+> Keep msec instead of jiffies in this define. This is needed by folowing
+> patch where we want this timeout to be exposed in debugfs.
+>
+> Note: This default value comes from BT Spec. 4.0 Vol 3 chapter 13.2.1.
+>
+> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 > ---
->  android/gatt.c | 43 ++++++++++++++++++++++++++++++-------------
->  1 file changed, 30 insertions(+), 13 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index fe8ba74..0327d54 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -96,6 +96,31 @@ static struct queue *conn_wait_queue = NULL;	/* Devs
-> waiting to connect */
-> 
->  static void bt_le_discovery_stop_cb(void);
-> 
-> +static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-> +{
-> +	uint8_t i;
+>   include/net/bluetooth/hci_core.h |  2 +-
+>   net/bluetooth/mgmt.c             | 13 +++++++++----
+>   2 files changed, 10 insertions(+), 5 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index e2bfcda..1c6776a 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1210,7 +1210,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+>   #define DISCOV_LE_SCAN_WIN		0x12
+>   #define DISCOV_LE_SCAN_INT		0x12
+>   #define DISCOV_LE_TIMEOUT		msecs_to_jiffies(10240)
+> -#define DISCOV_INTERLEAVED_TIMEOUT	msecs_to_jiffies(5120)
+> +#define DISCOV_INTERLEAVED_TIMEOUT	5120 /* msec */
+>   #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+>   #define DISCOV_BREDR_INQUIRY_LEN	0x08
+>
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 6487c73..e6d906f 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3352,6 +3352,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+>
+>   static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+>   {
+> +	unsigned long timeout = 0;
 > +
-> +	dst->type = BT_UUID128;
+>   	BT_DBG("status %d", status);
+>
+>   	if (status) {
+> @@ -3367,13 +3369,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+>
+>   	switch (hdev->discovery.type) {
+>   	case DISCOV_TYPE_LE:
+> -		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+> -				   DISCOV_LE_TIMEOUT);
+> +		timeout = DISCOV_LE_TIMEOUT;
+>   		break;
+>
+>   	case DISCOV_TYPE_INTERLEAVED:
+> -		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+> -				   DISCOV_INTERLEAVED_TIMEOUT);
+> +		timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
+>   		break;
+>
+>   	case DISCOV_TYPE_BREDR:
+> @@ -3382,6 +3382,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+>   	default:
+>   		BT_ERR("Invalid discovery type %d", hdev->discovery.type);
+>   	}
 > +
-> +	for (i = 0; i < 16; i++)
-> +		dst->value.u128.data[i] = uuid[15 - i];
+> +	if (!timeout)
+> +		return;
 > +
-> +}
-> +
-> +static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
-> +{
-> +	bt_uuid_t uu128;
-> +	uint8_t i;
-> +
-> +	if (src->type != BT_UUID128) {
-> +		bt_uuid_to_uuid128(src, &uu128);
-> +		src = &uu128;
-> +	}
-> +
-> +	for (i = 0; i < 16; i++)
-> +		uuid[15 - i] = src->value.u128.data[i];
-> +}
-> +
->  static void destroy_service(void *data)
->  {
->  	struct service *srvc = data;
-> @@ -317,7 +342,7 @@ static void primary_cb(uint8_t status, GSList *services,
-> void *user_data) continue;
->  		}
-> 
-> -		memcpy(&ev_res.srvc_id.uuid, &uuid.value, sizeof(uuid.value));
-> +		uuid2android(&uuid, ev_res.srvc_id.uuid);
-> 
->  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
->  					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
-> @@ -929,26 +954,22 @@ static void send_client_char_notify(const struct
-> characteristic *ch, uint8_t status)
->  {
->  	struct hal_ev_gatt_client_get_characteristic ev;
-> -	bt_uuid_t uuid;
-> 
->  	memset(&ev, 0, sizeof(ev));
->  	ev.status = status;
-> 
->  	if (ch) {
->  		ev.char_prop = ch->ch.properties;
-> +
->  		ev.char_id.inst_id = ch->id.instance;
-> -		bt_string_to_uuid(&uuid, ch->ch.uuid);
-> -		memcpy(&ev.char_id.uuid, &uuid.value.u128.data,
-> -						sizeof(ev.char_id.uuid));
-> +		uuid2android(&ch->id.uuid, ev.char_id.uuid);
->  	}
-> 
->  	ev.conn_id = conn_id;
->  	/* TODO need to be handled for included services too */
->  	ev.srvc_id.is_primary = 1;
->  	ev.srvc_id.inst_id = service->id.instance;
-> -	bt_string_to_uuid(&uuid, service->primary.uuid);
-> -	memcpy(&ev.srvc_id.uuid, &uuid.value.u128.data,
-> -					sizeof(ev.srvc_id.uuid));
-> +	uuid2android(&service->id.uuid, ev.srvc_id.uuid);
-> 
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->  					HAL_EV_GATT_CLIENT_GET_CHARACTERISTIC,
-> @@ -1016,12 +1037,8 @@ static void discover_char_cb(uint8_t status, GSList
-> *characteristics, static void hal_srvc_id_to_element_id(const struct
-> hal_gatt_srvc_id *from, struct element_id *to)
->  {
-> -	uint128_t uuid128;
-> -
->  	to->instance = from->inst_id;
-> -
-> -	memcpy(&uuid128.data, &from->uuid, sizeof(uuid128));
-> -	bt_uuid128_create(&to->uuid, uuid128);
-> +	android2uuid(from->uuid, &to->uuid);
->  }
-> 
->  static bool find_service(int32_t conn_id, struct element_id *service_id,
+> +	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
 
-Both patches applied, thanks.
+You may want to do like this here:
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+if (timeout)
+	queue_delayed_work(hdev->workqueue, hdev->le_scan_disable,
+			   timeout);
+
+BR,
+
+Andre
