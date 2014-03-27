@@ -2,58 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 3/3] mgmt-api: Add Remote RSSI Event
-Date: Thu, 27 Mar 2014 22:10:29 +0100
-Message-ID: <1395954629-16156-3-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1395954629-16156-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395954629-16156-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [RFC 1/3] mgmt-api: Add Start Remote RSSI Command
+Date: Thu, 27 Mar 2014 22:10:27 +0100
+Message-ID: <1395954629-16156-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ doc/mgmt-api.txt | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 6d3b86b..2ba2a5b 100644
+index 78f0bd2..28e7845 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -2310,3 +2310,33 @@ New Signature Resolving Key Event
+@@ -1668,6 +1668,38 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
  
- 	The provided Address and Address_Type are the identity of
- 	a device. So either its public address or static random address.
+ 
++Start Read Remote RSSI Command
++==============================
 +
-+
-+Remote RSSI Event
-+=================
-+
-+	Event Code:		0x0020
-+	Controller Index:	<controller id>
-+	Event Parameters:	Address (6 Octets)
++	Command Code:		0x0031
++	Controller Index:       <controller id>
++	Command Parameters:	Address (6 Octets)
 +				Address_Type (1 Octet)
-+				Active (1 Octet)
-+				RSSI (1 Octet)
++				Threshold (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Current_RSSI (1 Octet)
 +
-+	This event indicates that a remote RSSI has exceed threshold
-+	given on Start Read Remote RSSI command.
++	This command is used to start read remote rssi with given
++	threshold. On this command current remote RSSI is read and
++	is used as starting point for messurements. If threshold is
++	exceeded then Remote RSSI event is sent.
 +
-+	Possible values for the Address_Type parameter:
-+		0	BR/EDR
-+		1	LE Public
-+		2	LE Random
++	If threshold is 0 then no Remote RSSI event is generated but
++	only Command Complete with current RSSI.
 +
-+	The valid values for the Active parameter are 0x01
-+	(RSSI read active) and 0x00 (RSSI read stopped).
++	This command can be used only when controller is powered on.
 +
-+	Possible RSSI values:
-+		BR/EDR
-+			Range: -128 <= N <= 127 (signed integer)
-+			Units: dB
-+		LE:
-+			Range: -127 to 20, 127 (signed integer)
-+			Units: dBm
++	This command generates a Command Complete event on success
++	and on failure.
++
++	Possible errors:	Not Connected
++				Busy
++				Invalid Parameters
++				Not Powered
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
 1.8.4
 
