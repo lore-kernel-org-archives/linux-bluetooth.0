@@ -1,79 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 06/11] android/gatt: Add implementation of get_included_cb
-Date: Thu, 27 Mar 2014 22:13:04 +0100
-Message-Id: <1395954789-32459-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 04/11] android/gatt: Add initial implementation of get_included_service
+Date: Thu, 27 Mar 2014 22:13:02 +0100
+Message-Id: <1395954789-32459-4-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will pass found services to upper layer with notification.
-Caching included services should be done later.
+It will look for included service in range passed in command.
+It call gatt_find_included(), but without result callback now,
+as it is initial version.
 ---
- android/gatt.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ android/gatt.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 58 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 7eb867b..e35b099 100644
+index 2e93ef7..bf40162 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -980,10 +980,53 @@ struct get_included_data {
- 
- static void get_included_cb(uint8_t status, GSList *included, void *user_data)
- {
-+	struct hal_ev_gatt_client_get_inc_service ev;
- 	struct get_included_data *data = user_data;
-+	struct gatt_device *device = data->device;
-+	struct service *service = data->service;
-+	GSList *list = included;
-+	bt_uuid_t uuid;
-+
-+	DBG("");
- 
--	/* TODO pass included services to notification */
- 	free(data);
-+
-+	if (status) {
-+		error("gatt: no included services found");
-+		return;
-+	}
-+
-+	bt_string_to_uuid(&uuid, service->primary.uuid);
-+
-+	/* TODO store included services in device->services list */
-+	for (; list; list = list->next) {
-+		struct gatt_included *included = list->data;
-+		bt_uuid_t inc_uuid;
-+
-+		ev.conn_id = device->conn_id;
-+		ev.status = HAL_STATUS_SUCCESS;
-+
-+		ev.srvc_id.inst_id = 0;
-+		uuid2android(&uuid, ev.srvc_id.uuid);
-+
-+		ev.incl_srvc_id.inst_id = 0;
-+		bt_string_to_uuid(&inc_uuid, included->uuid);
-+		uuid2android(&uuid, ev.incl_srvc_id.uuid);
-+
-+		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
-+					HAL_EV_GATT_CLIENT_GET_INC_SERVICE,
-+					sizeof(ev), &ev);
-+	}
-+
-+	/* Android expects notification with error status in the end */
-+	ev.conn_id = device->conn_id;
-+	ev.status = HAL_STATUS_FAILED;
-+	ev.srvc_id.inst_id = 0;
-+	uuid2android(&uuid, ev.srvc_id.uuid);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
-+					HAL_EV_GATT_CLIENT_GET_INC_SERVICE,
-+					sizeof(ev), &ev);
+@@ -955,13 +955,70 @@ reply:
+ 			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
  }
  
++static bool match_service_by_uuid(const void *data, const void *user_data)
++{
++	const struct service *service = data;
++	const bt_uuid_t *uuid = user_data;
++	bt_uuid_t service_uuid;
++
++	if (bt_string_to_uuid(&service_uuid, service->primary.uuid) < 0)
++		return false;
++
++	return !bt_uuid_cmp(uuid, &service_uuid);
++}
++
++static struct service *find_service_bu_uuid(struct gatt_device *device,
++								bt_uuid_t *uuid)
++{
++	return queue_find(device->services, match_service_by_uuid, uuid);
++}
++
  static void handle_client_get_included_service(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
++	struct gatt_device *device;
++	struct service *service;
++	uint8_t status;
++
+ 	DBG("");
+ 
++	device = find_device_by_conn_id(cmd->conn_id);
++	if (!device) {
++		error("gatt: device with conn_id %d not found", cmd->conn_id);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	if (queue_isempty(device->services)) {
++		error("gatt: Search primary services first");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	if (!cmd->number) {
++		service = queue_peek_head(device->services);
++	} else {
++		bt_uuid_t uuid;
++
++		android2uuid(cmd->srvc_id->uuid, &uuid);
++		service = find_service_bu_uuid(device, &uuid);
++	}
++
++	if (!service) {
++		error("gatt: service not found");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	gatt_find_included(device->attrib, service->primary.range.start,
++					service->primary.range.end, NULL, NULL);
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 					HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
+-					HAL_STATUS_FAILED);
++					status);
+ }
+ 
+ static void send_client_char_notify(const struct characteristic *ch,
 -- 
 1.8.3.1
 
