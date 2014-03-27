@@ -1,30 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0] gatt: Fix proxies list iteration
-Date: Thu, 27 Mar 2014 16:45:02 -0300
-Message-Id: <1395949502-30266-1-git-send-email-claudio.takahasi@openbossa.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android/gatt: Add initial handling of register_for_notification
+Date: Thu, 27 Mar 2014 20:27:17 +0100
+Message-ID: <1946037.K2TfiEKbtd@athlon>
+In-Reply-To: <1395844640-11602-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1395844640-11602-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/gatt-dbus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Marcin,
 
-diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 95d1243..4456ec0 100644
---- a/src/gatt-dbus.c
-+++ b/src/gatt-dbus.c
-@@ -297,7 +297,7 @@ static int register_external_characteristics(GSList *proxies)
- {
- 	GSList *list;
- 
--	for (list = proxies; list; list = g_slist_next(proxies)) {
-+	for (list = proxies; list; list = g_slist_next(list)) {
- 		DBusMessageIter iter;
- 		const char *str, *path;
- 		bt_uuid_t uuid;
+On Wednesday 26 March 2014 15:37:17 Marcin Kraglak wrote:
+> This command will register for both notifications and indications for given
+> characteristic and service. Notifications list will be stored in
+> client struct.
+> ---
+>  android/gatt.c | 187
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
+> 185 insertions(+), 2 deletions(-)
+
+I've already applied Jakub's patches so you need to rebase this.
+
 -- 
-1.8.3.1
-
+Szymon K. Janc
+szymon.janc@gmail.com
