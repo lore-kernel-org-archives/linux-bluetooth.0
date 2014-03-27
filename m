@@ -1,62 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 1/3] mgmt-api: Add Start Remote RSSI Command
-Date: Thu, 27 Mar 2014 22:10:27 +0100
-Message-ID: <1395954629-16156-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/handsfree: Check service class is not zero
+Date: Thu, 27 Mar 2014 21:48:50 +0100
+Message-ID: <2072967.UJTOv3NnB9@athlon>
+In-Reply-To: <1394713917-21428-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1394713917-21428-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+Hi Andrei,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 78f0bd2..28e7845 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -1668,6 +1668,38 @@ Load Identity Resolving Keys Command
- 				Invalid Index
- 
- 
-+Start Read Remote RSSI Command
-+==============================
-+
-+	Command Code:		0x0031
-+	Controller Index:       <controller id>
-+	Command Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Threshold (1 Octet)
-+	Return Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Current_RSSI (1 Octet)
-+
-+	This command is used to start read remote rssi with given
-+	threshold. On this command current remote RSSI is read and
-+	is used as starting point for messurements. If threshold is
-+	exceeded then Remote RSSI event is sent.
-+
-+	If threshold is 0 then no Remote RSSI event is generated but
-+	only Command Complete with current RSSI.
-+
-+	This command can be used only when controller is powered on.
-+
-+	This command generates a Command Complete event on success
-+	and on failure.
-+
-+	Possible errors:	Not Connected
-+				Busy
-+				Invalid Parameters
-+				Not Powered
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
+On Thursday 13 March 2014 14:31:57 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Fixes static analyzers NULL dereference warnings. The similar check is
+> done in src/device.c in line 2959.
+> ---
+>  android/handsfree.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index b71c28e..7167938 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -1152,6 +1152,9 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int
+> err, gpointer data) goto fail;
+>  	}
+> 
+> +	if (!classes)
+> +		goto fail;
+> +
+>  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
+>  		error("handsfree: unable to get access protocols from record");
+>  		sdp_list_free(classes, free);
+> @@ -1242,6 +1245,9 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int
+> err, gpointer data) goto fail;
+>  	}
+> 
+> +	if (!classes)
+> +		goto fail;
+> +
+>  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
+>  		error("handsfree: unable to get access protocols from record");
+>  		sdp_list_free(classes, free);
+
+Applied with some modifications so that we log error in case classes are NULL.
+Thanks.
+
 -- 
-1.8.4
-
+Szymon K. Janc
+szymon.janc@gmail.com
