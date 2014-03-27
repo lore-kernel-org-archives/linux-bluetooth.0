@@ -2,75 +2,79 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 2/2] Bluetooth: Add new debugfs parameter
-Date: Thu, 27 Mar 2014 16:49:04 +0100
-Message-ID: <1395935344-31715-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 1/2] Bluetooth: Keep msec in DISCOV_INTERLEAVED_TIMEOUT
+Date: Thu, 27 Mar 2014 16:49:03 +0100
+Message-ID: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch it is possible to control discovery interleaved
-timeout value from debugfs.
+Keep msec instead of jiffies in this define. This is needed by folowing
+patch where we want this timeout to be exposed in debugfs.
 
-It is for fine tuning of this timeout.
+Note: This default value comes from BT Spec. 4.0 Vol 3 chapter 13.2.1.
 
 Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_core.c         | 4 ++++
- net/bluetooth/mgmt.c             | 2 +-
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/mgmt.c             | 13 +++++++++----
+ 2 files changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 1c6776a..6a5922f 100644
+index e2bfcda..1c6776a 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -199,6 +199,7 @@ struct hci_dev {
- 	__u16		le_scan_window;
- 	__u16		le_conn_min_interval;
- 	__u16		le_conn_max_interval;
-+	__u16		discov_interleaved_timeout;
- 	__u8		ssp_debug_mode;
- 
- 	__u16		devid_source;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c6189d9..4ae237c 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1823,6 +1823,9 @@ static int __hci_init(struct hci_dev *hdev)
- 				    &lowpan_debugfs_fops);
- 		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
- 				    &le_auto_conn_fops);
-+		debugfs_create_u16("discov_interleaved_timeout", 0644,
-+				   hdev->debugfs,
-+				   &hdev->discov_interleaved_timeout);
- 	}
- 
- 	return 0;
-@@ -3786,6 +3789,7 @@ struct hci_dev *hci_alloc_dev(void)
- 
- 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
- 
-+	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
- 	mutex_init(&hdev->lock);
- 	mutex_init(&hdev->req_lock);
+@@ -1210,7 +1210,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
+ #define DISCOV_LE_SCAN_WIN		0x12
+ #define DISCOV_LE_SCAN_INT		0x12
+ #define DISCOV_LE_TIMEOUT		msecs_to_jiffies(10240)
+-#define DISCOV_INTERLEAVED_TIMEOUT	msecs_to_jiffies(5120)
++#define DISCOV_INTERLEAVED_TIMEOUT	5120 /* msec */
+ #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
+ #define DISCOV_BREDR_INQUIRY_LEN	0x08
  
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e6d906f..b97477f 100644
+index 6487c73..e6d906f 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3373,7 +3373,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+@@ -3352,6 +3352,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
+ 
+ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ {
++	unsigned long timeout = 0;
++
+ 	BT_DBG("status %d", status);
+ 
+ 	if (status) {
+@@ -3367,13 +3369,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 
+ 	switch (hdev->discovery.type) {
+ 	case DISCOV_TYPE_LE:
+-		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+-				   DISCOV_LE_TIMEOUT);
++		timeout = DISCOV_LE_TIMEOUT;
  		break;
  
  	case DISCOV_TYPE_INTERLEAVED:
--		timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
-+		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
+-		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
+-				   DISCOV_INTERLEAVED_TIMEOUT);
++		timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
  		break;
  
  	case DISCOV_TYPE_BREDR:
+@@ -3382,6 +3382,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	default:
+ 		BT_ERR("Invalid discovery type %d", hdev->discovery.type);
+ 	}
++
++	if (!timeout)
++		return;
++
++	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
+ }
+ 
+ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
 -- 
 1.8.4
 
