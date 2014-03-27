@@ -1,89 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5334720A.7090109@openbossa.org>
-Date: Thu, 27 Mar 2014 15:46:34 -0300
-From: Andre Guedes <andre.guedes@openbossa.org>
+Date: Thu, 27 Mar 2014 14:18:49 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-03-24
+Message-ID: <20140327181849.GG31168@tuxdriver.com>
+References: <20140324173332.GA2214@joana>
+ <20140326183411.GB1741@joana>
 MIME-Version: 1.0
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] Bluetooth: Keep msec in DISCOV_INTERLEAVED_TIMEOUT
-References: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140326183411.GB1741@joana>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+On Wed, Mar 26, 2014 at 03:34:11PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> 2014-03-24 Gustavo Padovan <gustavo@padovan.org>:
+> 
+> > Hi John,
+> > 
+> > Here follow another set of patches to 3.15. This is mostly a bug fix pull
+> > request with the exception of one commit from Marcel which adds tracking to
+> > the current configured LE scan type parameter.
+> 
+> There is one more fix that we want to include in this pull request. Here
+> follows a new pull request, please pull, Thanks. 
+> 
+> 	Gustavo
+> 
+> --
+> The following changes since commit 40b552aa5a0bfa785bc7ddb5c2d7965b1e0bb08d:
+> 
+>   Bluetooth: Enforce strict Secure Connections Only mode security (2014-03-19 23:30:32 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to e8b1ab9e6d30394e0df3e4f60bf56c4dc9bf0863:
+> 
+>   Bluetooth: Fix returning peer address in pending connect state (2014-03-26 09:31:33 -0700)
 
-On 03/27/2014 12:49 PM, Lukasz Rymanowski wrote:
-> Keep msec instead of jiffies in this define. This is needed by folowing
-> patch where we want this timeout to be exposed in debugfs.
->
-> Note: This default value comes from BT Spec. 4.0 Vol 3 chapter 13.2.1.
->
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> ---
->   include/net/bluetooth/hci_core.h |  2 +-
->   net/bluetooth/mgmt.c             | 13 +++++++++----
->   2 files changed, 10 insertions(+), 5 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index e2bfcda..1c6776a 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1210,7 +1210,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event);
->   #define DISCOV_LE_SCAN_WIN		0x12
->   #define DISCOV_LE_SCAN_INT		0x12
->   #define DISCOV_LE_TIMEOUT		msecs_to_jiffies(10240)
-> -#define DISCOV_INTERLEAVED_TIMEOUT	msecs_to_jiffies(5120)
-> +#define DISCOV_INTERLEAVED_TIMEOUT	5120 /* msec */
->   #define DISCOV_INTERLEAVED_INQUIRY_LEN	0x04
->   #define DISCOV_BREDR_INQUIRY_LEN	0x08
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 6487c73..e6d906f 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3352,6 +3352,8 @@ static int mgmt_start_discovery_failed(struct hci_dev *hdev, u8 status)
->
->   static void start_discovery_complete(struct hci_dev *hdev, u8 status)
->   {
-> +	unsigned long timeout = 0;
-> +
->   	BT_DBG("status %d", status);
->
->   	if (status) {
-> @@ -3367,13 +3369,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
->
->   	switch (hdev->discovery.type) {
->   	case DISCOV_TYPE_LE:
-> -		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
-> -				   DISCOV_LE_TIMEOUT);
-> +		timeout = DISCOV_LE_TIMEOUT;
->   		break;
->
->   	case DISCOV_TYPE_INTERLEAVED:
-> -		queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
-> -				   DISCOV_INTERLEAVED_TIMEOUT);
-> +		timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
->   		break;
->
->   	case DISCOV_TYPE_BREDR:
-> @@ -3382,6 +3382,11 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
->   	default:
->   		BT_ERR("Invalid discovery type %d", hdev->discovery.type);
->   	}
-> +
-> +	if (!timeout)
-> +		return;
-> +
-> +	queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable, timeout);
+Pulling now...
 
-You may want to do like this here:
-
-if (timeout)
-	queue_delayed_work(hdev->workqueue, hdev->le_scan_disable,
-			   timeout);
-
-BR,
-
-Andre
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
