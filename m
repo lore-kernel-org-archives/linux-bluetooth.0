@@ -1,41 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix incorrect usage of bt_uuid_to_uuid128
-Date: Thu, 27 Mar 2014 15:51:16 +0100
-Message-ID: <2742319.EvBRQBAv4r@uw000953>
-In-Reply-To: <1395850086-26154-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1395850086-26154-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] attrib: Use const source data pointer for write
+Date: Thu, 27 Mar 2014 15:03:28 +0100
+Message-Id: <1395929009-23366-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Source buffer for write operations should be immutable.
+---
+ attrib/gatt.c | 6 +++---
+ attrib/gatt.h | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-On Wednesday 26 of March 2014 17:08:06 Grzegorz Kolodziejczyk wrote:
-> ---
->  android/gatt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 6354ac6..04e9729 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -970,7 +970,7 @@ static void cache_all_srvc_chars(GSList *characteristics, struct queue *q)
->  		memcpy(&ch->ch, characteristics->data, sizeof(ch->ch));
->  
->  		bt_string_to_uuid(&uuid, ch->ch.uuid);
-> -		bt_uuid_to_uuid128(&ch->id.uuid, &uuid);
-> +		bt_uuid_to_uuid128(&uuid, &ch->id.uuid);
->  
->  		/* For now we increment inst_id and use it as characteristic
->  		 * handle
-> 
-
-Applied, thanks.
-
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 7363b4b..5ae20f4 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -840,7 +840,7 @@ static guint prepare_write(struct write_long_data *long_write)
+ 									NULL);
+ }
+ 
+-guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
++guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
+ 			size_t vlen, GAttribResultFunc func, gpointer user_data)
+ {
+ 	uint8_t *buf;
+@@ -904,8 +904,8 @@ guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
+ 	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
+ }
+ 
+-guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+-				GDestroyNotify notify, gpointer user_data)
++guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
++			int vlen, GDestroyNotify notify, gpointer user_data)
+ {
+ 	uint8_t *buf;
+ 	size_t buflen;
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index a11e473..c65bf6c 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -80,15 +80,15 @@ guint gatt_discover_char(GAttrib *attrib, uint16_t start, uint16_t end,
+ guint gatt_read_char(GAttrib *attrib, uint16_t handle, GAttribResultFunc func,
+ 							gpointer user_data);
+ 
+-guint gatt_write_char(GAttrib *attrib, uint16_t handle, uint8_t *value,
++guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
+ 					size_t vlen, GAttribResultFunc func,
+ 					gpointer user_data);
+ 
+ guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				GAttribResultFunc func, gpointer user_data);
+ 
+-guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, uint8_t *value, int vlen,
+-				GDestroyNotify notify, gpointer user_data);
++guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
++			int vlen, GDestroyNotify notify, gpointer user_data);
+ 
+ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				bt_uuid_t *uuid, GAttribResultFunc func,
 -- 
-Best regards, 
-Szymon Janc
+1.9.0
+
