@@ -1,111 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 01/11] android/gatt: Add helper for getting device by conn_id
+Date: Thu, 27 Mar 2014 22:33:23 +0100
+Message-ID: <1965189.dW4yBg2Fyz@athlon>
+In-Reply-To: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <5334720A.7090109@openbossa.org>
-References: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<5334720A.7090109@openbossa.org>
-Date: Thu, 27 Mar 2014 22:34:57 +0100
-Message-ID: <CAMudyAu4CUnhB_mb9nB6bj+JUh9ACagnOdVn5qgK_yfdovwpyw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] Bluetooth: Keep msec in DISCOV_INTERLEAVED_TIMEOUT
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Marcin,
 
-On 27 March 2014 19:46, Andre Guedes <andre.guedes@openbossa.org> wrote:
-> Hi Lukasz,
->
-> On 03/27/2014 12:49 PM, Lukasz Rymanowski wrote:
->>
->> Keep msec instead of jiffies in this define. This is needed by folowing
->> patch where we want this timeout to be exposed in debugfs.
->>
->> Note: This default value comes from BT Spec. 4.0 Vol 3 chapter 13.2.1.
->>
->> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
->> ---
->>   include/net/bluetooth/hci_core.h |  2 +-
->>   net/bluetooth/mgmt.c             | 13 +++++++++----
->>   2 files changed, 10 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/net/bluetooth/hci_core.h
->> b/include/net/bluetooth/hci_core.h
->> index e2bfcda..1c6776a 100644
->> --- a/include/net/bluetooth/hci_core.h
->> +++ b/include/net/bluetooth/hci_core.h
->> @@ -1210,7 +1210,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int
->> event);
->>   #define DISCOV_LE_SCAN_WIN            0x12
->>   #define DISCOV_LE_SCAN_INT            0x12
->>   #define DISCOV_LE_TIMEOUT             msecs_to_jiffies(10240)
->> -#define DISCOV_INTERLEAVED_TIMEOUT     msecs_to_jiffies(5120)
->> +#define DISCOV_INTERLEAVED_TIMEOUT     5120 /* msec */
->>   #define DISCOV_INTERLEAVED_INQUIRY_LEN        0x04
->>   #define DISCOV_BREDR_INQUIRY_LEN      0x08
->>
->> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->> index 6487c73..e6d906f 100644
->> --- a/net/bluetooth/mgmt.c
->> +++ b/net/bluetooth/mgmt.c
->> @@ -3352,6 +3352,8 @@ static int mgmt_start_discovery_failed(struct
->> hci_dev *hdev, u8 status)
->>
->>   static void start_discovery_complete(struct hci_dev *hdev, u8 status)
->>   {
->> +       unsigned long timeout = 0;
->> +
->>         BT_DBG("status %d", status);
->>
->>         if (status) {
->> @@ -3367,13 +3369,11 @@ static void start_discovery_complete(struct
->> hci_dev *hdev, u8 status)
->>
->>         switch (hdev->discovery.type) {
->>         case DISCOV_TYPE_LE:
->> -               queue_delayed_work(hdev->workqueue,
->> &hdev->le_scan_disable,
->> -                                  DISCOV_LE_TIMEOUT);
->> +               timeout = DISCOV_LE_TIMEOUT;
->>                 break;
->>
->>         case DISCOV_TYPE_INTERLEAVED:
->> -               queue_delayed_work(hdev->workqueue,
->> &hdev->le_scan_disable,
->> -                                  DISCOV_INTERLEAVED_TIMEOUT);
->> +               timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
->>                 break;
->>
->>         case DISCOV_TYPE_BREDR:
->> @@ -3382,6 +3382,11 @@ static void start_discovery_complete(struct hci_dev
->> *hdev, u8 status)
->>         default:
->>                 BT_ERR("Invalid discovery type %d", hdev->discovery.type);
->>         }
->> +
->> +       if (!timeout)
->> +               return;
->> +
->> +       queue_delayed_work(hdev->workqueue, &hdev->le_scan_disable,
->> timeout);
->
->
-> You may want to do like this here:
->
-> if (timeout)
->         queue_delayed_work(hdev->workqueue, hdev->le_scan_disable,
->                            timeout);
->
+On Thursday 27 March 2014 22:12:59 Marcin Kraglak wrote:
+> It will look for cgatt_device by conn_id.
+> ---
+>  android/gatt.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 81bfdc0..7a3db27 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -713,6 +713,17 @@ static struct gatt_device *find_device(bdaddr_t *addr)
+>  	return NULL;
+>  }
+> 
+> +static struct gatt_device *find_device_by_conn_id(int32_t conn_id)
+> +{
+> +	struct gatt_device *dev;
+> +
+> +	dev = queue_find(conn_list, match_dev_by_conn_id, INT_TO_PTR(conn_id));
+> +	if (dev)
+> +		return dev;
+> +
+> +	return NULL;
 
-As I can see, in bluetooth module they usually check this way and in
-addition I do not have to break the line in queue_delayed_work(...)
-call, so I would keep this way.
+Wouldn't just return queue_find(); do the same here?
+> +}
+> +
+>  static void handle_client_connect(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_gatt_client_connect *cmd = buf;
+> @@ -850,8 +861,7 @@ static void handle_client_disconnect(const void *buf,
+> uint16_t len)
+> 
+>  	ba2str((bdaddr_t *)&cmd->bdaddr, addr);
+> 
+> -	dev = queue_find(conn_list, match_dev_by_conn_id,
+> -						INT_TO_PTR(cmd->conn_id));
+> +	dev = find_device_by_conn_id(cmd->conn_id);
+>  	if (!dev) {
+>  		error("gatt: dev %s with conn_id=%d not found",
+>  							addr, cmd->conn_id);
+> @@ -916,8 +926,7 @@ static void handle_client_search_service(const void
+> *buf, uint16_t len)
+> 
+>  	DBG("");
+> 
+> -	dev = queue_find(conn_list, match_dev_by_conn_id,
+> -						INT_TO_PTR(cmd->conn_id));
+> +	dev = find_device_by_conn_id(cmd->conn_id);
+>  	if (!dev) {
+>  		error("gatt: dev with conn_id=%d not found", cmd->conn_id);
+>  		status = HAL_STATUS_FAILED;
+> @@ -1040,8 +1049,7 @@ static bool find_service(int32_t conn_id, struct
+> element_id *service_id, struct gatt_device *device;
+>  	struct service *service;
+> 
+> -	device = queue_find(conn_list, match_dev_by_conn_id,
+> -							INT_TO_PTR(conn_id));
+> +	device = find_device_by_conn_id(conn_id);
+>  	if (!device) {
+>  		error("gatt: conn_id=%d not found", conn_id);
+>  		return false;
 
-> BR,
->
-> Andre
-
-BR
-\Lukasz
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
