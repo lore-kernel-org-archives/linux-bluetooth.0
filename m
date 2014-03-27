@@ -1,84 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v3 2/2] Bluetooth: Add new debugfs parameter
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395935344-31715-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Thu, 27 Mar 2014 09:06:47 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0333237E-E20D-41EF-92F4-D66E0732DFA3@holtmann.org>
-References: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com> <1395935344-31715-2-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 2/2] android/gatt: Fix cached services having element_id uuid not set
+Date: Thu, 27 Mar 2014 17:05:05 +0100
+Message-Id: <1395936305-23188-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1395936305-23188-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1395936305-23188-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+This patch removes temporary uuid as we already have uuid in services
+element_id, which now is properly filled.
+---
+ android/gatt.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
-> With this patch it is possible to control discovery interleaved
-> timeout value from debugfs.
-> 
-> It is for fine tuning of this timeout.
-> 
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> ---
-> include/net/bluetooth/hci_core.h | 1 +
-> net/bluetooth/hci_core.c         | 4 ++++
-> net/bluetooth/mgmt.c             | 2 +-
-> 3 files changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 1c6776a..6a5922f 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -199,6 +199,7 @@ struct hci_dev {
-> 	__u16		le_scan_window;
-> 	__u16		le_conn_min_interval;
-> 	__u16		le_conn_max_interval;
-> +	__u16		discov_interleaved_timeout;
-> 	__u8		ssp_debug_mode;
-> 
-> 	__u16		devid_source;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index c6189d9..4ae237c 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1823,6 +1823,9 @@ static int __hci_init(struct hci_dev *hdev)
-> 				    &lowpan_debugfs_fops);
-> 		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
-> 				    &le_auto_conn_fops);
-> +		debugfs_create_u16("discov_interleaved_timeout", 0644,
-> +				   hdev->debugfs,
-> +				   &hdev->discov_interleaved_timeout);
-> 	}
-> 
-> 	return 0;
-> @@ -3786,6 +3789,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 
-> 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
-
-remove this empty line.
-
-> 
-> +	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
-
-And add an empty line here.
-
-> 	mutex_init(&hdev->lock);
-> 	mutex_init(&hdev->req_lock);
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index e6d906f..b97477f 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3373,7 +3373,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
-> 		break;
-> 
-> 	case DISCOV_TYPE_INTERLEAVED:
-> -		timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
-> +		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
-> 		break;
-
-Regards
-
-Marcel
+diff --git a/android/gatt.c b/android/gatt.c
+index 0327d54..424e4db 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -304,7 +304,6 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 		struct hal_ev_gatt_client_search_result ev_res;
+ 		struct gatt_primary *prim = l->data;
+ 		struct service *p;
+-		bt_uuid_t uuid;
+ 
+ 		p = new0(struct service, 1);
+ 		if (!p) {
+@@ -321,6 +320,11 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 
+ 		memset(&ev_res, 0, sizeof(ev_res));
+ 
++		if (bt_string_to_uuid(&p->id.uuid, prim->uuid) < 0) {
++			error("gatt: Cannot convert string to uuid");
++			continue;
++		}
++
+ 		/* Put primary service to our local list */
+ 		memcpy(&p->primary, prim, sizeof(p->primary));
+ 		if (!queue_push_tail(dev->services, p)) {
+@@ -337,12 +341,7 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 		ev_res.srvc_id.is_primary = 1;
+ 		ev_res.srvc_id.inst_id = 0;
+ 
+-		if (bt_string_to_uuid(&uuid, prim->uuid) < 0) {
+-			error("gatt: Cannot convert string to uuid");
+-			continue;
+-		}
+-
+-		uuid2android(&uuid, ev_res.srvc_id.uuid);
++		uuid2android(&p->id.uuid, ev_res.srvc_id.uuid);
+ 
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT ,
+ 					HAL_EV_GATT_CLIENT_SEARCH_RESULT,
+-- 
+1.9.0
 
