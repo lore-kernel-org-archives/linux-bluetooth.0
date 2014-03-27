@@ -1,118 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 08/11] android/gatt: Add initial implementation of register_for_notification
-Date: Thu, 27 Mar 2014 22:13:06 +0100
-Message-Id: <1395954789-32459-8-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 11/11] android/gatt: Add deregister_for_notification implementation
+Date: Thu, 27 Mar 2014 22:13:09 +0100
+Message-Id: <1395954789-32459-11-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will register notification and indication handler for given parameters.
-Proper callback should be send with status of registration.
+This will unregister handlers for notification and indications
+and remove notification_data from client's list.
 ---
- android/gatt.c | 159 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 157 insertions(+), 2 deletions(-)
+ android/gatt.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 51 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 2cd0731..0a7bca0 100644
+index d004e35..384dccf 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -215,6 +215,54 @@ static bool match_char_by_higher_inst_id(const void *data,
- 	return inst_id < ch->id.instance;
- }
- 
-+static bool match_char_by_instance(const void *data, const void *user_data)
-+{
-+	const struct characteristic *ch = data;
-+	uint8_t inst_id = PTR_TO_INT(user_data);
-+
-+	return inst_id == ch->id.instance;
-+}
-+
-+static bool match_notification(const void *a, const void *b)
-+{
-+	const struct notification_data *a1 = a;
-+	const struct notification_data *b1 = b;
-+
-+	if (bacmp(&a1->dev->bdaddr, &b1->dev->bdaddr))
-+		return false;
-+	if (memcmp(&a1->ch, &b1->ch, sizeof(a1->ch)))
-+		return false;
-+	if (memcmp(&a1->service, &b1->service, sizeof(a1->service)))
-+		return false;
-+
-+	return true;
-+}
-+
-+static void destroy_notification(void *data)
-+{
-+	struct notification_data *notification = data;
-+
-+	if (--notification->ref)
-+		return;
-+
-+	queue_remove_if(notification->client->notifications, match_notification,
-+								notification);
-+	free(notification);
-+}
-+
-+static void unregister_notification(void *data)
-+{
-+	struct notification_data *notification = data;
-+
-+	if (notification->notif_id)
-+		g_attrib_unregister(notification->dev->attrib,
-+							notification->notif_id);
-+
-+	if (notification->ind_id)
-+		g_attrib_unregister(notification->dev->attrib,
-+							notification->ind_id);
-+}
-+
- static void destroy_device(void *data)
- {
- 	struct gatt_device *dev = data;
-@@ -231,8 +279,16 @@ static void destroy_gatt_client(void *data)
- {
- 	struct gatt_client *client = data;
- 
--	if (client->notifications)
-+	if (client->notifications) {
-+		while (queue_peek_head(client->notifications)) {
-+			struct notification_data *notification;
-+
-+			notification = queue_pop_head(client->notifications);
-+			unregister_notification(notification);
-+		}
-+
- 		queue_destroy(client->notifications, free);
-+	}
- 
- 	free(client);
- }
-@@ -1350,11 +1406,110 @@ static void handle_client_execute_write(const void *buf, uint16_t len)
- static void handle_client_register_for_notification(const void *buf,
+@@ -1573,11 +1573,61 @@ failed:
+ static void handle_client_deregister_for_notification(const void *buf,
  								uint16_t len)
  {
-+	const struct hal_cmd_gatt_client_register_for_notification *cmd = buf;
-+	struct notification_data *notification;
-+	char uuid[MAX_LEN_UUID_STR];
++	const struct hal_cmd_gatt_client_deregister_for_notification *cmd = buf;
++	struct notification_data *notification, notif;
 +	struct gatt_client *client;
-+	struct characteristic *c;
-+	struct element_id match_id;
 +	struct gatt_device *dev;
-+	struct service *service;
++	int32_t conn_id = 0;
 +	char addr_str[18];
 +	uint8_t status;
 +	bdaddr_t addr;
 +
  	DBG("");
  
-+	client = find_client_by_id(cmd->client_if);
++	client = queue_find(gatt_clients, match_client_by_id,
++						INT_TO_PTR(cmd->client_if));
 +	if (!client) {
-+		error("gatt: client %d not registered", cmd->client_if);
++		error("gatt: couldn't deregister: client not registered");
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
@@ -122,88 +47,41 @@ index 2cd0731..0a7bca0 100644
 +
 +	dev = queue_find(conn_list, match_dev_by_bdaddr, &addr);
 +	if (!dev) {
-+		error("gatt: device %s not found in connected devices list",
++		error("gatt: couldn't deregister: device %s not found",
 +								addr_str);
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
 +
-+	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
-+	service = queue_find(dev->services, match_srvc_by_element_id,
-+								&match_id);
-+	bt_uuid_to_string(&match_id.uuid, uuid, MAX_LEN_UUID_STR);
-+	if (!service) {
-+		error("gatt: can't register notification, service not found");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
++	conn_id = dev->conn_id;
++	memcpy(&notif.ch, &cmd->char_id, sizeof(notif.ch));
++	memcpy(&notif.service, &cmd->srvc_id, sizeof(notif.service));
++	notif.dev = dev;
 +
-+	c = queue_find(service->chars, match_char_by_instance,
-+					INT_TO_PTR(cmd->char_id.inst_id));
-+	if (!c) {
-+		error("gatt: can't register notification: no characteristic");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
++	notification = queue_find(client->notifications,
++						match_notification, &notif);
 +
-+	notification = new0(struct notification_data, 1);
 +	if (!notification) {
-+		error("gatt: failed to allocate memory for notification");
++		error("gatt: couldn't deregister: notification not registered");
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
 +
-+	memcpy(&notification->ch, &cmd->char_id, sizeof(notification->ch));
-+	memcpy(&notification->service, &cmd->srvc_id,
-+						sizeof(notification->service));
-+	notification->dev = dev;
-+	notification->client = client;
-+
-+	if (queue_find(client->notifications, match_notification,
-+			notification)) {
-+		DBG("can't register for notification, already registered");
-+		free(notification);
-+		status = HAL_STATUS_SUCCESS;
-+		goto failed;
-+	}
-+
-+	notification->notif_id = g_attrib_register(dev->attrib,
-+							ATT_OP_HANDLE_NOTIFY,
-+							c->ch.value_handle,
-+							NULL, notification,
-+							destroy_notification);
-+	if (!notification->notif_id) {
-+		free(notification);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	notification->ind_id = g_attrib_register(dev->attrib, ATT_OP_HANDLE_IND,
-+							c->ch.value_handle,
-+							NULL, notification,
-+							destroy_notification);
-+	if (!notification->ind_id) {
-+		g_attrib_unregister(dev->attrib, notification->notif_id);
-+		free(notification);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	notification->ref = 2;
-+
-+	queue_push_tail(client->notifications, notification);
++	unregister_notification(notification);
 +
 +	status = HAL_STATUS_SUCCESS;
 +
 +failed:
-+	/* TODO: send callback with notification enabled/disabled */
++	client_register_for_notif_cb(conn_id, 0, status, &cmd->srvc_id,
++								&cmd->char_id);
++
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_OP_GATT_CLIENT_REGISTER_FOR_NOTIFICATION,
+ 				HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION,
 -				HAL_STATUS_FAILED);
 +				status);
  }
  
- static void handle_client_deregister_for_notification(const void *buf,
+ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
 -- 
 1.8.3.1
 
