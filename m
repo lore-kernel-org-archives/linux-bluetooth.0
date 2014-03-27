@@ -1,50 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 27 Mar 2014 14:18:49 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-03-24
-Message-ID: <20140327181849.GG31168@tuxdriver.com>
-References: <20140324173332.GA2214@joana>
- <20140326183411.GB1741@joana>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140326183411.GB1741@joana>
-Sender: linux-wireless-owner@vger.kernel.org
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH v3 2/2] Bluetooth: Add new debugfs parameter
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1395935344-31715-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Thu, 27 Mar 2014 09:06:47 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0333237E-E20D-41EF-92F4-D66E0732DFA3@holtmann.org>
+References: <1395935344-31715-1-git-send-email-lukasz.rymanowski@tieto.com> <1395935344-31715-2-git-send-email-lukasz.rymanowski@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wed, Mar 26, 2014 at 03:34:11PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> 2014-03-24 Gustavo Padovan <gustavo@padovan.org>:
-> 
-> > Hi John,
-> > 
-> > Here follow another set of patches to 3.15. This is mostly a bug fix pull
-> > request with the exception of one commit from Marcel which adds tracking to
-> > the current configured LE scan type parameter.
-> 
-> There is one more fix that we want to include in this pull request. Here
-> follows a new pull request, please pull, Thanks. 
-> 
-> 	Gustavo
-> 
-> --
-> The following changes since commit 40b552aa5a0bfa785bc7ddb5c2d7965b1e0bb08d:
-> 
->   Bluetooth: Enforce strict Secure Connections Only mode security (2014-03-19 23:30:32 +0200)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to e8b1ab9e6d30394e0df3e4f60bf56c4dc9bf0863:
-> 
->   Bluetooth: Fix returning peer address in pending connect state (2014-03-26 09:31:33 -0700)
+Hi Lukasz,
 
-Pulling now...
+> With this patch it is possible to control discovery interleaved
+> timeout value from debugfs.
+> 
+> It is for fine tuning of this timeout.
+> 
+> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+> ---
+> include/net/bluetooth/hci_core.h | 1 +
+> net/bluetooth/hci_core.c         | 4 ++++
+> net/bluetooth/mgmt.c             | 2 +-
+> 3 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 1c6776a..6a5922f 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -199,6 +199,7 @@ struct hci_dev {
+> 	__u16		le_scan_window;
+> 	__u16		le_conn_min_interval;
+> 	__u16		le_conn_max_interval;
+> +	__u16		discov_interleaved_timeout;
+> 	__u8		ssp_debug_mode;
+> 
+> 	__u16		devid_source;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index c6189d9..4ae237c 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1823,6 +1823,9 @@ static int __hci_init(struct hci_dev *hdev)
+> 				    &lowpan_debugfs_fops);
+> 		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
+> 				    &le_auto_conn_fops);
+> +		debugfs_create_u16("discov_interleaved_timeout", 0644,
+> +				   hdev->debugfs,
+> +				   &hdev->discov_interleaved_timeout);
+> 	}
+> 
+> 	return 0;
+> @@ -3786,6 +3789,7 @@ struct hci_dev *hci_alloc_dev(void)
+> 
+> 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+remove this empty line.
+
+> 
+> +	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
+
+And add an empty line here.
+
+> 	mutex_init(&hdev->lock);
+> 	mutex_init(&hdev->req_lock);
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index e6d906f..b97477f 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3373,7 +3373,7 @@ static void start_discovery_complete(struct hci_dev *hdev, u8 status)
+> 		break;
+> 
+> 	case DISCOV_TYPE_INTERLEAVED:
+> -		timeout = msecs_to_jiffies(DISCOV_INTERLEAVED_TIMEOUT);
+> +		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
+> 		break;
+
+Regards
+
+Marcel
+
