@@ -1,87 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 11/11] android/gatt: Add deregister_for_notification implementation
-Date: Thu, 27 Mar 2014 22:13:09 +0100
-Message-Id: <1395954789-32459-11-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 05/11] android/gatt: Add get_included_data struct and callback
+Date: Thu, 27 Mar 2014 22:13:03 +0100
+Message-Id: <1395954789-32459-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1395954789-32459-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will unregister handlers for notification and indications
-and remove notification_data from client's list.
+Create user data passed to callback get_included_cb.
+It will handle included services and pass it to notification.
 ---
- android/gatt.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 51 insertions(+), 1 deletion(-)
+ android/gatt.c | 27 ++++++++++++++++++++++++++-
+ 1 file changed, 26 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index d004e35..384dccf 100644
+index bf40162..7eb867b 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -1573,11 +1573,61 @@ failed:
- static void handle_client_deregister_for_notification(const void *buf,
- 								uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_deregister_for_notification *cmd = buf;
-+	struct notification_data *notification, notif;
-+	struct gatt_client *client;
-+	struct gatt_device *dev;
-+	int32_t conn_id = 0;
-+	char addr_str[18];
-+	uint8_t status;
-+	bdaddr_t addr;
-+
- 	DBG("");
- 
-+	client = queue_find(gatt_clients, match_client_by_id,
-+						INT_TO_PTR(cmd->client_if));
-+	if (!client) {
-+		error("gatt: couldn't deregister: client not registered");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	android2bdaddr((bdaddr_t *)&cmd->bdaddr, &addr);
-+	ba2str(&addr, addr_str);
-+
-+	dev = queue_find(conn_list, match_dev_by_bdaddr, &addr);
-+	if (!dev) {
-+		error("gatt: couldn't deregister: device %s not found",
-+								addr_str);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	conn_id = dev->conn_id;
-+	memcpy(&notif.ch, &cmd->char_id, sizeof(notif.ch));
-+	memcpy(&notif.service, &cmd->srvc_id, sizeof(notif.service));
-+	notif.dev = dev;
-+
-+	notification = queue_find(client->notifications,
-+						match_notification, &notif);
-+
-+	if (!notification) {
-+		error("gatt: couldn't deregister: notification not registered");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	unregister_notification(notification);
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
-+	client_register_for_notif_cb(conn_id, 0, status, &cmd->srvc_id,
-+								&cmd->char_id);
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION,
--				HAL_STATUS_FAILED);
-+				status);
+@@ -973,9 +973,23 @@ static struct service *find_service_bu_uuid(struct gatt_device *device,
+ 	return queue_find(device->services, match_service_by_uuid, uuid);
  }
  
- static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
++struct get_included_data {
++	struct service *service;
++	struct gatt_device *device;
++};
++
++static void get_included_cb(uint8_t status, GSList *included, void *user_data)
++{
++	struct get_included_data *data = user_data;
++
++	/* TODO pass included services to notification */
++	free(data);
++}
++
+ static void handle_client_get_included_service(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
++	struct get_included_data *data;
+ 	struct gatt_device *device;
+ 	struct service *service;
+ 	uint8_t status;
+@@ -1010,8 +1024,19 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
++	data = new0(struct get_included_data, 1);
++	if (!data) {
++		error("gatt: failed to allocate memory for included_data");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	data->service = service;
++	data->device = device;
++
+ 	gatt_find_included(device->attrib, service->primary.range.start,
+-					service->primary.range.end, NULL, NULL);
++				service->primary.range.end, get_included_cb,
++				data);
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
 -- 
 1.8.3.1
 
