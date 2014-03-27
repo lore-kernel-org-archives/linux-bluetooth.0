@@ -1,72 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 26 Mar 2014 22:36:01 -0500
-From: Felipe Balbi <balbi@ti.com>
-To: Peter Hurley <peter@hurleysoftware.com>
-CC: <balbi@ti.com>, Greg KH <gregkh@linuxfoundation.org>,
-        Marcel Holtmann
-	<marcel@holtmann.org>, <linux-serial@vger.kernel.org>,
-        <linux-bluetooth@vger.kernel.org>, <m-karicheri2@ti.com>,
-        <b32955@freescale.com>,
-        Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 09/11] bluetooth: hci_ldisc: fix deadlock condition
-Message-ID: <20140327033601.GA13038@saruman.home>
-Reply-To: <balbi@ti.com>
-References: <1395343807-21618-1-git-send-email-balbi@ti.com>
- <1395343807-21618-9-git-send-email-balbi@ti.com>
- <53337513.1010708@hurleysoftware.com>
- <20140327020909.GA11651@saruman.home>
- <53338ADF.3060803@hurleysoftware.com>
+Message-ID: <53338C81.3060600@hurleysoftware.com>
+Date: Wed, 26 Mar 2014 22:27:13 -0400
+From: Peter Hurley <peter@hurleysoftware.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="TB36FDmn/VVEgNH/"
-In-Reply-To: <53338ADF.3060803@hurleysoftware.com>
+To: balbi@ti.com
+CC: Tony Lindgren <tony@atomide.com>,
+	Greg KH <gregkh@linuxfoundation.org>,
+	linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	m-karicheri2@ti.com, b32955@freescale.com,
+	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 10/11] Revert "serial: omap: unlock the port lock"
+References: <1395343807-21618-1-git-send-email-balbi@ti.com> <1395343807-21618-10-git-send-email-balbi@ti.com> <20140325182856.GA31906@atomide.com> <5333732F.6040803@hurleysoftware.com> <20140327021043.GB11651@saruman.home>
+In-Reply-To: <20140327021043.GB11651@saruman.home>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---TB36FDmn/VVEgNH/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 03/26/2014 10:10 PM, Felipe Balbi wrote:
+> Hi,
+>
+> On Wed, Mar 26, 2014 at 08:39:11PM -0400, Peter Hurley wrote:
+>> On 03/25/2014 02:28 PM, Tony Lindgren wrote:
+>>> * Felipe Balbi <balbi@ti.com> [140320 12:39]:
+>>>> This reverts commit 0324a821029e1f54e7a7f8fed48693cfce42dc0e.
+>>>>
+>>>> That commit tried to fix a deadlock problem when using
+>>>> hci_ldisc, but it turns out the bug was in hci_ldsic
+>>>> all along where it was calling ->write() from within
+>>>> ->write_wakeup() callback.
+>>>>
+>>>> The problem is that ->write_wakeup() was called with
+>>>> port lock held and ->write() tried to grab the same
+>>>> port lock.
+>>>
+>>> Should this and the next patch be earlier in the series
+>>> as a fix for the v3.15-rc cycle? Should they be cc: stable
+>>> as well?
+>>
+>> Well, right now the other fix has had _zero_ testing
+>> so not really a -stable candidate just yet.
+>
+> how can you even say that ?
 
-Hi,
+I misunderstood when you wrote:
 
-On Wed, Mar 26, 2014 at 10:20:15PM -0400, Peter Hurley wrote:
-> >>You may want to build on top of this patch split handling;
-> >>I noticed some of the protocol drivers are calling
-> >>hci_uart_tx_wakeup() from work functions already (so don't
-> >>need to schedule another work...)
-> >
-> >I don't think that should be part of $subject, though.
->=20
-> I don't understand what you mean here.
+On 03/20/2014 02:11 PM, Felipe Balbi wrote:
+ > here's a build-tested only patch which is waiting for testing from other
+ > colleagues who've got a platform to reproduce the problem:
 
-it seemed, at first, like you suggested to redo this patch modifying the
-protocol drivers to avoid two workqueues. But now that I read it again
-you _did_ write "on top of this patch".
+and then the version I reviewed had no Tested-by: tags.
 
---=20
-balbi
+> Unless you work for some 3 letter acronym
+> organizations, you have no clue about the fact that this was tested on a
+> keystone 2 platform.
 
---TB36FDmn/VVEgNH/
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+Ok.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+> How else would we have found the issue to start with ?
 
-iQIcBAEBAgAGBQJTM5yhAAoJEIaOsuA1yqREJmwP/RCH5cxTPO9r3kfm72rgeDPY
-ofFEK3bLEQ+fmVQloQAGbgE+8/ZodxydZb/8m8i8D/CHASG/hN/94DOaOw3Vf1wg
-njdjW2LcdErJ0TAHcoaxbjosJwmyOWU5L6SM7/lj2/DDqXaRnCURA7QoneIQhfnM
-QTlePNjLxSpB5meg0j+KI4IrbJeQe/gMAhfcvnVL6P1r2f1LN8lGyH20t9u5+zTd
-mQ9qz+rBs7wH+cEm8C2hJ/0blyznGFT1mMClcxAS3Zswn50JiNiPuT75gxZgTgLh
-xWO1UlUfj611xT/RjQhPWbsuFAJ6HvAjZSefAC+TdG62m9GhoXJ9KeLBnaGnryhV
-pBlXI+jvDX8diyt+c6Gavc4tK964nGsPmNIgfsrg4J3/FIABzt/U7KthB9Xs9kth
-WnoAIHhYlzeaf1Hp0TcgyNhHQFov1xu/1rMLnJvrdWouT6PS4jw2yvJPjOTZDdOn
-hs8N6/9UQVUqbaQepmb49PbWyf1idwjXBCtg4Xawc5N3phsBWqn4LF2Cjka0PbWA
-anTmYKNAk2uCe6AGAZY9EsD2xUxnrZMsbU8zWsCLfTMnh9Ryn573oJF9D5OOoZa/
-lrLo4zfe+1SWEClsuuBIFmab+TN6pfsVDTNHXWGioovFMYnbTq5anNTeAOWu52xw
-n8xKzNNluPIGtevpX4u9
-=n1X3
------END PGP SIGNATURE-----
+Bug report?
 
---TB36FDmn/VVEgNH/--
+Regards,
+Peter Hurley
+
