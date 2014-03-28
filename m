@@ -1,135 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: claudio.takahasi@openbossa.org,
-	Andre Guedes <andre.guedes@openbossa.org>
-Subject: [PATCH BlueZ v0 1/5] gatt: Introduce helper for adding descriptors
-Date: Fri, 28 Mar 2014 11:19:06 -0300
-Message-Id: <1396016350-16943-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
+Message-ID: <53357D91.3050601@linux.intel.com>
+Date: Fri, 28 Mar 2014 15:48:01 +0200
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC 0/3] Add HDP .register_application method
+References: <1395758081-22005-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1395758081-22005-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andre Guedes <andre.guedes@openbossa.org>
+ping.
 
-This patch adds btd_gatt_add_char_desc() helper which adds a
-characteristic descriptor to the local attribute database.
----
- src/gatt.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++-----
- src/gatt.h | 16 ++++++++++++++++
- 2 files changed, 65 insertions(+), 5 deletions(-)
-
-diff --git a/src/gatt.c b/src/gatt.c
-index 92092d3..f07effa 100644
---- a/src/gatt.c
-+++ b/src/gatt.c
-@@ -87,6 +87,23 @@ static struct btd_attribute *new_const_attribute(const bt_uuid_t *type,
- 	return attr;
- }
- 
-+static struct btd_attribute *new_attribute(const bt_uuid_t *type,
-+						btd_attr_read_t read_cb,
-+						btd_attr_write_t write_cb)
-+{
-+	struct btd_attribute *attr;
-+
-+	attr = new0(struct btd_attribute, 1);
-+	if (!attr)
-+		return NULL;
-+
-+	attr->type = *type;
-+	attr->read_cb = read_cb;
-+	attr->write_cb = write_cb;
-+
-+	return attr;
-+}
-+
- static int local_database_add(uint16_t handle, struct btd_attribute *attr)
- {
- 	attr->handle = handle;
-@@ -170,7 +187,7 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
- 	if (!char_decl)
- 		goto fail;
- 
--	char_value = new0(struct btd_attribute, 1);
-+	char_value = new_attribute(uuid, read_cb, write_cb);
- 	if (!char_value)
- 		goto fail;
- 
-@@ -192,10 +209,6 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
- 	 * implementation (external entity).
- 	 */
- 
--	char_value->type = *uuid;
--	char_value->read_cb = read_cb;
--	char_value->write_cb = write_cb;
--
- 	if (local_database_add(next_handle, char_value) < 0)
- 		/* TODO: remove declaration */
- 		goto fail;
-@@ -219,6 +232,37 @@ fail:
- 	return NULL;
- }
- 
-+struct btd_attribute *btd_gatt_add_char_desc(const bt_uuid_t *uuid,
-+						btd_attr_read_t read_cb,
-+						btd_attr_write_t write_cb)
-+{
-+	struct btd_attribute *attr;
-+
-+	/*
-+	 * From Core SPEC 4.1 page 2184:
-+	 * "Characteristic descriptor declaration permissions are defined by a
-+	 * higher layer profile or are implementation specific. A client shall
-+	 * not assume all characteristic descriptor declarations are readable."
-+	 *
-+	 * The read/write callbacks presence will define the descriptor
-+	 * permissions managed directly by the core. The upper layer can define
-+	 * additional permissions constraints.
-+	 */
-+
-+	attr = new_attribute(uuid, read_cb, write_cb);
-+	if (!attr)
-+		return NULL;
-+
-+	if (local_database_add(next_handle, attr) < 0) {
-+		free(attr);
-+		return NULL;
-+	}
-+
-+	next_handle = next_handle + 1;
-+
-+	return attr;
-+}
-+
- void gatt_init(void)
- {
- 	DBG("Starting GATT server");
-diff --git a/src/gatt.h b/src/gatt.h
-index 6c7f57e..da7af92 100644
---- a/src/gatt.h
-+++ b/src/gatt.h
-@@ -96,3 +96,19 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
- 						uint8_t properties,
- 						btd_attr_read_t read_cb,
- 						btd_attr_write_t write_cb);
-+
-+/*
-+ * btd_gatt_add_char_desc - Add a characteristic descriptor to the local
-+ * attribute database.
-+ * @uuid:	Characteristic Descriptor UUID (16-bits or 128-bits).
-+ * @read_cb:	Callback that should be called once the characteristic
-+ *		descriptor attribute is read.
-+ * @write_cb:	Callback that should be called once the characteristic
-+ *		descriptor attribute is written.
-+ *
-+ * Returns a reference to characteristic descriptor attribute. In case of
-+ * error, NULL is returned.
-+ */
-+struct btd_attribute *btd_gatt_add_char_desc(const bt_uuid_t *uuid,
-+						btd_attr_read_t read_cb,
-+						btd_attr_write_t write_cb);
--- 
-1.8.3.1
+On 03/25/2014 04:34 PM, Ravi kumar Veeramally wrote:
+> Due to limited IPC_MTU and variable length of
+> fields from 'bthl_reg_param_t *', it is difficult to put them
+> in single command and send though IPC. So we split this command
+> to multiple calls. First command will be called with opcode of
+> HAL_OP_HEALTH_REG_APP with 'struct hal_cmd_health_reg_app' data.
+> Later command will be called with opcode of
+> HAL_OP_HEALTH_MDEP with 'struct hal_cmd_health_mdep' data for
+> number_of_mdeps times. Daemon (android/health) side it will
+> process after it received all data and response will be sent
+> along with last call of HAL_OP_HEALTH_MDEP.
+>
+> This avoids increasing value of IPC_MTU and mainly because of
+> optional parameters in 'bthl_reg_param_t'. Incase of unfilled
+> optional parameters, fixed size arrays in hal commands will be
+> empty.
+>
+> Ravi kumar Veeramally (3):
+>    android/hal-ipc-api: Add extra command to Health HAL api document
+>    android/hal-msg: Add extra struct for mdep data
+>    android/hal-health: Add HDP .register_application method
+>
+>   android/hal-health.c    | 88 ++++++++++++++++++++++++++++++++++++++++++++++++-
+>   android/hal-ipc-api.txt | 34 +++++++++++--------
+>   android/hal-msg.h       | 37 ++++++++++-----------
+>   3 files changed, 126 insertions(+), 33 deletions(-)
+>
 
