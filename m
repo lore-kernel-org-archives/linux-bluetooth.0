@@ -2,74 +2,151 @@ Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 5/5] tools: Add emitting descriptor PropertiesChanged
-Date: Fri, 28 Mar 2014 11:19:10 -0300
-Message-Id: <1396016350-16943-6-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 2/5] gatt: Add descriptor to the database
+Date: Fri, 28 Mar 2014 11:19:07 -0300
+Message-Id: <1396016350-16943-3-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch forces emitting PropertiesChanged signal when the descriptor
-Value changes. Internally, BlueZ tracks the signal emitted to update
-the GDBusProxy properties.
+Initial support for GATT characteristic descriptors. This patch adds the
+characteristic descriptor attribute to the GATT local database based
+on the fetched GDBusProxy objects.
 ---
- tools/gatt-service.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ src/gatt-dbus.c | 100 ++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 65 insertions(+), 35 deletions(-)
 
-diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index c304b60..c4c358c 100644
---- a/tools/gatt-service.c
-+++ b/tools/gatt-service.c
-@@ -63,6 +63,7 @@ struct characteristic {
- 
- struct descriptor {
- 	char *uuid;
-+	char *path;
- 	uint8_t *value;
- 	int vlen;
- };
-@@ -125,6 +126,10 @@ static void desc_set_value(const GDBusPropertyTable *property,
- 	desc->vlen = vlen;
- 
- 	g_dbus_pending_property_success(id);
-+
-+	g_dbus_emit_property_changed(connection, desc->path,
-+					GATT_DESCRIPTOR_IFACE, "Value");
-+
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 3c9dc05..1bfa21f 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -353,20 +353,71 @@ static int register_external_service(const struct external_app *eapp,
+ 	return 0;
  }
  
- static const GDBusPropertyTable desc_properties[] = {
-@@ -274,6 +279,7 @@ static void desc_iface_destroy(gpointer user_data)
- 
- 	g_free(desc->uuid);
- 	g_free(desc->value);
-+	g_free(desc->path);
- 	g_free(desc);
- }
- 
-@@ -309,10 +315,12 @@ static gboolean register_characteristic(const char *chr_uuid,
- 	if (!desc_uuid)
- 		return ret;
- 
-+	desc_path = g_strdup_printf("%s/descriptor%d", chr_path, id++);
++static int add_char(GDBusProxy *proxy, const bt_uuid_t *uuid)
++{
++	DBusMessageIter iter;
++	struct btd_attribute *attr;
++	btd_attr_write_t write_cb;
++	btd_attr_read_t read_cb;
++	uint8_t propmask = 0;
 +
- 	desc = g_new0(struct descriptor, 1);
- 	desc->uuid = g_strdup(desc_uuid);
-+	desc->path = desc_path;
++	/*
++	 * Optional property. If is not informed, read and write
++	 * procedures will be allowed. Upper-layer should handle
++	 * characteristic requirements.
++	 */
++	if (g_dbus_proxy_get_property(proxy, "Flags", &iter))
++		propmask = flags_get_bitmask(&iter);
++	else
++		propmask = GATT_CHR_PROP_WRITE_WITHOUT_RESP
++						| GATT_CHR_PROP_WRITE
++						| GATT_CHR_PROP_READ;
++	if (!propmask)
++		return -EINVAL;
++
++	if (propmask & GATT_CHR_PROP_READ)
++		read_cb = proxy_read_cb;
++	else
++		read_cb = NULL;
++
++	if (propmask & (GATT_CHR_PROP_WRITE | GATT_CHR_PROP_WRITE_WITHOUT_RESP))
++		write_cb = proxy_write_cb;
++	else
++		write_cb = NULL;
++
++	attr = btd_gatt_add_char(uuid, propmask, read_cb, write_cb);
++	if (!attr)
++		return -ENOMEM;
++
++	g_hash_table_insert(proxy_hash, attr, g_dbus_proxy_ref(proxy));
++
++	return 0;
++}
++
++static int add_char_desc(GDBusProxy *proxy, const bt_uuid_t *uuid)
++{
++	struct btd_attribute *attr;
++
++	attr = btd_gatt_add_char_desc(uuid, proxy_read_cb, proxy_write_cb);
++	if (!attr)
++		return -ENOMEM;
++
++	g_hash_table_insert(proxy_hash, attr, g_dbus_proxy_ref(proxy));
++
++	return 0;
++}
++
+ static int register_external_characteristics(GSList *proxies)
  
--	desc_path = g_strdup_printf("%s/descriptor%d", chr_path, id++);
- 	if (!g_dbus_register_interface(connection, desc_path,
- 					GATT_DESCRIPTOR_IFACE,
- 					NULL, NULL, desc_properties,
-@@ -320,7 +328,6 @@ static gboolean register_characteristic(const char *chr_uuid,
- 		printf("Couldn't register descriptor interface\n");
- 		g_dbus_unregister_interface(connection, chr_path,
- 							GATT_CHR_IFACE);
--		g_free(desc_path);
- 		desc_iface_destroy(desc);
+ {
+ 	GSList *list;
  
- 		ret = FALSE;
+ 	for (list = proxies; list; list = g_slist_next(list)) {
++		GDBusProxy *proxy = list->data;
+ 		DBusMessageIter iter;
+-		const char *str, *path;
+ 		bt_uuid_t uuid;
+-		struct btd_attribute *attr;
+-		GDBusProxy *proxy = list->data;
+-		btd_attr_write_t write_cb;
+-		btd_attr_read_t read_cb;
+-		uint8_t propmask = 0;
++		const char *path, *iface, *str;
++		int ret;
+ 
+ 		/* Mandatory property */
+ 		if (!g_dbus_proxy_get_property(proxy, "UUID", &iter))
+@@ -380,39 +431,18 @@ static int register_external_characteristics(GSList *proxies)
+ 		if (bt_string_to_uuid(&uuid, str) < 0)
+ 			return -EINVAL;
+ 
+-		/*
+-		 * Optional property. If is not informed, read and write
+-		 * procedures will be allowed. Upper-layer should handle
+-		 * characteristic requirements.
+-		 */
+-		if (g_dbus_proxy_get_property(proxy, "Flags", &iter))
+-			propmask = flags_get_bitmask(&iter);
+-		else
+-			propmask = GATT_CHR_PROP_WRITE_WITHOUT_RESP
+-						| GATT_CHR_PROP_WRITE
+-						| GATT_CHR_PROP_READ;
+-		if (!propmask)
+-			return -EINVAL;
+-
+-		if (propmask & GATT_CHR_PROP_READ)
+-			read_cb = proxy_read_cb;
+-		else
+-			read_cb = NULL;
++		iface = g_dbus_proxy_get_interface(proxy);
++		path = g_dbus_proxy_get_path(proxy);
+ 
+-		if (propmask & (GATT_CHR_PROP_WRITE |
+-					GATT_CHR_PROP_WRITE_WITHOUT_RESP))
+-			write_cb = proxy_write_cb;
++		if (!strcmp(GATT_CHR_IFACE, iface))
++			ret = add_char(proxy, &uuid);
+ 		else
+-			write_cb = NULL;
++			ret = add_char_desc(proxy, &uuid);
+ 
+-		attr = btd_gatt_add_char(&uuid, propmask, read_cb, write_cb);
+-		if (!attr)
+-			return -EINVAL;
+-
+-		path = g_dbus_proxy_get_path(proxy);
+-		DBG("Added GATT CHR: %s (%s)", path, str);
++		if (ret < 0)
++			return ret;
+ 
+-		g_hash_table_insert(proxy_hash, attr, g_dbus_proxy_ref(proxy));
++		DBG("Added GATT: %s (%s)", path, str);
+ 	}
+ 
+ 	return 0;
 -- 
 1.8.3.1
 
