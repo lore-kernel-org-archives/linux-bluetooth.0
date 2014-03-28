@@ -1,31 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [RFC 2/3] mgmt-api: Add Stop Read Remote RSSI Command
+Subject: Re: [PATCH v4 3/3] Bluetooth: Keep msec in DISCOV_LE_TIMEOUT
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395954629-16156-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Fri, 28 Mar 2014 00:13:24 -0700
+In-Reply-To: <1395950121-12263-3-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Fri, 28 Mar 2014 00:12:10 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <090A8293-5C1D-458E-BC16-F4553C14894F@holtmann.org>
-References: <1395954629-16156-1-git-send-email-lukasz.rymanowski@tieto.com> <1395954629-16156-2-git-send-email-lukasz.rymanowski@tieto.com>
+Message-Id: <71980B98-959E-46CF-9C97-AD361E58A233@holtmann.org>
+References: <1395950121-12263-1-git-send-email-lukasz.rymanowski@tieto.com> <1395950121-12263-3-git-send-email-lukasz.rymanowski@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Lukasz,
 
-> ---
-> doc/mgmt-api.txt | 21 +++++++++++++++++++++
-> 1 file changed, 21 insertions(+)
+> To be consistent, lets use msec for this timeout as well.
 > 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 28e7845..6d3b86b 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -1700,6 +1700,27 @@ Start Read Remote RSSI Command
-> 				Invalid Index
+> Note: This define value is a minimum scan time taken from BT Core spec 4.0,
+> Vol 3, Part C, chapter 9.2.6
+> 
+> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+> ---
+> include/net/bluetooth/hci_core.h | 2 +-
+> net/bluetooth/mgmt.c             | 2 +-
+> 2 files changed, 2 insertions(+), 2 deletions(-)
 
-you really want to send all the mgmt-api changes in one patch to make them easier to review and comment on.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
