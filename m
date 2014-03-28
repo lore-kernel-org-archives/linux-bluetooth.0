@@ -1,30 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v4 2/3] Bluetooth: Add new debugfs parameter
+Subject: Re: [PATCH 1/2] Bluetooth: btmrvl: separate write-to-clear function from interrupt handler
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395950121-12263-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Fri, 28 Mar 2014 00:12:04 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C228771B-A193-4BA5-9F72-299F536B6DFB@holtmann.org>
-References: <1395950121-12263-1-git-send-email-lukasz.rymanowski@tieto.com> <1395950121-12263-2-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+In-Reply-To: <1395981043-2541-1-git-send-email-bzhao@marvell.com>
+Date: Fri, 28 Mar 2014 00:10:06 -0700
+Cc: linux-bluetooth@vger.kernel.org,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Message-Id: <03F7A083-7D4A-46B4-B628-2499614DCB45@holtmann.org>
+References: <1395981043-2541-1-git-send-email-bzhao@marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Bing,
 
-> With this patch it is possible to control discovery interleaved
-> timeout value from debugfs.
+> This patch improves readability and makes future changes easier.
 > 
-> It is for fine tuning of this timeout.
-> 
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
 > ---
-> include/net/bluetooth/hci_core.h | 1 +
-> net/bluetooth/hci_core.c         | 4 ++++
-> net/bluetooth/mgmt.c             | 2 +-
-> 3 files changed, 6 insertions(+), 1 deletion(-)
+> drivers/bluetooth/btmrvl_sdio.c | 53 +++++++++++++++++++++++++----------------
+> 1 file changed, 32 insertions(+), 21 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
