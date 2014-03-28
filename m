@@ -1,185 +1,187 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Subject: [PATCHv2 2/9] android/gatt: Handle read characteristic client command
-Date: Fri, 28 Mar 2014 19:54:38 +0100
-Message-Id: <1396032885-32077-3-git-send-email-jakub.tyszkowski@tieto.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/9] android/gatt: Use proper GATT status
+Date: Fri, 28 Mar 2014 19:54:37 +0100
+Message-Id: <1396032885-32077-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1396032885-32077-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1396032885-32077-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-
-This adds read characteristic client command handling.
+This patch introduces GATT_SUCCESS and GATT_FAILURE status codes
+according to Android API. This patch also fixes event status codes.
 ---
- android/gatt.c | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 138 insertions(+), 2 deletions(-)
+ android/gatt.c | 41 ++++++++++++++++++++++++-----------------
+ 1 file changed, 24 insertions(+), 17 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 8dacd86..15a61d4 100644
+index e361506..8dacd86 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -243,6 +243,26 @@ static bool match_notification(const void *a, const void *b)
- 	return true;
+@@ -48,6 +48,9 @@
+ #include "attrib/gatt.h"
+ #include "btio/btio.h"
+ 
++#define GATT_SUCCESS	0x00000000
++#define GATT_FAILURE	0x00000101
++
+ struct gatt_client {
+ 	int32_t id;
+ 	uint8_t uuid[16];
+@@ -343,7 +346,7 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+-	ev.status = status;
++	ev.status = GATT_SUCCESS;
+ 	ev.client_if = client->id;
+ 	memcpy(ev.app_uuid, client->uuid, sizeof(client->uuid));
+ 
+@@ -448,7 +451,7 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 					sizeof(ev_res), &ev_res);
+ 	}
+ 
+-	ev.status = HAL_STATUS_SUCCESS;
++	ev.status = GATT_SUCCESS;
+ 
+ done:
+ 	ev.conn_id = dev->conn_id;
+@@ -496,7 +499,7 @@ static void client_disconnect_notify(void *data, void *user_data)
+ 	struct gatt_device *dev = user_data;
+ 	int32_t id = PTR_TO_INT(data);
+ 
+-	send_client_disconnect_notify(id, dev, HAL_STATUS_SUCCESS);
++	send_client_disconnect_notify(id, dev, GATT_SUCCESS);
  }
-
-+static bool match_char_by_element_id(const void *data, const void *user_data)
-+{
-+	const struct element_id *exp_id = user_data;
-+	const struct characteristic *chars = data;
-+	bt_uuid_t uuid;
-+
-+	bt_string_to_uuid(&uuid, chars->ch.uuid);
-+	if (exp_id->instance == chars->id.instance)
-+		return !bt_uuid_cmp(&uuid, &exp_id->uuid);
-+
-+	return false;
-+}
-+
-+static void hal_gatt_id_to_element_id(const struct hal_gatt_gatt_id *from,
-+							struct element_id *to)
-+{
-+	to->instance = from->inst_id;
-+	android2uuid(from->uuid, &to->uuid);
-+}
-+
- static void destroy_notification(void *data)
- {
- 	struct notification_data *notification = data;
-@@ -1359,13 +1379,129 @@ static void handle_client_get_descriptor(const void *buf, uint16_t len)
- 			HAL_OP_GATT_CLIENT_GET_DESCRIPTOR, HAL_STATUS_FAILED);
- }
-
-+struct read_char_data {
-+	int32_t conn_id;
-+	struct service *service;
-+	struct characteristic *characteristic;
-+	uint8_t is_primary;
-+};
-+
-+static void send_client_read_char_notify(int32_t status, const uint8_t *pdu,
-+						uint16_t len, int32_t conn_id,
-+						struct service *service,
-+						struct characteristic *ch,
-+						uint8_t is_primary)
-+{
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_client_read_characteristic *ev = (void *) buf;
-+	bt_uuid_t uuid;
-+	ssize_t vlen;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	ev->conn_id = conn_id;
-+	ev->status = status;
-+
-+	ev->data.srvc_id.inst_id = service->id.instance;
-+	bt_string_to_uuid(&uuid, service->primary.uuid);
-+	uuid2android(&uuid, ev->data.srvc_id.uuid);
-+	ev->data.srvc_id.is_primary = is_primary;
-+
-+	ev->data.char_id.inst_id = ch->id.instance;
-+	bt_string_to_uuid(&uuid, ch->ch.uuid);
-+	uuid2android(&uuid, ev->data.char_id.uuid);
-+
-+	ev->data.status = status;
-+
-+	if (pdu) {
-+		vlen = dec_read_resp(pdu, len, ev->data.value, sizeof(buf));
-+		if (vlen < 0) {
-+			error("gatt: Protocol error");
-+			ev->status = GATT_FAILURE;
-+		} else {
-+			ev->data.len = vlen;
-+		}
-+	}
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+					HAL_EV_GATT_CLIENT_READ_CHARACTERISTIC,
-+					sizeof(*ev) + ev->data.len, ev);
-+}
-+
-+static void read_char_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
-+{
-+	struct read_char_data *data = user_data;
-+
-+	send_client_read_char_notify(status, pdu, len, data->conn_id,
-+					data->service, data->characteristic,
-+						data->is_primary);
-+
-+	free(data);
-+}
-+
- static void handle_client_read_characteristic(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
-+	struct read_char_data *cb_data;
-+	struct characteristic *ch;
-+	struct element_id match_id;
-+	struct gatt_device *dev;
-+	struct service *srvc;
-+	uint8_t status;
-+
+ 
+ static bool is_device_wating_for_connect(const bdaddr_t *addr,
+@@ -612,7 +615,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	struct hal_ev_gatt_client_connect ev;
+ 	GAttrib *attrib;
+ 	static uint32_t conn_id = 0;
+-	uint8_t status;
++	int32_t status;
+ 
+ 	/* Take device from conn waiting queue */
+ 	dev = queue_remove_if(conn_wait_queue, match_dev_by_bdaddr, addr);
+@@ -630,14 +633,14 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 
+ 	if (gerr) {
+ 		error("gatt: connection failed %s", gerr->message);
+-		status = HAL_STATUS_FAILED;
++		status = GATT_FAILURE;
+ 		goto reply;
+ 	}
+ 
+ 	attrib = g_attrib_new(io);
+ 	if (!attrib) {
+ 		error("gatt: unable to create new GAttrib instance");
+-		status = HAL_STATUS_FAILED;
++		status = GATT_FAILURE;
+ 		goto reply;
+ 	}
+ 
+@@ -650,11 +653,11 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	if (!queue_push_tail(conn_list, dev)) {
+ 		error("gatt: Cannot push dev on conn_list");
+ 		connection_cleanup(dev);
+-		status = HAL_STATUS_FAILED;
++		status = GATT_FAILURE;
+ 		goto reply;
+ 	}
+ 
+-	status = HAL_STATUS_SUCCESS;
++	status = GATT_SUCCESS;
+ 	goto reply;
+ 
+ reply:
+@@ -932,7 +935,7 @@ reply:
+ 		struct hal_ev_gatt_client_connect ev;
+ 
+ 		ev.conn_id = dev->conn_id;
+-		ev.status = HAL_STATUS_SUCCESS;
++		ev.status = GATT_SUCCESS;
+ 		ev.client_if = cmd->client_if;
+ 		bdaddr2android(&addr, &ev.bda);
+ 
+@@ -982,7 +985,7 @@ reply:
+ 	 * If this is last client, this is still OK to do because on connect
+ 	 * request we do le scan and wait until remote device start
+ 	 * advertisement */
+-	send_client_disconnect_notify(cmd->client_if, dev, HAL_STATUS_SUCCESS);
++	send_client_disconnect_notify(cmd->client_if, dev, GATT_SUCCESS);
+ 
+ 	/* If there is more clients just return */
+ 	if (!queue_isempty(dev->clients))
+@@ -1087,7 +1090,7 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
+ 		bt_uuid_t included_uuid;
+ 
+ 		ev.conn_id = device->conn_id;
+-		ev.status = HAL_STATUS_SUCCESS;
++		ev.status = GATT_SUCCESS;
+ 
+ 		ev.srvc_id.inst_id = 0;
+ 		uuid2android(&uuid, ev.srvc_id.uuid);
+@@ -1103,7 +1106,7 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
+ 
+ 	/* Android expects notification with error status in the end */
+ 	ev.conn_id = device->conn_id;
+-	ev.status = HAL_STATUS_FAILED;
++	ev.status = GATT_FAILURE;
+ 	ev.srvc_id.inst_id = 0;
+ 	uuid2android(&uuid, ev.srvc_id.uuid);
+ 
+@@ -1176,7 +1179,7 @@ static void send_client_char_notify(const struct characteristic *ch,
+ 	struct hal_ev_gatt_client_get_characteristic ev;
+ 
+ 	memset(&ev, 0, sizeof(ev));
+-	ev.status = ch ? HAL_STATUS_SUCCESS : HAL_STATUS_FAILED;
++	ev.status = ch ? GATT_SUCCESS : GATT_FAILURE;
+ 
+ 	if (ch) {
+ 		ev.char_prop = ch->ch.properties;
+@@ -1453,6 +1456,7 @@ static void handle_client_register_for_notification(const void *buf,
+ 	struct service *service;
+ 	int32_t conn_id = 0;
+ 	uint8_t status;
++	int32_t gatt_status;
+ 	bdaddr_t addr;
+ 
  	DBG("");
-
-+	/* TODO authorization needs to be handled */
-+
-+	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
-+	if (!find_service(cmd->conn_id, &match_id, &dev, &srvc)) {
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	/* search characteristics by element id */
-+	hal_gatt_id_to_element_id(&cmd->gatt_id, &match_id);
-+	ch = queue_find(srvc->chars, match_char_by_element_id, &match_id);
-+	if (!ch) {
-+		error("gatt: Characteristic with inst_id: %d not found",
-+							cmd->gatt_id.inst_id);
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	cb_data = new0(struct read_char_data, 1);
-+	if (!cb_data) {
-+		error("gatt: Cannot allocate cb data");
-+		status = HAL_STATUS_FAILED;
-+		goto done;
-+	}
-+
-+	cb_data->service = srvc;
-+	cb_data->conn_id = dev->conn_id;
-+	cb_data->characteristic = ch;
-+	cb_data->is_primary = cmd->srvc_id.is_primary;
-+
-+	if (!gatt_read_char(dev->attrib, ch->ch.value_handle,
-+						read_char_cb, cb_data)) {
-+		/* Read characteristic failed so we need to send
-+		 * notification with failed status as Android waits
-+		 * for it. Even though we reply success as a reply for
-+		 * this command.
-+		 */
-+		error("gatt: Cannot read characteristic with inst_id: %d",
-+							cmd->gatt_id.inst_id);
-+		send_client_read_char_notify(GATT_FAILURE, NULL, 0,
-+						dev->conn_id, srvc, ch,
-+						cmd->srvc_id.is_primary);
-+		free(cb_data);
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+done:
+@@ -1547,8 +1551,9 @@ static void handle_client_register_for_notification(const void *buf,
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+-	send_register_for_notification_ev(conn_id, 1, status, &cmd->srvc_id,
+-								&cmd->char_id);
++	gatt_status  = status ? GATT_SUCCESS : GATT_FAILURE;
++	send_register_for_notification_ev(conn_id, 1, gatt_status,
++						&cmd->srvc_id, &cmd->char_id);
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--					HAL_OP_GATT_CLIENT_READ_CHARACTERISTIC,
--					HAL_STATUS_FAILED);
-+				HAL_OP_GATT_CLIENT_READ_CHARACTERISTIC, status);
- }
-
- static void handle_client_write_characteristic(const void *buf, uint16_t len)
---
+ 				HAL_OP_GATT_CLIENT_REGISTER_FOR_NOTIFICATION,
+ 				status);
+@@ -1563,6 +1568,7 @@ static void handle_client_deregister_for_notification(const void *buf,
+ 	struct gatt_device *dev;
+ 	int32_t conn_id = 0;
+ 	uint8_t status;
++	int32_t gatt_status;
+ 	bdaddr_t addr;
+ 
+ 	DBG("");
+@@ -1598,8 +1604,9 @@ static void handle_client_deregister_for_notification(const void *buf,
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+-	send_register_for_notification_ev(conn_id, 0, status, &cmd->srvc_id,
+-								&cmd->char_id);
++	gatt_status  = status ? GATT_SUCCESS : GATT_FAILURE;
++	send_register_for_notification_ev(conn_id, 0, gatt_status,
++						&cmd->srvc_id, &cmd->char_id);
+ 
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 				HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION,
+-- 
 1.9.0
 
