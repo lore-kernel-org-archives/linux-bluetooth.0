@@ -1,72 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1396038238.5349.11.camel@g-VPCF13Z1E>
-Subject: Re: PATCH hid2hci for CSR 8510 A10
-From: Gordon <kernel@gkr.i24.cc>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Fri, 28 Mar 2014 21:23:58 +0100
-In-Reply-To: <20140328194907.GA24300@t440s.P-661HNU-F1>
-References: <1388440779.28025.21.camel@g-VPCF13Z1E>
-	 <1396034462.3390.5.camel@g-VPCF13Z1E>
-	 <20140328194907.GA24300@t440s.P-661HNU-F1>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+MIME-Version: 1.0
+In-Reply-To: <20140328175116.GA20397@t440s.P-661HNU-F1>
+References: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
+	<1396016350-16943-4-git-send-email-claudio.takahasi@openbossa.org>
+	<20140328175116.GA20397@t440s.P-661HNU-F1>
+Date: Fri, 28 Mar 2014 16:53:56 -0300
+Message-ID: <CAKT1EBdHqrAR2rusqyjLzLq0KzHgNw=4d2rzemLU=Eoqh06tVw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v0 3/5] tools: Add testing descriptor for IAS Alert Level
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Johan:
 
-On Fr, 2014-03-28 at 21:49 +0200, Johan Hedberg wrote:
-> Hi Gordon,
-> 
-> On Fri, Mar 28, 2014, Gordon wrote:
-> > some time ago I sent a patch attached to following mail.
-> > 
-> > On Mo, 2013-12-30 at 22:59 +0100, Gordon wrote:
-> > > Hi,
-> > > 
-> > > Could someone please review.
-> > 
-> > I didn't get a reply yet. Since it has been my first mail to this list I
-> > wonder whether there is anything wrong with this request, or just nobody
-> > is interested ?
-> 
-> A couple of things regarding the presentation of the patch should at
-> least be fixed:
-> 
->  - Send it as a proper git patch, i.e. using git commit, format-patch
->    and send-email
+On Fri, Mar 28, 2014 at 2:51 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Claudio,
+>
+> On Fri, Mar 28, 2014, Claudio Takahasi wrote:
+>> This patch adds a testing purpose only characteristic descriptor to
+>> allow reading and writing descriptors "Value" property.
+>> ---
+>>  tools/gatt-service.c | 50 +++++++++++++++++++++++++++++++++++++++++++-------
+>>  1 file changed, 43 insertions(+), 7 deletions(-)
+>
+> I've applied the first two patches but noticed something with this one:
+>
+>> +static gboolean register_characteristic(const char *chr_uuid,
+>>                                               const uint8_t *value, int vlen,
+>>                                               const char **props,
+>> +                                             const char *desc_uuid,
+>>                                               const char *service_path)
+>>  {
+>>       struct characteristic *chr;
+>>       static int id = 1;
+>> -     char *path;
+>> +     char *chr_path, *desc_path;
+>>       gboolean ret = TRUE;
+>>
+>> -     path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+>> +     chr_path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+>>
+>>       chr = g_new0(struct characteristic, 1);
+>>
+>> -     chr->uuid = g_strdup(uuid);
+>> +     chr->uuid = g_strdup(chr_uuid);
+>>       chr->value = g_memdup(value, vlen);
+>>       chr->vlen = vlen;
+>> -     chr->path = path;
+>> +     chr->path = chr_path;
+>>       chr->props = props;
+>>
+>> -     if (!g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+>> +     if (!g_dbus_register_interface(connection, chr_path, GATT_CHR_IFACE,
+>>                                       NULL, NULL, chr_properties,
+>>                                       chr, chr_iface_destroy)) {
+>>               printf("Couldn't register characteristic interface\n");
+>> +             return FALSE;
+>> +     }
+>> +
+>> +     if (!desc_uuid)
+>> +             return ret;
+>> +
+>> +     desc_path = g_strdup_printf("%s/descriptor%d", chr_path, id++);
+>> +     if (!g_dbus_register_interface(connection, desc_path,
+>> +                                     GATT_DESCRIPTOR_IFACE,
+>> +                                     NULL, NULL, desc_properties,
+>> +                                     g_strdup(desc_uuid), g_free)) {
+>> +             printf("Couldn't register descriptor interface\n");
+>> +             g_dbus_unregister_interface(connection, chr_path,
+>> +                                                     GATT_CHR_IFACE);
+>> +             g_free(desc_path);
+>>               ret = FALSE;
+>>       }
+>>
+>
+> Looks like you're leaking desc_path here if register_interface succeeds.
+> In general it seems a bit unnecessary to go for a dynamically allocated
+> approach since you only need the variable in the same function. Probably
+> a stack variable and snprintf would do an equally good or better job.
+>
+> Johan
 
-ok, will try.
+OK. I will send a new patch fixing this memory leak.
 
->  - Try to follow the bluez.git coding style which is roughly the same as
->    the Linux kernel coding style. I realize the rest of hid2hci.c is
->    probably the worst reference for good BlueZ coding style (being one
->    of the oldest pieces of code with very little maintenance over the
->    years).
-> 
+In this case specifically, I prefer to use dynamically allocated
+memory because in the next patch, the object path will be necessary to
+emit the PropertiesChanged signal.
 
-thanks for the detailed remarks, although removed from the reply, I will
-address them.
-
-> > +		//unable to detect EALREADY
-> 
-> We don't generally use C++ style comments in the tree. Prefer /* .. */
-> where possible. In this case I'd elaborate the comment a bit since I
-> don't quite understand what it means.
-
-I am not sure, other functions in hid2hci presumably return this when
-the device is already in the mode that should be switched to. 
-
-> 
-> > +	case HID:
-> > +		// currently unknown what to do here
-> 
-
-the method for switching back to hid mode is unknown, should I remove
-the cases or just be more verbose in the comments ?
-
-Thanks,
-
-Gordon
-
+Regards,
+Claudio
