@@ -1,24 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 28 Mar 2014 14:26:22 +0200
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v0] gatt: Fix proxies list iteration
-Message-ID: <20140328122622.GC11823@t440s.ger.corp.intel.com>
-References: <1395949502-30266-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1395949502-30266-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395999467-29192-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1395999467-29192-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Fri, 28 Mar 2014 07:34:20 -0400
+Message-ID: <CAJdJm_PGOZhZ1WZUMnZiNPiX0ntR-2fsark_2MtjPkuj=cYaFw@mail.gmail.com>
+Subject: Re: [RFC v3] Add Support for Read Remote RSSI
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Hi Lukasz,
 
-On Thu, Mar 27, 2014, Claudio Takahasi wrote:
-> ---
->  src/gatt-dbus.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Mar 28, 2014 at 5:37 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> If we go with v3, then in Android case we will need to add more logic
+> to bluetoothd to cover case when Application calles Read Remote Rssi
+> only once. We just need to avoid letting kernel to poll without the reason.
+> However I do expect android application to call this read remote rssi in
+> a loop anyway.
 
-Applied. Thanks.
+One way to do that is to have a "timeout" timer (e.g. 5 seconds) that
+is reset on each read_remote_rssi call from HAL. On this timer
+expires, Unregister is called.
 
-Johan
+Note that the comment I made on the patch itself regarding configuring
+the period for readings apply here: I think there should be some way
+to set this period. Otherwise, a two small period (say, 1s) will be
+wasting power for an application that reads only every 5s or 10s. Or
+the contrary, a too long timer will make applications which read more
+frequent receive inaccurate readings.
+
+Best Regards,
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
