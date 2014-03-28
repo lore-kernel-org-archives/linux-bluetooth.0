@@ -1,185 +1,185 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 7/9] android/gatt: Add client read descriptor handler
-Date: Fri, 28 Mar 2014 19:54:43 +0100
-Message-Id: <1396032885-32077-8-git-send-email-jakub.tyszkowski@tieto.com>
+Cc: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCHv2 2/9] android/gatt: Handle read characteristic client command
+Date: Fri, 28 Mar 2014 19:54:38 +0100
+Message-Id: <1396032885-32077-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1396032885-32077-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1396032885-32077-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+
+This adds read characteristic client command handling.
 ---
- android/gatt.c | 136 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 135 insertions(+), 1 deletion(-)
+ android/gatt.c | 140 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 138 insertions(+), 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 1fe7035..0a4159e 100644
+index 8dacd86..15a61d4 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -49,6 +49,8 @@
- #include "attrib/gatt.h"
- #include "btio/btio.h"
- 
-+#define GATT_MAX_ATTR_LEN 600
-+
- #define GATT_SUCCESS	0x00000000
- #define GATT_FAILURE	0x00000101
- 
-@@ -237,6 +239,17 @@ static bool match_char_by_higher_inst_id(const void *data,
- 	return inst_id < ch->id.instance;
+@@ -243,6 +243,26 @@ static bool match_notification(const void *a, const void *b)
+ 	return true;
  }
- 
-+static bool match_descr_by_element_id(const void *data, const void *user_data)
+
++static bool match_char_by_element_id(const void *data, const void *user_data)
 +{
 +	const struct element_id *exp_id = user_data;
-+	const struct descriptor *descr = data;
++	const struct characteristic *chars = data;
++	bt_uuid_t uuid;
 +
-+	if (exp_id->instance == descr->id.instance)
-+		return !bt_uuid_cmp(&descr->id.uuid, &exp_id->uuid);
++	bt_string_to_uuid(&uuid, chars->ch.uuid);
++	if (exp_id->instance == chars->id.instance)
++		return !bt_uuid_cmp(&uuid, &exp_id->uuid);
 +
 +	return false;
 +}
 +
- static bool match_descr_by_higher_inst_id(const void *data,
- 							const void *user_data)
- {
-@@ -1861,12 +1874,133 @@ done:
- 			HAL_OP_GATT_CLIENT_WRITE_CHARACTERISTIC, status);
- }
- 
-+static void send_client_descr_read_notify(int32_t status, const uint8_t *pdu,
-+						guint16 len, int32_t conn_id,
-+						const struct descriptor *descr,
-+						const struct service *srvc,
-+						const struct characteristic *ch)
++static void hal_gatt_id_to_element_id(const struct hal_gatt_gatt_id *from,
++							struct element_id *to)
 +{
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_client_read_descriptor *ev = (void *) buf;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	ev->status = status;
-+	ev->conn_id = conn_id;
-+
-+	if (srvc) {
-+		ev->data.srvc_id.inst_id = srvc->id.instance;
-+		uuid2android(&srvc->id.uuid, ev->data.srvc_id.uuid);
-+	}
-+
-+	if (ch) {
-+		ev->data.char_id.inst_id = ch->id.instance;
-+		uuid2android(&ch->id.uuid, ev->data.char_id.uuid);
-+	}
-+
-+	if (descr) {
-+		ev->data.descr_id.inst_id = descr->id.instance;
-+		uuid2android(&descr->id.uuid, ev->data.descr_id.uuid);
-+	}
-+
-+	if (pdu)
-+		ev->data.len = dec_read_resp(pdu, len, ev->data.value,
-+							GATT_MAX_ATTR_LEN);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+					HAL_EV_GATT_CLIENT_READ_DESCRIPTOR,
-+					sizeof(*ev) + ev->data.len, ev);
++	to->instance = from->inst_id;
++	android2uuid(from->uuid, &to->uuid);
 +}
 +
-+struct read_desc_data {
+ static void destroy_notification(void *data)
+ {
+ 	struct notification_data *notification = data;
+@@ -1359,13 +1379,129 @@ static void handle_client_get_descriptor(const void *buf, uint16_t len)
+ 			HAL_OP_GATT_CLIENT_GET_DESCRIPTOR, HAL_STATUS_FAILED);
+ }
+
++struct read_char_data {
 +	int32_t conn_id;
 +	struct service *service;
 +	struct characteristic *characteristic;
-+	struct descriptor *descriptor;
++	uint8_t is_primary;
 +};
 +
-+static void read_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
-+							gpointer user_data)
++static void send_client_read_char_notify(int32_t status, const uint8_t *pdu,
++						uint16_t len, int32_t conn_id,
++						struct service *service,
++						struct characteristic *ch,
++						uint8_t is_primary)
 +{
-+	struct read_desc_data *cb_data = user_data;
++	uint8_t buf[IPC_MTU];
++	struct hal_ev_gatt_client_read_characteristic *ev = (void *) buf;
++	bt_uuid_t uuid;
++	ssize_t vlen;
 +
-+	if (status != 0)
-+		error("gatt: Discover all char descriptors failed: %s\n",
-+							att_ecode2str(status));
++	memset(buf, 0, sizeof(buf));
 +
-+	send_client_descr_read_notify(status, pdu, len, cb_data->conn_id,
-+					cb_data->descriptor, cb_data->service,
-+					cb_data->characteristic);
++	ev->conn_id = conn_id;
++	ev->status = status;
 +
-+	free(cb_data);
++	ev->data.srvc_id.inst_id = service->id.instance;
++	bt_string_to_uuid(&uuid, service->primary.uuid);
++	uuid2android(&uuid, ev->data.srvc_id.uuid);
++	ev->data.srvc_id.is_primary = is_primary;
++
++	ev->data.char_id.inst_id = ch->id.instance;
++	bt_string_to_uuid(&uuid, ch->ch.uuid);
++	uuid2android(&uuid, ev->data.char_id.uuid);
++
++	ev->data.status = status;
++
++	if (pdu) {
++		vlen = dec_read_resp(pdu, len, ev->data.value, sizeof(buf));
++		if (vlen < 0) {
++			error("gatt: Protocol error");
++			ev->status = GATT_FAILURE;
++		} else {
++			ev->data.len = vlen;
++		}
++	}
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++					HAL_EV_GATT_CLIENT_READ_CHARACTERISTIC,
++					sizeof(*ev) + ev->data.len, ev);
 +}
 +
- static void handle_client_read_descriptor(const void *buf, uint16_t len)
++static void read_char_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct read_char_data *data = user_data;
++
++	send_client_read_char_notify(status, pdu, len, data->conn_id,
++					data->service, data->characteristic,
++						data->is_primary);
++
++	free(data);
++}
++
+ static void handle_client_read_characteristic(const void *buf, uint16_t len)
  {
-+	const struct hal_cmd_gatt_client_read_descriptor *cmd = buf;
-+	struct characteristic *ch = NULL;
-+	struct descriptor *descr = NULL;
-+	struct read_desc_data *cb_data;
-+	struct service *srvc = NULL;
++	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
++	struct read_char_data *cb_data;
++	struct characteristic *ch;
 +	struct element_id match_id;
 +	struct gatt_device *dev;
-+	int32_t conn_id = 0;
++	struct service *srvc;
 +	uint8_t status;
 +
  	DBG("");
- 
+
++	/* TODO authorization needs to be handled */
++
 +	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
 +	if (!find_service(cmd->conn_id, &match_id, &dev, &srvc)) {
-+		error("gatt: Read descr. could not find service");
-+		goto failed;
++		status = HAL_STATUS_FAILED;
++		goto done;
 +	}
 +
-+	conn_id = dev->conn_id;
-+
-+	hal_gatt_id_to_element_id(&cmd->char_id, &match_id);
++	/* search characteristics by element id */
++	hal_gatt_id_to_element_id(&cmd->gatt_id, &match_id);
 +	ch = queue_find(srvc->chars, match_char_by_element_id, &match_id);
 +	if (!ch) {
-+		error("gatt: Read descr. could not find characteristic");
-+		goto failed;
++		error("gatt: Characteristic with inst_id: %d not found",
++							cmd->gatt_id.inst_id);
++		status = HAL_STATUS_FAILED;
++		goto done;
 +	}
 +
-+	hal_gatt_id_to_element_id(&cmd->descr_id, &match_id);
-+	descr = queue_find(ch->descriptors, match_descr_by_element_id,
-+								&match_id);
-+	if (!descr) {
-+		error("gatt: Read descr. could not find descriptor");
-+		goto failed;
-+	}
-+
-+	cb_data = new0(struct read_desc_data, 1);
++	cb_data = new0(struct read_char_data, 1);
 +	if (!cb_data) {
-+		error("gatt: Read descr. could not allocate callback data");
-+
++		error("gatt: Cannot allocate cb data");
 +		status = HAL_STATUS_FAILED;
 +		goto done;
 +	}
 +
 +	cb_data->service = srvc;
-+	cb_data->conn_id = conn_id;
-+	cb_data->descriptor = descr;
++	cb_data->conn_id = dev->conn_id;
 +	cb_data->characteristic = ch;
++	cb_data->is_primary = cmd->srvc_id.is_primary;
 +
-+	/* TODO: handle cmd->auth_req flag */
-+	if (gatt_read_char(dev->attrib, descr->handle, read_desc_cb, cb_data)) {
-+		status = HAL_STATUS_SUCCESS;
-+		goto done;
++	if (!gatt_read_char(dev->attrib, ch->ch.value_handle,
++						read_char_cb, cb_data)) {
++		/* Read characteristic failed so we need to send
++		 * notification with failed status as Android waits
++		 * for it. Even though we reply success as a reply for
++		 * this command.
++		 */
++		error("gatt: Cannot read characteristic with inst_id: %d",
++							cmd->gatt_id.inst_id);
++		send_client_read_char_notify(GATT_FAILURE, NULL, 0,
++						dev->conn_id, srvc, ch,
++						cmd->srvc_id.is_primary);
++		free(cb_data);
 +	}
 +
-+	free(cb_data);
-+
-+failed:
-+	send_client_descr_read_notify(GATT_FAILURE, NULL, 0, conn_id, descr,
-+								srvc, ch);
 +	status = HAL_STATUS_SUCCESS;
 +
 +done:
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_CLIENT_READ_DESCRIPTOR, HAL_STATUS_FAILED);
-+			HAL_OP_GATT_CLIENT_READ_DESCRIPTOR, status);
+-					HAL_OP_GATT_CLIENT_READ_CHARACTERISTIC,
+-					HAL_STATUS_FAILED);
++				HAL_OP_GATT_CLIENT_READ_CHARACTERISTIC, status);
  }
- 
- static void handle_client_write_descriptor(const void *buf, uint16_t len)
--- 
+
+ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+--
 1.9.0
 
