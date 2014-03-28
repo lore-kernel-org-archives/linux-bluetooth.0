@@ -1,54 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: bt <linux-bluetooth@vger.kernel.org>,
-        "Gustavo F. Padovan"
-	<gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Amitkumar
- Karwar <akarwar@marvell.com>
-Date: Fri, 28 Mar 2014 14:51:27 -0700
-Subject: RE: [PATCH 2/2] Bluetooth: btmrvl: implement read-to-clear for
- SD8897 interrupts
-Message-ID: <477F20668A386D41ADCC57781B1F70430F6B720F76@SC-VEXCH1.marvell.com>
-References: <1395981043-2541-1-git-send-email-bzhao@marvell.com>
- <1395981043-2541-2-git-send-email-bzhao@marvell.com>
- <E92D9A61-D66B-4D57-8C12-BBC640E12CD3@holtmann.org>
-In-Reply-To: <E92D9A61-D66B-4D57-8C12-BBC640E12CD3@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+Date: Fri, 28 Mar 2014 15:52:25 -0500
+Message-ID: <CAJZTJf08OxfhGWqR5RB4xFmgMaaoA=H+msdDez=G9J7gyuzF4w@mail.gmail.com>
+Subject: Miccus Home RTX: Any issues useing with Linux?
+From: Steven Ulrick <meow8282@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hello Everyone,
+I searched for "Miccus Home RTX" on
+"http://dir.gmane.org/gmane.linux.bluez.kernel" and I was informed
+that "No documents match your query"
 
-> Hi Bing,
->=20
-> > For SD8897, CMD52 write_to_clear may have missing interrupts
-> > under certain corner case condition. Use CMD53 read-to-clear
-> > to fix the problem.
-> >
-> > Signed-off-by: Bing Zhao <bzhao@marvell.com>
-> > ---
-> > drivers/bluetooth/btmrvl_drv.h  |  2 ++
-> > drivers/bluetooth/btmrvl_main.c | 17 ++++++++++++++
-> > drivers/bluetooth/btmrvl_sdio.c | 52 ++++++++++++++++++++++++++++++++++=
-++++++-
-> > drivers/bluetooth/btmrvl_sdio.h |  3 +++
-> > 4 files changed, 73 insertions(+), 1 deletion(-)
->=20
-> Applying: Bluetooth: btmrvl: implement read-to-clear for SD8897 interrupt=
-s
-> Applying: Bluetooth: btmrvl: separate write-to-clear function from interr=
-upt handler
-> error: patch failed: drivers/bluetooth/btmrvl_sdio.c:684
-> error: drivers/bluetooth/btmrvl_sdio.c: patch does not apply
-> Patch failed at 0002 Bluetooth: btmrvl: separate write-to-clear function =
-from interrupt handler
+Are there any known issues with getting the "Miccus Home RTX" working
+under Linux?  If you have never heard of this device, here is a link
+to it's page on miccus.com:
+http://www.miccus.com/products/blubridge-home
 
-I verified this patch 2/2 and it can apply cleanly on my bluetooth-next loc=
-al tree.
+As a non-coder/developer, I can at least use my Miccus Home RTX to
+help you with any testing that is needed in adding support for this
+device to the kernel.
 
-I will resend this patch after a rebase.
-
-Thanks,
-Bing
+Steven P. Ulrick
