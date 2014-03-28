@@ -1,69 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 2/7] android/gatt: Add get_included_data struct and callback
-Date: Fri, 28 Mar 2014 11:49:17 +0100
-Message-Id: <1396003762-9350-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1396003762-9350-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1396003762-9350-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 1/7] android/gatt: Add initial implementation of get_included_service
+Date: Fri, 28 Mar 2014 11:49:16 +0100
+Message-Id: <1396003762-9350-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Create user data passed to callback get_included_cb.
-It will handle included services and pass it to notification.
+It will look for included service in range passed in command.
+It call gatt_find_included(), but without result callback now,
+as it is initial version.
 ---
- android/gatt.c | 27 ++++++++++++++++++++++++++-
- 1 file changed, 26 insertions(+), 1 deletion(-)
+ android/gatt.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index cf0ad61..ac753b7 100644
+index 92e16d4..cf0ad61 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -967,9 +967,23 @@ static struct service *find_service_by_uuid(struct gatt_device *device,
- 	return queue_find(device->services, match_service_by_uuid, uuid);
+@@ -949,13 +949,67 @@ reply:
+ 			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
  }
  
-+struct get_included_data {
-+	struct service *service;
-+	struct gatt_device *device;
-+};
-+
-+static void get_included_cb(uint8_t status, GSList *included, void *user_data)
++static bool match_service_by_uuid(const void *data, const void *user_data)
 +{
-+	struct get_included_data *data = user_data;
++	const struct service *service = data;
++	const bt_uuid_t *uuid = user_data;
++	bt_uuid_t service_uuid;
 +
-+	/* TODO pass included services to notification */
-+	free(data);
++	if (bt_string_to_uuid(&service_uuid, service->primary.uuid) < 0)
++		return false;
++
++	return !bt_uuid_cmp(uuid, &service_uuid);
++}
++
++static struct service *find_service_by_uuid(struct gatt_device *device,
++								bt_uuid_t *uuid)
++{
++	return queue_find(device->services, match_service_by_uuid, uuid);
 +}
 +
  static void handle_client_get_included_service(const void *buf, uint16_t len)
  {
- 	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
-+	struct get_included_data *data;
- 	struct gatt_device *device;
- 	struct service *service;
- 	uint8_t status;
-@@ -1001,8 +1015,19 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
- 		goto failed;
- 	}
++	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
++	struct gatt_device *device;
++	struct service *service;
++	uint8_t status;
++
+ 	DBG("");
  
-+	data = new0(struct get_included_data, 1);
-+	if (!data) {
-+		error("gatt: failed to allocate memory for included_data");
++	device = find_device_by_conn_id(cmd->conn_id);
++	if (!device) {
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
 +
-+	data->service = service;
-+	data->device = device;
++	if (queue_isempty(device->services)) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
 +
- 	gatt_find_included(device->attrib, service->primary.range.start,
--					service->primary.range.end, NULL, NULL);
-+				service->primary.range.end, get_included_cb,
-+				data);
++	if (!cmd->number) {
++		service = queue_peek_head(device->services);
++	} else {
++		bt_uuid_t uuid;
++
++		android2uuid(cmd->srvc_id->uuid, &uuid);
++		service = find_service_by_uuid(device, &uuid);
++	}
++
++	if (!service) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	gatt_find_included(device->attrib, service->primary.range.start,
++					service->primary.range.end, NULL, NULL);
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 					HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
+-					HAL_STATUS_FAILED);
++					status);
+ }
  
- 	status = HAL_STATUS_SUCCESS;
- 
+ static void send_client_char_notify(const struct characteristic *ch,
 -- 
 1.8.3.1
 
