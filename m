@@ -1,75 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/8] android/gatt: Add helper for getting device by conn_id
-Date: Fri, 28 Mar 2014 11:28:27 +0100
-Message-ID: <2797203.zJz3ML6XFU@uw000953>
-In-Reply-To: <1395999959-2396-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1395999959-2396-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastianchlad@gmail.com>
+Subject: [PATCH 2/2] android/pixit: PIXIT for L2CAP
+Date: Fri, 28 Mar 2014 11:18:34 +0100
+Message-Id: <1396001914-22821-2-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1396001914-22821-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1396001914-22821-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+From: Sebastian Chlad <sebastianchlad@gmail.com>
 
-On Friday 28 of March 2014 10:45:52 Marcin Kraglak wrote:
-> It will look for cgatt_device by conn_id.
-> ---
->  android/gatt.c | 14 ++++++++------
->  1 file changed, 8 insertions(+), 6 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 81b29af..92e16d4 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -722,6 +722,11 @@ static struct gatt_device *find_device(bdaddr_t *addr)
->  	return NULL;
->  }
->  
-> +static struct gatt_device *find_device_by_conn_id(int32_t conn_id)
-> +{
-> +	return queue_find(conn_list, match_dev_by_conn_id, INT_TO_PTR(conn_id));
-> +}
-> +
->  static void handle_client_connect(const void *buf, uint16_t len)
->  {
->  	const struct hal_cmd_gatt_client_connect *cmd = buf;
-> @@ -858,8 +863,7 @@ static void handle_client_disconnect(const void *buf, uint16_t len)
->  
->  	ba2str((bdaddr_t *)&cmd->bdaddr, addr);
->  
-> -	dev = queue_find(conn_list, match_dev_by_conn_id,
-> -						INT_TO_PTR(cmd->conn_id));
-> +	dev = find_device_by_conn_id(cmd->conn_id);
->  	if (!dev) {
->  		error("gatt: dev %s with conn_id=%d not found",
->  							addr, cmd->conn_id);
-> @@ -924,8 +928,7 @@ static void handle_client_search_service(const void *buf, uint16_t len)
->  
->  	DBG("");
->  
-> -	dev = queue_find(conn_list, match_dev_by_conn_id,
-> -						INT_TO_PTR(cmd->conn_id));
-> +	dev = find_device_by_conn_id(cmd->conn_id);
->  	if (!dev) {
->  		error("gatt: dev with conn_id=%d not found", cmd->conn_id);
->  		status = HAL_STATUS_FAILED;
-> @@ -1048,8 +1051,7 @@ static bool find_service(int32_t conn_id, struct element_id *service_id,
->  	struct gatt_device *device;
->  	struct service *service;
->  
-> -	device = queue_find(conn_list, match_dev_by_conn_id,
-> -							INT_TO_PTR(conn_id));
-> +	device = find_device_by_conn_id(conn_id);
->  	if (!device) {
->  		error("gatt: conn_id=%d not found", conn_id);
->  		return false;
-> 
+Adjusting some of the PIXITs settings for more reliable testing
+environment.
+---
+ android/pixit-l2cap.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This patch is now upstream. Thanks.
-
+diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
+index a307625..3ee8b44 100644
+--- a/android/pixit-l2cap.txt
++++ b/android/pixit-l2cap.txt
+@@ -12,14 +12,14 @@ Parameter Name                                         Value
+ TSPX_bd_addr_iut                                       112233445566 (*&)
+ TSPX_client_class_of_device                            100104
+ TSPX_server_class_of_device                            100104
+-TSPX_security_enabled                                  FALSE
++TSPX_security_enabled                                  TRUE
+ TSPX_delete_link_key                                   FALSE
+ TSPX_pin_code                                          0000
+ TSPX_flushto                                           FFFF
+ TSPX_inmtu                                             02A0
+ TSPX_no_fail_verditcs                                  FALSE
+ TSPX_oumtu                                             02A0
+-TSPX_iut_role_initiator                                FALSE
++TSPX_iut_role_initiator                                TRUE
+ TSPX_psm                                               1011 (*)
+ TSPX_time_guard                                        180000
+ TSPX_timer_ertx                                        120000
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
