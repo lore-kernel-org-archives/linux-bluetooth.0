@@ -1,40 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 0/9] android/gatt: Characteristic/Descriptors read and write
-Date: Fri, 28 Mar 2014 19:54:36 +0100
-Message-Id: <1396032885-32077-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Fri, 28 Mar 2014 19:51:16 +0200
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v0 3/5] tools: Add testing descriptor for IAS Alert
+ Level
+Message-ID: <20140328175116.GA20397@t440s.P-661HNU-F1>
+References: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1396016350-16943-4-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1396016350-16943-4-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set contains gatt characteristic and descriptors handling.
+Hi Claudio,
 
-It start with gatt status reporting fix, as expected by Android GATT_FAILURE
-does not map directly to HAL_STATUS.
+On Fri, Mar 28, 2014, Claudio Takahasi wrote:
+> This patch adds a testing purpose only characteristic descriptor to
+> allow reading and writing descriptors "Value" property.
+> ---
+>  tools/gatt-service.c | 50 +++++++++++++++++++++++++++++++++++++++++++-------
+>  1 file changed, 43 insertions(+), 7 deletions(-)
 
-Next two v2 patches are Gregorz's patches for characteristic read and write
-rebased on top of the gatt status reporting fix.
+I've applied the first two patches but noticed something with this one:
 
-Next goes descriptors get, read, write handling. The last patch is just
-simple cleanup.
+> +static gboolean register_characteristic(const char *chr_uuid,
+>  						const uint8_t *value, int vlen,
+>  						const char **props,
+> +						const char *desc_uuid,
+>  						const char *service_path)
+>  {
+>  	struct characteristic *chr;
+>  	static int id = 1;
+> -	char *path;
+> +	char *chr_path, *desc_path;
+>  	gboolean ret = TRUE;
+>  
+> -	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+> +	chr_path = g_strdup_printf("%s/characteristic%d", service_path, id++);
+>  
+>  	chr = g_new0(struct characteristic, 1);
+>  
+> -	chr->uuid = g_strdup(uuid);
+> +	chr->uuid = g_strdup(chr_uuid);
+>  	chr->value = g_memdup(value, vlen);
+>  	chr->vlen = vlen;
+> -	chr->path = path;
+> +	chr->path = chr_path;
+>  	chr->props = props;
+>  
+> -	if (!g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
+> +	if (!g_dbus_register_interface(connection, chr_path, GATT_CHR_IFACE,
+>  					NULL, NULL, chr_properties,
+>  					chr, chr_iface_destroy)) {
+>  		printf("Couldn't register characteristic interface\n");
+> +		return FALSE;
+> +	}
+> +
+> +	if (!desc_uuid)
+> +		return ret;
+> +
+> +	desc_path = g_strdup_printf("%s/descriptor%d", chr_path, id++);
+> +	if (!g_dbus_register_interface(connection, desc_path,
+> +					GATT_DESCRIPTOR_IFACE,
+> +					NULL, NULL, desc_properties,
+> +					g_strdup(desc_uuid), g_free)) {
+> +		printf("Couldn't register descriptor interface\n");
+> +		g_dbus_unregister_interface(connection, chr_path,
+> +							GATT_CHR_IFACE);
+> +		g_free(desc_path);
+>  		ret = FALSE;
+>  	}
+>  
 
-Grzegorz Kolodziejczyk (2):
-  android/gatt: Handle read characteristic client command
-  android/gatt: Handle write characteristic client command
+Looks like you're leaking desc_path here if register_interface succeeds.
+In general it seems a bit unnecessary to go for a dynamically allocated
+approach since you only need the variable in the same function. Probably
+a stack variable and snprintf would do an equally good or better job.
 
-Jakub Tyszkowski (7):
-  android/gatt: Use proper GATT status
-  android/gatt: Add queue for characteristic descriptors caching
-  android/gatt: Handle get descriptor client command
-  android/gatt: Search for descriptors and notify
-  android/gatt: Add client read descriptor handler
-  android/gatt: Add client write descriptor handler
-  android/gatt: Simplify matching functions
-
- android/gatt.c | 805 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 777 insertions(+), 28 deletions(-)
-
---
-1.9.0
-
+Johan
