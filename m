@@ -1,77 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1395999467-29192-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1395999467-29192-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1395999467-29192-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Fri, 28 Mar 2014 07:27:51 -0400
-Message-ID: <CAJdJm_Mq02JqKNA7SMS+-PE0D2EOTK=Z2VnwQPeyuNAaCYUQaw@mail.gmail.com>
-Subject: Re: [RFC v3] mgmt-api: Add support for Read Remote RSSI
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv4 5/7] android/gatt: Add send_register_for_notif_ev function
+Date: Fri, 28 Mar 2014 11:49:20 +0100
+Message-Id: <1396003762-9350-5-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1396003762-9350-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1396003762-9350-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+It will be called with register/deregister will be called.
+It will send status, service id and characteristic id.
+---
+ android/gatt.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-On Fri, Mar 28, 2014 at 5:37 AM, Lukasz Rymanowski
-<lukasz.rymanowski@tieto.com> wrote:
-> +Register Remote RSSI Change Command
-> +===================================
-> +
-> +       Command Code:           0x0031
-> +       Controller Index:       <controller id>
-> +       Command Parameters:     Address (6 Octets)
-> +                               Address_Type (1 Octet)
-> +                               Threshold (1 Octet)
-> +       Return Parameters:      Address (6 Octets)
-> +                               Address_Type (1 Octet)
-> +
-> +       This command is used to register on Remote RSSI Change with given
-> +       threshold. If threshold is exceeded then Remote RSSI Changed event
-> +       is sent.
-> +
-> +       Threshold shall be greater than 0.
-> +
-> +       Threshold will be remembered during power down/up toggles.
-> +
-> +       This command generates a Command Complete event on success
-> +       and on failure.
-> +
-> +       Possible errors:        Invalid Parameters
-> +                               Invalid Index
-
-What should happen if you attempt a Register again for the same address?
-
-I wonder also how can you tune the period for the readings (at least a
-debugfs entry should be provided for this). E.g. every 1s , every 10s
-etc.
-
-> +Unregister Remote RSSI Change Command
-> +=====================================
-> +
-> +       Command Code:           0x0032
-> +       Controller Index:       <controller id>
-> +       Command Parameters:     Address (6 Octets)
-> +                               Address_Type (1 Octet)
-> +       Return Parametes:       Address (6 Octets)
-> +                               Address_Type (1 Octet)
-> +
-> +       This command is used to unregister from Remote RSSI Change event
-> +       started with Register Remote RSSI Change command.
-> +
-> +       This command generates Command Complete event on success
-> +       and on failure.
-> +
-> +       Possible errors:        Rejected
-> +                               Invalid Parameters
-> +                               Invalid Index
-
-In which case "Rejected" will be reported?
-
-Best Regards,
+diff --git a/android/gatt.c b/android/gatt.c
+index d7ea745..e87237a 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1398,6 +1398,23 @@ static void handle_client_execute_write(const void *buf, uint16_t len)
+ 			HAL_OP_GATT_CLIENT_EXECUTE_WRITE, HAL_STATUS_FAILED);
+ }
+ 
++static void send_register_for_notification_ev(int32_t id, int32_t registered,
++					int32_t status,
++					const struct hal_gatt_srvc_id *srvc,
++					const struct hal_gatt_gatt_id *ch)
++{
++	struct hal_ev_gatt_client_reg_for_notif ev;
++
++	ev.conn_id = id;
++	ev.status = status;
++	ev.registered = registered;
++	memcpy(&ev.srvc_id, srvc, sizeof(ev.srvc_id));
++	memcpy(&ev.char_id, ch, sizeof(ev.char_id));
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_CLIENT_REGISTER_FOR_NOTIF, sizeof(ev), &ev);
++}
++
+ static void handle_client_register_for_notification(const void *buf,
+ 								uint16_t len)
+ {
+@@ -1409,6 +1426,7 @@ static void handle_client_register_for_notification(const void *buf,
+ 	struct element_id match_id;
+ 	struct gatt_device *dev;
+ 	struct service *service;
++	int32_t conn_id = 0;
+ 	uint8_t status;
+ 	bdaddr_t addr;
+ 
+@@ -1428,6 +1446,8 @@ static void handle_client_register_for_notification(const void *buf,
+ 		goto failed;
+ 	}
+ 
++	conn_id = dev->conn_id;
++
+ 	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
+ 	service = queue_find(dev->services, match_srvc_by_element_id,
+ 								&match_id);
+@@ -1500,7 +1520,8 @@ static void handle_client_register_for_notification(const void *buf,
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+-	/* TODO: send callback with notification enabled/disabled */
++	send_register_for_notification_ev(conn_id, 1, status, &cmd->srvc_id,
++								&cmd->char_id);
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 				HAL_OP_GATT_CLIENT_REGISTER_FOR_NOTIFICATION,
+ 				status);
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+1.8.3.1
+
