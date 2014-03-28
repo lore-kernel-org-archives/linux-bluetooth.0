@@ -1,94 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 2/8] android/gatt: Add initial implementation of get_included_service
-Date: Fri, 28 Mar 2014 10:45:53 +0100
-Message-Id: <1395999959-2396-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv3 8/8] android/gatt: Add deregister_for_notification implementation
+Date: Fri, 28 Mar 2014 10:45:59 +0100
+Message-Id: <1395999959-2396-8-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1395999959-2396-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1395999959-2396-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will look for included service in range passed in command.
-It call gatt_find_included(), but without result callback now,
-as it is initial version.
+This will unregister handlers for notification and indications
+and remove notification_data from client's list.
 ---
- android/gatt.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ android/gatt.c | 44 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 43 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 92e16d4..a801525 100644
+index a5d40fc..85db3d6 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -949,13 +949,67 @@ reply:
- 			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
- }
- 
-+static bool match_service_by_uuid(const void *data, const void *user_data)
-+{
-+	const struct service *service = data;
-+	const bt_uuid_t *uuid = user_data;
-+	bt_uuid_t service_uuid;
-+
-+	if (bt_string_to_uuid(&service_uuid, service->primary.uuid) < 0)
-+		return false;
-+
-+	return !bt_uuid_cmp(uuid, &service_uuid);
-+}
-+
-+static struct service *find_service_bu_uuid(struct gatt_device *device,
-+								bt_uuid_t *uuid)
-+{
-+	return queue_find(device->services, match_service_by_uuid, uuid);
-+}
-+
- static void handle_client_get_included_service(const void *buf, uint16_t len)
+@@ -1557,11 +1557,53 @@ failed:
+ static void handle_client_deregister_for_notification(const void *buf,
+ 								uint16_t len)
  {
-+	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
-+	struct gatt_device *device;
-+	struct service *service;
++	const struct hal_cmd_gatt_client_deregister_for_notification *cmd = buf;
++	struct notification_data *notification, notif;
++	struct gatt_client *client;
++	struct gatt_device *dev;
++	int32_t conn_id = 0;
 +	uint8_t status;
++	bdaddr_t addr;
 +
  	DBG("");
  
-+	device = find_device_by_conn_id(cmd->conn_id);
-+	if (!device) {
++	client = find_client_by_id(cmd->client_if);
++	if (!client) {
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
 +
-+	if (queue_isempty(device->services)) {
++	android2bdaddr(&cmd->bdaddr, &addr);
++
++	dev = find_device(&addr);
++	if (!dev) {
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
 +
-+	if (!cmd->number) {
-+		service = queue_peek_head(device->services);
-+	} else {
-+		bt_uuid_t uuid;
++	conn_id = dev->conn_id;
++	memcpy(&notif.ch, &cmd->char_id, sizeof(notif.ch));
++	memcpy(&notif.service, &cmd->srvc_id, sizeof(notif.service));
++	notif.dev = dev;
 +
-+		android2uuid(cmd->srvc_id->uuid, &uuid);
-+		service = find_service_bu_uuid(device, &uuid);
-+	}
-+
-+	if (!service) {
++	notification = queue_find(client->notifications,
++						match_notification, &notif);
++	if (!notification) {
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
 +
-+	gatt_find_included(device->attrib, service->primary.range.start,
-+					service->primary.range.end, NULL, NULL);
++	unregister_notification(notification);
 +
 +	status = HAL_STATUS_SUCCESS;
 +
 +failed:
++	send_register_for_notification_ev(conn_id, 0, status, &cmd->srvc_id,
++								&cmd->char_id);
++
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
--					HAL_STATUS_FAILED);
-+					status);
+ 				HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION,
+-				HAL_STATUS_FAILED);
++				status);
  }
  
- static void send_client_char_notify(const struct characteristic *ch,
+ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
 -- 
 1.8.3.1
 
