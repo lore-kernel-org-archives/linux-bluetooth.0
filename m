@@ -1,43 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix address in unmergeable device found events
-Date: Sat, 29 Mar 2014 08:39:53 +0200
-Message-Id: <1396075193-29925-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH 2/2 RESEND] Bluetooth: btmrvl: implement read-to-clear for SD8897 interrupts
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1396043679-4574-1-git-send-email-bzhao@marvell.com>
+Date: Fri, 28 Mar 2014 19:37:35 -0700
+Cc: bt <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Avinash Patil <patila@marvell.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Message-Id: <A1E5F7CA-66E6-46FE-81ED-23D7A5F963EA@holtmann.org>
+References: <1396043679-4574-1-git-send-email-bzhao@marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Bing,
 
-When sending out a device found event caused by an advertising report in
-the situation where we couldn't store the report as a pending one, the
-code was incorrectly trying to use the address and address type from the
-pending data. Since the pending data is cleared in the previous line
-this causes a potentially incorrect address type and an address of
-BDADDR_ANY. This patch fixes the call to use the address information
-correctly from the received advertising report.
+> For SD8897, CMD52 write_to_clear may have missing interrupts
+> under certain corner case condition. Use CMD53 read-to-clear
+> to fix the problem.
+> 
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> ---
+> drivers/bluetooth/btmrvl_drv.h  |  2 ++
+> drivers/bluetooth/btmrvl_main.c | 17 ++++++++++++++
+> drivers/bluetooth/btmrvl_sdio.c | 52 ++++++++++++++++++++++++++++++++++++++++-
+> drivers/bluetooth/btmrvl_sdio.h |  3 +++
+> 4 files changed, 73 insertions(+), 1 deletion(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ddb518c62ed1..84acc4aabc5f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4081,9 +4081,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 		 * the pending report and send out a device found event.
- 		 */
- 		clear_pending_adv_report(hdev);
--		mgmt_device_found(hdev, &d->last_adv_addr, LE_LINK,
--				  d->last_adv_addr_type, NULL, rssi, 0, 1,
--				  data, len, NULL, 0);
-+		mgmt_device_found(hdev, bdaddr, LE_LINK, bdaddr_type, NULL,
-+				  rssi, 0, 1, data, len, NULL, 0);
- 		return;
- 	}
- 
--- 
-1.9.0
+Regards
+
+Marcel
 
