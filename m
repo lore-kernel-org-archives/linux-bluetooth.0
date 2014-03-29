@@ -1,126 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [RFC] doc: Connection Parameters Command
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1395703047-5743-1-git-send-email-andre.guedes@openbossa.org>
-Date: Sat, 29 Mar 2014 11:23:26 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5E9DA4DA-78DE-4670-B27A-D497AF6A1986@holtmann.org>
-References: <1395703047-5743-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+From: Gordon <kernel@gkr.i24.cc>
+To: linux-bluetooth@vger.kernel.org
+Cc: Gordon <kernel@gkr.i24.cc>
+Subject: [PATCH] hid2hci add CSR 8510 A10 support
+Date: Sat, 29 Mar 2014 12:37:06 +0100
+Message-Id: <1396093026-28414-2-git-send-email-kernel@gkr.i24.cc>
+In-Reply-To: <1396093026-28414-1-git-send-email-kernel@gkr.i24.cc>
+References: <20140328194907.GA24300@t440s.P-661HNU-F1>
+ <1396093026-28414-1-git-send-email-kernel@gkr.i24.cc>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+add a new method "csr2" to hid2hci that sends a control message
+to the usb device which switches the Cambridge Silicon Radio 8510 A10
+as used in Sitecom CNT-524
 
-> This patch introduces commands to add and remove connection parameters.
-> ---
-> doc/mgmt-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> 1 file changed, 83 insertions(+), 1 deletion(-)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 78f0bd2..20e3e6c 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -995,7 +995,8 @@ Unpair Device Command
-> 	Return Parameters:	Address (6 Octets)
-> 				Address_Type (1 Octet)
-> 
-> -	Removes all keys associated with the remote device.
-> +	Removes all keys and connection parameters associated with the remote
-> +	device.
-> 
-> 	Possible values for the Address_Type parameter:
-> 		0	BR/EDR
-> @@ -1668,6 +1669,87 @@ Load Identity Resolving Keys Command
-> 				Invalid Index
-> 
-> 
-> +Load Connection Parameters Command
-> +====================================
-> +
-> +	Command Code:		0x0031
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Params_Count (2 Octets)
-> +				Params1 {
-> +					Address (6 Octets)
-> +					Address_Type (1 Octet)
-> +					Auto_Connect_Option (1 Octet)
-> +					Min_Connection_Interval (2 Octets)
-> +					Max_Connection_Interval (2 Octes)
-> +				}
-> +				Params2 {  }
-> +				...
-> +	Return Parameters:
-> +
-> +	This command is used load connection parameters from several LE devices
-> +	into kernel. It is only supported on controllers with LE support.
-> +
-> +	The provided Address and Address_Type are the identity of a device. So
-> +	either its public address or static random address. Unresolvable random
-> +	addresses and resolvable random addresses are not valid and will be
-> +	rejected.
-> +
-> +	Possible values for the Address_Type parameter:
-> +		0	Reserved (not in use)
-> +		1	LE Public
-> +		2	LE Random
-> +
-> +	Possible values for the Auto_Connect_Option parameter:
-> +		0	Disabled
-> +		1	Always
-> +		2	Link Loss
-> +
-> +	The 'Always' option configures the kernel to always re-establish the
-> +	connection, no matter the reason the connection was terminated. The
-> +	'Link Loss' option configures the kernel to re-establish the connection
-> +	only in case the connection was terminated due to a link loss.
-> +
-> +	The Min_Connection_Interval and Max_Connection_Interval parameters
-> +	should be configured as described in Core 4.1 spec, Vol 2, 7.8.12.
+fixes: https://bugzilla.kernel.org/show_bug.cgi?id=69181
+---
+ tools/hid2hci.1 |  2 +-
+ tools/hid2hci.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 48 insertions(+), 2 deletions(-)
 
-I think we should include the Connection_Latency and Supervision_Timeout here as well. Both are used on LE_Create_Connection and LE_Connection_Update commands.
-
-> +
-> +	This command can be used when the controller is not powered.
-> +
-> +	This command generates a Command Complete event on success or
-> +	a Command Status event on failure.
-> +
-> +	Possible errors:	Invalid Parameters
-> +				Invalid Index
-> +				Not Supported
-
-To complete this command, we actually need an event like "New Connection Parameter” that will inform userspace about the configured connection parameter setting. Either from the old L2CAP procedure to update them or from the Bluetooth 4.1 LE Remote Connection Parameter Request feature.
-
-We should start out with defaults like we do already and in case they get changed we notify userspace about them. So userspace can store them and on next reboot, load the known values into the system.
-
-> +
-> +
-> +Add Connection Parameters Command
-> +====================================
-
-If we use this command, then it should be “Set Connection Parameter”.
-
-> +
-> +	Command Code:		0x0032
-> +	Controller Index:	<controller id>
-> +	Command Parameters:	Address (6 Octets)
-> +				Address_Type (1 Octet)
-> +				Auto_Connect_Option (1 Octet)
-> +				Min_Connection_Interval (2 Octets)
-> +				Max_Connection_Interval (2 Octes)
-
-However I am not really sure if we want to just allow modification of the Auto_Connect_Option or also allow setting the other values.
-
-Maybe it would be actually be better to allow changing these parameters through a socket option. Since with Bluetooth 4.1 both sides are allowed to request parameter changes. Maybe even setting the Auto_Connect_Mode through a socket option would be a better choice.
-
-I am thinking of, okay, I am connected now, if I loose the link, please try to re-connect me. And from now on use xyz latency for it.
-
-So what we should do is focus on loading the default settings and notifying userspace about changed connection parameter settings. That all by itself already improves the system since the remote side does not always has to request the settings, we can start out with good ones for each individual device.
-
-Regards
-
-Marcel
+diff --git a/tools/hid2hci.1 b/tools/hid2hci.1
+index 8c5d520..c6876a3 100644
+--- a/tools/hid2hci.1
++++ b/tools/hid2hci.1
+@@ -32,7 +32,7 @@ mode and back.
+ .B --mode= [hid, hci]
+ Sets the mode to switch the device into
+ .TP
+-.B --method= [csr, logitech-hid, dell]
++.B --method= [csr, csr2, logitech-hid, dell]
+ Which vendor method to use for switching the device.
+ .TP
+ .B --devpath=
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 2dbfca7..1f64b41 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -119,6 +119,49 @@ static int usb_switch_csr(int fd, enum mode mode)
+ 	return err;
+ }
+ 
++static int usb_switch_csr2(int fd, enum mode mode)
++{
++	int err;
++	struct usbfs_disconnect disconnect;
++	uint8_t report[] = {
++		0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++	};
++	switch (mode) {
++	case HCI:
++		/* send report as is */
++		disconnect.interface = 0;
++		disconnect.flags = USBFS_DISCONNECT_EXCEPT_DRIVER;
++		strcpy(disconnect.driver, "usbfs");
++
++		if (ioctl(fd, USBFS_IOCTL_DISCONNECT, &disconnect) < 0) {
++			fprintf(stderr, "Can't claim interface: %s (%d)\n",
++				strerror(errno), errno);
++			return -1;
++		}
++		/* Set_report request with 
++		 * report id: 0x01, report type: feature (0x03) 
++		 * on interface 0
++		 */
++		err = control_message(fd,
++				      USB_ENDPOINT_OUT | USB_TYPE_CLASS |
++				      USB_RECIP_INTERFACE,
++				      USB_REQ_SET_CONFIGURATION,
++				      0x01 | (0x03 << 8),
++				      0, report, sizeof(report), 5000);
++		/* unable to detect whether the previous state 
++		 * already was HCI (EALREADY)  
++		 */
++		break;
++	case HID:
++		/* currently unknown how to switch to HID */
++		fprintf(stderr,
++			"csr2: Switching to hid mode is not implemented\n");
++		return -1;
++		break;
++	}
++	return err;
++}
++
+ static int hid_logitech_send_report(int fd, const char *buf, size_t size)
+ {
+ 	struct hiddev_report_info rinfo;
+@@ -258,7 +301,7 @@ static void usage(const char *error)
+ 	printf("Usage: hid2hci [options]\n"
+ 		"  --mode=       mode to switch to [hid|hci] (default hci)\n"
+ 		"  --devpath=    sys device path\n"
+-		"  --method=     method to use to switch [csr|logitech-hid|dell]\n"
++		"  --method=     method to use to switch [csr|csr2|logitech-hid|dell]\n"
+ 		"  --help\n\n");
+ }
+ 
+@@ -311,6 +354,9 @@ int main(int argc, char *argv[])
+ 			if (!strcmp(optarg, "csr")) {
+ 				method = METHOD_CSR;
+ 				usb_switch = usb_switch_csr;
++			} else if (!strcmp(optarg, "csr2")) {
++				method = METHOD_CSR;
++				usb_switch = usb_switch_csr2;
+ 			} else if (!strcmp(optarg, "logitech-hid")) {
+ 				method = METHOD_LOGITECH_HID;
+ 			} else if (!strcmp(optarg, "dell")) {
+-- 
+1.8.3.2
 
