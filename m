@@ -2,165 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 2/4] android/pts: Add PICS for MCAP
-Date: Sat, 29 Mar 2014 11:34:40 +0100
-Message-Id: <1396089282-5325-2-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1396089282-5325-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1396089282-5325-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH 1/4] android/pts: Add PIXITs for MCAP and HDP
+Date: Sat, 29 Mar 2014 11:34:39 +0100
+Message-Id: <1396089282-5325-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pics-mcap.txt | 141 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 141 insertions(+)
- create mode 100644 android/pics-mcap.txt
+ android/pixit-hdp.txt  | 32 ++++++++++++++++++++++++++++++++
+ android/pixit-mcap.txt | 37 +++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 android/pixit-hdp.txt
+ create mode 100644 android/pixit-mcap.txt
 
-diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
+diff --git a/android/pixit-hdp.txt b/android/pixit-hdp.txt
 new file mode 100644
-index 0000000..3b1086a
+index 0000000..24cdcec
 --- /dev/null
-+++ b/android/pics-mcap.txt
-@@ -0,0 +1,141 @@
-+MCAP PICS for the PTS tool.
++++ b/android/pixit-hdp.txt
+@@ -0,0 +1,32 @@
++HDP PIXIT for the PTS tool.
 +
 +PTS version: 5.1
 +
 +* - different than PTS defaults
-+# - not yet implemented/supported
++& - should be set to IUT Bluetooth address
 +
-+M - mandatory
-+O - optional
++               Required PIXIT settings
++-------------------------------------------------------------------------------
++Parameter Name						Value
++-------------------------------------------------------------------------------
++TSPX_security_enabled					TRUE (*)
++TSPX_delete_link_key					FALSE
++TSPX_bd_addr_iut					112233445566 (*&)
++TSPX_sink_device_class_of_device			00900
++TSPX_source_device_class_of_device			00900
++TSPX_pin_code						0000
++TSPX_use_dynamic_pin					FALSE
++TSPX_use_implicit_send					TRUE
++TSPX_MCAP_l2cap_psm_control				1001
++TSPX_MCAP_l2cap_psm_data				1003
++TSPX_MCAP_sync_lead_time				0BB8
++TSPX_MCAP_timestamp_native_resolution			2233
++TSPX_MCAP_timestamp_native_accuracy			1400
++TSPX_MCAP_timestamp_required_accuracy			6400
++TSPX_DC_max					1
++TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
++TSPX_time_guard						6000000
++TSPX_ieee_device_specialization				10417
++TSPX_ieee_standard_configuration			TRUE
++TSPX_MCAP_bluetooth_clock_access_resolution		55
++-------------------------------------------------------------------------------
+diff --git a/android/pixit-mcap.txt b/android/pixit-mcap.txt
+new file mode 100644
+index 0000000..ee67a1a
+--- /dev/null
++++ b/android/pixit-mcap.txt
+@@ -0,0 +1,37 @@
++MCAP PIXIT for the PTS tool.
 +
-+		Protocols
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_1_A_1	True (*)	Supports Standard Op Codes (C.1)
-+TSPC_MCAP_1_A_2	False		Supports Clock Synchronization Protocol (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Support for at least one of the defined protocols is Mandatory.
-+-------------------------------------------------------------------------------
++PTS version: 5.1
 +
++* - different than PTS defaults
++& - should be set to IUT Bluetooth address
 +
-+		Roles
++               Required PIXIT settings
 +-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
++Parameter Name						Value
 +-------------------------------------------------------------------------------
-+TSPC_MCAP_1_1	True (*)	Supports Source Role (C.1)
-+TSPC_MCAP_1_2	True (*)	Supports Sink Role (C.1)
-+TSPC_MCAP_1_3	False		Supports Sync-Slave Role (C.2)
-+TSPC_MCAP_1_4	False		Supports Sync-Master Role (C.3)
-+-------------------------------------------------------------------------------
-+C.1: If support for TSPC_MCAP_1_A_1 is supported, at least one of the
-+	defined roles is Mandatory otherwise Excluded.
-+C.2: Mandatory if TSPC_MCAP_1_A_2 is supported, otherwise Excluded.
-+C.3: Optional if TSPC_MCAP_1_A_2 is supported, otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
-+
-+		L2CAP Features - Source
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_2_1	True (*)	Supports L2CAP Control Channel (M)
-+TSPC_MCAP_2_2	True (*)	Supports at least one L2CAP Data Channel (M)
-+TSPC_MCAP_2_3	True (*)	Maximum number of simultaneous L2CAP Data
-+				Channels supported (DCmax) per MCL (M)
-+TSPC_MCAP_2_4	False		Can support multiple simultaneous MCLs with
-+				Standard Op Codes (O)
-+-------------------------------------------------------------------------------
-+
-+
-+		Connection Management - Source
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_3_1			This row inentionally left blank
-+TSPC_MCAP_3_2	True (*)	Initiate creation of Control and Data Channels
-+				(C.1)
-+TSPC_MCAP_3_3	True (*)	Accept creation of Control and Data Channels
-+				(C.1)
-+TSPC_MCAP_3_4	True (*)	Initiate Disconnection of MCL (M)
-+TSPC_MCAP_3_5	True (*)	Accept Disconnection of MCL (M)
-+TSPC_MCAP_3_6	True (*)	Initiate Disconnection of MDL (M)
-+TSPC_MCAP_3_7	True (*)	Accept Disconnection of MDL (M)
-+TSPC_MCAP_3_8	False		Initiate Reconnection of MDL (O)
-+TSPC_MCAP_3_9	False		Accept Reconnection of MDL (C.2)
-+TSPC_MCAP_3_10	False		Initiate Deletion of MDL (O)
-+TSPC_MCAP_3_11	True (*)	Accept Deletion of MDL (M)
-+TSPC_MCAP_3_12	False		Initiate Delete of All MDLs using 0xFFFF (O)
-+TSPC_MCAP_3_13	True (*)	Accept Delete of All MDLs using 0xFFFF (M)
-+TSPC_MCAP_3_14	False		Send MDL Abort request (O)
-+TSPC_MCAP_3_15	True (*)	Accept MDL Abort request (M)
-+-------------------------------------------------------------------------------
-+C.1: Support for at least one of TSPC_MCAP_3_2 or TSPC_MCAP_3_3 is Mandatory.
-+C.2: Mandatory if TSPC_MCAP_3_3 is supported, otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
-+
-+		L2CAP Features - Sink
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_4_1	True (*)	Supports L2CAP Control Channel (M)
-+TSPC_MCAP_4_2	True (*)	Supports at least one L2CAP Data Channel (M)
-+TSPC_MCAP_4_3	True (*)	Maximum number of simultaneous L2CAP Data
-+				Channels supported (DCmax) per MCL (M)
-+TSPC_MCAP_4_4	False		Can support multiple simultaneous MCLs with
-+				Standard Op Codes (O)
-+-------------------------------------------------------------------------------
-+
-+
-+		Connection Management - Sink
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_5_1			This row intentionally left blank
-+TSPC_MCAP_5_2	True (*)	Initiate creation of Control and Data Channels
-+				(M)
-+TSPC_MCAP_5_3	True (*)	Accept creation of Control and Data Channels
-+				(M)
-+TSPC_MCAP_5_4	True (*)	Initiate Disconnection of MCL (M)
-+TSPC_MCAP_5_5	True (*)	Accept Disconnection of MCL (M)
-+TSPC_MCAP_5_6	True (*)	Initiate Disconnection of MDL (M)
-+TSPC_MCAP_5_7	True (*)	Accept Disconnection of MDL (M)
-+TSPC_MCAP_5_8	False		Initiate Reconnection of MDL (O)
-+TSPC_MCAP_5_9	True (*)	Accept Reconnection of MDL (M)
-+TSPC_MCAP_5_10	False		Initiate Deletion of MDL (O)
-+TSPC_MCAP_5_11	True (*)	Accept Deletion of MDL (M)
-+TSPC_MCAP_5_12	False		Initiate Delete of All MDLs using 0xFFFF (O)
-+TSPC_MCAP_5_13	True (*)	Accept Delete of All MDLs using 0xFFFF (M)
-+TSPC_MCAP_5_14	False		Send MDL Abort request (O)
-+TSPC_MCAP_5_15	True (*)	Accept MDL Abort request (M)
-+-------------------------------------------------------------------------------
-+
-+
-+		Clock Synchronization Features - Sync-Slave
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_6_1	False (*)	Accept MD_SYNC_CAP_REQ and MD_SYNC_SET_REQ and
-+				Initiate MD_SYNC_INFO_IND (C.1)
-+TSPC_MCAP_6_2			This row intentionally left blank
-+TSPC_MCAP_6_3	False		Can support multiple simultaneous MCLs with CSP
-+				(O)
-+TSPC_MCAP_6_4	False		Can access Bluetooth Clock (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if MCAP TSPC_MCAP_1_A_2 is supported, otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
-+
-+		Clock Synchronization Features - Sync-Master
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_MCAP_7_1			This row intentionally left blank
-+TSPC_MCAP_7_2	False (*)	Initiate MD_SYNC_CAP_REQ and MD_SYNC_SET_REQ
-+				and Accept MD_SYNC_INFO_IND (C.1)
-+TSPC_MCAP_7_3	False		Can support multiple simultaneous MCLs with CSP (O)
-+TSPC_MCAP_7_4	False (*)	Can access Bluetooth Clock (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support IF TSPC_MCAP_1_A_2 is supported.
++TSPX_bd_addr_iut					112233445566 (*&)
++TSPX_delete_link_key					FALSE
++TSPX_MCAP_DC_max					2
++TSPX_MCAP_l2cap_psm_control				1003
++TSPX_MCAP_l2cap_psm_control_B
++TSPX_MCAP_l2cap_psm_data				1005
++TSPX_MCAP_l2cap_psm_data_B
++TSPX_MCAP_bluetooth_clock_access_resolution		55
++TSPX_MCAP_create_mdl_configuration
++TSPX_MCAP_data_channel_setup_mode
++TSPX_MCAP_iut_initiate_connection			TRUE (*)
++TSPX_MCAP_mdep_id					12
++TSPX_MCAP_profile_name
++TSPX_MCAP_sync_lead_time				0BB8
++TSPX_tester_role
++TSPX_MCAP_timestamp_native_accuracy			1400
++TSPX_MCAP_timestamp_native_resolution			2233
++TSPX_MCAP_timestamp_required_accuracy			6400
++TSPX_host_class_of_device				100108
++TSPX_pin_code						0000
++TSPX_security_enabled					TRUE (*)
++TSPX_time_guard						6000000
++TSPX_use_dynamic_pin					FALSE
++TSPX_use_implicit_send					TRUE
++TSPX_verbose_implicit_send				TRUE
 +-------------------------------------------------------------------------------
 -- 
 1.8.5.3
