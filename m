@@ -2,26 +2,26 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 3/4] android/pts: Add PICS for HDP
-Date: Sat, 29 Mar 2014 11:34:41 +0100
-Message-Id: <1396089282-5325-3-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH 2/4] android/pts: Add PICS for MCAP
+Date: Sat, 29 Mar 2014 11:34:40 +0100
+Message-Id: <1396089282-5325-2-git-send-email-sebastian.chlad@tieto.com>
 In-Reply-To: <1396089282-5325-1-git-send-email-sebastian.chlad@tieto.com>
 References: <1396089282-5325-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pics-hdp.txt | 307 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 307 insertions(+)
- create mode 100644 android/pics-hdp.txt
+ android/pics-mcap.txt | 141 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 141 insertions(+)
+ create mode 100644 android/pics-mcap.txt
 
-diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
+diff --git a/android/pics-mcap.txt b/android/pics-mcap.txt
 new file mode 100644
-index 0000000..3d8020d
+index 0000000..3b1086a
 --- /dev/null
-+++ b/android/pics-hdp.txt
-@@ -0,0 +1,307 @@
-+HDP PICS for the PTS tool.
++++ b/android/pics-mcap.txt
+@@ -0,0 +1,141 @@
++MCAP PICS for the PTS tool.
 +
 +PTS version: 5.1
 +
@@ -31,15 +31,14 @@ index 0000000..3d8020d
 +M - mandatory
 +O - optional
 +
-+
-+		Profile Version
++		Protocols
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_0_1	False		HDP 1.0 (C.1)
-+TSPC_HDP_0_2	True		HDP 1.1(C.1)
++TSPC_MCAP_1_A_1	True (*)	Supports Standard Op Codes (C.1)
++TSPC_MCAP_1_A_2	False		Supports Clock Synchronization Protocol (C.1)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory to support only one Profile version.
++C.1: Support for at least one of the defined protocols is Mandatory.
 +-------------------------------------------------------------------------------
 +
 +
@@ -47,42 +46,15 @@ index 0000000..3d8020d
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_1_1	True		Supports Source Role (C.1, C.2)
-+TSPC_HDP_1_2	True (*)	Supports Sink Role (C.1, C.3)
++TSPC_MCAP_1_1	True (*)	Supports Source Role (C.1)
++TSPC_MCAP_1_2	True (*)	Supports Sink Role (C.1)
++TSPC_MCAP_1_3	False		Supports Sync-Slave Role (C.2)
++TSPC_MCAP_1_4	False		Supports Sync-Master Role (C.3)
 +-------------------------------------------------------------------------------
-+C.1: At least one of the defined roles is Mandatory.
-+C.2: Mandatory if TSPC_MCAP_1_1 is supported, otherwise Excluded.
-+C.3: Mandatory if TSPC_MCAP_1_1 is supported, otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
-+
-+		GAP Features - Source
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HDP_2_1	True		Supports General-discoverable Mode (M)
-+TSPC_HDP_2_2	True		Supports bondable Mode (M) (C.1)
-+TSPC_HDP_2_3	True		Supports Response to Authentication requests (M)
-+TSPC_HDP_2_4	True		Supports Initiation of Authentication (M) (C.2)
-+TSPC_HDP_2_5	True		Supports Acceptance of Encryption request (M)
-+TSPC_HDP_2_6	True		Supports Initiation of Encryption (M) (C.3)
-+TSPC_HDP_2_7	True (*)	Supports General Inquiry (C.5) (C.4)
-+TSPC_HDP_2_8	True		Supports Acceptance of Bonding requests (M)
-+TSPC_HDP_2_9	True (*)	Supports Initiation of Bonding (O)
-+TSPC_HDP_2_10	True (*)	Supports Extended Inquiry Response (C.7)
-+TSPC_HDP_2_11	True (*)	Supports use of Health Class of Device (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_HDP_2_9 is supported, otherwise Optional.
-+C.2: Mandatory if Security Mode 2, 3, or 4 is supported, otherwise Optional.
-+C.3: Mandatory if Bluetooth version 2.1 + EDR is claimed, otherwise Optional.
-+C.4: Mandatory if TSPC_HDP_2_9 is supported, otherwise Optional.
-+C.5: Mandatory if TSPC_HDP_2_9 is supported, otherwise Optional.
-+C.6: Mandatory if Bluetooth Core Specification 2.1 + EDR or later
-+	(Not SUM ICS 31/4) and Table 2/1 (Supports General-discoverable Mode)
-+	is supported, otherwise Optional if Bluetooth Core Specification 2.1
-+	+ EDR or later (Not SUM ICS 31/4) is supported, otherwise Excluded.
-+C.7: Mandatory if Bluetooth Core specification 2.1 + EDR or later is supported,
-+	otherwise Excluded.
++C.1: If support for TSPC_MCAP_1_A_1 is supported, at least one of the
++	defined roles is Mandatory otherwise Excluded.
++C.2: Mandatory if TSPC_MCAP_1_A_2 is supported, otherwise Excluded.
++C.3: Optional if TSPC_MCAP_1_A_2 is supported, otherwise Excluded.
 +-------------------------------------------------------------------------------
 +
 +
@@ -90,243 +62,105 @@ index 0000000..3d8020d
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_3_1	True		Supports Reliable Control Channel (C.1)
-+TSPC_HDP_3_2	True		Uses FCS for Control Channel (M)
-+TSPC_HDP_3_3	True		Supports Reliable Data Channel (C.1)
-+TSPC_HDP_3_4	True		Can send data using SAR in ERTM (C.2)
-+TSPC_HDP_3_5	False		Uses FCS for Reliable Data Channel (O)
-+TSPC_HDP_3_6	False		Supports FCS option of "No FCS" for Reliable
-+				Data Channel (C.3)
-+TSPC_HDP_3_7	True		Supports Streaming Data Channel (C.4)
-+TSPC_HDP_3_8	False		Can send data using SAR in SM (C.5)
-+TSPC_HDP_3_9	False		Uses FCS for Steaming Data Channel (C.6)
-+TSPC_HDP_3_10	False		Supports FCS option of "No FCS" for Streaming
-+				(C.7)
-+TSPC_HDP_3_11	True		Maximum number of simultaneous Data Channels
-+				supported (DCmax) per MCL (C.8)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_L2CAP_2_12 is supported, otherwise Excluded.
-+C.2: Mandatory if TSPC_L2CAP_2_22 is supported, otherwise Excluded.
-+C.3: Optional if TSPC_L2CAP_2_14 is supported, otherwise Excluded.
-+C.4: Optional if TSPC_L2CAP_2_13 is supported, otherwise Excluded.
-+C.5: Mandatory if TSPC_HDP_3_7 and TSPC_L2CAP_2_23 are supported, otherwise
-+	Excluded.
-+C.6: Optional if TSPC_HDP_3_7 is supported, otherwise Excluded.
-+C.7: Optional if TSPC_HDP_3_7 and TSPC_L2CAP_2_14 are supported, otherwise
-+	Excluded.
-+C.8: >=2 if Table TSPC_HDP_3_7 is claimed, otherwise >=1.
++TSPC_MCAP_2_1	True (*)	Supports L2CAP Control Channel (M)
++TSPC_MCAP_2_2	True (*)	Supports at least one L2CAP Data Channel (M)
++TSPC_MCAP_2_3	True (*)	Maximum number of simultaneous L2CAP Data
++				Channels supported (DCmax) per MCL (M)
++TSPC_MCAP_2_4	False		Can support multiple simultaneous MCLs with
++				Standard Op Codes (O)
 +-------------------------------------------------------------------------------
 +
 +
-+		SDP Attributes - Source
++		Connection Management - Source
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_4_1	True		Supports advertisement of HDP Service Record
-+				(C.1) (C.4)
-+TSPC_HDP_4_2	True		Service Class ID List (C.2)
-+TSPC_HDP_4_3	True		Protocol Descriptor List (C.2)
-+TSPC_HDP_4_4	True		Bluetooth Profile Descriptor List (C.2)
-+TSPC_HDP_4_5	False		Additional Protocol Descriptor Lists (C.2)
-+TSPC_HDP_4_6	True (*)	Service Name (O)
-+TSPC_HDP_4_7	True (*)	Service Description (O)
-+TSPC_HDP_4_8	True (*)	Provider Name (O)
-+TSPC_HDP_4_9	True		HDP Supported Features (MDEP List) (C.3)
-+TSPC_HDP_4_10	True		MCAP Data Exchange Specification (C.3)
-+TSPC_HDP_4_11	True		MCAP Supported Procedures (C.3)
-+TSPC_HDP_4_12	False		Service Record State (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_HDP_6_3 is supported, otherwise Excluded.
-+C.2: Mandatory if TSPC_HDP_4_1 is supported, otherwise Optional.
-+C.3: Mandatory if TSPC_HDP_4_1 is supported, otherwise Excluded.
-+C.4: Mandatory to support SDP Server Role (SDP 1b/1) if this item is supported.
-+-------------------------------------------------------------------------------
-+
-+
-+		Device Identification - Source
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HDP_5_1	True		Device Identification Profile v1.3 or later
++TSPC_MCAP_3_1			This row inentionally left blank
++TSPC_MCAP_3_2	True (*)	Initiate creation of Control and Data Channels
 +				(C.1)
++TSPC_MCAP_3_3	True (*)	Accept creation of Control and Data Channels
++				(C.1)
++TSPC_MCAP_3_4	True (*)	Initiate Disconnection of MCL (M)
++TSPC_MCAP_3_5	True (*)	Accept Disconnection of MCL (M)
++TSPC_MCAP_3_6	True (*)	Initiate Disconnection of MDL (M)
++TSPC_MCAP_3_7	True (*)	Accept Disconnection of MDL (M)
++TSPC_MCAP_3_8	False		Initiate Reconnection of MDL (O)
++TSPC_MCAP_3_9	False		Accept Reconnection of MDL (C.2)
++TSPC_MCAP_3_10	False		Initiate Deletion of MDL (O)
++TSPC_MCAP_3_11	True (*)	Accept Deletion of MDL (M)
++TSPC_MCAP_3_12	False		Initiate Delete of All MDLs using 0xFFFF (O)
++TSPC_MCAP_3_13	True (*)	Accept Delete of All MDLs using 0xFFFF (M)
++TSPC_MCAP_3_14	False		Send MDL Abort request (O)
++TSPC_MCAP_3_15	True (*)	Accept MDL Abort request (M)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_HDP_4_1 is supported, otherwise Optional.
++C.1: Support for at least one of TSPC_MCAP_3_2 or TSPC_MCAP_3_3 is Mandatory.
++C.2: Mandatory if TSPC_MCAP_3_3 is supported, otherwise Excluded.
 +-------------------------------------------------------------------------------
-+
-+
-+		HDP Features - Source
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HDP_6_1	True		Supports Standard Op Codes (M)
-+TSPC_HDP_6_2	True (*)	Supports Initiate creation of Control and Data
-+				Channels (C.3) (C.7) (C.1 - MCAP Status)
-+TSPC_HDP_6_3	True		Supports Accept creation of Control and Data
-+				Channels (C.3) (C.8) (C.1 - MCAP Status)
-+TSPC_HDP_6_4	False		Supports Initiate Reconnection of MDL (O)
-+				(C.2 - MCAP Status)
-+TSPC_HDP_6_5	True		Supports Accept Reconnection of MDL (C.4)
-+TSPC_HDP_6_6	False		Supports Clock Synchronization Protocol (O)
-+TSPC_HDP_6_7	False (*)	Supports Sync-Slave (C.5)
-+TSPC_HDP_6_8	False		Supports Sync-Master (C.6)
-+-------------------------------------------------------------------------------
-+C.1: If TSPC_HDP_6_1 is supported, at least one is Mandatory, otherwise
-+	Excluded.
-+C.2: Optional if TSPC_HDP_6_1 is supported, otherwise Excluded.
-+C.3: Mandatory to support at least one.
-+C.4: Mandatory if TSPC_HDP_6_3 is supported, otherwise Excluded.
-+
-+C.5: Mandatory if TSPC_HDP_6_6 is supported, otherwise Excluded.
-+C.6: Optional if TSPC_HDP_6_6 is supported, otherwise Excluded.
-+C.7: Mandatory to support SDP Client Role (SDP 1b/2) if this item is supported.
-+C.8: Mandatory to support SDP Server Role (SDP 1b/1) if this item is supported.
-+-------------------------------------------------------------------------------
-+
-+
-+		Data Exchange Features - Source
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HDP_7_1	False		Supports Initiation of Echo Test (O)
-+TSPC_HDP_7_2	True		Supports Acceptance of Echo Test (M)
-+TSPC_HDP_7_3	True		Supports IEEE 11073-20601 (M)
-+TSPC_HDP_7_4	True		Supports IEEE 11073-20601 Agent Role (C.1)
-+TSPC_HDP_7_5	True (*)	Supports IEEE 11073-20601 Manager Role (C.1)
-+TSPC_HDP_7_6	False		Supports Initiation of Association Release (O)
-+-------------------------------------------------------------------------------
-+C.1: If TSPC_HDP_7_3 is supported, at least one is Mandatory, otherwise
-+	Excluded.
-+-------------------------------------------------------------------------------
-+
-+
-+		GAP Features - Sink
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HDP_8_1	True		Supports General-discoverable Mode (M)
-+TSPC_HDP_8_2	True		Supports Bondable Mode (M) (C.1)
-+TSPC_HDP_8_3	True		Supports Response to Authentitaction requests
-+				(M)
-+TSPC_HDP_8_4	True		Supports Initiation of Authentication (M) (C.2)
-+TSPC_HDP_8_5	True		Supports Acceptance of Encryption request (M)
-+TSPC_HDP_8_6	True		Supports Initiation of Encryption (M) (C.3)
-+TSPC_HDP_8_7	True		Supports General Inquiry (M) C.4)
-+TSPC_HDP_8_8	True		Supports Acceptance of Bonding requests (M)
-+TSPC_HDP_8_9	Ture (*)	Supports Initiation of Bonding (O)
-+TSPC_HDP_8_10	True (*)	Supports Extended Inquiry Response (C.5) (C.6)
-+TSPC_HDP_8_11	True (*)	Supports use of Health Class of Device (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_HDP_8_9 is supported, otherwise Optional.
-+C.2: Mandatory if Security Mode 2, 3, or 4 is supported, otherwise Optional.
-+C.3: Mandatory if Bluetooth version 2.1 + EDR is claimed (Not SUM ICS 31/4),
-+	otherwise Optional.
-+C.4: Mandatory if TSPC_HDP_8_9 is supported, otherwise Optional.
-+C.5: Mandatory if Bluetooth Core Specification 2.1 + EDR or later
-+	(Not SUM ICS 31/4) and TSPC_HDP_8_1 is supported, otherwise Optional
-+	if Bluetooth Core Specification 2.1 + EDR or later is supported,
-+	otherwise Excluded.
-+C.6: Mandatory if Bluetooth Core specification 2.1 + EDR or later
-+	(Not SUM ICS 31/4) is supported, otherwise Excluded.
-+-------------------------------------------------------------------------------
-+
 +
 +
 +		L2CAP Features - Sink
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_9_1	True		Supports Reliable Control Channel (C.1)
-+TSPC_HDP_9_2	True		Uses FCS for Control Channel (M)
-+TSPC_HDP_9_3	True		Supports Reliable Data Channel (C.1)
-+TSPC_HDP_9_4	True		Can send data using SAR in ERTM (C.2)
-+TSPC_HDP_9_5	False		Uses FCS for Reliable Data Channel (O)
-+TSPC_HDP_9_6	False		Supports FCS option of "No FCS" for Reliable
-+				Data Channel (C.3)
-+TSPC_HDP_9_7	True		Supports Streaming Data Channel (C.4)
-+TSPC_HDP_9_8	True		Can send data using SAR in SM (C.5)
-+TSPC_HDP_9_9	False		Uses FCS for Steaming Data Channel (O)
-+TSPC_HDP_9_10	False		Supports FCS option of "No FCS" for Streaming
-+				Data Channel (C.3)
-+TSPC_HDP_9_11	True		Maximum number of simultaneous Data Channels
-+				supported (DCmax) per MCL (M)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_L2CAP_2_12 is supported, otherwise Excluded.
-+C.2: Mandatory if TSPC_L2CAP_2_22 is supported, otherwise Excluded.
-+C.3: Optional if TSPC_L2CAP_2_14 is supported, otherwise Excluded.
-+C.4: Mandatory if TSPC_L2CAP_2_13 is supported, otherwise Excluded.
-+C.5: Mandatory if TSPC_L2CAP_2_23 is supported, otherwise Excluded.
++TSPC_MCAP_4_1	True (*)	Supports L2CAP Control Channel (M)
++TSPC_MCAP_4_2	True (*)	Supports at least one L2CAP Data Channel (M)
++TSPC_MCAP_4_3	True (*)	Maximum number of simultaneous L2CAP Data
++				Channels supported (DCmax) per MCL (M)
++TSPC_MCAP_4_4	False		Can support multiple simultaneous MCLs with
++				Standard Op Codes (O)
 +-------------------------------------------------------------------------------
 +
 +
-+		SDP Attributes - Sink
++		Connection Management - Sink
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_10_1	True		Supports advertisement of HDP Service Record (C.1)
-+TSPC_HDP_10_2	True		Service Class ID List (M)
-+TSPC_HDP_10_3	True		Protocol Descriptor List (M)
-+TSPC_HDP_10_4	True		Bluetooth Profile Descriptor List (M)
-+TSPC_HDP_10_5	True		Additional Protocol Descriptor Lists (M)
-+TSPC_HDP_10_6	True (*)	Service Name (O)
-+TSPC_HDP_10_7	False		Service Description (O)
-+TSPC_HDP_10_8	False		Provider Name (O)
-+TSPC_HDP_10_9	True		HDP Supported Features (MDEP List) (M)
-+TSPC_HDP_10_10	True		MCAP Data Exchange Specification (M)
-+TSPC_HDP_10_11	True		MCAP Supported Procedures (M)
-+TSPC_HDP_10_12	False		Service Record State (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support 10/1 and SDP Server Role (SDP 1b/1).
++TSPC_MCAP_5_1			This row intentionally left blank
++TSPC_MCAP_5_2	True (*)	Initiate creation of Control and Data Channels
++				(M)
++TSPC_MCAP_5_3	True (*)	Accept creation of Control and Data Channels
++				(M)
++TSPC_MCAP_5_4	True (*)	Initiate Disconnection of MCL (M)
++TSPC_MCAP_5_5	True (*)	Accept Disconnection of MCL (M)
++TSPC_MCAP_5_6	True (*)	Initiate Disconnection of MDL (M)
++TSPC_MCAP_5_7	True (*)	Accept Disconnection of MDL (M)
++TSPC_MCAP_5_8	False		Initiate Reconnection of MDL (O)
++TSPC_MCAP_5_9	True (*)	Accept Reconnection of MDL (M)
++TSPC_MCAP_5_10	False		Initiate Deletion of MDL (O)
++TSPC_MCAP_5_11	True (*)	Accept Deletion of MDL (M)
++TSPC_MCAP_5_12	False		Initiate Delete of All MDLs using 0xFFFF (O)
++TSPC_MCAP_5_13	True (*)	Accept Delete of All MDLs using 0xFFFF (M)
++TSPC_MCAP_5_14	False		Send MDL Abort request (O)
++TSPC_MCAP_5_15	True (*)	Accept MDL Abort request (M)
 +-------------------------------------------------------------------------------
 +
 +
-+		Device Identification - Sink
++		Clock Synchronization Features - Sync-Slave
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_11_1	True		Device Identification Profile v1.3 or later
-+				(M) (C.1)
++TSPC_MCAP_6_1	False (*)	Accept MD_SYNC_CAP_REQ and MD_SYNC_SET_REQ and
++				Initiate MD_SYNC_INFO_IND (C.1)
++TSPC_MCAP_6_2			This row intentionally left blank
++TSPC_MCAP_6_3	False		Can support multiple simultaneous MCLs with CSP
++				(O)
++TSPC_MCAP_6_4	False		Can access Bluetooth Clock (O)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory if 1/2 is supported.
++C.1: Mandatory if MCAP TSPC_MCAP_1_A_2 is supported, otherwise Excluded.
 +-------------------------------------------------------------------------------
 +
 +
-+		HDP Features - Sink
++		Clock Synchronization Features - Sync-Master
 +-------------------------------------------------------------------------------
 +Parameter Name	Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_HDP_12_1	True		Supports Standard Op Codes (M)
-+TSPC_HDP_12_2	True		Supports Initiate creation of Control and Data
-+				Channels (C.1) (C.5)
-+TSPC_HDP_12_3	True		Supports Accept creation of Control and Data
-+				Channels (C.1) (C.6)
-+TSPC_HDP_12_4	False		Supports Initiate Reconnection of MDL (O) (C.2)
-+TSPC_HDP_12_5	True		Supports Accept Reconnection of MDL (M)
-+TSPC_HDP_12_6	False		Supports Clock Synchronization Protocol (O)
-+TSPC_HDP_12_7	False		Supports Sync-Slave (C.3)
-+TSPC_HDP_12_8	False		Supports Sync-Master (C.6)
++TSPC_MCAP_7_1			This row intentionally left blank
++TSPC_MCAP_7_2	False (*)	Initiate MD_SYNC_CAP_REQ and MD_SYNC_SET_REQ
++				and Accept MD_SYNC_INFO_IND (C.1)
++TSPC_MCAP_7_3	False		Can support multiple simultaneous MCLs with CSP (O)
++TSPC_MCAP_7_4	False (*)	Can access Bluetooth Clock (O)
 +-------------------------------------------------------------------------------
-+C.1: Mandatory if TSPC_HDP_12_1 is supported, otherwise Excluded.
-+C.2: Optional if TSPC_HDP_12_1 is supported, otherwise Excluded.
-+C.3: Mandatory if TSPC_HDP_12_6 is supported, otherwise Excluded.
-+C.4: Optional if TSPC_HDP_12_6 is supported, otherwise Excluded.
-+C.5: Mandatory to support 12/2 and SDP Client Role (SDP 1b/2).
-+C.6: Mandatory to support 12/3 and SDP Server Role (SDP 1b/1).
-+-------------------------------------------------------------------------------
-+
-+
-+		Data Exchange Features - Sink
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_HDP_13_1	False		Supports Initiation of Echo Test (O)
-+TSPC_HDP_13_2	True		Supports Acceptance of Echo Test (M)
-+TSPC_HDP_13_3	True		Supports IEEE 11073-20601 (M)
-+TSPC_HDP_13_4	True (*)	Supports IEEE 11073-20601 Agent Role (C.1)
-+TSPC_HDP_13_5	False		Supports IEEE 11073-20601 Manager Role (C.1)
-+TSPC_HDP_13_6	False		Supports Initiation of Association Release (O)
-+-------------------------------------------------------------------------------
-+C.1: If TSPC_HDP_13_3 is supported, at least one is Mandatory, otherwise
-+	Excluded.
++C.1: Mandatory to support IF TSPC_MCAP_1_A_2 is supported.
 +-------------------------------------------------------------------------------
 -- 
 1.8.5.3
