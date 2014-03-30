@@ -1,57 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/gatt: Fix regression introduced by b278efa5
+Date: Sun, 30 Mar 2014 08:04:31 +0200
+Message-ID: <1396159471-1773-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <20140328161549.GA16919@t440s.P-661HNU-F1>
-References: <1395703047-5743-1-git-send-email-andre.guedes@openbossa.org>
-	<20140328161549.GA16919@t440s.P-661HNU-F1>
-Date: Sun, 30 Mar 2014 09:00:52 +0200
-Message-ID: <CAN_7+YZV=5TRx=xG-iEQz0+i+89-Ubo5OBxuE-tF_e7qCKu4Mg@mail.gmail.com>
-Subject: Re: [RFC] doc: Connection Parameters Command
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-HI Andre,
+Seems that GattService onScanResult is only looking into remote uuids in
+adverisement data. No device object is created in the Android framework,
+Therefore we need to send regular device found for BLE devices as well.
+Otherwise the Android GATT application will not be aware of remote device
+properties like name etc.
+---
+ android/bluetooth.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-On Fri, Mar 28, 2014 at 5:15 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Andre,
->
-> On Mon, Mar 24, 2014, Andre Guedes wrote:
->> This patch introduces commands to add and remove connection parameters.
->> ---
->>  doc/mgmt-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>  1 file changed, 83 insertions(+), 1 deletion(-)
->
-> All in all this looks pretty good to me. Just one thing I'd fix:
->
->> +Add Connection Parameters Command
->> +====================================
->> +
->> +     Command Code:           0x0032
->> +     Controller Index:       <controller id>
->> +     Command Parameters:     Address (6 Octets)
->> +                             Address_Type (1 Octet)
->> +                             Auto_Connect_Option (1 Octet)
->> +                             Min_Connection_Interval (2 Octets)
->> +                             Max_Connection_Interval (2 Octes)
->> +     Return Parameters:
->> +
->
-> This should have the Address and Address_Type also in the return
-> parameters for consistency and ability to distinguish the completion of
-> two simultaneous commands for the different devices.
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 690aaf6..734adeb 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1331,9 +1331,6 @@ static bool is_new_device(const struct device *dev)
+ 	if (dev->found)
+ 		return false;
+ 
+-	if (adapter.cur_discovery_type != SCAN_TYPE_DUAL)
+-		return false;
+-
+ 	if (dev->bond_state == HAL_BOND_STATE_BONDED)
+ 		return false;
+ 
+-- 
+1.8.4
 
-In addition to what Johan wrote, maybe you should send Command
-Complete event on both success and failure.
-So you always get the address information in userspace.
-
->
-> Johan
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-\Lukasz
