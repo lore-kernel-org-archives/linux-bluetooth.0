@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 BlueZ 11/12] android/avrcp-lib: Add support for parsing GetElementAttributes response
-Date: Sun, 30 Mar 2014 22:33:37 +0300
-Message-Id: <1396208018-23453-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH v2 BlueZ 09/12] android/avrcp-lib: Add support for parsing SetPlayerValue response
+Date: Sun, 30 Mar 2014 22:33:35 +0300
+Message-Id: <1396208018-23453-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1396208018-23453-1-git-send-email-luiz.dentz@gmail.com>
 References: <1396208018-23453-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,91 +12,39 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/avrcp-lib.c | 102 ++++++++++++++++++++++++++++++++++++++++++++++++----
- android/avrcp-lib.h |   6 ++--
- unit/test-avrcp.c   |   2 +-
- 3 files changed, 101 insertions(+), 9 deletions(-)
+ android/avrcp-lib.c | 59 +++++++++++++++++++++++++++++++++++++++++++----------
+ android/avrcp-lib.h |  8 +++++---
+ unit/test-avrcp.c   |  9 ++++----
+ 3 files changed, 57 insertions(+), 19 deletions(-)
 
 diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index c5b54d5..80b778a 100644
+index c2b376a..3c224a5 100644
 --- a/android/avrcp-lib.c
 +++ b/android/avrcp-lib.c
-@@ -1272,17 +1272,107 @@ int avrcp_set_volume(struct avrcp *session, uint8_t volume, avctp_rsp_cb func,
- 						func, user_data);
+@@ -1151,26 +1151,63 @@ int avrcp_get_current_player_value(struct avrcp *session, uint8_t number,
+ 				number + 1, get_value_rsp, session);
  }
  
--int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
--								void *user_data)
-+static int parse_attribute_list(struct avrcp_header *pdu, uint8_t *number,
-+						uint32_t *attrs, char **text)
- {
--	uint8_t buf[9];
-+	uint8_t *ptr;
-+	uint16_t params_len;
-+	int i;
-+
-+	if (pdu->params_len < 1)
-+		return -EPROTO;
-+
-+	*number = pdu->params[0];
-+	if (*number > AVRCP_MEDIA_ATTRIBUTE_LAST) {
-+		*number = 0;
-+		return -EPROTO;
-+	}
-+
-+	params_len = pdu->params_len - 1;
-+	for (i = 0, ptr = &pdu->params[1]; i < *number && params_len > 0; i++) {
-+		uint16_t len;
-+
-+		if (params_len < 8)
-+			goto fail;
-+
-+		attrs[i] = bt_get_be32(&ptr[0]);
-+		len = bt_get_be16(&ptr[6]);
-+
-+		params_len -= 8;
-+		ptr += 8;
-+
-+		if (len > params_len)
-+			goto fail;
-+
-+		if (len > 0) {
-+			text[i] = g_strndup((const char *) &ptr[8], len);
-+			params_len -= len;
-+			ptr += len;
-+		}
-+	}
-+
-+	if (i != *number)
-+		goto fail;
-+
-+	return 0;
-+
-+fail:
-+	for (i -= 1; i >= 0; i--)
-+		g_free(text[i]);
-+
-+	*number = 0;
-+
-+	return -EPROTO;
-+}
-+
-+static gboolean get_element_attributes_rsp(struct avctp *conn,
+-int avrcp_set_player_value(struct avrcp *session, uint8_t *attributes,
+-					uint8_t attr_count, uint8_t *values,
+-					avctp_rsp_cb func, void *user_data)
++static gboolean set_value_rsp(struct avctp *conn,
 +					uint8_t code, uint8_t subunit,
 +					uint8_t *operands, size_t operand_count,
 +					void *user_data)
-+{
+ {
+-	uint8_t buf[2 * AVRCP_ATTRIBUTE_LAST + 1];
 +	struct avrcp *session = user_data;
 +	struct avrcp_player *player = session->player;
 +	struct avrcp_header *pdu;
 +	uint8_t number = 0;
-+	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
-+	char *text[AVRCP_MEDIA_ATTRIBUTE_LAST];
++	uint8_t attrs[AVRCP_ATTRIBUTE_LAST];
++	uint8_t values[AVRCP_ATTRIBUTE_LAST];
 +	int err;
 +
 +	DBG("");
 +
-+	if (!player || !player->cfm || !player->cfm->get_element_attributes)
++	if (!player || !player->cfm || !player->cfm->set_value)
 +		return FALSE;
 +
 +	pdu = parse_pdu(operands, operand_count);
@@ -110,68 +58,92 @@ index c5b54d5..80b778a 100644
 +		goto done;
 +	}
 +
-+	err = parse_attribute_list(pdu, &number, attrs, text);
++	err = parse_value(pdu, &number, attrs, values);
 +
 +done:
-+	player->cfm->get_element_attributes(session, err, number, attrs, text,
++	player->cfm->set_value(session, err, number, attrs, values,
 +							player->user_data);
 +
 +	return FALSE;
 +}
 +
-+int avrcp_get_element_attributes(struct avrcp *session)
++int avrcp_set_player_value(struct avrcp *session, uint8_t number,
++					uint8_t *attrs, uint8_t *values)
 +{
-+	uint8_t pdu[9];
++	uint8_t pdu[2 * AVRCP_ATTRIBUTE_LAST + 1];
+ 	int i;
  
- 	/* This returns all attributes */
--	memset(buf, 0, sizeof(buf));
-+	memset(pdu, 0, sizeof(pdu));
+-	if (attr_count > AVRCP_ATTRIBUTE_LAST)
++	if (number > AVRCP_ATTRIBUTE_LAST)
+ 		return -EINVAL;
  
- 	return avrcp_send_req(session, AVC_CTYPE_STATUS, AVC_SUBUNIT_PANEL,
--				AVRCP_GET_ELEMENT_ATTRIBUTES, buf, sizeof(buf),
+-	buf[0] = attr_count;
++	pdu[0] = number;
+ 
+-	for (i = 0; i < attr_count; i++) {
+-		buf[i * 2 + 1] = attributes[i];
+-		buf[i * 2 + 2] = values[i];
++	for (i = 0; i < number; i++) {
++		pdu[i * 2 + 1] = attrs[i];
++		pdu[i * 2 + 2] = values[i];
+ 	}
+ 
+ 	return avrcp_send_req(session, AVC_CTYPE_CONTROL, AVC_SUBUNIT_PANEL,
+-				AVRCP_SET_PLAYER_VALUE, buf, 2 * attr_count + 1,
 -				func, user_data);
-+				AVRCP_GET_ELEMENT_ATTRIBUTES, pdu, sizeof(pdu),
-+				get_element_attributes_rsp, session);
++				AVRCP_SET_PLAYER_VALUE, pdu, 2 * number + 1,
++				set_value_rsp, session);
  }
  
- int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id,
+ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
 diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index f5666eb..2f35e90 100644
+index 30ceda0..2a65f16 100644
 --- a/android/avrcp-lib.h
 +++ b/android/avrcp-lib.h
-@@ -188,6 +188,9 @@ struct avrcp_control_cfm {
- 	void (*get_play_status) (struct avrcp *session, int err,
- 					uint8_t status, uint32_t position,
- 					uint32_t duration, void *user_data);
-+	void (*get_element_attributes) (struct avrcp *session, int err,
-+					uint8_t number, uint32_t *attrs,
-+					char **text, void *user_data);
+@@ -182,6 +182,9 @@ struct avrcp_control_cfm {
+ 	void (*get_value) (struct avrcp *session, int err,
+ 					uint8_t number, uint8_t *attrs,
+ 					uint8_t *values, void *user_data);
++	void (*set_value) (struct avrcp *session, int err,
++					uint8_t number, uint8_t *attrs,
++					uint8_t *values, void *user_data);
  };
  
  struct avrcp_passthrough_handler {
-@@ -231,8 +234,7 @@ int avrcp_get_current_player_value(struct avrcp *session, uint8_t number,
- int avrcp_get_play_status(struct avrcp *session);
- int avrcp_set_volume(struct avrcp *session, uint8_t volume, avctp_rsp_cb func,
- 							void *user_data);
--int avrcp_get_element_attributes(struct avrcp *session, avctp_rsp_cb func,
--							void *user_data);
-+int avrcp_get_element_attributes(struct avrcp *session);
- int avrcp_set_addressed_player(struct avrcp *session, uint16_t player_id,
- 					avctp_rsp_cb func, void *user_data);
- 
+@@ -218,9 +221,8 @@ int avrcp_get_player_attribute_text(struct avrcp *session, uint8_t number,
+ int avrcp_list_player_values(struct avrcp *session, uint8_t attr);
+ int avrcp_get_player_value_text(struct avrcp *session, uint8_t attr,
+ 					uint8_t number, uint8_t *values);
+-int avrcp_set_player_value(struct avrcp *session, uint8_t *attributes,
+-					uint8_t attr_count, uint8_t *values,
+-					avctp_rsp_cb func, void *user_data);
++int avrcp_set_player_value(struct avrcp *session, uint8_t number,
++					uint8_t *attrs, uint8_t *values);
+ int avrcp_get_current_player_value(struct avrcp *session, uint8_t number,
+ 							uint8_t *attrs);
+ int avrcp_get_play_status(struct avrcp *session, avctp_rsp_cb func,
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index ad15bb9..a0b009a 100644
+index 016c80c..8f74e9c 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -520,7 +520,7 @@ static void test_client(gconstpointer data)
- 		avrcp_get_play_status(context->session);
+@@ -508,13 +508,12 @@ static void test_client(gconstpointer data)
+ 	}
  
- 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-03-C"))
--		avrcp_get_element_attributes(context->session, NULL, NULL);
-+		avrcp_get_element_attributes(context->session);
+ 	if (g_str_equal(context->data->test_name, "/TP/PAS/BV-11-C")) {
+-		uint8_t attributes[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
++		uint8_t attrs[2] = { AVRCP_ATTRIBUTE_EQUALIZER,
+ 						AVRCP_ATTRIBUTE_REPEAT_MODE };
+-		uint8_t values[] = { 0xaa, 0xff };
++		uint8_t values[2] = { 0xaa, 0xff };
  
- 	if (g_str_equal(context->data->test_name, "/TP/NFY/BV-01-C"))
- 		avrcp_register_notification(context->session,
+-		avrcp_set_player_value(context->session, attributes,
+-						sizeof(attributes), values,
+-						NULL, NULL);
++		avrcp_set_player_value(context->session, sizeof(attrs), attrs,
++								values);
+ 	}
+ 
+ 	if (g_str_equal(context->data->test_name, "/TP/MDI/BV-01-C"))
 -- 
 1.8.5.3
 
