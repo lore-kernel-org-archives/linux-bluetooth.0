@@ -1,62 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53386DC2.7090805@gmail.com>
-Date: Sun, 30 Mar 2014 20:17:22 +0100
-From: Andrea <mariofutire@gmail.com>
 MIME-Version: 1.0
-To: Antonio Ospite <ao2@ao2.it>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: Controlling LEDs and rumble on sixaxis
-References: <53164362.4060102@gmail.com> <20140304231118.3500abb703a7c1a7679d01f1@ao2.it>
-In-Reply-To: <20140304231118.3500abb703a7c1a7679d01f1@ao2.it>
+In-Reply-To: <20140328161549.GA16919@t440s.P-661HNU-F1>
+References: <1395703047-5743-1-git-send-email-andre.guedes@openbossa.org>
+	<20140328161549.GA16919@t440s.P-661HNU-F1>
+Date: Sun, 30 Mar 2014 09:00:52 +0200
+Message-ID: <CAN_7+YZV=5TRx=xG-iEQz0+i+89-Ubo5OBxuE-tF_e7qCKu4Mg@mail.gmail.com>
+Subject: Re: [RFC] doc: Connection Parameters Command
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 04/03/14 22:11, Antonio Ospite wrote:
-> 
-> With older kernels you can already set LEDs and rumble by sending the
-> HID output report 01 via hidraw (actually there is a regression
-> preventing that via BT in some versions). See the code in the BlueZ
-> sixaxis plugin or in the newer linux kernel for the report format.
+HI Andre,
 
-hi
+On Fri, Mar 28, 2014 at 5:15 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Andre,
+>
+> On Mon, Mar 24, 2014, Andre Guedes wrote:
+>> This patch introduces commands to add and remove connection parameters.
+>> ---
+>>  doc/mgmt-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>  1 file changed, 83 insertions(+), 1 deletion(-)
+>
+> All in all this looks pretty good to me. Just one thing I'd fix:
+>
+>> +Add Connection Parameters Command
+>> +====================================
+>> +
+>> +     Command Code:           0x0032
+>> +     Controller Index:       <controller id>
+>> +     Command Parameters:     Address (6 Octets)
+>> +                             Address_Type (1 Octet)
+>> +                             Auto_Connect_Option (1 Octet)
+>> +                             Min_Connection_Interval (2 Octets)
+>> +                             Max_Connection_Interval (2 Octes)
+>> +     Return Parameters:
+>> +
+>
+> This should have the Address and Address_Type also in the return
+> parameters for consistency and ability to distinguish the completion of
+> two simultaneous commands for the different devices.
 
-after a while I managed to try to use the LEDs.
-I'm using linux 3.13.6 with this hack (modified for PS3 usb id)
+In addition to what Johan wrote, maybe you should send Command
+Complete event on both success and failure.
+So you always get the address information in userspace.
 
-http://www.spinics.net/lists/linux-bluetooth/msg42955.html
+>
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-as the good one is too complicated to back port to 3.13
-
-http://article.gmane.org/gmane.linux.kernel.input/34896
-
-(is it going to make it in 3.15?)
-
-This is all via Bluetooth, using bluez 5.16
-
-Results:
-	1) using /dev/hidraw0 LEDs work like a charm
-	2) I don't think my kernel supports /sys/class/leds as I can't find anything there
-	3) rumble does not work. I've tried various combination of the bytes 2 to 5
-	   (e.g. 0xfe, 0x00, 0xfe, 0xff) but nothing happens. do I need the full patch?
-	   or the hack is enough?
-	4) ff: tried fftest and nothing happens: this is the output
-
-Force feedback test program.
-HOLD FIRMLY YOUR WHEEL OR JOYSTICK TO PREVENT DAMAGES
-
-Device /dev/input/event0 opened
-Axes query:
-Effects: Periodic Rumble
-Number of simultaneous effects: 16
-Upload effects[1]: Invalid argument
-Upload effects[2]: Invalid argument
-Upload effects[3]: Invalid argument
-Enter effect number, -1 to exit
-1
-Now Playing: Constant Force
-Enter effect number, -1 to exit
-
-
-Any idea what else is missing to make rumble work?
-
+\Lukasz
