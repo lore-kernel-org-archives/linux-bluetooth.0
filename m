@@ -1,133 +1,309 @@
 Return-Path: <cyrus@holtmann.org>
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v1 1/3] tools: Add testing descriptor for IAS Alert Level
-Date: Mon, 31 Mar 2014 09:13:13 -0300
-Message-Id: <1396267995-17271-2-git-send-email-claudio.takahasi@openbossa.org>
-In-Reply-To: <1396267995-17271-1-git-send-email-claudio.takahasi@openbossa.org>
-References: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
- <1396267995-17271-1-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [RFC 1/2] android/hal-audio-hsp: Add audio HAL for HSP handling
+Date: Mon, 31 Mar 2014 14:44:19 +0300
+Message-Id: <1396266260-31712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds a testing purpose only characteristic descriptor to
-allow reading and writing descriptor's "Value" property.
----
- tools/gatt-service.c | 53 +++++++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 44 insertions(+), 9 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/tools/gatt-service.c b/tools/gatt-service.c
-index e319163..d2859f8 100644
---- a/tools/gatt-service.c
-+++ b/tools/gatt-service.c
-@@ -40,11 +40,15 @@
- #define GATT_MGR_IFACE			"org.bluez.GattManager1"
- #define GATT_SERVICE_IFACE		"org.bluez.GattService1"
- #define GATT_CHR_IFACE			"org.bluez.GattCharacteristic1"
-+#define GATT_DESCRIPTOR_IFACE		"org.bluez.GattDescriptor1"
+This adds audio HAL for handling SCO. Following needs to be added to
+audio_policy.conf:
+
+  hsp {
+    outputs {
+      hsp {
+        ...
+        devices AUDIO_DEVICE_OUT_ALL_SCO
+        ...
+      }
+    }
+---
+ android/Android.mk      |  23 ++++++
+ android/Makefile.am     |  15 ++++
+ android/hal-audio-hsp.c | 211 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 249 insertions(+)
+ create mode 100644 android/hal-audio-hsp.c
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 3a62485..630d928 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -273,6 +273,29 @@ LOCAL_MODULE := audio.a2dp.default
+ include $(BUILD_SHARED_LIBRARY)
  
- /* Immediate Alert Service UUID */
- #define IAS_UUID			"00001802-0000-1000-8000-00805f9b34fb"
- #define ALERT_LEVEL_CHR_UUID		"00002a06-0000-1000-8000-00805f9b34fb"
+ #
++# HSP audio
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := bluez/android/hal-audio-hsp.c
++
++LOCAL_C_INCLUDES = \
++	$(call include-path-for, system-core) \
++	$(call include-path-for, libhardware) \
++
++LOCAL_SHARED_LIBRARIES := \
++	libcutils \
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE := audio.hsp.default
++
++include $(BUILD_SHARED_LIBRARY)
++
++#
+ # l2cap-test
+ #
  
-+/* Random UUID for testing purpose */
-+#define READ_WRITE_DESCRIPTOR_UUID	"8260c653-1a54-426b-9e36-e84c238bc669"
-+
- static GMainLoop *main_loop;
- static GSList *services;
- static DBusConnection *connection;
-@@ -66,6 +70,21 @@ static const char const *ias_alert_level_props[] = {
- 						"write-without-response",
- 						NULL };
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 58ee3c9..19db75c 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -166,6 +166,21 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+ 					android/hardware/hardware.h \
+ 					android/system/audio.h
  
-+static gboolean desc_get_uuid(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
-+{
-+	const char *uuid = user_data;
++android_audio_hsp_default_la_SOURCES = android/audio-msg.h \
++					android/hal-msg.h \
++					android/hal-audio-hsp.c \
++					android/hardware/audio.h \
++					android/hardware/audio_effect.h \
++					android/hardware/hardware.h \
++					android/system/audio.h
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &uuid);
++android_audio_hsp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
 +
-+	return TRUE;
-+}
++android_audio_hsp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
++					-no-undefined -lrt
 +
-+static const GDBusPropertyTable desc_properties[] = {
-+	{ "UUID",		"s",	desc_get_uuid },
-+	{ }
++plugin_LTLIBRARIES += android/audio.hsp.default.la
++
+ unit_tests += android/test-ipc
+ 
+ android_test_ipc_SOURCES = android/test-ipc.c \
+diff --git a/android/hal-audio-hsp.c b/android/hal-audio-hsp.c
+new file mode 100644
+index 0000000..2ad46f2
+--- /dev/null
++++ b/android/hal-audio-hsp.c
+@@ -0,0 +1,211 @@
++/*
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include <hardware/audio.h>
++#include <hardware/hardware.h>
++
++#include "hal-log.h"
++
++struct hsp_audio_dev {
++	struct audio_hw_device dev;
++	struct a2dp_stream_out *out;
 +};
 +
- static gboolean chr_get_uuid(const GDBusPropertyTable *property,
- 					DBusMessageIter *iter, void *user_data)
- {
-@@ -201,33 +220,48 @@ static void chr_iface_destroy(gpointer user_data)
- 	g_free(chr);
- }
- 
--static gboolean register_characteristic(DBusConnection *conn, const char *uuid,
-+static gboolean register_characteristic(const char *chr_uuid,
- 						const uint8_t *value, int vlen,
- 						const char **props,
-+						const char *desc_uuid,
- 						const char *service_path)
- {
- 	struct characteristic *chr;
- 	static int id = 1;
--	char *path;
-+	char *desc_path;
- 	gboolean ret = TRUE;
- 
--	path = g_strdup_printf("%s/characteristic%d", service_path, id++);
--
- 	chr = g_new0(struct characteristic, 1);
--
--	chr->uuid = g_strdup(uuid);
-+	chr->uuid = g_strdup(chr_uuid);
- 	chr->value = g_memdup(value, vlen);
- 	chr->vlen = vlen;
--	chr->path = path;
- 	chr->props = props;
-+	chr->path = g_strdup_printf("%s/characteristic%d", service_path, id++);
- 
--	if (!g_dbus_register_interface(conn, path, GATT_CHR_IFACE,
-+	if (!g_dbus_register_interface(connection, chr->path, GATT_CHR_IFACE,
- 					NULL, NULL, chr_properties,
- 					chr, chr_iface_destroy)) {
- 		printf("Couldn't register characteristic interface\n");
-+		chr_iface_destroy(chr);
-+		return FALSE;
++static int audio_open_output_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					audio_output_flags_t flags,
++					struct audio_config *config,
++					struct audio_stream_out **stream_out)
++
++{
++	DBG("");
++
++	return -EINVAL;
++}
++
++static void audio_close_output_stream(struct audio_hw_device *dev,
++					struct audio_stream_out *stream_out)
++{
++	DBG("");
++
++	free(stream_out);
++}
++
++static int audio_set_parameters(struct audio_hw_device *dev,
++							const char *kvpairs)
++{
++	DBG("");
++
++	return 0;
++}
++
++static char *audio_get_parameters(const struct audio_hw_device *dev,
++							const char *keys)
++{
++	DBG("");
++
++	return strdup("");
++}
++
++static int audio_init_check(const struct audio_hw_device *dev)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int audio_set_voice_volume(struct audio_hw_device *dev, float volume)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_set_master_volume(struct audio_hw_device *dev, float volume)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_set_mode(struct audio_hw_device *dev, int mode)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_set_mic_mute(struct audio_hw_device *dev, bool state)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_get_mic_mute(const struct audio_hw_device *dev, bool *state)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
++					const struct audio_config *config)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_open_input_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					struct audio_config *config,
++					struct audio_stream_in **stream_in)
++{
++	DBG("");
++
++	return 0;
++}
++
++static void audio_close_input_stream(struct audio_hw_device *dev,
++					struct audio_stream_in *stream_in)
++{
++	DBG("");
++
++	free(stream_in);
++}
++
++static int audio_dump(const audio_hw_device_t *device, int fd)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int audio_close(hw_device_t *device)
++{
++	DBG("");
++
++	free(device);
++
++	return 0;
++}
++
++static int audio_open(const hw_module_t *module, const char *name,
++							hw_device_t **device)
++{
++	struct hsp_audio_dev *adev;
++
++	DBG("");
++
++	if (strcmp(name, AUDIO_HARDWARE_INTERFACE)) {
++		error("audio: interface %s not matching [%s]", name,
++						AUDIO_HARDWARE_INTERFACE);
++		return -EINVAL;
 +	}
 +
-+	if (!desc_uuid)
-+		return TRUE;
++	adev = calloc(1, sizeof(struct hsp_audio_dev));
++	if (!adev)
++		return -ENOMEM;
 +
-+	desc_path = g_strdup_printf("%s/descriptor%d", chr->path, id++);
-+	if (!g_dbus_register_interface(connection, desc_path,
-+					GATT_DESCRIPTOR_IFACE,
-+					NULL, NULL, desc_properties,
-+					g_strdup(desc_uuid), g_free)) {
-+		printf("Couldn't register descriptor interface\n");
-+		g_dbus_unregister_interface(connection, chr->path,
-+							GATT_CHR_IFACE);
- 		ret = FALSE;
- 	}
- 
-+	g_free(desc_path);
++	adev->dev.common.tag = HARDWARE_DEVICE_TAG;
++	adev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
++	adev->dev.common.module = (struct hw_module_t *) module;
++	adev->dev.common.close = audio_close;
 +
- 	return ret;
- }
- 
-@@ -258,9 +292,10 @@ static void create_services()
- 		return;
- 
- 	/* Add Alert Level Characteristic to Immediate Alert Service */
--	if (!register_characteristic(connection, ALERT_LEVEL_CHR_UUID,
-+	if (!register_characteristic(ALERT_LEVEL_CHR_UUID,
- 						&level, sizeof(level),
- 						ias_alert_level_props,
-+						READ_WRITE_DESCRIPTOR_UUID,
- 						service_path)) {
- 		printf("Couldn't register Alert Level characteristic (IAS)\n");
- 		g_dbus_unregister_interface(connection, service_path,
++	adev->dev.init_check = audio_init_check;
++	adev->dev.set_voice_volume = audio_set_voice_volume;
++	adev->dev.set_master_volume = audio_set_master_volume;
++	adev->dev.set_mode = audio_set_mode;
++	adev->dev.set_mic_mute = audio_set_mic_mute;
++	adev->dev.get_mic_mute = audio_get_mic_mute;
++	adev->dev.set_parameters = audio_set_parameters;
++	adev->dev.get_parameters = audio_get_parameters;
++	adev->dev.get_input_buffer_size = audio_get_input_buffer_size;
++	adev->dev.open_output_stream = audio_open_output_stream;
++	adev->dev.close_output_stream = audio_close_output_stream;
++	adev->dev.open_input_stream = audio_open_input_stream;
++	adev->dev.close_input_stream = audio_close_input_stream;
++	adev->dev.dump = audio_dump;
++
++	*device = &adev->dev.common;
++
++	return 0;
++}
++
++static struct hw_module_methods_t hal_module_methods = {
++	.open = audio_open,
++};
++
++struct audio_module HAL_MODULE_INFO_SYM = {
++	.common = {
++		.tag = HARDWARE_MODULE_TAG,
++		.version_major = 1,
++		.version_minor = 0,
++		.id = AUDIO_HARDWARE_MODULE_ID,
++		.name = "HSP Audio HW HAL",
++		.author = "Intel Corporation",
++		.methods = &hal_module_methods,
++	},
++};
 -- 
-1.8.3.1
+1.8.3.2
 
