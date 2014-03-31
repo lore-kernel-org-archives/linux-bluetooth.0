@@ -1,41 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android: Fix NULL pointer dereference
-Date: Mon, 31 Mar 2014 14:45:13 +0200
-Message-Id: <1396269913-23447-1-git-send-email-marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Simplify find_device helper
+Date: Mon, 31 Mar 2014 14:44:37 +0200
+Message-ID: <1669405.qm1PI0d5hl@uw000953>
+In-Reply-To: <1396258005-30573-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1396258005-30573-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If there is no adapter, hal_ipc in not initialized. Below is
-message from valgrind:
+Hi Marcin,
 
-==22501== Invalid read of size 4
-==22501==    at 0x805B809: ipc_unregister (ipc.c:421)
-==22501==    by 0x804AEAF: main (main.c:548)
-==22501==  Address 0x4 is not stack'd, malloc'd or (recently) free'd
----
- android/main.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+On Monday 31 of March 2014 11:26:45 Marcin Kraglak wrote:
+> We don't need to use dev pointer in second search attempt.
+> ---
+>  android/gatt.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index e361506..1bddbcf 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -805,11 +805,7 @@ static struct gatt_device *find_device(bdaddr_t *addr)
+>  	if (dev)
+>  		return dev;
+>  
+> -	dev = queue_find(conn_wait_queue, match_dev_by_bdaddr, addr);
+> -	if (dev)
+> -		return dev;
+> -
+> -	return NULL;
+> +	return queue_find(conn_wait_queue, match_dev_by_bdaddr, addr);
+>  }
+>  
+>  static struct gatt_device *find_device_by_conn_id(int32_t conn_id)
+> 
 
-diff --git a/android/main.c b/android/main.c
-index 828f81d..e229a6d 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -541,8 +541,11 @@ int main(int argc, char *argv[])
- 	bt_bluetooth_cleanup();
- 	g_main_loop_unref(event_loop);
- 
--	ipc_unregister(hal_ipc, HAL_SERVICE_ID_CORE);
--	ipc_cleanup(hal_ipc);
-+	/* If no adapter was initialized, hal_ipc is NULL */
-+	if (hal_ipc) {
-+		ipc_unregister(hal_ipc, HAL_SERVICE_ID_CORE);
-+		ipc_cleanup(hal_ipc);
-+	}
- 
- 	info("Exit");
- 
+Patch applied, thanks.
+
 -- 
-1.8.3.1
-
+Best regards, 
+Szymon Janc
