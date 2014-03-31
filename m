@@ -1,53 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Bump PTS version
-Date: Mon, 31 Mar 2014 15:55:12 +0200
-Message-ID: <2211002.uMZfjEavOz@uw000953>
-In-Reply-To: <1396273082-11250-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1396273082-11250-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android: Fix NULL pointer dereference
+Date: Mon, 31 Mar 2014 15:54:55 +0200
+Message-ID: <6986568.6jbTlktqIB@uw000953>
+In-Reply-To: <1396269913-23447-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1396269913-23447-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Marcin,
 
-On Monday 31 of March 2014 15:38:02 Sebastian Chlad wrote:
-> Add proper PTS version for PICS and PIXIT.
+On Monday 31 of March 2014 14:45:13 Marcin Kraglak wrote:
+> If there is no adapter, hal_ipc in not initialized. Below is
+> message from valgrind:
+> 
+> ==22501== Invalid read of size 4
+> ==22501==    at 0x805B809: ipc_unregister (ipc.c:421)
+> ==22501==    by 0x804AEAF: main (main.c:548)
+> ==22501==  Address 0x4 is not stack'd, malloc'd or (recently) free'd
 > ---
->  android/pics-l2cap.txt  | 2 +-
->  android/pixit-l2cap.txt | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  android/main.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
-> index 7b49627..096fbf4 100644
-> --- a/android/pics-l2cap.txt
-> +++ b/android/pics-l2cap.txt
-> @@ -1,6 +1,6 @@
->  L2CAP PICS for the PTS tool.
+> diff --git a/android/main.c b/android/main.c
+> index 828f81d..e229a6d 100644
+> --- a/android/main.c
+> +++ b/android/main.c
+> @@ -541,8 +541,11 @@ int main(int argc, char *argv[])
+>  	bt_bluetooth_cleanup();
+>  	g_main_loop_unref(event_loop);
 >  
-> -PTS version: 5.0
-> +PTS version: 5.1
+> -	ipc_unregister(hal_ipc, HAL_SERVICE_ID_CORE);
+> -	ipc_cleanup(hal_ipc);
+> +	/* If no adapter was initialized, hal_ipc is NULL */
+> +	if (hal_ipc) {
+> +		ipc_unregister(hal_ipc, HAL_SERVICE_ID_CORE);
+> +		ipc_cleanup(hal_ipc);
+> +	}
 >  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
-> index 3ee8b44..914a995 100644
-> --- a/android/pixit-l2cap.txt
-> +++ b/android/pixit-l2cap.txt
-> @@ -1,6 +1,6 @@
->  L2CAP PIXIT for the PTS tool.
->  
-> -PTS version: 5.0
-> +PTS version: 5.1
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> 
+>  	info("Exit");
 
-Applied. Thanks.
+Applied, thanks.
 
 -- 
 Best regards, 
