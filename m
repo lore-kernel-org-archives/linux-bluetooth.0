@@ -1,73 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <5339214E.700@linux.intel.com>
+Date: Mon, 31 Mar 2014 11:03:26 +0300
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1396013919-15122-1-git-send-email-luiz.dentz@gmail.com>
-References: <1396013919-15122-1-git-send-email-luiz.dentz@gmail.com>
-Date: Mon, 31 Mar 2014 11:02:45 +0300
-Message-ID: <CABBYNZ+eVt4JsqyjbNG-Y1Ad3f-uhm6md3TBbubRTt5gbg_+OA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] gobex/header: Add g_obex_header_new_tag function
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [RFC 0/3] Add HDP .register_application method
+References: <1395758081-22005-1-git-send-email-ravikumar.veeramally@linux.intel.com> <53357D91.3050601@linux.intel.com>
+In-Reply-To: <53357D91.3050601@linux.intel.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+ping.
 
-On Fri, Mar 28, 2014 at 3:38 PM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On 03/28/2014 03:48 PM, Ravi kumar Veeramally wrote:
+> ping.
 >
-> This function can be used to set tag using GObexApparam as argument but
-> for arbritary headers.
-> ---
->  gobex/gobex-header.c | 9 +++++++--
->  gobex/gobex-header.h | 1 +
->  2 files changed, 8 insertions(+), 2 deletions(-)
+> On 03/25/2014 04:34 PM, Ravi kumar Veeramally wrote:
+>> Due to limited IPC_MTU and variable length of
+>> fields from 'bthl_reg_param_t *', it is difficult to put them
+>> in single command and send though IPC. So we split this command
+>> to multiple calls. First command will be called with opcode of
+>> HAL_OP_HEALTH_REG_APP with 'struct hal_cmd_health_reg_app' data.
+>> Later command will be called with opcode of
+>> HAL_OP_HEALTH_MDEP with 'struct hal_cmd_health_mdep' data for
+>> number_of_mdeps times. Daemon (android/health) side it will
+>> process after it received all data and response will be sent
+>> along with last call of HAL_OP_HEALTH_MDEP.
+>>
+>> This avoids increasing value of IPC_MTU and mainly because of
+>> optional parameters in 'bthl_reg_param_t'. Incase of unfilled
+>> optional parameters, fixed size arrays in hal commands will be
+>> empty.
+>>
+>> Ravi kumar Veeramally (3):
+>>    android/hal-ipc-api: Add extra command to Health HAL api document
+>>    android/hal-msg: Add extra struct for mdep data
+>>    android/hal-health: Add HDP .register_application method
+>>
+>>   android/hal-health.c    | 88 
+>> ++++++++++++++++++++++++++++++++++++++++++++++++-
+>>   android/hal-ipc-api.txt | 34 +++++++++++--------
+>>   android/hal-msg.h       | 37 ++++++++++-----------
+>>   3 files changed, 126 insertions(+), 33 deletions(-)
+>>
 >
-> diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
-> index 281f8ea..fe70c8b 100644
-> --- a/gobex/gobex-header.c
-> +++ b/gobex/gobex-header.c
-> @@ -425,7 +425,7 @@ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len)
->         return header;
->  }
+> -- 
+> To unsubscribe from this list: send the line "unsubscribe 
+> linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
-> -GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
-> +GObexHeader *g_obex_header_new_tag(guint8 id, GObexApparam *apparam)
->  {
->         guint8 buf[1024];
->         gssize len;
-> @@ -434,7 +434,12 @@ GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
->         if (len < 0)
->                 return NULL;
->
-> -       return g_obex_header_new_bytes(G_OBEX_HDR_APPARAM, buf, len);
-> +       return g_obex_header_new_bytes(id, buf, len);
-> +}
-> +
-> +GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
-> +{
-> +       return g_obex_header_new_tag(G_OBEX_HDR_APPARAM, apparam);
->  }
->
->  GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
-> diff --git a/gobex/gobex-header.h b/gobex/gobex-header.h
-> index 42a2a0c..c2f975f 100644
-> --- a/gobex/gobex-header.h
-> +++ b/gobex/gobex-header.h
-> @@ -85,6 +85,7 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str);
->  GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len);
->  GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val);
->  GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val);
-> +GObexHeader *g_obex_header_new_tag(guint8 id, GObexApparam *apparam);
->  GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam);
->
->  GSList *g_obex_header_create_list(guint8 first_hdr_id, va_list args,
-> --
-> 1.8.5.3
 
-Please hold on reviewing this set since I found a problem with it.
-
-
--- 
-Luiz Augusto von Dentz
