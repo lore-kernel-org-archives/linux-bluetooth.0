@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 15/20] android/avrcp: Add avrcp_search() function
-Date: Mon, 31 Mar 2014 15:25:09 +0300
-Message-Id: <1396268714-4056-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 09/20] unit/avrcp: Add Connection establishment and release tests
+Date: Mon, 31 Mar 2014 15:25:03 +0300
+Message-Id: <1396268714-4056-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,75 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Tests are checking connection establishment and release for browsing
+channel. Since we are connected through socketpair the tests are dummy.
 ---
- android/avrcp-lib.c | 23 +++++++++++++++++++++--
- android/avrcp-lib.h |  4 ++++
- 2 files changed, 25 insertions(+), 2 deletions(-)
+ unit/test-avrcp.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 5f7a626..28c2445 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -28,6 +28,7 @@
- #include <stdbool.h>
- #include <glib.h>
- #include <errno.h>
-+#include <string.h>
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 6eb2413..a8a5c16 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -683,6 +683,19 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x00, 0x02, /* end */
+ 				0x00));
  
- #include "lib/bluetooth.h"
++	/* Connection Establishment for Browsing tests */
++
++	/*
++	 * Tests are checking connection establishment and release
++	 * for browsing channel. Since we are connected through socketpair
++	 * the tests are dummy
++	 */
++	define_test("/TP/CON/BV-01-C", test_dummy, raw_pdu(0x00));
++	define_test("/TP/CON/BV-02-C", test_dummy, raw_pdu(0x00));
++	define_test("/TP/CON/BV-03-C", test_dummy, raw_pdu(0x00));
++	define_test("/TP/CON/BV-04-C", test_dummy, raw_pdu(0x00));
++	define_test("/TP/CON/BV-05-C", test_dummy, raw_pdu(0x00));
++
+ 	/* Connection Establishment for Control tests */
  
-@@ -44,8 +45,6 @@
- #define AVRCP_PACKET_TYPE_CONTINUING		0x02
- #define AVRCP_PACKET_TYPE_END			0x03
- 
--#define AVRCP_CHARSET_UTF8			106
--
- #if __BYTE_ORDER == __LITTLE_ENDIAN
- 
- struct avrcp_header {
-@@ -1777,3 +1776,23 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
- 	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
- 							func, user_data);
- }
-+
-+int avrcp_search(struct avrcp *session, uint16_t charset, const char *string,
-+				avctp_browsing_rsp_cb func, void *user_data)
-+{
-+	size_t str_len = strnlen(string, 255 - 4);
-+	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + str_len + 4];
-+	struct avrcp_browsing_header *pdu = (void *) buf;
-+
-+	memset(buf, 0, sizeof(buf));
-+
-+	pdu->pdu_id = AVRCP_SEARCH;
-+	pdu->param_len = htons(str_len + 4);
-+
-+	bt_put_be16(charset, &pdu->params[0]);
-+	bt_put_be16(str_len, &pdu->params[2]);
-+	memcpy(&pdu->params[4], string, str_len);
-+
-+	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
-+							func, user_data);
-+}
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index a6b10de..9470857 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -124,6 +124,8 @@
- /* Company IDs for vendor dependent commands */
- #define IEEEID_BTSIG		0x001958
- 
-+#define AVRCP_CHARSET_UTF8	0x006a
-+
- /* Parameters legths */
- #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH       5
- 
-@@ -294,3 +296,5 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
- 				uint64_t uid, uint16_t counter, uint32_t *attr,
- 				size_t attr_count, avctp_browsing_rsp_cb func,
- 				void *user_data);
-+int avrcp_search(struct avrcp *session, uint16_t charset, const char *string,
-+				avctp_browsing_rsp_cb func, void *user_data);
+ 	/*
 -- 
 1.8.3.2
 
