@@ -1,28 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [RFC 1/2] android/hal-audio-hsp: Add audio HAL for HSP handling
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1396266260-31712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 31 Mar 2014 09:31:57 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] android/gatt: Handle read characteristic client command
-Date: Mon, 31 Mar 2014 19:16:34 +0200
-Message-ID: <1463983.pI3KIreCdQ@leonov>
-In-Reply-To: <1396282372-4188-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1396282372-4188-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Message-Id: <C3ED99D0-24D1-4D9A-A99E-B5EA1E1D6E63@holtmann.org>
+References: <1396266260-31712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Andrei,
 
-On Monday 31 of March 2014 18:12:50 Grzegorz Kolodziejczyk wrote:
-> This adds read characteristic client command handling.
-> ---
->  android/gatt.c | 139
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++- 1 file changed,
-> 137 insertions(+), 2 deletions(-)
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> This adds audio HAL for handling SCO. Following needs to be added to
+> audio_policy.conf:
+> 
+>  hsp {
+>    outputs {
+>      hsp {
+>        ...
+>        devices AUDIO_DEVICE_OUT_ALL_SCO
+>        ...
+>      }
+>    }
 
-Both patches applied, thanks.
+if we need modifications to /etc/audio_policy.conf, we should have this part of android/README or some other documentation. I also wonder if this not also needs an inputs { } section since HSP is actually full-duplex.
 
--- 
-BR
-Szymon Janc
+Also for the A2DP part, has something checked what happens if we provide additional settings.
+
+  a2dp {
+    outputs {
+      a2dp {
+        sampling_rates 44100
+        channel_masks AUDIO_CHANNEL_OUT_STEREO
+        formats AUDIO_FORMAT_PCM_16_BIT
+        devices AUDIO_DEVICE_OUT_ALL_A2DP
+      }
+    }
+  }
+
+So something like actually telling it about all 4 sampling rates or MP3 format?
+
+Regards
+
+Marcel
+
