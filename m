@@ -1,54 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 0/3] Add HDP .register_application method
-Date: Mon, 31 Mar 2014 15:49:41 +0200
-Message-ID: <1884435.E5HBSYUjjS@uw000953>
-In-Reply-To: <1396271615-10221-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1396271615-10221-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Bump PTS version
+Date: Mon, 31 Mar 2014 15:38:02 +0200
+Message-Id: <1396273082-11250-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Add proper PTS version for PICS and PIXIT.
+---
+ android/pics-l2cap.txt  | 2 +-
+ android/pixit-l2cap.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On Monday 31 of March 2014 16:13:32 Ravi kumar Veeramally wrote:
-> v2: Fixed Szymon's comments (response: app_id will be returned
->     in response to HAL_OP_HEALTH_REG_APP ipc command).
-> v1: Fixed Szymon's comments(copy terminating character null
->     also from HAL data(names, descriptions).
-> 
-> RFC: Due to limited IPC_MTU and variable length of
-> fields from 'bthl_reg_param_t *', it is difficult to put them
-> in single command and send though IPC. So we split this command
-> to multiple calls. First command will be called with opcode of
-> HAL_OP_HEALTH_REG_APP with 'struct hal_cmd_health_reg_app' data.
-> Later command will be called with opcode of
-> HAL_OP_HEALTH_MDEP with 'struct hal_cmd_health_mdep' data for
-> number_of_mdeps times. Daemon (android/health) side it will
-> process after it received all data and response will be sent
-> along with last call of HAL_OP_HEALTH_MDEP.
-> 
-> This avoids increasing value of IPC_MTU and mainly because of
-> optional parameters in 'bthl_reg_param_t'. Incase of unfilled
-> optional parameters, fixed size arrays in hal commands will be
-> empty.
-> 
-> Ravi kumar Veeramally (3):
->   android/hal-ipc-api: Add extra command to Health HAL api document
->   android/hal-msg: Add extra struct for mdep data
->   android/hal-health: Add HDP .register_application method
-> 
->  android/hal-health.c    | 83 ++++++++++++++++++++++++++++++++++++++++++++++++-
->  android/hal-ipc-api.txt | 35 +++++++++++++--------
->  android/hal-msg.h       | 37 +++++++++++-----------
->  3 files changed, 122 insertions(+), 33 deletions(-)
->
-
-All three patches are now upstream, thanks. 
-
+diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
+index 7b49627..096fbf4 100644
+--- a/android/pics-l2cap.txt
++++ b/android/pics-l2cap.txt
+@@ -1,6 +1,6 @@
+ L2CAP PICS for the PTS tool.
+ 
+-PTS version: 5.0
++PTS version: 5.1
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-l2cap.txt b/android/pixit-l2cap.txt
+index 3ee8b44..914a995 100644
+--- a/android/pixit-l2cap.txt
++++ b/android/pixit-l2cap.txt
+@@ -1,6 +1,6 @@
+ L2CAP PIXIT for the PTS tool.
+ 
+-PTS version: 5.0
++PTS version: 5.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
