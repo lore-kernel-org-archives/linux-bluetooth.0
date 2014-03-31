@@ -1,80 +1,142 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+eVt4JsqyjbNG-Y1Ad3f-uhm6md3TBbubRTt5gbg_+OA@mail.gmail.com>
-References: <1396013919-15122-1-git-send-email-luiz.dentz@gmail.com>
-	<CABBYNZ+eVt4JsqyjbNG-Y1Ad3f-uhm6md3TBbubRTt5gbg_+OA@mail.gmail.com>
-Date: Mon, 31 Mar 2014 17:32:26 +0300
-Message-ID: <CABBYNZ+dzrif2gt7UBH3KKtzXs89Yhsnp4fhGCyNp_thAotC6w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/4] gobex/header: Add g_obex_header_new_tag function
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 2/2] android/gatt: Handle write characteristic client command
+Date: Mon, 31 Mar 2014 15:59:48 +0200
+Message-Id: <1396274388-24698-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1396274388-24698-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396274388-24698-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This adds write characteristic client command handling.
+---
+ android/gatt.c | 107 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 105 insertions(+), 2 deletions(-)
 
-On Mon, Mar 31, 2014 at 11:02 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi,
->
-> On Fri, Mar 28, 2014 at 3:38 PM, Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This function can be used to set tag using GObexApparam as argument but
->> for arbritary headers.
->> ---
->>  gobex/gobex-header.c | 9 +++++++--
->>  gobex/gobex-header.h | 1 +
->>  2 files changed, 8 insertions(+), 2 deletions(-)
->>
->> diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
->> index 281f8ea..fe70c8b 100644
->> --- a/gobex/gobex-header.c
->> +++ b/gobex/gobex-header.c
->> @@ -425,7 +425,7 @@ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len)
->>         return header;
->>  }
->>
->> -GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
->> +GObexHeader *g_obex_header_new_tag(guint8 id, GObexApparam *apparam)
->>  {
->>         guint8 buf[1024];
->>         gssize len;
->> @@ -434,7 +434,12 @@ GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
->>         if (len < 0)
->>                 return NULL;
->>
->> -       return g_obex_header_new_bytes(G_OBEX_HDR_APPARAM, buf, len);
->> +       return g_obex_header_new_bytes(id, buf, len);
->> +}
->> +
->> +GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
->> +{
->> +       return g_obex_header_new_tag(G_OBEX_HDR_APPARAM, apparam);
->>  }
->>
->>  GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
->> diff --git a/gobex/gobex-header.h b/gobex/gobex-header.h
->> index 42a2a0c..c2f975f 100644
->> --- a/gobex/gobex-header.h
->> +++ b/gobex/gobex-header.h
->> @@ -85,6 +85,7 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str);
->>  GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len);
->>  GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val);
->>  GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val);
->> +GObexHeader *g_obex_header_new_tag(guint8 id, GObexApparam *apparam);
->>  GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam);
->>
->>  GSList *g_obex_header_create_list(guint8 first_hdr_id, va_list args,
->> --
->> 1.8.5.3
->
-> Please hold on reviewing this set since I found a problem with it.
-
-This is now pushed.
-
-
+diff --git a/android/gatt.c b/android/gatt.c
+index a42c14a..e31e8c4 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1500,13 +1500,116 @@ done:
+ 				HAL_OP_GATT_CLIENT_READ_CHARACTERISTIC, status);
+ }
+ 
++struct write_char_data {
++	int32_t conn_id;
++	struct element_id srvc_id;
++	struct element_id char_id;
++	uint8_t is_primary;
++};
++
++static void send_client_write_char_notify(int32_t status, int32_t conn_id,
++					struct element_id srvc_id,
++					struct element_id char_id,
++					uint8_t is_primary)
++{
++	struct hal_ev_gatt_client_write_characteristic ev;
++
++	memset(&ev, 0, sizeof(ev));
++
++	ev.conn_id = conn_id;
++	ev.status = status;
++
++	ev.data.srvc_id.inst_id = srvc_id.instance;
++	uuid2android(&srvc_id.uuid, ev.data.srvc_id.uuid);
++	ev.data.srvc_id.is_primary = is_primary;
++
++	ev.data.char_id.inst_id = char_id.instance;
++	uuid2android(&char_id.uuid, ev.data.srvc_id.uuid);
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++					HAL_EV_GATT_CLIENT_WRITE_CHARACTERISTIC,
++					sizeof(ev), &ev);
++}
++
++static void write_char_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct write_char_data *data = user_data;
++
++	send_client_write_char_notify(status, data->conn_id, data->srvc_id,
++					data->char_id, data->is_primary);
++
++	free(data);
++}
++
+ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_write_characteristic *cmd = buf;
++	struct write_char_data *cb_data;
++	struct characteristic *ch;
++	struct gatt_device *dev;
++	struct service *srvc;
++	struct element_id srvc_id;
++	struct element_id char_id;
++	uint8_t status;
++	uint8_t value[cmd->len];
++
+ 	DBG("");
+ 
++	if (len != sizeof(*cmd) + cmd->len) {
++		error("Invalid write characteristic size (%u bytes), "
++							"terminating", len);
++		raise(SIGTERM);
++		return;
++	}
++
++	memcpy(value, cmd->value, cmd->len);
++
++	hal_srvc_id_to_element_id(&cmd->srvc_id, &srvc_id);
++	hal_gatt_id_to_element_id(&cmd->gatt_id, &char_id);
++
++	if (!find_service(cmd->conn_id, &srvc_id, &dev, &srvc))
++		goto failed;
++
++	/* search characteristics by instance id */
++	ch = queue_find(srvc->chars, match_char_by_element_id, &char_id);
++	if (!ch) {
++		error("gatt: Characteristic with inst_id: %d not found",
++							cmd->gatt_id.inst_id);
++		goto failed;
++	}
++
++	cb_data = new0(struct write_char_data, 1);
++	if (!cb_data) {
++		error("gatt: Cannot allocate call data");
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	cb_data->srvc_id = srvc_id;
++	cb_data->char_id = char_id;
++	cb_data->conn_id = cmd->conn_id;
++	cb_data->is_primary = cmd->srvc_id.is_primary;
++
++	if (!gatt_write_char(dev->attrib, ch->ch.value_handle, value,
++					sizeof(value), write_char_cb, cb_data))
++	{
++		error("gatt: Cannot read characteristic with inst_id: %d",
++							cmd->gatt_id.inst_id);
++		free(cb_data);
++	}
++
++	status = HAL_STATUS_SUCCESS;
++	goto done;
++
++failed:
++	status = HAL_STATUS_SUCCESS;
++	send_client_write_char_notify(GATT_FAILURE, cmd->conn_id, srvc_id,
++					char_id, cmd->srvc_id.is_primary);
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-					HAL_OP_GATT_CLIENT_WRITE_CHARACTERISTIC,
+-					HAL_STATUS_FAILED);
++			HAL_OP_GATT_CLIENT_WRITE_CHARACTERISTIC, status);
+ }
+ 
+ static void handle_client_read_descriptor(const void *buf, uint16_t len)
 -- 
-Luiz Augusto von Dentz
+1.8.5.2
+
