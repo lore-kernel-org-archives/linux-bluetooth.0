@@ -2,83 +2,140 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/3] android/hal-ipc-api: Add extra command to Health HAL api document
-Date: Mon, 31 Mar 2014 12:46:59 +0300
-Message-Id: <1396259221-2761-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 3/3] android/hal-health: Add HDP .register_application method
+Date: Mon, 31 Mar 2014 12:47:01 +0300
+Message-Id: <1396259221-2761-4-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1396259221-2761-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1396259221-2761-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Defined extra command for MDEP data which is required for Register
-Application command. Also updated Opcode for rest of the commands.
----
- android/hal-ipc-api.txt | 35 ++++++++++++++++++++++-------------
- 1 file changed, 22 insertions(+), 13 deletions(-)
+Implementation of register_application is different compared
+to other apis. Due to limited IPC_MTU and variable length of
+fields from 'bthl_reg_param_t *', it is difficult to put them
+in single command and send though IPC. So we split this command
+multiple calls. First command will be called with opcode of
+HAL_OP_HEALTH_REG_APP with 'struct hal_cmd_health_reg_app' data.
+Later command will be called with opcode of
+HAL_OP_HEALTH_MDEP with 'struct hal_cmd_health_mdep' data for
+number_of_mdeps times. Daemon (android/health) side it will
+process after it received all data and response will be sent
+along with last call of HAL_OP_HEALTH_MDEP.
 
-diff --git a/android/hal-ipc-api.txt b/android/hal-ipc-api.txt
-index 5613e85..4270408 100644
---- a/android/hal-ipc-api.txt
-+++ b/android/hal-ipc-api.txt
-@@ -1125,28 +1125,37 @@ Commands and responses:
+This avoids increasing value of IPC_MTU and mainly because of
+optional parameters in 'bthl_reg_param_t'. Incase of unfilled
+optional parameters, fixed size arrays in hal commands will be
+empty.
+---
+ android/hal-health.c | 88 +++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 87 insertions(+), 1 deletion(-)
+
+diff --git a/android/hal-health.c b/android/hal-health.c
+index e6fe65a..877d4f1 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -38,6 +38,92 @@ static bool interface_ready(void)
+ static const struct hal_ipc_handler ev_handlers[] = {
+ };
  
- 	Opcode 0x01 - Register Application command/response
- 
--		Command parameters: Application name (string)
--		                    Provider name (string)
--		                    Service name (string)
--		                    Service description (string)
--		                    Number of MDEP (1 octet)
--		                    MDEP Role # (1 octet)
--		                    Data type # (1 octet)
--		                    Channel type # (1 octet)
--		                    MDEP description # (string)
--		                    ...
-+		Command parameters: Number of MDEP (1 octet)
-+		                    Application name offset (2 octets)
-+		                    Provider name offset (2 octets)
-+		                    Service name offset (2 octets)
-+		                    Service description offset (2 octets)
-+		                    Data length (2 octets)
-+		                    Data (data length)
-+		Response parameters: <none>
++static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
++{
++	uint8_t buf[IPC_MTU];
++	struct hal_cmd_health_reg_app *cmd = (void *) buf;
++	struct hal_cmd_health_mdep *mdep = (void *) buf;
++	struct hal_rsp_health_reg_app rsp;
++	size_t rsp_len = sizeof(rsp);
++	bt_status_t status;
++	uint16_t off, len;
++	int i;
 +
-+		Strings are null terminated.
-+		In case of an error, the error response will be returned.
++	DBG("");
 +
-+	Opcode 0x02 - Register Application MDEP data command/response
++	if (!interface_ready())
++		return BT_STATUS_NOT_READY;
 +
-+		Command parameters: MDEP Role (1 octet)
-+		                    Data type (1 octet)
-+		                    Channel type (1 octet)
-+		                    MDEP description length (2 octets)
-+		                    MDEP description (MDEP desciption length)
- 		Response parameters: Application ID (2 octets)
- 
- 		In case of an error, the error response will be returned.
- 
--	Opcode 0x02 - Unregister Application command/response
-+	Opcode 0x03 - Unregister Application command/response
- 
- 		Command parameters: Application ID (2 octets)
- 		Response parameters: <none>
- 
- 		In case of an error, the error response will be returned.
- 
--	Opcode 0x03 - Connect Channel command/response
-+	Opcode 0x04 - Connect Channel command/response
- 
- 		Command parameters: Application ID (2 octets)
- 		                    Remote address (6 octets)
-@@ -1155,7 +1164,7 @@ Commands and responses:
- 
- 		In case of an error, the error response will be returned.
- 
--	Opcode 0x04 - Destroy Channel command/response
-+	Opcode 0x05 - Destroy Channel command/response
- 
- 		Command parameters: Channel ID (2 octets)
- 		Response parameters: <none>
++	if (!reg || !app_id || !reg->application_name)
++		return BT_STATUS_PARM_INVALID;
++
++	memset(buf, 0, IPC_MTU);
++
++	cmd->num_of_mdep = reg->number_of_mdeps;
++
++	off = 0;
++	cmd->app_name_off = off;
++	len = strlen(reg->application_name) + 1;
++	memcpy(cmd->data, reg->application_name, len);
++	off += len;
++
++	if (reg->provider_name) {
++		len = strlen(reg->provider_name) + 1;
++		cmd->provider_name_off = off;
++		memcpy(cmd->data + off, reg->provider_name, len);
++		off += len;
++	} else {
++		cmd->provider_name_off = 0;
++	}
++
++	if (reg->srv_name) {
++		len = strlen(reg->srv_name) + 1;
++		cmd->service_name_off = off;
++		memcpy(cmd->data + off, reg->srv_name, len);
++		off += len;
++	} else {
++		cmd->service_name_off = 0;
++	}
++
++	if (reg->srv_desp) {
++		len = strlen(reg->srv_desp) + 1;
++		cmd->service_descr_off = off;
++		memcpy(cmd->data + off, reg->srv_desp, len);
++		off += len;
++	} else {
++		cmd->service_descr_off = 0;
++	}
++
++	cmd->len = off;
++	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
++				sizeof(*cmd) + cmd->len, &cmd, 0, NULL, NULL);
++
++	if (status != HAL_STATUS_SUCCESS)
++		return status;
++
++	for (i = 0; i < reg->number_of_mdeps; i++) {
++		memset(buf, 0, IPC_MTU);
++		mdep->role = reg->mdep_cfg[i].mdep_role;
++		mdep->data_type = reg->mdep_cfg[i].data_type;
++		mdep->channel_type = reg->mdep_cfg[i].channel_type;
++		mdep->descr_len = strlen(reg->mdep_cfg[i].mdep_description) + 1;
++		memcpy(mdep->descr, reg->mdep_cfg[i].mdep_description,
++							mdep->descr_len);
++
++		status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_MDEP,
++						sizeof(*mdep) + mdep->descr_len,
++						buf, &rsp_len, &rsp, NULL);
++
++		if (status != HAL_STATUS_SUCCESS)
++			return status;
++
++	}
++
++	*app_id = rsp.app_id;
++
++	return status;
++}
++
+ static bt_status_t unregister_application(int app_id)
+ {
+ 	struct hal_cmd_health_unreg_app cmd;
+@@ -149,7 +235,7 @@ static void cleanup(void)
+ static bthl_interface_t health_if = {
+ 	.size = sizeof(health_if),
+ 	.init = init,
+-	.register_application = NULL,
++	.register_application = register_application,
+ 	.unregister_application = unregister_application,
+ 	.connect_channel = connect_channel,
+ 	.destroy_channel = destroy_channel,
 -- 
 1.8.3.2
 
