@@ -1,96 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1396093026-28414-2-git-send-email-kernel@gkr.i24.cc>
-References: <20140328194907.GA24300@t440s.P-661HNU-F1>
-	<1396093026-28414-1-git-send-email-kernel@gkr.i24.cc>
-	<1396093026-28414-2-git-send-email-kernel@gkr.i24.cc>
-Date: Mon, 31 Mar 2014 08:17:06 -0400
-Message-ID: <CAJdJm_OWizW0sgvCFAbHBJ=moTggS5d2S5PnKU4Zc3qGPM6nrQ@mail.gmail.com>
-Subject: Re: [PATCH] hid2hci add CSR 8510 A10 support
-From: Anderson Lizardo <anderson.lizardo@openbossa.org>
-To: Gordon <kernel@gkr.i24.cc>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=ISO-8859-1
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v1 3/3] tools: Add emitting descriptor PropertiesChanged
+Date: Mon, 31 Mar 2014 09:13:15 -0300
+Message-Id: <1396267995-17271-4-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1396267995-17271-1-git-send-email-claudio.takahasi@openbossa.org>
+References: <1396016350-16943-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1396267995-17271-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Gordon,
+This patch forces emitting PropertiesChanged signal when the descriptor
+Value changes. Internally, BlueZ tracks the signal emitted to update
+the GDBusProxy properties.
+---
+ tools/gatt-service.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-A few more coding style suggestions below.
-
-On Sat, Mar 29, 2014 at 7:37 AM, Gordon <kernel@gkr.i24.cc> wrote:
-> diff --git a/tools/hid2hci.c b/tools/hid2hci.c
-> index 2dbfca7..1f64b41 100644
-> --- a/tools/hid2hci.c
-> +++ b/tools/hid2hci.c
-> @@ -119,6 +119,49 @@ static int usb_switch_csr(int fd, enum mode mode)
->         return err;
->  }
->
-> +static int usb_switch_csr2(int fd, enum mode mode)
-> +{
-> +       int err;
-> +       struct usbfs_disconnect disconnect;
-> +       uint8_t report[] = {
-> +               0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-> +       };
-
-Add an empty line here to separate variable declarations.
-
-> +       switch (mode) {
-> +       case HCI:
-> +               /* send report as is */
-> +               disconnect.interface = 0;
-> +               disconnect.flags = USBFS_DISCONNECT_EXCEPT_DRIVER;
-> +               strcpy(disconnect.driver, "usbfs");
-> +
-> +               if (ioctl(fd, USBFS_IOCTL_DISCONNECT, &disconnect) < 0) {
-> +                       fprintf(stderr, "Can't claim interface: %s (%d)\n",
-> +                               strerror(errno), errno);
-> +                       return -1;
-> +               }
-
-Add an empty line here.
-
-> +               /* Set_report request with
-> +                * report id: 0x01, report type: feature (0x03)
-> +                * on interface 0
-> +                */
-> +               err = control_message(fd,
-> +                                     USB_ENDPOINT_OUT | USB_TYPE_CLASS |
-> +                                     USB_RECIP_INTERFACE,
-> +                                     USB_REQ_SET_CONFIGURATION,
-> +                                     0x01 | (0x03 << 8),
-> +                                     0, report, sizeof(report), 5000);
-> +               /* unable to detect whether the previous state
-> +                * already was HCI (EALREADY)
-> +                */
-> +               break;
-> +       case HID:
-> +               /* currently unknown how to switch to HID */
-> +               fprintf(stderr,
-> +                       "csr2: Switching to hid mode is not implemented\n");
-> +               return -1;
-> +               break;
-
-Instead of "return -1; break;"  you can do:
-
-err = -1;
-break;
-
-> +       }
-
-Add an empty line here to separate the "return err" from the rest of the code.
-
-> +       return err;
-> +}
-> +
->  static int hid_logitech_send_report(int fd, const char *buf, size_t size)
->  {
->         struct hiddev_report_info rinfo;
-
-Best Regards,
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index ee37ef3..6bca404 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -63,6 +63,7 @@ struct characteristic {
+ 
+ struct descriptor {
+ 	char *uuid;
++	char *path;
+ 	uint8_t *value;
+ 	int vlen;
+ };
+@@ -125,6 +126,10 @@ static void desc_set_value(const GDBusPropertyTable *property,
+ 	desc->vlen = vlen;
+ 
+ 	g_dbus_pending_property_success(id);
++
++	g_dbus_emit_property_changed(connection, desc->path,
++					GATT_DESCRIPTOR_IFACE, "Value");
++
+ }
+ 
+ static const GDBusPropertyTable desc_properties[] = {
+@@ -274,6 +279,7 @@ static void desc_iface_destroy(gpointer user_data)
+ 
+ 	g_free(desc->uuid);
+ 	g_free(desc->value);
++	g_free(desc->path);
+ 	g_free(desc);
+ }
+ 
+@@ -286,8 +292,6 @@ static gboolean register_characteristic(const char *chr_uuid,
+ 	struct characteristic *chr;
+ 	struct descriptor *desc;
+ 	static int id = 1;
+-	char *desc_path;
+-	gboolean ret = TRUE;
+ 
+ 	chr = g_new0(struct characteristic, 1);
+ 	chr->uuid = g_strdup(chr_uuid);
+@@ -309,9 +313,9 @@ static gboolean register_characteristic(const char *chr_uuid,
+ 
+ 	desc = g_new0(struct descriptor, 1);
+ 	desc->uuid = g_strdup(desc_uuid);
++	desc->path = g_strdup_printf("%s/descriptor%d", chr->path, id++);
+ 
+-	desc_path = g_strdup_printf("%s/descriptor%d", chr->path, id++);
+-	if (!g_dbus_register_interface(connection, desc_path,
++	if (!g_dbus_register_interface(connection, desc->path,
+ 					GATT_DESCRIPTOR_IFACE,
+ 					NULL, NULL, desc_properties,
+ 					desc, desc_iface_destroy)) {
+@@ -320,12 +324,10 @@ static gboolean register_characteristic(const char *chr_uuid,
+ 							GATT_CHR_IFACE);
+ 
+ 		desc_iface_destroy(desc);
+-		ret = FALSE;
++		return FALSE;
+ 	}
+ 
+-	g_free(desc_path);
+-
+-	return ret;
++	return TRUE;
+ }
+ 
+ static char *register_service(const char *uuid)
 -- 
-Anderson Lizardo
-http://www.indt.org/?lang=en
-INdT - Manaus - Brazil
+1.8.3.1
+
