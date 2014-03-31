@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 09/20] unit/avrcp: Add Connection establishment and release tests
-Date: Mon, 31 Mar 2014 15:25:03 +0300
-Message-Id: <1396268714-4056-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 02/20] android/avrcp: Add avrcp_set_browsed_player() function
+Date: Mon, 31 Mar 2014 15:24:56 +0300
+Message-Id: <1396268714-4056-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,61 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Tests are checking connection establishment and release for browsing
-channel. Since we are connected through socketpair the tests are dummy.
 ---
- unit/test-avrcp.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ android/avrcp-lib.c | 18 ++++++++++++++++++
+ android/avrcp-lib.h |  9 +++++++++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 6eb2413..a8a5c16 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -683,6 +683,19 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x00, 0x02, /* end */
- 				0x00));
- 
-+	/* Connection Establishment for Browsing tests */
+diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+index 393ab54..42e00de 100644
+--- a/android/avrcp-lib.c
++++ b/android/avrcp-lib.c
+@@ -1682,3 +1682,21 @@ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
+ 	return avctp_send_passthrough(session->conn, AVC_VENDOR_UNIQUE, params,
+ 								sizeof(params));
+ }
 +
-+	/*
-+	 * Tests are checking connection establishment and release
-+	 * for browsing channel. Since we are connected through socketpair
-+	 * the tests are dummy
-+	 */
-+	define_test("/TP/CON/BV-01-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-02-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-03-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-04-C", test_dummy, raw_pdu(0x00));
-+	define_test("/TP/CON/BV-05-C", test_dummy, raw_pdu(0x00));
++int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id,
++				avctp_browsing_rsp_cb func, void *user_data)
++{
++	uint8_t buf[AVRCP_BROWSING_HEADER_LENGTH + 2];
++	struct avrcp_browsing_header *pdu = (void *) buf;
 +
- 	/* Connection Establishment for Control tests */
++	DBG("");
++
++	memset(buf, 0, sizeof(buf));
++
++	pdu->pdu_id = AVRCP_SET_BROWSED_PLAYER;
++	bt_put_be16(player_id, pdu->params);
++	pdu->param_len = htons(2);
++
++	return avctp_send_browsing_req(session->conn, buf, sizeof(buf),
++							func, user_data);
++}
+diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+index ca7a57f..ed26220 100644
+--- a/android/avrcp-lib.h
++++ b/android/avrcp-lib.h
+@@ -121,6 +121,13 @@
+ /* Parameters legths */
+ #define AVRCP_REGISTER_NOTIFICATION_PARAM_LENGTH       5
  
- 	/*
++struct avrcp_browsing_header {
++	uint8_t pdu_id;
++	uint16_t param_len;
++	uint8_t params[0];
++} __attribute__ ((packed));
++#define AVRCP_BROWSING_HEADER_LENGTH 3
++
+ struct avrcp;
+ 
+ struct avrcp_control_handler {
+@@ -268,3 +275,5 @@ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
+ int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
+ 							uint8_t status);
+ int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
++int avrcp_set_browsed_player(struct avrcp *session, uint16_t player_id,
++				avctp_browsing_rsp_cb func, void *user_data);
 -- 
 1.8.3.2
 
