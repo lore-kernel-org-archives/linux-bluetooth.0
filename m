@@ -1,32 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Missing Linux Bluetooth Headers
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CALkxMhFwk=JwSbA_uPgLxAjQUAhGiqTjPsEOQSer90BX+ojOfg@mail.gmail.com>
-Date: Mon, 31 Mar 2014 09:10:48 -0700
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Message-Id: <E7B700CC-2115-4762-8F53-7671D9B1DDA6@holtmann.org>
-References: <CALkxMhEJxUXaKZgSQ4BSa-UvuEx1uFwVbr4yikH+qB81cUkvDw@mail.gmail.com> <5B9B1FB0-A822-4B5E-A040-42920D336457@holtmann.org> <CALkxMhFwk=JwSbA_uPgLxAjQUAhGiqTjPsEOQSer90BX+ojOfg@mail.gmail.com>
-To: Michal Labedzki <michal.labedzki@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZ+eVt4JsqyjbNG-Y1Ad3f-uhm6md3TBbubRTt5gbg_+OA@mail.gmail.com>
+References: <1396013919-15122-1-git-send-email-luiz.dentz@gmail.com>
+	<CABBYNZ+eVt4JsqyjbNG-Y1Ad3f-uhm6md3TBbubRTt5gbg_+OA@mail.gmail.com>
+Date: Mon, 31 Mar 2014 17:32:26 +0300
+Message-ID: <CABBYNZ+dzrif2gt7UBH3KKtzXs89Yhsnp4fhGCyNp_thAotC6w@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 1/4] gobex/header: Add g_obex_header_new_tag function
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Michal,
+Hi,
 
-> So what external application should do? Add own copy of headers to
-> sources or try use BlueZ copy of headers. I think that first option is
-> better, because build dependency with BlueZ does not make
-> implementation kernel-safe. I think about user try to use one version
-> of libpcap and try to change kernel to older (there can be old kernel
-> API).
+On Mon, Mar 31, 2014 at 11:02 AM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> Hi,
+>
+> On Fri, Mar 28, 2014 at 3:38 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This function can be used to set tag using GObexApparam as argument but
+>> for arbritary headers.
+>> ---
+>>  gobex/gobex-header.c | 9 +++++++--
+>>  gobex/gobex-header.h | 1 +
+>>  2 files changed, 8 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/gobex/gobex-header.c b/gobex/gobex-header.c
+>> index 281f8ea..fe70c8b 100644
+>> --- a/gobex/gobex-header.c
+>> +++ b/gobex/gobex-header.c
+>> @@ -425,7 +425,7 @@ GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len)
+>>         return header;
+>>  }
+>>
+>> -GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
+>> +GObexHeader *g_obex_header_new_tag(guint8 id, GObexApparam *apparam)
+>>  {
+>>         guint8 buf[1024];
+>>         gssize len;
+>> @@ -434,7 +434,12 @@ GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
+>>         if (len < 0)
+>>                 return NULL;
+>>
+>> -       return g_obex_header_new_bytes(G_OBEX_HDR_APPARAM, buf, len);
+>> +       return g_obex_header_new_bytes(id, buf, len);
+>> +}
+>> +
+>> +GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam)
+>> +{
+>> +       return g_obex_header_new_tag(G_OBEX_HDR_APPARAM, apparam);
+>>  }
+>>
+>>  GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val)
+>> diff --git a/gobex/gobex-header.h b/gobex/gobex-header.h
+>> index 42a2a0c..c2f975f 100644
+>> --- a/gobex/gobex-header.h
+>> +++ b/gobex/gobex-header.h
+>> @@ -85,6 +85,7 @@ GObexHeader *g_obex_header_new_unicode(guint8 id, const char *str);
+>>  GObexHeader *g_obex_header_new_bytes(guint8 id, const void *data, gsize len);
+>>  GObexHeader *g_obex_header_new_uint8(guint8 id, guint8 val);
+>>  GObexHeader *g_obex_header_new_uint32(guint8 id, guint32 val);
+>> +GObexHeader *g_obex_header_new_tag(guint8 id, GObexApparam *apparam);
+>>  GObexHeader *g_obex_header_new_apparam(GObexApparam *apparam);
+>>
+>>  GSList *g_obex_header_create_list(guint8 first_hdr_id, va_list args,
+>> --
+>> 1.8.5.3
+>
+> Please hold on reviewing this set since I found a problem with it.
 
-for libpcap and sockaddr_hci and the HCI_CHANNEL_MONITOR, you should just add your own copy of these structs and defines. Do not even bother copying BlueZ headers. Just create the structs and defines by yourself and use them. We have done this internally inside BlueZ as well a few times.
+This is now pushed.
 
-A build or runtime dependency on libbluetooth is a bad idea. You can install libbluetooth if you build BlueZ with —enable-library, but that library will be deprecated at some point. So might well just prepare yourself for it.
 
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
