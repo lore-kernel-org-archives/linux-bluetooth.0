@@ -1,44 +1,20 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 2/2] android/hal-audio: Make code readable
-Date: Mon, 31 Mar 2014 14:44:20 +0300
-Message-Id: <1396266260-31712-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1396266260-31712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1396266260-31712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <5B9B1FB0-A822-4B5E-A040-42920D336457@holtmann.org>
+References: <CALkxMhEJxUXaKZgSQ4BSa-UvuEx1uFwVbr4yikH+qB81cUkvDw@mail.gmail.com>
+	<5B9B1FB0-A822-4B5E-A040-42920D336457@holtmann.org>
+Date: Mon, 31 Mar 2014 12:38:32 +0200
+Message-ID: <CALkxMhFwk=JwSbA_uPgLxAjQUAhGiqTjPsEOQSer90BX+ojOfg@mail.gmail.com>
+Subject: Re: Missing Linux Bluetooth Headers
+From: Michal Labedzki <michal.labedzki@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org development" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
----
- android/hal-audio.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 00dde49..c145533 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -1732,12 +1732,12 @@ static struct hw_module_methods_t hal_module_methods = {
- 
- struct audio_module HAL_MODULE_INFO_SYM = {
- 	.common = {
--	.tag = HARDWARE_MODULE_TAG,
--	.version_major = 1,
--	.version_minor = 0,
--	.id = AUDIO_HARDWARE_MODULE_ID,
--	.name = "A2DP Bluez HW HAL",
--	.author = "Intel Corporation",
--	.methods = &hal_module_methods,
-+		.tag = HARDWARE_MODULE_TAG,
-+		.version_major = 1,
-+		.version_minor = 0,
-+		.id = AUDIO_HARDWARE_MODULE_ID,
-+		.name = "A2DP Bluez HW HAL",
-+		.author = "Intel Corporation",
-+		.methods = &hal_module_methods,
- 	},
- };
--- 
-1.8.3.2
-
+So what external application should do? Add own copy of headers to
+sources or try use BlueZ copy of headers. I think that first option is
+better, because build dependency with BlueZ does not make
+implementation kernel-safe. I think about user try to use one version
+of libpcap and try to change kernel to older (there can be old kernel
+API).
