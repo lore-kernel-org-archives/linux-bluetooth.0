@@ -1,129 +1,146 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add management command for Secure Connection Only Mode
-Date: Sat,  1 Feb 2014 09:19:57 -0800
-Message-Id: <1391275197-5060-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Bing Zhao <bzhao@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan
+	<gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Scott James
+ Remnant <keybuk@chromium.org>,
+        Avinash Patil <patila@marvell.com>,
+        Amitkumar
+ Karwar <akarwar@marvell.com>, Bing Zhao <bzhao@marvell.com>
+Subject: [PATCH] Bluetooth: btmrvl: indicate pscan scheduling instant in a debug event
+Date: Mon, 31 Mar 2014 14:41:44 -0700
+Message-ID: <1396302104-11582-1-git-send-email-bzhao@marvell.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With support for Secure Connections it is possible to switch the
-controller into a mode that is called Secure Connections Only. In
-this mode only security level 4 connections are allowed (with the
-exception of security level 0 approved services).
+A vendor specific command is sent to firmware during
+initialization to enable this feature. This command is for
+SD8897 only.
 
-This patch just introduces the management command and setting of the
-right internal flags to enable this mode. It does not yet enforce it.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
 ---
- net/bluetooth/mgmt.c | 41 ++++++++++++++++++++++++++++++-----------
- 1 file changed, 30 insertions(+), 11 deletions(-)
+ drivers/bluetooth/btmrvl_drv.h  |  1 +
+ drivers/bluetooth/btmrvl_main.c | 19 +++++++++++++++++++
+ drivers/bluetooth/btmrvl_sdio.c |  5 +++++
+ drivers/bluetooth/btmrvl_sdio.h |  2 ++
+ 4 files changed, 27 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8c94841072a8..ce7ef339b1c4 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4043,7 +4043,7 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index 199ff49..16d136f 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -89,6 +89,7 @@ struct btmrvl_private {
+ #define MRVL_VENDOR_PKT			0xFE
+ 
+ /* Vendor specific Bluetooth commands */
++#define BT_CMD_PSCAN_WIN_REPORT_ENABLE	0xFC03
+ #define BT_CMD_AUTO_SLEEP_MODE		0xFC23
+ #define BT_CMD_HOST_SLEEP_CONFIG	0xFC59
+ #define BT_CMD_HOST_SLEEP_ENABLE	0xFC5A
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index 5c0b944..4f05e39 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -214,6 +214,23 @@ int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd)
+ }
+ EXPORT_SYMBOL_GPL(btmrvl_send_module_cfg_cmd);
+ 
++int btmrvl_pscan_window_reporting(struct btmrvl_private *priv, u8 subcmd)
++{
++	struct btmrvl_sdio_card *card = priv->btmrvl_dev.card;
++	int ret;
++
++	if (!card->support_pscan_win_report)
++		return 0;
++
++	ret = btmrvl_send_sync_cmd(priv, BT_CMD_PSCAN_WIN_REPORT_ENABLE,
++				   &subcmd, 1);
++	if (ret)
++		BT_ERR("PSCAN_WIN_REPORT_ENABLE command failed: %#x", ret);
++
++	return ret;
++}
++EXPORT_SYMBOL_GPL(btmrvl_pscan_window_reporting);
++
+ int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv)
  {
- 	struct mgmt_mode *cp = data;
- 	struct pending_cmd *cmd;
--	u8 status;
-+	u8 val, status;
- 	int err;
+ 	int ret;
+@@ -489,6 +506,8 @@ static int btmrvl_setup(struct hci_dev *hdev)
  
- 	BT_DBG("request for %s", hdev->name);
-@@ -4058,7 +4058,7 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
- 				  MGMT_STATUS_NOT_SUPPORTED);
+ 	btmrvl_cal_data_dt(priv);
  
--	if (cp->val != 0x00 && cp->val != 0x01)
-+	if (cp->val != 0x00 && cp->val != 0x01 && cp->val != 0x02)
- 		return cmd_status(sk, hdev->id, MGMT_OP_SET_SECURE_CONN,
- 				  MGMT_STATUS_INVALID_PARAMS);
- 
-@@ -4067,12 +4067,18 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
- 	if (!hdev_is_powered(hdev)) {
- 		bool changed;
- 
--		if (cp->val)
-+		if (cp->val) {
- 			changed = !test_and_set_bit(HCI_SC_ENABLED,
- 						    &hdev->dev_flags);
--		else
-+			if (cp->val == 0x02)
-+				set_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+			else
-+				clear_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+		} else {
- 			changed = test_and_clear_bit(HCI_SC_ENABLED,
- 						     &hdev->dev_flags);
-+			clear_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+		}
- 
- 		err = send_settings_rsp(sk, MGMT_OP_SET_SECURE_CONN, hdev);
- 		if (err < 0)
-@@ -4090,7 +4096,10 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
- 	}
- 
--	if (!!cp->val == test_bit(HCI_SC_ENABLED, &hdev->dev_flags)) {
-+	val = !!cp->val;
++	btmrvl_pscan_window_reporting(priv, 0x01);
 +
-+	if (val == test_bit(HCI_SC_ENABLED, &hdev->dev_flags) &&
-+	    (cp->val == 0x02) == test_bit(HCI_SC_ONLY, &hdev->dev_flags)) {
- 		err = send_settings_rsp(sk, MGMT_OP_SET_SECURE_CONN, hdev);
- 		goto failed;
+ 	priv->btmrvl_dev.psmode = 1;
+ 	btmrvl_enable_ps(priv);
+ 
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sdio.c
+index 9dedca5..efff064 100644
+--- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -108,6 +108,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8688 = {
+ 	.helper		= "mrvl/sd8688_helper.bin",
+ 	.firmware	= "mrvl/sd8688.bin",
+ 	.reg		= &btmrvl_reg_8688,
++	.support_pscan_win_report = false,
+ 	.sd_blksz_fw_dl	= 64,
+ };
+ 
+@@ -115,6 +116,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8787 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8787_uapsta.bin",
+ 	.reg		= &btmrvl_reg_87xx,
++	.support_pscan_win_report = false,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+ 
+@@ -122,6 +124,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8797 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8797_uapsta.bin",
+ 	.reg		= &btmrvl_reg_87xx,
++	.support_pscan_win_report = false,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+ 
+@@ -129,6 +132,7 @@ static const struct btmrvl_sdio_device btmrvl_sdio_sd8897 = {
+ 	.helper		= NULL,
+ 	.firmware	= "mrvl/sd8897_uapsta.bin",
+ 	.reg		= &btmrvl_reg_88xx,
++	.support_pscan_win_report = true,
+ 	.sd_blksz_fw_dl	= 256,
+ };
+ 
+@@ -1067,6 +1071,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
+ 		card->firmware = data->firmware;
+ 		card->reg = data->reg;
+ 		card->sd_blksz_fw_dl = data->sd_blksz_fw_dl;
++		card->support_pscan_win_report = data->support_pscan_win_report;
  	}
-@@ -4101,12 +4110,17 @@ static int set_secure_conn(struct sock *sk, struct hci_dev *hdev,
- 		goto failed;
- 	}
  
--	err = hci_send_cmd(hdev, HCI_OP_WRITE_SC_SUPPORT, 1, &cp->val);
-+	err = hci_send_cmd(hdev, HCI_OP_WRITE_SC_SUPPORT, 1, &val);
- 	if (err < 0) {
- 		mgmt_pending_remove(cmd);
- 		goto failed;
- 	}
+ 	if (btmrvl_sdio_register_dev(card) < 0) {
+diff --git a/drivers/bluetooth/btmrvl_sdio.h b/drivers/bluetooth/btmrvl_sdio.h
+index d4dd3b0..453559f 100644
+--- a/drivers/bluetooth/btmrvl_sdio.h
++++ b/drivers/bluetooth/btmrvl_sdio.h
+@@ -89,6 +89,7 @@ struct btmrvl_sdio_card {
+ 	const char *helper;
+ 	const char *firmware;
+ 	const struct btmrvl_sdio_card_reg *reg;
++	bool support_pscan_win_report;
+ 	u16 sd_blksz_fw_dl;
+ 	u8 rx_unit;
+ 	struct btmrvl_private *priv;
+@@ -98,6 +99,7 @@ struct btmrvl_sdio_device {
+ 	const char *helper;
+ 	const char *firmware;
+ 	const struct btmrvl_sdio_card_reg *reg;
++	const bool support_pscan_win_report;
+ 	u16 sd_blksz_fw_dl;
+ };
  
-+	if (cp->val == 0x02)
-+		set_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+	else
-+		clear_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+
- failed:
- 	hci_dev_unlock(hdev);
- 	return err;
-@@ -5063,19 +5077,24 @@ void mgmt_sc_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
- 	if (status) {
- 		u8 mgmt_err = mgmt_status(status);
- 
--		if (enable && test_and_clear_bit(HCI_SC_ENABLED,
--						 &hdev->dev_flags))
--			new_settings(hdev, NULL);
-+		if (enable) {
-+			if (test_and_clear_bit(HCI_SC_ENABLED,
-+					       &hdev->dev_flags))
-+				new_settings(hdev, NULL);
-+			clear_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+		}
- 
- 		mgmt_pending_foreach(MGMT_OP_SET_SECURE_CONN, hdev,
- 				     cmd_status_rsp, &mgmt_err);
- 		return;
- 	}
- 
--	if (enable)
-+	if (enable) {
- 		changed = !test_and_set_bit(HCI_SC_ENABLED, &hdev->dev_flags);
--	else
-+	} else {
- 		changed = test_and_clear_bit(HCI_SC_ENABLED, &hdev->dev_flags);
-+		clear_bit(HCI_SC_ONLY, &hdev->dev_flags);
-+	}
- 
- 	mgmt_pending_foreach(MGMT_OP_SET_SECURE_CONN, hdev,
- 			     settings_rsp, &match);
 -- 
-1.8.5.3
-
+1.8.0
