@@ -1,105 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1396353771-10434-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1396353771-10434-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 1 Apr 2014 14:07:07 -0300
+Message-ID: <CAKT1EBfAPYDwbC4A1KWhf9=fV2=oLA9EzAEJtq1PJUweaOC5aw@mail.gmail.com>
+Subject: Re: [PATCH] gatt: replace GList with struct queue
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Subject: [PATCH BlueZ v0] attrib: Improve Attribute Data length checking
-Date: Tue,  1 Apr 2014 14:33:30 -0300
-Message-Id: <1396373610-28223-1-git-send-email-claudio.takahasi@openbossa.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to Core SPEC, attribute data list must be grouped in elements
-of the same size.
----
- attrib/gatt.c | 40 +++++++++++++++++-----------------------
- 1 file changed, 17 insertions(+), 23 deletions(-)
+Hi Marcin/Johan,
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 5ae20f4..49cd1a3 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -254,6 +254,16 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 		goto done;
- 	}
- 
-+	if (list->len == 6)
-+		type = BT_UUID16;
-+	else if (list->len == 20)
-+		type = BT_UUID128;
-+	else {
-+		att_data_list_free(list);
-+		err = ATT_ECODE_INVALID_PDU;
-+		goto done;
-+	}
-+
- 	for (i = 0, end = 0; i < list->num; i++) {
- 		const uint8_t *data = list->data[i];
- 		struct gatt_primary *primary;
-@@ -262,19 +272,6 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 		start = get_le16(&data[0]);
- 		end = get_le16(&data[2]);
- 
--		/*
--		 * FIXME: Check before "for". Elements in the Attribute
--		 * Data List have the same length (list->len).
--		 */
--		if (list->len == 6)
--			type = BT_UUID16;
--		else if (list->len == 20)
--			type = BT_UUID128;
--		else {
--			/* Skipping invalid data */
--			continue;
--		}
--
- 		get_uuid128(type, &data[4], &uuid128);
- 
- 		primary = g_try_new0(struct gatt_primary, 1);
-@@ -507,6 +504,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 	struct att_data_list *list;
- 	unsigned int i, err = ATT_ECODE_ATTR_NOT_FOUND;
- 	uint16_t last = 0;
-+	uint8_t type;
- 
- 	if (status) {
- 		err = status;
-@@ -519,23 +517,18 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 		goto done;
- 	}
- 
-+	if (list->len == 7)
-+		type = BT_UUID16;
-+	else
-+		type = BT_UUID128;
-+
- 	for (i = 0; i < list->num; i++) {
- 		uint8_t *value = list->data[i];
- 		struct gatt_char *chars;
- 		bt_uuid_t uuid128;
--		uint8_t type;
- 
- 		last = get_le16(value);
- 
--		/*
--		 * FIXME: Check before "for". Elements in the Attribute
--		 * Data List have the same length (list->len).
--		 */
--		if (list->len == 7)
--			type = BT_UUID16;
--		else
--			type = BT_UUID128;
--
- 		get_uuid128(type, &value[5], &uuid128);
- 
- 		if (dc->uuid && bt_uuid_cmp(dc->uuid, &uuid128))
-@@ -543,6 +536,7 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 
- 		chars = g_try_new0(struct gatt_char, 1);
- 		if (!chars) {
-+			att_data_list_free(list);
- 			err = ATT_ECODE_INSUFF_RESOURCES;
- 			goto done;
- 		}
--- 
-1.8.3.1
+On Tue, Apr 1, 2014 at 9:02 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> Store local attributes in queue instead of GList, which depends on Glib.
+> ---
+>  src/gatt.c | 22 +++++++++++++---------
+>  1 file changed, 13 insertions(+), 9 deletions(-)
+>
+> diff --git a/src/gatt.c b/src/gatt.c
+> index f07effa..018ca27 100644
+> --- a/src/gatt.c
+> +++ b/src/gatt.c
+> @@ -31,6 +31,7 @@
+>  #include "lib/uuid.h"
+>  #include "attrib/att.h"
+>  #include "src/shared/util.h"
+> +#include "src/shared/queue.h"
+>
+>  #include "gatt-dbus.h"
+>  #include "gatt.h"
+> @@ -51,7 +52,7 @@ struct btd_attribute {
+>         uint8_t value[0];
+>  };
+>
+> -static GList *local_attribute_db;
+> +static struct queue *local_attribute_db;
+>  static uint16_t next_handle = 0x0001;
+>
+>  static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
+> @@ -104,13 +105,11 @@ static struct btd_attribute *new_attribute(const bt_uuid_t *type,
+>         return attr;
+>  }
+>
+> -static int local_database_add(uint16_t handle, struct btd_attribute *attr)
+> +static bool local_database_add(uint16_t handle, struct btd_attribute *attr)
+>  {
+>         attr->handle = handle;
+>
+> -       local_attribute_db = g_list_append(local_attribute_db, attr);
+> -
+> -       return 0;
+> +       return queue_push_tail(local_attribute_db, attr);
+>  }
+>
+>  struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+> @@ -138,7 +137,7 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+>         if (!attr)
+>                 return NULL;
+>
+> -       if (local_database_add(next_handle, attr) < 0) {
+> +       if (!local_database_add(next_handle, attr)) {
+>                 free(attr);
+>                 return NULL;
+>         }
+> @@ -191,7 +190,7 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+>         if (!char_value)
+>                 goto fail;
+>
+> -       if (local_database_add(next_handle, char_decl) < 0)
+> +       if (!local_database_add(next_handle, char_decl))
+>                 goto fail;
+>
+>         next_handle = next_handle + 1;
+> @@ -209,7 +208,7 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+>          * implementation (external entity).
+>          */
+>
+> -       if (local_database_add(next_handle, char_value) < 0)
+> +       if (!local_database_add(next_handle, char_value))
+>                 /* TODO: remove declaration */
+>                 goto fail;
+>
+> @@ -253,7 +252,7 @@ struct btd_attribute *btd_gatt_add_char_desc(const bt_uuid_t *uuid,
+>         if (!attr)
+>                 return NULL;
+>
+> -       if (local_database_add(next_handle, attr) < 0) {
+> +       if (!local_database_add(next_handle, attr)) {
+>                 free(attr);
+>                 return NULL;
+>         }
+> @@ -267,6 +266,8 @@ void gatt_init(void)
+>  {
+>         DBG("Starting GATT server");
+>
+> +       local_attribute_db = queue_new();
 
+It is missing to check the returned value, allocation may fail.
+
+I agree with this change if we extend the queue API implementing
+functions to iterate through the elements.
+
+In some cases it is more convenient to access elements directly
+instead of using queue_foreach, callbacks and user_data. One example
+applied to GATT/ATT is Read by Group Type Request (discover all
+primary service) which needs to access all service declarations
+(static attributes).
+
+Regards,
+Claudio
