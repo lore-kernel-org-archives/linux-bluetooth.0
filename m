@@ -1,25 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Apr 2014 17:09:57 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] tools/btmgmt: Print AD flags for LE devices
-Message-ID: <20140401140957.GA5694@t440s.P-661HNU-F1>
-References: <1396358985-16211-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCH v2 1/3] android/gatt: Remove redundant hal cmd check
+Date: Tue, 01 Apr 2014 15:56:49 +0200
+Message-ID: <26858286.n3DPGo1T2v@uw000953>
+In-Reply-To: <1396356869-21053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396356869-21053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1396358985-16211-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Grzegorz,
 
-On Tue, Apr 01, 2014, Szymon Janc wrote:
-> This is usefull for GAP qualification tests.
+On Tuesday 01 of April 2014 14:54:27 Grzegorz Kolodziejczyk wrote:
+> This removes redundant hal cmd check (is received in cmd UUID == NULL).
 > ---
->  tools/btmgmt.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+>  android/gatt.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 941582a..ee77a4e 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -350,12 +350,6 @@ static void handle_client_register(const void *buf, uint16_t len)
+>  
+>  	DBG("");
+>  
+> -	if (!cmd->uuid) {
+> -		error("gatt: no uuid received");
+> -		status = HAL_STATUS_FAILED;
+> -		goto failed;
+> -	}
+> -
+>  	if (queue_find(gatt_clients, match_client_by_uuid, &cmd->uuid)) {
+>  		error("gatt: client uuid is already on list");
+>  		status = HAL_STATUS_FAILED;
+> 
 
-Applied. Thanks.
+All patches pushed (with some fixes applied), thanks.
 
-Johan
+-- 
+Best regards, 
+Szymon Janc
