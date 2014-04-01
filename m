@@ -1,44 +1,117 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Tue, 1 Apr 2014 16:28:21 -0700
-Message-ID: <CAHZ1yCkNddT6MxBkRz0dNdXGn+MWZECK1L6XTaouRLLkECH5eg@mail.gmail.com>
-Subject: BUG: l2cap and rfcomm bind with 0 psm or channel no longer allocate
-From: Scott James Remnant <keybuk@google.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Gordon <kernel@gkr.i24.cc>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH v3] hid2hci add CSR 8510 A10 support
+Date: Tue,  1 Apr 2014 23:38:59 +0200
+Message-Id: <1396388339-4808-1-git-send-email-kernel@gkr.i24.cc>
+In-Reply-To: <CAJdJm_OWizW0sgvCFAbHBJ=moTggS5d2S5PnKU4Zc3qGPM6nrQ@mail.gmail.com>
+References: <CAJdJm_OWizW0sgvCFAbHBJ=moTggS5d2S5PnKU4Zc3qGPM6nrQ@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Seems to have occurred between 3.10.18 and bluetooth-next/for-upstream
+add a new method "csr2" to hid2hci that sends a control message
+to the usb device which switches the Cambridge Silicon Radio 8510 A10
+as used in Sitecom CNT-524
 
-Given:
+fixes: https://bugzilla.kernel.org/show_bug.cgi?id=69181
+---
 
->>> import dbus
->>> bus = dbus.SystemBus()
->>> bluez = bus.get_object('org.bluez', '/org/bluez')
->>> bluez.RegisterProfile('/profile1', '00002401-0000-1000-8000-00805f9b34fb', { 'Name': 'Test RFCOMM Service', 'Channel': dbus.UInt16(0) }, dbus_interface='org.bluez.ProfileManager1')
->>> bluez.RegisterProfile('/profile2', '00002402-0000-1000-8000-00805f9b34fb', { 'Name': 'Test RFCOMM Service', 'Channel': dbus.UInt16(0) }, dbus_interface='org.bluez.ProfileManager1')
+Notes:
+    3rd version, coding style corrections from Johan Hedberg and Anderson Lizardo
 
-The resulting SDP is:
+ tools/hid2hci.1 |  2 +-
+ tools/hid2hci.c | 51 ++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 51 insertions(+), 2 deletions(-)
 
-Service Name: Test RFCOMM Service
-Service RecHandle: 0x10006
-Service Class ID List:
-  UUID 128: 00002401-0000-1000-8000-00805f9b34fb
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 0
-
-Service Name: Test RFCOMM Service
-Service RecHandle: 0x10007
-Service Class ID List:
-  UUID 128: 00002402-0000-1000-8000-00805f9b34fb
-Protocol Descriptor List:
-  "L2CAP" (0x0100)
-  "RFCOMM" (0x0003)
-    Channel: 0
-
-Scott
+diff --git a/tools/hid2hci.1 b/tools/hid2hci.1
+index 8c5d520..c6876a3 100644
+--- a/tools/hid2hci.1
++++ b/tools/hid2hci.1
+@@ -32,7 +32,7 @@ mode and back.
+ .B --mode= [hid, hci]
+ Sets the mode to switch the device into
+ .TP
+-.B --method= [csr, logitech-hid, dell]
++.B --method= [csr, csr2, logitech-hid, dell]
+ Which vendor method to use for switching the device.
+ .TP
+ .B --devpath=
+diff --git a/tools/hid2hci.c b/tools/hid2hci.c
+index 2dbfca7..a83bace 100644
+--- a/tools/hid2hci.c
++++ b/tools/hid2hci.c
+@@ -119,6 +119,52 @@ static int usb_switch_csr(int fd, enum mode mode)
+ 	return err;
+ }
+ 
++static int usb_switch_csr2(int fd, enum mode mode)
++{
++	int err;
++	struct usbfs_disconnect disconnect;
++	uint8_t report[] = {
++		0x01, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++	};
++
++	switch (mode) {
++	case HCI:
++		/* send report as is */
++		disconnect.interface = 0;
++		disconnect.flags = USBFS_DISCONNECT_EXCEPT_DRIVER;
++		strcpy(disconnect.driver, "usbfs");
++
++		if (ioctl(fd, USBFS_IOCTL_DISCONNECT, &disconnect) < 0) {
++			fprintf(stderr, "Can't claim interface: %s (%d)\n",
++				strerror(errno), errno);
++			return -1;
++		}
++
++		/* Set_report request with 
++		 * report id: 0x01, report type: feature (0x03) 
++		 * on interface 0
++		 */
++		err = control_message(fd,
++				      USB_ENDPOINT_OUT | USB_TYPE_CLASS |
++				      USB_RECIP_INTERFACE,
++				      USB_REQ_SET_CONFIGURATION,
++				      0x01 | (0x03 << 8),
++				      0, report, sizeof(report), 5000);
++		/* unable to detect whether the previous state 
++		 * already was HCI (EALREADY)  
++		 */
++		break;
++	case HID:
++		/* currently unknown how to switch to HID */
++		fprintf(stderr,
++			"csr2: Switching to hid mode is not implemented\n");
++		err = -1;
++		break;
++	}
++
++	return err;
++}
++
+ static int hid_logitech_send_report(int fd, const char *buf, size_t size)
+ {
+ 	struct hiddev_report_info rinfo;
+@@ -258,7 +304,7 @@ static void usage(const char *error)
+ 	printf("Usage: hid2hci [options]\n"
+ 		"  --mode=       mode to switch to [hid|hci] (default hci)\n"
+ 		"  --devpath=    sys device path\n"
+-		"  --method=     method to use to switch [csr|logitech-hid|dell]\n"
++		"  --method=     method to use to switch [csr|csr2|logitech-hid|dell]\n"
+ 		"  --help\n\n");
+ }
+ 
+@@ -311,6 +357,9 @@ int main(int argc, char *argv[])
+ 			if (!strcmp(optarg, "csr")) {
+ 				method = METHOD_CSR;
+ 				usb_switch = usb_switch_csr;
++			} else if (!strcmp(optarg, "csr2")) {
++				method = METHOD_CSR;
++				usb_switch = usb_switch_csr2;
+ 			} else if (!strcmp(optarg, "logitech-hid")) {
+ 				method = METHOD_LOGITECH_HID;
+ 			} else if (!strcmp(optarg, "dell")) {
 -- 
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+1.8.3.2
+
