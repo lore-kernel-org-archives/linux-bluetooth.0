@@ -1,155 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] android/gatt: Handle register gatt server command
-Date: Tue,  1 Apr 2014 14:54:28 +0200
-Message-Id: <1396356869-21053-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1396356869-21053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1396356869-21053-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH] gatt: replace GList with struct queue
+Date: Tue,  1 Apr 2014 14:02:51 +0200
+Message-Id: <1396353771-10434-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds register gatt server command handling.
+Store local attributes in queue instead of GList, which depends on Glib.
 ---
- android/gatt.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 75 insertions(+), 2 deletions(-)
+ src/gatt.c | 22 +++++++++++++---------
+ 1 file changed, 13 insertions(+), 9 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index ee77a4e..fb4d9d1 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -57,6 +57,11 @@ struct gatt_client {
- 	struct queue *notifications;
+diff --git a/src/gatt.c b/src/gatt.c
+index f07effa..018ca27 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -31,6 +31,7 @@
+ #include "lib/uuid.h"
+ #include "attrib/att.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
+ 
+ #include "gatt-dbus.h"
+ #include "gatt.h"
+@@ -51,7 +52,7 @@ struct btd_attribute {
+ 	uint8_t value[0];
  };
  
-+struct gatt_server {
-+	int32_t id;
-+	uint8_t uuid[16];
-+};
-+
- struct element_id {
- 	bt_uuid_t uuid;
- 	uint8_t instance;
-@@ -105,6 +110,7 @@ static bdaddr_t adapter_addr;
- static bool scanning = false;
+-static GList *local_attribute_db;
++static struct queue *local_attribute_db;
+ static uint16_t next_handle = 0x0001;
  
- static struct queue *gatt_clients = NULL;
-+static struct queue *gatt_servers = NULL;
- static struct queue *conn_list	= NULL;		/* Connected devices */
- static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
- 
-@@ -184,6 +190,14 @@ static bool match_client_by_uuid(const void *data, const void *user_data)
- 	return !memcmp(exp_uuid, client->uuid, sizeof(client->uuid));
+ static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
+@@ -104,13 +105,11 @@ static struct btd_attribute *new_attribute(const bt_uuid_t *type,
+ 	return attr;
  }
  
-+static bool match_server_by_uuid(const void *data, const void *user_data)
-+{
-+	const uint8_t *exp_uuid = user_data;
-+	const struct gatt_server *server = data;
-+
-+	return !memcmp(exp_uuid, server->uuid, sizeof(server->uuid));
-+}
-+
- static bool match_client_by_id(const void *data, const void *user_data)
+-static int local_database_add(uint16_t handle, struct btd_attribute *attr)
++static bool local_database_add(uint16_t handle, struct btd_attribute *attr)
  {
- 	int32_t exp_id = PTR_TO_INT(user_data);
-@@ -340,6 +354,13 @@ static void destroy_gatt_client(void *data)
- 	free(client);
+ 	attr->handle = handle;
+ 
+-	local_attribute_db = g_list_append(local_attribute_db, attr);
+-
+-	return 0;
++	return queue_push_tail(local_attribute_db, attr);
  }
  
-+static void destroy_gatt_server(void *data)
-+{
-+	struct gatt_server *server = data;
-+
-+	free(server);
-+}
-+
- static void handle_client_register(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_register *cmd = buf;
-@@ -1874,10 +1895,55 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+@@ -138,7 +137,7 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	if (!attr)
+ 		return NULL;
  
- static void handle_server_register(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_server_register *cmd = buf;
-+	struct hal_ev_gatt_server_register ev;
-+	struct gatt_server *server;
-+	static int32_t server_cnt = 1;
-+	uint32_t status;
-+
- 	DBG("");
+-	if (local_database_add(next_handle, attr) < 0) {
++	if (!local_database_add(next_handle, attr)) {
+ 		free(attr);
+ 		return NULL;
+ 	}
+@@ -191,7 +190,7 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+ 	if (!char_value)
+ 		goto fail;
  
-+	memset(&ev, 0, sizeof(ev));
+-	if (local_database_add(next_handle, char_decl) < 0)
++	if (!local_database_add(next_handle, char_decl))
+ 		goto fail;
+ 
+ 	next_handle = next_handle + 1;
+@@ -209,7 +208,7 @@ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+ 	 * implementation (external entity).
+ 	 */
+ 
+-	if (local_database_add(next_handle, char_value) < 0)
++	if (!local_database_add(next_handle, char_value))
+ 		/* TODO: remove declaration */
+ 		goto fail;
+ 
+@@ -253,7 +252,7 @@ struct btd_attribute *btd_gatt_add_char_desc(const bt_uuid_t *uuid,
+ 	if (!attr)
+ 		return NULL;
+ 
+-	if (local_database_add(next_handle, attr) < 0) {
++	if (!local_database_add(next_handle, attr)) {
+ 		free(attr);
+ 		return NULL;
+ 	}
+@@ -267,6 +266,8 @@ void gatt_init(void)
+ {
+ 	DBG("Starting GATT server");
+ 
++	local_attribute_db = queue_new();
 +
-+	if (queue_find(gatt_servers, match_server_by_uuid, &cmd->uuid)) {
-+		error("gatt: Server uuid is already on list");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	server = new0(struct gatt_server, 1);
-+	if (!server) {
-+		error("gatt: Cannot allocate memory for registering server");
-+		status = HAL_STATUS_NOMEM;
-+		goto failed;
-+	}
-+
-+	memcpy(server->uuid, cmd->uuid, sizeof(server->uuid));
-+
-+	server->id = server_cnt++;
-+
-+	if (!queue_push_head(gatt_servers, server)) {
-+		error("gatt: Cannot push server on the list");
-+		free(server);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	ev.status = GATT_SUCCESS;
-+	ev.server_if = server->id;
-+	memcpy(ev.uuid, server->uuid, sizeof(server->uuid));
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
-+	if (status != HAL_STATUS_SUCCESS)
-+		ev.status = GATT_FAILURE;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+				HAL_EV_GATT_SERVER_REGISTER, sizeof(ev), &ev);
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_REGISTER,
--							HAL_STATUS_FAILED);
-+									status);
+ 	gatt_dbus_manager_register();
  }
  
- static void handle_server_unregister(const void *buf, uint16_t len)
-@@ -2092,10 +2158,14 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	conn_list = queue_new();
- 	conn_wait_queue = queue_new();
- 	gatt_clients = queue_new();
-+	gatt_servers = queue_new();
+@@ -274,5 +275,8 @@ void gatt_cleanup(void)
+ {
+ 	DBG("Stopping GATT server");
  
--	if (!conn_list || !conn_wait_queue || !gatt_clients) {
-+	if (!conn_list || !conn_wait_queue || !gatt_clients !gatt_servers) {
- 		error("gatt: Failed to allocate memory for queues");
- 
-+		queue_destroy(gatt_servers, NULL);
-+		gatt_servers = NULL;
++	queue_destroy(local_attribute_db, free);
++	local_attribute_db = NULL;
 +
- 		queue_destroy(gatt_clients, NULL);
- 		gatt_clients = NULL;
- 
-@@ -2125,6 +2195,9 @@ void bt_gatt_unregister(void)
- 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_GATT);
- 	hal_ipc = NULL;
- 
-+	queue_destroy(gatt_servers, destroy_gatt_server);
-+	gatt_servers = NULL;
-+
- 	queue_destroy(gatt_clients, destroy_gatt_client);
- 	gatt_clients = NULL;
- 
+ 	gatt_dbus_manager_unregister();
+ }
 -- 
-1.9.1
+1.8.5.3
 
