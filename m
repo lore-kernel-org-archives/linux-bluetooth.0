@@ -1,82 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/3] android/gatt: Move element_id creation helpers up
-Date: Tue, 01 Apr 2014 13:49:37 +0200
-Message-ID: <1752823.r1c4TL7u1F@uw000953>
-In-Reply-To: <1396339404-14418-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1396339404-14418-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/gatt: Handle unregister gatt server command
+Date: Tue,  1 Apr 2014 12:13:59 +0200
+Message-Id: <1396347239-944-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1396347239-944-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396347239-944-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ho Jakub,
+This adds unregister gatt server app command handling.
+---
+ android/gatt.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-On Tuesday 01 of April 2014 10:03:22 Jakub Tyszkowski wrote:
-> This helpers should be in one place, in file's upper part.
-> ---
->  android/gatt.c | 28 ++++++++++++++--------------
->  1 file changed, 14 insertions(+), 14 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 61746b1..39195f0 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -135,6 +135,20 @@ static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
->  		uuid[15 - i] = src->value.u128.data[i];
->  }
->  
-> +static void hal_srvc_id_to_element_id(const struct hal_gatt_srvc_id *from,
-> +							struct element_id *to)
-> +{
-> +	to->instance = from->inst_id;
-> +	android2uuid(from->uuid, &to->uuid);
-> +}
-> +
-> +static void hal_gatt_id_to_element_id(const struct hal_gatt_gatt_id *from,
-> +							struct element_id *to)
-> +{
-> +	to->instance = from->inst_id;
-> +	android2uuid(from->uuid, &to->uuid);
-> +}
-> +
->  static void destroy_service(void *data)
->  {
->  	struct service *srvc = data;
-> @@ -256,13 +270,6 @@ static bool match_char_by_element_id(const void *data, const void *user_data)
->  	return false;
->  }
->  
-> -static void hal_gatt_id_to_element_id(const struct hal_gatt_gatt_id *from,
-> -							struct element_id *to)
-> -{
-> -	to->instance = from->inst_id;
-> -	android2uuid(from->uuid, &to->uuid);
-> -}
-> -
->  static void destroy_notification(void *data)
->  {
->  	struct notification_data *notification = data;
-> @@ -1268,13 +1275,6 @@ static void discover_char_cb(uint8_t status, GSList *characteristics,
->  	free(data);
->  }
->  
-> -static void hal_srvc_id_to_element_id(const struct hal_gatt_srvc_id *from,
-> -							struct element_id *to)
-> -{
-> -	to->instance = from->inst_id;
-> -	android2uuid(from->uuid, &to->uuid);
-> -}
-> -
->  static bool find_service(int32_t conn_id, struct element_id *service_id,
->  				struct gatt_device **dev, struct service **srvc)
->  {
-> 
-
-All patches applied, thanks.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 5ca3fe7..0f99ab3 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -176,6 +176,14 @@ static bool match_client_by_id(const void *data, const void *user_data)
+ 	return client->id == exp_id;
+ }
+ 
++static bool match_server_by_id(const void *data, const void *user_data)
++{
++	int32_t exp_id = PTR_TO_INT(user_data);
++	const struct gatt_server *server = data;
++
++	return server->id == exp_id;
++}
++
+ static struct gatt_client *find_client_by_id(int32_t id)
+ {
+ 	return queue_find(gatt_clients, match_client_by_id, INT_TO_PTR(id));
+@@ -335,6 +343,13 @@ static void destroy_gatt_client(void *data)
+ 	free(client);
+ }
+ 
++static void destroy_gatt_server(void *data)
++{
++	struct gatt_server *server = data;
++
++	free(server);
++}
++
+ static void handle_client_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_register *cmd = buf;
+@@ -1956,10 +1971,26 @@ failed:
+ 
+ static void handle_server_unregister(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_server_unregister *cmd = buf;
++	uint8_t status;
++	struct gatt_server *server;
++
+ 	DBG("");
+ 
++	server = queue_remove_if(gatt_servers, match_server_by_id,
++						INT_TO_PTR(cmd->server_if));
++	if (!server) {
++		error("gatt: server_if=%d not found", cmd->server_if);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	destroy_gatt_server(server);
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_SERVER_UNREGISTER, HAL_STATUS_FAILED);
++					HAL_OP_GATT_SERVER_UNREGISTER, status);
+ }
+ 
+ static void handle_server_connect(const void *buf, uint16_t len)
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.2
+
