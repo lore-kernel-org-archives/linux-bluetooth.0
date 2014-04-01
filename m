@@ -1,27 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 0/5] Client descriptor operations
-Date: Tue,  1 Apr 2014 17:19:22 +0200
-Message-Id: <1396365567-17339-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: "Poulain, Loic" <loic.poulain@intel.com>
+To: "marcel@holtmann.org" <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH] Bluetooth: Remove hci_h4 unused defines
+Date: Tue, 1 Apr 2014 14:56:17 +0000
+Message-ID: <50C3158CF44D924791C15F1437EF2EC65D65E9@HASMSX104.ger.corp.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2 changes:
-	* Rebased on top of latest changes and cleanups.
-	* Function flow was redesigned to minimize label jumps.
+H4 states are not used anymore.
 
-Jakub Tyszkowski (5):
-  android/gatt: Add queue for characteristic descriptors caching
-  android/gatt: Handle get descriptor client command
-  android/gatt: Add descriptors sending and caching for client
-  android/gatt: Add client read descriptor handler
-  android/gatt: Add client write descriptor handler
+Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+---
+ drivers/bluetooth/hci_h4.c | 7 -------
+ 1 file changed, 7 deletions(-)
 
- android/gatt.c | 529 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 525 insertions(+), 4 deletions(-)
+diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+index 7048a58..66db9a8 100644
+--- a/drivers/bluetooth/hci_h4.c
++++ b/drivers/bluetooth/hci_h4.c
+@@ -55,13 +55,6 @@ struct h4_struct {
+ 	struct sk_buff_head txq;
+ };
+ =
 
---
-1.9.0
+-/* H4 receiver States */
+-#define H4_W4_PACKET_TYPE	0
+-#define H4_W4_EVENT_HDR		1
+-#define H4_W4_ACL_HDR		2
+-#define H4_W4_SCO_HDR		3
+-#define H4_W4_DATA		4
+-
+ /* Initialize protocol */
+ static int h4_open(struct hci_uart *hu)
+ {
+-- =
 
+1.8.3.2
+---------------------------------------------------------------------
+Intel Corporation SAS (French simplified joint stock company)
+Registered headquarters: "Les Montalets"- 2, rue de Paris, =
+
+92196 Meudon Cedex, France
+Registration Number:  302 456 199 R.C.S. NANTERRE
+Capital: 4,572,000 Euros
+
+This e-mail and any attachments may contain confidential material for
+the sole use of the intended recipient(s). Any review or distribution
+by others is strictly prohibited. If you are not the intended
+recipient, please contact the sender and delete all copies.
