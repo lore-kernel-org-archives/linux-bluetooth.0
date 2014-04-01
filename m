@@ -1,62 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Zheng, Wu" <wu.zheng@intel.com>
-To: "Hedberg, Johan" <johan.hedberg@intel.com>
-CC: "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-	"Xu, Martin" <martin.xu@intel.com>,
-	"Wu, JiangboX" <jiangbox.wu@intel.com>,
-	"'linux-bluetooth@vger.kernel.org'" <linux-bluetooth@vger.kernel.org>
-Subject: RE: Interface and the other properties is not provided when BT pan
- (NAP) is connected passively
-Date: Tue, 1 Apr 2014 08:37:05 +0000
-Message-ID: <2CF57A644018A745B8FE029C7223E16E1185B07C@SHSMSX104.ccr.corp.intel.com>
-References: <2CF57A644018A745B8FE029C7223E16E1185AD06@SHSMSX104.ccr.corp.intel.com>
- <20140401080109.GA18614@t440s.lan>
-In-Reply-To: <20140401080109.GA18614@t440s.lan>
-Content-Type: text/plain; charset="us-ascii"
+Date: Tue, 1 Apr 2014 11:30:36 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 1/2] android/hal-audio-hsp: Add audio HAL for HSP handling
+Message-ID: <20140401083034.GA13320@aemeltch-MOBL1>
+References: <1396266260-31712-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <C3ED99D0-24D1-4D9A-A99E-B5EA1E1D6E63@holtmann.org>
 MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <C3ED99D0-24D1-4D9A-A99E-B5EA1E1D6E63@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
->By "interface" I assume you mean "network interface"? (to avoid confusion e.g. with "D-Bus interface")
-Yes. "interface" is such as "bnep0", "bnep1" and so on.
-
->To my understanding that shouldn't be needed. You provide a bridge name when you call NetworkServer1.Register() and new connections are automatically added to that bridge. What else do you need?
-We want to get " network interface" such as "bnep0", "bnep1" and so on, not bridge name(such as "tether" and so on).
-
-Just like that the properties of "org.bluez.Network1" provides " network interface " such as "bnep0", "bnep1" after bnep connection successfully.
-
-Best Regards
-Zheng Wu
-
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Johan Hedberg
-Sent: Tuesday, April 1, 2014 4:01 PM
-To: Zheng, Wu
-Cc: Von Dentz, Luiz; Xu, Martin; Wu, JiangboX; linux-bluetooth@vger.kernel.org
-Subject: Re: Interface and the other properties is not provided when BT pan (NAP) is connected passively
-
-Hi Zheng Wu,
-
-On Tue, Apr 01, 2014, Zheng, Wu wrote:
-> We find that "org.bluez.NetworkServer1" doesn't provide any properties.
+On Mon, Mar 31, 2014 at 09:31:57AM -0700, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> Only "org.bluez.Network1" provides the related properties.
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > This adds audio HAL for handling SCO. Following needs to be added to
+> > audio_policy.conf:
+> > 
+> >  hsp {
+> >    outputs {
+> >      hsp {
+> >        ...
+> >        devices AUDIO_DEVICE_OUT_ALL_SCO
+> >        ...
+> >      }
+> >    }
 > 
-> It means that BT PANU or BT NAP connects with the other BT pan devices actively.
-> The related BT properties (such as interface) can be provided.
+> if we need modifications to /etc/audio_policy.conf, we should have this
+> part of android/README or some other documentation. I also wonder if
+> this not also needs an inputs { } section since HSP is actually
+> full-duplex.
 
-By "interface" I assume you mean "network interface"? (to avoid confusion e.g. with "D-Bus interface").
+Yes we need input section as well, this was just example, the complete
+sections would look like (copied from real device):
 
-> However, If BT NAP is connected passively, The related BT properties 
-> (such as interface) can't be provided.
+...
+  hsp {
+    outputs {
+      hsp {
+        sampling_rates 44100
+        channel_masks AUDIO_CHANNEL_OUT_STEREO
+        formats AUDIO_FORMAT_PCM_16_BIT
+        devices AUDIO_DEVICE_OUT_ALL_SCO
+      }
+    }
+    inputs {
+      hsp {
+        sampling_rates 44100
+        channel_masks AUDIO_CHANNEL_IN_MONO
+        formats AUDIO_FORMAT_PCM_16_BIT
+        devices AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET
+      }
+    }
+  }
+...
+
+> Also for the A2DP part, has something checked what happens if we provide
+> additional settings.
 > 
-> In TIZEN scene, the related BT properties (such as interface) is 
-> required when BT NAP is connected passively.
+>   a2dp {
+>     outputs {
+>       a2dp {
+>         sampling_rates 44100
+>         channel_masks AUDIO_CHANNEL_OUT_STEREO
+>         formats AUDIO_FORMAT_PCM_16_BIT
+>         devices AUDIO_DEVICE_OUT_ALL_A2DP
+>       }
+>     }
+>   }
 
-To my understanding that shouldn't be needed. You provide a bridge name when you call NetworkServer1.Register() and new connections are automatically added to that bridge. What else do you need?
+This looks like default configuration for Intel devices.
 
-Johan
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Best regards 
+Andrei Emeltchenko 
