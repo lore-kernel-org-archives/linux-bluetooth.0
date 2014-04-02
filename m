@@ -1,48 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 6/7] gatt: Fix possibly lost block when bluetoothd exits
-Date: Wed,  2 Apr 2014 15:30:25 -0300
-Message-Id: <1396463426-7268-7-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 5/7] gatt: Add removing service from the database
+Date: Wed,  2 Apr 2014 15:30:24 -0300
+Message-Id: <1396463426-7268-6-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes a possibly lost memory related to GDBusClient
-and GDBusProxy objects when bluetoothd daemon exits and there
-is registered external service.
-==1503==    by 0x47ECFB: g_dbus_client_new (client.c:1232)
-==1503==    by 0x461EC7: register_service (gatt-dbus.c:510)
+This patch removes the service declaration and its attributes when
+the external service implementation leaves the system bus, calls
+UnregisterService(), or RegisterService() fails.
 ---
- src/gatt-dbus.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ src/gatt-dbus.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
-index 17c3359..1a0e55e 100644
+index 3ded9cd..17c3359 100644
 --- a/src/gatt-dbus.c
 +++ b/src/gatt-dbus.c
-@@ -96,6 +96,11 @@ static gboolean external_service_destroy(void *user_data)
- 	return FALSE;
- }
+@@ -56,6 +56,7 @@ struct external_service {
+ 	DBusMessage *reg;
+ 	GDBusClient *client;
+ 	GSList *proxies;
++	struct btd_attribute *service;
+ };
  
-+static void external_service_free(void *user_data)
-+{
-+	external_service_destroy(user_data);
-+}
-+
- static void remove_service(DBusConnection *conn, void *user_data)
+ struct proxy_write_data {
+@@ -99,7 +100,8 @@ static void remove_service(DBusConnection *conn, void *user_data)
  {
  	struct external_service *esvc = user_data;
-@@ -622,6 +627,8 @@ void gatt_dbus_manager_unregister(void)
- 	g_hash_table_destroy(proxy_hash);
- 	proxy_hash = NULL;
  
-+	g_slist_free_full(external_services, external_service_free);
-+
- 	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
- 							GATT_MGR_IFACE);
+-	/* TODO: Remove from the database */
++	if (esvc->service)
++		btd_gatt_remove_service(esvc->service);
+ 
+ 	external_services = g_slist_remove(external_services, esvc);
+ 
+@@ -336,7 +338,7 @@ static void proxy_write_cb(struct btd_attribute *attr,
+ 
  }
+ 
+-static int register_external_service(const struct external_service *esvc,
++static int register_external_service(struct external_service *esvc,
+ 							GDBusProxy *proxy)
+ {
+ 	DBusMessageIter iter;
+@@ -360,7 +362,8 @@ static int register_external_service(const struct external_service *esvc,
+ 	if (bt_string_to_uuid(&uuid, str) < 0)
+ 		return -EINVAL;
+ 
+-	if (!btd_gatt_add_service(&uuid))
++	esvc->service = btd_gatt_add_service(&uuid);
++	if (!esvc->service)
+ 		return -EINVAL;
+ 
+ 	return 0;
+@@ -487,7 +490,8 @@ fail:
+ 	error("Could not register external service: %s", esvc->path);
+ 
+ 	reply = btd_error_invalid_args(esvc->reg);
+-	/* TODO: missing esvc/database cleanup */
++	if (esvc->service)
++		btd_gatt_remove_service(esvc->service);
+ 
+ reply:
+ 	dbus_message_unref(esvc->reg);
 -- 
 1.8.3.1
 
