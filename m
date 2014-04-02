@@ -1,75 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <533C8F3C.6090306@archlinux.org>
-Date: Thu, 03 Apr 2014 00:29:16 +0200
-From: =?ISO-8859-15?Q?Thomas_B=E4chler?= <thomas@archlinux.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>,
- linux-bluetooth@vger.kernel.org,
- "Linux-Kernel@Vger. Kernel. Org" <linux-kernel@vger.kernel.org>
-Subject: USB autosuspend causing trouble on Intel bluetooth (Linux 3.14)
-Content-Type: multipart/signed; micalg=pgp-sha1;
- protocol="application/pgp-signature";
- boundary="5iqIgv1kJHOiUX8DjMLmC58WfbLxCkcx9"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: Removing GAttrib.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25TeYWXMxQPqBGd9YnNWw+y5sYT+k4e-88hu_SRtFYWY+g@mail.gmail.com>
+Date: Wed, 2 Apr 2014 14:39:25 -0700
+Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <B767FC90-10FE-41A1-8607-90F8D3F18BD1@holtmann.org>
+References: <CAHrH25QBL52xfM4Qnk=NE1xn3RX2Bwxq_i0osDDCoi4egO2tkg@mail.gmail.com> <CAKT1EBfqP75+XJWkLt2yvkdEBVmNRmFC1_T667LAnuBrNFBxuQ@mail.gmail.com> <CAHrH25TeYWXMxQPqBGd9YnNWw+y5sYT+k4e-88hu_SRtFYWY+g@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---5iqIgv1kJHOiUX8DjMLmC58WfbLxCkcx9
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: quoted-printable
+Hi Arman,
 
-I am having trouble due to the following commit, which landed in 3.14:
+>> Remove GAttrib completely from the source will not be easy. You could
+>> try to restrict the usage of GAttrib to src/gatt.c
+>> Move discovery to src/gatt.c introduces another problem: probe
+>> profiles/services, reply properly for Pair() and ConnectProfiles(),
+>> helpers to access attributes of a given service, ...
+> 
+> My understanding of the ConnectProfile() D-Bus method was that it
+> pretty much only applies to BR/EDR. Even with GATT over BR/EDR I don't
+> know if this method makes sense as connecting to a specific remote
+> profile is not something you would do in LE. You would instead read
+> several GATT services and interact with all of them based on the
+> profile you're implementing. Maybe we can add D-Bus methods to
+> interact with specific GATT service UUIDs in the future but I don't
+> know if ConnectProfile fits into the overall BLE scheme, though please
+> correct me if I'm wrong.
 
-commit d2bee8fb6e18f6116aada39851918473761f7ab1
-Author: Tedd Ho-Jeong An <tedd.an@intel.com>
-Date:   Tue Nov 12 13:16:41 2013 -0800
+at the moment ConnectProfile() is BR/EDR specific and it most likely will stay way. So for LE only devices it should just return an error at the moment.
 
-    Bluetooth: Enable autosuspend for Intel Bluetooth device
+> As for the reply to pairing, I don't think much would change. The only
+> reason for moving discovery to src/gatt.c is to restrict usage of
+> GAttrib to src/gatt.c. In effect, what we would do is add a function,
+> e.g. btd_gatt_discover_primary, which would be, from the perspective
+> of src/device.c, a thin wrapper around gatt_discover_primary. Instead
+> of directly storing a list of gatt_primary, btd_device would now store
+> a list of btd_attribute (or handle) of its primary services. Initially
+> we would leave probing the way it is but we would have the profiles
+> use new functions in src/gatt to access characteristics and
+> descriptors, instead of using GAttrib directly.
+> 
+> As for the auto-connect case, whether or not we want to re-discover
+> all GATT services is something that I'm not sure about. We can always
+> think about this later, though.
 
-I have an Intel bluetooth dongle (8087:07dc) built into a Thinkpad. I
-primarily use it with my bluetooth mouse. Whenever I stop using the
-mouse for a few seconds, the mouse stops working. When I turn it off,
-the bluetooth applet on my desktop shows it as connected indefinitely. I
-can fix this situation by either of these actions:
-* restart bluetooth.service
-* disable+reenable bluetooth in the bluetooth applet
-* modprobe -r btusb && modprobe btusb
-The mouse then works again until I stop moving it for a short while.
+We want to use Service Changed notification and do a selective re-discover to avoid the extra overhead that a full discovery might cause. It does not have to be done in the beginning, but that is where this should be heading towards.
 
-The culprit is USB autosuspend. When I explicitly disable it (echo 'on'
-> power/control), the mouse works fine again. However, due to the
-aforementioned commit, I need to do this manually after every boot and
-every resume, because btusb keeps setting it back to 'auto'. I have
-found no way of overriding this behaviour.
+>> Probably, we will not be able to remote ATTIO immediately. ATTIO
+>> abstraction will be replaced by mgmt commands proposed by "[RFC] doc:
+>> Connection Parameters Command". Keep re-connections working with old
+>> kernels will be tricky.
+> 
+> Probably not. We can, however, try to at least remove the GAttrib
+> dependency from attio. With new discovery accessors in src/gatt, the
+> GAttrib pointer in attio_connect_cb would become unnecessary.
+> 
+>> My suggestion is start with small cleanups & improvements, as you
+>> probably noticed the code related to BLE & GATT is not easy to
+>> understand.
+>> 
+>> My understanding was GIOChannel usage is not encouraged anymore, we
+>> should use "struct io" instead. So, replace GIOChannel  by struct io
+>> could be a good starting point.
+>> (please confirm with Johan)
+> 
+> Afaict the primary piece of code concerning attribute discovery that
+> uses GIOChannel consists of the bt_io functions in btio/btio.*. If
+> Johan agrees, we could start by replacing GIOChannel with struct io in
+> btio/btio. Once we do this, we would make GAttrib use struct io
+> instead of GIOChannel as the initial step of the refactor. Let me know
+> if this is a good approach.
 
-Any advice or help is appreciated.
+When we are talking about ATT and struct io, I get the feeling we should not even involve btio at all. Especially for the LE only version we are running on L2CAP fixed channel.
+
+The attribute protocol should just run over a file descriptor. Whatever this file descriptor might be. Then the ATT handling needs to wrap this file descriptor into struct io. Similar to how I have done this for src/shared/mgmt.c.
+
+Some time back I started look into writing src/shared/att.c that really is suppose to be dead simple and just treats ATT protocol as a transport. This is how I see that basic interaction.
+
+	struct bt_att;
+
+	struct bt_att *bt_att_new(int fd);
+
+	struct bt_att *att_ref(struct bt_att *att);
+	void bt_att_unref(struct bt_att *att);
+
+	bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
+                                void *user_data, bt_att_destroy_func_t destroy);
+
+	bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close);
+
+For a lot of new code, I prefer if we are using file descriptors as base. Then it becomes easy to use on a socketpair for unit testing or put this onto a different transport.
+
+The GIOChannel and BtIO forces us to have knowledge about every single detail of transport. I think we did this the wrong way around. The actual IO handling should be done inside struct att and be an implementation detail. And it should just deal with the transport and not the setup of the transport. The setup is out of scope for the protocol handling.
+
+And I have been looking into similar things for src/shared/sdp.c along the same lines.
+
+	struct bt_sdp_server;
+
+	struct bt_sdp_server *bt_sdp_server_new(int fd, uint16_t mtu,
+                                                struct bt_sdp_db *db);
+
+	struct bt_sdp_server *bt_sdp_server_ref(struct bt_sdp_server *server);
+	void bt_sdp_server_unref(struct bt_sdp_server *server);
+
+	bool bt_sdp_server_set_debug(struct bt_sdp_server *server,
+                                bt_sdp_debug_func_t callback,
+                                void *user_data, bt_sdp_destroy_func_t destroy);
+
+	bool bt_sdp_server_set_search_attribute_support(struct bt_sdp_server *server,
+                                                                bool support);
+
+	bool bt_sdp_server_set_close_on_unref(struct bt_sdp_server *server,
+                                                        bool do_close);
+
+I think you get the idea.
+
 Regards
-Thomas B=E4chler
 
+Marcel
 
---5iqIgv1kJHOiUX8DjMLmC58WfbLxCkcx9
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-Comment: Using GnuPG with Thunderbird - http://www.enigmail.net/
-
-iQIcBAEBAgAGBQJTPI9CAAoJEChPw0yOSxolpaYP/inQQjMzH7jHukByOE0sFS97
-qXAyN4e4R+uPeWtfIrmgJUNYqlNSSnGEG2TJSxpdD4ZxjotJZQjkXGl9Y218L0N0
-dSIJLrNWLFnCIbeVJP/Eefovn/hnqIeS35h12ocqn8aUBL7HLu+JmrbgpIfCkmTr
-gkOnmIntdpdRZWJqNpyfEH6uFMpe+hPjpXx02e6LZrulMVVQvQvI+1IdCeAVChya
-SXNSdHD3PfpljPV4fziNldZRtBDINC8LTvBs1g66xH2BjSLeBFYbUXVWn8WTg1tO
-l93esE8tZpT7HYog+AjnH9p89BhMwqAEXsMRkpCHQfdY5fjT/X+NpfZDne/upYZm
-s59m3+DDu6Dav7rniiYzp2k3jNUp/xi7dl4wghyef5Jwd7u8yjyhiIQHysz0TO//
-tMUMg37/57jUJTDsnX55dw9P1SbDo7hzxb9ZG7vqM7PY69phCaQqSVNtQBAXHjm4
-ejyBuVfRfYZ9c6Q10VQFpcUacA5xN8nkXcdHMJxXpP7lJg7nLL4TmESjO1ay2JZb
-YdPRJLYXRRJd9IEC4k26wJZhCERcoifV9jknaRAYRF/dbQCq8vR/v/+iZmUojBd0
-GnvS6gZmCJra3OXC3bD5Kwt2EAtnT2GNkKrg4VBI6FppsoG731QRDIOiYWw1YORt
-8KHm1HKNWgdnSerYPG3B
-=bELs
------END PGP SIGNATURE-----
-
---5iqIgv1kJHOiUX8DjMLmC58WfbLxCkcx9--
