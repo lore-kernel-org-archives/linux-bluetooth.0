@@ -1,48 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <533C124A.7070606@openbossa.org>
-Date: Wed, 02 Apr 2014 10:36:10 -0300
-From: Andre Guedes <andre.guedes@openbossa.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Fix passing wrong event len in le dev found
+Date: Wed, 02 Apr 2014 14:51:48 +0200
+Message-ID: <9770534.ct3SkaySfx@uw000953>
+In-Reply-To: <1396438617-19549-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396438617-19549-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] doc: Connection Parameters Command
-References: <1395703047-5743-1-git-send-email-andre.guedes@openbossa.org> <20140328161549.GA16919@t440s.P-661HNU-F1>
-In-Reply-To: <20140328161549.GA16919@t440s.P-661HNU-F1>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Grzegorz,
 
-On 03/28/2014 01:15 PM, Johan Hedberg wrote:
-> Hi Andre,
->
-> On Mon, Mar 24, 2014, Andre Guedes wrote:
->> This patch introduces commands to add and remove connection parameters.
->> ---
->>   doc/mgmt-api.txt | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>   1 file changed, 83 insertions(+), 1 deletion(-)
->
-> All in all this looks pretty good to me. Just one thing I'd fix:
->
->> +Add Connection Parameters Command
->> +====================================
->> +
->> + Command Code: 0x0032
->> + Controller Index: <controller id>
->> + Command Parameters: Address (6 Octets)
->> + Address_Type (1 Octet)
->> + Auto_Connect_Option (1 Octet)
->> + Min_Connection_Interval (2 Octets)
->> + Max_Connection_Interval (2 Octes)
->> + Return Parameters:
->> +
->
-> This should have the Address and Address_Type also in the return
-> parameters for consistency and ability to distinguish the completion of
-> two simultaneous commands for the different devices.
+On Wednesday 02 of April 2014 13:36:57 Grzegorz Kolodziejczyk wrote:
+> This fix wrong notification length passing to ipc.
+> ---
+>  android/gatt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 8bd7028..5069f98 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -604,7 +604,7 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+>  
+>  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+>  						HAL_EV_GATT_CLIENT_SCAN_RESULT,
+> -						sizeof(ev) + ev->len, ev);
+> +						sizeof(*ev) + ev->len, ev);
+>  
+>  connect:
+>  	if (!is_device_wating_for_connect(addr, addr_type))
+> 
 
-Fair enough, I'll do it in next version.
+Patch applied, thanks.
 
-Thanks,
+I've also fixed missing length checks on HAL side.
 
-Andre
+-- 
+Best regards, 
+Szymon Janc
