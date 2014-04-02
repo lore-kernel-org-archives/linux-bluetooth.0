@@ -1,44 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix passing wrong event len in le dev found
-Date: Wed, 02 Apr 2014 14:51:48 +0200
-Message-ID: <9770534.ct3SkaySfx@uw000953>
-In-Reply-To: <1396438617-19549-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1396438617-19549-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Wed, 2 Apr 2014 15:49:51 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCHv4 01/20] android/avrcp: Add avrcp_connect_browsing()
+Message-ID: <20140402124950.GB14673@aemeltch-MOBL1>
+References: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZK8EL6yd1mttuLxX5_MEeiBi1G6mAN9rRY9tiABuM3hUg@mail.gmail.com>
+ <20140402123730.GA14673@aemeltch-MOBL1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140402123730.GA14673@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
-
-On Wednesday 02 of April 2014 13:36:57 Grzegorz Kolodziejczyk wrote:
-> This fix wrong notification length passing to ipc.
-> ---
->  android/gatt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Wed, Apr 02, 2014 at 03:37:32PM +0300, Andrei Emeltchenko wrote:
+> Hi Luiz,
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 8bd7028..5069f98 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -604,7 +604,7 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
->  
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->  						HAL_EV_GATT_CLIENT_SCAN_RESULT,
-> -						sizeof(ev) + ev->len, ev);
-> +						sizeof(*ev) + ev->len, ev);
->  
->  connect:
->  	if (!is_device_wating_for_connect(addr, addr_type))
+> On Wed, Apr 02, 2014 at 02:30:18PM +0300, Luiz Augusto von Dentz wrote:
+> > Hi Andrei,
+> > 
+> > On Mon, Mar 31, 2014 at 3:24 PM, Andrei Emeltchenko
+> > <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > >
+> > > Add support for browsing channel
+> > > ---
+> > >  android/avrcp-lib.c | 6 ++++++
+> > >  android/avrcp-lib.h | 2 ++
+> > >  2 files changed, 8 insertions(+)
+> > >
+> > > diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
+> > > index 1a2fa2a..393ab54 100644
+> > > --- a/android/avrcp-lib.c
+> > > +++ b/android/avrcp-lib.c
+> > > @@ -293,6 +293,12 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
+> > >         return session;
+> > >  }
+> > >
+> > > +int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
+> > > +                                                               size_t omtu)
+> > > +{
+> > > +       return avctp_connect_browsing(session->conn, fd, imtu, omtu);
+> > > +}
+> > > +
+> > >  void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+> > >                                                         void *user_data)
+> > >  {
+> > > diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
+> > > index 0b867aa..ca7a57f 100644
+> > > --- a/android/avrcp-lib.h
+> > > +++ b/android/avrcp-lib.h
+> > > @@ -207,6 +207,8 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
+> > >  void avrcp_shutdown(struct avrcp *session);
+> > >  void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
+> > >                                                         void *user_data);
+> > > +int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
+> > > +                                                               size_t omtu);
+> > >
+> > >  void avrcp_register_player(struct avrcp *session,
+> > >                                 const struct avrcp_control_ind *ind,
+> > > --
+> > > 1.8.3.2
+> > 
+> > This patch-set is now upstream, Ive end up redoing much of the API
+> > though since it was not using the callback mechanism.
 > 
+> Have you applied the last patch?
 
-Patch applied, thanks.
+Sorry, my wrong rebase.
 
-I've also fixed missing length checks on HAL side.
+Best regards 
+Andrei Emeltchenko 
 
--- 
-Best regards, 
-Szymon Janc
+> 
+> Best regards 
+> Andrei Emeltchenko 
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
