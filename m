@@ -1,31 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 7/7] doc: Add InvalidArguments to UnregisterService() errors
-Date: Wed,  2 Apr 2014 15:30:26 -0300
-Message-Id: <1396463426-7268-8-git-send-email-claudio.takahasi@openbossa.org>
+Subject: [PATCH BlueZ v0 6/7] gatt: Fix possibly lost block when bluetoothd exits
+Date: Wed,  2 Apr 2014 15:30:25 -0300
+Message-Id: <1396463426-7268-7-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds "org.bluez.Error.InvalidArguments" as possible error
-returned by GattManager1.UnregisterService().
+This patch fixes a possibly lost memory related to GDBusClient
+and GDBusProxy objects when bluetoothd daemon exits and there
+is registered external service.
+==1503==    by 0x47ECFB: g_dbus_client_new (client.c:1232)
+==1503==    by 0x461EC7: register_service (gatt-dbus.c:510)
 ---
- doc/gatt-api.txt | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ src/gatt-dbus.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
-index deb519b..8c7975c 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -145,4 +145,5 @@ Methods		RegisterService(object service, dict options)
- 			must match the same value that has been used
- 			on registration.
+diff --git a/src/gatt-dbus.c b/src/gatt-dbus.c
+index 17c3359..1a0e55e 100644
+--- a/src/gatt-dbus.c
++++ b/src/gatt-dbus.c
+@@ -96,6 +96,11 @@ static gboolean external_service_destroy(void *user_data)
+ 	return FALSE;
+ }
  
--			Possible errors: org.bluez.Error.DoesNotExist
-+			Possible errors: org.bluez.Error.InvalidArguments
-+					 org.bluez.Error.DoesNotExist
++static void external_service_free(void *user_data)
++{
++	external_service_destroy(user_data);
++}
++
+ static void remove_service(DBusConnection *conn, void *user_data)
+ {
+ 	struct external_service *esvc = user_data;
+@@ -622,6 +627,8 @@ void gatt_dbus_manager_unregister(void)
+ 	g_hash_table_destroy(proxy_hash);
+ 	proxy_hash = NULL;
+ 
++	g_slist_free_full(external_services, external_service_free);
++
+ 	g_dbus_unregister_interface(btd_get_dbus_connection(), "/org/bluez",
+ 							GATT_MGR_IFACE);
+ }
 -- 
 1.8.3.1
 
