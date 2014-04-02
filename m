@@ -1,65 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 2 Apr 2014 14:13:46 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Scott James Remnant <keybuk@google.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: BUG: l2cap and rfcomm bind with 0 psm or channel no longer
+ allocate
+Message-ID: <20140402111346.GA3770@t440s.lan>
+References: <CAHZ1yCkNddT6MxBkRz0dNdXGn+MWZECK1L6XTaouRLLkECH5eg@mail.gmail.com>
+ <CAHZ1yCmTzSOHDQ20szZucMrmYLvKRMpWkaLXBtvJ519EU8pBWg@mail.gmail.com>
+ <20140402052134.GA27831@t440s.P-661HNU-F1>
 MIME-Version: 1.0
-In-Reply-To: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1396268714-4056-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 2 Apr 2014 14:30:18 +0300
-Message-ID: <CABBYNZK8EL6yd1mttuLxX5_MEeiBi1G6mAN9rRY9tiABuM3hUg@mail.gmail.com>
-Subject: Re: [PATCHv4 01/20] android/avrcp: Add avrcp_connect_browsing()
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140402052134.GA27831@t440s.P-661HNU-F1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Mon, Mar 31, 2014 at 3:24 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Add support for browsing channel
-> ---
->  android/avrcp-lib.c | 6 ++++++
->  android/avrcp-lib.h | 2 ++
->  2 files changed, 8 insertions(+)
->
-> diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-> index 1a2fa2a..393ab54 100644
-> --- a/android/avrcp-lib.c
-> +++ b/android/avrcp-lib.c
-> @@ -293,6 +293,12 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version)
->         return session;
->  }
->
-> +int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
-> +                                                               size_t omtu)
-> +{
-> +       return avctp_connect_browsing(session->conn, fd, imtu, omtu);
-> +}
-> +
->  void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
->                                                         void *user_data)
->  {
-> diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-> index 0b867aa..ca7a57f 100644
-> --- a/android/avrcp-lib.h
-> +++ b/android/avrcp-lib.h
-> @@ -207,6 +207,8 @@ struct avrcp *avrcp_new(int fd, size_t imtu, size_t omtu, uint16_t version);
->  void avrcp_shutdown(struct avrcp *session);
->  void avrcp_set_destroy_cb(struct avrcp *session, avrcp_destroy_cb_t cb,
->                                                         void *user_data);
-> +int avrcp_connect_browsing(struct avrcp *session, int fd, size_t imtu,
-> +                                                               size_t omtu);
->
->  void avrcp_register_player(struct avrcp *session,
->                                 const struct avrcp_control_ind *ind,
-> --
-> 1.8.3.2
+On Wed, Apr 02, 2014, Johan Hedberg wrote:
+> On Tue, Apr 01, 2014, Scott James Remnant wrote:
+> > b783fbc Bluetooth: Refuse peer L2CAP address reading when not connected
+> > 35364c9 Bluetooth: Refuse peer RFCOMM address reading when not connected
+> > 
+> > The reason these break things is that they limit peer address checking
+> > to connected sockets, btio's get_peers() function is calling both
+> > getsockname() and getpeername(), bailing out if either fails, before
+> > checking what option is being checked for.
+> > 
+> > Smells more like a bluetoothd fix, but I don't like the idea of
+> > earlier versions of bluetoothd breaking on newer kernels.
+> 
+> Indeed. If not a bug it's at the very least bad design of BtIO (which
+> I'm to blame of) and now we're stuck suffering the results from that
+> since we can't really have the kernel break user space in this way.
+> 
+> We can (and probably should) fix this BtIO behavior, but at the same
+> time I think these checks must unfortunately be removed from the kernel
+> side before 3.15 goes out.
 
-This patch-set is now upstream, Ive end up redoing much of the API
-though since it was not using the callback mechanism.
+FWIW, for the user space side this should now be fixed. It could use a
+bit more testing though, however at least with our test-profile script
+the RFCOMM channel auto-allocation and resulting SDP record seems to be
+fine.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
