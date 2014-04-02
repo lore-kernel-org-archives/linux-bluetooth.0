@@ -1,79 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Subject: [PATCH BlueZ v0 2/7] gdbus: Avoid reporting GDBusClient disconnect twice
-Date: Wed,  2 Apr 2014 15:30:21 -0300
-Message-Id: <1396463426-7268-3-git-send-email-claudio.takahasi@openbossa.org>
+Cc: Andre Guedes <andre.guedes@openbossa.org>
+Subject: [PATCH BlueZ v0 1/7] gatt: Add helper for removing GATT services
+Date: Wed,  2 Apr 2014 15:30:20 -0300
+Message-Id: <1396463426-7268-2-git-send-email-claudio.takahasi@openbossa.org>
 In-Reply-To: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
 References: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-No matter if disconnection was reported previously, g_dbus_client_unref()
-was always calling service disconnect callback. This patch fix the
-following scenario:
-1) service disconnects from the bus
-2) disconnect callback gets called
-3) client calls g_dbus_client_unref(), disconnect callback is called
-   again.
----
- gdbus/client.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+From: Andre Guedes <andre.guedes@openbossa.org>
 
-diff --git a/gdbus/client.c b/gdbus/client.c
-index 3bf883a..eb68a0f 100644
---- a/gdbus/client.c
-+++ b/gdbus/client.c
-@@ -51,6 +51,7 @@ struct GDBusClient {
- 	GDBusWatchFunction connect_func;
- 	void *connect_data;
- 	GDBusWatchFunction disconn_func;
-+	gboolean connected;
- 	void *disconn_data;
- 	GDBusMessageFunction signal_func;
- 	void *signal_data;
-@@ -1146,6 +1147,8 @@ static void service_connect(DBusConnection *conn, void *user_data)
+This patch adds the btd_gatt_remove_service() helper which removes a GATT
+primary (or secondary) Service declaration (including its characteristics)
+from the local attribute database.
+---
+ src/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ src/gatt.h |  7 +++++++
+ 2 files changed, 49 insertions(+)
+
+diff --git a/src/gatt.c b/src/gatt.c
+index f07effa..3060462 100644
+--- a/src/gatt.c
++++ b/src/gatt.c
+@@ -26,6 +26,7 @@
+ #endif
  
- 	get_managed_objects(client);
+ #include <glib.h>
++#include <stdbool.h>
  
-+	client->connected = TRUE;
+ #include "log.h"
+ #include "lib/uuid.h"
+@@ -104,6 +105,18 @@ static struct btd_attribute *new_attribute(const bt_uuid_t *type,
+ 	return attr;
+ }
+ 
++static bool is_service(const struct btd_attribute *attr)
++{
++	if (attr->type.type != BT_UUID16)
++		return false;
 +
- 	g_dbus_client_unref(client);
++	if (attr->type.value.u16 == GATT_PRIM_SVC_UUID ||
++			attr->type.value.u16 == GATT_SND_SVC_UUID)
++		return true;
++
++	return false;
++}
++
+ static int local_database_add(uint16_t handle, struct btd_attribute *attr)
+ {
+ 	attr->handle = handle;
+@@ -149,6 +162,35 @@ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid)
+ 	return attr;
  }
  
-@@ -1156,8 +1159,10 @@ static void service_disconnect(DBusConnection *conn, void *user_data)
- 	g_list_free_full(client->proxy_list, proxy_free);
- 	client->proxy_list = NULL;
- 
--	if (client->disconn_func)
-+	if (client->disconn_func) {
- 		client->disconn_func(conn, client->disconn_data);
-+		client->connected = FALSE;
++void btd_gatt_remove_service(struct btd_attribute *service)
++{
++	GList *list = g_list_find(local_attribute_db, service);
++	bool first_node;
++
++	if (!list)
++		return;
++
++	first_node = local_attribute_db == list;
++
++	/* Remove service declaration attribute */
++	free(list->data);
++	list = g_list_delete_link(list, list);
++
++	/* Remove all characteristics until next service declaration */
++	while (list && !is_service(list->data)) {
++		free(list->data);
++		list = g_list_delete_link(list, list);
 +	}
- }
- 
- static DBusHandlerResult message_filter(DBusConnection *connection,
-@@ -1210,6 +1215,7 @@ GDBusClient *g_dbus_client_new(DBusConnection *connection,
- 	client->dbus_conn = dbus_connection_ref(connection);
- 	client->service_name = g_strdup(service);
- 	client->base_path = g_strdup(path);
-+	client->connected = FALSE;
- 
- 	client->match_rules = g_ptr_array_sized_new(1);
- 	g_ptr_array_set_free_func(client->match_rules, g_free);
-@@ -1284,7 +1290,11 @@ void g_dbus_client_unref(GDBusClient *client)
- 
- 	g_list_free_full(client->proxy_list, proxy_free);
- 
--	if (client->disconn_func)
++
 +	/*
-+	 * Don't call disconn_func twice if disconnection
-+	 * was previously reported.
++	 * When removing the first node, local attribute database head
++	 * needs to be updated. Node removed from middle doesn't change
++	 * the list head address.
 +	 */
-+	if (client->disconn_func && client->connected)
- 		client->disconn_func(client->dbus_conn, client->disconn_data);
++	if (first_node)
++		local_attribute_db = list;
++}
++
+ struct btd_attribute *btd_gatt_add_char(const bt_uuid_t *uuid,
+ 						uint8_t properties,
+ 						btd_attr_read_t read_cb,
+diff --git a/src/gatt.h b/src/gatt.h
+index da7af92..f16541e 100644
+--- a/src/gatt.h
++++ b/src/gatt.h
+@@ -81,6 +81,13 @@ typedef void (*btd_attr_write_t) (struct btd_attribute *attr,
+ struct btd_attribute *btd_gatt_add_service(const bt_uuid_t *uuid);
  
- 	g_dbus_remove_watch(client->dbus_conn, client->watch);
+ /*
++ * btd_gatt_remove_service - Remove a service (along with all its
++ * characteristics) from the local attribute database.
++ * @service:	Service declaration attribute.
++ */
++void btd_gatt_remove_service(struct btd_attribute *service);
++
++/*
+  * btd_gatt_add_char - Add a characteristic (declaration and value attributes)
+  * to local attribute database.
+  * @uuid:	Characteristic UUID (16-bits or 128-bits).
 -- 
 1.8.3.1
 
