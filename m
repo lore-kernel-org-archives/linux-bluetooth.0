@@ -1,187 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_P+OjFYyggY4g_TTZJ7V1H7a46k45KntCZxnTwFRCE4ZA@mail.gmail.com>
+In-Reply-To: <CABD6X-Jc+CTn3gY4QkbLmRNVVnU47g3=851SfOW-B6+Hunf3bw@mail.gmail.com>
 References: <1396518234-8375-1-git-send-email-marcin.kraglak@tieto.com>
 	<CAJdJm_P+OjFYyggY4g_TTZJ7V1H7a46k45KntCZxnTwFRCE4ZA@mail.gmail.com>
-Date: Thu, 3 Apr 2014 22:07:22 +0200
-Message-ID: <CAN_7+YZ=nOKxgCkg6Ok85610yTEr307qWyTubDh32cJgEmgsOQ@mail.gmail.com>
+	<CAJdJm_NYJ3+j-RNJK60CamCOCKkFHik9mZ4260P95PnQkPoE8A@mail.gmail.com>
+	<CABD6X-Jc+CTn3gY4QkbLmRNVVnU47g3=851SfOW-B6+Hunf3bw@mail.gmail.com>
+Date: Thu, 3 Apr 2014 16:04:52 -0400
+Message-ID: <CAJdJm_NgGpr-DGHt8uNBx9doNL5U4zk5YFHLr7rHex3La1gWKQ@mail.gmail.com>
 Subject: Re: [RFC] gatt: Add API for creating services
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Marcin,
 
-On Thu, Apr 3, 2014 at 3:34 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Marcin,
->
-> On Thu, Apr 3, 2014 at 5:43 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
->> It will allow to construct services, which can be later started
->> stopped and removed. Function for creating services will reserve
->> handles for service's attributes. Start service will put service
->> and attributes to local database. Stop method will remove it,
->> Remove method will completely remove service and free handles.
->> ---
->>  src/gatt.c | 38 ++++++++++++++++++++++++++++++++++
->>  src/gatt.h | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 108 insertions(+)
->>
->> diff --git a/src/gatt.c b/src/gatt.c
->> index bfd083a..7260ffa 100644
->> --- a/src/gatt.c
->> +++ b/src/gatt.c
->> @@ -27,6 +27,7 @@
->>
->>  #include <glib.h>
->>
->> +#include <stdbool.h>
->>  #include "log.h"
->>  #include "lib/uuid.h"
->>  #include "attrib/att.h"
->> @@ -263,6 +264,43 @@ uint16_t btd_gatt_add_char_desc(const bt_uuid_t *uuid,
->>         return attr->handle;
->>  }
->>
->> +uint16_t btd_gatt_create_service(const bt_uuid_t *uuid, uint16_t num_handles)
->> +{
->> +       return 0;
->> +}
->
-> Looking at android/hardware/bt_gatt_server.h and your proposed GATT
-> server HAL IPC in android/hal-msg.h, I now wonder whether is it worth
-> the trouble attempting to use the API from src/gatt.c for Android. It
-> seems to me that for Android, BlueZ needs only to manage the attribute
-> database for the GATT server. Compare that to BlueZ on Linux, where
-> you have to handle ATT packet encoding/decoding, D-Bus API, internal
-> plugins. Attempting to add the btd_attribute abstraction on Android
-> will just add unnecessary complexity IMHO.
->
-> So here is my *personal* proposal: you create an attribute database
-> management API in src/shared (e.g. src/shared/gatt-db.c), which could
-> be shared by src/gatt.c and Android's android/gatt.c. This API would
-> reference attributes and attribute groups (i.e. services and
-> characteristics) by handle.
->
+I'll split your answers to make sure I got everything addressed.
 
-Indeed the only common thing is attribute database as I mention in
-offline email.
-And we are perfectly fine to have this in src/shared/gatt-db.c
-We started in src/gatt.c as this fine anyway contains now only db.
+On Thu, Apr 3, 2014 at 3:12 PM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> about service changed - we have to manage it in daemon.
 
-However, I think that bdt_attribure fits us and we want to use it in gatt-db,
-but user of the gatt-db would be use only handle as proposed by Marcin.
+I could not find on the GATT server HAL API anything that is specific
+do Service Changed notifications. So what I expect is that Android HAL
+is implementing this internally after the app that implements a
+service is closed/uninstalled.
 
-Actually, also ATT encoding and decoding could be common part.
+> descriptors are added to characteristics, but api in android looks like this:
+> 1. reserve handles for service
+> 2. put attributes with reserved handles
+>
+> Therefore I propose to have method which can "commit" constructed
+> service to ba available, something like start service. Similar method
+> is present in android hal API.
 
-> This API needs functions for:
->
-> - adding/removing attributes. I was thinking on something like:
->
-> /* define att_db_read_t , att_read_result_t , att_db_write_t and
-> att_db_write_result_t see src/gatt.h for similar callbacks */
->
-> /* Append an attribute to an existing handle group. If 0x0000 is
-> given, initiate a new group at the end of the database. Return the
-> handle for the new attribute, or zero if there is no room for the new
-> attribute on the current group location */
-> uint16_t att_db_add(uint16_t handle_group, const bt_uuid_t *uuid,
-> const uint8_t *value, size_t len);
-> /* Add a dynamic attribute: instead of a static value, read/write
-> callbacks are used. Needed for attributes that read value from a
-> dynamic source */
-> uint16_t att_db_add_dynamic(uint16_t handle_group, const bt_uuid_t
-> *uuid, att_db_read_t read_cb, att_db_write_t write_cb);
-> /* If a handle for an attribute group is given, remove the whole
-> group. Otherwise, remove the single attribute. Return the handle for
-> the last removed attribute in the group, or 0x0000 on error. */
-> uint16_t att_db_remove(uint16_t handle);
-> /* Resize given handle group, relocating to a new position in the
-> database if necessary. Return the new location for the group, or
-> 0x0000 if the group could not be resized. */
-> uint16_t att_db_resize_group(uint16_t handle_group);
->
-> So how to detect attribute groups? The GATT specification (2.5.3
-> Attribute Grouping) and ATT spec (3.2.3 Attribute Handle Grouping)
-> briefly describe what are the valid groups. Note that the
-> "Characteristic" group is only valid inside a "Primary Service" or
-> "Secondary Service" group, so this is important if
-> att_db_resize_group() is to be used on a characteristic, it can only
-> be relocated inside its parent service.
->
-> - Functions for operating on attributes. While Android seems to need
-> only read/writing attributes based on handle, for BlueZ on Linux we
-> need all those operations available on the ATT specification (read by
-> group, read by type etc.). We could simply implement those operations
-> as database functions. At minimum:
->
-> /* Read/write to attribute with given handle */
-> void att_db_read(uint16_t handle, att_db_read_result_t result_cb, void
-> *user_data);
-> void att_db_write(uint16_t handle, att_db_write_result_t result_cb,
-> const uint8_t *value, size_t len, void *user_data);
->
-> - implement proper database "defragmentation".
+So you are referring to the separate Add Service and Start Service
+commands right? I agree we can have a separate commit procedure, at
+least to allow concurrent applications registering services at the
+same time. I'll include that on my RFC (should send tomorrow).
 
-Since Android does not have way to handle it, we will leave it for future work.
+> About reallocating attributes to new handles - Android doesn't provide
+> API to inform upper layer that we changed attribute's handle. I think
+> if we want allocate handles for service, we should first look for
+> 'holes' between existing services, and put it if there is available
+> space. Therefore I proposed to declare num of handles needed for
+> service while creating service.
 
-One idea is to always
-> append new services to the end, and once there are no available
-> handles, find free "holes" to reuse.
-> - Implement support for both 16-bit and 128-bit UUIDs. This is *very*
-> important for custom profiles. This means grouping 16-bit UUIDs
-> services separately from 128-bit UUIDs on the database. See the Core
-> spec for details. One idea is to keep 16-bit UUIDs at the lowest
-> handles (0x0001 , 0x0002 etc.) and 128-bit UUIDs at highest handles
-> (... 0xfffd, 0xfffe, 0xffff). src/attrib-server.c currently implements
-> an algorithm where 128-bit UUID services are added "backwards" so they
-> always get highest possible handles.
-> - attribute permissions: I not sure how Android handles permissions.
-> For Linux, we can handle permissions on top of the database API.
-> - service changed: I don't know how Android handles this, but for
-> bonded devices, you need to report service changed indication on
-> reconnection, giving a range that contains all services which have
-> been added/removed/modified. Maybe this can be left out of the initial
-> API.
->
-> A few things I could not figure out from Android API:
->
-> - Descriptors are added to services? I hope it is just a typo. From
-> android/hardware/bt_gatt_server.h:
->
->     /** Add a descriptor to a given service */
->     bt_status_t (*add_descriptor)(int server_if, int service_handle,
->                                   bt_uuid_t *uuid, int permissions);
+This is aligned with the need for a "commit" operation so we allow
+concurrent construction of services (see above). So I agree with you
+on the need to pre-allocate a number of handles.
 
-Right, this looks odd. It seems  that Android Framework register service
-in the way that descriptor is registered just after characteristic to
-which it belongs to.
-So we will have to remeber in android/gatt.c what characteristic was
-registered as the last one.
+Regarding finding holes on the database, we can make it more efficient
+if we keep track of free ranges in a separate structure, so we don't
+need to traverse the attribute list every time.
 
-Well. we will know for sure once we get this point and test it.
+> Creating groups looks good, but what will happen if two applications
+> will start creating services in the same time, without declaring
+> number of needed handles? We will probably need to 'reallocate' one of
+> them and assign new handles. And Android won't handle it.
+
+The attribute group concept is just a fancy generic name for services
+and characteristics (taken from the Spec). So you can do the following
+operations with the same gatt_db_add():
+
+- Add a new service
+- Add a characteristic to a service
+- Add a descriptor to a characteristic
+
+The other option is to have separate functions for these operations
+(and a gatt_db_remove_service()).
+
+I'll drop the "resize_group" function as it is unnecessary for now (if
+we pre-allocate the range like described above).
 
 >
-> - How attribute permissions are handled?
->
-What do you mean?
->
-> Any thoughts?
->
->
-> Best Regards,
-> --
-> Anderson Lizardo
-> http://www.indt.org/?lang=en
-> INdT - Manaus - Brazil
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> Idea of gatt-db which can be reused in both daemons is fine for me.
+> Question is if existing skeleton of gatt.h/c is anything more than db?
 
-BR
-Lukasz
+The current upstream code indeed has only DB handling functions. But
+we will introduce other code on that file that is not usable for
+Android, so that's why I'm proposing factoring the database management
+part to src/shared/gatt-db.{c,h}. You can think of src/gatt.c (in
+future) as the equivalent to android/gatt.c (but in Linux we need to
+do a lot more than in Android).
+
+>
+> @Anderson, did it clarify anything about android requirements?
+
+I still have a few specific questions on Android side:
+
+1) How is the "permissions" parameters for add characteristic/descriptor define?
+2) How these permissions should be checked?
+3) If you look at the "Add Descriptor" command, you do not provide a
+characteristic declaration handle to it, only a service declaration
+handle. How does it know to which characteristic to add the
+descriptor?
+
+Best Regards,
+-- 
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
