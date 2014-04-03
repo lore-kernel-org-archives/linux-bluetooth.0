@@ -1,42 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Thu, 3 Apr 2014 14:48:49 -0700
-Message-ID: <CAHZ1yCmu26xibOaeGUP3HGhp7cvC0eXuviJBRq2VDD0fE6U6SQ@mail.gmail.com>
-Subject: BUG: org.bluez.Device1.Connect() makes a BR/EDR connection to an
- LE-only Device on initial pairing
-From: Scott James Remnant <keybuk@google.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: Ralink driver compilation probleme since past commit
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAEvBDCU5u+vVYAM4-3WYh4=MLUoD6YyXhDoUGzaEHoTeXmv9jg@mail.gmail.com>
+Date: Thu, 3 Apr 2014 13:53:25 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F6CCE523-79B6-4513-8CD4-A6BA322F2E0B@holtmann.org>
+References: <CAEvBDCU5u+vVYAM4-3WYh4=MLUoD6YyXhDoUGzaEHoTeXmv9jg@mail.gmail.com>
+To: =?iso-8859-1?Q?Aur=E9lien_Ridet?= <aurelien.ridet@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The D-Bus API sequence for pairing a BR/EDR device is
+Hi Auelien,
 
-  org.bluez.Device1.Pair()
-  org.bluez.Device1.Connect()
+> Today I encountered a problem with driver compilation.
+> 
+> I'm trying to install a combo Wifi + Bluetooth RALINK card and I can't
+> get Bluetooth drivers 3.9.3 compiled. Here is a part of log
+> /var/lib/dkms/rtbth/3.9.3/
+> build/make.log :
+> 
+> [...]
+> /var/lib/dkms/rtbth/3.9.3/build/src/rtbth_core_bluez.c:406:6: error:
+> 'struct hci_dev' has no member named 'ioctl'  hdev->ioctl = rtbt_hci_dev_ioctl;
+> [...]
+> 
+> Searching on Internet, I found that :
+> 
+> CommitDate: Thu Oct 10 22:11:41 2013 +0200 Bluetooth: Remove
+> hdev->ioctl driver callback Since there is no use of hdev->ioctl by
+> any Bluetooth driver since ever, so just lets remove it.
+> 
+> Unfortunnaly this one used this structure.
+> Could you help me please ?
+> $ uname -r
+> 3.13-1-686-pae
+> 
+> Will this commit reverted ?
+> Can I undo it myself and recompile everything (how must I do)?
+> OR how far must I downgrade my kernel to compile this driver ? (I can't
+> find what was the first to use this modification).
 
-The connect call is necessary after pairing successfully completes to
-connect profiles, since a completed pairing does not do that
-implicitly.
+we are not converting the commit. This driver is an out-of-tree driver and as such it can break any time. The smart thing for Ralink/Mediatek to do would be to get this driver merged into the Bluetooth subsystem of the kernel.
 
-When this same sequence is used for an LE device, the Connect() call
-fails with a Page Timeout. This is because of:
+Regards
 
-  a9f523e core: Split LE and BR/EDR states for devices
+Marcel
 
-For LE devices there is only one "profile" connection to be made, ATT,
-which is already established as part of the call to Pair() in order to
-perform primary service discovery. And unlike the BR/EDR case, where
-the ACL connection is dropped after a few seconds, the ATT connection
-is then made available to other plugins (such as HoG).
-
-Of course, the UI doesn't know this, the D-Bus API doesn't reveal that
-this is really an LE device, so the UI makes the Connect() call to the
-already connected device. Because of that CL, this then attempts to
-bring up the BR/EDR bearer - and thus results in the Connect() call
-failing because the device doesn't have one.
-
-Scott
--- 
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
