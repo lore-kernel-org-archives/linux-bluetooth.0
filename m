@@ -1,47 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: =?ISO-8859-1?Q?Aur=E9lien_Ridet?= <aurelien.ridet@gmail.com>
-Date: Thu, 3 Apr 2014 22:32:45 +0200
-Message-ID: <CAEvBDCU5u+vVYAM4-3WYh4=MLUoD6YyXhDoUGzaEHoTeXmv9jg@mail.gmail.com>
-Subject: Ralink driver compilation probleme since past commit
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [RFC v2] doc: Connection Parameters command and event
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1396523885-3705-1-git-send-email-andre.guedes@openbossa.org>
+Date: Thu, 3 Apr 2014 13:26:42 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0264824E-D1B3-48E4-A56B-D932C8B9A82D@holtmann.org>
+References: <1396523885-3705-1-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear,
+Hi Andre,
 
-Today I encountered a problem with driver compilation.
+> doc/mgmt-api.txt | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 88 insertions(+), 1 deletion(-)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 78f0bd2..a2c65db 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -995,7 +995,8 @@ Unpair Device Command
+> 	Return Parameters:	Address (6 Octets)
+> 				Address_Type (1 Octet)
+> 
+> -	Removes all keys associated with the remote device.
+> +	Removes all keys and connection parameters associated with the remote
+> +	device.
+> 
+> 	Possible values for the Address_Type parameter:
+> 		0	BR/EDR
+> @@ -1668,6 +1669,62 @@ Load Identity Resolving Keys Command
+> 				Invalid Index
+> 
+> 
+> +Load Connection Parameters Command
+> +====================================
+> +
+> +	Command Code:		0x0031
+> +	Controller Index:	<controller id>
+> +	Command Parameters:	Params_Count (2 Octets)
+> +				Params1 {
+> +					Address (6 Octets)
+> +					Address_Type (1 Octet)
+> +					Auto_Connect_Option (1 Octet)
 
-I'm trying to install a combo Wifi + Bluetooth RALINK card and I can't
-get Bluetooth drivers 3.9.3 compiled. Here is a part of log
-/var/lib/dkms/rtbth/3.9.3/
-build/make.log :
+the one thing that I wonder is if we want to include this auto connect option here. I currently lean towards leaving this out and instead provide a different command that sets the auto-connect list.
 
-[...]
-/var/lib/dkms/rtbth/3.9.3/build/src/rtbth_core_bluez.c:406:6: error:
-'struct hci_dev' has no member named 'ioctl'  hdev->ioctl = rtbt_hci_dev_ioctl;
-[...]
+As I said before, the link-loss re-connect option is something I rather see set via a socket option. I think that just makes more sense. You are connect, and you want to be re-connect if anything forces a disconnect.
 
-Searching on Internet, I found that :
+> +					Min_Connection_Interval (2 Octets)
+> +					Max_Connection_Interval (2 Octes)
+> +					Connection_Latency (2 Octets)
+> +					Supervision_Timeout (2 Octets)
+> +				}
+> +				Params2 {  }
+> +				...
+> +	Return Parameters:
+> +
+> +	This command is used load connection parameters from several LE devices
+> +	into kernel. It is only supported on controllers with LE support.
+> +
+> +	The provided Address and Address_Type are the identity of a device. So
+> +	either its public address or static random address. Unresolvable random
+> +	addresses and resolvable random addresses are not valid and will be
+> +	rejected.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	Reserved (not in use)
+> +		1	LE Public
+> +		2	LE Random
 
-CommitDate: Thu Oct 10 22:11:41 2013 +0200 Bluetooth: Remove
-hdev->ioctl driver callback Since there is no use of hdev->ioctl by
-any Bluetooth driver since ever, so just lets remove it.
+What I wonder is if we should include BR/EDR here as well. Since the link supervision timeout is something we could allow modification on BR/EDR while keeping connection interval and latency at zero.
 
-Unfortunnaly this one used this structure.
-Could you help me please ?
-$ uname -r
-3.13-1-686-pae
+In the past there have been discussions about link supervision timeout being configurable and not just using the default value and hoping the remote side would adjust it.
 
-Will this commit reverted ?
-Can I undo it myself and recompile everything (how must I do)?
-OR how far must I downgrade my kernel to compile this driver ? (I can't
-find what was the first to use this modification).
+> +
+> +	Possible values for the Auto_Connect_Option parameter:
+> +		0	Disabled
+> +		1	Always
+> +		2	Link Loss
+> +
+> +	The 'Always' option configures the kernel to always re-establish the
+> +	connection, no matter the reason the connection was terminated. The
+> +	'Link Loss' option configures the kernel to re-establish the connection
+> +	only in case the connection was terminated due to a link loss.
+> +
+> +	The Min_Connection_Interval, Max_Connection_Interval, Connection_Latency
+> +	and Supervision_Timeout parameters should be configured as described in
+> +	Core 4.1 spec, Vol 2, 7.8.12.
+> +
+> +	This command can be used when the controller is not powered.
+> +
+> +	This command generates a Command Complete event on success or
+> +	a Command Status event on failure.
+> +
+> +	Possible errors:	Invalid Parameters
+> +				Invalid Index
+> +				Not Supported
+> +
+> +
+> Command Complete Event
+> ======================
+> 
+> @@ -2257,3 +2314,33 @@ New Signature Resolving Key Event
+> 
+> 	The provided Address and Address_Type are the identity of
+> 	a device. So either its public address or static random address.
+> +
+> +
+> +New Connection Parameters Event
+> +===============================
+> +
+> +	Event Code:		0x001a
+> +	Controller Index:	<controller id>
+> +	Event Parameters:	Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +				Connection_Interval (2 Octets)
 
-Best regard.
-Aurelien.
+This should be min and max connection interval. The actually chosen one by the controller is pretty irrelevant to us. We want to know what we have to load back into the kernel after next reboot.
 
-I can give you any detail you ask for.
+> +				Connection_Latency (2 Octets)
+> +				Supervision_Timeout (2 Octets)
+> +
+> +	This event indicates the new LE connection parameters set by GAP
+> +	Connection Parameter Update Procedure.
+> +
+> +	This event is sent only if the new parameters are different from the
+> +	parameters the user has configured (See Load Connection Parameters
+> +	Command) or if there is no parameters configured for that device.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	Reserved (not in use)
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	The provided Address and Address_Type are the identity of
+> +	a device. So either its public address or static random address.
+> +
+> +	The Connection_Interval, Connection_Latency and Supervision_Timeout
+> +	parameters are encoded as described in Core 4.1	spec, Vol 2, 7.7.65.3.
 
-Sorry for English faults, it's not my native language.
+Regards
+
+Marcel
+
