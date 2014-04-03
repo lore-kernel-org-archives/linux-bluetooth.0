@@ -1,40 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-From: Scott James Remnant <scott@netsplit.com>
+From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Scott James Remnant <scott@netsplit.com>
-Subject: [PATCH 1/2] core: don't set BR/EDR support when no flags present
-Date: Thu,  3 Apr 2014 15:27:33 -0700
-Message-Id: <1396564054-20566-1-git-send-email-scott@netsplit.com>
-In-Reply-To: <CAHZ1yCmu26xibOaeGUP3HGhp7cvC0eXuviJBRq2VDD0fE6U6SQ@mail.gmail.com>
-References: <CAHZ1yCmu26xibOaeGUP3HGhp7cvC0eXuviJBRq2VDD0fE6U6SQ@mail.gmail.com>
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH] client: Add support for printing property of array type
+Date: Thu,  3 Apr 2014 23:57:58 +0200
+Message-Id: <1396562278-30114-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The logic for setting the BR/EDR supported flag checked for the
-non-presence of the BR/EDR Unsupported flag without checking whether
-any flags were present at all.
+This allows to print UUIDs in user friendly fasion. Only string type
+support is needed.
 
-This meant all LE-only devices that returned Scan Response Data were
-being marked as supporting BR/EDR, since the flag was only set in the
-initial AD and not the SRD.
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs:
+        00000002-0000-1000-8000-0002ee000002
+        00001101-0000-1000-8000-00805f9b34fb
+        00001103-0000-1000-8000-00805f9b34fb
+        00001104-0000-1000-8000-00805f9b34fb
+        00001105-0000-1000-8000-00805f9b34fb
+
+instead of:
+
+[CHG] Device XX:XX:XX:XX:XX:XX UUIDs has unsupported type
 ---
- src/adapter.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ client/main.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index e396a3d..b8b9a9c 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4342,7 +4342,8 @@ static void update_found_devices(struct btd_adapter *adapter,
+diff --git a/client/main.c b/client/main.c
+index 5791e95..5a9d41a 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -29,6 +29,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <stdlib.h>
++#include <stdbool.h>
+ #include <signal.h>
+ #include <sys/signalfd.h>
  
- 	device_update_last_seen(dev, bdaddr_type);
+@@ -153,6 +154,8 @@ static void print_iter(const char *label, const char *name,
+ 	dbus_uint16_t valu16;
+ 	dbus_int16_t vals16;
+ 	const char *valstr;
++	DBusMessageIter subiter;
++	int type;
  
--	if (bdaddr_type != BDADDR_BREDR && !(eir_data.flags & EIR_BREDR_UNSUP))
-+	if (bdaddr_type != BDADDR_BREDR && eir_data.flags &&
-+					!(eir_data.flags & EIR_BREDR_UNSUP))
- 		device_set_bredr_support(dev, true);
- 
- 	if (eir_data.name != NULL && eir_data.name_complete)
+ 	if (iter == NULL) {
+ 		rl_printf("%s%s is nil\n", label, name);
+@@ -185,6 +188,24 @@ static void print_iter(const char *label, const char *name,
+ 		dbus_message_iter_get_basic(iter, &vals16);
+ 		rl_printf("%s%s: %d\n", label, name, vals16);
+ 		break;
++	case DBUS_TYPE_ARRAY:
++		dbus_message_iter_recurse(iter, &subiter);
++		rl_printf("%s%s:\n", label, name);
++
++		do {
++			type = dbus_message_iter_get_arg_type(&subiter);
++			if (type == DBUS_TYPE_INVALID)
++				break;
++
++			if (type == DBUS_TYPE_STRING) {
++				dbus_message_iter_get_basic(&subiter, &valstr);
++				rl_printf("\t%s\n", valstr);
++			}
++
++			dbus_message_iter_next(&subiter);
++		} while(true);
++
++		break;
+ 	default:
+ 		rl_printf("%s%s has unsupported type\n", label, name);
+ 		break;
 -- 
-1.9.1.423.g4596e3a
+1.9.1
 
