@@ -1,76 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH] client: Add support for printing property of array type
-Date: Thu,  3 Apr 2014 23:57:58 +0200
-Message-Id: <1396562278-30114-1-git-send-email-szymon.janc@gmail.com>
+MIME-Version: 1.0
+Date: Thu, 3 Apr 2014 14:48:49 -0700
+Message-ID: <CAHZ1yCmu26xibOaeGUP3HGhp7cvC0eXuviJBRq2VDD0fE6U6SQ@mail.gmail.com>
+Subject: BUG: org.bluez.Device1.Connect() makes a BR/EDR connection to an
+ LE-only Device on initial pairing
+From: Scott James Remnant <keybuk@google.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to print UUIDs in user friendly fasion. Only string type
-support is needed.
+The D-Bus API sequence for pairing a BR/EDR device is
 
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs:
-        00000002-0000-1000-8000-0002ee000002
-        00001101-0000-1000-8000-00805f9b34fb
-        00001103-0000-1000-8000-00805f9b34fb
-        00001104-0000-1000-8000-00805f9b34fb
-        00001105-0000-1000-8000-00805f9b34fb
+  org.bluez.Device1.Pair()
+  org.bluez.Device1.Connect()
 
-instead of:
+The connect call is necessary after pairing successfully completes to
+connect profiles, since a completed pairing does not do that
+implicitly.
 
-[CHG] Device XX:XX:XX:XX:XX:XX UUIDs has unsupported type
----
- client/main.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+When this same sequence is used for an LE device, the Connect() call
+fails with a Page Timeout. This is because of:
 
-diff --git a/client/main.c b/client/main.c
-index 5791e95..5a9d41a 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -29,6 +29,7 @@
- #include <errno.h>
- #include <unistd.h>
- #include <stdlib.h>
-+#include <stdbool.h>
- #include <signal.h>
- #include <sys/signalfd.h>
- 
-@@ -153,6 +154,8 @@ static void print_iter(const char *label, const char *name,
- 	dbus_uint16_t valu16;
- 	dbus_int16_t vals16;
- 	const char *valstr;
-+	DBusMessageIter subiter;
-+	int type;
- 
- 	if (iter == NULL) {
- 		rl_printf("%s%s is nil\n", label, name);
-@@ -185,6 +188,24 @@ static void print_iter(const char *label, const char *name,
- 		dbus_message_iter_get_basic(iter, &vals16);
- 		rl_printf("%s%s: %d\n", label, name, vals16);
- 		break;
-+	case DBUS_TYPE_ARRAY:
-+		dbus_message_iter_recurse(iter, &subiter);
-+		rl_printf("%s%s:\n", label, name);
-+
-+		do {
-+			type = dbus_message_iter_get_arg_type(&subiter);
-+			if (type == DBUS_TYPE_INVALID)
-+				break;
-+
-+			if (type == DBUS_TYPE_STRING) {
-+				dbus_message_iter_get_basic(&subiter, &valstr);
-+				rl_printf("\t%s\n", valstr);
-+			}
-+
-+			dbus_message_iter_next(&subiter);
-+		} while(true);
-+
-+		break;
- 	default:
- 		rl_printf("%s%s has unsupported type\n", label, name);
- 		break;
+  a9f523e core: Split LE and BR/EDR states for devices
+
+For LE devices there is only one "profile" connection to be made, ATT,
+which is already established as part of the call to Pair() in order to
+perform primary service discovery. And unlike the BR/EDR case, where
+the ACL connection is dropped after a few seconds, the ATT connection
+is then made available to other plugins (such as HoG).
+
+Of course, the UI doesn't know this, the D-Bus API doesn't reveal that
+this is really an LE device, so the UI makes the Connect() call to the
+already connected device. Because of that CL, this then attempts to
+bring up the BR/EDR bearer - and thus results in the Connect() call
+failing because the device doesn't have one.
+
+Scott
 -- 
-1.9.1
-
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
