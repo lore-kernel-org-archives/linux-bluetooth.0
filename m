@@ -1,73 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140403074944.GA20779@t440s.lan>
-References: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
-	<1396463426-7268-6-git-send-email-claudio.takahasi@openbossa.org>
-	<20140403074944.GA20779@t440s.lan>
-Date: Thu, 3 Apr 2014 16:12:48 -0300
-Message-ID: <CAKT1EBfTP2wTVJK+do-V+rcgqY5caCNzy4RaQ+Q6JTLMarZfyA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v0 5/7] gatt: Add removing service from the database
-From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAJdJm_NYJ3+j-RNJK60CamCOCKkFHik9mZ4260P95PnQkPoE8A@mail.gmail.com>
+References: <1396518234-8375-1-git-send-email-marcin.kraglak@tieto.com>
+	<CAJdJm_P+OjFYyggY4g_TTZJ7V1H7a46k45KntCZxnTwFRCE4ZA@mail.gmail.com>
+	<CAJdJm_NYJ3+j-RNJK60CamCOCKkFHik9mZ4260P95PnQkPoE8A@mail.gmail.com>
+Date: Thu, 3 Apr 2014 21:12:37 +0200
+Message-ID: <CABD6X-Jc+CTn3gY4QkbLmRNVVnU47g3=851SfOW-B6+Hunf3bw@mail.gmail.com>
+Subject: Re: [RFC] gatt: Add API for creating services
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan:
+Hi Anderson,
 
-On Thu, Apr 3, 2014 at 4:49 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Claudio,
+On 3 April 2014 16:01, Anderson Lizardo <anderson.lizardo@openbossa.org> wrote:
+> Hi Marcin,
 >
-> On Wed, Apr 02, 2014, Claudio Takahasi wrote:
->> This patch removes the service declaration and its attributes when
->> the external service implementation leaves the system bus, calls
->> UnregisterService(), or RegisterService() fails.
->> ---
->>  src/gatt-dbus.c | 12 ++++++++----
->>  1 file changed, 8 insertions(+), 4 deletions(-)
->
-> I've applied patches 1-4.
->
->> @@ -99,7 +100,8 @@ static void remove_service(DBusConnection *conn, void *user_data)
->>  {
->>       struct external_service *esvc = user_data;
+> On Thu, Apr 3, 2014 at 9:34 AM, Anderson Lizardo
+> <anderson.lizardo@openbossa.org> wrote:
+>> So here is my *personal* proposal: you create an attribute database
+>> management API in src/shared (e.g. src/shared/gatt-db.c), which could
+>> be shared by src/gatt.c and Android's android/gatt.c. This API would
+>> reference attributes and attribute groups (i.e. services and
+>> characteristics) by handle.
 >>
->> -     /* TODO: Remove from the database */
->> +     if (esvc->service)
->> +             btd_gatt_remove_service(esvc->service);
+>> This API needs functions for:
+>> [...]
 >
-> Would it not be safer to set esvc->service to NULL after this?
+> BTW, If you guys agree this attribute database API may work well for
+> Android needs, I'll proceed implementing an initial version and send
+> patches to the list as RFC (so hopefully it becomes clearer with
+> working source code). IMHO it helps both Android and Linux if we have
+> code in src/shared that can be useful to both code bases.
 >
->> @@ -360,7 +362,8 @@ static int register_external_service(const struct external_service *esvc,
->>       if (bt_string_to_uuid(&uuid, str) < 0)
->>               return -EINVAL;
->>
->> -     if (!btd_gatt_add_service(&uuid))
->> +     esvc->service = btd_gatt_add_service(&uuid);
->> +     if (!esvc->service)
->>               return -EINVAL;
->>
->>       return 0;
->> @@ -487,7 +490,8 @@ fail:
->>       error("Could not register external service: %s", esvc->path);
->>
->>       reply = btd_error_invalid_args(esvc->reg);
->> -     /* TODO: missing esvc/database cleanup */
->> +     if (esvc->service)
->> +             btd_gatt_remove_service(esvc->service);
->
-> Same here.
->
-> Johan
+> Best Regards,
+> --
+> Anderson Lizardo
+> http://www.indt.org/?lang=en
+> INdT - Manaus - Brazil
 
-Actually, there is a potential invalid memory access related to esvc
-(external_service), set esvc->service to NULL is not necessary.
+about service changed - we have to manage it in daemon.
+descriptors are added to characteristics, but api in android looks like this:
+1. reserve handles for service
+2. put attributes with reserved handles
 
-Race condition & invalid memory access can happen when calling
-remove_service callback & GDBusClient unref.
+Therefore I propose to have method which can "commit" constructed
+service to ba available, something like start service. Similar method
+is present in android hal API.
+About reallocating attributes to new handles - Android doesn't provide
+API to inform upper layer that we changed attribute's handle. I think
+if we want allocate handles for service, we should first look for
+'holes' between existing services, and put it if there is available
+space. Therefore I proposed to declare num of handles needed for
+service while creating service.
+Creating groups looks good, but what will happen if two applications
+will start creating services in the same time, without declaring
+number of needed handles? We will probably need to 'reallocate' one of
+them and assign new handles. And Android won't handle it.
 
-I will send another patchset fixing this problem.
+Idea of gatt-db which can be reused in both daemons is fine for me.
+Question is if existing skeleton of gatt.h/c is anything more than db?
 
-Regards,
-Claudio
+@Anderson, did it clarify anything about android requirements?
+
+BR
+Marcin
