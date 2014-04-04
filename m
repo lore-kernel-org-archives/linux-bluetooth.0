@@ -1,50 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Apr 2014 10:38:39 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Loic Poulain <loic.poulain@intel.com>
-Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv6] tools: add bcm43xx specific init in hciattach
-Message-ID: <20140404073839.GD16753@t440s.lan>
-References: <1396515889-1270-1-git-send-email-loic.poulain@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <1396515889-1270-1-git-send-email-loic.poulain@intel.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 3/3] android/gatt: Fix matching characteristict
+Date: Fri,  4 Apr 2014 09:32:00 +0200
+Message-Id: <1396596720-13779-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+This patch fixes searching for characteristic within service.
+Characteristics should be matched by element id (uuid, instance) not
+only instance id. Also redundant helper to match characteristic by
+instance is removed.
+---
+ android/gatt.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-On Thu, Apr 03, 2014, Loic Poulain wrote:
-> From: lpoulain <loic.poulain@intel.com>
+diff --git a/android/gatt.c b/android/gatt.c
+index 473929d..4f0a656 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -310,14 +310,6 @@ static bool match_descr_by_higher_inst_id(const void *data,
+ 	return instance < descr->id.instance;
+ }
+ 
+-static bool match_char_by_instance(const void *data, const void *user_data)
+-{
+-	const struct characteristic *ch = data;
+-	uint8_t inst_id = PTR_TO_INT(user_data);
+-
+-	return inst_id == ch->id.instance;
+-}
+-
+ static bool match_notification(const void *a, const void *b)
+ {
+ 	const struct notification_data *a1 = a;
+@@ -2251,8 +2243,8 @@ static void handle_client_register_for_notification(const void *buf,
+ 		goto failed;
+ 	}
+ 
+-	c = queue_find(service->chars, match_char_by_instance,
+-					INT_TO_PTR(cmd->char_id.inst_id));
++	hal_gatt_id_to_element_id(&cmd->char_id, &match_id);
++	c = queue_find(service->chars, match_char_by_element_id, &match_id);
+ 	if (!c) {
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
+-- 
+1.9.1
 
-You need to fix your git author information before this goes upstream.
-The above should say "First Last <email>".
-
-> Add a bcm43xx specific init sequence in hciattach
-> in order to initialize bcm43xx controllers.
-> ---
->  v6: Coding style
-> 
->  Makefile.tools            |   3 +-
->  tools/hciattach.c         |  11 +-
->  tools/hciattach.h         |   2 +
->  tools/hciattach_bcm43xx.c | 374 ++++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 388 insertions(+), 2 deletions(-)
->  create mode 100644 tools/hciattach_bcm43xx.c
-
-The code looks fine now but doesn't actually compile:
-
-  CC       tools/hciattach_bcm43xx.o
-tools/hciattach_bcm43xx.c: In function ‘bcm43xx_read_local_name’:
-tools/hciattach_bcm43xx.c:90:2: error: implicit declaration of function ‘free’ [-Werror=implicit-function-declaration]
-  free(resp);
-  ^
-tools/hciattach_bcm43xx.c:90:2: error: incompatible implicit declaration of built-in function ‘free’ [-Werror]
-cc1: all warnings being treated as errors
-make[1]: *** [tools/hciattach_bcm43xx.o] Error 1
-
-I believe that's because you've forgotten to #include <stdlib.h> which
-is needed by free().
-
-Always compile test with ./bootstrap-configure && make
-
-Johan
