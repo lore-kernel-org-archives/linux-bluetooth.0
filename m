@@ -1,88 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAJdJm_P2VQwB+N1-Ew8j4K27Absfi6BTBHJBKznkkBWwkpU5zA@mail.gmail.com>
-References: <1396518234-8375-1-git-send-email-marcin.kraglak@tieto.com>
-	<CAJdJm_P+OjFYyggY4g_TTZJ7V1H7a46k45KntCZxnTwFRCE4ZA@mail.gmail.com>
-	<CAN_7+YZ=nOKxgCkg6Ok85610yTEr307qWyTubDh32cJgEmgsOQ@mail.gmail.com>
-	<CAJdJm_P2VQwB+N1-Ew8j4K27Absfi6BTBHJBKznkkBWwkpU5zA@mail.gmail.com>
-Date: Fri, 4 Apr 2014 16:03:45 +0200
-Message-ID: <CAN_7+YY9oVjPOy2sY0prooPsPNd35ck_-VNp=70ZQdeatLjcbQ@mail.gmail.com>
-Subject: Re: [RFC] gatt: Add API for creating services
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Anderson Lizardo <anderson.lizardo@openbossa.org>
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Fri, 4 Apr 2014 18:54:49 +0530
+Message-ID: <CAFawTAwacR8yBrn7ZV0a5HPJgmQqEgvywd2v92fe35pD1cj+Jg@mail.gmail.com>
+Subject: Need help on bluez emulator
+From: Dibyendu Roy <diby.roy@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Anderson,
+Hi Greetings,
+I'm a newbie to bluetooth with some experience in C/Linux etc.
 
-On Thu, Apr 3, 2014 at 10:16 PM, Anderson Lizardo
-<anderson.lizardo@openbossa.org> wrote:
-> Hi Lukasz
->
-> On Thu, Apr 3, 2014 at 4:07 PM, Lukasz Rymanowski
-> <lukasz.rymanowski@gmail.com> wrote:
->> Indeed the only common thing is attribute database as I mention in
->> offline email.
->> And we are perfectly fine to have this in src/shared/gatt-db.c
->> We started in src/gatt.c as this fine anyway contains now only db.
->>
->> However, I think that bdt_attribure fits us and we want to use it in gatt-db,
->> but user of the gatt-db would be use only handle as proposed by Marcin.
->
-> Indeed, moving the GATT DB to src/shared will also mean having a
-> struct similar to btd_attribute there (but in my RFC it will be
-> internal as the API will only deal with handles).
->
->> Actually, also ATT encoding and decoding could be common part.
->
-> I can't find ATT decoding/encoding on the Android HAL headers. Are you
-> sure this is not handled internally by Android HAL?
+I want to use bluez emulator for testing few commands and events
+(without controller support).
+Can anybody help me on how to test with bluez emulator?
 
-What I meant is that we have to do ATT encoding/decoding in the
-daemon. Android is getting only
-read/write callbacks with value
+Any information on what are the executables/extra libraries required,
+how to compile/run those would be of great help.
 
-Therefore, code for ATT enc/dec could be common.
+Thanks in advance!!!
 
->
->>> - implement proper database "defragmentation".
->>
->> Since Android does not have way to handle it, we will leave it for future work.
->
-> IMHO this needs at least to be detected and return a proper error.
-
-If some Android App will remove GATT service, then given service will be removed
-from gatt-db.
-Daemon will send Service Changed to bonded devices and remote device
-hopefully will refresh their database.
-
-Other devices which will want to access missing GATT service will get
-error on ATT.
-
-I think there is nothing wrong that we will have some not used handles
-in the database or I missing something?
->
->>> - How attribute permissions are handled?
->>>
->> What do you mean?
->
-> As I said on the other reply, I could not understand how the
-> "permissions" parameters should be used in Android. Once you figure
-> out how to use them, we need to make a generic way to also handle
-> permissions on Linux. For now I'll just ignore it on the RFC code.
->
-
-Permissions we will handle in daemon. Meaning, daemon will take care to
-call android read/write callbacks only if permissions are OK for doing that.
-
-> Best Regards,
-> --
-> Anderson Lizardo
-> http://www.indt.org/?lang=en
-> INdT - Manaus - Brazil
-
-BR
-Lukasz
+BR,
+Dibyendu
