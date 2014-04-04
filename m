@@ -1,33 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/3] android/gatt: Remove useless variable cast
-Date: Fri,  4 Apr 2014 09:31:59 +0200
-Message-Id: <1396596720-13779-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH v2 1/3] android/gatt: Remove unused uuid variable
+Date: Fri,  4 Apr 2014 09:31:58 +0200
+Message-Id: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes useless uint8_t array to bdaddr_t cast.
-android2bdaddr function expects const void *buf as first parametr.
+This patch removes unused uuid string variable.
 ---
- android/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/gatt.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 68e2112..473929d 100644
+index 7a6a2a2..68e2112 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -2233,7 +2233,7 @@ static void handle_client_register_for_notification(const void *buf,
+@@ -2215,7 +2215,6 @@ static void handle_client_register_for_notification(const void *buf,
+ {
+ 	const struct hal_cmd_gatt_client_register_for_notification *cmd = buf;
+ 	struct notification_data *notification;
+-	char uuid[MAX_LEN_UUID_STR];
+ 	struct gatt_client *client;
+ 	struct characteristic *c;
+ 	struct element_id match_id;
+@@ -2247,7 +2246,6 @@ static void handle_client_register_for_notification(const void *buf,
+ 	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
+ 	service = queue_find(dev->services, match_srvc_by_element_id,
+ 								&match_id);
+-	bt_uuid_to_string(&match_id.uuid, uuid, MAX_LEN_UUID_STR);
+ 	if (!service) {
+ 		status = HAL_STATUS_FAILED;
  		goto failed;
- 	}
- 
--	android2bdaddr((bdaddr_t *)&cmd->bdaddr, &addr);
-+	android2bdaddr(&cmd->bdaddr, &addr);
- 
- 	dev = queue_find(conn_list, match_dev_by_bdaddr, &addr);
- 	if (!dev) {
 -- 
 1.9.1
 
