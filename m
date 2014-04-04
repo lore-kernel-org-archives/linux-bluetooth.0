@@ -1,36 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140404072528.GA16753@t440s.lan>
-References: <CAHZ1yCmu26xibOaeGUP3HGhp7cvC0eXuviJBRq2VDD0fE6U6SQ@mail.gmail.com>
-	<1396564054-20566-1-git-send-email-scott@netsplit.com>
-	<20140404072528.GA16753@t440s.lan>
-Date: Fri, 4 Apr 2014 08:20:39 -0700
-Message-ID: <CA+bD78i-x0O2odFSEGwSKHULg-uZ=rR7f9TTetBVnVFrf2T3LA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] core: don't set BR/EDR support when no flags present
-From: Scott James Remnant <scott@netsplit.com>
-To: Scott James Remnant <scott@netsplit.com>,
-	linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=ISO-8859-1
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/gatt: Fix sending notification for register gatt client
+Date: Fri,  4 Apr 2014 16:45:58 +0200
+Message-Id: <1396622758-24846-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Apr 4, 2014 at 12:25 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+This patch adds missing send notification in case of errors for gatt
+client registration. In case of error status GATT_FAILURE with given in
+cmd UUID is send in notification.
+---
+ android/gatt.c | 34 ++++++++++++++++++++++++----------
+ 1 file changed, 24 insertions(+), 10 deletions(-)
 
-> One thing to note regarding this first one: this is actually not a
-> problem with current bluetooth-next since there we merge the adv_ind and
-> scan_rsp into a single mgmt device found event. I.e. with such a kernel
-> we will not need to have this extra non-zero flags check. I added an
-> extra code comment to this place so we don't forget to fix it.
->
-
-Makes sense, we're testing with the current
-bluetooth-next/for-upstream tag, and it looks like the
-ADV_IND/SCAN_RSP merging patches aren't submitted yet ;-)
-
-Won't this mean that the flag checking will be needed on kernels prior
-to 3.15 in either case?
-
-Scott
+diff --git a/android/gatt.c b/android/gatt.c
+index 4f0a656..372acec 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -413,6 +413,8 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
++	memset(&ev, 0, sizeof(ev));
++
+ 	if (queue_find(gatt_clients, match_client_by_uuid, &cmd->uuid)) {
+ 		error("gatt: client uuid is already on list");
+ 		status = HAL_STATUS_FAILED;
+@@ -422,12 +424,10 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 	client = new0(struct gatt_client, 1);
+ 	if (!client) {
+ 		error("gatt: cannot allocate memory for registering client");
+-		status = HAL_STATUS_FAILED;
++		status = HAL_STATUS_NOMEM;
+ 		goto failed;
+ 	}
+ 
+-	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+-
+ 	client->notifications = queue_new();
+ 	if (!client->notifications) {
+ 		error("gatt: couldn't allocate notifications queue");
+@@ -436,22 +436,36 @@ static void handle_client_register(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	client->id = client_cnt++;
++	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+ 
+-	queue_push_head(gatt_clients, client);
++	client->id = client_cnt++;
+ 
+-	status = HAL_STATUS_SUCCESS;
++	if (!queue_push_head(gatt_clients, client)) {
++		error("gatt: Cannot push client on the list");
++		free(client);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
+ 
+ 	ev.status = GATT_SUCCESS;
+ 	ev.client_if = client->id;
+-	memcpy(ev.app_uuid, client->uuid, sizeof(client->uuid));
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
++	if (status != HAL_STATUS_SUCCESS)
++		ev.status = GATT_FAILURE;
++
++	/* We should send notification with given in cmd UUID
++	 * in case of errors
++	 */
++	memcpy(ev.app_uuid, cmd->uuid, sizeof(ev.app_uuid));
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+ 			HAL_EV_GATT_CLIENT_REGISTER_CLIENT, sizeof(ev), &ev);
+ 
+-failed:
+-	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-					HAL_OP_GATT_CLIENT_REGISTER, status);
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
++									status);
+ }
+ 
+ static void handle_client_unregister(const void *buf, uint16_t len)
 -- 
-Have you ever, ever felt like this?
-Had strange things happen?  Are you going round the twist?
+1.9.1
+
