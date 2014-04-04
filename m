@@ -1,49 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] android/gatt: Remove unused uuid variable
-Date: Fri, 04 Apr 2014 10:30:39 +0200
-Message-ID: <19956629.7zao5MFIZu@uw000953>
-In-Reply-To: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 4 Apr 2014 10:38:39 +0300
+From: Johan Hedberg <johan.hedberg@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
+Cc: marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv6] tools: add bcm43xx specific init in hciattach
+Message-ID: <20140404073839.GD16753@t440s.lan>
+References: <1396515889-1270-1-git-send-email-loic.poulain@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <1396515889-1270-1-git-send-email-loic.poulain@intel.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Loic,
 
-On Friday 04 of April 2014 09:31:58 Grzegorz Kolodziejczyk wrote:
-> This patch removes unused uuid string variable.
+On Thu, Apr 03, 2014, Loic Poulain wrote:
+> From: lpoulain <loic.poulain@intel.com>
+
+You need to fix your git author information before this goes upstream.
+The above should say "First Last <email>".
+
+> Add a bcm43xx specific init sequence in hciattach
+> in order to initialize bcm43xx controllers.
 > ---
->  android/gatt.c | 2 --
->  1 file changed, 2 deletions(-)
+>  v6: Coding style
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 7a6a2a2..68e2112 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -2215,7 +2215,6 @@ static void handle_client_register_for_notification(const void *buf,
->  {
->  	const struct hal_cmd_gatt_client_register_for_notification *cmd = buf;
->  	struct notification_data *notification;
-> -	char uuid[MAX_LEN_UUID_STR];
->  	struct gatt_client *client;
->  	struct characteristic *c;
->  	struct element_id match_id;
-> @@ -2247,7 +2246,6 @@ static void handle_client_register_for_notification(const void *buf,
->  	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
->  	service = queue_find(dev->services, match_srvc_by_element_id,
->  								&match_id);
-> -	bt_uuid_to_string(&match_id.uuid, uuid, MAX_LEN_UUID_STR);
->  	if (!service) {
->  		status = HAL_STATUS_FAILED;
->  		goto failed;
-> 
+>  Makefile.tools            |   3 +-
+>  tools/hciattach.c         |  11 +-
+>  tools/hciattach.h         |   2 +
+>  tools/hciattach_bcm43xx.c | 374 ++++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 388 insertions(+), 2 deletions(-)
+>  create mode 100644 tools/hciattach_bcm43xx.c
 
-All patches applied, thanks.
+The code looks fine now but doesn't actually compile:
 
--- 
-Best regards, 
-Szymon Janc
+  CC       tools/hciattach_bcm43xx.o
+tools/hciattach_bcm43xx.c: In function ‘bcm43xx_read_local_name’:
+tools/hciattach_bcm43xx.c:90:2: error: implicit declaration of function ‘free’ [-Werror=implicit-function-declaration]
+  free(resp);
+  ^
+tools/hciattach_bcm43xx.c:90:2: error: incompatible implicit declaration of built-in function ‘free’ [-Werror]
+cc1: all warnings being treated as errors
+make[1]: *** [tools/hciattach_bcm43xx.o] Error 1
+
+I believe that's because you've forgotten to #include <stdlib.h> which
+is needed by free().
+
+Always compile test with ./bootstrap-configure && make
+
+Johan
