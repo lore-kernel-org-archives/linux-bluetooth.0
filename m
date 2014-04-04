@@ -1,37 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/3] android/gatt: Remove unused uuid variable
-Date: Fri,  4 Apr 2014 09:31:58 +0200
-Message-Id: <1396596720-13779-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Fri, 4 Apr 2014 10:30:10 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v1 0/3] Add removing GATT services
+Message-ID: <20140404073010.GC16753@t440s.lan>
+References: <1396463426-7268-1-git-send-email-claudio.takahasi@openbossa.org>
+ <1396554412-2057-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1396554412-2057-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch removes unused uuid string variable.
----
- android/gatt.c | 2 --
- 1 file changed, 2 deletions(-)
+Hi Claudio,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 7a6a2a2..68e2112 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2215,7 +2215,6 @@ static void handle_client_register_for_notification(const void *buf,
- {
- 	const struct hal_cmd_gatt_client_register_for_notification *cmd = buf;
- 	struct notification_data *notification;
--	char uuid[MAX_LEN_UUID_STR];
- 	struct gatt_client *client;
- 	struct characteristic *c;
- 	struct element_id match_id;
-@@ -2247,7 +2246,6 @@ static void handle_client_register_for_notification(const void *buf,
- 	hal_srvc_id_to_element_id(&cmd->srvc_id, &match_id);
- 	service = queue_find(dev->services, match_srvc_by_element_id,
- 								&match_id);
--	bt_uuid_to_string(&match_id.uuid, uuid, MAX_LEN_UUID_STR);
- 	if (!service) {
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
--- 
-1.9.1
+On Thu, Apr 03, 2014, Claudio Takahasi wrote:
+> This patchset implements GattManager1.UnregisterService(), and low-level
+> functions to remove service declarations (and its attributes) from the
+> attribute database.
+> 
+> Changes v1-v0:
+>  * Fix potential invalid memory access
+>  * Cleanup of external service when registration fails
+> 
+> Claudio Takahasi (3):
+>   gatt: Add removing service from the database
+>   gatt: Fix possibly lost block when bluetoothd exits
+>   doc: Add InvalidArguments to UnregisterService() errors
+> 
+>  doc/gatt-api.txt |  3 ++-
+>  src/gatt-dbus.c  | 51 +++++++++++++++++++++++++++++++++++++++++----------
+>  2 files changed, 43 insertions(+), 11 deletions(-)
 
+All three patches have been applied. Thanks.
+
+Johan
