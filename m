@@ -1,23 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Apr 2014 20:20:10 +0200
-From: Tom <c0rky@userman.net>
-To: linux-bluetooth@vger.kernel.org
-Subject: Intel 7260
-Message-ID: <20140404182010.GA3696@userman>
+Date: Fri, 4 Apr 2014 21:22:29 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] Remove unneeded headers include
+Message-ID: <20140404182229.GA27240@t440s.P-661HNU-F1>
+References: <1396472817-7314-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1396472817-7314-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Greetings.
+Hi Claudio,
 
-I have been trying to get my bluetooth chip working on my Intel 7260 WiFi/Bluetooth chip, but it fails with 
-'Bluetooth: hci0 command 0x0c03 tx timeout'
+On Wed, Apr 02, 2014, Claudio Takahasi wrote:
+> ---
+>  plugins/gatt-example.c        | 1 -
+>  profiles/proximity/main.c     | 1 -
+>  profiles/proximity/reporter.c | 2 --
+>  src/attrib-server.c           | 4 ----
+>  4 files changed, 8 deletions(-)
 
-I do have the latest ucode from iwlwifi, and i've built iwlwifi and bluetooth support in to the kernel. But i just 
-can not seem to get the bluetooth working. Googling for a solution only give some obscure results. 
+This patch has been applied. Thanks.
 
-Is there a known bug that i am not aware of in reagards to this chip? 
-
-
-c0rky.
+Johan
