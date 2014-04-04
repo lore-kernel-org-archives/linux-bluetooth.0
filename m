@@ -1,90 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/gatt: Fix sending notification for register gatt client
-Date: Fri,  4 Apr 2014 16:45:58 +0200
-Message-Id: <1396622758-24846-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CAN_7+YY9oVjPOy2sY0prooPsPNd35ck_-VNp=70ZQdeatLjcbQ@mail.gmail.com>
+References: <1396518234-8375-1-git-send-email-marcin.kraglak@tieto.com>
+	<CAJdJm_P+OjFYyggY4g_TTZJ7V1H7a46k45KntCZxnTwFRCE4ZA@mail.gmail.com>
+	<CAN_7+YZ=nOKxgCkg6Ok85610yTEr307qWyTubDh32cJgEmgsOQ@mail.gmail.com>
+	<CAJdJm_P2VQwB+N1-Ew8j4K27Absfi6BTBHJBKznkkBWwkpU5zA@mail.gmail.com>
+	<CAN_7+YY9oVjPOy2sY0prooPsPNd35ck_-VNp=70ZQdeatLjcbQ@mail.gmail.com>
+Date: Fri, 4 Apr 2014 10:34:48 -0400
+Message-ID: <CAJdJm_NkE+eG8c=jeWGXY3+ovc8nwx6jqQei0RVZ5pfuiqNZ8A@mail.gmail.com>
+Subject: Re: [RFC] gatt: Add API for creating services
+From: Anderson Lizardo <anderson.lizardo@openbossa.org>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds missing send notification in case of errors for gatt
-client registration. In case of error status GATT_FAILURE with given in
-cmd UUID is send in notification.
----
- android/gatt.c | 34 ++++++++++++++++++++++++----------
- 1 file changed, 24 insertions(+), 10 deletions(-)
+Hi Lukasz,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 4f0a656..372acec 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -413,6 +413,8 @@ static void handle_client_register(const void *buf, uint16_t len)
- 
- 	DBG("");
- 
-+	memset(&ev, 0, sizeof(ev));
-+
- 	if (queue_find(gatt_clients, match_client_by_uuid, &cmd->uuid)) {
- 		error("gatt: client uuid is already on list");
- 		status = HAL_STATUS_FAILED;
-@@ -422,12 +424,10 @@ static void handle_client_register(const void *buf, uint16_t len)
- 	client = new0(struct gatt_client, 1);
- 	if (!client) {
- 		error("gatt: cannot allocate memory for registering client");
--		status = HAL_STATUS_FAILED;
-+		status = HAL_STATUS_NOMEM;
- 		goto failed;
- 	}
- 
--	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
--
- 	client->notifications = queue_new();
- 	if (!client->notifications) {
- 		error("gatt: couldn't allocate notifications queue");
-@@ -436,22 +436,36 @@ static void handle_client_register(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	client->id = client_cnt++;
-+	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
- 
--	queue_push_head(gatt_clients, client);
-+	client->id = client_cnt++;
- 
--	status = HAL_STATUS_SUCCESS;
-+	if (!queue_push_head(gatt_clients, client)) {
-+		error("gatt: Cannot push client on the list");
-+		free(client);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
- 
- 	ev.status = GATT_SUCCESS;
- 	ev.client_if = client->id;
--	memcpy(ev.app_uuid, client->uuid, sizeof(client->uuid));
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
-+	if (status != HAL_STATUS_SUCCESS)
-+		ev.status = GATT_FAILURE;
-+
-+	/* We should send notification with given in cmd UUID
-+	 * in case of errors
-+	 */
-+	memcpy(ev.app_uuid, cmd->uuid, sizeof(ev.app_uuid));
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
- 			HAL_EV_GATT_CLIENT_REGISTER_CLIENT, sizeof(ev), &ev);
- 
--failed:
--	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--					HAL_OP_GATT_CLIENT_REGISTER, status);
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
-+									status);
- }
- 
- static void handle_client_unregister(const void *buf, uint16_t len)
+On Fri, Apr 4, 2014 at 10:03 AM, Lukasz Rymanowski >>> Actually, also
+ATT encoding and decoding could be common part.
+>>
+>> I can't find ATT decoding/encoding on the Android HAL headers. Are you
+>> sure this is not handled internally by Android HAL?
+>
+> What I meant is that we have to do ATT encoding/decoding in the
+> daemon. Android is getting only
+> read/write callbacks with value
+>
+> Therefore, code for ATT enc/dec could be common.
+
+Ok, it is clearer for me now. I was misunderstanding the direction of
+notifications on the android/hal-ipc-api.txt document.
+
+I'll send the RFC API soon.
+
+Best Regards,
 -- 
-1.9.1
-
+Anderson Lizardo
+http://www.indt.org/?lang=en
+INdT - Manaus - Brazil
