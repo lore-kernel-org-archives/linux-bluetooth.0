@@ -1,91 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1396829760.13361.19.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: linux-firmware: Update Intel BT devices firmware patch files
- (7260/3160)
-From: Ben Hutchings <ben@decadent.org.uk>
-To: "An, Tedd" <tedd.an@intel.com>
-Cc: "dwmw2@infradead.org" <dwmw2@infradead.org>,
-	Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>,
-	"Grumbach, Emmanuel" <emmanuel.grumbach@intel.com>,
-	"Fry, Don" <don.fry@intel.com>
-Date: Mon, 07 Apr 2014 01:16:00 +0100
-In-Reply-To: <BB52B9B497F0EE4EB05C192A0408F6602F27F4AD@ORSMSX104.amr.corp.intel.com>
-References: <20140314135254.2edf9d2e@han1-desk-dev>
-	 <1395003913.15764.118.camel@deadeye.wl.decadent.org.uk>
-	 <BB52B9B497F0EE4EB05C192A0408F6602F27F4AD@ORSMSX104.amr.corp.intel.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-f+ld/HNCshPNp0fNK0tY"
-Mime-Version: 1.0
+Message-ID: <5341D403.8050001@gmx.net>
+Date: Mon, 07 Apr 2014 00:24:03 +0200
+From: Tobias Jakobi <liquid.acid@gmx.net>
+MIME-Version: 1.0
+To: Anderson Lizardo <anderson.lizardo@openbossa.org>
+CC: BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
+References: <530FBB6B.8080300@gmx.net>	<CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>	<5310BFEF.8010405@gmx.net> <CAJdJm_PVX=97RPVUJ5qx9k-OFNt=xidLrwgL6qK9QTTRBJHd+Q@mail.gmail.com> <53137E6E.7080305@gmx.net> <534179D4.4040607@gmx.net>
+In-Reply-To: <534179D4.4040607@gmx.net>
+Content-Type: multipart/mixed;
+ boundary="------------060406080106060702050105"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is a multi-part message in MIME format.
+--------------060406080106060702050105
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---=-f+ld/HNCshPNp0fNK0tY
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Tobias Jakobi wrote:
+> Just a small note that I updated the bluez stacks (both on the server
+> and the client) to 5.17. However the issue remains.
+> 
+> I've also created log from the debug output of bluetoothd on both sides:
+> http://www.math.uni-bielefeld.de/~tjakobi/bt-client.log
+> http://www.math.uni-bielefeld.de/~tjakobi/bt-server.log
+> 
+> Has anyone here actually managed to get a working TCP/IP network with
+> recent bluez stack?
+> 
+> Greets,
+> Tobias
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
 
-On Thu, 2014-03-20 at 17:44 +0000, An, Tedd wrote:
-> Hi Ben
->=20
-> Due to our internal change of build system, the version format needs
-> to be updated so I can track it more easily.
-[...]
-> > > --- a/WHENCE
-> > > +++ b/WHENCE
-> > > @@ -2254,9 +2254,9 @@ Driver: btusb - Bluetooth USB driver
-> > >  File: intel/ibt-hw-37.7.bseq
-> > >  Version: 1316.02.00
-> > >  File: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-> > > -Version: 1344.01.33
-> > > +Version: auto.WP_1303_02_patch_0.1.54.1 (0x36)
-> > >  File: intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
-> > > -Version: 1344.01.33
-> > > +Version: auto.WP_1303_02_patch_0.1.54.1 (0x36)
-> > [...]
-> >=20
-> > Why has the version format changed?  Are all the different parts actual=
-ly
-> > significant?
-[...]
+I think I isolated the issue. The problem is that the profiles that are
+associated to the NAP, PANU and GN services haven't got the auto_connect
+flag set.
 
-That doesn't answer the second question.
+So during connect_profiles() they're never considered, and there is no
+way to change this via the cmdline tools. Which effectively disables
+this functionality.
 
-I really have a hard time believing that all of 'auto.WP', '1303_02',
-'patch', '0.1.54.1' and '0x36' are all significant.  No-one else seems
-to need more than 4 components in a version number; what's so special
-about this firmware?
+Maybe the DBus interface can change these setting for built-in profiles,
+but you honestly can't expect the enduser to fiddle around with that.
 
-And another question: can an outside observer compare version strings
-and get any sense of which is newer?  Are the components in the right
-order (most significant first)?
+I attached a patch which enables autoconnect for all the above services.
+This finally establishes the TCP/IP connection for me.
 
-Ben.
+Greets,
+Tobias
 
---=20
-Ben Hutchings
-Sturgeon's Law: Ninety percent of everything is crap.
 
---=-f+ld/HNCshPNp0fNK0tY
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
+--------------060406080106060702050105
+Content-Type: text/x-patch;
+ name="0001-network-enable-autoconnect-for-NAP-PANU-and-GN.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-network-enable-autoconnect-for-NAP-PANU-and-GN.patch"
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+>From 25f98aa8bbce7763fc68402c7aeedf90f431e7de Mon Sep 17 00:00:00 2001
+From: Tobias Jakobi <tjakobi@math.uni-bielefeld.de>
+Date: Sun, 6 Apr 2014 23:58:32 +0200
+Subject: network: enable autoconnect for NAP, PANU and GN
 
-iQIVAwUAU0HuQOe/yOyVhhEJAQrXAxAAimHkEGk00dWxzT3JqOU3meayTjO3dDgF
-vi44gY/Cs4oaTJ2NBDLwP0UpSTMIa5v1u3hpTyIAHmJ1DLSl3JldJrf51P4gt4fp
-V8jePMjPWoBsL0EbiNnDUM3MsZTEc7aCYWP9cwWCtQhaPVXIykxrXXvLWDUm3Sr+
-XUSGQ74KcyIvH9KqVPkN1XIvFlmf3QW5WnK8Lb7h/KxKAxdy8OhKTWPt9egKGR3j
-5JhKSkJnsJ8ZWL6YIPd6+i5F6rjvNQHGkxI2qxbOi+jDHhy8ruymj4mU9/sFbf3F
-gQXVhN0X2hFDhcde7S8pyfvsW1WM/nP0J353jTVI2Ni8Gf9AlEY9al+zPMfYI8DH
-TA+R8zruPuGnptaxkHJBILzpt18zcxNJNjexCZxJyqeh55p/9muayYNRbjK1M8mk
-FZjWdMO9z9BjOwgem+TxoXs++pTUQOEweh93c3n/kpveXhH9GaKnEg/3vxK1lilC
-d8CHff+jmC9/uKfZAp2mIgxt70iKyWCLhr8eJvFE8qGXFL4SyFMBqylfnyUPyFvh
-/Wx9FkfU684/vLJyWS5G64HDoB4Ad75u6l6Ri15Ty7V26adBmv4SrCOYpROAAoGI
-gpYJKkYM1VmJ+w/oGIXtjM48qEmcDr5KXPGjeLWn98J6Zw9kCIV94amaciTYkZDr
-nGaSix9Zt8s=
-=ANg3
------END PGP SIGNATURE-----
+---
+ profiles/network/manager.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
---=-f+ld/HNCshPNp0fNK0tY--
+diff --git a/profiles/network/manager.c b/profiles/network/manager.c
+index 0fe98a0..9b501a3 100644
+--- a/profiles/network/manager.c
++++ b/profiles/network/manager.c
+@@ -137,6 +137,7 @@ static struct btd_profile panu_profile = {
+ 	.name		= "network-panu",
+ 	.local_uuid	= NAP_UUID,
+ 	.remote_uuid	= PANU_UUID,
++	.auto_connect	= true,
+ 	.device_probe	= connection_register,
+ 	.device_remove	= connection_unregister,
+ 	.connect	= connection_connect,
+@@ -149,6 +150,7 @@ static struct btd_profile gn_profile = {
+ 	.name		= "network-gn",
+ 	.local_uuid	= PANU_UUID,
+ 	.remote_uuid	= GN_UUID,
++	.auto_connect	= true,
+ 	.device_probe	= connection_register,
+ 	.device_remove	= connection_unregister,
+ 	.connect	= connection_connect,
+@@ -161,6 +163,7 @@ static struct btd_profile nap_profile = {
+ 	.name		= "network-nap",
+ 	.local_uuid	= PANU_UUID,
+ 	.remote_uuid	= NAP_UUID,
++	.auto_connect	= true,
+ 	.device_probe	= connection_register,
+ 	.device_remove	= connection_unregister,
+ 	.connect	= connection_connect,
+-- 
+1.8.3.2
+
+
+--------------060406080106060702050105--
