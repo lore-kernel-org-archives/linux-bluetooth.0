@@ -1,172 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 1/2] android: Avoid creating symlinks in lib/
-Date: Mon, 7 Apr 2014 09:52:11 +0200
-Message-ID: <1396857132-14596-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Mon, 7 Apr 2014 10:45:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Tobias Jakobi <liquid.acid@gmx.net>
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Subject: Re: [bluez-5.14] connect fails with 'org.bluez.Error.NotAvailable'
+Message-ID: <20140407074535.GA8112@t440s.lan>
+References: <530FBB6B.8080300@gmx.net>
+ <CAJdJm_P9FD+NwSAfG=1bWg0Ep2Ku7eTqwpLN2aX6p5-+rc=3sA@mail.gmail.com>
+ <5310BFEF.8010405@gmx.net>
+ <CAJdJm_PVX=97RPVUJ5qx9k-OFNt=xidLrwgL6qK9QTTRBJHd+Q@mail.gmail.com>
+ <53137E6E.7080305@gmx.net>
+ <534179D4.4040607@gmx.net>
+ <5341D403.8050001@gmx.net>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <5341D403.8050001@gmx.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add bluetooth-headers module which is fake static library
-to provide headers from lib/ directory in proper manner, i.e. from
-bluetooth/ directory. Headers are copied to intermediates directory
-and proper include path is added by build system once dependency to
-this module is added. It's not longer necessary to specify lib/
-directory on include path for each module.
+Hi Tobias,
 
-This is to avoid modyfing source repository by creating symlinks in
-lib/ directory - now it's possible to build BlueZ without touching
-source repository at all.
----
- android/Android.mk | 64 +++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 39 insertions(+), 25 deletions(-)
+On Mon, Apr 07, 2014, Tobias Jakobi wrote:
+> I think I isolated the issue. The problem is that the profiles that are
+> associated to the NAP, PANU and GN services haven't got the auto_connect
+> flag set.
+> 
+> So during connect_profiles() they're never considered, and there is no
+> way to change this via the cmdline tools. Which effectively disables
+> this functionality.
+> 
+> Maybe the DBus interface can change these setting for built-in profiles,
+> but you honestly can't expect the enduser to fiddle around with that.
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 3a62485..71584c4 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -74,27 +74,14 @@ LOCAL_C_INCLUDES := \
- 
- LOCAL_C_INCLUDES += \
- 	$(LOCAL_PATH)/bluez \
--	$(LOCAL_PATH)/bluez/lib \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libglib \
- 
--lib_headers := \
--	bluetooth.h \
--	hci.h \
--	hci_lib.h \
--	l2cap.h \
--	sdp_lib.h \
--	sdp.h \
--	rfcomm.h \
--	sco.h \
--	bnep.h \
--
--$(shell mkdir -p $(LOCAL_PATH)/bluez/lib/bluetooth)
--
--$(foreach file,$(lib_headers), $(shell ln -sf ../$(file) $(LOCAL_PATH)/bluez/lib/bluetooth/$(file)))
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
- 
- LOCAL_MODULE_TAGS := optional
- 
-@@ -215,10 +202,12 @@ LOCAL_SRC_FILES := \
- 
- LOCAL_C_INCLUDES := \
- 	$(LOCAL_PATH)/bluez \
--	$(LOCAL_PATH)/bluez/lib \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := btmon
-@@ -285,10 +274,12 @@ LOCAL_SRC_FILES := \
- 
- LOCAL_C_INCLUDES := \
- 	$(LOCAL_PATH)/bluez \
--	$(LOCAL_PATH)/bluez/lib \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := l2test
-@@ -350,10 +341,12 @@ LOCAL_SRC_FILES := \
- 
- LOCAL_C_INCLUDES := \
- 	$(LOCAL_PATH)/bluez \
--	$(LOCAL_PATH)/bluez/lib \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := btmgmt
-@@ -374,10 +367,12 @@ LOCAL_SRC_FILES := \
- 
- LOCAL_C_INCLUDES := \
- 	$(LOCAL_PATH)/bluez \
--	$(LOCAL_PATH)/bluez/lib \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := hcitool
-@@ -395,11 +390,11 @@ LOCAL_SRC_FILES := \
- 	bluez/lib/bluetooth.c \
- 	bluez/lib/hci.c \
- 
--LOCAL_C_INCLUDES := \
--	$(LOCAL_PATH)/bluez/lib \
--
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := l2ping
-@@ -417,11 +412,11 @@ LOCAL_SRC_FILES := \
- 	bluez/lib/bluetooth.c \
- 	bluez/lib/hci.c \
- 
--LOCAL_C_INCLUDES := \
--	$(LOCAL_PATH)/bluez/lib \
--
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
- LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
- LOCAL_MODULE_TAGS := debug
- LOCAL_MODULE := avtest
-@@ -490,3 +485,22 @@ LOCAL_REQUIRED_MODULES := \
- include $(BUILD_EXECUTABLE)
- 
- endif
-+
-+#
-+# bluetooth-headers
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_MODULE := bluetooth-headers
-+LOCAL_NODULE_TAGS := optional
-+LOCAL_MODULE_CLASS := STATIC_LIBRARIES
-+
-+include_path := $(local-intermediates-dir)/include
-+include_files := $(wildcard $(LOCAL_PATH)/bluez/lib/*.h)
-+$(shell mkdir -p $(include_path)/bluetooth)
-+$(foreach file,$(include_files),$(shell cp -u $(file) $(include_path)/bluetooth))
-+
-+LOCAL_EXPORT_C_INCLUDE_DIRS := $(include_path)
-+
-+include $(BUILD_STATIC_LIBRARY)
--- 
-1.9.1
+There is actually another D-Bus method that can be used to connect any
+profile, regardless of the auto_connect value: Device1.ConnectProfile().
 
+The test-device script already supports it by doing something like
+"test-device connect <addr> nap" instead of "test-device connect <addr>".
+I think it might be a good idea to extend bluetoothctl to support the
+same.
+
+Johan
