@@ -1,160 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53430825.8000008@openbossa.org>
-Date: Mon, 07 Apr 2014 17:18:45 -0300
-From: Andre Guedes <andre.guedes@openbossa.org>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC v2] doc: Connection Parameters command and event
-References: <1396523885-3705-1-git-send-email-andre.guedes@openbossa.org> <0264824E-D1B3-48E4-A56B-D932C8B9A82D@holtmann.org> <533F1FE4.1020104@openbossa.org> <B9C95212-8058-4E28-816D-2F0034C74064@holtmann.org>
-In-Reply-To: <B9C95212-8058-4E28-816D-2F0034C74064@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Re-test MAP against PTS 5.1
+Date: Mon,  7 Apr 2014 17:53:54 +0200
+Message-Id: <1396886034-31640-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ android/pics-map.txt  | 2 +-
+ android/pixit-map.txt | 7 ++++---
+ android/pts-map.txt   | 4 ++--
+ 3 files changed, 7 insertions(+), 6 deletions(-)
 
-On 04/04/2014 06:55 PM, Marcel Holtmann wrote:
-> Hi Andre,
->
->>>> doc/mgmt-api.txt | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->>>> 1 file changed, 88 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
->>>> index 78f0bd2..a2c65db 100644
->>>> --- a/doc/mgmt-api.txt
->>>> +++ b/doc/mgmt-api.txt
->>>> @@ -995,7 +995,8 @@ Unpair Device Command
->>>> 	Return Parameters:	Address (6 Octets)
->>>> 				Address_Type (1 Octet)
->>>>
->>>> -	Removes all keys associated with the remote device.
->>>> +	Removes all keys and connection parameters associated with the remote
->>>> +	device.
->>>>
->>>> 	Possible values for the Address_Type parameter:
->>>> 		0	BR/EDR
->>>> @@ -1668,6 +1669,62 @@ Load Identity Resolving Keys Command
->>>> 				Invalid Index
->>>>
->>>>
->>>> +Load Connection Parameters Command
->>>> +====================================
->>>> +
->>>> +	Command Code:		0x0031
->>>> +	Controller Index:	<controller id>
->>>> +	Command Parameters:	Params_Count (2 Octets)
->>>> +				Params1 {
->>>> +					Address (6 Octets)
->>>> +					Address_Type (1 Octet)
->>>> +					Auto_Connect_Option (1 Octet)
->>>
->>> the one thing that I wonder is if we want to include this auto connect option here. I currently lean towards leaving this out and instead provide a different command that sets the auto-connect list.
->>>
->>> As I said before, the link-loss re-connect option is something I rather see set via a socket option. I think that just makes more sense. You are connect, and you want to be re-connect if anything forces a disconnect.
->>
->> I'm Ok with removing the auto connect option from this command and discussing more about the best way to set it (another mgmt command or a new socket option).
->
-> what we need to look into a little bit is what profiles/services require and auto-connect. So something like HID comes to mind. I think that goes along the lines also with remote-wakeup features.
->
-> My current thinking is Add Auto Connection Devices with array of Address and Address_Type and Remove Auto Connection Devices with the same array.
->
-> And the link-loss feature just becomes a socket option. Which means that profiles/services that just need a link-loss support, can do it from the application. And for systems services like HID, we do the auto-connect control in the daemon.
->
->> So I'll remove it from the next version.
->>
->>>> +					Min_Connection_Interval (2 Octets)
->>>> +					Max_Connection_Interval (2 Octes)
->>>> +					Connection_Latency (2 Octets)
->>>> +					Supervision_Timeout (2 Octets)
->>>> +				}
->>>> +				Params2 {  }
->>>> +				...
->>>> +	Return Parameters:
->>>> +
->>>> +	This command is used load connection parameters from several LE devices
->>>> +	into kernel. It is only supported on controllers with LE support.
->>>> +
->>>> +	The provided Address and Address_Type are the identity of a device. So
->>>> +	either its public address or static random address. Unresolvable random
->>>> +	addresses and resolvable random addresses are not valid and will be
->>>> +	rejected.
->>>> +
->>>> +	Possible values for the Address_Type parameter:
->>>> +		0	Reserved (not in use)
->>>> +		1	LE Public
->>>> +		2	LE Random
->>>
->>> What I wonder is if we should include BR/EDR here as well. Since the link supervision timeout is something we could allow modification on BR/EDR while keeping connection interval and latency at zero.
->>>
->>> In the past there have been discussions about link supervision timeout being configurable and not just using the default value and hoping the remote side would adjust it.
->>
->> I would prefer to leave this out by now and focus on LE only. Once LE connection parameters are working fine, we can extend this command to handle BR/EDR parameters also.
->
-> We do not have to do it right away. It might be enough to do this only via socket options since you always have sockets with BR/EDR. LE with GATT on a fixed channel is rather special.
->
->>>> +
->>>> +	Possible values for the Auto_Connect_Option parameter:
->>>> +		0	Disabled
->>>> +		1	Always
->>>> +		2	Link Loss
->>>> +
->>>> +	The 'Always' option configures the kernel to always re-establish the
->>>> +	connection, no matter the reason the connection was terminated. The
->>>> +	'Link Loss' option configures the kernel to re-establish the connection
->>>> +	only in case the connection was terminated due to a link loss.
->>>> +
->>>> +	The Min_Connection_Interval, Max_Connection_Interval, Connection_Latency
->>>> +	and Supervision_Timeout parameters should be configured as described in
->>>> +	Core 4.1 spec, Vol 2, 7.8.12.
->>>> +
->>>> +	This command can be used when the controller is not powered.
->>>> +
->>>> +	This command generates a Command Complete event on success or
->>>> +	a Command Status event on failure.
->>>> +
->>>> +	Possible errors:	Invalid Parameters
->>>> +				Invalid Index
->>>> +				Not Supported
->>>> +
->>>> +
->>>> Command Complete Event
->>>> ======================
->>>>
->>>> @@ -2257,3 +2314,33 @@ New Signature Resolving Key Event
->>>>
->>>> 	The provided Address and Address_Type are the identity of
->>>> 	a device. So either its public address or static random address.
->>>> +
->>>> +
->>>> +New Connection Parameters Event
->>>> +===============================
->>>> +
->>>> +	Event Code:		0x001a
->>>> +	Controller Index:	<controller id>
->>>> +	Event Parameters:	Address (6 Octets)
->>>> +				Address_Type (1 Octet)
->>>> +				Connection_Interval (2 Octets)
->>>
->>> This should be min and max connection interval. The actually chosen one by the controller is pretty irrelevant to us. We want to know what we have to load back into the kernel after next reboot.
->>
->> The "HCI Connection Update" event reports only the value chosen by the controller (see description on page 1222). However, we can save the min and max values from Connection Update Procedure and use them in this mgmt event.
->>
->> I'll fix this in the next version.
->
-> And one thing we should do here as well. Add a Store_Hint parameters similar to what we do with all of our keys. That will allow the kernel to communicate parameters without them being loaded on next reboot.
->
-> This becomes important when we end up sending this out for resolvable or unresolvable addresses where we do not have an identity address. There is pretty much no point for userspace to store the values.
+diff --git a/android/pics-map.txt b/android/pics-map.txt
+index 2875885..1e0695f 100644
+--- a/android/pics-map.txt
++++ b/android/pics-map.txt
+@@ -1,6 +1,6 @@
+ MAP PICS for the PTS tool.
+ 
+-PTS version: 5.0
++PTS version: 5.1
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-map.txt b/android/pixit-map.txt
+index 48419f0..ba687c1 100644
+--- a/android/pixit-map.txt
++++ b/android/pixit-map.txt
+@@ -1,10 +1,11 @@
+ MAP PIXIT for the PTS tool.
+ 
+-PTS version: 5.0
++PTS version: 5.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+ # - should be set to tester's phone number
++$ - should be set to IUT e-mail address
+ 
+ 		Required PIXIT settings
+ -------------------------------------------------------------------------------
+@@ -12,7 +13,7 @@ Parameter Name						Value
+ -------------------------------------------------------------------------------
+ TSPX_auth_password					0000
+ TSPX_auth_user_id					PTS
+-TSPX_bd_addr_iut					08606E414394 (*&)
++TSPX_bd_addr_iut					112233445566 (*&)
+ TSPX_client_class_of_device				100204
+ TSPX_delete_link_key					FALSE
+ TSPX_get_object_name					put.gif
+@@ -42,5 +43,5 @@ TSPX_MASInstanceID_Email				0
+ TSPX_message_notification_l2cap_psm			1003
+ TSPX_message_notification_rfcomm_channel		9
+ TSPX_upload_msg_phonenumber				123456789 (#)
+-TSPX_upload_msg_emailaddress				PTS_Test@bluetooth.com
++TSPX_upload_msg_emailaddress				IUT-email ($)
+ -------------------------------------------------------------------------------
+diff --git a/android/pts-map.txt b/android/pts-map.txt
+index 856077d..b19a678 100644
+--- a/android/pts-map.txt
++++ b/android/pts-map.txt
+@@ -1,7 +1,7 @@
+ PTS test results for MAP
+ 
+-PTS version: 5.0
+-Tested: 19-Feb-2014
++PTS version: 5.1
++Tested: 07-April-2014
+ 
+ Results:
+ PASS	test passed
+-- 
+1.8.5.3
 
-I thought we wouldn't send this event for resolvable and unresolvable 
-addresses in first place.
-
-Anyways, if we decide to send this event for resolvable and unresolvable 
-addresses, the Store_Hint parameters is not really needed. By checking 
-Address and Address_Type parameters the user is able to know if it is a 
-resolvable or unresolvable address type and if it should store it or not.
-
-Is there any other usage for this parameter I'm missing?
-
-Regards,
-
-Andre
