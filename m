@@ -1,280 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Adjust PICS and PIXITs for OPP
-Date: Mon, 07 Apr 2014 11:39:54 +0200
-Message-ID: <16634526.Byy7RHjf0o@uw000953>
-In-Reply-To: <1396515551-13996-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1396515551-13996-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/gatt: Fix sending notification for register gatt client
+Date: Mon, 07 Apr 2014 11:17:20 +0200
+Message-ID: <15525889.u89ISmxBm2@uw000953>
+In-Reply-To: <1396622758-24846-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396622758-24846-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Grzegorz,
 
-On Thursday 03 of April 2014 10:59:11 Sebastian Chlad wrote:
-> Adjusting PICS and PIXITs for OPP on PTS 5.1
+On Friday 04 of April 2014 16:45:58 Grzegorz Kolodziejczyk wrote:
+> This patch adds missing send notification in case of errors for gatt
+> client registration. In case of error status GATT_FAILURE with given in
+> cmd UUID is send in notification.
 > ---
->  android/pics-opp.txt  | 113 +++++++++++++++++++++++++-------------------------
->  android/pixit-opp.txt |  24 +++++------
->  2 files changed, 69 insertions(+), 68 deletions(-)
+>  android/gatt.c | 34 ++++++++++++++++++++++++----------
+>  1 file changed, 24 insertions(+), 10 deletions(-)
 > 
-> diff --git a/android/pics-opp.txt b/android/pics-opp.txt
-> index cd4acce..0a5919e 100644
-> --- a/android/pics-opp.txt
-> +++ b/android/pics-opp.txt
-> @@ -1,6 +1,6 @@
->  OPP PICS for the PTS tool.
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 4f0a656..372acec 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -413,6 +413,8 @@ static void handle_client_register(const void *buf, uint16_t len)
 >  
-> -PTS version: 5.0
-> +PTS version: 5.1
+>  	DBG("");
 >  
->  * - different than PTS defaults
->  # - not yet implemented/supported
-> @@ -12,10 +12,10 @@ O - optional
->  -------------------------------------------------------------------------------
->  Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
-> -TSPC_OPP_1_1	True (*)	Role: Object Push Client.
-> -TSPC_OPP_1_2	True (*)	Role: Object Push Server.
-> +TSPC_OPP_1_1	True (*)	Role: Object Push Client (C.1)
-> +TSPC_OPP_1_2	True (*)	Role: Object Push Server (C.1)
+> +	memset(&ev, 0, sizeof(ev));
+> +
+>  	if (queue_find(gatt_clients, match_client_by_uuid, &cmd->uuid)) {
+>  		error("gatt: client uuid is already on list");
+>  		status = HAL_STATUS_FAILED;
+> @@ -422,12 +424,10 @@ static void handle_client_register(const void *buf, uint16_t len)
+>  	client = new0(struct gatt_client, 1);
+>  	if (!client) {
+>  		error("gatt: cannot allocate memory for registering client");
+> -		status = HAL_STATUS_FAILED;
+> +		status = HAL_STATUS_NOMEM;
+>  		goto failed;
+>  	}
+>  
+> -	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+> -
+>  	client->notifications = queue_new();
+>  	if (!client->notifications) {
+>  		error("gatt: couldn't allocate notifications queue");
+> @@ -436,22 +436,36 @@ static void handle_client_register(const void *buf, uint16_t len)
+>  		goto failed;
+>  	}
+>  
+> -	client->id = client_cnt++;
+> +	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+>  
+> -	queue_push_head(gatt_clients, client);
+> +	client->id = client_cnt++;
+>  
+> -	status = HAL_STATUS_SUCCESS;
+> +	if (!queue_push_head(gatt_clients, client)) {
+> +		error("gatt: Cannot push client on the list");
+> +		free(client);
 
-TSPC_OPP_1b_1 and TSPC_OPP_1b_2 seem to be missing, those define supported
-profile version.
+This will leak notifications. Use destroy_gatt_client() here.
 
->  -------------------------------------------------------------------------------
-> -C.1: It is Mandatory to Support at least one of the defined roles.
-> +C.1: Mandatory to support at least one of the defined roles.
->  -------------------------------------------------------------------------------
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+>  
+>  	ev.status = GATT_SUCCESS;
+>  	ev.client_if = client->id;
+> -	memcpy(ev.app_uuid, client->uuid, sizeof(client->uuid));
+> +
+> +	status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+> +	if (status != HAL_STATUS_SUCCESS)
+> +		ev.status = GATT_FAILURE;
+> +
+> +	/* We should send notification with given in cmd UUID
+> +	 * in case of errors
+> +	 */
+> +	memcpy(ev.app_uuid, cmd->uuid, sizeof(ev.app_uuid));
+
+This is send also for success scenario, so comment is bogus.
+Reword it ie. remove part about errors.
 
 >  
+>  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+>  			HAL_EV_GATT_CLIENT_REGISTER_CLIENT, sizeof(ev), &ev);
 >  
-> @@ -34,23 +34,18 @@ C.1: It is mandatory to support at least one of the profile versions.
->  -------------------------------------------------------------------------------
->  Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
-> -TSPC_OPP_2_1	True		Client: Perform Service Discovery request.
-> -					(M.1)
-> +TSPC_OPP_2_1	True		Client: Perform Service Discovery request (M)
->  TSPC_OPP_2_2	True		Client: Authentication/PIN exchange supported.
-> -					(M.1)
-> +					(M)
->  TSPC_OPP_2_2a	True (*)	Client: Require Authentication/PIN by default.
->  					(O)
-> -TSPC_OPP_2_3	True		Client: Object Push is supported. (M.1)
-> -TSPC_OPP_2_4	True (*)	Client: vCard 2.1 format is supported for
-> -					Object Push. (C.3)
-> -TSPC_OPP_2_5	False		Client: vCalender 1.0 format is supported for
-> -					Object Push. (O)
-> -TSPC_OPP_2_6	False		Client: vMsg as defined in IrMC 1.1 is supported
-> -					for Object Push. (O)
-> -TSPC_OPP_2_7	False		Client: vNote as defined in IrMC 1.1 is
-> -					supported for Object Push. (O)
-> +TSPC_OPP_2_3	True		Client: Object Push (M)
-> +TSPC_OPP_2_4	True (*)	Client: vCard 2.1 (C.3)
-> +TSPC_OPP_2_5	False		Client: vCalender 1.0 (O)
-> +TSPC_OPP_2_6	False		Client: vMsg as defined in IrMC 1.1 (O)
-> +TSPC_OPP_2_7	False		Client: vNote as defined in IrMC 1.1 (O)
->  TSPC_OPP_2_8	True (*)	Client: Support content formats other than those
-> -					declared in TSPC_OPP_2_44 through
-> +					declared in TSPC_OPP_2_4 through
->  					TSPC_OPP_2_7. (O)
->  TSPC_OPP_2_8a	False		Client: Support specific set of other content
->  					formats. (C.4)
-> @@ -61,10 +56,10 @@ TSPC_OPP_2_9a	False		Client: Push multiple vCard objects using
->  TSPC_OPP_2_9b	True (*)	Client: Push multiple vCard objects using the
->  					same PUT operation. (C.5)
->  TSPC_OPP_2_10	False		Client: Push multiple vCalender objects. (O)
-> -TSPC_OPP_2_10a	False		Client: Push multiple vMsg objects using
-> +TSPC_OPP_2_10a	False		Client: Push multiple vCalendar objects using
->  					different PUT operations. (C.6)
-> -TSPC_OPP_2_10b	False		Client: Push multiple vMsg objects using the
-> -					same PUT operation. (C.6)
-> +TSPC_OPP_2_10b	False		Client: Push multiple vCalendar objects using
-> +					the same PUT operation. (C.6)
->  TSPC_OPP_2_11	False		Client: Push multiple vMsg objects. (O)
->  TSPC_OPP_2_11a	False		Client: Push multiple vMsg objects using
->  					different PUT operations. (C.7)
-> @@ -75,17 +70,21 @@ TSPC_OPP_2_12a	False		Client: Push multiple vNote objects using
->  					different PUT operations. (C.8)
->  TSPC_OPP_2_12b	False		Client: Push multiple vNote objects using the
->  					same PUT operation. (C.8)
-> -TSPC_OPP_2_13	False		Client: Pull business card is supported. (O)
-> -TSPC_OPP_2_14	False		Client: vCard 2.1 format is supported for
-> -					Business Card Pull. (C.1)
-> -TSPC_OPP_2_15	False		Client: Exchange business card is supported. (O)
-> -TSPC_OPP_2_16	False		Client: vCard 2.1 format is supported for
-> -					Business Card Exchange (C.2)
-> +TSPC_OPP_2_13	False		Client: Pull business card (O)
-> +TSPC_OPP_2_14	False		Client: vCard 2.1 (C.1)
-> +TSPC_OPP_2_15	False		Client: Exchange business card (O)
-> +TSPC_OPP_2_16	False		Client: vCard 2.1 (C.2)
-> +TSPC_OPP_2_17	False		GOEP v2 (C.9)
-> +TSPC_OPP_2_18	False		GOEP v2 Backward Compability (C.9)
-> +TSPC_OPP_2_19	False		OBEX over L2CAP (C.9)
-> +TSPC_OPP_2_20	False		OBEX Reliable Session (C.10)
-> +TSPC_OPP_2_21	False		OBEX SRM (C.10)
-> +TSPC_OPP_2_22	False		Send OBEX SRMP header (C.10)
-> +TSPC_OPP_2_23	False		Receive OBEX SRMP header (C.11)
->  -------------------------------------------------------------------------------
->  C.1: Mandatory to Support IF (TSPC_OPP_2_13) Business Card Pull is supported.
->  C.2: Mandatory to Support IF (TSPC_OPP_2_15) Business Card Exchange is
->  	supported.
-> -M.1: Mandatory to Support IF (TSPC_OPP_1_1) supported.
->  C.3: vCard 2.1 support is required for devices containing phonebook
->  	applications. vCard 2.1 support optional for other devices.
->  C.4: Mandatory to support one of TSPC_OPP_2_8a or TSPC_OPP_2_8b if TSPC_OPP_2_8
-> @@ -98,6 +97,9 @@ C.7: Mandatory to support at least one of TSPC_OPP_2_11a and TSPC_OPP_2_11b if
->  	TSPC_OPP_2_11 is supported. Otherwise, both items are excluded.
->  C.8: Mandatory to support at least one of TSPC_OPP_2_12a and TSPC_OPP_2_12b if
->  	TSPC_OPP_2_12 is supported. Otherwise, both items are excluded.
-> +C.9: Mandatory if TSPC_OPP_1b_2 supported.
-> +C.10: Optional to support if TSPC_OPP_1b_2 supported else excluded.
-> +C.11: Mandatory if TSPC_OPP_17 and TSPC_OPP_21 supported else excluded.
->  -------------------------------------------------------------------------------
+> -failed:
+> -	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> -					HAL_OP_GATT_CLIENT_REGISTER, status);
+> +	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
+> +									status);
+>  }
 >  
->  
-> @@ -121,17 +123,13 @@ TSPC_OPP_3_1	True		Server: Provide information on supported
->  					request. (M)
->  TSPC_OPP_3_2	True		Server: Authentication/PIN exchange supported.
->  					(M)
-> -TSPC_OPP_3_3	True		Server: Object Push is supported. (M)
-> +TSPC_OPP_3_3	True		Server: Object Push (M)
->  TSPC_OPP_3_3a	True (*)	Server: Receive multiple objects in the same
->  					PUT operation. (O)
-> -TSPC_OPP_3_4	True (*)	Server: vCard 2.1 format is supported for Object
-> -					Push. (C.3)
-> -TSPC_OPP_3_5	False		Server: vCalender 1.0 format is supported for
-> -					Object Push. (O)
-> -TSPC_OPP_3_6	False		Server: vMsg as defined in IrMC 1.1 is supported
-> -					for Object Push. (O)
-> -TSPC_OPP_3_7	False		Server: vNote as defined in IrMC 1.1 is
-> -					supported for Object Push. (O)
-> +TSPC_OPP_3_4	True (*)	Server: vCard 2.1 (C.3)
-> +TSPC_OPP_3_5	False		Server: vCalender 1.0 format (O)
-> +TSPC_OPP_3_6	False		Server: vMsg as defined in IrMC 1.1 (O)
-> +TSPC_OPP_3_7	False		Server: vNote as defined in IrMC 1.1 (O)
->  TSPC_OPP_3_8	True (*)	Server: Support content formats other than those
->  					declared in TSPC_OPP_3_4 through
->  					TSPC_OPP_3_7. (O)
-> @@ -139,31 +137,37 @@ TSPC_OPP_3_8a	False		Server: Support specific set of other content
->  					formats. (C.4)
->  TSPC_OPP_3_8b	True (*)	Server: Support all content formats. (C.4)
->  TSPC_OPP_3_9	True (*)	Server: Object Push vCard reject. (O)
-> -TSPC_OPP_3_10	False		Server: Object Push vCal rejectt. (O)
-> +TSPC_OPP_3_10	False		Server: Object Push vCal reject. (O)
->  TSPC_OPP_3_11	False		Server: Object Push vMsg reject. (O)
->  TSPC_OPP_3_12	False		Server: Object Push vNote reject. (O)
-> -TSPC_OPP_3_13	False		Server: Business card pull is supported. (O.1)
-> -TSPC_OPP_3_14	False		Server: vCard 2.1 format is supported for
-> -					Business Card Pull. (C.1)
-> +TSPC_OPP_3_13	False		Server: Business card pull (O.1)
-> +TSPC_OPP_3_14	False		Server: vCard 2.1 (C.1)
->  TSPC_OPP_3_15	False		Server: Business card pull reject. (O)
-> -TSPC_OPP_3_16	False		Server: Business card exchange is supported.
-> -					(O.2)
-> -TSPC_OPP_3_17	False		Server: vCard 2.1 format is supported for
-> -					Business Card Exchange (C.2)
-> +TSPC_OPP_3_16	False		Server: Business card exchange (O.2)
-> +TSPC_OPP_3_17	False		Server: vCard 2.1 (C.2)
->  TSPC_OPP_3_18	False		Server: Business card exchange reject. (O)
-> +TSPC_OPP_3_19	False		GOEP v2 (C.5)
-> +TSPC_OPP_3_20	False		GOEP v2 Backward Compability (C.5)
-> +TSPC_OPP_3_21	False		OBEX over L2CAP (C.5)
-> +TSPC_OPP_3_22	False		OBEX Reliable Session (C.16)
-> +TSPC_OPP_3_23	False		OBEX SRM (C.6)
-> +TSPC_OPP_3_24	False		Send OBEX SRMP header (C.6)
-> +TSPC_OPP_3_25	False		Receive OBEX SRMP header (C.7)
->  -------------------------------------------------------------------------------
-> -M.1: Mandatory to Support IF (TSPC_OPP_1_2) supported.
-> -C.2: Mandatory to Support IF (TSPC_OPP_3_16) Business Card Exchange is
-> -	supported.
->  O.1: IF NOT Supported, an error message must be sent on request for Business
->  	Card Pull.
->  O.2: IF NOT Supported, an error message must be sent on request for Business
->  	Card Exchange.
->  C.1: Mandatory to Support IF (TSPC_OPP_3_13) Business Card Pull is supported.
-> +C.2: Mandatory to Support IF (TSPC_OPP_3_16) Business Card Exchange is
-> +	supported.
->  C.3: vCard 2.1 support is required for devices containing phonebook
->  	applications. vCard 2.1 support optional for other devices.
->  C.4: Mandatory to support one of TSPC_OPP_3_8a or TSPC_OPP_3_8b if TSPC_OPP_3_8
->  	is supported. Otherwise, both items are excluded.
-> +C.5: Mandatory if TSPC_OPP_2b_2 supported.
-> +C.6: Optional to support if TSPC_OPP_2b_2 supported, else excluded.
-> +C.7: Mandatory if TSPC_OPP_3_19 and TSPC_OPP_3_23 supported else excluded.
->  -------------------------------------------------------------------------------
->  
->  
-> @@ -171,16 +175,13 @@ C.4: Mandatory to support one of TSPC_OPP_3_8a or TSPC_OPP_3_8b if TSPC_OPP_3_8
->  -------------------------------------------------------------------------------
->  Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
-> -TSPC_OPP_4_1	False		Abort-Push Operation is supported. (O)
-> -TSPC_OPP_4_2	False		Disconnect of OBEX session should be tested.
-> +TSPC_OPP_4_1	False		Abort-Push Operation (O)
-> +TSPC_OPP_4_2	False		Intentionally Left Blank (N/A)
->  TSPC_OPP_4_3	False		Multiple vCards transferred as a single vObject
-> -					is supported. (C.1)
-> -TSPC_OPP_4_4	False		Multiple vCards transfer is supported. (C.1)
-> -TSPC_OPP_4_5	False		vCards with multiple Phone Number Fields is
-> -					supported. (C.1)
-> -TSPC_OPP_4_6	False		Server supports Push vCal to Different Time
-> -					Zone. (C.1)
-> -TSPC_ALL	False		Turn on all test cases.
-> +					(C.1)
-> +TSPC_OPP_4_4	False		Multiple vCards transfer (C.1)
-> +TSPC_OPP_4_5	False		vCards with multiple Phone Number Fields (C.1)
-> +TSPC_OPP_4_6	False		Push vCal to Different Time Zone Server (C.1)
->  -------------------------------------------------------------------------------
->  C.1: Optional if TSPC_OPP_1_2 is supported, otherwise excluded.
->  -------------------------------------------------------------------------------
-> diff --git a/android/pixit-opp.txt b/android/pixit-opp.txt
-> index 93f6a29..7b0f4f2 100644
-> --- a/android/pixit-opp.txt
-> +++ b/android/pixit-opp.txt
-> @@ -1,6 +1,6 @@
->  OPP PIXIT for the PTS tool.
->  
-> -PTS version: 5.0
-> +PTS version: 5.1
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> @@ -9,19 +9,19 @@ PTS version: 5.0
->  -------------------------------------------------------------------------------
->  Parameter Name						Value
->  -------------------------------------------------------------------------------
-> -TSPX_unsupported_extension				dat
-> -TSPX_supported_extension				jpg
-> -TSPX_security_enabled					False
-> -TSPX_bd_addr_iut					112233445566 (*&)
-> +TSPX_supported_extension				jpg (*)
-> +TSPX_unsupported_extension				pts
->  TSPX_client_class_of_device				100104
->  TSPX_server_class_of_device				100104
-> +TSPX_auth_password					0000
-> +TSPX_auth_user_id					PTS
-> +TSPX_l2cap_psm						1003
->  TSPX_rfcomm_channel					8
-> +TSPX_no_confirmations					FALSE
-> +TSPX_bd_addr_iut					112233445566 (*&)
-> +TSPX_delete_link_key					FALSE
->  TSPX_pin_code						0000
-> -TSPX_reply_reject_push					True
-> -TSPX_delete_link_key					False
-> -TSPX_time_guard						180000
-> -TSPX_use_implicit_send					True
-> -TSPX_secure_simple_pairing_pass_key_confirmation	False
-> -TSPX_PTS_sends_real_jpg_data				True
-> -TSPX_confirm_received_objects				True
-> +TSPX_security_enabled					FALSE
-> +TSPX_time_guard						300000
-> +TSPX_use_implicit_send					TRUE
->  -------------------------------------------------------------------------------
+>  static void handle_client_unregister(const void *buf, uint16_t len)
 > 
 
 -- 
