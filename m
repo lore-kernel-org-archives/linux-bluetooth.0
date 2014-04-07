@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 From: Paritosh Debnath <paritosh.debnath@intel.com>
 To: Ben Hutchings <ben@decadent.org.uk>
-Cc: linux-bluetooth@vger.kernel.org, johannes@sipsolutions.net,
+Cc: linux-bluetooth@vger.kernel.org,
 	Paritosh Debnath <paritosh.debnath@intel.com>
-Subject: [PATCH v2] firmware: update Intel Bluetooth device firmware patch files
-Date: Mon,  7 Apr 2014 16:30:20 +0530
-Message-Id: <1396868420-12070-1-git-send-email-paritosh.debnath@intel.com>
+Subject: [PATCH] firmware: update Intel Bluetooth device firmware patch files
+Date: Mon,  7 Apr 2014 16:25:55 +0530
+Message-Id: <1396868155-12007-1-git-send-email-paritosh.debnath@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -19,27 +19,10 @@ This patch fixes
 
 Signed-off-by: Paritosh Debnath <paritosh.debnath@intel.com>
 ---
- WHENCE                                  |    4 ++--
  intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq  |  Bin 18145 -> 21198 bytes
  intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq |  Bin 17917 -> 20989 bytes
- 3 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 0 insertions(+), 0 deletions(-)
 
-diff --git a/WHENCE b/WHENCE
-index ca0f30b..41cb86f 100644
---- a/WHENCE
-+++ b/WHENCE
-@@ -2255,9 +2255,9 @@ Driver: btusb - Bluetooth USB driver
- File: intel/ibt-hw-37.7.bseq
- Version: 1316.02.00
- File: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
--Version: 1344.01.33
-+Version: 1303.02.55
- File: intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
--Version: 1344.01.33
-+Version: 1303.02.55
- 
- Licence: Redistributable. See LICENCE.ibt_firmware for details
- 
 diff --git a/intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq b/intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
 index 49554882ae6a94e9943d7d69c37f935c814f2aed..6365493e5eef3d473af58ecea71a47801526daca 100644
 GIT binary patch
