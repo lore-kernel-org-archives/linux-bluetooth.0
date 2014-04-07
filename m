@@ -2,41 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 1/2] android/pts: Bump PTS version for HID
-Date: Mon,  7 Apr 2014 17:28:42 +0200
-Message-Id: <1396884523-29517-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH 2/2] android/pts: PTS tests results for AVCTP
+Date: Mon,  7 Apr 2014 16:45:56 +0200
+Message-Id: <1396881956-26016-2-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1396881956-26016-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1396881956-26016-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Re-test against PTS 5.1 as well as adding test for CT role.
 ---
- android/pics-hid.txt  | 2 +-
- android/pixit-hid.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ android/pts-avctp.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/pics-hid.txt b/android/pics-hid.txt
-index ac37e45..f1645cc 100644
---- a/android/pics-hid.txt
-+++ b/android/pics-hid.txt
-@@ -1,6 +1,6 @@
- HID PICS for the PTS tool.
+diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
+index 64fd5fc..d8e7230 100644
+--- a/android/pts-avctp.txt
++++ b/android/pts-avctp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for AVCTP
  
 -PTS version: 5.0
+-Tested: 18-Mar-2014
 +PTS version: 5.1
++Tested: 07-April-2014
+ Android version: 4.4.2
  
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
-index 1d36c92..44e4363 100644
---- a/android/pixit-hid.txt
-+++ b/android/pixit-hid.txt
-@@ -1,6 +1,6 @@
- HID PIXIT for the PTS tool.
- 
--PTS version: 5.0
-+PTS version: 5.1
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
+ Results:
+@@ -20,7 +20,7 @@ TC_CT_CCM_BV_03_C	N/A
+ TC_CT_CCM_BV_04_C	N/A
+ TC_CT_CCM_BI_01_C	N/A
+ TC_CT_NFR_BV_01_C	N/A
+-TC_CT_NFR_BV_04_C	N/A
++TC_CT_NFR_BV_04_C	PASS	haltest: rc set_volume 5
+ TC_CT_FRA_BV_01_C	N/A
+ TC_CT_FRA_BV_04_C	N/A
+ -------------------------------------------------------------------------------
 -- 
 1.8.5.3
 
