@@ -1,119 +1,164 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <53430CFE.7050902@openbossa.org>
+Date: Mon, 07 Apr 2014 17:39:26 -0300
 From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3] doc: Connection Parameters command and event
-Date: Mon,  7 Apr 2014 18:36:50 -0300
-Message-Id: <1396906610-3853-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v2] doc: Connection Parameters command and event
+References: <1396523885-3705-1-git-send-email-andre.guedes@openbossa.org> <0264824E-D1B3-48E4-A56B-D932C8B9A82D@holtmann.org> <533F1FE4.1020104@openbossa.org> <B9C95212-8058-4E28-816D-2F0034C74064@holtmann.org> <53430825.8000008@openbossa.org> <504D036E-0E93-4B0C-AEDE-37D2C9199413@holtmann.org>
+In-Reply-To: <504D036E-0E93-4B0C-AEDE-37D2C9199413@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 80 insertions(+), 1 deletion(-)
+Hi Marcel,
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index cd5cd24..6a536d8 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -1006,7 +1006,8 @@ Unpair Device Command
- 	Return Parameters:	Address (6 Octets)
- 				Address_Type (1 Octet)
- 
--	Removes all keys associated with the remote device.
-+	Removes all keys and connection parameters associated with the remote
-+	device.
- 
- 	Possible values for the Address_Type parameter:
- 		0	BR/EDR
-@@ -1679,6 +1680,52 @@ Load Identity Resolving Keys Command
- 				Invalid Index
- 
- 
-+Load Connection Parameters Command
-+====================================
-+
-+	Command Code:		0x0031
-+	Controller Index:	<controller id>
-+	Command Parameters:	Params_Count (2 Octets)
-+				Params1 {
-+					Address (6 Octets)
-+					Address_Type (1 Octet)
-+					Min_Connection_Interval (2 Octets)
-+					Max_Connection_Interval (2 Octes)
-+					Connection_Latency (2 Octets)
-+					Supervision_Timeout (2 Octets)
-+				}
-+				Params2 {  }
-+				...
-+	Return Parameters:
-+
-+	This command is used to load connection parameters from several LE
-+	devices into kernel. It is only supported on controllers with LE
-+	support.
-+
-+	The provided Address and Address_Type are the identity of a device. So
-+	either its public address or static random address. Unresolvable random
-+	addresses and resolvable random addresses are not valid and will be
-+	rejected.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The Min_Connection_Interval, Max_Connection_Interval, Connection_Latency
-+	and Supervision_Timeout parameters should be configured as described in
-+	Core 4.1 spec, Vol 2, 7.8.12.
-+
-+	This command can be used when the controller is not powered.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+				Not Supported
-+
-+
- Command Complete Event
- ======================
- 
-@@ -2268,3 +2315,35 @@ New Signature Resolving Key Event
- 
- 	The provided Address and Address_Type are the identity of
- 	a device. So either its public address or static random address.
-+
-+
-+New Connection Parameters Event
-+===============================
-+
-+	Event Code:		0x001a
-+	Controller Index:	<controller id>
-+	Event Parameters:	Store_Hint (1 Octet)
-+				Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Min_Connection_Interval (2 Octets)
-+				Max_Connection_Interval (2 Octes)
-+				Connection_Latency (2 Octets)
-+				Supervision_Timeout (2 Octets)
-+
-+	This event indicates the new LE connection parameters set by GAP
-+	Connection Parameter Update Procedure.
-+
-+	The Store_Hint parameter indicates whether the host is expected
-+	to store the connection parameters persistently or not.
-+
-+	This event is sent only if the new parameters are different from the
-+	parameters the user has configured (See Load Connection Parameters
-+	Command) or if there is no parameters configured for that device.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The Connection_Interval, Connection_Latency and Supervision_Timeout
-+	parameters are encoded as described in Core 4.1	spec, Vol 2, 7.7.65.3.
--- 
-1.9.1
+On 04/07/2014 05:31 PM, Marcel Holtmann wrote:
+> Hi Andre,
+>
+>>>>>> doc/mgmt-api.txt | 89 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>>>>>> 1 file changed, 88 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+>>>>>> index 78f0bd2..a2c65db 100644
+>>>>>> --- a/doc/mgmt-api.txt
+>>>>>> +++ b/doc/mgmt-api.txt
+>>>>>> @@ -995,7 +995,8 @@ Unpair Device Command
+>>>>>> 	Return Parameters:	Address (6 Octets)
+>>>>>> 				Address_Type (1 Octet)
+>>>>>>
+>>>>>> -	Removes all keys associated with the remote device.
+>>>>>> +	Removes all keys and connection parameters associated with the remote
+>>>>>> +	device.
+>>>>>>
+>>>>>> 	Possible values for the Address_Type parameter:
+>>>>>> 		0	BR/EDR
+>>>>>> @@ -1668,6 +1669,62 @@ Load Identity Resolving Keys Command
+>>>>>> 				Invalid Index
+>>>>>>
+>>>>>>
+>>>>>> +Load Connection Parameters Command
+>>>>>> +====================================
+>>>>>> +
+>>>>>> +	Command Code:		0x0031
+>>>>>> +	Controller Index:	<controller id>
+>>>>>> +	Command Parameters:	Params_Count (2 Octets)
+>>>>>> +				Params1 {
+>>>>>> +					Address (6 Octets)
+>>>>>> +					Address_Type (1 Octet)
+>>>>>> +					Auto_Connect_Option (1 Octet)
+>>>>>
+>>>>> the one thing that I wonder is if we want to include this auto connect option here. I currently lean towards leaving this out and instead provide a different command that sets the auto-connect list.
+>>>>>
+>>>>> As I said before, the link-loss re-connect option is something I rather see set via a socket option. I think that just makes more sense. You are connect, and you want to be re-connect if anything forces a disconnect.
+>>>>
+>>>> I'm Ok with removing the auto connect option from this command and discussing more about the best way to set it (another mgmt command or a new socket option).
+>>>
+>>> what we need to look into a little bit is what profiles/services require and auto-connect. So something like HID comes to mind. I think that goes along the lines also with remote-wakeup features.
+>>>
+>>> My current thinking is Add Auto Connection Devices with array of Address and Address_Type and Remove Auto Connection Devices with the same array.
+>>>
+>>> And the link-loss feature just becomes a socket option. Which means that profiles/services that just need a link-loss support, can do it from the application. And for systems services like HID, we do the auto-connect control in the daemon.
+>>>
+>>>> So I'll remove it from the next version.
+>>>>
+>>>>>> +					Min_Connection_Interval (2 Octets)
+>>>>>> +					Max_Connection_Interval (2 Octes)
+>>>>>> +					Connection_Latency (2 Octets)
+>>>>>> +					Supervision_Timeout (2 Octets)
+>>>>>> +				}
+>>>>>> +				Params2 {  }
+>>>>>> +				...
+>>>>>> +	Return Parameters:
+>>>>>> +
+>>>>>> +	This command is used load connection parameters from several LE devices
+>>>>>> +	into kernel. It is only supported on controllers with LE support.
+>>>>>> +
+>>>>>> +	The provided Address and Address_Type are the identity of a device. So
+>>>>>> +	either its public address or static random address. Unresolvable random
+>>>>>> +	addresses and resolvable random addresses are not valid and will be
+>>>>>> +	rejected.
+>>>>>> +
+>>>>>> +	Possible values for the Address_Type parameter:
+>>>>>> +		0	Reserved (not in use)
+>>>>>> +		1	LE Public
+>>>>>> +		2	LE Random
+>>>>>
+>>>>> What I wonder is if we should include BR/EDR here as well. Since the link supervision timeout is something we could allow modification on BR/EDR while keeping connection interval and latency at zero.
+>>>>>
+>>>>> In the past there have been discussions about link supervision timeout being configurable and not just using the default value and hoping the remote side would adjust it.
+>>>>
+>>>> I would prefer to leave this out by now and focus on LE only. Once LE connection parameters are working fine, we can extend this command to handle BR/EDR parameters also.
+>>>
+>>> We do not have to do it right away. It might be enough to do this only via socket options since you always have sockets with BR/EDR. LE with GATT on a fixed channel is rather special.
+>>>
+>>>>>> +
+>>>>>> +	Possible values for the Auto_Connect_Option parameter:
+>>>>>> +		0	Disabled
+>>>>>> +		1	Always
+>>>>>> +		2	Link Loss
+>>>>>> +
+>>>>>> +	The 'Always' option configures the kernel to always re-establish the
+>>>>>> +	connection, no matter the reason the connection was terminated. The
+>>>>>> +	'Link Loss' option configures the kernel to re-establish the connection
+>>>>>> +	only in case the connection was terminated due to a link loss.
+>>>>>> +
+>>>>>> +	The Min_Connection_Interval, Max_Connection_Interval, Connection_Latency
+>>>>>> +	and Supervision_Timeout parameters should be configured as described in
+>>>>>> +	Core 4.1 spec, Vol 2, 7.8.12.
+>>>>>> +
+>>>>>> +	This command can be used when the controller is not powered.
+>>>>>> +
+>>>>>> +	This command generates a Command Complete event on success or
+>>>>>> +	a Command Status event on failure.
+>>>>>> +
+>>>>>> +	Possible errors:	Invalid Parameters
+>>>>>> +				Invalid Index
+>>>>>> +				Not Supported
+>>>>>> +
+>>>>>> +
+>>>>>> Command Complete Event
+>>>>>> ======================
+>>>>>>
+>>>>>> @@ -2257,3 +2314,33 @@ New Signature Resolving Key Event
+>>>>>>
+>>>>>> 	The provided Address and Address_Type are the identity of
+>>>>>> 	a device. So either its public address or static random address.
+>>>>>> +
+>>>>>> +
+>>>>>> +New Connection Parameters Event
+>>>>>> +===============================
+>>>>>> +
+>>>>>> +	Event Code:		0x001a
+>>>>>> +	Controller Index:	<controller id>
+>>>>>> +	Event Parameters:	Address (6 Octets)
+>>>>>> +				Address_Type (1 Octet)
+>>>>>> +				Connection_Interval (2 Octets)
+>>>>>
+>>>>> This should be min and max connection interval. The actually chosen one by the controller is pretty irrelevant to us. We want to know what we have to load back into the kernel after next reboot.
+>>>>
+>>>> The "HCI Connection Update" event reports only the value chosen by the controller (see description on page 1222). However, we can save the min and max values from Connection Update Procedure and use them in this mgmt event.
+>>>>
+>>>> I'll fix this in the next version.
+>>>
+>>> And one thing we should do here as well. Add a Store_Hint parameters similar to what we do with all of our keys. That will allow the kernel to communicate parameters without them being loaded on next reboot.
+>>>
+>>> This becomes important when we end up sending this out for resolvable or unresolvable addresses where we do not have an identity address. There is pretty much no point for userspace to store the values.
+>>
+>> I thought we wouldn't send this event for resolvable and unresolvable addresses in first place.
+>>
+>> Anyways, if we decide to send this event for resolvable and unresolvable addresses, the Store_Hint parameters is not really needed. By checking Address and Address_Type parameters the user is able to know if it is a resolvable or unresolvable address type and if it should store it or not.
+>>
+>> Is there any other usage for this parameter I'm missing?
+>
+> that is the whole point behind such a parameter. We want to future-proof ourselves here. The Store_Hint works in a way that kernel tells userspace that it expects that these settings are loading on next reboot.
+>
+> It worked out in our favor in the past and for the cases where we started being stupid (see LTKs) it causes us to workaround it in userspace. And that is what I want to avoid.
+>
+> Not sending these information to userspace might be possible, but it goes against on how we do things currently with these device information that userspace needs to store.
 
+Thanks for the clarification.
+
+I'll add the Store_Hint parameter in the next version I'm about to send.
+
+Andre
