@@ -2,32 +2,42 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 2/2] android/pts: Re-test AVRCP against PTS 5.1
-Date: Mon,  7 Apr 2014 12:15:27 +0200
-Message-Id: <1396865727-27607-2-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1396865727-27607-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1396865727-27607-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH 1/2] android/pts: Bump PICS and PIXIT for AVRCP
+Date: Mon,  7 Apr 2014 12:15:26 +0200
+Message-Id: <1396865727-27607-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Bumping version of PTS for AVRCP profile.
 ---
- android/pts-avrcp.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/pics-avrcp.txt  | 2 +-
+ android/pixit-avrcp.txt | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
-index b6f591b..b05bdbf 100644
---- a/android/pts-avrcp.txt
-+++ b/android/pts-avrcp.txt
-@@ -1,7 +1,7 @@
- PTS test results for AVRCP
+diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
+index bee22c8..969be6a 100644
+--- a/android/pics-avrcp.txt
++++ b/android/pics-avrcp.txt
+@@ -1,6 +1,6 @@
+ AVRCP PICS for the PTS tool.
  
 -PTS version: 5.0
--Tested: 07-Mar-2014
 +PTS version: 5.1
-+Tested: 07-April-2014
- Android version: 4.4.2
  
- Results:
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-avrcp.txt b/android/pixit-avrcp.txt
+index 9b278ad..ceae884 100644
+--- a/android/pixit-avrcp.txt
++++ b/android/pixit-avrcp.txt
+@@ -1,6 +1,6 @@
+ AVRCP PIXIT for the PTS tool.
+ 
+-PTS version: 5.0
++PTS version: 5.1
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
 -- 
 1.8.5.3
 
