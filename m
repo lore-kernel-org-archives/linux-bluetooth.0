@@ -1,128 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sudha Bheemanna <b.sudha@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sudha Bheemanna <b.sudha@samsung.com>
-Subject: [PATCH V2] 32-bit UUID support for GATT Attribute Type
-Date: Tue, 08 Apr 2014 17:13:36 +0530
-Message-id: <1396957416-17137-1-git-send-email-b.sudha@samsung.com>
-In-reply-to: <yes@samsung.com>
-References: <yes@samsung.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/hidhost: Don't disconnect channels after sending virtual unplug
+Date: Tue,  8 Apr 2014 12:01:10 +0200
+Message-Id: <1396951270-7118-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-1>The BT core4.0 spec supports only 16-bit and 128-bit uuids for the attribute
-  type in GATT devices.
-2>The BT core 4.1 spec specifies the support for 32-bit uuid for Attribute
-  type in GATT devices.
+It is up to receipient to acknowledge this command by disconnecting
+L2CAP.
 
-This patch provides the code changes for 32-bit uuid for attribute type in GATT
-client role.
+This was affecting TC_HOS_HCR_BV_03_I qualification test case.
 ---
- attrib/att.c  |   12 ++++++++++++
- attrib/gatt.c |   11 +++++++++++
- 2 files changed, 23 insertions(+)
+ android/hidhost.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/attrib/att.c b/attrib/att.c
-index 8e9c06d..2225255 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -42,6 +42,8 @@ static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
- {
- 	if (src->type == BT_UUID16)
- 		put_le16(src->value.u16, dst);
-+	else if (src->type == BT_UUID32)
-+		put_le32(src->value.u32, dst);
- 	else
- 		/* Convert from 128-bit BE to LE */
- 		bswap_128(&src->value.u128, dst);
-@@ -134,6 +136,8 @@ static void get_uuid(uint8_t type, const void *val, bt_uuid_t *uuid)
- {
- 	if (type == BT_UUID16)
- 		bt_uuid16_create(uuid, get_le16(val));
-+	else if (type == BT_UUID32)
-+		bt_uuid32_create(uuid, get_le32(val));
- 	else {
- 		uint128_t u128;
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 81e7eb8..5ea7c5a 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -887,14 +887,10 @@ static void bt_hid_virtual_unplug(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
  
-@@ -153,6 +157,8 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+-	/* Wait either channels to HUP */
+-	if (dev->intr_io)
+-		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
+-
+-	if (dev->ctrl_io)
+-		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
+-
+-	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
++	/* Remote device shall disconnect to ack this command
++	 * TODO add disconnect guard timer or leave this to upper layer?
++	 * TODO remove bonding or leave this to upper layer?
++	 */
  
- 	if (uuid->type == BT_UUID16)
- 		uuid_len = 2;
-+	else if (uuid->type == BT_UUID32)
-+		uuid_len = 4;
- 	else if (uuid->type == BT_UUID128)
- 		uuid_len = 16;
- 	else
-@@ -187,6 +193,8 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 
- 	if (len == (min_len + 2))
- 		type = BT_UUID16;
-+	else if (len == (min_len + 4))
-+		type = BT_UUID32;
- 	else if (len == (min_len + 16))
- 		type = BT_UUID128;
- 	else
-@@ -398,6 +406,8 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
- 
- 	if (uuid->type == BT_UUID16)
- 		uuid_len = 2;
-+	else if (uuid->type == BT_UUID32)
-+		uuid_len = 4;
- 	else if (uuid->type == BT_UUID128)
- 		uuid_len = 16;
- 	else
-@@ -429,6 +439,8 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
- 
- 	if (len == (min_len + 2))
- 		type = BT_UUID16;
-+	if (len == (min_len + 4))
-+		type = BT_UUID32;
- 	else if (len == (min_len + 16))
- 		type = BT_UUID128;
- 	else
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 49cd1a3..bb2330a 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -143,6 +143,8 @@ static void put_uuid_le(const bt_uuid_t *uuid, void *dst)
- {
- 	if (uuid->type == BT_UUID16)
- 		put_le16(uuid->value.u16, dst);
-+	else if (uuid->type == BT_UUID32)
-+		put_le32(uuid->value.u32, dst);
- 	else
- 		/* Convert from 128-bit BE to LE */
- 		bswap_128(&uuid->value.u128, dst);
-@@ -155,6 +157,11 @@ static void get_uuid128(uint8_t type, const void *val, bt_uuid_t *uuid)
- 
- 		bt_uuid16_create(&uuid16, get_le16(val));
- 		bt_uuid_to_uuid128(&uuid16, uuid);
-+	} else if (type == BT_UUID32) {
-+		bt_uuid_t uuid32;
-+
-+		bt_uuid32_create(&uuid32, get_le32(val));
-+		bt_uuid_to_uuid128(&uuid32, uuid);
- 	} else {
- 		uint128_t u128;
- 
-@@ -256,6 +263,8 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 
- 	if (list->len == 6)
- 		type = BT_UUID16;
-+	else if (list->len == 8)
-+		type = BT_UUID32;
- 	else if (list->len == 20)
- 		type = BT_UUID128;
- 	else {
-@@ -519,6 +528,8 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
- 
- 	if (list->len == 7)
- 		type = BT_UUID16;
-+	else if (list->len == 9)
-+		type = BT_UUID32;
- 	else
- 		type = BT_UUID128;
+ 	status = HAL_STATUS_SUCCESS;
  
 -- 
-1.7.9.5
+1.9.1
 
