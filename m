@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <szymon.janc@tieto.com>,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 10/15] android/gatt: Add helper function to create_service
-Date: Tue, 8 Apr 2014 11:22:27 +0200
-Message-ID: <1396948952-2035-11-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 09/15] android/gatt: Prepare to cache included services
+Date: Tue, 8 Apr 2014 11:22:26 +0200
+Message-ID: <1396948952-2035-10-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1396948952-2035-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1396948952-2035-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
@@ -13,87 +13,64 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This function will be useful when we start cache also included
+With this patch struct service is enhanced to handle caching include
 services
 ---
- android/gatt.c | 56 ++++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 36 insertions(+), 20 deletions(-)
+ android/gatt.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f88c72a..3500cd4 100644
+index b95962d..f88c72a 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -521,6 +521,40 @@ done:
+@@ -85,6 +85,8 @@ struct characteristic {
+ struct service {
+ 	struct element_id id;
+ 	struct gatt_primary prim;
++	struct gatt_included incl;
++
+ 	bool primary;
  
- }
+ 	struct queue *chars;
+@@ -1194,8 +1196,13 @@ static bool match_service_by_uuid(const void *data, const void *user_data)
+ 	const struct service *service = data;
+ 	const bt_uuid_t *uuid = user_data;
+ 	bt_uuid_t service_uuid;
++	int res;
  
-+static struct service *create_service(bool primary, char *uuid, void *data)
-+{
-+	struct service *s;
-+
-+	s = new0(struct service, 1);
-+	if (!s) {
-+		error("gatt: Cannot allocate memory for gatt_primary");
-+		return NULL;
-+	}
-+
-+	s->chars = queue_new();
-+	if (!s->chars) {
-+		error("gatt: Cannot allocate memory for char cache");
-+		free(s);
-+		return NULL;
-+	}
-+
-+	if (bt_string_to_uuid(&s->id.uuid, uuid) < 0) {
-+		error("gatt: Cannot convert string to uuid");
-+		queue_destroy(s->chars, NULL);
-+		free(s);
-+		return NULL;
-+	}
-+
-+	/* Put primary service to our local list */
-+	s->primary = primary;
-+	if (s->primary)
-+		memcpy(&s->prim, data, sizeof(s->prim));
+-	if (bt_string_to_uuid(&service_uuid, service->prim.uuid) < 0)
++	if (service->primary)
++		res = bt_string_to_uuid(&service_uuid, service->prim.uuid);
 +	else
-+		memcpy(&s->incl, data, sizeof(s->incl));
-+
-+	return s;
-+}
-+
- static void primary_cb(uint8_t status, GSList *services, void *user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -546,27 +580,9 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 		struct gatt_primary *prim = l->data;
- 		struct service *p;
++		res = bt_string_to_uuid(&service_uuid, service->incl.uuid);
++	if (res < 0)
+ 		return false;
  
--		p = new0(struct service, 1);
--		if (!p) {
--			error("gatt: Cannot allocate memory for gatt_primary");
--			continue;
--		}
--
--		p->chars = queue_new();
--		if (!p->chars) {
--			error("gatt: Cannot allocate memory for char cache");
--			free(p);
--			continue;
--		}
--
--		if (bt_string_to_uuid(&p->id.uuid, prim->uuid) < 0) {
--			error("gatt: Cannot convert string to uuid");
-+		p = create_service(true, prim->uuid, prim);
-+		if (!p)
- 			continue;
--		}
--
--		/* Put primary service to our local list */
--		memcpy(&p->prim, prim, sizeof(p->prim));
--		p->primary = true;
+ 	return !bt_uuid_cmp(uuid, &service_uuid);
+@@ -1461,6 +1468,8 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
  
- 		if (!queue_push_tail(dev->services, p)) {
- 			error("gatt: Cannot push primary service to the list");
+ 	/* Discover all characteristics for services if not cached yet */
+ 	if (queue_isempty(srvc->chars)) {
++		struct att_range range;
++
+ 		struct discover_char_data *cb_data =
+ 					new0(struct discover_char_data, 1);
+ 
+@@ -1473,9 +1482,11 @@ static void handle_client_get_characteristic(const void *buf, uint16_t len)
+ 		cb_data->service = srvc;
+ 		cb_data->conn_id = dev->conn_id;
+ 
+-		if (!gatt_discover_char(dev->attrib, srvc->prim.range.start,
+-					srvc->prim.range.end, NULL,
+-					discover_char_cb, cb_data)) {
++		range = srvc->primary ? srvc->prim.range: srvc->incl.range;
++
++		if (!gatt_discover_char(dev->attrib, range.start, range.end,
++							NULL, discover_char_cb,
++							cb_data)) {
+ 			free(cb_data);
+ 
+ 			status = HAL_STATUS_FAILED;
 -- 
 1.8.4
 
