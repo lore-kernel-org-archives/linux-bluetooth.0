@@ -1,43 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <szymon.janc@tieto.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 00/15] android/gatt: Gatt client improvements
-Date: Tue, 8 Apr 2014 11:22:17 +0200
-Message-ID: <1396948952-2035-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Sudha Bheemanna <b.sudha@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sudha Bheemanna <b.sudha@samsung.com>
+Subject: [PATCH] [32-bit UUID Support] Added support for 32-bit uuid for the
+ Attribute type in ATT and GATT for GATT Client devices as per BT core 4.1
+ spec. BT core spec 4.0 supports only 16-bit and 128-bit uuids. This patch
+ provides the code changes for 32-bit uuid for GATT client role.
+Date: Tue, 08 Apr 2014 15:56:19 +0530
+Message-id: <1396952779-16298-1-git-send-email-b.sudha@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set adds:
-* caching primary and included sevices.
-* fix in hanling included services
-* add list of disconnected devices - thanks to this we keep 
-cached services and next connect is faster.
-* Fix  instance id for primary and included services
+---
+ attrib/att.c  |   12 ++++++++++++
+ attrib/gatt.c |   11 +++++++++++
+ 2 files changed, 23 insertions(+)
 
-Lukasz Rymanowski (15):
-  android/gatt: Change name of gatt_primary in service structure
-  android/gatt: Add flag primary to struct service
-  android/gatt: Add helper functions to send all primary services
-  android/gatt: Use cached primary services if possible
-  android/gatt: Add create_device helper function
-  android/gatt: Add list of disconnected device
-  android/gatt: Minor change in get_include_data
-  android/gatt: Add msg size check for get included service
-  android/gatt: Prepare to cache included services
-  android/gatt: Add helper function to create_service
-  android/gatt: Cache include services
-  android/gatt: Add helper to send included service
-  android/gatt: Change label name from failed to reply
-  android/gatt: Use cache for included services
-  android/gatt: Fix instance id for primary and included service
-
- android/gatt.c | 509 +++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 346 insertions(+), 163 deletions(-)
-
+diff --git a/attrib/att.c b/attrib/att.c
+index 8e9c06d..2225255 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -42,6 +42,8 @@ static inline void put_uuid_le(const bt_uuid_t *src, void *dst)
+ {
+ 	if (src->type == BT_UUID16)
+ 		put_le16(src->value.u16, dst);
++	else if (src->type == BT_UUID32)
++		put_le32(src->value.u32, dst);
+ 	else
+ 		/* Convert from 128-bit BE to LE */
+ 		bswap_128(&src->value.u128, dst);
+@@ -134,6 +136,8 @@ static void get_uuid(uint8_t type, const void *val, bt_uuid_t *uuid)
+ {
+ 	if (type == BT_UUID16)
+ 		bt_uuid16_create(uuid, get_le16(val));
++	else if (type == BT_UUID32)
++		bt_uuid32_create(uuid, get_le32(val));
+ 	else {
+ 		uint128_t u128;
+ 
+@@ -153,6 +157,8 @@ uint16_t enc_read_by_grp_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+ 
+ 	if (uuid->type == BT_UUID16)
+ 		uuid_len = 2;
++	else if (uuid->type == BT_UUID32)
++		uuid_len = 4;
+ 	else if (uuid->type == BT_UUID128)
+ 		uuid_len = 16;
+ 	else
+@@ -187,6 +193,8 @@ uint16_t dec_read_by_grp_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 
+ 	if (len == (min_len + 2))
+ 		type = BT_UUID16;
++	else if (len == (min_len + 4))
++		type = BT_UUID32;
+ 	else if (len == (min_len + 16))
+ 		type = BT_UUID128;
+ 	else
+@@ -398,6 +406,8 @@ uint16_t enc_read_by_type_req(uint16_t start, uint16_t end, bt_uuid_t *uuid,
+ 
+ 	if (uuid->type == BT_UUID16)
+ 		uuid_len = 2;
++	else if (uuid->type == BT_UUID32)
++		uuid_len = 4;
+ 	else if (uuid->type == BT_UUID128)
+ 		uuid_len = 16;
+ 	else
+@@ -429,6 +439,8 @@ uint16_t dec_read_by_type_req(const uint8_t *pdu, size_t len, uint16_t *start,
+ 
+ 	if (len == (min_len + 2))
+ 		type = BT_UUID16;
++	if (len == (min_len + 4))
++		type = BT_UUID32;
+ 	else if (len == (min_len + 16))
+ 		type = BT_UUID128;
+ 	else
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 49cd1a3..bb2330a 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -143,6 +143,8 @@ static void put_uuid_le(const bt_uuid_t *uuid, void *dst)
+ {
+ 	if (uuid->type == BT_UUID16)
+ 		put_le16(uuid->value.u16, dst);
++	else if (uuid->type == BT_UUID32)
++		put_le32(uuid->value.u32, dst);
+ 	else
+ 		/* Convert from 128-bit BE to LE */
+ 		bswap_128(&uuid->value.u128, dst);
+@@ -155,6 +157,11 @@ static void get_uuid128(uint8_t type, const void *val, bt_uuid_t *uuid)
+ 
+ 		bt_uuid16_create(&uuid16, get_le16(val));
+ 		bt_uuid_to_uuid128(&uuid16, uuid);
++	} else if (type == BT_UUID32) {
++		bt_uuid_t uuid32;
++
++		bt_uuid32_create(&uuid32, get_le32(val));
++		bt_uuid_to_uuid128(&uuid32, uuid);
+ 	} else {
+ 		uint128_t u128;
+ 
+@@ -256,6 +263,8 @@ static void primary_all_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 
+ 	if (list->len == 6)
+ 		type = BT_UUID16;
++	else if (list->len == 8)
++		type = BT_UUID32;
+ 	else if (list->len == 20)
+ 		type = BT_UUID128;
+ 	else {
+@@ -519,6 +528,8 @@ static void char_discovered_cb(guint8 status, const guint8 *ipdu, guint16 iplen,
+ 
+ 	if (list->len == 7)
+ 		type = BT_UUID16;
++	else if (list->len == 9)
++		type = BT_UUID32;
+ 	else
+ 		type = BT_UUID128;
+ 
 -- 
-1.8.4
+1.7.9.5
 
