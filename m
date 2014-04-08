@@ -1,68 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Timo Mueller <timo.mueller@oss.bmw-carit.de>
 To: linux-bluetooth@vger.kernel.org
-Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
-	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: [RFCv5 4/4] Bluetooth: Request MITM Protection when initiator
-Date: Tue,  8 Apr 2014 14:21:34 +0200
-Message-Id: <7d81693e4e83c5d2978eb1e125fc6847820bf8f2.1396943583.git.timo.mueller@bmw-carit.de>
-In-Reply-To: <4acef1ec343a64bcce2ed65b9d79df523fad5276.1396943583.git.timo.mueller@bmw-carit.de>
-References: <cover.1396943583.git.timo.mueller@bmw-carit.de>
- <4493824f7a251d7345f2120c70e80b673368b475.1396943583.git.timo.mueller@bmw-carit.de>
- <cab20b0aaed6f4543ccbdad89d8e81e379167722.1396943583.git.timo.mueller@bmw-carit.de>
- <4acef1ec343a64bcce2ed65b9d79df523fad5276.1396943583.git.timo.mueller@bmw-carit.de>
-In-Reply-To: <cover.1396943583.git.timo.mueller@bmw-carit.de>
-References: <cover.1396943583.git.timo.mueller@bmw-carit.de>
+Cc: Timo Mueller <timo.mueller@bmw-carit.de>
+Subject: [RFCv5 0/4] SSP MITM protection
+Date: Tue,  8 Apr 2014 14:21:30 +0200
+Message-Id: <cover.1396943583.git.timo.mueller@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Mikel Astiz <mikel.astiz@bmw-carit.de>
+From: Timo Mueller <timo.mueller@bmw-carit.de>
 
-The GAP Specification gives the flexibility to decide whether MITM
-Protection is requested or not (Bluetooth Core Specification v4.0
-Volume 3, part C, section 6.5.3) when replying to an
-HCI_EV_IO_CAPA_REQUEST event.
+Hi,
 
-The recommendation is *not* to set this flag "unless the security
-policy of an available local service requires MITM Protection"
-(regardless of the bonding type). However, the kernel doesn't
-necessarily have this information and therefore the safest choice is
-to always use MITM Protection, also for General Bonding.
+this is an updated version of v4 with the following changes:
 
-This patch changes the behavior for the General Bonding initiator
-role, always requesting MITM Protection even if no high security level
-is used. Depending on the remote capabilities, the protection might
-not be actually used, and we will accept this locally unless of course
-a high security level was originally required.
+1) The management option to relax the MITM Protection was dropped
+2) Some minor modifications to the commit messages
 
-Note that this was already done for Dedicated Bonding. No-Bonding is
-left unmodified because MITM Protection is normally not desired in
-these cases.
+Test information from the v4 cover letter:
+<snip>
+I've successfully tested these changes in the last couple of months at
+the UPF #46 in Vienna, with the CE4A golden device and the bluetooth
+PTS (where applicable).
+<snip>
 
-Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
-Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
----
- net/bluetooth/hci_event.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+>From the original cover letter:
+The way the kernel handles MITM Protection during pairing is
+inconsistent: General Bonding and Dedicated Bonding are not treated
+equally.
+<snip>
+Therefore, the safest choice is to always request MITM Protection,
+also for General Bonding [1]. The proposal here is to do this for both
+incoming (patch 6/8) and outgoing (patch 7/8) procedures, as it was
+previously done for Dedicated Bonding. This "conservative" approach is
+smart enough to fall back to not using MITM Protection if the IO
+capabilities don't allow it (this policy already existed before for
+Dedicated Bonding, see patch 5/8).
+<snip>
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8f76e35..07c37d0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3467,9 +3467,11 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		if (conn->remote_auth == 0xff) {
- 			cp.authentication = conn->auth_type;
- 
--			/* Use MITM protection for outgoing dedicated bonding */
-+			/* Request MITM protection if our IO caps allow it
-+			 * except for the no-bonding case
-+			 */
- 			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
--			    cp.authentication == HCI_AT_DEDICATED_BONDING)
-+			    cp.authentication != HCI_AT_NO_BONDING)
- 				cp.authentication |= 0x01;
- 		} else {
- 			conn->auth_type = hci_get_auth_req(conn);
+For completeness, a quick recap on the motivation behind this patch
+set:
+In our cars we always want to use SSP methods other than Just
+Works. We even go as far as rejecting JW connection attempts. In order
+to still be able to pair all devices that are capable of using any of
+the remaining SSP methods, we need to make sure that we're not falling
+back to JW, regardless of the bonding type (Dedicated or General). For
+example, currently a connection with the iPhone acting as the
+initiating LM would lead a JW connection which would get rejected.
+
+Best regards
+Timo
+
+Mikel Astiz (3):
+  Bluetooth: Refactor hci_get_auth_req()
+  Bluetooth: Refactor code for outgoing dedicated bonding
+  Bluetooth: Request MITM Protection when initiator
+
+Timo Mueller (1):
+  Bluetooth: Use MITM Protection when IO caps allow it
+
+ net/bluetooth/hci_event.c | 48 ++++++++++++++++++++++++++---------------------
+ net/bluetooth/mgmt.c      |  5 +----
+ 2 files changed, 28 insertions(+), 25 deletions(-)
+
 -- 
 1.9.0
 
