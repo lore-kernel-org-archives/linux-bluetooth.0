@@ -1,44 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/hidhost: Don't disconnect channels after sending virtual unplug
-Date: Tue,  8 Apr 2014 12:01:10 +0200
-Message-Id: <1396951270-7118-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 8 Apr 2014 10:56:22 +0100
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Andre Guedes <andre.guedes@openbossa.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v3] doc: Connection Parameters command and event
+Message-ID: <20140408095622.GA21390@t440s.spectrum.wifi>
+References: <1396906610-3853-1-git-send-email-andre.guedes@openbossa.org>
+ <03ACEBDE-F9B0-44F2-8466-CC578C37D8C1@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <03ACEBDE-F9B0-44F2-8466-CC578C37D8C1@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is up to receipient to acknowledge this command by disconnecting
-L2CAP.
+Hi Marcel,
 
-This was affecting TC_HOS_HCR_BV_03_I qualification test case.
----
- android/hidhost.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+On Mon, Apr 07, 2014, Marcel Holtmann wrote:
+> > +Load Connection Parameters Command
+> > +====================================
+> > +
+> > +	Command Code:		0x0031
+> > +	Controller Index:	<controller id>
+> > +	Command Parameters:	Params_Count (2 Octets)
+> 
+> 				Param_Count
+> 
+> > +				Params1 {
+> 
+> 				Param1
+> > +					Address (6 Octets)
+> > +					Address_Type (1 Octet)
+> > +					Min_Connection_Interval (2 Octets)
+> > +					Max_Connection_Interval (2 Octes)
+> > +					Connection_Latency (2 Octets)
+> > +					Supervision_Timeout (2 Octets)
+> > +				}
+> > +				Params2 {  }
+> 
+> 				Param2
+> 
+> It should be loading multiple sets of parameter. The specification
+> also talks about Connection Parameter as in singular set.
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 81e7eb8..5ea7c5a 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -887,14 +887,10 @@ static void bt_hid_virtual_unplug(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	/* Wait either channels to HUP */
--	if (dev->intr_io)
--		g_io_channel_shutdown(dev->intr_io, TRUE, NULL);
--
--	if (dev->ctrl_io)
--		g_io_channel_shutdown(dev->ctrl_io, TRUE, NULL);
--
--	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
-+	/* Remote device shall disconnect to ack this command
-+	 * TODO add disconnect guard timer or leave this to upper layer?
-+	 * TODO remove bonding or leave this to upper layer?
-+	 */
- 
- 	status = HAL_STATUS_SUCCESS;
- 
--- 
-1.9.1
+This would be very funny sounding English imo. The specification only
+uses singular for the HCI Commands and Event (where "Connection
+Parameter Request" does sound ok and doesn't mean that we're dealing
+with a single parameter). In the command and event descriptions the spec
+is pretty clear that we're dealing with multiple parameters, e.g.:
 
+(from 7.8.31):
+	"This indicates that the Host has accepted the remote device’s
+	request to change connection parameters."
+
+	"The Interval_Min parameter shall not be greater than the
+	Interval_Max parameter"
+
+	"The Timeout parameter shall..."o
+
+(from 7.8.32):
+	"This indicates that the Host has rejected the remote device’s
+	request to change connection parameters."
+
+(from 7.7.65.6):
+	"This event indicates to the master’s Host or the slave’s Host
+	that the remote device is requesting a change in the connection
+	parameters."
+
+So imo the spec is pretty clear that we're dealing with multiple
+parameters per device.
+
+
+> > +New Connection Parameters Event
+> 
+> 		Parameter
+
+Nope. We're notifying user space of a new set of multiple parameters.
+Using the singular form here makes this sound quite funny. If you had
+just one parameter then we wouldn't even name the event like this but
+directly spell out which parameter is in question (e.g. "New Connection
+Latency Event").
+
+If you don't believe me feel free to get another opinion from a native
+English speaker ;)
+
+Johan
