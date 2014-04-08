@@ -1,51 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH 00/15] android/gatt: Gatt client improvements
-Date: Tue, 08 Apr 2014 21:57:26 +0200
-Message-ID: <2361626.J53QVkP15G@athlon>
-In-Reply-To: <1396948952-2035-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1396948952-2035-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-ID: <1396983753.2061.27.camel@belkin5>
+Subject: Re: Cannot send files to PC from phone
+From: Pacho Ramos <pacho@gentoo.org>
+To: Bastien Nocera <hadess@hadess.net>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Date: Tue, 08 Apr 2014 21:02:33 +0200
+In-Reply-To: <1395487433.1597.60.camel@nuvo>
+References: <1395481944.1364.2.camel@belkin5>
+	 <1395487433.1597.60.camel@nuvo>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
-
-On Tuesday 08 April 2014 11:22:17 Lukasz Rymanowski wrote:
-> This patch set adds:
-> * caching primary and included sevices.
-> * fix in hanling included services
-> * add list of disconnected devices - thanks to this we keep
-> cached services and next connect is faster.
-> * Fix  instance id for primary and included services
+El sáb, 22-03-2014 a las 12:23 +0100, Bastien Nocera escribió:
+[...]
+> What are you using as the server (computer) side program? Is it
+> gnome-user-share, or the obex test application in bluez?
 > 
-> Lukasz Rymanowski (15):
->   android/gatt: Change name of gatt_primary in service structure
->   android/gatt: Add flag primary to struct service
->   android/gatt: Add helper functions to send all primary services
->   android/gatt: Use cached primary services if possible
->   android/gatt: Add create_device helper function
->   android/gatt: Add list of disconnected device
->   android/gatt: Minor change in get_include_data
->   android/gatt: Add msg size check for get included service
->   android/gatt: Prepare to cache included services
->   android/gatt: Add helper function to create_service
->   android/gatt: Cache include services
->   android/gatt: Add helper to send included service
->   android/gatt: Change label name from failed to reply
->   android/gatt: Use cache for included services
->   android/gatt: Fix instance id for primary and included service
+> Simply having obexd installed isn't enough, you need an application to
+> control it and handle authorisation, etc.
 > 
->  android/gatt.c | 509
-> +++++++++++++++++++++++++++++++++++++++------------------ 1 file changed,
-> 346 insertions(+), 163 deletions(-)
 
-All patches applied (including v2) with some changes discussed offline, 
-thanks.
+Only one question, even if it works ok with gnome-user-share, how can I
+use that obex test application? Or is there any other command line
+utility that could allow to send files to PC from phone without needing
+gnome-user-share?
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Thanks
+
