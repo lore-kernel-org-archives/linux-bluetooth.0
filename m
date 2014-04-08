@@ -1,105 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <szymon.janc@tieto.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 11/15] android/gatt: Cache include services
-Date: Tue, 8 Apr 2014 15:14:35 +0200
-Message-ID: <1396962875-14776-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Timo Mueller <timo.mueller@oss.bmw-carit.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Mikel Astiz <mikel.astiz@bmw-carit.de>,
+	Timo Mueller <timo.mueller@bmw-carit.de>
+Subject: [RFCv5 1/4] Bluetooth: Refactor hci_get_auth_req()
+Date: Tue,  8 Apr 2014 14:21:31 +0200
+Message-Id: <4493824f7a251d7345f2120c70e80b673368b475.1396943583.git.timo.mueller@bmw-carit.de>
+In-Reply-To: <cover.1396943583.git.timo.mueller@bmw-carit.de>
+References: <cover.1396943583.git.timo.mueller@bmw-carit.de>
+In-Reply-To: <cover.1396943583.git.timo.mueller@bmw-carit.de>
+References: <cover.1396943583.git.timo.mueller@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds caching included services.
-Note that included service in put on two queues.
-1. On main services queue on the device, together with primary services.
-2. On special queue inside the primary service.
+From: Mikel Astiz <mikel.astiz@bmw-carit.de>
 
-We need 1) to have easy search of service when Android framework request
-for characteristics etc.
+Refactor the code without changing its behavior by handling the
+no-bonding cases first followed by General Bonding.
 
-We need 2) to handle iteration on included services done by Android
-framework for a given primary service
+Signed-off-by: Mikel Astiz <mikel.astiz@bmw-carit.de>
+Signed-off-by: Timo Mueller <timo.mueller@bmw-carit.de>
 ---
- android/gatt.c | 39 ++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 38 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_event.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 3500cd4..063e177 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -90,6 +90,7 @@ struct service {
- 	bool primary;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 84acc4a..0801668 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3419,24 +3419,25 @@ unlock:
  
- 	struct queue *chars;
-+	struct queue *included;	/* Valid only for primary services */
- };
+ static u8 hci_get_auth_req(struct hci_conn *conn)
+ {
+-	/* If remote requests dedicated bonding follow that lead */
+-	if (conn->remote_auth == HCI_AT_DEDICATED_BONDING ||
+-	    conn->remote_auth == HCI_AT_DEDICATED_BONDING_MITM) {
+-		/* If both remote and local IO capabilities allow MITM
+-		 * protection then require it, otherwise don't */
+-		if (conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT ||
+-		    conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)
+-			return HCI_AT_DEDICATED_BONDING;
+-		else
+-			return HCI_AT_DEDICATED_BONDING_MITM;
+-	}
+-
+ 	/* If remote requests no-bonding follow that lead */
+ 	if (conn->remote_auth == HCI_AT_NO_BONDING ||
+ 	    conn->remote_auth == HCI_AT_NO_BONDING_MITM)
+ 		return conn->remote_auth | (conn->auth_type & 0x01);
  
- struct notification_data {
-@@ -204,6 +205,16 @@ static void destroy_service(void *data)
- 		return;
- 
- 	queue_destroy(srvc->chars, destroy_characteristic);
+-	return conn->auth_type;
++	/* For general bonding, use the given auth_type */
++	if (conn->remote_auth == HCI_AT_GENERAL_BONDING ||
++	    conn->remote_auth == HCI_AT_GENERAL_BONDING_MITM)
++		return conn->auth_type;
 +
-+	/* Included services we keep on two queues.
-+	 * 1. On the same queue with primary services.
-+	 * 2. On the queue inside primary service.
-+	 * So we need to free service memory only once but we need to destroy
-+	 * two queues
++	/* If both remote and local have enough IO capabilities, require
++	 * MITM protection
 +	 */
-+	if (srvc->primary)
-+		queue_destroy(srvc->included, NULL);
++	if (conn->remote_cap != HCI_IO_NO_INPUT_OUTPUT &&
++	    conn->io_capability != HCI_IO_NO_INPUT_OUTPUT)
++		return conn->remote_auth | 0x01;
 +
- 	free(srvc);
++	/* No MITM protection possible so remove requirement */
++	return conn->remote_auth & ~0x01;
  }
  
-@@ -552,6 +563,17 @@ static struct service *create_service(bool primary, char *uuid, void *data)
- 	else
- 		memcpy(&s->incl, data, sizeof(s->incl));
- 
-+	if (!s->primary)
-+		return s;
+ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3466,8 +3467,14 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		 * to DisplayYesNo as it is not supported by BT spec. */
+ 		cp.capability = (conn->io_capability == 0x04) ?
+ 				HCI_IO_DISPLAY_YESNO : conn->io_capability;
+-		conn->auth_type = hci_get_auth_req(conn);
+-		cp.authentication = conn->auth_type;
 +
-+	/* For primary service allocate queue for included services */
-+	s->included = queue_new();
-+	if (!s->included) {
-+		queue_destroy(s->chars, NULL);
-+		free(s);
-+		return NULL;
-+	}
-+
- 	return s;
- }
- 
-@@ -1254,11 +1276,26 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
- 
- 	bt_string_to_uuid(&uuid, service->prim.uuid);
- 
--	/* TODO store included services in device->services list */
- 	for (; included; included = included->next) {
- 		struct gatt_included *included_service = included->data;
- 		bt_uuid_t included_uuid;
-+		struct service *incl;
-+
-+		incl = create_service(false, included_service->uuid,
-+							included_service);
-+		if (!incl)
-+			continue;
- 
-+		/* Lets keep included service on two queues.
-+		 * 1. on services queue together with primary service
-+		 * 2. on special queue inside primary service
-+		 */
-+		if (!queue_push_tail(service->included, incl) ||
-+				!queue_push_tail(device->services, incl)) {
-+			error("gatt: Cannot push incl service to the list");
-+			destroy_service(incl);
-+			continue;
++		/* If we are initiators, there is no remote information yet */
++		if (conn->remote_auth == 0xff) {
++			cp.authentication = conn->auth_type;
++		} else {
++			conn->auth_type = hci_get_auth_req(conn);
++			cp.authentication = conn->auth_type;
 +		}
- 		ev.conn_id = device->conn_id;
- 		ev.status = GATT_SUCCESS;
  
+ 		if (hci_find_remote_oob_data(hdev, &conn->dst) &&
+ 		    (conn->out || test_bit(HCI_CONN_REMOTE_OOB, &conn->flags)))
 -- 
-1.8.4
+1.9.0
 
