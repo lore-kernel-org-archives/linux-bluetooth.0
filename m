@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Re-test MAP against PTS 5.1
-Date: Wed, 09 Apr 2014 19:57:08 +0200
-Message-ID: <2882402.6gt0rZAcsq@athlon>
-In-Reply-To: <1396886034-31640-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1396886034-31640-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH 1/2] android/pts: Bump PTS version for HID
+Date: Wed, 09 Apr 2014 19:56:42 +0200
+Message-ID: <3392791.mUbAyjtkG3@athlon>
+In-Reply-To: <1396884523-29517-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1396884523-29517-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,74 +14,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
 
-On Monday 07 April 2014 17:53:54 Sebastian Chlad wrote:
+On Monday 07 April 2014 17:28:42 Sebastian Chlad wrote:
 > ---
->  android/pics-map.txt  | 2 +-
->  android/pixit-map.txt | 7 ++++---
->  android/pts-map.txt   | 4 ++--
->  3 files changed, 7 insertions(+), 6 deletions(-)
+>  android/pics-hid.txt  | 2 +-
+>  android/pixit-hid.txt | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/pics-map.txt b/android/pics-map.txt
-> index 2875885..1e0695f 100644
-> --- a/android/pics-map.txt
-> +++ b/android/pics-map.txt
+> diff --git a/android/pics-hid.txt b/android/pics-hid.txt
+> index ac37e45..f1645cc 100644
+> --- a/android/pics-hid.txt
+> +++ b/android/pics-hid.txt
 > @@ -1,6 +1,6 @@
->  MAP PICS for the PTS tool.
+>  HID PICS for the PTS tool.
 > 
 > -PTS version: 5.0
 > +PTS version: 5.1
 > 
 >  * - different than PTS defaults
 >  # - not yet implemented/supported
-> diff --git a/android/pixit-map.txt b/android/pixit-map.txt
-> index 48419f0..ba687c1 100644
-> --- a/android/pixit-map.txt
-> +++ b/android/pixit-map.txt
-> @@ -1,10 +1,11 @@
->  MAP PIXIT for the PTS tool.
+> diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
+> index 1d36c92..44e4363 100644
+> --- a/android/pixit-hid.txt
+> +++ b/android/pixit-hid.txt
+> @@ -1,6 +1,6 @@
+>  HID PIXIT for the PTS tool.
 > 
 > -PTS version: 5.0
 > +PTS version: 5.1
 > 
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
->  # - should be set to tester's phone number
-> +$ - should be set to IUT e-mail address
-> 
->  		Required PIXIT settings
->  ---------------------------------------------------------------------------
-> ---- @@ -12,7 +13,7 @@ Parameter Name						Value
->  ---------------------------------------------------------------------------
-> ---- TSPX_auth_password					0000
->  TSPX_auth_user_id					PTS
-> -TSPX_bd_addr_iut					08606E414394 (*&)
-> +TSPX_bd_addr_iut					112233445566 (*&)
->  TSPX_client_class_of_device				100204
->  TSPX_delete_link_key					FALSE
->  TSPX_get_object_name					put.gif
-> @@ -42,5 +43,5 @@ TSPX_MASInstanceID_Email				0
->  TSPX_message_notification_l2cap_psm			1003
->  TSPX_message_notification_rfcomm_channel		9
->  TSPX_upload_msg_phonenumber				123456789 (#)
-> -TSPX_upload_msg_emailaddress				PTS_Test@bluetooth.com
-> +TSPX_upload_msg_emailaddress				IUT-email ($)
->  ---------------------------------------------------------------------------
-> ---- diff --git a/android/pts-map.txt b/android/pts-map.txt
-> index 856077d..b19a678 100644
-> --- a/android/pts-map.txt
-> +++ b/android/pts-map.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for MAP
-> 
-> -PTS version: 5.0
-> -Tested: 19-Feb-2014
-> +PTS version: 5.1
-> +Tested: 07-April-2014
-> 
->  Results:
->  PASS	test passed
 
-Applied, thanks.
+Both patches applied, thanks.
 
 -- 
 Szymon K. Janc
