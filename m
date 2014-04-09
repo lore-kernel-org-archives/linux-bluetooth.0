@@ -1,66 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 04/16] gatt: Remove service functionality
-Date: Wed,  9 Apr 2014 09:07:02 +0200
-Message-Id: <1397027234-12003-5-git-send-email-marcin.kraglak@tieto.com>
+Subject: [RFC 12/16] android/gatt: Add descriptor implementation
+Date: Wed,  9 Apr 2014 09:07:10 +0200
+Message-Id: <1397027234-12003-13-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will remove service with given handle and its attributes.
+It will add characteristic descriptor attribute to local database.
 ---
- src/shared/gatt-db.c | 21 +++++++++++++++++++++
- src/shared/gatt-db.h |  2 ++
- 2 files changed, 23 insertions(+)
+ android/gatt.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 15e2f95..3ff017c 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -51,6 +51,13 @@ struct gatt_db_service {
- 	struct gatt_db_attribute **attributes;
- };
+diff --git a/android/gatt.c b/android/gatt.c
+index 25cd7f1..acaa2a9 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -2806,10 +2806,42 @@ failed:
  
-+static bool match_service_by_handle(const void *data, const void *user_data)
-+{
-+	const struct gatt_db_service *service = data;
-+
-+	return service->attributes[0]->handle == PTR_TO_INT(user_data);
-+}
-+
- struct gatt_db *gatt_db_new(void)
+ static void handle_server_add_descriptor(const void *buf, uint16_t len)
  {
- 	struct gatt_db *db;
-@@ -169,3 +176,17 @@ uint16_t gatt_db_new_service(struct gatt_db *db, const bt_uuid_t *uuid,
++	const struct hal_cmd_gatt_server_add_descriptor *cmd = buf;
++	struct hal_ev_gatt_server_descriptor_added ev;
++	struct gatt_server *server;
++	bt_uuid_t uuid;
++	uint8_t status;
++
+ 	DBG("");
  
- 	return service->attributes[0]->handle;
++	server = find_server_by_id(cmd->server_if);
++	if (!server) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	android2uuid(cmd->uuid, &uuid);
++
++	ev.descr_handle = gatt_db_new_char_descriptor(gatt_db,
++							cmd->service_handle,
++							&uuid, cmd->permissions,
++							NULL, NULL, NULL);
++	if (!ev.descr_handle)
++		status = HAL_STATUS_FAILED;
++	else
++		status = HAL_STATUS_SUCCESS;
++
++failed:
++	ev.server_if = cmd->server_if;
++	ev.srvc_handle = cmd->service_handle;
++	memcpy(ev.uuid, cmd->uuid, sizeof(cmd->uuid));
++	ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_SERVER_DESCRIPTOR_ADDED, sizeof(ev), &ev);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_SERVER_ADD_DESCRIPTOR, HAL_STATUS_FAILED);
++				HAL_OP_GATT_SERVER_ADD_DESCRIPTOR, status);
  }
-+
-+bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle)
-+{
-+	struct gatt_db_service *service;
-+
-+	service = queue_remove_if(db->services, match_service_by_handle,
-+							INT_TO_PTR(handle));
-+	if (!service)
-+		return false;
-+
-+	gatt_db_service_destroy(service);
-+
-+	return true;
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 7c03013..f543a87 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -34,3 +34,5 @@ void gatt_db_destroy(struct gatt_db *db);
- uint16_t gatt_db_new_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 					enum gatt_db_service_type service_type,
- 					uint16_t num_handles);
-+
-+bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle);
+ 
+ static void handle_server_start_service(const void *buf, uint16_t len)
 -- 
 1.8.5.3
 
