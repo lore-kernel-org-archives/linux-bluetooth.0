@@ -1,78 +1,310 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <7D219F6D-037F-4B02-BEDB-FD787867F1B3@holtmann.org>
-References: <CAHrH25QBL52xfM4Qnk=NE1xn3RX2Bwxq_i0osDDCoi4egO2tkg@mail.gmail.com>
-	<CAKT1EBfqP75+XJWkLt2yvkdEBVmNRmFC1_T667LAnuBrNFBxuQ@mail.gmail.com>
-	<CAHrH25TeYWXMxQPqBGd9YnNWw+y5sYT+k4e-88hu_SRtFYWY+g@mail.gmail.com>
-	<B767FC90-10FE-41A1-8607-90F8D3F18BD1@holtmann.org>
-	<CAHrH25QWJKOVstwGHW3oY6U-sF4zCRP2sPCkSJSqi2y8yOvY4w@mail.gmail.com>
-	<8B6D3E26-762A-490C-9E33-A8E8357C97F5@holtmann.org>
-	<CAHrH25TTcq7=+rkLZ0LO6Zmp9oatsjfqxDL-TxZaKVfk96mPbw@mail.gmail.com>
-	<7D219F6D-037F-4B02-BEDB-FD787867F1B3@holtmann.org>
-Date: Tue, 8 Apr 2014 20:00:33 -0700
-Message-ID: <CAHrH25S6GeWfQCYwPz1UDOK0q8FysTXK9O2+F6vaiDZD8R4FGQ@mail.gmail.com>
-Subject: Re: Removing GAttrib.
-From: Arman Uguray <armansito@chromium.org>
+In-Reply-To: <7DA0218C-A05A-4E9C-9042-AA7E6F933302@holtmann.org>
+References: <20140409010501.4B23E100A34@puck.mtv.corp.google.com>
+	<7DA0218C-A05A-4E9C-9042-AA7E6F933302@holtmann.org>
+Date: Tue, 8 Apr 2014 19:41:22 -0700
+Message-ID: <CAGXr9JF-SxutMuhkrqKhC7xEg7-9pPaW26MmbXxg2df0-DFxzQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add BCM20702 firmware upgrade support
+From: Petri Gynther <pgynther@google.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Claudio Takahasi <claudio.takahasi@openbossa.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-Sounds good. I had a chance to sync up with Claudio and Lizardo
-face-to-face today at the Bluetooth World Conference and we had a long
-discussion on how to do this refactor. I will go ahead and start a new
-(and unit tested) implementation of the ATT layer as "struct bt_att"
-as you suggested. I will integrate this with attrib/gatt as a first
-step, replacing attrib/att. I will then move on to implement a bt_gatt
-and bt_att_db.
+On Tue, Apr 8, 2014 at 6:36 PM, Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+> Hi Petri,
+>
+>> After hardware reset, BCM20702 obtains its initial firmware from a PROM =
+chip.
+>> Once this initial firmware is running, the firmware can be further upgra=
+ded
+>> over HCI interface with .hcd files provided by Broadcom. This is also kn=
+own
+>> as "patch RAM" support. This change implements that.
+>>
+>> If the .hcd file is not found in /lib/firmware, BCM20702 continues to op=
+erate
+>> with the initial firmware. Sample kernel log:
+>>  hotplug: sys=3Dfirmware act=3Dadd fw=3Dbrcm/bcm20702-0a5c-22be.hcd dev=
+=3D...
+>>  Bluetooth: hci0: BCM20702: patch brcm/bcm20702-0a5c-22be.hcd not found
+>>  Bluetooth: hci0: BCM20702: firmware hci_ver=3D06 hci_rev=3D1000 lmp_ver=
+=3D06 lmp_subver=3D220e
+>>
+>> If the .hcd file is found, btusb driver pushes it to BCM20702, and BCM20=
+702
+>> starts using the new firmware. Sample kernel log:
+>>  hotplug: sys=3Dfirmware act=3Dadd fw=3Dbrcm/bcm20702-0a5c-22be.hcd dev=
+=3D...
+>>  Bluetooth: hci0: BCM20702: patching hci_ver=3D06 hci_rev=3D1000 lmp_ver=
+=3D06 lmp_subver=3D220e
+>>  Bluetooth: hci0: BCM20702: firmware hci_ver=3D06 hci_rev=3D1389 lmp_ver=
+=3D06 lmp_subver=3D220e
+>>
+>> Above, we can see that hci_rev goes from 1000 to 1389 as a result of the=
+ upgrade.
+>
+> this is a nice feature to have. Where are these hcd files are coming from=
+. Are they available somewhere or do we have them available in linux-firmwa=
+re.git tree.
 
--Arman
+In our case, we get these files directly from the vendor. I haven't
+seen these in linux-firmware.git tree. Some searching reveals that
+Windows drivers contain either .hex or .hcd files, and there appears
+to be a tool hex2hcd to convert to .hcd. See page
+http://swiesmann.de/?p=3D30.
 
-On Tue, Apr 8, 2014 at 6:28 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Arman,
+Interestingly, now that I look at that page more closely, Ubuntu 12.04
+LTS with kernel 3.8 supports this already? Has Ubuntu made a patch
+that bluetooth-next doesn't have?
+
 >
->>> I am pretty open on how many steps we want to take at a time or what we want to do later. What I know for sure is that I
->>> want to rid of GIOChannel and BtIO usage and GLib.
+> I also wonder if there is a bit more general naming convention for the fi=
+les. For example with a quick search I found references to BCM2045B2_002.00=
+2.011.0348.0349.hcd and similar. They indicate that the naming is not based=
+ on the USB vendor and product ID.
+
+Some version numbering scheme is applied by Broadcom. However, at
+least initially, I'd prefer using USB vid/pid in the .hcd filename. I
+know that the .hcd file that I have works on our specific vid/pid of
+BCM20702, but I have no idea whether it would work on other BCM20702
+variants.
+
+>
+> For example for the Intel ROM patching, we used internal versioning to pi=
+ck the right file. That way we were able to run it for all of our devices. =
+For the Broadcom devices, it might make sense to run the patchram routine f=
+or all devices not just this one specific one.
+
+It would make sense, but I have no way of testing it. I only feel
+comfortable introducing this to the single device that I've been able
+to test with. It can later be extended to other BCM variants as people
+test this.
+
+>
+>> Signed-off-by: Petri Gynther <pgynther@google.com>
+>> ---
+>> drivers/bluetooth/btusb.c | 139 ++++++++++++++++++++++++++++++++++++++++=
+++++++
+>> 1 file changed, 139 insertions(+)
 >>
->> I agree with everything you described and I think a clean GLib-free
->> implementation that can be shared among Linux and Android code is the
->> way to go. My only concern is that a D-Bus GATT client API is much
->> needed for Chromium and I'm concerned that the big overhaul involved
->> in removing BtIO and GLib is going to take too long.
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index f338b0c..371d7e9 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -49,6 +49,7 @@ static struct usb_driver btusb_driver;
+>> #define BTUSB_WRONG_SCO_MTU   0x40
+>> #define BTUSB_ATH3012         0x80
+>> #define BTUSB_INTEL           0x100
+>> +#define BTUSB_BCM20702_PATCHRAM      0x200
 >>
->> So my question is this: how open would you be for an initial GATT
->> client API that uses the existing code in attrib/* internally? I'm
->> thinking of something very similar to how android/gatt.c has been
->> implemented so far. So what I have in mind is:
+>> static const struct usb_device_id btusb_table[] =3D {
+>>       /* Generic Bluetooth USB device */
+>> @@ -103,6 +104,7 @@ static const struct usb_device_id btusb_table[] =3D =
+{
+>>       /* Broadcom BCM20702A0 */
+>>       { USB_DEVICE(0x0489, 0xe042) },
+>>       { USB_DEVICE(0x04ca, 0x2003) },
+>> +     { USB_DEVICE(0x0a5c, 0x22be), .driver_info =3D BTUSB_BCM20702_PATC=
+HRAM },
+>>       { USB_DEVICE(0x0b05, 0x17b5) },
+>>       { USB_DEVICE(0x0b05, 0x17cb) },
+>>       { USB_DEVICE(0x413c, 0x8197) },
+>> @@ -1380,6 +1382,140 @@ exit_mfg_deactivate:
+>>       return 0;
+>> }
 >>
->>     - The bt_gatt structure you mentioned, lives in src/shared/gatt.*
->> and internally uses GAttrib, etc. The code is D-Bus free and could be
->> used by the GATT client code in android/gatt as well.
->>     - D-Bus code added to src/gatt-dbus.* to expose client objects.
->> This code talks to src/shared/gatt.*.
->>     - src/device.* and profiles modified to use the new API with no
->> explicit GIOChannel usage.
+>> +static int btusb_setup_bcm20702(struct hci_dev *hdev)
+>> +{
+>> +     struct btusb_data *data =3D hci_get_drvdata(hdev);
+>> +     struct usb_device *udev =3D data->udev;
+>> +     char fw_name[64];
+>> +     const struct firmware *fw;
+>> +     const u8 *fw_ptr;
+>> +     size_t fw_size;
+>> +     const struct hci_command_hdr *cmd;
+>> +     const u8 *cmd_param;
+>> +     u16 opcode;
+>> +     struct sk_buff *skb;
+>> +     struct hci_rp_read_local_version *ver;
+>> +     long ret;
+>> +
+>> +     snprintf(fw_name, sizeof(fw_name), "brcm/bcm20702-%04x-%04x.hcd",
+>> +              le16_to_cpu(udev->descriptor.idVendor),
+>> +              le16_to_cpu(udev->descriptor.idProduct));
+>> +
+>> +     ret =3D request_firmware(&fw, fw_name, &hdev->dev);
+>> +     if (ret < 0) {
+>> +             BT_INFO("%s: BCM20702: patch %s not found", hdev->name,
+>> +                     fw_name);
+>> +             ret =3D 0;
+>> +             goto get_fw_ver;
+>> +     }
+>> +
+>> +     /* Reset */
+>> +     skb =3D __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEO=
+UT);
+>> +     if (IS_ERR(skb)) {
+>> +             ret =3D PTR_ERR(skb);
+>> +             BT_ERR("%s: HCI_OP_RESET failed (%ld)", hdev->name, ret);
+>> +             goto reset_fw;
+>> +     }
+>> +     kfree_skb(skb);
+>> +
+>> +     /* Read Local Version Info */
+>> +     skb =3D __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
+>> +                          HCI_INIT_TIMEOUT);
+>> +     if (IS_ERR(skb)) {
+>> +             ret =3D PTR_ERR(skb);
+>> +             BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
+>> +                     hdev->name, ret);
+>> +             goto reset_fw;
+>> +     }
+>> +
 >
-> I have no problem in doing this in parallel and take smaller or different steps. My main point is that everybody knows where we need to go in the long term.
+> You need a length check here to ensure that resulting buffer is the corre=
+ct length. Trusting the hardware is not a good idea. I have seen this go wr=
+ong in some cases.
+
+Will do. I'll send revised diff for this.
+
 >
->> What I'm suggesting is basically to make the daemon use the new API
->> first and implement the new API with the existing GLib based code so
->> that we have at least some implementation to work with for Chromium
->> (and we isolate GLib usage to one place as far as GATT is concerned),
->> and THEN implement bt_gatt, bt_att etc. the proper way. Is this
->> something that you would be open to upstreaming? My primary concern is
->> simply the amount of time it will take to implement a new ATT/GATT
->> endpoint but if you believe that we should absolutely do it the right
->> way the first time around then it's not the end of the world.
+>> +     ver =3D (struct hci_rp_read_local_version *) skb->data;
+>> +     BT_INFO("%s: BCM20702: patching hci_ver=3D%02x hci_rev=3D%04x lmp_=
+ver=3D%02x "
+>> +             "lmp_subver=3D%04x", hdev->name, ver->hci_ver, ver->hci_re=
+v,
+>> +             ver->lmp_ver, ver->lmp_subver);
+>> +     kfree_skb(skb);
+>> +
+>> +     /* Start Download */
+>> +     skb =3D __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
+>> +     if (IS_ERR(skb)) {
+>> +             ret =3D PTR_ERR(skb);
+>> +             BT_ERR("%s: BCM20702: Download Minidrv command failed (%ld=
+)",
+>> +                     hdev->name, ret);
+>> +             goto reset_fw;
+>> +     }
+>> +     kfree_skb(skb);
+>> +
+>> +     /* 50 msec delay after Download Minidrv completes */
+>> +     msleep(50);
+>> +
+>> +     fw_ptr =3D fw->data;
+>> +     fw_size =3D fw->size;
+>> +
+>> +     while (fw_size >=3D sizeof(*cmd)) {
+>> +             cmd =3D (struct hci_command_hdr *) fw_ptr;
+>> +             fw_ptr +=3D sizeof(*cmd);
+>> +             fw_size -=3D sizeof(*cmd);
+>> +
+>> +             if (fw_size < cmd->plen) {
+>> +                     BT_ERR("%s: BCM20702: patch %s is corrupted",
+>> +                             hdev->name, fw_name);
+>> +                     ret =3D -EINVAL;
+>> +                     goto reset_fw;
+>> +             }
+>> +
+>> +             cmd_param =3D fw_ptr;
+>> +             fw_ptr +=3D cmd->plen;
+>> +             fw_size -=3D cmd->plen;
+>> +
+>> +             opcode =3D le16_to_cpu(cmd->opcode);
+>> +
+>> +             skb =3D __hci_cmd_sync(hdev, opcode, cmd->plen, cmd_param,
+>> +                                  HCI_INIT_TIMEOUT);
+>> +             if (IS_ERR(skb)) {
+>> +                     ret =3D PTR_ERR(skb);
+>> +                     BT_ERR("%s: BCM20702: patch command %04x failed (%=
+ld)",
+>> +                             hdev->name, opcode, ret);
+>> +                     goto reset_fw;
+>> +             }
+>> +             kfree_skb(skb);
+>> +     }
+>> +
+>> +     /* 250 msec delay after Launch Ram completes */
+>> +     msleep(250);
+>> +
+>> +reset_fw:
+>> +     /* Reset */
+>> +     skb =3D __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEO=
+UT);
+>> +     if (IS_ERR(skb)) {
+>> +             ret =3D PTR_ERR(skb);
+>> +             BT_ERR("%s: HCI_OP_RESET failed (%ld)", hdev->name, ret);
+>> +             goto done;
+>> +     }
+>> +     kfree_skb(skb);
+>> +
+>> +get_fw_ver:
+>> +     /* Read Local Version Info */
+>> +     skb =3D __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
+>> +                          HCI_INIT_TIMEOUT);
+>> +     if (IS_ERR(skb)) {
+>> +             ret =3D PTR_ERR(skb);
+>> +             BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
+>> +                     hdev->name, ret);
+>> +             goto done;
+>> +     }
+>> +
+>> +     ver =3D (struct hci_rp_read_local_version *) skb->data;
+>> +     BT_INFO("%s: BCM20702: firmware hci_ver=3D%02x hci_rev=3D%04x lmp_=
+ver=3D%02x "
+>> +             "lmp_subver=3D%04x", hdev->name, ver->hci_ver, ver->hci_re=
+v,
+>> +             ver->lmp_ver, ver->lmp_subver);
+>> +     kfree_skb(skb);
 >
-> Go ahead with it. Internal refactoring is simple. Just plan to have unit tests included that check will ensure that all changes you make are tested.
+> Is this HCI_Reset and HCI_Read_Local_Version_Info really needed. The stan=
+dard init procedure will do exactly that anyway. I have no problem in havin=
+g this in here. I am just saying that it will be run anyway again after ->s=
+etup() completed.
 >
-> We did this for AVDTP, AVRCP and now MCAP for our refactoring to make code shareable between Android and upstream.
+> You can check for yourself when running btmon before plugging this device=
+ or manually loading btusb.
+
+The reset is important because it activates the new firmware. And, I
+do like seeing the local version info in kernel log because it makes
+it clear what FW version was before and is after the upgrade.
+
+>
+>> +
+>> +done:
+>> +     if (fw)
+>> +             release_firmware(fw);
+>> +
+>> +     return ret;
+>> +}
+>> +
+>> static int btusb_probe(struct usb_interface *intf,
+>>                               const struct usb_device_id *id)
+>> {
+>> @@ -1485,6 +1621,9 @@ static int btusb_probe(struct usb_interface *intf,
+>>       if (id->driver_info & BTUSB_BCM92035)
+>>               hdev->setup =3D btusb_setup_bcm92035;
+>>
+>> +     if (id->driver_info & BTUSB_BCM20702_PATCHRAM)
+>> +             hdev->setup =3D btusb_setup_bcm20702;
+>> +
+>
+> If we are somehow able to just do BTUSB_BROADCOM and always trigger the p=
+atchram loading based on the hardware found that would be super great.
+
+It would be nice, but I don't have enough resources to test it. I'd
+say let's start with this and extend from there.
+
+-- Petri
+
+>
+>>       if (id->driver_info & BTUSB_INTEL) {
+>>               usb_enable_autosuspend(data->udev);
+>>               hdev->setup =3D btusb_setup_intel;
 >
 > Regards
 >
