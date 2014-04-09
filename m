@@ -1,39 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/gatt: Fix incorrect event status
-Date: Thu, 10 Apr 2014 08:29:58 +0200
-Message-Id: <1397111398-18137-1-git-send-email-marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Add support for fake read RSSI
+Date: Wed, 09 Apr 2014 23:31:56 +0200
+Message-ID: <1439178.XRzOTKglYP@athlon>
+In-Reply-To: <1395747330-22919-1-git-send-email-szymon.janc@tieto.com>
+References: <1395747330-22919-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Return proper gatt_status in register_for_notification event.
----
- android/gatt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Tuesday 25 March 2014 12:35:30 Szymon Janc wrote:
+> This will ease testing until kernel support is added.
+> ---
+>  android/gatt.c | 27 ++++++++++++++++++++++++++-
+>  1 file changed, 26 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 0414c4f..f488e17 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -943,10 +943,35 @@ static void
+> handle_client_deregister_for_notification(const void *buf,
+> 
+>  static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
+>  {
+> +	const struct hal_cmd_gatt_client_read_remote_rssi *cmd = buf;
+> +	struct hal_ev_gatt_client_read_remote_rssi ev;
+> +	static int32_t fake_rssi = -71;
+> +	uint8_t status;
+> +
+>  	DBG("");
+> 
+> +	if (!queue_find(gatt_clients, match_client_by_id,
+> +						INT_TO_PTR(cmd->client_if))) {
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+> +	/* TODO fake RSSI until kernel support is added */
+> +	ev.client_if = cmd->client_if;
+> +	memcpy(ev.address, cmd->bdaddr, sizeof(ev.address));
+> +	ev.status = HAL_STATUS_SUCCESS;
+> +	ev.rssi = fake_rssi;
+> +
+> +	fake_rssi = fake_rssi == -71 ? -83 : -71;
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+> +			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
+> +
+> +	status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> -			HAL_OP_GATT_CLIENT_READ_REMOTE_RSSI, HAL_STATUS_FAILED);
+> +			HAL_OP_GATT_CLIENT_READ_REMOTE_RSSI, status);
+>  }
+> 
+>  static void handle_client_get_device_type(const void *buf, uint16_t len)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 15e788a..971e2dd 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2482,7 +2482,7 @@ static void handle_client_register_for_notification(const void *buf,
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
--	gatt_status  = status ? GATT_SUCCESS : GATT_FAILURE;
-+	gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
- 	send_register_for_notification_ev(conn_id, 1, gatt_status,
- 						&cmd->srvc_id, &cmd->char_id);
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-@@ -2535,7 +2535,7 @@ static void handle_client_deregister_for_notification(const void *buf,
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
--	gatt_status  = status ? GATT_SUCCESS : GATT_FAILURE;
-+	gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
- 	send_register_for_notification_ev(conn_id, 0, gatt_status,
- 						&cmd->srvc_id, &cmd->char_id);
- 
+Updated patch pushed.
+
 -- 
-1.8.5.3
-
+Szymon K. Janc
+szymon.janc@gmail.com
