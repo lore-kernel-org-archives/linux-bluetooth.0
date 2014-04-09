@@ -1,135 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 01/16] gatt: Add skeleton of gatt-db
-Date: Wed,  9 Apr 2014 09:06:59 +0200
-Message-Id: <1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [RFC 02/16] gatt: Add services list to gatt_db struct
+Date: Wed,  9 Apr 2014 09:07:00 +0200
+Message-Id: <1397027234-12003-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This change adds new() and destroy() fuctions for gatt_db,
-which will be used for storing local attributes.
+Gatt database will store all services in queue services. Each service
+contains attributes, number of handles included and flag if it is
+active service.
 ---
- android/Android.mk   |  1 +
- android/Makefile.am  |  1 +
- src/shared/gatt-db.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 27 +++++++++++++++++++++++++++
- 4 files changed, 76 insertions(+)
- create mode 100644 src/shared/gatt-db.c
- create mode 100644 src/shared/gatt-db.h
+ src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 5f4e70c..4c9cfb5 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
- 	bluez/src/shared/queue.c \
- 	bluez/src/shared/ringbuf.c \
- 	bluez/src/shared/hfp.c \
-+	bluez/src/shared/gatt-db.c \
- 	bluez/src/shared/io-glib.c \
- 	bluez/src/sdpd-database.c \
- 	bluez/src/sdpd-service.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index c51cce2..70e1dec 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -29,6 +29,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/ringbuf.h src/shared/ringbuf.c \
- 				src/shared/hfp.h src/shared/hfp.c \
-+				src/shared/gatt-db.h src/shared/gatt-db.c \
- 				android/bluetooth.h android/bluetooth.c \
- 				android/hidhost.h android/hidhost.c \
- 				android/ipc-common.h \
 diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-new file mode 100644
-index 0000000..e56b381
---- /dev/null
+index e56b381..47915c7 100644
+--- a/src/shared/gatt-db.c
 +++ b/src/shared/gatt-db.c
-@@ -0,0 +1,47 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
+@@ -21,11 +21,24 @@
+  *
+  */
+ 
++#include <stdbool.h>
 +
-+#include "src/shared/util.h"
-+#include "src/shared/gatt-db.h"
-+
-+struct gatt_db {
-+	uint16_t next_handle;
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
+ #include "src/shared/gatt-db.h"
+ 
+ struct gatt_db {
+ 	uint16_t next_handle;
++	struct queue *services;
 +};
 +
-+struct gatt_db *gatt_db_new(void)
-+{
-+	struct gatt_db *db;
++struct gatt_db_attribute {
++};
 +
-+	db = new0(struct gatt_db, 1);
-+	if (!db)
++struct gatt_db_service {
++	bool active;
++	uint16_t num_handles;
++	struct gatt_db_attribute **attributes;
+ };
+ 
+ struct gatt_db *gatt_db_new(void)
+@@ -36,12 +49,31 @@ struct gatt_db *gatt_db_new(void)
+ 	if (!db)
+ 		return NULL;
+ 
++	db->services = queue_new();
++	if (!db->services) {
++		free(db);
 +		return NULL;
++	}
 +
-+	db->next_handle = 0x0001;
-+
-+	return db;
-+}
-+
-+void gatt_db_destroy(struct gatt_db *db)
+ 	db->next_handle = 0x0001;
+ 
+ 	return db;
+ }
+ 
++static void gatt_db_service_destroy(void *data)
 +{
-+	free(db);
++	struct gatt_db_service *service = data;
++	int i;
++
++	for (i = 0; i < service->num_handles; i++)
++		free(service->attributes[i]);
++
++	free(service->attributes);
++	free(service);
 +}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-new file mode 100644
-index 0000000..2901afb
---- /dev/null
-+++ b/src/shared/gatt-db.h
-@@ -0,0 +1,27 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
 +
-+struct gatt_db;
-+
-+struct gatt_db *gatt_db_new(void);
-+void gatt_db_destroy(struct gatt_db *db);
+ void gatt_db_destroy(struct gatt_db *db)
+ {
++	queue_destroy(db->services, gatt_db_service_destroy);
+ 	free(db);
+ }
 -- 
 1.8.5.3
 
