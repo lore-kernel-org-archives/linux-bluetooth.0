@@ -1,113 +1,223 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 09 Apr 2014 06:30:31 +0000 (GMT)
-From: C S BHARGAVA <cs.bhargava@samsung.com>
-Subject: Re: Re: [PATCH] [Bluetooth 4.1][32bit-UUID Support] Added support for
- 32 bit uuid for the Attribute type in ATT and GATT  for GATT Client devices
-To: Marcel Holtmann <marcel@holtmann.org>, Sudha Bheemanna <b.sudha@samsung.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Reply-to: cs.bhargava@samsung.com
-MIME-version: 1.0
-Content-type: text/plain; charset=windows-1252
-MIME-version: 1.0
-Message-id: <8412078.94311397025031652.JavaMail.weblogic@epv6ml08>
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: Add BCM20702 firmware upgrade support
+Message-Id: <20140409043001.27305100A34@puck.mtv.corp.google.com>
+Date: Tue,  8 Apr 2014 21:30:01 -0700 (PDT)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgTWFyY2VsLA0KDQpJIHdvdWxkIGxpa2UgdG8gcmVtaW5kIHRoYXQgMzItVVVJRCBzdXBwb3J0
-IGlzIGFkZGVkIGluIHRoZSBBRFYgZGF0YSBhbmQgbmV3IEFEIFR5cGVzIHdlcmUgZGVmaW5lZCBm
-b3IgdGhpcy4NCg0KPzB4MUYJP6tMaXN0IG9mIDMyLWJpdCBTZXJ2aWNlIFNvbGljaXRhdGlvbiBV
-VUlEc7sNCjB4MjAJP6tTZXJ2aWNlIERhdGEgLSAzMi1iaXQgVVVJRLsNCg0KTmV2ZXJ0aGxlc3Ms
-IFNwZWNpZmljYXRpb24gdGFsa3MgYWJvdXQgMzItYml0IFVVSUQgZm9yIGF0dHJpYnV0ZSB0eXBl
-LiBTaW5jZSB0aGVyZSBhcmUgb25seSAxMCBHQVRUIGF0dHJpYnV0ZSB0eXBlcyBkZWZpbmVkIGlu
-IEJUIDQuMSBzcGVjLCBjYW4ndCB1bmRlcnN0YW5kIHRoZSBuZWVkIG9mIDMyLWJpdCBVVUlEIGp1
-c3QgdG8gZGVub3RlIGF0dHJpYnV0ZSB0eXBlLg0KVXNpbmcgMzItYml0IFVVSURzIHRvIHJlcHJl
-c2VudCB0aGUgYXR0cmlidXRlIGl0c2VsZiBtYWtlcyBzZW5jZS4NCg0KV2UgcmFpc2VkIGNvbmNl
-cm5lZCBlcnJhdGEgKEVycmF0YSBJRCA1NTU5KSBvbiB0aGlzIGFscmVhZHkgd2hpY2ggaXMgc3Rp
-bGwgb3Blbi4NCg0KUGxlYXNlIGxldCBtZSBrbm93IHlvdXIgb3BpbmlvbiBvbiB0aGlzLg0KDQpS
-ZWdhcmRzLA0KQmhhcmdhdmENCg0KLS0tLS0tLSBPcmlnaW5hbCBNZXNzYWdlIC0tLS0tLS0NClNl
-bmRlciA6IE1hcmNlbCBIb2x0bWFubjxtYXJjZWxAaG9sdG1hbm4ub3JnPiANCkRhdGUgICA6IEFw
-ciAwOCwgMjAxNCAxOTo0NiAoR01UKzA1OjMwKQ0KVGl0bGUgIDogUmU6IFtQQVRDSF0gW0JsdWV0
-b290aCA0LjFdWzMyYml0LVVVSUQgU3VwcG9ydF0gQWRkZWQgc3VwcG9ydCBmb3IgMzINCiBiaXQg
-dXVpZCBmb3IgdGhlIEF0dHJpYnV0ZSB0eXBlIGluIEFUVCBhbmQgR0FUVCAJCSBmb3IgR0FUVCBD
-bGllbnQgZGV2aWNlcw0KDQpIaSBTdWRoYSwNCg0KPiAxPiBBcyBwZXIgNC4wIHNwZWMgc3VwcG9y
-dCBmb3Igb25seSAxNiBhbmQgMTI4IGJpdCBzdXBwb3J0IHdhcyBwcm92aWRlZCBmb3IgYXR0cmli
-dXRlIHR5cGUgaW4gR0FUVC4NCj4gMj4gQXMgYSBwYXJ0IG9mIGNvcmUgNC4xIHNwZWMsIDMyIGJp
-dCB1dWlkIHN1cHBvcnQgaXMgYWxzbyBhZGRlZC4gVGhlIGNvZGUgY2hhbmdlcyBmb3IgdGhlIHNh
-bWUNCj4gICBpbiBBVFQgYW5kIEdBVFQgaXMgYWRkZWQgYXMgYSBwYXJ0IG9mIHRoaXMgcGF0Y2gg
-Zm9yIEdBVFQgY2xpZW50IHJvbGUuDQo+IC0tLQ0KPiBhdHRyaWIvYXR0LmMgIHwgICAxMiArKysr
-KysrKysrKysNCj4gYXR0cmliL2dhdHQuYyB8ICAgMTEgKysrKysrKysrKysNCj4gMiBmaWxlcyBj
-aGFuZ2VkLCAyMyBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXR0cmliL2F0dC5j
-IGIvYXR0cmliL2F0dC5jDQo+IGluZGV4IDhlOWMwNmQuLjIyMjUyNTUgMTAwNjQ0DQo+IC0tLSBh
-L2F0dHJpYi9hdHQuYw0KPiArKysgYi9hdHRyaWIvYXR0LmMNCj4gQEAgLTQyLDYgKzQyLDggQEAg
-c3RhdGljIGlubGluZSB2b2lkIHB1dF91dWlkX2xlKGNvbnN0IGJ0X3V1aWRfdCAqc3JjLCB2b2lk
-ICpkc3QpDQo+IHsNCj4gCWlmIChzcmMtPnR5cGUgPT0gQlRfVVVJRDE2KQ0KPiAJCXB1dF9sZTE2
-KHNyYy0+dmFsdWUudTE2LCBkc3QpOw0KPiArCWVsc2UgaWYgKHNyYy0+dHlwZSA9PSBCVF9VVUlE
-MzIpDQo+ICsJCXB1dF9sZTMyKHNyYy0+dmFsdWUudTMyLCBkc3QpOw0KDQpJIGhhdmUgbm8gaWRl
-YSB3aGVuIHRoaXMgd291bGQgZXZlciBoYXBwZW4uIFRoZSB3aXJlIHByb3RvY29sIG9mIEFUVCBk
-b2VzIG5vdCBzdXBwb3J0IDMyLWJpdCBVVUlEcyBhbmQgdGhleSBhbGwgbmVlZCB0byBiZSBjb252
-ZXJ0ZWQgaW50byAxMjgtYml0IFVVSURzLg0KDQo+IAllbHNlDQo+IAkJLyogQ29udmVydCBmcm9t
-IDEyOC1iaXQgQkUgdG8gTEUgKi8NCj4gCQlic3dhcF8xMjgoJnNyYy0+dmFsdWUudTEyOCwgZHN0
-KTsNCj4gQEAgLTEzNCw2ICsxMzYsOCBAQCBzdGF0aWMgdm9pZCBnZXRfdXVpZCh1aW50OF90IHR5
-cGUsIGNvbnN0IHZvaWQgKnZhbCwgYnRfdXVpZF90ICp1dWlkKQ0KPiB7DQo+IAlpZiAodHlwZSA9
-PSBCVF9VVUlEMTYpDQo+IAkJYnRfdXVpZDE2X2NyZWF0ZSh1dWlkLCBnZXRfbGUxNih2YWwpKTsN
-Cj4gKwllbHNlIGlmICh0eXBlID09IEJUX1VVSUQzMikNCj4gKwkJYnRfdXVpZDMyX2NyZWF0ZSh1
-dWlkLCBnZXRfbGUzMih2YWwpKTsNCg0KU2FtZSBoZXJlLiBUaGVyZSB3aWxsIGJlIG5vIDMyLWJp
-dCBVVUlEIGNvbWluZyBmcm9tIHRoZSB3aXJlLg0KDQo+IAllbHNlIHsNCj4gCQl1aW50MTI4X3Qg
-dTEyODsNCj4gDQo+IEBAIC0xNTMsNiArMTU3LDggQEAgdWludDE2X3QgZW5jX3JlYWRfYnlfZ3Jw
-X3JlcSh1aW50MTZfdCBzdGFydCwgdWludDE2X3QgZW5kLCBidF91dWlkX3QgKnV1aWQsDQo+IA0K
-PiAJaWYgKHV1aWQtPnR5cGUgPT0gQlRfVVVJRDE2KQ0KPiAJCXV1aWRfbGVuID0gMjsNCj4gKwll
-bHNlIGlmICh1dWlkLT50eXBlID09IEJUX1VVSUQzMikNCj4gKwkJdXVpZF9sZW4gPSA0Ow0KDQpU
-aGlzIGlzIG5vdCB2YWxpZC4gSXQgbmVlZHMgdG8gYmUgY29udmVydCB0byBhIDEyOC1iaXQgVVVJ
-RC4NCg0KPiAJZWxzZSBpZiAodXVpZC0+dHlwZSA9PSBCVF9VVUlEMTI4KQ0KPiAJCXV1aWRfbGVu
-ID0gMTY7DQo+IAllbHNlDQo+IEBAIC0xODcsNiArMTkzLDggQEAgdWludDE2X3QgZGVjX3JlYWRf
-YnlfZ3JwX3JlcShjb25zdCB1aW50OF90ICpwZHUsIHNpemVfdCBsZW4sIHVpbnQxNl90ICpzdGFy
-dCwNCj4gDQo+IAlpZiAobGVuID09IChtaW5fbGVuICsgMikpDQo+IAkJdHlwZSA9IEJUX1VVSUQx
-NjsNCj4gKwllbHNlIGlmIChsZW4gPT0gKG1pbl9sZW4gKyA0KSkNCj4gKwkJdHlwZSA9IEJUX1VV
-SUQzMjsNCg0KU2FtZSBoZXJlLCBubyAzMi1iaXQgVVVJRCBvbiB0aGUgd2lyZSwgdGhleSB3aWxs
-IGFsbCBiZSAxMjgtYml0Lg0KDQo+IAllbHNlIGlmIChsZW4gPT0gKG1pbl9sZW4gKyAxNikpDQo+
-IAkJdHlwZSA9IEJUX1VVSUQxMjg7DQo+IAllbHNlDQo+IEBAIC0zOTgsNiArNDA2LDggQEAgdWlu
-dDE2X3QgZW5jX3JlYWRfYnlfdHlwZV9yZXEodWludDE2X3Qgc3RhcnQsIHVpbnQxNl90IGVuZCwg
-YnRfdXVpZF90ICp1dWlkLA0KPiANCj4gCWlmICh1dWlkLT50eXBlID09IEJUX1VVSUQxNikNCj4g
-CQl1dWlkX2xlbiA9IDI7DQo+ICsJZWxzZSBpZiAodXVpZC0+dHlwZSA9PSBCVF9VVUlEMzIpDQo+
-ICsJCXV1aWRfbGVuID0gNDsNCj4gCWVsc2UgaWYgKHV1aWQtPnR5cGUgPT0gQlRfVVVJRDEyOCkN
-Cj4gCQl1dWlkX2xlbiA9IDE2Ow0KPiAJZWxzZQ0KPiBAQCAtNDI5LDYgKzQzOSw4IEBAIHVpbnQx
-Nl90IGRlY19yZWFkX2J5X3R5cGVfcmVxKGNvbnN0IHVpbnQ4X3QgKnBkdSwgc2l6ZV90IGxlbiwg
-dWludDE2X3QgKnN0YXJ0LA0KPiANCj4gCWlmIChsZW4gPT0gKG1pbl9sZW4gKyAyKSkNCj4gCQl0
-eXBlID0gQlRfVVVJRDE2Ow0KPiArCWlmIChsZW4gPT0gKG1pbl9sZW4gKyA0KSkNCj4gKwkJdHlw
-ZSA9IEJUX1VVSUQzMjsNCg0KVGhlc2UgdHdvIGFzIHdlbGwsIEkgZG8gbm90IHNlZSBhIHJlZmVy
-ZW5jZSBpbiB0aGUgc3BlYy4gdGhhdCB5b3UgY2FuIGVuY29kZSBvciBkZWNvZGUgMzItYml0IHNp
-emVkIFVVSUQgaW4gdGhlIHdpcmUgcHJvdG9jb2wuDQoNCj4gCWVsc2UgaWYgKGxlbiA9PSAobWlu
-X2xlbiArIDE2KSkNCj4gCQl0eXBlID0gQlRfVVVJRDEyODsNCj4gCWVsc2UNCj4gZGlmZiAtLWdp
-dCBhL2F0dHJpYi9nYXR0LmMgYi9hdHRyaWIvZ2F0dC5jDQo+IGluZGV4IDQ5Y2QxYTMuLmJiMjMz
-MGEgMTAwNjQ0DQo+IC0tLSBhL2F0dHJpYi9nYXR0LmMNCj4gKysrIGIvYXR0cmliL2dhdHQuYw0K
-PiBAQCAtMTQzLDYgKzE0Myw4IEBAIHN0YXRpYyB2b2lkIHB1dF91dWlkX2xlKGNvbnN0IGJ0X3V1
-aWRfdCAqdXVpZCwgdm9pZCAqZHN0KQ0KPiB7DQo+IAlpZiAodXVpZC0+dHlwZSA9PSBCVF9VVUlE
-MTYpDQo+IAkJcHV0X2xlMTYodXVpZC0+dmFsdWUudTE2LCBkc3QpOw0KPiArCWVsc2UgaWYgKHV1
-aWQtPnR5cGUgPT0gQlRfVVVJRDMyKQ0KPiArCQlwdXRfbGUzMih1dWlkLT52YWx1ZS51MzIsIGRz
-dCk7DQo+IAllbHNlDQo+IAkJLyogQ29udmVydCBmcm9tIDEyOC1iaXQgQkUgdG8gTEUgKi8NCj4g
-CQlic3dhcF8xMjgoJnV1aWQtPnZhbHVlLnUxMjgsIGRzdCk7DQo+IEBAIC0xNTUsNiArMTU3LDEx
-IEBAIHN0YXRpYyB2b2lkIGdldF91dWlkMTI4KHVpbnQ4X3QgdHlwZSwgY29uc3Qgdm9pZCAqdmFs
-LCBidF91dWlkX3QgKnV1aWQpDQo+IA0KPiAJCWJ0X3V1aWQxNl9jcmVhdGUoJnV1aWQxNiwgZ2V0
-X2xlMTYodmFsKSk7DQo+IAkJYnRfdXVpZF90b191dWlkMTI4KCZ1dWlkMTYsIHV1aWQpOw0KPiAr
-CX0gZWxzZSBpZiAodHlwZSA9PSBCVF9VVUlEMzIpIHsNCj4gKwkJYnRfdXVpZF90IHV1aWQzMjsN
-Cj4gKw0KPiArCQlidF91dWlkMzJfY3JlYXRlKCZ1dWlkMzIsIGdldF9sZTMyKHZhbCkpOw0KPiAr
-CQlidF91dWlkX3RvX3V1aWQxMjgoJnV1aWQzMiwgdXVpZCk7DQo+IAl9IGVsc2Ugew0KPiAJCXVp
-bnQxMjhfdCB1MTI4Ow0KPiANCj4gQEAgLTI1Niw2ICsyNjMsOCBAQCBzdGF0aWMgdm9pZCBwcmlt
-YXJ5X2FsbF9jYihndWludDggc3RhdHVzLCBjb25zdCBndWludDggKmlwZHUsIGd1aW50MTYgaXBs
-ZW4sDQo+IA0KPiAJaWYgKGxpc3QtPmxlbiA9PSA2KQ0KPiAJCXR5cGUgPSBCVF9VVUlEMTY7DQo+
-ICsJZWxzZSBpZiAobGlzdC0+bGVuID09IDgpDQo+ICsJCXR5cGUgPSBCVF9VVUlEMzI7DQo+IAll
-bHNlIGlmIChsaXN0LT5sZW4gPT0gMjApDQo+IAkJdHlwZSA9IEJUX1VVSUQxMjg7DQo+IAllbHNl
-IHsNCj4gQEAgLTUxOSw2ICs1MjgsOCBAQCBzdGF0aWMgdm9pZCBjaGFyX2Rpc2NvdmVyZWRfY2Io
-Z3VpbnQ4IHN0YXR1cywgY29uc3QgZ3VpbnQ4ICppcGR1LCBndWludDE2IGlwbGVuLA0KPiANCj4g
-CWlmIChsaXN0LT5sZW4gPT0gNykNCj4gCQl0eXBlID0gQlRfVVVJRDE2Ow0KPiArCWVsc2UgaWYg
-KGxpc3QtPmxlbiA9PSA5KQ0KPiArCQl0eXBlID0gQlRfVVVJRDMyOw0KPiAJZWxzZQ0KPiAJCXR5
-cGUgPSBCVF9VVUlEMTI4Ow0KDQpJIGp1c3QgZG8gbm90IHNlZSBob3cgdGhpcyBwYXRjaCBpcyBj
-b3JyZWN0IGF0IGFsbC4gSSBhbSByZWFkaW5nIHRoZSBCbHVldG9vdGggNC4xIHNwZWMgYW5kIHRo
-ZSAzMi1iaXQgVVVJRCBpcyBub3QgcGFydCBvZiB0aGUgd2lyZSBwcm90b2NvbC4gSXQgaXMgYW4g
-aW50ZXJuYWwgcmVwcmVzZW50YXRpb24gdGhhdCBhbHdheXMgbmVlZHMgdG8gYmUgY29udmVydGVk
-IGludG8gYSAxMjgtYml0IGJlZm9yZSBpdCBnb2VzIG92ZXIgdGhlIHdpcmUuIFdoaWNoIG1ha2Vz
-IHNlbnNlIHNpbmNlIG90aGVyd2lzZSBHQVRUIGZyb20gQmx1ZXRvb3RoIDQuMSB3b3VsZCBub3Qg
-YmUgYmFja3dhcmRzIGNvbXBhdGlibGUgd2l0aCBCbHVldG9vdGggNC4wIHNwZWNpZmljYXRpb24u
-DQoNClJlZ2FyZHMNCg0KTWFyY2VsDQoNCi0tDQpUbyB1bnN1YnNjcmliZSBmcm9tIHRoaXMgbGlz
-dDogc2VuZCB0aGUgbGluZSAidW5zdWJzY3JpYmUgbGludXgtYmx1ZXRvb3RoIiBpbg0KdGhlIGJv
-ZHkgb2YgYSBtZXNzYWdlIHRvIG1ham9yZG9tb0B2Z2VyLmtlcm5lbC5vcmcNCk1vcmUgbWFqb3Jk
-b21vIGluZm8gYXQgIGh0dHA6Ly92Z2VyLmtlcm5lbC5vcmcvbWFqb3Jkb21vLWluZm8uaHRtbA0K
+After hardware reset, BCM20702 obtains its initial firmware from a PROM chip.
+Once this initial firmware is running, the firmware can be further upgraded
+over HCI interface with .hcd files provided by Broadcom. This is also known
+as "patch RAM" support. This change implements that.
+
+If the .hcd file is not found in /lib/firmware, BCM20702 continues to operate
+with the initial firmware. Sample kernel log:
+  hotplug: sys=firmware act=add fw=brcm/bcm20702-0a5c-22be.hcd dev=...
+  Bluetooth: hci0: BCM20702: patch brcm/bcm20702-0a5c-22be.hcd not found
+  Bluetooth: hci0: BCM20702: firmware hci_ver=06 hci_rev=1000 lmp_ver=06 lmp_subver=220e
+
+If the .hcd file is found, btusb driver pushes it to BCM20702, and BCM20702
+starts using the new firmware. Sample kernel log:
+  hotplug: sys=firmware act=add fw=brcm/bcm20702-0a5c-22be.hcd dev=...
+  Bluetooth: hci0: BCM20702: patching hci_ver=06 hci_rev=1000 lmp_ver=06 lmp_subver=220e
+  Bluetooth: hci0: BCM20702: firmware hci_ver=06 hci_rev=1389 lmp_ver=06 lmp_subver=220e
+
+Above, we can see that hci_rev goes from 1000 to 1389 as a result of the upgrade.
+
+Signed-off-by: Petri Gynther <pgynther@google.com>
+---
+ drivers/bluetooth/btusb.c | 155 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 155 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f338b0c..59658a1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -49,6 +49,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_WRONG_SCO_MTU	0x40
+ #define BTUSB_ATH3012		0x80
+ #define BTUSB_INTEL		0x100
++#define BTUSB_BCM20702_PATCHRAM	0x200
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -103,6 +104,7 @@ static const struct usb_device_id btusb_table[] = {
+ 	/* Broadcom BCM20702A0 */
+ 	{ USB_DEVICE(0x0489, 0xe042) },
+ 	{ USB_DEVICE(0x04ca, 0x2003) },
++	{ USB_DEVICE(0x0a5c, 0x22be), .driver_info = BTUSB_BCM20702_PATCHRAM },
+ 	{ USB_DEVICE(0x0b05, 0x17b5) },
+ 	{ USB_DEVICE(0x0b05, 0x17cb) },
+ 	{ USB_DEVICE(0x413c, 0x8197) },
+@@ -1380,6 +1382,156 @@ exit_mfg_deactivate:
+ 	return 0;
+ }
+ 
++static int btusb_setup_bcm20702(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct usb_device *udev = data->udev;
++	char fw_name[64];
++	const struct firmware *fw;
++	const u8 *fw_ptr;
++	size_t fw_size;
++	const struct hci_command_hdr *cmd;
++	const u8 *cmd_param;
++	u16 opcode;
++	struct sk_buff *skb;
++	struct hci_rp_read_local_version *ver;
++	long ret;
++
++	snprintf(fw_name, sizeof(fw_name), "brcm/bcm20702-%04x-%04x.hcd",
++		 le16_to_cpu(udev->descriptor.idVendor),
++		 le16_to_cpu(udev->descriptor.idProduct));
++
++	ret = request_firmware(&fw, fw_name, &hdev->dev);
++	if (ret < 0) {
++		BT_INFO("%s: BCM20702: patch %s not found", hdev->name,
++			fw_name);
++		ret = 0;
++		goto get_fw_ver;
++	}
++
++	/* Reset */
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_RESET failed (%ld)", hdev->name, ret);
++		goto reset_fw;
++	}
++	kfree_skb(skb);
++
++	/* Read Local Version Info */
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
++			hdev->name, ret);
++		goto reset_fw;
++	}
++
++	if (skb->len != sizeof(*ver)) {
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
++			hdev->name);
++		kfree_skb(skb);
++		ret = -EIO;
++		goto reset_fw;
++	}
++
++	ver = (struct hci_rp_read_local_version *) skb->data;
++	BT_INFO("%s: BCM20702: patching hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
++		"lmp_subver=%04x", hdev->name, ver->hci_ver, ver->hci_rev,
++		ver->lmp_ver, ver->lmp_subver);
++	kfree_skb(skb);
++
++	/* Start Download */
++	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: BCM20702: Download Minidrv command failed (%ld)",
++			hdev->name, ret);
++		goto reset_fw;
++	}
++	kfree_skb(skb);
++
++	/* 50 msec delay after Download Minidrv completes */
++	msleep(50);
++
++	fw_ptr = fw->data;
++	fw_size = fw->size;
++
++	while (fw_size >= sizeof(*cmd)) {
++		cmd = (struct hci_command_hdr *) fw_ptr;
++		fw_ptr += sizeof(*cmd);
++		fw_size -= sizeof(*cmd);
++
++		if (fw_size < cmd->plen) {
++			BT_ERR("%s: BCM20702: patch %s is corrupted",
++				hdev->name, fw_name);
++			ret = -EINVAL;
++			goto reset_fw;
++		}
++
++		cmd_param = fw_ptr;
++		fw_ptr += cmd->plen;
++		fw_size -= cmd->plen;
++
++		opcode = le16_to_cpu(cmd->opcode);
++
++		skb = __hci_cmd_sync(hdev, opcode, cmd->plen, cmd_param,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			ret = PTR_ERR(skb);
++			BT_ERR("%s: BCM20702: patch command %04x failed (%ld)",
++				hdev->name, opcode, ret);
++			goto reset_fw;
++		}
++		kfree_skb(skb);
++	}
++
++	/* 250 msec delay after Launch Ram completes */
++	msleep(250);
++
++reset_fw:
++	/* Reset */
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_RESET failed (%ld)", hdev->name, ret);
++		goto done;
++	}
++	kfree_skb(skb);
++
++get_fw_ver:
++	/* Read Local Version Info */
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
++			hdev->name, ret);
++		goto done;
++	}
++
++	if (skb->len != sizeof(*ver)) {
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
++			hdev->name);
++		kfree_skb(skb);
++		ret = -EIO;
++		goto done;
++	}
++
++	ver = (struct hci_rp_read_local_version *) skb->data;
++	BT_INFO("%s: BCM20702: firmware hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
++		"lmp_subver=%04x", hdev->name, ver->hci_ver, ver->hci_rev,
++		ver->lmp_ver, ver->lmp_subver);
++	kfree_skb(skb);
++
++done:
++	if (fw)
++		release_firmware(fw);
++
++	return ret;
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 				const struct usb_device_id *id)
+ {
+@@ -1485,6 +1637,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_BCM92035)
+ 		hdev->setup = btusb_setup_bcm92035;
+ 
++	if (id->driver_info & BTUSB_BCM20702_PATCHRAM)
++		hdev->setup = btusb_setup_bcm20702;
++
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		usb_enable_autosuspend(data->udev);
+ 		hdev->setup = btusb_setup_intel;
+-- 
+1.9.1.423.g4596e3a
+
