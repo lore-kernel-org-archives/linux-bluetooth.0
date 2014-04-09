@@ -1,68 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 13/16] gatt: Add start/stop service functionality
-Date: Wed,  9 Apr 2014 09:07:11 +0200
-Message-Id: <1397027234-12003-14-git-send-email-marcin.kraglak@tieto.com>
+Subject: [RFC 16/16] android/gatt: Fix typo in event handlers array
+Date: Wed,  9 Apr 2014 09:07:14 +0200
+Message-Id: <1397027234-12003-17-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Only active services can be read by client.
 ---
- src/shared/gatt-db.c | 28 ++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  4 ++++
- 2 files changed, 32 insertions(+)
+ android/hal-gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 2886bb8..976885a 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -358,3 +358,31 @@ uint16_t gatt_db_new_included_service(struct gatt_db *db, uint16_t handle,
- 
- 	return update_attribute_handle(service, index);
- }
-+
-+bool gatt_db_start_service(struct gatt_db *db, uint16_t handle)
-+{
-+	struct gatt_db_service *service;
-+
-+	service = queue_find(db->services, match_service_by_handle,
-+							INT_TO_PTR(handle));
-+	if (!service)
-+		return false;
-+
-+	service->active = true;
-+
-+	return true;
-+}
-+
-+bool gatt_db_stop_service(struct gatt_db *db, uint16_t handle)
-+{
-+	struct gatt_db_service *service;
-+
-+	service = queue_find(db->services, match_service_by_handle,
-+							INT_TO_PTR(handle));
-+	if (!service)
-+		return false;
-+
-+	service->active = false;
-+
-+	return true;
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index a421e9e..ff371e6 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -61,3 +61,7 @@ uint16_t gatt_db_new_char_descriptor(struct gatt_db *db, uint16_t handle,
- 
- uint16_t gatt_db_new_included_service(struct gatt_db *db, uint16_t handle,
- 						uint16_t included_handle);
-+
-+bool gatt_db_start_service(struct gatt_db *db, uint16_t handle);
-+
-+bool gatt_db_stop_service(struct gatt_db *db, uint16_t handle);
+diff --git a/android/hal-gatt.c b/android/hal-gatt.c
+index 5e7443c..d8c0d54 100644
+--- a/android/hal-gatt.c
++++ b/android/hal-gatt.c
+@@ -536,7 +536,7 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 		sizeof(struct hal_ev_gatt_server_service_added) },
+ 	/* HAL_EV_GATT_SERVER_INC_SRVC_ADDED */
+ 	{ handle_included_service_added, false,
+-		sizeof(struct hal_ev_gatt_server_service_added) },
++		sizeof(struct hal_ev_gatt_server_inc_srvc_added) },
+ 	/* HAL_EV_GATT_SERVER_CHAR_ADDED */
+ 	{ handle_characteristic_added, false,
+ 		sizeof(struct hal_ev_gatt_server_characteristic_added) },
 -- 
 1.8.5.3
 
