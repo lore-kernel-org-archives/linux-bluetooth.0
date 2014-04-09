@@ -1,39 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1397038519.12775.42.camel@nuvo>
-Subject: Re: Cannot send files to PC from phone
-From: Bastien Nocera <hadess@hadess.net>
-To: Pacho Ramos <pacho@gentoo.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Date: Wed, 09 Apr 2014 12:15:19 +0200
-In-Reply-To: <1396983753.2061.27.camel@belkin5>
-References: <1395481944.1364.2.camel@belkin5>
-	 <1395487433.1597.60.camel@nuvo> <1396983753.2061.27.camel@belkin5>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/hal-gatt: Fix typo in struct name
+Date: Wed,  9 Apr 2014 11:26:53 +0200
+Message-Id: <1397035613-980-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, 2014-04-08 at 21:02 +0200, Pacho Ramos wrote:
-> El sáb, 22-03-2014 a las 12:23 +0100, Bastien Nocera escribió:
-> [...]
-> > What are you using as the server (computer) side program? Is it
-> > gnome-user-share, or the obex test application in bluez?
-> > 
-> > Simply having obexd installed isn't enough, you need an application to
-> > control it and handle authorisation, etc.
-> > 
-> 
-> Only one question, even if it works ok with gnome-user-share, how can I
-> use that obex test application?
+It causes ipc error due to incorrect message length.
+---
+ android/hal-gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Look for obex-server-tool in bluez, or the test program
-simple-obex-agent. Usually you'd just need to launch them.
-
->  Or is there any other command line
-> utility that could allow to send files to PC from phone without needing
-> gnome-user-share?
-
-Not that I know of.
-
-Cheers
+diff --git a/android/hal-gatt.c b/android/hal-gatt.c
+index 5e7443c..d8c0d54 100644
+--- a/android/hal-gatt.c
++++ b/android/hal-gatt.c
+@@ -536,7 +536,7 @@ static const struct hal_ipc_handler ev_handlers[] = {
+ 		sizeof(struct hal_ev_gatt_server_service_added) },
+ 	/* HAL_EV_GATT_SERVER_INC_SRVC_ADDED */
+ 	{ handle_included_service_added, false,
+-		sizeof(struct hal_ev_gatt_server_service_added) },
++		sizeof(struct hal_ev_gatt_server_inc_srvc_added) },
+ 	/* HAL_EV_GATT_SERVER_CHAR_ADDED */
+ 	{ handle_characteristic_added, false,
+ 		sizeof(struct hal_ev_gatt_server_characteristic_added) },
+-- 
+1.8.3.1
 
