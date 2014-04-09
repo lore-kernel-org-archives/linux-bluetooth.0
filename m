@@ -1,82 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC 02/16] gatt: Add services list to gatt_db struct
-Date: Wed,  9 Apr 2014 09:07:00 +0200
-Message-Id: <1397027234-12003-3-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [RFC 00/16] Gatt database initial implementation
+Date: Wed,  9 Apr 2014 09:06:58 +0200
+Message-Id: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Gatt database will store all services in queue services. Each service
-contains attributes, number of handles included and flag if it is
-active service.
----
- src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+This is proposal how gatt database implementation could look and
+how it can be used in Android. Current implementation contains:
+ - create/destroy gatt_db
+ - adding services, with given number of handles. This function returns
+	service attribute andle
+ - adding characteristics, descriptors and included services
+ - function to start/stop service - it will be used when we expose services
+	to client
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index e56b381..47915c7 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -21,11 +21,24 @@
-  *
-  */
- 
-+#include <stdbool.h>
-+
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
- 
- struct gatt_db {
- 	uint16_t next_handle;
-+	struct queue *services;
-+};
-+
-+struct gatt_db_attribute {
-+};
-+
-+struct gatt_db_service {
-+	bool active;
-+	uint16_t num_handles;
-+	struct gatt_db_attribute **attributes;
- };
- 
- struct gatt_db *gatt_db_new(void)
-@@ -36,12 +49,31 @@ struct gatt_db *gatt_db_new(void)
- 	if (!db)
- 		return NULL;
- 
-+	db->services = queue_new();
-+	if (!db->services) {
-+		free(db);
-+		return NULL;
-+	}
-+
- 	db->next_handle = 0x0001;
- 
- 	return db;
- }
- 
-+static void gatt_db_service_destroy(void *data)
-+{
-+	struct gatt_db_service *service = data;
-+	int i;
-+
-+	for (i = 0; i < service->num_handles; i++)
-+		free(service->attributes[i]);
-+
-+	free(service->attributes);
-+	free(service);
-+}
-+
- void gatt_db_destroy(struct gatt_db *db)
- {
-+	queue_destroy(db->services, gatt_db_service_destroy);
- 	free(db);
- }
+Next steps in gatt_db implementation should be:
+ - handling read/write callbacks
+ - handling attribute's permissions
+ - now we just increment available handle. We should check if we have free handles
+	between existing services
+
+Comments are welcome
+Marcin Kraglak
+
+Marcin Kraglak (16):
+  gatt: Add skeleton of gatt-db
+  gatt: Add services list to gatt_db struct
+  gatt: Add method for creating services in gatt_db
+  gatt: Remove service functionality
+  gatt: Add new sharacteristic functionality
+  gatt: Add characteristic descriptor method
+  gatt: Add included service functionality
+  android/gatt: Add service functionality
+  android/gatt: Add implementation of delete service
+  android/gatt: Add included service implementation
+  android/gatt: Add characteristic implementation
+  android/gatt: Add descriptor implementation
+  gatt: Add start/stop service functionality
+  android/gatt: Add handling of start service command
+  android/gatt: Add stop service command handling
+  android/gatt: Fix typo in event handlers array
+
+ android/Android.mk   |   1 +
+ android/Makefile.am  |   1 +
+ android/gatt.c       | 242 +++++++++++++++++++++++++++++++-
+ android/hal-gatt.c   |   2 +-
+ src/shared/gatt-db.c | 388 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-db.h |  67 +++++++++
+ 6 files changed, 693 insertions(+), 8 deletions(-)
+ create mode 100644 src/shared/gatt-db.c
+ create mode 100644 src/shared/gatt-db.h
+
 -- 
 1.8.5.3
 
