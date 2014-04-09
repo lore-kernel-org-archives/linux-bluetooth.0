@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/pts: Bump PTS version for HID
-Date: Wed, 09 Apr 2014 19:56:42 +0200
-Message-ID: <3392791.mUbAyjtkG3@athlon>
-In-Reply-To: <1396884523-29517-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1396884523-29517-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH 1/2] android/pts: Update PICS and PIXITs for AVCTP
+Date: Wed, 09 Apr 2014 19:56:11 +0200
+Message-ID: <7166295.ltLCPZ0Vu5@athlon>
+In-Reply-To: <1396881956-26016-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1396881956-26016-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,36 +14,75 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Sebastian,
 
-On Monday 07 April 2014 17:28:42 Sebastian Chlad wrote:
+On Monday 07 April 2014 16:45:55 Sebastian Chlad wrote:
+> Bumping version of PTS to 5.1 as well as adding the CT role. Since
+> both roles are enabled for AVRCP, AVCTP should follow the suit.
 > ---
->  android/pics-hid.txt  | 2 +-
->  android/pixit-hid.txt | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+>  android/pics-avctp.txt  | 16 ++++++++--------
+>  android/pixit-avctp.txt |  4 ++--
+>  2 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/android/pics-hid.txt b/android/pics-hid.txt
-> index ac37e45..f1645cc 100644
-> --- a/android/pics-hid.txt
-> +++ b/android/pics-hid.txt
+> diff --git a/android/pics-avctp.txt b/android/pics-avctp.txt
+> index 41ad4db..3490db5 100644
+> --- a/android/pics-avctp.txt
+> +++ b/android/pics-avctp.txt
 > @@ -1,6 +1,6 @@
->  HID PICS for the PTS tool.
+>  AVCTP PICS for the PTS tool.
 > 
 > -PTS version: 5.0
 > +PTS version: 5.1
 > 
 >  * - different than PTS defaults
 >  # - not yet implemented/supported
-> diff --git a/android/pixit-hid.txt b/android/pixit-hid.txt
-> index 1d36c92..44e4363 100644
-> --- a/android/pixit-hid.txt
-> +++ b/android/pixit-hid.txt
+> @@ -25,7 +25,7 @@ C.1: Mandatory to support only one Protocol Version.
+>  ---------------------------------------------------------------------------
+> ---- Parameter Name	Selected	Description
+>  ---------------------------------------------------------------------------
+> ---- -TSPC_AVCTP_1_1	False		Controller (C.1)
+> +TSPC_AVCTP_1_1	True (*)	Controller (C.1)
+>  TSPC_AVCTP_1_2	True (*)	Target (C.1)
+>  ---------------------------------------------------------------------------
+> ---- C.1: Mandatory to support at least one of the defined roles.
+> @@ -37,12 +37,12 @@ C.1: Mandatory to support at least one of the defined
+> roles. Parameter Name	Selected	Description
+>  ---------------------------------------------------------------------------
+> ---- TSPC_AVCTP_2_1	False		Message fragmentation (O)
+> -TSPC_AVCTP_2_2	False (*)	Transaction label management (M)
+> -TSPC_AVCTP_2_3	False (*)	Packet type field management (M)
+> -TSPC_AVCTP_2_4	False (*)	Message type field management (M)
+> -TSPC_AVCTP_2_5	False (*)	PID field management (M)
+> -TSPC_AVCTP_2_6	False (*)	IPID field mangement (M)
+> -TSPC_AVCTP_2_7	False (*)	Message information management (M)
+> +TSPC_AVCTP_2_2	True		Transaction label management (M)
+> +TSPC_AVCTP_2_3	True		Packet type field management (M)
+> +TSPC_AVCTP_2_4	True		Message type field management (M)
+> +TSPC_AVCTP_2_5	True		PID field management (M)
+> +TSPC_AVCTP_2_6	True		IPID field mangement (M)
+> +TSPC_AVCTP_2_7	True		Message information management (M)
+>  TSPC_AVCTP_2_8	False		Event registration for message reception (O)
+>  TSPC_AVCTP_2_9	False		Event registration for connection request (O)
+>  TSPC_AVCTP_2_10	False		Event registration for disconnection (O)
+> diff --git a/android/pixit-avctp.txt b/android/pixit-avctp.txt
+> index c5782fd..a9b3f4f 100644
+> --- a/android/pixit-avctp.txt
+> +++ b/android/pixit-avctp.txt
 > @@ -1,6 +1,6 @@
->  HID PIXIT for the PTS tool.
+>  AVCTP PIXIT for the PTS tool.
 > 
 > -PTS version: 5.0
 > +PTS version: 5.1
 > 
 >  * - different than PTS defaults
 >  & - should be set to IUT Bluetooth address
+> @@ -17,7 +17,7 @@ TSPX_avctp_tester_command_data
+>  TSPX_avctp_tester_response_data
+>  TSPX_avctp_iut_command_data
+>  TSPX_avctp_iut_response_data
+> -TSPX_bd_addr_iut		08606E414394 (&)
+> +TSPX_bd_addr_iut		11223344556677 (*&)
+>  TSPX_pin_code			0000
+>  TSPX_delete_link_key		FALSE
+>  TSPX_security_enabled		FALSE
 
 Both patches applied, thanks.
 
