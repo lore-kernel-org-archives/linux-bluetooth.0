@@ -1,63 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Ravi Kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: Re: [PATCH] android/hidhost: Fix hex string to buffer convertion
-Date: Thu, 10 Apr 2014 12:32:07 +0200
-Message-ID: <36770231.qit3PSfJSc@uw000953>
-In-Reply-To: <CABBYNZKt0=Tpn=R1NcctOXARhqED4Q4WORsXrwbkDy=gQWHVRw@mail.gmail.com>
-References: <1396959747-19848-1-git-send-email-szymon.janc@tieto.com> <3B53A9C2-0FA3-4C0C-BC44-9DF2798BFDF8@holtmann.org> <CABBYNZKt0=Tpn=R1NcctOXARhqED4Q4WORsXrwbkDy=gQWHVRw@mail.gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/5] android/gatt: Fix sending notification for register gatt client
+Date: Thu, 10 Apr 2014 11:57:18 +0200
+Message-ID: <1496413.xlNYFUqeld@uw000953>
+In-Reply-To: <1396872323-19162-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1396872323-19162-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Grzegorz,
 
-On Thursday 10 of April 2014 12:57:00 Luiz Augusto von Dentz wrote:
-> Hi,
+On Monday 07 of April 2014 14:05:19 Grzegorz Kolodziejczyk wrote:
+> This patch adds missing send notification in case of errors for gatt
+> client registration. In case of error status GATT_FAILURE with given in
+> cmd UUID is send in notification.
+> ---
+>  android/gatt.c | 32 ++++++++++++++++++++++----------
+>  1 file changed, 22 insertions(+), 10 deletions(-)
 > 
-> On Wed, Apr 9, 2014 at 11:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Szymon,
-> >
-> >> Due to missing limit specifier buffer was always filled with last hex
-> >> value in string.
-> >> ---
-> >> android/hidhost.c | 23 ++++++++++++++---------
-> >> 1 file changed, 14 insertions(+), 9 deletions(-)
-> >>
-> >> diff --git a/android/hidhost.c b/android/hidhost.c
-> >> index 5ea7c5a..124d710 100644
-> >> --- a/android/hidhost.c
-> >> +++ b/android/hidhost.c
-> >> @@ -162,10 +162,18 @@ static void hid_device_remove(struct hid_device *dev)
-> >>       hid_device_free(dev);
-> >> }
-> >>
-> >> +static void hex2buf(const uint8_t *hex, uint8_t *buf, int num)
-> >> +{
-> >> +     int i;
-> >> +
-> >> +     for (i = 0; i < num; i++)
-> >> +             sscanf((const char *)(hex + (i * 2)), "%02hhX", &buf[i]);
-> >> +}
-> >
-> > can we please build a cheaper version of this that does not require to use sscanf. Small hint is to look into src/util.c from oFono.
-> 
-> I also wonder why we are doing this? All the HAL does is to
-> memcpy(cmd->data, data, cmd->len) or is it because the string itself
-> is hexadecimal encoded? If that is the case someone probably deserves
-> a medal...
 
-Yeap, Java is passing string to send_data() and set_report() calls (those have no
-size parameter).
-
-In JNI you can see:
- const char *c_report = env->GetStringUTFChars(report, NULL);
-    if ( (status = sBluetoothHidInterface->send_data((bt_bdaddr_t *) addr, (char*) c_report)) !=
-             BT_STATUS_SUCCESS) {
-
-Those are test commands so not that important. But I wonder why this is done
-also in handle_uhid_output()...   Ravi, could you comment on that?
+This patch is now pushed, thanks.
 
 -- 
 Best regards, 
