@@ -3,79 +3,210 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 4/6] android/gatt: Fix handling client unregister
-Date: Thu, 10 Apr 2014 10:42:59 +0200
-Message-Id: <1397119381-13294-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/6] android/gatt: Refactor send_client_connect_notify
+Date: Thu, 10 Apr 2014 10:42:57 +0200
+Message-Id: <1397119381-13294-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When client do unregister we need to make sure that there is no
-connected device for this client or outstanding connection request
+Create helper function to send connect notification, similar to the
+send_client_disconnect_notify
 ---
- android/gatt.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ android/gatt.c | 80 +++++++++++++++++++++++++++++++++-------------------------
+ 1 file changed, 45 insertions(+), 35 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 82299a1..769d392 100644
+index df9c675..1bb797d 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -545,6 +545,42 @@ static void send_client_connect_notify(int32_t client_id,
- 				HAL_EV_GATT_CLIENT_CONNECT, sizeof(ev), &ev);
+@@ -491,6 +491,25 @@ failed:
+ 					HAL_OP_GATT_CLIENT_REGISTER, status);
  }
  
-+static void remove_cl_from_connected_dev_and_notify(void *data, void *user_data)
++static void send_client_connect_notify(int32_t client_id,
++						struct gatt_device *dev,
++						int32_t status)
 +{
-+	struct gatt_device *dev = data;
-+	int32_t id = PTR_TO_INT(user_data);
++	struct hal_ev_gatt_client_connect ev;
 +
-+	if (queue_remove_if(dev->clients, match_by_value, INT_TO_PTR(id))) {
-+		if (queue_isempty(dev->clients))
-+			connection_cleanup(dev);
++	ev.client_if = client_id;
++	ev.status = status;
 +
-+		send_client_disconnect_notify(id, dev, GATT_SUCCESS);
++	if (status == GATT_SUCCESS) {
++		/* Set address and client id in the event */
++		bdaddr2android(&dev->bdaddr, &ev.bda);
++		ev.conn_id = dev->conn_id;
 +	}
-+}
 +
-+static void remove_cl_from_connecting_dev_and_notify(void *data,
-+							void *user_data)
-+{
-+	struct gatt_device *dev = data;
-+	int32_t id = PTR_TO_INT(user_data);
-+
-+	if (queue_remove_if(dev->clients, match_by_value, INT_TO_PTR(id)))
-+		send_client_connect_notify(id, dev, GATT_FAILURE);
-+}
-+
-+static void remove_client_from_devices(int32_t client_id)
-+{
-+	queue_foreach(conn_list, remove_cl_from_connected_dev_and_notify,
-+							INT_TO_PTR(client_id));
-+
-+	/*TODO: Check if there is any zombie device (connected no client)*/
-+
-+	queue_foreach(conn_wait_queue, remove_cl_from_connecting_dev_and_notify,
-+							INT_TO_PTR(client_id));
-+
-+	/*TODO: Check if there is not zombie device plus stop scan */
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++				HAL_EV_GATT_CLIENT_CONNECT, sizeof(ev), &ev);
 +}
 +
  static void handle_client_unregister(const void *buf, uint16_t len)
  {
  	const struct hal_cmd_gatt_client_unregister *cmd = buf;
-@@ -561,6 +597,11 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 		goto failed;
+@@ -808,24 +827,25 @@ done:
+ 	return FALSE;
+ }
+ 
+-static void send_client_connect_notify(void *data, void *user_data)
++struct connect_data {
++	struct gatt_device *dev;
++	int32_t status;
++};
++
++static void send_client_connect_notifications(void *data, void *user_data)
+ {
+-	struct hal_ev_gatt_client_connect *ev = user_data;
+ 	int32_t id = PTR_TO_INT(data);
++	struct connect_data *c = user_data;
+ 
+-	ev->client_if = id;
+-
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+-				HAL_EV_GATT_CLIENT_CONNECT, sizeof(*ev), ev);
++	send_client_connect_notify(id, c->dev, c->status);
+ }
+ 
+ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ {
+ 	bdaddr_t *addr = user_data;
+ 	struct gatt_device *dev;
+-	struct hal_ev_gatt_client_connect ev;
++	struct connect_data data;
+ 	GAttrib *attrib;
+-	int32_t status;
+ 
+ 	/* Take device from conn waiting queue */
+ 	dev = queue_remove_if(conn_wait_queue, match_dev_by_bdaddr, addr);
+@@ -838,19 +858,16 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	g_io_channel_unref(dev->att_io);
+ 	dev->att_io = NULL;
+ 
+-	/* Set address and client id in the event */
+-	bdaddr2android(&dev->bdaddr, &ev.bda);
+-
+ 	if (gerr) {
+ 		error("gatt: connection failed %s", gerr->message);
+-		status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		goto reply;
  	}
  
-+	/* Check if there is any connect request or connected device for this
-+	 * client. If so, remove this client from those lists.
-+	 */
-+	remove_client_from_devices(cl->id);
-+
- 	destroy_gatt_client(cl);
- 	status = HAL_STATUS_SUCCESS;
+ 	attrib = g_attrib_new(io);
+ 	if (!attrib) {
+ 		error("gatt: unable to create new GAttrib instance");
+-		status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		goto reply;
+ 	}
  
+@@ -863,21 +880,18 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	if (!queue_push_tail(conn_list, dev)) {
+ 		error("gatt: Cannot push dev on conn_list");
+ 		connection_cleanup(dev);
+-		status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		goto reply;
+ 	}
+ 
+-	status = GATT_SUCCESS;
+-	goto reply;
++	data.status = GATT_SUCCESS;
+ 
+ reply:
+-	ev.conn_id = dev ? dev->conn_id : 0;
+-	ev.status = status;
+-
+-	queue_foreach(dev->clients, send_client_connect_notify, &ev);
++	data.dev = dev;
++	queue_foreach(dev->clients, send_client_connect_notifications, &data);
+ 
+ 	/* If connection did not succeed, destroy device */
+-	if (status)
++	if (data.status)
+ 		destroy_device(dev);
+ 
+ 	/* Check if we should restart scan */
+@@ -1221,7 +1235,7 @@ static void copy_client_to_dev(void *data, void *user_data)
+ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ {
+ 	struct gatt_device *dev = NULL;
+-	struct hal_ev_gatt_client_connect ev;
++	struct connect_data data;
+ 	GAttrib *attrib;
+ 	uint8_t dst_type;
+ 	bdaddr_t src, dst;
+@@ -1231,7 +1245,7 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ 	if (gerr) {
+ 		error("gatt: %s", gerr->message);
+ 		g_error_free(gerr);
+-		ev.status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		goto done;
+ 	}
+ 
+@@ -1243,26 +1257,23 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ 	if (gerr) {
+ 		error("gatt: bt_io_get: %s", gerr->message);
+ 		g_error_free(gerr);
+-		ev.status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		goto done;
+ 	}
+ 
+ 	dev = create_device(&dst);
+ 	if (!dev) {
+-		ev.status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		dev = NULL;
+ 		goto done;
+ 	}
+ 
+ 	dev->bdaddr_type = dst_type;
+ 
+-	/* Set address and client id in the event */
+-	bdaddr2android(&dev->bdaddr, &ev.bda);
+-
+ 	attrib = g_attrib_new(io);
+ 	if (!attrib) {
+ 		error("gatt: unable to create new GAttrib instance");
+-		ev.status = GATT_FAILURE;
++		data.status = GATT_FAILURE;
+ 		destroy_device(dev);
+ 		dev = NULL;
+ 		goto done;
+@@ -1273,15 +1284,15 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ 							disconnected_cb, dev);
+ 	dev->conn_id = ++conn_id;
+ 
+-	ev.status = GATT_SUCCESS;
++	data.status = GATT_SUCCESS;
+ 
+ done:
+-	/* Only in success case we have valid conn_id */
+-	ev.conn_id = ev.status == GATT_SUCCESS ? dev->conn_id : 0;
++	data.dev = dev;
+ 
+-	queue_foreach(listen_clients.clients, send_client_connect_notify, &ev);
++	queue_foreach(listen_clients.clients,
++				send_client_connect_notifications, &data);
+ 
+-	if (ev.status != GATT_SUCCESS)
++	if (data.status != GATT_SUCCESS)
+ 		return;
+ 
+ 	/*copy list of clients to device and clear listen */
+@@ -1349,7 +1360,6 @@ reply:
+ 		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+ 						HAL_EV_GATT_CLIENT_LISTEN,
+ 						sizeof(ev), &ev);
+-
+ }
+ 
+ static void handle_client_refresh(const void *buf, uint16_t len)
 -- 
 1.8.4
 
