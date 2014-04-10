@@ -2,59 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 3/4] android/gatt: Add Client's refresh function call
-Date: Thu, 10 Apr 2014 16:34:53 +0200
-Message-Id: <1397140494-4023-3-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/4] android/gatt: Add cache check in Clients caching callbacks
+Date: Thu, 10 Apr 2014 16:34:54 +0200
+Message-Id: <1397140494-4023-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds clearing remote devices cache (services, characteristics and
-descriptors).
+As we were only checking in API call functions if cache exist and not
+in asynchronous callbacks, it was possible to schedule multiple
+discovery sessions before cache was filled with data. This resulted in
+adding duplicate entries, when all scheduled discovery sessions started
+to cache data.
 ---
- android/gatt.c | 25 ++++++++++++++++++++++++-
- 1 file changed, 24 insertions(+), 1 deletion(-)
+ android/gatt.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 525ad41..5c33253 100644
+index 5c33253..aa2a5fd 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -1206,10 +1206,33 @@ static void handle_client_listen(const void *buf, uint16_t len)
+@@ -623,6 +623,12 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 		goto done;
+ 	}
  
- static void handle_client_refresh(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_refresh *cmd = buf;
-+	struct gatt_device *dev;
-+	uint8_t status;
-+	bdaddr_t bda;
-+
-+	/* This is Android's framework hidden API call. It seams that no
-+	 * notification is expected and Bluedroid silently updates device's
-+	 * cache under the hood. As we use lazy caching ,we can just clear the
-+	 * cache and we're done.
-+	 */
-+
- 	DBG("");
- 
-+	android2bdaddr(&cmd->bdaddr, &bda);
-+	dev = find_device(&bda);
-+	if (!dev) {
-+		status = HAL_STATUS_FAILED;
++	if (!queue_isempty(dev->services)) {
++		info("gatt: Services already cached");
++		gatt_status = GATT_SUCCESS;
 +		goto done;
 +	}
 +
-+	queue_remove_all(dev->services, NULL, NULL, destroy_service);
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+done:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REFRESH,
--							HAL_STATUS_FAILED);
-+									status);
- }
+ 	/* There might be multiply services with same uuid. Therefore make sure
+ 	 * each primary service one has unique instance_id
+ 	 */
+@@ -1564,7 +1570,8 @@ static void discover_char_cb(uint8_t status, GSList *characteristics,
+ {
+ 	struct discover_char_data *data = user_data;
  
- static void handle_client_search_service(const void *buf, uint16_t len)
+-	cache_all_srvc_chars(characteristics, data->service->chars);
++	if (queue_isempty(data->service->chars))
++		cache_all_srvc_chars(characteristics, data->service->chars);
+ 
+ 	send_client_char_notify(queue_peek_head(data->service->chars),
+ 						data->conn_id, data->service);
+@@ -1731,7 +1738,7 @@ static void gatt_discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	if (status)
+ 		error("gatt: Discover all char descriptors failed: %s",
+ 							att_ecode2str(status));
+-	else
++	else if (queue_isempty(data->ch->descriptors))
+ 		cache_all_descr(pdu, len, data->ch->descriptors);
+ 
+ 	descr = queue_peek_head(data->ch->descriptors);
 -- 
 1.9.1
 
