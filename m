@@ -1,52 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Fix not sending confirmation while receiving indication
+Date: Thu, 10 Apr 2014 11:29:46 +0200
+Message-ID: <1556117.jmY3lOSIcj@uw000953>
+In-Reply-To: <1397035360-32680-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1397035360-32680-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <3B53A9C2-0FA3-4C0C-BC44-9DF2798BFDF8@holtmann.org>
-References: <1396959747-19848-1-git-send-email-szymon.janc@tieto.com>
-	<3B53A9C2-0FA3-4C0C-BC44-9DF2798BFDF8@holtmann.org>
-Date: Thu, 10 Apr 2014 12:57:00 +0300
-Message-ID: <CABBYNZKt0=Tpn=R1NcctOXARhqED4Q4WORsXrwbkDy=gQWHVRw@mail.gmail.com>
-Subject: Re: [PATCH] android/hidhost: Fix hex string to buffer convertion
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcin,
 
-On Wed, Apr 9, 2014 at 11:49 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Szymon,
->
->> Due to missing limit specifier buffer was always filled with last hex
->> value in string.
->> ---
->> android/hidhost.c | 23 ++++++++++++++---------
->> 1 file changed, 14 insertions(+), 9 deletions(-)
->>
->> diff --git a/android/hidhost.c b/android/hidhost.c
->> index 5ea7c5a..124d710 100644
->> --- a/android/hidhost.c
->> +++ b/android/hidhost.c
->> @@ -162,10 +162,18 @@ static void hid_device_remove(struct hid_device *dev)
->>       hid_device_free(dev);
->> }
->>
->> +static void hex2buf(const uint8_t *hex, uint8_t *buf, int num)
->> +{
->> +     int i;
->> +
->> +     for (i = 0; i < num; i++)
->> +             sscanf((const char *)(hex + (i * 2)), "%02hhX", &buf[i]);
->> +}
->
-> can we please build a cheaper version of this that does not require to use sscanf. Small hint is to look into src/util.c from oFono.
+On Wednesday 09 of April 2014 11:22:40 Marcin Kraglak wrote:
+> Send confirmation after receiving indication.
+> ---
+>  android/gatt.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index a33ce25..a4c5026 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -2355,6 +2355,18 @@ static void handle_notification(const uint8_t *pdu, uint16_t len,
+>  	ev->len = len - data_offset;
+>  	memcpy(ev->value, pdu + data_offset, len - data_offset);
+>  
+> +	if (!ev->is_notify) {
+> +		uint8_t *res;
+> +		uint16_t len;
+> +		size_t plen;
+> +
+> +		res = g_attrib_get_buffer(notification->dev->attrib, &plen);
+> +		len = enc_confirmation(res, plen);
+> +		if (len > 0)
+> +			g_attrib_send(notification->dev->attrib, 0, res, len,
+> +							NULL, NULL, NULL);
+> +	}
+> +
+>  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_NOTIFY,
+>  						sizeof(*ev) + ev->len, ev);
+>  }
+> 
 
-I also wonder why we are doing this? All the HAL does is to
-memcpy(cmd->data, data, cmd->len) or is it because the string itself
-is hexadecimal encoded? If that is the case someone probably deserves
-a medal...
-
+Applied. Thanks.
 
 -- 
-Luiz Augusto von Dentz
+Best regards, 
+Szymon Janc
