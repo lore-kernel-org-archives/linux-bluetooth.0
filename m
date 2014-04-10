@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/gatt: Remove unneeded label from unregister_client
-Date: Thu, 10 Apr 2014 20:40:35 +0200
-Message-Id: <1397155238-8578-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 5/5] android/gatt: Fix type of status parameter
+Date: Thu, 10 Apr 2014 17:30:05 +0200
+Message-Id: <1397143805-17809-6-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1397143805-17809-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397143805-17809-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/gatt.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index a7a7204..4a720cc 100644
+index 235e9e4..cdca424 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -506,13 +506,11 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 	if (!cl) {
- 		error("gatt: client_if=%d not found", cmd->client_if);
- 		status = HAL_STATUS_FAILED;
--		goto failed;
-+	} else {
-+		destroy_gatt_client(cl);
-+		status = HAL_STATUS_SUCCESS;
- 	}
- 
--	destroy_gatt_client(cl);
--	status = HAL_STATUS_SUCCESS;
--
--failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+@@ -509,7 +509,7 @@ static void connection_cleanup(struct gatt_device *device)
  }
+ 
+ static void send_client_disconnect_notify(int32_t id, struct gatt_device *dev,
+-								uint8_t status)
++								int32_t status)
+ {
+ 	struct hal_ev_gatt_client_disconnect ev;
+ 
 -- 
-1.8.3.1
+1.8.4
 
