@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix incorrect event status
-Date: Thu, 10 Apr 2014 10:54:34 +0200
-Message-ID: <11455563.3Ct9QDaxCl@uw000953>
-In-Reply-To: <1397111398-18137-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1397111398-18137-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 5/6] android/gatt: Move put_device_on_disc_list up in the file
+Date: Thu, 10 Apr 2014 10:43:00 +0200
+Message-Id: <1397119381-13294-6-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+This is needed by following patch
+---
+ android/gatt.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-On Thursday 10 of April 2014 08:29:58 Marcin Kraglak wrote:
-> Return proper gatt_status in register_for_notification event.
-> ---
->  android/gatt.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 15e788a..971e2dd 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -2482,7 +2482,7 @@ static void handle_client_register_for_notification(const void *buf,
->  	status = HAL_STATUS_SUCCESS;
->  
->  failed:
-> -	gatt_status  = status ? GATT_SUCCESS : GATT_FAILURE;
-> +	gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
->  	send_register_for_notification_ev(conn_id, 1, gatt_status,
->  						&cmd->srvc_id, &cmd->char_id);
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-> @@ -2535,7 +2535,7 @@ static void handle_client_deregister_for_notification(const void *buf,
->  	status = HAL_STATUS_SUCCESS;
->  
->  failed:
-> -	gatt_status  = status ? GATT_SUCCESS : GATT_FAILURE;
-> +	gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
->  	send_register_for_notification_ev(conn_id, 0, gatt_status,
->  						&cmd->srvc_id, &cmd->char_id);
->  
-> 
-
-Patch applied. Thanks.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 769d392..d9c5773 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -568,6 +568,13 @@ static void remove_cl_from_connecting_dev_and_notify(void *data,
+ 		send_client_connect_notify(id, dev, GATT_FAILURE);
+ }
+ 
++static void put_device_on_disc_list(struct gatt_device *dev)
++{
++	dev->conn_id = 0;
++	queue_remove_all(dev->clients, NULL, NULL, NULL);
++	queue_push_tail(disc_dev_list, dev);
++}
++
+ static void remove_client_from_devices(int32_t client_id)
+ {
+ 	queue_foreach(conn_list, remove_cl_from_connected_dev_and_notify,
+@@ -820,13 +827,6 @@ connect:
+ 	bt_le_discovery_stop(bt_le_discovery_stop_cb);
+ }
+ 
+-static void put_device_on_disc_list(struct gatt_device *dev)
+-{
+-	dev->conn_id = 0;
+-	queue_remove_all(dev->clients, NULL, NULL, NULL);
+-	queue_push_tail(disc_dev_list, dev);
+-}
+-
+ static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
+ {
 -- 
-Best regards, 
-Szymon Janc
+1.8.4
+
