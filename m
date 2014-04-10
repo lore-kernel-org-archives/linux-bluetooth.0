@@ -1,43 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] android/hal-gatt: Fix sending uninitialised byte
-Date: Thu, 10 Apr 2014 15:17:09 +0300
-Message-Id: <1397132229-892-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1397132229-892-1-git-send-email-luiz.dentz@gmail.com>
-References: <1397132229-892-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] android/system-emulator: Pass --track-origin=yes to valgrind
+Date: Thu, 10 Apr 2014 15:17:08 +0300
+Message-Id: <1397132229-892-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes sending uninitialised byte on init:
+This adds --track-origin=yes option:
 
-Syscall param sendmsg(msg.msg_iov[1]) points to uninitialised byte(s)
-   at 0x534ADDD: ??? (in /usr/lib64/libpthread-2.18.so)
-   by 0x6B5628C: hal_ipc_cmd (hal-ipc.c:357)
-   by 0x6B54F6D: init (hal-gatt.c:1268)
-   by 0x4092DB: init_p (if-gatt.c:779)
-   by 0x401CCD: main (haltest.c:413)
- Address 0xffefffda1 is on thread 1's stack
- Uninitialised value was created by a stack allocation
-   at 0x6B54EC0: init (hal-gatt.c:1252)
+  "Controls whether Memcheck tracks the origin of uninitialised values.
+   By default, it does not, which means that although it can tell you
+   that an uninitialised value is being used in a dangerous way, it
+   cannot tell you where the uninitialised value came from. This often
+   makes it difficult to track down the root problem."
 ---
- android/hal-gatt.c | 1 +
- 1 file changed, 1 insertion(+)
+ android/system-emulator.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-index d8c0d54..6fde143 100644
---- a/android/hal-gatt.c
-+++ b/android/hal-gatt.c
-@@ -1264,6 +1264,7 @@ static bt_status_t init(const btgatt_callbacks_t *callbacks)
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
+diff --git a/android/system-emulator.c b/android/system-emulator.c
+index dc46814..c1b1b25 100644
+--- a/android/system-emulator.c
++++ b/android/system-emulator.c
+@@ -50,7 +50,7 @@ static pid_t snoop_pid = -1;
+ static void ctl_start(void)
+ {
+ 	char prg_name[PATH_MAX + 1];
+-	char *prg_argv[5];
++	char *prg_argv[6];
+ 	char *prg_envp[3];
+ 	pid_t pid;
  
- 	cmd.service_id = HAL_SERVICE_ID_GATT;
-+	cmd.mode = HAL_MODE_DEFAULT;
+@@ -58,9 +58,10 @@ static void ctl_start(void)
  
- 	ret = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, 0, NULL, NULL);
+ 	prg_argv[0] = "/usr/bin/valgrind";
+ 	prg_argv[1] = "--leak-check=full";
+-	prg_argv[2] = prg_name;
+-	prg_argv[3] = "-d";
+-	prg_argv[4] = NULL;
++	prg_argv[2] = "--track-origins=yes";
++	prg_argv[3] = prg_name;
++	prg_argv[4] = "-d";
++	prg_argv[5] = NULL;
+ 
+ 	prg_envp[0] = "G_SLICE=always-malloc";
+ 	prg_envp[1] = "G_DEBUG=gc-friendly";
 -- 
 1.9.0
 
