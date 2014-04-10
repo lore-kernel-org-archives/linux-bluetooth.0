@@ -1,51 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix not sending confirmation while receiving indication
-Date: Thu, 10 Apr 2014 11:29:46 +0200
-Message-ID: <1556117.jmY3lOSIcj@uw000953>
-In-Reply-To: <1397035360-32680-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1397035360-32680-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH] android/pts: Bump PTS version for HFP
+Date: Thu, 10 Apr 2014 11:24:32 +0200
+Message-ID: <3222934.dH6RK5nzCX@uw000953>
+In-Reply-To: <1397120832-23724-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1397120832-23724-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Sebastian,
 
-On Wednesday 09 of April 2014 11:22:40 Marcin Kraglak wrote:
-> Send confirmation after receiving indication.
+On Thursday 10 of April 2014 11:07:12 Sebastian Chlad wrote:
+> Re-checking PIXITs and PICS for HFP on PTS 5.1.
 > ---
->  android/gatt.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  android/pics-hfp.txt  | 2 +-
+>  android/pixit-hfp.txt | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index a33ce25..a4c5026 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -2355,6 +2355,18 @@ static void handle_notification(const uint8_t *pdu, uint16_t len,
->  	ev->len = len - data_offset;
->  	memcpy(ev->value, pdu + data_offset, len - data_offset);
+> diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
+> index 6c9808f..1a13edc 100644
+> --- a/android/pics-hfp.txt
+> +++ b/android/pics-hfp.txt
+> @@ -1,6 +1,6 @@
+>  HFP PICS for the PTS tool.
 >  
-> +	if (!ev->is_notify) {
-> +		uint8_t *res;
-> +		uint16_t len;
-> +		size_t plen;
-> +
-> +		res = g_attrib_get_buffer(notification->dev->attrib, &plen);
-> +		len = enc_confirmation(res, plen);
-> +		if (len > 0)
-> +			g_attrib_send(notification->dev->attrib, 0, res, len,
-> +							NULL, NULL, NULL);
-> +	}
-> +
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT, HAL_EV_GATT_CLIENT_NOTIFY,
->  						sizeof(*ev) + ev->len, ev);
->  }
+> -PTS version: 5.0
+> +PTS version: 5.1
+>  
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
+> index f539e07..ebf73c8 100644
+> --- a/android/pixit-hfp.txt
+> +++ b/android/pixit-hfp.txt
+> @@ -1,6 +1,6 @@
+>  HFP PIXIT for the PTS tool.
+>  
+> -PTS version: 5.0
+> +PTS version: 5.1
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
 > 
 
-Applied. Thanks.
+Applied, thanks.
 
 -- 
 Best regards, 
