@@ -1,158 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5346B0F2.20508@rwth-aachen.de>
-Date: Thu, 10 Apr 2014 16:55:46 +0200
-From: =?ISO-8859-1?Q?Jan_R=FCth?= <jan.rueth@rwth-aachen.de>
-MIME-Version: 1.0
-CC: <linux-bluetooth@vger.kernel.org>
-Subject: Re: LE Connection Update Disallowed
-References: <CAPm3yA3cOM0auyzqPLdKj5FFFva-REk3TnsrZcD9siV6kba+eA@mail.gmail.com>	<CAJdJm_OK5TW3ECqQgF_JnUzO3McPCW=inG3HOxm1c_K4ODkWEQ@mail.gmail.com>	<CAPm3yA2LJMPOSGGzscQe8XV+gu8+kf5WZurk8DsSWEBBCOJcew@mail.gmail.com>	<CAJdJm_MScMpFNekv-9E3eFneNmLsgdurKb-R3kMTP66Gy40yaQ@mail.gmail.com>	<CAPm3yA0m0AUyQd04J4H+mQ3NL7XjvkLX3M8R7cKhc8QGGG25hA@mail.gmail.com> <CAPm3yA2+hOxxwSM-2OgCM3Du_aLHtGja3pCaq-Rguj=REP-Z5g@mail.gmail.com>
-In-Reply-To: <CAPm3yA2+hOxxwSM-2OgCM3Du_aLHtGja3pCaq-Rguj=REP-Z5g@mail.gmail.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-To: unlisted-recipients:; (no To-header on input)
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 3/4] android/gatt: Add Client's refresh function call
+Date: Thu, 10 Apr 2014 16:34:53 +0200
+Message-Id: <1397140494-4023-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 10/02/14 13:30, Sandy Chapman wrote:
-> Hi All,
-> 
-> On Thu, Feb 6, 2014 at 12:21 PM, Sandy Chapman <schapman-1O7wWW109P4AvxtiuMwx3w@public.gmane.org> wrote:
->> Hi Anderson,
->>
->> On Wed, Feb 5, 2014 at 11:23 AM, Anderson Lizardo
->> <anderson.lizardo-430g2QfJUUCGglJvpFV4uA@public.gmane.org> wrote:
->>> HI Sandy,
->>>
->>> On Wed, Feb 5, 2014 at 10:51 AM, Sandy Chapman <schapman-1O7wWW109P4AvxtiuMwx3w@public.gmane.org> wrote:
->>>>>> How do I initiate a Connection Update from the peripheral?
->>>>>
->>>>> I never tried this procedure myself, but my guess it that you are
->>>>> using the incorrect mechanism on the slave role. Take a look at the
->>>>> "Connection Parameters Update Request" on Vol 3, Part A, Section 4.20.
->>>>> I believe this is the correct way to request from the slave (from what
->>>>> I understand while reading the Linux kernel implementation of the
->>>>> master side).
->>>>>
->>>>> Note that when Linux is the master, this command is issued
->>>>> automatically by the kernel when requested by the slave.
->>>>
->>>> I've taken a look at that section and it appears that this is what is
->>>> used to trigger the Connection Update. It states that the command
->>>> shall only be issued from the slave to the master. I can confirm that
->>>> my device is in the slave role using 'hcitool con'.
->>>
->>> I think you didn't notice that the section I mentioned is about a
->>> L2CAP signalling packet, not an HCI command (which in this case is to
->>> be used on the master side). I suggest you read a bit more on the
->>> L2CAP section to understand how these signalling packets work. Then
->>> you can try building such packet with "hcitool cmd" (unless there is
->>> some support for it on the current kernel, which I didn't check)
->>>
->>
->> Yes, you right, I missed that part. I've built out what my packet
->> should look like, but I'm having troubles sending it to the
->> controller. I really am stuck on issuing this packet. It appears that
->> I need to send an HCI ACL Data Packet which holds a Signalling
->> Command. This signalling command then holds the connection parameter
->> update request as it's payload. It looks like 'hcitool cmd' can't send
->> ACL packets though as the command requires an OGF and OCF which are
->> part of the HCI Command Packet, not the HCI ACL Data Packet. From what
->> I can tell, the best chance I'd have is to send it via the l2test tool
->> over L2CAP, but attempting to use le_public address type doesn't work
->> (which I believe will send the message over CID 0x0005 - the fixed LE
->> channel). It fails on getsockopt/setsockopt for the SOL_BLUETOOTH
->> type. From what I can tell, it requires a kernel with CoC (not sure
->> what it means or if I have it). I'm really hoping I'm not going to
->> have to compile the bluetooth kernel module myself to send this
->> connection update packet.
->>
->>>>> You may want to take a look at the "GAP Peripheral Preferred
->>>>> Connection Parameters" characteristic (see Vol 3, Part C, Section
->>>>> 12.3). If iPhones reads this characteristic and honours the
->>>>> parameters, it may help.
->>>>
->>>> Unfortunately, it appears Apple explicitly ignores this parameter
->>>> (section 3.6 in this document
->>>> https://developer.apple.com/hardwaredrivers/BluetoothDesignGuidelines.pdf).
->>>
->>> This is unfortunate. It would be the easiest way to pass custom
->>> connection parameters IMHO.
->>>
->>>> I believe that 'hcitool lecup' is exactly supposed to initiate this
->>>> process. I've also tried to use 'hcitool cmd' to issue direct commands
->>>> to the controller (using Vol 3, Part A, Section 4.20 as a guide), but
->>>> I am having no luck. It's stating that the command is disallowed (not
->>>> that the parameters are invalid), so I'm guessing there's something
->>>> else wrong. Since this is directly communicating with the controller,
->>>> where would the problem be? In the kernel, itself? Could it be a
->>>> problem with the Broadcom chipset in my MacBook?
->>>
->>> "hcitool lecup" is just a helper, it uses the same mechanism that
->>> "hcitool cmd" uses (and both are just "raw" interfaces to the
->>> Bluetooth controller). If you are getting an "Invalid Parameters" on
->>> any of them, is either because you built the packet incorrectly on
->>> "hcitool cmd" or given invalid values as per the spec.
->>>
->>> By the way, I suggest using "btmon" instead of "hcidump", as the
->>> former has nicer output and is more up-to-date (although I'm not sure
->>> it supports parsing "LE Connection Update" parameters).
->>>
->>
->> You're right btmon is much nicer and does support recognition of the
->> LE commands.
->>
->>> Best Regards,
->>> --
->>> Anderson Lizardo
->>> http://www.indt.org/?lang=en
->>> INdT - Manaus - Brazil
->>
->> I know what I'm doing might not be typical, but I really appreciate
->> your help. If there's any direction you could point me in, I'd be
->> really thankful. I don't really know what to try next.
->>
->> Thanks again,
->>
->> Sandy
-> 
-> Just wanted to post that I've got this working. However, I've had to
-> write code that will format the signalling packet properly and relay
-> it to the controller via hci (in a similar manner to how hcitool
-> current sends HCI commands). The approach I suggested in my previous
-> email worked (HCI ACL Data Packet containing a Signalling Command of
-> the type Connection Parameter Update Request). This required changes
-> to hci.c (to format and write the new packet to the hci device).
-> 
-> See Vol. 2, Part E, 4.1 for Host to Controller HCI flow.
-> See Vol. 2, Part E, 5.4.2 for HCI ACL Data Packet format.
-> See Vol. 3, Part A, 4 for Signalling Packet format.
-> See Vol. 3, Part A, 4.20 for Connection Parameter Update Request format.
-> 
-> Since I've got this working, I'm wondering if there is interest from
-> the bluez devs in supporting this going forward? If so, I can likely
-> clean up my code in such a way that it'll allow adding the other
-> signalling packet formats easily. Currently, I've got my specific
-> signalling packet exposed through hcitool (as a new command) as it was
-> convenient to piggyback on it. Since the ACL Data Packets are being
-> sent via HCI, this may be a decent place for this new functionality to
-> stay.
-> 
-> Anyway, I'm just wondering if there is any interest as I can likely do
-> some work to add this functionality and I don't think I'm going to be
-> the only one who wishes to be able to request the slave device to
-> renegotiate the connection parameters while a connection is open from
-> the command line. This would be useful in a case where a low energy
-> connection would require a burst of information to be sent (transfer
-> of a large log file, or an image from a sensor for examples).
-> 
-> Sandy
-> 
+This adds clearing remote devices cache (services, characteristics and
+descriptors).
+---
+ android/gatt.c | 25 ++++++++++++++++++++++++-
+ 1 file changed, 24 insertions(+), 1 deletion(-)
 
-Hi Sandy,
+diff --git a/android/gatt.c b/android/gatt.c
+index 525ad41..5c33253 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1206,10 +1206,33 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 
+ static void handle_client_refresh(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_refresh *cmd = buf;
++	struct gatt_device *dev;
++	uint8_t status;
++	bdaddr_t bda;
++
++	/* This is Android's framework hidden API call. It seams that no
++	 * notification is expected and Bluedroid silently updates device's
++	 * cache under the hood. As we use lazy caching ,we can just clear the
++	 * cache and we're done.
++	 */
++
+ 	DBG("");
+ 
++	android2bdaddr(&cmd->bdaddr, &bda);
++	dev = find_device(&bda);
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto done;
++	}
++
++	queue_remove_all(dev->services, NULL, NULL, destroy_service);
++
++	status = HAL_STATUS_SUCCESS;
++
++done:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REFRESH,
+-							HAL_STATUS_FAILED);
++									status);
+ }
+ 
+ static void handle_client_search_service(const void *buf, uint16_t len)
+-- 
+1.9.1
 
-would you mind sharing your code? I tried to implement it and I can see
-the connection update in btmon but afterwards I cannot send data from
-the slave to the master via my l2cap socket.
-
-
-Thanks
- Jan
