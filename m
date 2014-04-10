@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 6/6] android/gatt: Move not used devices to disconnected dev queue
-Date: Thu, 10 Apr 2014 14:40:08 +0200
-Message-ID: <21498123.GVIzOAgyxH@uw000953>
-In-Reply-To: <1397119381-13294-7-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com> <1397119381-13294-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 2/6] android/gatt: Refactor send_client_connect_notify
+Date: Thu, 10 Apr 2014 14:19:08 +0200
+Message-ID: <4645395.zSGLX08lCs@uw000953>
+In-Reply-To: <1397119381-13294-3-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com> <1397119381-13294-3-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,71 +14,209 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Thursday 10 of April 2014 10:43:01 Lukasz Rymanowski wrote:
-> With this patch, devices from conn_list and conn_wait_queue which are
-> without a client e.g. because client has unregister without any
-> cleaning, are move to the disconnected device queue.
+On Thursday 10 of April 2014 10:42:57 Lukasz Rymanowski wrote:
+> Create helper function to send connect notification, similar to the
+> send_client_disconnect_notify
 > ---
->  android/gatt.c | 26 ++++++++++++++++++++++++--
->  1 file changed, 24 insertions(+), 2 deletions(-)
+>  android/gatt.c | 80 +++++++++++++++++++++++++++++++++-------------------------
+>  1 file changed, 45 insertions(+), 35 deletions(-)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index d9c5773..4d7a3e4 100644
+> index df9c675..1bb797d 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -295,6 +295,13 @@ static bool match_dev_by_conn_id(const void *data, const void *user_data)
->  	return dev->conn_id == conn_id;
+> @@ -491,6 +491,25 @@ failed:
+>  					HAL_OP_GATT_CLIENT_REGISTER, status);
 >  }
 >  
-> +static bool match_dev_without_client(const void *data, const void *user_data)
+> +static void send_client_connect_notify(int32_t client_id,
+> +						struct gatt_device *dev,
+> +						int32_t status)
 > +{
-> +	const struct gatt_device *dev = data;
+> +	struct hal_ev_gatt_client_connect ev;
 > +
-> +	return queue_isempty(dev->clients);
+> +	ev.client_if = client_id;
+> +	ev.status = status;
+> +
+> +	if (status == GATT_SUCCESS) {
+> +		/* Set address and client id in the event */
+> +		bdaddr2android(&dev->bdaddr, &ev.bda);
+> +		ev.conn_id = dev->conn_id;
+> +	}
+> +
+> +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+> +				HAL_EV_GATT_CLIENT_CONNECT, sizeof(ev), &ev);
 > +}
 > +
->  static bool match_srvc_by_element_id(const void *data, const void *user_data)
->  {
->  	const struct element_id *exp_id = user_data;
-> @@ -575,17 +582,32 @@ static void put_device_on_disc_list(struct gatt_device *dev)
->  	queue_push_tail(disc_dev_list, dev);
->  }
->  
-> +static void park_not_used_devices(struct queue *q)
-> +{
-> +	struct gatt_device *dev;
-> +
-> +	/* Find device without client */
-> +	dev = queue_remove_if(q, match_dev_without_client, NULL);
-> +	while (dev) {
-> +		/* Park device on disconnected device queue */
-> +		put_device_on_disc_list(dev);
-> +		dev = queue_remove_if(q, match_dev_without_client, NULL);
-> +	};
-> +}
-> +
->  static void remove_client_from_devices(int32_t client_id)
->  {
->  	queue_foreach(conn_list, remove_cl_from_connected_dev_and_notify,
->  							INT_TO_PTR(client_id));
->  
-> -	/*TODO: Check if there is any zombie device (connected no client)*/
-> +	/*If there is any device without client, move it to disc list*/
-> +	park_not_used_devices(conn_list);
-
-Shouldn't those devices be disconnected as well? Also 'park' term is a bit
-unusual, maybe just call it cleanup?
-
->  
->  	queue_foreach(conn_wait_queue, remove_cl_from_connecting_dev_and_notify,
->  							INT_TO_PTR(client_id));
->  
-> -	/*TODO: Check if there is not zombie device plus stop scan */
-> +	/*If there is any device without client, move it to disc list*/
-> +	park_not_used_devices(conn_wait_queue);
->  }
->  
 >  static void handle_client_unregister(const void *buf, uint16_t len)
+>  {
+>  	const struct hal_cmd_gatt_client_unregister *cmd = buf;
+> @@ -808,24 +827,25 @@ done:
+>  	return FALSE;
+>  }
+>  
+> -static void send_client_connect_notify(void *data, void *user_data)
+> +struct connect_data {
+> +	struct gatt_device *dev;
+> +	int32_t status;
+> +};
+> +
+> +static void send_client_connect_notifications(void *data, void *user_data)
+>  {
+> -	struct hal_ev_gatt_client_connect *ev = user_data;
+>  	int32_t id = PTR_TO_INT(data);
+> +	struct connect_data *c = user_data;
+>  
+> -	ev->client_if = id;
+> -
+> -	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+> -				HAL_EV_GATT_CLIENT_CONNECT, sizeof(*ev), ev);
+> +	send_client_connect_notify(id, c->dev, c->status);
+>  }
+>  
+>  static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>  {
+>  	bdaddr_t *addr = user_data;
+>  	struct gatt_device *dev;
+> -	struct hal_ev_gatt_client_connect ev;
+> +	struct connect_data data;
+>  	GAttrib *attrib;
+> -	int32_t status;
+>  
+>  	/* Take device from conn waiting queue */
+>  	dev = queue_remove_if(conn_wait_queue, match_dev_by_bdaddr, addr);
+> @@ -838,19 +858,16 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>  	g_io_channel_unref(dev->att_io);
+>  	dev->att_io = NULL;
+>  
+> -	/* Set address and client id in the event */
+> -	bdaddr2android(&dev->bdaddr, &ev.bda);
+> -
+>  	if (gerr) {
+>  		error("gatt: connection failed %s", gerr->message);
+> -		status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		goto reply;
+>  	}
+>  
+>  	attrib = g_attrib_new(io);
+>  	if (!attrib) {
+>  		error("gatt: unable to create new GAttrib instance");
+> -		status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		goto reply;
+>  	}
+>  
+> @@ -863,21 +880,18 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>  	if (!queue_push_tail(conn_list, dev)) {
+>  		error("gatt: Cannot push dev on conn_list");
+>  		connection_cleanup(dev);
+> -		status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		goto reply;
+>  	}
+>  
+> -	status = GATT_SUCCESS;
+> -	goto reply;
+> +	data.status = GATT_SUCCESS;
+>  
+>  reply:
+> -	ev.conn_id = dev ? dev->conn_id : 0;
+> -	ev.status = status;
+> -
+> -	queue_foreach(dev->clients, send_client_connect_notify, &ev);
+> +	data.dev = dev;
+> +	queue_foreach(dev->clients, send_client_connect_notifications, &data);
+>  
+>  	/* If connection did not succeed, destroy device */
+> -	if (status)
+> +	if (data.status)
+>  		destroy_device(dev);
+>  
+>  	/* Check if we should restart scan */
+> @@ -1221,7 +1235,7 @@ static void copy_client_to_dev(void *data, void *user_data)
+>  static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+>  {
+>  	struct gatt_device *dev = NULL;
+> -	struct hal_ev_gatt_client_connect ev;
+> +	struct connect_data data;
+>  	GAttrib *attrib;
+>  	uint8_t dst_type;
+>  	bdaddr_t src, dst;
+> @@ -1231,7 +1245,7 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+>  	if (gerr) {
+>  		error("gatt: %s", gerr->message);
+>  		g_error_free(gerr);
+> -		ev.status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		goto done;
+>  	}
+>  
+> @@ -1243,26 +1257,23 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+>  	if (gerr) {
+>  		error("gatt: bt_io_get: %s", gerr->message);
+>  		g_error_free(gerr);
+> -		ev.status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		goto done;
+>  	}
+>  
+>  	dev = create_device(&dst);
+>  	if (!dev) {
+> -		ev.status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		dev = NULL;
+>  		goto done;
+>  	}
+>  
+>  	dev->bdaddr_type = dst_type;
+>  
+> -	/* Set address and client id in the event */
+> -	bdaddr2android(&dev->bdaddr, &ev.bda);
+> -
+>  	attrib = g_attrib_new(io);
+>  	if (!attrib) {
+>  		error("gatt: unable to create new GAttrib instance");
+> -		ev.status = GATT_FAILURE;
+> +		data.status = GATT_FAILURE;
+>  		destroy_device(dev);
+>  		dev = NULL;
+>  		goto done;
+> @@ -1273,15 +1284,15 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+>  							disconnected_cb, dev);
+>  	dev->conn_id = ++conn_id;
+>  
+> -	ev.status = GATT_SUCCESS;
+> +	data.status = GATT_SUCCESS;
+>  
+>  done:
+> -	/* Only in success case we have valid conn_id */
+> -	ev.conn_id = ev.status == GATT_SUCCESS ? dev->conn_id : 0;
+> +	data.dev = dev;
+>  
+> -	queue_foreach(listen_clients.clients, send_client_connect_notify, &ev);
+> +	queue_foreach(listen_clients.clients,
+> +				send_client_connect_notifications, &data);
+
+dev can be NULL here so this might crash.
+
+>  
+> -	if (ev.status != GATT_SUCCESS)
+> +	if (data.status != GATT_SUCCESS)
+>  		return;
+>  
+>  	/*copy list of clients to device and clear listen */
+> @@ -1349,7 +1360,6 @@ reply:
+>  		ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+>  						HAL_EV_GATT_CLIENT_LISTEN,
+>  						sizeof(ev), &ev);
+> -
+>  }
+
+Unrelated (if this is due to previous patch, please fix it there).
+
+>  
+>  static void handle_client_refresh(const void *buf, uint16_t len)
 > 
 
 -- 
