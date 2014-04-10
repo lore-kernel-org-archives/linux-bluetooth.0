@@ -1,58 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/gatt: Fix for scan non discoverable devices
-Date: Thu, 10 Apr 2014 15:36:33 +0200
-Message-Id: <1397136993-28133-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/6] android/gatt: Move not used devices to disconnected dev queue
+Date: Thu, 10 Apr 2014 14:40:08 +0200
+Message-ID: <21498123.GVIzOAgyxH@uw000953>
+In-Reply-To: <1397119381-13294-7-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com> <1397119381-13294-7-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch Android framework will not be notify with non
-discoverable LE devices.
----
- android/gatt.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Hi Łukasz,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index a33ce25..e10324e 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -41,6 +41,7 @@
- #include "src/log.h"
- #include "hal-msg.h"
- #include "utils.h"
-+#include "src/eir.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
- #include "attrib/gattrib.h"
-@@ -710,6 +711,7 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
- 	uint8_t buf[IPC_MTU];
- 	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
- 	char bda[18];
-+	struct eir_data e;
- 
- 	if (!scanning)
- 		goto connect;
-@@ -717,6 +719,17 @@ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
- 	ba2str(addr, bda);
- 	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
- 
-+	if (eir_len > 0) {
-+		memset(&e, 0 ,sizeof(e));
-+		eir_parse(&e, eir, eir_len);
-+
-+		/* Check if device is discoverable. If not then just try to
-+		 * connect
-+		 */
-+		if (!(e.flags & (EIR_LIM_DISC | EIR_GEN_DISC)))
-+			goto connect;
-+	}
-+
- 	bdaddr2android(addr, ev->bda);
- 	ev->rssi = rssi;
- 	ev->len = eir_len;
+On Thursday 10 of April 2014 10:43:01 Lukasz Rymanowski wrote:
+> With this patch, devices from conn_list and conn_wait_queue which are
+> without a client e.g. because client has unregister without any
+> cleaning, are move to the disconnected device queue.
+> ---
+>  android/gatt.c | 26 ++++++++++++++++++++++++--
+>  1 file changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index d9c5773..4d7a3e4 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -295,6 +295,13 @@ static bool match_dev_by_conn_id(const void *data, const void *user_data)
+>  	return dev->conn_id == conn_id;
+>  }
+>  
+> +static bool match_dev_without_client(const void *data, const void *user_data)
+> +{
+> +	const struct gatt_device *dev = data;
+> +
+> +	return queue_isempty(dev->clients);
+> +}
+> +
+>  static bool match_srvc_by_element_id(const void *data, const void *user_data)
+>  {
+>  	const struct element_id *exp_id = user_data;
+> @@ -575,17 +582,32 @@ static void put_device_on_disc_list(struct gatt_device *dev)
+>  	queue_push_tail(disc_dev_list, dev);
+>  }
+>  
+> +static void park_not_used_devices(struct queue *q)
+> +{
+> +	struct gatt_device *dev;
+> +
+> +	/* Find device without client */
+> +	dev = queue_remove_if(q, match_dev_without_client, NULL);
+> +	while (dev) {
+> +		/* Park device on disconnected device queue */
+> +		put_device_on_disc_list(dev);
+> +		dev = queue_remove_if(q, match_dev_without_client, NULL);
+> +	};
+> +}
+> +
+>  static void remove_client_from_devices(int32_t client_id)
+>  {
+>  	queue_foreach(conn_list, remove_cl_from_connected_dev_and_notify,
+>  							INT_TO_PTR(client_id));
+>  
+> -	/*TODO: Check if there is any zombie device (connected no client)*/
+> +	/*If there is any device without client, move it to disc list*/
+> +	park_not_used_devices(conn_list);
+
+Shouldn't those devices be disconnected as well? Also 'park' term is a bit
+unusual, maybe just call it cleanup?
+
+>  
+>  	queue_foreach(conn_wait_queue, remove_cl_from_connecting_dev_and_notify,
+>  							INT_TO_PTR(client_id));
+>  
+> -	/*TODO: Check if there is not zombie device plus stop scan */
+> +	/*If there is any device without client, move it to disc list*/
+> +	park_not_used_devices(conn_wait_queue);
+>  }
+>  
+>  static void handle_client_unregister(const void *buf, uint16_t len)
+> 
+
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
