@@ -3,107 +3,79 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/6] android/gatt: Move functions up in the file
-Date: Thu, 10 Apr 2014 10:42:58 +0200
-Message-Id: <1397119381-13294-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/6] android/gatt: Fix handling client unregister
+Date: Thu, 10 Apr 2014 10:42:59 +0200
+Message-Id: <1397119381-13294-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1397119381-13294-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move send_client_disconnect_notify and connection_cleanup up in the file
+When client do unregister we need to make sure that there is no
+connected device for this client or outstanding connection request
 ---
- android/gatt.c | 70 +++++++++++++++++++++++++++++-----------------------------
- 1 file changed, 35 insertions(+), 35 deletions(-)
+ android/gatt.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 1bb797d..82299a1 100644
+index 82299a1..769d392 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -491,6 +491,41 @@ failed:
- 					HAL_OP_GATT_CLIENT_REGISTER, status);
+@@ -545,6 +545,42 @@ static void send_client_connect_notify(int32_t client_id,
+ 				HAL_EV_GATT_CLIENT_CONNECT, sizeof(ev), &ev);
  }
  
-+static void connection_cleanup(struct gatt_device *device)
++static void remove_cl_from_connected_dev_and_notify(void *data, void *user_data)
 +{
-+	if (device->watch_id) {
-+		g_source_remove(device->watch_id);
-+		device->watch_id = 0;
-+	}
++	struct gatt_device *dev = data;
++	int32_t id = PTR_TO_INT(user_data);
 +
-+	if (device->att_io) {
-+		g_io_channel_shutdown(device->att_io, FALSE, NULL);
-+		g_io_channel_unref(device->att_io);
-+		device->att_io = NULL;
-+	}
++	if (queue_remove_if(dev->clients, match_by_value, INT_TO_PTR(id))) {
++		if (queue_isempty(dev->clients))
++			connection_cleanup(dev);
 +
-+	if (device->attrib) {
-+		GAttrib *attrib = device->attrib;
-+		device->attrib = NULL;
-+		g_attrib_cancel_all(attrib);
-+		g_attrib_unref(attrib);
++		send_client_disconnect_notify(id, dev, GATT_SUCCESS);
 +	}
 +}
 +
-+static void send_client_disconnect_notify(int32_t id, struct gatt_device *dev,
-+								uint8_t status)
++static void remove_cl_from_connecting_dev_and_notify(void *data,
++							void *user_data)
 +{
-+	struct hal_ev_gatt_client_disconnect ev;
++	struct gatt_device *dev = data;
++	int32_t id = PTR_TO_INT(user_data);
 +
-+	ev.client_if = id;
-+	ev.conn_id = dev->conn_id;
-+	ev.status = status;
-+	bdaddr2android(&dev->bdaddr, &ev.bda);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
++	if (queue_remove_if(dev->clients, match_by_value, INT_TO_PTR(id)))
++		send_client_connect_notify(id, dev, GATT_FAILURE);
 +}
 +
- static void send_client_connect_notify(int32_t client_id,
- 						struct gatt_device *dev,
- 						int32_t status)
-@@ -669,41 +704,6 @@ done:
- 	send_client_all_primary(gatt_status, dev->services, dev->conn_id);
- }
- 
--static void connection_cleanup(struct gatt_device *device)
--{
--	if (device->watch_id) {
--		g_source_remove(device->watch_id);
--		device->watch_id = 0;
--	}
--
--	if (device->att_io) {
--		g_io_channel_shutdown(device->att_io, FALSE, NULL);
--		g_io_channel_unref(device->att_io);
--		device->att_io = NULL;
--	}
--
--	if (device->attrib) {
--		GAttrib *attrib = device->attrib;
--		device->attrib = NULL;
--		g_attrib_cancel_all(attrib);
--		g_attrib_unref(attrib);
--	}
--}
--
--static void send_client_disconnect_notify(int32_t id, struct gatt_device *dev,
--								uint8_t status)
--{
--	struct hal_ev_gatt_client_disconnect ev;
--
--	ev.client_if = id;
--	ev.conn_id = dev->conn_id;
--	ev.status = status;
--	bdaddr2android(&dev->bdaddr, &ev.bda);
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
--}
--
- static void client_disconnect_notify(void *data, void *user_data)
++static void remove_client_from_devices(int32_t client_id)
++{
++	queue_foreach(conn_list, remove_cl_from_connected_dev_and_notify,
++							INT_TO_PTR(client_id));
++
++	/*TODO: Check if there is any zombie device (connected no client)*/
++
++	queue_foreach(conn_wait_queue, remove_cl_from_connecting_dev_and_notify,
++							INT_TO_PTR(client_id));
++
++	/*TODO: Check if there is not zombie device plus stop scan */
++}
++
+ static void handle_client_unregister(const void *buf, uint16_t len)
  {
- 	struct gatt_device *dev = user_data;
+ 	const struct hal_cmd_gatt_client_unregister *cmd = buf;
+@@ -561,6 +597,11 @@ static void handle_client_unregister(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
++	/* Check if there is any connect request or connected device for this
++	 * client. If so, remove this client from those lists.
++	 */
++	remove_client_from_devices(cl->id);
++
+ 	destroy_gatt_client(cl);
+ 	status = HAL_STATUS_SUCCESS;
+ 
 -- 
 1.8.4
 
