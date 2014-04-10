@@ -2,59 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 4/4] android/gatt: Add cache check in Clients caching callbacks
-Date: Thu, 10 Apr 2014 16:34:54 +0200
-Message-Id: <1397140494-4023-4-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/4] android/gatt: Fix sending device to (dis)connect callback
+Date: Thu, 10 Apr 2014 16:34:52 +0200
+Message-Id: <1397140494-4023-2-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As we were only checking in API call functions if cache exist and not
-in asynchronous callbacks, it was possible to schedule multiple
-discovery sessions before cache was filled with data. This resulted in
-adding duplicate entries, when all scheduled discovery sessions started
-to cache data.
+This fixes casting void* at wrong structure. We pass device, not bdaddr
+as user data.
 ---
- android/gatt.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ android/gatt.c | 11 ++++-------
+ 1 file changed, 4 insertions(+), 7 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 5c33253..aa2a5fd 100644
+index ff19767..525ad41 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -623,6 +623,12 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 		goto done;
- 	}
- 
-+	if (!queue_isempty(dev->services)) {
-+		info("gatt: Services already cached");
-+		gatt_status = GATT_SUCCESS;
-+		goto done;
-+	}
-+
- 	/* There might be multiply services with same uuid. Therefore make sure
- 	 * each primary service one has unique instance_id
- 	 */
-@@ -1564,7 +1570,8 @@ static void discover_char_cb(uint8_t status, GSList *characteristics,
+@@ -760,12 +760,11 @@ static void put_device_on_disc_list(struct gatt_device *dev)
+ static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
+ 							gpointer user_data)
  {
- 	struct discover_char_data *data = user_data;
+-	bdaddr_t *addr = user_data;
+-	struct gatt_device *dev;
++	struct gatt_device *dev = user_data;
+ 	int sock, err = 0;
+ 	socklen_t len;
  
--	cache_all_srvc_chars(characteristics, data->service->chars);
-+	if (queue_isempty(data->service->chars))
-+		cache_all_srvc_chars(characteristics, data->service->chars);
+-	dev = queue_remove_if(conn_list, match_dev_by_bdaddr, addr);
++	queue_remove(conn_list, dev);
  
- 	send_client_char_notify(queue_peek_head(data->service->chars),
- 						data->conn_id, data->service);
-@@ -1731,7 +1738,7 @@ static void gatt_discover_desc_cb(guint8 status, const guint8 *pdu, guint16 len,
- 	if (status)
- 		error("gatt: Discover all char descriptors failed: %s",
- 							att_ecode2str(status));
--	else
-+	else if (queue_isempty(data->ch->descriptors))
- 		cache_all_descr(pdu, len, data->ch->descriptors);
+ 	sock = g_io_channel_unix_get_fd(io);
+ 	len = sizeof(err);
+@@ -811,16 +810,14 @@ static void send_client_connect_notify(void *data, void *user_data)
  
- 	descr = queue_peek_head(data->ch->descriptors);
+ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ {
+-	bdaddr_t *addr = user_data;
+-	struct gatt_device *dev;
++	struct gatt_device *dev = user_data;
+ 	struct hal_ev_gatt_client_connect ev;
+ 	GAttrib *attrib;
+ 	static uint32_t conn_id = 0;
+ 	int32_t status;
+ 
+ 	/* Take device from conn waiting queue */
+-	dev = queue_remove_if(conn_wait_queue, match_dev_by_bdaddr, addr);
+-	if (!dev) {
++	if (!queue_remove(conn_wait_queue, dev)) {
+ 		error("gatt: Device not on the connect wait queue!?");
+ 		g_io_channel_shutdown(io, TRUE, NULL);
+ 		return;
 -- 
 1.9.1
 
