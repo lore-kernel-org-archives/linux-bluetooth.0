@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
-Date: Fri, 11 Apr 2014 12:02:31 -0700
-Message-Id: <1397242952-3997-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/2] android/gatt: Change name to more approperiate for cache all services
+Date: Fri, 11 Apr 2014 17:58:57 +0200
+Message-Id: <1397231937-29475-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1397231937-29475-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1397231937-29475-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-Commit 1c2e004183178 introduced an event handler for the encryption key
-refresh complete event with the intent of fixing some LE/SMP cases.
-However, this event is shared with BR/EDR and there we actually want to
-act only on the auth_complete event (which comes after the key refresh).
-
-If we do not do this we may trigger an L2CAP Connect Request too early
-and cause the remote side to return a security block error.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+This changes name of caching function from "primary callback" to "cache
+all services".
 ---
- net/bluetooth/hci_event.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ android/gatt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 07c37d0cecb2..ca19fd4bbb8f 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3388,6 +3388,12 @@ static void hci_key_refresh_complete_evt(struct hci_dev *hdev,
- 	if (!conn)
- 		goto unlock;
+diff --git a/android/gatt.c b/android/gatt.c
+index d8c63bf..d540736 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -589,7 +589,7 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
+ 	return s;
+ }
  
-+	/* For BR/EDR the necessary steps are taken through the
-+	 * auth_complete event.
-+	 */
-+	if (conn->type != LE_LINK)
-+		goto unlock;
-+
- 	if (!ev->status)
- 		conn->sec_level = conn->pending_sec_level;
+-static void primary_cb(GSList *services, struct gatt_device *dev)
++static void cache_all_srvc(GSList *services, struct gatt_device *dev)
+ {
+ 	GSList *l;
+ 	uint8_t instance_id;
+@@ -1242,7 +1242,7 @@ static void discover_srvc_cb(uint8_t status, GSList *services, void *user_data)
+ 	}
  
+ 	/* Caching primary and included services from remote */
+-	primary_cb(services, cb_data->dev);
++	cache_all_srvc(services, cb_data->dev);
+ 
+ 	/* Send filtered service by uuid */
+ 	if (cb_data->number) {
 -- 
-1.9.0
+1.9.1
 
