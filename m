@@ -2,33 +2,33 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/6] android/bluetooth: Remove debug log from create_device_from_info
-Date: Fri, 11 Apr 2014 09:41:25 +0200
-Message-Id: <1397202087-1203-4-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1397202087-1203-1-git-send-email-szymon.janc@tieto.com>
-References: <1397202087-1203-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/6] android/bluetooth: Fix passing NULL pointer to memcpy
+Date: Fri, 11 Apr 2014 09:41:22 +0200
+Message-Id: <1397202087-1203-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-create_device_from_info always calls create_device which already prints
-created device address.
+It is possible to have property with empty value (ie. bonded devices)
+so check len before calling memcpy.
 ---
- android/bluetooth.c | 2 --
- 1 file changed, 2 deletions(-)
+ android/bluetooth.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 401c35d..6df9f04 100644
+index 4e4397a..70b0849 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2062,8 +2062,6 @@ static struct device *create_device_from_info(GKeyFile *key_file,
- 	char **uuids;
- 	char *str;
+@@ -1160,7 +1160,9 @@ static int fill_hal_prop(void *buf, uint8_t type, uint16_t len,
  
--	DBG("%s", peer);
--
- 	/* BREDR if not present */
- 	type = g_key_file_get_integer(key_file, peer, "AddressType", NULL);
+ 	prop->type = type;
+ 	prop->len = len;
+-	memcpy(prop->val, val, len);
++
++	if (len)
++		memcpy(prop->val, val, len);
  
+ 	return sizeof(*prop) + len;
+ }
 -- 
 1.9.1
 
