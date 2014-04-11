@@ -1,37 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] android/gatt: Remove not needed empty line and redundand tab
-Date: Fri, 11 Apr 2014 12:29:48 +0200
-Message-Id: <1397212190-3240-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] android/gatt: Fix for scan non discoverable devices
+Date: Fri, 11 Apr 2014 11:24:58 +0200
+Message-Id: <1397208298-15979-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+With this patch Android framework will not be notify with non
+discoverable LE devices.
 ---
- android/gatt.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ android/bluetooth.c | 10 ++++++++--
+ android/bluetooth.h |  2 +-
+ android/gatt.c      |  5 +++--
+ 3 files changed, 12 insertions(+), 5 deletions(-)
 
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 4e4397a..e9df704 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1362,8 +1362,14 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
+ 	eir_data_free(&eir);
+ 
+ 	/* Notify Gatt if its registered for LE events */
+-	if (bdaddr_type != BDADDR_BREDR && gatt_device_found_cb)
+-		gatt_device_found_cb(bdaddr, bdaddr_type, rssi, data_len, data);
++	if (bdaddr_type != BDADDR_BREDR && gatt_device_found_cb) {
++		bool discoverable;
++
++		discoverable = (eir.flags & (EIR_LIM_DISC | EIR_GEN_DISC));
++
++		gatt_device_found_cb(bdaddr, bdaddr_type, rssi, data_len, data,
++								discoverable);
++	}
+ 
+ 	if (dev->bond_state != HAL_BOND_STATE_BONDED)
+ 		cache_device(dev);
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 8dbc623..807ebe7 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -37,7 +37,7 @@ void bt_adapter_remove_record(uint32_t handle);
+ 
+ typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
+ 					int rssi, uint16_t eir_len,
+-					const void *eir);
++					const void *eir, bool discoverable);
+ bool bt_le_discovery_start(bt_le_device_found cb);
+ 
+ typedef void (*bt_le_discovery_stopped)(void);
 diff --git a/android/gatt.c b/android/gatt.c
-index 15e788a..4e548c8 100644
+index a33ce25..50f1c41 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -126,7 +126,7 @@ static bool scanning = false;
+@@ -705,13 +705,14 @@ static bool is_device_wating_for_connect(const bdaddr_t *addr,
  
- static struct queue *gatt_clients = NULL;
- static struct queue *gatt_servers = NULL;
--static struct queue *conn_list	= NULL;		/* Connected devices */
-+static struct queue *conn_list = NULL;		/* Connected devices */
- static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
- static struct queue *disc_dev_list = NULL;	/* Disconnected devices */
+ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+ 						int rssi, uint16_t eir_len,
+-							const void *eir)
++							const void *eir,
++							bool discoverable)
+ {
+ 	uint8_t buf[IPC_MTU];
+ 	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
+ 	char bda[18];
  
-@@ -140,7 +140,6 @@ static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
+-	if (!scanning)
++	if (!scanning || !discoverable)
+ 		goto connect;
  
- 	for (i = 0; i < 16; i++)
- 		dst->value.u128.data[i] = uuid[15 - i];
--
- }
- 
- static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
+ 	ba2str(addr, bda);
 -- 
-1.9.1
+1.8.4
 
