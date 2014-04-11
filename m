@@ -1,35 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Fri, 11 Apr 2014 12:04:36 -0700
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Timo Mueller <timo.mueller@oss.bmw-carit.de>
+Cc: linux-bluetooth@vger.kernel.org,
+	Timo Mueller <timo.mueller@bmw-carit.de>
+Subject: Re: [RFCv5 0/4] SSP MITM protection
+Message-ID: <20140411190436.GA4078@t440s.ice.intel.com>
+References: <cover.1396943583.git.timo.mueller@bmw-carit.de>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 1/2] Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1397242952-3997-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 11 Apr 2014 14:38:12 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5F85C81E-F98E-4E0E-B731-CEDD2980A339@holtmann.org>
-References: <1397242952-3997-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <cover.1396943583.git.timo.mueller@bmw-carit.de>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Timo,
 
-> Commit 1c2e004183178 introduced an event handler for the encryption key
-> refresh complete event with the intent of fixing some LE/SMP cases.
-> However, this event is shared with BR/EDR and there we actually want to
-> act only on the auth_complete event (which comes after the key refresh).
+On Tue, Apr 08, 2014, Timo Mueller wrote:
+> this is an updated version of v4 with the following changes:
 > 
-> If we do not do this we may trigger an L2CAP Connect Request too early
-> and cause the remote side to return a security block error.
+> 1) The management option to relax the MITM Protection was dropped
+> 2) Some minor modifications to the commit messages
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 6 ++++++
-> 1 file changed, 6 insertions(+)
+> Test information from the v4 cover letter:
+> <snip>
+> I've successfully tested these changes in the last couple of months at
+> the UPF #46 in Vienna, with the CE4A golden device and the bluetooth
+> PTS (where applicable).
+> <snip>
+> 
+> From the original cover letter:
+> The way the kernel handles MITM Protection during pairing is
+> inconsistent: General Bonding and Dedicated Bonding are not treated
+> equally.
+> <snip>
+> Therefore, the safest choice is to always request MITM Protection,
+> also for General Bonding [1]. The proposal here is to do this for both
+> incoming (patch 6/8) and outgoing (patch 7/8) procedures, as it was
+> previously done for Dedicated Bonding. This "conservative" approach is
+> smart enough to fall back to not using MITM Protection if the IO
+> capabilities don't allow it (this policy already existed before for
+> Dedicated Bonding, see patch 5/8).
+> <snip>
+> 
+> For completeness, a quick recap on the motivation behind this patch
+> set:
+> In our cars we always want to use SSP methods other than Just
+> Works. We even go as far as rejecting JW connection attempts. In order
+> to still be able to pair all devices that are capable of using any of
+> the remaining SSP methods, we need to make sure that we're not falling
+> back to JW, regardless of the bonding type (Dedicated or General). For
+> example, currently a connection with the iPhone acting as the
+> initiating LM would lead a JW connection which would get rejected.
+> 
+> Best regards
+> Timo
+> 
+> Mikel Astiz (3):
+>   Bluetooth: Refactor hci_get_auth_req()
+>   Bluetooth: Refactor code for outgoing dedicated bonding
+>   Bluetooth: Request MITM Protection when initiator
+> 
+> Timo Mueller (1):
+>   Bluetooth: Use MITM Protection when IO caps allow it
+> 
+>  net/bluetooth/hci_event.c | 48 ++++++++++++++++++++++++++---------------------
+>  net/bluetooth/mgmt.c      |  5 +----
+>  2 files changed, 28 insertions(+), 25 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+I ran the BITE SSP tests on these (test vector 1.0.51) and they seem to
+be fine. The patches have now been applied to bluetooth-next.
 
-Regards
-
-Marcel
-
+Johan
