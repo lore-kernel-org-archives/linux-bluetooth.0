@@ -1,42 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/gatt: Change name to more approperiate for cache all services
-Date: Fri, 11 Apr 2014 12:29:50 +0200
-Message-Id: <1397212190-3240-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1397212190-3240-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1397212190-3240-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/3] android/gatt: Remove not needed empty line and redundand tab
+Date: Fri, 11 Apr 2014 12:29:48 +0200
+Message-Id: <1397212190-3240-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This changes name of caching function from "primary callback" to "cache
-all services".
 ---
- android/gatt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/gatt.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 33acf71..9cf4619 100644
+index 15e788a..4e548c8 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -579,7 +579,7 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	return s;
+@@ -126,7 +126,7 @@ static bool scanning = false;
+ 
+ static struct queue *gatt_clients = NULL;
+ static struct queue *gatt_servers = NULL;
+-static struct queue *conn_list	= NULL;		/* Connected devices */
++static struct queue *conn_list = NULL;		/* Connected devices */
+ static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
+ static struct queue *disc_dev_list = NULL;	/* Disconnected devices */
+ 
+@@ -140,7 +140,6 @@ static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
+ 
+ 	for (i = 0; i < 16; i++)
+ 		dst->value.u128.data[i] = uuid[15 - i];
+-
  }
  
--static void primary_cb(uint8_t status, GSList *services,
-+static void cache_all_srvc(uint8_t status, GSList *services,
- 						struct gatt_device *dev)
- {
- 	GSList *l;
-@@ -1204,7 +1204,7 @@ static void discover_srvc_cb(uint8_t status, GSList *services, void *user_data)
- 	struct service *s;
- 
- 	/* Caching primary and included services from remote */
--	primary_cb(status, services, cb_data->dev);
-+	cache_all_srvc(status, services, cb_data->dev);
- 
- 	/* Send filtered service by uuid */
- 	if (cb_data->number) {
+ static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
 -- 
 1.9.1
 
