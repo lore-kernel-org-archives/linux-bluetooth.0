@@ -1,73 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Apr 2014 12:04:36 -0700
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Timo Mueller <timo.mueller@oss.bmw-carit.de>
-Cc: linux-bluetooth@vger.kernel.org,
-	Timo Mueller <timo.mueller@bmw-carit.de>
-Subject: Re: [RFCv5 0/4] SSP MITM protection
-Message-ID: <20140411190436.GA4078@t440s.ice.intel.com>
-References: <cover.1396943583.git.timo.mueller@bmw-carit.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <cover.1396943583.git.timo.mueller@bmw-carit.de>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Fix redundant encryption request for reauthentication
+Date: Fri, 11 Apr 2014 12:02:32 -0700
+Message-Id: <1397242952-3997-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1397242952-3997-1-git-send-email-johan.hedberg@gmail.com>
+References: <1397242952-3997-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Timo,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tue, Apr 08, 2014, Timo Mueller wrote:
-> this is an updated version of v4 with the following changes:
-> 
-> 1) The management option to relax the MITM Protection was dropped
-> 2) Some minor modifications to the commit messages
-> 
-> Test information from the v4 cover letter:
-> <snip>
-> I've successfully tested these changes in the last couple of months at
-> the UPF #46 in Vienna, with the CE4A golden device and the bluetooth
-> PTS (where applicable).
-> <snip>
-> 
-> From the original cover letter:
-> The way the kernel handles MITM Protection during pairing is
-> inconsistent: General Bonding and Dedicated Bonding are not treated
-> equally.
-> <snip>
-> Therefore, the safest choice is to always request MITM Protection,
-> also for General Bonding [1]. The proposal here is to do this for both
-> incoming (patch 6/8) and outgoing (patch 7/8) procedures, as it was
-> previously done for Dedicated Bonding. This "conservative" approach is
-> smart enough to fall back to not using MITM Protection if the IO
-> capabilities don't allow it (this policy already existed before for
-> Dedicated Bonding, see patch 5/8).
-> <snip>
-> 
-> For completeness, a quick recap on the motivation behind this patch
-> set:
-> In our cars we always want to use SSP methods other than Just
-> Works. We even go as far as rejecting JW connection attempts. In order
-> to still be able to pair all devices that are capable of using any of
-> the remaining SSP methods, we need to make sure that we're not falling
-> back to JW, regardless of the bonding type (Dedicated or General). For
-> example, currently a connection with the iPhone acting as the
-> initiating LM would lead a JW connection which would get rejected.
-> 
-> Best regards
-> Timo
-> 
-> Mikel Astiz (3):
->   Bluetooth: Refactor hci_get_auth_req()
->   Bluetooth: Refactor code for outgoing dedicated bonding
->   Bluetooth: Request MITM Protection when initiator
-> 
-> Timo Mueller (1):
->   Bluetooth: Use MITM Protection when IO caps allow it
-> 
->  net/bluetooth/hci_event.c | 48 ++++++++++++++++++++++++++---------------------
->  net/bluetooth/mgmt.c      |  5 +----
->  2 files changed, 28 insertions(+), 25 deletions(-)
+When we're performing reauthentication (in order to elevate the
+security level from an unauthenticated key to an authenticated one) we
+do not need to issue any encryption command once authentication
+completes. Since the trigger for the encryption HCI command is the
+ENCRYPT_PEND flag this flag should not be set in this scenario.
+Instead, the REAUTH_PEND flag takes care of all necessary steps for
+reauthentication.
 
-I ran the BITE SSP tests on these (test vector 1.0.51) and they seem to
-be fine. The patches have now been applied to bluetooth-next.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_conn.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 55a174317925..095943c02d6e 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -884,14 +884,17 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_auth_requested cp;
+ 
+-		/* encrypt must be pending if auth is also pending */
+-		set_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+-
+ 		cp.handle = cpu_to_le16(conn->handle);
+ 		hci_send_cmd(conn->hdev, HCI_OP_AUTH_REQUESTED,
+ 			     sizeof(cp), &cp);
++
++		/* If we're already encrypted set the REAUTH_PEND flag,
++		 * otherwise set the ENCRYPT_PEND.
++		 */
+ 		if (conn->key_type != 0xff)
+ 			set_bit(HCI_CONN_REAUTH_PEND, &conn->flags);
++		else
++			set_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+ 	}
+ 
+ 	return 0;
+-- 
+1.9.0
+
