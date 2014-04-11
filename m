@@ -1,113 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android/gatt: Trivial whitespace fixes
-Date: Fri, 11 Apr 2014 15:43:48 +0200
-Message-ID: <1438281.X3cEQKDDM8@uw000953>
-In-Reply-To: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1397140494-4023-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: 
+References: 
+Subject: help required regarding Bluez manual installation
+From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
+Message-ID: <OF19DACBBB.041BC24D-ON65257CB7.004B18B4-65257CB7.004B18B7@tcs.com>
+Date: Fri, 11 Apr 2014 19:10:15 +0530
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi,
+ 
+I am new to this group and new to using Bluez stack.
+ 
+Manually, I want to install Bluez to my Ubuntu machine.
+I am using Ubuntu-12.04 in my PC.
+ 
+I have downloaded Bluez-4.98 and Bluez-4.101 and other higher versions.
+When , I manually Installed Bluez (either 4.98 or 4.101) to my machine, I always find out that A2DP or Handsfree connection never succeed.
+ 
+Can anyone help me, how to solve this Issue.
+ 
+Here is the process that I have followed to install Bluez.
+ 
+1) Configure.
+2) Make (compile the code)
+3) Run make install .
+ 
+4) From /usr/local , I have copied the binaries and libraries to the corresponding folders.
+ 
+Please help me and correct me, If I missed any steps.
+ 
+Thanks & Regards,
+Vinod.
+=====-----=====-----=====
+Notice: The information contained in this e-mail
+message and/or attachments to it may contain 
+confidential or privileged information. If you are 
+not the intended recipient, any dissemination, use, 
+review, distribution, printing or copying of the 
+information contained in this e-mail message 
+and/or attachments to it are strictly prohibited. If 
+you have received this communication in error, 
+please notify us by reply e-mail or telephone and 
+immediately and permanently delete the message 
+and any attachments. Thank you
 
-On Thursday 10 of April 2014 16:34:51 Jakub Tyszkowski wrote:
-> ---
->  android/gatt.c | 25 ++++++++++++-------------
->  1 file changed, 12 insertions(+), 13 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index a7a7204..ff19767 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -745,8 +745,8 @@ connect:
->  		return;
->  
->  	/* We are ok to perform connect now. Stop discovery
-> -	* and once it is stopped continue with creating ACL
-> -	*/
-> +	 * and once it is stopped continue with creating ACL
-> +	 */
->  	bt_le_discovery_stop(bt_le_discovery_stop_cb);
->  }
->  
-> @@ -792,7 +792,7 @@ done:
->  
->  	queue_foreach(dev->clients, client_disconnect_notify, dev);
->  
-> -	/* Reset conn_id and put on disconnected list.*/
-> +	/* Reset conn_id and put on disconnected list. */
->  	put_device_on_disc_list(dev);
->  
->  	return FALSE;
-> @@ -875,7 +875,7 @@ reply:
->  	if (scanning)
->  		bt_le_discovery_start(le_device_found_handler);
->  
-> -	/*FIXME: What to do if discovery won't start here. */
-> +	/* FIXME: What to do if discovery won't start here. */
->  }
->  
->  static int connect_le(struct gatt_device *dev)
-> @@ -895,11 +895,10 @@ static int connect_le(struct gatt_device *dev)
->  
->  	DBG("Connection attempt to: %s", addr);
->  
-> -	/*TODO: If we are bonded then we should use higier sec level */
-> +	/* TODO: If we are bonded then we should use higier sec level */
->  	sec_level = BT_IO_SEC_LOW;
->  
-> -	/*
-> -	 * This connection will help us catch any PDUs that comes before
-> +	/* This connection will help us catch any PDUs that comes before
->  	 * pairing finishes
->  	 */
->  	io = bt_io_connect(connect_cb, dev, NULL, &gerr,
-> @@ -996,7 +995,7 @@ static void bt_le_discovery_stop_cb(void)
->  {
->  	DBG("");
->  
-> -	/* Check now if there is any device ready to connect*/
-> +	/* Check now if there is any device ready to connect */
->  	if (connect_next_dev() < 0)
->  		bt_le_discovery_start(le_device_found_handler);
->  }
-> @@ -1061,9 +1060,9 @@ static void handle_client_connect(const void *buf, uint16_t len)
->  	android2bdaddr(&cmd->bdaddr, &addr);
->  
->  	/* We do support many clients for one device connection so lets check
-> -	  * If device is connected or in connecting state just update list of
-> -	  * clients
-> -	  */
-> +	 * If device is connected or in connecting state just update list of
-> +	 * clients
-> +	 */
->  	dev = find_device(&addr);
->  	if (dev) {
->  		/* Remeber to send dummy notification event  if we area
-> @@ -1127,13 +1126,13 @@ reply:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
->  								status);
->  
-> -	/* If there is an error here we should make sure dev is out.*/
-> +	/* If there is an error here we should make sure dev is out. */
->  	if ((status != HAL_STATUS_SUCCESS) && dev) {
->  		destroy_device(dev);
->  		return;
->  	}
->  
-> -	/* Send dummy notification since ACL is already up*/
-> +	/* Send dummy notification since ACL is already up */
->  	if (send_notify) {
->  		struct hal_ev_gatt_client_connect ev;
->  
-> 
 
-All patches in this set are now applied, thanks.
 
--- 
-Best regards, 
-Szymon Janc
