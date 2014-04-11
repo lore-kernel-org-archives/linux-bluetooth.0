@@ -1,251 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/gatt: Add support for uuid filter in search services
-Date: Fri, 11 Apr 2014 17:58:56 +0200
-Message-Id: <1397231937-29475-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 4/4] android/gatt: Cleanup device lists
+Date: Fri, 11 Apr 2014 16:37:09 +0200
+Message-Id: <1397227029-12779-5-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1397227029-12779-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397227029-12779-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for filtering by uuid in searched services.
+With this patch, devices from conn_list and conn_wait_queue which are
+without a client e.g. because client has unregister without any
+cleaning, are move to the disconnected device queue.
+
+Also connected device without clients are disconnected.
+And if there is no dev waiting for connect we do stop scan.
 ---
- android/gatt.c | 168 ++++++++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 114 insertions(+), 54 deletions(-)
+ android/gatt.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 47 insertions(+), 4 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 243e02f..d8c63bf 100644
+index 83a02ec..cb094db 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -314,6 +314,14 @@ static bool match_char_by_higher_inst_id(const void *data,
- 	return inst_id < ch->id.instance;
+@@ -284,6 +284,13 @@ static bool match_dev_by_conn_id(const void *data, const void *user_data)
+ 	return dev->conn_id == conn_id;
  }
  
-+static bool match_srvc_by_bt_uuid(const void *data, const void *user_data)
++static bool match_dev_without_client(const void *data, const void *user_data)
 +{
-+	const bt_uuid_t *exp_uuid = user_data;
-+	const struct service *service = data;
++	const struct gatt_device *dev = data;
 +
-+	return !bt_uuid_cmp(exp_uuid, &service->id.uuid);
++	return queue_isempty(dev->clients);
 +}
 +
- static bool match_descr_by_element_id(const void *data, const void *user_data)
+ static bool match_srvc_by_element_id(const void *data, const void *user_data)
  {
  	const struct element_id *exp_id = user_data;
-@@ -534,22 +542,6 @@ static void send_client_primary_notify(void *data, void *user_data)
- 					sizeof(ev), &ev);
+@@ -562,19 +569,55 @@ static void put_device_on_disc_list(struct gatt_device *dev)
+ 	queue_push_tail(disc_dev_list, dev);
  }
  
--static void send_client_all_primary(int32_t status, struct queue *services,
--							int32_t conn_id)
--{
--	struct hal_ev_gatt_client_search_complete ev;
--
--	if (!status)
--		queue_foreach(services, send_client_primary_notify,
--							INT_TO_PTR(conn_id));
--
--	ev.status = status;
--	ev.conn_id = conn_id;
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_EV_GATT_CLIENT_SEARCH_COMPLETE, sizeof(ev), &ev);
--
--}
--
- static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 								void *data)
- {
-@@ -597,34 +589,11 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	return s;
- }
- 
--static void primary_cb(uint8_t status, GSList *services, void *user_data)
-+static void primary_cb(GSList *services, struct gatt_device *dev)
- {
--	struct gatt_device *dev = user_data;
- 	GSList *l;
--	int32_t gatt_status;
- 	uint8_t instance_id;
- 
--	DBG("Status %d", status);
--
--	if (status) {
--		error("gatt: Discover all primary services failed: %s",
--							att_ecode2str(status));
--		gatt_status = GATT_FAILURE;
--		goto done;
--	}
--
--	if (!services) {
--		info("gatt: No primary services found");
--		gatt_status = GATT_SUCCESS;
--		goto done;
--	}
--
--	if (!queue_isempty(dev->services)) {
--		info("gatt: Services already cached");
--		gatt_status = GATT_SUCCESS;
--		goto done;
--	}
--
- 	/* There might be multiply services with same uuid. Therefore make sure
- 	 * each primary service one has unique instance_id
- 	 */
-@@ -647,11 +616,6 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 		DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
- 			prim->range.start, prim->range.end, prim->uuid);
- 	}
--
--	gatt_status = GATT_SUCCESS;
--
--done:
--	send_client_all_primary(gatt_status, dev->services, dev->conn_id);
- }
- 
- static void connection_cleanup(struct gatt_device *device)
-@@ -1240,11 +1204,77 @@ done:
- 									status);
- }
- 
-+struct discover_srvc_data {
-+	bt_uuid_t uuid;
++static void cleanup_conn_list(int32_t id)
++{
 +	struct gatt_device *dev;
-+	bool number;
-+};
 +
-+static void send_client_search_complete_notify(int32_t status, int32_t conn_id)
-+{
-+	struct hal_ev_gatt_client_search_complete ev;
++	/* Find device without client */
++	dev = queue_remove_if(conn_list, match_dev_without_client, NULL);
++	while (dev) {
++		/* Device is connected, lets disconnect and notify client */
++		connection_cleanup(dev);
++		send_client_disconnect_notify(id, dev, GATT_SUCCESS);
 +
-+	ev.status = status;
-+	ev.conn_id = conn_id;
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_CLIENT_SEARCH_COMPLETE, sizeof(ev), &ev);
++		/* Put device on disconnected device list */
++		put_device_on_disc_list(dev);
++		dev = queue_remove_if(conn_list, match_dev_without_client,
++									NULL);
++	};
 +}
 +
-+static void discover_srvc_cb(uint8_t status, GSList *services, void *user_data)
++static void cleanup_conn_wait_queue(int32_t id)
 +{
-+	struct discover_srvc_data *cb_data = user_data;
-+	struct service *s;
-+	int32_t gatt_status;
++	struct gatt_device *dev;
 +
-+	DBG("Status %d", status);
++	/* Find device without client */
++	dev = queue_remove_if(conn_wait_queue, match_dev_without_client, NULL);
++	while (dev) {
++		send_client_connect_notify(id, dev, GATT_FAILURE);
 +
-+	if (status) {
-+		error("gatt: Discover all primary services failed: %s",
-+							att_ecode2str(status));
-+		gatt_status = GATT_FAILURE;
-+		goto reply;
-+	}
++		/* Put device on disconnected device list */
++		put_device_on_disc_list(dev);
++		dev = queue_remove_if(conn_wait_queue,
++						match_dev_without_client, NULL);
++	};
 +
-+	if (!services) {
-+		info("gatt: No primary services found");
-+		gatt_status = GATT_SUCCESS;
-+		goto reply;
-+	}
-+
-+	/* Caching primary and included services from remote */
-+	primary_cb(services, cb_data->dev);
-+
-+	/* Send filtered service by uuid */
-+	if (cb_data->number) {
-+		s = queue_find(cb_data->dev->services, match_srvc_by_bt_uuid,
-+								&cb_data->uuid);
-+		if (s)
-+			send_client_primary_notify(s,
-+					INT_TO_PTR(cb_data->dev->conn_id));
-+		else
-+			error("gatt: Service with given UUID not found");
-+	} else {
-+		/* Send all found services */
-+		queue_foreach(cb_data->dev->services,
-+					send_client_primary_notify,
-+					INT_TO_PTR(cb_data->dev->conn_id));
-+	}
-+
-+	gatt_status = GATT_SUCCESS;
-+
-+reply:
-+	send_client_search_complete_notify(gatt_status, cb_data->dev->conn_id);
-+	free(cb_data);
++	/* Stop scan we had for connecting devices */
++	if (queue_isempty(conn_wait_queue) && !scanning)
++		bt_le_discovery_stop(NULL);
 +}
 +
- static void handle_client_search_service(const void *buf, uint16_t len)
+ static void remove_client_from_devices(int32_t id)
  {
- 	const struct hal_cmd_gatt_client_search_service *cmd = buf;
- 	struct gatt_device *dev;
- 	uint8_t status;
-+	struct service *s;
-+	bt_uuid_t uuid;
-+	bool number;
- 
  	DBG("");
  
-@@ -1255,26 +1285,56 @@ static void handle_client_search_service(const void *buf, uint16_t len)
- 		goto reply;
- 	}
+ 	queue_foreach(conn_list, remove_client_from_device_list,
+ 							INT_TO_PTR(id));
+-
+-	/*TODO: Check if there is any zombie device (connected no client)*/
++	cleanup_conn_list(id);
  
--	/*TODO:  Handle filter uuid */
-+	number = cmd->number;
-+
-+	if (number)
-+		android2uuid(cmd->filter_uuid, &uuid);
-+
-+	if (queue_isempty(dev->services)) {
-+		struct discover_srvc_data *cb_data =
-+					new0(struct discover_srvc_data, 1);
-+
-+		if (!cb_data) {
-+			error("gatt: Cannot allocate cb data");
-+			status = HAL_STATUS_FAILED;
-+			goto reply;
-+		}
-+
-+		cb_data->dev = dev;
-+		cb_data->number = number;
-+		if (number)
-+			memcpy(&cb_data->uuid, &uuid, sizeof(cb_data->uuid));
-+
-+		if (!gatt_discover_primary(dev->attrib, NULL, discover_srvc_cb,
-+								cb_data)) {
-+			free(cb_data);
-+			status = HAL_STATUS_FAILED;
-+			goto reply;
-+		}
- 
--	/* Use cache if possible */
--	if (!queue_isempty(dev->services)) {
- 		status = HAL_STATUS_SUCCESS;
--		send_client_all_primary(GATT_SUCCESS, dev->services,
--								dev->conn_id);
- 		goto reply;
- 	}
- 
--	if (!gatt_discover_primary(dev->attrib, NULL, primary_cb, dev)) {
--		status = HAL_STATUS_FAILED;
--		goto reply;
-+	if (number) {
-+		s = queue_find(dev->services, match_srvc_by_bt_uuid, &uuid);
-+
-+		if (s)
-+			send_client_primary_notify(s, INT_TO_PTR(dev->conn_id));
-+		else
-+			error("gatt: Service with given UUID not found");
-+	} else {
-+		queue_foreach(dev->services, send_client_primary_notify,
-+						INT_TO_PTR(dev->conn_id));
- 	}
- 
-+	send_client_search_complete_notify(GATT_SUCCESS, dev->conn_id);
-+
- 	status = HAL_STATUS_SUCCESS;
- 
- reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
-+				HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
+ 	queue_foreach(conn_wait_queue, remove_client_from_device_list,
+ 							INT_TO_PTR(id));
+-
+-	/*TODO: Check if there is not zombie device plus stop scan */
++	cleanup_conn_wait_queue(id);
  }
  
- static void send_client_incl_service_notify(const struct service *prim,
+ static void handle_client_unregister(const void *buf, uint16_t len)
 -- 
-1.9.1
+1.8.4
 
