@@ -1,32 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] android/gatt: Set proper primary flag for sending characteristics
-Date: Fri, 11 Apr 2014 14:40:25 +0200
-Message-Id: <1397220026-27177-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZLqBiCiR6YQ4NZBHFip8wmzSpVCOdiDkLUe0UM1qSWqxA@mail.gmail.com>
+References: <1397053018-4610-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1397053018-4610-3-git-send-email-andrzej.kaczmarek@tieto.com> <CABBYNZLqBiCiR6YQ4NZBHFip8wmzSpVCOdiDkLUe0UM1qSWqxA@mail.gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Fri, 11 Apr 2014 13:07:42 +0200
+Message-ID: <CAF3PWx3cB0-xAataVht-KSs=KoPvRc1-UY7ed=gwQ8DWu+nTew@mail.gmail.com>
+Subject: Re: [PATCH 2/7] android/hal-audio: Remove preset with 48000 frequency
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix sending included service's characteristics.
----
- android/gatt.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Hi Luiz,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index aa2a5fd..13ae340 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1510,8 +1510,7 @@ static void send_client_char_notify(const struct characteristic *ch,
- 	}
- 
- 	ev.conn_id = conn_id;
--	/* TODO need to be handled for included services too */
--	element_id_to_hal_srvc_id(&service->id, 1, &ev.srvc_id);
-+	element_id_to_hal_srvc_id(&service->id, service->primary, &ev.srvc_id);
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_EV_GATT_CLIENT_GET_CHARACTERISTIC,
--- 
-1.9.1
+On 10 April 2014 10:11, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>
+> Hi Andrzej,
+>
+> On Wed, Apr 9, 2014 at 5:16 PM, Andrzej Kaczmarek
+> <andrzej.kaczmarek@tieto.com> wrote:
+> > Having two presets with all parameters identical except of frequency is
+> > redundant since SNK has mandatory support for both 44100 and 48000 so
+> > in case we're INT we'll always set 44100 as this is first one we try.
+> > ---
+> >  android/hal-audio.c | 9 ---------
+> >  1 file changed, 9 deletions(-)
+> >
+> > diff --git a/android/hal-audio.c b/android/hal-audio.c
+> > index 23eb6b8..2f28b13 100644
+> > --- a/android/hal-audio.c
+> > +++ b/android/hal-audio.c
+> > @@ -265,15 +265,6 @@ static const a2dp_sbc_t sbc_presets[] = {
+> >                 .min_bitpool = MIN_BITPOOL,
+> >                 .max_bitpool = MAX_BITPOOL
+> >         },
+> > -       {
+> > -               .frequency = SBC_SAMPLING_FREQ_48000,
+> > -               .channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO,
+> > -               .subbands = SBC_SUBBANDS_8,
+> > -               .allocation_method = SBC_ALLOCATION_LOUDNESS,
+> > -               .block_length = SBC_BLOCK_LENGTH_16,
+> > -               .min_bitpool = MIN_BITPOOL,
+> > -               .max_bitpool = MAX_BITPOOL
+> > -       },
+> >  };
+> >
+> >  static int sbc_get_presets(struct audio_preset *preset, size_t *len)
+> > --
+> > 1.9.1
+>
+> Well the idea was that we could extend  AUDIO_OP_OPEN_STREAM to
+> include the preset index but I guess it does not make sense for
+> Android since it does not support 48Khz, well anything different than
+> 44.1Khz since it cannot mix otherwise, so perhaps it is safe to remove
+> it. On the other hand we do have support for 48Khz which the remote
+> can configure but we don't do any resampling so I wonder how this work
+> out.
 
+So if this was original idea I'll leave 48kHz since Android does
+support it (AudioFlinger can resample to both 44.1kHz and 48kHz
+without problems) and we already report proper sampling rate from
+hal-audio.
+
+BR,
+Andrzej
