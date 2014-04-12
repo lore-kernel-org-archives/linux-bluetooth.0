@@ -1,71 +1,109 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	claudio.takahasi@openbossa.org, anderson.lizardo@openbossa.org,
-	armansito@chromium.org,
+Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 01/10] attrib: Add API for reliable write
-Date: Sun, 13 Apr 2014 00:00:22 +0200
-Message-Id: <1397340031-29711-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/gatt: Fix memory leak
+Date: Sat, 12 Apr 2014 23:48:58 +0200
+Message-Id: <1397339338-29264-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Android expose to application api for reliable write. Therefore we need
-to add this support to gattrib
----
- attrib/gatt.c | 18 ++++++++++++++++++
- attrib/gatt.h |  6 ++++++
- 2 files changed, 24 insertions(+)
+It happens on daemon exit when connection is up.
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 49cd1a3..e461ab7 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -871,6 +871,24 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
- 	return prepare_write(long_write);
+295 (104 direct, 191 indirect) bytes in 1 blocks are definitely lost in
+loss record 140 of 148
+==25132==    at 0x4C2B6CD: malloc (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==25132==    by 0x4E7FBBD: g_try_malloc0 (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x437BF9: g_attrib_new (gattrib.c:495)
+==25132==    by 0x42F45F: connect_cb (gatt.c:845)
+==25132==    by 0x439DBA: connect_cb (btio.c:232)
+==25132==    by 0x4E79D12: g_main_context_dispatch (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x4E7A05F: ??? (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x4E7A459: g_main_loop_run (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x4044FD: main (main.c:531)
+
+This patch moves function connection_cleanup up in the file as this is
+needed by destroy_device
+---
+ android/gatt.c | 45 ++++++++++++++++++++++++---------------------
+ 1 file changed, 24 insertions(+), 21 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 243e02f..abec46b 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -388,6 +388,27 @@ static void unregister_notification(void *data)
+ 							notification->ind_id);
  }
  
-+guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					GAttribResultFunc func,
-+					gpointer user_data)
++static void connection_cleanup(struct gatt_device *device)
 +{
-+	uint8_t *buf;
-+	guint16 plen;
-+	size_t buflen;
++	if (device->watch_id) {
++		g_source_remove(device->watch_id);
++		device->watch_id = 0;
++	}
 +
-+	buf = g_attrib_get_buffer(attrib, &buflen);
++	if (device->att_io) {
++		g_io_channel_shutdown(device->att_io, FALSE, NULL);
++		g_io_channel_unref(device->att_io);
++		device->att_io = NULL;
++	}
 +
-+	plen = enc_prep_write_req(handle, 0, value, vlen, buf, buflen);
-+	if (!plen)
-+		return 0;
-+
-+	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
++	if (device->attrib) {
++		GAttrib *attrib = device->attrib;
++		device->attrib = NULL;
++		g_attrib_cancel_all(attrib);
++		g_attrib_unref(attrib);
++	}
 +}
 +
- guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
- 							gpointer user_data)
+ static void destroy_device(void *data)
  {
-diff --git a/attrib/gatt.h b/attrib/gatt.h
-index c65bf6c..76820e0 100644
---- a/attrib/gatt.h
-+++ b/attrib/gatt.h
-@@ -84,6 +84,12 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
- 					size_t vlen, GAttribResultFunc func,
- 					gpointer user_data);
+ 	struct gatt_device *dev = data;
+@@ -395,6 +416,9 @@ static void destroy_device(void *data)
+ 	if (!dev)
+ 		return;
  
-+guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					GAttribResultFunc func,
-+					gpointer user_data);
++	if (dev->conn_id)
++		connection_cleanup(dev);
 +
-+
- guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
- 				GAttribResultFunc func, gpointer user_data);
+ 	queue_destroy(dev->clients, NULL);
+ 	queue_destroy(dev->services, destroy_service);
+ 	free(dev);
+@@ -654,27 +678,6 @@ done:
+ 	send_client_all_primary(gatt_status, dev->services, dev->conn_id);
+ }
  
+-static void connection_cleanup(struct gatt_device *device)
+-{
+-	if (device->watch_id) {
+-		g_source_remove(device->watch_id);
+-		device->watch_id = 0;
+-	}
+-
+-	if (device->att_io) {
+-		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+-		g_io_channel_unref(device->att_io);
+-		device->att_io = NULL;
+-	}
+-
+-	if (device->attrib) {
+-		GAttrib *attrib = device->attrib;
+-		device->attrib = NULL;
+-		g_attrib_cancel_all(attrib);
+-		g_attrib_unref(attrib);
+-	}
+-}
+-
+ static void send_client_disconnect_notify(int32_t id, struct gatt_device *dev,
+ 								int32_t status)
+ {
 -- 
 1.8.4
 
