@@ -5,31 +5,50 @@ Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	claudio.takahasi@openbossa.org, anderson.lizardo@openbossa.org,
 	armansito@chromium.org,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 06/10] android/gatt: Fix error msg
-Date: Sun, 13 Apr 2014 00:00:27 +0200
-Message-Id: <1397340031-29711-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 02/10] attrib: Expose write execute
+Date: Sun, 13 Apr 2014 00:00:23 +0200
+Message-Id: <1397340031-29711-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is needed to cover Android API
 ---
- android/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ attrib/gatt.c | 6 ++++++
+ attrib/gatt.h | 2 ++
+ 2 files changed, 8 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9d45968..523a141 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2076,7 +2076,7 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index e461ab7..f5917db 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -871,6 +871,12 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
+ 	return prepare_write(long_write);
+ }
  
- 	if (!gatt_write_char(dev->attrib, ch->ch.value_handle, cmd->value,
- 					cmd->len, write_char_cb, cb_data)) {
--		error("gatt: Cannot read characteristic with inst_id: %d",
-+		error("gatt: Cannot write characteristic with inst_id: %d",
- 							cmd->gatt_id.inst_id);
- 		status = HAL_STATUS_FAILED;
- 		free(cb_data);
++guint gatt_execute_write(GAttrib *attrib, uint8_t flags,
++				GAttribResultFunc func, gpointer user_data)
++{
++	return execute_write(attrib, flags, func, user_data);
++}
++
+ guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
+ 					const uint8_t *value, size_t vlen,
+ 					GAttribResultFunc func,
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 76820e0..3fe6041 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -89,6 +89,8 @@ guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
+ 					GAttribResultFunc func,
+ 					gpointer user_data);
+ 
++guint gatt_execute_write(GAttrib *attrib, uint8_t flags,
++				GAttribResultFunc func, gpointer user_data);
+ 
+ guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				GAttribResultFunc func, gpointer user_data);
 -- 
 1.8.4
 
