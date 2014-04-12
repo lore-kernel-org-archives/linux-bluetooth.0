@@ -5,126 +5,84 @@ Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	claudio.takahasi@openbossa.org, anderson.lizardo@openbossa.org,
 	armansito@chromium.org,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 10/10] android/gatt: Add support for write without response
-Date: Sun, 13 Apr 2014 00:00:31 +0200
-Message-Id: <1397340031-29711-11-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 09/10] android/gatt: Add support for write execute
+Date: Sun, 13 Apr 2014 00:00:30 +0200
+Message-Id: <1397340031-29711-10-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch add support for write execute. There is possible to write or
+cancel all prepared data
 ---
- android/gatt.c | 55 +++++++++++++++++++++++++++++++++++++++----------------
- 1 file changed, 39 insertions(+), 16 deletions(-)
+ android/gatt.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 47 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 6fcc977..ce7c0d3 100644
+index e5da1b2..6fcc977 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -54,6 +54,7 @@
- #define GATT_SUCCESS	0x00000000
- #define GATT_FAILURE	0x00000101
+@@ -2418,12 +2418,58 @@ failed:
+ 				HAL_OP_GATT_CLIENT_WRITE_DESCRIPTOR, status);
+ }
  
-+#define GATT_WRITE_NO_RESPONSE	0x01
- #define GATT_WRITE_DEFAULT	0x02
- #define GATT_WRITE_RELIABLE	0x03
- 
-@@ -2070,15 +2071,22 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
-+	if (cmd->write_type != GATT_WRITE_NO_RESPONSE) {
-+		cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
- 						cmd->srvc_id.is_primary);
--	if (!cb_data) {
--		error("gatt: Cannot allocate call data");
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+		if (!cb_data) {
-+			error("gatt: Cannot allocate call data");
-+			status = HAL_STATUS_NOMEM;
-+			goto failed;
-+		}
- 	}
- 
- 	switch (cmd->write_type) {
-+	case GATT_WRITE_NO_RESPONSE:
-+		res = gatt_write_cmd(dev->attrib, ch->ch.value_handle,
-+							cmd->value, cmd->len,
-+							NULL, NULL);
-+		break;
- 	case GATT_WRITE_RELIABLE:
- 		res = gatt_reliable_write_char(dev->attrib, ch->ch.value_handle,
- 							cmd->value, cmd->len,
-@@ -2110,10 +2118,14 @@ failed:
- 			HAL_OP_GATT_CLIENT_WRITE_CHARACTERISTIC, status);
- 
- 	/* We should send notification with service, characteristic id in case
--	 * of errors.
-+	 * of error and write with no response
- 	 */
--	if (status != HAL_STATUS_SUCCESS) {
--		send_client_write_char_notify(GATT_FAILURE, cmd->conn_id,
-+	if (status != HAL_STATUS_SUCCESS ||
-+				cmd->write_type == GATT_WRITE_NO_RESPONSE) {
-+		int32_t gatt_status = (status == HAL_STATUS_SUCCESS) ?
-+						GATT_SUCCESS : GATT_FAILURE;
++static void send_client_write_execute_notify(int32_t id, int32_t status)
++{
++	struct hal_ev_gatt_client_exec_write ev;
 +
-+		send_client_write_char_notify(gatt_status, cmd->conn_id,
- 						&srvc_id, &char_id,
- 						cmd->srvc_id.is_primary);
- 		free(cb_data);
-@@ -2373,21 +2385,28 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	cb_data = create_desc_data(conn_id, &srvc->id, &ch->id, &descr->id,
--								primary);
--	if (!cb_data) {
--		error("gatt: Write descr. could not allocate callback data");
-+	if (cmd->write_type != GATT_WRITE_NO_RESPONSE) {
-+		cb_data = create_desc_data(conn_id, &srvc->id, &ch->id,
-+							&descr->id, primary);
-+		if (!cb_data) {
-+			error("gatt: Write descr. could not allocate cb_data");
- 
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+			status = HAL_STATUS_NOMEM;
-+			goto failed;
-+		}
- 	}
- 
- 	switch (cmd->write_type) {
-+	case GATT_WRITE_NO_RESPONSE:
-+		res = gatt_write_cmd(dev->attrib, descr->handle, cmd->value,
-+					cmd->len, NULL , NULL);
-+		break;
- 	case GATT_WRITE_RELIABLE:
- 		res = gatt_reliable_write_char(dev->attrib, descr->handle,
- 							cmd->value, cmd->len,
- 							write_descr_cb,
- 							cb_data);
++	ev.conn_id = id;
++	ev.status = status;
 +
- 		break;
- 	case GATT_WRITE_DEFAULT:
- 		res = gatt_write_char(dev->attrib, descr->handle, cmd->value,
-@@ -2408,8 +2427,12 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
--	if (status != HAL_STATUS_SUCCESS) {
--		send_client_descr_write_notify(GATT_FAILURE, conn_id, &srvc_id,
-+	if (status != HAL_STATUS_SUCCESS ||
-+				cmd->write_type == GATT_WRITE_NO_RESPONSE) {
-+		int32_t gatt_status = (status == HAL_STATUS_SUCCESS) ?
-+						GATT_SUCCESS : GATT_FAILURE;
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++					HAL_EV_GATT_CLIENT_EXEC_WRITE,
++					sizeof(ev), &ev);
++}
 +
-+		send_client_descr_write_notify(gatt_status, conn_id, &srvc_id,
- 						&char_id, &descr_id, primary);
- 		free(cb_data);
- 	}
++static void write_execute_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	send_client_write_execute_notify(PTR_TO_INT(user_data), status);
++}
++
+ static void handle_client_execute_write(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_execute_write *cmd = buf;
++	struct gatt_device *dev;
++	uint8_t status;
++	uint8_t flags;
++
+ 	DBG("");
+ 
++	dev = queue_find(conn_list, match_dev_by_conn_id,
++						INT_TO_PTR(cmd->conn_id));
++	if (!dev) {
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	flags = cmd->execute ? ATT_WRITE_ALL_PREP_WRITES :
++						ATT_CANCEL_ALL_PREP_WRITES;
++
++	if (!gatt_execute_write(dev->attrib, flags, write_execute_cb,
++						INT_TO_PTR(cmd->conn_id))) {
++		error("gatt: Could not send execute write");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_CLIENT_EXECUTE_WRITE, HAL_STATUS_FAILED);
++			HAL_OP_GATT_CLIENT_EXECUTE_WRITE, status);
++
++	/* In case of early error send also notification.*/
++	if (status != HAL_STATUS_SUCCESS)
++		send_client_write_execute_notify(cmd->conn_id, GATT_FAILURE);
+ }
+ 
+ static void handle_notification(const uint8_t *pdu, uint16_t len,
 -- 
 1.8.4
 
