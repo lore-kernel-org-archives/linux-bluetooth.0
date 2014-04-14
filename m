@@ -1,47 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] android/gatt: Fix memory leak
-Date: Mon, 14 Apr 2014 11:36:16 +0200
-Message-ID: <3951410.3Mdp0NIN3A@uw000953>
-In-Reply-To: <1397465714-12257-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397465714-12257-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 3/3] android/gatt: Add support for client->listen
+Date: Mon, 14 Apr 2014 10:58:39 +0200
+Message-Id: <1397465919-12677-3-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+This patch adds support for gatt client listen which start/stop
+advertising
+---
+ android/gatt.c | 66 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 64 insertions(+), 2 deletions(-)
 
-On Monday 14 of April 2014 10:55:14 Lukasz Rymanowski wrote:
-> It happens on daemon exit when connection is up.
-> 
-> 295 (104 direct, 191 indirect) bytes in 1 blocks are definitely lost in
-> loss record 140 of 148
-> ==25132==    at 0x4C2B6CD: malloc (in
-> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==25132==    by 0x4E7FBBD: g_try_malloc0 (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==25132==    by 0x437BF9: g_attrib_new (gattrib.c:495)
-> ==25132==    by 0x42F45F: connect_cb (gatt.c:845)
-> ==25132==    by 0x439DBA: connect_cb (btio.c:232)
-> ==25132==    by 0x4E79D12: g_main_context_dispatch (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==25132==    by 0x4E7A05F: ??? (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==25132==    by 0x4E7A459: g_main_loop_run (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==25132==    by 0x4044FD: main (main.c:531)
-> 
-> This patch moves function connection_cleanup up in the file as this is
-> needed by destroy_device
-> ---
->  android/gatt.c | 45 ++++++++++++++++++++++++---------------------
->  1 file changed, 24 insertions(+), 21 deletions(-)
-
-Patch applied, thanks.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 53131d4..e076a72 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -130,6 +130,8 @@ static struct queue *conn_list = NULL;		/* Connected devices */
+ static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
+ static struct queue *disc_dev_list = NULL;	/* Disconnected devices */
+ 
++static struct queue *listen_clients = NULL;
++
+ static void bt_le_discovery_stop_cb(void);
+ 
+ static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
+@@ -1279,12 +1281,65 @@ reply:
+ 	put_device_on_disc_list(dev);
+ }
+ 
++static void send_client_listen_notify(int32_t id, int32_t status)
++{
++	struct hal_ev_gatt_client_listen ev;
++
++	/* Server if because of typo in android headers */
++	ev.server_if = id;
++	ev.status = status;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++						HAL_EV_GATT_CLIENT_LISTEN,
++						sizeof(ev), &ev);
++	if (!status)
++		queue_remove(listen_clients, INT_TO_PTR(id));
++}
++
++static void set_advertising_cb(uint8_t status, void *user_data)
++{
++	int32_t client_id = PTR_TO_INT(user_data);
++
++	send_client_listen_notify(client_id, status);
++}
++
+ static void handle_client_listen(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_listen *cmd = buf;
++	uint8_t status;
++
+ 	DBG("");
+ 
++	if (queue_find(listen_clients, match_by_value,
++						INT_TO_PTR(cmd->client_if))) {
++
++		status = HAL_STATUS_SUCCESS;
++		goto reply;
++	}
++
++	if (!queue_push_tail(listen_clients, INT_TO_PTR(cmd->client_if))) {
++		error("gatt: Could not put client on listen queue");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	if (!bt_le_set_advertising(cmd->start, set_advertising_cb,
++						INT_TO_PTR(cmd->client_if))) {
++		error("gatt: Could not set advertising");
++		status = HAL_STATUS_FAILED;
++		queue_remove(listen_clients, INT_TO_PTR(cmd->client_if));
++		goto reply;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++
++reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_LISTEN,
+-							HAL_STATUS_FAILED);
++							status);
++
++	if (status != HAL_STATUS_SUCCESS)
++		send_client_listen_notify(cmd->client_if, GATT_FAILURE);
++
+ }
+ 
+ static void handle_client_refresh(const void *buf, uint16_t len)
+@@ -3008,9 +3063,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	gatt_clients = queue_new();
+ 	gatt_servers = queue_new();
+ 	disc_dev_list = queue_new();
++	listen_clients = queue_new();
+ 
+ 	if (!conn_list || !conn_wait_queue || !gatt_clients || !gatt_servers ||
+-							!disc_dev_list) {
++					!disc_dev_list || !listen_clients) {
+ 		error("gatt: Failed to allocate memory for queues");
+ 
+ 		queue_destroy(gatt_servers, NULL);
+@@ -3028,6 +3084,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 		queue_destroy(disc_dev_list, NULL);
+ 		disc_dev_list = NULL;
+ 
++		queue_destroy(listen_clients, NULL);
++		listen_clients = NULL;
++
+ 		return false;
+ 	}
+ 
+@@ -3062,4 +3121,7 @@ void bt_gatt_unregister(void)
+ 
+ 	queue_destroy(disc_dev_list, destroy_device);
+ 	disc_dev_list = NULL;
++
++	queue_destroy(listen_clients, NULL);
++	listen_clients = NULL;
+ }
 -- 
-Best regards, 
-Szymon Janc
+1.8.4
+
