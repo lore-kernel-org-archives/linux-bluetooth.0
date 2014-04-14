@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1397027234-12003-3-git-send-email-marcin.kraglak@tieto.com>
 References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
-	<1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
-Date: Mon, 14 Apr 2014 11:12:43 -0300
-Message-ID: <CAKT1EBd_sJ0Q17BV1Q8z9zr8mQd=iuj8GMPQcnVB=x7FRg_05w@mail.gmail.com>
-Subject: Re: [RFC 01/16] gatt: Add skeleton of gatt-db
+	<1397027234-12003-3-git-send-email-marcin.kraglak@tieto.com>
+Date: Mon, 14 Apr 2014 11:11:42 -0300
+Message-ID: <CAKT1EBdb3O03mN4RUw9hyYQJxb4si9LvqAcGLEcwQ=vC9DusvA@mail.gmail.com>
+Subject: Re: [RFC 02/16] gatt: Add services list to gatt_db struct
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -15,97 +15,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Wed, Apr 9, 2014 at 4:06 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> This change adds new() and destroy() fuctions for gatt_db,
-> which will be used for storing local attributes.
+On Wed, Apr 9, 2014 at 4:07 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> Gatt database will store all services in queue services. Each service
+> contains attributes, number of handles included and flag if it is
+> active service.
 > ---
->  android/Android.mk   |  1 +
->  android/Makefile.am  |  1 +
->  src/shared/gatt-db.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-db.h | 27 +++++++++++++++++++++++++++
->  4 files changed, 76 insertions(+)
->  create mode 100644 src/shared/gatt-db.c
->  create mode 100644 src/shared/gatt-db.h
+>  src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 >
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 5f4e70c..4c9cfb5 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
->         bluez/src/shared/queue.c \
->         bluez/src/shared/ringbuf.c \
->         bluez/src/shared/hfp.c \
-> +       bluez/src/shared/gatt-db.c \
->         bluez/src/shared/io-glib.c \
->         bluez/src/sdpd-database.c \
->         bluez/src/sdpd-service.c \
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index c51cce2..70e1dec 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -29,6 +29,7 @@ android_bluetoothd_SOURCES = android/main.c \
->                                 src/shared/mgmt.h src/shared/mgmt.c \
->                                 src/shared/ringbuf.h src/shared/ringbuf.c \
->                                 src/shared/hfp.h src/shared/hfp.c \
-> +                               src/shared/gatt-db.h src/shared/gatt-db.c \
->                                 android/bluetooth.h android/bluetooth.c \
->                                 android/hidhost.h android/hidhost.c \
->                                 android/ipc-common.h \
 > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> new file mode 100644
-> index 0000000..e56b381
-> --- /dev/null
+> index e56b381..47915c7 100644
+> --- a/src/shared/gatt-db.c
 > +++ b/src/shared/gatt-db.c
-> @@ -0,0 +1,47 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
+> @@ -21,11 +21,24 @@
+>   *
+>   */
+>
+> +#include <stdbool.h>
 > +
-> +#include "src/shared/util.h"
-> +#include "src/shared/gatt-db.h"
-> +
-> +struct gatt_db {
-> +       uint16_t next_handle;
+>  #include "src/shared/util.h"
+> +#include "src/shared/queue.h"
+>  #include "src/shared/gatt-db.h"
+>
+>  struct gatt_db {
+>         uint16_t next_handle;
+> +       struct queue *services;
 > +};
 > +
-> +struct gatt_db *gatt_db_new(void)
-> +{
-> +       struct gatt_db *db;
+> +struct gatt_db_attribute {
+> +};
 > +
-> +       db = new0(struct gatt_db, 1);
-> +       if (!db)
-> +               return NULL;
-> +
-> +       db->next_handle = 0x0001;
-> +
-> +       return db;
-> +}
+> +struct gatt_db_service {
+> +       bool active;
+> +       uint16_t num_handles;
+> +       struct gatt_db_attribute **attributes;
 
-Are you considering to use the same function to allocate/create a
-database to represent the remote "virtual" database?
-My point is: the same infra-structure could be used to represent a
-local database(per adapter maybe) or remote database.
+If the plan is to support handle allocation, maybe it'd better to have
+continuous memory allocation instead of attributes pointers.
+
+Claudio.
 
 <snip>
-
-Regards,
-Claudio
