@@ -1,61 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastianchlad@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: Re: [PATCH] android/pts: Bump PTS version for GATT
-Date: Mon, 14 Apr 2014 11:45:34 +0200
-Message-ID: <2254112.EGLGQHfA7Q@uw000953>
-In-Reply-To: <1397401702-5762-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1397401702-5762-1-git-send-email-sebastian.chlad@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] android/gatt: Fix memory leak
+Date: Mon, 14 Apr 2014 11:36:16 +0200
+Message-ID: <3951410.3Mdp0NIN3A@uw000953>
+In-Reply-To: <1397465714-12257-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397465714-12257-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Łukasz,
 
-On Sunday 13 of April 2014 17:08:22 Sebastian Chlad wrote:
+On Monday 14 of April 2014 10:55:14 Lukasz Rymanowski wrote:
+> It happens on daemon exit when connection is up.
+> 
+> 295 (104 direct, 191 indirect) bytes in 1 blocks are definitely lost in
+> loss record 140 of 148
+> ==25132==    at 0x4C2B6CD: malloc (in
+> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==25132==    by 0x4E7FBBD: g_try_malloc0 (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+> ==25132==    by 0x437BF9: g_attrib_new (gattrib.c:495)
+> ==25132==    by 0x42F45F: connect_cb (gatt.c:845)
+> ==25132==    by 0x439DBA: connect_cb (btio.c:232)
+> ==25132==    by 0x4E79D12: g_main_context_dispatch (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+> ==25132==    by 0x4E7A05F: ??? (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+> ==25132==    by 0x4E7A459: g_main_loop_run (in
+> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+> ==25132==    by 0x4044FD: main (main.c:531)
+> 
+> This patch moves function connection_cleanup up in the file as this is
+> needed by destroy_device
 > ---
->  android/pics-gatt.txt  | 2 +-
->  android/pixit-gatt.txt | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
-> index 8abf8c2..f3e8199 100644
-> --- a/android/pics-gatt.txt
-> +++ b/android/pics-gatt.txt
-> @@ -1,6 +1,6 @@
->  GATT PICS for the PTS tool.
->  
-> -PTS version: 5.0
-> +PTS version: 5.1
->  
->  * - different than PTS defaults
->  
-> diff --git a/android/pixit-gatt.txt b/android/pixit-gatt.txt
-> index 7bb8a28..c073452 100644
-> --- a/android/pixit-gatt.txt
-> +++ b/android/pixit-gatt.txt
-> @@ -1,6 +1,6 @@
->  GATT PIXIT for the PTS tool.
->  
-> -PTS version: 5.0
-> +PTS version: 5.1
->  
->  * - different than PTS defaults
->  & - should be set to IUT Bluetooth address
-> @@ -26,6 +26,6 @@ TSPX_mtu_size						23
->  TSPX_pin_code						0000
->  TSPX_use_dynamic_pin					FALSE
->  TSPX_delete_ltk						FALSE
-> -TSPX_characteristic_readable
-> +TSPX_characteristic_readable				FALSE
->  TSPX_tester_appearance					0000
->  -------------------------------------------------------------------------------
-> 
+>  android/gatt.c | 45 ++++++++++++++++++++++++---------------------
+>  1 file changed, 24 insertions(+), 21 deletions(-)
 
-Pushed. Thanks.
+Patch applied, thanks.
 
 -- 
 Best regards, 
