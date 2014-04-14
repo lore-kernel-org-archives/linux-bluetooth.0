@@ -3,86 +3,107 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/3] android/bluetooth: Expose gap api to set advertising
-Date: Mon, 14 Apr 2014 10:58:38 +0200
-Message-Id: <1397465919-12677-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] android/gatt: Fix memory leak
+Date: Mon, 14 Apr 2014 10:55:14 +0200
+Message-Id: <1397465714-12257-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch it is possible to start/stop advertising by gap clients
----
- android/bluetooth.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |  4 ++++
- 2 files changed, 47 insertions(+)
+It happens on daemon exit when connection is up.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index b3fad59..6624492 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2882,6 +2882,49 @@ static bool stop_discovery(uint8_t type)
- 	return false;
+295 (104 direct, 191 indirect) bytes in 1 blocks are definitely lost in
+loss record 140 of 148
+==25132==    at 0x4C2B6CD: malloc (in
+/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+==25132==    by 0x4E7FBBD: g_try_malloc0 (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x437BF9: g_attrib_new (gattrib.c:495)
+==25132==    by 0x42F45F: connect_cb (gatt.c:845)
+==25132==    by 0x439DBA: connect_cb (btio.c:232)
+==25132==    by 0x4E79D12: g_main_context_dispatch (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x4E7A05F: ??? (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x4E7A459: g_main_loop_run (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25132==    by 0x4044FD: main (main.c:531)
+
+This patch moves function connection_cleanup up in the file as this is
+needed by destroy_device
+---
+ android/gatt.c | 45 ++++++++++++++++++++++++---------------------
+ 1 file changed, 24 insertions(+), 21 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 53131d4..004063c 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -395,6 +395,27 @@ static void unregister_notification(void *data)
+ 							notification->ind_id);
  }
  
-+struct adv_user_data {
-+	bt_le_set_advertising_done cb;
-+	void *user_data;
-+};
-+
-+static void set_advertising_cb(uint8_t status, uint16_t length,
-+			const void *param, void *user_data)
++static void connection_cleanup(struct gatt_device *device)
 +{
-+	struct adv_user_data *data = user_data;
++	if (device->watch_id) {
++		g_source_remove(device->watch_id);
++		device->watch_id = 0;
++	}
 +
-+	DBG("");
++	if (device->att_io) {
++		g_io_channel_shutdown(device->att_io, FALSE, NULL);
++		g_io_channel_unref(device->att_io);
++		device->att_io = NULL;
++	}
 +
-+	if (status)
-+		error("Failed to set adverising for index %u: %s (0x%02x))",
-+				adapter.index, mgmt_errstr(status), status);
-+
-+	data->cb(status, data->user_data);
-+	free(data);
-+	return;
++	if (device->attrib) {
++		GAttrib *attrib = device->attrib;
++		device->attrib = NULL;
++		g_attrib_cancel_all(attrib);
++		g_attrib_unref(attrib);
++	}
 +}
 +
-+bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
-+							 void *user_data)
-+{
-+	struct adv_user_data *data;
-+	uint8_t adv = advertising ? 0x01 : 0x00;
-+
-+	data = new0(struct adv_user_data, 1);
-+	if (!data)
-+		return false;
-+
-+	data->cb = cb;
-+	data->user_data = user_data;
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_SET_ADVERTISING, adapter.index,
-+			sizeof(adv), &adv, set_advertising_cb, data, NULL) > 0)
-+		return true;
-+
-+	error("Failed to set advertising");
-+	free(data);
-+	return false;
-+}
-+
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
+ static void destroy_device(void *data)
  {
- 	if (!adapter.cur_discovery_type) {
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 807ebe7..3eddf16 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -42,3 +42,7 @@ bool bt_le_discovery_start(bt_le_device_found cb);
+ 	struct gatt_device *dev = data;
+@@ -402,6 +423,9 @@ static void destroy_device(void *data)
+ 	if (!dev)
+ 		return;
  
- typedef void (*bt_le_discovery_stopped)(void);
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
++	if (dev->conn_id)
++		connection_cleanup(dev);
 +
-+typedef void (*bt_le_set_advertising_done)(uint8_t status, void *user_data);
-+bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
-+							void *user_data);
+ 	queue_destroy(dev->clients, NULL);
+ 	queue_destroy(dev->services, destroy_service);
+ 	free(dev);
+@@ -499,27 +523,6 @@ failed:
+ 									status);
+ }
+ 
+-static void connection_cleanup(struct gatt_device *device)
+-{
+-	if (device->watch_id) {
+-		g_source_remove(device->watch_id);
+-		device->watch_id = 0;
+-	}
+-
+-	if (device->att_io) {
+-		g_io_channel_shutdown(device->att_io, FALSE, NULL);
+-		g_io_channel_unref(device->att_io);
+-		device->att_io = NULL;
+-	}
+-
+-	if (device->attrib) {
+-		GAttrib *attrib = device->attrib;
+-		device->attrib = NULL;
+-		g_attrib_cancel_all(attrib);
+-		g_attrib_unref(attrib);
+-	}
+-}
+-
+ static void send_client_disconnect_notify(int32_t id, struct gatt_device *dev,
+ 								int32_t status)
+ {
 -- 
 1.8.4
 
