@@ -3,20 +3,22 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 2/2] android/gatt: Add support for client listen command
-Date: Tue, 15 Apr 2014 10:16:10 +0200
-Message-Id: <1397549770-861-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 2/2] android/gatt: Add support for client listen command
+Date: Mon, 14 Apr 2014 22:53:07 +0200
+Message-Id: <1397508787-25137-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1397508787-25137-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397508787-25137-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 This patch adds support for gatt client listen which start/stop
 advertising
 ---
- android/gatt.c | 134 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 132 insertions(+), 2 deletions(-)
+ android/gatt.c | 125 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 123 insertions(+), 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 66fc3fc..0a9c7fc 100644
+index 66fc3fc..80d9918 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
 @@ -130,6 +130,8 @@ static struct queue *conn_list = NULL;		/* Connected devices */
@@ -28,7 +30,7 @@ index 66fc3fc..0a9c7fc 100644
  static void bt_le_discovery_stop_cb(void);
  
  static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-@@ -1282,12 +1284,133 @@ reply:
+@@ -1282,12 +1284,124 @@ reply:
  	put_device_on_disc_list(dev);
  }
  
@@ -56,11 +58,8 @@ index 66fc3fc..0a9c7fc 100644
 +
 +	send_client_listen_notify(l->client_id, status);
 +
-+	/* Let's remove client from the list in two cases
-+	 * 1. Start failed
-+	 * 2. Stop succeed
-+	 */
-+	if ((l->start && status) || (!l->start && !status))
++	/* Let's remove client from the list if he stop to listen */
++	if (!l->start)
 +		queue_remove(listen_clients, INT_TO_PTR(l->client_id));
 +
 +	free(l);
@@ -84,7 +83,7 @@ index 66fc3fc..0a9c7fc 100644
 +
 +	listening_client = queue_find(listen_clients, match_by_value,
 +						INT_TO_PTR(cmd->client_if));
-+	/* Start listening */
++	/* Stop listening */
 +	if (cmd->start) {
 +		if (listening_client) {
 +			status = HAL_STATUS_SUCCESS;
@@ -99,14 +98,11 @@ index 66fc3fc..0a9c7fc 100644
 +		}
 +
 +		/* If listen is already on just return success*/
-+		if (queue_length(listen_clients) > 1) {
++		if (!queue_isempty(listen_clients)) {
 +			status = HAL_STATUS_SUCCESS;
 +			goto reply;
 +		}
 +	} else {
-+		/* Stop listening.
-+		 * Check if client was listening
-+		 */
 +		if (!listening_client) {
 +			error("gatt: This client %d does not listen",
 +							cmd->client_if);
@@ -114,9 +110,6 @@ index 66fc3fc..0a9c7fc 100644
 +			goto reply;
 +		}
 +
-+		/* In case there is more listening clients don't stop
-+		 * advertising
-+		*/
 +		if (queue_length(listen_clients) > 1) {
 +			queue_remove(listen_clients,
 +						INT_TO_PTR(cmd->client_if));
@@ -163,7 +156,7 @@ index 66fc3fc..0a9c7fc 100644
  }
  
  static void handle_client_refresh(const void *buf, uint16_t len)
-@@ -3052,9 +3175,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+@@ -3052,9 +3166,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
  	gatt_clients = queue_new();
  	gatt_servers = queue_new();
  	disc_dev_list = queue_new();
@@ -175,7 +168,7 @@ index 66fc3fc..0a9c7fc 100644
  		error("gatt: Failed to allocate memory for queues");
  
  		queue_destroy(gatt_servers, NULL);
-@@ -3072,6 +3196,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+@@ -3072,6 +3187,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
  		queue_destroy(disc_dev_list, NULL);
  		disc_dev_list = NULL;
  
@@ -185,7 +178,7 @@ index 66fc3fc..0a9c7fc 100644
  		return false;
  	}
  
-@@ -3106,4 +3233,7 @@ void bt_gatt_unregister(void)
+@@ -3106,4 +3224,7 @@ void bt_gatt_unregister(void)
  
  	queue_destroy(disc_dev_list, destroy_device);
  	disc_dev_list = NULL;
