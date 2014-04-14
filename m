@@ -4,11 +4,11 @@ To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com,
 	claudio.takahasi@openbossa.org, anderson.lizardo@openbossa.org,
 	armansito@chromium.org
-Subject: Re: [PATCH 01/10] attrib: Add API for reliable write
-Date: Mon, 14 Apr 2014 16:28:07 +0200
-Message-ID: <3028620.qKlJO94k3d@uw000953>
-In-Reply-To: <1397340031-29711-2-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com> <1397340031-29711-2-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 00/10] android/gatt: GATT Client write types support
+Date: Mon, 14 Apr 2014 16:23:09 +0200
+Message-ID: <2909135.azPjR6oIy3@uw000953>
+In-Reply-To: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397340031-29711-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,64 +16,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Łukasz,
 
-On Sunday 13 of April 2014 00:00:22 Lukasz Rymanowski wrote:
-> Android expose to application api for reliable write. Therefore we need
-> to add this support to gattrib
-> ---
->  attrib/gatt.c | 18 ++++++++++++++++++
->  attrib/gatt.h |  6 ++++++
->  2 files changed, 24 insertions(+)
+On Sunday 13 of April 2014 00:00:21 Lukasz Rymanowski wrote:
+> This patch set adds support for different write types.
+> For this I had to expose some additional API from attrib.
 > 
-> diff --git a/attrib/gatt.c b/attrib/gatt.c
-> index 49cd1a3..e461ab7 100644
-> --- a/attrib/gatt.c
-> +++ b/attrib/gatt.c
-> @@ -871,6 +871,24 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
->  	return prepare_write(long_write);
->  }
->  
-> +guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
-> +					const uint8_t *value, size_t vlen,
-> +					GAttribResultFunc func,
-> +					gpointer user_data)
-> +{
-> +	uint8_t *buf;
-> +	guint16 plen;
-> +	size_t buflen;
-> +
-> +	buf = g_attrib_get_buffer(attrib, &buflen);
-> +
-> +	plen = enc_prep_write_req(handle, 0, value, vlen, buf, buflen);
-> +	if (!plen)
-> +		return 0;
-> +
-> +	return g_attrib_send(attrib, 0, buf, plen, func, user_data, NULL);
-> +}
-> +
->  guint gatt_exchange_mtu(GAttrib *attrib, uint16_t mtu, GAttribResultFunc func,
->  							gpointer user_data)
->  {
-> diff --git a/attrib/gatt.h b/attrib/gatt.h
-> index c65bf6c..76820e0 100644
-> --- a/attrib/gatt.h
-> +++ b/attrib/gatt.h
-> @@ -84,6 +84,12 @@ guint gatt_write_char(GAttrib *attrib, uint16_t handle, const uint8_t *value,
->  					size_t vlen, GAttribResultFunc func,
->  					gpointer user_data);
->  
-> +guint gatt_reliable_write_char(GAttrib *attrib, uint16_t handle,
-> +					const uint8_t *value, size_t vlen,
-> +					GAttribResultFunc func,
-> +					gpointer user_data);
-> +
-> +
-
-Just a minor: double empty line.
-
->  guint gatt_discover_char_desc(GAttrib *attrib, uint16_t start, uint16_t end,
->  				GAttribResultFunc func, gpointer user_data);
->  
+> Only signed write left to implement.
 > 
+> This patch set also do some code cleaning.
+> 
+> Lukasz Rymanowski (10):
+>   attrib: Add API for reliable write
+>   attrib: Expose write execute
+>   android/gatt: Add helper to create descr_data
+>   android/gatt: Avoid double helper struct for read/write characteristic
+>   android/gatt: Add helper to create characteristic op data
+>   android/gatt: Fix error msg
+>   android/gatt: Daemon accepts only default write type
+>   android/gatt: Add support for reliable write
+>   android/gatt: Add support for write execute
+>   android/gatt: Add support for write without response
+> 
+>  android/gatt.c | 264 ++++++++++++++++++++++++++++++++++++++++++---------------
+>  attrib/gatt.c  |  24 ++++++
+>  attrib/gatt.h  |   8 ++
+>  3 files changed, 226 insertions(+), 70 deletions(-)
+> 
+> 
+
+Patches 3-7 are now pushed. Thanks.
+
+I moved GATT write types definitions to HAL IPC.
 
 -- 
 Best regards, 
