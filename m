@@ -1,84 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 1/2] android/bluetooth: Expose API to set advertising
-Date: Mon, 14 Apr 2014 22:53:06 +0200
-Message-Id: <1397508787-25137-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CAKT1EBdb3O03mN4RUw9hyYQJxb4si9LvqAcGLEcwQ=vC9DusvA@mail.gmail.com>
+References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
+	<1397027234-12003-3-git-send-email-marcin.kraglak@tieto.com>
+	<CAKT1EBdb3O03mN4RUw9hyYQJxb4si9LvqAcGLEcwQ=vC9DusvA@mail.gmail.com>
+Date: Mon, 14 Apr 2014 21:57:11 +0200
+Message-ID: <CABD6X-+CTBj+e56yb=kqvaCc1GSnaQVM6vgvcRUOu_dq_DOhDA@mail.gmail.com>
+Subject: Re: [RFC 02/16] gatt: Add services list to gatt_db struct
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch android GAP expose start/stop advertising API
----
- android/bluetooth.c | 41 +++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |  4 ++++
- 2 files changed, 45 insertions(+)
+Hi Claudio,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index b3fad59..93c7935 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2882,6 +2882,47 @@ static bool stop_discovery(uint8_t type)
- 	return false;
- }
- 
-+struct adv_user_data {
-+	bt_le_set_advertising_done cb;
-+	void *user_data;
-+};
-+
-+static void set_advertising_cb(uint8_t status, uint16_t length,
-+			const void *param, void *user_data)
-+{
-+	struct adv_user_data *data = user_data;
-+
-+	DBG("");
-+
-+	if (status)
-+		error("Failed to set adverising %s (0x%02x))",
-+						mgmt_errstr(status), status);
-+
-+	data->cb(status, data->user_data);
-+}
-+
-+bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
-+							 void *user_data)
-+{
-+	struct adv_user_data *data;
-+	uint8_t adv = advertising ? 0x01 : 0x00;
-+
-+	data = new0(struct adv_user_data, 1);
-+	if (!data)
-+		return false;
-+
-+	data->cb = cb;
-+	data->user_data = user_data;
-+
-+	if (mgmt_send(mgmt_if, MGMT_OP_SET_ADVERTISING, adapter.index,
-+			sizeof(adv), &adv, set_advertising_cb, data, free) > 0)
-+		return true;
-+
-+	error("Failed to set advertising");
-+	free(data);
-+	return false;
-+}
-+
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
- {
- 	if (!adapter.cur_discovery_type) {
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 807ebe7..3eddf16 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -42,3 +42,7 @@ bool bt_le_discovery_start(bt_le_device_found cb);
- 
- typedef void (*bt_le_discovery_stopped)(void);
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
-+
-+typedef void (*bt_le_set_advertising_done)(uint8_t status, void *user_data);
-+bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
-+							void *user_data);
--- 
-1.8.4
+On 14 April 2014 16:11, Claudio Takahasi <claudio.takahasi@openbossa.org> wrote:
+> Hi Marcin,
+>
+> On Wed, Apr 9, 2014 at 4:07 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+>> Gatt database will store all services in queue services. Each service
+>> contains attributes, number of handles included and flag if it is
+>> active service.
+>> ---
+>>  src/shared/gatt-db.c | 32 ++++++++++++++++++++++++++++++++
+>>  1 file changed, 32 insertions(+)
+>>
+>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>> index e56b381..47915c7 100644
+>> --- a/src/shared/gatt-db.c
+>> +++ b/src/shared/gatt-db.c
+>> @@ -21,11 +21,24 @@
+>>   *
+>>   */
+>>
+>> +#include <stdbool.h>
+>> +
+>>  #include "src/shared/util.h"
+>> +#include "src/shared/queue.h"
+>>  #include "src/shared/gatt-db.h"
+>>
+>>  struct gatt_db {
+>>         uint16_t next_handle;
+>> +       struct queue *services;
+>> +};
+>> +
+>> +struct gatt_db_attribute {
+>> +};
+>> +
+>> +struct gatt_db_service {
+>> +       bool active;
+>> +       uint16_t num_handles;
+>> +       struct gatt_db_attribute **attributes;
+>
+> If the plan is to support handle allocation, maybe it'd better to have
+> continuous memory allocation instead of attributes pointers.
+>
+> Claudio.
+>
+> <snip>
 
+We store attribute value in attribute struct, and it's easier to
+iterate through array of pointers. But we can store pointer to
+attribute value, then continuous memory will be better. I can change
+it.
+
+BR
+Marcin
