@@ -3,80 +3,86 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/3] android/client: Add support for client->listen
-Date: Mon, 14 Apr 2014 10:58:37 +0200
-Message-Id: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/3] android/bluetooth: Expose gap api to set advertising
+Date: Mon, 14 Apr 2014 10:58:38 +0200
+Message-Id: <1397465919-12677-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1397465919-12677-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+With this patch it is possible to start/stop advertising by gap clients
 ---
- android/client/if-gatt.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+ android/bluetooth.h |  4 ++++
+ 2 files changed, 47 insertions(+)
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 250472a..f421421 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -576,6 +576,13 @@ static void gattc_read_remote_rssi_cb(int client_if, bt_bdaddr_t *bda, int rssi,
- 			client_if, bt_bdaddr_t2str(bda, buf), rssi, status);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index b3fad59..6624492 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2882,6 +2882,49 @@ static bool stop_discovery(uint8_t type)
+ 	return false;
  }
  
-+/* Callback invoked in response to listen */
-+static void gattc_listen_cb(int status, int client_if)
++struct adv_user_data {
++	bt_le_set_advertising_done cb;
++	void *user_data;
++};
++
++static void set_advertising_cb(uint8_t status, uint16_t length,
++			const void *param, void *user_data)
 +{
-+	haltest_info("%s: client_if=%d status=%d\n", __func__, client_if,
-+								status);
++	struct adv_user_data *data = user_data;
++
++	DBG("");
++
++	if (status)
++		error("Failed to set adverising for index %u: %s (0x%02x))",
++				adapter.index, mgmt_errstr(status), status);
++
++	data->cb(status, data->user_data);
++	free(data);
++	return;
 +}
 +
- static const btgatt_client_callbacks_t btgatt_client_callbacks = {
- 	.register_client_cb = gattc_register_client_cb,
- 	.scan_result_cb = gattc_scan_result_cb,
-@@ -593,7 +600,8 @@ static const btgatt_client_callbacks_t btgatt_client_callbacks = {
- 	.read_descriptor_cb = gattc_read_descriptor_cb,
- 	.write_descriptor_cb = gattc_write_descriptor_cb,
- 	.execute_write_cb = gattc_execute_write_cb,
--	.read_remote_rssi_cb = gattc_read_remote_rssi_cb
-+	.read_remote_rssi_cb = gattc_read_remote_rssi_cb,
-+	.listen_cb = gattc_listen_cb,
- };
- 
- /* BT-GATT Server callbacks */
-@@ -922,6 +930,27 @@ static void disconnect_p(int argc, const char **argv)
- 	EXEC(if_gatt->client->disconnect, client_if, &bd_addr, conn_id);
- }
- 
-+/* listen */
-+
-+/* Same completion as unregister for now, start stop is not auto completed */
-+#define listen_c unregister_client_c
-+
-+static void listen_p(int argc, const char **argv)
++bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
++							 void *user_data)
 +{
-+	int client_if;
-+	int start = 1;
++	struct adv_user_data *data;
++	uint8_t adv = advertising ? 0x01 : 0x00;
 +
-+	RETURN_IF_NULL(if_gatt);
++	data = new0(struct adv_user_data, 1);
++	if (!data)
++		return false;
 +
-+	VERIFY_CLIENT_IF(2, client_if);
++	data->cb = cb;
++	data->user_data = user_data;
 +
-+	/* start */
-+	if (argc >= 4)
-+		start = atoi(argv[3]);
++	if (mgmt_send(mgmt_if, MGMT_OP_SET_ADVERTISING, adapter.index,
++			sizeof(adv), &adv, set_advertising_cb, data, NULL) > 0)
++		return true;
 +
-+	EXEC(if_gatt->client->listen, client_if, start);
++	error("Failed to set advertising");
++	free(data);
++	return false;
 +}
 +
- /* refresh */
+ bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
+ {
+ 	if (!adapter.cur_discovery_type) {
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 807ebe7..3eddf16 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -42,3 +42,7 @@ bool bt_le_discovery_start(bt_le_device_found cb);
  
- static void refresh_c(int argc, const char **argv, enum_func *enum_func,
-@@ -1405,6 +1434,7 @@ static struct method client_methods[] = {
- 	STD_METHODCH(get_device_type, "<addr>"),
- 	STD_METHODCH(test_command,
- 			"<cmd> <addr> <uuid> [u1] [u2] [u3] [u4] [u5]"),
-+	STD_METHODCH(listen, "<client_if> [1|0]"),
- 	END_METHOD
- };
- 
+ typedef void (*bt_le_discovery_stopped)(void);
+ bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
++
++typedef void (*bt_le_set_advertising_done)(uint8_t status, void *user_data);
++bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
++							void *user_data);
 -- 
 1.8.4
 
