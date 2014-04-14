@@ -1,109 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2] android/gatt: Fix memory leak
-Date: Mon, 14 Apr 2014 10:55:14 +0200
-Message-Id: <1397465714-12257-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 1/6] android/bluetooth: Fix passing NULL pointer to memcpy
+Date: Mon, 14 Apr 2014 10:24:05 +0200
+Message-ID: <11846673.LzvPsPqHlb@uw000953>
+In-Reply-To: <1397202087-1203-1-git-send-email-szymon.janc@tieto.com>
+References: <1397202087-1203-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It happens on daemon exit when connection is up.
+On Friday 11 of April 2014 09:41:22 Szymon Janc wrote:
+> It is possible to have property with empty value (ie. bonded devices)
+> so check len before calling memcpy.
+> ---
+>  android/bluetooth.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 4e4397a..70b0849 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1160,7 +1160,9 @@ static int fill_hal_prop(void *buf, uint8_t type, uint16_t len,
+>  
+>  	prop->type = type;
+>  	prop->len = len;
+> -	memcpy(prop->val, val, len);
+> +
+> +	if (len)
+> +		memcpy(prop->val, val, len);
+>  
+>  	return sizeof(*prop) + len;
+>  }
+> 
 
-295 (104 direct, 191 indirect) bytes in 1 blocks are definitely lost in
-loss record 140 of 148
-==25132==    at 0x4C2B6CD: malloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==25132==    by 0x4E7FBBD: g_try_malloc0 (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==25132==    by 0x437BF9: g_attrib_new (gattrib.c:495)
-==25132==    by 0x42F45F: connect_cb (gatt.c:845)
-==25132==    by 0x439DBA: connect_cb (btio.c:232)
-==25132==    by 0x4E79D12: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==25132==    by 0x4E7A05F: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==25132==    by 0x4E7A459: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==25132==    by 0x4044FD: main (main.c:531)
+This serie is now upstream.
 
-This patch moves function connection_cleanup up in the file as this is
-needed by destroy_device
----
- android/gatt.c | 45 ++++++++++++++++++++++++---------------------
- 1 file changed, 24 insertions(+), 21 deletions(-)
-
-diff --git a/android/gatt.c b/android/gatt.c
-index 53131d4..004063c 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -395,6 +395,27 @@ static void unregister_notification(void *data)
- 							notification->ind_id);
- }
- 
-+static void connection_cleanup(struct gatt_device *device)
-+{
-+	if (device->watch_id) {
-+		g_source_remove(device->watch_id);
-+		device->watch_id = 0;
-+	}
-+
-+	if (device->att_io) {
-+		g_io_channel_shutdown(device->att_io, FALSE, NULL);
-+		g_io_channel_unref(device->att_io);
-+		device->att_io = NULL;
-+	}
-+
-+	if (device->attrib) {
-+		GAttrib *attrib = device->attrib;
-+		device->attrib = NULL;
-+		g_attrib_cancel_all(attrib);
-+		g_attrib_unref(attrib);
-+	}
-+}
-+
- static void destroy_device(void *data)
- {
- 	struct gatt_device *dev = data;
-@@ -402,6 +423,9 @@ static void destroy_device(void *data)
- 	if (!dev)
- 		return;
- 
-+	if (dev->conn_id)
-+		connection_cleanup(dev);
-+
- 	queue_destroy(dev->clients, NULL);
- 	queue_destroy(dev->services, destroy_service);
- 	free(dev);
-@@ -499,27 +523,6 @@ failed:
- 									status);
- }
- 
--static void connection_cleanup(struct gatt_device *device)
--{
--	if (device->watch_id) {
--		g_source_remove(device->watch_id);
--		device->watch_id = 0;
--	}
--
--	if (device->att_io) {
--		g_io_channel_shutdown(device->att_io, FALSE, NULL);
--		g_io_channel_unref(device->att_io);
--		device->att_io = NULL;
--	}
--
--	if (device->attrib) {
--		GAttrib *attrib = device->attrib;
--		device->attrib = NULL;
--		g_attrib_cancel_all(attrib);
--		g_attrib_unref(attrib);
--	}
--}
--
- static void send_client_disconnect_notify(int32_t id, struct gatt_device *dev,
- 								int32_t status)
- {
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
