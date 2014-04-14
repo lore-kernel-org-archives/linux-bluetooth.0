@@ -1,42 +1,155 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] core/profile: Fix regression when registering for client only
-Date: Mon, 14 Apr 2014 15:40:02 +0300
-Message-Id: <1397479202-3632-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1397479202-3632-1-git-send-email-luiz.dentz@gmail.com>
-References: <1397479202-3632-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/2] tools: Remove simple-service
+Date: Mon, 14 Apr 2014 15:40:01 +0300
+Message-Id: <1397479202-3632-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This got introduced with PCE that register a record for PBAP client, but
-it end up causing a regression where all profiles that have records would
-be probed as if server was enabled as well.
-
-Note that is was possible to register PBAP client with PCE record, in
-that case Role option should be omitted so both server and client role
-are enabled by default which does not affect PBAP server component since
-it uses a different UUID, in fact the correct form to add PCE record is
-probably to register as server only.
+simple-service no longer works since the API it uses no longer exists and
+Profile API already has a similar tool.
 ---
- src/profile.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ test/simple-service | 128 ----------------------------------------------------
+ 1 file changed, 128 deletions(-)
+ delete mode 100755 test/simple-service
 
-diff --git a/src/profile.c b/src/profile.c
-index f065235..f30f4f6 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -2209,7 +2209,7 @@ static struct ext_profile *create_ext(const char *owner, const char *path,
- 	p->local_uuid = ext->service ? ext->service : ext->uuid;
- 	p->remote_uuid = ext->remote_uuid;
- 
--	if (ext->enable_server || ext->record || ext->get_record) {
-+	if (ext->enable_server) {
- 		p->adapter_probe = ext_adapter_probe;
- 		p->adapter_remove = ext_adapter_remove;
- 	}
+diff --git a/test/simple-service b/test/simple-service
+deleted file mode 100755
+index 02d7648..0000000
+--- a/test/simple-service
++++ /dev/null
+@@ -1,128 +0,0 @@
+-#!/usr/bin/python
+-
+-from __future__ import absolute_import, print_function, unicode_literals
+-
+-import sys
+-import time
+-import dbus
+-import bluezutils
+-
+-xml = ' \
+-<?xml version="1.0" encoding="UTF-8" ?> 	\
+-<record>					\
+-  <attribute id="0x0001">			\
+-    <sequence>					\
+-      <uuid value="0x1101"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0002">			\
+-     <uint32 value="0"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0003">			\
+-    <uuid value="00001101-0000-1000-8000-00805f9b34fb"/> \
+-  </attribute>					\
+-						\
+-  <attribute id="0x0004">			\
+-    <sequence>					\
+-      <sequence>				\
+-        <uuid value="0x0100"/>			\
+-      </sequence>				\
+-      <sequence>				\
+-        <uuid value="0x0003"/>			\
+-        <uint8 value="23"/>			\
+-      </sequence>				\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0005">			\
+-    <sequence>					\
+-      <uuid value="0x1002"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0006">			\
+-    <sequence>					\
+-      <uint16 value="0x656e"/>			\
+-      <uint16 value="0x006a"/>			\
+-      <uint16 value="0x0100"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0007">			\
+-     <uint32 value="0"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0008">			\
+-     <uint8 value="0xff"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0009">			\
+-    <sequence>					\
+-      <sequence>				\
+-        <uuid value="0x1101"/>			\
+-        <uint16 value="0x0100"/>		\
+-      </sequence>				\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x000a">			\
+-    <url value="http://www.bluez.org/"/>	\
+-  </attribute>					\
+-						\
+-  <attribute id="0x000b">			\
+-    <url value="http://www.bluez.org/"/>	\
+-  </attribute>					\
+-						\
+-  <attribute id="0x000c">			\
+-    <url value="http://www.bluez.org/"/>	\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0100">			\
+-    <text value="Serial Port"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0101">			\
+-    <text value="Serial Port Service"/>		\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0102">			\
+-     <text value="BlueZ"/>			\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0200">			\
+-    <sequence>					\
+-      <uint16 value="0x0100"/>			\
+-    </sequence>					\
+-  </attribute>					\
+-						\
+-  <attribute id="0x0201">			\
+-     <uint32 value="0"/>			\
+-  </attribute>					\
+-</record>					\
+-'
+-
+-bus = dbus.SystemBus()
+-
+-if len(sys.argv) > 1:
+-	path = bluezutils.find_adapter(sys.argv[1]).object_path
+-else:
+-	path = bluezutils.find_adapter().object_path
+-
+-service = dbus.Interface(bus.get_object("org.bluez", path),
+-						"org.bluez.Service")
+-
+-handle = service.AddRecord(xml)
+-
+-print("Service record with handle 0x%04x added" % (handle))
+-
+-print("Press CTRL-C to remove service record")
+-
+-try:
+-	time.sleep(1000)
+-	print("Terminating session")
+-except:
+-	pass
+-
+-service.RemoveRecord(dbus.UInt32(handle))
 -- 
 1.9.0
 
