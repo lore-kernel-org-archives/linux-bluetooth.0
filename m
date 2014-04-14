@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1397027234-12003-4-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
 References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
-	<1397027234-12003-4-git-send-email-marcin.kraglak@tieto.com>
-Date: Mon, 14 Apr 2014 11:14:15 -0300
-Message-ID: <CAKT1EBcDG8_j2K0Hbr=TLHvf+A6W3SZ+-fxiO4xwByRH2ZnqFA@mail.gmail.com>
-Subject: Re: [RFC 03/16] gatt: Add method for creating services in gatt_db
+	<1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
+Date: Mon, 14 Apr 2014 11:12:43 -0300
+Message-ID: <CAKT1EBd_sJ0Q17BV1Q8z9zr8mQd=iuj8GMPQcnVB=x7FRg_05w@mail.gmail.com>
+Subject: Re: [RFC 01/16] gatt: Add skeleton of gatt-db
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -15,121 +15,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Wed, Apr 9, 2014 at 4:07 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> This function will reserve number of handles and create service attribute. Allowed
-> service types are PRIMARY and SECONDARY.
+On Wed, Apr 9, 2014 at 4:06 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> This change adds new() and destroy() fuctions for gatt_db,
+> which will be used for storing local attributes.
 > ---
->  src/shared/gatt-db.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/gatt-db.h |  9 +++++
->  2 files changed, 101 insertions(+)
+>  android/Android.mk   |  1 +
+>  android/Makefile.am  |  1 +
+>  src/shared/gatt-db.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h | 27 +++++++++++++++++++++++++++
+>  4 files changed, 76 insertions(+)
+>  create mode 100644 src/shared/gatt-db.c
+>  create mode 100644 src/shared/gatt-db.h
 >
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 5f4e70c..4c9cfb5 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
+>         bluez/src/shared/queue.c \
+>         bluez/src/shared/ringbuf.c \
+>         bluez/src/shared/hfp.c \
+> +       bluez/src/shared/gatt-db.c \
+>         bluez/src/shared/io-glib.c \
+>         bluez/src/sdpd-database.c \
+>         bluez/src/sdpd-service.c \
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index c51cce2..70e1dec 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -29,6 +29,7 @@ android_bluetoothd_SOURCES = android/main.c \
+>                                 src/shared/mgmt.h src/shared/mgmt.c \
+>                                 src/shared/ringbuf.h src/shared/ringbuf.c \
+>                                 src/shared/hfp.h src/shared/hfp.c \
+> +                               src/shared/gatt-db.h src/shared/gatt-db.c \
+>                                 android/bluetooth.h android/bluetooth.c \
+>                                 android/hidhost.h android/hidhost.c \
+>                                 android/ipc-common.h \
 > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 47915c7..15e2f95 100644
-> --- a/src/shared/gatt-db.c
+> new file mode 100644
+> index 0000000..e56b381
+> --- /dev/null
 > +++ b/src/shared/gatt-db.c
-> @@ -23,16 +23,26 @@
->
->  #include <stdbool.h>
->
-> +#include "lib/uuid.h"
->  #include "src/shared/util.h"
->  #include "src/shared/queue.h"
->  #include "src/shared/gatt-db.h"
->
-> +static const bt_uuid_t primary_service_uuid  = { .type = BT_UUID16,
-> +                                       .value.u16 = GATT_PRIM_SVC_UUID };
-> +static const bt_uuid_t secondary_service_uuid  = { .type = BT_UUID16,
-> +                                       .value.u16 = GATT_SND_SVC_UUID };
+> @@ -0,0 +1,47 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
 > +
->  struct gatt_db {
->         uint16_t next_handle;
->         struct queue *services;
->  };
->
->  struct gatt_db_attribute {
-> +       uint16_t handle;
-> +       bt_uuid_t uuid;
-> +       uint16_t val_len;
-> +       uint8_t value[0];
->  };
->
->  struct gatt_db_service {
-> @@ -77,3 +87,85 @@ void gatt_db_destroy(struct gatt_db *db)
->         queue_destroy(db->services, gatt_db_service_destroy);
->         free(db);
->  }
+> +#include "src/shared/util.h"
+> +#include "src/shared/gatt-db.h"
 > +
-> +static struct gatt_db_attribute *new_attribute(const bt_uuid_t *type,
-> +                                                       const uint8_t *val,
-> +                                                       uint16_t len)
+> +struct gatt_db {
+> +       uint16_t next_handle;
+> +};
+> +
+> +struct gatt_db *gatt_db_new(void)
 > +{
-> +       struct gatt_db_attribute *attribute;
+> +       struct gatt_db *db;
 > +
-> +       attribute = malloc0(sizeof(struct gatt_db_attribute) + len);
-> +       if (!attribute)
+> +       db = new0(struct gatt_db, 1);
+> +       if (!db)
 > +               return NULL;
 > +
-> +       attribute->uuid = *type;
-> +       memcpy(&attribute->value, val, len);
-> +       attribute->val_len = len;
+> +       db->next_handle = 0x0001;
 > +
-> +       return attribute;
+> +       return db;
 > +}
-> +
-> +static int uuid_to_le(const bt_uuid_t *uuid, uint8_t *dst)
-> +{
-> +       switch (uuid->type) {
-> +       case BT_UUID16:
-> +               put_le16(uuid->value.u16, dst);
-> +               break;
-> +       case BT_UUID32:
-> +               put_le32(uuid->value.u32, dst);
-> +               break;
-> +       default:
-> +               bswap_128(&uuid->value.u128, dst);
-> +               break;
-> +       }
-> +
-> +       return bt_uuid_len(uuid);
-> +}
-> +
-> +uint16_t gatt_db_new_service(struct gatt_db *db, const bt_uuid_t *uuid,
-> +                                       enum gatt_db_service_type service_type,
-> +                                       uint16_t num_handles)
 
-Just one suggestion, not sure if it will be possible. Plug-ins or
-other files using this function should have access to gatt_db, *maybe*
-it could be hidden.
+Are you considering to use the same function to allocate/create a
+database to represent the remote "virtual" database?
+My point is: the same infra-structure could be used to represent a
+local database(per adapter maybe) or remote database.
 
 <snip>
 
-> +       if (!queue_push_tail(db->services, service)) {
-> +               gatt_db_service_destroy(service);
-> +               return 0;
-> +       }
-> +
-> +       service->attributes[0]->handle = db->next_handle;
-> +       db->next_handle += num_handles;
-> +       service->num_handles = num_handles;
-> +
-> +       return service->attributes[0]->handle;
-> +}
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index 2901afb..7c03013 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -23,5 +23,14 @@
->
->  struct gatt_db;
->
-> +enum gatt_db_service_type {
-> +       GATT_DB_SERVICE_PRIMARY,
-> +       GATT_DB_SERVICE_SECONDARY
-> +};
-
-"bool" should be enough to inform if the service is primary or secondary.
-
-
-<snip>
-
+Regards,
 Claudio
