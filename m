@@ -2,50 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] android/gatt: Minor whitespace fixes
-Date: Mon, 14 Apr 2014 12:39:51 +0200
-Message-Id: <1397471991-21200-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1397471991-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1397471991-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] android/gatt: Fix caching included services descriptors
+Date: Mon, 14 Apr 2014 12:39:50 +0200
+Message-Id: <1397471991-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/gatt.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f303aea..150f7b5 100644
+index 004063c..f303aea 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -1249,7 +1249,7 @@ static void handle_client_disconnect(const void *buf, uint16_t len)
- 		goto reply;
- 	}
+@@ -1839,7 +1839,7 @@ static bool build_descr_cache(int32_t conn_id, struct gatt_device *dev,
  
--	/*Check if client owns this connection */
-+	/* Check if client owns this connection */
- 	if (!queue_remove_if(dev->clients, match_by_value,
- 						INT_TO_PTR(cmd->client_if))) {
- 		error("gatt: cannot remove conn_id=%d", cmd->client_if);
-@@ -1269,7 +1269,8 @@ reply:
- 	 * device then this is what we shall to do.
- 	 * If this is last client, this is still OK to do because on connect
- 	 * request we do le scan and wait until remote device start
--	 * advertisement */
-+	 * advertisement
-+	 */
- 	send_client_disconnect_notify(cmd->client_if, dev, GATT_SUCCESS);
+ 	/* Clip range to given characteristic */
+ 	start = ch->ch.value_handle + 1;
+-	end = srvc->prim.range.end;
++	end = srvc->primary ? srvc->prim.range.end : srvc->incl.range.end;
  
- 	/* If there is more clients just return */
-@@ -1336,7 +1337,7 @@ static void handle_client_search_service(const void *buf, uint16_t len)
- 		goto reply;
- 	}
- 
--	/*TODO:  Handle filter uuid */
-+	/* TODO:  Handle filter uuid */
- 
- 	/* Use cache if possible */
- 	if (!queue_isempty(dev->services)) {
+ 	/* Use next characteristic start as end. If there is none -
+ 	 * service end is valid end.
 -- 
 1.9.1
 
