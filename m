@@ -3,128 +3,82 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 2/2] android/gatt: Add support for client listen command
-Date: Mon, 14 Apr 2014 11:57:52 +0200
-Message-Id: <1397469472-17901-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1397469472-17901-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397469472-17901-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 1/2] android/bluetooth: Expose gap api to set advertising
+Date: Mon, 14 Apr 2014 11:57:51 +0200
+Message-Id: <1397469472-17901-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for gatt client listen which start/stop
-advertising
+With this patch it is possible to start/stop advertising by gap clients
 ---
- android/gatt.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 62 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ android/bluetooth.h |  4 ++++
+ 2 files changed, 45 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 53131d4..2e2b45e 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -130,6 +130,8 @@ static struct queue *conn_list = NULL;		/* Connected devices */
- static struct queue *conn_wait_queue = NULL;	/* Devs waiting to connect */
- static struct queue *disc_dev_list = NULL;	/* Disconnected devices */
- 
-+static struct queue *listen_clients = NULL;
-+
- static void bt_le_discovery_stop_cb(void);
- 
- static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-@@ -1279,12 +1281,63 @@ reply:
- 	put_device_on_disc_list(dev);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index b3fad59..93c7935 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2882,6 +2882,47 @@ static bool stop_discovery(uint8_t type)
+ 	return false;
  }
  
-+static void send_client_listen_notify(int32_t id, int32_t status)
++struct adv_user_data {
++	bt_le_set_advertising_done cb;
++	void *user_data;
++};
++
++static void set_advertising_cb(uint8_t status, uint16_t length,
++			const void *param, void *user_data)
 +{
-+	struct hal_ev_gatt_client_listen ev;
++	struct adv_user_data *data = user_data;
 +
-+	/* Server if because of typo in android headers */
-+	ev.server_if = id;
-+	ev.status = status;
++	DBG("");
 +
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+						HAL_EV_GATT_CLIENT_LISTEN,
-+						sizeof(ev), &ev);
-+	queue_remove(listen_clients, INT_TO_PTR(id));
++	if (status)
++		error("Failed to set adverising %s (0x%02x))",
++						mgmt_errstr(status), status);
++
++	data->cb(status, data->user_data);
 +}
 +
-+static void set_advertising_cb(uint8_t status, void *user_data)
++bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
++							 void *user_data)
 +{
-+	int32_t client_id = PTR_TO_INT(user_data);
++	struct adv_user_data *data;
++	uint8_t adv = advertising ? 0x01 : 0x00;
 +
-+	send_client_listen_notify(client_id, status);
++	data = new0(struct adv_user_data, 1);
++	if (!data)
++		return false;
++
++	data->cb = cb;
++	data->user_data = user_data;
++
++	if (mgmt_send(mgmt_if, MGMT_OP_SET_ADVERTISING, adapter.index,
++			sizeof(adv), &adv, set_advertising_cb, data, free) > 0)
++		return true;
++
++	error("Failed to set advertising");
++	free(data);
++	return false;
 +}
 +
- static void handle_client_listen(const void *buf, uint16_t len)
+ bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
  {
-+	const struct hal_cmd_gatt_client_listen *cmd = buf;
-+	uint8_t status;
-+
- 	DBG("");
+ 	if (!adapter.cur_discovery_type) {
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 807ebe7..3eddf16 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -42,3 +42,7 @@ bool bt_le_discovery_start(bt_le_device_found cb);
  
-+	if (queue_find(listen_clients, match_by_value,
-+						INT_TO_PTR(cmd->client_if))) {
+ typedef void (*bt_le_discovery_stopped)(void);
+ bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
 +
-+		status = HAL_STATUS_SUCCESS;
-+		goto reply;
-+	}
-+
-+	if (!queue_push_tail(listen_clients, INT_TO_PTR(cmd->client_if))) {
-+		error("gatt: Could not put client on listen queue");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
-+	if (!bt_le_set_advertising(cmd->start, set_advertising_cb,
-+						INT_TO_PTR(cmd->client_if))) {
-+		error("gatt: Could not set advertising");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_LISTEN,
--							HAL_STATUS_FAILED);
-+							status);
-+
-+	if (status != HAL_STATUS_SUCCESS)
-+		send_client_listen_notify(cmd->client_if, GATT_FAILURE);
-+
- }
- 
- static void handle_client_refresh(const void *buf, uint16_t len)
-@@ -3008,9 +3061,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	gatt_clients = queue_new();
- 	gatt_servers = queue_new();
- 	disc_dev_list = queue_new();
-+	listen_clients = queue_new();
- 
- 	if (!conn_list || !conn_wait_queue || !gatt_clients || !gatt_servers ||
--							!disc_dev_list) {
-+					!disc_dev_list || !listen_clients) {
- 		error("gatt: Failed to allocate memory for queues");
- 
- 		queue_destroy(gatt_servers, NULL);
-@@ -3028,6 +3082,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 		queue_destroy(disc_dev_list, NULL);
- 		disc_dev_list = NULL;
- 
-+		queue_destroy(listen_clients, NULL);
-+		listen_clients = NULL;
-+
- 		return false;
- 	}
- 
-@@ -3062,4 +3119,7 @@ void bt_gatt_unregister(void)
- 
- 	queue_destroy(disc_dev_list, destroy_device);
- 	disc_dev_list = NULL;
-+
-+	queue_destroy(listen_clients, NULL);
-+	listen_clients = NULL;
- }
++typedef void (*bt_le_set_advertising_done)(uint8_t status, void *user_data);
++bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
++							void *user_data);
 -- 
 1.8.4
 
