@@ -1,11 +1,11 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1397027234-12003-9-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1397027234-12003-8-git-send-email-marcin.kraglak@tieto.com>
 References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
-	<1397027234-12003-9-git-send-email-marcin.kraglak@tieto.com>
-Date: Tue, 15 Apr 2014 09:54:52 -0300
-Message-ID: <CAKT1EBdK6-yFwyOHyJhhFC4fHBvJUUhHwjH9WzJ8K44v4f=uVw@mail.gmail.com>
-Subject: Re: [RFC 08/16] android/gatt: Add service functionality
+	<1397027234-12003-8-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 15 Apr 2014 09:53:30 -0300
+Message-ID: <CAKT1EBd4GK++1NGeBSXWieHx=2N642YwJfJApjKFerfmCToHbQ@mail.gmail.com>
+Subject: Re: [RFC 07/16] gatt: Add included service functionality
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
@@ -16,120 +16,102 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 Hi Marcin,
 
 On Wed, Apr 9, 2014 at 4:07 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
-> It will Add service to local database.
+> It will add included service to service attribute list.
 > ---
->  android/gatt.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 55 insertions(+), 1 deletion(-)
+>  src/shared/gatt-db.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h |  3 +++
+>  2 files changed, 47 insertions(+)
 >
-> diff --git a/android/gatt.c b/android/gatt.c
-> index a33ce25..76753a8 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -43,6 +43,7 @@
->  #include "utils.h"
->  #include "src/shared/util.h"
->  #include "src/shared/queue.h"
-> +#include "src/shared/gatt-db.h"
->  #include "attrib/gattrib.h"
->  #include "attrib/att.h"
->  #include "attrib/gatt.h"
-> @@ -130,6 +131,8 @@ static struct queue *conn_list      = NULL;         /* Connected devices */
->  static struct queue *conn_wait_queue = NULL;   /* Devs waiting to connect */
->  static struct queue *disc_dev_list = NULL;     /* Disconnected devices */
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index 26b36d9..2886bb8 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -29,6 +29,7 @@
+>  #include "src/shared/gatt-db.h"
 >
-> +static struct gatt_db *gatt_db = NULL;
-> +
->  static void bt_le_discovery_stop_cb(void);
+>  #define MAX_CHAR_DECL_VALUE_LEN 19
+> +#define MAX_INCLUDED_VALUE_LEN 6
 >
->  static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-> @@ -2669,12 +2672,56 @@ static void handle_server_disconnect(const void *buf, uint16_t len)
->                         HAL_OP_GATT_SERVER_DISCONNECT, HAL_STATUS_FAILED);
+>  static const bt_uuid_t primary_service_uuid  = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_PRIM_SVC_UUID };
+> @@ -36,6 +37,8 @@ static const bt_uuid_t secondary_service_uuid  = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_SND_SVC_UUID };
+>  static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
+>                                         .value.u16 = GATT_CHARAC_UUID };
+> +static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
+> +                                       .value.u16 = GATT_INCLUDE_UUID };
+>
+>  struct gatt_db {
+>         uint16_t next_handle;
+> @@ -314,3 +317,44 @@ uint16_t gatt_db_new_char_descriptor(struct gatt_db *db, uint16_t handle,
+>
+>         return update_attribute_handle(service, i);
 >  }
->
-> +static struct gatt_server *find_server_by_id(int32_t id)
+> +
+> +uint16_t gatt_db_new_included_service(struct gatt_db *db, uint16_t handle,
+> +                                               uint16_t included_handle)
 > +{
-> +       return queue_find(gatt_servers, match_server_by_id, INT_TO_PTR(id));
+> +       struct gatt_db_service *included_service;
+> +       uint8_t value[MAX_INCLUDED_VALUE_LEN];
+> +       uint16_t len = sizeof(uint16_t) * 2;
+> +       struct gatt_db_service *service;
+> +       int index;
+> +
+> +       service = queue_find(db->services, match_service_by_handle,
+> +                                                       INT_TO_PTR(handle));
+> +       if (!service)
+> +               return 0;
+> +
+> +       included_service = queue_find(db->services, match_service_by_handle,
+> +                                               INT_TO_PTR(included_handle));
+
+Circular references may occur.
+
+> +
+> +       if (!included_service)
+> +               return 0;
+> +
+> +       put_le16(included_handle, &value[0]);
+> +       put_le16(included_handle + included_service->num_handles - 1,
+> +                                                       &value[2]);
+
+According to the BT core spec:
+"The Service UUID shall only be present when the UUID is a 16-bit
+Bluetooth UUID"
+
+It'd be relevant to add this comment here.
+
+> +       if (included_service->attributes[0]->val_len == 2) {
+> +               memcpy(&value[4], included_service->attributes[0]->value,
+> +                               included_service->attributes[0]->val_len);
+> +               len += included_service->attributes[0]->val_len;
+> +       }
+> +
+> +       index = get_attribute_index(service, 1);
+> +       if (!index)
+> +               return 0;
+> +
+> +       service->attributes[index] = new_attribute(&included_service_uuid,
+> +                                                               value, len);
+> +       if (!service->attributes[index])
+> +               return 0;
+> +
+> +       return update_attribute_handle(service, index);
 > +}
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 1191614..a421e9e 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -58,3 +58,6 @@ uint16_t gatt_db_new_char_descriptor(struct gatt_db *db, uint16_t handle,
+>                                                 gatt_db_read_t read_func,
+>                                                 gatt_db_write_t write_func,
+>                                                 void *user_data);
 > +
->  static void handle_server_add_service(const void *buf, uint16_t len)
->  {
-> +       const struct hal_cmd_gatt_server_add_service *cmd = buf;
-> +       struct hal_ev_gatt_server_service_added ev;
-> +       enum gatt_db_service_type type;
-> +       struct gatt_server *server;
-> +       uint8_t status;
-> +       bt_uuid_t uuid;
-> +
->         DBG("");
->
-> +       memset(&ev, 0, sizeof(ev));
-> +
-> +       server = find_server_by_id(cmd->server_if);
-> +       if (!server) {
-> +               status = HAL_STATUS_FAILED;
-> +               goto failed;
-> +       }
-> +
-> +       if (cmd->srvc_id.is_primary)
-> +               type = GATT_DB_SERVICE_PRIMARY;
-> +       else
-> +               type = GATT_DB_SERVICE_SECONDARY;
-> +
-> +       android2uuid(cmd->srvc_id.uuid, &uuid);
-> +
-> +       ev.srvc_handle = gatt_db_new_service(gatt_db, &uuid, type,
-> +                                                       cmd->num_handles);
-> +       if (!ev.srvc_handle) {
-> +               status = HAL_STATUS_FAILED;
-> +               goto failed;
-> +       }
-> +
-> +       status = HAL_STATUS_SUCCESS;
-> +
-> +failed:
-> +       ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
 
-I am not sure how many errors are planned, maybe it will be more
-convenient to add an error conversion helper: hal ->gatt
+Please add a brief description here
 
-> +       ev.srvc_id = cmd->srvc_id;
-> +       ev.server_if = cmd->server_if;
-> +
-> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-> +               HAL_EV_GATT_SERVER_SERVICE_ADDED, sizeof(ev), &ev);
-> +
->         ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-> -                       HAL_OP_GATT_SERVER_ADD_SERVICE, HAL_STATUS_FAILED);
-> +                       HAL_OP_GATT_SERVER_ADD_SERVICE, status);
->  }
->
->  static void handle_server_add_included_service(const void *buf, uint16_t len)
-> @@ -2859,6 +2906,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
->         gatt_clients = queue_new();
->         gatt_servers = queue_new();
->         disc_dev_list = queue_new();
-> +       gatt_db = gatt_db_new();
->
->         if (!conn_list || !conn_wait_queue || !gatt_clients || !gatt_servers ||
->                                                         !disc_dev_list) {
-> @@ -2879,6 +2927,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
->                 queue_destroy(disc_dev_list, NULL);
->                 disc_dev_list = NULL;
->
-> +               gatt_db_destroy(gatt_db);
-> +               gatt_db = NULL;
-> +
->                 return false;
->         }
->
-> @@ -2913,4 +2964,7 @@ void bt_gatt_unregister(void)
->
->         queue_destroy(disc_dev_list, destroy_device);
->         disc_dev_list = NULL;
-> +
-> +       gatt_db_destroy(gatt_db);
-> +       gatt_db = NULL;
->  }
+> +uint16_t gatt_db_new_included_service(struct gatt_db *db, uint16_t handle,
+> +                                               uint16_t included_handle);
 > --
 > 1.8.5.3
 >
