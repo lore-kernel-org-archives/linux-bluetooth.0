@@ -1,44 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] Bluetooth: Allow discovery during advertising
-Date: Tue, 15 Apr 2014 21:04:11 +0200
-Message-Id: <1397588651-13459-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1397027234-12003-16-git-send-email-marcin.kraglak@tieto.com>
+References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
+	<1397027234-12003-16-git-send-email-marcin.kraglak@tieto.com>
+Date: Tue, 15 Apr 2014 09:59:20 -0300
+Message-ID: <CAKT1EBcOCAKLv2LevnJrQcS9gHcmw3c-NZROiw+vWg19FrKPKA@mail.gmail.com>
+Subject: Re: [RFC 15/16] android/gatt: Add stop service command handling
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch it is possible to start scan when device does
-advertising.
+Hi Marcin,
 
-Most of chips do support such state combination, so there is no reason
-for blocking it here.
-If chip does not support this, kernel should get command status event
-with command disallowed status which should not make any problems.
+On Wed, Apr 9, 2014 at 4:07 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+> It will stop service in local database.
+> ---
+>  android/gatt.c | 26 +++++++++++++++++++++++++-
+>  1 file changed, 25 insertions(+), 1 deletion(-)
+>
+> diff --git a/android/gatt.c b/android/gatt.c
+> index edcb7aa..f5324f3 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -2881,10 +2881,34 @@ failed:
+>
+>  static void handle_server_stop_service(const void *buf, uint16_t len)
+>  {
+> +       const struct hal_cmd_gatt_server_stop_service *cmd = buf;
+> +       struct hal_ev_gatt_server_service_stopped ev;
+> +       struct gatt_server *server;
+> +       uint8_t status;
 
-Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
----
- net/bluetooth/mgmt.c | 7 -------
- 1 file changed, 7 deletions(-)
+"status" could be initialized to "HAL_STATUS_FAILED"
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 54abbce..57cef73 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3474,13 +3474,6 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
- 			goto failed;
- 		}
- 
--		if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
--			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
--					 MGMT_STATUS_REJECTED);
--			mgmt_pending_remove(cmd);
--			goto failed;
--		}
--
- 		/* If controller is scanning, it means the background scanning
- 		 * is running. Thus, we should temporarily stop it in order to
- 		 * set the discovery scanning parameters.
--- 
-1.8.4
+> +
+>         DBG("");
+>
+> +       server = find_server_by_id(cmd->server_if);
+> +       if (!server) {
+> +               status = HAL_STATUS_FAILED;
+> +               goto failed;
+> +       }
+> +
+> +       if (!gatt_db_stop_service(gatt_db, cmd->service_handle))
+> +               status = HAL_STATUS_FAILED;
+> +       else
+> +               status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+> +       ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
 
+Use conversion helper (hal ->gatt)?
+
+> +       ev.server_if = cmd->server_if;
+> +       ev.srvc_handle = cmd->service_handle;
+> +
+> +       ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+> +                       HAL_EV_GATT_SERVER_SERVICE_STOPPED, sizeof(ev), &ev);
+> +
+>         ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> -                       HAL_OP_GATT_SERVER_STOP_SERVICE, HAL_STATUS_FAILED);
+> +                               HAL_OP_GATT_SERVER_STOP_SERVICE, status);
+>  }
+>
+>  static void handle_server_delete_service(const void *buf, uint16_t len)
+> --
+> 1.8.5.3
+>
+
+Claudio
