@@ -2,74 +2,58 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android: Build hciattach tool
-Date: Tue, 15 Apr 2014 14:41:05 +0200
-Message-Id: <1397565665-28832-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] tools/hciattach: Fix missing includes
+Date: Tue, 15 Apr 2014 13:30:53 +0200
+Message-Id: <1397561453-23047-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+According to writev manual one should include <sys/uio.h> to use it.
+
+This fix following warnings with bionic:
+external/bluetooth/bluez/tools/hciattach_tialt.c: In function
+    'texas_load_firmware':
+external/bluetooth/bluez/tools/hciattach_tialt.c:142:4: warning:
+    implicit declaration of function 'writev'
+    [-Wimplicit-function-declaration]
+target thumb C: hciattach <= external/bluetooth/bluez/tools/
+    hciattach_ath3k.c
+target thumb C: hciattach <= external/bluetooth/bluez/tools/
+    hciattach_qualcomm.c
+external/bluetooth/bluez/tools/hciattach_qualcomm.c: In function
+    'qualcomm_load_firmware':
+external/bluetooth/bluez/tools/hciattach_qualcomm.c:147:4: warning:
+    implicit declaration of function 'writev'
+    [-Wimplicit-function-declaration]
 ---
-This requires ppoll. bionic at http://code.google.com/p/aosp-bluez
-was updated with ppoll backported from bionic master branch.
+ tools/hciattach_qualcomm.c | 1 +
+ tools/hciattach_tialt.c    | 1 +
+ 2 files changed, 2 insertions(+)
 
- android/Android.mk | 30 ++++++++++++++++++++++++++++++
- android/README     |  2 +-
- 2 files changed, 31 insertions(+), 1 deletion(-)
-
-diff --git a/android/Android.mk b/android/Android.mk
-index 5f4e70c..f838bfd 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -443,6 +443,36 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
- include $(BUILD_EXECUTABLE)
+diff --git a/tools/hciattach_qualcomm.c b/tools/hciattach_qualcomm.c
+index 0e02e1e..eb72a0f 100644
+--- a/tools/hciattach_qualcomm.c
++++ b/tools/hciattach_qualcomm.c
+@@ -40,6 +40,7 @@
+ #include <sys/poll.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
++#include <sys/uio.h>
  
- #
-+# hciattach
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/tools/hciattach.c \
-+	bluez/tools/hciattach_st.c \
-+	bluez/tools/hciattach_ti.c \
-+	bluez/tools/hciattach_tialt.c \
-+	bluez/tools/hciattach_ath3k.c \
-+	bluez/tools/hciattach_qualcomm.c \
-+	bluez/tools/hciattach_intel.c \
-+	bluez/tools/hciattach_bcm43xx.c \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_TAGS := optional
-+LOCAL_MODULE := hciattach
-+
-+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-+
-+include $(BUILD_EXECUTABLE)
-+
-+#
- # libsbc
- #
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
+diff --git a/tools/hciattach_tialt.c b/tools/hciattach_tialt.c
+index c3caa49..5c7f3a5 100644
+--- a/tools/hciattach_tialt.c
++++ b/tools/hciattach_tialt.c
+@@ -39,6 +39,7 @@
+ #include <sys/poll.h>
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
++#include <sys/uio.h>
  
-diff --git a/android/README b/android/README
-index ff4d7bf..6254d34 100644
---- a/android/README
-+++ b/android/README
-@@ -33,7 +33,7 @@ by BlueZ. SBC code is available at git://git.kernel.org/pub/scm/bluetooth/sbc
- - Bionic support - Currently only 'master' branch available at
- https://android.googlesource.com/platform/bionic provides all required
- functionality and running BlueZ on release branch requires backporting missing
--features (currently only epoll_create1 call for Android 4.4.2). Sample
-+features (currently epoll_create1 and ppoll calls for Android 4.4.2). Sample
- Bionic for Android 4.4.2 with all required features backported is available at
- https://code.google.com/p/aosp-bluez.platform-bionic/
- 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
 -- 
 1.9.1
 
