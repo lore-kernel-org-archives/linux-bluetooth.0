@@ -1,146 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 1/4] gatt: Add skeleton of gatt-db
-Date: Wed, 16 Apr 2014 09:19:04 +0200
-Message-Id: <1397632747-13308-2-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv1 4/4] gatt: Add remove_service function to gatt-db
+Date: Wed, 16 Apr 2014 09:19:07 +0200
+Message-Id: <1397632747-13308-5-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1397632747-13308-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1397632747-13308-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This change adds new() and destroy() fuctions for gatt_db,
-which will be used for storing local attributes.
+It will remove service with given handle. Return true if service
+was found and removed, otherwise false.
 ---
- android/Android.mk   |  1 +
- android/Makefile.am  |  1 +
- src/shared/gatt-db.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 38 ++++++++++++++++++++++++++++++++++++++
- 4 files changed, 87 insertions(+)
- create mode 100644 src/shared/gatt-db.c
- create mode 100644 src/shared/gatt-db.h
+ src/shared/gatt-db.c | 21 +++++++++++++++++++++
+ src/shared/gatt-db.h | 11 +++++++++++
+ 2 files changed, 32 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 5f4e70c..4c9cfb5 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
- 	bluez/src/shared/queue.c \
- 	bluez/src/shared/ringbuf.c \
- 	bluez/src/shared/hfp.c \
-+	bluez/src/shared/gatt-db.c \
- 	bluez/src/shared/io-glib.c \
- 	bluez/src/sdpd-database.c \
- 	bluez/src/sdpd-service.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index c51cce2..70e1dec 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -29,6 +29,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				src/shared/mgmt.h src/shared/mgmt.c \
- 				src/shared/ringbuf.h src/shared/ringbuf.c \
- 				src/shared/hfp.h src/shared/hfp.c \
-+				src/shared/gatt-db.h src/shared/gatt-db.c \
- 				android/bluetooth.h android/bluetooth.c \
- 				android/hidhost.h android/hidhost.c \
- 				android/ipc-common.h \
 diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-new file mode 100644
-index 0000000..e56b381
---- /dev/null
+index 0094616..7dc5908 100644
+--- a/src/shared/gatt-db.c
 +++ b/src/shared/gatt-db.c
-@@ -0,0 +1,47 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+#include "src/shared/util.h"
-+#include "src/shared/gatt-db.h"
-+
-+struct gatt_db {
-+	uint16_t next_handle;
-+};
-+
-+struct gatt_db *gatt_db_new(void)
+@@ -50,6 +50,13 @@ struct gatt_db_service {
+ 	struct gatt_db_attribute **attributes;
+ };
+ 
++static bool match_service_by_handle(const void *data, const void *user_data)
 +{
-+	struct gatt_db *db;
++	const struct gatt_db_service *service = data;
 +
-+	db = new0(struct gatt_db, 1);
-+	if (!db)
-+		return NULL;
-+
-+	db->next_handle = 0x0001;
-+
-+	return db;
++	return service->attributes[0]->handle == PTR_TO_INT(user_data);
 +}
 +
-+void gatt_db_destroy(struct gatt_db *db)
+ struct gatt_db *gatt_db_new(void)
+ {
+ 	struct gatt_db *db;
+@@ -166,3 +173,17 @@ uint16_t gatt_db_new_service(struct gatt_db *db, const bt_uuid_t *uuid,
+ 
+ 	return service->attributes[0]->handle;
+ }
++
++bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle)
 +{
-+	free(db);
++	struct gatt_db_service *service;
++
++	service = queue_remove_if(db->services, match_service_by_handle,
++							INT_TO_PTR(handle));
++	if (!service)
++		return false;
++
++	gatt_db_service_destroy(service);
++
++	return true;
 +}
 diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-new file mode 100644
-index 0000000..b3cd7a6
---- /dev/null
+index 1656bb0..a98684b 100644
+--- a/src/shared/gatt-db.h
 +++ b/src/shared/gatt-db.h
-@@ -0,0 +1,38 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
-+
-+struct gatt_db;
+@@ -50,3 +50,14 @@ void gatt_db_destroy(struct gatt_db *db);
+  */
+ uint16_t gatt_db_new_service(struct gatt_db *db, const bt_uuid_t *uuid,
+ 					bool primary, uint16_t num_handles);
 +
 +/*
-+ * gatt_db_new - Create new database for storing attributes
++ * gatt_db_remove_service - remove service from attribute database
 + *
-+ * Returns new database. In case of error NULL will be returned.
-+ */
-+struct gatt_db *gatt_db_new(void);
-+
-+/*
-+ * gatt_db_destroy - Destroy gatt database
++ * @db - gatt database
++ * @handle - service handle
 + *
-+ * @db - gatt database to be destroyed
++ * Return true if service was successfully removed. In case of error false is
++ * returned
 + */
-+void gatt_db_destroy(struct gatt_db *db);
++bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle);
 -- 
 1.8.5.3
 
