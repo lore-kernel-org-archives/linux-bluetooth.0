@@ -1,388 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] android/gatt: Add support for uuid filter in search services
-Date: Wed, 16 Apr 2014 16:52:52 +0200
-Message-Id: <1397659972-19065-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1397659972-19065-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1397659972-19065-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABD6X-K=u9jN0P6ZoxYwhaEftt=XVD9kbgY8VwxbN8qPjvfb7w@mail.gmail.com>
+References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
+	<1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
+	<CAKT1EBd_sJ0Q17BV1Q8z9zr8mQd=iuj8GMPQcnVB=x7FRg_05w@mail.gmail.com>
+	<CABD6X-K=u9jN0P6ZoxYwhaEftt=XVD9kbgY8VwxbN8qPjvfb7w@mail.gmail.com>
+Date: Wed, 16 Apr 2014 09:25:32 -0300
+Message-ID: <CAKT1EBfWJsDsNVw+R4BGE6TLFdu+Ks6m81+bz=9C0c1WDE_J0w@mail.gmail.com>
+Subject: Re: [RFC 01/16] gatt: Add skeleton of gatt-db
+From: Claudio Takahasi <claudio.takahasi@openbossa.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds support for filtering by uuid in searched services. If device
-is scanned for service by uuid, if found - will be added to cache and
-partial service search flag will be set. While performing whole services
-device scan then if partial scan was performed earlier, service cache
-will be refreshed.
----
- android/gatt.c | 303 ++++++++++++++++++++++++++++++++++++++++++---------------
- 1 file changed, 222 insertions(+), 81 deletions(-)
+Hi Marcin,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 30530f7..b804e2f 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -123,6 +123,7 @@ struct gatt_device {
- 	GAttrib *attrib;
- 	GIOChannel *att_io;
- 	struct queue *services;
-+	bool partial_srvc_search;
- 
- 	guint watch_id;
- };
-@@ -356,6 +357,22 @@ static bool match_char_by_higher_inst_id(const void *data,
- 	return inst_id < ch->id.instance;
- }
- 
-+static bool match_srvc_by_bt_uuid(const void *data, const void *user_data)
-+{
-+	const bt_uuid_t *exp_uuid = user_data;
-+	const struct service *service = data;
-+
-+	return !bt_uuid_cmp(exp_uuid, &service->id.uuid);
-+}
-+
-+static bool match_srvc_by_range(const void *data, const void *user_data)
-+{
-+	const struct service *srvc = data;
-+	const struct att_range *range = user_data;
-+
-+	return !memcmp(&srvc->prim.range, range, sizeof(srvc->prim.range));
-+}
-+
- static bool match_descr_by_element_id(const void *data, const void *user_data)
- {
- 	const struct element_id *exp_id = user_data;
-@@ -697,22 +714,6 @@ static void send_client_primary_notify(void *data, void *user_data)
- 					sizeof(ev), &ev);
- }
- 
--static void send_client_all_primary(int32_t status, struct queue *services,
--							int32_t conn_id)
--{
--	struct hal_ev_gatt_client_search_complete ev;
--
--	if (!status)
--		queue_foreach(services, send_client_primary_notify,
--							INT_TO_PTR(conn_id));
--
--	ev.status = status;
--	ev.conn_id = conn_id;
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_EV_GATT_CLIENT_SEARCH_COMPLETE, sizeof(ev), &ev);
--
--}
--
- static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 								void *data)
- {
-@@ -760,63 +761,6 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	return s;
- }
- 
--static void primary_cb(uint8_t status, GSList *services, void *user_data)
--{
--	struct gatt_device *dev = user_data;
--	GSList *l;
--	int32_t gatt_status;
--	uint8_t instance_id;
--
--	DBG("Status %d", status);
--
--	if (status) {
--		error("gatt: Discover all primary services failed: %s",
--							att_ecode2str(status));
--		gatt_status = GATT_FAILURE;
--		goto done;
--	}
--
--	if (!services) {
--		info("gatt: No primary services found");
--		gatt_status = GATT_SUCCESS;
--		goto done;
--	}
--
--	if (!queue_isempty(dev->services)) {
--		info("gatt: Services already cached");
--		gatt_status = GATT_SUCCESS;
--		goto done;
--	}
--
--	/* There might be multiply services with same uuid. Therefore make sure
--	 * each primary service one has unique instance_id
--	 */
--	instance_id = 0;
--
--	for (l = services; l; l = l->next) {
--		struct gatt_primary *prim = l->data;
--		struct service *p;
--
--		p = create_service(instance_id++, true, prim->uuid, prim);
--		if (!p)
--			continue;
--
--		if (!queue_push_tail(dev->services, p)) {
--			error("gatt: Cannot push primary service to the list");
--			free(p);
--			continue;
--		}
--
--		DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
--			prim->range.start, prim->range.end, prim->uuid);
--	}
--
--	gatt_status = GATT_SUCCESS;
--
--done:
--	send_client_all_primary(gatt_status, dev->services, dev->conn_id);
--}
--
- static void client_disconnect_notify(void *data, void *user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -1478,11 +1422,179 @@ done:
- 									status);
- }
- 
-+struct discover_srvc_data {
-+	bt_uuid_t uuid;
-+	struct gatt_device *dev;
-+};
-+
-+static void send_client_search_complete_notify(int32_t status, int32_t conn_id)
-+{
-+	struct hal_ev_gatt_client_search_complete ev;
-+
-+	ev.status = status;
-+	ev.conn_id = conn_id;
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_CLIENT_SEARCH_COMPLETE, sizeof(ev), &ev);
-+}
-+
-+static void discover_srvc_all_cb(uint8_t status, GSList *services,
-+								void *user_data)
-+{
-+	struct discover_srvc_data *cb_data = user_data;
-+	int32_t gatt_status;
-+	GSList *l;
-+	/* There might be multiply services with same uuid. Therefore make sure
-+	 * each primary service one has unique instance_id
-+	 */
-+	uint8_t instance_id = queue_length(cb_data->dev->services);
-+
-+	DBG("Status %d", status);
-+
-+	if (status) {
-+		error("gatt: Discover all primary services failed: %s",
-+							att_ecode2str(status));
-+		gatt_status = GATT_FAILURE;
-+		goto reply;
-+	}
-+
-+	if (!services) {
-+		info("gatt: No primary services found");
-+		gatt_status = GATT_SUCCESS;
-+		goto reply;
-+	}
-+
-+	for (l = services; l; l = l->next) {
-+		struct gatt_primary *prim = l->data;
-+		struct service *p;
-+
-+		if (queue_find(cb_data->dev->services, match_srvc_by_range,
-+								&prim->range))
-+			continue;
-+
-+		p = create_service(instance_id++, true, prim->uuid, prim);
-+		if (!p)
-+			continue;
-+
-+		if (!queue_push_tail(cb_data->dev->services, p)) {
-+			error("gatt: Cannot push primary service to the list");
-+			free(p);
-+			continue;
-+		}
-+
-+		DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
-+			prim->range.start, prim->range.end, prim->uuid);
-+	}
-+
-+	/* Send all found services notifications - first cache,
-+	 * then send notifies
-+	 */
-+	queue_foreach(cb_data->dev->services, send_client_primary_notify,
-+					INT_TO_PTR(cb_data->dev->conn_id));
-+
-+	/* Full search service scanning was performed */
-+	cb_data->dev->partial_srvc_search = false;
-+	gatt_status = GATT_SUCCESS;
-+
-+reply:
-+	send_client_search_complete_notify(gatt_status, cb_data->dev->conn_id);
-+	free(cb_data);
-+}
-+
-+static void discover_srvc_by_uuid_cb(uint8_t status, GSList *ranges,
-+								void *user_data)
-+{
-+	struct discover_srvc_data *cb_data = user_data;
-+	struct gatt_primary *prim;
-+	struct service *s;
-+	int32_t gatt_status;
-+	uint8_t instance_id = queue_length(cb_data->dev->services);
-+
-+	DBG("Status %d", status);
-+
-+	if (status) {
-+		error("gatt: Discover pri srvc filtered by uuid failed: %s",
-+							att_ecode2str(status));
-+		gatt_status = GATT_FAILURE;
-+		goto reply;
-+	}
-+
-+	if (!ranges) {
-+		info("gatt: No primary services found");
-+		gatt_status = GATT_SUCCESS;
-+		goto reply;
-+	}
-+
-+	prim = new0(struct gatt_primary, 1);
-+	if (!prim) {
-+		error("gatt: Error while caching primary service");
-+		return;
-+	}
-+
-+	bt_uuid_to_string(&cb_data->uuid, prim->uuid,
-+						sizeof(prim->uuid));
-+	/* If multiple instances of the same service (as identified by UUID)
-+	 * exist, the first instance of the service is returned.
-+	 */
-+	memcpy(&prim->range, ranges->data, sizeof(prim->range));
-+
-+	s = create_service(instance_id++, true, prim->uuid, prim);
-+	if (!s) {
-+		free(prim);
-+		gatt_status = GATT_FAILURE;
-+		goto reply;
-+	}
-+
-+	if (!queue_push_tail(cb_data->dev->services, s)) {
-+		error("gatt: Cannot push primary service to the list");
-+		free(prim);
-+		gatt_status = GATT_FAILURE;
-+		goto reply;
-+	}
-+
-+	send_client_primary_notify(s, INT_TO_PTR(cb_data->dev->conn_id));
-+
-+	DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
-+		prim->range.start, prim->range.end, prim->uuid);
-+
-+	/* Partial search service scanning was performed */
-+	cb_data->dev->partial_srvc_search = true;
-+	gatt_status = GATT_SUCCESS;
-+
-+reply:
-+	send_client_search_complete_notify(gatt_status, cb_data->dev->conn_id);
-+	free(cb_data);
-+}
-+
-+static guint search_dev_for_srvc(struct gatt_device *dev, bt_uuid_t *uuid)
-+{
-+	struct discover_srvc_data *cb_data =
-+					new0(struct discover_srvc_data, 1);
-+
-+	if (!cb_data) {
-+		error("gatt: Cannot allocate cb data");
-+		return 0;
-+	}
-+
-+	cb_data->dev = dev;
-+
-+	if (uuid) {
-+		memcpy(&cb_data->uuid, uuid, sizeof(cb_data->uuid));
-+		return gatt_discover_primary(dev->attrib, uuid,
-+					discover_srvc_by_uuid_cb, cb_data);
-+	} else {
-+		return gatt_discover_primary(dev->attrib, NULL,
-+						discover_srvc_all_cb, cb_data);
-+	}
-+}
-+
- static void handle_client_search_service(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_search_service *cmd = buf;
- 	struct gatt_device *dev;
- 	uint8_t status;
-+	struct service *s;
-+	bt_uuid_t uuid;
-+	guint srvc_search_success;
- 
- 	DBG("");
- 
-@@ -1494,25 +1606,54 @@ static void handle_client_search_service(const void *buf, uint16_t len)
- 	}
- 
- 	/* TODO:  Handle filter uuid */
-+		android2uuid(cmd->filter_uuid, &uuid);
-+
-+	/* Services not cached yet */
-+	if (queue_isempty(dev->services)) {
-+		if (cmd->number)
-+			srvc_search_success = search_dev_for_srvc(dev, &uuid);
-+		else
-+			srvc_search_success = search_dev_for_srvc(dev, NULL);
-+
-+		if (!srvc_search_success) {
-+			status = HAL_STATUS_FAILED;
-+			goto reply;
-+		}
- 
--	/* Use cache if possible */
--	if (!queue_isempty(dev->services)) {
- 		status = HAL_STATUS_SUCCESS;
--		send_client_all_primary(GATT_SUCCESS, dev->services,
--								dev->conn_id);
- 		goto reply;
- 	}
- 
--	if (!gatt_discover_primary(dev->attrib, NULL, primary_cb, dev)) {
--		status = HAL_STATUS_FAILED;
--		goto reply;
-+	/* Search in cached services for given service */
-+	if (cmd->number) {
-+		/* Search in cache for service by uuid */
-+		s = queue_find(dev->services, match_srvc_by_bt_uuid, &uuid);
-+
-+		if (s) {
-+			send_client_primary_notify(s, INT_TO_PTR(dev->conn_id));
-+		} else {
-+			if (!search_dev_for_srvc(dev, &uuid))
-+				status = HAL_STATUS_FAILED;
-+
-+			status = HAL_STATUS_SUCCESS;
-+			goto reply;
-+		}
-+	} else {
-+		/* Refresh service cache if only partial search was performed */
-+		if (dev->partial_srvc_search)
-+			srvc_search_success = search_dev_for_srvc(dev, NULL);
-+		else
-+			queue_foreach(dev->services, send_client_primary_notify,
-+						INT_TO_PTR(cmd->conn_id));
- 	}
- 
-+	send_client_search_complete_notify(GATT_SUCCESS, dev->conn_id);
-+
- 	status = HAL_STATUS_SUCCESS;
- 
- reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
-+				HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
- }
- 
- static void send_client_incl_service_notify(const struct service *prim,
--- 
-1.9.1
+On Mon, Apr 14, 2014 at 4:15 PM, Marcin Kraglak
+<marcin.kraglak@tieto.com> wrote:
+> Hi Claudio,
+>
+> On 14 April 2014 16:12, Claudio Takahasi <claudio.takahasi@openbossa.org> wrote:
+>> Hi Marcin,
+>>
+>> On Wed, Apr 9, 2014 at 4:06 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
+>>> This change adds new() and destroy() fuctions for gatt_db,
+>>> which will be used for storing local attributes.
+>>> ---
+>>>  android/Android.mk   |  1 +
+>>>  android/Makefile.am  |  1 +
+>>>  src/shared/gatt-db.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+>>>  src/shared/gatt-db.h | 27 +++++++++++++++++++++++++++
+>>>  4 files changed, 76 insertions(+)
+>>>  create mode 100644 src/shared/gatt-db.c
+>>>  create mode 100644 src/shared/gatt-db.h
+>>>
+>>> diff --git a/android/Android.mk b/android/Android.mk
+>>> index 5f4e70c..4c9cfb5 100644
+>>> --- a/android/Android.mk
+>>> +++ b/android/Android.mk
+>>> @@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
+>>>         bluez/src/shared/queue.c \
+>>>         bluez/src/shared/ringbuf.c \
+>>>         bluez/src/shared/hfp.c \
+>>> +       bluez/src/shared/gatt-db.c \
+>>>         bluez/src/shared/io-glib.c \
+>>>         bluez/src/sdpd-database.c \
+>>>         bluez/src/sdpd-service.c \
+>>> diff --git a/android/Makefile.am b/android/Makefile.am
+>>> index c51cce2..70e1dec 100644
+>>> --- a/android/Makefile.am
+>>> +++ b/android/Makefile.am
+>>> @@ -29,6 +29,7 @@ android_bluetoothd_SOURCES = android/main.c \
+>>>                                 src/shared/mgmt.h src/shared/mgmt.c \
+>>>                                 src/shared/ringbuf.h src/shared/ringbuf.c \
+>>>                                 src/shared/hfp.h src/shared/hfp.c \
+>>> +                               src/shared/gatt-db.h src/shared/gatt-db.c \
+>>>                                 android/bluetooth.h android/bluetooth.c \
+>>>                                 android/hidhost.h android/hidhost.c \
+>>>                                 android/ipc-common.h \
+>>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+>>> new file mode 100644
+>>> index 0000000..e56b381
+>>> --- /dev/null
+>>> +++ b/src/shared/gatt-db.c
+>>> @@ -0,0 +1,47 @@
+>>> +/*
+>>> + *
+>>> + *  BlueZ - Bluetooth protocol stack for Linux
+>>> + *
+>>> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+>>> + *
+>>> + *
+>>> + *  This library is free software; you can redistribute it and/or
+>>> + *  modify it under the terms of the GNU Lesser General Public
+>>> + *  License as published by the Free Software Foundation; either
+>>> + *  version 2.1 of the License, or (at your option) any later version.
+>>> + *
+>>> + *  This library is distributed in the hope that it will be useful,
+>>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+>>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+>>> + *  Lesser General Public License for more details.
+>>> + *
+>>> + *  You should have received a copy of the GNU Lesser General Public
+>>> + *  License along with this library; if not, write to the Free Software
+>>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+>>> + *
+>>> + */
+>>> +
+>>> +#include "src/shared/util.h"
+>>> +#include "src/shared/gatt-db.h"
+>>> +
+>>> +struct gatt_db {
+>>> +       uint16_t next_handle;
+>>> +};
+>>> +
+>>> +struct gatt_db *gatt_db_new(void)
+>>> +{
+>>> +       struct gatt_db *db;
+>>> +
+>>> +       db = new0(struct gatt_db, 1);
+>>> +       if (!db)
+>>> +               return NULL;
+>>> +
+>>> +       db->next_handle = 0x0001;
+>>> +
+>>> +       return db;
+>>> +}
+>>
+>> Are you considering to use the same function to allocate/create a
+>> database to represent the remote "virtual" database?
+>> My point is: the same infra-structure could be used to represent a
+>> local database(per adapter maybe) or remote database.
+>>
+>
+> We could add argument to new() like type: remote or local. What you
+> think about it?
 
+My intention was only to raise the possibility of having a common
+database for both: client and servers.
+We don't need to support it now, but we need to define a flexible
+architecture to allow extending it later.
+
+Claudio
