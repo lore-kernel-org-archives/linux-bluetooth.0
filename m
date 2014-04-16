@@ -1,34 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 0/4] Gatt attributes database skeleton
-Date: Wed, 16 Apr 2014 09:19:03 +0200
-Message-Id: <1397632747-13308-1-git-send-email-marcin.kraglak@tieto.com>
+From: Bing Zhao <bzhao@marvell.com>
+To: Petri Gynther <pgynther@google.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date: Tue, 15 Apr 2014 20:45:53 -0700
+Subject: RE: [PATCH] Bluetooth: btmrvl: Fix btmrvl_send_module_cfg_cmd()
+Message-ID: <477F20668A386D41ADCC57781B1F70430F7068606E@SC-VEXCH1.marvell.com>
+References: <20140415200001.1356C10153C@puck.mtv.corp.google.com>
+In-Reply-To: <20140415200001.1356C10153C@puck.mtv.corp.google.com>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This set introduce gatt database skeleton for storing local attributes.
-Now functionality for creating, destroying database and adding/removing
-services is provided.
-In comparision to RFC version, comments are added in header file, and type
-of sevice enum was replaced with bool "primary".
+Hi,
 
-Comments are welcome
+> Change subcmd parameter from int to u8 to match its use:
+> btmrvl_send_sync_cmd(priv, BT_CMD_MODULE_CFG_REQ, &subcmd, 1);
+> 
+> Signed-off-by: Petri Gynther <pgynther@google.com>
 
-Marcin Kraglak (4):
-  gatt: Add skeleton of gatt-db
-  gatt: Add services list to gatt_db struct
-  gatt: Add method for creating services in gatt_db
-  gatt: Add remove_service function to gatt-db
+This patch looks good to me, feel free to add:
 
- android/Android.mk   |   1 +
- android/Makefile.am  |   1 +
- src/shared/gatt-db.c | 189 +++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  63 +++++++++++++++++
- 4 files changed, 254 insertions(+)
- create mode 100644 src/shared/gatt-db.c
- create mode 100644 src/shared/gatt-db.h
+Reviewed-by: Bing Zhao <bzhao@marvell.com>
 
--- 
-1.8.5.3
+Thanks,
+Bing
+
+> ---
+>  drivers/bluetooth/btmrvl_drv.h  | 2 +-
+>  drivers/bluetooth/btmrvl_main.c | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+> index 199ff49..dc79f88 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -142,7 +142,7 @@ void btmrvl_interrupt(struct btmrvl_private *priv);
+>  bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
+>  int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
+> 
+> -int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd);
+> +int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, u8 subcmd);
+>  int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv);
+>  int btmrvl_enable_ps(struct btmrvl_private *priv);
+>  int btmrvl_prepare_command(struct btmrvl_private *priv);
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index 5c0b944..e9dbddb 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -202,7 +202,7 @@ static int btmrvl_send_sync_cmd(struct btmrvl_private *priv, u16 opcode,
+>  	return 0;
+>  }
+> 
+> -int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, int subcmd)
+> +int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, u8 subcmd)
+>  {
+>  	int ret;
+> 
+> --
+> 1.9.1.423.g4596e3a
 
