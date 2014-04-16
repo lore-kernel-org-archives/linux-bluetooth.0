@@ -1,126 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABD6X-K=u9jN0P6ZoxYwhaEftt=XVD9kbgY8VwxbN8qPjvfb7w@mail.gmail.com>
-References: <1397027234-12003-1-git-send-email-marcin.kraglak@tieto.com>
-	<1397027234-12003-2-git-send-email-marcin.kraglak@tieto.com>
-	<CAKT1EBd_sJ0Q17BV1Q8z9zr8mQd=iuj8GMPQcnVB=x7FRg_05w@mail.gmail.com>
-	<CABD6X-K=u9jN0P6ZoxYwhaEftt=XVD9kbgY8VwxbN8qPjvfb7w@mail.gmail.com>
-Date: Wed, 16 Apr 2014 09:25:32 -0300
-Message-ID: <CAKT1EBfWJsDsNVw+R4BGE6TLFdu+Ks6m81+bz=9C0c1WDE_J0w@mail.gmail.com>
-Subject: Re: [RFC 01/16] gatt: Add skeleton of gatt-db
+In-Reply-To: <3D02B219753AD44CBDDDE484323B177411279AD6@SHSMSX104.ccr.corp.intel.com>
+References: <3D02B219753AD44CBDDDE484323B177411279AD6@SHSMSX104.ccr.corp.intel.com>
+Date: Wed, 16 Apr 2014 09:20:37 -0300
+Message-ID: <CAKT1EBdJmd=faGGx2EJf_j79ehrWqWNP34kBAj4p4TewZ4JJCA@mail.gmail.com>
+Subject: Re: For Gatt feature question.
 From: Claudio Takahasi <claudio.takahasi@openbossa.org>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+To: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Chaojie Gu,
 
-On Mon, Apr 14, 2014 at 4:15 PM, Marcin Kraglak
-<marcin.kraglak@tieto.com> wrote:
-> Hi Claudio,
+On Wed, Apr 16, 2014 at 5:17 AM, Gu, Chao Jie <chao.jie.gu@intel.com> wrote:
+> Hi, Claudio:
 >
-> On 14 April 2014 16:12, Claudio Takahasi <claudio.takahasi@openbossa.org> wrote:
->> Hi Marcin,
->>
->> On Wed, Apr 9, 2014 at 4:06 AM, Marcin Kraglak <marcin.kraglak@tieto.com> wrote:
->>> This change adds new() and destroy() fuctions for gatt_db,
->>> which will be used for storing local attributes.
->>> ---
->>>  android/Android.mk   |  1 +
->>>  android/Makefile.am  |  1 +
->>>  src/shared/gatt-db.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
->>>  src/shared/gatt-db.h | 27 +++++++++++++++++++++++++++
->>>  4 files changed, 76 insertions(+)
->>>  create mode 100644 src/shared/gatt-db.c
->>>  create mode 100644 src/shared/gatt-db.h
->>>
->>> diff --git a/android/Android.mk b/android/Android.mk
->>> index 5f4e70c..4c9cfb5 100644
->>> --- a/android/Android.mk
->>> +++ b/android/Android.mk
->>> @@ -51,6 +51,7 @@ LOCAL_SRC_FILES := \
->>>         bluez/src/shared/queue.c \
->>>         bluez/src/shared/ringbuf.c \
->>>         bluez/src/shared/hfp.c \
->>> +       bluez/src/shared/gatt-db.c \
->>>         bluez/src/shared/io-glib.c \
->>>         bluez/src/sdpd-database.c \
->>>         bluez/src/sdpd-service.c \
->>> diff --git a/android/Makefile.am b/android/Makefile.am
->>> index c51cce2..70e1dec 100644
->>> --- a/android/Makefile.am
->>> +++ b/android/Makefile.am
->>> @@ -29,6 +29,7 @@ android_bluetoothd_SOURCES = android/main.c \
->>>                                 src/shared/mgmt.h src/shared/mgmt.c \
->>>                                 src/shared/ringbuf.h src/shared/ringbuf.c \
->>>                                 src/shared/hfp.h src/shared/hfp.c \
->>> +                               src/shared/gatt-db.h src/shared/gatt-db.c \
->>>                                 android/bluetooth.h android/bluetooth.c \
->>>                                 android/hidhost.h android/hidhost.c \
->>>                                 android/ipc-common.h \
->>> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
->>> new file mode 100644
->>> index 0000000..e56b381
->>> --- /dev/null
->>> +++ b/src/shared/gatt-db.c
->>> @@ -0,0 +1,47 @@
->>> +/*
->>> + *
->>> + *  BlueZ - Bluetooth protocol stack for Linux
->>> + *
->>> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
->>> + *
->>> + *
->>> + *  This library is free software; you can redistribute it and/or
->>> + *  modify it under the terms of the GNU Lesser General Public
->>> + *  License as published by the Free Software Foundation; either
->>> + *  version 2.1 of the License, or (at your option) any later version.
->>> + *
->>> + *  This library is distributed in the hope that it will be useful,
->>> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
->>> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
->>> + *  Lesser General Public License for more details.
->>> + *
->>> + *  You should have received a copy of the GNU Lesser General Public
->>> + *  License along with this library; if not, write to the Free Software
->>> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
->>> + *
->>> + */
->>> +
->>> +#include "src/shared/util.h"
->>> +#include "src/shared/gatt-db.h"
->>> +
->>> +struct gatt_db {
->>> +       uint16_t next_handle;
->>> +};
->>> +
->>> +struct gatt_db *gatt_db_new(void)
->>> +{
->>> +       struct gatt_db *db;
->>> +
->>> +       db = new0(struct gatt_db, 1);
->>> +       if (!db)
->>> +               return NULL;
->>> +
->>> +       db->next_handle = 0x0001;
->>> +
->>> +       return db;
->>> +}
->>
->> Are you considering to use the same function to allocate/create a
->> database to represent the remote "virtual" database?
->> My point is: the same infra-structure could be used to represent a
->> local database(per adapter maybe) or remote database.
->>
+>          Sorry for taking your time to ask you question about GATT again.
+> Recently we have implemented the part of Gatt feature in the Bluetooth-frwk
+> in Tizen according to the Gatt-API doc in the bluez 5.18. We hope we can do
+> some test for Gatt Client operation to contribute Gatt Client DBus API
+> related development. However, now we have encountered the some issues about
+> how to test GATT operation.
 >
-> We could add argument to new() like type: remote or local. What you
-> think about it?
+> Firstly, we have to familiar with the test steps about it. Now we setup two
+> environment for testing. One acts as Gatt Server, the other acts as Gatt
+> Client.
+>
+> For Gatt Server, I've checked out the latest tag (5.18) from git and have
+> built it and gatt-example.c is compiled into a static plugin that is loaded
+> at runtime. Through the bluetoothd running, I've confirmed that the plugin
+> is compiled and is loaded at runtime. When I use gattool to do some test,
+> connection is failed.
+>
+> Gatt server Bluetooth status:
+>
+> hci0:   Type: BR/EDR  Bus: USB
+>
+>         BD Address: 00:15:83:65:01:90  ACL MTU: 310:10  SCO MTU: 64:8
+>
+>         UP RUNNING PSCAN ISCAN
+>
+>         RX bytes:4394 acl:29 sco:0 events:197 errors:0
+>
+>         TX bytes:11856 acl:35 sco:0 commands:139 errors:0
+>
+>
+>
+> Gatt client Bluetooth status:
+>
+> hci0:  Type: BR/EDR  Bus: USB
+>
+> BD Address: 00:1A:7D:DA:71:0C  ACL MTU: 310:10  SCO MTU: 64:8
+>
+> UP RUNNING PSCAN
+>
+> RX bytes:104760 acl:34 sco:0 events:619 errors:0
+>
+> TX bytes:5704 acl:31 sco:0 commands:160 errors:0
+>
+>
+>
+> My operation step is:
+>
+> 1.       Scan and Pair the gatt client with gatt server , it pair
+> successfully.
+>
+> 2.       In the server side, furthermore to register external gatt service
+> by gatt-service.
+>
+> 3.       In the client side, use command line : gatttool -i hci0 -b
+> 00:15:83:65:01:90 --primary
+>
+> To do primary service discovery.
+>
+> Command line feedback: Connection refused (111)
+>
+>
+>
+>    The client bluetoothd fail log :
+>
+> bluetoothd[29734]: src/adapter.c:connect_failed_callback() hci0
+> 00:15:83:65:01:90 status 2
+>
+> bluetoothd[29734]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
+> 00:15:83:65:01:90 type 1 status 0x2
+>
+> bluetoothd[29734]: src/adapter.c:resume_discovery()
+>
+>
+>
+> gatt_connect function has failed in the gatt tool, any option need to set in
+> the command line ?
 
-My intention was only to raise the possibility of having a common
-database for both: client and servers.
-We don't need to support it now, but we need to define a flexible
-architecture to allow extending it later.
+Please share the btmon log (of both sides).
 
+Check if this problem also happens in BlueZ master.
+
+>
+> Which steps is right method to use gattool to test the gatt operation or
+> lack other configuration for bluez in the sever side?
+
+I recommend to use the interactive mode "-I" and specify the remote
+address type.
+
+>
+>
+>
+> Secondly, there are a lot of patchset about Gatt Client DBus API
+> implementation. Should we add all the patches into the latest tag (5.18) to
+> test Gatt Client DBus API?
+
+Do you mean re-base your patches to send upstream?
+First make sure that your implementation is aligned with the
+requirements that are being discussed in the ML: bt_att_* and shared
+attribute database.
+
+Regards,
 Claudio
