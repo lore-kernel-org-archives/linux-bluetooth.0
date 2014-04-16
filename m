@@ -1,30 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] android/bluetooth: Expose API to set advertising
-Date: Wed, 16 Apr 2014 11:46:54 +0200
-Message-ID: <2337051.jIitoRbpOF@uw000953>
-In-Reply-To: <1397508787-25137-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397508787-25137-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 1/2] android/gatt: Fix caching included services descriptors
+Date: Wed, 16 Apr 2014 10:26:47 +0200
+Message-ID: <2053080.O4OVkYrQ3G@uw000953>
+In-Reply-To: <1397471991-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1397471991-21200-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Jakub,
 
-On Monday 14 of April 2014 22:53:06 Lukasz Rymanowski wrote:
-> With this patch android GAP expose start/stop advertising API
+On Monday 14 of April 2014 12:39:50 Jakub Tyszkowski wrote:
 > ---
->  android/bluetooth.c | 41 +++++++++++++++++++++++++++++++++++++++++
->  android/bluetooth.h |  4 ++++
->  2 files changed, 45 insertions(+)
+>  android/gatt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index b3fad59..93c7935 100644
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 004063c..f303aea 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1839,7 +1839,7 @@ static bool build_descr_cache(int32_t conn_id, struct gatt_device *dev,
+>  
+>  	/* Clip range to given characteristic */
+>  	start = ch->ch.value_handle + 1;
+> -	end = srvc->prim.range.end;
+> +	end = srvc->primary ? srvc->prim.range.end : srvc->incl.range.end;
+>  
+>  	/* Use next characteristic start as end. If there is none -
+>  	 * service end is valid end.
+> 
 
-This patch is now pushed, thanks.
+Both patches applied, thanks.
 
 -- 
 Best regards, 
