@@ -1,195 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Re-run OPP PTS 5.1 test
-Date: Thu, 17 Apr 2014 16:00:06 +0200
-Message-Id: <1397743206-1242-1-git-send-email-sebastian.chlad@tieto.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] gobex: Fix removing invalid source
+Date: Thu, 17 Apr 2014 15:59:46 +0200
+Message-Id: <1397743186-29897-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1397743186-29897-1-git-send-email-szymon.janc@tieto.com>
+References: <1397743186-29897-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-opp.txt | 124 +++++++++++++++++++++++++++++++++-------------------
- 1 file changed, 80 insertions(+), 44 deletions(-)
+Since GLib 2.39 calling g_source_remove on already removed source
+is causing critical warning.
 
-diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-index fe4106f..50cd3f6 100644
---- a/android/pts-opp.txt
-+++ b/android/pts-opp.txt
-@@ -1,7 +1,7 @@
- PTS test results for OPP
+This was affecting unit/test-gobex-transfer when running with
+GLib 2.40.
+
+/gobex/test_packet_get_req_suspend_resume:
+(./unit/test-gobex-transfer:28879): GLib-CRITICAL **: Source ID 263 was
+    not found when attempting to remove it
+Trace/breakpoint trap
+---
+ gobex/gobex.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
+
+diff --git a/gobex/gobex.c b/gobex/gobex.c
+index 887e2a2..ee7d494 100644
+--- a/gobex/gobex.c
++++ b/gobex/gobex.c
+@@ -263,6 +263,8 @@ static gboolean req_timeout(gpointer user_data)
+ 	g_error_free(err);
+ 	pending_pkt_free(p);
  
--PTS version: 5.0
--Tested: 28-Jan-2014
-+PTS version: 5.1
-+Tested: 17-April-2014
- Android version: 4.4.2
++	p->timeout_id = 0;
++
+ 	return FALSE;
+ }
  
- Results:
-@@ -9,15 +9,33 @@ PASS	test passed
- FAIL	test failed
- INC	test is inconclusive
- N/A	test is disabled due to PICS setup
-+NONE	test result is none
+@@ -778,7 +780,9 @@ static gboolean pending_req_abort(GObex *obex, GError **err)
  
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_CLIENT_OPH_BV_01_I	PASS
-+TC_CLIENT_BC_BV_02_I	N/A
-+TC_CLIENT_BC_BV_04_I	N/A
-+TC_CLIENT_BCE_BV_01_I   N/A
-+TC_CLIENT_BCE_BV_03_I   N/A
-+TC_CLIENT_BCE_BV_04_I   N/A
-+TC_CLIENT_BCE_BV_05_I   N/A
-+TC_CLIENT_BCE_BV_06_I   N/A
-+TC_CLIENT_BCE_BV_07_I   N/A
-+TC_CLIENT_BCP_BV_01_I   N/A
-+TC_CLIENT_BCP_BV_02_I   N/A
-+TC_CLIENT_BCP_BV_03_I   N/A
-+TC_CLIENT_BCP_BV_04_I   N/A
-+TC_CLIENT_BCP_BV_05_I   N/A
-+TC_CLIENT_CON_BV_01_C	N/A
-+TC_CLIENT_OPH_BI_01_C	PASS	PTS issue: ID: 12081 (bluetooth.org)
-+				ETS-12081 required
-+TC_CLIENT_OPH_BV_01_I	NONE	OBEX_DISCONNECT_REQ sent on closed channel
-+				PTS issue reported: ID: 12081
- TC_CLIENT_OPH_BV_02_I	N/A
--TC_CLIENT_OPH_BV_03_I	PASS	Tester must send a contact to PTS
-+TC_CLIENT_OPH_BV_03_I	PASS	ETS-12081 required (bluetooth.org)
- TC_CLIENT_OPH_BV_04_I	N/A
--TC_CLIENT_OPH_BV_05_I	PASS	Tester must send a contact to PTS
-+TC_CLIENT_OPH_BV_05_I	PASS
- TC_CLIENT_OPH_BV_07_I	N/A
- TC_CLIENT_OPH_BV_08_I	N/A
- TC_CLIENT_OPH_BV_09_I	N/A
-@@ -30,69 +48,87 @@ TC_CLIENT_OPH_BV_15_I	N/A
- TC_CLIENT_OPH_BV_16_I	N/A
- TC_CLIENT_OPH_BV_17_I	N/A
- TC_CLIENT_OPH_BV_18_I	N/A
--TC_CLIENT_OPH_BV_19_I	PASS
-+TC_CLIENT_OPH_BV_19_I	PASS	ETS-12081 required
- TC_CLIENT_OPH_BV_20_I	PASS
--TC_CLIENT_OPH_BV_22_I	PASS
--TC_CLIENT_OPH_BV_23_I	PASS
-+TC_CLIENT_OPH_BV_22_I	PASS	ETS-12081 required
-+TC_CLIENT_OPH_BV_23_I	PASS	ETS-12081 required
- TC_CLIENT_OPH_BV_24_I	N/A
- TC_CLIENT_OPH_BV_25_I	N/A
- TC_CLIENT_OPH_BV_26_I	N/A
--TC_CLIENT_OPH_BV_34_I	PASS
--TC_CLIENT_OPH_BI_01_C	PASS
--TC_CLIENT_BCP_BV_01_I	N/A
--TC_CLIENT_BCP_BV_02_I	N/A
--TC_CLIENT_BCP_BV_03_I	N/A
--TC_CLIENT_BCP_BV_04_I	N/A
--TC_CLIENT_BCP_BV_05_I	N/A
--TC_CLIENT_BCE_BV_01_I	N/A
--TC_CLIENT_BCE_BV_03_I	N/A
--TC_CLIENT_BCE_BV_04_I	N/A
--TC_CLIENT_BCE_BV_05_I	N/A
--TC_CLIENT_BCE_BV_06_I	N/A
--TC_CLIENT_BCE_BV_07_I	N/A
--TC_SERVER_OPH_BV_01_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_02_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_03_I	PASS	IUT must be in the connectable mode. Tester must
-+TC_CLIENT_SRM_BV_01_C	N/A
-+TC_CLIENT_SRM_BV_03_C	N/A
-+TC_CLIENT_SRM_BV_05_C	N/A
-+TC_CLIENT_SRM_BV_07_C	N/A
-+TC_CLIENT_SRMP_BI_01_C	N/A
-+TC_CLIENT_SRMP_BV_01_C	N/A
-+TC_CLIENT_SRMP_BV_04_C	N/A
-+TC_CLIENT_SRMP_BV_05_C	N/A
-+TC_CLIENT_SRMP_BV_06_C	N/A
-+-------------------------------------------------------------------------------
-+TC_SERVER_BC_BV_01_I	N/A
-+TC_SERVER_BC_BV_03_I	N/A
-+TC_SERVER_BCE_BV_01_I	N/A
-+TC_SERVER_BCE_BV_03_I	N/A
-+TC_SERVER_BCE_BV_04_I	N/A
-+TC_SERVER_BCE_BV_05_I	N/A
-+TC_SERVER_BCE_BV_06_I	N/A
-+TC_SERVER_BCE_BV_07_I	N/A
-+TC_SERVER_BCP_BV_01_I	N/A
-+TC_SERVER_BCP_BV_02_I	PASS	ETS-12081 required (bluetooth.org)
-+TC_SERVER_BCP_BV_03_I	N/A
-+TC_SERVER_BCP_BV_04_I	N/A
-+TC_SERVER_BCP_BV_05_I	N/A
-+TC_SERVER_CON_BV_02_C	N/A
-+TC_SERVER_OPH_BV_01_I	PASS
-+TC_SERVER_OPH_BV_02_I	PASS
-+TC_SERVER_OPH_BV_03_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode. Tester must
- 					accept incoming file
--TC_SERVER_OPH_BV_04_I	PASS	IUT must be in the connectable mode. Tester must
-+TC_SERVER_OPH_BV_04_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode. Tester must
- 					accept incoming file
--TC_SERVER_OPH_BV_05_I	PASS	IUT must be in the connectable mode. Tester must
-+TC_SERVER_OPH_BV_05_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode. Tester must
- 					reject incoming file
- TC_SERVER_OPH_BV_07_I	N/A
- TC_SERVER_OPH_BV_08_I	N/A
- TC_SERVER_OPH_BV_09_I	N/A
--TC_SERVER_OPH_BV_10_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_10_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode
- TC_SERVER_OPH_BV_11_I	N/A
- TC_SERVER_OPH_BV_12_I	N/A
- TC_SERVER_OPH_BV_13_I	N/A
--TC_SERVER_OPH_BV_14_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_14_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode
- TC_SERVER_OPH_BV_15_I	N/A
- TC_SERVER_OPH_BV_16_I	N/A
- TC_SERVER_OPH_BV_17_I	N/A
--TC_SERVER_OPH_BV_18_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_19_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_18_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_19_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode
- TC_SERVER_OPH_BV_21_I	N/A
--TC_SERVER_OPH_BV_22_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_23_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_22_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_23_I	PASS	ETS-12081 required
-+				IUT must be in the connectable mode
- TC_SERVER_OPH_BV_24_I	N/A
- TC_SERVER_OPH_BV_25_I	N/A
- TC_SERVER_OPH_BV_26_I	N/A
--TC_SERVER_OPH_BV_34_I	PASS	IUT must be in the connectable mode
--TC_SERVER_BCP_BV_01_I	N/A
--TC_SERVER_BCP_BV_02_I	PASS	IUT must be in the connectable mode
--TC_SERVER_BCP_BV_03_I	N/A
--TC_SERVER_BCP_BV_04_I	N/A
--TC_SERVER_BCP_BV_05_I	N/A
--TC_SERVER_BCE_BV_01_I	N/A
--TC_SERVER_BCE_BV_03_I	N/A
--TC_SERVER_BCE_BV_04_I	N/A
--TC_SERVER_BCE_BV_05_I	N/A
--TC_SERVER_BCE_BV_06_I	N/A
--TC_SERVER_BCE_BV_07_I	N/A
-+TC_SERVER_ROB_BV_01_I	N/A
-+TC_SERVER_ROB_BV_02_I	N/A
-+TC_SERVER_SRM_BI_03_I	N/A
-+TC_SERVER_SRM_BI_05_I	N/A
-+TC_SERVER_SRM_BV_04_I	N/A
-+TC_SERVER_SRM_BV_08_I	N/A
-+TC_SERVER_SRMP_BV_02_I	N/A
-+TC_SERVER_SRMP_BV_03_I	N/A
- TC_CLIENT_OPH_BV_27_I	N/A
-+TC_CLIENT_OPH_BV_34_I	PASS
- TC_SERVER_OPH_BV_27_I	N/A
- TC_SERVER_OPH_BV_30_I	N/A
- TC_SERVER_OPH_BV_31_I	N/A
- TC_SERVER_OPH_BV_32_I	N/A
- TC_SERVER_OPH_BV_33_I	N/A
-+TC_SERVER_OPH_BV_34_I	PASS	ETS-12081 required
- -------------------------------------------------------------------------------
+ 	p->cancelled = TRUE;
+ 
+-	g_source_remove(p->timeout_id);
++	if (p->timeout_id > 0)
++		g_source_remove(p->timeout_id);
++
+ 	p->timeout = G_OBEX_ABORT_TIMEOUT;
+ 	p->timeout_id = g_timeout_add_seconds(p->timeout, req_timeout, obex);
+ 
+@@ -922,7 +926,11 @@ static void g_obex_srm_suspend(GObex *obex)
+ 	struct pending_pkt *p = obex->pending_req;
+ 	GObexPacket *req;
+ 
+-	g_source_remove(p->timeout_id);
++	if (p->timeout_id) {
++		g_source_remove(p->timeout_id);
++		p->timeout_id = 0;
++	}
++
+ 	p->suspended = TRUE;
+ 
+ 	req = g_obex_packet_new(G_OBEX_OP_GET, TRUE,
+@@ -1017,8 +1025,10 @@ static void auth_challenge(GObex *obex)
+ 
+ 	/* Remove it as pending and add it back to the queue so it gets sent
+ 	 * again */
+-	g_source_remove(p->timeout_id);
+-	p->timeout_id = 0;
++	if (p->timeout_id) {
++		g_source_remove(p->timeout_id);
++		p->timeout_id = 0;
++	}
+ 	obex->pending_req = NULL;
+ 	g_obex_send_internal(obex, p, NULL);
+ }
+@@ -1076,7 +1086,9 @@ static gboolean parse_response(GObex *obex, GObexPacket *rsp)
+ 	 * continue sending responses until the transfer is finished
+ 	 */
+ 	if (opcode == G_OBEX_OP_GET && rspcode == G_OBEX_RSP_CONTINUE) {
+-		g_source_remove(p->timeout_id);
++		if (p->timeout_id)
++			g_source_remove(p->timeout_id);
++
+ 		p->timeout_id = g_timeout_add_seconds(p->timeout, req_timeout,
+ 									obex);
+ 		return FALSE;
 -- 
-1.8.5.3
+1.9.1
 
