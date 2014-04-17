@@ -1,49 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] unit: Fix removing invalid source in test-hfp
-Date: Thu, 17 Apr 2014 15:59:45 +0200
-Message-Id: <1397743186-29897-1-git-send-email-szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 7/7] android/handsfree: trivial: Correct comment style
+Date: Thu, 17 Apr 2014 15:26:46 +0200
+Message-ID: <1401501.1zNi0hi367@uw000953>
+In-Reply-To: <1397737431-6101-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1397737431-6101-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since GLib 2.39 calling g_source_remove on already removed source
-is causing critical warning. This was causing unit/test-hfp to
-fail when running with GLib 2.40.
+Hi Andrei,
 
-./unit/test-hfp
-/hfp/test_init:
-(./unit/test-hfp:28878): GLib-CRITICAL **: Source ID 1 was not found
-    when attempting to remove it
-Trace/breakpoint trap
----
- unit/test-hfp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+On Thursday 17 of April 2014 15:23:51 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/handsfree.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index 55e151a..51dddb3 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -2204,10 +2204,10 @@ static const struct ipc_handler cmd_handlers[] = {
+>  	/* HAL_OP_HANDSFREE_DISCONNECT */
+>  	{ handle_disconnect, false,
+>  		sizeof(struct hal_cmd_handsfree_disconnect) },
+> -	/*HAL_OP_HANDSFREE_CONNECT_AUDIO*/
+> +	/* HAL_OP_HANDSFREE_CONNECT_AUDIO */
+>  	{ handle_connect_audio, false,
+>  		sizeof(struct hal_cmd_handsfree_connect_audio) },
+> -	/*HAL_OP_HANDSFREE_DISCONNECT_AUDIO*/
+> +	/* HAL_OP_HANDSFREE_DISCONNECT_AUDIO */
+>  	{ handle_disconnect_audio, false,
+>  		sizeof(struct hal_cmd_handsfree_disconnect_audio) },
+>  	/* define HAL_OP_HANDSFREE_START_VR */
+> 
 
-diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-index 445fcb7..20aa0b5 100644
---- a/unit/test-hfp.c
-+++ b/unit/test-hfp.c
-@@ -121,6 +121,8 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 	g_assert(!pdu->valid);
- 	context_quit(context);
- 
-+	context->watch_id = 0;
-+
- 	return FALSE;
- }
- 
-@@ -187,7 +189,8 @@ static void execute_context(struct context *context)
- {
- 	g_main_loop_run(context->main_loop);
- 
--	g_source_remove(context->watch_id);
-+	if (context->watch_id)
-+		g_source_remove(context->watch_id);
- 
- 	g_main_loop_unref(context->main_loop);
- 
+This one is now pushed, thanks.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
