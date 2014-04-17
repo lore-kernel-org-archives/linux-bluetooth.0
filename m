@@ -2,188 +2,24 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Re-run OPP PTS 5.1 test
-Date: Thu, 17 Apr 2014 10:56:22 +0200
-Message-Id: <1397724982-9238-2-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1397724982-9238-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1397724982-9238-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH] OPP regression or PTS issues
+Date: Thu, 17 Apr 2014 10:56:21 +0200
+Message-Id: <1397724982-9238-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
+There were some major changes between PTS 5.0 and 5.1 for OPP. Some PICS were
+added as well as some tests cases. While doing the regression tests I came
+across some regression however some of those looks to me like PTS issue; vide:
+vcf extension not being recognized.
+Would be good to get developers insight into this matter.
+
+Sebastian Chlad (1):
+  android/pts: Re-run OPP PTS 5.1 test
+
  android/pts-opp.txt | 116 ++++++++++++++++++++++++++++++++--------------------
  1 file changed, 72 insertions(+), 44 deletions(-)
 
-diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-index fe4106f..b683fff 100644
---- a/android/pts-opp.txt
-+++ b/android/pts-opp.txt
-@@ -1,7 +1,7 @@
- PTS test results for OPP
- 
--PTS version: 5.0
--Tested: 28-Jan-2014
-+PTS version: 5.1
-+Tested: 02-April-2014
- Android version: 4.4.2
- 
- Results:
-@@ -9,15 +9,32 @@ PASS	test passed
- FAIL	test failed
- INC	test is inconclusive
- N/A	test is disabled due to PICS setup
-+NONE	test result is none
- 
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_CLIENT_OPH_BV_01_I	PASS
-+TC_CLIENT_BC_BV_02_I	N/A
-+TC_CLIENT_BC_BV_04_I	N/A
-+TC_CLIENT_BCE_BV_01_I   N/A
-+TC_CLIENT_BCE_BV_03_I   N/A
-+TC_CLIENT_BCE_BV_04_I   N/A
-+TC_CLIENT_BCE_BV_05_I   N/A
-+TC_CLIENT_BCE_BV_06_I   N/A
-+TC_CLIENT_BCE_BV_07_I   N/A
-+TC_CLIENT_BCP_BV_01_I   N/A
-+TC_CLIENT_BCP_BV_02_I   N/A
-+TC_CLIENT_BCP_BV_03_I   N/A
-+TC_CLIENT_BCP_BV_04_I   N/A
-+TC_CLIENT_BCP_BV_05_I   N/A
-+TC_CLIENT_CON_BV_01_C	N/A
-+TC_CLIENT_OPH_BI_01_C	INC	BI test requires (wrong) vCard with null
-+				characters
-+TC_CLIENT_OPH_BV_01_I	NONE	OBEX_DISCONNECT_REQ sent on closed channel
- TC_CLIENT_OPH_BV_02_I	N/A
--TC_CLIENT_OPH_BV_03_I	PASS	Tester must send a contact to PTS
-+TC_CLIENT_OPH_BV_03_I	INC	PTS does not recognize vcf extension for vCard
- TC_CLIENT_OPH_BV_04_I	N/A
--TC_CLIENT_OPH_BV_05_I	PASS	Tester must send a contact to PTS
-+TC_CLIENT_OPH_BV_05_I	PASS
- TC_CLIENT_OPH_BV_07_I	N/A
- TC_CLIENT_OPH_BV_08_I	N/A
- TC_CLIENT_OPH_BV_09_I	N/A
-@@ -30,69 +47,80 @@ TC_CLIENT_OPH_BV_15_I	N/A
- TC_CLIENT_OPH_BV_16_I	N/A
- TC_CLIENT_OPH_BV_17_I	N/A
- TC_CLIENT_OPH_BV_18_I	N/A
--TC_CLIENT_OPH_BV_19_I	PASS
-+TC_CLIENT_OPH_BV_19_I	INC	PTS claims that any other type file should be
-+				sent except i.e. vcf even tough tester sends
-+				i.e. jpg
- TC_CLIENT_OPH_BV_20_I	PASS
--TC_CLIENT_OPH_BV_22_I	PASS
--TC_CLIENT_OPH_BV_23_I	PASS
-+TC_CLIENT_OPH_BV_22_I	INC	As in case of TC_CLIENT_OPH_BV_19_I
-+TC_CLIENT_OPH_BV_23_I	INC
- TC_CLIENT_OPH_BV_24_I	N/A
- TC_CLIENT_OPH_BV_25_I	N/A
- TC_CLIENT_OPH_BV_26_I	N/A
--TC_CLIENT_OPH_BV_34_I	PASS
--TC_CLIENT_OPH_BI_01_C	PASS
--TC_CLIENT_BCP_BV_01_I	N/A
--TC_CLIENT_BCP_BV_02_I	N/A
--TC_CLIENT_BCP_BV_03_I	N/A
--TC_CLIENT_BCP_BV_04_I	N/A
--TC_CLIENT_BCP_BV_05_I	N/A
--TC_CLIENT_BCE_BV_01_I	N/A
--TC_CLIENT_BCE_BV_03_I	N/A
--TC_CLIENT_BCE_BV_04_I	N/A
--TC_CLIENT_BCE_BV_05_I	N/A
--TC_CLIENT_BCE_BV_06_I	N/A
--TC_CLIENT_BCE_BV_07_I	N/A
--TC_SERVER_OPH_BV_01_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_02_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_03_I	PASS	IUT must be in the connectable mode. Tester must
-+TC_CLIENT_SRM_BV_01_C	N/A
-+TC_CLIENT_SRM_BV_03_C	N/A
-+TC_CLIENT_SRM_BV_05_C	N/A
-+TC_CLIENT_SRM_BV_07_C	N/A
-+TC_CLIENT_SRMP_BI_01_C	N/A
-+TC_CLIENT_SRMP_BV_01_C	N/A
-+TC_CLIENT_SRMP_BV_04_C	N/A
-+TC_CLIENT_SRMP_BV_05_C	N/A
-+TC_CLIENT_SRMP_BV_06_C	N/A
-+-------------------------------------------------------------------------------
-+TC_SERVER_BC_BV_01_I	N/A
-+TC_SERVER_BC_BV_03_I	N/A
-+TC_SERVER_BCE_BV_01_I	N/A
-+TC_SERVER_BCE_BV_03_I	N/A
-+TC_SERVER_BCE_BV_04_I	N/A
-+TC_SERVER_BCE_BV_05_I	N/A
-+TC_SERVER_BCE_BV_06_I	N/A
-+TC_SERVER_BCE_BV_07_I	N/A
-+TC_SERVER_BCP_BV_01_I	N/A
-+TC_SERVER_BCP_BV_02_I	INC
-+TC_SERVER_BCP_BV_03_I	N/A
-+TC_SERVER_BCP_BV_04_I	N/A
-+TC_SERVER_BCP_BV_05_I	N/A
-+TC_SERVER_CON_BV_02_C	N/A
-+TC_SERVER_OPH_BV_01_I	PASS
-+TC_SERVER_OPH_BV_02_I	PASS
-+TC_SERVER_OPH_BV_03_I	INC	IUT must be in the connectable mode. Tester must
- 					accept incoming file
--TC_SERVER_OPH_BV_04_I	PASS	IUT must be in the connectable mode. Tester must
-+TC_SERVER_OPH_BV_04_I	INC	IUT must be in the connectable mode. Tester must
- 					accept incoming file
--TC_SERVER_OPH_BV_05_I	PASS	IUT must be in the connectable mode. Tester must
-+TC_SERVER_OPH_BV_05_I	INC	IUT must be in the connectable mode. Tester must
- 					reject incoming file
- TC_SERVER_OPH_BV_07_I	N/A
- TC_SERVER_OPH_BV_08_I	N/A
- TC_SERVER_OPH_BV_09_I	N/A
--TC_SERVER_OPH_BV_10_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_10_I	INC	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_11_I	N/A
- TC_SERVER_OPH_BV_12_I	N/A
- TC_SERVER_OPH_BV_13_I	N/A
--TC_SERVER_OPH_BV_14_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_14_I	INC	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_15_I	N/A
- TC_SERVER_OPH_BV_16_I	N/A
- TC_SERVER_OPH_BV_17_I	N/A
--TC_SERVER_OPH_BV_18_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_19_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_18_I	INC	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_19_I	INC	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_21_I	N/A
--TC_SERVER_OPH_BV_22_I	PASS	IUT must be in the connectable mode
--TC_SERVER_OPH_BV_23_I	PASS	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_22_I	INC	IUT must be in the connectable mode
-+TC_SERVER_OPH_BV_23_I	INC	IUT must be in the connectable mode
- TC_SERVER_OPH_BV_24_I	N/A
- TC_SERVER_OPH_BV_25_I	N/A
- TC_SERVER_OPH_BV_26_I	N/A
--TC_SERVER_OPH_BV_34_I	PASS	IUT must be in the connectable mode
--TC_SERVER_BCP_BV_01_I	N/A
--TC_SERVER_BCP_BV_02_I	PASS	IUT must be in the connectable mode
--TC_SERVER_BCP_BV_03_I	N/A
--TC_SERVER_BCP_BV_04_I	N/A
--TC_SERVER_BCP_BV_05_I	N/A
--TC_SERVER_BCE_BV_01_I	N/A
--TC_SERVER_BCE_BV_03_I	N/A
--TC_SERVER_BCE_BV_04_I	N/A
--TC_SERVER_BCE_BV_05_I	N/A
--TC_SERVER_BCE_BV_06_I	N/A
--TC_SERVER_BCE_BV_07_I	N/A
-+TC_SERVER_ROB_BV_01_I	N/A
-+TC_SERVER_ROB_BV_02_I	N/A
-+TC_SERVER_SRM_BI_03_I	N/A
-+TC_SERVER_SRM_BI_05_I	N/A
-+TC_SERVER_SRM_BV_04_I	N/A
-+TC_SERVER_SRM_BV_08_I	N/A
-+TC_SERVER_SRMP_BV_02_I	N/A
-+TC_SERVER_SRMP_BV_03_I	N/A
- TC_CLIENT_OPH_BV_27_I	N/A
-+TC_CLIENT_OPH_BV_34_I	PASS
- TC_SERVER_OPH_BV_27_I	N/A
- TC_SERVER_OPH_BV_30_I	N/A
- TC_SERVER_OPH_BV_31_I	N/A
- TC_SERVER_OPH_BV_32_I	N/A
- TC_SERVER_OPH_BV_33_I	N/A
-+TC_SERVER_OPH_BV_34_I	INC
- -------------------------------------------------------------------------------
 -- 
 1.8.5.3
 
