@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/7] android/hal-audio-hsp: Add audio HAL for HSP handling
-Date: Thu, 17 Apr 2014 15:00:35 +0200
-Message-ID: <2409508.0799o0fXHS@uw000953>
-In-Reply-To: <1397737431-6101-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1397737431-6101-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 1/7] android/handsfree: Check service class is not zero
+Date: Thu, 17 Apr 2014 14:54:35 +0200
+Message-ID: <2086828.EMa9AY2hXh@uw000953>
+In-Reply-To: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,308 +14,51 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Thursday 17 of April 2014 15:23:46 Andrei Emeltchenko wrote:
+On Thursday 17 of April 2014 15:23:45 Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> This adds audio HAL for handling SCO. Following needs to be added to
-> audio_policy.conf:
-> 
->   hsp {
->     outputs {
->       hsp {
->         ...
->         devices AUDIO_DEVICE_OUT_ALL_SCO
->         ...
->       }
->     }
+> Fixes static analyzers NULL dereference warnings. The similar check is
+> done in src/device.c in line 2959.
 > ---
->  android/Android.mk      |  23 ++++++
->  android/Makefile.am     |  15 ++++
->  android/hal-audio-hsp.c | 211 ++++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 249 insertions(+)
->  create mode 100644 android/hal-audio-hsp.c
-
-I think we should avoid calling this HSP. This should be profile agnostic since it
-might also be usable with HFP. Maybe name it simply hal-audio-sco?
-
+>  android/handsfree.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 5f4e70c..a6aa55d 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -269,6 +269,29 @@ LOCAL_MODULE := audio.a2dp.default
->  include $(BUILD_SHARED_LIBRARY)
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index 02b6dad..c8026a0 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -1405,6 +1405,9 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
+>  		goto fail;
+>  	}
 >  
->  #
-> +# HSP audio
-> +#
+> +	if (!classes)
+> +		goto fail;
 > +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES := bluez/android/hal-audio-hsp.c
-> +
-> +LOCAL_C_INCLUDES = \
-> +	$(call include-path-for, system-core) \
-> +	$(call include-path-for, libhardware) \
-> +
-> +LOCAL_SHARED_LIBRARIES := \
-> +	libcutils \
-> +
-> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-> +
-> +LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-> +LOCAL_MODULE_TAGS := optional
-> +LOCAL_MODULE := audio.hsp.default
-> +
-> +include $(BUILD_SHARED_LIBRARY)
-> +
-> +#
->  # l2cap-test
->  #
+
+This is already checked :
+	if (sdp_get_service_classes(recs->data, &classes) < 0 || !classes) {
+		error("handsfree: unable to get service classes from record");
+		goto fail;
+	}
+
+What kind of warning do you get from static analyzer?
+
+>  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
+>  		error("handsfree: unable to get access protocols from record");
+>  		sdp_list_free(classes, free);
+> @@ -1495,6 +1498,9 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
+>  		goto fail;
+>  	}
 >  
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index c51cce2..caeb9cc 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -167,6 +167,21 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
->  					android/hardware/hardware.h \
->  					android/system/audio.h
->  
-> +android_audio_hsp_default_la_SOURCES = android/audio-msg.h \
-> +					android/hal-msg.h \
-> +					android/hal-audio-hsp.c \
-> +					android/hardware/audio.h \
-> +					android/hardware/audio_effect.h \
-> +					android/hardware/hardware.h \
-> +					android/system/audio.h
+> +	if (!classes)
+> +		goto fail;
 > +
-> +android_audio_hsp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
-> +
-> +android_audio_hsp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
-> +					-no-undefined -lrt
-> +
-> +plugin_LTLIBRARIES += android/audio.hsp.default.la
-> +
->  unit_tests += android/test-ipc
->  
->  android_test_ipc_SOURCES = android/test-ipc.c \
-> diff --git a/android/hal-audio-hsp.c b/android/hal-audio-hsp.c
-> new file mode 100644
-> index 0000000..c7ba504
-> --- /dev/null
-> +++ b/android/hal-audio-hsp.c
-> @@ -0,0 +1,211 @@
-> +/*
-> + * Copyright (C) 2013 Intel Corporation
-> + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
-> + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-> + * See the License for the specific language governing permissions and
-> + * limitations under the License.
-> + *
-> + */
-> +
-> +#include <errno.h>
-> +#include <stdio.h>
-> +#include <stdlib.h>
-> +#include <string.h>
-> +
-> +#include <hardware/audio.h>
-> +#include <hardware/hardware.h>
-> +
-> +#include "hal-log.h"
-> +
-> +struct hsp_audio_dev {
-> +	struct audio_hw_device dev;
-> +	struct a2dp_stream_out *out;
-> +};
-> +
-> +static int audio_open_output_stream(struct audio_hw_device *dev,
-> +					audio_io_handle_t handle,
-> +					audio_devices_t devices,
-> +					audio_output_flags_t flags,
-> +					struct audio_config *config,
-> +					struct audio_stream_out **stream_out)
-> +
-> +{
-> +	DBG("");
-> +
-> +	return -EINVAL;
-> +}
-> +
-> +static void audio_close_output_stream(struct audio_hw_device *dev,
-> +					struct audio_stream_out *stream_out)
-> +{
-> +	DBG("");
-> +
-> +	free(stream_out);
-> +}
-> +
-> +static int audio_set_parameters(struct audio_hw_device *dev,
-> +							const char *kvpairs)
-> +{
-> +	DBG("%s", kvpairs);
-> +
-> +	return 0;
-> +}
-> +
-> +static char *audio_get_parameters(const struct audio_hw_device *dev,
-> +							const char *keys)
-> +{
-> +	DBG("");
-> +
-> +	return strdup("");
-> +}
-> +
-> +static int audio_init_check(const struct audio_hw_device *dev)
-> +{
-> +	DBG("");
-> +
-> +	return 0;
-> +}
-> +
-> +static int audio_set_voice_volume(struct audio_hw_device *dev, float volume)
-> +{
-> +	DBG("%f", volume);
-> +
-> +	return 0;
-> +}
-> +
-> +static int audio_set_master_volume(struct audio_hw_device *dev, float volume)
-> +{
-> +	DBG("%f", volume);
-> +
-> +	return 0;
-> +}
-> +
-> +static int audio_set_mode(struct audio_hw_device *dev, int mode)
-> +{
-> +	DBG("");
-> +
-> +	return -ENOSYS;
-> +}
-> +
-> +static int audio_set_mic_mute(struct audio_hw_device *dev, bool state)
-> +{
-> +	DBG("");
-> +
-> +	return -ENOSYS;
-> +}
-> +
-> +static int audio_get_mic_mute(const struct audio_hw_device *dev, bool *state)
-> +{
-> +	DBG("");
-> +
-> +	return -ENOSYS;
-> +}
-> +
-> +static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
-> +					const struct audio_config *config)
-> +{
-> +	DBG("");
-> +
-> +	return -ENOSYS;
-> +}
-> +
-> +static int audio_open_input_stream(struct audio_hw_device *dev,
-> +					audio_io_handle_t handle,
-> +					audio_devices_t devices,
-> +					struct audio_config *config,
-> +					struct audio_stream_in **stream_in)
-> +{
-> +	DBG("");
-> +
-> +	return 0;
-> +}
-> +
-> +static void audio_close_input_stream(struct audio_hw_device *dev,
-> +					struct audio_stream_in *stream_in)
-> +{
-> +	DBG("");
-> +
-> +	free(stream_in);
-> +}
-> +
-> +static int audio_dump(const audio_hw_device_t *device, int fd)
-> +{
-> +	DBG("");
-> +
-> +	return 0;
-> +}
-> +
-> +static int audio_close(hw_device_t *device)
-> +{
-> +	DBG("");
-> +
-> +	free(device);
-> +
-> +	return 0;
-> +}
-> +
-> +static int audio_open(const hw_module_t *module, const char *name,
-> +							hw_device_t **device)
-> +{
-> +	struct hsp_audio_dev *adev;
-> +
-> +	DBG("");
-> +
-> +	if (strcmp(name, AUDIO_HARDWARE_INTERFACE)) {
-> +		error("audio: interface %s not matching [%s]", name,
-> +						AUDIO_HARDWARE_INTERFACE);
-> +		return -EINVAL;
-> +	}
-> +
-> +	adev = calloc(1, sizeof(struct hsp_audio_dev));
-> +	if (!adev)
-> +		return -ENOMEM;
-> +
-> +	adev->dev.common.tag = HARDWARE_DEVICE_TAG;
-> +	adev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
-> +	adev->dev.common.module = (struct hw_module_t *) module;
-> +	adev->dev.common.close = audio_close;
-> +
-> +	adev->dev.init_check = audio_init_check;
-> +	adev->dev.set_voice_volume = audio_set_voice_volume;
-> +	adev->dev.set_master_volume = audio_set_master_volume;
-> +	adev->dev.set_mode = audio_set_mode;
-> +	adev->dev.set_mic_mute = audio_set_mic_mute;
-> +	adev->dev.get_mic_mute = audio_get_mic_mute;
-> +	adev->dev.set_parameters = audio_set_parameters;
-> +	adev->dev.get_parameters = audio_get_parameters;
-> +	adev->dev.get_input_buffer_size = audio_get_input_buffer_size;
-> +	adev->dev.open_output_stream = audio_open_output_stream;
-> +	adev->dev.close_output_stream = audio_close_output_stream;
-> +	adev->dev.open_input_stream = audio_open_input_stream;
-> +	adev->dev.close_input_stream = audio_close_input_stream;
-> +	adev->dev.dump = audio_dump;
-> +
-> +	*device = &adev->dev.common;
-> +
-> +	return 0;
-> +}
-> +
-> +static struct hw_module_methods_t hal_module_methods = {
-> +	.open = audio_open,
-> +};
-> +
-> +struct audio_module HAL_MODULE_INFO_SYM = {
-> +	.common = {
-> +		.tag = HARDWARE_MODULE_TAG,
-> +		.version_major = 1,
-> +		.version_minor = 0,
-> +		.id = AUDIO_HARDWARE_MODULE_ID,
-> +		.name = "HSP Audio HW HAL",
-> +		.author = "Intel Corporation",
-> +		.methods = &hal_module_methods,
-> +	},
-> +};
+
+Ditto.
+
+>  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
+>  		error("handsfree: unable to get access protocols from record");
+>  		sdp_list_free(classes, free);
 > 
 
 -- 
