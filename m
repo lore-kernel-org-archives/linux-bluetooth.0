@@ -1,66 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/7] android/handsfree: Check service class is not zero
-Date: Thu, 17 Apr 2014 14:54:35 +0200
-Message-ID: <2086828.EMa9AY2hXh@uw000953>
-In-Reply-To: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"Johan Hedberg" <johan.hedberg@gmail.com>,
+	"Zheng, Wu" <wu.zheng@intel.com>
+Subject: RE: For Gatt feature question.
+Date: Thu, 17 Apr 2014 12:41:21 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B17741127B477@SHSMSX104.ccr.corp.intel.com>
+References: <3D02B219753AD44CBDDDE484323B177411279AD6@SHSMSX104.ccr.corp.intel.com>
+ <CAKT1EBdJmd=faGGx2EJf_j79ehrWqWNP34kBAj4p4TewZ4JJCA@mail.gmail.com>
+In-Reply-To: <CAKT1EBdJmd=faGGx2EJf_j79ehrWqWNP34kBAj4p4TewZ4JJCA@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
-
-On Thursday 17 of April 2014 15:23:45 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> Fixes static analyzers NULL dereference warnings. The similar check is
-> done in src/device.c in line 2959.
-> ---
->  android/handsfree.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index 02b6dad..c8026a0 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -1405,6 +1405,9 @@ static void sdp_hsp_search_cb(sdp_list_t *recs, int err, gpointer data)
->  		goto fail;
->  	}
->  
-> +	if (!classes)
-> +		goto fail;
-> +
-
-This is already checked :
-	if (sdp_get_service_classes(recs->data, &classes) < 0 || !classes) {
-		error("handsfree: unable to get service classes from record");
-		goto fail;
-	}
-
-What kind of warning do you get from static analyzer?
-
->  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
->  		error("handsfree: unable to get access protocols from record");
->  		sdp_list_free(classes, free);
-> @@ -1495,6 +1498,9 @@ static void sdp_hfp_search_cb(sdp_list_t *recs, int err, gpointer data)
->  		goto fail;
->  	}
->  
-> +	if (!classes)
-> +		goto fail;
-> +
-
-Ditto.
-
->  	if (sdp_get_access_protos(recs->data, &protos) < 0) {
->  		error("handsfree: unable to get access protocols from record");
->  		sdp_list_free(classes, free);
-> 
-
--- 
-Best regards, 
-Szymon Janc
+SGkgQ2xhdWRpbywgDQogIEZvciB0aGUgbGFzdCBtYWlsIGlzc3VlLCBJIGZvdW5kIHRoZSByb290
+IGNhdXNlIGlzIHRoYXQgYmx1ZXRvb3RoZCBpcyBub3QgZGVmYXVsdCBlbmFibGUgTEUgY29ubmVj
+dGFibGUgdW5kaXJlY3RlZCBhZHZlcnRpc2luZyBpbiB0aGUgR2F0dCBzZXJ2ZXIgc2lkZSwgc28g
+d2UgaGF2ZSB0byB1c2UgY29tbWFuZCBtYW51YWxseSBhczogaGNpY29uZmlnIGhjaTAgbGVhZHYg
+MCwgdGhlbiB0aGUgZ2F0dHRvb2wgLUkgY2FuIHdvcmsuIEFuZCB0aGFua3MgZm9yIHlvdXIgYWR2
+aWNlLg0KICBGb3IgYmx1ZXogdXNlciwgZmluYWxseSB3ZSBob3BlIHRvIGNhbGwgdGhlIERCdXMg
+aW50ZXJmYWNlIGNvbm5lY3QgbWV0aG9kIHRvIGNvbm5lY3QgTEUgZGV2aWNlLiBIb3dldmVyLCBU
+aGVyZSBpcyBzdGlsbCBvbmUgaXNzdWUgaW4gTEUgY29ubmVjdGlvbiBpbiB0aGUgYmx1ZXRvb3Ro
+ZCB3aGljaCBjYW4gYWx3YXlzIHJlcHJvZHVjZWQgaW4gYmx1ZXogbWF0ZXIgYnJhbmNoLiANCiAg
+V2UgaGF2ZSB0cmllZCB0d28gZGlmZmVyZW50IHdheXMgdG8gY29ubmVjdCBHYXR0IHNlcnZlciBz
+aWRlLg0KDQogIE9uZSBjYXNlLCB3ZSBlbmFibGUgTEUgY29ubmVjdGFibGUgdW5kaXJlY3RlZCBh
+ZHZlcnRpc2luZyBiZWZvcmUgdGhlIHNjYW5uaW5nOg0KICBXaGVuIHdlIHBhaXIgdGhlIEdhdHQg
+Q2xpZW50IHdpdGggR2F0dCBzZXJ2ZXIsIHRoZSBibHVldG9vdGhkIHRob3VnaHQgaXQgaXMgTEUg
+ZGV2aWNlICwgaXQgd2lsbCBieXBhc3MgdGhlIHBhaXJpbmcgcHJvY2VzcyBqdXN0IHRvIGNhbGwg
+ZGV2aWNlX2Nvbm5lY3RfbGUgZGV2aWNlLiBUaGlzIHdpbGwgcmVzdWx0IGluIGNvbm5lY3QgY29t
+bWFuZCBpbiBnYXR0b29sIGFuZCBibHVldG9vdGhjdHJsIGFsbCBmYWlsIHRvIGNvbm5lY3QuIA0K
+DQogIFRoZSBvdGhlciBjYXNlLCB3ZSBlbmFibGUgTEUgY29ubmVjdGFibGUgdW5kaXJlY3RlZCBh
+ZHZlcnRpc2luZyBhZnRlciB0aGUgc2Nhbm5pbmc6DQogIFdoZW4gd2UgcGFpciB0aGUgc2FtZSB0
+d28gZGV2aWNlcywgdGhlIGJsdWV0b290aGQgZGlkbid0IGtub3cgdGhpcyBpcyBHYXR0IHNlcnZl
+ciBpcyBMRSBkZXZpY2UgLCBzbyBpdCB3aWxsIGdvIHRocm91Z2h0IHRoZSBub3JtYWwgcGFpcmlu
+ZyBwcm9jZXNzLiBBbmQgdGhlbiBlbmFibGUgTEUgY29ubmVjdGFibGUgdW5kaXJlY3RlZCBhZHZl
+cnRpc2luZywgZ2F0dG9vbCAtSSBjYW4gY29ubmVjdCBnYXR0IHNlcnZlciBzaWRlIHN1Y2Nlc3Nm
+dWxseS4NCiAgSG93ZXZlciwgT25lIHByb2JsZW0gaXMgLCB3aGVuIHdlIHVzZSBCbHVldG9vdGhj
+dHJsIGNvbm5lY3QgY29tbWFuZCB0byBjb25uZWN0IGdhdHQgc2VydmVyLCB0aGUgcmVzdWx0IGlz
+IGFsd2F5cyBmYWlsZWQuIEJlY2F1c2UgYmRhZGRyX3R5cGUgaXMgQkRBRERSX0JSRURSIGluIHRo
+ZSBkZXZfY29ubmVjdCwgc28gYmx1ZXRvb3RoZCBjYW5ub3QgY2FsbCB0aGUgZGV2aWNlX2Nvbm5l
+Y3RfbGUgZnVuY3Rpb24gdG8gY29ubmVjdC4NCg0KICBJIHRoaW5rIHRoZSByaWdodCBzY2VuYXJp
+byBpcyBlbmFibGUgTEUgY29ubmVjdGFibGUgdW5kaXJlY3RlZCBhZHZlcnRpc2luZyBiZWZvcmUg
+dGhlIHNjYW5uaW5nLCBsZXQgdGhlIGNsaWVudCBrbm93cyB0aGUgb3RoZXIgc2lkZSBpcyBMRSBk
+ZXZpY2UuIA0KICBTbyBteSBxdWVzdGlvbiBpcyB3aHkgYmx1ZXRvb3RoZCBieXBhc3MgdGhlIHBh
+aXJpbmcgcHJvY2VzcyBqdXN0IHRvIGNhbGwgZGV2aWNlX2Nvbm5lY3RfbGUgZGV2aWNlIHdoZW4g
+ZW5hYmxpbmcgTEUgY29ubmVjdGFibGUgdW5kaXJlY3RlZCBhZHZlcnRpc2luZz8gDQogIEFuZCB3
+aGF0IGlzIHRoZSBmaW5hbCBzb2x1dGlvbiBmb3IgdGhpcyBpc3N1ZSBpZiB1c2VyIG5lZWQgdG8g
+Y2FsbCBibHVleiBEQnVzIGludGVyZmFjZSBjb25uZWN0IG1ldGhvZCBpbiB0aGUgZGV2aWNlLWFw
+aSBkb2M/DQoNClRoYW5rcyBhIGxvdA0KQ2hhb2ppZSBHdQ0KLWItLS0tT3JpZ2luYWwgTWVzc2Fn
+ZS0tLS0tDQpGcm9tOiBDbGF1ZGlvIFRha2FoYXNpIFttYWlsdG86Y2xhdWRpby50YWthaGFzaUBv
+cGVuYm9zc2Eub3JnXSANClNlbnQ6IFdlZG5lc2RheSwgQXByaWwgMTYsIDIwMTQgODoyMSBQTQ0K
+VG86IEd1LCBDaGFvIEppZQ0KQ2M6IGxpbnV4LWJsdWV0b290aEB2Z2VyLmtlcm5lbC5vcmc7IEpv
+aGFuIEhlZGJlcmcNClN1YmplY3Q6IFJlOiBGb3IgR2F0dCBmZWF0dXJlIHF1ZXN0aW9uLg0KDQpI
+aSBDaGFvamllIEd1LA0KDQpPbiBXZWQsIEFwciAxNiwgMjAxNCBhdCA1OjE3IEFNLCBHdSwgQ2hh
+byBKaWUgPGNoYW8uamllLmd1QGludGVsLmNvbT4gd3JvdGU6DQo+IEhpLCBDbGF1ZGlvOg0KPg0K
+PiAgICAgICAgICBTb3JyeSBmb3IgdGFraW5nIHlvdXIgdGltZSB0byBhc2sgeW91IHF1ZXN0aW9u
+IGFib3V0IEdBVFQgYWdhaW4uDQo+IFJlY2VudGx5IHdlIGhhdmUgaW1wbGVtZW50ZWQgdGhlIHBh
+cnQgb2YgR2F0dCBmZWF0dXJlIGluIHRoZSANCj4gQmx1ZXRvb3RoLWZyd2sgaW4gVGl6ZW4gYWNj
+b3JkaW5nIHRvIHRoZSBHYXR0LUFQSSBkb2MgaW4gdGhlIGJsdWV6IA0KPiA1LjE4LiBXZSBob3Bl
+IHdlIGNhbiBkbyBzb21lIHRlc3QgZm9yIEdhdHQgQ2xpZW50IG9wZXJhdGlvbiB0byANCj4gY29u
+dHJpYnV0ZSBHYXR0IENsaWVudCBEQnVzIEFQSSByZWxhdGVkIGRldmVsb3BtZW50LiBIb3dldmVy
+LCBub3cgd2UgDQo+IGhhdmUgZW5jb3VudGVyZWQgdGhlIHNvbWUgaXNzdWVzIGFib3V0IGhvdyB0
+byB0ZXN0IEdBVFQgb3BlcmF0aW9uLg0KPg0KPiBGaXJzdGx5LCB3ZSBoYXZlIHRvIGZhbWlsaWFy
+IHdpdGggdGhlIHRlc3Qgc3RlcHMgYWJvdXQgaXQuIE5vdyB3ZSANCj4gc2V0dXAgdHdvIGVudmly
+b25tZW50IGZvciB0ZXN0aW5nLiBPbmUgYWN0cyBhcyBHYXR0IFNlcnZlciwgdGhlIG90aGVyIA0K
+PiBhY3RzIGFzIEdhdHQgQ2xpZW50Lg0KPg0KPiBGb3IgR2F0dCBTZXJ2ZXIsIEkndmUgY2hlY2tl
+ZCBvdXQgdGhlIGxhdGVzdCB0YWcgKDUuMTgpIGZyb20gZ2l0IGFuZCANCj4gaGF2ZSBidWlsdCBp
+dCBhbmQgZ2F0dC1leGFtcGxlLmMgaXMgY29tcGlsZWQgaW50byBhIHN0YXRpYyBwbHVnaW4gdGhh
+dCANCj4gaXMgbG9hZGVkIGF0IHJ1bnRpbWUuIFRocm91Z2ggdGhlIGJsdWV0b290aGQgcnVubmlu
+ZywgSSd2ZSBjb25maXJtZWQgDQo+IHRoYXQgdGhlIHBsdWdpbiBpcyBjb21waWxlZCBhbmQgaXMg
+bG9hZGVkIGF0IHJ1bnRpbWUuIFdoZW4gSSB1c2UgDQo+IGdhdHRvb2wgdG8gZG8gc29tZSB0ZXN0
+LCBjb25uZWN0aW9uIGlzIGZhaWxlZC4NCj4NCj4gR2F0dCBzZXJ2ZXIgQmx1ZXRvb3RoIHN0YXR1
+czoNCj4NCj4gaGNpMDogICBUeXBlOiBCUi9FRFIgIEJ1czogVVNCDQo+DQo+ICAgICAgICAgQkQg
+QWRkcmVzczogMDA6MTU6ODM6NjU6MDE6OTAgIEFDTCBNVFU6IDMxMDoxMCAgU0NPIE1UVTogNjQ6
+OA0KPg0KPiAgICAgICAgIFVQIFJVTk5JTkcgUFNDQU4gSVNDQU4NCj4NCj4gICAgICAgICBSWCBi
+eXRlczo0Mzk0IGFjbDoyOSBzY286MCBldmVudHM6MTk3IGVycm9yczowDQo+DQo+ICAgICAgICAg
+VFggYnl0ZXM6MTE4NTYgYWNsOjM1IHNjbzowIGNvbW1hbmRzOjEzOSBlcnJvcnM6MA0KPg0KPg0K
+Pg0KPiBHYXR0IGNsaWVudCBCbHVldG9vdGggc3RhdHVzOg0KPg0KPiBoY2kwOiAgVHlwZTogQlIv
+RURSICBCdXM6IFVTQg0KPg0KPiBCRCBBZGRyZXNzOiAwMDoxQTo3RDpEQTo3MTowQyAgQUNMIE1U
+VTogMzEwOjEwICBTQ08gTVRVOiA2NDo4DQo+DQo+IFVQIFJVTk5JTkcgUFNDQU4NCj4NCj4gUlgg
+Ynl0ZXM6MTA0NzYwIGFjbDozNCBzY286MCBldmVudHM6NjE5IGVycm9yczowDQo+DQo+IFRYIGJ5
+dGVzOjU3MDQgYWNsOjMxIHNjbzowIGNvbW1hbmRzOjE2MCBlcnJvcnM6MA0KPg0KPg0KPg0KPiBN
+eSBvcGVyYXRpb24gc3RlcCBpczoNCj4NCj4gMS4gICAgICAgU2NhbiBhbmQgUGFpciB0aGUgZ2F0
+dCBjbGllbnQgd2l0aCBnYXR0IHNlcnZlciAsIGl0IHBhaXINCj4gc3VjY2Vzc2Z1bGx5Lg0KPg0K
+PiAyLiAgICAgICBJbiB0aGUgc2VydmVyIHNpZGUsIGZ1cnRoZXJtb3JlIHRvIHJlZ2lzdGVyIGV4
+dGVybmFsIGdhdHQgc2VydmljZQ0KPiBieSBnYXR0LXNlcnZpY2UuDQo+DQo+IDMuICAgICAgIElu
+IHRoZSBjbGllbnQgc2lkZSwgdXNlIGNvbW1hbmQgbGluZSA6IGdhdHR0b29sIC1pIGhjaTAgLWIN
+Cj4gMDA6MTU6ODM6NjU6MDE6OTAgLS1wcmltYXJ5DQo+DQo+IFRvIGRvIHByaW1hcnkgc2Vydmlj
+ZSBkaXNjb3ZlcnkuDQo+DQo+IENvbW1hbmQgbGluZSBmZWVkYmFjazogQ29ubmVjdGlvbiByZWZ1
+c2VkICgxMTEpDQo+DQo+DQo+DQo+ICAgIFRoZSBjbGllbnQgYmx1ZXRvb3RoZCBmYWlsIGxvZyA6
+DQo+DQo+IGJsdWV0b290aGRbMjk3MzRdOiBzcmMvYWRhcHRlci5jOmNvbm5lY3RfZmFpbGVkX2Nh
+bGxiYWNrKCkgaGNpMA0KPiAwMDoxNTo4Mzo2NTowMTo5MCBzdGF0dXMgMg0KPg0KPiBibHVldG9v
+dGhkWzI5NzM0XTogc3JjL2FkYXB0ZXIuYzpib25kaW5nX2F0dGVtcHRfY29tcGxldGUoKSBoY2kw
+IA0KPiBiZGFkZHINCj4gMDA6MTU6ODM6NjU6MDE6OTAgdHlwZSAxIHN0YXR1cyAweDINCj4NCj4g
+Ymx1ZXRvb3RoZFsyOTczNF06IHNyYy9hZGFwdGVyLmM6cmVzdW1lX2Rpc2NvdmVyeSgpDQo+DQo+
+DQo+DQo+IGdhdHRfY29ubmVjdCBmdW5jdGlvbiBoYXMgZmFpbGVkIGluIHRoZSBnYXR0IHRvb2ws
+IGFueSBvcHRpb24gbmVlZCB0byANCj4gc2V0IGluIHRoZSBjb21tYW5kIGxpbmUgPw0KDQpQbGVh
+c2Ugc2hhcmUgdGhlIGJ0bW9uIGxvZyAob2YgYm90aCBzaWRlcykuDQoNCkNoZWNrIGlmIHRoaXMg
+cHJvYmxlbSBhbHNvIGhhcHBlbnMgaW4gQmx1ZVogbWFzdGVyLg0KDQo+DQo+IFdoaWNoIHN0ZXBz
+IGlzIHJpZ2h0IG1ldGhvZCB0byB1c2UgZ2F0dG9vbCB0byB0ZXN0IHRoZSBnYXR0IG9wZXJhdGlv
+biANCj4gb3IgbGFjayBvdGhlciBjb25maWd1cmF0aW9uIGZvciBibHVleiBpbiB0aGUgc2V2ZXIg
+c2lkZT8NCg0KSSByZWNvbW1lbmQgdG8gdXNlIHRoZSBpbnRlcmFjdGl2ZSBtb2RlICItSSIgYW5k
+IHNwZWNpZnkgdGhlIHJlbW90ZSBhZGRyZXNzIHR5cGUuDQoNCj4NCj4NCj4NCj4gU2Vjb25kbHks
+IHRoZXJlIGFyZSBhIGxvdCBvZiBwYXRjaHNldCBhYm91dCBHYXR0IENsaWVudCBEQnVzIEFQSSAN
+Cj4gaW1wbGVtZW50YXRpb24uIFNob3VsZCB3ZSBhZGQgYWxsIHRoZSBwYXRjaGVzIGludG8gdGhl
+IGxhdGVzdCB0YWcgDQo+ICg1LjE4KSB0byB0ZXN0IEdhdHQgQ2xpZW50IERCdXMgQVBJPw0KDQpE
+byB5b3UgbWVhbiByZS1iYXNlIHlvdXIgcGF0Y2hlcyB0byBzZW5kIHVwc3RyZWFtPw0KRmlyc3Qg
+bWFrZSBzdXJlIHRoYXQgeW91ciBpbXBsZW1lbnRhdGlvbiBpcyBhbGlnbmVkIHdpdGggdGhlIHJl
+cXVpcmVtZW50cyB0aGF0IGFyZSBiZWluZyBkaXNjdXNzZWQgaW4gdGhlIE1MOiBidF9hdHRfKiBh
+bmQgc2hhcmVkIGF0dHJpYnV0ZSBkYXRhYmFzZS4NCg0KUmVnYXJkcywNCkNsYXVkaW8NCg==
