@@ -1,64 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Remove reconnect feature
-Date: Fri, 18 Apr 2014 15:16:43 +0200
-Message-ID: <1748862.qvstokQPbp@uw000953>
-In-Reply-To: <1397679511-16947-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1397679511-16947-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android: Build hciattach tool
+Date: Fri, 18 Apr 2014 15:16:04 +0200
+Message-ID: <2191282.BWAK0eFnUi@uw000953>
+In-Reply-To: <1397565665-28832-1-git-send-email-szymon.janc@tieto.com>
+References: <1397565665-28832-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
-
-On Wednesday 16 of April 2014 22:18:31 Lukasz Rymanowski wrote:
-> This patch removes reconnect try when remote BLE device got
-> disconnected.
-> This is to avoid confusion of Android framework which now get ACL
-> states changed event with state disconnected on Bluetooth HAL but no
-> disconnected Event on GATT HAL.
+On Tuesday 15 of April 2014 14:41:05 Szymon Janc wrote:
 > ---
->  android/gatt.c | 20 ++------------------
->  1 file changed, 2 insertions(+), 18 deletions(-)
+> This requires ppoll. bionic at http://code.google.com/p/aosp-bluez
+> was updated with ppoll backported from bionic master branch.
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index f52cb36..fa664cd 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -864,25 +864,9 @@ static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
+>  android/Android.mk | 30 ++++++++++++++++++++++++++++++
+>  android/README     |  2 +-
+>  2 files changed, 31 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 5f4e70c..f838bfd 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -443,6 +443,36 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
+>  include $(BUILD_EXECUTABLE)
 >  
->  	sock = g_io_channel_unix_get_fd(io);
->  	len = sizeof(err);
-> -	if (getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len) < 0)
-> -		goto done;
-> -
-> -	DBG("%s (%d)", strerror(err), err);
-> -
-> -	/* Keep scanning/re-connection active if disconnection reason
-> -	 * is connection timeout, remote user terminated connection or local
-> -	 * initiated disconnection.
-> -	 */
-> -	if (err == ETIMEDOUT || err == ECONNRESET || err == ECONNABORTED) {
-> -		if (!queue_push_tail(conn_wait_queue, dev)) {
-> -			error("gatt: Cannot push data");
-> -		} else {
-> -			bt_le_discovery_start(le_device_found_handler);
-> -			return FALSE;
-> -		}
-> -	}
-> +	if (!getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len))
-> +		DBG("%s (%d)", strerror(err), err);
+>  #
+> +# hciattach
+> +#
+> +
+> +include $(CLEAR_VARS)
+> +
+> +LOCAL_SRC_FILES := \
+> +	bluez/tools/hciattach.c \
+> +	bluez/tools/hciattach_st.c \
+> +	bluez/tools/hciattach_ti.c \
+> +	bluez/tools/hciattach_tialt.c \
+> +	bluez/tools/hciattach_ath3k.c \
+> +	bluez/tools/hciattach_qualcomm.c \
+> +	bluez/tools/hciattach_intel.c \
+> +	bluez/tools/hciattach_bcm43xx.c \
+> +	bluez/lib/bluetooth.c \
+> +	bluez/lib/hci.c \
+> +
+> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+> +
+> +LOCAL_STATIC_LIBRARIES := \
+> +	bluetooth-headers \
+> +
+> +LOCAL_MODULE_TAGS := optional
+> +LOCAL_MODULE := hciattach
+> +
+> +LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
+> +
+> +include $(BUILD_EXECUTABLE)
+> +
+> +#
+>  # libsbc
+>  #
 >  
-> -done:
->  	connection_cleanup(dev);
+> diff --git a/android/README b/android/README
+> index ff4d7bf..6254d34 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -33,7 +33,7 @@ by BlueZ. SBC code is available at git://git.kernel.org/pub/scm/bluetooth/sbc
+>  - Bionic support - Currently only 'master' branch available at
+>  https://android.googlesource.com/platform/bionic provides all required
+>  functionality and running BlueZ on release branch requires backporting missing
+> -features (currently only epoll_create1 call for Android 4.4.2). Sample
+> +features (currently epoll_create1 and ppoll calls for Android 4.4.2). Sample
+>  Bionic for Android 4.4.2 with all required features backported is available at
+>  https://code.google.com/p/aosp-bluez.platform-bionic/
 >  
->  	queue_foreach(dev->clients, client_disconnect_notify, dev);
 > 
 
-Applied, thanks.
+Pushed.
 
 -- 
 Best regards, 
