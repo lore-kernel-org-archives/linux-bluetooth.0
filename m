@@ -2,81 +2,49 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/7] android/bluetooth: Refactor handle_start_discovery_cmd
-Date: Fri, 18 Apr 2014 15:04:38 +0200
-Message-Id: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/7] android/bluetooth: Fix bt_le_discovery_start
+Date: Fri, 18 Apr 2014 15:04:40 +0200
+Message-Id: <1397826284-11118-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
+References: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes function flow easier to follow. Also fix usage of
-adapter.exp_discovery_type which should be used only when stopping
-currently running discovery session to restart it with new type.
+This fix wrong use of adapter.exp_discovery_type and setting callback
+even if failed to start discovery.
 ---
- android/bluetooth.c | 40 ++++++++++++++++++----------------------
- 1 file changed, 18 insertions(+), 22 deletions(-)
+ android/bluetooth.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 93c7935..0e16f74 100644
+index c38cec3..a531db6 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -3704,39 +3704,35 @@ static void handle_start_discovery_cmd(const void *buf, uint16_t len)
- {
- 	uint8_t status;
+@@ -2944,15 +2944,18 @@ bool bt_le_discovery_start(bt_le_device_found cb)
+ 	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
+ 		return false;
  
--	/* Check if there is discovery with BREDR type */
--	if (adapter.cur_discovery_type & SCAN_TYPE_BREDR) {
--		status = HAL_STATUS_SUCCESS;
--		goto reply;
--	}
+-	gatt_device_found_cb = cb;
 -
- 	if (!(adapter.current_settings & MGMT_SETTING_POWERED)) {
- 		status = HAL_STATUS_NOT_READY;
--		goto reply;
-+		goto failed;
- 	}
- 
--	adapter.exp_discovery_type |= SCAN_TYPE_DUAL;
+-	adapter.exp_discovery_type |= SCAN_TYPE_LE;
 -
--	/* If there is no discovery ongoing, try to start discovery */
--	if (!adapter.cur_discovery_type) {
--		if (!start_discovery(adapter.exp_discovery_type))
-+	switch (adapter.cur_discovery_type) {
-+	case SCAN_TYPE_DUAL:
-+	case SCAN_TYPE_BREDR:
-+		break;
-+	case SCAN_TYPE_NONE:
-+		if (!start_discovery(SCAN_TYPE_DUAL)) {
- 			status = HAL_STATUS_FAILED;
--		else
--			status = HAL_STATUS_SUCCESS;
-+			goto failed;
-+		}
+ 	/* If core is discovering, don't bother */
+-	if (adapter.cur_discovery_type)
++	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
++		gatt_device_found_cb = cb;
+ 		return true;
++	}
  
--		goto reply;
--	}
-+		break;
-+	case SCAN_TYPE_LE:
-+		if (!stop_discovery(SCAN_TYPE_LE)) {
-+			status = HAL_STATUS_FAILED;
-+			goto failed;
-+		}
- 
--	/* Stop discovery here. Once it is stop we will restart it
--	 * with exp_discovery_settings */
--	if (!stop_discovery(adapter.cur_discovery_type)) {
--		status = HAL_STATUS_FAILED;
--		goto reply;
-+		adapter.exp_discovery_type = SCAN_TYPE_DUAL;
-+		break;
- 	}
- 
- 	status = HAL_STATUS_SUCCESS;
- 
--reply:
-+failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_START_DISCOVERY,
- 									status);
+-	return start_discovery(adapter.exp_discovery_type);
++	if (start_discovery(SCAN_TYPE_LE)) {
++		gatt_device_found_cb = cb;
++		return true;
++	}
++
++	return false;
  }
+ 
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
 -- 
 1.9.1
 
