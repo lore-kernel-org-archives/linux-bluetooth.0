@@ -2,57 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 6/7] android/bluetooth: Avoid starting/stopping discovery with no type
-Date: Fri, 18 Apr 2014 15:04:43 +0200
-Message-Id: <1397826284-11118-6-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/7] android/bluetooth: Fix bt_le_discovery_stop
+Date: Fri, 18 Apr 2014 15:04:41 +0200
+Message-Id: <1397826284-11118-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
 References: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This fix invalid use of adapter.exp_discovery_type and not clearing
+callback.
 ---
- android/bluetooth.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ android/bluetooth.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index add507a..84ab6f9 100644
+index a531db6..68bfb12 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -1024,12 +1024,10 @@ static void clear_device_found(gpointer data, gpointer user_data)
+@@ -2925,18 +2925,23 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
  
- static uint8_t get_adapter_discovering_type(void)
+ bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
  {
--	uint8_t type;
-+	uint8_t type = SCAN_TYPE_NONE;
- 
- 	if (adapter.current_settings & MGMT_SETTING_BREDR)
--		type = SCAN_TYPE_BREDR;
--	else
--		type = 0;
-+		type |= SCAN_TYPE_BREDR;
- 
- 	if (adapter.current_settings & MGMT_SETTING_LE)
- 		type |= SCAN_TYPE_LE;
-@@ -1045,6 +1043,9 @@ static bool start_discovery(uint8_t type)
- 
- 	DBG("type=0x%x", cp.type);
- 
-+	if (cp.type == SCAN_TYPE_NONE)
-+		return false;
+-	if (!adapter.cur_discovery_type) {
++	if (adapter.cur_discovery_type != SCAN_TYPE_LE) {
+ 		if (cb)
+ 			cb();
 +
- 	if (mgmt_send(mgmt_if, MGMT_OP_START_DISCOVERY, adapter.index,
- 				sizeof(cp), &cp, NULL, NULL, NULL) > 0)
++		gatt_device_found_cb = NULL;
++
  		return true;
-@@ -2864,6 +2865,9 @@ static bool stop_discovery(uint8_t type)
+ 	}
  
- 	DBG("type=0x%x", cp.type);
- 
-+	if (cp.type == SCAN_TYPE_NONE)
+-	gatt_discovery_stopped_cb = cb;
+-	/* Remove device found callback */
++	if (!stop_discovery(SCAN_TYPE_LE))
 +		return false;
 +
- 	/* Lets drop all confirm name request as we don't need it anymore */
- 	g_slist_foreach(cached_devices, cancel_pending_confirm_name, NULL);
+ 	gatt_device_found_cb = NULL;
+-	adapter.exp_discovery_type &= ~SCAN_TYPE_LE;
++	gatt_discovery_stopped_cb = cb;
++	adapter.exp_discovery_type = SCAN_TYPE_NONE;
  
+-	return stop_discovery(adapter.cur_discovery_type);
++	return true;
+ }
+ 
+ bool bt_le_discovery_start(bt_le_device_found cb)
 -- 
 1.9.1
 
