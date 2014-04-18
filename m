@@ -1,39 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/4] android/hidhost: Fix handle_uhid_output
-Date: Fri, 18 Apr 2014 15:40:03 +0200
-Message-Id: <1397828406-29951-1-git-send-email-szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Re-run OPP PTS 5.1 test
+Date: Fri, 18 Apr 2014 15:28:16 +0200
+Message-ID: <2062416.E5ZCyEHlvn@uw000953>
+In-Reply-To: <1397743206-1242-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1397743206-1242-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Data from kernel is not in form of hex string. Just copy it instead of
-converting from hex string.
----
- android/hidhost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Sebastian,
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index d45e1bd..b8d2d8f 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -180,13 +180,13 @@ static void handle_uhid_output(struct hid_device *dev,
- 	if (!(dev->ctrl_io))
- 		return;
- 
--	req_size = 1 + (output->size / 2);
-+	req_size = 1 + output->size;
- 	req = g_try_malloc0(req_size);
- 	if (!req)
- 		return;
- 
- 	req[0] = HID_MSG_SET_REPORT | output->rtype;
--	hex2buf(output->data, req + 1, req_size - 1);
-+	memcpy(req + 1, output->data, req_size - 1);
- 
- 	fd = g_io_channel_unix_get_fd(dev->ctrl_io);
- 
+On Thursday 17 of April 2014 16:00:06 Sebastian Chlad wrote:
+> ---
+>  android/pts-opp.txt | 124 +++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 80 insertions(+), 44 deletions(-)
+> 
+> diff --git a/android/pts-opp.txt b/android/pts-opp.txt
+> index fe4106f..50cd3f6 100644
+
+Applied, thanks.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
