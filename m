@@ -1,54 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 4/7] android/bluetooth: Fix bt_le_discovery_stop
-Date: Fri, 18 Apr 2014 15:04:41 +0200
-Message-Id: <1397826284-11118-4-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
-References: <1397826284-11118-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: Passive scanning of iBeacons results in a "Data Buffer Overflow"
+From: Adam Warski <adam@warski.org>
+In-Reply-To: <59e67d6df57ced71c2e1c5c8901847da@orcas.net>
+Date: Fri, 18 Apr 2014 11:59:18 +0200
+Cc: Anderson Lizardo <anderson.lizardo@openbossa.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-bluetooth-owner@vger.kernel.org
+Message-Id: <E35C5A4C-E678-4951-9352-AFFDA0D65E21@warski.org>
+References: <6E6C1573-4744-486B-B2E6-2D3DC45D024B@warski.org> <CAJdJm_PMAVyiY-=13puBHAucCzObUWOSOXZ+maOL2z11YwOh-g@mail.gmail.com> <A4DDF6F3-8DD4-4CF7-A5C0-205F5B4EE489@warski.org> <CAJdJm_PN3xGjdNOtr3o-J0SJ8N6MJXBChUCwOWOZBrdFKDBfGA@mail.gmail.com> <407CD6A9-AFA8-4A8A-BA2C-882D7A64EF40@warski.org> <0BA8DEFD-9E73-4A6A-A9E6-1957634CABF8@warski.org> <CAJdJm_P6gnpW5AhO9j4+LV6KX30J4sTWd_tWW=x=E+ejQq3cTQ@mail.gmail.com> <A2B80C7C-697D-44E5-80EA-B398E62EE608@warski.org> <CAJdJm_MXR08tvceb0-vHT=VD+dKY_dz2MbkO3eaUoBneeFxXMA@mail.gmail.com> <A6C5B873-6614-45B3-AD4C-B3E08831E6D8@warski.org> <CAJdJm_MrjHy-fk-OQUeepxh2C_K=ap30ekR0U91e6kK+ov42HQ@mail.gmail.com> <C342F1F6-C4EB-4380-85D8-1F141CB06A83@warski.org> <CAJdJm_O6nF3NH7H+jZ8dZv=ED0VyP8-z4BqYnmxNqBcqOM8wNQ@mail.gmail.com> <59e67d6df57ced71c2e1c5c8901847da@orcas.net>
+To: Terry Hardie <terryh@orcas.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix invalid use of adapter.exp_discovery_type and not clearing
-callback.
----
- android/bluetooth.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+Finally came back to this problem, and setting USB to 1.1 (dwc_otg.speed=1 in /boot/cmdline.txt) fixes the problem.
+So indeed that is a USB problem.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index a531db6..68bfb12 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2925,18 +2925,23 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- 
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
- {
--	if (!adapter.cur_discovery_type) {
-+	if (adapter.cur_discovery_type != SCAN_TYPE_LE) {
- 		if (cb)
- 			cb();
-+
-+		gatt_device_found_cb = NULL;
-+
- 		return true;
- 	}
- 
--	gatt_discovery_stopped_cb = cb;
--	/* Remove device found callback */
-+	if (!stop_discovery(SCAN_TYPE_LE))
-+		return false;
-+
- 	gatt_device_found_cb = NULL;
--	adapter.exp_discovery_type &= ~SCAN_TYPE_LE;
-+	gatt_discovery_stopped_cb = cb;
-+	adapter.exp_discovery_type = SCAN_TYPE_NONE;
- 
--	return stop_discovery(adapter.cur_discovery_type);
-+	return true;
- }
- 
- bool bt_le_discovery_start(bt_le_device_found cb)
+Thanks for the help! :)
+
+Adam
+
+On 20 Mar 2014, at 00:47, Terry Hardie <terryh@orcas.net> wrote:
+
+> On 2014-03-18 07:07, Anderson Lizardo wrote:
+>>> And the same as before, after a short amount of time I start getting similar (not exactly the same [2]) errors. So it's not the dongle :)
+>> The logs seem to show the same behaviour as the other dongle:
+>> seemingly "random" packets with nonsense parameters (simply because
+>> the HCI packet was assembled incorrectly).
+>> I still blame the USB controller in RPi/Beaglebone for not feeding all
+>> USB fragments to the bluetooth subsystem... at least is my
+>> interpretation from Terry's logs (which are from USB sniffing).
+>> What I have no clue is why this is happenning: both of you tried
+>> powered USB hubs, and this was my only guess (insufficient power on
+>> the bus). If you could find a kernel version for your boards that are
+>> not causing any problems, then we can rule out HW related issues...
+> 
+> I agree that it looks like the USB controller's fault. It seems highly unlikely, though. A few reasons why I think so:
+> 
+> 1. The 2 boards use completely different USB controllers.
+> 2. Both those platforms talk to other USB devices pushing much higher data rates without any issue.
+> 3. The problem doesn't show up when the bus is forced to USB 1.1 (Full speed instead of high speed)
+> 4. The problem doesn't only show up during non-duplicate-filtered scans. I can reproduce it (although it takes a lot longer) with LE Advertisement packets only coming in once per second.
+> 
+> Let me ask another question:
+> 
+> Are there any other USB devices that ever send a bunch of data with no polling from the host? IE, if the host has no buffer space to accept an INT transaction, it will just be lost, and all other USB devices wait for the INT to be processed by getting an acknowledgement before generating another INT? Apologies for my lack of in-depth knowledge for the workings of USB bus transactions.
+> 
+> My suspicion is that if you follow the Bluetooth spec for HCI over USB (which all of these vendors making these USB devices should) then if the host USB controller is not fast enough, it can be overwhelmed. Forcing the bus to full-speed mode, means the bluetooth receiver is forced to buffer on its end, since it simply cannot transfer data to the host fast enough to overwhelm it. If my suspicion is true, then that means any packets of this type could overflow a host if it is busy enough, although much less likely to happen if the host is more powerful (in terms of processing power).
+> 
+> Regards,
+> 
+> Terry
+> 
+
 -- 
-1.9.1
+Adam Warski
+
+http://twitter.com/#!/adamwarski
+http://www.softwaremill.com
+http://www.warski.org
 
