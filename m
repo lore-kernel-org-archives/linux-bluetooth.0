@@ -1,40 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5354F3AA.9070707@canonical.com>
-Date: Mon, 21 Apr 2014 18:32:10 +0800
-From: Jesse Sung <jesse.sung@canonical.com>
+Message-ID: <53542641.9050607@gmail.com>
+Date: Sun, 20 Apr 2014 23:55:45 +0400
+From: Dmitry Grebennikov <dmitry.ew@gmail.com>
 MIME-Version: 1.0
-To: Petri Gynther <pgynther@google.com>,
- Marcel Holtmann <marcel@holtmann.org>,
- linux-bluetooth@vger.kernel.org
-CC: Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add BCM20702 firmware upgrade support
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Mail Delivery Subsystem <mailer-daemon@googlemail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: bluetooth support of intel 7260ac adapter
+References: <001a1134de9659277104f77e80cf@google.com>
+In-Reply-To: <001a1134de9659277104f77e80cf@google.com>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-Sorry for creating a new thread instead since I didn't subscribe this 
-mailing list.
+Also, hciconfig output:
+$  sudo hcitool scan
+Device is not available: No such device
+$  sudo hciconfig hci0 up
+Can't get device info: No such device
+$  sudo hciconfig hci0 unblock
+Can't get device info: No such device
 
->>>> Interestingly, now that I look at that page more closely, Ubuntu 12.04
->>>> LTS with kernel 3.8 supports this already? Has Ubuntu made a patch
->>>> that bluetooth-next doesn't have?
->>>
->>> That is Ubuntu for you. They just push patches into their kernel and never give them back to upstream or make sure they get merged into bluetooth-next. I really dislike that behavior. It is always the easy way out instead of trying to do the right thing.
->>>
+Thanks.
+
+> On 20.04.2014 23:07, Marcel Holtmann wrote:
+>> Hi Dmitry,
 >>
->> See this page: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/1065400
->
-> It is a stupid userspace version that is racy as hell. Even the bug mentions that it should be done in the kernel. And I am pretty sure that was my initial comment as well. Just posting the userspace patch for reference.
+>>> Could you help me please to make my intel 7260ac wifi+bt adapter
+>>> work correctly?
+>>>
+>>> I bought it recently and installed in my laptop. Wifi works
+>>> perfectly (iwlwifi + firmware), while bluetooth controller isn't
+>>> detected with lspci, lshw completely.
+>>>
+>>> I found that Tedd Ho-Jeong An released bluetooth firmware for this
+>>> card.
+>>> So I installed linux-firmware-git package, which contain needed
+>>> intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq file.
+>>> I wrote to load btusb module in /etc/modules-load/
+>>> I don't know how to force btusb driver to load firmware file.
+>>> What could be the problem with detection only wireless network
+>>> controller, but not bluetooth?
+>> the Bluetooth controller would show up as USB device. So you should
+>> look with lsusb. And check rfkill if you have a platform Bluetooth
+>> switch that will enable/disable the Bluetooth controller.
+>>
+>> Regards
+>>
+>> Marcel
+>>
+> Thanks for answer.
+> I attach lsusb output, there are two rows with Intel Corp. Integrated
+> Rate Matching Hub, but I don't think it's what needed.
+> That is the problem that there is no bluetooth adapter in rfkill:
+>> # rfkill list
+>> 2: samsung-wlan: Wireless LAN
+>>          Soft blocked: no
+>>          Hard blocked: no
+>> 3: phy1: Wireless LAN
+>>          Soft blocked: no
+>>          Hard blocked: no
+> Dmitry Grebennikov
 
-No it's not the stupid userspace loader you're referring to.
 
-And no, these patches are not pushed into Ubuntu kernel only.
-
-These stupid patches were sent to this mailing list for review, for 
-three or four times, and all of them were rejected by you. The latest 
-version of patches that got rejected should be quite similar to Petri's.
-
-Regards,
-Jesse
