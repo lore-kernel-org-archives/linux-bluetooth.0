@@ -2,33 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 09/11] android/client: Add connect_channel support to haltest
-Date: Tue, 22 Apr 2014 15:06:08 +0300
-Message-Id: <1398168371-29685-10-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 08/11] android/client: Add unregister_application support to haltest
+Date: Tue, 22 Apr 2014 15:06:07 +0300
+Message-Id: <1398168371-29685-9-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1398168371-29685-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1398168371-29685-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-hl.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ android/client/if-hl.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/android/client/if-hl.c b/android/client/if-hl.c
-index 557d27a..16a3d16 100644
+index 7c15a76..557d27a 100644
 --- a/android/client/if-hl.c
 +++ b/android/client/if-hl.c
-@@ -191,6 +191,35 @@ static void unregister_application_p(int argc, const char **argv)
- 	EXEC(if_hl->unregister_application, app_id);
+@@ -173,6 +173,24 @@ static void register_application_p(int argc, const char **argv)
+ 	free(reg);
  }
  
-+/* connect_channel */
++/* unregister_application */
 +
-+static void connect_channel_p(int argc, const char **argv)
++static void unregister_application_p(int argc, const char **argv)
 +{
-+	uint32_t app_id, mdep_cfg_index;
-+	int channel_id = -1;
-+	bt_bdaddr_t bd_addr;
++	uint32_t app_id;
 +
 +	RETURN_IF_NULL(if_hl);
 +
@@ -37,28 +35,19 @@ index 557d27a..16a3d16 100644
 +		return;
 +	}
 +
-+	VERIFY_ADDR_ARG(3, &bd_addr);
-+
-+	if (argc <= 4) {
-+		haltest_error("No mdep cfg index is specified");
-+		return;
-+	}
-+
 +	app_id = (uint32_t) atoi(argv[2]);
-+	mdep_cfg_index = (uint32_t) atoi(argv[4]);
 +
-+	EXEC(if_hl->connect_channel, app_id, &bd_addr, mdep_cfg_index,
-+								&channel_id);
++	EXEC(if_hl->unregister_application, app_id);
 +}
 +
  /* cleanup */
  
  static void cleanup_p(int argc, const char **argv)
-@@ -209,6 +238,7 @@ static struct method methods[] = {
+@@ -190,6 +208,7 @@ static struct method methods[] = {
+ 		"<app_name> <provider_name> <srv_name> <srv_descr>\n"
  		"<num_of_mdeps>\n"
  		"[<mdep_role> <data_type> <channel_type> <mdep_descr>] ..."),
- 	STD_METHODH(unregister_application, "<app_id>"),
-+	STD_METHODH(connect_channel, "<app_id> <bd_addr> <mdep_cfg_index>"),
++	STD_METHODH(unregister_application, "<app_id>"),
  	STD_METHOD(cleanup),
  	END_METHOD
  };
