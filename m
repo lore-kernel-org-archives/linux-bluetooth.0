@@ -1,50 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 01/11] android/hal-health: Use correct enums
-Date: Tue, 22 Apr 2014 15:06:00 +0300
-Message-Id: <1398168371-29685-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1398168371-29685-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1398168371-29685-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Tue, 22 Apr 2014 14:34:30 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Claudio Takahasi <claudio.takahasi@openbossa.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v0] gatt: Fix not replying for write requests
+Message-ID: <20140422113430.GA10626@t440s.lan>
+References: <1397744385-29209-1-git-send-email-claudio.takahasi@openbossa.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1397744385-29209-1-git-send-email-claudio.takahasi@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-health.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Hi Claudio,
 
-diff --git a/android/hal-health.c b/android/hal-health.c
-index 8d12107..4ba6fe7 100644
---- a/android/hal-health.c
-+++ b/android/hal-health.c
-@@ -93,7 +93,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
- 						sizeof(*cmd) + cmd->len, &cmd,
- 							&rsp_len, &rsp, NULL);
- 
--	if (status != HAL_STATUS_SUCCESS)
-+	if (status != BT_STATUS_SUCCESS)
- 		return status;
- 
- 	for (i = 0; i < reg->number_of_mdeps; i++) {
-@@ -109,7 +109,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
- 						sizeof(*mdep) + mdep->descr_len,
- 						buf, 0, NULL, NULL);
- 
--		if (status != HAL_STATUS_SUCCESS)
-+		if (status != BT_STATUS_SUCCESS)
- 			return status;
- 
- 	}
-@@ -158,7 +158,7 @@ static bt_status_t connect_channel(int app_id, bt_bdaddr_t *bd_addr,
- 					HAL_OP_HEALTH_CONNECT_CHANNEL,
- 					sizeof(cmd), &cmd, &len, &rsp, NULL);
- 
--	if (status == HAL_STATUS_SUCCESS)
-+	if (status == BT_STATUS_SUCCESS)
- 		*channel_id = rsp.channel_id;
- 
- 	return status;
--- 
-1.8.3.2
+On Thu, Apr 17, 2014, Claudio Takahasi wrote:
+> Attributes should not be unregistered dynamically unless the service
+> implementation calls UnregisterService() or leave the system bus.
+> Implementations may accidentally (or maliciously) unregister a GATT
+> object (characteristic or descriptor) belonging to a service hierarchy.
+> gdbus automatically tracks InterfacesRemoved() signal, and destroys the
+> GDBusProxy associated with the removed interfaces. Subsequent calls of
+> g_dbus_proxy_set_property_array() returns FALSE, and it needs to be
+> handled properly since the GDBusProxy result callback will not be called.
+> ---
+>  src/gatt-dbus.c | 10 +++++++---
+>  1 file changed, 7 insertions(+), 3 deletions(-)
 
+Applied. Thanks.
+
+Johan
