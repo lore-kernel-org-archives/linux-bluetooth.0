@@ -1,125 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5356313A.5040704@tieto.com>
-Date: Tue, 22 Apr 2014 11:07:06 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] android/gatt: Refactor client connection handling
-References: <1397830148-6301-1-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1397830148-6301-1-git-send-email-jakub.tyszkowski@tieto.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+In-Reply-To: <1397728697-22563-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1397728697-22563-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1397728697-22563-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Date: Tue, 22 Apr 2014 10:16:23 +0200
+Message-ID: <CAN_7+YZ=LiiBCuWxFCOhW9s9L40kptofujL+Q7aUT-mAH=XtDA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] android/gatt: Extend android2uuid uuid type support
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Two issues which are now fixed:
+Hi Grzegorz,
 
-On 04/18/2014 04:09 PM, Jakub Tyszkowski wrote:
-> @@ -861,45 +861,37 @@ static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
->   	int sock, err = 0;
->   	socklen_t len;
+On Thu, Apr 17, 2014 at 11:58 AM, Grzegorz Kolodziejczyk
+<grzegorz.kolodziejczyk@tieto.com> wrote:
+> Now conversion function android2uuid can recognize type of uuid and set
+> it value by copying significant bytes.
+> ---
+>  android/gatt.c | 34 +++++++++++++++++++++++++++++++---
+>  1 file changed, 31 insertions(+), 3 deletions(-)
 >
-> -	queue_remove(conn_list, dev);
-> -
->   	sock = g_io_channel_unix_get_fd(io);
->   	len = sizeof(err);
->   	if (!getsockopt(sock, SOL_SOCKET, SO_ERROR, &err, &len))
->   		DBG("%s (%d)", strerror(err), err);
+> diff --git a/android/gatt.c b/android/gatt.c
+> index e339789..3a7ace1 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -54,6 +54,13 @@
+>  #define GATT_SUCCESS   0x00000000
+>  #define GATT_FAILURE   0x00000101
 >
-> +	device_disconnect_clients(dev);
->   	connection_cleanup(dev);
-Connection cleanup unrefs attrib, triggering notification cleanup, which 
-still needs client's connection map to remove itself from notification 
-queue, thus the proper order is:
-    	connection_cleanup(dev);
-   +	device_disconnect_clients(dev);
+> +#define BASE_UUID16_OFFSET     12
+> +
+> +static uint8_t BLUETOOTH_UUID[] = {
+> +       0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+> +       0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+> +};
+> +
+>  struct gatt_client {
+>         int32_t id;
+>         uint8_t uuid[16];
+> @@ -134,14 +141,35 @@ static struct queue *listen_clients = NULL;
+>
+>  static void bt_le_discovery_stop_cb(void);
+>
+> +static int get_type_from_android_uuid(const uint8_t *uuid)
 
-> @@ -1099,96 +1061,204 @@ static struct gatt_device *create_device(bdaddr_t *addr)
->
->   	bacpy(&dev->bdaddr, addr);
->
-> -	dev->clients = queue_new();
->   	dev->services = queue_new();
-> -
-> -	if (!dev->clients || !dev->services) {
-> +	if (!dev->services) {
->   		error("gatt: Failed to allocate memory for client");
+Actually this function does not only take type. It checks if this is
+bluetooth uuid or not, and if it is bluetooth uuid it uses uuid16 to
+represent it. So IMHO this function name should be rather
+is_bluetooth_uuid(..)  Of course it would return here bool and then
+you can use correct uuid type depends on this bool.
+
+> +{
+> +       int i;
 > +
->   		destroy_device(dev);
->   		return NULL;
->   	}
->
-> +	if (!queue_push_head(gatt_devices, dev)) {
-> +		error("gatt: Cannot push device to queue");
+> +       for (i = 0; i < 16; i++) {
+> +               /* ignore minimal uuid (16) value */
+> +               if (i == 12 || i == 13)
+> +                       continue;
 > +
-> +		return NULL;
-> +	}
+> +               if (uuid[i] != BLUETOOTH_UUID[i])
+> +                       return BT_UUID128;
+> +       }
 > +
->   	return dev;
->   }
->
-> -static void handle_client_connect(const void *buf, uint16_t len)
-> +static struct connection_record *create_conn_record(struct gatt_device *device,
-> +						struct gatt_client *client)
->   {
-> -	const struct hal_cmd_gatt_client_connect *cmd = buf;
-> -	struct gatt_device *dev = NULL;
-> -	void *l;
-> -	bdaddr_t addr;
-> +	struct connection_record *new_conn;
-> +	struct connection_record *last;
-> +
-> +	/* Check if already connected */
-> +	new_conn = new0(struct connection_record, 1);
-> +	if (!new_conn)
-> +		return NULL;
-> +
-> +	new_conn->client = client;
-> +	new_conn->device = device;
-> +
-> +	/* Make connection id unique to connection record
-> +	 * (client, device) pair.
-> +	 */
-> +	last = queue_peek_head(client_connections);
-> +	if (last)
-> +		new_conn->id = last->id + 1;
-> +	else
-> +		new_conn->id = 1;
-> +
-> +	if (!queue_push_head(client_connections, new_conn)) {
-> +		error("gatt: Cannot push client on the client queue!?");
-> +
-> +		free(new_conn);
-> +		return NULL;
-> +	}
-> +
-> +	new_conn->device->client_count++;
-> +
-> +	return new_conn;
+> +       return BT_UUID16;
 > +}
 > +
-> +static void trigger_disconnection(struct connection_record *conn)
-> +{
-> +	if (conn->device->state == DEVICE_STATE_DISCONNECTED)
-> +		return;
-> +
-> +	if (queue_remove(client_connections, conn)) {
-> +		send_client_disconnect_notify(conn, GATT_SUCCESS);
-> +		conn->device->client_count--;
-> +	}
-> +
-> +	if (conn->device->client_count <= 0) {
-> +		connection_cleanup(conn->device);
-> +		device_set_state(conn->device, DEVICE_STATE_DISCONNECTED);
-> +	}
-> +
-> +	free(conn);
-> +}
-> +
-> +static void client_disconnect_devices(struct gatt_client *client)
-> +{
-> +	struct connection_record *conn;
-> +
-> +	/* find every connection for client record and trigger disconnect */
-> +	while ((conn = queue_find(client_connections,
-It should obviously be:
-while ((conn = queue_remove_if(client_connections,
+>  static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
+>  {
+>         uint8_t i;
+>
+> -       dst->type = BT_UUID128;
+> +       dst->type = get_type_from_android_uuid(uuid);
+>
+> -       for (i = 0; i < 16; i++)
+> -               dst->value.u128.data[i] = uuid[15 - i];
+> +       if (dst->type == BT_UUID16) {
+> +               /* copy 16 bit uuid value from full android 128bit uuid */
+> +               dst->value.u16 = (uuid[13] << 8) + uuid[12];
+> +       } else {
+> +               for (i = 0; i < 16; i++)
+> +                       dst->value.u128.data[i] = uuid[15 - i];
+> +       }
+>  }
+>
+>  static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+BR
+Lukasz
