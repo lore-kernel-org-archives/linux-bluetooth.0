@@ -1,62 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Apr 2014 09:22:56 -0500
-From: Felipe Balbi <balbi@ti.com>
-To: Felipe Balbi <balbi@ti.com>
-CC: Greg KH <gregkh@linuxfoundation.org>,
-	<linux-serial@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<peter@hurleysoftware.com>, <m-karicheri2@ti.com>,
-	<b32955@freescale.com>,
-	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 01/11] tty: serial: add missing braces
-Message-ID: <20140422142256.GC5524@saruman.home>
-Reply-To: <balbi@ti.com>
-References: <1395343807-21618-1-git-send-email-balbi@ti.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="+B+y8wtTXqdUj1xM"
-In-Reply-To: <1395343807-21618-1-git-send-email-balbi@ti.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <F292C463-102B-458E-BE3C-2BA274D21AFB@holtmann.org>
+References: <5354F3AA.9070707@canonical.com>
+	<F292C463-102B-458E-BE3C-2BA274D21AFB@holtmann.org>
+Date: Tue, 22 Apr 2014 20:34:38 +0800
+Message-ID: <CAH10aOjfgBHjbXS2uY6DLW6wTki9FzDPusR-8ODFnwGajd69sA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add BCM20702 firmware upgrade support
+From: Jesse Sung <jesse.sung@canonical.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Petri Gynther <pgynther@google.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>, yk@canonical.com
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---+B+y8wtTXqdUj1xM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Hi Marcel,
 
-Hi,
+2014-04-22 2:19 GMT+08:00 Marcel Holtmann <marcel@holtmann.org>:
+> Hi Jesse,
+>
+>> Sorry for creating a new thread instead since I didn't subscribe this ma=
+iling list.
+>>
+>>>>>> Interestingly, now that I look at that page more closely, Ubuntu 12.=
+04
+>>>>>> LTS with kernel 3.8 supports this already? Has Ubuntu made a patch
+>>>>>> that bluetooth-next doesn't have?
+>>>>>
+>>>>> That is Ubuntu for you. They just push patches into their kernel and =
+never give them back to upstream or make sure they get merged into bluetoot=
+h-next. I really dislike that behavior. It is always the easy way out inste=
+ad of trying to do the right thing.
+>>>>>
+>>>>
+>>>> See this page: https://bugs.launchpad.net/ubuntu/+source/linux/+bug/10=
+65400
+>>>
+>>> It is a stupid userspace version that is racy as hell. Even the bug men=
+tions that it should be done in the kernel. And I am pretty sure that was m=
+y initial comment as well. Just posting the userspace patch for reference.
+>>
+>> No it's not the stupid userspace loader you're referring to.
+>>
+>> And no, these patches are not pushed into Ubuntu kernel only.
+>>
+>> These stupid patches were sent to this mailing list for review, for thre=
+e or four times, and all of them were rejected by you. The latest version o=
+f patches that got rejected should be quite similar to Petri's.
+>
+> so do you have answers to all the questions I raised with Petri? I can go=
+ through the archive and read my own comments, but if I rejected the patche=
+s, then there was a reason for that.
 
-On Thu, Mar 20, 2014 at 02:29:57PM -0500, Felipe Balbi wrote:
-> per CodingStyle we should have those braces, no
-> functional changes.
->=20
-> Signed-off-by: Felipe Balbi <balbi@ti.com>
+You did have a reason, and I don't complain about the rejection at all.
 
-Greg, do you want me to refresh and resend this series ?
+The reason I reply is that Petri asked why there's a patch in Ubuntu
+and not in upstream, and, with all due respect, the answer of "That is
+Ubuntu for you. They just push patches into their kernel and never
+give them back to upstream or make sure they get merged into
+bluetooth-next." doesn't reflect what happened. The launchpad link
+Petri mentioned is all about patching btusb instead of using userspace
+loader, but guess you're too busy to read the short description.
 
---=20
-balbi
+For Petri's question, patches have been rejected for several times.
+Since these patchram modules are equipped on more and more devices
+recently, making them supported is better than just leaving them
+unsupported, even with a solution that does not perfectly match the
+expectation of upstream IMHO. That's why I tried to push these
+rejected patches into Ubuntu kernel. The Ubuntu kernel team accepted
+them though they do have concerns about these patches are not accepted
+by upstream. I'm still working on a solution when I have time to do
+so.
 
---+B+y8wtTXqdUj1xM
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+And as I didn't subscribe to this mailing list, would you mind to show
+me the questions you're referring to? Most likely I won't have answers
+to all of the questions, after all, all the clue I have is the
+userspace loader. But I'd be more than happy to give it a try.
 
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTVntAAAoJEIaOsuA1yqREYyUP/jA9FzIhfh8oc1uKvY4SuEA+
-MB4tjfDMN9z10dQqwsSnGp3fu9iTdcDfS8Ch5ujFEpQs6ufZ8L8FZCurjI5JW7nC
-Kh0uWeAgRbdAxRQUX2eZ1SQGN0Vs59hO5X5O0Uvi2sYfjLFUyhWSgVPSzccq/rcl
-lMwWYqaF/5NjRpdGMoOT5tUPT2ElC72JLLBzm0AVbyvFwlbl3hgA8420vGfiinNr
-dMV5UQl0YqdQpLdylDiv8RbplJVuEuucZPnMtHn07oO81loMOmk8YKgJV6w7fppP
-sWw7GmTrl+/h40kPKhzMFQbNZ7KTHOo0nsUAzafj/wcdFsh2ehhV3Ah82wT8G7L+
-q+YQN1rd5DjI7bQd0YqDoR7mFzKo9HMlNeXrKJZp4NFkHpbrO5mJr3LvA6s7wp4q
-E7GYIGy6oBJZ+k1UIX51Yot2z+iW/e9tdUXoWNt/3uL18YvBXbpkQlZjoc7vaY/i
-eOsc5cEkiRSYF5l87UBvpsf5JotPUnparWZysAR70bhrvSdZ9K6cVdNNQp1rdQiA
-MH5yhnU7MHuDrWIvs0HFGnilPqFoYB1H8oCrvmsqTGEy8gbElHaOyxjAeASU+mHw
-Uf+hcvD0ezaE+kCHyxxKKAxsxhZVoXy1n7d2zNVCNdijqNgDDJq6ed8m2lZLp6IQ
-NKbYgqTRGmBoOyEFUQRg
-=DQiI
------END PGP SIGNATURE-----
-
---+B+y8wtTXqdUj1xM--
+Regards,
+Jesse
