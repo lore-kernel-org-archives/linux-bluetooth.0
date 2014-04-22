@@ -1,112 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/bluetooth: Make possible to start BlueZ in LE mode only
-Date: Wed, 23 Apr 2014 00:16:31 +0200
-Message-Id: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH] Revert "Bluetooth: Enable autosuspend for Intel Bluetooth device"
+Date: Tue, 22 Apr 2014 14:04:16 -0700
+Message-Id: <1398200656-55480-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds possibility to start BlueZ only in LE mode only.
+This reverts commit d2bee8fb6e18f6116aada39851918473761f7ab1.
 
-It is useful for testing purpose, when you want test BlueZ in
-peripheral mode against any dual mode device.
+Enabling autosuspend for Intel Bluetooth devices has been shown to not
+work reliable. It does work for some people with certain combinations
+of USB host controllers, but for others it puts the device to sleep and
+it will not wake up for any event.
+
+These events can be important ones like HCI Inquiry Complete or HCI
+Connection Request. The events will arrive as soon as you poke the
+device with a new command, but that is not something we can do in
+these cases.
+
+Initially there were patches to the xHCI USB controller that fixed
+this for some people, but not for all. This could be well a problem
+somewhere in the USB subsystem or in the USB host controllers or
+just plain a hardware issue somewhere. At this moment we just do
+not know and the only safe action is to revert this patch.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Cc: Tedd Ho-Jeong An <tedd.an@intel.com>
+Cc: stable@vger.kernel.org
 ---
- android/README          |  3 +++
- android/bluetooth.c     |  7 ++++++-
- android/hal-bluetooth.c | 15 ++++++++++++++-
- android/hal-msg.h       |  1 +
- 4 files changed, 24 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/android/README b/android/README
-index 6254d34..9b08610 100644
---- a/android/README
-+++ b/android/README
-@@ -166,6 +166,9 @@ options.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f338b0c5a8de..dc99eff2a4de 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1485,10 +1485,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_BCM92035)
+ 		hdev->setup = btusb_setup_bcm92035;
  
- Property	Value		Description
- -------------------------------------------
-+mode		le_only		Enable BlueZ in Low Energy mode only.
-+		<none>		Enable BlueZ in default mode - enable br/edr/le
-+				if possible.
- handsfree	hfp		Enable Handsfree Profile (HFP) with narrowband
- 				speech only
- 		hfp_wbs		Enable Handsfree Profile (HFP) with narrowband
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 93c7935..923285c 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3894,10 +3894,15 @@ static const struct ipc_handler cmd_handlers[] = {
+-	if (id->driver_info & BTUSB_INTEL) {
+-		usb_enable_autosuspend(data->udev);
++	if (id->driver_info & BTUSB_INTEL)
+ 		hdev->setup = btusb_setup_intel;
+-	}
  
- void bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
- {
--	DBG("");
-+	DBG("mode 0x%x", mode);
- 
- 	hal_ipc = ipc;
- 
-+	if ((mode == HAL_MODE_LE_ONLY) &&
-+			(adapter.current_settings & MGMT_SETTING_LE) &&
-+			(adapter.current_settings & MGMT_SETTING_BREDR))
-+		set_mode(MGMT_OP_SET_BREDR, 0x00);
-+
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
- }
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 48d5ea2..69009ff 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -29,6 +29,8 @@
- #include "hal-ipc.h"
- #include "hal-utils.h"
- 
-+#define MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
-+
- static const bt_callbacks_t *bt_hal_cbacks = NULL;
- 
- #define enum_prop_to_hal(prop, hal_prop, type) do { \
-@@ -412,6 +414,17 @@ static const struct hal_ipc_handler ev_handlers[] = {
- 	}
- };
- 
-+static uint8_t get_mode(void)
-+{
-+	char value[PROPERTY_VALUE_MAX];
-+
-+	if (property_get(MODE_PROPERTY_NAME, value, "") > 0 &&
-+					(!strcasecmp(value, "le_only")))
-+		return HAL_MODE_LE_ONLY;
-+
-+	return HAL_MODE_DEFAULT;
-+}
-+
- static int init(bt_callbacks_t *callbacks)
- {
- 	struct hal_cmd_register_module cmd;
-@@ -433,7 +446,7 @@ static int init(bt_callbacks_t *callbacks)
- 	}
- 
- 	cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
--	cmd.mode = HAL_MODE_DEFAULT;
-+	cmd.mode = get_mode();
- 
- 	status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index ed0a67a..db21870 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -55,6 +55,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
- #define HAL_OP_STATUS			IPC_OP_STATUS
- 
- #define HAL_MODE_DEFAULT		0x00
-+#define HAL_MODE_LE_ONLY		0x01
- 
- #define HAL_OP_REGISTER_MODULE		0x01
- struct hal_cmd_register_module {
+ 	/* Interface numbers are hardcoded in the specification */
+ 	data->isoc = usb_ifnum_to_if(data->udev, 1);
 -- 
-1.8.4
+1.9.0
 
