@@ -1,32 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Apr 2014 14:34:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Claudio Takahasi <claudio.takahasi@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v0] gatt: Fix not replying for write requests
-Message-ID: <20140422113430.GA10626@t440s.lan>
-References: <1397744385-29209-1-git-send-email-claudio.takahasi@openbossa.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1397744385-29209-1-git-send-email-claudio.takahasi@openbossa.org>
+In-Reply-To: <1395999467-29192-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1395999467-29192-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 22 Apr 2014 12:29:19 +0200
+Message-ID: <CAMudyAurKOVaruq807qNPs9=vJeahZ2_DbjBe6AT31drCQbezg@mail.gmail.com>
+Subject: Re: [RFC v3] Add Support for Read Remote RSSI
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+Ping
 
-On Thu, Apr 17, 2014, Claudio Takahasi wrote:
-> Attributes should not be unregistered dynamically unless the service
-> implementation calls UnregisterService() or leave the system bus.
-> Implementations may accidentally (or maliciously) unregister a GATT
-> object (characteristic or descriptor) belonging to a service hierarchy.
-> gdbus automatically tracks InterfacesRemoved() signal, and destroys the
-> GDBusProxy associated with the removed interfaces. Subsequent calls of
-> g_dbus_proxy_set_property_array() returns FALSE, and it needs to be
-> handled properly since the GDBusProxy result callback will not be called.
-> ---
->  src/gatt-dbus.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
-
-Applied. Thanks.
-
-Johan
+On 28 March 2014 10:37, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+> v2: Idea in this version is to start/stop read remote RSSI only
+> when device is connected.
+> In this version there is possibility to read one time RSSI value.
+>
+> v3: Idea is to register/unregister for RSSI Changed event any time.
+> Kernel to handle polling and notify userspace if given threshold has
+> been exceeded.
+>
+> If we go with v3, then in Android case we will need to add more logic
+> to bluetoothd to cover case when Application calles Read Remote Rssi
+> only once. We just need to avoid letting kernel to poll without the reason.
+> However I do expect android application to call this read remote rssi in
+> a loop anyway.
+>
+> To consider in v3: Do we need Unregister command or we can use Register
+> command with threshold equal to 0 as a unregister ?
+>
+> Lukasz Rymanowski (1):
+>   mgmt-api: Add support for Read Remote RSSI
+>
+>  doc/mgmt-api.txt | 73 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 73 insertions(+)
+>
+> --
+> 1.8.4
+>
+\Łukasz
