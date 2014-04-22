@@ -1,33 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Apr 2014 09:52:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Return EOPNOTSUPP for HCISETRAW ioctl command
-Message-ID: <20140422065207.GA27455@t440s.lan>
-References: <1397703878-44875-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1397703878-44875-1-git-send-email-marcel@holtmann.org>
+From: Martin Kampas <martin.kampas@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Martin Kampas <martin.kampas@tieto.com>
+Subject: [PATCH] obex-client-tool: Set the length header
+Date: Tue, 22 Apr 2014 07:08:00 +0200
+Message-Id: <1398143280-21017-1-git-send-email-martin.kampas@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+At least 'put' to other device with obexd v0.48 does not work without
+this.
+---
+ tools/obex-client-tool.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-On Wed, Apr 16, 2014, Marcel Holtmann wrote:
-> The HCISETRAW ioctl command is not really useful. To utilize raw and
-> direct access to the HCI controller, the HCI User Channel feature has
-> been introduced. Return EOPNOTSUPP to indicate missing support for
-> this command.
-> 
-> For legacy reasons hcidump used to use HCISETRAW for permission check
-> to return proper error codes to users. To keep backwards compability
-> return EPERM in case the caller does not have CAP_NET_ADMIN capability.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_sock.c | 11 +----------
->  1 file changed, 1 insertion(+), 10 deletions(-)
+diff --git a/tools/obex-client-tool.c b/tools/obex-client-tool.c
+index 54dbcbb..7207c77 100644
+--- a/tools/obex-client-tool.c
++++ b/tools/obex-client-tool.c
+@@ -135,11 +135,19 @@ static void cmd_put(int argc, char **argv)
+ 		return;
+ 	}
+ 
++	struct stat st;
++	if (fstat(fd, &st) < 0) {
++		close(fd);
++		g_printerr("fstat: %s\n", strerror(errno));
++		return;
++	}
++
+ 	data = g_new0(struct transfer_data, 1);
+ 	data->fd = fd;
+ 
+ 	g_obex_put_req(obex, put_data_cb, transfer_complete, data, &err,
+ 						G_OBEX_HDR_NAME, argv[1],
++						G_OBEX_HDR_LENGTH, st.st_size,
+ 						G_OBEX_HDR_INVALID);
+ 	if (err != NULL) {
+ 		g_printerr("put failed: %s\n", err->message);
+-- 
+1.9.2
 
-Applied to bluetooth-next. Thanks.
-
-Johan
