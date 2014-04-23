@@ -1,47 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH] android/bluetooth: Make possible to start BlueZ in LE mode only
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Tue, 22 Apr 2014 17:29:12 -0700
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Message-Id: <F332EBA9-C4B5-43C1-B50C-48EB46AEFFC1@holtmann.org>
-References: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Tue, 22 Apr 2014 17:28:43 -0700
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Felipe Balbi <balbi@ti.com>
+Cc: linux-serial@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	peter@hurleysoftware.com, m-karicheri2@ti.com,
+	b32955@freescale.com,
+	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 01/11] tty: serial: add missing braces
+Message-ID: <20140423002843.GC24603@kroah.com>
+References: <1395343807-21618-1-git-send-email-balbi@ti.com>
+ <20140422142256.GC5524@saruman.home>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140422142256.GC5524@saruman.home>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
-
-> This patch adds possibility to start BlueZ only in LE mode only.
+On Tue, Apr 22, 2014 at 09:22:56AM -0500, Felipe Balbi wrote:
+> Hi,
 > 
-> It is useful for testing purpose, when you want test BlueZ in
-> peripheral mode against any dual mode device.
-> ---
-> android/README          |  3 +++
-> android/bluetooth.c     |  7 ++++++-
-> android/hal-bluetooth.c | 15 ++++++++++++++-
-> android/hal-msg.h       |  1 +
-> 4 files changed, 24 insertions(+), 2 deletions(-)
+> On Thu, Mar 20, 2014 at 02:29:57PM -0500, Felipe Balbi wrote:
+> > per CodingStyle we should have those braces, no
+> > functional changes.
+> > 
+> > Signed-off-by: Felipe Balbi <balbi@ti.com>
 > 
-> diff --git a/android/README b/android/README
-> index 6254d34..9b08610 100644
-> --- a/android/README
-> +++ b/android/README
-> @@ -166,6 +166,9 @@ options.
-> 
-> Property	Value		Description
-> -------------------------------------------
-> +mode		le_only		Enable BlueZ in Low Energy mode only.
-> +		<none>		Enable BlueZ in default mode - enable br/edr/le
-> +				if possible.
+> Greg, do you want me to refresh and resend this series ?
 
-we better do “bredr” and “le” here. If left empty it will default to auto detect mode with BR/EDR and LE enabled if available with your kernel and supported by the controller.
+If there are conflicts with my current tree, sure, I'd love to have
+that.  I should be trying to dig out from my patch backlog for 3.16-rc1
+by the end of this week...
 
-There might be actually an use case where you have a dual-mode controller, but want to just only use BR/EDR. It will be especially hard to fine BR/EDR only controllers.
+thanks,
 
-Regards
-
-Marcel
-
+greg k-h
