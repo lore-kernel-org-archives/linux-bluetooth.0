@@ -1,27 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Apr 2014 14:31:17 -0300
+Date: Wed, 23 Apr 2014 14:29:01 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: "Poulain, Loic" <loic.poulain@intel.com>
-Cc: "marcel@holtmann.org" <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: Remove hci_h4 unused defines
-Message-ID: <20140423173117.GC7832@joana>
-References: <50C3158CF44D924791C15F1437EF2EC65D65E9@HASMSX104.ger.corp.intel.com>
+To: Mohammed Habibulla <moch@chromium.org>
+Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+	johan.hedberg@gmail.com, keybuk@chromium.org
+Subject: Re: [PATCH] Bluetooth: Add support for Lite-on [04ca:3007]
+Message-ID: <20140423172901.GB7832@joana>
+References: <1397759833-1627-1-git-send-email-moch@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <50C3158CF44D924791C15F1437EF2EC65D65E9@HASMSX104.ger.corp.intel.com>
+In-Reply-To: <1397759833-1627-1-git-send-email-moch@chromium.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Hi Mohammed,
 
-2014-04-01 Poulain, Loic <loic.poulain@intel.com>:
+2014-04-17 Mohammed Habibulla <moch@chromium.org>:
 
-> H4 states are not used anymore.
+> Add support for the AR9462 chip
 > 
-> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=04ca ProdID=3007 Rev= 0.01
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Signed-off-by: Mohammed Habibulla <moch@chromium.org>
 > ---
->  drivers/bluetooth/hci_h4.c | 7 -------
->  1 file changed, 7 deletions(-)
+>  drivers/bluetooth/ath3k.c | 2 ++
+>  drivers/bluetooth/btusb.c | 1 +
+>  2 files changed, 3 insertions(+)
 
 Patch has been applied to bluetooth-next. Thanks.
 
