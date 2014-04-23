@@ -1,27 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1398143280-21017-1-git-send-email-martin.kampas@tieto.com>
-References: <1398143280-21017-1-git-send-email-martin.kampas@tieto.com>
-Date: Wed, 23 Apr 2014 10:24:17 +0300
-Message-ID: <CABBYNZL763g4AptiqcS-M4LvwD1BwMQnZg=HLHiJGYCG9qznFg@mail.gmail.com>
-Subject: Re: [PATCH] obex-client-tool: Set the length header
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Martin Kampas <martin.kampas@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] android/bluetooth: Make possible to start BlueZ in LE mode only
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 22 Apr 2014 17:29:12 -0700
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Message-Id: <F332EBA9-C4B5-43C1-B50C-48EB46AEFFC1@holtmann.org>
+References: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Martin,
+Hi Lukasz,
 
-On Tue, Apr 22, 2014 at 8:08 AM, Martin Kampas <martin.kampas@tieto.com> wrote:
-> At least 'put' to other device with obexd v0.48 does not work without
-> this.
+> This patch adds possibility to start BlueZ only in LE mode only.
+> 
+> It is useful for testing purpose, when you want test BlueZ in
+> peripheral mode against any dual mode device.
+> ---
+> android/README          |  3 +++
+> android/bluetooth.c     |  7 ++++++-
+> android/hal-bluetooth.c | 15 ++++++++++++++-
+> android/hal-msg.h       |  1 +
+> 4 files changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/README b/android/README
+> index 6254d34..9b08610 100644
+> --- a/android/README
+> +++ b/android/README
+> @@ -166,6 +166,9 @@ options.
+> 
+> Property	Value		Description
+> -------------------------------------------
+> +mode		le_only		Enable BlueZ in Low Energy mode only.
+> +		<none>		Enable BlueZ in default mode - enable br/edr/le
+> +				if possible.
 
-The patch itself is fine but there got to be something wrong with
-obexd if it cannot accept a PUT without length, maybe it is the agent
-that is rejecting it?
+we better do “bredr” and “le” here. If left empty it will default to auto detect mode with BR/EDR and LE enabled if available with your kernel and supported by the controller.
 
+There might be actually an use case where you have a dual-mode controller, but want to just only use BR/EDR. It will be especially hard to fine BR/EDR only controllers.
 
--- 
-Luiz Augusto von Dentz
+Regards
+
+Marcel
+
