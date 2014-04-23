@@ -10,36 +10,105 @@ CC: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>,
         Linux OMAP
  Mailing List <linux-omap@vger.kernel.org>,
         Tony Lindgren <tony@atomide.com>, Felipe Balbi <balbi@ti.com>
-Subject: [PATCH 04/13] serial: fix UART_IIR_ID
-Date: Wed, 23 Apr 2014 09:58:28 -0500
-Message-ID: <1398265117-11793-4-git-send-email-balbi@ti.com>
+Subject: [PATCH 02/13] bluetooth: hci_ldisc: fix deadlock condition
+Date: Wed, 23 Apr 2014 09:58:26 -0500
+Message-ID: <1398265117-11793-2-git-send-email-balbi@ti.com>
 In-Reply-To: <1398265117-11793-1-git-send-email-balbi@ti.com>
 References: <1398265117-11793-1-git-send-email-balbi@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-UART IRQ Identification bitfield is 3
-bits long (bits 3:1) but current mask only
-masks 2 bits. Fix it.
+LDISCs shouldn't call tty->ops->write() from within
+->write_wakeup().
 
+->write_wakeup() is called with port lock taken and
+IRQs disabled, tty->ops->write() will try to acquire
+the same port lock and we will deadlock.
+
+Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
+Reported-by: Huang Shijie <b32955@freescale.com>
 Signed-off-by: Felipe Balbi <balbi@ti.com>
 ---
- include/uapi/linux/serial_reg.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/hci_ldisc.c | 24 +++++++++++++++++++-----
+ drivers/bluetooth/hci_uart.h  |  1 +
+ 2 files changed, 20 insertions(+), 5 deletions(-)
 
-diff --git a/include/uapi/linux/serial_reg.h b/include/uapi/linux/serial_reg.h
-index e632260..99b4705 100644
---- a/include/uapi/linux/serial_reg.h
-+++ b/include/uapi/linux/serial_reg.h
-@@ -32,7 +32,7 @@
+diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
+index f1fbf4f..e00f8f5 100644
+--- a/drivers/bluetooth/hci_ldisc.c
++++ b/drivers/bluetooth/hci_ldisc.c
+@@ -118,10 +118,6 @@ static inline struct sk_buff *hci_uart_dequeue(struct hci_uart *hu)
  
- #define UART_IIR	2	/* In:  Interrupt ID Register */
- #define UART_IIR_NO_INT		0x01 /* No interrupts pending */
--#define UART_IIR_ID		0x06 /* Mask for the interrupt ID */
-+#define UART_IIR_ID		0x0e /* Mask for the interrupt ID */
- #define UART_IIR_MSI		0x00 /* Modem status interrupt */
- #define UART_IIR_THRI		0x02 /* Transmitter holding register empty */
- #define UART_IIR_RDI		0x04 /* Receiver data interrupt */
+ int hci_uart_tx_wakeup(struct hci_uart *hu)
+ {
+-	struct tty_struct *tty = hu->tty;
+-	struct hci_dev *hdev = hu->hdev;
+-	struct sk_buff *skb;
+-
+ 	if (test_and_set_bit(HCI_UART_SENDING, &hu->tx_state)) {
+ 		set_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+ 		return 0;
+@@ -129,6 +125,22 @@ int hci_uart_tx_wakeup(struct hci_uart *hu)
+ 
+ 	BT_DBG("");
+ 
++	schedule_work(&hu->write_work);
++
++	return 0;
++}
++
++static void hci_uart_write_work(struct work_struct *work)
++{
++	struct hci_uart *hu = container_of(work, struct hci_uart, write_work);
++	struct tty_struct *tty = hu->tty;
++	struct hci_dev *hdev = hu->hdev;
++	struct sk_buff *skb;
++
++	/* REVISIT: should we cope with bad skbs or ->write() returning
++	 * and error value ?
++	 */
++
+ restart:
+ 	clear_bit(HCI_UART_TX_WAKEUP, &hu->tx_state);
+ 
+@@ -153,7 +165,6 @@ restart:
+ 		goto restart;
+ 
+ 	clear_bit(HCI_UART_SENDING, &hu->tx_state);
+-	return 0;
+ }
+ 
+ static void hci_uart_init_work(struct work_struct *work)
+@@ -282,6 +293,7 @@ static int hci_uart_tty_open(struct tty_struct *tty)
+ 	tty->receive_room = 65536;
+ 
+ 	INIT_WORK(&hu->init_ready, hci_uart_init_work);
++	INIT_WORK(&hu->write_work, hci_uart_write_work);
+ 
+ 	spin_lock_init(&hu->rx_lock);
+ 
+@@ -319,6 +331,8 @@ static void hci_uart_tty_close(struct tty_struct *tty)
+ 	if (hdev)
+ 		hci_uart_close(hdev);
+ 
++	cancel_work_sync(&hu->write_work);
++
+ 	if (test_and_clear_bit(HCI_UART_PROTO_SET, &hu->flags)) {
+ 		if (hdev) {
+ 			if (test_bit(HCI_UART_REGISTERED, &hu->flags))
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index fffa61f..12df101 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -68,6 +68,7 @@ struct hci_uart {
+ 	unsigned long		hdev_flags;
+ 
+ 	struct work_struct	init_ready;
++	struct work_struct	write_work;
+ 
+ 	struct hci_uart_proto	*proto;
+ 	void			*priv;
 -- 
 1.9.2.459.g68773ac
