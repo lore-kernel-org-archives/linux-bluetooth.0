@@ -1,59 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Apr 2014 14:37:22 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Allow discovery during advertising
-Message-ID: <20140423113722.GA2967@t440s.lan>
-References: <1397588651-13459-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Martin Kampas <martin.kampas@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] obex-client-tool: Set the length header
+Date: Wed, 23 Apr 2014 12:20:06 +0200
+Message-ID: <5012684.PXV09D887U@5th>
+In-Reply-To: <CABBYNZJjB6D4Bekqu+wK9EeRrzg=26GFhB-KW-Spzq7X-tt4cg@mail.gmail.com>
+References: <1398143280-21017-1-git-send-email-martin.kampas@tieto.com> <CABBYNZ+6aXGkqnHcoaYCU+2DQ95i_W-+g2H4dM8uAV0rob1_CA@mail.gmail.com> <CABBYNZJjB6D4Bekqu+wK9EeRrzg=26GFhB-KW-Spzq7X-tt4cg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1397588651-13459-1-git-send-email-lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Hi Luiz,
 
-On Tue, Apr 15, 2014, Lukasz Rymanowski wrote:
-> With this patch it is possible to start scan when device does
-> advertising.
+On Wednesday, April 23, 2014 11:28:55 AM Luiz Augusto von Dentz wrote:
+> Try the with the following patch:
 > 
-> Most of chips do support such state combination, so there is no reason
-> for blocking it here.
-> If chip does not support this, kernel should get command status event
-> with command disallowed status which should not make any problems.
+> diff --git a/obexd/src/obex.c b/obexd/src/obex.c
+> index bd4770d..7b4634e 100644
+> --- a/obexd/src/obex.c
+> +++ b/obexd/src/obex.c
+> @@ -873,6 +873,10 @@ static void cmd_put(GObex *obex, GObexPacket
+> *req, gpointer user_data)
 > 
-> Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-> ---
->  net/bluetooth/mgmt.c | 7 -------
->  1 file changed, 7 deletions(-)
+>         os->cmd = G_OBEX_OP_PUT;
 > 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 54abbce..57cef73 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -3474,13 +3474,6 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
->  			goto failed;
->  		}
->  
-> -		if (test_bit(HCI_ADVERTISING, &hdev->dev_flags)) {
-> -			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
-> -					 MGMT_STATUS_REJECTED);
-> -			mgmt_pending_remove(cmd);
-> -			goto failed;
-> -		}
-> -
->  		/* If controller is scanning, it means the background scanning
->  		 * is running. Thus, we should temporarily stop it in order to
->  		 * set the discovery scanning parameters.
+> +       /* Set size to unknown if a body header exists */
+> +       if (g_obex_packet_get_body(req))
+> +               os->size = OBJECT_SIZE_UNKNOWN;
+> +
+>         parse_name(os, req);
+>         parse_length(os, req);
+>         parse_time(os, req);
 
-The general principle we've been following is that we don't send HCI
-commands to the controller that we know will fail. In this case we do
-track the supported states in hdev->le_states so you should be using
-that to determine whether the command should fail or not.
+I tried your patch with the old obexd v0.48 and it worked (I am sorry I could not easily try with the newest obexd from bluez tree).
 
-You might need to add tracking of the advertising type though (similar
-to how we track the own_addr_type for advertising) to know which state
-combination to check.
+Both patches seems worth to apply - mine to make the obex-client-tool work with old buggy devices.
 
-Johan
+Here is your patch aligned for v0.48:
+
+diff --git a/src/obex.c b/src/obex.c
+index 9044961..5ae4ff1 100644
+--- a/src/obex.c
++++ b/src/obex.c
+@@ -961,6 +961,10 @@ static void cmd_put(GObex *obex, GObexPacket *req, gpointer user_data)
+ 
+        os->cmd = G_OBEX_OP_PUT;
+ 
++       /* Set size to unknown if a body header exists */
++       if (g_obex_packet_get_body(req))
++               os->size = OBJECT_SIZE_UNKNOWN;
++
+        parse_name(os, req);
+        parse_length(os, req);
+        parse_time(os, req);
+--
+
+BR,
+Martin
+
+
+
