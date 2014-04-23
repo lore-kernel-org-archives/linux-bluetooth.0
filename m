@@ -10,45 +10,49 @@ CC: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>,
         Linux OMAP
  Mailing List <linux-omap@vger.kernel.org>,
         Tony Lindgren <tony@atomide.com>, Felipe Balbi <balbi@ti.com>
-Subject: [PATCH 06/13] tty: serial: omap: switch over to devm_request_gpio
-Date: Wed, 23 Apr 2014 09:58:30 -0500
-Message-ID: <1398265117-11793-6-git-send-email-balbi@ti.com>
+Subject: [PATCH 08/13] tty: serial: omap: switch over to platform_get_resource
+Date: Wed, 23 Apr 2014 09:58:32 -0500
+Message-ID: <1398265117-11793-8-git-send-email-balbi@ti.com>
 In-Reply-To: <1398265117-11793-1-git-send-email-balbi@ti.com>
 References: <1398265117-11793-1-git-send-email-balbi@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-this will make sure gpio gets freed automatically
-when this device is destroyed.
+this way we can remove one pointer declaration.
 
 Signed-off-by: Felipe Balbi <balbi@ti.com>
 ---
- drivers/tty/serial/omap-serial.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/tty/serial/omap-serial.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/tty/serial/omap-serial.c b/drivers/tty/serial/omap-serial.c
-index f456f46..07d4273 100644
+index 3813740..cb45e88 100644
 --- a/drivers/tty/serial/omap-serial.c
 +++ b/drivers/tty/serial/omap-serial.c
-@@ -1611,7 +1611,7 @@ static int serial_omap_probe_rs485(struct uart_omap_port *up,
- 	/* check for tx enable gpio */
- 	up->rts_gpio = of_get_named_gpio_flags(np, "rts-gpio", 0, &flags);
- 	if (gpio_is_valid(up->rts_gpio)) {
--		ret = gpio_request(up->rts_gpio, "omap-serial");
-+		ret = devm_gpio_request(up->dev, up->rts_gpio, "omap-serial");
- 		if (ret < 0)
- 			return ret;
- 		ret = gpio_direction_output(up->rts_gpio,
-@@ -1677,7 +1677,8 @@ static int serial_omap_probe(struct platform_device *pdev)
+@@ -1644,7 +1644,6 @@ static int serial_omap_probe(struct platform_device *pdev)
+ 	struct omap_uart_port_info *omap_up_info = dev_get_platdata(&pdev->dev);
+ 	struct uart_omap_port *up;
+ 	struct resource *mem;
+-	struct resource *irq;
+ 	int uartirq = 0;
+ 	int wakeirq = 0;
+ 	int ret;
+@@ -1658,12 +1657,9 @@ static int serial_omap_probe(struct platform_device *pdev)
+ 		omap_up_info = of_get_uart_port_info(&pdev->dev);
+ 		pdev->dev.platform_data = omap_up_info;
+ 	} else {
+-		irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
+-		if (!irq) {
+-			dev_err(&pdev->dev, "no irq resource?\n");
+-			return -ENODEV;
+-		}
+-		uartirq = irq->start;
++		uartirq = platform_get_irq(pdev, 0);
++		if (uartirq < 0)
++			return -EPROBE_DEFER;
+ 	}
  
- 	if (gpio_is_valid(omap_up_info->DTR_gpio) &&
- 	    omap_up_info->DTR_present) {
--		ret = gpio_request(omap_up_info->DTR_gpio, "omap-serial");
-+		ret = devm_gpio_request(&pdev->dev, omap_up_info->DTR_gpio,
-+				"omap-serial");
- 		if (ret < 0)
- 			return ret;
- 		ret = gpio_direction_output(omap_up_info->DTR_gpio,
+ 	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 -- 
 1.9.2.459.g68773ac
