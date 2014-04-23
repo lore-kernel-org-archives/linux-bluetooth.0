@@ -1,66 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <F332EBA9-C4B5-43C1-B50C-48EB46AEFFC1@holtmann.org>
-References: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<F332EBA9-C4B5-43C1-B50C-48EB46AEFFC1@holtmann.org>
-Date: Wed, 23 Apr 2014 10:22:50 +0200
-Message-ID: <CAMudyAsrsnsSHkw-Nhz_Q2ooOtxL8ewW1AG+3-2bwp5LpReNZA@mail.gmail.com>
-Subject: Re: [PATCH] android/bluetooth: Make possible to start BlueZ in LE
- mode only
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Szymon Janc <szymon.janc@tieto.com>
+In-Reply-To: <7726122.LGD9fIbFvh@5th>
+References: <1398143280-21017-1-git-send-email-martin.kampas@tieto.com>
+	<CABBYNZL763g4AptiqcS-M4LvwD1BwMQnZg=HLHiJGYCG9qznFg@mail.gmail.com>
+	<7726122.LGD9fIbFvh@5th>
+Date: Wed, 23 Apr 2014 11:20:59 +0300
+Message-ID: <CABBYNZ+6aXGkqnHcoaYCU+2DQ95i_W-+g2H4dM8uAV0rob1_CA@mail.gmail.com>
+Subject: Re: [PATCH] obex-client-tool: Set the length header
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Martin Kampas <martin.kampas@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Martin,
 
-On 23 April 2014 02:29, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Lukasz,
+On Wed, Apr 23, 2014 at 10:54 AM, Martin Kampas <martin.kampas@tieto.com> wrote:
+> Hi Luiz,
 >
->> This patch adds possibility to start BlueZ only in LE mode only.
->>
->> It is useful for testing purpose, when you want test BlueZ in
->> peripheral mode against any dual mode device.
->> ---
->> android/README          |  3 +++
->> android/bluetooth.c     |  7 ++++++-
->> android/hal-bluetooth.c | 15 ++++++++++++++-
->> android/hal-msg.h       |  1 +
->> 4 files changed, 24 insertions(+), 2 deletions(-)
->>
->> diff --git a/android/README b/android/README
->> index 6254d34..9b08610 100644
->> --- a/android/README
->> +++ b/android/README
->> @@ -166,6 +166,9 @@ options.
->>
->> Property      Value           Description
->> -------------------------------------------
->> +mode         le_only         Enable BlueZ in Low Energy mode only.
->> +             <none>          Enable BlueZ in default mode - enable br/e=
-dr/le
->> +                             if possible.
+> On Wednesday, April 23, 2014 10:24:17 AM Luiz Augusto von Dentz wrote:
+>> The patch itself is fine but there got to be something wrong with
+>> obexd if it cannot accept a PUT without length, maybe it is the agent
+>> that is rejecting it?
 >
-> we better do =E2=80=9Cbredr=E2=80=9D and =E2=80=9Cle=E2=80=9D here.
+> If I am not wrong it is rejected inside the opp plugin in opp_chkput() [1] (where OBJECT_SIZE_DELETE should be the initial value of obex_session::size), called from check_put() [2]
+>
+> I also tried with an Android 4.1 device and got the same result.
+>
+> BR,
+> Martin
+>
+> [1] http://git.kernel.org/cgit/bluetooth/obexd.git/tree/plugins/opp.c?id=0.48#n122
+> [2] http://git.kernel.org/cgit/bluetooth/obexd.git/tree/src/obex.c?id=0.48#n918
 
-> If left empty it will default to auto detect mode with BR/EDR and LE enab=
-led if available with your kernel and supported by the controller.
->
-Yes this is exactly how it works.
+Hmm, looks likes it is still broken, btw the proper check is probably
+to check the existence of a body header and then set size to
+OBJECT_SIZE_UNKNOWN before parse_length.
 
-> There might be actually an use case where you have a dual-mode controller=
-, but want to just only use BR/EDR. It will be especially hard to fine BR/E=
-DR only controllers.
->
-It's true.
-I started with le_only as I need that now. I left br/edr only case for
-the time somebody will need it as it is  easy to extend.
-If you want it now, I will add it.
 
-> Regards
->
-> Marcel
->
-BR
-\=C5=81ukasz
+-- 
+Luiz Augusto von Dentz
