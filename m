@@ -1,56 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Apr 2014 14:29:01 -0300
+Date: Wed, 23 Apr 2014 14:27:29 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
-To: Mohammed Habibulla <moch@chromium.org>
-Cc: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-	johan.hedberg@gmail.com, keybuk@chromium.org
-Subject: Re: [PATCH] Bluetooth: Add support for Lite-on [04ca:3007]
-Message-ID: <20140423172901.GB7832@joana>
-References: <1397759833-1627-1-git-send-email-moch@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Revert "Bluetooth: Enable autosuspend for Intel
+ Bluetooth device"
+Message-ID: <20140423172729.GA7832@joana>
+References: <1398200656-55480-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1397759833-1627-1-git-send-email-moch@chromium.org>
+In-Reply-To: <1398200656-55480-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Mohammed,
+Hi Marcel,
 
-2014-04-17 Mohammed Habibulla <moch@chromium.org>:
+2014-04-22 Marcel Holtmann <marcel@holtmann.org>:
 
-> Add support for the AR9462 chip
+> This reverts commit d2bee8fb6e18f6116aada39851918473761f7ab1.
 > 
-> T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=03 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04ca ProdID=3007 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> Enabling autosuspend for Intel Bluetooth devices has been shown to not
+> work reliable. It does work for some people with certain combinations
+> of USB host controllers, but for others it puts the device to sleep and
+> it will not wake up for any event.
 > 
-> Signed-off-by: Mohammed Habibulla <moch@chromium.org>
+> These events can be important ones like HCI Inquiry Complete or HCI
+> Connection Request. The events will arrive as soon as you poke the
+> device with a new command, but that is not something we can do in
+> these cases.
+> 
+> Initially there were patches to the xHCI USB controller that fixed
+> this for some people, but not for all. This could be well a problem
+> somewhere in the USB subsystem or in the USB host controllers or
+> just plain a hardware issue somewhere. At this moment we just do
+> not know and the only safe action is to revert this patch.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Tedd Ho-Jeong An <tedd.an@intel.com>
+> Cc: stable@vger.kernel.org
 > ---
->  drivers/bluetooth/ath3k.c | 2 ++
->  drivers/bluetooth/btusb.c | 1 +
->  2 files changed, 3 insertions(+)
+>  drivers/bluetooth/btusb.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
-Patch has been applied to bluetooth-next. Thanks.
+Patch has been applied to bluetooth.git. Thanks.
 
 	Gustavo
