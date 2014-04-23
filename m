@@ -1,29 +1,19 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Jesse Koegler" <Jesse.Koegler@the-NAC.com>
-To: "'Luiz Augusto von Dentz'" <luiz.dentz@gmail.com>
-Cc: "'Andrei Emeltchenko'" <Andrei.Emeltchenko.news@gmail.com>,
-	<linux-bluetooth@vger.kernel.org>
-References: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com><1397737431-6101-5-git-send-email-Andrei.Emeltchenko.news@gmail.com><EFAD1464E1954DBDA1F670B07446BE71@NAC.local> <CABBYNZJB9oV2Y2pGNnXMcnN2LVj4Ph+akR=appk3bWYbqo5myQ@mail.gmail.com>
-In-Reply-To: <CABBYNZJB9oV2Y2pGNnXMcnN2LVj4Ph+akR=appk3bWYbqo5myQ@mail.gmail.com>
-Subject: RE: [PATCH 5/7] android/hal-audio: Add SCO audio API
-Date: Wed, 23 Apr 2014 14:59:56 -0400
-Message-ID: <C0A40171937C45BAA0B532E4A99DB04D@NAC.local>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
+In-Reply-To: <EFAD1464E1954DBDA1F670B07446BE71@NAC.local>
+References: <1397737431-6101-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1397737431-6101-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<EFAD1464E1954DBDA1F670B07446BE71@NAC.local>
+Date: Wed, 23 Apr 2014 21:41:24 +0300
+Message-ID: <CABBYNZJB9oV2Y2pGNnXMcnN2LVj4Ph+akR=appk3bWYbqo5myQ@mail.gmail.com>
+Subject: Re: [PATCH 5/7] android/hal-audio: Add SCO audio API
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Jesse Koegler <Jesse.Koegler@the-nac.com>
+Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
-
-
-
-Ok, thanks
-
------Original Message-----
-From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com] 
-Sent: Wednesday, April 23, 2014 2:41 PM
-To: Jesse Koegler
-Cc: Andrei Emeltchenko; linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/7] android/hal-audio: Add SCO audio API
 
 Hi Jesse,
 
@@ -31,13 +21,10 @@ On Wed, Apr 23, 2014 at 5:06 PM, Jesse Koegler
 <Jesse.Koegler@the-nac.com> wrote:
 > All,
 >
-> I am currently using bluez 4.98 (time to update, I know). Within 4.98 I
-have
+> I am currently using bluez 4.98 (time to update, I know). Within 4.98 I have
 > been unable to find a way to control the responses to SCO link requests.
-> Will this or any other patches since 4.98 allow controlling of the
-responses
-> to SCO link requests? To my understanding this is done on the chip level
-and
+> Will this or any other patches since 4.98 allow controlling of the responses
+> to SCO link requests? To my understanding this is done on the chip level and
 > is outside the scope of the stack, has that changed at all?
 
 Please don't hijack threads with unrelated questions, create a new
@@ -141,8 +128,7 @@ thread... Regarding your question, have a look at the SCO socket API
 >
 > +/* Audio IPC functions */
 > +
-> +static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t
-len,
+> +static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
 > +                       void *param, size_t *rsp_len, void *rsp, int *fd)
 > +{
 > +       ssize_t ret;
@@ -156,8 +142,7 @@ len,
 > +       pthread_mutex_lock(&sk_mutex);
 > +
 > +       if (audio_sk < 0) {
-> +               error("audio: Invalid cmd socket passed to
-audio_ipc_cmd");
+> +               error("audio: Invalid cmd socket passed to audio_ipc_cmd");
 > +               goto failed;
 > +       }
 > +
@@ -185,8 +170,7 @@ audio_ipc_cmd");
 > +
 > +       ret = sendmsg(audio_sk, &msg, 0);
 > +       if (ret < 0) {
-> +               error("audio: Sending command failed:%s",
-strerror(errno));
+> +               error("audio: Sending command failed:%s", strerror(errno));
 > +               goto failed;
 > +       }
 > +
@@ -222,22 +206,19 @@ strerror(errno));
 > +       }
 > +
 > +       if (ret < (ssize_t) sizeof(cmd)) {
-> +               error("audio: Too small response received(%zd bytes)",
-ret);
+> +               error("audio: Too small response received(%zd bytes)", ret);
 > +               goto failed;
 > +       }
 > +
 > +       if (cmd.service_id != service_id) {
 > +               error("audio: Invalid service id (%u vs %u)",
 > cmd.service_id,
-> +
-service_id);
+> +                                                               service_id);
 > +               goto failed;
 > +       }
 > +
 > +       if (ret != (ssize_t) (sizeof(cmd) + cmd.len)) {
-> +               error("audio: Malformed response received(%zd bytes)",
-ret);
+> +               error("audio: Malformed response received(%zd bytes)", ret);
 > +               goto failed;
 > +       }
 > +
@@ -276,8 +257,7 @@ ret);
 > +               for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
 > +                                       cmsg = CMSG_NXTHDR(&msg, cmsg)) {
 > +                       if (cmsg->cmsg_level == SOL_SOCKET
-> +                                       && cmsg->cmsg_type == SCM_RIGHTS)
-{
+> +                                       && cmsg->cmsg_type == SCM_RIGHTS) {
 > +                               memcpy(fd, CMSG_DATA(cmsg), sizeof(int));
 > +                               break;
 > +                       }
@@ -376,8 +356,7 @@ ret);
 > @@ -219,9 +408,17 @@ static int audio_open_output_stream(struct
 > audio_hw_device *dev,
 >  static void audio_close_output_stream(struct audio_hw_device *dev,
->                                         struct audio_stream_out
-*stream_out)
+>                                         struct audio_stream_out *stream_out)
 >  {
 > -       DBG("");
 > +       struct hsp_audio_dev *hsp_dev = (struct hsp_audio_dev *) dev;
@@ -419,8 +398,7 @@ ret);
 > +                       if (err != ECONNABORTED && err != EINVAL)
 > +                               error("audio: Failed to accept socket: %d
 > (%s)",
-> +                                                       err,
-strerror(err));
+> +                                                       err, strerror(err));
 > +
 > +                       break;
 > +               }
@@ -520,8 +498,7 @@ strerror(err));
 >
 >         DBG("");
 >
-> @@ -338,6 +642,10 @@ static int audio_open(const hw_module_t *module,
-const
+> @@ -338,6 +642,10 @@ static int audio_open(const hw_module_t *module, const
 > char *name,
 >                 return -EINVAL;
 >         }
@@ -606,8 +583,7 @@ const
 > @@ -2597,6 +2636,9 @@ done:
 >         hal_ipc = ipc;
 >         ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
->
-G_N_ELEMENTS(cmd_handlers));
+>                                                 G_N_ELEMENTS(cmd_handlers));
 > +
 > +       bt_audio_register(NULL);
 > +
@@ -624,8 +600,7 @@ G_N_ELEMENTS(cmd_handlers));
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-in
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
 > the body of a message to majordomo@vger.kernel.org
 > More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
@@ -633,4 +608,3 @@ in
 
 -- 
 Luiz Augusto von Dentz
-
