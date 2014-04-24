@@ -1,196 +1,158 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Apr 2014 20:21:00 -0500
-From: Felipe Balbi <balbi@ti.com>
-To: NeilBrown <neilb@suse.de>
-CC: <balbi@ti.com>, Nishanth Menon <nm@ti.com>,
-        Greg KH
-	<gregkh@linuxfoundation.org>, <marcel@holtmann.org>,
-        <gustavo@padovan.org>, <johan.hedberg@gmail.com>, <jslaby@suse.cz>,
-        <grant.likely@linaro.org>,
-        Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        <linux-bluetooth@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        Linux OMAP Mailing List
-	<linux-omap@vger.kernel.org>,
-        Tony Lindgren <tony@atomide.com>
+Date: Thu, 24 Apr 2014 10:13:29 +1000
+From: NeilBrown <neilb@suse.de>
+To: <balbi@ti.com>
+Cc: Nishanth Menon <nm@ti.com>, Greg KH <gregkh@linuxfoundation.org>,
+ <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>,
+ <jslaby@suse.cz>, <grant.likely@linaro.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
+ <linux-serial@vger.kernel.org>, <devicetree@vger.kernel.org>, Linux OMAP
+ Mailing List <linux-omap@vger.kernel.org>, Tony Lindgren <tony@atomide.com>
 Subject: Re: [PATCH 10/13] tty: serial: omap: remove some dead code
-Message-ID: <20140424012100.GB13374@saruman.home>
-Reply-To: <balbi@ti.com>
+Message-ID: <20140424101329.02e6a62f@notabene.brown>
+In-Reply-To: <20140423230121.GC10924@saruman.home>
 References: <1398265117-11793-1-git-send-email-balbi@ti.com>
- <1398265117-11793-10-git-send-email-balbi@ti.com>
- <5357DDA8.4040206@ti.com>
- <20140424084305.20c7f301@notabene.brown>
- <20140423230121.GC10924@saruman.home>
- <20140424101329.02e6a62f@notabene.brown>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="QKdGvSO+nmPlgiQ/"
-In-Reply-To: <20140424101329.02e6a62f@notabene.brown>
+	<1398265117-11793-10-git-send-email-balbi@ti.com>
+	<5357DDA8.4040206@ti.com>
+	<20140424084305.20c7f301@notabene.brown>
+	<20140423230121.GC10924@saruman.home>
+Mime-Version: 1.0
+Content-Type: multipart/signed; micalg=PGP-SHA1;
+ boundary="Sig_/3o3JF0SUzTrvuVU1E.zWyqc"; protocol="application/pgp-signature"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---QKdGvSO+nmPlgiQ/
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--Sig_/3o3JF0SUzTrvuVU1E.zWyqc
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Wed, 23 Apr 2014 18:01:21 -0500 Felipe Balbi <balbi@ti.com> wrote:
 
-On Thu, Apr 24, 2014 at 10:13:29AM +1000, NeilBrown wrote:
-> On Wed, 23 Apr 2014 18:01:21 -0500 Felipe Balbi <balbi@ti.com> wrote:
+> Hi,
 >=20
-> > Hi,
+> On Thu, Apr 24, 2014 at 08:43:05AM +1000, NeilBrown wrote:
+> > On Wed, 23 Apr 2014 10:35:04 -0500 Nishanth Menon <nm@ti.com> wrote:
 > >=20
-> > On Thu, Apr 24, 2014 at 08:43:05AM +1000, NeilBrown wrote:
-> > > On Wed, 23 Apr 2014 10:35:04 -0500 Nishanth Menon <nm@ti.com> wrote:
-> > >=20
-> > > > On 04/23/2014 09:58 AM, Felipe Balbi wrote:
-> > > > > nobody passes a DTR_gpio to this driver, so
-> > > > > this code is not necessary.
-> > > > >=20
-> > > > > Signed-off-by: Felipe Balbi <balbi@ti.com>
-> > > > > ---
+> > > On 04/23/2014 09:58 AM, Felipe Balbi wrote:
+> > > > nobody passes a DTR_gpio to this driver, so
+> > > > this code is not necessary.
 > > > >=20
-> > > > Niel,
-> > > > this seems to revert the functionality introduced in
-> > > > commit 9574f36fb801035f6ab0fbb1b53ce2c12c17d100
-> > > > (OMAP/serial: Add support for driving a GPIO as DTR.)
-> > > >=20
-> > > > would you like to Ack this change?
+> > > > Signed-off-by: Felipe Balbi <balbi@ti.com>
+> > > > ---
 > > >=20
-> > > I have a couple of out-of-tree drivers that use this support.
+> > > Niel,
+> > > this seems to revert the functionality introduced in
+> > > commit 9574f36fb801035f6ab0fbb1b53ce2c12c17d100
+> > > (OMAP/serial: Add support for driving a GPIO as DTR.)
 > > >=20
-> > > I hope to get back to working on that code one day and even get those=
- drivers
-> > > upstream.  So I would really prefer this code to remain if it isn't c=
-ausing
-> > > any actual problems.
+> > > would you like to Ack this change?
 > >=20
-> > it causes problem with DT (not really). That suport is only available on
-> > legacy platform_data-based boot, it's not available on DT. I hear Tony
-> > is pretty close to turning OMAP3 DT-only.
+> > I have a couple of out-of-tree drivers that use this support.
 > >=20
-> > > Of course, I can always re-submit it when I need it again, but that i=
-t just
-> > > extra work all around.
-> >=20
-> > I wonder how you will pass those attributes through DT considering they
-> > are *really* SW configuration. Why can't you use the real DTR pin, btw ?
-> >=20
+> > I hope to get back to working on that code one day and even get those d=
+rivers
+> > upstream.  So I would really prefer this code to remain if it isn't cau=
+sing
+> > any actual problems.
 >=20
-> This myth that DT is only about hardware is probably one of the
-> reasons that I haven't got these out-of-tree drivers upstream yet.
-
-take that up with DT maintainers
-
-> There is no "real" DTR pin.
-
-heh, my bad... confused with RTS which is supported in this HW.
-
-> When I open /dev/ttyWHATEVER, I need the driver for the device that is
-> permanently connected to that serial port to be told that the serial-devi=
-ce
-> has been opened so that it can "power on" or "wake up" the device.
+> it causes problem with DT (not really). That suport is only available on
+> legacy platform_data-based boot, it's not available on DT. I hear Tony
+> is pretty close to turning OMAP3 DT-only.
 >=20
-> I don't much care how that happens, or how I tell DT that it has to happe=
-n.
-> I just need it to happen.
+> > Of course, I can always re-submit it when I need it again, but that it =
+just
+> > extra work all around.
 >=20
-> In discrete hardware devices, the DTR line is what you would use.  The RS=
-232
-> port would raise (or lower or whatever) DTR when /dev/ttyWHATEVER was ope=
-n,
-> and  the device that was plugged in would detect the level change and do
-> stuff.
+> I wonder how you will pass those attributes through DT considering they
+> are *really* SW configuration. Why can't you use the real DTR pin, btw ?
 >=20
-> But I don't have discrete hardware.  I have a bunch of stuff soldered ont=
-o a
-> board with ad-hoc connections chosen to make the life of the hardware bui=
-lder
-> easy rather than chosen to make the life of the software developer easy
-> (which I think is the correct choice).
->=20
-> So I need to tell DT "This device is plugged into this UART, and there is=
- no
-> DTR line, but when the UARTs DTR line would be asserted (if it had one), =
-then
-> I need that regulator of there turned on". or maybe "I need to toggle this
-> GPIO  with exactly this pattern, while watching that GPIO to see if it is
-> working".
->=20
-> So I thought:
->=20
->  1/ give the UART a "virtual" DTR so it could drive any GPIO
->  2/ create a "gpio-to-regulator" driver which presented as a (virtual) gp=
-io
->     and responded to state changes on that GPIO by turning on or off the
->     regulator
->  3/ create a dedicated driver which knows how to toggle the magic GPIO wh=
-ile
->     watching the other GPIO to convince the silly device to wakeup, or go=
- to
->     sleep, as required, and have this appear as a (virtual) GPIO.
->=20
-> Then I can just tell DT that these (virtual) GPIOs are connected together,
-> and it will all just work.  And it does.
->=20
-> But given the whole "no no, DT is for describing hardware, and you are
-> describing software" attitude,  it seems that I lost motivation for a whi=
-le
-> (that wasn't the only reason, but it didn't help).
->=20
-> I have a patch which converts the OMAP serial driver to use DT to configu=
-re
-> these virtual DTR lines.  I'm very happy to submit that if there is some
-> chance it might be accepted and will keep the current DTR code in place.
 
-I have no problem either way, just that unused code doesn't have to be
-sitting in the tree and I'm not entirely sure this GPIO should be
-handled by omap-serial.c, perhaps something more generic inside
-serial-core so other UART drivers can benefit from it.
+This myth that DT is only about hardware is probably one of the reasons tha=
+t I
+haven't got these out-of-tree drivers upstream yet.
 
-> On the other hand, if you can point out to me what I'm missing, and how I=
- can
-> solve my problem with any virtual GPIOs, I'm all ears.
->=20
-> To make my problem simple and explicit:  I have a device attached to a UA=
-RT
-> which has a separate regulator.  The regulator should be powered on if and
+There is no "real" DTR pin.
 
-So you're using DTR to power the GPIO and hoping that the regulator
-stabilizes quickly enough so that by the time your open() finishes you
-don't have to add nonsensical msleep() calls before writing to the
-device. Sounds a bit fragile to me.
+When I open /dev/ttyWHATEVER, I need the driver for the device that is
+permanently connected to that serial port to be told that the serial-device
+has been opened so that it can "power on" or "wake up" the device.
 
-> only if the /dev/ttyXX interface to the UART is open.  The device is a
-> bluetooth transceiver.
+I don't much care how that happens, or how I tell DT that it has to happen.
+I just need it to happen.
 
-considering this is a BTUART device, why didn't you do this at the ldisc
-level ? hci_uart_open() sounds like a good choice from a quick thinking.
+In discrete hardware devices, the DTR line is what you would use.  The RS232
+port would raise (or lower or whatever) DTR when /dev/ttyWHATEVER was open,
+and  the device that was plugged in would detect the level change and do
+stuff.
 
---=20
-balbi
+But I don't have discrete hardware.  I have a bunch of stuff soldered onto a
+board with ad-hoc connections chosen to make the life of the hardware build=
+er
+easy rather than chosen to make the life of the software developer easy
+(which I think is the correct choice).
 
---QKdGvSO+nmPlgiQ/
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
+So I need to tell DT "This device is plugged into this UART, and there is no
+DTR line, but when the UARTs DTR line would be asserted (if it had one), th=
+en
+I need that regulator of there turned on". or maybe "I need to toggle this
+GPIO  with exactly this pattern, while watching that GPIO to see if it is
+working".
+
+So I thought:
+
+ 1/ give the UART a "virtual" DTR so it could drive any GPIO
+ 2/ create a "gpio-to-regulator" driver which presented as a (virtual) gpio
+    and responded to state changes on that GPIO by turning on or off the
+    regulator
+ 3/ create a dedicated driver which knows how to toggle the magic GPIO while
+    watching the other GPIO to convince the silly device to wakeup, or go to
+    sleep, as required, and have this appear as a (virtual) GPIO.
+
+Then I can just tell DT that these (virtual) GPIOs are connected together,
+and it will all just work.  And it does.
+
+But given the whole "no no, DT is for describing hardware, and you are
+describing software" attitude,  it seems that I lost motivation for a while
+(that wasn't the only reason, but it didn't help).
+
+I have a patch which converts the OMAP serial driver to use DT to configure
+these virtual DTR lines.  I'm very happy to submit that if there is some
+chance it might be accepted and will keep the current DTR code in place.
+
+On the other hand, if you can point out to me what I'm missing, and how I c=
+an
+solve my problem with any virtual GPIOs, I'm all ears.
+
+To make my problem simple and explicit:  I have a device attached to a UART
+which has a separate regulator.  The regulator should be powered on if and
+only if the /dev/ttyXX interface to the UART is open.  The device is a
+bluetooth transceiver.
+(I have another device which is a GPS receiver which has similar
+but more complicated requirements)
+
+Thanks,
+NeilBrown
+
+
+--Sig_/3o3JF0SUzTrvuVU1E.zWyqc
+Content-Type: application/pgp-signature; name=signature.asc
+Content-Disposition: attachment; filename=signature.asc
 
 -----BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
+Version: GnuPG v2.0.22 (GNU/Linux)
 
-iQIcBAEBAgAGBQJTWGb8AAoJEIaOsuA1yqRENNUQAIGPo+rZyQHDJvv85rm7WE/K
-P6+dbz5UN5dEIWvNNpY4mY8whp2EGz8yIdse4mVxes3BjThZlqY2e+NhxI82mG2j
-DFzVf/ZvleJ4wQL8JZ6Q9kCJ6tmiBVgvN/FuXy2PN5q89B7fVVG7YKQz9nPIGan1
-tlxh0MbFHsn0PGVbU3sryEz0M1jnJ4OTkrdgTQvC+CqqjElSjfj0IGESi85KtKn3
-19j3p/07DNaJJR/59KDBrdKxJyzqvp3e9ypbLX7p61eOx0EcWLRD7f2U5Qp8CYT4
-Fo+/pgqC6AD10E2LoFbFyispjOjkHX1d9TeOe6B5xD3bx+y0dOTb8m6ysHEMTv6M
-eYmbUzlgge2SAqmrOeyGsviHG5gtrXYBJ7vS084cZtfh35Azhgqqp5gz8htrgFLX
-eV48kWV2lh5lVyqEfY41YSy6W474Sf3cIMRF+mH8EQCrG9ZMH5UM22s+TEUZrElA
-p55NBm2uCJJy38aPdkPBbYKrwS/IQ7ule+BVO7TwBQQ8l6unv3IkjIqzO+E1ylqU
-5qzRCKnbgbq/d6S6QwHQaRFCflmVpm2j4ARjuAOBAEk5ZaS40DPknS8JwzcEbdmU
-rsDWaTiJnpl04M6URT/Az59wSxujt1gVSp4OR2Hr52sGKpSclcgngj3XkIHHxZvI
-vkiXxtGLDqfNlM3Iqh8J
-=LPHB
+iQIVAwUBU1hXKTnsnt1WYoG5AQKbQBAAqIJymgkITkPEb42Wdl/WAc5Tupcga6dW
+v4WP3SGhNOZJBtB+EctQlhX9Tq1lLRqr2N+ZOrLP2BeClESyBldwljsxPh50uKrm
+kNytSB1OKTxaVWTCR3IpKHuCXau76UnRgEtTV8lB3eOVx2hjjjcufddqfAjBWd4L
+7ANcOxYieQyhIOJjkdBTQI5lH8WP7hEJ/gYH6S8HiDt8HvDlRKFDmWu2pxrAF22v
+YssPN/n/B3WZh96D9X2XKNWIrzSfaGHMNYJrjBXQCHyRlAUuFjRtNIP0MDa0lmpS
+7uqB+wzW3HQ/LcNBbmaM1vdmvvnbPVslFQQuNZZott+18OmpMsTOMv+eJSv0SGkt
+/m0YDZoMCIG4/fDhYEJMJOKYSWWBY0d4tYQBXOM++T2gC4zpxPlHsBEP5GtxMqre
+aNFNhIZzU6PuEZjPBEwQz/R8iwDVP5et+DxB7GT5kpXi07m89jh3m8txLfuNr9Np
+qDL8jxge6r7+QSWkfsKjt9KT+MBlaq7ag9TRyQ3ZjO73XR/yzP3Hbf65sf+jwE+P
+clIvFMo/FomQp5PyMzgVMPdl0Fjrp+BeeaMHR20d6yHzS3vwJNnC8tBSs92jFvo2
+hccNg2iunqHNlqXkPc4P5PMaLsZU3/HW1vSO00qAqAndmC7ILwrVcdaZxsenxf+u
+yXkavL4drUw=
+=E12t
 -----END PGP SIGNATURE-----
 
---QKdGvSO+nmPlgiQ/--
+--Sig_/3o3JF0SUzTrvuVU1E.zWyqc--
