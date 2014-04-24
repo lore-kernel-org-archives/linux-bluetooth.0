@@ -1,57 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Apr 2014 11:01:07 +0200
-From: Andreas =?iso-8859-1?Q?Bie=DFmann?= <andreas@biessmann.de>
-To: Felipe Balbi <balbi@ti.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, marcel@holtmann.org,
-	gustavo@padovan.org, johan.hedberg@gmail.com, jslaby@suse.cz,
-	grant.likely@linaro.org,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	Linux OMAP Mailing List <linux-omap@vger.kernel.org>,
-	Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 02/13] bluetooth: hci_ldisc: fix deadlock condition
-Message-ID: <20140424090107.GB8095@punisher.2og.er.corscience.de>
-References: <1398265117-11793-1-git-send-email-balbi@ti.com>
- <1398265117-11793-2-git-send-email-balbi@ti.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] android/bluetooth: Allow to start BlueZ in a single mode.
+Date: Thu, 24 Apr 2014 10:36:47 +0200
+Message-ID: <1620245.Ypbl0G4UED@leonov>
+In-Reply-To: <1398272007-15338-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1398272007-15338-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-In-Reply-To: <1398265117-11793-2-git-send-email-balbi@ti.com>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Felipe Balbi,
+Hi ≈Åukasz,
 
-On Wed, Apr 23, 2014 at 09:58:26AM -0500, Felipe Balbi wrote:
-> LDISCs shouldn't call tty->ops->write() from within
-> ->write_wakeup().
+On Wednesday 23 of April 2014 18:53:24 Lukasz Rymanowski wrote:
+> With this patches it is possible to start Bluez in a single mode.
 > 
-> ->write_wakeup() is called with port lock taken and
-> IRQs disabled, tty->ops->write() will try to acquire
-> the same port lock and we will deadlock.
+> v2: Refactor of previous patch so we don't disable already enabled LE mode.
+> It was actually not accodring to the spec.
 > 
-> Acked-by: Marcel Holtmann <marcel@holtmann.org>
-> Reviewed-by: Peter Hurley <peter@hurleysoftware.com>
-> Reported-by: Huang Shijie <b32955@freescale.com>
-> Signed-off-by: Felipe Balbi <balbi@ti.com>
+> Lukasz Rymanowski (3):
+>   android/bluetooth: Add supported lmp settings to adapter struct
+>   android/bluetooth: Do not enable BT LE by default
+>   android/bluetooth: Make possible to start BlueZ in a single mode
+> 
+>  android/README          |  4 ++++
+>  android/bluetooth.c     | 52
+> +++++++++++++++++++++++++++++++++++++++++-------- android/bluetooth.h     |
+>  2 +-
+>  android/hal-bluetooth.c | 19 +++++++++++++++++-
+>  android/hal-msg.h       |  2 ++
+>  android/main.c          |  5 ++++-
+>  6 files changed, 73 insertions(+), 11 deletions(-)
 
-Tested-by: Andreas Bieﬂmann <andreas@biessmann.de>
+All patches applied, thanks.
 
-on custom TI AM37xx board with 3.4.87. Therefore I vote for adding this to
-stable branches (at least 3.4). It applies with a slight line shifting
-(init_work is not available there).
-
-I wonder if you have seen my approach [1] to fix this deadlock.  This stuff is
-quiet new to me. As I understood the work_queue has a bit more overhead than a
-tasklet. Therefore I implemented my fix with a tasklet. Would be great if one
-could shed some light on that.
-
-Best regards
-
-Andreas Bieﬂmann
-
-[1] https://lkml.org/lkml/2014/4/16/425
-
-> ---
->  drivers/bluetooth/hci_ldisc.c | 24 +++++++++++++++++++-----
->  drivers/bluetooth/hci_uart.h  |  1 +
->  2 files changed, 20 insertions(+), 5 deletions(-)
+-- 
+BR
+Szymon Janc
