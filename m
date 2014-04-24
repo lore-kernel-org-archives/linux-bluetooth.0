@@ -1,134 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Apr 2014 12:27:09 -0300
+Date: Thu, 24 Apr 2014 11:53:29 -0300
 From: Gustavo Padovan <gustavo@padovan.org>
 To: linville@tuxdriver.com
 Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-04-24
-Message-ID: <20140424152709.GE7832@joana>
+Subject: pull request: bluetooth 2014-04-24
+Message-ID: <20140424145329.GD7832@joana>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="U+BazGySraz5kW0T"
-Sender: linux-bluetooth-owner@vger.kernel.org
+	protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
---U+BazGySraz5kW0T
+--/9DWx/yDrRhgMJTb
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
 Hi John,
 
-Here goes some patches for the -next release. There is nothing really speci=
-al
-for this pull request, just a bunch of refactors, fixes and clean ups.=20
+Some fixes for 3.15. There is a revert for the intel driver, a new device id,
+and two important SSP fixes from Johan.
+Also we've noticed that your wireless.git tree is not up to date, so this pull
+was rebased on top of net.git. If you pull from this you'll will be pulling
+net/master from yesterday as well.
 
-Please pull, or let me know of any problems! Thanks.
+Please pull or let me know of any concerns you have. Thanks!
 
 	Gustavo
 
 ---
-The following changes since commit e8b1ab9e6d30394e0df3e4f60bf56c4dc9bf0863:
+The following changes since commit 6a51b5e4d59e00051e65e836520912cd7c717be1:
 
-  Bluetooth: Fix returning peer address in pending connect state (2014-03-2=
-6 09:31:33 -0700)
+  hisax/icc: add missing semicolon after label (2014-04-22 21:22:47 -0400)
 
 are available in the git repository at:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t for-upstream
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
 
-for you to fetch changes up to 22e70786413ed05950207eda7be420c280b776d7:
+for you to fetch changes up to b66a81831359495b3768ace72452209cdf5d6614:
 
-  Bluetooth: Remove hci_h4 unused defines (2014-04-24 11:55:26 -0300)
+  Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-24 12:43:33 +0300)
 
 ----------------------------------------------------------------
-Andre Guedes (1):
-      Bluetooth: Use memdup_user in le_auto_conn_write()
-
-Bing Zhao (2):
-      Bluetooth: btmrvl: separate write-to-clear function from interrupt ha=
-ndler
-      Bluetooth: btmrvl: implement read-to-clear for SD8897 interrupts
-
-Johan Hedberg (15):
-      Bluetooth: Refactor advertising report processing into its own functi=
-on
-      Bluetooth: Move local identity address setting to a central place
-      Bluetooth: Fix LE responder/initiator address setting
-      Bluetooth: Add error mapping for Directed Advertising Timeout
-      Bluetooth: Don't send device found events during passive scanning
-      Bluetooth: Add scan_rsp parameter to mgmt_device_found()
-      Bluetooth: Add directed advertising support through connect()
-      Bluetooth: Merge ADV_IND/ADV_SCAN_IND and SCAN_RSP together
-      Bluetooth: Remove redundant NULL check
-      Bluetooth: Fix line splitting of mgmt_device_found parameters
-      Bluetooth: Don't send device found events for duplicate reports
-      Bluetooth: Store also RSSI for pending advertising reports
-      Bluetooth: Fix RSSI value in device found event from disabling scan
-      Bluetooth: Remove unnecessary NULL check in hci_inquiry_cache_update
-      Bluetooth: Fix address in unmergeable device found events
-
-Lukasz Rymanowski (3):
-      Bluetooth: Keep msec in DISCOV_INTERLEAVED_TIMEOUT
-      Bluetooth: Add new debugfs parameter
-      Bluetooth: Keep msec in DISCOV_LE_TIMEOUT
+Johan Hedberg (2):
+      Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
+      Bluetooth: Fix redundant encryption request for reauthentication
 
 Marcel Holtmann (1):
-      Bluetooth: Return EOPNOTSUPP for HCISETRAW ioctl command
+      Revert "Bluetooth: Enable autosuspend for Intel Bluetooth device"
 
-Mikel Astiz (3):
-      Bluetooth: Refactor hci_get_auth_req()
-      Bluetooth: Refactor code for outgoing dedicated bonding
-      Bluetooth: Request MITM Protection when initiator
+Mohammed Habibulla (1):
+      Bluetooth: Add support for Lite-on [04ca:3007]
 
-Petri Gynther (1):
-      Bluetooth: btmrvl: Fix btmrvl_send_module_cfg_cmd()
-
-Poulain, Loic (1):
-      Bluetooth: Remove hci_h4 unused defines
-
-Timo Mueller (1):
-      Bluetooth: Use MITM Protection when IO caps allow it
-
- drivers/bluetooth/btmrvl_drv.h   |   4 +-
- drivers/bluetooth/btmrvl_main.c  |  19 +++-
- drivers/bluetooth/btmrvl_sdio.c  | 103 ++++++++++++++++----
- drivers/bluetooth/btmrvl_sdio.h  |   3 +
- drivers/bluetooth/hci_h4.c       |   7 --
- include/net/bluetooth/hci.h      |   1 +
- include/net/bluetooth/hci_core.h |  13 ++-
- net/bluetooth/hci_conn.c         |  81 ++++++++++++++--
- net/bluetooth/hci_core.c         |  20 ++--
- net/bluetooth/hci_event.c        | 246 +++++++++++++++++++++++++++++++++++=
-------------
- net/bluetooth/hci_sock.c         |  11 +--
- net/bluetooth/lib.c              |   1 +
- net/bluetooth/mgmt.c             |  36 ++++---
- 13 files changed, 407 insertions(+), 138 deletions(-)
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 5 ++---
+ net/bluetooth/hci_conn.c  | 9 ++++++---
+ net/bluetooth/hci_event.c | 6 ++++++
+ 4 files changed, 16 insertions(+), 6 deletions(-)
 
 
-
---U+BazGySraz5kW0T
+--/9DWx/yDrRhgMJTb
 Content-Type: application/pgp-signature
 
 -----BEGIN PGP SIGNATURE-----
 Version: GnuPG v1
 
-iQIcBAEBAgAGBQJTWS1NAAoJEPs3PUX4s20ohvYP/RU10NTJw5n8If0Lu9kvaxPW
-uQcjFv79pN0CgjhoRaQQ9JAeAH5wWDJJYOspP5bqhTOr9yxsacyHxalW7AJFIxsb
-sm5goDObARrSGiPrCVvQVQSil/jUfBw7ksUwYwSEvFNkPs9L46kh0t06BSupg+JU
-gVxWL+6J0wOm/SDIIaW85awzbqriXf11z78uq402PtMiUemH2Sh2KTlkg/k2BH7n
-LNdOTZASRVQbgToGcIe/Rb9OtedUxcmFo5DfqGVrx/nYrowxx4FvJJLedfVd7KNG
-zgnaIM9XQDz/D8y+DUrtdOpHfSqP57gAEyb9A5H9/Ic9K2OeXevicDvxOtyWEKjT
-YgRrfxSKyeOYVG5XBXDRDMfpZfCUukhkoewcCBXOe49wT+c8nUyNxlUfGs0kS8hp
-8ZoKJhoX1SB6t9PkArjV7e47Gf/Q2E+se/RrmnRcTy6VEqCyc4ChgXqyqmSFjiSO
-Thm7rO/2I3qAJNOxJmruTOA9+vYNIgyglZGXuKlkFYqDsLjlUXTCywq7nXYaHbSt
-EsdQlLsS3D50dsTgdHa0l+hv4XuqsMe4Ctn3XWWZqgz6G4vwmQOdIMFdSwtXAh92
-rWxkiLsH9BWpZaIC4eeAwDwXgAe8JE86xyu7hijVLdkSeXDEWVSgVhRyBQ8GSC5V
-6lUsLNsHJYrRETtPi0Nq
-=lFEO
+iQIcBAEBAgAGBQJTWSVpAAoJEPs3PUX4s20oLWQP/1hhfe6EZ45Sec94NIsSYB5K
+EZYvvOX4sKj3VhTT/dzKIBZDp7aLHyBZGB4HRBezKe0KqiNFV3eVU9Um1BsWxCgH
+u5S/PgS1yj2BOSgCJAy2dZPYqQii8KEUugIocRMzqs6ZtolbnaucQexSy65af4hY
+MVyHPUCRgtYi9tMDu/JTyi3b+LDzYgztYG5mgLzuw3zz2SaGc9bLdJIQ4aPyaIge
+rwzoLxPJKxfF+7xIObhVccMK150AjwapsN9/oV+FGDmP83zxXxGoBOFGf8lorQbh
+2C4Ol0zqJj8pob3cQxExwZjmVX9LG0vm/wqeNW9E3wKfelhkwdf4cF25kvfvnPAl
+pjhhjp7ssbEBnPhxwKqJIEb6VuAaZPMYuV+62g9gcU3wq2LCSSRI1s31LgEiNBbh
+7HedJ12UD4Q6BqHzrSf4Mc3Bhli1jz1HL4wwZy2DxqhAu7mlRxHVjkg+iupeSp6l
+jJDjbWdzF3WH/E+lhJCI9mgGQb97X1ZwzCjLJxO2/QXDs2RlQU6+bSjbDbUDec9+
+0mrRNbfJgzdezuHBFWQEX0UkKG6E6mliXmJ+GH9OJDHA+VTIyMtm7vjowe68jMZW
+a1Iq52ijBMKlo1goMlkVR8K3KE0PpWNSSh0TdoYzrYWzBo8uM80uasyuNDvyhdqc
+Ab1PYbsWaogXz91HHxYG
+=TAG1
 -----END PGP SIGNATURE-----
 
---U+BazGySraz5kW0T--
+--/9DWx/yDrRhgMJTb--
