@@ -1,70 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Apr 2014 21:44:47 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-04-24
-Message-ID: <20140425014446.GC3410@tuxdriver.com>
-References: <20140424145329.GD7832@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140424145329.GD7832@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Thu, 24 Apr 2014 18:26:47 -0400
+Message-ID: <CAOAOC6YOUP0rkX5Yk2CifzaVonwz=7o-2JtaFqPkFGybHRypqw@mail.gmail.com>
+Subject: Google Glass as audio out device
+From: Tim Nelson <tim.l.nelson@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This tag has a lot of stuff in it not in the wireless tree.
-Please only send me pull requests that only include patches related
-to Bluetooth.
+Is there any way to get Google Glass to work as an audio device? If
+not are there any plans to for the future?
 
-John
-
-On Thu, Apr 24, 2014 at 11:53:29AM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Some fixes for 3.15. There is a revert for the intel driver, a new device id,
-> and two important SSP fixes from Johan.
-> Also we've noticed that your wireless.git tree is not up to date, so this pull
-> was rebased on top of net.git. If you pull from this you'll will be pulling
-> net/master from yesterday as well.
-> 
-> Please pull or let me know of any concerns you have. Thanks!
-> 
-> 	Gustavo
-> 
-> ---
-> The following changes since commit 6a51b5e4d59e00051e65e836520912cd7c717be1:
-> 
->   hisax/icc: add missing semicolon after label (2014-04-22 21:22:47 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-> 
-> for you to fetch changes up to b66a81831359495b3768ace72452209cdf5d6614:
-> 
->   Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-24 12:43:33 +0300)
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (2):
->       Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
->       Bluetooth: Fix redundant encryption request for reauthentication
-> 
-> Marcel Holtmann (1):
->       Revert "Bluetooth: Enable autosuspend for Intel Bluetooth device"
-> 
-> Mohammed Habibulla (1):
->       Bluetooth: Add support for Lite-on [04ca:3007]
-> 
->  drivers/bluetooth/ath3k.c | 2 ++
->  drivers/bluetooth/btusb.c | 5 ++---
->  net/bluetooth/hci_conn.c  | 9 ++++++---
->  net/bluetooth/hci_event.c | 6 ++++++
->  4 files changed, 16 insertions(+), 6 deletions(-)
-> 
-
-
-
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Currently I run eOS and I am not sure if this is Kernel related or driver.
