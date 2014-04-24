@@ -1,84 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Apr 2014 11:53:29 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2014-04-24
-Message-ID: <20140424145329.GD7832@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="/9DWx/yDrRhgMJTb"
-Sender: linux-kernel-owner@vger.kernel.org
+Date: Thu, 24 Apr 2014 15:19:14 +0100
+From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
+To: <balbi@ti.com>
+Cc: NeilBrown <neilb@suse.de>, Nishanth Menon <nm@ti.com>,
+        Greg KH
+ <gregkh@linuxfoundation.org>, <marcel@holtmann.org>,
+        <gustavo@padovan.org>, <johan.hedberg@gmail.com>, <jslaby@suse.cz>,
+        <grant.likely@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-serial@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        Linux OMAP Mailing List
+ <linux-omap@vger.kernel.org>,
+        Tony Lindgren <tony@atomide.com>
+Subject: Re: [PATCH 10/13] tty: serial: omap: remove some dead code
+Message-ID: <20140424151914.6bc6463a@alan.etchedpixels.co.uk>
+In-Reply-To: <20140424012100.GB13374@saruman.home>
+References: <1398265117-11793-1-git-send-email-balbi@ti.com>
+	<1398265117-11793-10-git-send-email-balbi@ti.com>
+	<5357DDA8.4040206@ti.com>
+	<20140424084305.20c7f301@notabene.brown>
+	<20140423230121.GC10924@saruman.home>
+	<20140424101329.02e6a62f@notabene.brown>
+	<20140424012100.GB13374@saruman.home>
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+> > But I don't have discrete hardware.  I have a bunch of stuff soldered onto a
+> > board with ad-hoc connections chosen to make the life of the hardware builder
+> > easy rather than chosen to make the life of the software developer easy
+> > (which I think is the correct choice).
+> > 
+> > So I need to tell DT "This device is plugged into this UART, and there is no
+> > DTR line, but when the UARTs DTR line would be asserted (if it had one), then
+> > I need that regulator of there turned on". or maybe "I need to toggle this
+> > GPIO  with exactly this pattern, while watching that GPIO to see if it is
+> > working".
+> > 
+> > So I thought:
+> > 
+> >  1/ give the UART a "virtual" DTR so it could drive any GPIO
+> >  2/ create a "gpio-to-regulator" driver which presented as a (virtual) gpio
+> >     and responded to state changes on that GPIO by turning on or off the
+> >     regulator
+> >  3/ create a dedicated driver which knows how to toggle the magic GPIO while
+> >     watching the other GPIO to convince the silly device to wakeup, or go to
+> >     sleep, as required, and have this appear as a (virtual) GPIO.
 
---/9DWx/yDrRhgMJTb
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Unless you are using it as a "real' DTR line then I think this is the
+wrong approach. This problem actually is turning up in both PC class and
+ARM boxes now all over the place for three reasons I am seeing.
 
-Hi John,
+1. We are getting a lot of hardware moving to serial attached
+bluetooth/gps/etc because of the power win. In addition ACPI can describe
+power relationships and what is on the other end of a UART embedded in
+the device
 
-Some fixes for 3.15. There is a revert for the intel driver, a new device id,
-and two important SSP fixes from Johan.
-Also we've noticed that your wireless.git tree is not up to date, so this pull
-was rebased on top of net.git. If you pull from this you'll will be pulling
-net/master from yesterday as well.
+2. We've got cheap hardware with modem lines being "retrofitted" via gpio
 
-Please pull or let me know of any concerns you have. Thanks!
+3. There are a subset of devices that have extra control lines beyond the
+usual serial port ones. These range from additional control lines for
+things like smartcard programmers to port muxing.
 
-	Gustavo
+> I have no problem either way, just that unused code doesn't have to be
+> sitting in the tree and I'm not entirely sure this GPIO should be
+> handled by omap-serial.c, perhaps something more generic inside
+> serial-core so other UART drivers can benefit from it.
 
----
-The following changes since commit 6a51b5e4d59e00051e65e836520912cd7c717be1:
+serial-core provides power hooks. If the goal is that this comes on when
+you power up the uart and goes away on the last close then the hooks are
+there already. If its ldisc specific then the tty layer also calls the
+device on ldisc changes precisely so it can make hardware specific
+twiddles in such cases.
 
-  hisax/icc: add missing semicolon after label (2014-04-22 21:22:47 -0400)
+A set of gpios on the tty_port object would not go amiss and would also
+address the PC case.
 
-are available in the git repository at:
+> considering this is a BTUART device, why didn't you do this at the ldisc
+> level ? hci_uart_open() sounds like a good choice from a quick thinking.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+ldiscs are hardware independent. Nothing about hardware belongs in an
+ldisc. Any ldisc should within reason work on any port.
 
-for you to fetch changes up to b66a81831359495b3768ace72452209cdf5d6614:
+What I propsed when it came up ages ago was to expose some gpio settings
+in the tty, to provide ways for them to be set by default and also ioctls
+to configure them. I still think this (but moved into the tty_port as its
+a persistent hardware property) is a good idea now that we are starting
+to see more use cases than weird dongles and muxes on pre-production
+reference boards.
 
-  Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-24 12:43:33 +0300)
+With my tty and serial hat on I think a power gpio is a no-brainer even
+without doing the other work and therefore it should probably be described
+generically for a serial port in the DT as well as in the ACPI data. If
+you should also be able to give it a regulator to use as well that also
+seems to make complete sense.
 
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
-      Bluetooth: Fix redundant encryption request for reauthentication
-
-Marcel Holtmann (1):
-      Revert "Bluetooth: Enable autosuspend for Intel Bluetooth device"
-
-Mohammed Habibulla (1):
-      Bluetooth: Add support for Lite-on [04ca:3007]
-
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 5 ++---
- net/bluetooth/hci_conn.c  | 9 ++++++---
- net/bluetooth/hci_event.c | 6 ++++++
- 4 files changed, 16 insertions(+), 6 deletions(-)
-
-
---/9DWx/yDrRhgMJTb
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTWSVpAAoJEPs3PUX4s20oLWQP/1hhfe6EZ45Sec94NIsSYB5K
-EZYvvOX4sKj3VhTT/dzKIBZDp7aLHyBZGB4HRBezKe0KqiNFV3eVU9Um1BsWxCgH
-u5S/PgS1yj2BOSgCJAy2dZPYqQii8KEUugIocRMzqs6ZtolbnaucQexSy65af4hY
-MVyHPUCRgtYi9tMDu/JTyi3b+LDzYgztYG5mgLzuw3zz2SaGc9bLdJIQ4aPyaIge
-rwzoLxPJKxfF+7xIObhVccMK150AjwapsN9/oV+FGDmP83zxXxGoBOFGf8lorQbh
-2C4Ol0zqJj8pob3cQxExwZjmVX9LG0vm/wqeNW9E3wKfelhkwdf4cF25kvfvnPAl
-pjhhjp7ssbEBnPhxwKqJIEb6VuAaZPMYuV+62g9gcU3wq2LCSSRI1s31LgEiNBbh
-7HedJ12UD4Q6BqHzrSf4Mc3Bhli1jz1HL4wwZy2DxqhAu7mlRxHVjkg+iupeSp6l
-jJDjbWdzF3WH/E+lhJCI9mgGQb97X1ZwzCjLJxO2/QXDs2RlQU6+bSjbDbUDec9+
-0mrRNbfJgzdezuHBFWQEX0UkKG6E6mliXmJ+GH9OJDHA+VTIyMtm7vjowe68jMZW
-a1Iq52ijBMKlo1goMlkVR8K3KE0PpWNSSh0TdoYzrYWzBo8uM80uasyuNDvyhdqc
-Ab1PYbsWaogXz91HHxYG
-=TAG1
------END PGP SIGNATURE-----
-
---/9DWx/yDrRhgMJTb--
+Alan
