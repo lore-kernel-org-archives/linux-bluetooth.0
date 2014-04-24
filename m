@@ -1,72 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 0/2] Client connection handling refactor
-Date: Thu, 24 Apr 2014 15:01:57 +0200
-Message-Id: <1398344519-8994-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 4/4] gatt: Add remove_service function to gatt-db
+Date: Thu, 24 Apr 2014 14:44:52 +0200
+Message-Id: <1398343492-19874-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1398343492-19874-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1398343492-19874-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is rather big connection handling refactor but each of those little
-changes, significantly change connection handling logic. For the reason of not
-rewriting it again and again for every change made, single patch was done.
-Multiple, connection specific device lists were replaced with one, while
-devices store their connection state instead. Client list in each device were
-replaced with single, global list, storing (connection_id, client*, device*)
-tuples. This seams to be more natural and easier to pass required data to
-other functions as most actions are performed by specific clients on specific
-device or connection.
+It will remove service with given handle. Return true if service
+was found and removed, otherwise false.
+---
+ src/shared/gatt-db.c | 21 +++++++++++++++++++++
+ src/shared/gatt-db.h |  1 +
+ 2 files changed, 22 insertions(+)
 
-Storing such connection describing triplets allows search for the rest
-of those three entities, knowing one of them, i.e. when client unregisters
-(disconnect all devices connected to client), device disconnects
-(notify all clients about disconnection) or specific client disconnects from
-single device.
-
-As connection id was previously assigned to and accessed from device,
-and now device is accessed from connection record, having unique
-connection_id, quite a lot of logic had to be changed, including
-notification handling. This change was needed as Android uses
-connection_id to identify particular client<->device and not the physical
-adapter<->device connection, which is irrelevant on HAL API level.
-
-Changes in compare to RFC:
- * notification destroy invalid read fixed by freeing notifcations
- 	before connection are freed
- * renamed device state enum values
- * renamed free_connection to destroy_connection
- * do device's connection reference counting only in create/destroy
- 	connection functions for better reference tracking and use
- 	destroy_connection on profile cleanup
- * remove double client and device searches in connect handler and move
- 	new device creation from connection search helper to connect handler
- * proper connect notifications with GATT_FAILURE are now send on
- 	disconnecting devices in connection_pending and connectable states
- * on removal of device in connectable/connection_pending, state check
- 	if scan should be stopped was added
-
-v2 changes:
- * various name fixes
- * simplified some function flow containing if statements and returns
- * added helper for finding device in one of two possible states to avoid
- 	double device list iteration, checking for CONNECTING and
- 	CONNECTION_PENDING devices
- * removed check for ref counter being decrement below 0 in destroy_connection,
- 	as it is the only place where decrementation and destruction are done
- * added missing device free if it cannot be pushed to list
- * removed connection id quasi reuse mechanism in favor of static counter
- * few function renames
- * added CONNECTING device state to postpone scan triggering when some
- 	device's connection is ongoing
-
-Jakub Tyszkowski (2):
-  android/gatt: Refactor client connection handling
-  android/gatt: Add DEVICE_CONNECTING state
-
- android/gatt.c | 1020 +++++++++++++++++++++++++++++---------------------------
- 1 file changed, 534 insertions(+), 486 deletions(-)
-
---
-1.9.1
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 672c11c..a211cda 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -50,6 +50,13 @@ struct gatt_db_service {
+ 	struct gatt_db_attribute **attributes;
+ };
+ 
++static bool match_service_by_handle(const void *data, const void *user_data)
++{
++	const struct gatt_db_service *service = data;
++
++	return service->attributes[0]->handle == PTR_TO_INT(user_data);
++}
++
+ struct gatt_db *gatt_db_new(void)
+ {
+ 	struct gatt_db *db;
+@@ -170,3 +177,17 @@ uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
+ 
+ 	return service->attributes[0]->handle;
+ }
++
++bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle)
++{
++	struct gatt_db_service *service;
++
++	service = queue_remove_if(db->services, match_service_by_handle,
++							INT_TO_PTR(handle));
++	if (!service)
++		return false;
++
++	gatt_db_service_destroy(service);
++
++	return true;
++}
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 7cae6b1..b014b17 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -28,3 +28,4 @@ void gatt_db_destroy(struct gatt_db *db);
+ 
+ uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
+ 					bool primary, uint16_t num_handles);
++bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle);
+-- 
+1.8.3.1
 
