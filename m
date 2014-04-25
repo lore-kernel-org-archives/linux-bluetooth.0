@@ -1,43 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Apr 2014 08:58:33 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+Date: Fri, 25 Apr 2014 09:46:02 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-04-25
-Message-ID: <20140425125831.GA17143@tuxdriver.com>
-References: <20140425124602.GF7832@joana>
+Subject: pull request: bluetooth 2014-04-25
+Message-ID: <20140425124602.GF7832@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140425124602.GF7832@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="Md/poaVZ8hnGTzuv"
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Apr 25, 2014 at 09:46:02AM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Some fixes for 3.15. There is a revert for the intel driver, a new device id,
-> and two important SSP fixes from Johan. This one is rebased on wireless/master.
-> 
-> Please pull or let me know of any concerns you have. Thanks!
-> 	
-> 	Gustavo
-> 
-> ---
-> The following changes since commit ffa216bb5eecfce0f01b0b2a95d5c320dde90005:
-> 
->   brcmfmac: Fix brcmf_chip_ai_coredisable not applying reset bits to BCMA_IOCTL (2014-04-24 21:46:22 -0400)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-> 
-> for you to fetch changes up to 1fb4e09a7e780b915dbd172592ae7e2a4c071065:
-> 
->   Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-25 09:47:16 +0300)
 
-Pulling now...thanks!
+--Md/poaVZ8hnGTzuv
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Hi John,
+
+Some fixes for 3.15. There is a revert for the intel driver, a new device i=
+d,
+and two important SSP fixes from Johan. This one is rebased on wireless/mas=
+ter.
+
+Please pull or let me know of any concerns you have. Thanks!
+=09
+	Gustavo
+
+---
+The following changes since commit ffa216bb5eecfce0f01b0b2a95d5c320dde90005:
+
+  brcmfmac: Fix brcmf_chip_ai_coredisable not applying reset bits to BCMA_I=
+OCTL (2014-04-24 21:46:22 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for=
+-upstream
+
+for you to fetch changes up to 1fb4e09a7e780b915dbd172592ae7e2a4c071065:
+
+  Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-25 09:47:16 +0300)
+
+----------------------------------------------------------------
+Johan Hedberg (2):
+      Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
+      Bluetooth: Fix redundant encryption request for reauthentication
+
+Marcel Holtmann (1):
+      Revert "Bluetooth: Enable autosuspend for Intel Bluetooth device"
+
+Mohammed Habibulla (1):
+      Bluetooth: Add support for Lite-on [04ca:3007]
+
+ drivers/bluetooth/ath3k.c | 2 ++
+ drivers/bluetooth/btusb.c | 5 ++---
+ net/bluetooth/hci_conn.c  | 9 ++++++---
+ net/bluetooth/hci_event.c | 6 ++++++
+ 4 files changed, 16 insertions(+), 6 deletions(-)
+
+
+--Md/poaVZ8hnGTzuv
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTWlkKAAoJEPs3PUX4s20oaP8P/0L4mTwU2Ek/GSV3MGv+sZx+
+8jeW319sWQYW9jo1CqNOqbgvuSecgnaptHInuz5AlHnjHycRlB4o3vRWgeqHhbRf
+1v/zB5iyXjinvd7r32d5GdDem7OUs46LWhAo4Qv65RW6XaoRR8iE/DbL2uHXF7gk
+fmknTntK8QHKjVwZmpbo14FnahCDLvxff0fMM7gkuEZntYFmj8LbEoNjZMU8bwgD
+86AWhCIfijzKUhkXNYaiVLPd9xzk8rApH8ziJaYfocGuO9o4/yexLr2Gqi5e7XyI
+u6gqYXBg8y6LeA3MlF7O5Vb1w5f4zmzfnz6c3js+qRq1nKrSteKYzINwKXE52zVd
+EbmqnOxbUThCG0Z2N/aIp7kBprit3IoW2OlT6lOI6CdgmQAUsOjGd21SjNHIPvTq
+ZjcdhsDdekrM7KrGq5q94WdmnfidFTa6j7ZwqRkUsR8bAY6do5uYlY+DSBrkJrTH
+VmNnGm72zXnlYdmWFBP1NEvQYx/+EEuoEfJnmRu+jG/0v3WReLhHBq1/TqPGDCdq
+YxDzgK+rjyEBeVOB2h9BUpJYwp+++1BLfG2X6gj6SFlsab8PC+YS6HD+JD7AgXHH
+yJXbx/lZeClHeby6UtOcg8Zt2fFvxWoywijkiozDTWLe3v3NRngMaDy+ufeHVfNh
+4Ms5NZ5mL4320Gand74C
+=PzFE
+-----END PGP SIGNATURE-----
+
+--Md/poaVZ8hnGTzuv--
