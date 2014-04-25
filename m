@@ -1,49 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Apr 2014 22:21:03 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-        "linux-wireless@vger.kernel.org Wireless" <linux-wireless@vger.kernel.org>,
-        BlueZ development <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-04-24
-Message-ID: <20140425020421.GD3410@tuxdriver.com>
-References: <20140424145329.GD7832@joana>
- <20140425014446.GC3410@tuxdriver.com>
- <C9BCBE06-78C4-41C6-9B70-BFB2C6AFDF7A@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <C9BCBE06-78C4-41C6-9B70-BFB2C6AFDF7A@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: pull request: bluetooth 2014-04-24
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140425014446.GC3410@tuxdriver.com>
+Date: Thu, 24 Apr 2014 18:51:13 -0700
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	"linux-wireless@vger.kernel.org Wireless"
+	<linux-wireless@vger.kernel.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	linux-kernel@vger.kernel.org
+Message-Id: <C9BCBE06-78C4-41C6-9B70-BFB2C6AFDF7A@holtmann.org>
+References: <20140424145329.GD7832@joana> <20140425014446.GC3410@tuxdriver.com>
+To: "John W. Linville" <linville@tuxdriver.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Apr 24, 2014 at 06:51:13PM -0700, Marcel Holtmann wrote:
-> Hi John,
-> 
-> > This tag has a lot of stuff in it not in the wireless tree.
-> > Please only send me pull requests that only include patches related
-> > to Bluetooth.
-> > 
-> >> Some fixes for 3.15. There is a revert for the intel driver, a new device id,
-> >> and two important SSP fixes from Johan.
-> >> Also we've noticed that your wireless.git tree is not up to date, so this pull
-> >> was rebased on top of net.git. If you pull from this you'll will be pulling
-> >> net/master from yesterday as well.
-> 
-> as Gustavo explained, this is against net.git since wireless.git has not yet been rebased.
-> 
-> Regards
-> 
-> Marcel
+Hi John,
 
-wireless.git is where it is going to be.  It is based from a few dozen
-commits before -rc1, which was what Dave had as the base of his tree
-when I started merging post -rc1 fixes into wireless.git.
+> This tag has a lot of stuff in it not in the wireless tree.
+> Please only send me pull requests that only include patches related
+> to Bluetooth.
+> 
+>> Some fixes for 3.15. There is a revert for the intel driver, a new device id,
+>> and two important SSP fixes from Johan.
+>> Also we've noticed that your wireless.git tree is not up to date, so this pull
+>> was rebased on top of net.git. If you pull from this you'll will be pulling
+>> net/master from yesterday as well.
 
-I'm sorry if this is inconvenient, but among other things this keeps
-net.git and linux.git stuff from getting into wireless-testing.git
-prematurely.
+as Gustavo explained, this is against net.git since wireless.git has not yet been rebased.
 
-John
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Regards
+
+Marcel
+
