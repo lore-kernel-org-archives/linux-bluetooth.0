@@ -1,42 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 0/4] Gatt database skeleton
-Date: Fri, 25 Apr 2014 09:53:10 +0200
-Message-ID: <11771691.Xrp9yWhCWP@leonov>
-In-Reply-To: <1398338627-32588-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1398338627-32588-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 24 Apr 2014 22:21:03 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+        "linux-wireless@vger.kernel.org Wireless" <linux-wireless@vger.kernel.org>,
+        BlueZ development <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2014-04-24
+Message-ID: <20140425020421.GD3410@tuxdriver.com>
+References: <20140424145329.GD7832@joana>
+ <20140425014446.GC3410@tuxdriver.com>
+ <C9BCBE06-78C4-41C6-9B70-BFB2C6AFDF7A@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <C9BCBE06-78C4-41C6-9B70-BFB2C6AFDF7A@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
-
-On Thursday 24 of April 2014 13:23:43 Marcin Kraglak wrote:
-> Changes in v2:
->  - removed doxygen comments
->  - in new_service method num_handle must be 1 or greater
->  - removed coding-style errors
+On Thu, Apr 24, 2014 at 06:51:13PM -0700, Marcel Holtmann wrote:
+> Hi John,
 > 
-> Marcin Kraglak (4):
->   gatt: Add skeleton of gatt-db
->   gatt: Add services list to gatt_db struct
->   gatt: Add method for creating services in gatt_db
->   gatt: Add remove_service function to gatt-db
+> > This tag has a lot of stuff in it not in the wireless tree.
+> > Please only send me pull requests that only include patches related
+> > to Bluetooth.
+> > 
+> >> Some fixes for 3.15. There is a revert for the intel driver, a new device id,
+> >> and two important SSP fixes from Johan.
+> >> Also we've noticed that your wireless.git tree is not up to date, so this pull
+> >> was rebased on top of net.git. If you pull from this you'll will be pulling
+> >> net/master from yesterday as well.
 > 
->  android/Android.mk   |   1 +
->  android/Makefile.am  |   1 +
->  src/shared/gatt-db.c | 193
-> +++++++++++++++++++++++++++++++++++++++++++++++++++ src/shared/gatt-db.h | 
-> 31 +++++++++
->  4 files changed, 226 insertions(+)
->  create mode 100644 src/shared/gatt-db.c
->  create mode 100644 src/shared/gatt-db.h
+> as Gustavo explained, this is against net.git since wireless.git has not yet been rebased.
+> 
+> Regards
+> 
+> Marcel
 
-Patches 1 and 2 are now pushed, thanks.
+wireless.git is where it is going to be.  It is based from a few dozen
+commits before -rc1, which was what Dave had as the base of his tree
+when I started merging post -rc1 fixes into wireless.git.
 
+I'm sorry if this is inconvenient, but among other things this keeps
+net.git and linux.git stuff from getting into wireless-testing.git
+prematurely.
+
+John
 -- 
-BR
-Szymon Janc
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
