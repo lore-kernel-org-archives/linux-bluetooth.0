@@ -1,68 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 00/35] Add remaining AVRCP Browsing commands
-Date: Fri, 25 Apr 2014 11:38:37 +0300
-Message-Id: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 25 Apr 2014 11:16:08 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] gobex: Fix removing invalid source
+Message-ID: <20140425081608.GA2689@t440s.lan>
+References: <1397743186-29897-1-git-send-email-szymon.janc@tieto.com>
+ <1397743186-29897-2-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1397743186-29897-2-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Szymon,
 
-This adds the following AVRCP Browsing commands with the respective
-qualification tests:
+On Thu, Apr 17, 2014, Szymon Janc wrote:
+> Since GLib 2.39 calling g_source_remove on already removed source
+> is causing critical warning.
+> 
+> This was affecting unit/test-gobex-transfer when running with
+> GLib 2.40.
+> 
+> /gobex/test_packet_get_req_suspend_resume:
+> (./unit/test-gobex-transfer:28879): GLib-CRITICAL **: Source ID 263 was
+>     not found when attempting to remove it
+> Trace/breakpoint trap
+> ---
+>  gobex/gobex.c | 22 +++++++++++++++++-----
+>  1 file changed, 17 insertions(+), 5 deletions(-)
 
-  - GetFolderItems
-  - ChangePath
-  - GetItemAttributes
-  - PlayItem
-  - Search
-  - AddToNowPlaying
+Both patches in this set have been applied, however I fine-tuned this
+one a bit to have all checks in the consistent "id > 0" form.
 
-Luiz Augusto von Dentz (35):
-  android/avctp: Make browsing handler return ssize_t
-  android/avrcp-lib: Add initial code for handling browsing PDUs
-  android/avctp: Add proper checks for invalid browsing PDUs
-  unit/test-avrcp: Add /TP/INV/BI-02-C test
-  android/avctp: Add avctp_send_browsing function
-  android/avrcp-lib: Add support for parsing GetFolderItems PDU
-  unit/test-avrcp: Add /TP/MPS/BV-09-C test
-  unit/test-avrcp: Add /TP/MCN/CB/BV-02-C test
-  unit/test-avrcp: Add /TP/MCN/CB/BI-01-C test
-  unit/test-avrcp: Add /TP/MCN/CB/BI-02-C test
-  unit/test-avrcp: Add /TP/MCN/CB/BI-03-C test
-  unit/test-avrcp: Add /TP/MCN/SRC/BV-04-C test
-  unit/test-avrcp: Add /TP/MCN/NP/BV-05-C test
-  unit/test-avrcp: Add /TP/MCN/NP/BV-06-C test
-  android/avrcp-lib: Add support for parsing ChangePath PDU
-  unit/test-avrcp: Add /TP/MCN/CB/BV-05-C test
-  unit/test-avrcp: Add /TP/MCN/CB/BV-06-C test
-  unit/test-avrcp: Add /TP/MCN/CB/BI-04-C test
-  android/avrcp-lib: Add support for parsing GetItemAttributes PDU
-  unit/test-avrcp: Add /TP/MCN/CB/BV-08-C test
-  unit/test-avrcp: Add /TP/MCN/SRC/BV-06-C test
-  unit/test-avrcp: Add /TP/MCN/NP/BV-08-C test
-  unit/test-avrcp: Add /TP/MCN/NP/BV-09-C test
-  android/avrcp: Add avrcp_play_item function
-  unit/test-avrcp: Add /TP/MCN/NP/BV-01-C test
-  android/avrcp-lib: Add support for parsing PlayItem PDU
-  unit/test-avrcp: Add /TP/MCN/NP/BV-02-C test
-  unit/test-avrcp: Add /TP/MCN/NP/BI-01-C test
-  android/avrcp-lib: Add support for parsing Search PDU
-  unit/test-avrcp: Add /TP/MCN/SRC/BV-02-C test
-  android/avrcp: Add avrcp_add_to_now_playing function
-  unit/test-avrcp: Add /TP/MCN/NP/BV-03-C test
-  android/avrcp-lib: Add support for parsing AddToNowPlaying PDU
-  unit/test-avrcp: Add /TP/MCN/NP/BV-04-C test
-  unit/test-avrcp: Add /TP/MCN/NP/BI-02-C test
-
- android/avctp.c     |  33 ++-
- android/avctp.h     |   4 +-
- android/avrcp-lib.c | 608 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- android/avrcp-lib.h |  43 ++++
- unit/test-avrcp.c   | 335 ++++++++++++++++++++++++++++-
- 5 files changed, 1003 insertions(+), 20 deletions(-)
-
--- 
-1.9.0
-
+Johan
