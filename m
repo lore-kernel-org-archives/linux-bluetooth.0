@@ -1,42 +1,118 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Apr 2014 12:40:17 +0100
-From: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>
-To: Yegor Yefremov <yegorslists@googlemail.com>
-Cc: NeilBrown <neilb@suse.de>, balbi@ti.com, Nishanth Menon <nm@ti.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Marcel Holtmann
- <marcel@holtmann.org>, gustavo@padovan.org,
-        johan.hedberg@gmail.com, jslaby@suse.cz,
-        Grant Likely <grant.likely@linaro.org>,
-        Linux Kernel
- Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-serial@vger.kernel.org,
-        devicetree@vger.kernel.org,
-        Linux OMAP Mailing List
- <linux-omap@vger.kernel.org>,
-        Tony Lindgren <tony@atomide.com>
-Subject: Re: [PATCH 10/13] tty: serial: omap: remove some dead code
-Message-ID: <20140425124017.6fbcb971@alan.etchedpixels.co.uk>
-In-Reply-To: <CAGm1_kvSEcXRGoQrUoJcmFq6gTHkjupzDqesw3cTmL=V74yPOw@mail.gmail.com>
-References: <1398265117-11793-1-git-send-email-balbi@ti.com>
-	<1398265117-11793-10-git-send-email-balbi@ti.com>
-	<5357DDA8.4040206@ti.com>
-	<20140424084305.20c7f301@notabene.brown>
-	<20140423230121.GC10924@saruman.home>
-	<20140424101329.02e6a62f@notabene.brown>
-	<20140424012100.GB13374@saruman.home>
-	<20140424151914.6bc6463a@alan.etchedpixels.co.uk>
-	<20140425193412.7d32e429@notabene.brown>
-	<CAGm1_kvSEcXRGoQrUoJcmFq6gTHkjupzDqesw3cTmL=V74yPOw@mail.gmail.com>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 3/4] gatt: Add included service functionality
+Date: Fri, 25 Apr 2014 13:02:31 +0200
+Message-ID: <10614446.RWdJ0oYC3y@leonov>
+In-Reply-To: <1398416472-7852-3-git-send-email-marcin.kraglak@tieto.com>
+References: <1398416472-7852-1-git-send-email-marcin.kraglak@tieto.com> <1398416472-7852-3-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-> As soon as this patch
-> (http://www.spinics.net/lists/arm-kernel/msg325197.html) will be
-> applied, we don't really need this DTR GPIO any more.
+Hi Marcin,
 
-For the omap specific case, not for the general case of sorting out power
-hierarchies.
+On Friday 25 of April 2014 11:01:11 Marcin Kraglak wrote:
+> It will add included service to service attribute list. It will first
+> look for included service and then create attribute. In case of error
+> or if there is no free handle, 0 will be returned.
+> ---
+>  src/shared/gatt-db.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/gatt-db.h |  3 +++
+>  2 files changed, 47 insertions(+)
+> 
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index a0f860c..abb5f61 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -29,6 +29,7 @@
+>  #include "src/shared/gatt-db.h"
+> 
+>  #define MAX_CHAR_DECL_VALUE_LEN 19
+> +#define MAX_INCLUDED_VALUE_LEN 6
+> 
+>  static const bt_uuid_t primary_service_uuid = { .type = BT_UUID16,
+>  					.value.u16 = GATT_PRIM_SVC_UUID };
+> @@ -36,6 +37,8 @@ static const bt_uuid_t secondary_service_uuid = { .type =
+> BT_UUID16, .value.u16 = GATT_SND_SVC_UUID };
+>  static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
+>  					.value.u16 = GATT_CHARAC_UUID };
+> +static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
+> +					.value.u16 = GATT_INCLUDE_UUID };
+> 
+>  struct gatt_db {
+>  	uint16_t next_handle;
+> @@ -315,3 +318,44 @@ uint16_t gatt_db_new_char_descriptor(struct gatt_db
+> *db, uint16_t handle,
+> 
+>  	return update_attribute_handle(service, i);
+>  }
+> +
+> +uint16_t gatt_db_new_included_service(struct gatt_db *db, uint16_t handle,
+> +						uint16_t included_handle)
+> +{
 
-Alan
+Please keep convention of using add/remove in functions names when you 
+add/remove stuff from db. (this applies to all other patches as well).
+
+> +	struct gatt_db_service *included_service;
+> +	uint8_t value[MAX_INCLUDED_VALUE_LEN];
+> +	uint16_t len = sizeof(uint16_t) * 2;
+
+I'd start from 0 and just increment when needed.
+
+> +	struct gatt_db_service *service;
+> +	int index;
+> +
+> +	service = queue_find(db->services, match_service_by_handle,
+> +							INT_TO_PTR(handle));
+> +	if (!service)
+> +		return 0;
+> +
+> +	included_service = queue_find(db->services, match_service_by_handle,
+> +						INT_TO_PTR(included_handle));
+> +
+> +	if (!included_service)
+> +		return 0;
+> +
+> +	put_le16(included_handle, &value[0]);
+> +	put_le16(included_handle + included_service->num_handles - 1,
+> +							&value[2]);
+> +	if (included_service->attributes[0]->val_len == 2) {
+
+Comments. Also if that makes code more readable maybe it makes sense to define 
+constants for that and avoid magic numbers in first place?
+
+> +		memcpy(&value[4], included_service->attributes[0]->value,
+> +				included_service->attributes[0]->val_len);
+> +		len += included_service->attributes[0]->val_len;
+> +	}
+> +
+> +	index = get_attribute_index(service, 1);
+> +	if (!index)
+> +		return 0;
+> +
+> +	service->attributes[index] = new_attribute(&included_service_uuid,
+> +								value, len);
+> +	if (!service->attributes[index])
+> +		return 0;
+> +
+> +	return update_attribute_handle(service, index);
+> +}
+> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+> index 281ae6a..cdbbf36 100644
+> --- a/src/shared/gatt-db.h
+> +++ b/src/shared/gatt-db.h
+> @@ -51,3 +51,6 @@ uint16_t gatt_db_new_char_descriptor(struct gatt_db *db,
+> uint16_t handle, gatt_db_read_t read_func,
+>  						gatt_db_write_t write_func,
+>  						void *user_data);
+> +
+> +uint16_t gatt_db_new_included_service(struct gatt_db *db, uint16_t handle,
+> +						uint16_t included_handle);
+
+-- 
+BR
+Szymon Janc
