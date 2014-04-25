@@ -1,165 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/4] gatt: Add new characteristic functionality
-Date: Fri, 25 Apr 2014 12:17:57 +0200
-Message-Id: <1398421077-14935-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <20140425193412.7d32e429@notabene.brown>
+References: <1398265117-11793-1-git-send-email-balbi@ti.com>
+ <1398265117-11793-10-git-send-email-balbi@ti.com> <5357DDA8.4040206@ti.com>
+ <20140424084305.20c7f301@notabene.brown> <20140423230121.GC10924@saruman.home>
+ <20140424101329.02e6a62f@notabene.brown> <20140424012100.GB13374@saruman.home>
+ <20140424151914.6bc6463a@alan.etchedpixels.co.uk> <20140425193412.7d32e429@notabene.brown>
+From: Yegor Yefremov <yegorslists@googlemail.com>
+Date: Fri, 25 Apr 2014 11:53:21 +0200
+Message-ID: <CAGm1_kvSEcXRGoQrUoJcmFq6gTHkjupzDqesw3cTmL=V74yPOw@mail.gmail.com>
+Subject: Re: [PATCH 10/13] tty: serial: omap: remove some dead code
+To: NeilBrown <neilb@suse.de>
+Cc: One Thousand Gnomes <gnomes@lxorguk.ukuu.org.uk>, balbi@ti.com, Nishanth Menon <nm@ti.com>,
+	Greg KH <gregkh@linuxfoundation.org>, Marcel Holtmann <marcel@holtmann.org>, gustavo@padovan.org,
+	johan.hedberg@gmail.com, jslaby@suse.cz,
+	Grant Likely <grant.likely@linaro.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-bluetooth@vger.kernel.org,
+	linux-serial@vger.kernel.org, devicetree@vger.kernel.org,
+	Linux OMAP Mailing List <linux-omap@vger.kernel.org>, Tony Lindgren <tony@atomide.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It will attach characteristic declaration and value, and return value
-handle. It is needed to pass service handle to which this characteristic
-will be added. If there is not enough free handles in service, 0 will be
-returned.
----
- src/shared/gatt-db.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 15 +++++++++
- 2 files changed, 110 insertions(+)
+On Fri, Apr 25, 2014 at 11:34 AM, NeilBrown <neilb@suse.de> wrote:
+> On Thu, 24 Apr 2014 15:19:14 +0100 One Thousand Gnomes
+> <gnomes@lxorguk.ukuu.org.uk> wrote:
+>
+>> > > But I don't have discrete hardware.  I have a bunch of stuff soldered onto a
+>> > > board with ad-hoc connections chosen to make the life of the hardware builder
+>> > > easy rather than chosen to make the life of the software developer easy
+>> > > (which I think is the correct choice).
+>> > >
+>> > > So I need to tell DT "This device is plugged into this UART, and there is no
+>> > > DTR line, but when the UARTs DTR line would be asserted (if it had one), then
+>> > > I need that regulator of there turned on". or maybe "I need to toggle this
+>> > > GPIO  with exactly this pattern, while watching that GPIO to see if it is
+>> > > working".
+>> > >
+>> > > So I thought:
+>> > >
+>> > >  1/ give the UART a "virtual" DTR so it could drive any GPIO
+>> > >  2/ create a "gpio-to-regulator" driver which presented as a (virtual) gpio
+>> > >     and responded to state changes on that GPIO by turning on or off the
+>> > >     regulator
+>> > >  3/ create a dedicated driver which knows how to toggle the magic GPIO while
+>> > >     watching the other GPIO to convince the silly device to wakeup, or go to
+>> > >     sleep, as required, and have this appear as a (virtual) GPIO.
+>>
+>> Unless you are using it as a "real' DTR line then I think this is the
+>> wrong approach. This problem actually is turning up in both PC class and
+>> ARM boxes now all over the place for three reasons I am seeing.
+>>
+>> 1. We are getting a lot of hardware moving to serial attached
+>> bluetooth/gps/etc because of the power win. In addition ACPI can describe
+>> power relationships and what is on the other end of a UART embedded in
+>> the device
+>>
+>> 2. We've got cheap hardware with modem lines being "retrofitted" via gpio
+>>
+>> 3. There are a subset of devices that have extra control lines beyond the
+>> usual serial port ones. These range from additional control lines for
+>> things like smartcard programmers to port muxing.
+>>
+>> > I have no problem either way, just that unused code doesn't have to be
+>> > sitting in the tree and I'm not entirely sure this GPIO should be
+>> > handled by omap-serial.c, perhaps something more generic inside
+>> > serial-core so other UART drivers can benefit from it.
+>>
+>> serial-core provides power hooks. If the goal is that this comes on when
+>> you power up the uart and goes away on the last close then the hooks are
+>> there already.
+>
+> Could you be a bit more explicit, or point to an example user of these hooks?
+>
+> I had a quick look and I guess that uart_change_pm() is the most likely
+> candidate for what you are referring to.
+> I can see how that interfaces to the specific piece of uart hardware, such as
+> omap-serial.c
+> But I cannot see how you would plumb that though to the device that was
+> plugged in to the serial port.  I guess if that device could be registered as
+> a child of the omap_serial device, then power management inheritance might
+> come in to play, but I cannot see any way to tell a serial port that it has
+> some arbitrary child device.
+>
+> So maybe I'm missing something.
+>
+>>                  If its ldisc specific then the tty layer also calls the
+>> device on ldisc changes precisely so it can make hardware specific
+>> twiddles in such cases.
+>>
+>> A set of gpios on the tty_port object would not go amiss and would also
+>> address the PC case.
+>>
+>> > considering this is a BTUART device, why didn't you do this at the ldisc
+>> > level ? hci_uart_open() sounds like a good choice from a quick thinking.
+>>
+>> ldiscs are hardware independent. Nothing about hardware belongs in an
+>> ldisc. Any ldisc should within reason work on any port.
+>>
+>> What I propsed when it came up ages ago was to expose some gpio settings
+>> in the tty, to provide ways for them to be set by default and also ioctls
+>> to configure them. I still think this (but moved into the tty_port as its
+>> a persistent hardware property) is a good idea now that we are starting
+>> to see more use cases than weird dongles and muxes on pre-production
+>> reference boards.
+>>
+>> With my tty and serial hat on I think a power gpio is a no-brainer even
+>> without doing the other work and therefore it should probably be described
+>> generically for a serial port in the DT as well as in the ACPI data. If
+>> you should also be able to give it a regulator to use as well that also
+>> seems to make complete sense.
+>
+> In one case the "power on" sequence is substantially more complex that just a
+> gpio or regulator.  I would need to write a device driver for the (GPS) chip
+> which could receive a poweron/poweroff signal from the uart and do the
+> required magic.
+>
+> Having serial-core know about gpios and regulators and random other stuff
+> seems wrong.
+> I would really like to see the "runtime interpreted power sequences" become a
+> real thing.  Then serial-core could activate a "RIPS", and that would have
+> the flexibility to do whatever is needed without adding complexity to
+> serial-core.
+> Using a virtual GPIO was my poor-mans RIPS.  Using gpiolib, and driver can
+> pretend to be a gpio so it is a simple "pipe" to send a power-on/power-off
+> signal over.
+>
+> So ... with your "serial" hat on, if I were to write/test a patch to allow
+> any serial port to have a "power-gpio" described in DT and the gpio would be
+> driven in uart_change_pm(), would you consider accepting that patch, or did I
+> misunderstand?
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index a211cda..91590d3 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -28,10 +28,14 @@
- #include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
- 
-+#define MAX_CHAR_DECL_VALUE_LEN 19
-+
- static const bt_uuid_t primary_service_uuid = { .type = BT_UUID16,
- 					.value.u16 = GATT_PRIM_SVC_UUID };
- static const bt_uuid_t secondary_service_uuid = { .type = BT_UUID16,
- 					.value.u16 = GATT_SND_SVC_UUID };
-+static const bt_uuid_t characteristic_uuid = { .type = BT_UUID16,
-+					.value.u16 = GATT_CHARAC_UUID };
- 
- struct gatt_db {
- 	uint16_t next_handle;
-@@ -43,6 +47,10 @@ struct gatt_db_attribute {
- 	bt_uuid_t uuid;
- 	uint16_t val_len;
- 	uint8_t value[0];
-+	uint8_t permissions;
-+	gatt_db_read_t read_func;
-+	gatt_db_write_t write_func;
-+	void *user_data;
- };
- 
- struct gatt_db_service {
-@@ -191,3 +199,90 @@ bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle)
- 
- 	return true;
- }
-+
-+static uint16_t get_attribute_index(struct gatt_db_service *service,
-+							int end_offset)
-+{
-+	int i = 0;
-+
-+	while (i < service->num_handles - end_offset && service->attributes[i])
-+		i++;
-+
-+	return i == service->num_handles - end_offset ? 0 : i;
-+}
-+
-+static uint16_t get_handle_at_index(struct gatt_db_service *service,
-+								int index)
-+{
-+	return service->attributes[index]->handle;
-+}
-+
-+static uint16_t update_attribute_handle(struct gatt_db_service *service,
-+								int index)
-+{
-+	uint16_t previous_handle;
-+
-+	previous_handle = service->attributes[index - 1]->handle;
-+	service->attributes[index]->handle = previous_handle + 1;
-+
-+	return service->attributes[index]->handle;
-+}
-+
-+static void set_attribute_data(struct gatt_db_attribute *attribute,
-+						gatt_db_read_t read_func,
-+						gatt_db_write_t write_func,
-+						uint8_t permissions,
-+						void *user_data)
-+{
-+	attribute->permissions = permissions;
-+	attribute->read_func = read_func;
-+	attribute->write_func = write_func;
-+	attribute->user_data = user_data;
-+}
-+
-+uint16_t gatt_db_new_characteristic(struct gatt_db *db, uint16_t handle,
-+						const bt_uuid_t *uuid,
-+						uint8_t permissions,
-+						uint8_t properties,
-+						gatt_db_read_t read_func,
-+						gatt_db_write_t write_func,
-+						void *user_data)
-+{
-+	uint8_t value[MAX_CHAR_DECL_VALUE_LEN];
-+	struct gatt_db_service *service;
-+	uint16_t len = 0;
-+	int i;
-+
-+	service = queue_find(db->services, match_service_by_handle,
-+							INT_TO_PTR(handle));
-+	if (!service)
-+		return 0;
-+
-+	i = get_attribute_index(service, 1);
-+	if (!i)
-+		return 0;
-+
-+	value[0] = properties;
-+	len += sizeof(properties);
-+	put_le16(get_handle_at_index(service, i - 1) + 2, &value[1]);
-+	len += sizeof(uint16_t);
-+	len += uuid_to_le(uuid, &value[3]);
-+
-+	service->attributes[i] = new_attribute(&characteristic_uuid, value,
-+									len);
-+	if (!service->attributes[i])
-+		return 0;
-+
-+	update_attribute_handle(service, i++);
-+
-+	service->attributes[i] = new_attribute(uuid, NULL, 0);
-+	if (!service->attributes[i]) {
-+		free(service->attributes[i - 1]);
-+		return 0;
-+	}
-+
-+	set_attribute_data(service->attributes[i], read_func, write_func,
-+							permissions, user_data);
-+
-+	return update_attribute_handle(service, i);
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index b014b17..9ee1a08 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -29,3 +29,18 @@ void gatt_db_destroy(struct gatt_db *db);
- uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 					bool primary, uint16_t num_handles);
- bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle);
-+
-+typedef void (*gatt_db_read_t) (uint16_t handle, const bdaddr_t *bdaddr,
-+				uint16_t request_id, void *user_data);
-+
-+typedef void (*gatt_db_write_t)  (uint16_t handle, const bdaddr_t *bdaddr,
-+				uint16_t request_id, const uint8_t *value,
-+								size_t len);
-+
-+uint16_t gatt_db_new_characteristic(struct gatt_db *db, uint16_t handle,
-+						const bt_uuid_t *uuid,
-+						uint8_t permissions,
-+						uint8_t properties,
-+						gatt_db_read_t read_func,
-+						gatt_db_write_t write_func,
-+						void *user_data);
--- 
-1.8.5.3
+As soon as this patch
+(http://www.spinics.net/lists/arm-kernel/msg325197.html) will be
+applied, we don't really need this DTR GPIO any more.
 
+DTR_active is the only stuff, that is missing.
+
+Yegor
