@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/35] unit/test-avrcp: Add /TP/MPS/BV-09-C test
-Date: Fri, 25 Apr 2014 11:38:44 +0300
-Message-Id: <1398415152-22950-8-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 05/35] android/avctp: Add avctp_send_browsing function
+Date: Fri, 25 Apr 2014 11:38:42 +0300
+Message-Id: <1398415152-22950-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 References: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,70 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Verify the GetFolderItems response for the Media Player List issued by
-the TG.
+This function can be used to send responses over browsing channel.
 ---
- unit/test-avrcp.c | 26 +++++++++++++++++++++++++-
- 1 file changed, 25 insertions(+), 1 deletion(-)
+ android/avctp.c | 12 ++++++++++++
+ android/avctp.h |  2 ++
+ 2 files changed, 14 insertions(+)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index a483f0e..40c8ed5 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -231,7 +231,7 @@ static gboolean browse_test_handler(GIOChannel *channel, GIOCondition cond,
- 	g_assert(len > 0);
- 
- 	if (g_test_verbose())
--		util_hexdump('>', buf, len, test_debug, "AVCTP: ");
-+		util_hexdump('>', buf, len, test_debug, "AVRCP: ");
- 
- 	g_assert_cmpint(len, ==, pdu->size);
- 
-@@ -545,6 +545,19 @@ static int set_addressed(struct avrcp *session, uint8_t transaction,
- 	return -EAGAIN;
+diff --git a/android/avctp.c b/android/avctp.c
+index 94f84ad..7098fc2 100644
+--- a/android/avctp.c
++++ b/android/avctp.c
+@@ -1208,6 +1208,18 @@ int avctp_send_browsing_req(struct avctp *session,
+ 	return 0;
  }
  
-+static int get_folder_items(struct avrcp *session, uint8_t transaction,
-+				uint8_t scope, uint32_t start, uint32_t end,
-+				uint16_t number, uint32_t *attrs,
-+				void *user_data)
++int avctp_send_browsing(struct avctp *session, uint8_t transaction,
++					const struct iovec *iov, int iov_cnt)
 +{
-+	DBG("");
++	struct avctp_channel *browsing = session->browsing;
 +
-+	avrcp_get_folder_items_rsp(session, transaction, 0xabcd, 0, NULL, NULL,
-+									NULL);
++	if (browsing == NULL)
++		return -ENOTCONN;
 +
-+	return -EAGAIN;
++	return avctp_browsing_send(browsing, transaction, AVCTP_RESPONSE,
++								iov, iov_cnt);
 +}
 +
- static const struct avrcp_control_ind control_ind = {
- 	.get_capabilities = get_capabilities,
- 	.list_attributes = list_attributes,
-@@ -557,6 +570,7 @@ static const struct avrcp_control_ind control_ind = {
- 	.get_element_attributes = get_element_attributes,
- 	.register_notification = register_notification,
- 	.set_addressed = set_addressed,
-+	.get_folder_items = get_folder_items,
- };
- 
- static void test_server(gconstpointer data)
-@@ -699,6 +713,16 @@ int main(int argc, char *argv[])
- 				0x00, 0x00, 0x00, 0x02, /* end */
- 				0x00));
- 
-+	/* GetFolderItems - TG */
-+	define_test("/TP/MPS/BV-09-C", test_server,
-+			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
-+				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
-+				0x00, 0x00, 0x00, 0x00, /* start */
-+				0x00, 0x00, 0x00, 0x02, /* end */
-+				0x00),
-+			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
-+				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
-+
- 	/*
- 	 * Media Content Navigation Commands and Notifications for Content
- 	 * Browsing.
+ static const char *op2str(uint8_t op)
+ {
+ 	int i;
+diff --git a/android/avctp.h b/android/avctp.h
+index b395188..2b33858 100644
+--- a/android/avctp.h
++++ b/android/avctp.h
+@@ -172,6 +172,8 @@ int avctp_send_vendor(struct avctp *session, uint8_t transaction,
+ int avctp_send_vendor_req(struct avctp *session, uint8_t code, uint8_t subunit,
+ 					const struct iovec *iov, int iov_cnt,
+ 					avctp_rsp_cb func, void *user_data);
++int avctp_send_browsing(struct avctp *session, uint8_t transaction,
++					const struct iovec *iov, int iov_cnt);
+ int avctp_send_browsing_req(struct avctp *session,
+ 				const struct iovec *iov, int iov_cnt,
+ 				avctp_browsing_rsp_cb func, void *user_data);
 -- 
 1.9.0
 
