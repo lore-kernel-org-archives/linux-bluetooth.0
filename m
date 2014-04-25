@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 06/35] android/avrcp-lib: Add support for parsing GetFolderItems PDU
-Date: Fri, 25 Apr 2014 11:38:43 +0300
-Message-Id: <1398415152-22950-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 07/35] unit/test-avrcp: Add /TP/MPS/BV-09-C test
+Date: Fri, 25 Apr 2014 11:38:44 +0300
+Message-Id: <1398415152-22950-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 References: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,165 +11,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Verify the GetFolderItems response for the Media Player List issued by
+the TG.
 ---
- android/avrcp-lib.c | 103 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/avrcp-lib.h |   9 +++++
- 2 files changed, 112 insertions(+)
+ unit/test-avrcp.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 8f7f187..be3305d 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -782,7 +782,52 @@ static void avrcp_set_control_handlers(struct avrcp *session,
- 	session->control_data = user_data;
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index a483f0e..40c8ed5 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -231,7 +231,7 @@ static gboolean browse_test_handler(GIOChannel *channel, GIOCondition cond,
+ 	g_assert(len > 0);
+ 
+ 	if (g_test_verbose())
+-		util_hexdump('>', buf, len, test_debug, "AVCTP: ");
++		util_hexdump('>', buf, len, test_debug, "AVRCP: ");
+ 
+ 	g_assert_cmpint(len, ==, pdu->size);
+ 
+@@ -545,6 +545,19 @@ static int set_addressed(struct avrcp *session, uint8_t transaction,
+ 	return -EAGAIN;
  }
  
-+static ssize_t get_folder_items(struct avrcp *session, uint8_t transaction,
-+					uint16_t params_len, uint8_t *params,
-+					void *user_data)
++static int get_folder_items(struct avrcp *session, uint8_t transaction,
++				uint8_t scope, uint32_t start, uint32_t end,
++				uint16_t number, uint32_t *attrs,
++				void *user_data)
 +{
-+	struct avrcp_player *player = user_data;
-+	uint8_t scope;
-+	uint32_t start, end;
-+	uint16_t number;
-+	uint32_t attrs[AVRCP_MEDIA_ATTRIBUTE_LAST];
-+	int i;
-+
 +	DBG("");
 +
-+	if (!player->ind || !player->ind->get_folder_items)
-+		return -ENOSYS;
++	avrcp_get_folder_items_rsp(session, transaction, 0xabcd, 0, NULL, NULL,
++									NULL);
 +
-+	if (!params || params_len < 10)
-+		return -EINVAL;
-+
-+	scope = params[0];
-+	if (scope > AVRCP_MEDIA_NOW_PLAYING)
-+		return -EBADRQC;
-+
-+	start = get_be32(&params[1]);
-+	end = get_be32(&params[5]);
-+
-+	if (start > end)
-+		return -ERANGE;
-+
-+	number = get_be16(&params[9]);
-+
-+	for (i = 0; i < number; i++) {
-+		attrs[i] = get_be32(&params[11 + i * 4]);
-+
-+		if (attrs[i] == AVRCP_MEDIA_ATTRIBUTE_ILLEGAL ||
-+				attrs[i] > AVRCP_MEDIA_ATTRIBUTE_LAST)
-+			return -EINVAL;
-+	}
-+
-+	return player->ind->get_folder_items(session, transaction, scope, start,
-+							end, number, attrs,
-+							player->user_data);
++	return -EAGAIN;
 +}
 +
- static const struct avrcp_browsing_handler browsing_handlers[] = {
-+		{ AVRCP_GET_FOLDER_ITEMS, get_folder_items },
- 		{ },
+ static const struct avrcp_control_ind control_ind = {
+ 	.get_capabilities = get_capabilities,
+ 	.list_attributes = list_attributes,
+@@ -557,6 +570,7 @@ static const struct avrcp_control_ind control_ind = {
+ 	.get_element_attributes = get_element_attributes,
+ 	.register_notification = register_notification,
+ 	.set_addressed = set_addressed,
++	.get_folder_items = get_folder_items,
  };
  
-@@ -951,6 +996,32 @@ static int avrcp_send_browsing_req(struct avrcp *session, uint8_t pdu_id,
- 							func, user_data);
- }
+ static void test_server(gconstpointer data)
+@@ -699,6 +713,16 @@ int main(int argc, char *argv[])
+ 				0x00, 0x00, 0x00, 0x02, /* end */
+ 				0x00));
  
-+static int avrcp_send_browsing(struct avrcp *session, uint8_t transaction,
-+				uint8_t pdu_id, const struct iovec *iov,
-+				int iov_cnt)
-+{
-+	struct iovec pdu[iov_cnt + 1];
-+	struct avrcp_browsing_header hdr;
-+	int i;
++	/* GetFolderItems - TG */
++	define_test("/TP/MPS/BV-09-C", test_server,
++			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
++				0x00, 0x0a, AVRCP_MEDIA_PLAYER_LIST,
++				0x00, 0x00, 0x00, 0x00, /* start */
++				0x00, 0x00, 0x00, 0x02, /* end */
++				0x00),
++			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
++				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
 +
-+	memset(&hdr, 0, sizeof(hdr));
-+
-+	for (i = 0; i < iov_cnt; i++) {
-+		pdu[i + 1].iov_base = iov[i].iov_base;
-+		pdu[i + 1].iov_len = iov[i].iov_len;
-+		hdr.params_len += iov[i].iov_len;
-+	}
-+
-+	hdr.pdu_id = pdu_id;
-+	hdr.params_len = htons(hdr.params_len);
-+
-+	pdu[0].iov_base = &hdr;
-+	pdu[0].iov_len = sizeof(hdr);
-+
-+	return avctp_send_browsing(session->conn, transaction, pdu,
-+								iov_cnt + 1);
-+}
-+
- static gboolean get_capabilities_rsp(struct avctp *conn,
- 					uint8_t code, uint8_t subunit,
- 					uint8_t *operands, size_t operand_count,
-@@ -2384,6 +2455,38 @@ int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
- 				&iov, 1);
- }
- 
-+int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
-+					uint16_t counter, uint8_t number,
-+					uint8_t *type, uint16_t *len,
-+					uint8_t **params)
-+{
-+	struct iovec iov[UINT8_MAX * 2 + 1];
-+	uint8_t pdu[5];
-+	uint8_t item[UINT8_MAX][3];
-+	int i;
-+
-+	pdu[0] = AVRCP_STATUS_SUCCESS;
-+	put_be16(counter, &pdu[1]);
-+	put_be16(number, &pdu[3]);
-+
-+	iov[0].iov_base = pdu;
-+	iov[0].iov_len = sizeof(pdu);
-+
-+	for (i = 0; i < number; i++) {
-+		item[i][0] = type[i];
-+		put_be16(len[i], &item[i][1]);
-+
-+		iov[i * 2 + 1].iov_base = item[i];
-+		iov[i * 2 + 1].iov_len = sizeof(item[i]);
-+
-+		iov[i * 2 + 2].iov_base = params[i];
-+		iov[i * 2 + 2].iov_len = len[i];
-+	}
-+
-+	return avrcp_send_browsing(session, transaction, AVRCP_GET_FOLDER_ITEMS,
-+							iov, number * 2 + 1);
-+}
-+
- int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
- {
- 	uint8_t params[5];
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index a2cff01..90fb5dd 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -159,6 +159,10 @@ struct avrcp_control_ind {
- 					uint32_t interval, void *user_data);
- 	int (*set_addressed) (struct avrcp *session, uint8_t transaction,
- 					uint16_t id, void *user_data);
-+	int (*get_folder_items) (struct avrcp *session, uint8_t transaction,
-+					uint8_t scope, uint32_t start,
-+					uint32_t end, uint16_t number,
-+					uint32_t *attrs, void *user_data);
- };
- 
- struct avrcp_control_cfm {
-@@ -290,4 +294,9 @@ int avrcp_register_notification_rsp(struct avrcp *session, uint8_t transaction,
- 					size_t params_len);
- int avrcp_set_addressed_player_rsp(struct avrcp *session, uint8_t transaction,
- 							uint8_t status);
-+int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
-+					uint16_t counter, uint8_t number,
-+					uint8_t *type, uint16_t *len,
-+					uint8_t **params);
-+
- int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
+ 	/*
+ 	 * Media Content Navigation Commands and Notifications for Content
+ 	 * Browsing.
 -- 
 1.9.0
 
