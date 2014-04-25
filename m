@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 31/35] android/avrcp: Add avrcp_add_to_now_playing function
-Date: Fri, 25 Apr 2014 11:39:08 +0300
-Message-Id: <1398415152-22950-32-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 28/35] unit/test-avrcp: Add /TP/MCN/NP/BI-01-C test
+Date: Fri, 25 Apr 2014 11:39:05 +0300
+Message-Id: <1398415152-22950-29-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 References: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,92 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+To verify the PlayItem response issued by the TG when an invalid UID is
+requested.
 ---
- android/avrcp-lib.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- android/avrcp-lib.h |  4 ++++
- 2 files changed, 52 insertions(+)
+ unit/test-avrcp.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index a6f69ff..6c2928b 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -2407,6 +2407,54 @@ int avrcp_search(struct avrcp *session, const char *string)
- 							search_rsp, session);
- }
- 
-+static gboolean add_to_now_playing_rsp(struct avctp *conn, uint8_t *operands,
-+					size_t operand_count, void *user_data)
-+{
-+	struct avrcp *session = user_data;
-+	struct avrcp_player *player = session->player;
-+	struct avrcp_browsing_header *pdu;
-+	int err;
-+
-+	DBG("");
-+
-+	if (!player || !player->cfm || !player->cfm->add_to_now_playing)
-+		return FALSE;
-+
-+	pdu = parse_browsing_pdu(operands, operand_count);
-+	if (!pdu) {
-+		err = -EPROTO;
-+		goto done;
-+	}
-+
-+	err = parse_browsing_status(pdu);
-+
-+done:
-+	player->cfm->add_to_now_playing(session, err, player->user_data);
-+
-+	return FALSE;
-+}
-+
-+int avrcp_add_to_now_playing(struct avrcp *session, uint8_t scope, uint64_t uid,
-+							uint16_t counter)
-+{
-+	struct iovec iov;
-+	uint8_t pdu[11];
-+
-+	if (scope > AVRCP_MEDIA_NOW_PLAYING)
-+		return -EINVAL;
-+
-+	pdu[0] = scope;
-+	put_be64(uid, &pdu[1]);
-+	put_be16(counter, &pdu[9]);
-+
-+	iov.iov_base = pdu;
-+	iov.iov_len = sizeof(pdu);
-+
-+	return avrcp_send_browsing_req(session, AVRCP_ADD_TO_NOW_PLAYING,
-+					&iov, 1, add_to_now_playing_rsp,
-+					session);
-+}
-+
- int avrcp_get_capabilities_rsp(struct avrcp *session, uint8_t transaction,
- 						uint8_t number, uint8_t *events)
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 5af4f4b..9da8761 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -598,6 +598,9 @@ static int play_item(struct avrcp *session, uint8_t transaction, uint8_t scope,
  {
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index fb097af..83bc72e 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -226,6 +226,8 @@ struct avrcp_control_cfm {
- 	void (*play_item) (struct avrcp *session, int err, void *user_data);
- 	void (*search) (struct avrcp *session, int err, uint16_t counter,
- 					uint32_t items, void *user_data);
-+	void (*add_to_now_playing) (struct avrcp *session, int err,
-+					void *user_data);
- };
+ 	DBG("");
  
- struct avrcp_passthrough_handler {
-@@ -283,6 +285,8 @@ int avrcp_get_item_attributes(struct avrcp *session, uint8_t scope,
- int avrcp_play_item(struct avrcp *session, uint8_t scope, uint64_t uid,
- 							uint16_t counter);
- int avrcp_search(struct avrcp *session, const char *string);
-+int avrcp_add_to_now_playing(struct avrcp *session, uint8_t scope, uint64_t uid,
-+							uint16_t counter);
++	if (!uid)
++		return -ENOENT;
++
+ 	avrcp_play_item_rsp(session, transaction);
  
- int avrcp_get_capabilities_rsp(struct avrcp *session, uint8_t transaction,
- 					uint8_t number, uint8_t *events);
+ 	return -EAGAIN;
+@@ -1002,6 +1005,16 @@ int main(int argc, char *argv[])
+ 			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
+ 				0x00, 0x02, 0x04, 0x00));
+ 
++	/* PlayItem - NowPlaying - TG */
++	define_test("/TP/MCN/NP/BI-01-C", test_server,
++			brs_pdu(0x00, 0x11, 0x0e, AVRCP_PLAY_ITEM,
++				0x00, 0x0b, AVRCP_MEDIA_NOW_PLAYING,
++				0x00, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x00, /* uid */
++				0xaa, 0xbb),		/* counter */
++			brs_pdu(0x02, 0x11, 0x0e, AVRCP_PLAY_ITEM,
++				0x00, 0x01, 0x09));
++
+ 	/* Media Player Selection IOP tests */
+ 
+ 	/* Listing of available media players */
 -- 
 1.9.0
 
