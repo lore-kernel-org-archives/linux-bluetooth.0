@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 15/35] android/avrcp-lib: Add support for parsing ChangePath PDU
-Date: Fri, 25 Apr 2014 11:38:52 +0300
-Message-Id: <1398415152-22950-16-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 13/35] unit/test-avrcp: Add /TP/MCN/NP/BV-05-C test
+Date: Fri, 25 Apr 2014 11:38:50 +0300
+Message-Id: <1398415152-22950-14-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 References: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,95 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+To verify the GetFolderItems command issued by the CT on the NowPlaying
+folder.
 ---
- android/avrcp-lib.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- android/avrcp-lib.h |  5 +++++
- 2 files changed, 47 insertions(+)
+ unit/test-avrcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index be3305d..ce7309f 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -826,8 +826,34 @@ static ssize_t get_folder_items(struct avrcp *session, uint8_t transaction,
- 							player->user_data);
- }
+diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+index 93262a8..beaaa4a 100644
+--- a/unit/test-avrcp.c
++++ b/unit/test-avrcp.c
+@@ -637,6 +637,10 @@ static void test_client(gconstpointer data)
+ 					AVRCP_MEDIA_SEARCH, 0x01, 0xaabb,
+ 					0, NULL);
  
-+static ssize_t change_path(struct avrcp *session, uint8_t transaction,
-+					uint16_t params_len, uint8_t *params,
-+					void *user_data)
-+{
-+	struct avrcp_player *player = user_data;
-+	uint8_t direction;
-+	uint16_t counter;
-+	uint64_t uid;
++	if (g_str_equal(context->data->test_name, "/TP/MCN/NP/BV-05-C"))
++		avrcp_get_folder_items(context->session,
++					AVRCP_MEDIA_NOW_PLAYING, 0, 2, 0, NULL);
 +
-+	DBG("");
-+
-+	if (!player->ind || !player->ind->change_path)
-+		return -ENOSYS;
-+
-+	if (!params || params_len < 11)
-+		return -EINVAL;
-+
-+	counter = get_be16(&params[0]);
-+	direction = params[2];
-+	uid = get_be64(&params[3]);
-+
-+	return player->ind->change_path(session, transaction, counter,
-+					direction, uid, player->user_data);
-+}
-+
- static const struct avrcp_browsing_handler browsing_handlers[] = {
- 		{ AVRCP_GET_FOLDER_ITEMS, get_folder_items },
-+		{ AVRCP_CHANGE_PATH, change_path },
- 		{ },
- };
+ 	if (g_str_equal(context->data->test_name, "/TP/CFG/BV-01-C"))
+ 		avrcp_get_capabilities(context->session, CAP_EVENTS_SUPPORTED);
  
-@@ -2487,6 +2513,22 @@ int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
- 							iov, number * 2 + 1);
- }
+@@ -839,6 +843,16 @@ int main(int argc, char *argv[])
+ 				0xaa, 0xbb,		/* counter */
+ 				0x00));			/* num attr */
  
-+int avrcp_change_path_rsp(struct avrcp *session, uint8_t transaction,
-+								uint32_t items)
-+{
-+	struct iovec iov;
-+	uint8_t pdu[5];
++	/* Media Content Navigation Commands and Notifications for NowPlaying */
 +
-+	pdu[0] = AVRCP_STATUS_SUCCESS;
-+	put_be32(items, &pdu[1]);
++	/* GetFolderItems - NowPlaying - CT */
++	define_test("/TP/MCN/NP/BV-05-C", test_client,
++			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
++				0x00, 0x0a, AVRCP_MEDIA_NOW_PLAYING,
++				0x00, 0x00, 0x00, 0x00, /* start */
++				0x00, 0x00, 0x00, 0x02, /* end */
++				0x00));
 +
-+	iov.iov_base = pdu;
-+	iov.iov_len = sizeof(pdu);
-+
-+	return avrcp_send_browsing(session, transaction, AVRCP_CHANGE_PATH,
-+								&iov, 1);
-+}
-+
- int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op)
- {
- 	uint8_t params[5];
-diff --git a/android/avrcp-lib.h b/android/avrcp-lib.h
-index 90fb5dd..0fb3586 100644
---- a/android/avrcp-lib.h
-+++ b/android/avrcp-lib.h
-@@ -163,6 +163,9 @@ struct avrcp_control_ind {
- 					uint8_t scope, uint32_t start,
- 					uint32_t end, uint16_t number,
- 					uint32_t *attrs, void *user_data);
-+	int (*change_path) (struct avrcp *session, uint8_t transaction,
-+					uint16_t counter, uint8_t direction,
-+					uint64_t uid, void *user_data);
- };
+ 	/* Media Player Selection IOP tests */
  
- struct avrcp_control_cfm {
-@@ -298,5 +301,7 @@ int avrcp_get_folder_items_rsp(struct avrcp *session, uint8_t transaction,
- 					uint16_t counter, uint8_t number,
- 					uint8_t *type, uint16_t *len,
- 					uint8_t **params);
-+int avrcp_change_path_rsp(struct avrcp *session, uint8_t transaction,
-+								uint32_t items);
- 
- int avrcp_send_passthrough(struct avrcp *session, uint32_t vendor, uint8_t op);
+ 	/* Listing of available media players */
 -- 
 1.9.0
 
