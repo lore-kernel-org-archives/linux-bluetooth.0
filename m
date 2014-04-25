@@ -1,86 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Apr 2014 09:46:02 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2014-04-25
-Message-ID: <20140425124602.GF7832@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="Md/poaVZ8hnGTzuv"
-Sender: linux-wireless-owner@vger.kernel.org
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 4/4] gatt: Add method to set service active
+Date: Fri, 25 Apr 2014 14:28:44 +0200
+Message-Id: <1398428924-6304-4-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1398428924-6304-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1398428924-6304-1-git-send-email-marcin.kraglak@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---Md/poaVZ8hnGTzuv
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi John,
-
-Some fixes for 3.15. There is a revert for the intel driver, a new device i=
-d,
-and two important SSP fixes from Johan. This one is rebased on wireless/mas=
-ter.
-
-Please pull or let me know of any concerns you have. Thanks!
-=09
-	Gustavo
-
+This function will set active flag in database. Only active
+services can be read by client from database. This falg will be
+checked when remote will read attributes from this database.
+Non-active services won't be exposed.
 ---
-The following changes since commit ffa216bb5eecfce0f01b0b2a95d5c320dde90005:
+ src/shared/gatt-db.c | 16 ++++++++++++++++
+ src/shared/gatt-db.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-  brcmfmac: Fix brcmf_chip_ai_coredisable not applying reset bits to BCMA_I=
-OCTL (2014-04-24 21:46:22 -0400)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 6c72c7c..96e58be 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -57,6 +57,7 @@ struct gatt_db_attribute {
+ };
+ 
+ struct gatt_db_service {
++	bool active;
+ 	uint16_t num_handles;
+ 	struct gatt_db_attribute **attributes;
+ };
+@@ -368,3 +369,18 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
+ 
+ 	return update_attribute_handle(service, index);
+ }
++
++bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
++								bool active)
++{
++	struct gatt_db_service *service;
++
++	service = queue_find(db->services, match_service_by_handle,
++							INT_TO_PTR(handle));
++	if (!service)
++		return false;
++
++	service->active = active;
++
++	return true;
++}
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 05623ca..fa86870 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -54,3 +54,6 @@ uint16_t gatt_db_add_char_descriptor(struct gatt_db *db, uint16_t handle,
+ 
+ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
+ 						uint16_t included_handle);
++
++bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
++								bool active);
+-- 
+1.8.5.3
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for=
--upstream
-
-for you to fetch changes up to 1fb4e09a7e780b915dbd172592ae7e2a4c071065:
-
-  Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-25 09:47:16 +0300)
-
-----------------------------------------------------------------
-Johan Hedberg (2):
-      Bluetooth: Fix triggering BR/EDR L2CAP Connect too early
-      Bluetooth: Fix redundant encryption request for reauthentication
-
-Marcel Holtmann (1):
-      Revert "Bluetooth: Enable autosuspend for Intel Bluetooth device"
-
-Mohammed Habibulla (1):
-      Bluetooth: Add support for Lite-on [04ca:3007]
-
- drivers/bluetooth/ath3k.c | 2 ++
- drivers/bluetooth/btusb.c | 5 ++---
- net/bluetooth/hci_conn.c  | 9 ++++++---
- net/bluetooth/hci_event.c | 6 ++++++
- 4 files changed, 16 insertions(+), 6 deletions(-)
-
-
---Md/poaVZ8hnGTzuv
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTWlkKAAoJEPs3PUX4s20oaP8P/0L4mTwU2Ek/GSV3MGv+sZx+
-8jeW319sWQYW9jo1CqNOqbgvuSecgnaptHInuz5AlHnjHycRlB4o3vRWgeqHhbRf
-1v/zB5iyXjinvd7r32d5GdDem7OUs46LWhAo4Qv65RW6XaoRR8iE/DbL2uHXF7gk
-fmknTntK8QHKjVwZmpbo14FnahCDLvxff0fMM7gkuEZntYFmj8LbEoNjZMU8bwgD
-86AWhCIfijzKUhkXNYaiVLPd9xzk8rApH8ziJaYfocGuO9o4/yexLr2Gqi5e7XyI
-u6gqYXBg8y6LeA3MlF7O5Vb1w5f4zmzfnz6c3js+qRq1nKrSteKYzINwKXE52zVd
-EbmqnOxbUThCG0Z2N/aIp7kBprit3IoW2OlT6lOI6CdgmQAUsOjGd21SjNHIPvTq
-ZjcdhsDdekrM7KrGq5q94WdmnfidFTa6j7ZwqRkUsR8bAY6do5uYlY+DSBrkJrTH
-VmNnGm72zXnlYdmWFBP1NEvQYx/+EEuoEfJnmRu+jG/0v3WReLhHBq1/TqPGDCdq
-YxDzgK+rjyEBeVOB2h9BUpJYwp+++1BLfG2X6gj6SFlsab8PC+YS6HD+JD7AgXHH
-yJXbx/lZeClHeby6UtOcg8Zt2fFvxWoywijkiozDTWLe3v3NRngMaDy+ufeHVfNh
-4Ms5NZ5mL4320Gand74C
-=PzFE
------END PGP SIGNATURE-----
-
---Md/poaVZ8hnGTzuv--
