@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 21/35] unit/test-avrcp: Add /TP/MCN/SRC/BV-06-C test
-Date: Fri, 25 Apr 2014 11:38:58 +0300
-Message-Id: <1398415152-22950-22-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 18/35] unit/test-avrcp: Add /TP/MCN/CB/BI-04-C test
+Date: Fri, 25 Apr 2014 11:38:55 +0300
+Message-Id: <1398415152-22950-19-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 References: <1398415152-22950-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-To verify the GetItemAttributes response issued by the TG on a Media Item
-in the Search folder other than the currently playing one (UID 0x0).
+To verify the ChangePath response issued by the TG when an invalid Folder
+UID is requested.
 ---
- unit/test-avrcp.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ unit/test-avrcp.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
 diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index 2394557..39b1091 100644
+index 2d51779..1cde8fb 100644
 --- a/unit/test-avrcp.c
 +++ b/unit/test-avrcp.c
-@@ -915,6 +915,17 @@ int main(int argc, char *argv[])
- 				0xaa, 0xbb,		/* counter */
- 				0x00));			/* num attr */
+@@ -573,6 +573,9 @@ static int change_path(struct avrcp *session, uint8_t transaction,
+ {
+ 	DBG("");
  
-+	/* GetItemAttributes - TG */
-+	define_test("/TP/MCN/SRC/BV-06-C", test_server,
-+			brs_pdu(0x00, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
-+				0x00, 0x0c, AVRCP_MEDIA_SEARCH,
-+				0x00, 0x00, 0x00, 0x00,
-+				0x00, 0x00, 0x00, 0x01,	/* uid */
-+				0xaa, 0xbb,		/* counter */
-+				0x00),			/* num attr */
-+			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_ITEM_ATTRIBUTES,
-+				0x00, 0x02, 0x04, 0x00));
++	if (!uid)
++		return -ENOTDIR;
 +
- 	/* Media Content Navigation Commands and Notifications for NowPlaying */
+ 	avrcp_change_path_rsp(session, transaction, 0);
  
- 	/* GetFolderItems - NowPlaying - CT */
-@@ -935,7 +946,6 @@ int main(int argc, char *argv[])
+ 	return -EAGAIN;
+@@ -841,6 +844,17 @@ int main(int argc, char *argv[])
  			brs_pdu(0x02, 0x11, 0x0e, AVRCP_GET_FOLDER_ITEMS,
- 				0x00, 0x05, 0x04, 0xab, 0xcd, 0x00, 0x00));
+ 				0x00, 0x01, 0x0b));
  
--
- 	/* Media Player Selection IOP tests */
++	/* ChangePath - TG */
++	define_test("/TP/MCN/CB/BI-04-C", test_server,
++			brs_pdu(0x00, 0x11, 0x0e, AVRCP_CHANGE_PATH,
++				0x00, 0x0b,
++				0xaa, 0xbb,		/* counter */
++				0x01,			/* direction */
++				0x00, 0x00, 0x00, 0x00,
++				0x00, 0x00, 0x00, 0x00	/* Folder UID */),
++			brs_pdu(0x02, 0x11, 0x0e, AVRCP_CHANGE_PATH,
++				0x00, 0x01, 0x08));
++
+ 	/* Media Content Navigation Commands and Notifications for Search */
  
- 	/* Listing of available media players */
+ 	/* Search - CT */
 -- 
 1.9.0
 
