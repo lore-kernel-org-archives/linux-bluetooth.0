@@ -2,60 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android/gatt: Implement get device type command
-Date: Sat, 26 Apr 2014 17:26:14 +0200
-Message-Id: <1398525974-3672-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
-References: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] android/bluetooth: Add function for getting device Android type
+Date: Sat, 26 Apr 2014 17:26:13 +0200
+Message-Id: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This will be used by GATT HAL.
 ---
- android/gatt.c    | 13 +++++++++++--
- android/hal-msg.h |  4 ++++
- 2 files changed, 15 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 9 +++++++++
+ android/bluetooth.h | 2 ++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 8c7909a..0355af1 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2972,10 +2972,19 @@ failed:
- 
- static void handle_client_get_device_type(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_client_get_device_type *cmd = buf;
-+	struct hal_rsp_gatt_client_get_device_type rsp;
-+	bdaddr_t bdaddr;
-+
- 	DBG("");
- 
--	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_CLIENT_GET_DEVICE_TYPE, HAL_STATUS_FAILED);
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
-+
-+	rsp.type = bt_get_device_android_type(&bdaddr);
-+
-+	ipc_send_rsp_full(hal_ipc, HAL_SERVICE_ID_GATT,
-+					HAL_OP_GATT_CLIENT_GET_DEVICE_TYPE,
-+					sizeof(rsp), &rsp, -1);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 7d82aba..20455e3 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1180,6 +1180,15 @@ static uint8_t get_device_android_type(struct device *dev)
+ 	return HAL_TYPE_BREDR;
  }
  
- static void handle_client_set_adv_data(const void *buf, uint16_t len)
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 52ecafb..9d28866 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -730,6 +730,10 @@ struct hal_cmd_gatt_client_get_device_type {
- 	uint8_t bdaddr[6];
- } __attribute__((packed));
- 
-+struct hal_rsp_gatt_client_get_device_type {
-+	uint8_t type;
-+} __attribute__((packed));
++uint8_t bt_get_device_android_type(const bdaddr_t *addr)
++{
++	struct device *dev;
 +
- #define HAL_OP_GATT_CLIENT_SET_ADV_DATA		0x015
- struct hal_cmd_gatt_client_set_adv_data {
- 	int32_t  server_if;
++	dev = get_device(addr, BDADDR_BREDR);
++
++	return get_device_android_type(dev);
++}
++
+ static bool rssi_above_threshold(int old, int new)
+ {
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 634458f..649c9ba 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -46,3 +46,5 @@ bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
+ typedef void (*bt_le_set_advertising_done)(uint8_t status, void *user_data);
+ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
+ 							void *user_data);
++
++uint8_t bt_get_device_android_type(const bdaddr_t *addr);
 -- 
 1.9.0
 
