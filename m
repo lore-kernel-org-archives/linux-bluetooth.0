@@ -1,36 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/4] gatt: Add new characteristic functionality
-Date: Sat, 26 Apr 2014 18:16:30 +0200
-Message-ID: <1954668.vWOP6SXplt@leonov>
-In-Reply-To: <1398428924-6304-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1398428924-6304-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] android/gatt: Implement get device type command
+Date: Sat, 26 Apr 2014 17:26:14 +0200
+Message-Id: <1398525974-3672-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
+References: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+---
+ android/gatt.c    | 13 +++++++++++--
+ android/hal-msg.h |  4 ++++
+ 2 files changed, 15 insertions(+), 2 deletions(-)
 
-On Friday 25 of April 2014 14:28:41 Marcin Kraglak wrote:
-> It will attach characteristic declaration and value, and return value
-> handle. It is needed to pass service handle to which this characteristic
-> will be added. If there is not enough free handles in service, 0 will be
-> returned.
-> ---
->  src/shared/gatt-db.c | 101
-> +++++++++++++++++++++++++++++++++++++++++++++++++++ src/shared/gatt-db.h | 
-> 15 ++++++++
->  2 files changed, 116 insertions(+)
-
-All patches applied, thanks.
-
-Yet, I had to fix some quite severe bugs. Also some other changes (including 
-API) we discussed with Łukasz are present. Please make sure to rebase before
-sending further patches.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 8c7909a..0355af1 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -2972,10 +2972,19 @@ failed:
+ 
+ static void handle_client_get_device_type(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_client_get_device_type *cmd = buf;
++	struct hal_rsp_gatt_client_get_device_type rsp;
++	bdaddr_t bdaddr;
++
+ 	DBG("");
+ 
+-	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_CLIENT_GET_DEVICE_TYPE, HAL_STATUS_FAILED);
++	android2bdaddr(cmd->bdaddr, &bdaddr);
++
++	rsp.type = bt_get_device_android_type(&bdaddr);
++
++	ipc_send_rsp_full(hal_ipc, HAL_SERVICE_ID_GATT,
++					HAL_OP_GATT_CLIENT_GET_DEVICE_TYPE,
++					sizeof(rsp), &rsp, -1);
+ }
+ 
+ static void handle_client_set_adv_data(const void *buf, uint16_t len)
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 52ecafb..9d28866 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -730,6 +730,10 @@ struct hal_cmd_gatt_client_get_device_type {
+ 	uint8_t bdaddr[6];
+ } __attribute__((packed));
+ 
++struct hal_rsp_gatt_client_get_device_type {
++	uint8_t type;
++} __attribute__((packed));
++
+ #define HAL_OP_GATT_CLIENT_SET_ADV_DATA		0x015
+ struct hal_cmd_gatt_client_set_adv_data {
+ 	int32_t  server_if;
 -- 
-BR
-Szymon Janc
+1.9.0
+
