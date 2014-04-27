@@ -2,53 +2,105 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 4/8] android/bluetooth: Fix bt_le_discovery_stop
-Date: Sun, 27 Apr 2014 16:54:54 +0200
-Message-Id: <1398610498-1112-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 5/8] android/bluetooth: Refactor mgmt_discovering_event
+Date: Sun, 27 Apr 2014 16:54:55 +0200
+Message-Id: <1398610498-1112-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1398610498-1112-1-git-send-email-szymon.janc@tieto.com>
 References: <1398610498-1112-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fix invalid use of adapter.exp_discovery_type and not clearing
-callback.
+This make funtion simpler and fix bogus discovery restart (which
+should only happen for LE scanning triggered by GATT HAL).
 ---
- android/bluetooth.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+ android/bluetooth.c | 55 +++++++++++++++++++++++------------------------------
+ 1 file changed, 24 insertions(+), 31 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 20f8993..28ad91a 100644
+index 28ad91a..af5c8ad 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2925,18 +2925,23 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- 
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
+@@ -1061,56 +1061,49 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
  {
--	if (!adapter.cur_discovery_type) {
-+	if (adapter.cur_discovery_type != SCAN_TYPE_LE) {
- 		if (cb)
- 			cb();
-+
-+		gatt_device_found_cb = NULL;
-+
- 		return true;
+ 	const struct mgmt_ev_discovering *ev = param;
+ 	struct hal_ev_discovery_state_changed cp;
+-	bool is_discovering = adapter.cur_discovery_type;
++	uint8_t type;
+ 
+ 	if (length < sizeof(*ev)) {
+ 		error("Too small discovering event");
+ 		return;
  	}
  
--	gatt_discovery_stopped_cb = cb;
--	/* Remove device found callback */
-+	if (!stop_discovery(SCAN_TYPE_LE))
-+		return false;
+-	DBG("hci%u type %u discovering %u", index, ev->type,
+-							ev->discovering);
++	DBG("type %u discovering %u", ev->type, ev->discovering);
+ 
+-	if (is_discovering == !!ev->discovering)
++	if (!!adapter.cur_discovery_type == !!ev->discovering)
+ 		return;
+ 
+-	adapter.cur_discovery_type = ev->discovering ?
+-						ev->type : SCAN_TYPE_NONE;
+-
+-	DBG("new discovering state %u", ev->discovering);
+-
+-	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
++	if (ev->discovering) {
++		adapter.cur_discovery_type = ev->type;
+ 		cp.state = HAL_DISCOVERY_STATE_STARTED;
+-	} else {
+-		g_slist_foreach(bonded_devices, clear_device_found, NULL);
+-		g_slist_foreach(cached_devices, clear_device_found, NULL);
+-		cp.state = HAL_DISCOVERY_STATE_STOPPED;
 +
- 	gatt_device_found_cb = NULL;
--	adapter.exp_discovery_type &= ~SCAN_TYPE_LE;
-+	gatt_discovery_stopped_cb = cb;
++		goto done;
+ 	}
+ 
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+-			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
++	adapter.cur_discovery_type = SCAN_TYPE_NONE;
++	cp.state = HAL_DISCOVERY_STATE_STOPPED;
++
++	g_slist_foreach(bonded_devices, clear_device_found, NULL);
++	g_slist_foreach(cached_devices, clear_device_found, NULL);
+ 
+-	if (gatt_discovery_stopped_cb &&
+-			(adapter.cur_discovery_type == SCAN_TYPE_NONE)) {
+-		/* One shot notification about discovery stopped send to gatt*/
++	/* One shot notification about discovery stopped */
++	if (gatt_discovery_stopped_cb) {
+ 		gatt_discovery_stopped_cb();
+ 		gatt_discovery_stopped_cb = NULL;
+ 	}
+ 
+-	/* If discovery is ON or there is no expected next discovery session
+-	 * then just return
+-	 */
+-	if ((adapter.cur_discovery_type != SCAN_TYPE_NONE) ||
+-		(adapter.exp_discovery_type == SCAN_TYPE_NONE))
+-		return;
++	type = adapter.exp_discovery_type;
 +	adapter.exp_discovery_type = SCAN_TYPE_NONE;
  
--	return stop_discovery(adapter.cur_discovery_type);
-+	return true;
+-	start_discovery(adapter.exp_discovery_type);
++	if (type == SCAN_TYPE_NONE && gatt_device_found_cb)
++		type = SCAN_TYPE_LE;
+ 
+-	/* Maintain expected discovery type if there is gatt client
+-	 * registered
+-	 */
+-	adapter.exp_discovery_type = gatt_device_found_cb ?
+-						SCAN_TYPE_LE : SCAN_TYPE_NONE;
++	if (type != SCAN_TYPE_NONE)
++		start_discovery(type);
++
++done:
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
++			HAL_EV_DISCOVERY_STATE_CHANGED, sizeof(cp), &cp);
  }
  
- bool bt_le_discovery_start(bt_le_device_found cb)
+ static void confirm_device_name_cb(uint8_t status, uint16_t length,
 -- 
 1.9.1
 
