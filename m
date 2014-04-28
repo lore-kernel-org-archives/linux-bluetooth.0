@@ -1,78 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/3] android/gatt: Add DEVICE_CONNECTING state
-Date: Mon, 28 Apr 2014 15:17:48 +0200
-Message-Id: <1398691070-25530-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 1/2] android/bluetooth: Add function for getting device Android type
+Date: Mon, 28 Apr 2014 14:12:51 +0200
+Message-ID: <7443148.12nTOPWj9A@uw000953>
+In-Reply-To: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
+References: <1398525974-3672-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This will allow us to determine if we can scan for other devices to
-connect or postpone it until previous connection is handled.
----
- android/gatt.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+On Saturday 26 of April 2014 17:26:13 Szymon Janc wrote:
+> This will be used by GATT HAL.
+> ---
+>  android/bluetooth.c | 9 +++++++++
+>  android/bluetooth.h | 2 ++
+>  2 files changed, 11 insertions(+)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 7d82aba..20455e3 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1180,6 +1180,15 @@ static uint8_t get_device_android_type(struct device *dev)
+>  	return HAL_TYPE_BREDR;
+>  }
+>  
+> +uint8_t bt_get_device_android_type(const bdaddr_t *addr)
+> +{
+> +	struct device *dev;
+> +
+> +	dev = get_device(addr, BDADDR_BREDR);
+> +
+> +	return get_device_android_type(dev);
+> +}
+> +
+>  static bool rssi_above_threshold(int old, int new)
+>  {
+>  	/* only 8 dBm or more */
+> diff --git a/android/bluetooth.h b/android/bluetooth.h
+> index 634458f..649c9ba 100644
+> --- a/android/bluetooth.h
+> +++ b/android/bluetooth.h
+> @@ -46,3 +46,5 @@ bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
+>  typedef void (*bt_le_set_advertising_done)(uint8_t status, void *user_data);
+>  bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
+>  							void *user_data);
+> +
+> +uint8_t bt_get_device_android_type(const bdaddr_t *addr);
+> 
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b224c28..b533661 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -58,13 +58,15 @@ typedef enum {
- 	DEVICE_DISCONNECTED = 0,
- 	DEVICE_CONNECT_INIT,		/* connection procedure initiated */
- 	DEVICE_CONNECT_READY,		/* dev found during LE scan */
--	DEVICE_CONNECTED,		/* connection has been established */
-+	DEVICE_CONNECTING,		/* io connection triggered */
-+	DEVICE_CONNECTED,		/* io connection has been established */
- } gatt_device_state_t;
- 
- static const char const *device_state_str[] = {
- 	"DISCONNECTED",
- 	"CONNECT INIT",
- 	"CONNECT READY",
-+	"CONNECTING",
- 	"CONNECTED",
- };
- 
-@@ -953,7 +955,7 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	uint32_t status;
- 	GAttrib *attrib;
- 
--	if (dev->state != DEVICE_CONNECT_READY) {
-+	if (dev->state != DEVICE_CONNECTING) {
- 		error("gatt: Device not in a connecting state!?");
- 		g_io_channel_shutdown(io, TRUE, NULL);
- 		return;
-@@ -993,7 +995,7 @@ reply:
- 	device_unref(dev);
- 
- 	/* Check if we should restart scan */
--	if (scanning)
-+	if (scanning || find_device_by_state(DEVICE_CONNECT_INIT))
- 		bt_le_discovery_start(le_device_found_handler);
- 
- 	/* FIXME: What to do if discovery won't start here. */
-@@ -1040,6 +1042,7 @@ static int connect_le(struct gatt_device *dev)
- 
- 	/* Keep this, so we can cancel the connection */
- 	dev->att_io = io;
-+	device_set_state(dev, DEVICE_CONNECTING);
- 
- 	return 0;
- }
-@@ -1207,8 +1210,9 @@ static bool trigger_connection(struct connection *connection)
- 		break;
- 	}
- 
--	/* after state change trigger discovering */
--	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
-+	/* after state change - trigger discovering (if ACL is not creating) */
-+	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT) &&
-+				!find_device_by_state(DEVICE_CONNECTING))
- 		if (!bt_le_discovery_start(le_device_found_handler)) {
- 			error("gatt: Could not start scan");
- 
+Pushed.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
