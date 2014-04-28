@@ -2,103 +2,111 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 7/7] android/gatt: Handle Server apps connections
-Date: Mon, 28 Apr 2014 15:32:06 +0200
-Message-Id: <1398691926-1777-8-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 6/7] ndroid/gatt: Extract common code from client_connect
+Date: Mon, 28 Apr 2014 15:32:05 +0200
+Message-Id: <1398691926-1777-7-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1398691926-1777-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1398691926-1777-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This handles server connections.
+Code extracted from client connect handler will be reused by server
+connect handler
 ---
- android/gatt.c | 44 ++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 40 insertions(+), 4 deletions(-)
+ android/gatt.c | 60 +++++++++++++++++++++++++++++-----------------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index e775f19..e634aa6 100644
+index 549bb30..e775f19 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -628,12 +628,29 @@ static void send_client_connection_notify(struct app_connection *connection,
- 							sizeof(ev), &ev);
+@@ -1251,56 +1251,56 @@ static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id,
+ 								&conn_match);
  }
  
-+static void send_server_connection_notify(struct app_connection *connection,
-+								bool connected)
-+{
-+	struct hal_ev_gatt_server_connection ev;
-+
-+	ev.server_if = connection->app->id;
-+	ev.conn_id = connection->id;
-+	ev.connected = connected;
-+
-+	bdaddr2android(&connection->device->bdaddr, &ev.bdaddr);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+				HAL_EV_GATT_SERVER_CONNECTION, sizeof(ev), &ev);
+-static void handle_client_connect(const void *buf, uint16_t len)
++static uint8_t handle_connect(int32_t app_id, const bdaddr_t *addr,
++								bool is_direct)
+ {
+-	const struct hal_cmd_gatt_client_connect *cmd = buf;
+ 	struct app_connection conn_match;
+ 	struct app_connection *conn;
+ 	struct gatt_device *device;
+-	struct gatt_app *client;
+-	bdaddr_t addr;
+-	uint8_t status;
++	struct gatt_app *app;
+ 
+ 	DBG("");
+ 
+-	client = find_app_by_id(cmd->client_if);
+-	if (!client) {
+-		status = HAL_STATUS_FAILED;
+-		goto reply;
+-	}
+-
+-	android2bdaddr(&cmd->bdaddr, &addr);
++	app = find_app_by_id(app_id);
++	if (!app)
++		return HAL_STATUS_FAILED;
+ 
+-	device = find_device_by_addr(&addr);
++	device = find_device_by_addr(addr);
+ 	if (!device) {
+-		device = create_device(&addr);
+-		if (!device) {
+-			status = HAL_STATUS_FAILED;
+-			goto reply;
+-		}
++		device = create_device(addr);
++		if (!device)
++			return HAL_STATUS_FAILED;
+ 	}
+ 
+ 	conn_match.device = device;
+-	conn_match.app = client;
++	conn_match.app = app;
+ 
+ 	conn = queue_find(app_connections, match_connection_by_device_and_app,
+ 								&conn_match);
+ 	if (!conn) {
+-		conn = create_connection(device, client);
+-		if (!conn) {
+-			status = HAL_STATUS_NOMEM;
+-			goto reply;
+-		}
++		conn = create_connection(device, app);
++		if (!conn)
++			return HAL_STATUS_NOMEM;
+ 	}
+ 
+-	if (!trigger_connection(conn)) {
+-		status = HAL_STATUS_FAILED;
+-		goto reply;
+-	}
++	if (!trigger_connection(conn))
++		return HAL_STATUS_FAILED;
+ 
+-	status = HAL_STATUS_SUCCESS;
++	return HAL_STATUS_SUCCESS;
 +}
 +
- static void send_app_disconnect_notify(struct app_connection *connection,
- 								int32_t status)
- {
- 	if (connection->app->type == APP_CLIENT)
- 		send_client_disconnection_notify(connection, status);
--	/* TODO: handle APP_SERVER */
-+	else
-+		send_server_connection_notify(connection, status ? true :
-+									false);
- }
- 
- static void send_app_connect_notify(struct app_connection *connection,
-@@ -641,7 +658,9 @@ static void send_app_connect_notify(struct app_connection *connection,
- {
- 	if (connection->app->type == APP_CLIENT)
- 		send_client_connection_notify(connection, status);
--	/* TODO: handle APP_SERVER */
-+	else
-+		send_server_connection_notify(connection, status ? false :
-+									true);
- }
- 
- static void disconnect_notify_by_device(void *data, void *user_data)
-@@ -3125,18 +3144,35 @@ failed:
- 
- static void handle_server_connect(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_server_connect *cmd = buf;
++static void handle_client_connect(const void *buf, uint16_t len)
++{
++	const struct hal_cmd_gatt_client_connect *cmd = buf;
 +	uint8_t status;
 +	bdaddr_t addr;
 +
- 	DBG("");
- 
-+	status = handle_connect(cmd->server_if, &addr, cmd->is_direct);
++	DBG("");
 +
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_CONNECT,
--							HAL_STATUS_FAILED);
-+								status);
++	android2bdaddr(&cmd->bdaddr, &addr);
++
++	status = handle_connect(cmd->client_if, &addr, cmd->is_direct);
+ 
+-reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_CONNECT,
+ 								status);
  }
- 
- static void handle_server_disconnect(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_server_disconnect *cmd = buf;
-+	struct app_connection *conn;
-+	uint8_t status;
-+
- 	DBG("");
- 
-+	/* TODO: should we care to match also bdaddr when conn_id is unique? */
-+	conn = find_connection_by_id(cmd->conn_id);
-+	if (conn)
-+		trigger_disconnection(conn);
-+
-+	status = HAL_STATUS_SUCCESS;
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_SERVER_DISCONNECT, HAL_STATUS_FAILED);
-+					HAL_OP_GATT_SERVER_DISCONNECT, status);
- }
- 
- static void handle_server_add_service(const void *buf, uint16_t len)
 -- 
 1.9.1
 
