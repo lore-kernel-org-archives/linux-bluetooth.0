@@ -2,183 +2,103 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/gatt: Use common code for server and client register
-Date: Mon, 28 Apr 2014 16:23:20 +0200
-Message-Id: <1398695000-6446-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 7/7] android/gatt: Handle Server apps connections
+Date: Mon, 28 Apr 2014 15:32:06 +0200
+Message-Id: <1398691926-1777-8-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1398691926-1777-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1398691926-1777-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As clients and servers are stored on a single list we can use common
-code in both of register handlers.
+This handles server connections.
 ---
- android/gatt.c | 121 ++++++++++++++++++++++++---------------------------------
- 1 file changed, 50 insertions(+), 71 deletions(-)
+ android/gatt.c | 44 ++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 40 insertions(+), 4 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index e634aa6..1454000 100644
+index e775f19..e634aa6 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -154,8 +154,6 @@ static struct queue *gatt_apps = NULL;
- static struct queue *gatt_devices = NULL;
- static struct queue *app_connections = NULL;
- 
--static int32_t app_id = 1;
--
- static struct queue *listen_clients = NULL;
- 
- static void bt_le_discovery_stop_cb(void);
-@@ -534,55 +532,64 @@ static void destroy_gatt_app(void *data)
- 	free(app);
+@@ -628,12 +628,29 @@ static void send_client_connection_notify(struct app_connection *connection,
+ 							sizeof(ev), &ev);
  }
  
--static void handle_client_register(const void *buf, uint16_t len)
--{
--	const struct hal_cmd_gatt_client_register *cmd = buf;
--	struct hal_ev_gatt_client_register_client ev;
--	struct gatt_app *client;
--	uint8_t status;
--
--	DBG("");
- 
--	memset(&ev, 0, sizeof(ev));
-+static int handle_app_register(const uint8_t *uuid, gatt_app_type_t app_type,
-+								uint8_t *status)
++static void send_server_connection_notify(struct app_connection *connection,
++								bool connected)
 +{
-+	static int32_t application_id = 1;
-+	struct gatt_app *app;
- 
--	if (queue_find(gatt_apps, match_app_by_uuid, &cmd->uuid)) {
--		error("gatt: client uuid is already on list");
--		status = HAL_STATUS_FAILED;
--		goto failed;
-+	if (queue_find(gatt_apps, match_app_by_uuid, (void *) uuid)) {
-+		error("gatt: app uuid is already on list");
-+		*status = HAL_STATUS_FAILED;
-+		return 0;
- 	}
- 
--	client = new0(struct gatt_app, 1);
--	client->type = APP_CLIENT;
--	if (!client) {
--		error("gatt: cannot allocate memory for registering client");
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+	app = new0(struct gatt_app, 1);
-+	app->type = app_type;
-+	if (!app) {
-+		error("gatt: Cannot allocate memory for registering app");
-+		*status = HAL_STATUS_NOMEM;
-+		return 0;
-+	}
++	struct hal_ev_gatt_server_connection ev;
 +
-+	if (app_type == APP_CLIENT) {
-+		app->notifications = queue_new();
-+		if (!app->notifications) {
-+			error("gatt: couldn't allocate notifications queue");
-+			destroy_gatt_app(app);
-+			*status = HAL_STATUS_NOMEM;
-+			return 0;
-+		}
- 	}
- 
--	client->notifications = queue_new();
--	if (!client->notifications) {
--		error("gatt: couldn't allocate notifications queue");
--		destroy_gatt_app(client);
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+	memcpy(app->uuid, uuid, sizeof(app->uuid));
++	ev.server_if = connection->app->id;
++	ev.conn_id = connection->id;
++	ev.connected = connected;
 +
-+	app->id = application_id++;
++	bdaddr2android(&connection->device->bdaddr, &ev.bdaddr);
 +
-+	if (!queue_push_head(gatt_apps, app)) {
-+		error("gatt: Cannot push app on the list");
-+		free(app);
-+		*status = HAL_STATUS_FAILED;
-+		return 0;
- 	}
- 
--	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
-+	*status = HAL_STATUS_SUCCESS;
-+	return app->id;
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++				HAL_EV_GATT_SERVER_CONNECTION, sizeof(ev), &ev);
 +}
- 
--	client->id = app_id++;
-+static void handle_client_register(const void *buf, uint16_t len)
-+{
-+	const struct hal_cmd_gatt_client_register *cmd = buf;
-+	struct hal_ev_gatt_client_register_client ev;
-+	uint8_t status;
- 
--	if (!queue_push_head(gatt_apps, client)) {
--		error("gatt: Cannot push client on the list");
--		destroy_gatt_app(client);
--		status = HAL_STATUS_NOMEM;
--		goto failed;
--	}
-+	DBG("");
- 
--	ev.client_if = client->id;
-+	memset(&ev, 0, sizeof(ev));
- 
--	status = HAL_STATUS_SUCCESS;
-+	ev.client_if = handle_app_register(cmd->uuid, APP_CLIENT, &status);
- 
--failed:
- 	if (status == HAL_STATUS_SUCCESS)
- 		ev.status = GATT_SUCCESS;
- 	else
-@@ -3069,45 +3076,17 @@ static void handle_server_register(const void *buf, uint16_t len)
++
+ static void send_app_disconnect_notify(struct app_connection *connection,
+ 								int32_t status)
  {
- 	const struct hal_cmd_gatt_server_register *cmd = buf;
- 	struct hal_ev_gatt_server_register ev;
--	struct gatt_app *server;
--	uint32_t status;
-+	uint8_t status;
+ 	if (connection->app->type == APP_CLIENT)
+ 		send_client_disconnection_notify(connection, status);
+-	/* TODO: handle APP_SERVER */
++	else
++		send_server_connection_notify(connection, status ? true :
++									false);
+ }
  
+ static void send_app_connect_notify(struct app_connection *connection,
+@@ -641,7 +658,9 @@ static void send_app_connect_notify(struct app_connection *connection,
+ {
+ 	if (connection->app->type == APP_CLIENT)
+ 		send_client_connection_notify(connection, status);
+-	/* TODO: handle APP_SERVER */
++	else
++		send_server_connection_notify(connection, status ? false :
++									true);
+ }
+ 
+ static void disconnect_notify_by_device(void *data, void *user_data)
+@@ -3125,18 +3144,35 @@ failed:
+ 
+ static void handle_server_connect(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_server_connect *cmd = buf;
++	uint8_t status;
++	bdaddr_t addr;
++
  	DBG("");
  
- 	memset(&ev, 0, sizeof(ev));
++	status = handle_connect(cmd->server_if, &addr, cmd->is_direct);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_CONNECT,
+-							HAL_STATUS_FAILED);
++								status);
+ }
  
--	if (queue_find(gatt_apps, match_app_by_uuid, &cmd->uuid)) {
--		error("gatt: Server uuid is already on list");
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
--	server = new0(struct gatt_app, 1);
--	server->type = APP_SERVER;
--	if (!server) {
--		error("gatt: Cannot allocate memory for registering server");
--		status = HAL_STATUS_NOMEM;
--		goto failed;
--	}
-+	ev.server_if = handle_app_register(cmd->uuid, APP_SERVER, &status);
+ static void handle_server_disconnect(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_server_disconnect *cmd = buf;
++	struct app_connection *conn;
++	uint8_t status;
++
+ 	DBG("");
  
--	memcpy(server->uuid, cmd->uuid, sizeof(server->uuid));
--
--	server->id = app_id++;
--
--	if (!queue_push_head(gatt_apps, server)) {
--		error("gatt: Cannot push server on the list");
--		free(server);
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
--	ev.status = GATT_SUCCESS;
--	ev.server_if = server->id;
--
--	status = HAL_STATUS_SUCCESS;
--
--failed:
--	if (status != HAL_STATUS_SUCCESS)
-+	if (status == HAL_STATUS_SUCCESS)
-+		ev.status = GATT_SUCCESS;
-+	else
- 		ev.status = GATT_FAILURE;
++	/* TODO: should we care to match also bdaddr when conn_id is unique? */
++	conn = find_connection_by_id(cmd->conn_id);
++	if (conn)
++		trigger_disconnection(conn);
++
++	status = HAL_STATUS_SUCCESS;
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_SERVER_DISCONNECT, HAL_STATUS_FAILED);
++					HAL_OP_GATT_SERVER_DISCONNECT, status);
+ }
  
- 	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
+ static void handle_server_add_service(const void *buf, uint16_t len)
 -- 
 1.9.1
 
