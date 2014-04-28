@@ -1,104 +1,104 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <535E3D75.1050108@gmail.com>
-Date: Mon, 28 Apr 2014 07:37:25 -0400
-From: Austin S Hemmelgarn <ahferroin7@gmail.com>
-MIME-Version: 1.0
-To: Dmitry Grebennikov <dmitry.ew@gmail.com>,
-	=?UTF-8?B?QmrDuHJuIE1vcms=?= <bjorn@mork.no>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: minipcie bluetooth card not detected
-References: <535D03F5.5040100@gmail.com> <878uqqdg1p.fsf@nemi.mork.no> <535D1E82.2080809@gmail.com>
-In-Reply-To: <535D1E82.2080809@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH RESEND BlueZ 2/2] client: Fix not releasing agent if bluetoothd exit without calling Release
+Date: Mon, 28 Apr 2014 12:57:02 +0300
+Message-Id: <1398679022-13863-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1398679022-13863-1-git-send-email-luiz.dentz@gmail.com>
+References: <1398679022-13863-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 2014-04-27 11:13, Dmitry Grebennikov wrote:
-> On 27.04.2014 18:04, Bjørn Mork wrote:
->> Dmitry Grebennikov <dmitry.ew@gmail.com> writes:
->>
->>> Hello,
->>> I bought new Intel Wireless 7260 ac + BT card recently and installed
->>> to my laptop.
->>> Wifi works out of box with iwlwifi module + firmware.
->>> But the bluetooth adapter isn't recognized at all.
->>> What could be the problem with it?
->>>
->>> The driver for this card is available and installed (btusb with intel
->>> bt firmware).
->>> lsusb shows no bluetooth adapter (see attachment).
->>> Hcitool scan reports that "Device is not available: No such device"
->>> Dmesg and lspci outputs are also attached.
->> Yes, doesn't look like there is any USB device is detected at all, so
->> drivers don't really matter.
->>
->>> BIOS is upgraded to the last available update.
->> Are you 100% sure that the mini-PCIe slot has USB properly wired up?
->> Did the previous module include any USB functions, or do you have some
->> other USB mini-PCIe module (e.g. a 3G modem) to test it with?
->>
->> Does the laptop have any other mini-PCIe slots where you can test the
->> 7260 module?
->>
->> My impression is that laptop vendors don't necessarily wire up and test
->> stuff they don't use in their own hardware configurations, like USB
->> support in a mini-PCIe slot for intended for PCIe-only wlan cards.
->>
->> I have installed the same 7260 module in two older laptops with mixed
->> results regarding the BT function. In both cases, the 7260 module
->> replaced an older PCIe-only wlan module. I had to put a piece of tape
->> over the D- and D+ pins to avoid the USB part being detected when
->> installing in an Acer 3810tz.  Otherwise the USB device was detected,
->> but reading the device descripor failed - resulting in annoying timeouts
->> both when the BIOS ran and later when Linux booted.  I have similar
->> issues with my Thinkpad X301, but only occasionally on resume.  So I
->> haven't yet disabled the USB part... I am hoping to fix the annoying
->> serialized probing on resume instead, but haven't gotten around to doing
->> that yet.
->>
->> I am pretty sure that both cases are caused by platform issues specific
->> to those laptop models, which were never intended to support any USB
->> module in those slots.
->>
->> But based on these results, I would not be surprised if there are
->> laptops out there with mini-PCIe slots completely without USB support.
->> That's actually better than the Acer variant IMHO, because you don't
->> have to figure out how to physically disable the USB pins yourself.
->>
->>
->> Bjørn
-> Bjørn,
-> Thanks for your answer.
-> 
-> My previous wireless card was Broadcom BCM94313HMGB, also with both wifi
-> & bt support.
-> Bluetooth adapter was always detected.
-> But there were more pins on BCM card than on Intel (some Intel 7260 pins
-> have ho wire).
-> 
-> May be the reason is more up-to-date mini-PCIe standard of Intel card,
-> which is not supported by the PCIe slot of the motherboard ??
-> Intel have some information about the PCIe standard requirements here:
-> http://www.intel.com/support/wireless/wlan/sb/CS-031167.htm
-> 
-> If so, what could be the workarounds?
-> I now there are some adapters from mini-PCIe to SATA or USB.
-> But I'm not sure if the speed of connection would be the same as via
-> mini-PCIe...
-> 
-> Dmitry Grebennikov
-> -- 
-> To unsubscribe from this list: send the line "unsubscribe
-> linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-I'm having pretty much the same issues with a 7260AC on an Acer Aspire
-V5-131, which came with a Atheros chip that had PCIe Wifi and USB
-Bluetooth.  The original (Atheros) chip that came with it had issues
-with Bluetooth, but I have tried it in other systems and had no issues
-with Bluetooth in those, so I think those issues were with Acer's BIOS
-not letting the OS properly manage the Bluetooth module.  I do not think
-though that the Bluetooth issues I am having with the 7260 are the same
-though, because I have tried it in other systems (which I know have
-proper USB wiring in the mini-PCIe slots) and can't get it to work there
-either.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+If AgentManager1 disappear the agent should auto release itself
+otherwise next time AgentManager1 appears bluetoothctl wont register
+the agent again.
+---
+ client/agent.c | 26 ++++++++++++++++----------
+ client/main.c  |  5 ++++-
+ 2 files changed, 20 insertions(+), 11 deletions(-)
+
+diff --git a/client/agent.c b/client/agent.c
+index 81526a1..f074d82 100644
+--- a/client/agent.c
++++ b/client/agent.c
+@@ -156,14 +156,11 @@ dbus_bool_t agent_input(DBusConnection *conn, const char *input)
+ 	return TRUE;
+ }
+ 
+-static DBusMessage *release_agent(DBusConnection *conn,
+-					DBusMessage *msg, void *user_data)
++static void agent_release(DBusConnection *conn)
+ {
+ 	agent_registered = FALSE;
+ 	agent_capability = NULL;
+ 
+-	rl_printf("Agent released\n");
+-
+ 	if (pending_message) {
+ 		dbus_message_unref(pending_message);
+ 		pending_message = NULL;
+@@ -172,6 +169,14 @@ static DBusMessage *release_agent(DBusConnection *conn,
+ 	agent_release_prompt();
+ 
+ 	g_dbus_unregister_interface(conn, AGENT_PATH, AGENT_INTERFACE);
++}
++
++static DBusMessage *release_agent(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	rl_printf("Agent released\n");
++
++	agent_release(conn);
+ 
+ 	return dbus_message_new_method_return(msg);
+ }
+@@ -430,13 +435,8 @@ static void unregister_agent_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == FALSE) {
+-		agent_registered = FALSE;
+-		agent_capability = NULL;
+ 		rl_printf("Agent unregistered\n");
+-
+-		if (g_dbus_unregister_interface(conn, AGENT_PATH,
+-						AGENT_INTERFACE) == FALSE)
+-			rl_printf("Failed to unregister agent object\n");
++		agent_release(conn);
+ 	} else {
+ 		rl_printf("Failed to unregister agent: %s\n", error.name);
+ 		dbus_error_free(&error);
+@@ -450,6 +450,12 @@ void agent_unregister(DBusConnection *conn, GDBusProxy *manager)
+ 		return;
+ 	}
+ 
++	if (!manager) {
++		rl_printf("Agent unregistered\n");
++		agent_release(conn);
++		return;
++	}
++
+ 	if (g_dbus_proxy_method_call(manager, "UnregisterAgent",
+ 						unregister_agent_setup,
+ 						unregister_agent_reply,
+diff --git a/client/main.c b/client/main.c
+index bce678a..75119e0 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -339,8 +339,11 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+ 			dev_list = NULL;
+ 		}
+ 	} else if (!strcmp(interface, "org.bluez.AgentManager1")) {
+-		if (agent_manager == proxy)
++		if (agent_manager == proxy) {
+ 			agent_manager = NULL;
++			if (agent_capability)
++				agent_unregister(dbus_conn, NULL);
++		}
+ 	}
+ }
+ 
+-- 
+1.9.0
+
