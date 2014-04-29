@@ -1,33 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <63DE85F1-67DB-4FF4-94FF-0DEE1EC710FC@sqhead.com>
-References: <63DE85F1-67DB-4FF4-94FF-0DEE1EC710FC@sqhead.com>
-Date: Tue, 29 Apr 2014 10:56:43 +0300
-Message-ID: <CABBYNZ+FqzdtEOHKxHfP5cCcOtMn5GSsiRvG3pzsbN2V6GzeFA@mail.gmail.com>
-Subject: Re: Detecting presence and connecting headset when not in pairing mode
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jon Nordby <jon@sqhead.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Tue, 29 Apr 2014 03:21:06 +0200
+Message-ID: <CAMudyAvKvdHwmA8UxXfb5udt3va8z3ZnPwanwbXXmzkCEyFYfQ@mail.gmail.com>
+Subject: Re: [PATCH 00/36] android/gatt: GATT server implementation
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jon,
+Hi
 
-On Mon, Apr 28, 2014 at 11:37 PM, Jon Nordby <jon@sqhead.com> wrote:
-> Hi,
+On 29 April 2014 03:14, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+> This patch set adds major part of GATT server support for Android:
+> * GATT database extension to get, read and write data
+> * Handling GATT Server Android requests
+> * Create listening socket for BLE.
+> * Support GATT Service
+> * Support Device Information Service
+> * Support Service Changed (skeleton)
+> * some bugfixes
 >
-> I’m using BlueZ 4.98 with Ubuntu 12.04 on an embedded device.
-> When I power up a BT headset* (A2DP) in pairing mode, the DBus signal DeviceFound is emitted on /org/bluez/PID/hci0
-> But, when I power it up in normal modus, I do not see any signals firing on DBus. However, if I use “bt-audio -c MAC” it connects successfully.
+> Still some improvements are needed.
 >
-> How am I supposed to programatically detect that the headset is present and automatically establish a connection with it?
+> Tested on PC and Nexus 5 as peripheral device.
 >
-> * Testing with a Sony DR-BT200 right now.
 
-You don't, the headset is to one that should reconnect if it doesn't
-there might have been some problem when you paired with it.
+Forgot to mention that for now we do handle ATT requests in android
+folder but once bt_att will be ready we will move to use that io.
 
+> Grzegorz Kolodziejczyk (3):
+>   android/gatt: Add support for ATT read by type
+>   android/gatt: Add MTU request cmd handling
+>   android/gatt: Add Find info gatt server cmd handling
+>
+> Jakub Tyszkowski (3):
+>   android/gatt: Add comment about event type being sent
+>   android/gatt: Register device information service
+>   android/gatt: Register GATT service
+>
+> Lukasz Rymanowski (20):
+>   android/gatt: Add listening socket for GATT
+>   android/gatt: Add ATT msg handler
+>   shared: Use pointer for request data instead of int
+>   shared/gatt: Extend read callback with offset
+>   android/gatt: Add register GAP Service
+>   gatt: Add some characteristics uuids
+>   shared: Extend write callback with offset
+>   android/gatt: Add support for ATT read by group type
+>   shared/gatt: Add support to read from database
+>   android/gatt: Move struct req_data up in the file
+>   android/gatt: Add support to read request
+>   shared/gatt: Add support for write request
+>   android/gatt: Add support for write request
+>   android/gatt: Add support for execute write
+>   android/gatt: Move struct req_data upper in the file
+>   android/gatt: Add write callback to server
+>   android/gatt: Add read_cb for GATT Server
+>   android/hal-gatt-api: Fix IPC definition for send response
+>   android/gatt: Add support for GATT server send response
+>   android/gatt: Add support for send indication
+>
+> Marcin Kraglak (10):
+>   android/gatt: Add service functionality
+>   android/gatt: Add implementation of delete service
+>   android/gatt: Add included service implementation
+>   android/gatt: Add characteristic implementation
+>   android/gatt: Add handling of start service command
+>   android/gatt: Add stop service command handling
+>   android/gatt: Add descriptor implementation
+>   shared/gatt: Add function to read by group type
+>   shared/gatt: Add function to find by type
+>   shared/gatt: Add function to read by type
+>
+>  android/gatt.c       | 1176 +++++++++++++++++++++++++++++++++++++++++++++++---
+>  android/hal-gatt.c   |    7 +-
+>  android/hal-msg.h    |    3 +
+>  lib/uuid.h           |    7 +
+>  src/shared/gatt-db.c |  320 ++++++++++++++
+>  src/shared/gatt-db.h |   62 ++-
+>  6 files changed, 1515 insertions(+), 60 deletions(-)
+>
+> --
+> 1.8.4
+>
 
--- 
-Luiz Augusto von Dentz
+\Lukasz
