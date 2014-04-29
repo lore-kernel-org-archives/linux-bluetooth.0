@@ -2,37 +2,64 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
-	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 01/36] android/gatt: Add comment about event type being sent
-Date: Tue, 29 Apr 2014 03:14:31 +0200
-Message-Id: <1398734107-4793-2-git-send-email-lukasz.rymanowski@tieto.com>
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/gatt: Add support for send indication
+Date: Tue, 29 Apr 2014 03:14:32 +0200
+Message-Id: <1398734107-4793-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-
+With this patch Android app can send indication to remote device
 ---
- android/gatt.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ android/gatt.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 0e81e7d..ed4ee75 100644
+index 3e291cf..74d36bb 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -599,6 +599,11 @@ failed:
- static void send_client_disconnection_notify(struct app_connection *connection,
- 								int32_t status)
- {
-+	/* disconnect and connect events are binary the same so its safe to pass
-+	 * hal_ev_gatt_client_disconnect struct even for connect event.
-+	 * Note that server do this the right way, having single event for
-+	 * connection state notification.
-+	 */
- 	struct hal_ev_gatt_client_disconnect ev;
+@@ -3666,10 +3666,38 @@ failed:
  
- 	ev.client_if = connection->app->id;
+ static void handle_server_send_indication(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	struct app_connection *conn;
++	uint8_t status;
++	uint16_t length;
++
+ 	DBG("");
+ 
++	conn = find_connection_by_id(cmd->conn_id);
++	if (!conn) {
++		error("gatt: Could not find connection");
++		status = HAL_STATUS_FAILED;
++		goto reply;
++	}
++
++	if (cmd->confirm)
++		/* TODO: Add data to track confirmation for this request */
++		length = enc_indication(cmd->attribute_handle,
++					(uint8_t *)cmd->value, cmd->len,
++					pdu, sizeof(pdu));
++	else
++		length = enc_notification(cmd->attribute_handle,
++						(uint8_t *)cmd->value, cmd->len,
++						pdu, sizeof(pdu));
++
++	g_attrib_send(conn->device->attrib , 0, pdu, length, NULL, NULL , NULL);
++
++	status = HAL_STATUS_SUCCESS;
++
++reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_SERVER_SEND_INDICATION, HAL_STATUS_FAILED);
++				HAL_OP_GATT_SERVER_SEND_INDICATION, status);
+ }
+ 
+ static void handle_server_send_response(const void *buf, uint16_t len)
 -- 
 1.8.4
 
