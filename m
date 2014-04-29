@@ -1,103 +1,138 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140429125652.GA18942@t440s.lan>
-References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1398734107-4793-27-git-send-email-lukasz.rymanowski@tieto.com>
-	<20140429081329.GH21742@t440s.lan>
-	<CAN_7+Yb4ZgRYHSZUfjkGz7bEdvuyt7GDUS6w5y7Aurq8E0+xgw@mail.gmail.com>
-	<20140429125652.GA18942@t440s.lan>
-Date: Tue, 29 Apr 2014 18:32:32 +0200
-Message-ID: <CAN_7+Ya0bN4Kt1rQX4gfY-cUTNhrJDV6xZgpUrivrsvaaPFiug@mail.gmail.com>
-Subject: Re: [PATCH 25/36] android/gatt: Add support to read request
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Szymon Janc <szymon.janc@tieto.com>
+In-Reply-To: <CABBYNZ+fhCw4mHDBtSz2NBgxDGKxUXpQSZVV5WCUFc2Ji20xfA@mail.gmail.com>
+References: <1398763780-16592-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1398763780-16592-2-git-send-email-andrzej.kaczmarek@tieto.com> <CABBYNZ+fhCw4mHDBtSz2NBgxDGKxUXpQSZVV5WCUFc2Ji20xfA@mail.gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Tue, 29 Apr 2014 17:31:58 +0200
+Message-ID: <CAF3PWx2mQyBuwzv5ui07MC0tk+t2236CZ2ao2PfSPWDcFFDCOA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hog: Improve report map debugging
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan
+Hi Luiz,
 
-On Tue, Apr 29, 2014 at 2:56 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lukasz,
+On 29 April 2014 14:50, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Andrzej,
 >
-> On Tue, Apr 29, 2014, Lukasz Rymanowski wrote:
->> On Tue, Apr 29, 2014 at 10:13 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> > On Tue, Apr 29, 2014, Lukasz Rymanowski wrote:
->> >> +static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
->> >> +                                     struct gatt_device *dev)
->> >> +{
->> >> +     uint16_t handle;
->> >> +     uint16_t len;
->> >> +     uint16_t offset = 0;
->> >> +     struct req_data *req_data;
->> >> +
->> >> +     DBG("");
->> >> +
->> >> +     req_data = new0(struct req_data, 1);
->> >> +     if (!req_data)
->> >> +             return ATT_ECODE_UNLIKELY;
->> >> +
->> >> +     switch (cmd[0]) {
->> >> +     case ATT_OP_READ_BLOB_REQ:
->> >> +             len = dec_read_blob_req(cmd, cmd_len, &handle, &offset);
->> >> +             if (!len) {
->> >> +                     free(req_data);
->> >> +                     return ATT_ECODE_INVALID_PDU;
->> >> +             }
->> >> +             req_data->long_read = true;
->> >> +             break;
->> >> +     case ATT_OP_READ_REQ:
->> >> +             len = dec_read_req(cmd, cmd_len, &handle);
->> >> +             if (!len) {
->> >> +                     free(req_data);
->> >> +                     return ATT_ECODE_INVALID_PDU;
->> >> +             }
->> >> +             break;
->> >> +     default:
->> >> +             error("gatt: Unexpected read type 0x%02x", cmd[0]);
->> >> +             free(req_data);
->> >> +             return ATT_ECODE_REQ_NOT_SUPP;
->> >> +     }
->> >> +
->> >> +     req_data->dev = dev;
->> >> +     req_data->opcode = cmd[0];
->> >> +
->> >> +     if (!gatt_db_read(gatt_db, handle, offset, req_data)) {
->> >> +             free(req_data);
->> >> +             return ATT_ECODE_UNLIKELY;
->> >> +     }
->> >> +
->> >> +     return 0;
->> >> +}
->> >
->> > Where is req_data freed in the case that gatt_db_read succeeds?
+> On Tue, Apr 29, 2014 at 12:29 PM, Andrzej Kaczmarek
+> <andrzej.kaczmarek@tieto.com> wrote:
+>> Now that we can split report map into items it's convenient to have it
+>> printed with items structure preserved which makes it more useful for
+>> debugging.
+>> ---
+>>  profiles/input/hog.c | 64 +++++++++++++++++++++++++++++++---------------------
+>>  1 file changed, 38 insertions(+), 26 deletions(-)
 >>
->> It is freed later in the callback. Will put comment about that.
+>> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+>> index ab88414..c43ce6a 100644
+>> --- a/profiles/input/hog.c
+>> +++ b/profiles/input/hog.c
+>> @@ -378,6 +378,28 @@ static bool parse_descriptor_item(uint8_t *buf, ssize_t blen, ssize_t *len,
+>>         return *len <= blen;
+>>  }
+>>
+>> +static void report_map_item(uint8_t *buf, uint8_t len)
+>> +{
+>> +       char str[51]; /* 16x3 (data) + 2 (continuation marker) + 1 (null) */
+>> +       char *p = str;
+>> +       int i;
+>> +
+>> +       i = 0;
+>> +       while (i < len) {
+>> +               p += sprintf(p, " %02x", buf[i]);
+>> +
+>> +               i++;
+>> +
+>> +               if (i % 16 == 0 && i < len) {
+>> +                       sprintf(p, " \\");
+>> +                       DBG("%s", str);
+>> +                       p = str;
+>> +               }
+>> +       }
+>> +
+>> +       DBG("%s", str);
+>> +}
 >
-> Which callback is that? E.g. in 13/36 the gap_read_cb function does not
-> free req_data.
+> I would call it print_report, in future we might actually need to
+> check if debug is enabled and bail out since otherwise it just run a
+> useless loop that prints nothing.
 
-Your previous comment realized me that we are missing that in read
-callback for gatt service, device
-information service and service changed. it is now fixed.
+I changed this to return string buffer so it can be used as DBG("%s",
+item2string(...)) so it's not called without debug. I think 'item' is
+better here than 'report' since Report Map is in fact Report
+Descriptor consisting of items, as defined by HID spec.
 
+>>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>                                                         gpointer user_data)
+>>  {
+>> @@ -388,7 +410,6 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>         uint16_t vendor_src, vendor, product, version;
+>>         ssize_t vlen;
+>>         int i;
+>> -       int next_item = 0;
+>>
+>>         if (status != 0) {
+>>                 error("Report Map read failed: %s", att_ecode2str(status));
+>> @@ -402,35 +423,26 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>         }
+>>
+>>         DBG("Report MAP:");
+>> -       for (i = 0; i < vlen; i++) {
+>> +       for (i = 0; i < vlen;) {
+>>                 ssize_t item_len = 0;
+>>                 bool is_long_item = false;
+>>
+>> -               if (i == next_item) {
+>> -                       if (parse_descriptor_item(&value[i], vlen - i,
+>> -                                                       &item_len,
+>> -                                                       &is_long_item)) {
+>> -                               /* Report ID is short item with prefix
+>> -                                * 100001xx (binary)
+>> -                                */
+>> -                               if (!is_long_item && (value[i] & 0xfc) == 0x84)
+>> -                                       hogdev->has_report_id = TRUE;
+>> -
+>> -                               next_item += item_len;
+>> -                       } else {
+>> -                               error("Report Map parsing failed at %d", i);
+>> -
+>> -                               /* We do not increase next_item here so we won't
+>> -                                * parse subsequent data - this is what we want.
+>> -                                */
+>> -                       }
+>> -               }
+>> +               if (parse_descriptor_item(&value[i], vlen - i,
+>> +                                               &item_len,
+>> +                                               &is_long_item)) {
+>> +                       /* Report ID is short item with prefix 100001xx */
+>> +                       if (!is_long_item && (value[i] & 0xfc) == 0x84)
+>> +                               hogdev->has_report_id = TRUE;
+>>
+>> -               if (i % 2 == 0) {
+>> -                       if (i + 1 == vlen)
+>> -                               DBG("\t %02x", value[i]);
+>> -                       else
+>> -                               DBG("\t %02x %02x", value[i], value[i + 1]);
+>> +                       report_map_item(&value[i], item_len);
+>> +
+>> +                       i += item_len;
+>> +               } else {
+>> +                       error("Report Map parsing failed at %d", i);
+>> +
+>> +                       /* Just print remaining items at once and break */
+>> +                       report_map_item(&value[i], vlen - i);
+>> +                       break;
+>>                 }
 >
-> In general this kind of API design seems quite strange to me. Probably
-> the information contained in struct req_data can be made fixed for the
-> gatt-db API instead of something chosen by the user (in this case
-> android/gatt.c), and probably doesn't have to be dynamically allocated
-> to begin with.
+> I would consider error on parse_descriptor so you can actually break
+> on the if parse_descriptor fails.
 
-well  I agree. I will do something like request_complete_cb which should be
-called in the end of request and there we do free.
-Also for now this callback  will take aswell response pdu and length,
-so it will be one place
-where msg is send back to remote device.
+This is how it works now: breaks parsing in case
+parse_descriptor_item(). Or did I misunderstood?
 
-it will be in v2
-
->
-> Johan
+BR,
+Andrzej
