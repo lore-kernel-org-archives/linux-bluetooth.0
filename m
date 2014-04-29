@@ -3,63 +3,77 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/gatt: Add support for send indication
-Date: Tue, 29 Apr 2014 03:14:32 +0200
-Message-Id: <1398734107-4793-3-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 00/36] android/gatt: GATT server implementation
+Date: Tue, 29 Apr 2014 03:14:30 +0200
+Message-Id: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch Android app can send indication to remote device
----
- android/gatt.c | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+This patch set adds major part of GATT server support for Android:
+* GATT database extension to get, read and write data 
+* Handling GATT Server Android requests
+* Create listening socket for BLE.
+* Support GATT Service
+* Support Device Information Service
+* Support Service Changed (skeleton)
+* some bugfixes
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 3e291cf..74d36bb 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3666,10 +3666,38 @@ failed:
- 
- static void handle_server_send_indication(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
-+	struct app_connection *conn;
-+	uint8_t status;
-+	uint16_t length;
-+
- 	DBG("");
- 
-+	conn = find_connection_by_id(cmd->conn_id);
-+	if (!conn) {
-+		error("gatt: Could not find connection");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
-+	if (cmd->confirm)
-+		/* TODO: Add data to track confirmation for this request */
-+		length = enc_indication(cmd->attribute_handle,
-+					(uint8_t *)cmd->value, cmd->len,
-+					pdu, sizeof(pdu));
-+	else
-+		length = enc_notification(cmd->attribute_handle,
-+						(uint8_t *)cmd->value, cmd->len,
-+						pdu, sizeof(pdu));
-+
-+	g_attrib_send(conn->device->attrib , 0, pdu, length, NULL, NULL , NULL);
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_SERVER_SEND_INDICATION, HAL_STATUS_FAILED);
-+				HAL_OP_GATT_SERVER_SEND_INDICATION, status);
- }
- 
- static void handle_server_send_response(const void *buf, uint16_t len)
+Still some improvements are needed.
+
+Tested on PC and Nexus 5 as peripheral device.
+
+Grzegorz Kolodziejczyk (3):
+  android/gatt: Add support for ATT read by type
+  android/gatt: Add MTU request cmd handling
+  android/gatt: Add Find info gatt server cmd handling
+
+Jakub Tyszkowski (3):
+  android/gatt: Add comment about event type being sent
+  android/gatt: Register device information service
+  android/gatt: Register GATT service
+
+Lukasz Rymanowski (20):
+  android/gatt: Add listening socket for GATT
+  android/gatt: Add ATT msg handler
+  shared: Use pointer for request data instead of int
+  shared/gatt: Extend read callback with offset
+  android/gatt: Add register GAP Service
+  gatt: Add some characteristics uuids
+  shared: Extend write callback with offset
+  android/gatt: Add support for ATT read by group type
+  shared/gatt: Add support to read from database
+  android/gatt: Move struct req_data up in the file
+  android/gatt: Add support to read request
+  shared/gatt: Add support for write request
+  android/gatt: Add support for write request
+  android/gatt: Add support for execute write
+  android/gatt: Move struct req_data upper in the file
+  android/gatt: Add write callback to server
+  android/gatt: Add read_cb for GATT Server
+  android/hal-gatt-api: Fix IPC definition for send response
+  android/gatt: Add support for GATT server send response
+  android/gatt: Add support for send indication
+
+Marcin Kraglak (10):
+  android/gatt: Add service functionality
+  android/gatt: Add implementation of delete service
+  android/gatt: Add included service implementation
+  android/gatt: Add characteristic implementation
+  android/gatt: Add handling of start service command
+  android/gatt: Add stop service command handling
+  android/gatt: Add descriptor implementation
+  shared/gatt: Add function to read by group type
+  shared/gatt: Add function to find by type
+  shared/gatt: Add function to read by type
+
+ android/gatt.c       | 1176 +++++++++++++++++++++++++++++++++++++++++++++++---
+ android/hal-gatt.c   |    7 +-
+ android/hal-msg.h    |    3 +
+ lib/uuid.h           |    7 +
+ src/shared/gatt-db.c |  320 ++++++++++++++
+ src/shared/gatt-db.h |   62 ++-
+ 6 files changed, 1515 insertions(+), 60 deletions(-)
+
 -- 
 1.8.4
 
