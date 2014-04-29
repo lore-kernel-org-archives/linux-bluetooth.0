@@ -1,109 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 29 Apr 2014 11:16:09 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH 32/36] android/gatt: Add write callback to server
+Message-ID: <20140429081609.GJ21742@t440s.lan>
+References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1398734107-4793-34-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1397610266-20894-2-git-send-email-armansito@chromium.org>
-References: <1397610266-20894-1-git-send-email-armansito@chromium.org>
-	<1397610266-20894-2-git-send-email-armansito@chromium.org>
-Date: Tue, 29 Apr 2014 11:25:42 +0300
-Message-ID: <CABBYNZJ8dbpwE7Ofrr6akcXgGbxi7YVi0TKC9Z6NYb8-6ivjdQ@mail.gmail.com>
-Subject: Re: [RFC 1/2] src/shared/att: Introduce struct bt_att.
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1398734107-4793-34-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
 
-> +/* Error response */
-> +#define ATT_OP_ERROR_RESP              0x01
-> +struct bt_att_error_rsp_param {
-> +       uint8_t request_opcode;
-> +       uint16_t handle;
-> +       uint8_t error_code;
-> +};
+On Tue, Apr 29, 2014, Lukasz Rymanowski wrote:
+> Write callback is now attached to characteristics and descriptors
+> registered by Android app.
+> 
+> Transaction id is generated and stored in gatt_app together with request
+> data(device ptr, cmd opcode etc).
+> ---
+>  android/gatt.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 100 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 2eb5b18..09eae80 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -82,6 +82,10 @@ struct gatt_app {
+>  
+>  	/* Valid for client applications */
+>  	struct queue *notifications;
 > +
-> +/* Exchange MTU */
-> +#define ATT_OP_EXCHANGE_MTU_REQ                0x02
-> +struct bt_att_exchange_mtu_req_param {
-> +       uint16_t client_rx_mtu;
-> +};
-> +
-> +#define ATT_OP_EXCHANGE_MTU_RESP       0x03
-> +struct bt_att_exchange_mtu_rsp_param {
-> +       uint16_t server_rx_mtu;
-> +};
+> +	/* Transaction data valid for server application */
+> +	int32_t pend_trans_id;
 
-I would keep the PDU internally and have functions for that e.g.
-bt_att_error_rsp, btw you can probably drop the _param suffix since it
-is quite obvious what it is for.
+Could we please be consistent with async operation id types. I.e. use an
+unsigned int here.
 
-> +/* Error codes for Error response PDU */
-> +#define ATT_ERROR_INVALID_HANDLE                       0x01
-> +#define ATT_ERROR_READ_NOT_PERMITTED                   0x02
-> +#define ATT_ERROR_WRITE_NOT_PERMITTED                  0x03
-> +#define ATT_ERROR_INVALID_PDU                          0x04
-> +#define ATT_ERROR_AUTHENTICATION                       0x05
-> +#define ATT_ERROR_REQUEST_NOT_SUPPORTED                        0x06
-> +#define ATT_ERROR_INVALID_OFFSET                       0x07
-> +#define ATT_ERROR_AUTHORIZATION                                0x08
-> +#define ATT_ERROR_PREPARE_QUEUE_FULL                   0x09
-> +#define ATT_ERROR_ATTRIBUTE_NOT_FOUND                  0x0A
-> +#define ATT_ERROR_ATTRIBUTE_NOT_LONG                   0x0B
-> +#define ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE     0x0C
-> +#define ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN          0x0D
-> +#define ATT_ERROR_UNLIKELY                             0x0E
-> +#define ATT_ERROR_INSUFFICIENT_ENCRYPTION              0x0F
-> +#define ATT_ERROR_UNSUPPORTED_GROUP_TYPE               0x10
-> +#define ATT_ERROR_INSUFFICIENT_RESOURCES               0x11
-> +/* Application defined errors */
-> +#define ATT_ERROR_IO                                   0x80
-> +#define ATT_ERROR_TIMEOUT                              0x81
-> +#define ATT_ERROR_ABORTED                              0x82
-
-Perhaps we could map errno to ATT errors, that way this can also be
-made internal to the library.
-
-> +typedef void (*bt_att_destroy_func_t)(void *user_data);
-> +
-> +struct bt_att;
-> +
-> +struct bt_att *bt_att_new(int fd);
-> +
-> +struct bt_att *bt_att_ref(struct bt_att *att);
-> +void bt_att_unref(struct bt_att *att);
-> +
-> +typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
-> +
-> +bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
-> +                               void *user_data, bt_att_destroy_func_t destroy);
-> +
-> +bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close);
-> +
-> +uint16_t bt_att_get_mtu(struct bt_att *att);
-> +bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu);
-> +
-> +typedef void (*bt_att_request_func_t)(uint8_t opcode, const void *param,
-> +                                       uint16_t length, void *user_data);
-
-I think we should make the callback receive the bt_att session as well.
-
-> +unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
-> +                               const void *param, uint16_t length,
-> +                               bt_att_request_func_t callback, void *user_data,
-> +                               bt_att_destroy_func_t destroy);
-> +
-> +bool bt_att_cancel(struct bt_att *att, unsigned int id);
-> +bool bt_att_cancel_all(struct bt_att *att);
-> --
-> 1.9.1.423.g4596e3a
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Johan
