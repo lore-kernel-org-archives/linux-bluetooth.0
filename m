@@ -2,134 +2,135 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH v2 19/40] android/gatt: Register device information service
-Date: Tue, 29 Apr 2014 18:47:08 +0200
-Message-Id: <1398790049-30303-20-git-send-email-lukasz.rymanowski@tieto.com>
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 17/40] android/gatt: Add register GAP Service
+Date: Tue, 29 Apr 2014 18:47:06 +0200
+Message-Id: <1398790049-30303-18-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-
-This adds placeholder data to device information service. To get
-real data we should figure out the best way to get Android's system
-properties and expose them to profiles for reading.
+Register GAP service with device name characteristic,
+appearance and peripheral privacy flag
 ---
- android/gatt.c | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
+ android/gatt.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 88e583c..9719637 100644
+index cba1db6..88e583c 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -3800,6 +3800,97 @@ static void register_gap_service(void)
- 
- 	gatt_db_service_set_active(gatt_db, gap_srvc_data.srvc , true);
+@@ -3706,6 +3706,100 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ 		error("gatt: Could not attache to server");
  }
+ 
++struct gap_srvc_handles {
++	uint16_t srvc;
 +
-+/* TODO: Get those data from device possible via androig/bluetooth.c */
-+static struct device_info {
-+	const char *manufacturer_name;
-+	const char *system_id;
-+	const char *model_number;
-+	const char *serial_number;
-+	const char *firmware_rev;
-+	const char *hardware_rev;
-+	const char *software_rev;
-+} device_info = {
-+	.manufacturer_name =	"BlueZ",
-+	.system_id =		"BlueZ for Android",
-+	.model_number =		"model no",
-+	.serial_number =	"serial no",
-+	.firmware_rev =		"firmware rev",
-+	.hardware_rev =		"hardware rev",
-+	.software_rev =		"software rev",
++	/* Characteristics */
++	uint16_t dev_name;
++	uint16_t appear;
++	uint16_t priv;
 +};
 +
-+static void device_info_read_cb(uint16_t handle, uint16_t offset,
-+					void *req_data,
-+					gatt_db_complete_func_t cb,
-+					void *user_data)
++static struct gap_srvc_handles gap_srvc_data;
++
++#define APPEARANCE_GENERIC_PHONE 0x0040
++#define PERIPHERAL_PRIVACY_DISABLE 0x00
++
++struct req_data {
++	struct gatt_device *dev;
++	uint8_t opcode;
++};
++
++static void gap_read_cb(uint16_t handle, uint16_t offset, void *req_data,
++						gatt_db_complete_func_t cb,
++						void *user_data)
 +{
 +	uint8_t pdu[ATT_DEFAULT_LE_MTU];
-+	char *buf = user_data;
 +	uint16_t len;
-+
-+	len = enc_read_resp((uint8_t *) buf, strlen(buf), pdu, sizeof(pdu));
-+
-+	cb(req_data, pdu, len);
-+}
-+
-+static void register_device_info_service(void)
-+{
-+	bt_uuid_t uuid;
-+	uint16_t srvc_handle;
 +
 +	DBG("");
 +
-+	/* Device Information Service */
-+	bt_uuid16_create(&uuid, 0x180a);
-+	srvc_handle = gatt_db_add_service(gatt_db, &uuid, true, 15);
++	if (handle == gap_srvc_data.dev_name) {
++		const char *name = bt_get_adapter_name();
 +
-+	/* User data are not const hence (void *) cast is used */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_SYSTEM_ID);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.system_id);
++		len = enc_read_resp((uint8_t *)name, strlen(name),
++							pdu, sizeof(pdu));
++		goto done;
++	}
 +
-+	bt_uuid16_create(&uuid, GATT_CHARAC_MODEL_NUMBER_STRING);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.model_number);
++	if (handle == gap_srvc_data.appear) {
++		uint8_t val[2];
++		put_le16(APPEARANCE_GENERIC_PHONE, val);
++		len = enc_read_resp(val, sizeof(val), pdu, sizeof(pdu));
++		goto done;
++	}
 +
-+	bt_uuid16_create(&uuid, GATT_CHARAC_SERIAL_NUMBER_STRING);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.serial_number);
++	if (handle == gap_srvc_data.priv) {
++		uint8_t val = PERIPHERAL_PRIVACY_DISABLE;
++		len = enc_read_resp(&val, sizeof(val), pdu, sizeof(pdu));
++		goto done;
++	}
 +
-+	bt_uuid16_create(&uuid, GATT_CHARAC_FIRMWARE_REVISION_STRING);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.firmware_rev);
++	error("gatt: Unknown handle 0x%02x", handle);
++	len = enc_error_resp(ATT_OP_READ_REQ, handle,
++					ATT_ECODE_UNLIKELY, pdu, sizeof(pdu));
 +
-+	bt_uuid16_create(&uuid, GATT_CHARAC_HARDWARE_REVISION_STRING);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.hardware_rev);
-+
-+	bt_uuid16_create(&uuid, GATT_CHARAC_SOFTWARE_REVISION_STRING);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.software_rev);
-+
-+	bt_uuid16_create(&uuid, GATT_CHARAC_MANUFACTURER_NAME_STRING);
-+	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_READ,
-+					device_info_read_cb, NULL,
-+					(void *) device_info.manufacturer_name);
-+
-+	gatt_db_service_set_active(gatt_db, srvc_handle, true);
++done:
++	cb(req_data, pdu, len);
 +}
 +
++static void register_gap_service(void)
++{
++	bt_uuid_t uuid;
++
++	/* GAP UUID */
++	bt_uuid16_create(&uuid, 0x1800);
++	gap_srvc_data.srvc = gatt_db_add_service(gatt_db, &uuid, true, 7);
++
++	/* Device name characteristic */
++	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
++	gap_srvc_data.dev_name =
++			gatt_db_add_characteristic(gatt_db, gap_srvc_data.srvc,
++							&uuid, 0,
++							GATT_CHR_PROP_READ,
++							gap_read_cb, NULL,
++							NULL);
++
++	/* Appearance */
++	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
++	gap_srvc_data.appear =
++			gatt_db_add_characteristic(gatt_db, gap_srvc_data.srvc,
++							&uuid, 0,
++							GATT_CHR_PROP_READ,
++							gap_read_cb, NULL,
++							NULL);
++
++	/* Pripheral privacy flag */
++	bt_uuid16_create(&uuid, GATT_CHARAC_PERIPHERAL_PRIV_FLAG);
++	gap_srvc_data.priv =
++			gatt_db_add_characteristic(gatt_db, gap_srvc_data.srvc,
++							&uuid, 0,
++							GATT_CHR_PROP_READ,
++							gap_read_cb, NULL,
++							NULL);
++
++	gatt_db_service_set_active(gatt_db, gap_srvc_data.srvc , true);
++}
  static int start_listen_socket(void)
  {
  	GError *gerr = NULL;
-@@ -3867,6 +3958,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+@@ -3772,6 +3866,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	if (start_listen_socket() < 0)
  		error("Could not start GATT listening");
  
- 	register_gap_service();
-+	register_device_info_service();
- 
++	register_gap_service();
++
  	return true;
  }
+ 
 -- 
 1.8.4
 
