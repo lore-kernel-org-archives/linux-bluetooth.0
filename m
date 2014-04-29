@@ -2,50 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
-	Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Subject: [PATCH 22/36] android/gatt: Add support for ATT read by type
-Date: Tue, 29 Apr 2014 03:14:53 +0200
-Message-Id: <1398734107-4793-24-git-send-email-lukasz.rymanowski@tieto.com>
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 21/36] android/gatt: Add support for ATT read by group type
+Date: Tue, 29 Apr 2014 03:14:52 +0200
+Message-Id: <1398734107-4793-23-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-
 ---
- android/gatt.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ android/gatt.c | 84 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 83 insertions(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index eb1a910..d442a49 100644
+index 9f3a796..eb1a910 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -3629,6 +3629,19 @@ static void copy_to_att_list(void *data, void *user_data)
- 	memcpy(&value[4], group->value, group->len);
- }
+@@ -3610,17 +3610,98 @@ static const struct ipc_handler cmd_handlers[] = {
+ 		sizeof(struct hal_cmd_gatt_server_send_response) },
+ };
  
-+static void copy_to_att_list_type(void *data, void *user_data)
++struct copy_att_list_data {
++	int iterator;
++	struct att_data_list *adl;
++};
++
++static void copy_to_att_list(void *data, void *user_data)
 +{
 +	struct copy_att_list_data *l = user_data;
-+	struct gatt_db_handle_value *hdl_val = data;
++	struct gatt_db_group *group = data;
 +	uint8_t *value;
 +
 +	value = (void *)l->adl->data[l->iterator++];
 +
-+	put_le16(hdl_val->handle, value);
++	put_le16(group->handle, value);
++	put_le16(group->end_group, &value[2]);
 +
-+	memcpy(&value[2], hdl_val->value, hdl_val->length);
++	memcpy(&value[4], group->value, group->len);
 +}
 +
- static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
- 						uint8_t *rsp, size_t rsp_size,
- 						uint16_t *length)
-@@ -3680,6 +3693,59 @@ static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
- 	return 0;
- }
- 
-+static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
++static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
 +						uint8_t *rsp, size_t rsp_size,
 +						uint16_t *length)
 +{
@@ -55,19 +52,17 @@ index eb1a910..d442a49 100644
 +	struct queue *q;
 +	struct att_data_list *adl;
 +	struct copy_att_list_data l;
-+	struct gatt_db_handle_value *h;
++	struct gatt_db_group *d;
 +
-+	DBG("");
-+
-+	len = dec_read_by_type_req(cmd, cmd_len, &start, &end, &uuid);
++	len = dec_read_by_grp_req(cmd, cmd_len, &start, &end, &uuid);
 +	if (!len)
 +		return ATT_ECODE_INVALID_PDU;
 +
 +	q = queue_new();
 +	if (!q)
-+		return ATT_ECODE_UNLIKELY;
++		return ATT_ECODE_IO;
 +
-+	gatt_db_read_by_type(gatt_db, start, end, uuid, q);
++	gatt_db_read_by_group_type(gatt_db, start, end, uuid, q);
 +
 +	if (queue_isempty(q)) {
 +		queue_destroy(q, NULL);
@@ -75,10 +70,10 @@ index eb1a910..d442a49 100644
 +	}
 +
 +	len = queue_length(q);
-+	h = queue_peek_tail(q);
++	d = queue_peek_head(q);
 +
-+	/* Element here is handle + value*/
-+	adl = att_data_list_alloc(len, sizeof(uint16_t) + h->length);
++	/* Element contains start/end handle + size of uuid */
++	adl = att_data_list_alloc(len, 2 * sizeof(uint16_t) + d->len);
 +	if (adl == NULL) {
 +		queue_destroy(q, NULL);
 +		return ATT_ECODE_UNLIKELY;
@@ -87,9 +82,9 @@ index eb1a910..d442a49 100644
 +	l.iterator = 0;
 +	l.adl = adl;
 +
-+	queue_foreach(q, copy_to_att_list_type, &l);
++	queue_foreach(q, copy_to_att_list, &l);
 +
-+	len = enc_read_by_type_resp(adl, rsp, rsp_size);
++	len = enc_read_by_grp_resp(adl, rsp, rsp_size);
 +	*length = len;
 +
 +	att_data_list_free(adl);
@@ -101,15 +96,43 @@ index eb1a910..d442a49 100644
  static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
  {
  	struct gatt_device *dev = user_data;
-@@ -3703,6 +3769,8 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- 								&length);
- 		break;
- 	case ATT_OP_READ_BY_TYPE_REQ:
-+		status = read_by_type(ipdu, len, opdu, sizeof(opdu), &length);
+ 	uint8_t opdu[ATT_DEFAULT_LE_MTU];
+ 	uint8_t status;
+ 	uint16_t length = 0;
++	size_t vlen;
++	uint8_t *value = g_attrib_get_buffer(dev->attrib, &vlen);
+ 
+ 	DBG("op 0x%02x", ipdu[0]);
+ 
++	if (len > vlen) {
++		error("Too much data on ATT socket %p", value);
++		status = ATT_ECODE_INVALID_PDU;
++		goto done;
++	}
++
+ 	switch (ipdu[0]) {
+ 	case ATT_OP_READ_BY_GROUP_REQ:
++		status = read_by_group_type(ipdu, len, opdu, sizeof(opdu),
++								&length);
 +		break;
+ 	case ATT_OP_READ_BY_TYPE_REQ:
  	case ATT_OP_READ_REQ:
  	case ATT_OP_READ_BLOB_REQ:
- 	case ATT_OP_MTU_REQ:
+@@ -3641,12 +3722,13 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		goto done;
+ 	}
+ 
++
+ done:
+ 	if (status)
+ 		length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
+ 							ATT_DEFAULT_LE_MTU);
+ 
+-	g_attrib_send(dev->attrib, 0, opdu, length , NULL, NULL, NULL);
++	g_attrib_send(dev->attrib, 0, opdu, length, NULL, NULL, NULL);
+ }
+ 
+ static void create_listen_connections(void *data, void *user_data)
 -- 
 1.8.4
 
