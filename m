@@ -1,199 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2] android/gatt: Use common code for server and client register
-Date: Tue, 29 Apr 2014 16:35:03 +0200
-Message-Id: <1398782103-19413-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZL=gidP7m89NACUPBnL87+JDO3kG8zHLHCbz7_+3-WCXw@mail.gmail.com>
+References: <1398763780-16592-1-git-send-email-andrzej.kaczmarek@tieto.com> <CABBYNZL=gidP7m89NACUPBnL87+JDO3kG8zHLHCbz7_+3-WCXw@mail.gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Tue, 29 Apr 2014 15:56:14 +0200
+Message-ID: <CAF3PWx3xm0RH8DYR=w4PcC_ZDVKeQOhiMZuL8b27U=79+-nw2w@mail.gmail.com>
+Subject: Re: [PATCH 1/2] hog: Fix checking for Report ID item
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As clients and servers are stored on a single list we can use common
-code in both of register handlers.
+Hi Luiz,
 
-We always confirm registration handling with HAL_STATUS_SUCCESS,
-regardless of registration result, which is reported by event
-notification containing GATT_SUCCESS or GATT_FAILURE status.
----
- android/gatt.c | 117 ++++++++++++++++++++++-----------------------------------
- 1 file changed, 44 insertions(+), 73 deletions(-)
+On 29 April 2014 14:37, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Andrzej,
+>
+> On Tue, Apr 29, 2014 at 12:29 PM, Andrzej Kaczmarek
+> <andrzej.kaczmarek@tieto.com> wrote:
+>> Report ID item is detected by just looking for possible item prefixes
+>> anywhere in report map. This could lead to false-positive detection if
+>> value we look for is inside item data.
+>>
+>> This patch adds simple parser which can split report map into proper
+>> items and check for Report ID item in reliable way.
+>
+> Well it looks like the format of each descriptor can be different so I
+> would add this to the patch description and probably quote from spec
+> what is those formats.
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 78349ba..4775ecc 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -152,8 +152,6 @@ static struct queue *gatt_apps = NULL;
- static struct queue *gatt_devices = NULL;
- static struct queue *app_connections = NULL;
- 
--static int32_t app_id = 1;
--
- static struct queue *listen_clients = NULL;
- 
- static void bt_le_discovery_stop_cb(void);
-@@ -536,56 +534,58 @@ static void destroy_gatt_app(void *data)
- 	free(app);
- }
- 
--static void handle_client_register(const void *buf, uint16_t len)
-+static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
- {
--	const struct hal_cmd_gatt_client_register *cmd = buf;
--	struct hal_ev_gatt_client_register_client ev;
--	struct gatt_app *client;
--	uint8_t status;
--
--	DBG("");
--
--	memset(&ev, 0, sizeof(ev));
-+	static int32_t application_id = 1;
-+	struct gatt_app *app;
- 
--	if (queue_find(gatt_apps, match_app_by_uuid, &cmd->uuid)) {
--		error("gatt: client uuid is already on list");
--		status = HAL_STATUS_FAILED;
--		goto failed;
-+	if (queue_find(gatt_apps, match_app_by_uuid, (void *) uuid)) {
-+		error("gatt: app uuid is already on list");
-+		return 0;
- 	}
- 
--	client = new0(struct gatt_app, 1);
--	client->type = APP_CLIENT;
--	if (!client) {
--		error("gatt: cannot allocate memory for registering client");
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+	app = new0(struct gatt_app, 1);
-+	if (!app) {
-+		error("gatt: Cannot allocate memory for registering app");
-+		return 0;
- 	}
- 
--	client->notifications = queue_new();
--	if (!client->notifications) {
--		error("gatt: couldn't allocate notifications queue");
--		destroy_gatt_app(client);
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+	app->type = app_type;
-+
-+	if (app->type == APP_CLIENT) {
-+		app->notifications = queue_new();
-+		if (!app->notifications) {
-+			error("gatt: couldn't allocate notifications queue");
-+			destroy_gatt_app(app);
-+			return 0;
-+		}
- 	}
- 
--	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
-+	memcpy(app->uuid, uuid, sizeof(app->uuid));
- 
--	client->id = app_id++;
-+	app->id = application_id++;
- 
--	if (!queue_push_head(gatt_apps, client)) {
--		error("gatt: Cannot push client on the list");
--		destroy_gatt_app(client);
--		status = HAL_STATUS_NOMEM;
--		goto failed;
-+	if (!queue_push_head(gatt_apps, app)) {
-+		error("gatt: Cannot push app on the list");
-+		destroy_gatt_app(app);
-+		return 0;
- 	}
- 
--	ev.client_if = client->id;
-+	return app->id;
-+}
- 
--	status = HAL_STATUS_SUCCESS;
-+static void handle_client_register(const void *buf, uint16_t len)
-+{
-+	const struct hal_cmd_gatt_client_register *cmd = buf;
-+	struct hal_ev_gatt_client_register_client ev;
- 
--failed:
--	if (status == HAL_STATUS_SUCCESS)
-+	DBG("");
-+
-+	memset(&ev, 0, sizeof(ev));
-+
-+	ev.client_if = register_app(cmd->uuid, APP_CLIENT);
-+
-+	if (ev.client_if)
- 		ev.status = GATT_SUCCESS;
- 	else
- 		ev.status = GATT_FAILURE;
-@@ -597,7 +597,7 @@ failed:
- 			HAL_EV_GATT_CLIENT_REGISTER_CLIENT, sizeof(ev), &ev);
- 
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
--									status);
-+							HAL_STATUS_SUCCESS);
- }
- 
- static void send_client_disconnection_notify(struct app_connection *connection,
-@@ -3096,45 +3096,16 @@ static void handle_server_register(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_server_register *cmd = buf;
- 	struct hal_ev_gatt_server_register ev;
--	struct gatt_app *server;
--	uint32_t status;
- 
- 	DBG("");
- 
- 	memset(&ev, 0, sizeof(ev));
- 
--	if (queue_find(gatt_apps, match_app_by_uuid, &cmd->uuid)) {
--		error("gatt: Server uuid is already on list");
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
--	server = new0(struct gatt_app, 1);
--	server->type = APP_SERVER;
--	if (!server) {
--		error("gatt: Cannot allocate memory for registering server");
--		status = HAL_STATUS_NOMEM;
--		goto failed;
--	}
-+	ev.server_if = register_app(cmd->uuid, APP_SERVER);
- 
--	memcpy(server->uuid, cmd->uuid, sizeof(server->uuid));
--
--	server->id = app_id++;
--
--	if (!queue_push_head(gatt_apps, server)) {
--		error("gatt: Cannot push server on the list");
--		free(server);
--		status = HAL_STATUS_FAILED;
--		goto failed;
--	}
--
--	ev.status = GATT_SUCCESS;
--	ev.server_if = server->id;
--
--	status = HAL_STATUS_SUCCESS;
--
--failed:
--	if (status != HAL_STATUS_SUCCESS)
-+	if (ev.server_if)
-+		ev.status = GATT_SUCCESS;
-+	else
- 		ev.status = GATT_FAILURE;
- 
- 	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
-@@ -3143,7 +3114,7 @@ failed:
- 				HAL_EV_GATT_SERVER_REGISTER, sizeof(ev), &ev);
- 
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT, HAL_OP_GATT_SERVER_REGISTER,
--									status);
-+							HAL_STATUS_SUCCESS);
- }
- 
- static void handle_server_unregister(const void *buf, uint16_t len)
--- 
-1.9.1
+Sure, I can add better description why parsing is done this way.
 
+>> ---
+>>  profiles/input/hog.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++-----
+>>  1 file changed, 55 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+>> index a11e04e..ab88414 100644
+>> --- a/profiles/input/hog.c
+>> +++ b/profiles/input/hog.c
+>> @@ -345,6 +345,39 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+>>                                         external_service_char_cb, hogdev);
+>>  }
+>>
+>> +static bool parse_descriptor_item(uint8_t *buf, ssize_t blen, ssize_t *len,
+>> +                                                               bool *is_long)
+>> +{
+>> +       if (!blen)
+>> +               return false;
+>> +
+>> +       if (buf[0] == 0xFE) {
+>> +               if (blen < 3)
+>> +                       return false;
+>> +               /* long item:
+>> +                * byte 0 -> 0xFE
+>> +                * byte 1 -> data size
+>> +                * byte 2 -> tag
+>> +                * + data
+>> +                */
+>> +               *len = buf[1] + 3;
+>> +               *is_long = true;
+>> +       } else {
+>> +               uint8_t b_size;
+>> +               /* short item:
+>> +                * byte 0[1..0] -> data size (=0, 1, 2, 4)
+>> +                * byte 0[3..2] -> type
+>> +                * byte 0[7..4] -> tag
+>> +                * + data
+>> +                */
+>> +               b_size = buf[0] & 0x03;
+>> +               *len = (b_size ? 1 << (b_size - 1) : 0) + 1;
+>> +               *is_long = false;
+>> +       }
+>
+> Perhaps split this into 2 functions one to parse sort descriptors and
+> one for long descriptors, also you can probably drop the item suffix
+> e.g.: parse_short_descriptor, parse_long_descriptor.
+
+I'll need to check 1st byte of item anyway in order to differentiate
+between short and long item before calling proper handler so we'll end
+up with code which calls one-liner functions.
+Perhaps name of this function is misleading since we don't really
+parse items here since this is something uhid will do. We just need to
+figure out item length co we can skip to next one.
+
+>> +       return *len <= blen;
+>> +}
+>> +
+>>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>                                                         gpointer user_data)
+>>  {
+>> @@ -355,6 +388,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>         uint16_t vendor_src, vendor, product, version;
+>>         ssize_t vlen;
+>>         int i;
+>> +       int next_item = 0;
+>>
+>>         if (status != 0) {
+>>                 error("Report Map read failed: %s", att_ecode2str(status));
+>> @@ -369,11 +403,27 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>>
+>>         DBG("Report MAP:");
+>>         for (i = 0; i < vlen; i++) {
+>> -               switch (value[i]) {
+>> -               case 0x85:
+>> -               case 0x86:
+>> -               case 0x87:
+>> -                       hogdev->has_report_id = TRUE;
+>> +               ssize_t item_len = 0;
+>> +               bool is_long_item = false;
+>> +
+>> +               if (i == next_item) {
+>> +                       if (parse_descriptor_item(&value[i], vlen - i,
+>> +                                                       &item_len,
+>> +                                                       &is_long_item)) {
+>> +                               /* Report ID is short item with prefix
+>> +                                * 100001xx (binary)
+>> +                                */
+>> +                               if (!is_long_item && (value[i] & 0xfc) == 0x84)
+>
+> Hmm, so long descriptors are ignored? Is that really what we want?
+
+Yes, long items do not matter here. We only need to know whether there
+is at least one Report ID item inside descriptor (don't even care
+about its contents) which is defined as short item by HID spec.
+
+I'll try to make better description and function names for v2 so it's
+clear what precisely we do here.
+
+BR,
+Andrzej
