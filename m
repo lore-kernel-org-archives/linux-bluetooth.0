@@ -1,50 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <7F93D51C-98BC-4DB3-B438-E3B7ECE1160D@sqhead.com>
-References: <63DE85F1-67DB-4FF4-94FF-0DEE1EC710FC@sqhead.com>
-	<CABBYNZ+FqzdtEOHKxHfP5cCcOtMn5GSsiRvG3pzsbN2V6GzeFA@mail.gmail.com>
-	<7F93D51C-98BC-4DB3-B438-E3B7ECE1160D@sqhead.com>
-Date: Tue, 29 Apr 2014 15:15:45 +0300
-Message-ID: <CABBYNZ+apmq_Py+GezpkbUUth8fVaNiqhX49HVEzHJ=LreRKwQ@mail.gmail.com>
-Subject: Re: Detecting presence and connecting headset when not in pairing mode
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Jon Nordby <jon@sqhead.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20140429081329.GH21742@t440s.lan>
+References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1398734107-4793-27-git-send-email-lukasz.rymanowski@tieto.com>
+	<20140429081329.GH21742@t440s.lan>
+Date: Tue, 29 Apr 2014 14:12:54 +0200
+Message-ID: <CAN_7+Yb4ZgRYHSZUfjkGz7bEdvuyt7GDUS6w5y7Aurq8E0+xgw@mail.gmail.com>
+Subject: Re: [PATCH 25/36] android/gatt: Add support to read request
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jon,
+Hi Johan,
 
-On Tue, Apr 29, 2014 at 2:37 PM, Jon Nordby <jon@sqhead.com> wrote:
+On Tue, Apr 29, 2014 at 10:13 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> On Tue, Apr 29, 2014, Lukasz Rymanowski wrote:
+>> +static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+>> +                                     struct gatt_device *dev)
+>> +{
+>> +     uint16_t handle;
+>> +     uint16_t len;
+>> +     uint16_t offset = 0;
+>> +     struct req_data *req_data;
+>> +
+>> +     DBG("");
+>> +
+>> +     req_data = new0(struct req_data, 1);
+>> +     if (!req_data)
+>> +             return ATT_ECODE_UNLIKELY;
+>> +
+>> +     switch (cmd[0]) {
+>> +     case ATT_OP_READ_BLOB_REQ:
+>> +             len = dec_read_blob_req(cmd, cmd_len, &handle, &offset);
+>> +             if (!len) {
+>> +                     free(req_data);
+>> +                     return ATT_ECODE_INVALID_PDU;
+>> +             }
+>> +             req_data->long_read = true;
+>> +             break;
+>> +     case ATT_OP_READ_REQ:
+>> +             len = dec_read_req(cmd, cmd_len, &handle);
+>> +             if (!len) {
+>> +                     free(req_data);
+>> +                     return ATT_ECODE_INVALID_PDU;
+>> +             }
+>> +             break;
+>> +     default:
+>> +             error("gatt: Unexpected read type 0x%02x", cmd[0]);
+>> +             free(req_data);
+>> +             return ATT_ECODE_REQ_NOT_SUPP;
+>> +     }
+>> +
+>> +     req_data->dev = dev;
+>> +     req_data->opcode = cmd[0];
+>> +
+>> +     if (!gatt_db_read(gatt_db, handle, offset, req_data)) {
+>> +             free(req_data);
+>> +             return ATT_ECODE_UNLIKELY;
+>> +     }
+>> +
+>> +     return 0;
+>> +}
 >
-> On 29 Apr 2014, at 09:56, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->
->> Hi Jon,
->
-> Hi Luiz,
->
->>
->> On Mon, Apr 28, 2014 at 11:37 PM, Jon Nordby <jon@sqhead.com> wrote:
->>> Hi,
->>>
->>> I’m using BlueZ 4.98 with Ubuntu 12.04 on an embedded device.
->>> When I power up a BT headset* (A2DP) in pairing mode, the DBus signal DeviceFound is emitted on /org/bluez/PID/hci0
->>> But, when I power it up in normal modus, I do not see any signals firing on DBus. However, if I use “bt-audio -c MAC” it connects successfully.
->>>
->>> How am I supposed to programatically detect that the headset is present and automatically establish a connection with it?
->>>
->>> * Testing with a Sony DR-BT200 right now.
->>
->> You don't, the headset is to one that should reconnect if it doesn't
->> there might have been some problem when you paired with it.
->
-> Ok. Does this require having a bluez agent running in addition to bluetoothd? If so, which should I use on an embedded system (no UI/session)?
+> Where is req_data freed in the case that gatt_db_read succeeds?
 
-Yes, the agent is required for pairing since the user has to
-authenticate, you can however automate the process by registering an
-agent with NoInputNoOutput (e.g. simple-agent -c NoInputNoOutput) this
-will cause just works paring if supported (requires Bluetooth 2.1 >).
+It is freed later in the callback. Will put comment about that.
 
--- 
-Luiz Augusto von Dentz
+>
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Thanks
+Lukasz
