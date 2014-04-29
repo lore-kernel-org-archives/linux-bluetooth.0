@@ -3,42 +3,123 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 11/36] shared: Use pointer for request data instead of int
-Date: Tue, 29 Apr 2014 03:14:42 +0200
-Message-Id: <1398734107-4793-13-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 10/36] android/gatt: Add ATT msg handler
+Date: Tue, 29 Apr 2014 03:14:41 +0200
+Message-Id: <1398734107-4793-12-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is because user of database might need to get in callback some more
-information then request id. It is to avoid keep in database user any
-list of request_id data.
+This patch adds skeleton for ATT msg handler and also attach it to the
+attrib on connect_cb and connect_event
 ---
- src/shared/gatt-db.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/gatt.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 56 insertions(+), 1 deletion(-)
 
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index f68f4b3..d1443cb 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -30,12 +30,12 @@ uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 					bool primary, uint16_t num_handles);
- bool gatt_db_remove_service(struct gatt_db *db, uint16_t handle);
+diff --git a/android/gatt.c b/android/gatt.c
+index d87af39..5ca22e2 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -134,6 +134,7 @@ struct gatt_device {
+ 	struct queue *services;
  
--typedef void (*gatt_db_read_t) (uint16_t handle, uint16_t request_id,
-+typedef void (*gatt_db_read_t) (uint16_t handle, void *req_data,
- 							void *user_data);
+ 	guint watch_id;
++	guint server_id;
  
--typedef void (*gatt_db_write_t) (uint16_t handle, uint16_t request_id,
--					const uint8_t *value, size_t len,
--					void *user_data);
-+typedef void (*gatt_db_write_t) (uint16_t handle, const uint8_t *value,
-+						size_t len, void *req_data,
-+						void *user_data);
+ 	int ref;
+ 	int conn_cnt;
+@@ -494,6 +495,9 @@ static void connection_cleanup(struct gatt_device *device)
+ 		device->att_io = NULL;
+ 	}
  
- uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
- 						const bt_uuid_t *uuid,
++	if (device->server_id)
++		g_attrib_unregister(device->attrib, device->server_id);
++
+ 	if (device->attrib) {
+ 		GAttrib *attrib = device->attrib;
+ 		device->attrib = NULL;
+@@ -954,6 +958,8 @@ static void send_app_connect_notifications(void *data, void *user_data)
+ 		send_app_connect_notify(conn, con_data->status);
+ }
+ 
++static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data);
++
+ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ {
+ 	struct gatt_device *dev = user_data;
+@@ -989,6 +995,12 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+ 	dev->watch_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+ 							disconnected_cb, dev);
+ 
++	dev->server_id = g_attrib_register(attrib, GATTRIB_ALL_REQS,
++						GATTRIB_ALL_HANDLES,
++						att_handler, dev, NULL);
++	if (!dev->server_id)
++		error("gatt: Could not attache to server");
++
+ 	device_set_state(dev, DEVICE_CONNECTED);
+ 
+ 	status = GATT_SUCCESS;
+@@ -3594,6 +3606,45 @@ static const struct ipc_handler cmd_handlers[] = {
+ 		sizeof(struct hal_cmd_gatt_server_send_response) },
+ };
+ 
++static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
++{
++	struct gatt_device *dev = user_data;
++	uint8_t opdu[ATT_DEFAULT_LE_MTU];
++	uint8_t status;
++	uint16_t length = 0;
++
++	DBG("op 0x%02x", ipdu[0]);
++
++	switch (ipdu[0]) {
++	case ATT_OP_READ_BY_GROUP_REQ:
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_MTU_REQ:
++	case ATT_OP_FIND_INFO_REQ:
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_FIND_BY_TYPE_REQ:
++	case ATT_OP_HANDLE_CNF:
++	case ATT_OP_HANDLE_IND:
++	case ATT_OP_HANDLE_NOTIFY:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++	default:
++		DBG("Unsupported request 0x%02x", ipdu[0]);
++		status = ATT_ECODE_REQ_NOT_SUPP;
++		goto done;
++	}
++
++done:
++	if (status)
++		length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
++							ATT_DEFAULT_LE_MTU);
++
++	g_attrib_send(dev->attrib, 0, opdu, length , NULL, NULL, NULL);
++}
++
+ static void create_listen_connections(void *data, void *user_data)
+ {
+ 	struct gatt_device *dev = user_data;
+@@ -3659,7 +3710,11 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+ 
+ 	queue_foreach(app_connections, send_app_connect_notifications, &data);
+ 
+-	/*TODO: Attach to attrib db */
++	dev->server_id = g_attrib_register(attrib, GATTRIB_ALL_REQS,
++						GATTRIB_ALL_HANDLES,
++						att_handler, dev, NULL);
++	if (!dev->server_id)
++		error("gatt: Could not attache to server");
+ }
+ 
+ static int start_listen_socket(void)
 -- 
 1.8.4
 
