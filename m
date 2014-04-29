@@ -3,66 +3,52 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 40/40] android/gatt: Add support for send indication
-Date: Tue, 29 Apr 2014 18:47:29 +0200
-Message-Id: <1398790049-30303-41-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 38/40] android/hal-gatt-api: Fix IPC definition for send response
+Date: Tue, 29 Apr 2014 18:47:27 +0200
+Message-Id: <1398790049-30303-39-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-With this patch Android app can send indication to remote device
 ---
- android/gatt.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ android/hal-gatt.c | 7 +++++--
+ android/hal-msg.h  | 3 +++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 80880eb..3638ae8 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3663,10 +3663,41 @@ failed:
+diff --git a/android/hal-gatt.c b/android/hal-gatt.c
+index 16b5607..e1faccb 100644
+--- a/android/hal-gatt.c
++++ b/android/hal-gatt.c
+@@ -1237,9 +1237,12 @@ static bt_status_t send_response(int conn_id, int trans_id, int status,
+ 	cmd->conn_id = conn_id;
+ 	cmd->trans_id = trans_id;
+ 	cmd->status = status;
+-	cmd->len = sizeof(*response);
++	cmd->handle = response->attr_value.handle;
++	cmd->offset = response->attr_value.offset;
++	cmd->auth_req = response->attr_value.auth_req;
++	cmd->len = response->attr_value.len;
  
- static void handle_server_send_indication(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
-+	struct app_connection *conn;
-+	struct gatt_app *app;
-+	uint8_t status;
-+	uint16_t length;
-+
- 	DBG("");
+-	memcpy(cmd->data, response, sizeof(*response));
++	memcpy(cmd->data, response->attr_value.value, cmd->len);
  
-+	conn = find_connection_by_id(cmd->conn_id);
-+	if (!conn) {
-+		error("gatt: Could not find connection");
-+		status = HAL_STATUS_FAILED;
-+		goto reply;
-+	}
-+
-+	app = conn->app;
-+
-+	if (cmd->confirm)
-+		/* TODO: Add data to track confirmation for this request */
-+		length = enc_indication(cmd->attribute_handle,
-+					(uint8_t *)cmd->value, cmd->len,
-+					pdu, sizeof(pdu));
-+	else
-+		length = enc_notification(cmd->attribute_handle,
-+						(uint8_t *)cmd->value, cmd->len,
-+						pdu, sizeof(pdu));
-+
-+	app->gatt_db_complete_cb(app->data, pdu, length);
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_SERVER_SEND_INDICATION, HAL_STATUS_FAILED);
-+				HAL_OP_GATT_SERVER_SEND_INDICATION, status);
- }
- 
- static void handle_server_send_response(const void *buf, uint16_t len)
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_GATT,
+ 					HAL_OP_GATT_SERVER_SEND_RESPONSE,
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 9d28866..09bd9a0 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -847,6 +847,9 @@ struct hal_cmd_gatt_server_send_indication {
+ struct hal_cmd_gatt_server_send_response {
+ 	int32_t conn_id;
+ 	int32_t trans_id;
++	uint16_t handle;
++	uint16_t offset;
++	uint8_t auth_req;
+ 	int32_t status;
+ 	uint16_t len;
+ 	uint8_t data[0];
 -- 
 1.8.4
 
