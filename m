@@ -1,129 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 1/2] hog: Fix checking for Report ID item presence
-Date: Tue, 29 Apr 2014 19:25:29 +0200
-Message-ID: <1398792330-23636-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 40/40] android/gatt: Add support for send indication
+Date: Tue, 29 Apr 2014 18:55:18 +0200
+Message-Id: <1398790518-30728-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Report ID item in Report Descriptor is now detected by simply looking
-for applicable item prefixes anywhere in data and does not take items
-structure into consideration. This could lead to false-positive
-detections in case value we look for is just part of item data, not an
-actual item prefix.
-
-As defined in Device Class Definition for HID (6.2.2.7), Report ID is
-a short item with prefix 100001nn (binary) thus we do not need to do
-complete parsing of Report Descriptor but only need to check items
-prefixes in order to find Report ID items reliably.
-
-This patch checks Report Descriptor item by item looking for item
-prefix which matches Report ID, as defined in spec above.
+With this patch Android app can send indication to remote device
 ---
-v2:
-- more verbose commit description
-- changed parse_descriptor_item() to get_descriptor_item_info()
-- reformatted get_descriptor_item_info() a bit
+ android/gatt.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
- profiles/input/hog.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 62 insertions(+), 5 deletions(-)
-
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index a11e04e..767bcfa 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -345,6 +345,46 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
- 					external_service_char_cb, hogdev);
- }
+diff --git a/android/gatt.c b/android/gatt.c
+index 80880eb..71b78ad 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3663,10 +3663,38 @@ failed:
  
-+static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen, ssize_t *len,
-+								bool *is_long)
-+{
-+	if (!blen)
-+		return false;
+ static void handle_server_send_indication(const void *buf, uint16_t len)
+ {
++	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	struct app_connection *conn;
++	uint8_t status;
++	uint16_t length;
 +
-+	*is_long = (buf[0] == 0xfe);
-+
-+	if (*is_long) {
-+		if (blen < 3)
-+			return false;
-+
-+		/*
-+		 * long item:
-+		 * byte 0 -> 0xFE
-+		 * byte 1 -> data size
-+		 * byte 2 -> tag
-+		 * + data
-+		 */
-+
-+		*len = buf[1] + 3;
-+	} else {
-+		uint8_t b_size;
-+
-+		/*
-+		 * short item:
-+		 * byte 0[1..0] -> data size (=0, 1, 2, 4)
-+		 * byte 0[3..2] -> type
-+		 * byte 0[7..4] -> tag
-+		 * + data
-+		 */
-+
-+		b_size = buf[0] & 0x03;
-+		*len = (b_size ? 1 << (b_size - 1) : 0) + 1;
+ 	DBG("");
+ 
++	conn = find_connection_by_id(cmd->conn_id);
++	if (!conn) {
++		error("gatt: Could not find connection");
++		status = HAL_STATUS_FAILED;
++		goto reply;
 +	}
 +
-+	/* item length should be no more than input buffer length */
-+	return *len <= blen;
-+}
++	if (cmd->confirm)
++		/* TODO: Add data to track confirmation for this request */
++		length = enc_indication(cmd->attribute_handle,
++					(uint8_t *)cmd->value, cmd->len,
++					pdu, sizeof(pdu));
++	else
++		length = enc_notification(cmd->attribute_handle,
++						(uint8_t *)cmd->value, cmd->len,
++						pdu, sizeof(pdu));
 +
- static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 							gpointer user_data)
- {
-@@ -355,6 +395,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 	uint16_t vendor_src, vendor, product, version;
- 	ssize_t vlen;
- 	int i;
-+	int next_item = 0;
++	g_attrib_send(conn->device->attrib, 0, pdu, length, NULL, NULL, NULL);
++
++	status = HAL_STATUS_SUCCESS;
++
++reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_SERVER_SEND_INDICATION, HAL_STATUS_FAILED);
++				HAL_OP_GATT_SERVER_SEND_INDICATION, status);
+ }
  
- 	if (status != 0) {
- 		error("Report Map read failed: %s", att_ecode2str(status));
-@@ -369,11 +410,27 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
- 
- 	DBG("Report MAP:");
- 	for (i = 0; i < vlen; i++) {
--		switch (value[i]) {
--		case 0x85:
--		case 0x86:
--		case 0x87:
--			hogdev->has_report_id = TRUE;
-+		ssize_t ilen = 0;
-+		bool long_item = false;
-+
-+		if (i == next_item) {
-+			if (get_descriptor_item_info(&value[i], vlen - i,
-+							&ilen, &long_item)) {
-+				/*
-+				 * Report ID is short item with prefix 100001xx
-+				 */
-+				if (!long_item && (value[i] & 0xfc) == 0x84)
-+					hogdev->has_report_id = TRUE;
-+
-+				next_item += ilen;
-+			} else {
-+				error("Report Map parsing failed at %d", i);
-+
-+				/*
-+				 * We do not increase next_item here so we won't
-+				 * parse subsequent data - this is what we want.
-+				 */
-+			}
- 		}
- 
- 		if (i % 2 == 0) {
+ static void handle_server_send_response(const void *buf, uint16_t len)
 -- 
-1.9.2
+1.8.4
 
