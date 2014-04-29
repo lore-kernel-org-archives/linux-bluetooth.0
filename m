@@ -1,150 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Apr 2014 20:38:34 +0200
-From: Libor Pechacek <lpechacek@suse.cz>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Peter Hurley <peter@hurleysoftware.com>,
-	Seung-Woo Kim <sw0312.kim@samsung.com>,
-	Gianluca Anzolin <gianluca@sottospazio.it>,
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Al Cho <acho@suse.com>
-Subject: [PATCH] rfcomm: Convert spinlocks into mutexes
-Message-ID: <20140429183834.GA6076@fmn.suse.cz>
+Date: Tue, 29 Apr 2014 21:20:25 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH v2 29/40] android/gatt: Add support to read request
+Message-ID: <20140429182025.GA21895@t440s.P-661HNU-F1>
+References: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
+ <1398790049-30303-30-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1398790049-30303-30-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Enabling CONFIG_DEBUG_ATOMIC_SLEEP has shown that some rfcomm functions
-acquiring spinlocks call sleeping locks further in the chain.  Converting
-the offending spinlocks into mutexes makes sleeping safe.
+Hi Lukasz,
 
-Signed-off-by: Libor Pechacek <lpechacek@suse.cz>
----
- include/net/bluetooth/rfcomm.h |  6 +++---
- net/bluetooth/rfcomm/core.c    |  2 +-
- net/bluetooth/rfcomm/tty.c     | 20 ++++++++++----------
- 3 files changed, 14 insertions(+), 14 deletions(-)
+On Tue, Apr 29, 2014, Lukasz Rymanowski wrote:
+> +static void gatt_request_complete(void *data, const uint8_t *pdu, uint16_t len)
+> +{
+> +	struct req_data *d = data;
+> +
+> +	if (pdu)
+> +		g_attrib_send(d->dev->attrib, 0, pdu, len, NULL, NULL, NULL);
+> +	else
+> +		error("gatt: gatt_request_complete: pdu not present ?!");
+> +
+> +	free(d);
+> +}
+> +
+> +static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+> +					struct gatt_device *dev)
+> +{
+> +	uint16_t handle;
+> +	uint16_t len;
+> +	uint16_t offset = 0;
+> +	struct req_data *req_data;
+> +
+> +	DBG("");
+> +
+> +	req_data = new0(struct req_data, 1);
+> +	if (!req_data)
+> +		return ATT_ECODE_INSUFF_RESOURCES;
+> +
+> +	switch (cmd[0]) {
+> +	case ATT_OP_READ_BLOB_REQ:
+> +		len = dec_read_blob_req(cmd, cmd_len, &handle, &offset);
+> +		if (!len) {
+> +			free(req_data);
+> +			return ATT_ECODE_INVALID_PDU;
+> +		}
+> +		req_data->long_read = true;
+> +		break;
+> +	case ATT_OP_READ_REQ:
+> +		len = dec_read_req(cmd, cmd_len, &handle);
+> +		if (!len) {
+> +			free(req_data);
+> +			return ATT_ECODE_INVALID_PDU;
+> +		}
+> +		break;
+> +	default:
+> +		error("gatt: Unexpected read type 0x%02x", cmd[0]);
+> +		free(req_data);
+> +		return ATT_ECODE_REQ_NOT_SUPP;
+> +	}
+> +
+> +	req_data->dev = dev;
+> +	req_data->opcode = cmd[0];
+> +
+> +	if (!gatt_db_read(gatt_db, handle, offset, req_data, gatt_request_complete)) {
+> +		free(req_data);
+> +		return ATT_ECODE_UNLIKELY;
+> +	}
 
-diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-index 2611cc389d7d..578b83127af1 100644
---- a/include/net/bluetooth/rfcomm.h
-+++ b/include/net/bluetooth/rfcomm.h
-@@ -173,7 +173,7 @@ struct rfcomm_dlc {
- 	struct sk_buff_head   tx_queue;
- 	struct timer_list     timer;
- 
--	spinlock_t    lock;
-+	struct mutex  lock;
- 	unsigned long state;
- 	unsigned long flags;
- 	atomic_t      refcnt;
-@@ -244,8 +244,8 @@ int  rfcomm_dlc_get_modem_status(struct rfcomm_dlc *d, u8 *v24_sig);
- void rfcomm_dlc_accept(struct rfcomm_dlc *d);
- struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel);
- 
--#define rfcomm_dlc_lock(d)     spin_lock(&d->lock)
--#define rfcomm_dlc_unlock(d)   spin_unlock(&d->lock)
-+#define rfcomm_dlc_lock(d)     mutex_lock(&d->lock)
-+#define rfcomm_dlc_unlock(d)   mutex_unlock(&d->lock)
- 
- static inline void rfcomm_dlc_hold(struct rfcomm_dlc *d)
- {
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index cf620260affa..754b6fe4f742 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -307,7 +307,7 @@ struct rfcomm_dlc *rfcomm_dlc_alloc(gfp_t prio)
- 	setup_timer(&d->timer, rfcomm_dlc_timeout, (unsigned long)d);
- 
- 	skb_queue_head_init(&d->tx_queue);
--	spin_lock_init(&d->lock);
-+	mutex_init(&d->lock);
- 	atomic_set(&d->refcnt, 1);
- 
- 	rfcomm_dlc_clear_state(d);
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index 403ec09f480a..8e385a0ae60e 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -70,7 +70,7 @@ struct rfcomm_dev {
- };
- 
- static LIST_HEAD(rfcomm_dev_list);
--static DEFINE_SPINLOCK(rfcomm_dev_lock);
-+static DEFINE_MUTEX(rfcomm_dev_lock);
- 
- static void rfcomm_dev_data_ready(struct rfcomm_dlc *dlc, struct sk_buff *skb);
- static void rfcomm_dev_state_change(struct rfcomm_dlc *dlc, int err);
-@@ -96,9 +96,9 @@ static void rfcomm_dev_destruct(struct tty_port *port)
- 	if (dev->tty_dev)
- 		tty_unregister_device(rfcomm_tty_driver, dev->id);
- 
--	spin_lock(&rfcomm_dev_lock);
-+	mutex_lock(&rfcomm_dev_lock);
- 	list_del(&dev->list);
--	spin_unlock(&rfcomm_dev_lock);
-+	mutex_unlock(&rfcomm_dev_lock);
- 
- 	kfree(dev);
- 
-@@ -161,14 +161,14 @@ static struct rfcomm_dev *rfcomm_dev_get(int id)
- {
- 	struct rfcomm_dev *dev;
- 
--	spin_lock(&rfcomm_dev_lock);
-+	mutex_lock(&rfcomm_dev_lock);
- 
- 	dev = __rfcomm_dev_lookup(id);
- 
- 	if (dev && !tty_port_get(&dev->port))
- 		dev = NULL;
- 
--	spin_unlock(&rfcomm_dev_lock);
-+	mutex_unlock(&rfcomm_dev_lock);
- 
- 	return dev;
- }
-@@ -224,7 +224,7 @@ static struct rfcomm_dev *__rfcomm_dev_add(struct rfcomm_dev_req *req,
- 	if (!dev)
- 		return ERR_PTR(-ENOMEM);
- 
--	spin_lock(&rfcomm_dev_lock);
-+	mutex_lock(&rfcomm_dev_lock);
- 
- 	if (req->dev_id < 0) {
- 		dev->id = 0;
-@@ -305,11 +305,11 @@ static struct rfcomm_dev *__rfcomm_dev_add(struct rfcomm_dev_req *req,
- 	   holds reference to this module. */
- 	__module_get(THIS_MODULE);
- 
--	spin_unlock(&rfcomm_dev_lock);
-+	mutex_unlock(&rfcomm_dev_lock);
- 	return dev;
- 
- out:
--	spin_unlock(&rfcomm_dev_lock);
-+	mutex_unlock(&rfcomm_dev_lock);
- 	kfree(dev);
- 	return ERR_PTR(err);
- }
-@@ -524,7 +524,7 @@ static int rfcomm_get_dev_list(void __user *arg)
- 
- 	di = dl->dev_info;
- 
--	spin_lock(&rfcomm_dev_lock);
-+	mutex_lock(&rfcomm_dev_lock);
- 
- 	list_for_each_entry(dev, &rfcomm_dev_list, list) {
- 		if (!tty_port_get(&dev->port))
-@@ -540,7 +540,7 @@ static int rfcomm_get_dev_list(void __user *arg)
- 			break;
- 	}
- 
--	spin_unlock(&rfcomm_dev_lock);
-+	mutex_unlock(&rfcomm_dev_lock);
- 
- 	dl->dev_num = n;
- 	size = sizeof(*dl) + n * sizeof(*di);
--- 
-1.7.12.4
+I don't understand the need to have so many levels of callback passing
+instead of having simple direct calls, especially since all functions
+are in the same c-file anyway. I.e. why can't the characteristic
+read/write callbacks be responsible themselves for sending the response
+PDU (if that's all your gatt_request_complete function is needed for).
+
+This passing a callback (gatt_request_complete in this case) as a
+parameter to another callback (the read/write callback) doesn't really
+help in keeping things simple and understandable.
+
+Johan
