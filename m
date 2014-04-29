@@ -3,134 +3,37 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 17/40] android/gatt: Add register GAP Service
-Date: Tue, 29 Apr 2014 18:47:06 +0200
-Message-Id: <1398790049-30303-18-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 18/40] gatt: Add some characteristics uuids
+Date: Tue, 29 Apr 2014 18:47:07 +0200
+Message-Id: <1398790049-30303-19-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Register GAP service with device name characteristic,
-appearance and peripheral privacy flag
+These characteristics uuids will be used in following patch
 ---
- android/gatt.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 96 insertions(+)
+ lib/uuid.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index cba1db6..88e583c 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3706,6 +3706,100 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
- 		error("gatt: Could not attache to server");
- }
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 237145b..701e248 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -118,6 +118,13 @@ extern "C" {
+ #define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
+ #define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
+ #define GATT_CHARAC_SERVICE_CHANGED			0x2A05
++#define GATT_CHARAC_SYSTEM_ID				0x2A23
++#define GATT_CHARAC_MODEL_NUMBER_STRING		0x2A24
++#define GATT_CHARAC_SERIAL_NUMBER_STRING		0x2A25
++#define GATT_CHARAC_FIRMWARE_REVISION_STRING		0x2A26
++#define GATT_CHARAC_HARDWARE_REVISION_STRING		0x2A27
++#define GATT_CHARAC_SOFTWARE_REVISION_STRING		0x2A28
++#define GATT_CHARAC_MANUFACTURER_NAME_STRING		0x2A29
  
-+struct gap_srvc_handles {
-+	uint16_t srvc;
-+
-+	/* Characteristics */
-+	uint16_t dev_name;
-+	uint16_t appear;
-+	uint16_t priv;
-+};
-+
-+static struct gap_srvc_handles gap_srvc_data;
-+
-+#define APPEARANCE_GENERIC_PHONE 0x0040
-+#define PERIPHERAL_PRIVACY_DISABLE 0x00
-+
-+struct req_data {
-+	struct gatt_device *dev;
-+	uint8_t opcode;
-+};
-+
-+static void gap_read_cb(uint16_t handle, uint16_t offset, void *req_data,
-+						gatt_db_complete_func_t cb,
-+						void *user_data)
-+{
-+	uint8_t pdu[ATT_DEFAULT_LE_MTU];
-+	uint16_t len;
-+
-+	DBG("");
-+
-+	if (handle == gap_srvc_data.dev_name) {
-+		const char *name = bt_get_adapter_name();
-+
-+		len = enc_read_resp((uint8_t *)name, strlen(name),
-+							pdu, sizeof(pdu));
-+		goto done;
-+	}
-+
-+	if (handle == gap_srvc_data.appear) {
-+		uint8_t val[2];
-+		put_le16(APPEARANCE_GENERIC_PHONE, val);
-+		len = enc_read_resp(val, sizeof(val), pdu, sizeof(pdu));
-+		goto done;
-+	}
-+
-+	if (handle == gap_srvc_data.priv) {
-+		uint8_t val = PERIPHERAL_PRIVACY_DISABLE;
-+		len = enc_read_resp(&val, sizeof(val), pdu, sizeof(pdu));
-+		goto done;
-+	}
-+
-+	error("gatt: Unknown handle 0x%02x", handle);
-+	len = enc_error_resp(ATT_OP_READ_REQ, handle,
-+					ATT_ECODE_UNLIKELY, pdu, sizeof(pdu));
-+
-+done:
-+	cb(req_data, pdu, len);
-+}
-+
-+static void register_gap_service(void)
-+{
-+	bt_uuid_t uuid;
-+
-+	/* GAP UUID */
-+	bt_uuid16_create(&uuid, 0x1800);
-+	gap_srvc_data.srvc = gatt_db_add_service(gatt_db, &uuid, true, 7);
-+
-+	/* Device name characteristic */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_DEVICE_NAME);
-+	gap_srvc_data.dev_name =
-+			gatt_db_add_characteristic(gatt_db, gap_srvc_data.srvc,
-+							&uuid, 0,
-+							GATT_CHR_PROP_READ,
-+							gap_read_cb, NULL,
-+							NULL);
-+
-+	/* Appearance */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_APPEARANCE);
-+	gap_srvc_data.appear =
-+			gatt_db_add_characteristic(gatt_db, gap_srvc_data.srvc,
-+							&uuid, 0,
-+							GATT_CHR_PROP_READ,
-+							gap_read_cb, NULL,
-+							NULL);
-+
-+	/* Pripheral privacy flag */
-+	bt_uuid16_create(&uuid, GATT_CHARAC_PERIPHERAL_PRIV_FLAG);
-+	gap_srvc_data.priv =
-+			gatt_db_add_characteristic(gatt_db, gap_srvc_data.srvc,
-+							&uuid, 0,
-+							GATT_CHR_PROP_READ,
-+							gap_read_cb, NULL,
-+							NULL);
-+
-+	gatt_db_service_set_active(gatt_db, gap_srvc_data.srvc , true);
-+}
- static int start_listen_socket(void)
- {
- 	GError *gerr = NULL;
-@@ -3772,6 +3866,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	if (start_listen_socket() < 0)
- 		error("Could not start GATT listening");
- 
-+	register_gap_service();
-+
- 	return true;
- }
- 
+ /* GATT Characteristic Descriptors */
+ #define GATT_CHARAC_EXT_PROPER_UUID			0x2900
 -- 
 1.8.4
 
