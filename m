@@ -2,62 +2,105 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 28/36] shared/gatt: Add support for write request
-Date: Tue, 29 Apr 2014 03:14:59 +0200
-Message-Id: <1398734107-4793-30-git-send-email-lukasz.rymanowski@tieto.com>
+	Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 27/36] android/gatt: Add Find info gatt server cmd handling
+Date: Tue, 29 Apr 2014 03:14:58 +0200
+Message-Id: <1398734107-4793-29-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- src/shared/gatt-db.c | 23 +++++++++++++++++++++++
- src/shared/gatt-db.h |  3 +++
- 2 files changed, 26 insertions(+)
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 42b0903..527e4a7 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -706,3 +706,26 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
- 
- 	return true;
+The Find Information Request is used to obtain the mapping of attribute
+handles with their associated types. This allows a client to discover the
+list of attributes and their types on a server.
+---
+ android/gatt.c | 63 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 9b72640..10450cd 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3843,6 +3843,66 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 	return 0;
  }
-+
-+bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
-+			const uint8_t *value, size_t len, void *req_data)
-+{
-+	struct gatt_db_service *service;
-+	uint16_t service_handle;
-+	struct gatt_db_attribute *a;
-+
-+	service = queue_find(db->services, find_service_for_handle,
-+						INT_TO_PTR(handle));
-+	if (!service)
-+		return false;
-+
-+	service_handle = service->attributes[0]->handle;
-+
-+	a = service->attributes[handle - service_handle];
-+	if (!a || !a->write_func)
-+		return false;
-+
-+	a->write_func(handle, offset, value, len, req_data, a->user_data);
-+
-+	return true;
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index b63d1f6..2c77a07 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -106,3 +106,6 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
  
- bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
- 							void *req_data);
++static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
++						uint8_t *rsp, size_t rsp_size,
++						uint16_t *length)
++{
++	struct queue *q;
++	struct gatt_db_find_information *last_element;
++	struct copy_att_list_data l;
++	struct att_data_list *adl;
++	uint16_t start, end;
++	uint16_t num;
++	uint8_t format;
++	uint16_t len;
 +
-+bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
-+			const uint8_t *value, size_t len, void *req_data);
++	DBG("");
++
++	len = dec_find_info_req(cmd, cmd_len, &start, &end);
++	if (!len)
++		return ATT_ECODE_INVALID_PDU;
++
++	q = queue_new();
++	if (!q)
++		return ATT_ECODE_UNLIKELY;
++
++	gatt_db_find_information(gatt_db, start, end, q);
++
++	if (queue_isempty(q)) {
++		queue_destroy(q, NULL);
++		return ATT_ECODE_ATTR_NOT_FOUND;
++	}
++
++	len = queue_length(q);
++
++	last_element = queue_peek_head(q);
++
++	if (last_element->uuid.type == BT_UUID16) {
++		num = sizeof(uint16_t);
++		format = ATT_FIND_INFO_RESP_FMT_16BIT;
++	} else {
++		num = sizeof(uint128_t);
++		format = ATT_FIND_INFO_RESP_FMT_128BIT;
++	}
++
++	adl = att_data_list_alloc(len, num + sizeof(uint16_t));
++
++	l.iterator = 0;
++	l.adl = adl;
++
++	queue_foreach(q, copy_to_att_list_type, &l);
++
++	len = enc_find_info_resp(format, adl, rsp, rsp_size);
++	if (!len)
++		return ATT_ECODE_UNLIKELY;
++
++	*length = len;
++	att_data_list_free(adl);
++	queue_destroy(q, free);
++
++	return 0;
++}
++
+ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ {
+ 	struct gatt_device *dev = user_data;
+@@ -3881,6 +3941,9 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 								&length);
+ 		break;
+ 	case ATT_OP_FIND_INFO_REQ:
++		status = find_info_handle(ipdu, len, opdu, sizeof(opdu),
++								&length);
++		break;
+ 	case ATT_OP_WRITE_REQ:
+ 	case ATT_OP_WRITE_CMD:
+ 	case ATT_OP_FIND_BY_TYPE_REQ:
 -- 
 1.8.4
 
