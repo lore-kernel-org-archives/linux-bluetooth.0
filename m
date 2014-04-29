@@ -1,125 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 10/36] android/gatt: Add ATT msg handler
-Date: Tue, 29 Apr 2014 03:14:41 +0200
-Message-Id: <1398734107-4793-12-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: szymon.janc@tieto.com, Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH 08/36] android/gatt: Add descriptor implementation
+Date: Tue, 29 Apr 2014 03:14:39 +0200
+Message-Id: <1398734107-4793-10-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds skeleton for ATT msg handler and also attach it to the
-attrib on connect_cb and connect_event
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+
+It will add characteristic descriptor attribute to local database.
 ---
- android/gatt.c | 57 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 56 insertions(+), 1 deletion(-)
+ android/gatt.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index d87af39..5ca22e2 100644
+index 46128af..d20b87a 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -134,6 +134,7 @@ struct gatt_device {
- 	struct queue *services;
+@@ -3320,30 +3320,41 @@ failed:
+ static void handle_server_add_descriptor(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_server_add_descriptor *cmd = buf;
+-	char uuidstr[MAX_LEN_UUID_STR];
++	struct hal_ev_gatt_server_descriptor_added ev;
+ 	struct gatt_app *server;
+-	bt_uuid_t descr_uuid;
++	bt_uuid_t uuid;
+ 	uint8_t status;
  
- 	guint watch_id;
-+	guint server_id;
+ 	DBG("");
  
- 	int ref;
- 	int conn_cnt;
-@@ -494,6 +495,9 @@ static void connection_cleanup(struct gatt_device *device)
- 		device->att_io = NULL;
++	memset(&ev, 0, sizeof(ev));
++
+ 	server = find_app_by_id(cmd->server_if);
+ 	if (!server) {
+-		error("gatt: server_if=%d not found", cmd->server_if);
+ 		status = HAL_STATUS_FAILED;
+ 		goto failed;
  	}
  
-+	if (device->server_id)
-+		g_attrib_unregister(device->attrib, device->server_id);
+-	android2uuid(cmd->uuid, &descr_uuid);
+-	bt_uuid_to_string(&descr_uuid, uuidstr, MAX_LEN_UUID_STR);
+-
+-	/* TODO: Add descriptor to attribute database */
+-	DBG("Add descriptor: server: %d, srvc_hnd: %d, uuid: %s, perm: %d",
+-		cmd->server_if, cmd->service_handle, uuidstr, cmd->permissions);
++	android2uuid(cmd->uuid, &uuid);
+ 
+-	status = HAL_STATUS_SUCCESS;
++	ev.descr_handle = gatt_db_add_char_descriptor(gatt_db,
++							cmd->service_handle,
++							&uuid, cmd->permissions,
++							NULL, NULL, NULL);
++	if (!ev.descr_handle)
++		status = HAL_STATUS_FAILED;
++	else
++		status = HAL_STATUS_SUCCESS;
+ 
+ failed:
++	ev.server_if = cmd->server_if;
++	ev.srvc_handle = cmd->service_handle;
++	memcpy(ev.uuid, cmd->uuid, sizeof(cmd->uuid));
++	ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
 +
- 	if (device->attrib) {
- 		GAttrib *attrib = device->attrib;
- 		device->attrib = NULL;
-@@ -954,6 +958,8 @@ static void send_app_connect_notifications(void *data, void *user_data)
- 		send_app_connect_notify(conn, con_data->status);
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_SERVER_DESCRIPTOR_ADDED, sizeof(ev), &ev);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 				HAL_OP_GATT_SERVER_ADD_DESCRIPTOR, status);
  }
- 
-+static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data);
-+
- static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -989,6 +995,12 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 	dev->watch_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
- 							disconnected_cb, dev);
- 
-+	dev->server_id = g_attrib_register(attrib, GATTRIB_ALL_REQS,
-+						GATTRIB_ALL_HANDLES,
-+						att_handler, dev, NULL);
-+	if (!dev->server_id)
-+		error("gatt: Could not attache to server");
-+
- 	device_set_state(dev, DEVICE_CONNECTED);
- 
- 	status = GATT_SUCCESS;
-@@ -3594,6 +3606,45 @@ static const struct ipc_handler cmd_handlers[] = {
- 		sizeof(struct hal_cmd_gatt_server_send_response) },
- };
- 
-+static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
-+{
-+	struct gatt_device *dev = user_data;
-+	uint8_t opdu[ATT_DEFAULT_LE_MTU];
-+	uint8_t status;
-+	uint16_t length = 0;
-+
-+	DBG("op 0x%02x", ipdu[0]);
-+
-+	switch (ipdu[0]) {
-+	case ATT_OP_READ_BY_GROUP_REQ:
-+	case ATT_OP_READ_BY_TYPE_REQ:
-+	case ATT_OP_READ_REQ:
-+	case ATT_OP_READ_BLOB_REQ:
-+	case ATT_OP_MTU_REQ:
-+	case ATT_OP_FIND_INFO_REQ:
-+	case ATT_OP_WRITE_REQ:
-+	case ATT_OP_WRITE_CMD:
-+	case ATT_OP_FIND_BY_TYPE_REQ:
-+	case ATT_OP_HANDLE_CNF:
-+	case ATT_OP_HANDLE_IND:
-+	case ATT_OP_HANDLE_NOTIFY:
-+	case ATT_OP_READ_MULTI_REQ:
-+	case ATT_OP_PREP_WRITE_REQ:
-+	case ATT_OP_EXEC_WRITE_REQ:
-+	default:
-+		DBG("Unsupported request 0x%02x", ipdu[0]);
-+		status = ATT_ECODE_REQ_NOT_SUPP;
-+		goto done;
-+	}
-+
-+done:
-+	if (status)
-+		length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
-+							ATT_DEFAULT_LE_MTU);
-+
-+	g_attrib_send(dev->attrib, 0, opdu, length , NULL, NULL, NULL);
-+}
-+
- static void create_listen_connections(void *data, void *user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -3659,7 +3710,11 @@ static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
- 
- 	queue_foreach(app_connections, send_app_connect_notifications, &data);
- 
--	/*TODO: Attach to attrib db */
-+	dev->server_id = g_attrib_register(attrib, GATTRIB_ALL_REQS,
-+						GATTRIB_ALL_HANDLES,
-+						att_handler, dev, NULL);
-+	if (!dev->server_id)
-+		error("gatt: Could not attache to server");
- }
- 
- static int start_listen_socket(void)
 -- 
 1.8.4
 
