@@ -1,133 +1,220 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <535FAEB8.7080908@tieto.com>
+Date: Tue, 29 Apr 2014 15:52:56 +0200
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZL=gidP7m89NACUPBnL87+JDO3kG8zHLHCbz7_+3-WCXw@mail.gmail.com>
-References: <1398763780-16592-1-git-send-email-andrzej.kaczmarek@tieto.com> <CABBYNZL=gidP7m89NACUPBnL87+JDO3kG8zHLHCbz7_+3-WCXw@mail.gmail.com>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Tue, 29 Apr 2014 15:56:14 +0200
-Message-ID: <CAF3PWx3xm0RH8DYR=w4PcC_ZDVKeQOhiMZuL8b27U=79+-nw2w@mail.gmail.com>
-Subject: Re: [PATCH 1/2] hog: Fix checking for Report ID item
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Use common code for server and client register
+References: <1398695000-6446-1-git-send-email-jakub.tyszkowski@tieto.com> <1491436.EFYgZNmm4q@uw000953>
+In-Reply-To: <1491436.EFYgZNmm4q@uw000953>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-On 29 April 2014 14:37, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
-> Hi Andrzej,
+On 04/29/2014 03:31 PM, Szymon Janc wrote:
+> Hi Jakub,
 >
-> On Tue, Apr 29, 2014 at 12:29 PM, Andrzej Kaczmarek
-> <andrzej.kaczmarek@tieto.com> wrote:
->> Report ID item is detected by just looking for possible item prefixes
->> anywhere in report map. This could lead to false-positive detection if
->> value we look for is inside item data.
->>
->> This patch adds simple parser which can split report map into proper
->> items and check for Report ID item in reliable way.
->
-> Well it looks like the format of each descriptor can be different so I
-> would add this to the patch description and probably quote from spec
-> what is those formats.
-
-Sure, I can add better description why parsing is done this way.
-
+> On Monday 28 of April 2014 16:23:20 Jakub Tyszkowski wrote:
+>> As clients and servers are stored on a single list we can use common
+>> code in both of register handlers.
 >> ---
->>  profiles/input/hog.c | 60 +++++++++++++++++++++++++++++++++++++++++++++++-----
->>  1 file changed, 55 insertions(+), 5 deletions(-)
+>>   android/gatt.c | 121 ++++++++++++++++++++++++---------------------------------
+>>   1 file changed, 50 insertions(+), 71 deletions(-)
 >>
->> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
->> index a11e04e..ab88414 100644
->> --- a/profiles/input/hog.c
->> +++ b/profiles/input/hog.c
->> @@ -345,6 +345,39 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
->>                                         external_service_char_cb, hogdev);
->>  }
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index e634aa6..1454000 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -154,8 +154,6 @@ static struct queue *gatt_apps = NULL;
+>>   static struct queue *gatt_devices = NULL;
+>>   static struct queue *app_connections = NULL;
 >>
->> +static bool parse_descriptor_item(uint8_t *buf, ssize_t blen, ssize_t *len,
->> +                                                               bool *is_long)
+>> -static int32_t app_id = 1;
+>> -
+>>   static struct queue *listen_clients = NULL;
+>>
+>>   static void bt_le_discovery_stop_cb(void);
+>> @@ -534,55 +532,64 @@ static void destroy_gatt_app(void *data)
+>>   	free(app);
+>>   }
+>>
+>> -static void handle_client_register(const void *buf, uint16_t len)
+>> -{
+>> -	const struct hal_cmd_gatt_client_register *cmd = buf;
+>> -	struct hal_ev_gatt_client_register_client ev;
+>> -	struct gatt_app *client;
+>> -	uint8_t status;
+>> -
+>> -	DBG("");
+>>
+>
+> Double empty line.
+>
+>> -	memset(&ev, 0, sizeof(ev));
+>> +static int handle_app_register(const uint8_t *uuid, gatt_app_type_t app_type,
+>> +								uint8_t *status)
+>
+> I'd name this simply register_app(). Also *status parameter is not really useful
+> since Java is not using it. Returning 0 is enough for error here.
+>
+> ev.client_if = handle_app_register(..);
+> if (ev.client_if)
+>    status = HAL_STATUS_SUCCESS;
+> else ....
+>
 >> +{
->> +       if (!blen)
->> +               return false;
->> +
->> +       if (buf[0] == 0xFE) {
->> +               if (blen < 3)
->> +                       return false;
->> +               /* long item:
->> +                * byte 0 -> 0xFE
->> +                * byte 1 -> data size
->> +                * byte 2 -> tag
->> +                * + data
->> +                */
->> +               *len = buf[1] + 3;
->> +               *is_long = true;
->> +       } else {
->> +               uint8_t b_size;
->> +               /* short item:
->> +                * byte 0[1..0] -> data size (=0, 1, 2, 4)
->> +                * byte 0[3..2] -> type
->> +                * byte 0[7..4] -> tag
->> +                * + data
->> +                */
->> +               b_size = buf[0] & 0x03;
->> +               *len = (b_size ? 1 << (b_size - 1) : 0) + 1;
->> +               *is_long = false;
->> +       }
+>> +	static int32_t application_id = 1;
+>> +	struct gatt_app *app;
+>>
+>> -	if (queue_find(gatt_apps, match_app_by_uuid, &cmd->uuid)) {
+>> -		error("gatt: client uuid is already on list");
+>> -		status = HAL_STATUS_FAILED;
+>> -		goto failed;
+>> +	if (queue_find(gatt_apps, match_app_by_uuid, (void *) uuid)) {
+>> +		error("gatt: app uuid is already on list");
+>> +		*status = HAL_STATUS_FAILED;
+>> +		return 0;
+>>   	}
+>>
+>> -	client = new0(struct gatt_app, 1);
+>> -	client->type = APP_CLIENT;
+>> -	if (!client) {
+>> -		error("gatt: cannot allocate memory for registering client");
+>> -		status = HAL_STATUS_NOMEM;
+>> -		goto failed;
+>> +	app = new0(struct gatt_app, 1);
+>> +	app->type = app_type;
+>> +	if (!app) {
 >
-> Perhaps split this into 2 functions one to parse sort descriptors and
-> one for long descriptors, also you can probably drop the item suffix
-> e.g.: parse_short_descriptor, parse_long_descriptor.
-
-I'll need to check 1st byte of item anyway in order to differentiate
-between short and long item before calling proper handler so we'll end
-up with code which calls one-liner functions.
-Perhaps name of this function is misleading since we don't really
-parse items here since this is something uhid will do. We just need to
-figure out item length co we can skip to next one.
-
->> +       return *len <= blen;
+> app was already dereferenced line above.
+>
+> app->type = app_type;
+> should be after null check.
+>
+>> +		error("gatt: Cannot allocate memory for registering app");
+>> +		*status = HAL_STATUS_NOMEM;
+>> +		return 0;
+>> +	}
+>> +
+>> +	if (app_type == APP_CLIENT) {
+>> +		app->notifications = queue_new();
+>> +		if (!app->notifications) {
+>> +			error("gatt: couldn't allocate notifications queue");
+>> +			destroy_gatt_app(app);
+>> +			*status = HAL_STATUS_NOMEM;
+>> +			return 0;
+>> +		}
+>>   	}
+>>
+>> -	client->notifications = queue_new();
+>> -	if (!client->notifications) {
+>> -		error("gatt: couldn't allocate notifications queue");
+>> -		destroy_gatt_app(client);
+>> -		status = HAL_STATUS_NOMEM;
+>> -		goto failed;
+>> +	memcpy(app->uuid, uuid, sizeof(app->uuid));
+>> +
+>> +	app->id = application_id++;
+>> +
+>> +	if (!queue_push_head(gatt_apps, app)) {
+>> +		error("gatt: Cannot push app on the list");
+>> +		free(app);
+>
+> destroy_gatt_app(app) here.
+>
+>> +		*status = HAL_STATUS_FAILED;
+>> +		return 0;
+>>   	}
+>>
+>> -	memcpy(client->uuid, cmd->uuid, sizeof(client->uuid));
+>> +	*status = HAL_STATUS_SUCCESS;
+>> +	return app->id;
 >> +}
->> +
->>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
->>                                                         gpointer user_data)
->>  {
->> @@ -355,6 +388,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
->>         uint16_t vendor_src, vendor, product, version;
->>         ssize_t vlen;
->>         int i;
->> +       int next_item = 0;
 >>
->>         if (status != 0) {
->>                 error("Report Map read failed: %s", att_ecode2str(status));
->> @@ -369,11 +403,27 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>> -	client->id = app_id++;
+>> +static void handle_client_register(const void *buf, uint16_t len)
+>> +{
+>> +	const struct hal_cmd_gatt_client_register *cmd = buf;
+>> +	struct hal_ev_gatt_client_register_client ev;
+>> +	uint8_t status;
 >>
->>         DBG("Report MAP:");
->>         for (i = 0; i < vlen; i++) {
->> -               switch (value[i]) {
->> -               case 0x85:
->> -               case 0x86:
->> -               case 0x87:
->> -                       hogdev->has_report_id = TRUE;
->> +               ssize_t item_len = 0;
->> +               bool is_long_item = false;
->> +
->> +               if (i == next_item) {
->> +                       if (parse_descriptor_item(&value[i], vlen - i,
->> +                                                       &item_len,
->> +                                                       &is_long_item)) {
->> +                               /* Report ID is short item with prefix
->> +                                * 100001xx (binary)
->> +                                */
->> +                               if (!is_long_item && (value[i] & 0xfc) == 0x84)
+>> -	if (!queue_push_head(gatt_apps, client)) {
+>> -		error("gatt: Cannot push client on the list");
+>> -		destroy_gatt_app(client);
+>> -		status = HAL_STATUS_NOMEM;
+>> -		goto failed;
+>> -	}
+>> +	DBG("");
+>>
+>> -	ev.client_if = client->id;
+>> +	memset(&ev, 0, sizeof(ev));
+>>
+>> -	status = HAL_STATUS_SUCCESS;
+>> +	ev.client_if = handle_app_register(cmd->uuid, APP_CLIENT, &status);
+>>
+>> -failed:
+>>   	if (status == HAL_STATUS_SUCCESS)
+>>   		ev.status = GATT_SUCCESS;
+>>   	else
+>> @@ -3069,45 +3076,17 @@ static void handle_server_register(const void *buf, uint16_t len)
+>>   {
+>>   	const struct hal_cmd_gatt_server_register *cmd = buf;
+>>   	struct hal_ev_gatt_server_register ev;
+>> -	struct gatt_app *server;
+>> -	uint32_t status;
+>> +	uint8_t status;
+>>
+>>   	DBG("");
+>>
+>>   	memset(&ev, 0, sizeof(ev));
+>>
+>> -	if (queue_find(gatt_apps, match_app_by_uuid, &cmd->uuid)) {
+>> -		error("gatt: Server uuid is already on list");
+>> -		status = HAL_STATUS_FAILED;
+>> -		goto failed;
+>> -	}
+>> -
+>> -	server = new0(struct gatt_app, 1);
+>> -	server->type = APP_SERVER;
+>> -	if (!server) {
+>> -		error("gatt: Cannot allocate memory for registering server");
+>> -		status = HAL_STATUS_NOMEM;
+>> -		goto failed;
+>> -	}
+>> +	ev.server_if = handle_app_register(cmd->uuid, APP_SERVER, &status);
+>>
+>> -	memcpy(server->uuid, cmd->uuid, sizeof(server->uuid));
+>> -
+>> -	server->id = app_id++;
+>> -
+>> -	if (!queue_push_head(gatt_apps, server)) {
+>> -		error("gatt: Cannot push server on the list");
+>> -		free(server);
+>> -		status = HAL_STATUS_FAILED;
+>> -		goto failed;
+>> -	}
+>> -
+>> -	ev.status = GATT_SUCCESS;
+>> -	ev.server_if = server->id;
+>> -
+>> -	status = HAL_STATUS_SUCCESS;
+>> -
+>> -failed:
+>> -	if (status != HAL_STATUS_SUCCESS)
+>> +	if (status == HAL_STATUS_SUCCESS)
+>> +		ev.status = GATT_SUCCESS;
+>> +	else
+>>   		ev.status = GATT_FAILURE;
+>>
+>>   	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
+>>
 >
-> Hmm, so long descriptors are ignored? Is that really what we want?
 
-Yes, long items do not matter here. We only need to know whether there
-is at least one Report ID item inside descriptor (don't even care
-about its contents) which is defined as short item by HID spec.
+I'll fix all of these in v2.
 
-I'll try to make better description and function names for v2 so it's
-clear what precisely we do here.
+Thanks,
+Jakub
 
-BR,
-Andrzej
