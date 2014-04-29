@@ -3,104 +3,61 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 29/36] android/gatt: Add support for write request
-Date: Tue, 29 Apr 2014 03:15:00 +0200
-Message-Id: <1398734107-4793-31-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 28/36] shared/gatt: Add support for write request
+Date: Tue, 29 Apr 2014 03:14:59 +0200
+Message-Id: <1398734107-4793-30-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch add support for write request, command and prepare write
 ---
- android/gatt.c | 62 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 60 insertions(+), 2 deletions(-)
+ src/shared/gatt-db.c | 23 +++++++++++++++++++++++
+ src/shared/gatt-db.h |  3 +++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 10450cd..661e294 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3903,6 +3903,60 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 	return 0;
- }
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 42b0903..527e4a7 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -706,3 +706,26 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
  
-+static uint8_t write_request(const uint8_t *cmd, uint16_t cmd_len,
-+						struct gatt_device *dev)
+ 	return true;
+ }
++
++bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
++			const uint8_t *value, size_t len, void *req_data)
 +{
-+	uint16_t handle;
-+	uint16_t offset = 0;
-+	uint16_t len;
-+	uint8_t value[ATT_DEFAULT_LE_MTU];
-+	size_t vlen;
-+	struct req_data *req_data;
++	struct gatt_db_service *service;
++	uint16_t service_handle;
++	struct gatt_db_attribute *a;
 +
-+	req_data = new0(struct req_data, 1);
-+	if (!req_data)
-+		return ATT_ECODE_UNLIKELY;
++	service = queue_find(db->services, find_service_for_handle,
++						INT_TO_PTR(handle));
++	if (!service)
++		return false;
 +
-+	switch (cmd[0]) {
-+	case ATT_OP_WRITE_CMD:
-+		len = dec_write_cmd(cmd, cmd_len, &handle, value, &vlen);
-+		if (!len) {
-+			free(req_data);
-+			return ATT_ECODE_INVALID_PDU;
-+		}
-+		break;
-+	case ATT_OP_WRITE_REQ:
-+		len = dec_write_req(cmd, cmd_len, &handle, value, &vlen);
-+		if (!len) {
-+			free(req_data);
-+			return ATT_ECODE_INVALID_PDU;
-+		}
-+		break;
-+	case ATT_OP_PREP_WRITE_REQ:
-+		len = dec_prep_write_req(cmd, cmd_len, &handle, &offset,
-+							value, &vlen);
-+		if (!len) {
-+			free(req_data);
-+			return ATT_ECODE_INVALID_PDU;
-+		}
-+		break;
-+	default:
-+		error("gatt: Unexpected write type 0x02%x", cmd[0]);
-+		free(req_data);
-+		return ATT_ECODE_REQ_NOT_SUPP;
-+	}
++	service_handle = service->attributes[0]->handle;
 +
-+	req_data->dev = dev;
-+	req_data->opcode = cmd[0];
++	a = service->attributes[handle - service_handle];
++	if (!a || !a->write_func)
++		return false;
 +
-+	if (!gatt_db_write(gatt_db, handle, offset, value, vlen, &req_data)) {
-+		free(req_data);
-+		return ATT_ECODE_UNLIKELY;
-+	}
++	a->write_func(handle, offset, value, len, req_data, a->user_data);
 +
-+	return 0;
++	return true;
 +}
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index b63d1f6..2c77a07 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -106,3 +106,6 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
+ 
+ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
+ 							void *req_data);
 +
- static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -3946,13 +4000,17 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- 		break;
- 	case ATT_OP_WRITE_REQ:
- 	case ATT_OP_WRITE_CMD:
-+	case ATT_OP_PREP_WRITE_REQ:
-+		status = write_request(ipdu, len, dev);
-+		if (!status)
-+			return;
-+		break;
-+	case ATT_OP_EXEC_WRITE_REQ:
- 	case ATT_OP_FIND_BY_TYPE_REQ:
- 	case ATT_OP_HANDLE_CNF:
- 	case ATT_OP_HANDLE_IND:
- 	case ATT_OP_HANDLE_NOTIFY:
- 	case ATT_OP_READ_MULTI_REQ:
--	case ATT_OP_PREP_WRITE_REQ:
--	case ATT_OP_EXEC_WRITE_REQ:
- 	default:
- 		DBG("Unsupported request 0x%02x", ipdu[0]);
- 		status = ATT_ECODE_REQ_NOT_SUPP;
++bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
++			const uint8_t *value, size_t len, void *req_data);
 -- 
 1.8.4
 
