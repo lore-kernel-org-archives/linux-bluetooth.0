@@ -3,37 +3,45 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 18/40] gatt: Add some characteristics uuids
-Date: Tue, 29 Apr 2014 18:47:07 +0200
-Message-Id: <1398790049-30303-19-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 16/40] android/bluetooth: Add function for getting device Android name
+Date: Tue, 29 Apr 2014 18:47:05 +0200
+Message-Id: <1398790049-30303-17-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These characteristics uuids will be used in following patch
+This will be used by GATT HAL
 ---
- lib/uuid.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ android/bluetooth.c | 5 +++++
+ android/bluetooth.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 237145b..701e248 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -118,6 +118,13 @@ extern "C" {
- #define GATT_CHARAC_RECONNECTION_ADDRESS		0x2A03
- #define GATT_CHARAC_PERIPHERAL_PREF_CONN		0x2A04
- #define GATT_CHARAC_SERVICE_CHANGED			0x2A05
-+#define GATT_CHARAC_SYSTEM_ID				0x2A23
-+#define GATT_CHARAC_MODEL_NUMBER_STRING		0x2A24
-+#define GATT_CHARAC_SERIAL_NUMBER_STRING		0x2A25
-+#define GATT_CHARAC_FIRMWARE_REVISION_STRING		0x2A26
-+#define GATT_CHARAC_HARDWARE_REVISION_STRING		0x2A27
-+#define GATT_CHARAC_SOFTWARE_REVISION_STRING		0x2A28
-+#define GATT_CHARAC_MANUFACTURER_NAME_STRING		0x2A29
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 03b8576..655fb1e 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1198,6 +1198,11 @@ uint8_t bt_get_device_android_type(const bdaddr_t *addr)
+ 	return get_device_android_type(dev);
+ }
  
- /* GATT Characteristic Descriptors */
- #define GATT_CHARAC_EXT_PROPER_UUID			0x2900
++const char *bt_get_adapter_name(void)
++{
++	return adapter.name;
++}
++
+ static bool rssi_above_threshold(int old, int new)
+ {
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 649c9ba..dddbf20 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -48,3 +48,4 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
+ 							void *user_data);
+ 
+ uint8_t bt_get_device_android_type(const bdaddr_t *addr);
++const char *bt_get_adapter_name(void);
 -- 
 1.8.4
 
