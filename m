@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v2 23/40] shared/gatt: Add function to find by type
-Date: Tue, 29 Apr 2014 18:47:12 +0200
-Message-Id: <1398790049-30303-24-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 22/40] shared/gatt: Add function to read by group type
+Date: Tue, 29 Apr 2014 18:47:11 +0200
+Message-Id: <1398790049-30303-23-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398790049-30303-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,111 +13,112 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
-It will look for attributes with given uuid and value.
+It will return list of gropu values, starting handle, end handle and
+service attrtbute value.
 ---
- src/shared/gatt-db.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 12 +++++++++
+ src/shared/gatt-db.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-db.h | 13 ++++++++++
  2 files changed, 84 insertions(+)
 
 diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 26fdc84..c3645f1 100644
+index 8675dcc..26fdc84 100644
 --- a/src/shared/gatt-db.c
 +++ b/src/shared/gatt-db.c
-@@ -480,3 +480,75 @@ void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
+@@ -409,3 +409,74 @@ bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
  
- 	queue_foreach(db->services, read_by_group_type, &data);
+ 	return true;
  }
 +
-+struct find_by_type_value_data {
++struct read_by_group_type_data {
 +	struct queue *queue;
 +	bt_uuid_t uuid;
 +	uint16_t start_handle;
 +	uint16_t end_handle;
-+	uint16_t value_length;
-+	const uint8_t *value;
++	uint16_t uuid_size;
++	bool stop_search;
 +};
 +
-+static void find_by_type_value(void *data, void *user_data)
++static void read_by_group_type(void *data, void *user_data)
 +{
-+	struct find_by_type_value_data *search_data = user_data;
++	struct read_by_group_type_data *search_data = user_data;
 +	struct gatt_db_service *service = data;
-+	struct gatt_db_attribute *attribute;
-+	struct gatt_db_range *range;
-+	int i;
++	struct gatt_db_group *group;
 +
 +	if (!service->active)
 +		return;
 +
-+	for (i = 0; i < service->num_handles; i++) {
-+		attribute = service->attributes[i];
++	/* Don't want more results as they have different size*/
++	if (search_data->stop_search)
++		return;
 +
-+		if (!attribute)
-+			continue;
++	if (bt_uuid_cmp(&search_data->uuid, &service->attributes[0]->uuid))
++		return;
 +
-+		if ((attribute->handle < search_data->start_handle) ||
-+				(attribute->handle > search_data->end_handle))
-+			continue;
++	if (service->attributes[0]->handle < search_data->start_handle)
++		return;
 +
-+		if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
-+			continue;
++	/* Remember size of uuid */
++	if (!search_data->uuid_size) {
++		search_data->uuid_size = service->attributes[0]->value_len;
++	} else if (search_data->uuid_size !=
++					service->attributes[0]->value_len) {
 +
-+		if (attribute->value_len != search_data->value_length)
-+			continue;
++		/* Don't want more results. This is last */
++		search_data->stop_search = true;
++		return;
++	}
 +
-+		if (!memcmp(attribute->value, search_data->value,
-+							attribute->value_len))
-+			continue;
++	group = malloc0(sizeof(struct gatt_db_group) +
++					service->attributes[0]->value_len);
++	if (!group)
++		return;
 +
-+		range = new0(struct gatt_db_range, 1);
-+		if (!range)
-+			return;
-+
-+		range->handle = attribute->handle;
-+		range->end_group = service->attributes[0]->handle +
++	group->len = service->attributes[0]->value_len;
++	memcpy(group->value, service->attributes[0]->value, group->len);
++	group->handle = service->attributes[0]->handle;
++	group->end_group = service->attributes[0]->handle +
 +						service->num_handles - 1;
 +
-+		if (!queue_push_tail(search_data->queue, range))
-+			free(range);
-+	}
++	if (!queue_push_tail(search_data->queue, group))
++		free(group);
 +}
 +
-+void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
++void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
 +							uint16_t end_handle,
 +							const bt_uuid_t type,
-+							const uint8_t *value,
-+							uint16_t length,
 +							struct queue *queue)
 +{
-+	struct find_by_type_value_data data;
++	struct read_by_group_type_data data;
 +
 +	data.uuid = type;
 +	data.start_handle = start_handle;
 +	data.end_handle = end_handle;
 +	data.queue = queue;
-+	data.value_length = length;
-+	data.value = value;
++	data.uuid_size = 0;
++	data.stop_search = false;
 +
-+	queue_foreach(db->services, find_by_type_value, &data);
++	queue_foreach(db->services, read_by_group_type, &data);
 +}
 diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index b6e963d..e582f83 100644
+index c1b7b41..b6e963d 100644
 --- a/src/shared/gatt-db.h
 +++ b/src/shared/gatt-db.h
-@@ -77,3 +77,15 @@ void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
- 							const bt_uuid_t type,
- 							struct queue *queue);
+@@ -64,3 +64,16 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
+ 
+ bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
+ 								bool active);
 +
-+struct gatt_db_range {
++struct gatt_db_group {
 +	uint16_t handle;
 +	uint16_t end_group;
++	uint16_t len;
++	uint8_t value[0];
 +};
 +
-+void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
++/* Returns queue with struct gatt_db_group */
++void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
 +							uint16_t end_handle,
 +							const bt_uuid_t type,
-+							const uint8_t *value,
-+							uint16_t length,
 +							struct queue *queue);
 -- 
 1.8.4
