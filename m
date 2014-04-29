@@ -1,124 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com, Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH 18/36] shared/gatt: Add function to read by group type
-Date: Tue, 29 Apr 2014 03:14:49 +0200
-Message-Id: <1398734107-4793-20-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: szymon.janc@tieto.com,
+	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 17/36] android/gatt: Register GATT service
+Date: Tue, 29 Apr 2014 03:14:48 +0200
+Message-Id: <1398734107-4793-19-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 
-It will return list of gropu values, starting handle, end handle and
-service attrtbute value.
+This adds database record about gatt's 'services changed'
+characteristic. Proper flag in device is being set to mark it for
+notification if gatt services are changed.
 ---
- src/shared/gatt-db.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 13 ++++++++++
- 2 files changed, 84 insertions(+)
+ android/gatt.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8675dcc..26fdc84 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -409,3 +409,74 @@ bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
+diff --git a/android/gatt.c b/android/gatt.c
+index 2ad5936..9f3a796 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -133,6 +133,8 @@ struct gatt_device {
+ 	GIOChannel *att_io;
+ 	struct queue *services;
+ 
++	bool notify_services_changed;
++
+ 	guint watch_id;
+ 	guint server_id;
+ 
+@@ -3900,6 +3902,35 @@ static void register_device_info_service(void)
+ 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
+ }
+ 
++static void gatt_srvc_change_register_cb(uint16_t handle, uint16_t offset,
++						const uint8_t *val, size_t len,
++						void *req_data, void *user_data)
++{
++	struct req_data *data = req_data;
++
++	/* Set services changed notification flag */
++	data->dev->notify_services_changed = !!(*val);
++}
++
++static void register_gatt_service(void)
++{
++	bt_uuid_t uuid;
++	uint16_t srvc_handle;
++
++	DBG("");
++
++	bt_uuid16_create(&uuid, 0x1801);
++	srvc_handle = gatt_db_add_service(gatt_db, &uuid, true, 3);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_INDICATE,
++					NULL, gatt_srvc_change_register_cb,
++					NULL);
++
++	gatt_db_service_set_active(gatt_db, srvc_handle, true);
++}
++
+ static int start_listen_socket(void)
+ {
+ 	GError *gerr = NULL;
+@@ -3968,6 +3999,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 
+ 	register_gap_service();
+ 	register_device_info_service();
++	register_gatt_service();
  
  	return true;
  }
-+
-+struct read_by_group_type_data {
-+	struct queue *queue;
-+	bt_uuid_t uuid;
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint16_t uuid_size;
-+	bool stop_search;
-+};
-+
-+static void read_by_group_type(void *data, void *user_data)
-+{
-+	struct read_by_group_type_data *search_data = user_data;
-+	struct gatt_db_service *service = data;
-+	struct gatt_db_group *group;
-+
-+	if (!service->active)
-+		return;
-+
-+	/* Don't want more results as they have different size*/
-+	if (search_data->stop_search)
-+		return;
-+
-+	if (bt_uuid_cmp(&search_data->uuid, &service->attributes[0]->uuid))
-+		return;
-+
-+	if (service->attributes[0]->handle < search_data->start_handle)
-+		return;
-+
-+	/* Remember size of uuid */
-+	if (!search_data->uuid_size) {
-+		search_data->uuid_size = service->attributes[0]->value_len;
-+	} else if (search_data->uuid_size !=
-+					service->attributes[0]->value_len) {
-+
-+		/* Don't want more results. This is last */
-+		search_data->stop_search = true;
-+		return;
-+	}
-+
-+	group = malloc0(sizeof(struct gatt_db_group) +
-+					service->attributes[0]->value_len);
-+	if (!group)
-+		return;
-+
-+	group->len = service->attributes[0]->value_len;
-+	memcpy(group->value, service->attributes[0]->value, group->len);
-+	group->handle = service->attributes[0]->handle;
-+	group->end_group = service->attributes[0]->handle +
-+						service->num_handles - 1;
-+
-+	if (!queue_push_tail(search_data->queue, group))
-+		free(group);
-+}
-+
-+void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
-+							uint16_t end_handle,
-+							const bt_uuid_t type,
-+							struct queue *queue)
-+{
-+	struct read_by_group_type_data data;
-+
-+	data.uuid = type;
-+	data.start_handle = start_handle;
-+	data.end_handle = end_handle;
-+	data.queue = queue;
-+	data.uuid_size = 0;
-+	data.stop_search = false;
-+
-+	queue_foreach(db->services, read_by_group_type, &data);
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 314e09b..9d5e214 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -58,3 +58,16 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
- 
- bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
- 								bool active);
-+
-+struct gatt_db_group {
-+	uint16_t handle;
-+	uint16_t end_group;
-+	uint16_t len;
-+	uint8_t value[0];
-+};
-+
-+/* Returns queue with struct gatt_db_group */
-+void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
-+							uint16_t end_handle,
-+							const bt_uuid_t type,
-+							struct queue *queue);
 -- 
 1.8.4
 
