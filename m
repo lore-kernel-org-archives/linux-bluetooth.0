@@ -2,55 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH v4 02/38] android/gatt: Remove redundant find function parameter
-Date: Wed, 30 Apr 2014 11:13:33 +0200
-Message-Id: <1398849249-5868-3-git-send-email-lukasz.rymanowski@tieto.com>
+	Marcin Kraglak <marcin.kraglak@tieto.com>
+Subject: [PATCH v4 05/38] android/gatt: Add included service implementation
+Date: Wed, 30 Apr 2014 11:13:36 +0200
+Message-Id: <1398849249-5868-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
-As client and server apps id is guaranteed to be unique, there is no
-need for this search function parameter.
+It will add included service attribute to database.
 ---
- android/gatt.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+ android/gatt.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f9eff30..0bb5a70 100644
+index e4ef1ea..f8398fc 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -1248,8 +1248,7 @@ static void handle_client_unregister(const void *buf, uint16_t len)
- 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
- }
- 
--static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id,
--							int32_t app_type)
-+static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
+@@ -3219,25 +3219,38 @@ failed:
+ static void handle_server_add_included_service(const void *buf, uint16_t len)
  {
- 	struct app_connection conn_match;
- 	struct gatt_device *dev = NULL;
-@@ -2891,7 +2890,7 @@ static void handle_client_register_for_notification(const void *buf,
+ 	const struct hal_cmd_gatt_server_add_inc_service *cmd = buf;
++	struct hal_ev_gatt_server_inc_srvc_added ev;
+ 	struct gatt_app *server;
+ 	uint8_t status;
  
- 	android2bdaddr(&cmd->bdaddr, &addr);
+ 	DBG("");
  
--	conn = find_conn(&addr, cmd->client_if, APP_CLIENT);
-+	conn = find_conn(&addr, cmd->client_if);
- 	if (!conn) {
++	memset(&ev, 0, sizeof(ev));
++
+ 	server = find_app_by_id(cmd->server_if);
+ 	if (!server) {
+-		error("gatt: server_if=%d not found", cmd->server_if);
  		status = HAL_STATUS_FAILED;
  		goto failed;
-@@ -2997,7 +2996,7 @@ static void handle_client_deregister_for_notification(const void *buf,
+ 	}
  
- 	android2bdaddr(&cmd->bdaddr, &addr);
+-	/* TODO: Add included service to attribute database */
+-	DBG("Add included service: server: %d, srvc_hnd: %d, incl_hnd: %d",
+-		cmd->server_if, cmd->service_handle, cmd->included_handle);
++	ev.incl_srvc_handle = gatt_db_add_included_service(gatt_db,
++							cmd->service_handle,
++							cmd->included_handle);
++	if (!ev.incl_srvc_handle) {
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
  
--	conn = find_conn(&addr, cmd->client_if, APP_CLIENT);
-+	conn = find_conn(&addr, cmd->client_if);
- 	if (!conn) {
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
+ 	status = HAL_STATUS_SUCCESS;
+-
+ failed:
++	ev.srvc_handle = cmd->service_handle;
++	ev.status = status;
++	ev.server_if = cmd->server_if;
++	ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_SERVER_INC_SRVC_ADDED, sizeof(ev), &ev);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 				HAL_OP_GATT_SERVER_ADD_INC_SERVICE, status);
+ }
 -- 
 1.8.4
 
