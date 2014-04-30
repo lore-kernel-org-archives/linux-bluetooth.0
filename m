@@ -2,124 +2,95 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v4 21/38] shared/gatt: Add function to read by group type
-Date: Wed, 30 Apr 2014 11:13:52 +0200
-Message-Id: <1398849249-5868-22-git-send-email-lukasz.rymanowski@tieto.com>
+	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH v4 20/38] android/gatt: Register GATT service
+Date: Wed, 30 Apr 2014 11:13:51 +0200
+Message-Id: <1398849249-5868-21-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 
-It will return list of gropu values, starting handle, end handle and
-service attrtbute value.
+This adds database record about gatt's 'services changed'
+characteristic. Proper flag in device is being set to mark it for
+notification if gatt services are changed.
 ---
- src/shared/gatt-db.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h | 13 ++++++++++
- 2 files changed, 84 insertions(+)
+ android/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 46 insertions(+)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 8675dcc..26fdc84 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -409,3 +409,74 @@ bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
+diff --git a/android/gatt.c b/android/gatt.c
+index f5aad93..d588a56 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -133,6 +133,8 @@ struct gatt_device {
+ 	GIOChannel *att_io;
+ 	struct queue *services;
  
- 	return true;
++	bool notify_services_changed;
++
+ 	guint watch_id;
+ 	guint server_id;
+ 
+@@ -3898,6 +3900,49 @@ static void register_device_info_service(void)
+ 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
  }
-+
-+struct read_by_group_type_data {
-+	struct queue *queue;
-+	bt_uuid_t uuid;
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint16_t uuid_size;
-+	bool stop_search;
-+};
-+
-+static void read_by_group_type(void *data, void *user_data)
+ 
++static void gatt_srvc_change_register_cb(uint16_t handle, uint16_t offset,
++						const uint8_t *val, size_t len,
++						uint8_t att_opcode,
++						bdaddr_t *bdaddr,
++						void *user_data)
 +{
-+	struct read_by_group_type_data *search_data = user_data;
-+	struct gatt_db_service *service = data;
-+	struct gatt_db_group *group;
++	uint8_t pdu[ATT_DEFAULT_LE_MTU];
++	struct gatt_device *dev;
++	uint16_t length;
 +
-+	if (!service->active)
-+		return;
-+
-+	/* Don't want more results as they have different size*/
-+	if (search_data->stop_search)
-+		return;
-+
-+	if (bt_uuid_cmp(&search_data->uuid, &service->attributes[0]->uuid))
-+		return;
-+
-+	if (service->attributes[0]->handle < search_data->start_handle)
-+		return;
-+
-+	/* Remember size of uuid */
-+	if (!search_data->uuid_size) {
-+		search_data->uuid_size = service->attributes[0]->value_len;
-+	} else if (search_data->uuid_size !=
-+					service->attributes[0]->value_len) {
-+
-+		/* Don't want more results. This is last */
-+		search_data->stop_search = true;
++	dev = find_device_by_addr(bdaddr);
++	if (!dev) {
++		error("gatt: Could not find device ?!");
 +		return;
 +	}
 +
-+	group = malloc0(sizeof(struct gatt_db_group) +
-+					service->attributes[0]->value_len);
-+	if (!group)
-+		return;
++	/* Set services changed notification flag */
++	dev->notify_services_changed = !!(*val);
 +
-+	group->len = service->attributes[0]->value_len;
-+	memcpy(group->value, service->attributes[0]->value, group->len);
-+	group->handle = service->attributes[0]->handle;
-+	group->end_group = service->attributes[0]->handle +
-+						service->num_handles - 1;
++	length = enc_write_resp(pdu);
 +
-+	if (!queue_push_tail(search_data->queue, group))
-+		free(group);
++	g_attrib_send(dev->attrib, 0, pdu, length, NULL, NULL, NULL);
 +}
 +
-+void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
-+							uint16_t end_handle,
-+							const bt_uuid_t type,
-+							struct queue *queue)
++static void register_gatt_service(void)
 +{
-+	struct read_by_group_type_data data;
++	bt_uuid_t uuid;
++	uint16_t srvc_handle;
 +
-+	data.uuid = type;
-+	data.start_handle = start_handle;
-+	data.end_handle = end_handle;
-+	data.queue = queue;
-+	data.uuid_size = 0;
-+	data.stop_search = false;
++	DBG("");
 +
-+	queue_foreach(db->services, read_by_group_type, &data);
++	bt_uuid16_create(&uuid, 0x1801);
++	srvc_handle = gatt_db_add_service(gatt_db, &uuid, true, 3);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_INDICATE,
++					NULL, gatt_srvc_change_register_cb,
++					NULL);
++
++	gatt_db_service_set_active(gatt_db, srvc_handle, true);
 +}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 74817a0..8c04c0f 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -59,3 +59,16 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
++
+ static int start_listen_socket(void)
+ {
+ 	GError *gerr = NULL;
+@@ -3966,6 +4011,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
  
- bool gatt_db_service_set_active(struct gatt_db *db, uint16_t handle,
- 								bool active);
-+
-+struct gatt_db_group {
-+	uint16_t handle;
-+	uint16_t end_group;
-+	uint16_t len;
-+	uint8_t value[0];
-+};
-+
-+/* Returns queue with struct gatt_db_group */
-+void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
-+							uint16_t end_handle,
-+							const bt_uuid_t type,
-+							struct queue *queue);
+ 	register_gap_service();
+ 	register_device_info_service();
++	register_gatt_service();
+ 
+ 	return true;
+ }
 -- 
 1.8.4
 
