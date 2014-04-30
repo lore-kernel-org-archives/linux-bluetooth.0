@@ -1,41 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Re-run OPP with ETS-12160
-Date: Wed, 30 Apr 2014 11:23:07 +0200
-Message-ID: <2911569.JJvJOSa0vN@uw000953>
-In-Reply-To: <1398771067-6531-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1398771067-6531-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH] android/gatt: Remove redundant find function parameter
+Date: Wed, 30 Apr 2014 11:22:48 +0200
+Message-ID: <5203543.5rAnQQMj8k@uw000953>
+In-Reply-To: <1398767468-15966-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1398767468-15966-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Jakub,
 
-On Tuesday 29 of April 2014 13:31:07 Sebastian Chlad wrote:
-> There is new ETS for OPP: 12160 which solves the problem of the
-> client test: OPH_BV_01_I
+On Tuesday 29 of April 2014 12:31:08 Jakub Tyszkowski wrote:
+> As client and server apps id is guaranteed to be unique, there is no
+> need for this search function parameter.
 > ---
->  android/pts-opp.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  android/gatt.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 > 
-> diff --git a/android/pts-opp.txt b/android/pts-opp.txt
-> index 86b9589..0a070ca 100644
-> --- a/android/pts-opp.txt
-> +++ b/android/pts-opp.txt
-> @@ -30,8 +30,8 @@ TC_CLIENT_BCP_BV_05_I   N/A
->  TC_CLIENT_CON_BV_01_C	N/A
->  TC_CLIENT_OPH_BI_01_C	PASS	PTS issue: ID: 12081 (bluetooth.org)
->  				ETS-12081 required
-> -TC_CLIENT_OPH_BV_01_I	NONE	OBEX_DISCONNECT_REQ sent on closed channel
-> -				PTS issue reported: ID: 12081
-> +TC_CLIENT_OPH_BV_01_I	PASS	PTS issue: ID: 12081.
-> +				ETS-12160 required
->  TC_CLIENT_OPH_BV_02_I	N/A
->  TC_CLIENT_OPH_BV_03_I	PASS	ETS-12081 required (bluetooth.org)
->  TC_CLIENT_OPH_BV_04_I	N/A
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 0e81e7d..b2c1a02 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1242,8 +1242,7 @@ static void handle_client_unregister(const void *buf, uint16_t len)
+>  					HAL_OP_GATT_CLIENT_UNREGISTER, status);
+>  }
+>  
+> -static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id,
+> -							int32_t app_type)
+> +static struct app_connection *find_conn(const bdaddr_t *addr, int32_t app_id)
+>  {
+>  	struct app_connection conn_match;
+>  	struct gatt_device *dev = NULL;
+> @@ -2875,7 +2874,7 @@ static void handle_client_register_for_notification(const void *buf,
+>  
+>  	android2bdaddr(&cmd->bdaddr, &addr);
+>  
+> -	conn = find_conn(&addr, cmd->client_if, APP_CLIENT);
+> +	conn = find_conn(&addr, cmd->client_if);
+>  	if (!conn) {
+>  		status = HAL_STATUS_FAILED;
+>  		goto failed;
+> @@ -2980,7 +2979,7 @@ static void handle_client_deregister_for_notification(const void *buf,
+>  
+>  	android2bdaddr(&cmd->bdaddr, &addr);
+>  
+> -	conn = find_conn(&addr, cmd->client_if, APP_CLIENT);
+> +	conn = find_conn(&addr, cmd->client_if);
+>  	if (!conn) {
+>  		status = HAL_STATUS_FAILED;
+>  		goto failed;
 > 
 
 Applied, thanks.
