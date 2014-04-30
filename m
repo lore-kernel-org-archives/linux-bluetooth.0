@@ -1,106 +1,140 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, johan.hedberg@gmail.com
-Subject: Re: [PATCH v4 00/38] android/gatt: GATT server implementation
-Date: Wed, 30 Apr 2014 17:31:35 +0200
-Message-ID: <1402229.mYdsSYSnjX@uw000953>
-In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1398792330-23636-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1398792330-23636-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Wed, 30 Apr 2014 15:54:09 +0300
+Message-ID: <CABBYNZK9VBAdqc+G+DTjb6tOLRDs0Jjw06taCLSNXfKyG_k9ug@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] hog: Fix checking for Report ID item presence
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrzej,
 
-On Wednesday 30 of April 2014 11:13:31 Lukasz Rymanowski wrote:
-> This patch set adds major part of GATT server support for Android:
-> * GATT database extension to get, read and write data
-> * Handling GATT Server Android requests
-> * Create listening socket for BLE.
-> * Support GATT Service
-> * Support Device Information Service
-> * Support Service Changed (skeleton)
-> * some bugfixes
-> 
-> Still some improvements are needed.
-> 
-> Tested on PC and Nexus 5 as peripheral device.
-> 
+On Tue, Apr 29, 2014 at 8:25 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> Report ID item in Report Descriptor is now detected by simply looking
+> for applicable item prefixes anywhere in data and does not take items
+> structure into consideration. This could lead to false-positive
+> detections in case value we look for is just part of item data, not an
+> actual item prefix.
+>
+> As defined in Device Class Definition for HID (6.2.2.7), Report ID is
+> a short item with prefix 100001nn (binary) thus we do not need to do
+> complete parsing of Report Descriptor but only need to check items
+> prefixes in order to find Report ID items reliably.
+>
+> This patch checks Report Descriptor item by item looking for item
+> prefix which matches Report ID, as defined in spec above.
+> ---
 > v2:
-> * Handled comments from Johan
-> * Added complete callback to database requests
-> * some bugfixes found during tests with haltest
-> * Rebase on upstream
-> 
-> v3:
-> * fixed android/gatt: Add support for send indication
-> 
-> v4:
-> * simplify communication between gatt server and database
-> * Some bugfixes 
-> 
-> Grzegorz Kolodziejczyk (3):
->   android/gatt: Add support for ATT read by type
->   android/gatt: Add MTU request cmd handling
->   android/gatt: Add Find info gatt server cmd handling
-> 
-> Jakub Tyszkowski (3):
->   android/gatt: Remove redundant find function parameter
->   android/gatt: Register device information service
->   android/gatt: Register GATT service
-> 
-> Lukasz Rymanowski (21):
->   android/gatt: Rename listen_clients to listen_apps
->   android/gatt: Add listening socket for GATT
->   android/gatt: Assume that each server wants waits for connection
->   android/gatt: Add ATT msg handler
->   shared/gatt: Use bdaddr instead of request_id
->   shared/gatt: Extend read/write callback with offset
->   shared/gatt: Add att_opcode to read/write callback
->   android/bluetooth: Add function for getting device Android name
->   android/gatt: Add register GAP Service
->   gatt: Add some characteristics uuids
->   android/gatt: Add support for ATT read by group type
->   shared/gatt: Add support to read from database
->   android/gatt: Add support to read request
->   shared/gatt: Add support for write request
->   android/gatt: Add support for write request
->   android/gatt: Add support for execute write
->   android/gatt: Add write_cb to GATT server
->   android/gatt: Add read_cb for GATT Server
->   android/hal-gatt-api: Fix IPC definition for send response
->   android/gatt: Add support for GATT server send response
->   android/gatt: Add support for send indication
-> 
-> Marcin Kraglak (11):
->   android/gatt: Add service functionality
->   android/gatt: Add implementation of delete service
->   android/gatt: Add included service implementation
->   android/gatt: Add characteristic implementation
->   android/gatt: Add handling of start service command
->   android/gatt: Add stop service command handling
->   android/gatt: Add descriptor implementation
->   shared/gatt: Add function to read by group type
->   shared/gatt: Add function to find by type
->   shared/gatt: Add function to read by type
->   shared/gatt: Add function to find information
-> 
->  android/bluetooth.c  |    5 +
->  android/bluetooth.h  |    1 +
->  android/gatt.c       | 1249 +++++++++++++++++++++++++++++++++++++++++++++++---
->  android/hal-gatt.c   |    7 +-
->  android/hal-msg.h    |    3 +
->  lib/uuid.h           |    7 +
->  src/shared/gatt-db.c |  322 +++++++++++++
->  src/shared/gatt-db.h |   60 ++-
->  8 files changed, 1577 insertions(+), 77 deletions(-)
-> 
-> 
+> - more verbose commit description
+> - changed parse_descriptor_item() to get_descriptor_item_info()
+> - reformatted get_descriptor_item_info() a bit
+>
+>  profiles/input/hog.c | 67 ++++++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 62 insertions(+), 5 deletions(-)
+>
+> diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+> index a11e04e..767bcfa 100644
+> --- a/profiles/input/hog.c
+> +++ b/profiles/input/hog.c
+> @@ -345,6 +345,46 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+>                                         external_service_char_cb, hogdev);
+>  }
+>
+> +static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen, ssize_t *len,
+> +                                                               bool *is_long)
+> +{
+> +       if (!blen)
+> +               return false;
+> +
+> +       *is_long = (buf[0] == 0xfe);
+> +
+> +       if (*is_long) {
+> +               if (blen < 3)
+> +                       return false;
+> +
+> +               /*
+> +                * long item:
+> +                * byte 0 -> 0xFE
+> +                * byte 1 -> data size
+> +                * byte 2 -> tag
+> +                * + data
+> +                */
+> +
+> +               *len = buf[1] + 3;
+> +       } else {
+> +               uint8_t b_size;
+> +
+> +               /*
+> +                * short item:
+> +                * byte 0[1..0] -> data size (=0, 1, 2, 4)
+> +                * byte 0[3..2] -> type
+> +                * byte 0[7..4] -> tag
+> +                * + data
+> +                */
+> +
+> +               b_size = buf[0] & 0x03;
+> +               *len = (b_size ? 1 << (b_size - 1) : 0) + 1;
+> +       }
+> +
+> +       /* item length should be no more than input buffer length */
+> +       return *len <= blen;
+> +}
+> +
+>  static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>                                                         gpointer user_data)
+>  {
+> @@ -355,6 +395,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>         uint16_t vendor_src, vendor, product, version;
+>         ssize_t vlen;
+>         int i;
+> +       int next_item = 0;
+>
+>         if (status != 0) {
+>                 error("Report Map read failed: %s", att_ecode2str(status));
+> @@ -369,11 +410,27 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+>
+>         DBG("Report MAP:");
+>         for (i = 0; i < vlen; i++) {
+> -               switch (value[i]) {
+> -               case 0x85:
+> -               case 0x86:
+> -               case 0x87:
+> -                       hogdev->has_report_id = TRUE;
+> +               ssize_t ilen = 0;
+> +               bool long_item = false;
+> +
+> +               if (i == next_item) {
+> +                       if (get_descriptor_item_info(&value[i], vlen - i,
+> +                                                       &ilen, &long_item)) {
+> +                               /*
+> +                                * Report ID is short item with prefix 100001xx
+> +                                */
+> +                               if (!long_item && (value[i] & 0xfc) == 0x84)
+> +                                       hogdev->has_report_id = TRUE;
+> +
+> +                               next_item += ilen;
+> +                       } else {
+> +                               error("Report Map parsing failed at %d", i);
+> +
+> +                               /*
+> +                                * We do not increase next_item here so we won't
+> +                                * parse subsequent data - this is what we want.
+> +                                */
+> +                       }
+>                 }
+>
+>                 if (i % 2 == 0) {
+> --
+> 1.9.2
 
-A modified version of this patchset is now pushed upstream.
+Applied, thanks.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
