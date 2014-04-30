@@ -2,78 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v4 09/38] android/gatt: Add descriptor implementation
-Date: Wed, 30 Apr 2014 11:13:40 +0200
-Message-Id: <1398849249-5868-10-git-send-email-lukasz.rymanowski@tieto.com>
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 11/38] android/gatt: Assume that each server wants waits for connection
+Date: Wed, 30 Apr 2014 11:13:42 +0200
+Message-Id: <1398849249-5868-12-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-
-It will add characteristic descriptor attribute to local database.
 ---
- android/gatt.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+ android/gatt.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index e888268..115fb1a 100644
+index 9e950ec..f035e3f 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -3302,30 +3302,41 @@ failed:
- static void handle_server_add_descriptor(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_server_add_descriptor *cmd = buf;
--	char uuidstr[MAX_LEN_UUID_STR];
-+	struct hal_ev_gatt_server_descriptor_added ev;
- 	struct gatt_app *server;
--	bt_uuid_t descr_uuid;
-+	bt_uuid_t uuid;
- 	uint8_t status;
- 
- 	DBG("");
- 
-+	memset(&ev, 0, sizeof(ev));
-+
- 	server = find_app_by_id(cmd->server_if);
- 	if (!server) {
--		error("gatt: server_if=%d not found", cmd->server_if);
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
+@@ -575,6 +575,13 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+ 		return 0;
  	}
  
--	android2uuid(cmd->uuid, &descr_uuid);
--	bt_uuid_to_string(&descr_uuid, uuidstr, MAX_LEN_UUID_STR);
--
--	/* TODO: Add descriptor to attribute database */
--	DBG("Add descriptor: server: %d, srvc_hnd: %d, uuid: %s, perm: %d",
--		cmd->server_if, cmd->service_handle, uuidstr, cmd->permissions);
-+	android2uuid(cmd->uuid, &uuid);
- 
--	status = HAL_STATUS_SUCCESS;
-+	ev.descr_handle = gatt_db_add_char_descriptor(gatt_db,
-+							cmd->service_handle,
-+							&uuid, cmd->permissions,
-+							NULL, NULL, NULL);
-+	if (!ev.descr_handle)
-+		status = HAL_STATUS_FAILED;
-+	else
-+		status = HAL_STATUS_SUCCESS;
- 
- failed:
-+	ev.server_if = cmd->server_if;
-+	ev.srvc_handle = cmd->service_handle;
-+	memcpy(ev.uuid, cmd->uuid, sizeof(cmd->uuid));
-+	ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
++	if ((app->type == APP_SERVER) &&
++			!queue_push_tail(listen_apps, INT_TO_PTR(app->id))) {
++		error("gatt: Cannot push server on the list");
++		destroy_gatt_app(app);
++		return 0;
++	}
 +
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_SERVER_DESCRIPTOR_ADDED, sizeof(ev), &ev);
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_OP_GATT_SERVER_ADD_DESCRIPTOR, status);
+ 	return app->id;
  }
+ 
 -- 
 1.8.4
 
