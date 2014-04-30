@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v4 05/38] android/gatt: Add included service implementation
-Date: Wed, 30 Apr 2014 11:13:36 +0200
-Message-Id: <1398849249-5868-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 04/38] android/gatt: Add implementation of delete service
+Date: Wed, 30 Apr 2014 11:13:35 +0200
+Message-Id: <1398849249-5868-5-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,20 +13,20 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 
-It will add included service attribute to database.
+It will delete sarvice from local database
 ---
- android/gatt.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+ android/gatt.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index e4ef1ea..f8398fc 100644
+index 6e578e1..e4ef1ea 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -3219,25 +3219,38 @@ failed:
- static void handle_server_add_included_service(const void *buf, uint16_t len)
+@@ -3361,27 +3361,37 @@ failed:
+ static void handle_server_delete_service(const void *buf, uint16_t len)
  {
- 	const struct hal_cmd_gatt_server_add_inc_service *cmd = buf;
-+	struct hal_ev_gatt_server_inc_srvc_added ev;
+ 	const struct hal_cmd_gatt_server_delete_service *cmd = buf;
++	struct hal_ev_gatt_server_service_deleted ev;
  	struct gatt_app *server;
  	uint8_t status;
  
@@ -41,31 +41,30 @@ index e4ef1ea..f8398fc 100644
  		goto failed;
  	}
  
--	/* TODO: Add included service to attribute database */
--	DBG("Add included service: server: %d, srvc_hnd: %d, incl_hnd: %d",
--		cmd->server_if, cmd->service_handle, cmd->included_handle);
-+	ev.incl_srvc_handle = gatt_db_add_included_service(gatt_db,
-+							cmd->service_handle,
-+							cmd->included_handle);
-+	if (!ev.incl_srvc_handle) {
+-	/* TODO: delete service from attribute database */
+-	DBG("Delete service: server: %d, srvc_hnd: %d", cmd->server_if,
+-							cmd->service_handle);
++	if (!gatt_db_remove_service(gatt_db, cmd->service_handle)) {
 +		status = HAL_STATUS_FAILED;
 +		goto failed;
 +	}
  
  	status = HAL_STATUS_SUCCESS;
--
+ 
  failed:
-+	ev.srvc_handle = cmd->service_handle;
-+	ev.status = status;
-+	ev.server_if = cmd->server_if;
 +	ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
++	ev.srvc_handle = cmd->service_handle;
++	ev.server_if = cmd->server_if;
 +
 +	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_SERVER_INC_SRVC_ADDED, sizeof(ev), &ev);
++			HAL_EV_GATT_SERVER_SERVICE_DELETED, sizeof(ev), &ev);
 +
  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_OP_GATT_SERVER_ADD_INC_SERVICE, status);
+-				HAL_OP_GATT_SERVER_DELETE_SERVICE, status);
++			HAL_OP_GATT_SERVER_DELETE_SERVICE, status);
  }
+ 
+ static void handle_server_send_indication(const void *buf, uint16_t len)
 -- 
 1.8.4
 
