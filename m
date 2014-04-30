@@ -3,66 +3,73 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 31/38] shared/gatt: Add support for write request
-Date: Wed, 30 Apr 2014 11:14:02 +0200
-Message-Id: <1398849249-5868-32-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 28/38] android/gatt: Add support to read request
+Date: Wed, 30 Apr 2014 11:13:59 +0200
+Message-Id: <1398849249-5868-29-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Added support for read and read blob
 ---
- src/shared/gatt-db.c | 24 ++++++++++++++++++++++++
- src/shared/gatt-db.h |  4 ++++
- 2 files changed, 28 insertions(+)
+ android/gatt.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 1f57c8a..f63a7fd 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -704,6 +704,30 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
+diff --git a/android/gatt.c b/android/gatt.c
+index 2c13522..2177c968 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3733,6 +3733,37 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	return 0;
+ }
  
- 	a->read_func(handle, offset, att_opcode, bdaddr, a->user_data);
- 
-+	return true;
++static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
++					struct gatt_device *dev)
++{
++	uint16_t handle;
++	uint16_t len;
++	uint16_t offset = 0;
++
++	DBG("");
++
++	switch (cmd[0]) {
++	case ATT_OP_READ_BLOB_REQ:
++		len = dec_read_blob_req(cmd, cmd_len, &handle, &offset);
++		if (!len)
++			return ATT_ECODE_INVALID_PDU;
++		break;
++	case ATT_OP_READ_REQ:
++		len = dec_read_req(cmd, cmd_len, &handle);
++		if (!len)
++			return ATT_ECODE_INVALID_PDU;
++		break;
++	default:
++		error("gatt: Unexpected read type 0x%02x", cmd[0]);
++		return ATT_ECODE_REQ_NOT_SUPP;
++	}
++
++	if (!gatt_db_read(gatt_db, handle, offset, cmd[0], &dev->bdaddr))
++		return ATT_ECODE_UNLIKELY;
++
++	return 0;
 +}
 +
-+bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
-+					const uint8_t *value, size_t len,
-+					uint8_t att_opcode, bdaddr_t *bdaddr)
-+{
-+	struct gatt_db_service *service;
-+	uint16_t service_handle;
-+	struct gatt_db_attribute *a;
-+
-+	service = queue_find(db->services, find_service_for_handle,
-+						INT_TO_PTR(handle));
-+	if (!service)
-+		return false;
-+
-+	service_handle = service->attributes[0]->handle;
-+
-+	a = service->attributes[handle - service_handle];
-+	if (!a || !a->write_func)
-+		return false;
-+
-+	a->write_func(handle, offset, value, len, att_opcode, bdaddr,
-+								a->user_data);
- 
- 	return true;
- }
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 6cf07db..f704b8e 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -107,3 +107,7 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
- 
- bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
- 					uint8_t att_opcode, bdaddr_t *bdaddr);
-+
-+bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
-+					const uint8_t *value, size_t len,
-+					uint8_t att_opcode, bdaddr_t *bdaddr);
+ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ {
+ 	struct gatt_device *dev = user_data;
+@@ -3760,6 +3791,11 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		break;
+ 	case ATT_OP_READ_REQ:
+ 	case ATT_OP_READ_BLOB_REQ:
++		status = read_request(ipdu, len, dev);
++		if (!status)
++			/* Response will be sent in callback */
++			return;
++		break;
+ 	case ATT_OP_MTU_REQ:
+ 	case ATT_OP_FIND_INFO_REQ:
+ 	case ATT_OP_WRITE_REQ:
 -- 
 1.8.4
 
