@@ -2,124 +2,111 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v4 03/38] android/gatt: Add service functionality
-Date: Wed, 30 Apr 2014 11:13:34 +0200
-Message-Id: <1398849249-5868-4-git-send-email-lukasz.rymanowski@tieto.com>
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 01/38] android/gatt: Rename listen_clients to listen_apps
+Date: Wed, 30 Apr 2014 11:13:32 +0200
+Message-Id: <1398849249-5868-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-
-It will Add service to local database.
+This is because on this list there will be also servers id
 ---
- android/gatt.c | 40 ++++++++++++++++++++++++++++++----------
- 1 file changed, 30 insertions(+), 10 deletions(-)
+ android/gatt.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 0bb5a70..6e578e1 100644
+index 4775ecc..f9eff30 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -43,6 +43,7 @@
- #include "utils.h"
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
-+#include "src/shared/gatt-db.h"
- #include "attrib/gattrib.h"
- #include "attrib/att.h"
- #include "attrib/gatt.h"
-@@ -153,6 +154,7 @@ static struct queue *gatt_devices = NULL;
+@@ -152,7 +152,7 @@ static struct queue *gatt_apps = NULL;
+ static struct queue *gatt_devices = NULL;
  static struct queue *app_connections = NULL;
  
- static struct queue *listen_apps = NULL;
-+static struct gatt_db *gatt_db = NULL;
+-static struct queue *listen_clients = NULL;
++static struct queue *listen_apps = NULL;
  
  static void bt_le_discovery_stop_cb(void);
  
-@@ -3175,32 +3177,43 @@ static void handle_server_disconnect(const void *buf, uint16_t len)
- static void handle_server_add_service(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_server_add_service *cmd = buf;
--	char uuidstr[MAX_LEN_UUID_STR];
-+	struct hal_ev_gatt_server_service_added ev;
- 	struct gatt_app *server;
--	struct element_id srvc_id;
- 	uint8_t status;
-+	bt_uuid_t uuid;
+@@ -1380,7 +1380,7 @@ static void set_advertising_cb(uint8_t status, void *user_data)
+ 	 * 2. Stop succeed
+ 	 */
+ 	if ((l->start && status) || (!l->start && !status))
+-		queue_remove(listen_clients, INT_TO_PTR(l->client_id));
++		queue_remove(listen_apps, INT_TO_PTR(l->client_id));
  
- 	DBG("");
- 
-+	memset(&ev, 0, sizeof(ev));
-+
- 	server = find_app_by_id(cmd->server_if);
- 	if (!server) {
--		error("gatt: server_if=%d not found", cmd->server_if);
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
+ 	free(l);
+ }
+@@ -1401,7 +1401,7 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 		goto reply;
  	}
  
--	hal_srvc_id_to_element_id(&cmd->srvc_id, &srvc_id);
--	bt_uuid_to_string(&srvc_id.uuid, uuidstr, MAX_LEN_UUID_STR);
-+	android2uuid(cmd->srvc_id.uuid, &uuid);
+-	listening_client = queue_find(listen_clients, match_by_value,
++	listening_client = queue_find(listen_apps, match_by_value,
+ 						INT_TO_PTR(cmd->client_if));
+ 	/* Start listening */
+ 	if (cmd->start) {
+@@ -1410,7 +1410,7 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 			goto reply;
+ 		}
  
--	/* TODO: execute attribute database transaction */
--	DBG("Add primary service: server: %d, srvc_uuid: %s, num_handles: %d",
--				cmd->server_if, uuidstr, cmd->num_handles);
-+	ev.srvc_handle = gatt_db_add_service(gatt_db, &uuid,
-+							cmd->srvc_id.is_primary,
-+							cmd->num_handles);
-+	if (!ev.srvc_handle) {
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
+-		if (!queue_push_tail(listen_clients,
++		if (!queue_push_tail(listen_apps,
+ 						INT_TO_PTR(cmd->client_if))) {
+ 			error("gatt: Could not put client on listen queue");
+ 			status = HAL_STATUS_FAILED;
+@@ -1418,7 +1418,7 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 		}
  
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
-+	ev.status = status == HAL_STATUS_SUCCESS ? GATT_SUCCESS : GATT_FAILURE;
-+	ev.srvc_id = cmd->srvc_id;
-+	ev.server_if = cmd->server_if;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_SERVER_SERVICE_ADDED, sizeof(ev), &ev);
-+
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--					HAL_OP_GATT_SERVER_ADD_SERVICE, status);
-+			HAL_OP_GATT_SERVER_ADD_SERVICE, status);
- }
- 
- static void handle_server_add_included_service(const void *buf, uint16_t len)
-@@ -3503,9 +3516,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 		/* If listen is already on just return success*/
+-		if (queue_length(listen_clients) > 1) {
++		if (queue_length(listen_apps) > 1) {
+ 			status = HAL_STATUS_SUCCESS;
+ 			goto reply;
+ 		}
+@@ -1435,8 +1435,8 @@ static void handle_client_listen(const void *buf, uint16_t len)
+ 		 * In case there is more listening clients don't stop
+ 		 * advertising
+ 		 */
+-		if (queue_length(listen_clients) > 1) {
+-			queue_remove(listen_clients,
++		if (queue_length(listen_apps) > 1) {
++			queue_remove(listen_apps,
+ 						INT_TO_PTR(cmd->client_if));
+ 			status = HAL_STATUS_SUCCESS;
+ 			goto reply;
+@@ -3503,9 +3503,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 	gatt_devices = queue_new();
  	gatt_apps = queue_new();
  	app_connections = queue_new();
- 	listen_apps = queue_new();
-+	gatt_db = gatt_db_new();
+-	listen_clients = queue_new();
++	listen_apps = queue_new();
  
- 	if (!gatt_devices || !gatt_apps || !listen_apps ||
--							!app_connections) {
-+						!app_connections || !gatt_db) {
+-	if (!gatt_devices || !gatt_apps || !listen_clients ||
++	if (!gatt_devices || !gatt_apps || !listen_apps ||
+ 							!app_connections) {
  		error("gatt: Failed to allocate memory for queues");
  
- 		queue_destroy(gatt_apps, NULL);
-@@ -3520,6 +3534,9 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 		queue_destroy(listen_apps, NULL);
- 		listen_apps = NULL;
+@@ -3518,8 +3518,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 		queue_destroy(app_connections, NULL);
+ 		app_connections = NULL;
  
-+		gatt_db_destroy(gatt_db);
-+		gatt_db = NULL;
-+
+-		queue_destroy(listen_clients, NULL);
+-		listen_clients = NULL;
++		queue_destroy(listen_apps, NULL);
++		listen_apps = NULL;
+ 
  		return false;
  	}
+@@ -3550,6 +3550,6 @@ void bt_gatt_unregister(void)
+ 	queue_destroy(gatt_devices, destroy_device);
+ 	gatt_devices = NULL;
  
-@@ -3551,4 +3568,7 @@ void bt_gatt_unregister(void)
- 
- 	queue_destroy(listen_apps, NULL);
- 	listen_apps = NULL;
-+
-+	gatt_db_destroy(gatt_db);
-+	gatt_db = NULL;
+-	queue_destroy(listen_clients, NULL);
+-	listen_clients = NULL;
++	queue_destroy(listen_apps, NULL);
++	listen_apps = NULL;
  }
 -- 
 1.8.4
