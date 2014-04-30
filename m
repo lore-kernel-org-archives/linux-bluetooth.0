@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH v4 20/38] android/gatt: Register GATT service
-Date: Wed, 30 Apr 2014 11:13:51 +0200
-Message-Id: <1398849249-5868-21-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 19/38] android/gatt: Register device information service
+Date: Wed, 30 Apr 2014 11:13:50 +0200
+Message-Id: <1398849249-5868-20-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -13,39 +13,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 
-This adds database record about gatt's 'services changed'
-characteristic. Proper flag in device is being set to mark it for
-notification if gatt services are changed.
+This adds placeholder data to device information service. To get
+real data we should figure out the best way to get Android's system
+properties and expose them to profiles for reading.
 ---
- android/gatt.c | 46 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 46 insertions(+)
+ android/gatt.c | 98 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 98 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f5aad93..d588a56 100644
+index ef8bd7c..f5aad93 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -133,6 +133,8 @@ struct gatt_device {
- 	GIOChannel *att_io;
- 	struct queue *services;
+@@ -3801,6 +3801,103 @@ static void register_gap_service(void)
  
-+	bool notify_services_changed;
-+
- 	guint watch_id;
- 	guint server_id;
- 
-@@ -3898,6 +3900,49 @@ static void register_device_info_service(void)
- 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
+ 	gatt_db_service_set_active(gatt_db, gap_srvc_data.srvc , true);
  }
- 
-+static void gatt_srvc_change_register_cb(uint16_t handle, uint16_t offset,
-+						const uint8_t *val, size_t len,
-+						uint8_t att_opcode,
-+						bdaddr_t *bdaddr,
-+						void *user_data)
++
++/* TODO: Get those data from device possible via androig/bluetooth.c */
++static struct device_info {
++	const char *manufacturer_name;
++	const char *system_id;
++	const char *model_number;
++	const char *serial_number;
++	const char *firmware_rev;
++	const char *hardware_rev;
++	const char *software_rev;
++} device_info = {
++	.manufacturer_name =	"BlueZ",
++	.system_id =		"BlueZ for Android",
++	.model_number =		"model no",
++	.serial_number =	"serial no",
++	.firmware_rev =		"firmware rev",
++	.hardware_rev =		"hardware rev",
++	.software_rev =		"software rev",
++};
++
++static void device_info_read_cb(uint16_t handle, uint16_t offset,
++					uint8_t att_opcode, bdaddr_t *bdaddr,
++					void *user_data)
 +{
 +	uint8_t pdu[ATT_DEFAULT_LE_MTU];
 +	struct gatt_device *dev;
-+	uint16_t length;
++	char *buf = user_data;
++	uint16_t len;
 +
 +	dev = find_device_by_addr(bdaddr);
 +	if (!dev) {
@@ -53,29 +63,64 @@ index f5aad93..d588a56 100644
 +		return;
 +	}
 +
-+	/* Set services changed notification flag */
-+	dev->notify_services_changed = !!(*val);
++	len = enc_read_resp((uint8_t *) buf, strlen(buf), pdu, sizeof(pdu));
 +
-+	length = enc_write_resp(pdu);
-+
-+	g_attrib_send(dev->attrib, 0, pdu, length, NULL, NULL, NULL);
++	g_attrib_send(dev->attrib, 0, pdu, len, NULL, NULL, NULL);
 +}
 +
-+static void register_gatt_service(void)
++static void register_device_info_service(void)
 +{
 +	bt_uuid_t uuid;
 +	uint16_t srvc_handle;
 +
 +	DBG("");
 +
-+	bt_uuid16_create(&uuid, 0x1801);
-+	srvc_handle = gatt_db_add_service(gatt_db, &uuid, true, 3);
++	/* Device Information Service */
++	bt_uuid16_create(&uuid, 0x180a);
++	srvc_handle = gatt_db_add_service(gatt_db, &uuid, true, 15);
 +
-+	bt_uuid16_create(&uuid, GATT_CHARAC_SERVICE_CHANGED);
++	/* User data are not const hence (void *) cast is used */
++	bt_uuid16_create(&uuid, GATT_CHARAC_SYSTEM_ID);
 +	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
-+					GATT_CHR_PROP_INDICATE,
-+					NULL, gatt_srvc_change_register_cb,
-+					NULL);
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.system_id);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_MODEL_NUMBER_STRING);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.model_number);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_SERIAL_NUMBER_STRING);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.serial_number);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_FIRMWARE_REVISION_STRING);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.firmware_rev);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_HARDWARE_REVISION_STRING);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.hardware_rev);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_SOFTWARE_REVISION_STRING);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.software_rev);
++
++	bt_uuid16_create(&uuid, GATT_CHARAC_MANUFACTURER_NAME_STRING);
++	gatt_db_add_characteristic(gatt_db, srvc_handle, &uuid, 0,
++					GATT_CHR_PROP_READ,
++					device_info_read_cb, NULL,
++					(void *) device_info.manufacturer_name);
 +
 +	gatt_db_service_set_active(gatt_db, srvc_handle, true);
 +}
@@ -83,11 +128,11 @@ index f5aad93..d588a56 100644
  static int start_listen_socket(void)
  {
  	GError *gerr = NULL;
-@@ -3966,6 +4011,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+@@ -3868,6 +3965,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
+ 		error("Could not start GATT listening");
  
  	register_gap_service();
- 	register_device_info_service();
-+	register_gatt_service();
++	register_device_info_service();
  
  	return true;
  }
