@@ -3,73 +3,52 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v4 28/38] android/gatt: Add support to read request
-Date: Wed, 30 Apr 2014 11:13:59 +0200
-Message-Id: <1398849249-5868-29-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v4 36/38] android/hal-gatt-api: Fix IPC definition for send response
+Date: Wed, 30 Apr 2014 11:14:07 +0200
+Message-Id: <1398849249-5868-37-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added support for read and read blob
 ---
- android/gatt.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ android/hal-gatt.c | 7 +++++--
+ android/hal-msg.h  | 3 +++
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 2c13522..2177c968 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3733,6 +3733,37 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
- 	return 0;
- }
+diff --git a/android/hal-gatt.c b/android/hal-gatt.c
+index 16b5607..e1faccb 100644
+--- a/android/hal-gatt.c
++++ b/android/hal-gatt.c
+@@ -1237,9 +1237,12 @@ static bt_status_t send_response(int conn_id, int trans_id, int status,
+ 	cmd->conn_id = conn_id;
+ 	cmd->trans_id = trans_id;
+ 	cmd->status = status;
+-	cmd->len = sizeof(*response);
++	cmd->handle = response->attr_value.handle;
++	cmd->offset = response->attr_value.offset;
++	cmd->auth_req = response->attr_value.auth_req;
++	cmd->len = response->attr_value.len;
  
-+static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
-+					struct gatt_device *dev)
-+{
+-	memcpy(cmd->data, response, sizeof(*response));
++	memcpy(cmd->data, response->attr_value.value, cmd->len);
+ 
+ 	return hal_ipc_cmd(HAL_SERVICE_ID_GATT,
+ 					HAL_OP_GATT_SERVER_SEND_RESPONSE,
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 9d28866..09bd9a0 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -847,6 +847,9 @@ struct hal_cmd_gatt_server_send_indication {
+ struct hal_cmd_gatt_server_send_response {
+ 	int32_t conn_id;
+ 	int32_t trans_id;
 +	uint16_t handle;
-+	uint16_t len;
-+	uint16_t offset = 0;
-+
-+	DBG("");
-+
-+	switch (cmd[0]) {
-+	case ATT_OP_READ_BLOB_REQ:
-+		len = dec_read_blob_req(cmd, cmd_len, &handle, &offset);
-+		if (!len)
-+			return ATT_ECODE_INVALID_PDU;
-+		break;
-+	case ATT_OP_READ_REQ:
-+		len = dec_read_req(cmd, cmd_len, &handle);
-+		if (!len)
-+			return ATT_ECODE_INVALID_PDU;
-+		break;
-+	default:
-+		error("gatt: Unexpected read type 0x%02x", cmd[0]);
-+		return ATT_ECODE_REQ_NOT_SUPP;
-+	}
-+
-+	if (!gatt_db_read(gatt_db, handle, offset, cmd[0], &dev->bdaddr))
-+		return ATT_ECODE_UNLIKELY;
-+
-+	return 0;
-+}
-+
- static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -3760,6 +3791,11 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- 		break;
- 	case ATT_OP_READ_REQ:
- 	case ATT_OP_READ_BLOB_REQ:
-+		status = read_request(ipdu, len, dev);
-+		if (!status)
-+			/* Response will be sent in callback */
-+			return;
-+		break;
- 	case ATT_OP_MTU_REQ:
- 	case ATT_OP_FIND_INFO_REQ:
- 	case ATT_OP_WRITE_REQ:
++	uint16_t offset;
++	uint8_t auth_req;
+ 	int32_t status;
+ 	uint16_t len;
+ 	uint8_t data[0];
 -- 
 1.8.4
 
