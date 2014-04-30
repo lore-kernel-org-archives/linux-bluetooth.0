@@ -1,107 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
-	Marcin Kraglak <marcin.kraglak@tieto.com>
-Subject: [PATCH v4 24/38] shared/gatt: Add function to find information
-Date: Wed, 30 Apr 2014 11:13:55 +0200
-Message-Id: <1398849249-5868-25-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1398849249-5868-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <20140429081609.GJ21742@t440s.lan>
+References: <1398734107-4793-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1398734107-4793-34-git-send-email-lukasz.rymanowski@tieto.com>
+	<20140429081609.GJ21742@t440s.lan>
+Date: Wed, 30 Apr 2014 11:14:42 +0200
+Message-ID: <CAN_7+YZHAdxyP5Y0o4+HzMO9QZaAaXtr_WBcLGd7ukuZQ5QM4A@mail.gmail.com>
+Subject: Re: [PATCH 32/36] android/gatt: Add write callback to server
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+Hi Johan,
 
-It will return list of handle and uuid
----
- src/shared/gatt-db.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  9 ++++++++
- 2 files changed, 67 insertions(+)
+On Tue, Apr 29, 2014 at 10:16 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi,
+>
+> On Tue, Apr 29, 2014, Lukasz Rymanowski wrote:
+>> Write callback is now attached to characteristics and descriptors
+>> registered by Android app.
+>>
+>> Transaction id is generated and stored in gatt_app together with request
+>> data(device ptr, cmd opcode etc).
+>> ---
+>>  android/gatt.c | 102 +++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 100 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index 2eb5b18..09eae80 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -82,6 +82,10 @@ struct gatt_app {
+>>
+>>       /* Valid for client applications */
+>>       struct queue *notifications;
+>> +
+>> +     /* Transaction data valid for server application */
+>> +     int32_t pend_trans_id;
+>
+> Could we please be consistent with async operation id types. I.e. use an
+> unsigned int here.
+>
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 60d3140..cbdd8a0 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -613,3 +613,61 @@ void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
- 
- 	queue_foreach(db->services, read_by_type, &data);
- }
-+
-+
-+struct find_information_data {
-+	struct queue *queue;
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+};
-+
-+static void find_information(void *data, void *user_data)
-+{
-+	struct find_information_data *search_data = user_data;
-+	struct gatt_db_service *service = data;
-+	struct gatt_db_attribute *attribute;
-+	struct gatt_db_find_information *value;
-+	int i;
-+
-+	if (!service->active)
-+		return;
-+
-+	/* Check if service is in range */
-+	if ((service->attributes[0]->handle + service->num_handles - 1) <
-+						search_data->start_handle)
-+		return;
-+
-+	for (i = 0; i < service->num_handles; i++) {
-+		attribute = service->attributes[i];
-+		if (!attribute)
-+			continue;
-+
-+		if (attribute->handle < search_data->start_handle)
-+			continue;
-+
-+		if (attribute->handle > search_data->end_handle)
-+			return;
-+
-+		value = new0(struct gatt_db_find_information, 1);
-+		if (!value)
-+			return;
-+
-+		value->handle = attribute->handle;
-+		value->uuid = attribute->uuid;
-+		if (!queue_push_tail(search_data->queue, value))
-+			free(value);
-+	}
-+}
-+
-+void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
-+							uint16_t end_handle,
-+							struct queue *queue)
-+{
-+	struct find_information_data data;
-+
-+	data.start_handle = start_handle;
-+	data.end_handle = end_handle;
-+	data.queue = queue;
-+
-+	queue_foreach(db->services, find_information, &data);
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index b5f9073..a91c798 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -95,3 +95,12 @@ void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
- 							const bt_uuid_t type,
- 							struct queue *queue);
-+
-+struct gatt_db_find_information {
-+	uint16_t handle;
-+	bt_uuid_t uuid;
-+};
-+
-+void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
-+							uint16_t end_handle,
-+							struct queue *queue);
--- 
-1.8.4
+This one handled in v4
 
+> Johan
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+Lukasz
