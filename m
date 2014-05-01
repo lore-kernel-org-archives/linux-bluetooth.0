@@ -1,63 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rick Mann <rmann@latencyzero.com>
-Content-Type: multipart/signed; boundary="Apple-Mail=_0785BEFD-F01D-45BC-AF5A-E4A34D4D2190"; protocol="application/pgp-signature"; micalg=pgp-sha1
-Subject: Getting started with BLE device
-Message-Id: <35E2DFE7-B463-4A15-8148-F7E30A201646@latencyzero.com>
-Date: Thu, 1 May 2014 19:59:32 -0700
-To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Date: Thu, 1 May 2014 20:32:19 +0200
+From: Sander Eikelenboom <linux@eikelenboom.it>
+Reply-To: Sander Eikelenboom <linux@eikelenboom.it>
+Message-ID: <1169298713.20140501203219@eikelenboom.it>
+To: Marcel Holtmann <marcel@holtmann.org>, gianluca@sottospazio.it
+CC: linux-bluetooth@vger.kernel.org
+Subject: BUG: spinlock wrong CPU on CPU#3, krfcommd/1500 (resend)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi  Gianluca / Marcel,
 
---Apple-Mail=_0785BEFD-F01D-45BC-AF5A-E4A34D4D2190
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+Sorry for the resend, but i had a typo in the mailinglist address.
 
-We've been building a product with a different BLE module. Today we got =
-our new hardware that uses a TiWi-BLE module and BlueZ (under Ubuntu =
-12.04 and 14.04), and I'm looking for documentation on how to get =
-started with it. I can't seem to find a good starting point.
+Here a splat i just encountered on boot:
 
-The Ubuntu image we have (it came from our board designer) has a bunch =
-of commands installed, like bluez-test-adapter, bluez-test-service, etc. =
-But when I try to execute bluez-test-adapter (as root), I just get dbus =
-errors:
-
-	dbus.exceptions.DBusException: org.bluez.Error.NoSuchAdapter: No =
-such adapter=20
-
-Some other attempts, including hciconfig and python =
-/usr/share/doc/bluez/examples/list-devices, show no devices. I'm not =
-sure what a device looks like (is it /dev/something?). It's possible our =
-kernel isn't properly configured. But I can't find any docs that show me =
-how to start.
-
-The end goal is to configure this device to be a Bluetooth LE server.
-
-I'd greatly appreciate some guidance as to where to go next. Thanks!
-
---=20
-Rick
+[   78.248869] BUG: spinlock wrong CPU on CPU#3, krfcommd/1500
+[   78.255126]  lock: 0xffff880056d8ded8, .magic: dead4ead, .owner: krfcommd/1500, .owner_cpu: 0
+[   78.261375] CPU: 3 PID: 1500 Comm: krfcommd Not tainted 3.15.0-rc3-20140501-nbdebug5+ #1
+[   78.267767] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS V1.8B1 09/13/2010
+[   78.274173]  ffff880056d8ded8 ffff880057217d18 ffffffff81b8d666 ffff88005f6cfd88
+[   78.280707]  ffff880056c3a3c0 ffff880057217d38 ffffffff81b8974c ffff880056d8ded8
+[   78.287091]  ffffffff81f56fab ffff880057217d58 ffffffff81b89777 ffff880056d8ded8
+[   78.293371] Call Trace:
+[   78.299496]  [<ffffffff81b8d666>] dump_stack+0x46/0x58
+[   78.305601]  [<ffffffff81b8974c>] spin_dump+0x91/0x96
+[   78.311662]  [<ffffffff81b89777>] spin_bug+0x26/0x2b
+[   78.317599]  [<ffffffff8111a5ce>] do_raw_spin_unlock+0xae/0x100
+[   78.323557]  [<ffffffff81b974cb>] _raw_spin_unlock+0x2b/0x40
+[   78.329571]  [<ffffffff81b636d3>] rfcomm_run+0x1063/0x1310
+[   78.335608]  [<ffffffff81b9754d>] ? _raw_spin_unlock_irqrestore+0x6d/0x90
+[   78.341715]  [<ffffffff81b62670>] ? rfcomm_check_accept+0xc0/0xc0
+[   78.347830]  [<ffffffff810ee1a4>] kthread+0xe4/0x100
+[   78.353916]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
+[   78.360121]  [<ffffffff81b9893c>] ret_from_fork+0x7c/0xb0
+[   78.366191]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
 
 
+--
+Sander
 
-
---Apple-Mail=_0785BEFD-F01D-45BC-AF5A-E4A34D4D2190
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iEYEARECAAYFAlNjChQACgkQBzBA/9aDmJshpACguammuXp9XZmFoyP2Y+jn1lU8
-SrcAoIWGC2M6II6p2F/ERWlo+hyx9L4M
-=lPzE
------END PGP SIGNATURE-----
-
---Apple-Mail=_0785BEFD-F01D-45BC-AF5A-E4A34D4D2190--
