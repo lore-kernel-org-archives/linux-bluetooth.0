@@ -2,118 +2,167 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 04/11] hog: Discover descriptors using gatt_discover_desc
-Date: Fri,  2 May 2014 12:57:35 +0200
-Message-Id: <1399028262-17187-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 02/11] attrib: Discover descriptors using gatt_discover_desc
+Date: Fri,  2 May 2014 12:57:33 +0200
+Message-Id: <1399028262-17187-2-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1399028262-17187-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1399028262-17187-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- profiles/input/hog.c | 52 ++++++++++++----------------------------------------
- 1 file changed, 12 insertions(+), 40 deletions(-)
+ attrib/gatttool.c    | 49 ++++++++++++-------------------------------------
+ attrib/interactive.c | 49 ++++++++++---------------------------------------
+ 2 files changed, 22 insertions(+), 76 deletions(-)
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index ae2affd..f79f977 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -199,74 +199,46 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
- 					guint16 plen, gpointer user_data);
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index 5e0f820..bca7f69 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -400,49 +400,23 @@ error:
+ 	return FALSE;
+ }
  
- 
--static void discover_descriptor_cb(guint8 status, const guint8 *pdu,
--					guint16 len, gpointer user_data)
-+static void discover_descriptor_cb(uint8_t status, GSList *descs,
-+								void *user_data)
+-static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
++static void char_desc_cb(uint8_t status, GSList *descriptors, void *user_data)
  {
- 	struct disc_desc_cb_data *ddcb_data = user_data;
- 	struct report *report;
- 	struct hog_device *hogdev;
--	struct att_data_list *list = NULL;
- 	GAttrib *attrib = NULL;
--	uint8_t format;
--	uint16_t handle = 0xffff;
--	uint16_t end = ddcb_data->end;
+-	struct att_data_list *list;
+-	guint8 format;
 -	int i;
--
--	if (status == ATT_ECODE_ATTR_NOT_FOUND) {
--		DBG("Discover all characteristic descriptors finished");
--		goto done;
--	}
++	GSList *l;
  
- 	if (status != 0) {
--		error("Discover all characteristic descriptors failed: %s",
-+		error("Discover all descriptors failed: %s",
- 							att_ecode2str(status));
- 		goto done;
+-	if (status != 0) {
+-		g_printerr("Discover all characteristic descriptors failed: "
+-						"%s\n", att_ecode2str(status));
+-		goto done;
++	if (status) {
++		g_printerr("Discover descriptors failed: %s\n",
++							att_ecode2str(status));
++		return;
  	}
  
--	list = dec_find_info_resp(pdu, len, &format);
+-	list = dec_find_info_resp(pdu, plen, &format);
 -	if (list == NULL)
--		return;
--
--	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
 -		goto done;
--
--	for (i = 0; i < list->num; i++) {
--		uint16_t uuid16;
--		uint8_t *value;
-+	for ( ; descs; descs = descs->next) {
-+		struct gatt_desc *desc = descs->data;
++	for (l = descriptors; l; l = l->next) {
++		struct gatt_desc *desc = l->data;
  
+-	for (i = 0; i < list->num; i++) {
+-		char uuidstr[MAX_LEN_UUID_STR];
+-		uint16_t handle;
+-		uint8_t *value;
+-		bt_uuid_t uuid;
+-
 -		value = list->data[i];
 -		handle = get_le16(value);
--		uuid16 = get_le16(&value[2]);
 -
--		switch (uuid16) {
-+		switch (desc->uuid16) {
- 		case GATT_CLIENT_CHARAC_CFG_UUID:
- 			report = ddcb_data->data;
- 			attrib = report->hogdev->attrib;
--			write_ccc(handle, report);
-+			write_ccc(desc->handle, report);
- 			break;
- 		case GATT_REPORT_REFERENCE:
- 			report = ddcb_data->data;
- 			attrib = report->hogdev->attrib;
--			gatt_read_char(attrib, handle,
-+			gatt_read_char(attrib, desc->handle,
- 						report_reference_cb, report);
- 			break;
- 		case GATT_EXTERNAL_REPORT_REFERENCE:
- 			hogdev = ddcb_data->data;
- 			attrib = hogdev->attrib;
--			gatt_read_char(attrib, handle,
-+			gatt_read_char(attrib, desc->handle,
- 					external_report_reference_cb, hogdev);
- 			break;
- 		}
+-		if (format == ATT_FIND_INFO_RESP_FMT_16BIT)
+-			bt_uuid16_create(&uuid, get_le16(&value[2]));
+-		else {
+-			uint128_t u128;
+-
+-			/* Converts from LE to BE byte order */
+-			bswap_128(&value[2], &u128);
+-			bt_uuid128_create(&uuid, u128);
+-		}
+-
+-		bt_uuid_to_string(&uuid, uuidstr, MAX_LEN_UUID_STR);
+-		g_print("handle = 0x%04x, uuid = %s\n", handle, uuidstr);
++		g_print("handle = 0x%04x, uuid = %s\n", desc->handle,
++								desc->uuid);
  	}
  
- done:
+-	att_data_list_free(list);
+-
+-done:
+ 	if (!opt_listen)
+ 		g_main_loop_quit(event_loop);
+ }
+@@ -451,7 +425,8 @@ static gboolean characteristics_desc(gpointer user_data)
+ {
+ 	GAttrib *attrib = user_data;
+ 
+-	gatt_discover_char_desc(attrib, opt_start, opt_end, char_desc_cb, NULL);
++	gatt_discover_desc(attrib, opt_start, opt_end, NULL, char_desc_cb,
++									NULL);
+ 
+ 	return FALSE;
+ }
+diff --git a/attrib/interactive.c b/attrib/interactive.c
+index 4865944..08f39f7 100644
+--- a/attrib/interactive.c
++++ b/attrib/interactive.c
+@@ -269,51 +269,22 @@ static void char_cb(uint8_t status, GSList *characteristics, void *user_data)
+ 	}
+ }
+ 
+-static void char_desc_cb(guint8 status, const guint8 *pdu, guint16 plen,
+-							gpointer user_data)
++static void char_desc_cb(uint8_t status, GSList *descriptors, void *user_data)
+ {
+-	struct att_data_list *list;
+-	guint8 format;
+-	uint16_t handle = 0xffff;
+-	int i;
++	GSList *l;
+ 
+-	if (status != 0) {
+-		rl_printf("Discover descriptors finished: %s\n",
+-						att_ecode2str(status));
++	if (status) {
++		error("Discover descriptors failed: %s\n",
++							att_ecode2str(status));
+ 		return;
+ 	}
+ 
+-	list = dec_find_info_resp(pdu, plen, &format);
+-	if (list == NULL)
+-		return;
++	for (l = descriptors; l; l = l->next) {
++		struct gatt_desc *desc = l->data;
+ 
+-	for (i = 0; i < list->num; i++) {
+-		char uuidstr[MAX_LEN_UUID_STR];
+-		uint8_t *value;
+-		bt_uuid_t uuid;
+-
+-		value = list->data[i];
+-		handle = get_le16(value);
+-
+-		if (format == 0x01)
+-			bt_uuid16_create(&uuid, get_le16(&value[2]));
+-		else {
+-			uint128_t u128;
+-
+-			/* Converts from LE to BE byte order */
+-			bswap_128(&value[2], &u128);
+-			bt_uuid128_create(&uuid, u128);
+-		}
+-
+-		bt_uuid_to_string(&uuid, uuidstr, MAX_LEN_UUID_STR);
+-		rl_printf("handle: 0x%04x, uuid: %s\n", handle, uuidstr);
++		rl_printf("handle: 0x%04x, uuid: %s\n", desc->handle,
++								desc->uuid);
+ 	}
+-
 -	att_data_list_free(list);
 -
 -	if (handle != 0xffff && handle < end)
--		gatt_discover_char_desc(attrib, handle + 1, end,
--					discover_descriptor_cb, ddcb_data);
--	else
--		g_free(ddcb_data);
-+	g_free(ddcb_data);
+-		gatt_discover_char_desc(attrib, handle + 1, end, char_desc_cb,
+-									NULL);
  }
  
- static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
-@@ -281,8 +253,8 @@ static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
- 	ddcb_data->end = end;
- 	ddcb_data->data = user_data;
+ static void char_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+@@ -564,7 +535,7 @@ static void cmd_char_desc(int argcp, char **argvp)
+ 	} else
+ 		end = 0xffff;
  
--	gatt_discover_char_desc(attrib, start, end, discover_descriptor_cb,
--								ddcb_data);
-+	gatt_discover_desc(attrib, start, end, NULL,
-+					discover_descriptor_cb, ddcb_data);
+-	gatt_discover_char_desc(attrib, start, end, char_desc_cb, NULL);
++	gatt_discover_desc(attrib, start, end, NULL, char_desc_cb, NULL);
  }
  
- static void external_service_char_cb(uint8_t status, GSList *chars,
+ static void cmd_read_hnd(int argcp, char **argvp)
 -- 
 1.9.2
 
