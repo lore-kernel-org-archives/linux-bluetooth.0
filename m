@@ -2,91 +2,102 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 03/11] gas: Discover CCC using gatt_discover_desc
-Date: Fri,  2 May 2014 12:57:34 +0200
-Message-Id: <1399028262-17187-3-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 11/11] hog: Remove redundant struct
+Date: Fri,  2 May 2014 12:57:42 +0200
+Message-Id: <1399028262-17187-11-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1399028262-17187-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1399028262-17187-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Since complete descriptor discovery is now performed inside gatt code,
+there's no need to store end handle for characteristics and thus we can
+remove disc_desc_cb_data.
 ---
- profiles/gatt/gas.c | 40 +++++++++++++---------------------------
- 1 file changed, 13 insertions(+), 27 deletions(-)
+ profiles/input/hog.c | 25 +++++--------------------
+ 1 file changed, 5 insertions(+), 20 deletions(-)
 
-diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
-index 7a9d34e..d240450 100644
---- a/profiles/gatt/gas.c
-+++ b/profiles/gatt/gas.c
-@@ -238,40 +238,22 @@ static void write_ccc(GAttrib *attrib, uint16_t handle, gpointer user_data)
- 								user_data);
- }
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index f79f977..12bc19a 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -102,11 +102,6 @@ struct report {
+ 	struct hog_device	*hogdev;
+ };
  
--static void gatt_descriptors_cb(guint8 status, const guint8 *pdu, guint16 len,
--							gpointer user_data)
-+static void discover_ccc_cb(uint8_t status, GSList *descs, void *user_data)
+-struct disc_desc_cb_data {
+-	uint16_t end;
+-	gpointer data;
+-};
+-
+ static gboolean suspend_supported = FALSE;
+ static GSList *devices = NULL;
+ 
+@@ -202,7 +197,6 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 								void *user_data)
  {
- 	struct gas *gas = user_data;
--	struct att_data_list *list;
--	int i;
--	uint8_t format;
-+	struct gatt_desc *desc;
- 
--	if (status) {
--		error("Discover all GATT characteristic descriptors: %s",
-+	if (status != 0) {
-+		error("Discover Service Changed CCC failed: %s",
+-	struct disc_desc_cb_data *ddcb_data = user_data;
+ 	struct report *report;
+ 	struct hog_device *hogdev;
+ 	GAttrib *attrib = NULL;
+@@ -210,7 +204,7 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 	if (status != 0) {
+ 		error("Discover all descriptors failed: %s",
  							att_ecode2str(status));
- 		return;
- 	}
- 
--	list = dec_find_info_resp(pdu, len, &format);
--	if (list == NULL)
--		return;
--
--	if (format != ATT_FIND_INFO_RESP_FMT_16BIT)
 -		goto done;
--
--	for (i = 0; i < list->num; i++) {
--		uint16_t uuid16, ccc;
--		uint8_t *value;
--
--		value = list->data[i];
--		ccc = get_le16(value);
--		uuid16 = get_le16(&value[2]);
--		DBG("CCC: 0x%04x UUID: 0x%04x", ccc, uuid16);
--		write_ccc(gas->attrib, ccc, user_data);
--	}
-+	/* There will be only one descriptor on list and it will be CCC */
-+	desc = descs->data;
- 
--done:
--	att_data_list_free(list);
-+	DBG("CCC: 0x%04x", desc->handle);
-+	write_ccc(gas->attrib, desc->handle, user_data);
- }
- 
- static void gatt_characteristic_cb(uint8_t status, GSList *characteristics,
-@@ -280,6 +262,7 @@ static void gatt_characteristic_cb(uint8_t status, GSList *characteristics,
- 	struct gas *gas = user_data;
- 	struct gatt_char *chr;
- 	uint16_t start, end;
-+	bt_uuid_t uuid;
- 
- 	if (status) {
- 		error("Discover Service Changed handle: %s", att_ecode2str(status));
-@@ -297,7 +280,10 @@ static void gatt_characteristic_cb(uint8_t status, GSList *characteristics,
++		return;
  	}
  
- 	gas->changed_handle = chr->value_handle;
--	gatt_discover_char_desc(gas->attrib, start, end, gatt_descriptors_cb,
-+
-+	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
-+
-+	gatt_discover_desc(gas->attrib, start, end, &uuid, discover_ccc_cb,
- 									gas);
+ 	for ( ; descs; descs = descs->next) {
+@@ -218,43 +212,34 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 
+ 		switch (desc->uuid16) {
+ 		case GATT_CLIENT_CHARAC_CFG_UUID:
+-			report = ddcb_data->data;
++			report = user_data;
+ 			attrib = report->hogdev->attrib;
+ 			write_ccc(desc->handle, report);
+ 			break;
+ 		case GATT_REPORT_REFERENCE:
+-			report = ddcb_data->data;
++			report = user_data;
+ 			attrib = report->hogdev->attrib;
+ 			gatt_read_char(attrib, desc->handle,
+ 						report_reference_cb, report);
+ 			break;
+ 		case GATT_EXTERNAL_REPORT_REFERENCE:
+-			hogdev = ddcb_data->data;
++			hogdev = user_data;
+ 			attrib = hogdev->attrib;
+ 			gatt_read_char(attrib, desc->handle,
+ 					external_report_reference_cb, hogdev);
+ 			break;
+ 		}
+ 	}
+-
+-done:
+-	g_free(ddcb_data);
  }
  
+ static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+ 							gpointer user_data)
+ {
+-	struct disc_desc_cb_data *ddcb_data;
+-
+ 	if (start > end)
+ 		return;
+ 
+-	ddcb_data = g_new0(struct disc_desc_cb_data, 1);
+-	ddcb_data->end = end;
+-	ddcb_data->data = user_data;
+-
+ 	gatt_discover_desc(attrib, start, end, NULL,
+-					discover_descriptor_cb, ddcb_data);
++					discover_descriptor_cb, user_data);
+ }
+ 
+ static void external_service_char_cb(uint8_t status, GSList *chars,
 -- 
 1.9.2
 
