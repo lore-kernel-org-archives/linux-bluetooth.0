@@ -1,81 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: multipart/signed; boundary="Apple-Mail=_AF95197C-57F2-426E-8C65-399A1B46AE75"; protocol="application/pgp-signature"; micalg=pgp-sha1
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Getting started with BLE device
-From: Rick Mann <rmann@latencyzero.com>
-In-Reply-To: <1399057367.24457.11.camel@SejoLaptop>
-Date: Mon, 5 May 2014 12:18:07 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9E061E41-3F1F-4929-A9A7-A9B64618CF75@latencyzero.com>
-References: <35E2DFE7-B463-4A15-8148-F7E30A201646@latencyzero.com> <1399057367.24457.11.camel@SejoLaptop>
-To: Sejo Ruiz <sejoruiz@gmail.com>
+Message-ID: <53678FEF.4050104@gmail.com>
+Date: Mon, 05 May 2014 15:19:43 +0200
+From: Sergio Ruiz <sejoruiz@gmail.com>
+MIME-Version: 1.0
+To: Johan Hedberg <johan.hedberg@gmail.com>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: Problems running the tests in BlueZ 5.18
+References: <1399056781.24457.6.camel@SejoLaptop> <20140505073728.GA24502@t440s.lan>
+In-Reply-To: <20140505073728.GA24502@t440s.lan>
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan.
 
---Apple-Mail=_AF95197C-57F2-426E-8C65-399A1B46AE75
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On 05/05/14 09:37, Johan Hedberg wrote:
+> Hi Sejo,
+>
+> First thing that comes to mind: have you passed --enable-experimental to
+> configure when building BlueZ, and have you passed -E to bluetoothd when
+> running it? At least the former is needed for the thermometer plugin
+> (about the latter I'm not completely sure).
+>
+> Johan
+First, I'd like to thank you for your answer, it solved the problems I 
+was having.
+The thing is that now I can only run the tests when I log in as root. 
+Despite is not a big problem, I'd like to know if there is a way of 
+executing the tests without having to grant root permissions (I'm 
+worried about security issues on the system) Is it enough to add the 
+current user to the lp group? Or maybe I need to modify the policies 
+that are set in bluetooth.conf? (by the way, now I don't have a proper 
+bluetooth.conf file, so I'm not sure where are those policies set now)
+Finally, I'm still not able to run the proximity test. It points to the 
+same problem (the interface org.bluez.ProximityMonitor1 doesn't exist) 
+I'm not going to use this service, and since I haven't seen anything 
+related to the test in bluetooth.conf, I have assumed that is not 
+completely implemented, but still I'd like to help if some testing is 
+needed.
 
-Thanks, Sejo.
-
-Looks like it's not seen:
-
-# hciconfig
-#
-
-But bluetoothd *is* running:
-
-# ps axww | grep blue
-  243 ?        Ss     0:00 /usr/sbin/bluetoothd
-
-
-The device is not a USB device. It's an LSR TiWi-BLE module connected =
-directly to the processor via UART (or SPI bus, not sure which).
-
-On May 2, 2014, at 12:02 , Sejo Ruiz <sejoruiz@gmail.com> wrote:
-
-> Hi Rick.
-> First of all, you should make sure that the device is recognized as a =
-BT
-> device. Run hciconfig as sudo user to see if it returns something as
-> hci0. If you can see it, then you can do hciconfig hci0 up to set up =
-the
-> interface and start playing. If not, then you could try to do lsusb =
-and
-> see what devices are connected to the USB. If you cannot see your =
-device
-> there, or something goes wrong, you can always try to check what is
-> going on by plugging the device off and on again and then type dmesg |
-> tail. Finally, make sure the bluetooth daemon is running. You can do
-> that by executing /etc/init.d/bluetoothd status (I'm not sure about =
-this
-> last one)
-> NOTE: I suggest to execute all the commands with sudo.
->=20
-
-
---=20
-Rick
-
-
-
-
---Apple-Mail=_AF95197C-57F2-426E-8C65-399A1B46AE75
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iEYEARECAAYFAlNn4+8ACgkQBzBA/9aDmJsv5ACfVdxDZQtV72CiipCRLXinh9kq
-dp4AoKwkwBR1rAjiYMqXTSZRRv2sVpF6
-=LRJR
------END PGP SIGNATURE-----
-
---Apple-Mail=_AF95197C-57F2-426E-8C65-399A1B46AE75--
+Thank you again for your help.
