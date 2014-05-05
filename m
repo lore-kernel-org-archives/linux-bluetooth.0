@@ -1,42 +1,134 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53678FEF.4050104@gmail.com>
-Date: Mon, 05 May 2014 15:19:43 +0200
-From: Sergio Ruiz <sejoruiz@gmail.com>
-MIME-Version: 1.0
-To: Johan Hedberg <johan.hedberg@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Problems running the tests in BlueZ 5.18
-References: <1399056781.24457.6.camel@SejoLaptop> <20140505073728.GA24502@t440s.lan>
-In-Reply-To: <20140505073728.GA24502@t440s.lan>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/3] Bluetooth: 6LoWPAN: Allow user to set the device role via sysfs
+Date: Mon,  5 May 2014 12:31:24 +0300
+Message-Id: <1399282285-32743-3-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan.
+This is temporary patch that will eventually disappear when
+the 6LoWPAN device services can be discovered automatically.
 
-On 05/05/14 09:37, Johan Hedberg wrote:
-> Hi Sejo,
->
-> First thing that comes to mind: have you passed --enable-experimental to
-> configure when building BlueZ, and have you passed -E to bluetoothd when
-> running it? At least the former is needed for the thermometer plugin
-> (about the latter I'm not completely sure).
->
-> Johan
-First, I'd like to thank you for your answer, it solved the problems I 
-was having.
-The thing is that now I can only run the tests when I log in as root. 
-Despite is not a big problem, I'd like to know if there is a way of 
-executing the tests without having to grant root permissions (I'm 
-worried about security issues on the system) Is it enough to add the 
-current user to the lp group? Or maybe I need to modify the policies 
-that are set in bluetooth.conf? (by the way, now I don't have a proper 
-bluetooth.conf file, so I'm not sure where are those policies set now)
-Finally, I'm still not able to run the proximity test. It points to the 
-same problem (the interface org.bluez.ProximityMonitor1 doesn't exist) 
-I'm not going to use this service, and since I haven't seen anything 
-related to the test in bluetooth.conf, I have assumed that is not 
-completely implemented, but still I'd like to help if some testing is 
-needed.
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 53 ++++++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_event.c        |  3 +++
+ 4 files changed, 58 insertions(+)
 
-Thank you again for your help.
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 4261a67..3060254 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -140,6 +140,7 @@ enum {
+ 	HCI_FAST_CONNECTABLE,
+ 	HCI_BREDR_ENABLED,
+ 	HCI_6LOWPAN_ENABLED,
++	HCI_6LOWPAN_ROLE_NODE,
+ 	HCI_LE_SCAN_INTERRUPTED,
+ };
+ 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d73f418..3cf9c45 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -510,6 +510,7 @@ enum {
+ 	HCI_CONN_POWER_SAVE,
+ 	HCI_CONN_REMOTE_OOB,
+ 	HCI_CONN_6LOWPAN,
++	HCI_CONN_6LOWPAN_ROLE_NODE,
+ };
+ 
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d31f144..b0558cf 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -914,6 +914,57 @@ static const struct file_operations lowpan_debugfs_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static ssize_t lowpan_role_read(struct file *file, char __user *user_buf,
++				size_t count, loff_t *ppos)
++{
++	struct hci_dev *hdev = file->private_data;
++	char buf[8];
++	int i;
++
++	if (test_bit(HCI_6LOWPAN_ROLE_NODE, &hdev->dev_flags)) {
++		strncpy(buf, "node", 4);
++		i = 4;
++	} else {
++		strncpy(buf, "router", 6);
++		i = 6;
++	}
++	buf[i] = '\n';
++	buf[i + 1] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, i + 1);
++}
++
++static ssize_t lowpan_role_write(struct file *fp,
++				 const char __user *user_buffer,
++				 size_t count, loff_t *position)
++{
++	struct hci_dev *hdev = fp->private_data;
++	bool node = false;
++	char buf[32];
++	size_t buf_size = min(count, (sizeof(buf)-1));
++
++	if (copy_from_user(buf, user_buffer, buf_size))
++		return -EFAULT;
++
++	buf[buf_size] = '\0';
++
++	if (buf[0] == 'n' || buf[0] == 'N')
++		node = true;
++
++	if (node == test_bit(HCI_6LOWPAN_ROLE_NODE, &hdev->dev_flags))
++		return -EALREADY;
++
++	change_bit(HCI_6LOWPAN_ROLE_NODE, &hdev->dev_flags);
++
++	return count;
++}
++
++static const struct file_operations lowpan_role_debugfs_fops = {
++	.open		= simple_open,
++	.read		= lowpan_role_read,
++	.write		= lowpan_role_write,
++	.llseek		= default_llseek,
++};
++
+ static int le_auto_conn_show(struct seq_file *sf, void *ptr)
+ {
+ 	struct hci_dev *hdev = sf->private;
+@@ -1826,6 +1877,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 		debugfs_create_u16("discov_interleaved_timeout", 0644,
+ 				   hdev->debugfs,
+ 				   &hdev->discov_interleaved_timeout);
++		debugfs_create_file("6lowpan_role", 0644, hdev->debugfs, hdev,
++				    &lowpan_role_debugfs_fops);
+ 	}
+ 
+ 	return 0;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index ca19fd4..8f54bf5 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3984,6 +3984,9 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (test_bit(HCI_6LOWPAN_ENABLED, &hdev->dev_flags))
+ 		set_bit(HCI_CONN_6LOWPAN, &conn->flags);
+ 
++	if (test_bit(HCI_6LOWPAN_ROLE_NODE, &hdev->dev_flags))
++		set_bit(HCI_CONN_6LOWPAN_ROLE_NODE, &conn->flags);
++
+ 	hci_conn_add_sysfs(conn);
+ 
+ 	hci_proto_connect_cfm(conn, ev->status);
+-- 
+1.8.3.1
+
