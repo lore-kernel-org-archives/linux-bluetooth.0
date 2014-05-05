@@ -1,49 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/3] Bluetooth LE 6LoWPAN using CoC
-Date: Mon,  5 May 2014 12:31:22 +0300
-Message-Id: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH 2/2] android/pts: Re-run GAP test suit
+Date: Mon,  5 May 2014 11:17:33 +0200
+Message-Id: <1399281453-24838-3-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1399281453-24838-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1399281453-24838-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ android/pts-gap.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-here is first version of BT LE 6LoWPAN functionality but using
-connection oriented channels instead of fixed channel one.
-
-At the moment, the initial configuration needs to be done manually.
-So in the slave device say:
-# echo node > /sys/kernel/debug/bluetooth/hci0/6lowpan_role
-# echo Y > /sys/kernel/debug/bluetooth/hci0/6lowpan
-# hciconfig hci0 leadv
-
-And in the master device say:
-# echo Y > /sys/kernel/debug/bluetooth/hci0/6lowpan
-# hcitool lecc <slave-addr>
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (3):
-  Bluetooth: Refactor l2cap_sock_sendmsg() to copy user buffer
-  Bluetooth: 6LoWPAN: Allow user to set the device role via sysfs
-  Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed
-    one
-
- include/net/bluetooth/hci.h      |   1 +
- include/net/bluetooth/hci_core.h |   1 +
- include/net/bluetooth/l2cap.h    |   3 +-
- net/bluetooth/6lowpan.c          | 470 ++++++++++++++++++++++++---------------
- net/bluetooth/6lowpan.h          |  19 +-
- net/bluetooth/hci_core.c         |  53 +++++
- net/bluetooth/hci_event.c        |   3 +
- net/bluetooth/l2cap_core.c       |  44 +++-
- net/bluetooth/l2cap_sock.c       |  25 ++-
- 9 files changed, 411 insertions(+), 208 deletions(-)
-
+diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+index 8be9a5a..cd5709a 100644
+--- a/android/pts-gap.txt
++++ b/android/pts-gap.txt
+@@ -1,7 +1,7 @@
+ PTS test results for GAP
+ 
+ PTS version: 5.1
+-Tested: 11-April-2014
++Tested: 29-April-2014
+ Android version: 4.4.2
+ 
+ Results:
+@@ -161,8 +161,8 @@ TC_DM_NCON_BV_01_C	N/A
+ TC_DM_CON_BV_01_C	N/A
+ TC_DM_NBON_BV_01_C	N/A
+ TC_DM_BON_BV_01_C	INC
+-TC_DM_GIN_BV_01_C	INC
+-TC_DM_LIN_BV_01_C	INC
++TC_DM_GIN_BV_01_C	PASS
++TC_DM_LIN_BV_01_C	PASS
+ TC_DM_NAD_BV_01_C	PASS	Start discovery from IUT
+ TC_DM_NAD_BV_02_C	PASS
+ TC_DM_LEP_BV_01_C	N/A
 -- 
-1.8.3.1
+1.8.5.3
 
