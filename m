@@ -1,44 +1,79 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; boundary="Apple-Mail=_9D16A3CC-39AA-4633-997D-3A9537E1F59C"; protocol="application/pgp-signature"; micalg=pgp-sha1
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: BLE Passive scan & Bonding quest (dbus vs mgmt-api vs plugins)
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <6FFA5235-4897-4AF9-AF0D-10258F2E056B@me.com>
-Date: Mon, 5 May 2014 18:40:07 -0700
+Subject: Re: Getting started with BLE device
+From: Rick Mann <rmann@latencyzero.com>
+In-Reply-To: <1399057367.24457.11.camel@SejoLaptop>
+Date: Mon, 5 May 2014 18:19:24 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <48778ECB-83A1-48BC-97B7-81020E098C20@holtmann.org>
-References: <6FFA5235-4897-4AF9-AF0D-10258F2E056B@me.com>
-To: d.eriksson@me.com
+Message-Id: <98A4D598-0499-42E8-B639-0A2A8AC458E8@latencyzero.com>
+References: <35E2DFE7-B463-4A15-8148-F7E30A201646@latencyzero.com> <1399057367.24457.11.camel@SejoLaptop>
+To: Sejo Ruiz <sejoruiz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
 
-> I'm on Kernel v3.13 & BlueZ 5.18 and been testing around to find the cleanest approach for a fully automatic discovery and headless pairing/bonding of BLE peripherals (in my case HOGP / HID).
+--Apple-Mail=_9D16A3CC-39AA-4633-997D-3A9537E1F59C
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;
+	charset=us-ascii
+
+I got a little farther. The following commands reveal something:
+
+root@linaro-alip:/home/rmann# rfkill block bluetooth
+root@linaro-alip:/home/rmann# rfkill unblock bluetooth
+root@linaro-alip:/home/rmann# hciattach -t 30 /dev/ttymxc2 texas 115200 flow
+Found a Texas Instruments' chip!
+Firmware file : /lib/firmware/TIInit_7.6.15.bts
+Loaded BTS script version 1
+texas: changing baud rate to 3000000, flow control to 1
+Device setup complete
+root@linaro-alip:/home/rmann# hcitool scan
+Scanning ...
+    80:56:F2:FF:FF:5B   GRETCHEN-THINK
+    9C:2A:70:86:00:25   MP_THINKPAD_6
+    3C:77:E6:EE:E9:9F   MP_ACCOUNTANT
+    7C:E9:D3:E6:68:4D   MP_THINKPAD_4
+    60:D8:19:B6:9B:B4   FORGE
+
+
+On May 2, 2014, at 12:02 , Sejo Ruiz <sejoruiz@gmail.com> wrote:
+
+> Hi Rick.
+> First of all, you should make sure that the device is recognized as a BT
+> device. Run hciconfig as sudo user to see if it returns something as
+> hci0. If you can see it, then you can do hciconfig hci0 up to set up the
+> interface and start playing. If not, then you could try to do lsusb and
+> see what devices are connected to the USB. If you cannot see your device
+> there, or something goes wrong, you can always try to check what is
+> going on by plugging the device off and on again and then type dmesg |
+> tail. Finally, make sure the bluetooth daemon is running. You can do
+> that by executing /etc/init.d/bluetoothd status (I'm not sure about this
+> last one)
+> NOTE: I suggest to execute all the commands with sudo.
 > 
-> Basically, today a "scan and pair (bond)" could today be done using either "bluetoothctl", "hcitool", "dbus/python-agents", "C plugins", or the "C Management API". (please correct me if I'm wrong here).
-> 
-> As we have many many options to achieve this, I'd like some guidance on how to re-use as much mechanisms that already exists in BlueZ and/or kernel/user-space, preferably involving as few building blocks as possible.
-> 
-> 
-> In short, I continuously need to run a passive scan for LE-devices only and bond to specific hid-devices based on suitable vendor info in the advertise data or the device information service.
-> 
-> I'm sharing the radio with a wifi using co-ex so "BT-classic" must be off and I assume active scan will eat too much air-time.
-> Once paired (or bonded as SIG and the IC-manuf. calls it), it should be a persistent and identifiable /dev/input device 
-> 
-> Any existing bluez or linux ways to do this I'd prefer to re-use, like utilising 'udev rules', bluetoothd patches or configs to optimise for LE-only and in general keep things light as I want to run the discovery/scan at all times. I'm ok with pure C or mix with shell and python, whatever works best and would be considered bluez future-proof.
 
-with mgmt version 1.4 starting from kernel 3.13 you can take a dual-mode controller and actually disable BR/EDR features. So for all intense and purposes it will look and behave like a LE only controller. Check btmgmt bredr command.
 
-Within bluetoothd we do not have support for forcefully turning a dual-mode controller into a single mode LE controller. You would need to add a config option for that. By default we will be a dual-mode controller and use dual-mode host operations.
+-- 
+Rick
 
-When you pair a HoG device using D-Bus APIs of bluetoothd, it will become bonded and we will auto-reconnect it. This currently uses active scanning to re-connect the HID device, but we are in the process of adding passive scanning + auto-connect feature to the kernel to optimize this.
 
-The initial discovery and pairing phase is not included here. That is what normally external programs like the UI are doing. So you would just need to write a program that behaves like the UI and discovers your device. The D-Bus APIs to do so are fully documented. You can do that in C or Python or any other language with D-Bus bindings.
 
-If you are very custom and not running bluetoothd, then you need to implement GATT + HoG by yourself and driver the mgmt API all by yourself. This is possible as well, but I only recommend that if you have a really specific custom use case. It is also a bit of work.
 
-Regards
+--Apple-Mail=_9D16A3CC-39AA-4633-997D-3A9537E1F59C
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP using GPGMail
 
-Marcel
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
 
+iEYEARECAAYFAlNoOJwACgkQBzBA/9aDmJugGwCgoRDWGzp48NB1ahRqaclFCKca
+WJoAoK3IPIucYkvpwAntSGHrBRIsmQZp
+=7hMy
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_9D16A3CC-39AA-4633-997D-3A9537E1F59C--
