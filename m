@@ -1,47 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1399382735.2316.3.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH 0/3] Bluetooth LE 6LoWPAN using CoC
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 06 May 2014 16:25:35 +0300
-In-Reply-To: <1536F5A0-B421-41DE-90FA-1BB55F95A4B0@holtmann.org>
-References: 
-	<1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
-	 <1536F5A0-B421-41DE-90FA-1BB55F95A4B0@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Subject: Re: [PATCH 1/4] android/gatt: Fix included service notification send
+Date: Tue, 06 May 2014 15:08:41 +0200
+Message-ID: <5304046.ElZuD7aAa9@uw000953>
+In-Reply-To: <1399370226-19126-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1399370226-19126-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Grzegorz,
 
-On ma, 2014-05-05 at 19:22 -0700, Marcel Holtmann wrote:
-> Hi Jukka,
+On Tuesday 06 of May 2014 11:57:03 Grzegorz Kolodziejczyk wrote:
+> In case of service not found there was read from invalid memory of a
+> primary service needed by send notification. Also there is no need to
+> additionaly check if included service is null outside notifiaction
+> function because it's already done in this function.
+> ---
+>  android/gatt.c | 50 ++++++++++++++++++--------------------------------
+>  1 file changed, 18 insertions(+), 32 deletions(-)
 > 
-> > here is first version of BT LE 6LoWPAN functionality but using
-> > connection oriented channels instead of fixed channel one.
-> > 
-> > At the moment, the initial configuration needs to be done manually.
-> > So in the slave device say:
-> > # echo node > /sys/kernel/debug/bluetooth/hci0/6lowpan_role
-> > # echo Y > /sys/kernel/debug/bluetooth/hci0/6lowpan
-> > # hciconfig hci0 leadv
-> > 
-> > And in the master device say:
-> > # echo Y > /sys/kernel/debug/bluetooth/hci0/6lowpan
-> > # hcitool lecc <slave-addr>
+> diff --git a/android/gatt.c b/android/gatt.c
+> index e768856..bbf899f 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -1600,7 +1600,7 @@ reply:
+>  			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
+>  }
+>  
+> -static void send_client_incl_service_notify(const struct service *prim,
+> +static void send_client_incl_service_notify(const struct element_id *srvc_id,
+>  						const struct service *incl,
+>  						int32_t conn_id,
+>  						int32_t status)
+> @@ -1612,7 +1612,7 @@ static void send_client_incl_service_notify(const struct service *prim,
+>  	ev.conn_id = conn_id;
+>  	ev.status = status;
+>  
+> -	element_id_to_hal_srvc_id(&prim->id, 1, &ev.srvc_id);
+> +	element_id_to_hal_srvc_id(srvc_id, 1, &ev.srvc_id);
+>  
+>  	if (incl)
+>  		element_id_to_hal_srvc_id(&incl->id, 0, &ev.incl_srvc_id);
+> @@ -1642,7 +1642,7 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
+>  	struct get_included_data *data = user_data;
+>  	struct app_connection *conn = data->conn;
+>  	struct service *service = data->prim;
+> -	struct service *incl;
+> +	struct service *incl = NULL;
+>  	int instance_id;
+>  
+>  	DBG("");
+> @@ -1695,15 +1695,9 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
+>  	 */
+>  	incl = queue_peek_head(service->included);
+>  
+> -	if (incl) {
+> -		send_client_incl_service_notify(service, incl, conn->id,
+> -								GATT_SUCCESS);
+> -		return;
+> -	}
+> -
+>  failed:
+> -	send_client_incl_service_notify(service, NULL, conn->id,
+> -								GATT_FAILURE);
+> +	send_client_incl_service_notify(&service->id, incl, conn->id,
+> +					incl ? GATT_SUCCESS : GATT_FAILURE);
+>  }
+>  
+>  static bool search_included_services(struct app_connection *connection,
+> @@ -1758,12 +1752,15 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
+>  	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
+>  	struct app_connection *conn;
+>  	struct service *prim_service;
+> -	struct service *incl_service;
+> +	struct service *incl_service = NULL;
+>  	struct element_id match_id;
+> +	struct element_id srvc_id;
+>  	uint8_t status;
+>  
+>  	DBG("");
+>  
+> +	hal_srvc_id_to_element_id(&cmd->srvc_id, &srvc_id);
+> +
+>  	if (len != sizeof(*cmd) +
+>  			(cmd->continuation ? sizeof(cmd->incl_srvc_id[0]) : 0)) {
+>  		error("Invalid get incl services size (%u bytes), terminating",
+> @@ -1784,7 +1781,10 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
+>  		else
+>  			status = HAL_STATUS_FAILED;
+>  
+> -		goto reply;
+> +		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> +				HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
+> +				status);
+> +		return;
+>  	}
+>  
+>  	/* Try to use cache here */
+> @@ -1797,31 +1797,17 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
+>  						INT_TO_PTR(inst_id));
+>  	}
+>  
+> -	/*
+> -	 * Note that Android framework expects failure notification
+> -	 * which is treat as the end of included services
+> -	 */
+> -	if (!incl_service)
+> -		send_client_incl_service_notify(prim_service, NULL,
+> -						conn->id, GATT_FAILURE);
+> -	else
+> -		send_client_incl_service_notify(prim_service, incl_service,
+> -						conn->id, GATT_SUCCESS);
+> -
+>  	status = HAL_STATUS_SUCCESS;
+>  
+>  reply:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> -					HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
+> -					status);
+> +			HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE, status);
+>  
+> -	/*
+> -	 * In case of error in handling request we need to send event with
+> -	 * Android framework is stupid and do not check status of response
+> +	/* In case of error in handling request we need to send event with
+> +	 * service id of cmd and gatt failure status.
+>  	 */
+> -	if (status)
+> -		send_client_incl_service_notify(prim_service, NULL,
+> -						conn->id, GATT_FAILURE);
+> +	send_client_incl_service_notify(&srvc_id, incl_service, cmd->conn_id,
+> +					incl_service ? GATT_SUCCESS : GATT_FAILURE);
+>  }
+>  
+>  static void send_client_char_notify(const struct characteristic *ch,
 > 
-> my current idea of providing an mgmt API for networking is to introduce HCI_CHANNEL_NETWORK and use a network specific mgmt API on that socket.
-> 
-> This is something to think about. We could extend it to BNEP/PAN as well where we handle the whole connection logic inside the kernel. That way you can easily enable/disable PAN or 6loWPAN. bluetoothd or even an external 6loWPAN daemon could deal with connection establishment and acceptance.
-> 
-> However more importantly this could be easily confined into bluetooth_network.ko at some point in the future and then automatically loaded via bt-chan-4 module aliases. Similar to how we load RFCOMM module via bt-proto-3 when accessing the socket.
-> 
-> Alternative we can create a mgmt subcommand API and then load modules via bt-mgmt-x type of handling once accessing subcommands.
 
-Is this something for the future or should I implement this in this
-patchset?
+Pushed (patches 2-4 squashed). Thanks.
 
-
-Cheers,
-Jukka
+-- 
+Best regards, 
+Szymon Janc
