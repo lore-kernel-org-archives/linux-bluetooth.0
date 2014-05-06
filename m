@@ -4,48 +4,89 @@ To: linux-bluetooth@vger.kernel.org
 Cc: Antonio Ospite <ao2@ao2.it>, Bastien Nocera <hadess@hadess.net>,
 	Szymon Janc <szymon.janc@gmail.com>,
 	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: [PATCH BlueZ 0/5] plugin/sixaxis: use the sysfs leds class
-Date: Tue,  6 May 2014 12:06:11 +0200
-Message-Id: <1399370776-5027-1-git-send-email-ao2@ao2.it>
+Subject: [PATCH BlueZ 2/5] plugins/sixaxis: factor out a set_leds_hidraw() function
+Date: Tue,  6 May 2014 12:06:13 +0200
+Message-Id: <1399370776-5027-3-git-send-email-ao2@ao2.it>
+In-Reply-To: <1399370776-5027-1-git-send-email-ao2@ao2.it>
+References: <1399370776-5027-1-git-send-email-ao2@ao2.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+This is in preparation for a set_leds_sysfs() function.
 
-on kernels >= 3.14 the hid-sony driver exposes leds class entries in
-sysfs for setting the Sixaxis LEDs, the patches in this set make BlueZ
-use this interface as the default one and fall-back to hidraw in case
-using sysfs fails (e.g. on older hid-sony versions).
+Also use TRUE as the return value of set_leds_hidraw() in the success
+case just to be more semantically nice; the return value is not used in
+setup_leds() anyway because the latter has to always return FALSE.
+---
+ plugins/sixaxis.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-Patch 1 is a cleanup, it's optional, feel free to reject it; the libudev
-version bump is needed for patch 5 tho.
-
-Patches 2,3 and 4 are refactorings in preparation of patch 5.
-
-Patch 5 adds the actual support for the sysfs mechanism.
-
-The changes have been tested with libudev-204 along with linux-3.13,
-linux 3.14 and linux-3.15-rc4, however some more testing with different
-libudev and kernel versions won't hurt :)
-
-Thanks,
-   Antonio
-
-Antonio Ospite (5):
-  plugins/sixaxis: simplify get_js_numbers()
-  plugins/sixaxis: factor out a set_leds_hidraw() function
-  plugins/sixaxis: factor out a calc_leds_bitmap() function
-  plugins/sixaxis: add a get_leds_data() function
-  plugins/sixaxis: add a set_leds_sysfs() function
-
- configure.ac      |   4 +-
- plugins/sixaxis.c | 256 ++++++++++++++++++++++++++++++++++++++++--------------
- 2 files changed, 193 insertions(+), 67 deletions(-)
-
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 9db14ec..61fd0b5 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -125,8 +125,7 @@ static int set_master_bdaddr(int fd, const bdaddr_t *bdaddr)
+ 	return ret;
+ }
+ 
+-static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+-							gpointer user_data)
++static gboolean set_leds_hidraw(int fd, int number)
+ {
+ 	/*
+ 	 * the total time the led is active (0xff means forever)
+@@ -147,14 +146,7 @@ static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+ 		0xff, 0x27, 0x10, 0x00, 0x32, /* LED_1 */
+ 		0x00, 0x00, 0x00, 0x00, 0x00,
+ 	};
+-	int number = GPOINTER_TO_INT(user_data);
+ 	int ret;
+-	int fd;
+-
+-	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+-		return FALSE;
+-
+-	DBG("number %d", number);
+ 
+ 	/* TODO we could support up to 10 (1 + 2 + 3 + 4) */
+ 	if (number > 7)
+@@ -167,11 +159,9 @@ static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+ 
+ 	leds_report[10] |= 0x01 << number;
+ 
+-	fd = g_io_channel_unix_get_fd(channel);
+-
+ 	ret = write(fd, leds_report, sizeof(leds_report));
+ 	if (ret == sizeof(leds_report))
+-		return FALSE;
++		return TRUE;
+ 
+ 	if (ret < 0)
+ 		error("sixaxis: failed to set LEDS (%s)", strerror(errno));
+@@ -181,6 +171,23 @@ static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+ 	return FALSE;
+ }
+ 
++static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
++							gpointer user_data)
++{
++	int number = GPOINTER_TO_INT(user_data);
++	int fd;
++
++	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
++		return FALSE;
++
++	DBG("number %d", number);
++
++	fd = g_io_channel_unix_get_fd(channel);
++	set_leds_hidraw(fd, number);
++
++	return FALSE;
++}
++
+ static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+ {
+ 	char device_addr[18], master_addr[18], adapter_addr[18];
 -- 
-Antonio Ospite
-http://ao2.it
+2.0.0.rc0
 
-A: Because it messes up the order in which people normally read text.
-   See http://en.wikipedia.org/wiki/Posting_style
-Q: Why is top-posting such a bad thing?
