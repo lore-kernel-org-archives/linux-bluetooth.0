@@ -1,67 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1399383225.2316.11.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH 2/3] Bluetooth: 6LoWPAN: Allow user to set the device
- role via sysfs
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Tue, 06 May 2014 16:33:45 +0300
-In-Reply-To: <6BAA298A-CBCB-4729-BD82-9B0E3AB476E9@holtmann.org>
-References: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
-	 <1399282285-32743-3-git-send-email-jukka.rissanen@linux.intel.com>
-	 <6BAA298A-CBCB-4729-BD82-9B0E3AB476E9@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH 00/10] bt_att initial implementation
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
+Date: Tue, 6 May 2014 06:31:34 -0700
+Cc: Arman Uguray <armansito@chromium.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <780A1AF5-538F-4239-A4E2-86B0BB2EDDB0@holtmann.org>
+References: <1399351563-25991-1-git-send-email-armansito@chromium.org> <CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Luiz,
 
-On ma, 2014-05-05 at 19:13 -0700, Marcel Holtmann wrote:
-> Hi Jukka,
+>> This patch set introduces "struct bt_att" which handles the transport logic for
+>> interactions over the Attribute Protocol. struct bt_att is meant to be
+>> connection-agnostic: It enables a new GATT/ATT stack based around src/shared/io,
+>> so that the library internals of how the connection is managed (glib vs
+>> mainloop) is not tied to the protocol implementation. bt_att will initially
+>> support the client-side protocol and eventually extended to support the server
+>> side.
+>> 
+>> Major changes introduced in this patch-set:
+>>  - src/shared/att.[h,cc], which introduces "struct bt_att", with initial
+>>    support for client-initiated requests and asynchronous response handling via
+>>    a callback.
+>>  - unit/test-att, which defines unit tests for request/response using a
+>>    socketpair.
+>>  - tools/btatt, which is a command-line tool for debugging the Attribute
+>>    Protocol.
+>> 
+>> The majority of the above are introduced in patches 1 through 3, which consist
+>> almost entirely of boilerplate taken from src/shared/mgmt.*, unit/test-mgmt, and
+>> tools/btmgmt.c.
+>> 
+>> The 9 patches introduced here are the initial portion of 20+ patches where each
+>> ATT operation is implemented in groups of 3 patches:
+>>  - 1 patch that implements the request/response or command in src/shared/att
+>>  - 1 patch that adds a unit test to unit/test-att
+>>  - 1 patch that adds a command for the request to tools/btatt
+>> 
+>> Arman Uguray (10):
+>>  src/shared/att: Introduce struct bt_att.
+>>  unit/test-att: Add unit tests for src/shared/att.
+>>  tools/btatt: Add command-line tool for ATT protocol testing.
+>>  tools/btatt: Add "exchange-mtu" command.
+>>  src/shared/att: Add "Find Information" request and response.
+>>  unit/test-att: Add unit test for "Find Information" request/response.
+>>  tools/btatt: Add "find-information" command.
+>>  src/shared/att: Add "Find By Type Value" request and response.
+>>  unit/test-att: Add unit test for "Find By Type Value"
+>>    request/response.
+>>  tools/btatt: Add "find-by-type-value" command.
+>> 
+>> Makefile.am      |  12 +-
+>> Makefile.tools   |  10 +-
+>> src/shared/att.c | 689 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> src/shared/att.h | 124 ++++++++++
+>> tools/btatt.c    | 626 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>> unit/test-att.c  | 473 ++++++++++++++++++++++++++++++++++++++
+>> 6 files changed, 1932 insertions(+), 2 deletions(-)
+>> create mode 100644 src/shared/att.c
+>> create mode 100644 src/shared/att.h
+>> create mode 100644 tools/btatt.c
+>> create mode 100644 unit/test-att.c
+>> 
+>> --
+>> 1.9.1.423.g4596e3a
 > 
-> > This is temporary patch that will eventually disappear when
-> > the 6LoWPAN device services can be discovered automatically.
-> > 
-> > Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> > ---
-> > include/net/bluetooth/hci.h      |  1 +
-> > include/net/bluetooth/hci_core.h |  1 +
-> > net/bluetooth/hci_core.c         | 53 ++++++++++++++++++++++++++++++++++++++++
-> > net/bluetooth/hci_event.c        |  3 +++
-> > 4 files changed, 58 insertions(+)
-> > 
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 4261a67..3060254 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -140,6 +140,7 @@ enum {
-> > 	HCI_FAST_CONNECTABLE,
-> > 	HCI_BREDR_ENABLED,
-> > 	HCI_6LOWPAN_ENABLED,
-> > +	HCI_6LOWPAN_ROLE_NODE,
-> > 	HCI_LE_SCAN_INTERRUPTED,
-> > };
-> > 
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index d73f418..3cf9c45 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -510,6 +510,7 @@ enum {
-> > 	HCI_CONN_POWER_SAVE,
-> > 	HCI_CONN_REMOTE_OOB,
-> > 	HCI_CONN_6LOWPAN,
-> > +	HCI_CONN_6LOWPAN_ROLE_NODE,
-> > };
-> 
-> I really want this confined to bluetooth_6lowpan.ko module. So the all the HCI flags need to go away. Especially with this being on connection oriented channels now, there is really no point in having this in the HCI layer. This becomes an high layer L2CAP protocol problem.
+> Apparently you have ignored my comments regarding the API, it is
+> probably not the best thing to base everything on mgmt API since that
+> is a internal protocol which does not need encoding as everything is
+> passed in host order, also unlike mgmt you have GATT on top o ATT so
+> it is beneficial to use iovec in the API.
 
-Ok, I was hoping we first get the stuff in, and then next patches would
-create a separate 6lowpan module. But I can prepare a separate module
-creation into this patchset also.
+what now? mgmt is little-endian and not host order. I do not design host order protocols ;)
 
+Actually ATT and mgmt are pretty much similar. ATT is one transaction at a time. It is send a request, get response. If that transaction model is failing, you disconnect.
 
-Cheers,
-Jukka
+I am pretty much in favor of just being plain simple when it comes to pure ATT. The GATT layer can make semantic sense out of the ATT PDUs. For all intense and purposes ATT is just some PDUs that are exchanged.
 
+Regards
+
+Marcel
 
