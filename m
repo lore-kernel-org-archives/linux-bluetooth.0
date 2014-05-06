@@ -1,135 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/gatt: Fix included service notification send
-Date: Tue,  6 May 2014 11:57:03 +0200
-Message-Id: <1399370226-19126-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1399351563-25991-1-git-send-email-armansito@chromium.org>
+References: <1399351563-25991-1-git-send-email-armansito@chromium.org>
+Date: Tue, 6 May 2014 11:29:38 +0300
+Message-ID: <CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
+Subject: Re: [PATCH 00/10] bt_att initial implementation
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-In case of service not found there was read from invalid memory of a
-primary service needed by send notification. Also there is no need to
-additionaly check if included service is null outside notifiaction
-function because it's already done in this function.
----
- android/gatt.c | 50 ++++++++++++++++++--------------------------------
- 1 file changed, 18 insertions(+), 32 deletions(-)
+Hi Arman,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index e768856..bbf899f 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1600,7 +1600,7 @@ reply:
- 			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
- }
- 
--static void send_client_incl_service_notify(const struct service *prim,
-+static void send_client_incl_service_notify(const struct element_id *srvc_id,
- 						const struct service *incl,
- 						int32_t conn_id,
- 						int32_t status)
-@@ -1612,7 +1612,7 @@ static void send_client_incl_service_notify(const struct service *prim,
- 	ev.conn_id = conn_id;
- 	ev.status = status;
- 
--	element_id_to_hal_srvc_id(&prim->id, 1, &ev.srvc_id);
-+	element_id_to_hal_srvc_id(srvc_id, 1, &ev.srvc_id);
- 
- 	if (incl)
- 		element_id_to_hal_srvc_id(&incl->id, 0, &ev.incl_srvc_id);
-@@ -1642,7 +1642,7 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
- 	struct get_included_data *data = user_data;
- 	struct app_connection *conn = data->conn;
- 	struct service *service = data->prim;
--	struct service *incl;
-+	struct service *incl = NULL;
- 	int instance_id;
- 
- 	DBG("");
-@@ -1695,15 +1695,9 @@ static void get_included_cb(uint8_t status, GSList *included, void *user_data)
- 	 */
- 	incl = queue_peek_head(service->included);
- 
--	if (incl) {
--		send_client_incl_service_notify(service, incl, conn->id,
--								GATT_SUCCESS);
--		return;
--	}
--
- failed:
--	send_client_incl_service_notify(service, NULL, conn->id,
--								GATT_FAILURE);
-+	send_client_incl_service_notify(&service->id, incl, conn->id,
-+					incl ? GATT_SUCCESS : GATT_FAILURE);
- }
- 
- static bool search_included_services(struct app_connection *connection,
-@@ -1758,12 +1752,15 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
- 	const struct hal_cmd_gatt_client_get_included_service *cmd = buf;
- 	struct app_connection *conn;
- 	struct service *prim_service;
--	struct service *incl_service;
-+	struct service *incl_service = NULL;
- 	struct element_id match_id;
-+	struct element_id srvc_id;
- 	uint8_t status;
- 
- 	DBG("");
- 
-+	hal_srvc_id_to_element_id(&cmd->srvc_id, &srvc_id);
-+
- 	if (len != sizeof(*cmd) +
- 			(cmd->continuation ? sizeof(cmd->incl_srvc_id[0]) : 0)) {
- 		error("Invalid get incl services size (%u bytes), terminating",
-@@ -1784,7 +1781,10 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
- 		else
- 			status = HAL_STATUS_FAILED;
- 
--		goto reply;
-+		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
-+				HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
-+				status);
-+		return;
- 	}
- 
- 	/* Try to use cache here */
-@@ -1797,31 +1797,17 @@ static void handle_client_get_included_service(const void *buf, uint16_t len)
- 						INT_TO_PTR(inst_id));
- 	}
- 
--	/*
--	 * Note that Android framework expects failure notification
--	 * which is treat as the end of included services
--	 */
--	if (!incl_service)
--		send_client_incl_service_notify(prim_service, NULL,
--						conn->id, GATT_FAILURE);
--	else
--		send_client_incl_service_notify(prim_service, incl_service,
--						conn->id, GATT_SUCCESS);
--
- 	status = HAL_STATUS_SUCCESS;
- 
- reply:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--					HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE,
--					status);
-+			HAL_OP_GATT_CLIENT_GET_INCLUDED_SERVICE, status);
- 
--	/*
--	 * In case of error in handling request we need to send event with
--	 * Android framework is stupid and do not check status of response
-+	/* In case of error in handling request we need to send event with
-+	 * service id of cmd and gatt failure status.
- 	 */
--	if (status)
--		send_client_incl_service_notify(prim_service, NULL,
--						conn->id, GATT_FAILURE);
-+	send_client_incl_service_notify(&srvc_id, incl_service, cmd->conn_id,
-+					incl_service ? GATT_SUCCESS : GATT_FAILURE);
- }
- 
- static void send_client_char_notify(const struct characteristic *ch,
--- 
-1.9.2
+On Tue, May 6, 2014 at 7:45 AM, Arman Uguray <armansito@chromium.org> wrote:
+> This patch set introduces "struct bt_att" which handles the transport logic for
+> interactions over the Attribute Protocol. struct bt_att is meant to be
+> connection-agnostic: It enables a new GATT/ATT stack based around src/shared/io,
+> so that the library internals of how the connection is managed (glib vs
+> mainloop) is not tied to the protocol implementation. bt_att will initially
+> support the client-side protocol and eventually extended to support the server
+> side.
+>
+> Major changes introduced in this patch-set:
+>   - src/shared/att.[h,cc], which introduces "struct bt_att", with initial
+>     support for client-initiated requests and asynchronous response handling via
+>     a callback.
+>   - unit/test-att, which defines unit tests for request/response using a
+>     socketpair.
+>   - tools/btatt, which is a command-line tool for debugging the Attribute
+>     Protocol.
+>
+> The majority of the above are introduced in patches 1 through 3, which consist
+> almost entirely of boilerplate taken from src/shared/mgmt.*, unit/test-mgmt, and
+> tools/btmgmt.c.
+>
+> The 9 patches introduced here are the initial portion of 20+ patches where each
+> ATT operation is implemented in groups of 3 patches:
+>   - 1 patch that implements the request/response or command in src/shared/att
+>   - 1 patch that adds a unit test to unit/test-att
+>   - 1 patch that adds a command for the request to tools/btatt
+>
+> Arman Uguray (10):
+>   src/shared/att: Introduce struct bt_att.
+>   unit/test-att: Add unit tests for src/shared/att.
+>   tools/btatt: Add command-line tool for ATT protocol testing.
+>   tools/btatt: Add "exchange-mtu" command.
+>   src/shared/att: Add "Find Information" request and response.
+>   unit/test-att: Add unit test for "Find Information" request/response.
+>   tools/btatt: Add "find-information" command.
+>   src/shared/att: Add "Find By Type Value" request and response.
+>   unit/test-att: Add unit test for "Find By Type Value"
+>     request/response.
+>   tools/btatt: Add "find-by-type-value" command.
+>
+>  Makefile.am      |  12 +-
+>  Makefile.tools   |  10 +-
+>  src/shared/att.c | 689 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/shared/att.h | 124 ++++++++++
+>  tools/btatt.c    | 626 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>  unit/test-att.c  | 473 ++++++++++++++++++++++++++++++++++++++
+>  6 files changed, 1932 insertions(+), 2 deletions(-)
+>  create mode 100644 src/shared/att.c
+>  create mode 100644 src/shared/att.h
+>  create mode 100644 tools/btatt.c
+>  create mode 100644 unit/test-att.c
+>
+> --
+> 1.9.1.423.g4596e3a
 
+Apparently you have ignored my comments regarding the API, it is
+probably not the best thing to base everything on mgmt API since that
+is a internal protocol which does not need encoding as everything is
+passed in host order, also unlike mgmt you have GATT on top o ATT so
+it is beneficial to use iovec in the API.
+
+Regarding unit tests, I think you should take a look at test-av*, and
+there exists a test specification for ATT/GATT so we should start with
+it since is what PTS uses for qualification:
+https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=229871
+
+You can use the name and description of the unit test following the
+test specification:
+
+/TP/GAC/CL/BV-01-C: Verify that a Generic Attribute Profile client can
+generate an Exchange MTU Request command  to configure ATT_MTU over
+LE.
