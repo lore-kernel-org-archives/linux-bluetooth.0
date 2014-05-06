@@ -1,68 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rick Mann <rmann@latencyzero.com>
-Content-Type: multipart/signed; boundary="Apple-Mail=_836AFB03-18EA-4BCB-8BD7-F4095E16175A"; protocol="application/pgp-signature"; micalg=pgp-sha1
-Subject: Problems enabling GATT
-Message-Id: <B45316ED-3A52-4411-B5B6-4C9BE9E8116D@latencyzero.com>
-Date: Tue, 6 May 2014 14:05:34 -0700
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] shared/gatt: Check if handles counter is not wrapped
+Date: Tue,  6 May 2014 16:27:23 +0200
+Message-Id: <1399386443-25537-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Make sure that handles are fitting in UINT16_MAX range before adding
+service to database.
+---
+ src/shared/gatt-db.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---Apple-Mail=_836AFB03-18EA-4BCB-8BD7-F4095E16175A
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=windows-1252
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 6a15a4c..ebfd586 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -162,7 +162,7 @@ uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
+ 	uint8_t value[16];
+ 	uint16_t len;
+ 
+-	if (num_handles < 1)
++	if (num_handles < 1 || (num_handles + db->next_handle) > UINT16_MAX)
+ 		return 0;
+ 
+ 	service = new0(struct gatt_db_service, 1);
+-- 
+1.9.1
 
-BlueZ 4.101
-Ubuntu 13.09
-
-If I modify /etc/bluetooth/main.conf and change EnableGatt to true, then =
-run bluetoothd, I get
-
-=95 bluetoothd[1170]: plugins/dbusoob.c:dbusoob_init() Setup dbusoob =
-plugin
-=95 bluetoothd[1170]: Not enough free handles to register service
-
-I'm also seeing
-
-=95 bluetoothd[1170]: src/main.c:parse_config() Key file does not have =
-key 'DeviceID'
-
-In the end, I need to create a Bluetooth peripheral that advertises a =
-set of services and a number of characteristics.
-
-You can see the full output here: http://pastebin.com/M5vAh8x3
-
-Is there something else I need to do to enable BLE? I'm also trying to =
-add
-
-EnableLE =3D true
-AttributeServer =3D true
-
-But they seem to have no effect.
-
---=20
-Rick
-
-
-
-
---Apple-Mail=_836AFB03-18EA-4BCB-8BD7-F4095E16175A
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iEYEARECAAYFAlNpTp4ACgkQBzBA/9aDmJsFiwCfd+DBNtyCRf84INRg0T1O+ptG
-o+4AnRL7in9R8AqeoOC/EbvzeDPLNXzJ
-=/7eg
------END PGP SIGNATURE-----
-
---Apple-Mail=_836AFB03-18EA-4BCB-8BD7-F4095E16175A--
