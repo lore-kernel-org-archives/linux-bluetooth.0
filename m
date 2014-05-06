@@ -1,89 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1399351563-25991-1-git-send-email-armansito@chromium.org>
-References: <1399351563-25991-1-git-send-email-armansito@chromium.org>
-Date: Tue, 6 May 2014 11:29:38 +0300
-Message-ID: <CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
-Subject: Re: [PATCH 00/10] bt_att initial implementation
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: 
+References: 
+Subject: Handsfree and A2DP connection failed 
+From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
+Message-ID: <OF8084FB93.8A83D1D7-ON65257CD0.0029CC3E-65257CD0.0029CC41@tcs.com>
+Date: Tue, 6 May 2014 13:06:32 +0530
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi,
+ 
+I am new to this group and new to using Bluez stack.
+ 
+Manually, I want to install Bluez to my Ubuntu machine.
+I am using Ubuntu-12.04 in my PC.
+ 
+I have downloaded Bluez-4.98 and Bluez-4.101 and other higher versions.
+When , I manually Installed Bluez (either 4.98 or 4.101) to my machine, I always find out that A2DP or Handsfree connection never succeed.
 
-On Tue, May 6, 2014 at 7:45 AM, Arman Uguray <armansito@chromium.org> wrote:
-> This patch set introduces "struct bt_att" which handles the transport logic for
-> interactions over the Attribute Protocol. struct bt_att is meant to be
-> connection-agnostic: It enables a new GATT/ATT stack based around src/shared/io,
-> so that the library internals of how the connection is managed (glib vs
-> mainloop) is not tied to the protocol implementation. bt_att will initially
-> support the client-side protocol and eventually extended to support the server
-> side.
->
-> Major changes introduced in this patch-set:
->   - src/shared/att.[h,cc], which introduces "struct bt_att", with initial
->     support for client-initiated requests and asynchronous response handling via
->     a callback.
->   - unit/test-att, which defines unit tests for request/response using a
->     socketpair.
->   - tools/btatt, which is a command-line tool for debugging the Attribute
->     Protocol.
->
-> The majority of the above are introduced in patches 1 through 3, which consist
-> almost entirely of boilerplate taken from src/shared/mgmt.*, unit/test-mgmt, and
-> tools/btmgmt.c.
->
-> The 9 patches introduced here are the initial portion of 20+ patches where each
-> ATT operation is implemented in groups of 3 patches:
->   - 1 patch that implements the request/response or command in src/shared/att
->   - 1 patch that adds a unit test to unit/test-att
->   - 1 patch that adds a command for the request to tools/btatt
->
-> Arman Uguray (10):
->   src/shared/att: Introduce struct bt_att.
->   unit/test-att: Add unit tests for src/shared/att.
->   tools/btatt: Add command-line tool for ATT protocol testing.
->   tools/btatt: Add "exchange-mtu" command.
->   src/shared/att: Add "Find Information" request and response.
->   unit/test-att: Add unit test for "Find Information" request/response.
->   tools/btatt: Add "find-information" command.
->   src/shared/att: Add "Find By Type Value" request and response.
->   unit/test-att: Add unit test for "Find By Type Value"
->     request/response.
->   tools/btatt: Add "find-by-type-value" command.
->
->  Makefile.am      |  12 +-
->  Makefile.tools   |  10 +-
->  src/shared/att.c | 689 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->  src/shared/att.h | 124 ++++++++++
->  tools/btatt.c    | 626 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  unit/test-att.c  | 473 ++++++++++++++++++++++++++++++++++++++
->  6 files changed, 1932 insertions(+), 2 deletions(-)
->  create mode 100644 src/shared/att.c
->  create mode 100644 src/shared/att.h
->  create mode 100644 tools/btatt.c
->  create mode 100644 unit/test-att.c
->
-> --
-> 1.9.1.423.g4596e3a
+Same behavior observed when I cross-compile and copied the libraries on iMX-6Q boards too.
 
-Apparently you have ignored my comments regarding the API, it is
-probably not the best thing to base everything on mgmt API since that
-is a internal protocol which does not need encoding as everything is
-passed in host order, also unlike mgmt you have GATT on top o ATT so
-it is beneficial to use iovec in the API.
+Can anyone help me, how to solve this Issue.
+ 
+Here is the process that I have followed to install Bluez.
+ 
+1) Configure.
+2) Make (compile the code)
+3) Run make install .
+ 
+4) From /usr/local , I have copied the binaries and libraries to the corresponding folders.
+ 
+Please help me and correct me, If I missed any steps.
+ 
+Thanks & Regards,
+Vinod.
+=====-----=====-----=====
+Notice: The information contained in this e-mail
+message and/or attachments to it may contain 
+confidential or privileged information. If you are 
+not the intended recipient, any dissemination, use, 
+review, distribution, printing or copying of the 
+information contained in this e-mail message 
+and/or attachments to it are strictly prohibited. If 
+you have received this communication in error, 
+please notify us by reply e-mail or telephone and 
+immediately and permanently delete the message 
+and any attachments. Thank you
 
-Regarding unit tests, I think you should take a look at test-av*, and
-there exists a test specification for ATT/GATT so we should start with
-it since is what PTS uses for qualification:
-https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=229871
 
-You can use the name and description of the unit test following the
-test specification:
 
-/TP/GAC/CL/BV-01-C: Verify that a Generic Attribute Profile client can
-generate an Exchange MTU Request command  to configure ATT_MTU over
-LE.
