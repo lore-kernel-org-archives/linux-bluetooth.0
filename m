@@ -1,88 +1,148 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 00/10] bt_att initial implementation
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
-Date: Tue, 6 May 2014 06:31:34 -0700
-Cc: Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <780A1AF5-538F-4239-A4E2-86B0BB2EDDB0@holtmann.org>
-References: <1399351563-25991-1-git-send-email-armansito@chromium.org> <CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1399383094.2316.9.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH 1/3] Bluetooth: Refactor l2cap_sock_sendmsg() to copy
+ user buffer
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Tue, 06 May 2014 16:31:34 +0300
+In-Reply-To: <EF0AC955-D8AD-437C-829A-7B3D938948CC@holtmann.org>
+References: 
+	<1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
+	 <1399282285-32743-2-git-send-email-jukka.rissanen@linux.intel.com>
+	 <EF0AC955-D8AD-437C-829A-7B3D938948CC@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
->> This patch set introduces "struct bt_att" which handles the transport logic for
->> interactions over the Attribute Protocol. struct bt_att is meant to be
->> connection-agnostic: It enables a new GATT/ATT stack based around src/shared/io,
->> so that the library internals of how the connection is managed (glib vs
->> mainloop) is not tied to the protocol implementation. bt_att will initially
->> support the client-side protocol and eventually extended to support the server
->> side.
->> 
->> Major changes introduced in this patch-set:
->>  - src/shared/att.[h,cc], which introduces "struct bt_att", with initial
->>    support for client-initiated requests and asynchronous response handling via
->>    a callback.
->>  - unit/test-att, which defines unit tests for request/response using a
->>    socketpair.
->>  - tools/btatt, which is a command-line tool for debugging the Attribute
->>    Protocol.
->> 
->> The majority of the above are introduced in patches 1 through 3, which consist
->> almost entirely of boilerplate taken from src/shared/mgmt.*, unit/test-mgmt, and
->> tools/btmgmt.c.
->> 
->> The 9 patches introduced here are the initial portion of 20+ patches where each
->> ATT operation is implemented in groups of 3 patches:
->>  - 1 patch that implements the request/response or command in src/shared/att
->>  - 1 patch that adds a unit test to unit/test-att
->>  - 1 patch that adds a command for the request to tools/btatt
->> 
->> Arman Uguray (10):
->>  src/shared/att: Introduce struct bt_att.
->>  unit/test-att: Add unit tests for src/shared/att.
->>  tools/btatt: Add command-line tool for ATT protocol testing.
->>  tools/btatt: Add "exchange-mtu" command.
->>  src/shared/att: Add "Find Information" request and response.
->>  unit/test-att: Add unit test for "Find Information" request/response.
->>  tools/btatt: Add "find-information" command.
->>  src/shared/att: Add "Find By Type Value" request and response.
->>  unit/test-att: Add unit test for "Find By Type Value"
->>    request/response.
->>  tools/btatt: Add "find-by-type-value" command.
->> 
->> Makefile.am      |  12 +-
->> Makefile.tools   |  10 +-
->> src/shared/att.c | 689 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
->> src/shared/att.h | 124 ++++++++++
->> tools/btatt.c    | 626 ++++++++++++++++++++++++++++++++++++++++++++++++++
->> unit/test-att.c  | 473 ++++++++++++++++++++++++++++++++++++++
->> 6 files changed, 1932 insertions(+), 2 deletions(-)
->> create mode 100644 src/shared/att.c
->> create mode 100644 src/shared/att.h
->> create mode 100644 tools/btatt.c
->> create mode 100644 unit/test-att.c
->> 
->> --
->> 1.9.1.423.g4596e3a
+
+On ma, 2014-05-05 at 18:49 -0700, Marcel Holtmann wrote:
+> Hi Jukka,
 > 
-> Apparently you have ignored my comments regarding the API, it is
-> probably not the best thing to base everything on mgmt API since that
-> is a internal protocol which does not need encoding as everything is
-> passed in host order, also unlike mgmt you have GATT on top o ATT so
-> it is beneficial to use iovec in the API.
+> > The l2cap_chan_send() is changed to use kernel memory directly,
+> > so this function must read the user buffer before sending the
+> > message.
+> > 
+> > The change is done as the 6LoWPAN also uses l2cap_chan_send()
+> > and in order to minimize the amount of code changes, we must
+> > copy the user buffer in sock handling code.
+> 
+> is this really the best approach. What are other subsystems doing?
 
-what now? mgmt is little-endian and not host order. I do not design host order protocols ;)
+Johan suggested this approach and I took it :)
 
-Actually ATT and mgmt are pretty much similar. ATT is one transaction at a time. It is send a request, get response. If that transaction model is failing, you disconnect.
 
-I am pretty much in favor of just being plain simple when it comes to pure ATT. The GATT layer can make semantic sense out of the ATT PDUs. For all intense and purposes ATT is just some PDUs that are exchanged.
+> 
+> > Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> > ---
+> > net/bluetooth/l2cap_core.c | 25 +++++++++++++++++++++----
+> > net/bluetooth/l2cap_sock.c | 25 ++++++++++++++++++++++++-
+> > 2 files changed, 45 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> > index a1e5bb7..528b38a 100644
+> > --- a/net/bluetooth/l2cap_core.c
+> > +++ b/net/bluetooth/l2cap_core.c
+> > @@ -2098,6 +2098,24 @@ static void l2cap_send_ack(struct l2cap_chan *chan)
+> > 	}
+> > }
+> > 
+> > +static inline void memcpy_fromiovec_kernel(void *kdata, struct iovec *iov,
+> > +					   int len)
+> > +{
+> > +	while (len > 0) {
+> > +		if (iov->iov_len) {
+> > +			int copy = min_t(unsigned int, len, iov->iov_len);
+> > +
+> > +			memcpy(kdata, iov->iov_base, copy);
+> > +
+> > +			len -= copy;
+> > +			kdata += copy;
+> > +			iov->iov_base += copy;
+> > +			iov->iov_len -= copy;
+> > +		}
+> > +		iov++;
+> > +	}
+> > +}
+> 
+> I am a bit amazed that there are no existing helper functions for this. Should we add this to lib/iovec.c? At least lets check what the upstream guys think.
 
-Regards
+Did a quick search and did not find similar helper, I might have missed
+it thou.
 
-Marcel
+> 
+> > +
+> > static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> > 					 struct msghdr *msg, int len,
+> > 					 int count, struct sk_buff *skb)
+> > @@ -2106,8 +2124,7 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> > 	struct sk_buff **frag;
+> > 	int sent = 0;
+> > 
+> > -	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
+> > -		return -EFAULT;
+> > +	memcpy_fromiovec_kernel(skb_put(skb, count), msg->msg_iov, count);
+> > 
+> > 	sent += count;
+> > 	len  -= count;
+> > @@ -2126,8 +2143,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+> > 
+> > 		*frag = tmp;
+> > 
+> > -		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
+> > -			return -EFAULT;
+> > +		memcpy_fromiovec_kernel(skb_put(*frag, count), msg->msg_iov,
+> > +					count);
+> > 
+> > 		(*frag)->priority = skb->priority;
+> > 
+> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> > index f59e00c..bbee8dc 100644
+> > --- a/net/bluetooth/l2cap_sock.c
+> > +++ b/net/bluetooth/l2cap_sock.c
+> > @@ -948,6 +948,9 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+> > {
+> > 	struct sock *sk = sock->sk;
+> > 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+> > +	struct msghdr kernel_msg;
+> > +	struct kvec iv;
+> > +	void *buf;
+> > 	int err;
+> > 
+> > 	BT_DBG("sock %p, sk %p", sock, sk);
+> > @@ -968,10 +971,30 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+> > 	if (err)
+> > 		return err;
+> > 
+> > +	buf = kmalloc(len, GFP_KERNEL);
+> > +	if (!buf)
+> > +		return -ENOMEM;
+> > +
+> > +	if (memcpy_fromiovec(buf, msg->msg_iov, len)) {
+> > +		err = -EFAULT;
+> > +		goto done;
+> > +	}
+> > +
+> > +	iv.iov_base = buf;
+> > +	iv.iov_len = len;
+> > +
+> > +	memset(&kernel_msg, 0, sizeof(kernel_msg));
+> > +
+> > +	kernel_msg.msg_iov = (struct iovec *) &iv;
+> > +	kernel_msg.msg_iovlen = 1;
+> > +	kernel_msg.msg_flags = msg->msg_flags;
+> > +
+> > 	l2cap_chan_lock(chan);
+> > -	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+> > +	err = l2cap_chan_send(chan, &kernel_msg, len, sk->sk_priority);
+> 
+> If we move this here. Why are we keeping input variable as an IOV? Will the kernel internal code ever use or require an IOV. We could just make l2cap_chan_send flat with a single buffer.
 
+I can certainly refactor l2cap_chan_send() further, it is only called
+from two places in current code (a2mp.c and l2cap_sock.c).
+
+
+Cheers,
+Jukka
