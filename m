@@ -1,46 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 0/3] Bluetooth LE 6LoWPAN using CoC
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1399382735.2316.3.camel@jrissane-mobl.ger.corp.intel.com>
-Date: Tue, 6 May 2014 06:45:50 -0700
+Message-ID: <1399383225.2316.11.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH 2/3] Bluetooth: 6LoWPAN: Allow user to set the device
+ role via sysfs
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D5C53048-F260-4521-94D5-42B6A9C26ADA@holtmann.org>
-References: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com> <1536F5A0-B421-41DE-90FA-1BB55F95A4B0@holtmann.org> <1399382735.2316.3.camel@jrissane-mobl.ger.corp.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Date: Tue, 06 May 2014 16:33:45 +0300
+In-Reply-To: <6BAA298A-CBCB-4729-BD82-9B0E3AB476E9@holtmann.org>
+References: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com>
+	 <1399282285-32743-3-git-send-email-jukka.rissanen@linux.intel.com>
+	 <6BAA298A-CBCB-4729-BD82-9B0E3AB476E9@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi Marcel,
 
->>> here is first version of BT LE 6LoWPAN functionality but using
->>> connection oriented channels instead of fixed channel one.
->>> 
->>> At the moment, the initial configuration needs to be done manually.
->>> So in the slave device say:
->>> # echo node > /sys/kernel/debug/bluetooth/hci0/6lowpan_role
->>> # echo Y > /sys/kernel/debug/bluetooth/hci0/6lowpan
->>> # hciconfig hci0 leadv
->>> 
->>> And in the master device say:
->>> # echo Y > /sys/kernel/debug/bluetooth/hci0/6lowpan
->>> # hcitool lecc <slave-addr>
->> 
->> my current idea of providing an mgmt API for networking is to introduce HCI_CHANNEL_NETWORK and use a network specific mgmt API on that socket.
->> 
->> This is something to think about. We could extend it to BNEP/PAN as well where we handle the whole connection logic inside the kernel. That way you can easily enable/disable PAN or 6loWPAN. bluetoothd or even an external 6loWPAN daemon could deal with connection establishment and acceptance.
->> 
->> However more importantly this could be easily confined into bluetooth_network.ko at some point in the future and then automatically loaded via bt-chan-4 module aliases. Similar to how we load RFCOMM module via bt-proto-3 when accessing the socket.
->> 
->> Alternative we can create a mgmt subcommand API and then load modules via bt-mgmt-x type of handling once accessing subcommands.
+On ma, 2014-05-05 at 19:13 -0700, Marcel Holtmann wrote:
+> Hi Jukka,
 > 
-> Is this something for the future or should I implement this in this
-> patchset?
+> > This is temporary patch that will eventually disappear when
+> > the 6LoWPAN device services can be discovered automatically.
+> > 
+> > Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+> > ---
+> > include/net/bluetooth/hci.h      |  1 +
+> > include/net/bluetooth/hci_core.h |  1 +
+> > net/bluetooth/hci_core.c         | 53 ++++++++++++++++++++++++++++++++++++++++
+> > net/bluetooth/hci_event.c        |  3 +++
+> > 4 files changed, 58 insertions(+)
+> > 
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 4261a67..3060254 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -140,6 +140,7 @@ enum {
+> > 	HCI_FAST_CONNECTABLE,
+> > 	HCI_BREDR_ENABLED,
+> > 	HCI_6LOWPAN_ENABLED,
+> > +	HCI_6LOWPAN_ROLE_NODE,
+> > 	HCI_LE_SCAN_INTERRUPTED,
+> > };
+> > 
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> > index d73f418..3cf9c45 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -510,6 +510,7 @@ enum {
+> > 	HCI_CONN_POWER_SAVE,
+> > 	HCI_CONN_REMOTE_OOB,
+> > 	HCI_CONN_6LOWPAN,
+> > +	HCI_CONN_6LOWPAN_ROLE_NODE,
+> > };
+> 
+> I really want this confined to bluetooth_6lowpan.ko module. So the all the HCI flags need to go away. Especially with this being on connection oriented channels now, there is really no point in having this in the HCI layer. This becomes an high layer L2CAP protocol problem.
 
-start with a debugfs API and having 6loWPAN support separated in its own module. The own module part is really the important thing. We want to keep this out of the core.
+Ok, I was hoping we first get the stuff in, and then next patches would
+create a separate 6lowpan module. But I can prepare a separate module
+creation into this patchset also.
 
-Regards
 
-Marcel
+Cheers,
+Jukka
+
 
