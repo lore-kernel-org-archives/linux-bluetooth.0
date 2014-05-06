@@ -1,129 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 1/3] Bluetooth: Refactor l2cap_sock_sendmsg() to copy user buffer
+Subject: Re: BLE Passive scan & Bonding quest (dbus vs mgmt-api vs plugins)
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1399282285-32743-2-git-send-email-jukka.rissanen@linux.intel.com>
-Date: Mon, 5 May 2014 18:49:30 -0700
+In-Reply-To: <6FFA5235-4897-4AF9-AF0D-10258F2E056B@me.com>
+Date: Mon, 5 May 2014 18:40:07 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <EF0AC955-D8AD-437C-829A-7B3D938948CC@holtmann.org>
-References: <1399282285-32743-1-git-send-email-jukka.rissanen@linux.intel.com> <1399282285-32743-2-git-send-email-jukka.rissanen@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Message-Id: <48778ECB-83A1-48BC-97B7-81020E098C20@holtmann.org>
+References: <6FFA5235-4897-4AF9-AF0D-10258F2E056B@me.com>
+To: d.eriksson@me.com
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi David,
 
-> The l2cap_chan_send() is changed to use kernel memory directly,
-> so this function must read the user buffer before sending the
-> message.
+> I'm on Kernel v3.13 & BlueZ 5.18 and been testing around to find the cleanest approach for a fully automatic discovery and headless pairing/bonding of BLE peripherals (in my case HOGP / HID).
 > 
-> The change is done as the 6LoWPAN also uses l2cap_chan_send()
-> and in order to minimize the amount of code changes, we must
-> copy the user buffer in sock handling code.
+> Basically, today a "scan and pair (bond)" could today be done using either "bluetoothctl", "hcitool", "dbus/python-agents", "C plugins", or the "C Management API". (please correct me if I'm wrong here).
+> 
+> As we have many many options to achieve this, I'd like some guidance on how to re-use as much mechanisms that already exists in BlueZ and/or kernel/user-space, preferably involving as few building blocks as possible.
+> 
+> 
+> In short, I continuously need to run a passive scan for LE-devices only and bond to specific hid-devices based on suitable vendor info in the advertise data or the device information service.
+> 
+> I'm sharing the radio with a wifi using co-ex so "BT-classic" must be off and I assume active scan will eat too much air-time.
+> Once paired (or bonded as SIG and the IC-manuf. calls it), it should be a persistent and identifiable /dev/input device 
+> 
+> Any existing bluez or linux ways to do this I'd prefer to re-use, like utilising 'udev rules', bluetoothd patches or configs to optimise for LE-only and in general keep things light as I want to run the discovery/scan at all times. I'm ok with pure C or mix with shell and python, whatever works best and would be considered bluez future-proof.
 
-is this really the best approach. What are other subsystems doing?
+with mgmt version 1.4 starting from kernel 3.13 you can take a dual-mode controller and actually disable BR/EDR features. So for all intense and purposes it will look and behave like a LE only controller. Check btmgmt bredr command.
 
-> Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-> ---
-> net/bluetooth/l2cap_core.c | 25 +++++++++++++++++++++----
-> net/bluetooth/l2cap_sock.c | 25 ++++++++++++++++++++++++-
-> 2 files changed, 45 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index a1e5bb7..528b38a 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -2098,6 +2098,24 @@ static void l2cap_send_ack(struct l2cap_chan *chan)
-> 	}
-> }
-> 
-> +static inline void memcpy_fromiovec_kernel(void *kdata, struct iovec *iov,
-> +					   int len)
-> +{
-> +	while (len > 0) {
-> +		if (iov->iov_len) {
-> +			int copy = min_t(unsigned int, len, iov->iov_len);
-> +
-> +			memcpy(kdata, iov->iov_base, copy);
-> +
-> +			len -= copy;
-> +			kdata += copy;
-> +			iov->iov_base += copy;
-> +			iov->iov_len -= copy;
-> +		}
-> +		iov++;
-> +	}
-> +}
+Within bluetoothd we do not have support for forcefully turning a dual-mode controller into a single mode LE controller. You would need to add a config option for that. By default we will be a dual-mode controller and use dual-mode host operations.
 
-I am a bit amazed that there are no existing helper functions for this. Should we add this to lib/iovec.c? At least lets check what the upstream guys think.
+When you pair a HoG device using D-Bus APIs of bluetoothd, it will become bonded and we will auto-reconnect it. This currently uses active scanning to re-connect the HID device, but we are in the process of adding passive scanning + auto-connect feature to the kernel to optimize this.
 
-> +
-> static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
-> 					 struct msghdr *msg, int len,
-> 					 int count, struct sk_buff *skb)
-> @@ -2106,8 +2124,7 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
-> 	struct sk_buff **frag;
-> 	int sent = 0;
-> 
-> -	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
-> -		return -EFAULT;
-> +	memcpy_fromiovec_kernel(skb_put(skb, count), msg->msg_iov, count);
-> 
-> 	sent += count;
-> 	len  -= count;
-> @@ -2126,8 +2143,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
-> 
-> 		*frag = tmp;
-> 
-> -		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
-> -			return -EFAULT;
-> +		memcpy_fromiovec_kernel(skb_put(*frag, count), msg->msg_iov,
-> +					count);
-> 
-> 		(*frag)->priority = skb->priority;
-> 
-> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> index f59e00c..bbee8dc 100644
-> --- a/net/bluetooth/l2cap_sock.c
-> +++ b/net/bluetooth/l2cap_sock.c
-> @@ -948,6 +948,9 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> {
-> 	struct sock *sk = sock->sk;
-> 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> +	struct msghdr kernel_msg;
-> +	struct kvec iv;
-> +	void *buf;
-> 	int err;
-> 
-> 	BT_DBG("sock %p, sk %p", sock, sk);
-> @@ -968,10 +971,30 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> 	if (err)
-> 		return err;
-> 
-> +	buf = kmalloc(len, GFP_KERNEL);
-> +	if (!buf)
-> +		return -ENOMEM;
-> +
-> +	if (memcpy_fromiovec(buf, msg->msg_iov, len)) {
-> +		err = -EFAULT;
-> +		goto done;
-> +	}
-> +
-> +	iv.iov_base = buf;
-> +	iv.iov_len = len;
-> +
-> +	memset(&kernel_msg, 0, sizeof(kernel_msg));
-> +
-> +	kernel_msg.msg_iov = (struct iovec *) &iv;
-> +	kernel_msg.msg_iovlen = 1;
-> +	kernel_msg.msg_flags = msg->msg_flags;
-> +
-> 	l2cap_chan_lock(chan);
-> -	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
-> +	err = l2cap_chan_send(chan, &kernel_msg, len, sk->sk_priority);
+The initial discovery and pairing phase is not included here. That is what normally external programs like the UI are doing. So you would just need to write a program that behaves like the UI and discovers your device. The D-Bus APIs to do so are fully documented. You can do that in C or Python or any other language with D-Bus bindings.
 
-If we move this here. Why are we keeping input variable as an IOV? Will the kernel internal code ever use or require an IOV. We could just make l2cap_chan_send flat with a single buffer.
+If you are very custom and not running bluetoothd, then you need to implement GATT + HoG by yourself and driver the mgmt API all by yourself. This is possible as well, but I only recommend that if you have a really specific custom use case. It is also a bit of work.
 
 Regards
 
