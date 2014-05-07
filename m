@@ -1,49 +1,191 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 1/2] doc: Update RSSI property description.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHZ1yC=FOajpzi3GwrHU=Jqb5KFMCTPp7RPw8G+8KLDGR9DxyA@mail.gmail.com>
-Date: Wed, 7 May 2014 13:30:45 -0700
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Szymon Janc <szymon.janc@tieto.com>,
-	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Message-Id: <BE676041-D159-4AE7-A4D4-D0BA4D983A70@holtmann.org>
-References: <1399472233-19056-1-git-send-email-lukasz.rymanowski@tieto.com> <CAHZ1yC=3GQJLcuKV4FwRKcHLY2C5xFsQJh1FVpvabBWTpfWsTg@mail.gmail.com> <E4F0A858-85C9-4D2C-B716-4C58469A0465@holtmann.org> <CAHZ1yC=FOajpzi3GwrHU=Jqb5KFMCTPp7RPw8G+8KLDGR9DxyA@mail.gmail.com>
-To: Scott James Remnant <keybuk@google.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Antonio Ospite <ao2@ao2.it>
+Cc: linux-bluetooth@vger.kernel.org,
+	Bastien Nocera <hadess@hadess.net>,
+	Frank Praznik <frank.praznik@oh.rr.com>
+Subject: Re: [PATCH BlueZ 5/5] plugins/sixaxis: add a set_leds_sysfs() function
+Date: Wed, 07 May 2014 22:24:41 +0200
+Message-ID: <6305682.zY7iR8LDWr@athlon>
+In-Reply-To: <1399370776-5027-6-git-send-email-ao2@ao2.it>
+References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1399370776-5027-6-git-send-email-ao2@ao2.it>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+Hi Antonio,
 
->>>> RSSI property is inquiry RSSI and this should be stated here especially
->>>> that we plan to add connection RSSI property soon.
->>> 
->>> Does connection RSSI really need to be a separate property? Why can't
->>> the same property be used for both? It's the same device after all.
->> 
->> the problem is that they are different. They get measured differently. One is essentially tight to the Inquiry TX power and the other to the TX power of the connection. Results will be different. This has always been the problem with Bluetooth’s RSSI. Mapping the RSSI you got Extended Inquiry Result to Read RSSI is not possible.
->> 
+On Tuesday 06 May 2014 12:06:16 Antonio Ospite wrote:
+> On recent kernels the hid-sony driver exposes leds class entries in
+> sysfs for setting the Sixaxis LEDs, use this interface and fall back to
+> hidraw in case using sysfs fails (e.g. on older hid-sony versions).
 > 
-> LE Devices aren't ever in a situation where they are Advertising
-> during a Connection though, right?
+> Setting the LEDs via sysfs is the preferred way on newer kernels, the
+> rationale behind that is:
+> 
+>   1. the Sixaxis uses the same HID output report for setting both LEDs
+>      and rumble effects;
+>   2. hid-sony remembers the state of LEDs in order to preserve them when
+>      setting rumble effects;
+>   3. when the LEDs are set via hidraw hid-sony has no way to know the
+>      new LEDs state and thus can change the LEDs in an inconsistent way
+>      when setting rumble effects later.
+> ---
+>  plugins/sixaxis.c | 77
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++--- 1 file changed, 73
+> insertions(+), 4 deletions(-)
+> 
+> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+> index 2b35d1c..446d499 100644
+> --- a/plugins/sixaxis.c
+> +++ b/plugins/sixaxis.c
+> @@ -185,10 +185,40 @@ static gboolean set_leds_hidraw(int fd, uint8_t
+> leds_bitmap) return FALSE;
+>  }
+> 
+> +static gboolean set_leds_sysfs(struct leds_data *data)
 
-they can be. Bluetooth 4.1 introduces link layer topology. As long as your controller supports this state, you can advertise again.
+Make it return bool.
 
-> So either the RSSI + TX Power are relevant to Inquiry (when Connected
-> = false) or relevant to Connection (when Connected = true)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 4; i++) {
+> +		char path[PATH_MAX] = { 0 };
+> +		char buf[2] = { 0 };
+> +		int fd;
+> +		int ret;
+> +
+> +		if (data->syspaths[i] == NULL)
 
-We can do that, but it is also semantic wise a bit of a nasty thing to do. The meaning of a property changes depending on if another property is true or false. Sounds like a hack to me.
+if (!data->..)
 
-> Since the Connection RSSI on a Classic device is always just deviation
-> from the golden range, the RSSI field isn't even that interesting in
-> those cases.
+> +			return FALSE;
+> +
+> +		snprintf(path, PATH_MAX, "%s/brightness", data->syspaths[i]);
+> +		fd = open(path, O_WRONLY);
+> +		if (fd < 0) {
+> +			error("Cannot open %s (%s)", path, strerror(errno));
 
-For BR/EDR this is mostly irrelevant. However in combination with TX power you can calculate the path loss and that makes it interesting again.
+Prefix error message with "sixaxis:"
 
-Regards
+> +			return FALSE;
+> +		}
+> +
+> +		/* i+1 because leds start from 1, LED0 is never used */
+> +		buf[0] = '0' + !!(data->bitmap & (1 << (i+1)));
 
-Marcel
+Spaces around + in i+1.
 
+> +		ret = write(fd, buf, sizeof(buf));
+> +		close(fd);
+> +		if (ret != sizeof(buf))
+> +			return FALSE;
+> +	}
+> +
+> +	return TRUE;
+> +}
+> +
+>  static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+>  							gpointer user_data)
+>  {
+> -	int fd;
+>  	int i;
+>  	int ret;
+>  	struct leds_data *data = (struct leds_data *)user_data;
+> @@ -199,9 +229,11 @@ static gboolean setup_leds(GIOChannel *channel,
+> GIOCondition cond, if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+>  		goto out;
+> 
+> -	fd = g_io_channel_unix_get_fd(channel);
+> -
+> -	set_leds_hidraw(fd, data->bitmap);
+> +	ret = set_leds_sysfs(data);
+> +	if (ret == FALSE) {
+
+if (!set_leds_sysfs())
+
+> +		int fd = g_io_channel_unix_get_fd(channel);
+> +		set_leds_hidraw(fd, data->bitmap);
+> +	}
+> 
+>  out:
+>  	for (i = 0; i < 4; i++)
+> @@ -324,6 +356,39 @@ static int get_js_number(struct udev_device *udevice)
+>  	return number;
+>  }
+> 
+> +static int get_leds_devices(struct udev_device *udevice, char *paths[4])
+> +{
+> +	struct udev_list_entry *devices, *dev_list_entry;
+> +	struct udev_enumerate *enumerate;
+> +	struct udev_device *hid_parent;
+> +	int index = 0;
+> +	int ret;
+> +
+> +	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
+> +								"hid", NULL);
+> +
+> +	enumerate = udev_enumerate_new(udev_device_get_udev(udevice));
+> +	udev_enumerate_add_match_parent(enumerate, hid_parent);
+> +	udev_enumerate_add_match_subsystem(enumerate, "leds");
+> +	udev_enumerate_scan_devices(enumerate);
+> +	devices = udev_enumerate_get_list_entry(enumerate);
+> +
+> +	if (devices == NULL) {
+
+if (!devices)..
+
+Also this check should follow devices assignment without extra empty line.
+
+> +		ret = FALSE;
+> +		goto out;
+> +	}
+> +
+> +	udev_list_entry_foreach(dev_list_entry, devices) {
+> +		const char *syspath = udev_list_entry_get_name(dev_list_entry);
+> +		paths[index++] = strdup(syspath);
+> +	}
+
+Is this guaranteed that this loop will iterate only 4 times? If yes please add 
+comment, if not break loop to avoid writing on random memory.
+
+> +
+> +	ret = TRUE;
+> +out:
+> +	udev_enumerate_unref(enumerate);
+> +	return ret;
+> +}
+> +
+>  static struct leds_data *get_leds_data(struct udev_device *udevice)
+>  {
+>  	struct leds_data *data;
+> @@ -344,6 +409,10 @@ static struct leds_data *get_leds_data(struct
+> udev_device *udevice) if (ret == FALSE)
+>  		goto err;
+> 
+> +	/* it's OK if this fails, set_leds_hidraw() will be used if
+> +	 * any of the values in data->syspaths is not defined */
+
+Multi line comment should be like that: (there is still some inconsistency 
+about that in BlueZ code, but lets keep new code right)
+
+/*
+ * foo
+ * bar
+ */
+
+> +	get_leds_devices(udevice, data->syspaths);
+
+Since return code is not important in this function why not just make it 
+return void? 
+
+> +
+>  	return data;
+> 
+>  err:
+
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
