@@ -1,220 +1,309 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 09/10] android/audio: Use resampler interface to resample SCO
-Date: Wed,  7 May 2014 11:45:25 +0300
-Message-Id: <1399452326-25009-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1399452326-25009-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399452326-25009-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 01/10] android/hal-audio-hsp: Add audio HAL for HSP handling
+Date: Wed,  7 May 2014 11:45:17 +0300
+Message-Id: <1399452326-25009-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Resample Android audio from 44100 to 8000.
----
- android/hal-audio-hsp.c | 112 +++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 105 insertions(+), 7 deletions(-)
+This adds audio HAL for handling SCO. Following needs to be added to
+audio_policy.conf:
 
+  hsp {
+    outputs {
+      hsp {
+        ...
+        devices AUDIO_DEVICE_OUT_ALL_SCO
+        ...
+      }
+    }
+---
+ android/Android.mk      |  23 ++++++
+ android/Makefile.am     |  15 ++++
+ android/hal-audio-hsp.c | 211 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 249 insertions(+)
+ create mode 100644 android/hal-audio-hsp.c
+
+diff --git a/android/Android.mk b/android/Android.mk
+index 638a042..9226ff0 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -271,6 +271,29 @@ LOCAL_MODULE := audio.a2dp.default
+ include $(BUILD_SHARED_LIBRARY)
+ 
+ #
++# HSP audio
++#
++
++include $(CLEAR_VARS)
++
++LOCAL_SRC_FILES := bluez/android/hal-audio-hsp.c
++
++LOCAL_C_INCLUDES = \
++	$(call include-path-for, system-core) \
++	$(call include-path-for, libhardware) \
++
++LOCAL_SHARED_LIBRARIES := \
++	libcutils \
++
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++
++LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
++LOCAL_MODULE_TAGS := optional
++LOCAL_MODULE := audio.hsp.default
++
++include $(BUILD_SHARED_LIBRARY)
++
++#
+ # l2cap-test
+ #
+ 
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 5ab6411..856524f 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -169,6 +169,21 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+ 					android/hardware/hardware.h \
+ 					android/system/audio.h
+ 
++android_audio_hsp_default_la_SOURCES = android/audio-msg.h \
++					android/hal-msg.h \
++					android/hal-audio-hsp.c \
++					android/hardware/audio.h \
++					android/hardware/audio_effect.h \
++					android/hardware/hardware.h \
++					android/system/audio.h
++
++android_audio_hsp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
++
++android_audio_hsp_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
++					-no-undefined -lrt
++
++plugin_LTLIBRARIES += android/audio.hsp.default.la
++
+ unit_tests += android/test-ipc
+ 
+ android_test_ipc_SOURCES = android/test-ipc.c \
 diff --git a/android/hal-audio-hsp.c b/android/hal-audio-hsp.c
-index 5497003..7fe9ece 100644
---- a/android/hal-audio-hsp.c
+new file mode 100644
+index 0000000..c7ba504
+--- /dev/null
 +++ b/android/hal-audio-hsp.c
-@@ -27,6 +27,7 @@
- 
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
-+#include <audio_utils/resampler.h>
- 
- #include "../src/shared/util.h"
- 
-@@ -35,6 +36,7 @@
- #include "hal-log.h"
- 
- #define AUDIO_STREAM_DEFAULT_RATE	44100
-+#define AUDIO_STREAM_SCO_RATE		8000
- #define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
- 
- #define OUT_BUFFER_SIZE			2560
-@@ -61,6 +63,10 @@ struct hsp_stream_out {
- 	int fd;
- 
- 	uint8_t *downmix_buf;
-+
-+	struct resampler_itfe *resampler;
-+	int16_t *resample_buf;
-+	uint32_t resample_frame_num;
- };
- 
- struct hsp_audio_dev {
-@@ -68,6 +74,22 @@ struct hsp_audio_dev {
- 	struct hsp_stream_out *out;
- };
- 
+@@ -0,0 +1,211 @@
 +/*
-+ * return the minimum frame numbers from resampling between BT stack's rate
-+ * and audio flinger's. For output stream, 'output' shall be true, otherwise
-+ * false for input streams at audio flinger side.
++ * Copyright (C) 2013 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
 + */
-+static size_t get_resample_frame_num(uint32_t sco_rate, uint32_t rate,
-+						size_t frame_num, bool output)
++
++#include <errno.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
++#include <hardware/audio.h>
++#include <hardware/hardware.h>
++
++#include "hal-log.h"
++
++struct hsp_audio_dev {
++	struct audio_hw_device dev;
++	struct a2dp_stream_out *out;
++};
++
++static int audio_open_output_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					audio_output_flags_t flags,
++					struct audio_config *config,
++					struct audio_stream_out **stream_out)
++
 +{
-+	size_t resample_frames_num = frame_num * sco_rate / rate + output;
++	DBG("");
 +
-+	DBG("resampler: sco_rate %d frame_num %zd rate %d resample frames %zd",
-+				sco_rate, frame_num, rate, resample_frames_num);
-+
-+	return resample_frames_num;
++	return -EINVAL;
 +}
 +
- /* Audio IPC functions */
- 
- static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
-@@ -259,6 +281,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- {
- 	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
- 	size_t frame_num = bytes / audio_stream_frame_size(&out->stream.common);
-+	size_t output_frame_num = frame_num;
-+	void *send_buf = out->downmix_buf;
-+	size_t total;
- 
- 	DBG("write to fd %d bytes %zu", out->fd, bytes);
- 
-@@ -268,6 +293,34 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 	}
- 
- 	downmix_to_mono(out, buffer, frame_num);
++static void audio_close_output_stream(struct audio_hw_device *dev,
++					struct audio_stream_out *stream_out)
++{
++	DBG("");
 +
-+	if (out->resampler) {
-+		int ret;
++	free(stream_out);
++}
 +
-+		/* limit resampler's output within what resample buf can hold */
-+		output_frame_num = out->resample_frame_num;
++static int audio_set_parameters(struct audio_hw_device *dev,
++							const char *kvpairs)
++{
++	DBG("%s", kvpairs);
 +
-+		ret = out->resampler->resample_from_input(out->resampler,
-+								send_buf,
-+								&frame_num,
-+								out->resample_buf,
-+								&output_frame_num);
-+		if (ret) {
-+			error("Failed to resample frames: %zd input %zd (%s)",
-+				frame_num, output_frame_num, strerror(ret));
-+			return -1;
-+		}
++	return 0;
++}
 +
-+		send_buf = out->resample_buf;
++static char *audio_get_parameters(const struct audio_hw_device *dev,
++							const char *keys)
++{
++	DBG("");
 +
-+		DBG("Resampled: frame_num %zd, output_frame_num %zd", 
-+						frame_num, output_frame_num);
++	return strdup("");
++}
++
++static int audio_init_check(const struct audio_hw_device *dev)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int audio_set_voice_volume(struct audio_hw_device *dev, float volume)
++{
++	DBG("%f", volume);
++
++	return 0;
++}
++
++static int audio_set_master_volume(struct audio_hw_device *dev, float volume)
++{
++	DBG("%f", volume);
++
++	return 0;
++}
++
++static int audio_set_mode(struct audio_hw_device *dev, int mode)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_set_mic_mute(struct audio_hw_device *dev, bool state)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_get_mic_mute(const struct audio_hw_device *dev, bool *state)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
++					const struct audio_config *config)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int audio_open_input_stream(struct audio_hw_device *dev,
++					audio_io_handle_t handle,
++					audio_devices_t devices,
++					struct audio_config *config,
++					struct audio_stream_in **stream_in)
++{
++	DBG("");
++
++	return 0;
++}
++
++static void audio_close_input_stream(struct audio_hw_device *dev,
++					struct audio_stream_in *stream_in)
++{
++	DBG("");
++
++	free(stream_in);
++}
++
++static int audio_dump(const audio_hw_device_t *device, int fd)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int audio_close(hw_device_t *device)
++{
++	DBG("");
++
++	free(device);
++
++	return 0;
++}
++
++static int audio_open(const hw_module_t *module, const char *name,
++							hw_device_t **device)
++{
++	struct hsp_audio_dev *adev;
++
++	DBG("");
++
++	if (strcmp(name, AUDIO_HARDWARE_INTERFACE)) {
++		error("audio: interface %s not matching [%s]", name,
++						AUDIO_HARDWARE_INTERFACE);
++		return -EINVAL;
 +	}
 +
-+	total = output_frame_num * sizeof(int16_t) * 1;
++	adev = calloc(1, sizeof(struct hsp_audio_dev));
++	if (!adev)
++		return -ENOMEM;
 +
-+	DBG("total %zd", total);
++	adev->dev.common.tag = HARDWARE_DEVICE_TAG;
++	adev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
++	adev->dev.common.module = (struct hw_module_t *) module;
++	adev->dev.common.close = audio_close;
 +
- 	return bytes;
- }
- 
-@@ -300,19 +353,18 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
- 
- static uint32_t out_get_channels(const struct audio_stream *stream)
- {
--	DBG("");
-+	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
- 
--	/* AudioFlinger can only provide stereo stream, so we return it here and
--	 * later we'll downmix this to mono in case codec requires it
--	 */
--	return AUDIO_CHANNEL_OUT_STEREO;
-+	DBG("channels num: %u", popcount(out->cfg.channels));
++	adev->dev.init_check = audio_init_check;
++	adev->dev.set_voice_volume = audio_set_voice_volume;
++	adev->dev.set_master_volume = audio_set_master_volume;
++	adev->dev.set_mode = audio_set_mode;
++	adev->dev.set_mic_mute = audio_set_mic_mute;
++	adev->dev.get_mic_mute = audio_get_mic_mute;
++	adev->dev.set_parameters = audio_set_parameters;
++	adev->dev.get_parameters = audio_get_parameters;
++	adev->dev.get_input_buffer_size = audio_get_input_buffer_size;
++	adev->dev.open_output_stream = audio_open_output_stream;
++	adev->dev.close_output_stream = audio_close_output_stream;
++	adev->dev.open_input_stream = audio_open_input_stream;
++	adev->dev.close_input_stream = audio_close_input_stream;
++	adev->dev.dump = audio_dump;
 +
-+	return out->cfg.channels;
- }
- 
- static audio_format_t out_get_format(const struct audio_stream *stream)
- {
- 	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
- 
--	DBG("");
-+	DBG("format: %u", out->cfg.format);
- 
- 	return out->cfg.format;
- }
-@@ -402,6 +454,8 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	struct hsp_audio_dev *adev = (struct hsp_audio_dev *) dev;
- 	struct hsp_stream_out *out;
- 	int fd = -1;
-+	int chan_num, ret;
-+	size_t resample_size;
- 	uint16_t mtu;
- 
- 	DBG("");
-@@ -434,8 +488,9 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	out->stream.write = out_write;
- 	out->stream.get_render_position = out_get_render_position;
- 
-+	/* Configuration for Android */
- 	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
--	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
-+	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
- 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
- 	out->cfg.frame_num = OUT_STREAM_FRAMES;
- 	out->cfg.mtu = mtu;
-@@ -447,11 +502,54 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	}
- 
- 	DBG("size %zd", out_get_buffer_size(&out->stream.common));
++	*device = &adev->dev.common;
 +
-+	/* Channel numbers for resampler */
-+	chan_num = 1;
++	return 0;
++}
 +
-+	ret = create_resampler(out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num,
-+						RESAMPLER_QUALITY_DEFAULT, NULL,
-+						&out->resampler);
-+	if (ret) {
-+		error("Failed to create resampler (%s)", strerror(ret));
-+		goto failed;
-+	}
++static struct hw_module_methods_t hal_module_methods = {
++	.open = audio_open,
++};
 +
-+	DBG("Created resampler: input rate [%d] output rate [%d] channels [%d]",
-+				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num);
-+
-+	out->resample_frame_num = get_resample_frame_num(AUDIO_STREAM_SCO_RATE,
-+							out->cfg.rate,
-+							out->cfg.frame_num, 1);
-+
-+	if (!out->resample_frame_num) {
-+		error("frame num is too small to resample, discard it");
-+		goto failed;
-+	}
-+
-+	resample_size = sizeof(int16_t) * chan_num * out->resample_frame_num;
-+
-+	out->resample_buf = malloc(resample_size);
-+	if (!out->resample_buf) {
-+		error("failed to allocate resample buffer for %u frames",
-+						out->resample_frame_num);
-+		goto failed;
-+	}
-+
-+	DBG("resampler: frame num %u buf size %zd bytes", 
-+					out->resample_frame_num, resample_size);
-+
- 	*stream_out = &out->stream;
- 	adev->out = out;
- 	out->fd = fd;
- 
- 	return 0;
-+failed:
-+	free(out->downmix_buf);
-+	free(out);
-+	stream_out = NULL;
-+	adev->out = NULL;
-+
-+	return ret;
- }
- 
- static void audio_close_output_stream(struct audio_hw_device *dev,
++struct audio_module HAL_MODULE_INFO_SYM = {
++	.common = {
++		.tag = HARDWARE_MODULE_TAG,
++		.version_major = 1,
++		.version_minor = 0,
++		.id = AUDIO_HARDWARE_MODULE_ID,
++		.name = "HSP Audio HW HAL",
++		.author = "Intel Corporation",
++		.methods = &hal_module_methods,
++	},
++};
 -- 
 1.8.3.2
 
