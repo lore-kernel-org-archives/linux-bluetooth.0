@@ -1,102 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Antonio Ospite <ao2@ao2.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: Re: [PATCH BlueZ 2/5] plugins/sixaxis: factor out a set_leds_hidraw() function
-Date: Wed, 07 May 2014 21:58:09 +0200
-Message-ID: <2255265.xHg6cUfLQi@athlon>
-In-Reply-To: <1399370776-5027-3-git-send-email-ao2@ao2.it>
-References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1399370776-5027-3-git-send-email-ao2@ao2.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <E4F0A858-85C9-4D2C-B716-4C58469A0465@holtmann.org>
+References: <1399472233-19056-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<CAHZ1yC=3GQJLcuKV4FwRKcHLY2C5xFsQJh1FVpvabBWTpfWsTg@mail.gmail.com>
+	<E4F0A858-85C9-4D2C-B716-4C58469A0465@holtmann.org>
+Date: Wed, 7 May 2014 12:55:08 -0700
+Message-ID: <CAHZ1yC=FOajpzi3GwrHU=Jqb5KFMCTPp7RPw8G+8KLDGR9DxyA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] doc: Update RSSI property description.
+From: Scott James Remnant <keybuk@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Szymon Janc <szymon.janc@tieto.com>, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antonio,
+On Wed, May 7, 2014 at 12:06 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
+e:
 
-On Tuesday 06 May 2014 12:06:13 Antonio Ospite wrote:
-> This is in preparation for a set_leds_sysfs() function.
-> 
-> Also use TRUE as the return value of set_leds_hidraw() in the success
-> case just to be more semantically nice; the return value is not used in
-> setup_leds() anyway because the latter has to always return FALSE.
+>>> RSSI property is inquiry RSSI and this should be stated here especially
+>>> that we plan to add connection RSSI property soon.
+>>
+>> Does connection RSSI really need to be a separate property? Why can't
+>> the same property be used for both? It's the same device after all.
+>
+> the problem is that they are different. They get measured differently. On=
+e is essentially tight to the Inquiry TX power and the other to the TX powe=
+r of the connection. Results will be different. This has always been the pr=
+oblem with Bluetooth=E2=80=99s RSSI. Mapping the RSSI you got Extended Inqu=
+iry Result to Read RSSI is not possible.
+>
 
-I'd just make it return void then.
+LE Devices aren't ever in a situation where they are Advertising
+during a Connection though, right?
 
-> ---
->  plugins/sixaxis.c | 31 +++++++++++++++++++------------
->  1 file changed, 19 insertions(+), 12 deletions(-)
-> 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 9db14ec..61fd0b5 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -125,8 +125,7 @@ static int set_master_bdaddr(int fd, const bdaddr_t
-> *bdaddr) return ret;
->  }
-> 
-> -static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
-> -							gpointer user_data)
-> +static gboolean set_leds_hidraw(int fd, int number)
->  {
->  	/*
->  	 * the total time the led is active (0xff means forever)
-> @@ -147,14 +146,7 @@ static gboolean setup_leds(GIOChannel *channel,
-> GIOCondition cond, 0xff, 0x27, 0x10, 0x00, 0x32, /* LED_1 */
->  		0x00, 0x00, 0x00, 0x00, 0x00,
->  	};
-> -	int number = GPOINTER_TO_INT(user_data);
->  	int ret;
-> -	int fd;
-> -
-> -	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-> -		return FALSE;
-> -
-> -	DBG("number %d", number);
-> 
->  	/* TODO we could support up to 10 (1 + 2 + 3 + 4) */
->  	if (number > 7)
-> @@ -167,11 +159,9 @@ static gboolean setup_leds(GIOChannel *channel,
-> GIOCondition cond,
-> 
->  	leds_report[10] |= 0x01 << number;
-> 
-> -	fd = g_io_channel_unix_get_fd(channel);
-> -
->  	ret = write(fd, leds_report, sizeof(leds_report));
->  	if (ret == sizeof(leds_report))
-> -		return FALSE;
-> +		return TRUE;
-> 
->  	if (ret < 0)
->  		error("sixaxis: failed to set LEDS (%s)", strerror(errno));
-> @@ -181,6 +171,23 @@ static gboolean setup_leds(GIOChannel *channel,
-> GIOCondition cond, return FALSE;
->  }
-> 
-> +static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
-> +							gpointer user_data)
-> +{
-> +	int number = GPOINTER_TO_INT(user_data);
-> +	int fd;
-> +
-> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-> +		return FALSE;
-> +
-> +	DBG("number %d", number);
-> +
-> +	fd = g_io_channel_unix_get_fd(channel);
-> +	set_leds_hidraw(fd, number);
-> +
-> +	return FALSE;
-> +}
-> +
->  static bool setup_device(int fd, int index, struct btd_adapter *adapter)
->  {
->  	char device_addr[18], master_addr[18], adapter_addr[18];
+So either the RSSI + TX Power are relevant to Inquiry (when Connected
+=3D false) or relevant to Connection (when Connected =3D true)
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+
+Since the Connection RSSI on a Classic device is always just deviation
+from the golden range, the RSSI field isn't even that interesting in
+those cases.
+
+Scott
+--=20
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
