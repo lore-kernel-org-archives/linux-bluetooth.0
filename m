@@ -1,637 +1,595 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1399452326-25009-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 03/10] android/hal-audio: Add SCO audio API
+Date: Wed,  7 May 2014 11:45:19 +0300
+Message-Id: <1399452326-25009-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1399452326-25009-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399452326-25009-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1399452326-25009-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Wed, 7 May 2014 13:58:03 +0300
-Message-ID: <CABBYNZJtXk-FpynWPb0WiguJdXFwHyt+gL=C6n5Z+Bq9R6YhiA@mail.gmail.com>
-Subject: Re: [PATCHv2 05/10] android/haltest: Add testinng for audio SCO HAL
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Wed, May 7, 2014 at 11:45 AM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Adds testing support for audio-sco HAL.
+---
+ android/audio-msg.h     |   9 +-
+ android/hal-audio-hsp.c | 325 +++++++++++++++++++++++++++++++++++++++++++++++-
+ android/handsfree.c     |  59 ++++++++-
+ 3 files changed, 388 insertions(+), 5 deletions(-)
 
-It can probably be called sco alone dropping audio prefix.
-
-> ---
->  android/Android.mk            |   1 +
->  android/Makefile.am           |   1 +
->  android/client/haltest.c      |   3 +
->  android/client/if-audio-sco.c | 520 ++++++++++++++++++++++++++++++++++++++++++
->  android/client/if-main.h      |   1 +
->  5 files changed, 526 insertions(+)
->  create mode 100644 android/client/if-audio-sco.c
->
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 9226ff0..ba06145 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -149,6 +149,7 @@ LOCAL_SRC_FILES := \
->         bluez/android/client/history.c \
->         bluez/android/client/tabcompletion.c \
->         bluez/android/client/if-audio.c \
-> +       bluez/android/client/if-audio-sco.c \
->         bluez/android/client/if-av.c \
->         bluez/android/client/if-rc.c \
->         bluez/android/client/if-bt.c \
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 856524f..3b91548 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -109,6 +109,7 @@ android_haltest_SOURCES = android/client/haltest.c \
->                                 android/client/if-hl.c \
->                                 android/client/if-sock.c \
->                                 android/client/if-audio.c \
-> +                               android/client/if-audio-sco.c \
->                                 android/hardware/hardware.c \
->                                 android/hal-utils.h android/hal-utils.c
->
-> diff --git a/android/client/haltest.c b/android/client/haltest.c
-> index 5d05b75..4a9d1db 100644
-> --- a/android/client/haltest.c
-> +++ b/android/client/haltest.c
-> @@ -32,6 +32,7 @@
->
->  const struct interface *interfaces[] = {
->         &audio_if,
-> +       &audio_sco_if,
->         &bluetooth_if,
->         &av_if,
->         &rc_if,
-> @@ -394,10 +395,12 @@ static void init(void)
->         const struct method *m;
->         const char *argv[4];
->         char init_audio[] = "audio init";
-> +       char init_audio_sco[] = "audio-sco init";
->         char init_bt[] = "bluetooth init";
->         uint32_t i;
->
->         process_line(init_audio);
-> +       process_line(init_audio_sco);
->         process_line(init_bt);
->
->         m = get_interface_method("bluetooth", "get_profile_interface");
-> diff --git a/android/client/if-audio-sco.c b/android/client/if-audio-sco.c
-> new file mode 100644
-> index 0000000..f5daaa0
-> --- /dev/null
-> +++ b/android/client/if-audio-sco.c
-> @@ -0,0 +1,520 @@
-> +/*
-> + * Copyright (C) 2014 Intel Corporation
-> + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
-> + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-> + * See the License for the specific language governing permissions and
-> + * limitations under the License.
-> + *
-> + */
-> +
-> +#include "if-main.h"
-> +#include "../hal-utils.h"
-> +#include "pthread.h"
-> +#include "unistd.h"
-> +#include <math.h>
-> +
-> +audio_hw_device_t *if_audio_sco = NULL;
-> +static struct audio_stream_out *stream_out = NULL;
-> +
-> +static size_t buffer_size = 0;
-> +static pthread_t play_thread = 0;
-> +static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
-> +static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
-> +
-> +enum state {
-> +       STATE_STOPPED,
-> +       STATE_STOPPING,
-> +       STATE_PLAYING,
-> +       STATE_SUSPENDED,
-> +       STATE_MAX
-> +};
-> +
-> +SINTMAP(audio_channel_mask_t, -1, "(AUDIO_CHANNEL_INVALID)")
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_LOW_FREQUENCY),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_BACK_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_BACK_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_BACK_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_SIDE_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_SIDE_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_MONO),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_STEREO),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_QUAD),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_SURROUND),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_5POINT1),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_7POINT1),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_ALL),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +ENDMAP
-> +
-> +SINTMAP(audio_format_t, -1, "(AUDIO_FORMAT_INVALID)")
-> +       DELEMENT(AUDIO_FORMAT_DEFAULT),
-> +       DELEMENT(AUDIO_FORMAT_PCM),
-> +       DELEMENT(AUDIO_FORMAT_MP3),
-> +       DELEMENT(AUDIO_FORMAT_AMR_NB),
-> +       DELEMENT(AUDIO_FORMAT_AMR_WB),
-> +       DELEMENT(AUDIO_FORMAT_AAC),
-> +       DELEMENT(AUDIO_FORMAT_HE_AAC_V1),
-> +       DELEMENT(AUDIO_FORMAT_HE_AAC_V2),
-> +       DELEMENT(AUDIO_FORMAT_VORBIS),
-> +       DELEMENT(AUDIO_FORMAT_MAIN_MASK),
-> +       DELEMENT(AUDIO_FORMAT_SUB_MASK),
-> +       DELEMENT(AUDIO_FORMAT_PCM_16_BIT),
-> +       DELEMENT(AUDIO_FORMAT_PCM_8_BIT),
-> +       DELEMENT(AUDIO_FORMAT_PCM_32_BIT),
-> +       DELEMENT(AUDIO_FORMAT_PCM_8_24_BIT),
-> +ENDMAP
-> +
-> +static int current_state = STATE_STOPPED;
-> +
-> +#define SAMPLERATE 44100
-> +static short sample[SAMPLERATE];
-> +static uint16_t sample_pos;
-> +
-> +static void init_p(int argc, const char **argv)
-> +{
-> +       int err;
-> +       const hw_module_t *module;
-> +       audio_hw_device_t *device;
-> +
-> +       err = hw_get_module_by_class(AUDIO_HARDWARE_MODULE_ID, "hsp", &module);
-> +       if (err) {
-> +               haltest_error("hw_get_module_by_class returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       err = audio_hw_device_open(module, &device);
-> +       if (err) {
-> +               haltest_error("audio_hw_device_open returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       if_audio_sco = device;
-> +}
-> +
-> +static int feed_from_file(short *buffer, void *data)
-> +{
-> +       FILE *in = data;
-> +       return fread(buffer, buffer_size, 1, in);
-> +}
-> +
-> +static int feed_from_generator(short *buffer, void *data)
-> +{
-> +       size_t i = 0;
-> +       float volume = 0.5;
-> +       float *freq = data;
-> +       float f = 1;
-> +
-> +       if (freq)
-> +               f = *freq;
-> +
-> +       /* buffer_size is in bytes but we are using buffer of shorts (2 bytes)*/
-> +       for (i = 0; i < buffer_size / sizeof(*buffer) - 1;) {
-> +               if (sample_pos >= SAMPLERATE)
-> +                       sample_pos = sample_pos % SAMPLERATE;
-> +
-> +               /* Use the same sample for both channels */
-> +               buffer[i++] = sample[sample_pos] * volume;
-> +               buffer[i++] = sample[sample_pos] * volume;
-> +
-> +               sample_pos += f;
-> +       }
-> +
-> +       return buffer_size;
-> +}
-> +
-> +static void prepare_sample(void)
-> +{
-> +       int x;
-> +       double s;
-> +
-> +       haltest_info("Preparing audio sample...\n");
-> +
-> +       for (x = 0; x < SAMPLERATE; x++) {
-> +               /* prepare sinusoidal 1Hz sample */
-> +               s = (2.0 * 3.14159) * ((double)x / SAMPLERATE);
-> +               s = sin(s);
-> +
-> +               /* remap <-1, 1> to signed 16bit PCM range */
-> +               sample[x] = s * 32767;
-> +       }
-> +
-> +       sample_pos = 0;
-> +}
-> +
-> +static void *playback_thread(void *data)
-> +{
-> +       int (*filbuff_cb) (short*, void*);
-> +       short buffer[buffer_size / sizeof(short)];
-> +       size_t len = 0;
-> +       ssize_t w_len = 0;
-> +       FILE *in = data;
-> +       void *cb_data = NULL;
-> +       float freq = 440.0;
-> +
-> +       /* Use file or fall back to generator */
-> +       if (in) {
-> +               filbuff_cb = feed_from_file;
-> +               cb_data = in;
-> +       } else {
-> +               prepare_sample();
-> +               filbuff_cb = feed_from_generator;
-> +               cb_data = &freq;
-> +       }
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       current_state = STATE_PLAYING;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       do {
-> +               pthread_mutex_lock(&state_mutex);
-> +
-> +               if (current_state == STATE_STOPPING) {
-> +                       haltest_info("Detected stopping\n");
-> +                       pthread_mutex_unlock(&state_mutex);
-> +                       break;
-> +               } else if (current_state == STATE_SUSPENDED) {
-> +                       pthread_mutex_unlock(&state_mutex);
-> +                       usleep(500);
-> +                       continue;
-> +               }
-> +
-> +               pthread_mutex_unlock(&state_mutex);
-> +
-> +               len = filbuff_cb(buffer, cb_data);
-> +
-> +               pthread_mutex_lock(&outstream_mutex);
-> +               if (!stream_out) {
-> +                       pthread_mutex_unlock(&outstream_mutex);
-> +                       break;
-> +               }
-> +
-> +               w_len = stream_out->write(stream_out, buffer, buffer_size);
-> +               pthread_mutex_unlock(&outstream_mutex);
-> +       } while (len && w_len > 0);
-> +
-> +       if (in)
-> +               fclose(in);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       current_state = STATE_STOPPED;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       haltest_info("Done playing.\n");
-> +
-> +       return NULL;
-> +}
-> +
-> +static void play_p(int argc, const char **argv)
-> +{
-> +       const char *fname = NULL;
-> +       FILE *in = NULL;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3) {
-> +               haltest_error("Invalid audio file path.\n");
-> +               haltest_info("Using sound generator.\n");
-> +       } else {
-> +               fname = argv[2];
-> +               in = fopen(fname, "r");
-> +
-> +               if (in == NULL) {
-> +                       haltest_error("Cannot open file: %s\n", fname);
-> +                       return;
-> +               }
-> +               haltest_info("Playing file: %s\n", fname);
-> +       }
-> +
-> +       if (buffer_size == 0) {
-> +               haltest_error("Invalid buffer size. Was stream_out opened?\n");
-> +               goto fail;
-> +       }
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state != STATE_STOPPED) {
-> +               haltest_error("Already playing or stream suspended!\n");
-> +               pthread_mutex_unlock(&state_mutex);
-> +               goto fail;
-> +       }
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
-> +               haltest_error("Cannot create playback thread!\n");
-> +               goto fail;
-> +       }
-> +
-> +       return;
-> +fail:
-> +       if (in)
-> +               fclose(in);
-> +}
-> +
-> +static void stop_p(int argc, const char **argv)
-> +{
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state == STATE_STOPPED || current_state == STATE_STOPPING) {
-> +               pthread_mutex_unlock(&state_mutex);
-> +               return;
-> +       }
-> +
-> +       current_state = STATE_STOPPING;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       pthread_mutex_lock(&outstream_mutex);
-> +       stream_out->common.standby(&stream_out->common);
-> +       pthread_mutex_unlock(&outstream_mutex);
-> +
-> +       haltest_info("Ended %s\n", __func__);
-> +}
-> +
-> +static void open_output_stream_p(int argc, const char **argv)
-> +{
-> +       int err;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state == STATE_PLAYING) {
-> +               haltest_error("Already playing!\n");
-> +               pthread_mutex_unlock(&state_mutex);
-> +               return;
-> +       }
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       err = if_audio_sco->open_output_stream(if_audio_sco,
-> +                                               0,
-> +                                               AUDIO_DEVICE_OUT_ALL_A2DP,
-> +                                               AUDIO_OUTPUT_FLAG_NONE,
-> +                                               NULL,
-> +                                               &stream_out);
-> +       if (err < 0) {
-> +               haltest_error("open output stream returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       buffer_size = stream_out->common.get_buffer_size(&stream_out->common);
-> +       if (buffer_size == 0)
-> +               haltest_error("Invalid buffer size received!\n");
-> +       else
-> +               haltest_info("Using buffer size: %zu\n", buffer_size);
-> +}
-> +
-> +static void close_output_stream_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       stop_p(argc, argv);
-> +
-> +       haltest_info("Waiting for playback thread...\n");
-> +       pthread_join(play_thread, NULL);
-> +
-> +       if_audio_sco->close_output_stream(if_audio_sco, stream_out);
-> +
-> +       stream_out = NULL;
-> +       buffer_size = 0;
-> +}
-> +
-> +static void cleanup_p(int argc, const char **argv)
-> +{
-> +       int err;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state != STATE_STOPPED) {
-> +               pthread_mutex_unlock(&state_mutex);
-> +               close_output_stream_p(0, NULL);
-> +       } else {
-> +               pthread_mutex_unlock(&state_mutex);
-> +       }
-> +
-> +       err = audio_hw_device_close(if_audio_sco);
-> +       if (err < 0) {
-> +               haltest_error("audio_hw_device_close returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       if_audio_sco = NULL;
-> +}
-> +
-> +static void suspend_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state != STATE_PLAYING) {
-> +               pthread_mutex_unlock(&state_mutex);
-> +               return;
-> +       }
-> +       current_state = STATE_SUSPENDED;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       pthread_mutex_lock(&outstream_mutex);
-> +       stream_out->common.standby(&stream_out->common);
-> +       pthread_mutex_unlock(&outstream_mutex);
-> +}
-> +
-> +static void resume_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state == STATE_SUSPENDED)
-> +               current_state = STATE_PLAYING;
-> +       pthread_mutex_unlock(&state_mutex);
-> +}
-> +
-> +static void get_latency_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       haltest_info("Output audio stream latency: %d\n",
-> +                                       stream_out->get_latency(stream_out));
-> +}
-> +
-> +static void get_buffer_size_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       haltest_info("Current output buffer size: %zu\n",
-> +               stream_out->common.get_buffer_size(&stream_out->common));
-> +}
-> +
-> +static void get_channels_p(int argc, const char **argv)
-> +{
-> +       audio_channel_mask_t channels;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       channels = stream_out->common.get_channels(&stream_out->common);
-> +
-> +       haltest_info("Channels: %s\n", audio_channel_mask_t2str(channels));
-> +}
-> +
-> +static void get_format_p(int argc, const char **argv)
-> +{
-> +       audio_format_t format;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       format = stream_out->common.get_format(&stream_out->common);
-> +
-> +       haltest_info("Format: %s\n", audio_format_t2str(format));
-> +}
-> +
-> +static void get_sample_rate_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       haltest_info("Current sample rate: %d\n",
-> +               stream_out->common.get_sample_rate(&stream_out->common));
-> +}
-> +
-> +static void get_parameters_p(int argc, const char **argv)
-> +{
-> +       const char *keystr;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3) {
-> +               haltest_info("No keys given.\n");
-> +               keystr = "";
-> +       } else {
-> +               keystr = argv[2];
-> +       }
-> +
-> +       haltest_info("Current parameters: %s\n",
-> +                       stream_out->common.get_parameters(&stream_out->common,
-> +                                                               keystr));
-> +}
-> +
-> +static void set_parameters_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3) {
-> +               haltest_error("No key=value; pairs given.\n");
-> +               return;
-> +       }
-> +
-> +       stream_out->common.set_parameters(&stream_out->common, argv[2]);
-> +}
-> +
-> +static void set_sample_rate_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3)
-> +               return;
-> +
-> +       stream_out->common.set_sample_rate(&stream_out->common, atoi(argv[2]));
-> +}
-> +
-> +static void init_check_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +
-> +       haltest_info("Init check result: %d\n", if_audio_sco->init_check(if_audio_sco));
-> +}
-> +
-> +static struct method methods[] = {
-> +       STD_METHOD(init),
-> +       STD_METHOD(cleanup),
-> +       STD_METHOD(open_output_stream),
-> +       STD_METHOD(close_output_stream),
-> +       STD_METHODH(play, "<path to pcm file>"),
-> +       STD_METHOD(stop),
-> +       STD_METHOD(suspend),
-> +       STD_METHOD(resume),
-> +       STD_METHOD(get_latency),
-> +       STD_METHOD(get_buffer_size),
-> +       STD_METHOD(get_channels),
-> +       STD_METHOD(get_format),
-> +       STD_METHOD(get_sample_rate),
-> +       STD_METHODH(get_parameters, "<A2dpSuspended;closing>"),
-> +       STD_METHODH(set_parameters, "<A2dpSuspended=value;closing=value>"),
-
-Those A2dp parameter should not apply here so we probably should
-remove these methods.
-
-> +       STD_METHODH(set_sample_rate, "<sample rate>"),
-> +       STD_METHOD(init_check),
-> +       END_METHOD
-> +};
-> +
-> +const struct interface audio_sco_if = {
-> +       .name = "audio-sco",
-> +       .methods = methods
-> +};
-> diff --git a/android/client/if-main.h b/android/client/if-main.h
-> index ff6006c..b77710c 100644
-> --- a/android/client/if-main.h
-> +++ b/android/client/if-main.h
-> @@ -68,6 +68,7 @@ struct interface {
->  };
->
->  extern const struct interface audio_if;
-> +extern const struct interface audio_sco_if;
->  extern const struct interface bluetooth_if;
->  extern const struct interface av_if;
->  extern const struct interface rc_if;
-> --
-> 1.8.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/android/audio-msg.h b/android/audio-msg.h
+index 5981355..8db3298 100644
+--- a/android/audio-msg.h
++++ b/android/audio-msg.h
+@@ -24,9 +24,11 @@
+ #define BLUEZ_AUDIO_MTU 1024
+ 
+ static const char BLUEZ_AUDIO_SK_PATH[] = "\0bluez_audio_socket";
++static const char BLUEZ_AUDIO_SCO_SK_PATH[] = "\0bluez_audio_sco_socket";
+ 
+ #define AUDIO_SERVICE_ID		0
+-#define AUDIO_SERVICE_ID_MAX		AUDIO_SERVICE_ID
++#define AUDIO_SERVICE_SCO_ID		1
++#define AUDIO_SERVICE_ID_MAX		AUDIO_SERVICE_SCO_ID
+ 
+ #define AUDIO_STATUS_SUCCESS		IPC_STATUS_SUCCESS
+ #define AUDIO_STATUS_FAILED		0x01
+@@ -79,3 +81,8 @@ struct audio_cmd_resume_stream {
+ struct audio_cmd_suspend_stream {
+ 	uint8_t id;
+ } __attribute__((packed));
++
++#define AUDIO_OP_SCO_GET_FD		0x01
++struct audio_rsp_sco_get_fd {
++	uint16_t mtu;
++} __attribute__((packed));
+diff --git a/android/hal-audio-hsp.c b/android/hal-audio-hsp.c
+index 992066c..b0ebc45 100644
+--- a/android/hal-audio-hsp.c
++++ b/android/hal-audio-hsp.c
+@@ -16,13 +16,20 @@
+  */
+ 
+ #include <errno.h>
++#include <pthread.h>
++#include <poll.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <unistd.h>
+ 
+ #include <hardware/audio.h>
+ #include <hardware/hardware.h>
+ 
++#include "audio-msg.h"
++#include "ipc-common.h"
+ #include "hal-log.h"
+ 
+ #define AUDIO_STREAM_DEFAULT_RATE	44100
+@@ -30,15 +37,24 @@
+ 
+ #define OUT_BUFFER_SIZE			2560
+ 
++static int listen_sk = -1;
++static int audio_sk = -1;
++
++static pthread_t ipc_th = 0;
++static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
++
+ struct hsp_audio_config {
+ 	uint32_t rate;
+ 	uint32_t channels;
++	uint16_t mtu;
+ 	audio_format_t format;
+ };
+ 
+ struct hsp_stream_out {
+ 	struct audio_stream_out stream;
++
+ 	struct hsp_audio_config cfg;
++	int fd;
+ };
+ 
+ struct hsp_audio_dev {
+@@ -46,13 +62,186 @@ struct hsp_audio_dev {
+ 	struct hsp_stream_out *out;
+ };
+ 
++/* Audio IPC functions */
++
++static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
++			void *param, size_t *rsp_len, void *rsp, int *fd)
++{
++	ssize_t ret;
++	struct msghdr msg;
++	struct iovec iv[2];
++	struct ipc_hdr cmd;
++	char cmsgbuf[CMSG_SPACE(sizeof(int))];
++	struct ipc_status s;
++	size_t s_len = sizeof(s);
++
++	pthread_mutex_lock(&sk_mutex);
++
++	if (audio_sk < 0) {
++		error("audio: Invalid cmd socket passed to audio_ipc_cmd");
++		goto failed;
++	}
++
++	if (!rsp || !rsp_len) {
++		memset(&s, 0, s_len);
++		rsp_len = &s_len;
++		rsp = &s;
++	}
++
++	memset(&msg, 0, sizeof(msg));
++	memset(&cmd, 0, sizeof(cmd));
++
++	cmd.service_id = service_id;
++	cmd.opcode = opcode;
++	cmd.len = len;
++
++	iv[0].iov_base = &cmd;
++	iv[0].iov_len = sizeof(cmd);
++
++	iv[1].iov_base = param;
++	iv[1].iov_len = len;
++
++	msg.msg_iov = iv;
++	msg.msg_iovlen = 2;
++
++	ret = sendmsg(audio_sk, &msg, 0);
++	if (ret < 0) {
++		error("audio: Sending command failed:%s", strerror(errno));
++		goto failed;
++	}
++
++	/* socket was shutdown */
++	if (ret == 0) {
++		error("audio: Command socket closed");
++		goto failed;
++	}
++
++	memset(&msg, 0, sizeof(msg));
++	memset(&cmd, 0, sizeof(cmd));
++
++	iv[0].iov_base = &cmd;
++	iv[0].iov_len = sizeof(cmd);
++
++	iv[1].iov_base = rsp;
++	iv[1].iov_len = *rsp_len;
++
++	msg.msg_iov = iv;
++	msg.msg_iovlen = 2;
++
++	if (fd) {
++		memset(cmsgbuf, 0, sizeof(cmsgbuf));
++		msg.msg_control = cmsgbuf;
++		msg.msg_controllen = sizeof(cmsgbuf);
++	}
++
++	ret = recvmsg(audio_sk, &msg, 0);
++	if (ret < 0) {
++		error("audio: Receiving command response failed:%s",
++							strerror(errno));
++		goto failed;
++	}
++
++	if (ret < (ssize_t) sizeof(cmd)) {
++		error("audio: Too small response received(%zd bytes)", ret);
++		goto failed;
++	}
++
++	if (cmd.service_id != service_id) {
++		error("audio: Invalid service id (%u vs %u)", cmd.service_id,
++								service_id);
++		goto failed;
++	}
++
++	if (ret != (ssize_t) (sizeof(cmd) + cmd.len)) {
++		error("audio: Malformed response received(%zd bytes)", ret);
++		goto failed;
++	}
++
++	if (cmd.opcode != opcode && cmd.opcode != AUDIO_OP_STATUS) {
++		error("audio: Invalid opcode received (%u vs %u)",
++						cmd.opcode, opcode);
++		goto failed;
++	}
++
++	if (cmd.opcode == AUDIO_OP_STATUS) {
++		struct ipc_status *s = rsp;
++
++		if (sizeof(*s) != cmd.len) {
++			error("audio: Invalid status length");
++			goto failed;
++		}
++
++		if (s->code == AUDIO_STATUS_SUCCESS) {
++			error("audio: Invalid success status response");
++			goto failed;
++		}
++
++		pthread_mutex_unlock(&sk_mutex);
++
++		return s->code;
++	}
++
++	pthread_mutex_unlock(&sk_mutex);
++
++	/* Receive auxiliary data in msg */
++	if (fd) {
++		struct cmsghdr *cmsg;
++
++		*fd = -1;
++
++		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
++					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
++			if (cmsg->cmsg_level == SOL_SOCKET
++					&& cmsg->cmsg_type == SCM_RIGHTS) {
++				memcpy(fd, CMSG_DATA(cmsg), sizeof(int));
++				break;
++			}
++		}
++
++		if (*fd < 0)
++			goto failed;
++	}
++
++	if (rsp_len)
++		*rsp_len = cmd.len;
++
++	return AUDIO_STATUS_SUCCESS;
++
++failed:
++	/* Some serious issue happen on IPC - recover */
++	shutdown(audio_sk, SHUT_RDWR);
++	pthread_mutex_unlock(&sk_mutex);
++
++	return AUDIO_STATUS_FAILED;
++}
++
++static int ipc_get_sco_fd(int *fd, uint16_t *mtu)
++{
++	struct audio_rsp_sco_get_fd rsp;
++	size_t rsp_len = sizeof(rsp);
++	int ret;
++
++	DBG("");
++
++	ret = audio_ipc_cmd(AUDIO_SERVICE_SCO_ID, AUDIO_OP_SCO_GET_FD, 0,
++						NULL, &rsp_len, &rsp, fd);
++
++	*mtu = rsp.mtu;
++
++	return ret;
++}
++
+ /* Audio stream functions */
+ 
+ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 								size_t bytes)
+ {
++	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
++
+ 	/* write data */
+ 
++	DBG("write to fd %d bytes %zu", out->fd, bytes);
++
+ 	return bytes;
+ }
+ 
+@@ -60,7 +249,7 @@ static uint32_t out_get_sample_rate(const struct audio_stream *stream)
+ {
+ 	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
+ 
+-	DBG("");
++	DBG("rate %u", out->cfg.rate);
+ 
+ 	return out->cfg.rate;
+ }
+@@ -74,7 +263,7 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+ 
+ static size_t out_get_buffer_size(const struct audio_stream *stream)
+ {
+-	DBG("");
++	DBG("buf size %u", OUT_BUFFER_SIZE);
+ 
+ 	return OUT_BUFFER_SIZE;
+ }
+@@ -182,9 +371,18 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ {
+ 	struct hsp_audio_dev *adev = (struct hsp_audio_dev *) dev;
+ 	struct hsp_stream_out *out;
++	int fd = -1;
++	uint16_t mtu;
+ 
+ 	DBG("");
+ 
++	if (ipc_get_sco_fd(&fd, &mtu) != AUDIO_STATUS_SUCCESS) {
++		error("audio: cannot get fd");
++		return -EIO;
++	}
++
++	DBG("got sco fd %d mtu %u", fd, mtu);
++
+ 	out = calloc(1, sizeof(struct hsp_stream_out));
+ 	if (!out)
+ 		return -ENOMEM;
+@@ -209,9 +407,11 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
+ 	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
+ 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	out->cfg.mtu = mtu;
+ 
+ 	*stream_out = &out->stream;
+ 	adev->out = out;
++	out->fd = fd;
+ 
+ 	return 0;
+ }
+@@ -219,9 +419,17 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ static void audio_close_output_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_out *stream_out)
+ {
+-	DBG("");
++	struct hsp_audio_dev *hsp_dev = (struct hsp_audio_dev *) dev;
++
++	DBG("dev %p stream %p fd %d", dev, stream_out, hsp_dev->out->fd);
++
++	if (hsp_dev->out && hsp_dev->out->fd) {
++		close(hsp_dev->out->fd);
++		hsp_dev->out->fd = -1;
++	}
+ 
+ 	free(stream_out);
++	hsp_dev->out = NULL;
+ }
+ 
+ static int audio_set_parameters(struct audio_hw_device *dev,
+@@ -325,10 +533,117 @@ static int audio_close(hw_device_t *device)
+ 	return 0;
+ }
+ 
++static void *ipc_handler(void *data)
++{
++	bool done = false;
++	struct pollfd pfd;
++	int sk;
++
++	DBG("");
++
++	while (!done) {
++		DBG("Waiting for connection ...");
++
++		sk = accept(listen_sk, NULL, NULL);
++		if (sk < 0) {
++			int err = errno;
++
++			if (err == EINTR)
++				continue;
++
++			if (err != ECONNABORTED && err != EINVAL)
++				error("audio: Failed to accept socket: %d (%s)",
++							err, strerror(err));
++
++			break;
++		}
++
++		pthread_mutex_lock(&sk_mutex);
++		audio_sk = sk;
++		pthread_mutex_unlock(&sk_mutex);
++
++		DBG("Audio IPC: Connected");
++
++		memset(&pfd, 0, sizeof(pfd));
++		pfd.fd = audio_sk;
++		pfd.events = POLLHUP | POLLERR | POLLNVAL;
++
++		/* Check if socket is still alive. Empty while loop.*/
++		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
++
++		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
++			info("Audio HAL: Socket closed");
++
++			pthread_mutex_lock(&sk_mutex);
++			close(audio_sk);
++			audio_sk = -1;
++			pthread_mutex_unlock(&sk_mutex);
++		}
++	}
++
++	info("Closing Audio IPC thread");
++	return NULL;
++}
++
++static int audio_ipc_init(void)
++{
++	struct sockaddr_un addr;
++	int err;
++	int sk;
++
++	DBG("");
++
++	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
++	if (sk < 0) {
++		err = -errno;
++		error("audio: Failed to create socket: %d (%s)", -err,
++								strerror(-err));
++		return err;
++	}
++
++	memset(&addr, 0, sizeof(addr));
++	addr.sun_family = AF_UNIX;
++
++	memcpy(addr.sun_path, BLUEZ_AUDIO_SCO_SK_PATH,
++					sizeof(BLUEZ_AUDIO_SCO_SK_PATH));
++
++	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
++		err = -errno;
++		error("audio: Failed to bind socket: %d (%s)", -err,
++								strerror(-err));
++		goto failed;
++	}
++
++	if (listen(sk, 1) < 0) {
++		err = -errno;
++		error("audio: Failed to listen on the socket: %d (%s)", -err,
++								strerror(-err));
++		goto failed;
++	}
++
++	listen_sk = sk;
++
++	err = pthread_create(&ipc_th, NULL, ipc_handler, NULL);
++	if (err) {
++		err = -err;
++		ipc_th = 0;
++		error("audio: Failed to start Audio IPC thread: %d (%s)",
++							-err, strerror(-err));
++		goto failed;
++	}
++
++	return 0;
++
++failed:
++	close(sk);
++	return err;
++}
++
+ static int audio_open(const hw_module_t *module, const char *name,
+ 							hw_device_t **device)
+ {
+ 	struct hsp_audio_dev *adev;
++	int err;
+ 
+ 	DBG("");
+ 
+@@ -338,6 +653,10 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 		return -EINVAL;
+ 	}
+ 
++	err = audio_ipc_init();
++	if (err < 0)
++		return err;
++
+ 	adev = calloc(1, sizeof(struct hsp_audio_dev));
+ 	if (!adev)
+ 		return -ENOMEM;
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 8202e53..8762044 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -45,6 +45,7 @@
+ #include "bluetooth.h"
+ #include "src/log.h"
+ #include "utils.h"
++#include "audio-msg.h"
+ 
+ #define HSP_AG_CHANNEL 12
+ #define HFP_AG_CHANNEL 13
+@@ -156,7 +157,9 @@ static struct {
+ static uint32_t hfp_ag_features = 0;
+ 
+ static bdaddr_t adapter_addr;
++
+ static struct ipc *hal_ipc = NULL;
++static struct ipc *audio_ipc = NULL;
+ 
+ static uint32_t hfp_record_id = 0;
+ static GIOChannel *hfp_server = NULL;
+@@ -822,6 +825,8 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	g_io_channel_unref(device.sco);
+ 	device.sco = NULL;
+ 
++	DBG("");
++
+ 	device.sco_watch = 0;
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+@@ -887,6 +892,27 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 							sco_watch_cb, NULL);
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++
++	if (audio_ipc) {
++		int fd = g_io_channel_unix_get_fd(chan);
++		GError *err = NULL;
++		uint16_t mtu = 48;
++		struct audio_rsp_sco_get_fd rsp;
++
++		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
++							BT_IO_OPT_INVALID)) {
++			error("Unable to get MTU: %s\n", err->message);
++			g_clear_error(&err);
++		}
++
++		DBG("fd %d mtu %u", fd, mtu);
++
++		rsp.mtu = mtu;
++
++		ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_SCO_ID,
++					AUDIO_OP_SCO_GET_FD, sizeof(rsp), &rsp,
++					fd);
++	}
+ }
+ 
+ static bool connect_sco(void)
+@@ -904,7 +930,7 @@ static bool connect_sco(void)
+ 				device.negotiated_codec != CODEC_ID_CVSD)
+ 		voice_settings = BT_VOICE_TRANSPARENT;
+ 	else
+-		voice_settings = BT_VOICE_CVSD_16BIT;
++		voice_settings = 0;
+ 
+ 	io = bt_io_connect(connect_sco_cb, NULL, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+@@ -2563,6 +2589,34 @@ static void disable_sco_server(void)
+ 	}
+ }
+ 
++static void bt_audio_sco_get_fd(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	connect_audio();
++}
++
++static const struct ipc_handler audio_handlers[] = {
++	/* AUDIO_OP_SCO_GET_FD */
++	{ bt_audio_sco_get_fd, false, 0 }
++};
++
++static bool bt_audio_register(ipc_disconnect_cb disconnect)
++{
++	DBG("");
++
++	audio_ipc = ipc_init(BLUEZ_AUDIO_SCO_SK_PATH,
++				sizeof(BLUEZ_AUDIO_SCO_SK_PATH),
++				AUDIO_SERVICE_ID_MAX, false, disconnect, NULL);
++	if (!audio_ipc)
++		return false;
++
++	ipc_register(audio_ipc, AUDIO_SERVICE_SCO_ID, audio_handlers,
++						G_N_ELEMENTS(audio_handlers));
++
++	return true;
++}
++
+ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ {
+ 	DBG("mode 0x%x", mode);
+@@ -2597,6 +2651,9 @@ done:
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
++
++	bt_audio_register(NULL);
++
+ 	return true;
+ }
+ 
 -- 
-Luiz Augusto von Dentz
+1.8.3.2
+
