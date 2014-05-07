@@ -1,57 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] shared/tester: Add support for debug logs for tester
-Date: Wed,  7 May 2014 16:45:07 +0200
-Message-Id: <1399473907-9698-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: johan.hedberg@gmail.com, szymon.janc@tieto.com,
+	andrzej.kaczmarek@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/2] doc: Introduce Start/Stop Connection Monitor
+Date: Wed,  7 May 2014 16:17:13 +0200
+Message-Id: <1399472233-19056-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1399472233-19056-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1399472233-19056-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It allows to print debug logs if debug mode is enabled. It could help in
-case of additional debug prints need (verbose mode).
+This patch introduce device method to start and stop connection monitor
+and two new device properties ConnectionRSSI and ConnectionTXPower which
+are tracked when monitor is active
 ---
- src/shared/tester.c | 14 ++++++++++++++
- src/shared/tester.h |  2 ++
- 2 files changed, 16 insertions(+)
+ doc/device-api.txt | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 56e5696..7f1b980 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -134,6 +134,20 @@ void tester_print(const char *format, ...)
- 	printf("%s\n", COLOR_OFF);
- }
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 7a301d3..9e7296e 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -100,6 +100,34 @@ Methods		void Connect()
+ 			Possible errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.Failed
  
-+void tester_debug(const char *format, ...)
-+{
-+	va_list ap;
 +
-+	if (!tester_use_debug())
-+		return;
++		void StartConnectionMonitor()
 +
-+	printf("   tester-dbg: %s", COLOR_WHITE);
-+	va_start(ap, format);
-+	vprintf(format, ap);
-+	va_end(ap);
-+	printf("%s\n", COLOR_OFF);
-+}
++			This method starts connection monitor session.
 +
- void tester_warn(const char *format, ...)
- {
- 	va_list ap;
-diff --git a/src/shared/tester.h b/src/shared/tester.h
-index 85d5e95..0231f19 100644
---- a/src/shared/tester.h
-+++ b/src/shared/tester.h
-@@ -33,6 +33,8 @@ void tester_print(const char *format, ...)
- 				__attribute__((format(printf, 1, 2)));
- void tester_warn(const char *format, ...)
- 				__attribute__((format(printf, 1, 2)));
-+void tester_debug(const char *format, ...)
-+				__attribute__((format(printf, 1, 2)));
++			This method enables connection information tracking.
++			E.g. ConnectionRSSI, ConnectionTXPower.
++
++			Use StopConnectionMonitor to release session.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++					 org.bluez.Error.NotConnected
++					 org.bluez.Error.NotSupported
++
++		void StopConnectionMonitor()
++
++			This method stops previous StartConnectionMonitor
++			session.
++
++			Note that connection monitor is shared between all
++			monitor sessions thus calling StopConnectionMonitor
++			releases a single session.
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.NotReady
++					 org.bluez.Error.NotAuthorized
++
+ Properties	string Address [readonly]
  
- typedef void (*tester_destroy_func_t)(void *user_data);
- typedef void (*tester_data_func_t)(const void *test_data);
+ 			The Bluetooth device address of the remote device.
+@@ -193,3 +221,23 @@ Properties	string Address [readonly]
+ 
+ 			Received Signal Strength Indicator (inquiry) of the remote
+ 			device.
++
++		int16 ConnectionRSSI [readonly, optional]
++
++			Received Signal Strength Indicator of connected remote
++			device.
++
++			This property is present only if at least one connection
++			monitor session is active.
++
++			Note that RSSI has different units for BR/EDR (dB)
++			and LE (dBm) as specified in BT Core ver. 4.1, Vol. 2,
++			Part E, Chapter 7.5.4
++
++		int16 ConnectionTXPower [readonly, optional]
++
++			Transmit power level to the remote device on the existing
++			connection
++
++			This property is present only if at least one connection
++			monitor session is active.
 -- 
-1.9.2
+1.8.4
 
