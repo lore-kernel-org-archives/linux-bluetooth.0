@@ -1,60 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Add possibility to start android daemon on PC in single mode
-Date: Wed, 07 May 2014 16:15:13 +0200
-Message-ID: <6364532.x448p36TxV@uw000953>
-In-Reply-To: <1399420934-30409-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1399420934-30409-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	andrzej.kaczmarek@tieto.com,
+	johan.hedberg@gmail.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] mgmt-api: Add support to get connection information
+Date: Wed,  7 May 2014 14:15:40 +0200
+Message-Id: <1399464940-16908-1-git-send-email-lukasz.rymanowski@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+This patch introduces Get Connection Information command.
+---
+ doc/mgmt-api.txt | 38 ++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 38 insertions(+)
 
-On Wednesday 07 of May 2014 02:02:14 Lukasz Rymanowski wrote:
-> With this patch it is possible to start android daemon on PC in
-> BREDR or LE or BREDR/LE mode by setting system environment variable
-> named BLUETOOTH_MODE to appropriate value according to README.
-> 
-> This is useful for testing purposes.
-> ---
->  android/cutils/properties.h | 13 +++++++++++++
->  1 file changed, 13 insertions(+)
-> 
-> diff --git a/android/cutils/properties.h b/android/cutils/properties.h
-> index 66a4a84..b9c59a5 100644
-> --- a/android/cutils/properties.h
-> +++ b/android/cutils/properties.h
-> @@ -29,9 +29,22 @@
->  
->  #define PROPERTY_VALUE_MAX 32
->  
-> +#define BLUETOOTH_MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
-> +
->  static inline int property_get(const char *key, char *value,
->  						const char *default_value)
->  {
-> +	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_NAME)) {
-> +		char *mode;
-> +
-> +		mode = getenv("BLUETOOTH_MODE");
-> +		if (!mode)
-> +			return 0;
-> +
-> +		memcpy(value, mode, strlen(mode));
-> +		return 1;
-> +	}
-> +
->  	return 0;
->  }
->  
-> 
-
-Pushed with changes we discussed offline, thanks.
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index cd5cd24..8ca8457 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1679,6 +1679,44 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
+ 
+ 
++Get Connection Information Command
++==================================
++
++	Command Code:		0x0031
++	Controller Index:       <controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Data_Type (4 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				RSSI (1 Octet)
++				Flags (4 Octets)
++				EIR_Data_Length (2 Octets)
++				EIR_Data (0-65535 Octets)
++
++	This command is used to get connection information.
++
++	Data_Type parameter is a bitmask with currently the following available
++	bits:
++
++		0	TX Power
++
++	All the other bits are reserved and shall be set to 0. Unknown bits are
++	ignored.
++
++	All the requested Data_Type information are returned in EIR_Data.
++
++	Flags are reserved for the future use.
++
++	This command generates a Command Complete event on success and
++	on failure.
++
++	Possible errors:	Not Connected
++				Not Powered
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.8.4
