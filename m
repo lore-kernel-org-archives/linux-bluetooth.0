@@ -1,73 +1,224 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; CHARSET=US-ASCII
-Subject: Re: BLE Passive scan & Bonding quest (dbus vs mgmt-api vs plugins)
-From: d.eriksson@me.com
-In-reply-to: <48778ECB-83A1-48BC-97B7-81020E098C20@holtmann.org>
-Date: Thu, 08 May 2014 01:24:12 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-id: <9E1E42D8-A76F-4174-89BE-106D2A3AA966@me.com>
-References: <6FFA5235-4897-4AF9-AF0D-10258F2E056B@me.com>
- <48778ECB-83A1-48BC-97B7-81020E098C20@holtmann.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add Broadcom patch RAM support
+Message-Id: <20140507223541.387FE1005DE@puck.mtv.corp.google.com>
+Date: Wed,  7 May 2014 15:35:41 -0700 (PDT)
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+After hardware reset, some BCM Bluetooth adapters obtain their initial firmware
+from OTPROM chip. Once this initial firmware is running, the firmware can be
+further upgraded over HCI interface with .hcd files provided by Broadcom. This
+is also known as "patch RAM" support. This change implements that.
 
-pls see my reply in-line below:
+If the .hcd file is not found in /lib/firmware, BCM Bluetooth adapter continues
+to operate with the initial firmware. Sample kernel log:
+  hotplug: sys=firmware act=add fw=brcm/BCM20702A0-0a5c-22be.hcd dev=...
+  Bluetooth: hci0: BCM: patch brcm/BCM20702A0-0a5c-22be.hcd not found
+  Bluetooth: hci0: BCM: firmware hci_ver=06 hci_rev=1000 lmp_ver=06 lmp_subver=220e
 
+If the .hcd file is found, btusb driver pushes it to the BCM Bluetooth adapter and
+it starts using the new firmware. Sample kernel log:
+  hotplug: sys=firmware act=add fw=brcm/BCM20702A0-0a5c-22be.hcd dev=...
+  Bluetooth: hci0: BCM: patching hci_ver=06 hci_rev=1000 lmp_ver=06 lmp_subver=220e
+  Bluetooth: hci0: BCM: firmware hci_ver=06 hci_rev=1389 lmp_ver=06 lmp_subver=220e
 
-On 06 May 2014, at 03:40, Marcel Holtmann <marcel@holtmann.org> wrote:
+Above, we can see that hci_rev goes from 1000 to 1389 as a result of the upgrade.
 
-> Hi David,
-> 
->> I'm on Kernel v3.13 & BlueZ 5.18 and been testing around to find the cleanest approach for a fully automatic discovery and headless pairing/bonding of BLE peripherals (in my case HOGP / HID).
->> 
->> Basically, today a "scan and pair (bond)" could today be done using either "bluetoothctl", "hcitool", "dbus/python-agents", "C plugins", or the "C Management API". (please correct me if I'm wrong here).
->> 
->> As we have many many options to achieve this, I'd like some guidance on how to re-use as much mechanisms that already exists in BlueZ and/or kernel/user-space, preferably involving as few building blocks as possible.
->> 
->> 
->> In short, I continuously need to run a passive scan for LE-devices only and bond to specific hid-devices based on suitable vendor info in the advertise data or the device information service.
->> 
->> I'm sharing the radio with a wifi using co-ex so "BT-classic" must be off and I assume active scan will eat too much air-time.
->> Once paired (or bonded as SIG and the IC-manuf. calls it), it should be a persistent and identifiable /dev/input device 
->> 
->> Any existing bluez or linux ways to do this I'd prefer to re-use, like utilising 'udev rules', bluetoothd patches or configs to optimise for LE-only and in general keep things light as I want to run the discovery/scan at all times. I'm ok with pure C or mix with shell and python, whatever works best and would be considered bluez future-proof.
-> 
-> with mgmt version 1.4 starting from kernel 3.13 you can take a dual-mode controller and actually disable BR/EDR features. So for all intense and purposes it will look and behave like a LE only controller. Check btmgmt bredr command.
+Signed-off-by: Petri Gynther <pgynther@google.com>
+---
+ drivers/bluetooth/btusb.c | 158 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 157 insertions(+), 1 deletion(-)
 
-Seems like "scan" is behaving a bit different when running it interactively in bluetoothctl vs. mgmt. Didn't figure out how to best scan, match and connect the hid device. Are there some good examples written?  
-
-we have mgmt, py-agents, plugins/autopair.c. To me I'd prefer to consolidate the part initiating and sequencing the scanning part with the filtering and hid creation. I also need a good way to distinguish and lookup BT-UUID to and from /dev/input/eventX, Y, etc.
-
-Would be great to hear some opinions on pros/cons doing this via python+dbus vs pure hci via hcitool, mgmt etc. 
-
-
-> Within bluetoothd we do not have support for forcefully turning a dual-mode controller into a single mode LE controller. You would need to add a config option for that. By default we will be a dual-mode controller and use dual-mode host operations.
-
-Great, the config options to explicitly disable BR/EDR, you mean this exists already? Honestly I'm not so fluent in the exact structure of the bluez configuration tree, what's mandatory, could be stripped out to ensure we're passive only and minimize air-time.
-
-
-> When you pair a HoG device using D-Bus APIs of bluetoothd, it will become bonded and we will auto-reconnect it.
-for HoG, can you explain the order/feature of the pair vs trust commands ?
-
-
-> This currently uses active scanning to re-connect the HID device, but we are in the process of adding passive scanning + auto-connect feature to the kernel to optimize this.
-
-Sounds great, looking forward to this feature, any planned ETA ? 
-
-Will this require the peripheral to use direct advertise -> central (bluez)?
-
-Any other ways to achieve passive scan today by (I guess) bypassing d-bus/bluetoothd to perform the scan/discovery?
-
-I'm also curious if you or someone here have worked with linux sleep-modes and via a BLE peripheral wake the system. I believe it's called "Sniff Mode" right?
-
-
-> The initial discovery and pairing phase is not included here. That is what normally external programs like the UI are doing. So you would just need to write a program that behaves like the UI and discovers your device. The D-Bus APIs to do so are fully documented. You can do that in C or Python or any other language with D-Bus bindings.
-
-Any hidden gems on how to setup some scan & pair rules with minimal complexity and max re-use of existing tools?
-
-
-
-Best David
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index f338b0c..1b3e514 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -49,6 +49,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_WRONG_SCO_MTU	0x40
+ #define BTUSB_ATH3012		0x80
+ #define BTUSB_INTEL		0x100
++#define BTUSB_BCM_PATCHRAM	0x200
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -111,7 +112,8 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0489, 0xff, 0x01, 0x01) },
+ 
+ 	/* Broadcom devices with vendor specific id */
+-	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01) },
++	{ USB_VENDOR_AND_INTERFACE_INFO(0x0a5c, 0xff, 0x01, 0x01),
++	  .driver_info = BTUSB_BCM_PATCHRAM },
+ 
+ 	/* Belkin F8065bf - Broadcom based */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x050d, 0xff, 0x01, 0x01) },
+@@ -1380,6 +1382,157 @@ exit_mfg_deactivate:
+ 	return 0;
+ }
+ 
++static int btusb_setup_bcm_patchram(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	struct usb_device *udev = data->udev;
++	char fw_name[64];
++	const struct firmware *fw;
++	const u8 *fw_ptr;
++	size_t fw_size;
++	const struct hci_command_hdr *cmd;
++	const u8 *cmd_param;
++	u16 opcode;
++	struct sk_buff *skb;
++	struct hci_rp_read_local_version *ver;
++	long ret;
++
++	snprintf(fw_name, sizeof(fw_name), "brcm/%s-%04x-%04x.hcd",
++		 udev->product ? udev->product : "BCM",
++		 le16_to_cpu(udev->descriptor.idVendor),
++		 le16_to_cpu(udev->descriptor.idProduct));
++
++	ret = request_firmware(&fw, fw_name, &hdev->dev);
++	if (ret < 0) {
++		BT_INFO("%s: BCM: patch %s not found", hdev->name,
++			fw_name);
++		ret = 0;
++		goto get_fw_ver;
++	}
++
++	/* Reset */
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_RESET failed (%ld)", hdev->name, ret);
++		goto reset_fw;
++	}
++	kfree_skb(skb);
++
++	/* Read Local Version Info */
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
++			hdev->name, ret);
++		goto reset_fw;
++	}
++
++	if (skb->len != sizeof(*ver)) {
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
++			hdev->name);
++		kfree_skb(skb);
++		ret = -EIO;
++		goto reset_fw;
++	}
++
++	ver = (struct hci_rp_read_local_version *) skb->data;
++	BT_INFO("%s: BCM: patching hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
++		"lmp_subver=%04x", hdev->name, ver->hci_ver, ver->hci_rev,
++		ver->lmp_ver, ver->lmp_subver);
++	kfree_skb(skb);
++
++	/* Start Download */
++	skb = __hci_cmd_sync(hdev, 0xfc2e, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: BCM: Download Minidrv command failed (%ld)",
++			hdev->name, ret);
++		goto reset_fw;
++	}
++	kfree_skb(skb);
++
++	/* 50 msec delay after Download Minidrv completes */
++	msleep(50);
++
++	fw_ptr = fw->data;
++	fw_size = fw->size;
++
++	while (fw_size >= sizeof(*cmd)) {
++		cmd = (struct hci_command_hdr *) fw_ptr;
++		fw_ptr += sizeof(*cmd);
++		fw_size -= sizeof(*cmd);
++
++		if (fw_size < cmd->plen) {
++			BT_ERR("%s: BCM: patch %s is corrupted",
++				hdev->name, fw_name);
++			ret = -EINVAL;
++			goto reset_fw;
++		}
++
++		cmd_param = fw_ptr;
++		fw_ptr += cmd->plen;
++		fw_size -= cmd->plen;
++
++		opcode = le16_to_cpu(cmd->opcode);
++
++		skb = __hci_cmd_sync(hdev, opcode, cmd->plen, cmd_param,
++				     HCI_INIT_TIMEOUT);
++		if (IS_ERR(skb)) {
++			ret = PTR_ERR(skb);
++			BT_ERR("%s: BCM: patch command %04x failed (%ld)",
++				hdev->name, opcode, ret);
++			goto reset_fw;
++		}
++		kfree_skb(skb);
++	}
++
++	/* 250 msec delay after Launch Ram completes */
++	msleep(250);
++
++reset_fw:
++	/* Reset */
++	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_RESET failed (%ld)", hdev->name, ret);
++		goto done;
++	}
++	kfree_skb(skb);
++
++get_fw_ver:
++	/* Read Local Version Info */
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
++			     HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION failed (%ld)",
++			hdev->name, ret);
++		goto done;
++	}
++
++	if (skb->len != sizeof(*ver)) {
++		BT_ERR("%s: HCI_OP_READ_LOCAL_VERSION event length mismatch",
++			hdev->name);
++		kfree_skb(skb);
++		ret = -EIO;
++		goto done;
++	}
++
++	ver = (struct hci_rp_read_local_version *) skb->data;
++	BT_INFO("%s: BCM: firmware hci_ver=%02x hci_rev=%04x lmp_ver=%02x "
++		"lmp_subver=%04x", hdev->name, ver->hci_ver, ver->hci_rev,
++		ver->lmp_ver, ver->lmp_subver);
++	kfree_skb(skb);
++
++done:
++	if (fw)
++		release_firmware(fw);
++
++	return ret;
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 				const struct usb_device_id *id)
+ {
+@@ -1485,6 +1638,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_BCM92035)
+ 		hdev->setup = btusb_setup_bcm92035;
+ 
++	if (id->driver_info & BTUSB_BCM_PATCHRAM)
++		hdev->setup = btusb_setup_bcm_patchram;
++
+ 	if (id->driver_info & BTUSB_INTEL) {
+ 		usb_enable_autosuspend(data->udev);
+ 		hdev->setup = btusb_setup_intel;
+-- 
+1.9.1.423.g4596e3a
