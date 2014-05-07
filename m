@@ -1,32 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 1/2] doc: Update RSSI property description.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHZ1yC=3GQJLcuKV4FwRKcHLY2C5xFsQJh1FVpvabBWTpfWsTg@mail.gmail.com>
-Date: Wed, 7 May 2014 12:06:00 -0700
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Szymon Janc <szymon.janc@tieto.com>,
+MIME-Version: 1.0
+In-Reply-To: <1399472233-19056-2-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1399472233-19056-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1399472233-19056-2-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 7 May 2014 11:15:52 -0700
+Message-ID: <CAHZ1yCk593aNDzLAjb3RjoTehYaZgm5BxAnKQQwSY_9Md76+8g@mail.gmail.com>
+Subject: Re: [PATCH 2/2] doc: Introduce Start/Stop Connection Monitor
+From: Scott James Remnant <keybuk@google.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, szymon.janc@tieto.com,
 	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Message-Id: <E4F0A858-85C9-4D2C-B716-4C58469A0465@holtmann.org>
-References: <1399472233-19056-1-git-send-email-lukasz.rymanowski@tieto.com> <CAHZ1yC=3GQJLcuKV4FwRKcHLY2C5xFsQJh1FVpvabBWTpfWsTg@mail.gmail.com>
-To: Scott James Remnant <keybuk@google.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+On Wed, May 7, 2014 at 7:17 AM, Lukasz Rymanowski
+<lukasz.rymanowski@tieto.com> wrote:
+> This patch introduce device method to start and stop connection monitor
+> and two new device properties ConnectionRSSI and ConnectionTXPower which
+> are tracked when monitor is active
 
->> RSSI property is inquiry RSSI and this should be stated here especially
->> that we plan to add connection RSSI property soon.
-> 
-> Does connection RSSI really need to be a separate property? Why can't
-> the same property be used for both? It's the same device after all.
+Does a polling API like this make more sense than just an "Update
+Connection Properties" method call?
 
-the problem is that they are different. They get measured differently. One is essentially tight to the Inquiry TX power and the other to the TX power of the connection. Results will be different. This has always been the problem with Bluetooth’s RSSI. Mapping the RSSI you got Extended Inquiry Result to Read RSSI is not possible.
+Why make new properties? The existing RSSI property could be re-used
+without confusion, likewise the TXPower property could be called just
+that - which would then give a place to fill in the TX Power if
+present in AD as well.
 
-Regards
-
-Marcel
-
+Scott
+-- 
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
