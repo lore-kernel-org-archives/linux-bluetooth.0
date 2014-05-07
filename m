@@ -4,11 +4,11 @@ To: Antonio Ospite <ao2@ao2.it>
 Cc: linux-bluetooth@vger.kernel.org,
 	Bastien Nocera <hadess@hadess.net>,
 	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: Re: [PATCH BlueZ 1/5] plugins/sixaxis: simplify get_js_numbers()
-Date: Wed, 07 May 2014 21:57:49 +0200
-Message-ID: <1503255.GchojqlcyW@athlon>
-In-Reply-To: <1399370776-5027-2-git-send-email-ao2@ao2.it>
-References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1399370776-5027-2-git-send-email-ao2@ao2.it>
+Subject: Re: [PATCH BlueZ 2/5] plugins/sixaxis: factor out a set_leds_hidraw() function
+Date: Wed, 07 May 2014 21:58:09 +0200
+Message-ID: <2255265.xHg6cUfLQi@athlon>
+In-Reply-To: <1399370776-5027-3-git-send-email-ao2@ao2.it>
+References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1399370776-5027-3-git-send-email-ao2@ao2.it>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,168 +16,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Antonio,
 
-On Tuesday 06 May 2014 12:06:12 Antonio Ospite wrote:
-
-Just a nitpick :) we usually start commit summary with capital letter eg.
-"plugins/sixaxis: Simplify get_js_numbers function"
-
-Same goes to rest of commits in this series.
-
-> Use udev_enumerate_add_match_parent() to simplify get_js_number() a lot,
-> with this mechanism the old JOIN-like operation to find joystick nodes
-> is no longer necessary.
+On Tuesday 06 May 2014 12:06:13 Antonio Ospite wrote:
+> This is in preparation for a set_leds_sysfs() function.
 > 
-> Also require libudev >= 172, this is where
-> udev_enumerate_add_match_parent() has been first introduced.
+> Also use TRUE as the return value of set_leds_hidraw() in the success
+> case just to be more semantically nice; the return value is not used in
+> setup_leds() anyway because the latter has to always return FALSE.
 
-This should be fine, any distro shipping BlueZ 5 is most likely already 
-providing newer version of udev anyway.
+I'd just make it return void then.
 
+> ---
+>  plugins/sixaxis.c | 31 +++++++++++++++++++------------
+>  1 file changed, 19 insertions(+), 12 deletions(-)
 > 
-> NOTE: using udev_enumerate_add_match_parent() results in a memory leak
-> when enumerating child devices, this has been fixed in udev 207; the
-> commit which fixes the issue is this one:
-> http://cgit.freedesktop.org/systemd/systemd/commit/?id=51cc07576e119dea6e654
-> 78eeba9472979fd0936 ---
->  configure.ac      |  4 +--
->  plugins/sixaxis.c | 92
-> +++++++++++++++++++++++++++---------------------------- 2 files changed, 47
-> insertions(+), 49 deletions(-)
-> 
-> diff --git a/configure.ac b/configure.ac
-> index 54a387f..4208ad8 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -125,8 +125,8 @@ AM_CONDITIONAL(MONITOR, test "${enable_monitor}" !=
-> "no") AC_ARG_ENABLE(udev, AC_HELP_STRING([--disable-udev],
->  		[disable udev device support]), [enable_udev=${enableval}])
->  if (test "${enable_tools}" != "no" && test "${enable_udev}" != "no"); then
-> -	PKG_CHECK_MODULES(UDEV, libudev >= 143, dummy=yes,
-> -				AC_MSG_ERROR(libudev >= 143 is required))
-> +	PKG_CHECK_MODULES(UDEV, libudev >= 172, dummy=yes,
-> +				AC_MSG_ERROR(libudev >= 172 is required))
->  	AC_SUBST(UDEV_CFLAGS)
->  	AC_SUBST(UDEV_LIBS)
->  	AC_CHECK_LIB(udev, udev_hwdb_new,
 > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 8045448..9db14ec 100644
+> index 9db14ec..61fd0b5 100644
 > --- a/plugins/sixaxis.c
 > +++ b/plugins/sixaxis.c
-> @@ -235,62 +235,60 @@ static bool setup_device(int fd, int index, struct
-> btd_adapter *adapter)
+> @@ -125,8 +125,7 @@ static int set_master_bdaddr(int fd, const bdaddr_t
+> *bdaddr) return ret;
+>  }
 > 
->  static int get_js_number(struct udev_device *udevice)
+> -static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+> -							gpointer user_data)
+> +static gboolean set_leds_hidraw(int fd, int number)
 >  {
-> -	struct udev_list_entry *devices, *dev_list_entry;
-> +	struct udev_list_entry *dev_list_entry;
->  	struct udev_enumerate *enumerate;
->  	struct udev_device *hid_parent;
-> -	const char *hidraw_node;
-> -	const char *hid_phys;
-> +	struct udev_device *transport_parent;
-> +	struct udev_device *js_dev;
-> +	const char *js_devname;
->  	int number = 0;
+>  	/*
+>  	 * the total time the led is active (0xff means forever)
+> @@ -147,14 +146,7 @@ static gboolean setup_leds(GIOChannel *channel,
+> GIOCondition cond, 0xff, 0x27, 0x10, 0x00, 0x32, /* LED_1 */
+>  		0x00, 0x00, 0x00, 0x00, 0x00,
+>  	};
+> -	int number = GPOINTER_TO_INT(user_data);
+>  	int ret;
+> -	int fd;
+> -
+> -	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+> -		return FALSE;
+> -
+> -	DBG("number %d", number);
 > 
-> -	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
-> -								"hid", NULL);
-> -
-> -	hid_phys = udev_device_get_property_value(hid_parent, "HID_PHYS");
-> -	hidraw_node = udev_device_get_devnode(udevice);
-> -	if (!hid_phys || !hidraw_node)
-> -		return 0;
-> +	/*
-> +	 * Go up by two levels from the hidraw device in order to support
-> +	 * older kernels, where the hierachy of HID devices is different than
-> +	 * newer kernels:
-> +	 *
-> +	 *   - on kernels < 3.14 the input device is child of the transport
-> +	 *     device (usbhid, hidp):
-> +	 *
-> +	 *       USB/BT
-> +	 *       |- hid
-> +	 *       |  `- hidraw *
-> +	 *       `- input
-> +	 *          `- js
-> +	 *
-> +	 *   - on kernels >= 3.14 the input device is child of the hid device
-> +	 *     itself, as it should be:
-> +	 *
-> +	 *       USB/BT
-> +	 *       `- hid
-> +	 *          |- hidraw *
-> +	 *          `- input
-> +	 *             `- js
-> +	 */
-> +	hid_parent = udev_device_get_parent(udevice);
-> +	transport_parent = udev_device_get_parent(hid_parent);
+>  	/* TODO we could support up to 10 (1 + 2 + 3 + 4) */
+>  	if (number > 7)
+> @@ -167,11 +159,9 @@ static gboolean setup_leds(GIOChannel *channel,
+> GIOCondition cond,
 > 
->  	enumerate = udev_enumerate_new(udev_device_get_udev(udevice));
-> +	udev_enumerate_add_match_parent(enumerate, transport_parent);
->  	udev_enumerate_add_match_sysname(enumerate, "js*");
->  	udev_enumerate_scan_devices(enumerate);
-> -	devices = udev_enumerate_get_list_entry(enumerate);
-> -
-> -	udev_list_entry_foreach(dev_list_entry, devices) {
-> -		struct udev_device *input_parent;
-> -		struct udev_device *js_dev;
-> -		const char *input_phys;
-> -		const char *devname;
-> -
-> -		devname = udev_list_entry_get_name(dev_list_entry);
-> -		js_dev = udev_device_new_from_syspath(
-> -						udev_device_get_udev(udevice),
-> -						devname);
-> -
-> -		input_parent = udev_device_get_parent_with_subsystem_devtype(
-> -							js_dev, "input", NULL);
-> -		if (!input_parent)
-> -			goto next;
-> -
-> -		/* check if this is the joystick relative to the hidraw device
-> -		 * above */
-> -		input_phys = udev_device_get_sysattr_value(input_parent,
-> -									"phys");
-> -		if (!input_phys)
-> -			goto next;
-> -
-> -		if (!strcmp(input_phys, hid_phys)) {
-> -			number = atoi(udev_device_get_sysnum(js_dev));
-> -
-> -			/* joystick numbers start from 0, leds from 1 */
-> -			number++;
-> -
-> -			udev_device_unref(js_dev);
-> -			break;
-> -		}
-> -next:
-> -		udev_device_unref(js_dev);
-> -	}
+>  	leds_report[10] |= 0x01 << number;
 > 
-> +	/* get the first js* device, there should be only one anyway */
-> +	dev_list_entry = udev_enumerate_get_list_entry(enumerate);
-> +
-> +	if (dev_list_entry == NULL)
-
-if (!dev_list_entry) ...
-
-> +		return number;
-> +
-> +	js_devname = udev_list_entry_get_name(dev_list_entry);
-> +	js_dev = udev_device_new_from_syspath(
-> +					udev_device_get_udev(udevice),
-> +					js_devname);
-
-Indentation issue here.
-
-> +
-> +	/* joystick numbers start from 0, leds from 1 */
-> +	number = atoi(udev_device_get_sysnum(js_dev)) + 1;
-> +
-> +	udev_device_unref(js_dev);
->  	udev_enumerate_unref(enumerate);
+> -	fd = g_io_channel_unix_get_fd(channel);
+> -
+>  	ret = write(fd, leds_report, sizeof(leds_report));
+>  	if (ret == sizeof(leds_report))
+> -		return FALSE;
+> +		return TRUE;
 > 
->  	return number;
+>  	if (ret < 0)
+>  		error("sixaxis: failed to set LEDS (%s)", strerror(errno));
+> @@ -181,6 +171,23 @@ static gboolean setup_leds(GIOChannel *channel,
+> GIOCondition cond, return FALSE;
+>  }
+> 
+> +static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	int number = GPOINTER_TO_INT(user_data);
+> +	int fd;
+> +
+> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+> +		return FALSE;
+> +
+> +	DBG("number %d", number);
+> +
+> +	fd = g_io_channel_unix_get_fd(channel);
+> +	set_leds_hidraw(fd, number);
+> +
+> +	return FALSE;
+> +}
+> +
+>  static bool setup_device(int fd, int index, struct btd_adapter *adapter)
+>  {
+>  	char device_addr[18], master_addr[18], adapter_addr[18];
 
 -- 
 Szymon K. Janc
