@@ -4,11 +4,11 @@ To: Antonio Ospite <ao2@ao2.it>
 Cc: linux-bluetooth@vger.kernel.org,
 	Bastien Nocera <hadess@hadess.net>,
 	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: Re: [PATCH BlueZ 5/5] plugins/sixaxis: add a set_leds_sysfs() function
-Date: Wed, 07 May 2014 22:24:41 +0200
-Message-ID: <6305682.zY7iR8LDWr@athlon>
-In-Reply-To: <1399370776-5027-6-git-send-email-ao2@ao2.it>
-References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1399370776-5027-6-git-send-email-ao2@ao2.it>
+Subject: Re: [PATCH BlueZ 4/5] plugins/sixaxis: add a get_leds_data() function
+Date: Wed, 07 May 2014 22:04:42 +0200
+Message-ID: <3241221.vQjXq9bzg2@athlon>
+In-Reply-To: <1399370776-5027-5-git-send-email-ao2@ao2.it>
+References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1399370776-5027-5-git-send-email-ao2@ao2.it>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -16,175 +16,129 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Antonio,
 
-On Tuesday 06 May 2014 12:06:16 Antonio Ospite wrote:
-> On recent kernels the hid-sony driver exposes leds class entries in
-> sysfs for setting the Sixaxis LEDs, use this interface and fall back to
-> hidraw in case using sysfs fails (e.g. on older hid-sony versions).
+On Tuesday 06 May 2014 12:06:15 Antonio Ospite wrote:
+> Get all the data necessary to set the LEDs (bitmap and/or sysfs paths)
+> in a single function, returning a leds_data structure to be passed as
+> argument to the setup_leds() callback.
 > 
-> Setting the LEDs via sysfs is the preferred way on newer kernels, the
-> rationale behind that is:
-> 
->   1. the Sixaxis uses the same HID output report for setting both LEDs
->      and rumble effects;
->   2. hid-sony remembers the state of LEDs in order to preserve them when
->      setting rumble effects;
->   3. when the LEDs are set via hidraw hid-sony has no way to know the
->      new LEDs state and thus can change the LEDs in an inconsistent way
->      when setting rumble effects later.
+> For now only the bitmap field is populated, which is the only thing that
+> set_leds_hidraw() needs.
 > ---
->  plugins/sixaxis.c | 77
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++--- 1 file changed, 73
-> insertions(+), 4 deletions(-)
+>  plugins/sixaxis.c | 54
+> +++++++++++++++++++++++++++++++++++++++++++++++------- 1 file changed, 47
+> insertions(+), 7 deletions(-)
 > 
 > diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 2b35d1c..446d499 100644
+> index b629c06..2b35d1c 100644
 > --- a/plugins/sixaxis.c
 > +++ b/plugins/sixaxis.c
-> @@ -185,10 +185,40 @@ static gboolean set_leds_hidraw(int fd, uint8_t
-> leds_bitmap) return FALSE;
->  }
+> @@ -61,6 +61,11 @@ static const struct {
+>  	},
+>  };
 > 
-> +static gboolean set_leds_sysfs(struct leds_data *data)
-
-Make it return bool.
-
-> +{
-> +	int i;
+> +struct leds_data {
+> +	char *syspaths[4];
+> +	uint8_t bitmap;
+> +};
 > +
-> +	for (i = 0; i < 4; i++) {
-> +		char path[PATH_MAX] = { 0 };
-> +		char buf[2] = { 0 };
-> +		int fd;
-> +		int ret;
-> +
-> +		if (data->syspaths[i] == NULL)
-
-if (!data->..)
-
-> +			return FALSE;
-> +
-> +		snprintf(path, PATH_MAX, "%s/brightness", data->syspaths[i]);
-> +		fd = open(path, O_WRONLY);
-> +		if (fd < 0) {
-> +			error("Cannot open %s (%s)", path, strerror(errno));
-
-Prefix error message with "sixaxis:"
-
-> +			return FALSE;
-> +		}
-> +
-> +		/* i+1 because leds start from 1, LED0 is never used */
-> +		buf[0] = '0' + !!(data->bitmap & (1 << (i+1)));
-
-Spaces around + in i+1.
-
-> +		ret = write(fd, buf, sizeof(buf));
-> +		close(fd);
-> +		if (ret != sizeof(buf))
-> +			return FALSE;
-> +	}
-> +
-> +	return TRUE;
-> +}
-> +
->  static gboolean setup_leds(GIOChannel *channel, GIOCondition cond,
->  							gpointer user_data)
+>  static struct udev *ctx = NULL;
+>  static struct udev_monitor *monitor = NULL;
+>  static guint watch_id = 0;
+> @@ -183,19 +188,25 @@ static gboolean set_leds_hidraw(int fd, uint8_t
+> leds_bitmap) static gboolean setup_leds(GIOChannel *channel, GIOCondition
+> cond, gpointer user_data)
 >  {
-> -	int fd;
->  	int i;
->  	int ret;
->  	struct leds_data *data = (struct leds_data *)user_data;
-> @@ -199,9 +229,11 @@ static gboolean setup_leds(GIOChannel *channel,
-> GIOCondition cond, if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
->  		goto out;
+> -	int number = GPOINTER_TO_INT(user_data);
+> -	uint8_t bitmap = 0;
+>  	int fd;
+> +	int i;
+> +	int ret;
+> +	struct leds_data *data = (struct leds_data *)user_data;
 > 
-> -	fd = g_io_channel_unix_get_fd(channel);
-> -
-> -	set_leds_hidraw(fd, data->bitmap);
-> +	ret = set_leds_sysfs(data);
-> +	if (ret == FALSE) {
-
-if (!set_leds_sysfs())
-
-> +		int fd = g_io_channel_unix_get_fd(channel);
-> +		set_leds_hidraw(fd, data->bitmap);
-> +	}
+> -	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+> +	if (data == NULL)
+>  		return FALSE;
 > 
->  out:
->  	for (i = 0; i < 4; i++)
-> @@ -324,6 +356,39 @@ static int get_js_number(struct udev_device *udevice)
+> -	DBG("number %d", number);
+> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
+> +		goto out;
+> 
+>  	fd = g_io_channel_unix_get_fd(channel);
+> 
+> -	if (calc_leds_bitmap(number, &bitmap))
+> -		set_leds_hidraw(fd, bitmap);
+> +	set_leds_hidraw(fd, data->bitmap);
+> +
+> +out:
+> +	for (i = 0; i < 4; i++)
+> +		free(data->syspaths[i]);
+> +	free(data);
+> 
+>  	return FALSE;
+>  }
+> @@ -313,6 +324,35 @@ static int get_js_number(struct udev_device *udevice)
 >  	return number;
 >  }
 > 
-> +static int get_leds_devices(struct udev_device *udevice, char *paths[4])
+> +static struct leds_data *get_leds_data(struct udev_device *udevice)
 > +{
-> +	struct udev_list_entry *devices, *dev_list_entry;
-> +	struct udev_enumerate *enumerate;
-> +	struct udev_device *hid_parent;
-> +	int index = 0;
+> +	struct leds_data *data;
+> +	int number;
+> +	int i;
 > +	int ret;
 > +
-> +	hid_parent = udev_device_get_parent_with_subsystem_devtype(udevice,
-> +								"hid", NULL);
+> +	data = malloc(sizeof(*data));
+> +	if (data == NULL)
+
+if (!data) ..
+
+> +		return NULL;
 > +
-> +	enumerate = udev_enumerate_new(udev_device_get_udev(udevice));
-> +	udev_enumerate_add_match_parent(enumerate, hid_parent);
-> +	udev_enumerate_add_match_subsystem(enumerate, "leds");
-> +	udev_enumerate_scan_devices(enumerate);
-> +	devices = udev_enumerate_get_list_entry(enumerate);
-> +
-> +	if (devices == NULL) {
+> +	memset(data, 0, sizeof(*data));
 
-if (!devices)..
-
-Also this check should follow devices assignment without extra empty line.
-
-> +		ret = FALSE;
-> +		goto out;
-> +	}
-> +
-> +	udev_list_entry_foreach(dev_list_entry, devices) {
-> +		const char *syspath = udev_list_entry_get_name(dev_list_entry);
-> +		paths[index++] = strdup(syspath);
-> +	}
-
-Is this guaranteed that this loop will iterate only 4 times? If yes please add 
-comment, if not break loop to avoid writing on random memory.
+You can use malloc0() from src/shared instead.
 
 > +
-> +	ret = TRUE;
-> +out:
-> +	udev_enumerate_unref(enumerate);
-> +	return ret;
+> +	number = get_js_number(udevice);
+> +	DBG("number %d", number);
+> +
+> +	ret = calc_leds_bitmap(number, &data->bitmap);
+> +	if (ret == FALSE)
+> +		goto err;
+
+ret seems to be redundant
+
+if (!calc_leds_bitmap())
+  goto err
+
+> +
+> +	return data;
+> +
+> +err:
+> +	for (i = 0; i < 4; i++)
+> +		free(data->syspaths[i]);
+> +	free(data);
+
+Please add helper (eg. leds_data_destroy()) for clearing this and use where 
+needed.
+
+Add empty line here.
+
+> +	return NULL;
 > +}
 > +
->  static struct leds_data *get_leds_data(struct udev_device *udevice)
->  {
->  	struct leds_data *data;
-> @@ -344,6 +409,10 @@ static struct leds_data *get_leds_data(struct
-> udev_device *udevice) if (ret == FALSE)
->  		goto err;
+>  static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
+> {
+>  	struct udev_device *hid_parent;
+> @@ -374,7 +414,7 @@ static void device_added(struct udev_device *udevice)
+>  		/* wait for events before setting leds */
+>  		g_io_add_watch(io, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+>  				setup_leds,
+> -				GINT_TO_POINTER(get_js_number(udevice)));
+> +				get_leds_data(udevice));
 > 
-> +	/* it's OK if this fails, set_leds_hidraw() will be used if
-> +	 * any of the values in data->syspaths is not defined */
-
-Multi line comment should be like that: (there is still some inconsistency 
-about that in BlueZ code, but lets keep new code right)
-
-/*
- * foo
- * bar
- */
-
-> +	get_leds_devices(udevice, data->syspaths);
-
-Since return code is not important in this function why not just make it 
-return void? 
-
-> +
->  	return data;
-> 
->  err:
+>  		break;
+>  	default:
 
 -- 
 Szymon K. Janc
