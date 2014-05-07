@@ -1,79 +1,199 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <CABBYNZ++3Zgoia1t6CkWwVVNo+O_4nkUn+Vmw9phgAu3gdXdxw@mail.gmail.com>
-References: <1399351563-25991-1-git-send-email-armansito@chromium.org>
-	<CABBYNZLuRf89qgE6vV5PWZFZcB4em11_ySJnUXMGb+gSQ1djkw@mail.gmail.com>
-	<780A1AF5-538F-4239-A4E2-86B0BB2EDDB0@holtmann.org>
-	<CAHrH25RNVpVJccoo_O_EDFQH=NOwisjKkSX1gYFGCnNsjKW8Ag@mail.gmail.com>
-	<CABBYNZ++3Zgoia1t6CkWwVVNo+O_4nkUn+Vmw9phgAu3gdXdxw@mail.gmail.com>
-Date: Wed, 7 May 2014 12:25:11 -0700
-Message-ID: <CAHrH25Tmw0HUAW=j1wHJ5sOhhpuCCdP_QBjUr6xVDg+YKeQLEw@mail.gmail.com>
-Subject: Re: [PATCH 00/10] bt_att initial implementation
-From: Arman Uguray <armansito@chromium.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcin Kraglak <marcin.kraglak@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] tools: Add "hciconfig pagetype" command
+Message-Id: <20140507191001.8901C100802@puck.mtv.corp.google.com>
+Date: Wed,  7 May 2014 12:10:01 -0700 (PDT)
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Add "hciconfig pagetype" command so that Bluetooth adapter can be
+easily configured to standard or interlaced page scan mode.
+---
+ lib/hci.c         | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ lib/hci.h         | 17 +++++++++++++++--
+ lib/hci_lib.h     |  2 ++
+ tools/hciconfig.1 |  6 ++++++
+ tools/hciconfig.c | 37 +++++++++++++++++++++++++++++++++++++
+ 5 files changed, 111 insertions(+), 2 deletions(-)
 
->> That last bit of course is different from mgmt, where the parameters
->> structure definition itself encodes the data being sent over the
->> socket, whereas bt_att performs encoding/decoding logic. Either way, I
->> think this definition makes for a nice API.
->
-> If you can really tell by opcode how to encode/decode the data that
-> should be fine, regarding the API style I would favor functions vs use
-> of opcode + struct, I understand in MGMT case we did this to define
-> the protocol at PDU level so anyone could use those to implement a
-> library thus why it is placed under lib/. Anyway Im not against either
-> style since we can still change if we need.
+diff --git a/lib/hci.c b/lib/hci.c
+index 005578a..dea38da 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -2236,6 +2236,57 @@ int hci_write_inquiry_mode(int dd, uint8_t mode, int to)
+ 	return 0;
+ }
+ 
++int hci_read_page_scan_type(int dd, uint8_t *type, int to)
++{
++	read_page_scan_type_rp rp;
++	struct hci_request rq;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf    = OGF_HOST_CTL;
++	rq.ocf    = OCF_READ_PAGE_SCAN_TYPE;
++	rq.rparam = &rp;
++	rq.rlen   = READ_PAGE_SCAN_TYPE_RP_SIZE;
++
++	if (hci_send_req(dd, &rq, to) < 0)
++		return -1;
++
++	if (rp.status) {
++		errno = EIO;
++		return -1;
++	}
++
++	*type = rp.type;
++	return 0;
++}
++
++int hci_write_page_scan_type(int dd, uint8_t type, int to)
++{
++	write_page_scan_type_cp cp;
++	write_page_scan_type_rp rp;
++	struct hci_request rq;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.type = type;
++
++	memset(&rq, 0, sizeof(rq));
++	rq.ogf    = OGF_HOST_CTL;
++	rq.ocf    = OCF_WRITE_PAGE_SCAN_TYPE;
++	rq.cparam = &cp;
++	rq.clen   = WRITE_PAGE_SCAN_TYPE_CP_SIZE;
++	rq.rparam = &rp;
++	rq.rlen   = WRITE_PAGE_SCAN_TYPE_RP_SIZE;
++
++	if (hci_send_req(dd, &rq, to) < 0)
++		return -1;
++
++	if (rp.status) {
++		errno = EIO;
++		return -1;
++	}
++
++	return 0;
++}
++
+ int hci_read_afh_mode(int dd, uint8_t *mode, int to)
+ {
+ 	read_afh_mode_rp rp;
+diff --git a/lib/hci.h b/lib/hci.h
+index 0c94829..760b3fa 100644
+--- a/lib/hci.h
++++ b/lib/hci.h
+@@ -1070,10 +1070,23 @@ typedef struct {
+ #define WRITE_INQUIRY_MODE_RP_SIZE 1
+ 
+ #define OCF_READ_PAGE_SCAN_TYPE		0x0046
++typedef struct {
++	uint8_t		status;
++	uint8_t		type;
++} __attribute__ ((packed)) read_page_scan_type_rp;
++#define READ_PAGE_SCAN_TYPE_RP_SIZE 2
+ 
+ #define OCF_WRITE_PAGE_SCAN_TYPE	0x0047
+-	#define PAGE_SCAN_TYPE_STANDARD		0x00
+-	#define PAGE_SCAN_TYPE_INTERLACED	0x01
++typedef struct {
++	uint8_t		type;
++} __attribute__ ((packed)) write_page_scan_type_cp;
++#define WRITE_PAGE_SCAN_TYPE_CP_SIZE 1
++typedef struct {
++	uint8_t		status;
++} __attribute__ ((packed)) write_page_scan_type_rp;
++#define WRITE_PAGE_SCAN_TYPE_RP_SIZE 1
++#define PAGE_SCAN_TYPE_STANDARD		0x00
++#define PAGE_SCAN_TYPE_INTERLACED	0x01
+ 
+ #define OCF_READ_AFH_MODE		0x0048
+ typedef struct {
+diff --git a/lib/hci_lib.h b/lib/hci_lib.h
+index 50744c3..6be0030 100644
+--- a/lib/hci_lib.h
++++ b/lib/hci_lib.h
+@@ -94,6 +94,8 @@ int hci_read_inquiry_scan_type(int dd, uint8_t *type, int to);
+ int hci_write_inquiry_scan_type(int dd, uint8_t type, int to);
+ int hci_read_inquiry_mode(int dd, uint8_t *mode, int to);
+ int hci_write_inquiry_mode(int dd, uint8_t mode, int to);
++int hci_read_page_scan_type(int dd, uint8_t *type, int to);
++int hci_write_page_scan_type(int dd, uint8_t type, int to);
+ int hci_read_afh_mode(int dd, uint8_t *mode, int to);
+ int hci_write_afh_mode(int dd, uint8_t mode, int to);
+ int hci_read_ext_inquiry_response(int dd, uint8_t *fec, uint8_t *data, int to);
+diff --git a/tools/hciconfig.1 b/tools/hciconfig.1
+index 633ffa3..4f6dee1 100644
+--- a/tools/hciconfig.1
++++ b/tools/hciconfig.1
+@@ -168,6 +168,12 @@ slots and inquiry scan interval to
+ .I int
+ slots.
+ .TP
++.BI pagetype " [type]"
++With no
++.IR type ,
++prints out the current page scan type. Otherwise, sets page scan type to
++.IR type .
++.TP
+ \fBpageparms\fP [\fIwin\fP:\fIint\fP]
+ With no
+ .IR win : int ,
+diff --git a/tools/hciconfig.c b/tools/hciconfig.c
+index 765d980..99c77e1 100644
+--- a/tools/hciconfig.c
++++ b/tools/hciconfig.c
+@@ -1463,6 +1463,42 @@ static void cmd_inq_parms(int ctl, int hdev, char *opt)
+ 	}
+ }
+ 
++static void cmd_page_type(int ctl, int hdev, char *opt)
++{
++	int dd;
++
++	dd = hci_open_dev(hdev);
++	if (dd < 0) {
++		fprintf(stderr, "Can't open device hci%d: %s (%d)\n",
++						hdev, strerror(errno), errno);
++		exit(1);
++	}
++
++	if (opt) {
++		uint8_t type = atoi(opt);
++
++		if (hci_write_page_scan_type(dd, type, 2000) < 0) {
++			fprintf(stderr, "Can't set page scan type on hci%d: %s (%d)\n",
++						hdev, strerror(errno), errno);
++			exit(1);
++		}
++	} else {
++		uint8_t type;
++
++		if (hci_read_page_scan_type(dd, &type, 1000) < 0) {
++			fprintf(stderr, "Can't read page scan type on hci%d: %s (%d)\n",
++						hdev, strerror(errno), errno);
++			exit(1);
++		}
++
++		print_dev_hdr(&di);
++		printf("\tPage scan type: %s\n", type == PAGE_SCAN_TYPE_INTERLACED ?
++				"Interlaced Page Scan" : "Standard Page Scan");
++	}
++
++	hci_close_dev(dd);
++}
++
+ static void cmd_page_parms(int ctl, int hdev, char *opt)
+ {
+ 	struct hci_request rq;
+@@ -1932,6 +1968,7 @@ static struct {
+ 	{ "inqdata",	cmd_inq_data,	"[data]",	"Get/Set inquiry data" },
+ 	{ "inqtype",	cmd_inq_type,	"[type]",	"Get/Set inquiry scan type" },
+ 	{ "inqparms",	cmd_inq_parms,	"[win:int]",	"Get/Set inquiry scan window and interval" },
++	{ "pagetype",	cmd_page_type,	"[type]",	"Get/Set page scan type" },
+ 	{ "pageparms",	cmd_page_parms,	"[win:int]",	"Get/Set page scan window and interval" },
+ 	{ "pageto",	cmd_page_to,	"[to]",		"Get/Set page timeout" },
+ 	{ "afhmode",	cmd_afh_mode,	"[mode]",	"Get/Set AFH mode" },
+-- 
+1.9.1.423.g4596e3a
 
-Yes, the opcode tells you exactly what the final PDU will look like. I
-had to make a decision between opcode + struct vs functions and I went
-with the former as it felt more consistent. Though, as you said, we
-can always change things up later if we feel like there's a better
-way.
-
->> This is a very good point. Currently the idea is to have a bt_gatt
->> which defines GATT client-side functions for primary service
->> discovery, read/write requests etc, which would then internally use
->> bt_att for ATT protocol transactions, and gatt_db which solely serves
->> as a medium for storage of local/remote attributes. Basically, a
->> complete implementation of a GATT client/server would create and
->> manage individual instances of bt_gatt/bt_att for all requests and
->> gatt_db to explicitly store the results of those requests. In essence,
->> the database implementation and bt_gatt/bt_att won't need to
->> explicitly depend on each other.
->
-> I believe bt_gatt will actually need to depend on gatt_db at some
-> point because it makes it a lot more convenient to do the
-> qualification tests without having to implement the interaction with
-> gatt_db on the test itself and it is also more convenient in terms of
-> API since you don't have to create extra callbacks to interact with
-> the db.
-
-That's true. It mostly depends on whether the code is implementing a
-GATT client or server so we should make bt_att and gatt_db not depend
-on each other, so as to make the code reusable for both client/server.
-Since bt_gatt is going to end up being mostly client-only, I'm fine
-with an instance of bt_gatt creating its own internal gatt_db.
-
->> This is why it might make sense to hold off on writing PTS style tests
->> until we have the complete picture in place. For now, I went with a
->> simple set of unit tests to make sure that basic PDU encoding/decoding
->> is done correctly for bt_att. As we then start putting gatt_db and
->> bt_gatt together, I say we then write tests in the fashion of
->> test-av*.
->
-> Well you risk having to do the same test more than once, in case of
-> ATT I don't think that is a problem since there doesn't seems to be
-> tests specific for it but in case of GATT I would stick with test spec
-> since the beginning.
-
-Exactly what I'm thinking. For GATT we should plan tests based on the
-test spec as we develop the code.
-
--Arman
