@@ -1,115 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAN_7+YaCPTu40mVXFOJTVmtUNSMy4qcH9Vcs6K06SriQW7dWvg@mail.gmail.com>
-References: <1397728697-22563-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<1397728697-22563-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-	<CAN_7+YaCPTu40mVXFOJTVmtUNSMy4qcH9Vcs6K06SriQW7dWvg@mail.gmail.com>
-Date: Thu, 8 May 2014 15:18:47 +0200
-Message-ID: <CAMv5GbcY46o0q_8B4W-DX+P6R2CLXzNNCZjqB_czFF+O7smkfg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] android/gatt: Extend android2uuid uuid type support
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: marcel@holtmann.org,
+	andrzej.kaczmarek@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3] mgmt-api: Add support to get connection information
+Date: Thu,  8 May 2014 14:59:59 +0200
+Message-Id: <1399553999-14566-1-git-send-email-lukasz.rymanowski@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 22 April 2014 10:14, Lukasz Rymanowski <lukasz.rymanowski@gmail.com> wrote:
->
-> Hi Grzegorz,
->
->
-> On Thu, Apr 17, 2014 at 11:58 AM, Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com> wrote:
->>
->> Now conversion function android2uuid can recognize type of uuid and set
->> it value by copying significant bytes.
->> ---
->>  android/gatt.c | 34 +++++++++++++++++++++++++++++++---
->>  1 file changed, 31 insertions(+), 3 deletions(-)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index e339789..3a7ace1 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -54,6 +54,13 @@
->>  #define GATT_SUCCESS   0x00000000
->>  #define GATT_FAILURE   0x00000101
->>
->> +#define BASE_UUID16_OFFSET     12
->> +
->> +static uint8_t BLUETOOTH_UUID[] = {
->> +       0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
->> +       0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
->> +};
->> +
->>  struct gatt_client {
->>         int32_t id;
->>         uint8_t uuid[16];
->> @@ -134,14 +141,35 @@ static struct queue *listen_clients = NULL;
->>
->>  static void bt_le_discovery_stop_cb(void);
->>
->> +static int get_type_from_android_uuid(const uint8_t *uuid)
->
->
-> Actually this function does not only take type. It checks if this is bluetooth uuid or not, and if it is bluetooth uuid it uses uuid16 to represent it. So IMHO this function name should be rather is_bluetooth_uuid(..)  Of course it would return here bool and then you can use correct uuid type depends on this bool.
->>
-Ok. It'll be more readable after changing name of uuid type
-recognizing function to "is_bluetooth_uuid" returning boolean value.
-I'll send new rebased and changed version. Thanks.
->> +{
->> +       int i;
->> +
->> +       for (i = 0; i < 16; i++) {
->> +               /* ignore minimal uuid (16) value */
->> +               if (i == 12 || i == 13)
->> +                       continue;
->> +
->> +               if (uuid[i] != BLUETOOTH_UUID[i])
->> +                       return BT_UUID128;
->> +       }
->> +
->> +       return BT_UUID16;
->> +}
->> +
->>  static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
->>  {
->>         uint8_t i;
->>
->> -       dst->type = BT_UUID128;
->> +       dst->type = get_type_from_android_uuid(uuid);
->>
->> -       for (i = 0; i < 16; i++)
->> -               dst->value.u128.data[i] = uuid[15 - i];
->> +       if (dst->type == BT_UUID16) {
->> +               /* copy 16 bit uuid value from full android 128bit uuid */
->> +               dst->value.u16 = (uuid[13] << 8) + uuid[12];
->
->
-> maybe return here
->
-It's not needed here because of function end after if-else.
->> +       } else {
->> +               for (i = 0; i < 16; i++)
->> +                       dst->value.u128.data[i] = uuid[15 - i];
->> +       }
->>  }
->>
->>  static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
->
->
-> BR
-> Lukasz
->>
->> --
->> 1.9.1
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->
->
+This patch introduces Get Connection Information command.
+---
 
-Best regards,
-Grzegorz
+v2: Changed Command name and add Flags into the response
+v3: Added TXPowerMax into the response based on the comments we got.
+
+ doc/mgmt-api.txt | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
+
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index cd5cd24..8345048 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1679,6 +1679,45 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
+ 
+ 
++Get Connection Information Command
++==================================
++
++	Command Code:		0x0031
++	Controller Index:       <controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Data_Type (4 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				RSSI (1 Octet)
++				TXPowerMax (1 Octet)
++				Flags (4 Octets)
++				EIR_Data_Length (2 Octets)
++				EIR_Data (0-65535 Octets)
++
++	This command is used to get connection information.
++
++	Data_Type parameter is a bitmask with currently the following available
++	bits:
++
++		0	TX Power
++
++	All the other bits are reserved and shall be set to 0. Unknown bits are
++	ignored.
++
++	All the requested Data_Type information are returned in EIR_Data.
++
++	Flags are reserved for the future use.
++
++	This command generates a Command Complete event on success and
++	on failure.
++
++	Possible errors:	Not Connected
++				Not Powered
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+-- 
+1.8.4
