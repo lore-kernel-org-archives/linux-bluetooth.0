@@ -1,310 +1,248 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: PTS tests results for IOPT
-Date: Thu,  8 May 2014 13:36:45 +0200
-Message-Id: <1399549005-2486-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1399536103-19052-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1399536103-19052-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 8 May 2014 14:24:15 +0300
+Message-ID: <CABBYNZ+VMbaapx1F+ySnf5zY8z203sGbcJYUCMnYfA3fLX0xpQ@mail.gmail.com>
+Subject: Re: [PATCHv3 02/12] android/hal-audio-hsp: Add open_output_stream()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PICS, PIXITs as well as PTS tests results for IOPT.
----
- android/pics-iopt.txt  | 223 +++++++++++++++++++++++++++++++++++++++++++++++++
- android/pixit-iopt.txt |  23 +++++
- android/pts-iopt.txt   |  23 +++++
- 3 files changed, 269 insertions(+)
- create mode 100644 android/pics-iopt.txt
- create mode 100644 android/pixit-iopt.txt
- create mode 100644 android/pts-iopt.txt
+Hi Andrei,
 
-diff --git a/android/pics-iopt.txt b/android/pics-iopt.txt
-new file mode 100644
-index 0000000..a1289ef
---- /dev/null
-+++ b/android/pics-iopt.txt
-@@ -0,0 +1,223 @@
-+IOPT PICS for the PTS tool.
-+
-+PTS version: 5.1
-+
-+* - different than PTS defaults
-+# - not yet implemented/supported
-+
-+M - mandatory
-+O - optional
-+
-+		Profiles
-+-------------------------------------------------------------------------------
-+Parameter Name				Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_support_						Support for: Advanced
-+AdvancedAudioDistributionProfile_Sink	False		Audio Distribution
-+							Profile. Role: Sink
-+
-+TSPC_support_						Support for: Advanced
-+AdvancedAudioDistributionProfile_Source	True (*)	Audio Distribution
-+							Profile. Role: Source
-+
-+TSPC_support_AVRemoteControlProfile_CT	True (*)	Support for: Audio\Video
-+							Remote Control Profile.
-+							Role: Controller
-+
-+TSPC_support_AVRemoteControlProfile_TG	True (*)	Support for: Audio\Video
-+							Remote Control Profile.
-+							Role: Target
-+
-+TSPC_support_BasicImagingProfile_CLIENT	False		Support for: Basic
-+							Imaging Profile.
-+							Role: Client
-+
-+TSPC_support_BasicImagingProfile_			Support for: Basic
-+SERVER_ImagingAutomaticArchive		False		Imaging Profile. Role:
-+							Server Functionality:
-+							Imaging autoarchive
-+
-+TSPC_support_BasicImagingProfile_	False		Support for: Basic
-+SERVER_ImagingReferencedObjects				Imaging Profile. Role:
-+							Server Functionality:
-+							Imaging ref. objects
-+
-+TSPC_support_BasicImagingProfile_	False		Support for: Basic
-+SERVER_ImagingResponder					Imaging Profile. Role:
-+							Server Functionality:
-+							Imaging responder
-+
-+TSPC_support_				False		Support for: Basic
-+BasicPrintingProfile_PRINTER				Printing Profile. Role:
-+							Printer
-+
-+TSPC_support_						Support for: Basic
-+BasicPriProfile_PRINTER_ReflectedUI	False		Printing Profile. Role:
-+							Printer Functionality:
-+							Reflected UI
-+
-+TSPC_support_BasicPrintingProfile_			Support for: Basic
-+SENDER_Referenced_objects_Service	False		Printing Profile. Role:
-+							Sender Functionality:
-+							Refe. objects service
-+
-+TSPC_support_DialUpNetworkingProfile_DT	False		Support for: Dial-Up
-+							Networking Profile.
-+							Role: Data Terminal
-+
-+TSPC_support_DialUpNetworkingProfile_GW	False		Support for: Dial-Up
-+							Networking Profile.
-+							Role: Gateway
-+
-+TSPC_support_				True (*)	Support for: Extended
-+ExtendedServiceDiscoveryProfile_IP_LAP			SDP. Version: IP-LAP
-+
-+TSPC_support_				True (*)	Support for: Extended
-+ExtendedServiceDiscoveryProfile_IP_PAN			SDP. Version: IP-PAN
-+
-+TSPC_support_				True (*)	Support for: Extended
-+ExtendedServiceDiscoveryProfile_L2CAP			SDP. Version: L2CAP
-+
-+TSPC_support_FAXProfile_DE		False		Support for: FAX Profile
-+							Role: Data Terminal
-+
-+TSPC_support_FAXProfile_GW		False		Support for: FAX Profile
-+							Role: Gateway
-+
-+TSPC_support_FileTransferProfile_CLIENT	False		Support for: FTP
-+							Role: Client
-+
-+TSPC_support_FileTransferProfile_SERVER	False		Support for: FTP
-+							Role: Server
-+
-+TSPC_support_HealthDeviceProfile_Sink	False (#)	Support for: HDP
-+							Role: Sink
-+
-+TSPC_support_HealthDeviceProfile_Source	False (#)	Support for: HDP
-+							Role: Source
-+
-+TSPC_support_NewHandsFreeProfile_AG	False		Support for: HFP
-+							Role: Audio gateway
-+
-+TSPC_support_NewHandsFreeProfile_HF	False		Support for: HFP
-+							Role: Hands-Free unit
-+
-+TSPC_support_				False		Support for: Hard Copy
-+HardCopyReplacementProfile_				cable Repl. Profile
-+CLIENT_CR_RegisterNotofication_support			Role: Client
-+							Functionality: CR
-+							register notification
-+							support
-+
-+TSPC_support_				False		Support for: Hard Copy
-+HardCopyReplacementProfile_CLIENT_print			cable Repl. Profile.
-+							Role: Client
-+							Functionality: Print
-+
-+TSPC_support_				False		Support for: Hard Copy
-+HardCopyReplacementProfile_CLIENT_scan			cable Repl. Profile.
-+							Role: Client
-+							Functionality: Scan
-+
-+TSPC_support_				False		Support for: Hard Copy
-+HardCopyReplacementProfile_SERVER_print			cable Repl. Profile.
-+							Role: Server
-+							Functionality: Print
-+
-+TSPC_support_				False		Support for: Hard Copy
-+HardCopyReplacementProfile_SERVER_scan			cable Repl. Profile.
-+							Role: Server
-+							Functionality: Scan
-+
-+TSPC_support_HeadsetProfile_AG		True (*)	Support for: HSP
-+							Role: Audio Gateway
-+
-+TSPC_support_HeadsetProfile_HS		False		Support for: HSP
-+							Role: Headset
-+
-+TSPC_support_				False		Support for: HID
-+HumanInterfaceDeviceProfile				Role: Device
-+
-+TSPC_support_HID_Host			True (*)	Support for: HID
-+							Role: Host
-+
-+TSPC_support_LANAccessProfile_DT	False		Support for: LAN Access
-+							Profile. Role: Data
-+							Terminal
-+
-+TSPC_support_LANAccessProfile_LAP	False		Support for: LAN Access
-+							Profile. Role: LAN
-+							Access Point
-+
-+TSPC_support_MessaeAccessProfile_MCE	False		Support for: MAP
-+							Role: MCE
-+
-+TSPC_support_MessageAccessProfile_MSE	True (*)	Support for: MAP
-+							Role: MSE
-+
-+TSPC_support_ObjectPushProfile_CLIENT	True (*)	Support for: OPP
-+							Role: Client
-+
-+TSPC_support_ObjectPushProfile_SERVER	True (*)	Support for: OPP
-+							Role: Server
-+
-+TSPC_support_				False		Support for: PAN
-+PersonalAreaNetworkProfile_GN				Role: GN
-+
-+TSPC_support_				True (*)	Support for: PAN
-+PersonalAreaNetworkProfile_NAP				Role: NAP
-+
-+TSPC_support_				True (*)	Support for: PAN
-+PersonalAreaNetworkProfile_PANU				Role: PANU
-+
-+TSPC_support_PhonebookAccessProfile_PCE	False		Support for: PBAP
-+							Role: PCE
-+
-+TSPC_support_PhonebookAccessProfile_PSE	True (*)	Support for: PBAP
-+							Role: PSE
-+
-+TSPC_support_SerialPortProfile_Service	False		Support for: SPP
-+							Role: Dev B
-+
-+TSPC_support_				False		Support for: Service
-+ServiceDiscoveryApplicationProfile			Discovery Application
-+							Profile
-+
-+TSPC_support_SIMAccessProfile_CLIENT	False		Support for: SIM access
-+							Profile. Role: Client
-+
-+TSPC_support_SIMAccessProfile_SERVER	False		Support for: SIM access
-+							Profile. Role: Server
-+
-+TSPC_support_				False		Support for:
-+SynchronizationProfile_CLIENT				Synchronization Profile
-+							Role: Client
-+
-+TSPC_support_				False		Support for:
-+SynchronizationProfile_SERVER				Synchronization Profile
-+							Role: Server
-+
-+TSPC_support_UDIProfile_MT		False		Support for: UDI Profile
-+							Role: MT
-+
-+TSPC_support_UDIProfile_TA		False		Support for: UDI Profile
-+							Role: TA
-+
-+TSPC_support_				False		Support for: Video
-+VideoDistributionProfile_Sink				distribution Profile
-+							Role: Sink
-+
-+TSPC_support_				False		Support for: Video
-+VideoDistributionProfile_Source				distribution Profile
-+							Role: Source
-+
-+TSPC_support_WAPOverBluetooth_CLIENT	False		Support for: WAP over
-+							Bluetooth Profile
-+							Role: Client
-+
-+TSPC_support_WAPOverBluetooth_PROXY	False		Support for: WAP over
-+							Bluetooth Profile
-+							Role: PROXY
-+
-+TSPC_support_GNSS_SERVER		False		Support for: GNSS
-+							Role: Server
-diff --git a/android/pixit-iopt.txt b/android/pixit-iopt.txt
-new file mode 100644
-index 0000000..a4bb581
---- /dev/null
-+++ b/android/pixit-iopt.txt
-@@ -0,0 +1,23 @@
-+IOPT PIXIT for the PTS tool.
-+
-+PTS version: 5.1
-+
-+* - different than PTS defaults
-+& - should be set to IUT Bluetooth address
-+
-+		Required PIXIT settings
-+-------------------------------------------------------------------------------
-+Parameter Name						Value
-+-------------------------------------------------------------------------------
-+TSPX_security_enabled					FALSE
-+TSPX_delete_link_key					FALSE
-+TSPX_bd_addr_iut					112233445566 (*&)
-+TSPX_class_of_device_pts				200404
-+TSPX_class_of_device_test_pts_initiator			TRUE
-+TSPX_limited_inquiry_used				FALSE
-+TSPX_pin_code						0000
-+TSPX_time_guard						200000
-+TSPX_device_search_time					20
-+TSPX_use_implicit_send					TRUE
-+TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
-+-------------------------------------------------------------------------------
-diff --git a/android/pts-iopt.txt b/android/pts-iopt.txt
-new file mode 100644
-index 0000000..815740d
---- /dev/null
-+++ b/android/pts-iopt.txt
-@@ -0,0 +1,23 @@
-+PTS test results for IOPT
-+
-+PTS version: 5.1
-+Tested: 08-May-2014
-+Android version: 4.4.2
-+
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
-+
-+-------------------------------------------------------------------------------
-+Test Name	Result	Notes
-+-------------------------------------------------------------------------------
-+TC_COD_BV_01_I	PASS	IUT must be discoverable
-+TC_COD_BV_02_I	N/A	Under PTS 5.1 test shall be disabled as there is
-+			matching test case in HFP test suit (test No. 15)
-+			PICS settings for HFP shall be disabled for IOPT
-+TC_SDSS_BV_02_I	PASS
-+TC_SDSA_BV_03_I	PASS
-+TC_SDR_BV_04_I	PASS
-+-------------------------------------------------------------------------------
+On Thu, May 8, 2014 at 11:01 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Function adds audio_open_output_stream() and sets dummy callbacks.
+> ---
+>  android/hal-sco.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 176 insertions(+), 3 deletions(-)
+>
+> diff --git a/android/hal-sco.c b/android/hal-sco.c
+> index c7ba504..bc7d987 100644
+> --- a/android/hal-sco.c
+> +++ b/android/hal-sco.c
+> @@ -25,22 +25,195 @@
+>
+>  #include "hal-log.h"
+>
+> +#define AUDIO_STREAM_DEFAULT_RATE      44100
+> +#define AUDIO_STREAM_DEFAULT_FORMAT    AUDIO_FORMAT_PCM_16_BIT
+> +
+> +#define OUT_BUFFER_SIZE                        2560
+> +
+> +struct hsp_audio_config {
+> +       uint32_t rate;
+> +       uint32_t channels;
+> +       audio_format_t format;
+> +};
+> +
+> +struct hsp_stream_out {
+> +       struct audio_stream_out stream;
+> +       struct hsp_audio_config cfg;
+> +};
+> +
+>  struct hsp_audio_dev {
+>         struct audio_hw_device dev;
+> -       struct a2dp_stream_out *out;
+> +       struct hsp_stream_out *out;
+>  };
+
+Please rename hsp to sco, also fix where you actually introduced
+a2dp_stream_out.
+
+Tip: you can use git rebase -i origin/master change the commit that
+want to fix from pick to edit once you are done do git add and git
+rebase --continue
+
+> +/* Audio stream functions */
+> +
+> +static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+> +                                                               size_t bytes)
+> +{
+> +       /* write data */
+> +
+> +       return bytes;
+> +}
+> +
+> +static uint32_t out_get_sample_rate(const struct audio_stream *stream)
+> +{
+> +       struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
+> +
+> +       DBG("rate %u", out->cfg.rate);
+> +
+> +       return out->cfg.rate;
+> +}
+> +
+> +static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+> +{
+> +       DBG("rate %u", rate);
+> +
+> +       return 0;
+> +}
+> +
+> +static size_t out_get_buffer_size(const struct audio_stream *stream)
+> +{
+> +       DBG("buf size %u", OUT_BUFFER_SIZE);
+> +
+> +       return OUT_BUFFER_SIZE;
+> +}
+> +
+> +static uint32_t out_get_channels(const struct audio_stream *stream)
+> +{
+> +       DBG("");
+> +
+> +       /* AudioFlinger can only provide stereo stream, so we return it here and
+> +        * later we'll downmix this to mono in case codec requires it
+> +        */
+> +       return AUDIO_CHANNEL_OUT_STEREO;
+> +}
+> +
+> +static audio_format_t out_get_format(const struct audio_stream *stream)
+> +{
+> +       struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
+> +
+> +       DBG("");
+> +
+> +       return out->cfg.format;
+> +}
+> +
+> +static int out_set_format(struct audio_stream *stream, audio_format_t format)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_standby(struct audio_stream *stream)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static int out_dump(const struct audio_stream *stream, int fd)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
+> +{
+> +       DBG("%s", kvpairs);
+> +
+> +       return 0;
+> +}
+> +
+> +static char *out_get_parameters(const struct audio_stream *stream,
+> +                                                       const char *keys)
+> +{
+> +       DBG("");
+> +
+> +       return strdup("");
+> +}
+> +
+> +static uint32_t out_get_latency(const struct audio_stream_out *stream)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static int out_set_volume(struct audio_stream_out *stream, float left,
+> +                                                               float right)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_get_render_position(const struct audio_stream_out *stream,
+> +                                                       uint32_t *dsp_frames)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_add_audio_effect(const struct audio_stream *stream,
+> +                                                       effect_handle_t effect)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_remove_audio_effect(const struct audio_stream *stream,
+> +                                                       effect_handle_t effect)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+>  static int audio_open_output_stream(struct audio_hw_device *dev,
+>                                         audio_io_handle_t handle,
+>                                         audio_devices_t devices,
+>                                         audio_output_flags_t flags,
+>                                         struct audio_config *config,
+>                                         struct audio_stream_out **stream_out)
+> -
+>  {
+> +       struct hsp_audio_dev *adev = (struct hsp_audio_dev *) dev;
+> +       struct hsp_stream_out *out;
+> +
+>         DBG("");
+>
+> -       return -EINVAL;
+> +       out = calloc(1, sizeof(struct hsp_stream_out));
+> +       if (!out)
+> +               return -ENOMEM;
+> +
+> +       out->stream.common.get_sample_rate = out_get_sample_rate;
+> +       out->stream.common.set_sample_rate = out_set_sample_rate;
+> +       out->stream.common.get_buffer_size = out_get_buffer_size;
+> +       out->stream.common.get_channels = out_get_channels;
+> +       out->stream.common.get_format = out_get_format;
+> +       out->stream.common.set_format = out_set_format;
+> +       out->stream.common.standby = out_standby;
+> +       out->stream.common.dump = out_dump;
+> +       out->stream.common.set_parameters = out_set_parameters;
+> +       out->stream.common.get_parameters = out_get_parameters;
+> +       out->stream.common.add_audio_effect = out_add_audio_effect;
+> +       out->stream.common.remove_audio_effect = out_remove_audio_effect;
+> +       out->stream.get_latency = out_get_latency;
+> +       out->stream.set_volume = out_set_volume;
+> +       out->stream.write = out_write;
+> +       out->stream.get_render_position = out_get_render_position;
+> +
+> +       out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
+> +       out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
+> +       out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+> +
+> +       *stream_out = &out->stream;
+> +       adev->out = out;
+> +
+> +       return 0;
+>  }
+>
+>  static void audio_close_output_stream(struct audio_hw_device *dev,
+> --
+> 1.8.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
 -- 
-1.8.5.3
-
+Luiz Augusto von Dentz
