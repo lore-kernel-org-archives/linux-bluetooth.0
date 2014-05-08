@@ -1,86 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1399551937-27109-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1399551937-27109-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 8 May 2014 16:27:51 +0300
-Message-ID: <CABBYNZ++bA0pAh7PE=rCh0Ko+5HpiSA_XBhjLU3An5emxEFkUg@mail.gmail.com>
-Subject: Re: [PATCHv4 06/12] android/ipc: Use error printing error messages
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/3] android/bluetooth: Always create device object in create bond
+Date: Thu,  8 May 2014 15:26:03 +0200
+Message-Id: <1399555563-21054-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1399555563-21054-1-git-send-email-szymon.janc@tieto.com>
+References: <1399555563-21054-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+If device is not known (ie. OOB pairing) create new device object
+so it can be later used in pairing events.
+---
+ android/bluetooth.c | 22 ++++++++--------------
+ 1 file changed, 8 insertions(+), 14 deletions(-)
 
-On Thu, May 8, 2014 at 3:25 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> This helps to identify problem since DBG is not printed by default.
-> ---
->  android/ipc.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
->
-> diff --git a/android/ipc.c b/android/ipc.c
-> index 8cd34ea..89fff8d 100644
-> --- a/android/ipc.c
-> +++ b/android/ipc.c
-> @@ -96,31 +96,31 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
->         const struct ipc_handler *handler;
->
->         if (len < (ssize_t) sizeof(*msg)) {
-> -               DBG("message too small (%zd bytes)", len);
-> +               error("message too small (%zd bytes)", len);
->                 return -EBADMSG;
->         }
->
->         if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
-> -               DBG("message malformed (%zd bytes)", len);
-> +               error("message malformed (%zd bytes)", len);
->                 return -EBADMSG;
->         }
->
->         /* if service is valid */
->         if (msg->service_id > max_index) {
-> -               DBG("unknown service (0x%x)", msg->service_id);
-> +               error("unknown service (0x%x)", msg->service_id);
->                 return -EOPNOTSUPP;
->         }
->
->         /* if service is registered */
->         if (!handlers[msg->service_id].handler) {
-> -               DBG("service not registered (0x%x)", msg->service_id);
-> +               error("service not registered (0x%x)", msg->service_id);
->                 return -EOPNOTSUPP;
->         }
->
->         /* if opcode is valid */
->         if (msg->opcode == IPC_OP_STATUS ||
->                         msg->opcode > handlers[msg->service_id].size) {
-> -               DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
-> +               error("invalid opcode 0x%x for service 0x%x", msg->opcode,
->                                                         msg->service_id);
->                 return -EOPNOTSUPP;
->         }
-> @@ -131,7 +131,7 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
->         /* if payload size is valid */
->         if ((handler->var_len && handler->data_len > msg->len) ||
->                         (!handler->var_len && handler->data_len != msg->len)) {
-> -               DBG("invalid size for opcode 0x%x service 0x%x",
-> +               error("invalid size for opcode 0x%x service 0x%x",
->                                                 msg->opcode, msg->service_id);
->                 return -EMSGSIZE;
->         }
-> --
-> 1.8.3.2
-
-Im not sure if that was not done on purpose, well if that gonna exit
-anyway maybe it is fine to use error but then we should probably
-prefix the messages with 'IPC:'
-
-
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 85db038..be7b47c 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -3157,20 +3157,16 @@ static void handle_create_bond_cmd(const void *buf, uint16_t len)
+ 	cp.io_cap = DEFAULT_IO_CAPABILITY;
+ 	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+ 
+-	dev = find_device(&cp.addr.bdaddr);
++	/* type is used only as fallback when device is not in cache */
++	dev = get_device(&cp.addr.bdaddr, BDADDR_BREDR);
+ 
+-	if (dev) {
+-		if (dev->bond_state != HAL_BOND_STATE_NONE) {
+-			status = HAL_STATUS_FAILED;
+-			goto fail;
+-		}
+-
+-		cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
+-	} else {
+-		/* Fallback to BREDR if device is unknown eg. OOB */
+-		cp.addr.type = BDADDR_BREDR;
++	if (dev->bond_state != HAL_BOND_STATE_NONE) {
++		status = HAL_STATUS_FAILED;
++		goto fail;
+ 	}
+ 
++	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
++
+ 	if (mgmt_send(mgmt_if, MGMT_OP_PAIR_DEVICE, adapter.index, sizeof(cp),
+ 				&cp, pair_device_complete, NULL, NULL) == 0) {
+ 		status = HAL_STATUS_FAILED;
+@@ -3179,9 +3175,7 @@ static void handle_create_bond_cmd(const void *buf, uint16_t len)
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+-	if (dev)
+-		set_device_bond_state(dev, HAL_STATUS_SUCCESS,
+-							HAL_BOND_STATE_BONDING);
++	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDING);
+ 
+ fail:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CREATE_BOND,
 -- 
-Luiz Augusto von Dentz
+1.9.1
+
