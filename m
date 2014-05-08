@@ -1,131 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support for SMP Invalid Parameters error code
-Date: Thu,  8 May 2014 14:19:11 +0300
-Message-Id: <1399547951-26259-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/2] doc: Introduce Start/Stop Connection Monitor
+Date: Thu,  8 May 2014 12:31:17 +0200
+Message-Id: <1399545077-9344-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1399545077-9344-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1399545077-9344-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+This patch introduces device method to start and stop connection monitor
+and two new device properties ConnectionRSSI, ConnectionTXPower and
+ConnectionTXPowerMax.
 
-The Invalid Parameters error code is used to indicate that the command
-length is invalid or that a parameter is outside of the specified range.
-This error code wasn't clearly specified in the Bluetooth 4.0
-specification but since 4.1 this has been fixed.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+ConnectionRSSI and ConnectionTXPower  are tracked when monitor is active
 ---
- net/bluetooth/smp.c | 20 ++++++++++----------
- net/bluetooth/smp.h |  1 +
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ doc/device-api.txt | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index dfb4e1161c10..b5b926399e76 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -663,7 +663,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 7a301d3..0b44417 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -100,6 +100,34 @@ Methods		void Connect()
+ 			Possible errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.Failed
  
- 	if (skb->len < sizeof(*req))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
++
++		void StartConnectionMonitor()
++
++			This method starts connection monitor session.
++
++			This method enables connection information tracking.
++			E.g. ConnectionRSSI, ConnectionTXPower.
++
++			Use StopConnectionMonitor to release session.
++
++			Possible errors: org.bluez.Error.NotReady
++					 org.bluez.Error.Failed
++					 org.bluez.Error.NotConnected
++					 org.bluez.Error.NotSupported
++
++		void StopConnectionMonitor()
++
++			This method stops previous StartConnectionMonitor
++			session.
++
++			Note that connection monitor is shared between all
++			monitor sessions thus calling StopConnectionMonitor
++			releases a single session.
++
++			Possible errors: org.bluez.Error.Failed
++					 org.bluez.Error.NotReady
++					 org.bluez.Error.NotAuthorized
++
+ Properties	string Address [readonly]
  
- 	if (conn->hcon->link_mode & HCI_LM_MASTER)
- 		return SMP_CMD_NOTSUPP;
-@@ -720,7 +720,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
+ 			The Bluetooth device address of the remote device.
+@@ -193,3 +221,26 @@ Properties	string Address [readonly]
  
- 	if (skb->len < sizeof(*rsp))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	if (!(conn->hcon->link_mode & HCI_LM_MASTER))
- 		return SMP_CMD_NOTSUPP;
-@@ -770,7 +770,7 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
- 
- 	if (skb->len < sizeof(smp->pcnf))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	memcpy(smp->pcnf, skb->data, sizeof(smp->pcnf));
- 	skb_pull(skb, sizeof(smp->pcnf));
-@@ -794,7 +794,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
- 
- 	if (skb->len < sizeof(smp->rrnd))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	memcpy(smp->rrnd, skb->data, sizeof(smp->rrnd));
- 	skb_pull(skb, sizeof(smp->rrnd));
-@@ -836,7 +836,7 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
- 
- 	if (skb->len < sizeof(*rp))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	if (!(conn->hcon->link_mode & HCI_LM_MASTER))
- 		return SMP_CMD_NOTSUPP;
-@@ -944,7 +944,7 @@ static int smp_cmd_encrypt_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
- 
- 	if (skb->len < sizeof(*rp))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	/* Ignore this PDU if it wasn't requested */
- 	if (!(smp->remote_key_dist & SMP_DIST_ENC_KEY))
-@@ -969,7 +969,7 @@ static int smp_cmd_master_ident(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
- 
- 	if (skb->len < sizeof(*rp))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	/* Ignore this PDU if it wasn't requested */
- 	if (!(smp->remote_key_dist & SMP_DIST_ENC_KEY))
-@@ -1001,7 +1001,7 @@ static int smp_cmd_ident_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("");
- 
- 	if (skb->len < sizeof(*info))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	/* Ignore this PDU if it wasn't requested */
- 	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
-@@ -1025,7 +1025,7 @@ static int smp_cmd_ident_addr_info(struct l2cap_conn *conn,
- 	BT_DBG("");
- 
- 	if (skb->len < sizeof(*info))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	/* Ignore this PDU if it wasn't requested */
- 	if (!(smp->remote_key_dist & SMP_DIST_ID_KEY))
-@@ -1075,7 +1075,7 @@ static int smp_cmd_sign_info(struct l2cap_conn *conn, struct sk_buff *skb)
- 	BT_DBG("conn %p", conn);
- 
- 	if (skb->len < sizeof(*rp))
--		return SMP_UNSPECIFIED;
-+		return SMP_INVALID_PARAMS;
- 
- 	/* Ignore this PDU if it wasn't requested */
- 	if (!(smp->remote_key_dist & SMP_DIST_SIGN))
-diff --git a/net/bluetooth/smp.h b/net/bluetooth/smp.h
-index 1277147a9150..afd16231db13 100644
---- a/net/bluetooth/smp.h
-+++ b/net/bluetooth/smp.h
-@@ -111,6 +111,7 @@ struct smp_cmd_security_req {
- #define SMP_CMD_NOTSUPP			0x07
- #define SMP_UNSPECIFIED			0x08
- #define SMP_REPEATED_ATTEMPTS		0x09
-+#define SMP_INVALID_PARAMS		0x0a
- 
- #define SMP_MIN_ENC_KEY_SIZE		7
- #define SMP_MAX_ENC_KEY_SIZE		16
+ 			Received Signal Strength Indicator (inquiry) of the remote
+ 			device.
++
++		int16 ConnectionRSSI [readonly, optional]
++
++			Received Signal Strength Indicator of connected remote
++			device.
++
++			This property is present only if at least one connection
++			monitor session is active.
++
++			Note that RSSI has different units for BR/EDR (dB)
++			and LE (dBm) as specified in BT Core ver. 4.1, Vol. 2,
++			Part E, Chapter 7.5.4
++
++		int16 ConnectionTXPowerMax [readonly, optional]
++
++			Maximum transmit power level to connected remote device.
++
++		int16 ConnectionTXPower [readonly, optional]
++
++			Transmit power level to connected remote device.
++
++			This property is present only if at least one connection
++			monitor session is active.
 -- 
-1.9.0
+1.8.4
 
