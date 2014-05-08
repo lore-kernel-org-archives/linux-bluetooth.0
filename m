@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 02/12] android/hal-audio-hsp: Add open_output_stream()
-Date: Thu,  8 May 2014 11:01:33 +0300
-Message-Id: <1399536103-19052-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 04/12] android/handsfree: Add SCO Audio IPC
+Date: Thu,  8 May 2014 11:01:35 +0300
+Message-Id: <1399536103-19052-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,214 +11,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function adds audio_open_output_stream() and sets dummy callbacks.
+If SCO Audio IPC gets connected it provides only one command:
+connect_sco().
 ---
- android/hal-sco.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 176 insertions(+), 3 deletions(-)
+ android/handsfree.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index c7ba504..bc7d987 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -25,22 +25,195 @@
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 8202e53..96f0f6e 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -45,6 +45,7 @@
+ #include "bluetooth.h"
+ #include "src/log.h"
+ #include "utils.h"
++#include "sco-msg.h"
  
- #include "hal-log.h"
+ #define HSP_AG_CHANNEL 12
+ #define HFP_AG_CHANNEL 13
+@@ -156,7 +157,9 @@ static struct {
+ static uint32_t hfp_ag_features = 0;
  
-+#define AUDIO_STREAM_DEFAULT_RATE	44100
-+#define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
+ static bdaddr_t adapter_addr;
 +
-+#define OUT_BUFFER_SIZE			2560
-+
-+struct hsp_audio_config {
-+	uint32_t rate;
-+	uint32_t channels;
-+	audio_format_t format;
-+};
-+
-+struct hsp_stream_out {
-+	struct audio_stream_out stream;
-+	struct hsp_audio_config cfg;
-+};
-+
- struct hsp_audio_dev {
- 	struct audio_hw_device dev;
--	struct a2dp_stream_out *out;
-+	struct hsp_stream_out *out;
- };
+ static struct ipc *hal_ipc = NULL;
++static struct ipc *audio_ipc = NULL;
  
-+/* Audio stream functions */
-+
-+static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
-+								size_t bytes)
-+{
-+	/* write data */
-+
-+	return bytes;
-+}
-+
-+static uint32_t out_get_sample_rate(const struct audio_stream *stream)
-+{
-+	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
-+
-+	DBG("rate %u", out->cfg.rate);
-+
-+	return out->cfg.rate;
-+}
-+
-+static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
-+{
-+	DBG("rate %u", rate);
-+
-+	return 0;
-+}
-+
-+static size_t out_get_buffer_size(const struct audio_stream *stream)
-+{
-+	DBG("buf size %u", OUT_BUFFER_SIZE);
-+
-+	return OUT_BUFFER_SIZE;
-+}
-+
-+static uint32_t out_get_channels(const struct audio_stream *stream)
-+{
-+	DBG("");
-+
-+	/* AudioFlinger can only provide stereo stream, so we return it here and
-+	 * later we'll downmix this to mono in case codec requires it
-+	 */
-+	return AUDIO_CHANNEL_OUT_STEREO;
-+}
-+
-+static audio_format_t out_get_format(const struct audio_stream *stream)
-+{
-+	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
-+
-+	DBG("");
-+
-+	return out->cfg.format;
-+}
-+
-+static int out_set_format(struct audio_stream *stream, audio_format_t format)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_standby(struct audio_stream *stream)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int out_dump(const struct audio_stream *stream, int fd)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
-+{
-+	DBG("%s", kvpairs);
-+
-+	return 0;
-+}
-+
-+static char *out_get_parameters(const struct audio_stream *stream,
-+							const char *keys)
-+{
-+	DBG("");
-+
-+	return strdup("");
-+}
-+
-+static uint32_t out_get_latency(const struct audio_stream_out *stream)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int out_set_volume(struct audio_stream_out *stream, float left,
-+								float right)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_get_render_position(const struct audio_stream_out *stream,
-+							uint32_t *dsp_frames)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_add_audio_effect(const struct audio_stream *stream,
-+							effect_handle_t effect)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_remove_audio_effect(const struct audio_stream *stream,
-+							effect_handle_t effect)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
- static int audio_open_output_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					audio_output_flags_t flags,
- 					struct audio_config *config,
- 					struct audio_stream_out **stream_out)
--
- {
-+	struct hsp_audio_dev *adev = (struct hsp_audio_dev *) dev;
-+	struct hsp_stream_out *out;
-+
- 	DBG("");
+ static uint32_t hfp_record_id = 0;
+ static GIOChannel *hfp_server = NULL;
+@@ -822,6 +825,8 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	g_io_channel_unref(device.sco);
+ 	device.sco = NULL;
  
--	return -EINVAL;
-+	out = calloc(1, sizeof(struct hsp_stream_out));
-+	if (!out)
-+		return -ENOMEM;
++	DBG("");
 +
-+	out->stream.common.get_sample_rate = out_get_sample_rate;
-+	out->stream.common.set_sample_rate = out_set_sample_rate;
-+	out->stream.common.get_buffer_size = out_get_buffer_size;
-+	out->stream.common.get_channels = out_get_channels;
-+	out->stream.common.get_format = out_get_format;
-+	out->stream.common.set_format = out_set_format;
-+	out->stream.common.standby = out_standby;
-+	out->stream.common.dump = out_dump;
-+	out->stream.common.set_parameters = out_set_parameters;
-+	out->stream.common.get_parameters = out_get_parameters;
-+	out->stream.common.add_audio_effect = out_add_audio_effect;
-+	out->stream.common.remove_audio_effect = out_remove_audio_effect;
-+	out->stream.get_latency = out_get_latency;
-+	out->stream.set_volume = out_set_volume;
-+	out->stream.write = out_write;
-+	out->stream.get_render_position = out_get_render_position;
+ 	device.sco_watch = 0;
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+@@ -887,6 +892,27 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 							sco_watch_cb, NULL);
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
 +
-+	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
-+	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
-+	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	if (audio_ipc) {
++		int fd = g_io_channel_unix_get_fd(chan);
++		GError *err = NULL;
++		uint16_t mtu = 48;
++		struct audio_rsp_connect_sco rsp;
 +
-+	*stream_out = &out->stream;
-+	adev->out = out;
++		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
++							BT_IO_OPT_INVALID)) {
++			error("Unable to get MTU: %s\n", err->message);
++			g_clear_error(&err);
++		}
 +
-+	return 0;
++		DBG("fd %d mtu %u", fd, mtu);
++
++		rsp.mtu = mtu;
++
++		ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_SCO_ID,
++					AUDIO_OP_CONNECT_SCO, sizeof(rsp), &rsp,
++					fd);
++	}
  }
  
- static void audio_close_output_stream(struct audio_hw_device *dev,
+ static bool connect_sco(void)
+@@ -904,7 +930,7 @@ static bool connect_sco(void)
+ 				device.negotiated_codec != CODEC_ID_CVSD)
+ 		voice_settings = BT_VOICE_TRANSPARENT;
+ 	else
+-		voice_settings = BT_VOICE_CVSD_16BIT;
++		voice_settings = 0;
+ 
+ 	io = bt_io_connect(connect_sco_cb, NULL, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+@@ -2563,6 +2589,33 @@ static void disable_sco_server(void)
+ 	}
+ }
+ 
++static void bt_audio_connect_sco(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	connect_audio();
++}
++
++static const struct ipc_handler audio_handlers[] = {
++	/* AUDIO_OP_CONNECT_SCO */
++	{ bt_audio_connect_sco, false, 0 }
++};
++
++static bool bt_audio_register(ipc_disconnect_cb disconnect)
++{
++	DBG("");
++
++	audio_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
++				AUDIO_SERVICE_SCO_ID, false, disconnect, NULL);
++	if (!audio_ipc)
++		return false;
++
++	ipc_register(audio_ipc, AUDIO_SERVICE_SCO_ID, audio_handlers,
++						G_N_ELEMENTS(audio_handlers));
++
++	return true;
++}
++
+ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ {
+ 	DBG("mode 0x%x", mode);
+@@ -2597,6 +2650,9 @@ done:
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
++
++	bt_audio_register(NULL);
++
+ 	return true;
+ }
+ 
 -- 
 1.8.3.2
 
