@@ -1,76 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 1/2] android/gatt: Extend android2uuid uuid type support
-Date: Thu,  8 May 2014 15:30:52 +0200
-Message-Id: <1399555853-11553-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1399551937-27109-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1399551937-27109-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 8 May 2014 16:27:51 +0300
+Message-ID: <CABBYNZ++bA0pAh7PE=rCh0Ko+5HpiSA_XBhjLU3An5emxEFkUg@mail.gmail.com>
+Subject: Re: [PATCHv4 06/12] android/ipc: Use error printing error messages
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now conversion function android2uuid can recognize type of uuid and set
-it value by copying significant bytes.
----
- android/gatt.c | 37 ++++++++++++++++++++++++++++++++-----
- 1 file changed, 32 insertions(+), 5 deletions(-)
+Hi Andrei,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 4ff70e4..da68adc 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -55,6 +55,13 @@
- #define GATT_SUCCESS	0x00000000
- #define GATT_FAILURE	0x00000101
- 
-+#define BASE_UUID16_OFFSET     12
-+
-+static uint8_t BLUETOOTH_UUID[] = {
-+	0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-+	0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-+};
-+
- typedef enum {
- 	DEVICE_DISCONNECTED = 0,
- 	DEVICE_CONNECT_INIT,		/* connection procedure initiated */
-@@ -171,14 +178,34 @@ static GIOChannel *listening_io = NULL;
- 
- static void bt_le_discovery_stop_cb(void);
- 
--static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-+static bool is_bluetooth_uuid(const uint8_t *uuid)
- {
--	uint8_t i;
-+	int i;
- 
--	dst->type = BT_UUID128;
-+	for (i = 0; i < 16; i++) {
-+		/* ignore minimal uuid (16) value */
-+		if (i == 12 || i == 13)
-+			continue;
- 
--	for (i = 0; i < 16; i++)
--		dst->value.u128.data[i] = uuid[15 - i];
-+		if (uuid[i] != BLUETOOTH_UUID[i])
-+			return false;
-+	}
-+
-+	return true;
-+}
-+
-+static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-+{
-+	if (is_bluetooth_uuid(uuid)) {
-+		/* copy 16 bit uuid value from full android 128bit uuid */
-+		dst->type = BT_UUID16;
-+		dst->value.u16 = (uuid[13] << 8) + uuid[12];
-+	} else {
-+		uint8_t i;
-+		dst->type = BT_UUID128;
-+		for (i = 0; i < 16; i++)
-+			dst->value.u128.data[i] = uuid[15 - i];
-+	}
- }
- 
- static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
+On Thu, May 8, 2014 at 3:25 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> This helps to identify problem since DBG is not printed by default.
+> ---
+>  android/ipc.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+>
+> diff --git a/android/ipc.c b/android/ipc.c
+> index 8cd34ea..89fff8d 100644
+> --- a/android/ipc.c
+> +++ b/android/ipc.c
+> @@ -96,31 +96,31 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
+>         const struct ipc_handler *handler;
+>
+>         if (len < (ssize_t) sizeof(*msg)) {
+> -               DBG("message too small (%zd bytes)", len);
+> +               error("message too small (%zd bytes)", len);
+>                 return -EBADMSG;
+>         }
+>
+>         if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
+> -               DBG("message malformed (%zd bytes)", len);
+> +               error("message malformed (%zd bytes)", len);
+>                 return -EBADMSG;
+>         }
+>
+>         /* if service is valid */
+>         if (msg->service_id > max_index) {
+> -               DBG("unknown service (0x%x)", msg->service_id);
+> +               error("unknown service (0x%x)", msg->service_id);
+>                 return -EOPNOTSUPP;
+>         }
+>
+>         /* if service is registered */
+>         if (!handlers[msg->service_id].handler) {
+> -               DBG("service not registered (0x%x)", msg->service_id);
+> +               error("service not registered (0x%x)", msg->service_id);
+>                 return -EOPNOTSUPP;
+>         }
+>
+>         /* if opcode is valid */
+>         if (msg->opcode == IPC_OP_STATUS ||
+>                         msg->opcode > handlers[msg->service_id].size) {
+> -               DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
+> +               error("invalid opcode 0x%x for service 0x%x", msg->opcode,
+>                                                         msg->service_id);
+>                 return -EOPNOTSUPP;
+>         }
+> @@ -131,7 +131,7 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
+>         /* if payload size is valid */
+>         if ((handler->var_len && handler->data_len > msg->len) ||
+>                         (!handler->var_len && handler->data_len != msg->len)) {
+> -               DBG("invalid size for opcode 0x%x service 0x%x",
+> +               error("invalid size for opcode 0x%x service 0x%x",
+>                                                 msg->opcode, msg->service_id);
+>                 return -EMSGSIZE;
+>         }
+> --
+> 1.8.3.2
+
+Im not sure if that was not done on purpose, well if that gonna exit
+anyway maybe it is fine to use error but then we should probably
+prefix the messages with 'IPC:'
+
+
 -- 
-1.9.2
-
+Luiz Augusto von Dentz
