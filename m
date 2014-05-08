@@ -1,46 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 8 May 2014 23:15:32 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petri Gynther <pgynther@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] input: Add userspace HID support
-Message-ID: <20140508201532.GA16659@t440s.P-661HNU-F1>
-References: <20140508200001.D3AB3100D85@puck.mtv.corp.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140508200001.D3AB3100D85@puck.mtv.corp.google.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <A3E47A33-7BD7-40D7-8513-8AE8A1C13AC0@holtmann.org>
+References: <1399555935-702-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1399555935-702-8-git-send-email-andrzej.kaczmarek@tieto.com> <A3E47A33-7BD7-40D7-8513-8AE8A1C13AC0@holtmann.org>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Thu, 8 May 2014 22:06:34 +0200
+Message-ID: <CAF3PWx3cDTe6zwOvGXy6sWXDZSio-RtcXJrAGPoqq9oXCukNig@mail.gmail.com>
+Subject: Re: [PATCH 7/8] Bluetooth: Avoid pooling TX power for LE links
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi Marcel,
 
-On Thu, May 08, 2014, Petri Gynther wrote:
-> Enable HID protocol handling in userspace when UserspaceHID=true in input.conf.
-> 
-> Benefits of userspace HID:
-> 1. Persistent HID/input pipeline
->    For a Bluetooth HID device, the corresponding kernel HID/input devices are
->    created only once when the Bluetooth HID device is used the first time.
->    The HID/input pipeline is not destroyed and recreated every time when
->    the Bluetooth HID device disconnects and reconnects.
-> 
-> 2. HID vs HoG parity
->    Enables HID and HoG devices to operate the same way in BlueZ stack, using
->    uHID kernel module (/dev/uhid) to pass HID report data between bluetoothd
->    and kernel HID subsystem.
-> 
-> 3. Debugging
->    It is easier to debug HID protocol in userspace than in HIDP kernel module.
-> ---
->  Makefile.plugins           |   3 +-
->  profiles/input/device.c    | 674 +++++++++++++++++++++++++++++++++++++++++++--
->  profiles/input/device.h    |   1 +
->  profiles/input/hidp_defs.h |  79 ++++++
->  profiles/input/input.conf  |   4 +
->  profiles/input/manager.c   |  10 +
->  6 files changed, 754 insertions(+), 17 deletions(-)
->  create mode 100644 profiles/input/hidp_defs.h
+On 8 May 2014 17:29, Marcel Holtmann <marcel@holtmann.org> wrote:
+> Hi Andrzej,
+>
+>> TX power for LE links is immutable thus we do not need to query for it
+>> if already have value.
+>
+> can you include the part from the specification that clarifies this.
 
-Applied. Thanks.
+I'm not sure there's quote in spec that says this explicitly... iirc
+there's explicit statement that it can be controlled on physical link
+by LM for BR/EDR, but for LE I could not find such information. I
+assume it does not change as otherwise TPS spec does not make sense.
+But does my reasoning make sense? :-)
 
-Johan
+BR,
+Andrzej
