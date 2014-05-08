@@ -1,167 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1399551937-27109-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1399551937-27109-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 8 May 2014 16:22:35 +0300
-Message-ID: <CABBYNZJZAg33U_QpkeD80xBQj-cH3qTY6we6-O+A6D47x76Y6Q@mail.gmail.com>
-Subject: Re: [PATCHv4 04/12] android/handsfree: Add SCO Audio IPC
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <CAN_7+YaCPTu40mVXFOJTVmtUNSMy4qcH9Vcs6K06SriQW7dWvg@mail.gmail.com>
+References: <1397728697-22563-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<1397728697-22563-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<CAN_7+YaCPTu40mVXFOJTVmtUNSMy4qcH9Vcs6K06SriQW7dWvg@mail.gmail.com>
+Date: Thu, 8 May 2014 15:18:47 +0200
+Message-ID: <CAMv5GbcY46o0q_8B4W-DX+P6R2CLXzNNCZjqB_czFF+O7smkfg@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] android/gatt: Extend android2uuid uuid type support
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+On 22 April 2014 10:14, Lukasz Rymanowski <lukasz.rymanowski@gmail.com> wrote:
+>
+> Hi Grzegorz,
+>
+>
+> On Thu, Apr 17, 2014 at 11:58 AM, Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com> wrote:
+>>
+>> Now conversion function android2uuid can recognize type of uuid and set
+>> it value by copying significant bytes.
+>> ---
+>>  android/gatt.c | 34 +++++++++++++++++++++++++++++++---
+>>  1 file changed, 31 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index e339789..3a7ace1 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -54,6 +54,13 @@
+>>  #define GATT_SUCCESS   0x00000000
+>>  #define GATT_FAILURE   0x00000101
+>>
+>> +#define BASE_UUID16_OFFSET     12
+>> +
+>> +static uint8_t BLUETOOTH_UUID[] = {
+>> +       0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
+>> +       0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+>> +};
+>> +
+>>  struct gatt_client {
+>>         int32_t id;
+>>         uint8_t uuid[16];
+>> @@ -134,14 +141,35 @@ static struct queue *listen_clients = NULL;
+>>
+>>  static void bt_le_discovery_stop_cb(void);
+>>
+>> +static int get_type_from_android_uuid(const uint8_t *uuid)
+>
+>
+> Actually this function does not only take type. It checks if this is bluetooth uuid or not, and if it is bluetooth uuid it uses uuid16 to represent it. So IMHO this function name should be rather is_bluetooth_uuid(..)  Of course it would return here bool and then you can use correct uuid type depends on this bool.
+>>
+Ok. It'll be more readable after changing name of uuid type
+recognizing function to "is_bluetooth_uuid" returning boolean value.
+I'll send new rebased and changed version. Thanks.
+>> +{
+>> +       int i;
+>> +
+>> +       for (i = 0; i < 16; i++) {
+>> +               /* ignore minimal uuid (16) value */
+>> +               if (i == 12 || i == 13)
+>> +                       continue;
+>> +
+>> +               if (uuid[i] != BLUETOOTH_UUID[i])
+>> +                       return BT_UUID128;
+>> +       }
+>> +
+>> +       return BT_UUID16;
+>> +}
+>> +
+>>  static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
+>>  {
+>>         uint8_t i;
+>>
+>> -       dst->type = BT_UUID128;
+>> +       dst->type = get_type_from_android_uuid(uuid);
+>>
+>> -       for (i = 0; i < 16; i++)
+>> -               dst->value.u128.data[i] = uuid[15 - i];
+>> +       if (dst->type == BT_UUID16) {
+>> +               /* copy 16 bit uuid value from full android 128bit uuid */
+>> +               dst->value.u16 = (uuid[13] << 8) + uuid[12];
+>
+>
+> maybe return here
+>
+It's not needed here because of function end after if-else.
+>> +       } else {
+>> +               for (i = 0; i < 16; i++)
+>> +                       dst->value.u128.data[i] = uuid[15 - i];
+>> +       }
+>>  }
+>>
+>>  static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
+>
+>
+> BR
+> Lukasz
+>>
+>> --
+>> 1.9.1
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
 
-On Thu, May 8, 2014 at 3:25 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> If SCO Audio IPC gets connected it provides only one command:
-> connect_sco().
-> ---
->  android/handsfree.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 57 insertions(+), 1 deletion(-)
->
-> diff --git a/android/handsfree.c b/android/handsfree.c
-> index 8202e53..96f0f6e 100644
-> --- a/android/handsfree.c
-> +++ b/android/handsfree.c
-> @@ -45,6 +45,7 @@
->  #include "bluetooth.h"
->  #include "src/log.h"
->  #include "utils.h"
-> +#include "sco-msg.h"
->
->  #define HSP_AG_CHANNEL 12
->  #define HFP_AG_CHANNEL 13
-> @@ -156,7 +157,9 @@ static struct {
->  static uint32_t hfp_ag_features = 0;
->
->  static bdaddr_t adapter_addr;
-> +
->  static struct ipc *hal_ipc = NULL;
-> +static struct ipc *audio_ipc = NULL;
->
->  static uint32_t hfp_record_id = 0;
->  static GIOChannel *hfp_server = NULL;
-> @@ -822,6 +825,8 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
->         g_io_channel_unref(device.sco);
->         device.sco = NULL;
->
-> +       DBG("");
-> +
->         device.sco_watch = 0;
->
->         device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-> @@ -887,6 +892,27 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
->                                                         sco_watch_cb, NULL);
->
->         device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
-> +
-> +       if (audio_ipc) {
-> +               int fd = g_io_channel_unix_get_fd(chan);
-> +               GError *err = NULL;
-> +               uint16_t mtu = 48;
-> +               struct audio_rsp_connect_sco rsp;
-> +
-> +               if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
-> +                                                       BT_IO_OPT_INVALID)) {
-> +                       error("Unable to get MTU: %s\n", err->message);
-> +                       g_clear_error(&err);
-> +               }
-> +
-> +               DBG("fd %d mtu %u", fd, mtu);
-> +
-> +               rsp.mtu = mtu;
-> +
-> +               ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_SCO_ID,
-> +                                       AUDIO_OP_CONNECT_SCO, sizeof(rsp), &rsp,
-> +                                       fd);
-> +       }
-
-This does not look correct place to do it, I would probably move to a
-separate function and call it from device_set_audio_state.
-
->  }
->
->  static bool connect_sco(void)
-> @@ -904,7 +930,7 @@ static bool connect_sco(void)
->                                 device.negotiated_codec != CODEC_ID_CVSD)
->                 voice_settings = BT_VOICE_TRANSPARENT;
->         else
-> -               voice_settings = BT_VOICE_CVSD_16BIT;
-> +               voice_settings = 0;
-
-What is the reason for changing this value to 0?
-
->
->         io = bt_io_connect(connect_sco_cb, NULL, NULL, &gerr,
->                                 BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-> @@ -2563,6 +2589,33 @@ static void disable_sco_server(void)
->         }
->  }
->
-> +static void bt_audio_connect_sco(const void *buf, uint16_t len)
-> +{
-> +       DBG("");
-> +
-> +       connect_audio();
-
-There doesn't seems to exist any connect_audio function, does this
-even compile? Btw, you need to check if it is already connected then
-you should respond immediately.
-
-> +}
-> +
-> +static const struct ipc_handler audio_handlers[] = {
-> +       /* AUDIO_OP_CONNECT_SCO */
-> +       { bt_audio_connect_sco, false, 0 }
-> +};
-> +
-> +static bool bt_audio_register(ipc_disconnect_cb disconnect)
-> +{
-> +       DBG("");
-> +
-> +       audio_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
-> +                               AUDIO_SERVICE_SCO_ID, false, disconnect, NULL);
-> +       if (!audio_ipc)
-> +               return false;
-> +
-> +       ipc_register(audio_ipc, AUDIO_SERVICE_SCO_ID, audio_handlers,
-> +                                               G_N_ELEMENTS(audio_handlers));
-> +
-> +       return true;
-> +}
-> +
->  bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
->  {
->         DBG("mode 0x%x", mode);
-> @@ -2597,6 +2650,9 @@ done:
->         hal_ipc = ipc;
->         ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
->                                                 G_N_ELEMENTS(cmd_handlers));
-> +
-> +       bt_audio_register(NULL);
-> +
-
-I would also change it to bt_sco_register and obviously you need to
-cleanup properly.
-
->         return true;
->  }
->
-> --
-> 1.8.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
--- 
-Luiz Augusto von Dentz
+Best regards,
+Grzegorz
