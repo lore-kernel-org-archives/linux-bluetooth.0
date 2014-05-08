@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 06/12] android/ipc: Use error printing error messages
-Date: Thu,  8 May 2014 11:01:37 +0300
-Message-Id: <1399536103-19052-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 12/12] android/audio: Add write to SCO
+Date: Thu,  8 May 2014 11:01:43 +0300
+Message-Id: <1399536103-19052-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,61 +11,109 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This helps to identify problem since DBG is not printed by default.
+For synchronization interleave read() and write().
 ---
- android/ipc.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ android/hal-sco.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 73 insertions(+)
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 8cd34ea..89fff8d 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -96,31 +96,31 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	const struct ipc_handler *handler;
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 1ce7f15..c5dd712 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -41,6 +41,8 @@
+ #define OUT_BUFFER_SIZE			2560
+ #define OUT_STREAM_FRAMES		2560
  
- 	if (len < (ssize_t) sizeof(*msg)) {
--		DBG("message too small (%zd bytes)", len);
-+		error("message too small (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
++#define SOCKET_POLL_TIMEOUT_MS		500
++
+ static int listen_sk = -1;
+ static int audio_sk = -1;
  
- 	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
--		DBG("message malformed (%zd bytes)", len);
-+		error("message malformed (%zd bytes)", len);
- 		return -EBADMSG;
+@@ -275,6 +277,74 @@ static void downmix_to_mono(struct hsp_stream_out *out, const uint8_t *buffer,
  	}
+ }
  
- 	/* if service is valid */
- 	if (msg->service_id > max_index) {
--		DBG("unknown service (0x%x)", msg->service_id);
-+		error("unknown service (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
++static bool write_data(struct hsp_stream_out *out, const uint8_t *buffer,
++								size_t bytes)
++{
++	struct pollfd pfd;
++	size_t len, written = 0;
++	int ret;
++	uint16_t mtu = /* out->cfg.mtu */ 48;
++	uint8_t read_buf[mtu];
++	bool do_write = false;
++
++	pfd.fd = out->fd;
++	pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
++
++	while (bytes > written) {
++
++		/* poll for sending */
++		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
++			DBG("timeout fd %d", out->fd);
++			return false;
++		}
++
++		if (pfd.revents & (POLLHUP | POLLNVAL)) {
++			error("error fd %d, events 0x%x", out->fd, pfd.revents);
++			return false;
++		}
++
++		if (pfd.revents & POLLIN) {
++			ret = read(out->fd, read_buf, mtu);
++			if (ret < 0) {
++				error("Error reading fd %d (%s)", out->fd,
++							strerror(errno));
++				return false;
++			}
++
++			do_write = true;
++		}
++
++		if (!do_write)
++			continue;
++
++		len = bytes - written > mtu ? mtu : bytes - written;
++
++		ret = write(out->fd, buffer + written, len);
++		if (ret > 0) {
++			written += ret;
++			do_write = false;
++			continue;
++		}
++
++		if (errno == EAGAIN) {
++			ret = errno;
++			warn("write failed (%d)", ret);
++			continue;
++		}
++
++		if (errno != EINTR) {
++			ret = errno;
++			error("write failed (%d) fd %d bytes %zd", ret, out->fd,
++									bytes);
++			return false;
++		}
++	}
++
++	DBG("written %zd bytes", bytes);
++
++	return true;
++}
++
+ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 								size_t bytes)
+ {
+@@ -320,6 +390,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
  
- 	/* if service is registered */
- 	if (!handlers[msg->service_id].handler) {
--		DBG("service not registered (0x%x)", msg->service_id);
-+		error("service not registered (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
+ 	DBG("total %zd", total);
  
- 	/* if opcode is valid */
- 	if (msg->opcode == IPC_OP_STATUS ||
- 			msg->opcode > handlers[msg->service_id].size) {
--		DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
-+		error("invalid opcode 0x%x for service 0x%x", msg->opcode,
- 							msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
-@@ -131,7 +131,7 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	/* if payload size is valid */
- 	if ((handler->var_len && handler->data_len > msg->len) ||
- 			(!handler->var_len && handler->data_len != msg->len)) {
--		DBG("invalid size for opcode 0x%x service 0x%x",
-+		error("invalid size for opcode 0x%x service 0x%x",
- 						msg->opcode, msg->service_id);
- 		return -EMSGSIZE;
- 	}
++	if (!write_data(out, send_buf, total))
++		return -1;
++
+ 	return bytes;
+ }
+ 
 -- 
 1.8.3.2
 
