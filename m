@@ -1,160 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 01/12] android/hal-sco: Add audio HAL for SCO handling
-Date: Thu,  8 May 2014 15:25:26 +0300
-Message-Id: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 02/12] android/hal-audio-hsp: Add open_output_stream()
+Date: Thu,  8 May 2014 15:25:27 +0300
+Message-Id: <1399551937-27109-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This adds audio HAL for handling SCO. Following needs to be added to
-audio_policy.conf:
-
-  sco {
-    outputs {
-      sco {
-        ...
-        devices AUDIO_DEVICE_OUT_ALL_SCO
-        ...
-      }
-    }
+Function adds audio_open_output_stream() and sets dummy callbacks.
 ---
- android/Android.mk  |  23 ++++++
- android/Makefile.am |  15 ++++
- android/hal-sco.c   | 211 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 249 insertions(+)
- create mode 100644 android/hal-sco.c
+ android/hal-sco.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 176 insertions(+), 3 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 638a042..942c7ba 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -271,6 +271,29 @@ LOCAL_MODULE := audio.a2dp.default
- include $(BUILD_SHARED_LIBRARY)
- 
- #
-+# SCO audio
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := bluez/android/hal-sco.c
-+
-+LOCAL_C_INCLUDES = \
-+	$(call include-path-for, system-core) \
-+	$(call include-path-for, libhardware) \
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libcutils \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-+LOCAL_MODULE_TAGS := optional
-+LOCAL_MODULE := audio.hsp.default
-+
-+include $(BUILD_SHARED_LIBRARY)
-+
-+#
- # l2cap-test
- #
- 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 5ab6411..990ce6b 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -169,6 +169,21 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
- 					android/hardware/hardware.h \
- 					android/system/audio.h
- 
-+android_audio_sco_default_la_SOURCES = android/audio-msg.h \
-+					android/hal-msg.h \
-+					android/hal-sco.c \
-+					android/hardware/audio.h \
-+					android/hardware/audio_effect.h \
-+					android/hardware/hardware.h \
-+					android/system/audio.h
-+
-+android_audio_sco_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
-+
-+android_audio_sco_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
-+					-no-undefined -lrt
-+
-+plugin_LTLIBRARIES += android/audio.sco.default.la
-+
- unit_tests += android/test-ipc
- 
- android_test_ipc_SOURCES = android/test-ipc.c \
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-new file mode 100644
-index 0000000..5a70aba
---- /dev/null
+index 5a70aba..9815c14 100644
+--- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -0,0 +1,211 @@
-+/*
-+ * Copyright (C) 2013 Intel Corporation
-+ *
-+ * Licensed under the Apache License, Version 2.0 (the "License");
-+ * you may not use this file except in compliance with the License.
-+ * You may obtain a copy of the License at
-+ *
-+ *      http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * Unless required by applicable law or agreed to in writing, software
-+ * distributed under the License is distributed on an "AS IS" BASIS,
-+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+ * See the License for the specific language governing permissions and
-+ * limitations under the License.
-+ *
-+ */
+@@ -25,22 +25,195 @@
+ 
+ #include "hal-log.h"
+ 
++#define AUDIO_STREAM_DEFAULT_RATE	44100
++#define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
 +
-+#include <errno.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
++#define OUT_BUFFER_SIZE			2560
 +
-+#include <hardware/audio.h>
-+#include <hardware/hardware.h>
-+
-+#include "hal-log.h"
-+
-+struct sco_audio_dev {
-+	struct audio_hw_device dev;
-+	struct a2dp_stream_out *out;
++struct hsp_audio_config {
++	uint32_t rate;
++	uint32_t channels;
++	audio_format_t format;
 +};
 +
-+static int audio_open_output_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					audio_output_flags_t flags,
-+					struct audio_config *config,
-+					struct audio_stream_out **stream_out)
++struct sco_stream_out {
++	struct audio_stream_out stream;
++	struct hsp_audio_config cfg;
++};
 +
+ struct sco_audio_dev {
+ 	struct audio_hw_device dev;
+-	struct a2dp_stream_out *out;
++	struct sco_stream_out *out;
+ };
+ 
++/* Audio stream functions */
++
++static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
++								size_t bytes)
++{
++	/* write data */
++
++	return bytes;
++}
++
++static uint32_t out_get_sample_rate(const struct audio_stream *stream)
++{
++	struct sco_stream_out *out = (struct sco_stream_out *) stream;
++
++	DBG("rate %u", out->cfg.rate);
++
++	return out->cfg.rate;
++}
++
++static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
++{
++	DBG("rate %u", rate);
++
++	return 0;
++}
++
++static size_t out_get_buffer_size(const struct audio_stream *stream)
++{
++	DBG("buf size %u", OUT_BUFFER_SIZE);
++
++	return OUT_BUFFER_SIZE;
++}
++
++static uint32_t out_get_channels(const struct audio_stream *stream)
 +{
 +	DBG("");
 +
-+	return -EINVAL;
++	/* AudioFlinger can only provide stereo stream, so we return it here and
++	 * later we'll downmix this to mono in case codec requires it
++	 */
++	return AUDIO_CHANNEL_OUT_STEREO;
 +}
 +
-+static void audio_close_output_stream(struct audio_hw_device *dev,
-+					struct audio_stream_out *stream_out)
++static audio_format_t out_get_format(const struct audio_stream *stream)
++{
++	struct sco_stream_out *out = (struct sco_stream_out *) stream;
++
++	DBG("");
++
++	return out->cfg.format;
++}
++
++static int out_set_format(struct audio_stream *stream, audio_format_t format)
 +{
 +	DBG("");
 +
-+	free(stream_out);
++	return -ENOSYS;
 +}
 +
-+static int audio_set_parameters(struct audio_hw_device *dev,
-+							const char *kvpairs)
++static int out_standby(struct audio_stream *stream)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int out_dump(const struct audio_stream *stream, int fd)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
 +{
 +	DBG("%s", kvpairs);
 +
 +	return 0;
 +}
 +
-+static char *audio_get_parameters(const struct audio_hw_device *dev,
++static char *out_get_parameters(const struct audio_stream *stream,
 +							const char *keys)
 +{
 +	DBG("");
@@ -162,148 +134,91 @@ index 0000000..5a70aba
 +	return strdup("");
 +}
 +
-+static int audio_init_check(const struct audio_hw_device *dev)
++static uint32_t out_get_latency(const struct audio_stream_out *stream)
 +{
 +	DBG("");
 +
 +	return 0;
 +}
 +
-+static int audio_set_voice_volume(struct audio_hw_device *dev, float volume)
-+{
-+	DBG("%f", volume);
-+
-+	return 0;
-+}
-+
-+static int audio_set_master_volume(struct audio_hw_device *dev, float volume)
-+{
-+	DBG("%f", volume);
-+
-+	return 0;
-+}
-+
-+static int audio_set_mode(struct audio_hw_device *dev, int mode)
++static int out_set_volume(struct audio_stream_out *stream, float left,
++								float right)
 +{
 +	DBG("");
 +
 +	return -ENOSYS;
 +}
 +
-+static int audio_set_mic_mute(struct audio_hw_device *dev, bool state)
++static int out_get_render_position(const struct audio_stream_out *stream,
++							uint32_t *dsp_frames)
 +{
 +	DBG("");
 +
 +	return -ENOSYS;
 +}
 +
-+static int audio_get_mic_mute(const struct audio_hw_device *dev, bool *state)
++static int out_add_audio_effect(const struct audio_stream *stream,
++							effect_handle_t effect)
 +{
 +	DBG("");
 +
 +	return -ENOSYS;
 +}
 +
-+static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
-+					const struct audio_config *config)
++static int out_remove_audio_effect(const struct audio_stream *stream,
++							effect_handle_t effect)
 +{
 +	DBG("");
 +
 +	return -ENOSYS;
 +}
 +
-+static int audio_open_input_stream(struct audio_hw_device *dev,
-+					audio_io_handle_t handle,
-+					audio_devices_t devices,
-+					struct audio_config *config,
-+					struct audio_stream_in **stream_in)
-+{
-+	DBG("");
+ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 					audio_io_handle_t handle,
+ 					audio_devices_t devices,
+ 					audio_output_flags_t flags,
+ 					struct audio_config *config,
+ 					struct audio_stream_out **stream_out)
+-
+ {
++	struct sco_audio_dev *adev = (struct sco_audio_dev *) dev;
++	struct sco_stream_out *out;
 +
-+	return 0;
-+}
-+
-+static void audio_close_input_stream(struct audio_hw_device *dev,
-+					struct audio_stream_in *stream_in)
-+{
-+	DBG("");
-+
-+	free(stream_in);
-+}
-+
-+static int audio_dump(const audio_hw_device_t *device, int fd)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int audio_close(hw_device_t *device)
-+{
-+	DBG("");
-+
-+	free(device);
-+
-+	return 0;
-+}
-+
-+static int audio_open(const hw_module_t *module, const char *name,
-+							hw_device_t **device)
-+{
-+	struct sco_audio_dev *adev;
-+
-+	DBG("");
-+
-+	if (strcmp(name, AUDIO_HARDWARE_INTERFACE)) {
-+		error("audio: interface %s not matching [%s]", name,
-+						AUDIO_HARDWARE_INTERFACE);
-+		return -EINVAL;
-+	}
-+
-+	adev = calloc(1, sizeof(struct sco_audio_dev));
-+	if (!adev)
+ 	DBG("");
+ 
+-	return -EINVAL;
++	out = calloc(1, sizeof(struct sco_stream_out));
++	if (!out)
 +		return -ENOMEM;
 +
-+	adev->dev.common.tag = HARDWARE_DEVICE_TAG;
-+	adev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
-+	adev->dev.common.module = (struct hw_module_t *) module;
-+	adev->dev.common.close = audio_close;
++	out->stream.common.get_sample_rate = out_get_sample_rate;
++	out->stream.common.set_sample_rate = out_set_sample_rate;
++	out->stream.common.get_buffer_size = out_get_buffer_size;
++	out->stream.common.get_channels = out_get_channels;
++	out->stream.common.get_format = out_get_format;
++	out->stream.common.set_format = out_set_format;
++	out->stream.common.standby = out_standby;
++	out->stream.common.dump = out_dump;
++	out->stream.common.set_parameters = out_set_parameters;
++	out->stream.common.get_parameters = out_get_parameters;
++	out->stream.common.add_audio_effect = out_add_audio_effect;
++	out->stream.common.remove_audio_effect = out_remove_audio_effect;
++	out->stream.get_latency = out_get_latency;
++	out->stream.set_volume = out_set_volume;
++	out->stream.write = out_write;
++	out->stream.get_render_position = out_get_render_position;
 +
-+	adev->dev.init_check = audio_init_check;
-+	adev->dev.set_voice_volume = audio_set_voice_volume;
-+	adev->dev.set_master_volume = audio_set_master_volume;
-+	adev->dev.set_mode = audio_set_mode;
-+	adev->dev.set_mic_mute = audio_set_mic_mute;
-+	adev->dev.get_mic_mute = audio_get_mic_mute;
-+	adev->dev.set_parameters = audio_set_parameters;
-+	adev->dev.get_parameters = audio_get_parameters;
-+	adev->dev.get_input_buffer_size = audio_get_input_buffer_size;
-+	adev->dev.open_output_stream = audio_open_output_stream;
-+	adev->dev.close_output_stream = audio_close_output_stream;
-+	adev->dev.open_input_stream = audio_open_input_stream;
-+	adev->dev.close_input_stream = audio_close_input_stream;
-+	adev->dev.dump = audio_dump;
++	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
++	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
++	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
 +
-+	*device = &adev->dev.common;
++	*stream_out = &out->stream;
++	adev->out = out;
 +
 +	return 0;
-+}
-+
-+static struct hw_module_methods_t hal_module_methods = {
-+	.open = audio_open,
-+};
-+
-+struct audio_module HAL_MODULE_INFO_SYM = {
-+	.common = {
-+		.tag = HARDWARE_MODULE_TAG,
-+		.version_major = 1,
-+		.version_minor = 0,
-+		.id = AUDIO_HARDWARE_MODULE_ID,
-+		.name = "HSP Audio HW HAL",
-+		.author = "Intel Corporation",
-+		.methods = &hal_module_methods,
-+	},
-+};
+ }
+ 
+ static void audio_close_output_stream(struct audio_hw_device *dev,
 -- 
 1.8.3.2
 
