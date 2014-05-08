@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 11/12] android/audio: Use resampler interface to resample SCO
-Date: Thu,  8 May 2014 11:01:42 +0300
-Message-Id: <1399536103-19052-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 03/12] android/audio: Add Audio SCO message API
+Date: Thu,  8 May 2014 11:01:34 +0300
+Message-Id: <1399536103-19052-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,210 +11,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Resample Android audio from 44100 to 8000.
+SCO API will be used when communicating with SCO Audio HAL.
 ---
- android/hal-sco.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 105 insertions(+), 7 deletions(-)
+ android/sco-ipc-api.txt | 36 ++++++++++++++++++++++++++++++++++++
+ android/sco-msg.h       | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
+ create mode 100644 android/sco-ipc-api.txt
+ create mode 100644 android/sco-msg.h
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index d55d34d..1ce7f15 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -27,6 +27,7 @@
- 
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
-+#include <audio_utils/resampler.h>
- 
- #include "../src/shared/util.h"
- #include "sco-msg.h"
-@@ -34,6 +35,7 @@
- #include "hal-log.h"
- 
- #define AUDIO_STREAM_DEFAULT_RATE	44100
-+#define AUDIO_STREAM_SCO_RATE		8000
- #define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
- 
- #define OUT_BUFFER_SIZE			2560
-@@ -60,6 +62,10 @@ struct hsp_stream_out {
- 	int fd;
- 
- 	uint8_t *downmix_buf;
+diff --git a/android/sco-ipc-api.txt b/android/sco-ipc-api.txt
+new file mode 100644
+index 0000000..75b2cba
+--- /dev/null
++++ b/android/sco-ipc-api.txt
+@@ -0,0 +1,36 @@
++Bluetooth SCO Audio Plugin
++==========================
 +
-+	struct resampler_itfe *resampler;
-+	int16_t *resample_buf;
-+	uint32_t resample_frame_num;
- };
- 
- struct hsp_audio_dev {
-@@ -67,6 +73,22 @@ struct hsp_audio_dev {
- 	struct hsp_stream_out *out;
- };
- 
++The SCO Audio Plugin communicate through abstract socket name
++"\0bluez_sco_socket".
++
++	.---Audio---.                             .--Android--.
++	|  Plugin   |                             |   Daemon  |
++	|           |          Command            |           |
++	|           | --------------------------> |           |
++	|           |                             |           |
++	|           | <-------------------------- |           |
++	|           |          Response           |           |
++	|           |                             |           |
++	|           |                             |           |
++	|           |                             |           |
++	'-----------'                             '-----------'
++
++
++	Audio HAL                               Daemon
++	----------------------------------------------------
++
++	call connect_sco()                    --> create SCO socket
++	return connect_sco()                  <-- return socket fd and mtu
++
++SCO Audio Service (ID 0)
++========================
++
++	Opcode 0x00 - Error response
++
++		Response parameters: Status (1 octet)
++
++	Opcode 0x01 - Connect Audio SCO command
++
++		Command parameters: <none>
++		Response parameters: MTU (2 octets)
+diff --git a/android/sco-msg.h b/android/sco-msg.h
+new file mode 100644
+index 0000000..cd2f894
+--- /dev/null
++++ b/android/sco-msg.h
+@@ -0,0 +1,36 @@
 +/*
-+ * return the minimum frame numbers from resampling between BT stack's rate
-+ * and audio flinger's. For output stream, 'output' shall be true, otherwise
-+ * false for input streams at audio flinger side.
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
 + */
-+static size_t get_resample_frame_num(uint32_t sco_rate, uint32_t rate,
-+						size_t frame_num, bool output)
-+{
-+	size_t resample_frames_num = frame_num * sco_rate / rate + output;
 +
-+	DBG("resampler: sco_rate %d frame_num %zd rate %d resample frames %zd",
-+				sco_rate, frame_num, rate, resample_frames_num);
++static const char BLUEZ_SCO_SK_PATH[] = "\0bluez_sco_socket";
 +
-+	return resample_frames_num;
-+}
++#define AUDIO_SERVICE_SCO_ID		1
 +
- /* Audio IPC functions */
- 
- static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
-@@ -258,6 +280,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- {
- 	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
- 	size_t frame_num = bytes / audio_stream_frame_size(&out->stream.common);
-+	size_t output_frame_num = frame_num;
-+	void *send_buf = out->downmix_buf;
-+	size_t total;
- 
- 	DBG("write to fd %d bytes %zu", out->fd, bytes);
- 
-@@ -267,6 +292,34 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 	}
- 
- 	downmix_to_mono(out, buffer, frame_num);
++#define AUDIO_STATUS_SUCCESS		IPC_STATUS_SUCCESS
++#define AUDIO_STATUS_FAILED		0x01
 +
-+	if (out->resampler) {
-+		int ret;
++#define AUDIO_OP_STATUS			IPC_OP_STATUS
 +
-+		/* limit resampler's output within what resample buf can hold */
-+		output_frame_num = out->resample_frame_num;
-+
-+		ret = out->resampler->resample_from_input(out->resampler,
-+								send_buf,
-+								&frame_num,
-+								out->resample_buf,
-+								&output_frame_num);
-+		if (ret) {
-+			error("Failed to resample frames: %zd input %zd (%s)",
-+				frame_num, output_frame_num, strerror(ret));
-+			return -1;
-+		}
-+
-+		send_buf = out->resample_buf;
-+
-+		DBG("Resampled: frame_num %zd, output_frame_num %zd", 
-+						frame_num, output_frame_num);
-+	}
-+
-+	total = output_frame_num * sizeof(int16_t) * 1;
-+
-+	DBG("total %zd", total);
-+
- 	return bytes;
- }
- 
-@@ -299,19 +352,18 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
- 
- static uint32_t out_get_channels(const struct audio_stream *stream)
- {
--	DBG("");
-+	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
- 
--	/* AudioFlinger can only provide stereo stream, so we return it here and
--	 * later we'll downmix this to mono in case codec requires it
--	 */
--	return AUDIO_CHANNEL_OUT_STEREO;
-+	DBG("channels num: %u", popcount(out->cfg.channels));
-+
-+	return out->cfg.channels;
- }
- 
- static audio_format_t out_get_format(const struct audio_stream *stream)
- {
- 	struct hsp_stream_out *out = (struct hsp_stream_out *) stream;
- 
--	DBG("");
-+	DBG("format: %u", out->cfg.format);
- 
- 	return out->cfg.format;
- }
-@@ -401,6 +453,8 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	struct hsp_audio_dev *adev = (struct hsp_audio_dev *) dev;
- 	struct hsp_stream_out *out;
- 	int fd = -1;
-+	int chan_num, ret;
-+	size_t resample_size;
- 	uint16_t mtu;
- 
- 	DBG("");
-@@ -433,8 +487,9 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	out->stream.write = out_write;
- 	out->stream.get_render_position = out_get_render_position;
- 
-+	/* Configuration for Android */
- 	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
--	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
-+	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
- 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
- 	out->cfg.frame_num = OUT_STREAM_FRAMES;
- 	out->cfg.mtu = mtu;
-@@ -446,11 +501,54 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	}
- 
- 	DBG("size %zd", out_get_buffer_size(&out->stream.common));
-+
-+	/* Channel numbers for resampler */
-+	chan_num = 1;
-+
-+	ret = create_resampler(out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num,
-+						RESAMPLER_QUALITY_DEFAULT, NULL,
-+						&out->resampler);
-+	if (ret) {
-+		error("Failed to create resampler (%s)", strerror(ret));
-+		goto failed;
-+	}
-+
-+	DBG("Created resampler: input rate [%d] output rate [%d] channels [%d]",
-+				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num);
-+
-+	out->resample_frame_num = get_resample_frame_num(AUDIO_STREAM_SCO_RATE,
-+							out->cfg.rate,
-+							out->cfg.frame_num, 1);
-+
-+	if (!out->resample_frame_num) {
-+		error("frame num is too small to resample, discard it");
-+		goto failed;
-+	}
-+
-+	resample_size = sizeof(int16_t) * chan_num * out->resample_frame_num;
-+
-+	out->resample_buf = malloc(resample_size);
-+	if (!out->resample_buf) {
-+		error("failed to allocate resample buffer for %u frames",
-+						out->resample_frame_num);
-+		goto failed;
-+	}
-+
-+	DBG("resampler: frame num %u buf size %zd bytes", 
-+					out->resample_frame_num, resample_size);
-+
- 	*stream_out = &out->stream;
- 	adev->out = out;
- 	out->fd = fd;
- 
- 	return 0;
-+failed:
-+	free(out->downmix_buf);
-+	free(out);
-+	stream_out = NULL;
-+	adev->out = NULL;
-+
-+	return ret;
- }
- 
- static void audio_close_output_stream(struct audio_hw_device *dev,
++#define AUDIO_OP_CONNECT_SCO		0x01
++struct audio_rsp_connect_sco {
++	uint16_t mtu;
++} __attribute__((packed));
 -- 
 1.8.3.2
 
