@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 06/12] android/ipc: Use error printing error messages
-Date: Thu,  8 May 2014 15:25:31 +0300
-Message-Id: <1399551937-27109-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 09/12] audio/haltest: Make audio_stream static
+Date: Thu,  8 May 2014 15:25:34 +0300
+Message-Id: <1399551937-27109-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,61 +11,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This helps to identify problem since DBG is not printed by default.
 ---
- android/ipc.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ android/client/if-audio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 8cd34ea..89fff8d 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -96,31 +96,31 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	const struct ipc_handler *handler;
+diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+index ede8533..6a48025 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-audio.c
+@@ -22,7 +22,7 @@
+ #include <math.h>
  
- 	if (len < (ssize_t) sizeof(*msg)) {
--		DBG("message too small (%zd bytes)", len);
-+		error("message too small (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
+ audio_hw_device_t *if_audio = NULL;
+-struct audio_stream_out *stream_out = NULL;
++static struct audio_stream_out *stream_out = NULL;
  
- 	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
--		DBG("message malformed (%zd bytes)", len);
-+		error("message malformed (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
- 
- 	/* if service is valid */
- 	if (msg->service_id > max_index) {
--		DBG("unknown service (0x%x)", msg->service_id);
-+		error("unknown service (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* if service is registered */
- 	if (!handlers[msg->service_id].handler) {
--		DBG("service not registered (0x%x)", msg->service_id);
-+		error("service not registered (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* if opcode is valid */
- 	if (msg->opcode == IPC_OP_STATUS ||
- 			msg->opcode > handlers[msg->service_id].size) {
--		DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
-+		error("invalid opcode 0x%x for service 0x%x", msg->opcode,
- 							msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
-@@ -131,7 +131,7 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	/* if payload size is valid */
- 	if ((handler->var_len && handler->data_len > msg->len) ||
- 			(!handler->var_len && handler->data_len != msg->len)) {
--		DBG("invalid size for opcode 0x%x service 0x%x",
-+		error("invalid size for opcode 0x%x service 0x%x",
- 						msg->opcode, msg->service_id);
- 		return -EMSGSIZE;
- 	}
+ static size_t buffer_size = 0;
+ static pthread_t play_thread = 0;
 -- 
 1.8.3.2
 
