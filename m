@@ -1,74 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 4/8] Bluetooth: Add support for user data in hci_request
+Subject: Re: [PATCH 7/8] Bluetooth: Avoid pooling TX power for LE links
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1399555935-702-5-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Thu, 8 May 2014 08:32:19 -0700
+In-Reply-To: <1399555935-702-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 8 May 2014 08:29:06 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5725B981-E83A-467E-80ED-18B9C8FE285F@holtmann.org>
-References: <1399555935-702-1-git-send-email-andrzej.kaczmarek@tieto.com> <1399555935-702-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Message-Id: <A3E47A33-7BD7-40D7-8513-8AE8A1C13AC0@holtmann.org>
+References: <1399555935-702-1-git-send-email-andrzej.kaczmarek@tieto.com> <1399555935-702-8-git-send-email-andrzej.kaczmarek@tieto.com>
 To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrzej,
 
-> This patch makes possible to store some user data in hci_request struct
-> which will be available in completion callback. Data can be added when
-> initializing new request using hci_req_init(). With this it's now easy
-> to run request which can be associated with e.g. specific hci_conn.
-> 
+> TX power for LE links is immutable thus we do not need to query for it
+> if already have value.
+
+can you include the part from the specification that clarifies this.
+
 > Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 > ---
-> include/net/bluetooth/bluetooth.h |  3 +-
-> include/net/bluetooth/hci_core.h  |  3 +-
-> net/bluetooth/hci_conn.c          |  4 +-
-> net/bluetooth/hci_core.c          | 29 +++++++++-----
-> net/bluetooth/mgmt.c              | 84 +++++++++++++++++++++------------------
-> 5 files changed, 69 insertions(+), 54 deletions(-)
+> net/bluetooth/mgmt.c | 14 ++++++++++----
+> 1 file changed, 10 insertions(+), 4 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 904777c1..28378ad 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -273,12 +273,13 @@ struct l2cap_ctrl {
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index e84adf9..3f6c81a 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4726,10 +4726,16 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+> 		hci_req_add(&req, HCI_OP_READ_RSSI, sizeof(req_rssi_cp),
+> 			    &req_rssi_cp);
 > 
-> struct hci_dev;
-> 
-> -typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status);
-> +typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, void *data);
-> 
-> struct hci_req_ctrl {
-> 	bool			start;
-> 	u8			event;
-> 	hci_req_complete_t	complete;
-> +	void			*data;
-> };
-> 
-> struct bt_skb_cb {
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 211bad6..30d245f 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1162,6 +1162,7 @@ int hci_unregister_cb(struct hci_cb *hcb);
-> struct hci_request {
-> 	struct hci_dev		*hdev;
-> 	struct sk_buff_head	cmd_q;
-> +	void			*data;
-> 
-> 	/* If something goes wrong when building the HCI request, the error
-> 	 * value is stored in this field.
-> @@ -1169,7 +1170,7 @@ struct hci_request {
-> 	int			err;
-> };
-> 
-> -void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
-> +void hci_req_init(struct hci_request *req, struct hci_dev *hdev, void *data);
-
-do we really want to have everybody add extra data in here. We are now touching every possible call that we have so far. I do not really like this at the moment.
-
-Two questions. a) can we do this without this change and b) if we do it can someone benefit from it.
+> -		req_txp_cp.handle = cpu_to_le16(conn->handle);
+> -		req_txp_cp.type = TX_POWER_TYPE_CURRENT;
+> -		hci_req_add(&req, HCI_OP_READ_TX_POWER_LEVEL,
+> -			    sizeof(req_txp_cp), &req_txp_cp);
+> +		/* For LE links TX power is immutable so we don't need to query
+> +		 * controller again once value is known.
+> +		 */
+> +		if (!bdaddr_type_is_le(cp->addr.type) ||
+> +		    conn->tx_power == HCI_TX_POWER_INVALID) {
+> +			req_txp_cp.handle = cpu_to_le16(conn->handle);
+> +			req_txp_cp.type = TX_POWER_TYPE_CURRENT;
+> +			hci_req_add(&req, HCI_OP_READ_TX_POWER_LEVEL,
+> +				    sizeof(req_txp_cp), &req_txp_cp);
+> +		}
 
 Regards
 
