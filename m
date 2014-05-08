@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 12/12] android/audio: Add write to SCO
-Date: Thu,  8 May 2014 15:25:37 +0300
-Message-Id: <1399551937-27109-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 04/12] android/handsfree: Add SCO Audio IPC
+Date: Thu,  8 May 2014 15:25:29 +0300
+Message-Id: <1399551937-27109-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,107 +11,122 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For synchronization interleave read() and write().
+If SCO Audio IPC gets connected it provides only one command:
+connect_sco().
 ---
- android/hal-sco.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 73 insertions(+)
+ android/handsfree.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 7b6608b..5ec56ce 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -41,6 +41,8 @@
- #define OUT_BUFFER_SIZE			2560
- #define OUT_STREAM_FRAMES		2560
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 8202e53..96f0f6e 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -45,6 +45,7 @@
+ #include "bluetooth.h"
+ #include "src/log.h"
+ #include "utils.h"
++#include "sco-msg.h"
  
-+#define SOCKET_POLL_TIMEOUT_MS		500
+ #define HSP_AG_CHANNEL 12
+ #define HFP_AG_CHANNEL 13
+@@ -156,7 +157,9 @@ static struct {
+ static uint32_t hfp_ag_features = 0;
+ 
+ static bdaddr_t adapter_addr;
 +
- static int listen_sk = -1;
- static int audio_sk = -1;
+ static struct ipc *hal_ipc = NULL;
++static struct ipc *audio_ipc = NULL;
  
-@@ -275,6 +277,74 @@ static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
+ static uint32_t hfp_record_id = 0;
+ static GIOChannel *hfp_server = NULL;
+@@ -822,6 +825,8 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	g_io_channel_unref(device.sco);
+ 	device.sco = NULL;
+ 
++	DBG("");
++
+ 	device.sco_watch = 0;
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+@@ -887,6 +892,27 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 							sco_watch_cb, NULL);
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++
++	if (audio_ipc) {
++		int fd = g_io_channel_unix_get_fd(chan);
++		GError *err = NULL;
++		uint16_t mtu = 48;
++		struct audio_rsp_connect_sco rsp;
++
++		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
++							BT_IO_OPT_INVALID)) {
++			error("Unable to get MTU: %s\n", err->message);
++			g_clear_error(&err);
++		}
++
++		DBG("fd %d mtu %u", fd, mtu);
++
++		rsp.mtu = mtu;
++
++		ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_SCO_ID,
++					AUDIO_OP_CONNECT_SCO, sizeof(rsp), &rsp,
++					fd);
++	}
+ }
+ 
+ static bool connect_sco(void)
+@@ -904,7 +930,7 @@ static bool connect_sco(void)
+ 				device.negotiated_codec != CODEC_ID_CVSD)
+ 		voice_settings = BT_VOICE_TRANSPARENT;
+ 	else
+-		voice_settings = BT_VOICE_CVSD_16BIT;
++		voice_settings = 0;
+ 
+ 	io = bt_io_connect(connect_sco_cb, NULL, NULL, &gerr,
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+@@ -2563,6 +2589,33 @@ static void disable_sco_server(void)
  	}
  }
  
-+static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
-+								size_t bytes)
++static void bt_audio_connect_sco(const void *buf, uint16_t len)
 +{
-+	struct pollfd pfd;
-+	size_t len, written = 0;
-+	int ret;
-+	uint16_t mtu = /* out->cfg.mtu */ 48;
-+	uint8_t read_buf[mtu];
-+	bool do_write = false;
++	DBG("");
 +
-+	pfd.fd = out->fd;
-+	pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
++	connect_audio();
++}
 +
-+	while (bytes > written) {
++static const struct ipc_handler audio_handlers[] = {
++	/* AUDIO_OP_CONNECT_SCO */
++	{ bt_audio_connect_sco, false, 0 }
++};
 +
-+		/* poll for sending */
-+		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
-+			DBG("timeout fd %d", out->fd);
-+			return false;
-+		}
++static bool bt_audio_register(ipc_disconnect_cb disconnect)
++{
++	DBG("");
 +
-+		if (pfd.revents & (POLLHUP | POLLNVAL)) {
-+			error("error fd %d, events 0x%x", out->fd, pfd.revents);
-+			return false;
-+		}
++	audio_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
++				AUDIO_SERVICE_SCO_ID, false, disconnect, NULL);
++	if (!audio_ipc)
++		return false;
 +
-+		if (pfd.revents & POLLIN) {
-+			ret = read(out->fd, read_buf, mtu);
-+			if (ret < 0) {
-+				error("Error reading fd %d (%s)", out->fd,
-+							strerror(errno));
-+				return false;
-+			}
-+
-+			do_write = true;
-+		}
-+
-+		if (!do_write)
-+			continue;
-+
-+		len = bytes - written > mtu ? mtu : bytes - written;
-+
-+		ret = write(out->fd, buffer + written, len);
-+		if (ret > 0) {
-+			written += ret;
-+			do_write = false;
-+			continue;
-+		}
-+
-+		if (errno == EAGAIN) {
-+			ret = errno;
-+			warn("write failed (%d)", ret);
-+			continue;
-+		}
-+
-+		if (errno != EINTR) {
-+			ret = errno;
-+			error("write failed (%d) fd %d bytes %zd", ret, out->fd,
-+									bytes);
-+			return false;
-+		}
-+	}
-+
-+	DBG("written %zd bytes", bytes);
++	ipc_register(audio_ipc, AUDIO_SERVICE_SCO_ID, audio_handlers,
++						G_N_ELEMENTS(audio_handlers));
 +
 +	return true;
 +}
 +
- static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 								size_t bytes)
+ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
  {
-@@ -320,6 +390,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 
- 	DBG("total %zd", total);
- 
-+	if (!write_data(out, send_buf, total))
-+		return -1;
+ 	DBG("mode 0x%x", mode);
+@@ -2597,6 +2650,9 @@ done:
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
 +
- 	return bytes;
++	bt_audio_register(NULL);
++
+ 	return true;
  }
  
 -- 
