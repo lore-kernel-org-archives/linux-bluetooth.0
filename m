@@ -1,75 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+Date: Thu, 8 May 2014 12:02:46 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/bluetooth: Make sure proper controller mode is set on start
-Date: Thu,  8 May 2014 11:07:13 +0200
-Message-Id: <1399540033-26119-1-git-send-email-szymon.janc@tieto.com>
+Subject: Re: [PATCHv3 01/12] android/hal-sco: Add audio HAL for SCO handling
+Message-ID: <20140508090244.GB21149@aemeltch-MOBL1>
+References: <1399536103-19052-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1399536103-19052-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20140508085542.GA21149@aemeltch-MOBL1>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140508085542.GA21149@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-BR/EDR and LE features can be toggled before daemon is started and
-we should not assume their state.
----
- android/bluetooth.c | 31 ++++++++++++++++++++++++-------
- 1 file changed, 24 insertions(+), 7 deletions(-)
+On Thu, May 08, 2014 at 11:55:47AM +0300, Andrei Emeltchenko wrote:
+> On Thu, May 08, 2014 at 11:01:32AM +0300, Andrei Emeltchenko wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> > 
+> > This adds audio HAL for handling SCO. Following needs to be added to
+> > audio_policy.conf:
+> > 
+> >   sco {
+> >     outputs {
+> >       sco {
+> >         ...
+> >         devices AUDIO_DEVICE_OUT_ALL_SCO
+> >         ...
+> >       }
+> >     }
+> > ---
+> >  android/Android.mk  |  23 ++++++
+> >  android/Makefile.am |  15 ++++
+> >  android/hal-sco.c   | 211 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 249 insertions(+)
+> >  create mode 100644 android/hal-sco.c
+> > 
+> > diff --git a/android/Android.mk b/android/Android.mk
+> > index 638a042..b7b284d 100644
+> > --- a/android/Android.mk
+> > +++ b/android/Android.mk
+> > @@ -271,6 +271,29 @@ LOCAL_MODULE := audio.a2dp.default
+> >  include $(BUILD_SHARED_LIBRARY)
+> >  
+> >  #
+> > +# SCO audio
+> > +#
+> > +
+> > +include $(CLEAR_VARS)
+> > +
+> > +LOCAL_SRC_FILES := bluez/android/hal-sco.c
+> > +
+> > +LOCAL_C_INCLUDES = \
+> > +	$(call include-path-for, system-core) \
+> > +	$(call include-path-for, libhardware) \
+> > +
+> > +LOCAL_SHARED_LIBRARIES := \
+> > +	libcutils \
+> > +
+> > +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+> > +
+> > +LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+> > +LOCAL_MODULE_TAGS := optional
+> > +LOCAL_MODULE := audio.sco.default
+> 
+> I changed hsp to sco, I think this is not a good idea here since hsp is
+> mentioned in audio_policy.conf
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 2bc79e2..dbd6102 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3966,12 +3966,19 @@ static const struct ipc_handler cmd_handlers[] = {
- 
- bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
- {
-+	uint32_t missing_settings;
-+
- 	DBG("mode 0x%x", mode);
- 
-+	missing_settings = adapter.current_settings ^
-+					adapter.supported_settings;
-+
- 	switch (mode) {
- 	case HAL_MODE_DEFAULT:
--		if (!(adapter.current_settings & MGMT_SETTING_LE) &&
--				(adapter.supported_settings & MGMT_SETTING_LE))
-+		if (missing_settings & MGMT_SETTING_BREDR)
-+			set_mode(MGMT_OP_SET_BREDR, 0x01);
-+
-+		if (missing_settings & MGMT_SETTING_LE)
- 			set_mode(MGMT_OP_SET_LE, 0x01);
- 		break;
- 	case HAL_MODE_LE:
-@@ -3990,14 +3997,24 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
- 			set_mode(MGMT_OP_SET_BREDR, 0x00);
- 		break;
- 	case HAL_MODE_BREDR:
--		/*
--		 * BR/EDR Should be enabled on start, if it is not that means
--		 * there is LE controller only and we should fail
--		 */
--		if (!(adapter.current_settings & MGMT_SETTING_BREDR)) {
-+		/* Fail if controller does not support BR/EDR */
-+		if (!(adapter.supported_settings & MGMT_SETTING_BREDR)) {
- 			error("BR/EDR Mode not supported");
- 			return false;
- 		}
-+
-+		/* Enable BR/EDR if it is not enabled */
-+		if (missing_settings & MGMT_SETTING_BREDR)
-+			set_mode(MGMT_OP_SET_BREDR, 0x01);
-+
-+		/*
-+		 * According to Core Spec 4.0 host should not disable LE in
-+		 * controller if it was enabled (Vol 2. Part E. 7.3.79).
-+		 * Core Spec 4.1 removed this limitation and chips seem to be
-+		 * handling this just fine anyway.
-+		 */
-+		if (adapter.current_settings & MGMT_SETTING_LE)
-+			set_mode(MGMT_OP_SET_LE, 0x00);
- 		break;
- 	default:
- 		error("Unknown mode 0x%x", mode);
--- 
-1.9.1
+Here:
+https://github.com/android-ia/device_intel_mixins/blob/master/audio/hsw_alc282/audio_policy.conf
+
+  hsp {
+    outputs {
+      hsp {
+        sampling_rates 44100
+        channel_masks AUDIO_CHANNEL_OUT_STEREO
+        formats AUDIO_FORMAT_PCM_16_BIT
+        devices AUDIO_DEVICE_OUT_ALL_SCO
+      }
+    }
+    inputs {
+      hsp {
+        sampling_rates 44100
+        channel_masks AUDIO_CHANNEL_IN_MONO
+        formats AUDIO_FORMAT_PCM_16_BIT
+        devices AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET
+      }
+    }
+  }
+
+
+Best regards 
+Andrei Emeltchenko 
 
