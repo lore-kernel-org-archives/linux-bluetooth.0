@@ -1,633 +1,399 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1399551937-27109-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1399551937-27109-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Thu, 8 May 2014 16:31:14 +0300
-Message-ID: <CABBYNZJcQfRyF1e_0B_5PJqZVh7RUAF6JhgDgJq54Zh0iNVo_w@mail.gmail.com>
-Subject: Re: [PATCHv4 07/12] android/haltest: Add testinng for audio SCO HAL
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 2/2] android/gatt: Add support for uuid filter in search services
+Date: Thu,  8 May 2014 15:30:53 +0200
+Message-Id: <1399555853-11553-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1399555853-11553-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1399555853-11553-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+This adds support for filtering by uuid in searched services. If device
+is scanned for service by uuid, if found - will be added to cache and
+partial service search flag will be set. While performing whole services
+device scan then if partial scan was performed earlier, service cache
+will be refreshed.
+---
+ android/gatt.c | 311 +++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 223 insertions(+), 88 deletions(-)
 
-On Thu, May 8, 2014 at 3:25 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Adds testing support for audio-sco HAL.
-> ---
->  android/Android.mk            |   1 +
->  android/Makefile.am           |   1 +
->  android/client/haltest.c      |   3 +
->  android/client/if-audio-sco.c | 520 ++++++++++++++++++++++++++++++++++++++++++
->  android/client/if-main.h      |   1 +
->  5 files changed, 526 insertions(+)
->  create mode 100644 android/client/if-audio-sco.c
->
-> diff --git a/android/Android.mk b/android/Android.mk
-> index 942c7ba..c453f91 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -149,6 +149,7 @@ LOCAL_SRC_FILES := \
->         bluez/android/client/history.c \
->         bluez/android/client/tabcompletion.c \
->         bluez/android/client/if-audio.c \
-> +       bluez/android/client/if-audio-sco.c \
->         bluez/android/client/if-av.c \
->         bluez/android/client/if-rc.c \
->         bluez/android/client/if-bt.c \
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 990ce6b..5113d71 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -109,6 +109,7 @@ android_haltest_SOURCES = android/client/haltest.c \
->                                 android/client/if-hl.c \
->                                 android/client/if-sock.c \
->                                 android/client/if-audio.c \
-> +                               android/client/if-audio-sco.c \
->                                 android/hardware/hardware.c \
->                                 android/hal-utils.h android/hal-utils.c
->
-> diff --git a/android/client/haltest.c b/android/client/haltest.c
-> index 5d05b75..0871dd7 100644
-> --- a/android/client/haltest.c
-> +++ b/android/client/haltest.c
-> @@ -32,6 +32,7 @@
->
->  const struct interface *interfaces[] = {
->         &audio_if,
-> +       &sco_if,
->         &bluetooth_if,
->         &av_if,
->         &rc_if,
-> @@ -394,10 +395,12 @@ static void init(void)
->         const struct method *m;
->         const char *argv[4];
->         char init_audio[] = "audio init";
-> +       char init_audio_sco[] = "audio-sco init";
->         char init_bt[] = "bluetooth init";
->         uint32_t i;
->
->         process_line(init_audio);
-> +       process_line(init_audio_sco);
->         process_line(init_bt);
->
->         m = get_interface_method("bluetooth", "get_profile_interface");
-> diff --git a/android/client/if-audio-sco.c b/android/client/if-audio-sco.c
-> new file mode 100644
-> index 0000000..24e07cd
-> --- /dev/null
-> +++ b/android/client/if-audio-sco.c
-> @@ -0,0 +1,520 @@
-> +/*
-> + * Copyright (C) 2014 Intel Corporation
-> + *
-> + * Licensed under the Apache License, Version 2.0 (the "License");
-> + * you may not use this file except in compliance with the License.
-> + * You may obtain a copy of the License at
-> + *
-> + *      http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * Unless required by applicable law or agreed to in writing, software
-> + * distributed under the License is distributed on an "AS IS" BASIS,
-> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-> + * See the License for the specific language governing permissions and
-> + * limitations under the License.
-> + *
-> + */
-> +
-> +#include "if-main.h"
-> +#include "../hal-utils.h"
-> +#include "pthread.h"
-> +#include "unistd.h"
-> +#include <math.h>
-> +
-> +audio_hw_device_t *if_audio_sco = NULL;
-> +static struct audio_stream_out *stream_out = NULL;
-> +
-> +static size_t buffer_size = 0;
-> +static pthread_t play_thread = 0;
-> +static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
-> +static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
-> +
-> +enum state {
-> +       STATE_STOPPED,
-> +       STATE_STOPPING,
-> +       STATE_PLAYING,
-> +       STATE_SUSPENDED,
-> +       STATE_MAX
-> +};
-> +
-> +SINTMAP(audio_channel_mask_t, -1, "(AUDIO_CHANNEL_INVALID)")
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_LOW_FREQUENCY),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_BACK_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_BACK_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_BACK_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_SIDE_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_SIDE_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_CENTER),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_MONO),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_STEREO),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_QUAD),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_SURROUND),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_5POINT1),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_7POINT1),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_ALL),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +       DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
-> +ENDMAP
-> +
-> +SINTMAP(audio_format_t, -1, "(AUDIO_FORMAT_INVALID)")
-> +       DELEMENT(AUDIO_FORMAT_DEFAULT),
-> +       DELEMENT(AUDIO_FORMAT_PCM),
-> +       DELEMENT(AUDIO_FORMAT_MP3),
-> +       DELEMENT(AUDIO_FORMAT_AMR_NB),
-> +       DELEMENT(AUDIO_FORMAT_AMR_WB),
-> +       DELEMENT(AUDIO_FORMAT_AAC),
-> +       DELEMENT(AUDIO_FORMAT_HE_AAC_V1),
-> +       DELEMENT(AUDIO_FORMAT_HE_AAC_V2),
-> +       DELEMENT(AUDIO_FORMAT_VORBIS),
-> +       DELEMENT(AUDIO_FORMAT_MAIN_MASK),
-> +       DELEMENT(AUDIO_FORMAT_SUB_MASK),
-> +       DELEMENT(AUDIO_FORMAT_PCM_16_BIT),
-> +       DELEMENT(AUDIO_FORMAT_PCM_8_BIT),
-> +       DELEMENT(AUDIO_FORMAT_PCM_32_BIT),
-> +       DELEMENT(AUDIO_FORMAT_PCM_8_24_BIT),
-> +ENDMAP
-> +
-> +static int current_state = STATE_STOPPED;
-> +
-> +#define SAMPLERATE 44100
-> +static short sample[SAMPLERATE];
-> +static uint16_t sample_pos;
-> +
-> +static void init_p(int argc, const char **argv)
-> +{
-> +       int err;
-> +       const hw_module_t *module;
-> +       audio_hw_device_t *device;
-> +
-> +       err = hw_get_module_by_class(AUDIO_HARDWARE_MODULE_ID, "hsp", &module);
-> +       if (err) {
-> +               haltest_error("hw_get_module_by_class returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       err = audio_hw_device_open(module, &device);
-> +       if (err) {
-> +               haltest_error("audio_hw_device_open returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       if_audio_sco = device;
-> +}
-> +
-> +static int feed_from_file(short *buffer, void *data)
-> +{
-> +       FILE *in = data;
-> +       return fread(buffer, buffer_size, 1, in);
-> +}
-> +
-> +static int feed_from_generator(short *buffer, void *data)
-> +{
-> +       size_t i = 0;
-> +       float volume = 0.5;
-> +       float *freq = data;
-> +       float f = 1;
-> +
-> +       if (freq)
-> +               f = *freq;
-> +
-> +       /* buffer_size is in bytes but we are using buffer of shorts (2 bytes)*/
-> +       for (i = 0; i < buffer_size / sizeof(*buffer) - 1;) {
-> +               if (sample_pos >= SAMPLERATE)
-> +                       sample_pos = sample_pos % SAMPLERATE;
-> +
-> +               /* Use the same sample for both channels */
-> +               buffer[i++] = sample[sample_pos] * volume;
-> +               buffer[i++] = sample[sample_pos] * volume;
-> +
-> +               sample_pos += f;
-> +       }
-> +
-> +       return buffer_size;
-> +}
-> +
-> +static void prepare_sample(void)
-> +{
-> +       int x;
-> +       double s;
-> +
-> +       haltest_info("Preparing audio sample...\n");
-> +
-> +       for (x = 0; x < SAMPLERATE; x++) {
-> +               /* prepare sinusoidal 1Hz sample */
-> +               s = (2.0 * 3.14159) * ((double)x / SAMPLERATE);
-> +               s = sin(s);
-> +
-> +               /* remap <-1, 1> to signed 16bit PCM range */
-> +               sample[x] = s * 32767;
-> +       }
-> +
-> +       sample_pos = 0;
-> +}
-> +
-> +static void *playback_thread(void *data)
-> +{
-> +       int (*filbuff_cb) (short*, void*);
-> +       short buffer[buffer_size / sizeof(short)];
-> +       size_t len = 0;
-> +       ssize_t w_len = 0;
-> +       FILE *in = data;
-> +       void *cb_data = NULL;
-> +       float freq = 440.0;
-> +
-> +       /* Use file or fall back to generator */
-> +       if (in) {
-> +               filbuff_cb = feed_from_file;
-> +               cb_data = in;
-> +       } else {
-> +               prepare_sample();
-> +               filbuff_cb = feed_from_generator;
-> +               cb_data = &freq;
-> +       }
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       current_state = STATE_PLAYING;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       do {
-> +               pthread_mutex_lock(&state_mutex);
-> +
-> +               if (current_state == STATE_STOPPING) {
-> +                       haltest_info("Detected stopping\n");
-> +                       pthread_mutex_unlock(&state_mutex);
-> +                       break;
-> +               } else if (current_state == STATE_SUSPENDED) {
-> +                       pthread_mutex_unlock(&state_mutex);
-> +                       usleep(500);
-> +                       continue;
-> +               }
-> +
-> +               pthread_mutex_unlock(&state_mutex);
-> +
-> +               len = filbuff_cb(buffer, cb_data);
-> +
-> +               pthread_mutex_lock(&outstream_mutex);
-> +               if (!stream_out) {
-> +                       pthread_mutex_unlock(&outstream_mutex);
-> +                       break;
-> +               }
-> +
-> +               w_len = stream_out->write(stream_out, buffer, buffer_size);
-> +               pthread_mutex_unlock(&outstream_mutex);
-> +       } while (len && w_len > 0);
-> +
-> +       if (in)
-> +               fclose(in);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       current_state = STATE_STOPPED;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       haltest_info("Done playing.\n");
-> +
-> +       return NULL;
-> +}
-> +
-> +static void play_p(int argc, const char **argv)
-> +{
-> +       const char *fname = NULL;
-> +       FILE *in = NULL;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3) {
-> +               haltest_error("Invalid audio file path.\n");
-> +               haltest_info("Using sound generator.\n");
-> +       } else {
-> +               fname = argv[2];
-> +               in = fopen(fname, "r");
-> +
-> +               if (in == NULL) {
-> +                       haltest_error("Cannot open file: %s\n", fname);
-> +                       return;
-> +               }
-> +               haltest_info("Playing file: %s\n", fname);
-> +       }
-> +
-> +       if (buffer_size == 0) {
-> +               haltest_error("Invalid buffer size. Was stream_out opened?\n");
-> +               goto fail;
-> +       }
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state != STATE_STOPPED) {
-> +               haltest_error("Already playing or stream suspended!\n");
-> +               pthread_mutex_unlock(&state_mutex);
-> +               goto fail;
-> +       }
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
-> +               haltest_error("Cannot create playback thread!\n");
-> +               goto fail;
-> +       }
-> +
-> +       return;
-> +fail:
-> +       if (in)
-> +               fclose(in);
-> +}
-> +
-> +static void stop_p(int argc, const char **argv)
-> +{
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state == STATE_STOPPED || current_state == STATE_STOPPING) {
-> +               pthread_mutex_unlock(&state_mutex);
-> +               return;
-> +       }
-> +
-> +       current_state = STATE_STOPPING;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       pthread_mutex_lock(&outstream_mutex);
-> +       stream_out->common.standby(&stream_out->common);
-> +       pthread_mutex_unlock(&outstream_mutex);
-> +
-> +       haltest_info("Ended %s\n", __func__);
-> +}
-> +
-> +static void open_output_stream_p(int argc, const char **argv)
-> +{
-> +       int err;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state == STATE_PLAYING) {
-> +               haltest_error("Already playing!\n");
-> +               pthread_mutex_unlock(&state_mutex);
-> +               return;
-> +       }
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       err = if_audio_sco->open_output_stream(if_audio_sco,
-> +                                               0,
-> +                                               AUDIO_DEVICE_OUT_ALL_A2DP,
-
-I suppose this should be AUDIO_DEVICE_OUT_ALL_HSP or whatever it is called.
-
-> +                                               AUDIO_OUTPUT_FLAG_NONE,
-> +                                               NULL,
-> +                                               &stream_out);
-> +       if (err < 0) {
-> +               haltest_error("open output stream returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       buffer_size = stream_out->common.get_buffer_size(&stream_out->common);
-> +       if (buffer_size == 0)
-> +               haltest_error("Invalid buffer size received!\n");
-> +       else
-> +               haltest_info("Using buffer size: %zu\n", buffer_size);
-> +}
-> +
-> +static void close_output_stream_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       stop_p(argc, argv);
-> +
-> +       haltest_info("Waiting for playback thread...\n");
-> +       pthread_join(play_thread, NULL);
-> +
-> +       if_audio_sco->close_output_stream(if_audio_sco, stream_out);
-> +
-> +       stream_out = NULL;
-> +       buffer_size = 0;
-> +}
-> +
-> +static void cleanup_p(int argc, const char **argv)
-> +{
-> +       int err;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state != STATE_STOPPED) {
-> +               pthread_mutex_unlock(&state_mutex);
-> +               close_output_stream_p(0, NULL);
-> +       } else {
-> +               pthread_mutex_unlock(&state_mutex);
-> +       }
-> +
-> +       err = audio_hw_device_close(if_audio_sco);
-> +       if (err < 0) {
-> +               haltest_error("audio_hw_device_close returned %d\n", err);
-> +               return;
-> +       }
-> +
-> +       if_audio_sco = NULL;
-> +}
-> +
-> +static void suspend_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state != STATE_PLAYING) {
-> +               pthread_mutex_unlock(&state_mutex);
-> +               return;
-> +       }
-> +       current_state = STATE_SUSPENDED;
-> +       pthread_mutex_unlock(&state_mutex);
-> +
-> +       pthread_mutex_lock(&outstream_mutex);
-> +       stream_out->common.standby(&stream_out->common);
-> +       pthread_mutex_unlock(&outstream_mutex);
-> +}
-> +
-> +static void resume_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       pthread_mutex_lock(&state_mutex);
-> +       if (current_state == STATE_SUSPENDED)
-> +               current_state = STATE_PLAYING;
-> +       pthread_mutex_unlock(&state_mutex);
-> +}
-> +
-> +static void get_latency_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       haltest_info("Output audio stream latency: %d\n",
-> +                                       stream_out->get_latency(stream_out));
-> +}
-> +
-> +static void get_buffer_size_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       haltest_info("Current output buffer size: %zu\n",
-> +               stream_out->common.get_buffer_size(&stream_out->common));
-> +}
-> +
-> +static void get_channels_p(int argc, const char **argv)
-> +{
-> +       audio_channel_mask_t channels;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       channels = stream_out->common.get_channels(&stream_out->common);
-> +
-> +       haltest_info("Channels: %s\n", audio_channel_mask_t2str(channels));
-> +}
-> +
-> +static void get_format_p(int argc, const char **argv)
-> +{
-> +       audio_format_t format;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       format = stream_out->common.get_format(&stream_out->common);
-> +
-> +       haltest_info("Format: %s\n", audio_format_t2str(format));
-> +}
-> +
-> +static void get_sample_rate_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       haltest_info("Current sample rate: %d\n",
-> +               stream_out->common.get_sample_rate(&stream_out->common));
-> +}
-> +
-> +static void get_parameters_p(int argc, const char **argv)
-> +{
-> +       const char *keystr;
-> +
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3) {
-> +               haltest_info("No keys given.\n");
-> +               keystr = "";
-> +       } else {
-> +               keystr = argv[2];
-> +       }
-> +
-> +       haltest_info("Current parameters: %s\n",
-> +                       stream_out->common.get_parameters(&stream_out->common,
-> +                                                               keystr));
-> +}
-> +
-> +static void set_parameters_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3) {
-> +               haltest_error("No key=value; pairs given.\n");
-> +               return;
-> +       }
-> +
-> +       stream_out->common.set_parameters(&stream_out->common, argv[2]);
-> +}
-> +
-> +static void set_sample_rate_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +       RETURN_IF_NULL(stream_out);
-> +
-> +       if (argc < 3)
-> +               return;
-> +
-> +       stream_out->common.set_sample_rate(&stream_out->common, atoi(argv[2]));
-> +}
-> +
-> +static void init_check_p(int argc, const char **argv)
-> +{
-> +       RETURN_IF_NULL(if_audio_sco);
-> +
-> +       haltest_info("Init check result: %d\n", if_audio_sco->init_check(if_audio_sco));
-> +}
-> +
-> +static struct method methods[] = {
-> +       STD_METHOD(init),
-> +       STD_METHOD(cleanup),
-> +       STD_METHOD(open_output_stream),
-> +       STD_METHOD(close_output_stream),
-> +       STD_METHODH(play, "<path to pcm file>"),
-> +       STD_METHOD(stop),
-> +       STD_METHOD(suspend),
-> +       STD_METHOD(resume),
-> +       STD_METHOD(get_latency),
-> +       STD_METHOD(get_buffer_size),
-> +       STD_METHOD(get_channels),
-> +       STD_METHOD(get_format),
-> +       STD_METHOD(get_sample_rate),
-> +       STD_METHODH(get_parameters, "<closing>"),
-> +       STD_METHODH(set_parameters, "<closing=value>"),
-> +       STD_METHODH(set_sample_rate, "<sample rate>"),
-> +       STD_METHOD(init_check),
-> +       END_METHOD
-> +};
-> +
-> +const struct interface sco_if = {
-> +       .name = "audio-sco",
-> +       .methods = methods
-> +};
-> diff --git a/android/client/if-main.h b/android/client/if-main.h
-> index ff6006c..88da0c7 100644
-> --- a/android/client/if-main.h
-> +++ b/android/client/if-main.h
-> @@ -68,6 +68,7 @@ struct interface {
->  };
->
->  extern const struct interface audio_if;
-> +extern const struct interface sco_if;
->  extern const struct interface bluetooth_if;
->  extern const struct interface av_if;
->  extern const struct interface rc_if;
-> --
-> 1.8.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
-
+diff --git a/android/gatt.c b/android/gatt.c
+index da68adc..ccb3efb 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -147,6 +147,7 @@ struct gatt_device {
+ 	GAttrib *attrib;
+ 	GIOChannel *att_io;
+ 	struct queue *services;
++	bool partial_srvc_search;
+ 
+ 	bool notify_services_changed;
+ 
+@@ -416,6 +417,22 @@ static bool match_srvc_by_higher_inst_id(const void *data,
+ 	return inst_id < s->id.instance;
+ }
+ 
++static bool match_srvc_by_bt_uuid(const void *data, const void *user_data)
++{
++	const bt_uuid_t *exp_uuid = user_data;
++	const struct service *service = data;
++
++	return !bt_uuid_cmp(exp_uuid, &service->id.uuid);
++}
++
++static bool match_srvc_by_range(const void *data, const void *user_data)
++{
++	const struct service *srvc = data;
++	const struct att_range *range = user_data;
++
++	return !memcmp(&srvc->prim.range, range, sizeof(srvc->prim.range));
++}
++
+ static bool match_char_by_higher_inst_id(const void *data,
+ 							const void *user_data)
+ {
+@@ -808,22 +825,6 @@ static void send_client_primary_notify(void *data, void *user_data)
+ 			HAL_EV_GATT_CLIENT_SEARCH_RESULT, sizeof(ev), &ev);
+ }
+ 
+-static void send_client_all_primary(struct app_connection *connection,
+-								int32_t status)
+-{
+-	struct hal_ev_gatt_client_search_complete ev;
+-
+-	if (!status)
+-		queue_foreach(connection->device->services,
+-						send_client_primary_notify,
+-						INT_TO_PTR(connection->id));
+-
+-	ev.status = status;
+-	ev.conn_id = connection->id;
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_EV_GATT_CLIENT_SEARCH_COMPLETE, sizeof(ev), &ev);
+-}
+-
+ static struct service *create_service(uint8_t id, bool primary, char *uuid,
+ 								void *data)
+ {
+@@ -871,64 +872,6 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
+ 	return s;
+ }
+ 
+-static void primary_cb(uint8_t status, GSList *services, void *user_data)
+-{
+-	struct app_connection *conn = user_data;
+-	GSList *l;
+-	int32_t gatt_status;
+-	uint8_t instance_id;
+-
+-	DBG("Status %d", status);
+-
+-	if (status) {
+-		error("gatt: Discover all primary services failed: %s",
+-							att_ecode2str(status));
+-		gatt_status = GATT_FAILURE;
+-		goto done;
+-	}
+-
+-	if (!services) {
+-		info("gatt: No primary services found");
+-		gatt_status = GATT_SUCCESS;
+-		goto done;
+-	}
+-
+-	if (!queue_isempty(conn->device->services)) {
+-		info("gatt: Services already cached");
+-		gatt_status = GATT_SUCCESS;
+-		goto done;
+-	}
+-
+-	/*
+-	 * There might be multiply services with same uuid. Therefore make sure
+-	 * each primary service one has unique instance_id
+-	 */
+-	instance_id = 0;
+-
+-	for (l = services; l; l = l->next) {
+-		struct gatt_primary *prim = l->data;
+-		struct service *p;
+-
+-		p = create_service(instance_id++, true, prim->uuid, prim);
+-		if (!p)
+-			continue;
+-
+-		if (!queue_push_tail(conn->device->services, p)) {
+-			error("gatt: Cannot push primary service to the list");
+-			free(p);
+-			continue;
+-		}
+-
+-		DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
+-			prim->range.start, prim->range.end, prim->uuid);
+-	}
+-
+-	gatt_status = GATT_SUCCESS;
+-
+-done:
+-	send_client_all_primary(conn, gatt_status);
+-}
+-
+ static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
+ 						int rssi, uint16_t eir_len,
+ 							const void *eir,
+@@ -1568,11 +1511,173 @@ done:
+ 									status);
+ }
+ 
++struct discover_srvc_data {
++	bt_uuid_t uuid;
++	struct app_connection *conn;
++};
++
++static void send_client_search_complete_notify(int32_t status, int32_t conn_id)
++{
++	struct hal_ev_gatt_client_search_complete ev;
++
++	ev.status = status;
++	ev.conn_id = conn_id;
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_CLIENT_SEARCH_COMPLETE, sizeof(ev), &ev);
++}
++
++static void discover_srvc_all_cb(uint8_t status, GSList *services,
++								void *user_data)
++{
++	struct discover_srvc_data *cb_data = user_data;
++	struct gatt_device *dev = cb_data->conn->device;
++	int32_t gatt_status;
++	GSList *l;
++	/*
++	 * There might be multiply services with same uuid. Therefore make sure
++	 * each primary service one has unique instance_id
++	 */
++	uint8_t instance_id = queue_length(dev->services);
++
++	DBG("Status %d", status);
++
++	if (status) {
++		error("gatt: Discover all primary services failed: %s",
++							att_ecode2str(status));
++		gatt_status = GATT_FAILURE;
++		goto reply;
++	}
++
++	if (!services) {
++		info("gatt: No primary services found");
++		gatt_status = GATT_SUCCESS;
++		goto reply;
++	}
++
++	for (l = services; l; l = l->next) {
++		struct gatt_primary *prim = l->data;
++		struct service *p;
++
++		if (queue_find(dev->services, match_srvc_by_range,
++								&prim->range))
++			continue;
++
++		p = create_service(instance_id++, true, prim->uuid, prim);
++		if (!p)
++			continue;
++
++		if (!queue_push_tail(dev->services, p)) {
++			error("gatt: Cannot push primary service to the list");
++			free(p);
++			continue;
++		}
++
++		DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
++			prim->range.start, prim->range.end, prim->uuid);
++	}
++
++	/* Send all found services notifications - first cache,
++	 * then send notifies
++	 */
++	queue_foreach(dev->services, send_client_primary_notify,
++						INT_TO_PTR(cb_data->conn->id));
++
++	/* Full search service scanning was performed */
++	dev->partial_srvc_search = false;
++	gatt_status = GATT_SUCCESS;
++
++reply:
++	send_client_search_complete_notify(gatt_status, cb_data->conn->id);
++	free(cb_data);
++}
++
++static void discover_srvc_by_uuid_cb(uint8_t status, GSList *ranges,
++								void *user_data)
++{
++	struct discover_srvc_data *cb_data = user_data;
++	struct gatt_primary prim;
++	struct service *s;
++	int32_t gatt_status;
++	struct gatt_device *dev = cb_data->conn->device;
++	uint8_t instance_id = queue_length(dev->services);
++
++	DBG("Status %d", status);
++
++	if (status) {
++		error("gatt: Discover pri srvc filtered by uuid failed: %s",
++							att_ecode2str(status));
++		gatt_status = GATT_FAILURE;
++		goto reply;
++	}
++
++	if (!ranges) {
++		info("gatt: No primary services searched by uuid found");
++		gatt_status = GATT_SUCCESS;
++		goto reply;
++	}
++
++	bt_uuid_to_string(&cb_data->uuid, prim.uuid, sizeof(prim.uuid));
++	/* If multiple instances of the same service (as identified by UUID)
++	 * exist, the first instance of the service is returned.
++	 */
++	memcpy(&prim.range, ranges->data, sizeof(prim.range));
++
++	s = create_service(instance_id++, true, prim.uuid, &prim);
++	if (!s) {
++		gatt_status = GATT_FAILURE;
++		goto reply;
++	}
++
++	if (!queue_push_tail(dev->services, s)) {
++		error("gatt: Cannot push primary service to the list");
++		gatt_status = GATT_FAILURE;
++		goto reply;
++	}
++
++	send_client_primary_notify(s, INT_TO_PTR(cb_data->conn->id));
++
++	DBG("attr handle = 0x%04x, end grp handle = 0x%04x uuid: %s",
++		prim.range.start, prim.range.end, prim.uuid);
++
++	/* Partial search service scanning was performed */
++	dev->partial_srvc_search = true;
++	gatt_status = GATT_SUCCESS;
++
++reply:
++	send_client_search_complete_notify(gatt_status, cb_data->conn->id);
++	free(cb_data);
++}
++
++static guint search_dev_for_srvc(struct app_connection *conn, bt_uuid_t *uuid)
++{
++	struct discover_srvc_data *cb_data =
++					new0(struct discover_srvc_data, 1);
++
++	if (!cb_data) {
++		error("gatt: Cannot allocate cb data");
++		return 0;
++	}
++
++	cb_data->conn = conn;
++
++	if (uuid) {
++		memcpy(&cb_data->uuid, uuid, sizeof(cb_data->uuid));
++		return gatt_discover_primary(conn->device->attrib, uuid,
++					discover_srvc_by_uuid_cb, cb_data);
++	} else {
++		return gatt_discover_primary(conn->device->attrib, NULL,
++						discover_srvc_all_cb, cb_data);
++	}
++}
++
+ static void handle_client_search_service(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_search_service *cmd = buf;
+ 	struct app_connection *conn;
+ 	uint8_t status;
++	struct service *s;
++	bt_uuid_t uuid;
++	guint srvc_search_success;
+ 
+ 	DBG("");
+ 
+@@ -1591,16 +1696,6 @@ static void handle_client_search_service(const void *buf, uint16_t len)
+ 		goto reply;
+ 	}
+ 
+-	/* TODO:  Handle filter uuid */
+-
+-	/* Use cache if possible */
+-	if (!queue_isempty(conn->device->services)) {
+-		send_client_all_primary(conn, GATT_SUCCESS);
+-
+-		status = HAL_STATUS_SUCCESS;
+-		goto reply;
+-	}
+-
+ 	if (conn->device->state != DEVICE_CONNECTED) {
+ 		char bda[18];
+ 
+@@ -1611,17 +1706,57 @@ static void handle_client_search_service(const void *buf, uint16_t len)
+ 		goto reply;
+ 	}
+ 
+-	if (!gatt_discover_primary(conn->device->attrib, NULL, primary_cb,
+-									conn)) {
+-		status = HAL_STATUS_FAILED;
++	if (cmd->filtered)
++		android2uuid(cmd->filter_uuid, &uuid);
++
++	/* Services not cached yet */
++	if (queue_isempty(conn->device->services)) {
++		if (cmd->filtered)
++			srvc_search_success = search_dev_for_srvc(conn, &uuid);
++		else
++			srvc_search_success = search_dev_for_srvc(conn, NULL);
++
++		if (!srvc_search_success) {
++			status = HAL_STATUS_FAILED;
++			goto reply;
++		}
++
++		status = HAL_STATUS_SUCCESS;
+ 		goto reply;
+ 	}
+ 
++	/* Search in cached services for given service */
++	if (cmd->filtered) {
++		/* Search in cache for service by uuid */
++		s = queue_find(conn->device->services, match_srvc_by_bt_uuid,
++									&uuid);
++
++		if (s) {
++			send_client_primary_notify(s, INT_TO_PTR(conn->id));
++		} else {
++			if (!search_dev_for_srvc(conn, &uuid))
++				status = HAL_STATUS_FAILED;
++
++			status = HAL_STATUS_SUCCESS;
++			goto reply;
++		}
++	} else {
++		/* Refresh service cache if only partial search was performed */
++		if (conn->device->partial_srvc_search)
++			srvc_search_success = search_dev_for_srvc(conn, NULL);
++		else
++			queue_foreach(conn->device->services,
++						send_client_primary_notify,
++						INT_TO_PTR(cmd->conn_id));
++	}
++
++	send_client_search_complete_notify(GATT_SUCCESS, conn->id);
++
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ reply:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
++				HAL_OP_GATT_CLIENT_SEARCH_SERVICE, status);
+ }
+ 
+ static void send_client_incl_service_notify(const struct element_id *srvc_id,
 -- 
-Luiz Augusto von Dentz
+1.9.2
+
