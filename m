@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 04/12] android/handsfree: Add SCO Audio IPC
-Date: Thu,  8 May 2014 15:25:29 +0300
-Message-Id: <1399551937-27109-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 03/12] android/audio: Add Audio SCO message API
+Date: Thu,  8 May 2014 15:25:28 +0300
+Message-Id: <1399551937-27109-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,124 +11,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-If SCO Audio IPC gets connected it provides only one command:
-connect_sco().
+SCO API will be used when communicating with SCO Audio HAL.
 ---
- android/handsfree.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 57 insertions(+), 1 deletion(-)
+ android/sco-ipc-api.txt | 36 ++++++++++++++++++++++++++++++++++++
+ android/sco-msg.h       | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
+ create mode 100644 android/sco-ipc-api.txt
+ create mode 100644 android/sco-msg.h
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 8202e53..96f0f6e 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -45,6 +45,7 @@
- #include "bluetooth.h"
- #include "src/log.h"
- #include "utils.h"
-+#include "sco-msg.h"
- 
- #define HSP_AG_CHANNEL 12
- #define HFP_AG_CHANNEL 13
-@@ -156,7 +157,9 @@ static struct {
- static uint32_t hfp_ag_features = 0;
- 
- static bdaddr_t adapter_addr;
+diff --git a/android/sco-ipc-api.txt b/android/sco-ipc-api.txt
+new file mode 100644
+index 0000000..75b2cba
+--- /dev/null
++++ b/android/sco-ipc-api.txt
+@@ -0,0 +1,36 @@
++Bluetooth SCO Audio Plugin
++==========================
 +
- static struct ipc *hal_ipc = NULL;
-+static struct ipc *audio_ipc = NULL;
- 
- static uint32_t hfp_record_id = 0;
- static GIOChannel *hfp_server = NULL;
-@@ -822,6 +825,8 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
- 	g_io_channel_unref(device.sco);
- 	device.sco = NULL;
- 
-+	DBG("");
++The SCO Audio Plugin communicate through abstract socket name
++"\0bluez_sco_socket".
 +
- 	device.sco_watch = 0;
- 
- 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
-@@ -887,6 +892,27 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 							sco_watch_cb, NULL);
- 
- 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++	.---Audio---.                             .--Android--.
++	|  Plugin   |                             |   Daemon  |
++	|           |          Command            |           |
++	|           | --------------------------> |           |
++	|           |                             |           |
++	|           | <-------------------------- |           |
++	|           |          Response           |           |
++	|           |                             |           |
++	|           |                             |           |
++	|           |                             |           |
++	'-----------'                             '-----------'
 +
-+	if (audio_ipc) {
-+		int fd = g_io_channel_unix_get_fd(chan);
-+		GError *err = NULL;
-+		uint16_t mtu = 48;
-+		struct audio_rsp_connect_sco rsp;
 +
-+		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
-+							BT_IO_OPT_INVALID)) {
-+			error("Unable to get MTU: %s\n", err->message);
-+			g_clear_error(&err);
-+		}
++	Audio HAL                               Daemon
++	----------------------------------------------------
 +
-+		DBG("fd %d mtu %u", fd, mtu);
++	call connect_sco()                    --> create SCO socket
++	return connect_sco()                  <-- return socket fd and mtu
 +
-+		rsp.mtu = mtu;
++SCO Audio Service (ID 0)
++========================
 +
-+		ipc_send_rsp_full(audio_ipc, AUDIO_SERVICE_SCO_ID,
-+					AUDIO_OP_CONNECT_SCO, sizeof(rsp), &rsp,
-+					fd);
-+	}
- }
- 
- static bool connect_sco(void)
-@@ -904,7 +930,7 @@ static bool connect_sco(void)
- 				device.negotiated_codec != CODEC_ID_CVSD)
- 		voice_settings = BT_VOICE_TRANSPARENT;
- 	else
--		voice_settings = BT_VOICE_CVSD_16BIT;
-+		voice_settings = 0;
- 
- 	io = bt_io_connect(connect_sco_cb, NULL, NULL, &gerr,
- 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-@@ -2563,6 +2589,33 @@ static void disable_sco_server(void)
- 	}
- }
- 
-+static void bt_audio_connect_sco(const void *buf, uint16_t len)
-+{
-+	DBG("");
++	Opcode 0x00 - Error response
 +
-+	connect_audio();
-+}
++		Response parameters: Status (1 octet)
 +
-+static const struct ipc_handler audio_handlers[] = {
-+	/* AUDIO_OP_CONNECT_SCO */
-+	{ bt_audio_connect_sco, false, 0 }
-+};
++	Opcode 0x01 - Connect Audio SCO command
 +
-+static bool bt_audio_register(ipc_disconnect_cb disconnect)
-+{
-+	DBG("");
++		Command parameters: <none>
++		Response parameters: MTU (2 octets)
+diff --git a/android/sco-msg.h b/android/sco-msg.h
+new file mode 100644
+index 0000000..cd2f894
+--- /dev/null
++++ b/android/sco-msg.h
+@@ -0,0 +1,36 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	audio_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
-+				AUDIO_SERVICE_SCO_ID, false, disconnect, NULL);
-+	if (!audio_ipc)
-+		return false;
++static const char BLUEZ_SCO_SK_PATH[] = "\0bluez_sco_socket";
 +
-+	ipc_register(audio_ipc, AUDIO_SERVICE_SCO_ID, audio_handlers,
-+						G_N_ELEMENTS(audio_handlers));
++#define AUDIO_SERVICE_SCO_ID		1
 +
-+	return true;
-+}
++#define AUDIO_STATUS_SUCCESS		IPC_STATUS_SUCCESS
++#define AUDIO_STATUS_FAILED		0x01
 +
- bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- {
- 	DBG("mode 0x%x", mode);
-@@ -2597,6 +2650,9 @@ done:
- 	hal_ipc = ipc;
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
++#define AUDIO_OP_STATUS			IPC_OP_STATUS
 +
-+	bt_audio_register(NULL);
-+
- 	return true;
- }
- 
++#define AUDIO_OP_CONNECT_SCO		0x01
++struct audio_rsp_connect_sco {
++	uint16_t mtu;
++} __attribute__((packed));
 -- 
 1.8.3.2
 
