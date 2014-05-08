@@ -1,60 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140508073646.GA14385@t440s.lan>
-References: <20140506004501.318D810193E@puck.mtv.corp.google.com>
-	<20140508073646.GA14385@t440s.lan>
-Date: Thu, 8 May 2014 12:21:17 -0700
-Message-ID: <CAGXr9JFAcMES1c2oPUx+gtEZaowoOea5UFp0hFR2ROBsjRkRrw@mail.gmail.com>
-Subject: Re: [PATCH] input: Add userspace HID support
-From: Petri Gynther <pgynther@google.com>
-To: Petri Gynther <pgynther@google.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH 4/8] Bluetooth: Add support for user data in hci_request
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1399555935-702-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Thu, 8 May 2014 08:32:19 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <5725B981-E83A-467E-80ED-18B9C8FE285F@holtmann.org>
+References: <1399555935-702-1-git-send-email-andrzej.kaczmarek@tieto.com> <1399555935-702-5-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrzej,
 
-On Thu, May 8, 2014 at 12:36 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Petri,
->
-> On Mon, May 05, 2014, Petri Gynther wrote:
->> Enable HID protocol handling in userspace when UserspaceHID=true in input.conf.
->>
->> Benefits of userspace HID:
->> 1. Persistent HID/input pipeline
->>    For a Bluetooth HID device, the corresponding kernel HID/input devices are
->>    created only once when the Bluetooth HID device is used the first time.
->>    The HID/input pipeline is not destroyed and recreated every time when
->>    the Bluetooth HID device disconnects and reconnects.
->>
->> 2. HID vs HoG parity
->>    Enables HID and HoG devices to operate the same way in BlueZ stack, using
->>    uHID kernel module (/dev/uhid) to pass HID report data between bluetoothd
->>    and kernel HID subsystem.
->>
->> 3. Debugging
->>    It is easier to debug HID protocol in userspace than in HIDP kernel module.
->> ---
->>  Makefile.plugins           |   3 +-
->>  profiles/input/device.c    | 674 +++++++++++++++++++++++++++++++++++++++++++--
->>  profiles/input/device.h    |   1 +
->>  profiles/input/hidp_defs.h |  79 ++++++
->>  profiles/input/input.conf  |   4 +
->>  profiles/input/manager.c   |  10 +
->>  6 files changed, 754 insertions(+), 17 deletions(-)
->>  create mode 100644 profiles/input/hidp_defs.h
->
-> Considering that we're using uhid also for the Android HID solution
-> (see android/hidhost.c) is there an opportunity here to avoid code
-> duplication by sharing some code? I'm not saying that this must be done
-> before we apply your patch, but if code sharing is possible it'd be good
-> to try to refactor common parts into src/shared/hid.c or similar.
->
-> Johan
+> This patch makes possible to store some user data in hci_request struct
+> which will be available in completion callback. Data can be added when
+> initializing new request using hci_req_init(). With this it's now easy
+> to run request which can be associated with e.g. specific hci_conn.
+> 
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> ---
+> include/net/bluetooth/bluetooth.h |  3 +-
+> include/net/bluetooth/hci_core.h  |  3 +-
+> net/bluetooth/hci_conn.c          |  4 +-
+> net/bluetooth/hci_core.c          | 29 +++++++++-----
+> net/bluetooth/mgmt.c              | 84 +++++++++++++++++++++------------------
+> 5 files changed, 69 insertions(+), 54 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index 904777c1..28378ad 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -273,12 +273,13 @@ struct l2cap_ctrl {
+> 
+> struct hci_dev;
+> 
+> -typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status);
+> +typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, void *data);
+> 
+> struct hci_req_ctrl {
+> 	bool			start;
+> 	u8			event;
+> 	hci_req_complete_t	complete;
+> +	void			*data;
+> };
+> 
+> struct bt_skb_cb {
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 211bad6..30d245f 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1162,6 +1162,7 @@ int hci_unregister_cb(struct hci_cb *hcb);
+> struct hci_request {
+> 	struct hci_dev		*hdev;
+> 	struct sk_buff_head	cmd_q;
+> +	void			*data;
+> 
+> 	/* If something goes wrong when building the HCI request, the error
+> 	 * value is stored in this field.
+> @@ -1169,7 +1170,7 @@ struct hci_request {
+> 	int			err;
+> };
+> 
+> -void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
+> +void hci_req_init(struct hci_request *req, struct hci_dev *hdev, void *data);
 
-I think Marcel also mentioned this earlier. I can certainly look into
-refactoring, but I'd prefer to do that after this patch is applied, so
-we have a working userspace HID solution as a baseline.
+do we really want to have everybody add extra data in here. We are now touching every possible call that we have so far. I do not really like this at the moment.
 
--- Petri
+Two questions. a) can we do this without this change and b) if we do it can someone benefit from it.
+
+Regards
+
+Marcel
+
