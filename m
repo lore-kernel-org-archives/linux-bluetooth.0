@@ -2,173 +2,195 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v1 08/10] src/shared/att: Add "Find By Type Value" request and response.
-Date: Fri,  9 May 2014 13:13:58 -0700
-Message-Id: <1399666440-14078-9-git-send-email-armansito@chromium.org>
+Subject: [PATCH v1 07/10] tools/btatt: Add "find-information" command.
+Date: Fri,  9 May 2014 13:13:57 -0700
+Message-Id: <1399666440-14078-8-git-send-email-armansito@chromium.org>
 In-Reply-To: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for the "Find By Type Value" request and
-response with their corresponding parameter structures.
----
- src/shared/att.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/att.h | 16 +++++++++++
- 2 files changed, 102 insertions(+)
+Added command for the "Find Information" request. Sample run:
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 4e0d839..a97d1ef 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -207,6 +207,11 @@ static bool handle_find_info_rsp(struct bt_att *att, const uint8_t *pdu,
- 	struct bt_att_find_information_rsp_param param;
- 	uint8_t *information_data;
+$ btatt -d 00:02:5B:00:15:10 -v find-information 0x0001 0xffff
+att: ATT command 0x04
+att: < 04 01 00 ff ff
+att: > 05 01 01 00 00 28 02 00 03 28 03 00 00 2a 04 00 03 28 05 00 01 2a
+Find Information response:
+	Format: 0x01
+	Information Data:
+		handle: 0x0001, uuid: 2800
+		handle: 0x0002, uuid: 2803
+		handle: 0x0003, uuid: 2a00
+		handle: 0x0004, uuid: 2803
+		handle: 0x0005, uuid: 2a01
+---
+ tools/btatt.c | 131 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 129 insertions(+), 2 deletions(-)
+
+diff --git a/tools/btatt.c b/tools/btatt.c
+index de8d300..a6aa281 100644
+--- a/tools/btatt.c
++++ b/tools/btatt.c
+@@ -34,6 +34,8 @@
+ #include <bluetooth/l2cap.h>
  
-+	/* PDU must contain at least the following:
-+	 * - Attribute Opcode (1 octet)
-+	 * - Format (1 octet)
-+	 * - Information Data (4 to MTU-2 octets)
-+	 */
- 	if (pdu_length < 6)
- 		return false;
+ #include "monitor/mainloop.h"
++#include "lib/uuid.h"
++#include "src/shared/util.h"
+ #include "src/shared/att.h"
  
-@@ -232,6 +237,45 @@ static bool handle_find_info_rsp(struct bt_att *att, const uint8_t *pdu,
- 	return true;
+ #define ATT_CID 4
+@@ -64,7 +66,7 @@ static void exchange_mtu_cb(uint8_t opcode, const void *param,
+ 	}
+ 
+ 	if (opcode != ATT_OP_EXCHANGE_MTU_RESP) {
+-		fprintf(stderr, "Invalid response opcode (%u)\n", opcode);
++		fprintf(stderr, "Invalid response opcode (0x%02x)\n", opcode);
+ 		goto done;
+ 	}
+ 
+@@ -131,6 +133,130 @@ static void cmd_mtu(struct bt_att *att, int argc, char **argv)
+ 	}
  }
  
-+static bool handle_find_by_type_value_rsp(struct bt_att *att,
-+							const uint8_t *pdu,
-+							uint16_t pdu_length)
++static void find_info_cb(uint8_t opcode, const void *param,
++						uint16_t len, void *user_data)
 +{
-+	struct bt_att_find_by_type_value_rsp_param param;
-+	uint8_t *handles_info_list;
++	const struct bt_att_find_information_rsp_param *rp;
++	bt_uuid_t uuid;
++	char uuidstr[MAX_LEN_UUID_STR];
++	int pair_count, pair_size;
++	uint128_t u128;
++	const uint8_t *data_ptr;
++	int i;
 +
-+	/* PDU must contain at least the following:
-+	 * - Attribute Opcode (1 octet)
-+	 * - Handles Information List (4 to MTU-1 octets)
-+	 */
-+	if (pdu_length < 5)
-+		return false;
++	if (opcode == ATT_OP_ERROR_RESP) {
++		handle_error(param, len);
++		goto done;
++	}
 +
-+	/* Each Handle Information field is composed of 4 octets. Return error,
-+	 * if the length of the field is not a multiple of 4.
-+	 */
-+	if ((pdu_length - 1) % 4)
-+		return false;
++	if (opcode != ATT_OP_FIND_INFORMATION_RESP) {
++		fprintf(stderr, "Invalid response opcode (0x%02x)\n", opcode);
++		goto done;
++	}
++
++	rp = param;
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Invalid \"Find Information\" response length "
++								"(%u)\n", len);
++		goto done;
++	}
++
++	pair_size = 2;
++	if (rp->format == 0x01)
++		pair_size += 2;
++	else if (rp->format == 0x02)
++		pair_size += 16;
++	else {
++		fprintf(stderr, "Invalid \"Find Information\" response format "
++						"(0x%02x)\n", rp->format);
++		goto done;
++	}
++
++	pair_count = rp->length / pair_size;
++
++	printf("Find Information response:\n" "\tFormat: 0x%02x\n", rp->format);
++	printf("\tInformation Data:\n");
++
++	data_ptr = rp->information_data;
++	for (i = 0; i < pair_count; i++) {
++		printf("\t\thandle: 0x%04x", get_le16(data_ptr));
++
++		if (rp->format == 0x01) {
++			bt_uuid16_create(&uuid, get_le16(data_ptr + 2));
++		} else {
++			bswap_128(data_ptr + 2, &u128);
++			bt_uuid128_create(&uuid, u128);
++		}
++
++		bt_uuid_to_string(&uuid, uuidstr, MAX_LEN_UUID_STR);
++		printf(", uuid: %s\n", uuidstr);
++
++		data_ptr += pair_size;
++	}
++
++done:
++	mainloop_quit();
++}
++
++static void find_info_usage(void)
++{
++	printf("Usage: btatt find-information <start handle> <end handle>\n");
++}
++
++static struct option find_info_options[] = {
++	{ "help", 	0, 0, 'h'},
++	{}
++};
++
++static void cmd_find_info(struct bt_att *att, int argc, char **argv)
++{
++	struct bt_att_find_information_req_param param;
++	uint16_t start, end;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+h", find_info_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'h':
++		default:
++			find_info_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 2) {
++		find_info_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	start = strtol(argv[0], NULL, 0);
++	if (!start) {
++		fprintf(stderr, "Invalid start handle: %s\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	end = strtol(argv[1], NULL, 0);
++	if (!end) {
++		fprintf(stderr, "Invalid end handle: %s\n", argv[1]);
++		exit(EXIT_FAILURE);
++	}
 +
 +	memset(&param, 0, sizeof(param));
++	param.start_handle = start;
++	param.end_handle = end;
 +
-+	param.length = pdu_length - 1;
-+	handles_info_list = malloc(param.length);
-+	if (!handles_info_list)
-+		return false;
-+
-+	memcpy(handles_info_list, pdu + 1, param.length);
-+
-+	param.handles_information_list = handles_info_list;
-+
-+	request_complete(att, ATT_OP_FIND_BY_TYPE_VALUE_REQ, pdu[0], &param,
-+								sizeof(param));
-+
-+	free(handles_info_list);
-+
-+	return true;
++	if (bt_att_send(att, ATT_OP_FIND_INFORMATION_REQ, &param,
++				sizeof(param), find_info_cb, NULL, NULL) == 0) {
++		fprintf(stderr, "Unable to send \"Find Information\" request\n");
++		exit(EXIT_FAILURE);
++	}
 +}
 +
- static bool handle_response(struct bt_att *att, const uint8_t *pdu,
- 							uint16_t pdu_length)
+ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type)
  {
-@@ -256,6 +300,13 @@ static bool handle_response(struct bt_att *att, const uint8_t *pdu,
- 		}
- 		return true;
- 
-+	case ATT_OP_FIND_BY_TYPE_VALUE_RESP:
-+		if (!handle_find_by_type_value_rsp(att, pdu, pdu_length)) {
-+			req_opcode = ATT_OP_FIND_BY_TYPE_VALUE_REQ;
-+			goto fail;
-+		}
-+		return true;
-+
- 	default:
- 		break;
- 	}
-@@ -483,6 +534,37 @@ static bool encode_find_info_req(const void *param, uint16_t length, void *buf,
- 	return true;
- }
- 
-+static bool encode_find_by_type_value_req(const void *param, uint16_t length,
-+							void *buf, uint16_t mtu,
-+							uint16_t *pdu_length)
-+{
-+	const struct bt_att_find_by_type_value_req_param *cp = param;
-+	const uint16_t len =  7 + cp->length;
-+	uint8_t *bytes = buf;
-+
-+	if (length != sizeof(*cp))
-+		return false;
-+
-+	if (len > mtu)
-+		return false;
-+
-+	put_le16(cp->start_handle, bytes + 1);
-+	put_le16(cp->end_handle, bytes + 3);
-+	put_le16(cp->type, bytes + 5);
-+
-+	*pdu_length = len;
-+
-+	if (cp->length == 0)
-+		return true;
-+
-+	if (!cp->value)
-+		return false;
-+
-+	memcpy(bytes + 7, cp->value, cp->length);
-+
-+	return true;
-+}
-+
- static bool encode_pdu(uint8_t opcode, const void *param, uint16_t length,
- 				uint16_t mtu, void *pdu, uint16_t *pdu_length)
- {
-@@ -511,6 +593,10 @@ static bool encode_pdu(uint8_t opcode, const void *param, uint16_t length,
- 		return encode_find_info_req(param, length, bytes,
- 							mtu, pdu_length);
- 
-+	if (opcode == ATT_OP_FIND_BY_TYPE_VALUE_REQ)
-+		return encode_find_by_type_value_req(param, length, bytes,
-+							mtu, pdu_length);
-+
- 	return false;
- }
- 
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 569116a..df11726 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -57,6 +57,22 @@ struct bt_att_find_information_rsp_param {
- 	uint16_t length;
+ 	int sock;
+@@ -185,7 +311,8 @@ static struct {
+ 	void (*func)(struct bt_att *att, int argc, char **argv);
+ 	char *doc;
+ } command[] = {
+-	{ "exchange-mtu",	cmd_mtu,	"\"Exchange MTU\" request." },
++	{ "exchange-mtu", cmd_mtu, "\"Exchange MTU\" request" },
++	{ "find-information", cmd_find_info, "\"Find Information\" request" },
+ 	{ }
  };
  
-+/* Find By Type Value */
-+#define ATT_OP_FIND_BY_TYPE_VALUE_REQ	0x06
-+struct bt_att_find_by_type_value_req_param {
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+	uint16_t type;  /* 2 octet UUID */
-+	const uint8_t *value;
-+	uint16_t length;  /* MAX length: (ATT_MTU - 7) */
-+};
-+
-+#define ATT_OP_FIND_BY_TYPE_VALUE_RESP	0x07
-+struct bt_att_find_by_type_value_rsp_param {
-+	const uint8_t *handles_information_list;
-+	uint16_t length;
-+};
-+
- /* Error codes for Error response PDU */
- #define ATT_ERROR_INVALID_HANDLE			0x01
- #define ATT_ERROR_READ_NOT_PERMITTED			0x02
 -- 
 1.8.3.2
 
