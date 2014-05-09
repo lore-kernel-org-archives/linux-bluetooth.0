@@ -1,89 +1,324 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <20140509102748.GA31552@t440s.lan>
-References: <1399555935-702-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1399555935-702-5-git-send-email-andrzej.kaczmarek@tieto.com>
- <5725B981-E83A-467E-80ED-18B9C8FE285F@holtmann.org> <20140509102748.GA31552@t440s.lan>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Fri, 9 May 2014 13:04:04 +0200
-Message-ID: <CAF3PWx3q+GtaMgOY-b4eMy0t=8yq1RsGf2vmpape4GNW4h3X5g@mail.gmail.com>
-Subject: Re: [PATCH 4/8] Bluetooth: Add support for user data in hci_request
-To: Marcel Holtmann <marcel@holtmann.org>, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 9 May 2014 13:46:43 +0300
+Message-ID: <CABBYNZ+nDiyUBoAf7Nc_PN3DzT4nWNDB9aqm6NGhngSE0HghVg@mail.gmail.com>
+Subject: Re: [PATCHv5 01/13] android/hal-sco: Add audio HAL for SCO handling
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Andrei,
 
-On 9 May 2014 12:27, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Marcel,
+On Fri, May 9, 2014 at 12:19 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> On Thu, May 08, 2014, Marcel Holtmann wrote:
->> > This patch makes possible to store some user data in hci_request struct
->> > which will be available in completion callback. Data can be added when
->> > initializing new request using hci_req_init(). With this it's now easy
->> > to run request which can be associated with e.g. specific hci_conn.
->> >
->> > Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
->> > ---
->> > include/net/bluetooth/bluetooth.h |  3 +-
->> > include/net/bluetooth/hci_core.h  |  3 +-
->> > net/bluetooth/hci_conn.c          |  4 +-
->> > net/bluetooth/hci_core.c          | 29 +++++++++-----
->> > net/bluetooth/mgmt.c              | 84 +++++++++++++++++++++------------------
->> > 5 files changed, 69 insertions(+), 54 deletions(-)
->> >
->> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
->> > index 904777c1..28378ad 100644
->> > --- a/include/net/bluetooth/bluetooth.h
->> > +++ b/include/net/bluetooth/bluetooth.h
->> > @@ -273,12 +273,13 @@ struct l2cap_ctrl {
->> >
->> > struct hci_dev;
->> >
->> > -typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status);
->> > +typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, void *data);
->> >
->> > struct hci_req_ctrl {
->> >     bool                    start;
->> >     u8                      event;
->> >     hci_req_complete_t      complete;
->> > +   void                    *data;
->> > };
->> >
->> > struct bt_skb_cb {
->> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->> > index 211bad6..30d245f 100644
->> > --- a/include/net/bluetooth/hci_core.h
->> > +++ b/include/net/bluetooth/hci_core.h
->> > @@ -1162,6 +1162,7 @@ int hci_unregister_cb(struct hci_cb *hcb);
->> > struct hci_request {
->> >     struct hci_dev          *hdev;
->> >     struct sk_buff_head     cmd_q;
->> > +   void                    *data;
->> >
->> >     /* If something goes wrong when building the HCI request, the error
->> >      * value is stored in this field.
->> > @@ -1169,7 +1170,7 @@ struct hci_request {
->> >     int                     err;
->> > };
->> >
->> > -void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
->> > +void hci_req_init(struct hci_request *req, struct hci_dev *hdev, void *data);
->>
->> do we really want to have everybody add extra data in here. We are now
->> touching every possible call that we have so far. I do not really like
->> this at the moment.
+> This adds audio HAL for handling SCO. Following needs to be added to
+> audio_policy.conf:
 >
-> Maybe hci_sent_cmd_data() could be used instead to help look up the
-> connection that the completed command was targeting?
+>   sco {
+>     outputs {
+>       sco {
+>         ...
+>         devices AUDIO_DEVICE_OUT_ALL_SCO
+>         ...
+>       }
+>     }
+> ---
+>  android/Android.mk  |  23 ++++++
+>  android/Makefile.am |  15 ++++
+>  android/hal-sco.c   | 211 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 249 insertions(+)
+>  create mode 100644 android/hal-sco.c
+>
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 638a042..942c7ba 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -271,6 +271,29 @@ LOCAL_MODULE := audio.a2dp.default
+>  include $(BUILD_SHARED_LIBRARY)
+>
+>  #
+> +# SCO audio
+> +#
+> +
+> +include $(CLEAR_VARS)
+> +
+> +LOCAL_SRC_FILES := bluez/android/hal-sco.c
+> +
+> +LOCAL_C_INCLUDES = \
+> +       $(call include-path-for, system-core) \
+> +       $(call include-path-for, libhardware) \
+> +
+> +LOCAL_SHARED_LIBRARIES := \
+> +       libcutils \
+> +
+> +LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+> +
+> +LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+> +LOCAL_MODULE_TAGS := optional
+> +LOCAL_MODULE := audio.hsp.default
+> +
+> +include $(BUILD_SHARED_LIBRARY)
+> +
+> +#
+>  # l2cap-test
+>  #
+>
+> diff --git a/android/Makefile.am b/android/Makefile.am
+> index 5ab6411..990ce6b 100644
+> --- a/android/Makefile.am
+> +++ b/android/Makefile.am
+> @@ -169,6 +169,21 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+>                                         android/hardware/hardware.h \
+>                                         android/system/audio.h
+>
+> +android_audio_sco_default_la_SOURCES = android/audio-msg.h \
+> +                                       android/hal-msg.h \
+> +                                       android/hal-sco.c \
+> +                                       android/hardware/audio.h \
+> +                                       android/hardware/audio_effect.h \
+> +                                       android/hardware/hardware.h \
+> +                                       android/system/audio.h
+> +
+> +android_audio_sco_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
+> +
+> +android_audio_sco_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
+> +                                       -no-undefined -lrt
+> +
+> +plugin_LTLIBRARIES += android/audio.sco.default.la
+> +
+>  unit_tests += android/test-ipc
+>
+>  android_test_ipc_SOURCES = android/test-ipc.c \
+> diff --git a/android/hal-sco.c b/android/hal-sco.c
+> new file mode 100644
+> index 0000000..5a70aba
+> --- /dev/null
+> +++ b/android/hal-sco.c
+> @@ -0,0 +1,211 @@
+> +/*
+> + * Copyright (C) 2013 Intel Corporation
+> + *
+> + * Licensed under the Apache License, Version 2.0 (the "License");
+> + * you may not use this file except in compliance with the License.
+> + * You may obtain a copy of the License at
+> + *
+> + *      http://www.apache.org/licenses/LICENSE-2.0
+> + *
+> + * Unless required by applicable law or agreed to in writing, software
+> + * distributed under the License is distributed on an "AS IS" BASIS,
+> + * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+> + * See the License for the specific language governing permissions and
+> + * limitations under the License.
+> + *
+> + */
+> +
+> +#include <errno.h>
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +
+> +#include <hardware/audio.h>
+> +#include <hardware/hardware.h>
+> +
+> +#include "hal-log.h"
+> +
+> +struct sco_audio_dev {
+> +       struct audio_hw_device dev;
+> +       struct a2dp_stream_out *out;
+> +};
+> +
+> +static int audio_open_output_stream(struct audio_hw_device *dev,
+> +                                       audio_io_handle_t handle,
+> +                                       audio_devices_t devices,
+> +                                       audio_output_flags_t flags,
+> +                                       struct audio_config *config,
+> +                                       struct audio_stream_out **stream_out)
+> +
+> +{
+> +       DBG("");
+> +
+> +       return -EINVAL;
+> +}
+> +
+> +static void audio_close_output_stream(struct audio_hw_device *dev,
+> +                                       struct audio_stream_out *stream_out)
+> +{
+> +       DBG("");
+> +
+> +       free(stream_out);
+> +}
+> +
+> +static int audio_set_parameters(struct audio_hw_device *dev,
+> +                                                       const char *kvpairs)
+> +{
+> +       DBG("%s", kvpairs);
+> +
+> +       return 0;
+> +}
+> +
+> +static char *audio_get_parameters(const struct audio_hw_device *dev,
+> +                                                       const char *keys)
+> +{
+> +       DBG("");
+> +
+> +       return strdup("");
+> +}
+> +
+> +static int audio_init_check(const struct audio_hw_device *dev)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static int audio_set_voice_volume(struct audio_hw_device *dev, float volume)
+> +{
+> +       DBG("%f", volume);
+> +
+> +       return 0;
+> +}
+> +
+> +static int audio_set_master_volume(struct audio_hw_device *dev, float volume)
+> +{
+> +       DBG("%f", volume);
+> +
+> +       return 0;
+> +}
+> +
+> +static int audio_set_mode(struct audio_hw_device *dev, int mode)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int audio_set_mic_mute(struct audio_hw_device *dev, bool state)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int audio_get_mic_mute(const struct audio_hw_device *dev, bool *state)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static size_t audio_get_input_buffer_size(const struct audio_hw_device *dev,
+> +                                       const struct audio_config *config)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int audio_open_input_stream(struct audio_hw_device *dev,
+> +                                       audio_io_handle_t handle,
+> +                                       audio_devices_t devices,
+> +                                       struct audio_config *config,
+> +                                       struct audio_stream_in **stream_in)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static void audio_close_input_stream(struct audio_hw_device *dev,
+> +                                       struct audio_stream_in *stream_in)
+> +{
+> +       DBG("");
+> +
+> +       free(stream_in);
+> +}
+> +
+> +static int audio_dump(const audio_hw_device_t *device, int fd)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static int audio_close(hw_device_t *device)
+> +{
+> +       DBG("");
+> +
+> +       free(device);
+> +
+> +       return 0;
+> +}
+> +
+> +static int audio_open(const hw_module_t *module, const char *name,
+> +                                                       hw_device_t **device)
+> +{
+> +       struct sco_audio_dev *adev;
+> +
+> +       DBG("");
+> +
+> +       if (strcmp(name, AUDIO_HARDWARE_INTERFACE)) {
+> +               error("audio: interface %s not matching [%s]", name,
+> +                                               AUDIO_HARDWARE_INTERFACE);
+> +               return -EINVAL;
+> +       }
+> +
+> +       adev = calloc(1, sizeof(struct sco_audio_dev));
+> +       if (!adev)
+> +               return -ENOMEM;
+> +
+> +       adev->dev.common.tag = HARDWARE_DEVICE_TAG;
+> +       adev->dev.common.version = AUDIO_DEVICE_API_VERSION_CURRENT;
+> +       adev->dev.common.module = (struct hw_module_t *) module;
+> +       adev->dev.common.close = audio_close;
+> +
+> +       adev->dev.init_check = audio_init_check;
+> +       adev->dev.set_voice_volume = audio_set_voice_volume;
+> +       adev->dev.set_master_volume = audio_set_master_volume;
+> +       adev->dev.set_mode = audio_set_mode;
+> +       adev->dev.set_mic_mute = audio_set_mic_mute;
+> +       adev->dev.get_mic_mute = audio_get_mic_mute;
+> +       adev->dev.set_parameters = audio_set_parameters;
+> +       adev->dev.get_parameters = audio_get_parameters;
+> +       adev->dev.get_input_buffer_size = audio_get_input_buffer_size;
+> +       adev->dev.open_output_stream = audio_open_output_stream;
+> +       adev->dev.close_output_stream = audio_close_output_stream;
+> +       adev->dev.open_input_stream = audio_open_input_stream;
+> +       adev->dev.close_input_stream = audio_close_input_stream;
+> +       adev->dev.dump = audio_dump;
+> +
+> +       *device = &adev->dev.common;
+> +
+> +       return 0;
+> +}
+> +
+> +static struct hw_module_methods_t hal_module_methods = {
+> +       .open = audio_open,
+> +};
+> +
+> +struct audio_module HAL_MODULE_INFO_SYM = {
+> +       .common = {
+> +               .tag = HARDWARE_MODULE_TAG,
+> +               .version_major = 1,
+> +               .version_minor = 0,
+> +               .id = AUDIO_HARDWARE_MODULE_ID,
+> +               .name = "HSP Audio HW HAL",
+> +               .author = "Intel Corporation",
+> +               .methods = &hal_module_methods,
+> +       },
+> +};
+> --
+> 1.8.3.2
 
-For purpose of this set of patches it should be fine, both Read RSSI
-and Read Transmit Power Level have handle as first parameter so we
-don't even need to bother with checking which command was sent last in
-case of error. So we can use this now and just get back to user_data
-in case something pops in future which cannot be resolved using
-available structures.
+Ive applied just the first one after renaming most of the callbacks to
+start with sco prefix not audio, please rebase.
 
-BR,
-Andrzej
+
+-- 
+Luiz Augusto von Dentz
