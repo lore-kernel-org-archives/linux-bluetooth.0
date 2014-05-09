@@ -1,142 +1,232 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v2 6/6] Bluetooth: Add support for max_tx_power in Get Conn Info
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1399664133-2892-7-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Fri, 9 May 2014 14:10:33 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <5455C792-E0ED-4986-B015-F8A1EAB9CA66@holtmann.org>
-References: <1399664133-2892-1-git-send-email-andrzej.kaczmarek@tieto.com> <1399664133-2892-7-git-send-email-andrzej.kaczmarek@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+From: Arman Uguray <armansito@chromium.org>
+To: linux-bluetooth@vger.kernel.org
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH v1 10/10] tools/btatt: Add "find-by-type-value" command.
+Date: Fri,  9 May 2014 13:14:00 -0700
+Message-Id: <1399666440-14078-11-git-send-email-armansito@chromium.org>
+In-Reply-To: <1399666440-14078-1-git-send-email-armansito@chromium.org>
+References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Added command for the "Find By Type Value" request. Sample runs:
 
-> This patch adds support for max_tx_power in Get Connection Information
-> request. Value is read only once for given connection and then always
-> returned in response as parameter.
-> 
-> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> ---
-> include/net/bluetooth/hci_core.h |  1 +
-> include/net/bluetooth/mgmt.h     |  1 +
-> net/bluetooth/hci_conn.c         |  1 +
-> net/bluetooth/hci_event.c        | 18 +++++++++++++++++-
-> net/bluetooth/mgmt.c             |  8 ++++++++
-> 5 files changed, 28 insertions(+), 1 deletion(-)
+$ btatt -d 00:02:5B:00:15:10 -v find-by-type-value 0x0001 0xffff
+att: ATT command 0x06
+att: < 06 01 00 ff ff 00 28
+att: > 01 06 01 00 0a
+Error response:
+	opcode: 0x06
+	handle: 0x0001
+	error: 0x0a
 
-I would prefer if you split the actual tracking of the value from the mgmt part of it. Keep it two patches. The first one can be applied easily before the second until we sort out the details of the mgmt API.
+$ btatt -d 00:02:5B:00:15:10 -v find-by-type-value 0x0001 0xffff 01 18
+att: ATT command 0x06
+att: < 06 01 00 ff ff 00 28 01 08
+att: > 07 08 00 08 00
+Find By Type Value response:
+	Handle Information List:
+		Attr Handle: 0x0008, Grp End Handle: 0x0008
+---
+ tools/btatt.c | 163 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 161 insertions(+), 2 deletions(-)
 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 6353617..665752c 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -380,6 +380,7 @@ struct hci_conn {
-> 	__u16		le_conn_max_interval;
-> 	__s8		rssi;
-> 	__s8		tx_power;
-> +	__s8		max_tx_power;
-> 	unsigned long	flags;
-> 
-> 	unsigned long	conn_info_timestamp;
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 34faa2e..33d016b 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -420,6 +420,7 @@ struct mgmt_cp_get_conn_info {
-> struct mgmt_rp_get_conn_info {
-> 	struct mgmt_addr_info addr;
-> 	__s8	rssi;
-> +	__s8	max_tx_power;
-> 	__u32	flags;
-> 	__le16	eir_len;
-> 	__u8	eir[0];
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 74b368b..a987e7d 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -408,6 +408,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
-> 	conn->remote_auth = 0xff;
-> 	conn->key_type = 0xff;
-> 	conn->tx_power = HCI_TX_POWER_INVALID;
-> +	conn->max_tx_power = HCI_TX_POWER_INVALID;
-> 
-> 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
-> 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 63cc9bc..af4276d 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1283,9 +1283,25 @@ static void hci_cc_read_tx_power_level(struct hci_dev *hdev,
-> 	hci_dev_lock(hdev);
-> 
-> 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-> -	if (conn && sent->type == 0x00)
-> +	if (!conn)
-> +		goto unlock;
-> +
-> +	switch (sent->type) {
-> +	case 0x00:
-> 		conn->tx_power = rp->tx_power_level;
-> +		break;
-> +
-> +	case 0x01:
-> +		conn->max_tx_power = rp->tx_power_level;
-> +		break;
-> +
-
-Remove these extra empty lines between the case statement. They are just bloat.
-
-> +	default:
-> +		BT_ERR("Used reserved Read_Transmit_Power_Level param %d",
-> +		       sent->type);
-
-I do not think we want to print an error here. We are just tracking type we know. So remove the default case.
-
-> +		break;
-> +	}
-> 
-> +unlock:
-> 	hci_dev_unlock(hdev);
-> }
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index cac2edf..fa918f7 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -4600,6 +4600,7 @@ static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
-> 	}
-> 
-> 	rp->rssi = conn->rssi;
-> +	rp->max_tx_power = conn->max_tx_power;
-> 
-> 	if (cp->data_type & MGMT_CONN_INFO_DATA_TX_POWER) {
-> 		eir_len = eir_append_data(rp->eir, 0, EIR_TX_POWER,
-> @@ -4767,6 +4768,13 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
-> 				    sizeof(req_txp_cp), &req_txp_cp);
-> 		}
-> 
-> +		if (conn->max_tx_power == HCI_TX_POWER_INVALID) {
-> +			req_txp_cp.handle = cpu_to_le16(conn->handle);
-> +			req_txp_cp.type = 0x01;
-> +			hci_req_add(&req, HCI_OP_READ_TX_POWER_LEVEL,
-> +				    sizeof(req_txp_cp), &req_txp_cp);
-> +		}
-> +
-
-If the TX power can not change for LE, then neither can the TX max power.
-
-> 		req_rssi_cp.handle = cpu_to_le16(conn->handle);
-> 		hci_req_add(&req, HCI_OP_READ_RSSI, sizeof(req_rssi_cp),
-> 			    &req_rssi_cp);
-
-I prefer if we read the RSSI before reading anything else. Actually the order should be RSSI, TX power and then TX max power.
-
-For RSSI we always have to return and if it fails, we can just error out. That is what the hci_req_run will do if any of the HCI commands fail. If they fail, we can easily just return HCI_TX_POWER_INVALID for the other two values.
-
-Regards
-
-Marcel
+diff --git a/tools/btatt.c b/tools/btatt.c
+index a6aa281..0867d9b 100644
+--- a/tools/btatt.c
++++ b/tools/btatt.c
+@@ -29,6 +29,7 @@
+ #include <stdio.h>
+ #include <getopt.h>
+ #include <string.h>
++#include <errno.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/l2cap.h>
+@@ -51,8 +52,11 @@ static void handle_error(const void *param, uint16_t len)
+ 		return;
+ 	}
+ 
+-	printf("Request failed:\n\topcode:\t%u\n\thandle:\t%u\n\terror:\t%u\n",
+-			rp->request_opcode, rp->handle, rp->error_code);
++	printf("Error response:\n"
++				"\topcode:\t0x%02x\n"
++				"\thandle:\t0x%04x\n"
++				"\terror:\t0x%02x\n",
++				rp->request_opcode, rp->handle, rp->error_code);
+ }
+ 
+ static void exchange_mtu_cb(uint8_t opcode, const void *param,
+@@ -257,6 +261,159 @@ static void cmd_find_info(struct bt_att *att, int argc, char **argv)
+ 	}
+ }
+ 
++static void find_by_type_val_cb(uint8_t opcode, const void *param,
++						uint16_t len, void *user_data)
++{
++	const struct bt_att_find_by_type_value_rsp_param *rp;
++	uint16_t att_handle, grp_handle;
++	const uint8_t *data_ptr;
++	int num_handle_infos;
++	int i;
++
++	if (opcode == ATT_OP_ERROR_RESP) {
++		handle_error(param, len);
++		goto done;
++	}
++
++	if (opcode != ATT_OP_FIND_BY_TYPE_VALUE_RESP) {
++		fprintf(stderr, "Invalid response opcode (0x%02x)\n", opcode);
++		goto done;
++	}
++
++	rp = param;
++
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Invalid \"Find By Type Value\" response length"
++								" (%u)\n", len);
++		goto done;
++	}
++
++	if (rp->length == 0) {
++		fprintf(stderr, "\"Handle Info. List\" field is empty!\n");
++		goto done;
++	}
++
++	if (rp->length % 4) {
++		fprintf(stderr, "Malformed response\n");
++		goto done;
++	}
++
++	num_handle_infos = rp->length / 4;
++
++	printf("Find By Type Value response:\n");
++	printf("\tHandle Information List:\n");
++
++	data_ptr = rp->handles_information_list;
++	for (i = 0; i < num_handle_infos; i++) {
++		printf("\t\tAttr Handle: 0x%04x, Grp End Handle: 0x%04x\n",
++							get_le16(data_ptr),
++							get_le16(data_ptr + 2));
++
++		data_ptr += 4;
++	}
++
++done:
++	mainloop_quit();
++}
++
++static void find_by_type_val_usage(void)
++{
++	printf("Usage: btatt find-by-type-value <start handle> <end handle> "
++							"<uuid> <value>\n");
++
++	printf("e.g. btatt find-by-type-value 0x0001 0xFFFF 0x280C 00 01\n");
++}
++
++static struct option find_by_type_val_options[] = {
++	{ "help",	0, 0, 'h'},
++	{}
++};
++
++static void cmd_find_by_type_val(struct bt_att *att, int argc, char **argv)
++{
++	struct bt_att_find_by_type_value_req_param param;
++	uint16_t start, end, type, length;
++	uint8_t *value = NULL;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+h", find_by_type_val_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'h':
++		default:
++			find_by_type_val_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++
++	if (argc < 3) {
++		find_by_type_val_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	start = strtol(argv[0], NULL, 0);
++	if (!start) {
++		fprintf(stderr, "Invalid start handle: %s\n", argv[0]);
++		exit(EXIT_FAILURE);
++	}
++
++	end = strtol(argv[1], NULL, 0);
++	if (!end) {
++		fprintf(stderr, "Invalid end handle: %s\n", argv[1]);
++		exit(EXIT_FAILURE);
++	}
++
++	type = strtol(argv[2], NULL, 0);
++	if (!type) {
++		fprintf(stderr, "Invalid 16-bit UUID: %s\n", argv[2]);
++		exit(EXIT_FAILURE);
++	}
++
++	length = argc - 3;
++
++	if (length > 0) {
++		int i;
++
++		value = malloc(length);
++
++		for (i = 3; i < argc; i++) {
++			if (strlen(argv[i]) != 2) {
++				fprintf(stderr, "Invalid value byte: %s\n",
++								argv[i]);
++				free(value);
++				exit(EXIT_FAILURE);
++			}
++
++			value[i-3] = strtol(argv[i], NULL, 16);
++			if (errno) {
++				perror("Error parsing value");
++				free(value);
++				exit(EXIT_FAILURE);
++			}
++		}
++	}
++
++	memset(&param, 0, sizeof(param));
++	param.start_handle = start;
++	param.end_handle = end;
++	param.type = type;
++	param.value = value;
++	param.length = length;
++
++	if (!bt_att_send(att, ATT_OP_FIND_BY_TYPE_VALUE_REQ, &param,
++			sizeof(param), find_by_type_val_cb, NULL, NULL)) {
++		fprintf(stderr, "Unable to send \"Find By Type Value\" "
++								"request\n");
++		free(value);
++		exit(EXIT_FAILURE);
++	}
++
++	free(value);
++}
++
+ static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type)
+ {
+ 	int sock;
+@@ -313,6 +470,8 @@ static struct {
+ } command[] = {
+ 	{ "exchange-mtu", cmd_mtu, "\"Exchange MTU\" request" },
+ 	{ "find-information", cmd_find_info, "\"Find Information\" request" },
++	{ "find-by-type-value", cmd_find_by_type_val,
++						"\"Find By Type Value\" request" },
+ 	{ }
+ };
+ 
+-- 
+1.8.3.2
 
