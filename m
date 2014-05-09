@@ -1,32 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: PTS tests results for IOPT
-Date: Fri, 09 May 2014 14:50:21 +0200
-Message-ID: <2395987.knigA4KrC6@uw000953>
-In-Reply-To: <1399549005-2486-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1399549005-2486-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <OF722F7CB5.D96FAD3D-ON65257CD3.0040BB09-65257CD3.0040BB0C@tcs.com>
+References: <OF8084FB93.8A83D1D7-ON65257CD0.0029CC3E-65257CD0.0029CC41@LocalDomain>
+	<OF722F7CB5.D96FAD3D-ON65257CD3.0040BB09-65257CD3.0040BB0C@tcs.com>
+Date: Fri, 9 May 2014 15:42:09 +0300
+Message-ID: <CABBYNZKdnb73Uh-OKmNfUQs3-J=yQ+0rYvNFeV-bshxEVYa5yA@mail.gmail.com>
+Subject: Re: System will halt during a phone call with HandsFree profile
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi,
 
-On Thursday 08 of May 2014 13:36:45 Sebastian Chlad wrote:
-> PICS, PIXITs as well as PTS tests results for IOPT.
-> ---
->  android/pics-iopt.txt  | 223 +++++++++++++++++++++++++++++++++++++++++++++++++
->  android/pixit-iopt.txt |  23 +++++
->  android/pts-iopt.txt   |  23 +++++
->  3 files changed, 269 insertions(+)
->  create mode 100644 android/pics-iopt.txt
->  create mode 100644 android/pixit-iopt.txt
->  create mode 100644 android/pts-iopt.txt
+On Fri, May 9, 2014 at 2:47 PM, Vinod Rayapudi <vinod.rayapudi@tcs.com> wrote:
+> Hi,
+>
+> I am working with Bluez 4.96, 4.98 .
+> By using OFONO, I have established HandsFree connection.
+> After successful HF connection, If I make a call my system will halt.
+>
+> Can anyone help me, how to solve this Issue.
 
-Applied (after adding those files to android/Makefile.am), thanks.
+You will need to provide more logs/traces, it looks like your kernel
+is crashing what version is it? Also BlueZ 4.x is no longer supported.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
