@@ -1,46 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140509115045.GA3536@t440s.lan>
-References: <20140509014001.0A027100DB2@puck.mtv.corp.google.com>
-	<20140509115045.GA3536@t440s.lan>
-Date: Fri, 9 May 2014 09:44:22 -0700
-Message-ID: <CAGXr9JH9F+HdZj9PzeTZwnb9MCctHJkgW9BTL8SD-2bPXG8j0A@mail.gmail.com>
-Subject: Re: [PATCH] hog: Fix report_value_cb()
-From: Petri Gynther <pgynther@google.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-version: 1.0
+Content-type: text/plain; CHARSET=US-ASCII
+Subject: Re: Bluez 5.18 on 3.12
+From: David Eriksson <ftslc@me.com>
+In-reply-to: <52C9C733-259A-427E-A857-9A291047620D@holtmann.org>
+Date: Fri, 09 May 2014 17:02:04 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-id: <AE9E98E2-E507-43EC-9C1E-8464FB4F8F3C@me.com>
+References: <BC611432-5B36-4EA5-8667-082F55020330@me.com>
+ <52C9C733-259A-427E-A857-9A291047620D@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Thanks for info Marcel,
 
-On Fri, May 9, 2014 at 4:50 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Petri,
->
-> On Thu, May 08, 2014, Petri Gynther wrote:
->> 1. Fix potential buffer overflow. It would happen in the case:
->>    hogdev->has_report_id == TRUE && report_size == UHID_DATA_MAX
->>
->> 2. Adjust function signature to match GAttribNotifyFunc.
->>
->> 3. Adjust uHID error handling to mimic uhid_send_input_report() in
->>    profiles/input/device.c
->> ---
->>  profiles/input/hog.c | 44 +++++++++++++++++++++++++++++---------------
->>  1 file changed, 29 insertions(+), 15 deletions(-)
->
-> Whenever I see a commit message like this it begs the question:
-> shouldn't these separate fixes be in separate patches? If at all
-> possible please split the patch into smaller ones so that each one
-> contains a single independent fix. That makes it much easier to track
-> exactly which code change maps to which described fix as well the
-> possibility to do some bisecting later in case one of the fixes
-> introduces a bug.
->
-> Johan
+Where can I read what's new/specific for the 1.4 release?  
 
-Fair enough. I'll break this down to three commits and send a new
-patch out shortly.
+I'm mainly after BLE, Hogp and passive scans.
 
--- Petri
+
+best David
+
+On 09 May 2014, at 13:06, Marcel Holtmann <marcel@holtmann.org> wrote:
+
+> Hi David,
+> 
+>> Anyone here that have a feeling on how hard it would be to get bluez 5.18+ with mgmt api running on 3.12?
+> 
+> that should just work. Linux kernel 3.4 and later should be supported. I recommend at least kernel 3.9 to get mgmt API 1.3 which contains a bunch of fixes that we otherwise have to work around.
+> 
+> Unless you need features from mgmt API 1.4, then you need at least Linux kernel 3.13.
+> 
+> Regards
+> 
+> Marcel
+> 
