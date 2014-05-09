@@ -1,37 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; CHARSET=US-ASCII
-Subject: Re: Bluez 5.18 on 3.12
-From: David Eriksson <ftslc@me.com>
-In-reply-to: <52C9C733-259A-427E-A857-9A291047620D@holtmann.org>
-Date: Fri, 09 May 2014 17:02:04 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-id: <AE9E98E2-E507-43EC-9C1E-8464FB4F8F3C@me.com>
-References: <BC611432-5B36-4EA5-8667-082F55020330@me.com>
- <52C9C733-259A-427E-A857-9A291047620D@holtmann.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 15/15] android/tester-ng: Add setprop scanmode none success tc
+Date: Fri,  9 May 2014 16:42:48 +0200
+Message-Id: <1399646568-20742-15-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1399646568-20742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1399646568-20742-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Thanks for info Marcel,
+This adds scan mode set property to none success test case.
+---
+ android/android-tester-ng.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-Where can I read what's new/specific for the 1.4 release?  
+diff --git a/android/android-tester-ng.c b/android/android-tester-ng.c
+index cd7a28c..0134ca7 100644
+--- a/android/android-tester-ng.c
++++ b/android/android-tester-ng.c
+@@ -1107,6 +1107,14 @@ static bt_property_t setprop_scanmode_conn_prop = {
+ 	.len = sizeof(bt_scan_mode_t),
+ };
+ 
++static bt_scan_mode_t test_setprop_scanmode_none = BT_SCAN_MODE_NONE;
++
++static bt_property_t setprop_scanmode_none_prop = {
++	.type = BT_PROPERTY_ADAPTER_SCAN_MODE,
++	.val = &test_setprop_scanmode_none,
++	.len = sizeof(bt_scan_mode_t),
++};
++
+ static void bt_set_scanmode_property(bt_property_t *mode)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1129,6 +1137,11 @@ static void bt_set_scanmode_conn_action(void)
+ 	bt_set_scanmode_property(&setprop_scanmode_conn_prop);
+ }
+ 
++static void bt_set_scanmode_none_action(void)
++{
++	bt_set_scanmode_property(&setprop_scanmode_none_prop);
++}
++
+ static void generic_test_function(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -1320,6 +1333,25 @@ static struct step bluetooth_setprop_scanmode_conn_success_steps[] = {
+ 	}
+ };
+ 
++static struct step bluetooth_setprop_scanmode_none_success_steps[] = {
++	{
++	.action_result.status = BT_STATUS_SUCCESS,
++	.action = bluetooth_enable_action,
++	},
++	{
++	.callback = CB_BT_ADAPTER_STATE_CHANGED,
++	.callback_result.state = BT_STATE_ON,
++	},
++	{
++	.action_result.status = BT_STATUS_SUCCESS,
++	.action = bt_set_scanmode_none_action,
++	},
++	{
++	.callback = CB_BT_ADAPTER_PROPERTIES,
++	.callback_result.properties = &setprop_scanmode_none_prop,
++	}
++};
++
+ static struct step gatt_register_client_success_steps[] = {
+ 	{
+ 	.action_result.status = BT_STATUS_SUCCESS,
+@@ -1410,6 +1442,10 @@ int main(int argc, char *argv[])
+ 			bluetooth_setprop_scanmode_conn_success_steps,
+ 			setup, generic_test_function, teardown);
+ 
++	test_bredrle("Bluetooth Set SCAN_MODE NONE - Success",
++			bluetooth_setprop_scanmode_none_success_steps,
++			setup, generic_test_function, teardown);
++
+ 	test_bredrle("Socket Init", dummy_steps, setup_socket,
+ 					generic_test_function, teardown);
+ 
+-- 
+1.9.2
 
-I'm mainly after BLE, Hogp and passive scans.
-
-
-best David
-
-On 09 May 2014, at 13:06, Marcel Holtmann <marcel@holtmann.org> wrote:
-
-> Hi David,
-> 
->> Anyone here that have a feeling on how hard it would be to get bluez 5.18+ with mgmt api running on 3.12?
-> 
-> that should just work. Linux kernel 3.4 and later should be supported. I recommend at least kernel 3.9 to get mgmt API 1.3 which contains a bunch of fixes that we otherwise have to work around.
-> 
-> Unless you need features from mgmt API 1.4, then you need at least Linux kernel 3.13.
-> 
-> Regards
-> 
-> Marcel
-> 
