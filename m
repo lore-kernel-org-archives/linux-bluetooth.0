@@ -1,37 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 May 2014 14:50:45 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petri Gynther <pgynther@google.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] hog: Fix report_value_cb()
-Message-ID: <20140509115045.GA3536@t440s.lan>
-References: <20140509014001.0A027100DB2@puck.mtv.corp.google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140509014001.0A027100DB2@puck.mtv.corp.google.com>
+In-Reply-To: <OF8084FB93.8A83D1D7-ON65257CD0.0029CC3E-65257CD0.0029CC41@LocalDomain>
+References: <OF8084FB93.8A83D1D7-ON65257CD0.0029CC3E-65257CD0.0029CC41@LocalDomain>
+Subject: System will halt during a phone call with HandsFree profile
+From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
+Message-ID: <OF722F7CB5.D96FAD3D-ON65257CD3.0040BB09-65257CD3.0040BB0C@tcs.com>
+Date: Fri, 9 May 2014 17:17:01 +0530
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi,
 
-On Thu, May 08, 2014, Petri Gynther wrote:
-> 1. Fix potential buffer overflow. It would happen in the case:
->    hogdev->has_report_id == TRUE && report_size == UHID_DATA_MAX
-> 
-> 2. Adjust function signature to match GAttribNotifyFunc.
-> 
-> 3. Adjust uHID error handling to mimic uhid_send_input_report() in
->    profiles/input/device.c
-> ---
->  profiles/input/hog.c | 44 +++++++++++++++++++++++++++++---------------
->  1 file changed, 29 insertions(+), 15 deletions(-)
+I am working with Bluez 4.96, 4.98 .
+By using OFONO, I have established HandsFree connection.
+After successful HF connection, If I make a call my system will halt.
 
-Whenever I see a commit message like this it begs the question:
-shouldn't these separate fixes be in separate patches? If at all
-possible please split the patch into smaller ones so that each one
-contains a single independent fix. That makes it much easier to track
-exactly which code change maps to which described fix as well the
-possibility to do some bisecting later in case one of the fixes
-introduces a bug.
+Can anyone help me, how to solve this Issue.
 
-Johan
+Thanks & Regards,
+Vinod.
+=====-----=====-----=====
+Notice: The information contained in this e-mail
+message and/or attachments to it may contain 
+confidential or privileged information. If you are 
+not the intended recipient, any dissemination, use, 
+review, distribution, printing or copying of the 
+information contained in this e-mail message 
+and/or attachments to it are strictly prohibited. If 
+you have received this communication in error, 
+please notify us by reply e-mail or telephone and 
+immediately and permanently delete the message 
+and any attachments. Thank you
+
+
+
