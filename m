@@ -2,109 +2,182 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v1 04/10] tools/btatt: Add "exchange-mtu" command.
-Date: Fri,  9 May 2014 13:13:54 -0700
-Message-Id: <1399666440-14078-5-git-send-email-armansito@chromium.org>
+Subject: [PATCH v1 03/10] tools/btatt: Add command-line tool for ATT protocol testing.
+Date: Fri,  9 May 2014 13:13:53 -0700
+Message-Id: <1399666440-14078-4-git-send-email-armansito@chromium.org>
 In-Reply-To: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added command for "Exchange MTU" request/response. Also added code for
-initiating an L2CAP connection over the ATT channel. Tested using a CSR
-uEnergy 1000 board with the following results:
-
-$ btatt -d 00:02:5B:00:15:10 -v exchange-mtu 50
-Going to set MTU to 16 bit value: 50
-att: ATT command 0x02
-att < 02 32 00
-att > 03 17 00
-Exchange MTU response: Server Rx MTU 23
+Initial commit for tools/btatt. Added basic command line options parsing
+and added the tool to Makefile.tools as experimental.
 ---
- tools/btatt.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 190 insertions(+), 1 deletion(-)
+ Makefile.tools |  10 +++-
+ tools/btatt.c  | 152 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 161 insertions(+), 1 deletion(-)
+ create mode 100644 tools/btatt.c
 
+diff --git a/Makefile.tools b/Makefile.tools
+index 40f076b..13f6691 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -278,7 +278,7 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+ 			tools/btmgmt tools/btinfo tools/btattach \
+ 			tools/btsnoop tools/btproxy tools/btiotest \
+ 			tools/mpris-player tools/cltest tools/seq2bseq \
+-			tools/ibeacon
++			tools/ibeacon tools/btatt
+ 
+ tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
+ tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
+@@ -342,6 +342,14 @@ tools_ibeacon_SOURCES = tools/ibeacon.c monitor/bt.h \
+ 				src/shared/queue.h src/shared/queue.c \
+ 				src/shared/ringbuf.h src/shared/ringbuf.c
+ 
++tools_btatt_SOURCES = tools/btatt.c src/uuid-helper.c \
++				monitor/mainloop.h monitor/mainloop.c \
++				src/shared/io.h src/shared/io-mainloop.c \
++				src/shared/queue.h src/shared/queue.c \
++				src/shared/util.h src/shared/util.c \
++				src/shared/att.h src/shared/att.c
++tools_btatt_LDADD = lib/libbluetooth-internal.la
++
+ EXTRA_DIST += tools/bdaddr.1
+ endif
+ 
 diff --git a/tools/btatt.c b/tools/btatt.c
-index 476bb94..de8d300 100644
---- a/tools/btatt.c
+new file mode 100644
+index 0000000..476bb94
+--- /dev/null
 +++ b/tools/btatt.c
-@@ -31,6 +31,7 @@
- #include <string.h>
- 
- #include <bluetooth/bluetooth.h>
-+#include <bluetooth/l2cap.h>
- 
- #include "monitor/mainloop.h"
- #include "src/shared/att.h"
-@@ -39,11 +40,152 @@
- 
- static bool verbose = false;
- 
-+static void handle_error(const void *param, uint16_t len)
-+{
-+	const struct bt_att_error_rsp_param *rp = param;
+@@ -0,0 +1,152 @@
++/*
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	if (len != sizeof(*rp)) {
-+		fprintf(stderr, "Invalid error response length (%u)\n", len);
-+		return;
-+	}
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
 +
-+	printf("Request failed:\n\topcode:\t%u\n\thandle:\t%u\n\terror:\t%u\n",
-+			rp->request_opcode, rp->handle, rp->error_code);
-+}
++#include <stdbool.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <getopt.h>
++#include <string.h>
 +
-+static void exchange_mtu_cb(uint8_t opcode, const void *param,
-+						uint16_t len, void *user_data)
-+{
-+	const struct bt_att_exchange_mtu_rsp_param *rp;
++#include <bluetooth/bluetooth.h>
 +
-+	if (opcode == ATT_OP_ERROR_RESP) {
-+		handle_error(param, len);
-+		goto done;
-+	}
++#include "monitor/mainloop.h"
++#include "src/shared/att.h"
 +
-+	if (opcode != ATT_OP_EXCHANGE_MTU_RESP) {
-+		fprintf(stderr, "Invalid response opcode (%u)\n", opcode);
-+		goto done;
-+	}
++#define ATT_CID 4
 +
-+	rp = param;
++static bool verbose = false;
 +
-+	if (len != sizeof(*rp)) {
-+		fprintf(stderr, "Invalid \"Exchange MTU\" response length "
-+								"(%u)\n", len);
-+		goto done;
-+	}
-+
-+	printf("Exchange MTU response: Server Rx MTU: %u\n", rp->server_rx_mtu);
-+
-+done:
-+	mainloop_quit();
-+}
-+
-+static void mtu_usage(void)
-+{
-+	printf("Usage: btatt exchange-mtu <ATT_MTU>\n");
-+}
-+
-+static struct option mtu_options[] = {
-+	{ "help",	0, 0, 'h'},
-+	{}
++static struct {
++	char *cmd;
++	void (*func)(struct bt_att *att, int argc, char **argv);
++	char *doc;
++} command[] = {
++	{ }
 +};
 +
-+static void cmd_mtu(struct bt_att *att, int argc, char **argv)
++static void usage(void)
 +{
-+	struct bt_att_exchange_mtu_req_param param;
-+	uint16_t mtu;
-+	int opt;
++	int i;
 +
-+	while ((opt = getopt_long(argc, argv, "+h", mtu_options,
-+							NULL)) != -1) {
++	printf("btatt\n");
++	printf("Usage:\n"
++		"\tbtatt [options] <command> [command parameters]\n");
++
++	printf("Options:\n"
++		"\t-i, --index <id>\tSpecify adapter index, e.g. hci0\n"
++		"\t-d, --dest <addr>\tSpecify the destination address\n"
++		"\t-t, --type [random|public] \tSpecify the LE address type\n"
++		"\t-v, --verbose\tEnable extra logging\n"
++		"\t-h, --help\tDisplay help\n");
++
++	printf("Commands:\n");
++	for (i = 0; command[i].cmd; i++)
++		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
++
++	printf("\n"
++		"For more information on the usage of each command use:\n"
++		"\tbtatt <command> --help\n" );
++}
++
++static struct option main_options[] = {
++	{ "index",	1, 0, 'i' },
++	{ "dest",	1, 0, 'd' },
++	{ "type",	1, 0, 't' },
++	{ "verbose",	0, 0, 'v' },
++	{ "help",	0, 0, 'h' },
++	{ 0, 0, 0, 0}
++};
++
++int main(int argc, char *argv[])
++{
++	int opt, i;
++	int dev_id = -1;
++	bool dest_given = false;
++	uint8_t dest_type = BDADDR_LE_PUBLIC;
++	bdaddr_t src_addr, dst_addr;
++	int fd;
++
++	while ((opt = getopt_long(argc, argv, "+hvt:i:d:",
++						main_options, NULL)) != -1) {
 +		switch (opt) {
++		case 'i':
++			dev_id = hci_devid(optarg);
++			if (dev_id < 0) {
++				perror("Invalid adapter");
++				return EXIT_FAILURE;
++			}
++			break;
++		case 'd':
++			if (str2ba(optarg, &dst_addr) < 0) {
++				fprintf(stderr, "Invalid destination address\n");
++				return EXIT_FAILURE;
++			}
++			dest_given = true;
++			break;
++		case 't':
++			if (strcmp(optarg, "random") == 0)
++				dest_type = BDADDR_LE_RANDOM;
++			else if (strcmp(optarg, "public") == 0)
++				dest_type = BDADDR_LE_PUBLIC;
++			else {
++				fprintf(stderr, "Allowed types: random, public\n");
++				return EXIT_FAILURE;
++			}
++			break;
++		case 'v':
++			verbose = true;
++			break;
 +		case 'h':
++			usage();
++			return 0;
 +		default:
-+			mtu_usage();
-+			exit(EXIT_SUCCESS);
++			break;
 +		}
 +	}
 +
@@ -113,150 +186,24 @@ index 476bb94..de8d300 100644
 +	optind = 0;
 +
 +	if (argc < 1) {
-+		mtu_usage();
-+		exit(EXIT_FAILURE);
++		usage();
++		return 0;
 +	}
 +
-+	mtu = atoi(argv[0]);
-+
-+	if (verbose)
-+		printf("Going to set MTU to 16 bit value: %u\n", mtu);
-+
-+	memset(&param, 0, sizeof(param));
-+	param.client_rx_mtu = mtu;
-+	if (bt_att_send(att, ATT_OP_EXCHANGE_MTU_REQ, &param, sizeof(param),
-+					exchange_mtu_cb, NULL, NULL) == 0) {
-+		fprintf(stderr, "Unable to send \"Exchange MTU\" request\n");
-+		exit(EXIT_FAILURE);
-+	}
-+}
-+
-+static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type)
-+{
-+	int sock;
-+	struct sockaddr_l2 srcaddr, dstaddr;
-+	char srcaddr_str[18], dstaddr_str[18];
-+
-+	if (verbose) {
-+		ba2str(src, srcaddr_str);
-+		ba2str(dst, dstaddr_str);
-+
-+		printf("Opening L2CAP LE connection on ATT channel: "
-+					"src: %s dest: %s\n", srcaddr_str, dstaddr_str);
-+	}
-+
-+	sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-+	if (sock < 0) {
-+		perror("Failed to create L2CAP socket");
-+		return -1;
-+	}
-+
-+	/* Set up source address */
-+	memset(&srcaddr, 0, sizeof(srcaddr));
-+	srcaddr.l2_family = AF_BLUETOOTH;
-+	bacpy(&srcaddr.l2_bdaddr, src);
-+	srcaddr.l2_cid = htobs(ATT_CID);
-+	srcaddr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
-+
-+	if (bind(sock, (struct sockaddr *) &srcaddr, sizeof(srcaddr)) < 0) {
-+		perror("Failed to bind L2CAP socket");
-+		close(sock);
-+		return -1;
-+	}
-+
-+	/* Set up destination address */
-+	memset(&dstaddr, 0, sizeof(dstaddr));
-+	dstaddr.l2_family = AF_BLUETOOTH;
-+	bacpy(&dstaddr.l2_bdaddr, dst);
-+	dstaddr.l2_cid = htobs(ATT_CID);
-+	dstaddr.l2_bdaddr_type = dst_type;
-+
-+	if (connect(sock, (struct sockaddr *) &dstaddr, sizeof(dstaddr)) < 0) {
-+		perror("Failed to connect");
-+		close(sock);
-+		return -1;
-+	}
-+
-+	return sock;
-+}
-+
- static struct {
- 	char *cmd;
- 	void (*func)(struct bt_att *att, int argc, char **argv);
- 	char *doc;
- } command[] = {
-+	{ "exchange-mtu",	cmd_mtu,	"\"Exchange MTU\" request." },
- 	{ }
- };
- 
-@@ -80,6 +222,13 @@ static struct option main_options[] = {
- 	{ 0, 0, 0, 0}
- };
- 
-+static void att_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
-+
-+	printf("%s%s\n", prefix, str);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	int opt, i;
-@@ -88,6 +237,8 @@ int main(int argc, char *argv[])
- 	uint8_t dest_type = BDADDR_LE_PUBLIC;
- 	bdaddr_t src_addr, dst_addr;
- 	int fd;
-+	struct bt_att *att;
-+	int exit_status;
- 
- 	while ((opt = getopt_long(argc, argv, "+hvt:i:d:",
- 						main_options, NULL)) != -1) {
-@@ -148,5 +299,43 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
--	return 0;
-+	mainloop_init();
-+
-+	fd = l2cap_le_att_connect(&src_addr, &dst_addr, dest_type);
-+
-+	if (fd < 0)
-+		return EXIT_FAILURE;
-+
-+	att = bt_att_new(fd);
-+
-+	if (!att) {
-+		fprintf(stderr, "Failed to create bt_att.");
-+		close(fd);
++	if (dev_id == -1)
++		bacpy(&src_addr, BDADDR_ANY);
++	else if (hci_devba(dev_id, &src_addr) < 0) {
++		perror("Adapter not available");
 +		return EXIT_FAILURE;
 +	}
 +
-+	if (verbose)
-+		bt_att_set_debug(att, att_debug, "att: ", NULL);
-+
-+	bt_att_set_close_on_unref(att, true);
-+
-+	for (i = 0; command[i].cmd; i++) {
-+		if (strcmp(command[i].cmd, argv[0]) == 0)
-+			break;
-+	}
-+
-+	if (command[i].cmd == NULL) {
-+		fprintf(stderr, "Unknown command: %s\n", argv[0]);
-+		bt_att_unref(att);
++	if (!dest_given) {
++		fprintf(stderr, "Destination address required\n");
 +		return EXIT_FAILURE;
 +	}
 +
-+	command[i].func(att, argc, argv);
-+
-+	exit_status = mainloop_run();
-+
-+	bt_att_cancel_all(att);
-+	bt_att_unref(att);
-+
-+	return exit_status;
- }
++	return 0;
++}
 -- 
 1.8.3.2
 
