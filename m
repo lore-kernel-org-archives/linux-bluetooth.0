@@ -3,45 +3,60 @@ From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 5/6] Bluetooth: Avoid pooling TX power for LE links
-Date: Fri,  9 May 2014 21:35:32 +0200
-Message-Id: <1399664133-2892-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 2/6] Bluetooth: Move eir_append_data up
+Date: Fri,  9 May 2014 21:35:29 +0200
+Message-Id: <1399664133-2892-3-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1399664133-2892-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1399664133-2892-1-git-send-email-andrzej.kaczmarek@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-TX power for LE links is immutable thus we do not need to query for it
-if already have value.
+This patch moves eir_append_data up in file, close to other eir-related
+functions, so we can use it later in mgmt handlers.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 ---
- net/bluetooth/mgmt.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ net/bluetooth/mgmt.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a7f45d2..cac2edf 100644
+index f2a9422..5e88ac9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -4756,10 +4756,16 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -701,6 +701,17 @@ static void update_adv_data(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_LE_SET_ADV_DATA, sizeof(cp), &cp);
+ }
  
- 		hci_req_init(&req, hdev);
++static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
++				  u8 data_len)
++{
++	eir[eir_len++] = sizeof(type) + data_len;
++	eir[eir_len++] = type;
++	memcpy(&eir[eir_len], data, data_len);
++	eir_len += data_len;
++
++	return eir_len;
++}
++
+ static void create_eir(struct hci_dev *hdev, u8 *data)
+ {
+ 	u8 *ptr = data;
+@@ -5105,17 +5116,6 @@ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
+ 	mgmt_event(MGMT_EV_NEW_CSRK, hdev, &ev, sizeof(ev), NULL);
+ }
  
--		req_txp_cp.handle = cpu_to_le16(conn->handle);
--		req_txp_cp.type = 0x00;
--		hci_req_add(&req, HCI_OP_READ_TX_POWER_LEVEL,
--			    sizeof(req_txp_cp), &req_txp_cp);
-+		/* For LE links TX power is immutable so we don't need to query
-+		 * controller again once value is known.
-+		 */
-+		if (!bdaddr_type_is_le(cp->addr.type) ||
-+		    conn->tx_power == HCI_TX_POWER_INVALID) {
-+			req_txp_cp.handle = cpu_to_le16(conn->handle);
-+			req_txp_cp.type = 0x00;
-+			hci_req_add(&req, HCI_OP_READ_TX_POWER_LEVEL,
-+				    sizeof(req_txp_cp), &req_txp_cp);
-+		}
- 
- 		req_rssi_cp.handle = cpu_to_le16(conn->handle);
- 		hci_req_add(&req, HCI_OP_READ_RSSI, sizeof(req_rssi_cp),
+-static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type, u8 *data,
+-				  u8 data_len)
+-{
+-	eir[eir_len++] = sizeof(type) + data_len;
+-	eir[eir_len++] = type;
+-	memcpy(&eir[eir_len], data, data_len);
+-	eir_len += data_len;
+-
+-	return eir_len;
+-}
+-
+ void mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			   u8 addr_type, u32 flags, u8 *name, u8 name_len,
+ 			   u8 *dev_class)
 -- 
 1.9.2
