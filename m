@@ -2,185 +2,261 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v1 05/10] src/shared/att: Add "Find Information" request and response.
-Date: Fri,  9 May 2014 13:13:55 -0700
-Message-Id: <1399666440-14078-6-git-send-email-armansito@chromium.org>
+Subject: [PATCH v1 04/10] tools/btatt: Add "exchange-mtu" command.
+Date: Fri,  9 May 2014 13:13:54 -0700
+Message-Id: <1399666440-14078-5-git-send-email-armansito@chromium.org>
 In-Reply-To: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for the "Find Information" request and response
-with their corresponding parameter structures.
----
- src/shared/att.c | 93 +++++++++++++++++++++++++++++++++++++++++++++++++++-----
- src/shared/att.h | 14 +++++++++
- 2 files changed, 99 insertions(+), 8 deletions(-)
+Added command for "Exchange MTU" request/response. Also added code for
+initiating an L2CAP connection over the ATT channel. Tested using a CSR
+uEnergy 1000 board with the following results:
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 515d9ec..4e0d839 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -191,6 +191,8 @@ static bool handle_exchange_mtu_rsp(struct bt_att *att, const uint8_t *pdu,
- 	if (pdu_length != 3)
- 		return false;
+$ btatt -d 00:02:5B:00:15:10 -v exchange-mtu 50
+Going to set MTU to 16 bit value: 50
+att: ATT command 0x02
+att < 02 32 00
+att > 03 17 00
+Exchange MTU response: Server Rx MTU 23
+---
+ tools/btatt.c | 191 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 190 insertions(+), 1 deletion(-)
+
+diff --git a/tools/btatt.c b/tools/btatt.c
+index 476bb94..de8d300 100644
+--- a/tools/btatt.c
++++ b/tools/btatt.c
+@@ -31,6 +31,7 @@
+ #include <string.h>
  
-+	memset(&param, 0, sizeof(param));
-+
- 	param.server_rx_mtu = get_le16(pdu + 1);
+ #include <bluetooth/bluetooth.h>
++#include <bluetooth/l2cap.h>
  
- 	request_complete(att, ATT_OP_EXCHANGE_MTU_REQ, pdu[0],
-@@ -199,16 +201,67 @@ static bool handle_exchange_mtu_rsp(struct bt_att *att, const uint8_t *pdu,
- 	return true;
- }
+ #include "monitor/mainloop.h"
+ #include "src/shared/att.h"
+@@ -39,11 +40,152 @@
  
-+static bool handle_find_info_rsp(struct bt_att *att, const uint8_t *pdu,
-+							uint16_t pdu_length)
+ static bool verbose = false;
+ 
++static void handle_error(const void *param, uint16_t len)
 +{
-+	struct bt_att_find_information_rsp_param param;
-+	uint8_t *information_data;
++	const struct bt_att_error_rsp_param *rp = param;
 +
-+	if (pdu_length < 6)
-+		return false;
-+
-+	memset(&param, 0, sizeof(param));
-+
-+	param.format = pdu[1];
-+	param.length = pdu_length - 2;
-+
-+	/* param.length is at least 4, as checked above */
-+	information_data = malloc(param.length);
-+	if (!information_data)
-+		return false;
-+
-+	memcpy(information_data, pdu + 2, param.length);
-+
-+	param.information_data = information_data;
-+
-+	request_complete(att, ATT_OP_FIND_INFORMATION_REQ, pdu[0],
-+							&param, sizeof(param));
-+
-+	free(information_data);
-+
-+	return true;
-+}
-+
- static bool handle_response(struct bt_att *att, const uint8_t *pdu,
- 							uint16_t pdu_length)
- {
- 	uint8_t opcode = pdu[0];
-+	uint8_t req_opcode;
- 
--	if (opcode == ATT_OP_ERROR_RESP)
-+	switch (opcode) {
-+	case ATT_OP_ERROR_RESP:
- 		return handle_error_rsp(att, pdu, pdu_length);
- 
--	if (opcode == ATT_OP_EXCHANGE_MTU_RESP)
--		return handle_exchange_mtu_rsp(att, pdu, pdu_length);
-+	case ATT_OP_EXCHANGE_MTU_RESP:
-+		if (!handle_exchange_mtu_rsp(att, pdu, pdu_length)) {
-+			req_opcode = ATT_OP_EXCHANGE_MTU_REQ;
-+			goto fail;
-+		}
-+		return true;
-+
-+	case ATT_OP_FIND_INFORMATION_RESP:
-+		if (!handle_find_info_rsp(att, pdu, pdu_length)) {
-+			req_opcode = ATT_OP_FIND_INFORMATION_REQ;
-+			goto fail;
-+		}
-+		return true;
-+
-+	default:
-+		break;
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Invalid error response length (%u)\n", len);
++		return;
 +	}
 +
-+fail:
-+	request_complete(att, req_opcode, ATT_OP_ERROR_RESP, NULL, 0);
- 
- 	return false;
- }
-@@ -395,14 +448,36 @@ static bool encode_mtu_req(const void *param, uint16_t length, void *buf,
- {
- 	const struct bt_att_exchange_mtu_req_param *cp = param;
- 	const uint16_t len = 3;
-+	uint8_t *bytes = buf;
- 
--	if (length != sizeof(struct bt_att_exchange_mtu_req_param))
-+	if (length != sizeof(*cp))
- 		return false;
- 
- 	if (len > mtu)
- 		return false;
- 
--	put_le16(cp->client_rx_mtu, buf);
-+	put_le16(cp->client_rx_mtu, bytes + 1);
-+	*pdu_length = len;
-+
-+	return true;
++	printf("Request failed:\n\topcode:\t%u\n\thandle:\t%u\n\terror:\t%u\n",
++			rp->request_opcode, rp->handle, rp->error_code);
 +}
 +
-+static bool encode_find_info_req(const void *param, uint16_t length, void *buf,
-+						uint16_t mtu, uint16_t *pdu_length)
++static void exchange_mtu_cb(uint8_t opcode, const void *param,
++						uint16_t len, void *user_data)
 +{
-+	const struct bt_att_find_information_req_param *cp = param;
-+	const uint16_t len = 5;
-+	uint8_t *bytes = buf;
++	const struct bt_att_exchange_mtu_rsp_param *rp;
 +
-+	if (length != sizeof(*cp))
-+		return false;
++	if (opcode == ATT_OP_ERROR_RESP) {
++		handle_error(param, len);
++		goto done;
++	}
 +
-+	if (len > mtu)
-+		return false;
++	if (opcode != ATT_OP_EXCHANGE_MTU_RESP) {
++		fprintf(stderr, "Invalid response opcode (%u)\n", opcode);
++		goto done;
++	}
 +
-+	put_le16(cp->start_handle, bytes + 1);
-+	put_le16(cp->end_handle, bytes + 3);
++	rp = param;
 +
- 	*pdu_length = len;
- 
- 	return true;
-@@ -429,10 +504,12 @@ static bool encode_pdu(uint8_t opcode, const void *param, uint16_t length,
- 	if (!param)
- 		return false;
- 
--	if (opcode == ATT_OP_EXCHANGE_MTU_REQ) {
--		return encode_mtu_req(param, length, bytes + 1,
-+	if (opcode == ATT_OP_EXCHANGE_MTU_REQ)
-+		return encode_mtu_req(param, length, bytes, mtu, pdu_length);
++	if (len != sizeof(*rp)) {
++		fprintf(stderr, "Invalid \"Exchange MTU\" response length "
++								"(%u)\n", len);
++		goto done;
++	}
 +
-+	if (opcode == ATT_OP_FIND_INFORMATION_REQ)
-+		return encode_find_info_req(param, length, bytes,
- 							mtu, pdu_length);
--	}
- 
- 	return false;
- }
-diff --git a/src/shared/att.h b/src/shared/att.h
-index 34cb005..569116a 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -43,6 +43,20 @@ struct bt_att_exchange_mtu_rsp_param {
- 	uint16_t server_rx_mtu;
++	printf("Exchange MTU response: Server Rx MTU: %u\n", rp->server_rx_mtu);
++
++done:
++	mainloop_quit();
++}
++
++static void mtu_usage(void)
++{
++	printf("Usage: btatt exchange-mtu <ATT_MTU>\n");
++}
++
++static struct option mtu_options[] = {
++	{ "help",	0, 0, 'h'},
++	{}
++};
++
++static void cmd_mtu(struct bt_att *att, int argc, char **argv)
++{
++	struct bt_att_exchange_mtu_req_param param;
++	uint16_t mtu;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+h", mtu_options,
++							NULL)) != -1) {
++		switch (opt) {
++		case 'h':
++		default:
++			mtu_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		mtu_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	mtu = atoi(argv[0]);
++
++	if (verbose)
++		printf("Going to set MTU to 16 bit value: %u\n", mtu);
++
++	memset(&param, 0, sizeof(param));
++	param.client_rx_mtu = mtu;
++	if (bt_att_send(att, ATT_OP_EXCHANGE_MTU_REQ, &param, sizeof(param),
++					exchange_mtu_cb, NULL, NULL) == 0) {
++		fprintf(stderr, "Unable to send \"Exchange MTU\" request\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
++static int l2cap_le_att_connect(bdaddr_t *src, bdaddr_t *dst, uint8_t dst_type)
++{
++	int sock;
++	struct sockaddr_l2 srcaddr, dstaddr;
++	char srcaddr_str[18], dstaddr_str[18];
++
++	if (verbose) {
++		ba2str(src, srcaddr_str);
++		ba2str(dst, dstaddr_str);
++
++		printf("Opening L2CAP LE connection on ATT channel: "
++					"src: %s dest: %s\n", srcaddr_str, dstaddr_str);
++	}
++
++	sock = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
++	if (sock < 0) {
++		perror("Failed to create L2CAP socket");
++		return -1;
++	}
++
++	/* Set up source address */
++	memset(&srcaddr, 0, sizeof(srcaddr));
++	srcaddr.l2_family = AF_BLUETOOTH;
++	bacpy(&srcaddr.l2_bdaddr, src);
++	srcaddr.l2_cid = htobs(ATT_CID);
++	srcaddr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
++
++	if (bind(sock, (struct sockaddr *) &srcaddr, sizeof(srcaddr)) < 0) {
++		perror("Failed to bind L2CAP socket");
++		close(sock);
++		return -1;
++	}
++
++	/* Set up destination address */
++	memset(&dstaddr, 0, sizeof(dstaddr));
++	dstaddr.l2_family = AF_BLUETOOTH;
++	bacpy(&dstaddr.l2_bdaddr, dst);
++	dstaddr.l2_cid = htobs(ATT_CID);
++	dstaddr.l2_bdaddr_type = dst_type;
++
++	if (connect(sock, (struct sockaddr *) &dstaddr, sizeof(dstaddr)) < 0) {
++		perror("Failed to connect");
++		close(sock);
++		return -1;
++	}
++
++	return sock;
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(struct bt_att *att, int argc, char **argv);
+ 	char *doc;
+ } command[] = {
++	{ "exchange-mtu",	cmd_mtu,	"\"Exchange MTU\" request." },
+ 	{ }
  };
  
-+/* Find Information */
-+#define ATT_OP_FIND_INFORMATION_REQ	0x04
-+struct bt_att_find_information_req_param {
-+	uint16_t start_handle;
-+	uint16_t end_handle;
-+};
+@@ -80,6 +222,13 @@ static struct option main_options[] = {
+ 	{ 0, 0, 0, 0}
+ };
+ 
++static void att_debug(const char *str, void *user_data)
++{
++	const char *prefix = user_data;
 +
-+#define ATT_OP_FIND_INFORMATION_RESP	0x05
-+struct bt_att_find_information_rsp_param {
-+	uint8_t format;
-+	const uint8_t *information_data;
-+	uint16_t length;
-+};
++	printf("%s%s\n", prefix, str);
++}
 +
- /* Error codes for Error response PDU */
- #define ATT_ERROR_INVALID_HANDLE			0x01
- #define ATT_ERROR_READ_NOT_PERMITTED			0x02
+ int main(int argc, char *argv[])
+ {
+ 	int opt, i;
+@@ -88,6 +237,8 @@ int main(int argc, char *argv[])
+ 	uint8_t dest_type = BDADDR_LE_PUBLIC;
+ 	bdaddr_t src_addr, dst_addr;
+ 	int fd;
++	struct bt_att *att;
++	int exit_status;
+ 
+ 	while ((opt = getopt_long(argc, argv, "+hvt:i:d:",
+ 						main_options, NULL)) != -1) {
+@@ -148,5 +299,43 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
+ 
+-	return 0;
++	mainloop_init();
++
++	fd = l2cap_le_att_connect(&src_addr, &dst_addr, dest_type);
++
++	if (fd < 0)
++		return EXIT_FAILURE;
++
++	att = bt_att_new(fd);
++
++	if (!att) {
++		fprintf(stderr, "Failed to create bt_att.");
++		close(fd);
++		return EXIT_FAILURE;
++	}
++
++	if (verbose)
++		bt_att_set_debug(att, att_debug, "att: ", NULL);
++
++	bt_att_set_close_on_unref(att, true);
++
++	for (i = 0; command[i].cmd; i++) {
++		if (strcmp(command[i].cmd, argv[0]) == 0)
++			break;
++	}
++
++	if (command[i].cmd == NULL) {
++		fprintf(stderr, "Unknown command: %s\n", argv[0]);
++		bt_att_unref(att);
++		return EXIT_FAILURE;
++	}
++
++	command[i].func(att, argc, argv);
++
++	exit_status = mainloop_run();
++
++	bt_att_cancel_all(att);
++	bt_att_unref(att);
++
++	return exit_status;
+ }
 -- 
 1.8.3.2
 
