@@ -1,71 +1,103 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 06/13] android/ipc: Use error printing error messages
-Date: Fri,  9 May 2014 12:19:48 +0300
-Message-Id: <1399627195-471-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <20140509081408.GD23010@aemeltch-MOBL1>
+References: <1399551937-27109-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<1399551937-27109-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+	<CABBYNZ+QNsM9aQ_5gM_dYYtSp9PP0YsSE+=4yHrvJbm1HBe06A@mail.gmail.com>
+	<20140509081408.GD23010@aemeltch-MOBL1>
+Date: Fri, 9 May 2014 11:16:32 +0300
+Message-ID: <CABBYNZ+VULHVKKUjhTDhV_p_sQdqpSU2xsPRGX2RTdVSWYjKhA@mail.gmail.com>
+Subject: Re: [PATCHv4 12/12] android/audio: Add write to SCO
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-This helps to identify problem since DBG is not printed by default.
----
- android/ipc.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+On Fri, May 9, 2014 at 11:14 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Thu, May 08, 2014 at 04:51:48PM +0300, Luiz Augusto von Dentz wrote:
+>> Hi Andrei,
+>>
+>> On Thu, May 8, 2014 at 3:25 PM, Andrei Emeltchenko
+>> <Andrei.Emeltchenko.news@gmail.com> wrote:
+>> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>> >
+>> > For synchronization interleave read() and write().
+>> > ---
+>> >  android/hal-sco.c | 73 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>> >  1 file changed, 73 insertions(+)
+>> >
+>> > diff --git a/android/hal-sco.c b/android/hal-sco.c
+>> > index 7b6608b..5ec56ce 100644
+>> > --- a/android/hal-sco.c
+>> > +++ b/android/hal-sco.c
+>> > @@ -41,6 +41,8 @@
+>> >  #define OUT_BUFFER_SIZE                        2560
+>> >  #define OUT_STREAM_FRAMES              2560
+>> >
+>> > +#define SOCKET_POLL_TIMEOUT_MS         500
+>> > +
+>> >  static int listen_sk = -1;
+>> >  static int audio_sk = -1;
+>> >
+>> > @@ -275,6 +277,74 @@ static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
+>> >         }
+>> >  }
+>> >
+>> > +static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+>> > +                                                               size_t bytes)
+>> > +{
+>> > +       struct pollfd pfd;
+>> > +       size_t len, written = 0;
+>> > +       int ret;
+>> > +       uint16_t mtu = /* out->cfg.mtu */ 48;
+>> > +       uint8_t read_buf[mtu];
+>> > +       bool do_write = false;
+>> > +
+>> > +       pfd.fd = out->fd;
+>> > +       pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
+>> > +
+>> > +       while (bytes > written) {
+>> > +
+>> > +               /* poll for sending */
+>> > +               if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
+>> > +                       DBG("timeout fd %d", out->fd);
+>> > +                       return false;
+>> > +               }
+>> > +
+>> > +               if (pfd.revents & (POLLHUP | POLLNVAL)) {
+>> > +                       error("error fd %d, events 0x%x", out->fd, pfd.revents);
+>> > +                       return false;
+>> > +               }
+>> > +
+>> > +               if (pfd.revents & POLLIN) {
+>> > +                       ret = read(out->fd, read_buf, mtu);
+>> > +                       if (ret < 0) {
+>> > +                               error("Error reading fd %d (%s)", out->fd,
+>> > +                                                       strerror(errno));
+>> > +                               return false;
+>> > +                       }
+>> > +
+>> > +                       do_write = true;
+>>
+>> You probably gonna have store the read data in a buffer to be read by
+>> upper layer after remixed to 44.1 KHz, to safe space you can probably
+>> leave the remixing to be done on the read callback. Im fine to do this
+>> in a separate patch but we should at least add a comment about it.
+>
+> I think we need to have special thread which does read-write since Android
+> might call read() without write().
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 8cd34ea..be963b5 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -96,31 +96,31 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	const struct ipc_handler *handler;
- 
- 	if (len < (ssize_t) sizeof(*msg)) {
--		DBG("message too small (%zd bytes)", len);
-+		error("IPC: message too small (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
- 
- 	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
--		DBG("message malformed (%zd bytes)", len);
-+		error("IPC: message malformed (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
- 
- 	/* if service is valid */
- 	if (msg->service_id > max_index) {
--		DBG("unknown service (0x%x)", msg->service_id);
-+		error("IPC: unknown service (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* if service is registered */
- 	if (!handlers[msg->service_id].handler) {
--		DBG("service not registered (0x%x)", msg->service_id);
-+		error("IPC: service not registered (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* if opcode is valid */
- 	if (msg->opcode == IPC_OP_STATUS ||
- 			msg->opcode > handlers[msg->service_id].size) {
--		DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
-+		error("IPC: invalid opcode 0x%x for service 0x%x", msg->opcode,
- 							msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
-@@ -131,7 +131,7 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	/* if payload size is valid */
- 	if ((handler->var_len && handler->data_len > msg->len) ||
- 			(!handler->var_len && handler->data_len != msg->len)) {
--		DBG("invalid size for opcode 0x%x service 0x%x",
-+		error("IPC: invalid size for opcode 0x%x service 0x%x",
- 						msg->opcode, msg->service_id);
- 		return -EMSGSIZE;
- 	}
+PulseAudio synchronize by time if audio in not open in both direction,
+this means we would have to sleep as we do in A2DP.
+
+
 -- 
-1.8.3.2
-
+Luiz Augusto von Dentz
