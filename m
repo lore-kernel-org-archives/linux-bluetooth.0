@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 12/13] android/audio: Add write to SCO
-Date: Fri,  9 May 2014 12:19:54 +0300
-Message-Id: <1399627195-471-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 03/13] android/audio: Add Audio SCO message API
+Date: Fri,  9 May 2014 12:19:45 +0300
+Message-Id: <1399627195-471-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,110 +11,98 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For synchronization interleave read() and write().
+SCO API will be used when communicating with SCO Audio HAL.
 ---
- android/hal-sco.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 74 insertions(+)
+ android/sco-ipc-api.txt | 36 ++++++++++++++++++++++++++++++++++++
+ android/sco-msg.h       | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 72 insertions(+)
+ create mode 100644 android/sco-ipc-api.txt
+ create mode 100644 android/sco-msg.h
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 1256144..a36edf5 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -41,6 +41,8 @@
- #define OUT_BUFFER_SIZE			2560
- #define OUT_STREAM_FRAMES		2560
- 
-+#define SOCKET_POLL_TIMEOUT_MS		500
+diff --git a/android/sco-ipc-api.txt b/android/sco-ipc-api.txt
+new file mode 100644
+index 0000000..75b2cba
+--- /dev/null
++++ b/android/sco-ipc-api.txt
+@@ -0,0 +1,36 @@
++Bluetooth SCO Audio Plugin
++==========================
 +
- static int listen_sk = -1;
- static int audio_sk = -1;
- 
-@@ -275,6 +277,75 @@ static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
- 	}
- }
- 
-+static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
-+								size_t bytes)
-+{
-+	struct pollfd pfd;
-+	size_t len, written = 0;
-+	int ret;
-+	uint16_t mtu = /* out->cfg.mtu */ 48;
-+	uint8_t read_buf[mtu];
-+	bool do_write = false;
++The SCO Audio Plugin communicate through abstract socket name
++"\0bluez_sco_socket".
 +
-+	pfd.fd = out->fd;
-+	pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
++	.---Audio---.                             .--Android--.
++	|  Plugin   |                             |   Daemon  |
++	|           |          Command            |           |
++	|           | --------------------------> |           |
++	|           |                             |           |
++	|           | <-------------------------- |           |
++	|           |          Response           |           |
++	|           |                             |           |
++	|           |                             |           |
++	|           |                             |           |
++	'-----------'                             '-----------'
 +
-+	while (bytes > written) {
 +
-+		/* poll for sending */
-+		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
-+			DBG("timeout fd %d", out->fd);
-+			return false;
-+		}
++	Audio HAL                               Daemon
++	----------------------------------------------------
 +
-+		if (pfd.revents & (POLLHUP | POLLNVAL)) {
-+			error("error fd %d, events 0x%x", out->fd, pfd.revents);
-+			return false;
-+		}
++	call connect_sco()                    --> create SCO socket
++	return connect_sco()                  <-- return socket fd and mtu
 +
-+		/* FIXME synchronize by time instead of read() */
-+		if (pfd.revents & POLLIN) {
-+			ret = read(out->fd, read_buf, mtu);
-+			if (ret < 0) {
-+				error("Error reading fd %d (%s)", out->fd,
-+							strerror(errno));
-+				return false;
-+			}
++SCO Audio Service (ID 0)
++========================
 +
-+			do_write = true;
-+		}
++	Opcode 0x00 - Error response
 +
-+		if (!do_write)
-+			continue;
++		Response parameters: Status (1 octet)
 +
-+		len = bytes - written > mtu ? mtu : bytes - written;
++	Opcode 0x01 - Connect Audio SCO command
 +
-+		ret = write(out->fd, buffer + written, len);
-+		if (ret > 0) {
-+			written += ret;
-+			do_write = false;
-+			continue;
-+		}
++		Command parameters: <none>
++		Response parameters: MTU (2 octets)
+diff --git a/android/sco-msg.h b/android/sco-msg.h
+new file mode 100644
+index 0000000..cd2f894
+--- /dev/null
++++ b/android/sco-msg.h
+@@ -0,0 +1,36 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+		if (errno == EAGAIN) {
-+			ret = errno;
-+			warn("write failed (%d)", ret);
-+			continue;
-+		}
++static const char BLUEZ_SCO_SK_PATH[] = "\0bluez_sco_socket";
 +
-+		if (errno != EINTR) {
-+			ret = errno;
-+			error("write failed (%d) fd %d bytes %zd", ret, out->fd,
-+									bytes);
-+			return false;
-+		}
-+	}
++#define AUDIO_SERVICE_SCO_ID		1
 +
-+	DBG("written %zd bytes", bytes);
++#define AUDIO_STATUS_SUCCESS		IPC_STATUS_SUCCESS
++#define AUDIO_STATUS_FAILED		0x01
 +
-+	return true;
-+}
++#define AUDIO_OP_STATUS			IPC_OP_STATUS
 +
- static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 								size_t bytes)
- {
-@@ -320,6 +391,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 
- 	DBG("total %zd", total);
- 
-+	if (!write_data(out, send_buf, total))
-+		return -1;
-+
- 	return bytes;
- }
- 
++#define AUDIO_OP_CONNECT_SCO		0x01
++struct audio_rsp_connect_sco {
++	uint16_t mtu;
++} __attribute__((packed));
 -- 
 1.8.3.2
 
