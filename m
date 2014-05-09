@@ -1,59 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Rick Mann <rmann@latencyzero.com>
-Content-Type: multipart/signed; boundary="Apple-Mail=_B857D3EA-F527-493B-A292-717959D4A796"; protocol="application/pgp-signature"; micalg=pgp-sha1
-Message-Id: <EA6ABF6E-51A5-47B3-B61E-0A0745627A96@latencyzero.com>
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: Bluez 5.18 on 3.12
-Date: Fri, 9 May 2014 10:28:36 -0700
-References: <BC611432-5B36-4EA5-8667-082F55020330@me.com>
-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <BC611432-5B36-4EA5-8667-082F55020330@me.com>
+MIME-Version: 1.0
+In-Reply-To: <20140509115045.GA3536@t440s.lan>
+References: <20140509014001.0A027100DB2@puck.mtv.corp.google.com>
+	<20140509115045.GA3536@t440s.lan>
+Date: Fri, 9 May 2014 09:44:22 -0700
+Message-ID: <CAGXr9JH9F+HdZj9PzeTZwnb9MCctHJkgW9BTL8SD-2bPXG8j0A@mail.gmail.com>
+Subject: Re: [PATCH] hog: Fix report_value_cb()
+From: Petri Gynther <pgynther@google.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Johan,
 
---Apple-Mail=_B857D3EA-F527-493B-A292-717959D4A796
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=us-ascii
+On Fri, May 9, 2014 at 4:50 AM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Petri,
+>
+> On Thu, May 08, 2014, Petri Gynther wrote:
+>> 1. Fix potential buffer overflow. It would happen in the case:
+>>    hogdev->has_report_id == TRUE && report_size == UHID_DATA_MAX
+>>
+>> 2. Adjust function signature to match GAttribNotifyFunc.
+>>
+>> 3. Adjust uHID error handling to mimic uhid_send_input_report() in
+>>    profiles/input/device.c
+>> ---
+>>  profiles/input/hog.c | 44 +++++++++++++++++++++++++++++---------------
+>>  1 file changed, 29 insertions(+), 15 deletions(-)
+>
+> Whenever I see a commit message like this it begs the question:
+> shouldn't these separate fixes be in separate patches? If at all
+> possible please split the patch into smaller ones so that each one
+> contains a single independent fix. That makes it much easier to track
+> exactly which code change maps to which described fix as well the
+> possibility to do some bisecting later in case one of the fixes
+> introduces a bug.
+>
+> Johan
 
-Yesterday I got it up and running on 3.10.
+Fair enough. I'll break this down to three commits and send a new
+patch out shortly.
 
-On May 9, 2014, at 02:40 , David Eriksson <ftslc@me.com> wrote:
-
-> Hi,
->=20
-> Anyone here that have a feeling on how hard it would be to get bluez =
-5.18+ with mgmt api running on 3.12?
->=20
-> David
-> --
-> To unsubscribe from this list: send the line "unsubscribe =
-linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-
---=20
-Rick
-
-
-
-
---Apple-Mail=_B857D3EA-F527-493B-A292-717959D4A796
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iEYEARECAAYFAlNtEEQACgkQBzBA/9aDmJv4rQCgprzkQwV3sms3r9jZbHeCLVbn
-Rc0An2QbkJ0eIcRAsNc+qrG8jGwAzCsV
-=/BE2
------END PGP SIGNATURE-----
-
---Apple-Mail=_B857D3EA-F527-493B-A292-717959D4A796--
+-- Petri
