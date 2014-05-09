@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 10/13] android/audio: Add downmix support to audio SCO HAL
-Date: Fri,  9 May 2014 12:19:52 +0300
-Message-Id: <1399627195-471-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 13/13] android/handsfree: Do not make unneeded VOICE ioctl()
+Date: Fri,  9 May 2014 12:19:55 +0300
+Message-Id: <1399627195-471-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,135 +12,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 49 ++++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 44 insertions(+), 5 deletions(-)
+ android/handsfree.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 4153139..09eea1c 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -28,6 +28,7 @@
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
+diff --git a/android/handsfree.c b/android/handsfree.c
+index e694503..befaa6f 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -930,8 +930,9 @@ static bool connect_sco(void)
+ 	if (device.sco)
+ 		return false;
  
-+#include "../src/shared/util.h"
- #include "sco-msg.h"
- #include "ipc-common.h"
- #include "hal-log.h"
-@@ -36,6 +37,7 @@
- #define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
- 
- #define OUT_BUFFER_SIZE			2560
-+#define OUT_STREAM_FRAMES		2560
- 
- static int listen_sk = -1;
- static int audio_sk = -1;
-@@ -46,6 +48,7 @@ static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
- struct sco_audio_config {
- 	uint32_t rate;
- 	uint32_t channels;
-+	uint32_t frame_num;
- 	uint16_t mtu;
- 	audio_format_t format;
- };
-@@ -55,6 +58,8 @@ struct sco_stream_out {
- 
- 	struct sco_audio_config cfg;
- 	int fd;
-+
-+	uint8_t *downmix_buf;
- };
- 
- struct sco_audio_dev {
-@@ -233,15 +238,35 @@ static int ipc_connect_sco(int *fd, uint16_t *mtu)
- 
- /* Audio stream functions */
- 
-+static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
-+							size_t frame_num)
-+{
-+	const int16_t *input = (const void *) buffer;
-+	int16_t *output = (void *) out->downmix_buf;
-+	size_t i;
-+
-+	for (i = 0; i < frame_num; i++) {
-+		int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
-+		int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
-+
-+		put_unaligned(cpu_to_le16((l + r) >> 1), &output[i]);
-+	}
-+}
-+
- static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 								size_t bytes)
- {
- 	struct sco_stream_out *out = (struct sco_stream_out *) stream;
--
--	/* write data */
-+	size_t frame_num = bytes / audio_stream_frame_size(&out->stream.common);
- 
- 	DBG("write to fd %d bytes %zu", out->fd, bytes);
- 
-+	if (!out->downmix_buf) {
-+		error("audio: downmix buffer not initialized");
-+		return -1;
-+	}
-+
-+	downmix_to_mono(out, buffer, frame_num);
- 	return bytes;
- }
- 
-@@ -263,9 +288,13 @@ static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
- 
- static size_t out_get_buffer_size(const struct audio_stream *stream)
- {
--	DBG("buf size %u", OUT_BUFFER_SIZE);
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+	size_t size = audio_stream_frame_size(&out->stream.common) *
-+							out->cfg.frame_num;
-+
-+	DBG("buf size %zd", size);
- 
--	return OUT_BUFFER_SIZE;
-+	return size;
- }
- 
- static uint32_t out_get_channels(const struct audio_stream *stream)
-@@ -407,8 +436,16 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
- 	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
- 	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
- 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
-+	out->cfg.frame_num = OUT_STREAM_FRAMES;
- 	out->cfg.mtu = mtu;
- 
-+	out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
-+	if (!out->downmix_buf) {
-+		free(out);
-+		return -ENOMEM;
-+	}
-+
-+	DBG("size %zd", out_get_buffer_size(&out->stream.common));
- 	*stream_out = &out->stream;
- 	adev->out = out;
- 	out->fd = fd;
-@@ -420,6 +457,7 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
- 					struct audio_stream_out *stream_out)
- {
- 	struct sco_audio_dev *sco_dev = (struct sco_audio_dev *) dev;
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
- 
- 	DBG("dev %p stream %p fd %d", dev, stream_out, sco_dev->out->fd);
- 
-@@ -428,7 +466,8 @@ static void audio_close_output_stream(struct audio_hw_device *dev,
- 		sco_dev->out->fd = -1;
- 	}
- 
--	free(stream_out);
-+	free(out->downmix_buf);
-+	free(out);
- 	sco_dev->out = NULL;
- }
- 
+-	if ((device.features & HFP_HF_FEAT_CODEC) &&
+-				device.negotiated_codec != CODEC_ID_CVSD)
++	if (!(device.features & HFP_HF_FEAT_CODEC))
++		voice_settings = 0;
++	else if (device.negotiated_codec != CODEC_ID_CVSD)
+ 		voice_settings = BT_VOICE_TRANSPARENT;
+ 	else
+ 		voice_settings = BT_VOICE_CVSD_16BIT;
 -- 
 1.8.3.2
 
