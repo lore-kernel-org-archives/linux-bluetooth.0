@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 02/13] android/hal-audio-hsp: Add open_output_stream()
-Date: Fri,  9 May 2014 12:19:44 +0300
-Message-Id: <1399627195-471-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv5 11/13] android/audio: Use resampler interface to resample SCO
+Date: Fri,  9 May 2014 12:19:53 +0300
+Message-Id: <1399627195-471-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,211 +11,207 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Function adds audio_open_output_stream() and sets dummy callbacks.
+Resample Android audio from 44100 to 8000.
 ---
- android/hal-sco.c | 179 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 176 insertions(+), 3 deletions(-)
+ android/hal-sco.c | 112 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 105 insertions(+), 7 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 5a70aba..6711d7f 100644
+index 09eea1c..1256144 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -25,22 +25,195 @@
+@@ -27,6 +27,7 @@
  
+ #include <hardware/audio.h>
+ #include <hardware/hardware.h>
++#include <audio_utils/resampler.h>
+ 
+ #include "../src/shared/util.h"
+ #include "sco-msg.h"
+@@ -34,6 +35,7 @@
  #include "hal-log.h"
  
-+#define AUDIO_STREAM_DEFAULT_RATE	44100
-+#define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
+ #define AUDIO_STREAM_DEFAULT_RATE	44100
++#define AUDIO_STREAM_SCO_RATE		8000
+ #define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
+ 
+ #define OUT_BUFFER_SIZE			2560
+@@ -60,6 +62,10 @@ struct sco_stream_out {
+ 	int fd;
+ 
+ 	uint8_t *downmix_buf;
 +
-+#define OUT_BUFFER_SIZE			2560
-+
-+struct sco_audio_config {
-+	uint32_t rate;
-+	uint32_t channels;
-+	audio_format_t format;
-+};
-+
-+struct sco_stream_out {
-+	struct audio_stream_out stream;
-+	struct sco_audio_config cfg;
-+};
-+
- struct sco_audio_dev {
- 	struct audio_hw_device dev;
--	struct a2dp_stream_out *out;
-+	struct sco_stream_out *out;
++	struct resampler_itfe *resampler;
++	int16_t *resample_buf;
++	uint32_t resample_frame_num;
  };
  
-+/* Audio stream functions */
-+
-+static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
-+								size_t bytes)
-+{
-+	/* write data */
-+
-+	return bytes;
-+}
-+
-+static uint32_t out_get_sample_rate(const struct audio_stream *stream)
-+{
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+
-+	DBG("rate %u", out->cfg.rate);
-+
-+	return out->cfg.rate;
-+}
-+
-+static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
-+{
-+	DBG("rate %u", rate);
-+
-+	return 0;
-+}
-+
-+static size_t out_get_buffer_size(const struct audio_stream *stream)
-+{
-+	DBG("buf size %u", OUT_BUFFER_SIZE);
-+
-+	return OUT_BUFFER_SIZE;
-+}
-+
-+static uint32_t out_get_channels(const struct audio_stream *stream)
-+{
-+	DBG("");
-+
-+	/* AudioFlinger can only provide stereo stream, so we return it here and
-+	 * later we'll downmix this to mono in case codec requires it
-+	 */
-+	return AUDIO_CHANNEL_OUT_STEREO;
-+}
-+
-+static audio_format_t out_get_format(const struct audio_stream *stream)
-+{
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+
-+	DBG("");
-+
-+	return out->cfg.format;
-+}
-+
-+static int out_set_format(struct audio_stream *stream, audio_format_t format)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_standby(struct audio_stream *stream)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int out_dump(const struct audio_stream *stream, int fd)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
-+{
-+	DBG("%s", kvpairs);
-+
-+	return 0;
-+}
-+
-+static char *out_get_parameters(const struct audio_stream *stream,
-+							const char *keys)
-+{
-+	DBG("");
-+
-+	return strdup("");
-+}
-+
-+static uint32_t out_get_latency(const struct audio_stream_out *stream)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int out_set_volume(struct audio_stream_out *stream, float left,
-+								float right)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_get_render_position(const struct audio_stream_out *stream,
-+							uint32_t *dsp_frames)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_add_audio_effect(const struct audio_stream *stream,
-+							effect_handle_t effect)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_remove_audio_effect(const struct audio_stream *stream,
-+							effect_handle_t effect)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
- static int audio_open_output_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					audio_output_flags_t flags,
- 					struct audio_config *config,
- 					struct audio_stream_out **stream_out)
--
- {
-+	struct sco_audio_dev *adev = (struct sco_audio_dev *) dev;
-+	struct sco_stream_out *out;
-+
- 	DBG("");
+ struct sco_audio_dev {
+@@ -67,6 +73,22 @@ struct sco_audio_dev {
+ 	struct sco_stream_out *out;
+ };
  
--	return -EINVAL;
-+	out = calloc(1, sizeof(struct sco_stream_out));
-+	if (!out)
-+		return -ENOMEM;
++/*
++ * return the minimum frame numbers from resampling between BT stack's rate
++ * and audio flinger's. For output stream, 'output' shall be true, otherwise
++ * false for input streams at audio flinger side.
++ */
++static size_t get_resample_frame_num(uint32_t sco_rate, uint32_t rate,
++						size_t frame_num, bool output)
++{
++	size_t resample_frames_num = frame_num * sco_rate / rate + output;
 +
-+	out->stream.common.get_sample_rate = out_get_sample_rate;
-+	out->stream.common.set_sample_rate = out_set_sample_rate;
-+	out->stream.common.get_buffer_size = out_get_buffer_size;
-+	out->stream.common.get_channels = out_get_channels;
-+	out->stream.common.get_format = out_get_format;
-+	out->stream.common.set_format = out_set_format;
-+	out->stream.common.standby = out_standby;
-+	out->stream.common.dump = out_dump;
-+	out->stream.common.set_parameters = out_set_parameters;
-+	out->stream.common.get_parameters = out_get_parameters;
-+	out->stream.common.add_audio_effect = out_add_audio_effect;
-+	out->stream.common.remove_audio_effect = out_remove_audio_effect;
-+	out->stream.get_latency = out_get_latency;
-+	out->stream.set_volume = out_set_volume;
-+	out->stream.write = out_write;
-+	out->stream.get_render_position = out_get_render_position;
++	DBG("resampler: sco_rate %d frame_num %zd rate %d resample frames %zd",
++				sco_rate, frame_num, rate, resample_frames_num);
 +
-+	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
-+	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
-+	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	return resample_frames_num;
++}
 +
-+	*stream_out = &out->stream;
-+	adev->out = out;
+ /* Audio IPC functions */
+ 
+ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
+@@ -258,6 +280,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ {
+ 	struct sco_stream_out *out = (struct sco_stream_out *) stream;
+ 	size_t frame_num = bytes / audio_stream_frame_size(&out->stream.common);
++	size_t output_frame_num = frame_num;
++	void *send_buf = out->downmix_buf;
++	size_t total;
+ 
+ 	DBG("write to fd %d bytes %zu", out->fd, bytes);
+ 
+@@ -267,6 +292,34 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 	}
+ 
+ 	downmix_to_mono(out, buffer, frame_num);
 +
-+	return 0;
++	if (out->resampler) {
++		int ret;
++
++		/* limit resampler's output within what resample buf can hold */
++		output_frame_num = out->resample_frame_num;
++
++		ret = out->resampler->resample_from_input(out->resampler,
++								send_buf,
++								&frame_num,
++								out->resample_buf,
++								&output_frame_num);
++		if (ret) {
++			error("Failed to resample frames: %zd input %zd (%s)",
++				frame_num, output_frame_num, strerror(ret));
++			return -1;
++		}
++
++		send_buf = out->resample_buf;
++
++		DBG("Resampled: frame_num %zd, output_frame_num %zd", 
++						frame_num, output_frame_num);
++	}
++
++	total = output_frame_num * sizeof(int16_t) * 1;
++
++	DBG("total %zd", total);
++
+ 	return bytes;
+ }
+ 
+@@ -299,19 +352,18 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
+ 
+ static uint32_t out_get_channels(const struct audio_stream *stream)
+ {
+-	DBG("");
++	struct sco_stream_out *out = (struct sco_stream_out *) stream;
+ 
+-	/* AudioFlinger can only provide stereo stream, so we return it here and
+-	 * later we'll downmix this to mono in case codec requires it
+-	 */
+-	return AUDIO_CHANNEL_OUT_STEREO;
++	DBG("channels num: %u", popcount(out->cfg.channels));
++
++	return out->cfg.channels;
+ }
+ 
+ static audio_format_t out_get_format(const struct audio_stream *stream)
+ {
+ 	struct sco_stream_out *out = (struct sco_stream_out *) stream;
+ 
+-	DBG("");
++	DBG("format: %u", out->cfg.format);
+ 
+ 	return out->cfg.format;
+ }
+@@ -401,6 +453,8 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	struct sco_audio_dev *adev = (struct sco_audio_dev *) dev;
+ 	struct sco_stream_out *out;
+ 	int fd = -1;
++	int chan_num, ret;
++	size_t resample_size;
+ 	uint16_t mtu;
+ 
+ 	DBG("");
+@@ -433,8 +487,9 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	out->stream.write = out_write;
+ 	out->stream.get_render_position = out_get_render_position;
+ 
++	/* Configuration for Android */
+ 	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
+-	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
++	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+ 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+ 	out->cfg.mtu = mtu;
+@@ -446,11 +501,54 @@ static int audio_open_output_stream(struct audio_hw_device *dev,
+ 	}
+ 
+ 	DBG("size %zd", out_get_buffer_size(&out->stream.common));
++
++	/* Channel numbers for resampler */
++	chan_num = 1;
++
++	ret = create_resampler(out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num,
++						RESAMPLER_QUALITY_DEFAULT, NULL,
++						&out->resampler);
++	if (ret) {
++		error("Failed to create resampler (%s)", strerror(ret));
++		goto failed;
++	}
++
++	DBG("Created resampler: input rate [%d] output rate [%d] channels [%d]",
++				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num);
++
++	out->resample_frame_num = get_resample_frame_num(AUDIO_STREAM_SCO_RATE,
++							out->cfg.rate,
++							out->cfg.frame_num, 1);
++
++	if (!out->resample_frame_num) {
++		error("frame num is too small to resample, discard it");
++		goto failed;
++	}
++
++	resample_size = sizeof(int16_t) * chan_num * out->resample_frame_num;
++
++	out->resample_buf = malloc(resample_size);
++	if (!out->resample_buf) {
++		error("failed to allocate resample buffer for %u frames",
++						out->resample_frame_num);
++		goto failed;
++	}
++
++	DBG("resampler: frame num %u buf size %zd bytes", 
++					out->resample_frame_num, resample_size);
++
+ 	*stream_out = &out->stream;
+ 	adev->out = out;
+ 	out->fd = fd;
+ 
+ 	return 0;
++failed:
++	free(out->downmix_buf);
++	free(out);
++	stream_out = NULL;
++	adev->out = NULL;
++
++	return ret;
  }
  
  static void audio_close_output_stream(struct audio_hw_device *dev,
