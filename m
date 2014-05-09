@@ -1,79 +1,294 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 9 May 2014 13:27:48 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/8] Bluetooth: Add support for user data in hci_request
-Message-ID: <20140509102748.GA31552@t440s.lan>
-References: <1399555935-702-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1399555935-702-5-git-send-email-andrzej.kaczmarek@tieto.com>
- <5725B981-E83A-467E-80ED-18B9C8FE285F@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/bluetooth: Pass device to set_device_bond_state
+Date: Fri, 09 May 2014 12:00:24 +0200
+Message-ID: <1872105.MJAh2gK3j0@uw000953>
+In-Reply-To: <1399555563-21054-1-git-send-email-szymon.janc@tieto.com>
+References: <1399555563-21054-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <5725B981-E83A-467E-80ED-18B9C8FE285F@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
-
-On Thu, May 08, 2014, Marcel Holtmann wrote:
-> > This patch makes possible to store some user data in hci_request struct
-> > which will be available in completion callback. Data can be added when
-> > initializing new request using hci_req_init(). With this it's now easy
-> > to run request which can be associated with e.g. specific hci_conn.
-> > 
-> > Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-> > ---
-> > include/net/bluetooth/bluetooth.h |  3 +-
-> > include/net/bluetooth/hci_core.h  |  3 +-
-> > net/bluetooth/hci_conn.c          |  4 +-
-> > net/bluetooth/hci_core.c          | 29 +++++++++-----
-> > net/bluetooth/mgmt.c              | 84 +++++++++++++++++++++------------------
-> > 5 files changed, 69 insertions(+), 54 deletions(-)
-> > 
-> > diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> > index 904777c1..28378ad 100644
-> > --- a/include/net/bluetooth/bluetooth.h
-> > +++ b/include/net/bluetooth/bluetooth.h
-> > @@ -273,12 +273,13 @@ struct l2cap_ctrl {
-> > 
-> > struct hci_dev;
-> > 
-> > -typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status);
-> > +typedef void (*hci_req_complete_t)(struct hci_dev *hdev, u8 status, void *data);
-> > 
-> > struct hci_req_ctrl {
-> > 	bool			start;
-> > 	u8			event;
-> > 	hci_req_complete_t	complete;
-> > +	void			*data;
-> > };
-> > 
-> > struct bt_skb_cb {
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index 211bad6..30d245f 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -1162,6 +1162,7 @@ int hci_unregister_cb(struct hci_cb *hcb);
-> > struct hci_request {
-> > 	struct hci_dev		*hdev;
-> > 	struct sk_buff_head	cmd_q;
-> > +	void			*data;
-> > 
-> > 	/* If something goes wrong when building the HCI request, the error
-> > 	 * value is stored in this field.
-> > @@ -1169,7 +1170,7 @@ struct hci_request {
-> > 	int			err;
-> > };
-> > 
-> > -void hci_req_init(struct hci_request *req, struct hci_dev *hdev);
-> > +void hci_req_init(struct hci_request *req, struct hci_dev *hdev, void *data);
+On Thursday 08 of May 2014 15:26:01 Szymon Janc wrote:
+> This is in preparation for always having device object present when
+> handling events.
+> ---
+>  android/bluetooth.c | 104 ++++++++++++++++++++++++++++++++++------------------
+>  1 file changed, 68 insertions(+), 36 deletions(-)
 > 
-> do we really want to have everybody add extra data in here. We are now
-> touching every possible call that we have so far. I do not really like
-> this at the moment.
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 2bc79e2..4eb5e2f 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -643,15 +643,9 @@ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+>  				HAL_EV_BOND_STATE_CHANGED, sizeof(ev), &ev);
+>  }
+>  
+> -static void set_device_bond_state(const bdaddr_t *addr, uint8_t status,
+> +static void set_device_bond_state(struct device *dev, uint8_t status,
+>  								int state)
+>  {
+> -	struct device *dev;
+> -
+> -	dev = find_device(addr);
+> -	if (!dev)
+> -		return;
+> -
+>  	if (dev->bond_state == state)
+>  		return;
+>  
+> @@ -860,6 +854,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+>  {
+>  	const struct mgmt_ev_new_link_key *ev = param;
+>  	const struct mgmt_addr_info *addr = &ev->key.addr;
+> +	struct device *dev;
+>  	char dst[18];
+>  
+>  	if (length < sizeof(*ev)) {
+> @@ -878,8 +873,11 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+>  		return;
+>  	}
+>  
+> -	set_device_bond_state(&addr->bdaddr, HAL_STATUS_SUCCESS,
+> -							HAL_BOND_STATE_BONDED);
+> +	dev = find_device(&ev->key.addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDED);
+>  
+>  	if (ev->store_hint) {
+>  		const struct mgmt_link_key_info *key = &ev->key;
+> @@ -922,8 +920,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+>  	 */
+>  	get_device_name(dev);
+>  
+> -	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+> -						HAL_BOND_STATE_BONDING);
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDING);
+>  
+>  	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
+>  
+> @@ -959,6 +956,7 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	const struct mgmt_ev_user_confirm_request *ev = param;
+> +	struct device *dev;
+>  	char dst[18];
+>  
+>  	if (length < sizeof(*ev)) {
+> @@ -969,8 +967,11 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
+>  	ba2str(&ev->addr.bdaddr, dst);
+>  	DBG("%s confirm_hint %u", dst, ev->confirm_hint);
+>  
+> -	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+> -						HAL_BOND_STATE_BONDING);
+> +	dev = find_device(&ev->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDING);
+>  
+>  	if (ev->confirm_hint)
+>  		send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_CONSENT, 0);
+> @@ -983,6 +984,7 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	const struct mgmt_ev_user_passkey_request *ev = param;
+> +	struct device *dev;
+>  	char dst[18];
+>  
+>  	if (length < sizeof(*ev)) {
+> @@ -993,8 +995,11 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+>  	ba2str(&ev->addr.bdaddr, dst);
+>  	DBG("%s", dst);
+>  
+> -	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+> -						HAL_BOND_STATE_BONDING);
+> +	dev = find_device(&ev->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDING);
+>  
+>  	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_ENTRY, 0);
+>  }
+> @@ -1004,6 +1009,7 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
+>  							void *user_data)
+>  {
+>  	const struct mgmt_ev_passkey_notify *ev = param;
+> +	struct device *dev;
+>  	char dst[18];
+>  
+>  	if (length < sizeof(*ev)) {
+> @@ -1018,8 +1024,11 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
+>  	if (ev->entered)
+>  		return;
+>  
+> -	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+> -						HAL_BOND_STATE_BONDING);
+> +	dev = find_device(&ev->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDING);
+>  
+>  	send_ssp_request(&ev->addr.bdaddr, HAL_SSP_VARIANT_NOTIF, ev->passkey);
+>  }
+> @@ -1551,6 +1560,8 @@ static void mgmt_connect_failed_event(uint16_t index, uint16_t length,
+>  	DBG("");
+>  
+>  	dev = find_device(&ev->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+>  
+>  	/*
+>  	 * In case security mode 3 pairing we will get connect failed event
+> @@ -1558,10 +1569,11 @@ static void mgmt_connect_failed_event(uint16_t index, uint16_t length,
+>  	 * bonding, if so update bond state
+>  	 */
+>  
+> -	if (dev && dev->bond_state == HAL_BOND_STATE_BONDING)
+> -		set_device_bond_state(&ev->addr.bdaddr,
+> -						status_mgmt2hal(ev->status),
+> -						HAL_BOND_STATE_NONE);
+> +	if (dev->bond_state != HAL_BOND_STATE_BONDING)
+> +		return;
+> +
+> +	set_device_bond_state(dev, status_mgmt2hal(ev->status),
+> +							HAL_BOND_STATE_NONE);
+>  }
+>  
+>  static void mgmt_auth_failed_event(uint16_t index, uint16_t length,
+> @@ -1578,17 +1590,21 @@ static void mgmt_auth_failed_event(uint16_t index, uint16_t length,
+>  	DBG("");
+>  
+>  	dev = find_device(&ev->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	if (dev->bond_state != HAL_BOND_STATE_BONDING)
+> +		return;
+>  
+> -	if (dev && dev->bond_state == HAL_BOND_STATE_BONDING)
+> -		set_device_bond_state(&ev->addr.bdaddr,
+> -						status_mgmt2hal(ev->status),
+> -						HAL_BOND_STATE_NONE);
+> +	set_device_bond_state(dev, status_mgmt2hal(ev->status),
+> +							HAL_BOND_STATE_NONE);
+>  }
+>  
+>  static void mgmt_device_unpaired_event(uint16_t index, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	const struct mgmt_ev_device_unpaired *ev = param;
+> +	struct device *dev;
+>  
+>  	if (length < sizeof(*ev)) {
+>  		error("Too small device unpaired event (%u bytes)", length);
+> @@ -1599,8 +1615,11 @@ static void mgmt_device_unpaired_event(uint16_t index, uint16_t length,
+>  
+>  	/* TODO should device be disconnected ? */
+>  
+> -	set_device_bond_state(&ev->addr.bdaddr, HAL_STATUS_SUCCESS,
+> -							HAL_BOND_STATE_NONE);
+> +	dev = find_device(&ev->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_NONE);
+>  }
+>  
+>  static void store_ltk(const bdaddr_t *dst, uint8_t bdaddr_type, bool master,
+> @@ -1653,7 +1672,7 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	const struct mgmt_ev_new_long_term_key *ev = param;
+> -	const struct mgmt_addr_info *addr = &ev->key.addr;
+> +	struct device *dev;
+>  	char dst[18];
+>  
+>  	if (length < sizeof(*ev)) {
+> @@ -1661,13 +1680,16 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+>  		return;
+>  	}
+>  
+> -	ba2str(&addr->bdaddr, dst);
+> +	ba2str(&ev->key.addr.bdaddr, dst);
+>  
+>  	DBG("new LTK for %s type %u enc_size %u store_hint %u",
+>  			dst, ev->key.type, ev->key.enc_size, ev->store_hint);
+>  
+> -	set_device_bond_state(&addr->bdaddr, HAL_STATUS_SUCCESS,
+> -							HAL_BOND_STATE_BONDED);
+> +	dev = find_device(&ev->key.addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_BONDED);
+>  
+>  	if (ev->store_hint) {
+>  		const struct mgmt_ltk_info *key = &ev->key;
+> @@ -3110,6 +3132,7 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	const struct mgmt_rp_pair_device *rp = param;
+> +	struct device *dev;
+>  
+>  	DBG("status %u", status);
+>  
+> @@ -3120,7 +3143,11 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+>  	if (status == MGMT_STATUS_SUCCESS)
+>  		return;
+>  
+> -	set_device_bond_state(&rp->addr.bdaddr, status_mgmt2hal(status),
+> +	dev = find_device(&rp->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, status_mgmt2hal(status),
+>  							HAL_BOND_STATE_NONE);
+>  }
+>  
+> @@ -3156,8 +3183,9 @@ static void handle_create_bond_cmd(const void *buf, uint16_t len)
+>  
+>  	status = HAL_STATUS_SUCCESS;
+>  
+> -	set_device_bond_state(&cp.addr.bdaddr, HAL_STATUS_SUCCESS,
+> -						HAL_BOND_STATE_BONDING);
+> +	if (dev)
+> +		set_device_bond_state(dev, HAL_STATUS_SUCCESS,
+> +							HAL_BOND_STATE_BONDING);
+>  
+>  fail:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CREATE_BOND,
+> @@ -3200,14 +3228,18 @@ static void unpair_device_complete(uint8_t status, uint16_t length,
+>  					const void *param, void *user_data)
+>  {
+>  	const struct mgmt_rp_unpair_device *rp = param;
+> +	struct device *dev;
+>  
+>  	DBG("status %u", status);
+>  
+>  	if (status != MGMT_STATUS_SUCCESS && status != MGMT_STATUS_NOT_PAIRED)
+>  		return;
+>  
+> -	set_device_bond_state(&rp->addr.bdaddr, HAL_STATUS_SUCCESS,
+> -							HAL_BOND_STATE_NONE);
+> +	dev = find_device(&rp->addr.bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	set_device_bond_state(dev, HAL_STATUS_SUCCESS, HAL_BOND_STATE_NONE);
+>  }
+>  
+>  static void handle_remove_bond_cmd(const void *buf, uint16_t len)
+> 
 
-Maybe hci_sent_cmd_data() could be used instead to help look up the
-connection that the completed command was targeting?
+Applied.
 
-Johan
+-- 
+Best regards, 
+Szymon Janc
