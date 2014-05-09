@@ -1,102 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Petri Gynther <pgynther@google.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] hog: Fix report_value_cb()
-Message-Id: <20140509014001.0A027100DB2@puck.mtv.corp.google.com>
-Date: Thu,  8 May 2014 18:40:00 -0700 (PDT)
+Subject: [PATCH] doc: Add mgmt command for changing the controller public address
+Date: Thu,  8 May 2014 17:46:47 -0700
+Message-Id: <1399596407-41740-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-1. Fix potential buffer overflow. It would happen in the case:
-   hogdev->has_report_id == TRUE && report_size == UHID_DATA_MAX
-
-2. Adjust function signature to match GAttribNotifyFunc.
-
-3. Adjust uHID error handling to mimic uhid_send_input_report() in
-   profiles/input/device.c
 ---
- profiles/input/hog.c | 44 +++++++++++++++++++++++++++++---------------
- 1 file changed, 29 insertions(+), 15 deletions(-)
+ doc/mgmt-api.txt | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/profiles/input/hog.c b/profiles/input/hog.c
-index 12bc19a..671dab5 100644
---- a/profiles/input/hog.c
-+++ b/profiles/input/hog.c
-@@ -76,6 +76,7 @@
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index cd5cd2417b07..2bb275227abe 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1679,6 +1679,42 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
  
- #define HOG_REPORT_MAP_MAX_SIZE        512
- #define HID_INFO_SIZE			4
-+#define ATT_NOTIFICATION_HEADER_SIZE	3
  
- struct hog_device {
- 	uint16_t		id;
-@@ -105,38 +106,51 @@ struct report {
- static gboolean suspend_supported = FALSE;
- static GSList *devices = NULL;
- 
--static void report_value_cb(const uint8_t *pdu, uint16_t len,
--							gpointer user_data)
-+static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- {
- 	struct report *report = user_data;
- 	struct hog_device *hogdev = report->hogdev;
- 	struct uhid_event ev;
--	uint16_t report_size = len - 3;
- 	uint8_t *buf;
-+	ssize_t status;
- 
--	if (len < 3) { /* 1-byte opcode + 2-byte handle */
-+	if (len < ATT_NOTIFICATION_HEADER_SIZE) {
- 		error("Malformed ATT notification");
- 		return;
- 	}
- 
-+	pdu += ATT_NOTIFICATION_HEADER_SIZE;
-+	len -= ATT_NOTIFICATION_HEADER_SIZE;
++Change Public Address Command
++=============================
 +
- 	memset(&ev, 0, sizeof(ev));
- 	ev.type = UHID_INPUT;
--	ev.u.input.size = MIN(report_size, UHID_DATA_MAX);
--
- 	buf = ev.u.input.data;
++	Command Code:		0x0031
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++	Return Parameters:
 +
- 	if (hogdev->has_report_id) {
--		*buf = report->id;
--		buf++;
--		ev.u.input.size++;
-+		buf[0] = report->id;
-+		len = MIN(len, sizeof(ev.u.input.data) - 1);
-+		memcpy(buf + 1, pdu, len);
-+		ev.u.input.size = ++len;
-+	} else {
-+		len = MIN(len, sizeof(ev.u.input.data));
-+		memcpy(buf, pdu, len);
-+		ev.u.input.size = len;
-+	}
++	This command allows changing the public address. Since a vendor
++	specific procedure is required, this command might not be supported
++	by all controllers. Actually most likely only a handful embedded
++	controllers will offer support for this command.
 +
-+	status = write(hogdev->uhid_fd, &ev, sizeof(ev));
-+	if (status < 0) {
-+		error("uHID dev write error: %s (%d)", strerror(errno), errno);
-+		return;
- 	}
++	It is only possible to change the public address when the
++	controller is powered off.
++
++	When this command succeeds, the current controller index will
++	become invalid and an Index Removed event will be send. Once
++	the address has been successfully changed an Index Added event
++	will be send. There is no guarantee that the controller index
++	stays the same.
++
++	All previous configured parameters and settings are lost when
++	this command succeeds. The controller has to be treated as new
++	one. Use this command only when you really know what you are
++	doing.
++
++	This command generates a Command Complete event on success or a
++	Command Status event on failure.
++
++	Possible errors:	Rejected
++				Not Supported
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
  
--	memcpy(buf, &pdu[3], MIN(report_size, UHID_DATA_MAX));
-+	/* uHID kernel driver does not handle partial writes */
-+	if ((size_t) status < sizeof(ev)) {
-+		error("uHID dev write error: partial write (%zd of %lu bytes)",
-+							status, sizeof(ev));
-+		return;
-+	}
- 
--	if (write(hogdev->uhid_fd, &ev, sizeof(ev)) < 0)
--		error("uHID write failed: %s", strerror(errno));
--	else
--		DBG("Report from HoG device 0x%04X written to uHID fd %d",
--						hogdev->id, hogdev->uhid_fd);
-+	DBG("HoG report (%u bytes) -> uHID fd %d", len, hogdev->uhid_fd);
- }
- 
- static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
 -- 
-1.9.1.423.g4596e3a
+1.9.0
 
