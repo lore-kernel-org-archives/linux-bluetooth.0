@@ -1,88 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v4 1/2] android/gatt: Extend android2uuid uuid type support
-Date: Fri, 09 May 2014 12:00:11 +0200
-Message-ID: <2026027.BF65vCn7D3@uw000953>
-In-Reply-To: <1399555853-11553-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1399555853-11553-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv5 04/13] android/handsfree: Add SCO Audio IPC
+Date: Fri,  9 May 2014 12:19:46 +0300
+Message-Id: <1399627195-471-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1399627195-471-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Thursday 08 of May 2014 15:30:52 Grzegorz Kolodziejczyk wrote:
-> Now conversion function android2uuid can recognize type of uuid and set
-> it value by copying significant bytes.
-> ---
->  android/gatt.c | 37 ++++++++++++++++++++++++++++++++-----
->  1 file changed, 32 insertions(+), 5 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 4ff70e4..da68adc 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -55,6 +55,13 @@
->  #define GATT_SUCCESS	0x00000000
->  #define GATT_FAILURE	0x00000101
->  
-> +#define BASE_UUID16_OFFSET     12
-> +
-> +static uint8_t BLUETOOTH_UUID[] = {
-> +	0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00, 0x00, 0x80,
-> +	0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
-> +};
-> +
->  typedef enum {
->  	DEVICE_DISCONNECTED = 0,
->  	DEVICE_CONNECT_INIT,		/* connection procedure initiated */
-> @@ -171,14 +178,34 @@ static GIOChannel *listening_io = NULL;
->  
->  static void bt_le_discovery_stop_cb(void);
->  
-> -static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-> +static bool is_bluetooth_uuid(const uint8_t *uuid)
->  {
-> -	uint8_t i;
-> +	int i;
->  
-> -	dst->type = BT_UUID128;
-> +	for (i = 0; i < 16; i++) {
-> +		/* ignore minimal uuid (16) value */
-> +		if (i == 12 || i == 13)
-> +			continue;
->  
-> -	for (i = 0; i < 16; i++)
-> -		dst->value.u128.data[i] = uuid[15 - i];
-> +		if (uuid[i] != BLUETOOTH_UUID[i])
-> +			return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
-> +static void android2uuid(const uint8_t *uuid, bt_uuid_t *dst)
-> +{
-> +	if (is_bluetooth_uuid(uuid)) {
-> +		/* copy 16 bit uuid value from full android 128bit uuid */
-> +		dst->type = BT_UUID16;
-> +		dst->value.u16 = (uuid[13] << 8) + uuid[12];
-> +	} else {
-> +		uint8_t i;
-> +		dst->type = BT_UUID128;
-> +		for (i = 0; i < 16; i++)
-> +			dst->value.u128.data[i] = uuid[15 - i];
-> +	}
->  }
->  
->  static void uuid2android(const bt_uuid_t *src, uint8_t *uuid)
-> 
+If SCO Audio IPC gets connected it provides only one command:
+connect_sco().
+---
+ android/handsfree.c | 69 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
-Both patches applied (with small changes), thanks.
-
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 8202e53..e694503 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -45,6 +45,7 @@
+ #include "bluetooth.h"
+ #include "src/log.h"
+ #include "utils.h"
++#include "sco-msg.h"
+ 
+ #define HSP_AG_CHANNEL 12
+ #define HFP_AG_CHANNEL 13
+@@ -156,7 +157,9 @@ static struct {
+ static uint32_t hfp_ag_features = 0;
+ 
+ static bdaddr_t adapter_addr;
++
+ static struct ipc *hal_ipc = NULL;
++static struct ipc *sco_ipc = NULL;
+ 
+ static uint32_t hfp_record_id = 0;
+ static GIOChannel *hfp_server = NULL;
+@@ -822,6 +825,8 @@ static gboolean sco_watch_cb(GIOChannel *chan, GIOCondition cond,
+ 	g_io_channel_unref(device.sco);
+ 	device.sco = NULL;
+ 
++	DBG("");
++
+ 	device.sco_watch = 0;
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_DISCONNECTED);
+@@ -856,6 +861,30 @@ done:
+ 	hfp_gw_send_info(device.gw, "+BCS: %u", type);
+ }
+ 
++static void send_sco_fd(GIOChannel *chan)
++{
++	if (sco_ipc) {
++		int fd = g_io_channel_unix_get_fd(chan);
++		GError *err = NULL;
++		uint16_t mtu = 48;
++		struct audio_rsp_connect_sco rsp;
++
++		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
++							BT_IO_OPT_INVALID)) {
++			error("Unable to get MTU: %s\n", err->message);
++			g_clear_error(&err);
++		}
++
++		DBG("fd %d mtu %u", fd, mtu);
++
++		rsp.mtu = mtu;
++
++		ipc_send_rsp_full(sco_ipc, AUDIO_SERVICE_SCO_ID,
++					AUDIO_OP_CONNECT_SCO, sizeof(rsp), &rsp,
++					fd);
++	}
++}
++
+ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ {
+ 	DBG("");
+@@ -887,6 +916,7 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 							sco_watch_cb, NULL);
+ 
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++	send_sco_fd(chan);
+ }
+ 
+ static bool connect_sco(void)
+@@ -2563,6 +2593,41 @@ static void disable_sco_server(void)
+ 	}
+ }
+ 
++static void bt_audio_connect_sco(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	connect_audio();
++}
++
++static const struct ipc_handler audio_handlers[] = {
++	/* AUDIO_OP_CONNECT_SCO */
++	{ bt_audio_connect_sco, false, 0 }
++};
++
++static void bt_sco_unregister(void)
++{
++	DBG("");
++
++	ipc_cleanup(sco_ipc);
++	sco_ipc = NULL;
++}
++
++static bool bt_sco_register(ipc_disconnect_cb disconnect)
++{
++	DBG("");
++
++	sco_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
++				AUDIO_SERVICE_SCO_ID, false, disconnect, NULL);
++	if (!sco_ipc)
++		return false;
++
++	ipc_register(sco_ipc, AUDIO_SERVICE_SCO_ID, audio_handlers,
++						G_N_ELEMENTS(audio_handlers));
++
++	return true;
++}
++
+ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ {
+ 	DBG("mode 0x%x", mode);
+@@ -2597,6 +2662,9 @@ done:
+ 	hal_ipc = ipc;
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
++
++	bt_sco_register(NULL);
++
+ 	return true;
+ }
+ 
+@@ -2604,6 +2672,7 @@ void bt_handsfree_unregister(void)
+ {
+ 	DBG("");
+ 
++	bt_sco_unregister();
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
+ 	hal_ipc = NULL;
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.2
+
