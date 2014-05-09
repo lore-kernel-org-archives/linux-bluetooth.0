@@ -3,116 +3,90 @@ From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: marcel@holtmann.org,
 	Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 1/6] Bluetooth: Store TX power level for connection
-Date: Fri,  9 May 2014 21:35:28 +0200
-Message-Id: <1399664133-2892-2-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 4/6] Bluetooth: Make max age for connection information configurable
+Date: Fri,  9 May 2014 21:35:31 +0200
+Message-Id: <1399664133-2892-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1399664133-2892-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1399664133-2892-1-git-send-email-andrzej.kaczmarek@tieto.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to store local TX power level for connection
-when reply for HCI_Read_Transmit_Power_Level is received.
+This patch adds debugfs entry to configure max age of connection
+information. Cached values will be only refreshed by Get Connection
+Information request if cache is older than this value. Default value
+is 2000ms.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 ---
- include/net/bluetooth/hci.h      | 11 +++++++++++
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_conn.c         |  1 +
- net/bluetooth/hci_event.c        | 29 +++++++++++++++++++++++++++++
- 4 files changed, 42 insertions(+)
+ include/net/bluetooth/hci_core.h | 4 ++++
+ net/bluetooth/hci_core.c         | 4 ++++
+ net/bluetooth/mgmt.c             | 4 +---
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ad2ecc9..201a09a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1054,6 +1054,17 @@ struct hci_cp_write_page_scan_activity {
- 	__le16   window;
- } __packed;
- 
-+#define HCI_OP_READ_TX_POWER_LEVEL	0x0c2d
-+struct hci_cp_read_tx_power_level {
-+	__le16   handle;
-+	__u8     type;
-+} __packed;
-+struct hci_rp_read_tx_power_level {
-+	__u8     status;
-+	__le16   handle;
-+	__s8     tx_power_level;
-+} __packed;
-+
- #define HCI_OP_READ_PAGE_SCAN_TYPE	0x0c46
- struct hci_rp_read_page_scan_type {
- 	__u8     status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0318d52..211bad6 100644
+index 9be523a..6353617 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -375,6 +375,7 @@ struct hci_conn {
+@@ -145,6 +145,9 @@ struct oob_data {
+ /* Default LE RPA expiry time, 15 minutes */
+ #define HCI_DEFAULT_RPA_TIMEOUT		(15 * 60)
+ 
++/* Default max age of connection information, 2 sec */
++#define DEFAULT_CONN_INFO_MAX_AGE	2000
++
+ struct amp_assoc {
+ 	__u16	len;
+ 	__u16	offset;
+@@ -200,6 +203,7 @@ struct hci_dev {
  	__u16		le_conn_min_interval;
  	__u16		le_conn_max_interval;
- 	__s8		rssi;
-+	__s8		tx_power;
- 	unsigned long	flags;
+ 	__u16		discov_interleaved_timeout;
++	__u16		conn_info_max_age;
+ 	__u8		ssp_debug_mode;
  
- 	__u8		remote_cap;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 55a1743..74b368b 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -407,6 +407,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
- 	conn->io_capability = hdev->io_capability;
- 	conn->remote_auth = 0xff;
- 	conn->key_type = 0xff;
-+	conn->tx_power = HCI_TX_POWER_INVALID;
+ 	__u16		devid_source;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d31f144..b2d1eee1e3 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1754,6 +1754,9 @@ static int __hci_init(struct hci_dev *hdev)
+ 			    &blacklist_fops);
+ 	debugfs_create_file("uuids", 0444, hdev->debugfs, hdev, &uuids_fops);
  
- 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
- 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2bb0053..63cc9bc 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1264,6 +1264,31 @@ static void hci_cc_read_rssi(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_unlock(hdev);
- }
++	debugfs_create_u16("conn_info_max_age", 0644, hdev->debugfs,
++			   &hdev->conn_info_max_age);
++
+ 	if (lmp_bredr_capable(hdev)) {
+ 		debugfs_create_file("inquiry_cache", 0444, hdev->debugfs,
+ 				    hdev, &inquiry_cache_fops);
+@@ -3789,6 +3792,7 @@ struct hci_dev *hci_alloc_dev(void)
  
-+static void hci_cc_read_tx_power_level(struct hci_dev *hdev,
-+				       struct sk_buff *skb)
-+{
-+	struct hci_cp_read_tx_power_level *sent;
-+	struct hci_rp_read_tx_power_level *rp = (void *) skb->data;
-+	struct hci_conn *conn;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
-+
-+	if (rp->status)
-+		return;
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_READ_TX_POWER_LEVEL);
-+	if (!sent)
-+		return;
-+
-+	hci_dev_lock(hdev);
-+
-+	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
-+	if (conn && sent->type == 0x00)
-+		conn->tx_power = rp->tx_power_level;
-+
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_cs_inquiry(struct hci_dev *hdev, __u8 status)
- {
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-@@ -2660,6 +2685,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_cc_read_rssi(hdev, skb);
- 		break;
+ 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
+ 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
++	hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
  
-+	case HCI_OP_READ_TX_POWER_LEVEL:
-+		hci_cc_read_tx_power_level(hdev, skb);
-+		break;
-+
- 	default:
- 		BT_DBG("%s opcode 0x%4.4x", hdev->name, opcode);
- 		break;
+ 	mutex_init(&hdev->lock);
+ 	mutex_init(&hdev->req_lock);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 2d86ce1..a7f45d2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -114,8 +114,6 @@ static const u16 mgmt_events[] = {
+ 
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+ 
+-#define CONN_INFO_MAX_AGE	msecs_to_jiffies(2 * 1000)
+-
+ #define hdev_is_powered(hdev) (test_bit(HCI_UP, &hdev->flags) && \
+ 				!test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+ 
+@@ -4751,7 +4749,7 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	 * unknown, otherwise just reply.
+ 	 */
+ 	if (time_after(jiffies, conn->conn_info_timestamp +
+-		       CONN_INFO_MAX_AGE) ||
++		       msecs_to_jiffies(hdev->conn_info_max_age)) ||
+ 	    conn->tx_power == HCI_TX_POWER_INVALID) {
+ 		struct hci_cp_read_tx_power_level req_txp_cp;
+ 		struct hci_cp_read_rssi req_rssi_cp;
 -- 
 1.9.2
