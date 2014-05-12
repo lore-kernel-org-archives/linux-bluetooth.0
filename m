@@ -1,42 +1,108 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/8] Fix reading attribute value in database
-Date: Mon, 12 May 2014 15:02:30 +0200
-Message-Id: <1399899758-4944-1-git-send-email-marcin.kraglak@tieto.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Add PTS test listing for HDP
+Date: Mon, 12 May 2014 14:29:01 +0200
+Message-Id: <1399897741-25955-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is refactor of existing server and database.
-Now all functions in gatt_db for processing ATT commands are changed
-to fill queue with handles of found attributes only, and no specific
-data is used. There are also getters for attribute type and end
-group type. Gatt_db_read is also refactored to return value of attribute
-if exists or call read_cb if registered. In first case we can fill response,
-otherwise we have collect data from callbacks in pending_requests queue
-(in device struct) and then send response.
-We also consider passing read_result_cb to gatt_db_read(), it can simplify
-collecting attributes values (data will be always passed to read_result_cb).
-Also functions like gatt_db_find_by_type can be replaced in future with
-one "filtering" function.
+---
+ android/Makefile.am |  3 ++-
+ android/pts-hdp.txt | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 74 insertions(+), 1 deletion(-)
+ create mode 100644 android/pts-hdp.txt
 
-Jakub Tyszkowski (2):
-  android/gatt: Fix sending att responses
-  shared/gatt: Make 'find_by_type_value' callback compatible
-
-Marcin Kraglak (6):
-  shared/gatt: Extend gatt_db_read function
-  android/gatt: Refactor ATT read operations
-  shared/gatt: Make read by type use response queue
-  shared/gatt: Refactor find information
-  shared/gatt: Add function to get end group handle
-  shared/gatt: Refactor read_by_group_type
-
- android/gatt.c       | 445 ++++++++++++++++++++++++++++++++++-----------------
- src/shared/gatt-db.c | 128 +++++++--------
- src/shared/gatt-db.h |  42 ++---
- 3 files changed, 372 insertions(+), 243 deletions(-)
-
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 78015e6..3d1595f 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -262,4 +262,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-hfp.txt \
+ 				android/pts-gatt.txt \
+ 				android/pts-hsp.txt \
+-				android/pts-iopt.txt
++				android/pts-iopt.txt \
++				android/pts-hdp.txt
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+new file mode 100644
+index 0000000..1dec18c
+--- /dev/null
++++ b/android/pts-hdp.txt
+@@ -0,0 +1,72 @@
++PTS test results for HDP
++
++PTS version: 5.1
++Tested: not tested
++Android version: 4.4.2
++
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
++
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_SRC_CON_BV_01_I	INC
++TC_SRC_CON_BV_02_I	INC
++TC_SRC_CON_BV_03_I	INC
++TC_SRC_CON_BV_04_I	INC
++TC_SRC_CON_BV_05_I	INC
++TC_SRC_CON_BV_06_I	INC
++TC_SRC_CON_BV_07_I	INC
++TC_SRC_CON_BV_08_I	INC
++TC_SRC_CON_BV_09_I	INC
++TC_SRC_CON_BV_10_I	INC
++TC_SRC_CC_BV_01_C	INC
++TC_SRC_CC_BV_02_C	INC
++TC_SRC_CC_BV_03_C	INC
++TC_SRC_CC_BV_05_C	INC
++TC_SRC_CC_BV_07_C	INC
++TC_SRC_CC_BV_09_C	INC
++TC_SRC_CC_BI_12_C	INC
++TC_SRC_HCT_BV_01_I	INC
++TC_SRC_HCT_BV_02_I	INC
++TC_SRC_HCT_BV_03_I	N/A
++TC_SRC_HCT_BV_04_I	INC
++TC_SRC_HCT_BV_05_C	N/A
++TC_SRC_HCT_BV_06_C	INC
++TC_SRC_HCT_BV_07_C	INC
++TC_SRC_DE_BV_01_I	INC
++TC_SRC_DE_BV_02_I	INC
++TC_SRC_DEP_BV_01_I	INC
++TC_SRC_DEP_BV_02_I	N/A
++TC_SNK_CON_BV_01_I	INC
++TC_SNK_CON_BV_02_I	INC
++TC_SNK_CON_BV_03_I	INC
++TC_SNK_CON_BV_04_I	INC
++TC_SNK_CON_BV_05_I	INC
++TC_SNK_CON_BV_06_I	INC
++TC_SNK_CON_BV_07_I	INC
++TC_SNK_CON_BV_08_I	INC
++TC_SNK_CON_BV_09_I	INC
++TC_SNK_CON_BV_10_I	INC
++TC_SNK_CC_BV_01_C	INC
++TC_SNK_CC_BV_02_C	INC
++TC_SNK_CC_BV_04_C	INC
++TC_SNK_CC_BV_06_C	INC
++TC_SNK_CC_BV_08_C	INC
++TC_SNK_CC_BV_10_C	INC
++TC_SNK_CC_BI_11_C	INC
++TC_SNK_HCT_BV_01_I	INC
++TC_SNK_HCT_BV_02_I	INC
++TC_SNK_HCT_BV_03_I	N/A
++TC_SNK_HCT_BV_04_I	INC
++TC_SNK_HCT_BV_05_C	N/A
++TC_SNK_HCT_BV_06_C	INC
++TC_SNK_HCT_BV_07_C	INC
++TC_SNK_DE_BV_01_I	N/A
++TC_SNK_DE_BV_02_I	INC
++TC_SNK_DEP_BV_03_I	INC
++TC_SNK_DEP_BV_04_I	INC
++-------------------------------------------------------------------------------
 -- 
 1.8.5.3
 
