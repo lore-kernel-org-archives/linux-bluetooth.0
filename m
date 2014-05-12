@@ -1,121 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 7/8] shared/gatt: Make 'find_by_type_value' callback compatible
-Date: Mon, 12 May 2014 15:02:37 +0200
-Message-Id: <1399899758-4944-8-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 6/8] shared/gatt: Add function to get end group handle
+Date: Mon, 12 May 2014 15:02:36 +0200
+Message-Id: <1399899758-4944-7-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1399899758-4944-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1399899758-4944-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-
-'Find by type and value' was handling only values written directly to
-database and not those returned by callbacks or by Android Framework.
-This replaces it with 'find by type' and leaves value verification to
-the user.
+This helper will return end group handle of attribute.
 ---
- src/shared/gatt-db.c | 36 +++++++-----------------------------
- src/shared/gatt-db.h | 11 ++---------
- 2 files changed, 9 insertions(+), 38 deletions(-)
+ src/shared/gatt-db.c | 12 ++++++++++++
+ src/shared/gatt-db.h |  2 ++
+ 2 files changed, 14 insertions(+)
 
 diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 41457e2..3869d4f 100644
+index 532e0b7..41457e2 100644
 --- a/src/shared/gatt-db.c
 +++ b/src/shared/gatt-db.c
-@@ -485,16 +485,13 @@ struct find_by_type_value_data {
- 	bt_uuid_t uuid;
- 	uint16_t start_handle;
- 	uint16_t end_handle;
--	uint16_t value_length;
--	const uint8_t *value;
- };
+@@ -744,3 +744,15 @@ const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
  
--static void find_by_type_value(void *data, void *user_data)
-+static void find_by_type(void *data, void *user_data)
- {
- 	struct find_by_type_value_data *search_data = user_data;
- 	struct gatt_db_service *service = data;
- 	struct gatt_db_attribute *attribute;
--	struct gatt_db_range *range;
- 	int i;
- 
- 	if (!service->active)
-@@ -513,43 +510,24 @@ static void find_by_type_value(void *data, void *user_data)
- 		if (bt_uuid_cmp(&search_data->uuid, &attribute->uuid))
- 			continue;
- 
--		if (attribute->value_len != search_data->value_length)
--			continue;
--
--		if (!memcmp(attribute->value, search_data->value,
--							attribute->value_len))
--			continue;
--
--		range = new0(struct gatt_db_range, 1);
--		if (!range)
--			return;
--
--		range->handle = attribute->handle;
--		range->end_group = service->attributes[0]->handle +
--						service->num_handles - 1;
--
--		if (!queue_push_tail(search_data->queue, range))
--			free(range);
-+		queue_push_tail(search_data->queue,
-+						UINT_TO_PTR(attribute->handle));
- 	}
+ 	return &attribute->uuid;
  }
- 
--void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
-+void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
--							const bt_uuid_t type,
--							const uint8_t *value,
--							uint16_t length,
-+							const bt_uuid_t *type,
- 							struct queue *queue)
- {
- 	struct find_by_type_value_data data;
- 
--	data.uuid = type;
-+	data.uuid = *type;
- 	data.start_handle = start_handle;
- 	data.end_handle = end_handle;
- 	data.queue = queue;
--	data.value_length = length;
--	data.value = value;
- 
--	queue_foreach(db->services, find_by_type_value, &data);
-+	queue_foreach(db->services, find_by_type, &data);
- }
- 
- struct read_by_type_data {
++
++uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle)
++{
++	struct gatt_db_service *service;
++
++	service = queue_find(db->services, find_service_for_handle,
++						INT_TO_PTR(handle));
++	if (!service)
++		return 0;
++
++	return service->attributes[0]->handle + service->num_handles - 1;
++}
 diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index ddb40da..5b2a17c 100644
+index cc9120c..ddb40da 100644
 --- a/src/shared/gatt-db.h
 +++ b/src/shared/gatt-db.h
-@@ -73,16 +73,9 @@ void gatt_db_read_by_group_type(struct gatt_db *db, uint16_t start_handle,
- 							const bt_uuid_t type,
- 							struct queue *queue);
+@@ -104,3 +104,5 @@ bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
  
--struct gatt_db_range {
--	uint16_t handle;
--	uint16_t end_group;
--};
--
--void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
-+void gatt_db_find_by_type(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
--							const bt_uuid_t type,
--							const uint8_t *value,
--							uint16_t length,
-+							const bt_uuid_t *type,
- 							struct queue *queue);
- /* List of handles */
- void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
+ const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
+ 							uint16_t handle);
++
++uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle);
 -- 
 1.8.5.3
 
