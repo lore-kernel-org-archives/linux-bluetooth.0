@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 12 May 2014 22:41:26 +0800
-From: Adam Lee <adam.lee@canonical.com>
-To: Ben Hutchings <ben@decadent.org.uk>
-Cc: Paritosh Debnath <paritosh.debnath@intel.com>,
-	linux-bluetooth@vger.kernel.org, johannes@sipsolutions.net
-Subject: Re: [PATCH v3] firmware: update Intel Bluetooth device firmware
- patch files
-Message-ID: <20140512144126.GA4972@adam-laptop>
-References: <1396949427-6929-1-git-send-email-paritosh.debnath@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1396949427-6929-1-git-send-email-paritosh.debnath@intel.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] android/gatt: Refresh device cache on disconnect if not bonded
+Date: Mon, 12 May 2014 16:38:13 +0200
+Message-Id: <1399905493-10699-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1399905493-10699-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1399905493-10699-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Apr 08, 2014 at 03:00:27PM +0530, Paritosh Debnath wrote:
-> This patch updates firmware patch files for following Intel Bluetooth devices:
-> - Intel Wireless Bluetooth 7260
-> - Intel Wireless Bluetooth 3160
-> 
-> This patch fixes
-> - Issue with LED blinking
-> - Issue with USB
-> - No SCO data over EHCI
-> 
-> Signed-off-by: Paritosh Debnath <paritosh.debnath@intel.com>
-> ---
-> This patch contains fixes given on 0x36 submitted by Tedd
-> http://www.spinics.net/lists/linux-bluetooth/msg45790.html
-> ---
->  WHENCE                                  |    4 ++--
->  intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq  |  Bin 18145 -> 21198 bytes
->  intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq |  Bin 17917 -> 20989 bytes
->  3 files changed, 2 insertions(+), 2 deletions(-)
+This adds refreshing of device cache in case if device is not bonded.
 
-Hi, please maintainer apply this patch? Lots of laptops are affected.
+It affects on TC_GAD_CL_BV_01_C, TC_GAD_CL_BV_02_C and search services
+PTS test cases. With this patch those PTS tests cases pass.
+---
+ android/gatt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
+diff --git a/android/gatt.c b/android/gatt.c
+index 157ebe6..1c94713 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -570,6 +570,10 @@ static void connection_cleanup(struct gatt_device *device)
+ 			bt_le_discovery_stop(NULL);
+ 	}
+ 
++	/* If device is not bonded service cache should be refreshed */
++	if (!bt_device_is_bonded(&device->bdaddr))
++		queue_remove_all(device->services, NULL, NULL, destroy_service);
++
+ 	device_set_state(device, DEVICE_DISCONNECTED);
+ }
+ 
 -- 
-Adam Lee
+1.9.2
+
