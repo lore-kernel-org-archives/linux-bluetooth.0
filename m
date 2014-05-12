@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 04/11] android/hal-sco: Implement Audio IPC on Audio HAL
-Date: Mon, 12 May 2014 11:57:02 +0300
-Message-Id: <1399885029-6358-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 11/11] android/audio: Add write to SCO
+Date: Mon, 12 May 2014 11:57:09 +0300
+Message-Id: <1399885029-6358-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,425 +11,110 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+For synchronization interleave read() and write().
 ---
- android/hal-sco.c | 319 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 318 insertions(+), 1 deletion(-)
+ android/hal-sco.c | 74 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 74 insertions(+)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 06e39ed..c154c43 100644
+index b244333..97f0808 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -16,14 +16,20 @@
-  */
- 
- #include <errno.h>
-+#include <pthread.h>
-+#include <poll.h>
- #include <stdio.h>
- #include <stdlib.h>
- #include <string.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
- #include <unistd.h>
- 
- #include <hardware/audio.h>
- #include <hardware/hardware.h>
- 
-+#include "sco-msg.h"
-+#include "ipc-common.h"
- #include "hal-log.h"
- 
- #define AUDIO_STREAM_DEFAULT_RATE	44100
-@@ -31,15 +37,24 @@
- 
+@@ -41,6 +41,8 @@
  #define OUT_BUFFER_SIZE			2560
+ #define OUT_STREAM_FRAMES		2560
  
-+static int listen_sk = -1;
-+static int audio_sk = -1;
++#define SOCKET_POLL_TIMEOUT_MS		500
 +
-+static pthread_t ipc_th = 0;
-+static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
-+
- struct sco_audio_config {
- 	uint32_t rate;
- 	uint32_t channels;
-+	uint16_t mtu;
- 	audio_format_t format;
- };
+ static int listen_sk = -1;
+ static int audio_sk = -1;
  
- struct sco_stream_out {
- 	struct audio_stream_out stream;
-+
- 	struct sco_audio_config cfg;
-+	int fd;
- };
+@@ -275,6 +277,75 @@ static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
+ 	}
+ }
  
- struct sco_dev {
-@@ -47,13 +62,186 @@ struct sco_dev {
- 	struct sco_stream_out *out;
- };
- 
-+/* Audio IPC functions */
-+
-+static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
-+			void *param, size_t *rsp_len, void *rsp, int *fd)
++static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
++								size_t bytes)
 +{
-+	ssize_t ret;
-+	struct msghdr msg;
-+	struct iovec iv[2];
-+	struct ipc_hdr cmd;
-+	char cmsgbuf[CMSG_SPACE(sizeof(int))];
-+	struct ipc_status s;
-+	size_t s_len = sizeof(s);
-+
-+	pthread_mutex_lock(&sk_mutex);
-+
-+	if (audio_sk < 0) {
-+		error("audio: Invalid cmd socket passed to audio_ipc_cmd");
-+		goto failed;
-+	}
-+
-+	if (!rsp || !rsp_len) {
-+		memset(&s, 0, s_len);
-+		rsp_len = &s_len;
-+		rsp = &s;
-+	}
-+
-+	memset(&msg, 0, sizeof(msg));
-+	memset(&cmd, 0, sizeof(cmd));
-+
-+	cmd.service_id = service_id;
-+	cmd.opcode = opcode;
-+	cmd.len = len;
-+
-+	iv[0].iov_base = &cmd;
-+	iv[0].iov_len = sizeof(cmd);
-+
-+	iv[1].iov_base = param;
-+	iv[1].iov_len = len;
-+
-+	msg.msg_iov = iv;
-+	msg.msg_iovlen = 2;
-+
-+	ret = sendmsg(audio_sk, &msg, 0);
-+	if (ret < 0) {
-+		error("audio: Sending command failed:%s", strerror(errno));
-+		goto failed;
-+	}
-+
-+	/* socket was shutdown */
-+	if (ret == 0) {
-+		error("audio: Command socket closed");
-+		goto failed;
-+	}
-+
-+	memset(&msg, 0, sizeof(msg));
-+	memset(&cmd, 0, sizeof(cmd));
-+
-+	iv[0].iov_base = &cmd;
-+	iv[0].iov_len = sizeof(cmd);
-+
-+	iv[1].iov_base = rsp;
-+	iv[1].iov_len = *rsp_len;
-+
-+	msg.msg_iov = iv;
-+	msg.msg_iovlen = 2;
-+
-+	if (fd) {
-+		memset(cmsgbuf, 0, sizeof(cmsgbuf));
-+		msg.msg_control = cmsgbuf;
-+		msg.msg_controllen = sizeof(cmsgbuf);
-+	}
-+
-+	ret = recvmsg(audio_sk, &msg, 0);
-+	if (ret < 0) {
-+		error("audio: Receiving command response failed:%s",
-+							strerror(errno));
-+		goto failed;
-+	}
-+
-+	if (ret < (ssize_t) sizeof(cmd)) {
-+		error("audio: Too small response received(%zd bytes)", ret);
-+		goto failed;
-+	}
-+
-+	if (cmd.service_id != service_id) {
-+		error("audio: Invalid service id (%u vs %u)", cmd.service_id,
-+								service_id);
-+		goto failed;
-+	}
-+
-+	if (ret != (ssize_t) (sizeof(cmd) + cmd.len)) {
-+		error("audio: Malformed response received(%zd bytes)", ret);
-+		goto failed;
-+	}
-+
-+	if (cmd.opcode != opcode && cmd.opcode != AUDIO_OP_STATUS) {
-+		error("audio: Invalid opcode received (%u vs %u)",
-+						cmd.opcode, opcode);
-+		goto failed;
-+	}
-+
-+	if (cmd.opcode == AUDIO_OP_STATUS) {
-+		struct ipc_status *s = rsp;
-+
-+		if (sizeof(*s) != cmd.len) {
-+			error("audio: Invalid status length");
-+			goto failed;
-+		}
-+
-+		if (s->code == AUDIO_STATUS_SUCCESS) {
-+			error("audio: Invalid success status response");
-+			goto failed;
-+		}
-+
-+		pthread_mutex_unlock(&sk_mutex);
-+
-+		return s->code;
-+	}
-+
-+	pthread_mutex_unlock(&sk_mutex);
-+
-+	/* Receive auxiliary data in msg */
-+	if (fd) {
-+		struct cmsghdr *cmsg;
-+
-+		*fd = -1;
-+
-+		for (cmsg = CMSG_FIRSTHDR(&msg); cmsg;
-+					cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+			if (cmsg->cmsg_level == SOL_SOCKET
-+					&& cmsg->cmsg_type == SCM_RIGHTS) {
-+				memcpy(fd, CMSG_DATA(cmsg), sizeof(int));
-+				break;
-+			}
-+		}
-+
-+		if (*fd < 0)
-+			goto failed;
-+	}
-+
-+	if (rsp_len)
-+		*rsp_len = cmd.len;
-+
-+	return AUDIO_STATUS_SUCCESS;
-+
-+failed:
-+	/* Some serious issue happen on IPC - recover */
-+	shutdown(audio_sk, SHUT_RDWR);
-+	pthread_mutex_unlock(&sk_mutex);
-+
-+	return AUDIO_STATUS_FAILED;
-+}
-+
-+static int ipc_connect_sco(int *fd, uint16_t *mtu)
-+{
-+	struct audio_rsp_connect_sco rsp;
-+	size_t rsp_len = sizeof(rsp);
++	struct pollfd pfd;
++	size_t len, written = 0;
 +	int ret;
++	uint16_t mtu = /* out->cfg.mtu */ 48;
++	uint8_t read_buf[mtu];
++	bool do_write = false;
 +
-+	DBG("");
++	pfd.fd = out->fd;
++	pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
 +
-+	ret = audio_ipc_cmd(AUDIO_SERVICE_SCO_ID, AUDIO_OP_CONNECT_SCO, 0,
-+						NULL, &rsp_len, &rsp, fd);
++	while (bytes > written) {
 +
-+	*mtu = rsp.mtu;
++		/* poll for sending */
++		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
++			DBG("timeout fd %d", out->fd);
++			return false;
++		}
 +
-+	return ret;
++		if (pfd.revents & (POLLHUP | POLLNVAL)) {
++			error("error fd %d, events 0x%x", out->fd, pfd.revents);
++			return false;
++		}
++
++		/* FIXME synchronize by time instead of read() */
++		if (pfd.revents & POLLIN) {
++			ret = read(out->fd, read_buf, mtu);
++			if (ret < 0) {
++				error("Error reading fd %d (%s)", out->fd,
++							strerror(errno));
++				return false;
++			}
++
++			do_write = true;
++		}
++
++		if (!do_write)
++			continue;
++
++		len = bytes - written > mtu ? mtu : bytes - written;
++
++		ret = write(out->fd, buffer + written, len);
++		if (ret > 0) {
++			written += ret;
++			do_write = false;
++			continue;
++		}
++
++		if (errno == EAGAIN) {
++			ret = errno;
++			warn("write failed (%d)", ret);
++			continue;
++		}
++
++		if (errno != EINTR) {
++			ret = errno;
++			error("write failed (%d) fd %d bytes %zd", ret, out->fd,
++									bytes);
++			return false;
++		}
++	}
++
++	DBG("written %zd bytes", bytes);
++
++	return true;
 +}
 +
- /* Audio stream functions */
- 
  static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
  								size_t bytes)
  {
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+
- 	/* write data */
+@@ -320,6 +391,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
  
-+	DBG("write to fd %d bytes %zu", out->fd, bytes);
+ 	DBG("total %zd", total);
+ 
++	if (!write_data(out, send_buf, total))
++		return -1;
 +
  	return bytes;
  }
  
-@@ -183,9 +371,18 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- {
- 	struct sco_dev *adev = (struct sco_dev *) dev;
- 	struct sco_stream_out *out;
-+	int fd = -1;
-+	uint16_t mtu;
- 
- 	DBG("");
- 
-+	if (ipc_connect_sco(&fd, &mtu) != AUDIO_STATUS_SUCCESS) {
-+		error("audio: cannot get fd");
-+		return -EIO;
-+	}
-+
-+	DBG("got sco fd %d mtu %u", fd, mtu);
-+
- 	out = calloc(1, sizeof(struct sco_stream_out));
- 	if (!out)
- 		return -ENOMEM;
-@@ -210,9 +407,11 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
- 	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
- 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
-+	out->cfg.mtu = mtu;
- 
- 	*stream_out = &out->stream;
- 	adev->out = out;
-+	out->fd = fd;
- 
- 	return 0;
- }
-@@ -220,9 +419,17 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- static void sco_close_output_stream(struct audio_hw_device *dev,
- 					struct audio_stream_out *stream_out)
- {
--	DBG("");
-+	struct sco_dev *sco_dev = (struct sco_dev *) dev;
-+
-+	DBG("dev %p stream %p fd %d", dev, stream_out, sco_dev->out->fd);
-+
-+	if (sco_dev->out && sco_dev->out->fd) {
-+		close(sco_dev->out->fd);
-+		sco_dev->out->fd = -1;
-+	}
- 
- 	free(stream_out);
-+	sco_dev->out = NULL;
- }
- 
- static int sco_set_parameters(struct audio_hw_device *dev,
-@@ -326,10 +533,116 @@ static int sco_close(hw_device_t *device)
- 	return 0;
- }
- 
-+static void *ipc_handler(void *data)
-+{
-+	bool done = false;
-+	struct pollfd pfd;
-+	int sk;
-+
-+	DBG("");
-+
-+	while (!done) {
-+		DBG("Waiting for connection ...");
-+
-+		sk = accept(listen_sk, NULL, NULL);
-+		if (sk < 0) {
-+			int err = errno;
-+
-+			if (err == EINTR)
-+				continue;
-+
-+			if (err != ECONNABORTED && err != EINVAL)
-+				error("audio: Failed to accept socket: %d (%s)",
-+							err, strerror(err));
-+
-+			break;
-+		}
-+
-+		pthread_mutex_lock(&sk_mutex);
-+		audio_sk = sk;
-+		pthread_mutex_unlock(&sk_mutex);
-+
-+		DBG("Audio IPC: Connected");
-+
-+		memset(&pfd, 0, sizeof(pfd));
-+		pfd.fd = audio_sk;
-+		pfd.events = POLLHUP | POLLERR | POLLNVAL;
-+
-+		/* Check if socket is still alive. Empty while loop.*/
-+		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
-+
-+		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-+			info("Audio HAL: Socket closed");
-+
-+			pthread_mutex_lock(&sk_mutex);
-+			close(audio_sk);
-+			audio_sk = -1;
-+			pthread_mutex_unlock(&sk_mutex);
-+		}
-+	}
-+
-+	info("Closing Audio IPC thread");
-+	return NULL;
-+}
-+
-+static int sco_ipc_init(void)
-+{
-+	struct sockaddr_un addr;
-+	int err;
-+	int sk;
-+
-+	DBG("");
-+
-+	sk = socket(PF_LOCAL, SOCK_SEQPACKET, 0);
-+	if (sk < 0) {
-+		err = -errno;
-+		error("audio: Failed to create socket: %d (%s)", -err,
-+								strerror(-err));
-+		return err;
-+	}
-+
-+	memset(&addr, 0, sizeof(addr));
-+	addr.sun_family = AF_UNIX;
-+
-+	memcpy(addr.sun_path, BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH));
-+
-+	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
-+		err = -errno;
-+		error("audio: Failed to bind socket: %d (%s)", -err,
-+								strerror(-err));
-+		goto failed;
-+	}
-+
-+	if (listen(sk, 1) < 0) {
-+		err = -errno;
-+		error("audio: Failed to listen on the socket: %d (%s)", -err,
-+								strerror(-err));
-+		goto failed;
-+	}
-+
-+	listen_sk = sk;
-+
-+	err = pthread_create(&ipc_th, NULL, ipc_handler, NULL);
-+	if (err) {
-+		err = -err;
-+		ipc_th = 0;
-+		error("audio: Failed to start Audio IPC thread: %d (%s)",
-+							-err, strerror(-err));
-+		goto failed;
-+	}
-+
-+	return 0;
-+
-+failed:
-+	close(sk);
-+	return err;
-+}
-+
- static int sco_open(const hw_module_t *module, const char *name,
- 							hw_device_t **device)
- {
- 	struct sco_dev *dev;
-+	int err;
- 
- 	DBG("");
- 
-@@ -339,6 +652,10 @@ static int sco_open(const hw_module_t *module, const char *name,
- 		return -EINVAL;
- 	}
- 
-+	err = sco_ipc_init();
-+	if (err < 0)
-+		return err;
-+
- 	dev = calloc(1, sizeof(struct sco_dev));
- 	if (!dev)
- 		return -ENOMEM;
 -- 
 1.8.3.2
 
