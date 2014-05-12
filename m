@@ -1,108 +1,221 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 02/11] android/audio: Add Audio SCO message API
-Date: Mon, 12 May 2014 11:57:00 +0300
-Message-Id: <1399885029-6358-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 01/11] android/hal-audio-hsp: Add open_output_stream()
+Date: Mon, 12 May 2014 11:56:59 +0300
+Message-Id: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-SCO API will be used when communicating with SCO Audio HAL.
+Function adds audio_open_output_stream() and sets dummy callbacks.
 ---
- android/sco-ipc-api.txt | 36 ++++++++++++++++++++++++++++++++++++
- android/sco-msg.h       | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 72 insertions(+)
- create mode 100644 android/sco-ipc-api.txt
- create mode 100644 android/sco-msg.h
+ android/hal-sco.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 176 insertions(+), 2 deletions(-)
 
-diff --git a/android/sco-ipc-api.txt b/android/sco-ipc-api.txt
-new file mode 100644
-index 0000000..75b2cba
---- /dev/null
-+++ b/android/sco-ipc-api.txt
-@@ -0,0 +1,36 @@
-+Bluetooth SCO Audio Plugin
-+==========================
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 8f8c3b6..06e39ed 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -26,21 +26,195 @@
+ 
+ #include "hal-log.h"
+ 
++#define AUDIO_STREAM_DEFAULT_RATE	44100
++#define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
 +
-+The SCO Audio Plugin communicate through abstract socket name
-+"\0bluez_sco_socket".
++#define OUT_BUFFER_SIZE			2560
 +
-+	.---Audio---.                             .--Android--.
-+	|  Plugin   |                             |   Daemon  |
-+	|           |          Command            |           |
-+	|           | --------------------------> |           |
-+	|           |                             |           |
-+	|           | <-------------------------- |           |
-+	|           |          Response           |           |
-+	|           |                             |           |
-+	|           |                             |           |
-+	|           |                             |           |
-+	'-----------'                             '-----------'
++struct sco_audio_config {
++	uint32_t rate;
++	uint32_t channels;
++	audio_format_t format;
++};
 +
++struct sco_stream_out {
++	struct audio_stream_out stream;
++	struct sco_audio_config cfg;
++};
 +
-+	Audio HAL                               Daemon
-+	----------------------------------------------------
+ struct sco_dev {
+ 	struct audio_hw_device dev;
++	struct sco_stream_out *out;
+ };
+ 
++/* Audio stream functions */
 +
-+	call connect_sco()                    --> create SCO socket
-+	return connect_sco()                  <-- return socket fd and mtu
++static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
++								size_t bytes)
++{
++	/* write data */
 +
-+SCO Audio Service (ID 0)
-+========================
++	return bytes;
++}
 +
-+	Opcode 0x00 - Error response
++static uint32_t out_get_sample_rate(const struct audio_stream *stream)
++{
++	struct sco_stream_out *out = (struct sco_stream_out *) stream;
 +
-+		Response parameters: Status (1 octet)
++	DBG("rate %u", out->cfg.rate);
 +
-+	Opcode 0x01 - Connect Audio SCO command
++	return out->cfg.rate;
++}
 +
-+		Command parameters: <none>
-+		Response parameters: MTU (2 octets)
-diff --git a/android/sco-msg.h b/android/sco-msg.h
-new file mode 100644
-index 0000000..cd2f894
---- /dev/null
-+++ b/android/sco-msg.h
-@@ -0,0 +1,36 @@
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ *  This library is free software; you can redistribute it and/or
-+ *  modify it under the terms of the GNU Lesser General Public
-+ *  License as published by the Free Software Foundation; either
-+ *  version 2.1 of the License, or (at your option) any later version.
-+ *
-+ *  This library is distributed in the hope that it will be useful,
-+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ *  Lesser General Public License for more details.
-+ *
-+ *  You should have received a copy of the GNU Lesser General Public
-+ *  License along with this library; if not, write to the Free Software
-+ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-+ *
-+ */
++static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
++{
++	DBG("rate %u", rate);
 +
-+static const char BLUEZ_SCO_SK_PATH[] = "\0bluez_sco_socket";
++	return 0;
++}
 +
-+#define AUDIO_SERVICE_SCO_ID		1
++static size_t out_get_buffer_size(const struct audio_stream *stream)
++{
++	DBG("buf size %u", OUT_BUFFER_SIZE);
 +
-+#define AUDIO_STATUS_SUCCESS		IPC_STATUS_SUCCESS
-+#define AUDIO_STATUS_FAILED		0x01
++	return OUT_BUFFER_SIZE;
++}
 +
-+#define AUDIO_OP_STATUS			IPC_OP_STATUS
++static uint32_t out_get_channels(const struct audio_stream *stream)
++{
++	DBG("");
 +
-+#define AUDIO_OP_CONNECT_SCO		0x01
-+struct audio_rsp_connect_sco {
-+	uint16_t mtu;
-+} __attribute__((packed));
++	/* AudioFlinger can only provide stereo stream, so we return it here and
++	 * later we'll downmix this to mono in case codec requires it
++	 */
++	return AUDIO_CHANNEL_OUT_STEREO;
++}
++
++static audio_format_t out_get_format(const struct audio_stream *stream)
++{
++	struct sco_stream_out *out = (struct sco_stream_out *) stream;
++
++	DBG("");
++
++	return out->cfg.format;
++}
++
++static int out_set_format(struct audio_stream *stream, audio_format_t format)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int out_standby(struct audio_stream *stream)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int out_dump(const struct audio_stream *stream, int fd)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
++{
++	DBG("%s", kvpairs);
++
++	return 0;
++}
++
++static char *out_get_parameters(const struct audio_stream *stream,
++							const char *keys)
++{
++	DBG("");
++
++	return strdup("");
++}
++
++static uint32_t out_get_latency(const struct audio_stream_out *stream)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int out_set_volume(struct audio_stream_out *stream, float left,
++								float right)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int out_get_render_position(const struct audio_stream_out *stream,
++							uint32_t *dsp_frames)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int out_add_audio_effect(const struct audio_stream *stream,
++							effect_handle_t effect)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int out_remove_audio_effect(const struct audio_stream *stream,
++							effect_handle_t effect)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
+ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 					audio_io_handle_t handle,
+ 					audio_devices_t devices,
+ 					audio_output_flags_t flags,
+ 					struct audio_config *config,
+ 					struct audio_stream_out **stream_out)
+-
+ {
++	struct sco_dev *adev = (struct sco_dev *) dev;
++	struct sco_stream_out *out;
++
+ 	DBG("");
+ 
+-	return -EINVAL;
++	out = calloc(1, sizeof(struct sco_stream_out));
++	if (!out)
++		return -ENOMEM;
++
++	out->stream.common.get_sample_rate = out_get_sample_rate;
++	out->stream.common.set_sample_rate = out_set_sample_rate;
++	out->stream.common.get_buffer_size = out_get_buffer_size;
++	out->stream.common.get_channels = out_get_channels;
++	out->stream.common.get_format = out_get_format;
++	out->stream.common.set_format = out_set_format;
++	out->stream.common.standby = out_standby;
++	out->stream.common.dump = out_dump;
++	out->stream.common.set_parameters = out_set_parameters;
++	out->stream.common.get_parameters = out_get_parameters;
++	out->stream.common.add_audio_effect = out_add_audio_effect;
++	out->stream.common.remove_audio_effect = out_remove_audio_effect;
++	out->stream.get_latency = out_get_latency;
++	out->stream.set_volume = out_set_volume;
++	out->stream.write = out_write;
++	out->stream.get_render_position = out_get_render_position;
++
++	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
++	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
++	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++
++	*stream_out = &out->stream;
++	adev->out = out;
++
++	return 0;
+ }
+ 
+ static void sco_close_output_stream(struct audio_hw_device *dev,
 -- 
 1.8.3.2
 
