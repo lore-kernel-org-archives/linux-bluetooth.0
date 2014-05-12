@@ -1,221 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 01/11] android/hal-audio-hsp: Add open_output_stream()
-Date: Mon, 12 May 2014 11:56:59 +0300
-Message-Id: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Add test listing for MCAP
+Date: Mon, 12 May 2014 15:26:40 +0200
+Message-Id: <1399901200-30251-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Function adds audio_open_output_stream() and sets dummy callbacks.
 ---
- android/hal-sco.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 176 insertions(+), 2 deletions(-)
+ android/Makefile.am  |  3 +-
+ android/pts-mcap.txt | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 79 insertions(+), 1 deletion(-)
+ create mode 100644 android/pts-mcap.txt
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 8f8c3b6..06e39ed 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -26,21 +26,195 @@
- 
- #include "hal-log.h"
- 
-+#define AUDIO_STREAM_DEFAULT_RATE	44100
-+#define AUDIO_STREAM_DEFAULT_FORMAT	AUDIO_FORMAT_PCM_16_BIT
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 3d1595f..fb3dcbb 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -263,4 +263,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-gatt.txt \
+ 				android/pts-hsp.txt \
+ 				android/pts-iopt.txt \
+-				android/pts-hdp.txt
++				android/pts-hdp.txt \
++				android/pts-mcap.txt
+diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
+new file mode 100644
+index 0000000..9a77839
+--- /dev/null
++++ b/android/pts-mcap.txt
+@@ -0,0 +1,77 @@
++PTS test results for MCAP
 +
-+#define OUT_BUFFER_SIZE			2560
++PTS version: 5.1
++Tested: not tested
++Android version: 4.4.2
 +
-+struct sco_audio_config {
-+	uint32_t rate;
-+	uint32_t channels;
-+	audio_format_t format;
-+};
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
 +
-+struct sco_stream_out {
-+	struct audio_stream_out stream;
-+	struct sco_audio_config cfg;
-+};
-+
- struct sco_dev {
- 	struct audio_hw_device dev;
-+	struct sco_stream_out *out;
- };
- 
-+/* Audio stream functions */
-+
-+static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
-+								size_t bytes)
-+{
-+	/* write data */
-+
-+	return bytes;
-+}
-+
-+static uint32_t out_get_sample_rate(const struct audio_stream *stream)
-+{
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+
-+	DBG("rate %u", out->cfg.rate);
-+
-+	return out->cfg.rate;
-+}
-+
-+static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
-+{
-+	DBG("rate %u", rate);
-+
-+	return 0;
-+}
-+
-+static size_t out_get_buffer_size(const struct audio_stream *stream)
-+{
-+	DBG("buf size %u", OUT_BUFFER_SIZE);
-+
-+	return OUT_BUFFER_SIZE;
-+}
-+
-+static uint32_t out_get_channels(const struct audio_stream *stream)
-+{
-+	DBG("");
-+
-+	/* AudioFlinger can only provide stereo stream, so we return it here and
-+	 * later we'll downmix this to mono in case codec requires it
-+	 */
-+	return AUDIO_CHANNEL_OUT_STEREO;
-+}
-+
-+static audio_format_t out_get_format(const struct audio_stream *stream)
-+{
-+	struct sco_stream_out *out = (struct sco_stream_out *) stream;
-+
-+	DBG("");
-+
-+	return out->cfg.format;
-+}
-+
-+static int out_set_format(struct audio_stream *stream, audio_format_t format)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_standby(struct audio_stream *stream)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int out_dump(const struct audio_stream *stream, int fd)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
-+{
-+	DBG("%s", kvpairs);
-+
-+	return 0;
-+}
-+
-+static char *out_get_parameters(const struct audio_stream *stream,
-+							const char *keys)
-+{
-+	DBG("");
-+
-+	return strdup("");
-+}
-+
-+static uint32_t out_get_latency(const struct audio_stream_out *stream)
-+{
-+	DBG("");
-+
-+	return 0;
-+}
-+
-+static int out_set_volume(struct audio_stream_out *stream, float left,
-+								float right)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_get_render_position(const struct audio_stream_out *stream,
-+							uint32_t *dsp_frames)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_add_audio_effect(const struct audio_stream *stream,
-+							effect_handle_t effect)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
-+static int out_remove_audio_effect(const struct audio_stream *stream,
-+							effect_handle_t effect)
-+{
-+	DBG("");
-+
-+	return -ENOSYS;
-+}
-+
- static int sco_open_output_stream(struct audio_hw_device *dev,
- 					audio_io_handle_t handle,
- 					audio_devices_t devices,
- 					audio_output_flags_t flags,
- 					struct audio_config *config,
- 					struct audio_stream_out **stream_out)
--
- {
-+	struct sco_dev *adev = (struct sco_dev *) dev;
-+	struct sco_stream_out *out;
-+
- 	DBG("");
- 
--	return -EINVAL;
-+	out = calloc(1, sizeof(struct sco_stream_out));
-+	if (!out)
-+		return -ENOMEM;
-+
-+	out->stream.common.get_sample_rate = out_get_sample_rate;
-+	out->stream.common.set_sample_rate = out_set_sample_rate;
-+	out->stream.common.get_buffer_size = out_get_buffer_size;
-+	out->stream.common.get_channels = out_get_channels;
-+	out->stream.common.get_format = out_get_format;
-+	out->stream.common.set_format = out_set_format;
-+	out->stream.common.standby = out_standby;
-+	out->stream.common.dump = out_dump;
-+	out->stream.common.set_parameters = out_set_parameters;
-+	out->stream.common.get_parameters = out_get_parameters;
-+	out->stream.common.add_audio_effect = out_add_audio_effect;
-+	out->stream.common.remove_audio_effect = out_remove_audio_effect;
-+	out->stream.get_latency = out_get_latency;
-+	out->stream.set_volume = out_set_volume;
-+	out->stream.write = out_write;
-+	out->stream.get_render_position = out_get_render_position;
-+
-+	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
-+	out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
-+	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
-+
-+	*stream_out = &out->stream;
-+	adev->out = out;
-+
-+	return 0;
- }
- 
- static void sco_close_output_stream(struct audio_hw_device *dev,
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_MCAP_CE_BV_01_C	INC
++TC_MCAP_CE_BV_02_C	INC
++TC_MCAP_CE_BV_03_C	INC
++TC_MCAP_CE_BV_04_C	INC
++TC_MCAP_CM_ABT_BV_01_C	N/A
++TC_MCAP_CM_ABT_BV_02_C	INC
++TC_MCAP_CM_ABT_BV_03_C	N/A
++TC_MCAP_CM_DEL_BV_01_C	N/A
++TC_MCAP_CM_DEL_BV_02_C	INC
++TC_MCAP_CM_DEL_BV_02_C	N/A
++TC_MCAP_CM_DEL_BV_04_C	INC
++TC_MCAP_CM_DIS_BV_01_C	INC
++TC_MCAP_CM_DIS_BV_02_C	INC
++TC_MCAP_CM_DIS_BV_03_C	INC
++TC_MCAP_CM_DIS_BV_04_C	INC
++TC_MCAP_CM_DIS_BV_05_C	INC
++TC_MCAP_CM_REC_BV_01_C	N/A
++TC_MCAP_CM_REC_BV_02_C	INC
++TC_MCAP_CM_REC_BV_03_C	N/A
++TC_MCAP_CM_REC_BV_04_C	INC
++TC_MCAP_CM_REC_BV_05_C	N/A
++TC_MCAP_CM_REC_BV_06_C	INC
++TC_MCAP_CS_ERR_BI_01_C	N/A
++TC_MCAP_CS_ERR_BI_02_C	N/A
++TC_MCAP_CS_ERR_BI_03_C	N/A
++TC_MCAP_CS_ERR_BI_04_C	N/A
++TC_MCAP_CS_I_BV_01_I	N/A
++TC_MCAP_CS_I_BV_02_I	N/A
++TC_MCAP_CS_I_BV_03_C	N/A
++TC_MCAP_CS_I_BV_04_C	N/A
++TC_MCAP_CS_R_BV_01_I	N/A
++TC_MCAP_CS_R_BV_02_I	N/A
++TC_MCAP_CS_R_BV_03_C	N/A
++TC_MCAP_CS_T_BV_04_C	N/A
++TC_MCAP_ERR_BI_01_C	INC
++TC_MCAP_ERR_BI_02_C	INC
++TC_MCAP_ERR_BI_03_C	INC
++TC_MCAP_ERR_BI_04_C	INC
++TC_MCAP_ERR_BI_05_C	INC
++TC_MCAP_ERR_BI_06_C	INC
++TC_MCAP_ERR_BI_07_C	INC
++TC_MCAP_ERR_BI_08_C	INC
++TC_MCAP_ERR_BI_09_C	INC
++TC_MCAP_ERR_BI_10_C	INC
++TC_MCAP_ERR_BI_11_C	INC
++TC_MCAP_ERR_BI_12_C	INC
++TC_MCAP_ERR_BI_13_C	INC
++TC_MCAP_ERR_BI_14_C	INC
++TC_MCAP_ERR_BI_15_C	INC
++TC_MCAP_ERR_BI_16_C	INC
++TC_MCAP_ERR_BI_17_C	INC
++TC_MCAP_ERR_BI_18_C	INC
++TC_MCAP_ERR_BI_19_C	INC
++TC_MCAP_ERR_BI_20_C	INC
++TC_MCAP_INV_BI_01_C	INC
++TC_MCAP_INV_BI_02_C	INC
++TC_MCAP_INV_BI_03_C	INC
++TC_MCAP_INV_BI_04_C	INC
++TC_MCAP_INV_BI_05_C	INC
++TC_MCAP_INV_BI_06_C	INC
++TC_MCAP_INV_BI_07_C	INC
++-------------------------------------------------------------------------------
 -- 
-1.8.3.2
+1.8.5.3
 
