@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 07/11] android/audio: Add resampler support
-Date: Mon, 12 May 2014 11:57:05 +0300
-Message-Id: <1399885029-6358-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv6 06/11] android/haltest: Add testinng for audio SCO HAL
+Date: Mon, 12 May 2014 11:57:04 +0300
+Message-Id: <1399885029-6358-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,457 +11,603 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The patch adds support for resampling audio in host and Android. There
-are Android wrappers for SPEEXDSP library added to host.
+Adds testing support for audio-sco HAL.
 ---
- android/Android.mk              |   2 +
- android/Makefile.am             |   6 +-
- android/audio_utils/resampler.c | 265 ++++++++++++++++++++++++++++++++++++++++
- android/audio_utils/resampler.h | 109 +++++++++++++++++
- configure.ac                    |   7 ++
- 5 files changed, 388 insertions(+), 1 deletion(-)
- create mode 100644 android/audio_utils/resampler.c
- create mode 100644 android/audio_utils/resampler.h
+ android/Android.mk       |   1 +
+ android/Makefile.am      |   1 +
+ android/client/haltest.c |   3 +
+ android/client/if-main.h |   1 +
+ android/client/if-sco.c  | 520 +++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 526 insertions(+)
+ create mode 100644 android/client/if-sco.c
 
 diff --git a/android/Android.mk b/android/Android.mk
-index 6d0169b..cc0f8f5 100644
+index b7b284d..6d0169b 100644
 --- a/android/Android.mk
 +++ b/android/Android.mk
-@@ -282,9 +282,11 @@ LOCAL_SRC_FILES := bluez/android/hal-sco.c
- LOCAL_C_INCLUDES = \
- 	$(call include-path-for, system-core) \
- 	$(call include-path-for, libhardware) \
-+	$(call include-path-for, audio-utils) \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
-+	libaudioutils \
- 
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
- 
+@@ -149,6 +149,7 @@ LOCAL_SRC_FILES := \
+ 	bluez/android/client/history.c \
+ 	bluez/android/client/tabcompletion.c \
+ 	bluez/android/client/if-audio.c \
++	bluez/android/client/if-sco.c \
+ 	bluez/android/client/if-av.c \
+ 	bluez/android/client/if-rc.c \
+ 	bluez/android/client/if-bt.c \
 diff --git a/android/Makefile.am b/android/Makefile.am
-index 6570868..6587fc3 100644
+index 78015e6..6570868 100644
 --- a/android/Makefile.am
 +++ b/android/Makefile.am
-@@ -175,9 +175,13 @@ android_audio_sco_default_la_SOURCES = android/hal-log.h \
- 					android/hardware/audio.h \
- 					android/hardware/audio_effect.h \
- 					android/hardware/hardware.h \
-+					android/audio_utils/resampler.c \
-+					android/audio_utils/resampler.h \
- 					android/system/audio.h
+@@ -109,6 +109,7 @@ android_haltest_SOURCES = android/client/haltest.c \
+ 				android/client/if-hl.c \
+ 				android/client/if-sock.c \
+ 				android/client/if-audio.c \
++				android/client/if-sco.c \
+ 				android/hardware/hardware.c \
+ 				android/hal-utils.h android/hal-utils.c
  
--android_audio_sco_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
-+android_audio_sco_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android -Wno-declaration-after-statement
-+
-+android_audio_sco_default_la_LIBADD = @SPEEXDSP_LIBS@
+diff --git a/android/client/haltest.c b/android/client/haltest.c
+index 5d05b75..0871dd7 100644
+--- a/android/client/haltest.c
++++ b/android/client/haltest.c
+@@ -32,6 +32,7 @@
  
- android_audio_sco_default_la_LDFLAGS = $(AM_LDFLAGS) -module -avoid-version \
- 					-no-undefined -lrt
-diff --git a/android/audio_utils/resampler.c b/android/audio_utils/resampler.c
+ const struct interface *interfaces[] = {
+ 	&audio_if,
++	&sco_if,
+ 	&bluetooth_if,
+ 	&av_if,
+ 	&rc_if,
+@@ -394,10 +395,12 @@ static void init(void)
+ 	const struct method *m;
+ 	const char *argv[4];
+ 	char init_audio[] = "audio init";
++	char init_audio_sco[] = "audio-sco init";
+ 	char init_bt[] = "bluetooth init";
+ 	uint32_t i;
+ 
+ 	process_line(init_audio);
++	process_line(init_audio_sco);
+ 	process_line(init_bt);
+ 
+ 	m = get_interface_method("bluetooth", "get_profile_interface");
+diff --git a/android/client/if-main.h b/android/client/if-main.h
+index ff6006c..88da0c7 100644
+--- a/android/client/if-main.h
++++ b/android/client/if-main.h
+@@ -68,6 +68,7 @@ struct interface {
+ };
+ 
+ extern const struct interface audio_if;
++extern const struct interface sco_if;
+ extern const struct interface bluetooth_if;
+ extern const struct interface av_if;
+ extern const struct interface rc_if;
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
 new file mode 100644
-index 0000000..137e4d2
+index 0000000..96ddcc4
 --- /dev/null
-+++ b/android/audio_utils/resampler.c
-@@ -0,0 +1,265 @@
++++ b/android/client/if-sco.c
+@@ -0,0 +1,520 @@
 +/*
-+** Copyright 2011, The Android Open-Source Project
-+**
-+** Licensed under the Apache License, Version 2.0 (the "License");
-+** you may not use this file except in compliance with the License.
-+** You may obtain a copy of the License at
-+**
-+**     http://www.apache.org/licenses/LICENSE-2.0
-+**
-+** Unless required by applicable law or agreed to in writing, software
-+** distributed under the License is distributed on an "AS IS" BASIS,
-+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+** See the License for the specific language governing permissions and
-+** limitations under the License.
-+*/
-+
-+//#define LOG_NDEBUG 0
-+
-+#include <errno.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <system/audio.h>
-+#include <audio_utils/resampler.h>
-+#include <speex/speex_resampler.h>
-+
-+#include "hal-log.h"
-+
-+struct resampler {
-+    struct resampler_itfe itfe;
-+    SpeexResamplerState *speex_resampler;       // handle on speex resampler
-+    struct resampler_buffer_provider *provider; // buffer provider installed by client
-+    uint32_t in_sample_rate;                    // input sampling rate in Hz
-+    uint32_t out_sample_rate;                   // output sampling rate in Hz
-+    uint32_t channel_count;                     // number of channels (interleaved)
-+    int16_t *in_buf;                            // input buffer
-+    size_t in_buf_size;                         // input buffer size
-+    size_t frames_in;                           // number of frames in input buffer
-+    size_t frames_rq;                           // cached number of output frames
-+    size_t frames_needed;                       // minimum number of input frames to produce
-+                                                // frames_rq output frames
-+    int32_t speex_delay_ns;                     // delay introduced by speex resampler in ns
-+};
-+
-+
-+//------------------------------------------------------------------------------
-+// speex based resampler
-+//------------------------------------------------------------------------------
-+
-+static void resampler_reset(struct resampler_itfe *resampler)
-+{
-+    struct resampler *rsmp = (struct resampler *)resampler;
-+
-+    rsmp->frames_in = 0;
-+    rsmp->frames_rq = 0;
-+
-+    if (rsmp != NULL && rsmp->speex_resampler != NULL) {
-+        speex_resampler_reset_mem(rsmp->speex_resampler);
-+    }
-+}
-+
-+static int32_t resampler_delay_ns(struct resampler_itfe *resampler)
-+{
-+    struct resampler *rsmp = (struct resampler *)resampler;
-+
-+    int32_t delay = (int32_t)((1000000000 * (int64_t)rsmp->frames_in) / rsmp->in_sample_rate);
-+    delay += rsmp->speex_delay_ns;
-+
-+    return delay;
-+}
-+
-+// outputs a number of frames less or equal to *outFrameCount and updates *outFrameCount
-+// with the actual number of frames produced.
-+static int resampler_resample_from_provider(struct resampler_itfe *resampler,
-+                       int16_t *out,
-+                       size_t *outFrameCount)
-+{
-+    struct resampler *rsmp = (struct resampler *)resampler;
-+
-+    if (rsmp == NULL || out == NULL || outFrameCount == NULL) {
-+        return -EINVAL;
-+    }
-+    if (rsmp->provider == NULL) {
-+        *outFrameCount = 0;
-+        return -ENOSYS;
-+    }
-+
-+    size_t framesRq = *outFrameCount;
-+    // update and cache the number of frames needed at the input sampling rate to produce
-+    // the number of frames requested at the output sampling rate
-+    if (framesRq != rsmp->frames_rq) {
-+        rsmp->frames_needed = (framesRq * rsmp->in_sample_rate) / rsmp->out_sample_rate + 1;
-+        rsmp->frames_rq = framesRq;
-+    }
-+
-+    size_t framesWr = 0;
-+    size_t inFrames = 0;
-+    while (framesWr < framesRq) {
-+        if (rsmp->frames_in < rsmp->frames_needed) {
-+            // make sure that the number of frames present in rsmp->in_buf (rsmp->frames_in) is at
-+            // least the number of frames needed to produce the number of frames requested at
-+            // the output sampling rate
-+            if (rsmp->in_buf_size < rsmp->frames_needed) {
-+                rsmp->in_buf_size = rsmp->frames_needed;
-+                rsmp->in_buf = (int16_t *)realloc(rsmp->in_buf,
-+                                        rsmp->in_buf_size * rsmp->channel_count * sizeof(int16_t));
-+            }
-+            struct resampler_buffer buf;
-+            buf.frame_count = rsmp->frames_needed - rsmp->frames_in;
-+            rsmp->provider->get_next_buffer(rsmp->provider, &buf);
-+            if (buf.raw == NULL) {
-+                break;
-+            }
-+            memcpy(rsmp->in_buf + rsmp->frames_in * rsmp->channel_count,
-+                    buf.raw,
-+                    buf.frame_count * rsmp->channel_count * sizeof(int16_t));
-+            rsmp->frames_in += buf.frame_count;
-+            rsmp->provider->release_buffer(rsmp->provider, &buf);
-+        }
-+
-+        size_t outFrames = framesRq - framesWr;
-+        inFrames = rsmp->frames_in;
-+        if (rsmp->channel_count == 1) {
-+            speex_resampler_process_int(rsmp->speex_resampler,
-+                                        0,
-+                                        rsmp->in_buf,
-+                                        (void *) &inFrames,
-+                                        out + framesWr,
-+                                        (void *) &outFrames);
-+        } else {
-+            speex_resampler_process_interleaved_int(rsmp->speex_resampler,
-+                                        rsmp->in_buf,
-+                                        (void *) &inFrames,
-+                                        out + framesWr * rsmp->channel_count,
-+                                        (void *) &outFrames);
-+        }
-+        framesWr += outFrames;
-+        rsmp->frames_in -= inFrames;
-+
-+        if ((framesWr != framesRq) && (rsmp->frames_in != 0))
-+            warn("ReSampler::resample() remaining %zd frames in and %zd out",
-+                rsmp->frames_in, (framesRq - framesWr));
-+    }
-+    if (rsmp->frames_in) {
-+        memmove(rsmp->in_buf,
-+                rsmp->in_buf + inFrames * rsmp->channel_count,
-+                rsmp->frames_in * rsmp->channel_count * sizeof(int16_t));
-+    }
-+    *outFrameCount = framesWr;
-+
-+    return 0;
-+}
-+
-+static int resampler_resample_from_input(struct resampler_itfe *resampler,
-+                                  int16_t *in,
-+                                  size_t *inFrameCount,
-+                                  int16_t *out,
-+                                  size_t *outFrameCount)
-+{
-+    struct resampler *rsmp = (struct resampler *)resampler;
-+
-+    if (rsmp == NULL || in == NULL || inFrameCount == NULL ||
-+            out == NULL || outFrameCount == NULL) {
-+        return -EINVAL;
-+    }
-+    if (rsmp->provider != NULL) {
-+        *outFrameCount = 0;
-+        return -ENOSYS;
-+    }
-+
-+    if (rsmp->channel_count == 1) {
-+        speex_resampler_process_int(rsmp->speex_resampler,
-+                                    0,
-+                                    in,
-+                                    (void *) inFrameCount,
-+                                    out,
-+                                    (void *) outFrameCount);
-+    } else {
-+        speex_resampler_process_interleaved_int(rsmp->speex_resampler,
-+                                                in,
-+                                                (void *) inFrameCount,
-+                                                out,
-+                                                (void *) outFrameCount);
-+    }
-+
-+    DBG("resampler_resample_from_input() DONE in %zd out %zd", *inFrameCount, *outFrameCount);
-+
-+    return 0;
-+}
-+
-+int create_resampler(uint32_t inSampleRate,
-+                    uint32_t outSampleRate,
-+                    uint32_t channelCount,
-+                    uint32_t quality,
-+                    struct resampler_buffer_provider* provider,
-+                    struct resampler_itfe **resampler)
-+{
-+    int error;
-+    struct resampler *rsmp;
-+
-+    DBG("create_resampler() In SR %d Out SR %d channels %d",
-+         inSampleRate, outSampleRate, channelCount);
-+
-+    if (resampler == NULL) {
-+        return -EINVAL;
-+    }
-+
-+    *resampler = NULL;
-+
-+    if (quality <= RESAMPLER_QUALITY_MIN || quality >= RESAMPLER_QUALITY_MAX) {
-+        return -EINVAL;
-+    }
-+
-+    rsmp = (struct resampler *)calloc(1, sizeof(struct resampler));
-+
-+    rsmp->speex_resampler = speex_resampler_init(channelCount,
-+                                      inSampleRate,
-+                                      outSampleRate,
-+                                      quality,
-+                                      &error);
-+    if (rsmp->speex_resampler == NULL) {
-+        error("ReSampler: Cannot create speex resampler: %s", speex_resampler_strerror(error));
-+        free(rsmp);
-+        return -ENODEV;
-+    }
-+
-+    rsmp->itfe.reset = resampler_reset;
-+    rsmp->itfe.resample_from_provider = resampler_resample_from_provider;
-+    rsmp->itfe.resample_from_input = resampler_resample_from_input;
-+    rsmp->itfe.delay_ns = resampler_delay_ns;
-+
-+    rsmp->provider = provider;
-+    rsmp->in_sample_rate = inSampleRate;
-+    rsmp->out_sample_rate = outSampleRate;
-+    rsmp->channel_count = channelCount;
-+    rsmp->in_buf = NULL;
-+    rsmp->in_buf_size = 0;
-+
-+    resampler_reset(&rsmp->itfe);
-+
-+    int frames = speex_resampler_get_input_latency(rsmp->speex_resampler);
-+    rsmp->speex_delay_ns = (int32_t)((1000000000 * (int64_t)frames) / rsmp->in_sample_rate);
-+    frames = speex_resampler_get_output_latency(rsmp->speex_resampler);
-+    rsmp->speex_delay_ns += (int32_t)((1000000000 * (int64_t)frames) / rsmp->out_sample_rate);
-+
-+    *resampler = &rsmp->itfe;
-+    DBG("create_resampler() DONE rsmp %p &rsmp->itfe %p speex %p",
-+         rsmp, &rsmp->itfe, rsmp->speex_resampler);
-+    return 0;
-+}
-+
-+void release_resampler(struct resampler_itfe *resampler)
-+{
-+    struct resampler *rsmp = (struct resampler *)resampler;
-+
-+    if (rsmp == NULL) {
-+        return;
-+    }
-+
-+    free(rsmp->in_buf);
-+
-+    if (rsmp->speex_resampler != NULL) {
-+        speex_resampler_destroy(rsmp->speex_resampler);
-+    }
-+    free(rsmp);
-+}
-diff --git a/android/audio_utils/resampler.h b/android/audio_utils/resampler.h
-new file mode 100644
-index 0000000..0c7046f
---- /dev/null
-+++ b/android/audio_utils/resampler.h
-@@ -0,0 +1,109 @@
-+/*
-+** Copyright 2008, The Android Open-Source Project
-+**
-+** Licensed under the Apache License, Version 2.0 (the "License");
-+** you may not use this file except in compliance with the License.
-+** You may obtain a copy of the License at
-+**
-+**     http://www.apache.org/licenses/LICENSE-2.0
-+**
-+** Unless required by applicable law or agreed to in writing, software
-+** distributed under the License is distributed on an "AS IS" BASIS,
-+** WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-+** See the License for the specific language governing permissions and
-+** limitations under the License.
-+*/
-+
-+#ifndef ANDROID_RESAMPLER_H
-+#define ANDROID_RESAMPLER_H
-+
-+#include <stdint.h>
-+#include <sys/time.h>
-+
-+__BEGIN_DECLS
-+
-+
-+#define RESAMPLER_QUALITY_MAX 10
-+#define RESAMPLER_QUALITY_MIN 0
-+#define RESAMPLER_QUALITY_DEFAULT 4
-+#define RESAMPLER_QUALITY_VOIP 3
-+#define RESAMPLER_QUALITY_DESKTOP 5
-+
-+struct resampler_buffer {
-+    union {
-+        void*       raw;
-+        short*      i16;
-+        int8_t*     i8;
-+    };
-+    size_t frame_count;
-+};
-+
-+/* call back interface used by the resampler to get new data */
-+struct resampler_buffer_provider
-+{
-+    /**
-+     *  get a new buffer of data:
-+     *   as input: buffer->frame_count is the number of frames requested
-+     *   as output: buffer->frame_count is the number of frames returned
-+     *              buffer->raw points to data returned
-+     */
-+    int (*get_next_buffer)(struct resampler_buffer_provider *provider,
-+            struct resampler_buffer *buffer);
-+    /**
-+     *  release a consumed buffer of data:
-+     *   as input: buffer->frame_count is the number of frames released
-+     *             buffer->raw points to data released
-+     */
-+    void (*release_buffer)(struct resampler_buffer_provider *provider,
-+            struct resampler_buffer *buffer);
-+};
-+
-+/* resampler interface */
-+struct resampler_itfe {
-+    /**
-+     * reset resampler state
-+     */
-+    void (*reset)(struct resampler_itfe *resampler);
-+    /**
-+     * resample input from buffer provider and output at most *outFrameCount to out buffer.
-+     * *outFrameCount is updated with the actual number of frames produced.
-+     */
-+    int (*resample_from_provider)(struct resampler_itfe *resampler,
-+                    int16_t *out,
-+                    size_t *outFrameCount);
-+    /**
-+     * resample at most *inFrameCount frames from in buffer and output at most
-+     * *outFrameCount to out buffer. *inFrameCount and *outFrameCount are updated respectively
-+     * with the number of frames remaining in input and written to output.
-+     */
-+    int (*resample_from_input)(struct resampler_itfe *resampler,
-+                    int16_t *in,
-+                    size_t *inFrameCount,
-+                    int16_t *out,
-+                    size_t *outFrameCount);
-+    /**
-+     * return the latency introduced by the resampler in ns.
-+     */
-+    int32_t (*delay_ns)(struct resampler_itfe *resampler);
-+};
-+
-+/**
-+ * create a resampler according to input parameters passed.
-+ * If resampler_buffer_provider is not NULL only resample_from_provider() can be called.
-+ * If resampler_buffer_provider is NULL only resample_from_input() can be called.
++ * Copyright (C) 2014 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
 + */
-+int create_resampler(uint32_t inSampleRate,
-+          uint32_t outSampleRate,
-+          uint32_t channelCount,
-+          uint32_t quality,
-+          struct resampler_buffer_provider *provider,
-+          struct resampler_itfe **);
 +
-+/**
-+ * release resampler resources.
-+ */
-+void release_resampler(struct resampler_itfe *);
++#include "if-main.h"
++#include "../hal-utils.h"
++#include "pthread.h"
++#include "unistd.h"
++#include <math.h>
 +
-+__END_DECLS
++audio_hw_device_t *if_audio_sco = NULL;
++static struct audio_stream_out *stream_out = NULL;
 +
-+#endif // ANDROID_RESAMPLER_H
-diff --git a/configure.ac b/configure.ac
-index 54a387f..e1a2288 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -259,6 +259,13 @@ if (test "${enable_android}" = "yes"); then
- 	AC_SUBST(SBC_LIBS)
- fi
- 
-+if (test "${enable_android}" = "yes"); then
-+	PKG_CHECK_MODULES(SPEEXDSP, speexdsp >= 1.2, dummy=yes,
-+					AC_MSG_ERROR(SPEEXDSP library >= 1.2 is required))
-+	AC_SUBST(SPEEXDSP_CFLAGS)
-+	AC_SUBST(SPEEXDSP_LIBS)
-+fi
++static size_t buffer_size = 0;
++static pthread_t play_thread = 0;
++static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
++static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
 +
- AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
- 			[Directory for the Android daemon storage files])
- 
++enum state {
++	STATE_STOPPED,
++	STATE_STOPPING,
++	STATE_PLAYING,
++	STATE_SUSPENDED,
++	STATE_MAX
++};
++
++SINTMAP(audio_channel_mask_t, -1, "(AUDIO_CHANNEL_INVALID)")
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_RIGHT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_LOW_FREQUENCY),
++	DELEMENT(AUDIO_CHANNEL_OUT_BACK_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_BACK_RIGHT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT_OF_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_RIGHT_OF_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_BACK_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_SIDE_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_SIDE_RIGHT),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_FRONT_RIGHT),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_CENTER),
++	DELEMENT(AUDIO_CHANNEL_OUT_TOP_BACK_RIGHT),
++	DELEMENT(AUDIO_CHANNEL_OUT_MONO),
++	DELEMENT(AUDIO_CHANNEL_OUT_STEREO),
++	DELEMENT(AUDIO_CHANNEL_OUT_QUAD),
++	DELEMENT(AUDIO_CHANNEL_OUT_SURROUND),
++	DELEMENT(AUDIO_CHANNEL_OUT_5POINT1),
++	DELEMENT(AUDIO_CHANNEL_OUT_7POINT1),
++	DELEMENT(AUDIO_CHANNEL_OUT_ALL),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
++	DELEMENT(AUDIO_CHANNEL_OUT_FRONT_LEFT),
++ENDMAP
++
++SINTMAP(audio_format_t, -1, "(AUDIO_FORMAT_INVALID)")
++	DELEMENT(AUDIO_FORMAT_DEFAULT),
++	DELEMENT(AUDIO_FORMAT_PCM),
++	DELEMENT(AUDIO_FORMAT_MP3),
++	DELEMENT(AUDIO_FORMAT_AMR_NB),
++	DELEMENT(AUDIO_FORMAT_AMR_WB),
++	DELEMENT(AUDIO_FORMAT_AAC),
++	DELEMENT(AUDIO_FORMAT_HE_AAC_V1),
++	DELEMENT(AUDIO_FORMAT_HE_AAC_V2),
++	DELEMENT(AUDIO_FORMAT_VORBIS),
++	DELEMENT(AUDIO_FORMAT_MAIN_MASK),
++	DELEMENT(AUDIO_FORMAT_SUB_MASK),
++	DELEMENT(AUDIO_FORMAT_PCM_16_BIT),
++	DELEMENT(AUDIO_FORMAT_PCM_8_BIT),
++	DELEMENT(AUDIO_FORMAT_PCM_32_BIT),
++	DELEMENT(AUDIO_FORMAT_PCM_8_24_BIT),
++ENDMAP
++
++static int current_state = STATE_STOPPED;
++
++#define SAMPLERATE 44100
++static short sample[SAMPLERATE];
++static uint16_t sample_pos;
++
++static void init_p(int argc, const char **argv)
++{
++	int err;
++	const hw_module_t *module;
++	audio_hw_device_t *device;
++
++	err = hw_get_module_by_class(AUDIO_HARDWARE_MODULE_ID, "hsp", &module);
++	if (err) {
++		haltest_error("hw_get_module_by_class returned %d\n", err);
++		return;
++	}
++
++	err = audio_hw_device_open(module, &device);
++	if (err) {
++		haltest_error("audio_hw_device_open returned %d\n", err);
++		return;
++	}
++
++	if_audio_sco = device;
++}
++
++static int feed_from_file(short *buffer, void *data)
++{
++	FILE *in = data;
++	return fread(buffer, buffer_size, 1, in);
++}
++
++static int feed_from_generator(short *buffer, void *data)
++{
++	size_t i = 0;
++	float volume = 0.5;
++	float *freq = data;
++	float f = 1;
++
++	if (freq)
++		f = *freq;
++
++	/* buffer_size is in bytes but we are using buffer of shorts (2 bytes)*/
++	for (i = 0; i < buffer_size / sizeof(*buffer) - 1;) {
++		if (sample_pos >= SAMPLERATE)
++			sample_pos = sample_pos % SAMPLERATE;
++
++		/* Use the same sample for both channels */
++		buffer[i++] = sample[sample_pos] * volume;
++		buffer[i++] = sample[sample_pos] * volume;
++
++		sample_pos += f;
++	}
++
++	return buffer_size;
++}
++
++static void prepare_sample(void)
++{
++	int x;
++	double s;
++
++	haltest_info("Preparing audio sample...\n");
++
++	for (x = 0; x < SAMPLERATE; x++) {
++		/* prepare sinusoidal 1Hz sample */
++		s = (2.0 * 3.14159) * ((double)x / SAMPLERATE);
++		s = sin(s);
++
++		/* remap <-1, 1> to signed 16bit PCM range */
++		sample[x] = s * 32767;
++	}
++
++	sample_pos = 0;
++}
++
++static void *playback_thread(void *data)
++{
++	int (*filbuff_cb) (short*, void*);
++	short buffer[buffer_size / sizeof(short)];
++	size_t len = 0;
++	ssize_t w_len = 0;
++	FILE *in = data;
++	void *cb_data = NULL;
++	float freq = 440.0;
++
++	/* Use file or fall back to generator */
++	if (in) {
++		filbuff_cb = feed_from_file;
++		cb_data = in;
++	} else {
++		prepare_sample();
++		filbuff_cb = feed_from_generator;
++		cb_data = &freq;
++	}
++
++	pthread_mutex_lock(&state_mutex);
++	current_state = STATE_PLAYING;
++	pthread_mutex_unlock(&state_mutex);
++
++	do {
++		pthread_mutex_lock(&state_mutex);
++
++		if (current_state == STATE_STOPPING) {
++			haltest_info("Detected stopping\n");
++			pthread_mutex_unlock(&state_mutex);
++			break;
++		} else if (current_state == STATE_SUSPENDED) {
++			pthread_mutex_unlock(&state_mutex);
++			usleep(500);
++			continue;
++		}
++
++		pthread_mutex_unlock(&state_mutex);
++
++		len = filbuff_cb(buffer, cb_data);
++
++		pthread_mutex_lock(&outstream_mutex);
++		if (!stream_out) {
++			pthread_mutex_unlock(&outstream_mutex);
++			break;
++		}
++
++		w_len = stream_out->write(stream_out, buffer, buffer_size);
++		pthread_mutex_unlock(&outstream_mutex);
++	} while (len && w_len > 0);
++
++	if (in)
++		fclose(in);
++
++	pthread_mutex_lock(&state_mutex);
++	current_state = STATE_STOPPED;
++	pthread_mutex_unlock(&state_mutex);
++
++	haltest_info("Done playing.\n");
++
++	return NULL;
++}
++
++static void play_p(int argc, const char **argv)
++{
++	const char *fname = NULL;
++	FILE *in = NULL;
++
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	if (argc < 3) {
++		haltest_error("Invalid audio file path.\n");
++		haltest_info("Using sound generator.\n");
++	} else {
++		fname = argv[2];
++		in = fopen(fname, "r");
++
++		if (in == NULL) {
++			haltest_error("Cannot open file: %s\n", fname);
++			return;
++		}
++		haltest_info("Playing file: %s\n", fname);
++	}
++
++	if (buffer_size == 0) {
++		haltest_error("Invalid buffer size. Was stream_out opened?\n");
++		goto fail;
++	}
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state != STATE_STOPPED) {
++		haltest_error("Already playing or stream suspended!\n");
++		pthread_mutex_unlock(&state_mutex);
++		goto fail;
++	}
++	pthread_mutex_unlock(&state_mutex);
++
++	if (pthread_create(&play_thread, NULL, playback_thread, in) != 0) {
++		haltest_error("Cannot create playback thread!\n");
++		goto fail;
++	}
++
++	return;
++fail:
++	if (in)
++		fclose(in);
++}
++
++static void stop_p(int argc, const char **argv)
++{
++	pthread_mutex_lock(&state_mutex);
++	if (current_state == STATE_STOPPED || current_state == STATE_STOPPING) {
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++
++	current_state = STATE_STOPPING;
++	pthread_mutex_unlock(&state_mutex);
++
++	pthread_mutex_lock(&outstream_mutex);
++	stream_out->common.standby(&stream_out->common);
++	pthread_mutex_unlock(&outstream_mutex);
++
++	haltest_info("Ended %s\n", __func__);
++}
++
++static void open_output_stream_p(int argc, const char **argv)
++{
++	int err;
++
++	RETURN_IF_NULL(if_audio_sco);
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state == STATE_PLAYING) {
++		haltest_error("Already playing!\n");
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++	pthread_mutex_unlock(&state_mutex);
++
++	err = if_audio_sco->open_output_stream(if_audio_sco,
++						0,
++						AUDIO_DEVICE_OUT_ALL_SCO,
++						AUDIO_OUTPUT_FLAG_NONE,
++						NULL,
++						&stream_out);
++	if (err < 0) {
++		haltest_error("open output stream returned %d\n", err);
++		return;
++	}
++
++	buffer_size = stream_out->common.get_buffer_size(&stream_out->common);
++	if (buffer_size == 0)
++		haltest_error("Invalid buffer size received!\n");
++	else
++		haltest_info("Using buffer size: %zu\n", buffer_size);
++}
++
++static void close_output_stream_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	stop_p(argc, argv);
++
++	haltest_info("Waiting for playback thread...\n");
++	pthread_join(play_thread, NULL);
++
++	if_audio_sco->close_output_stream(if_audio_sco, stream_out);
++
++	stream_out = NULL;
++	buffer_size = 0;
++}
++
++static void cleanup_p(int argc, const char **argv)
++{
++	int err;
++
++	RETURN_IF_NULL(if_audio_sco);
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state != STATE_STOPPED) {
++		pthread_mutex_unlock(&state_mutex);
++		close_output_stream_p(0, NULL);
++	} else {
++		pthread_mutex_unlock(&state_mutex);
++	}
++
++	err = audio_hw_device_close(if_audio_sco);
++	if (err < 0) {
++		haltest_error("audio_hw_device_close returned %d\n", err);
++		return;
++	}
++
++	if_audio_sco = NULL;
++}
++
++static void suspend_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state != STATE_PLAYING) {
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++	current_state = STATE_SUSPENDED;
++	pthread_mutex_unlock(&state_mutex);
++
++	pthread_mutex_lock(&outstream_mutex);
++	stream_out->common.standby(&stream_out->common);
++	pthread_mutex_unlock(&outstream_mutex);
++}
++
++static void resume_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state == STATE_SUSPENDED)
++		current_state = STATE_PLAYING;
++	pthread_mutex_unlock(&state_mutex);
++}
++
++static void get_latency_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	haltest_info("Output audio stream latency: %d\n",
++					stream_out->get_latency(stream_out));
++}
++
++static void get_buffer_size_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	haltest_info("Current output buffer size: %zu\n",
++		stream_out->common.get_buffer_size(&stream_out->common));
++}
++
++static void get_channels_p(int argc, const char **argv)
++{
++	audio_channel_mask_t channels;
++
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	channels = stream_out->common.get_channels(&stream_out->common);
++
++	haltest_info("Channels: %s\n", audio_channel_mask_t2str(channels));
++}
++
++static void get_format_p(int argc, const char **argv)
++{
++	audio_format_t format;
++
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	format = stream_out->common.get_format(&stream_out->common);
++
++	haltest_info("Format: %s\n", audio_format_t2str(format));
++}
++
++static void get_sample_rate_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	haltest_info("Current sample rate: %d\n",
++		stream_out->common.get_sample_rate(&stream_out->common));
++}
++
++static void get_parameters_p(int argc, const char **argv)
++{
++	const char *keystr;
++
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	if (argc < 3) {
++		haltest_info("No keys given.\n");
++		keystr = "";
++	} else {
++		keystr = argv[2];
++	}
++
++	haltest_info("Current parameters: %s\n",
++			stream_out->common.get_parameters(&stream_out->common,
++								keystr));
++}
++
++static void set_parameters_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	if (argc < 3) {
++		haltest_error("No key=value; pairs given.\n");
++		return;
++	}
++
++	stream_out->common.set_parameters(&stream_out->common, argv[2]);
++}
++
++static void set_sample_rate_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++
++	if (argc < 3)
++		return;
++
++	stream_out->common.set_sample_rate(&stream_out->common, atoi(argv[2]));
++}
++
++static void init_check_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++
++	haltest_info("Init check result: %d\n", if_audio_sco->init_check(if_audio_sco));
++}
++
++static struct method methods[] = {
++	STD_METHOD(init),
++	STD_METHOD(cleanup),
++	STD_METHOD(open_output_stream),
++	STD_METHOD(close_output_stream),
++	STD_METHODH(play, "<path to pcm file>"),
++	STD_METHOD(stop),
++	STD_METHOD(suspend),
++	STD_METHOD(resume),
++	STD_METHOD(get_latency),
++	STD_METHOD(get_buffer_size),
++	STD_METHOD(get_channels),
++	STD_METHOD(get_format),
++	STD_METHOD(get_sample_rate),
++	STD_METHODH(get_parameters, "<closing>"),
++	STD_METHODH(set_parameters, "<closing=value>"),
++	STD_METHODH(set_sample_rate, "<sample rate>"),
++	STD_METHOD(init_check),
++	END_METHOD
++};
++
++const struct interface sco_if = {
++	.name = "audio-sco",
++	.methods = methods
++};
 -- 
 1.8.3.2
 
