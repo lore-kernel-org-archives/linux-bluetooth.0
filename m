@@ -1,207 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/8] shared/gatt: Refactor find information
-Date: Mon, 12 May 2014 15:02:35 +0200
-Message-Id: <1399899758-4944-6-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/8] shared/gatt: Extend gatt_db_read function
+Date: Mon, 12 May 2014 15:02:32 +0200
+Message-Id: <1399899758-4944-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1399899758-4944-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1399899758-4944-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Now find information will fill queue with handles of found attributes.
+If value exists in database, return pointer to it instead of returning
+false. It is needed because some attributes don't have read_cb callback
+and their value can be read directly from database. If read_cb is
+registered, it will be called. In case of error false will be returned.
 ---
- android/gatt.c       | 66 ++++++++++++++++++----------------------------------
- src/shared/gatt-db.c | 32 ++++++++++++++++++-------
- src/shared/gatt-db.h | 12 ++++------
- 3 files changed, 50 insertions(+), 60 deletions(-)
+ android/gatt.c       |  3 ++-
+ src/shared/gatt-db.c | 17 ++++++++++++++---
+ src/shared/gatt-db.h |  3 ++-
+ 3 files changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index f107b41..e53787e 100644
+index d8bcfb5..0a2abe3 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -3963,31 +3963,6 @@ static void copy_to_att_list(void *data, void *user_data)
- 	memcpy(&value[4], group->value, group->len);
- }
- 
--static void copy_to_att_list_info(void *data, void *user_data)
--{
--	struct copy_att_list_data *l = user_data;
--	struct gatt_db_find_information *info = data;
--	uint8_t *value;
--
--	value = l->adl->data[l->iterator++];
--
--	put_le16(info->handle, value);
--
--	switch (info->uuid.type) {
--	case BT_UUID16:
--		memcpy(&value[2], &info->uuid.value.u16,
--						bt_uuid_len(&info->uuid));
--		break;
--	case BT_UUID128:
--		memcpy(&value[2], &info->uuid.value.u128,
--						bt_uuid_len(&info->uuid));
--		break;
--	default:
--		error("gatt: Unexpected UUID type");
--		break;
--	}
--}
--
- static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
- 						uint8_t *rsp, size_t rsp_size,
- 						uint16_t *length)
-@@ -4296,12 +4271,9 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- 						uint16_t *length)
- {
- 	struct queue *q;
--	struct gatt_db_find_information *last_element;
--	struct copy_att_list_data l;
- 	struct att_data_list *adl;
-+	int iterator = 0;
- 	uint16_t start, end;
--	uint16_t num;
--	uint8_t format;
- 	uint16_t len;
- 
- 	DBG("");
-@@ -4322,29 +4294,35 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
+@@ -4105,7 +4105,8 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+ 		return ATT_ECODE_REQ_NOT_SUPP;
  	}
  
- 	len = queue_length(q);
-+	adl = att_data_list_alloc(len, 2 * sizeof(uint16_t));
-+	if (!adl) {
-+		queue_destroy(q, NULL);
-+		return ATT_ECODE_INSUFF_RESOURCES;
-+	}
-+
-+	while (queue_peek_head(q)) {
-+		uint8_t *value;
-+		const bt_uuid_t *type;
-+		uint16_t handle = PTR_TO_UINT(queue_pop_head(q));
- 
--	last_element = queue_peek_head(q);
-+		type = gatt_db_get_attribute_type(gatt_db, handle);
-+		if (!type)
-+			break;
-+
-+		value = adl->data[iterator++];
-+
-+		put_le16(handle, value);
-+		memcpy(&value[2], &type->value.u16, bt_uuid_len(type));
- 
--	if (last_element->uuid.type == BT_UUID16) {
--		num = sizeof(uint16_t);
--		format = ATT_FIND_INFO_RESP_FMT_16BIT;
--	} else {
--		num = sizeof(uint128_t);
--		format = ATT_FIND_INFO_RESP_FMT_128BIT;
- 	}
- 
--	adl = att_data_list_alloc(len, num + sizeof(uint16_t));
- 	if (!adl) {
--		queue_destroy(q, free);
-+		queue_destroy(q, NULL);
- 		return ATT_ECODE_INSUFF_RESOURCES;
- 	}
- 
--	l.iterator = 0;
--	l.adl = adl;
--
--	queue_foreach(q, copy_to_att_list_info, &l);
--
--	len = enc_find_info_resp(format, adl, rsp, rsp_size);
-+	len = enc_find_info_resp(ATT_FIND_INFO_RESP_FMT_16BIT, adl, rsp,
-+								rsp_size);
- 	if (!len)
+-	if (!gatt_db_read(gatt_db, handle, offset, cmd[0], &dev->bdaddr))
++	if (!gatt_db_read(gatt_db, handle, offset, cmd[0], &dev->bdaddr, NULL,
++									NULL))
  		return ATT_ECODE_UNLIKELY;
  
+ 	return 0;
 diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 324a532..532e0b7 100644
+index ebfd586..adce153 100644
 --- a/src/shared/gatt-db.c
 +++ b/src/shared/gatt-db.c
-@@ -614,7 +614,6 @@ static void find_information(void *data, void *user_data)
- 	struct find_information_data *search_data = user_data;
- 	struct gatt_db_service *service = data;
- 	struct gatt_db_attribute *attribute;
--	struct gatt_db_find_information *value;
- 	int i;
- 
- 	if (!service->active)
-@@ -636,14 +635,8 @@ static void find_information(void *data, void *user_data)
- 		if (attribute->handle > search_data->end_handle)
- 			return;
- 
--		value = new0(struct gatt_db_find_information, 1);
--		if (!value)
--			return;
--
--		value->handle = attribute->handle;
--		value->uuid = attribute->uuid;
--		if (!queue_push_tail(search_data->queue, value))
--			free(value);
-+		queue_push_tail(search_data->queue,
-+						UINT_TO_PTR(attribute->handle));
- 	}
+@@ -684,12 +684,16 @@ static bool find_service_for_handle(const void *data, const void *user_data)
  }
  
-@@ -730,3 +723,24 @@ bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
+ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
+-				uint8_t att_opcode, bdaddr_t *bdaddr)
++				uint8_t att_opcode, bdaddr_t *bdaddr,
++				uint8_t **value, uint16_t *length)
+ {
+ 	struct gatt_db_service *service;
+ 	uint16_t service_handle;
+ 	struct gatt_db_attribute *a;
+ 
++	if (!value || !length)
++		return false;
++
+ 	service = queue_find(db->services, find_service_for_handle,
+ 						INT_TO_PTR(handle));
+ 	if (!service)
+@@ -698,10 +702,17 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
+ 	service_handle = service->attributes[0]->handle;
+ 
+ 	a = service->attributes[handle - service_handle];
+-	if (!a || !a->read_func)
++	if (!a || offset > a->value_len)
+ 		return false;
+ 
+-	a->read_func(handle, offset, att_opcode, bdaddr, a->user_data);
++	if (!a->read_func) {
++		*value = &a->value[offset];
++		*length = a->value_len - offset;
++	} else {
++		*value = NULL;
++		*length = 0;
++		a->read_func(handle, offset, att_opcode, bdaddr, a->user_data);
++	}
  
  	return true;
  }
-+
-+const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
-+							uint16_t handle)
-+{
-+	struct gatt_db_service *service;
-+	struct gatt_db_attribute *attribute;
-+	uint16_t service_handle;
-+
-+	service = queue_find(db->services, find_service_for_handle,
-+						INT_TO_PTR(handle));
-+	if (!service)
-+		return NULL;
-+
-+	service_handle = service->attributes[0]->handle;
-+
-+	attribute = service->attributes[handle - service_handle];
-+	if (!attribute)
-+		return NULL;
-+
-+	return &attribute->uuid;
-+}
 diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index 6c9216d..cc9120c 100644
+index f704b8e..a5a5f41 100644
 --- a/src/shared/gatt-db.h
 +++ b/src/shared/gatt-db.h
-@@ -84,17 +84,12 @@ void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
- 							const uint8_t *value,
- 							uint16_t length,
+@@ -106,7 +106,8 @@ void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
  							struct queue *queue);
--
-+/* List of handles */
- void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
- 							const bt_uuid_t type,
- 							struct queue *queue);
--
--struct gatt_db_find_information {
--	uint16_t handle;
--	bt_uuid_t uuid;
--};
--
-+/* List of handles */
- void gatt_db_find_information(struct gatt_db *db, uint16_t start_handle,
- 							uint16_t end_handle,
- 							struct queue *queue);
-@@ -106,3 +101,6 @@ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
+ 
+ bool gatt_db_read(struct gatt_db *db, uint16_t handle, uint16_t offset,
+-					uint8_t att_opcode, bdaddr_t *bdaddr);
++					uint8_t att_opcode, bdaddr_t *bdaddr,
++					uint8_t **value, uint16_t *length);
+ 
  bool gatt_db_write(struct gatt_db *db, uint16_t handle, uint16_t offset,
  					const uint8_t *value, size_t len,
- 					uint8_t att_opcode, bdaddr_t *bdaddr);
-+
-+const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
-+							uint16_t handle);
 -- 
 1.8.5.3
 
