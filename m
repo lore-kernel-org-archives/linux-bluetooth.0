@@ -1,37 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/gatt: Refresh device cache on disconnect if not bonded
-Date: Mon, 12 May 2014 16:38:13 +0200
-Message-Id: <1399905493-10699-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-In-Reply-To: <1399905493-10699-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1399905493-10699-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 1/2] android/bluetooth: Add function for getting bonded device list
+Date: Mon, 12 May 2014 16:38:12 +0200
+Message-Id: <1399905493-10699-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds refreshing of device cache in case if device is not bonded.
-
-It affects on TC_GAD_CL_BV_01_C, TC_GAD_CL_BV_02_C and search services
-PTS test cases. With this patch those PTS tests cases pass.
+This will be used by GATT HAL.
 ---
- android/gatt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ android/bluetooth.c | 8 ++++++++
+ android/bluetooth.h | 1 +
+ 2 files changed, 9 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 157ebe6..1c94713 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -570,6 +570,10 @@ static void connection_cleanup(struct gatt_device *device)
- 			bt_le_discovery_stop(NULL);
- 	}
- 
-+	/* If device is not bonded service cache should be refreshed */
-+	if (!bt_device_is_bonded(&device->bdaddr))
-+		queue_remove_all(device->services, NULL, NULL, destroy_service);
-+
- 	device_set_state(device, DEVICE_DISCONNECTED);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index be7b47c..ecdbeac 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1218,6 +1218,14 @@ const char *bt_get_adapter_name(void)
+ 	return adapter.name;
  }
  
++bool bt_device_is_bonded(const bdaddr_t *bdaddr)
++{
++	if (g_slist_find_custom(bonded_devices, bdaddr, device_match))
++		return true;
++
++	return false;
++}
++
+ static bool rssi_above_threshold(int old, int new)
+ {
+ 	/* only 8 dBm or more */
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index dddbf20..3eef7a4 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -49,3 +49,4 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
+ 
+ uint8_t bt_get_device_android_type(const bdaddr_t *addr);
+ const char *bt_get_adapter_name(void);
++bool bt_device_is_bonded(const bdaddr_t *bdaddr);
 -- 
 1.9.2
 
