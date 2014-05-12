@@ -1,71 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv6 05/11] android/ipc: Use error printing error messages
-Date: Mon, 12 May 2014 11:57:03 +0300
-Message-Id: <1399885029-6358-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Amith Raghunath <Amith.Raghunath@LNTTECHSERVICES.COM>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Wins Thomas <Wins.Thomas@LNTTECHSERVICES.COM>
+Subject: Query regarding BLE communication between 2 Dual Mode devices
+Date: Mon, 12 May 2014 03:00:20 +0000
+Message-ID: <86D12A3EE8C39046AB3F026D471074661D23BE25@POCITMSEXMB02.LntUniverse.com>
+Content-Type: text/plain; charset=US-ASCII
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel / Claudio,
+   Subject: Query regarding the BLE communication between 2 Dual Mode devices.
+   Stack Ver: bluez 5.14 / bluez 5.18.
+   Kernel Ver: 3.10
 
-This helps to identify problem since DBG is not printed by default.
----
- android/ipc.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+   I am trying to establish BLE connection between 2 dual mode devices using bluez at both the sides.
+   The Classic connection gets established, but BLE connection does not happen
+   (--experimental flag is enabled while running the configure script to include BLE modules & the bluetoothd log indicates that the relevant BLE modules are loaded).
+   I am communicating with Bluez stack via D-BUS interface.
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 8cd34ea..be963b5 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -96,31 +96,31 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	const struct ipc_handler *handler;
- 
- 	if (len < (ssize_t) sizeof(*msg)) {
--		DBG("message too small (%zd bytes)", len);
-+		error("IPC: message too small (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
- 
- 	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
--		DBG("message malformed (%zd bytes)", len);
-+		error("IPC: message malformed (%zd bytes)", len);
- 		return -EBADMSG;
- 	}
- 
- 	/* if service is valid */
- 	if (msg->service_id > max_index) {
--		DBG("unknown service (0x%x)", msg->service_id);
-+		error("IPC: unknown service (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* if service is registered */
- 	if (!handlers[msg->service_id].handler) {
--		DBG("service not registered (0x%x)", msg->service_id);
-+		error("IPC: service not registered (0x%x)", msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
- 
- 	/* if opcode is valid */
- 	if (msg->opcode == IPC_OP_STATUS ||
- 			msg->opcode > handlers[msg->service_id].size) {
--		DBG("invalid opcode 0x%x for service 0x%x", msg->opcode,
-+		error("IPC: invalid opcode 0x%x for service 0x%x", msg->opcode,
- 							msg->service_id);
- 		return -EOPNOTSUPP;
- 	}
-@@ -131,7 +131,7 @@ static int ipc_handle_msg(struct service_handler *handlers, size_t max_index,
- 	/* if payload size is valid */
- 	if ((handler->var_len && handler->data_len > msg->len) ||
- 			(!handler->var_len && handler->data_len != msg->len)) {
--		DBG("invalid size for opcode 0x%x service 0x%x",
-+		error("IPC: invalid size for opcode 0x%x service 0x%x",
- 						msg->opcode, msg->service_id);
- 		return -EMSGSIZE;
- 	}
--- 
-1.8.3.2
+   It will be of great help if you can provide answers to my below queries. I am trying to find a solution to this.
+       1.  Is this a known issue or a new issue ?
+       2.  If I want to add a commit (patch) to the bluez git what is the procedure ?
 
+Thanks,
+Amith
+
+L&T Technology Services Ltd
+
+www.LntTechservices.com<http://www.lnttechservices.com/>
+
+This Email may contain confidential or privileged information for the intended recipient (s). If you are not the intended recipient, please do not use or disseminate the information, notify the sender and delete it from your system.
