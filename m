@@ -2,91 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 4/6] android/hal-bluetooth: Add support for sending configuration
-Date: Tue, 13 May 2014 19:09:19 +0200
-Message-Id: <1400000961-24376-5-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 3/6] android: Add functions for getting configuration options
+Date: Tue, 13 May 2014 19:09:18 +0200
+Message-Id: <1400000961-24376-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
 References: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-bluetooth.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ android/main.c  | 30 ++++++++++++++++++++++++++++++
+ android/utils.h |  5 +++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index 2155978..05d785b 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -31,6 +31,11 @@
- 
- #define MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
- 
-+#define CONFIG_PROP_MANUFACTURER "ro.product.manufacturer"
-+#define CONFIG_PROP_SYSTEM_ID "ro.product.name"
-+#define CONFIG_PROP_MODEL "ro.product.model"
-+#define CONFIG_PROP_SERIAL "ro.serialno"
+diff --git a/android/main.c b/android/main.c
+index e85f696..bf4235a 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -61,6 +61,10 @@
+ #include "handsfree.h"
+ #include "gatt.h"
+ #include "health.h"
++#include "utils.h"
 +
- static const bt_callbacks_t *bt_hal_cbacks = NULL;
++#define DEFAULT_MANUFACTURER_NAME "BlueZ"
++#define DEFAULT_SYSTEM_ID "BlueZ for Android"
  
- #define enum_prop_to_hal(prop, hal_prop, type) do { \
-@@ -431,6 +436,43 @@ static uint8_t get_mode(void)
- 	return HAL_MODE_DEFAULT;
- }
+ #define STARTUP_GRACE_SECONDS 5
+ #define SHUTDOWN_GRACE_SECONDS 10
+@@ -80,6 +84,32 @@ static struct ipc *hal_ipc = NULL;
  
-+static int send_configuration(void)
+ static bool services[HAL_SERVICE_ID_MAX + 1] = { false };
+ 
++const char *bt_config_get_manufacturer(void)
 +{
-+	char buf[IPC_MTU];
-+	struct hal_cmd_configuration *cmd = (void *) buf;
-+	char prop[PROPERTY_VALUE_MAX];
++	if (config_manufacturer)
++		return config_manufacturer;
 +
-+	cmd->num = 0;
-+
-+	if (property_get(CONFIG_PROP_MANUFACTURER, prop, NULL) > 0) {
-+		strcpy((char *) cmd->props[cmd->num].buf, prop);
-+		cmd->props[cmd->num].type = HAL_CONFIG_MANUFACTURER_NAME;
-+		cmd->num ++;
-+	}
-+
-+	if (property_get(CONFIG_PROP_SYSTEM_ID, prop, NULL) > 0) {
-+		strcpy((char *) cmd->props[cmd->num].buf, prop);
-+		cmd->props[cmd->num].type = HAL_CONFIG_SYSTEM_ID;
-+		cmd->num ++;
-+	}
-+
-+	if (property_get(CONFIG_PROP_MODEL, prop, NULL) > 0) {
-+		strcpy((char *) cmd->props[cmd->num].buf, prop);
-+		cmd->props[cmd->num].type = HAL_CONFIG_MODEL_NUMBER;
-+		cmd->num ++;
-+	}
-+
-+	if (property_get(CONFIG_PROP_SERIAL, prop, NULL) > 0) {
-+		strcpy((char *) cmd->props[cmd->num].buf, prop);
-+		cmd->props[cmd->num].type = HAL_CONFIG_SERIAL_NUMBER;
-+		cmd->num ++;
-+	}
-+
-+	return hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_CONFIGURATION,
-+				sizeof(*cmd) + cmd->num * sizeof(cmd->props[0]),
-+				cmd, NULL, NULL, NULL);
++	return DEFAULT_MANUFACTURER_NAME;
 +}
 +
- static int init(bt_callbacks_t *callbacks)
- {
- 	struct hal_cmd_register_module cmd;
-@@ -451,6 +493,12 @@ static int init(bt_callbacks_t *callbacks)
- 		return BT_STATUS_FAIL;
- 	}
- 
-+	status = send_configuration();
-+	if (status != BT_STATUS_SUCCESS) {
-+		error("Failed to send configuration");
-+		goto fail;
-+	}
++const char *bt_config_get_system_id(void)
++{
++	if (config_system_id)
++		return config_system_id;
 +
- 	cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
- 	cmd.mode = get_mode();
- 
++	return DEFAULT_SYSTEM_ID;
++}
++
++const char *bt_config_get_model(void)
++{
++	return config_model;
++}
++
++const char *bt_config_get_serial(void)
++{
++	return config_serial;
++}
++
+ static void service_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_register_module *m = buf;
+diff --git a/android/utils.h b/android/utils.h
+index 560e991..e1e791a 100644
+--- a/android/utils.h
++++ b/android/utils.h
+@@ -30,3 +30,8 @@ static inline void bdaddr2android(const bdaddr_t *src, void *buf)
+ {
+ 	baswap(buf, src);
+ }
++
++const char *bt_config_get_manufacturer(void);
++const char *bt_config_get_system_id(void);
++const char *bt_config_get_model(void);
++const char *bt_config_get_serial(void);
 -- 
 1.9.1
 
