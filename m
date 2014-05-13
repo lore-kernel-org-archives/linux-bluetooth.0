@@ -1,102 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android/handsfree: Fix Connect SCO command
-Date: Tue, 13 May 2014 20:22:49 +0300
-Message-Id: <1400001769-6690-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC 5/6] android/bluetooth: Use system id for default adapter name
+Date: Tue, 13 May 2014 19:09:20 +0200
+Message-Id: <1400000961-24376-6-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
+References: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This command should not trigger SCO connection since there is already a
-command Connect Audio dedicated to do that.
 ---
- android/handsfree.c | 53 ++++++++++++++++++++++++-----------------------------
- 1 file changed, 24 insertions(+), 29 deletions(-)
+ android/bluetooth.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index cb5e657..7ca0ba8 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -861,30 +861,6 @@ done:
- 	hfp_gw_send_info(device.gw, "+BCS: %u", type);
- }
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 2a7c0e6..e8d6762 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -53,8 +53,6 @@
+ #include "utils.h"
+ #include "bluetooth.h"
  
--static void send_sco_fd(GIOChannel *chan)
--{
--	if (sco_ipc) {
--		int fd = g_io_channel_unix_get_fd(chan);
--		GError *err = NULL;
--		uint16_t mtu = 48;
--		struct sco_rsp_connect rsp;
+-#define DEFAULT_ADAPTER_NAME "BlueZ for Android"
 -
--		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
--							BT_IO_OPT_INVALID)) {
--			error("Unable to get MTU: %s\n", err->message);
--			g_clear_error(&err);
--		}
--
--		DBG("fd %d mtu %u", fd, mtu);
--
--		rsp.mtu = mtu;
--
--		ipc_send_rsp_full(sco_ipc, SCO_SERVICE_ID,
--					SCO_OP_CONNECT, sizeof(rsp), &rsp,
--					fd);
--	}
--}
--
- static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
- {
- 	if (err) {
-@@ -914,7 +890,6 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 							sco_watch_cb, NULL);
+ #define DUT_MODE_FILE "/sys/kernel/debug/bluetooth/hci%u/dut_mode"
  
- 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
--	send_sco_fd(chan);
- }
+ #define SETTINGS_FILE ANDROID_STORAGEDIR"/settings"
+@@ -189,7 +187,11 @@ static void store_adapter_config(void)
+ 	ba2str(&adapter.bdaddr, addr);
  
- static bool connect_sco(void)
-@@ -2592,14 +2567,34 @@ static void disable_sco_server(void)
- 
- static void bt_sco_connect(const void *buf, uint16_t len)
- {
-+	int fd;
-+	GError *err;
-+	struct sco_rsp_connect rsp;
+ 	g_key_file_set_string(key_file, "General", "Address", addr);
+-	g_key_file_set_string(key_file, "General", "Name", adapter.name);
 +
- 	DBG("");
- 
--	if (device.sco) {
--		send_sco_fd(device.sco);
--		return;
-+	if (!device.sco)
-+		goto failed;
++	if (adapter.name)
++		g_key_file_set_string(key_file, "General", "Name",
++				adapter.name);
 +
-+	err = NULL;
-+	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
-+							BT_IO_OPT_INVALID)) {
-+		error("Unable to get MTU: %s\n", err->message);
-+		g_clear_error(&err);
-+		goto failed;
+ 	g_key_file_set_integer(key_file, "General", "DiscoverableTimeout",
+ 						adapter.discoverable_timeout);
+ 
+@@ -2413,7 +2415,6 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 
+ 	if (!bacmp(&adapter.bdaddr, BDADDR_ANY)) {
+ 		bacpy(&adapter.bdaddr, &rp->bdaddr);
+-		adapter.name = g_strdup(DEFAULT_ADAPTER_NAME);
+ 		store_adapter_config();
+ 	} else if (bacmp(&adapter.bdaddr, &rp->bdaddr)) {
+ 		error("Bluetooth address mismatch");
+@@ -2421,7 +2422,7 @@ static void read_info_complete(uint8_t status, uint16_t length,
+ 		goto failed;
  	}
  
--	connect_audio();
-+	fd = g_io_channel_unix_get_fd(device.sco);
-+
-+	DBG("fd %d mtu %u", fd, rsp.mtu);
-+
-+	ipc_send_rsp_full(sco_ipc, SCO_SERVICE_ID, SCO_OP_CONNECT,
-+							sizeof(rsp), &rsp, fd);
-+
-+	return;
-+
-+failed:
-+	ipc_send_rsp(sco_ipc, SCO_SERVICE_ID, SCO_OP_STATUS, SCO_STATUS_FAILED);
- }
+-	if (g_strcmp0(adapter.name, (const char *) rp->name))
++	if (adapter.name && g_strcmp0(adapter.name, (const char *) rp->name))
+ 		set_adapter_name((uint8_t *)adapter.name, strlen(adapter.name));
  
- static const struct ipc_handler sco_handlers[] = {
+ 	set_adapter_class();
+@@ -4043,6 +4044,11 @@ bool bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
+ 		return false;
+ 	}
+ 
++	if (!adapter.name) {
++		adapter.name = g_strdup(bt_config_get_system_id());
++		set_adapter_name((uint8_t *)adapter.name, strlen(adapter.name));
++	}
++
+ 	hal_ipc = ipc;
+ 
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
 -- 
-1.9.0
+1.9.1
 
