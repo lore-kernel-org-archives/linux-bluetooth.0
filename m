@@ -1,35 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Date: Tue, 13 May 2014 13:55:19 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/pts: Add PTS test listing for HDP
-Date: Tue, 13 May 2014 12:56:56 +0200
-Message-ID: <1642632.UvNO225g6O@uw000953>
-In-Reply-To: <1399976751-4206-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1399976751-4206-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCHv6 07/11] android/audio: Add resampler support
+Message-ID: <20140513105441.GA27218@aemeltch-MOBL1>
+References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1399885029-6358-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <48B10FF8-C2D8-4528-AF0D-497D96546A5B@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <48B10FF8-C2D8-4528-AF0D-497D96546A5B@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Marcel,
 
-On Tuesday 13 of May 2014 12:25:49 Sebastian Chlad wrote:
-> ---
->  android/Makefile.am |  3 ++-
->  android/pts-hdp.txt | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 74 insertions(+), 1 deletion(-)
->  create mode 100644 android/pts-hdp.txt
+On Mon, May 12, 2014 at 06:29:40PM -0700, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 78015e6..3d1595f 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
+> > The patch adds support for resampling audio in host and Android. There
+> > are Android wrappers for SPEEXDSP library added to host.
+> > ---
+> > android/Android.mk              |   2 +
+> > android/Makefile.am             |   6 +-
+> > android/audio_utils/resampler.c | 265 ++++++++++++++++++++++++++++++++++++++++
+> > android/audio_utils/resampler.h | 109 +++++++++++++++++
+> > configure.ac                    |   7 ++
+> > 5 files changed, 388 insertions(+), 1 deletion(-)
+> > create mode 100644 android/audio_utils/resampler.c
+> > create mode 100644 android/audio_utils/resampler.h
+> > 
+> > diff --git a/android/Android.mk b/android/Android.mk
+> > index 6d0169b..cc0f8f5 100644
+> > --- a/android/Android.mk
+> > +++ b/android/Android.mk
+> > @@ -282,9 +282,11 @@ LOCAL_SRC_FILES := bluez/android/hal-sco.c
+> > LOCAL_C_INCLUDES = \
+> > 	$(call include-path-for, system-core) \
+> > 	$(call include-path-for, libhardware) \
+> > +	$(call include-path-for, audio-utils) \
+> > 
+> > LOCAL_SHARED_LIBRARIES := \
+> > 	libcutils \
+> > +	libaudioutils \
+> > 
+> 
+> where is this coming from? Why this directory? Why this name?
 
-Patches 1 and 2 applied, thanks.
+This is standard Android library and directory name. You can search it in
+Android AOSP.
 
-For MPS please enable AVRCP as we discussed offline.
+> Why not use compile it directly into the SCO audio module and use a name like android/audio_resampler.[ch].
 
--- 
-Best regards, 
-Szymon Janc
+This is standard Android library used also by other projects.
+
+Best regards 
+Andrei Emeltchenko 
