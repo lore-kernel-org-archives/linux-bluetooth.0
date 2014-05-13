@@ -2,73 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [RFC 2/2] unit: Add test case for AES-CMAC-128
-Date: Tue, 13 May 2014 12:44:28 +0200
-Message-Id: <1399977868-31937-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [RFC 1/2] shared/aes-cmac: Add support for AES-CMAC-128
+Date: Tue, 13 May 2014 12:44:27 +0200
+Message-Id: <1399977868-31937-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1399977868-31937-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1399977868-31937-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Example data taken from the NIST Special Publication 800-38B
-(http://csrc.nist.gov/publications/PubsSPs.html)
+This patch adds handling AES-CMAC-128 signing as specified in the NIST
+Special Publication 800-38B
 ---
- Makefile.am          |   8 ++-
- unit/test-aes-cmac.c | 169 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 176 insertions(+), 1 deletion(-)
- create mode 100644 unit/test-aes-cmac.c
+ src/shared/aes-cmac.c | 346 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/aes-cmac.h |  38 ++++++
+ 2 files changed, 384 insertions(+)
+ create mode 100644 src/shared/aes-cmac.c
+ create mode 100644 src/shared/aes-cmac.h
 
-diff --git a/Makefile.am b/Makefile.am
-index f96c700..482d611 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -226,7 +226,8 @@ AM_CFLAGS += @DBUS_CFLAGS@ @GLIB_CFLAGS@
- AM_CPPFLAGS = -I$(builddir)/lib -I$(srcdir)/gdbus
- 
- 
--unit_tests += unit/test-eir unit/test-uuid unit/test-textfile unit/test-crc
-+unit_tests += unit/test-eir unit/test-uuid unit/test-textfile unit/test-crc \
-+							 unit/test-aes-cmac
- 
- unit_test_eir_SOURCES = unit/test-eir.c src/eir.c src/uuid-helper.c
- unit_test_eir_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
-@@ -240,6 +241,11 @@ unit_test_textfile_LDADD = @GLIB_LIBS@
- unit_test_crc_SOURCES = unit/test-crc.c monitor/crc.h monitor/crc.c
- unit_test_crc_LDADD = @GLIB_LIBS@
- 
-+unit_test_aes_cmac_SOURCES = unit/test-aes-cmac.c \
-+				src/shared/aes-cmac.h src/shared/aes-cmac.c \
-+				src/shared/crypto.h src/shared/crypto.c
-+unit_test_aes_cmac_LDADD = @GLIB_LIBS@
-+
- unit_tests += unit/test-ringbuf unit/test-queue
- 
- unit_test_ringbuf_SOURCES = unit/test-ringbuf.c \
-diff --git a/unit/test-aes-cmac.c b/unit/test-aes-cmac.c
+diff --git a/src/shared/aes-cmac.c b/src/shared/aes-cmac.c
 new file mode 100644
-index 0000000..ae2f5d6
+index 0000000..660ceff
 --- /dev/null
-+++ b/unit/test-aes-cmac.c
-@@ -0,0 +1,169 @@
++++ b/src/shared/aes-cmac.c
+@@ -0,0 +1,346 @@
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2011  Intel Corporation
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
 + *
 + *
-+ *  This program is free software; you can redistribute it and/or modify
-+ *  it under the terms of the GNU General Public License as published by
-+ *  the Free Software Foundation; either version 2 of the License, or
-+ *  (at your option) any later version.
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under typedef struct {
++	uint64_t a, b;
++} u128;the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
 + *
-+ *  This program is distributed in the hope that it will be useful,
++ *  This library is distributed in the hope that it will be useful,
 + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ *  GNU General Public License for more details.
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
 + *
-+ *  You should have received a copy of the GNU General Public License
-+ *  along with this program; if not, write to the Free Software
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
 + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 + *
 + */
@@ -78,147 +55,366 @@ index 0000000..ae2f5d6
 +#endif
 +
 +#include "src/shared/aes-cmac.h"
++#include "src/shared/util.h"
++#include "src/shared/crypto.h"
 +
++#include <stdio.h>
 +#include <string.h>
-+#include <glib.h>
 +
-+static struct bt_ac *aes_cmac;
++struct bt_ac {
++	struct bt_crypto *crypto;
 +
-+struct test_data {
-+	const uint8_t *msg;
-+	uint16_t msg_len;
-+	const uint8_t *t;
++	uint8_t k[16];
++	uint8_t k1[16];
++	uint8_t k2[16];
++
++	bool sign_counter;
++	uint32_t sign_counter_val;
 +};
 +
-+static const uint8_t key[] = {
-+	0x3c, 0x4f, 0xcf, 0x09, 0x88, 0x15, 0xf7, 0xab, 0xa6, 0xd2, 0xae, 0x28,
-+	0x16, 0x15, 0x7e, 0x2b
-+};
-+
-+static const uint8_t t_empty_string[] = {
-+	0x12, 0x7d, 0xa3, 0x7f, 0x28, 0x37, 0x59, 0xe9, 0x29, 0x69, 0x1d, 0xbb
-+};
-+
-+static const struct test_data testcase_data_1 = {
-+	.msg_len = 0,
-+	.t = t_empty_string
-+};
-+
-+static const uint8_t msg_2[] = {
-+	0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11,
-+	0x73, 0x93, 0x17, 0x2a
-+
-+};
-+
-+static const uint8_t t_msg_2[] = {
-+	0x9d, 0xdd, 0x9b, 0xf7, 0x44, 0x41, 0x4d, 0x6b, 0xb4, 0x16, 0x0a, 0x07
-+};
-+
-+static const struct test_data testcase_data_2 = {
-+	.msg = msg_2,
-+	.msg_len = 16,
-+	.t = t_msg_2
-+};
-+
-+static const uint8_t msg_3[] = {
-+	0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11,
-+	0x73, 0x93, 0x17, 0x2a, 0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c,
-+	0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51, 0x30, 0xc8, 0x1c, 0x46,
-+	0xa3, 0x5c, 0xe4, 0x11
-+};
-+
-+static const uint8_t t_msg_3[12] = {
-+	0x61, 0x32, 0xca, 0x30, 0x30, 0xe6, 0x9a, 0xde, 0x47, 0x67, 0xa6, 0xdf
-+};
-+
-+static const struct test_data testcase_data_3 = {
-+	.msg = msg_3,
-+	.msg_len = 40,
-+	.t = t_msg_3
-+};
-+
-+static const uint8_t msg_4[] = {
-+	0x6b, 0xc1, 0xbe, 0xe2, 0x2e, 0x40, 0x9f, 0x96, 0xe9, 0x3d, 0x7e, 0x11,
-+	0x73, 0x93, 0x17, 0x2a, 0xae, 0x2d, 0x8a, 0x57, 0x1e, 0x03, 0xac, 0x9c,
-+	0x9e, 0xb7, 0x6f, 0xac, 0x45, 0xaf, 0x8e, 0x51, 0x30, 0xc8, 0x1c, 0x46,
-+	0xa3, 0x5c, 0xe4, 0x11, 0xe5, 0xfb, 0xc1, 0x19, 0x1a, 0x0a, 0x52, 0xef,
-+	0xf6, 0x9f, 0x24, 0x45, 0xdf, 0x4f, 0x9b, 0x17, 0xad, 0x2b, 0x41, 0x7b,
-+	0xe6, 0x6c, 0x37, 0x10
-+};
-+
-+static const uint8_t t_msg_4[12] = {
-+	0x17, 0x74, 0x49, 0xfc, 0x92, 0x9d, 0x3b, 0x7e, 0xbf, 0xbe, 0xf0, 0x51
-+};
-+
-+static const struct test_data testcase_data_4 = {
-+	.msg = msg_4,
-+	.msg_len = 64,
-+	.t = t_msg_4
-+};
-+
-+static void test_ac_start(void)
-+{
-+	aes_cmac = bt_ac_new(key, false);
-+	g_assert(aes_cmac);
-+}
-+
-+static void print_key(const uint8_t t[12])
++static void ac_subkey_gen(const uint8_t l[16], uint8_t sub_k[16])
 +{
 +	int i;
 +
-+	for (i = 0; i < 12; i++)
-+		g_print("0x%02x, ", t[i]);
++	memset(sub_k, 0, 16);
 +
-+	g_print("\n");
++	/* Left shifting */
++	for (i = 0; i < 16; i++) {
++		uint16_t p = l[i];
++
++		p <<= 1;
++		sub_k[i] |= p & 0xff;
++
++		if (i == 15)
++			break;
++
++		/* Don't forget moving bit */
++		sub_k[i + 1] = p >> 8;
++	}
++
++	if (l[15] & 0x80)
++		sub_k[0] ^= 0x87;
 +}
 +
-+static bool result_compare(const uint8_t exp[12], uint8_t res[12])
++/*
++ * This function generates sub keys according to AES-CMAC
++ *
++ * As an input we have k which is 128 bits
++ *
++ * There are two sub keys generated in following way:
++ *
++ * L = AES-128 (K, 0^16)
++ * for i = 1,2 {
++ *     if MSB(L)
++ *         K_i = L << 1 ^ 0x87
++ *     else
++ *         K_i = L << 1
++ *
++ *     L = K_i
++ * }
++ */
++static bool ac_subkeys_gen(struct bt_crypto *crypto, const uint8_t k[16],
++					uint8_t k1[16], uint8_t k2[16])
++{
++	uint8_t z[16];
++	uint8_t l[16];
++
++	memset(z, 0, 16);
++	memset(l, 0, 16);
++
++	/* AES encryption of 16 bytes z */
++	if (!bt_crypto_e(crypto, k, z, l))
++		return false;
++
++	/* Generate sub keys - K1, K2 */
++	ac_subkey_gen(l, k1);
++	ac_subkey_gen(k1, k2);
++
++	return true;
++}
++
++struct bt_ac *bt_ac_new(const uint8_t k[16], bool sign_counter)
++{
++	struct bt_ac *ac;
++	struct bt_crypto *crypto;
++
++	ac = new0(struct bt_ac, 1);
++	if (!ac)
++		return NULL;
++
++	crypto = bt_crypto_new();
++	if (!crypto)
++		goto failed;
++
++	if (!ac_subkeys_gen(crypto, k, ac->k1, ac->k2))
++		goto failed;
++
++	memcpy(ac->k, k, 16);
++	ac->crypto = crypto;
++
++	/*
++	 * Enable sign counter as specified in BT Core Spec 4.1 Vol[3], Part H
++	 * Chapter 2.4.5
++	 */
++	ac->sign_counter = sign_counter;
++
++	return ac;
++
++failed:
++	free(ac);
++	return NULL;
++}
++
++void bt_ac_destroy(struct bt_ac *aes_cmac)
++{
++	if (!aes_cmac)
++		return;
++
++	bt_crypto_unref(aes_cmac->crypto);
++
++	free(aes_cmac);
++}
++
++typedef struct {
++	uint64_t a, b;
++} u128;
++
++static inline void u128_xor(const uint8_t p[16], const uint8_t q[16],
++								uint8_t r[16])
++{
++	u128 pp, qq, rr;
++
++	memcpy(&pp, p, 16);
++	memcpy(&qq, q, 16);
++
++	rr.a = pp.a ^ qq.a;
++	rr.b = pp.b ^ qq.b;
++
++	memcpy(r, &rr, 16);
++}
++
++static inline void swap128(const uint8_t src[16], uint8_t dst[16])
++{
++	int i;
++
++	for (i = 0; i < 16; i++)
++		dst[15 - i] = src[i];
++}
++
++static bool encode_block(struct bt_ac *aes_cmac, const uint8_t m[16],
++								uint8_t c[16])
++{
++	uint8_t tmp[16];
++	uint8_t mp[16];
++
++	/* Swap the message so crypto will get less significant byte in m[0] */
++	swap128(m, tmp);
++
++	/* Xor with previous encrypted block */
++	u128_xor(tmp, c, mp);
++
++	/* AES-128 using k */
++	if (!bt_crypto_e(aes_cmac->crypto, aes_cmac->k, mp, c))
++		return false;
++
++	return true;
++}
++
++static bool encode_last_block(struct bt_ac *aes_cmac, const uint8_t m[16],
++						uint16_t len, uint8_t c[16])
++{
++	uint8_t tmp[16];
++	uint8_t mp[16];
++	uint8_t mpp[16];
++	bool flag;
++
++	/* Flag if msg is complete */
++	flag = (len != 16);
++
++	/* Swap the message so crypto will get less significant byte in m[0] */
++	swap128(m, tmp);
++
++	/* Note: add padding on swapped message*/
++	if (flag)
++		tmp[15-len] |= 0x80;
++
++	/* Last block we need to xor with K1 or K2 */
++	u128_xor(tmp, flag ? aes_cmac->k2 : aes_cmac->k1, mp);
++
++	/* Xor with previous encrypted block */
++	u128_xor(mp, c, mpp);
++
++	/* AES-128 using k */
++	if (!bt_crypto_e(aes_cmac->crypto, aes_cmac->k, mpp, c))
++		return false;
++
++	return true;
++}
++
++/*
++ * AES-CMAC-128 signing function
++ *
++ * This function is used to sign data with algorithm defined in the NIST Special
++ * Publication 800-38B
++ *
++ * The following are inputs of the signing algorithm:
++ *     m is a variable length
++ *     key k is 128 bits
++ *     sign_counter is 32 bits
++ *
++ * Before this functions is called, sub keys k1 and k2 are generated.
++ * See ac_subkeys_gen.
++ *
++ * If sing_counter has been enabled then message before will be concatenated
++ * with 32 bits sing_counter as described in BT Core Spec 4.1 Vol[3], Part H
++ * Chapter 2.4.5
++ *
++ *     M = m || sign_counter
++ *
++ * Message is build from blocks M_i:
++ *     M = M_1 || M_2 || ... || M_{n-1} || M_n
++ *
++ * Length of M_i is 128 bits for 0 < i < n and the length of last block is less
++ * than or equal to 128 bits.
++ *
++ *     If length of M_n is less than 128 then
++ *         (M_n)' = (M_n || padding) ^ K2
++ *     else
++ *         (M_n)' = M_n ^ K1
++ *
++ * Where padding is 10^i and i = 128 - 8 * len(M_n) - 1
++ *
++ * For example: M_n            = 0x30c81c46a35ce411
++ *              M_n || padding = 0x30c81c46a35ce4118000000000000000
++ *
++ * Signing procedure uses AES-CBC (Cipher block chaining mode):
++ *
++ * C = 0
++ * For each M_i
++ *     Y = C ^ M_i
++ *     C = AES-128(K,Y)
++ *
++ * Last encrypted block X, truncated to 12 octects taken in MSB order is the
++ * sign result T.
++ */
++bool bt_ac_sign(struct bt_ac *aes_cmac, const uint8_t *m, uint16_t m_len,
++								uint8_t t[12])
++{
++	uint8_t sc_len = aes_cmac->sign_counter ? sizeof(uint32_t) : 0;
++	uint16_t len = m_len + sc_len;
++	uint8_t mp[len];
++	uint8_t c[16];
++	uint8_t tmp[16];
++	int i = 0;
++
++	/* Handle sign_counter if necessary */
++	memset(mp, 0, len);
++	memcpy(mp, m, m_len);
++
++	if (aes_cmac->sign_counter)
++		put_le32(aes_cmac->sign_counter_val++, mp + m_len);
++	/*
++	 * We are doing AES-CBC. In C we will keep last encrypted block.
++	 * C(0) is just 16 bytes zeros message.
++	 */
++	memset(c, 0, 16);
++
++	/* Start AES-CBC of n-1 blocks of data.*/
++	for (i = 0; len - i > 16; i += 16) {
++		memcpy(tmp, mp + i , 16);
++
++		/*
++		 * In C we provide last encrypted block and next encrypted block
++		 * will be returned
++		 */
++		if (!encode_block(aes_cmac, tmp, c))
++			return false;
++	}
++
++	/* Handle last block of data */
++	memset(tmp, 0, 16);
++	memcpy(tmp, mp + i , len - i);
++
++	/* Padding is handled inside this function */
++	if (!encode_last_block(aes_cmac, tmp, len - i, c))
++		return false;
++
++	/* Signature is a 12 octets of last encrypted block C(n) */
++	memcpy(t, c + 4, 12);
++	return true;
++}
++
++static bool verify(const uint8_t t[12], const uint8_t tp[12])
 +{
 +	int i;
 +	for (i = 0; i < 12; i++)
-+		if (exp[i] != res[i])
++		if (t[i] != tp[i])
 +			return false;
 +
 +	return true;
 +}
 +
-+static void test_ac_sign(gconstpointer data)
++bool bt_ac_verify(struct bt_ac *aes_cmac, const uint8_t *m,
++						uint16_t m_len, uint8_t t[12])
 +{
-+	uint8_t t[12];
-+	const struct test_data *d = data;
++	uint8_t tp[12];
 +
-+	memset(t, 0, 12);
-+	if (!bt_ac_sign(aes_cmac, d->msg, d->msg_len, t))
-+		g_assert(true);
++	memset(tp, 0, 12);
 +
-+	if (g_test_verbose()) {
-+		g_print("Result T: ");
-+		print_key(t);
-+		g_print("Expected T:");
-+		print_key(d->t);
-+	}
++	if (!bt_ac_sign(aes_cmac, m, m_len, tp))
++		return false;
 +
-+	g_assert(result_compare(d->t, t));
++	return verify(t, tp);
 +}
 +
-+static void test_ac_stop(void)
++uint32_t bt_ac_get_sign_counter(struct bt_ac *aes_cmac)
 +{
-+	bt_ac_destroy(aes_cmac);
++	return aes_cmac->sign_counter_val;
 +}
+diff --git a/src/shared/aes-cmac.h b/src/shared/aes-cmac.h
+new file mode 100644
+index 0000000..62068aa
+--- /dev/null
++++ b/src/shared/aes-cmac.h
+@@ -0,0 +1,38 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+int main(int argc, char *argv[])
-+{
-+	g_test_init(&argc, &argv, NULL);
++#include <stdbool.h>
++#include <stdint.h>
 +
-+	g_test_add_func("/aes-cmac/0", test_ac_start);
-+	g_test_add_data_func("/aes-cmac/1", &testcase_data_1, test_ac_sign);
-+	g_test_add_data_func("/aes-cmac/2", &testcase_data_2, test_ac_sign);
-+	g_test_add_data_func("/aes-cmac/3", &testcase_data_3, test_ac_sign);
-+	g_test_add_data_func("/aes-cmac/4", &testcase_data_4, test_ac_sign);
-+	g_test_add_func("/aes-cmac/5", test_ac_stop);
++struct bt_ac;
 +
-+	return g_test_run();
-+}
++struct bt_ac *bt_ac_new(const uint8_t k[16], bool sign_counter);
++void bt_ac_destroy(struct bt_ac *aes_cmac);
++
++bool bt_ac_sign(struct bt_ac *aes_cmac, const uint8_t *m, uint16_t m_len,
++								uint8_t t[12]);
++
++bool bt_ac_verify(struct bt_ac *aes_cmac, const uint8_t *m, uint16_t m_len,
++								uint8_t t[12]);
++
++uint32_t bt_ac_get_sign_counter(struct bt_ac *aes_cmac);
 -- 
 1.8.4
 
