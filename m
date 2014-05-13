@@ -1,52 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [RFC 1/2] shared/aes-cmac: Add support for AES-CMAC-128
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1399977868-31937-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Tue, 13 May 2014 06:24:00 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0C9B7B6F-E3B6-453A-86B2-3ECE979A7796@holtmann.org>
-References: <1399977868-31937-1-git-send-email-lukasz.rymanowski@tieto.com> <1399977868-31937-2-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v5] mgmt-api: Add support to get connection information
+Date: Tue, 13 May 2014 15:09:11 +0200
+Message-Id: <1399986551-6419-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+This patch introduces Get Connection Information command.
+---
+v2: Changed Command name and add Flags into the response
+v3: Added TXPowerMax into the response based on the comments we got.
+v4: Fixed name to TX_Power_Max
+v5: Removed EIR and Data Type. Only fixed values in the response.
 
-> This patch adds handling AES-CMAC-128 signing as specified in the NIST
-> Special Publication 800-38B
-> ---
-> src/shared/aes-cmac.c | 346 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> src/shared/aes-cmac.h |  38 ++++++
-> 2 files changed, 384 insertions(+)
-> create mode 100644 src/shared/aes-cmac.c
-> create mode 100644 src/shared/aes-cmac.h
+ doc/mgmt-api.txt | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-I really like to see it included in src/shared/crypto.c. Lets try that one first. It is meant to provide the whole crypto toolbox for us.
-
-> 
-> diff --git a/src/shared/aes-cmac.c b/src/shared/aes-cmac.c
-> new file mode 100644
-> index 0000000..660ceff
-> --- /dev/null
-> +++ b/src/shared/aes-cmac.c
-> @@ -0,0 +1,346 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under typedef struct {
-> +	uint64_t a, b;
-> +} u128;the terms of the GNU Lesser General Public
-
-Something is broken here.
-
-Regards
-
-Marcel
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index cd5cd24..e51ba6c 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1679,6 +1679,32 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
+ 
+ 
++Get Connection Information Command
++==================================
++
++	Command Code:		0x0031
++	Controller Index:       <controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				RSSI (1 Octet)
++				TX_Power (1 Octet)
++				TX_Power_Max (1 Octet)
++
++	This command is used to get connection information.
++
++	TX_Power and TX_Power_Max are set to 127 if incorrect.
++
++	This command generates a Command Complete event on success and
++	on failure.
++
++	Possible errors:	Not Connected
++				Not Powered
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+-- 
+1.8.4
 
