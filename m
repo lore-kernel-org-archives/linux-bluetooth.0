@@ -1,53 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: multipart/signed; boundary="Apple-Mail=_8B2B1773-6BA2-4BC3-A4B9-0A1018413B42"; protocol="application/pgp-signature"; micalg=pgp-sha1
+Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: BLE connection failing
-From: Rick Mann <rmann@latencyzero.com>
-In-Reply-To: <9ED33F2C-C3EF-41D7-8559-C04F1E6CE21D@holtmann.org>
-Date: Mon, 12 May 2014 18:32:21 -0700
+Subject: Re: [PATCHv6 07/11] android/audio: Add resampler support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1399885029-6358-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 12 May 2014 18:29:40 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <7E32DBFD-3A61-4126-8B8F-71E1E3D395EB@latencyzero.com>
-References: <B473A0F2-765A-47EC-950F-69FAF659504B@latencyzero.com> <9ED33F2C-C3EF-41D7-8559-C04F1E6CE21D@holtmann.org>
-To: Marcel Holtmann <marcel@holtmann.org>
+Message-Id: <48B10FF8-C2D8-4528-AF0D-497D96546A5B@holtmann.org>
+References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1399885029-6358-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrei,
 
---Apple-Mail=_8B2B1773-6BA2-4BC3-A4B9-0A1018413B42
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;
-	charset=windows-1252
+> The patch adds support for resampling audio in host and Android. There
+> are Android wrappers for SPEEXDSP library added to host.
+> ---
+> android/Android.mk              |   2 +
+> android/Makefile.am             |   6 +-
+> android/audio_utils/resampler.c | 265 ++++++++++++++++++++++++++++++++++++++++
+> android/audio_utils/resampler.h | 109 +++++++++++++++++
+> configure.ac                    |   7 ++
+> 5 files changed, 388 insertions(+), 1 deletion(-)
+> create mode 100644 android/audio_utils/resampler.c
+> create mode 100644 android/audio_utils/resampler.h
+> 
+> diff --git a/android/Android.mk b/android/Android.mk
+> index 6d0169b..cc0f8f5 100644
+> --- a/android/Android.mk
+> +++ b/android/Android.mk
+> @@ -282,9 +282,11 @@ LOCAL_SRC_FILES := bluez/android/hal-sco.c
+> LOCAL_C_INCLUDES = \
+> 	$(call include-path-for, system-core) \
+> 	$(call include-path-for, libhardware) \
+> +	$(call include-path-for, audio-utils) \
+> 
+> LOCAL_SHARED_LIBRARIES := \
+> 	libcutils \
+> +	libaudioutils \
+> 
 
+where is this coming from? Why this directory? Why this name?
 
-On May 12, 2014, at 18:27 , Marcel Holtmann <marcel@holtmann.org> wrote:
+Why not use compile it directly into the SCO audio module and use a name like android/audio_resampler.[ch].
 
-> kernel 3.13 and later have support for Set Advertising mgmt command. =
-That is what you should be using. Just issue =93btmgmt advertising on=94.
+Regards
 
-Unfortunately, I can't. We're stuck with the 3.10 kernel. I turn on =
-advertising with hciconfig hci0 leadv. Advertising is not the problem =
-though, as you can see.
+Marcel
 
-
---=20
-Rick
-
-
-
-
---Apple-Mail=_8B2B1773-6BA2-4BC3-A4B9-0A1018413B42
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
-	filename=signature.asc
-Content-Type: application/pgp-signature;
-	name=signature.asc
-Content-Description: Message signed with OpenPGP using GPGMail
-
------BEGIN PGP SIGNATURE-----
-Comment: GPGTools - https://gpgtools.org
-
-iEYEARECAAYFAlNxdiYACgkQBzBA/9aDmJsOogCbBu6GxiZODVrCeTx7wQK+/ziW
-TbYAn0AElq5+jxjQ40hvTSc2ga3l7yBR
-=8TBj
------END PGP SIGNATURE-----
-
---Apple-Mail=_8B2B1773-6BA2-4BC3-A4B9-0A1018413B42--
