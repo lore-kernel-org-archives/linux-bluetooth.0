@@ -1,82 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CAMudyAvpA2aLoP62B4ZibdD+MFUpmJwDQN2Nuu574ze_LFu_LQ@mail.gmail.com>
-References: <1399977868-31937-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1399977868-31937-2-git-send-email-lukasz.rymanowski@tieto.com>
-	<0C9B7B6F-E3B6-453A-86B2-3ECE979A7796@holtmann.org>
-	<CAMudyAvpA2aLoP62B4ZibdD+MFUpmJwDQN2Nuu574ze_LFu_LQ@mail.gmail.com>
-Date: Tue, 13 May 2014 22:59:40 +0200
-Message-ID: <CAMudyAtGHDJYH6oHG_zcYM+s2btmkUv9RU4xoZV0BE7burx=-Q@mail.gmail.com>
-Subject: Re: [RFC 1/2] shared/aes-cmac: Add support for AES-CMAC-128
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 0/6] android: Configuration command
+Date: Tue, 13 May 2014 22:32:54 +0200
+Message-ID: <2033637.5yzdKDHhAh@athlon>
+In-Reply-To: <92E59A56-9A08-481D-971C-FD3362FD9208@holtmann.org>
+References: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com> <92E59A56-9A08-481D-971C-FD3362FD9208@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-On 13 May 2014 15:44, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> Hi Marcel,
+On Tuesday 13 May 2014 11:54:55 Marcel Holtmann wrote:
+> Hi Szymon,
+> 
+> > This will allow to pass Android properties over IPC and use them
+> > in daemon for customization eg. Device Information or default adapter
+> > name.
+> > 
+> > Open points:
+> > - what properties should be read, currently I use ro.product.* as those
+> > 
+> >   are present on AOSP Nexus devices, but eg. on Xperia phones there
+> >   seem to be ro.semc.product.* with more userfriendly name, so this
+> >   may vary upon devices. (eg ST18i vs Xperia Ray in model property).
+> >   Or maybe just use ro.bluetooth.* and require integrator to set those
+> >   accrodingly?
+> 
+> I think we should take ro.bluetooth.* and fallback to ro.product.*. If some
+> manufactures want to do something different, they can either set
+> ro.bluetooth.* or hack the code.
 >
-> On 13 May 2014 15:24, Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Lukasz,
->>
->>> This patch adds handling AES-CMAC-128 signing as specified in the NIST
->>> Special Publication 800-38B
->>> ---
->>> src/shared/aes-cmac.c | 346 ++++++++++++++++++++++++++++++++++++++++++++++++++
->>> src/shared/aes-cmac.h |  38 ++++++
->>> 2 files changed, 384 insertions(+)
->>> create mode 100644 src/shared/aes-cmac.c
->>> create mode 100644 src/shared/aes-cmac.h
->>
->> I really like to see it included in src/shared/crypto.c. Lets try that one first. It is meant to provide the whole crypto toolbox for us.
->
-> I tried but it did not look good to me then.
->
-> Anyway, what I need to do is to add to struct bt_crypro a member which
-> will contain aes-cmac session data (key, sub keys, sign_counter)
-> I need to also mess a bit with bt_crypto_new and add there parameters
-> needed to initialize AES-CMAC ?
-> Is that a good way?
->
+> Nexus devices should default to something useful. We have to take that as
+> standard location for product information.
+> 
+> Since non of the DID details are mandatory, I prefer also that they are just
+> not present if they are not configured in any property. Maybe BlueZ
+> defaults for manufacturer and systemd id.
 
-Looks like I did way too much. I will use AF_ALG type "hash" name
-"cmac(aes)" - that should work fine. And also should fit crypto.c very
-well.
+Sounds good.
 
->>
->>>
->>> diff --git a/src/shared/aes-cmac.c b/src/shared/aes-cmac.c
->>> new file mode 100644
->>> index 0000000..660ceff
->>> --- /dev/null
->>> +++ b/src/shared/aes-cmac.c
->>> @@ -0,0 +1,346 @@
->>> +/*
->>> + *
->>> + *  BlueZ - Bluetooth protocol stack for Linux
->>> + *
->>> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
->>> + *
->>> + *
->>> + *  This library is free software; you can redistribute it and/or
->>> + *  modify it under typedef struct {
->>> +     uint64_t a, b;
->>> +} u128;the terms of the GNU Lesser General Public
->>
->> Something is broken here.
->>
-> How that happen (?) Thanks.
->
->> Regards
->>
->> Marcel
->>
-> BR
-> \Łukasz
+> > - should we also use this instead of 'Mode' passed on service init?
+> > 
+> >   This would keep handling of all properities consistent but I'm fine
+> >   if we decide to keep Modes special.
+> 
+> Do not understand the question. What do you mean.
 
-BR
-Lukasz
+I mean that we could pass all properties this way, including ones used to 
+configure HALs (persist.sys.bluetooth.handsfree, persist.sys.bluetooth.mode) 
+that currently are passed as "Mode" while registering service.
+
+I also wonder if we could change our customization properties from 
+persist.sys.bluetooth.* to ro.bluetooth.*. I'm not sure why we choose to use 
+sys.persist.bluetooth in first place... do we really want this to be runtime 
+configurable?
+
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
