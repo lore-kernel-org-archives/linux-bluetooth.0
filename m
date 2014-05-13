@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 5/5] Bluetooth: Add support for max_tx_power in Get Conn Info
-Date: Tue, 13 May 2014 11:52:31 +0200
-Message-ID: <1399974751-7226-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 3/5] Bluetooth: Avoid polling TX power for LE links
+Date: Tue, 13 May 2014 11:52:29 +0200
+Message-ID: <1399974751-7226-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,74 +12,39 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for max_tx_power in Get Connection Information
-request. Value is read only once for given connection and then always
-returned in response as parameter.
+TX power for LE links is immutable thus we do not need to query for it
+if already have value.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 ---
- include/net/bluetooth/mgmt.h |  1 +
- net/bluetooth/mgmt.c         | 19 ++++++++++++++++---
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 9b60367..b74309a 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -420,6 +420,7 @@ struct mgmt_rp_get_conn_info {
- 	struct mgmt_addr_info addr;
- 	__s8	rssi;
- 	__s8	tx_power;
-+	__s8	max_tx_power;
- } __packed;
- 
- #define MGMT_EV_CMD_COMPLETE		0x0001
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f3d90b9..17ebaa3 100644
+index c3e4382..f3d90b9 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -4583,10 +4583,13 @@ static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
- 	if (!match->mgmt_status) {
- 		rp.rssi = conn->rssi;
+@@ -4715,10 +4715,16 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		hci_req_add(&req, HCI_OP_READ_RSSI, sizeof(req_rssi_cp),
+ 			    &req_rssi_cp);
  
--		if (match->valid_tx_power)
-+		if (match->valid_tx_power) {
- 			rp.tx_power = conn->tx_power;
--		else
-+			rp.max_tx_power = conn->max_tx_power;
-+		} else {
- 			rp.tx_power = HCI_TX_POWER_INVALID;
-+			rp.max_tx_power = HCI_TX_POWER_INVALID;
-+		}
- 	}
- 
- 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_GET_CONN_INFO,
-@@ -4609,7 +4612,9 @@ static void conn_info_refresh_complete(struct hci_dev *hdev, u8 status)
- 	hci_dev_lock(hdev);
- 
- 	/* TX power data is valid in case request completed successfully,
--	 * otherwise we assume it's not valid.
-+	 * otherwise we assume it's not valid. At the moment we assume that
-+	 * either both or none of current and max values are valid to keep code
-+	 * simple.
- 	 */
- 	match.valid_tx_power = !status;
- 
-@@ -4726,6 +4731,14 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 				    sizeof(req_txp_cp), &req_txp_cp);
- 		}
- 
-+		/* Max TX power needs to be read only once per connection */
-+		if (conn->max_tx_power == HCI_TX_POWER_INVALID) {
+-		req_txp_cp.handle = cpu_to_le16(conn->handle);
+-		req_txp_cp.type = 0x00;
+-		hci_req_add(&req, HCI_OP_READ_TX_POWER,
+-			    sizeof(req_txp_cp), &req_txp_cp);
++		/* For LE links TX power does not change thus we don't need to
++		 * query for it once value is known.
++		 */
++		if (!bdaddr_type_is_le(cp->addr.type) ||
++		    conn->tx_power == HCI_TX_POWER_INVALID) {
 +			req_txp_cp.handle = cpu_to_le16(conn->handle);
-+			req_txp_cp.type = 0x01;
++			req_txp_cp.type = 0x00;
 +			hci_req_add(&req, HCI_OP_READ_TX_POWER,
 +				    sizeof(req_txp_cp), &req_txp_cp);
 +		}
-+
+ 
  		err = hci_req_run(&req, conn_info_refresh_complete);
  		if (err < 0)
- 			goto unlock;
 -- 
 1.9.3
 
