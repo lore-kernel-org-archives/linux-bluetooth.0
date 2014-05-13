@@ -2,50 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [RFC 0/6] android: Configuration command
-Date: Tue, 13 May 2014 19:09:15 +0200
-Message-Id: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
+Subject: [RFC 1/6] android/hal-msg: Add configuration command
+Date: Tue, 13 May 2014 19:09:16 +0200
+Message-Id: <1400000961-24376-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
+References: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+---
+ android/hal-msg.h | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-This will allow to pass Android properties over IPC and use them
-in daemon for customization eg. Device Information or default adapter name.
-
-Open points:
- - what properties should be read, currently I use ro.product.* as those
-   are present on AOSP Nexus devices, but eg. on Xperia phones there
-   seem to be ro.semc.product.* with more userfriendly name, so this
-   may vary upon devices. (eg ST18i vs Xperia Ray in model property).
-   Or maybe just use ro.bluetooth.* and require integrator to set those
-   accrodingly?
-
- - should we also use this instead of 'Mode' passed on service init?
-   This would keep handling of all properities consistent but I'm fine
-   if we decide to keep Modes special.
-
-Comments are welcome.
-
-BR
-Szymon Janc
-
-Szymon Janc (6):
-  android/hal-msg: Add configuration command
-  android: Add support for configuration command
-  android: Add functions for getting configuration options
-  android/hal-bluetooth: Add support for sending configuration
-  android/bluetooth: Use system id for default adapter name
-  android/gatt: Use configuration data for device information profile
-
- android/bluetooth.c     |  16 +++++--
- android/gatt.c          | 125 +++++++++++++++++++++++++-----------------------
- android/hal-bluetooth.c |  48 +++++++++++++++++++
- android/hal-msg.h       |  18 +++++++
- android/main.c          |  90 ++++++++++++++++++++++++++++++++++
- android/utils.h         |   5 ++
- 6 files changed, 238 insertions(+), 64 deletions(-)
-
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 09bd9a0..8daea2d 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -69,6 +69,24 @@ struct hal_cmd_unregister_module {
+ 	uint8_t service_id;
+ } __attribute__((packed));
+ 
++#define HAL_CONFIG_MANUFACTURER_NAME	0x00
++#define HAL_CONFIG_SYSTEM_ID		0x01
++#define HAL_CONFIG_MODEL_NUMBER		0x02
++#define HAL_CONFIG_SERIAL_NUMBER	0x03
++
++#define HAL_CONFIG_PROP_LEN		92
++
++struct hal_config_prop {
++	uint8_t type;
++	uint8_t buf[HAL_CONFIG_PROP_LEN];
++} __attribute__((packed));
++
++#define HAL_OP_CONFIGURATION		0x03
++struct hal_cmd_configuration {
++	uint8_t num;
++	struct hal_config_prop props[0];
++} __attribute__((packed));
++
+ /* Bluetooth Core HAL API */
+ 
+ #define HAL_OP_ENABLE			0x01
 -- 
 1.9.1
 
