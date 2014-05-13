@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v3 0/5] Bluetooth: Get Connection Information
-Date: Tue, 13 May 2014 11:52:26 +0200
-Message-ID: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Amith Raghunath <Amith.Raghunath@LNTTECHSERVICES.COM>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC: Wins Thomas <Wins.Thomas@LNTTECHSERVICES.COM>
+Subject: Possible Bug (issue) in the Bluez 5.18  for BLE device detection
+Date: Tue, 13 May 2014 08:45:30 +0000
+Message-ID: <86D12A3EE8C39046AB3F026D471074661D23C019@POCITMSEXMB02.LntUniverse.com>
+Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
-Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
 
-Changes in v3:
-- max TX power patches split as requested
-- conn info age configurable by min/max values and actual value is randomized
-- commands order changes to be RSSI, TX power and TX power max
-- removed queueing of requests - we'll only have one pending request per
-  connection and reply from cache for others
-- request can only fail if reading RSSI failed, otherwise it's considered ok
-  and HCI_TX_POWER_INVALID is returned as TX power values
+-----Original Message-----
+From: Amith Raghunath
+Sent: 12 May 2014 08:30
+To: linux-bluetooth@vger.kernel.org
+Cc: Wins Thomas (Wins.Thomas@LNTTECHSERVICES.COM)
+Subject: Query regarding BLE communication between 2 Dual Mode devices
 
+Hi Marcel / Claudio,
+   Subject: Query regarding the BLE communication between 2 Dual Mode devices.
+   Stack Ver: bluez 5.14 / bluez 5.18.
+   Kernel Ver: 3.10
 
-Andrzej Kaczmarek (5):
-  Bluetooth: Add conn info lifetime parameters to debugfs
-  Bluetooth: Add support to get connection information
-  Bluetooth: Avoid polling TX power for LE links
-  Bluetooth: Store max TX power level for connection
-  Bluetooth: Add support for max_tx_power in Get Conn Info
+   I am trying to establish BLE connection between 2 dual mode devices using bluez at both the sides.
+   The Classic connection gets established, but BLE connection does not happen
+   (--experimental flag is enabled while running the configure script to include BLE modules & the bluetoothd log indicates that the relevant BLE modules are loaded).
+   I am communicating with Bluez stack via D-BUS interface.
 
- include/net/bluetooth/hci_core.h |   9 ++
- include/net/bluetooth/mgmt.h     |  14 +++
- net/bluetooth/hci_conn.c         |   1 +
- net/bluetooth/hci_core.c         |   7 ++
- net/bluetooth/hci_event.c        |  12 ++-
- net/bluetooth/mgmt.c             | 213 +++++++++++++++++++++++++++++++++++++++
- 6 files changed, 255 insertions(+), 1 deletion(-)
+   It will be of great help if you can provide answers to my below queries. I am trying to find a solution to this.
+       1.  Is this a known issue or a new issue ?
+       2.  If I want to add a commit (patch) to the bluez git what is the procedure ?
 
--- 
-1.9.3
+Thanks,
+Amith
 
+L&T Technology Services Ltd
+
+www.LntTechservices.com<http://www.lnttechservices.com/>
+
+This Email may contain confidential or privileged information for the intended recipient (s). If you are not the intended recipient, please do not use or disseminate the information, notify the sender and delete it from your system.
