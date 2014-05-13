@@ -1,63 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+Date: Tue, 13 May 2014 22:35:03 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 0/6] android: Configuration command
-Date: Tue, 13 May 2014 22:32:54 +0200
-Message-ID: <2033637.5yzdKDHhAh@athlon>
-In-Reply-To: <92E59A56-9A08-481D-971C-FD3362FD9208@holtmann.org>
-References: <1400000961-24376-1-git-send-email-szymon.janc@tieto.com> <92E59A56-9A08-481D-971C-FD3362FD9208@holtmann.org>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH v3 2/5] Bluetooth: Add support to get connection
+ information
+Message-ID: <20140513193503.GA25306@t440s.P-661HNU-F1>
+References: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com>
+ <1399974751-7226-3-git-send-email-andrzej.kaczmarek@tieto.com>
+ <2978AA04-546F-4BE3-868E-DD03F243BEE9@holtmann.org>
+ <CAF3PWx1GfvfPm5TN9OuDi9jPCWNtjsELyRR-eG3rmDHi6sHPRQ@mail.gmail.com>
+ <52A402F5-1159-4BE3-9F2A-8B5713E52B52@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <52A402F5-1159-4BE3-9F2A-8B5713E52B52@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On Tuesday 13 May 2014 11:54:55 Marcel Holtmann wrote:
-> Hi Szymon,
-> 
-> > This will allow to pass Android properties over IPC and use them
-> > in daemon for customization eg. Device Information or default adapter
-> > name.
+On Tue, May 13, 2014, Marcel Holtmann wrote:
+> >>> +static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+> >>> +                      u16 len)
+> >>> +{
+> >>> +     struct mgmt_cp_get_conn_info *cp = data;
+> >>> +     struct mgmt_rp_get_conn_info rp;
+> >>> +     struct hci_conn *conn;
+> >>> +     unsigned long conn_info_age;
+> >>> +     int err = 0;
+> >>> +
+> >>> +     BT_DBG("%s", hdev->name);
+> >>> +
+> >>> +     memset(&rp, 0, sizeof(rp));
+> >>> +     bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
+> >>> +     rp.addr.type = cp->addr.type;
+> >> 
+> >> Do we really want to just keep zeroed out values and not set the
+> >> values to invalid. What are we doing for other commands that
+> >> require the same return parameters set to match up with the remote
+> >> address.
 > > 
-> > Open points:
-> > - what properties should be read, currently I use ro.product.* as those
-> > 
-> >   are present on AOSP Nexus devices, but eg. on Xperia phones there
-> >   seem to be ro.semc.product.* with more userfriendly name, so this
-> >   may vary upon devices. (eg ST18i vs Xperia Ray in model property).
-> >   Or maybe just use ro.bluetooth.* and require integrator to set those
-> >   accrodingly?
+> > Actually there's no other command which returns address *and* some
+> > parameters so this will be first one. So in case of failure should we
+> > put proper 'invalid' values into response parameter and not just
+> > leaving them set to zero? There is always error code which means
+> > request failed and returned parameters are invalid anyway. And in case
+> > of success response we overwrite zeroes with proper values of course.
 > 
-> I think we should take ro.bluetooth.* and fallback to ro.product.*. If some
-> manufactures want to do something different, they can either set
-> ro.bluetooth.* or hack the code.
->
-> Nexus devices should default to something useful. We have to take that as
-> standard location for product information.
-> 
-> Since non of the DID details are mandatory, I prefer also that they are just
-> not present if they are not configured in any property. Maybe BlueZ
-> defaults for manufacturer and systemd id.
+> good question. Johan, what do you think?
 
-Sounds good.
+I'm fine with the "zeroes in case of failure" approach. It's also
+consistent with the "sender sets to zero and receiver ignores" approach
+that's present in various protocol specs for reserved or invalid parts
+of PDUs. That said, I'm not sure if there is a simple example to be
+taken for reference from the HCI spec.
 
-> > - should we also use this instead of 'Mode' passed on service init?
-> > 
-> >   This would keep handling of all properities consistent but I'm fine
-> >   if we decide to keep Modes special.
-> 
-> Do not understand the question. What do you mean.
-
-I mean that we could pass all properties this way, including ones used to 
-configure HALs (persist.sys.bluetooth.handsfree, persist.sys.bluetooth.mode) 
-that currently are passed as "Mode" while registering service.
-
-I also wonder if we could change our customization properties from 
-persist.sys.bluetooth.* to ro.bluetooth.*. I'm not sure why we choose to use 
-sys.persist.bluetooth in first place... do we really want this to be runtime 
-configurable?
-
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Johan
