@@ -1,58 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH v3 2/5] Bluetooth: Add support to get connection information
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140513193503.GA25306@t440s.P-661HNU-F1>
-Date: Tue, 13 May 2014 15:47:46 -0700
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Message-Id: <58DE6297-2740-48EC-812C-B943ACA1A9F0@holtmann.org>
-References: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com> <1399974751-7226-3-git-send-email-andrzej.kaczmarek@tieto.com> <2978AA04-546F-4BE3-868E-DD03F243BEE9@holtmann.org> <CAF3PWx1GfvfPm5TN9OuDi9jPCWNtjsELyRR-eG3rmDHi6sHPRQ@mail.gmail.com> <52A402F5-1159-4BE3-9F2A-8B5713E52B52@holtmann.org> <20140513193503.GA25306@t440s.P-661HNU-F1>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CAMudyAvpA2aLoP62B4ZibdD+MFUpmJwDQN2Nuu574ze_LFu_LQ@mail.gmail.com>
+References: <1399977868-31937-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1399977868-31937-2-git-send-email-lukasz.rymanowski@tieto.com>
+	<0C9B7B6F-E3B6-453A-86B2-3ECE979A7796@holtmann.org>
+	<CAMudyAvpA2aLoP62B4ZibdD+MFUpmJwDQN2Nuu574ze_LFu_LQ@mail.gmail.com>
+Date: Tue, 13 May 2014 22:59:40 +0200
+Message-ID: <CAMudyAtGHDJYH6oHG_zcYM+s2btmkUv9RU4xoZV0BE7burx=-Q@mail.gmail.com>
+Subject: Re: [RFC 1/2] shared/aes-cmac: Add support for AES-CMAC-128
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
->>>>> +static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
->>>>> +                      u16 len)
->>>>> +{
->>>>> +     struct mgmt_cp_get_conn_info *cp = data;
->>>>> +     struct mgmt_rp_get_conn_info rp;
->>>>> +     struct hci_conn *conn;
->>>>> +     unsigned long conn_info_age;
->>>>> +     int err = 0;
->>>>> +
->>>>> +     BT_DBG("%s", hdev->name);
->>>>> +
->>>>> +     memset(&rp, 0, sizeof(rp));
->>>>> +     bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
->>>>> +     rp.addr.type = cp->addr.type;
->>>> 
->>>> Do we really want to just keep zeroed out values and not set the
->>>> values to invalid. What are we doing for other commands that
->>>> require the same return parameters set to match up with the remote
->>>> address.
->>> 
->>> Actually there's no other command which returns address *and* some
->>> parameters so this will be first one. So in case of failure should we
->>> put proper 'invalid' values into response parameter and not just
->>> leaving them set to zero? There is always error code which means
->>> request failed and returned parameters are invalid anyway. And in case
->>> of success response we overwrite zeroes with proper values of course.
->> 
->> good question. Johan, what do you think?
-> 
-> I'm fine with the "zeroes in case of failure" approach. It's also
-> consistent with the "sender sets to zero and receiver ignores" approach
-> that's present in various protocol specs for reserved or invalid parts
-> of PDUs. That said, I'm not sure if there is a simple example to be
-> taken for reference from the HCI spec.
+On 13 May 2014 15:44, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+> Hi Marcel,
+>
+> On 13 May 2014 15:24, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> Hi Lukasz,
+>>
+>>> This patch adds handling AES-CMAC-128 signing as specified in the NIST
+>>> Special Publication 800-38B
+>>> ---
+>>> src/shared/aes-cmac.c | 346 ++++++++++++++++++++++++++++++++++++++++++++++++++
+>>> src/shared/aes-cmac.h |  38 ++++++
+>>> 2 files changed, 384 insertions(+)
+>>> create mode 100644 src/shared/aes-cmac.c
+>>> create mode 100644 src/shared/aes-cmac.h
+>>
+>> I really like to see it included in src/shared/crypto.c. Lets try that one first. It is meant to provide the whole crypto toolbox for us.
+>
+> I tried but it did not look good to me then.
+>
+> Anyway, what I need to do is to add to struct bt_crypro a member which
+> will contain aes-cmac session data (key, sub keys, sign_counter)
+> I need to also mess a bit with bt_crypto_new and add there parameters
+> needed to initialize AES-CMAC ?
+> Is that a good way?
+>
 
-okay, then we go with the zero. However that means that mgmt-api.txt needs to mention that these fields are invalid in case of error response.
+Looks like I did way too much. I will use AF_ALG type "hash" name
+"cmac(aes)" - that should work fine. And also should fit crypto.c very
+well.
 
-Regards
+>>
+>>>
+>>> diff --git a/src/shared/aes-cmac.c b/src/shared/aes-cmac.c
+>>> new file mode 100644
+>>> index 0000000..660ceff
+>>> --- /dev/null
+>>> +++ b/src/shared/aes-cmac.c
+>>> @@ -0,0 +1,346 @@
+>>> +/*
+>>> + *
+>>> + *  BlueZ - Bluetooth protocol stack for Linux
+>>> + *
+>>> + *  Copyright (C) 2014  Intel Corporation. All rights reserved.
+>>> + *
+>>> + *
+>>> + *  This library is free software; you can redistribute it and/or
+>>> + *  modify it under typedef struct {
+>>> +     uint64_t a, b;
+>>> +} u128;the terms of the GNU Lesser General Public
+>>
+>> Something is broken here.
+>>
+> How that happen (?) Thanks.
+>
+>> Regards
+>>
+>> Marcel
+>>
+> BR
+> \Łukasz
 
-Marcel
-
+BR
+Lukasz
