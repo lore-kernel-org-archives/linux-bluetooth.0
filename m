@@ -1,34 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Add PTS testing files for MPS
-Date: Tue, 13 May 2014 18:18:59 +0200
-Message-ID: <13728786.oM8aRvkFCU@uw000953>
-In-Reply-To: <1399978743-7383-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1399978743-7383-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Date: Tue, 13 May 2014 16:00:42 +0200
+Message-ID: <CAOb4fKcq6R4PTo_m0j+e09hgkKj2nSizWd8_8j340pV-CrXAJg@mail.gmail.com>
+Subject: External Bluez plugin and GATT profile
+From: =?UTF-8?B?SsOhbiBMYWxpxaE=?= <lalis.jan@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi,
 
-On Tuesday 13 of May 2014 12:59:03 Sebastian Chlad wrote:
-> Adding all required files for MPS: PICS, PIXIT as well as pts
-> tests listing.
-> ---
->  android/Makefile.am   |   5 +-
->  android/pics-mps.txt  | 339 ++++++++++++++++++++++++++++++++++++++++++++++++++
->  android/pixit-mps.txt |  46 +++++++
->  android/pts-mps.txt   |  53 ++++++++
->  4 files changed, 442 insertions(+), 1 deletion(-)
->  create mode 100644 android/pics-mps.txt
->  create mode 100644 android/pixit-mps.txt
->  create mode 100644 android/pts-mps.txt
+I want to create external plugin for Bluez where I create custom GATT
+profile. I created plugin without problems, but problem is with
+creating custom profile using function gatt_service_add (I dont find
+any other working solution in code for creating custom profile),
+because this function is not exported as external function.
 
-Applied, thanks.
+I know that there are some exported functions (with btd_ prefix) but
+there is no example or documentation for how to use them and playing
+with this functions give me no working result. Very simple example
+will be good starting point for everyone, who want to start write
+custom profile for BLE usign Bluez API.
 
--- 
-Best regards, 
-Szymon Janc
+Thanks for help,
+
+
+Jan
