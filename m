@@ -2,13 +2,14 @@ Return-Path: <cyrus@holtmann.org>
 From: Amith Raghunath <Amith.Raghunath@LNTTECHSERVICES.COM>
 To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 CC: Wins Thomas <Wins.Thomas@LNTTECHSERVICES.COM>
-Subject: Possible Bug (issue) in the Bluez 5.18  for BLE device detection
-Date: Tue, 13 May 2014 08:45:30 +0000
-Message-ID: <86D12A3EE8C39046AB3F026D471074661D23C019@POCITMSEXMB02.LntUniverse.com>
+Subject: FW: Query regarding BLE communication between 2 Dual Mode devices
+Date: Tue, 13 May 2014 04:41:02 +0000
+Message-ID: <86D12A3EE8C39046AB3F026D471074661D23BF85@POCITMSEXMB02.LntUniverse.com>
 Content-Type: text/plain; charset=US-ASCII
 MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
+
 
 
 -----Original Message-----
