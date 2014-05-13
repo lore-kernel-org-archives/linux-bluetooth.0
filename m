@@ -1,108 +1,289 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 1/3] android/pts: Add PTS test listing for HDP
-Date: Tue, 13 May 2014 12:25:49 +0200
-Message-Id: <1399976751-4206-1-git-send-email-sebastian.chlad@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v3 2/5] Bluetooth: Add support to get connection information
+Date: Tue, 13 May 2014 11:52:28 +0200
+Message-ID: <1399974751-7226-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1399974751-7226-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/Makefile.am |  3 ++-
- android/pts-hdp.txt | 72 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 74 insertions(+), 1 deletion(-)
- create mode 100644 android/pts-hdp.txt
+This patch adds support for Get Connection Information mgmt command
+which can be used to query for information about connection, i.e. RSSI
+and local TX power level.
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 78015e6..3d1595f 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -262,4 +262,5 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pts-hfp.txt \
- 				android/pts-gatt.txt \
- 				android/pts-hsp.txt \
--				android/pts-iopt.txt
-+				android/pts-iopt.txt \
-+				android/pts-hdp.txt
-diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-new file mode 100644
-index 0000000..1dec18c
---- /dev/null
-+++ b/android/pts-hdp.txt
-@@ -0,0 +1,72 @@
-+PTS test results for HDP
+In general values cached in hci_conn are returned as long as they are
+considered valid, i.e. do not exceed age limit set in hdev. This limit
+is calculated as random value between min/max values to avoid client
+trying to guess when to poll for updated information.
+
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+---
+ include/net/bluetooth/hci_core.h |   2 +
+ include/net/bluetooth/mgmt.h     |  13 +++
+ net/bluetooth/mgmt.c             | 194 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 209 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4623f45..cbbab63 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -384,6 +384,8 @@ struct hci_conn {
+ 	__s8		tx_power;
+ 	unsigned long	flags;
+ 
++	unsigned long	conn_info_timestamp;
 +
-+PTS version: 5.1
-+Tested: not tested
-+Android version: 4.4.2
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
+ 	__u8		remote_id;
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index d4b571c..9b60367 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -409,6 +409,19 @@ struct mgmt_cp_load_irks {
+ } __packed;
+ #define MGMT_LOAD_IRKS_SIZE		2
+ 
++#define MGMT_CONN_INFO_DATA_TX_POWER	0x00000001
 +
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
++#define MGMT_OP_GET_CONN_INFO		0x0031
++struct mgmt_cp_get_conn_info {
++	struct mgmt_addr_info addr;
++} __packed;
++#define MGMT_GET_CONN_INFO_SIZE		MGMT_ADDR_INFO_SIZE
++struct mgmt_rp_get_conn_info {
++	struct mgmt_addr_info addr;
++	__s8	rssi;
++	__s8	tx_power;
++} __packed;
 +
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_SRC_CON_BV_01_I	INC
-+TC_SRC_CON_BV_02_I	INC
-+TC_SRC_CON_BV_03_I	INC
-+TC_SRC_CON_BV_04_I	INC
-+TC_SRC_CON_BV_05_I	INC
-+TC_SRC_CON_BV_06_I	INC
-+TC_SRC_CON_BV_07_I	INC
-+TC_SRC_CON_BV_08_I	INC
-+TC_SRC_CON_BV_09_I	INC
-+TC_SRC_CON_BV_10_I	INC
-+TC_SRC_CC_BV_01_C	INC
-+TC_SRC_CC_BV_02_C	INC
-+TC_SRC_CC_BV_03_C	INC
-+TC_SRC_CC_BV_05_C	INC
-+TC_SRC_CC_BV_07_C	INC
-+TC_SRC_CC_BV_09_C	INC
-+TC_SRC_CC_BI_12_C	INC
-+TC_SRC_HCT_BV_01_I	INC
-+TC_SRC_HCT_BV_02_I	INC
-+TC_SRC_HCT_BV_03_I	N/A
-+TC_SRC_HCT_BV_04_I	INC
-+TC_SRC_HCT_BV_05_C	N/A
-+TC_SRC_HCT_BV_06_C	INC
-+TC_SRC_HCT_BV_07_C	INC
-+TC_SRC_DE_BV_01_I	INC
-+TC_SRC_DE_BV_02_I	INC
-+TC_SRC_DEP_BV_01_I	INC
-+TC_SRC_DEP_BV_02_I	N/A
-+TC_SNK_CON_BV_01_I	INC
-+TC_SNK_CON_BV_02_I	INC
-+TC_SNK_CON_BV_03_I	INC
-+TC_SNK_CON_BV_04_I	INC
-+TC_SNK_CON_BV_05_I	INC
-+TC_SNK_CON_BV_06_I	INC
-+TC_SNK_CON_BV_07_I	INC
-+TC_SNK_CON_BV_08_I	INC
-+TC_SNK_CON_BV_09_I	INC
-+TC_SNK_CON_BV_10_I	INC
-+TC_SNK_CC_BV_01_C	INC
-+TC_SNK_CC_BV_02_C	INC
-+TC_SNK_CC_BV_04_C	INC
-+TC_SNK_CC_BV_06_C	INC
-+TC_SNK_CC_BV_08_C	INC
-+TC_SNK_CC_BV_10_C	INC
-+TC_SNK_CC_BI_11_C	INC
-+TC_SNK_HCT_BV_01_I	INC
-+TC_SNK_HCT_BV_02_I	INC
-+TC_SNK_HCT_BV_03_I	N/A
-+TC_SNK_HCT_BV_04_I	INC
-+TC_SNK_HCT_BV_05_C	N/A
-+TC_SNK_HCT_BV_06_C	INC
-+TC_SNK_HCT_BV_07_C	INC
-+TC_SNK_DE_BV_01_I	N/A
-+TC_SNK_DE_BV_02_I	INC
-+TC_SNK_DEP_BV_03_I	INC
-+TC_SNK_DEP_BV_04_I	INC
-+-------------------------------------------------------------------------------
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f2a9422..c3e4382 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -83,6 +83,7 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_SET_DEBUG_KEYS,
+ 	MGMT_OP_SET_PRIVACY,
+ 	MGMT_OP_LOAD_IRKS,
++	MGMT_OP_GET_CONN_INFO,
+ };
+ 
+ static const u16 mgmt_events[] = {
+@@ -4557,6 +4558,198 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++struct cmd_conn_lookup {
++	struct hci_conn *conn;
++	bool valid_tx_power;
++	u8 mgmt_status;
++};
++
++static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
++{
++	struct cmd_conn_lookup *match = data;
++	struct mgmt_cp_get_conn_info *cp;
++	struct mgmt_rp_get_conn_info rp;
++	struct hci_conn *conn = cmd->user_data;
++
++	if (conn != match->conn)
++		return;
++
++	cp = (struct mgmt_cp_get_conn_info *) cmd->param;
++
++	memset(&rp, 0, sizeof(rp));
++	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
++	rp.addr.type = cp->addr.type;
++
++	if (!match->mgmt_status) {
++		rp.rssi = conn->rssi;
++
++		if (match->valid_tx_power)
++			rp.tx_power = conn->tx_power;
++		else
++			rp.tx_power = HCI_TX_POWER_INVALID;
++	}
++
++	cmd_complete(cmd->sk, cmd->index, MGMT_OP_GET_CONN_INFO,
++		     match->mgmt_status, &rp, sizeof(rp));
++
++	hci_conn_drop(conn);
++
++	mgmt_pending_remove(cmd);
++}
++
++static void conn_info_refresh_complete(struct hci_dev *hdev, u8 status)
++{
++	struct hci_cp_read_rssi *cp;
++	struct hci_conn *conn;
++	struct cmd_conn_lookup match;
++	u16 handle;
++
++	BT_DBG("status 0x%02x", status);
++
++	hci_dev_lock(hdev);
++
++	/* TX power data is valid in case request completed successfully,
++	 * otherwise we assume it's not valid.
++	 */
++	match.valid_tx_power = !status;
++
++	/* Commands sent in request are either Read RSSI or Read Transmit Power
++	 * Level so we check which one was last sent to retrieve connection
++	 * handle.  Both commands have handle as first parameter so it's safe to
++	 * cast data on the same command struct.
++	 *
++	 * First command sent is always Read RSSI and we fail only if it fails.
++	 * In other case we simply override error to indicate success as we
++	 * already remembered if TX power value is actually valid.
++	 */
++	cp = hci_sent_cmd_data(hdev, HCI_OP_READ_RSSI);
++	if (!cp) {
++		cp = hci_sent_cmd_data(hdev, HCI_OP_READ_TX_POWER);
++		status = 0;
++	}
++
++	if (!cp) {
++		BT_ERR("invalid sent_cmd in response");
++		goto unlock;
++	}
++
++	handle = __le16_to_cpu(cp->handle);
++	conn = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!conn) {
++		BT_ERR("unknown handle (%d) in response", handle);
++		goto unlock;
++	}
++
++	match.conn = conn;
++	match.mgmt_status = mgmt_status(status);
++
++	/* Cache refresh is complete, now reply for mgmt request for given
++	 * connection only.
++	 */
++	mgmt_pending_foreach(MGMT_OP_GET_CONN_INFO, hdev,
++			     get_conn_info_complete, &match);
++
++unlock:
++	hci_dev_unlock(hdev);
++}
++
++static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
++			 u16 len)
++{
++	struct mgmt_cp_get_conn_info *cp = data;
++	struct mgmt_rp_get_conn_info rp;
++	struct hci_conn *conn;
++	unsigned long conn_info_age;
++	int err = 0;
++
++	BT_DBG("%s", hdev->name);
++
++	memset(&rp, 0, sizeof(rp));
++	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
++	rp.addr.type = cp->addr.type;
++
++	if (!bdaddr_type_is_valid(cp->addr.type))
++		return cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
++				    MGMT_STATUS_INVALID_PARAMS,
++				    &rp, sizeof(rp));
++
++	hci_dev_lock(hdev);
++
++	if (!hdev_is_powered(hdev)) {
++		err = cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
++				   MGMT_STATUS_NOT_POWERED, &rp, sizeof(rp));
++		goto unlock;
++	}
++
++	if (cp->addr.type == BDADDR_BREDR)
++		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
++					       &cp->addr.bdaddr);
++	else
++		conn = hci_conn_hash_lookup_ba(hdev, LE_LINK, &cp->addr.bdaddr);
++
++	if (!conn || conn->state != BT_CONNECTED) {
++		err = cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
++				   MGMT_STATUS_NOT_CONNECTED, &rp, sizeof(rp));
++		goto unlock;
++	}
++
++	/* To avoid client trying to guess when to poll again for information we
++	 * calculate conn info age as random value between min/max set in hdev.
++	 */
++	conn_info_age = hdev->conn_info_min_age +
++			prandom_u32_max(hdev->conn_info_max_age -
++					hdev->conn_info_min_age);
++
++	/* Query controller to refresh cached values if they are too old or were
++	 * never read.
++	 */
++	if (time_after(jiffies, conn->conn_info_timestamp + conn_info_age) ||
++	    !conn->conn_info_timestamp) {
++		struct hci_request req;
++		struct hci_cp_read_tx_power req_txp_cp;
++		struct hci_cp_read_rssi req_rssi_cp;
++		struct pending_cmd *cmd;
++
++		hci_req_init(&req, hdev);
++		req_rssi_cp.handle = cpu_to_le16(conn->handle);
++		hci_req_add(&req, HCI_OP_READ_RSSI, sizeof(req_rssi_cp),
++			    &req_rssi_cp);
++
++		req_txp_cp.handle = cpu_to_le16(conn->handle);
++		req_txp_cp.type = 0x00;
++		hci_req_add(&req, HCI_OP_READ_TX_POWER,
++			    sizeof(req_txp_cp), &req_txp_cp);
++
++		err = hci_req_run(&req, conn_info_refresh_complete);
++		if (err < 0)
++			goto unlock;
++
++		cmd = mgmt_pending_add(sk, MGMT_OP_GET_CONN_INFO, hdev,
++				       data, len);
++		if (!cmd) {
++			err = -ENOMEM;
++			goto unlock;
++		}
++
++		hci_conn_hold(conn);
++		cmd->user_data = conn;
++
++		conn->conn_info_timestamp = jiffies;
++	} else {
++		/* Cache is valid, just reply with values cached in hci_conn */
++		rp.rssi = conn->rssi;
++		rp.tx_power = conn->tx_power;
++		rp.max_tx_power = conn->max_tx_power;
++
++		err = cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
++				   MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
++	}
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
++}
++
+ static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+@@ -4612,6 +4805,7 @@ static const struct mgmt_handler {
+ 	{ set_debug_keys,         false, MGMT_SETTING_SIZE },
+ 	{ set_privacy,            false, MGMT_SET_PRIVACY_SIZE },
+ 	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
++	{ get_conn_info,          false, MGMT_GET_CONN_INFO_SIZE },
+ };
+ 
+ 
 -- 
-1.8.5.3
+1.9.3
 
