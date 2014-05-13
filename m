@@ -1,79 +1,236 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: Re: [PATCH 1/8] android/gatt: Fix sending att responses
-Date: Tue, 13 May 2014 15:04:26 +0200
-Message-ID: <2770088.jWxQEZVvW7@uw000953>
-In-Reply-To: <1399899758-4944-2-git-send-email-marcin.kraglak@tieto.com>
-References: <1399899758-4944-1-git-send-email-marcin.kraglak@tieto.com> <1399899758-4944-2-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1399885029-6358-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 13 May 2014 14:22:55 +0300
+Message-ID: <CABBYNZLPw3PGk5WRU+kWQ7j6H5XVDC_j8yGH7UKPCBQidt-x2Q@mail.gmail.com>
+Subject: Re: [PATCHv6 01/11] android/hal-audio-hsp: Add open_output_stream()
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrei,
 
-On Monday 12 of May 2014 15:02:31 Marcin Kraglak wrote:
-> From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-> 
-> In case of error we should respond and not fail silently.
-> Before sending we should also check length value as, opdu is filled
-> only for some ATT operations and some are handled by read callbacks,
-> sending their own responses. We should be gradually moving to the later,
-> using response data queue.
+On Mon, May 12, 2014 at 11:56 AM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> Function adds audio_open_output_stream() and sets dummy callbacks.
 > ---
->  android/gatt.c | 11 +++--------
->  1 file changed, 3 insertions(+), 8 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 157ebe6..d8bcfb5 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4321,18 +4321,12 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
->  		break;
->  	case ATT_OP_WRITE_REQ:
->  		status = write_req_request(ipdu, len, dev);
-> -		if (!status)
-> -			return;
->  		break;
->  	case ATT_OP_WRITE_CMD:
->  		status = write_cmd_request(ipdu, len, dev);
-> -		if (!status)
-> -			return;
->  		break;
->  	case ATT_OP_PREP_WRITE_REQ:
->  		status = write_prep_request(ipdu, len, dev);
-> -		if (!status)
-> -			return;
->  		break;
->  	case ATT_OP_EXEC_WRITE_REQ:
->  		/* TODO */
-> @@ -4344,7 +4338,7 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
->  	default:
->  		DBG("Unsupported request 0x%02x", ipdu[0]);
->  		status = ATT_ECODE_REQ_NOT_SUPP;
-> -		goto done;
-> +		break;
->  	}
->  
->  done:
-> @@ -4352,7 +4346,8 @@ done:
->  		length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
->  							ATT_DEFAULT_LE_MTU);
->  
-> -	g_attrib_send(dev->attrib, 0, opdu, length, NULL, NULL, NULL);
-> +	if (length)
-> +		g_attrib_send(dev->attrib, 0, opdu, length, NULL, NULL, NULL);
+>  android/hal-sco.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 176 insertions(+), 2 deletions(-)
+>
+> diff --git a/android/hal-sco.c b/android/hal-sco.c
+> index 8f8c3b6..06e39ed 100644
+> --- a/android/hal-sco.c
+> +++ b/android/hal-sco.c
+> @@ -26,21 +26,195 @@
+>
+>  #include "hal-log.h"
+>
+> +#define AUDIO_STREAM_DEFAULT_RATE      44100
+> +#define AUDIO_STREAM_DEFAULT_FORMAT    AUDIO_FORMAT_PCM_16_BIT
+> +
+> +#define OUT_BUFFER_SIZE                        2560
+> +
+> +struct sco_audio_config {
+> +       uint32_t rate;
+> +       uint32_t channels;
+> +       audio_format_t format;
+> +};
+> +
+> +struct sco_stream_out {
+> +       struct audio_stream_out stream;
+> +       struct sco_audio_config cfg;
+> +};
+> +
+>  struct sco_dev {
+>         struct audio_hw_device dev;
+> +       struct sco_stream_out *out;
+>  };
+>
+> +/* Audio stream functions */
+> +
+> +static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+> +                                                               size_t bytes)
+> +{
+> +       /* write data */
+> +
+> +       return bytes;
+> +}
+> +
+> +static uint32_t out_get_sample_rate(const struct audio_stream *stream)
+> +{
+> +       struct sco_stream_out *out = (struct sco_stream_out *) stream;
+> +
+> +       DBG("rate %u", out->cfg.rate);
+> +
+> +       return out->cfg.rate;
+> +}
+> +
+> +static int out_set_sample_rate(struct audio_stream *stream, uint32_t rate)
+> +{
+> +       DBG("rate %u", rate);
+> +
+> +       return 0;
+> +}
+> +
+> +static size_t out_get_buffer_size(const struct audio_stream *stream)
+> +{
+> +       DBG("buf size %u", OUT_BUFFER_SIZE);
+> +
+> +       return OUT_BUFFER_SIZE;
+> +}
+> +
+> +static uint32_t out_get_channels(const struct audio_stream *stream)
+> +{
+> +       DBG("");
+> +
+> +       /* AudioFlinger can only provide stereo stream, so we return it here and
+> +        * later we'll downmix this to mono in case codec requires it
+> +        */
+> +       return AUDIO_CHANNEL_OUT_STEREO;
+> +}
+> +
+> +static audio_format_t out_get_format(const struct audio_stream *stream)
+> +{
+> +       struct sco_stream_out *out = (struct sco_stream_out *) stream;
+> +
+> +       DBG("");
+> +
+> +       return out->cfg.format;
+> +}
+> +
+> +static int out_set_format(struct audio_stream *stream, audio_format_t format)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_standby(struct audio_stream *stream)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static int out_dump(const struct audio_stream *stream, int fd)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
+> +{
+> +       DBG("%s", kvpairs);
+> +
+> +       return 0;
+> +}
+> +
+> +static char *out_get_parameters(const struct audio_stream *stream,
+> +                                                       const char *keys)
+> +{
+> +       DBG("");
+> +
+> +       return strdup("");
+> +}
+> +
+> +static uint32_t out_get_latency(const struct audio_stream_out *stream)
+> +{
+> +       DBG("");
+> +
+> +       return 0;
+> +}
+> +
+> +static int out_set_volume(struct audio_stream_out *stream, float left,
+> +                                                               float right)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_get_render_position(const struct audio_stream_out *stream,
+> +                                                       uint32_t *dsp_frames)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_add_audio_effect(const struct audio_stream *stream,
+> +                                                       effect_handle_t effect)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+> +static int out_remove_audio_effect(const struct audio_stream *stream,
+> +                                                       effect_handle_t effect)
+> +{
+> +       DBG("");
+> +
+> +       return -ENOSYS;
+> +}
+> +
+>  static int sco_open_output_stream(struct audio_hw_device *dev,
+>                                         audio_io_handle_t handle,
+>                                         audio_devices_t devices,
+>                                         audio_output_flags_t flags,
+>                                         struct audio_config *config,
+>                                         struct audio_stream_out **stream_out)
+> -
+>  {
+> +       struct sco_dev *adev = (struct sco_dev *) dev;
+> +       struct sco_stream_out *out;
+> +
+>         DBG("");
+>
+> -       return -EINVAL;
+> +       out = calloc(1, sizeof(struct sco_stream_out));
+> +       if (!out)
+> +               return -ENOMEM;
+> +
+> +       out->stream.common.get_sample_rate = out_get_sample_rate;
+> +       out->stream.common.set_sample_rate = out_set_sample_rate;
+> +       out->stream.common.get_buffer_size = out_get_buffer_size;
+> +       out->stream.common.get_channels = out_get_channels;
+> +       out->stream.common.get_format = out_get_format;
+> +       out->stream.common.set_format = out_set_format;
+> +       out->stream.common.standby = out_standby;
+> +       out->stream.common.dump = out_dump;
+> +       out->stream.common.set_parameters = out_set_parameters;
+> +       out->stream.common.get_parameters = out_get_parameters;
+> +       out->stream.common.add_audio_effect = out_add_audio_effect;
+> +       out->stream.common.remove_audio_effect = out_remove_audio_effect;
+> +       out->stream.get_latency = out_get_latency;
+> +       out->stream.set_volume = out_set_volume;
+> +       out->stream.write = out_write;
+> +       out->stream.get_render_position = out_get_render_position;
+> +
+> +       out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
+> +       out->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
+> +       out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+> +
+> +       *stream_out = &out->stream;
+> +       adev->out = out;
+> +
+> +       return 0;
 >  }
->  
->  static void create_listen_connections(void *data, void *user_data)
-> 
+>
+>  static void sco_close_output_stream(struct audio_hw_device *dev,
+> --
+> 1.8.3.2
 
-This patch doesn't change function flow, I suppose it would matter later in
-series. Please put patches in proper order.
+Pushed, note that I have changed quite a bit of some code including
+fixing the resampler to not define variable in the middle of the code.
+
 
 -- 
-Best regards, 
-Szymon Janc
+Luiz Augusto von Dentz
