@@ -1,43 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Amith Raghunath <Amith.Raghunath@LNTTECHSERVICES.COM>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC: Wins Thomas <Wins.Thomas@LNTTECHSERVICES.COM>
-Subject: FW: Query regarding BLE communication between 2 Dual Mode devices
-Date: Tue, 13 May 2014 04:41:02 +0000
-Message-ID: <86D12A3EE8C39046AB3F026D471074661D23BF85@POCITMSEXMB02.LntUniverse.com>
-Content-Type: text/plain; charset=US-ASCII
-MIME-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; boundary="Apple-Mail=_9F68419B-4428-41DC-A602-4EFB7668EF49"; protocol="application/pgp-signature"; micalg=pgp-sha1
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: BLE connection failing
+From: Rick Mann <rmann@latencyzero.com>
+In-Reply-To: <7BB1715C-A0F8-4F74-B0D4-D4CD353962BA@holtmann.org>
+Date: Mon, 12 May 2014 19:51:57 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C4C34379-64F0-479E-8581-A4BDB32D24A3@latencyzero.com>
+References: <B473A0F2-765A-47EC-950F-69FAF659504B@latencyzero.com> <9ED33F2C-C3EF-41D7-8559-C04F1E6CE21D@holtmann.org> <7E32DBFD-3A61-4126-8B8F-71E1E3D395EB@latencyzero.com> <7BB1715C-A0F8-4F74-B0D4-D4CD353962BA@holtmann.org>
+To: Marcel Holtmann <marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 
+--Apple-Mail=_9F68419B-4428-41DC-A602-4EFB7668EF49
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=windows-1252
 
------Original Message-----
-From: Amith Raghunath
-Sent: 12 May 2014 08:30
-To: linux-bluetooth@vger.kernel.org
-Cc: Wins Thomas (Wins.Thomas@LNTTECHSERVICES.COM)
-Subject: Query regarding BLE communication between 2 Dual Mode devices
 
-Hi Marcel / Claudio,
-   Subject: Query regarding the BLE communication between 2 Dual Mode devices.
-   Stack Ver: bluez 5.14 / bluez 5.18.
-   Kernel Ver: 3.10
+On May 12, 2014, at 19:22 , Marcel Holtmann <marcel@holtmann.org> wrote:
 
-   I am trying to establish BLE connection between 2 dual mode devices using bluez at both the sides.
-   The Classic connection gets established, but BLE connection does not happen
-   (--experimental flag is enabled while running the configure script to include BLE modules & the bluetoothd log indicates that the relevant BLE modules are loaded).
-   I am communicating with Bluez stack via D-BUS interface.
+> the kernel does way more than just sending the HCI command. It does =
+tracking of the connections and also re-enabling of advertising when =
+needed. If you are stuck with 3.10 kernel, then do not bother with LE =
+peripheral role. It makes no sense.
 
-   It will be of great help if you can provide answers to my below queries. I am trying to find a solution to this.
-       1.  Is this a known issue or a new issue ?
-       2.  If I want to add a commit (patch) to the bluez git what is the procedure ?
+Others have led me to believe I should be able to do this, just can't =
+enable advertising via the mgmt interface. I can re-enable advertising =
+if I need to.
 
-Thanks,
-Amith
+What do you mean "tracking of the connections?"
 
-L&T Technology Services Ltd
+--=20
+Rick
 
-www.LntTechservices.com<http://www.lnttechservices.com/>
 
-This Email may contain confidential or privileged information for the intended recipient (s). If you are not the intended recipient, please do not use or disseminate the information, notify the sender and delete it from your system.
+
+
+--Apple-Mail=_9F68419B-4428-41DC-A602-4EFB7668EF49
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+	filename=signature.asc
+Content-Type: application/pgp-signature;
+	name=signature.asc
+Content-Description: Message signed with OpenPGP using GPGMail
+
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - https://gpgtools.org
+
+iEYEARECAAYFAlNxiM0ACgkQBzBA/9aDmJspLACfTg7FDgXIFlEXLBsfJLjNzSfy
+SagAoPwpNnWSoKgY8KDemzt2RX9yh66t
+=gJjk
+-----END PGP SIGNATURE-----
+
+--Apple-Mail=_9F68419B-4428-41DC-A602-4EFB7668EF49--
