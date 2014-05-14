@@ -1,88 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Holler <holler@ahsoftware.de>
-To: linux-kernel@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Alexander Holler <holler@ahsoftware.de>
-Subject: [PATCH 1/2] bluetooth: don't include local processing of HCI commands in the command timeout
-Date: Wed, 14 May 2014 16:00:24 +0200
-Message-Id: <1400076025-5103-1-git-send-email-holler@ahsoftware.de>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Run PTS tests for SM
+Date: Wed, 14 May 2014 15:38:25 +0200
+Message-Id: <1400074705-10299-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I assume the timeout for processing HCI commands was originally intended to
-detect hung bluetooth devices and should not include the time needed locally
-to handle the response to an HCI command. That is important because the time
-needed locally (by the kernel or even userland) to process responses to HCI
-commands varies a lot between systems and HCI commands. That's even more true
-since many actions to HCI command responses are handled inside works which
-might be delayed quiet some time, depending on the actual system load.
-
-So stop the timeout as soon as a response to an HCI command was received.
-
-This fixes various problems which resulted in HCI command timeouts and an
-afterwards non-working bluetooth stack, especially on slower systems like
-some ARM devices.
-
-Drawback is that in-kernel problems like deadlocks aren't detected by HCI
-command timeouts anymore, but such problems should be detected and handled
-by other means and not by a timeout where it is hard to specify a value
-reasonable for all possible systems (-configurations, -loads).
-
-Furthermore, if the timeout includes local processing of HCI command
-responses, in-kernel errors like hung tasks might be masked by the
-timeout, because the hung task would be killed by the timeout before
-the hung task would be detected (by other means).
-
-Signed-off-by: Alexander Holler <holler@ahsoftware.de>
 ---
- net/bluetooth/hci_event.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ android/Makefile.am |  3 ++-
+ android/pts-sm.txt  | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+), 1 deletion(-)
+ create mode 100644 android/pts-sm.txt
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 15010a2..94c2dc0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2338,6 +2338,9 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	opcode = __le16_to_cpu(ev->opcode);
- 
-+	if (opcode != HCI_OP_NOP)
-+		del_timer(&hdev->cmd_timer);
+diff --git a/android/Makefile.am b/android/Makefile.am
+index be8bb5b..e663790 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -274,4 +274,5 @@ EXTRA_DIST += android/Android.mk android/README \
+ 				android/pts-iopt.txt \
+ 				android/pts-hdp.txt \
+ 				android/pts-mcap.txt \
+-				android/pts-mps.txt
++				android/pts-mps.txt \
++				android/pts-sm.txt
+diff --git a/android/pts-sm.txt b/android/pts-sm.txt
+new file mode 100644
+index 0000000..0792de8
+--- /dev/null
++++ b/android/pts-sm.txt
+@@ -0,0 +1,63 @@
++PTS test results for SM
 +
- 	switch (opcode) {
- 	case HCI_OP_INQUIRY_CANCEL:
- 		hci_cc_inquiry_cancel(hdev, skb);
-@@ -2584,9 +2587,6 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		break;
- 	}
- 
--	if (opcode != HCI_OP_NOP)
--		del_timer(&hdev->cmd_timer);
--
- 	hci_req_cmd_complete(hdev, opcode, status);
- 
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags)) {
-@@ -2605,6 +2605,9 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	opcode = __le16_to_cpu(ev->opcode);
- 
-+	if (opcode != HCI_OP_NOP)
-+		del_timer(&hdev->cmd_timer);
++PTS version: 5.1
++Tested: 14-May-2014
++Android version: 4.4.2
 +
- 	switch (opcode) {
- 	case HCI_OP_INQUIRY:
- 		hci_cs_inquiry(hdev, ev->status);
-@@ -2675,9 +2678,6 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		break;
- 	}
- 
--	if (opcode != HCI_OP_NOP)
--		del_timer(&hdev->cmd_timer);
--
- 	if (ev->status ||
- 	    (hdev->sent_cmd && !bt_cb(hdev->sent_cmd)->req.event))
- 		hci_req_cmd_complete(hdev, opcode, ev->status);
++Results:
++PASS	test passed
++FAIL	test failed
++INC	test is inconclusive
++N/A	test is disabled due to PICS setup
++NONE	test result is none
++
++-------------------------------------------------------------------------------
++Test Name		Result	Notes
++-------------------------------------------------------------------------------
++TC_PROT_BV_01_C		PASS
++TC_PROT_BV_02_C		FAIL	JIRA: BZ-24
++				btmgmt advertising on
++TC_JW_BV_01_C		FAIL	JIRA: BZ-25
++TC_JW_BV_02_C		INC	JIRA: BZ-26
++TC_JW_BV_05_C		INC
++TC_JW_BI_01_C		PASS
++TC_JW_BI_02_C		INC
++TC_JW_BI_03_C		INC
++TC_JW_BI_04_C		FAIL
++TC_PKE_BV_01_C		FAIL
++TC_PKE_BV_02_C		INC
++TC_PKE_BV_04_C		FAIL
++TC_PKE_BV_05_C		INC
++TC_PKE_BI_01_C		INC
++TC_PKE_BI_02_C		PASS
++TC_PKE_BI_03_C		INC
++TC_OOB_BV_01_C		FAIL
++TC_OOB_BV_02_C		INC
++TC_OOB_BV_03_C		FAIL
++TC_OOB_BV_04_C		INC
++TC_OOB_BV_05_C		INC
++TC_OOB_BV_06_C		INC
++TC_OOB_BV_07_C		INC
++TC_OOB_BV_08_C		INC
++TC_OOB_BV_09_C		INC
++TC_OOB_BV_10_C		INC
++TC_OOB_BI_01_C		INC
++TC_OOB_BI_02_C		INC
++TC_EKS_BV_01_C		INC
++TC_EKS_BV_02_C		INC
++TC_EKS_BI_01_C		INC
++TC_EKS_BI_02_C		INC
++TC_SIGN_BV_01_C		INC
++TC_SIGN_BV_03_C		INC
++TC_SIGN_BI_01_C		INC
++TC_KDU_BV_01_C		INC
++TC_KDU_BV_02_C		INC
++TC_KDU_BV_03_C		INC
++TC_KDU_BV_04_C		INC
++TC_KDU_BV_05_C		INC
++TC_KDU_BV_06_C		INC
++TC_KDU_BV_07_C		INC
++TC_SIP_BV_01_C		INC
++TC_SIP_BV_02_C		FAIL
++TC_SIE_BV_01_C		INC
++-------------------------------------------------------------------------------
 -- 
-1.8.3.1
+1.8.5.3
+
