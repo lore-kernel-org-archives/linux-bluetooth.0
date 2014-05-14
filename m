@@ -1,89 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Subject: Re: [PATCH 2/3] shared/crypto: Add support to sign data with AES-CMAC
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1400058266-31790-2-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 14 May 2014 08:07:15 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <B1BB1461-49E6-41AA-9409-B0A53377F7E1@holtmann.org>
-References: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com> <1400058266-31790-2-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <CABBYNZLmDazb+0=-sph80yXsVYY4CcP0EVgBiJt00spE-=YhTw@mail.gmail.com>
+References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
+	<1399666440-14078-2-git-send-email-armansito@chromium.org>
+	<01CD59B6-44C7-425A-8686-82C428F41C87@holtmann.org>
+	<CAHrH25RubNJx89MabHvHQc8ZsymcdDB2VoNVxwEooHEDv2=ybA@mail.gmail.com>
+	<CABBYNZLmDazb+0=-sph80yXsVYY4CcP0EVgBiJt00spE-=YhTw@mail.gmail.com>
+Date: Wed, 14 May 2014 07:54:03 -0700
+Message-ID: <CAHrH25TYbP7mkwJeJO3vcECetbTCx_TguUDuE1k02XC=a6pOmQ@mail.gmail.com>
+Subject: Re: [PATCH v1 01/10] src/shared/att: Introduce struct bt_att.
+From: Arman Uguray <armansito@chromium.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukas,
+Hi Luiz,
 
-> This patch adds support to generate hash using AES-CMAC algorithm
-> ---
-> src/shared/crypto.c | 37 +++++++++++++++++++++++++++++++++++++
-> src/shared/crypto.h |  4 ++++
-> 2 files changed, 41 insertions(+)
-> 
-> diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-> index f0b2979..a0bcc7b 100644
-> --- a/src/shared/crypto.c
-> +++ b/src/shared/crypto.c
-> @@ -256,6 +256,43 @@ static inline void swap128(const uint8_t src[16], uint8_t dst[16])
-> 		dst[15 - i] = src[i];
-> }
-> 
-> +bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
-> +					const uint8_t key[16],
-> +					const uint8_t *m, uint16_t m_len,
-> +					uint8_t hash[12])
-> +{
-> +	int fd;
-> +	int len;
-> +	uint8_t tmp[16], out[16];
-> +
-> +	if (!crypto)
-> +		return false;
-> +
-> +	/* The most significant octet of key corresponds to key[0] */
-> +	swap128(key, tmp);
-> +
-> +	fd = alg_new(crypto->cmac_aes, tmp, 16);
-> +	if (fd < 0)
-> +		return false;
-> +
-> +	len = send(fd, m, m_len, 0);
-> +	if (len < 0)
-> +		return false;
-> +
-> +	len = read(fd, out, 16);
-> +	if (len < 0)
-> +		return false;
-> +
-> +	/*
-> +	 * The most significant octet of hash corresponds to out[0]  - swap it.
-> +	 * Then truncate in most significant bit first order to a length of
-> +	 * 12 octets
-> +	 */
-> +	swap128(out, tmp);
-> +	memcpy(hash, tmp + 4, 12);
-> +
-> +	return true;
-> +}
-> /*
->  * Security function e
->  *
-> diff --git a/src/shared/crypto.h b/src/shared/crypto.h
-> index cae8daa..05888b9 100644
-> --- a/src/shared/crypto.h
-> +++ b/src/shared/crypto.h
-> @@ -46,3 +46,7 @@ bool bt_crypto_c1(struct bt_crypto *crypto, const uint8_t k[16],
-> bool bt_crypto_s1(struct bt_crypto *crypto, const uint8_t k[16],
-> 			const uint8_t r1[16], const uint8_t r2[16],
-> 			uint8_t res[16]);
-> +bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
-> +					const uint8_t key[16],
-> +					const uint8_t *m, uint16_t m_len,
-> +					uint8_t hash[12]);
+>> Actually what I have in mind is even simpler than this. For outgoing
+>> operations that don't solicit a response (such as commands and
+>> outgoing notifications) we simply send them and invoke the callback
+>> with a special opcode such as "BT_ATT_PDU_SENT". For those outgoing
+>> operations that do solicit a response (e.g. requests and indications),
+>> the request remains pending until the response is received. A
+>> responses array is not really necessary, since there is already a 1:1
+>> mapping between ATT requests and their responses, so we know exactly
+>> which request the received response matches (even the error response
+>> contains the request that caused it in its PDU).
+>
+> I don't think we need an special opcode when the PDU is sent, the
+> caller might actually not set any callback and I don't think there is
+> any special action that can be triggered by having such a thing,
+> specially because it is in no way an acknowledgment it just mean it
+> has been dispatched it may still not reach the remote side. In other
+> words if ATT does not have acknowledgment we should not invent one
+> either.
 
-we are using the cryptographic names from the Bluetooth specification cryptographic toolbox. I bet this one has a proper function name as well. So lets use that one.
+Makes sense. The idea I had was that if the caller passes NULL to
+bt_att_send for the callback, then no acknowledgement would happen but
+if they do, we would confirm with a special PDU, but this will no
+longer be necessary if we have a separate function as you suggest
+below.
 
-Regards
+>> For incoming requests, we treat these as events as you said. To
+>> respond to them, the upper layer than just needs to call bt_att_send
+>> with the corresponding response opcode and parameters.
+>
+> I would not reuse the same function for both requests and responses,
+> responses should not have any callback and custom data attached for
+> the same reasons stated above, so I would have att_send_rsp for
+> responses alone.
 
-Marcel
-
+Maybe it would make sense to have one function to send operations that
+solicit a response (requests/indications), e.g.
+bt_att_send_op_with_rsp and one function for those that don't (for
+responses/commands/notifications) like bt_att_send_op_no_rsp. Or do
+you think we should have separate functions such as bt_att_send_req,
+bt_att_send_rsp, bt_att_send_not, bt_att_send_ind, etc?
