@@ -1,67 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/gatt: Fix handling advertising state
-Date: Wed, 14 May 2014 13:26:34 +0200
-Message-Id: <1400066794-12621-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v4 0/5] Bluetooth: Get Connection Information
+Date: Wed, 14 May 2014 12:49:38 +0200
+Message-ID: <1400064583-12623-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes enabling advertising.
-It was not possible to enable it if we had server registered
-which is on listen_apps list but does not trigger advertising.
+Hi,
 
-This patch introduces static counter to track number of clients
-requested advertising.
----
- android/gatt.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Changes in v4:
+- include max_tx_power when declaring structs for 1st time, request will
+  just reply with HCI_TX_POWER_INVALID without other patches for max_tx_power
+- fixed debugfs to have basic validation
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 157ebe6..ad89233 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -167,6 +167,7 @@ struct app_connection {
- static struct ipc *hal_ipc = NULL;
- static bdaddr_t adapter_addr;
- static bool scanning = false;
-+static unsigned int advertising_cnt = 0;
- 
- static struct queue *gatt_apps = NULL;
- static struct queue *gatt_devices = NULL;
-@@ -1374,6 +1375,10 @@ static void set_advertising_cb(uint8_t status, void *user_data)
- 
- 	send_client_listen_notify(l->client_id, status);
- 
-+	/* In case of success update advertising state*/
-+	if (!status)
-+		advertising_cnt = l->start ? 1 : 0;
-+
- 	/*
- 	 * Let's remove client from the list in two cases
- 	 * 1. Start failed
-@@ -1418,7 +1423,8 @@ static void handle_client_listen(const void *buf, uint16_t len)
- 		}
- 
- 		/* If listen is already on just return success*/
--		if (queue_length(listen_apps) > 1) {
-+		if (advertising_cnt > 0) {
-+			advertising_cnt++;
- 			status = HAL_STATUS_SUCCESS;
- 			goto reply;
- 		}
-@@ -1435,7 +1441,8 @@ static void handle_client_listen(const void *buf, uint16_t len)
- 		 * In case there is more listening clients don't stop
- 		 * advertising
- 		 */
--		if (queue_length(listen_apps) > 1) {
-+		if (advertising_cnt > 1) {
-+			advertising_cnt--;
- 			queue_remove(listen_apps,
- 						INT_TO_PTR(cmd->client_if));
- 			status = HAL_STATUS_SUCCESS;
+
+Andrzej Kaczmarek (5):
+  Bluetooth: Add conn info lifetime parameters to debugfs
+  Bluetooth: Add support to get connection information
+  Bluetooth: Avoid polling TX power for LE links
+  Bluetooth: Store max TX power level for connection
+  Bluetooth: Add support for max_tx_power in Get Conn Info
+
+ include/net/bluetooth/hci_core.h |   9 ++
+ include/net/bluetooth/mgmt.h     |  14 +++
+ net/bluetooth/hci_conn.c         |   1 +
+ net/bluetooth/hci_core.c         |  63 ++++++++++++
+ net/bluetooth/hci_event.c        |  12 ++-
+ net/bluetooth/mgmt.c             | 213 +++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 311 insertions(+), 1 deletion(-)
+
 -- 
-1.8.4
+1.9.3
 
