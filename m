@@ -1,81 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/3] shared/crypto: Add support to sign data with AES-CMAC
-Date: Wed, 14 May 2014 11:04:25 +0200
-Message-Id: <1400058266-31790-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com>
+Date: Wed, 14 May 2014 11:21:23 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ] android/handsfree: Fix Connect SCO command
+Message-ID: <20140514082120.GC27218@aemeltch-MOBL1>
+References: <1400001769-6690-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1400001769-6690-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to generate hash using AES-CMAC algorithm
----
- src/shared/crypto.c | 37 +++++++++++++++++++++++++++++++++++++
- src/shared/crypto.h |  4 ++++
- 2 files changed, 41 insertions(+)
+Hi Luiz,
 
-diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index f0b2979..a0bcc7b 100644
---- a/src/shared/crypto.c
-+++ b/src/shared/crypto.c
-@@ -256,6 +256,43 @@ static inline void swap128(const uint8_t src[16], uint8_t dst[16])
- 		dst[15 - i] = src[i];
- }
- 
-+bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
-+					const uint8_t key[16],
-+					const uint8_t *m, uint16_t m_len,
-+					uint8_t hash[12])
-+{
-+	int fd;
-+	int len;
-+	uint8_t tmp[16], out[16];
-+
-+	if (!crypto)
-+		return false;
-+
-+	/* The most significant octet of key corresponds to key[0] */
-+	swap128(key, tmp);
-+
-+	fd = alg_new(crypto->cmac_aes, tmp, 16);
-+	if (fd < 0)
-+		return false;
-+
-+	len = send(fd, m, m_len, 0);
-+	if (len < 0)
-+		return false;
-+
-+	len = read(fd, out, 16);
-+	if (len < 0)
-+		return false;
-+
-+	/*
-+	 * The most significant octet of hash corresponds to out[0]  - swap it.
-+	 * Then truncate in most significant bit first order to a length of
-+	 * 12 octets
-+	 */
-+	swap128(out, tmp);
-+	memcpy(hash, tmp + 4, 12);
-+
-+	return true;
-+}
- /*
-  * Security function e
-  *
-diff --git a/src/shared/crypto.h b/src/shared/crypto.h
-index cae8daa..05888b9 100644
---- a/src/shared/crypto.h
-+++ b/src/shared/crypto.h
-@@ -46,3 +46,7 @@ bool bt_crypto_c1(struct bt_crypto *crypto, const uint8_t k[16],
- bool bt_crypto_s1(struct bt_crypto *crypto, const uint8_t k[16],
- 			const uint8_t r1[16], const uint8_t r2[16],
- 			uint8_t res[16]);
-+bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
-+					const uint8_t key[16],
-+					const uint8_t *m, uint16_t m_len,
-+					uint8_t hash[12]);
--- 
-1.8.4
+On Tue, May 13, 2014 at 08:22:49PM +0300, Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This command should not trigger SCO connection since there is already a
+> command Connect Audio dedicated to do that.
 
+Do you handle incoming connections?
+
+Best regards 
+Andrei Emeltchenko 
+
+> ---
+>  android/handsfree.c | 53 ++++++++++++++++++++++++-----------------------------
+>  1 file changed, 24 insertions(+), 29 deletions(-)
+> 
+> diff --git a/android/handsfree.c b/android/handsfree.c
+> index cb5e657..7ca0ba8 100644
+> --- a/android/handsfree.c
+> +++ b/android/handsfree.c
+> @@ -861,30 +861,6 @@ done:
+>  	hfp_gw_send_info(device.gw, "+BCS: %u", type);
+>  }
+>  
+> -static void send_sco_fd(GIOChannel *chan)
+> -{
+> -	if (sco_ipc) {
+> -		int fd = g_io_channel_unix_get_fd(chan);
+> -		GError *err = NULL;
+> -		uint16_t mtu = 48;
+> -		struct sco_rsp_connect rsp;
+> -
+> -		if (!bt_io_get(chan, &err, BT_IO_OPT_MTU, &mtu,
+> -							BT_IO_OPT_INVALID)) {
+> -			error("Unable to get MTU: %s\n", err->message);
+> -			g_clear_error(&err);
+> -		}
+> -
+> -		DBG("fd %d mtu %u", fd, mtu);
+> -
+> -		rsp.mtu = mtu;
+> -
+> -		ipc_send_rsp_full(sco_ipc, SCO_SERVICE_ID,
+> -					SCO_OP_CONNECT, sizeof(rsp), &rsp,
+> -					fd);
+> -	}
+> -}
+> -
+>  static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>  {
+>  	if (err) {
+> @@ -914,7 +890,6 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+>  							sco_watch_cb, NULL);
+>  
+>  	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
+> -	send_sco_fd(chan);
+>  }
+>  
+>  static bool connect_sco(void)
+> @@ -2592,14 +2567,34 @@ static void disable_sco_server(void)
+>  
+>  static void bt_sco_connect(const void *buf, uint16_t len)
+>  {
+> +	int fd;
+> +	GError *err;
+> +	struct sco_rsp_connect rsp;
+> +
+>  	DBG("");
+>  
+> -	if (device.sco) {
+> -		send_sco_fd(device.sco);
+> -		return;
+> +	if (!device.sco)
+> +		goto failed;
+> +
+> +	err = NULL;
+> +	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
+> +							BT_IO_OPT_INVALID)) {
+> +		error("Unable to get MTU: %s\n", err->message);
+> +		g_clear_error(&err);
+> +		goto failed;
+>  	}
+>  
+> -	connect_audio();
+> +	fd = g_io_channel_unix_get_fd(device.sco);
+> +
+> +	DBG("fd %d mtu %u", fd, rsp.mtu);
+> +
+> +	ipc_send_rsp_full(sco_ipc, SCO_SERVICE_ID, SCO_OP_CONNECT,
+> +							sizeof(rsp), &rsp, fd);
+> +
+> +	return;
+> +
+> +failed:
+> +	ipc_send_rsp(sco_ipc, SCO_SERVICE_ID, SCO_OP_STATUS, SCO_STATUS_FAILED);
+>  }
+>  
+>  static const struct ipc_handler sco_handlers[] = {
+> -- 
+> 1.9.0
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
