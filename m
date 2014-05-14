@@ -1,77 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix handling advertising state
-Date: Wed, 14 May 2014 15:19:11 +0200
-Message-ID: <5603621.8izkkfudE9@uw000953>
-In-Reply-To: <1400066794-12621-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400066794-12621-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 1/2] doc: Fix bit numbering in mgmt-api
+Date: Wed, 14 May 2014 15:18:00 +0200
+Message-ID: <1400073481-7099-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+---
+ doc/mgmt-api.txt | 34 +++++++++++++++++-----------------
+ 1 file changed, 17 insertions(+), 17 deletions(-)
 
-On Wednesday 14 of May 2014 13:26:34 Lukasz Rymanowski wrote:
-> This patch fixes enabling advertising.
-> It was not possible to enable it if we had server registered
-> which is on listen_apps list but does not trigger advertising.
-> 
-> This patch introduces static counter to track number of clients
-> requested advertising.
-> ---
->  android/gatt.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 157ebe6..ad89233 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -167,6 +167,7 @@ struct app_connection {
->  static struct ipc *hal_ipc = NULL;
->  static bdaddr_t adapter_addr;
->  static bool scanning = false;
-> +static unsigned int advertising_cnt = 0;
->  
->  static struct queue *gatt_apps = NULL;
->  static struct queue *gatt_devices = NULL;
-> @@ -1374,6 +1375,10 @@ static void set_advertising_cb(uint8_t status, void *user_data)
->  
->  	send_client_listen_notify(l->client_id, status);
->  
-> +	/* In case of success update advertising state*/
-> +	if (!status)
-> +		advertising_cnt = l->start ? 1 : 0;
-> +
->  	/*
->  	 * Let's remove client from the list in two cases
->  	 * 1. Start failed
-> @@ -1418,7 +1423,8 @@ static void handle_client_listen(const void *buf, uint16_t len)
->  		}
->  
->  		/* If listen is already on just return success*/
-> -		if (queue_length(listen_apps) > 1) {
-> +		if (advertising_cnt > 0) {
-> +			advertising_cnt++;
->  			status = HAL_STATUS_SUCCESS;
->  			goto reply;
->  		}
-> @@ -1435,7 +1441,8 @@ static void handle_client_listen(const void *buf, uint16_t len)
->  		 * In case there is more listening clients don't stop
->  		 * advertising
->  		 */
-> -		if (queue_length(listen_apps) > 1) {
-> +		if (advertising_cnt > 1) {
-> +			advertising_cnt--;
->  			queue_remove(listen_apps,
->  						INT_TO_PTR(cmd->client_if));
->  			status = HAL_STATUS_SUCCESS;
-> 
-
-Patch applied, thanks.
-
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index cd5cd24..9374f9d 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -214,20 +214,20 @@ Read Controller Information Command
+ 	Current_Settings & Supported_Settings is a bitmask with
+ 	currently the following available bits:
+ 
+-		1	Powered
+-		2	Connectable
+-		3	Fast Connectable
+-		4	Discoverable
+-		5	Pairable
+-		6	Link Level Security (Sec. mode 3)
+-		7	Secure Simple Pairing
+-		8	Basic Rate/Enhanced Data Rate
+-		9	High Speed
+-		10	Low Energy
+-		11	Advertising
+-		12	Secure Connections
+-		13	Debug Keys
+-		14	Privacy
++		0	Powered
++		1	Connectable
++		2	Fast Connectable
++		3	Discoverable
++		4	Pairable
++		5	Link Level Security (Sec. mode 3)
++		6	Secure Simple Pairing
++		7	Basic Rate/Enhanced Data Rate
++		8	High Speed
++		9	Low Energy
++		10	Advertising
++		11	Secure Connections
++		12	Debug Keys
++		13	Privacy
+ 
+ 	This command generates a Command Complete event on success or
+ 	a Command Status event on failure.
+@@ -1270,9 +1270,9 @@ Start Discovery Command
+ 	Possible values for the Address_Type parameter are a bit-wise or
+ 	of the following bits:
+ 
+-		1	BR/EDR
+-		2	LE Public
+-		3	LE Random
++		0	BR/EDR
++		1	LE Public
++		2	LE Random
+ 
+ 	By combining these e.g. the following values are possible:
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
