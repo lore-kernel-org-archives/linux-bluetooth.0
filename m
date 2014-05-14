@@ -1,45 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 14 May 2014 17:53:35 +0200
-From: Samuel Ortiz <sameo@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix L2CAP LE debugfs entries permissions
-Message-ID: <20140514155335.GR4157@zurbaran>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH 2/3] shared/crypto: Add support to sign data with AES-CMAC
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAF3PWx3Bte2G-PbRCYfQAOMOyi1RcszpW-U4qBHUayiVvLKNyg@mail.gmail.com>
+Date: Wed, 14 May 2014 08:29:34 -0700
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <4491C253-FDB1-403F-A6BF-59A00A784E6F@holtmann.org>
+References: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com> <1400058266-31790-2-git-send-email-lukasz.rymanowski@tieto.com> <B1BB1461-49E6-41AA-9409-B0A53377F7E1@holtmann.org> <CAF3PWx3Bte2G-PbRCYfQAOMOyi1RcszpW-U4qBHUayiVvLKNyg@mail.gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrzej,
 
-0466 was probably meant to be 0644, there's no reason why everyone
-except root could write there.
+>>> This patch adds support to generate hash using AES-CMAC algorithm
+>>> ---
+>>> src/shared/crypto.c | 37 +++++++++++++++++++++++++++++++++++++
+>>> src/shared/crypto.h |  4 ++++
+>>> 2 files changed, 41 insertions(+)
+>>> 
+>>> diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+>>> index f0b2979..a0bcc7b 100644
+>>> --- a/src/shared/crypto.c
+>>> +++ b/src/shared/crypto.c
+>>> @@ -256,6 +256,43 @@ static inline void swap128(const uint8_t src[16], uint8_t dst[16])
+>>>              dst[15 - i] = src[i];
+>>> }
+>>> 
+>>> +bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
+>>> +                                     const uint8_t key[16],
+>>> +                                     const uint8_t *m, uint16_t m_len,
+>>> +                                     uint8_t hash[12])
+>>> +{
+>>> +     int fd;
+>>> +     int len;
+>>> +     uint8_t tmp[16], out[16];
+>>> +
+>>> +     if (!crypto)
+>>> +             return false;
+>>> +
+>>> +     /* The most significant octet of key corresponds to key[0] */
+>>> +     swap128(key, tmp);
+>>> +
+>>> +     fd = alg_new(crypto->cmac_aes, tmp, 16);
+>>> +     if (fd < 0)
+>>> +             return false;
+>>> +
+>>> +     len = send(fd, m, m_len, 0);
+>>> +     if (len < 0)
+>>> +             return false;
+>>> +
+>>> +     len = read(fd, out, 16);
+>>> +     if (len < 0)
+>>> +             return false;
+>>> +
+>>> +     /*
+>>> +      * The most significant octet of hash corresponds to out[0]  - swap it.
+>>> +      * Then truncate in most significant bit first order to a length of
+>>> +      * 12 octets
+>>> +      */
+>>> +     swap128(out, tmp);
+>>> +     memcpy(hash, tmp + 4, 12);
+>>> +
+>>> +     return true;
+>>> +}
+>>> /*
+>>> * Security function e
+>>> *
+>>> diff --git a/src/shared/crypto.h b/src/shared/crypto.h
+>>> index cae8daa..05888b9 100644
+>>> --- a/src/shared/crypto.h
+>>> +++ b/src/shared/crypto.h
+>>> @@ -46,3 +46,7 @@ bool bt_crypto_c1(struct bt_crypto *crypto, const uint8_t k[16],
+>>> bool bt_crypto_s1(struct bt_crypto *crypto, const uint8_t k[16],
+>>>                      const uint8_t r1[16], const uint8_t r2[16],
+>>>                      uint8_t res[16]);
+>>> +bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
+>>> +                                     const uint8_t key[16],
+>>> +                                     const uint8_t *m, uint16_t m_len,
+>>> +                                     uint8_t hash[12]);
+>> 
+>> we are using the cryptographic names from the Bluetooth specification cryptographic toolbox. I bet this one has a proper function name as well. So lets use that one.
+> 
+> Actually it does not have other name - AES-CMAC is referenced in
+> section "2.4.5 Signing algorithm" of SMP specification as algorithm to
+> be used for signing. Perhaps we can call it 'bt_crypto_le_sign' since
+> it's used for signing LE data (as per spec) or just leave as-is.
 
-Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
----
- net/bluetooth/l2cap_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+that is actually bad. This might require a specification errata since all cryptographic functions should be explained. That is highly important just for endian sake.
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index a1e5bb7..dc4d301 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -7519,9 +7519,9 @@ int __init l2cap_init(void)
- 	l2cap_debugfs = debugfs_create_file("l2cap", 0444, bt_debugfs,
- 					    NULL, &l2cap_debugfs_fops);
- 
--	debugfs_create_u16("l2cap_le_max_credits", 0466, bt_debugfs,
-+	debugfs_create_u16("l2cap_le_max_credits", 0644, bt_debugfs,
- 			   &le_max_credits);
--	debugfs_create_u16("l2cap_le_default_mps", 0466, bt_debugfs,
-+	debugfs_create_u16("l2cap_le_default_mps", 0644, bt_debugfs,
- 			   &le_default_mps);
- 
- 	bt_6lowpan_init();
--- 
-2.0.0.rc0
+Maybe bt_crypto_sign_att is better. We can sort out the exact name a bit later.
 
--- 
-Intel Open Source Technology Centre
-http://oss.intel.com/
+Regards
+
+Marcel
+
