@@ -1,41 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 14 May 2014 17:53:35 +0200
+From: Samuel Ortiz <sameo@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix L2CAP LE debugfs entries permissions
+Message-ID: <20140514155335.GR4157@zurbaran>
 MIME-Version: 1.0
-In-Reply-To: <D2E1C6A3-BB46-4C9D-8603-241B6CF69EBE@holtmann.org>
-References: <1400066794-12621-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<D2E1C6A3-BB46-4C9D-8603-241B6CF69EBE@holtmann.org>
-Date: Wed, 14 May 2014 18:02:17 +0200
-Message-ID: <CAN_7+YbccmQce05h4A_TGQGgOToJhxx1B=xU=egf76zsfS8vXQ@mail.gmail.com>
-Subject: Re: [PATCH] android/gatt: Fix handling advertising state
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
 
-On Wed, May 14, 2014 at 5:12 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Lukasz,
->
->> This patch fixes enabling advertising.
->> It was not possible to enable it if we had server registered
->> which is on listen_apps list but does not trigger advertising.
->
-> does this mean we always advertise when registering GATT server?
-No. We just put each server on the listen_apps queue and once remote
-device connects to us, this server gets connection callback.
+0466 was probably meant to be 0644, there's no reason why everyone
+except root could write there.
 
-> If so, then this is wrong. The GATT server has nothing to do with advertising.
->
-> Regards
->
-> Marcel
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Signed-off-by: Samuel Ortiz <sameo@linux.intel.com>
+---
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-BR
-Lukasz
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index a1e5bb7..dc4d301 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -7519,9 +7519,9 @@ int __init l2cap_init(void)
+ 	l2cap_debugfs = debugfs_create_file("l2cap", 0444, bt_debugfs,
+ 					    NULL, &l2cap_debugfs_fops);
+ 
+-	debugfs_create_u16("l2cap_le_max_credits", 0466, bt_debugfs,
++	debugfs_create_u16("l2cap_le_max_credits", 0644, bt_debugfs,
+ 			   &le_max_credits);
+-	debugfs_create_u16("l2cap_le_default_mps", 0466, bt_debugfs,
++	debugfs_create_u16("l2cap_le_default_mps", 0644, bt_debugfs,
+ 			   &le_default_mps);
+ 
+ 	bt_6lowpan_init();
+-- 
+2.0.0.rc0
+
+-- 
+Intel Open Source Technology Centre
+http://oss.intel.com/
