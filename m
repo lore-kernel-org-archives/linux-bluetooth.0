@@ -1,79 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Antonio Ospite <ao2@ao2.it>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 2/3] shared/crypto: Add support to sign data with AES-CMAC
-Date: Thu, 15 May 2014 08:15:31 +0200
-Message-Id: <1400134532-26574-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1400134532-26574-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400134532-26574-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: Antonio Ospite <ao2@ao2.it>, Bastien Nocera <hadess@hadess.net>,
+	Szymon Janc <szymon.janc@gmail.com>,
+	Frank Praznik <frank.praznik@oh.rr.com>
+Subject: [PATCHv2 BlueZ 0/5] plugin/sixaxis: Set leds using the sysfs leds class
+Date: Wed, 14 May 2014 23:40:01 +0200
+Message-Id: <1400103605-25183-1-git-send-email-ao2@ao2.it>
+In-Reply-To: <1399370776-5027-1-git-send-email-ao2@ao2.it>
+References: <1399370776-5027-1-git-send-email-ao2@ao2.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support to generate hash using AES-CMAC algorithm
----
- src/shared/crypto.c | 36 ++++++++++++++++++++++++++++++++++++
- src/shared/crypto.h |  3 +++
- 2 files changed, 39 insertions(+)
+Hi,
 
-diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index f0b2979..0aec373 100644
---- a/src/shared/crypto.c
-+++ b/src/shared/crypto.c
-@@ -256,6 +256,42 @@ static inline void swap128(const uint8_t src[16], uint8_t dst[16])
- 		dst[15 - i] = src[i];
- }
- 
-+bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
-+					const uint8_t *m, uint16_t m_len,
-+					uint8_t signature[12])
-+{
-+	int fd;
-+	int len;
-+	uint8_t tmp[16], out[16];
-+
-+	if (!crypto)
-+		return false;
-+
-+	/* The most significant octet of key corresponds to key[0] */
-+	swap128(key, tmp);
-+
-+	fd = alg_new(crypto->cmac_aes, tmp, 16);
-+	if (fd < 0)
-+		return false;
-+
-+	len = send(fd, m, m_len, 0);
-+	if (len < 0)
-+		return false;
-+
-+	len = read(fd, out, 16);
-+	if (len < 0)
-+		return false;
-+
-+	/*
-+	 * The most significant octet of hash corresponds to out[0]  - swap it.
-+	 * Then truncate in most significant bit first order to a length of
-+	 * 12 octets
-+	 */
-+	swap128(out, tmp);
-+	memcpy(signature, tmp + 4, 12);
-+
-+	return true;
-+}
- /*
-  * Security function e
-  *
-diff --git a/src/shared/crypto.h b/src/shared/crypto.h
-index cae8daa..64faed2 100644
---- a/src/shared/crypto.h
-+++ b/src/shared/crypto.h
-@@ -46,3 +46,6 @@ bool bt_crypto_c1(struct bt_crypto *crypto, const uint8_t k[16],
- bool bt_crypto_s1(struct bt_crypto *crypto, const uint8_t k[16],
- 			const uint8_t r1[16], const uint8_t r2[16],
- 			uint8_t res[16]);
-+bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
-+					const uint8_t *m, uint16_t m_len,
-+					uint8_t signature[12]);
+here's the updated patch series, the commit messages have been fixed too!
+
+I am leaving out patch 1/5 for now:
+
+  plugins/sixaxis: Simplify get_js_numbers()
+
+I decided to do so because there is still some timing issue: the new
+procedure to retrieve the js number is faster, and on the _very_first_
+run it fails and returns 0, I suspect this has to do with the fact that
+the joydev module gets loaded after the hidraw uevent and the
+enumeration in the plugin completes before the js node shows up in
+sysfs, I'll do some more experiments on that.
+
+So please apply only patches from 2 to 5, thanks, I kept the numbering
+as in v1 for clarity.
+
+Changes since v1 are annotated in each patch.
+
+The changes have been tested with libudev-204 along with linux-3.13,
+linux 3.14 and linux-3.15-rc4. 
+
+To recap:
+  - on kernels < 3.14 the hidraw mechanism is used
+  - on kernels >= 3,14 the sysfs mechanism is used to avoid
+    inconsistencies with rumble effects.
+
+Thanks,
+   Antonio
+
+Antonio Ospite (4):
+  plugins/sixaxis: Factor out a set_leds_hidraw() function
+  plugins/sixaxis: Factor out a calc_leds_bitmap() function
+  plugins/sixaxis: Add a get_leds_data() function
+  plugins/sixaxis: Add a set_leds_sysfs() function
+
+ configure.ac      |   4 +-
+ plugins/sixaxis.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++-------
+ 2 files changed, 158 insertions(+), 24 deletions(-)
+
 -- 
-1.8.4
+Antonio Ospite
+http://ao2.it
 
+A: Because it messes up the order in which people normally read text.
+   See http://en.wikipedia.org/wiki/Posting_style
+Q: Why is top-posting such a bad thing?
