@@ -1,99 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Run PTS tests for SM
-Date: Wed, 14 May 2014 15:38:25 +0200
-Message-Id: <1400074705-10299-1-git-send-email-sebastian.chlad@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v6] doc: Add description for Get Connection Information command
+Date: Wed, 14 May 2014 15:28:26 +0200
+Message-ID: <1400074106-8545-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/Makefile.am |  3 ++-
- android/pts-sm.txt  | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+), 1 deletion(-)
- create mode 100644 android/pts-sm.txt
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index be8bb5b..e663790 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -274,4 +274,5 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pts-iopt.txt \
- 				android/pts-hdp.txt \
- 				android/pts-mcap.txt \
--				android/pts-mps.txt
-+				android/pts-mps.txt \
-+				android/pts-sm.txt
-diff --git a/android/pts-sm.txt b/android/pts-sm.txt
-new file mode 100644
-index 0000000..0792de8
---- /dev/null
-+++ b/android/pts-sm.txt
-@@ -0,0 +1,63 @@
-+PTS test results for SM
+This patch introduces Get Connection Information command.
+---
+ doc/mgmt-api.txt | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
+
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index cd5cd24..b691ae0 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1679,6 +1679,35 @@ Load Identity Resolving Keys Command
+ 				Invalid Index
+ 
+ 
++Get Connection Information Command
++==================================
 +
-+PTS version: 5.1
-+Tested: 14-May-2014
-+Android version: 4.4.2
++	Command Code:		0x0031
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				RSSI (1 Octet)
++				TX_Power (1 Octet)
++				Max_TX_Power (1 Octet)
 +
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
-+NONE	test result is none
++	This command is used to get connection information.
 +
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_PROT_BV_01_C		PASS
-+TC_PROT_BV_02_C		FAIL	JIRA: BZ-24
-+				btmgmt advertising on
-+TC_JW_BV_01_C		FAIL	JIRA: BZ-25
-+TC_JW_BV_02_C		INC	JIRA: BZ-26
-+TC_JW_BV_05_C		INC
-+TC_JW_BI_01_C		PASS
-+TC_JW_BI_02_C		INC
-+TC_JW_BI_03_C		INC
-+TC_JW_BI_04_C		FAIL
-+TC_PKE_BV_01_C		FAIL
-+TC_PKE_BV_02_C		INC
-+TC_PKE_BV_04_C		FAIL
-+TC_PKE_BV_05_C		INC
-+TC_PKE_BI_01_C		INC
-+TC_PKE_BI_02_C		PASS
-+TC_PKE_BI_03_C		INC
-+TC_OOB_BV_01_C		FAIL
-+TC_OOB_BV_02_C		INC
-+TC_OOB_BV_03_C		FAIL
-+TC_OOB_BV_04_C		INC
-+TC_OOB_BV_05_C		INC
-+TC_OOB_BV_06_C		INC
-+TC_OOB_BV_07_C		INC
-+TC_OOB_BV_08_C		INC
-+TC_OOB_BV_09_C		INC
-+TC_OOB_BV_10_C		INC
-+TC_OOB_BI_01_C		INC
-+TC_OOB_BI_02_C		INC
-+TC_EKS_BV_01_C		INC
-+TC_EKS_BV_02_C		INC
-+TC_EKS_BI_01_C		INC
-+TC_EKS_BI_02_C		INC
-+TC_SIGN_BV_01_C		INC
-+TC_SIGN_BV_03_C		INC
-+TC_SIGN_BI_01_C		INC
-+TC_KDU_BV_01_C		INC
-+TC_KDU_BV_02_C		INC
-+TC_KDU_BV_03_C		INC
-+TC_KDU_BV_04_C		INC
-+TC_KDU_BV_05_C		INC
-+TC_KDU_BV_06_C		INC
-+TC_KDU_BV_07_C		INC
-+TC_SIP_BV_01_C		INC
-+TC_SIP_BV_02_C		FAIL
-+TC_SIE_BV_01_C		INC
-+-------------------------------------------------------------------------------
++	TX_Power and Max_TX_Power can be set to 127 if values are invalid or
++	unknown.
++
++	This command generates a Command Complete event on success and
++	on failure. In case of failure only Address and Address_Type fields
++	are valid and values of remaining parameters are considered invalid
++	and shall be ignored.
++
++	Possible errors:	Not Connected
++				Not Powered
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-1.8.5.3
+1.9.3
 
