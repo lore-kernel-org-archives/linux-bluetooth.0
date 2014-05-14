@@ -2,82 +2,80 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/3] shared/crypto: Add support for AES-CMAC-128
-Date: Wed, 14 May 2014 11:04:24 +0200
-Message-Id: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/3] shared/crypto: Add support to sign data with AES-CMAC
+Date: Wed, 14 May 2014 11:04:25 +0200
+Message-Id: <1400058266-31790-2-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1400058266-31790-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch extends bt_crypto with AF_ALG socket for cmac(aes) hash.
-Socket is created on bt_crybto initialization.
+This patch adds support to generate hash using AES-CMAC algorithm
 ---
- src/shared/crypto.c | 32 ++++++++++++++++++++++++++++++++
- 1 file changed, 32 insertions(+)
+ src/shared/crypto.c | 37 +++++++++++++++++++++++++++++++++++++
+ src/shared/crypto.h |  4 ++++
+ 2 files changed, 41 insertions(+)
 
 diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index cc7536a..f0b2979 100644
+index f0b2979..a0bcc7b 100644
 --- a/src/shared/crypto.c
 +++ b/src/shared/crypto.c
-@@ -70,6 +70,7 @@ struct bt_crypto {
- 	int ref_count;
- 	int ecb_aes;
- 	int urandom;
-+	int cmac_aes;
- };
- 
- static int urandom_setup(void)
-@@ -105,6 +106,28 @@ static int ecb_aes_setup(void)
- 	return fd;
+@@ -256,6 +256,43 @@ static inline void swap128(const uint8_t src[16], uint8_t dst[16])
+ 		dst[15 - i] = src[i];
  }
  
-+static int cmac_aes_setup(void)
++bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
++					const uint8_t key[16],
++					const uint8_t *m, uint16_t m_len,
++					uint8_t hash[12])
 +{
-+	struct sockaddr_alg salg;
 +	int fd;
++	int len;
++	uint8_t tmp[16], out[16];
 +
-+	fd = socket(PF_ALG, SOCK_SEQPACKET | SOCK_CLOEXEC, 0);
++	if (!crypto)
++		return false;
++
++	/* The most significant octet of key corresponds to key[0] */
++	swap128(key, tmp);
++
++	fd = alg_new(crypto->cmac_aes, tmp, 16);
 +	if (fd < 0)
-+		return -1;
++		return false;
 +
-+	memset(&salg, 0, sizeof(salg));
-+	salg.salg_family = AF_ALG;
-+	strcpy((char *) salg.salg_type, "hash");
-+	strcpy((char *) salg.salg_name, "cmac(aes)");
++	len = send(fd, m, m_len, 0);
++	if (len < 0)
++		return false;
 +
-+	if (bind(fd, (struct sockaddr *) &salg, sizeof(salg)) < 0) {
-+		close(fd);
-+		return -1;
-+	}
++	len = read(fd, out, 16);
++	if (len < 0)
++		return false;
 +
-+	return fd;
++	/*
++	 * The most significant octet of hash corresponds to out[0]  - swap it.
++	 * Then truncate in most significant bit first order to a length of
++	 * 12 octets
++	 */
++	swap128(out, tmp);
++	memcpy(hash, tmp + 4, 12);
++
++	return true;
 +}
-+
- struct bt_crypto *bt_crypto_new(void)
- {
- 	struct bt_crypto *crypto;
-@@ -126,6 +149,14 @@ struct bt_crypto *bt_crypto_new(void)
- 		return NULL;
- 	}
- 
-+	crypto->cmac_aes = cmac_aes_setup();
-+	if (crypto->cmac_aes < 0) {
-+		close(crypto->urandom);
-+		close(crypto->ecb_aes);
-+		free(crypto);
-+		return NULL;
-+	}
-+
- 	return bt_crypto_ref(crypto);
- }
- 
-@@ -149,6 +180,7 @@ void bt_crypto_unref(struct bt_crypto *crypto)
- 
- 	close(crypto->urandom);
- 	close(crypto->ecb_aes);
-+	close(crypto->cmac_aes);
- 
- 	free(crypto);
- }
+ /*
+  * Security function e
+  *
+diff --git a/src/shared/crypto.h b/src/shared/crypto.h
+index cae8daa..05888b9 100644
+--- a/src/shared/crypto.h
++++ b/src/shared/crypto.h
+@@ -46,3 +46,7 @@ bool bt_crypto_c1(struct bt_crypto *crypto, const uint8_t k[16],
+ bool bt_crypto_s1(struct bt_crypto *crypto, const uint8_t k[16],
+ 			const uint8_t r1[16], const uint8_t r2[16],
+ 			uint8_t res[16]);
++bool bt_crypto_cmac_aes_hash(struct bt_crypto *crypto,
++					const uint8_t key[16],
++					const uint8_t *m, uint16_t m_len,
++					uint8_t hash[12]);
 -- 
 1.8.4
 
