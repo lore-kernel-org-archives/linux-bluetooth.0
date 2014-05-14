@@ -1,56 +1,205 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 1/3] input: Fix compilation errors on 32 bit machine
-Date: Wed, 14 May 2014 21:49:07 +0200
-Message-Id: <1400096949-18895-1-git-send-email-szymon.janc@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv3 15/15] android/gatt: Add find by type and value handler
+Date: Wed, 14 May 2014 20:30:16 +0200
+Message-Id: <1400092216-10358-16-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1400092216-10358-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1400092216-10358-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Fix following with GCC version 4.8.2 (Debian 4.8.2-21):
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 
-  CC       profiles/input/bluetoothd-device.o
-profiles/input/device.c: In function ‘uhid_send_feature_answer’:
-profiles/input/device.c:232:8: error: format ‘%lu’ expects argument
-  of type ‘long unsigned int’, but argument 3 has type ‘unsigned int’
-   [-Werror=format=]
-        len, sizeof(ev));
-        ^
-profiles/input/device.c: In function ‘uhid_send_input_report’:
-profiles/input/device.c:274:8: error: format ‘%lu’ expects argument of
-   type ‘long unsigned int’, but argument 3 has type ‘unsigned int’
-   [-Werror=format=]
-        len, sizeof(ev));
-        ^
+As from database point of view there are two data sources (db entry,
+and callbacks), we need to perform 'find by type' in databse and filter
+out entries with not matching values, before sending.
 ---
- profiles/input/device.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/gatt.c | 133 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 132 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/input/device.c b/profiles/input/device.c
-index 3e89e2d..52222ea 100644
---- a/profiles/input/device.c
-+++ b/profiles/input/device.c
-@@ -228,7 +228,7 @@ static bool uhid_send_feature_answer(struct input_device *idev,
+diff --git a/android/gatt.c b/android/gatt.c
+index cdaa3ef..ff166c9 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -762,6 +762,9 @@ struct response_data {
+ 	uint16_t length;
+ 	uint8_t *value;
+ 	uint16_t offset;
++
++	uint8_t *filter_value;
++	uint16_t filter_vlen;
+ };
  
- 	/* uHID kernel driver does not handle partial writes */
- 	if ((size_t) len < sizeof(ev)) {
--		error("uHID dev write error: partial write (%zd of %lu bytes)",
-+		error("uHID dev write error: partial write (%zd of %zu bytes)",
- 							len, sizeof(ev));
- 		return false;
- 	}
-@@ -270,7 +270,7 @@ static bool uhid_send_input_report(struct input_device *idev,
+ static void destroy_response_data(void *data)
+@@ -769,6 +772,7 @@ static void destroy_response_data(void *data)
+ 	struct response_data *entry = data;
  
- 	/* uHID kernel driver does not handle partial writes */
- 	if ((size_t) len < sizeof(ev)) {
--		error("uHID dev write error: partial write (%zd of %lu bytes)",
-+		error("uHID dev write error: partial write (%zd of %zu bytes)",
- 							len, sizeof(ev));
- 		return false;
+ 	free(entry->value);
++	free(entry->filter_value);
+ 	free(entry);
+ }
+ 
+@@ -4024,6 +4028,21 @@ static void process_pending_read_requests(uint8_t att_opcode,
+ 						NULL, destroy_response_data);
+ }
+ 
++static bool is_service(const bt_uuid_t *type)
++{
++	bt_uuid_t uuid;
++
++	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
++	if (!bt_uuid_cmp(&uuid, type))
++		return true;
++
++	bt_uuid16_create(&uuid, GATT_SND_SVC_UUID);
++	if (!bt_uuid_cmp(&uuid, type))
++		return true;
++
++	return false;
++}
++
+ static void send_pending_response(uint8_t opcode, struct gatt_device *device)
+ {
+ 	uint8_t rsp[ATT_DEFAULT_LE_MTU];
+@@ -4142,6 +4161,54 @@ static void send_pending_response(uint8_t opcode, struct gatt_device *device)
+ 
+ 		att_data_list_free(adl);
+ 		queue_destroy(temp, destroy_response_data);
++		break;
++	}
++	case ATT_OP_FIND_BY_TYPE_REQ: {
++		GSList *list = NULL;
++
++		val = queue_pop_head(device->pending_requests);
++		while (val) {
++			struct att_range *range;
++			const bt_uuid_t *type;
++
++			/* Its find by type and value - filter by value here */
++			if ((val->length != val->filter_vlen) ||
++				memcmp(val->value, val->filter_value,
++								val->length)) {
++
++				destroy_response_data(val);
++				val = queue_pop_head(device->pending_requests);
++				continue;
++			}
++
++			range = new0(struct att_range, 1);
++			if (!range) {
++				destroy_response_data(val);
++				error = ATT_ECODE_INSUFF_RESOURCES;
++				break;
++			}
++
++			range->start = val->handle;
++			range->end = range->start;
++
++			/* Get proper end handle if its group type */
++			type = gatt_db_get_attribute_type(gatt_db, val->handle);
++			if (is_service(type))
++				range->end = gatt_db_get_end_handle(gatt_db,
++								val->handle);
++
++			list = g_slist_append(list, range);
++
++			destroy_response_data(val);
++			val = queue_pop_head(device->pending_requests);
++		}
++
++		if (list && !error)
++			len = enc_find_by_type_resp(list, rsp, sizeof(rsp));
++		else
++			error = ATT_ECODE_ATTR_NOT_FOUND;
++
++		g_slist_free_full(list, free);
+ 
+ 		break;
  	}
+@@ -4445,6 +4512,68 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 	return 0;
+ }
+ 
++static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
++						struct gatt_device *device)
++{
++	uint8_t search_value[ATT_DEFAULT_LE_MTU];
++	size_t search_vlen;
++	uint16_t start, end;
++	uint16_t handle;
++	struct queue *q;
++	bt_uuid_t uuid;
++	uint16_t len;
++
++	DBG("");
++
++	len = dec_find_by_type_req(cmd, cmd_len, &start, &end, &uuid,
++						search_value, &search_vlen);
++	if (!len)
++		return ATT_ECODE_INVALID_PDU;
++
++	q = queue_new();
++	if (!q)
++		return ATT_ECODE_UNLIKELY;
++
++	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
++
++	handle = PTR_TO_UINT(queue_pop_head(q));
++	while (handle) {
++		struct response_data *data;
++
++		data = new0(struct response_data, 1);
++		if (!data) {
++			queue_destroy(q, NULL);
++			return ATT_ECODE_INSUFF_RESOURCES;
++		}
++
++		data->filter_value = malloc0(search_vlen);
++		if (!data) {
++			destroy_response_data(data);
++			queue_destroy(q, NULL);
++			return ATT_ECODE_INSUFF_RESOURCES;
++		}
++
++		data->handle = handle;
++		data->filter_vlen = search_vlen;
++		memcpy(data->filter_value, search_value, search_vlen);
++
++		queue_push_tail(device->pending_requests, data);
++
++		handle = PTR_TO_UINT(queue_pop_head(q));
++	}
++
++	queue_destroy(q, NULL);
++
++	process_pending_read_requests(ATT_OP_FIND_BY_TYPE_REQ, device);
++
++	/* Send if no response_data elements left to be filled by callbacks */
++	if (!queue_find(device->pending_requests, match_handle_val_by_empty_len,
++									NULL))
++		send_pending_response(cmd[0], device);
++
++	return 0;
++}
++
+ static uint8_t write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *dev)
+ {
+@@ -4556,9 +4685,11 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		if (!status)
+ 			return;
+ 		break;
++	case ATT_OP_FIND_BY_TYPE_REQ:
++		status = find_by_type_request(ipdu, len, dev);
++		break;
+ 	case ATT_OP_EXEC_WRITE_REQ:
+ 		/* TODO */
+-	case ATT_OP_FIND_BY_TYPE_REQ:
+ 	case ATT_OP_HANDLE_CNF:
+ 	case ATT_OP_HANDLE_IND:
+ 	case ATT_OP_HANDLE_NOTIFY:
 -- 
-2.0.0.rc2
+1.9.0
 
