@@ -1,39 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: <marcel@holtmann.org>, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v5 0/5] Bluetooth: Get Connection Information
-Date: Wed, 14 May 2014 13:43:01 +0200
-Message-ID: <1400067786-10677-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <1400064583-12623-3-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1400064583-12623-1-git-send-email-andrzej.kaczmarek@tieto.com> <1400064583-12623-3-git-send-email-andrzej.kaczmarek@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Wed, 14 May 2014 13:30:54 +0200
+Message-ID: <CAF3PWx3MDMQqGAsENRsfz07dbmeZYF5Uy+nWzybGpyQtM6Xy-Q@mail.gmail.com>
+Subject: Re: [PATCH v4 2/5] Bluetooth: Add support to get connection information
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-Changes in v4:
-- include max_tx_power when declaring structs for 1st time, request will
-  just reply with HCI_TX_POWER_INVALID without other patches for max_tx_power
-- fixed debugfs to have basic validation
+Please ignore this set, some unnecessary #define is still present here
+ - I'll send v5 in a moment.
 
-Changes in v5:
-- removed unnecessary #define from mgmt.h
+On 14 May 2014 12:49, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com> wrote:
+> This patch adds support for Get Connection Information mgmt command
+> which can be used to query for information about connection, i.e. RSSI
+> and local TX power level.
+>
+> In general values cached in hci_conn are returned as long as they are
+> considered valid, i.e. do not exceed age limit set in hdev. This limit
+> is calculated as random value between min/max values to avoid client
+> trying to guess when to poll for updated information.
+>
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> ---
+>  include/net/bluetooth/hci_core.h |   2 +
+>  include/net/bluetooth/mgmt.h     |  14 +++
+>  net/bluetooth/mgmt.c             | 196 +++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 212 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 4623f45..cbbab63 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -384,6 +384,8 @@ struct hci_conn {
+>         __s8            tx_power;
+>         unsigned long   flags;
+>
+> +       unsigned long   conn_info_timestamp;
+> +
+>         __u8            remote_cap;
+>         __u8            remote_auth;
+>         __u8            remote_id;
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index d4b571c..b74309a 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -409,6 +409,20 @@ struct mgmt_cp_load_irks {
+>  } __packed;
+>  #define MGMT_LOAD_IRKS_SIZE            2
+>
+> +#define MGMT_CONN_INFO_DATA_TX_POWER   0x00000001
 
+This should be removed.
 
-Andrzej Kaczmarek (5):
-  Bluetooth: Add conn info lifetime parameters to debugfs
-  Bluetooth: Add support to get connection information
-  Bluetooth: Avoid polling TX power for LE links
-  Bluetooth: Store max TX power level for connection
-  Bluetooth: Add support for max_tx_power in Get Conn Info
-
- include/net/bluetooth/hci_core.h |   9 ++
- include/net/bluetooth/mgmt.h     |  12 +++
- net/bluetooth/hci_conn.c         |   1 +
- net/bluetooth/hci_core.c         |  63 ++++++++++++
- net/bluetooth/hci_event.c        |  12 ++-
- net/bluetooth/mgmt.c             | 213 +++++++++++++++++++++++++++++++++++++++
- 6 files changed, 309 insertions(+), 1 deletion(-)
-
--- 
-1.9.3
+BR,
+Andrzej
