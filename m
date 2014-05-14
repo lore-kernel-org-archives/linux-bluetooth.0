@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v4 5/5] Bluetooth: Add support for max_tx_power in Get Conn Info
-Date: Wed, 14 May 2014 12:49:43 +0200
-Message-ID: <1400064583-12623-6-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v4 4/5] Bluetooth: Store max TX power level for connection
+Date: Wed, 14 May 2014 12:49:42 +0200
+Message-ID: <1400064583-12623-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400064583-12623-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400064583-12623-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,72 +12,65 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for max_tx_power in Get Connection Information
-request. Value is read only once for given connection and then always
-returned in response as parameter.
+This patch adds support to store local maximum TX power level for
+connection when reply for HCI_Read_Transmit_Power_Level is received.
 
 Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 ---
- net/bluetooth/mgmt.c | 23 +++++++++++++++++------
- 1 file changed, 17 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_conn.c         |  1 +
+ net/bluetooth/hci_event.c        | 12 +++++++++++-
+ 3 files changed, 13 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 664dbc4..17ebaa3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4583,12 +4583,13 @@ static void get_conn_info_complete(struct pending_cmd *cmd, void *data)
- 	if (!match->mgmt_status) {
- 		rp.rssi = conn->rssi;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cbbab63..b386bf1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -382,6 +382,7 @@ struct hci_conn {
+ 	__u16		le_conn_max_interval;
+ 	__s8		rssi;
+ 	__s8		tx_power;
++	__s8		max_tx_power;
+ 	unsigned long	flags;
  
--		if (match->valid_tx_power)
-+		if (match->valid_tx_power) {
- 			rp.tx_power = conn->tx_power;
--		else
-+			rp.max_tx_power = conn->max_tx_power;
-+		} else {
- 			rp.tx_power = HCI_TX_POWER_INVALID;
--
--		rp.max_tx_power = HCI_TX_POWER_INVALID;
-+			rp.max_tx_power = HCI_TX_POWER_INVALID;
-+		}
- 	}
+ 	unsigned long	conn_info_timestamp;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 74b368b..a987e7d 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -408,6 +408,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst)
+ 	conn->remote_auth = 0xff;
+ 	conn->key_type = 0xff;
+ 	conn->tx_power = HCI_TX_POWER_INVALID;
++	conn->max_tx_power = HCI_TX_POWER_INVALID;
  
- 	cmd_complete(cmd->sk, cmd->index, MGMT_OP_GET_CONN_INFO,
-@@ -4611,7 +4612,9 @@ static void conn_info_refresh_complete(struct hci_dev *hdev, u8 status)
+ 	set_bit(HCI_CONN_POWER_SAVE, &conn->flags);
+ 	conn->disc_timeout = HCI_DISCONN_TIMEOUT;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index fa614e3..492d8d5 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1282,9 +1282,19 @@ static void hci_cc_read_tx_power(struct hci_dev *hdev, struct sk_buff *skb)
  	hci_dev_lock(hdev);
  
- 	/* TX power data is valid in case request completed successfully,
--	 * otherwise we assume it's not valid.
-+	 * otherwise we assume it's not valid. At the moment we assume that
-+	 * either both or none of current and max values are valid to keep code
-+	 * simple.
- 	 */
- 	match.valid_tx_power = !status;
- 
-@@ -4728,6 +4731,14 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 				    sizeof(req_txp_cp), &req_txp_cp);
- 		}
- 
-+		/* Max TX power needs to be read only once per connection */
-+		if (conn->max_tx_power == HCI_TX_POWER_INVALID) {
-+			req_txp_cp.handle = cpu_to_le16(conn->handle);
-+			req_txp_cp.type = 0x01;
-+			hci_req_add(&req, HCI_OP_READ_TX_POWER,
-+				    sizeof(req_txp_cp), &req_txp_cp);
-+		}
+ 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
+-	if (conn && sent->type == 0x00)
++	if (!conn)
++		goto unlock;
 +
- 		err = hci_req_run(&req, conn_info_refresh_complete);
- 		if (err < 0)
- 			goto unlock;
-@@ -4747,7 +4758,7 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 		/* Cache is valid, just reply with values cached in hci_conn */
- 		rp.rssi = conn->rssi;
- 		rp.tx_power = conn->tx_power;
--		rp.max_tx_power = HCI_TX_POWER_INVALID;
-+		rp.max_tx_power = conn->max_tx_power;
++	switch (sent->type) {
++	case 0x00:
+ 		conn->tx_power = rp->tx_power;
++		break;
++	case 0x01:
++		conn->max_tx_power = rp->tx_power;
++		break;
++	}
  
- 		err = cmd_complete(sk, hdev->id, MGMT_OP_GET_CONN_INFO,
- 				   MGMT_STATUS_SUCCESS, &rp, sizeof(rp));
++unlock:
+ 	hci_dev_unlock(hdev);
+ }
+ 
 -- 
 1.9.3
 
