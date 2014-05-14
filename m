@@ -1,70 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 2/2] lib: Update indexes in mgmt string translation arrays
-Date: Wed, 14 May 2014 15:18:01 +0200
-Message-ID: <1400073481-7099-2-git-send-email-andrzej.kaczmarek@tieto.com>
-In-Reply-To: <1400073481-7099-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1400073481-7099-1-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: <marcel@holtmann.org>, Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v5 3/5] Bluetooth: Avoid polling TX power for LE links
+Date: Wed, 14 May 2014 13:43:04 +0200
+Message-ID: <1400067786-10677-4-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1400067786-10677-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1400067786-10677-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- lib/mgmt.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+TX power for LE links is immutable thus we do not need to query for it
+if already have value.
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index ab45735..9bdd341 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -561,7 +561,7 @@ static const char *mgmt_op[] = {
- 	"Confirm Name",
- 	"Block Device",
- 	"Unblock Device",
--	"Set Device ID",
-+	"Set Device ID",		/* 0x0028 */
- 	"Set Advertising",
- 	"Set BR/EDR",
- 	"Set Static Address",
-@@ -569,7 +569,7 @@ static const char *mgmt_op[] = {
- 	"Set Secure Connections",
- 	"Set Debug Keys",
- 	"Set Privacy",
--	"Load Identity Resolving Keys",
-+	"Load Identity Resolving Keys",	/* 0x0030 */
- };
+Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+---
+ net/bluetooth/mgmt.c | 14 ++++++++++----
+ 1 file changed, 10 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 0e5a316..664dbc4 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4717,10 +4717,16 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		hci_req_add(&req, HCI_OP_READ_RSSI, sizeof(req_rssi_cp),
+ 			    &req_rssi_cp);
  
- static const char *mgmt_ev[] = {
-@@ -597,7 +597,7 @@ static const char *mgmt_ev[] = {
- 	"Device Unblocked",
- 	"Device Unpaired",
- 	"Passkey Notify",
--	"New Identity Resolving Key",
-+	"New Identity Resolving Key",	/* 0x0018 */
- 	"New Signature Resolving Key",
- };
+-		req_txp_cp.handle = cpu_to_le16(conn->handle);
+-		req_txp_cp.type = 0x00;
+-		hci_req_add(&req, HCI_OP_READ_TX_POWER,
+-			    sizeof(req_txp_cp), &req_txp_cp);
++		/* For LE links TX power does not change thus we don't need to
++		 * query for it once value is known.
++		 */
++		if (!bdaddr_type_is_le(cp->addr.type) ||
++		    conn->tx_power == HCI_TX_POWER_INVALID) {
++			req_txp_cp.handle = cpu_to_le16(conn->handle);
++			req_txp_cp.type = 0x00;
++			hci_req_add(&req, HCI_OP_READ_TX_POWER,
++				    sizeof(req_txp_cp), &req_txp_cp);
++		}
  
-@@ -610,7 +610,7 @@ static const char *mgmt_status[] = {
- 	"Authentication Failed",
- 	"Not Paired",
- 	"No Resources",
--	"Timeout",
-+	"Timeout",			/* 0x08 */
- 	"Already Connected",
- 	"Busy",
- 	"Rejected",
-@@ -618,7 +618,7 @@ static const char *mgmt_status[] = {
- 	"Invalid Parameters",
- 	"Disconnected",
- 	"Not Powered",
--	"Cancelled",
-+	"Cancelled",			/* 0x10 */
- 	"Invalid Index",
- 	"Blocked through rfkill",
- };
+ 		err = hci_req_run(&req, conn_info_refresh_complete);
+ 		if (err < 0)
 -- 
 1.9.3
-
