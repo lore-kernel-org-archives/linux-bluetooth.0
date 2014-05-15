@@ -1,73 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAHrH25TYbP7mkwJeJO3vcECetbTCx_TguUDuE1k02XC=a6pOmQ@mail.gmail.com>
-References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
-	<1399666440-14078-2-git-send-email-armansito@chromium.org>
-	<01CD59B6-44C7-425A-8686-82C428F41C87@holtmann.org>
-	<CAHrH25RubNJx89MabHvHQc8ZsymcdDB2VoNVxwEooHEDv2=ybA@mail.gmail.com>
-	<CABBYNZLmDazb+0=-sph80yXsVYY4CcP0EVgBiJt00spE-=YhTw@mail.gmail.com>
-	<CAHrH25TYbP7mkwJeJO3vcECetbTCx_TguUDuE1k02XC=a6pOmQ@mail.gmail.com>
-Date: Thu, 15 May 2014 16:07:23 +0300
-Message-ID: <CABBYNZK4A6qOeRvnHXo8JrS8JTUuM951=eCtNSGxHAdraX409Q@mail.gmail.com>
-Subject: Re: [PATCH v1 01/10] src/shared/att: Introduce struct bt_att.
+In-Reply-To: <1400076025-5103-2-git-send-email-holler@ahsoftware.de>
+References: <1400076025-5103-1-git-send-email-holler@ahsoftware.de>
+	<1400076025-5103-2-git-send-email-holler@ahsoftware.de>
+Date: Thu, 15 May 2014 15:54:00 +0300
+Message-ID: <CABBYNZLFutVy=Msz7=AAwXmo4wDHjv59GcLCedEzSrWjkLQ3cw@mail.gmail.com>
+Subject: Re: [PATCH 2/2] bluetooth: raise HCI_CMD_TIMEOUT from 2s to 8s
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
+To: Alexander Holler <holler@ahsoftware.de>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Alexander,
 
-On Wed, May 14, 2014 at 5:54 PM, Arman Uguray <armansito@chromium.org> wrote:
-> Hi Luiz,
+On Wed, May 14, 2014 at 5:00 PM, Alexander Holler <holler@ahsoftware.de> wrote:
+> The reasoning to do this is the following:
 >
->>> Actually what I have in mind is even simpler than this. For outgoing
->>> operations that don't solicit a response (such as commands and
->>> outgoing notifications) we simply send them and invoke the callback
->>> with a special opcode such as "BT_ATT_PDU_SENT". For those outgoing
->>> operations that do solicit a response (e.g. requests and indications),
->>> the request remains pending until the response is received. A
->>> responses array is not really necessary, since there is already a 1:1
->>> mapping between ATT requests and their responses, so we know exactly
->>> which request the received response matches (even the error response
->>> contains the request that caused it in its PDU).
->>
->> I don't think we need an special opcode when the PDU is sent, the
->> caller might actually not set any callback and I don't think there is
->> any special action that can be triggered by having such a thing,
->> specially because it is in no way an acknowledgment it just mean it
->> has been dispatched it may still not reach the remote side. In other
->> words if ATT does not have acknowledgment we should not invent one
->> either.
+> - If a timeout occurs, the HCI-communication is broken afterwards and the
+>   dongle isn't usable anymore.
+> - If it works after e.g. waiting 4s everyone is still happy but if it
+>   just breaks after only waiting 2s nothing is gained.
+> - Having to wait some more seconds until an error occurs doesn't change
+>   anything.
 >
-> Makes sense. The idea I had was that if the caller passes NULL to
-> bt_att_send for the callback, then no acknowledgement would happen but
-> if they do, we would confirm with a special PDU, but this will no
-> longer be necessary if we have a separate function as you suggest
-> below.
+> So there is no disadvantage in rasing the timeout but a great advantage
+> in case the dongle needs more than 2s to process an HCI command.
+> E.g. I had sometimes HCI command timeouts at boot (but never after the BT stack
+> was successfull started). I assume the reason might be the USB-probing which
+> happend before through the bootloader, which might have confused the dongle
+> such that it needs a bit more time, but I'm not sure.
 >
->>> For incoming requests, we treat these as events as you said. To
->>> respond to them, the upper layer than just needs to call bt_att_send
->>> with the corresponding response opcode and parameters.
->>
->> I would not reuse the same function for both requests and responses,
->> responses should not have any callback and custom data attached for
->> the same reasons stated above, so I would have att_send_rsp for
->> responses alone.
+> Together with the patch which limits the timeout only to the actual time the
+> dongle needs to process an HCI command (and doesn't include the time the
+> kernel needs to process the answer to an HCI command), my problems were gone.
 >
-> Maybe it would make sense to have one function to send operations that
-> solicit a response (requests/indications), e.g.
-> bt_att_send_op_with_rsp and one function for those that don't (for
-> responses/commands/notifications) like bt_att_send_op_no_rsp. Or do
-> you think we should have separate functions such as bt_att_send_req,
-> bt_att_send_rsp, bt_att_send_not, bt_att_send_ind, etc?
+> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+> ---
+>  include/net/bluetooth/hci.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index be150cf..d50fd34 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -180,7 +180,7 @@ enum {
+>  #define HCI_DISCONN_TIMEOUT    msecs_to_jiffies(2000)  /* 2 seconds */
+>  #define HCI_PAIRING_TIMEOUT    msecs_to_jiffies(60000) /* 60 seconds */
+>  #define HCI_INIT_TIMEOUT       msecs_to_jiffies(10000) /* 10 seconds */
+> -#define HCI_CMD_TIMEOUT                msecs_to_jiffies(2000)  /* 2 seconds */
+> +#define HCI_CMD_TIMEOUT                msecs_to_jiffies(8000)  /* 8 seconds */
+>  #define HCI_ACL_TX_TIMEOUT     msecs_to_jiffies(45000) /* 45 seconds */
+>  #define HCI_AUTO_OFF_TIMEOUT   msecs_to_jiffies(2000)  /* 2 seconds */
+>  #define HCI_POWER_OFF_TIMEOUT  msecs_to_jiffies(5000)  /* 5 seconds */
+> --
+> 1.8.3.1
 
-Well personally I would have dedicated function for each opcode, that
-way there is very little room for confusion i.e using
-bt_att_send_op_with_rsp for an opcode that does not solicit a response
-and vice-versa, internally you can still have them using common
-functions.
+This timeout seems arbitrary so I suppose we can increase it if we
+feel it is necessary but we used already different timeout for
+different commands like HCI_POWER_OFF_TIMEOUT, so perhaps if we can
+identify which command is more likely to timeout.
+
+We could perhaps auto reset if a command timeout if there is really no
+other way to recover.
+
 
 -- 
 Luiz Augusto von Dentz
