@@ -1,48 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 06/15] shared/gatt: Modify gatt_db_find_information to return list of handles
-Date: Thu, 15 May 2014 15:02:28 +0200
-Message-Id: <1400158957-22216-7-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv4 05/15] shared/gatt: Remove unused structure
+Date: Thu, 15 May 2014 15:02:27 +0200
+Message-Id: <1400158957-22216-6-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1400158957-22216-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1400158957-22216-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For now this function will return list of found handles.
+This structure is no longer used in gatt_db implementation.
 ---
- src/shared/gatt-db.c | 11 ++---------
- 1 file changed, 2 insertions(+), 9 deletions(-)
+ src/shared/gatt-db.h | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index d5fa17d..cb63754 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -614,7 +614,6 @@ static void find_information(void *data, void *user_data)
- 	struct find_information_data *search_data = user_data;
- 	struct gatt_db_service *service = data;
- 	struct gatt_db_attribute *attribute;
--	struct gatt_db_find_information *value;
- 	int i;
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 62bac41..4f8b1df 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -85,12 +85,6 @@ void gatt_db_find_by_type_value(struct gatt_db *db, uint16_t start_handle,
+ 							uint16_t length,
+ 							struct queue *queue);
  
- 	if (!service->active)
-@@ -636,14 +635,8 @@ static void find_information(void *data, void *user_data)
- 		if (attribute->handle > search_data->end_handle)
- 			return;
- 
--		value = new0(struct gatt_db_find_information, 1);
--		if (!value)
--			return;
+-struct gatt_db_handle_value {
+-	uint16_t handle;
+-	uint16_t length;
+-	uint8_t value[0];
+-};
 -
--		value->handle = attribute->handle;
--		value->uuid = attribute->uuid;
--		if (!queue_push_tail(search_data->queue, value))
--			free(value);
-+		queue_push_tail(search_data->queue,
-+						UINT_TO_PTR(attribute->handle));
- 	}
- }
- 
+ void gatt_db_read_by_type(struct gatt_db *db, uint16_t start_handle,
+ 							uint16_t end_handle,
+ 							const bt_uuid_t type,
 -- 
 1.9.0
 
