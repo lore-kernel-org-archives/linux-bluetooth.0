@@ -1,63 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal <vikram.pal@samsung.com>
-To: 'Johan Hedberg' <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	bharat.panda@samsung.com, p.sinha@samsung.com, cpgs@samsung.com
-References: <004201cf6a99$bbc7d590$335780b0$@samsung.com>
- <20140514075617.GA28535@t440s.lan>
-In-reply-to: <20140514075617.GA28535@t440s.lan>
-Subject: RE: Add SDP discovery support to gatttool with BR
-Date: Thu, 15 May 2014 16:19:51 +0530
-Message-id: <008401cf702b$67556cb0$36004610$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] Add device type info to device info(btd_device)
+Date: Thu, 15 May 2014 15:25:38 +0530
+Message-id: <1400147738-23861-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Add device type information whether LE or BR/EDR or
+LE/BR/EDR to device info, which can be further
+exposed as a device property.
 
->-----Original Message-----
->From: Johan Hedberg [mailto:johan.hedberg@gmail.com] 
->Sent: Wednesday, May 14, 2014 1:26 PM
->To: Vikrampal
->Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin;
-bharat.panda@samsung.com; p.sinha@samsung.com; cpgs@samsung.com
->Subject: Re: Add SDP discovery support to gatttool with BR
->
->Hi Vikram,
->
->On Thu, May 08, 2014, Vikrampal wrote:
->> I am new to BlueZ community. I'd like to contribute to BlueZ 
->> community. I went through BlueZ's TODO items.
->> To get started, I have selected adding SDP discovery support to 
->> gatttool with BR as my first work.
->> 
->> - Add sdp discovery support to gatttool with BR (--sdp, default is 
->> 0x1f)
->
->Not sure what exactly you mean here. ATT over BR/EDR uses a fixed PSM so
-separate discovery of this is not necessary. The core spec says:
->
->"The use of a fixed PSM allows rapid reconnection of the L2CAP channel for
-Attribute Protocol as a preliminary SDP query is not required."
->
->Based on git blame this item was added 5th Oct 2010, i.e. in the very early
-days of the LE specification. I suspect that there might have been some
-confusion regarding >the ATT PSM back then. While this kind of PSM discovery
-it's not completely pointless, we don't do it for any other fixed PSM
-profiles either (e.g. A2DP & AVRCP) so I >think it's better to spend time on
-more valuable tasks instead.
->
->I've now removed the ATT PSM related items from the TODO file (which btw
-could use much more cleanups in general).
->
->Johan
+Signed-off-by: Bharat Panda <bharat.panda@samsung.com>
+---
+ src/adapter.c |    6 ++++++
+ src/device.c  |   11 +++++++++++
+ 2 files changed, 17 insertions(+)
 
-Thanks for your kind advice. Could you please suggest me as to which all
-topics are of more value currently so that
-I may pick up one of them as my maiden contribution. 
-
-Regards,
-Vikram
+diff --git a/src/adapter.c b/src/adapter.c
+index f5abfe3..5154448 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4355,6 +4355,12 @@ static void update_found_devices(struct btd_adapter *adapter,
+ 					!(eir_data.flags & EIR_BREDR_UNSUP))
+ 		device_set_bredr_support(dev, true);
+ 
++	if (eir_data.flags & (EIR_BREDR_UNSUP))
++		device_set_le_support(dev, true);
++
++	if (eir_data.flags & (EIR_CONTROLLER | EIR_SIM_HOST | (!EIR_BREDR_UNSUP)))
++		device_set_dual_mode_support(dev, true);
++
+ 	if (eir_data.name != NULL && eir_data.name_complete)
+ 		device_store_cached_name(dev, eir_data.name);
+ 
+diff --git a/src/device.c b/src/device.c
+index 41637b3..f88a1b1 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -169,6 +169,7 @@ struct btd_device {
+ 	char		*path;
+ 	bool		bredr;
+ 	bool		le;
++	bool		dual_mode;
+ 	bool		pending_paired;		/* "Paired" waiting for SDP */
+ 	bool		svc_refreshed;
+ 	GSList		*svc_callbacks;
+@@ -2472,6 +2473,16 @@ void device_set_bredr_support(struct btd_device *device, bool bredr)
+ 	device->bredr = bredr;
+ }
+ 
++void device_set_le_support(struct btd_device *device, bool le)
++{
++	device->le= le;
++}
++
++void device_set_dual_mode_support(struct btd_device *device, bool dual_mode)
++{
++	device->dual_mode= dual_mode;
++}
++
+ void device_update_last_seen(struct btd_device *device, uint8_t bdaddr_type)
+ {
+ 	if (bdaddr_type == BDADDR_BREDR)
+-- 
+1.7.9.5
 
