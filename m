@@ -1,70 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5374DD22.9060303@gmail.com>
-Date: Thu, 15 May 2014 11:28:34 -0400
-From: Frank Praznik <frank.praznik@gmail.com>
+Message-ID: <5374DAEF.40605@ahsoftware.de>
+Date: Thu, 15 May 2014 17:19:11 +0200
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-To: Antonio Ospite <ao2@ao2.it>, linux-bluetooth@vger.kernel.org
-CC: Bastien Nocera <hadess@hadess.net>,
-	Szymon Janc <szymon.janc@gmail.com>,
-	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: Re: [PATCHv2 BlueZ 0/5] plugin/sixaxis: Set leds using the sysfs
- leds class
-References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1400103605-25183-1-git-send-email-ao2@ao2.it>
-In-Reply-To: <1400103605-25183-1-git-send-email-ao2@ao2.it>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+ Marcel Holtmann <marcel@holtmann.org>,
+ Gustavo Padovan <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 2/2] bluetooth: raise HCI_CMD_TIMEOUT from 2s to 8s
+References: <1400076025-5103-1-git-send-email-holler@ahsoftware.de>	<1400076025-5103-2-git-send-email-holler@ahsoftware.de> <CABBYNZLFutVy=Msz7=AAwXmo4wDHjv59GcLCedEzSrWjkLQ3cw@mail.gmail.com> <5374D452.8020709@ahsoftware.de>
+In-Reply-To: <5374D452.8020709@ahsoftware.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The current version of get_js_numbers() won't work correctly on 
-Bluetooth gamepads if more than one is connected.  Currently it looks 
-for the correct js* device via just the PHYS attribute which works on 
-USB, but PHYS is the same value for all Bluetooth devices on a single 
-adapter (MAC of the host Bluetooth adapter).  As is, all Bluetooth DS3 
-controllers will end up with the LEDs set to the controller number of 
-the first js* device on the Bluetooth adapter.  A simple fix would be to 
-compare against PHYS and UNIQ when searching for the correct js device 
-since UNIQ contains the individual device MAC address.
+Am 15.05.2014 16:50, schrieb Alexander Holler:
+> Am 15.05.2014 14:54, schrieb Luiz Augusto von Dentz:
 
-On 5/14/2014 17:40, Antonio Ospite wrote:
-> Hi,
+>> This timeout seems arbitrary so I suppose we can increase it if we
+>> feel it is necessary but we used already different timeout for
+>> different commands like HCI_POWER_OFF_TIMEOUT, so perhaps if we can
+>> identify which command is more likely to timeout.
+>>
+>> We could perhaps auto reset if a command timeout if there is really no
+>> other way to recover.
 >
-> here's the updated patch series, the commit messages have been fixed too!
+> It is arbitrary but 2s is not enough here. And as I've written in the
+> description, there is absolutely no reason to keep this timeout
+> unnecessarily short. No one cares if an error message appears after 2s
+> or 8s if the communication with the dongle is in both cases broken
+> afterwards.
 >
-> I am leaving out patch 1/5 for now:
->
->    plugins/sixaxis: Simplify get_js_numbers()
->
-> I decided to do so because there is still some timing issue: the new
-> procedure to retrieve the js number is faster, and on the _very_first_
-> run it fails and returns 0, I suspect this has to do with the fact that
-> the joydev module gets loaded after the hidraw uevent and the
-> enumeration in the plugin completes before the js node shows up in
-> sysfs, I'll do some more experiments on that.
->
-> So please apply only patches from 2 to 5, thanks, I kept the numbering
-> as in v1 for clarity.
->
-> Changes since v1 are annotated in each patch.
->
-> The changes have been tested with libudev-204 along with linux-3.13,
-> linux 3.14 and linux-3.15-rc4.
->
-> To recap:
->    - on kernels < 3.14 the hidraw mechanism is used
->    - on kernels >= 3,14 the sysfs mechanism is used to avoid
->      inconsistencies with rumble effects.
->
-> Thanks,
->     Antonio
->
-> Antonio Ospite (4):
->    plugins/sixaxis: Factor out a set_leds_hidraw() function
->    plugins/sixaxis: Factor out a calc_leds_bitmap() function
->    plugins/sixaxis: Add a get_leds_data() function
->    plugins/sixaxis: Add a set_leds_sysfs() function
->
->   configure.ac      |   4 +-
->   plugins/sixaxis.c | 178 +++++++++++++++++++++++++++++++++++++++++++++++-------
->   2 files changed, 158 insertions(+), 24 deletions(-)
->
+> One of the commands I experieced the problem with was e.g.
+> HCI_OP_DELETE_STORED_LINK_KEY or HCI_OP_WRITE_SSP_MODE.
 
+The problem is that you can never be sure what the origin of a timeouted 
+command was. It might have been e.g. the USB-subsystem through wich the 
+command and the response has to travel (in case of USB dongles) and not 
+the dongle itself.
+
+Regards,
+
+Alexander Holler
