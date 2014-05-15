@@ -1,206 +1,214 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android: Add mode for SCO over HCI
-Date: Thu, 15 May 2014 15:29:31 +0300
-Message-Id: <1400156971-23998-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv4 15/15] android/gatt: Add find by type and value handler
+Date: Thu, 15 May 2014 15:02:37 +0200
+Message-Id: <1400158957-22216-16-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1400158957-22216-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1400158957-22216-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 
-This adds the option --sco-over-hci that can be used to enable SCO over
-HCI routing, by default it is disabled.
+As from database point of view there are two data sources (db entry,
+and callbacks), we need to perform 'find by type' in databse and filter
+out entries with not matching values, before sending.
 ---
- android/bluetoothd-wrapper.c | 16 ++++++++++++----
- android/handsfree.c          |  9 +++------
- android/handsfree.h          |  3 +++
- android/main.c               | 10 +++++++++-
- android/system-emulator.c    |  5 +++--
- 5 files changed, 30 insertions(+), 13 deletions(-)
+ android/gatt.c | 135 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 133 insertions(+), 2 deletions(-)
 
-diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
-index 90ed292..4402024 100644
---- a/android/bluetoothd-wrapper.c
-+++ b/android/bluetoothd-wrapper.c
-@@ -28,6 +28,8 @@
- 
- #define PROPERTY_MGMT_DEBUG_NAME "persist.sys.bluetooth.mgmtdbg"
- 
-+#define PROPERTY_SCO_NAME "persist.sys.bluetooth.sco"
+diff --git a/android/gatt.c b/android/gatt.c
+index 2dbf085..e892571 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -764,6 +764,9 @@ struct pending_request {
+ 	int length;
+ 	uint8_t *value;
+ 	uint16_t offset;
 +
- #define VALGRIND_BIN "/system/bin/valgrind"
++	uint8_t *filter_value;
++	uint16_t filter_vlen;
+ };
  
- #define BLUETOOTHD_BIN "/system/bin/bluetoothd-main"
-@@ -52,15 +54,16 @@ static void run_valgrind(int debug, int mgmt_dbg)
- 	execve(prg_argv[0], prg_argv, prg_envp);
+ static void destroy_pending_request(void *data)
+@@ -771,6 +774,7 @@ static void destroy_pending_request(void *data)
+ 	struct pending_request *entry = data;
+ 
+ 	free(entry->value);
++	free(entry->filter_value);
+ 	free(entry);
  }
  
--static void run_bluetoothd(int debug, int mgmt_dbg)
-+static void run_bluetoothd(int debug, int mgmt_dbg, int sco_hci)
- {
--	char *prg_argv[4];
-+	char *prg_argv[5];
- 	char *prg_envp[1];
+@@ -3416,6 +3420,21 @@ failed:
+ 				HAL_OP_GATT_SERVER_ADD_INC_SERVICE, status);
+ }
  
- 	prg_argv[0] = BLUETOOTHD_BIN;
- 	prg_argv[1] = debug ? "-d" : NULL;
- 	prg_argv[2] = mgmt_dbg ? "--mgmt-debug" : NULL;
--	prg_argv[3] = NULL;
-+	prg_argv[3] = sco_hci ? "--sco-over-hci" : NULL;
-+	prg_argv[4] = NULL;
- 
- 	prg_envp[0] = NULL;
- 
-@@ -72,6 +75,7 @@ int main(int argc, char *argv[])
- 	char value[PROPERTY_VALUE_MAX];
- 	int debug = 0;
- 	int mgmt_dbg = 0;
-+	int sco_hci = 0;
- 
- 	if (property_get(PROPERTY_DEBUG_NAME, value, "") > 0 &&
- 			(!strcasecmp(value, "true") || atoi(value) > 0))
-@@ -83,6 +87,10 @@ int main(int argc, char *argv[])
- 			mgmt_dbg = 1;
- 	}
- 
-+	if (property_get(PROPERTY_SCO_NAME, value, "") > 0 &&
-+			(!strcasecmp(value, "true") || atoi(value) > 0))
-+			sco_hci = 1;
++static bool is_service(const bt_uuid_t *type)
++{
++	bt_uuid_t uuid;
 +
- 	if (property_get(PROPERTY_VALGRIND_NAME, value, "") > 0 &&
- 			(!strcasecmp(value, "true") || atoi(value) > 0))
- 		run_valgrind(debug, mgmt_dbg);
-@@ -91,7 +99,7 @@ int main(int argc, char *argv[])
- 	 * In case we failed to execute Valgrind, try to run bluetoothd
- 	 * without it
- 	 */
--	run_bluetoothd(debug, mgmt_dbg);
-+	run_bluetoothd(debug, mgmt_dbg, sco_hci);
++	bt_uuid16_create(&uuid, GATT_PRIM_SVC_UUID);
++	if (!bt_uuid_cmp(&uuid, type))
++		return true;
++
++	bt_uuid16_create(&uuid, GATT_SND_SVC_UUID);
++	if (!bt_uuid_cmp(&uuid, type))
++		return true;
++
++	return false;
++}
++
+ static void send_dev_pending_response(struct gatt_device *device,
+ 								uint8_t opcode)
+ {
+@@ -3542,6 +3561,55 @@ static void send_dev_pending_response(struct gatt_device *device,
  
+ 		break;
+ 	}
++	case ATT_OP_FIND_BY_TYPE_REQ: {
++		GSList *list = NULL;
++
++		val = queue_pop_head(device->pending_requests);
++		while (val) {
++			struct att_range *range;
++			const bt_uuid_t *type;
++
++			/* Its find by type and value - filter by value here */
++			if ((val->length != val->filter_vlen) ||
++				memcmp(val->value, val->filter_value,
++								val->length)) {
++
++				destroy_pending_request(val);
++				val = queue_pop_head(device->pending_requests);
++				continue;
++			}
++
++			range = new0(struct att_range, 1);
++			if (!range) {
++				destroy_pending_request(val);
++				error = ATT_ECODE_INSUFF_RESOURCES;
++				break;
++			}
++
++			range->start = val->handle;
++			range->end = range->start;
++
++			/* Get proper end handle if its group type */
++			type = gatt_db_get_attribute_type(gatt_db, val->handle);
++			if (is_service(type))
++				range->end = gatt_db_get_end_handle(gatt_db,
++								val->handle);
++
++			list = g_slist_append(list, range);
++
++			destroy_pending_request(val);
++			val = queue_pop_head(device->pending_requests);
++		}
++
++		if (list && !error)
++			len = enc_find_by_type_resp(list, rsp, sizeof(rsp));
++		else
++			error = ATT_ECODE_ATTR_NOT_FOUND;
++
++		g_slist_free_full(list, free);
++
++		break;
++	}
+ 	default:
+ 		break;
+ 	}
+@@ -4167,7 +4235,6 @@ static const struct ipc_handler cmd_handlers[] = {
+ 		sizeof(struct hal_cmd_gatt_server_send_response) },
+ };
+ 
+-
+ static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
+ 						uint8_t *rsp, size_t rsp_size,
+ 						uint16_t *length,
+@@ -4442,6 +4509,68 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
  	return 0;
  }
-diff --git a/android/handsfree.c b/android/handsfree.c
-index 7ca0ba8..b625501 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -2602,7 +2602,7 @@ static const struct ipc_handler sco_handlers[] = {
- 	{ bt_sco_connect, false, 0 }
- };
  
--static void bt_sco_unregister(void)
-+void bt_sco_unregister(void)
- {
- 	DBG("");
- 
-@@ -2610,12 +2610,12 @@ static void bt_sco_unregister(void)
- 	sco_ipc = NULL;
- }
- 
--static bool bt_sco_register(ipc_disconnect_cb disconnect)
-+bool bt_sco_register(void)
- {
- 	DBG("");
- 
- 	sco_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
--				SCO_SERVICE_ID, false, disconnect, NULL);
-+					SCO_SERVICE_ID, false, NULL, NULL);
- 	if (!sco_ipc)
- 		return false;
- 
-@@ -2660,8 +2660,6 @@ done:
- 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
- 						G_N_ELEMENTS(cmd_handlers));
- 
--	bt_sco_register(NULL);
--
- 	return true;
- }
- 
-@@ -2669,7 +2667,6 @@ void bt_handsfree_unregister(void)
- {
- 	DBG("");
- 
--	bt_sco_unregister();
- 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
- 	hal_ipc = NULL;
- 
-diff --git a/android/handsfree.h b/android/handsfree.h
-index e5eff47..fb65e47 100644
---- a/android/handsfree.h
-+++ b/android/handsfree.h
-@@ -23,3 +23,6 @@
- 
- bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
- void bt_handsfree_unregister(void);
++static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
++						struct gatt_device *device)
++{
++	uint8_t search_value[ATT_DEFAULT_LE_MTU];
++	size_t search_vlen;
++	uint16_t start, end;
++	uint16_t handle;
++	struct queue *q;
++	bt_uuid_t uuid;
++	uint16_t len;
 +
-+bool bt_sco_register(void);
-+void bt_sco_unregister(void);
-diff --git a/android/main.c b/android/main.c
-index 0a0c150..9d84ac7 100644
---- a/android/main.c
-+++ b/android/main.c
-@@ -362,6 +362,7 @@ static gboolean option_version = FALSE;
- static gint option_index = -1;
- static gboolean option_dbg = FALSE;
- static gboolean option_mgmt_dbg = FALSE;
-+static gboolean option_sco_hci = FALSE;
- 
- static GOptionEntry options[] = {
- 	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
-@@ -372,7 +373,8 @@ static GOptionEntry options[] = {
- 				"Enable debug logs", NULL},
- 	{ "mgmt-debug", 0, 0, G_OPTION_ARG_NONE, &option_mgmt_dbg,
- 				"Enable mgmt debug logs", NULL},
--
-+	{ "sco-over-hci", 0, 0, G_OPTION_ARG_NONE, &option_sco_hci,
-+				"Enable SCO over HCI", NULL},
- 	{ NULL }
- };
- 
-@@ -528,6 +530,9 @@ int main(int argc, char *argv[])
- 		return EXIT_FAILURE;
- 	}
- 
-+	if (option_sco_hci)
-+		bt_sco_register();
++	DBG("");
 +
- 	/* Use params: mtu = 0, flags = 0 */
- 	start_sdp_server(0, 0);
- 
-@@ -544,6 +549,9 @@ int main(int argc, char *argv[])
- 
- 	cleanup_services();
- 
-+	if (option_sco_hci)
-+		bt_sco_unregister();
++	len = dec_find_by_type_req(cmd, cmd_len, &start, &end, &uuid,
++						search_value, &search_vlen);
++	if (!len)
++		return ATT_ECODE_INVALID_PDU;
 +
- 	stop_sdp_server();
- 	bt_bluetooth_cleanup();
- 	g_main_loop_unref(event_loop);
-diff --git a/android/system-emulator.c b/android/system-emulator.c
-index c1b1b25..b677248 100644
---- a/android/system-emulator.c
-+++ b/android/system-emulator.c
-@@ -50,7 +50,7 @@ static pid_t snoop_pid = -1;
- static void ctl_start(void)
++	q = queue_new();
++	if (!q)
++		return ATT_ECODE_UNLIKELY;
++
++	gatt_db_find_by_type(gatt_db, start, end, &uuid, q);
++
++	handle = PTR_TO_UINT(queue_pop_head(q));
++	while (handle) {
++		struct pending_request *data;
++
++		data = new0(struct pending_request, 1);
++		if (!data) {
++			queue_destroy(q, NULL);
++			return ATT_ECODE_INSUFF_RESOURCES;
++		}
++
++		data->filter_value = malloc0(search_vlen);
++		if (!data) {
++			destroy_pending_request(data);
++			queue_destroy(q, NULL);
++			return ATT_ECODE_INSUFF_RESOURCES;
++		}
++
++		data->handle = handle;
++		data->filter_vlen = search_vlen;
++		memcpy(data->filter_value, search_value, search_vlen);
++
++		queue_push_tail(device->pending_requests, data);
++
++		handle = PTR_TO_UINT(queue_pop_head(q));
++	}
++
++	queue_destroy(q, NULL);
++
++	process_dev_pending_requests(device, ATT_OP_FIND_BY_TYPE_REQ);
++
++	/* Send if no response_data elements left to be filled by callbacks */
++	if (!queue_find(device->pending_requests, match_pending_dev_request,
++									NULL))
++		send_dev_pending_response(device, cmd[0]);
++
++	return 0;
++}
++
+ static uint8_t write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *dev)
  {
- 	char prg_name[PATH_MAX + 1];
--	char *prg_argv[6];
-+	char *prg_argv[7];
- 	char *prg_envp[3];
- 	pid_t pid;
- 
-@@ -61,7 +61,8 @@ static void ctl_start(void)
- 	prg_argv[2] = "--track-origins=yes";
- 	prg_argv[3] = prg_name;
- 	prg_argv[4] = "-d";
--	prg_argv[5] = NULL;
-+	prg_argv[5] = "--sco-over-hci";
-+	prg_argv[6] = NULL;
- 
- 	prg_envp[0] = "G_SLICE=always-malloc";
- 	prg_envp[1] = "G_DEBUG=gc-friendly";
+@@ -4553,9 +4682,11 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		if (!status)
+ 			return;
+ 		break;
++	case ATT_OP_FIND_BY_TYPE_REQ:
++		status = find_by_type_request(ipdu, len, dev);
++		break;
+ 	case ATT_OP_EXEC_WRITE_REQ:
+ 		/* TODO */
+-	case ATT_OP_FIND_BY_TYPE_REQ:
+ 	case ATT_OP_HANDLE_CNF:
+ 	case ATT_OP_HANDLE_IND:
+ 	case ATT_OP_HANDLE_NOTIFY:
 -- 
 1.9.0
 
