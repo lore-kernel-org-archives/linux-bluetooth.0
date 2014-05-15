@@ -1,382 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv5 02/15] android/gatt: Refactor ATT read operations
-Date: Thu, 15 May 2014 16:16:13 +0200
-Message-Id: <1400163373-24665-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH BlueZ] android: Add mode for SCO over HCI
+Date: Thu, 15 May 2014 15:29:31 +0300
+Message-Id: <1400156971-23998-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This changes device info and gap services callbacks to use response queue.
-It will allow them work with plain read and read by type as well.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This starts transition to single response data queue, which should be
-filled by various read type functions and processed in one place. This
-will unify the way that responses are send, regardless of data source
-(value taken directly from database, returned by read callback or sent
-from upper layers asynchronously).
-
-We will also introduce 'getter' type functions, using handles to
-retrieve data from database. This will make various read and find
-operations return handles instead of their own custom structures,
-different for every operation performed.
+This adds the option --sco-over-hci that can be used to enable SCO over
+HCI routing, by default it is disabled.
 ---
- android/gatt.c | 242 +++++++++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 208 insertions(+), 34 deletions(-)
+ android/bluetoothd-wrapper.c | 16 ++++++++++++----
+ android/handsfree.c          |  9 +++------
+ android/handsfree.h          |  3 +++
+ android/main.c               | 10 +++++++++-
+ android/system-emulator.c    |  5 +++--
+ 5 files changed, 30 insertions(+), 13 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 67a1330..7f03af5 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -156,6 +156,8 @@ struct gatt_device {
+diff --git a/android/bluetoothd-wrapper.c b/android/bluetoothd-wrapper.c
+index 90ed292..4402024 100644
+--- a/android/bluetoothd-wrapper.c
++++ b/android/bluetoothd-wrapper.c
+@@ -28,6 +28,8 @@
  
- 	int ref;
- 	int conn_cnt;
+ #define PROPERTY_MGMT_DEBUG_NAME "persist.sys.bluetooth.mgmtdbg"
+ 
++#define PROPERTY_SCO_NAME "persist.sys.bluetooth.sco"
 +
-+	struct queue *pending_requests;
- };
+ #define VALGRIND_BIN "/system/bin/valgrind"
  
- struct app_connection {
-@@ -753,6 +755,25 @@ static void disconnect_notify_by_device(void *data, void *user_data)
- 		send_app_connect_notify(conn, GATT_FAILURE);
+ #define BLUETOOTHD_BIN "/system/bin/bluetoothd-main"
+@@ -52,15 +54,16 @@ static void run_valgrind(int debug, int mgmt_dbg)
+ 	execve(prg_argv[0], prg_argv, prg_envp);
  }
  
-+#define READ_INIT -3
-+#define READ_PENDING -2
-+#define READ_FAILED -1
-+
-+struct pending_request {
-+	uint16_t handle;
-+	int length;
-+	uint8_t *value;
-+	uint16_t offset;
-+};
-+
-+static void destroy_pending_request(void *data)
-+{
-+	struct pending_request *entry = data;
-+
-+	free(entry->value);
-+	free(entry);
-+}
-+
- static void destroy_device(void *data)
+-static void run_bluetoothd(int debug, int mgmt_dbg)
++static void run_bluetoothd(int debug, int mgmt_dbg, int sco_hci)
  {
- 	struct gatt_device *dev = data;
-@@ -761,6 +782,7 @@ static void destroy_device(void *data)
- 		return;
+-	char *prg_argv[4];
++	char *prg_argv[5];
+ 	char *prg_envp[1];
  
- 	queue_destroy(dev->services, destroy_service);
-+	queue_destroy(dev->pending_requests, destroy_pending_request);
+ 	prg_argv[0] = BLUETOOTHD_BIN;
+ 	prg_argv[1] = debug ? "-d" : NULL;
+ 	prg_argv[2] = mgmt_dbg ? "--mgmt-debug" : NULL;
+-	prg_argv[3] = NULL;
++	prg_argv[3] = sco_hci ? "--sco-over-hci" : NULL;
++	prg_argv[4] = NULL;
  
- 	free(dev);
- }
-@@ -1143,6 +1165,13 @@ static struct gatt_device *create_device(const bdaddr_t *addr)
- 		return NULL;
+ 	prg_envp[0] = NULL;
+ 
+@@ -72,6 +75,7 @@ int main(int argc, char *argv[])
+ 	char value[PROPERTY_VALUE_MAX];
+ 	int debug = 0;
+ 	int mgmt_dbg = 0;
++	int sco_hci = 0;
+ 
+ 	if (property_get(PROPERTY_DEBUG_NAME, value, "") > 0 &&
+ 			(!strcasecmp(value, "true") || atoi(value) > 0))
+@@ -83,6 +87,10 @@ int main(int argc, char *argv[])
+ 			mgmt_dbg = 1;
  	}
  
-+	dev->pending_requests = queue_new();
-+	if (!dev->pending_requests) {
-+		error("gatt: Failed to allocate memory for client");
-+		destroy_device(dev);
-+		return NULL;
-+	}
++	if (property_get(PROPERTY_SCO_NAME, value, "") > 0 &&
++			(!strcasecmp(value, "true") || atoi(value) > 0))
++			sco_hci = 1;
 +
- 	if (!queue_push_head(gatt_devices, dev)) {
- 		error("gatt: Cannot push device to queue");
- 		destroy_device(dev);
-@@ -3387,6 +3416,118 @@ failed:
- 				HAL_OP_GATT_SERVER_ADD_INC_SERVICE, status);
- }
- 
-+static void send_dev_pending_response(struct gatt_device *device,
-+								uint8_t opcode)
-+{
-+	uint8_t rsp[ATT_DEFAULT_LE_MTU];
-+	struct pending_request *val;
-+	uint16_t len = 0;
-+	uint8_t error = 0;
-+
-+	switch (opcode) {
-+	case ATT_OP_READ_BLOB_REQ:
-+		val = queue_pop_head(device->pending_requests);
-+		if (!val || val->length < 0) {
-+			error = ATT_ECODE_ATTR_NOT_FOUND;
-+			goto done;
-+		}
-+
-+		len = enc_read_blob_resp(val->value, val->length, val->offset,
-+							rsp, sizeof(rsp));
-+		destroy_pending_request(val);
-+		break;
-+	case ATT_OP_READ_REQ:
-+		val = queue_pop_head(device->pending_requests);
-+		if (!val || val->length < 0) {
-+			error = ATT_ECODE_ATTR_NOT_FOUND;
-+			goto done;
-+		}
-+
-+		len = enc_read_resp(val->value, val->length, rsp, sizeof(rsp));
-+		destroy_pending_request(val);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+done:
-+	if (!len)
-+		len = enc_error_resp(opcode, 0x0000, error, rsp,
-+							ATT_DEFAULT_LE_MTU);
-+
-+	g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
-+
-+	queue_remove_all(device->pending_requests, NULL, NULL,
-+						destroy_pending_request);
-+}
-+
-+struct request_processing_data {
-+	uint8_t opcode;
-+	struct gatt_device *device;
-+};
-+
-+static bool match_pending_dev_request(const void *data, const void *user_data)
-+{
-+	const struct pending_request *pending_request = data;
-+
-+	return pending_request->length == READ_PENDING;
-+}
-+
-+static bool match_dev_request_by_handle(const void *data, const void *user_data)
-+{
-+	const struct pending_request *handle_data = data;
-+	uint16_t handle = PTR_TO_UINT(user_data);
-+
-+	return handle_data->handle == handle;
-+}
-+
-+static void read_requested_attributes(void *data, void *user_data)
-+{
-+	struct pending_request *resp_data = data;
-+	struct request_processing_data *process_data = user_data;
-+	uint8_t *value;
-+	int value_len;
-+
-+	if (!gatt_db_read(gatt_db, resp_data->handle,
-+						resp_data->offset,
-+						process_data->opcode,
-+						&process_data->device->bdaddr,
-+						&value, &value_len))
-+		resp_data->length = READ_FAILED;
-+
-+	/* We have value here already if no callback will be called */
-+	if (value_len >= 0) {
-+		resp_data->value = malloc0(value_len);
-+		if (!resp_data->value) {
-+			/* If data cannot be copied, act like when read fails */
-+			resp_data->length = READ_FAILED;
-+			return;
-+		}
-+
-+		memcpy(resp_data->value, value, value_len);
-+		resp_data->length = value_len;
-+	} else {
-+		resp_data->length = READ_PENDING;
-+	}
-+}
-+
-+static void process_dev_pending_requests(struct gatt_device *device,
-+							uint8_t att_opcode)
-+{
-+	struct request_processing_data process_data;
-+
-+	process_data.device = device;
-+	process_data.opcode = att_opcode;
-+
-+	/* Process pending requests and prepare response */
-+	queue_foreach(device->pending_requests, read_requested_attributes,
-+								&process_data);
-+
-+	if (!queue_find(device->pending_requests,
-+					match_pending_dev_request, NULL))
-+		send_dev_pending_response(device, att_opcode);
-+}
-+
- static void send_gatt_response(uint8_t opcode, uint16_t handle,
- 					uint16_t offset, uint8_t status,
- 					uint16_t len, const uint8_t *data,
-@@ -4096,7 +4237,8 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
- {
- 	uint16_t handle;
- 	uint16_t len;
--	uint16_t offset = 0;
-+	uint16_t offset;
-+	struct pending_request *data;
- 
- 	DBG("");
- 
-@@ -4110,15 +4252,26 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
- 		len = dec_read_req(cmd, cmd_len, &handle);
- 		if (!len)
- 			return ATT_ECODE_INVALID_PDU;
-+		offset = 0;
- 		break;
- 	default:
- 		error("gatt: Unexpected read type 0x%02x", cmd[0]);
- 		return ATT_ECODE_REQ_NOT_SUPP;
- 	}
- 
--	if (!gatt_db_read(gatt_db, handle, offset, cmd[0], &dev->bdaddr, NULL,
--									NULL))
--		return ATT_ECODE_UNLIKELY;
-+	data = new0(struct pending_request, 1);
-+	if (!data)
-+		return ATT_ECODE_INSUFF_RESOURCES;
-+
-+	data->offset = offset;
-+	data->handle = handle;
-+	data->length = READ_INIT;
-+	if (!queue_push_tail(dev->pending_requests, data)) {
-+		free(data);
-+		return ATT_ECODE_INSUFF_RESOURCES;
-+	}
-+
-+	process_dev_pending_requests(dev, cmd[0]);
+ 	if (property_get(PROPERTY_VALGRIND_NAME, value, "") > 0 &&
+ 			(!strcasecmp(value, "true") || atoi(value) > 0))
+ 		run_valgrind(debug, mgmt_dbg);
+@@ -91,7 +99,7 @@ int main(int argc, char *argv[])
+ 	 * In case we failed to execute Valgrind, try to run bluetoothd
+ 	 * without it
+ 	 */
+-	run_bluetoothd(debug, mgmt_dbg);
++	run_bluetoothd(debug, mgmt_dbg, sco_hci);
  
  	return 0;
  }
-@@ -4319,9 +4472,6 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- 	case ATT_OP_READ_REQ:
- 	case ATT_OP_READ_BLOB_REQ:
- 		status = read_request(ipdu, len, dev);
--		if (!status)
--			/* Response will be sent in callback */
--			return;
- 		break;
- 	case ATT_OP_MTU_REQ:
- 		status = mtu_att_handle(ipdu, len, opdu, sizeof(opdu), dev,
-@@ -4364,7 +4514,8 @@ done:
- 		length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
- 							ATT_DEFAULT_LE_MTU);
+diff --git a/android/handsfree.c b/android/handsfree.c
+index 7ca0ba8..b625501 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -2602,7 +2602,7 @@ static const struct ipc_handler sco_handlers[] = {
+ 	{ bt_sco_connect, false, 0 }
+ };
  
--	g_attrib_send(dev->attrib, 0, opdu, length, NULL, NULL, NULL);
-+	if (length)
-+		g_attrib_send(dev->attrib, 0, opdu, length, NULL, NULL, NULL);
- }
- 
- static void create_listen_connections(void *data, void *user_data)
-@@ -4465,8 +4616,7 @@ static struct gap_srvc_handles gap_srvc_data;
- static void gap_read_cb(uint16_t handle, uint16_t offset, uint8_t att_opcode,
- 					bdaddr_t *bdaddr, void *user_data)
+-static void bt_sco_unregister(void)
++void bt_sco_unregister(void)
  {
--	uint8_t pdu[ATT_DEFAULT_LE_MTU];
--	uint16_t len;
-+	struct pending_request *entry;
- 	struct gatt_device *dev;
- 
  	DBG("");
-@@ -4477,33 +4627,46 @@ static void gap_read_cb(uint16_t handle, uint16_t offset, uint8_t att_opcode,
- 		return;
- 	}
  
-+	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
-+							UINT_TO_PTR(handle));
-+	if (!entry)
-+		return;
-+
- 	if (handle == gap_srvc_data.dev_name) {
- 		const char *name = bt_get_adapter_name();
- 
--		len = enc_read_resp((uint8_t *)name, strlen(name),
--							pdu, sizeof(pdu));
--		goto done;
--	}
-+		entry->value = malloc0(strlen(name));
-+		if (!entry->value) {
-+			queue_remove(dev->pending_requests, entry);
-+			free(entry);
-+			return;
-+		}
- 
--	if (handle == gap_srvc_data.appear) {
--		uint8_t val[2];
--		put_le16(APPEARANCE_GENERIC_PHONE, val);
--		len = enc_read_resp(val, sizeof(val), pdu, sizeof(pdu));
--		goto done;
--	}
-+		entry->length = strlen(name);
-+		memcpy(entry->value, bt_get_adapter_name(), entry->length);
-+	} else if (handle == gap_srvc_data.appear) {
-+		entry->value = malloc0(2);
-+		if (!entry->value) {
-+			queue_remove(dev->pending_requests, entry);
-+			free(entry);
-+			return;
-+		}
- 
--	if (handle == gap_srvc_data.priv) {
--		uint8_t val = PERIPHERAL_PRIVACY_DISABLE;
--		len = enc_read_resp(&val, sizeof(val), pdu, sizeof(pdu));
--		goto done;
--	}
-+		put_le16(APPEARANCE_GENERIC_PHONE, entry->value);
-+		entry->length = sizeof(uint8_t) * 2;
-+	} else if (handle == gap_srvc_data.priv) {
-+		entry->value = malloc0(1);
-+		if (!entry->value) {
-+			queue_remove(dev->pending_requests, entry);
-+			free(entry);
-+			return;
-+		}
- 
--	error("gatt: Unknown handle 0x%02x", handle);
--	len = enc_error_resp(ATT_OP_READ_REQ, handle,
--					ATT_ECODE_UNLIKELY, pdu, sizeof(pdu));
-+		*entry->value = PERIPHERAL_PRIVACY_DISABLE;
-+		entry->length = sizeof(uint8_t);
-+	}
- 
--done:
--	g_attrib_send(dev->attrib, 0, pdu, len, NULL, NULL, NULL);
-+	entry->offset = offset;
+@@ -2610,12 +2610,12 @@ static void bt_sco_unregister(void)
+ 	sco_ipc = NULL;
  }
  
- static void register_gap_service(void)
-@@ -4567,10 +4730,9 @@ static void device_info_read_cb(uint16_t handle, uint16_t offset,
- 					uint8_t att_opcode, bdaddr_t *bdaddr,
- 					void *user_data)
+-static bool bt_sco_register(ipc_disconnect_cb disconnect)
++bool bt_sco_register(void)
  {
--	uint8_t pdu[ATT_DEFAULT_LE_MTU];
-+	struct pending_request *entry;
- 	struct gatt_device *dev;
- 	char *buf = user_data;
--	uint16_t len;
+ 	DBG("");
  
- 	dev = find_device_by_addr(bdaddr);
- 	if (!dev) {
-@@ -4578,9 +4740,21 @@ static void device_info_read_cb(uint16_t handle, uint16_t offset,
- 		return;
- 	}
+ 	sco_ipc = ipc_init(BLUEZ_SCO_SK_PATH, sizeof(BLUEZ_SCO_SK_PATH),
+-				SCO_SERVICE_ID, false, disconnect, NULL);
++					SCO_SERVICE_ID, false, NULL, NULL);
+ 	if (!sco_ipc)
+ 		return false;
  
--	len = enc_read_resp((uint8_t *) buf, strlen(buf), pdu, sizeof(pdu));
-+	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
-+							UINT_TO_PTR(handle));
-+	if (!entry)
-+		return;
-+
-+	entry->value = malloc0(strlen(buf));
-+	if (!entry->value) {
-+		queue_remove(dev->pending_requests, entry);
-+		free(entry);
-+		return;
-+	}
+@@ -2660,8 +2660,6 @@ done:
+ 	ipc_register(hal_ipc, HAL_SERVICE_ID_HANDSFREE, cmd_handlers,
+ 						G_N_ELEMENTS(cmd_handlers));
  
--	g_attrib_send(dev->attrib, 0, pdu, len, NULL, NULL, NULL);
-+	entry->length = strlen(buf);
-+	memcpy(entry->value, buf, entry->length);
-+	entry->offset = offset;
+-	bt_sco_register(NULL);
+-
+ 	return true;
  }
  
- static void register_device_info_service(void)
+@@ -2669,7 +2667,6 @@ void bt_handsfree_unregister(void)
+ {
+ 	DBG("");
+ 
+-	bt_sco_unregister();
+ 	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HANDSFREE);
+ 	hal_ipc = NULL;
+ 
+diff --git a/android/handsfree.h b/android/handsfree.h
+index e5eff47..fb65e47 100644
+--- a/android/handsfree.h
++++ b/android/handsfree.h
+@@ -23,3 +23,6 @@
+ 
+ bool bt_handsfree_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
+ void bt_handsfree_unregister(void);
++
++bool bt_sco_register(void);
++void bt_sco_unregister(void);
+diff --git a/android/main.c b/android/main.c
+index 0a0c150..9d84ac7 100644
+--- a/android/main.c
++++ b/android/main.c
+@@ -362,6 +362,7 @@ static gboolean option_version = FALSE;
+ static gint option_index = -1;
+ static gboolean option_dbg = FALSE;
+ static gboolean option_mgmt_dbg = FALSE;
++static gboolean option_sco_hci = FALSE;
+ 
+ static GOptionEntry options[] = {
+ 	{ "version", 'v', 0, G_OPTION_ARG_NONE, &option_version,
+@@ -372,7 +373,8 @@ static GOptionEntry options[] = {
+ 				"Enable debug logs", NULL},
+ 	{ "mgmt-debug", 0, 0, G_OPTION_ARG_NONE, &option_mgmt_dbg,
+ 				"Enable mgmt debug logs", NULL},
+-
++	{ "sco-over-hci", 0, 0, G_OPTION_ARG_NONE, &option_sco_hci,
++				"Enable SCO over HCI", NULL},
+ 	{ NULL }
+ };
+ 
+@@ -528,6 +530,9 @@ int main(int argc, char *argv[])
+ 		return EXIT_FAILURE;
+ 	}
+ 
++	if (option_sco_hci)
++		bt_sco_register();
++
+ 	/* Use params: mtu = 0, flags = 0 */
+ 	start_sdp_server(0, 0);
+ 
+@@ -544,6 +549,9 @@ int main(int argc, char *argv[])
+ 
+ 	cleanup_services();
+ 
++	if (option_sco_hci)
++		bt_sco_unregister();
++
+ 	stop_sdp_server();
+ 	bt_bluetooth_cleanup();
+ 	g_main_loop_unref(event_loop);
+diff --git a/android/system-emulator.c b/android/system-emulator.c
+index c1b1b25..b677248 100644
+--- a/android/system-emulator.c
++++ b/android/system-emulator.c
+@@ -50,7 +50,7 @@ static pid_t snoop_pid = -1;
+ static void ctl_start(void)
+ {
+ 	char prg_name[PATH_MAX + 1];
+-	char *prg_argv[6];
++	char *prg_argv[7];
+ 	char *prg_envp[3];
+ 	pid_t pid;
+ 
+@@ -61,7 +61,8 @@ static void ctl_start(void)
+ 	prg_argv[2] = "--track-origins=yes";
+ 	prg_argv[3] = prg_name;
+ 	prg_argv[4] = "-d";
+-	prg_argv[5] = NULL;
++	prg_argv[5] = "--sco-over-hci";
++	prg_argv[6] = NULL;
+ 
+ 	prg_envp[0] = "G_SLICE=always-malloc";
+ 	prg_envp[1] = "G_DEBUG=gc-friendly";
 -- 
 1.9.0
 
