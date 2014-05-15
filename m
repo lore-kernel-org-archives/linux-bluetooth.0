@@ -1,167 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Antonio Ospite <ao2@ao2.it>
-Cc: linux-bluetooth@vger.kernel.org,
-	Bastien Nocera <hadess@hadess.net>,
-	Frank Praznik <frank.praznik@oh.rr.com>
-Subject: Re: [PATCHv2 BlueZ 4/5] plugins/sixaxis: Add a get_leds_data() function
-Date: Thu, 15 May 2014 22:25:02 +0200
-Message-ID: <4897470.dN8z262Y57@athlon>
-In-Reply-To: <1400103605-25183-4-git-send-email-ao2@ao2.it>
-References: <1399370776-5027-1-git-send-email-ao2@ao2.it> <1400103605-25183-1-git-send-email-ao2@ao2.it> <1400103605-25183-4-git-send-email-ao2@ao2.it>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Date: Thu, 15 May 2014 21:52:32 +0200
+Message-ID: <CAL1QEK3bxy_iuR++NYFDmVFUzgqiowV4YxEgAOPY1KRJx5_ExA@mail.gmail.com>
+Subject: [Bluez 4.95] Can't start the bluetoothd daemon
+From: =?UTF-8?B?SsOpcsOpbXkgQ2F6YXV4?= <jcazaux@sirlan.com>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Antonio,
+Hello,
 
-On Wednesday 14 May 2014 23:40:04 Antonio Ospite wrote:
-> Get all the data necessary to set the LEDs (bitmap and/or sysfs path
-> prefix) in a single function, returning a leds_data structure to be
-> passed as argument to the setup_leds() callback.
-> 
-> For now only the bitmap field is populated, which is the only thing that
-> set_leds_hidraw() needs.
-> ---
-> 
-> Changes since v1:
->   - Use capital letter after colon in the short commit message.
->   - Add a leds_data_destroy() helper.
->   - Use implicit NULL checks for pointers.
->   - Use malloc0() from src/shared/utils.h.
->   - Add empty line before the return statement in get_leds_data().
->   - Remove casting on a void pointer.
->   - Instead of 4 strings for the sysfs paths use a sigle string containing
-> the common prefix of the sysfs paths of LEDs devices (i.e. the path
-> omitting the LED number)
-> 
->  plugins/sixaxis.c | 56
-> +++++++++++++++++++++++++++++++++++++++++++++++-------- 1 file changed, 48
-> insertions(+), 8 deletions(-)
-> 
-> diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
-> index 1b7bb30..56110a4 100644
-> --- a/plugins/sixaxis.c
-> +++ b/plugins/sixaxis.c
-> @@ -44,6 +44,7 @@
->  #include "src/device.h"
->  #include "src/plugin.h"
->  #include "src/log.h"
-> +#include "src/shared/util.h"
-> 
->  static const struct {
->  	const char *name;
-> @@ -61,6 +62,20 @@ static const struct {
->  	},
->  };
-> 
-> +struct leds_data {
-> +	char *syspath_prefix;
+I encounter several issues using the bluetooth on my embedded system
+(a STLinux 2.4 OS).
 
-Just add this in patch where it is first used. So here struct leds_data will 
-have only bitmap.
+I'm using bluez 4.95 and dbus 1.4.14.
 
-> +	uint8_t bitmap;
-> +};
-> +
-> +static void leds_data_destroy(struct leds_data **data)
-> +{
-> +	free((*data)->syspath_prefix);
-> +	(*data)->syspath_prefix = NULL;
+I can't connect to the local SDP server. No SDP server is running.
 
-No need to NULL this since data is freed line below.
+root@b2020-h416_a9:~# sdptool browse local
+Failed to connect to SDP server on FF:FF:FF:00:00:00: No such file or directory
+root@b2020-h416_a9:~#
 
-> +
-> +	free(*data);
-> +	*data = NULL;
+No active bluetoothd process on the system:
 
-Make this function get just pointer, there is no need to NULL data from it.
-Initially leds_data_destroy() can just free data, you can add more when 
-introducing additional members.
+root@b2020-h416_a9:~# ps aux |grep blue
+root 1290 0.0 0.0 1564 492 pts/2 S+ 03:52 0:00 grep blue
+root@b2020-h416_a9:~#
 
-> +}
-> +
->  static struct udev *ctx = NULL;
->  static struct udev_monitor *monitor = NULL;
->  static guint watch_id = 0;
-> @@ -181,20 +196,21 @@ static void set_leds_hidraw(int fd, uint8_t
-> leds_bitmap) static gboolean setup_leds(GIOChannel *channel, GIOCondition
-> cond, gpointer user_data)
->  {
-> -	int number = GPOINTER_TO_INT(user_data);
-> -	uint8_t bitmap;
->  	int fd;
-> +	struct leds_data *data = user_data;
-> 
-> -	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-> +	if (!data)
->  		return FALSE;
-> 
-> -	DBG("number %d", number);
-> +	if (cond & (G_IO_HUP | G_IO_ERR | G_IO_NVAL))
-> +		goto out;
-> 
->  	fd = g_io_channel_unix_get_fd(channel);
-> 
-> -	bitmap = calc_leds_bitmap(number);
-> -	if (bitmap != 0)
-> -		set_leds_hidraw(fd, bitmap);
-> +	set_leds_hidraw(fd, data->bitmap);
-> +
-> +out:
-> +	leds_data_destroy(&data);
-> 
->  	return FALSE;
->  }
-> @@ -314,6 +330,30 @@ next:
->  	return number;
->  }
-> 
-> +static struct leds_data *get_leds_data(struct udev_device *udevice)
-> +{
-> +	struct leds_data *data;
-> +	int number;
-> +
-> +	data = malloc0(sizeof(*data));
-> +	if (!data)
-> +		return NULL;
+root@b2020-h416_a9:~# ps aux |grep sdp
+root 1292 0.0 0.0 1564 492 pts/2 S+ 03:52 0:00 grep sdp
+root@b2020-h416_a9:~#
 
-You can allocate data after calling calc_leds_bitmap(), function will be a bit 
-simpler.
+Here is the dmesg stack trace:
+root@b2020-h416_a9:~# dmesg |grep Blue
+[ 0.220000] Bluetooth: Core ver 2.16
+[ 0.220000] Bluetooth: HCI device and connection manager initialized
+[ 0.220000] Bluetooth: HCI socket layer initialized
+[ 0.220000] Bluetooth: L2CAP socket layer initialized
+[ 0.220000] Bluetooth: SCO socket layer initialized
+[ 0.600000] Bluetooth: Virtual HCI driver ver 1.3
+[ 0.600000] Bluetooth: HCI UART driver ver 2.2
+[ 0.600000] Bluetooth: HCI H4 protocol initialized
+[ 0.600000] Bluetooth: HCI BCSP protocol initialized
+[ 0.600000] Bluetooth: HCILL protocol initialized
+[ 0.600000] Bluetooth: HCIATH3K protocol initialized
+[ 0.600000] Bluetooth: Generic Bluetooth SDIO driver ver 0.1
+[ 0.780000] Bluetooth: RFCOMM TTY layer initialized
+[ 0.780000] Bluetooth: RFCOMM socket layer initialized
+[ 0.780000] Bluetooth: RFCOMM ver 1.11
+[ 0.780000] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[ 0.780000] Bluetooth: BNEP filters: protocol multicast
+[ 0.780000] Bluetooth: HIDP (Human Interface Emulation) ver 1.2
+root@b2020-h416_a9:~#
 
-> +
-> +	number = get_js_number(udevice);
-> +	DBG("number %d", number);
-> +
-> +	data->bitmap = calc_leds_bitmap(number);
-> +	if (data->bitmap == 0)
-> +		goto err;
-> +
-> +	return data;
-> +
-> +err:
-> +	leds_data_destroy(&data);
-> +
-> +	return NULL;
-> +}
-> +
->  static int get_supported_device(struct udev_device *udevice, uint16_t *bus)
-> {
->  	struct udev_device *hid_parent;
-> @@ -375,7 +415,7 @@ static void device_added(struct udev_device *udevice)
->  		/* wait for events before setting leds */
->  		g_io_add_watch(io, G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
->  				setup_leds,
-> -				GINT_TO_POINTER(get_js_number(udevice)));
-> +				get_leds_data(udevice));
+The following bluetoothd doesn't create a bluetooth process:
+root@b2020-h416_a9:~# bluetoothd
+root@b2020-h416_a9:~# ps aux |grep blue
+root 1302 0.0 0.0 1564 492 pts/2 S+ 03:57 0:00 grep blue
+root@b2020-h416_a9:~#
 
-This could fit same line as setup_leds.
+With the -n option, I have the following error:
+root@b2020-h416_a9:~# bluetoothd -n
+bluetoothd[1303]: Bluetooth daemon 4.95
+bluetoothd[1303]: Unable to get on D-Bus
+root@b2020-h416_a9:~#
 
-> 
->  		break;
->  	default:
+dbus is not active and cannot be started:
+root@b2020-h416_a9:~# dbus-launch
+Failed to start message bus: Failed to read directory
+"/etc/dbus-1/session.d": No such file or directory
+EOF in dbus-launch reading address from bus daemon
+root@b2020-h416_a9:~#
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+
+So, I have created the /etc/dbus-1/session.d directory:
+
+mkdir /etc/dbus-1/session.d
+
+root@b2020-h416_a9:~# dbus-launch
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-aIOwKaatcU,guid=8d540a0ec3d355269fda85bf00015156
+DBUS_SESSION_BUS_PID=2361
+
+root@b2020-h416_a9:~# ps aux |grep dbus
+root 2361 0.0 0.0 2420 492 ? Ss 23:59 0:00 /usr/bin/dbus-daemon --fork
+--print-pid 4 --print-address 6 --session
+root 2363 0.0 0.0 1564 492 pts/3 S+ 23:59 0:00 grep dbus
+root@b2020-h416_a9:~#
+
+Unfortunately, the bluetooth daemon can't be started:
+
+root@b2020-h416_a9:~# bluetoothd -n
+bluetoothd[2364]: Bluetooth daemon 4.95
+bluetoothd[2364]: Unable to get on D-Bus
+root@b2020-h416_a9:~#
+
+
+The USB bluetooth device is detected:
+root@b2020-h416_a9:~# hciconfig -a
+hci0: Type: BR/EDR Bus: USB
+BD Address: 00:02:72:CC:97:CD ACL MTU: 1021:8 SCO MTU: 64:1
+UP RUNNING PSCAN ISCAN
+RX bytes:1494 acl:0 sco:0 events:43 errors:0
+TX bytes:656 acl:0 sco:0 commands:43 errors:0
+Features: 0xbf 0xfe 0xcf 0xfe 0xdb 0xff 0x7b 0x87
+Packet type: DM1 DM3 DM5 DH1 DH3 DH5 HV1 HV2 HV3
+Link policy: RSWITCH SNIFF
+Link mode: SLAVE ACCEPT
+Name: 'BCM20702A'
+Class: 0x000000
+Service Classes: Unspecified
+Device Class: Miscellaneous,
+HCI Version: 4.0 (0x6) Revision: 0x1000
+LMP Version: 4.0 (0x6) Subversion: 0x220e
+Manufacturer: Broadcom Corporation (15)
+
+root@b2020-h416_a9:~#
+
+Thank you for your help
+
+Best regards,
