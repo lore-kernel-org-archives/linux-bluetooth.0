@@ -1,68 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 15 May 2014 16:16:03 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH ] Add device type info to device info(btd_device)
-Message-ID: <20140515131603.GA7144@t440s.lan>
-References: <1400147738-23861-1-git-send-email-bharat.panda@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1400147738-23861-1-git-send-email-bharat.panda@samsung.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <CAHrH25TYbP7mkwJeJO3vcECetbTCx_TguUDuE1k02XC=a6pOmQ@mail.gmail.com>
+References: <1399666440-14078-1-git-send-email-armansito@chromium.org>
+	<1399666440-14078-2-git-send-email-armansito@chromium.org>
+	<01CD59B6-44C7-425A-8686-82C428F41C87@holtmann.org>
+	<CAHrH25RubNJx89MabHvHQc8ZsymcdDB2VoNVxwEooHEDv2=ybA@mail.gmail.com>
+	<CABBYNZLmDazb+0=-sph80yXsVYY4CcP0EVgBiJt00spE-=YhTw@mail.gmail.com>
+	<CAHrH25TYbP7mkwJeJO3vcECetbTCx_TguUDuE1k02XC=a6pOmQ@mail.gmail.com>
+Date: Thu, 15 May 2014 16:07:23 +0300
+Message-ID: <CABBYNZK4A6qOeRvnHXo8JrS8JTUuM951=eCtNSGxHAdraX409Q@mail.gmail.com>
+Subject: Re: [PATCH v1 01/10] src/shared/att: Introduce struct bt_att.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi Arman,
 
-On Thu, May 15, 2014, Bharat Panda wrote:
-> Add device type information whether LE or BR/EDR or
-> LE/BR/EDR to device info, which can be further
-> exposed as a device property.
-> 
-> Signed-off-by: Bharat Panda <bharat.panda@samsung.com>
-> ---
->  src/adapter.c |    6 ++++++
->  src/device.c  |   11 +++++++++++
->  2 files changed, 17 insertions(+)
-> 
-> diff --git a/src/adapter.c b/src/adapter.c
-> index f5abfe3..5154448 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -4355,6 +4355,12 @@ static void update_found_devices(struct btd_adapter *adapter,
->  					!(eir_data.flags & EIR_BREDR_UNSUP))
->  		device_set_bredr_support(dev, true);
->  
-> +	if (eir_data.flags & (EIR_BREDR_UNSUP))
-> +		device_set_le_support(dev, true);
+On Wed, May 14, 2014 at 5:54 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz,
+>
+>>> Actually what I have in mind is even simpler than this. For outgoing
+>>> operations that don't solicit a response (such as commands and
+>>> outgoing notifications) we simply send them and invoke the callback
+>>> with a special opcode such as "BT_ATT_PDU_SENT". For those outgoing
+>>> operations that do solicit a response (e.g. requests and indications),
+>>> the request remains pending until the response is received. A
+>>> responses array is not really necessary, since there is already a 1:1
+>>> mapping between ATT requests and their responses, so we know exactly
+>>> which request the received response matches (even the error response
+>>> contains the request that caused it in its PDU).
+>>
+>> I don't think we need an special opcode when the PDU is sent, the
+>> caller might actually not set any callback and I don't think there is
+>> any special action that can be triggered by having such a thing,
+>> specially because it is in no way an acknowledgment it just mean it
+>> has been dispatched it may still not reach the remote side. In other
+>> words if ATT does not have acknowledgment we should not invent one
+>> either.
+>
+> Makes sense. The idea I had was that if the caller passes NULL to
+> bt_att_send for the callback, then no acknowledgement would happen but
+> if they do, we would confirm with a special PDU, but this will no
+> longer be necessary if we have a separate function as you suggest
+> below.
+>
+>>> For incoming requests, we treat these as events as you said. To
+>>> respond to them, the upper layer than just needs to call bt_att_send
+>>> with the corresponding response opcode and parameters.
+>>
+>> I would not reuse the same function for both requests and responses,
+>> responses should not have any callback and custom data attached for
+>> the same reasons stated above, so I would have att_send_rsp for
+>> responses alone.
+>
+> Maybe it would make sense to have one function to send operations that
+> solicit a response (requests/indications), e.g.
+> bt_att_send_op_with_rsp and one function for those that don't (for
+> responses/commands/notifications) like bt_att_send_op_no_rsp. Or do
+> you think we should have separate functions such as bt_att_send_req,
+> bt_att_send_rsp, bt_att_send_not, bt_att_send_ind, etc?
 
-Simply the address type should be enough to know that LE is supported.
-No need to check for any AD flags. Anyway, it seems to me that this
-chunk is addressing the only real issue (although in a wrong way), but
-I'll get to that later.
+Well personally I would have dedicated function for each opcode, that
+way there is very little room for confusion i.e using
+bt_att_send_op_with_rsp for an opcode that does not solicit a response
+and vice-versa, internally you can still have them using common
+functions.
 
-> +	if (eir_data.flags & (EIR_CONTROLLER | EIR_SIM_HOST | (!EIR_BREDR_UNSUP)))
-> +		device_set_dual_mode_support(dev, true);
-
-Since Bluetooth 4.1 these flags should not be set and can be ignored
-(see volume 3, part C, section 13.1.1).
-
-> @@ -169,6 +169,7 @@ struct btd_device {
->  	char		*path;
->  	bool		bredr;
->  	bool		le;
-> +	bool		dual_mode;
-
-This seems completely pointless to me since dual_mode == true would be
-exactly the same as bredr && le.
-
-So, regarding the only potential issue that I could see: it seems we're
-lacking code for updating LE support if a device was first discovered
-and created over BR/EDR and then we come across it later through LE
-discovery. In such a case dev->le would stay untouched.
-
-I just pushed several patches related to this which should hopefully fix
-the issue. Let me know if something is still not working for you the way
-you'd want with latest git.
-
-Johan
+-- 
+Luiz Augusto von Dentz
