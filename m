@@ -1,67 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/gatt: Add stub for setting advertising data
-Date: Fri, 16 May 2014 16:10:40 +0200
-Message-Id: <1400249440-31062-1-git-send-email-szymon.janc@tieto.com>
+Date: Fri, 16 May 2014 17:00:56 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Send Exchange MTU request on connect
+Message-ID: <20140516140056.GA26830@t440s.P-661HNU-F1>
+References: <1400247195-23530-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1400247195-23530-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Currently kernel is lacking support for fine grained configuration of
-advertising data but this is ignored for now.
+Hi Jakub,
 
-Vendor data is not supported and if it is to be set command will fail.
-This should be implemented when kernel support is added.
----
- android/gatt.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+On Fri, May 16, 2014, Jakub Tyszkowski wrote:
+> According to spec: "This request shall only be sent once during a
+> connection by the client." This is needed to pass TC_GAC_CL_BV_01_C.
+> ---
+>  android/gatt.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 283bb6d..15fdb98 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -978,6 +978,18 @@ static void send_app_connect_notifications(void *data, void *user_data)
+>  
+>  static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data);
+>  
+> +static void send_exchange_mtu_request(struct gatt_device *device,
+> +							uint16_t mtu_size)
+> +{
+> +	uint8_t req[ATT_DEFAULT_LE_MTU];
+> +	uint16_t len = 0;
+> +
+> +	len = enc_mtu_req(mtu_size, req, ATT_DEFAULT_LE_MTU);
+> +	if (len) {
+> +		g_attrib_send(device->attrib, 0, req, len, NULL, NULL, NULL);
+> +	}
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9bbcc48..067e14e 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3242,10 +3242,38 @@ static void handle_client_get_device_type(const void *buf, uint16_t len)
- 
- static void handle_client_set_adv_data(const void *buf, uint16_t len)
- {
--	DBG("");
-+	const struct hal_cmd_gatt_client_set_adv_data *cmd = buf;
-+	uint8_t status;
-+
-+	if (len != sizeof(*cmd) + cmd->manufacturer_len) {
-+		error("Invalid set adv data command (%u bytes), terminating",
-+									len);
-+		raise(SIGTERM);
-+		return;
-+	}
-+
-+	DBG("scan_rsp=%u name=%u tx=%u min=%d max=%d app=%d manufacturer=%u",
-+		cmd->set_scan_rsp, cmd->include_name, cmd->include_txpower,
-+		cmd->min_interval, cmd->max_interval, cmd->appearance,
-+		cmd->manufacturer_len);
-+
-+	/*
-+	 * TODO
-+	 * Currently kernel is setting all except for vendor data.
-+	 * This should be implemented when kernel supports it.
-+	 */
- 
-+	if (cmd->manufacturer_len) {
-+		error("gatt: Manufacturer advertising data not supported");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
-+	status = HAL_STATUS_SUCCESS;
-+
-+failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_OP_GATT_CLIENT_SET_ADV_DATA, HAL_STATUS_FAILED);
-+				HAL_OP_GATT_CLIENT_SET_ADV_DATA, status);
- }
- 
- static void handle_client_test_command(const void *buf, uint16_t len)
--- 
-1.9.1
+No braces needed for one-line branches.
 
+> +}
+> +
+>  static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>  {
+>  	struct gatt_device *dev = user_data;
+> @@ -1023,6 +1035,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>  
+>  	status = GATT_SUCCESS;
+>  
+> +	send_exchange_mtu_request(dev, ATT_DEFAULT_LE_MTU);
+
+I'd have expected you to use gatt_exchange_mtu() with the actual MTU
+value from the socket and have a similar callback with similar logic as
+exchange_mtu_cb() in profiles/gatt/gas.c.  Why is this not needed?
+
+Johan
