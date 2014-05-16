@@ -1,184 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Re-run PTS GAP tests
-Date: Fri, 16 May 2014 17:23:24 +0200
-Message-Id: <1400253804-15197-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: BUG: spinlock wrong CPU on CPU#3, krfcommd/1500 (resend)
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Content-Type: text/plain; charset=us-ascii
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1433096136.20140516162252@eikelenboom.it>
+Date: Fri, 16 May 2014 08:20:54 -0700
+Cc: gianluca@sottospazio.it, linux-bluetooth@vger.kernel.org
+Message-Id: <25887AA2-0BA2-4BD1-ACA6-C43E34F1284B@holtmann.org>
+References: <1433096136.20140516162252@eikelenboom.it>
+To: Sander Eikelenboom <linux@eikelenboom.it>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-gap.txt | 96 ++++++++++++++++++++++++++++++-----------------------
- 1 file changed, 55 insertions(+), 41 deletions(-)
+Hi Sander,
 
-diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-index 8be9a5a..b18679a 100644
---- a/android/pts-gap.txt
-+++ b/android/pts-gap.txt
-@@ -1,7 +1,7 @@
- PTS test results for GAP
- 
- PTS version: 5.1
--Tested: 11-April-2014
-+Tested: 16-May-2014
- Android version: 4.4.2
- 
- Results:
-@@ -9,6 +9,7 @@ PASS	test passed
- FAIL	test failed
- INC	test is inconclusive
- N/A	test is disabled due to PICS setup
-+(#)	not implemented
- 
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
-@@ -61,8 +62,11 @@ TC_DISC_GENP_BV_05_C	PASS	btmgmt find -l
- 				PTS AD flags must have bit 1 and bit 0 unset
- TC_IDLE_GIN_BV_01_C	PASS	Start discovery from IUT
- TC_IDLE_LIN_BV_01_C	PASS	hcitool scan --iac=liac
--TC_IDLE_NAMP_BV_01_C	PASS
--TC_IDLE_NAMP_BV_02_C	INC
-+TC_IDLE_NAMP_BV_01_C	PASS	possible to PASS using haltest following steps:
-+				gattc - register client, connect to PTS, search
-+				all services, get characteristic and then read
-+				characteristic (name)
-+TC_IDLE_NAMP_BV_02_C	PASS	haltest: gatts connect
- TC_CONN_NCON_BV_01_C	N/A
- TC_CONN_NCON_BV_02_C	N/A
- TC_CONN_NCON_BV_03_C	N/A
-@@ -74,65 +78,72 @@ TC_CONN_UCON_BV_02_C	N/A
- TC_CONN_UCON_BV_03_C	N/A
- TC_CONN_UCON_BV_04_C	N/A
- TC_CONN_UCON_BV_05_C	N/A
--TC_CONN_ACEP_BV_01_C	INC
--TC_CONN_ACEP_BV_02_C	INC
--TC_CONN_GCEP_BV_01_C	INC
--TC_CONN_GCEP_BV_02_C	INC
--TC_CONN_GCEP_BV_03_C	INC
--TC_CONN_GCEP_BV_04_C	INC
--TC_CONN_SCEP_BV_01_C	INC
--TC_CONN_SCEP_BV_02_C	INC
--TC_CONN_DCEP_BV_01_C	INC
--TC_CONN_DCEP_BV_02_C	INC
-+TC_CONN_ACEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
-+TC_CONN_ACEP_BV_02_C	(#)	Privacy feature - not implemented
-+TC_CONN_GCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
-+TC_CONN_GCEP_BV_02_C	PASS	'gattc connect' prior to pressing OK on PTS
-+TC_CONN_GCEP_BV_03_C	(#)	Privacy feature - not implemented
-+TC_CONN_GCEP_BV_04_C	(#)	Privacy feature - not implemented
-+TC_CONN_SCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
-+TC_CONN_SCEP_BV_02_C	(#)	Privacy feature - not implemented
-+TC_CONN_DCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
-+TC_CONN_DCEP_BV_02_C	(#)	Privacy feature - not implemented
- TC_CONN_DCEP_BV_03_C	PASS
--TC_CONN_DCEP_BV_04_C	INC
-+TC_CONN_DCEP_BV_04_C	(#)	Privacy feature - not implemented
- TC_CONN_CPUP_BV_01_C	N/A
- TC_CONN_CPUP_BV_02_C	N/A
- TC_CONN_CPUP_BV_03_C	N/A
- TC_CONN_CPUP_BV_04_C	PASS
- TC_CONN_CPUP_BV_05_C	PASS
--TC_CONN_CPUP_BV_06_C	INC
-+TC_CONN_CPUP_BV_06_C	PASS	PTS issue - ID: 12187
-+				ETS + new pixit file should be added
- TC_CONN_TERM_BV_01_C	PASS
- TC_CONN_PRDA_BV_01_C	N/A
--TC_CONN_PRDA_BV_02_C	INC
-+TC_CONN_PRDA_BV_02_C	(#)	Privacy feature - not implemented
- TC_BOND_NBON_BV_01_C	PASS
--TC_BOND_NBON_BV_02_C	INC
-+TC_BOND_NBON_BV_02_C	PASS	haltest: gattc_register_client
-+				gattc connect <client_id> <address>
-+				bluetooth create_bond <address>
-+				bluetooth remove_bond <address>
- TC_BOND_NBON_BV_03_C	N/A
- TC_BOND_BON_BV_01_C	N/A
--TC_BOND_BON_BV_02_C	INC
-+TC_BOND_BON_BV_02_C	PASS
- TC_BOND_BON_BV_03_C	N/A
--TC_BOND_BON_BV_04_C	INC
-+TC_BOND_BON_BV_04_C	PASS	haltest: gattc_register_client
-+				gattc connect <client_id> <address>
-+				bluetooth remove_bond <address>
-+				gattc connect <client_id> <address>
- TC_SEC_AUT_BV_11_C	N/A
--TC_SEC_AUT_BV_12_C	INC
--TC_SEC_AUT_BV_13_C	INC
-+TC_SEC_AUT_BV_12_C	INC	JIRA: BZ-29
-+TC_SEC_AUT_BV_13_C	INC	JIRA: BZ-30
- TC_SEC_AUT_BV_14_C	N/A
- TC_SEC_AUT_BV_15_C	N/A
--TC_SEC_AUT_BV_16_C	INC
--TC_SEC_AUT_BV_17_C	INC
-+TC_SEC_AUT_BV_16_C	(#)
-+TC_SEC_AUT_BV_17_C	PASS
- TC_SEC_AUT_BV_18_C	N/A
--TC_SEC_AUT_BV_19_C	INC
-+TC_SEC_AUT_BV_19_C	PASS
- TC_SEC_AUT_BV_20_C	N/A
--TC_SEC_AUT_BV_21_C	INC
-+TC_SEC_AUT_BV_21_C	(#)
- TC_SEC_AUT_BV_22_C	N/A
- TC_SEC_AUT_BV_23_C	N/A
--TC_SEC_AUT_BV_24_C	INC
--TC_SEC_CSIGN_BV_01_C	INC
--TC_SEC_CSIGN_BV_02_C	INC
--TC_SEC_CSIGN_BI_01_C	INC
--TC_SEC_CSIGN_BI_02_C	INC
--TC_SEC_CSIGN_BI_03_C	INC
--TC_SEC_CSIGN_BI_04_C	INC
--TC_PRIV_CONN_BV_01_C	INC
--TC_PRIV_CONN_BV_02_C	INC
--TC_PRIV_CONN_BV_03_C	INC
--TC_PRIV_CONN_BV_04_C	INC
-+TC_SEC_AUT_BV_24_C	(#)
-+TC_SEC_CSIGN_BV_01_C	(#)	Not yet implemented - signed write
-+TC_SEC_CSIGN_BV_02_C	(#)
-+TC_SEC_CSIGN_BI_01_C	(#)
-+TC_SEC_CSIGN_BI_02_C	(#)
-+TC_SEC_CSIGN_BI_03_C	(#)
-+TC_SEC_CSIGN_BI_04_C	(#)
-+TC_PRIV_CONN_BV_01_C	(#)	Privacy feature - not implemented
-+TC_PRIV_CONN_BV_02_C	(#)	Privacy feature - not implemented
-+TC_PRIV_CONN_BV_03_C	(#)	Privacy feature - not implemented
-+TC_PRIV_CONN_BV_04_C	(#)	Privacy feature - not implemented
- TC_PRIV_CONN_BV_05_C	N/A
- TC_PRIV_CONN_BV_06_C	N/A
- TC_PRIV_CONN_BV_07_C	N/A
- TC_PRIV_CONN_BV_08_C	N/A
- TC_PRIV_CONN_BV_09_C	N/A
- TC_PRIV_CONN_BV_10_C	N/A
--TC_PRIV_CONN_BV_11_C	INC
-+TC_PRIV_CONN_BV_11_C	(#)	Privacy feature - not implemented
- TC_ADV_BV_01_C		N/A
- TC_ADV_BV_02_C		N/A
- TC_ADV_BV_03_C		N/A
-@@ -149,7 +160,9 @@ TC_ADV_BV_13_C		N/A
- TC_ADV_BV_14_C		N/A
- TC_ADV_BV_15_C		N/A
- TC_ADV_BV_16_C		N/A
--TC_GAT_BV_01_C		INC
-+TC_GAT_BV_01_C		PASS	haltest:
-+				gattc register_client
-+				gattc connect
- TC_GAT_BV_02_C		N/A
- TC_GAT_BV_03_C		N/A
- TC_GAT_BV_04_C		N/A
-@@ -160,9 +173,10 @@ TC_GAT_BV_08_C		N/A
- TC_DM_NCON_BV_01_C	N/A
- TC_DM_CON_BV_01_C	N/A
- TC_DM_NBON_BV_01_C	N/A
--TC_DM_BON_BV_01_C	INC
--TC_DM_GIN_BV_01_C	INC
--TC_DM_LIN_BV_01_C	INC
-+TC_DM_BON_BV_01_C	PASS	haltest:
-+				create_bond and remove_bond when requested
-+TC_DM_GIN_BV_01_C	PASS
-+TC_DM_LIN_BV_01_C	PASS
- TC_DM_NAD_BV_01_C	PASS	Start discovery from IUT
- TC_DM_NAD_BV_02_C	PASS
- TC_DM_LEP_BV_01_C	N/A
--- 
-1.8.5.3
+> I previously reported the splat below i encountered on boot,
+> but haven't had a response yet. It is still present on 3.15-rc5.
+> 
+> 
+> [   78.248869] BUG: spinlock wrong CPU on CPU#3, krfcommd/1500
+> [   78.255126]  lock: 0xffff880056d8ded8, .magic: dead4ead, .owner: krfcommd/1500, .owner_cpu: 0
+> [   78.261375] CPU: 3 PID: 1500 Comm: krfcommd Not tainted 3.15.0-rc3-20140501-nbdebug5+ #1
+> [   78.267767] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS V1.8B1 09/13/2010
+> [   78.274173]  ffff880056d8ded8 ffff880057217d18 ffffffff81b8d666 ffff88005f6cfd88
+> [   78.280707]  ffff880056c3a3c0 ffff880057217d38 ffffffff81b8974c ffff880056d8ded8
+> [   78.287091]  ffffffff81f56fab ffff880057217d58 ffffffff81b89777 ffff880056d8ded8
+> [   78.293371] Call Trace:
+> [   78.299496]  [<ffffffff81b8d666>] dump_stack+0x46/0x58
+> [   78.305601]  [<ffffffff81b8974c>] spin_dump+0x91/0x96
+> [   78.311662]  [<ffffffff81b89777>] spin_bug+0x26/0x2b
+> [   78.317599]  [<ffffffff8111a5ce>] do_raw_spin_unlock+0xae/0x100
+> [   78.323557]  [<ffffffff81b974cb>] _raw_spin_unlock+0x2b/0x40
+> [   78.329571]  [<ffffffff81b636d3>] rfcomm_run+0x1063/0x1310
+> [   78.335608]  [<ffffffff81b9754d>] ? _raw_spin_unlock_irqrestore+0x6d/0x90
+> [   78.341715]  [<ffffffff81b62670>] ? rfcomm_check_accept+0xc0/0xc0
+> [   78.347830]  [<ffffffff810ee1a4>] kthread+0xe4/0x100
+> [   78.353916]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
+> [   78.360121]  [<ffffffff81b9893c>] ret_from_fork+0x7c/0xb0
+> [   78.366191]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
+
+can you bisect which patch has introduced this issue. It is the first time I see it.
+
+Regards
+
+Marcel
 
