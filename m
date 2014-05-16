@@ -1,54 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 00/10] bt_att initial implementation
-Date: Fri, 16 May 2014 13:14:48 -0700
-Message-Id: <1400271298-29769-1-git-send-email-armansito@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <20140516140056.GA26830@t440s.P-661HNU-F1>
+References: <1400247195-23530-1-git-send-email-jakub.tyszkowski@tieto.com>
+	<20140516140056.GA26830@t440s.P-661HNU-F1>
+Date: Fri, 16 May 2014 21:44:53 +0200
+Message-ID: <CANmD6r24G29P3_vuw1RNmy3qDncwZpytZV3Z8K=QeWgL=zUs+w@mail.gmail.com>
+Subject: Re: [PATCH] android/gatt: Send Exchange MTU request on connect
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v1:
-   - Updated the copyright notice in new files to include Google Inc. Retained
-   the Intel copyright in src/shared/att.c and unit/test-att.c which take a lot
-   of code from src/shared/mgmt.c and unit/test-mgmt.c respectively.
+Hi Johan,
 
-   - Removed ATT_ERROR_IO from src/shared/att as 0x80 is a legitimate
-   application error that varies among GATT profiles. On I/O errors, the code
-   now invokes the callback with ATT_OP_ERROR_RESP with NULL parameters.
+On 16 May 2014 16:00, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Jakub,
+>
+> On Fri, May 16, 2014, Jakub Tyszkowski wrote:
+>> According to spec: "This request shall only be sent once during a
+>> connection by the client." This is needed to pass TC_GAC_CL_BV_01_C.
+>> ---
+>>  android/gatt.c | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index 283bb6d..15fdb98 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -978,6 +978,18 @@ static void send_app_connect_notifications(void *data, void *user_data)
+>>
+>>  static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data);
+>>
+>> +static void send_exchange_mtu_request(struct gatt_device *device,
+>> +                                                     uint16_t mtu_size)
+>> +{
+>> +     uint8_t req[ATT_DEFAULT_LE_MTU];
+>> +     uint16_t len = 0;
+>> +
+>> +     len = enc_mtu_req(mtu_size, req, ATT_DEFAULT_LE_MTU);
+>> +     if (len) {
+>> +             g_attrib_send(device->attrib, 0, req, len, NULL, NULL, NULL);
+>> +     }
+>
+> No braces needed for one-line branches.
+>
+>> +}
+>> +
+>>  static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>>  {
+>>       struct gatt_device *dev = user_data;
+>> @@ -1023,6 +1035,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
+>>
+>>       status = GATT_SUCCESS;
+>>
+>> +     send_exchange_mtu_request(dev, ATT_DEFAULT_LE_MTU);
+>
+> I'd have expected you to use gatt_exchange_mtu() with the actual MTU
+> value from the socket and have a similar callback with similar logic as
+> exchange_mtu_cb() in profiles/gatt/gas.c.  Why is this not needed?
+>
+> Johan
 
-v2:
-   - Renamed all opcode macros to look like BT_ATT_OP_* instead of ATT_OP_*.
-   - Fixed bt_att_set_mtu to resize the internal buffer.
-   - Renamed bt_att_send to bt_att_send_sequential, for sequential request/
-   response and indication/confirmation flows. The non-sequential version will
-   be called bt_att_send and not take in any callbacks.
+Umm... this was mindless indeed. I'll do this the right way in v2.
 
-Arman Uguray (10):
-  src/shared/att: Introduce struct bt_att.
-  unit/test-att: Add unit tests for src/shared/att.
-  tools/btatt: Add command-line tool for ATT protocol testing.
-  tools/btatt: Add "exchange-mtu" command.
-  src/shared/att: Add "Find Information" request and response.
-  unit/test-att: Add unit test for "Find Information" request/response.
-  tools/btatt: Add "find-information" command.
-  src/shared/att: Add "Find By Type Value" request and response.
-  unit/test-att: Add unit test for "Find By Type Value"
-    request/response.
-  tools/btatt: Add "find-by-type-value" command.
-
- Makefile.am      |  12 +-
- Makefile.tools   |  10 +-
- src/shared/att.c | 694 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/att.h | 131 +++++++++++
- tools/btatt.c    | 629 +++++++++++++++++++++++++++++++++++++++++++++++++
- unit/test-att.c  | 474 +++++++++++++++++++++++++++++++++++++
- 6 files changed, 1948 insertions(+), 2 deletions(-)
- create mode 100644 src/shared/att.c
- create mode 100644 src/shared/att.h
- create mode 100644 tools/btatt.c
- create mode 100644 unit/test-att.c
-
--- 
-1.8.3.2
-
+Jakub
