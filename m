@@ -1,47 +1,130 @@
 Return-Path: <cyrus@holtmann.org>
-Subject: Re: BUG: spinlock wrong CPU on CPU#3, krfcommd/1500 (resend)
-Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
-Content-Type: text/plain; charset=us-ascii
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1433096136.20140516162252@eikelenboom.it>
-Date: Fri, 16 May 2014 08:20:54 -0700
-Cc: gianluca@sottospazio.it, linux-bluetooth@vger.kernel.org
-Message-Id: <25887AA2-0BA2-4BD1-ACA6-C43E34F1284B@holtmann.org>
-References: <1433096136.20140516162252@eikelenboom.it>
-To: Sander Eikelenboom <linux@eikelenboom.it>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/4] tools: Add conn-info to btmgmt
+Date: Fri, 16 May 2014 17:19:12 +0200
+Message-ID: <1400253554-31574-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1400253554-31574-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1400253554-31574-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sander,
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 
-> I previously reported the splat below i encountered on boot,
-> but haven't had a response yet. It is still present on 3.15-rc5.
-> 
-> 
-> [   78.248869] BUG: spinlock wrong CPU on CPU#3, krfcommd/1500
-> [   78.255126]  lock: 0xffff880056d8ded8, .magic: dead4ead, .owner: krfcommd/1500, .owner_cpu: 0
-> [   78.261375] CPU: 3 PID: 1500 Comm: krfcommd Not tainted 3.15.0-rc3-20140501-nbdebug5+ #1
-> [   78.267767] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS V1.8B1 09/13/2010
-> [   78.274173]  ffff880056d8ded8 ffff880057217d18 ffffffff81b8d666 ffff88005f6cfd88
-> [   78.280707]  ffff880056c3a3c0 ffff880057217d38 ffffffff81b8974c ffff880056d8ded8
-> [   78.287091]  ffffffff81f56fab ffff880057217d58 ffffffff81b89777 ffff880056d8ded8
-> [   78.293371] Call Trace:
-> [   78.299496]  [<ffffffff81b8d666>] dump_stack+0x46/0x58
-> [   78.305601]  [<ffffffff81b8974c>] spin_dump+0x91/0x96
-> [   78.311662]  [<ffffffff81b89777>] spin_bug+0x26/0x2b
-> [   78.317599]  [<ffffffff8111a5ce>] do_raw_spin_unlock+0xae/0x100
-> [   78.323557]  [<ffffffff81b974cb>] _raw_spin_unlock+0x2b/0x40
-> [   78.329571]  [<ffffffff81b636d3>] rfcomm_run+0x1063/0x1310
-> [   78.335608]  [<ffffffff81b9754d>] ? _raw_spin_unlock_irqrestore+0x6d/0x90
-> [   78.341715]  [<ffffffff81b62670>] ? rfcomm_check_accept+0xc0/0xc0
-> [   78.347830]  [<ffffffff810ee1a4>] kthread+0xe4/0x100
-> [   78.353916]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
-> [   78.360121]  [<ffffffff81b9893c>] ret_from_fork+0x7c/0xb0
-> [   78.366191]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
+---
+ tools/btmgmt.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 89 insertions(+)
 
-can you bisect which patch has introduced this issue. It is the first time I see it.
-
-Regards
-
-Marcel
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 48d42a3..0618de1 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -2137,6 +2137,94 @@ static void cmd_debug_keys(struct mgmt *mgmt, uint16_t index,
+ 	cmd_setting(mgmt, index, MGMT_OP_SET_DEBUG_KEYS, argc, argv);
+ }
+ 
++static void conn_info_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	const struct mgmt_rp_get_conn_info *rp = param;	char addr[18];
++
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "Get Conn Info failed, status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		goto done;
++	}
++
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Unexpected Get Conn Info len %u\n", len);
++		goto done;
++	}
++
++	ba2str(&rp->addr.bdaddr, addr);
++
++	if (status != 0) {
++		fprintf(stderr, "Get Conn Info for %s (%s) failed. status 0x%02x (%s)\n",
++						addr, typestr(rp->addr.type),
++						status, mgmt_errstr(status));
++		goto done;
++	}
++
++	printf("Connection Information for %s (%s)\n",
++						addr, typestr(rp->addr.type));
++	printf("\tRSSI %d\n\tTX power %d\n\tmaximum TX power %d\n",
++				rp->rssi, rp->tx_power, rp->max_tx_power);
++
++done:
++	mainloop_quit();
++}
++
++static void conn_info_usage(void)
++{
++	printf("Usage: btmgmt conn-info [-t type] <remote address>\n");
++}
++
++static struct option conn_info_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "type",	1, 0, 't' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_conn_info(struct mgmt *mgmt, uint16_t index,
++						int argc, char **argv)
++{
++	struct mgmt_cp_get_conn_info cp;
++	uint8_t type = BDADDR_BREDR;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+t:h", conn_info_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++		default:
++			conn_info_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		conn_info_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++
++	if (mgmt_send(mgmt, MGMT_OP_GET_CONN_INFO, index, sizeof(cp), &cp,
++					conn_info_rsp, NULL, NULL) == 0) {
++		fprintf(stderr, "Unable to send get_conn_info cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
+@@ -2179,6 +2267,7 @@ static struct {
+ 	{ "did",	cmd_did,	"Set Device ID"			},
+ 	{ "static-addr",cmd_static_addr,"Set static address"		},
+ 	{ "debug-keys",	cmd_debug_keys,	"Toogle debug keys"		},
++	{ "conn-info",	cmd_conn_info,	"Get connection information"	},
+ 	{ }
+ };
+ 
+-- 
+1.9.3
 
