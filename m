@@ -1,51 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH] android/gatt: Send Exchange MTU request on connect
-Date: Fri, 16 May 2014 15:33:15 +0200
-Message-Id: <1400247195-23530-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [RFC 2/3] android/hal-sco: Fixes for unreliable mtu
+Date: Fri, 16 May 2014 15:57:03 +0300
+Message-Id: <1400245024-12533-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1400245024-12533-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1400245024-12533-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-According to spec: "This request shall only be sent once during a
-connection by the client." This is needed to pass TC_GAC_CL_BV_01_C.
----
- android/gatt.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 283bb6d..15fdb98 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -978,6 +978,18 @@ static void send_app_connect_notifications(void *data, void *user_data)
+---
+ android/hal-sco.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index fb7b4d4..3c6e5bf 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -300,7 +300,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 	struct pollfd pfd;
+ 	size_t len, written = 0;
+ 	int ret;
+-	uint16_t mtu = /* out->cfg.mtu */ 48;
++	uint16_t mtu = out->cfg.mtu;
+ 	uint64_t audio_sent_us, audio_passed_us;
  
- static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data);
- 
-+static void send_exchange_mtu_request(struct gatt_device *device,
-+							uint16_t mtu_size)
-+{
-+	uint8_t req[ATT_DEFAULT_LE_MTU];
-+	uint16_t len = 0;
+ 	pfd.fd = out->fd;
+@@ -594,7 +594,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+ 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+-	out->cfg.mtu = mtu;
 +
-+	len = enc_mtu_req(mtu_size, req, ATT_DEFAULT_LE_MTU);
-+	if (len) {
-+		g_attrib_send(device->attrib, 0, req, len, NULL, NULL, NULL);
-+	}
-+}
-+
- static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- {
- 	struct gatt_device *dev = user_data;
-@@ -1023,6 +1035,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
++	/* we get wrong mtu size for some reason */
++	out->cfg.mtu = /* mtu */ 48;
  
- 	status = GATT_SUCCESS;
- 
-+	send_exchange_mtu_request(dev, ATT_DEFAULT_LE_MTU);
-+
- reply:
- 	data.dev = dev;
- 	data.status = status;
+ 	out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
+ 	if (!out->downmix_buf) {
 -- 
-1.9.3
+1.8.3.2
 
