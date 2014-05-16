@@ -1,44 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 May 2014 16:22:52 +0200
-From: Sander Eikelenboom <linux@eikelenboom.it>
-Reply-To: Sander Eikelenboom <linux@eikelenboom.it>
-Message-ID: <1433096136.20140516162252@eikelenboom.it>
-To: Marcel Holtmann <marcel@holtmann.org>, gianluca@sottospazio.it
-CC: linux-bluetooth@vger.kernel.org
-Subject: BUG: spinlock wrong CPU on CPU#3, krfcommd/1500 (resend)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/gatt: Add stub for setting advertising data
+Date: Fri, 16 May 2014 16:10:40 +0200
+Message-Id: <1400249440-31062-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi  Gianluca / Marcel,
+Currently kernel is lacking support for fine grained configuration of
+advertising data but this is ignored for now.
 
-I previously reported the splat below i encountered on boot,
-but haven't had a response yet. It is still present on 3.15-rc5.
+Vendor data is not supported and if it is to be set command will fail.
+This should be implemented when kernel support is added.
+---
+ android/gatt.c | 32 ++++++++++++++++++++++++++++++--
+ 1 file changed, 30 insertions(+), 2 deletions(-)
 
-
-[   78.248869] BUG: spinlock wrong CPU on CPU#3, krfcommd/1500
-[   78.255126]  lock: 0xffff880056d8ded8, .magic: dead4ead, .owner: krfcommd/1500, .owner_cpu: 0
-[   78.261375] CPU: 3 PID: 1500 Comm: krfcommd Not tainted 3.15.0-rc3-20140501-nbdebug5+ #1
-[   78.267767] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS V1.8B1 09/13/2010
-[   78.274173]  ffff880056d8ded8 ffff880057217d18 ffffffff81b8d666 ffff88005f6cfd88
-[   78.280707]  ffff880056c3a3c0 ffff880057217d38 ffffffff81b8974c ffff880056d8ded8
-[   78.287091]  ffffffff81f56fab ffff880057217d58 ffffffff81b89777 ffff880056d8ded8
-[   78.293371] Call Trace:
-[   78.299496]  [<ffffffff81b8d666>] dump_stack+0x46/0x58
-[   78.305601]  [<ffffffff81b8974c>] spin_dump+0x91/0x96
-[   78.311662]  [<ffffffff81b89777>] spin_bug+0x26/0x2b
-[   78.317599]  [<ffffffff8111a5ce>] do_raw_spin_unlock+0xae/0x100
-[   78.323557]  [<ffffffff81b974cb>] _raw_spin_unlock+0x2b/0x40
-[   78.329571]  [<ffffffff81b636d3>] rfcomm_run+0x1063/0x1310
-[   78.335608]  [<ffffffff81b9754d>] ? _raw_spin_unlock_irqrestore+0x6d/0x90
-[   78.341715]  [<ffffffff81b62670>] ? rfcomm_check_accept+0xc0/0xc0
-[   78.347830]  [<ffffffff810ee1a4>] kthread+0xe4/0x100
-[   78.353916]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
-[   78.360121]  [<ffffffff81b9893c>] ret_from_fork+0x7c/0xb0
-[   78.366191]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
-
-
---
-Sander
+diff --git a/android/gatt.c b/android/gatt.c
+index 9bbcc48..067e14e 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3242,10 +3242,38 @@ static void handle_client_get_device_type(const void *buf, uint16_t len)
+ 
+ static void handle_client_set_adv_data(const void *buf, uint16_t len)
+ {
+-	DBG("");
++	const struct hal_cmd_gatt_client_set_adv_data *cmd = buf;
++	uint8_t status;
++
++	if (len != sizeof(*cmd) + cmd->manufacturer_len) {
++		error("Invalid set adv data command (%u bytes), terminating",
++									len);
++		raise(SIGTERM);
++		return;
++	}
++
++	DBG("scan_rsp=%u name=%u tx=%u min=%d max=%d app=%d manufacturer=%u",
++		cmd->set_scan_rsp, cmd->include_name, cmd->include_txpower,
++		cmd->min_interval, cmd->max_interval, cmd->appearance,
++		cmd->manufacturer_len);
++
++	/*
++	 * TODO
++	 * Currently kernel is setting all except for vendor data.
++	 * This should be implemented when kernel supports it.
++	 */
+ 
++	if (cmd->manufacturer_len) {
++		error("gatt: Manufacturer advertising data not supported");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
++	status = HAL_STATUS_SUCCESS;
++
++failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_OP_GATT_CLIENT_SET_ADV_DATA, HAL_STATUS_FAILED);
++				HAL_OP_GATT_CLIENT_SET_ADV_DATA, status);
+ }
+ 
+ static void handle_client_test_command(const void *buf, uint16_t len)
+-- 
+1.9.1
 
