@@ -2,91 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 4/4] android/gatt: Add proper read_remote_rssi implementation
-Date: Fri, 16 May 2014 20:22:49 +0200
-Message-Id: <1400264569-7936-4-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 3/4] android/bluetooth: Add support to read connection RSSI
+Date: Fri, 16 May 2014 20:22:48 +0200
+Message-Id: <1400264569-7936-3-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/gatt.c | 45 ++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 36 insertions(+), 9 deletions(-)
+ android/bluetooth.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/bluetooth.h |  5 +++++
+ 2 files changed, 61 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9d90f3a..a01257f 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3194,11 +3194,35 @@ failed:
- 			HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION, status);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 1e760d4..e1dc965 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -3033,6 +3033,62 @@ bool bt_le_discovery_start(bt_le_device_found cb)
+ 	return false;
  }
  
-+static void send_client_remote_rssi_notify(int32_t client_if,
-+						const bdaddr_t *addr,
-+						int32_t rssi, int32_t status)
++struct read_rssi_user_data {
++	bt_read_device_rssi_done cb;
++	void *user_data;
++};
++
++static void read_device_rssi_cb(uint8_t status, uint16_t length,
++			const void *param, void *user_data)
 +{
-+	struct hal_ev_gatt_client_read_remote_rssi ev;
++	const struct mgmt_rp_get_conn_info *rp = param;
++	struct read_rssi_user_data *data = user_data;
 +
-+	ev.client_if = client_if;
-+	bdaddr2android(addr, &ev.address);
-+	ev.rssi = rssi;
-+	ev.status = status;
++	DBG("");
 +
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
-+}
++	if (status)
++		error("Failed to get conn info: %s (0x%02x))",
++						mgmt_errstr(status), status);
 +
-+static void read_remote_rssi_cb(uint8_t status, const bdaddr_t *addr,
-+						int8_t rssi, void *user_data)
-+{
-+	int32_t client_if = PTR_TO_INT(user_data);
-+	int32_t gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
-+
-+	send_client_remote_rssi_notify(client_if, addr, rssi, gatt_status);
-+}
-+
- static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_read_remote_rssi *cmd = buf;
--	struct hal_ev_gatt_client_read_remote_rssi ev;
- 	uint8_t status;
-+	bdaddr_t bdaddr;
- 
- 	DBG("");
- 
-@@ -3207,20 +3231,23 @@ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	/* TODO fake RSSI until kernel support is added */
--	ev.client_if = cmd->client_if;
--	memcpy(ev.address, cmd->bdaddr, sizeof(ev.address));
--	ev.status = HAL_STATUS_SUCCESS;
--	ev.rssi = -50 - (rand() % 40);
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
-+	android2bdaddr(cmd->bdaddr, &bdaddr);
-+	if (!bt_read_device_rssi(&bdaddr, read_remote_rssi_cb,
-+						INT_TO_PTR(cmd->client_if))) {
-+		error("gatt: Could not read RSSI");
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
++	if (length < sizeof(*rp)) {
++		error("Wrong size of get conn info response");
++		return;
 +	}
- 
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
- 			HAL_OP_GATT_CLIENT_READ_REMOTE_RSSI, status);
 +
-+	if (status != HAL_STATUS_SUCCESS)
-+		send_client_remote_rssi_notify(cmd->client_if, &bdaddr, 0,
-+								GATT_FAILURE);
- }
- 
- static void handle_client_get_device_type(const void *buf, uint16_t len)
++	data->cb(status, &rp->addr.bdaddr, rp->rssi, data->user_data);
++}
++
++bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
++							void *user_data)
++{
++	struct device *dev;
++	struct read_rssi_user_data *data;
++	struct mgmt_cp_get_conn_info cp;
++
++	dev = find_device(addr);
++	if (!dev)
++		return false;
++
++	memcpy(&cp.addr.bdaddr, addr, sizeof(cp.addr.bdaddr));
++	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
++
++	data = new0(struct read_rssi_user_data, 1);
++	if (!data)
++		return false;
++
++	data->cb = cb;
++	data->user_data = user_data;
++
++	if (!mgmt_send(mgmt_if, MGMT_OP_GET_CONN_INFO, adapter.index,
++			sizeof(cp), &cp, read_device_rssi_cb, data, free)) {
++		free(data);
++		error("Failed to get conn info");
++		return false;
++	}
++
++	return true;
++}
++
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
+ {
+ 	const uint8_t *mode = buf;
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 3eef7a4..6a3e766 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -50,3 +50,8 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
+ uint8_t bt_get_device_android_type(const bdaddr_t *addr);
+ const char *bt_get_adapter_name(void);
+ bool bt_device_is_bonded(const bdaddr_t *bdaddr);
++
++typedef void (*bt_read_device_rssi_done)(uint8_t status, const bdaddr_t *addr,
++						int8_t rssi, void *user_data);
++bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
++							void *user_data);
 -- 
 1.9.3
 
