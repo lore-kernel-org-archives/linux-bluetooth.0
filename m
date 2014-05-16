@@ -1,10 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/4] tools: Add conn-info to btmgmt
-Date: Fri, 16 May 2014 17:19:12 +0200
-Message-ID: <1400253554-31574-2-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 4/4] android/gatt: Add proper read_remote_rssi implementation
+Date: Fri, 16 May 2014 17:19:14 +0200
+Message-ID: <1400253554-31574-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400253554-31574-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400253554-31574-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,119 +12,83 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-
 ---
- tools/btmgmt.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 89 insertions(+)
+ android/gatt.c | 45 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 36 insertions(+), 9 deletions(-)
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 48d42a3..0618de1 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -2137,6 +2137,94 @@ static void cmd_debug_keys(struct mgmt *mgmt, uint16_t index,
- 	cmd_setting(mgmt, index, MGMT_OP_SET_DEBUG_KEYS, argc, argv);
+diff --git a/android/gatt.c b/android/gatt.c
+index 9d90f3a..a01257f 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3194,11 +3194,35 @@ failed:
+ 			HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION, status);
  }
  
-+static void conn_info_rsp(uint8_t status, uint16_t len, const void *param,
-+							void *user_data)
++static void send_client_remote_rssi_notify(int32_t client_if,
++						const bdaddr_t *addr,
++						int32_t rssi, int32_t status)
 +{
-+	const struct mgmt_rp_get_conn_info *rp = param;	char addr[18];
++	struct hal_ev_gatt_client_read_remote_rssi ev;
 +
-+	if (len == 0 && status != 0) {
-+		fprintf(stderr, "Get Conn Info failed, status 0x%02x (%s)\n",
-+						status, mgmt_errstr(status));
-+		goto done;
-+	}
++	ev.client_if = client_if;
++	bdaddr2android(addr, &ev.address);
++	ev.rssi = rssi;
++	ev.status = status;
 +
-+	if (len < sizeof(*rp)) {
-+		fprintf(stderr, "Unexpected Get Conn Info len %u\n", len);
-+		goto done;
-+	}
-+
-+	ba2str(&rp->addr.bdaddr, addr);
-+
-+	if (status != 0) {
-+		fprintf(stderr, "Get Conn Info for %s (%s) failed. status 0x%02x (%s)\n",
-+						addr, typestr(rp->addr.type),
-+						status, mgmt_errstr(status));
-+		goto done;
-+	}
-+
-+	printf("Connection Information for %s (%s)\n",
-+						addr, typestr(rp->addr.type));
-+	printf("\tRSSI %d\n\tTX power %d\n\tmaximum TX power %d\n",
-+				rp->rssi, rp->tx_power, rp->max_tx_power);
-+
-+done:
-+	mainloop_quit();
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
 +}
 +
-+static void conn_info_usage(void)
++static void read_remote_rssi_cb(uint8_t status, const bdaddr_t *addr,
++						int8_t rssi, void *user_data)
 +{
-+	printf("Usage: btmgmt conn-info [-t type] <remote address>\n");
++	int32_t client_if = PTR_TO_INT(user_data);
++	int32_t gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
++
++	send_client_remote_rssi_notify(client_if, addr, rssi, gatt_status);
 +}
 +
-+static struct option conn_info_options[] = {
-+	{ "help",	0, 0, 'h' },
-+	{ "type",	1, 0, 't' },
-+	{ 0, 0, 0, 0 }
-+};
-+
-+static void cmd_conn_info(struct mgmt *mgmt, uint16_t index,
-+						int argc, char **argv)
-+{
-+	struct mgmt_cp_get_conn_info cp;
-+	uint8_t type = BDADDR_BREDR;
-+	int opt;
-+
-+	while ((opt = getopt_long(argc, argv, "+t:h", conn_info_options,
-+								NULL)) != -1) {
-+		switch (opt) {
-+		case 't':
-+			type = strtol(optarg, NULL, 0);
-+			break;
-+		case 'h':
-+		default:
-+			conn_info_usage();
-+			exit(EXIT_SUCCESS);
-+		}
-+	}
-+
-+	argc -= optind;
-+	argv += optind;
-+	optind = 0;
-+
-+	if (argc < 1) {
-+		conn_info_usage();
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	str2ba(argv[0], &cp.addr.bdaddr);
-+	cp.addr.type = type;
-+
-+	if (mgmt_send(mgmt, MGMT_OP_GET_CONN_INFO, index, sizeof(cp), &cp,
-+					conn_info_rsp, NULL, NULL) == 0) {
-+		fprintf(stderr, "Unable to send get_conn_info cmd\n");
-+		exit(EXIT_FAILURE);
-+	}
-+}
-+
- static struct {
- 	char *cmd;
- 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
-@@ -2179,6 +2267,7 @@ static struct {
- 	{ "did",	cmd_did,	"Set Device ID"			},
- 	{ "static-addr",cmd_static_addr,"Set static address"		},
- 	{ "debug-keys",	cmd_debug_keys,	"Toogle debug keys"		},
-+	{ "conn-info",	cmd_conn_info,	"Get connection information"	},
- 	{ }
- };
+ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_read_remote_rssi *cmd = buf;
+-	struct hal_ev_gatt_client_read_remote_rssi ev;
+ 	uint8_t status;
++	bdaddr_t bdaddr;
  
+ 	DBG("");
+ 
+@@ -3207,20 +3231,23 @@ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	/* TODO fake RSSI until kernel support is added */
+-	ev.client_if = cmd->client_if;
+-	memcpy(ev.address, cmd->bdaddr, sizeof(ev.address));
+-	ev.status = HAL_STATUS_SUCCESS;
+-	ev.rssi = -50 - (rand() % 40);
+-
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
++	android2bdaddr(cmd->bdaddr, &bdaddr);
++	if (!bt_read_device_rssi(&bdaddr, read_remote_rssi_cb,
++						INT_TO_PTR(cmd->client_if))) {
++		error("gatt: Could not read RSSI");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 			HAL_OP_GATT_CLIENT_READ_REMOTE_RSSI, status);
++
++	if (status != HAL_STATUS_SUCCESS)
++		send_client_remote_rssi_notify(cmd->client_if, &bdaddr, 0,
++								GATT_FAILURE);
+ }
+ 
+ static void handle_client_get_device_type(const void *buf, uint16_t len)
 -- 
 1.9.3
 
