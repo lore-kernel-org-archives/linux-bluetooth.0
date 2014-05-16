@@ -2,179 +2,173 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 09/10] unit/test-att: Add unit test for "Find By Type Value" request/response.
-Date: Fri, 16 May 2014 13:14:57 -0700
-Message-Id: <1400271298-29769-10-git-send-email-armansito@chromium.org>
+Subject: [PATCH v2 08/10] src/shared/att: Add "Find By Type Value" request and response.
+Date: Fri, 16 May 2014 13:14:56 -0700
+Message-Id: <1400271298-29769-9-git-send-email-armansito@chromium.org>
 In-Reply-To: <1400271298-29769-1-git-send-email-armansito@chromium.org>
 References: <1400271298-29769-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Added test cases for the "Find By Type Value" request/response.
+This patch adds support for the "Find By Type Value" request and
+response with their corresponding parameter structures.
 ---
- unit/test-att.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 99 insertions(+), 6 deletions(-)
+ src/shared/att.c | 86 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/att.h | 16 +++++++++++
+ 2 files changed, 102 insertions(+)
 
-diff --git a/unit/test-att.c b/unit/test-att.c
-index f208a45..b9c0bcf 100644
---- a/unit/test-att.c
-+++ b/unit/test-att.c
-@@ -202,7 +202,7 @@ struct request_test_data {
- 	uint16_t resp_param_length;
- 	const void *req_data;
- 	uint16_t req_size;
--	const  void *resp_data;
-+	const void *resp_data;
- 	uint16_t resp_size;
- 	bool (*compare_func)(const void *a, const void *b);
- };
-@@ -235,11 +235,11 @@ static const struct request_test_data request_test_1 = {
- };
+diff --git a/src/shared/att.c b/src/shared/att.c
+index f124731..23af33c 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -208,6 +208,11 @@ static bool handle_find_info_rsp(struct bt_att *att, const uint8_t *pdu,
+ 	struct bt_att_find_information_rsp_param param;
+ 	uint8_t *information_data;
  
- /* Exchange MTU request <-> error response test */
--static const unsigned char exchange_mtu_req_bytes_2[] = { 0x02, 0x32, 0x00 };
-+static const uint8_t exchange_mtu_req_bytes_2[] = { 0x02, 0x32, 0x00 };
- static const struct bt_att_exchange_mtu_req_param exchange_mtu_req_param_2 = {
- 	.client_rx_mtu = 50,
- };
--static const unsigned char exchange_mtu_resp_bytes_2[] = {
-+static const uint8_t exchange_mtu_resp_bytes_2[] = {
- 	0x01, 0x02, 0x00, 0x00, 0x06
- };
- static const struct bt_att_error_rsp_param exchange_mtu_rsp_param_2 = {
-@@ -273,14 +273,14 @@ static bool compare_find_info_rsp(const void *a, const void *b)
- 							p2->length) == 0;
++	/* PDU must contain at least the following:
++	 * - Attribute Opcode (1 octet)
++	 * - Format (1 octet)
++	 * - Information Data (4 to MTU-2 octets)
++	 */
+ 	if (pdu_length < 6)
+ 		return false;
+ 
+@@ -233,6 +238,45 @@ static bool handle_find_info_rsp(struct bt_att *att, const uint8_t *pdu,
+ 	return true;
  }
  
--static const unsigned char find_info_req_bytes[] = {
-+static const uint8_t find_info_req_bytes[] = {
- 	0x04, 0x01, 0x00, 0xff, 0xff
- };
- static const struct bt_att_find_information_req_param find_info_req_param = {
- 	.start_handle = 0x0001,
- 	.end_handle = 0xffff,
- };
--static const unsigned char find_info_resp_bytes_1[] = {
-+static const uint8_t find_info_resp_bytes_1[] = {
- 	0x05, 0x01, 0x01, 0x00, 0x0d, 0x18
- };
- static const uint8_t find_info_resp_information_data_1[] = {
-@@ -306,7 +306,7 @@ static const struct request_test_data request_test_3 = {
- };
- 
- /* Find Information request <-> invalid response */
--static const unsigned char find_info_resp_bytes_2[] = {
-+static const uint8_t find_info_resp_bytes_2[] = {
- 	0x05, 0x01
- };
- 
-@@ -321,6 +321,96 @@ static const struct request_test_data request_test_4 = {
- 	.resp_size = sizeof(find_info_resp_bytes_2),
- };
- 
-+/* Find By Type Value request <-> response */
-+static bool compare_find_by_type_val_rsp(const void *a, const void *b)
++static bool handle_find_by_type_value_rsp(struct bt_att *att,
++							const uint8_t *pdu,
++							uint16_t pdu_length)
 +{
-+	const struct bt_att_find_by_type_value_rsp_param *p1 = a;
-+	const struct bt_att_find_by_type_value_rsp_param *p2 = b;
++	struct bt_att_find_by_type_value_rsp_param param;
++	uint8_t *handles_info_list;
 +
-+	if (p1->length != p2->length)
++	/* PDU must contain at least the following:
++	 * - Attribute Opcode (1 octet)
++	 * - Handles Information List (4 to MTU-1 octets)
++	 */
++	if (pdu_length < 5)
 +		return false;
 +
-+	return memcmp(p1->handles_information_list,
-+				p2->handles_information_list, p2->length) == 0;
++	/* Each Handle Information field is composed of 4 octets. Return error,
++	 * if the length of the field is not a multiple of 4.
++	 */
++	if ((pdu_length - 1) % 4)
++		return false;
++
++	memset(&param, 0, sizeof(param));
++
++	param.length = pdu_length - 1;
++	handles_info_list = malloc(param.length);
++	if (!handles_info_list)
++		return false;
++
++	memcpy(handles_info_list, pdu + 1, param.length);
++
++	param.handles_information_list = handles_info_list;
++
++	request_complete(att, BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ, pdu[0], &param,
++								sizeof(param));
++
++	free(handles_info_list);
++
++	return true;
 +}
 +
-+static const uint8_t find_by_type_val_req_bytes_1[] = {
-+	0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28, 0x01, 0x02, 0x03, 0x04
-+};
-+static const uint8_t find_by_type_val_req_att_value[] = {
-+	0x01, 0x02, 0x03, 0x04
-+};
-+static const struct bt_att_find_by_type_value_req_param
-+						find_by_type_val_rqp_1 = {
-+	.start_handle = 0x0001,
-+	.end_handle = 0xffff,
-+	.type = 0x2800,
-+	.value = find_by_type_val_req_att_value,
-+	.length = sizeof(find_by_type_val_req_att_value),
-+};
-+static const uint8_t find_by_type_val_rsp_bytes_1[] = {
-+	0x07, 0x01, 0x00, 0x02, 0x00, 0x02, 0x00, 0x03, 0x00
-+};
-+static const struct bt_att_find_by_type_value_rsp_param find_by_type_val_rpp = {
-+	.handles_information_list = find_by_type_val_rsp_bytes_1 + 1,
-+	.length = sizeof(find_by_type_val_rsp_bytes_1) - 1,
-+};
-+
-+static const struct request_test_data request_test_5 = {
-+	.req_opcode = BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ,
-+	.req_param = &find_by_type_val_rqp_1,
-+	.req_param_length = sizeof(find_by_type_val_rqp_1),
-+	.resp_opcode = BT_ATT_OP_FIND_BY_TYPE_VALUE_RESP,
-+	.resp_param = &find_by_type_val_rpp,
-+	.resp_param_length = sizeof(find_by_type_val_rpp),
-+	.req_data = find_by_type_val_req_bytes_1,
-+	.req_size = sizeof(find_by_type_val_req_bytes_1),
-+	.resp_data = find_by_type_val_rsp_bytes_1,
-+	.resp_size = sizeof(find_by_type_val_rsp_bytes_1),
-+	.compare_func = compare_find_by_type_val_rsp,
-+};
-+
-+/* Find By Type Value request <-> invalid response */
-+static const uint8_t find_by_type_val_rsp_bytes_2[] = {
-+	0x07, 0x01, 0x00, 0x02
-+};
-+
-+static const struct request_test_data request_test_6 = {
-+	.req_opcode = BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ,
-+	.req_param = &find_by_type_val_rqp_1,
-+	.req_param_length = sizeof(find_by_type_val_rqp_1),
-+	.resp_opcode = BT_ATT_OP_ERROR_RESP,
-+	.req_data = find_by_type_val_req_bytes_1,
-+	.req_size = sizeof(find_by_type_val_req_bytes_1),
-+	.resp_data = find_by_type_val_rsp_bytes_2,
-+	.resp_size = sizeof(find_by_type_val_rsp_bytes_2),
-+};
-+
-+/* Find By Type Value request no value <-> response */
-+static const uint8_t find_by_type_val_req_bytes_2[] = {
-+	0x06, 0x01, 0x00, 0xff, 0xff, 0x00, 0x28
-+};
-+static const struct bt_att_find_by_type_value_req_param
-+						find_by_type_val_rqp_2 = {
-+	.start_handle = 0x0001,
-+	.end_handle = 0xffff,
-+	.type = 0x2800,
-+};
-+
-+static const struct request_test_data request_test_7 = {
-+	.req_opcode = BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ,
-+	.req_param = &find_by_type_val_rqp_2,
-+	.req_param_length = sizeof(find_by_type_val_rqp_2),
-+	.resp_opcode = BT_ATT_OP_FIND_BY_TYPE_VALUE_RESP,
-+	.resp_param = &find_by_type_val_rpp,
-+	.resp_param_length = sizeof(find_by_type_val_rpp),
-+	.req_data = find_by_type_val_req_bytes_2,
-+	.req_size = sizeof(find_by_type_val_req_bytes_2),
-+	.resp_data = find_by_type_val_rsp_bytes_1,
-+	.resp_size = sizeof(find_by_type_val_rsp_bytes_1),
-+	.compare_func = compare_find_by_type_val_rsp,
-+};
-+
- static void test_request_callback(uint8_t opcode, const void *param,
- 					uint16_t length, void *user_data)
+ static bool handle_response(struct bt_att *att, const uint8_t *pdu,
+ 							uint16_t pdu_length)
  {
-@@ -376,6 +466,9 @@ int main(int argc, char *argv[])
- 	g_test_add_data_func("/att/request/2", &request_test_2, test_request);
- 	g_test_add_data_func("/att/request/3", &request_test_3, test_request);
- 	g_test_add_data_func("/att/request/4", &request_test_4, test_request);
-+	g_test_add_data_func("/att/request/5", &request_test_5, test_request);
-+	g_test_add_data_func("/att/request/6", &request_test_6, test_request);
-+	g_test_add_data_func("/att/request/7", &request_test_7, test_request);
+@@ -257,6 +301,13 @@ static bool handle_response(struct bt_att *att, const uint8_t *pdu,
+ 		}
+ 		return true;
  
- 	return g_test_run();
++	case BT_ATT_OP_FIND_BY_TYPE_VALUE_RESP:
++		if (!handle_find_by_type_value_rsp(att, pdu, pdu_length)) {
++			req_opcode = BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ;
++			goto fail;
++		}
++		return true;
++
+ 	default:
+ 		break;
+ 	}
+@@ -493,6 +544,37 @@ static bool encode_find_info_req(const void *param, uint16_t length, void *buf,
+ 	return true;
  }
+ 
++static bool encode_find_by_type_value_req(const void *param, uint16_t length,
++							void *buf, uint16_t mtu,
++							uint16_t *pdu_length)
++{
++	const struct bt_att_find_by_type_value_req_param *cp = param;
++	const uint16_t len =  7 + cp->length;
++	uint8_t *bytes = buf;
++
++	if (length != sizeof(*cp))
++		return false;
++
++	if (len > mtu)
++		return false;
++
++	put_le16(cp->start_handle, bytes + 1);
++	put_le16(cp->end_handle, bytes + 3);
++	put_le16(cp->type, bytes + 5);
++
++	*pdu_length = len;
++
++	if (cp->length == 0)
++		return true;
++
++	if (!cp->value)
++		return false;
++
++	memcpy(bytes + 7, cp->value, cp->length);
++
++	return true;
++}
++
+ static bool encode_pdu(uint8_t opcode, const void *param, uint16_t length,
+ 				uint16_t mtu, void *pdu, uint16_t *pdu_length)
+ {
+@@ -521,6 +603,10 @@ static bool encode_pdu(uint8_t opcode, const void *param, uint16_t length,
+ 		return encode_find_info_req(param, length, bytes,
+ 							mtu, pdu_length);
+ 
++	if (opcode == BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ)
++		return encode_find_by_type_value_req(param, length, bytes,
++							mtu, pdu_length);
++
+ 	return false;
+ }
+ 
+diff --git a/src/shared/att.h b/src/shared/att.h
+index 16d852d..8649c25 100644
+--- a/src/shared/att.h
++++ b/src/shared/att.h
+@@ -57,6 +57,22 @@ struct bt_att_find_information_rsp_param {
+ 	uint16_t length;
+ };
+ 
++/* Find By Type Value */
++#define BT_ATT_OP_FIND_BY_TYPE_VALUE_REQ	0x06
++struct bt_att_find_by_type_value_req_param {
++	uint16_t start_handle;
++	uint16_t end_handle;
++	uint16_t type;  /* 2 octet UUID */
++	const uint8_t *value;
++	uint16_t length;  /* MAX length: (ATT_MTU - 7) */
++};
++
++#define BT_ATT_OP_FIND_BY_TYPE_VALUE_RESP	0x07
++struct bt_att_find_by_type_value_rsp_param {
++	const uint8_t *handles_information_list;
++	uint16_t length;
++};
++
+ /* Error codes for Error response PDU */
+ #define BT_ATT_ERROR_INVALID_HANDLE			0x01
+ #define BT_ATT_ERROR_READ_NOT_PERMITTED			0x02
 -- 
 1.8.3.2
 
