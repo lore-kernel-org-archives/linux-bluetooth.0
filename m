@@ -1,41 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix for read request
-Date: Fri, 16 May 2014 14:36:34 +0200
-Message-ID: <43760990.aZUY7d9jVI@uw000953>
-In-Reply-To: <1400237252-3968-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400237252-3968-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH] shared/gatt: Fix freeing uninitialized attributes
+Date: Fri, 16 May 2014 14:36:18 +0200
+Message-ID: <2765194.znkhuiMyg3@uw000953>
+In-Reply-To: <1400234827-24438-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1400234827-24438-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Marcin,
 
-On Friday 16 of May 2014 12:47:32 Lukasz Rymanowski wrote:
-> If there is no attribute in database we should return immediately.
+On Friday 16 of May 2014 12:07:07 Marcin Kraglak wrote:
+> Don't free uninitialized attributes. It could cause NULL pointer
+> dereference.
 > ---
->  android/gatt.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  src/shared/gatt-db.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 9bbcc48..9d90f3a 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -3656,8 +3656,10 @@ static void read_requested_attributes(void *data, void *user_data)
->  						resp_data->offset,
->  						process_data->opcode,
->  						&process_data->device->bdaddr,
-> -						&value, &value_len))
-> +						&value, &value_len)) {
->  		resp_data->length = READ_FAILED;
-> +		return;
-> +	}
+> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> index d9f63be..36316af 100644
+> --- a/src/shared/gatt-db.c
+> +++ b/src/shared/gatt-db.c
+> @@ -99,6 +99,10 @@ static void attribute_destroy(void *data)
+>  {
+>  	struct gatt_db_attribute *attribute = data;
 >  
->  	/* We have value here already if no callback will be called */
->  	if (value_len >= 0) {
+> +	/* Attribute was not initialized by user */
+> +	if (!attribute)
+> +		return;
+> +
+>  	free(attribute->value);
+>  	free(attribute);
+>  }
 > 
 
 Applied, thanks.
