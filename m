@@ -1,100 +1,128 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 3/4] android/bluetooth: Add support to read connection RSSI
-Date: Fri, 16 May 2014 20:22:48 +0200
-Message-Id: <1400264569-7936-3-git-send-email-andrzej.kaczmarek@tieto.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/4] tools: Add conn-info to btmgmt
+Date: Fri, 16 May 2014 20:22:47 +0200
+Message-Id: <1400264569-7936-2-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/bluetooth.c | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |  5 +++++
- 2 files changed, 61 insertions(+)
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 1e760d4..e1dc965 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -3033,6 +3033,62 @@ bool bt_le_discovery_start(bt_le_device_found cb)
- 	return false;
+---
+ tools/btmgmt.c | 89 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 89 insertions(+)
+
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 48d42a3..0618de1 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -2137,6 +2137,94 @@ static void cmd_debug_keys(struct mgmt *mgmt, uint16_t index,
+ 	cmd_setting(mgmt, index, MGMT_OP_SET_DEBUG_KEYS, argc, argv);
  }
  
-+struct read_rssi_user_data {
-+	bt_read_device_rssi_done cb;
-+	void *user_data;
-+};
-+
-+static void read_device_rssi_cb(uint8_t status, uint16_t length,
-+			const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_get_conn_info *rp = param;
-+	struct read_rssi_user_data *data = user_data;
-+
-+	DBG("");
-+
-+	if (status)
-+		error("Failed to get conn info: %s (0x%02x))",
-+						mgmt_errstr(status), status);
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of get conn info response");
-+		return;
-+	}
-+
-+	data->cb(status, &rp->addr.bdaddr, rp->rssi, data->user_data);
-+}
-+
-+bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
++static void conn_info_rsp(uint8_t status, uint16_t len, const void *param,
 +							void *user_data)
 +{
-+	struct device *dev;
-+	struct read_rssi_user_data *data;
-+	struct mgmt_cp_get_conn_info cp;
++	const struct mgmt_rp_get_conn_info *rp = param;	char addr[18];
 +
-+	dev = find_device(addr);
-+	if (!dev)
-+		return false;
-+
-+	memcpy(&cp.addr.bdaddr, addr, sizeof(cp.addr.bdaddr));
-+	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
-+
-+	data = new0(struct read_rssi_user_data, 1);
-+	if (!data)
-+		return false;
-+
-+	data->cb = cb;
-+	data->user_data = user_data;
-+
-+	if (!mgmt_send(mgmt_if, MGMT_OP_GET_CONN_INFO, adapter.index,
-+			sizeof(cp), &cp, read_device_rssi_cb, data, free)) {
-+		free(data);
-+		error("Failed to get conn info");
-+		return false;
++	if (len == 0 && status != 0) {
++		fprintf(stderr, "Get Conn Info failed, status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++		goto done;
 +	}
 +
-+	return true;
++	if (len < sizeof(*rp)) {
++		fprintf(stderr, "Unexpected Get Conn Info len %u\n", len);
++		goto done;
++	}
++
++	ba2str(&rp->addr.bdaddr, addr);
++
++	if (status != 0) {
++		fprintf(stderr, "Get Conn Info for %s (%s) failed. status 0x%02x (%s)\n",
++						addr, typestr(rp->addr.type),
++						status, mgmt_errstr(status));
++		goto done;
++	}
++
++	printf("Connection Information for %s (%s)\n",
++						addr, typestr(rp->addr.type));
++	printf("\tRSSI %d\n\tTX power %d\n\tmaximum TX power %d\n",
++				rp->rssi, rp->tx_power, rp->max_tx_power);
++
++done:
++	mainloop_quit();
 +}
 +
- static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
- {
- 	const uint8_t *mode = buf;
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 3eef7a4..6a3e766 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -50,3 +50,8 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- uint8_t bt_get_device_android_type(const bdaddr_t *addr);
- const char *bt_get_adapter_name(void);
- bool bt_device_is_bonded(const bdaddr_t *bdaddr);
++static void conn_info_usage(void)
++{
++	printf("Usage: btmgmt conn-info [-t type] <remote address>\n");
++}
 +
-+typedef void (*bt_read_device_rssi_done)(uint8_t status, const bdaddr_t *addr,
-+						int8_t rssi, void *user_data);
-+bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
-+							void *user_data);
++static struct option conn_info_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "type",	1, 0, 't' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_conn_info(struct mgmt *mgmt, uint16_t index,
++						int argc, char **argv)
++{
++	struct mgmt_cp_get_conn_info cp;
++	uint8_t type = BDADDR_BREDR;
++	int opt;
++
++	while ((opt = getopt_long(argc, argv, "+t:h", conn_info_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++		default:
++			conn_info_usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		conn_info_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++
++	if (mgmt_send(mgmt, MGMT_OP_GET_CONN_INFO, index, sizeof(cp), &cp,
++					conn_info_rsp, NULL, NULL) == 0) {
++		fprintf(stderr, "Unable to send get_conn_info cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
+@@ -2179,6 +2267,7 @@ static struct {
+ 	{ "did",	cmd_did,	"Set Device ID"			},
+ 	{ "static-addr",cmd_static_addr,"Set static address"		},
+ 	{ "debug-keys",	cmd_debug_keys,	"Toogle debug keys"		},
++	{ "conn-info",	cmd_conn_info,	"Get connection information"	},
+ 	{ }
+ };
+ 
 -- 
 1.9.3
 
