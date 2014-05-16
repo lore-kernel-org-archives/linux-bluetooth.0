@@ -1,34 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/gatt: Fix for read request
-Date: Fri, 16 May 2014 12:47:32 +0200
-Message-Id: <1400237252-3968-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH] shared/gatt: Fix freeing uninitialized attributes
+Date: Fri, 16 May 2014 12:07:07 +0200
+Message-Id: <1400234827-24438-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If there is no attribute in database we should return immediately.
+Don't free uninitialized attributes. It could cause NULL pointer
+dereference.
 ---
- android/gatt.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ src/shared/gatt-db.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9bbcc48..9d90f3a 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3656,8 +3656,10 @@ static void read_requested_attributes(void *data, void *user_data)
- 						resp_data->offset,
- 						process_data->opcode,
- 						&process_data->device->bdaddr,
--						&value, &value_len))
-+						&value, &value_len)) {
- 		resp_data->length = READ_FAILED;
-+		return;
-+	}
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index d9f63be..36316af 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -99,6 +99,10 @@ static void attribute_destroy(void *data)
+ {
+ 	struct gatt_db_attribute *attribute = data;
  
- 	/* We have value here already if no callback will be called */
- 	if (value_len >= 0) {
++	/* Attribute was not initialized by user */
++	if (!attribute)
++		return;
++
+ 	free(attribute->value);
+ 	free(attribute);
+ }
 -- 
-1.8.4
+1.9.0
 
