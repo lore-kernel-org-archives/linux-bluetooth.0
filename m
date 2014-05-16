@@ -1,116 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/4] android/gatt: Add support to read connection RSSI
-Date: Fri, 16 May 2014 19:42:01 +0200
-Message-ID: <1769707.WSk76j6M5p@athlon>
-In-Reply-To: <1400253554-31574-3-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1400253554-31574-1-git-send-email-andrzej.kaczmarek@tieto.com> <1400253554-31574-3-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Marcin Kraglak <marcin.kraglak@tieto.com>, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] shared/gatt: Fix freeing uninitialized attributes
+Date: Fri, 16 May 2014 18:24:22 +0200
+Message-ID: <1987880.BnWgK9kt0s@athlon>
+In-Reply-To: <9A0C0D87-616B-4D33-A61F-85E5F954B77A@holtmann.org>
+References: <1400234827-24438-1-git-send-email-marcin.kraglak@tieto.com> <9A0C0D87-616B-4D33-A61F-85E5F954B77A@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Hi Marcel,
 
-Prefix should be android/bluetooth:
-
-On Friday 16 May 2014 17:19:13 Andrzej Kaczmarek wrote:
-> ---
->  android/bluetooth.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
-> android/bluetooth.h |  5 +++++
->  2 files changed, 55 insertions(+)
+On Friday 16 May 2014 08:17:25 Marcel Holtmann wrote:
+> Hi Marcin,
 > 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 1e760d4..ee33676 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -3033,6 +3033,56 @@ bool bt_le_discovery_start(bt_le_device_found cb)
->  	return false;
->  }
+> > Don't free uninitialized attributes. It could cause NULL pointer
+> > dereference.
+> > ---
+> > src/shared/gatt-db.c | 4 ++++
+> > 1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+> > index d9f63be..36316af 100644
+> > --- a/src/shared/gatt-db.c
+> > +++ b/src/shared/gatt-db.c
+> > @@ -99,6 +99,10 @@ static void attribute_destroy(void *data)
+> > {
+> > 
+> > 	struct gatt_db_attribute *attribute = data;
+> > 
+> > +	/* Attribute was not initialized by user */
+> > +	if (!attribute)
+> > +		return;
+> > +
+> > 
+> > 	free(attribute->value);
+> > 	free(attribute);
 > 
-> +struct read_rssi_user_data {
-> +	bt_read_device_rssi_done cb;
-> +	void *user_data;
-> +};
-> +
-> +static void read_device_rssi_cb(uint8_t status, uint16_t length,
-> +			const void *param, void *user_data)
-> +{
-> +	const struct mgmt_rp_get_conn_info *rp = param;
-> +	struct read_rssi_user_data *data = user_data;
-> +
-> +	DBG("");
-> +
-> +	if (status)
-> +		error("Failed to get conn info: %s (0x%02x))",
-> +						mgmt_errstr(status), status);
-> +
-> +	data->cb(status, &rp->addr.bdaddr, rp->rssi, data->user_data);
+> I think the real question is why a function with void *data is called with a
+> NULL pointer in the first place. That is the thing you should fix and not
+> hack around this by doing a NULL check. So this is clearly a function that
+> you gave to callback somehow, fix that part. I do not remember any of the
+> code in src/shared/ that has the destroy callbacks requiring any of this.
+> We are expecting that data is valid.
 
-This will crash if kernel doesn't support this command.
-Since we will add dependency on required mgmt version eventually, I think it 
-should be enough to bail out if size doesn't match.
+This is due to attributes[] in struct gatt_db_service might not be fully used 
+by user (we preallocate handles). But since attribute_destroy() is used only 
+from gatt_db_service_destroy() maybe it would be better to check if pointer is 
+not NULL there since checking this inside gatt_db_service_destroy() would be 
+easier to follow.
 
-	if (length < sizeof(*rp)) {
-		error("Wrong size of get connection info response");
-		return;
-	}
+Something like this maybe: ?
 
-> +}
-> +
-> +bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
-> +							void *user_data)
-> +{
-> +	struct device *dev;
-> +	struct read_rssi_user_data *data;
-> +	struct mgmt_cp_get_conn_info cp;
-> +
-> +	/* type is used only as fallback when device is not in cache */
-> +	dev = get_device(addr, BDADDR_BREDR);
+-static void attribute_destroy(void *data)
++static void attribute_destroy(struct gatt_db_attribute *attribute)
+ {
+-       struct gatt_db_attribute *attribute = data;
+-
+-       /* Attribute was not initialized by user */
+-       if (!attribute)
+-               return;
+-
+        free(attribute->value);
+        free(attribute);
+ }
+@@ -131,8 +125,13 @@ static void gatt_db_service_destroy(void *data)
+        struct gatt_db_service *service = data;
+        int i;
+ 
+-       for (i = 0; i < service->num_handles; i++)
++       for (i = 0; i < service->num_handles; i++) {
++               /* Attribute was not initialized by user */
++               if (!service->attributes[i])
++                       continue;
++
+                attribute_destroy(service->attributes[i]);
++       }
 
-I think we can use find_dev() and fail if none is found, it should be 
-connected after in first place.
 
-> +
-> +	memcpy(&cp.addr.bdaddr, addr, sizeof(cp.addr.bdaddr));
-> +	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
-> +
-> +	data = new0(struct read_rssi_user_data, 1);
-> +	if (!data)
-> +		return false;
-> +
-> +	data->cb = cb;
-> +	data->user_data = user_data;
-> +
-> +	if (!mgmt_send(mgmt_if, MGMT_OP_GET_CONN_INFO, adapter.index,
-> +			sizeof(cp), &cp, read_device_rssi_cb, data, free)) {
-> +		free(data);
-> +		error("Failed to get conn info");
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
->  {
->  	const uint8_t *mode = buf;
-> diff --git a/android/bluetooth.h b/android/bluetooth.h
-> index 3eef7a4..6a3e766 100644
-> --- a/android/bluetooth.h
-> +++ b/android/bluetooth.h
-> @@ -50,3 +50,8 @@ bool bt_le_set_advertising(bool advertising,
-> bt_le_set_advertising_done cb, uint8_t bt_get_device_android_type(const
-> bdaddr_t *addr);
->  const char *bt_get_adapter_name(void);
->  bool bt_device_is_bonded(const bdaddr_t *bdaddr);
-> +
-> +typedef void (*bt_read_device_rssi_done)(uint8_t status, const bdaddr_t
-> *addr, +						int8_t rssi, void *user_data);
-> +bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
-> +							void *user_data);
+
 
 -- 
 Szymon K. Janc
