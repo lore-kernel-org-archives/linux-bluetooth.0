@@ -1,51 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 16 May 2014 18:03:45 +0200
-From: Sander Eikelenboom <linux@eikelenboom.it>
-Message-ID: <532656177.20140516180345@eikelenboom.it>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: gianluca@sottospazio.it, linux-bluetooth@vger.kernel.org
-Subject: Re: BUG: spinlock wrong CPU on CPU#3, krfcommd/1500 (resend)
-In-Reply-To: <25887AA2-0BA2-4BD1-ACA6-C43E34F1284B@holtmann.org>
-References: <1433096136.20140516162252@eikelenboom.it> <25887AA2-0BA2-4BD1-ACA6-C43E34F1284B@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.2 \(1874\))
+Subject: Re: [PATCH] Bluetooth: Add missing msecs to jiffies conversion
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1400251737-16342-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Fri, 16 May 2014 08:23:50 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6F8EDDDA-9905-4FD6-853D-3E0105285121@holtmann.org>
+References: <1400251737-16342-1-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Andrzej,
 
-Friday, May 16, 2014, 5:20:54 PM, you wrote:
+> conn_info_age value is calculated in ms, so need to be converted to
+> jiffies.
+> 
+> Signed-off-by: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+> ---
+> net/bluetooth/mgmt.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> Hi Sander,
+patch has been applied to bluetooth-next tree.
 
->> I previously reported the splat below i encountered on boot,
->> but haven't had a response yet. It is still present on 3.15-rc5.
->> 
->> 
->> [   78.248869] BUG: spinlock wrong CPU on CPU#3, krfcommd/1500
->> [   78.255126]  lock: 0xffff880056d8ded8, .magic: dead4ead, .owner: krfcommd/1500, .owner_cpu: 0
->> [   78.261375] CPU: 3 PID: 1500 Comm: krfcommd Not tainted 3.15.0-rc3-20140501-nbdebug5+ #1
->> [   78.267767] Hardware name: MSI MS-7640/890FXA-GD70 (MS-7640)  , BIOS V1.8B1 09/13/2010
->> [   78.274173]  ffff880056d8ded8 ffff880057217d18 ffffffff81b8d666 ffff88005f6cfd88
->> [   78.280707]  ffff880056c3a3c0 ffff880057217d38 ffffffff81b8974c ffff880056d8ded8
->> [   78.287091]  ffffffff81f56fab ffff880057217d58 ffffffff81b89777 ffff880056d8ded8
->> [   78.293371] Call Trace:
->> [   78.299496]  [<ffffffff81b8d666>] dump_stack+0x46/0x58
->> [   78.305601]  [<ffffffff81b8974c>] spin_dump+0x91/0x96
->> [   78.311662]  [<ffffffff81b89777>] spin_bug+0x26/0x2b
->> [   78.317599]  [<ffffffff8111a5ce>] do_raw_spin_unlock+0xae/0x100
->> [   78.323557]  [<ffffffff81b974cb>] _raw_spin_unlock+0x2b/0x40
->> [   78.329571]  [<ffffffff81b636d3>] rfcomm_run+0x1063/0x1310
->> [   78.335608]  [<ffffffff81b9754d>] ? _raw_spin_unlock_irqrestore+0x6d/0x90
->> [   78.341715]  [<ffffffff81b62670>] ? rfcomm_check_accept+0xc0/0xc0
->> [   78.347830]  [<ffffffff810ee1a4>] kthread+0xe4/0x100
->> [   78.353916]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
->> [   78.360121]  [<ffffffff81b9893c>] ret_from_fork+0x7c/0xb0
->> [   78.366191]  [<ffffffff810ee0c0>] ? __init_kthread_worker+0x70/0x70
+Regards
 
-> can you bisect which patch has introduced this issue. It is the first time I see it.
+Marcel
 
-Well i can try, but the baseline of 3.14.x still has that nice lockdep splat thing.
-
-
-> Regards
-
-> Marcel
