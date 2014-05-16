@@ -1,68 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140516140056.GA26830@t440s.P-661HNU-F1>
-References: <1400247195-23530-1-git-send-email-jakub.tyszkowski@tieto.com>
-	<20140516140056.GA26830@t440s.P-661HNU-F1>
-Date: Fri, 16 May 2014 21:44:53 +0200
-Message-ID: <CANmD6r24G29P3_vuw1RNmy3qDncwZpytZV3Z8K=QeWgL=zUs+w@mail.gmail.com>
-Subject: Re: [PATCH] android/gatt: Send Exchange MTU request on connect
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>,
-	BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 4/4] android/gatt: Add proper read_remote_rssi implementation
+Date: Fri, 16 May 2014 20:22:49 +0200
+Message-Id: <1400264569-7936-4-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ android/gatt.c | 45 ++++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 36 insertions(+), 9 deletions(-)
 
-On 16 May 2014 16:00, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Jakub,
->
-> On Fri, May 16, 2014, Jakub Tyszkowski wrote:
->> According to spec: "This request shall only be sent once during a
->> connection by the client." This is needed to pass TC_GAC_CL_BV_01_C.
->> ---
->>  android/gatt.c | 14 ++++++++++++++
->>  1 file changed, 14 insertions(+)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index 283bb6d..15fdb98 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -978,6 +978,18 @@ static void send_app_connect_notifications(void *data, void *user_data)
->>
->>  static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data);
->>
->> +static void send_exchange_mtu_request(struct gatt_device *device,
->> +                                                     uint16_t mtu_size)
->> +{
->> +     uint8_t req[ATT_DEFAULT_LE_MTU];
->> +     uint16_t len = 0;
->> +
->> +     len = enc_mtu_req(mtu_size, req, ATT_DEFAULT_LE_MTU);
->> +     if (len) {
->> +             g_attrib_send(device->attrib, 0, req, len, NULL, NULL, NULL);
->> +     }
->
-> No braces needed for one-line branches.
->
->> +}
->> +
->>  static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->>  {
->>       struct gatt_device *dev = user_data;
->> @@ -1023,6 +1035,8 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
->>
->>       status = GATT_SUCCESS;
->>
->> +     send_exchange_mtu_request(dev, ATT_DEFAULT_LE_MTU);
->
-> I'd have expected you to use gatt_exchange_mtu() with the actual MTU
-> value from the socket and have a similar callback with similar logic as
-> exchange_mtu_cb() in profiles/gatt/gas.c.  Why is this not needed?
->
-> Johan
+diff --git a/android/gatt.c b/android/gatt.c
+index 9d90f3a..a01257f 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3194,11 +3194,35 @@ failed:
+ 			HAL_OP_GATT_CLIENT_DEREGISTER_FOR_NOTIFICATION, status);
+ }
+ 
++static void send_client_remote_rssi_notify(int32_t client_if,
++						const bdaddr_t *addr,
++						int32_t rssi, int32_t status)
++{
++	struct hal_ev_gatt_client_read_remote_rssi ev;
++
++	ev.client_if = client_if;
++	bdaddr2android(addr, &ev.address);
++	ev.rssi = rssi;
++	ev.status = status;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
++}
++
++static void read_remote_rssi_cb(uint8_t status, const bdaddr_t *addr,
++						int8_t rssi, void *user_data)
++{
++	int32_t client_if = PTR_TO_INT(user_data);
++	int32_t gatt_status = status ? GATT_FAILURE : GATT_SUCCESS;
++
++	send_client_remote_rssi_notify(client_if, addr, rssi, gatt_status);
++}
++
+ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_read_remote_rssi *cmd = buf;
+-	struct hal_ev_gatt_client_read_remote_rssi ev;
+ 	uint8_t status;
++	bdaddr_t bdaddr;
+ 
+ 	DBG("");
+ 
+@@ -3207,20 +3231,23 @@ static void handle_client_read_remote_rssi(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
+-	/* TODO fake RSSI until kernel support is added */
+-	ev.client_if = cmd->client_if;
+-	memcpy(ev.address, cmd->bdaddr, sizeof(ev.address));
+-	ev.status = HAL_STATUS_SUCCESS;
+-	ev.rssi = -50 - (rand() % 40);
+-
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+-			HAL_EV_GATT_CLIENT_READ_REMOTE_RSSI, sizeof(ev), &ev);
++	android2bdaddr(cmd->bdaddr, &bdaddr);
++	if (!bt_read_device_rssi(&bdaddr, read_remote_rssi_cb,
++						INT_TO_PTR(cmd->client_if))) {
++		error("gatt: Could not read RSSI");
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
+ 
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 			HAL_OP_GATT_CLIENT_READ_REMOTE_RSSI, status);
++
++	if (status != HAL_STATUS_SUCCESS)
++		send_client_remote_rssi_notify(cmd->client_if, &bdaddr, 0,
++								GATT_FAILURE);
+ }
+ 
+ static void handle_client_get_device_type(const void *buf, uint16_t len)
+-- 
+1.9.3
 
-Umm... this was mindless indeed. I'll do this the right way in v2.
-
-Jakub
