@@ -2,48 +2,136 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/4] android/hal: Fix sending not initialised data
-Date: Fri, 16 May 2014 13:00:40 +0200
-Message-Id: <1400238042-16015-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1400238042-16015-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1400238042-16015-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/4] android/gatt: Handle Androids read/write responses in response queue
+Date: Fri, 16 May 2014 13:00:39 +0200
+Message-Id: <1400238042-16015-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-As we always send whole gatt_response_t struct through IPC,
-but copy only cmd->len bytes, the rest should be initilised to 0.
-
-This fixes the following issue:
-==30585== Syscall param socketcall.sendmsg(msg.msg_iov[i]) points
-to uninitialised byte(s)
-==30585==    at 0x534133D: ??? (syscall-template.S:82)
-==30585==    by 0x7756336: hal_ipc_cmd (hal-ipc.c:359)
-==30585==    by 0x77546DF: send_response.part.0 (hal-gatt.c:1247)
-==30585==    by 0x408119: gatts_send_response_p (if-gatt.c:1777)
-==30585==    by 0x40219F: process_line (haltest.c:293)
-==30585==    by 0x402552: terminal_action_enter (terminal.c:666)
-==30585==    by 0x403184: terminal_process_char (terminal.c:781)
-==30585==    by 0x401B90: stdin_handler (haltest.c:308)
-==30585==    by 0x402261: poll_dispatch_loop (pollhandler.c:60)
-==30585==    by 0x401870: main (haltest.c:441)
-==30585==  Address 0x7fefff2a3 is on thread 1's stack
+This is needed for reads like "read by type" to support Android
+responses, callback reads and direct db reads in a single request.
 ---
- android/hal-gatt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/gatt.c | 88 ++++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 58 insertions(+), 30 deletions(-)
 
-diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-index e1faccb..93dc066 100644
---- a/android/hal-gatt.c
-+++ b/android/hal-gatt.c
-@@ -1231,6 +1231,8 @@ static bt_status_t send_response(int conn_id, int trans_id, int status,
- 	struct hal_cmd_gatt_server_send_response *cmd = (void *) buf;
- 	size_t cmd_len = sizeof(*cmd) + sizeof(*response);
+diff --git a/android/gatt.c b/android/gatt.c
+index 9bbcc48..20850af 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3610,6 +3610,37 @@ static void send_dev_pending_response(struct gatt_device *device,
  
-+	memset(buf, 0 , IPC_MTU);
+ 		break;
+ 	}
++	case ATT_OP_EXEC_WRITE_REQ:
++		val = queue_pop_head(device->pending_requests);
++		if (!val) {
++			error = ATT_ECODE_ATTR_NOT_FOUND;
++			break;
++		}
 +
- 	if (!interface_ready())
- 		return BT_STATUS_NOT_READY;
++		len = enc_exec_write_resp(rsp);
++		destroy_pending_request(val);
++		break;
++	case ATT_OP_WRITE_REQ:
++		val = queue_pop_head(device->pending_requests);
++		if (!val) {
++			error = ATT_ECODE_ATTR_NOT_FOUND;
++			break;
++		}
++
++		len = enc_write_resp(rsp);
++		destroy_pending_request(val);
++		break;
++	case ATT_OP_PREP_WRITE_REQ:
++		val = queue_pop_head(device->pending_requests);
++		if (!val) {
++			error = ATT_ECODE_ATTR_NOT_FOUND;
++			break;
++		}
++
++		len = enc_prep_write_resp(val->handle, val->offset, val->value,
++						val->length, rsp, sizeof(rsp));
++		destroy_pending_request(val);
++		break;
+ 	default:
+ 		break;
+ 	}
+@@ -3698,48 +3729,45 @@ static void send_gatt_response(uint8_t opcode, uint16_t handle,
+ 					bdaddr_t *bdaddr)
+ {
+ 	struct gatt_device *dev;
+-	uint16_t length;
+-	uint8_t pdu[ATT_DEFAULT_LE_MTU];
+-
+-	DBG("");
++	struct pending_request *entry;
  
+ 	dev = find_device_by_addr(bdaddr);
+ 	if (!dev) {
+ 		error("gatt: send_gatt_response, could not find dev");
+-		return;
++		goto done;
+ 	}
+ 
+-	if (!status) {
+-		length = enc_error_resp(opcode, handle, status, pdu,
+-								sizeof(pdu));
++	if (status)
+ 		goto done;
+-	}
+ 
+-	switch (opcode) {
+-	case ATT_OP_EXEC_WRITE_REQ:
+-		length = enc_exec_write_resp(pdu);
+-		break;
+-	case ATT_OP_WRITE_REQ:
+-		length = enc_write_resp(pdu);
+-		break;
+-	case ATT_OP_PREP_WRITE_REQ:
+-		length = enc_prep_write_resp(handle, offset, data, len, pdu,
+-								sizeof(pdu));
+-		break;
+-	case ATT_OP_READ_BLOB_REQ:
+-		length = enc_read_blob_resp((uint8_t *)data, len, offset, pdu,
+-								sizeof(pdu));
+-		break;
+-	case ATT_OP_READ_REQ:
+-		length = enc_read_resp((uint8_t *)data, len, pdu, sizeof(pdu));
+-		break;
+-	default:
+-		error("gatt: Unexpected opcode");
++	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
++							UINT_TO_PTR(handle));
++	if (!entry) {
++		DBG("No pending response found! Bogus android response?");
+ 		return;
+ 	}
+ 
++	entry->handle = handle;
++	entry->offset = offset;
++	entry->length = len;
++
++	if (!len)
++		goto done;
++
++	entry->value = malloc0(len);
++	if (!entry->value) {
++		/* send_dev_pending_request on empty queue sends error resp. */
++		queue_remove(dev->pending_requests, entry);
++		destroy_pending_request(entry);
++
++		goto done;
++	}
++
++	memcpy(entry->value, data, len);
++
+ done:
+-	g_attrib_send(dev->attrib, 0, pdu, length, NULL, NULL, NULL);
++	if (!queue_find(dev->pending_requests, match_pending_dev_request, NULL))
++		send_dev_pending_response(dev, opcode);
+ }
+ 
+ static void set_trans_id(struct gatt_app *app, unsigned int id, int8_t opcode)
 -- 
 1.9.3
 
