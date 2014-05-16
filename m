@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/gatt: Fix reading attribute value
-Date: Fri, 16 May 2014 10:45:35 +0200
-Message-ID: <18188176.R3cMoBMcFL@uw000953>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] android/gatt: Don't try send responses after process_dev_pending_req()
+Date: Fri, 16 May 2014 10:37:39 +0200
+Message-Id: <1400229459-21617-3-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1400229459-21617-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1400229459-21617-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Process_dev_pending_requests call send_pending_respone, so we don't
+have to call it again.
+---
+ android/gatt.c | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-On Friday 16 of May 2014 10:37:37 Marcin Kraglak wrote:
-> If value and length was set by callback while gatt_db_read(), don't set
-> length to READ_PENDING. We have to set it only for async callbacks, then
-> length is still READ_INIT.
-> ---
->  android/gatt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b367eef..2a2e649 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -3670,7 +3670,7 @@ static void read_requested_attributes(void *data, void *user_data)
->  
->  		memcpy(resp_data->value, value, value_len);
->  		resp_data->length = value_len;
-> -	} else {
-> +	} else if (resp_data->length == READ_INIT) {
->  		resp_data->length = READ_PENDING;
->  	}
->  }
-> 
-
-All patches applied, thanks.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index f2fd17d..9bbcc48 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4346,11 +4346,6 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	process_dev_pending_requests(device, ATT_OP_READ_BY_TYPE_REQ);
+ 
+-	/* We send immediate if no data left to be filled by async callbacks */
+-	if (!queue_find(device->pending_requests, match_pending_dev_request,
+-									NULL))
+-		send_dev_pending_response(device, ATT_OP_READ_BY_TYPE_REQ);
+-
+ 	return 0;
+ }
+ 
+@@ -4565,11 +4560,6 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	process_dev_pending_requests(device, ATT_OP_FIND_BY_TYPE_REQ);
+ 
+-	/* Send if no response_data elements left to be filled by callbacks */
+-	if (!queue_find(device->pending_requests, match_pending_dev_request,
+-									NULL))
+-		send_dev_pending_response(device, cmd[0]);
+-
+ 	return 0;
+ }
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.9.0
+
