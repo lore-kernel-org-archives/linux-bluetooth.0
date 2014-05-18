@@ -2,210 +2,243 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/5] android/bluetooth: Track device last connected bearer
-Date: Sun, 18 May 2014 13:53:56 +0200
-Message-Id: <1400414040-30913-2-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/5] android/bluetooth: Track if paired device is bonded
+Date: Sun, 18 May 2014 13:53:59 +0200
+Message-Id: <1400414040-30913-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1400414040-30913-1-git-send-email-szymon.janc@tieto.com>
 References: <1400414040-30913-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to correctly choose address type when pairing dual mode
-devices.
+This is a preparation for correctly handling no bond pairing.
+
+Currently paired but not bonded devices are left on list of bonded
+devices in Framework until BT is restarted on device. This is due to
+Android Framework is not allowing stack to unpair device by its own
+(setting bond state bonded->no_bond is ignored).
 ---
- android/bluetooth.c | 75 +++++++++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 62 insertions(+), 13 deletions(-)
+ android/bluetooth.c | 55 +++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 36 insertions(+), 19 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 1e760d4..bf562bc 100644
+index 29c4ab6..5163291 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -104,7 +104,8 @@ struct device {
- 	uint32_t class;
- 	int32_t rssi;
+@@ -99,7 +99,9 @@ struct device {
+ 	bool pairing;
  
--	uint32_t timestamp;
-+	time_t bredr_seen;
-+	time_t le_seen;
+ 	bool bredr_paired;
++	bool bredr_bonded;
+ 	bool le_paired;
++	bool le_bonded;
  
- 	GSList *uuids;
+ 	char *name;
+ 	char *friendly_name;
+@@ -649,9 +651,11 @@ static void send_bond_state_change(const bdaddr_t *addr, uint8_t status,
+ 				HAL_EV_BOND_STATE_CHANGED, sizeof(ev), &ev);
+ }
  
-@@ -263,7 +264,12 @@ static void store_device_info(struct device *dev, const char *path)
+-static void update_bredr_state(struct device *dev, bool pairing, bool paired)
++static void update_bredr_state(struct device *dev, bool pairing, bool paired,
++								bool bonded)
+ {
+-	if (pairing == dev->pairing && paired == dev->bredr_paired)
++	if (pairing == dev->pairing && paired == dev->bredr_paired &&
++						bonded == dev->bredr_bonded)
+ 		return;
+ 
+ 	/* avoid unpairing device on incoming pairing request */
+@@ -674,14 +678,17 @@ static void update_bredr_state(struct device *dev, bool pairing, bool paired)
+ 	}
+ 
+ 	dev->bredr_paired = paired;
++	dev->bredr_bonded = bonded;
+ 
+ done:
+ 	dev->pairing = pairing;
+ }
+ 
+-static void update_le_state(struct device *dev, bool pairing, bool paired)
++static void update_le_state(struct device *dev, bool pairing, bool paired,
++								bool bonded)
+ {
+-	if (pairing == dev->pairing && paired == dev->le_paired)
++	if (pairing == dev->pairing && paired == dev->le_paired &&
++						bonded == dev->le_bonded)
+ 		return;
+ 
+ 	/* avoid unpairing device on incoming pairing request */
+@@ -704,6 +711,7 @@ static void update_le_state(struct device *dev, bool pairing, bool paired)
+ 	}
+ 
+ 	dev->le_paired = paired;
++	dev->le_bonded = bonded;
+ 
+ done:
+ 	dev->pairing = pairing;
+@@ -714,6 +722,10 @@ static uint8_t device_bond_state(struct device *dev)
+ 	if (dev->pairing)
+ 		return HAL_BOND_STATE_BONDING;
+ 
++	/*
++	 * We are checking for paired here instead of bonded as HAL API is
++	 * using BOND state also if there was no bonding pairing.
++	 */
+ 	if (dev->bredr_paired || dev->le_paired)
+ 		return HAL_BOND_STATE_BONDED;
+ 
+@@ -721,16 +733,17 @@ static uint8_t device_bond_state(struct device *dev)
+ }
+ 
+ static void update_device_state(struct device *dev, uint8_t addr_type,
+-				uint8_t status, bool pairing, bool paired)
++				uint8_t status, bool pairing, bool paired,
++				bool bonded)
+ {
+ 	uint8_t old_bond, new_bond;
+ 
+ 	old_bond = device_bond_state(dev);
+ 
+ 	if (addr_type == BDADDR_BREDR)
+-		update_bredr_state(dev, pairing, paired);
++		update_bredr_state(dev, pairing, paired, bonded);
  	else
- 		g_key_file_remove_key(key_file, addr, "Class", NULL);
+-		update_le_state(dev, pairing, paired);
++		update_le_state(dev, pairing, paired, bonded);
  
--	g_key_file_set_integer(key_file, addr, "Timestamp", dev->timestamp);
-+	if (dev->bredr_seen > dev->le_seen)
-+		g_key_file_set_integer(key_file, addr, "Timestamp",
-+							dev->bredr_seen);
-+	else
-+		g_key_file_set_integer(key_file, addr, "Timestamp",
-+								dev->le_seen);
+ 	new_bond = device_bond_state(dev);
  
- 	if (dev->uuids) {
- 		GSList *l;
-@@ -374,7 +380,6 @@ static void cache_device(struct device *new_dev)
+@@ -943,7 +956,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+ 		return;
  
- cache:
- 	cached_devices = g_slist_prepend(cached_devices, new_dev);
--	new_dev->timestamp = time(NULL);
- 	store_device_info(new_dev, CACHE_FILE);
+ 	update_device_state(dev, ev->key.addr.type, HAL_STATUS_SUCCESS, false,
+-									true);
++							true, !!ev->store_hint);
+ 
+ 	if (ev->store_hint) {
+ 		const struct mgmt_link_key_info *key = &ev->key;
+@@ -987,7 +1000,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+ 	get_device_name(dev);
+ 
+ 	update_device_state(dev, ev->addr.type, HAL_STATUS_SUCCESS, true,
+-									false);
++								false, false);
+ 
+ 	DBG("%s type %u secure %u", dst, ev->addr.type, ev->secure);
+ 
+@@ -1036,7 +1049,7 @@ static void user_confirm_request_callback(uint16_t index, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, ev->addr.type, HAL_STATUS_SUCCESS, true,
+-									false);
++								false, false);
+ 
+ 	if (ev->confirm_hint)
+ 		send_ssp_request(dev, HAL_SSP_VARIANT_CONSENT, 0);
+@@ -1064,7 +1077,7 @@ static void user_passkey_request_callback(uint16_t index, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, ev->addr.type, HAL_STATUS_SUCCESS, true,
+-									false);
++								false, false);
+ 
+ 	send_ssp_request(dev, HAL_SSP_VARIANT_ENTRY, 0);
+ }
+@@ -1094,7 +1107,7 @@ static void user_passkey_notify_callback(uint16_t index, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, ev->addr.type, HAL_STATUS_SUCCESS, true,
+-									false);
++								false, false);
+ 
+ 	send_ssp_request(dev, HAL_SSP_VARIANT_NOTIF, ev->passkey);
+ }
+@@ -1652,7 +1665,7 @@ static void mgmt_connect_failed_event(uint16_t index, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, ev->addr.type, status_mgmt2hal(ev->status),
+-								false, false);
++							false, false, false);
  }
  
-@@ -392,13 +397,14 @@ static struct device *create_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type)
+ static void mgmt_auth_failed_event(uint16_t index, uint16_t length,
+@@ -1676,7 +1689,7 @@ static void mgmt_auth_failed_event(uint16_t index, uint16_t length,
+ 		return;
  
- 	if (bdaddr_type == BDADDR_BREDR) {
- 		dev->bredr = true;
-+		dev->bredr_seen = time(NULL);
- 	} else {
- 		dev->le = true;
- 		dev->bdaddr_type = bdaddr_type;
-+		dev->le_seen = time(NULL);
+ 	update_device_state(dev, ev->addr.type, status_mgmt2hal(ev->status),
+-								false, false);
++							false, false, false);
+ }
+ 
+ static void mgmt_device_unpaired_event(uint16_t index, uint16_t length,
+@@ -1699,7 +1712,7 @@ static void mgmt_device_unpaired_event(uint16_t index, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, ev->addr.type, HAL_STATUS_SUCCESS, false,
+-									false);
++								false, false);
+ }
+ 
+ static void store_ltk(const bdaddr_t *dst, uint8_t bdaddr_type, bool master,
+@@ -1770,7 +1783,7 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, ev->key.addr.type, HAL_STATUS_SUCCESS, false,
+-									true);
++							true, !!ev->store_hint);
+ 
+ 	if (ev->store_hint) {
+ 		const struct mgmt_ltk_info *key = &ev->key;
+@@ -2228,18 +2241,21 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 	if (str) {
+ 		g_free(str);
+ 		dev->bredr_paired = true;
++		dev->bredr_bonded = true;
  	}
  
- 	dev->bond_state = HAL_BOND_STATE_NONE;
--	dev->timestamp = time(NULL);
- 
- 	/*
- 	 * Use address for name, will be change if one is present
-@@ -1400,6 +1406,11 @@ static void update_found_device(const bdaddr_t *bdaddr, uint8_t bdaddr_type,
- 
- 	dev = get_device(bdaddr, bdaddr_type);
- 
-+	if (bdaddr_type == BDADDR_BREDR)
-+		dev->bredr_seen = time(NULL);
-+	else
-+		dev->le_seen = time(NULL);
-+
- 	/*
- 	 * Device found event needs to be send also for known device if this is
- 	 * new discovery session. Otherwise framework will ignore it.
-@@ -2178,8 +2189,13 @@ static struct device *create_device_from_info(GKeyFile *key_file,
- 
- 	dev->class = g_key_file_get_integer(key_file, peer, "Class", NULL);
- 
--	dev->timestamp = g_key_file_get_integer(key_file, peer, "Timestamp",
--									NULL);
-+	if (dev->bredr)
-+		dev->bredr_seen = g_key_file_get_integer(key_file, peer,
-+								"Timestamp",
-+								NULL);
-+	else
-+		dev->le_seen = g_key_file_get_integer(key_file, peer,
-+							"Timestamp", NULL);
- 
- 	uuids = g_key_file_get_string_list(key_file, peer, "Services", NULL,
- 									NULL);
-@@ -2279,12 +2295,27 @@ failed:
- 	return info;
- }
- 
-+static time_t device_timestamp(const struct device *dev)
-+{
-+	if (dev->bredr && dev->le) {
-+		if (dev->le_seen > dev->bredr_seen)
-+			return dev->le_seen;
-+
-+		return dev->bredr_seen;
-+	}
-+
-+	if (dev->bredr)
-+		return dev->bredr_seen;
-+
-+	return dev->le_seen;
-+}
-+
- static int device_timestamp_cmp(gconstpointer  a, gconstpointer  b)
- {
- 	const struct device *deva = a;
- 	const struct device *devb = b;
- 
--	return deva->timestamp < devb->timestamp;
-+	return device_timestamp(deva) < device_timestamp(devb);
- }
- 
- static void load_devices_cache(void)
-@@ -3155,6 +3186,18 @@ static void pair_device_complete(uint8_t status, uint16_t length,
- 							HAL_BOND_STATE_NONE);
- }
- 
-+static uint8_t select_device_bearer(struct device *dev)
-+{
-+	if (dev->bredr && dev->le) {
-+		if (dev->le_seen > dev->bredr_seen)
-+			return dev->bdaddr_type;
-+
-+		return BDADDR_BREDR;
-+	}
-+
-+	return dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
-+}
-+
- static void handle_create_bond_cmd(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_create_bond *cmd = buf;
-@@ -3173,7 +3216,7 @@ static void handle_create_bond_cmd(const void *buf, uint16_t len)
- 		goto fail;
+ 	str = g_key_file_get_string(key_file, peer, "LongTermKey", NULL);
+ 	if (str) {
+ 		g_free(str);
+ 		dev->le_paired = true;
++		dev->le_bonded = true;
  	}
  
--	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
-+	cp.addr.type = select_device_bearer(dev);
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_PAIR_DEVICE, adapter.index, sizeof(cp),
- 				&cp, pair_device_complete, NULL, NULL) == 0) {
-@@ -3205,8 +3248,7 @@ static void handle_cancel_bond_cmd(const void *buf, uint16_t len)
- 		goto failed;
+ 	str = g_key_file_get_string(key_file, peer, "SlaveLongTermKey", NULL);
+ 	if (str) {
+ 		g_free(str);
+ 		dev->le_paired = true;
++		dev->le_bonded = true;
  	}
  
--	cp.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
--
-+	cp.type = select_device_bearer(dev);
+ 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
+@@ -3250,7 +3266,7 @@ static void pair_device_complete(uint8_t status, uint16_t length,
+ 		return;
  
- 	if (mgmt_reply(mgmt_if, MGMT_OP_CANCEL_PAIR_DEVICE,
- 					adapter.index, sizeof(cp), &cp,
-@@ -3256,7 +3298,7 @@ static void handle_remove_bond_cmd(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	cp.addr.type = dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
-+	cp.addr.type = select_device_bearer(dev);
- 
- 	if (mgmt_send(mgmt_if, MGMT_OP_UNPAIR_DEVICE, adapter.index,
- 				sizeof(cp), &cp, unpair_device_complete,
-@@ -3494,8 +3536,12 @@ static uint8_t get_device_version_info(struct device *dev)
- 
- static uint8_t get_device_timestamp(struct device *dev)
- {
-+	uint32_t timestamp;
-+
-+	timestamp = device_timestamp(dev);
-+
- 	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TIMESTAMP,
--				sizeof(dev->timestamp), &dev->timestamp);
-+						sizeof(timestamp), &timestamp);
- 
- 	return HAL_STATUS_SUCCESS;
+ 	update_device_state(dev, rp->addr.type, status_mgmt2hal(status), false,
+-									false);
++								false, false);
  }
-@@ -3506,6 +3552,7 @@ static void get_remote_device_props(struct device *dev)
- 	struct hal_ev_remote_device_props *ev = (void *) buf;
- 	uint128_t uuids[g_slist_length(dev->uuids)];
- 	uint8_t android_type;
-+	uint32_t timestamp;
- 	int size, i;
- 	GSList *l;
  
-@@ -3550,8 +3597,10 @@ static void get_remote_device_props(struct device *dev)
- 									uuids);
- 	ev->num_props++;
+ static uint8_t select_device_bearer(struct device *dev)
+@@ -3301,7 +3317,8 @@ static void handle_create_bond_cmd(const void *buf, uint16_t len)
  
-+	timestamp = get_device_timestamp(dev);
-+
- 	size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_TIMESTAMP,
--				sizeof(dev->timestamp), &dev->timestamp);
-+						sizeof(timestamp), &timestamp);
- 	ev->num_props++;
+ 	status = HAL_STATUS_SUCCESS;
  
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+-	update_device_state(dev, cp.addr.type, HAL_STATUS_SUCCESS, true, false);
++	update_device_state(dev, cp.addr.type, HAL_STATUS_SUCCESS, true, false,
++									false);
+ 
+ fail:
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_OP_CREATE_BOND,
+@@ -3355,7 +3372,7 @@ static void unpair_device_complete(uint8_t status, uint16_t length,
+ 		return;
+ 
+ 	update_device_state(dev, rp->addr.type, HAL_STATUS_SUCCESS, false,
+-									false);
++								false, false);
+ }
+ 
+ static void handle_remove_bond_cmd(const void *buf, uint16_t len)
 -- 
 1.9.0
 
