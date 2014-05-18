@@ -1,43 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+MIME-Version: 1.0
+Date: Sun, 18 May 2014 09:17:00 +0530
+Message-ID: <CALSp4eNGPZ+S=yi=SCJ-X3Yu0YWqDxwscmgm_Y1Cz1v4x6QRcA@mail.gmail.com>
+Subject: BT over TTY lines
+From: bhasker neti <bnetiqipl@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 0/5] android: Pairing improvements
-Date: Sun, 18 May 2014 13:53:55 +0200
-Message-Id: <1400414040-30913-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+We are working on x86 ubuntu based project where our BT chipset is
+connected to PC.
 
-This improves (fix) the way dual mode devices are handled. Bearer type is
-now tracked and allows to use correct one for dual mode device.
-
-This also adds tracking if remote device was bonded or not. This is in
-preparation for fixing no bond pairing. Android HAL does not distinguish
-between pairing and bonding and appears to be ignoring bond state change
-bonded->no_bond from stack. This leads to situation when device is no longer
-paired (after being disconnected) but still being listed as bonded in
-Android Framework. Possible solution would be to not call bond_state change
-to bonded for no bond case (this seems to be what Bluedroid is doing [1])
-but this still needs further analyze and testing.
-
-BR
-Szymon Janc
+We are using TTY interface for all tx/rx operations.
 
 
-[1] http://androidxref.com/4.4.2_r1/xref/external/bluetooth/bluedroid/btif/src/btif_dm.c#338
+Bluetooth flow :
 
-Szymon Janc (5):
-  android/bluetooth: Track device last connected bearer
-  android/bluetooth: Fix pairing of dual mode devices
-  android/bluetooth: Fix unpairing dual mode device
-  android/bluetooth: Track if paired device is bonded
-  android/bluetooth: Simplify check if device type changed
+It downloads the initial firmware via /dev/ttyXYZ from user space, and
+then attaches hci_ldisc with tty_ldisc in the kernel, then does all
+the Tx/Rx operations.
 
- android/bluetooth.c | 315 ++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 233 insertions(+), 82 deletions(-)
+We are facing one issue:
 
--- 
-1.9.0
+When we connect the chip via UART interface, it is coming as
+/dev/ttyS0, the code base is working fine, from user space as well as
+from kernel space,
 
+But when we connect the chip using UART/USB converter, it is coming up
+as /dev/ttyUSB0, we were able to download from user space via tty
+interface, but from kernel space we are not able to communicate with
+the device,
+
+I am not able to trace the tty code, but I can see that in failure
+case no command is going out on serial lines from PC.
+
+Can you please share some inputs here, is there anything specially we
+need to handle USB serial interfaces? How it is different from UART
+tty interface ?
+
+Here is our code base :
+
+http://lxr.free-electrons.com/source/drivers/bluetooth/hci_ldisc.c#L139
+
+
+Setup details:
+
+Ubuntu 12.04
+Kernel : 3-10.
+BLUEZ : 4.98/4.101
