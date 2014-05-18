@@ -1,38 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Re-run PTS GAP tests
-Date: Sun, 18 May 2014 14:08:20 +0200
-Message-ID: <5581030.3FeAUJZ6lB@leonov>
-In-Reply-To: <1400253804-15197-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1400253804-15197-1-git-send-email-sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Add stub for setting advertising data
+Date: Sun, 18 May 2014 14:04:37 +0200
+Message-ID: <2267731.aQYSTh3Z0d@leonov>
+In-Reply-To: <1400249440-31062-1-git-send-email-szymon.janc@tieto.com>
+References: <1400249440-31062-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
-
-On Friday 16 of May 2014 17:23:24 Sebastian Chlad wrote:
+On Friday 16 of May 2014 16:10:40 Szymon Janc wrote:
+> Currently kernel is lacking support for fine grained configuration of
+> advertising data but this is ignored for now.
+> 
+> Vendor data is not supported and if it is to be set command will fail.
+> This should be implemented when kernel support is added.
 > ---
->  android/pts-gap.txt | 96
-> ++++++++++++++++++++++++++++++----------------------- 1 file changed, 55
-> insertions(+), 41 deletions(-)
+>  android/gatt.c | 32 ++++++++++++++++++++++++++++++--
+>  1 file changed, 30 insertions(+), 2 deletions(-)
 > 
-> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-> index 8be9a5a..b18679a 100644
-> --- a/android/pts-gap.txt
-> +++ b/android/pts-gap.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for GAP
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 9bbcc48..067e14e 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -3242,10 +3242,38 @@ static void handle_client_get_device_type(const void
+> *buf, uint16_t len)
 > 
->  PTS version: 5.1
-> -Tested: 11-April-2014
-> +Tested: 16-May-2014
->  Android version: 4.4.2
+>  static void handle_client_set_adv_data(const void *buf, uint16_t len)
+>  {
+> -	DBG("");
+> +	const struct hal_cmd_gatt_client_set_adv_data *cmd = buf;
+> +	uint8_t status;
+> +
+> +	if (len != sizeof(*cmd) + cmd->manufacturer_len) {
+> +		error("Invalid set adv data command (%u bytes), terminating",
+> +									len);
+> +		raise(SIGTERM);
+> +		return;
+> +	}
+> +
+> +	DBG("scan_rsp=%u name=%u tx=%u min=%d max=%d app=%d manufacturer=%u",
+> +		cmd->set_scan_rsp, cmd->include_name, cmd->include_txpower,
+> +		cmd->min_interval, cmd->max_interval, cmd->appearance,
+> +		cmd->manufacturer_len);
+> +
+> +	/*
+> +	 * TODO
+> +	 * Currently kernel is setting all except for vendor data.
+> +	 * This should be implemented when kernel supports it.
+> +	 */
+> 
+> +	if (cmd->manufacturer_len) {
+> +		error("gatt: Manufacturer advertising data not supported");
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+> +	status = HAL_STATUS_SUCCESS;
+> +
+> +failed:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> -			HAL_OP_GATT_CLIENT_SET_ADV_DATA, HAL_STATUS_FAILED);
+> +				HAL_OP_GATT_CLIENT_SET_ADV_DATA, status);
+>  }
+> 
+>  static void handle_client_test_command(const void *buf, uint16_t len)
 
-Applied, thanks.
+Applied.
 
 -- 
 BR
