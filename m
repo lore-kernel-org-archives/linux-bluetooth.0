@@ -2,69 +2,70 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 2/4] emulator/btdev: Add support for Read TX Power command
-Date: Mon, 19 May 2014 23:14:03 +0200
-Message-Id: <1400534045-16818-2-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 4/4] tools/mgmt-tester: Add "Get Conn Info - Not Connected"
+Date: Mon, 19 May 2014 23:14:05 +0200
+Message-Id: <1400534045-16818-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400534045-16818-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400534045-16818-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- emulator/btdev.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ tools/mgmt-tester.c | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index d97476b..28709ca 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1764,6 +1764,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_le_ltk_req_reply *llrr;
- 	const struct bt_hci_cmd_read_local_amp_assoc *rlaa_cmd;
- 	const struct bt_hci_cmd_read_rssi *rrssi;
-+	const struct bt_hci_cmd_read_tx_power *rtxp;
- 	struct bt_hci_rsp_read_default_link_policy rdlp;
- 	struct bt_hci_rsp_read_stored_link_key rslk;
- 	struct bt_hci_rsp_write_stored_link_key wslk;
-@@ -1815,6 +1816,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	struct bt_hci_rsp_user_confirm_request_reply ucrr_rsp;
- 	struct bt_hci_rsp_user_confirm_request_neg_reply ucrnr_rsp;
- 	struct bt_hci_rsp_read_rssi rrssi_rsp;
-+	struct bt_hci_rsp_read_tx_power rtxp_rsp;
- 	uint8_t status, page;
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 14b1d3d..4290c21 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -2766,6 +2766,22 @@ static const void *get_conn_info_expect_param_func(uint16_t *len)
+ 	return param;
+ }
  
- 	switch (opcode) {
-@@ -2476,6 +2478,30 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_complete(btdev, opcode, &rrssi_rsp, sizeof(rrssi_rsp));
- 		break;
++static const void *get_conn_info_error_expect_param_func(uint16_t *len)
++{
++	struct test_data *data = tester_get_data();
++	static uint8_t param[10];
++
++	/* All unset parameters shall be 0 in case of error */
++	memset(param, 0, sizeof(param));
++
++	memcpy(param, hciemu_get_client_bdaddr(data->hciemu), 6);
++	param[6] = 0x00; /* Address type */
++
++	*len = sizeof(param);
++
++	return param;
++}
++
+ static const struct generic_data get_conn_info_succes1_test = {
+ 	.setup_settings = settings_powered_connectable_pairable_ssp,
+ 	.send_opcode = MGMT_OP_GET_CONN_INFO,
+@@ -2774,6 +2790,14 @@ static const struct generic_data get_conn_info_succes1_test = {
+ 	.expect_func = get_conn_info_expect_param_func,
+ };
  
-+	case BT_HCI_CMD_READ_TX_POWER:
-+		rtxp = data;
++static const struct generic_data get_conn_info_ncon_test = {
++	.setup_settings = settings_powered_connectable_pairable_ssp,
++	.send_opcode = MGMT_OP_GET_CONN_INFO,
++	.send_func = get_conn_info_send_param_func,
++	.expect_status = MGMT_STATUS_NOT_CONNECTED,
++	.expect_func = get_conn_info_error_expect_param_func,
++};
 +
-+		switch (rtxp->type) {
-+		case 0x00:
-+			rtxp_rsp.status = BT_HCI_ERR_SUCCESS;
-+			rtxp_rsp.level =  -1; /* non-zero */
-+			break;
+ static void client_cmd_complete(uint16_t opcode, uint8_t status,
+ 					const void *param, uint8_t len,
+ 					void *user_data)
+@@ -4104,5 +4128,9 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Get Conn Info - Success",
+ 				&get_conn_info_succes1_test, NULL,
+ 				test_command_generic_connect);
++	test_bredrle("Get Conn Info - Not Connected",
++				&get_conn_info_ncon_test, NULL,
++				test_command_generic);
 +
-+		case 0x01:
-+			rtxp_rsp.status = BT_HCI_ERR_SUCCESS;
-+			rtxp_rsp.level = 4; /* max for class 2 radio */
-+			break;
-+
-+		default:
-+			rtxp_rsp.level = 0;
-+			rtxp_rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			break;
-+		}
-+
-+		rtxp_rsp.handle = rtxp->handle;
-+		cmd_complete(btdev, opcode, &rtxp_rsp, sizeof(rtxp_rsp));
-+		break;
-+
- 	case BT_HCI_CMD_READ_LOCAL_AMP_INFO:
- 		if (btdev->type != BTDEV_TYPE_AMP)
- 			goto unsupported;
+ 	return tester_run();
+ }
 -- 
 1.9.3
 
