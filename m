@@ -1,52 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 00/11] Connection parameters D-Bus API
-Date: Tue, 20 May 2014 01:44:32 +0200
-Message-Id: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [RFC 01/11] doc: Update RSSI property description.
+Date: Tue, 20 May 2014 01:44:33 +0200
+Message-Id: <1400543083-28811-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 
-Following patches add possibility for applications to have RSSI and TX
-power data for connected device. This uses recently introduced mgmt
-command Get Connection Information.
+RSSI property applies to either inquiry or advertising packets and this
+should be stated here especially that we plan to add connection RSSI
+property.
+---
+ doc/device-api.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-There are 3 new properties for RSSI, current TX power and max TX power.
-Polling for RSSI and TX power can be enabled via Start-/Stop- methods
-in a manner similar to discovery on adapter. Max TX power is read once
-when device is connected and obviously does not change.
-
-As for now polling interval is set to arbitrary chosen value of 2secs,
-but perhapts this could be configurable via main.conf entry.
-
-
-Andrzej Kaczmarek (9):
-  core: Add ConnectionRSSI property
-  core: Add ConnectionTXPower property
-  core: Add ConnectionTXPowerMax property
-  core: Make connection properties exist only when connected
-  core: Read max TX power when device connected
-  shared: Fix queue_find to accept const ptr as match data
-  core: Add API to start/stop connection monitoring
-  core: Store list of monitored devices in adapter
-  core: Poll for connection info
-
-Lukasz Rymanowski (2):
-  doc: Update RSSI property description.
-  doc: Introduce connection monitoring API
-
- doc/device-api.txt |  56 +++++++++++
- src/adapter.c      | 205 +++++++++++++++++++++++++++++++++++++++++
- src/adapter.h      |   7 ++
- src/device.c       | 265 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/device.h       |   3 +
- src/shared/queue.c |   4 +-
- src/shared/queue.h |   2 +-
- 7 files changed, 539 insertions(+), 3 deletions(-)
-
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 2d9fa3c..577ee60 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -192,4 +192,4 @@ Properties	string Address [readonly]
+ 		int16 RSSI [readonly, optional]
+ 
+ 			Received Signal Strength Indicator of the remote
+-			device.
++			device (inquiry or advertising).
 -- 
 1.9.3
 
