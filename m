@@ -1,29 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 19 May 2014 14:15:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] emulator/bthost: Add support to set auth_req for
+ bthost
+Message-ID: <20140519111512.GA19291@t440s.lan>
+References: <1400496822-28557-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <CALSp4ePK23cLJfBMT3Yz79rFkyn_o1PC=oDghnZ+qoAR13SNNg@mail.gmail.com>
-References: <CALSp4ePK23cLJfBMT3Yz79rFkyn_o1PC=oDghnZ+qoAR13SNNg@mail.gmail.com>
-Date: Mon, 19 May 2014 17:11:37 +0530
-Message-ID: <CALSp4eNpw3XcOW=0uGtV0rgCRsAGGO0EJF7q8VKbLKXWNEh_4A@mail.gmail.com>
-Subject: Re: Bluetooth SCO over HCI interface
-From: bhasker neti <bnetiqipl@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1400496822-28557-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Linux-bluetooth  team,
+Hi Andrzej,
 
-Can you please share teh inputs,
+On Mon, May 19, 2014, Andrzej Kaczmarek wrote:
+> This patch makes possible to set Authentication_Requirements to be used
+> in io_capa_request_reply when replying for io_capa_request_evt.
+> ---
+>  emulator/bthost.c | 8 +++++++-
+>  emulator/bthost.h | 1 +
+>  2 files changed, 8 insertions(+), 1 deletion(-)
 
-How can I enable sco on ubuntu 12.04,
+Both patches have been applied. Thanks.
 
-Please share the configuration required,
-
-Thanks,
-Bhasker
-
-On Sun, May 18, 2014 at 12:33 AM, bhasker neti <bnetiqipl@gmail.com> wrote:
-> I have Bluetooth usb interface connected to ubuntu machine,
-> Bluetooth all other functionality is working fine except SCO audio.
->
->  -Bhasker
+Johan
