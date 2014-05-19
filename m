@@ -1,53 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/4] emulator/btdev: Add support for Read RSSI command
-Date: Mon, 19 May 2014 23:14:02 +0200
-Message-Id: <1400534045-16818-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Mon, 19 May 2014 16:34:57 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2014-05-15
+Message-ID: <20140519203456.GK7650@tuxdriver.com>
+References: <20140515135600.GB1966@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140515135600.GB1966@joana>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- emulator/btdev.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On Thu, May 15, 2014 at 10:56:00AM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> This pull request contains a very important fix for 3.15. Here we fix the
+> permissions of a debugfs file that would otherwise allow unauthorized users
+> to write content to it.
+> 
+> Please pull! Thanks.
+> 
+>         Gustavo
+> 
+> ---
+> The following changes since commit 1fb4e09a7e780b915dbd172592ae7e2a4c071065:
+> 
+>   Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-25 09:47:16 +0300)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
+> 
+> for you to fetch changes up to 40b9397a1a61a37917b93e7d57e6f2faf3a086b4:
+> 
+>   Bluetooth: Fix L2CAP LE debugfs entries permissions (2014-05-14 09:07:07 -0700)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index e590efa..d97476b 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -1763,6 +1763,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	const struct bt_hci_cmd_le_start_encrypt *lse;
- 	const struct bt_hci_cmd_le_ltk_req_reply *llrr;
- 	const struct bt_hci_cmd_read_local_amp_assoc *rlaa_cmd;
-+	const struct bt_hci_cmd_read_rssi *rrssi;
- 	struct bt_hci_rsp_read_default_link_policy rdlp;
- 	struct bt_hci_rsp_read_stored_link_key rslk;
- 	struct bt_hci_rsp_write_stored_link_key wslk;
-@@ -1813,6 +1814,7 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 	struct bt_hci_rsp_pin_code_request_neg_reply pcrnr_rsp;
- 	struct bt_hci_rsp_user_confirm_request_reply ucrr_rsp;
- 	struct bt_hci_rsp_user_confirm_request_neg_reply ucrnr_rsp;
-+	struct bt_hci_rsp_read_rssi rrssi_rsp;
- 	uint8_t status, page;
- 
- 	switch (opcode) {
-@@ -2465,6 +2467,15 @@ static void default_cmd(struct btdev *btdev, uint16_t opcode,
- 		cmd_complete(btdev, opcode, &rdbs, sizeof(rdbs));
- 		break;
- 
-+	case BT_HCI_CMD_READ_RSSI:
-+		rrssi = data;
-+
-+		rrssi_rsp.status = BT_HCI_ERR_SUCCESS;
-+		rrssi_rsp.handle = rrssi->handle;
-+		rrssi_rsp.rssi = -1; /* non-zero so we can see it in tester */
-+		cmd_complete(btdev, opcode, &rrssi_rsp, sizeof(rrssi_rsp));
-+		break;
-+
- 	case BT_HCI_CMD_READ_LOCAL_AMP_INFO:
- 		if (btdev->type != BTDEV_TYPE_AMP)
- 			goto unsupported;
+Pulling now...
+
 -- 
-1.9.3
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
