@@ -2,58 +2,107 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 08/11] shared: Fix queue_find to accept const ptr as match data
-Date: Tue, 20 May 2014 01:44:40 +0200
-Message-Id: <1400543083-28811-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 05/11] core: Add ConnectionTXPowerMax property
+Date: Tue, 20 May 2014 01:44:37 +0200
+Message-Id: <1400543083-28811-6-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes queue_find definition to have const pointer as data to
-be matched against. Match function already does have const pointers as
-arguments. Also parameter name is updated to be 'match_data' since this
-actually is not user_data, just data to be matched against.
----
- src/shared/queue.c | 4 ++--
- src/shared/queue.h | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
+This patch adds ConnectionTXPowerMax property on org.bluez.Device1
+interface which provides maximum local TX power on currently connected
+link.
 
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index 8a69729..ea4ff96 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -188,7 +188,7 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+Property value will be read after connection and won't change during
+connection lifetime.
+---
+ src/device.c | 31 +++++++++++++++++++++++++++++++
+ src/device.h |  1 +
+ 2 files changed, 32 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index ac42a75..8661386 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -221,6 +221,7 @@ struct btd_device {
+ 
+ 	int8_t		conn_rssi;
+ 	int8_t		conn_tx_power;
++	int8_t		conn_max_tx_power;
+ 
+ 	GIOChannel	*att_io;
+ 	guint		cleanup_id;
+@@ -851,6 +852,18 @@ static gboolean dev_property_get_conn_txpower(
+ 	return TRUE;
  }
  
- void *queue_find(struct queue *queue, queue_match_func_t function,
--							void *user_data)
-+							const void *match_data)
++static gboolean dev_property_get_conn_max_txpower(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
++{
++	struct btd_device *device = data;
++	dbus_int16_t val = device->conn_max_tx_power;
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
++
++	return TRUE;
++}
++
+ static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
  {
- 	struct queue_entry *entry;
+ 	struct btd_device *device = data;
+@@ -1946,6 +1959,7 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Adapter", "o", dev_property_get_adapter },
+ 	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
+ 	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower },
++	{ "ConnectionTXPowerMax", "n", dev_property_get_conn_max_txpower },
+ 	{ }
+ };
  
-@@ -196,7 +196,7 @@ void *queue_find(struct queue *queue, queue_match_func_t function,
- 		return NULL;
+@@ -2342,6 +2356,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+ 	device->adapter = adapter;
  
- 	for (entry = queue->head; entry; entry = entry->next)
--		if (function(entry->data, user_data))
-+		if (function(entry->data, match_data))
- 			return entry->data;
+ 	device->conn_tx_power = 127; /* invalid */
++	device->conn_max_tx_power = 127; /* invalid */
  
- 	return NULL;
-diff --git a/src/shared/queue.h b/src/shared/queue.h
-index 8201ff8..709590b 100644
---- a/src/shared/queue.h
-+++ b/src/shared/queue.h
-@@ -44,7 +44,7 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
- typedef bool (*queue_match_func_t)(const void *a, const void *b);
+ 	return btd_device_ref(device);
+ }
+@@ -4105,6 +4120,22 @@ void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power)
+ 							"ConnectionTXPower");
+ }
  
- void *queue_find(struct queue *queue, queue_match_func_t function,
--							void *user_data);
-+							const void *match_data);
- 
- bool queue_remove(struct queue *queue, void *data);
- void *queue_remove_if(struct queue *queue, queue_match_func_t function,
++void device_set_conn_max_tx_power(struct btd_device *device, int8_t tx_power)
++{
++	if (!device)
++		return;
++
++	if (device->conn_max_tx_power == tx_power)
++		return;
++
++	DBG("conn_max_tx_power %d", tx_power);
++
++	device->conn_max_tx_power = tx_power;
++
++	g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
++							"ConnectionTXPowerMax");
++}
++
+ static void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ {
+ 	char addr[18];
+diff --git a/src/device.h b/src/device.h
+index e0e44cc..b59fa19 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -90,6 +90,7 @@ void device_set_legacy(struct btd_device *device, bool legacy);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
+ void device_set_conn_rssi(struct btd_device *device, int8_t rssi);
+ void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power);
++void device_set_conn_max_tx_power(struct btd_device *device, int8_t tx_power);
+ bool btd_device_is_connected(struct btd_device *dev);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+ bool device_is_retrying(struct btd_device *device);
 -- 
 1.9.3
 
