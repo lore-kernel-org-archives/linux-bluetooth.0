@@ -2,87 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 07/11] core: Read max TX power when device connected
-Date: Tue, 20 May 2014 01:44:39 +0200
-Message-Id: <1400543083-28811-8-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 06/11] core: Make connection properties exist only when connected
+Date: Tue, 20 May 2014 01:44:38 +0200
+Message-Id: <1400543083-28811-7-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds proper support for max TX power, i.e. this property
-is refreshed once device is connected.
+This patch adds common 'exists' function for Connection* properties
+on org.bluez.Device1 interface. It will make properties to exist only
+when device is connected since they do not make sense otherwise.
 ---
- src/adapter.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ src/device.c | 18 +++++++++++++++---
+ 1 file changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f5f8c8c..585f2e2 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6174,6 +6174,54 @@ static void disconnected_callback(uint16_t index, uint16_t length,
- 	dev_disconnected(adapter, &ev->addr, reason);
+diff --git a/src/device.c b/src/device.c
+index 8661386..1891735 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -864,6 +864,15 @@ static gboolean dev_property_get_conn_max_txpower(
+ 	return TRUE;
  }
  
-+static void read_max_tx_power_destroy(void *data)
++static gboolean dev_property_exists_conn(const GDBusPropertyTable *property,
++								void *data)
 +{
 +	struct btd_device *device = data;
 +
-+	btd_device_unref(device);
++	/* TODO: only exists when monitoring is enabled? */
++	return btd_device_is_connected(device) ? TRUE : FALSE;
 +}
 +
-+static void read_max_tx_power_rsp(uint8_t status, uint16_t len,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_get_conn_info *rp = param;
-+	struct btd_device *device = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Get Connection Information failed: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (len < sizeof(*rp)) {
-+		error("Too small Get Connection Information response");
-+		return;
-+	}
-+
-+	device_set_conn_max_tx_power(device, rp->max_tx_power);
-+}
-+
-+static void read_max_tx_power(struct btd_adapter *adapter,
-+					struct btd_device *device,
-+					const bdaddr_t *addr, uint8_t addr_type)
-+{
-+	struct mgmt_cp_get_conn_info cp;
-+	char addrstr[18];
-+
-+	ba2str(addr, addrstr);
-+	DBG("bdaddr %s type %d", addrstr, addr_type);
-+
-+	btd_device_ref(device);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	bacpy(&cp.addr.bdaddr, addr);
-+	cp.addr.type = addr_type;
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO, adapter->dev_id,
-+					sizeof(cp), &cp, read_max_tx_power_rsp,
-+					device, read_max_tx_power_destroy);
-+}
-+
- static void connected_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
  {
-@@ -6220,6 +6268,8 @@ static void connected_callback(uint16_t index, uint16_t length,
- 		btd_device_device_set_name(device, eir_data.name);
- 	}
- 
-+	read_max_tx_power(adapter, device, &ev->addr.bdaddr, ev->addr.type);
-+
- 	eir_data_free(&eir_data);
- }
+ 	struct btd_device *device = data;
+@@ -1957,9 +1966,12 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Modalias", "s", dev_property_get_modalias, NULL,
+ 						dev_property_exists_modalias },
+ 	{ "Adapter", "o", dev_property_get_adapter },
+-	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
+-	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower },
+-	{ "ConnectionTXPowerMax", "n", dev_property_get_conn_max_txpower },
++	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi, NULL,
++						dev_property_exists_conn },
++	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower, NULL,
++						dev_property_exists_conn },
++	{ "ConnectionTXPowerMax", "n", dev_property_get_conn_max_txpower, NULL,
++						dev_property_exists_conn },
+ 	{ }
+ };
  
 -- 
 1.9.3
