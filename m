@@ -1,44 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 19 May 2014 16:34:57 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth 2014-05-15
-Message-ID: <20140519203456.GK7650@tuxdriver.com>
-References: <20140515135600.GB1966@joana>
+Date: Mon, 19 May 2014 20:41:28 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] code: Improve handling of unpaired event
+Message-ID: <20140519174128.GA27959@t440s.P-661HNU-F1>
+References: <1400520830-12651-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140515135600.GB1966@joana>
+In-Reply-To: <1400520830-12651-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, May 15, 2014 at 10:56:00AM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> This pull request contains a very important fix for 3.15. Here we fix the
-> permissions of a debugfs file that would otherwise allow unauthorized users
-> to write content to it.
-> 
-> Please pull! Thanks.
-> 
->         Gustavo
-> 
+Hi Szymon,
+
+On Mon, May 19, 2014, Szymon Janc wrote:
+> Unpaired event is per bearer and and bluetoothd should unpair device
+> only on that bearer.
 > ---
-> The following changes since commit 1fb4e09a7e780b915dbd172592ae7e2a4c071065:
-> 
->   Bluetooth: Add support for Lite-on [04ca:3007] (2014-04-25 09:47:16 +0300)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git master
-> 
-> for you to fetch changes up to 40b9397a1a61a37917b93e7d57e6f2faf3a086b4:
-> 
->   Bluetooth: Fix L2CAP LE debugfs entries permissions (2014-05-14 09:07:07 -0700)
+>  src/adapter.c | 44 ++++++++++++++++++++++++++++++++++++++------
+>  src/device.c  | 32 ++++++++++++++++++++++++++++++++
+>  src/device.h  |  1 +
+>  3 files changed, 71 insertions(+), 6 deletions(-)
 
-Pulling now...
+Applied. Thanks.
 
--- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+Johan
