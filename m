@@ -1,35 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] lib: Add definitions for Get Connection Information command
-Date: Mon, 19 May 2014 10:14:35 +0200
-Message-ID: <1647133.A4Brs3lOK4@uw000953>
-In-Reply-To: <20140519052308.GA4421@t440s.P-661HNU-F1>
-References: <1400264569-7936-1-git-send-email-andrzej.kaczmarek@tieto.com> <20140519052308.GA4421@t440s.P-661HNU-F1>
+Date: Mon, 19 May 2014 16:10:44 +0800
+From: Adam Lee <adam.lee@canonical.com>
+To: David Woodhouse <dwmw2@infradead.org>,
+	Ben Hutchings <ben@decadent.org.uk>
+Cc: Paritosh Debnath <paritosh.debnath@intel.com>,
+	linux-bluetooth@vger.kernel.org, johannes@sipsolutions.net
+Subject: Re: [PATCH v3] firmware: update Intel Bluetooth device firmware
+ patch files
+Message-ID: <20140519081044.GB30044@adam-laptop>
+References: <1396949427-6929-1-git-send-email-paritosh.debnath@intel.com>
+ <20140512144126.GA4972@adam-laptop>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140512144126.GA4972@adam-laptop>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
-
-On Monday 19 of May 2014 08:23:08 Johan Hedberg wrote:
-> Hi,
-> 
-> On Fri, May 16, 2014, Andrzej Kaczmarek wrote:
+On Mon, May 12, 2014 at 10:41:26PM +0800, Adam Lee wrote:
+> On Tue, Apr 08, 2014 at 03:00:27PM +0530, Paritosh Debnath wrote:
+> > This patch updates firmware patch files for following Intel Bluetooth devices:
+> > - Intel Wireless Bluetooth 7260
+> > - Intel Wireless Bluetooth 3160
+> > 
+> > This patch fixes
+> > - Issue with LED blinking
+> > - Issue with USB
+> > - No SCO data over EHCI
+> > 
+> > Signed-off-by: Paritosh Debnath <paritosh.debnath@intel.com>
 > > ---
-> >  lib/mgmt.h | 12 ++++++++++++
-> >  1 file changed, 12 insertions(+)
+> > This patch contains fixes given on 0x36 submitted by Tedd
+> > http://www.spinics.net/lists/linux-bluetooth/msg45790.html
+> > ---
+> >  WHENCE                                  |    4 ++--
+> >  intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq  |  Bin 18145 -> 21198 bytes
+> >  intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq |  Bin 17917 -> 20989 bytes
+> >  3 files changed, 2 insertions(+), 2 deletions(-)
 > 
-> I've applied the first two patches from this set for the conn-info
-> support.
-> 
-> Johan
+> Hi, please maintainer apply this patch? Lots of laptops are affected.
 
-Patches 3 and 4 are now also upstream, thanks.
+Sorry to bother, but maintainers, please apply this.
+
+Intel 7260 bluetooth malfunction when it is connected to EHCI bus(fixed
+by new firmware):
+http://www.spinics.net/lists/linux-bluetooth/msg39377.html
+
+Intel [8087:07dc] Bluetooth headset only works in A2DP mode on Dell
+Latitude E5440(fixed by new firmware too):
+https://bugs.launchpad.net/bugs/1310558
 
 -- 
-Best regards, 
-Szymon Janc
+Adam Lee
