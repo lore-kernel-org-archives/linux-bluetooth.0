@@ -2,107 +2,128 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 04/11] core: Add ConnectionTXPower property
-Date: Tue, 20 May 2014 01:44:36 +0200
-Message-Id: <1400543083-28811-5-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 10/11] core: Store list of monitored devices in adapter
+Date: Tue, 20 May 2014 01:44:42 +0200
+Message-Id: <1400543083-28811-11-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds ConnectionTXPower property on org.bluez.Device1
-interface which provides local TX power on currently connected link.
-
-Property value will be refreshed once connection monitoring code is in
-place.
+This patch adds list of devices which should be polled for connection
+information to adapter.
 ---
- src/device.c | 32 ++++++++++++++++++++++++++++++++
- src/device.h |  1 +
- 2 files changed, 33 insertions(+)
+ src/adapter.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index fd4e120..ac42a75 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -220,6 +220,7 @@ struct btd_device {
- 	int8_t		rssi;
+diff --git a/src/adapter.c b/src/adapter.c
+index a3204d0..045ce30 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -53,6 +53,7 @@
+ #include "lib/mgmt.h"
+ #include "src/shared/mgmt.h"
+ #include "src/shared/util.h"
++#include "src/shared/queue.h"
  
- 	int8_t		conn_rssi;
-+	int8_t		conn_tx_power;
+ #include "hcid.h"
+ #include "sdpd.h"
+@@ -178,6 +179,7 @@ struct btd_adapter {
+ 	bool discovery_suspended;	/* discovery has been suspended */
+ 	GSList *discovery_list;		/* list of discovery clients */
+ 	GSList *discovery_found;	/* list of found devices */
++	struct queue *monitored_devices;
+ 	guint discovery_idle_timeout;	/* timeout between discovery runs */
+ 	guint passive_scan_timeout;	/* timeout between passive scans */
+ 	guint temp_devices_timeout;	/* timeout for temporary devices */
+@@ -4166,6 +4168,8 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
  
- 	GIOChannel	*att_io;
- 	guint		cleanup_id;
-@@ -838,6 +839,18 @@ static gboolean dev_property_get_conn_rssi(const GDBusPropertyTable *property,
- 	return TRUE;
+ 	adapter->auths = g_queue_new();
+ 
++	adapter->monitored_devices = queue_new();
++
+ 	return btd_adapter_ref(adapter);
  }
  
-+static gboolean dev_property_get_conn_txpower(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
+@@ -4190,6 +4194,9 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->connect_list);
+ 	adapter->connect_list = NULL;
+ 
++	queue_destroy(adapter->monitored_devices, free);
++	adapter->monitored_devices = NULL;
++
+ 	for (l = adapter->devices; l; l = l->next)
+ 		device_remove(l->data, FALSE);
+ 
+@@ -5460,15 +5467,41 @@ static void disconnect_complete(uint8_t status, uint16_t length,
+ 	dev_disconnected(adapter, &rp->addr, MGMT_DEV_DISCONN_LOCAL_HOST);
+ }
+ 
++struct monitored_device {
++	struct mgmt_addr_info addr;
++};
++
++static bool compare_monitored_device(const void *a, const void *b)
 +{
-+	struct btd_device *device = data;
-+	dbus_int16_t val = device->conn_tx_power;
++	const struct monitored_device *a1 = a;
++	const struct monitored_device *b1 = b;
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
-+
-+	return TRUE;
++	return !memcmp(&a1->addr.bdaddr, &b1->addr.bdaddr, sizeof(bdaddr_t)) &&
++			a1->addr.type == b1->addr.type;
 +}
 +
- static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
+ int btd_adapter_add_monitored_device(struct btd_adapter *adapter,
+ 							const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type)
  {
- 	struct btd_device *device = data;
-@@ -1932,6 +1945,7 @@ static const GDBusPropertyTable device_properties[] = {
- 						dev_property_exists_modalias },
- 	{ "Adapter", "o", dev_property_get_adapter },
- 	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
-+	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower },
- 	{ }
- };
++	struct monitored_device *mdev;
+ 	char addrstr[18];
  
-@@ -2327,6 +2341,8 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
- 	str2ba(address, &device->bdaddr);
- 	device->adapter = adapter;
+ 	ba2str(bdaddr, addrstr);
+ 	DBG("addr %s type %d", addrstr, bdaddr_type);
  
-+	device->conn_tx_power = 127; /* invalid */
++	mdev = new0(struct monitored_device, 1);
++	bacpy(&mdev->addr.bdaddr, bdaddr);
++	mdev->addr.type = bdaddr_type;
 +
- 	return btd_device_ref(device);
++	if (queue_find(adapter->monitored_devices, compare_monitored_device,
++									mdev)) {
++		free(mdev);
++		return 0;
++	}
++
++	queue_push_tail(adapter->monitored_devices, mdev);
++
+ 	return 0;
  }
  
-@@ -4073,6 +4089,22 @@ void device_set_conn_rssi(struct btd_device *device, int8_t rssi)
- 							"ConnectionRSSI");
+@@ -5476,11 +5509,26 @@ int btd_adapter_remove_monitored_device(struct btd_adapter *adapter,
+ 							const bdaddr_t *bdaddr,
+ 							uint8_t bdaddr_type)
+ {
++	struct monitored_device match;
++	struct monitored_device *mdev;
+ 	char addrstr[18];
+ 
+ 	ba2str(bdaddr, addrstr);
+ 	DBG("addr %s type %d", addrstr, bdaddr_type);
+ 
++	memset(&match, 0, sizeof(match));
++	bacpy(&match.addr.bdaddr, bdaddr);
++	match.addr.type = bdaddr_type;
++
++	mdev = queue_find(adapter->monitored_devices, compare_monitored_device,
++									&match);
++	if (!mdev)
++		return 0;
++
++	queue_remove(adapter->monitored_devices, mdev);
++
++	free(mdev);
++
+ 	return 0;
  }
  
-+void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power)
-+{
-+	if (!device)
-+		return;
-+
-+	if (device->conn_tx_power == tx_power)
-+		return;
-+
-+	DBG("conn_tx_power %d", tx_power);
-+
-+	device->conn_tx_power = tx_power;
-+
-+	g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
-+							"ConnectionTXPower");
-+}
-+
- static void device_set_auto_connect(struct btd_device *device, gboolean enable)
- {
- 	char addr[18];
-diff --git a/src/device.h b/src/device.h
-index 79d5132..e0e44cc 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -89,6 +89,7 @@ void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
- void device_set_legacy(struct btd_device *device, bool legacy);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
- void device_set_conn_rssi(struct btd_device *device, int8_t rssi);
-+void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power);
- bool btd_device_is_connected(struct btd_device *dev);
- uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
- bool device_is_retrying(struct btd_device *device);
 -- 
 1.9.3
 
