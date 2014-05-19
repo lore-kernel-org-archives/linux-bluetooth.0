@@ -2,142 +2,99 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [RFC 11/11] core: Poll for connection info
-Date: Tue, 20 May 2014 01:44:43 +0200
-Message-Id: <1400543083-28811-12-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [RFC 03/11] core: Add ConnectionRSSI property
+Date: Tue, 20 May 2014 01:44:35 +0200
+Message-Id: <1400543083-28811-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1400543083-28811-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds actual polling mechanism for devices which are stored
-on list for each adapter.
----
- src/adapter.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 83 insertions(+)
+This patch adds ConnectionRSSI property on org.bluez.Device1 interface
+which provides RSSI on currently connected link (unlike RSSI which
+provides RSSI for inquiry/advertising packets).
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 045ce30..c0ebfab 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -183,6 +183,7 @@ struct btd_adapter {
- 	guint discovery_idle_timeout;	/* timeout between discovery runs */
- 	guint passive_scan_timeout;	/* timeout between passive scans */
- 	guint temp_devices_timeout;	/* timeout for temporary devices */
-+	guint mon_devices_timeout;
+Property value will be refreshed once connection monitoring code is in
+place.
+---
+ src/device.c | 30 ++++++++++++++++++++++++++++++
+ src/device.h |  1 +
+ 2 files changed, 31 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index 8222610..fd4e120 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -219,6 +219,8 @@ struct btd_device {
+ 	bool		legacy;
+ 	int8_t		rssi;
  
- 	guint pairable_timeout_id;	/* pairable timeout id */
- 	guint auth_idle_id;		/* Pending authorization dequeue */
-@@ -4189,6 +4190,11 @@ static void adapter_remove(struct btd_adapter *adapter)
- 		adapter->temp_devices_timeout = 0;
- 	}
- 
-+	if (adapter->mon_devices_timeout > 0) {
-+		g_source_remove(adapter->mon_devices_timeout);
-+		adapter->mon_devices_timeout = 0;
-+	}
++	int8_t		conn_rssi;
 +
- 	discovery_cleanup(adapter);
- 
- 	g_slist_free(adapter->connect_list);
-@@ -5467,6 +5473,73 @@ static void disconnect_complete(uint8_t status, uint16_t length,
- 	dev_disconnected(adapter, &rp->addr, MGMT_DEV_DISCONN_LOCAL_HOST);
+ 	GIOChannel	*att_io;
+ 	guint		cleanup_id;
+ 	guint		store_id;
+@@ -825,6 +827,17 @@ static gboolean dev_property_get_trusted(const GDBusPropertyTable *property,
+ 	return TRUE;
  }
  
-+static void monitor_conn_info_destroy(void *data)
++static gboolean dev_property_get_conn_rssi(const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
 +{
 +	struct btd_device *device = data;
++	dbus_int16_t val = device->conn_rssi;
 +
-+	btd_device_unref(device);
-+}
-+
-+static void monitor_conn_info_rsp(uint8_t status, uint16_t len,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_get_conn_info *rp = param;
-+	struct btd_device *device = user_data;
-+
-+	DBG("status %d", status);
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Get Connection Information failed: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (len < sizeof(*rp)) {
-+		error("Too small Get Connection Information response");
-+		return;
-+	}
-+
-+	device_set_conn_rssi(device, rp->rssi);
-+	device_set_conn_tx_power(device, rp->tx_power);
-+}
-+
-+static void monitor_conn_info(void *data, void *user_data)
-+{
-+	struct mgmt_addr_info *addr = data;
-+	struct btd_adapter *adapter = user_data;
-+	struct mgmt_cp_get_conn_info cp;
-+	char addrstr[18];
-+	struct btd_device *device;
-+
-+	ba2str(&addr->bdaddr, addrstr);
-+	DBG("bdaddr %s type %d", addrstr, addr->type);
-+
-+	device = btd_adapter_find_device(adapter, &addr->bdaddr, addr->type);
-+	if (!device)
-+		return;
-+
-+	btd_device_ref(device);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	bacpy(&cp.addr.bdaddr, &addr->bdaddr);
-+	cp.addr.type = addr->type;
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO, adapter->dev_id,
-+					sizeof(cp), &cp, monitor_conn_info_rsp,
-+					device, monitor_conn_info_destroy);
-+}
-+
-+static gboolean trigger_conn_monitor(gpointer user_data)
-+{
-+	struct btd_adapter *adapter = user_data;
-+
-+	DBG("");
-+
-+	queue_foreach(adapter->monitored_devices, monitor_conn_info, adapter);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
 +
 +	return TRUE;
 +}
 +
- struct monitored_device {
- 	struct mgmt_addr_info addr;
+ static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
+ {
+ 	struct btd_device *device = data;
+@@ -1918,6 +1931,7 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Modalias", "s", dev_property_get_modalias, NULL,
+ 						dev_property_exists_modalias },
+ 	{ "Adapter", "o", dev_property_get_adapter },
++	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
+ 	{ }
  };
-@@ -5500,6 +5573,10 @@ int btd_adapter_add_monitored_device(struct btd_adapter *adapter,
- 		return 0;
- 	}
  
-+	if (!queue_length(adapter->monitored_devices))
-+		adapter->mon_devices_timeout =
-+			g_timeout_add(2000, trigger_conn_monitor, adapter);
-+
- 	queue_push_tail(adapter->monitored_devices, mdev);
- 
- 	return 0;
-@@ -5529,6 +5606,12 @@ int btd_adapter_remove_monitored_device(struct btd_adapter *adapter,
- 
- 	free(mdev);
- 
-+	if (!queue_length(adapter->monitored_devices))
-+		if (adapter->mon_devices_timeout > 0) {
-+			g_source_remove(adapter->mon_devices_timeout);
-+			adapter->mon_devices_timeout = 0;
-+		}
-+
- 	return 0;
+@@ -4043,6 +4057,22 @@ void device_set_rssi(struct btd_device *device, int8_t rssi)
+ 						DEVICE_INTERFACE, "RSSI");
  }
  
++void device_set_conn_rssi(struct btd_device *device, int8_t rssi)
++{
++	if (!device)
++		return;
++
++	if (device->conn_rssi == rssi)
++		return;
++
++	DBG("conn_rssi %d", rssi);
++
++	device->conn_rssi = rssi;
++
++	g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
++							"ConnectionRSSI");
++}
++
+ static void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ {
+ 	char addr[18];
+diff --git a/src/device.h b/src/device.h
+index 2e0473e..79d5132 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -88,6 +88,7 @@ void btd_device_set_trusted(struct btd_device *device, gboolean trusted);
+ void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
+ void device_set_legacy(struct btd_device *device, bool legacy);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
++void device_set_conn_rssi(struct btd_device *device, int8_t rssi);
+ bool btd_device_is_connected(struct btd_device *dev);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+ bool device_is_retrying(struct btd_device *device);
 -- 
 1.9.3
 
