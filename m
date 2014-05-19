@@ -1,42 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CALSp4eNpw3XcOW=0uGtV0rgCRsAGGO0EJF7q8VKbLKXWNEh_4A@mail.gmail.com>
-References: <CALSp4ePK23cLJfBMT3Yz79rFkyn_o1PC=oDghnZ+qoAR13SNNg@mail.gmail.com>
-	<CALSp4eNpw3XcOW=0uGtV0rgCRsAGGO0EJF7q8VKbLKXWNEh_4A@mail.gmail.com>
-Date: Mon, 19 May 2014 18:10:37 +0300
-Message-ID: <CABBYNZLfXxWG8pJLa9s4zqJyewkdkBraCVNAiW+vmsHYUf5dRQ@mail.gmail.com>
-Subject: Re: Bluetooth SCO over HCI interface
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: bhasker neti <bnetiqipl@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Adjust PICS for GATT
+Date: Mon, 19 May 2014 15:21:32 +0200
+Message-Id: <1400505692-5855-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+As we do not support SDP record for GATT we shall disable
+respective PICS (6/3). Moreover patch disables support for
+Attribute Protocol over BR/EDR.
+---
+ android/pics-gatt.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-On Mon, May 19, 2014 at 2:41 PM, bhasker neti <bnetiqipl@gmail.com> wrote:
-> Hi Linux-bluetooth  team,
->
-> Can you please share teh inputs,
->
-> How can I enable sco on ubuntu 12.04,
->
-> Please share the configuration required,
->
-> Thanks,
-> Bhasker
->
-> On Sun, May 18, 2014 at 12:33 AM, bhasker neti <bnetiqipl@gmail.com> wrote:
->> I have Bluetooth usb interface connected to ubuntu machine,
->> Bluetooth all other functionality is working fine except SCO audio.
-
-First, no top posting please, regarding your problem we need quite a
-bit more information about what hardware you are using as well as
-software,BlueZ version and possibly logs and how you are trying to
-connect SCO.
-
-
-
+diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
+index f3e8199..a648846 100644
+--- a/android/pics-gatt.txt
++++ b/android/pics-gatt.txt
+@@ -29,7 +29,7 @@ C.4: Optional IF TSPC_GATT_1_2 is supported, otherwise Excluded
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_GATT_2_1	True		Attribute Protocol Supported over BR/EDR
++TSPC_GATT_2_1	False (*)	Attribute Protocol Supported over BR/EDR
+ 					(L2CAP fixed channel support) (C.1)
+ TSPC_GATT_2_2	True		Attribute Protocol Supported over LE (C.2)
+ -------------------------------------------------------------------------------
+@@ -221,7 +221,7 @@ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_GATT_6_2	True		Discover GATT Services using Service Discovery
+ 					Profile (C.1)
+-TSPC_GATT_6_3	True		Publish SDP record for GATT services support
++TSPC_GATT_6_3	False  (*)	Publish SDP record for GATT services support
+ 					via BR/EDR (C.2)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory IF TSPC_GATT_1_1 is supported, otherwise Excluded
 -- 
-Luiz Augusto von Dentz
+1.8.5.3
+
