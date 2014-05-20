@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/6] Bluetooth: Update smp_confirm to return a response code
-Date: Tue, 20 May 2014 09:45:52 +0300
-Message-Id: <1400568352-20454-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 5/6] Bluetooth: Update smp_random to return a response code
+Date: Tue, 20 May 2014 09:45:51 +0300
+Message-Id: <1400568352-20454-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
 References: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,44 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that smp_confirm() is called "inline" we can have it return a
-response code and have the sending of it be done in the shared place for
-command handlers. One exception is when we're entering smp.c from mgmt.c
-when user space responds to authentication, in which case we still need
-our own code to call smp_failuer().
+Since we're now calling smp_random() "inline" we can have it directly
+return a response code and have the shared command handler send the
+response.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ net/bluetooth/smp.c | 34 +++++++++++-----------------------
+ 1 file changed, 11 insertions(+), 23 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index fa782d7b495b..4f9662d0fd81 100644
+index 8d1a1903e458..fa782d7b495b 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -467,14 +467,13 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 	return ret;
+@@ -503,19 +503,17 @@ error:
+ 	smp_failure(conn, reason);
  }
  
--static void smp_confirm(struct smp_chan *smp)
-+static u8 smp_confirm(struct smp_chan *smp)
+-static void smp_random(struct smp_chan *smp)
++static u8 smp_random(struct smp_chan *smp)
  {
  	struct l2cap_conn *conn = smp->conn;
- 	struct hci_dev *hdev = conn->hcon->hdev;
+ 	struct hci_conn *hcon = conn->hcon;
+ 	struct hci_dev *hdev = hcon->hdev;
  	struct crypto_blkcipher *tfm = hdev->tfm_aes;
- 	struct smp_cmd_pairing_confirm cp;
+-	u8 reason, confirm[16];
++	u8 confirm[16];
  	int ret;
--	u8 reason;
  
- 	BT_DBG("conn %p", conn);
+-	if (IS_ERR_OR_NULL(tfm)) {
+-		reason = SMP_UNSPECIFIED;
+-		goto error;
+-	}
++	if (IS_ERR_OR_NULL(tfm))
++		return SMP_UNSPECIFIED;
  
-@@ -488,19 +487,14 @@ static void smp_confirm(struct smp_chan *smp)
+ 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
+ 
+@@ -528,15 +526,12 @@ static void smp_random(struct smp_chan *smp)
  
  	hci_dev_unlock(hdev);
  
@@ -53,9 +59,30 @@ index fa782d7b495b..4f9662d0fd81 100644
 +	if (ret)
 +		return SMP_UNSPECIFIED;
  
- 	clear_bit(SMP_FLAG_CFM_PENDING, &smp->flags);
+ 	if (memcmp(smp->pcnf, confirm, sizeof(smp->pcnf)) != 0) {
+ 		BT_ERR("Pairing failed (confirmation values mismatch)");
+-		reason = SMP_CONFIRM_FAILED;
+-		goto error;
++		return SMP_CONFIRM_FAILED;
+ 	}
  
- 	smp_send_cmd(smp->conn, SMP_CMD_PAIRING_CONFIRM, sizeof(cp), &cp);
+ 	if (hcon->out) {
+@@ -549,10 +544,8 @@ static void smp_random(struct smp_chan *smp)
+ 		memset(stk + smp->enc_key_size, 0,
+ 		       SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
+ 
+-		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags)) {
+-			reason = SMP_UNSPECIFIED;
+-			goto error;
+-		}
++		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
++			return SMP_UNSPECIFIED;
+ 
+ 		hci_le_start_enc(hcon, ediv, rand, stk);
+ 		hcon->enc_key_size = smp->enc_key_size;
+@@ -574,10 +567,7 @@ static void smp_random(struct smp_chan *smp)
+ 			    ediv, rand);
+ 	}
  
 -	return;
 -
@@ -64,39 +91,18 @@ index fa782d7b495b..4f9662d0fd81 100644
 +	return 0;
  }
  
- static u8 smp_random(struct smp_chan *smp)
-@@ -657,8 +651,11 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
- 	}
+ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+@@ -815,9 +805,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	memcpy(smp->rrnd, skb->data, sizeof(smp->rrnd));
+ 	skb_pull(skb, sizeof(smp->rrnd));
  
- 	/* If it is our turn to send Pairing Confirm, do so now */
--	if (test_bit(SMP_FLAG_CFM_PENDING, &smp->flags))
--		smp_confirm(smp);
-+	if (test_bit(SMP_FLAG_CFM_PENDING, &smp->flags)) {
-+		u8 rsp = smp_confirm(smp);
-+		if (rsp)
-+			smp_failure(conn, rsp);
-+	}
- 
- 	return 0;
+-	smp_random(smp);
+-
+-	return 0;
++	return smp_random(smp);
  }
-@@ -765,7 +762,7 @@ static u8 smp_cmd_pairing_rsp(struct l2cap_conn *conn, struct sk_buff *skb)
  
- 	/* Can't compose response until we have been confirmed */
- 	if (test_bit(SMP_FLAG_TK_VALID, &smp->flags))
--		smp_confirm(smp);
-+		return smp_confirm(smp);
- 
- 	return 0;
- }
-@@ -786,7 +783,7 @@ static u8 smp_cmd_pairing_confirm(struct l2cap_conn *conn, struct sk_buff *skb)
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
- 			     smp->prnd);
- 	else if (test_bit(SMP_FLAG_TK_VALID, &smp->flags))
--		smp_confirm(smp);
-+		return smp_confirm(smp);
- 	else
- 		set_bit(SMP_FLAG_CFM_PENDING, &smp->flags);
- 
+ static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
 -- 
 1.9.0
 
