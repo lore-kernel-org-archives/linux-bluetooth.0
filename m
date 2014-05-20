@@ -1,44 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 20 May 2014 19:24:19 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vikrampal <vikram.pal@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, p.sinha@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com
-Subject: Re: ATT/GATT parsing to hcidump
-Message-ID: <20140520162419.GA24078@t440s.P-661HNU-F1>
-References: <001601cf7436$ad7c6360$08752a20$@samsung.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <001601cf7436$ad7c6360$08752a20$@samsung.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 0/6] Bluetooth: SMP cleanups
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 20 May 2014 08:50:17 -0700
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C57C26F5-3933-40C9-9B85-FB96A97625D5@holtmann.org>
+References: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikram,
+Hi Johan,
 
-On Tue, May 20, 2014, Vikrampal wrote:
-> Being new to BlueZ community, I went through BlueZ's TODO items.
-> To get started, I've selected the below TODO item as my maiden contribution.
+> Here's a set of cleanups for the SMP code.
 > 
-> - ATT/GATT parsing to hcidump. Partially implemented, missing to fix
-> multiple advertises in the same event and RSSI
+> Johan
 > 
-> Please provide me your valuable suggestion for the same. Thanks!
+> ----------------------------------------------------------------
+> Johan Hedberg (6):
+>      Bluetooth: Make SMP context private to smp.c
+>      Bluetooth: Fix setting initial local auth_req value
+>      Bluetooth: Remove unnecessary work structs from SMP code
+>      Bluetooth: Rename smp->smp_flags to smp->flags
+>      Bluetooth: Update smp_random to return a response code
+>      Bluetooth: Update smp_confirm to return a response code
+> 
+> net/bluetooth/hci_conn.c |   1 +
+> net/bluetooth/hci_core.c |   1 +
+> net/bluetooth/mgmt.c     |   1 +
+> net/bluetooth/smp.c      | 133 ++++++++++++++++++++-------------------
+> net/bluetooth/smp.h      |  29 ---------
+> 5 files changed, 70 insertions(+), 95 deletions(-)
 
-Please don't look at old versions of the TODO. This item was removed
-last when when I did some basic cleanup there. Now days btmon is the
-preferred replacement for hcidump and it should already have full
-ATT/GATT decoding support.
+all 6 patches have been applied to bluetooth-next tree.
 
-Sorry about the general bad shape of the TODO content. I'm hereby
-calling on anyone with time to do further cleanups on this file,
-especially the maintainers.
+Regards
 
-I don't unfortunately have any good first task suggestion for you,
-except that you might want to also think of what features you feel are
-missing from the perspective of the needs of your company or
-organization.
-
-Johan
-
+Marcel
 
