@@ -1,103 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Run MPS PTS tests
-Date: Tue, 20 May 2014 20:27:26 +0200
-Message-ID: <1917751.ufacKUZ6i8@athlon>
-In-Reply-To: <1400592707-26287-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1400592707-26287-1-git-send-email-sebastian.chlad@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH] android/gatt: Use connect_confirm on incoming connection
+Date: Tue, 20 May 2014 20:25:59 +0200
+Message-ID: <7004783.jupSDf4p6S@athlon>
+In-Reply-To: <1400575412-544-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1400575412-544-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Łukasz,
 
-On Tuesday 20 May 2014 15:31:47 Sebastian Chlad wrote:
+On Tuesday 20 May 2014 10:43:32 Lukasz Rymanowski wrote:
+> This is in order to reuse connect_cb for incoming and outgoing
+> connections. Also it makes code cleaner.
 > ---
->  android/pixit-mps.txt |  2 +-
->  android/pts-mps.txt   | 40 ++++++++++++++++++++--------------------
->  2 files changed, 21 insertions(+), 21 deletions(-)
+>  android/gatt.c | 47 +++++++++++++++++------------------------------
+>  1 file changed, 17 insertions(+), 30 deletions(-)
 > 
-> diff --git a/android/pixit-mps.txt b/android/pixit-mps.txt
-> index c59c913..317a391 100644
-> --- a/android/pixit-mps.txt
-> +++ b/android/pixit-mps.txt
-> @@ -10,7 +10,7 @@ PTS version: 5.1
->  ---------------------------------------------------------------------------
-> ---- Parameter Name						Value
->  ---------------------------------------------------------------------------
-> ---- -TSPX_avrcp_revision
-> +TSPX_avrcp_revision					1.5 (^)
->  TSPX_class_of_device					20050C
->  TSPX_establish_avdtp_stream				TRUE
->  TSPX_iut_establishes_initial_condition			FALSE
-> diff --git a/android/pts-mps.txt b/android/pts-mps.txt
-> index 005318d..4930818 100644
-> --- a/android/pts-mps.txt
-> +++ b/android/pts-mps.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for MPS
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 8e0d72a..d402a31 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -991,8 +991,10 @@ static void connect_cb(GIOChannel *io, GError *gerr,
+> gpointer user_data) return;
+>  	}
 > 
->  PTS version: 5.1
-> -Tested: not tested
-> +Tested: 20.05.2014
->  Android version: 4.4.2
+> -	g_io_channel_unref(dev->att_io);
+> -	dev->att_io = NULL;
+> +	if (dev->att_io) {
+> +		g_io_channel_unref(dev->att_io);
+> +		dev->att_io = NULL;
+> +	}
 > 
->  Results:
-> @@ -14,17 +14,17 @@ NONE	test result is none
->  ---------------------------------------------------------------------------
-> ---- Test Name				Result	Notes
->  ---------------------------------------------------------------------------
-> ---- -TC_AG_SRC_HFAV_ACT_SD_BV_01_I		INC
-> -TC_AG_SRC_HFAV_ACT_SD_BV_02_I		INC
-> -TC_AG_SRC_HFAV_ACT_SD_BV_03_I		INC
-> -TC_AG_SRC_HFAV_CLH_SD_BV_01_I		INC
-> +TC_AG_SRC_HFAV_ACT_SD_BV_01_I		FAIL	JIRA: BZ-33
-> +TC_AG_SRC_HFAV_ACT_SD_BV_02_I		PASS
-> +TC_AG_SRC_HFAV_ACT_SD_BV_03_I		PASS
-> +TC_AG_SRC_HFAV_CLH_SD_BV_01_I		INC	JIRA: BZ-33
->  TC_AG_SRC_HFAV_CLH_SD_BV_02_I		N/A
-> -TC_AG_SRC_HFAV_CLH_SD_BV_03_I		INC
-> -TC_AG_SRC_HFAV_CLH_SD_BV_04_I		INC
-> -TC_AG_SRC_HFAV_CLH_SD_BV_05_I		INC
-> -TC_AG_SRC_HFAV_CLH_SD_BV_06_I		INC
-> -TC_AVP_CTH_SD_BI_01_I			INC
-> -TC_AVP_CTH_SD_BI_02_I			INC
-> +TC_AG_SRC_HFAV_CLH_SD_BV_03_I		INC	JIRA: BZ-33
-> +TC_AG_SRC_HFAV_CLH_SD_BV_04_I		INC	JIRA: BZ-33
-> +TC_AG_SRC_HFAV_CLH_SD_BV_05_I		INC	JIRA: BZ-33
-> +TC_AG_SRC_HFAV_CLH_SD_BV_06_I		INC	JIRA: BZ-33
-> +TC_AVP_CTH_SD_BI_01_I			INC	JIRA: BZ-33
-> +TC_AVP_CTH_SD_BI_02_I			PASS
->  TC_HF_SNK_HFAV_ACT_SD_BV_01_I		N/A
->  TC_HF_SNK_HFAV_ACT_SD_BV_02_I		N/A
->  TC_HF_SNK_HFAV_ACT_SD_BV_03_I		N/A
-> @@ -41,13 +41,13 @@ TC_HF_SNK_CT_HFAV_CLH_MD_BV_03_I	N/A
->  TC_HF_SNK_CT_HFAV_CLH_MD_BV_04_I	N/A
->  TC_HF_SNK_CT_HFAV_CLH_MD_BV_05_I	N/A
->  TC_HF_SNK_CT_HFAV_CLH_MD_BV_06_I	N/A
-> -TC_SDP_CTH_SD_BV_01_I			INC
-> -TC_SRC_TG_HFAV_ACT_MD_BV_01_I		INC
-> -TC_SRC_TG_HFAV_CLH_MD_BV_01_I		INC
-> -TC_SRC_TG_HFAV_CLH_MD_BV_02_I		INC
-> -TC_SRC_TG_HFAV_CLH_MD_BV_03_I		INC
-> -TC_SRC_TG_HFAV_CLH_MD_BV_04_I		INC
-> -TC_SRC_TG_HFAV_CLH_MD_BV_05_I		INC
-> -TC_SRC_TG_HFAV_CLH_MD_BV_06_I		INC
-> -TC_PAIRING_HF_SNK_CT			INC
-> +TC_SDP_CTH_SD_BV_01_I			INC	JIRA: BZ-34
-> +TC_SRC_TG_HFAV_ACT_MD_BV_01_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_01_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_02_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_03_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_04_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_05_I		PASS
-> +TC_SRC_TG_HFAV_CLH_MD_BV_06_I		PASS
-> +TC_PAIRING_HF_SNK_CT			PASS
->  ---------------------------------------------------------------------------
-> ----
+>  	if (gerr) {
+>  		error("gatt: connection failed %s", gerr->message);
+> @@ -4794,21 +4796,15 @@ static void create_listen_connections(void *data,
+> void *user_data) create_connection(dev, app);
+>  }
+> 
+> -static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
+> +static void connect_confirm(GIOChannel *io, void *user_data)
+>  {
+>  	struct gatt_device *dev;
+>  	uint8_t dst_type;
+>  	bdaddr_t dst;
+> -	struct connect_data data;
+> +	GError *gerr = NULL;
+> 
+>  	DBG("");
+> 
+> -	if (gerr) {
+> -		error("gatt: %s", gerr->message);
+> -		g_error_free(gerr);
+> -		return;
+> -	}
+> -
+>  	bt_io_get(io, &gerr,
+>  			BT_IO_OPT_DEST_BDADDR, &dst,
+>  			BT_IO_OPT_DEST_TYPE, &dst_type,
+> @@ -4825,7 +4821,7 @@ static void connect_event(GIOChannel *io, GError
+> *gerr, void *user_data) dev = create_device(&dst);
+>  		if (!dev) {
+>  			error("gatt: Could not create device");
+> -			return;
+> +			goto drop;
+>  		}
+> 
+>  		dev->bdaddr_type = dst_type;
+> @@ -4836,32 +4832,23 @@ static void connect_event(GIOChannel *io, GError
+> *gerr, void *user_data) ba2str(&dst, addr);
+>  			info("gatt: Rejecting incoming connection from %s",
+>  									addr);
+> -			return;
+> +			goto drop;
+>  		}
+>  	}
+> 
+> -	dev->attrib = g_attrib_new(io);
+> -	if (!dev->attrib) {
+> -		error("gatt: unable to create new GAttrib instance");
+> -		destroy_device(dev);
+> -		return;
+> +	if (!bt_io_accept(io, connect_cb, device_ref(dev), NULL, NULL)) {
+> +		error("gatt: failed to accept connection");
+> +		device_unref(dev);
+> +		goto drop;
+>  	}
+> -	dev->watch_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+> -							disconnected_cb, dev);
+> 
+>  	queue_foreach(listen_apps, create_listen_connections, dev);
+> +	device_set_state(dev, DEVICE_CONNECT_READY);
+> 
+> -	data.dev = dev;
+> -	data.status = GATT_SUCCESS;
+> -	device_set_state(dev, DEVICE_CONNECTED);
+> -
+> -	queue_foreach(app_connections, send_app_connect_notifications, &data);
+> +	return;
+> 
+> -	dev->server_id = g_attrib_register(dev->attrib, GATTRIB_ALL_REQS,
+> -						GATTRIB_ALL_HANDLES,
+> -						att_handler, dev, NULL);
+> -	if (dev->server_id == 0)
+> -		error("gatt: Could not attach to server");
+> +drop:
+> +	g_io_channel_shutdown(io, TRUE, NULL);
+>  }
+> 
+>  struct gap_srvc_handles {
+> @@ -5132,7 +5119,7 @@ static bool start_listening_io(void)
+>  	GError *gerr = NULL;
+> 
+>  	/* For now only listen on BLE */
+> -	listening_io = bt_io_listen(connect_event, NULL,
+> +	listening_io = bt_io_listen(NULL, connect_confirm,
+>  					&listening_io, NULL, &gerr,
+>  					BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
+>  					BT_IO_OPT_CID, ATT_CID,
 
 Applied, thanks.
 
