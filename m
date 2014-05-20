@@ -1,127 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH] android/gatt: Use connect_confirm on incoming connection
-Date: Tue, 20 May 2014 20:25:59 +0200
-Message-ID: <7004783.jupSDf4p6S@athlon>
-In-Reply-To: <1400575412-544-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400575412-544-1-git-send-email-lukasz.rymanowski@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Don't response with error for NOTIFICATION and INDICATION
+Date: Tue, 20 May 2014 20:24:21 +0200
+Message-ID: <2463261.SrCrPTSHpr@athlon>
+In-Reply-To: <1400565511-2360-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1400565511-2360-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Marcin,
 
-On Tuesday 20 May 2014 10:43:32 Lukasz Rymanowski wrote:
-> This is in order to reuse connect_cb for incoming and outgoing
-> connections. Also it makes code cleaner.
+On Tuesday 20 May 2014 07:58:31 Marcin Kraglak wrote:
+> We shouldn't response for these commands, as they will be serviced
+> in client implementation.
 > ---
->  android/gatt.c | 47 +++++++++++++++++------------------------------
->  1 file changed, 17 insertions(+), 30 deletions(-)
+>  android/gatt.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index 8e0d72a..d402a31 100644
+> index 8e0d72a..5caa50f 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -991,8 +991,10 @@ static void connect_cb(GIOChannel *io, GError *gerr,
-> gpointer user_data) return;
->  	}
-> 
-> -	g_io_channel_unref(dev->att_io);
-> -	dev->att_io = NULL;
-> +	if (dev->att_io) {
-> +		g_io_channel_unref(dev->att_io);
-> +		dev->att_io = NULL;
-> +	}
-> 
->  	if (gerr) {
->  		error("gatt: connection failed %s", gerr->message);
-> @@ -4794,21 +4796,15 @@ static void create_listen_connections(void *data,
-> void *user_data) create_connection(dev, app);
->  }
-> 
-> -static void connect_event(GIOChannel *io, GError *gerr, void *user_data)
-> +static void connect_confirm(GIOChannel *io, void *user_data)
->  {
->  	struct gatt_device *dev;
->  	uint8_t dst_type;
->  	bdaddr_t dst;
-> -	struct connect_data data;
-> +	GError *gerr = NULL;
-> 
->  	DBG("");
-> 
-> -	if (gerr) {
-> -		error("gatt: %s", gerr->message);
-> -		g_error_free(gerr);
-> -		return;
-> -	}
-> -
->  	bt_io_get(io, &gerr,
->  			BT_IO_OPT_DEST_BDADDR, &dst,
->  			BT_IO_OPT_DEST_TYPE, &dst_type,
-> @@ -4825,7 +4821,7 @@ static void connect_event(GIOChannel *io, GError
-> *gerr, void *user_data) dev = create_device(&dst);
->  		if (!dev) {
->  			error("gatt: Could not create device");
-> -			return;
-> +			goto drop;
->  		}
-> 
->  		dev->bdaddr_type = dst_type;
-> @@ -4836,32 +4832,23 @@ static void connect_event(GIOChannel *io, GError
-> *gerr, void *user_data) ba2str(&dst, addr);
->  			info("gatt: Rejecting incoming connection from %s",
->  									addr);
-> -			return;
-> +			goto drop;
->  		}
->  	}
-> 
-> -	dev->attrib = g_attrib_new(io);
-> -	if (!dev->attrib) {
-> -		error("gatt: unable to create new GAttrib instance");
-> -		destroy_device(dev);
-> -		return;
-> +	if (!bt_io_accept(io, connect_cb, device_ref(dev), NULL, NULL)) {
-> +		error("gatt: failed to accept connection");
-> +		device_unref(dev);
-> +		goto drop;
->  	}
-> -	dev->watch_id = g_io_add_watch(io, G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-> -							disconnected_cb, dev);
-> 
->  	queue_foreach(listen_apps, create_listen_connections, dev);
-> +	device_set_state(dev, DEVICE_CONNECT_READY);
-> 
-> -	data.dev = dev;
-> -	data.status = GATT_SUCCESS;
-> -	device_set_state(dev, DEVICE_CONNECTED);
-> -
-> -	queue_foreach(app_connections, send_app_connect_notifications, &data);
-> +	return;
-> 
-> -	dev->server_id = g_attrib_register(dev->attrib, GATTRIB_ALL_REQS,
-> -						GATTRIB_ALL_HANDLES,
-> -						att_handler, dev, NULL);
-> -	if (dev->server_id == 0)
-> -		error("gatt: Could not attach to server");
-> +drop:
-> +	g_io_channel_shutdown(io, TRUE, NULL);
->  }
-> 
->  struct gap_srvc_handles {
-> @@ -5132,7 +5119,7 @@ static bool start_listening_io(void)
->  	GError *gerr = NULL;
-> 
->  	/* For now only listen on BLE */
-> -	listening_io = bt_io_listen(connect_event, NULL,
-> +	listening_io = bt_io_listen(NULL, connect_confirm,
->  					&listening_io, NULL, &gerr,
->  					BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
->  					BT_IO_OPT_CID, ATT_CID,
+> @@ -4762,11 +4762,13 @@ static void att_handler(const uint8_t *ipdu,
+> uint16_t len, gpointer user_data) case ATT_OP_FIND_BY_TYPE_REQ:
+>  		status = find_by_type_request(ipdu, len, dev);
+>  		break;
+> +        case ATT_OP_HANDLE_IND:
+> +        case ATT_OP_HANDLE_NOTIFY:
+> +		/* Client will handle this */
+> +		return;
+>  	case ATT_OP_EXEC_WRITE_REQ:
+>  		/* TODO */
+>  	case ATT_OP_HANDLE_CNF:
+> -	case ATT_OP_HANDLE_IND:
+> -	case ATT_OP_HANDLE_NOTIFY:
+>  	case ATT_OP_READ_MULTI_REQ:
+>  	default:
+>  		DBG("Unsupported request 0x%02x", ipdu[0]);
 
 Applied, thanks.
 
