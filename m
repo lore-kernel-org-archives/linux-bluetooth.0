@@ -1,49 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/6] Bluetooth: Fix setting initial local auth_req value
-Date: Tue, 20 May 2014 09:45:48 +0300
-Message-Id: <1400568352-20454-3-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
-References: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 0/6] Bluetooth: SMP cleanups
+Date: Tue, 20 May 2014 09:45:46 +0300
+Message-Id: <1400568352-20454-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi,
 
-There is no reason to have the initial local value conditional to
-whether the remote value has bonding set or not. We can either way start
-off with the value we received.
+Here's a set of cleanups for the SMP code.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Johan
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index df91ed28084f..72743f87b22f 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -685,8 +685,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
- 	struct smp_chan *smp;
--	u8 key_size;
--	u8 auth = SMP_AUTH_NONE;
-+	u8 key_size, auth;
- 	int ret;
- 
- 	BT_DBG("conn %p", conn);
-@@ -710,8 +709,7 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	skb_pull(skb, sizeof(*req));
- 
- 	/* We didn't start the pairing, so match remote */
--	if (req->auth_req & SMP_AUTH_BONDING)
--		auth = req->auth_req;
-+	auth = req->auth_req;
- 
- 	conn->hcon->pending_sec_level = authreq_to_seclevel(auth);
- 
--- 
-1.9.0
+----------------------------------------------------------------
+Johan Hedberg (6):
+      Bluetooth: Make SMP context private to smp.c
+      Bluetooth: Fix setting initial local auth_req value
+      Bluetooth: Remove unnecessary work structs from SMP code
+      Bluetooth: Rename smp->smp_flags to smp->flags
+      Bluetooth: Update smp_random to return a response code
+      Bluetooth: Update smp_confirm to return a response code
+
+ net/bluetooth/hci_conn.c |   1 +
+ net/bluetooth/hci_core.c |   1 +
+ net/bluetooth/mgmt.c     |   1 +
+ net/bluetooth/smp.c      | 133 ++++++++++++++++++++-------------------
+ net/bluetooth/smp.h      |  29 ---------
+ 5 files changed, 70 insertions(+), 95 deletions(-)
 
