@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <001601cf7436$ad7c6360$08752a20$@samsung.com>
-References: <001601cf7436$ad7c6360$08752a20$@samsung.com>
-Date: Tue, 20 May 2014 18:29:15 +0300
-Message-ID: <CABBYNZLMrj__0xcj624De3fo9BT1tX-a6cWWYgXKwwqcPFmLzw@mail.gmail.com>
-Subject: Re: ATT/GATT parsing to hcidump
+In-Reply-To: <OF9492748C.5E888D74-ON65257CDE.00285283-65257CDE.00285286@tcs.com>
+References: <OF9492748C.5E888D74-ON65257CDE.00285283-65257CDE.00285286@tcs.com>
+Date: Tue, 20 May 2014 18:13:18 +0300
+Message-ID: <CABBYNZJi49XwzbWwtSvwGD5xzPGBG8OmRyi=RxdxiBfimOEprQ@mail.gmail.com>
+Subject: Re: AVRCP support required in Bluez 4.98 or 4.101
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Vikrampal <vikram.pal@samsung.com>
+To: Vinod Rayapudi <vinod.rayapudi@tcs.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Dmitry Kasatkin <d.kasatkin@samsung.com>, p.sinha@samsung.com,
-	bharat.panda@samsung.com, cpgs@samsung.com
+	linux-bluetooth-owner@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi,
 
-On Tue, May 20, 2014 at 5:20 PM, Vikrampal <vikram.pal@samsung.com> wrote:
-> Hi All,
+On Tue, May 20, 2014 at 10:20 AM, Vinod Rayapudi <vinod.rayapudi@tcs.com> wrote:
+> Dear Team,
 >
-> Being new to BlueZ community, I went through BlueZ's TODO items.
-> To get started, I've selected the below TODO item as my maiden contribution.
+> I am working with Bluez 4.98 and 4.101 version.
+> Due to some project related constraints we are not able to move to Bluez 5+ versions.
 >
-> - ATT/GATT parsing to hcidump. Partially implemented, missing to fix
-> multiple advertises in the same event and RSSI
+> I want to use AVRCP and where as in Bluez 4.98 or 4.101 versions, I couldn't find any support for PLAY,PAUSE,STOP,FORWARD etc.
 >
-> Please provide me your valuable suggestion for the same. Thanks!
+> Can anyone help me, how to add these features with Bluez 4+ version.
+>
+> With Bluez 4.98, I can see that VolumeUp and Down controls in d-feet but from hcidump shows those commands are not implemented.
 
+You are mostly on your own with 4.x, you can try backporting from what
+is currently upstream but there is no support for 4.x anymore.
 
-We should probably update the TODO about hcidump, the plans are to
-move the parsers to btmon and deprecate hcidump so there is a _LOT_
-work in to be done in that area.
+-- 
+Luiz Augusto von Dentz
