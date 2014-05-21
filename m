@@ -2,34 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/3] attrib: Fix minor whitespace issue
-Date: Wed, 21 May 2014 16:34:41 +0200
-Message-Id: <1400682882-11341-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1400682882-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1400682882-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/3] android/gatt: Check for connection state on connection search
+Date: Wed, 21 May 2014 16:34:40 +0200
+Message-Id: <1400682882-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Replace spaces with tabs.
+This search was used with the assumption that connection is in
+"connected" state. This could result in attrib pointer being
+dereferenced while it's still NULL (pending connection).
 ---
- attrib/att.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/gatt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/attrib/att.h b/attrib/att.h
-index c612d80..927a044 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -83,8 +83,8 @@
- #define ATT_PSM					31
+diff --git a/android/gatt.c b/android/gatt.c
+index 89da60d..1b000c4 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -364,8 +364,14 @@ static bool match_connection_by_device_and_app(const void *data,
  
- /* Flags for Execute Write Request Operation */
--#define ATT_CANCEL_ALL_PREP_WRITES              0x00
--#define ATT_WRITE_ALL_PREP_WRITES               0x01
-+#define ATT_CANCEL_ALL_PREP_WRITES		0x00
-+#define ATT_WRITE_ALL_PREP_WRITES		0x01
+ static struct app_connection *find_connection_by_id(int32_t conn_id)
+ {
+-	return queue_find(app_connections, match_connection_by_id,
++	struct app_connection *conn;
++
++	conn = queue_find(app_connections, match_connection_by_id,
+ 							INT_TO_PTR(conn_id));
++	if (conn && conn->device->state == DEVICE_CONNECTED)
++		return conn;
++
++	return NULL;
+ }
  
- /* Find Information Response Formats */
- #define ATT_FIND_INFO_RESP_FMT_16BIT		0x01
+ static bool match_connection_by_device(const void *data, const void *user_data)
 -- 
 1.9.3
 
