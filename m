@@ -1,28 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv4 0/4] MTU negotiation
-Date: Wed, 21 May 2014 16:17:31 +0200
-Message-Id: <1400681855-7438-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <20140521131631.GA25779@t440s.P-661HNU-F1>
+References: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1400676302-13626-6-git-send-email-lukasz.rymanowski@tieto.com>
+	<20140521131631.GA25779@t440s.P-661HNU-F1>
+Date: Wed, 21 May 2014 16:10:01 +0200
+Message-ID: <CAMudyAuRM29q_LPX63Bh2tpHS_S5h5toZoJu2MJQEXuOavpuzg@mail.gmail.com>
+Subject: Re: [PATCH 05/12] android/bluetooth: Expose API to update sign counter
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-V4 changes:
-	* add check for application type allowing only client to send request
-	* simplified mtu handling, its stored in device on every change so there
-		is no need to take it out of attrib io channel every time
-	* added patches 3 and 4
+Hi Johan,
 
-Jakub Tyszkowski (4):
-  android/gatt: Send Exchange MTU request on connect
-  android/gatt: Use g_attrib buffer where possible for att
-  android/gatt: Make att_handler use g_attrib buffer
-  android/gatt: Use default mtu on mtu exchange response
+On 21 May 2014 15:16, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Wed, May 21, 2014, Lukasz Rymanowski wrote:
+>> +void bt_update_sign_counter(const bdaddr_t *addr, bool local);
+>
+> This doesn't make for a good API since you can't know which counter
+> bt_update_sign_counter(bdaddr, true/false) updates without looking at
+> the actual implementation. Either create a two-value enum or have two
+> separate functions to make the calling code more readable.
+>
 
- android/gatt.c | 221 +++++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 168 insertions(+), 53 deletions(-)
+Ok, will add enum here.
 
---
-1.9.3
+> Johan
 
+Thanks
+Lukasz
