@@ -3,55 +3,67 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 00/12] android/gatt: Add support for write signature command
-Date: Wed, 21 May 2014 14:44:50 +0200
-Message-Id: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/gatt: Fix handling write request
+Date: Wed, 21 May 2014 14:32:19 +0200
+Message-Id: <1400675539-12592-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set add support for write signature command for android part.
-* handling CSRK and signCounter in android/bluetooth - storage
-* exchanging CSRK and signCounter between android/bluetooth and gatt
-* handling incoming and outgoing write signature command.
+This patch adds write request to Android framework and uses buffor on
+the stack for the request event.
+---
+ android/gatt.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-Some common part has been updated (attrib, crypto)
-
-In next patches error handling will be added.
-
-Note: If you run on Nexus devices there is need to update kernel which
-needs to support CRYPTO_CSRK, CRYPTO_USER_API, CRYPTO_USER_API_HASH,
-CRYPTO_USER_API_SKCIPHER. All the information available on
-https://code.google.com/p/aosp-bluez/
-
-
-Lukasz Rymanowski (12):
-  shared/crypto: Extend bt_crypto_sign_att with sign counter
-  attrib: Add helpers to enc and dec signed write command
-  attrib/gatt: Add wrapper to send signed write command
-  android/bluetooth: Expose API to get CSRK for device
-  android/bluetooth: Expose API to update sign counter
-  android/bluetooth: Add support to read CSRK from the kernel
-  android/bluetooth: Store CSRK
-  android/bluetooth: Read CSRK from the storage on startup
-  android/bluetooth: Store sign counter needed for aes-cmac sign
-  android/gatt: Add crypto needed for sign write
-  android/gatt: Add support for signed write command
-  android/gatt: Add handling signed write from remote device
-
- android/Android.mk  |   1 +
- android/Makefile.am |   1 +
- android/bluetooth.c | 182 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |   5 ++
- android/gatt.c      |  88 ++++++++++++++++++++++++-
- attrib/att.c        |  55 ++++++++++++++++
- attrib/att.h        |  11 ++++
- attrib/gatt.c       |  16 +++++
- attrib/gatt.h       |   5 ++
- src/shared/crypto.c |  23 ++++++-
- src/shared/crypto.h |   1 +
- unit/test-crypto.c  |   2 +-
- 12 files changed, 385 insertions(+), 5 deletions(-)
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 89da60d..42bf2ec 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3891,7 +3891,8 @@ static void write_cb(uint16_t handle, uint16_t offset,
+ 					uint8_t att_opcode, bdaddr_t *bdaddr,
+ 					void *user_data)
+ {
+-	struct hal_ev_gatt_server_request_write ev;
++	uint8_t buf[IPC_MTU];
++	struct hal_ev_gatt_server_request_write *ev = (void *) buf;
+ 	struct gatt_app *app;
+ 	int32_t id = PTR_TO_INT(user_data);
+ 	static int32_t trans_id = 1;
+@@ -3916,21 +3917,24 @@ static void write_cb(uint16_t handle, uint16_t offset,
+ 	if (att_opcode == ATT_OP_EXEC_WRITE_REQ)
+ 		goto failed;
+ 
+-	memset(&ev, 0, sizeof(ev));
++	memset(ev, 0, sizeof(*ev));
+ 
+-	bdaddr2android(bdaddr, ev.bdaddr);
+-	ev.attr_handle = handle;
+-	ev.offset = offset;
++	bdaddr2android(bdaddr, &ev->bdaddr);
++	ev->attr_handle = handle;
++	ev->offset = offset;
+ 
+-	ev.conn_id = conn->id;
+-	ev.trans_id = app->trans_id.id;
++	ev->conn_id = conn->id;
++	ev->trans_id = app->trans_id.id;
+ 
+-	ev.is_prep = att_opcode == ATT_OP_PREP_WRITE_REQ;
+-	ev.need_rsp = att_opcode == ATT_OP_WRITE_REQ;
++	ev->is_prep = att_opcode == ATT_OP_PREP_WRITE_REQ;
++	ev->need_rsp = att_opcode == ATT_OP_WRITE_REQ;
+ 
+-	ev.length = len;
+-	memcpy(&ev.value, value, len);
++	ev->length = len;
++	memcpy(ev->value, value, len);
+ 
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
++			HAL_EV_GATT_SERVER_REQUEST_WRITE,
++						sizeof(*ev) + ev->length , ev);
+ 	return;
+ 
+ failed:
 -- 
 1.8.4
 
