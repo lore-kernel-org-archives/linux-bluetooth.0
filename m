@@ -3,83 +3,56 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 07/12] android/bluetooth: Store CSRK
-Date: Wed, 21 May 2014 14:44:57 +0200
-Message-Id: <1400676302-13626-8-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 05/12] android/bluetooth: Expose API to update sign counter
+Date: Wed, 21 May 2014 14:44:55 +0200
+Message-Id: <1400676302-13626-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-CSRK is generated while paring and should be used for sign att packets
-when LE devices uses write signed command.
+This is needed so GATT can notify GAP that write sign has been done and
+sign counter shall be increased as per spec.
 ---
- android/bluetooth.c | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 44 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 14 ++++++++++++++
+ android/bluetooth.h |  2 ++
+ 2 files changed, 16 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index a703148..576911c 100644
+index 6a10e83..201238b 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -1804,6 +1804,46 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
- 	/* TODO browse services here? */
+@@ -3229,6 +3229,20 @@ bool bt_get_csrk(const bdaddr_t *addr, bool local, uint8_t key[16],
+ 	return true;
  }
  
-+static void store_csrk(struct device *dev)
++void bt_update_sign_counter(const bdaddr_t *addr, bool local)
 +{
-+	GKeyFile *key_file;
-+	char key_str[33];
-+	char addr[18];
-+	int i;
-+	gsize length = 0;
-+	char *data;
++	struct device *dev;
 +
-+	ba2str(&dev->bdaddr, addr);
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
-+		g_key_file_free(key_file);
++	dev = find_device(addr);
++	if (!dev)
 +		return;
-+	}
 +
-+	if (dev->valid_local_csrk) {
-+
-+		for (i = 0; i < 16; i++)
-+			sprintf(key_str + (i * 2), "%2.2X",
-+							dev->local_csrk[i]);
-+
-+		g_key_file_set_string(key_file, addr, "LocalCSRK", key_str);
-+	}
-+
-+	if (dev->valid_remote_csrk) {
-+		for (i = 0; i < 16; i++)
-+			sprintf(key_str + (i * 2), "%2.2X", dev->remote_csrk[i]);
-+
-+		g_key_file_set_string(key_file, addr, "RemoteCSRK", key_str);
-+	}
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(DEVICES_FILE, data, length, NULL);
-+	g_free(data);
-+
-+	g_key_file_free(key_file);
++	if (local)
++		dev->local_sign_cnt++;
++	else
++		dev->remote_sign_cnt++;
 +}
 +
- static void new_csrk_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
  {
-@@ -1834,7 +1874,10 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
+ 	const uint8_t *mode = buf;
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 8462770..cc07525 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -58,3 +58,5 @@ bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
  
--	/*TODO: Store it. Remember about Sign Counter*/
-+	if (ev->store_hint)
-+		store_csrk(dev);
+ bool bt_get_csrk(const bdaddr_t *addr, bool local, uint8_t key[16],
+ 							uint32_t *sign_cnt);
 +
-+	/*TODO: Store sign counter */
- }
- 
- static void register_mgmt_handlers(void)
++void bt_update_sign_counter(const bdaddr_t *addr, bool local);
 -- 
 1.8.4
 
