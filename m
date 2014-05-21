@@ -1,27 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 21 May 2014 16:16:31 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH 05/12] android/bluetooth: Expose API to update sign
- counter
-Message-ID: <20140521131631.GA25779@t440s.P-661HNU-F1>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 12/12] android/gatt: Add handling signed write from remote device
+Date: Wed, 21 May 2014 14:45:02 +0200
+Message-Id: <1400676302-13626-13-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
- <1400676302-13626-6-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1400676302-13626-6-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+---
+ android/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-On Wed, May 21, 2014, Lukasz Rymanowski wrote:
-> +void bt_update_sign_counter(const bdaddr_t *addr, bool local);
+diff --git a/android/gatt.c b/android/gatt.c
+index 933f830..5db4e93 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4705,6 +4705,44 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0], &dev->bdaddr);
+ }
+ 
++static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
++						struct gatt_device *dev)
++{
++	uint8_t value[ATT_DEFAULT_LE_MTU];
++	uint8_t s[ATT_SIGNATURE_LEN];
++	uint16_t handle;
++	uint16_t len;
++	size_t vlen;
++	uint8_t csrk[16];
++	uint32_t sign_cnt;
++
++	if (!bt_get_csrk(&dev->bdaddr, false, csrk, &sign_cnt)) {
++		error("gatt: No valid csrk from remote device");
++		return;
++	}
++
++	len = dec_signed_write_cmd(cmd, cmd_len, &handle, value, &vlen, s);
++	if (len) {
++		uint8_t t[ATT_SIGNATURE_LEN];
++
++		/* Generate signature and verify it */
++		if (!bt_crypto_sign_att(crypto, csrk, value, vlen, sign_cnt,
++									t)) {
++			error("gatt: Error when generating att signature");
++			return;
++		}
++
++		if (memcmp(t, s, ATT_SIGNATURE_LEN)) {
++			error("gatt: signature does not match");
++			return;
++		}
++		/* Signature OK, proceed with write */
++		bt_update_sign_counter(&dev->bdaddr, false);
++		gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
++								&dev->bdaddr);
++	}
++}
++
+ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *dev)
+ {
+@@ -4791,6 +4829,10 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		write_cmd_request(ipdu, len, dev);
+ 		/* No response on write cmd */
+ 		return;
++	case ATT_OP_SIGNED_WRITE_CMD:
++		write_signed_cmd_request(ipdu, len, dev);
++		/* No response on write signed cmd */
++		return;
+ 	case ATT_OP_PREP_WRITE_REQ:
+ 		status = write_prep_request(ipdu, len, dev);
+ 		if (!status)
+-- 
+1.8.4
 
-This doesn't make for a good API since you can't know which counter
-bt_update_sign_counter(bdaddr, true/false) updates without looking at
-the actual implementation. Either create a two-value enum or have two
-separate functions to make the calling code more readable.
-
-Johan
