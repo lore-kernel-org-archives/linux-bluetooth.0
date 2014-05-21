@@ -3,93 +3,99 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 10/12] android/gatt: Add crypto needed for sign write
-Date: Wed, 21 May 2014 14:45:00 +0200
-Message-Id: <1400676302-13626-11-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 09/12] android/bluetooth: Store sign counter needed for aes-cmac sign
+Date: Wed, 21 May 2014 14:44:59 +0200
+Message-Id: <1400676302-13626-10-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If CSRK is valid between sessions we should remember sign counter.
+Therefor store it.
 ---
- android/Android.mk  |  1 +
- android/Makefile.am |  1 +
- android/gatt.c      | 10 +++++++++-
- 3 files changed, 11 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 4235a7c..4548ed7 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -53,6 +53,7 @@ LOCAL_SRC_FILES := \
- 	bluez/src/shared/hfp.c \
- 	bluez/src/shared/gatt-db.c \
- 	bluez/src/shared/io-glib.c \
-+	bluez/src/shared/crypto.c \
- 	bluez/src/sdpd-database.c \
- 	bluez/src/sdpd-service.c \
- 	bluez/src/sdpd-request.c \
-diff --git a/android/Makefile.am b/android/Makefile.am
-index e663790..1bde83d 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -31,6 +31,7 @@ android_bluetoothd_SOURCES = android/main.c \
- 				src/shared/ringbuf.h src/shared/ringbuf.c \
- 				src/shared/hfp.h src/shared/hfp.c \
- 				src/shared/gatt-db.h src/shared/gatt-db.c \
-+				src/shared/crypto.h src/shared/crypto.c \
- 				android/bluetooth.h android/bluetooth.c \
- 				android/hidhost.h android/hidhost.c \
- 				android/ipc-common.h \
-diff --git a/android/gatt.c b/android/gatt.c
-index 89da60d..fa017e8 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -44,6 +44,7 @@
- #include "src/shared/util.h"
- #include "src/shared/queue.h"
- #include "src/shared/gatt-db.h"
-+#include "src/shared/crypto.h"
- #include "attrib/gattrib.h"
- #include "attrib/att.h"
- #include "attrib/gatt.h"
-@@ -180,6 +181,8 @@ static struct gatt_db *gatt_db = NULL;
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 0fe1e9a..d08161d 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1876,8 +1876,6 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
  
- static GIOChannel *listening_io = NULL;
+ 	if (ev->store_hint)
+ 		store_csrk(dev);
+-
+-	/*TODO: Store sign counter */
+ }
  
-+static struct bt_crypto *crypto = NULL;
+ static void register_mgmt_handlers(void)
+@@ -2351,6 +2349,9 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 			sscanf(str + (i * 2), "%02hhX", &dev->local_csrk[i]);
+ 
+ 		g_free(str);
 +
- static void bt_le_discovery_stop_cb(void);
- 
- static bool is_bluetooth_uuid(const uint8_t *uuid)
-@@ -5144,9 +5147,10 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	app_connections = queue_new();
- 	listen_apps = queue_new();
- 	gatt_db = gatt_db_new();
-+	crypto = bt_crypto_new();
- 
- 	if (!gatt_devices || !gatt_apps || !listen_apps ||
--						!app_connections || !gatt_db) {
-+				!app_connections || !gatt_db || !crypto) {
- 		error("gatt: Failed to allocate memory for queues");
- 
- 		queue_destroy(gatt_apps, NULL);
-@@ -5167,6 +5171,8 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 		g_io_channel_unref(listening_io);
- 		listening_io = NULL;
- 
-+		bt_crypto_unref(crypto);
-+
- 		return false;
++		dev->local_sign_cnt = g_key_file_get_integer(key_file, peer,
++						"LocalCSRKSignCounter", NULL);
  	}
  
-@@ -5208,4 +5214,6 @@ void bt_gatt_unregister(void)
+ 	str = g_key_file_get_string(key_file, peer, "RemoteCSRK", NULL);
+@@ -2362,6 +2363,9 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 			sscanf(str + (i * 2), "%02hhX", &dev->remote_csrk[i]);
  
- 	g_io_channel_unref(listening_io);
- 	listening_io = NULL;
+ 		g_free(str);
 +
-+	bt_crypto_unref(crypto);
++		dev->remote_sign_cnt = g_key_file_get_integer(key_file, peer,
++						"RemoteCSRKSignCounter", NULL);
+ 	}
+ 
+ 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
+@@ -3331,6 +3335,36 @@ bool bt_get_csrk(const bdaddr_t *addr, bool local, uint8_t key[16],
+ 	return true;
  }
+ 
++static void store_sign_counter(struct device *dev, bool local)
++{
++	const char *sign_cnt_s;
++	uint32_t sign_cnt;
++	GKeyFile *key_file;
++
++	gsize length = 0;
++	char addr[18];
++	char *data;
++
++	key_file = g_key_file_new();
++	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
++		g_key_file_free(key_file);
++		return;
++	}
++
++	ba2str(&dev->bdaddr, addr);
++
++	sign_cnt_s = local ? "LocalCSRKSignCounter" : "RemoteCSRKSignCounter";
++	sign_cnt = local ? dev->local_sign_cnt : dev->remote_sign_cnt;
++
++	g_key_file_set_integer(key_file, addr, sign_cnt_s, sign_cnt);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(DEVICES_FILE, data, length, NULL);
++	g_free(data);
++
++	g_key_file_free(key_file);
++}
++
+ void bt_update_sign_counter(const bdaddr_t *addr, bool local)
+ {
+ 	struct device *dev;
+@@ -3343,6 +3377,8 @@ void bt_update_sign_counter(const bdaddr_t *addr, bool local)
+ 		dev->local_sign_cnt++;
+ 	else
+ 		dev->remote_sign_cnt++;
++
++	store_sign_counter(dev, local);
+ }
+ 
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
 -- 
 1.8.4
 
