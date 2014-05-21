@@ -1,248 +1,316 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/8] unit/test-uhid: Add /uhid/command/create test
-Date: Wed, 21 May 2014 18:01:03 +0300
-Message-Id: <1400684469-2693-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1400684469-2693-1-git-send-email-luiz.dentz@gmail.com>
-References: <1400684469-2693-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/8] shared/uhid: Add initial API
+Date: Wed, 21 May 2014 18:01:02 +0300
+Message-Id: <1400684469-2693-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- unit/test-uhid.c | 210 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 210 insertions(+)
+ Makefile.am       |   8 +++
+ src/shared/uhid.c | 175 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/uhid.h |  43 ++++++++++++++
+ unit/test-uhid.c  |  37 ++++++++++++
+ 4 files changed, 263 insertions(+)
+ create mode 100644 src/shared/uhid.c
+ create mode 100644 src/shared/uhid.h
+ create mode 100644 unit/test-uhid.c
 
-diff --git a/unit/test-uhid.c b/unit/test-uhid.c
-index e0fb411..e4b53e6 100644
---- a/unit/test-uhid.c
-+++ b/unit/test-uhid.c
-@@ -25,13 +25,223 @@
- #include <config.h>
- #endif
+diff --git a/Makefile.am b/Makefile.am
+index 3ca98d0..6b989b4 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -263,6 +263,14 @@ unit_test_mgmt_SOURCES = unit/test-mgmt.c \
+ 				src/shared/mgmt.h src/shared/mgmt.c
+ unit_test_mgmt_LDADD = @GLIB_LIBS@
  
++unit_tests += unit/test-uhid
++
++unit_test_uhid_SOURCES = unit/test-uhid.c \
++				src/shared/uhid.h src/shared/uhid.c \
++				src/shared/io.h src/shared/io-glib.c \
++				src/shared/util.h src/shared/util.c
++unit_test_uhid_LDADD = @GLIB_LIBS@
++
+ unit_tests += unit/test-sdp
+ 
+ unit_test_sdp_SOURCES = unit/test-sdp.c \
+diff --git a/src/shared/uhid.c b/src/shared/uhid.c
+new file mode 100644
+index 0000000..13d9b5e
+--- /dev/null
++++ b/src/shared/uhid.c
+@@ -0,0 +1,175 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <stdio.h>
 +#include <unistd.h>
-+#include <stdlib.h>
-+#include <stdbool.h>
-+#include <inttypes.h>
 +#include <string.h>
++#include <errno.h>
 +#include <fcntl.h>
-+#include <sys/socket.h>
 +
- #include <glib.h>
- 
- #include "src/shared/uhid.h"
++#include "src/shared/io.h"
 +#include "src/shared/util.h"
++#include "src/shared/uhid.h"
 +
-+struct test_pdu {
-+	bool valid;
-+	const uint8_t *data;
-+	size_t size;
++#define UHID_DEVICE_FILE "/dev/uhid"
++
++struct bt_uhid {
++	int ref_count;
++	struct io *io;
 +};
 +
-+struct test_data {
-+	char *test_name;
-+	struct test_pdu *pdu_list;
-+};
++static void uhid_free(struct bt_uhid *uhid)
++{
++	if (uhid->io)
++		io_destroy(uhid->io);
 +
-+struct context {
-+	GMainLoop *main_loop;
++	free(uhid);
++}
++
++static bool uhid_read_handler(struct io *io, void *user_data)
++{
++	int fd;
++	ssize_t len;
++	struct uhid_event ev;
++
++	fd = io_get_fd(io);
++	if (fd < 0)
++		return false;
++
++	memset(&ev, 0, sizeof(ev));
++
++	len = read(fd, &ev, sizeof(ev));
++	if (len < 0)
++		return false;
++
++	if ((size_t) len < sizeof(ev.type))
++		return false;
++
++	return true;
++}
++
++struct bt_uhid *bt_uhid_new_default(void)
++{
 +	struct bt_uhid *uhid;
-+	guint source;
-+	guint process;
 +	int fd;
-+	unsigned int pdu_offset;
-+	const struct test_data *data;
-+};
 +
-+#define event(args...)						\
-+	{							\
-+		.valid = true,					\
-+		.data = (void *) args,				\
-+		.size = sizeof(*args),				\
++	fd = open(UHID_DEVICE_FILE, O_RDWR | O_CLOEXEC);
++	if (fd < 0)
++		return NULL;
++
++	uhid = bt_uhid_new(fd);
++	if (!uhid) {
++		close(fd);
++		return NULL;
 +	}
 +
-+#define define_test(name, function, args...)				\
-+	do {								\
-+		const struct test_pdu pdus[] = {			\
-+			args, { }					\
-+		};							\
-+		static struct test_data data;				\
-+		data.test_name = g_strdup(name);			\
-+		data.pdu_list = g_malloc(sizeof(pdus));			\
-+		memcpy(data.pdu_list, pdus, sizeof(pdus));		\
-+		g_test_add_data_func(name, &data, function);		\
-+	} while (0)
++	io_set_close_on_destroy(uhid->io, true);
 +
-+static void test_debug(const char *str, void *user_data)
-+{
-+	const char *prefix = user_data;
-+
-+	g_print("%s%s\n", prefix, str);
++	return uhid;
 +}
 +
-+static void test_free(gconstpointer user_data)
++struct bt_uhid *bt_uhid_new(int fd)
 +{
-+	const struct test_data *data = user_data;
++	struct bt_uhid *uhid;
 +
-+	g_free(data->test_name);
-+	g_free(data->pdu_list);
++	uhid = new0(struct bt_uhid, 1);
++	if (!uhid)
++		return NULL;
++
++	uhid->io = io_new(fd);
++	if (!uhid->io)
++		goto failed;
++
++	if (!io_set_read_handler(uhid->io, uhid_read_handler, uhid, NULL))
++		goto failed;
++
++	return bt_uhid_ref(uhid);
++
++failed:
++	uhid_free(uhid);
++	return NULL;
 +}
 +
-+static gboolean context_quit(gpointer user_data)
++struct bt_uhid *bt_uhid_ref(struct bt_uhid *uhid)
 +{
-+	struct context *context = user_data;
++	if (!uhid)
++		return NULL;
 +
-+	if (context->process > 0)
-+		g_source_remove(context->process);
++	__sync_fetch_and_add(&uhid->ref_count, 1);
 +
-+	g_main_loop_quit(context->main_loop);
-+
-+	return FALSE;
++	return uhid;
 +}
 +
-+static gboolean send_pdu(gpointer user_data)
++void bt_uhid_unref(struct bt_uhid *uhid)
 +{
-+	struct context *context = user_data;
-+	const struct test_pdu *pdu;
-+	ssize_t len;
-+
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
-+
-+	len = write(context->fd, pdu->data, pdu->size);
-+
-+	if (g_test_verbose())
-+		util_hexdump('<', pdu->data, len, test_debug, "uHID: ");
-+
-+	g_assert_cmpint(len, ==, pdu->size);
-+
-+	context->process = 0;
-+	return FALSE;
-+}
-+
-+static void context_process(struct context *context)
-+{
-+	if (!context->data->pdu_list[context->pdu_offset].valid) {
-+		context_quit(context);
++	if (!uhid)
 +		return;
-+	}
 +
-+	context->process = g_idle_add(send_pdu, context);
++	if (__sync_sub_and_fetch(&uhid->ref_count, 1))
++		return;
++
++	uhid_free(uhid);
 +}
 +
-+static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
-+							gpointer user_data)
++bool bt_uhid_set_close_on_unref(struct bt_uhid *uhid, bool do_close)
 +{
-+	struct context *context = user_data;
-+	const struct test_pdu *pdu;
-+	unsigned char buf[sizeof(struct uhid_event)];
-+	ssize_t len;
++	if (!uhid || !uhid->io)
++		return false;
++
++	io_set_close_on_destroy(uhid->io, do_close);
++
++	return true;
++}
++
++unsigned int bt_uhid_register(struct bt_uhid *uhid, uint32_t type,
++				bt_uhid_notify_func_t func, void *user_data)
++{
++	return 0;
++}
++
++bool bt_uhid_unregister(struct bt_uhid *uhid, unsigned int id)
++{
++	return false;
++}
++
++int bt_uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev)
++{
 +	int fd;
++	ssize_t len;
 +
-+	pdu = &context->data->pdu_list[context->pdu_offset++];
++	if (!uhid->io)
++		return -ENOTCONN;
 +
-+	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP)) {
-+		context->source = 0;
-+		g_print("%s: cond %x\n", __func__, cond);
-+		return FALSE;
-+	}
++	fd = io_get_fd(uhid->io);
 +
-+	fd = g_io_channel_unix_get_fd(channel);
++	len = write(fd, ev, sizeof(*ev));
++	if (len < 0)
++		return -errno;
 +
-+	len = read(fd, buf, sizeof(buf));
-+
-+	g_assert(len > 0);
-+
-+	if (g_test_verbose())
-+		util_hexdump('>', buf, len, test_debug, "uHID: ");
-+
-+	g_assert_cmpint(len, ==, pdu->size);
-+
-+	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
-+
-+	context_process(context);
-+
-+	return TRUE;
++	/* uHID kernel driver does not handle partial writes */
++	return len != sizeof(*ev) ? -EIO : 0;
 +}
+diff --git a/src/shared/uhid.h b/src/shared/uhid.h
+new file mode 100644
+index 0000000..fcf5379
+--- /dev/null
++++ b/src/shared/uhid.h
+@@ -0,0 +1,43 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+static struct context *create_context(gconstpointer data)
++#include <stdbool.h>
++#include <stdint.h>
++#include <linux/uhid.h>
++
++struct bt_uhid;
++
++struct bt_uhid *bt_uhid_new_default(void);
++struct bt_uhid *bt_uhid_new(int fd);
++
++struct bt_uhid *bt_uhid_ref(struct bt_uhid *uhid);
++void bt_uhid_unref(struct bt_uhid *uhid);
++
++bool bt_uhid_set_close_on_unref(struct bt_uhid *uhid, bool do_close);
++
++typedef void (*bt_uhid_callback_t)(struct uhid_event *ev, void *user_data);
++unsigned int bt_uhid_register(struct bt_uhid *uhid, uint32_t event,
++				bt_uhid_callback_t func, void *user_data);
++bool bt_uhid_unregister(struct bt_uhid *uhid, unsigned int id);
++
++int bt_uhid_send(struct bt_uhid *uhid, const struct uhid_event *ev);
+diff --git a/unit/test-uhid.c b/unit/test-uhid.c
+new file mode 100644
+index 0000000..e0fb411
+--- /dev/null
++++ b/unit/test-uhid.c
+@@ -0,0 +1,37 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This program is free software; you can redistribute it and/or modify
++ *  it under the terms of the GNU General Public License as published by
++ *  the Free Software Foundation; either version 2 of the License, or
++ *  (at your option) any later version.
++ *
++ *  This program is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ *  GNU General Public License for more details.
++ *
++ *  You should have received a copy of the GNU General Public License
++ *  along with this program; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <glib.h>
++
++#include "src/shared/uhid.h"
++
++int main(int argc, char *argv[])
 +{
-+	struct context *context = g_new0(struct context, 1);
-+	GIOChannel *channel;
-+	int err, sv[2];
++	g_test_init(&argc, &argv, NULL);
 +
-+	context->main_loop = g_main_loop_new(NULL, FALSE);
-+	g_assert(context->main_loop);
-+
-+	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
-+	g_assert(err == 0);
-+
-+	context->uhid = bt_uhid_new(sv[0]);
-+	g_assert(context->uhid != NULL);
-+
-+	channel = g_io_channel_unix_new(sv[1]);
-+
-+	g_io_channel_set_close_on_unref(channel, TRUE);
-+	g_io_channel_set_encoding(channel, NULL, NULL);
-+	g_io_channel_set_buffered(channel, FALSE);
-+
-+	context->source = g_io_add_watch(channel,
-+				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
-+				test_handler, context);
-+	g_assert(context->source > 0);
-+
-+	g_io_channel_unref(channel);
-+
-+	context->fd = sv[1];
-+	context->data = data;
-+
-+	return context;
++	return g_test_run();
 +}
-+
-+static void destroy_context(struct context *context)
-+{
-+	if (context->source > 0)
-+		g_source_remove(context->source);
-+
-+	bt_uhid_unref(context->uhid);
-+
-+	g_main_loop_unref(context->main_loop);
-+
-+	test_free(context->data);
-+	g_free(context);
-+}
-+
-+static void execute_context(struct context *context)
-+{
-+	g_main_loop_run(context->main_loop);
-+
-+	destroy_context(context);
-+}
-+
-+static const struct uhid_event ev_create = {
-+	.type = UHID_CREATE,
-+};
-+
-+static void test_client(gconstpointer data)
-+{
-+	struct context *context = create_context(data);
-+
-+	if (g_str_equal(context->data->test_name, "/uhid/command/create"))
-+		bt_uhid_send(context->uhid, &ev_create);
-+
-+	execute_context(context);
-+}
- 
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
- 
-+	define_test("/uhid/command/create", test_client, event(&ev_create));
-+
- 	return g_test_run();
- }
 -- 
 1.9.0
 
