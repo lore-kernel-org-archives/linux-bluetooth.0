@@ -1,65 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Wed, 21 May 2014 10:16:32 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] shared: Fix queue_find to accept const ptr as match
+ data
+Message-ID: <20140521071632.GA22541@t440s.lan>
+References: <1400081232-19459-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1399473907-9698-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-References: <1399473907-9698-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
-Date: Wed, 21 May 2014 09:46:51 +0200
-Message-ID: <CAMv5GbcEFwY9TKp5zOQVvvSHNn3OO_8FLu6vm8WaC19zwNJ7dA@mail.gmail.com>
-Subject: Re: [PATCH] shared/tester: Add support for debug logs for tester
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1400081232-19459-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ping
+Hi Andrzej,
 
-On 7 May 2014 16:45, Grzegorz Kolodziejczyk
-<grzegorz.kolodziejczyk@tieto.com> wrote:
-> It allows to print debug logs if debug mode is enabled. It could help in
-> case of additional debug prints need (verbose mode).
+On Wed, May 14, 2014, Andrzej Kaczmarek wrote:
+> This patch fixes queue_find definition to have const pointer as data to
+> be matched against. Match function already does have const pointers as
+> arguments. Also parameter name is updated to be 'match_data' since this
+> actually is not user_data, just data to be matched against.
 > ---
->  src/shared/tester.c | 14 ++++++++++++++
->  src/shared/tester.h |  2 ++
->  2 files changed, 16 insertions(+)
->
-> diff --git a/src/shared/tester.c b/src/shared/tester.c
-> index 56e5696..7f1b980 100644
-> --- a/src/shared/tester.c
-> +++ b/src/shared/tester.c
-> @@ -134,6 +134,20 @@ void tester_print(const char *format, ...)
->         printf("%s\n", COLOR_OFF);
->  }
->
-> +void tester_debug(const char *format, ...)
-> +{
-> +       va_list ap;
-> +
-> +       if (!tester_use_debug())
-> +               return;
-> +
-> +       printf("   tester-dbg: %s", COLOR_WHITE);
-> +       va_start(ap, format);
-> +       vprintf(format, ap);
-> +       va_end(ap);
-> +       printf("%s\n", COLOR_OFF);
-> +}
-> +
->  void tester_warn(const char *format, ...)
->  {
->         va_list ap;
-> diff --git a/src/shared/tester.h b/src/shared/tester.h
-> index 85d5e95..0231f19 100644
-> --- a/src/shared/tester.h
-> +++ b/src/shared/tester.h
-> @@ -33,6 +33,8 @@ void tester_print(const char *format, ...)
->                                 __attribute__((format(printf, 1, 2)));
->  void tester_warn(const char *format, ...)
->                                 __attribute__((format(printf, 1, 2)));
-> +void tester_debug(const char *format, ...)
-> +                               __attribute__((format(printf, 1, 2)));
->
->  typedef void (*tester_destroy_func_t)(void *user_data);
->  typedef void (*tester_data_func_t)(const void *test_data);
-> --
-> 1.9.2
->
+>  src/shared/queue.c | 4 ++--
+>  src/shared/queue.h | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+
+Both patches in this set have been applied. Thanks.
+
+Johan
