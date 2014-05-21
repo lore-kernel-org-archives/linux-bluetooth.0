@@ -3,51 +3,73 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 08/12] android/bluetooth: Read CSRK from the storage on startup
-Date: Wed, 21 May 2014 14:44:58 +0200
-Message-Id: <1400676302-13626-9-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 06/12] android/bluetooth: Add support to read CSRK from the kernel
+Date: Wed, 21 May 2014 14:44:56 +0200
+Message-Id: <1400676302-13626-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/bluetooth.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ android/bluetooth.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 576911c..0fe1e9a 100644
+index 201238b..a703148 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2342,6 +2342,28 @@ static struct device *create_device_from_info(GKeyFile *key_file,
- 		dev->le_bonded = true;
- 	}
+@@ -1804,6 +1804,39 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+ 	/* TODO browse services here? */
+ }
  
-+	str = g_key_file_get_string(key_file, peer, "LocalCSRK", NULL);
-+	if (str) {
-+		int i;
++static void new_csrk_callback(uint16_t index, uint16_t length,
++					const void *param, void *user_data)
++{
++	const struct mgmt_ev_new_csrk *ev = param;
++	struct device *dev;
++	char dst[18];
 +
-+		dev->valid_local_csrk = true;
-+		for (i = 0; i < 16; i++)
-+			sscanf(str + (i * 2), "%02hhX", &dev->local_csrk[i]);
-+
-+		g_free(str);
++	if (length < sizeof(*ev)) {
++		error("Too small csrk event (%u bytes)", length);
++		return;
 +	}
 +
-+	str = g_key_file_get_string(key_file, peer, "RemoteCSRK", NULL);
-+	if (str) {
-+		int i;
++	ba2str(&ev->key.addr.bdaddr, dst);
++	dev = find_device(&ev->key.addr.bdaddr);
++	if (!dev)
++		return;
 +
++	if (ev->key.master == 0x01) {
++		memcpy(dev->remote_csrk, ev->key.val, 16);
++		dev->remote_sign_cnt = 0;
 +		dev->valid_remote_csrk = true;
-+		for (i = 0; i < 16; i++)
-+			sscanf(str + (i * 2), "%02hhX", &dev->remote_csrk[i]);
-+
-+		g_free(str);
++	} else if (ev->key.master == 0x00) {
++		memcpy(dev->local_csrk, ev->key.val, 16);
++		dev->local_sign_cnt = 0;
++		dev->valid_local_csrk = true;
++	} else {
++		error("Unknown key type 02%02x", ev->key.master);
++		return;
 +	}
 +
- 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
- 	if (str) {
- 		g_free(dev->name);
++	/*TODO: Store it. Remember about Sign Counter*/
++}
++
+ static void register_mgmt_handlers(void)
+ {
+ 	mgmt_register(mgmt_if, MGMT_EV_NEW_SETTINGS, adapter.index,
+@@ -1853,6 +1886,10 @@ static void register_mgmt_handlers(void)
+ 
+ 	mgmt_register(mgmt_if, MGMT_EV_NEW_LONG_TERM_KEY, adapter.index,
+ 					new_long_term_key_event, NULL, NULL);
++
++	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter.index,
++						new_csrk_callback, NULL, NULL);
++
+ }
+ 
+ static void load_link_keys_complete(uint8_t status, uint16_t length,
 -- 
 1.8.4
 
