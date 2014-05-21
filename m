@@ -1,92 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] android: Include headers from libhardware as system headers
-Date: Wed, 21 May 2014 18:18:02 +0200
-Message-ID: <1400689082-12662-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 8/8] unit/test-uhid: Add /uhid/event/feature test
+Date: Wed, 21 May 2014 18:01:09 +0300
+Message-Id: <1400684469-2693-8-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1400684469-2693-1-git-send-email-luiz.dentz@gmail.com>
+References: <1400684469-2693-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Including hardware/audio.h in Android build produces sign-compare
-warning due to nested include of cutils/bitops.h. Since we cannot avoid
-this warning in sane way unless it's fixed in AOSP tree, we can make
-GCC think this is a system header and suppress warnings.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch changes the way headers from libhardware are added to
-search path from LOCAL_C_INCLUDES to explicit "-isystem" option added
-to LOCAL_CFLAGS.
 ---
- android/Android.mk | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ unit/test-uhid.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 4235a7c..d3d94ed 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -121,12 +121,12 @@ LOCAL_SRC_FILES := \
+diff --git a/unit/test-uhid.c b/unit/test-uhid.c
+index a8aba9b..85e1356 100644
+--- a/unit/test-uhid.c
++++ b/unit/test-uhid.c
+@@ -243,6 +243,10 @@ static const struct uhid_event ev_output = {
+ 	.type = UHID_OUTPUT,
+ };
  
- LOCAL_C_INCLUDES += \
- 	$(call include-path-for, system-core) \
--	$(call include-path-for, libhardware) \
++static const struct uhid_event ev_feature = {
++	.type = UHID_FEATURE,
++};
++
+ static void test_client(gconstpointer data)
+ {
+ 	struct context *context = create_context(data);
+@@ -270,11 +274,19 @@ static void handle_output(struct uhid_event *ev, void *user_data)
+ 	context_quit(user_data);
+ }
  
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
++static void handle_feature(struct uhid_event *ev, void *user_data)
++{
++	g_assert_cmpint(ev->type, ==, UHID_FEATURE);
++
++	context_quit(user_data);
++}
++
+ static void test_server(gconstpointer data)
+ {
+ 	struct context *context = create_context(data);
  
--LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
-+	-isystem $(call include-path-for, libhardware)
+ 	bt_uhid_register(context->uhid, UHID_OUTPUT, handle_output, context);
++	bt_uhid_register(context->uhid, UHID_FEATURE, handle_feature, context);
  
- LOCAL_MODULE := bluetooth.default
- LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
-@@ -163,9 +163,9 @@ LOCAL_SRC_FILES := \
+ 	g_idle_add(send_pdu, context);
  
- LOCAL_C_INCLUDES += \
- 	$(call include-path-for, system-core) \
--	$(call include-path-for, libhardware) \
+@@ -292,6 +304,7 @@ int main(int argc, char *argv[])
+ 	define_test("/uhid/command/input", test_client, event(&ev_input));
  
--LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
-+	-isystem $(call include-path-for, libhardware)
+ 	define_test("/uhid/event/output", test_server, event(&ev_output));
++	define_test("/uhid/event/feature", test_server, event(&ev_feature));
  
- LOCAL_SHARED_LIBRARIES := libhardware
- 
-@@ -256,14 +256,14 @@ LOCAL_SRC_FILES := bluez/android/hal-audio.c
- 
- LOCAL_C_INCLUDES = \
- 	$(call include-path-for, system-core) \
--	$(call include-path-for, libhardware) \
- 	$(call include-path-for, sbc) \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
- 	libsbc \
- 
--LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
-+	-isystem $(call include-path-for, libhardware)
- 
- LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
- LOCAL_MODULE_TAGS := optional
-@@ -281,14 +281,14 @@ LOCAL_SRC_FILES := bluez/android/hal-sco.c
- 
- LOCAL_C_INCLUDES = \
- 	$(call include-path-for, system-core) \
--	$(call include-path-for, libhardware) \
- 	$(call include-path-for, audio-utils) \
- 
- LOCAL_SHARED_LIBRARIES := \
- 	libcutils \
- 	libaudioutils \
- 
--LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) \
-+	-isystem $(call include-path-for, libhardware)
- 
- LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
- LOCAL_MODULE_TAGS := optional
+ 	return g_test_run();
+ }
 -- 
-1.9.3
+1.9.0
 
