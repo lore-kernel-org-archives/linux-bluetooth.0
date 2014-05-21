@@ -1,69 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/gatt: Fix handling write request
-Date: Wed, 21 May 2014 14:32:19 +0200
-Message-Id: <1400675539-12592-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2] shared/tester: Add support for debug logs for tester
+Date: Wed, 21 May 2014 14:00:59 +0200
+Message-Id: <1400673659-27028-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds write request to Android framework and uses buffor on
-the stack for the request event.
+It allows to print debug logs if debug mode is enabled. It could help in
+case of additional debug prints need (verbose mode).
 ---
- android/gatt.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+ src/shared/tester.c | 14 ++++++++++++++
+ src/shared/tester.h |  2 ++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 89da60d..42bf2ec 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3891,7 +3891,8 @@ static void write_cb(uint16_t handle, uint16_t offset,
- 					uint8_t att_opcode, bdaddr_t *bdaddr,
- 					void *user_data)
+diff --git a/src/shared/tester.c b/src/shared/tester.c
+index 56e5696..88dfaeb 100644
+--- a/src/shared/tester.c
++++ b/src/shared/tester.c
+@@ -134,6 +134,20 @@ void tester_print(const char *format, ...)
+ 	printf("%s\n", COLOR_OFF);
+ }
+ 
++void tester_debug(const char *format, ...)
++{
++	va_list ap;
++
++	if (!tester_use_debug())
++		return;
++
++	printf("  %s", COLOR_WHITE);
++	va_start(ap, format);
++	vprintf(format, ap);
++	va_end(ap);
++	printf("%s\n", COLOR_OFF);
++}
++
+ void tester_warn(const char *format, ...)
  {
--	struct hal_ev_gatt_server_request_write ev;
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_server_request_write *ev = (void *) buf;
- 	struct gatt_app *app;
- 	int32_t id = PTR_TO_INT(user_data);
- 	static int32_t trans_id = 1;
-@@ -3916,21 +3917,24 @@ static void write_cb(uint16_t handle, uint16_t offset,
- 	if (att_opcode == ATT_OP_EXEC_WRITE_REQ)
- 		goto failed;
+ 	va_list ap;
+diff --git a/src/shared/tester.h b/src/shared/tester.h
+index 85d5e95..0231f19 100644
+--- a/src/shared/tester.h
++++ b/src/shared/tester.h
+@@ -33,6 +33,8 @@ void tester_print(const char *format, ...)
+ 				__attribute__((format(printf, 1, 2)));
+ void tester_warn(const char *format, ...)
+ 				__attribute__((format(printf, 1, 2)));
++void tester_debug(const char *format, ...)
++				__attribute__((format(printf, 1, 2)));
  
--	memset(&ev, 0, sizeof(ev));
-+	memset(ev, 0, sizeof(*ev));
- 
--	bdaddr2android(bdaddr, ev.bdaddr);
--	ev.attr_handle = handle;
--	ev.offset = offset;
-+	bdaddr2android(bdaddr, &ev->bdaddr);
-+	ev->attr_handle = handle;
-+	ev->offset = offset;
- 
--	ev.conn_id = conn->id;
--	ev.trans_id = app->trans_id.id;
-+	ev->conn_id = conn->id;
-+	ev->trans_id = app->trans_id.id;
- 
--	ev.is_prep = att_opcode == ATT_OP_PREP_WRITE_REQ;
--	ev.need_rsp = att_opcode == ATT_OP_WRITE_REQ;
-+	ev->is_prep = att_opcode == ATT_OP_PREP_WRITE_REQ;
-+	ev->need_rsp = att_opcode == ATT_OP_WRITE_REQ;
- 
--	ev.length = len;
--	memcpy(&ev.value, value, len);
-+	ev->length = len;
-+	memcpy(ev->value, value, len);
- 
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+			HAL_EV_GATT_SERVER_REQUEST_WRITE,
-+						sizeof(*ev) + ev->length , ev);
- 	return;
- 
- failed:
+ typedef void (*tester_destroy_func_t)(void *user_data);
+ typedef void (*tester_data_func_t)(const void *test_data);
 -- 
-1.8.4
+1.9.2
 
