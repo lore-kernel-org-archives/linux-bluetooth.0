@@ -3,114 +3,109 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 02/12] attrib: Add helpers to enc and dec signed write command
-Date: Wed, 21 May 2014 14:44:52 +0200
-Message-Id: <1400676302-13626-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 01/12] shared/crypto: Extend bt_crypto_sign_att with sign counter
+Date: Wed, 21 May 2014 14:44:51 +0200
+Message-Id: <1400676302-13626-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400676302-13626-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/att.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- attrib/att.h | 11 +++++++++++
- 2 files changed, 66 insertions(+)
+Sign counter is use in two places during att signing:
+1) Shall be concatenated with siging message before sigining: BT spec
+4.1, Vol[3], Part H, chapter 2.4.5
 
-diff --git a/attrib/att.c b/attrib/att.c
-index 8e9c06d..e7d5682 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -561,6 +561,61 @@ uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
- 	return len;
- }
+2) Shall be a part of signature send in the att packet: BT spec 4.1
+Vol[3], Part C, chapter 10.4.1
+
+With this patch, bt_crypto_sign_att returns correct signature.
+
+Note: For testing purpose it is possible to provide sign counter
+less then 0.
+---
+ src/shared/crypto.c | 23 ++++++++++++++++++++---
+ src/shared/crypto.h |  1 +
+ unit/test-crypto.c  |  2 +-
+ 3 files changed, 22 insertions(+), 4 deletions(-)
+
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index 0aec373..03b932a 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -258,23 +258,33 @@ static inline void swap128(const uint8_t src[16], uint8_t dst[16])
  
-+uint16_t enc_signed_write_cmd(uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					const uint8_t signature[12],
-+					uint8_t *pdu, size_t len)
-+{
-+	const uint16_t hdr_len = sizeof(pdu[0]) + sizeof(handle);
-+	const uint16_t min_len =  hdr_len + ATT_SIGNATURE_LEN;
-+
-+	if (pdu == NULL)
-+		return 0;
-+
-+	if (vlen > len - min_len)
-+		vlen = len - min_len;
-+
-+	pdu[0] = ATT_OP_SIGNED_WRITE_CMD;
-+	put_le16(handle, &pdu[1]);
-+
-+	if (vlen > 0)
-+		memcpy(&pdu[hdr_len], value, vlen);
-+
-+	memcpy(&pdu[hdr_len + vlen], signature, ATT_SIGNATURE_LEN);
-+
-+	return min_len + vlen;
-+}
-+
-+uint16_t dec_signed_write_cmd(const uint8_t *pdu, size_t len,
-+						uint16_t *handle,
-+						uint8_t *value, size_t *vlen,
-+						uint8_t signature[12])
-+{
-+	const uint16_t hdr_len = sizeof(pdu[0]) + sizeof(*handle);
-+	const uint16_t min_len =  hdr_len + ATT_SIGNATURE_LEN;
-+
-+
-+	if (pdu == NULL)
-+		return 0;
-+
-+	if (value == NULL || vlen == NULL || handle == NULL)
-+		return 0;
-+
-+	if (len < min_len)
-+		return 0;
-+
-+	if (pdu[0] != ATT_OP_SIGNED_WRITE_CMD)
-+		return 0;
-+
-+	*vlen = len - min_len;
-+	*handle = get_le16(&pdu[1]);
-+	memcpy(value, pdu + hdr_len, *vlen);
-+
-+	memcpy(signature, pdu + hdr_len + *vlen, ATT_SIGNATURE_LEN);
-+
-+	return len;
-+}
-+
- uint16_t enc_write_req(uint16_t handle, const uint8_t *value, size_t vlen,
- 						uint8_t *pdu, size_t len)
+ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 					const uint8_t *m, uint16_t m_len,
++					const int32_t sign_cnt,
+ 					uint8_t signature[12])
  {
-diff --git a/attrib/att.h b/attrib/att.h
-index c612d80..068ddf8 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -22,6 +22,9 @@
-  *
-  */
+ 	int fd;
+ 	int len;
+ 	uint8_t tmp[16], out[16];
++	uint16_t msg_len = m_len + sizeof(uint32_t);
++	uint8_t msg[msg_len];
  
-+/* Len of signature in write signed packet */
-+#define ATT_SIGNATURE_LEN		12
+-	if (!crypto)
+-		return false;
++	memset(msg, 0, msg_len);
++	memcpy(msg, m, m_len);
 +
- /* Attribute Protocol Opcodes */
- #define ATT_OP_ERROR			0x01
- #define ATT_OP_MTU_REQ			0x02
-@@ -129,6 +132,14 @@ uint16_t enc_write_cmd(uint16_t handle, const uint8_t *value, size_t vlen,
- 						uint8_t *pdu, size_t len);
- uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
- 						uint8_t *value, size_t *vlen);
-+uint16_t enc_signed_write_cmd(uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					const uint8_t signature[12],
-+					uint8_t *pdu, size_t len);
-+uint16_t dec_signed_write_cmd(const uint8_t *pdu, size_t len,
-+						uint16_t *handle,
-+						uint8_t *value, size_t *vlen,
-+						uint8_t signature[12]);
- struct att_data_list *dec_read_by_type_resp(const uint8_t *pdu, size_t len);
- uint16_t enc_write_req(uint16_t handle, const uint8_t *value, size_t vlen,
- 						uint8_t *pdu, size_t len);
++	/* Add sign_counter to the message */
++	if (sign_cnt >= 0)
++		put_le32(sign_cnt, msg + msg_len);
++	else
++		msg_len = m_len;
+ 
+ 	/* The most significant octet of key corresponds to key[0] */
+ 	swap128(key, tmp);
+ 
++	memcpy(signature, tmp + 4, 12);
+ 	fd = alg_new(crypto->cmac_aes, tmp, 16);
+ 	if (fd < 0)
+ 		return false;
+ 
+-	len = send(fd, m, m_len, 0);
++	len = send(fd, msg, msg_len, 0);
+ 	if (len < 0)
+ 		return false;
+ 
+@@ -283,6 +293,13 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 		return false;
+ 
+ 	/*
++	 *  If there is sign counter available it should be placed in the
++	 *  signature as specified in BT spec. 4.1 Vol[3], Part C,
++	 *  chapter 10.4.1
++	 */
++	if (sign_cnt >= 0)
++		put_le32(sign_cnt, out + 8);
++	/*
+ 	 * The most significant octet of hash corresponds to out[0]  - swap it.
+ 	 * Then truncate in most significant bit first order to a length of
+ 	 * 12 octets
+diff --git a/src/shared/crypto.h b/src/shared/crypto.h
+index 64faed2..f15eac7 100644
+--- a/src/shared/crypto.h
++++ b/src/shared/crypto.h
+@@ -48,4 +48,5 @@ bool bt_crypto_s1(struct bt_crypto *crypto, const uint8_t k[16],
+ 			uint8_t res[16]);
+ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 					const uint8_t *m, uint16_t m_len,
++					const int32_t sign_cnt,
+ 					uint8_t signature[12]);
+diff --git a/unit/test-crypto.c b/unit/test-crypto.c
+index 8b44f4e..34828e0 100644
+--- a/unit/test-crypto.c
++++ b/unit/test-crypto.c
+@@ -139,7 +139,7 @@ static void test_sign(gconstpointer data)
+ 	const struct test_data *d = data;
+ 
+ 	memset(t, 0, 12);
+-	if (!bt_crypto_sign_att(crypto, key, d->msg, d->msg_len, t))
++	if (!bt_crypto_sign_att(crypto, key, d->msg, d->msg_len, -1, t))
+ 		g_assert(true);
+ 
+ 	if (g_test_verbose()) {
 -- 
 1.8.4
 
