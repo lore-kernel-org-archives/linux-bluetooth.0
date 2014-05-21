@@ -1,57 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <20140521110540.GA22193@t440s.lan>
+References: <1399473907-9698-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+	<20140521110540.GA22193@t440s.lan>
+Date: Wed, 21 May 2014 13:55:34 +0200
+Message-ID: <CAMv5Gbf_ky6meMzFG42fGv2JaMGx7XdvwPfPa3xZQ4zQqqUMpQ@mail.gmail.com>
+Subject: Re: [PATCH] shared/tester: Add support for debug logs for tester
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] shared/tester: Add support for debug logs for tester
-Date: Wed, 21 May 2014 14:00:59 +0200
-Message-Id: <1400673659-27028-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It allows to print debug logs if debug mode is enabled. It could help in
-case of additional debug prints need (verbose mode).
----
- src/shared/tester.c | 14 ++++++++++++++
- src/shared/tester.h |  2 ++
- 2 files changed, 16 insertions(+)
+Hi Johan,
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index 56e5696..88dfaeb 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -134,6 +134,20 @@ void tester_print(const char *format, ...)
- 	printf("%s\n", COLOR_OFF);
- }
- 
-+void tester_debug(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	if (!tester_use_debug())
-+		return;
-+
-+	printf("  %s", COLOR_WHITE);
-+	va_start(ap, format);
-+	vprintf(format, ap);
-+	va_end(ap);
-+	printf("%s\n", COLOR_OFF);
-+}
-+
- void tester_warn(const char *format, ...)
- {
- 	va_list ap;
-diff --git a/src/shared/tester.h b/src/shared/tester.h
-index 85d5e95..0231f19 100644
---- a/src/shared/tester.h
-+++ b/src/shared/tester.h
-@@ -33,6 +33,8 @@ void tester_print(const char *format, ...)
- 				__attribute__((format(printf, 1, 2)));
- void tester_warn(const char *format, ...)
- 				__attribute__((format(printf, 1, 2)));
-+void tester_debug(const char *format, ...)
-+				__attribute__((format(printf, 1, 2)));
- 
- typedef void (*tester_destroy_func_t)(void *user_data);
- typedef void (*tester_data_func_t)(const void *test_data);
--- 
-1.9.2
+On 21 May 2014 13:05, Johan Hedberg <johan.hedberg@gmail.com> wrote:
+> Hi Grzegorz,
+>
+> On Wed, May 07, 2014, Grzegorz Kolodziejczyk wrote:
+>> +void tester_debug(const char *format, ...)
+>> +{
+>> +     va_list ap;
+>> +
+>> +     if (!tester_use_debug())
+>> +             return;
+>> +
+>> +     printf("   tester-dbg: %s", COLOR_WHITE);
+>
+> I think it'd be good to make the prefix consistent with the other
+> logging functions here. Do we really need to know that a line is a debug
+> print? Isn't it simply enough that the line is printed when debugging is
+> enabled? I don't see any special identifiers for the other types of logs
+> either. So unless there's a good reason to have it I'd just keep this
+> consistent with the other logs.
+Ok, I agree. I'll send fixed v2.
 
+>
+> Johan
+
+Best regards,
+Grzegorz
