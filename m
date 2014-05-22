@@ -3,78 +3,72 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 12/12] android/gatt: Add handling signed write from remote device
-Date: Thu, 22 May 2014 21:06:26 +0200
-Message-Id: <1400785586-22710-13-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 11/12] android/gatt: Add support for signed write command
+Date: Thu, 22 May 2014 21:06:25 +0200
+Message-Id: <1400785586-22710-12-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ android/gatt.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 33e1db9..4c5409a 100644
+index 9e65fb5..33e1db9 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -4763,6 +4763,44 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 	gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0], &dev->bdaddr);
+@@ -2610,6 +2610,38 @@ static void write_char_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	free(data);
  }
  
-+static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
-+						struct gatt_device *dev)
++static bool signed_write_cmd(struct gatt_device *dev, uint16_t handle,
++					const uint8_t *value, uint16_t vlen)
 +{
-+	uint8_t value[ATT_DEFAULT_LE_MTU];
 +	uint8_t s[ATT_SIGNATURE_LEN];
-+	uint16_t handle;
-+	uint16_t len;
-+	size_t vlen;
 +	uint8_t csrk[16];
 +	uint32_t sign_cnt;
 +
-+	if (!bt_get_csrk(&dev->bdaddr, REMOTE_CSRK, csrk, &sign_cnt)) {
-+		error("gatt: No valid csrk from remote device");
-+		return;
++	memset(csrk, 0, 16);
++
++	if (!bt_get_csrk(&dev->bdaddr, LOCAL_CSRK, csrk, &sign_cnt)) {
++		error("gatt: Could not get csrk key");
++		return false;
 +	}
 +
-+	len = dec_signed_write_cmd(cmd, cmd_len, &handle, value, &vlen, s);
-+	if (len) {
-+		uint8_t t[ATT_SIGNATURE_LEN];
++	memset(s, 0, ATT_SIGNATURE_LEN);
 +
-+		/* Generate signature and verify it */
-+		if (!bt_crypto_sign_att(crypto, csrk, value, vlen, sign_cnt,
-+									t)) {
-+			error("gatt: Error when generating att signature");
-+			return;
-+		}
-+
-+		if (memcmp(t, s, ATT_SIGNATURE_LEN)) {
-+			error("gatt: signature does not match");
-+			return;
-+		}
-+		/* Signature OK, proceed with write */
-+		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK);
-+		gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
-+								&dev->bdaddr);
++	if (!bt_crypto_sign_att(crypto, csrk, value, vlen, sign_cnt, s)) {
++		error("gatt: Could not sign att data");
++		return false;
 +	}
++
++	if (!gatt_signed_write_cmd(dev->attrib, handle, value, vlen, s, NULL,
++									NULL)) {
++		error("gatt: Could write signed cmd");
++		return false;
++	}
++
++	bt_update_sign_counter(&dev->bdaddr, LOCAL_CSRK);
++
++	return true;
 +}
 +
- static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
- 						struct gatt_device *dev)
+ static void handle_client_write_characteristic(const void *buf, uint16_t len)
  {
-@@ -4876,6 +4914,10 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
- 		write_cmd_request(ipdu, len, dev);
- 		/* No response on write cmd */
- 		return;
-+	case ATT_OP_SIGNED_WRITE_CMD:
-+		write_signed_cmd_request(ipdu, len, dev);
-+		/* No response on write signed cmd */
-+		return;
- 	case ATT_OP_PREP_WRITE_REQ:
- 		status = write_prep_request(ipdu, len, dev);
- 		if (!status)
+ 	const struct hal_cmd_gatt_client_write_characteristic *cmd = buf;
+@@ -2674,6 +2706,10 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+ 							cmd->value, cmd->len,
+ 							write_char_cb, cb_data);
+ 		break;
++	case GATT_WRITE_TYPE_SIGNED:
++		res = signed_write_cmd(conn->device, ch->ch.value_handle,
++					cmd->value, cmd->len);
++		break;
+ 	default:
+ 		error("gatt: Write type %d unsupported", cmd->write_type);
+ 		status = HAL_STATUS_UNSUPPORTED;
 -- 
 1.8.4
 
