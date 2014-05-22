@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 14/14] android/haltest: Implement read to file
-Date: Thu, 22 May 2014 15:06:07 +0300
-Message-Id: <1400760367-24915-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 06/14] android/hal-sco: Check file descriptor >= 0
+Date: Thu, 22 May 2014 15:05:59 +0300
+Message-Id: <1400760367-24915-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,130 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Reads data from stream_in and write to specified file.
 ---
- android/Android.mk      |  3 +++
- android/client/if-sco.c | 53 +++++++++++++++++++++++++++++++++++++++++++++----
- 2 files changed, 52 insertions(+), 4 deletions(-)
+ android/hal-sco.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index cc0f8f5..0da16b6 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -165,6 +165,9 @@ LOCAL_C_INCLUDES += \
- 	$(call include-path-for, system-core) \
- 	$(call include-path-for, libhardware) \
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 4ac5d00..e940547 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -710,11 +710,11 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
+ 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
+ 	struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
  
-+LOCAL_C_INCLUDES += \
-+	$(LOCAL_PATH)/bluez/android \
-+
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+-	DBG("dev %p stream %p fd %d", dev, stream_out, sco_dev->out->fd);
++	DBG("dev %p stream %p fd %d", dev, out, sco_dev->out->fd);
  
- LOCAL_SHARED_LIBRARIES := libhardware
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 87e2d79..d575d99 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -15,6 +15,8 @@
-  *
-  */
- 
-+#include "../src/shared/util.h"
-+
- #include "if-main.h"
- #include "../hal-utils.h"
- #include "pthread.h"
-@@ -239,12 +241,29 @@ static void *playback_thread(void *data)
- 	return NULL;
- }
- 
-+static void write_stereo_pcm16(char *buffer, size_t len, FILE *out)
-+{
-+	const int16_t *input = (const void *) buffer;
-+	int16_t sample[2];
-+	size_t i;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		int16_t mono = le16_to_cpu(get_unaligned(&input[i]));
-+
-+		put_unaligned(cpu_to_le16(mono), &sample[0]);
-+		put_unaligned(cpu_to_le16(mono), &sample[1]);
-+
-+		fwrite(sample, sizeof(sample), 1, out);
-+	}
-+}
-+
- static void *read_thread(void *data)
- {
- 	int (*filbuff_cb) (short*, void*) = feed_from_in;
- 	short buffer[buffer_size / sizeof(short)];
- 	size_t len = 0;
- 	void *cb_data = NULL;
-+	FILE *out = data;
- 
- 	pthread_mutex_lock(&state_mutex);
- 	current_state = STATE_PLAYING;
-@@ -266,9 +285,18 @@ static void *read_thread(void *data)
- 		pthread_mutex_unlock(&state_mutex);
- 
- 		len = filbuff_cb(buffer, cb_data);
--		haltest_info("len %zd\n", len);
-+
-+		haltest_info("Read %zd bytes\n", len);
-+
-+		if (out) {
-+			write_stereo_pcm16((char *) buffer, len, out);
-+			haltest_info("Written %zd bytes\n", len * 2);
-+		}
- 	} while (len);
- 
-+	if (out)
-+		fclose(out);
-+
- 	pthread_mutex_lock(&state_mutex);
- 	current_state = STATE_STOPPED;
- 	pthread_mutex_unlock(&state_mutex);
-@@ -355,9 +383,26 @@ static void loop_p(int argc, const char **argv)
- 
- static void read_p(int argc, const char **argv)
- {
-+	const char *fname = NULL;
-+	FILE *out = NULL;
-+
- 	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_in);
- 
-+	if (argc < 3) {
-+		haltest_error("Invalid audio file path.\n");
-+		haltest_info("Using read and through away\n");
-+	} else {
-+		fname = argv[2];
-+		out = fopen(fname, "w");
-+		if (!out) {
-+			haltest_error("Cannot open file: %s\n", fname);
-+			return;
-+		}
-+
-+		haltest_info("Reading to file: %s\n", fname);
-+	}
-+
- 	if (!buffer_size_in) {
- 		haltest_error("Invalid buffer sizes. Streams opened\n");
- 		return;
-@@ -371,10 +416,10 @@ static void read_p(int argc, const char **argv)
+-	if (sco_dev->out && sco_dev->out->fd) {
+-		close(sco_dev->out->fd);
+-		sco_dev->out->fd = -1;
++	if (out && out->fd >= 0) {
++		close(out->fd);
++		out->fd = -1;
  	}
- 	pthread_mutex_unlock(&state_mutex);
  
--	if (pthread_create(&play_thread, NULL, read_thread,
--							stream_in) != 0)
-+	if (pthread_create(&play_thread, NULL, read_thread, out) != 0) {
- 		haltest_error("Cannot create playback thread!\n");
--
-+		fclose(out);
-+	}
- }
- 
- static void stop_p(int argc, const char **argv)
+ 	free(out->cache);
 -- 
 1.8.3.2
 
