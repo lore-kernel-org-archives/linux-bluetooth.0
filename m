@@ -1,33 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] android/hal-audio: Fix wrong memory access
-Date: Thu, 22 May 2014 16:07:02 +0300
-Message-Id: <1400764022-26666-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/3] android/gatt: Check for connection state on connection search
+Date: Thu, 22 May 2014 14:12:19 +0200
+Message-ID: <1981859.VIDaj1bQ3U@uw000953>
+In-Reply-To: <1400682882-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1400682882-11341-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Jakub,
 
-downmix_buf is allocated to have buffer size FIXED_BUFFER_SIZE / 2, when
-we access it as (int16_t *) we shall device index by 2.
----
- android/hal-audio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Wednesday 21 of May 2014 16:34:40 Jakub Tyszkowski wrote:
+> This search was used with the assumption that connection is in
+> "connected" state. This could result in attrib pointer being
+> dereferenced while it's still NULL (pending connection).
+> ---
+>  android/gatt.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 89da60d..1b000c4 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -364,8 +364,14 @@ static bool match_connection_by_device_and_app(const void *data,
+>  
+>  static struct app_connection *find_connection_by_id(int32_t conn_id)
+>  {
+> -	return queue_find(app_connections, match_connection_by_id,
+> +	struct app_connection *conn;
+> +
+> +	conn = queue_find(app_connections, match_connection_by_id,
+>  							INT_TO_PTR(conn_id));
+> +	if (conn && conn->device->state == DEVICE_CONNECTED)
+> +		return conn;
+> +
+> +	return NULL;
+>  }
+>  
+>  static bool match_connection_by_device(const void *data, const void *user_data)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 7305bb6..96fa5c3 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -984,7 +984,7 @@ static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
- 	int16_t *output = (void *) out->downmix_buf;
- 	size_t i;
- 
--	for (i = 0; i < bytes / 2; i++) {
-+	for (i = 0; i < bytes / (2 * sizeof(int16_t)); i++) {
- 		int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
- 		int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
- 
+Patch 1/3 is now applied, thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
