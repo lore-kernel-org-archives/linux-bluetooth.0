@@ -1,49 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/3] lib/sdp: Add attributes and service class for MPS
-Date: Thu, 22 May 2014 11:57:52 +0200
-Message-Id: <1400752674-31232-1-git-send-email-szymon.janc@tieto.com>
+Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 12/12] android/gatt: Add handling signed write from remote device
+Date: Thu, 22 May 2014 10:07:42 +0200
+Message-Id: <1400746062-24766-13-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- lib/sdp.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+ android/gatt.c | 42 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-diff --git a/lib/sdp.h b/lib/sdp.h
-index 34adf9a..cc10e9f 100644
---- a/lib/sdp.h
-+++ b/lib/sdp.h
-@@ -134,6 +134,8 @@ extern "C" {
- #define MAP_SVCLASS_ID			0x1134
- #define GNSS_SVCLASS_ID			0x1135
- #define GNSS_SERVER_SVCLASS_ID		0x1136
-+#define MPS_SC_SVCLASS_ID		0x113A
-+#define MPS_SVCLASS_ID			0x113B
- #define PNP_INFO_SVCLASS_ID		0x1200
- #define GENERIC_NETWORKING_SVCLASS_ID	0x1201
- #define GENERIC_FILETRANS_SVCLASS_ID	0x1202
-@@ -228,6 +230,7 @@ extern "C" {
- #define GENERIC_ACCESS_PROFILE_ID	GENERIC_ACCESS_SVCLASS_ID
- #define GENERIC_ATTRIB_PROFILE_ID	GENERIC_ATTRIB_SVCLASS_ID
- #define APPLE_AGENT_PROFILE_ID		APPLE_AGENT_SVCLASS_ID
-+#define MPS_PROFILE_ID			MPS_SC_SVCLASS_ID
+diff --git a/android/gatt.c b/android/gatt.c
+index e36042a..2a0e7bc 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4705,6 +4705,44 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0], &dev->bdaddr);
+ }
  
- /*
-  * Compatibility macros for the old MDP acronym
-@@ -270,6 +273,10 @@ extern "C" {
- #define SDP_ATTR_GOEP_L2CAP_PSM			0x0200
- #define SDP_ATTR_SVCDB_STATE			0x0201
- 
-+#define SDP_ATTR_MPSD_SCENARIOS			0x0200
-+#define SDP_ATTR_MPMD_SCENARIOS			0x0201
-+#define SDP_ATTR_MPS_DEPENDENCIES		0x0202
++static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
++						struct gatt_device *dev)
++{
++	uint8_t value[ATT_DEFAULT_LE_MTU];
++	uint8_t s[ATT_SIGNATURE_LEN];
++	uint16_t handle;
++	uint16_t len;
++	size_t vlen;
++	uint8_t csrk[16];
++	uint32_t sign_cnt;
 +
- #define SDP_ATTR_SERVICE_VERSION		0x0300
- #define SDP_ATTR_EXTERNAL_NETWORK		0x0301
- #define SDP_ATTR_SUPPORTED_DATA_STORES_LIST	0x0301
++	if (!bt_get_csrk(&dev->bdaddr, REMOTE_CSRK, csrk, &sign_cnt)) {
++		error("gatt: No valid csrk from remote device");
++		return;
++	}
++
++	len = dec_signed_write_cmd(cmd, cmd_len, &handle, value, &vlen, s);
++	if (len) {
++		uint8_t t[ATT_SIGNATURE_LEN];
++
++		/* Generate signature and verify it */
++		if (!bt_crypto_sign_att(crypto, csrk, value, vlen, sign_cnt,
++									t)) {
++			error("gatt: Error when generating att signature");
++			return;
++		}
++
++		if (memcmp(t, s, ATT_SIGNATURE_LEN)) {
++			error("gatt: signature does not match");
++			return;
++		}
++		/* Signature OK, proceed with write */
++		bt_update_sign_counter(&dev->bdaddr, REMOTE_CSRK);
++		gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
++								&dev->bdaddr);
++	}
++}
++
+ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *dev)
+ {
+@@ -4791,6 +4829,10 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		write_cmd_request(ipdu, len, dev);
+ 		/* No response on write cmd */
+ 		return;
++	case ATT_OP_SIGNED_WRITE_CMD:
++		write_signed_cmd_request(ipdu, len, dev);
++		/* No response on write signed cmd */
++		return;
+ 	case ATT_OP_PREP_WRITE_REQ:
+ 		status = write_prep_request(ipdu, len, dev);
+ 		if (!status)
 -- 
-1.9.1
+1.8.4
 
