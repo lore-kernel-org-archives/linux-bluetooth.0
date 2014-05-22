@@ -1,56 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/5] unit/test-queue: Add /queue/foreach_destroy test
-Date: Thu, 22 May 2014 13:33:59 +0300
-Message-Id: <1400754843-4759-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] android/gatt: Don't process read_by_type request with invalied range
+Date: Thu, 22 May 2014 12:33:55 +0200
+Message-Id: <1400754835-3325-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This tests queue_destroy from queue_foreach callback.
+Return ATT_ECODE_INVALID_HANDLE if range is incorrect. It repairs
+TC_GAR_SR_BI_08_C test case.
 ---
- unit/test-queue.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ android/gatt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index 7c6d2ad..55273e3 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -58,11 +58,32 @@ static void test_basic(void)
- 	queue_destroy(queue, NULL);
- }
+diff --git a/android/gatt.c b/android/gatt.c
+index 89da60d..dae0df3 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4404,6 +4404,9 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
  
-+static void foreach_destroy(void *data, void *user_data)
-+{
-+	struct queue *queue = user_data;
++	if (start > end)
++		return ATT_ECODE_INVALID_HANDLE;
 +
-+	queue_destroy(queue, NULL);
-+}
-+
-+static void test_foreach_destroy(void)
-+{
-+	struct queue *queue;
-+
-+	queue = queue_new();
-+	g_assert(queue != NULL);
-+
-+	queue_push_tail(queue, UINT_TO_PTR(1));
-+	queue_push_tail(queue, UINT_TO_PTR(2));
-+
-+	queue_foreach(queue, foreach_destroy, queue);
-+}
-+
- int main(int argc, char *argv[])
- {
- 	g_test_init(&argc, &argv, NULL);
- 
- 	g_test_add_func("/queue/basic", test_basic);
-+	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
- 
- 	return g_test_run();
- }
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_INSUFF_RESOURCES;
 -- 
 1.9.0
 
