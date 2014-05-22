@@ -1,58 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/5] unit/test-queue: Add /queue/foreach_destroy test
-Date: Thu, 22 May 2014 15:02:58 +0300
-Message-Id: <1400760182-16836-1-git-send-email-luiz.dentz@gmail.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 4/4] android/gatt: Use pending request for write req and prep write
+Date: Thu, 22 May 2014 13:17:45 +0200
+Message-Id: <1400757465-11522-5-git-send-email-lukasz.rymanowski@tieto.com>
+In-Reply-To: <1400757465-11522-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1400757465-11522-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-This tests queue_destroy from queue_foreach callback.
+This patch add missing pending request for write operations.
+Now Android server application can send response to remote device
 ---
-v2: Fix patch 4/5: queue_find cannot be used for entries nodes.
+ android/gatt.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
- unit/test-queue.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
-
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index 7c6d2ad..55273e3 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -58,11 +58,32 @@ static void test_basic(void)
- 	queue_destroy(queue, NULL);
- }
- 
-+static void foreach_destroy(void *data, void *user_data)
-+{
-+	struct queue *queue = user_data;
-+
-+	queue_destroy(queue, NULL);
-+}
-+
-+static void test_foreach_destroy(void)
-+{
-+	struct queue *queue;
-+
-+	queue = queue_new();
-+	g_assert(queue != NULL);
-+
-+	queue_push_tail(queue, UINT_TO_PTR(1));
-+	queue_push_tail(queue, UINT_TO_PTR(2));
-+
-+	queue_foreach(queue, foreach_destroy, queue);
-+}
-+
- int main(int argc, char *argv[])
+diff --git a/android/gatt.c b/android/gatt.c
+index 39314a1..26b2300 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4658,6 +4658,7 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *dev)
  {
- 	g_test_init(&argc, &argv, NULL);
+ 	uint8_t value[ATT_DEFAULT_LE_MTU];
++	struct pending_request *data;
+ 	uint16_t handle;
+ 	uint16_t len;
+ 	size_t vlen;
+@@ -4666,6 +4667,18 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
  
- 	g_test_add_func("/queue/basic", test_basic);
-+	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
++	data = new0(struct pending_request, 1);
++	if (!data)
++		return ATT_ECODE_INSUFF_RESOURCES;
++
++	data->handle = handle;
++	data->state = REQUEST_INIT;
++
++	if (!queue_push_tail(dev->pending_requests, data)) {
++		free(data);
++		return ATT_ECODE_INSUFF_RESOURCES;
++	}
++
+ 	if (!gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
+ 								&dev->bdaddr))
+ 		return ATT_ECODE_UNLIKELY;
+@@ -4677,6 +4690,7 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+ 						struct gatt_device *dev)
+ {
+ 	uint8_t value[ATT_DEFAULT_LE_MTU];
++	struct pending_request *data;
+ 	uint16_t handle;
+ 	uint16_t offset;
+ 	uint16_t len;
+@@ -4687,6 +4701,19 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
  
- 	return g_test_run();
- }
++	data = new0(struct pending_request, 1);
++	if (!data)
++		return ATT_ECODE_INSUFF_RESOURCES;
++
++	data->handle = handle;
++	data->offset = offset;
++	data->state = REQUEST_INIT;
++
++	if (!queue_push_tail(dev->pending_requests, data)) {
++		free(data);
++		return ATT_ECODE_INSUFF_RESOURCES;
++	}
++
+ 	if (!gatt_db_write(gatt_db, handle, offset, value, vlen, cmd[0],
+ 								&dev->bdaddr))
+ 		return ATT_ECODE_UNLIKELY;
 -- 
-1.9.0
+1.8.4
 
