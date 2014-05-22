@@ -1,44 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Don't process read_by_type request with invalied range
-Date: Thu, 22 May 2014 14:04:28 +0200
-Message-ID: <50030536.bG1W7Pr17I@uw000953>
-In-Reply-To: <1400754835-3325-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1400754835-3325-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 5/5] shared/queue: Make queue_find default do direct match for NULL callback
+Date: Thu, 22 May 2014 15:03:02 +0300
+Message-Id: <1400760182-16836-5-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1400760182-16836-1-git-send-email-luiz.dentz@gmail.com>
+References: <1400760182-16836-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thursday 22 of May 2014 12:33:55 Marcin Kraglak wrote:
-> Return ATT_ECODE_INVALID_HANDLE if range is incorrect. It repairs
-> TC_GAR_SR_BI_08_C test case.
-> ---
->  android/gatt.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 89da60d..dae0df3 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4404,6 +4404,9 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
->  	if (!len)
->  		return ATT_ECODE_INVALID_PDU;
->  
-> +	if (start > end)
-> +		return ATT_ECODE_INVALID_HANDLE;
-> +
->  	q = queue_new();
->  	if (!q)
->  		return ATT_ECODE_INSUFF_RESOURCES;
-> 
+---
+ src/shared/queue.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Applied, thanks.
-
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 20f51b8..8bbb7df 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -224,6 +224,11 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 	queue_unref(queue);
+ }
+ 
++static bool direct_match(const void *a, const void *b)
++{
++	return a == b;
++}
++
+ void *queue_find(struct queue *queue, queue_match_func_t function,
+ 							const void *match_data)
+ {
+@@ -232,6 +237,9 @@ void *queue_find(struct queue *queue, queue_match_func_t function,
+ 	if (!queue || !function)
+ 		return NULL;
+ 
++	if (!function)
++		function = direct_match;
++
+ 	for (entry = queue->head; entry; entry = entry->next)
+ 		if (function(entry->data, match_data))
+ 			return entry->data;
 -- 
-Best regards, 
-Szymon Janc
+1.9.0
+
