@@ -3,114 +3,57 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 02/12] attrib: Add helpers to enc and dec signed write command
-Date: Thu, 22 May 2014 10:07:32 +0200
-Message-Id: <1400746062-24766-3-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 00/12]  android/gatt: Add support for write signature command
+Date: Thu, 22 May 2014 10:07:30 +0200
+Message-Id: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- attrib/att.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- attrib/att.h | 11 +++++++++++
- 2 files changed, 66 insertions(+)
+This patch set add support for write signature command for android part.
+* handling CSRK and signCounter in android/bluetooth - storage
+* exchanging CSRK and signCounter between android/bluetooth and gatt
+* handling incoming and outgoing write signature command.
 
-diff --git a/attrib/att.c b/attrib/att.c
-index 8e9c06d..e7d5682 100644
---- a/attrib/att.c
-+++ b/attrib/att.c
-@@ -561,6 +561,61 @@ uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
- 	return len;
- }
- 
-+uint16_t enc_signed_write_cmd(uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					const uint8_t signature[12],
-+					uint8_t *pdu, size_t len)
-+{
-+	const uint16_t hdr_len = sizeof(pdu[0]) + sizeof(handle);
-+	const uint16_t min_len =  hdr_len + ATT_SIGNATURE_LEN;
-+
-+	if (pdu == NULL)
-+		return 0;
-+
-+	if (vlen > len - min_len)
-+		vlen = len - min_len;
-+
-+	pdu[0] = ATT_OP_SIGNED_WRITE_CMD;
-+	put_le16(handle, &pdu[1]);
-+
-+	if (vlen > 0)
-+		memcpy(&pdu[hdr_len], value, vlen);
-+
-+	memcpy(&pdu[hdr_len + vlen], signature, ATT_SIGNATURE_LEN);
-+
-+	return min_len + vlen;
-+}
-+
-+uint16_t dec_signed_write_cmd(const uint8_t *pdu, size_t len,
-+						uint16_t *handle,
-+						uint8_t *value, size_t *vlen,
-+						uint8_t signature[12])
-+{
-+	const uint16_t hdr_len = sizeof(pdu[0]) + sizeof(*handle);
-+	const uint16_t min_len =  hdr_len + ATT_SIGNATURE_LEN;
-+
-+
-+	if (pdu == NULL)
-+		return 0;
-+
-+	if (value == NULL || vlen == NULL || handle == NULL)
-+		return 0;
-+
-+	if (len < min_len)
-+		return 0;
-+
-+	if (pdu[0] != ATT_OP_SIGNED_WRITE_CMD)
-+		return 0;
-+
-+	*vlen = len - min_len;
-+	*handle = get_le16(&pdu[1]);
-+	memcpy(value, pdu + hdr_len, *vlen);
-+
-+	memcpy(signature, pdu + hdr_len + *vlen, ATT_SIGNATURE_LEN);
-+
-+	return len;
-+}
-+
- uint16_t enc_write_req(uint16_t handle, const uint8_t *value, size_t vlen,
- 						uint8_t *pdu, size_t len)
- {
-diff --git a/attrib/att.h b/attrib/att.h
-index c612d80..068ddf8 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -22,6 +22,9 @@
-  *
-  */
- 
-+/* Len of signature in write signed packet */
-+#define ATT_SIGNATURE_LEN		12
-+
- /* Attribute Protocol Opcodes */
- #define ATT_OP_ERROR			0x01
- #define ATT_OP_MTU_REQ			0x02
-@@ -129,6 +132,14 @@ uint16_t enc_write_cmd(uint16_t handle, const uint8_t *value, size_t vlen,
- 						uint8_t *pdu, size_t len);
- uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
- 						uint8_t *value, size_t *vlen);
-+uint16_t enc_signed_write_cmd(uint16_t handle,
-+					const uint8_t *value, size_t vlen,
-+					const uint8_t signature[12],
-+					uint8_t *pdu, size_t len);
-+uint16_t dec_signed_write_cmd(const uint8_t *pdu, size_t len,
-+						uint16_t *handle,
-+						uint8_t *value, size_t *vlen,
-+						uint8_t signature[12]);
- struct att_data_list *dec_read_by_type_resp(const uint8_t *pdu, size_t len);
- uint16_t enc_write_req(uint16_t handle, const uint8_t *value, size_t vlen,
- 						uint8_t *pdu, size_t len);
+Some common part has been updated (attrib, crypto)
+
+In next patches error handling will be added.
+
+Note: If you run on Nexus devices there is need to update kernel which
+needs to support CRYPTO_CSRK, CRYPTO_USER_API, CRYPTO_USER_API_HASH,
+CRYPTO_USER_API_SKCIPHER. All the information available on
+https://code.google.com/p/aosp-bluez/
+
+v2:
+* handled Johan comments
+
+Lukasz Rymanowski (12):
+  shared/crypto: Extend bt_crypto_sign_att with sign counter
+  attrib: Add helpers to enc and dec signed write command
+  attrib/gatt: Add wrapper to send signed write command
+  android/bluetooth: Expose API to get CSRK for device
+  android/bluetooth: Expose API to update sign counter
+  android/bluetooth: Add support to read CSRK from the kernel
+  android/bluetooth: Store CSRK
+  android/bluetooth: Read CSRK from the storage on startup
+  android/bluetooth: Store sign counter needed for aes-cmac sign
+  android/gatt: Add crypto needed for sign write
+  android/gatt: Add support for signed write command
+  android/gatt: Add handling signed write from remote device
+
+ android/Android.mk  |   1 +
+ android/Makefile.am |   1 +
+ android/bluetooth.c | 185 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ android/bluetooth.h |  10 +++
+ android/gatt.c      |  89 ++++++++++++++++++++++++-
+ attrib/att.c        |  55 ++++++++++++++++
+ attrib/att.h        |  11 ++++
+ attrib/gatt.c       |  16 +++++
+ attrib/gatt.h       |   5 ++
+ src/shared/crypto.c |  24 +++++--
+ src/shared/crypto.h |   1 +
+ unit/test-crypto.c  |   2 +-
+ 12 files changed, 394 insertions(+), 6 deletions(-)
+
 -- 
 1.8.4
 
