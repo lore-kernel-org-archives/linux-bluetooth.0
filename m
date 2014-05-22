@@ -1,94 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/5] shared/queue: Fix queue_foreach not detecting queue has been destroyed
-Date: Thu, 22 May 2014 13:34:00 +0300
-Message-Id: <1400754843-4759-2-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1400754843-4759-1-git-send-email-luiz.dentz@gmail.com>
-References: <1400754843-4759-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 1/5] unit/test-queue: Add /queue/foreach_destroy test
+Date: Thu, 22 May 2014 13:33:59 +0300
+Message-Id: <1400754843-4759-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes queue_foreach crashing if it callback call queue_destroy.
+This tests queue_destroy from queue_foreach callback.
 ---
- src/shared/queue.c | 29 ++++++++++++++++++++++++++---
- 1 file changed, 26 insertions(+), 3 deletions(-)
+ unit/test-queue.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index ea4ff96..c9c0812 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -34,11 +34,30 @@ struct queue_entry {
- };
+diff --git a/unit/test-queue.c b/unit/test-queue.c
+index 7c6d2ad..55273e3 100644
+--- a/unit/test-queue.c
++++ b/unit/test-queue.c
+@@ -58,11 +58,32 @@ static void test_basic(void)
+ 	queue_destroy(queue, NULL);
+ }
  
- struct queue {
-+	int ref_count;
- 	struct queue_entry *head;
- 	struct queue_entry *tail;
- 	unsigned int entries;
- };
- 
-+static struct queue *queue_ref(struct queue *queue)
++static void foreach_destroy(void *data, void *user_data)
 +{
-+	if (!queue)
-+		return NULL;
++	struct queue *queue = user_data;
 +
-+	__sync_fetch_and_add(&queue->ref_count, 1);
-+
-+	return queue;
++	queue_destroy(queue, NULL);
 +}
 +
-+static void queue_unref(struct queue *queue)
++static void test_foreach_destroy(void)
 +{
-+	if (__sync_sub_and_fetch(&queue->ref_count, 1))
-+		return;
++	struct queue *queue;
 +
-+	free(queue);
++	queue = queue_new();
++	g_assert(queue != NULL);
++
++	queue_push_tail(queue, UINT_TO_PTR(1));
++	queue_push_tail(queue, UINT_TO_PTR(2));
++
++	queue_foreach(queue, foreach_destroy, queue);
 +}
 +
- struct queue *queue_new(void)
+ int main(int argc, char *argv[])
  {
- 	struct queue *queue;
-@@ -51,7 +70,7 @@ struct queue *queue_new(void)
- 	queue->tail = NULL;
- 	queue->entries = 0;
+ 	g_test_init(&argc, &argv, NULL);
  
--	return queue;
-+	return queue_ref(queue);
+ 	g_test_add_func("/queue/basic", test_basic);
++	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
+ 
+ 	return g_test_run();
  }
- 
- void queue_destroy(struct queue *queue, queue_destroy_func_t destroy)
-@@ -74,7 +93,7 @@ void queue_destroy(struct queue *queue, queue_destroy_func_t destroy)
- 		free(tmp);
- 	}
- 
--	free(queue);
-+	queue_unref(queue);
- }
- 
- bool queue_push_tail(struct queue *queue, void *data)
-@@ -177,14 +196,18 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
- 		return;
- 
- 	entry = queue->head;
-+	if (!entry)
-+		return;
- 
--	while (entry) {
-+	queue_ref(queue);
-+	while (entry && queue->ref_count > 1) {
- 		struct queue_entry *tmp = entry;
- 
- 		entry = tmp->next;
- 
- 		function(tmp->data, user_data);
- 	}
-+	queue_unref(queue);
- }
- 
- void *queue_find(struct queue *queue, queue_match_func_t function,
 -- 
 1.9.0
 
