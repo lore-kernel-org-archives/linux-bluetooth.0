@@ -1,66 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140522102858.GA7869@t440s.lan>
-References: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1400746062-24766-2-git-send-email-lukasz.rymanowski@tieto.com>
-	<20140522102858.GA7869@t440s.lan>
-Date: Thu, 22 May 2014 12:59:41 +0200
-Message-ID: <CAMudyAu-3SKfkAqG3A3ZTLdyEPYLJ7tOdPnDZzaHX0ExUtAsfw@mail.gmail.com>
-Subject: Re: [PATCH v2 01/12] shared/crypto: Extend bt_crypto_sign_att with
- sign counter
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Szymon Janc <szymon.janc@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv5 3/4] android/gatt: Make att_handler use g_attrib buffer
+Date: Thu, 22 May 2014 12:54:32 +0200
+Message-Id: <1400756073-16330-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1400756073-16330-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1400756073-16330-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+This makes use of g_attrib buffer for output and removes some unused
+read_by_group_type function parameters.
+---
+ android/gatt.c | 33 +++++++++++++++------------------
+ 1 file changed, 15 insertions(+), 18 deletions(-)
 
-On 22 May 2014 12:28, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Lukasz,
->
-> On Thu, May 22, 2014, Lukasz Rymanowski wrote:
->> Note: For testing purpose it is possible to provide sign counter
->> less then 0.
-> <snip>
->>  bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
->>                                       const uint8_t *m, uint16_t m_len,
->> -                                     uint8_t signature[12])
->> +                                     int32_t sign_cnt, uint8_t signature[12])
-> <snip>
->> +     /* Add sign_counter to the message */
->> +     if (sign_cnt >= 0)
->> +             put_le32(sign_cnt, msg + msg_len);
->> +     else
->> +             msg_len = m_len;
-> <snip>
->>       /*
->> +      *  If there is sign counter available it should be placed in the
->> +      *  signature as specified in BT spec. 4.1 Vol[3], Part C,
->> +      *  chapter 10.4.1
->> +      */
->> +     if (sign_cnt >= 0)
->> +             put_le32(sign_cnt, out + 8);
->
-> Could you elaborate a bit on what exactly this "testing purpose" is and
-> why it really needs to be part of the API? I don't see anywhere in the
-> spec where it'd give us a choice of not having a counter available (I
-> might have missed it though).
->
+diff --git a/android/gatt.c b/android/gatt.c
+index c67fc97..4a9fd56 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4398,8 +4398,6 @@ static const struct ipc_handler cmd_handlers[] = {
+ };
+ 
+ static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
+-						uint8_t *rsp, size_t rsp_size,
+-						uint16_t *length,
+ 						struct gatt_device *device)
+ {
+ 	uint16_t start, end;
+@@ -4783,24 +4781,22 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ {
+ 	struct gatt_device *dev = user_data;
+-	uint8_t opdu[ATT_DEFAULT_LE_MTU];
+ 	uint8_t status;
+-	uint16_t length = 0;
+-	size_t vlen;
+-	uint8_t *value = g_attrib_get_buffer(dev->attrib, &vlen);
++	uint16_t resp_length = 0;
++	size_t length;
++	uint8_t *opdu = g_attrib_get_buffer(dev->attrib, &length);
+ 
+ 	DBG("op 0x%02x", ipdu[0]);
+ 
+-	if (len > vlen) {
+-		error("gatt: Too much data on ATT socket %p", value);
++	if (len > length) {
++		error("gatt: Too much data on ATT socket %p", opdu);
+ 		status = ATT_ECODE_INVALID_PDU;
+ 		goto done;
+ 	}
+ 
+ 	switch (ipdu[0]) {
+ 	case ATT_OP_READ_BY_GROUP_REQ:
+-		status = read_by_group_type(ipdu, len, opdu, sizeof(opdu),
+-								&length, dev);
++		status = read_by_group_type(ipdu, len, dev);
+ 		break;
+ 	case ATT_OP_READ_BY_TYPE_REQ:
+ 		status = read_by_type(ipdu, len, dev);
+@@ -4810,12 +4806,12 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		status = read_request(ipdu, len, dev);
+ 		break;
+ 	case ATT_OP_MTU_REQ:
+-		status = mtu_att_handle(ipdu, len, opdu, sizeof(opdu), dev,
+-								&length);
++		status = mtu_att_handle(ipdu, len, opdu, length, dev,
++								&resp_length);
+ 		break;
+ 	case ATT_OP_FIND_INFO_REQ:
+-		status = find_info_handle(ipdu, len, opdu, sizeof(opdu),
+-								&length);
++		status = find_info_handle(ipdu, len, opdu, length,
++								&resp_length);
+ 		break;
+ 	case ATT_OP_WRITE_REQ:
+ 		status = write_req_request(ipdu, len, dev);
+@@ -4850,11 +4846,12 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 
+ done:
+ 	if (status)
+-		length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
+-							ATT_DEFAULT_LE_MTU);
++		resp_length = enc_error_resp(ipdu[0], 0x0000, status, opdu,
++									length);
+ 
+-	if (length)
+-		g_attrib_send(dev->attrib, 0, opdu, length, NULL, NULL, NULL);
++	if (resp_length)
++		g_attrib_send(dev->attrib, 0, opdu, resp_length, NULL, NULL,
++									NULL);
+ }
+ 
+ static void create_listen_connections(void *data, void *user_data)
+-- 
+1.9.3
 
-I'm using test vectors from the spec in the test-crypto and those does
-not use sign counter.
-Maybe solution is that I generate own test vectors for those unit tests?
-
-> Even if this is part of the API you're now restricting the range of
-> possible counter values to half of what the specification would allow,
-> i.e. the type should be int64_t with an added check that you don't allow
-> values beyond UINT32_MAX (however I'm unconvinced that this API should
-> have a signed parameter to begin with).
->
-> Johan
-
-BR
-Lukasz
