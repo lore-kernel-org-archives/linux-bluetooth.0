@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 3/5] unit/test-queue: Add /queue/foreach_remove_all test
-Date: Thu, 22 May 2014 15:03:00 +0300
-Message-Id: <1400760182-16836-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 4/5] shared/queue: Fix queue_foreach not detecting queue has changed
+Date: Thu, 22 May 2014 15:03:01 +0300
+Message-Id: <1400760182-16836-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1400760182-16836-1-git-send-email-luiz.dentz@gmail.com>
 References: <1400760182-16836-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,48 +11,42 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This tests queue_remove_all from queue_foreach callback.
+This fixes queue_foreach crashing if callback calls queue_remove_all.
 ---
- unit/test-queue.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ src/shared/queue.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/unit/test-queue.c b/unit/test-queue.c
-index 55273e3..af7dfd3 100644
---- a/unit/test-queue.c
-+++ b/unit/test-queue.c
-@@ -78,12 +78,33 @@ static void test_foreach_destroy(void)
- 	queue_foreach(queue, foreach_destroy, queue);
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index c9c0812..20f51b8 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -187,6 +187,17 @@ void *queue_peek_tail(struct queue *queue)
+ 	return queue->tail->data;
  }
  
-+static void foreach_remove_all(void *data, void *user_data)
++static bool queue_find_entry(struct queue *queue, const void *data)
 +{
-+	struct queue *queue = user_data;
++	struct queue_entry *entry;
 +
-+	queue_remove_all(queue, NULL, NULL, NULL);
++	for (entry = queue->head; entry; entry = entry->next)
++		if (entry == data)
++			return true;
++
++	return false;
 +}
 +
-+static void test_foreach_remove_all(void)
-+{
-+	struct queue *queue;
-+
-+	queue = queue_new();
-+	g_assert(queue != NULL);
-+
-+	queue_push_tail(queue, UINT_TO_PTR(1));
-+	queue_push_tail(queue, UINT_TO_PTR(2));
-+
-+	queue_foreach(queue, foreach_remove_all, queue);
-+}
-+
- int main(int argc, char *argv[])
+ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 							void *user_data)
  {
- 	g_test_init(&argc, &argv, NULL);
+@@ -206,6 +217,9 @@ void queue_foreach(struct queue *queue, queue_foreach_func_t function,
+ 		entry = tmp->next;
  
- 	g_test_add_func("/queue/basic", test_basic);
- 	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
-+	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
- 
- 	return g_test_run();
+ 		function(tmp->data, user_data);
++
++		if (!queue_find_entry(queue, entry))
++			break;
+ 	}
+ 	queue_unref(queue);
  }
 -- 
 1.9.0
