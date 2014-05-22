@@ -3,51 +3,84 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 08/12] android/bluetooth: Read CSRK from the storage on startup
-Date: Thu, 22 May 2014 21:06:22 +0200
-Message-Id: <1400785586-22710-9-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 07/12] android/bluetooth: Store CSRK
+Date: Thu, 22 May 2014 21:06:21 +0200
+Message-Id: <1400785586-22710-8-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+CSRK is generated while paring and should be used for sign att packets
+when LE devices uses write signed command.
 ---
- android/bluetooth.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ android/bluetooth.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index b910b01..f8a7b3d 100644
+index 54eb65d..b910b01 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2344,6 +2344,28 @@ static struct device *create_device_from_info(GKeyFile *key_file,
- 		dev->le_bonded = true;
+@@ -1805,6 +1805,47 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+ 	/* TODO browse services here? */
+ }
+ 
++static void store_csrk(struct device *dev)
++{
++	GKeyFile *key_file;
++	char key_str[33];
++	char addr[18];
++	int i;
++	gsize length = 0;
++	char *data;
++
++	ba2str(&dev->bdaddr, addr);
++
++	key_file = g_key_file_new();
++	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
++		g_key_file_free(key_file);
++		return;
++	}
++
++	if (dev->valid_local_csrk) {
++
++		for (i = 0; i < 16; i++)
++			sprintf(key_str + (i * 2), "%2.2X",
++							dev->local_csrk[i]);
++
++		g_key_file_set_string(key_file, addr, "LocalCSRK", key_str);
++	}
++
++	if (dev->valid_remote_csrk) {
++		for (i = 0; i < 16; i++)
++			sprintf(key_str + (i * 2), "%2.2X",
++							dev->remote_csrk[i]);
++
++		g_key_file_set_string(key_file, addr, "RemoteCSRK", key_str);
++	}
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(DEVICES_FILE, data, length, NULL);
++	g_free(data);
++
++	g_key_file_free(key_file);
++}
++
+ static void new_csrk_callback(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -1835,7 +1876,10 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
+ 		return;
  	}
  
-+	str = g_key_file_get_string(key_file, peer, "LocalCSRK", NULL);
-+	if (str) {
-+		int i;
+-	/*TODO: Store it. Remember about Sign Counter*/
++	if (ev->store_hint)
++		store_csrk(dev);
 +
-+		dev->valid_local_csrk = true;
-+		for (i = 0; i < 16; i++)
-+			sscanf(str + (i * 2), "%02hhX", &dev->local_csrk[i]);
-+
-+		g_free(str);
-+	}
-+
-+	str = g_key_file_get_string(key_file, peer, "RemoteCSRK", NULL);
-+	if (str) {
-+		int i;
-+
-+		dev->valid_remote_csrk = true;
-+		for (i = 0; i < 16; i++)
-+			sscanf(str + (i * 2), "%02hhX", &dev->remote_csrk[i]);
-+
-+		g_free(str);
-+	}
-+
- 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
- 	if (str) {
- 		g_free(dev->name);
++	/*TODO: Store sign counter */
+ }
+ 
+ static void register_mgmt_handlers(void)
 -- 
 1.8.4
 
