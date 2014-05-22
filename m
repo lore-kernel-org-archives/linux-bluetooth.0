@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 06/14] android/hal-sco: Check file descriptor >= 0
-Date: Thu, 22 May 2014 15:05:59 +0300
-Message-Id: <1400760367-24915-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 02/14] android/hal-sco: Fixes for unreliable mtu
+Date: Thu, 22 May 2014 15:05:55 +0300
+Message-Id: <1400760367-24915-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,29 +12,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/hal-sco.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 4ac5d00..e940547 100644
+index fb7b4d4..3c6e5bf 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -710,11 +710,11 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
- 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
- 	struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
+@@ -300,7 +300,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 	struct pollfd pfd;
+ 	size_t len, written = 0;
+ 	int ret;
+-	uint16_t mtu = /* out->cfg.mtu */ 48;
++	uint16_t mtu = out->cfg.mtu;
+ 	uint64_t audio_sent_us, audio_passed_us;
  
--	DBG("dev %p stream %p fd %d", dev, stream_out, sco_dev->out->fd);
-+	DBG("dev %p stream %p fd %d", dev, out, sco_dev->out->fd);
+ 	pfd.fd = out->fd;
+@@ -594,7 +594,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+ 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+-	out->cfg.mtu = mtu;
++
++	/* we get wrong mtu size for some reason */
++	out->cfg.mtu = /* mtu */ 48;
  
--	if (sco_dev->out && sco_dev->out->fd) {
--		close(sco_dev->out->fd);
--		sco_dev->out->fd = -1;
-+	if (out && out->fd >= 0) {
-+		close(out->fd);
-+		out->fd = -1;
- 	}
- 
- 	free(out->cache);
+ 	out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
+ 	if (!out->downmix_buf) {
 -- 
 1.8.3.2
 
