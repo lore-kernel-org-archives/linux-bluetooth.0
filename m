@@ -3,73 +3,56 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 06/12] android/bluetooth: Add support to read CSRK from the kernel
-Date: Thu, 22 May 2014 21:06:20 +0200
-Message-Id: <1400785586-22710-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 05/12] android/bluetooth: Expose API to update sign counter
+Date: Thu, 22 May 2014 21:06:19 +0200
+Message-Id: <1400785586-22710-6-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is needed so GATT can notify GAP that write sign has been done and
+sign counter shall be increased as per spec.
 ---
- android/bluetooth.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ android/bluetooth.c | 14 ++++++++++++++
+ android/bluetooth.h |  2 ++
+ 2 files changed, 16 insertions(+)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index c972cd5..54eb65d 100644
+index 644a556..c972cd5 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -1805,6 +1805,39 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
- 	/* TODO browse services here? */
+@@ -3231,6 +3231,20 @@ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type, uint8_t key[16],
+ 	return true;
  }
  
-+static void new_csrk_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
++void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type)
 +{
-+	const struct mgmt_ev_new_csrk *ev = param;
 +	struct device *dev;
-+	char dst[18];
 +
-+	if (length < sizeof(*ev)) {
-+		error("Too small csrk event (%u bytes)", length);
-+		return;
-+	}
-+
-+	ba2str(&ev->key.addr.bdaddr, dst);
-+	dev = find_device(&ev->key.addr.bdaddr);
++	dev = find_device(addr);
 +	if (!dev)
 +		return;
 +
-+	if (ev->key.master == 0x01) {
-+		memcpy(dev->remote_csrk, ev->key.val, 16);
-+		dev->remote_sign_cnt = 0;
-+		dev->valid_remote_csrk = true;
-+	} else if (ev->key.master == 0x00) {
-+		memcpy(dev->local_csrk, ev->key.val, 16);
-+		dev->local_sign_cnt = 0;
-+		dev->valid_local_csrk = true;
-+	} else {
-+		error("Unknown key type 02%02x", ev->key.master);
-+		return;
-+	}
-+
-+	/*TODO: Store it. Remember about Sign Counter*/
++	if (type == LOCAL_CSRK)
++		dev->local_sign_cnt++;
++	else
++		dev->remote_sign_cnt++;
 +}
 +
- static void register_mgmt_handlers(void)
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
  {
- 	mgmt_register(mgmt_if, MGMT_EV_NEW_SETTINGS, adapter.index,
-@@ -1854,6 +1887,10 @@ static void register_mgmt_handlers(void)
+ 	const uint8_t *mode = buf;
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 9c88f62..1c14377 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -64,3 +64,5 @@ bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
  
- 	mgmt_register(mgmt_if, MGMT_EV_NEW_LONG_TERM_KEY, adapter.index,
- 					new_long_term_key_event, NULL, NULL);
+ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type,
+ 					uint8_t key[16], uint32_t *sign_cnt);
 +
-+	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter.index,
-+						new_csrk_callback, NULL, NULL);
-+
- }
- 
- static void load_link_keys_complete(uint8_t status, uint16_t length,
++void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
 -- 
 1.8.4
 
