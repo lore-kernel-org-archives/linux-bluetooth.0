@@ -1,44 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZJi49XwzbWwtSvwGD5xzPGBG8OmRyi=RxdxiBfimOEprQ@mail.gmail.com>
-References: <CABBYNZJi49XwzbWwtSvwGD5xzPGBG8OmRyi=RxdxiBfimOEprQ@mail.gmail.com>,
-	<OF9492748C.5E888D74-ON65257CDE.00285283-65257CDE.00285286@tcs.com>
-Subject: Help required for Bluez manual installation
-From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	linux-bluetooth-owner@vger.kernel.org
-Message-ID: <OF9D7C80F4.16F2EDD9-ON65257CE0.002BF66A-65257CE0.002BF66C@tcs.com>
-Date: Thu, 22 May 2014 13:30:11 +0530
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <6903600.aZEQEVyvJm@uw000953>
+References: <1400689082-12662-1-git-send-email-andrzej.kaczmarek@tieto.com> <6903600.aZEQEVyvJm@uw000953>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Date: Thu, 22 May 2014 09:59:31 +0200
+Message-ID: <CAF3PWx1aM87OtE6v03616MTJ8ZrtmLvWTgyBr-bbKqg712oMYA@mail.gmail.com>
+Subject: Re: [PATCH] android: Include headers from libhardware as system headers
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Szymon,
 
-I have installed Bluez 4.98 from Synaptic.
+On 22 May 2014 09:32, Szymon Janc <szymon.janc@tieto.com> wrote:
+> Hi Andrzej,
+>
+> On Wednesday 21 of May 2014 18:18:02 Andrzej Kaczmarek wrote:
+>> Including hardware/audio.h in Android build produces sign-compare
+>> warning due to nested include of cutils/bitops.h. Since we cannot avoid
+>> this warning in sane way unless it's fixed in AOSP tree, we can make
+>> GCC think this is a system header and suppress warnings.
+>>
+>> This patch changes the way headers from libhardware are added to
+>> search path from LOCAL_C_INCLUDES to explicit "-isystem" option added
+>> to LOCAL_CFLAGS.
+>> ---
+>>  android/Android.mk | 16 ++++++++--------
+>>  1 file changed, 8 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/android/Android.mk b/android/Android.mk
+>> index 4235a7c..d3d94ed 100644
+>> --- a/android/Android.mk
+>> +++ b/android/Android.mk
+>> @@ -121,12 +121,12 @@ LOCAL_SRC_FILES := \
+>
+> I'd rather fix this in AOSP instead of hacking this in our build system.
 
-When I download the code for Blue 4.101 and installed in my machine, nothing is working.
+I agree, I pushed patch for this already:
+https://android-review.googlesource.com/95341
 
-I have replaced 'bluetoothd' and 'libbluetooth.so.3.xx' files.
-Are there any other files , that I need to overwrite with the existing ones.
-
-Can anyone suggest me, what and files are mandatory when we compile and code and replacing the libraries.
-
-Thanks & Regards,
-Vinod.
-
-=====-----=====-----=====
-Notice: The information contained in this e-mail
-message and/or attachments to it may contain 
-confidential or privileged information. If you are 
-not the intended recipient, any dissemination, use, 
-review, distribution, printing or copying of the 
-information contained in this e-mail message 
-and/or attachments to it are strictly prohibited. If 
-you have received this communication in error, 
-please notify us by reply e-mail or telephone and 
-immediately and permanently delete the message 
-and any attachments. Thank you
-
-
-
+BR,
+Andrzej
