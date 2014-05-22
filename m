@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 08/14] android/haltest: Add open/close input stream commands
-Date: Thu, 22 May 2014 15:06:01 +0300
-Message-Id: <1400760367-24915-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 14/14] android/haltest: Implement read to file
+Date: Thu, 22 May 2014 15:06:07 +0300
+Message-Id: <1400760367-24915-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,130 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Reads data from stream_in and write to specified file.
 ---
- android/client/if-sco.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ android/Android.mk      |  3 +++
+ android/client/if-sco.c | 53 +++++++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 52 insertions(+), 4 deletions(-)
 
+diff --git a/android/Android.mk b/android/Android.mk
+index cc0f8f5..0da16b6 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -165,6 +165,9 @@ LOCAL_C_INCLUDES += \
+ 	$(call include-path-for, system-core) \
+ 	$(call include-path-for, libhardware) \
+ 
++LOCAL_C_INCLUDES += \
++	$(LOCAL_PATH)/bluez/android \
++
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+ 
+ LOCAL_SHARED_LIBRARIES := libhardware
 diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index b7f5a80..c71d0b4 100644
+index 87e2d79..d575d99 100644
 --- a/android/client/if-sco.c
 +++ b/android/client/if-sco.c
-@@ -23,8 +23,10 @@
+@@ -15,6 +15,8 @@
+  *
+  */
  
- audio_hw_device_t *if_audio_sco = NULL;
- static struct audio_stream_out *stream_out = NULL;
-+static struct audio_stream_in *stream_in = NULL;
- 
- static size_t buffer_size = 0;
-+static size_t buffer_size_in = 0;
- static pthread_t play_thread = 0;
- static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
- static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
-@@ -340,6 +342,53 @@ static void close_output_stream_p(int argc, const char **argv)
- 	buffer_size = 0;
++#include "../src/shared/util.h"
++
+ #include "if-main.h"
+ #include "../hal-utils.h"
+ #include "pthread.h"
+@@ -239,12 +241,29 @@ static void *playback_thread(void *data)
+ 	return NULL;
  }
  
-+static void open_input_stream_p(int argc, const char **argv)
++static void write_stereo_pcm16(char *buffer, size_t len, FILE *out)
 +{
-+	int err;
++	const int16_t *input = (const void *) buffer;
++	int16_t sample[2];
++	size_t i;
 +
-+	RETURN_IF_NULL(if_audio_sco);
++	for (i = 0; i < len / 2; i++) {
++		int16_t mono = le16_to_cpu(get_unaligned(&input[i]));
 +
-+	pthread_mutex_lock(&state_mutex);
-+	if (current_state == STATE_PLAYING) {
-+		haltest_error("Already playing!\n");
-+		pthread_mutex_unlock(&state_mutex);
-+		return;
++		put_unaligned(cpu_to_le16(mono), &sample[0]);
++		put_unaligned(cpu_to_le16(mono), &sample[1]);
++
++		fwrite(sample, sizeof(sample), 1, out);
 +	}
-+	pthread_mutex_unlock(&state_mutex);
-+
-+	err = if_audio_sco->open_input_stream(if_audio_sco,
-+						0,
-+						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
-+						NULL,
-+						&stream_in);
-+	if (err < 0) {
-+		haltest_error("open output stream returned %d\n", err);
-+		return;
-+	}
-+
-+	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
-+	if (buffer_size_in == 0)
-+		haltest_error("Invalid buffer size received!\n");
-+	else
-+		haltest_info("Using buffer size: %zu\n", buffer_size_in);
 +}
 +
-+static void close_input_stream_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_audio_sco);
-+	RETURN_IF_NULL(stream_in);
-+
-+	stop_p(argc, argv);
-+
-+	haltest_info("Waiting for playback thread...\n");
-+	pthread_join(play_thread, NULL);
-+
-+	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
-+
-+	stream_in = NULL;
-+	buffer_size_in = 0;
-+}
-+
- static void cleanup_p(int argc, const char **argv)
+ static void *read_thread(void *data)
  {
- 	int err;
-@@ -499,6 +548,8 @@ static struct method methods[] = {
- 	STD_METHOD(cleanup),
- 	STD_METHOD(open_output_stream),
- 	STD_METHOD(close_output_stream),
-+	STD_METHOD(open_input_stream),
-+	STD_METHOD(close_input_stream),
- 	STD_METHODH(play, "<path to pcm file>"),
- 	STD_METHOD(stop),
- 	STD_METHOD(suspend),
+ 	int (*filbuff_cb) (short*, void*) = feed_from_in;
+ 	short buffer[buffer_size / sizeof(short)];
+ 	size_t len = 0;
+ 	void *cb_data = NULL;
++	FILE *out = data;
+ 
+ 	pthread_mutex_lock(&state_mutex);
+ 	current_state = STATE_PLAYING;
+@@ -266,9 +285,18 @@ static void *read_thread(void *data)
+ 		pthread_mutex_unlock(&state_mutex);
+ 
+ 		len = filbuff_cb(buffer, cb_data);
+-		haltest_info("len %zd\n", len);
++
++		haltest_info("Read %zd bytes\n", len);
++
++		if (out) {
++			write_stereo_pcm16((char *) buffer, len, out);
++			haltest_info("Written %zd bytes\n", len * 2);
++		}
+ 	} while (len);
+ 
++	if (out)
++		fclose(out);
++
+ 	pthread_mutex_lock(&state_mutex);
+ 	current_state = STATE_STOPPED;
+ 	pthread_mutex_unlock(&state_mutex);
+@@ -355,9 +383,26 @@ static void loop_p(int argc, const char **argv)
+ 
+ static void read_p(int argc, const char **argv)
+ {
++	const char *fname = NULL;
++	FILE *out = NULL;
++
+ 	RETURN_IF_NULL(if_audio_sco);
+ 	RETURN_IF_NULL(stream_in);
+ 
++	if (argc < 3) {
++		haltest_error("Invalid audio file path.\n");
++		haltest_info("Using read and through away\n");
++	} else {
++		fname = argv[2];
++		out = fopen(fname, "w");
++		if (!out) {
++			haltest_error("Cannot open file: %s\n", fname);
++			return;
++		}
++
++		haltest_info("Reading to file: %s\n", fname);
++	}
++
+ 	if (!buffer_size_in) {
+ 		haltest_error("Invalid buffer sizes. Streams opened\n");
+ 		return;
+@@ -371,10 +416,10 @@ static void read_p(int argc, const char **argv)
+ 	}
+ 	pthread_mutex_unlock(&state_mutex);
+ 
+-	if (pthread_create(&play_thread, NULL, read_thread,
+-							stream_in) != 0)
++	if (pthread_create(&play_thread, NULL, read_thread, out) != 0) {
+ 		haltest_error("Cannot create playback thread!\n");
+-
++		fclose(out);
++	}
+ }
+ 
+ static void stop_p(int argc, const char **argv)
 -- 
 1.8.3.2
 
