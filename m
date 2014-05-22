@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 04/14] android/hal-sco: Make use of config parameter
-Date: Thu, 22 May 2014 15:05:57 +0300
-Message-Id: <1400760367-24915-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCv0 03/14] android/hal-sco: Add SCO packet cache
+Date: Thu, 22 May 2014 15:05:56 +0300
+Message-Id: <1400760367-24915-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use config parameter when opening output stream.
+SCO cached is used when Android writes with packet sizes which cannot
+fit to 48 bytes SCO frames. Remaining frames are cached and written next
+time Android perform out->write().
 ---
- android/hal-sco.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ android/hal-sco.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 5cd63c2..402b184 100644
+index 3c6e5bf..5cd63c2 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -582,7 +582,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	size_t resample_size;
- 	uint16_t mtu;
+@@ -64,6 +64,9 @@ struct sco_stream_out {
+ 	int fd;
  
--	DBG("");
-+	DBG("config %p device flags 0x%02x", config, devices);
- 
- 	if (ipc_connect_sco(&fd, &mtu) != SCO_STATUS_SUCCESS) {
- 		error("sco: cannot get fd");
-@@ -612,10 +612,20 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	out->stream.write = out_write;
- 	out->stream.get_render_position = out_get_render_position;
- 
--	/* Configuration for Android */
--	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
--	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
--	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
-+	if (config) {
-+		DBG("config: rate %u chan mask %x format %d offload %p",
-+				config->sample_rate, config->channel_mask,
-+				config->format, &config->offload_info);
+ 	uint8_t *downmix_buf;
++	uint8_t *cache;
++	size_t cache_len;
 +
-+		out->cfg.format = config->format;
-+		out->cfg.channels = config->channel_mask;
-+		out->cfg.rate = config->sample_rate;
-+	} else {
-+		out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
-+		out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
-+		out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+ 	size_t samples;
+ 	struct timespec start;
+ 
+@@ -301,6 +304,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 	size_t len, written = 0;
+ 	int ret;
+ 	uint16_t mtu = out->cfg.mtu;
++	uint8_t *p;
+ 	uint64_t audio_sent_us, audio_passed_us;
+ 
+ 	pfd.fd = out->fd;
+@@ -320,6 +324,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 			return false;
+ 		}
+ 
++		len = bytes - written > mtu ? mtu : bytes - written;
+ 
+ 		clock_gettime(CLOCK_REALTIME, &now);
+ 		/* Mark start of the stream */
+@@ -341,12 +346,30 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 			memcpy(&out->start, &now, sizeof(out->start));
+ 		}
+ 
++		if (out->cache_len) {
++			DBG("First packet cache_len %zd", out->cache_len);
++			memcpy(out->cache + out->cache_len, buffer,
++							mtu - out->cache_len);
++			p = out->cache;
++		}
+ 
+-		len = bytes - written > mtu ? mtu : bytes - written;
++		if (bytes - written >= mtu)
++			p = (void *) buffer + written;
++		else {
++			memcpy(out->cache, buffer + written, bytes - written);
++			out->cache_len = bytes - written;
++			DBG("Last packet, cache %zd bytes", bytes - written);
++			written += bytes - written;
++			continue;
++		}
+ 
+-		ret = write(out->fd, buffer + written, len);
++		ret = write(out->fd, p, len);
+ 		if (ret > 0) {
+-			written += ret;
++			if (out->cache_len) {
++				written = mtu - out->cache_len;
++				out->cache_len = 0;
++			} else
++				written += ret;
+ 
+ 			out->samples += ret / 2;
+ 
+@@ -604,6 +627,13 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 		return -ENOMEM;
+ 	}
+ 
++	out->cache = malloc(out->cfg.mtu);
++	if (!out->cache) {
++		free(out->downmix_buf);
++		free(out);
++		return -ENOMEM;
 +	}
 +
- 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+ 	DBG("size %zd", out_get_buffer_size(&out->stream.common));
  
- 	/* we get wrong mtu size for some reason */
+ 	/* Channel numbers for resampler */
+@@ -647,6 +677,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 
+ 	return 0;
+ failed:
++	free(out->cache);
+ 	free(out->downmix_buf);
+ 	free(out);
+ 	stream_out = NULL;
+@@ -668,6 +699,7 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
+ 		sco_dev->out->fd = -1;
+ 	}
+ 
++	free(out->cache);
+ 	free(out->downmix_buf);
+ 	free(out);
+ 	sco_dev->out = NULL;
 -- 
 1.8.3.2
 
