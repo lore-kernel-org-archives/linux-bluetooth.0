@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/bluetooth: Add bonded information to found device callback
-Date: Thu, 22 May 2014 13:13:24 +0200
-Message-ID: <2469505.QrkjKaLJfi@uw000953>
-In-Reply-To: <1400600254-19736-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400600254-19736-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2] gatt: Fix not freeing GError on failure
+Date: Thu, 22 May 2014 13:01:56 +0200
+Message-Id: <1400756516-19877-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <20140521145431.GA30054@t440s>
+References: <20140521145431.GA30054@t440s>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+---
+ profiles/gatt/gas.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-On Tuesday 20 of May 2014 17:37:34 Lukasz Rymanowski wrote:
-> If device is bonded then discoverable flag is not set. This cause that
-> gatt application will not get scan callback with advertising bonded
-> device.
-> 
-> ---
-> 
-> Not sure if it should work like that but lets do it for now. It is
-> useful for testing at least.
-
-As we discussed applications should just connect on already bonded devices and
-get notify when connected. But Bluetooth SIG reference app expects to have
-device appear in scan result (even if bonded) to be able to do anything with it.
-
-Since it is likely that this scheme will be copied by apps developer this
-patch is now pushed upstream. Thanks.
-
+diff --git a/profiles/gatt/gas.c b/profiles/gatt/gas.c
+index d240450..b51b4a8 100644
+--- a/profiles/gatt/gas.c
++++ b/profiles/gatt/gas.c
+@@ -329,6 +329,11 @@ static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+ 		DBG("MTU Exchange: Requesting %d", imtu);
+ 	}
+ 
++	if (gerr) {
++		error("Could not acquire att imtu and cid: %s", gerr->message);
++		g_error_free(gerr);
++	}
++
+ 	if (device_get_appearance(gas->device, &app) < 0) {
+ 		bt_uuid_t uuid;
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
