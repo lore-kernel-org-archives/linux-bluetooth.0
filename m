@@ -3,73 +3,62 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 06/12] android/bluetooth: Add support to read CSRK from the kernel
-Date: Thu, 22 May 2014 10:07:36 +0200
-Message-Id: <1400746062-24766-7-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 03/12] attrib/gatt: Add wrapper to send signed write command
+Date: Thu, 22 May 2014 10:07:33 +0200
+Message-Id: <1400746062-24766-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/bluetooth.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ attrib/gatt.c | 16 ++++++++++++++++
+ attrib/gatt.h |  5 +++++
+ 2 files changed, 21 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 8df4d91..c599e4a 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1804,6 +1804,39 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
- 	/* TODO browse services here? */
+diff --git a/attrib/gatt.c b/attrib/gatt.c
+index 73eaf7a..ce08003 100644
+--- a/attrib/gatt.c
++++ b/attrib/gatt.c
+@@ -1065,6 +1065,22 @@ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
+ 	return g_attrib_send(attrib, 0, buf, plen, NULL, user_data, notify);
  }
  
-+static void new_csrk_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
++guint gatt_signed_write_cmd(GAttrib *attrib, uint16_t handle,
++						const uint8_t *value, int vlen,
++						const uint8_t signature[12],
++						GDestroyNotify notify,
++						gpointer user_data)
 +{
-+	const struct mgmt_ev_new_csrk *ev = param;
-+	struct device *dev;
-+	char dst[18];
++	uint8_t *buf;
++	size_t buflen;
++	guint16 plen;
 +
-+	if (length < sizeof(*ev)) {
-+		error("Too small csrk event (%u bytes)", length);
-+		return;
-+	}
-+
-+	ba2str(&ev->key.addr.bdaddr, dst);
-+	dev = find_device(&ev->key.addr.bdaddr);
-+	if (!dev)
-+		return;
-+
-+	if (ev->key.master == 0x01) {
-+		memcpy(dev->remote_csrk, ev->key.val, 16);
-+		dev->remote_sign_cnt = 0;
-+		dev->valid_remote_csrk = true;
-+	} else if (ev->key.master == 0x00) {
-+		memcpy(dev->local_csrk, ev->key.val, 16);
-+		dev->local_sign_cnt = 0;
-+		dev->valid_local_csrk = true;
-+	} else {
-+		error("Unknown key type 02%02x", ev->key.master);
-+		return;
-+	}
-+
-+	/*TODO: Store it. Remember about Sign Counter*/
++	buf = g_attrib_get_buffer(attrib, &buflen);
++	plen = enc_signed_write_cmd(handle, value, vlen, signature, buf,
++									buflen);
++	return g_attrib_send(attrib, 0, buf, plen, NULL, user_data, notify);
 +}
 +
- static void register_mgmt_handlers(void)
+ static sdp_data_t *proto_seq_find(sdp_list_t *proto_list)
  {
- 	mgmt_register(mgmt_if, MGMT_EV_NEW_SETTINGS, adapter.index,
-@@ -1853,6 +1886,10 @@ static void register_mgmt_handlers(void)
+ 	sdp_list_t *list;
+diff --git a/attrib/gatt.h b/attrib/gatt.h
+index 7d055f0..2d869e3 100644
+--- a/attrib/gatt.h
++++ b/attrib/gatt.h
+@@ -105,6 +105,11 @@ guint gatt_execute_write(GAttrib *attrib, uint8_t flags,
+ guint gatt_write_cmd(GAttrib *attrib, uint16_t handle, const uint8_t *value,
+ 			int vlen, GDestroyNotify notify, gpointer user_data);
  
- 	mgmt_register(mgmt_if, MGMT_EV_NEW_LONG_TERM_KEY, adapter.index,
- 					new_long_term_key_event, NULL, NULL);
-+
-+	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter.index,
-+						new_csrk_callback, NULL, NULL);
-+
- }
- 
- static void load_link_keys_complete(uint8_t status, uint16_t length,
++guint gatt_signed_write_cmd(GAttrib *attrib, uint16_t handle,
++						const uint8_t *value, int vlen,
++						const uint8_t signature[12],
++						GDestroyNotify notify,
++						gpointer user_data);
+ guint gatt_read_char_by_uuid(GAttrib *attrib, uint16_t start, uint16_t end,
+ 				bt_uuid_t *uuid, GAttribResultFunc func,
+ 				gpointer user_data);
 -- 
 1.8.4
 
