@@ -1,117 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFCv0 03/14] android/hal-sco: Add SCO packet cache
-Date: Thu, 22 May 2014 15:05:56 +0300
-Message-Id: <1400760367-24915-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Don't process read_by_type request with invalied range
+Date: Thu, 22 May 2014 14:04:28 +0200
+Message-ID: <50030536.bG1W7Pr17I@uw000953>
+In-Reply-To: <1400754835-3325-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1400754835-3325-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcin,
 
-SCO cached is used when Android writes with packet sizes which cannot
-fit to 48 bytes SCO frames. Remaining frames are cached and written next
-time Android perform out->write().
----
- android/hal-sco.c | 38 +++++++++++++++++++++++++++++++++++---
- 1 file changed, 35 insertions(+), 3 deletions(-)
+On Thursday 22 of May 2014 12:33:55 Marcin Kraglak wrote:
+> Return ATT_ECODE_INVALID_HANDLE if range is incorrect. It repairs
+> TC_GAR_SR_BI_08_C test case.
+> ---
+>  android/gatt.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 89da60d..dae0df3 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -4404,6 +4404,9 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+>  	if (!len)
+>  		return ATT_ECODE_INVALID_PDU;
+>  
+> +	if (start > end)
+> +		return ATT_ECODE_INVALID_HANDLE;
+> +
+>  	q = queue_new();
+>  	if (!q)
+>  		return ATT_ECODE_INSUFF_RESOURCES;
+> 
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 3c6e5bf..5cd63c2 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -64,6 +64,9 @@ struct sco_stream_out {
- 	int fd;
- 
- 	uint8_t *downmix_buf;
-+	uint8_t *cache;
-+	size_t cache_len;
-+
- 	size_t samples;
- 	struct timespec start;
- 
-@@ -301,6 +304,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 	size_t len, written = 0;
- 	int ret;
- 	uint16_t mtu = out->cfg.mtu;
-+	uint8_t *p;
- 	uint64_t audio_sent_us, audio_passed_us;
- 
- 	pfd.fd = out->fd;
-@@ -320,6 +324,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 			return false;
- 		}
- 
-+		len = bytes - written > mtu ? mtu : bytes - written;
- 
- 		clock_gettime(CLOCK_REALTIME, &now);
- 		/* Mark start of the stream */
-@@ -341,12 +346,30 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 			memcpy(&out->start, &now, sizeof(out->start));
- 		}
- 
-+		if (out->cache_len) {
-+			DBG("First packet cache_len %zd", out->cache_len);
-+			memcpy(out->cache + out->cache_len, buffer,
-+							mtu - out->cache_len);
-+			p = out->cache;
-+		}
- 
--		len = bytes - written > mtu ? mtu : bytes - written;
-+		if (bytes - written >= mtu)
-+			p = (void *) buffer + written;
-+		else {
-+			memcpy(out->cache, buffer + written, bytes - written);
-+			out->cache_len = bytes - written;
-+			DBG("Last packet, cache %zd bytes", bytes - written);
-+			written += bytes - written;
-+			continue;
-+		}
- 
--		ret = write(out->fd, buffer + written, len);
-+		ret = write(out->fd, p, len);
- 		if (ret > 0) {
--			written += ret;
-+			if (out->cache_len) {
-+				written = mtu - out->cache_len;
-+				out->cache_len = 0;
-+			} else
-+				written += ret;
- 
- 			out->samples += ret / 2;
- 
-@@ -604,6 +627,13 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 		return -ENOMEM;
- 	}
- 
-+	out->cache = malloc(out->cfg.mtu);
-+	if (!out->cache) {
-+		free(out->downmix_buf);
-+		free(out);
-+		return -ENOMEM;
-+	}
-+
- 	DBG("size %zd", out_get_buffer_size(&out->stream.common));
- 
- 	/* Channel numbers for resampler */
-@@ -647,6 +677,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 
- 	return 0;
- failed:
-+	free(out->cache);
- 	free(out->downmix_buf);
- 	free(out);
- 	stream_out = NULL;
-@@ -668,6 +699,7 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
- 		sco_dev->out->fd = -1;
- 	}
- 
-+	free(out->cache);
- 	free(out->downmix_buf);
- 	free(out);
- 	sco_dev->out = NULL;
+Applied, thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
