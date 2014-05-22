@@ -3,56 +3,100 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 05/12] android/bluetooth: Expose API to update sign counter
-Date: Thu, 22 May 2014 10:07:35 +0200
-Message-Id: <1400746062-24766-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 09/12] android/bluetooth: Store sign counter needed for aes-cmac sign
+Date: Thu, 22 May 2014 10:07:39 +0200
+Message-Id: <1400746062-24766-10-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400746062-24766-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed so GATT can notify GAP that write sign has been done and
-sign counter shall be increased as per spec.
+If CSRK is valid between sessions we should remember sign counter.
+Therefor store it.
 ---
- android/bluetooth.c | 14 ++++++++++++++
- android/bluetooth.h |  2 ++
- 2 files changed, 16 insertions(+)
+ android/bluetooth.c | 41 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 39 insertions(+), 2 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 2ef7846..8df4d91 100644
+index 83aae9f..082441f 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -3230,6 +3230,20 @@ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type, uint8_t key[16],
+@@ -1877,8 +1877,6 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
+ 
+ 	if (ev->store_hint)
+ 		store_csrk(dev);
+-
+-	/*TODO: Store sign counter */
+ }
+ 
+ static void register_mgmt_handlers(void)
+@@ -2352,6 +2350,9 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 			sscanf(str + (i * 2), "%02hhX", &dev->local_csrk[i]);
+ 
+ 		g_free(str);
++
++		dev->local_sign_cnt = g_key_file_get_integer(key_file, peer,
++						"LocalCSRKSignCounter", NULL);
+ 	}
+ 
+ 	str = g_key_file_get_string(key_file, peer, "RemoteCSRK", NULL);
+@@ -2363,6 +2364,9 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 			sscanf(str + (i * 2), "%02hhX", &dev->remote_csrk[i]);
+ 
+ 		g_free(str);
++
++		dev->remote_sign_cnt = g_key_file_get_integer(key_file, peer,
++						"RemoteCSRKSignCounter", NULL);
+ 	}
+ 
+ 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
+@@ -3333,6 +3337,37 @@ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type, uint8_t key[16],
  	return true;
  }
  
-+void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type)
++static void store_sign_counter(struct device *dev, enum bt_csrk_type type)
 +{
-+	struct device *dev;
++	const char *sign_cnt_s;
++	uint32_t sign_cnt;
++	GKeyFile *key_file;
++	bool local = (type == LOCAL_CSRK);
 +
-+	dev = find_device(addr);
-+	if (!dev)
++	gsize length = 0;
++	char addr[18];
++	char *data;
++
++	key_file = g_key_file_new();
++	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
++		g_key_file_free(key_file);
 +		return;
++	}
 +
-+	if (type == LOCAL_CSRK)
-+		dev->local_sign_cnt++;
-+	else
-+		dev->remote_sign_cnt++;
++	ba2str(&dev->bdaddr, addr);
++
++	sign_cnt_s = local ? "LocalCSRKSignCounter" : "RemoteCSRKSignCounter";
++	sign_cnt = local ? dev->local_sign_cnt : dev->remote_sign_cnt;
++
++	g_key_file_set_integer(key_file, addr, sign_cnt_s, sign_cnt);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(DEVICES_FILE, data, length, NULL);
++	g_free(data);
++
++	g_key_file_free(key_file);
 +}
 +
- static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
+ void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type)
  {
- 	const uint8_t *mode = buf;
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 35a5b52..c4fb375 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -63,3 +63,5 @@ bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
- 
- bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type,
- 					uint8_t key[16], uint32_t *sign_cnt);
+ 	struct device *dev;
+@@ -3345,6 +3380,8 @@ void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type)
+ 		dev->local_sign_cnt++;
+ 	else
+ 		dev->remote_sign_cnt++;
 +
-+void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
++	store_sign_counter(dev, type);
+ }
+ 
+ static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
 -- 
 1.8.4
 
