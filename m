@@ -2,28 +2,26 @@ Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
 In-Reply-To: 
 References: 
-Subject: Help required in Bluez manual installation
+Subject: Help required to debug Bluez stack
 From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
 To: linux-bluetooth@vger.kernel.org,
 	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
-Message-ID: <OF7442A3D3.FC6BD1B5-ON65257CE0.002C6DCE-65257CE0.002C6DD0@tcs.com>
-Date: Thu, 22 May 2014 13:35:16 +0530
+Message-ID: <OF5970E49C.3D31B9CD-ON65257CE0.002C42F8-65257CE0.002C42FA@tcs.com>
+Date: Thu, 22 May 2014 13:33:27 +0530
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Dear Team,
 
-I have installed Bluez 4.98 from Synaptic.
+I am working with Bluez 4.x version.
 
-When I download the code for Blue 4.101 and installed in my machine, nothing is working.
+I want to debug Bluez stack.
 
-I have replaced 'bluetoothd' and 'libbluetooth.so.3.xx' libraries.
-Are there any other files , that I need to overwrite with the existing ones.
+Can anyone help me, how to debug the stack.
 
-Can anyone suggest me, what and files are mandatory when we compile and code and replacing the libraries.
-
-Please don't ignore my mail, as I am working with Bluez 4.x version. Your valuable suggestions can help me to work with my requirements.
+Please don't ignore my mail, as I am working with Bluez 4.x version.
+I need your help.
 
 Thanks & Regards,
 Vinod.
