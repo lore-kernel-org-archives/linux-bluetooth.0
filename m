@@ -3,93 +3,114 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com, johan.hedberg@gmail.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3 04/12] android/bluetooth: Expose API to get CSRK for device
-Date: Thu, 22 May 2014 21:06:18 +0200
-Message-Id: <1400785586-22710-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v3 02/12] attrib: Add helpers to enc and dec signed write command
+Date: Thu, 22 May 2014 21:06:16 +0200
+Message-Id: <1400785586-22710-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1400785586-22710-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-GATT will take CSRK key and sign counter each time it needs it to sign
-att package or to verify att package
 ---
- android/bluetooth.c | 31 +++++++++++++++++++++++++++++++
- android/bluetooth.h |  8 ++++++++
- 2 files changed, 39 insertions(+)
+ attrib/att.c | 55 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ attrib/att.h | 11 +++++++++++
+ 2 files changed, 66 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 93b9cd7..644a556 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -116,6 +116,14 @@ struct device {
- 
- 	bool found; /* if device is found in current discovery session */
- 	unsigned int confirm_id; /* mgtm command id if command pending */
-+
-+	bool valid_remote_csrk;
-+	uint8_t remote_csrk[16];
-+	uint32_t remote_sign_cnt;
-+
-+	bool valid_local_csrk;
-+	uint8_t local_csrk[16];
-+	uint32_t local_sign_cnt;
- };
- 
- struct browse_req {
-@@ -3200,6 +3208,29 @@ bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
- 	return true;
+diff --git a/attrib/att.c b/attrib/att.c
+index 8e9c06d..e7d5682 100644
+--- a/attrib/att.c
++++ b/attrib/att.c
+@@ -561,6 +561,61 @@ uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 	return len;
  }
  
-+bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type, uint8_t key[16],
-+							uint32_t *sign_cnt)
++uint16_t enc_signed_write_cmd(uint16_t handle,
++					const uint8_t *value, size_t vlen,
++					const uint8_t signature[12],
++					uint8_t *pdu, size_t len)
 +{
-+	struct device *dev;
-+	bool local = (type == LOCAL_CSRK);
++	const uint16_t hdr_len = sizeof(pdu[0]) + sizeof(handle);
++	const uint16_t min_len =  hdr_len + ATT_SIGNATURE_LEN;
 +
-+	dev = find_device(addr);
-+	if (!dev)
-+		return false;
++	if (pdu == NULL)
++		return 0;
 +
-+	if (local && dev->valid_local_csrk) {
-+		memcpy(key, dev->local_csrk, 16);
-+		*sign_cnt = dev->local_sign_cnt;
-+	} else if (!local && dev->valid_remote_csrk) {
-+		memcpy(key, dev->remote_csrk, 16);
-+		*sign_cnt = dev->remote_sign_cnt;
-+	} else {
-+		return false;
-+	}
++	if (vlen > len - min_len)
++		vlen = len - min_len;
 +
-+	return true;
++	pdu[0] = ATT_OP_SIGNED_WRITE_CMD;
++	put_le16(handle, &pdu[1]);
++
++	if (vlen > 0)
++		memcpy(&pdu[hdr_len], value, vlen);
++
++	memcpy(&pdu[hdr_len + vlen], signature, ATT_SIGNATURE_LEN);
++
++	return min_len + vlen;
 +}
 +
- static uint8_t set_adapter_scan_mode(const void *buf, uint16_t len)
++uint16_t dec_signed_write_cmd(const uint8_t *pdu, size_t len,
++						uint16_t *handle,
++						uint8_t *value, size_t *vlen,
++						uint8_t signature[12])
++{
++	const uint16_t hdr_len = sizeof(pdu[0]) + sizeof(*handle);
++	const uint16_t min_len =  hdr_len + ATT_SIGNATURE_LEN;
++
++
++	if (pdu == NULL)
++		return 0;
++
++	if (value == NULL || vlen == NULL || handle == NULL)
++		return 0;
++
++	if (len < min_len)
++		return 0;
++
++	if (pdu[0] != ATT_OP_SIGNED_WRITE_CMD)
++		return 0;
++
++	*vlen = len - min_len;
++	*handle = get_le16(&pdu[1]);
++	memcpy(value, pdu + hdr_len, *vlen);
++
++	memcpy(signature, pdu + hdr_len + *vlen, ATT_SIGNATURE_LEN);
++
++	return len;
++}
++
+ uint16_t enc_write_req(uint16_t handle, const uint8_t *value, size_t vlen,
+ 						uint8_t *pdu, size_t len)
  {
- 	const uint8_t *mode = buf;
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index a0b81a6..9c88f62 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -21,6 +21,11 @@
+diff --git a/attrib/att.h b/attrib/att.h
+index c612d80..068ddf8 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -22,6 +22,9 @@
   *
   */
  
-+enum bt_csrk_type {
-+	LOCAL_CSRK,
-+	REMOTE_CSRK,
-+};
++/* Len of signature in write signed packet */
++#define ATT_SIGNATURE_LEN		12
 +
- typedef void (*bt_bluetooth_ready)(int err, const bdaddr_t *addr);
- bool bt_bluetooth_start(int index, bool mgmt_dbg, bt_bluetooth_ready cb);
- 
-@@ -56,3 +61,6 @@ typedef void (*bt_read_device_rssi_done)(uint8_t status, const bdaddr_t *addr,
- 						int8_t rssi, void *user_data);
- bool bt_read_device_rssi(const bdaddr_t *addr, bt_read_device_rssi_done cb,
- 							void *user_data);
-+
-+bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type,
-+					uint8_t key[16], uint32_t *sign_cnt);
+ /* Attribute Protocol Opcodes */
+ #define ATT_OP_ERROR			0x01
+ #define ATT_OP_MTU_REQ			0x02
+@@ -129,6 +132,14 @@ uint16_t enc_write_cmd(uint16_t handle, const uint8_t *value, size_t vlen,
+ 						uint8_t *pdu, size_t len);
+ uint16_t dec_write_cmd(const uint8_t *pdu, size_t len, uint16_t *handle,
+ 						uint8_t *value, size_t *vlen);
++uint16_t enc_signed_write_cmd(uint16_t handle,
++					const uint8_t *value, size_t vlen,
++					const uint8_t signature[12],
++					uint8_t *pdu, size_t len);
++uint16_t dec_signed_write_cmd(const uint8_t *pdu, size_t len,
++						uint16_t *handle,
++						uint8_t *value, size_t *vlen,
++						uint8_t signature[12]);
+ struct att_data_list *dec_read_by_type_resp(const uint8_t *pdu, size_t len);
+ uint16_t enc_write_req(uint16_t handle, const uint8_t *value, size_t vlen,
+ 						uint8_t *pdu, size_t len);
 -- 
 1.8.4
 
