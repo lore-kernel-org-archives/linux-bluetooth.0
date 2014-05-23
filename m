@@ -2,71 +2,41 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android: Add gatttool to debug builds
-Date: Fri, 23 May 2014 12:50:09 +0200
-Message-Id: <1400842209-4473-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1400842209-4473-1-git-send-email-szymon.janc@tieto.com>
-References: <1400842209-4473-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] gatttool: Allow to build without interactive mode
+Date: Fri, 23 May 2014 12:50:08 +0200
+Message-Id: <1400842209-4473-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This is needed for using gatttool on Android where readline is not
+available.
 ---
- android/Android.mk | 42 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 42 insertions(+)
+ attrib/gatttool.h | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index f59352a..2a1052f 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -247,6 +247,48 @@ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
- include $(BUILD_EXECUTABLE)
+diff --git a/attrib/gatttool.h b/attrib/gatttool.h
+index 8f0913c..f15fe01 100644
+--- a/attrib/gatttool.h
++++ b/attrib/gatttool.h
+@@ -21,8 +21,18 @@
+  *
+  */
  
- #
-+# gatttool
-+#
++#ifdef GATTTOOL_NO_INTERACTIVE
++static inline int interactive(const char *src, const char *dst,
++						const char *dst_type, int psm)
++{
++	g_print("Interactive mode disabled\n");
++	return 0;
++}
++#else
+ int interactive(const char *src, const char *dst, const char *dst_type,
+ 								int psm);
++#endif
 +
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/attrib/gatttool.c \
-+	bluez/attrib/att.c \
-+	bluez/attrib/gatt.c \
-+	bluez/attrib/gattrib.c \
-+	bluez/attrib/utils.c \
-+	bluez/btio/btio.c \
-+	bluez/src/log.c \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/uuid.c \
-+	bluez/lib/hci.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/bluez \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) -DGATTTOOL_NO_INTERACTIVE
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/bluez \
-+	$(call include-path-for, glib) \
-+	$(call include-path-for, glib)/glib \
-+
-+LOCAL_SHARED_LIBRARIES := \
-+	libglib \
-+
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := debug
-+LOCAL_MODULE := gatttool
-+
-+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-+
-+include $(BUILD_EXECUTABLE)
-+
-+#
- # A2DP audio
- #
- 
+ GIOChannel *gatt_connect(const char *src, const char *dst,
+ 			const char *dst_type, const char *sec_level,
+ 			int psm, int mtu, BtIOConnect connect_cb,
 -- 
 1.9.1
 
