@@ -1,166 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 6/8] Bluetooth: 6lowpan: Fix MAC address universal/local bit handling
-Date: Fri, 23 May 2014 12:27:26 +0300
-Message-Id: <1400837248-12179-7-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH v2 7/8] Bluetooth: 6LoWPAN: Create a kernel module
+Date: Fri, 23 May 2014 12:27:27 +0300
+Message-Id: <1400837248-12179-8-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The universal/local bit handling was incorrectly done in the code.
+Instead of adding the 6LoWPAN functionality to Bluetooth module,
+we create a separate kernel module for it.
 
-So when setting EUI address from BD address we do this:
-- If BD address type is PUBLIC, then we clear the universal bit
-  in EUI address. If the address type is RANDOM, then the universal
-  bit is set (BT 6lowpan draft chapter 3.2.2)
-- After this we invert the universal/local bit according to RFC 2464
+Usage:
 
-When figuring out BD address we do the reverse:
-- Take EUI address from stateless IPv6 address, invert the
-  universal/local bit according to RFC 2464
-- If universal bit is 1 in this modified EUI address, then address
-  type is set to RANDOM, otherwise it is PUBLIC
+In the client side do this:
 
-Note that 6lowpan_iphc.[ch] does the final toggling of U/L bit
-before sending or receiving the network packet.
+# modprobe bluetooth_6lowpan
+# echo 'psm 62' > /sys/kernel/debug/bluetooth/hci0/6lowpan
+# hciconfig hci0 leadv
+
+
+In the server side do this:
+
+# modprobe bluetooth_6lowpan
+# echo 'psm 62' > /sys/kernel/debug/bluetooth/hci0/6lowpan
+# hcitool lecc E0:06:E6:B7:2A:73
+# echo 'connect E0:06:E6:B7:2A:73 1' > \
+                  /sys/kernel/debug/bluetooth/hci0/6lowpan
+
+The 6LoWPAN functionality can be controlled by psm value. If it
+is left to 0, then the module is disabled and all the 6LoWPAN
+connections are dropped if there were any.
+
+The 6lowpan controlling interface is a temporary solution
+until the specifications are ready.
 
 Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- net/bluetooth/6lowpan.c | 65 ++++++++++++++++++++++++++-----------------------
- 1 file changed, 34 insertions(+), 31 deletions(-)
+ net/bluetooth/6lowpan.c | 13 +++++++++++--
+ net/bluetooth/Kconfig   |  6 +++---
+ net/bluetooth/Makefile  |  4 +++-
+ 3 files changed, 17 insertions(+), 6 deletions(-)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 3390b7b..46cc298 100644
+index 46cc298..04e0501 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -337,12 +337,18 @@ static int bt_6lowpan_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 	return err;
- }
+@@ -14,6 +14,7 @@
+ #include <linux/if_arp.h>
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
++#include <linux/module.h>
+ #include <linux/debugfs.h>
  
--static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
--			    bdaddr_t *addr, u8 *addr_type)
-+static u8 get_addr_type_from_eui64(u8 byte)
+ #include <net/ipv6.h>
+@@ -1223,14 +1224,14 @@ static struct hci_cb lowpan_cb = {
+ 	.connect_cfm	= lowpan_connect_hcon,
+ };
+ 
+-int bt_6lowpan_init(void)
++static int __init bt_6lowpan_init(void)
  {
--	u8 *eui64;
-+	/* Is universal(0) or local(1) bit,  */
-+	if (byte & 0x02)
-+		return BDADDR_LE_RANDOM;
+ 	hci_register_cb(&lowpan_cb);
  
--	eui64 = ip6_daddr->s6_addr + 8;
-+	return BDADDR_LE_PUBLIC;
-+}
-+
-+static void copy_to_bdaddr(struct in6_addr *ip6_daddr, bdaddr_t *addr)
-+{
-+	u8 *eui64 = ip6_daddr->s6_addr + 8;
- 
- 	addr->b[0] = eui64[7];
- 	addr->b[1] = eui64[6];
-@@ -350,16 +356,19 @@ static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
- 	addr->b[3] = eui64[2];
- 	addr->b[4] = eui64[1];
- 	addr->b[5] = eui64[0];
-+}
- 
--	addr->b[5] ^= 2;
-+static void convert_dest_bdaddr(struct in6_addr *ip6_daddr,
-+				bdaddr_t *addr, u8 *addr_type)
-+{
-+	copy_to_bdaddr(ip6_daddr, addr);
- 
--	/* Set universal/local bit to 0 */
--	if (addr->b[5] & 1) {
--		addr->b[5] &= ~1;
--		*addr_type = ADDR_LE_DEV_PUBLIC;
--	} else {
--		*addr_type = ADDR_LE_DEV_RANDOM;
--	}
-+	/* We need to toggle the U/L bit that we got from IPv6 address
-+	 * so that we get the proper address and type of the BD address.
-+	 */
-+	addr->b[5] ^= 0x02;
-+
-+	*addr_type = get_addr_type_from_eui64(addr->b[5]);
+ 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
  }
  
- static int header_create(struct sk_buff *skb, struct net_device *netdev,
-@@ -390,9 +399,11 @@ static int header_create(struct sk_buff *skb, struct net_device *netdev,
- 		/* Get destination BT device from skb.
- 		 * If there is no such peer then discard the packet.
- 		 */
--		get_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
-+		convert_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
- 
--		BT_DBG("dest addr %pMR type %d", &addr, addr_type);
-+		BT_DBG("dest addr %pMR type %s(%d) IP %pI6c", &addr,
-+		       addr_type == BDADDR_LE_PUBLIC ? "PUBLIC" : "RANDOM",
-+		       addr_type, &hdr->daddr);
- 
- 		read_lock_irqsave(&devices_lock, flags);
- 		peer = peer_lookup_ba(dev, &addr, addr_type);
-@@ -489,15 +500,17 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
- 	} else {
- 		unsigned long flags;
- 
--		get_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
-+		convert_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
- 		dev = lowpan_dev(netdev);
- 
- 		read_lock_irqsave(&devices_lock, flags);
- 		peer = peer_lookup_ba(dev, &addr, addr_type);
- 		read_unlock_irqrestore(&devices_lock, flags);
- 
--		BT_DBG("xmit from %s to %pMR (%pI6c) peer %p", netdev->name,
--		       &addr, &lowpan_cb(skb)->addr, peer);
-+		BT_DBG("xmit %s to %pMR type %s(%d) IP %pI6c peer %p",
-+		       netdev->name, &addr,
-+		       addr_type == BDADDR_LE_PUBLIC ? "PUBLIC" : "RANDOM",
-+		       addr_type, &lowpan_cb(skb)->addr, peer);
- 
- 		if (peer && peer->chan)
- 			err = send_pkt(peer->chan, skb, netdev);
-@@ -553,13 +566,11 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
- 	eui[6] = addr[1];
- 	eui[7] = addr[0];
- 
--	eui[0] ^= 2;
--
--	/* Universal/local bit set, RFC 4291 */
--	if (addr_type == ADDR_LE_DEV_PUBLIC)
--		eui[0] |= 1;
-+	/* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
-+	if (addr_type == BDADDR_LE_PUBLIC)
-+		eui[0] &= ~2;
- 	else
--		eui[0] &= ~1;
-+		eui[0] |= 2;
- }
- 
- static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
-@@ -567,7 +578,6 @@ static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+-void bt_6lowpan_cleanup(void)
++static void __exit bt_6lowpan_cleanup(void)
  {
- 	netdev->addr_assign_type = NET_ADDR_PERM;
- 	set_addr(netdev->dev_addr, addr->b, addr_type);
--	netdev->dev_addr[0] ^= 2;
+ 	debugfs_remove(lowpan_debugfs);
+ 
+@@ -1238,3 +1239,11 @@ void bt_6lowpan_cleanup(void)
+ 
+ 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
  }
++
++module_init(bt_6lowpan_init);
++module_exit(bt_6lowpan_cleanup);
++
++MODULE_AUTHOR("Jukka Rissanen <jukka.rissanen@linux.intel.com>");
++MODULE_DESCRIPTION("Bluetooth LE 6LoWPAN");
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 06ec144..7ef1a5a 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -6,7 +6,6 @@ menuconfig BT
+ 	tristate "Bluetooth subsystem support"
+ 	depends on NET && !S390
+ 	depends on RFKILL || !RFKILL
+-	select 6LOWPAN_IPHC if BT_6LOWPAN
+ 	select CRC16
+ 	select CRYPTO
+ 	select CRYPTO_BLKCIPHER
+@@ -41,10 +40,11 @@ menuconfig BT
+ 	  more information, see <http://www.bluez.org/>.
  
- static void ifup(struct net_device *netdev)
-@@ -637,13 +647,6 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+ config BT_6LOWPAN
+-	bool "Bluetooth 6LoWPAN support"
++	tristate "Bluetooth LE 6LoWPAN support"
+ 	depends on BT && IPV6
++	select 6LOWPAN_IPHC if BT_6LOWPAN
+ 	help
+-	  IPv6 compression over Bluetooth.
++	  IPv6 compression over Bluetooth LE.
  
- 	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
- 	       EUI64_ADDR_LEN);
--	peer->eui64_addr[0] ^= 2; /* second bit-flip (Universe/Local)
--				   * is done according RFC2464
--				   */
--
--	raw_dump_inline(__func__, "peer IPv6 address",
--			(unsigned char *)&peer->peer_addr, 16);
--	raw_dump_inline(__func__, "peer EUI64 address", peer->eui64_addr, 8);
+ source "net/bluetooth/rfcomm/Kconfig"
  
- 	write_lock_irqsave(&devices_lock, flags);
- 	INIT_LIST_HEAD(&peer->list);
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index ca51246..886e9aa 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -7,10 +7,12 @@ obj-$(CONFIG_BT_RFCOMM)	+= rfcomm/
+ obj-$(CONFIG_BT_BNEP)	+= bnep/
+ obj-$(CONFIG_BT_CMTP)	+= cmtp/
+ obj-$(CONFIG_BT_HIDP)	+= hidp/
++obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
++
++bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+ 	a2mp.o amp.o
+-bluetooth-$(CONFIG_BT_6LOWPAN) += 6lowpan.o
+ 
+ subdir-ccflags-y += -D__CHECK_ENDIAN__
 -- 
 1.8.3.1
 
