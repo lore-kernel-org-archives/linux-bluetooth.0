@@ -1,124 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 8/8] Bluetooth: 6lowpan: Remove all 6lowpan network devices when module is unloaded
-Date: Fri, 23 May 2014 12:27:28 +0300
-Message-Id: <1400837248-12179-9-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH v2 6/8] Bluetooth: 6lowpan: Fix MAC address universal/local bit handling
+Date: Fri, 23 May 2014 12:27:26 +0300
+Message-Id: <1400837248-12179-7-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+The universal/local bit handling was incorrectly done in the code.
+
+So when setting EUI address from BD address we do this:
+- If BD address type is PUBLIC, then we clear the universal bit
+  in EUI address. If the address type is RANDOM, then the universal
+  bit is set (BT 6lowpan draft chapter 3.2.2)
+- After this we invert the universal/local bit according to RFC 2464
+
+When figuring out BD address we do the reverse:
+- Take EUI address from stateless IPv6 address, invert the
+  universal/local bit according to RFC 2464
+- If universal bit is 1 in this modified EUI address, then address
+  type is set to RANDOM, otherwise it is PUBLIC
+
+Note that 6lowpan_iphc.[ch] does the final toggling of U/L bit
+before sending or receiving the network packet.
+
 Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- net/bluetooth/6lowpan.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ net/bluetooth/6lowpan.c | 65 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 34 insertions(+), 31 deletions(-)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index 04e0501..4310eb1 100644
+index 3390b7b..46cc298 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -592,6 +592,17 @@ static void ifup(struct net_device *netdev)
- 	rtnl_unlock();
+@@ -337,12 +337,18 @@ static int bt_6lowpan_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
+ 	return err;
  }
  
-+static void ifdown(struct net_device *netdev)
-+{
-+	int err;
-+
-+	rtnl_lock();
-+	err = dev_close(netdev);
-+	if (err < 0)
-+		BT_INFO("iface %s cannot be closed (%d)", netdev->name, err);
-+	rtnl_unlock();
+-static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
+-			    bdaddr_t *addr, u8 *addr_type)
++static u8 get_addr_type_from_eui64(u8 byte)
+ {
+-	u8 *eui64;
++	/* Is universal(0) or local(1) bit,  */
++	if (byte & 0x02)
++		return BDADDR_LE_RANDOM;
+ 
+-	eui64 = ip6_daddr->s6_addr + 8;
++	return BDADDR_LE_PUBLIC;
 +}
 +
- static void do_notify_peers(struct work_struct *work)
- {
- 	struct lowpan_dev *dev = container_of(work, struct lowpan_dev,
-@@ -721,6 +732,9 @@ static inline void bt_6lowpan_chan_ready_cb(struct l2cap_chan *chan)
- 		}
- 	}
- 
-+	if (!try_module_get(THIS_MODULE))
-+		return;
-+
- 	add_peer_chan(chan, dev);
- 	ifup(dev->netdev);
- }
-@@ -780,11 +794,15 @@ static void bt_6lowpan_chan_close_cb(struct l2cap_chan *chan)
- 		}
- 	}
- 
-+	module_put(THIS_MODULE);
-+
- 	if (!err && last && dev && !atomic_read(&dev->peer_count)) {
- 		write_unlock_irqrestore(&devices_lock, flags);
- 
- 		cancel_delayed_work_sync(&dev->notify_peers);
- 
-+		ifdown(dev->netdev);
-+
- 		if (!removed) {
- 			INIT_WORK(&entry->delete_netdev, delete_netdev);
- 			schedule_work(&entry->delete_netdev);
-@@ -1186,6 +1204,38 @@ static void lowpan_create_hci(struct hci_dev *hdev)
- 	schedule_work(&check->setup_6lowpan);
- }
- 
-+static void disconnect_devices(void)
++static void copy_to_bdaddr(struct in6_addr *ip6_daddr, bdaddr_t *addr)
 +{
-+	struct lowpan_dev *entry, *tmp, *new_dev;
-+	struct list_head devices;
-+	unsigned long flags;
-+
-+	INIT_LIST_HEAD(&devices);
-+
-+	read_lock_irqsave(&devices_lock, flags);
-+
-+	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
-+		new_dev = kmalloc(sizeof(*new_dev), GFP_ATOMIC);
-+		if (!new_dev)
-+			break;
-+
-+		new_dev->netdev = entry->netdev;
-+		INIT_LIST_HEAD(&new_dev->list);
-+
-+		list_add(&new_dev->list, &devices);
-+	}
-+
-+	read_unlock_irqrestore(&devices_lock, flags);
-+
-+	list_for_each_entry_safe(entry, tmp, &devices, list) {
-+		ifdown(entry->netdev);
-+		BT_DBG("Unregistering netdev %s %p",
-+		       entry->netdev->name, entry->netdev);
-+		unregister_netdev(entry->netdev);
-+		kfree(entry);
-+	}
++	u8 *eui64 = ip6_daddr->s6_addr + 8;
+ 
+ 	addr->b[0] = eui64[7];
+ 	addr->b[1] = eui64[6];
+@@ -350,16 +356,19 @@ static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
+ 	addr->b[3] = eui64[2];
+ 	addr->b[4] = eui64[1];
+ 	addr->b[5] = eui64[0];
 +}
-+
- static int device_event(struct notifier_block *unused,
- 			unsigned long event, void *ptr)
- {
-@@ -1202,6 +1252,8 @@ static int device_event(struct notifier_block *unused,
- 		list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices,
- 					 list) {
- 			if (entry->netdev == netdev) {
-+				BT_DBG("Unregistered netdev %s %p",
-+				       netdev->name, netdev);
- 				list_del(&entry->list);
- 				kfree(entry);
- 				break;
-@@ -1237,6 +1289,8 @@ static void __exit bt_6lowpan_cleanup(void)
  
- 	hci_unregister_cb(&lowpan_cb);
+-	addr->b[5] ^= 2;
++static void convert_dest_bdaddr(struct in6_addr *ip6_daddr,
++				bdaddr_t *addr, u8 *addr_type)
++{
++	copy_to_bdaddr(ip6_daddr, addr);
  
-+	disconnect_devices();
+-	/* Set universal/local bit to 0 */
+-	if (addr->b[5] & 1) {
+-		addr->b[5] &= ~1;
+-		*addr_type = ADDR_LE_DEV_PUBLIC;
+-	} else {
+-		*addr_type = ADDR_LE_DEV_RANDOM;
+-	}
++	/* We need to toggle the U/L bit that we got from IPv6 address
++	 * so that we get the proper address and type of the BD address.
++	 */
++	addr->b[5] ^= 0x02;
 +
- 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
++	*addr_type = get_addr_type_from_eui64(addr->b[5]);
  }
  
+ static int header_create(struct sk_buff *skb, struct net_device *netdev,
+@@ -390,9 +399,11 @@ static int header_create(struct sk_buff *skb, struct net_device *netdev,
+ 		/* Get destination BT device from skb.
+ 		 * If there is no such peer then discard the packet.
+ 		 */
+-		get_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
++		convert_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
+ 
+-		BT_DBG("dest addr %pMR type %d", &addr, addr_type);
++		BT_DBG("dest addr %pMR type %s(%d) IP %pI6c", &addr,
++		       addr_type == BDADDR_LE_PUBLIC ? "PUBLIC" : "RANDOM",
++		       addr_type, &hdr->daddr);
+ 
+ 		read_lock_irqsave(&devices_lock, flags);
+ 		peer = peer_lookup_ba(dev, &addr, addr_type);
+@@ -489,15 +500,17 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	} else {
+ 		unsigned long flags;
+ 
+-		get_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
++		convert_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
+ 		dev = lowpan_dev(netdev);
+ 
+ 		read_lock_irqsave(&devices_lock, flags);
+ 		peer = peer_lookup_ba(dev, &addr, addr_type);
+ 		read_unlock_irqrestore(&devices_lock, flags);
+ 
+-		BT_DBG("xmit from %s to %pMR (%pI6c) peer %p", netdev->name,
+-		       &addr, &lowpan_cb(skb)->addr, peer);
++		BT_DBG("xmit %s to %pMR type %s(%d) IP %pI6c peer %p",
++		       netdev->name, &addr,
++		       addr_type == BDADDR_LE_PUBLIC ? "PUBLIC" : "RANDOM",
++		       addr_type, &lowpan_cb(skb)->addr, peer);
+ 
+ 		if (peer && peer->chan)
+ 			err = send_pkt(peer->chan, skb, netdev);
+@@ -553,13 +566,11 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+ 	eui[6] = addr[1];
+ 	eui[7] = addr[0];
+ 
+-	eui[0] ^= 2;
+-
+-	/* Universal/local bit set, RFC 4291 */
+-	if (addr_type == ADDR_LE_DEV_PUBLIC)
+-		eui[0] |= 1;
++	/* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
++	if (addr_type == BDADDR_LE_PUBLIC)
++		eui[0] &= ~2;
+ 	else
+-		eui[0] &= ~1;
++		eui[0] |= 2;
+ }
+ 
+ static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+@@ -567,7 +578,6 @@ static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+ {
+ 	netdev->addr_assign_type = NET_ADDR_PERM;
+ 	set_addr(netdev->dev_addr, addr->b, addr_type);
+-	netdev->dev_addr[0] ^= 2;
+ }
+ 
+ static void ifup(struct net_device *netdev)
+@@ -637,13 +647,6 @@ static struct l2cap_chan *add_peer_chan(struct l2cap_chan *chan,
+ 
+ 	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
+ 	       EUI64_ADDR_LEN);
+-	peer->eui64_addr[0] ^= 2; /* second bit-flip (Universe/Local)
+-				   * is done according RFC2464
+-				   */
+-
+-	raw_dump_inline(__func__, "peer IPv6 address",
+-			(unsigned char *)&peer->peer_addr, 16);
+-	raw_dump_inline(__func__, "peer EUI64 address", peer->eui64_addr, 8);
+ 
+ 	write_lock_irqsave(&devices_lock, flags);
+ 	INIT_LIST_HEAD(&peer->list);
 -- 
 1.8.3.1
 
