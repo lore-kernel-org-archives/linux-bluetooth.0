@@ -1,258 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/gatt: Add debug logs useful for PTS testing
+Date: Fri, 23 May 2014 16:02:33 +0200
+Message-ID: <2545768.QERf4PJ5oZ@uw000953>
+In-Reply-To: <1400852946-24498-1-git-send-email-lukasz.rymanowski@tieto.com>
+References: <1400852946-24498-1-git-send-email-lukasz.rymanowski@tieto.com>
 MIME-Version: 1.0
-In-Reply-To: <1400793986-31558-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1400793986-31558-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Fri, 23 May 2014 16:29:47 +0200
-Message-ID: <CAMudyAtFkf2WdK7asM0ui7KDDCW5GUeRH-eHeWmDmKugdxrVtw@mail.gmail.com>
-Subject: Re: [PATCH] android/pts: Rerun TC_GAW_CL* testes using gatttool
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc: Szymon Janc <szymon.janc@tieto.com>,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Łukasz,
 
-
-
-On 22 May 2014 23:26, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+On Friday 23 of May 2014 15:49:06 Lukasz Rymanowski wrote:
 > ---
->  android/pts-gatt.txt | 210 ++++++++++++++++++++++++++++++++++++++++++---------
->  1 file changed, 175 insertions(+), 35 deletions(-)
->
-> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-> index 86b2555..67912c9 100644
-> --- a/android/pts-gatt.txt
-> +++ b/android/pts-gatt.txt
-> @@ -171,45 +171,185 @@ TC_GAR_SR_BI_32_C        INC
->  TC_GAR_SR_BI_33_C      INC
->  TC_GAR_SR_BI_34_C      INC
->  TC_GAR_SR_BI_35_C      INC
-> -TC_GAW_CL_BV_01_C      INC
-> +TC_GAW_CL_BV_01_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-cmd uuid value
-> +                               disconnect
->  TC_GAW_CL_BV_02_C      INC
-> -TC_GAW_CL_BV_03_C      INC
-> -TC_GAW_CL_BI_02_C      INC
-> -TC_GAW_CL_BI_03_C      INC
-> -TC_GAW_CL_BI_04_C      INC
-> -TC_GAW_CL_BI_05_C      INC
-> -TC_GAW_CL_BI_06_C      INC
-> -TC_GAW_CL_BV_05_C      INC
-> -TC_GAW_CL_BI_07_C      INC
-> -TC_GAW_CL_BI_08_C      INC
-> +TC_GAW_CL_BV_03_C      PASS     gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_02_C      PASS     gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_03_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_04_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_05_C      PASS     gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_06_C      PASS     gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BV_05_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_07_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_08_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
->  TC_GAW_CL_BI_09_C      INC
-> -TC_GAW_CL_BI_11_C      INC
-> -TC_GAW_CL_BI_12_C      INC
-> -TC_GAW_CL_BI_13_C      INC
-> -TC_GAW_CL_BV_06_C      INC
-> -TC_GAW_CL_BI_14_C      INC
-> -TC_GAW_CL_BI_15_C      INC
-> -TC_GAW_CL_BI_17_C      INC
-> -TC_GAW_CL_BI_18_C      INC
-> -TC_GAW_CL_BI_19_C      INC
-> -TC_GAW_CL_BV_08_C      INC
-> -TC_GAW_CL_BI_20_C      INC
-> -TC_GAW_CL_BI_21_C      INC
-> -TC_GAW_CL_BI_22_C      INC
-> -TC_GAW_CL_BI_23_C      INC
-> -TC_GAW_CL_BI_24_C      INC
-> -TC_GAW_CL_BV_09_C      INC
-> -TC_GAW_CL_BI_25_C      INC
-> -TC_GAW_CL_BI_26_C      INC
-> +TC_GAW_CL_BI_11_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_12_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_13_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BV_06_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_14_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_15_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_17_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_18_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_19_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BV_08_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_20_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_21_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_22_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_23_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_24_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BV_09_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_25_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_26_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
->  TC_GAW_CL_BI_27_C      INC
-> -TC_GAW_CL_BI_29_C      INC
-> -TC_GAW_CL_BI_30_C      INC
-> -TC_GAW_CL_BI_31_C      INC
-> +TC_GAW_CL_BI_29_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_30_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_31_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
->  TC_GAW_CL_BI_32_C      INC
-> -TC_GAW_CL_BI_33_C      INC
-> -TC_GAW_CL_BI_34_C      INC
-> -TC_GAW_CL_BI_35_C      INC
-> -TC_GAW_CL_BI_36_C      INC
-> +TC_GAW_CL_BI_33_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_34_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
-> +TC_GAW_CL_BI_35_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid value
-> +                               disconnect
-> +TC_GAW_CL_BI_36_C      PASS    gatttool:
-> +                               ./gatttool -I -b pts_addr
-> +                               connect
-> +                               char-write-req uuid long_value
-> +                               disconnect
->  TC_GAW_SR_BV_01_C      INC
->  TC_GAW_SR_BV_02_C      INC
->  TC_GAW_SR_BI_01_C      INC
+>  android/gatt.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 532a416..804c6ba 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -2165,6 +2165,9 @@ static void cache_all_srvc_chars(struct service *srvc, GSList *characteristics)
+>  							srvc->incl.range.end;
+>  		}
+>  
+> +		DBG("attr handle = 0x%04x, end handle = 0x%04x uuid: %s",
+> +				ch->ch.handle ,ch->end_handle, ch->ch.uuid);
+> +
+>  		if (!queue_push_tail(srvc->chars, ch)) {
+>  			error("gatt: Error while caching characteristic");
+>  			destroy_characteristic(ch);
+> @@ -2321,6 +2324,8 @@ static void gatt_discover_desc_cb(guint8 status, GSList *descs,
+>  		descr->id.instance = i++;
+>  		descr->handle = desc->handle;
+>  
+> +		DBG("attr handle = 0x%04x, uuid: %s", desc->handle, desc->uuid);
+> +
+>  		if (!queue_push_tail(ch->descriptors, descr))
+>  			free(descr);
+>  	}
 
-Maybe lets wait with this  - new patch with haltest instructions will
-come later.
+Applied, thanks.
 
-BR
-Lukasz
-> --
-> 1.8.4
->
+-- 
+Best regards, 
+Szymon Janc
