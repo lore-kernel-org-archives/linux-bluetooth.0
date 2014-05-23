@@ -1,42 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 1/2] gatttool: Allow to build without interactive mode
-Date: Fri, 23 May 2014 12:50:08 +0200
-Message-Id: <1400842209-4473-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Clearly distinguish mgmt LTK type from authenticated property
+Date: Fri, 23 May 2014 13:19:53 +0300
+Message-Id: <1400840393-21232-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed for using gatttool on Android where readline is not
-available.
----
- attrib/gatttool.h | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/attrib/gatttool.h b/attrib/gatttool.h
-index 8f0913c..f15fe01 100644
---- a/attrib/gatttool.h
-+++ b/attrib/gatttool.h
-@@ -21,8 +21,18 @@
-  *
-  */
+On the mgmt level we have a key type parameter which currently accepts
+two possible values: 0x00 for unauthenticated and 0x01 for
+authenticated. However, in the internal struct smp_ltk representation we
+have an explicit "authenticated" boolean value.
+
+To make this distinction clear, add defines for the possible mgmt values
+and do conversion to and from the internal authenticated value.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/mgmt.h |  3 +++
+ net/bluetooth/mgmt.c         | 19 ++++++++++++++++---
+ 2 files changed, 19 insertions(+), 3 deletions(-)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 226ae03cafe7..bcffc9ae0c89 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -181,6 +181,9 @@ struct mgmt_cp_load_link_keys {
+ } __packed;
+ #define MGMT_LOAD_LINK_KEYS_SIZE	3
  
-+#ifdef GATTTOOL_NO_INTERACTIVE
-+static inline int interactive(const char *src, const char *dst,
-+						const char *dst_type, int psm)
-+{
-+	g_print("Interactive mode disabled\n");
-+	return 0;
-+}
-+#else
- int interactive(const char *src, const char *dst, const char *dst_type,
- 								int psm);
-+#endif
++#define MGMT_LTK_UNAUTHENTICATED	0x00
++#define MGMT_LTK_AUTHENTICATED		0x01
 +
- GIOChannel *gatt_connect(const char *src, const char *dst,
- 			const char *dst_type, const char *sec_level,
- 			int psm, int mtu, BtIOConnect connect_cb,
+ struct mgmt_ltk_info {
+ 	struct mgmt_addr_info addr;
+ 	__u8	type;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f8ca69dd1984..5e9c21a5525f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4534,7 +4534,7 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	for (i = 0; i < key_count; i++) {
+ 		struct mgmt_ltk_info *key = &cp->keys[i];
+-		u8 type, addr_type;
++		u8 type, addr_type, authenticated;
+ 
+ 		if (key->addr.type == BDADDR_LE_PUBLIC)
+ 			addr_type = ADDR_LE_DEV_PUBLIC;
+@@ -4546,8 +4546,13 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 		else
+ 			type = HCI_SMP_LTK_SLAVE;
+ 
++		if (key->type == MGMT_LTK_UNAUTHENTICATED)
++			authenticated = 0x00;
++		else
++			authenticated = 0x01;
++
+ 		hci_add_ltk(hdev, &key->addr.bdaddr, addr_type, type,
+-			    key->type, key->val, key->enc_size, key->ediv,
++			    authenticated, key->val, key->enc_size, key->ediv,
+ 			    key->rand);
+ 	}
+ 
+@@ -5222,6 +5227,14 @@ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 	mgmt_event(MGMT_EV_NEW_LINK_KEY, hdev, &ev, sizeof(ev), NULL);
+ }
+ 
++static u8 mgmt_ltk_type(struct smp_ltk *ltk)
++{
++	if (ltk->authenticated)
++		return MGMT_LTK_AUTHENTICATED;
++
++	return MGMT_LTK_UNAUTHENTICATED;
++}
++
+ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent)
+ {
+ 	struct mgmt_ev_new_long_term_key ev;
+@@ -5247,7 +5260,7 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent)
+ 
+ 	bacpy(&ev.key.addr.bdaddr, &key->bdaddr);
+ 	ev.key.addr.type = link_to_bdaddr(LE_LINK, key->bdaddr_type);
+-	ev.key.type = key->authenticated;
++	ev.key.type = mgmt_ltk_type(key);
+ 	ev.key.enc_size = key->enc_size;
+ 	ev.key.ediv = key->ediv;
+ 	ev.key.rand = key->rand;
 -- 
-1.9.1
+1.9.3
 
