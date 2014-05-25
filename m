@@ -1,65 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v2 03/10] tools/btatt: Add command-line tool for ATT protocol testing.
+Subject: Re: [PATCH v2 02/10] unit/test-att: Add unit tests for src/shared/att.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1400271298-29769-4-git-send-email-armansito@chromium.org>
-Date: Sat, 24 May 2014 23:10:01 -0700
+In-Reply-To: <1400271298-29769-3-git-send-email-armansito@chromium.org>
+Date: Sat, 24 May 2014 23:03:33 -0700
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <62A84830-F03B-4B8E-8588-A39B31EF4CF0@holtmann.org>
-References: <1400271298-29769-1-git-send-email-armansito@chromium.org> <1400271298-29769-4-git-send-email-armansito@chromium.org>
+Message-Id: <A8F91314-BB19-4458-9620-A2CF8354D326@holtmann.org>
+References: <1400271298-29769-1-git-send-email-armansito@chromium.org> <1400271298-29769-3-git-send-email-armansito@chromium.org>
 To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arman,
 
-> Initial commit for tools/btatt. Added basic command line options parsing
-> and added the tool to Makefile.tools as experimental.
+> This patch introduces unit tests for src/shared/att. The code currently
+> only tests locally initiated requests and responses.
 > ---
-> Makefile.tools |  10 +++-
-> tools/btatt.c  | 152 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 161 insertions(+), 1 deletion(-)
-> create mode 100644 tools/btatt.c
+> Makefile.am     |   9 ++
+> unit/test-att.c | 308 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> 2 files changed, 317 insertions(+)
+> create mode 100644 unit/test-att.c
 > 
-> diff --git a/Makefile.tools b/Makefile.tools
-> index 40f076b..13f6691 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -278,7 +278,7 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
-> 			tools/btmgmt tools/btinfo tools/btattach \
-> 			tools/btsnoop tools/btproxy tools/btiotest \
-> 			tools/mpris-player tools/cltest tools/seq2bseq \
-> -			tools/ibeacon
-> +			tools/ibeacon tools/btatt
+> diff --git a/Makefile.am b/Makefile.am
+> index 0c3424f..04be6c4 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -262,6 +262,15 @@ unit_test_mgmt_SOURCES = unit/test-mgmt.c \
+> 				src/shared/mgmt.h src/shared/mgmt.c
+> unit_test_mgmt_LDADD = @GLIB_LIBS@
 > 
-> tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
-> tools_bdaddr_LDADD = lib/libbluetooth-internal.la @UDEV_LIBS@
-> @@ -342,6 +342,14 @@ tools_ibeacon_SOURCES = tools/ibeacon.c monitor/bt.h \
-> 				src/shared/queue.h src/shared/queue.c \
-> 				src/shared/ringbuf.h src/shared/ringbuf.c
-> 
-> +tools_btatt_SOURCES = tools/btatt.c src/uuid-helper.c \
-> +				monitor/mainloop.h monitor/mainloop.c \
-> +				src/shared/io.h src/shared/io-mainloop.c \
+> +unit_tests += unit/test-att
+> +
+> +unit_test_att_SOURCES = unit/test-att.c \
+> +				src/shared/io.h src/shared/io-glib.c \
 > +				src/shared/queue.h src/shared/queue.c \
 > +				src/shared/util.h src/shared/util.c \
 > +				src/shared/att.h src/shared/att.c
-> +tools_btatt_LDADD = lib/libbluetooth-internal.la
+> +unit_test_att_LDADD = @GLIB_LIBS@
 > +
-> EXTRA_DIST += tools/bdaddr.1
-> endif
+> unit_tests += unit/test-sdp
 > 
-> diff --git a/tools/btatt.c b/tools/btatt.c
+> unit_test_sdp_SOURCES = unit/test-sdp.c \
+> diff --git a/unit/test-att.c b/unit/test-att.c
 > new file mode 100644
-> index 0000000..476bb94
+> index 0000000..9d631fb
 > --- /dev/null
-> +++ b/tools/btatt.c
-> @@ -0,0 +1,152 @@
+> +++ b/unit/test-att.c
+> @@ -0,0 +1,308 @@
 > +/*
+> + *
 > + *  BlueZ - Bluetooth protocol stack for Linux
 > + *
 > + *  Copyright (C) 2014  Google Inc.
+> + *  Copyright (C) 2014  Intel Corporation.
 > + *
 > + *
 > + *  This program is free software; you can redistribute it and/or modify
@@ -82,143 +76,132 @@ Hi Arman,
 > +#include <config.h>
 > +#endif
 > +
-> +#include <stdbool.h>
 > +#include <stdlib.h>
-> +#include <stdio.h>
-> +#include <getopt.h>
-> +#include <string.h>
+> +#include <stdbool.h>
+> +#include <unistd.h>
+> +#include <sys/socket.h>
 > +
-> +#include <bluetooth/bluetooth.h>
+> +#include <glib.h>
 > +
-> +#include "monitor/mainloop.h"
 > +#include "src/shared/att.h"
 > +
-> +#define ATT_CID 4
-> +
-> +static bool verbose = false;
-> +
-> +static struct {
-> +	char *cmd;
-> +	void (*func)(struct bt_att *att, int argc, char **argv);
-> +	char *doc;
-> +} command[] = {
-> +	{ }
+> +struct context {
+> +	GMainLoop *main_loop;
+> +	struct bt_att *att_client;
+> +	guint server_source;
+> +	GList *handler_list;
 > +};
 > +
-> +static void usage(void)
+> +enum action {
+> +	ACTION_PASSED,
+> +	ACTION_IGNORE,
+> +};
+> +
+> +struct handler {
+> +	const void *req_data;
+> +	uint16_t req_size;
+> +	const void *resp_data;
+> +	uint16_t resp_size;
+> +	enum action action;
+> +};
+> +
+> +static void att_debug(const char *str, void *user_data)
 > +{
-> +	int i;
+> +	const char *prefix = user_data;
 > +
-> +	printf("btatt\n");
-> +	printf("Usage:\n"
-> +		"\tbtatt [options] <command> [command parameters]\n");
-> +
-> +	printf("Options:\n"
-> +		"\t-i, --index <id>\tSpecify adapter index, e.g. hci0\n"
-> +		"\t-d, --dest <addr>\tSpecify the destination address\n"
-> +		"\t-t, --type [random|public] \tSpecify the LE address type\n"
-> +		"\t-v, --verbose\tEnable extra logging\n"
-> +		"\t-h, --help\tDisplay help\n");
-> +
-> +	printf("Commands:\n");
-> +	for (i = 0; command[i].cmd; i++)
-> +		printf("\t%-15s\t%s\n", command[i].cmd, command[i].doc);
-> +
-> +	printf("\n"
-> +		"For more information on the usage of each command use:\n"
-> +		"\tbtatt <command> --help\n" );
+> +	g_printf("%s%s\n", prefix, str);
 > +}
 > +
-> +static struct option main_options[] = {
-> +	{ "index",	1, 0, 'i' },
-> +	{ "dest",	1, 0, 'd' },
-> +	{ "type",	1, 0, 't' },
-> +	{ "verbose",	0, 0, 'v' },
-> +	{ "help",	0, 0, 'h' },
-> +	{ 0, 0, 0, 0}
-> +};
-> +
-> +int main(int argc, char *argv[])
+> +static void context_quit(struct context *context)
 > +{
-> +	int opt, i;
-> +	int dev_id = -1;
-> +	bool dest_given = false;
-> +	uint8_t dest_type = BDADDR_LE_PUBLIC;
-> +	bdaddr_t src_addr, dst_addr;
-> +	int fd;
+> +	g_main_loop_quit(context->main_loop);
+> +}
 > +
-> +	while ((opt = getopt_long(argc, argv, "+hvt:i:d:",
-> +						main_options, NULL)) != -1) {
-> +		switch (opt) {
-> +		case 'i':
-> +			dev_id = hci_devid(optarg);
-> +			if (dev_id < 0) {
-> +				perror("Invalid adapter");
-> +				return EXIT_FAILURE;
+> +static void check_actions(struct context *context, int server_socket,
+> +					const void *data, uint16_t size)
+> +{
+> +	GList *list;
+> +	ssize_t written;
+> +
+> +	for (list = g_list_first(context->handler_list); list;
+> +						list = g_list_next(list)) {
+> +		struct handler *handler = list->data;
+> +
+> +		if (size != handler->req_size)
+> +			continue;
+> +
+> +		if (memcmp(data, handler->req_data, handler->req_size))
+> +			continue;
+> +
+> +		switch (handler->action) {
+> +		case ACTION_PASSED:
+> +			if (!handler->resp_data || !handler->resp_size) {
+> +				context_quit(context);
+> +				return;
 > +			}
-
-if at all possible, avoid libbluetooth functions. And we should support --index 0 and also --index hci0 here as valid parameters. See btmon for example.
-
-> +			break;
-> +		case 'd':
-> +			if (str2ba(optarg, &dst_addr) < 0) {
-> +				fprintf(stderr, "Invalid destination address\n");
-> +				return EXIT_FAILURE;
-> +			}
-> +			dest_given = true;
-> +			break;
-> +		case 't':
-> +			if (strcmp(optarg, "random") == 0)
-> +				dest_type = BDADDR_LE_RANDOM;
-> +			else if (strcmp(optarg, "public") == 0)
-> +				dest_type = BDADDR_LE_PUBLIC;
-> +			else {
-> +				fprintf(stderr, "Allowed types: random, public\n");
-> +				return EXIT_FAILURE;
-> +			}
-
-This is cosmetic, but public should become before random.
-
-> +			break;
-> +		case 'v':
-> +			verbose = true;
-> +			break;
-> +		case 'h':
-> +			usage();
-> +			return 0;
-> +		default:
-> +			break;
+> +
+> +			/* Test case involves a response. */
+> +			written = write(server_socket, handler->resp_data,
+> +							handler->resp_size);
+> +			g_assert(written == handler->resp_size);
+> +			return;
+> +		case ACTION_IGNORE:
+> +			return;
 > +		}
 > +	}
 > +
-> +	argc -= optind;
-> +	argv += optind;
-> +	optind = 0;
+> +	g_test_message("Request not handled\n");
+> +	g_assert_not_reached();
+> +}
 > +
-> +	if (argc < 1) {
-> +		usage();
-> +		return 0;
-> +	}
+> +static gboolean server_handler(GIOChannel *channel, GIOCondition cond,
+> +							gpointer user_data)
+> +{
+> +	struct context *context = user_data;
+> +	unsigned char buf[512];
+> +	ssize_t result;
+> +	int fd;
 > +
-> +	if (dev_id == -1)
-> +		bacpy(&src_addr, BDADDR_ANY);
-
-I would just default src_addr to BDADDR_ANY in the beginning of main() and then have index option overwrite it.
-
-> +	else if (hci_devba(dev_id, &src_addr) < 0) {
-> +		perror("Adapter not available");
-> +		return EXIT_FAILURE;
-> +	}
-
-I would say, lets just have the connect() fail if the adapter is not available. No need to be super smart upfront. The L2CAP socket will give us a proper error.
-
+> +	if (cond & (G_IO_NVAL | G_IO_ERR | G_IO_HUP))
+> +		return FALSE;
 > +
-> +	if (!dest_given) {
-> +		fprintf(stderr, "Destination address required\n");
-> +		return EXIT_FAILURE;
-> +	}
+> +	fd = g_io_channel_unix_get_fd(channel);
+> +
+> +	result = read(fd, buf, sizeof(buf));
+> +	if (result < 0)
+> +		return FALSE;
+> +
+> +	check_actions(context, fd, buf, result);
+> +
+> +	return TRUE;
+> +}
+> +
+> +static struct context *create_context(void)
+> +{
+> +	struct context *context = g_new0(struct context, 1);
+> +	GIOChannel *channel;
+> +	int err, sv[2];
+> +
+> +	context->main_loop = g_main_loop_new(NULL, FALSE);
+> +	g_assert(context->main_loop);
+> +
+> +	err = socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_CLOEXEC, 0, sv);
+> +	g_assert(err == 0);
+> +
+> +	channel = g_io_channel_unix_new(sv[0]);
+> +
+> +	g_io_channel_set_close_on_unref(channel, TRUE);
+> +	g_io_channel_set_encoding(channel, NULL, NULL);
+> +	g_io_channel_set_buffered(channel, FALSE);
+> +
+> +	context->server_source = g_io_add_watch(channel,
+> +				G_IO_IN | G_IO_HUP | G_IO_ERR | G_IO_NVAL,
+> +				server_handler, context);
+> +	g_assert(context->server_source > 0);
+> +
+> +	g_io_channel_unref(channel);
 
-Comparing it to BDADDR_ANY here might be simpler. Same as with src_addr, set it to BDADDR_ANY in the beginning.
+please target struct io as wrapper for IO handling. Long term we want to get rid of GIOChannel and GLib.
 
 Regards
 
