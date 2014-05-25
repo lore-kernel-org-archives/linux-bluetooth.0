@@ -1,189 +1,149 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv5 1/3] android/gatt: Use g_attrib buffer where possible for att
-Date: Mon, 26 May 2014 09:13:14 +0200
-Message-Id: <1401088396-2074-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <6F8AC54A-0775-4224-A508-CD9DA868A46D@me.com>
+References: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<6F8AC54A-0775-4224-A508-CD9DA868A46D@me.com>
+Date: Sun, 25 May 2014 20:34:52 +0200
+Message-ID: <CAN_7+YZBC8jYCkY=LVb3fYRjDOWrTGUAzp0k8eowpkUkCh9-dw@mail.gmail.com>
+Subject: Re: [PATCH] android/bluetooth: Make possible to start BlueZ in LE
+ mode only
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: d.eriksson@me.com
+Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This replaces fixed size pdu usage with g_attrib buffer when possible.
-When only received packets are decoded we use dynamic allocation with
-current mtu.
----
- android/gatt.c | 42 ++++++++++++++++++++++++------------------
- 1 file changed, 24 insertions(+), 18 deletions(-)
+Hi David,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 70cd5fe..2ae3669 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3569,7 +3569,8 @@ static bool is_service(const bt_uuid_t *type)
- static void send_dev_pending_response(struct gatt_device *device,
- 								uint8_t opcode)
- {
--	uint8_t rsp[ATT_DEFAULT_LE_MTU];
-+	size_t mtu;
-+	uint8_t *rsp = g_attrib_get_buffer(device->attrib, &mtu);
- 	struct pending_request *val;
- 	uint16_t len = 0;
- 	uint8_t error = 0;
-@@ -3613,7 +3614,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 			val = queue_pop_head(temp);
- 		}
- 
--		len = enc_read_by_type_resp(adl, rsp, sizeof(rsp));
-+		len = enc_read_by_type_resp(adl, rsp, mtu);
- 
- 		att_data_list_free(adl);
- 		queue_destroy(temp, destroy_pending_request);
-@@ -3628,7 +3629,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 		}
- 
- 		len = enc_read_blob_resp(val->value, val->length, val->offset,
--							rsp, sizeof(rsp));
-+								rsp, mtu);
- 		destroy_pending_request(val);
- 		break;
- 	case ATT_OP_READ_REQ:
-@@ -3638,7 +3639,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 			goto done;
- 		}
- 
--		len = enc_read_resp(val->value, val->length, rsp, sizeof(rsp));
-+		len = enc_read_resp(val->value, val->length, rsp, mtu);
- 		destroy_pending_request(val);
- 		break;
- 	case ATT_OP_READ_BY_GROUP_REQ: {
-@@ -3684,7 +3685,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 			val = queue_pop_head(temp);
- 		}
- 
--		len = enc_read_by_grp_resp(adl, rsp, sizeof(rsp));
-+		len = enc_read_by_grp_resp(adl, rsp, mtu);
- 
- 		att_data_list_free(adl);
- 		queue_destroy(temp, destroy_pending_request);
-@@ -3732,7 +3733,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 		}
- 
- 		if (list && !error)
--			len = enc_find_by_type_resp(list, rsp, sizeof(rsp));
-+			len = enc_find_by_type_resp(list, rsp, mtu);
- 		else
- 			error = ATT_ECODE_ATTR_NOT_FOUND;
- 
-@@ -3768,7 +3769,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 		}
- 
- 		len = enc_prep_write_resp(val->handle, val->offset, val->value,
--						val->length, rsp, sizeof(rsp));
-+							val->length, rsp, mtu);
- 		destroy_pending_request(val);
- 		break;
- 	default:
-@@ -3777,8 +3778,7 @@ static void send_dev_pending_response(struct gatt_device *device,
- 
- done:
- 	if (!len)
--		len = enc_error_resp(opcode, 0x0000, error, rsp,
--							ATT_DEFAULT_LE_MTU);
-+		len = enc_error_resp(opcode, 0x0000, error, rsp, mtu);
- 
- 	g_attrib_send(device->attrib, 0, rsp, len, NULL, NULL, NULL);
- 
-@@ -4217,10 +4217,11 @@ failed:
- static void handle_server_send_indication(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_server_send_indication *cmd = buf;
--	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	struct app_connection *conn;
- 	uint8_t status;
- 	uint16_t length;
-+	uint8_t *pdu;
-+	size_t mtu;
- 
- 	DBG("");
- 
-@@ -4231,15 +4232,17 @@ static void handle_server_send_indication(const void *buf, uint16_t len)
- 		goto reply;
- 	}
- 
-+	pdu = g_attrib_get_buffer(conn->device->attrib, &mtu);
-+
- 	if (cmd->confirm)
- 		/* TODO: Add data to track confirmation for this request */
- 		length = enc_indication(cmd->attribute_handle,
--					(uint8_t *)cmd->value, cmd->len,
--					pdu, sizeof(pdu));
-+					(uint8_t *)cmd->value, cmd->len, pdu,
-+					mtu);
- 	else
- 		length = enc_notification(cmd->attribute_handle,
- 						(uint8_t *)cmd->value, cmd->len,
--						pdu, sizeof(pdu));
-+						pdu, mtu);
- 
- 	g_attrib_send(conn->device->attrib, 0, pdu, length, NULL, NULL, NULL);
- 
-@@ -4659,7 +4662,7 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
- static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
- 						struct gatt_device *device)
- {
--	uint8_t search_value[ATT_DEFAULT_LE_MTU];
-+	uint8_t search_value[cmd_len];
- 	size_t search_vlen;
- 	uint16_t start, end;
- 	uint16_t handle;
-@@ -4717,7 +4720,7 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
- static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 						struct gatt_device *dev)
- {
--	uint8_t value[ATT_DEFAULT_LE_MTU];
-+	uint8_t value[cmd_len];
- 	uint16_t handle;
- 	uint16_t len;
- 	size_t vlen;
-@@ -4732,7 +4735,7 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
- 						struct gatt_device *dev)
- {
--	uint8_t value[ATT_DEFAULT_LE_MTU];
-+	uint8_t value[cmd_len];
- 	struct pending_request *data;
- 	uint16_t handle;
- 	uint16_t len;
-@@ -4764,7 +4767,7 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
- static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
- 						struct gatt_device *dev)
- {
--	uint8_t value[ATT_DEFAULT_LE_MTU];
-+	uint8_t value[cmd_len];
- 	struct pending_request *data;
- 	uint16_t handle;
- 	uint16_t offset;
-@@ -5172,9 +5175,10 @@ static void gatt_srvc_change_register_cb(uint16_t handle, uint16_t offset,
- 						bdaddr_t *bdaddr,
- 						void *user_data)
- {
--	uint8_t pdu[ATT_DEFAULT_LE_MTU];
- 	struct gatt_device *dev;
- 	uint16_t length;
-+	size_t mtu;
-+	uint8_t *pdu;
- 
- 	dev = find_device_by_addr(bdaddr);
- 	if (!dev) {
-@@ -5182,6 +5186,8 @@ static void gatt_srvc_change_register_cb(uint16_t handle, uint16_t offset,
- 		return;
- 	}
- 
-+	pdu = g_attrib_get_buffer(dev->attrib, &mtu);
-+
- 	/* TODO handle CCC */
- 
- 	/* Set services changed notification flag */
--- 
-1.9.3
+On Sun, May 25, 2014 at 5:38 PM,  <d.eriksson@me.com> wrote:
+> Hi Lukasz,
+>
+> Maybe unrelated, but I'm looking for a way to enforce BlueZ to run LE only (central) under linux 3.13.
+> btmgmt bredr seems to do this, but could I do it via some "config-level" setting to ensure no one on the system can initiate anything else than LE related things.
+>
 
+AFAIK For now it is possible only for Android version.
+For "normal" BlueZ you need to extend BlueZ daemon. Probably add
+special config to main.conf and add similar handling it as we did for
+Android.
+
+> best David
+>
+
+BR
+Lukasz
+
+> On 23 Apr 2014, at 00:16, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
+>
+>> This patch adds possibility to start BlueZ only in LE mode only.
+>>
+>> It is useful for testing purpose, when you want test BlueZ in
+>> peripheral mode against any dual mode device.
+>> ---
+>> android/README          |  3 +++
+>> android/bluetooth.c     |  7 ++++++-
+>> android/hal-bluetooth.c | 15 ++++++++++++++-
+>> android/hal-msg.h       |  1 +
+>> 4 files changed, 24 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/android/README b/android/README
+>> index 6254d34..9b08610 100644
+>> --- a/android/README
+>> +++ b/android/README
+>> @@ -166,6 +166,9 @@ options.
+>>
+>> Property      Value           Description
+>> -------------------------------------------
+>> +mode         le_only         Enable BlueZ in Low Energy mode only.
+>> +             <none>          Enable BlueZ in default mode - enable br/edr/le
+>> +                             if possible.
+>> handsfree     hfp             Enable Handsfree Profile (HFP) with narrowband
+>>                               speech only
+>>               hfp_wbs         Enable Handsfree Profile (HFP) with narrowband
+>> diff --git a/android/bluetooth.c b/android/bluetooth.c
+>> index 93c7935..923285c 100644
+>> --- a/android/bluetooth.c
+>> +++ b/android/bluetooth.c
+>> @@ -3894,10 +3894,15 @@ static const struct ipc_handler cmd_handlers[] = {
+>>
+>> void bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
+>> {
+>> -     DBG("");
+>> +     DBG("mode 0x%x", mode);
+>>
+>>       hal_ipc = ipc;
+>>
+>> +     if ((mode == HAL_MODE_LE_ONLY) &&
+>> +                     (adapter.current_settings & MGMT_SETTING_LE) &&
+>> +                     (adapter.current_settings & MGMT_SETTING_BREDR))
+>> +             set_mode(MGMT_OP_SET_BREDR, 0x00);
+>> +
+>>       ipc_register(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
+>>                                               G_N_ELEMENTS(cmd_handlers));
+>> }
+>> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
+>> index 48d5ea2..69009ff 100644
+>> --- a/android/hal-bluetooth.c
+>> +++ b/android/hal-bluetooth.c
+>> @@ -29,6 +29,8 @@
+>> #include "hal-ipc.h"
+>> #include "hal-utils.h"
+>>
+>> +#define MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
+>> +
+>> static const bt_callbacks_t *bt_hal_cbacks = NULL;
+>>
+>> #define enum_prop_to_hal(prop, hal_prop, type) do { \
+>> @@ -412,6 +414,17 @@ static const struct hal_ipc_handler ev_handlers[] = {
+>>       }
+>> };
+>>
+>> +static uint8_t get_mode(void)
+>> +{
+>> +     char value[PROPERTY_VALUE_MAX];
+>> +
+>> +     if (property_get(MODE_PROPERTY_NAME, value, "") > 0 &&
+>> +                                     (!strcasecmp(value, "le_only")))
+>> +             return HAL_MODE_LE_ONLY;
+>> +
+>> +     return HAL_MODE_DEFAULT;
+>> +}
+>> +
+>> static int init(bt_callbacks_t *callbacks)
+>> {
+>>       struct hal_cmd_register_module cmd;
+>> @@ -433,7 +446,7 @@ static int init(bt_callbacks_t *callbacks)
+>>       }
+>>
+>>       cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
+>> -     cmd.mode = HAL_MODE_DEFAULT;
+>> +     cmd.mode = get_mode();
+>>
+>>       status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
+>>                                       sizeof(cmd), &cmd, NULL, NULL, NULL);
+>> diff --git a/android/hal-msg.h b/android/hal-msg.h
+>> index ed0a67a..db21870 100644
+>> --- a/android/hal-msg.h
+>> +++ b/android/hal-msg.h
+>> @@ -55,6 +55,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
+>> #define HAL_OP_STATUS                 IPC_OP_STATUS
+>>
+>> #define HAL_MODE_DEFAULT              0x00
+>> +#define HAL_MODE_LE_ONLY             0x01
+>>
+>> #define HAL_OP_REGISTER_MODULE                0x01
+>> struct hal_cmd_register_module {
+>> --
+>> 1.8.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
