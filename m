@@ -1,149 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <6F8AC54A-0775-4224-A508-CD9DA868A46D@me.com>
-References: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<6F8AC54A-0775-4224-A508-CD9DA868A46D@me.com>
-Date: Sun, 25 May 2014 20:34:52 +0200
-Message-ID: <CAN_7+YZBC8jYCkY=LVb3fYRjDOWrTGUAzp0k8eowpkUkCh9-dw@mail.gmail.com>
-Subject: Re: [PATCH] android/bluetooth: Make possible to start BlueZ in LE
- mode only
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: d.eriksson@me.com
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1400957638-18418-2-git-send-email-szymon.janc@gmail.com>
+References: <1400957638-18418-1-git-send-email-szymon.janc@gmail.com>
+	<1400957638-18418-2-git-send-email-szymon.janc@gmail.com>
+Date: Sun, 25 May 2014 19:01:12 +0300
+Message-ID: <CABBYNZJ5zb5-1ePb_snWJ5Q=eVpKRQnipER08-sh5-Ec=sr_Ow@mail.gmail.com>
+Subject: Re: [PATCH 2/2] shared/uhid: Use uhid_copy.h instead of system header
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Szymon,
 
-On Sun, May 25, 2014 at 5:38 PM,  <d.eriksson@me.com> wrote:
-> Hi Lukasz,
+On Sat, May 24, 2014 at 9:53 PM, Szymon Janc <szymon.janc@gmail.com> wrote:
+> ---
+>  src/shared/uhid.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 >
-> Maybe unrelated, but I'm looking for a way to enforce BlueZ to run LE only (central) under linux 3.13.
-> btmgmt bredr seems to do this, but could I do it via some "config-level" setting to ensure no one on the system can initiate anything else than LE related things.
+> diff --git a/src/shared/uhid.h b/src/shared/uhid.h
+> index fcf5379..459a249 100644
+> --- a/src/shared/uhid.h
+> +++ b/src/shared/uhid.h
+> @@ -23,7 +23,8 @@
 >
-
-AFAIK For now it is possible only for Android version.
-For "normal" BlueZ you need to extend BlueZ daemon. Probably add
-special config to main.conf and add similar handling it as we did for
-Android.
-
-> best David
+>  #include <stdbool.h>
+>  #include <stdint.h>
+> -#include <linux/uhid.h>
+> +
+> +#include "profiles/input/uhid_copy.h"
 >
-
-BR
-Lukasz
-
-> On 23 Apr 2014, at 00:16, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->
->> This patch adds possibility to start BlueZ only in LE mode only.
->>
->> It is useful for testing purpose, when you want test BlueZ in
->> peripheral mode against any dual mode device.
->> ---
->> android/README          |  3 +++
->> android/bluetooth.c     |  7 ++++++-
->> android/hal-bluetooth.c | 15 ++++++++++++++-
->> android/hal-msg.h       |  1 +
->> 4 files changed, 24 insertions(+), 2 deletions(-)
->>
->> diff --git a/android/README b/android/README
->> index 6254d34..9b08610 100644
->> --- a/android/README
->> +++ b/android/README
->> @@ -166,6 +166,9 @@ options.
->>
->> Property      Value           Description
->> -------------------------------------------
->> +mode         le_only         Enable BlueZ in Low Energy mode only.
->> +             <none>          Enable BlueZ in default mode - enable br/edr/le
->> +                             if possible.
->> handsfree     hfp             Enable Handsfree Profile (HFP) with narrowband
->>                               speech only
->>               hfp_wbs         Enable Handsfree Profile (HFP) with narrowband
->> diff --git a/android/bluetooth.c b/android/bluetooth.c
->> index 93c7935..923285c 100644
->> --- a/android/bluetooth.c
->> +++ b/android/bluetooth.c
->> @@ -3894,10 +3894,15 @@ static const struct ipc_handler cmd_handlers[] = {
->>
->> void bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
->> {
->> -     DBG("");
->> +     DBG("mode 0x%x", mode);
->>
->>       hal_ipc = ipc;
->>
->> +     if ((mode == HAL_MODE_LE_ONLY) &&
->> +                     (adapter.current_settings & MGMT_SETTING_LE) &&
->> +                     (adapter.current_settings & MGMT_SETTING_BREDR))
->> +             set_mode(MGMT_OP_SET_BREDR, 0x00);
->> +
->>       ipc_register(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
->>                                               G_N_ELEMENTS(cmd_handlers));
->> }
->> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
->> index 48d5ea2..69009ff 100644
->> --- a/android/hal-bluetooth.c
->> +++ b/android/hal-bluetooth.c
->> @@ -29,6 +29,8 @@
->> #include "hal-ipc.h"
->> #include "hal-utils.h"
->>
->> +#define MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
->> +
->> static const bt_callbacks_t *bt_hal_cbacks = NULL;
->>
->> #define enum_prop_to_hal(prop, hal_prop, type) do { \
->> @@ -412,6 +414,17 @@ static const struct hal_ipc_handler ev_handlers[] = {
->>       }
->> };
->>
->> +static uint8_t get_mode(void)
->> +{
->> +     char value[PROPERTY_VALUE_MAX];
->> +
->> +     if (property_get(MODE_PROPERTY_NAME, value, "") > 0 &&
->> +                                     (!strcasecmp(value, "le_only")))
->> +             return HAL_MODE_LE_ONLY;
->> +
->> +     return HAL_MODE_DEFAULT;
->> +}
->> +
->> static int init(bt_callbacks_t *callbacks)
->> {
->>       struct hal_cmd_register_module cmd;
->> @@ -433,7 +446,7 @@ static int init(bt_callbacks_t *callbacks)
->>       }
->>
->>       cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
->> -     cmd.mode = HAL_MODE_DEFAULT;
->> +     cmd.mode = get_mode();
->>
->>       status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
->>                                       sizeof(cmd), &cmd, NULL, NULL, NULL);
->> diff --git a/android/hal-msg.h b/android/hal-msg.h
->> index ed0a67a..db21870 100644
->> --- a/android/hal-msg.h
->> +++ b/android/hal-msg.h
->> @@ -55,6 +55,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
->> #define HAL_OP_STATUS                 IPC_OP_STATUS
->>
->> #define HAL_MODE_DEFAULT              0x00
->> +#define HAL_MODE_LE_ONLY             0x01
->>
->> #define HAL_OP_REGISTER_MODULE                0x01
->> struct hal_cmd_register_module {
->> --
->> 1.8.4
->>
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>  struct bt_uhid;
 >
 > --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 2.0.0.rc4
+
+Maybe we should move uhid_copy to shared or just merge it in uhid.h,
+anyway no code should be using uhid_copy alone now that we bt_uhid in
+place.
+
+
+-- 
+Luiz Augusto von Dentz
