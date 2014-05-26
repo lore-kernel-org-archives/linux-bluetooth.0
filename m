@@ -1,57 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] lib/sdp: Add attributes and service class for MPS
-Date: Mon, 26 May 2014 11:11:11 +0200
-Message-ID: <4902369.Ihp58TOQrg@uw000953>
-In-Reply-To: <1400857882-3298-1-git-send-email-szymon.janc@tieto.com>
-References: <1400857882-3298-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCHv2 6/6] android/gatt: Check permissions before read execution
+Date: Mon, 26 May 2014 11:10:29 +0200
+Message-Id: <1401095429-28432-6-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1401095429-28432-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1401095429-28432-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Friday 23 of May 2014 17:11:19 Szymon Janc wrote:
-> ---
->  lib/sdp.h | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/lib/sdp.h b/lib/sdp.h
-> index 34adf9a..cc10e9f 100644
-> --- a/lib/sdp.h
-> +++ b/lib/sdp.h
-> @@ -134,6 +134,8 @@ extern "C" {
->  #define MAP_SVCLASS_ID			0x1134
->  #define GNSS_SVCLASS_ID			0x1135
->  #define GNSS_SERVER_SVCLASS_ID		0x1136
-> +#define MPS_SC_SVCLASS_ID		0x113A
-> +#define MPS_SVCLASS_ID			0x113B
->  #define PNP_INFO_SVCLASS_ID		0x1200
->  #define GENERIC_NETWORKING_SVCLASS_ID	0x1201
->  #define GENERIC_FILETRANS_SVCLASS_ID	0x1202
-> @@ -228,6 +230,7 @@ extern "C" {
->  #define GENERIC_ACCESS_PROFILE_ID	GENERIC_ACCESS_SVCLASS_ID
->  #define GENERIC_ATTRIB_PROFILE_ID	GENERIC_ATTRIB_SVCLASS_ID
->  #define APPLE_AGENT_PROFILE_ID		APPLE_AGENT_SVCLASS_ID
-> +#define MPS_PROFILE_ID			MPS_SC_SVCLASS_ID
->  
->  /*
->   * Compatibility macros for the old MDP acronym
-> @@ -270,6 +273,10 @@ extern "C" {
->  #define SDP_ATTR_GOEP_L2CAP_PSM			0x0200
->  #define SDP_ATTR_SVCDB_STATE			0x0201
->  
-> +#define SDP_ATTR_MPSD_SCENARIOS			0x0200
-> +#define SDP_ATTR_MPMD_SCENARIOS			0x0201
-> +#define SDP_ATTR_MPS_DEPENDENCIES		0x0202
-> +
->  #define SDP_ATTR_SERVICE_VERSION		0x0300
->  #define SDP_ATTR_EXTERNAL_NETWORK		0x0301
->  #define SDP_ATTR_SUPPORTED_DATA_STORES_LIST	0x0301
-> 
+Check device security level and attribute permissions before read
+execution.
+---
+ android/gatt.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 88 insertions(+)
 
-Pushed.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index cde8816..2d0e06a 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3817,13 +3817,101 @@ static bool match_dev_request_by_handle(const void *data, const void *user_data)
+ 	return handle_data->handle == handle;
+ }
+ 
++static uint8_t check_device_permissions(struct gatt_device *device,
++					uint8_t opcode, uint32_t permissions)
++{
++	GIOChannel *io;
++	int sec_level;
++
++	io = g_attrib_get_channel(device->attrib);
++
++	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
++							BT_IO_OPT_INVALID))
++		return ATT_ECODE_UNLIKELY;
++
++	switch (opcode) {
++	case ATT_OP_SIGNED_WRITE_CMD:
++		if (!(permissions & GATT_PERM_WRITE_SIGNED))
++				return ATT_ECODE_WRITE_NOT_PERM;
++
++		if ((permissions & GATT_PERM_WRITE_SIGNED_MITM) && sec_level <
++							BT_SECURITY_HIGH)
++			return ATT_ECODE_AUTHENTICATION;
++
++		break;
++	case ATT_OP_READ_BY_TYPE_REQ:
++	case ATT_OP_READ_REQ:
++	case ATT_OP_READ_BLOB_REQ:
++	case ATT_OP_READ_MULTI_REQ:
++	case ATT_OP_READ_BY_GROUP_REQ:
++		if (permissions && !(permissions & GATT_PERM_READ))
++			return ATT_ECODE_READ_NOT_PERM;
++
++		if ((permissions & GATT_PERM_READ_ENCRYPTED) && sec_level <
++							BT_SECURITY_MEDIUM)
++			return ATT_ECODE_INSUFF_ENC;
++
++		if ((permissions & GATT_PERM_READ_MITM) && sec_level <
++							BT_SECURITY_HIGH)
++			return ATT_ECODE_AUTHENTICATION;
++
++		if ((permissions & GATT_PERM_READ_AUTHORIZATION))
++			return ATT_ECODE_AUTHORIZATION;
++
++		break;
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
++		if (!(permissions & GATT_PERM_WRITE))
++			return ATT_ECODE_WRITE_NOT_PERM;
++
++		if ((permissions & GATT_PERM_WRITE_ENCRYPTED) && sec_level <
++							BT_SECURITY_MEDIUM)
++			return ATT_ECODE_INSUFF_ENC;
++
++		if ((permissions & GATT_PERM_WRITE_MITM) &&
++						sec_level < BT_SECURITY_HIGH)
++			return ATT_ECODE_AUTHENTICATION;
++
++		if ((permissions & GATT_PERM_WRITE_AUTHORIZATION))
++			return ATT_ECODE_AUTHORIZATION;
++
++	break;
++	default:
++		break;
++	}
++
++	return 0;
++}
++
+ static void read_requested_attributes(void *data, void *user_data)
+ {
+ 	struct pending_request *resp_data = data;
+ 	struct request_processing_data *process_data = user_data;
++	uint32_t permissions;
+ 	uint8_t *value;
+ 	int value_len;
+ 
++	permissions = gatt_db_get_attribute_permissions(gatt_db,
++			resp_data->handle);
++
++	/*
++	 * Check if it is attribute we didn't declare permissions, like service
++	 * declaration or included service. Set permissions to read only
++	 */
++	if (permissions == 0)
++		permissions = GATT_PERM_READ;
++
++	resp_data->error = check_device_permissions(process_data->device,
++							process_data->opcode,
++							permissions);
++
++	if (resp_data->error) {
++		resp_data->state = REQUEST_DONE;
++		return;
++	}
++
+ 	if (!gatt_db_read(gatt_db, resp_data->handle,
+ 						resp_data->offset,
+ 						process_data->opcode,
 -- 
-Best regards, 
-Szymon Janc
+1.9.0
+
