@@ -1,84 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 00/26] android: Add aptX support
-Date: Mon, 26 May 2014 15:16:26 +0200
-Message-ID: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFC] android/hal-audio: Fix wrong memory access
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAF3PWx0XGcT+s+2i6wxsZevLpa7oP9uNQ84AsEt0xNYNaf+2xA@mail.gmail.com>
+Date: Mon, 26 May 2014 15:14:43 +0200
+Cc: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>,
+	linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Message-Id: <C9D87C5A-DAF5-41C2-B9D0-8D1757AB587C@holtmann.org>
+References: <1400764022-26666-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <0ADD0151-224B-418E-94D6-B88CBD760BA8@holtmann.org> <CAF3PWx0Mm5goNNtVtqwM7LxRRskC6+vH8+8NRO1UYB4bB4_AJA@mail.gmail.com> <BD6D66D8-668E-49DE-9FE9-85FF67F6613A@holtmann.org> <CAF3PWx0XGcT+s+2i6wxsZevLpa7oP9uNQ84AsEt0xNYNaf+2xA@mail.gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrzej,
 
-Here are "few" patches which at the end of series add aptX support to BfA.
-Of course, since aptX is a proprietary codec, this is only wrapper around
-encoder library which has to be provided by platform vendor since it needs
-to be licensed. Once one has library, aptX can be enabled in following way:
+>>>>> downmix_buf is allocated to have buffer size FIXED_BUFFER_SIZE / 2, when
+>>>>> we access it as (int16_t *) we shall device index by 2.
+>>>>> ---
+>>>>> android/hal-audio.c | 2 +-
+>>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>> 
+>>>>> diff --git a/android/hal-audio.c b/android/hal-audio.c
+>>>>> index 7305bb6..96fa5c3 100644
+>>>>> --- a/android/hal-audio.c
+>>>>> +++ b/android/hal-audio.c
+>>>>> @@ -984,7 +984,7 @@ static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
+>>>>>     int16_t *output = (void *) out->downmix_buf;
+>>>>>     size_t i;
+>>>>> 
+>>>>> -     for (i = 0; i < bytes / 2; i++) {
+>>>>> +     for (i = 0; i < bytes / (2 * sizeof(int16_t)); i++) {
+>>>>>             int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
+>>>>>             int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
+>>>> 
+>>>> I wonder actually what this get_unaligned is doing here? You cast the const void into const int16_t buffer. Is this really needed? Where is our input and output buffer coming from? Aren’t these aligned anyway? Meaning aren’t they allocated?
+>>> 
+>>> We have this buffer from AudioFlinger so we don't actually know
+>>> alignment or if this is pointer to beginning of some internal buffer
+>>> (it's most probably both, but I don't think we should assume this).
+>> 
+>> and audio system that does not give you a guarantee here on the alignment is utterly screwed up. Seriously, that is just bad for performance. Especially bad on ARM CPUs, so I doubt that they have not thought about this.
+> 
+> This is only to be on safe side and in terms of performance it does
+> not really matter here since this code won't probably be used at all -
+> who has mono A2DP headset nowadays? But of course we can change this
+> with proper comment. Actually I use it like this in aptX where samples
+> are accessed from the same buffer.
 
-adb shell setprop persist.sys.bluetooth.codecs aptx
-adb shell setprop persist.sys.bluetooth.aptxlib <aptx-library>.so
+I have no idea what that means. The important part is that the buffer itself is aligned. With binary codecs like aptX this is even more important since we have no idea if aptX does the unaligned access or not.
 
-Note that this works with headsets which have aptX codec registered as
-0x0000004f/0x0001 vendor specific codec info which seems to be most common.
-However, there is (are?) headset like Kinivo BTH410 which claims aptX support
-but has only SEP with vendor codec 0x0000000a/0x0001 which does not seem to
-be compatible with first one. It won't work.
+Regards
 
-Apart from many fixes and aptX support, this patchset also adds definitions
-and tools support for AAC. No codec support in HAL audio yet, this is wip
-at the moment - there is AAC encoder available in AOSP which can be reused
-here. And no pass-through for AAC since it does not seem to be possible,
-at least not at the moment.
-
-
-Andrzej Kaczmarek (26):
-  android/a2dp: Fix removing device on incoming connection
-  android: Fix missing include
-  android/hal-audio: Fix PT in media packets
-  android/hal-audio: Fix media_packet definition
-  android/hal-audio: Make RTP header optional
-  android/hal-audio: Make update_qos optional
-  android/hal-audio: Send packets only when data were encoded
-  android/hal-audio: Allow to autoselect endpoint in open_stream IPC
-  android/hal-audio: Make codecs configurable
-  android/hal-audio: Add load/unload methods for codec
-  android/hal-audio: Allow to return 0 from get_presets
-  audio: Fix a2dp_vendor_codec_t declaration
-  audio: Add definitions for MPEG-2,4 AAC codec
-  audio: Add macros to access MPEG-2,4 AAC codec info
-  audio: Add definitions for aptX
-  android/a2dp: Fix SEP selection
-  tools/hcidump: Decode MPEG-2,4 AAC codec capabilities
-  tools/hcidump: Decode aptX codec capabilities
-  tools/avinfo: Decode MPEG-2,4 AAC codec capabilities
-  tools/avinfo: Decode aptX codec capabilities
-  android: Add avinfo to makefile
-  android/a2dp: Add support to check MPEG-2,4 AAC caps
-  android/a2dp: Add support to check aptX capabilities
-  android/hal-audio-aptx: Add initial support for aptX codec
-  android/hal-audio-aptx: Load aptX encoder library
-  android/hal-audio-aptx: Add encoding
-
- android/Android.mk           |  29 +++++
- android/Makefile.am          |   2 +
- android/a2dp.c               | 134 ++++++++++++++++++++-
- android/audio-msg.h          |   1 +
- android/avdtp.c              |  23 ++++
- android/avdtp.h              |   2 +
- android/cutils/properties.h  |   1 +
- android/hal-audio-aptx.c     | 273 +++++++++++++++++++++++++++++++++++++++++++
- android/hal-audio-sbc.c      |  41 ++++++-
- android/hal-audio.c          | 185 +++++++++++++++++++++++------
- android/hal-audio.h          |  26 ++---
- profiles/audio/a2dp-codecs.h | 102 +++++++++++++++-
- profiles/audio/a2dp.c        |  12 +-
- tools/avinfo.c               |  88 ++++++++++++--
- tools/parser/avdtp.c         | 103 +++++++++++++++-
- 15 files changed, 941 insertions(+), 81 deletions(-)
- create mode 100644 android/hal-audio-aptx.c
-
--- 
-1.9.3
+Marcel
 
