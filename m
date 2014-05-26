@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 26/26] android/hal-audio-aptx: Add encoding
-Date: Mon, 26 May 2014 15:16:52 +0200
-Message-ID: <1401110212-11526-27-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 22/26] android/a2dp: Add support to check MPEG-2,4 AAC caps
+Date: Mon, 26 May 2014 15:16:48 +0200
+Message-ID: <1401110212-11526-23-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,63 +13,113 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-audio-aptx.c | 35 ++++++++++++++++++++++++++++++++---
- 1 file changed, 32 insertions(+), 3 deletions(-)
+ android/a2dp.c | 72 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 72 insertions(+)
 
-diff --git a/android/hal-audio-aptx.c b/android/hal-audio-aptx.c
-index 4099c07..6954c91 100644
---- a/android/hal-audio-aptx.c
-+++ b/android/hal-audio-aptx.c
-@@ -170,7 +170,15 @@ static bool aptx_codec_init(struct audio_preset *preset, uint16_t payload_len,
- 
- 	memcpy(&aptx_data->aptx, preset->data, preset->len);
- 
--	/* TODO: initialize encoder */
-+	aptx_data->enc = calloc(1, aptx_sizeof);
-+	if (!aptx_data->enc) {
-+		error("APTX: failed to create encoder");
-+		free(aptx_data);
-+		return false;
-+	}
-+
-+	/* 1 = big-endian, this is what devices are using */
-+	aptx_init(aptx_data->enc, 1);
- 
- 	*codec_data = aptx_data;
- 
-@@ -215,9 +223,30 @@ static ssize_t aptx_encode_mediapacket(void *codec_data, const uint8_t *buffer,
- 					size_t len, struct media_packet *mp,
- 					size_t mp_data_len, size_t *written)
- {
--	/* TODO: add encoding */
-+	struct aptx_data *aptx_data = (struct aptx_data *) codec_data;
-+	const int16_t *ptr = (const void *) buffer;
-+	size_t bytes_in = 0;
-+	size_t bytes_out = 0;
-+
-+	while ((len - bytes_in) >= 16 && (mp_data_len - bytes_out) >= 4) {
-+		int pcm_l[4], pcm_r[4];
-+		int i;
-+
-+		for (i = 0; i < 4; i++) {
-+			pcm_l[i] = ptr[0];
-+			pcm_r[i] = ptr[1];
-+			ptr += 2;
-+		}
-+
-+		aptx_encode(aptx_data->enc, pcm_l, pcm_r, &mp->data[bytes_out]);
-+
-+		bytes_in += 16;
-+		bytes_out += 4;
-+	}
-+
-+	*written = bytes_out;
- 
--	return len;
-+	return bytes_in;
+diff --git a/android/a2dp.c b/android/a2dp.c
+index 0b586a8..a65c94d 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -327,6 +327,52 @@ static int sbc_check_config(void *caps, uint8_t caps_len, void *conf,
+ 	return 0;
  }
  
- static const struct audio_codec codec = {
++static int mpeg24_check_config(void *caps, uint8_t caps_len, void *conf,
++							uint8_t conf_len)
++{
++	a2dp_aac_t *cap, *config;
++
++	if (conf_len != caps_len || conf_len != sizeof(a2dp_aac_t)) {
++		error("AAC: Invalid configuration size (%u)", conf_len);
++		return -EINVAL;
++	}
++
++	cap = caps;
++	config = conf;
++
++	if (!(cap->object_type & config->object_type)) {
++		error("AAC: Unsupported object type (%u) by endpoint",
++							config->object_type);
++		return -EINVAL;
++	}
++
++	if (!(AAC_GET_FREQUENCY(*cap) & AAC_GET_FREQUENCY(*config))) {
++		error("AAC: Unsupported frequency (%u) by endpoint",
++						AAC_GET_FREQUENCY(*config));
++		return -EINVAL;
++	}
++
++	if (!(cap->channels & config->channels)) {
++		error("AAC: Unsupported channels (%u) by endpoint",
++							config->channels);
++		return -EINVAL;
++	}
++
++	/* VBR support in SNK is mandatory but let's make sure we don't try to
++	 * have VBR on remote which for some reason does not support it
++	 */
++	if (!cap->vbr && config->vbr) {
++		error("AAC: Unsupported VBR (%u) by endpoint",
++							config->vbr);
++		return -EINVAL;
++	}
++
++	if (AAC_GET_BITRATE(*cap) < AAC_GET_BITRATE(*config))
++		return -ERANGE;
++
++	return 0;
++}
++
+ static int check_capabilities(struct a2dp_preset *preset,
+ 				struct avdtp_media_codec_capability *codec,
+ 				uint8_t codec_len)
+@@ -336,6 +382,9 @@ static int check_capabilities(struct a2dp_preset *preset,
+ 	case A2DP_CODEC_SBC:
+ 		return sbc_check_config(codec->data, codec_len, preset->data,
+ 								preset->len);
++	case A2DP_CODEC_MPEG24:
++		return mpeg24_check_config(codec->data, codec_len, preset->data,
++								preset->len);
+ 	default:
+ 		return -EINVAL;
+ 	}
+@@ -360,6 +409,26 @@ static struct a2dp_preset *sbc_select_range(void *caps, uint8_t caps_len,
+ 	return p;
+ }
+ 
++static struct a2dp_preset *mpeg24_select_range(void *caps, uint8_t caps_len,
++						void *conf, uint8_t conf_len)
++{
++	struct a2dp_preset *p;
++	a2dp_aac_t *cap, *config;
++	uint32_t bitrate;
++
++	cap = caps;
++	config = conf;
++
++	bitrate = MIN(AAC_GET_BITRATE(*cap), AAC_GET_BITRATE(*config));
++	AAC_SET_BITRATE(*config, bitrate);
++
++	p = g_new0(struct a2dp_preset, 1);
++	p->len = conf_len;
++	p->data = g_memdup(conf, p->len);
++
++	return p;
++}
++
+ static struct a2dp_preset *select_preset_range(struct a2dp_preset *preset,
+ 				struct avdtp_media_codec_capability *codec,
+ 				uint8_t codec_len)
+@@ -369,6 +438,9 @@ static struct a2dp_preset *select_preset_range(struct a2dp_preset *preset,
+ 	case A2DP_CODEC_SBC:
+ 		return sbc_select_range(codec->data, codec_len, preset->data,
+ 								preset->len);
++	case A2DP_CODEC_MPEG24:
++		return mpeg24_select_range(codec->data, codec_len, preset->data,
++								preset->len);
+ 	default:
+ 		return NULL;
+ 	}
 -- 
 1.9.3
 
