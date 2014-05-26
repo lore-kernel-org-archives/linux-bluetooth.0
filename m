@@ -1,63 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1401092222.2400.18.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH v2 1/8] Bluetooth: Refactor l2cap_sock_sendmsg() to copy
- user buffer
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 26 May 2014 11:17:02 +0300
-In-Reply-To: <98B7DE79-FFC6-435F-86DA-36F11C8F7C2B@holtmann.org>
-References: 
-	<1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com>
-	 <1400837248-12179-2-git-send-email-jukka.rissanen@linux.intel.com>
-	 <98B7DE79-FFC6-435F-86DA-36F11C8F7C2B@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] android: Fix sending uninitialised data
+Date: Mon, 26 May 2014 09:32:43 +0200
+Message-Id: <1401089563-9932-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1401089563-9932-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401089563-9932-1-git-send-email-jakub.tyszkowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This fixes the following:
 
-On la, 2014-05-24 at 21:48 -0700, Marcel Holtmann wrote:
-> > diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-> > index f59e00c..7e7b28a 100644
-> > --- a/net/bluetooth/l2cap_sock.c
-> > +++ b/net/bluetooth/l2cap_sock.c
-> > @@ -948,6 +948,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> > {
-> > 	struct sock *sk = sock->sk;
-> > 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
-> > +	unsigned char *buf;
-> > 	int err;
-> > 
-> > 	BT_DBG("sock %p, sk %p", sock, sk);
-> > @@ -968,10 +969,21 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
-> > 	if (err)
-> > 		return err;
-> > 
-> > +	buf = kmalloc(len, GFP_KERNEL);
-> > +	if (!buf)
-> > +		return -ENOMEM;
-> > +
-> > +	if (memcpy_fromiovec(buf, msg->msg_iov, len)) {
-> > +		err = -EFAULT;
-> > +		goto done;
-> > +	}
-> > +
-> > 	l2cap_chan_lock(chan);
-> > -	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
-> > +	err = l2cap_chan_send(chan, buf, len, sk->sk_priority, msg->msg_flags);
-> > 	l2cap_chan_unlock(chan);
-> > 
-> > +done:
-> > +	kfree(buf);
-> > 	return err;
-> > }
-> 
-> We don’t have to use chan->ops->alloc_skb here? Has this become obsolete now?
+==25759== Syscall param socketcall.sendmsg(msg.msg_iov[i]) points to
+uninitialised byte(s)
+==25759==    at 0x521C570: __sendmsg_nocancel (syscall-template.S:82)
+==25759==    by 0x41688F: ipc_send (ipc.c:366)
+==25759==    by 0x40ECF8: send_ssp_request (bluetooth.c:1028)
+==25759==    by 0x4110A6: user_confirm_request_callback
+(bluetooth.c:1055)
+==25759==    by 0x4094FE: queue_foreach (queue.c:186)
+==25759==    by 0x409FCF: can_read_data (mgmt.c:287)
+==25759==    by 0x408E4C: read_callback (io-glib.c:168)
+==25759==    by 0x4E79D12: g_main_context_dispatch (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25759==    by 0x4E7A05F: ??? (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25759==    by 0x4E7A459: g_main_loop_run (in
+/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
+==25759==    by 0x40454D: main (main.c:538)
+==25759==  Address 0x7ff00085d is on thread 1's stack
+==25759==  Uninitialised value was created by a stack allocation
+==25759==    at 0x40EC77: send_ssp_request (bluetooth.c:1018)
+---
+ android/bluetooth.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Isn't the buf here just a normal memory buffer that stores just the user
-data and has nothing to do with sk_buff that is returned by alloc_skb()?
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 93b9cd7..85409a3 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1018,6 +1018,8 @@ static void send_ssp_request(struct device *dev, uint8_t variant,
+ {
+ 	struct hal_ev_ssp_request ev;
+ 
++	memset(&ev, 0, sizeof(ev));
++
+ 	bdaddr2android(&dev->bdaddr, ev.bdaddr);
+ 	memcpy(ev.name, dev->name, strlen(dev->name));
+ 	ev.class_of_dev = dev->class;
+-- 
+1.9.3
 
-
-Cheers,
-Jukka
