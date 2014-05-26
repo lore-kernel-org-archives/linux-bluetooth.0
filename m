@@ -1,39 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android/hal-gatt: Fix missing check if interface is ready
-Date: Tue, 27 May 2014 00:11:30 +0200
-Message-ID: <2872925.oNVPNmXkhV@athlon>
-In-Reply-To: <1401116627-28767-1-git-send-email-szymon.janc@tieto.com>
-References: <1401116627-28767-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH 3/5] android/gatt: Implement enable test command
+Date: Mon, 26 May 2014 23:53:26 +0200
+Message-Id: <1401141208-26912-4-git-send-email-szymon.janc@gmail.com>
+In-Reply-To: <1401141208-26912-1-git-send-email-szymon.janc@gmail.com>
+References: <1401141208-26912-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 26 May 2014 17:03:44 Szymon Janc wrote:
-> ---
->  android/hal-gatt.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-> index 93dc066..6f0d2c5 100644
-> --- a/android/hal-gatt.c
-> +++ b/android/hal-gatt.c
-> @@ -573,6 +573,9 @@ static bt_status_t register_client(bt_uuid_t *uuid)
->  {
->  	struct hal_cmd_gatt_client_register cmd;
-> 
-> +	if (!interface_ready())
-> +		return BT_STATUS_NOT_READY;
-> +
->  	memcpy(cmd.uuid, uuid, sizeof(*uuid));
-> 
->  	return hal_ipc_cmd(HAL_SERVICE_ID_GATT, HAL_OP_GATT_CLIENT_REGISTER,
+This command is used to enable and disable test interface.
+---
+ android/gatt.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-Patches 1-3 are now applied.
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 8b0082e..1ce6ff9 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -194,6 +194,12 @@ static GIOChannel *listening_io = NULL;
+ 
+ static struct bt_crypto *crypto = NULL;
+ 
++static int test_client_if = 0;
++static const uint8_t TEST_UUID[] = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x01, 0x02, 0x03, 0x04
++};
++
+ static void bt_le_discovery_stop_cb(void);
+ 
+ static bool is_bluetooth_uuid(const uint8_t *uuid)
+@@ -3450,6 +3456,20 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+ 
+ 	switch (cmd->command) {
+ 	case GATT_CLIENT_TEST_CMD_ENABLE:
++		if (cmd->u1) {
++			if (!test_client_if)
++				test_client_if = register_app(TEST_UUID,
++								APP_CLIENT);
++
++			if (test_client_if)
++				status = HAL_STATUS_SUCCESS;
++			else
++				status = HAL_STATUS_FAILED;
++		} else {
++			status = unregister_client(test_client_if);
++			test_client_if = 0;
++		}
++		break;
+ 	case GATT_CLIENT_TEST_CMD_CONNECT:
+ 	case GATT_CLIENT_TEST_CMD_DISCONNECT:
+ 	case GATT_CLIENT_TEST_CMD_DISCOVER:
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+2.0.0.rc4
+
