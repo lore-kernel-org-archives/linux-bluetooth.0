@@ -1,62 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=windows-1252
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v2 1/8] Bluetooth: Refactor l2cap_sock_sendmsg() to copy user buffer
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1401092222.2400.18.camel@jrissane-mobl.ger.corp.intel.com>
-Date: Mon, 26 May 2014 14:13:08 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <09DFE249-71A0-44E6-8552-0BDE5CC656EF@holtmann.org>
-References: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com> <1400837248-12179-2-git-send-email-jukka.rissanen@linux.intel.com> <98B7DE79-FFC6-435F-86DA-36F11C8F7C2B@holtmann.org> <1401092222.2400.18.camel@jrissane-mobl.ger.corp.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] lib/sdp: Add attributes and service class for MPS
+Date: Mon, 26 May 2014 11:11:11 +0200
+Message-ID: <4902369.Ihp58TOQrg@uw000953>
+In-Reply-To: <1400857882-3298-1-git-send-email-szymon.janc@tieto.com>
+References: <1400857882-3298-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
-
->>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
->>> index f59e00c..7e7b28a 100644
->>> --- a/net/bluetooth/l2cap_sock.c
->>> +++ b/net/bluetooth/l2cap_sock.c
->>> @@ -948,6 +948,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
->>> {
->>> 	struct sock *sk = sock->sk;
->>> 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
->>> +	unsigned char *buf;
->>> 	int err;
->>> 
->>> 	BT_DBG("sock %p, sk %p", sock, sk);
->>> @@ -968,10 +969,21 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
->>> 	if (err)
->>> 		return err;
->>> 
->>> +	buf = kmalloc(len, GFP_KERNEL);
->>> +	if (!buf)
->>> +		return -ENOMEM;
->>> +
->>> +	if (memcpy_fromiovec(buf, msg->msg_iov, len)) {
->>> +		err = -EFAULT;
->>> +		goto done;
->>> +	}
->>> +
->>> 	l2cap_chan_lock(chan);
->>> -	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
->>> +	err = l2cap_chan_send(chan, buf, len, sk->sk_priority, msg->msg_flags);
->>> 	l2cap_chan_unlock(chan);
->>> 
->>> +done:
->>> +	kfree(buf);
->>> 	return err;
->>> }
->> 
->> We don’t have to use chan->ops->alloc_skb here? Has this become obsolete now?
+On Friday 23 of May 2014 17:11:19 Szymon Janc wrote:
+> ---
+>  lib/sdp.h | 7 +++++++
+>  1 file changed, 7 insertions(+)
 > 
-> Isn't the buf here just a normal memory buffer that stores just the user
-> data and has nothing to do with sk_buff that is returned by alloc_skb()?
+> diff --git a/lib/sdp.h b/lib/sdp.h
+> index 34adf9a..cc10e9f 100644
+> --- a/lib/sdp.h
+> +++ b/lib/sdp.h
+> @@ -134,6 +134,8 @@ extern "C" {
+>  #define MAP_SVCLASS_ID			0x1134
+>  #define GNSS_SVCLASS_ID			0x1135
+>  #define GNSS_SERVER_SVCLASS_ID		0x1136
+> +#define MPS_SC_SVCLASS_ID		0x113A
+> +#define MPS_SVCLASS_ID			0x113B
+>  #define PNP_INFO_SVCLASS_ID		0x1200
+>  #define GENERIC_NETWORKING_SVCLASS_ID	0x1201
+>  #define GENERIC_FILETRANS_SVCLASS_ID	0x1202
+> @@ -228,6 +230,7 @@ extern "C" {
+>  #define GENERIC_ACCESS_PROFILE_ID	GENERIC_ACCESS_SVCLASS_ID
+>  #define GENERIC_ATTRIB_PROFILE_ID	GENERIC_ATTRIB_SVCLASS_ID
+>  #define APPLE_AGENT_PROFILE_ID		APPLE_AGENT_SVCLASS_ID
+> +#define MPS_PROFILE_ID			MPS_SC_SVCLASS_ID
+>  
+>  /*
+>   * Compatibility macros for the old MDP acronym
+> @@ -270,6 +273,10 @@ extern "C" {
+>  #define SDP_ATTR_GOEP_L2CAP_PSM			0x0200
+>  #define SDP_ATTR_SVCDB_STATE			0x0201
+>  
+> +#define SDP_ATTR_MPSD_SCENARIOS			0x0200
+> +#define SDP_ATTR_MPMD_SCENARIOS			0x0201
+> +#define SDP_ATTR_MPS_DEPENDENCIES		0x0202
+> +
+>  #define SDP_ATTR_SERVICE_VERSION		0x0300
+>  #define SDP_ATTR_EXTERNAL_NETWORK		0x0301
+>  #define SDP_ATTR_SUPPORTED_DATA_STORES_LIST	0x0301
+> 
 
-I asked the question, because I do not know. Do we need alloc_skb callback at all.
+Pushed.
 
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
