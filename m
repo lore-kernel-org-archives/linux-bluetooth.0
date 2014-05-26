@@ -2,44 +2,74 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@gmail.com>
-Subject: [PATCH 5/5] android/gatt: Implement disconnect test command
-Date: Mon, 26 May 2014 23:53:28 +0200
-Message-Id: <1401141208-26912-6-git-send-email-szymon.janc@gmail.com>
+Subject: [PATCH 2/5] android/gatt: Factor out unregistering client into helper function
+Date: Mon, 26 May 2014 23:53:25 +0200
+Message-Id: <1401141208-26912-3-git-send-email-szymon.janc@gmail.com>
 In-Reply-To: <1401141208-26912-1-git-send-email-szymon.janc@gmail.com>
 References: <1401141208-26912-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This will be also used by test interface.
 ---
- android/gatt.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ android/gatt.c | 37 ++++++++++++++++++++++---------------
+ 1 file changed, 22 insertions(+), 15 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 6eb4440..af3af08 100644
+index 0acb4b6..8b0082e 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -3445,6 +3445,7 @@ failed:
- static void handle_client_test_command(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_test_command *cmd = buf;
-+	struct gatt_app *app;
- 	bdaddr_t bdaddr;
- 	bt_uuid_t uuid;
- 	uint8_t status;
-@@ -3475,6 +3476,13 @@ static void handle_client_test_command(const void *buf, uint16_t len)
- 		status = handle_connect(test_client_if, &bdaddr);
- 		break;
- 	case GATT_CLIENT_TEST_CMD_DISCONNECT:
-+		app = queue_find(gatt_apps, match_app_by_id,
-+						INT_TO_PTR(test_client_if));
-+		if (app)
-+			app_disconnect_devices(app);
+@@ -1360,28 +1360,35 @@ static bool trigger_connection(struct app_connection *connection)
+ 	return true;
+ }
+ 
++static uint8_t unregister_client(int client_if)
++{
++	struct gatt_app *cl;
 +
-+		status = HAL_STATUS_SUCCESS;
-+		break;
- 	case GATT_CLIENT_TEST_CMD_DISCOVER:
- 	case GATT_CLIENT_TEST_CMD_PAIRING_CONFIG:
- 	default:
++	cl = queue_remove_if(gatt_apps, match_app_by_id, INT_TO_PTR(client_if));
++	if (!cl) {
++		error("gatt: client_if=%d not found", client_if);
++
++		return HAL_STATUS_FAILED;
++	}
++
++	/*
++	 * Check if there is any connect request or connected device
++	 * for this client. If so, remove this client from those lists.
++	 */
++	app_disconnect_devices(cl);
++	destroy_gatt_app(cl);
++
++	return HAL_STATUS_SUCCESS;
++}
++
+ static void handle_client_unregister(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_unregister *cmd = buf;
+ 	uint8_t status;
+-	struct gatt_app *cl;
+ 
+ 	DBG("");
+ 
+-	cl = queue_remove_if(gatt_apps, match_app_by_id,
+-						INT_TO_PTR(cmd->client_if));
+-	if (!cl) {
+-		error("gatt: client_if=%d not found", cmd->client_if);
+-		status = HAL_STATUS_FAILED;
+-	} else {
+-		/*
+-		 * Check if there is any connect request or connected device
+-		 * for this client. If so, remove this client from those lists.
+-		 */
+-		app_disconnect_devices(cl);
+-		destroy_gatt_app(cl);
+-		status = HAL_STATUS_SUCCESS;
+-	}
++	status = unregister_client(cmd->client_if);
+ 
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+ 					HAL_OP_GATT_CLIENT_UNREGISTER, status);
 -- 
 2.0.0.rc4
 
