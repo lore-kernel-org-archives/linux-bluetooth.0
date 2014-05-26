@@ -1,42 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 5/8] Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed one
-Date: Mon, 26 May 2014 20:25:56 +0200
-Message-ID: <1702130.YSG8MgCIJi@athlon>
-In-Reply-To: <DED0C0AE-2C66-4B7F-8496-A6CD1DA0230A@holtmann.org>
-References: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com> <1401107914.2400.21.camel@jrissane-mobl.ger.corp.intel.com> <DED0C0AE-2C66-4B7F-8496-A6CD1DA0230A@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 4/4] android/README: Update information about GATT HAL support
+Date: Mon, 26 May 2014 17:03:47 +0200
+Message-Id: <1401116627-28767-4-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1401116627-28767-1-git-send-email-szymon.janc@tieto.com>
+References: <1401116627-28767-1-git-send-email-szymon.janc@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+test_command appears to be usefull for PTS testing and probably should
+be implemented.
+---
+ android/README | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-On Monday 26 May 2014 14:46:37 Marcel Holtmann wrote:
-> Hi Jukka,
-> 
-> >>> +static struct sk_buff *bt_6lowpan_chan_alloc_skb_cb(struct l2cap_chan
-> >>> *chan, +						    unsigned long len, int nb)
-> >>> +{
-> >>> +	return bt_skb_alloc(len, GFP_ATOMIC);
-> >> 
-> >> Does this have to be GFP_ATOMIC?
-> > 
-> > Yep, I see "BUG: sleeping function called from invalid context..."
-> > without it.
-> 
-> should we fix the caller? I am curious why this is possible in the first
-> place. The whole Bluetooth subsystem should run in a workqueue these days.
-> Do we have by any chance the wrong lock hold at this point or why is this
-> happening.
-> 
-> If we really need to keep GFP_ATOMIC here then you need to add a comment on
-> why that is. Because otherwise we will forget about it next time around.
-
-FWIW this is due to holding hci_dev_list_lock which is RW_LOCK. For similar 
-reason there is GFP_ATOMIC in read_index_list() in mgmt.c.
-
+diff --git a/android/README b/android/README
+index 91fc545..bcc2e7b 100644
+--- a/android/README
++++ b/android/README
+@@ -223,7 +223,7 @@ Profile ID    HAL header         Status
+ core          bluetooth.h        complete
+ a2dp          bt_av.h            complete
+ gatt          bt_gatt.h          partial
+-              bt_gatt_client.h   partial
++              bt_gatt_client.h   complete
+               bt_gatt_server.h   initial
+ handsfree     bt_hf.h            complete
+ hidhost       bt_hh.h            complete
+@@ -293,6 +293,14 @@ get_player_app_values_text_cb      NULL JNI implementation
+ set_player_app_value_cb            NULL JNI implementation
+ 
+ 
++HAL GATT
++--------
++
++methods:
++client->set_adv_data               missing kernel support for vendor data
++client->test_command               test command
++
++
+ Known Android issues
+ ====================
+ 
+@@ -324,3 +332,5 @@ HFP		Response and Hold		AT+BTRH, +BTRH
+ HFP		In-band Ring Tone		+BSIR
+ AVRCP		Player Settings			HAL API present but not used
+ AVRCP		Browsing			No HAL API
++GATT		Client read multiple		No HAL API
++		characteristics
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+1.9.1
+
