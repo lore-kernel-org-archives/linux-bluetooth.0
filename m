@@ -2,28 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] android/gatt: Fix possible memory leak
-Date: Mon, 26 May 2014 09:32:42 +0200
-Message-Id: <1401089563-9932-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv5 3/3] android/gatt: Use default mtu on mtu exchange response
+Date: Mon, 26 May 2014 09:13:16 +0200
+Message-Id: <1401088396-2074-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1401088396-2074-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401088396-2074-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+We should be setting new mtu after sending response using old mtu. This
+also moves sending the response from att_handler to mtu_att_handle.
 ---
- android/gatt.c | 1 +
- 1 file changed, 1 insertion(+)
+ android/gatt.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index c8af09c..e7f7c86 100644
+index 5da6ffa..c8af09c 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -4440,6 +4440,7 @@ static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
- 		if (!queue_push_tail(device->pending_requests, entry)) {
- 			queue_remove_all(device->pending_requests, NULL, NULL,
- 						destroy_pending_request);
-+			free(entry);
- 			queue_destroy(q, NULL);
- 			return ATT_ECODE_UNLIKELY;
- 		}
+@@ -4546,14 +4546,14 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+ }
+ 
+ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+-					uint8_t *rsp, size_t rsp_size,
+-					struct gatt_device *dev,
+-					uint16_t *length)
++							struct gatt_device *dev)
+ {
+-	uint16_t mtu, imtu, omtu;
++	uint16_t mtu, imtu;
++	size_t omtu;
+ 	GIOChannel *io;
+ 	GError *gerr = NULL;
+ 	uint16_t len;
++	uint8_t *rsp;
+ 
+ 	DBG("");
+ 
+@@ -4568,7 +4568,6 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	bt_io_get(io, &gerr,
+ 			BT_IO_OPT_IMTU, &imtu,
+-			BT_IO_OPT_OMTU, &omtu,
+ 			BT_IO_OPT_INVALID);
+ 	if (gerr) {
+ 		error("bt_io_get: %s", gerr->message);
+@@ -4576,16 +4575,18 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 		return ATT_ECODE_UNLIKELY;
+ 	}
+ 
+-	/* Limit OMTU to received value */
+-	mtu = MIN(mtu, omtu);
+-	g_attrib_set_mtu(dev->attrib, mtu);
++	rsp = g_attrib_get_buffer(dev->attrib, &omtu);
+ 
+ 	/* Respond with our IMTU */
+-	len = enc_mtu_resp(imtu, rsp, rsp_size);
++	len = enc_mtu_resp(imtu, rsp, omtu);
+ 	if (!len)
+ 		return ATT_ECODE_UNLIKELY;
+ 
+-	*length = len;
++	g_attrib_send(dev->attrib, 0, rsp, len, NULL, NULL, NULL);
++
++	/* Limit OMTU to received value */
++	mtu = MIN(mtu, omtu);
++	g_attrib_set_mtu(dev->attrib, mtu);
+ 
+ 	return 0;
+ }
+@@ -4825,8 +4826,7 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		status = read_request(ipdu, len, dev);
+ 		break;
+ 	case ATT_OP_MTU_REQ:
+-		status = mtu_att_handle(ipdu, len, opdu, length, dev,
+-								&resp_length);
++		status = mtu_att_handle(ipdu, len, dev);
+ 		break;
+ 	case ATT_OP_FIND_INFO_REQ:
+ 		status = find_info_handle(ipdu, len, opdu, length,
 -- 
 1.9.3
 
