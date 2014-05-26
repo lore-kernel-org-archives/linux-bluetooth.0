@@ -1,38 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Adam Lee <adam8157@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Subject: [PATCH] Bluetooth: ath3k: no need to set same pipe multiple times
-Date: Tue, 27 May 2014 13:49:07 +0800
-Message-Id: <1401169747-11033-1-git-send-email-adam8157@gmail.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/gatt: Fix possible memory leak in write request
+Date: Tue, 27 May 2014 00:14:21 +0200
+Message-ID: <11034349.R0bk4YHB4h@athlon>
+In-Reply-To: <1401113183-6617-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1401113183-6617-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Invoking usb_sndbulkpipe() on same pipe for same purpose only once is
-enough.
+Hi Marcin,
 
-Signed-off-by: Adam Lee <adam8157@gmail.com>
----
- drivers/bluetooth/ath3k.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Monday 26 May 2014 16:06:22 Marcin Kraglak wrote:
+> If write cannot be executed, remove data from queue and free
+> allocated memory.
+> ---
+>  android/gatt.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index e41a69e..721785a 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -4969,8 +4969,11 @@ static uint8_t write_req_request(const uint8_t *cmd,
+> uint16_t cmd_len, }
+> 
+>  	if (!gatt_db_write(gatt_db, handle, 0, value, vlen, cmd[0],
+> -								&dev->bdaddr))
+> +								&dev->bdaddr)) {
+> +		queue_remove(dev->pending_requests, data);
+> +		free(data);
+>  		return ATT_ECODE_UNLIKELY;
+> +	}
+> 
+>  	return 0;
+>  }
 
-diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
-index a83b57e..f983806 100644
---- a/drivers/bluetooth/ath3k.c
-+++ b/drivers/bluetooth/ath3k.c
-@@ -193,9 +193,10 @@ static int ath3k_load_firmware(struct usb_device *udev,
- 	sent += 20;
- 	count -= 20;
- 
-+	pipe = usb_sndbulkpipe(udev, 0x02);
-+
- 	while (count) {
- 		size = min_t(uint, count, BULK_SIZE);
--		pipe = usb_sndbulkpipe(udev, 0x02);
- 		memcpy(send_buf, firmware->data + sent, size);
- 
- 		err = usb_bulk_msg(udev, pipe, send_buf, size,
+Both patches applied, thanks.
+
 -- 
-2.0.0.rc4
-
+Szymon K. Janc
+szymon.janc@gmail.com
