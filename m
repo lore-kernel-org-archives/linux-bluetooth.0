@@ -1,110 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 26 May 2014 18:41:22 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-05-26
-Message-ID: <20140526214122.GA2034@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="ikeVEW9yuYc//A+q"
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH v2 5/8] Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed one
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1702130.YSG8MgCIJi@athlon>
+Date: Mon, 26 May 2014 21:55:00 +0200
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <33C8228A-35E1-43E7-A164-5B9E7C14FE2C@holtmann.org>
+References: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com> <1401107914.2400.21.camel@jrissane-mobl.ger.corp.intel.com> <DED0C0AE-2C66-4B7F-8496-A6CD1DA0230A@holtmann.org> <1702130.YSG8MgCIJi@athlon>
+To: Szymon Janc <szymon.janc@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Szymon,
 
---ikeVEW9yuYc//A+q
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+>>>>> +static struct sk_buff *bt_6lowpan_chan_alloc_skb_cb(struct l2cap_chan
+>>>>> *chan, +						    unsigned long len, int nb)
+>>>>> +{
+>>>>> +	return bt_skb_alloc(len, GFP_ATOMIC);
+>>>> 
+>>>> Does this have to be GFP_ATOMIC?
+>>> 
+>>> Yep, I see "BUG: sleeping function called from invalid context..."
+>>> without it.
+>> 
+>> should we fix the caller? I am curious why this is possible in the first
+>> place. The whole Bluetooth subsystem should run in a workqueue these days.
+>> Do we have by any chance the wrong lock hold at this point or why is this
+>> happening.
+>> 
+>> If we really need to keep GFP_ATOMIC here then you need to add a comment on
+>> why that is. Because otherwise we will forget about it next time around.
+> 
+> FWIW this is due to holding hci_dev_list_lock which is RW_LOCK. For similar 
+> reason there is GFP_ATOMIC in read_index_list() in mgmt.c.
 
-Hi John,
+okay then, any reason this can not be turned into a mutex?
 
-Some more patches for 3.16. There is nothing really special here, just a
-bunch of clean ups, fixes plus some small improvements. Please pull.
+Regards
 
-Thanks!
+Marcel
 
-	Gustavo
-
----
-
-The following changes since commit 22e70786413ed05950207eda7be420c280b776d7:
-
-  Bluetooth: Remove hci_h4 unused defines (2014-04-24 11:55:26 -0300)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to d7b2545023ecfde94d3ea9c03c5480ac18da96c9:
-
-  Bluetooth: Clearly distinguish mgmt LTK type from authenticated property (2014-05-23 11:24:04 -0700)
-
-----------------------------------------------------------------
-Andrzej Kaczmarek (8):
-      Bluetooth: Store RSSI for connection
-      Bluetooth: Store TX power level for connection
-      Bluetooth: Add conn info lifetime parameters to debugfs
-      Bluetooth: Add support to get connection information
-      Bluetooth: Avoid polling TX power for LE links
-      Bluetooth: Store max TX power level for connection
-      Bluetooth: Add support for max_tx_power in Get Conn Info
-      Bluetooth: Add missing msecs to jiffies conversion
-
-Johan Hedberg (8):
-      Bluetooth: Add support for SMP Invalid Parameters error code
-      Bluetooth: Make SMP context private to smp.c
-      Bluetooth: Fix setting initial local auth_req value
-      Bluetooth: Remove unnecessary work structs from SMP code
-      Bluetooth: Rename smp->smp_flags to smp->flags
-      Bluetooth: Update smp_random to return a response code
-      Bluetooth: Update smp_confirm to return a response code
-      Bluetooth: Clearly distinguish mgmt LTK type from authenticated property
-
-Libor Pechacek (1):
-      Bluetooth: Convert RFCOMM spinlocks into mutexes
-
-Marcel Holtmann (1):
-      Bluetooth: Increment management interface revision
-
-Petri Gynther (1):
-      Bluetooth: btusb: Add Broadcom patch RAM support
-
- drivers/bluetooth/btusb.c        | 155 ++++++++++++++++++++++++++++++-
- include/net/bluetooth/hci.h      |  21 +++++
- include/net/bluetooth/hci_core.h |  11 +++
- include/net/bluetooth/mgmt.h     |  15 +++
- include/net/bluetooth/rfcomm.h   |   6 +-
- net/bluetooth/hci_conn.c         |   3 +
- net/bluetooth/hci_core.c         |  64 +++++++++++++
- net/bluetooth/hci_event.c        |  61 +++++++++++++
- net/bluetooth/mgmt.c             | 236 +++++++++++++++++++++++++++++++++++++++++++++++-
- net/bluetooth/rfcomm/core.c      |   2 +-
- net/bluetooth/rfcomm/tty.c       |  20 ++--
- net/bluetooth/smp.c              | 153 +++++++++++++++----------------
- net/bluetooth/smp.h              |  30 +-----
- 13 files changed, 653 insertions(+), 124 deletions(-)
-
-
---ikeVEW9yuYc//A+q
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTg7UCAAoJEPs3PUX4s20oMQ0QALApbMjC4Ylk5+WKaRyuRIr5
-fEbkbe9Mnvn5IOVq3SDJamQ9CMf6+4b3J0qYSs4yug1435AbLpR29Q1rAwCNhJ50
-WdbzOI7VOfRod/mpB8TzbCxLH2X0/RaKNXFW0tW9VET3mRXvTPJH6OS+YKRIJ+N8
-tHfhwxy7HXHdFSszK/AnL9CLVv8b30lcKtSaoW2DDZ76AzKnNneVMKzLvUO5ICVG
-0SzBo96c/ci9weE1Edp5PG7upl15AqjMVizJYrXnaQ6+CGATIIp1SxaQEU4vXNSN
-dEckVpgUpCM1eXHziB9Yf70r1js31/c9QAVEoavmC/9c5Q6rJ2g1JcMZN8vNHv55
-JVMsfsGpMXenDNX+uzfMxYrpKn05PPqzyEAlKit8Hw3DXZEYD1azKqHID4uyBfVo
-YI0D/Xoef8ZA1/Ctu1tKGnOnpn+smcEoukFRqKp7+Rve+aOKXqnjW1zyHJGci8cM
-/ctynJh73UBz/NUwQO6Os+W4vJ1NrPnFgVuJs8R+fVLa1PF5quDe+tH0F7MjISQn
-J6VECehz8VbwBjaz9miedzA7qM7V8CiNo1ju8gqu/6eyUJtiJh7Tdns0QwRGuJH0
-OFuZUMYfKijxe7pooKcx4kiB+eswm2FYdNk3YnKL66i0SqYhDOLjE+dYUdvZ8IEW
-nKpzpLC+L7PhfgebJwhU
-=XSPz
------END PGP SIGNATURE-----
-
---ikeVEW9yuYc//A+q--
