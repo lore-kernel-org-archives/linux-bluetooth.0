@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Message-ID: <1401107914.2400.21.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH v2 5/8] Bluetooth: 6LoWPAN: Use connected oriented
+ channel instead of fixed one
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] android/hal-audio: Fix wrong memory access
-Date: Mon, 26 May 2014 14:39:09 +0200
-Message-ID: <1891719.cXgZzUXdHp@uw000953>
-In-Reply-To: <1400764022-26666-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1400764022-26666-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 26 May 2014 15:38:34 +0300
+In-Reply-To: <BF841E7C-706C-42C4-BEA6-E2A6C64066CE@holtmann.org>
+References: 
+	<1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com>
+	 <1400837248-12179-6-git-send-email-jukka.rissanen@linux.intel.com>
+	 <BF841E7C-706C-42C4-BEA6-E2A6C64066CE@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On Thursday 22 of May 2014 16:07:02 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On la, 2014-05-24 at 22:04 -0700, Marcel Holtmann wrote:
+> > +static struct sk_buff *bt_6lowpan_chan_alloc_skb_cb(struct l2cap_chan *chan,
+> > +						    unsigned long len, int nb)
+> > +{
+> > +	return bt_skb_alloc(len, GFP_ATOMIC);
 > 
-> downmix_buf is allocated to have buffer size FIXED_BUFFER_SIZE / 2, when
-> we access it as (int16_t *) we shall device index by 2.
-> ---
->  android/hal-audio.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Does this have to be GFP_ATOMIC?
 > 
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 7305bb6..96fa5c3 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -984,7 +984,7 @@ static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
->  	int16_t *output = (void *) out->downmix_buf;
->  	size_t i;
->  
-> -	for (i = 0; i < bytes / 2; i++) {
-> +	for (i = 0; i < bytes / (2 * sizeof(int16_t)); i++) {
->  		int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
->  		int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
->  
 
-Although RFC I've applied this patch but modified commit message and added
-a local 'frames' variable with comment where this calculation comes from.
-Thanks.
+Yep, I see "BUG: sleeping function called from invalid context..."
+without it.
 
--- 
-Best regards, 
-Szymon Janc
+
+Cheers,
+Jukka
