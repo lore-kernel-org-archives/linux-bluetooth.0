@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 06/26] android/hal-audio: Make update_qos optional
-Date: Mon, 26 May 2014 15:16:32 +0200
-Message-ID: <1401110212-11526-7-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 20/26] tools/avinfo: Decode aptX codec capabilities
+Date: Mon, 26 May 2014 15:16:46 +0200
+Message-ID: <1401110212-11526-21-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -13,33 +13,59 @@ Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/hal-audio.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ tools/avinfo.c | 34 +++++++++++++++++++++++++++++++---
+ 1 file changed, 31 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 946a835..534620a 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -524,7 +524,8 @@ static bool resume_endpoint(struct audio_endpoint *ep)
- 	ep->samples = 0;
- 	ep->resync = false;
+diff --git a/tools/avinfo.c b/tools/avinfo.c
+index 7e9dfd1..7d58e25 100644
+--- a/tools/avinfo.c
++++ b/tools/avinfo.c
+@@ -158,14 +158,42 @@ struct getcap_resp {
+ 	uint8_t caps[0];
+ } __attribute__ ((packed));
  
--	ep->codec->update_qos(ep->codec_data, QOS_POLICY_DEFAULT);
-+	if (ep->codec->update_qos)
-+		ep->codec->update_qos(ep->codec_data, QOS_POLICY_DEFAULT);
++static void print_aptx(a2dp_aptx_t *aptx)
++{
++	printf("\t\tVendor Specific Value (aptX)");
++
++	printf("\n\t\t\tFrequencies: ");
++	if (aptx->frequency & APTX_SAMPLING_FREQ_16000)
++		printf("16kHz ");
++	if (aptx->frequency & APTX_SAMPLING_FREQ_32000)
++		printf("32kHz ");
++	if (aptx->frequency & APTX_SAMPLING_FREQ_44100)
++		printf("44.1kHz ");
++	if (aptx->frequency & APTX_SAMPLING_FREQ_48000)
++		printf("48kHz ");
++
++	printf("\n\t\t\tChannel modes: ");
++	if (aptx->channel_mode & APTX_CHANNEL_MODE_MONO)
++		printf("Mono ");
++	if (aptx->channel_mode & APTX_CHANNEL_MODE_STEREO)
++		printf("Stereo ");
++
++	printf("\n");
++}
++
+ static void print_vendor(a2dp_vendor_codec_t *vendor)
+ {
++	uint32_t vendor_id = btohl(vendor->vendor_id);
++	uint16_t codec_id = btohs(vendor->codec_id);
++
+ 	printf("\tMedia Codec: Vendor Specific A2DP Codec");
  
- 	return true;
+-	printf("\n\t\tVendor ID 0x%08x", btohl(vendor->vendor_id));
++	printf("\n\t\tVendor ID 0x%08x", vendor_id);
++
++	printf("\n\t\tVendor Specific Codec ID 0x%04x\n", codec_id);
+ 
+-	printf("\n\t\tVendor Specific Codec ID 0x%04x\n",
+-						btohs(vendor->codec_id));
++	if (vendor_id == APTX_VENDOR_ID && codec_id == APTX_CODEC_ID)
++		print_aptx((void *) vendor);
  }
-@@ -683,7 +684,8 @@ static bool write_data(struct a2dp_stream_out *out, const void *buffer,
- 			if (diff > MAX_DELAY) {
- 				warn("lag is %jums, resyncing", diff / 1000);
  
--				ep->codec->update_qos(ep->codec_data,
-+				if (ep->codec->update_qos)
-+					ep->codec->update_qos(ep->codec_data,
- 							QOS_POLICY_DECREASE);
- 				ep->resync = true;
- 			}
+ static void print_mpeg24(a2dp_aac_t *aac)
 -- 
 1.9.3
 
