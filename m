@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 18/26] tools/hcidump: Decode aptX codec capabilities
-Date: Mon, 26 May 2014 15:16:44 +0200
-Message-ID: <1401110212-11526-19-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 10/26] android/hal-audio: Add load/unload methods for codec
+Date: Mon, 26 May 2014 15:16:36 +0200
+Message-ID: <1401110212-11526-11-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401110212-11526-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,89 +12,76 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This patch adds optional load/unload methods for codec which can be
+used to initialize some static data for codec, e.g. load shared library
+which provides encoder. Unlike init/cleanup which are called on stream
+open/close these methods are called when audio device is opened/closed
+thus most likely only once.
 ---
- tools/parser/avdtp.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 47 insertions(+), 3 deletions(-)
+ android/hal-audio.c | 16 ++++++++++++++++
+ android/hal-audio.h |  3 +++
+ 2 files changed, 19 insertions(+)
 
-diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-index 5806c07..14dc417 100644
---- a/tools/parser/avdtp.c
-+++ b/tools/parser/avdtp.c
-@@ -150,6 +150,13 @@ static char *codec2str(uint8_t type, uint8_t codec)
- 	return "Unknown";
- }
- 
-+static char *vndcodec2str(uint32_t vendor, uint16_t vndcodec)
-+{
-+	if (vendor == 0x0000004f && vndcodec == 0x0001)
-+		return "aptX";
-+	return "Unknown";
-+}
-+
- static char *cat2str(uint8_t cat)
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index e6015f2..416a3ad 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -1334,11 +1334,19 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
+ static int audio_close(hw_device_t *device)
  {
- 	switch (cat) {
-@@ -213,13 +220,23 @@ static void capabilities(int level, struct frame *frm)
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)device;
++	size_t i;
  
- 		if (cat == 7) {
- 			uint8_t type, codec;
--			uint16_t tmp, freq;
--			uint32_t bitrate;
-+			uint16_t tmp, freq, vndcodec = 0;
-+			uint32_t bitrate, vendor = 0;
+ 	DBG("");
  
- 			type  = get_u8(frm);
- 			codec = get_u8(frm);
+ 	unregister_endpoints();
  
--			printf("%s - %s\n", cat2str(cat), codec2str(type, codec));
-+			if (codec == 255) {
-+				vendor = btohl(htonl(get_u32(frm)));
-+				vndcodec = btohs(htons(get_u16(frm)));
++	for (i = 0; i < NUM_CODECS; i++) {
++		const struct audio_codec *codec = audio_codecs[i].get();
 +
-+				printf("%s - %s (%s)\n", cat2str(cat),
-+						codec2str(type, codec),
-+						vndcodec2str(vendor, vndcodec));
-+			} else {
-+				printf("%s - %s\n", cat2str(cat),
-+							codec2str(type, codec));
-+			}
++		if (codec->unload)
++			codec->unload();
++	}
++
+ 	shutdown(listen_sk, SHUT_RDWR);
+ 	shutdown(audio_sk, SHUT_RDWR);
  
- 			switch (codec) {
- 			case 0:
-@@ -324,6 +341,33 @@ static void capabilities(int level, struct frame *frm)
- 				printf("%ubps ", bitrate);
- 				printf("%s\n", tmp & 0x80 ? "VBR" : "");
- 				break;
-+			case 255:
-+				if (vendor == 0x0000004f &&
-+							vndcodec == 0x0001) {
-+					tmp = get_u8(frm);
-+					p_indent(level + 1, frm);
-+					if (tmp & 0x80)
-+						printf("16kHz ");
-+					if (tmp & 0x40)
-+						printf("32kHz ");
-+					if (tmp & 0x20)
-+						printf("44.1kHz ");
-+					if (tmp & 0x10)
-+						printf("48kHz ");
-+					printf("\n");
-+					p_indent(level + 1, frm);
-+					if (tmp & 0x02)
-+						printf("Stereo ");
-+					if (tmp & 0x01)
-+						printf("Mono ");
-+					printf("\n");
-+					break;
-+				} else {
-+					hex_dump(level + 1, frm, len - 8);
-+					frm->ptr += (len - 8);
-+					frm->len -= (len - 8);
-+				}
-+				break;
- 			default:
- 				hex_dump(level + 1, frm, len - 2);
- 				frm->ptr += (len - 2);
+@@ -1478,6 +1486,7 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 							hw_device_t **device)
+ {
+ 	struct a2dp_audio_dev *a2dp_dev;
++	size_t i;
+ 	int err;
+ 
+ 	DBG("");
+@@ -1516,6 +1525,13 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 	a2dp_dev->dev.close_input_stream = audio_close_input_stream;
+ 	a2dp_dev->dev.dump = audio_dump;
+ 
++	for (i = 0; i < NUM_CODECS; i++) {
++		const struct audio_codec *codec = audio_codecs[i].get();
++
++		if (codec->load)
++			codec->load();
++	}
++
+ 	/*
+ 	 * Note that &a2dp_dev->dev.common is the same pointer as a2dp_dev.
+ 	 * This results from the structure of following structs:a2dp_audio_dev,
+diff --git a/android/hal-audio.h b/android/hal-audio.h
+index be71473..decbdd8 100644
+--- a/android/hal-audio.h
++++ b/android/hal-audio.h
+@@ -75,6 +75,9 @@ struct audio_codec {
+ 	uint8_t type;
+ 	bool use_rtp;
+ 
++	bool (*load) (void);
++	void (*unload) (void);
++
+ 	int (*get_presets) (struct audio_preset *preset, size_t *len);
+ 
+ 	bool (*init) (struct audio_preset *preset, uint16_t mtu,
 -- 
 1.9.3
 
