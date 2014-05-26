@@ -1,82 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset=windows-1252
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH v2 1/8] Bluetooth: Refactor l2cap_sock_sendmsg() to copy user buffer
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1401092222.2400.18.camel@jrissane-mobl.ger.corp.intel.com>
+Date: Mon, 26 May 2014 14:13:08 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/6] shared/gatt: Define atribute permissions as uint32_t
-Date: Mon, 26 May 2014 14:19:20 +0200
-Message-ID: <13606412.hJyRAG23iT@uw000953>
-In-Reply-To: <1401095429-28432-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1401095429-28432-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <09DFE249-71A0-44E6-8552-0BDE5CC656EF@holtmann.org>
+References: <1400837248-12179-1-git-send-email-jukka.rissanen@linux.intel.com> <1400837248-12179-2-git-send-email-jukka.rissanen@linux.intel.com> <98B7DE79-FFC6-435F-86DA-36F11C8F7C2B@holtmann.org> <1401092222.2400.18.camel@jrissane-mobl.ger.corp.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Jukka,
 
-On Monday 26 of May 2014 11:10:24 Marcin Kraglak wrote:
-> ---
->  src/shared/gatt-db.c | 6 +++---
->  src/shared/gatt-db.h | 4 ++--
->  2 files changed, 5 insertions(+), 5 deletions(-)
+>>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>>> index f59e00c..7e7b28a 100644
+>>> --- a/net/bluetooth/l2cap_sock.c
+>>> +++ b/net/bluetooth/l2cap_sock.c
+>>> @@ -948,6 +948,7 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+>>> {
+>>> 	struct sock *sk = sock->sk;
+>>> 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+>>> +	unsigned char *buf;
+>>> 	int err;
+>>> 
+>>> 	BT_DBG("sock %p, sk %p", sock, sk);
+>>> @@ -968,10 +969,21 @@ static int l2cap_sock_sendmsg(struct kiocb *iocb, struct socket *sock,
+>>> 	if (err)
+>>> 		return err;
+>>> 
+>>> +	buf = kmalloc(len, GFP_KERNEL);
+>>> +	if (!buf)
+>>> +		return -ENOMEM;
+>>> +
+>>> +	if (memcpy_fromiovec(buf, msg->msg_iov, len)) {
+>>> +		err = -EFAULT;
+>>> +		goto done;
+>>> +	}
+>>> +
+>>> 	l2cap_chan_lock(chan);
+>>> -	err = l2cap_chan_send(chan, msg, len, sk->sk_priority);
+>>> +	err = l2cap_chan_send(chan, buf, len, sk->sk_priority, msg->msg_flags);
+>>> 	l2cap_chan_unlock(chan);
+>>> 
+>>> +done:
+>>> +	kfree(buf);
+>>> 	return err;
+>>> }
+>> 
+>> We don’t have to use chan->ops->alloc_skb here? Has this become obsolete now?
 > 
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index 36316af..90c09bb 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -48,7 +48,7 @@ struct gatt_db {
->  struct gatt_db_attribute {
->  	uint16_t handle;
->  	bt_uuid_t uuid;
-> -	uint8_t permissions;
-> +	uint32_t permissions;
->  	uint16_t value_len;
->  	uint8_t *value;
->  
-> @@ -269,7 +269,7 @@ static void set_attribute_data(struct gatt_db_attribute *attribute,
->  
->  uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
->  						const bt_uuid_t *uuid,
-> -						uint8_t permissions,
-> +						uint32_t permissions,
->  						uint8_t properties,
->  						gatt_db_read_t read_func,
->  						gatt_db_write_t write_func,
-> @@ -317,7 +317,7 @@ uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
->  
->  uint16_t gatt_db_add_char_descriptor(struct gatt_db *db, uint16_t handle,
->  						const bt_uuid_t *uuid,
-> -						uint8_t permissions,
-> +						uint32_t permissions,
->  						gatt_db_read_t read_func,
->  						gatt_db_write_t write_func,
->  						void *user_data)
-> diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-> index 3d46730..350e34e 100644
-> --- a/src/shared/gatt-db.h
-> +++ b/src/shared/gatt-db.h
-> @@ -41,7 +41,7 @@ typedef void (*gatt_db_write_t) (uint16_t handle, uint16_t offset,
->  
->  uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
->  						const bt_uuid_t *uuid,
-> -						uint8_t permissions,
-> +						uint32_t permissions,
->  						uint8_t properties,
->  						gatt_db_read_t read_func,
->  						gatt_db_write_t write_func,
-> @@ -49,7 +49,7 @@ uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
->  
->  uint16_t gatt_db_add_char_descriptor(struct gatt_db *db, uint16_t handle,
->  						const bt_uuid_t *uuid,
-> -						uint8_t permissions,
-> +						uint32_t permissions,
->  						gatt_db_read_t read_func,
->  						gatt_db_write_t write_func,
->  						void *user_data);
-> 
+> Isn't the buf here just a normal memory buffer that stores just the user
+> data and has nothing to do with sk_buff that is returned by alloc_skb()?
 
-All patches applied (with some cleanups in the last one), thanks.
+I asked the question, because I do not know. Do we need alloc_skb callback at all.
 
--- 
-Best regards, 
-Szymon Janc
+Regards
+
+Marcel
+
