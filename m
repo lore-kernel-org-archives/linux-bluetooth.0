@@ -1,288 +1,122 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1400760367-24915-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1400760367-24915-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 27 May 2014 16:08:09 +0300
-Message-ID: <CABBYNZLMKcj_fpSNfpHftuzWiWA=WTOotseftrBf2202iqT-PA@mail.gmail.com>
-Subject: Re: [RFCv0 07/14] android/hal-sco: Use global sco file descriptor
+In-Reply-To: <1401177171-19994-2-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
+	<1401177171-19994-2-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Tue, 27 May 2014 15:49:28 +0300
+Message-ID: <CABBYNZ+1MJevdU8HiY+p-72aNYJT9dRQyp0ki7aQRmdRt5fUFQ@mail.gmail.com>
+Subject: Re: [PATCH 1/9] doc: Introduce connection monitoring API
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi,
 
-On Thu, May 22, 2014 at 3:06 PM, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Tue, May 27, 2014 at 10:52 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 >
-> Android may open input/output stream independently so we use global sco
-> file descriptor and mutexes.
+> This patch introduces API to monitor connection parameters.
+>
+> New device properties are introduced: ConnectionRSSI, ConnectionTXPower
+> and ConnectionTXPowerMax.
+>
+> Client can request to poll for updates of RSSI and TX power via Start-
+> and StopConnectionMonitor methods.
 > ---
->  android/hal-sco.c | 85 ++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 50 insertions(+), 35 deletions(-)
+>  doc/device-api.txt | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 56 insertions(+)
 >
-> diff --git a/android/hal-sco.c b/android/hal-sco.c
-> index e940547..8c2549b 100644
-> --- a/android/hal-sco.c
-> +++ b/android/hal-sco.c
-> @@ -46,6 +46,10 @@
->  static int listen_sk = -1;
->  static int ipc_sk = -1;
+> diff --git a/doc/device-api.txt b/doc/device-api.txt
+> index 577ee60..67f573c 100644
+> --- a/doc/device-api.txt
+> +++ b/doc/device-api.txt
+> @@ -100,6 +100,35 @@ Methods            void Connect()
+>                         Possible errors: org.bluez.Error.DoesNotExist
+>                                          org.bluez.Error.Failed
 >
-> +static int sco_fd = -1;
-> +static uint16_t sco_mtu = 0;
-> +static pthread_mutex_t sco_mutex = PTHREAD_MUTEX_INITIALIZER;
 > +
-
-Do we really need a mutex for this? I mean this is almost the same as
-protecting the device itself for opening concurrent input and output,
-if that is the case then I think it is better to put the mutex there.
-
->  static pthread_t ipc_th = 0;
->  static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
->
-> @@ -53,7 +57,6 @@ struct sco_audio_config {
->         uint32_t rate;
->         uint32_t channels;
->         uint32_t frame_num;
-> -       uint16_t mtu;
->         audio_format_t format;
->  };
->
-> @@ -61,7 +64,6 @@ struct sco_stream_out {
->         struct audio_stream_out stream;
->
->         struct sco_audio_config cfg;
-> -       int fd;
->
->         uint8_t *downmix_buf;
->         uint8_t *cache;
-> @@ -79,7 +81,6 @@ struct sco_stream_in {
->         struct audio_stream_in stream;
->
->         struct sco_audio_config cfg;
-> -       int fd;
->  };
->
->  struct sco_dev {
-> @@ -257,18 +258,25 @@ failed:
->         return SCO_STATUS_FAILED;
->  }
->
-> -static int ipc_connect_sco(int *fd, uint16_t *mtu)
-> +static int ipc_connect_sco(void)
->  {
->         struct sco_rsp_connect rsp;
->         size_t rsp_len = sizeof(rsp);
-> -       int ret;
-> +       int ret = SCO_STATUS_SUCCESS;
->
->         DBG("");
->
-> -       ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL, &rsp_len,
-> -                                                               &rsp, fd);
-> +       pthread_mutex_lock(&sco_mutex);
+> +               void StartConnectionMonitor()
 > +
-> +       if (sco_fd < 0) {
-> +               ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL,
-> +                                               &rsp_len, &rsp, &sco_fd);
+> +                       This method starts connection monitor session. This
+> +                       includes link RSSI and TX power.
+> +                       Use StopConnectionMonitor to release the sessions
+> +                       acquired.
 > +
-> +               /* Sometimes mtu returned is wrong */
-> +               sco_mtu = /* rsp.mtu */ 48;
-> +       }
->
-> -       *mtu = rsp.mtu;
-> +       pthread_mutex_unlock(&sco_mutex);
->
->         return ret;
->  }
-> @@ -311,28 +319,27 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
->         struct pollfd pfd;
->         size_t len, written = 0;
->         int ret;
-> -       uint16_t mtu = out->cfg.mtu;
->         uint8_t *p;
->         uint64_t audio_sent_us, audio_passed_us;
->
-> -       pfd.fd = out->fd;
-> -       pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
-> +       pfd.fd = sco_fd;
-> +       pfd.events = POLLOUT | POLLHUP | POLLNVAL;
->
->         while (bytes > written) {
->                 struct timespec now;
->
->                 /* poll for sending */
->                 if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
-> -                       DBG("timeout fd %d", out->fd);
-> +                       DBG("timeout fd %d", sco_fd);
->                         return false;
->                 }
->
->                 if (pfd.revents & (POLLHUP | POLLNVAL)) {
-> -                       error("error fd %d, events 0x%x", out->fd, pfd.revents);
-> +                       error("error fd %d, events 0x%x", sco_fd, pfd.revents);
->                         return false;
->                 }
->
-> -               len = bytes - written > mtu ? mtu : bytes - written;
-> +               len = bytes - written > sco_mtu ? sco_mtu : bytes - written;
->
->                 clock_gettime(CLOCK_REALTIME, &now);
->                 /* Mark start of the stream */
-> @@ -357,11 +364,11 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
->                 if (out->cache_len) {
->                         DBG("First packet cache_len %zd", out->cache_len);
->                         memcpy(out->cache + out->cache_len, buffer,
-> -                                                       mtu - out->cache_len);
-> +                                               sco_mtu - out->cache_len);
->                         p = out->cache;
->                 }
->
-> -               if (bytes - written >= mtu)
-> +               if (bytes - written >= sco_mtu)
->                         p = (void *) buffer + written;
->                 else {
->                         memcpy(out->cache, buffer + written, bytes - written);
-> @@ -371,10 +378,10 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
->                         continue;
->                 }
->
-> -               ret = write(out->fd, p, len);
-> +               ret = write(sco_fd, p, len);
->                 if (ret > 0) {
->                         if (out->cache_len) {
-> -                               written = mtu - out->cache_len;
-> +                               written = sco_mtu - out->cache_len;
->                                 out->cache_len = 0;
->                         } else
->                                 written += ret;
-> @@ -394,7 +401,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
->
->                 if (errno != EINTR) {
->                         ret = errno;
-> -                       error("write failed (%d) fd %d bytes %zd", ret, out->fd,
-> +                       error("write failed (%d) fd %d bytes %zd", ret, sco_fd,
->                                                                         bytes);
->                         return false;
->                 }
-> @@ -414,7 +421,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
->         void *send_buf = out->downmix_buf;
->         size_t total;
->
-> -       DBG("write to fd %d bytes %zu", out->fd, bytes);
-> +       DBG("write to fd %d bytes %zu", sco_fd, bytes);
->
->         if (!out->downmix_buf) {
->                 error("sco: downmix buffer not initialized");
-> @@ -585,19 +592,17 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
->  {
->         struct sco_dev *adev = (struct sco_dev *) dev;
->         struct sco_stream_out *out;
-> -       int fd = -1;
->         int chan_num, ret;
->         size_t resample_size;
-> -       uint16_t mtu;
->
->         DBG("config %p device flags 0x%02x", config, devices);
->
-> -       if (ipc_connect_sco(&fd, &mtu) != SCO_STATUS_SUCCESS) {
-> +       if (ipc_connect_sco() != SCO_STATUS_SUCCESS) {
->                 error("sco: cannot get fd");
->                 return -EIO;
->         }
->
-> -       DBG("got sco fd %d mtu %u", fd, mtu);
-> +       DBG("got sco fd %d mtu %u", sco_fd, sco_mtu);
->
->         out = calloc(1, sizeof(struct sco_stream_out));
->         if (!out)
-> @@ -636,16 +641,13 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
->
->         out->cfg.frame_num = OUT_STREAM_FRAMES;
->
-> -       /* we get wrong mtu size for some reason */
-> -       out->cfg.mtu = /* mtu */ 48;
-> -
->         out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
->         if (!out->downmix_buf) {
->                 free(out);
->                 return -ENOMEM;
->         }
->
-> -       out->cache = malloc(out->cfg.mtu);
-> +       out->cache = malloc(sco_mtu);
->         if (!out->cache) {
->                 free(out->downmix_buf);
->                 free(out);
-> @@ -691,7 +693,6 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
->
->         *stream_out = &out->stream;
->         adev->out = out;
-> -       out->fd = fd;
->
->         return 0;
->  failed:
-> @@ -704,18 +705,30 @@ failed:
->         return ret;
->  }
->
-> +static void close_sco_socket(void)
-> +{
-> +       DBG("");
+> +                       This process will start updating connection-related
+> +                       properties, e.g. ConnectionRSSI and ConnectionTXPower.
 > +
-> +       pthread_mutex_lock(&sco_mutex);
+> +                       Note that all sessions for device are released when
+> +                       device is disconnected and it's required to start
+> +                       sessiong again once reconnected.
 > +
-> +       if (sco_fd >= 0) {
-> +               shutdown(sco_fd, SHUT_RDWR);
-> +               close(sco_fd);
-> +               sco_fd = -1;
-> +       }
+> +                       Possible errors: org.bluez.Error.Busy
+> +                                        org.bluez.Error.NotConnected
 > +
-> +       pthread_mutex_unlock(&sco_mutex);
-> +}
+> +               void StopConnectionMonitor()
 > +
->  static void sco_close_output_stream(struct audio_hw_device *dev,
->                                         struct audio_stream_out *stream_out)
->  {
->         struct sco_dev *sco_dev = (struct sco_dev *) dev;
->         struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
->
-> -       DBG("dev %p stream %p fd %d", dev, out, sco_dev->out->fd);
-> +       DBG("dev %p stream %p fd %d", dev, out, sco_fd);
->
-> -       if (out && out->fd >= 0) {
-> -               close(out->fd);
-> -               out->fd = -1;
-> -       }
-> +       close_sco_socket();
->
->         free(out->cache);
->         free(out->downmix_buf);
-> @@ -965,7 +978,9 @@ static void sco_close_input_stream(struct audio_hw_device *dev,
->         struct sco_dev *sco_dev = (struct sco_dev *) dev;
->         struct sco_stream_in *in = (struct sco_stream_in *) stream_in;
->
-> -       DBG("dev %p stream %p fd %d", dev, in, in->fd);
-> +       DBG("dev %p stream %p fd %d", dev, in, sco_fd);
+> +                       This method stops previous StartConnectionMonitor
+> +                       session.
 > +
-> +       close_sco_socket();
+> +                       Note that connection monitor is shared between all
+> +                       monitor sessions thus calling StopConnectionMonitor
+> +                       releases a single session.
+> +
+> +                       Possible errors: org.bluez.Error.Failed
+> +
+>  Properties     string Address [readonly]
 >
->         free(in);
->         sco_dev->in = NULL;
+>                         The Bluetooth device address of the remote device.
+> @@ -193,3 +222,30 @@ Properties string Address [readonly]
+>
+>                         Received Signal Strength Indicator of the remote
+>                         device (inquiry or advertising).
+> +
+> +               int16 ConnectionRSSI [readonly, optional]
+> +
+> +                       Received Signal Strength Indicator of connected remote
+> +                       device.
+> +
+> +                       This property is present only if device is connected
+> +                       and will be updated if at least one monitoring session
+> +                       is active.
+> +
+> +                       Note that RSSI has different units for BR/EDR (dB)
+> +                       and LE (dBm) as specified in BT Core ver. 4.1, Vol. 2,
+> +                       Part E, Chapter 7.5.4
+> +
+> +               int16 ConnectionTXPower [readonly, optional]
+> +
+> +                       Transmit power level to connected remote device.
+> +
+> +                       This property is present only if device is connected
+> +                       and will be updated if at least one monitoring session
+> +                       is active.
+> +
+> +               int16 ConnectionTXPowerMax [readonly, optional]
+> +
+> +                       Maximum transmit power level to connected remote device.
+> +
+> +                       This property is present only if device is connected.
 > --
-> 1.8.3.2
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 1.9.3
 
+IMO this API is too low level, if there is a reliable way to calculate
+the link quality we should do it and probably expose as a single
+property in percentage like we see in WiFi and other technologies,
+trying to push this to the application to figure out is probably bad
+idea since different applications may come up with different results.
 
+I would follow connman API design:
+
+  uint8 Strength [readonly]
+
+  Indicates the signal strength of the service. This
+  is a normalized value between 0 and 100...
 
 -- 
 Luiz Augusto von Dentz
