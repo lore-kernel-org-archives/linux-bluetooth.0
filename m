@@ -2,63 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 6/6] android/gatt: Exchange mtu on connect if acting as client
-Date: Tue, 27 May 2014 12:15:34 +0200
-Message-Id: <1401185734-23672-6-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/6] shared/gatt-db: Fix cropping permissions value
+Date: Tue, 27 May 2014 12:15:32 +0200
+Message-Id: <1401185734-23672-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1401185734-23672-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1401185734-23672-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When no client apps are registered we basically act as server only and
-mtu exchange request handling is enough. When acting as client we send
-request.
 ---
- android/gatt.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ src/shared/gatt-db.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index a8f072f..b120834 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -320,11 +320,24 @@ static bool match_app_by_id(const void *data, const void *user_data)
- 	return client->id == exp_id;
- }
- 
-+static bool match_app_by_type(const void *data, const void *user_data)
-+{
-+	gatt_app_type_t app_type = PTR_TO_INT(user_data);
-+	const struct gatt_app *app = data;
-+
-+	return app->type == app_type;
-+}
-+
- static struct gatt_app *find_app_by_id(int32_t id)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index d6f3143..998e93e 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -258,7 +258,7 @@ static uint16_t update_attribute_handle(struct gatt_db_service *service,
+ static void set_attribute_data(struct gatt_db_attribute *attribute,
+ 						gatt_db_read_t read_func,
+ 						gatt_db_write_t write_func,
+-						uint8_t permissions,
++						uint32_t permissions,
+ 						void *user_data)
  {
- 	return queue_find(gatt_apps, match_app_by_id, INT_TO_PTR(id));
- }
- 
-+static struct gatt_app *find_app_by_type(gatt_app_type_t type)
-+{
-+	return queue_find(gatt_apps, match_app_by_type, INT_TO_PTR(type));
-+}
-+
- static bool match_by_value(const void *data, const void *user_data)
- {
- 	return data == user_data;
-@@ -1116,9 +1129,9 @@ static void connect_cb(GIOChannel *io, GError *gerr, gpointer user_data)
- 
- 	device_set_state(dev, DEVICE_CONNECTED);
- 
--	/* Send exchange mtu request as we assume being client and server */
--	/* TODO: Dont exchange mtu if no client apps */
--	send_exchange_mtu_request(dev);
-+	/* Send exchange mtu request if any client app was registered */
-+	if (find_app_by_type(APP_CLIENT))
-+		send_exchange_mtu_request(dev);
- 
- 	status = GATT_SUCCESS;
- 
+ 	attribute->permissions = permissions;
 -- 
 1.9.3
 
