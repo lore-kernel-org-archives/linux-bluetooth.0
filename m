@@ -1,105 +1,143 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Eva Kolanska <eva.kolanska@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [RFC 1/3] android: Add gatt CCC value storage
-Date: Tue, 27 May 2014 16:33:41 +0200
-Message-Id: <1401201223-17852-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
+Cc: Eva Kolanska <eva.kolanska@tieto.com>
+Subject: [PATCH] android/pts: Update GATT PTS tests results
+Date: Tue, 27 May 2014 16:22:39 +0200
+Message-Id: <1401200559-10561-1-git-send-email-eva.kolanska@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Client Characteristic Configuration for Service Changed Characteristic
-should be stored for every bonded device, so we know if we should be
-sending value (range affected by changes) indication.
 ---
- android/bluetooth.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
- android/bluetooth.h |  4 ++++
- 2 files changed, 49 insertions(+)
+ android/pts-gatt.txt |   87 +++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 76 insertions(+), 11 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 8ee2025..dea9be1 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -158,6 +158,7 @@ struct device {
- 	bool valid_local_csrk;
- 	uint8_t local_csrk[16];
- 	uint32_t local_sign_cnt;
-+	uint16_t gatt_ccc;
- };
- 
- struct browse_req {
-@@ -645,6 +646,44 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
- 	/* TODO: Gatt attrib set*/
- }
- 
-+void bt_store_gatt_ccc(const bdaddr_t *dst, uint16_t value)
-+{
-+	GKeyFile *key_file;
-+	gsize length = 0;
-+	char addr[18];
-+	char *data;
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
-+		g_key_file_free(key_file);
-+		return;
-+	}
-+
-+	ba2str(dst, addr);
-+
-+	DBG("%s Gatt CCC %d", addr, value);
-+
-+	g_key_file_set_integer(key_file, addr, "GattCCC", value);
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(DEVICES_FILE, data, length, NULL);
-+	g_free(data);
-+
-+	g_key_file_free(key_file);
-+}
-+
-+uint16_t bt_get_gatt_ccc(const bdaddr_t *addr)
-+{
-+	struct device *dev;
-+
-+	dev = find_device(addr);
-+	if (!dev)
-+		return 0;
-+
-+	return dev->gatt_ccc;
-+}
-+
- static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
- 					uint8_t type, uint8_t pin_length)
- {
-@@ -2408,6 +2447,12 @@ static struct device *create_device_from_info(GKeyFile *key_file,
- 						"RemoteCSRKSignCounter", NULL);
- 	}
- 
-+	str = g_key_file_get_string(key_file, peer, "GattCCC", NULL);
-+	if (str) {
-+		dev->gatt_ccc = atoi(str);
-+		g_free(str);
-+	}
-+
- 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
- 	if (str) {
- 		g_free(dev->name);
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 1c14377..b4a5f32 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -66,3 +66,7 @@ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type,
- 					uint8_t key[16], uint32_t *sign_cnt);
- 
- void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
-+
-+void bt_store_gatt_ccc(const bdaddr_t *addr, uint16_t value);
-+
-+uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index d025064..b5126ee 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -19,6 +19,7 @@ TC_GAC_CL_BV_01_C	PASS	haltest:
+ 				gattc get_characteristic
+ 				gattc write_characteristic: type 3
+ TC_GAC_SR_BV_01_C	INC	JIRA: BZ-22
++				PTS issue #12250
+ TC_GAD_CL_BV_01_C	PASS	haltest:
+ 				gattc register_client
+ 				gattc scan
+@@ -131,20 +132,49 @@ TC_GAR_CL_BI_35_C	PASS	haltest:
+ 				gattc read_characteristic
+ TC_GAR_SR_BV_01_C	PASS
+ TC_GAR_SR_BI_01_C	PASS
+-TC_GAR_SR_BI_02_C	INC
++TC_GAR_SR_BI_02_C	PASS
+ TC_GAR_SR_BI_03_C	INC
+-TC_GAR_SR_BI_04_C	INC
++TC_GAR_SR_BI_04_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 3
++				gatts start_service
++				gatts send_response
+ TC_GAR_SR_BI_05_C	INC
+ TC_GAR_SR_BV_03_C	PASS
+-TC_GAR_SR_BI_06_C	INC
++TC_GAR_SR_BI_06_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 16
++				gatts start_service
+ TC_GAR_SR_BI_07_C	PASS
+ TC_GAR_SR_BI_08_C	PASS
+ TC_GAR_SR_BI_09_C	INC
+ TC_GAR_SR_BI_10_C	INC
+ TC_GAR_SR_BI_11_C	INC
+-TC_GAR_SR_BV_04_C	INC
+-TC_GAR_SR_BI_12_C	INC
+-TC_GAR_SR_BI_13_C	INC
++TC_GAR_SR_BV_04_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
++TC_GAR_SR_BI_12_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 8 <permissions> 16
++				gatts start_service
++				gatts send_response
++TC_GAR_SR_BI_13_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
++				gatts send_response: <status> 7
+ TC_GAR_SR_BI_14_C	INC
+ TC_GAR_SR_BI_15_C	INC
+ TC_GAR_SR_BI_16_C	INC
+@@ -155,17 +185,52 @@ TC_GAR_SR_BI_19_C	INC
+ TC_GAR_SR_BI_20_C	INC
+ TC_GAR_SR_BI_21_C	INC
+ TC_GAR_SR_BI_22_C	INC
+-TC_GAR_SR_BV_06_C	INC
++TC_GAR_SR_BV_06_C	PASS haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 2 <permissions> 1
++				gatts add_descriptor
++				gatts start_service
++				gatts send_response
+ TC_GAR_SR_BI_23_C	INC
+-TC_GAR_SR_BI_24_C	INC
++TC_GAR_SR_BI_24_C	PASS haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 2 <permissions> 1
++				gatts add_descriptor
++				gatts start_service
++				gatts send_response: <status> 1
+ TC_GAR_SR_BI_25_C	INC
+ TC_GAR_SR_BI_26_C	INC
+ TC_GAR_SR_BI_27_C	INC
+-TC_GAR_SR_BV_07_C	INC
++TC_GAR_SR_BV_07_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts add_descriptor: <permissions> 1
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
+ TC_GAR_SR_BV_08_C	INC
+ TC_GAR_SR_BI_28_C	INC
+-TC_GAR_SR_BI_29_C	INC
+-TC_GAR_SR_BI_30_C	INC
++TC_GAR_SR_BI_29_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts add_descriptor: <permissions> 1
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
++				gatts send_response: <status> 7
++TC_GAR_SR_BI_30_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts add_descriptor: <permissions> 1
++				gatts start_service
++				gatts send_response: <status> 1
+ TC_GAR_SR_BI_31_C	INC
+ TC_GAR_SR_BI_32_C	INC
+ TC_GAR_SR_BI_33_C	INC
 -- 
-1.9.3
+1.7.9.5
 
