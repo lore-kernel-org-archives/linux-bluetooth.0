@@ -1,74 +1,166 @@
 Return-Path: <cyrus@holtmann.org>
-From: Eva Kolanska <eva.kolanska@tieto.com>
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eva Kolanska <eva.kolanska@tieto.com>
-Subject: [PATCH] android/pts: Update GATT PTS tests results
-Date: Tue, 27 May 2014 10:40:39 +0200
-Message-Id: <1401180039-29269-1-git-send-email-eva.kolanska@tieto.com>
+Subject: [PATCH] Bluetooth: 6LoWPAN: Fix MAC address universal/local bit handling
+Date: Tue, 27 May 2014 11:33:22 +0300
+Message-Id: <1401179602-15133-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-gatt.txt |   38 +++++++++++++++++++++++++-------------
- 1 file changed, 25 insertions(+), 13 deletions(-)
+The universal/local bit handling was incorrectly done in the code.
 
-diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-index 92cbefa..d025064 100644
---- a/android/pts-gatt.txt
-+++ b/android/pts-gatt.txt
-@@ -458,7 +458,7 @@ TC_GAW_SR_BI_32_C	INC
- TC_GAW_SR_BI_33_C	INC
- TC_GAW_SR_BI_34_C	INC
- TC_GAW_SR_BI_35_C	INC
--TC_GAN_CL_BV_01_C	INC	Possible PTS issue
-+TC_GAN_CL_BV_01_C	INC	PTS issue #12249
- TC_GAN_SR_BV_01_C	INC
- TC_GAI_CL_BV_01_C	INC  	PTS issue #12211
- TC_GAI_SR_BV_01_C	INC
-@@ -466,19 +466,31 @@ TC_GAS_CL_BV_01_C	PASS	haltest:
- 				gattc connect
- 				gattc disconnect
- TC_GAS_SR_BV_01_C	INC
--TC_GAT_CL_BV_01_C	INC
--TC_GAT_CL_BV_02_C	INC
-+TC_GAT_CL_BV_01_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc read_characcteristic
-+				gattc disconnect
-+TC_GAT_CL_BV_02_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc write_characcteristic 2 <short_value>
-+				gattc disconnect
- TC_GAT_SR_BV_01_C	INC
--TC_GPA_CL_BV_01_C	INC
--TC_GPA_CL_BV_02_C	INC
--TC_GPA_CL_BV_03_C	INC
--TC_GPA_CL_BV_04_C	INC
--TC_GPA_CL_BV_05_C	INC
--TC_GPA_CL_BV_06_C	INC
--TC_GPA_CL_BV_07_C	INC
--TC_GPA_CL_BV_08_C	INC
--TC_GPA_CL_BV_11_C	INC
--TC_GPA_CL_BV_12_C	INC
-+TC_GPA_CL_BV_01_C	INC	gatttool required
-+TC_GPA_CL_BV_02_C	INC	gatttool required
-+TC_GPA_CL_BV_03_C	INC	gatttool required
-+TC_GPA_CL_BV_04_C	INC	gatttool required
-+TC_GPA_CL_BV_05_C	INC	gatttool required
-+TC_GPA_CL_BV_06_C	INC	gatttool required
-+TC_GPA_CL_BV_07_C	INC	gatttool required
-+TC_GPA_CL_BV_08_C	INC	gatttool required
-+TC_GPA_CL_BV_11_C	INC	gatttool required
-+TC_GPA_CL_BV_12_C	INC	gatttool required
- TC_GPA_SR_BV_01_C	INC
- TC_GPA_SR_BV_02_C	INC
- TC_GPA_SR_BV_03_C	INC
+So when setting EUI address from BD address we do this:
+- If BD address type is PUBLIC, then we clear the universal bit
+  in EUI address. If the address type is RANDOM, then the universal
+  bit is set (BT 6lowpan draft chapter 3.2.2)
+- After this we invert the universal/local bit according to RFC 2464
+
+When figuring out BD address we do the reverse:
+- Take EUI address from stateless IPv6 address, invert the
+  universal/local bit according to RFC 2464
+- If universal bit is 1 in this modified EUI address, then address
+  type is set to RANDOM, otherwise it is PUBLIC
+
+Note that 6lowpan_iphc.[ch] does the final toggling of U/L bit
+before sending or receiving the network packet.
+
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ net/bluetooth/6lowpan.c | 65 ++++++++++++++++++++++++++-----------------------
+ 1 file changed, 35 insertions(+), 30 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index adb3ea0..d906016 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -420,12 +420,18 @@ static int conn_send(struct l2cap_conn *conn,
+ 	return 0;
+ }
+ 
+-static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
+-			    bdaddr_t *addr, u8 *addr_type)
++static u8 get_addr_type_from_eui64(u8 byte)
+ {
+-	u8 *eui64;
++	/* Is universal(0) or local(1) bit,  */
++	if (byte & 0x02)
++		return ADDR_LE_DEV_RANDOM;
+ 
+-	eui64 = ip6_daddr->s6_addr + 8;
++	return ADDR_LE_DEV_PUBLIC;
++}
++
++static void copy_to_bdaddr(struct in6_addr *ip6_daddr, bdaddr_t *addr)
++{
++	u8 *eui64 = ip6_daddr->s6_addr + 8;
+ 
+ 	addr->b[0] = eui64[7];
+ 	addr->b[1] = eui64[6];
+@@ -433,16 +439,19 @@ static void get_dest_bdaddr(struct in6_addr *ip6_daddr,
+ 	addr->b[3] = eui64[2];
+ 	addr->b[4] = eui64[1];
+ 	addr->b[5] = eui64[0];
++}
+ 
+-	addr->b[5] ^= 2;
++static void convert_dest_bdaddr(struct in6_addr *ip6_daddr,
++				bdaddr_t *addr, u8 *addr_type)
++{
++	copy_to_bdaddr(ip6_daddr, addr);
+ 
+-	/* Set universal/local bit to 0 */
+-	if (addr->b[5] & 1) {
+-		addr->b[5] &= ~1;
+-		*addr_type = ADDR_LE_DEV_PUBLIC;
+-	} else {
+-		*addr_type = ADDR_LE_DEV_RANDOM;
+-	}
++	/* We need to toggle the U/L bit that we got from IPv6 address
++	 * so that we get the proper address and type of the BD address.
++	 */
++	addr->b[5] ^= 0x02;
++
++	*addr_type = get_addr_type_from_eui64(addr->b[5]);
+ }
+ 
+ static int header_create(struct sk_buff *skb, struct net_device *netdev,
+@@ -473,9 +482,11 @@ static int header_create(struct sk_buff *skb, struct net_device *netdev,
+ 		/* Get destination BT device from skb.
+ 		 * If there is no such peer then discard the packet.
+ 		 */
+-		get_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
++		convert_dest_bdaddr(&hdr->daddr, &addr, &addr_type);
+ 
+-		BT_DBG("dest addr %pMR type %d", &addr, addr_type);
++		BT_DBG("dest addr %pMR type %s IP %pI6c", &addr,
++		       addr_type == ADDR_LE_DEV_PUBLIC ? "PUBLIC" : "RANDOM",
++		       &hdr->daddr);
+ 
+ 		read_lock_irqsave(&devices_lock, flags);
+ 		peer = peer_lookup_ba(dev, &addr, addr_type);
+@@ -556,7 +567,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 	} else {
+ 		unsigned long flags;
+ 
+-		get_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
++		convert_dest_bdaddr(&lowpan_cb(skb)->addr, &addr, &addr_type);
+ 		eui64_addr = lowpan_cb(skb)->addr.s6_addr + 8;
+ 		dev = lowpan_dev(netdev);
+ 
+@@ -564,8 +575,10 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 		peer = peer_lookup_ba(dev, &addr, addr_type);
+ 		read_unlock_irqrestore(&devices_lock, flags);
+ 
+-		BT_DBG("xmit from %s to %pMR (%pI6c) peer %p", netdev->name,
+-		       &addr, &lowpan_cb(skb)->addr, peer);
++		BT_DBG("xmit %s to %pMR type %s IP %pI6c peer %p",
++		       netdev->name, &addr,
++		       addr_type == ADDR_LE_DEV_PUBLIC ? "PUBLIC" : "RANDOM",
++		       &lowpan_cb(skb)->addr, peer);
+ 
+ 		if (peer && peer->conn)
+ 			err = send_pkt(peer->conn, netdev->dev_addr,
+@@ -620,13 +633,13 @@ static void set_addr(u8 *eui, u8 *addr, u8 addr_type)
+ 	eui[6] = addr[1];
+ 	eui[7] = addr[0];
+ 
+-	eui[0] ^= 2;
+-
+-	/* Universal/local bit set, RFC 4291 */
++	/* Universal/local bit set, BT 6lowpan draft ch. 3.2.1 */
+ 	if (addr_type == ADDR_LE_DEV_PUBLIC)
+-		eui[0] |= 1;
++		eui[0] &= ~0x02;
+ 	else
+-		eui[0] &= ~1;
++		eui[0] |= 0x02;
++
++	BT_DBG("type %d addr %*phC", addr_type, 8, eui);
+ }
+ 
+ static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+@@ -634,7 +647,6 @@ static void set_dev_addr(struct net_device *netdev, bdaddr_t *addr,
+ {
+ 	netdev->addr_assign_type = NET_ADDR_PERM;
+ 	set_addr(netdev->dev_addr, addr->b, addr_type);
+-	netdev->dev_addr[0] ^= 2;
+ }
+ 
+ static void ifup(struct net_device *netdev)
+@@ -684,13 +696,6 @@ static int add_peer_conn(struct l2cap_conn *conn, struct lowpan_dev *dev)
+ 
+ 	memcpy(&peer->eui64_addr, (u8 *)&peer->peer_addr.s6_addr + 8,
+ 	       EUI64_ADDR_LEN);
+-	peer->eui64_addr[0] ^= 2; /* second bit-flip (Universe/Local)
+-				   * is done according RFC2464
+-				   */
+-
+-	raw_dump_inline(__func__, "peer IPv6 address",
+-			(unsigned char *)&peer->peer_addr, 16);
+-	raw_dump_inline(__func__, "peer EUI64 address", peer->eui64_addr, 8);
+ 
+ 	write_lock_irqsave(&devices_lock, flags);
+ 	INIT_LIST_HEAD(&peer->list);
 -- 
-1.7.9.5
+1.8.3.1
 
