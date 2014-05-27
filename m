@@ -1,100 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Lukasz Rymanowski
-	<lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/9] doc: Introduce connection monitoring API
-Date: Tue, 27 May 2014 09:52:43 +0200
-Message-ID: <1401177171-19994-2-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Andrzej Kaczmarek
+	<andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 5/9] core: Make connection properties exist only when connected
+Date: Tue, 27 May 2014 09:52:47 +0200
+Message-ID: <1401177171-19994-6-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-
-This patch introduces API to monitor connection parameters.
-
-New device properties are introduced: ConnectionRSSI, ConnectionTXPower
-and ConnectionTXPowerMax.
-
-Client can request to poll for updates of RSSI and TX power via Start-
-and StopConnectionMonitor methods.
+This patch adds common 'exists' function for Connection* properties
+on org.bluez.Device1 interface. It will make properties to exist only
+when device is connected since they do not make sense otherwise.
 ---
- doc/device-api.txt | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 56 insertions(+)
+ src/device.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 577ee60..67f573c 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -100,6 +100,35 @@ Methods		void Connect()
- 			Possible errors: org.bluez.Error.DoesNotExist
- 					 org.bluez.Error.Failed
+diff --git a/src/device.c b/src/device.c
+index 8661386..a66f397 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -864,6 +864,22 @@ static gboolean dev_property_get_conn_max_txpower(
+ 	return TRUE;
+ }
  
++static gboolean dev_property_exists_conn(const GDBusPropertyTable *property,
++								void *data)
++{
++	struct btd_device *device = data;
 +
-+		void StartConnectionMonitor()
++	/* Properties do not exist on disconnected device */
++	if (!btd_device_is_connected(device))
++		return FALSE;
 +
-+			This method starts connection monitor session. This
-+			includes link RSSI and TX power.
-+			Use StopConnectionMonitor to release the sessions
-+			acquired.
++	/* Properties do not exist if no one requested monitoring */
++	if (!queue_length(device->monitor_list))
++		return FALSE;
 +
-+			This process will start updating connection-related
-+			properties, e.g. ConnectionRSSI and ConnectionTXPower.
++	return TRUE;
++}
 +
-+			Note that all sessions for device are released when
-+			device is disconnected and it's required to start
-+			sessiong again once reconnected.
-+
-+			Possible errors: org.bluez.Error.Busy
-+					 org.bluez.Error.NotConnected
-+
-+		void StopConnectionMonitor()
-+
-+			This method stops previous StartConnectionMonitor
-+			session.
-+
-+			Note that connection monitor is shared between all
-+			monitor sessions thus calling StopConnectionMonitor
-+			releases a single session.
-+
-+			Possible errors: org.bluez.Error.Failed
-+
- Properties	string Address [readonly]
+ static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
+ {
+ 	struct btd_device *device = data;
+@@ -1957,9 +1973,12 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Modalias", "s", dev_property_get_modalias, NULL,
+ 						dev_property_exists_modalias },
+ 	{ "Adapter", "o", dev_property_get_adapter },
+-	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
+-	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower },
+-	{ "ConnectionTXPowerMax", "n", dev_property_get_conn_max_txpower },
++	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi, NULL,
++						dev_property_exists_conn },
++	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower, NULL,
++						dev_property_exists_conn },
++	{ "ConnectionTXPowerMax", "n", dev_property_get_conn_max_txpower, NULL,
++						dev_property_exists_conn },
+ 	{ }
+ };
  
- 			The Bluetooth device address of the remote device.
-@@ -193,3 +222,30 @@ Properties	string Address [readonly]
- 
- 			Received Signal Strength Indicator of the remote
- 			device (inquiry or advertising).
-+
-+		int16 ConnectionRSSI [readonly, optional]
-+
-+			Received Signal Strength Indicator of connected remote
-+			device.
-+
-+			This property is present only if device is connected
-+			and will be updated if at least one monitoring session
-+			is active.
-+
-+			Note that RSSI has different units for BR/EDR (dB)
-+			and LE (dBm) as specified in BT Core ver. 4.1, Vol. 2,
-+			Part E, Chapter 7.5.4
-+
-+		int16 ConnectionTXPower [readonly, optional]
-+
-+			Transmit power level to connected remote device.
-+
-+			This property is present only if device is connected
-+			and will be updated if at least one monitoring session
-+			is active.
-+
-+		int16 ConnectionTXPowerMax [readonly, optional]
-+
-+			Maximum transmit power level to connected remote device.
-+
-+			This property is present only if device is connected.
 -- 
 1.9.3
