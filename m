@@ -1,109 +1,100 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
-CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Andrzej Kaczmarek
-	<andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 3/9] core: Add ConnectionTXPower property
-Date: Tue, 27 May 2014 09:52:45 +0200
-Message-ID: <1401177171-19994-4-git-send-email-andrzej.kaczmarek@tieto.com>
+CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Lukasz Rymanowski
+	<lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/9] doc: Introduce connection monitoring API
+Date: Tue, 27 May 2014 09:52:43 +0200
+Message-ID: <1401177171-19994-2-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds ConnectionTXPower property on org.bluez.Device1
-interface which provides local TX power on currently connected link.
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 
-Property value will be refreshed once connection monitoring code is in
-place.
+This patch introduces API to monitor connection parameters.
+
+New device properties are introduced: ConnectionRSSI, ConnectionTXPower
+and ConnectionTXPowerMax.
+
+Client can request to poll for updates of RSSI and TX power via Start-
+and StopConnectionMonitor methods.
 ---
- src/device.c | 32 ++++++++++++++++++++++++++++++++
- src/device.h |  1 +
- 2 files changed, 33 insertions(+)
+ doc/device-api.txt | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 56 insertions(+)
 
-diff --git a/src/device.c b/src/device.c
-index fd4e120..ac42a75 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -220,6 +220,7 @@ struct btd_device {
- 	int8_t		rssi;
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 577ee60..67f573c 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -100,6 +100,35 @@ Methods		void Connect()
+ 			Possible errors: org.bluez.Error.DoesNotExist
+ 					 org.bluez.Error.Failed
  
- 	int8_t		conn_rssi;
-+	int8_t		conn_tx_power;
++
++		void StartConnectionMonitor()
++
++			This method starts connection monitor session. This
++			includes link RSSI and TX power.
++			Use StopConnectionMonitor to release the sessions
++			acquired.
++
++			This process will start updating connection-related
++			properties, e.g. ConnectionRSSI and ConnectionTXPower.
++
++			Note that all sessions for device are released when
++			device is disconnected and it's required to start
++			sessiong again once reconnected.
++
++			Possible errors: org.bluez.Error.Busy
++					 org.bluez.Error.NotConnected
++
++		void StopConnectionMonitor()
++
++			This method stops previous StartConnectionMonitor
++			session.
++
++			Note that connection monitor is shared between all
++			monitor sessions thus calling StopConnectionMonitor
++			releases a single session.
++
++			Possible errors: org.bluez.Error.Failed
++
+ Properties	string Address [readonly]
  
- 	GIOChannel	*att_io;
- 	guint		cleanup_id;
-@@ -838,6 +839,18 @@ static gboolean dev_property_get_conn_rssi(const GDBusPropertyTable *property,
- 	return TRUE;
- }
+ 			The Bluetooth device address of the remote device.
+@@ -193,3 +222,30 @@ Properties	string Address [readonly]
  
-+static gboolean dev_property_get_conn_txpower(
-+					const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *data)
-+{
-+	struct btd_device *device = data;
-+	dbus_int16_t val = device->conn_tx_power;
+ 			Received Signal Strength Indicator of the remote
+ 			device (inquiry or advertising).
 +
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
++		int16 ConnectionRSSI [readonly, optional]
 +
-+	return TRUE;
-+}
++			Received Signal Strength Indicator of connected remote
++			device.
 +
- static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
- {
- 	struct btd_device *device = data;
-@@ -1932,6 +1945,7 @@ static const GDBusPropertyTable device_properties[] = {
- 						dev_property_exists_modalias },
- 	{ "Adapter", "o", dev_property_get_adapter },
- 	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
-+	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower },
- 	{ }
- };
- 
-@@ -2327,6 +2341,8 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
- 	str2ba(address, &device->bdaddr);
- 	device->adapter = adapter;
- 
-+	device->conn_tx_power = 127; /* invalid */
++			This property is present only if device is connected
++			and will be updated if at least one monitoring session
++			is active.
 +
- 	return btd_device_ref(device);
- }
- 
-@@ -4073,6 +4089,22 @@ void device_set_conn_rssi(struct btd_device *device, int8_t rssi)
- 							"ConnectionRSSI");
- }
- 
-+void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power)
-+{
-+	if (!device)
-+		return;
++			Note that RSSI has different units for BR/EDR (dB)
++			and LE (dBm) as specified in BT Core ver. 4.1, Vol. 2,
++			Part E, Chapter 7.5.4
 +
-+	if (device->conn_tx_power == tx_power)
-+		return;
++		int16 ConnectionTXPower [readonly, optional]
 +
-+	DBG("conn_tx_power %d", tx_power);
++			Transmit power level to connected remote device.
 +
-+	device->conn_tx_power = tx_power;
++			This property is present only if device is connected
++			and will be updated if at least one monitoring session
++			is active.
 +
-+	g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
-+							"ConnectionTXPower");
-+}
++		int16 ConnectionTXPowerMax [readonly, optional]
 +
- static void device_set_auto_connect(struct btd_device *device, gboolean enable)
- {
- 	char addr[18];
-diff --git a/src/device.h b/src/device.h
-index 79d5132..e0e44cc 100644
---- a/src/device.h
-+++ b/src/device.h
-@@ -89,6 +89,7 @@ void device_set_bonded(struct btd_device *device, uint8_t bdaddr_type);
- void device_set_legacy(struct btd_device *device, bool legacy);
- void device_set_rssi(struct btd_device *device, int8_t rssi);
- void device_set_conn_rssi(struct btd_device *device, int8_t rssi);
-+void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power);
- bool btd_device_is_connected(struct btd_device *dev);
- uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
- bool device_is_retrying(struct btd_device *device);
++			Maximum transmit power level to connected remote device.
++
++			This property is present only if device is connected.
 -- 
 1.9.3
