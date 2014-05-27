@@ -3,88 +3,107 @@ From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Andrzej Kaczmarek
 	<andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 6/9] core: Read max TX power when device connected
-Date: Tue, 27 May 2014 09:52:48 +0200
-Message-ID: <1401177171-19994-7-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 4/9] core: Add ConnectionTXPowerMax property
+Date: Tue, 27 May 2014 09:52:46 +0200
+Message-ID: <1401177171-19994-5-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds proper support for max TX power, i.e. this property
-is refreshed once device is connected.
----
- src/adapter.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+This patch adds ConnectionTXPowerMax property on org.bluez.Device1
+interface which provides maximum local TX power on currently connected
+link.
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f5f8c8c..585f2e2 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -6174,6 +6174,54 @@ static void disconnected_callback(uint16_t index, uint16_t length,
- 	dev_disconnected(adapter, &ev->addr, reason);
+Property value will be read after connection and won't change during
+connection lifetime.
+---
+ src/device.c | 31 +++++++++++++++++++++++++++++++
+ src/device.h |  1 +
+ 2 files changed, 32 insertions(+)
+
+diff --git a/src/device.c b/src/device.c
+index ac42a75..8661386 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -221,6 +221,7 @@ struct btd_device {
+ 
+ 	int8_t		conn_rssi;
+ 	int8_t		conn_tx_power;
++	int8_t		conn_max_tx_power;
+ 
+ 	GIOChannel	*att_io;
+ 	guint		cleanup_id;
+@@ -851,6 +852,18 @@ static gboolean dev_property_get_conn_txpower(
+ 	return TRUE;
  }
  
-+static void read_max_tx_power_destroy(void *data)
++static gboolean dev_property_get_conn_max_txpower(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *data)
 +{
 +	struct btd_device *device = data;
++	dbus_int16_t val = device->conn_max_tx_power;
 +
-+	btd_device_unref(device);
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_INT16, &val);
++
++	return TRUE;
 +}
 +
-+static void read_max_tx_power_rsp(uint8_t status, uint16_t len,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_get_conn_info *rp = param;
-+	struct btd_device *device = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS) {
-+		error("Get Connection Information failed: %s (0x%02x)",
-+						mgmt_errstr(status), status);
-+		return;
-+	}
-+
-+	if (len < sizeof(*rp)) {
-+		error("Too small Get Connection Information response");
-+		return;
-+	}
-+
-+	device_set_conn_max_tx_power(device, rp->max_tx_power);
-+}
-+
-+static void read_max_tx_power(struct btd_adapter *adapter,
-+					struct btd_device *device,
-+					const bdaddr_t *addr, uint8_t addr_type)
-+{
-+	struct mgmt_cp_get_conn_info cp;
-+	char addrstr[18];
-+
-+	ba2str(addr, addrstr);
-+	DBG("bdaddr %s type %d", addrstr, addr_type);
-+
-+	btd_device_ref(device);
-+
-+	memset(&cp, 0, sizeof(cp));
-+	bacpy(&cp.addr.bdaddr, addr);
-+	cp.addr.type = addr_type;
-+
-+	mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO, adapter->dev_id,
-+					sizeof(cp), &cp, read_max_tx_power_rsp,
-+					device, read_max_tx_power_destroy);
-+}
-+
- static void connected_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
+ static void set_trust(GDBusPendingPropertySet id, gboolean value, void *data)
  {
-@@ -6220,6 +6268,8 @@ static void connected_callback(uint16_t index, uint16_t length,
- 		btd_device_device_set_name(device, eir_data.name);
- 	}
+ 	struct btd_device *device = data;
+@@ -1946,6 +1959,7 @@ static const GDBusPropertyTable device_properties[] = {
+ 	{ "Adapter", "o", dev_property_get_adapter },
+ 	{ "ConnectionRSSI", "n", dev_property_get_conn_rssi },
+ 	{ "ConnectionTXPower", "n", dev_property_get_conn_txpower },
++	{ "ConnectionTXPowerMax", "n", dev_property_get_conn_max_txpower },
+ 	{ }
+ };
  
-+	read_max_tx_power(adapter, device, &ev->addr.bdaddr, ev->addr.type);
-+
- 	eir_data_free(&eir_data);
+@@ -2342,6 +2356,7 @@ static struct btd_device *device_new(struct btd_adapter *adapter,
+ 	device->adapter = adapter;
+ 
+ 	device->conn_tx_power = 127; /* invalid */
++	device->conn_max_tx_power = 127; /* invalid */
+ 
+ 	return btd_device_ref(device);
+ }
+@@ -4105,6 +4120,22 @@ void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power)
+ 							"ConnectionTXPower");
  }
  
++void device_set_conn_max_tx_power(struct btd_device *device, int8_t tx_power)
++{
++	if (!device)
++		return;
++
++	if (device->conn_max_tx_power == tx_power)
++		return;
++
++	DBG("conn_max_tx_power %d", tx_power);
++
++	device->conn_max_tx_power = tx_power;
++
++	g_dbus_emit_property_changed(dbus_conn, device->path, DEVICE_INTERFACE,
++							"ConnectionTXPowerMax");
++}
++
+ static void device_set_auto_connect(struct btd_device *device, gboolean enable)
+ {
+ 	char addr[18];
+diff --git a/src/device.h b/src/device.h
+index e0e44cc..b59fa19 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -90,6 +90,7 @@ void device_set_legacy(struct btd_device *device, bool legacy);
+ void device_set_rssi(struct btd_device *device, int8_t rssi);
+ void device_set_conn_rssi(struct btd_device *device, int8_t rssi);
+ void device_set_conn_tx_power(struct btd_device *device, int8_t tx_power);
++void device_set_conn_max_tx_power(struct btd_device *device, int8_t tx_power);
+ bool btd_device_is_connected(struct btd_device *dev);
+ uint8_t btd_device_get_bdaddr_type(struct btd_device *dev);
+ bool device_is_retrying(struct btd_device *device);
 -- 
 1.9.3
