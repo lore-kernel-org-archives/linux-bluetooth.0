@@ -2,38 +2,104 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [RFC 0/3] Gatt Client Characteristic Configuration
-Date: Tue, 27 May 2014 16:33:40 +0200
-Message-Id: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [RFC 1/3] android: Add gatt CCC value storage
+Date: Tue, 27 May 2014 16:33:41 +0200
+Message-Id: <1401201223-17852-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds Client Characteristic Configuration descriptor for Service Changed
-Characteristic registered on gatt init. This stored value should be persistent
-across connections for bonded devices, thus gatt specific api was aded to
-bluetooth core profile exposing storage functionality.
+Client Characteristic Configuration for Service Changed Characteristic
+should be stored for every bonded device, so we know if we should be
+sending value (range affected by changes) indication.
+---
+ android/bluetooth.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ android/bluetooth.h |  4 ++++
+ 2 files changed, 49 insertions(+)
 
-We could consider creating more generic functions, allowing to store custom
-<key, value> pairs. that other profiles could use aswell. Then on every value
-read we would access the file as we do on write, instead of storing it in device
-along with other properties.
-
-I'm not sure which aproach would be better. Should we go with the generic
-version already or do it later if it turns out that we need to store more
-thing for more profiles?
-
-Regards,
-
-Jakub Tyszkowski (3):
-  android: Add gatt CCC value storage
-  android/gatt: Store CCC and indicate service change
-  android/gatt: Make CCC descriptor readable
-
- android/bluetooth.c |  45 +++++++++++++++++
- android/bluetooth.h |   4 ++
- android/gatt.c      | 141 ++++++++++++++++++++++++++++++++++++++++++++++------
- 3 files changed, 174 insertions(+), 16 deletions(-)
-
---
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 8ee2025..dea9be1 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -158,6 +158,7 @@ struct device {
+ 	bool valid_local_csrk;
+ 	uint8_t local_csrk[16];
+ 	uint32_t local_sign_cnt;
++	uint16_t gatt_ccc;
+ };
+ 
+ struct browse_req {
+@@ -645,6 +646,44 @@ static void mgmt_dev_class_changed_event(uint16_t index, uint16_t length,
+ 	/* TODO: Gatt attrib set*/
+ }
+ 
++void bt_store_gatt_ccc(const bdaddr_t *dst, uint16_t value)
++{
++	GKeyFile *key_file;
++	gsize length = 0;
++	char addr[18];
++	char *data;
++
++	key_file = g_key_file_new();
++
++	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
++		g_key_file_free(key_file);
++		return;
++	}
++
++	ba2str(dst, addr);
++
++	DBG("%s Gatt CCC %d", addr, value);
++
++	g_key_file_set_integer(key_file, addr, "GattCCC", value);
++
++	data = g_key_file_to_data(key_file, &length, NULL);
++	g_file_set_contents(DEVICES_FILE, data, length, NULL);
++	g_free(data);
++
++	g_key_file_free(key_file);
++}
++
++uint16_t bt_get_gatt_ccc(const bdaddr_t *addr)
++{
++	struct device *dev;
++
++	dev = find_device(addr);
++	if (!dev)
++		return 0;
++
++	return dev->gatt_ccc;
++}
++
+ static void store_link_key(const bdaddr_t *dst, const uint8_t *key,
+ 					uint8_t type, uint8_t pin_length)
+ {
+@@ -2408,6 +2447,12 @@ static struct device *create_device_from_info(GKeyFile *key_file,
+ 						"RemoteCSRKSignCounter", NULL);
+ 	}
+ 
++	str = g_key_file_get_string(key_file, peer, "GattCCC", NULL);
++	if (str) {
++		dev->gatt_ccc = atoi(str);
++		g_free(str);
++	}
++
+ 	str = g_key_file_get_string(key_file, peer, "Name", NULL);
+ 	if (str) {
+ 		g_free(dev->name);
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index 1c14377..b4a5f32 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -66,3 +66,7 @@ bool bt_get_csrk(const bdaddr_t *addr, enum bt_csrk_type type,
+ 					uint8_t key[16], uint32_t *sign_cnt);
+ 
+ void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
++
++void bt_store_gatt_ccc(const bdaddr_t *addr, uint16_t value);
++
++uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
+-- 
 1.9.3
 
