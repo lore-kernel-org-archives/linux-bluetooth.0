@@ -2,50 +2,32 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 5/6] android/gatt: Initialize crypto first
-Date: Tue, 27 May 2014 12:15:33 +0200
-Message-Id: <1401185734-23672-5-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 3/6] android/gatt: Use proper variable to store response length
+Date: Tue, 27 May 2014 12:15:31 +0200
+Message-Id: <1401185734-23672-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1401185734-23672-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1401185734-23672-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the missleading error on crypto setup failure:
-
-02-17 20:19:44.639 I/bluetoothd( 1705): bluetoothd[1706]: gatt: Failed
-to allocate memory for queues
+This fixes confirmations being not send.
 ---
- android/gatt.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index dab9781..a8f072f 100644
+index 18e1e03..dab9781 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -5491,15 +5491,20 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	if (!start_listening_io())
- 		return false;
- 
-+	crypto = bt_crypto_new();
-+	if (!crypto) {
-+		error("gatt: Failed to setup crypto.");
-+		return false;
-+	}
-+
- 	gatt_devices = queue_new();
- 	gatt_apps = queue_new();
- 	app_connections = queue_new();
- 	listen_apps = queue_new();
- 	gatt_db = gatt_db_new();
--	crypto = bt_crypto_new();
- 
--	if (!gatt_devices || !gatt_apps || !listen_apps ||
--				!app_connections || !gatt_db || !crypto) {
-+	if (!gatt_devices || !gatt_apps || !listen_apps || !app_connections ||
-+								!gatt_db) {
- 		error("gatt: Failed to allocate memory for queues");
- 
- 		queue_destroy(gatt_apps, NULL);
+@@ -5101,7 +5101,7 @@ static void att_handler(const uint8_t *ipdu, uint16_t len, gpointer user_data)
+ 		 * registered for this indication, event will be send in
+ 		 * handle_notification
+ 		 */
+-		length = enc_confirmation(opdu, sizeof(opdu));
++		resp_length = enc_confirmation(opdu, sizeof(opdu));
+ 		status = 0;
+ 		break;
+ 	case ATT_OP_HANDLE_NOTIFY:
 -- 
 1.9.3
 
