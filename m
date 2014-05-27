@@ -1,11 +1,10 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1400760367-24915-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1400760367-24915-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-	<1400760367-24915-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Tue, 27 May 2014 16:40:20 +0300
-Message-ID: <CABBYNZ+YbMWEte2u6mi2G5y-eOb==PsOxD0tA0j6GZwxgCyK3g@mail.gmail.com>
-Subject: Re: [RFCv0 12/14] android/hal-sco: Fix memory leak
+Date: Tue, 27 May 2014 16:26:45 +0300
+Message-ID: <CABBYNZJbe-8Zjth1t-M_9obOrDwmidT-K3rDxFMPO7bSr3c+dA@mail.gmail.com>
+Subject: Re: [RFCv0 01/14] android/hal-sco: Use nanosleep for SCO synchronization
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
@@ -15,42 +14,135 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Thu, May 22, 2014 at 3:06 PM, Andrei Emeltchenko
+On Thu, May 22, 2014 at 3:05 PM, Andrei Emeltchenko
 <Andrei.Emeltchenko.news@gmail.com> wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 >
-> Release resampler on exit.
 > ---
->  android/hal-sco.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  android/hal-sco.c | 56 +++++++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 42 insertions(+), 14 deletions(-)
 >
 > diff --git a/android/hal-sco.c b/android/hal-sco.c
-> index 8635866..bf3b6d4 100644
+> index ea9857e..fb7b4d4 100644
 > --- a/android/hal-sco.c
 > +++ b/android/hal-sco.c
-> @@ -692,6 +692,8 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+> @@ -64,6 +64,8 @@ struct sco_stream_out {
+>         int fd;
 >
->         return 0;
->  failed:
-> +       if (out->resampler)
-> +               release_resampler(out->resampler);
->         free(out->cache);
->         free(out->downmix_buf);
->         free(out);
-> @@ -726,6 +728,9 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
+>         uint8_t *downmix_buf;
+> +       size_t samples;
+> +       struct timespec start;
 >
->         close_sco_socket();
+>         struct resampler_itfe *resampler;
+>         int16_t *resample_buf;
+> @@ -277,6 +279,21 @@ static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
+>         }
+>  }
 >
-> +       if (out->resampler)
-> +               release_resampler(out->resampler);
-> +       free(out->resample_buf);
->         free(out->cache);
->         free(out->downmix_buf);
->         free(out);
+> +static uint64_t timespec_diff_us(struct timespec *a, struct timespec *b)
+> +{
+> +       struct timespec res;
+> +
+> +       res.tv_sec = a->tv_sec - b->tv_sec;
+> +       res.tv_nsec = a->tv_nsec - b->tv_nsec;
+> +
+> +       if (res.tv_nsec < 0) {
+> +               res.tv_sec--;
+> +               res.tv_nsec += 1000000000ll; /* 1sec */
+> +       }
+> +
+> +       return res.tv_sec * 1000000ll + res.tv_nsec / 1000ll;
+> +}
+> +
+>  static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+>                                                                 size_t bytes)
+>  {
+> @@ -284,13 +301,13 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+>         size_t len, written = 0;
+>         int ret;
+>         uint16_t mtu = /* out->cfg.mtu */ 48;
+> -       uint8_t read_buf[mtu];
+> -       bool do_write = false;
+> +       uint64_t audio_sent_us, audio_passed_us;
+>
+>         pfd.fd = out->fd;
+>         pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
+>
+>         while (bytes > written) {
+> +               struct timespec now;
+>
+>                 /* poll for sending */
+>                 if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
+> @@ -303,27 +320,38 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+>                         return false;
+>                 }
+>
+> -               /* FIXME synchronize by time instead of read() */
+> -               if (pfd.revents & POLLIN) {
+> -                       ret = read(out->fd, read_buf, mtu);
+> -                       if (ret < 0) {
+> -                               error("Error reading fd %d (%s)", out->fd,
+> -                                                       strerror(errno));
+> -                               return false;
+> -                       }
+>
+> -                       do_write = true;
+> +               clock_gettime(CLOCK_REALTIME, &now);
+
+Im not sure why did you choose to got with CLOCK_REALTIME, we used
+CLOCK_MONOTONIC on hal-audio.c for a very important reason because it
+is nonsettable.
+
+> +               /* Mark start of the stream */
+> +               if (!out->samples)
+> +                       memcpy(&out->start, &now, sizeof(out->start));
+> +
+> +               audio_sent_us = out->samples * 1000000ll / AUDIO_STREAM_SCO_RATE;
+> +               audio_passed_us = timespec_diff_us(&now, &out->start);
+> +               if ((int) (audio_sent_us - audio_passed_us) > 1500) {
+
+What is 1500 for?
+
+> +                       struct timespec timeout = {0,
+> +                                               (audio_sent_us -
+> +                                                audio_passed_us) * 1000};
+> +                       DBG("Sleeping for %d ms",
+> +                                       (int) (audio_sent_us - audio_passed_us));
+> +                       nanosleep(&timeout, NULL);
+
+Also we should use clock_nanosleep just as hal-audio.c.
+
+> +               } else if ((int)(audio_passed_us - audio_sent_us) > 50000) {
+> +                       DBG("\n\nResync\n\n");
+> +                       out->samples = 0;
+> +                       memcpy(&out->start, &now, sizeof(out->start));
+>                 }
+>
+> -               if (!do_write)
+> -                       continue;
+>
+>                 len = bytes - written > mtu ? mtu : bytes - written;
+>
+>                 ret = write(out->fd, buffer + written, len);
+>                 if (ret > 0) {
+>                         written += ret;
+> -                       do_write = false;
+> +
+> +                       out->samples += ret / 2;
+> +
+> +                       DBG("written %d samples %zd total %zd bytes",
+> +                                       ret, out->samples, written);
+>                         continue;
+>                 }
+>
 > --
 > 1.8.3.2
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Ive pushed just this one, please rebase this set.
 
 
 -- 
