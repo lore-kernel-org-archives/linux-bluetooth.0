@@ -1,63 +1,81 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5384AD17.3020608@ahsoftware.de>
-Date: Tue, 27 May 2014 17:19:51 +0200
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
- Marcel Holtmann <marcel@holtmann.org>,
- Gustavo Padovan <gustavo@padovan.org>,
- Johan Hedberg <johan.hedberg@gmail.com>
-Subject: Re: [PATCH 2/2] bluetooth: raise HCI_CMD_TIMEOUT from 2s to 8s
-References: <1400076025-5103-1-git-send-email-holler@ahsoftware.de>	<1400076025-5103-2-git-send-email-holler@ahsoftware.de> <CABBYNZLFutVy=Msz7=AAwXmo4wDHjv59GcLCedEzSrWjkLQ3cw@mail.gmail.com> <5374D452.8020709@ahsoftware.de> <5374DAEF.40605@ahsoftware.de> <5375A3B5.1060706@ahsoftware.de>
-In-Reply-To: <5375A3B5.1060706@ahsoftware.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/2] tools/btmgmt: Add set-io-cap command
+Date: Tue, 27 May 2014 17:17:45 +0200
+Message-Id: <1401203866-8851-1-git-send-email-lukasz.rymanowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 16.05.2014 07:35, schrieb Alexander Holler:
-> Am 15.05.2014 17:19, schrieb Alexander Holler:
->> Am 15.05.2014 16:50, schrieb Alexander Holler:
->>> Am 15.05.2014 14:54, schrieb Luiz Augusto von Dentz:
->>
->>>> This timeout seems arbitrary so I suppose we can increase it if we
->>>> feel it is necessary but we used already different timeout for
->>>> different commands like HCI_POWER_OFF_TIMEOUT, so perhaps if we can
->>>> identify which command is more likely to timeout.
->>>>
->>>> We could perhaps auto reset if a command timeout if there is really no
->>>> other way to recover.
->>>
->>> It is arbitrary but 2s is not enough here. And as I've written in the
->>> description, there is absolutely no reason to keep this timeout
->>> unnecessarily short. No one cares if an error message appears after 2s
->>> or 8s if the communication with the dongle is in both cases broken
->>> afterwards.
->>>
->>> One of the commands I experieced the problem with was e.g.
->>> HCI_OP_DELETE_STORED_LINK_KEY or HCI_OP_WRITE_SSP_MODE.
->>
->> The problem is that you can never be sure what the origin of a timeouted
->> command was. It might have been e.g. the USB-subsystem through wich the
->> command and the response has to travel (in case of USB dongles) and not
->> the dongle itself.
->
-> To explain a bit more, the box I'm experiencing these problems boots
-> from USB2.0 HD. So it's likely that there is quiet some action on the
-> bus and that shouldn't affect the operation of the BT-stack (besides
-> slowing it maybe a bit down).
+This is needed for testing e.g. PTS
+---
+ tools/btmgmt.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
-Anything wrong with my conclusion?
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 0618de1..ca16d85 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -2225,6 +2225,49 @@ static void cmd_conn_info(struct mgmt *mgmt, uint16_t index,
+ 	}
+ }
+ 
++static void set_io_cap_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	if (status != 0)
++		fprintf(stderr, "Could not set IO Capability with "
++						"status 0x%02x (%s)\n",
++						status, mgmt_errstr(status));
++	else
++		printf("IO Capabilities successfully set\n");
++
++	mainloop_quit();
++}
++
++static void set_io_cap_usage(void)
++{
++	printf("Usage: btmgmt [cap]\n");
++}
++
++static void cmd_set_io_cap(struct mgmt *mgmt, uint16_t index,
++						int argc, char **argv)
++{
++	struct mgmt_cp_set_io_capability cp;
++	uint8_t cap = 0x01;
++
++	if (argc < 2) {
++		set_io_cap_usage();
++		exit(EXIT_FAILURE);
++	}
++
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	cap = atoi(argv[1]);
++	memset(&cp, 0, sizeof(cp));
++	cp.io_capability = cap;
++
++	if (mgmt_send(mgmt, MGMT_OP_SET_IO_CAPABILITY, index, sizeof(cp), &cp,
++					set_io_cap_rsp, NULL, NULL) == 0) {
++		fprintf(stderr, "Unable to send set-io-cap cmd\n");
++		exit(EXIT_FAILURE);
++	}
++}
++
+ static struct {
+ 	char *cmd;
+ 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
+@@ -2268,6 +2311,7 @@ static struct {
+ 	{ "static-addr",cmd_static_addr,"Set static address"		},
+ 	{ "debug-keys",	cmd_debug_keys,	"Toogle debug keys"		},
+ 	{ "conn-info",	cmd_conn_info,	"Get connection information"	},
++	{ "set-io-cap",	cmd_set_io_cap,	"Set IO Capability"		},
+ 	{ }
+ };
+ 
+-- 
+1.8.4
 
-I don't know what's the origin of the current timeout of 2s, but I don't 
-think it takes the used transport into account.
-
-So if the source of these 2s is the spec for BT-devices, the 2s would 
-make sense as a timeout to test BT-devices, but it already becomes an 
-arbitrary value whenever the transport isn't realtime and/or exclusive 
-for the device but e.g. an I/O scheduler is inbetween (which is the case 
-for USB).
-
-Regards,
-
-Alexander Holler
