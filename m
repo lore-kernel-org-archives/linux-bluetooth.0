@@ -1,94 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1401223906.2586.18.camel@deadeye.wl.decadent.org.uk>
-Subject: Re: linux-firmware: Add firmware patch file for Intel Bluetooth
- 7260 ROM-spin
-From: Ben Hutchings <ben@decadent.org.uk>
-To: Tedd Ho-Jeong An <tedd.an@intel.com>
-Cc: linux-firmware@kernel.org, linux-bluetooth@vger.kernel.org,
-	emmanuel.grumbach@intel.com, don.fry@intel.com
-Date: Tue, 27 May 2014 21:51:46 +0100
-In-Reply-To: <20140321190814.252602a0@han1-desk-dev>
-References: <20140321190814.252602a0@han1-desk-dev>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="=-Ueko2v63bh9fOMGN9ZUm"
-Mime-Version: 1.0
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 6/6] android/gatt: Exchange mtu on connect if acting as client
+Date: Tue, 27 May 2014 22:41:57 +0200
+Message-ID: <58386092.pIfScf94rH@leonov>
+In-Reply-To: <1401185734-23672-6-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401185734-23672-1-git-send-email-jakub.tyszkowski@tieto.com> <1401185734-23672-6-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Jakub,
 
---=-Ueko2v63bh9fOMGN9ZUm
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tuesday 27 of May 2014 12:15:34 Jakub Tyszkowski wrote:
+> When no client apps are registered we basically act as server only and
+> mtu exchange request handling is enough. When acting as client we send
+> request.
+> ---
+>  android/gatt.c | 19 ++++++++++++++++---
+>  1 file changed, 16 insertions(+), 3 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index a8f072f..b120834 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -320,11 +320,24 @@ static bool match_app_by_id(const void *data, const
+> void *user_data) return client->id == exp_id;
+>  }
+> 
+> +static bool match_app_by_type(const void *data, const void *user_data)
+> +{
+> +	gatt_app_type_t app_type = PTR_TO_INT(user_data);
+> +	const struct gatt_app *app = data;
+> +
+> +	return app->type == app_type;
+> +}
+> +
+>  static struct gatt_app *find_app_by_id(int32_t id)
+>  {
+>  	return queue_find(gatt_apps, match_app_by_id, INT_TO_PTR(id));
+>  }
+> 
+> +static struct gatt_app *find_app_by_type(gatt_app_type_t type)
+> +{
+> +	return queue_find(gatt_apps, match_app_by_type, INT_TO_PTR(type));
+> +}
+> +
+>  static bool match_by_value(const void *data, const void *user_data)
+>  {
+>  	return data == user_data;
+> @@ -1116,9 +1129,9 @@ static void connect_cb(GIOChannel *io, GError *gerr,
+> gpointer user_data)
+> 
+>  	device_set_state(dev, DEVICE_CONNECTED);
+> 
+> -	/* Send exchange mtu request as we assume being client and server */
+> -	/* TODO: Dont exchange mtu if no client apps */
+> -	send_exchange_mtu_request(dev);
+> +	/* Send exchange mtu request if any client app was registered */
+> +	if (find_app_by_type(APP_CLIENT))
+> +		send_exchange_mtu_request(dev);
+> 
+>  	status = GATT_SUCCESS;
 
-On Fri, 2014-03-21 at 19:08 -0700, Tedd Ho-Jeong An wrote:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->=20
-> This patch adds the firmware patch file for
-> - Intel Wirless 7260 BT ROM-spin SKU, also known as WP2 B5.
->=20
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-[...]
+I think we should also exchange MTU if first client app (since connection) is 
+registered and exchange MTU was not performed by remote client.
 
-I'm finally giving up and applying your two patches, but I am tempted to
-add smething like this on top:
-
-diff --git a/WHENCE b/WHENCE
-index 98519be..f4758fa 100644
---- a/WHENCE
-+++ b/WHENCE
-@@ -2265,15 +2265,15 @@ Found also in alsa-firmware package.
- Driver: btusb - Bluetooth USB driver
-=20
- File: intel/ibt-hw-37.7.bseq
--Version: 1316.02.00
-+Version: 2013-04-22 (1316.02.00)
- File: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
--Version: auto.WP_1303_02_patch_0.1.54.1 (0x36)
-+Version: 2014-03-14 (auto.WP_1303_02_patch_0.1.54.1, 0x36)
- File: intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
--Version: auto.WP_1303_02_patch_0.1.54.1 (0x36)
-+Version: 2014-03-14 (auto.WP_1303_02_patch_0.1.54.1, 0x36)
- File: intel/ibt-hw-37.8.bseq
--Version: 1339_02.00
-+Version: 2014-03-14 (1339_02.00)
- File: intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq
--Version: STP2_C0_1339_02_patch_13.1 (0x0D)
-+Version: 2014-03-14 (STP2_C0_1339_02_patch_13.1, 0x0D)
-=20
- Licence: Redistributable. See LICENCE.ibt_firmware for details
-=20
----
-
-That way, it will be easy to recognise a new version - but I suspect
-those email dates don't match your internal release dates.  I really
-would prefer if you could come up with a better alternative.
-
-Ben.
-
---=20
-Ben Hutchings
-A free society is one where it is safe to be unpopular. - Adlai Stevenson
-
---=-Ueko2v63bh9fOMGN9ZUm
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQIVAwUAU4T68ee/yOyVhhEJAQrLnw//Q0W7xPvx6Us5Q65MSaA5hBlFdIq8VGG+
-gPn23bIRqaQncRzyT3D2u10CxS1g4+lFAlgbUhbQRJVpyOpHmm91E1x8PyN5qec7
-iSHrHtOF627t0D2oYJAnJMvTv3uy536ub1mOg2wz+b1slxvjjzbh7ispHNjHME2W
-1htKoedKt5TTVKH8Ihlb+Fq8mO5Zs+bAFDUs+IL8VQlfyUEP26pbII79zfcuGTx7
-0Eos6aTJZ7w0BAthmjCALFXF0rbRnSSo8CZNC9aKn3wpRc32HlubxDw+KjOoSa5k
-dXnGEu/FXD5OAj/kB27CcGoGEUs/fft7/OQnmpPq2UAmtIDXQaTuBQQqp/tOlkI5
-GP+IHutMQRtJbj2/nG6liT2AocywI41KTUWS2+E4gBM05Z7twh3o7ZSsrvtuwbgA
-vkqMvW8mPZsACXNCP6IASoRzGFlt4BlpRRgUyearM/Qn1yHdsh0OqMcHxoSVzrTt
-dufaoiP0pZl6uBv4dz6douIq4EC8sbCILLz6V3wMiEdP0Dq1W9+U3nodZB8yJdSq
-kgFkAfhotylytUfiwLqs/tL4Hw5ePd4BEXpb9Vi/PugCrOKNVnPUiQ4D/UXyXqs+
-v7SjFzp1tVkDaNSYbVLtq5NHzZrkw7IbN3oXeDwJcy+gHc60HLpZiDc62q+6mina
-jLL4kha1XfI=
-=erhy
------END PGP SIGNATURE-----
-
---=-Ueko2v63bh9fOMGN9ZUm--
+-- 
+BR
+Szymon Janc
