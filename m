@@ -1,59 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 27 May 2014 10:54:22 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] android/hal-audio: Fix wrong memory access
-Message-ID: <20140527075343.GA9423@aemeltch-MOBL1>
-References: <1400764022-26666-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <0ADD0151-224B-418E-94D6-B88CBD760BA8@holtmann.org>
- <CAF3PWx0Mm5goNNtVtqwM7LxRRskC6+vH8+8NRO1UYB4bB4_AJA@mail.gmail.com>
- <BD6D66D8-668E-49DE-9FE9-85FF67F6613A@holtmann.org>
- <CAF3PWx0XGcT+s+2i6wxsZevLpa7oP9uNQ84AsEt0xNYNaf+2xA@mail.gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Andrzej Kaczmarek
+	<andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 9/9] core: Poll for connection info
+Date: Tue, 27 May 2014 09:52:51 +0200
+Message-ID: <1401177171-19994-10-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <CAF3PWx0XGcT+s+2i6wxsZevLpa7oP9uNQ84AsEt0xNYNaf+2xA@mail.gmail.com>
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 26, 2014 at 02:59:31PM +0200, Andrzej Kaczmarek wrote:
-> Hi Marcel,
-> 
-> On 26 May 2014 14:48, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > Hi Andrzej,
-> >
-> >>>> downmix_buf is allocated to have buffer size FIXED_BUFFER_SIZE / 2, when
-> >>>> we access it as (int16_t *) we shall device index by 2.
-> >>>> ---
-> >>>> android/hal-audio.c | 2 +-
-> >>>> 1 file changed, 1 insertion(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> >>>> index 7305bb6..96fa5c3 100644
-> >>>> --- a/android/hal-audio.c
-> >>>> +++ b/android/hal-audio.c
-> >>>> @@ -984,7 +984,7 @@ static void downmix_to_mono(struct a2dp_stream_out *out, const uint8_t *buffer,
-> >>>>      int16_t *output = (void *) out->downmix_buf;
-> >>>>      size_t i;
-> >>>>
-> >>>> -     for (i = 0; i < bytes / 2; i++) {
-> >>>> +     for (i = 0; i < bytes / (2 * sizeof(int16_t)); i++) {
-> >>>>              int16_t l = le16_to_cpu(get_unaligned(&input[i * 2]));
-> >>>>              int16_t r = le16_to_cpu(get_unaligned(&input[i * 2 + 1]));
-> >>>
-> >>> I wonder actually what this get_unaligned is doing here? You cast the const void into const int16_t buffer. Is this really needed? Where is our input and output buffer coming from? Aren’t these aligned anyway? Meaning aren’t they allocated?
-> >>
-> >> We have this buffer from AudioFlinger so we don't actually know
-> >> alignment or if this is pointer to beginning of some internal buffer
-> >> (it's most probably both, but I don't think we should assume this).
-> >
-> > and audio system that does not give you a guarantee here on the alignment is utterly screwed up. Seriously, that is just bad for performance. Especially bad on ARM CPUs, so I doubt that they have not thought about this.
-> 
-> This is only to be on safe side and in terms of performance it does
-> not really matter here since this code won't probably be used at all -
+This patch adds actual polling mechanism for devices which are stored
+on list for each adapter.
+---
+ src/adapter.c | 83 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 83 insertions(+)
 
-It was definitely not used. It crashes. I have modified code for SCO where
-downmix was used.
-
-Best regards 
-Andrei Emeltchenko 
+diff --git a/src/adapter.c b/src/adapter.c
+index 045ce30..c0ebfab 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -183,6 +183,7 @@ struct btd_adapter {
+ 	guint discovery_idle_timeout;	/* timeout between discovery runs */
+ 	guint passive_scan_timeout;	/* timeout between passive scans */
+ 	guint temp_devices_timeout;	/* timeout for temporary devices */
++	guint mon_devices_timeout;
+ 
+ 	guint pairable_timeout_id;	/* pairable timeout id */
+ 	guint auth_idle_id;		/* Pending authorization dequeue */
+@@ -4189,6 +4190,11 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 		adapter->temp_devices_timeout = 0;
+ 	}
+ 
++	if (adapter->mon_devices_timeout > 0) {
++		g_source_remove(adapter->mon_devices_timeout);
++		adapter->mon_devices_timeout = 0;
++	}
++
+ 	discovery_cleanup(adapter);
+ 
+ 	g_slist_free(adapter->connect_list);
+@@ -5467,6 +5473,73 @@ static void disconnect_complete(uint8_t status, uint16_t length,
+ 	dev_disconnected(adapter, &rp->addr, MGMT_DEV_DISCONN_LOCAL_HOST);
+ }
+ 
++static void monitor_conn_info_destroy(void *data)
++{
++	struct btd_device *device = data;
++
++	btd_device_unref(device);
++}
++
++static void monitor_conn_info_rsp(uint8_t status, uint16_t len,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_get_conn_info *rp = param;
++	struct btd_device *device = user_data;
++
++	DBG("status %d", status);
++
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Get Connection Information failed: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
++	}
++
++	if (len < sizeof(*rp)) {
++		error("Too small Get Connection Information response");
++		return;
++	}
++
++	device_set_conn_rssi(device, rp->rssi);
++	device_set_conn_tx_power(device, rp->tx_power);
++}
++
++static void monitor_conn_info(void *data, void *user_data)
++{
++	struct mgmt_addr_info *addr = data;
++	struct btd_adapter *adapter = user_data;
++	struct mgmt_cp_get_conn_info cp;
++	char addrstr[18];
++	struct btd_device *device;
++
++	ba2str(&addr->bdaddr, addrstr);
++	DBG("bdaddr %s type %d", addrstr, addr->type);
++
++	device = btd_adapter_find_device(adapter, &addr->bdaddr, addr->type);
++	if (!device)
++		return;
++
++	btd_device_ref(device);
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, &addr->bdaddr);
++	cp.addr.type = addr->type;
++
++	mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO, adapter->dev_id,
++					sizeof(cp), &cp, monitor_conn_info_rsp,
++					device, monitor_conn_info_destroy);
++}
++
++static gboolean trigger_conn_monitor(gpointer user_data)
++{
++	struct btd_adapter *adapter = user_data;
++
++	DBG("");
++
++	queue_foreach(adapter->monitored_devices, monitor_conn_info, adapter);
++
++	return TRUE;
++}
++
+ struct monitored_device {
+ 	struct mgmt_addr_info addr;
+ };
+@@ -5500,6 +5573,10 @@ int btd_adapter_add_monitored_device(struct btd_adapter *adapter,
+ 		return 0;
+ 	}
+ 
++	if (!queue_length(adapter->monitored_devices))
++		adapter->mon_devices_timeout =
++			g_timeout_add(2000, trigger_conn_monitor, adapter);
++
+ 	queue_push_tail(adapter->monitored_devices, mdev);
+ 
+ 	return 0;
+@@ -5529,6 +5606,12 @@ int btd_adapter_remove_monitored_device(struct btd_adapter *adapter,
+ 
+ 	free(mdev);
+ 
++	if (!queue_length(adapter->monitored_devices))
++		if (adapter->mon_devices_timeout > 0) {
++			g_source_remove(adapter->mon_devices_timeout);
++			adapter->mon_devices_timeout = 0;
++		}
++
+ 	return 0;
+ }
+ 
+-- 
+1.9.3
