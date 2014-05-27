@@ -3,127 +3,87 @@ From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: <johan.hedberg@gmail.com>, <marcel@holtmann.org>, Andrzej Kaczmarek
 	<andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 8/9] core: Store list of monitored devices in adapter
-Date: Tue, 27 May 2014 09:52:50 +0200
-Message-ID: <1401177171-19994-9-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 6/9] core: Read max TX power when device connected
+Date: Tue, 27 May 2014 09:52:48 +0200
+Message-ID: <1401177171-19994-7-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds list of devices which should be polled for connection
-information to adapter.
+This patch adds proper support for max TX power, i.e. this property
+is refreshed once device is connected.
 ---
- src/adapter.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ src/adapter.c | 50 ++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index a3204d0..045ce30 100644
+index f5f8c8c..585f2e2 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -53,6 +53,7 @@
- #include "lib/mgmt.h"
- #include "src/shared/mgmt.h"
- #include "src/shared/util.h"
-+#include "src/shared/queue.h"
- 
- #include "hcid.h"
- #include "sdpd.h"
-@@ -178,6 +179,7 @@ struct btd_adapter {
- 	bool discovery_suspended;	/* discovery has been suspended */
- 	GSList *discovery_list;		/* list of discovery clients */
- 	GSList *discovery_found;	/* list of found devices */
-+	struct queue *monitored_devices;
- 	guint discovery_idle_timeout;	/* timeout between discovery runs */
- 	guint passive_scan_timeout;	/* timeout between passive scans */
- 	guint temp_devices_timeout;	/* timeout for temporary devices */
-@@ -4166,6 +4168,8 @@ static struct btd_adapter *btd_adapter_new(uint16_t index)
- 
- 	adapter->auths = g_queue_new();
- 
-+	adapter->monitored_devices = queue_new();
-+
- 	return btd_adapter_ref(adapter);
+@@ -6174,6 +6174,54 @@ static void disconnected_callback(uint16_t index, uint16_t length,
+ 	dev_disconnected(adapter, &ev->addr, reason);
  }
  
-@@ -4190,6 +4194,9 @@ static void adapter_remove(struct btd_adapter *adapter)
- 	g_slist_free(adapter->connect_list);
- 	adapter->connect_list = NULL;
- 
-+	queue_destroy(adapter->monitored_devices, free);
-+	adapter->monitored_devices = NULL;
-+
- 	for (l = adapter->devices; l; l = l->next)
- 		device_remove(l->data, FALSE);
- 
-@@ -5460,15 +5467,41 @@ static void disconnect_complete(uint8_t status, uint16_t length,
- 	dev_disconnected(adapter, &rp->addr, MGMT_DEV_DISCONN_LOCAL_HOST);
- }
- 
-+struct monitored_device {
-+	struct mgmt_addr_info addr;
-+};
-+
-+static bool compare_monitored_device(const void *a, const void *b)
++static void read_max_tx_power_destroy(void *data)
 +{
-+	const struct monitored_device *a1 = a;
-+	const struct monitored_device *b1 = b;
++	struct btd_device *device = data;
 +
-+	return !memcmp(&a1->addr.bdaddr, &b1->addr.bdaddr, sizeof(bdaddr_t)) &&
-+			a1->addr.type == b1->addr.type;
++	btd_device_unref(device);
 +}
 +
- int btd_adapter_add_monitored_device(struct btd_adapter *adapter,
- 							const bdaddr_t *bdaddr,
- 							uint8_t bdaddr_type)
- {
-+	struct monitored_device *mdev;
- 	char addrstr[18];
- 
- 	ba2str(bdaddr, addrstr);
- 	DBG("addr %s type %d", addrstr, bdaddr_type);
- 
-+	mdev = new0(struct monitored_device, 1);
-+	bacpy(&mdev->addr.bdaddr, bdaddr);
-+	mdev->addr.type = bdaddr_type;
++static void read_max_tx_power_rsp(uint8_t status, uint16_t len,
++					const void *param, void *user_data)
++{
++	const struct mgmt_rp_get_conn_info *rp = param;
++	struct btd_device *device = user_data;
 +
-+	if (queue_find(adapter->monitored_devices, compare_monitored_device,
-+									mdev)) {
-+		free(mdev);
-+		return 0;
++	if (status != MGMT_STATUS_SUCCESS) {
++		error("Get Connection Information failed: %s (0x%02x)",
++						mgmt_errstr(status), status);
++		return;
 +	}
 +
-+	queue_push_tail(adapter->monitored_devices, mdev);
++	if (len < sizeof(*rp)) {
++		error("Too small Get Connection Information response");
++		return;
++	}
 +
- 	return 0;
- }
- 
-@@ -5476,11 +5509,26 @@ int btd_adapter_remove_monitored_device(struct btd_adapter *adapter,
- 							const bdaddr_t *bdaddr,
- 							uint8_t bdaddr_type)
++	device_set_conn_max_tx_power(device, rp->max_tx_power);
++}
++
++static void read_max_tx_power(struct btd_adapter *adapter,
++					struct btd_device *device,
++					const bdaddr_t *addr, uint8_t addr_type)
++{
++	struct mgmt_cp_get_conn_info cp;
++	char addrstr[18];
++
++	ba2str(addr, addrstr);
++	DBG("bdaddr %s type %d", addrstr, addr_type);
++
++	btd_device_ref(device);
++
++	memset(&cp, 0, sizeof(cp));
++	bacpy(&cp.addr.bdaddr, addr);
++	cp.addr.type = addr_type;
++
++	mgmt_send(adapter->mgmt, MGMT_OP_GET_CONN_INFO, adapter->dev_id,
++					sizeof(cp), &cp, read_max_tx_power_rsp,
++					device, read_max_tx_power_destroy);
++}
++
+ static void connected_callback(uint16_t index, uint16_t length,
+ 					const void *param, void *user_data)
  {
-+	struct monitored_device match;
-+	struct monitored_device *mdev;
- 	char addrstr[18];
+@@ -6220,6 +6268,8 @@ static void connected_callback(uint16_t index, uint16_t length,
+ 		btd_device_device_set_name(device, eir_data.name);
+ 	}
  
- 	ba2str(bdaddr, addrstr);
- 	DBG("addr %s type %d", addrstr, bdaddr_type);
- 
-+	memset(&match, 0, sizeof(match));
-+	bacpy(&match.addr.bdaddr, bdaddr);
-+	match.addr.type = bdaddr_type;
++	read_max_tx_power(adapter, device, &ev->addr.bdaddr, ev->addr.type);
 +
-+	mdev = queue_find(adapter->monitored_devices, compare_monitored_device,
-+									&match);
-+	if (!mdev)
-+		return 0;
-+
-+	queue_remove(adapter->monitored_devices, mdev);
-+
-+	free(mdev);
-+
- 	return 0;
+ 	eir_data_free(&eir_data);
  }
  
 -- 
