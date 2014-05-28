@@ -1,66 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 0/6] Bluetooth LE 6LoWPAN using CoC
-Date: Wed, 28 May 2014 14:43:02 +0300
-Message-Id: <1401277388-4611-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [RFC] bluetooth: Try to avoid forming scatternets
+Date: Wed, 28 May 2014 14:40:04 +0300
+Message-Id: <1401277204-28062-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-this v3 patchset fixes the issues found in v2.
+In case of multiple connections automatically attempt to become master
+to avoid scatternet topology.
 
-I removed the hci callback patches from v2 as they we no
-longer needed after refactoring the code a bit.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_event.c | 21 ++++++++++++++++-----
+ 1 file changed, 16 insertions(+), 5 deletions(-)
 
-The patch that fixes MAC address U/L bit handling was sent earlier
-and is required by these patches.
-
-Usage:
-
-In the slave side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ hciconfig hci0 leadv
-
-In the master side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ echo 'connect E0:06:E6:B7:2A:73 1' > \
-                  /sys/kernel/debug/bluetooth/6lowpan_control
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (6):
-  Bluetooth: Refactor l2cap_sock_sendmsg() to copy user buffer
-  Bluetooth: l2cap: Set more channel defaults
-  Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed
-    one
-  Bluetooth: 6LoWPAN: Create a kernel module
-  Bluetooth: 6LoWPAN: Count module usage
-  Bluetooth: 6LoWPAN: Remove network devices when unloading
-
- include/net/bluetooth/hci.h      |   1 -
- include/net/bluetooth/hci_core.h |   1 -
- include/net/bluetooth/l2cap.h    |   5 +-
- net/bluetooth/6lowpan.c          | 837 ++++++++++++++++++++++++++++++---------
- net/bluetooth/6lowpan.h          |  47 ---
- net/bluetooth/Kconfig            |   6 +-
- net/bluetooth/Makefile           |   4 +-
- net/bluetooth/a2mp.c             |  12 +-
- net/bluetooth/hci_core.c         |  45 ---
- net/bluetooth/hci_event.c        |   3 -
- net/bluetooth/l2cap_core.c       | 107 ++---
- net/bluetooth/l2cap_sock.c       |  14 +-
- 12 files changed, 721 insertions(+), 361 deletions(-)
- delete mode 100644 net/bluetooth/6lowpan.h
-
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 492d8d5..e6aed6e 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2017,8 +2017,15 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (ev->status) {
+ 		hci_proto_connect_cfm(conn, ev->status);
+ 		hci_conn_del(conn);
+-	} else if (ev->link_type != ACL_LINK)
++	} else if (ev->link_type != ACL_LINK) {
+ 		hci_proto_connect_cfm(conn, ev->status);
++	} else if (hci_conn_num(hdev, ACL_LINK) > 1) {
++		/* Attempt to switch to master to avoid scatternet */
++		list_for_each_entry(conn, &hdev->conn_hash.list, list) {
++			if (conn->type == ACL_LINK)
++				hci_conn_switch_role(conn, 0x00);
++		}
++	}
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -2035,6 +2042,12 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
+ 	       ev->link_type);
+ 
++	hci_dev_lock(hdev);
++
++	/* Allways attempt to become the master in multiple connection case */
++	if (hci_conn_num(hdev, ev->link_type) > 0)
++		mask |= HCI_LM_MASTER;
++
+ 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type,
+ 				      &flags);
+ 
+@@ -2044,8 +2057,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		struct inquiry_entry *ie;
+ 		struct hci_conn *conn;
+ 
+-		hci_dev_lock(hdev);
+-
+ 		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
+ 		if (ie)
+ 			memcpy(ie->data.dev_class, ev->dev_class, 3);
+@@ -2063,8 +2074,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		memcpy(conn->dev_class, ev->dev_class, 3);
+ 
+-		hci_dev_unlock(hdev);
+-
+ 		if (ev->link_type == ACL_LINK ||
+ 		    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
+ 			struct hci_cp_accept_conn_req cp;
+@@ -2106,6 +2115,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		cp.reason = HCI_ERROR_REJ_BAD_ADDR;
+ 		hci_send_cmd(hdev, HCI_OP_REJECT_CONN_REQ, sizeof(cp), &cp);
+ 	}
++
++	hci_dev_unlock(hdev);
+ }
+ 
+ static u8 hci_to_mgmt_reason(u8 err)
 -- 
-1.8.3.1
+1.9.0
 
