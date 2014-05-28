@@ -3,14 +3,15 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 7/9] shared/crypto: Swap message before signing it
-Date: Wed, 28 May 2014 16:44:40 +0200
-Message-Id: <1401288283-13480-13-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 7/9] shared/crypto: Fix byte order of message
+Date: Wed, 28 May 2014 16:44:39 +0200
+Message-Id: <1401288283-13480-12-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1401288283-13480-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1401288283-13480-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Message should be swapped before we send it to the kernel for signing
 ---
  src/shared/crypto.c | 6 +++++-
  1 file changed, 5 insertions(+), 1 deletion(-)
