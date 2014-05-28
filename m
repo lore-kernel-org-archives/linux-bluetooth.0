@@ -1,47 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 0/5] android: GATT client test interface
-Date: Wed, 28 May 2014 14:45:17 +0200
-Message-ID: <28600963.hEaRg1ophi@uw000953>
-In-Reply-To: <1401141208-26912-1-git-send-email-szymon.janc@gmail.com>
-References: <1401141208-26912-1-git-send-email-szymon.janc@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH 2/2] android/pts: Disable some PTS tests
+Date: Wed, 28 May 2014 14:25:26 +0200
+Message-Id: <1401279926-19312-2-git-send-email-sebastian.chlad@tieto.com>
+In-Reply-To: <1401279926-19312-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1401279926-19312-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 26 of May 2014 23:53:23 Szymon Janc wrote:
-> Hi,
-> 
-> This adds initial implementation of GATT client test command. It seems
-> to be usefull when testing against PTS for executing actions that are
-> no possible from standard API.
-> 
-> This is initial implementation with enable/connect/disconnect commands.
-> 
-> Commands are not defined in HAL but in here:
-> http://androidxref.com/4.4.2_r1/xref/packages/apps/Bluetooth/src/com/android/bluetooth/gatt/GattDebugUtils.java#77
-> 
-> BR
-> Szymon Janc
-> 
-> Szymon Janc (5):
->   android/gatt: Add initial implementation of client test command
->   android/gatt: Factor out unregistering client into helper function
->   android/gatt: Implement enable test command
->   android/gatt: Implement connect test command
->   android/gatt: Implement disconnect test command
-> 
->  android/gatt.c    | 89 +++++++++++++++++++++++++++++++++++++++++++++----------
->  android/hal-msg.h |  6 ++++
->  2 files changed, 79 insertions(+), 16 deletions(-)
-> 
-> 
+Both PICS 3/11 and 4/11 (Read Multiple Characteristic) are
+disabled which disable some of the tests from GAR section for
+server and client.
+---
+ android/pts-gatt.txt | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-Applied.
-
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index 60968e2..61cdf76 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -97,12 +97,12 @@ TC_GAR_CL_BI_15_C	PASS	haltest:
+ TC_GAR_CL_BI_16_C	PASS	haltest:
+ 				gattc read_characteristic
+ TC_GAR_CL_BI_17_C	INC	not implemented (encryption)
+-TC_GAR_CL_BV_05_C	INC	JIRA: BZ-32
+-TC_GAR_CL_BI_18_C	INC	JIRA: BZ-32
+-TC_GAR_CL_BI_19_C	INC	JIRA: BZ-32
+-TC_GAR_CL_BI_20_C	INC	JIRA: BZ-32
+-TC_GAR_CL_BI_21_C	INC	JIRA: BZ-32
+-TC_GAR_CL_BI_22_C	INC	JIRA: BZ-32
++TC_GAR_CL_BV_05_C	N/A
++TC_GAR_CL_BI_18_C	N/A
++TC_GAR_CL_BI_19_C	N/A
++TC_GAR_CL_BI_20_C	N/A
++TC_GAR_CL_BI_21_C	N/A
++TC_GAR_CL_BI_22_C	N/A
+ TC_GAR_CL_BV_06_C	PASS	haltest:
+ 				gattc read_descriptor
+ TC_GAR_CL_BI_23_C	PASS	haltest:
+@@ -224,12 +224,12 @@ TC_GAR_SR_BI_17_C	PASS	haltest:
+ 						 <properties> 2 <permissions> 1
+ 				gatts start_service
+ 				gatts send_response: <status> 12
+-TC_GAR_SR_BV_05_C	INC
+-TC_GAR_SR_BI_18_C	INC
+-TC_GAR_SR_BI_19_C	INC
+-TC_GAR_SR_BI_20_C	INC
+-TC_GAR_SR_BI_21_C	INC
+-TC_GAR_SR_BI_22_C	INC
++TC_GAR_SR_BV_05_C	N/A
++TC_GAR_SR_BI_18_C	N/A
++TC_GAR_SR_BI_19_C	N/A
++TC_GAR_SR_BI_20_C	N/A
++TC_GAR_SR_BI_21_C	N/A
++TC_GAR_SR_BI_22_C	N/A
+ TC_GAR_SR_BV_06_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_characteristic:
 -- 
-Best regards, 
-Szymon Janc
+1.8.5.3
+
