@@ -1,42 +1,106 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH 1/2] android/pics: Adjust PICS for GATT
-Date: Wed, 28 May 2014 14:25:25 +0200
-Message-Id: <1401279926-19312-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1401267002-6306-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1401267002-6306-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Wed, 28 May 2014 15:19:44 +0300
+Message-ID: <CABBYNZ+m5jVJfRrAad3zyTL1MEPjBpKsQdH+4zcvXomw_JccnQ@mail.gmail.com>
+Subject: Re: [PATCH] tools/hcidump: Decode MPEG-1,2 Audio codec capabilities
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since there is no support for 'Read Multiple Characteristic
-Values' for both server and client, respective PICS should be set
-to 'False'.
----
- android/pics-gatt.txt | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Andrzej,
 
-diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
-index a648846..a77aedb 100644
---- a/android/pics-gatt.txt
-+++ b/android/pics-gatt.txt
-@@ -58,7 +58,7 @@ TSPC_GATT_3_7	True		Client: Discover All Characteristic Descriptors
- TSPC_GATT_3_8	True		Client: Read Characteristic Value (C.1)
- TSPC_GATT_3_9	True		Client: Read using Characteristic UUID (C.1)
- TSPC_GATT_3_10	True		Client: Read Long Characteristic Values (C.1)
--TSPC_GATT_3_11	True		Client: Read Multiple Characteristic
-+TSPC_GATT_3_11	False (*)	Client: Read Multiple Characteristic
- 					Values (C.1)
- TSPC_GATT_3_12	True		Client: Write without Response (C.1)
- TSPC_GATT_3_13	True		Client: Signed Write Without Response (C.1)
-@@ -140,7 +140,7 @@ TSPC_GATT_4_7	True		Server: Discover All Characteristic
- TSPC_GATT_4_8	True		Server: Read Characteristic Value (M)
- TSPC_GATT_4_9	True		Server: Read using Characteristic UUID (M)
- TSPC_GATT_4_10	True		Server: Read Long Characteristic Values (C.4)
--TSPC_GATT_4_11	True		Server: Read Multiple Characteristic
-+TSPC_GATT_4_11	False (*)	Server: Read Multiple Characteristic
- 					Values (C.4)
- TSPC_GATT_4_12	True		Server: Write without Response (C.2)
- TSPC_GATT_4_13	False (*)	Server: Signed Write Without Response (C.4)
+On Wed, May 28, 2014 at 11:50 AM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> ---
+>  tools/parser/avdtp.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+>
+> diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
+> index 14dc417..5969067 100644
+> --- a/tools/parser/avdtp.c
+> +++ b/tools/parser/avdtp.c
+> @@ -222,6 +222,7 @@ static void capabilities(int level, struct frame *frm)
+>                         uint8_t type, codec;
+>                         uint16_t tmp, freq, vndcodec = 0;
+>                         uint32_t bitrate, vendor = 0;
+> +                       int i;
+>
+>                         type  = get_u8(frm);
+>                         codec = get_u8(frm);
+> @@ -288,6 +289,63 @@ static void capabilities(int level, struct frame *frm)
+>                                 p_indent(level + 1, frm);
+>                                 printf("Bitpool Range %d-%d\n", tmp, get_u8(frm));
+>                                 break;
+> +                       case 1:
+> +                               tmp = get_u8(frm);
+> +                               p_indent(level + 1, frm);
+> +                               printf("Layers: ");
+> +                               if (tmp & 0x80)
+> +                                       printf("1 ");
+> +                               if (tmp & 0x40)
+> +                                       printf("2 ");
+> +                               if (tmp & 0x20)
+> +                                       printf("3 ");
+> +                               printf("\n");
+> +                               p_indent(level + 1, frm);
+> +                               printf("CRC Protection: %s\n",
+> +                                               tmp & 0x10 ? "Yes" : "No");
+> +                               p_indent(level + 1, frm);
+> +                               if (tmp & 0x08)
+> +                                       printf("Mono ");
+> +                               if (tmp & 0x04)
+> +                                       printf("DualChannel ");
+> +                               if (tmp & 0x02)
+> +                                       printf("Stereo ");
+> +                               if (tmp & 0x01)
+> +                                       printf("JointStereo ");
+> +                               printf("\n");
+> +                               tmp = get_u8(frm);
+> +                               p_indent(level + 1, frm);
+> +                               printf("Media Payload Format: RFC-2250 %s\n",
+> +                                               tmp & 0x40 ? "RFC-3119" : "");
+> +                               p_indent(level + 1, frm);
+> +                               if (tmp & 0x20)
+> +                                       printf("16kHz ");
+> +                               if (tmp & 0x10)
+> +                                       printf("22.05kHz ");
+> +                               if (tmp & 0x08)
+> +                                       printf("24kHz ");
+> +                               if (tmp & 0x04)
+> +                                       printf("32kHz ");
+> +                               if (tmp & 0x02)
+> +                                       printf("44.1kHz ");
+> +                               if (tmp & 0x01)
+> +                                       printf("48kHz ");
+> +                               printf("\n");
+> +                               tmp = get_u16(frm);
+> +                               p_indent(level + 1, frm);
+> +                               printf("VBR: %s\n",
+> +                                               tmp & 0x8000 ? "Yes" : "No");
+> +                               p_indent(level + 1, frm);
+> +                               printf("Bit Rate Indexes: ");
+> +                               if (tmp & 0x8000) {
+> +                                       printf("n/a");
+> +                               } else {
+> +                                       for (i = 0; i < 15; i++, tmp >>= 1)
+> +                                               if (tmp & 0x0001)
+> +                                                       printf("%d ", i);
+> +                               }
+> +                               printf("\n");
+> +                               break;
+>                         case 2:
+>                                 tmp = get_u8(frm);
+>                                 p_indent(level + 1, frm);
+> --
+> 1.9.3
+
+Pushed, thanks.
+
+
 -- 
-1.8.5.3
-
+Luiz Augusto von Dentz
