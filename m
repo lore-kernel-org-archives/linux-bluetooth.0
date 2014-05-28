@@ -2,37 +2,40 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] android/pts: Update GATT PTS results
-Date: Wed, 28 May 2014 11:19:07 +0200
-Message-Id: <1401268747-21901-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1401268747-21901-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1401268747-21901-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] android/client: Allow zero length responses
+Date: Wed, 28 May 2014 11:19:06 +0200
+Message-Id: <1401268747-21901-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pts-gatt.txt | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ android/client/if-gatt.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-index 6508ec1..6de65d2 100644
---- a/android/pts-gatt.txt
-+++ b/android/pts-gatt.txt
-@@ -227,7 +227,13 @@ TC_GAR_SR_BV_07_C	PASS	haltest:
- 				gatts send_response:
- 						<data> value greater than MTU
- 						repeat with correct offset
--TC_GAR_SR_BV_08_C	INC
-+TC_GAR_SR_BV_08_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 2 <permissions> 1
-+				gatts add_descriptor: <permissions> 1
-+				gatts start_service
-+				gatts send_response: repeat with correct offset
- TC_GAR_SR_BI_28_C	INC
- TC_GAR_SR_BI_29_C	PASS	haltest:
- 				gatts add_service
+diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+index 252e89d..0375126 100644
+--- a/android/client/if-gatt.c
++++ b/android/client/if-gatt.c
+@@ -1772,15 +1772,11 @@ static void gatts_send_response_p(int argc, const char *argv[])
+ 	data.attr_value.auth_req = 0;
+ 	data.attr_value.len = 0;
+ 
+-	if (argc <= 7) {
+-		haltest_error("No data specified\n");
+-		return;
+-	}
+-
+-	data.attr_value.len = strlen(argv[7]);
+-	scan_field(argv[7], data.attr_value.len, data.attr_value.value,
++	if (argc > 7) {
++		data.attr_value.len = strlen(argv[7]);
++		scan_field(argv[7], data.attr_value.len, data.attr_value.value,
+ 						sizeof(data.attr_value.value));
+-
++	}
+ 
+ 	haltest_info("conn_id %d, trans_id %d, status %d", conn_id, trans_id,
+ 									status);
 -- 
 1.9.3
 
