@@ -3,9 +3,9 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/9] android/gatt: Fix handling signed write command from remote
-Date: Wed, 28 May 2014 16:44:30 +0200
-Message-Id: <1401288283-13480-3-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/9] android/gatt: Fix handling sign write from remote
+Date: Wed, 28 May 2014 16:44:31 +0200
+Message-Id: <1401288283-13480-4-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1401288283-13480-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1401288283-13480-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
