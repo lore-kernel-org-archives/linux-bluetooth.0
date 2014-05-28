@@ -1,95 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH] tools/hcidump: Decode MPEG-1,2 Audio codec capabilities
-Date: Wed, 28 May 2014 10:50:02 +0200
-Message-ID: <1401267002-6306-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1401256588-1467-1-git-send-email-kiran.kumar@linaro.org>
+References: <1401256588-1467-1-git-send-email-kiran.kumar@linaro.org>
+Date: Wed, 28 May 2014 11:45:13 +0300
+Message-ID: <CABBYNZLn7Uw=Jcu_haMEczmfgY5pnfz=jwktwKDqmQ29JXk+GA@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth: Keep master role when SCO or eSCO is active
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Kiran Kumar Raparthy <kiran.kumar@linaro.org>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	"hyungseoung.yoo" <hyungseoung.yoo@samsung.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, Android Kernel Team <kernel-team@android.com>,
+	John Stultz <john.stultz@linaro.org>, Jaikumar Ganesh <jaikumarg@android.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/parser/avdtp.c | 58 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+Hi,
 
-diff --git a/tools/parser/avdtp.c b/tools/parser/avdtp.c
-index 14dc417..5969067 100644
---- a/tools/parser/avdtp.c
-+++ b/tools/parser/avdtp.c
-@@ -222,6 +222,7 @@ static void capabilities(int level, struct frame *frm)
- 			uint8_t type, codec;
- 			uint16_t tmp, freq, vndcodec = 0;
- 			uint32_t bitrate, vendor = 0;
-+			int i;
- 
- 			type  = get_u8(frm);
- 			codec = get_u8(frm);
-@@ -288,6 +289,63 @@ static void capabilities(int level, struct frame *frm)
- 				p_indent(level + 1, frm);
- 				printf("Bitpool Range %d-%d\n", tmp, get_u8(frm));
- 				break;
-+			case 1:
-+				tmp = get_u8(frm);
-+				p_indent(level + 1, frm);
-+				printf("Layers: ");
-+				if (tmp & 0x80)
-+					printf("1 ");
-+				if (tmp & 0x40)
-+					printf("2 ");
-+				if (tmp & 0x20)
-+					printf("3 ");
-+				printf("\n");
-+				p_indent(level + 1, frm);
-+				printf("CRC Protection: %s\n",
-+						tmp & 0x10 ? "Yes" : "No");
-+				p_indent(level + 1, frm);
-+				if (tmp & 0x08)
-+					printf("Mono ");
-+				if (tmp & 0x04)
-+					printf("DualChannel ");
-+				if (tmp & 0x02)
-+					printf("Stereo ");
-+				if (tmp & 0x01)
-+					printf("JointStereo ");
-+				printf("\n");
-+				tmp = get_u8(frm);
-+				p_indent(level + 1, frm);
-+				printf("Media Payload Format: RFC-2250 %s\n",
-+						tmp & 0x40 ? "RFC-3119" : "");
-+				p_indent(level + 1, frm);
-+				if (tmp & 0x20)
-+					printf("16kHz ");
-+				if (tmp & 0x10)
-+					printf("22.05kHz ");
-+				if (tmp & 0x08)
-+					printf("24kHz ");
-+				if (tmp & 0x04)
-+					printf("32kHz ");
-+				if (tmp & 0x02)
-+					printf("44.1kHz ");
-+				if (tmp & 0x01)
-+					printf("48kHz ");
-+				printf("\n");
-+				tmp = get_u16(frm);
-+				p_indent(level + 1, frm);
-+				printf("VBR: %s\n",
-+						tmp & 0x8000 ? "Yes" : "No");
-+				p_indent(level + 1, frm);
-+				printf("Bit Rate Indexes: ");
-+				if (tmp & 0x8000) {
-+					printf("n/a");
-+				} else {
-+					for (i = 0; i < 15; i++, tmp >>= 1)
-+						if (tmp & 0x0001)
-+							printf("%d ", i);
-+				}
-+				printf("\n");
-+				break;
- 			case 2:
- 				tmp = get_u8(frm);
- 				p_indent(level + 1, frm);
+On Wed, May 28, 2014 at 8:56 AM, Kiran Kumar Raparthy
+<kiran.kumar@linaro.org> wrote:
+> From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
+>
+> Preserve the master role when SCO or eSCO is active
+> as this improves compatability with lots of
+> headset and chipset combinations.
+>
+> This is one of the number of patches from the Android AOSP
+> common.git tree, which is used on almost all Android devices.
+> It looks like it would improve support for compatibility with
+> lot of headset,so I wanted to submit it for review to see
+> if it should go upstream.
+>
+> Cc: Marcel Holtmann <marcel@holtmann.org> (maintainer:BLUETOOTH SUBSYSTEM)
+> Cc: Gustavo Padovan <gustavo@padovan.org> (maintainer:BLUETOOTH SUBSYSTEM)
+> Cc: Johan Hedberg <johan.hedberg@gmail.com> (maintainer:BLUETOOTH SUBSYSTEM)
+> Cc: "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING [GENERAL])
+> Cc: linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM)
+> Cc: netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
+> Cc: linux-kernel@vger.kernel.org (open list)
+> Cc: Android Kernel Team <kernel-team@android.com>
+> Cc: John Stultz <john.stultz@linaro.org>
+> Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
+> Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
+> [kiran: Added context to commit message]
+> Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
+> ---
+>  net/bluetooth/hci_event.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 15010a2..6f944d5 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1915,6 +1915,15 @@ unlock:
+>         hci_conn_check_pending(hdev);
+>  }
+>
+> +static inline bool is_sco_active(struct hci_dev *hdev)
+> +{
+> +       if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
+> +                       (hci_conn_hash_lookup_state(hdev, ESCO_LINK,
+> +                                                   BT_CONNECTED)))
+> +               return true;
+> +       return false;
+> +}
+> +
+>  static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+>         struct hci_ev_conn_request *ev = (void *) skb->data;
+> @@ -1961,7 +1970,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>
+>                         bacpy(&cp.bdaddr, &ev->bdaddr);
+>
+> -                       if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+> +                       if (lmp_rswitch_capable(hdev) && ((mask & HCI_LM_MASTER)
+> +                                               || is_sco_active(hdev)))
+>                                 cp.role = 0x00; /* Become master */
+>                         else
+>                                 cp.role = 0x01; /* Remain slave */
+> --
+> 1.8.2.1
+
+I guess the real issue is the possibility of creating a scatternet if
+you have more than one connection, I will send a patch for scatternet
+shortly but that does not guarantee the remote device wont reject it.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
