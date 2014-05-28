@@ -1,106 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] shared/gatt: Define Read only permissions value while creating database
-Date: Wed, 28 May 2014 08:53:58 +0200
-Message-Id: <1401260041-693-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <75980FDA-BF07-4EC7-A978-B3D41BA39610@holtmann.org>
+References: <1400272636-31555-1-git-send-email-armansito@chromium.org>
+	<1400272636-31555-2-git-send-email-armansito@chromium.org>
+	<75980FDA-BF07-4EC7-A978-B3D41BA39610@holtmann.org>
+Date: Tue, 27 May 2014 23:20:05 -0700
+Message-ID: <CAHrH25RYxG=qgaPc+j4zCwZ==0gpd9-zZqgPvfS9-OUu8tmAog@mail.gmail.com>
+Subject: Re: [RFC BlueZ 1/1] src/shared/gatt: Introduce bt_gatt skeleton.
+From: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This value will be set by user when creating database. It is needed
-to set proper permissions in service declaration, include declaration
-and characteristic declaration.
----
- android/gatt.c       |  2 +-
- src/shared/gatt-db.c | 13 +++++++------
- src/shared/gatt-db.h |  2 +-
- 3 files changed, 9 insertions(+), 8 deletions(-)
+Hi Marcel,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9234b46..99e91f4 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -5497,7 +5497,7 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	gatt_apps = queue_new();
- 	app_connections = queue_new();
- 	listen_apps = queue_new();
--	gatt_db = gatt_db_new();
-+	gatt_db = gatt_db_new(GATT_PERM_READ);
- 	crypto = bt_crypto_new();
- 
- 	if (!gatt_devices || !gatt_apps || !listen_apps ||
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 998e93e..5d5739d 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -43,6 +43,7 @@ static const bt_uuid_t included_service_uuid = { .type = BT_UUID16,
- struct gatt_db {
- 	uint16_t next_handle;
- 	struct queue *services;
-+	uint32_t read_only_perm;
- };
- 
- struct gatt_db_attribute {
-@@ -107,7 +108,7 @@ static void attribute_destroy(void *data)
- 	free(attribute);
- }
- 
--struct gatt_db *gatt_db_new(void)
-+struct gatt_db *gatt_db_new(uint32_t read_only_perm)
- {
- 	struct gatt_db *db;
- 
-@@ -121,6 +122,7 @@ struct gatt_db *gatt_db_new(void)
- 		return NULL;
- 	}
- 
-+	db->read_only_perm = read_only_perm;
- 	db->next_handle = 0x0001;
- 
- 	return db;
-@@ -192,6 +194,8 @@ uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
- 		return 0;
- 	}
- 
-+	service->attributes[0]->permissions = db->read_only_perm;
-+
- 	if (!queue_push_tail(db->services, service)) {
- 		gatt_db_service_destroy(service);
- 		return 0;
-@@ -301,6 +305,7 @@ uint16_t gatt_db_add_characteristic(struct gatt_db *db, uint16_t handle,
- 	if (!service->attributes[i])
- 		return 0;
- 
-+	service->attributes[i]->permissions = db->read_only_perm;
- 	update_attribute_handle(service, i++);
- 
- 	service->attributes[i] = new_attribute(uuid, NULL, 0);
-@@ -389,11 +394,7 @@ uint16_t gatt_db_add_included_service(struct gatt_db *db, uint16_t handle,
- 	if (!service->attributes[index])
- 		return 0;
- 
--	/* The Attribute Permissions shall be read only and not require
--	 * authentication or authorization. Vol 2. Part G. 3.2
--	 *
--	 * TODO handle permissions
--	 */
-+	service->attributes[0]->permissions = db->read_only_perm;
- 	set_attribute_data(service->attributes[index], NULL, NULL, 0, NULL);
- 
- 	return update_attribute_handle(service, index);
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index f2f2f4d..7336823 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -23,7 +23,7 @@
- 
- struct gatt_db;
- 
--struct gatt_db *gatt_db_new(void);
-+struct gatt_db *gatt_db_new(uint32_t read_only_perm);
- void gatt_db_destroy(struct gatt_db *db);
- 
- uint16_t gatt_db_add_service(struct gatt_db *db, const bt_uuid_t *uuid,
--- 
-1.9.0
+>> +bool bt_gatt_discover_primary_services(struct bt_gatt *gatt, bt_uuid_t =
+*uuid,
+>> +                                     bt_gatt_discovery_callback_t callb=
+ack,
+>> +                                     void *user_data);
+>> +
+>> +bool bt_gatt_discover_included_services(struct bt_gatt *gatt,
+>> +                                     struct bt_gatt_handle_range range,
+>> +                                     bt_uuid_t *uuid,
+>> +                                     bt_gatt_discovery_callback_t callb=
+ack,
+>> +                                     void *user_data);
+>> +
+>> +bool bt_gatt_discover_characteristics(struct bt_gatt *gatt,
+>> +                                     struct bt_gatt_handle_range range,
+>> +                                     bt_uuid_t *uuid,
+>> +                                     bt_gatt_discovery_callback_t callb=
+ack,
+>> +                                     void *user_data);
+>> +
+>> +bool bt_gatt_discover_descriptors(struct bt_gatt *gatt,
+>> +                                     struct bt_gatt_handle_range range,
+>> +                                     bt_gatt_discovery_callback_t callb=
+ack,
+>> +                                     void *user_data);
+>
+> Should we really expose these low-level operations? Why not just have one=
+ bt_gatt_discover() that does all the magic for us. At the end of the day, =
+that is what most devices do when they connect to a remote device. They wil=
+l update the services they either know or have to discover new ones.
 
+I think we should have them. I pretty much see bt_gatt as an interface
+that translates GATT feature procedures to the underlying ATT protocol
+operations. I leave the magic to be the responsibility of the of the
+upper-layer, where we will have a client implementation that brings
+together src/shared/gatt and src/shared/gatt-db. I'm thinking
+something along the lines of a btd_gatt_client for bluetoothd, that
+discovers everything, caches all attributes, and makes them accessible
+to all the profiles/plugins (this is actually what I'm doing initially
+on Chrome OS using GAttrib, since we're against a deadline for
+Chrome). Eventually we could use this to remove the attio callbacks.
+
+So, to answer your question, I think having these functions at this
+level will be useful, especially for testing when we start writing PTS
+style tests for GATT.
+
+As for your other comments, I will make names shorter. I'm used to
+writing long and very explicit function names, but I figured I would
+upload them and see if someone yells at me :P
+
+Cheers,
+Arman
