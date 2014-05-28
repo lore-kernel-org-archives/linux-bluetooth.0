@@ -1,32 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] android/gatt: Add missing opcode to check_device_permissions
-Date: Wed, 28 May 2014 08:54:01 +0200
-Message-Id: <1401260041-693-4-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 2/4] shared/gatt: Return integer value in get_attribute_permission
+Date: Wed, 28 May 2014 08:53:59 +0200
+Message-Id: <1401260041-693-2-git-send-email-marcin.kraglak@tieto.com>
 In-Reply-To: <1401260041-693-1-git-send-email-marcin.kraglak@tieto.com>
 References: <1401260041-693-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It returned ATT_ECODE_UNLIKELY when processing find_by_type_value
-request.
+Return -1 to notfiy user that given attribute cannot be found.
 ---
- android/gatt.c | 1 +
- 1 file changed, 1 insertion(+)
+ src/shared/gatt-db.c | 7 ++++---
+ src/shared/gatt-db.h | 2 +-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b95047d..3bce506 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -3885,6 +3885,7 @@ static uint8_t check_device_permissions(struct gatt_device *device,
- 	case ATT_OP_READ_BLOB_REQ:
- 	case ATT_OP_READ_MULTI_REQ:
- 	case ATT_OP_READ_BY_GROUP_REQ:
-+	case ATT_OP_FIND_BY_TYPE_REQ:
- 		if (!(permissions & GATT_PERM_READ))
- 			return ATT_ECODE_READ_NOT_PERM;
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 5d5739d..e9a0846 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -30,6 +30,7 @@
  
+ #define MAX_CHAR_DECL_VALUE_LEN 19
+ #define MAX_INCLUDED_VALUE_LEN 6
++#define ATTRIBUTE_NOT_FOUND -1
+ 
+ static const bt_uuid_t primary_service_uuid = { .type = BT_UUID16,
+ 					.value.u16 = GATT_PRIM_SVC_UUID };
+@@ -735,7 +736,7 @@ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle)
+ 	return service->attributes[0]->handle + service->num_handles - 1;
+ }
+ 
+-uint32_t gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle)
++int64_t gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle)
+ {
+ 	struct gatt_db_attribute *attribute;
+ 	struct gatt_db_service *service;
+@@ -744,7 +745,7 @@ uint32_t gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle)
+ 	service = queue_find(db->services, find_service_for_handle,
+ 							INT_TO_PTR(handle));
+ 	if (!service)
+-		return 0;
++		return ATTRIBUTE_NOT_FOUND;
+ 
+ 	service_handle = service->attributes[0]->handle;
+ 
+@@ -755,7 +756,7 @@ uint32_t gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle)
+ 	 */
+ 	attribute = service->attributes[handle - service_handle];
+ 	if (!attribute)
+-		return 0;
++		return ATTRIBUTE_NOT_FOUND;
+ 
+ 	return attribute->permissions;
+ }
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index 7336823..3ab3478 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -92,4 +92,4 @@ const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
+ 
+ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle);
+ 
+-uint32_t gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle);
++int64_t gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle);
 -- 
 1.9.0
 
