@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/client: Allow zero length responses
-Date: Wed, 28 May 2014 11:28:47 +0200
-Message-ID: <2085513.UkBDmqa62f@uw000953>
-In-Reply-To: <1401268747-21901-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1401268747-21901-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCHv2 1/2] android/gatt: Fix not checking for read errors in read by type
+Date: Wed, 28 May 2014 11:27:37 +0200
+Message-ID: <25481012.KzKCjSqATe@uw000953>
+In-Reply-To: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,37 +14,34 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jakub,
 
-On Wednesday 28 of May 2014 11:19:06 Jakub Tyszkowski wrote:
+On Wednesday 28 of May 2014 11:17:59 Jakub Tyszkowski wrote:
 > ---
->  android/client/if-gatt.c | 12 ++++--------
->  1 file changed, 4 insertions(+), 8 deletions(-)
+>  android/gatt.c | 8 +++++++-
+>  1 file changed, 7 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> index 252e89d..0375126 100644
-> --- a/android/client/if-gatt.c
-> +++ b/android/client/if-gatt.c
-> @@ -1772,15 +1772,11 @@ static void gatts_send_response_p(int argc, const char *argv[])
->  	data.attr_value.auth_req = 0;
->  	data.attr_value.len = 0;
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 9234b46..6189407 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -3643,9 +3643,15 @@ static void send_dev_pending_response(struct gatt_device *device,
+>  			goto done;
+>  		}
 >  
-> -	if (argc <= 7) {
-> -		haltest_error("No data specified\n");
-> -		return;
-> -	}
-> -
-> -	data.attr_value.len = strlen(argv[7]);
-> -	scan_field(argv[7], data.attr_value.len, data.attr_value.value,
-> +	if (argc > 7) {
-> +		data.attr_value.len = strlen(argv[7]);
-> +		scan_field(argv[7], data.attr_value.len, data.attr_value.value,
->  						sizeof(data.attr_value.value));
-> -
-> +	}
+> +		if (val->error) {
+> +			queue_destroy(temp, NULL);
+> +			error = val->error;
+> +			goto done;
+> +		}
+> +
+>  		length = val->length;
 >  
->  	haltest_info("conn_id %d, trans_id %d, status %d", conn_id, trans_id,
->  									status);
+> -		while (val && val->length == length) {
+> +		while (val && val->length == length && val->error == 0) {
+>  			queue_push_tail(temp, val);
+>  			val = queue_pop_head(device->pending_requests);
+>  		}
 
-This patch is now applied, thanks.
+This patch is now pushed, thanks.
 
 -- 
 Best regards, 
