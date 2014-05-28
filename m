@@ -2,40 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] android/client: Allow zero length responses
-Date: Wed, 28 May 2014 11:19:06 +0200
-Message-Id: <1401268747-21901-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 2/2] android/pts: Update GATT PTS results
+Date: Wed, 28 May 2014 11:18:00 +0200
+Message-Id: <1401268680-21765-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/client/if-gatt.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+ android/pts-gatt.txt | 21 ++++++++++++++++++---
+ 1 file changed, 18 insertions(+), 3 deletions(-)
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 252e89d..0375126 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -1772,15 +1772,11 @@ static void gatts_send_response_p(int argc, const char *argv[])
- 	data.attr_value.auth_req = 0;
- 	data.attr_value.len = 0;
- 
--	if (argc <= 7) {
--		haltest_error("No data specified\n");
--		return;
--	}
--
--	data.attr_value.len = strlen(argv[7]);
--	scan_field(argv[7], data.attr_value.len, data.attr_value.value,
-+	if (argc > 7) {
-+		data.attr_value.len = strlen(argv[7]);
-+		scan_field(argv[7], data.attr_value.len, data.attr_value.value,
- 						sizeof(data.attr_value.value));
--
-+	}
- 
- 	haltest_info("conn_id %d, trans_id %d, status %d", conn_id, trans_id,
- 									status);
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index b5126ee..6508ec1 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -149,9 +149,24 @@ TC_GAR_SR_BI_06_C	PASS	haltest:
+ 				gatts start_service
+ TC_GAR_SR_BI_07_C	PASS
+ TC_GAR_SR_BI_08_C	PASS
+-TC_GAR_SR_BI_09_C	INC
+-TC_GAR_SR_BI_10_C	INC
+-TC_GAR_SR_BI_11_C	INC
++TC_GAR_SR_BI_09_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts start_service
++				gatts send_response: <status> 8
++TC_GAR_SR_BI_10_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts start_service
++				gatts send_response: <status> 5
++TC_GAR_SR_BI_11_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 2 <permissions> 1
++				gatts start_service
++				gatts send_response: <status> 12
+ TC_GAR_SR_BV_04_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_chaaracteristic:
 -- 
 1.9.3
 
