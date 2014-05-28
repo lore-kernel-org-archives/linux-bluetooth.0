@@ -1,92 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1401256588-1467-1-git-send-email-kiran.kumar@linaro.org>
-References: <1401256588-1467-1-git-send-email-kiran.kumar@linaro.org>
-Date: Wed, 28 May 2014 11:45:13 +0300
-Message-ID: <CABBYNZLn7Uw=Jcu_haMEczmfgY5pnfz=jwktwKDqmQ29JXk+GA@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Keep master role when SCO or eSCO is active
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Kiran Kumar Raparthy <kiran.kumar@linaro.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	"hyungseoung.yoo" <hyungseoung.yoo@samsung.com>, Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, Android Kernel Team <kernel-team@android.com>,
-	John Stultz <john.stultz@linaro.org>, Jaikumar Ganesh <jaikumarg@android.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH v2 01/10] src/shared/att: Introduce struct bt_att.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25SdNUQ+5SUC0vmoU90q57iKVkkLERyK7UZ+W=8j7uGKsg@mail.gmail.com>
+Date: Wed, 28 May 2014 10:37:02 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <A75E24DA-B69D-452D-8E27-B75DBF2855C8@holtmann.org>
+References: <1400271298-29769-1-git-send-email-armansito@chromium.org> <1400271298-29769-2-git-send-email-armansito@chromium.org> <2DDA7254-76A3-43EE-A116-B6D5B245D8A3@holtmann.org> <CAHrH25SdNUQ+5SUC0vmoU90q57iKVkkLERyK7UZ+W=8j7uGKsg@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Arman,
 
-On Wed, May 28, 2014 at 8:56 AM, Kiran Kumar Raparthy
-<kiran.kumar@linaro.org> wrote:
-> From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
->
-> Preserve the master role when SCO or eSCO is active
-> as this improves compatability with lots of
-> headset and chipset combinations.
->
-> This is one of the number of patches from the Android AOSP
-> common.git tree, which is used on almost all Android devices.
-> It looks like it would improve support for compatibility with
-> lot of headset,so I wanted to submit it for review to see
-> if it should go upstream.
->
-> Cc: Marcel Holtmann <marcel@holtmann.org> (maintainer:BLUETOOTH SUBSYSTEM)
-> Cc: Gustavo Padovan <gustavo@padovan.org> (maintainer:BLUETOOTH SUBSYSTEM)
-> Cc: Johan Hedberg <johan.hedberg@gmail.com> (maintainer:BLUETOOTH SUBSYSTEM)
-> Cc: "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING [GENERAL])
-> Cc: linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM)
-> Cc: netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
-> Cc: linux-kernel@vger.kernel.org (open list)
-> Cc: Android Kernel Team <kernel-team@android.com>
-> Cc: John Stultz <john.stultz@linaro.org>
-> Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
-> Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
-> [kiran: Added context to commit message]
-> Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
-> ---
->  net/bluetooth/hci_event.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 15010a2..6f944d5 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1915,6 +1915,15 @@ unlock:
->         hci_conn_check_pending(hdev);
->  }
->
-> +static inline bool is_sco_active(struct hci_dev *hdev)
-> +{
-> +       if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
-> +                       (hci_conn_hash_lookup_state(hdev, ESCO_LINK,
-> +                                                   BT_CONNECTED)))
-> +               return true;
-> +       return false;
-> +}
-> +
->  static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->  {
->         struct hci_ev_conn_request *ev = (void *) skb->data;
-> @@ -1961,7 +1970,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->
->                         bacpy(&cp.bdaddr, &ev->bdaddr);
->
-> -                       if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
-> +                       if (lmp_rswitch_capable(hdev) && ((mask & HCI_LM_MASTER)
-> +                                               || is_sco_active(hdev)))
->                                 cp.role = 0x00; /* Become master */
->                         else
->                                 cp.role = 0x01; /* Remain slave */
-> --
-> 1.8.2.1
+>>> +unsigned int bt_att_send_sequential(struct bt_att *att, uint8_t opcode,
+>>> +                             const void *param, uint16_t length,
+>>> +                             bt_att_request_func_t callback, void *user_data,
+>>> +                             bt_att_destroy_func_t destroy);
+>> 
+>> That is the implied behavior for _send functions. So I would not use _send_sequential here at all.
+> 
+> This mainly came about after the discussion with Luiz on patch set v1.
+> My idea was to use bt_att_send for non-sequential ops and
+> bt_att_send_sequential for the opposite. I could rename these to
+> bt_att_send_without_rsp and bt_att_send, respectively.
 
-I guess the real issue is the possibility of creating a scatternet if
-you have more than one connection, I will send a patch for scatternet
-shortly but that does not guarantee the remote device wont reject it.
+I am getting the feeling that just having bt_att_send only seems much cleaner. And if you give an opcode that does not expect a response, then you have to give an empty callback function. If not you get an error. I have to scratch my head a bit against this.
 
+>> I am still not sure that we should be doing it like this. We tried this with gattrib and it did not turn out that great. I really like the approach of I send this command and expect this PDU back or an error. The reason here is that in theory you can get interleaved commands/response on the same channel.
+> 
+> I understand the reasoning behind this; then again it introduces
+> potential error cases such as expecting the wrong PDU back, e.g.
+> expecting a "Write Response" while sending a "Read Request". In the
+> end, I don't see much value in building the API that way, since in
+> ATT, all sequential requests have a 1-to-1 mapping to a sequential
+> response. e.g., if we receive a "Read Response", the currently pending
+> request absolutely has to be a "Read Request", otherwise we are
+> supposed to ignore the PDU (or drop the connection entirely, according
+> to the spec).
+> 
+>> 
+>> So this is what you would normally expect:
+>> 
+>>        -> command
+>>        <- response
+>> 
+>> Straight forward and simple, right. However nothing is stopping the other side from issues the same command in the other direction.
+>> 
+>>        -> command
+>>        <- command
+>>        <- response
+>>        -> response
+>> 
+>> And this is not to mention notifications and confirmations that can happen as well.
+>> 
+>> I am thinking out loud here. What might help is a table that classifies which opcode is a command, response, notification or confirmation and based on that we just do the right thing.
+> 
+> Well, I actually did write a similar unit test on my local branch
+> using my current implementation and these work as expected. The way I
+> structured the code actually does (or will do in upcoming patches)
+> exactly what you say, though instead of using tables, each "handler"
+> function explicitly checks the opcode to see if it falls into its
+> expected category (e.g. handle_response, handle_notification, etc.).
+> 
+> ATT is a really simple protocol in this regard.
 
--- 
-Luiz Augusto von Dentz
+It is simple, but it is also not structured. Opcode numbers have no higher meaning. They are just numbers. That why having a table of known opcodes and its semantics might be the simplest way.
+
+>> 
+>> Unfortunately we need to get this one right and I know that rebasing patches can be a pain. So if you just want to send the initial 01/01 patch for this then that is fine with me as well. I think some units tests with this overlapping bi-directional communication would be amazingly great to have. I do wonder if other OSes handle this well.
+> 
+> Absolutely. Let me know if this has convinced you. So my idea is to
+> have a bt_att_send and bt_att_send_without_rsp. I originally had a
+> single bt_att_send for all opcodes, but Luiz brought up the fact that
+> having a one for all function leads to some inconsistencies, such as
+> cases where a callback is passed along with an opcode that doesn't
+> expect a response. Personally I don't think this is such a problem as
+> long as the API is well documented.
+
+Right now as said above, just having bt_att_send seems enough. Start with that and see how it goes. Add an extra simpler helper that utilizes bt_att_send with an empty callback is dead simple. We can worry about that later.
+
+> Luiz's suggestion was to actually have a separate function per ATT
+> opcode. In that approach we would remove the opcode + parameter
+> structure design entirely and have the individual functions accept the
+> right parameters. So, no bt_att_send, but bt_att_send_read_request,
+> etc. Do you think this would be a cleaner approach in the end?
+
+I do not want this. Having separate function for each opcode pair or function gets really complicated. We have been down this rabbit hole before. The more generic approach have worked out nicely with mgmt handling and I really like trying to duplicate that. And my current feeling is that bt_att_send is the way to go.
+
+Regards
+
+Marcel
+
