@@ -2,50 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 2/2] android/pts: Update GATT PTS results
-Date: Wed, 28 May 2014 11:18:00 +0200
-Message-Id: <1401268680-21765-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 1/2] android/gatt: Fix not checking for read errors in read by type
+Date: Wed, 28 May 2014 11:17:59 +0200
+Message-Id: <1401268680-21765-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pts-gatt.txt | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ android/gatt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-index b5126ee..6508ec1 100644
---- a/android/pts-gatt.txt
-+++ b/android/pts-gatt.txt
-@@ -149,9 +149,24 @@ TC_GAR_SR_BI_06_C	PASS	haltest:
- 				gatts start_service
- TC_GAR_SR_BI_07_C	PASS
- TC_GAR_SR_BI_08_C	PASS
--TC_GAR_SR_BI_09_C	INC
--TC_GAR_SR_BI_10_C	INC
--TC_GAR_SR_BI_11_C	INC
-+TC_GAR_SR_BI_09_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 2 <permissions> 1
-+				gatts start_service
-+				gatts send_response: <status> 8
-+TC_GAR_SR_BI_10_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 2 <permissions> 1
-+				gatts start_service
-+				gatts send_response: <status> 5
-+TC_GAR_SR_BI_11_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 2 <permissions> 1
-+				gatts start_service
-+				gatts send_response: <status> 12
- TC_GAR_SR_BV_04_C	PASS	haltest:
- 				gatts add_service
- 				gatts add_chaaracteristic:
+diff --git a/android/gatt.c b/android/gatt.c
+index 9234b46..6189407 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3643,9 +3643,15 @@ static void send_dev_pending_response(struct gatt_device *device,
+ 			goto done;
+ 		}
+ 
++		if (val->error) {
++			queue_destroy(temp, NULL);
++			error = val->error;
++			goto done;
++		}
++
+ 		length = val->length;
+ 
+-		while (val && val->length == length) {
++		while (val && val->length == length && val->error == 0) {
+ 			queue_push_tail(temp, val);
+ 			val = queue_pop_head(device->pending_requests);
+ 		}
 -- 
 1.9.3
 
