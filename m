@@ -1,83 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] bluetooth: Try to avoid forming scatternets
-Date: Wed, 28 May 2014 14:40:04 +0300
-Message-Id: <1401277204-28062-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] input: Do not send UHID_DESTROY
+Date: Wed, 28 May 2014 14:27:55 +0300
+Message-Id: <1401276475-20978-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1401276475-20978-1-git-send-email-luiz.dentz@gmail.com>
+References: <1401276475-20978-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In case of multiple connections automatically attempt to become master
-to avoid scatternet topology.
+Accourding to uHID documentation when diconnecting the kernel will take
+care of cleaning up any device created:
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+  "If you close() the fd, the device is automatically unregistered and
+   destroyed internally."
 ---
- net/bluetooth/hci_event.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+ profiles/input/device.c | 17 +----------------
+ profiles/input/hog.c    | 10 ----------
+ 2 files changed, 1 insertion(+), 26 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 492d8d5..e6aed6e 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2017,8 +2017,15 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	if (ev->status) {
- 		hci_proto_connect_cfm(conn, ev->status);
- 		hci_conn_del(conn);
--	} else if (ev->link_type != ACL_LINK)
-+	} else if (ev->link_type != ACL_LINK) {
- 		hci_proto_connect_cfm(conn, ev->status);
-+	} else if (hci_conn_num(hdev, ACL_LINK) > 1) {
-+		/* Attempt to switch to master to avoid scatternet */
-+		list_for_each_entry(conn, &hdev->conn_hash.list, list) {
-+			if (conn->type == ACL_LINK)
-+				hci_conn_switch_role(conn, 0x00);
-+		}
-+	}
+diff --git a/profiles/input/device.c b/profiles/input/device.c
+index 785b1e9..a61b2c7 100644
+--- a/profiles/input/device.c
++++ b/profiles/input/device.c
+@@ -108,22 +108,7 @@ static int connection_disconnect(struct input_device *idev, uint32_t flags);
  
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -2035,6 +2042,12 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
- 	       ev->link_type);
- 
-+	hci_dev_lock(hdev);
-+
-+	/* Allways attempt to become the master in multiple connection case */
-+	if (hci_conn_num(hdev, ev->link_type) > 0)
-+		mask |= HCI_LM_MASTER;
-+
- 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type,
- 				      &flags);
- 
-@@ -2044,8 +2057,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		struct inquiry_entry *ie;
- 		struct hci_conn *conn;
- 
--		hci_dev_lock(hdev);
+ static void input_device_free(struct input_device *idev)
+ {
+-	if (idev->uhid) {
+-		if (idev->uhid_created) {
+-			int err;
+-			struct uhid_event ev;
 -
- 		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
- 		if (ie)
- 			memcpy(ie->data.dev_class, ev->dev_class, 3);
-@@ -2063,8 +2074,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 		memcpy(conn->dev_class, ev->dev_class, 3);
- 
--		hci_dev_unlock(hdev);
+-			memset(&ev, 0, sizeof(ev));
+-			ev.type = UHID_DESTROY;
+-			err = bt_uhid_send(idev->uhid, &ev);
+-			if (err < 0)
+-				error("bt_uhid_send: %s (%d)", strerror(-err),
+-									-err);
+-		}
 -
- 		if (ev->link_type == ACL_LINK ||
- 		    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
- 			struct hci_cp_accept_conn_req cp;
-@@ -2106,6 +2115,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		cp.reason = HCI_ERROR_REJ_BAD_ADDR;
- 		hci_send_cmd(hdev, HCI_OP_REJECT_CONN_REQ, sizeof(cp), &cp);
- 	}
-+
-+	hci_dev_unlock(hdev);
- }
+-		bt_uhid_unref(idev->uhid);
+-	}
+-
++	bt_uhid_unref(idev->uhid);
+ 	btd_service_unref(idev->service);
+ 	btd_device_unref(idev->device);
+ 	g_free(idev->path);
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index 47a4fb1..3753343 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -750,17 +750,7 @@ static struct hog_device *hog_register_device(struct btd_device *device,
  
- static u8 hci_to_mgmt_reason(u8 err)
+ static int hog_unregister_device(struct hog_device *hogdev)
+ {
+-	struct uhid_event ev;
+-	int err;
+-
+ 	btd_device_remove_attio_callback(hogdev->device, hogdev->attioid);
+-
+-	memset(&ev, 0, sizeof(ev));
+-	ev.type = UHID_DESTROY;
+-	err = bt_uhid_send(hogdev->uhid, &ev);
+-	if (err < 0)
+-		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
+-
+ 	bt_uhid_unref(hogdev->uhid);
+ 	hog_free_device(hogdev);
+ 
 -- 
 1.9.0
 
