@@ -1,95 +1,279 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <5385F341.1070508@cogentembedded.com>
-Date: Wed, 28 May 2014 18:31:29 +0400
-From: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-MIME-Version: 1.0
-To: Kiran Kumar Raparthy <kiran.kumar@linaro.org>,
- linux-kernel@vger.kernel.org
-CC: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, open@holtmann.org,
-	list@holtmann.org:BLUETOOTH SUBSYSTEM <linux-bluetooth@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-	Android Kernel Team <kernel-team@android.com>,
-	John Stultz <john.stultz@linaro.org>,
-	Jaikumar Ganesh <jaikumarg@android.com>
-Subject: Re: [RFC] Bluetooth: Keep master role when SCO or eSCO is active
-References: <1401256588-1467-1-git-send-email-kiran.kumar@linaro.org>
-In-Reply-To: <1401256588-1467-1-git-send-email-kiran.kumar@linaro.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+From: Eva Kolanska <eva.kolanska@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Eva Kolanska <eva.kolanska@tieto.com>
+Subject: [PATCH] android/pts: Update GATT Server test results
+Date: Wed, 28 May 2014 16:24:48 +0200
+Message-Id: <1401287088-1256-1-git-send-email-eva.kolanska@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello.
+---
+ android/pts-gatt.txt |  224 +++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 193 insertions(+), 31 deletions(-)
 
-On 05/28/2014 09:56 AM, Kiran Kumar Raparthy wrote:
+diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+index 60968e2..a15c1d2 100644
+--- a/android/pts-gatt.txt
++++ b/android/pts-gatt.txt
+@@ -286,7 +286,9 @@ TC_GAR_SR_BV_08_C	PASS	haltest:
+ 						<properties> 2 <permissions> 1
+ 				gatts add_descriptor: <permissions> 1
+ 				gatts start_service
+-				gatts send_response: repeat with correct offset
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
+ TC_GAR_SR_BI_28_C	PASS	haltest:
+ 				gatts add_service
+ 				gatts add_chaaracteristic:
+@@ -579,22 +581,98 @@ TC_GAW_CL_BI_36_C	PASS	haltest:
+ 				gattc get_descriptor
+ 				gattc write_descriptor 2 <long_value>
+ 				gattc disconnect
+-TC_GAW_SR_BV_01_C	INC
+-TC_GAW_SR_BV_02_C	INC
+-TC_GAW_SR_BI_01_C	INC
+-TC_GAW_SR_BV_03_C	INC
+-TC_GAW_SR_BI_02_C	INC
+-TC_GAW_SR_BI_03_C	INC
+-TC_GAW_SR_BI_04_C	INC
+-TC_GAW_SR_BI_05_C	INC
+-TC_GAW_SR_BI_06_C	INC
++TC_GAW_SR_BV_01_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 4 <permissions> 16
++				gatts start_service
++TC_GAW_SR_BV_02_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 68
++						<permissions> 129
++				gatts start_service
++				gatts send_response: repeat with correct <data>
++TC_GAW_SR_BI_01_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 68
++						<permissions> 129
++				gatts start_service
++				gatts send_response: repeat with <data> 1
++TC_GAW_SR_BV_03_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++TC_GAW_SR_BI_02_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response: <status> 1
++TC_GAW_SR_BI_03_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 1
++				gatts start_service
++TC_GAW_SR_BI_04_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response: <status> 8
++TC_GAW_SR_BI_05_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response: <status> 5
++TC_GAW_SR_BI_06_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response: <status> 12
+ TC_GAW_SR_BV_05_C	INC
+-TC_GAW_SR_BI_07_C	INC
+-TC_GAW_SR_BI_08_C	INC
++TC_GAW_SR_BI_07_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response
++TC_GAW_SR_BI_08_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 2 <permissions> 1
++				gatts start_service
+ TC_GAW_SR_BI_09_C	INC
+-TC_GAW_SR_BI_11_C	INC
+-TC_GAW_SR_BI_12_C	INC
+-TC_GAW_SR_BI_13_C	INC
++TC_GAW_SR_BI_11_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
++				gatts send_response: <status> 8
++TC_GAW_SR_BI_12_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
++				gatts send_response: <status> 5
++TC_GAW_SR_BI_13_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response:
++						<data> value greater than MTU
++						repeat with correct offset
++				gatts send_response: <status> 12
+ TC_GAW_SR_BV_06_C	INC
+ TC_GAW_SR_BV_10_C	INC
+ TC_GAW_SR_BI_14_C	INC
+@@ -603,22 +681,95 @@ TC_GAW_SR_BI_17_C	INC
+ TC_GAW_SR_BI_18_C	INC
+ TC_GAW_SR_BI_19_C	INC
+ TC_GAW_SR_BV_07_C	INC
+-TC_GAW_CL_BV_08_C	INC
+-TC_GAW_SR_BI_20_C	INC
+-TC_GAW_SR_BI_21_C	INC
+-TC_GAW_SR_BI_22_C	INC
+-TC_GAW_SR_BI_23_C	INC
+-TC_GAW_SR_BI_24_C	INC
++TC_GAW_CL_BV_08_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response
++TC_GAW_SR_BI_20_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 1
++TC_GAW_SR_BI_21_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 2 <permissions> 1
++				gatts add_descriptor: <permmisions> 1
++				gatts start_service
++TC_GAW_SR_BI_22_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 8
++
++TC_GAW_SR_BI_23_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 5
++TC_GAW_SR_BI_24_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 12
+ TC_GAW_SR_BV_09_C	INC
+-TC_GAW_SR_BI_25_C	INC
++TC_GAW_SR_BI_25_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 1
+ TC_GAW_SR_BI_26_C	INC
+ TC_GAW_SR_BI_27_C	INC
+-TC_GAW_SR_BI_29_C	INC
+-TC_GAW_SR_BI_30_C	INC
+-TC_GAW_SR_BI_31_C	INC
+-TC_GAW_SR_BI_32_C	INC
++TC_GAW_SR_BI_29_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 8
++TC_GAW_SR_BI_30_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 5
++TC_GAW_SR_BI_31_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response: <status> 12
++TC_GAW_SR_BI_32_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
++				gatts send_response
++				gatts send_response: <status> 13
+ TC_GAW_SR_BI_33_C	INC
+-TC_GAW_SR_BI_34_C	INC
++TC_GAW_SR_BI_34_C	PASS	haltest:
++				gatts add_service
++				gatts add_characteristic:
++						<properties> 10 <permissions> 17
++				gatts add_descriptor: <permmisions> 17
++				gatts start_service
++				gatts send_response
++				gatts send_response: <status> 13
+ TC_GAW_SR_BI_35_C	INC
+ TC_GAN_CL_BV_01_C	INC	PTS issue #12249
+ TC_GAN_SR_BV_01_C	INC
+@@ -653,10 +804,21 @@ TC_GPA_CL_BV_07_C	INC	gatttool required
+ TC_GPA_CL_BV_08_C	INC	gatttool required
+ TC_GPA_CL_BV_11_C	INC	gatttool required
+ TC_GPA_CL_BV_12_C	INC	gatttool required
+-TC_GPA_SR_BV_01_C	INC
+-TC_GPA_SR_BV_02_C	INC
+-TC_GPA_SR_BV_03_C	INC
+-TC_GPA_SR_BV_04_C	INC
++TC_GPA_SR_BV_01_C	PASS
++TC_GPA_SR_BV_02_C	PASS	haltest:
++				gatts add_service
++				gatts start_service
++TC_GPA_SR_BV_03_C	PASS	haltest:
++				gatts add_service
++				gatts add_service
++				add_included_service
++				gatts start_service
++				gatts start_service
++TC_GPA_SR_BV_04_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 10 <permissions> 17
++				gatts start_service
+ TC_GPA_SR_BV_05_C	INC
+ TC_GPA_SR_BV_06_C	INC
+ TC_GPA_SR_BV_07_C	INC
+-- 
+1.7.9.5
 
-> From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
-
-> Preserve the master role when SCO or eSCO is active
-> as this improves compatability with lots of
-
-    Compatibility.
-
-> headset and chipset combinations.
-
-> This is one of the number of patches from the Android AOSP
-> common.git tree, which is used on almost all Android devices.
-> It looks like it would improve support for compatibility with
-> lot of headset,so I wanted to submit it for review to see
-> if it should go upstream.
-
-> Cc: Marcel Holtmann <marcel@holtmann.org> (maintainer:BLUETOOTH SUBSYSTEM)
-> Cc: Gustavo Padovan <gustavo@padovan.org> (maintainer:BLUETOOTH SUBSYSTEM)
-> Cc: Johan Hedberg <johan.hedberg@gmail.com> (maintainer:BLUETOOTH SUBSYSTEM)
-> Cc: "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING [GENERAL])
-> Cc: linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM)
-> Cc: netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
-> Cc: linux-kernel@vger.kernel.org (open list)
-> Cc: Android Kernel Team <kernel-team@android.com>
-> Cc: John Stultz <john.stultz@linaro.org>
-> Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
-> Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
-> [kiran: Added context to commit message]
-> Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
-> ---
->   net/bluetooth/hci_event.c | 12 +++++++++++-
->   1 file changed, 11 insertions(+), 1 deletion(-)
-
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 15010a2..6f944d5 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1915,6 +1915,15 @@ unlock:
->   	hci_conn_check_pending(hdev);
->   }
->
-> +static inline bool is_sco_active(struct hci_dev *hdev)
-> +{
-> +	if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
-> +			(hci_conn_hash_lookup_state(hdev, ESCO_LINK,
-
-    () around function/macro invocation not needed (if this is a macro, 
-consider enclosing its definition in parens instead). Also, this line should
-start under 'hdev' on the previous one.
-
-> +						    BT_CONNECTED)))
-> +		return true;
-> +	return false;
-> +}
-> +
->   static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->   {
->   	struct hci_ev_conn_request *ev = (void *) skb->data;
-> @@ -1961,7 +1970,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
->
->   			bacpy(&cp.bdaddr, &ev->bdaddr);
->
-> -			if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
-> +			if (lmp_rswitch_capable(hdev) && ((mask & HCI_LM_MASTER)
-> +						|| is_sco_active(hdev)))
-
-   Don't start the line with ||, leave it on the previous line instead.
-
-WBR, Sergei
