@@ -3,49 +3,42 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 8/9] unit/crypto: Update after changes in singing process
-Date: Wed, 28 May 2014 16:44:41 +0200
-Message-Id: <1401288283-13480-14-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 7/9] shared/crypto: Swap message before signing it
+Date: Wed, 28 May 2014 16:44:40 +0200
+Message-Id: <1401288283-13480-13-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1401288283-13480-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1401288283-13480-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- unit/test-crypto.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/shared/crypto.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/unit/test-crypto.c b/unit/test-crypto.c
-index 9bc072b..c5a6954 100644
---- a/unit/test-crypto.c
-+++ b/unit/test-crypto.c
-@@ -62,7 +62,7 @@ static const uint8_t msg_2[] = {
- };
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index ad89174..c400081 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -265,6 +265,7 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 	uint8_t tmp[16], out[16];
+ 	uint16_t msg_len = m_len + sizeof(uint32_t);
+ 	uint8_t msg[msg_len];
++	uint8_t msg_s[msg_len];
  
- static const uint8_t t_msg_2[] = {
--	0x00, 0x00, 0x00, 0x00, 0x79, 0xc1, 0x60, 0x5b, 0x71, 0x32, 0x68, 0x59
-+	0x00, 0x00, 0x00, 0x00, 0x27, 0x39, 0x74, 0xf4, 0x39, 0x2a, 0x23, 0x2a
- };
+ 	if (!crypto)
+ 		return false;
+@@ -283,7 +284,10 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 	if (fd < 0)
+ 		return false;
  
- static const struct test_data test_data_2 = {
-@@ -79,7 +79,7 @@ static const uint8_t msg_3[] = {
- };
- 
- static const uint8_t t_msg_3[12] = {
--	0x00, 0x00, 0x00, 0x00, 0x3e, 0xc3, 0x46, 0x95, 0x2c, 0xdf, 0x88, 0x32
-+	0x00, 0x00, 0x00, 0x00, 0xb7, 0xca, 0x94, 0xab, 0x87, 0xc7, 0x82, 0x18
- };
- 
- static const struct test_data test_data_3 = {
-@@ -98,7 +98,7 @@ static const uint8_t msg_4[] = {
- };
- 
- static const uint8_t t_msg_4[12] = {
--	0x00, 0x00, 0x00, 0x00, 0x43, 0x0c, 0xaa, 0x71, 0x19, 0x73, 0xbb, 0x59
-+	0x00, 0x00, 0x00, 0x00, 0x44, 0xe1, 0xe6, 0xce, 0x1d, 0xf5, 0x13, 0x68
- };
- 
- static const struct test_data test_data_4 = {
+-	len = send(fd, msg, msg_len, 0);
++	/* Swap msg before signing */
++	swap_buf(msg, msg_s, msg_len);
++
++	len = send(fd, msg_s, msg_len, 0);
+ 	if (len < 0) {
+ 		close(fd);
+ 		return false;
 -- 
 1.8.4
 
