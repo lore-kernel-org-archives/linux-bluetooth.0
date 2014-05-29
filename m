@@ -1,49 +1,210 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: johan.hedberg@gmail.com, szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 00/10] Fixes to sign write
-Date: Thu, 29 May 2014 15:49:34 +0200
-Message-Id: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Eva Kolanska <eva.kolanska@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] android/pts: Update GATT test results
+Date: Thu, 29 May 2014 15:44:20 +0200
+Message-ID: <1735626.oMcviHHkt7@uw000953>
+In-Reply-To: <1401370455-20995-1-git-send-email-eva.kolanska@tieto.com>
+References: <1401370455-20995-1-git-send-email-eva.kolanska@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set brings couple of bug fixes founded during tests against PTS.
-Biggest change is that I had to move signing procedure down to att.c as
-not only payload need to be signed but also opcode and handle.
-Therefore it makes sense to generate signature in place where pdu is encoded
+Hi Eva,
 
-With those patches PTS TC_GAW_CL_BV_02_C and TC_GAW_SR_BV_02_C are passing
+On Thursday 29 of May 2014 15:34:15 Eva Kolanska wrote:
+> ---
+>  android/pts-gatt.txt |  129 ++++++++++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 110 insertions(+), 19 deletions(-)
+> 
+> diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
+> index 8fe019c..283e81a 100644
+> --- a/android/pts-gatt.txt
+> +++ b/android/pts-gatt.txt
+> @@ -120,7 +120,13 @@ TC_GAR_CL_BI_03_C	PASS	haltest:
+>  				gattc read_characteristic
+>  TC_GAR_CL_BI_04_C	PASS	haltest:
+>  				gattc read_characteristic
+> -TC_GAR_CL_BI_05_C	INC	not implemented (encryption)
+> +TC_GAR_CL_BI_05_C	PASS	haltest:
+> +				gattc connect
+> +				gattc search_service
+> +				gattc get_characteristic: srvc_id based on
+> +								handle from logs
+> +				gattc read_characteristic
+> +				gattc disconnect
+>  TC_GAR_CL_BV_03_C	INC	JIRA: BZ-31, Possible PTS issue #12227
+>  TC_GAR_CL_BI_06_C	PASS	haltest:
+>  				gattc connect
+> @@ -154,7 +160,13 @@ TC_GAR_CL_BI_15_C	PASS	haltest:
+>  				gattc read_characteristic
+>  TC_GAR_CL_BI_16_C	PASS	haltest:
+>  				gattc read_characteristic
+> -TC_GAR_CL_BI_17_C	INC	not implemented (encryption)
+> +TC_GAR_CL_BI_17_C	PASS	haltest:
+> +				gattc connect
+> +				gattc search_service
+> +				gattc get_characteristic: srvc_id based on
+> +								handle from logs
+> +				gattc read_characteristic
+> +				gattc disconnect
+>  TC_GAR_CL_BV_05_C	N/A
+>  TC_GAR_CL_BI_18_C	N/A
+>  TC_GAR_CL_BI_19_C	N/A
+> @@ -171,7 +183,15 @@ TC_GAR_CL_BI_25_C	PASS	haltest:
+>  				gattc read_descriptor
+>  TC_GAR_CL_BI_26_C	PASS	haltest:
+>  				gattc read_descriptor
+> -TC_GAR_CL_BI_27_C	INC	not implemented (encryption)
+> +TC_GAR_CL_BI_27_C	PASS	haltest:
+> +				gattc connect
+> +				gattc search_service
+> +				gattc get_characteristic: srvc_id based on
+> +								handle from logs
+> +				gattc get_descriptor: srvc_id based on
+> +								handle from logs
+> +				gattc read_descriptor
+> +				gattc disconnect
+>  TC_GAR_CL_BV_07_C	PASS	haltest:
+>  				gattc read_descriptor
+>  TC_GAR_CL_BI_28_C	PASS	haltest:
+> @@ -184,7 +204,15 @@ TC_GAR_CL_BI_31_C	PASS	haltest:
+>  				gattc read_descriptor
+>  TC_GAR_CL_BI_32_C	PASS	haltest:
+>  				gattc read_descriptor
+> -TC_GAR_CL_BI_33_C	INC	not implemented (encryption)
+> +TC_GAR_CL_BI_33_C	PASS	haltest:
+> +				gattc connect
+> +				gattc search_service
+> +				gattc get_characteristic: srvc_id based on
+> +								handle from logs
+> +				gattc get_descriptor: srvc_id based on
+> +								handle from logs
+> +				gattc read_descriptor
+> +				gattc disconnect
+>  TC_GAR_CL_BI_34_C	N/A
+>  TC_GAR_CL_BI_35_C	PASS	haltest:
+>  				gattc read_characteristic
+> @@ -829,9 +857,23 @@ TC_GAW_SR_BI_34_C	PASS	haltest:
+>  				gatts send_response
+>  				gatts send_response: <status> 13
+>  TC_GAW_SR_BI_35_C	INC
+> -TC_GAN_CL_BV_01_C	INC	PTS issue #12249
+> +TC_GAN_CL_BV_01_C	PASS	haltest:
+> +				gattc connect
+> +				gattc search_service
+> +				gattc get_characteristic: srvc_id based on
+> +								handle from logs
+> +				gattc get_descriptor
+> +				gattc write_descriptor 2 <hex_value> 0001
+> +				gattc disconnect
+>  TC_GAN_SR_BV_01_C	INC
+> -TC_GAI_CL_BV_01_C	INC  	PTS issue #12211
+> +TC_GAI_CL_BV_01_C	PASS	haltest:
+> +				gattc connect
+> +				gattc search_service
+> +				gattc get_characteristic: srvc_id based on
+> +								handle from logs
+> +				gattc get_descriptor
+> +				gattc write_descriptor 2 <hex_value> 0002
+> +				gattc disconnect
+>  TC_GAI_SR_BV_01_C	INC
+>  TC_GAS_CL_BV_01_C	PASS	haltest:
+>  				gattc connect
+> @@ -852,14 +894,38 @@ TC_GAT_CL_BV_02_C	PASS	haltest:
+>  				gattc write_characcteristic 2 <short_value>
+>  				gattc disconnect
+>  TC_GAT_SR_BV_01_C	INC
+> -TC_GPA_CL_BV_01_C	INC	gatttool required
+> -TC_GPA_CL_BV_02_C	INC	gatttool required
+> -TC_GPA_CL_BV_03_C	INC	gatttool required
+> -TC_GPA_CL_BV_04_C	INC	gatttool required
+> -TC_GPA_CL_BV_05_C	INC	gatttool required
+> -TC_GPA_CL_BV_06_C	INC	gatttool required
+> -TC_GPA_CL_BV_07_C	INC	gatttool required
+> -TC_GPA_CL_BV_08_C	INC	gatttool required
+> +TC_GPA_CL_BV_01_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_02_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_03_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_04_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_05_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_06_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_07_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+> +TC_GPA_CL_BV_08_C	PASS	haltest:
+> +				gattc connect
+> +				test_command: <cmd> 224 [u1] 8
+> +				gattc disconnect
+>  TC_GPA_CL_BV_11_C	INC	gatttool required
+>  TC_GPA_CL_BV_12_C	INC	gatttool required
+>  TC_GPA_SR_BV_01_C	PASS
+> @@ -877,10 +943,35 @@ TC_GPA_SR_BV_04_C	PASS	haltest:
+>  				gatts add_chaaracteristic:
+>  						<properties> 10 <permissions> 17
+>  				gatts start_service
+> -TC_GPA_SR_BV_05_C	INC
+> -TC_GPA_SR_BV_06_C	INC
+> -TC_GPA_SR_BV_07_C	INC
+> -TC_GPA_SR_BV_08_C	INC
+> -TC_GPA_SR_BV_11_C	INC
+> +TC_GPA_SR_BV_05_C	PASS	haltest:
+> +				gatts add_service
+> +				gatts add_chaaracteristic:
+> +						<properties> 138 <permissions> 17
+> +				gatts add_descriptor <UUID> 2900
+> +				gatts start_service
+> +				gatts send_response
+> +TC_GPA_SR_BV_06_C	PASS	haltest:
+> +				gatts add_service
+> +				gatts add_chaaracteristic:
+> +						<properties> 138 <permissions> 17
+> +				gatts add_descriptor <UUID> 2901
+> +				gatts start_service
+> +				gatts send_respons
+> +TC_GPA_SR_BV_07_C	PASS
+> +TC_GPA_SR_BV_08_C	PASS	haltest:
+> +				gatts add_service
+> +				gatts add_chaaracteristic:
+> +						<properties> 138 <permissions> 17
+> +				gatts add_descriptor <UUID> 2903
+> +				gatts start_service
+> +				gatts send_respons
+> +TC_GPA_SR_BV_11_C	PASS	haltest:
+> +				gatts add_service
+> +				gatts add_chaaracteristic:
+> +						<properties> 138 <permissions> 17
+> +				gatts add_descriptor <UUID> 2905
+> +				gatts start_service
+> +				gatts send_respons: repeat with correct offset
+> +								and data
+>  TC_GPA_SR_BV_12_C	INC
+>  -------------------------------------------------------------------------------
+> 
 
-v2:
-* Rebase
-* Added one more cleanup patch to the series (remove not needed mempcy)
-
-Lukasz Rymanowski (10):
-  android/gatt: Verify signature counter from remote
-  android/gatt: Fix handling signed write command from remote
-  android/gatt: Fix signed write command encoding
-  shared/crypto: Fix concatenate of sign counter into the msg
-  shared/crypto: Fix byte order of sign counter added to signature
-  shared/crypto: Change swap128 to swap_buf
-  shared/crypto: Fix byte order of message
-  unit/crypto: Update unit test vectors after changes in singing process
-  android/pts: Update GATT PTS test results
-  shared/crypto: Remove not needed memcpy
-
- Makefile.am          |  3 ++-
- Makefile.tools       |  4 +++-
- android/gatt.c       | 25 ++++++++++++-------------
- android/pts-gatt.txt | 20 ++++++++++++++++++--
- attrib/att.c         | 11 +++++++----
- attrib/att.h         |  6 +++++-
- attrib/gatt.c        | 11 ++++++++---
- attrib/gatt.h        |  4 +++-
- src/shared/crypto.c  | 27 +++++++++++++++------------
- unit/test-crypto.c   |  6 +++---
- 10 files changed, 76 insertions(+), 41 deletions(-)
+Applied, thanks.
 
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
