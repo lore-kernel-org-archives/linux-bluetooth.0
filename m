@@ -1,44 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 29 May 2014 13:04:14 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-05-26
-Message-ID: <20140529170414.GC3542@tuxdriver.com>
-References: <20140526214122.GA2034@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140526214122.GA2034@joana>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix properly ignoring LTKs of unknown types
+Date: Thu, 29 May 2014 19:36:53 +0300
+Message-Id: <1401381413-12782-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, May 26, 2014 at 06:41:22PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Some more patches for 3.16. There is nothing really special here, just a
-> bunch of clean ups, fixes plus some small improvements. Please pull.
-> 
-> Thanks!
-> 
-> 	Gustavo
-> 
-> ---
-> 
-> The following changes since commit 22e70786413ed05950207eda7be420c280b776d7:
-> 
->   Bluetooth: Remove hci_h4 unused defines (2014-04-24 11:55:26 -0300)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to d7b2545023ecfde94d3ea9c03c5480ac18da96c9:
-> 
->   Bluetooth: Clearly distinguish mgmt LTK type from authenticated property (2014-05-23 11:24:04 -0700)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Pulling now...
+In case there are new LTK types in the future we shouldn't just blindly
+assume that != MGMT_LTK_UNAUTHENTICATED means that the key is
+authenticated. This patch adds explicit checks for each allowed key type
+in the form of a switch statement and skips any key which has an unknown
+value.
 
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5e9c21a5525f..0fce54412ffd 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4546,10 +4546,16 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+ 		else
+ 			type = HCI_SMP_LTK_SLAVE;
+ 
+-		if (key->type == MGMT_LTK_UNAUTHENTICATED)
++		switch (key->type) {
++		case MGMT_LTK_UNAUTHENTICATED:
+ 			authenticated = 0x00;
+-		else
++			break;
++		case MGMT_LTK_AUTHENTICATED:
+ 			authenticated = 0x01;
++			break;
++		default:
++			continue;
++		}
+ 
+ 		hci_add_ltk(hdev, &key->addr.bdaddr, addr_type, type,
+ 			    authenticated, key->val, key->enc_size, key->ediv,
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.9.3
+
