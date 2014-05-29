@@ -3,32 +3,39 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 04/10] shared/crypto: Fix concatenate of sign counter into the msg
-Date: Thu, 29 May 2014 15:49:38 +0200
-Message-Id: <1401371384-10427-5-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 01/10] android/gatt: Verify signature counter from remote
+Date: Thu, 29 May 2014 15:49:35 +0200
+Message-Id: <1401371384-10427-2-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes incorrectly concatenated sign counter to the message
+We will receive signature counter as a part of signature in att packet.
+We shall verify if signature counter has value as expected otherwise
+drop the message.
 ---
- src/shared/crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/gatt.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index e46f07f..b50baa5 100644
---- a/src/shared/crypto.c
-+++ b/src/shared/crypto.c
-@@ -273,7 +273,7 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
- 	memcpy(msg, m, m_len);
+diff --git a/android/gatt.c b/android/gatt.c
+index 9b51ab1..d93bdcb 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -5050,6 +5050,13 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
  
- 	/* Add sign_counter to the message */
--	put_le32(sign_cnt, msg + msg_len);
-+	put_le32(sign_cnt, msg + m_len);
+ 	if (len) {
+ 		uint8_t t[ATT_SIGNATURE_LEN];
++		uint32_t r_sign_cnt = get_le32(s);
++
++		if (r_sign_cnt != sign_cnt) {
++			error("gatt: sign_cnt does not match (%d!=%d)",
++							sign_cnt, r_sign_cnt);
++			return;
++		}
  
- 	/* The most significant octet of key corresponds to key[0] */
- 	swap128(key, tmp);
+ 		/* Generate signature and verify it */
+ 		if (!bt_crypto_sign_att(crypto, csrk, value, vlen, sign_cnt,
 -- 
 1.8.4
 
