@@ -3,49 +3,85 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 08/10] unit/crypto: Update unit test vectors after changes in singing process
-Date: Thu, 29 May 2014 15:49:42 +0200
-Message-Id: <1401371384-10427-9-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 06/10] shared/crypto: Change swap128 to swap_buf
+Date: Thu, 29 May 2014 15:49:40 +0200
+Message-Id: <1401371384-10427-7-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+We will need to swap bigger buffers so lets make swap128 more generic for
+that purpose
 ---
- unit/test-crypto.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ src/shared/crypto.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/unit/test-crypto.c b/unit/test-crypto.c
-index 9bc072b..c5a6954 100644
---- a/unit/test-crypto.c
-+++ b/unit/test-crypto.c
-@@ -62,7 +62,7 @@ static const uint8_t msg_2[] = {
- };
+diff --git a/src/shared/crypto.c b/src/shared/crypto.c
+index d4c4cc7..ad89174 100644
+--- a/src/shared/crypto.c
++++ b/src/shared/crypto.c
+@@ -248,12 +248,12 @@ static bool alg_encrypt(int fd, const void *inbuf, size_t inlen,
+ 	return true;
+ }
  
- static const uint8_t t_msg_2[] = {
--	0x00, 0x00, 0x00, 0x00, 0x79, 0xc1, 0x60, 0x5b, 0x71, 0x32, 0x68, 0x59
-+	0x00, 0x00, 0x00, 0x00, 0x27, 0x39, 0x74, 0xf4, 0x39, 0x2a, 0x23, 0x2a
- };
+-static inline void swap128(const uint8_t src[16], uint8_t dst[16])
++static inline void swap_buf(const uint8_t *src, uint8_t *dst, uint16_t len)
+ {
+ 	int i;
  
- static const struct test_data test_data_2 = {
-@@ -79,7 +79,7 @@ static const uint8_t msg_3[] = {
- };
+-	for (i = 0; i < 16; i++)
+-		dst[15 - i] = src[i];
++	for (i = 0; i < len; i++)
++		dst[len - 1 - i] = src[i];
+ }
  
- static const uint8_t t_msg_3[12] = {
--	0x00, 0x00, 0x00, 0x00, 0x3e, 0xc3, 0x46, 0x95, 0x2c, 0xdf, 0x88, 0x32
-+	0x00, 0x00, 0x00, 0x00, 0xb7, 0xca, 0x94, 0xab, 0x87, 0xc7, 0x82, 0x18
- };
+ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+@@ -276,7 +276,7 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 	put_le32(sign_cnt, msg + m_len);
  
- static const struct test_data test_data_3 = {
-@@ -98,7 +98,7 @@ static const uint8_t msg_4[] = {
- };
+ 	/* The most significant octet of key corresponds to key[0] */
+-	swap128(key, tmp);
++	swap_buf(key, tmp, 16);
  
- static const uint8_t t_msg_4[12] = {
--	0x00, 0x00, 0x00, 0x00, 0x43, 0x0c, 0xaa, 0x71, 0x19, 0x73, 0xbb, 0x59
-+	0x00, 0x00, 0x00, 0x00, 0x44, 0xe1, 0xe6, 0xce, 0x1d, 0xf5, 0x13, 0x68
- };
+ 	memcpy(signature, tmp + 4, 12);
+ 	fd = alg_new(crypto->cmac_aes, tmp, 16);
+@@ -308,7 +308,7 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 	 * Then truncate in most significant bit first order to a length of
+ 	 * 12 octets
+ 	 */
+-	swap128(out, tmp);
++	swap_buf(out, tmp, 16);
+ 	memcpy(signature, tmp + 4, 12);
  
- static const struct test_data test_data_4 = {
+ 	return true;
+@@ -336,7 +336,7 @@ bool bt_crypto_e(struct bt_crypto *crypto, const uint8_t key[16],
+ 		return false;
+ 
+ 	/* The most significant octet of key corresponds to key[0] */
+-	swap128(key, tmp);
++	swap_buf(key, tmp, 16);
+ 
+ 	fd = alg_new(crypto->ecb_aes, tmp, 16);
+ 	if (fd < 0)
+@@ -344,7 +344,7 @@ bool bt_crypto_e(struct bt_crypto *crypto, const uint8_t key[16],
+ 
+ 
+ 	/* Most significant octet of plaintextData corresponds to in[0] */
+-	swap128(plaintext, in);
++	swap_buf(plaintext, in, 16);
+ 
+ 	if (!alg_encrypt(fd, in, 16, out, 16)) {
+ 		close(fd);
+@@ -352,7 +352,7 @@ bool bt_crypto_e(struct bt_crypto *crypto, const uint8_t key[16],
+ 	}
+ 
+ 	/* Most significant octet of encryptedData corresponds to out[0] */
+-	swap128(out, encrypted);
++	swap_buf(out, encrypted, 16);
+ 
+ 	close(fd);
+ 
 -- 
 1.8.4
 
