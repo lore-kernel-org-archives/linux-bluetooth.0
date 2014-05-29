@@ -3,31 +3,43 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: johan.hedberg@gmail.com, szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2 05/10] shared/crypto: Fix byte order of sign counter added to signature
-Date: Thu, 29 May 2014 15:49:39 +0200
-Message-Id: <1401371384-10427-6-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 07/10] shared/crypto: Fix byte order of message
+Date: Thu, 29 May 2014 15:49:41 +0200
+Message-Id: <1401371384-10427-8-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Message should be swapped before we send it to the kernel for signing
 ---
- src/shared/crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ src/shared/crypto.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/src/shared/crypto.c b/src/shared/crypto.c
-index b50baa5..d4c4cc7 100644
+index ad89174..c400081 100644
 --- a/src/shared/crypto.c
 +++ b/src/shared/crypto.c
-@@ -301,7 +301,7 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
- 	 * As to BT spec. 4.1 Vol[3], Part C, chapter 10.4.1 sign counter should
- 	 * be placed in the signature
- 	 */
--	put_le32(sign_cnt, out + 8);
-+	put_be32(sign_cnt, out + 8);
+@@ -265,6 +265,7 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 	uint8_t tmp[16], out[16];
+ 	uint16_t msg_len = m_len + sizeof(uint32_t);
+ 	uint8_t msg[msg_len];
++	uint8_t msg_s[msg_len];
  
- 	/*
- 	 * The most significant octet of hash corresponds to out[0]  - swap it.
+ 	if (!crypto)
+ 		return false;
+@@ -283,7 +284,10 @@ bool bt_crypto_sign_att(struct bt_crypto *crypto, const uint8_t key[16],
+ 	if (fd < 0)
+ 		return false;
+ 
+-	len = send(fd, msg, msg_len, 0);
++	/* Swap msg before signing */
++	swap_buf(msg, msg_s, msg_len);
++
++	len = send(fd, msg_s, msg_len, 0);
+ 	if (len < 0) {
+ 		close(fd);
+ 		return false;
 -- 
 1.8.4
 
