@@ -1,223 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/4] android/gatt: Fix parallel reading/writing attributes values from applications
-Date: Fri, 30 May 2014 07:51:11 +0200
-Message-Id: <1401429074-31535-1-git-send-email-marcin.kraglak@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <CAHrH25RCoFeA9hrQPOndyQzxNiySGkiPziaT+nuLkGqcityQBQ@mail.gmail.com>
+References: <1400271298-29769-1-git-send-email-armansito@chromium.org>
+	<1400271298-29769-2-git-send-email-armansito@chromium.org>
+	<2DDA7254-76A3-43EE-A116-B6D5B245D8A3@holtmann.org>
+	<CAHrH25SdNUQ+5SUC0vmoU90q57iKVkkLERyK7UZ+W=8j7uGKsg@mail.gmail.com>
+	<A75E24DA-B69D-452D-8E27-B75DBF2855C8@holtmann.org>
+	<CABBYNZL6WrM1sCC4VSXzWWCv8jK-ebpGZdhQ52hCo-v=oFTHVg@mail.gmail.com>
+	<CAHrH25RCoFeA9hrQPOndyQzxNiySGkiPziaT+nuLkGqcityQBQ@mail.gmail.com>
+Date: Thu, 29 May 2014 23:56:13 +0300
+Message-ID: <CABBYNZ++Z7eYNSorqTnBKed1L-gE-Bx89+M5Tj1C4B5btBQ+ZQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/10] src/shared/att: Introduce struct bt_att.
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It is needed because in some cases we send few read requests to applications.
-Now all transactions data are overriden by last one, and if application wants
-to respond to previous requests, transaction data is not found.
----
- android/gatt.c | 85 ++++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 59 insertions(+), 26 deletions(-)
+Hi Arman, Marcel,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 66d6224..80d9f30 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -106,9 +106,6 @@ struct gatt_app {
- 
- 	/* Valid for client applications */
- 	struct queue *notifications;
--
--	/* Transaction data valid for server application */
--	struct pending_trans_data trans_id;
- };
- 
- struct element_id {
-@@ -175,6 +172,7 @@ struct gatt_device {
- struct app_connection {
- 	struct gatt_device *device;
- 	struct gatt_app *app;
-+	struct queue *transactions;
- 	int32_t id;
- };
- 
-@@ -182,6 +180,7 @@ static struct ipc *hal_ipc = NULL;
- static bdaddr_t adapter_addr;
- static bool scanning = false;
- static unsigned int advertising_cnt = 0;
-+static int32_t trans_id = 1;
- 
- static struct queue *gatt_apps = NULL;
- static struct queue *gatt_devices = NULL;
-@@ -855,6 +854,8 @@ static void destroy_connection(void *data)
- 	if (conn->device->conn_cnt == 0)
- 		connection_cleanup(conn->device);
- 
-+	queue_destroy(conn->transactions, free);
-+
- cleanup:
- 	device_unref(conn->device);
- 	free(conn);
-@@ -1305,6 +1306,12 @@ static struct app_connection *create_connection(struct gatt_device *device,
- 	new_conn->app = app;
- 	new_conn->id = last_conn_id++;
- 
-+	new_conn->transactions = queue_new();
-+	if (!new_conn->transactions) {
-+		free(new_conn);
-+		return NULL;
-+	}
-+
- 	if (!queue_push_head(app_connections, new_conn)) {
- 		error("gatt: Cannot push client on the client queue!?");
- 
-@@ -4169,26 +4176,29 @@ done:
- 		send_dev_pending_response(dev, opcode);
- }
- 
--static void set_trans_id(struct gatt_app *app, unsigned int id, int8_t opcode)
-+static struct pending_trans_data *new_transaction(unsigned int id,
-+								uint8_t opcode)
- {
--	app->trans_id.id = id;
--	app->trans_id.opcode = opcode;
--}
-+	struct pending_trans_data *transaction;
- 
--static void clear_trans_id(struct gatt_app *app)
--{
--	app->trans_id.id = 0;
--	app->trans_id.opcode = 0;
-+	transaction = new0(struct pending_trans_data, 1);
-+	if (!transaction)
-+		return NULL;
-+
-+	transaction->id = id;
-+	transaction->opcode = opcode;
-+
-+	return transaction;
- }
- 
- static void read_cb(uint16_t handle, uint16_t offset, uint8_t att_opcode,
- 					bdaddr_t *bdaddr, void *user_data)
- {
-+	struct pending_trans_data *transaction;
- 	struct hal_ev_gatt_server_request_read ev;
- 	struct gatt_app *app;
- 	struct app_connection *conn;
- 	int32_t id = PTR_TO_INT(user_data);
--	static int32_t trans_id = 1;
- 
- 	app = find_app_by_id(id);
- 	if (!app) {
-@@ -4205,14 +4215,23 @@ static void read_cb(uint16_t handle, uint16_t offset, uint8_t att_opcode,
- 	memset(&ev, 0, sizeof(ev));
- 
- 	/* Store the request data, complete callback and transaction id */
--	set_trans_id(app, trans_id++, att_opcode);
-+	transaction = new_transaction(trans_id++, att_opcode);
-+	if (!transaction) {
-+		error("gatt: failed to allocate memory for transaction");
-+		goto failed;
-+	}
-+
-+	if (!queue_push_tail(conn->transactions, transaction)) {
-+		free(transaction);
-+		goto failed;
-+	}
- 
- 	bdaddr2android(bdaddr, ev.bdaddr);
- 	ev.conn_id = conn->id;
- 	ev.attr_handle = handle;
- 	ev.offset = offset;
- 	ev.is_long = att_opcode == ATT_OP_READ_BLOB_REQ;
--	ev.trans_id = app->trans_id.id;
-+	ev.trans_id = transaction->id;
- 
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
- 					HAL_EV_GATT_SERVER_REQUEST_READ,
-@@ -4232,9 +4251,9 @@ static void write_cb(uint16_t handle, uint16_t offset,
- {
- 	uint8_t buf[IPC_MTU];
- 	struct hal_ev_gatt_server_request_write *ev = (void *) buf;
-+	struct pending_trans_data *transaction;
- 	struct gatt_app *app;
- 	int32_t id = PTR_TO_INT(user_data);
--	static int32_t trans_id = 1;
- 	struct app_connection *conn;
- 
- 	app = find_app_by_id(id);
-@@ -4250,7 +4269,16 @@ static void write_cb(uint16_t handle, uint16_t offset,
- 	}
- 
- 	/* Store the request data, complete callback and transaction id */
--	set_trans_id(app, trans_id++, att_opcode);
-+	transaction = new_transaction(trans_id++, att_opcode);
-+	if (!transaction) {
-+		error("gatt: failed to allocate memory for transaction");
-+		goto failed;
-+	}
-+
-+	if (!queue_push_tail(conn->transactions, transaction)) {
-+		free(transaction);
-+		goto failed;
-+	}
- 
- 	/* TODO figure it out */
- 	if (att_opcode == ATT_OP_EXEC_WRITE_REQ)
-@@ -4263,7 +4291,7 @@ static void write_cb(uint16_t handle, uint16_t offset,
- 	ev->offset = offset;
- 
- 	ev->conn_id = conn->id;
--	ev->trans_id = app->trans_id.id;
-+	ev->trans_id = transaction->id;
- 
- 	ev->is_prep = att_opcode == ATT_OP_PREP_WRITE_REQ;
- 	ev->need_rsp = att_opcode == ATT_OP_WRITE_REQ;
-@@ -4557,11 +4585,18 @@ reply:
- 				HAL_OP_GATT_SERVER_SEND_INDICATION, status);
- }
- 
-+static bool match_trans_id(const void *data, const void *user_data)
-+{
-+	const struct pending_trans_data *transaction = data;
-+
-+	return transaction->id == PTR_TO_UINT(user_data);
-+}
-+
- static void handle_server_send_response(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_server_send_response *cmd = buf;
-+	struct pending_trans_data *transaction;
- 	struct app_connection *conn;
--	struct gatt_app *app;
- 	uint8_t status;
- 
- 	DBG("");
-@@ -4573,22 +4608,20 @@ static void handle_server_send_response(const void *buf, uint16_t len)
- 		goto reply;
- 	}
- 
--	app = conn->app;
--
--	if ((unsigned int)cmd->trans_id != app->trans_id.id) {
--		error("gatt: transaction ID mismatch (%d!=%d)",
--					cmd->trans_id, app->trans_id.id);
--
-+	transaction = queue_remove_if(conn->transactions, match_trans_id,
-+						UINT_TO_PTR(cmd->trans_id));
-+	if (!transaction) {
-+		error("gatt: transaction ID = %d not found", cmd->trans_id);
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
- 	}
- 
--	send_gatt_response(conn->app->trans_id.opcode, cmd->handle, cmd->offset,
-+	send_gatt_response(transaction->opcode, cmd->handle, cmd->offset,
- 					cmd->status, cmd->len, cmd->data,
- 					&conn->device->bdaddr);
- 
- 	/* Clean request data */
--	clear_trans_id(app);
-+	free(transaction);
- 
- 	status = HAL_STATUS_SUCCESS;
- 
+On Wed, May 28, 2014 at 9:45 PM, Arman Uguray <armansito@chromium.org> wrote:
+> Hi Luiz & Marcel,
+>
+>>>> ATT is a really simple protocol in this regard.
+>>>
+>>> It is simple, but it is also not structured. Opcode numbers have no higher meaning. They are just numbers. That why having a table of known opcodes and its semantics might be the simplest way.
+>
+> Sure. At least for requests, responses, and indications/notifications
+> we can have a table. For commands, you can actually check if the
+> command bit of the opcode has been set; in that regard the opcodes do
+> have some higher meaning: they do encode whether or not the operation
+> should be signed and whether or not they are commands. Then again, the
+> spec does define specifically which opcodes should have those bits
+> set. Eitherway, I will make it so that the semantic meaning of opcodes
+> is more explicitly checked in the source file.
+>
+>>>> Absolutely. Let me know if this has convinced you. So my idea is to
+>>>> have a bt_att_send and bt_att_send_without_rsp. I originally had a
+>>>> single bt_att_send for all opcodes, but Luiz brought up the fact that
+>>>> having a one for all function leads to some inconsistencies, such as
+>>>> cases where a callback is passed along with an opcode that doesn't
+>>>> expect a response. Personally I don't think this is such a problem as
+>>>> long as the API is well documented.
+>>>
+>>> Right now as said above, just having bt_att_send seems enough. Start with that and see how it goes. Add an extra simpler helper that utilizes bt_att_send with an empty callback is dead simple. We can worry about that later.
+>
+> So, basically what I had earlier, with more explicit handling of
+> opcode semantics instead of somewhat vague handlers?
+>
+>>> In case of MGMT perhaps it was different because there you don't
+>>> actually have responses but actual requests that needs to be
+>>> acknowledged before the next request can be sent out.
+>>
+>> Actually mgmt with calling write directly caused a bunch of issues. We are not doing that anymore. We nicely queue > everything so that orders actually become predictable.
+>
+> Well this is also true for ATT. I.e. a client is not supposed to send
+> a second request before it has received a response to a previous
+> request on the same connection, hence they have to go through two
+> queues: a write queue waiting for POLLOUT, and a pending queue while
+> waiting for the response from the remote device, where the pending
+> queue bars any more requests from getting added to the write queue.
+> Outgoing indications will also go through the same queues. Commands
+> and notifications, on the other hand, skip the pending queue and can
+> go straight to the write queue.
+
+Well regardless if you have it calling write directly or waiting
+POLLOUT it can still fail which needs a callback and if the caller did
+not have it maybe we should write it immediately.
+
+> The way I ended up implementing this involved having separate queues
+> for requests, responses, commands, notifications, and indications, but
+> I think that's overkill. We really just need a "sequential" queue, to
+> queue requests and indications and a "non-sequential" queue for
+> commands/notifications. In the former case, I think it's fine to use
+> the same queue for indications and requests, since indications are
+> only sent from servers and requests are only sent from clients, and
+> afaik you can't have both ends of the same ATT connection be
+> simultaneously in peripheral and central roles, though I may be wrong.
+> At least this is why iOS (& Android afaik) seem to expose a different
+> LE random address for each app that implements a GATT server.
+
+Here is where things get interesting, the role of a server and client
+I believe is not per connection but per profile, so in a given
+connection device A may act as a client for profile X but as a server
+for profile Y.
+
+Take a look at 3.3.2 Sequential Protocol in the core spec, I think in
+some cases it is actually allowed to have multiple outstanding
+requests if their types are different, perhaps that is why you had the
+idea of multiple queues, but this makes the handling much more
+complicated for the client but as a server we have to be able to
+respond to those in parallel. One think that catches my eye was these
+huge timeout of 30 seconds for a transaction, having a single request
+queue can have a bad impact in responsiveness where a single request
+can block anything to happen for 30 seconds.
+
+
 -- 
-1.9.0
-
+Luiz Augusto von Dentz
