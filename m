@@ -1,199 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Eva Kolanska <eva.kolanska@tieto.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Eva Kolanska <eva.kolanska@tieto.com>
-Subject: [PATCH v2] android/pts: Update GATT test results
-Date: Thu, 29 May 2014 15:34:15 +0200
-Message-Id: <1401370455-20995-1-git-send-email-eva.kolanska@tieto.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/6] android/gatt: Initial support for write test command
+Date: Thu, 29 May 2014 15:04:59 +0200
+Message-Id: <1401368704-4265-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-gatt.txt |  129 ++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 110 insertions(+), 19 deletions(-)
+This is handled mostly the same way as read so we can use the same
+function for sending att requests.
 
-diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-index 8fe019c..283e81a 100644
---- a/android/pts-gatt.txt
-+++ b/android/pts-gatt.txt
-@@ -120,7 +120,13 @@ TC_GAR_CL_BI_03_C	PASS	haltest:
- 				gattc read_characteristic
- TC_GAR_CL_BI_04_C	PASS	haltest:
- 				gattc read_characteristic
--TC_GAR_CL_BI_05_C	INC	not implemented (encryption)
-+TC_GAR_CL_BI_05_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc read_characteristic
-+				gattc disconnect
- TC_GAR_CL_BV_03_C	INC	JIRA: BZ-31, Possible PTS issue #12227
- TC_GAR_CL_BI_06_C	PASS	haltest:
- 				gattc connect
-@@ -154,7 +160,13 @@ TC_GAR_CL_BI_15_C	PASS	haltest:
- 				gattc read_characteristic
- TC_GAR_CL_BI_16_C	PASS	haltest:
- 				gattc read_characteristic
--TC_GAR_CL_BI_17_C	INC	not implemented (encryption)
-+TC_GAR_CL_BI_17_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc read_characteristic
-+				gattc disconnect
- TC_GAR_CL_BV_05_C	N/A
- TC_GAR_CL_BI_18_C	N/A
- TC_GAR_CL_BI_19_C	N/A
-@@ -171,7 +183,15 @@ TC_GAR_CL_BI_25_C	PASS	haltest:
- 				gattc read_descriptor
- TC_GAR_CL_BI_26_C	PASS	haltest:
- 				gattc read_descriptor
--TC_GAR_CL_BI_27_C	INC	not implemented (encryption)
-+TC_GAR_CL_BI_27_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc get_descriptor: srvc_id based on
-+								handle from logs
-+				gattc read_descriptor
-+				gattc disconnect
- TC_GAR_CL_BV_07_C	PASS	haltest:
- 				gattc read_descriptor
- TC_GAR_CL_BI_28_C	PASS	haltest:
-@@ -184,7 +204,15 @@ TC_GAR_CL_BI_31_C	PASS	haltest:
- 				gattc read_descriptor
- TC_GAR_CL_BI_32_C	PASS	haltest:
- 				gattc read_descriptor
--TC_GAR_CL_BI_33_C	INC	not implemented (encryption)
-+TC_GAR_CL_BI_33_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc get_descriptor: srvc_id based on
-+								handle from logs
-+				gattc read_descriptor
-+				gattc disconnect
- TC_GAR_CL_BI_34_C	N/A
- TC_GAR_CL_BI_35_C	PASS	haltest:
- 				gattc read_characteristic
-@@ -829,9 +857,23 @@ TC_GAW_SR_BI_34_C	PASS	haltest:
- 				gatts send_response
- 				gatts send_response: <status> 13
- TC_GAW_SR_BI_35_C	INC
--TC_GAN_CL_BV_01_C	INC	PTS issue #12249
-+TC_GAN_CL_BV_01_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc get_descriptor
-+				gattc write_descriptor 2 <hex_value> 0001
-+				gattc disconnect
- TC_GAN_SR_BV_01_C	INC
--TC_GAI_CL_BV_01_C	INC  	PTS issue #12211
-+TC_GAI_CL_BV_01_C	PASS	haltest:
-+				gattc connect
-+				gattc search_service
-+				gattc get_characteristic: srvc_id based on
-+								handle from logs
-+				gattc get_descriptor
-+				gattc write_descriptor 2 <hex_value> 0002
-+				gattc disconnect
- TC_GAI_SR_BV_01_C	INC
- TC_GAS_CL_BV_01_C	PASS	haltest:
- 				gattc connect
-@@ -852,14 +894,38 @@ TC_GAT_CL_BV_02_C	PASS	haltest:
- 				gattc write_characcteristic 2 <short_value>
- 				gattc disconnect
- TC_GAT_SR_BV_01_C	INC
--TC_GPA_CL_BV_01_C	INC	gatttool required
--TC_GPA_CL_BV_02_C	INC	gatttool required
--TC_GPA_CL_BV_03_C	INC	gatttool required
--TC_GPA_CL_BV_04_C	INC	gatttool required
--TC_GPA_CL_BV_05_C	INC	gatttool required
--TC_GPA_CL_BV_06_C	INC	gatttool required
--TC_GPA_CL_BV_07_C	INC	gatttool required
--TC_GPA_CL_BV_08_C	INC	gatttool required
-+TC_GPA_CL_BV_01_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_02_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_03_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_04_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_05_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_06_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_07_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
-+TC_GPA_CL_BV_08_C	PASS	haltest:
-+				gattc connect
-+				test_command: <cmd> 224 [u1] 8
-+				gattc disconnect
- TC_GPA_CL_BV_11_C	INC	gatttool required
- TC_GPA_CL_BV_12_C	INC	gatttool required
- TC_GPA_SR_BV_01_C	PASS
-@@ -877,10 +943,35 @@ TC_GPA_SR_BV_04_C	PASS	haltest:
- 				gatts add_chaaracteristic:
- 						<properties> 10 <permissions> 17
- 				gatts start_service
--TC_GPA_SR_BV_05_C	INC
--TC_GPA_SR_BV_06_C	INC
--TC_GPA_SR_BV_07_C	INC
--TC_GPA_SR_BV_08_C	INC
--TC_GPA_SR_BV_11_C	INC
-+TC_GPA_SR_BV_05_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 138 <permissions> 17
-+				gatts add_descriptor <UUID> 2900
-+				gatts start_service
-+				gatts send_response
-+TC_GPA_SR_BV_06_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 138 <permissions> 17
-+				gatts add_descriptor <UUID> 2901
-+				gatts start_service
-+				gatts send_respons
-+TC_GPA_SR_BV_07_C	PASS
-+TC_GPA_SR_BV_08_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 138 <permissions> 17
-+				gatts add_descriptor <UUID> 2903
-+				gatts start_service
-+				gatts send_respons
-+TC_GPA_SR_BV_11_C	PASS	haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 138 <permissions> 17
-+				gatts add_descriptor <UUID> 2905
-+				gatts start_service
-+				gatts send_respons: repeat with correct offset
-+								and data
- TC_GPA_SR_BV_12_C	INC
- -------------------------------------------------------------------------------
+As test command parameters are of type uint16_t, we cannot write longer
+values. We can figure out the ways to overcome this limitation if it
+turns out that it's really needed (i.e. some PTS test cases cannot be
+passed).
+---
+ android/gatt.c    | 19 +++++++++++++------
+ android/hal-msg.h |  1 +
+ 2 files changed, 14 insertions(+), 6 deletions(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 9b51ab1..5919377 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3442,9 +3442,10 @@ failed:
+ 				HAL_OP_GATT_CLIENT_SET_ADV_DATA, status);
+ }
+ 
+-static uint8_t handle_test_command_read(bdaddr_t *bdaddr, bt_uuid_t *uuid,
+-					uint16_t read_type, uint16_t u2,
+-					uint16_t u3, uint16_t u4, uint16_t u5)
++static uint8_t handle_test_command_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid,
++						uint16_t op, uint16_t u2,
++						uint16_t u3, uint16_t u4,
++						uint16_t u5)
+ {
+ 	guint16 length = 0;
+ 	struct gatt_device *dev;
+@@ -3459,7 +3460,7 @@ static uint8_t handle_test_command_read(bdaddr_t *bdaddr, bt_uuid_t *uuid,
+ 	if (!pdu)
+ 		return HAL_STATUS_FAILED;
+ 
+-	switch (read_type) {
++	switch (op) {
+ 	case ATT_OP_READ_REQ:
+ 		length = enc_read_req(u2, pdu, mtu);
+ 		break;
+@@ -3473,8 +3474,13 @@ static uint8_t handle_test_command_read(bdaddr_t *bdaddr, bt_uuid_t *uuid,
+ 		length = enc_read_by_grp_req(u2, u3, uuid, pdu, mtu);
+ 		break;
+ 	case ATT_OP_READ_MULTI_REQ:
++		return HAL_STATUS_UNSUPPORTED;
++	case ATT_OP_WRITE_REQ:
++	case ATT_OP_WRITE_CMD:
++	case ATT_OP_PREP_WRITE_REQ:
++	case ATT_OP_EXEC_WRITE_REQ:
+ 	default:
+-		error("gatt: Unknown read type");
++		error("gatt: Unknown operation type");
+ 
+ 		return HAL_STATUS_UNSUPPORTED;
+ 	}
+@@ -3532,7 +3538,8 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+ 		status = HAL_STATUS_FAILED;
+ 		break;
+ 	case GATT_CLIENT_TEST_CMD_READ:
+-		status = handle_test_command_read(&bdaddr, &uuid, cmd->u1,
++	case GATT_CLIENT_TEST_CMD_WRITE:
++		status = handle_test_command_read_write(&bdaddr, &uuid, cmd->u1,
+ 							cmd->u2, cmd->u3,
+ 							cmd->u4, cmd->u5);
+ 		break;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index ae15499..5da62f3 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -752,6 +752,7 @@ struct hal_cmd_gatt_client_set_adv_data {
+ #define GATT_CLIENT_TEST_CMD_DISCONNECT		0x03
+ #define GATT_CLIENT_TEST_CMD_DISCOVER		0x04
+ #define GATT_CLIENT_TEST_CMD_READ		0xe0
++#define GATT_CLIENT_TEST_CMD_WRITE		0xe1
+ #define GATT_CLIENT_TEST_CMD_PAIRING_CONFIG	0xf0
+ 
+ #define HAL_OP_GATT_CLIENT_TEST_COMMAND		0x16
 -- 
-1.7.9.5
+1.9.3
 
