@@ -1,36 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix authentication check for FIPS security level
-Date: Fri, 30 May 2014 14:45:19 +0300
-Message-Id: <1401450319-14615-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 30 May 2014 13:28:01 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
+Subject: Re: [PATCH v2 00/10] Fixes to sign write
+Message-ID: <20140530102801.GA3761@t440s.P-661HNU-F1>
+References: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Lukasz,
 
-When checking whether we need to request authentication or not we should
-include HCI_SECURITY_FIPS to the levels that always need authentication.
-This patch fixes check for it in the hci_outgoing_auth_needed()
-function.
+On Thu, May 29, 2014, Lukasz Rymanowski wrote:
+> This patch set brings couple of bug fixes founded during tests against PTS.
+> Biggest change is that I had to move signing procedure down to att.c as
+> not only payload need to be signed but also opcode and handle.
+> Therefore it makes sense to generate signature in place where pdu is encoded
+> 
+> With those patches PTS TC_GAW_CL_BV_02_C and TC_GAW_SR_BV_02_C are passing
+> 
+> v2:
+> * Rebase
+> * Added one more cleanup patch to the series (remove not needed mempcy)
+> 
+> Lukasz Rymanowski (10):
+>   android/gatt: Verify signature counter from remote
+>   android/gatt: Fix handling signed write command from remote
+>   android/gatt: Fix signed write command encoding
+>   shared/crypto: Fix concatenate of sign counter into the msg
+>   shared/crypto: Fix byte order of sign counter added to signature
+>   shared/crypto: Change swap128 to swap_buf
+>   shared/crypto: Fix byte order of message
+>   unit/crypto: Update unit test vectors after changes in singing process
+>   android/pts: Update GATT PTS test results
+>   shared/crypto: Remove not needed memcpy
+> 
+>  Makefile.am          |  3 ++-
+>  Makefile.tools       |  4 +++-
+>  android/gatt.c       | 25 ++++++++++++-------------
+>  android/pts-gatt.txt | 20 ++++++++++++++++++--
+>  attrib/att.c         | 11 +++++++----
+>  attrib/att.h         |  6 +++++-
+>  attrib/gatt.c        | 11 ++++++++---
+>  attrib/gatt.h        |  4 +++-
+>  src/shared/crypto.c  | 27 +++++++++++++++------------
+>  unit/test-crypto.c   |  6 +++---
+>  10 files changed, 76 insertions(+), 41 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 1 +
- 1 file changed, 1 insertion(+)
+All patches in this set have been applied. Thanks.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 492d8d5071c7..6cf9596ff69b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1453,6 +1453,7 @@ static int hci_outgoing_auth_needed(struct hci_dev *hdev,
- 	 * is requested.
- 	 */
- 	if (!hci_conn_ssp_enabled(conn) && !(conn->auth_type & 0x01) &&
-+	    conn->pending_sec_level != BT_SECURITY_FIPS &&
- 	    conn->pending_sec_level != BT_SECURITY_HIGH &&
- 	    conn->pending_sec_level != BT_SECURITY_MEDIUM)
- 		return 0;
--- 
-1.9.3
-
+Johan
