@@ -1,82 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kiran Kumar Raparthy <kiran.kumar@linaro.org>
-To: linux-kernel@vger.kernel.org
-Cc: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Android Kernel Team <kernel-team@android.com>,
-	John Stultz <john.stultz@linaro.org>,
-	Jaikumar Ganesh <jaikumarg@android.com>,
-	Kiran Raparthy <kiran.kumar@linaro.org>
-Subject: [RFC v2] Bluetooth: Keep master role when SCO or eSCO is active
-Date: Fri, 30 May 2014 11:54:54 +0530
-Message-Id: <1401431094-2833-1-git-send-email-kiran.kumar@linaro.org>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] android/gatt: Check for invalid handle errors
+Date: Fri, 30 May 2014 07:51:14 +0200
+Message-Id: <1401429074-31535-4-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1401429074-31535-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1401429074-31535-1-git-send-email-marcin.kraglak@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
-
-Preserve the master role when SCO or eSCO is active
-as this improves compatability with lots of
-headset and chipset combinations.
-
-This is one of the number of patches from the Android AOSP
-common.git tree, which is used on almost all Android devices.
-It looks like it would improve support for compatibility with
-lot of headset,so I wanted to submit it for review to see
-if it should go upstream.
-
-v2: Fixed formatting issues pointed by Sergei
-
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: Android Kernel Team <kernel-team@android.com>
-Cc: John Stultz <john.stultz@linaro.org>
-Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
-Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
-[kiran: Added context to commit message]
-Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
+Check if handle or range is valid for server.
 ---
- net/bluetooth/hci_event.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ android/gatt.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 15010a2..48bc772 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1915,6 +1915,14 @@ unlock:
- 	hci_conn_check_pending(hdev);
- }
+diff --git a/android/gatt.c b/android/gatt.c
+index 48a32ec..8ccbad9 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4753,6 +4753,9 @@ static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
  
-+static inline bool is_sco_active(struct hci_dev *hdev)
-+{
-+	if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
-+		hci_conn_hash_lookup_state(hdev, ESCO_LINK, BT_CONNECTED))
-+		return true;
-+	return false;
-+}
++	if (start > end || start == 0)
++		return ATT_ECODE_INVALID_HANDLE;
 +
- static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_conn_request *ev = (void *) skb->data;
-@@ -1961,7 +1969,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_INSUFF_RESOURCES;
+@@ -4806,7 +4809,7 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
  
- 			bacpy(&cp.bdaddr, &ev->bdaddr);
+-	if (start > end)
++	if (start > end || start == 0)
+ 		return ATT_ECODE_INVALID_HANDLE;
  
--			if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
-+			if (lmp_rswitch_capable(hdev) &&
-+				((mask & HCI_LM_MASTER) ||
-+				is_sco_active(hdev)))
- 				cp.role = 0x00; /* Become master */
- 			else
- 				cp.role = 0x01; /* Remain slave */
+ 	q = queue_new();
+@@ -4869,6 +4872,9 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+ 		return ATT_ECODE_REQ_NOT_SUPP;
+ 	}
+ 
++	if (handle == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	data = new0(struct pending_request, 1);
+ 	if (!data)
+ 		return ATT_ECODE_INSUFF_RESOURCES;
+@@ -4948,6 +4954,9 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (start > end || start == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_UNLIKELY;
+@@ -5017,6 +5026,9 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (start > end || start == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_UNLIKELY;
+@@ -5070,6 +5082,9 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return;
+ 
++	if (handle == 0)
++		return;
++
+ 	if (!gatt_db_has_attribute(gatt_db, handle))
+ 		return;
+ 
+@@ -5099,6 +5114,9 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	len = dec_signed_write_cmd(cmd, cmd_len, &handle, value, &vlen, s);
+ 
++	if (handle == 0)
++		return;
++
+ 	if (!gatt_db_has_attribute(gatt_db, handle))
+ 		return;
+ 
+@@ -5142,6 +5160,9 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (handle == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	if (!gatt_db_has_attribute(gatt_db, handle))
+ 		return ATT_ECODE_ATTR_NOT_FOUND;
+ 
+@@ -5193,6 +5214,9 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (handle == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	if (!gatt_db_has_attribute(gatt_db, handle))
+ 		return ATT_ECODE_ATTR_NOT_FOUND;
+ 
 -- 
-1.8.2.1
+1.9.0
+
