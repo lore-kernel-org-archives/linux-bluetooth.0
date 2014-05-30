@@ -1,55 +1,113 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 30 May 2014 13:28:01 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org, szymon.janc@tieto.com
-Subject: Re: [PATCH v2 00/10] Fixes to sign write
-Message-ID: <20140530102801.GA3761@t440s.P-661HNU-F1>
-References: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1401371384-10427-1-git-send-email-lukasz.rymanowski@tieto.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 3/3] android/gatt: Check for invalid handle errors
+Date: Fri, 30 May 2014 11:37:42 +0200
+Message-Id: <1401442662-11475-3-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1401442662-11475-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1401442662-11475-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Check if handle or handle range is valid for server. If is invalid,
+reply with ATT_ECODE_INVALID_HANDLE.
+---
+ android/gatt.c | 26 +++++++++++++++++++++++++-
+ 1 file changed, 25 insertions(+), 1 deletion(-)
 
-On Thu, May 29, 2014, Lukasz Rymanowski wrote:
-> This patch set brings couple of bug fixes founded during tests against PTS.
-> Biggest change is that I had to move signing procedure down to att.c as
-> not only payload need to be signed but also opcode and handle.
-> Therefore it makes sense to generate signature in place where pdu is encoded
-> 
-> With those patches PTS TC_GAW_CL_BV_02_C and TC_GAW_SR_BV_02_C are passing
-> 
-> v2:
-> * Rebase
-> * Added one more cleanup patch to the series (remove not needed mempcy)
-> 
-> Lukasz Rymanowski (10):
->   android/gatt: Verify signature counter from remote
->   android/gatt: Fix handling signed write command from remote
->   android/gatt: Fix signed write command encoding
->   shared/crypto: Fix concatenate of sign counter into the msg
->   shared/crypto: Fix byte order of sign counter added to signature
->   shared/crypto: Change swap128 to swap_buf
->   shared/crypto: Fix byte order of message
->   unit/crypto: Update unit test vectors after changes in singing process
->   android/pts: Update GATT PTS test results
->   shared/crypto: Remove not needed memcpy
-> 
->  Makefile.am          |  3 ++-
->  Makefile.tools       |  4 +++-
->  android/gatt.c       | 25 ++++++++++++-------------
->  android/pts-gatt.txt | 20 ++++++++++++++++++--
->  attrib/att.c         | 11 +++++++----
->  attrib/att.h         |  6 +++++-
->  attrib/gatt.c        | 11 ++++++++---
->  attrib/gatt.h        |  4 +++-
->  src/shared/crypto.c  | 27 +++++++++++++++------------
->  unit/test-crypto.c   |  6 +++---
->  10 files changed, 76 insertions(+), 41 deletions(-)
+diff --git a/android/gatt.c b/android/gatt.c
+index 421cae4..ee14968 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4755,6 +4755,9 @@ static uint8_t read_by_group_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (start > end || start == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_INSUFF_RESOURCES;
+@@ -4808,7 +4811,7 @@ static uint8_t read_by_type(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
+-	if (start > end)
++	if (start > end || start == 0)
+ 		return ATT_ECODE_INVALID_HANDLE;
+ 
+ 	q = queue_new();
+@@ -4871,6 +4874,9 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+ 		return ATT_ECODE_REQ_NOT_SUPP;
+ 	}
+ 
++	if (handle == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	data = new0(struct pending_request, 1);
+ 	if (!data)
+ 		return ATT_ECODE_INSUFF_RESOURCES;
+@@ -4950,6 +4956,9 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (start > end || start == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_UNLIKELY;
+@@ -5019,6 +5028,9 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (start > end || start == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	q = queue_new();
+ 	if (!q)
+ 		return ATT_ECODE_UNLIKELY;
+@@ -5072,6 +5084,9 @@ static void write_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return;
+ 
++	if (handle == 0)
++		return;
++
+ 	if (!gatt_db_get_attribute_permissions(gatt_db, handle, &permissions))
+ 		return;
+ 
+@@ -5100,6 +5115,9 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
+ 
+ 	len = dec_signed_write_cmd(cmd, cmd_len, &handle, value, &vlen, s);
+ 
++	if (handle == 0)
++		return;
++
+ 	if (!gatt_db_get_attribute_permissions(gatt_db, handle, &permissions))
+ 		return;
+ 
+@@ -5142,6 +5160,9 @@ static uint8_t write_req_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (handle == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	if (!gatt_db_get_attribute_permissions(gatt_db, handle, &permissions))
+ 		return ATT_ECODE_ATTR_NOT_FOUND;
+ 
+@@ -5191,6 +5212,9 @@ static uint8_t write_prep_request(const uint8_t *cmd, uint16_t cmd_len,
+ 	if (!len)
+ 		return ATT_ECODE_INVALID_PDU;
+ 
++	if (handle == 0)
++		return ATT_ECODE_INVALID_HANDLE;
++
+ 	if (!gatt_db_get_attribute_permissions(gatt_db, handle, &permissions))
+ 		return ATT_ECODE_ATTR_NOT_FOUND;
+ 
+-- 
+1.9.0
 
-All patches in this set have been applied. Thanks.
-
-Johan
