@@ -1,64 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH 1/2] bluetooth: don't include local processing of HCI commands in the command timeout
+Subject: Re: [RFC] bluetooth: Try to avoid forming scatternets
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1400076025-5103-1-git-send-email-holler@ahsoftware.de>
-Date: Sat, 31 May 2014 07:28:08 +0200
-Cc: LKML <linux-kernel@vger.kernel.org>,
-	linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Message-Id: <C2044AE9-519F-4A3D-BA6D-1076318AA4F5@holtmann.org>
-References: <1400076025-5103-1-git-send-email-holler@ahsoftware.de>
-To: Alexander Holler <holler@ahsoftware.de>
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <1401277204-28062-1-git-send-email-luiz.dentz@gmail.com>
+Date: Sat, 31 May 2014 07:23:47 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <BE96F0F6-FB1C-463E-A75B-6F9BE4EE0ABC@holtmann.org>
+References: <1401277204-28062-1-git-send-email-luiz.dentz@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+Hi Luiz,
 
-> I assume the timeout for processing HCI commands was originally intended to
-> detect hung bluetooth devices and should not include the time needed locally
-> to handle the response to an HCI command. That is important because the time
-> needed locally (by the kernel or even userland) to process responses to HCI
-> commands varies a lot between systems and HCI commands. That's even more true
-> since many actions to HCI command responses are handled inside works which
-> might be delayed quiet some time, depending on the actual system load.
+> In case of multiple connections automatically attempt to become master
+> to avoid scatternet topology.
 > 
-> So stop the timeout as soon as a response to an HCI command was received.
-> 
-> This fixes various problems which resulted in HCI command timeouts and an
-> afterwards non-working bluetooth stack, especially on slower systems like
-> some ARM devices.
-> 
-> Drawback is that in-kernel problems like deadlocks aren't detected by HCI
-> command timeouts anymore, but such problems should be detected and handled
-> by other means and not by a timeout where it is hard to specify a value
-> reasonable for all possible systems (-configurations, -loads).
-> 
-> Furthermore, if the timeout includes local processing of HCI command
-> responses, in-kernel errors like hung tasks might be masked by the
-> timeout, because the hung task would be killed by the timeout before
-> the hung task would be detected (by other means).
-> 
-> Signed-off-by: Alexander Holler <holler@ahsoftware.de>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> net/bluetooth/hci_event.c | 12 ++++++------
-> 1 file changed, 6 insertions(+), 6 deletions(-)
+> net/bluetooth/hci_event.c | 21 ++++++++++++++++-----
+> 1 file changed, 16 insertions(+), 5 deletions(-)
 > 
 > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 15010a2..94c2dc0 100644
+> index 492d8d5..e6aed6e 100644
 > --- a/net/bluetooth/hci_event.c
 > +++ b/net/bluetooth/hci_event.c
-> @@ -2338,6 +2338,9 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> @@ -2017,8 +2017,15 @@ static void hci_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	if (ev->status) {
+> 		hci_proto_connect_cfm(conn, ev->status);
+> 		hci_conn_del(conn);
+> -	} else if (ev->link_type != ACL_LINK)
+> +	} else if (ev->link_type != ACL_LINK) {
+> 		hci_proto_connect_cfm(conn, ev->status);
+> +	} else if (hci_conn_num(hdev, ACL_LINK) > 1) {
+> +		/* Attempt to switch to master to avoid scatternet */
+> +		list_for_each_entry(conn, &hdev->conn_hash.list, list) {
+> +			if (conn->type == ACL_LINK)
+> +				hci_conn_switch_role(conn, 0x00);
+> +		}
+> +	}
+
+I am not convinced this is a good idea. We do not know if the other also has two connections and wants to be the master. I think we can not generalize this on the HCI level. This has to be L2CAP socket policy that will allow us to make smart decisions. Sometimes the scatternet is just the better choice since our scatternet will result in a cheaper one than the others.
+ 
 > 
-> 	opcode = __le16_to_cpu(ev->opcode);
+> unlock:
+> 	hci_dev_unlock(hdev);
+> @@ -2035,6 +2042,12 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
+> 	       ev->link_type);
 > 
-> +	if (opcode != HCI_OP_NOP)
-> +		del_timer(&hdev->cmd_timer);
+> +	hci_dev_lock(hdev);
+> +
+> +	/* Allways attempt to become the master in multiple connection case */
+> +	if (hci_conn_num(hdev, ev->link_type) > 0)
+> +		mask |= HCI_LM_MASTER;
 > +
 
-so I actually wonder if we should move away from timer and move to a delayed work item to handle the timeout and if that would actually fix this issue.
+Isn’t this useless for SCO and eSCO links since the master definition is really only for the ACL link.
+
+> 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type,
+> 				      &flags);
+> 
+> @@ -2044,8 +2057,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 		struct inquiry_entry *ie;
+> 		struct hci_conn *conn;
+> 
+> -		hci_dev_lock(hdev);
+> -
+> 		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
+> 		if (ie)
+> 			memcpy(ie->data.dev_class, ev->dev_class, 3);
+> @@ -2063,8 +2074,6 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 
+> 		memcpy(conn->dev_class, ev->dev_class, 3);
+> 
+> -		hci_dev_unlock(hdev);
+> -
+> 		if (ev->link_type == ACL_LINK ||
+> 		    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
+> 			struct hci_cp_accept_conn_req cp;
+> @@ -2106,6 +2115,8 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 		cp.reason = HCI_ERROR_REJ_BAD_ADDR;
+> 		hci_send_cmd(hdev, HCI_OP_REJECT_CONN_REQ, sizeof(cp), &cp);
+> 	}
+> +
+> +	hci_dev_unlock(hdev);
+> }
 
 Regards
 
