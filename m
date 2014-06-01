@@ -1,47 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix requiring SMP MITM for outgoing connections
-Date: Sun,  1 Jun 2014 09:45:24 +0300
-Message-Id: <1401605124-330-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: Kiran Kumar Raparthy <kiran.kumar@linaro.org>
+To: linux-kernel@vger.kernel.org
+Cc: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Android Kernel Team <kernel-team@android.com>,
+	John Stultz <john.stultz@linaro.org>,
+	Jaikumar Ganesh <jaikumarg@android.com>,
+	Kiran Raparthy <kiran.kumar@linaro.org>
+Subject: [RFC v3] Bluetooth: Keep master role when SCO or eSCO is active
+Date: Sun,  1 Jun 2014 10:50:34 +0530
+Message-Id: <1401600034-16687-1-git-send-email-kiran.kumar@linaro.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
 
-Due to recent changes to the way that the MITM requirement is set for
-outgoing pairing attempts we can no longer rely on the hcon->auth_type
-variable (which is actually good since it was formed from BR/EDR
-concepts that don't really exist for SMP).
+Preserve the master role when SCO or eSCO is active
+as this improves compatability with lots of
+headset and chipset combinations.
 
-To match the logic that BR/EDR now uses simply rely on the local IO
-capability and/or needed security level to set the MITM requirement for
-outgoing pairing requests.
+This is one of the number of patches from the Android AOSP
+common.git tree, which is used on almost all Android devices.
+It looks like it would improve support for compatibility with
+lot of headset,so I wanted to submit it for review to see
+if it should go upstream.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+v3: Fixed formatting issues pointed by Sergei
+
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Gustavo Padovan <gustavo@padovan.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: Android Kernel Team <kernel-team@android.com>
+Cc: John Stultz <john.stultz@linaro.org>
+Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
+Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
+[kiran: Added context to commit message]
+Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
 ---
- net/bluetooth/smp.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ net/bluetooth/hci_event.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 4f9662d0fd81..3d1cc164557d 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -909,10 +909,11 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 15010a2..cfb1355 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1915,6 +1915,14 @@ unlock:
+ 	hci_conn_check_pending(hdev);
+ }
  
- 	authreq = seclevel_to_authreq(sec_level);
++static inline bool is_sco_active(struct hci_dev *hdev)
++{
++	if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
++	    hci_conn_hash_lookup_state(hdev, ESCO_LINK, BT_CONNECTED))
++		return true;
++	return false;
++}
++
+ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_conn_request *ev = (void *) skb->data;
+@@ -1961,7 +1969,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
--	/* hcon->auth_type is set by pair_device in mgmt.c. If the MITM
--	 * flag is set we should also set it for the SMP request.
-+	/* Require MITM if IO Capability allows or the security level
-+	 * requires it.
- 	 */
--	if ((hcon->auth_type & 0x01))
-+	if (hcon->io_capability != HCI_IO_NO_INPUT_OUTPUT ||
-+	    sec_level > BT_SECURITY_MEDIUM)
- 		authreq |= SMP_AUTH_MITM;
+ 			bacpy(&cp.bdaddr, &ev->bdaddr);
  
- 	if (hcon->link_mode & HCI_LM_MASTER) {
+-			if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
++			if (lmp_rswitch_capable(hdev) &&
++			    ((mask & HCI_LM_MASTER) ||
++			    is_sco_active(hdev)))
+ 				cp.role = 0x00; /* Become master */
+ 			else
+ 				cp.role = 0x01; /* Remain slave */
 -- 
-1.9.3
-
+1.8.2.1
