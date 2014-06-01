@@ -1,53 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Mark Ventimiglia <mark.ventimiglia@gmail.com>
-Date: Sat, 31 May 2014 22:49:34 -0500
-Message-ID: <CANhQzn18sxtZkq2gQPqBnJD+v+t55ah9GWqR0yEemFOt6dnmQg@mail.gmail.com>
-Subject: Bluez 5.18 - Agent not being released when unregistered
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: [RFC] Bluetooth: Use struct delayed_work for HCI command timeout
+Date: Sat, 31 May 2014 18:38:22 -0700
+Message-Id: <1401586702-54238-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-I'm writing a custom agent for an embedded Linux application that's
-running BlueZ 5.18 on a Raspberry Pi w/ Linux 3.6.11+. I am able to
-register the agent and handle pairing requests fine, but when I
-unregister the agent I'm not seeing the D-Bus Release method call go
-out. To test this, I wrote a simple program to register the agent,
-sleep for 3 seconds, and unregister the agent. When I turn on debug
-for bluetoothd, I get the following in the debug log:
+This is an experimental patch that converts hdev->cmd_timer from
+struct timer_list to struct delayed_work.
 
-Jun  1 00:46:27 raspberrypi bluetoothd[5498]: src/agent.c:agent_ref()
-0x1fee8e0: ref=1
-Jun  1 00:46:27 raspberrypi bluetoothd[5498]:
-src/agent.c:register_agent() agent :1.284
-Jun  1 00:46:27 raspberrypi bluetoothd[5498]:
-src/agent.c:set_default_agent() Default agent set to :1.284
-/test/agent
-Jun  1 00:46:30 raspberrypi bluetoothd[5498]:
-src/agent.c:unregister_agent() agent :1.284
-Jun  1 00:46:30 raspberrypi bluetoothd[5498]:
-src/agent.c:agent_disconnect() Agent :1.284 disconnected
-Jun  1 00:46:30 raspberrypi bluetoothd[5498]:
-src/agent.c:set_default_agent() Default agent cleared
-Jun  1 00:46:31 raspberrypi bluetoothd[5498]:
-src/agent.c:agent_destroy() agent :1.284
-Jun  1 00:46:31 raspberrypi bluetoothd[5498]:
-src/agent.c:agent_unref() 0x1fee8e0: ref=0
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h |  2 +-
+ net/bluetooth/hci_core.c         | 17 +++++++++--------
+ net/bluetooth/hci_event.c        |  4 ++--
+ 3 files changed, 12 insertions(+), 11 deletions(-)
 
-I noticed that agent_release() is not called. In the 5.18 code,
-agent_release() is called by agent_destroy(), which is installed as a
-hash table remove hook that is called when agent_disconnect() calls
-g_hash_table_remove(). Before removing the agent from the hash table,
-agent_disconnect() sets agent->watch = 0. However, agent_destroy()
-only calls agent_release() if agent->watch == 0. According to my read,
-this can never be true (and agent_release() will never get called)
-because agent->watch will have already been set to 0 in
-agent_disconnect() before agent_destroy() is ever called.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b386bf17e6c2..de3bb22e83f9 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -273,7 +273,7 @@ struct hci_dev {
+ 
+ 	struct delayed_work	service_cache;
+ 
+-	struct timer_list	cmd_timer;
++	struct delayed_work	cmd_timer;
+ 
+ 	struct work_struct	rx_work;
+ 	struct work_struct	cmd_work;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 0a43cce9a914..9e0368b02a11 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2432,7 +2432,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 	hci_req_lock(hdev);
+ 
+ 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+-		del_timer_sync(&hdev->cmd_timer);
++		cancel_delayed_work_sync(&hdev->cmd_timer);
+ 		hci_req_unlock(hdev);
+ 		return 0;
+ 	}
+@@ -2488,7 +2488,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+ 
+ 	/* Drop last sent command */
+ 	if (hdev->sent_cmd) {
+-		del_timer_sync(&hdev->cmd_timer);
++		cancel_delayed_work_sync(&hdev->cmd_timer);
+ 		kfree_skb(hdev->sent_cmd);
+ 		hdev->sent_cmd = NULL;
+ 	}
+@@ -3205,9 +3205,10 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
+ }
+ 
+ /* HCI command timer function */
+-static void hci_cmd_timeout(unsigned long arg)
++static void hci_cmd_timeout(struct work_struct *work)
+ {
+-	struct hci_dev *hdev = (void *) arg;
++	struct hci_dev *hdev = container_of(work, struct hci_dev,
++					    cmd_timer.work);
+ 
+ 	if (hdev->sent_cmd) {
+ 		struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+@@ -3884,7 +3885,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 
+ 	init_waitqueue_head(&hdev->req_wait_q);
+ 
+-	setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
++	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
+ 
+ 	hci_init_sysfs(hdev);
+ 	discovery_init(hdev);
+@@ -5287,10 +5288,10 @@ static void hci_cmd_work(struct work_struct *work)
+ 			atomic_dec(&hdev->cmd_cnt);
+ 			hci_send_frame(hdev, skb);
+ 			if (test_bit(HCI_RESET, &hdev->flags))
+-				del_timer(&hdev->cmd_timer);
++				cancel_delayed_work(&hdev->cmd_timer);
+ 			else
+-				mod_timer(&hdev->cmd_timer,
+-					  jiffies + HCI_CMD_TIMEOUT);
++				schedule_delayed_work(&hdev->cmd_timer,
++						      HCI_CMD_TIMEOUT);
+ 		} else {
+ 			skb_queue_head(&hdev->cmd_q, skb);
+ 			queue_work(hdev->workqueue, &hdev->cmd_work);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6cf9596ff69b..4f942ea43cd8 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2705,7 +2705,7 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ 
+ 	if (opcode != HCI_OP_NOP)
+-		del_timer(&hdev->cmd_timer);
++		cancel_delayed_work(&hdev->cmd_timer);
+ 
+ 	hci_req_cmd_complete(hdev, opcode, status);
+ 
+@@ -2796,7 +2796,7 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	}
+ 
+ 	if (opcode != HCI_OP_NOP)
+-		del_timer(&hdev->cmd_timer);
++		cancel_delayed_work(&hdev->cmd_timer);
+ 
+ 	if (ev->status ||
+ 	    (hdev->sent_cmd && !bt_cb(hdev->sent_cmd)->req.event))
+-- 
+1.9.3
 
-Am I missing something in this sequence of events? Or is
-agent_release() not supposed to be called when an agent is
-unregistered?
-
-Regards,
-Mark
