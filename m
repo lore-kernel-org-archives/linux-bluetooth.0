@@ -1,80 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <AB19A214-D495-44EE-87E0-45332F156767@holtmann.org>
-References: <1401631076-20818-1-git-send-email-rickard_strandqvist@spectrumdigital.se>
-	<AB19A214-D495-44EE-87E0-45332F156767@holtmann.org>
-Date: Sun, 1 Jun 2014 17:41:12 +0200
-Message-ID: <CAFo99gZVJ3D-f_j8C4zYBod4yaLveq8X5__URyTuOAKcffN-Cg@mail.gmail.com>
-Subject: Re: [PATCH] net: bluetooth: hci_core.c: Cleaning up uninitialized variables
-From: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] android/hal-audio-sbc: Fix use of incorrect number of frames per packet
+Date: Sun,  1 Jun 2014 18:26:04 +0300
+Message-Id: <1401636364-10858-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel!
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Number of frames should always be limited to the maximun that can be set
+in the payload header.
+---
+ android/hal-audio-sbc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Sorry sorry!! This is obviously not necessary!
+diff --git a/android/hal-audio-sbc.c b/android/hal-audio-sbc.c
+index ad20f51..0c31035 100644
+--- a/android/hal-audio-sbc.c
++++ b/android/hal-audio-sbc.c
+@@ -241,6 +241,9 @@ static void sbc_codec_calculate(struct sbc_data *sbc_data)
+ 	out_frame_len = sbc_get_frame_length(&sbc_data->enc);
+ 	num_frames = sbc_data->payload_len / out_frame_len;
+ 
++	if (num_frames > MAX_FRAMES_IN_PAYLOAD)
++		num_frames = MAX_FRAMES_IN_PAYLOAD;
++
+ 	sbc_data->in_frame_len = in_frame_len;
+ 	sbc_data->in_buf_size = num_frames * in_frame_len;
+ 
+@@ -346,7 +349,7 @@ static ssize_t sbc_encode_mediapacket(void *codec_data, const uint8_t *buffer,
+ 
+ 	while (len - consumed >= sbc_data->in_frame_len &&
+ 			mp_data_len - encoded >= sbc_data->out_frame_len &&
+-			frame_count < MAX_FRAMES_IN_PAYLOAD) {
++			frame_count < sbc_data->frames_per_packet) {
+ 		ssize_t read;
+ 		ssize_t written = 0;
+ 
+-- 
+1.9.0
 
-This is code that was left when I tried to split up my original big patch.
-
-This was part of code trying to solve a possible divided by 0.
-
-
-    int q = 0;
-
-...
-
-    if (num)
-        q = cnt / num;
-    *quote = q ? q : 1;
-
-
-But I'm not sure if it can happen in reality...
-Guessing it will be caught by in that case by:
-
-    if (!chan)
-        return NULL;
-
-
-
-I had actually not planned to submit this divided by 0 patch at all :-/
-
-
-Best regards
-Rickard Strandqvist
-
-
-2014-06-01 16:24 GMT+02:00 Marcel Holtmann <marcel@holtmann.org>:
-> Hi Rickard,
->
->> There is a risk that the variable will be used without being initialized.
->>
->> This was largely found by using a static code analysis program called cppcheck.
->>
->> Signed-off-by: Rickard Strandqvist <rickard_strandqvist@spectrumdigital.se>
->> ---
->> net/bluetooth/hci_core.c |    2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
->> index 1c6ffaa..1d93d2f 100644
->> --- a/net/bluetooth/hci_core.c
->> +++ b/net/bluetooth/hci_core.c
->> @@ -4603,7 +4603,7 @@ static struct hci_chan *hci_chan_sent(struct hci_dev *hdev, __u8 type,
->>       struct hci_chan *chan = NULL;
->>       unsigned int num = 0, min = ~0, cur_prio = 0;
->>       struct hci_conn *conn;
->> -     int cnt, q, conn_num = 0;
->> +     int cnt, q = 0, conn_num = 0;
->
-> I have no idea on how the variable will be used without being initialized. Have you actually looked through that function. The only thing we do with q is assign it and then use it. That is it.
->
-> Regards
->
-> Marcel
->
