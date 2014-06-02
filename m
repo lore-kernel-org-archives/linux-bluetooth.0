@@ -1,50 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Jun 2014 18:30:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] monitor: Fix crash when parsing SDP
-Message-ID: <20140602153007.GA15058@t440s.P-661HNU-F1>
-References: <1401719591-5503-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1401719591-5503-1-git-send-email-szymon.janc@tieto.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFCv2 2/2] android/gatt: Add test command for database dump
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1401715171-29175-3-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Mon, 2 Jun 2014 17:05:13 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C088D1E3-5FAD-49FA-8255-B63ADB999622@holtmann.org>
+References: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com> <1401715171-29175-3-git-send-email-jakub.tyszkowski@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Jakub,
 
-On Mon, Jun 02, 2014, Szymon Janc wrote:
-> get_tid() may return NULL if bogus tid is passed.
-> This fix following crash:
-> 
-> Invalid write of size 1
->    at 0x4A0A643: memcpy@@GLIBC_2.14 (in /usr/lib64/valgrind/
->      vgpreload_memcheck-amd64-linux.so)
->    by 0x4218E4: search_attr_req (sdp.c:413)
->    by 0x42214D: sdp_packet (sdp.c:748)
->    by 0x41ED09: l2cap_frame (l2cap.c:2632)
->    by 0x414D51: packet_hci_acldata (packet.c:7713)
->    by 0x415133: packet_monitor (packet.c:3332)
->    by 0x404AEC: control_reader (control.c:911)
->    by 0x40231A: main (main.c:197)
->  Address 0x6 is not stack'd, malloc'd or (recently) free'd
-> 
-> Process terminating with default action of signal 11 (SIGSEGV)
->  Access not within mapped region at address 0x6
->    at 0x4A0A643: memcpy@@GLIBC_2.14 (in /usr/lib64/valgrind/
->      vgpreload_memcheck-amd64-linux.so)
->    by 0x4218E4: search_attr_req (sdp.c:413)
->    by 0x42214D: sdp_packet (sdp.c:748)
->    by 0x41ED09: l2cap_frame (l2cap.c:2632)
->    by 0x414D51: packet_hci_acldata (packet.c:7713)
->    by 0x415133: packet_monitor (packet.c:3332)
->    by 0x404AEC: control_reader (control.c:911)
->    by 0x40231A: main (main.c:197)
+> With this we can check all attributes handles, uuids, permissions etc.
+> on demand without adding to much logs. This will help to execute and
+> verify some PTS test cases and debug.
 > ---
->  monitor/sdp.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> android/gatt.c    | 4 ++++
+> android/hal-msg.h | 1 +
+> 2 files changed, 5 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 429181f..83a051b 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -3543,6 +3543,10 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+> 		status = test_read_write(&bdaddr, &uuid, cmd->u1, cmd->u2,
+> 						cmd->u3, cmd->u4, cmd->u5);
+> 		break;
+> +	case GATT_CLIENT_TEST_CMD_DB_DUMP:
+> +		gatt_db_dump(gatt_db);
+> +		status = HAL_STATUS_SUCCESS;
+> +		break;
+> 	case GATT_CLIENT_TEST_CMD_PAIRING_CONFIG:
+> 	default:
+> 		status = HAL_STATUS_FAILED;
+> diff --git a/android/hal-msg.h b/android/hal-msg.h
+> index 5da62f3..ce86304 100644
+> --- a/android/hal-msg.h
+> +++ b/android/hal-msg.h
+> @@ -753,6 +753,7 @@ struct hal_cmd_gatt_client_set_adv_data {
+> #define GATT_CLIENT_TEST_CMD_DISCOVER		0x04
+> #define GATT_CLIENT_TEST_CMD_READ		0xe0
+> #define GATT_CLIENT_TEST_CMD_WRITE		0xe1
+> +#define GATT_CLIENT_TEST_CMD_DB_DUMP		0xe2
+> #define GATT_CLIENT_TEST_CMD_PAIRING_CONFIG	0xf0
 
-Applied. Thanks.
+are these all defined by Bluedroid and Android Bluetooth Service or are some of these BlueZ specific? If so we need to comment that.
 
-Johan
+Regards
+
+Marcel
+
