@@ -1,126 +1,101 @@
 Return-Path: <cyrus@holtmann.org>
 From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 3/5] Bluetooth: 6LoWPAN: Create a kernel module
-Date: Mon,  2 Jun 2014 18:00:25 +0300
-Message-Id: <1401721227-28439-4-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH v5 5/5] Bluetooth: 6LoWPAN: Remove network devices when unloading
+Date: Mon,  2 Jun 2014 18:00:27 +0300
+Message-Id: <1401721227-28439-6-git-send-email-jukka.rissanen@linux.intel.com>
 In-Reply-To: <1401721227-28439-1-git-send-email-jukka.rissanen@linux.intel.com>
 References: <1401721227-28439-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Instead of adding the 6LoWPAN functionality to Bluetooth module,
-we create a separate kernel module for it.
-
-Usage:
-
-In the slave side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ hciconfig hci0 leadv
-
-In the master side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ echo 'connect E0:06:E6:B7:2A:73 1' > \
-                  /sys/kernel/debug/bluetooth/6lowpan_control
-
-The 6LoWPAN functionality can be controlled by psm value. If it
-is left to 0, then the module is disabled and all the 6LoWPAN
-connections are dropped if there were any. In the above example,
-the psm value is just an example and not a real value for
-6LoWPAN service. The real psm value is yet to be defined in
-Bluetooth specification.
-
-The 6lowpan controlling interface is a temporary solution
-until the specifications are ready.
+When the module is unloaded, unregister the network device
+so that the system does not try to access non-existing device.
 
 Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 ---
- net/bluetooth/6lowpan.c | 11 ++++++++++-
- net/bluetooth/Kconfig   |  6 +++---
- net/bluetooth/Makefile  |  4 +++-
- 3 files changed, 16 insertions(+), 5 deletions(-)
+ net/bluetooth/6lowpan.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
-index d197bbe..debf003 100644
+index 90c64da..b2d1139 100644
 --- a/net/bluetooth/6lowpan.c
 +++ b/net/bluetooth/6lowpan.c
-@@ -14,6 +14,7 @@
- #include <linux/if_arp.h>
- #include <linux/netdevice.h>
- #include <linux/etherdevice.h>
-+#include <linux/module.h>
- #include <linux/debugfs.h>
- 
- #include <net/ipv6.h>
-@@ -1231,7 +1232,7 @@ static int __init bt_6lowpan_init(void)
- 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
+@@ -598,6 +598,17 @@ static void ifup(struct net_device *netdev)
+ 	rtnl_unlock();
  }
  
--void bt_6lowpan_cleanup(void)
-+static void __exit bt_6lowpan_cleanup(void)
++static void ifdown(struct net_device *netdev)
++{
++	int err;
++
++	rtnl_lock();
++	err = dev_close(netdev);
++	if (err < 0)
++		BT_INFO("iface %s cannot be closed (%d)", netdev->name, err);
++	rtnl_unlock();
++}
++
+ static void do_notify_peers(struct work_struct *work)
  {
- 	cleanup_6lowpan();
+ 	struct lowpan_dev *dev = container_of(work, struct lowpan_dev,
+@@ -811,6 +822,8 @@ static void chan_close_cb(struct l2cap_chan *chan)
  
-@@ -1239,3 +1240,11 @@ void bt_6lowpan_cleanup(void)
+ 		cancel_delayed_work_sync(&dev->notify_peers);
  
- 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
++		ifdown(dev->netdev);
++
+ 		if (!removed) {
+ 			INIT_WORK(&entry->delete_netdev, delete_netdev);
+ 			schedule_work(&entry->delete_netdev);
+@@ -1198,6 +1211,38 @@ static void cleanup_6lowpan(void)
+ 		chan_close(listen_chan, 0);
  }
+ 
++static void disconnect_devices(void)
++{
++	struct lowpan_dev *entry, *tmp, *new_dev;
++	struct list_head devices;
++	unsigned long flags;
 +
-+module_init(bt_6lowpan_init);
-+module_exit(bt_6lowpan_cleanup);
++	INIT_LIST_HEAD(&devices);
 +
-+MODULE_AUTHOR("Jukka Rissanen <jukka.rissanen@linux.intel.com>");
-+MODULE_DESCRIPTION("Bluetooth 6LoWPAN");
-+MODULE_VERSION(VERSION);
-+MODULE_LICENSE("GPL");
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index 06ec144..f5afaa2 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -6,7 +6,6 @@ menuconfig BT
- 	tristate "Bluetooth subsystem support"
- 	depends on NET && !S390
- 	depends on RFKILL || !RFKILL
--	select 6LOWPAN_IPHC if BT_6LOWPAN
- 	select CRC16
- 	select CRYPTO
- 	select CRYPTO_BLKCIPHER
-@@ -41,10 +40,11 @@ menuconfig BT
- 	  more information, see <http://www.bluez.org/>.
- 
- config BT_6LOWPAN
--	bool "Bluetooth 6LoWPAN support"
-+	tristate "Bluetooth 6LoWPAN support"
- 	depends on BT && IPV6
-+	select 6LOWPAN_IPHC if BT_6LOWPAN
- 	help
--	  IPv6 compression over Bluetooth.
-+	  IPv6 compression over Bluetooth Low Energy.
- 
- source "net/bluetooth/rfcomm/Kconfig"
- 
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index ca51246..886e9aa 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -7,10 +7,12 @@ obj-$(CONFIG_BT_RFCOMM)	+= rfcomm/
- obj-$(CONFIG_BT_BNEP)	+= bnep/
- obj-$(CONFIG_BT_CMTP)	+= cmtp/
- obj-$(CONFIG_BT_HIDP)	+= hidp/
-+obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
++	read_lock_irqsave(&devices_lock, flags);
 +
-+bluetooth_6lowpan-y := 6lowpan.o
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
- 	a2mp.o amp.o
--bluetooth-$(CONFIG_BT_6LOWPAN) += 6lowpan.o
- 
- subdir-ccflags-y += -D__CHECK_ENDIAN__
++	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
++		new_dev = kmalloc(sizeof(*new_dev), GFP_ATOMIC);
++		if (!new_dev)
++			break;
++
++		new_dev->netdev = entry->netdev;
++		INIT_LIST_HEAD(&new_dev->list);
++
++		list_add(&new_dev->list, &devices);
++	}
++
++	read_unlock_irqrestore(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &devices, list) {
++		ifdown(entry->netdev);
++		BT_DBG("Unregistering netdev %s %p",
++		       entry->netdev->name, entry->netdev);
++		unregister_netdev(entry->netdev);
++		kfree(entry);
++	}
++}
++
+ static int device_event(struct notifier_block *unused,
+ 			unsigned long event, void *ptr)
+ {
+@@ -1214,6 +1259,8 @@ static int device_event(struct notifier_block *unused,
+ 		list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices,
+ 					 list) {
+ 			if (entry->netdev == netdev) {
++				BT_DBG("Unregistered netdev %s %p",
++				       netdev->name, netdev);
+ 				list_del(&entry->list);
+ 				kfree(entry);
+ 				break;
 -- 
 1.8.3.1
 
