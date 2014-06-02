@@ -2,90 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [RFCv2 1/2] shared/gatt-db: Add databse dump
-Date: Mon,  2 Jun 2014 15:19:30 +0200
-Message-Id: <1401715171-29175-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [RFCv2 0/2] Attribute database dump
+Date: Mon,  2 Jun 2014 15:19:29 +0200
+Message-Id: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is usefull to execute and verify PTS test cases, and will be called
-from haltest using gatt client 'test_command'.
----
+RFCv2 changes:
+	* added check for not used attribute slots (in case more attributes were
+		reserved using gatt_db_add_service than actually used)
+
+RFC1 message:
+
+This allows to dump attributes database content for debug purposes and PTS tests
+needs.
+
+Android API does not provide attribute handle information that is needes to
+pass some PTS test cases. To avoid adding more and more logs to the daemon
+databse, database dump is provided. This will simplify executing writes and
+reads on some specific handles, which are requested by PTS and previously
+required calling multiple API functions in haltest only to find proper attribute
+to write to, or read from.
+
+This dumps db in the following format:
+
+[ att database dump start ]
+attr_hnd: 00001, uuid: 2800, perm: 0000000, val_len: 00002, attr_value: 00 18                                            ..
+attr_hnd: 00002, uuid: 2803, perm: 0000000, val_len: 00005, attr_value: 02 03 00 00 2a                                   ....*
+attr_hnd: 00003, uuid: 2a00, perm: 0000001, val_len: 00000, attr_value: <read_cb>
+.
+.
+.
+attr_hnd: 00024, uuid: 2803, perm: 0000000, val_len: 00005, attr_value: 20 19 00 05 2a                                    ...*
+attr_hnd: 00025, uuid: 2a05, perm: 0000001, val_len: 00000, attr_value:
+attr_hnd: 00026, uuid: 2902, perm: 0000001, val_len: 00000, attr_value: <write_cb>
+<empty>
+<empty>
+.
+.
+.
+<empty>
+[ att database dump end ]
+
+Jakub Tyszkowski (2):
+  shared/gatt-db: Add databse dump
+  android/gatt: Add test command for database dump
+
+ android/gatt.c       |  4 ++++
+ android/hal-msg.h    |  1 +
  src/shared/gatt-db.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
  src/shared/gatt-db.h |  1 +
- 2 files changed, 53 insertions(+)
+ 4 files changed, 58 insertions(+)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index c11c5d1..7405998 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -761,3 +761,55 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 	return true;
- 
- }
-+
-+static void dump_data(const char *str, void *user_data)
-+{
-+	if (user_data)
-+		printf("%s%s", (char *) user_data, str);
-+	else
-+		printf("%s", str);
-+}
-+
-+static void dump_attribute(struct gatt_db_attribute *attr)
-+{
-+	char uuidstr[MAX_LEN_UUID_STR + 1];
-+
-+	if (!attr) {
-+		util_debug(dump_data, NULL, " <empty>\n");
-+		return;
-+	}
-+
-+	bt_uuid_to_string(&attr->uuid, uuidstr, sizeof(uuidstr));
-+	util_debug(dump_data, NULL,
-+			"attr_hnd: %.5d, uuid: %s, perm: %.7d, val_len: %.5d, ",
-+			attr->handle, uuidstr, attr->permissions,
-+			attr->value_len);
-+
-+	if (attr->value_len) {
-+		util_hexdump(':', attr->value, attr->value_len, dump_data,
-+								"attr_value");
-+	} else {
-+		util_debug(dump_data, "attr_value:",
-+					attr->read_func ? " <read_cb>" : "");
-+		util_debug(dump_data, NULL,
-+					attr->write_func ? " <write_cb>" : "");
-+	}
-+
-+	util_debug(dump_data, NULL, "\n");
-+}
-+
-+static void dump_service(void *data, void *user_data)
-+{
-+	struct gatt_db_service *srvc = data;
-+	int i;
-+
-+	for (i = 0; i < srvc->num_handles; i++)
-+		dump_attribute(srvc->attributes[i]);
-+}
-+
-+void gatt_db_dump(struct gatt_db *db)
-+{
-+	util_debug(dump_data, NULL, "[ att database dump start ]\n");
-+	queue_foreach(db->services, dump_service, NULL);
-+	util_debug(dump_data, NULL, "[ att database dump end ]\n");
-+}
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index a88f637..dad8b11 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -94,3 +94,4 @@ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle);
- 
- bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 							uint32_t *permissions);
-+void gatt_db_dump(struct gatt_db *db);
--- 
+--
 2.0.0
-
