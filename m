@@ -1,69 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] monitor: Fix crash when parsing SDP
-Date: Mon,  2 Jun 2014 16:33:11 +0200
-Message-Id: <1401719591-5503-1-git-send-email-szymon.janc@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 2 Jun 2014 11:06:36 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2014-06-01
+Message-ID: <20140602140636.GA1659@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-get_tid() may return NULL if bogus tid is passed.
-This fix following crash:
 
-Invalid write of size 1
-   at 0x4A0A643: memcpy@@GLIBC_2.14 (in /usr/lib64/valgrind/
-     vgpreload_memcheck-amd64-linux.so)
-   by 0x4218E4: search_attr_req (sdp.c:413)
-   by 0x42214D: sdp_packet (sdp.c:748)
-   by 0x41ED09: l2cap_frame (l2cap.c:2632)
-   by 0x414D51: packet_hci_acldata (packet.c:7713)
-   by 0x415133: packet_monitor (packet.c:3332)
-   by 0x404AEC: control_reader (control.c:911)
-   by 0x40231A: main (main.c:197)
- Address 0x6 is not stack'd, malloc'd or (recently) free'd
+--wRRV7LY7NUeQGEoC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Process terminating with default action of signal 11 (SIGSEGV)
- Access not within mapped region at address 0x6
-   at 0x4A0A643: memcpy@@GLIBC_2.14 (in /usr/lib64/valgrind/
-     vgpreload_memcheck-amd64-linux.so)
-   by 0x4218E4: search_attr_req (sdp.c:413)
-   by 0x42214D: sdp_packet (sdp.c:748)
-   by 0x41ED09: l2cap_frame (l2cap.c:2632)
-   by 0x414D51: packet_hci_acldata (packet.c:7713)
-   by 0x415133: packet_monitor (packet.c:3332)
-   by 0x404AEC: control_reader (control.c:911)
-   by 0x40231A: main (main.c:197)
+Hi John,
+
+Here some more patches for 3.16. We know that Linus already opened the merge
+window, but this is fix only pull request, and most of the patches here are
+also tagged for stable.
+
+Please pull! or let me know of any issues. Thanks!
+
+	Gustavo
+
 ---
- monitor/sdp.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+The following changes since commit d7b2545023ecfde94d3ea9c03c5480ac18da96c9:
 
+  Bluetooth: Clearly distinguish mgmt LTK type from authenticated property (2014-05-23 11:24:04 -0700)
 
-TBH I'm not sure if this isn't just hiding real issue somewhere else in
-monitor code...
+are available in the git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
 
-diff --git a/monitor/sdp.c b/monitor/sdp.c
-index a0ab314..8acc8bd 100644
---- a/monitor/sdp.c
-+++ b/monitor/sdp.c
-@@ -737,13 +737,13 @@ void sdp_packet(const struct l2cap_frame *frame, uint16_t channel)
- 	print_indent(6, pdu_color, "SDP: ", pdu_str, COLOR_OFF,
- 				" (0x%2.2x) tid %d len %d", pdu, tid, plen);
- 
--	if (!sdp_data || !sdp_data->func) {
-+	tid_info = get_tid(tid, channel);
-+
-+	if (!sdp_data || !sdp_data->func || !tid_info) {
- 		packet_hexdump(frame->data + 5, frame->size - 5);
- 		return;
- 	}
- 
--	tid_info = get_tid(tid, channel);
--
- 	l2cap_frame_pull(&sdp_frame, frame, 5);
- 	sdp_data->func(&sdp_frame, tid_info);
- }
--- 
-1.9.3
+for you to fetch changes up to 8a96f3cd22878fc0bb564a8478a6e17c0b8dca73:
 
+  Bluetooth: Fix L2CAP deadlock (2014-06-02 13:38:19 +0300)
+
+----------------------------------------------------------------
+Adam Lee (1):
+      Bluetooth: ath3k: no need to set same pipe multiple times
+
+Johan Hedberg (4):
+      Bluetooth: Fix properly ignoring LTKs of unknown types
+      Bluetooth: Fix authentication check for FIPS security level
+      Bluetooth: Fix requiring SMP MITM for outgoing connections
+      Bluetooth: Fix missing check for FIPS security level
+
+Jukka Rissanen (2):
+      Bluetooth: 6LoWPAN: Fix MAC address universal/local bit handling
+      Bluetooth: l2cap: Set more channel defaults
+
+Jukka Taimisto (1):
+      Bluetooth: Fix L2CAP deadlock
+
+ drivers/bluetooth/ath3k.c  |  3 ++-
+ net/bluetooth/6lowpan.c    | 65 +++++++++++++++++++++++++++++-------------------------
+ net/bluetooth/hci_event.c  |  4 +++-
+ net/bluetooth/l2cap_core.c |  6 +++++
+ net/bluetooth/l2cap_sock.c |  5 ++++-
+ net/bluetooth/mgmt.c       | 10 +++++++--
+ net/bluetooth/smp.c        |  7 +++---
+ 7 files changed, 62 insertions(+), 38 deletions(-)
+
+--wRRV7LY7NUeQGEoC
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTjITsAAoJEPs3PUX4s20oFSEQAKpJqns+h74NOPIqHPOfv+pr
+hGvKvstASH9IeuA+km+BHDFSS0Eqwkc1M8AnS8sZIrVq8sML+89bpBMyhYSIOzwM
+sugpDuGXn0rMQ4Ia24gEwjgLBs94j0NcG1Q5/AjsaJcQ/8JOo7Or19lcB/yASZ1b
+gHQ9H9niF6kpQnxfConkfT+UvhSxtSFro1/wFoM1+9kyiMujFXxLgFQcEo32xHdE
+2NycQWRJe81fB7m1USuzBtBbMPp0DL0qTOPDR/i6K4TmEOgCgPvT/RReJxLTVm+J
+jZBrh7q5UPXF7NG9A7+Vu2heKh1jcXrrkSzLQ1jRDM2Wy77JRsaQ+RITgnRHKmCm
+KyAa/oRobEtx8sCv8465klw33LoVKtbuN6nDmNzFLBXYrA5A5I+v6IvqoQEtsklP
+uCqxLDswRkdg3xbOiad5bxd3X5cLEQ2S158yqi+UQEO84kN33ylsaEfxVAlxnzEJ
+4ehhsOZVOkTPUhSQzwyVEy4iq4d3urgQwTlH2aj7RQS4DzZ5Tfow8uth7jUAOpFW
+k6Qj59UZsR2aOCiPZgIpQzaHWI7L8mT0nraOq2Bqq2dcbOucHAqFX3pyt7+c3Kqc
+QSrX2zrowJ5S1J4LkaMa8HsKHH2DBusbBelLth6q6JxP9AnWczOHeP3rySMNjrxT
+9XWfb9s6lAIiDKbN2cvo
+=Gn+6
+-----END PGP SIGNATURE-----
+
+--wRRV7LY7NUeQGEoC--
