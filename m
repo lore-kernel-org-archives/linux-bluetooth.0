@@ -1,161 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; CHARSET=US-ASCII
-Subject: Re: [PATCH] android/bluetooth: Make possible to start BlueZ in LE mode
- only
-From: d.eriksson@me.com
-In-reply-to: <CAN_7+YZBC8jYCkY=LVb3fYRjDOWrTGUAzp0k8eowpkUkCh9-dw@mail.gmail.com>
-Date: Tue, 03 Jun 2014 00:06:28 +0400
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-id: <23645E3F-EC81-4110-A9DB-177E32BB275E@me.com>
-References: <1398204991-5165-1-git-send-email-lukasz.rymanowski@tieto.com>
- <6F8AC54A-0775-4224-A508-CD9DA868A46D@me.com>
- <CAN_7+YZBC8jYCkY=LVb3fYRjDOWrTGUAzp0k8eowpkUkCh9-dw@mail.gmail.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 6/6] android/hidhost: Add support for HoG
+Date: Mon,  2 Jun 2014 20:50:07 +0300
+Message-Id: <1401731407-10352-6-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1401731407-10352-1-git-send-email-luiz.dentz@gmail.com>
+References: <1401731407-10352-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Do you or you know someone that could be up for the job?
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-best david
+This enables using hidhost HAL for LE devices since this is how HoG is
+implemented in Android.
+---
+ android/hidhost.c | 85 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 85 insertions(+)
 
-On 25 May 2014, at 22:34, Lukasz Rymanowski <lukasz.rymanowski@gmail.com> wrote:
-
-> Hi David,
-> 
-> On Sun, May 25, 2014 at 5:38 PM,  <d.eriksson@me.com> wrote:
->> Hi Lukasz,
->> 
->> Maybe unrelated, but I'm looking for a way to enforce BlueZ to run LE only (central) under linux 3.13.
->> btmgmt bredr seems to do this, but could I do it via some "config-level" setting to ensure no one on the system can initiate anything else than LE related things.
->> 
-> 
-> AFAIK For now it is possible only for Android version.
-> For "normal" BlueZ you need to extend BlueZ daemon. Probably add
-> special config to main.conf and add similar handling it as we did for
-> Android.
-> 
->> best David
->> 
-> 
-> BR
-> Lukasz
-> 
->> On 23 Apr 2014, at 00:16, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
->> 
->>> This patch adds possibility to start BlueZ only in LE mode only.
->>> 
->>> It is useful for testing purpose, when you want test BlueZ in
->>> peripheral mode against any dual mode device.
->>> ---
->>> android/README          |  3 +++
->>> android/bluetooth.c     |  7 ++++++-
->>> android/hal-bluetooth.c | 15 ++++++++++++++-
->>> android/hal-msg.h       |  1 +
->>> 4 files changed, 24 insertions(+), 2 deletions(-)
->>> 
->>> diff --git a/android/README b/android/README
->>> index 6254d34..9b08610 100644
->>> --- a/android/README
->>> +++ b/android/README
->>> @@ -166,6 +166,9 @@ options.
->>> 
->>> Property      Value           Description
->>> -------------------------------------------
->>> +mode         le_only         Enable BlueZ in Low Energy mode only.
->>> +             <none>          Enable BlueZ in default mode - enable br/edr/le
->>> +                             if possible.
->>> handsfree     hfp             Enable Handsfree Profile (HFP) with narrowband
->>>                              speech only
->>>              hfp_wbs         Enable Handsfree Profile (HFP) with narrowband
->>> diff --git a/android/bluetooth.c b/android/bluetooth.c
->>> index 93c7935..923285c 100644
->>> --- a/android/bluetooth.c
->>> +++ b/android/bluetooth.c
->>> @@ -3894,10 +3894,15 @@ static const struct ipc_handler cmd_handlers[] = {
->>> 
->>> void bt_bluetooth_register(struct ipc *ipc, uint8_t mode)
->>> {
->>> -     DBG("");
->>> +     DBG("mode 0x%x", mode);
->>> 
->>>      hal_ipc = ipc;
->>> 
->>> +     if ((mode == HAL_MODE_LE_ONLY) &&
->>> +                     (adapter.current_settings & MGMT_SETTING_LE) &&
->>> +                     (adapter.current_settings & MGMT_SETTING_BREDR))
->>> +             set_mode(MGMT_OP_SET_BREDR, 0x00);
->>> +
->>>      ipc_register(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, cmd_handlers,
->>>                                              G_N_ELEMENTS(cmd_handlers));
->>> }
->>> diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
->>> index 48d5ea2..69009ff 100644
->>> --- a/android/hal-bluetooth.c
->>> +++ b/android/hal-bluetooth.c
->>> @@ -29,6 +29,8 @@
->>> #include "hal-ipc.h"
->>> #include "hal-utils.h"
->>> 
->>> +#define MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
->>> +
->>> static const bt_callbacks_t *bt_hal_cbacks = NULL;
->>> 
->>> #define enum_prop_to_hal(prop, hal_prop, type) do { \
->>> @@ -412,6 +414,17 @@ static const struct hal_ipc_handler ev_handlers[] = {
->>>      }
->>> };
->>> 
->>> +static uint8_t get_mode(void)
->>> +{
->>> +     char value[PROPERTY_VALUE_MAX];
->>> +
->>> +     if (property_get(MODE_PROPERTY_NAME, value, "") > 0 &&
->>> +                                     (!strcasecmp(value, "le_only")))
->>> +             return HAL_MODE_LE_ONLY;
->>> +
->>> +     return HAL_MODE_DEFAULT;
->>> +}
->>> +
->>> static int init(bt_callbacks_t *callbacks)
->>> {
->>>      struct hal_cmd_register_module cmd;
->>> @@ -433,7 +446,7 @@ static int init(bt_callbacks_t *callbacks)
->>>      }
->>> 
->>>      cmd.service_id = HAL_SERVICE_ID_BLUETOOTH;
->>> -     cmd.mode = HAL_MODE_DEFAULT;
->>> +     cmd.mode = get_mode();
->>> 
->>>      status = hal_ipc_cmd(HAL_SERVICE_ID_CORE, HAL_OP_REGISTER_MODULE,
->>>                                      sizeof(cmd), &cmd, NULL, NULL, NULL);
->>> diff --git a/android/hal-msg.h b/android/hal-msg.h
->>> index ed0a67a..db21870 100644
->>> --- a/android/hal-msg.h
->>> +++ b/android/hal-msg.h
->>> @@ -55,6 +55,7 @@ static const char BLUEZ_HAL_SK_PATH[] = "\0bluez_hal_socket";
->>> #define HAL_OP_STATUS                 IPC_OP_STATUS
->>> 
->>> #define HAL_MODE_DEFAULT              0x00
->>> +#define HAL_MODE_LE_ONLY             0x01
->>> 
->>> #define HAL_OP_REGISTER_MODULE                0x01
->>> struct hal_cmd_register_module {
->>> --
->>> 1.8.4
->>> 
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->> 
->> --
->> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->> the body of a message to majordomo@vger.kernel.org
->> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 4a158c6..b47c1cb 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -48,6 +48,9 @@
+ #include "hal-msg.h"
+ #include "ipc-common.h"
+ #include "ipc.h"
++#include "bluetooth.h"
++#include "gatt.h"
++#include "hog.h"
+ #include "hidhost.h"
+ #include "utils.h"
+ 
+@@ -77,11 +80,14 @@
+ /* HID Virtual Cable Unplug */
+ #define HID_VIRTUAL_CABLE_UNPLUG	0x05
+ 
++#define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
++
+ static bdaddr_t adapter_addr;
+ 
+ static GIOChannel *ctrl_io = NULL;
+ static GIOChannel *intr_io = NULL;
+ static GSList *devices = NULL;
++static unsigned int hog_app = 0;
+ 
+ static struct ipc *hal_ipc = NULL;
+ 
+@@ -102,6 +108,7 @@ struct hid_device {
+ 	guint		intr_watch;
+ 	struct bt_uhid	*uhid;
+ 	uint8_t		last_hid_msg;
++	struct bt_hog	*hog;
+ };
+ 
+ static int device_cmp(gconstpointer s, gconstpointer user_data)
+@@ -131,6 +138,9 @@ static void hid_device_free(void *data)
+ 	if (dev->uhid)
+ 		bt_uhid_unref(dev->uhid);
+ 
++	if (dev->hog)
++		bt_hog_unref(dev->hog);
++
+ 	g_free(dev->rd_data);
+ 	g_free(dev);
+ }
+@@ -722,6 +732,63 @@ fail:
+ 	hid_device_remove(dev);
+ }
+ 
++static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
++{
++	GSList *l;
++	struct hid_device *dev;
++
++	l = g_slist_find_custom(devices, addr, device_cmp);
++	dev = l ? l->data : NULL;
++
++	if (err < 0) {
++		if (!dev)
++			return;
++		goto fail;
++	}
++
++	if (!dev) {
++		dev = g_new0(struct hid_device, 1);
++		bacpy(&dev->dst, addr);
++		devices = g_slist_append(devices, dev);
++		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
++	}
++
++	if (!dev->hog) {
++		/* TODO: Get device details and primary */
++		dev->hog = bt_hog_new("bluez-input-device", dev->vendor,
++					dev->product, dev->version, NULL);
++		if (!dev->hog) {
++			error("HoG: unable to create session");
++			goto fail;
++		}
++	}
++
++	if (!bt_hog_attach(dev->hog, attrib)) {
++		error("HoG: unable to attach");
++		goto fail;
++	}
++
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
++
++	return;
++
++fail:
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
++	hid_device_remove(dev);
++}
++
++static bool hog_connect(struct hid_device *dev)
++{
++	if (!hog_app) {
++		hog_app = bt_gatt_register_app(HOG_UUID, GATT_CLIENT,
++								hog_conn_cb);
++		if (!hog_app)
++			return false;
++	}
++
++	return bt_gatt_connect_app(hog_app, &dev->dst);
++}
++
+ static void bt_hid_connect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_hidhost_connect *cmd = buf;
+@@ -748,6 +815,14 @@ static void bt_hid_connect(const void *buf, uint16_t len)
+ 	ba2str(&dev->dst, addr);
+ 	DBG("connecting to %s", addr);
+ 
++	if (bt_is_device_le(&dst)) {
++		if (!hog_connect(dev)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
++		goto done;
++	}
++
+ 	sdp_uuid16_create(&uuid, PNP_INFO_SVCLASS_ID);
+ 	if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
+ 				hid_sdp_did_search_cb, dev, NULL, 0) < 0) {
+@@ -757,6 +832,7 @@ static void bt_hid_connect(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
++done:
+ 	devices = g_slist_append(devices, dev);
+ 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
+ 
+@@ -786,6 +862,13 @@ static void bt_hid_disconnect(const void *buf, uint16_t len)
+ 	}
+ 
+ 	dev = l->data;
++	if (dev->hog) {
++		if (!bt_gatt_disconnect_app(hog_app, &dst)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
++		goto done;
++	}
+ 
+ 	/* Wait either channels to HUP */
+ 	if (dev->intr_io)
+@@ -796,6 +879,8 @@ static void bt_hid_disconnect(const void *buf, uint16_t len)
+ 
+ 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
+ 
++
++done:
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+-- 
+1.9.0
 
