@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/6] android/gatt: Make application API public
-Date: Mon,  2 Jun 2014 20:50:04 +0300
-Message-Id: <1401731407-10352-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/6] android/hog: Strip dependencies from input plugin
+Date: Mon,  2 Jun 2014 20:50:03 +0300
+Message-Id: <1401731407-10352-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1401731407-10352-1-git-send-email-luiz.dentz@gmail.com>
 References: <1401731407-10352-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,329 +11,846 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This in future gonna be used by HoG to receive connection notifications.
+This strip any dependecy from input plugin so the code can be used by
+hidhost interface.
 ---
- android/gatt.c | 143 ++++++++++++++++++++++++++++++++++++++++++++++-----------
- android/gatt.h |  15 ++++++
- 2 files changed, 130 insertions(+), 28 deletions(-)
+ android/Android.mk  |   1 +
+ android/Makefile.am |   1 +
+ android/hog.c       | 448 +++++++++++++++++++---------------------------------
+ android/hog.h       |  35 ++++
+ 4 files changed, 198 insertions(+), 287 deletions(-)
+ create mode 100644 android/hog.h
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 429181f..a893407 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -87,11 +87,6 @@ static const char const *device_state_str[] = {
- 	"CONNECTED",
- };
+diff --git a/android/Android.mk b/android/Android.mk
+index de909d6..04857a6 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -32,6 +32,7 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES := \
+ 	bluez/android/main.c \
+ 	bluez/android/bluetooth.c \
++	bluez/android/hog.c \
+ 	bluez/android/hidhost.c \
+ 	bluez/android/socket.c \
+ 	bluez/android/ipc.c \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index bcaec4c..0d4b614 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -35,6 +35,7 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				src/shared/uhid.h src/shared/uhid.c \
+ 				android/bluetooth.h android/bluetooth.c \
+ 				android/hidhost.h android/hidhost.c \
++				android/hog.h android/hog.c \
+ 				android/ipc-common.h \
+ 				android/ipc.h android/ipc.c \
+ 				android/avdtp.h android/avdtp.c \
+diff --git a/android/hog.c b/android/hog.c
+index 3753343..bfb9c17 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -2,6 +2,7 @@
+  *
+  *  BlueZ - Bluetooth protocol stack for Linux
+  *
++ *  Copyright (C) 2014  Intel Corporation.
+  *  Copyright (C) 2012  Marcel Holtmann <marcel@holtmann.org>
+  *  Copyright (C) 2012  Nordic Semiconductor Inc.
+  *  Copyright (C) 2012  Instituto Nokia de Tecnologia - INdT
+@@ -42,21 +43,17 @@
+ #include "src/log.h"
  
--typedef enum {
--	APP_CLIENT,
--	APP_SERVER,
--} gatt_app_type_t;
+ #include "lib/uuid.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/service.h"
+ #include "src/shared/util.h"
+ #include "src/shared/uhid.h"
+ 
+-#include "src/plugin.h"
 -
- struct pending_trans_data {
- 	unsigned int id;
- 	uint8_t opcode;
-@@ -101,13 +96,15 @@ struct gatt_app {
- 	int32_t id;
- 	uint8_t uuid[16];
+-#include "suspend.h"
+ #include "attrib/att.h"
+ #include "attrib/gattrib.h"
+-#include "src/attio.h"
+ #include "attrib/gatt.h"
  
--	gatt_app_type_t type;
-+	gatt_type_t type;
- 
- 	/* Valid for client applications */
- 	struct queue *notifications;
- 
- 	/* Transaction data valid for server application */
- 	struct pending_trans_data trans_id;
++#include "btio/btio.h"
 +
-+	gatt_conn_cb_t func;
++#include "android/hog.h"
++
+ #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+ 
+ #define HOG_INFO_UUID		0x2A4A
+@@ -76,12 +73,14 @@
+ #define HID_INFO_SIZE			4
+ #define ATT_NOTIFICATION_HEADER_SIZE	3
+ 
+-struct hog_device {
+-	uint16_t		id;
+-	struct btd_device	*device;
++struct bt_hog {
++	int			ref_count;
++	char			*name;
++	uint16_t		vendor;
++	uint16_t		product;
++	uint16_t		version;
++	struct gatt_primary	*primary;
+ 	GAttrib			*attrib;
+-	guint			attioid;
+-	struct gatt_primary	*hog_primary;
+ 	GSList			*reports;
+ 	struct bt_uhid		*uhid;
+ 	gboolean		has_report_id;
+@@ -93,20 +92,17 @@ struct hog_device {
  };
  
- struct element_id {
-@@ -617,7 +614,7 @@ static void destroy_gatt_app(void *data)
- 	 * too. So remove all elements and then destroy queue.
- 	 */
+ struct report {
++	struct bt_hog		*hog;
+ 	uint8_t			id;
+ 	uint8_t			type;
+ 	guint			notifyid;
+ 	struct gatt_char	*decl;
+-	struct hog_device	*hogdev;
+ };
  
--	if (app->type == APP_CLIENT)
-+	if (app->type == GATT_CLIENT)
- 		while (queue_peek_head(app->notifications)) {
- 			struct notification_data *notification;
+-static gboolean suspend_supported = FALSE;
+-static GSList *devices = NULL;
+-
+ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ {
+ 	struct report *report = user_data;
+-	struct hog_device *hogdev = report->hogdev;
++	struct bt_hog *hog = report->hog;
+ 	struct uhid_event ev;
+ 	uint8_t *buf;
+ 	int err;
+@@ -123,7 +119,7 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 	ev.type = UHID_INPUT;
+ 	buf = ev.u.input.data;
  
-@@ -630,14 +627,14 @@ static void destroy_gatt_app(void *data)
- 	free(app);
+-	if (hogdev->has_report_id) {
++	if (hog->has_report_id) {
+ 		buf[0] = report->id;
+ 		len = MIN(len, sizeof(ev.u.input.data) - 1);
+ 		memcpy(buf + 1, pdu, len);
+@@ -134,7 +130,7 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 		ev.u.input.size = len;
+ 	}
+ 
+-	err = bt_uhid_send(hogdev->uhid, &ev);
++	err = bt_uhid_send(hog->uhid, &ev);
+ 	if (err < 0) {
+ 		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
+ 		return;
+@@ -147,7 +143,7 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+ 	struct report *report = user_data;
+-	struct hog_device *hogdev = report->hogdev;
++	struct bt_hog *hog = report->hog;
+ 
+ 	if (status != 0) {
+ 		error("Write report characteristic descriptor failed: %s",
+@@ -155,7 +151,7 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ 		return;
+ 	}
+ 
+-	report->notifyid = g_attrib_register(hogdev->attrib,
++	report->notifyid = g_attrib_register(hog->attrib,
+ 					ATT_OP_HANDLE_NOTIFY,
+ 					report->decl->value_handle,
+ 					report_value_cb, report, NULL);
+@@ -166,10 +162,10 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ static void write_ccc(uint16_t handle, gpointer user_data)
+ {
+ 	struct report *report = user_data;
+-	struct hog_device *hogdev = report->hogdev;
++	struct bt_hog *hog = report->hog;
+ 	uint8_t value[] = { 0x01, 0x00 };
+ 
+-	gatt_write_char(hogdev->attrib, handle, value, sizeof(value),
++	gatt_write_char(hog->attrib, handle, value, sizeof(value),
+ 					report_ccc_written_cb, report);
  }
  
--static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
-+static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
+@@ -202,7 +198,7 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 								void *user_data)
  {
- 	static int32_t application_id = 1;
- 	struct gatt_app *app;
+ 	struct report *report;
+-	struct hog_device *hogdev;
++	struct bt_hog *hog;
+ 	GAttrib *attrib = NULL;
  
- 	if (queue_find(gatt_apps, match_app_by_uuid, uuid)) {
- 		error("gatt: app uuid is already on list");
--		return 0;
-+		return NULL;
+ 	if (status != 0) {
+@@ -217,20 +213,20 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 		switch (desc->uuid16) {
+ 		case GATT_CLIENT_CHARAC_CFG_UUID:
+ 			report = user_data;
+-			attrib = report->hogdev->attrib;
++			attrib = report->hog->attrib;
+ 			write_ccc(desc->handle, report);
+ 			break;
+ 		case GATT_REPORT_REFERENCE:
+ 			report = user_data;
+-			attrib = report->hogdev->attrib;
++			attrib = report->hog->attrib;
+ 			gatt_read_char(attrib, desc->handle,
+ 						report_reference_cb, report);
+ 			break;
+ 		case GATT_EXTERNAL_REPORT_REFERENCE:
+-			hogdev = user_data;
+-			attrib = hogdev->attrib;
++			hog = user_data;
++			attrib = hog->attrib;
+ 			gatt_read_char(attrib, desc->handle,
+-					external_report_reference_cb, hogdev);
++					external_report_reference_cb, hog);
+ 			break;
+ 		}
+ 	}
+@@ -249,8 +245,8 @@ static void discover_descriptor(GAttrib *attrib, uint16_t start, uint16_t end,
+ static void external_service_char_cb(uint8_t status, GSList *chars,
+ 								void *user_data)
+ {
+-	struct hog_device *hogdev = user_data;
+-	struct gatt_primary *prim = hogdev->hog_primary;
++	struct bt_hog *hog = user_data;
++	struct gatt_primary *primary = hog->primary;
+ 	struct report *report;
+ 	GSList *l;
+ 
+@@ -271,19 +267,19 @@ static void external_service_char_cb(uint8_t status, GSList *chars,
+ 				chr->handle, chr->uuid, chr->properties);
+ 
+ 		report = g_new0(struct report, 1);
+-		report->hogdev = hogdev;
++		report->hog = hog;
+ 		report->decl = g_memdup(chr, sizeof(*chr));
+-		hogdev->reports = g_slist_append(hogdev->reports, report);
++		hog->reports = g_slist_append(hog->reports, report);
+ 		start = chr->value_handle + 1;
+-		end = (next ? next->handle - 1 : prim->range.end);
+-		discover_descriptor(hogdev->attrib, start, end, report);
++		end = (next ? next->handle - 1 : primary->range.end);
++		discover_descriptor(hog->attrib, start, end, report);
+ 	}
+ }
+ 
+ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+-	struct hog_device *hogdev = user_data;
++	struct bt_hog *hog = user_data;
+ 	uint16_t uuid16;
+ 	bt_uuid_t uuid;
+ 
+@@ -302,8 +298,8 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+ 	DBG("External report reference read, external report characteristic "
+ 						"UUID: 0x%04x", uuid16);
+ 	bt_uuid16_create(&uuid, uuid16);
+-	gatt_discover_char(hogdev->attrib, 0x00, 0xff, &uuid,
+-					external_service_char_cb, hogdev);
++	gatt_discover_char(hog->attrib, 0x00, 0xff, &uuid,
++					external_service_char_cb, hog);
+ }
+ 
+ static int report_type_cmp(gconstpointer a, gconstpointer b)
+@@ -325,14 +321,14 @@ static void output_written_cb(guint8 status, const guint8 *pdu,
+ 
+ static void forward_report(struct uhid_event *ev, void *user_data)
+ {
+-	struct hog_device *hogdev = user_data;
++	struct bt_hog *hog = user_data;
+ 	struct report *report;
+ 	GSList *l;
+ 	void *data;
+ 	int size;
+ 	guint type;
+ 
+-	if (hogdev->has_report_id) {
++	if (hog->has_report_id) {
+ 		data = ev->u.output.data + 1;
+ 		size = ev->u.output.size - 1;
+ 	} else {
+@@ -351,24 +347,24 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ 		return;
  	}
  
- 	app = new0(struct gatt_app, 1);
-@@ -646,14 +643,14 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
- 		return 0;
- 	}
+-	l = g_slist_find_custom(hogdev->reports, GUINT_TO_POINTER(type),
++	l = g_slist_find_custom(hog->reports, GUINT_TO_POINTER(type),
+ 							report_type_cmp);
+ 	if (!l)
+ 		return;
  
--	app->type = app_type;
-+	app->type = type;
+ 	report = l->data;
  
--	if (app->type == APP_CLIENT) {
-+	if (app->type == GATT_CLIENT) {
- 		app->notifications = queue_new();
- 		if (!app->notifications) {
- 			error("gatt: couldn't allocate notifications queue");
- 			destroy_gatt_app(app);
--			return 0;
-+			return NULL;
+-	DBG("Sending report type %d to device 0x%04X handle 0x%X", type,
+-				hogdev->id, report->decl->value_handle);
++	DBG("Sending report type %d to handle 0x%X", type,
++						report->decl->value_handle);
+ 
+-	if (hogdev->attrib == NULL)
++	if (hog->attrib == NULL)
+ 		return;
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
+-		gatt_write_char(hogdev->attrib, report->decl->value_handle,
+-				data, size, output_written_cb, hogdev);
++		gatt_write_char(hog->attrib, report->decl->value_handle,
++				data, size, output_written_cb, hog);
+ 	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+-		gatt_write_cmd(hogdev->attrib, report->decl->value_handle,
++		gatt_write_cmd(hog->attrib, report->decl->value_handle,
+ 						data, size, NULL, NULL);
+ }
+ 
+@@ -437,14 +433,13 @@ static char *item2string(char *str, uint8_t *buf, uint8_t len)
+ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
+ {
+-	struct hog_device *hogdev = user_data;
+-	struct btd_adapter *adapter = device_get_adapter(hogdev->device);
++	struct bt_hog *hog = user_data;
+ 	uint8_t value[HOG_REPORT_MAP_MAX_SIZE];
+ 	struct uhid_event ev;
+-	uint16_t vendor_src, vendor, product, version;
+ 	ssize_t vlen;
+ 	char itemstr[20]; /* 5x3 (data) + 4 (continuation) + 1 (null) */
+ 	int i, err;
++	GError *gerr = NULL;
+ 
+ 	if (status != 0) {
+ 		error("Report Map read failed: %s", att_ecode2str(status));
+@@ -466,7 +461,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 								&long_item)) {
+ 			/* Report ID is short item with prefix 100001xx */
+ 			if (!long_item && (value[i] & 0xfc) == 0x84)
+-				hogdev->has_report_id = TRUE;
++				hog->has_report_id = TRUE;
+ 
+ 			DBG("\t%s", item2string(itemstr, &value[i], ilen));
+ 
+@@ -480,45 +475,43 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
  		}
  	}
  
-@@ -664,33 +661,35 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
- 	if (!queue_push_head(gatt_apps, app)) {
- 		error("gatt: Cannot push app on the list");
- 		destroy_gatt_app(app);
--		return 0;
-+		return NULL;
+-	vendor_src = btd_device_get_vendor_src(hogdev->device);
+-	vendor = btd_device_get_vendor(hogdev->device);
+-	product = btd_device_get_product(hogdev->device);
+-	version = btd_device_get_version(hogdev->device);
+-	DBG("DIS information: vendor_src=0x%X, vendor=0x%X, product=0x%X, "
+-			"version=0x%X",	vendor_src, vendor, product, version);
+-
+ 	/* create uHID device */
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_CREATE;
+-	if (device_name_known(hogdev->device))
+-		device_get_name(hogdev->device, (char *) ev.u.create.name,
+-						sizeof(ev.u.create.name));
+-	else
+-		strcpy((char *) ev.u.create.name, "bluez-hog-device");
+-	ba2str(btd_adapter_get_address(adapter), (char *) ev.u.create.phys);
+-	ba2str(device_get_address(hogdev->device), (char *) ev.u.create.uniq);
+-	ev.u.create.vendor = vendor;
+-	ev.u.create.product = product;
+-	ev.u.create.version = version;
+-	ev.u.create.country = hogdev->bcountrycode;
++
++	bt_io_get(g_attrib_get_channel(hog->attrib), &gerr,
++			BT_IO_OPT_SOURCE, ev.u.create.phys,
++			BT_IO_OPT_DEST, ev.u.create.uniq,
++			BT_IO_OPT_INVALID);
++	if (gerr) {
++		error("Failed to connection details: %s", gerr->message);
++		g_error_free(gerr);
++		return;
++	}
++
++	strcpy((char *) ev.u.create.name, hog->name);
++	ev.u.create.vendor = hog->vendor;
++	ev.u.create.product = hog->product;
++	ev.u.create.version = hog->version;
++	ev.u.create.country = hog->bcountrycode;
+ 	ev.u.create.bus = BUS_BLUETOOTH;
+ 	ev.u.create.rd_data = value;
+ 	ev.u.create.rd_size = vlen;
+ 
+-	err = bt_uhid_send(hogdev->uhid, &ev);
++	err = bt_uhid_send(hog->uhid, &ev);
+ 	if (err < 0) {
+ 		error("bt_uhid_send: %s", strerror(-err));
+ 		return;
  	}
  
--	if ((app->type == APP_SERVER) &&
-+	if ((app->type == GATT_SERVER) &&
- 			!queue_push_tail(listen_apps, INT_TO_PTR(app->id))) {
- 		error("gatt: Cannot push server on the list");
- 		destroy_gatt_app(app);
--		return 0;
-+		return NULL;
+-	bt_uhid_register(hogdev->uhid, UHID_OUTPUT, forward_report, hogdev);
+-	bt_uhid_register(hogdev->uhid, UHID_FEATURE, forward_report, hogdev);
++	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
++	bt_uhid_register(hog->uhid, UHID_FEATURE, forward_report, hog);
+ }
+ 
+ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
+ {
+-	struct hog_device *hogdev = user_data;
++	struct bt_hog *hog = user_data;
+ 	uint8_t value[HID_INFO_SIZE];
+ 	ssize_t vlen;
+ 
+@@ -534,18 +527,18 @@ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 		return;
  	}
  
--	return app->id;
-+	return app;
+-	hogdev->bcdhid = get_le16(&value[0]);
+-	hogdev->bcountrycode = value[2];
+-	hogdev->flags = value[3];
++	hog->bcdhid = get_le16(&value[0]);
++	hog->bcountrycode = value[2];
++	hog->flags = value[3];
+ 
+ 	DBG("bcdHID: 0x%04X bCountryCode: 0x%02X Flags: 0x%02X",
+-			hogdev->bcdhid, hogdev->bcountrycode, hogdev->flags);
++			hog->bcdhid, hog->bcountrycode, hog->flags);
  }
  
- static void handle_client_register(const void *buf, uint16_t len)
+ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 							gpointer user_data)
  {
- 	const struct hal_cmd_gatt_client_register *cmd = buf;
- 	struct hal_ev_gatt_client_register_client ev;
-+	struct gatt_app *app;
+-	struct hog_device *hogdev = user_data;
++	struct bt_hog *hog = user_data;
+ 	uint8_t value;
+ 	ssize_t vlen;
  
- 	DBG("");
+@@ -564,20 +557,18 @@ static void proto_mode_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
+ 	if (value == HOG_PROTO_MODE_BOOT) {
+ 		uint8_t nval = HOG_PROTO_MODE_REPORT;
  
- 	memset(&ev, 0, sizeof(ev));
+-		DBG("HoG device 0x%04X is operating in Boot Procotol Mode",
+-								hogdev->id);
++		DBG("HoG is operating in Boot Procotol Mode");
  
--	ev.client_if = register_app(cmd->uuid, APP_CLIENT);
-+	app = register_app(cmd->uuid, GATT_CLIENT);
+-		gatt_write_cmd(hogdev->attrib, hogdev->proto_mode_handle, &nval,
++		gatt_write_cmd(hog->attrib, hog->proto_mode_handle, &nval,
+ 						sizeof(nval), NULL, NULL);
+ 	} else if (value == HOG_PROTO_MODE_REPORT)
+-		DBG("HoG device 0x%04X is operating in Report Protocol Mode",
+-								hogdev->id);
++		DBG("HoG is operating in Report Protocol Mode");
+ }
  
--	if (ev.client_if)
-+	if (app) {
-+		ev.client_if = app->id;
- 		ev.status = GATT_SUCCESS;
--	else
-+	} else
- 		ev.status = GATT_FAILURE;
- 
- 	/* We should send notification with given in cmd UUID */
-@@ -708,6 +707,12 @@ static void send_client_disconnection_notify(struct app_connection *connection,
+ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
  {
- 	struct hal_ev_gatt_client_disconnect ev;
+-	struct hog_device *hogdev = user_data;
+-	struct gatt_primary *prim = hogdev->hog_primary;
++	struct bt_hog *hog = user_data;
++	struct gatt_primary *primary = hog->primary;
+ 	bt_uuid_t report_uuid, report_map_uuid, info_uuid;
+ 	bt_uuid_t proto_mode_uuid, ctrlpt_uuid;
+ 	struct report *report;
+@@ -610,277 +601,160 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 		bt_string_to_uuid(&uuid, chr->uuid);
  
-+	if (connection->app->func) {
-+		connection->app->func(&connection->device->bdaddr, -ENOTCONN,
-+						connection->device->attrib);
+ 		start = chr->value_handle + 1;
+-		end = (next ? next->handle - 1 : prim->range.end);
++		end = (next ? next->handle - 1 : primary->range.end);
+ 
+ 		if (bt_uuid_cmp(&uuid, &report_uuid) == 0) {
+ 			report = g_new0(struct report, 1);
+-			report->hogdev = hogdev;
++			report->hog = hog;
+ 			report->decl = g_memdup(chr, sizeof(*chr));
+-			hogdev->reports = g_slist_append(hogdev->reports,
++			hog->reports = g_slist_append(hog->reports,
+ 								report);
+-			discover_descriptor(hogdev->attrib, start, end, report);
++			discover_descriptor(hog->attrib, start, end, report);
+ 		} else if (bt_uuid_cmp(&uuid, &report_map_uuid) == 0) {
+-			gatt_read_char(hogdev->attrib, chr->value_handle,
+-						report_map_read_cb, hogdev);
+-			discover_descriptor(hogdev->attrib, start, end, hogdev);
++			gatt_read_char(hog->attrib, chr->value_handle,
++						report_map_read_cb, hog);
++			discover_descriptor(hog->attrib, start, end, hog);
+ 		} else if (bt_uuid_cmp(&uuid, &info_uuid) == 0)
+ 			info_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &proto_mode_uuid) == 0)
+ 			proto_mode_handle = chr->value_handle;
+ 		else if (bt_uuid_cmp(&uuid, &ctrlpt_uuid) == 0)
+-			hogdev->ctrlpt_handle = chr->value_handle;
++			hog->ctrlpt_handle = chr->value_handle;
+ 	}
+ 
+ 	if (proto_mode_handle) {
+-		hogdev->proto_mode_handle = proto_mode_handle;
+-		gatt_read_char(hogdev->attrib, proto_mode_handle,
+-						proto_mode_read_cb, hogdev);
++		hog->proto_mode_handle = proto_mode_handle;
++		gatt_read_char(hog->attrib, proto_mode_handle,
++						proto_mode_read_cb, hog);
+ 	}
+ 
+ 	if (info_handle)
+-		gatt_read_char(hogdev->attrib, info_handle, info_read_cb,
+-									hogdev);
+-}
+-
+-static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+-{
+-	struct hog_device *hogdev = user_data;
+-	struct gatt_primary *prim = hogdev->hog_primary;
+-	GSList *l;
+-
+-	DBG("HoG connected");
+-
+-	hogdev->attrib = g_attrib_ref(attrib);
+-
+-	if (hogdev->reports == NULL) {
+-		gatt_discover_char(hogdev->attrib, prim->range.start,
+-						prim->range.end, NULL,
+-						char_discovered_cb, hogdev);
+-		return;
+-	}
+-
+-	for (l = hogdev->reports; l; l = l->next) {
+-		struct report *r = l->data;
+-
+-		r->notifyid = g_attrib_register(hogdev->attrib,
+-					ATT_OP_HANDLE_NOTIFY,
+-					r->decl->value_handle,
+-					report_value_cb, r, NULL);
+-	}
+-}
+-
+-static void attio_disconnected_cb(gpointer user_data)
+-{
+-	struct hog_device *hogdev = user_data;
+-	GSList *l;
+-
+-	DBG("HoG disconnected");
+-
+-	for (l = hogdev->reports; l; l = l->next) {
+-		struct report *r = l->data;
+-
+-		g_attrib_unregister(hogdev->attrib, r->notifyid);
+-	}
+-
+-	g_attrib_unref(hogdev->attrib);
+-	hogdev->attrib = NULL;
+-}
+-
+-static struct hog_device *hog_new_device(struct btd_device *device,
+-								uint16_t id)
+-{
+-	struct hog_device *hogdev;
+-
+-	hogdev = g_try_new0(struct hog_device, 1);
+-	if (!hogdev)
+-		return NULL;
+-
+-	hogdev->id = id;
+-	hogdev->device = btd_device_ref(device);
+-
+-	return hogdev;
++		gatt_read_char(hog->attrib, info_handle, info_read_cb,
++									hog);
+ }
+ 
+ static void report_free(void *data)
+ {
+ 	struct report *report = data;
+-	struct hog_device *hogdev = report->hogdev;
++	struct bt_hog *hog = report->hog;
+ 
+-	if (hogdev->attrib)
+-		g_attrib_unregister(hogdev->attrib, report->notifyid);
++	if (hog->attrib)
++		g_attrib_unregister(hog->attrib, report->notifyid);
+ 
+ 	g_free(report->decl);
+ 	g_free(report);
+ }
+ 
+-static void hog_free_device(struct hog_device *hogdev)
++static void hog_free(struct bt_hog *hog)
+ {
+-	btd_device_unref(hogdev->device);
+-	g_slist_free_full(hogdev->reports, report_free);
+-	g_attrib_unref(hogdev->attrib);
+-	g_free(hogdev->hog_primary);
+-	g_free(hogdev);
++	bt_uhid_unref(hog->uhid);
++	g_slist_free_full(hog->reports, report_free);
++	g_attrib_unref(hog->attrib);
++	g_free(hog->name);
++	g_free(hog->primary);
++	g_free(hog);
+ }
+ 
+-static struct hog_device *hog_register_device(struct btd_device *device,
+-						struct gatt_primary *prim)
++struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t product,
++					uint16_t version, void *primary)
+ {
+-	struct hog_device *hogdev;
++	struct bt_hog *hog;
+ 
+-	hogdev = hog_new_device(device, prim->range.start);
+-	if (!hogdev)
++	hog = g_try_new0(struct bt_hog, 1);
++	if (!hog)
+ 		return NULL;
+ 
+-	hogdev->uhid = bt_uhid_new_default();
+-	if (!hogdev->uhid) {
+-		error("bt_uhid_new_default: failed");
+-		hog_free_device(hogdev);
++	hog->uhid = bt_uhid_new_default();
++	if (!hog->uhid) {
++		hog_free(hog);
+ 		return NULL;
+ 	}
+ 
+-	hogdev->hog_primary = g_memdup(prim, sizeof(*prim));
+-
+-	hogdev->attioid = btd_device_add_attio_callback(device,
+-							attio_connected_cb,
+-							attio_disconnected_cb,
+-							hogdev);
+-
+-	return hogdev;
+-}
+-
+-static int hog_unregister_device(struct hog_device *hogdev)
+-{
+-	btd_device_remove_attio_callback(hogdev->device, hogdev->attioid);
+-	bt_uhid_unref(hogdev->uhid);
+-	hog_free_device(hogdev);
+-
+-	return 0;
+-}
+-
+-static int set_control_point(struct hog_device *hogdev, gboolean suspend)
+-{
+-	uint8_t value = suspend ? 0x00 : 0x01;
+-
+-	if (hogdev->attrib == NULL)
+-		return -ENOTCONN;
+-
+-	DBG("0x%4X HID Control Point: %s", hogdev->id, suspend ?
+-						"Suspend" : "Exit Suspend");
+-
+-	if (hogdev->ctrlpt_handle == 0)
+-		return -ENOTSUP;
+-
+-	gatt_write_cmd(hogdev->attrib, hogdev->ctrlpt_handle, &value,
+-					sizeof(value), NULL, NULL);
++	hog->name = g_strdup(name);
++	hog->vendor = vendor;
++	hog->product = product;
++	hog->version = version;
++	hog->primary = g_memdup(primary, sizeof(*primary));
+ 
+-	return 0;
+-}
+-
+-static void set_suspend(gpointer data, gpointer user_data)
+-{
+-	struct hog_device *hogdev = data;
+-	gboolean suspend = GPOINTER_TO_INT(user_data);
+-
+-	set_control_point(hogdev, suspend);
++	return bt_hog_ref(hog);
+ }
+ 
+-static void suspend_callback(void)
++struct bt_hog *bt_hog_ref(struct bt_hog *hog)
+ {
+-	gboolean suspend = TRUE;
++	if (!hog)
++		return NULL;
+ 
+-	DBG("Suspending ...");
++	__sync_fetch_and_add(&hog->ref_count, 1);
+ 
+-	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
++	return hog;
+ }
+ 
+-static void resume_callback(void)
++void bt_hog_unref(struct bt_hog *hog)
+ {
+-	gboolean suspend = FALSE;
++	if (!hog)
 +		return;
-+	}
-+
- 	ev.client_if = connection->app->id;
- 	ev.conn_id = connection->id;
- 	ev.status = status;
-@@ -716,6 +721,7 @@ static void send_client_disconnection_notify(struct app_connection *connection,
  
- 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
- 				HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
-+
- }
- 
- static void send_client_connection_notify(struct app_connection *connection,
-@@ -723,6 +729,13 @@ static void send_client_connection_notify(struct app_connection *connection,
- {
- 	struct hal_ev_gatt_client_connect ev;
- 
-+	if (connection->app->func) {
-+		connection->app->func(&connection->device->bdaddr,
-+					status == GATT_SUCCESS ? 0 : -ENOTCONN,
-+					connection->device->attrib);
+-	DBG("Resuming ...");
++	if (__sync_sub_and_fetch(&hog->ref_count, 1))
 +		return;
-+	}
-+
- 	ev.client_if = connection->app->id;
- 	ev.conn_id = connection->id;
- 	ev.status = status;
-@@ -738,6 +751,13 @@ static void send_server_connection_notify(struct app_connection *connection,
- {
- 	struct hal_ev_gatt_server_connection ev;
  
-+	if (connection->app->func) {
-+		connection->app->func(&connection->device->bdaddr,
-+					connected ? 0 : -ENOTCONN,
-+					connection->device->attrib);
-+		return;
-+	}
-+
- 	ev.server_if = connection->app->id;
- 	ev.conn_id = connection->id;
- 	ev.connected = connected;
-@@ -751,7 +771,7 @@ static void send_server_connection_notify(struct app_connection *connection,
- static void send_app_disconnect_notify(struct app_connection *connection,
- 								int32_t status)
- {
--	if (connection->app->type == APP_CLIENT)
-+	if (connection->app->type == GATT_CLIENT)
- 		send_client_disconnection_notify(connection, status);
- 	else
- 		send_server_connection_notify(connection, !!status);
-@@ -760,9 +780,9 @@ static void send_app_disconnect_notify(struct app_connection *connection,
- static void send_app_connect_notify(struct app_connection *connection,
- 								int32_t status)
- {
--	if (connection->app->type == APP_CLIENT)
-+	if (connection->app->type == GATT_CLIENT)
- 		send_client_connection_notify(connection, status);
--	else
-+	else if (connection->app->type == GATT_SERVER)
- 		send_server_connection_notify(connection, !status);
+-	g_slist_foreach(devices, set_suspend, GINT_TO_POINTER(suspend));
++	hog_free(hog);
  }
  
-@@ -3510,9 +3530,11 @@ static void handle_client_test_command(const void *buf, uint16_t len)
- 	switch (cmd->command) {
- 	case GATT_CLIENT_TEST_CMD_ENABLE:
- 		if (cmd->u1) {
--			if (!test_client_if)
--				test_client_if = register_app(TEST_UUID,
--								APP_CLIENT);
-+			if (!test_client_if) {
-+				app = register_app(TEST_UUID, GATT_CLIENT);
-+				if (app)
-+					test_client_if = app->id;
-+			}
- 
- 			if (test_client_if)
- 				status = HAL_STATUS_SUCCESS;
-@@ -3557,16 +3579,18 @@ static void handle_server_register(const void *buf, uint16_t len)
+-static int hog_probe(struct btd_service *service)
++bool bt_hog_attach(struct bt_hog *hog, void *gatt)
  {
- 	const struct hal_cmd_gatt_server_register *cmd = buf;
- 	struct hal_ev_gatt_server_register ev;
-+	struct gatt_app *app;
+-	struct btd_device *device = btd_service_get_device(service);
+-	const char *path = device_get_path(device);
+-	GSList *primaries, *l;
+-
+-	DBG("path %s", path);
++	struct gatt_primary *primary = hog->primary;
++	GSList *l;
  
- 	DBG("");
- 
- 	memset(&ev, 0, sizeof(ev));
- 
--	ev.server_if = register_app(cmd->uuid, APP_SERVER);
-+	app = register_app(cmd->uuid, GATT_SERVER);
- 
--	if (ev.server_if)
-+	if (app) {
-+		ev.server_if = app->id;
- 		ev.status = GATT_SUCCESS;
--	else
-+	} else
- 		ev.status = GATT_FAILURE;
- 
- 	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
-@@ -5746,3 +5770,66 @@ void bt_gatt_unregister(void)
- 	bt_crypto_unref(crypto);
- 	crypto = NULL;
- }
-+
-+
-+unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
-+							gatt_conn_cb_t func)
-+{
-+	struct gatt_app *app;
-+	bt_uuid_t uuid128;
-+
-+	bt_string_to_uuid(&uuid128, uuid);
-+	app = register_app((void *) &uuid128.value.u128, type);
-+	if (!app)
-+		return 0;
-+
-+	app->func = func;
-+
-+	return app->id;
-+}
-+
-+bool bt_gatt_unregister_app(unsigned int id)
-+{
-+	uint8_t status;
-+
-+	status = unregister_client(id);
-+
-+	return status != HAL_STATUS_FAILED;
-+}
-+
-+bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr)
-+{
-+	uint8_t status;
-+
-+	status = handle_connect(id, addr);
-+
-+	return status != HAL_STATUS_FAILED;
-+}
-+
-+bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr)
-+{
-+	struct app_connection match;
-+	struct app_connection *conn;
-+	struct gatt_device *device;
-+	struct gatt_app *app;
-+
-+	app = find_app_by_id(id);
-+	if (!app)
+-	primaries = btd_device_get_primaries(device);
+-	if (primaries == NULL)
+-		return -EINVAL;
++	if (hog->attrib)
 +		return false;
-+
-+	device = find_device_by_addr(addr);
-+	if (!device)
-+		return false;
-+
-+	match.device = device;
-+	match.app = app;
-+
-+	conn = queue_find(app_connections, match_connection_by_device_and_app,
-+									&match);
-+	if (!conn)
-+		return false;
-+
-+	trigger_disconnection(conn);
-+
+ 
+-	for (l = primaries; l; l = g_slist_next(l)) {
+-		struct gatt_primary *prim = l->data;
+-		struct hog_device *hogdev;
++	hog->attrib = g_attrib_ref(gatt);
+ 
+-		if (strcmp(prim->uuid, HOG_UUID) != 0)
+-			continue;
++	if (hog->reports == NULL) {
++		gatt_discover_char(hog->attrib, primary->range.start,
++						primary->range.end, NULL,
++						char_discovered_cb, hog);
++		return true;
++	}
+ 
+-		hogdev = hog_register_device(device, prim);
+-		if (hogdev == NULL)
+-			continue;
++	for (l = hog->reports; l; l = l->next) {
++		struct report *r = l->data;
+ 
+-		devices = g_slist_append(devices, hogdev);
++		r->notifyid = g_attrib_register(hog->attrib,
++					ATT_OP_HANDLE_NOTIFY,
++					r->decl->value_handle,
++					report_value_cb, r, NULL);
+ 	}
+ 
+-	return 0;
 +	return true;
-+}
-diff --git a/android/gatt.h b/android/gatt.h
-index d4392d9..5ba9161 100644
---- a/android/gatt.h
-+++ b/android/gatt.h
-@@ -23,3 +23,18 @@
+ }
  
- bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr);
- void bt_gatt_unregister(void);
+-static void remove_device(gpointer a, gpointer b)
++void bt_hog_detach(struct bt_hog *hog)
+ {
+-	struct hog_device *hogdev = a;
+-	struct btd_device *device = b;
+-
+-	if (hogdev->device != device)
+-		return;
+-
+-	devices = g_slist_remove(devices, hogdev);
+-	hog_unregister_device(hogdev);
+-}
++	GSList *l;
+ 
+-static void hog_remove(struct btd_service *service)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	const char *path = device_get_path(device);
++	for (l = hog->reports; l; l = l->next) {
++		struct report *r = l->data;
+ 
+-	DBG("path %s", path);
++		g_attrib_unregister(hog->attrib, r->notifyid);
++	}
+ 
+-	g_slist_foreach(devices, remove_device, device);
++	g_attrib_unref(hog->attrib);
++	hog->attrib = NULL;
+ }
+ 
+-static struct btd_profile hog_profile = {
+-	.name		= "input-hog",
+-	.remote_uuid	= HOG_UUID,
+-	.device_probe	= hog_probe,
+-	.device_remove	= hog_remove,
+-};
+-
+-static int hog_init(void)
++int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+ {
+-	int err;
++	uint8_t value = suspend ? 0x00 : 0x01;
+ 
+-	err = suspend_init(suspend_callback, resume_callback);
+-	if (err < 0)
+-		error("Loading suspend plugin failed: %s (%d)", strerror(-err),
+-									-err);
+-	else
+-		suspend_supported = TRUE;
++	if (hog->attrib == NULL)
++		return -ENOTCONN;
+ 
+-	return btd_profile_register(&hog_profile);
+-}
++	if (hog->ctrlpt_handle == 0)
++		return -ENOTSUP;
+ 
+-static void hog_exit(void)
+-{
+-	if (suspend_supported)
+-		suspend_exit();
++	gatt_write_cmd(hog->attrib, hog->ctrlpt_handle, &value,
++					sizeof(value), NULL, NULL);
+ 
+-	btd_profile_unregister(&hog_profile);
++	return 0;
+ }
+-
+-BLUETOOTH_PLUGIN_DEFINE(hog, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-							hog_init, hog_exit)
+diff --git a/android/hog.h b/android/hog.h
+new file mode 100644
+index 0000000..7cf446b
+--- /dev/null
++++ b/android/hog.h
+@@ -0,0 +1,35 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
++struct bt_hog;
 +
-+typedef enum {
-+	GATT_CLIENT,
-+	GATT_SERVER,
-+} gatt_type_t;
++struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t product,
++					uint16_t version, void *primary);
 +
-+typedef void (*gatt_conn_cb_t)(const bdaddr_t *addr, int err, void *attrib);
++struct bt_hog *bt_hog_ref(struct bt_hog *hog);
++void bt_hog_unref(struct bt_hog *hog);
 +
-+unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
-+							gatt_conn_cb_t func);
-+bool bt_gatt_unregister_app(unsigned int id);
++bool bt_hog_attach(struct bt_hog *hog, void *gatt);
++void bt_hog_detach(struct bt_hog *hog);
 +
-+bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
-+bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
++int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
 -- 
 1.9.0
 
