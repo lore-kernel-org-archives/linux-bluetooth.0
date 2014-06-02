@@ -1,90 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 2 Jun 2014 11:06:36 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-06-01
-Message-ID: <20140602140636.GA1659@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="wRRV7LY7NUeQGEoC"
-Sender: linux-kernel-owner@vger.kernel.org
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [RFCv2 1/2] shared/gatt-db: Add databse dump
+Date: Mon,  2 Jun 2014 15:19:30 +0200
+Message-Id: <1401715171-29175-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-
---wRRV7LY7NUeQGEoC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi John,
-
-Here some more patches for 3.16. We know that Linus already opened the merge
-window, but this is fix only pull request, and most of the patches here are
-also tagged for stable.
-
-Please pull! or let me know of any issues. Thanks!
-
-	Gustavo
-
+This is usefull to execute and verify PTS test cases, and will be called
+from haltest using gatt client 'test_command'.
 ---
-The following changes since commit d7b2545023ecfde94d3ea9c03c5480ac18da96c9:
+ src/shared/gatt-db.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/gatt-db.h |  1 +
+ 2 files changed, 53 insertions(+)
 
-  Bluetooth: Clearly distinguish mgmt LTK type from authenticated property (2014-05-23 11:24:04 -0700)
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index c11c5d1..7405998 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -761,3 +761,55 @@ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+ 	return true;
+ 
+ }
++
++static void dump_data(const char *str, void *user_data)
++{
++	if (user_data)
++		printf("%s%s", (char *) user_data, str);
++	else
++		printf("%s", str);
++}
++
++static void dump_attribute(struct gatt_db_attribute *attr)
++{
++	char uuidstr[MAX_LEN_UUID_STR + 1];
++
++	if (!attr) {
++		util_debug(dump_data, NULL, " <empty>\n");
++		return;
++	}
++
++	bt_uuid_to_string(&attr->uuid, uuidstr, sizeof(uuidstr));
++	util_debug(dump_data, NULL,
++			"attr_hnd: %.5d, uuid: %s, perm: %.7d, val_len: %.5d, ",
++			attr->handle, uuidstr, attr->permissions,
++			attr->value_len);
++
++	if (attr->value_len) {
++		util_hexdump(':', attr->value, attr->value_len, dump_data,
++								"attr_value");
++	} else {
++		util_debug(dump_data, "attr_value:",
++					attr->read_func ? " <read_cb>" : "");
++		util_debug(dump_data, NULL,
++					attr->write_func ? " <write_cb>" : "");
++	}
++
++	util_debug(dump_data, NULL, "\n");
++}
++
++static void dump_service(void *data, void *user_data)
++{
++	struct gatt_db_service *srvc = data;
++	int i;
++
++	for (i = 0; i < srvc->num_handles; i++)
++		dump_attribute(srvc->attributes[i]);
++}
++
++void gatt_db_dump(struct gatt_db *db)
++{
++	util_debug(dump_data, NULL, "[ att database dump start ]\n");
++	queue_foreach(db->services, dump_service, NULL);
++	util_debug(dump_data, NULL, "[ att database dump end ]\n");
++}
+diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
+index a88f637..dad8b11 100644
+--- a/src/shared/gatt-db.h
++++ b/src/shared/gatt-db.h
+@@ -94,3 +94,4 @@ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle);
+ 
+ bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
+ 							uint32_t *permissions);
++void gatt_db_dump(struct gatt_db *db);
+-- 
+2.0.0
 
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 8a96f3cd22878fc0bb564a8478a6e17c0b8dca73:
-
-  Bluetooth: Fix L2CAP deadlock (2014-06-02 13:38:19 +0300)
-
-----------------------------------------------------------------
-Adam Lee (1):
-      Bluetooth: ath3k: no need to set same pipe multiple times
-
-Johan Hedberg (4):
-      Bluetooth: Fix properly ignoring LTKs of unknown types
-      Bluetooth: Fix authentication check for FIPS security level
-      Bluetooth: Fix requiring SMP MITM for outgoing connections
-      Bluetooth: Fix missing check for FIPS security level
-
-Jukka Rissanen (2):
-      Bluetooth: 6LoWPAN: Fix MAC address universal/local bit handling
-      Bluetooth: l2cap: Set more channel defaults
-
-Jukka Taimisto (1):
-      Bluetooth: Fix L2CAP deadlock
-
- drivers/bluetooth/ath3k.c  |  3 ++-
- net/bluetooth/6lowpan.c    | 65 +++++++++++++++++++++++++++++-------------------------
- net/bluetooth/hci_event.c  |  4 +++-
- net/bluetooth/l2cap_core.c |  6 +++++
- net/bluetooth/l2cap_sock.c |  5 ++++-
- net/bluetooth/mgmt.c       | 10 +++++++--
- net/bluetooth/smp.c        |  7 +++---
- 7 files changed, 62 insertions(+), 38 deletions(-)
-
---wRRV7LY7NUeQGEoC
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTjITsAAoJEPs3PUX4s20oFSEQAKpJqns+h74NOPIqHPOfv+pr
-hGvKvstASH9IeuA+km+BHDFSS0Eqwkc1M8AnS8sZIrVq8sML+89bpBMyhYSIOzwM
-sugpDuGXn0rMQ4Ia24gEwjgLBs94j0NcG1Q5/AjsaJcQ/8JOo7Or19lcB/yASZ1b
-gHQ9H9niF6kpQnxfConkfT+UvhSxtSFro1/wFoM1+9kyiMujFXxLgFQcEo32xHdE
-2NycQWRJe81fB7m1USuzBtBbMPp0DL0qTOPDR/i6K4TmEOgCgPvT/RReJxLTVm+J
-jZBrh7q5UPXF7NG9A7+Vu2heKh1jcXrrkSzLQ1jRDM2Wy77JRsaQ+RITgnRHKmCm
-KyAa/oRobEtx8sCv8465klw33LoVKtbuN6nDmNzFLBXYrA5A5I+v6IvqoQEtsklP
-uCqxLDswRkdg3xbOiad5bxd3X5cLEQ2S158yqi+UQEO84kN33ylsaEfxVAlxnzEJ
-4ehhsOZVOkTPUhSQzwyVEy4iq4d3urgQwTlH2aj7RQS4DzZ5Tfow8uth7jUAOpFW
-k6Qj59UZsR2aOCiPZgIpQzaHWI7L8mT0nraOq2Bqq2dcbOucHAqFX3pyt7+c3Kqc
-QSrX2zrowJ5S1J4LkaMa8HsKHH2DBusbBelLth6q6JxP9AnWczOHeP3rySMNjrxT
-9XWfb9s6lAIiDKbN2cvo
-=Gn+6
------END PGP SIGNATURE-----
-
---wRRV7LY7NUeQGEoC--
