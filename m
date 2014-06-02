@@ -1,42 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <84F1FEF9-5872-4456-9460-EC8CAEDADE87@holtmann.org>
-References: <1401177171-19994-1-git-send-email-andrzej.kaczmarek@tieto.com>
- <1401177171-19994-2-git-send-email-andrzej.kaczmarek@tieto.com> <84F1FEF9-5872-4456-9460-EC8CAEDADE87@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Mon, 2 Jun 2014 13:00:00 +0200
-Message-ID: <CAF3PWx0n=OnWMXDdA5__VZoBKN2F7fD-TbgiAmacL6Qgzy7q-w@mail.gmail.com>
-Subject: Re: [PATCH 1/9] doc: Introduce connection monitoring API
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Content-Type: text/plain; charset=UTF-8
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4 3/5] Bluetooth: 6LoWPAN: Create a kernel module
+Date: Mon,  2 Jun 2014 13:08:22 +0300
+Message-Id: <1401703704-22451-4-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1401703704-22451-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1401703704-22451-1-git-send-email-jukka.rissanen@linux.intel.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Instead of adding the 6LoWPAN functionality to Bluetooth module,
+we create a separate kernel module for it.
 
-On 31 May 2014 07:17, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Andrzej,
->
->> This patch introduces API to monitor connection parameters.
->>
->> New device properties are introduced: ConnectionRSSI, ConnectionTXPower
->> and ConnectionTXPowerMax.
->>
->> Client can request to poll for updates of RSSI and TX power via Start-
->> and StopConnectionMonitor methods.
->
-> I am not convinced on the naming of the method calls and properties. They feel complicated and long and not really clear with its purpose.
->
-> What I am curious if we just expose the calculated pathloss or some value that has a more clear sense and usefulness for proximity. Why not do the job for the application instead of letting the application figure it out by itself.
+Usage:
 
-For pathloss you'll need remote TX power so it could be done from PXP
-which has (or can have) this value. But still, on BR/EDR pathloss is
-kind of useless due to how RSSI is defined.
+In the slave side do this:
 
-What if we move these properties to new interface (and perhaps
-implement in plugin), something like let's say org.bluez.Connection1?
-And mark it as experimental for now, let's see how it works.
+$ modprobe bluetooth_6lowpan
+$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
+$ hciconfig hci0 leadv
 
-BR,
-Andrzej
+In the master side do this:
+
+$ modprobe bluetooth_6lowpan
+$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
+$ echo 'connect E0:06:E6:B7:2A:73 1' > \
+                  /sys/kernel/debug/bluetooth/6lowpan_control
+
+The 6LoWPAN functionality can be controlled by psm value. If it
+is left to 0, then the module is disabled and all the 6LoWPAN
+connections are dropped if there were any. In the above example,
+the psm value is just an example and not a real value for
+6LoWPAN service. The real psm value is yet to be defined in
+Bluetooth specification.
+
+The 6lowpan controlling interface is a temporary solution
+until the specifications are ready.
+
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ net/bluetooth/6lowpan.c | 11 ++++++++++-
+ net/bluetooth/Kconfig   |  6 +++---
+ net/bluetooth/Makefile  |  4 +++-
+ 3 files changed, 16 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index 33be8c9..79e753b 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -14,6 +14,7 @@
+ #include <linux/if_arp.h>
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
++#include <linux/module.h>
+ #include <linux/debugfs.h>
+ 
+ #include <net/ipv6.h>
+@@ -1237,7 +1238,7 @@ static int __init bt_6lowpan_init(void)
+ 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
+ 
+-void bt_6lowpan_cleanup(void)
++static void __exit bt_6lowpan_cleanup(void)
+ {
+ 	cleanup_6lowpan();
+ 
+@@ -1245,3 +1246,11 @@ void bt_6lowpan_cleanup(void)
+ 
+ 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
++
++module_init(bt_6lowpan_init);
++module_exit(bt_6lowpan_cleanup);
++
++MODULE_AUTHOR("Jukka Rissanen <jukka.rissanen@linux.intel.com>");
++MODULE_DESCRIPTION("Bluetooth 6LoWPAN");
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 06ec144..f5afaa2 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -6,7 +6,6 @@ menuconfig BT
+ 	tristate "Bluetooth subsystem support"
+ 	depends on NET && !S390
+ 	depends on RFKILL || !RFKILL
+-	select 6LOWPAN_IPHC if BT_6LOWPAN
+ 	select CRC16
+ 	select CRYPTO
+ 	select CRYPTO_BLKCIPHER
+@@ -41,10 +40,11 @@ menuconfig BT
+ 	  more information, see <http://www.bluez.org/>.
+ 
+ config BT_6LOWPAN
+-	bool "Bluetooth 6LoWPAN support"
++	tristate "Bluetooth 6LoWPAN support"
+ 	depends on BT && IPV6
++	select 6LOWPAN_IPHC if BT_6LOWPAN
+ 	help
+-	  IPv6 compression over Bluetooth.
++	  IPv6 compression over Bluetooth Low Energy.
+ 
+ source "net/bluetooth/rfcomm/Kconfig"
+ 
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index ca51246..886e9aa 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -7,10 +7,12 @@ obj-$(CONFIG_BT_RFCOMM)	+= rfcomm/
+ obj-$(CONFIG_BT_BNEP)	+= bnep/
+ obj-$(CONFIG_BT_CMTP)	+= cmtp/
+ obj-$(CONFIG_BT_HIDP)	+= hidp/
++obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
++
++bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+ 	a2mp.o amp.o
+-bluetooth-$(CONFIG_BT_6LOWPAN) += 6lowpan.o
+ 
+ subdir-ccflags-y += -D__CHECK_ENDIAN__
+-- 
+1.8.3.1
+
