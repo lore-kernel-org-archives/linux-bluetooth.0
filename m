@@ -1,66 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 0/5] Bluetooth LE 6LoWPAN using CoC
-Date: Mon,  2 Jun 2014 18:00:22 +0300
-Message-Id: <1401721227-28439-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCH] android: Fix compile error
+Date: Mon,  2 Jun 2014 11:49:39 -0300
+Message-Id: <1401720579-18551-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+During configure, if SBC is not installed in the system, we may use
+SBC_CFLAGS and SBC_LIBS variables to indicate where SBC headers and
+binaries can be found.
 
-v5:
-- memory buffer made const in patch 1
-- misc changes and refactoring in patch 2
+However, SBC_CFLAGS variable is not used in android/Makefile.am,
+causing the following compile error:
 
-v4:
-- renamed l2cap_from_skbuf() to more logical l2cap_copy_into_skbuff()
-  in l2cap_core.c (patch 1)
-- fixed the module usage count code in patch 4
+$ ./bootstrap-configure SBC_CFLAGS=-I../sbc SBC_LIBS=-L../sbc/src/
+$ make
 
-Usage:
+(...)
 
-In the slave side do this:
+android/hal-audio-sbc.c:22:21: fatal error: sbc/sbc.h: No such file or directory
+ #include <sbc/sbc.h>
+^
+compilation terminated.
+make[1]: *** [android/android_audio_a2dp_default_la-hal-audio-sbc.lo] Error 1
 
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ hciconfig hci0 leadv
+This patch fixes this error by appending SBC_CFLAGS to android_audio_
+a2dp_default_la_CFLAGS.
+---
+ android/Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-In the master side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ echo 'connect E0:06:E6:B7:2A:73 1' > \
-                  /sys/kernel/debug/bluetooth/6lowpan_control
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (5):
-  Bluetooth: Refactor l2cap_sock_sendmsg() to copy user buffer
-  Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed
-    one
-  Bluetooth: 6LoWPAN: Create a kernel module
-  Bluetooth: 6LoWPAN: Count module usage
-  Bluetooth: 6LoWPAN: Remove network devices when unloading
-
- include/net/bluetooth/hci.h      |   1 -
- include/net/bluetooth/hci_core.h |   1 -
- include/net/bluetooth/l2cap.h    |   5 +-
- net/bluetooth/6lowpan.c          | 845 +++++++++++++++++++++++++++++----------
- net/bluetooth/6lowpan.h          |  47 ---
- net/bluetooth/Kconfig            |   6 +-
- net/bluetooth/Makefile           |   4 +-
- net/bluetooth/a2mp.c             |  12 +-
- net/bluetooth/hci_core.c         |  45 ---
- net/bluetooth/hci_event.c        |   3 -
- net/bluetooth/l2cap_core.c       | 101 ++---
- net/bluetooth/l2cap_sock.c       |  14 +-
- 12 files changed, 716 insertions(+), 368 deletions(-)
- delete mode 100644 net/bluetooth/6lowpan.h
-
+diff --git a/android/Makefile.am b/android/Makefile.am
+index bcaec4c..08e6a95 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -205,7 +205,8 @@ android_test_ipc_LDADD = @GLIB_LIBS@
+ 
+ plugin_LTLIBRARIES += android/audio.a2dp.default.la
+ 
+-android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android
++android_audio_a2dp_default_la_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
++					@SBC_CFLAGS@
+ 
+ android_audio_a2dp_default_la_LIBADD = @SBC_LIBS@
+ 
 -- 
-1.8.3.1
+1.9.1
 
