@@ -2,9 +2,9 @@ Return-Path: <cyrus@holtmann.org>
 From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
 To: <linux-bluetooth@vger.kernel.org>
 CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH v2 2/5] android/hal-audio: Allow codec to init on startup
-Date: Mon, 2 Jun 2014 13:20:08 +0200
-Message-ID: <1401708011-12828-3-git-send-email-andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 3/5] android/hal-audio-aptx: Add initial support for aptX codec
+Date: Mon, 2 Jun 2014 13:20:09 +0200
+Message-ID: <1401708011-12828-4-git-send-email-andrzej.kaczmarek@tieto.com>
 In-Reply-To: <1401708011-12828-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401708011-12828-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
@@ -12,105 +12,288 @@ Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds optional load/unload methods for codec which can be
-used to initialize some static data for codec, e.g. load shared library
-which provides encoder. Unlike init/cleanup which are called on stream
-open/close these methods are called when audio device is opened/closed
-thus most likely only once.
-
-Additional optional 'available' method is provided which is used by HAL
-core to check whether given codec is initialized properly and can have
-endpoint registered, i.e. codec may only be available if there's .so
-with encoder available on filesystem.
+This patch adds support for aptX codec. Since this is proprietary codec
+it requires to obtain license form vendor (CSR) in order to use it.
+Also shared library which provices encoder implementation is required
+since this implementation only wraps it into audio HAL.
 ---
- android/hal-audio.c | 28 +++++++++++++++++++++++++++-
- android/hal-audio.h |  4 ++++
- 2 files changed, 31 insertions(+), 1 deletion(-)
+ android/Android.mk       |   2 +
+ android/Makefile.am      |   1 +
+ android/hal-audio-aptx.c | 210 +++++++++++++++++++++++++++++++++++++++++++++++
+ android/hal-audio.c      |   1 +
+ android/hal-audio.h      |   1 +
+ 5 files changed, 215 insertions(+)
+ create mode 100644 android/hal-audio-aptx.c
 
+diff --git a/android/Android.mk b/android/Android.mk
+index de909d6..f28b8f3 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -257,6 +257,7 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES := \
+ 	bluez/android/hal-audio.c \
+ 	bluez/android/hal-audio-sbc.c \
++	bluez/android/hal-audio-aptx.c \
+ 
+ LOCAL_C_INCLUDES = \
+ 	$(call include-path-for, system-core) \
+@@ -268,6 +269,7 @@ LOCAL_SHARED_LIBRARIES := \
+ 	libsbc \
+ 
+ LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
++LOCAL_LDFLAGS := -ldl
+ 
+ LOCAL_MODULE_PATH := $(TARGET_OUT_SHARED_LIBRARIES)/hw
+ LOCAL_MODULE_TAGS := optional
+diff --git a/android/Makefile.am b/android/Makefile.am
+index bcaec4c..30d3c9a 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -170,6 +170,7 @@ android_audio_a2dp_default_la_SOURCES = android/audio-msg.h \
+ 					android/hal-audio.h \
+ 					android/hal-audio.c \
+ 					android/hal-audio-sbc.c \
++					android/hal-audio-aptx.c \
+ 					android/hardware/audio.h \
+ 					android/hardware/audio_effect.h \
+ 					android/hardware/hardware.h \
+diff --git a/android/hal-audio-aptx.c b/android/hal-audio-aptx.c
+new file mode 100644
+index 0000000..b7b5dfc
+--- /dev/null
++++ b/android/hal-audio-aptx.c
+@@ -0,0 +1,210 @@
++/*
++ * Copyright (C) 2014 Tieto Poland
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
++
++#include <stdint.h>
++#include <stdbool.h>
++#include <string.h>
++#include <malloc.h>
++#include <dlfcn.h>
++
++#include "audio-msg.h"
++#include "hal-audio.h"
++#include "hal-log.h"
++#include "../src/shared/util.h"
++#include "../profiles/audio/a2dp-codecs.h"
++
++struct aptx_data {
++	a2dp_aptx_t aptx;
++
++	void *enc;
++};
++
++static const a2dp_aptx_t aptx_presets[] = {
++	{
++		.info = {
++			.vendor_id = APTX_VENDOR_ID,
++			.codec_id = APTX_CODEC_ID,
++		},
++		.frequency = APTX_SAMPLING_FREQ_44100 |
++						APTX_SAMPLING_FREQ_48000,
++		.channel_mode = APTX_CHANNEL_MODE_STEREO,
++	},
++	{
++		.info = {
++			.vendor_id = APTX_VENDOR_ID,
++			.codec_id = APTX_CODEC_ID,
++		},
++		.frequency = APTX_SAMPLING_FREQ_48000,
++		.channel_mode = APTX_CHANNEL_MODE_STEREO,
++	},
++	{
++		.info = {
++			.vendor_id = APTX_VENDOR_ID,
++			.codec_id = APTX_CODEC_ID,
++		},
++		.frequency = APTX_SAMPLING_FREQ_44100,
++		.channel_mode = APTX_CHANNEL_MODE_STEREO,
++	},
++};
++
++static bool aptx_load(void)
++{
++	/* TODO: load aptX codec library */
++	return false;
++}
++
++static void aptx_unload(void)
++{
++	/* TODO: unload aptX codec library */
++}
++
++static bool aptx_available(void)
++{
++	return false;
++}
++
++static int aptx_get_presets(struct audio_preset *preset, size_t *len)
++{
++	int i;
++	int count;
++	size_t new_len = 0;
++	uint8_t *ptr = (uint8_t *) preset;
++	size_t preset_size = sizeof(*preset) + sizeof(a2dp_aptx_t);
++
++	DBG("");
++
++	count = sizeof(aptx_presets) / sizeof(aptx_presets[0]);
++
++	for (i = 0; i < count; i++) {
++		preset = (struct audio_preset *) ptr;
++
++		if (new_len + preset_size > *len)
++			break;
++
++		preset->len = sizeof(a2dp_aptx_t);
++		memcpy(preset->data, &aptx_presets[i], preset->len);
++
++		new_len += preset_size;
++		ptr += preset_size;
++	}
++
++	*len = new_len;
++
++	return i;
++}
++
++static bool aptx_codec_init(struct audio_preset *preset, uint16_t payload_len,
++							void **codec_data)
++{
++	struct aptx_data *aptx_data;
++
++	DBG("");
++
++	if (preset->len != sizeof(a2dp_aptx_t)) {
++		error("APTX: preset size mismatch");
++		return false;
++	}
++
++	aptx_data = new0(struct aptx_data, 1);
++	if (!aptx_data)
++		return false;
++
++	memcpy(&aptx_data->aptx, preset->data, preset->len);
++
++	/* TODO: initialize encoder */
++
++	*codec_data = aptx_data;
++
++	return true;
++}
++
++static bool aptx_cleanup(void *codec_data)
++{
++	struct aptx_data *aptx_data = (struct aptx_data *) codec_data;
++
++	free(aptx_data->enc);
++	free(codec_data);
++
++	return true;
++}
++
++static bool aptx_get_config(void *codec_data, struct audio_input_config *config)
++{
++	struct aptx_data *aptx_data = (struct aptx_data *) codec_data;
++
++	config->rate = aptx_data->aptx.frequency & APTX_SAMPLING_FREQ_48000 ?
++								48000 : 44100;
++	config->channels = AUDIO_CHANNEL_OUT_STEREO;
++	config->format = AUDIO_FORMAT_PCM_16_BIT;
++
++	return true;
++}
++
++static size_t aptx_get_buffer_size(void *codec_data)
++{
++	/* TODO: return actual value */
++	return 0;
++}
++
++static size_t aptx_get_mediapacket_duration(void *codec_data)
++{
++	/* TODO: return actual value */
++	return 0;
++}
++
++static ssize_t aptx_encode_mediapacket(void *codec_data, const uint8_t *buffer,
++					size_t len, struct media_packet *mp,
++					size_t mp_data_len, size_t *written)
++{
++	/* TODO: add encoding */
++
++	return len;
++}
++
++static bool aptx_update_qos(void *codec_data, uint8_t op)
++{
++	/*
++	 * aptX has constant bitrate of 352kbps (with constant 4:1 compression
++	 * ratio) thus QoS is not possible here.
++	 */
++
++	return false;
++}
++
++static const struct audio_codec codec = {
++	.type = A2DP_CODEC_VENDOR,
++	.use_rtp = false,
++
++	.load = aptx_load,
++	.unload = aptx_unload,
++	.available = aptx_available,
++
++	.get_presets = aptx_get_presets,
++
++	.init = aptx_codec_init,
++	.cleanup = aptx_cleanup,
++	.get_config = aptx_get_config,
++	.get_buffer_size = aptx_get_buffer_size,
++	.get_mediapacket_duration = aptx_get_mediapacket_duration,
++	.encode_mediapacket = aptx_encode_mediapacket,
++	.update_qos = aptx_update_qos,
++};
++
++const struct audio_codec *codec_aptx(void)
++{
++	return &codec;
++}
 diff --git a/android/hal-audio.c b/android/hal-audio.c
-index f15e767..3c62686 100644
+index 3c62686..4c982b0 100644
 --- a/android/hal-audio.c
 +++ b/android/hal-audio.c
-@@ -421,11 +421,19 @@ static int register_endpoints(void)
- 	size_t i;
+@@ -97,6 +97,7 @@ extern int clock_nanosleep(clockid_t clock_id, int flags,
+ #endif
  
- 	for (i = 0; i < NUM_CODECS; i++, ep++) {
--		const struct audio_codec *codec = audio_codecs[i]();
-+		audio_codec_get_t get_codec = audio_codecs[i];
-+		const struct audio_codec *codec = get_codec();
+ static const audio_codec_get_t audio_codecs[] = {
++		codec_aptx,
+ 		codec_sbc,
+ };
  
- 		if (!codec)
- 			return AUDIO_STATUS_FAILED;
- 
-+		/*
-+		 * Skip codecs which are unavailable, i.e. were not loaded due
-+		 * to missing .so
-+		 */
-+		if (codec->available && !codec->available())
-+			continue;
-+
- 		ep->id = ipc_open_cmd(codec);
- 
- 		if (!ep->id)
-@@ -1275,11 +1283,20 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
- static int audio_close(hw_device_t *device)
- {
- 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)device;
-+	size_t i;
- 
- 	DBG("");
- 
- 	unregister_endpoints();
- 
-+	for (i = 0; i < NUM_CODECS; i++) {
-+		audio_codec_get_t get_codec = audio_codecs[i];
-+		const struct audio_codec *codec = get_codec();
-+
-+		if (codec->unload)
-+			codec->unload();
-+	}
-+
- 	shutdown(listen_sk, SHUT_RDWR);
- 	shutdown(audio_sk, SHUT_RDWR);
- 
-@@ -1419,6 +1436,7 @@ static int audio_open(const hw_module_t *module, const char *name,
- 							hw_device_t **device)
- {
- 	struct a2dp_audio_dev *a2dp_dev;
-+	size_t i;
- 	int err;
- 
- 	DBG("");
-@@ -1457,6 +1475,14 @@ static int audio_open(const hw_module_t *module, const char *name,
- 	a2dp_dev->dev.close_input_stream = audio_close_input_stream;
- 	a2dp_dev->dev.dump = audio_dump;
- 
-+	for (i = 0; i < NUM_CODECS; i++) {
-+		audio_codec_get_t get_codec = audio_codecs[i];
-+		const struct audio_codec *codec = get_codec();
-+
-+		if (codec->load)
-+			codec->load();
-+	}
-+
- 	/*
- 	 * Note that &a2dp_dev->dev.common is the same pointer as a2dp_dev.
- 	 * This results from the structure of following structs:a2dp_audio_dev,
 diff --git a/android/hal-audio.h b/android/hal-audio.h
-index be71473..a47a7ea 100644
+index a47a7ea..12635bf 100644
 --- a/android/hal-audio.h
 +++ b/android/hal-audio.h
-@@ -75,6 +75,10 @@ struct audio_codec {
- 	uint8_t type;
- 	bool use_rtp;
+@@ -100,3 +100,4 @@ struct audio_codec {
+ typedef const struct audio_codec * (*audio_codec_get_t) (void);
  
-+	bool (*load) (void);
-+	void (*unload) (void);
-+	bool (*available) (void);
-+
- 	int (*get_presets) (struct audio_preset *preset, size_t *len);
- 
- 	bool (*init) (struct audio_preset *preset, uint16_t mtu,
+ const struct audio_codec *codec_sbc(void);
++const struct audio_codec *codec_aptx(void);
 -- 
 1.9.3
 
