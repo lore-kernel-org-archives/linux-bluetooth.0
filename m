@@ -1,118 +1,116 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v2 4/5] android/hal-audio-aptx: Load aptX encoder library
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1401708011-12828-5-git-send-email-andrzej.kaczmarek@tieto.com>
-Date: Mon, 2 Jun 2014 13:51:49 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <249307BB-42C3-44F9-A2C4-CFEED915D3EF@holtmann.org>
-References: <1401708011-12828-1-git-send-email-andrzej.kaczmarek@tieto.com> <1401708011-12828-5-git-send-email-andrzej.kaczmarek@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH v2 2/5] android/hal-audio: Allow codec to init on startup
+Date: Mon, 2 Jun 2014 13:20:08 +0200
+Message-ID: <1401708011-12828-3-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1401708011-12828-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1401708011-12828-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+This patch adds optional load/unload methods for codec which can be
+used to initialize some static data for codec, e.g. load shared library
+which provides encoder. Unlike init/cleanup which are called on stream
+open/close these methods are called when audio device is opened/closed
+thus most likely only once.
 
-> This patch adds loading of aptX encoder library which should be provided
-> by user. hal-audio-aptx will try to load 'libbt-aptx.so' so it should be
-> available in search patch, preferably in /system/lib.
-> ---
-> android/hal-audio-aptx.c | 51 ++++++++++++++++++++++++++++++++++++++++++++----
-> 1 file changed, 47 insertions(+), 4 deletions(-)
-> 
-> diff --git a/android/hal-audio-aptx.c b/android/hal-audio-aptx.c
-> index b7b5dfc..28db0f6 100644
-> --- a/android/hal-audio-aptx.c
-> +++ b/android/hal-audio-aptx.c
-> @@ -27,6 +27,8 @@
-> #include "../src/shared/util.h"
-> #include "../profiles/audio/a2dp-codecs.h"
-> 
-> +#define APTX_SO_NAME	"libbt-aptx.so"
-> +
-> struct aptx_data {
-> 	a2dp_aptx_t aptx;
-> 
-> @@ -61,20 +63,61 @@ static const a2dp_aptx_t aptx_presets[] = {
-> 	},
-> };
-> 
-> +static void *aptx_dl;
+Additional optional 'available' method is provided which is used by HAL
+core to check whether given codec is initialized properly and can have
+endpoint registered, i.e. codec may only be available if there's .so
+with encoder available on filesystem.
+---
+ android/hal-audio.c | 28 +++++++++++++++++++++++++++-
+ android/hal-audio.h |  4 ++++
+ 2 files changed, 31 insertions(+), 1 deletion(-)
 
-this is a horrible name for a variable. I had to wrap my brain around to where the _dl comes from ;)
-
-The dlopen manpage calls it handle so lets use aptx_handle here as variable name
-
-> +static int aptx_sizeof = 0;
-
-This name also give me a headache. aptx_btencsize seems to be more natural and clearer on what we store here.
-
-I am also not sure you need to initialize this to 0. It is protected by the aptx_handle variable.
-
-> +static int (*aptx_init)(void *, short);
-> +static int (*aptx_encode)(void *, void *, void *, void *);
-> +
-
-> static bool aptx_load(void)
-> {
-> -	/* TODO: load aptX codec library */
-> -	return false;
-> +	const char * (*aptx_version)(void);
-> +	const char * (*aptx_build)(void);
-> +	int (*aptx_sizeofenc)(void);
-
-> +
-> +	aptx_dl = dlopen(APTX_SO_NAME, RTLD_LAZY);
-> +	if (!aptx_dl) {
-> +		error("APTX: failed to open library %s (%s)", APTX_SO_NAME,
-> +								dlerror());
-> +		return false;
-> +	}
-> +
-> +	aptx_version = dlsym(aptx_dl, "aptxbtenc_version");
-> +	aptx_build = dlsym(aptx_dl, "aptxbtenc_build");
-> +
-> +	if (aptx_version && aptx_build)
-> +		info("APTX: using library version %s build %s", aptx_version(),
-> +								aptx_build());
-> +	else
-> +		warn("APTX: cannot retrieve library version");
-> +
-> +	aptx_sizeofenc = dlsym(aptx_dl, "SizeofAptxbtenc");
-> +	aptx_init = dlsym(aptx_dl, "aptxbtenc_init");
-> +	aptx_encode = dlsym(aptx_dl, "aptxbtenc_encodestereo");
-> +	if (!aptx_sizeofenc || !aptx_init || !aptx_encode) {
-> +		error("APTX: failed initialize library");
-> +		dlclose(aptx_dl);
-> +		aptx_dl = NULL;
-> +		return false;
-> +	}
-> +
-> +	aptx_sizeof = aptx_sizeofenc();
-> +
-> +	info("APTX: codec library initialized (size=%d)", aptx_sizeof);
-> +
-> +	return true;
-> }
-> 
-> static void aptx_unload(void)
-> {
-> -	/* TODO: unload aptX codec library */
-> +	if (aptx_dl) {
-> +		dlclose(aptx_dl);
-> +		aptx_dl = NULL;
-> +	}
-> }
-> 
-> static bool aptx_available(void)
-> {
-> -	return false;
-> +	return aptx_dl != NULL;
-
-At some point we need to start using !!aptx_handle syntax here instead of the != NULL. But this is more a general comment on how I like the coding style to change. Nothing that needs to be done right away. Just keep it in mind.
-
-Regards
-
-Marcel
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index f15e767..3c62686 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -421,11 +421,19 @@ static int register_endpoints(void)
+ 	size_t i;
+ 
+ 	for (i = 0; i < NUM_CODECS; i++, ep++) {
+-		const struct audio_codec *codec = audio_codecs[i]();
++		audio_codec_get_t get_codec = audio_codecs[i];
++		const struct audio_codec *codec = get_codec();
+ 
+ 		if (!codec)
+ 			return AUDIO_STATUS_FAILED;
+ 
++		/*
++		 * Skip codecs which are unavailable, i.e. were not loaded due
++		 * to missing .so
++		 */
++		if (codec->available && !codec->available())
++			continue;
++
+ 		ep->id = ipc_open_cmd(codec);
+ 
+ 		if (!ep->id)
+@@ -1275,11 +1283,20 @@ static int audio_dump(const audio_hw_device_t *device, int fd)
+ static int audio_close(hw_device_t *device)
+ {
+ 	struct a2dp_audio_dev *a2dp_dev = (struct a2dp_audio_dev *)device;
++	size_t i;
+ 
+ 	DBG("");
+ 
+ 	unregister_endpoints();
+ 
++	for (i = 0; i < NUM_CODECS; i++) {
++		audio_codec_get_t get_codec = audio_codecs[i];
++		const struct audio_codec *codec = get_codec();
++
++		if (codec->unload)
++			codec->unload();
++	}
++
+ 	shutdown(listen_sk, SHUT_RDWR);
+ 	shutdown(audio_sk, SHUT_RDWR);
+ 
+@@ -1419,6 +1436,7 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 							hw_device_t **device)
+ {
+ 	struct a2dp_audio_dev *a2dp_dev;
++	size_t i;
+ 	int err;
+ 
+ 	DBG("");
+@@ -1457,6 +1475,14 @@ static int audio_open(const hw_module_t *module, const char *name,
+ 	a2dp_dev->dev.close_input_stream = audio_close_input_stream;
+ 	a2dp_dev->dev.dump = audio_dump;
+ 
++	for (i = 0; i < NUM_CODECS; i++) {
++		audio_codec_get_t get_codec = audio_codecs[i];
++		const struct audio_codec *codec = get_codec();
++
++		if (codec->load)
++			codec->load();
++	}
++
+ 	/*
+ 	 * Note that &a2dp_dev->dev.common is the same pointer as a2dp_dev.
+ 	 * This results from the structure of following structs:a2dp_audio_dev,
+diff --git a/android/hal-audio.h b/android/hal-audio.h
+index be71473..a47a7ea 100644
+--- a/android/hal-audio.h
++++ b/android/hal-audio.h
+@@ -75,6 +75,10 @@ struct audio_codec {
+ 	uint8_t type;
+ 	bool use_rtp;
+ 
++	bool (*load) (void);
++	void (*unload) (void);
++	bool (*available) (void);
++
+ 	int (*get_presets) (struct audio_preset *preset, size_t *len);
+ 
+ 	bool (*init) (struct audio_preset *preset, uint16_t mtu,
+-- 
+1.9.3
 
