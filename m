@@ -1,66 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <538D8035.5040801@tieto.com>
-Date: Tue, 03 Jun 2014 09:58:45 +0200
-From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFCv2 2/2] android/gatt: Add test command for database dump
-References: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com> <1401715171-29175-3-git-send-email-jakub.tyszkowski@tieto.com> <C088D1E3-5FAD-49FA-8255-B63ADB999622@holtmann.org>
-In-Reply-To: <C088D1E3-5FAD-49FA-8255-B63ADB999622@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: BLE profile contribution - query
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <FD9DAB3E3C4CF1429AA0813D1115E8BC81F06C@POCITMSEXMB03.LntUniverse.com>
+Date: Tue, 3 Jun 2014 06:23:53 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <4E14832E-2162-45D3-AF80-4AE6C5FB7097@holtmann.org>
+References: <FD9DAB3E3C4CF1429AA0813D1115E8BC81F06C@POCITMSEXMB03.LntUniverse.com>
+To: Wins Thomas <Wins.Thomas@LNTTECHSERVICES.COM>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Wins,
 
-> Hi Jakub,
->
->> With this we can check all attributes handles, uuids, permissions etc.
->> on demand without adding to much logs. This will help to execute and
->> verify some PTS test cases and debug.
->> ---
->> android/gatt.c    | 4 ++++
->> android/hal-msg.h | 1 +
->> 2 files changed, 5 insertions(+)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index 429181f..83a051b 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -3543,6 +3543,10 @@ static void handle_client_test_command(const void *buf, uint16_t len)
->> 		status = test_read_write(&bdaddr, &uuid, cmd->u1, cmd->u2,
->> 						cmd->u3, cmd->u4, cmd->u5);
->> 		break;
->> +	case GATT_CLIENT_TEST_CMD_DB_DUMP:
->> +		gatt_db_dump(gatt_db);
->> +		status = HAL_STATUS_SUCCESS;
->> +		break;
->> 	case GATT_CLIENT_TEST_CMD_PAIRING_CONFIG:
->> 	default:
->> 		status = HAL_STATUS_FAILED;
->> diff --git a/android/hal-msg.h b/android/hal-msg.h
->> index 5da62f3..ce86304 100644
->> --- a/android/hal-msg.h
->> +++ b/android/hal-msg.h
->> @@ -753,6 +753,7 @@ struct hal_cmd_gatt_client_set_adv_data {
->> #define GATT_CLIENT_TEST_CMD_DISCOVER		0x04
->> #define GATT_CLIENT_TEST_CMD_READ		0xe0
->> #define GATT_CLIENT_TEST_CMD_WRITE		0xe1
->> +#define GATT_CLIENT_TEST_CMD_DB_DUMP		0xe2
->> #define GATT_CLIENT_TEST_CMD_PAIRING_CONFIG	0xf0
->
-> are these all defined by Bluedroid and Android Bluetooth Service or are some of these BlueZ specific? If so we need to comment that.
+> One of our developer was working on implementing  the Findme profile (FMP)  based on the Bluetooth SIG Standard for a PoC (See below mail). We would like to contribute this work to open source but not seen this BLE profiles implementations in your TODO List items.  Could you please provide the necessary procedure so he can contribute the code .
 
-Some are defined by Android, but we added our own starting from 0xe0. I 
-wonder if README entry wouldn't be better to actually comment that and 
-describe parameters for commands we added, so they can be used in 
-haltest without searching through the implementation.
+first step should be to post the code as patches to this mailing list. We can then take it from there. All the review of patches will happen right here on the mailing list.
 
->
-> Regards
->
-> Marcel
->
+Quick heads up to comply with the projects coding style just from the beginning. Otherwise we will send it back unseen. Minor coding style issues can fixed during the review.
 
-Regards,
-Jakub
+If you want an entry in the TODO list, then just send a patch for it. Plain and simple as that. Same applies to any documentation you want to provide. Just a patch to bluez.git or for kernel pieces bluetooth-next.git tree.
+
+Regards
+
+Marcel
+
