@@ -1,39 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com
-Subject: BlueZ make error
-Date: Tue, 03 Jun 2014 18:55:33 +0530
-Message-id: <009101cf7f2f$5810a4f0$0831eed0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+Date: Tue, 3 Jun 2014 13:41:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] tools/btmgmt: Add scan-params command
+Message-ID: <20140603104127.GA7160@t440s.lan>
+References: <1401790416-30962-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1401790416-30962-1-git-send-email-andrzej.kaczmarek@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Andrzej,
 
-While building the latest BlueZ, I'm getting below error:
+On Tue, Jun 03, 2014, Andrzej Kaczmarek wrote:
+> ---
+>  tools/btmgmt.c | 41 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 41 insertions(+)
 
-krampal-ubuntu:~/bluez$ sudo make
-make --no-print-directory all-am
-  CC       client/main.o
-client/main.c: In function 'cmd_version':
-client/main.c:1098:28: error: 'VERSION' undeclared (first use in this
-function)
-  rl_printf("Version %s\n", VERSION);
-                            ^
-client/main.c:1098:28: note: each undeclared identifier is reported only
-once for each function it appears in
-client/main.c: In function 'main':
-client/main.c:1489:18: error: 'VERSION' undeclared (first use in this
-function)
-   printf("%s\n", VERSION);
-                  ^
-make[1]: *** [client/main.o] Error 1
-make: *** [all] Error 2
+All four patches have been applied. Thanks.
 
-Please help me. Thanks!
-
-Regards,
-Vikram
-
+Johan
