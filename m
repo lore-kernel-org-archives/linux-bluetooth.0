@@ -1,24 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 3 Jun 2014 13:41:27 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] tools/btmgmt: Add scan-params command
-Message-ID: <20140603104127.GA7160@t440s.lan>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 4/4] tools/btmgmt: Trival whitespace fix
+Date: Tue, 3 Jun 2014 12:13:36 +0200
+Message-ID: <1401790416-30962-4-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1401790416-30962-1-git-send-email-andrzej.kaczmarek@tieto.com>
 References: <1401790416-30962-1-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1401790416-30962-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+---
+ tools/btmgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-On Tue, Jun 03, 2014, Andrzej Kaczmarek wrote:
-> ---
->  tools/btmgmt.c | 41 +++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 41 insertions(+)
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index 22fc547..8f5a981 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -2443,7 +2443,7 @@ static struct {
+ 	{ "hs",		cmd_hs,		"Toggle HS support"		},
+ 	{ "le",		cmd_le,		"Toggle LE support"		},
+ 	{ "advertising",cmd_advertising,"Toggle LE advertising",	},
+-	{ "bredr",      cmd_bredr,      "Toggle BR/EDR support",	},
++	{ "bredr",	cmd_bredr,	"Toggle BR/EDR support",	},
+ 	{ "privacy",	cmd_privacy,	"Toggle privacy support"	},
+ 	{ "class",	cmd_class,	"Set device major/minor class"	},
+ 	{ "disconnect", cmd_disconnect, "Disconnect device"		},
+-- 
+1.9.3
 
-All four patches have been applied. Thanks.
-
-Johan
