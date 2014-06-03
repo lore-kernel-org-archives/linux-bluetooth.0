@@ -1,78 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-To: <linux-bluetooth@vger.kernel.org>
-CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Subject: [PATCH 1/4] tools/btmgmt: Add scan-params command
-Date: Tue, 3 Jun 2014 12:13:33 +0200
-Message-ID: <1401790416-30962-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFCv2 2/2] android/gatt: Add test command for database dump
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <538D8035.5040801@tieto.com>
+Date: Tue, 3 Jun 2014 11:24:39 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <710F3208-4DE5-4204-AD43-5C8C8345841B@holtmann.org>
+References: <1401715171-29175-1-git-send-email-jakub.tyszkowski@tieto.com> <1401715171-29175-3-git-send-email-jakub.tyszkowski@tieto.com> <C088D1E3-5FAD-49FA-8255-B63ADB999622@holtmann.org> <538D8035.5040801@tieto.com>
+To: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- tools/btmgmt.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+Hi Jakub,
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 0c42e17..2742dfc 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -2383,6 +2383,46 @@ static void cmd_set_io_cap(struct mgmt *mgmt, uint16_t index,
- 	}
- }
- 
-+static void scan_params_rsp(uint8_t status, uint16_t len, const void *param,
-+							void *user_data)
-+{
-+	if (status != 0)
-+		fprintf(stderr, "Set scan parameters failed with status 0x%02x (%s)\n",
-+						status, mgmt_errstr(status));
-+	else
-+		printf("Scan parameters successfully set\n");
-+
-+	mainloop_quit();
-+}
-+
-+static void scan_params_usage(void)
-+{
-+	printf("Usage: btmgmt scan-params <interval> <window>\n");
-+}
-+
-+static void cmd_scan_params(struct mgmt *mgmt, uint16_t index,
-+							int argc, char **argv)
-+{
-+	struct mgmt_cp_set_scan_params cp;
-+
-+	if (argc < 3) {
-+		scan_params_usage();
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (index == MGMT_INDEX_NONE)
-+		index = 0;
-+
-+	cp.interval = strtol(argv[1], NULL, 0);
-+	cp.window = strtol(argv[2], NULL, 0);
-+
-+	if (mgmt_send(mgmt, MGMT_OP_SET_SCAN_PARAMS, index, sizeof(cp), &cp,
-+					scan_params_rsp, NULL, NULL) == 0) {
-+		fprintf(stderr, "Unable to send set_scan_params cmd\n");
-+		exit(EXIT_FAILURE);
-+	}
-+}
-+
- static struct {
- 	char *cmd;
- 	void (*func)(struct mgmt *mgmt, uint16_t index, int argc, char **argv);
-@@ -2427,6 +2467,7 @@ static struct {
- 	{ "debug-keys",	cmd_debug_keys,	"Toogle debug keys"		},
- 	{ "conn-info",	cmd_conn_info,	"Get connection information"	},
- 	{ "set-io-cap",	cmd_set_io_cap,	"Set IO Capability"		},
-+	{ "scan-params",cmd_scan_params,"Set Scan Parameters"		},
- 	{ }
- };
- 
--- 
-1.9.3
+>>> With this we can check all attributes handles, uuids, permissions etc.
+>>> on demand without adding to much logs. This will help to execute and
+>>> verify some PTS test cases and debug.
+>>> ---
+>>> android/gatt.c    | 4 ++++
+>>> android/hal-msg.h | 1 +
+>>> 2 files changed, 5 insertions(+)
+>>> 
+>>> diff --git a/android/gatt.c b/android/gatt.c
+>>> index 429181f..83a051b 100644
+>>> --- a/android/gatt.c
+>>> +++ b/android/gatt.c
+>>> @@ -3543,6 +3543,10 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+>>> 		status = test_read_write(&bdaddr, &uuid, cmd->u1, cmd->u2,
+>>> 						cmd->u3, cmd->u4, cmd->u5);
+>>> 		break;
+>>> +	case GATT_CLIENT_TEST_CMD_DB_DUMP:
+>>> +		gatt_db_dump(gatt_db);
+>>> +		status = HAL_STATUS_SUCCESS;
+>>> +		break;
+>>> 	case GATT_CLIENT_TEST_CMD_PAIRING_CONFIG:
+>>> 	default:
+>>> 		status = HAL_STATUS_FAILED;
+>>> diff --git a/android/hal-msg.h b/android/hal-msg.h
+>>> index 5da62f3..ce86304 100644
+>>> --- a/android/hal-msg.h
+>>> +++ b/android/hal-msg.h
+>>> @@ -753,6 +753,7 @@ struct hal_cmd_gatt_client_set_adv_data {
+>>> #define GATT_CLIENT_TEST_CMD_DISCOVER		0x04
+>>> #define GATT_CLIENT_TEST_CMD_READ		0xe0
+>>> #define GATT_CLIENT_TEST_CMD_WRITE		0xe1
+>>> +#define GATT_CLIENT_TEST_CMD_DB_DUMP		0xe2
+>>> #define GATT_CLIENT_TEST_CMD_PAIRING_CONFIG	0xf0
+>> 
+>> are these all defined by Bluedroid and Android Bluetooth Service or are some of these BlueZ specific? If so we need to comment that.
+> 
+> Some are defined by Android, but we added our own starting from 0xe0. I wonder if README entry wouldn't be better to actually comment that and describe parameters for commands we added, so they can be used in haltest without searching through the implementation.
+
+the code should have a comment right there to distinguish BlueZ specific from generic ones. In addition a section in the README is a great idea.
+
+Regards
+
+Marcel
 
