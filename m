@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCV2 19/28] android/hal-sco: Skip resampling for output stream with 8k
-Date: Wed,  4 Jun 2014 17:17:50 +0300
-Message-Id: <1401891479-11965-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCV2 12/28] android/haltest: Add loop command
+Date: Wed,  4 Jun 2014 17:17:43 +0300
+Message-Id: <1401891479-11965-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,33 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+loop command makes stream_in->read() and then stream_out->write(). At
+the moment buffers shall be equal.
 ---
- android/hal-sco.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/client/if-sco.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 06e0261..e3d5242 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -659,6 +659,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 		return -ENOMEM;
- 	}
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+index b4c3506..39c3e3a 100644
+--- a/android/client/if-sco.c
++++ b/android/client/if-sco.c
+@@ -148,6 +148,11 @@ static int feed_from_generator(short *buffer, void *data)
+ 	return buffer_size;
+ }
  
-+	if (out->cfg.rate == AUDIO_STREAM_SCO_RATE)
-+		goto skip_resampler;
++static int feed_from_in(short *buffer, void *data)
++{
++	return stream_in->read(stream_in, buffer, buffer_size_in);
++}
 +
- 	/* Channel numbers for resampler */
- 	chan_num = 1;
+ static void prepare_sample(void)
+ {
+ 	int x;
+@@ -179,8 +184,12 @@ static void *playback_thread(void *data)
  
-@@ -691,7 +694,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
- 				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num,
- 				out->resample_frame_num, resample_size);
--
-+skip_resampler:
- 	*stream_out = &out->stream;
- 	adev->out = out;
+ 	/* Use file or fall back to generator */
+ 	if (in) {
+-		filbuff_cb = feed_from_file;
+-		cb_data = in;
++		if (data == stream_in)
++			filbuff_cb = feed_from_in;
++		else {
++			filbuff_cb = feed_from_file;
++			cb_data = in;
++		}
+ 	} else {
+ 		prepare_sample();
+ 		filbuff_cb = feed_from_generator;
+@@ -218,7 +227,7 @@ static void *playback_thread(void *data)
+ 		pthread_mutex_unlock(&outstream_mutex);
+ 	} while (len && w_len > 0);
  
+-	if (in)
++	if (in && data != stream_in)
+ 		fclose(in);
+ 
+ 	pthread_mutex_lock(&state_mutex);
+@@ -315,6 +324,35 @@ fail:
+ 		fclose(in);
+ }
+ 
++static void loop_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++	RETURN_IF_NULL(stream_in);
++
++	if (!buffer_size || !buffer_size_in) {
++		haltest_error("Invalid buffer sizes. Streams opened\n");
++		return;
++	}
++
++	if (buffer_size != buffer_size_in) {
++		haltest_error("read/write buffers differ, not supported\n");
++		return;
++	}
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state != STATE_STOPPED) {
++		haltest_error("Already playing or stream suspended!\n");
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++	pthread_mutex_unlock(&state_mutex);
++
++	if (pthread_create(&play_thread, NULL, playback_thread,
++							stream_in) != 0)
++		haltest_error("Cannot create playback thread!\n");
++}
++
+ static void read_p(int argc, const char **argv)
+ {
+ 	RETURN_IF_NULL(if_audio_sco);
+@@ -615,6 +653,7 @@ static struct method methods[] = {
+ 	STD_METHOD(close_input_stream),
+ 	STD_METHODH(play, "<path to pcm file>"),
+ 	STD_METHOD(read),
++	STD_METHOD(loop),
+ 	STD_METHOD(stop),
+ 	STD_METHOD(suspend),
+ 	STD_METHOD(resume),
 -- 
 1.8.3.2
 
