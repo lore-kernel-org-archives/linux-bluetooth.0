@@ -1,38 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Eva Kolanska <eva.kolanska@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Eva Kolanska <eva.kolanska@tieto.com>
-Subject: [PATCH] android/pts: Update GATT test results
-Date: Wed,  4 Jun 2014 12:45:35 +0200
-Message-Id: <1401878735-32340-1-git-send-email-eva.kolanska@tieto.com>
+Date: Wed, 4 Jun 2014 13:18:06 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC 0/3] Gatt Client Characteristic Configuration
+Message-ID: <20140604101806.GB13961@t440s.ice.intel.com>
+References: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1401201223-17852-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-gatt.txt |   11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Hi Jakub,
 
-diff --git a/android/pts-gatt.txt b/android/pts-gatt.txt
-index 8724532..08ade26 100644
---- a/android/pts-gatt.txt
-+++ b/android/pts-gatt.txt
-@@ -1040,7 +1040,14 @@ TC_GPA_SR_BV_11_C	PASS	haltest:
- 						<properties> 138 <permissions> 17
- 				gatts add_descriptor <UUID> 2905
- 				gatts start_service
--				gatts send_respons: repeat with correct offset
-+				gatts send_response: repeat with correct offset
- 								and data
--TC_GPA_SR_BV_12_C	INC
-+TC_GPA_SR_BV_12_C	PASS	For this test use build from PTS issue #12262
-+				haltest:
-+				gatts add_service
-+				gatts add_chaaracteristic:
-+						<properties> 10 <permissions> 17
-+				gatts add_descriptor <UUID> 2904
-+				gatts start_service
-+				gatts send_response: repeat with correct data
- -------------------------------------------------------------------------------
--- 
-1.7.9.5
+On Tue, May 27, 2014, Jakub Tyszkowski wrote:
+> This adds Client Characteristic Configuration descriptor for Service Changed
+> Characteristic registered on gatt init. This stored value should be persistent
+> across connections for bonded devices, thus gatt specific api was aded to
+> bluetooth core profile exposing storage functionality.
+> 
+> We could consider creating more generic functions, allowing to store custom
+> <key, value> pairs. that other profiles could use aswell. Then on every value
+> read we would access the file as we do on write, instead of storing it in device
+> along with other properties.
+> 
+> I'm not sure which aproach would be better. Should we go with the generic
+> version already or do it later if it turns out that we need to store more
+> thing for more profiles?
 
+I'd go with a specific solution now. We can still change this later if
+necessary.
+
+Johan
