@@ -1,105 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] unit/test-avrcp: Add /TP/RCR/BV-02-C test
-Date: Wed,  4 Jun 2014 18:20:10 +0300
-Message-Id: <1401895212-13159-1-git-send-email-luiz.dentz@gmail.com>
+From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Subject: [PATCH 2/2] profiles/audio: Fix propagation of EHOSTDOWN error
+Date: Wed, 4 Jun 2014 17:14:45 +0200
+Message-ID: <1401894885-7444-2-git-send-email-andrzej.kaczmarek@tieto.com>
+In-Reply-To: <1401894885-7444-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1401894885-7444-1-git-send-email-andrzej.kaczmarek@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-To verify that the TG can handle fragmentation correctly.
+EHOSTDOWN error is now overwritten by EIO and once it's passed to
+device_profile_connected it triggers connection of another profiles
+while it should actually stop connecting them.
 ---
- unit/test-avrcp.c | 46 ++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 44 insertions(+), 2 deletions(-)
+ profiles/audio/sink.c   | 13 ++++++++-----
+ profiles/audio/source.c | 13 ++++++++-----
+ 2 files changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index c41f2e6..af77118 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -46,6 +46,7 @@
- struct test_pdu {
- 	bool valid;
- 	bool fragmented;
-+	bool continuing;
- 	bool browse;
- 	const uint8_t *data;
- 	size_t size;
-@@ -93,6 +94,14 @@ struct context {
- 		.size = sizeof(data(args)),			\
+diff --git a/profiles/audio/sink.c b/profiles/audio/sink.c
+index d16af23..da8992e 100644
+--- a/profiles/audio/sink.c
++++ b/profiles/audio/sink.c
+@@ -229,11 +229,14 @@ static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp
+ 	if (err) {
+ 		avdtp_unref(sink->session);
+ 		sink->session = NULL;
+-		if (avdtp_error_category(err) == AVDTP_ERRNO
+-				&& avdtp_error_posix_errno(err) != EHOSTDOWN) {
+-			perr = -EAGAIN;
+-		} else
+-			perr = -EIO;
++
++		perr = -avdtp_error_posix_errno(err);
++		if (perr != -EHOSTDOWN) {
++			if (avdtp_error_category(err) == AVDTP_ERRNO)
++				perr = -EAGAIN;
++			else
++				perr = -EIO;
++		}
+ 		goto failed;
  	}
  
-+#define cont_pdu(args...)					\
-+	{							\
-+		.valid = true,					\
-+		.continuing = true,				\
-+		.data = data(args),				\
-+		.size = sizeof(data(args)),			\
-+	}
+diff --git a/profiles/audio/source.c b/profiles/audio/source.c
+index 843b3e8..b0abaa3 100644
+--- a/profiles/audio/source.c
++++ b/profiles/audio/source.c
+@@ -229,11 +229,14 @@ static void discovery_complete(struct avdtp *session, GSList *seps, struct avdtp
+ 	if (err) {
+ 		avdtp_unref(source->session);
+ 		source->session = NULL;
+-		if (avdtp_error_category(err) == AVDTP_ERRNO
+-				&& avdtp_error_posix_errno(err) != EHOSTDOWN) {
+-			perr = -EAGAIN;
+-		} else
+-			perr = -EIO;
 +
- #define define_test(name, function, args...)				\
- 	do {								\
- 		const struct test_pdu pdus[] = {			\
-@@ -195,7 +204,8 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 	if (g_test_verbose())
- 		util_hexdump('>', buf, len, test_debug, "AVRCP: ");
++		perr = -avdtp_error_posix_errno(err);
++		if (perr != -EHOSTDOWN) {
++			if (avdtp_error_category(err) == AVDTP_ERRNO)
++				perr = -EAGAIN;
++			else
++				perr = -EIO;
++		}
+ 		goto failed;
+ 	}
  
--	g_assert_cmpint(len, ==, pdu->size);
-+	if (!pdu->continuing)
-+		g_assert_cmpint(len, ==, pdu->size);
- 
- 	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
- 
-@@ -486,9 +496,19 @@ static int get_element_attributes(struct avrcp *session, uint8_t transaction,
- 					uint64_t uid, uint8_t number,
- 					uint32_t *attrs, void *user_data)
- {
-+	struct context *context = user_data;
-+
- 	DBG("");
- 
--	avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
-+	if (g_str_equal(context->data->test_name, "/TP/RCR/BV-02-C")) {
-+		uint8_t params[1024];
-+
-+		memset(params, 0, sizeof(params));
-+
-+		avrcp_get_element_attrs_rsp(session, transaction, params,
-+							sizeof(params));
-+	} else
-+		avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
- 
- 	return -EAGAIN;
- }
-@@ -1623,5 +1643,27 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
- 				0x00, 0x00, 0x01, 0x00));
- 
-+	/* Request continuing response - TG */
-+	define_test("/TP/RCR/BV-02-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
-+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-+			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x01, 0x01, 0xf9),
-+			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
-+				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
-+			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x02, 0x01, 0xf9),
-+			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
-+				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
-+			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x03, 0x00, 0x0e));
-+
- 	return g_test_run();
- }
 -- 
 1.9.3
 
