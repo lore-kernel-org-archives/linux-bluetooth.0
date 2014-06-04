@@ -1,100 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <31158844.FpJplVcR4q@leonov>
-References: <1401886448-28463-1-git-send-email-marcin.kraglak@tieto.com>
-	<31158844.FpJplVcR4q@leonov>
-Date: Wed, 4 Jun 2014 20:31:56 +0200
-Message-ID: <CABD6X-KPBwXOc=SjMzG9rbSo4E5wH7o+CdeqXOKHn_CasvMmuA@mail.gmail.com>
-Subject: Re: [PATCH] android/gatt: Set attrib MTU correctly
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: "linux-bluetooth@vger.kernel.org development"
-	<linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 2/2] shared/hfp: Fix crash due to invalid free
+Date: Wed,  4 Jun 2014 19:41:08 +0200
+Message-Id: <1401903668-27548-2-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1401903668-27548-1-git-send-email-szymon.janc@tieto.com>
+References: <1401903668-27548-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+If there are no characters before '\r' memchr() will return pointer
+matching passed string. This will results either in double free (if
+'\r' happen to be the first byte in ringbuffer buffer) or in freeing
+pointer inside ringbuffer buffer (if '\r' is not the first byte).
+---
+ src/shared/hfp.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-On 4 June 2014 19:38, Szymon Janc <szymon.janc@tieto.com> wrote:
-> Hi Marcin,
->
-> On Wednesday 04 of June 2014 14:54:08 Marcin Kraglak wrote:
->> We should set g_attrib mtu with MIN of two values: Remote Rx MTU
->> and local Tx MTU. In previous solution once we set g_attrib mtu, we
->> could only reduce MTU (because we took previously set g_attrib MTU
->> and Remote Rx MTU). It affected cases when remote wanted to increase
->> MTU
->
-> According to spec:
-> section 3.4.2.1: "This [Exchange MTU] request shall only be sent once during a
-> connection by the client."
-> section 3.4.2.2: "A device's Exchange MTU Request shall contain the same MTU
-> as the device's Exchange MTU Response (i.e. the MTU shall be symmetric)."
->
-> So if I get the spec correctly it is illegal to increase (or decrease) MTU
-> after it was exchanged (we should probably respond with error if client is
-> sending request more than one).
->
-> Please correct me if I'm wrong.
->
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index 36c8c3e..196e777 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -381,6 +381,7 @@ static void process_input(struct hfp_gw *hfp)
+ {
+ 	char *str, *ptr;
+ 	size_t len, count;
++	bool free_ptr = false;
+ 
+ 	str = ringbuf_peek(hfp->read_buf, 0, &len);
+ 	if (!str)
+@@ -407,6 +408,7 @@ static void process_input(struct hfp_gw *hfp)
+ 
+ 		*ptr = '\0';
+ 		count = asprintf(&ptr, "%s%s", str, str2);
++		free_ptr = true;
+ 		str = ptr;
+ 	} else {
+ 		count = ptr - str;
+@@ -424,7 +426,7 @@ static void process_input(struct hfp_gw *hfp)
+ 
+ 	len = ringbuf_drain(hfp->read_buf, count + 1);
+ 
+-	if (str == ptr)
++	if (free_ptr)
+ 		free(ptr);
+ }
+ 
+-- 
+1.9.3
 
-That is not the case. We set g_attrib MTU when g_attrib_new() is called,
-and then it is set to default value - 23 (gattrib.c:499). While
-exchanging MTU we
-get MIN value of g_attrib MTU, which was previously set to 23 and remote MTU.
-So it was set to 23 again. (It means that we always used default MTU).
-Now we get remote MTU and local output MTU.
-
-Increasing or decreasing MTU even if it was previously exchanged can be a point
-of discussion, however PTS exchange it two times in test case TP/GAC/SR/BV-01-C.
-We can create an issue for this case.
-
->> .
->> ---
->>  android/gatt.c | 9 +++++----
->>  1 file changed, 5 insertions(+), 4 deletions(-)
->>
->> diff --git a/android/gatt.c b/android/gatt.c
->> index 429181f..5bf7694 100644
->> --- a/android/gatt.c
->> +++ b/android/gatt.c
->> @@ -4857,8 +4857,8 @@ static uint8_t read_request(const uint8_t *cmd,
->> uint16_t cmd_len, static uint8_t mtu_att_handle(const uint8_t *cmd,
->> uint16_t cmd_len, struct gatt_device *dev)
->>  {
->> -     uint16_t mtu, imtu;
->> -     size_t omtu;
->> +     uint16_t mtu, imtu, omtu;
->> +     size_t length;
->>       GIOChannel *io;
->>       GError *gerr = NULL;
->>       uint16_t len;
->> @@ -4877,6 +4877,7 @@ static uint8_t mtu_att_handle(const uint8_t *cmd,
->> uint16_t cmd_len,
->>
->>       bt_io_get(io, &gerr,
->>                       BT_IO_OPT_IMTU, &imtu,
->> +                     BT_IO_OPT_OMTU, &omtu,
->>                       BT_IO_OPT_INVALID);
->>       if (gerr) {
->>               error("bt_io_get: %s", gerr->message);
->> @@ -4884,10 +4885,10 @@ static uint8_t mtu_att_handle(const uint8_t *cmd,
->> uint16_t cmd_len, return ATT_ECODE_UNLIKELY;
->>       }
->>
->> -     rsp = g_attrib_get_buffer(dev->attrib, &omtu);
->> +     rsp = g_attrib_get_buffer(dev->attrib, &length);
->>
->>       /* Respond with our IMTU */
->> -     len = enc_mtu_resp(imtu, rsp, omtu);
->> +     len = enc_mtu_resp(imtu, rsp, length);
->>       if (!len)
->>               return ATT_ECODE_UNLIKELY;
->
-> --
-> BR
-> Szymon Janc
-
-BR
-Marcin
