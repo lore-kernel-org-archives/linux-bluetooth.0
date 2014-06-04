@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCV2 16/28] android/haltest: Implement read to file
-Date: Wed,  4 Jun 2014 17:17:47 +0300
-Message-Id: <1401891479-11965-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCV2 02/28] android/handsfree: Connect SCO audio on demand
+Date: Wed,  4 Jun 2014 17:17:33 +0300
+Message-Id: <1401891479-11965-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,131 +11,48 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Reads data from stream_in and write to specified file.
 ---
- android/Android.mk      |  3 +++
- android/client/if-sco.c | 55 ++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 53 insertions(+), 5 deletions(-)
+ android/handsfree.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index a52aefe..79058e0 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -167,6 +167,9 @@ LOCAL_C_INCLUDES += \
- 	$(call include-path-for, system-core) \
- 	$(call include-path-for, libhardware) \
+diff --git a/android/handsfree.c b/android/handsfree.c
+index b530aa9..49e6a22 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -169,6 +169,8 @@ static GIOChannel *hsp_server = NULL;
  
-+LOCAL_C_INCLUDES += \
-+	$(LOCAL_PATH)/bluez/android \
+ static GIOChannel *sco_server = NULL;
+ 
++static void bt_sco_connect(const void *buf, uint16_t len);
 +
- LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+ static void device_set_state(uint8_t state)
+ {
+ 	struct hal_ev_handsfree_conn_state ev;
+@@ -892,6 +894,9 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 							sco_watch_cb, NULL);
  
- LOCAL_SHARED_LIBRARIES := libhardware
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 39c3e3a..b5fa926 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -15,6 +15,8 @@
-  *
-  */
- 
-+#include "../src/shared/util.h"
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
 +
- #include "if-main.h"
- #include "../hal-utils.h"
- #include "pthread.h"
-@@ -239,12 +241,29 @@ static void *playback_thread(void *data)
- 	return NULL;
++	if (ipc_is_connected(sco_ipc))
++		bt_sco_connect(NULL, 0);
  }
  
-+static void write_stereo_pcm16(char *buffer, size_t len, FILE *out)
-+{
-+	const int16_t *input = (const void *) buffer;
-+	int16_t sample[2];
-+	size_t i;
-+
-+	for (i = 0; i < len / 2; i++) {
-+		int16_t mono = get_unaligned(&input[i]);
-+
-+		put_unaligned(mono, &sample[0]);
-+		put_unaligned(mono, &sample[1]);
-+
-+		fwrite(sample, sizeof(sample), 1, out);
+ static bool connect_sco(void)
+@@ -2577,8 +2582,12 @@ static void bt_sco_connect(const void *buf, uint16_t len)
+ 
+ 	DBG("");
+ 
+-	if (!device.sco)
+-		goto failed;
++	if (!device.sco) {
++		DBG("SCO is not established, connecting...");
++		if (!connect_audio())
++			goto failed;
++		return;
 +	}
-+}
-+
- static void *read_thread(void *data)
- {
- 	int (*filbuff_cb) (short*, void*) = feed_from_in;
--	short buffer[buffer_size / sizeof(short)];
-+	short buffer[buffer_size_in / sizeof(short)];
- 	size_t len = 0;
- 	void *cb_data = NULL;
-+	FILE *out = data;
  
- 	pthread_mutex_lock(&state_mutex);
- 	current_state = STATE_PLAYING;
-@@ -266,9 +285,18 @@ static void *read_thread(void *data)
- 		pthread_mutex_unlock(&state_mutex);
- 
- 		len = filbuff_cb(buffer, cb_data);
--		haltest_info("len %zd\n", len);
-+
-+		haltest_info("Read %zd bytes\n", len);
-+
-+		if (out) {
-+			write_stereo_pcm16((char *) buffer, len, out);
-+			haltest_info("Written %zd bytes\n", len * 2);
-+		}
- 	} while (len);
- 
-+	if (out)
-+		fclose(out);
-+
- 	pthread_mutex_lock(&state_mutex);
- 	current_state = STATE_STOPPED;
- 	pthread_mutex_unlock(&state_mutex);
-@@ -355,9 +383,26 @@ static void loop_p(int argc, const char **argv)
- 
- static void read_p(int argc, const char **argv)
- {
-+	const char *fname = NULL;
-+	FILE *out = NULL;
-+
- 	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_in);
- 
-+	if (argc < 3) {
-+		haltest_error("Invalid audio file path.\n");
-+		haltest_info("Using read and through away\n");
-+	} else {
-+		fname = argv[2];
-+		out = fopen(fname, "w");
-+		if (!out) {
-+			haltest_error("Cannot open file: %s\n", fname);
-+			return;
-+		}
-+
-+		haltest_info("Reading to file: %s\n", fname);
-+	}
-+
- 	if (!buffer_size_in) {
- 		haltest_error("Invalid buffer sizes. Streams opened\n");
- 		return;
-@@ -371,10 +416,10 @@ static void read_p(int argc, const char **argv)
- 	}
- 	pthread_mutex_unlock(&state_mutex);
- 
--	if (pthread_create(&play_thread, NULL, read_thread,
--							stream_in) != 0)
-+	if (pthread_create(&play_thread, NULL, read_thread, out) != 0) {
- 		haltest_error("Cannot create playback thread!\n");
--
-+		fclose(out);
-+	}
- }
- 
- static void stop_p(int argc, const char **argv)
+ 	err = NULL;
+ 	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
 -- 
 1.8.3.2
 
