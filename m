@@ -1,48 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCV2 01/28] android/ipc: Add ipc_is_connected() check
-Date: Wed,  4 Jun 2014 17:17:32 +0300
-Message-Id: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/gatt: Set attrib MTU correctly
+Date: Wed,  4 Jun 2014 14:54:08 +0200
+Message-Id: <1401886448-28463-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Checks that ipc is connected
+We should set g_attrib mtu with MIN of two values: Remote Rx MTU
+and local Tx MTU. In previous solution once we set g_attrib mtu, we
+could only reduce MTU (because we took previously set g_attrib MTU
+and Remote Rx MTU). It affected cases when remote wanted to increase
+MTU.
 ---
- android/ipc.c | 5 +++++
- android/ipc.h | 1 +
- 2 files changed, 6 insertions(+)
+ android/gatt.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/android/ipc.c b/android/ipc.c
-index 8cd34ea..137e6f9 100644
---- a/android/ipc.c
-+++ b/android/ipc.c
-@@ -287,6 +287,11 @@ static gboolean cmd_connect_cb(GIOChannel *io, GIOCondition cond,
- 	return FALSE;
- }
+diff --git a/android/gatt.c b/android/gatt.c
+index 429181f..5bf7694 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4857,8 +4857,8 @@ static uint8_t read_request(const uint8_t *cmd, uint16_t cmd_len,
+ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 							struct gatt_device *dev)
+ {
+-	uint16_t mtu, imtu;
+-	size_t omtu;
++	uint16_t mtu, imtu, omtu;
++	size_t length;
+ 	GIOChannel *io;
+ 	GError *gerr = NULL;
+ 	uint16_t len;
+@@ -4877,6 +4877,7 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
  
-+bool ipc_is_connected(struct ipc *ipc)
-+{
-+	return ipc->cmd_watch;
-+}
-+
- struct ipc *ipc_init(const char *path, size_t size, int max_service_id,
- 					bool notifications,
- 					ipc_disconnect_cb cb, void *cb_data)
-diff --git a/android/ipc.h b/android/ipc.h
-index cc4e92d..171a77c 100644
---- a/android/ipc.h
-+++ b/android/ipc.h
-@@ -36,6 +36,7 @@ struct ipc;
+ 	bt_io_get(io, &gerr,
+ 			BT_IO_OPT_IMTU, &imtu,
++			BT_IO_OPT_OMTU, &omtu,
+ 			BT_IO_OPT_INVALID);
+ 	if (gerr) {
+ 		error("bt_io_get: %s", gerr->message);
+@@ -4884,10 +4885,10 @@ static uint8_t mtu_att_handle(const uint8_t *cmd, uint16_t cmd_len,
+ 		return ATT_ECODE_UNLIKELY;
+ 	}
  
- typedef void (*ipc_disconnect_cb) (void *data);
+-	rsp = g_attrib_get_buffer(dev->attrib, &omtu);
++	rsp = g_attrib_get_buffer(dev->attrib, &length);
  
-+bool ipc_is_connected(struct ipc *ipc);
- struct ipc *ipc_init(const char *path, size_t size, int max_service_id,
- 					bool notifications,
- 					ipc_disconnect_cb cb, void *cb_data);
+ 	/* Respond with our IMTU */
+-	len = enc_mtu_resp(imtu, rsp, omtu);
++	len = enc_mtu_resp(imtu, rsp, length);
+ 	if (!len)
+ 		return ATT_ECODE_UNLIKELY;
+ 
 -- 
-1.8.3.2
+1.9.0
 
