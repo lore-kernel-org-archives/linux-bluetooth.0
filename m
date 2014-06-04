@@ -1,34 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 4 Jun 2014 22:39:30 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] core: Fix cleaning pending services when ACL
- connection failed
-Message-ID: <20140604193930.GA6929@t440s.P-661HNU-F1>
-References: <1401894885-7444-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Message-ID: <538F75A0.8010609@ahsoftware.de>
+Date: Wed, 04 Jun 2014 21:38:08 +0200
+From: Alexander Holler <holler@ahsoftware.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1401894885-7444-1-git-send-email-andrzej.kaczmarek@tieto.com>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Use struct delayed_work for HCI command timeout
+References: <1401586702-54238-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1401586702-54238-1-git-send-email-marcel@holtmann.org>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+Am 01.06.2014 03:38, schrieb Marcel Holtmann:
+> This is an experimental patch that converts hdev->cmd_timer from
+> struct timer_list to struct delayed_work.
 
-On Wed, Jun 04, 2014, Andrzej Kaczmarek wrote:
-> In case ACL connection failed to establish, all pending services shall
-> be always removed. At the moment it's only done in case there's pending
-> Connect message which does not take into account reconnect scenario,
-> i.e. service connection was triggered by reconnection timeout and there
-> is no pending message.
-> 
-> In such case, when reconnection failed there will be some services on
-> pending list and subsequent reconnect attempts will fail with EBUSY
-> immediately.
-> ---
->  src/device.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+I don't know what this patch should change.
 
-Both patches have been applied. Thanks.
+If I understand it correctly, a workqueue is used instead of a timer. 
+But besides that nothing else was changed. So instead of a timer, a work 
+now kills the hci-cmd-task and posts an error. And that is exactly what 
+happened here. So after one (failed) try, I've gone back to use my 2 
+small patches.
 
-Johan
+Regards,
+
+Alexander Holler
