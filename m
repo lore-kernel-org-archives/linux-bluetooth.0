@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCV2 02/28] android/handsfree: Connect SCO audio on demand
-Date: Wed,  4 Jun 2014 17:17:33 +0300
-Message-Id: <1401891479-11965-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCV2 24/28] android/hal-sco: Add stream synchronization
+Date: Wed,  4 Jun 2014 17:17:55 +0300
+Message-Id: <1401891479-11965-24-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,47 +12,212 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/handsfree.c | 13 +++++++++++--
- 1 file changed, 11 insertions(+), 2 deletions(-)
+ android/hal-sco.c | 81 ++++++++++++++++++++++++++++++++++++++-----------------
+ 1 file changed, 57 insertions(+), 24 deletions(-)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index b530aa9..49e6a22 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -169,6 +169,8 @@ static GIOChannel *hsp_server = NULL;
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index fe0d98c..955f511 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -54,6 +54,9 @@ static pthread_mutex_t sco_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static pthread_t ipc_th = 0;
+ static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
  
- static GIOChannel *sco_server = NULL;
- 
-+static void bt_sco_connect(const void *buf, uint16_t len);
++static struct sco_stream_in *sco_stream_in = NULL;
++static struct sco_stream_out *sco_stream_out = NULL;
 +
- static void device_set_state(uint8_t state)
- {
- 	struct hal_ev_handsfree_conn_state ev;
-@@ -892,6 +894,9 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 							sco_watch_cb, NULL);
+ struct sco_audio_config {
+ 	uint32_t rate;
+ 	uint32_t channels;
+@@ -78,6 +81,18 @@ struct sco_stream_out {
+ 	uint32_t resample_frame_num;
+ };
  
- 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
++static void sco_close_socket(void)
++{
++	DBG("sco fd %d", sco_fd);
 +
-+	if (ipc_is_connected(sco_ipc))
-+		bt_sco_connect(NULL, 0);
++	if (sco_fd < 0)
++		return;
++
++	shutdown(sco_fd, SHUT_RDWR);
++	close(sco_fd);
++	sco_fd = -1;
++}
++
+ struct sco_stream_in {
+ 	struct audio_stream_in stream;
+ 
+@@ -428,6 +443,9 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 
+ 	DBG("write to fd %d bytes %zu", sco_fd, bytes);
+ 
++	if (sco_fd < 0)
++		return -1;
++
+ 	if (!out->downmix_buf) {
+ 		error("sco: downmix buffer not initialized");
+ 		return -1;
+@@ -606,17 +624,22 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 
+ 	DBG("config %p device flags 0x%02x", config, devices);
+ 
++	if (sco_stream_out) {
++		DBG("stream_out already open");
++		return -EIO;
++	}
++
+ 	if (ipc_connect_sco() != SCO_STATUS_SUCCESS) {
+ 		error("sco: cannot get fd");
+ 		return -EIO;
+ 	}
+ 
+-	DBG("got sco fd %d mtu %u", sco_fd, sco_mtu);
+-
+ 	out = calloc(1, sizeof(struct sco_stream_out));
+ 	if (!out)
+ 		return -ENOMEM;
+ 
++	DBG("stream %p sco fd %d mtu %u", out, sco_fd, sco_mtu);
++
+ 	out->stream.common.get_sample_rate = out_get_sample_rate;
+ 	out->stream.common.set_sample_rate = out_set_sample_rate;
+ 	out->stream.common.get_buffer_size = out_get_buffer_size;
+@@ -701,6 +724,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ skip_resampler:
+ 	*stream_out = &out->stream;
+ 	adev->out = out;
++	sco_stream_out = out;
+ 
+ 	return 0;
+ failed:
+@@ -712,25 +736,11 @@ failed:
+ 	free(out);
+ 	stream_out = NULL;
+ 	adev->out = NULL;
++	sco_stream_out = NULL;
+ 
+ 	return ret;
  }
  
- static bool connect_sco(void)
-@@ -2577,8 +2582,12 @@ static void bt_sco_connect(const void *buf, uint16_t len)
+-static void close_sco_socket(void)
+-{
+-	DBG("");
+-
+-	pthread_mutex_lock(&sco_mutex);
+-
+-	if (sco_fd >= 0) {
+-		shutdown(sco_fd, SHUT_RDWR);
+-		close(sco_fd);
+-		sco_fd = -1;
+-	}
+-
+-	pthread_mutex_unlock(&sco_mutex);
+-}
+-
+ static void sco_close_output_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_out *stream_out)
+ {
+@@ -739,8 +749,6 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
  
- 	DBG("");
+ 	DBG("dev %p stream %p fd %d", dev, out, sco_fd);
  
--	if (!device.sco)
--		goto failed;
-+	if (!device.sco) {
-+		DBG("SCO is not established, connecting...");
-+		if (!connect_audio())
-+			goto failed;
-+		return;
-+	}
+-	close_sco_socket();
+-
+ 	if (out->resampler) {
+ 		release_resampler(out->resampler);
+ 		free(out->resample_buf);
+@@ -750,6 +758,15 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
+ 	free(out->downmix_buf);
+ 	free(out);
+ 	sco_dev->out = NULL;
++
++	pthread_mutex_lock(&sco_mutex);
++
++	sco_stream_out = NULL;
++
++	if (!sco_stream_in)
++		sco_close_socket();
++
++	pthread_mutex_unlock(&sco_mutex);
+ }
  
- 	err = NULL;
- 	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
+ static int sco_set_parameters(struct audio_hw_device *dev,
+@@ -990,6 +1007,9 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+ 
+ 	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
+ 
++	if (sco_fd < 0)
++		return -1;
++
+ 	if (!in->resampler && in->cfg.rate != AUDIO_STREAM_SCO_RATE) {
+ 		error("Cannot find resampler");
+ 		return -1;
+@@ -1053,15 +1073,18 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 
+ 	DBG("config %p device flags 0x%02x", config, devices);
+ 
+-	if (ipc_connect_sco() != SCO_STATUS_SUCCESS) {
+-		error("sco: cannot get fd");
+-		return -EIO;
++	if (sco_stream_in) {
++		DBG("stream_in already open");
++		ret = -EIO;
++		goto failed2;
+ 	}
+ 
+ 	in = calloc(1, sizeof(struct sco_stream_in));
+ 	if (!in)
+ 		return -ENOMEM;
+ 
++	DBG("stream %p sco fd %d mtu %u", in, sco_fd, sco_mtu);
++
+ 	in->stream.common.get_sample_rate = in_get_sample_rate;
+ 	in->stream.common.set_sample_rate = in_set_sample_rate;
+ 	in->stream.common.get_buffer_size = in_get_buffer_size;
+@@ -1127,14 +1150,17 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ skip_resampler:
+ 	*stream_in = &in->stream;
+ 	sco_dev->in = in;
++	sco_stream_in = in;
+ 
+ 	return 0;
+ failed:
+ 	if (in->resampler)
+ 		release_resampler(in->resampler);
+ 	free(in);
++failed2:
+ 	stream_in = NULL;
+ 	sco_dev->in = NULL;
++	sco_stream_in = NULL;
+ 
+ 	return ret;
+ }
+@@ -1147,8 +1173,6 @@ static void sco_close_input_stream(struct audio_hw_device *dev,
+ 
+ 	DBG("dev %p stream %p fd %d", dev, in, sco_fd);
+ 
+-	close_sco_socket();
+-
+ 	if (in->resampler) {
+ 		release_resampler(in->resampler);
+ 		free(in->resample_buf);
+@@ -1156,6 +1180,15 @@ static void sco_close_input_stream(struct audio_hw_device *dev,
+ 
+ 	free(in);
+ 	sco_dev->in = NULL;
++
++	pthread_mutex_lock(&sco_mutex);
++
++	sco_stream_in = NULL;
++
++	if (!sco_stream_out)
++		sco_close_socket();
++
++	pthread_mutex_unlock(&sco_mutex);
+ }
+ 
+ static int sco_dump(const audio_hw_device_t *device, int fd)
 -- 
 1.8.3.2
 
