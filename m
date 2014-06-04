@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFCV2 03/28] android/hal-sco: Use nanosleep for SCO synchronization
-Date: Wed,  4 Jun 2014 17:17:34 +0300
-Message-Id: <1401891479-11965-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [RFCV2 10/28] android/haltest: Add open/close input stream commands
+Date: Wed,  4 Jun 2014 17:17:41 +0300
+Message-Id: <1401891479-11965-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1401891479-11965-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,111 +12,87 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 56 +++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 42 insertions(+), 14 deletions(-)
+ android/client/if-sco.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 5888275..701d15e 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -64,6 +64,8 @@ struct sco_stream_out {
- 	int fd;
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+index b7f5a80..c71d0b4 100644
+--- a/android/client/if-sco.c
++++ b/android/client/if-sco.c
+@@ -23,8 +23,10 @@
  
- 	uint8_t *downmix_buf;
-+	size_t samples;
-+	struct timespec start;
+ audio_hw_device_t *if_audio_sco = NULL;
+ static struct audio_stream_out *stream_out = NULL;
++static struct audio_stream_in *stream_in = NULL;
  
- 	struct resampler_itfe *resampler;
- 	int16_t *resample_buf;
-@@ -277,6 +279,21 @@ static void downmix_to_mono(struct sco_stream_out *out, const uint8_t *buffer,
- 	}
+ static size_t buffer_size = 0;
++static size_t buffer_size_in = 0;
+ static pthread_t play_thread = 0;
+ static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -340,6 +342,53 @@ static void close_output_stream_p(int argc, const char **argv)
+ 	buffer_size = 0;
  }
  
-+static uint64_t timespec_diff_us(struct timespec *a, struct timespec *b)
++static void open_input_stream_p(int argc, const char **argv)
 +{
-+	struct timespec res;
++	int err;
 +
-+	res.tv_sec = a->tv_sec - b->tv_sec;
-+	res.tv_nsec = a->tv_nsec - b->tv_nsec;
++	RETURN_IF_NULL(if_audio_sco);
 +
-+	if (res.tv_nsec < 0) {
-+		res.tv_sec--;
-+		res.tv_nsec += 1000000000ll; /* 1sec */
++	pthread_mutex_lock(&state_mutex);
++	if (current_state == STATE_PLAYING) {
++		haltest_error("Already playing!\n");
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++	pthread_mutex_unlock(&state_mutex);
++
++	err = if_audio_sco->open_input_stream(if_audio_sco,
++						0,
++						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
++						NULL,
++						&stream_in);
++	if (err < 0) {
++		haltest_error("open output stream returned %d\n", err);
++		return;
 +	}
 +
-+	return res.tv_sec * 1000000ll + res.tv_nsec / 1000ll;
++	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
++	if (buffer_size_in == 0)
++		haltest_error("Invalid buffer size received!\n");
++	else
++		haltest_info("Using buffer size: %zu\n", buffer_size_in);
 +}
 +
- static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 								size_t bytes)
++static void close_input_stream_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_in);
++
++	stop_p(argc, argv);
++
++	haltest_info("Waiting for playback thread...\n");
++	pthread_join(play_thread, NULL);
++
++	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
++
++	stream_in = NULL;
++	buffer_size_in = 0;
++}
++
+ static void cleanup_p(int argc, const char **argv)
  {
-@@ -284,13 +301,13 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 	size_t len, written = 0;
- 	int ret;
- 	uint16_t mtu = /* out->cfg.mtu */ 48;
--	uint8_t read_buf[mtu];
--	bool do_write = false;
-+	uint64_t audio_sent_us, audio_passed_us;
- 
- 	pfd.fd = out->fd;
- 	pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
- 
- 	while (bytes > written) {
-+		struct timespec now;
- 
- 		/* poll for sending */
- 		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
-@@ -303,27 +320,38 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 			return false;
- 		}
- 
--		/* FIXME synchronize by time instead of read() */
--		if (pfd.revents & POLLIN) {
--			ret = read(out->fd, read_buf, mtu);
--			if (ret < 0) {
--				error("Error reading fd %d (%s)", out->fd,
--							strerror(errno));
--				return false;
--			}
- 
--			do_write = true;
-+		clock_gettime(CLOCK_REALTIME, &now);
-+		/* Mark start of the stream */
-+		if (!out->samples)
-+			memcpy(&out->start, &now, sizeof(out->start));
-+
-+		audio_sent_us = out->samples * 1000000ll / AUDIO_STREAM_SCO_RATE;
-+		audio_passed_us = timespec_diff_us(&now, &out->start);
-+		if ((int) (audio_sent_us - audio_passed_us) > 1500) {
-+			struct timespec timeout = {0,
-+						(audio_sent_us -
-+						 audio_passed_us) * 1000};
-+			DBG("Sleeping for %d ms",
-+					(int) (audio_sent_us - audio_passed_us));
-+			nanosleep(&timeout, NULL);
-+		} else if ((int)(audio_passed_us - audio_sent_us) > 50000) {
-+			DBG("\n\nResync\n\n");
-+			out->samples = 0;
-+			memcpy(&out->start, &now, sizeof(out->start));
- 		}
- 
--		if (!do_write)
--			continue;
- 
- 		len = bytes - written > mtu ? mtu : bytes - written;
- 
- 		ret = write(out->fd, buffer + written, len);
- 		if (ret > 0) {
- 			written += ret;
--			do_write = false;
-+
-+			out->samples += ret / 2;
-+
-+			DBG("written %d samples %zd total %zd bytes",
-+					ret, out->samples, written);
- 			continue;
- 		}
- 
+ 	int err;
+@@ -499,6 +548,8 @@ static struct method methods[] = {
+ 	STD_METHOD(cleanup),
+ 	STD_METHOD(open_output_stream),
+ 	STD_METHOD(close_output_stream),
++	STD_METHOD(open_input_stream),
++	STD_METHOD(close_input_stream),
+ 	STD_METHODH(play, "<path to pcm file>"),
+ 	STD_METHOD(stop),
+ 	STD_METHOD(suspend),
 -- 
 1.8.3.2
 
