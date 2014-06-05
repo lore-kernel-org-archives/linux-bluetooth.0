@@ -1,45 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Thu, 5 Jun 2014 17:46:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Assign L2CAP socket priority when allocating
+ SKB
+Message-ID: <20140605144637.GA20662@t440s.P-661HNU-F1>
+References: <1401974571-19264-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <1401979897-6920-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1401979897-6920-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-From: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Date: Thu, 5 Jun 2014 17:18:27 +0200
-Message-ID: <CAF3PWx1PcCFvr_H1Ru6kLY84FhAED2tjEaU=bjx=kHiPtR90UQ@mail.gmail.com>
-Subject: Re: [PATCH] android/hal-audio: Fix memory leak
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1401974571-19264-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On 5 June 2014 16:51, Andrei Emeltchenko
-<Andrei.Emeltchenko.news@gmail.com> wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
->
-> Fixes clang warning:
-> ...
-> android/hal-audio.c:484:3: warning: Potential leak of memory pointed to
-> by 'preset'
-> ...
+On Thu, Jun 05, 2014, Marcel Holtmann wrote:
+> The SKB for L2CAP sockets are all allocated in a central callback
+> in the socket support. Instead of having to pass around the socket
+> priority all the time, assign it to skb->priority when actually
+> allocating the SKB.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  android/hal-audio.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/android/hal-audio.c b/android/hal-audio.c
-> index 439b583..4d3cdb1 100644
-> --- a/android/hal-audio.c
-> +++ b/android/hal-audio.c
-> @@ -482,6 +482,7 @@ static bool open_endpoint(struct audio_endpoint **epp,
->
->         if (!ep) {
->                 error("Cound not find opened endpoint");
-> +               free(preset);
->                 return false;
->         }
+>  include/net/bluetooth/l2cap.h |  3 +--
+>  net/bluetooth/a2mp.c          |  2 +-
+>  net/bluetooth/l2cap_core.c    | 23 +++++++----------------
+>  net/bluetooth/l2cap_sock.c    |  4 +++-
+>  4 files changed, 12 insertions(+), 20 deletions(-)
 
-I'd rather do 'goto failed' here so we also close fd.
+Applied to bluetooth-next. Thanks.
 
-BR,
-Andrzej
+Johan
