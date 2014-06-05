@@ -1,30 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Jun 2014 15:29:11 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: Adam Lee <adam8157@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: ath3k: reduce pipe setting times in
- ath3k_load_fwfile()
-Message-ID: <20140605182911.GB1944@joana>
-References: <20140527131548.GB2034@joana>
- <1401976064-6736-1-git-send-email-adam8157@gmail.com>
+Date: Thu, 5 Jun 2014 14:10:18 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-06-01
+Message-ID: <20140605181018.GE3621@tuxdriver.com>
+References: <20140602140636.GA1659@joana>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1401976064-6736-1-git-send-email-adam8157@gmail.com>
+In-Reply-To: <20140602140636.GA1659@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Adam,
-
-2014-06-05 Adam Lee <adam8157@gmail.com>:
-
-> Invoking usb_sndbulkpipe() on same pipe for same purpose only once is
-> enough.
+On Mon, Jun 02, 2014 at 11:06:36AM -0300, Gustavo Padovan wrote:
+> Hi John,
 > 
-> Signed-off-by: Adam Lee <adam8157@gmail.com>
+> Here some more patches for 3.16. We know that Linus already opened the merge
+> window, but this is fix only pull request, and most of the patches here are
+> also tagged for stable.
+> 
+> Please pull! or let me know of any issues. Thanks!
+> 
+> 	Gustavo
+> 
 > ---
->  drivers/bluetooth/ath3k.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> The following changes since commit d7b2545023ecfde94d3ea9c03c5480ac18da96c9:
+> 
+>   Bluetooth: Clearly distinguish mgmt LTK type from authenticated property (2014-05-23 11:24:04 -0700)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 8a96f3cd22878fc0bb564a8478a6e17c0b8dca73:
+> 
+>   Bluetooth: Fix L2CAP deadlock (2014-06-02 13:38:19 +0300)
 
-Patch has been applied to bluetooth-next. Thanks.
+Pulling now...
 
-	Gustavo
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
