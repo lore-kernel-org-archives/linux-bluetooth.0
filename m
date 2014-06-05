@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix incorrectly overriding conn->src_type
-Date: Thu,  5 Jun 2014 12:19:54 +0300
-Message-Id: <1401959994-9611-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1401958444-6623-1-git-send-email-johan.hedberg@gmail.com>
-References: <1401958444-6623-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix incorrectly overriding conn->src_type
+Date: Thu,  5 Jun 2014 11:54:04 +0300
+Message-Id: <1401958444-6623-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -16,14 +14,12 @@ type of the src_member. It should never be overridden. There is already
 code in place in the command status handler of HCI_LE_Create_Connection
 to copy the right initiator address into conn->init_addr_type.
 
-Without this patch, if privacy is enabled, we will send the wrong
-address type in the SMP identity address information PDU (it'll e.g.
-contain our public address but a random address type).
+Without this patch, if privacy is enable, e.g. disconnection events to
+user space will contain the identity address by the wrong address type
+(e.g. public address with random address type).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Reworded misleading commit message
-
  net/bluetooth/hci_conn.c | 5 -----
  1 file changed, 5 deletions(-)
 
