@@ -1,44 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 5 Jun 2014 20:38:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andre Guedes <andre.guedes@openbossa.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android: Fix compile error
-Message-ID: <20140605173818.GA8098@t440s.P-661HNU-F1>
-References: <1401720579-18551-1-git-send-email-andre.guedes@openbossa.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1401720579-18551-1-git-send-email-andre.guedes@openbossa.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 1/2] android/client: Fix reversing send_response values
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1401985955-13502-1-git-send-email-marcin.kraglak@tieto.com>
+Date: Thu, 5 Jun 2014 18:54:51 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <98CCDBAF-AEE9-40C7-AD1D-C8CEC69FDA9A@holtmann.org>
+References: <1401985955-13502-1-git-send-email-marcin.kraglak@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Marcin,
 
-On Mon, Jun 02, 2014, Andre Guedes wrote:
-> During configure, if SBC is not installed in the system, we may use
-> SBC_CFLAGS and SBC_LIBS variables to indicate where SBC headers and
-> binaries can be found.
-> 
-> However, SBC_CFLAGS variable is not used in android/Makefile.am,
-> causing the following compile error:
-> 
-> $ ./bootstrap-configure SBC_CFLAGS=-I../sbc SBC_LIBS=-L../sbc/src/
-> $ make
-> 
-> (...)
-> 
-> android/hal-audio-sbc.c:22:21: fatal error: sbc/sbc.h: No such file or directory
->  #include <sbc/sbc.h>
-> ^
-> compilation terminated.
-> make[1]: *** [android/android_audio_a2dp_default_la-hal-audio-sbc.lo] Error 1
-> 
-> This patch fixes this error by appending SBC_CFLAGS to android_audio_
-> a2dp_default_la_CFLAGS.
+> We don't want to reverse data passed to send_response.
 > ---
->  android/Makefile.am | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> android/client/if-gatt.c | 32 +++++++++++++++++++++++++++-----
+> 1 file changed, 27 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+> index 0375126..a9c8644 100644
+> --- a/android/client/if-gatt.c
+> +++ b/android/client/if-gatt.c
+> @@ -1750,6 +1750,30 @@ static void gatts_send_indication_p(int argc, const char *argv[])
+> 							len, confirm, data);
+> }
+> 
+> +/*
+> + * convert hex string to uint8_t array
+> + */
+> +static int fill_buffer(const char *str, uint8_t *out, int out_size)
+> +{
+> +	int len = strlen(str);
+> +	int length = 0;
+> +	int i;
+> +
+> +	memset(out, 0, out_size);
+> +	if (out_size * 2 > len + 1)
+> +		out_size = (len + 1) / 2;
+> +
+> +	for (i = 0; i < out_size && len > length; ++i) {
+> +		if (len >= length)
+> +			sscanf(str + length, "%02hhx", &out[i]);
+> +		else
+> +			sscanf(str, "%1hhx", &out[i]);
+> +		length += 2;
+> +	}
+> +
+> +	return len/2;
+> +}
 
-Applied. Thanks.
+it is just the client code, but what is this function doing? My brain seriously takes a core dump trying to understand this.
 
-Johan
+Has anybody actually looked into decode_hex_own_buf or similar from oFono. Using sscanf seems the most inefficient way of handling this.
+
+Regards
+
+Marcel
+
