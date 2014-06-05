@@ -1,41 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/client: Fix handling hex test arguments
-Date: Thu,  5 Jun 2014 13:08:41 +0200
-Message-Id: <1401966521-32270-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 2/3] android/client: Add additional support for handling hex values
+Date: Thu,  5 Jun 2014 13:08:40 +0200
+Message-Id: <1401966521-32270-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1401966521-32270-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1401966521-32270-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch allows to pass as argument hex and int values as test command
-argument. Hex values must be prefixed by '0x' or '0X'.
+This patch allows to handle properly hex values prefixed by "0x" or
+"0X" as function parameter.
 ---
  android/client/if-gatt.c | 3 ++-
  1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 652c0f8..178770d 100644
+index f6e6327..652c0f8 100644
 --- a/android/client/if-gatt.c
 +++ b/android/client/if-gatt.c
-@@ -68,6 +68,7 @@ const btgatt_interface_t *if_gatt = NULL;
- #define VERIFY_TRANS_ID(n, v) VERIFY_INT_ARG(n, v, "No trans_id specified\n")
- #define VERIFY_STATUS(n, v) VERIFY_INT_ARG(n, v, "No status specified\n")
- #define VERIFY_OFFSET(n, v) VERIFY_INT_ARG(n, v, "No offset specified\n")
-+#define VERIFY_TEST_ARG(n, v) VERIFY_INT_ARG(n, v, "No test arg specified\n")
- #define VERIFY_HANDLE(n, v) VERIFY_HEX_ARG(n, v, "No "#v" specified\n")
- #define VERIFY_SERVICE_HANDLE(n, v) VERIFY_HANDLE(n, v)
+@@ -40,10 +40,11 @@ const btgatt_interface_t *if_gatt = NULL;
+ #define MAX_READ_PARAMS_STR_LEN (MAX_SRVC_ID_STR_LEN + MAX_CHAR_ID_STR_LEN \
+ 		+ MAX_UUID_STR_LEN + MAX_HEX_VAL_STR_LEN + 80)
  
-@@ -1406,7 +1407,7 @@ static void test_command_p(int argc, const char **argv)
- 	VERIFY_UUID(4, &uuid);
- 
- 	for (i = 5; i < argc; i++)
--		*u++ = atoi(argv[i]);
-+		VERIFY_TEST_ARG(i, *u++);
- 
- 	EXEC(if_gatt->client->test_command, command, &params);
- }
++/* Hex arguments must have "0x" or "0X" prefix */
+ #define VERIFY_INT_ARG(n, v, err) \
+ 	do { \
+ 		if (n < argc) \
+-			v = atoi(argv[n]); \
++			v = strtol(argv[n], NULL, 0); \
+ 		else { \
+ 			haltest_error(err); \
+ 			return;\
 -- 
 1.9.2
 
