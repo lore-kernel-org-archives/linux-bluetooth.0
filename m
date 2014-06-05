@@ -1,110 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 BlueZ 1/4] unit/test-avrcp: Add /TP/RCR/BV-02-C test
-Date: Thu,  5 Jun 2014 14:45:44 +0300
-Message-Id: <1401968747-11848-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <0DD74990-7D04-4415-810D-3D75B073742A@holtmann.org>
+References: <1401966105-31223-1-git-send-email-bharat.panda@samsung.com>
+	<0DD74990-7D04-4415-810D-3D75B073742A@holtmann.org>
+Date: Thu, 5 Jun 2014 17:10:18 +0530
+Message-ID: <CANBo3n89N56u8NCpd52EoEZSPxDmZjN9_GxHjSXVnT_V=5BO2A@mail.gmail.com>
+Subject: Re: [PATCH ] profiles: Fix crash due to NULL pointer access
+From: bharat panda <bharat22bhusan@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Bharat Panda <bharat.panda@samsung.com>,
+	linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-To verify that the TG can handle fragmentation correctly.
----
-v2: Fix not copying from offset.
-v3: Add define for AV/C data offset so it can be taken into account when
-calculating the amount of bytes that can fit in a single packet.
+>> NULL pointer check is added after memory allocation
+>> to prevent core dump due to NULL pointer access.
+>>
+>> Signed-off-by: Bharat Panda <bharat.panda@samsung.com>
+>> ---
+>> profiles/audio/a2dp.c  |    8 ++++++++
+>> profiles/audio/avctp.c |    4 ++++
+>> profiles/audio/avdtp.c |   16 ++++++++++++++++
+>> profiles/health/hdp.c  |    4 +++-
+>> profiles/health/mcap.c |    2 ++
+>> 5 files changed, 33 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+>> index c9dac9a..580cb60 100644
+>> --- a/profiles/audio/a2dp.c
+>> +++ b/profiles/audio/a2dp.c
+>> @@ -523,6 +523,8 @@ static gboolean endpoint_getcap_ind(struct avdtp *session,
+>>                                                       a2dp_sep->user_data);
+>>
+>>       codec_caps = g_malloc0(sizeof(*codec_caps) + length);
+>> +     if(!codec_caps)
+>> +             return -ENOMEM;
+>
+> the only way this can return NULL is when the size argument is 0. In all other cases it will abort the program.
+>
+In one of our a2dp connection test, we found it restarted bluetoothd,
+and failed to store the capabilities because of NULL pointer abort.
+Just to avoid same issue in other cases, I have added this check to
+ignore the abort.
 
- unit/test-avrcp.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 45 insertions(+), 2 deletions(-)
 
-diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
-index c41f2e6..eddce41 100644
---- a/unit/test-avrcp.c
-+++ b/unit/test-avrcp.c
-@@ -46,6 +46,7 @@
- struct test_pdu {
- 	bool valid;
- 	bool fragmented;
-+	bool continuing;
- 	bool browse;
- 	const uint8_t *data;
- 	size_t size;
-@@ -93,6 +94,14 @@ struct context {
- 		.size = sizeof(data(args)),			\
- 	}
- 
-+#define cont_pdu(args...)					\
-+	{							\
-+		.valid = true,					\
-+		.continuing = true,				\
-+		.data = data(args),				\
-+		.size = sizeof(data(args)),			\
-+	}
-+
- #define define_test(name, function, args...)				\
- 	do {								\
- 		const struct test_pdu pdus[] = {			\
-@@ -195,7 +204,8 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
- 	if (g_test_verbose())
- 		util_hexdump('>', buf, len, test_debug, "AVRCP: ");
- 
--	g_assert_cmpint(len, ==, pdu->size);
-+	if (!pdu->continuing)
-+		g_assert_cmpint(len, ==, pdu->size);
- 
- 	g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
- 
-@@ -486,9 +496,20 @@ static int get_element_attributes(struct avrcp *session, uint8_t transaction,
- 					uint64_t uid, uint8_t number,
- 					uint32_t *attrs, void *user_data)
- {
-+	struct context *context = user_data;
-+
- 	DBG("");
- 
--	avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
-+	if (g_str_equal(context->data->test_name, "/TP/RCR/BV-02-C")) {
-+		uint8_t params[1024];
-+
-+		memset(params, 0x00, sizeof(params) / 2);
-+		memset(params + (sizeof(params) / 2), 0xff, sizeof(params) / 2);
-+
-+		avrcp_get_element_attrs_rsp(session, transaction, params,
-+							sizeof(params));
-+	} else
-+		avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
- 
- 	return -EAGAIN;
- }
-@@ -1623,5 +1644,27 @@ int main(int argc, char *argv[])
- 				0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
- 				0x00, 0x00, 0x01, 0x00));
- 
-+	/* Request continuing response - TG */
-+	define_test("/TP/RCR/BV-02-C", test_server,
-+			raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
-+				0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
-+			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x01, 0x01, 0xf9),
-+			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
-+				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
-+			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x02, 0x01, 0xf9),
-+			raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
-+				0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
-+			cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
-+				0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
-+				0x03, 0x00, 0x0e));
-+
- 	return g_test_run();
- }
 -- 
-1.9.3
-
+Regards
+Bharat
