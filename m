@@ -1,77 +1,126 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Marcin Kraglak <marcin.kraglak@tieto.com>, linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/client: Fix reversing send_response values
-Date: Fri, 06 Jun 2014 06:14:05 +0200
-Message-ID: <1969057.WmnuWKjhxa@leonov>
-In-Reply-To: <98CCDBAF-AEE9-40C7-AD1D-C8CEC69FDA9A@holtmann.org>
-References: <1401985955-13502-1-git-send-email-marcin.kraglak@tieto.com> <98CCDBAF-AEE9-40C7-AD1D-C8CEC69FDA9A@holtmann.org>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] android/gatt: Set attrib MTU correctly
+Date: Fri, 06 Jun 2014 06:10:38 +0200
+Message-ID: <15758554.8aJB8G2yDj@leonov>
+In-Reply-To: <CABD6X-KPBwXOc=SjMzG9rbSo4E5wH7o+CdeqXOKHn_CasvMmuA@mail.gmail.com>
+References: <1401886448-28463-1-git-send-email-marcin.kraglak@tieto.com> <31158844.FpJplVcR4q@leonov> <CABD6X-KPBwXOc=SjMzG9rbSo4E5wH7o+CdeqXOKHn_CasvMmuA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin, Marcel,
+Hi Marcin,
 
-On Thursday 05 of June 2014 18:54:51 Marcel Holtmann wrote:
-> Hi Marcin,
+On Wednesday 04 of June 2014 20:31:56 Marcin Kraglak wrote:
+> Hi Szymon,
 > 
-> > We don't want to reverse data passed to send_response.
-> > ---
-> > android/client/if-gatt.c | 32 +++++++++++++++++++++++++++-----
-> > 1 file changed, 27 insertions(+), 5 deletions(-)
+> On 4 June 2014 19:38, Szymon Janc <szymon.janc@tieto.com> wrote:
+> > Hi Marcin,
 > > 
-> > diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-> > index 0375126..a9c8644 100644
-> > --- a/android/client/if-gatt.c
-> > +++ b/android/client/if-gatt.c
-> > @@ -1750,6 +1750,30 @@ static void gatts_send_indication_p(int argc, const
-> > char *argv[])> 
-> > 							len, confirm, data);
+> > On Wednesday 04 of June 2014 14:54:08 Marcin Kraglak wrote:
+> >> We should set g_attrib mtu with MIN of two values: Remote Rx MTU
+> >> and local Tx MTU. In previous solution once we set g_attrib mtu, we
+> >> could only reduce MTU (because we took previously set g_attrib MTU
+> >> and Remote Rx MTU). It affected cases when remote wanted to increase
+> >> MTU
 > > 
-> > }
+> > According to spec:
+> > section 3.4.2.1: "This [Exchange MTU] request shall only be sent once
+> > during a connection by the client."
+> > section 3.4.2.2: "A device's Exchange MTU Request shall contain the same
+> > MTU as the device's Exchange MTU Response (i.e. the MTU shall be
+> > symmetric)."
 > > 
-> > +/*
-> > + * convert hex string to uint8_t array
-> > + */
-> > +static int fill_buffer(const char *str, uint8_t *out, int out_size)
-> > +{
-> > +	int len = strlen(str);
-> > +	int length = 0;
-> > +	int i;
-> > +
-> > +	memset(out, 0, out_size);
-> > +	if (out_size * 2 > len + 1)
-> > +		out_size = (len + 1) / 2;
-> > +
-> > +	for (i = 0; i < out_size && len > length; ++i) {
-> > +		if (len >= length)
-> > +			sscanf(str + length, "%02hhx", &out[i]);
-> > +		else
-> > +			sscanf(str, "%1hhx", &out[i]);
-> > +		length += 2;
-> > +	}
-> > +
-> > +	return len/2;
-> > +}
+> > So if I get the spec correctly it is illegal to increase (or decrease) MTU
+> > after it was exchanged (we should probably respond with error if client is
+> > sending request more than one).
+> > 
+> > Please correct me if I'm wrong.
 > 
-> it is just the client code, but what is this function doing? My brain
-> seriously takes a core dump trying to understand this.
-> 
-> Has anybody actually looked into decode_hex_own_buf or similar from oFono.
-> Using sscanf seems the most inefficient way of handling this.
+> That is not the case. We set g_attrib MTU when g_attrib_new() is called,
+> and then it is set to default value - 23 (gattrib.c:499). While
+> exchanging MTU we
+> get MIN value of g_attrib MTU, which was previously set to 23 and remote
+> MTU. So it was set to 23 again. (It means that we always used default MTU).
+> Now we get remote MTU and local output MTU.
 
-Check hex2buf() in hidhost code.
+Fair enough. This patch is now applied, thanks.
 
 > 
-> Regards
+> Increasing or decreasing MTU even if it was previously exchanged can be a
+> point of discussion, however PTS exchange it two times in test case
+> TP/GAC/SR/BV-01-C. We can create an issue for this case.
+
+I guess PTS errata should be filled to clear this up.
+
 > 
-> Marcel
+> >> .
+> >> ---
+> >> 
+> >>  android/gatt.c | 9 +++++----
+> >>  1 file changed, 5 insertions(+), 4 deletions(-)
+> >> 
+> >> diff --git a/android/gatt.c b/android/gatt.c
+> >> index 429181f..5bf7694 100644
+> >> --- a/android/gatt.c
+> >> +++ b/android/gatt.c
+> >> @@ -4857,8 +4857,8 @@ static uint8_t read_request(const uint8_t *cmd,
+> >> uint16_t cmd_len, static uint8_t mtu_att_handle(const uint8_t *cmd,
+> >> uint16_t cmd_len, struct gatt_device *dev)
+> >> 
+> >>  {
+> >> 
+> >> -     uint16_t mtu, imtu;
+> >> -     size_t omtu;
+> >> +     uint16_t mtu, imtu, omtu;
+> >> +     size_t length;
+> >> 
+> >>       GIOChannel *io;
+> >>       GError *gerr = NULL;
+> >>       uint16_t len;
+> >> 
+> >> @@ -4877,6 +4877,7 @@ static uint8_t mtu_att_handle(const uint8_t *cmd,
+> >> uint16_t cmd_len,
+> >> 
+> >>       bt_io_get(io, &gerr,
+> >>       
+> >>                       BT_IO_OPT_IMTU, &imtu,
+> >> 
+> >> +                     BT_IO_OPT_OMTU, &omtu,
+> >> 
+> >>                       BT_IO_OPT_INVALID);
+> >>       
+> >>       if (gerr) {
+> >>       
+> >>               error("bt_io_get: %s", gerr->message);
+> >> 
+> >> @@ -4884,10 +4885,10 @@ static uint8_t mtu_att_handle(const uint8_t *cmd,
+> >> uint16_t cmd_len, return ATT_ECODE_UNLIKELY;
+> >> 
+> >>       }
+> >> 
+> >> -     rsp = g_attrib_get_buffer(dev->attrib, &omtu);
+> >> +     rsp = g_attrib_get_buffer(dev->attrib, &length);
+> >> 
+> >>       /* Respond with our IMTU */
+> >> 
+> >> -     len = enc_mtu_resp(imtu, rsp, omtu);
+> >> +     len = enc_mtu_resp(imtu, rsp, length);
+> >> 
+> >>       if (!len)
+> >>       
+> >>               return ATT_ECODE_UNLIKELY;
+> > 
+> > --
+> > BR
+> > Szymon Janc
 > 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth"
-> in the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> BR
+> Marcin
 
 -- 
 BR
