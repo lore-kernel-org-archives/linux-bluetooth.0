@@ -1,98 +1,123 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/2] android/client: Fix reversing send_response values
-Date: Fri,  6 Jun 2014 10:35:51 +0200
-Message-Id: <1402043752-11390-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1401968747-11848-1-git-send-email-luiz.dentz@gmail.com>
+References: <1401968747-11848-1-git-send-email-luiz.dentz@gmail.com>
+Date: Fri, 6 Jun 2014 11:24:47 +0300
+Message-ID: <CABBYNZLHMmY=wrw6GjYX-9gZYEYE7Ec87aN1mMcoU7vx+GwOcg@mail.gmail.com>
+Subject: Re: [PATCH v3 BlueZ 1/4] unit/test-avrcp: Add /TP/RCR/BV-02-C test
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Add function to parse hex string to uint8_t array and use it in
-send_response command.
----
- android/client/if-gatt.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 59 insertions(+), 2 deletions(-)
+Hi,
 
-diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
-index 178770d..4b1c549 100644
---- a/android/client/if-gatt.c
-+++ b/android/client/if-gatt.c
-@@ -1752,6 +1752,51 @@ static void gatts_send_indication_p(int argc, const char *argv[])
- 							len, confirm, data);
- }
- 
-+/*
-+ * convert hex string to uint8_t array
-+ */
-+static int fill_buffer(const char *str, uint8_t *out, int out_size)
-+{
-+	int str_len;
-+	int i, j;
-+	char c;
-+	uint8_t b;
-+
-+	str_len = strlen(str);
-+
-+	for (i = 0, j = 0; i < out_size && j < str_len; i++, j++) {
-+		c = str[j];
-+
-+		if (c >= 'a' && c <= 'f')
-+			c += 'A' - 'a';
-+
-+		if (c >= '0' && c <= '9')
-+			b = c - '0';
-+		else if (c >= 'A' && c <= 'F')
-+			b = 10 + c - 'A';
-+		else
-+			return 0;
-+
-+		j++;
-+
-+		c = str[j];
-+
-+		if (c >= 'a' && c <= 'f')
-+			c += 'A' - 'a';
-+
-+		if (c >= '0' && c <= '9')
-+			b = b * 16 + c - '0';
-+		else if (c >= 'A' && c <= 'F')
-+			b = b * 16 + 10 + c - 'A';
-+		else
-+			return 0;
-+
-+		out[i] = b;
-+	}
-+
-+	return i;
-+}
-+
- /* send_response */
- 
- static void gatts_send_response_p(int argc, const char *argv[])
-@@ -1775,9 +1820,21 @@ static void gatts_send_response_p(int argc, const char *argv[])
- 	data.attr_value.len = 0;
- 
- 	if (argc > 7) {
--		data.attr_value.len = strlen(argv[7]);
--		scan_field(argv[7], data.attr_value.len, data.attr_value.value,
-+		const char *str;
-+
-+		if (strncmp(argv[7], "0X", 2) && strncmp(argv[7], "0x", 2)) {
-+			haltest_error("Value must be hex string");
-+			return;
-+		}
-+
-+		str = argv[7] + 2;
-+
-+		data.attr_value.len = fill_buffer(str, data.attr_value.value,
- 						sizeof(data.attr_value.value));
-+		if (data.attr_value.len == 0) {
-+			haltest_error("Failed to parse response value");
-+			return;
-+		}
- 	}
- 
- 	haltest_info("conn_id %d, trans_id %d, status %d", conn_id, trans_id,
+On Thu, Jun 5, 2014 at 2:45 PM, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> To verify that the TG can handle fragmentation correctly.
+> ---
+> v2: Fix not copying from offset.
+> v3: Add define for AV/C data offset so it can be taken into account when
+> calculating the amount of bytes that can fit in a single packet.
+>
+>  unit/test-avrcp.c | 47 +++++++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 45 insertions(+), 2 deletions(-)
+>
+> diff --git a/unit/test-avrcp.c b/unit/test-avrcp.c
+> index c41f2e6..eddce41 100644
+> --- a/unit/test-avrcp.c
+> +++ b/unit/test-avrcp.c
+> @@ -46,6 +46,7 @@
+>  struct test_pdu {
+>         bool valid;
+>         bool fragmented;
+> +       bool continuing;
+>         bool browse;
+>         const uint8_t *data;
+>         size_t size;
+> @@ -93,6 +94,14 @@ struct context {
+>                 .size = sizeof(data(args)),                     \
+>         }
+>
+> +#define cont_pdu(args...)                                      \
+> +       {                                                       \
+> +               .valid = true,                                  \
+> +               .continuing = true,                             \
+> +               .data = data(args),                             \
+> +               .size = sizeof(data(args)),                     \
+> +       }
+> +
+>  #define define_test(name, function, args...)                           \
+>         do {                                                            \
+>                 const struct test_pdu pdus[] = {                        \
+> @@ -195,7 +204,8 @@ static gboolean test_handler(GIOChannel *channel, GIOCondition cond,
+>         if (g_test_verbose())
+>                 util_hexdump('>', buf, len, test_debug, "AVRCP: ");
+>
+> -       g_assert_cmpint(len, ==, pdu->size);
+> +       if (!pdu->continuing)
+> +               g_assert_cmpint(len, ==, pdu->size);
+>
+>         g_assert(memcmp(buf, pdu->data, pdu->size) == 0);
+>
+> @@ -486,9 +496,20 @@ static int get_element_attributes(struct avrcp *session, uint8_t transaction,
+>                                         uint64_t uid, uint8_t number,
+>                                         uint32_t *attrs, void *user_data)
+>  {
+> +       struct context *context = user_data;
+> +
+>         DBG("");
+>
+> -       avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
+> +       if (g_str_equal(context->data->test_name, "/TP/RCR/BV-02-C")) {
+> +               uint8_t params[1024];
+> +
+> +               memset(params, 0x00, sizeof(params) / 2);
+> +               memset(params + (sizeof(params) / 2), 0xff, sizeof(params) / 2);
+> +
+> +               avrcp_get_element_attrs_rsp(session, transaction, params,
+> +                                                       sizeof(params));
+> +       } else
+> +               avrcp_get_element_attrs_rsp(session, transaction, NULL, 0);
+>
+>         return -EAGAIN;
+>  }
+> @@ -1623,5 +1644,27 @@ int main(int argc, char *argv[])
+>                                 0x00, 0x19, 0x58, AVRCP_SET_ABSOLUTE_VOLUME,
+>                                 0x00, 0x00, 0x01, 0x00));
+>
+> +       /* Request continuing response - TG */
+> +       define_test("/TP/RCR/BV-02-C", test_server,
+> +                       raw_pdu(0x00, 0x11, 0x0e, 0x01, 0x48, 0x00,
+> +                               0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+> +                               0x00, 0x00, 0x09, 0x00, 0x00, 0x00,
+> +                               0x00, 0x00, 0x00, 0x00, 0x00, 0x00),
+> +                       cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+> +                               0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+> +                               0x01, 0x01, 0xf9),
+> +                       raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+> +                               0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
+> +                               0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
+> +                       cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+> +                               0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+> +                               0x02, 0x01, 0xf9),
+> +                       raw_pdu(0x00, 0x11, 0x0e, 0x00, 0x48, 0x00,
+> +                               0x00, 0x19, 0x58, AVRCP_REQUEST_CONTINUING,
+> +                               0x00, 0x00, 0x01, AVRCP_GET_ELEMENT_ATTRIBUTES),
+> +                       cont_pdu(0x02, 0x11, 0x0e, 0x0c, 0x48, 0x00,
+> +                               0x00, 0x19, 0x58, AVRCP_GET_ELEMENT_ATTRIBUTES,
+> +                               0x03, 0x00, 0x0e));
+> +
+>         return g_test_run();
+>  }
+> --
+> 1.9.3
+
+Pushed.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
