@@ -1,87 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <9D57110C-C152-438B-8A0B-59A24FC456D9@holtmann.org>
-References: <1402049971-7762-1-git-send-email-kiran.kumar@linaro.org>
-	<02B0CA51-A2BB-47D0-B526-229C12C8195C@holtmann.org>
-	<CA+RfmHbnd8qSvrnbj0zpn65SHONKG4tj_7L16+e+HOg=NczOtQ@mail.gmail.com>
-	<9D57110C-C152-438B-8A0B-59A24FC456D9@holtmann.org>
-Date: Fri, 6 Jun 2014 22:46:25 +0530
-Message-ID: <CA+RfmHZFOku=rEEyqTMv0s=mVcUPWYWRwg=5RwOaeZEmKf+Tjg@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: Do not attempt to send dlci disconnect when in BT_CONFIG.
-From: Kiran Raparthy <kiran.kumar@linaro.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: LKML <linux-kernel@vger.kernel.org>, Nick Pelly <npelly@google.com>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>, Peter Hurley <peter@hurleysoftware.com>,
-	Seung-Woo Kim <sw0312.kim@samsung.com>,
-	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, Android Kernel Team <kernel-team@android.com>,
-	John Stultz <john.stultz@linaro.org>
-Content-Type: multipart/alternative; boundary=001a11c14dba7ac53404fb2e05e5
+From: Eva Kolanska <eva.kolanska@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Eva Kolanska <eva.kolanska@tieto.com>
+Subject: [PATCH] android/pts: Update GAP test results
+Date: Fri,  6 Jun 2014 15:54:45 +0200
+Message-Id: <1402062885-25627-1-git-send-email-eva.kolanska@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
---001a11c14dba7ac53404fb2e05e5
-Content-Type: text/plain; charset=UTF-8
+---
+ android/pts-gap.txt |   75 +++++++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 55 insertions(+), 20 deletions(-)
 
-Hi Marcel,
-Thanks for the feedback.
-I'll try to reproduce on latest build and send the required info.
+diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+index a08e385..9323f3c 100644
+--- a/android/pts-gap.txt
++++ b/android/pts-gap.txt
+@@ -154,26 +154,52 @@ TC_BOND_BON_BV_04_C	PASS	haltest: gattc_register_client
+ 				gattc connect <client_id> <address>
+ 				bluetooth remove_bond <address>
+ 				gattc connect <client_id> <address>
+-TC_SEC_AUT_BV_11_C	INC
+-TC_SEC_AUT_BV_12_C	INC	JIRA: BZ-29
+-TC_SEC_AUT_BV_13_C	INC	JIRA: BZ-30
+-TC_SEC_AUT_BV_14_C	INC
++TC_SEC_AUT_BV_11_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_12_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_13_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_14_C	INC	Handling sec-lev level on-link - not implemented
+ TC_SEC_AUT_BV_15_C	N/A
+-TC_SEC_AUT_BV_16_C	INC	Not implemented
++TC_SEC_AUT_BV_16_C	INC	Handling sec-lev level on-link - not implemented
+ TC_SEC_AUT_BV_17_C	PASS
+-TC_SEC_AUT_BV_18_C	INC
++TC_SEC_AUT_BV_18_C	INC	Handling sec-lev level on-link - not implemented
+ TC_SEC_AUT_BV_19_C	PASS
+-TC_SEC_AUT_BV_20_C	INC
+-TC_SEC_AUT_BV_21_C	INC	Not implemented
+-TC_SEC_AUT_BV_22_C	INC
+-TC_SEC_AUT_BV_23_C	INC
+-TC_SEC_AUT_BV_24_C	INC	Not implemented
+-TC_SEC_CSIGN_BV_01_C	INC	Not yet implemented - signed write
+-TC_SEC_CSIGN_BV_02_C	INC	Not implemented
+-TC_SEC_CSIGN_BI_01_C	INC	Not implemented
+-TC_SEC_CSIGN_BI_02_C	INC	Not implemented
+-TC_SEC_CSIGN_BI_03_C	INC	Not implemented
+-TC_SEC_CSIGN_BI_04_C	INC	Not implemented
++TC_SEC_AUT_BV_20_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_21_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_22_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_23_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_AUT_BV_24_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_CSIGN_BV_01_C	PASS	haltest:
++				gattc connect
++				bluetooth create_bond
++				gattc connect
++				gattc write_characteristic: <write_type> 4
++				gattc disconnect
++TC_SEC_CSIGN_BV_02_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 66
++						<permissions> 129
++				gatts start_service
++				gatts disconnect
++				gattc disconnect
++TC_SEC_CSIGN_BI_01_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 66
++						<permissions> 129
++				gatts start_service
++				gatts disconnect
++				gattc disconnect
++TC_SEC_CSIGN_BI_02_C	PASS	haltest:
++				gatts add_service
++				gatts add_chaaracteristic:
++						<properties> 66
++						<permissions> 129
++				gatts start_service
++				gatts disconnect
++				gattc disconnect
++TC_SEC_CSIGN_BI_03_C	INC	Handling sec-lev level on-link - not implemented
++TC_SEC_CSIGN_BI_04_C	INC	Handling sec-lev level on-link - not implemented
+ TC_PRIV_CONN_BV_01_C	INC	Privacy feature - not implemented
+ TC_PRIV_CONN_BV_02_C	INC	Privacy feature - not implemented
+ TC_PRIV_CONN_BV_03_C	INC	Privacy feature - not implemented
+@@ -224,8 +250,10 @@ TC_DM_NAD_BV_01_C	PASS	Start discovery from IUT
+ TC_DM_NAD_BV_02_C	PASS
+ TC_DM_LEP_BV_01_C	PASS	gattc register_client
+ 				gattc listen 1 1
+-TC_DM_LEP_BV_02_C	INC
+-TC_DM_LEP_BV_03_C	INC
++TC_DM_LEP_BV_02_C	PASS	Use basic rate PTS dongle
++				haltest:
++				bluetooth set_adapter_property
++TC_DM_LEP_BV_03_C	N/A	correction of CR impl - removed 2013-10-22
+ TC_DM_LEP_BV_04_C	PASS	l2test -n <PTS bdaddr>
+ TC_DM_LEP_BV_05_C	PASS	btmgmt find -b
+ 				l2test -n 00:1B:DC:06:06:22
+@@ -233,6 +261,13 @@ TC_DM_LEP_BV_06_C	PASS
+ TC_DM_LEP_BV_07_C	PASS
+ TC_DM_LEP_BV_08_C	PASS
+ TC_DM_LEP_BV_09_C	PASS
+-TC_DM_LEP_BV_10_C	INC
++TC_DM_LEP_BV_10_C	PASS	haltest:
++				gattc listen 1
++				gattc listen 1 0
++				bluetooth start_discovery
++				bluetooth cancel_discovery
++				gattc listen 1
++				gattc listen 1 0
++				bluetooth create_bond
+ TC_DM_LEP_BV_11_C	PASS
+ -------------------------------------------------------------------------------
+-- 
+1.7.9.5
 
-Regards,
-Kiran
-
-On Friday, 6 June 2014, Marcel Holtmann <marcel@holtmann.org> wrote:
-> Hi Kiran,
->
-> Below are the traces used by author for submitting patch previously.
->
-> [  132.856414] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
-> [  132.856933] rfcomm:__rfcomm_sock_close: sk c63fca00 state 5 socket
-c5cb3a20
-> [  132.857788] rfcomm:__rfcomm_dlc_close: dlc c61ea240 state 7 dlci 38
-> err 0 session c63d4ba0
-> [  132.858612] rfcomm:rfcomm_send_disc: c63d4ba0 dlci 38
-> [  132.859069] rfcomm:rfcomm_send_frame: session c63d4ba0 len 4
-> [  132.859893] l2cap:l2cap_sock_sendmsg: sock c5cb38c0, sk c63fc800
-> [  132.860351] rfcomm:rfcomm_dlc_set_timer: dlc c61ea240 state 8 timeout
-2000
-> [ 133.863739] rfcomm:rfcomm_sock_release: sock c5cb3a20, sk c63fca00
-> [ 133.864257] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00
-> [ 133.865081] rfcomm:rfcomm_sock_kill: sk c63fca00 state 5 refcnt 2
-> [ 133.865539] rfcomm:rfcomm_sock_destruct: sk c63fca00 dlc c61ea240
->
-> they need to be run against a recent bluetooth-next tree. And we also
-need HCI traces to show the problem.
-> Regards
-> Marcel
->
-
---001a11c14dba7ac53404fb2e05e5
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-Hi Marcel,<br>Thanks for the feedback.<br>I&#39;ll try to reproduce on late=
-st build and send the required info.<br><br>Regards,<br>Kiran<br><br>On Fri=
-day, 6 June 2014, Marcel Holtmann &lt;<a href=3D"mailto:marcel@holtmann.org=
-">marcel@holtmann.org</a>&gt; wrote:<br>
-&gt; Hi Kiran,<br>&gt;<br>&gt; Below are the traces used by author for subm=
-itting patch previously.<br>&gt;<br>&gt; [=C2=A0 132.856414] rfcomm:rfcomm_=
-sock_shutdown: sock c5cb3a20, sk c63fca00<br>&gt; [=C2=A0 132.856933] rfcom=
-m:__rfcomm_sock_close: sk c63fca00 state 5 socket c5cb3a20<br>
-&gt; [=C2=A0 132.857788] rfcomm:__rfcomm_dlc_close: dlc c61ea240 state 7 dl=
-ci 38<br>&gt; err 0 session c63d4ba0<br>&gt; [=C2=A0 132.858612] rfcomm:rfc=
-omm_send_disc: c63d4ba0 dlci 38<br>&gt; [=C2=A0 132.859069] rfcomm:rfcomm_s=
-end_frame: session c63d4ba0 len 4<br>
-&gt; [=C2=A0 132.859893] l2cap:l2cap_sock_sendmsg: sock c5cb38c0, sk c63fc8=
-00<br>&gt; [=C2=A0 132.860351] rfcomm:rfcomm_dlc_set_timer: dlc c61ea240 st=
-ate 8 timeout 2000<br>&gt; [ 133.863739] rfcomm:rfcomm_sock_release: sock c=
-5cb3a20, sk c63fca00<br>
-&gt; [ 133.864257] rfcomm:rfcomm_sock_shutdown: sock c5cb3a20, sk c63fca00<=
-br>&gt; [ 133.865081] rfcomm:rfcomm_sock_kill: sk c63fca00 state 5 refcnt 2=
-<br>&gt; [ 133.865539] rfcomm:rfcomm_sock_destruct: sk c63fca00 dlc c61ea24=
-0<br>
-&gt;<br>&gt; they need to be run against a recent bluetooth-next tree. And =
-we also need HCI traces to show the problem.<br>&gt; Regards<br>&gt; Marcel=
-<br>&gt;
-
---001a11c14dba7ac53404fb2e05e5--
