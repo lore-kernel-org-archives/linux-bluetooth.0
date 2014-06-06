@@ -1,97 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kiran Kumar Raparthy <kiran.kumar@linaro.org>
-To: linux-kernel@vger.kernel.org
-Cc: Nick Pelly <npelly@google.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Android Kernel Team <kernel-team@android.com>,
-	John Stultz <john.stultz@linaro.org>,
-	Kiran Raparthy <kiran.kumar@linaro.org>
-Subject: [RFC] Bluetooth: Add ACL MTU, available buffers and total buffers to hci_conn_info.
-Date: Fri,  6 Jun 2014 15:48:00 +0530
-Message-Id: <1402049880-7686-1-git-send-email-kiran.kumar@linaro.org>
+MIME-Version: 1.0
+In-Reply-To: <1401727071-28731-1-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1401727071-28731-1-git-send-email-andrzej.kaczmarek@tieto.com>
+Date: Fri, 6 Jun 2014 11:43:30 +0300
+Message-ID: <CABBYNZJYg8=0pHPfhW7J5ppdCRahyNcExcn0zkOOz5iEGbg6Ow@mail.gmail.com>
+Subject: Re: [PATCH v3 0/5] android: aptX support
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Nick Pelly <npelly@google.com>
+Hi Andrzej,
 
-Add ACL MTU, available buffers and total buffers to hci_conn_info.
+On Mon, Jun 2, 2014 at 7:37 PM, Andrzej Kaczmarek
+<andrzej.kaczmarek@tieto.com> wrote:
+> v3 changes:
+> - fixed variable names
+> - added queue for loaded codecs
+>
+>
+> Andrzej Kaczmarek (5):
+>   android/hal-audio: Always call qos_update
+>   android/hal-audio: Allow codec to init on startup
+>   android/hal-audio-aptx: Add initial support for aptX codec
+>   android/hal-audio-aptx: Load aptX encoder library
+>   android/hal-audio-aptx: Add encoding
+>
+>  android/Android.mk       |   4 +
+>  android/Makefile.am      |   1 +
+>  android/hal-audio-aptx.c | 276 +++++++++++++++++++++++++++++++++++++++++++++++
+>  android/hal-audio.c      |  84 +++++++++++----
+>  android/hal-audio.h      |   4 +
+>  5 files changed, 349 insertions(+), 20 deletions(-)
+>  create mode 100644 android/hal-audio-aptx.c
+>
+> --
+> 1.9.3
 
-This provides userspace debugging tools access to ACL flow control state.
+Applied, thanks.
 
-This is one of the number of patches from the Android AOSP common.git tree,
-which is used on almost all Android devices.  so I wanted to submit it for
-review to see if it should go upstream.
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: Android Kernel Team <kernel-team@android.com>
-Cc: John Stultz <john.stultz@linaro.org>
-Signed-off-by: Nick Pelly <npelly@google.com>
-[kiran: Added context to commit message]
-Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
----
- include/net/bluetooth/hci.h |  3 +++
- net/bluetooth/hci_conn.c    | 18 ++++++++++++++++++
- 2 files changed, 21 insertions(+)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index be150cf..67dc0fb 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1830,6 +1830,9 @@ struct hci_conn_info {
- 	__u8     out;
- 	__u16    state;
- 	__u32    link_mode;
-+	__u32    mtu;
-+	__u32    cnt;
-+	__u32    pkts;
- };
- 
- struct hci_dev_req {
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 521fd4f..c2ba0fe 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1064,6 +1064,15 @@ int hci_get_conn_list(void __user *arg)
- 		(ci + n)->out   = c->out;
- 		(ci + n)->state = c->state;
- 		(ci + n)->link_mode = c->link_mode;
-+		if (c->type == SCO_LINK) {
-+			(ci + n)->mtu = hdev->sco_mtu;
-+			(ci + n)->cnt = hdev->sco_cnt;
-+			(ci + n)->pkts = hdev->sco_pkts;
-+		} else {
-+			(ci + n)->mtu = hdev->acl_mtu;
-+			(ci + n)->cnt = hdev->acl_cnt;
-+			(ci + n)->pkts = hdev->acl_pkts;
-+		}
- 		if (++n >= req.conn_num)
- 			break;
- 	}
-@@ -1100,6 +1109,15 @@ int hci_get_conn_info(struct hci_dev *hdev, void __user *arg)
- 		ci.out   = conn->out;
- 		ci.state = conn->state;
- 		ci.link_mode = conn->link_mode;
-+		if (req.type == SCO_LINK) {
-+			ci.mtu = hdev->sco_mtu;
-+			ci.cnt = hdev->sco_cnt;
-+			ci.pkts = hdev->sco_pkts;
-+		} else {
-+			ci.mtu = hdev->acl_mtu;
-+			ci.cnt = hdev->acl_cnt;
-+			ci.pkts = hdev->acl_pkts;
-+		}
- 	}
- 	hci_dev_unlock(hdev);
- 
 -- 
-1.8.2.1
+Luiz Augusto von Dentz
