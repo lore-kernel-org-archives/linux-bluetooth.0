@@ -1,222 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/gatt: Fix parallel reading/writing attributes values from applications
-Date: Fri, 06 Jun 2014 06:08:17 +0200
-Message-ID: <7307660.f9KvX5gET3@leonov>
-In-Reply-To: <1401961132-29459-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1401961132-29459-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH 1/3] android/client: Add properly print prefix for hex values
+Date: Fri, 06 Jun 2014 06:07:48 +0200
+Message-ID: <4542739.tukqMUaLjY@leonov>
+In-Reply-To: <1401966521-32270-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1401966521-32270-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Grzegorz,
 
-On Thursday 05 of June 2014 11:38:50 Marcin Kraglak wrote:
-> It is needed because in some cases we send few read requests to
-> applications. Now all transactions data are overriden by last one, and if
-> application wants to respond to previous requests, transaction data is not
-> found.
-> It happens when two devices will read attribute from one application in the
-> same time or if device will read few values in time (i.e. read by type
-> request or find by type value request).
+On Thursday 05 of June 2014 13:08:39 Grzegorz Kolodziejczyk wrote:
+> This patch fix print hex values by adding "0x" prefix.
 > ---
->  android/gatt.c | 77
-> ++++++++++++++++++++++++++++++++++++++-------------------- 1 file changed,
-> 50 insertions(+), 27 deletions(-)
+>  android/client/if-gatt.c | 22 +++++++++++-----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 429181f..f450eac 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -105,9 +105,6 @@ struct gatt_app {
+> diff --git a/android/client/if-gatt.c b/android/client/if-gatt.c
+> index 0375126..f6e6327 100644
+> --- a/android/client/if-gatt.c
+> +++ b/android/client/if-gatt.c
+> @@ -454,7 +454,7 @@ static void gattc_get_characteristic_cb(int conn_id, int
+> status, char srvc_id_buf[MAX_SRVC_ID_STR_LEN];
+>  	char char_id_buf[MAX_CHAR_ID_STR_LEN];
 > 
->  	/* Valid for client applications */
->  	struct queue *notifications;
-> -
-> -	/* Transaction data valid for server application */
-> -	struct pending_trans_data trans_id;
->  };
+> -	haltest_info("%s: conn_id=%d status=%d srvc_id=%s char_id=%s,
+> char_prop=%x\n", +	haltest_info("%s: conn_id=%d status=%d srvc_id=%s
+> char_id=%s, char_prop=0x%x\n", __func__, conn_id, status,
+>  			btgatt_srvc_id_t2str(srvc_id, srvc_id_buf),
+>  			btgatt_gatt_id_t2str(char_id, char_id_buf), char_prop);
+> @@ -644,7 +644,7 @@ static void gatts_service_added_cb(int status, int
+> server_if,
 > 
->  struct element_id {
-> @@ -174,6 +171,7 @@ struct gatt_device {
->  struct app_connection {
->  	struct gatt_device *device;
->  	struct gatt_app *app;
-> +	struct queue *transactions;
->  	int32_t id;
->  };
+>  	snprintf(server_if_str, sizeof(server_if_str), "%d", server_if);
 > 
-> @@ -855,6 +853,7 @@ static void destroy_connection(void *data)
->  		connection_cleanup(conn->device);
-> 
->  cleanup:
-> +	queue_destroy(conn->transactions, free);
->  	device_unref(conn->device);
->  	free(conn);
+> -	haltest_info("%s: status=%d server_if=%d srvc_id=%s handle=%x\n",
+> +	haltest_info("%s: status=%d server_if=%d srvc_id=%s handle=0x%x\n",
+>  			__func__, status, server_if,
+>  			btgatt_srvc_id_t2str(srvc_id, buf), srvc_handle);
 >  }
-> @@ -1304,9 +1303,15 @@ static struct app_connection
-> *create_connection(struct gatt_device *device, new_conn->app = app;
->  	new_conn->id = last_conn_id++;
-> 
-> +	new_conn->transactions = queue_new();
-> +	if (!new_conn->transactions) {
-> +		free(new_conn);
-> +		return NULL;
-> +	}
-> +
->  	if (!queue_push_head(app_connections, new_conn)) {
->  		error("gatt: Cannot push client on the client queue!?");
-> -
-> +		queue_destroy(new_conn->transactions, free);
->  		free(new_conn);
->  		return NULL;
->  	}
-> @@ -4167,26 +4172,35 @@ done:
->  		send_dev_pending_response(dev, opcode);
->  }
-> 
-> -static void set_trans_id(struct gatt_app *app, unsigned int id, int8_t
-> opcode) +static struct pending_trans_data *conn_add_transact(struct
-> app_connection *conn, +								uint8_t opcode)
+> @@ -654,7 +654,7 @@ static void gatts_included_service_added_cb(int status,
+> int server_if, int srvc_handle,
+>  							int incl_srvc_handle)
 >  {
-> -	app->trans_id.id = id;
-> -	app->trans_id.opcode = opcode;
-> -}
-> +	struct pending_trans_data *transaction;
-> +	static int32_t trans_id = 1;
+> -	haltest_info("%s: status=%d server_if=%d srvc_handle=%x
+> inc_srvc_handle=%x\n", +	haltest_info("%s: status=%d server_if=%d
+> srvc_handle=0x%x inc_srvc_handle=0x%x\n", __func__, status, server_if,
+>  						srvc_handle, incl_srvc_handle);
+>  }
+> @@ -667,7 +667,7 @@ static void gatts_characteristic_added_cb(int status,
+> int server_if, {
+>  	char buf[MAX_SRVC_ID_STR_LEN];
 > 
-> -static void clear_trans_id(struct gatt_app *app)
-> -{
-> -	app->trans_id.id = 0;
-> -	app->trans_id.opcode = 0;
-> +	transaction = new0(struct pending_trans_data, 1);
-> +	if (!transaction)
-> +		return NULL;
-> +
-> +	if (!queue_push_tail(conn->transactions, transaction)) {
-> +		free(transaction);
-> +		return NULL;
-> +	}
-> +
-> +	transaction->id = trans_id++;
-> +	transaction->opcode = opcode;
-> +
-> +	return transaction;
+> -	haltest_info("%s: status=%d server_if=%d uuid=%s srvc_handle=%x
+> char_handle=%x\n", +	haltest_info("%s: status=%d server_if=%d uuid=%s
+> srvc_handle=0x%x char_handle=0x%x\n", __func__, status, server_if,
+> gatt_uuid_t2str(uuid, buf),
+>  			srvc_handle, char_handle);
+>  }
+> @@ -679,7 +679,7 @@ static void gatts_descriptor_added_cb(int status, int
+> server_if, {
+>  	char buf[MAX_SRVC_ID_STR_LEN];
+> 
+> -	haltest_info("%s: status=%d server_if=%d uuid=%s srvc_handle=%x
+> descr_handle=%x\n", +	haltest_info("%s: status=%d server_if=%d uuid=%s
+> srvc_handle=0x%x descr_handle=0x%x\n", __func__, status, server_if,
+> gatt_uuid_t2str(uuid, buf),
+>  			srvc_handle, descr_handle);
+>  }
+> @@ -687,21 +687,21 @@ static void gatts_descriptor_added_cb(int status, int
+> server_if, /* Callback invoked in response to start_service */
+>  static void gatts_service_started_cb(int status, int server_if, int
+> srvc_handle) {
+> -	haltest_info("%s: status=%d server_if=%d srvc_handle=%x\n",
+> +	haltest_info("%s: status=%d server_if=%d srvc_handle=0x%x\n",
+>  				__func__, status, server_if, srvc_handle);
 >  }
 > 
->  static void read_cb(uint16_t handle, uint16_t offset, uint8_t att_opcode,
->  					bdaddr_t *bdaddr, void *user_data)
->  {
-> +	struct pending_trans_data *transaction;
->  	struct hal_ev_gatt_server_request_read ev;
->  	struct gatt_app *app;
->  	struct app_connection *conn;
->  	int32_t id = PTR_TO_INT(user_data);
-> -	static int32_t trans_id = 1;
-> 
->  	app = find_app_by_id(id);
->  	if (!app) {
-> @@ -4203,14 +4217,16 @@ static void read_cb(uint16_t handle, uint16_t
-> offset, uint8_t att_opcode, memset(&ev, 0, sizeof(ev));
-> 
->  	/* Store the request data, complete callback and transaction id */
-> -	set_trans_id(app, trans_id++, att_opcode);
-> +	transaction = conn_add_transact(conn, att_opcode);
-> +	if (!transaction)
-> +		goto failed;
-> 
->  	bdaddr2android(bdaddr, ev.bdaddr);
->  	ev.conn_id = conn->id;
->  	ev.attr_handle = handle;
->  	ev.offset = offset;
->  	ev.is_long = att_opcode == ATT_OP_READ_BLOB_REQ;
-> -	ev.trans_id = app->trans_id.id;
-> +	ev.trans_id = transaction->id;
-> 
->  	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
->  					HAL_EV_GATT_SERVER_REQUEST_READ,
-> @@ -4230,9 +4246,9 @@ static void write_cb(uint16_t handle, uint16_t offset,
-> {
->  	uint8_t buf[IPC_MTU];
->  	struct hal_ev_gatt_server_request_write *ev = (void *) buf;
-> +	struct pending_trans_data *transaction;
->  	struct gatt_app *app;
->  	int32_t id = PTR_TO_INT(user_data);
-> -	static int32_t trans_id = 1;
->  	struct app_connection *conn;
-> 
->  	app = find_app_by_id(id);
-> @@ -4248,7 +4264,9 @@ static void write_cb(uint16_t handle, uint16_t offset,
-> }
-> 
->  	/* Store the request data, complete callback and transaction id */
-> -	set_trans_id(app, trans_id++, att_opcode);
-> +	transaction = conn_add_transact(conn, att_opcode);
-> +	if (!transaction)
-> +		goto failed;
-> 
->  	/* TODO figure it out */
->  	if (att_opcode == ATT_OP_EXEC_WRITE_REQ)
-> @@ -4261,7 +4279,7 @@ static void write_cb(uint16_t handle, uint16_t offset,
-> ev->offset = offset;
-> 
->  	ev->conn_id = conn->id;
-> -	ev->trans_id = app->trans_id.id;
-> +	ev->trans_id = transaction->id;
-> 
->  	ev->is_prep = att_opcode == ATT_OP_PREP_WRITE_REQ;
->  	ev->need_rsp = att_opcode == ATT_OP_WRITE_REQ;
-> @@ -4555,11 +4573,18 @@ reply:
->  				HAL_OP_GATT_SERVER_SEND_INDICATION, status);
+>  /* Callback invoked in response to stop_service */
+>  static void gatts_service_stopped_cb(int status, int server_if, int
+> srvc_handle) {
+> -	haltest_info("%s: status=%d server_if=%d srvc_handle=%x\n",
+> +	haltest_info("%s: status=%d server_if=%d srvc_handle=0x%x\n",
+>  				__func__, status, server_if, srvc_handle);
 >  }
 > 
-> +static bool match_trans_id(const void *data, const void *user_data)
-> +{
-> +	const struct pending_trans_data *transaction = data;
-> +
-> +	return transaction->id == PTR_TO_UINT(user_data);
-> +}
-> +
->  static void handle_server_send_response(const void *buf, uint16_t len)
+>  /* Callback triggered when a service has been deleted */
+>  static void gatts_service_deleted_cb(int status, int server_if, int
+> srvc_handle) {
+> -	haltest_info("%s: status=%d server_if=%d srvc_handle=%x\n",
+> +	haltest_info("%s: status=%d server_if=%d srvc_handle=0x%x\n",
+>  				__func__, status, server_if, srvc_handle);
+>  }
+> 
+> @@ -715,7 +715,7 @@ static void gatts_request_read_cb(int conn_id, int
+> trans_id, bt_bdaddr_t *bda, {
+>  	char buf[MAX_ADDR_STR_LEN];
+> 
+> -	haltest_info("%s: conn_id=%d trans_id=%d bda=%s attr_handle=%x offset=%d
+> is_long=%d\n", +	haltest_info("%s: conn_id=%d trans_id=%d bda=%s
+> attr_handle=0x%x offset=%d is_long=%d\n", __func__, conn_id, trans_id,
+> bt_bdaddr_t2str(bda, buf),
+>  			attr_handle, offset, is_long);
+>  }
+> @@ -732,7 +732,7 @@ static void gatts_request_write_cb(int conn_id, int
+> trans_id, bt_bdaddr_t *bda, char buf[MAX_ADDR_STR_LEN];
+>  	char valbuf[100];
+> 
+> -	haltest_info("%s: conn_id=%d trans_id=%d bda=%s attr_handle=%x offset=%d
+> length=%d need_rsp=%d is_prep=%d value=%s\n", +	haltest_info("%s:
+> conn_id=%d trans_id=%d bda=%s attr_handle=0x%x offset=%d length=%d
+> need_rsp=%d is_prep=%d value=%s\n", __func__, conn_id, trans_id,
+> bt_bdaddr_t2str(bda, buf),
+>  			attr_handle, offset, length, need_rsp, is_prep,
+>  			array2str(value, length, valbuf, sizeof(valbuf)));
+> @@ -755,7 +755,7 @@ static void gatts_request_exec_write_cb(int conn_id, int
+> trans_id, */
+>  static void gatts_response_confirmation_cb(int status, int handle)
 >  {
->  	const struct hal_cmd_gatt_server_send_response *cmd = buf;
-> +	struct pending_trans_data *transaction;
->  	struct app_connection *conn;
-> -	struct gatt_app *app;
->  	uint8_t status;
+> -	haltest_info("%s: status=%d handle=%x\n", __func__, status, handle);
+> +	haltest_info("%s: status=%d handle=0x%x\n", __func__, status, handle);
+>  }
 > 
->  	DBG("");
-> @@ -4571,22 +4596,20 @@ static void handle_server_send_response(const void
-> *buf, uint16_t len) goto reply;
->  	}
-> 
-> -	app = conn->app;
-> -
-> -	if ((unsigned int)cmd->trans_id != app->trans_id.id) {
-> -		error("gatt: transaction ID mismatch (%d!=%d)",
-> -					cmd->trans_id, app->trans_id.id);
-> -
-> +	transaction = queue_remove_if(conn->transactions, match_trans_id,
-> +						UINT_TO_PTR(cmd->trans_id));
-> +	if (!transaction) {
-> +		error("gatt: transaction ID = %d not found", cmd->trans_id);
->  		status = HAL_STATUS_FAILED;
->  		goto reply;
->  	}
-> 
-> -	send_gatt_response(conn->app->trans_id.opcode, cmd->handle, cmd->offset,
-> +	send_gatt_response(transaction->opcode, cmd->handle, cmd->offset,
->  					cmd->status, cmd->len, cmd->data,
->  					&conn->device->bdaddr);
-> 
->  	/* Clean request data */
-> -	clear_trans_id(app);
-> +	free(transaction);
-> 
->  	status = HAL_STATUS_SUCCESS;
+>  static const btgatt_server_callbacks_t btgatt_server_callbacks = {
 
 All patches applied, thanks.
 
