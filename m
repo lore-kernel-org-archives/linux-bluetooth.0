@@ -1,29 +1,49 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 8 Jun 2014 12:07:37 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Use const for struct l2cap_ops field
-Message-ID: <20140608090737.GA28683@t440s.P-661HNU-F1>
-References: <1402214731-4445-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1402214731-4445-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Shrink size of struct l2cap_ctrl fields
+Date: Sun,  8 Jun 2014 10:26:57 +0200
+Message-Id: <1402216017-10419-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The struct l2cap_ctrl fields are wasting an unsigned int when all the
+bits can fit into an __u8 field.
 
-On Sun, Jun 08, 2014, Marcel Holtmann wrote:
-> The struct l2cap_ops field should not allow any modifications and thus
-> it is better declared as const.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/l2cap.h | 2 +-
->  net/bluetooth/a2mp.c          | 2 +-
->  net/bluetooth/l2cap_sock.c    | 2 +-
->  3 files changed, 3 insertions(+), 3 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/bluetooth.h | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 904777c1cd24..373000de610d 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -260,15 +260,15 @@ struct sock *bt_accept_dequeue(struct sock *parent, struct socket *newsock);
+ 
+ /* Skb helpers */
+ struct l2cap_ctrl {
+-	unsigned int	sframe:1,
+-			poll:1,
+-			final:1,
+-			fcs:1,
+-			sar:2,
+-			super:2;
+-	__u16		reqseq;
+-	__u16		txseq;
+-	__u8		retries;
++	__u8	sframe:1,
++		poll:1,
++		final:1,
++		fcs:1,
++		sar:2,
++		super:2;
++	__u16	reqseq;
++	__u16	txseq;
++	__u8	retries;
+ };
+ 
+ struct hci_dev;
+-- 
+1.9.3
 
-Johan
