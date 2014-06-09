@@ -1,28 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Eva Kolanska <eva.kolanska@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update GAP test results
-Date: Mon, 09 Jun 2014 11:56:53 +0200
-Message-ID: <1585060.QofOWshEHF@uw000953>
-In-Reply-To: <1402062885-25627-1-git-send-email-eva.kolanska@tieto.com>
-References: <1402062885-25627-1-git-send-email-eva.kolanska@tieto.com>
+Subject: Re: [PATCH] android/pts: Re-run PTS for A2DP
+Date: Mon, 09 Jun 2014 11:56:26 +0200
+Message-ID: <2345898.eQABk24GzC@uw000953>
+In-Reply-To: <1402306702-32575-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1402306702-32575-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Eva,
+Hi Sebastian,
 
-On Friday 06 of June 2014 15:54:45 Eva Kolanska wrote:
+On Monday 09 of June 2014 11:38:22 Sebastian Chlad wrote:
+> PTS session for A2DP which includes new PICS settings with PICS:
+> 'Additional encoder Codec' set to TRUE as there is aptX support
+> added.
 > ---
->  android/pts-gap.txt |   75 +++++++++++++++++++++++++++++++++++++--------------
->  1 file changed, 55 insertions(+), 20 deletions(-)
-> 
-> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-> index a08e385..9323f3c 100644
-> --- a/android/pts-gap.txt
-> +++ b/android/pts-gap.txt
+>  android/pics-a2dp.txt | 2 +-
+>  android/pts-a2dp.txt  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
 Applied, thanks.
 
