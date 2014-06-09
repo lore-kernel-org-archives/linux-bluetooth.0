@@ -1,37 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Jun 2014 12:49:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
-Subject: Re: SPP profile in Bluez
-Message-ID: <20140609094952.GA23710@t440s.lan>
-References: <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Re-run PTS for A2DP
+Date: Mon,  9 Jun 2014 11:38:22 +0200
+Message-Id: <1402306702-32575-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinod,
+PTS session for A2DP which includes new PICS settings with PICS:
+'Additional encoder Codec' set to TRUE as there is aptX support
+added.
+---
+ android/pics-a2dp.txt | 2 +-
+ android/pts-a2dp.txt  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-On Mon, Jun 09, 2014, Vinod Rayapudi wrote:
-> I want to use SPP in Bluez stack.
-> 
-> Can anyone help me, from which versions of Bluez SPP is available ?
+diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
+index 81debcd..53b3c1c 100644
+--- a/android/pics-a2dp.txt
++++ b/android/pics-a2dp.txt
+@@ -50,7 +50,7 @@ C.1: At least one of the values shall be supported.
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_A2DP_3_1	True		SRC: SBC encoder Codec (M)
+-TSPC_A2DP_3_2	False		SRC: Additional encoder Codec (O)
++TSPC_A2DP_3_2	True (*)	SRC: Additional encoder Codec (O)
+ -------------------------------------------------------------------------------
+ 
+ 
+diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
+index 3670dd0..5780db1 100644
+--- a/android/pts-a2dp.txt
++++ b/android/pts-a2dp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for A2DP
+ 
+ PTS version: 5.1
+-Tested: 07-April-2014
++Tested: 06-June-2014
+ Android version: 4.4.2
+ 
+ Results:
+-- 
+1.8.5.3
 
-SPP has always been available with BlueZ. The only thing that has kept
-changing a bit is the preferred way to implement it. The RFCOMM socket
-interface would be an option that's available regardless of BlueZ
-version, however it may not be the most convenient one if you can
-restrict yourself to newer BlueZ versions.
-
-> I would like to use SPP Connect, Disconnect, Read and Write functionalities.
-
-With BlueZ 5 the simplest way is probably to use the Profile interface
-(see doc/profile-api.txt and test/test-profile). If you implement that
-interface you will get the new SPP connection (RFCOMM socket) handed
-over to you over D-Bus once successfully connected. Connecting as client
-would happen by issuing a ConnectProfile("spp") D-Bus method call.
-
-Johan
