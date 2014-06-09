@@ -1,30 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Re-run PTS for A2DP
-Date: Mon, 09 Jun 2014 11:56:26 +0200
-Message-ID: <2345898.eQABk24GzC@uw000953>
-In-Reply-To: <1402306702-32575-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1402306702-32575-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Mon, 9 Jun 2014 12:49:52 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
+Subject: Re: SPP profile in Bluez
+Message-ID: <20140609094952.GA23710@t440s.lan>
+References: <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Vinod,
 
-On Monday 09 of June 2014 11:38:22 Sebastian Chlad wrote:
-> PTS session for A2DP which includes new PICS settings with PICS:
-> 'Additional encoder Codec' set to TRUE as there is aptX support
-> added.
-> ---
->  android/pics-a2dp.txt | 2 +-
->  android/pts-a2dp.txt  | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+On Mon, Jun 09, 2014, Vinod Rayapudi wrote:
+> I want to use SPP in Bluez stack.
+> 
+> Can anyone help me, from which versions of Bluez SPP is available ?
 
-Applied, thanks.
+SPP has always been available with BlueZ. The only thing that has kept
+changing a bit is the preferred way to implement it. The RFCOMM socket
+interface would be an option that's available regardless of BlueZ
+version, however it may not be the most convenient one if you can
+restrict yourself to newer BlueZ versions.
 
--- 
-Best regards, 
-Szymon Janc
+> I would like to use SPP Connect, Disconnect, Read and Write functionalities.
+
+With BlueZ 5 the simplest way is probably to use the Profile interface
+(see doc/profile-api.txt and test/test-profile). If you implement that
+interface you will get the new SPP connection (RFCOMM socket) handed
+over to you over D-Bus once successfully connected. Connecting as client
+would happen by issuing a ConnectProfile("spp") D-Bus method call.
+
+Johan
