@@ -1,303 +1,206 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 1/5] android/gatt: Fix not detecting device found by Bluetooth HAL
-Date: Mon,  9 Jun 2014 11:15:47 +0300
-Message-Id: <1402301751-26353-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <1401600034-16687-1-git-send-email-kiran.kumar@linaro.org>
+References: <1401600034-16687-1-git-send-email-kiran.kumar@linaro.org>
+Date: Mon, 9 Jun 2014 11:38:34 +0530
+Message-ID: <CA+RfmHZr+NDNheW6Ki7N7BGw7PBT8jsip0k1m1opo+Y8C8zgiQ@mail.gmail.com>
+Subject: Re: [RFC v3] Bluetooth: Keep master role when SCO or eSCO is active
+From: Kiran Raparthy <kiran.kumar@linaro.org>
+To: linux-kernel@vger.kernel.org
+Cc: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>, Marcel Holtmann <marcel@holtmann.org>,
+	Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	"open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, Android Kernel Team <kernel-team@android.com>,
+	John Stultz <john.stultz@linaro.org>, Jaikumar Ganesh <jaikumarg@android.com>,
+	Kiran Raparthy <kiran.kumar@linaro.org>
+Content-Type: multipart/alternative; boundary=001a11c13db295e8d004fb610a9f
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--001a11c13db295e8d004fb610a9f
+Content-Type: text/plain; charset=UTF-8
 
-This is necessary so that devices found during regular discovery can be
-handled by gatt HAL.
----
- android/bluetooth.c |  42 ++++++++++++++-------
- android/bluetooth.h |   5 ++-
- android/gatt.c      | 105 ++++++++++++++++++++++++++++++----------------------
- 3 files changed, 92 insertions(+), 60 deletions(-)
+Just a reminder.
+Regards,
+Kiran
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index d275297..834d687 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -179,6 +179,7 @@ static struct {
- 	uint32_t current_settings;
- 	uint32_t supported_settings;
- 
-+	bool le_scanning;
- 	uint8_t cur_discovery_type;
- 	uint8_t exp_discovery_type;
- 	uint32_t discoverable_timeout;
-@@ -1301,10 +1302,8 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 	}
- 
- 	type = adapter.exp_discovery_type;
--	adapter.exp_discovery_type = SCAN_TYPE_NONE;
--
--	if (type == SCAN_TYPE_NONE && gatt_device_found_cb)
--		type = SCAN_TYPE_LE;
-+	adapter.exp_discovery_type = adapter.le_scanning ? SCAN_TYPE_LE :
-+								SCAN_TYPE_NONE;
- 
- 	if (type != SCAN_TYPE_NONE)
- 		start_discovery(type);
-@@ -3392,42 +3391,57 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- 	return false;
- }
- 
-+bool bt_le_register(bt_le_device_found cb)
-+{
-+	if (gatt_device_found_cb)
-+		return false;
-+
-+	gatt_device_found_cb = cb;
-+
-+	return true;
-+}
-+
-+void bt_le_unregister(void)
-+{
-+	gatt_device_found_cb = NULL;
-+}
-+
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
- {
-+	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
-+		return false;
-+
-+	adapter.le_scanning = false;
-+
- 	if (adapter.cur_discovery_type != SCAN_TYPE_LE) {
- 		if (cb)
- 			cb();
- 
--		gatt_device_found_cb = NULL;
--
- 		return true;
- 	}
- 
- 	if (!stop_discovery(SCAN_TYPE_LE))
- 		return false;
- 
--	gatt_device_found_cb = NULL;
- 	gatt_discovery_stopped_cb = cb;
- 	adapter.exp_discovery_type = SCAN_TYPE_NONE;
- 
- 	return true;
- }
- 
--bool bt_le_discovery_start(bt_le_device_found cb)
-+bool bt_le_discovery_start(void)
- {
- 	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
- 		return false;
- 
-+	adapter.le_scanning = true;
-+
- 	/* If core is discovering, don't bother */
--	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
--		gatt_device_found_cb = cb;
-+	if (adapter.cur_discovery_type != SCAN_TYPE_NONE)
- 		return true;
--	}
- 
--	if (start_discovery(SCAN_TYPE_LE)) {
--		gatt_device_found_cb = cb;
-+	if (start_discovery(SCAN_TYPE_LE))
- 		return true;
--	}
- 
- 	return false;
- }
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 2409d46..7c64bab 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -44,7 +44,10 @@ typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
- 					int rssi, uint16_t eir_len,
- 					const void *eir, bool discoverable,
- 					bool bonded);
--bool bt_le_discovery_start(bt_le_device_found cb);
-+bool bt_le_register(bt_le_device_found cb);
-+void bt_le_unregister(void);
-+
-+bool bt_le_discovery_start(void);
- 
- typedef void (*bt_le_discovery_stopped)(void);
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
-diff --git a/android/gatt.c b/android/gatt.c
-index c25aed4..f797e7d 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -627,6 +627,47 @@ static void destroy_gatt_app(void *data)
- 	free(app);
- }
- 
-+static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
-+						int rssi, uint16_t eir_len,
-+						const void *eir,
-+						bool discoverable, bool bonded)
-+{
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
-+	struct gatt_device *dev;
-+	char bda[18];
-+
-+	if (!scanning || (!discoverable && !bonded))
-+		goto connect;
-+
-+	ba2str(addr, bda);
-+	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
-+
-+	bdaddr2android(addr, ev->bda);
-+	ev->rssi = rssi;
-+	ev->len = eir_len;
-+
-+	memcpy(ev->adv_data, eir, ev->len);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+						HAL_EV_GATT_CLIENT_SCAN_RESULT,
-+						sizeof(*ev) + ev->len, ev);
-+
-+connect:
-+	dev = find_device_by_addr(addr);
-+	if (!dev || (dev->state != DEVICE_CONNECT_INIT))
-+		return;
-+
-+	device_set_state(dev, DEVICE_CONNECT_READY);
-+	dev->bdaddr_type = addr_type;
-+
-+	/*
-+	 * We are ok to perform connect now. Stop discovery
-+	 * and once it is stopped continue with creating ACL
-+	 */
-+	bt_le_discovery_stop(bt_le_discovery_stop_cb);
-+}
-+
- static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
- {
- 	static int32_t application_id = 1;
-@@ -637,6 +678,10 @@ static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
- 		return NULL;
- 	}
- 
-+	/* Register LE once the first app register */
-+	if (queue_isempty(gatt_apps))
-+		bt_le_register(le_device_found_handler);
-+
- 	app = new0(struct gatt_app, 1);
- 	if (!app) {
- 		error("gatt: Cannot allocate memory for registering app");
-@@ -956,47 +1001,6 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	return s;
- }
- 
--static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
--						int rssi, uint16_t eir_len,
--						const void *eir,
--						bool discoverable, bool bonded)
--{
--	uint8_t buf[IPC_MTU];
--	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
--	struct gatt_device *dev;
--	char bda[18];
--
--	if (!scanning || (!discoverable && !bonded))
--		goto connect;
--
--	ba2str(addr, bda);
--	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
--
--	bdaddr2android(addr, ev->bda);
--	ev->rssi = rssi;
--	ev->len = eir_len;
--
--	memcpy(ev->adv_data, eir, ev->len);
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--						HAL_EV_GATT_CLIENT_SCAN_RESULT,
--						sizeof(*ev) + ev->len, ev);
--
--connect:
--	dev = find_device_by_addr(addr);
--	if (!dev || (dev->state != DEVICE_CONNECT_INIT))
--		return;
--
--	device_set_state(dev, DEVICE_CONNECT_READY);
--	dev->bdaddr_type = addr_type;
--
--	/*
--	 * We are ok to perform connect now. Stop discovery
--	 * and once it is stopped continue with creating ACL
--	 */
--	bt_le_discovery_stop(bt_le_discovery_stop_cb);
--}
--
- static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-@@ -1207,7 +1211,7 @@ reply:
- 
- 	/* Check if we should restart scan */
- 	if (scanning)
--		bt_le_discovery_start(le_device_found_handler);
-+		bt_le_discovery_start();
- 
- 	/* FIXME: What to do if discovery won't start here. */
- }
-@@ -1293,7 +1297,7 @@ static void handle_client_scan(const void *buf, uint16_t len)
- 	}
- 
- 	/* Turn on scan */
--	if (!bt_le_discovery_start(le_device_found_handler)) {
-+	if (!bt_le_discovery_start()) {
- 		error("gatt: LE scan switch failed");
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
-@@ -1325,7 +1329,7 @@ static void bt_le_discovery_stop_cb(void)
- 
- 	/* Check now if there is any device ready to connect */
- 	if (connect_next_dev() < 0)
--		bt_le_discovery_start(le_device_found_handler);
-+		bt_le_discovery_start();
- }
- 
- static struct gatt_device *create_device(const bdaddr_t *addr)
-@@ -1434,7 +1438,7 @@ static bool trigger_connection(struct app_connection *connection)
- 
- 	/* after state change trigger discovering */
- 	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
--		if (!bt_le_discovery_start(le_device_found_handler)) {
-+		if (!bt_le_discovery_start()) {
- 			error("gatt: Could not start scan");
- 
- 			return false;
-@@ -5917,6 +5921,15 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	if (!start_listening_io())
- 		return false;
- 
-+	if (!bt_le_register(le_device_found_handler)) {
-+		error("gatt: bt_le_register failed");
-+
-+		g_io_channel_unref(listening_io);
-+		listening_io = NULL;
-+
-+		return false;
-+	}
-+
- 	crypto = bt_crypto_new();
- 	if (!crypto) {
- 		error("gatt: Failed to setup crypto");
-@@ -6001,6 +6014,8 @@ void bt_gatt_unregister(void)
- 
- 	bt_crypto_unref(crypto);
- 	crypto = NULL;
-+
-+	bt_le_unregister();
- }
- 
- 
--- 
-1.9.3
 
+On 1 June 2014 10:50, Kiran Kumar Raparthy <kiran.kumar@linaro.org> wrote:
+
+> From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
+>
+> Preserve the master role when SCO or eSCO is active
+> as this improves compatability with lots of
+> headset and chipset combinations.
+>
+> This is one of the number of patches from the Android AOSP
+> common.git tree, which is used on almost all Android devices.
+> It looks like it would improve support for compatibility with
+> lot of headset,so I wanted to submit it for review to see
+> if it should go upstream.
+>
+> v3: Fixed formatting issues pointed by Sergei
+>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: Android Kernel Team <kernel-team@android.com>
+> Cc: John Stultz <john.stultz@linaro.org>
+> Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
+> Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
+> [kiran: Added context to commit message]
+> Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
+> ---
+>  net/bluetooth/hci_event.c | 12 +++++++++++-
+>  1 file changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 15010a2..cfb1355 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1915,6 +1915,14 @@ unlock:
+>         hci_conn_check_pending(hdev);
+>  }
+>
+> +static inline bool is_sco_active(struct hci_dev *hdev)
+> +{
+> +       if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
+> +           hci_conn_hash_lookup_state(hdev, ESCO_LINK, BT_CONNECTED))
+> +               return true;
+> +       return false;
+> +}
+> +
+>  static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff
+> *skb)
+>  {
+>         struct hci_ev_conn_request *ev = (void *) skb->data;
+> @@ -1961,7 +1969,9 @@ static void hci_conn_request_evt(struct hci_dev
+> *hdev, struct sk_buff *skb)
+>
+>                         bacpy(&cp.bdaddr, &ev->bdaddr);
+>
+> -                       if (lmp_rswitch_capable(hdev) && (mask &
+> HCI_LM_MASTER))
+> +                       if (lmp_rswitch_capable(hdev) &&
+> +                           ((mask & HCI_LM_MASTER) ||
+> +                           is_sco_active(hdev)))
+>                                 cp.role = 0x00; /* Become master */
+>                         else
+>                                 cp.role = 0x01; /* Remain slave */
+> --
+> 1.8.2.1
+>
+>
+
+--001a11c13db295e8d004fb610a9f
+Content-Type: text/html; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Just a reminder.<div style>Regards,</div><div style>Kiran<=
+/div></div><div class=3D"gmail_extra"><br><br><div class=3D"gmail_quote">On=
+ 1 June 2014 10:50, Kiran Kumar Raparthy <span dir=3D"ltr">&lt;<a href=3D"m=
+ailto:kiran.kumar@linaro.org" target=3D"_blank">kiran.kumar@linaro.org</a>&=
+gt;</span> wrote:<br>
+<blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1p=
+x #ccc solid;padding-left:1ex">From: &quot;hyungseoung.yoo&quot; &lt;<a hre=
+f=3D"mailto:hyungseoung.yoo@samsung.com">hyungseoung.yoo@samsung.com</a>&gt=
+;<br>
+
+<br>
+Preserve the master role when SCO or eSCO is active<br>
+as this improves compatability with lots of<br>
+headset and chipset combinations.<br>
+<br>
+This is one of the number of patches from the Android AOSP<br>
+common.git tree, which is used on almost all Android devices.<br>
+It looks like it would improve support for compatibility with<br>
+lot of headset,so I wanted to submit it for review to see<br>
+if it should go upstream.<br>
+<br>
+v3: Fixed formatting issues pointed by Sergei<br>
+<br>
+Cc: Marcel Holtmann &lt;<a href=3D"mailto:marcel@holtmann.org">marcel@holtm=
+ann.org</a>&gt;<br>
+Cc: Gustavo Padovan &lt;<a href=3D"mailto:gustavo@padovan.org">gustavo@pado=
+van.org</a>&gt;<br>
+Cc: Johan Hedberg &lt;<a href=3D"mailto:johan.hedberg@gmail.com">johan.hedb=
+erg@gmail.com</a>&gt;<br>
+Cc: &quot;David S. Miller&quot; &lt;<a href=3D"mailto:davem@davemloft.net">=
+davem@davemloft.net</a>&gt;<br>
+Cc: <a href=3D"mailto:linux-bluetooth@vger.kernel.org">linux-bluetooth@vger=
+.kernel.org</a><br>
+Cc: <a href=3D"mailto:netdev@vger.kernel.org">netdev@vger.kernel.org</a><br=
+>
+Cc: <a href=3D"mailto:linux-kernel@vger.kernel.org">linux-kernel@vger.kerne=
+l.org</a><br>
+Cc: Android Kernel Team &lt;<a href=3D"mailto:kernel-team@android.com">kern=
+el-team@android.com</a>&gt;<br>
+Cc: John Stultz &lt;<a href=3D"mailto:john.stultz@linaro.org">john.stultz@l=
+inaro.org</a>&gt;<br>
+Signed-off-by: hyungseoung.yoo &lt;<a href=3D"mailto:hyungseoung.yoo@samsun=
+g.com">hyungseoung.yoo@samsung.com</a>&gt;<br>
+Signed-off-by: Jaikumar Ganesh &lt;<a href=3D"mailto:jaikumarg@android.com"=
+>jaikumarg@android.com</a>&gt;<br>
+[kiran: Added context to commit message]<br>
+Signed-off-by: Kiran Raparthy &lt;<a href=3D"mailto:kiran.kumar@linaro.org"=
+>kiran.kumar@linaro.org</a>&gt;<br>
+---<br>
+=C2=A0net/bluetooth/hci_event.c | 12 +++++++++++-<br>
+=C2=A01 file changed, 11 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c<br>
+index 15010a2..cfb1355 100644<br>
+--- a/net/bluetooth/hci_event.c<br>
++++ b/net/bluetooth/hci_event.c<br>
+@@ -1915,6 +1915,14 @@ unlock:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 hci_conn_check_pending(hdev);<br>
+=C2=A0}<br>
+<br>
++static inline bool is_sco_active(struct hci_dev *hdev)<br>
++{<br>
++ =C2=A0 =C2=A0 =C2=A0 if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CO=
+NNECTED) ||<br>
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 hci_conn_hash_lookup_state(hdev, ESCO_=
+LINK, BT_CONNECTED))<br>
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 return true;<br>
++ =C2=A0 =C2=A0 =C2=A0 return false;<br>
++}<br>
++<br>
+=C2=A0static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff=
+ *skb)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 struct hci_ev_conn_request *ev =3D (void *) skb=
+-&gt;data;<br>
+@@ -1961,7 +1969,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev=
+, struct sk_buff *skb)<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 bacpy(&amp;cp.bdaddr, &amp;ev-&gt;bdaddr);<br>
+<br>
+- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 if (lmp_rswitch_capable(hdev) &amp;&amp; (mask &amp; HCI_LM_MASTER))<br=
+>
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 if (lmp_rswitch_capable(hdev) &amp;&amp;<br>
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 ((mask &amp; HCI_LM_MASTER) ||<br>
++ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 is_sco_active(hdev)))<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cp.role =3D 0x00; /* Become master *=
+/<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 else<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cp.role =3D 0x01; /* Remain slave */=
+<br>
+<span class=3D"HOEnZb"><font color=3D"#888888">--<br>
+1.8.2.1<br>
+<br>
+</font></span></blockquote></div><br></div>
+
+--001a11c13db295e8d004fb610a9f--
