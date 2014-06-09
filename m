@@ -1,42 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH 2/2] SDP: Make sdp_set_access_protos() return void
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402315699-30381-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Date: Mon, 9 Jun 2014 14:10:24 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <31CD08C4-C776-4F0F-A0D6-2DD5CB854639@holtmann.org>
-References: <1402315699-30381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1402315699-30381-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] HDP: Fix checking always constant error code
+Date: Mon,  9 Jun 2014 15:08:18 +0300
+Message-Id: <1402315699-30381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Function always returns 0, so there is sense to make it void function.
-> ---
-> lib/sdp.c     | 6 +-----
-> lib/sdp_lib.h | 2 +-
-> 2 files changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/lib/sdp.c b/lib/sdp.c
-> index e5e4622..da26b78 100644
-> --- a/lib/sdp.c
-> +++ b/lib/sdp.c
-> @@ -2380,10 +2380,8 @@ static sdp_data_t *access_proto_to_dataseq(sdp_record_t *rec, sdp_list_t *proto)
->  *
->  * This function replaces the existing sdp_access_proto_t
->  * structure (if any) with the new one specified.
-> - *
-> - * returns 0 if successful or -1 if there is a failure.
->  */
-> -int sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
-> +void sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+sdp_set_access_protos() always returns 0, there is no sense to check for
+error code. Fixes compile warnings.
+---
+ profiles/health/hdp_util.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-if this is libbluetooth API, then we can not do that. I am not planning to break that API.
-
-Regards
-
-Marcel
+diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
+index 58770b5..ff427a6 100644
+--- a/profiles/health/hdp_util.c
++++ b/profiles/health/hdp_util.c
+@@ -362,7 +362,7 @@ static gboolean set_sdp_services_uuid(sdp_record_t *record, HdpRole role)
+ static gboolean register_service_protocols(struct hdp_adapter *adapter,
+ 						sdp_record_t *sdp_record)
+ {
+-	gboolean ret;
++	gboolean ret = TRUE;
+ 	uuid_t l2cap_uuid, mcap_c_uuid;
+ 	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
+ 	sdp_list_t *access_proto_list = NULL;
+@@ -425,11 +425,7 @@ static gboolean register_service_protocols(struct hdp_adapter *adapter,
+ 		goto end;
+ 	}
+ 
+-	if (sdp_set_access_protos(sdp_record, access_proto_list) < 0) {
+-		ret = FALSE;
+-		goto end;
+-	}
+-	ret = TRUE;
++	sdp_set_access_protos(sdp_record, access_proto_list);
+ 
+ end:
+ 	if (l2cap_list != NULL)
+-- 
+1.8.3.2
 
