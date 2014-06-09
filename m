@@ -1,52 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53958FA2.1090205@ahsoftware.de>
-Date: Mon, 09 Jun 2014 12:42:42 +0200
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] Bluetooth: Use struct delayed_work for HCI command timeout
-References: <1401586702-54238-1-git-send-email-marcel@holtmann.org> <538F75A0.8010609@ahsoftware.de> <538F8F49.7050501@ahsoftware.de> <038A5220-47E3-411C-88EE-C4DFE35724BD@holtmann.org>
-In-Reply-To: <038A5220-47E3-411C-88EE-C4DFE35724BD@holtmann.org>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+From: vikrampal <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: vikrampal <vikram.pal@samsung.com>
+Subject: [PATCH ] Fixed memory issues to avoid potential crash
+Date: Mon, 09 Jun 2014 15:59:52 +0530
+Message-id: <1402309792-18098-1-git-send-email-vikram.pal@samsung.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 05.06.2014 12:53, schrieb Marcel Holtmann:
-> Hi Alexander,
->
->>>> This is an experimental patch that converts hdev->cmd_timer from
->>>> struct timer_list to struct delayed_work.
->>>
->>> I don't know what this patch should change.
->>>
->>> If I understand it correctly, a workqueue is used instead of a timer.
->>> But besides that nothing else was changed. So instead of a timer, a work
->>> now kills the hci-cmd-task and posts an error. And that is exactly what
->>> happened here. So after one (failed) try, I've gone back to use my 2
->>> small patches.
->>
->> I assume the reasoning for the patch was to get the load of system queue somehow into the timeout. But that can't work. E.g. if the queue is already very busy when the hci command is (scheduled to) send and the (delayed) timeout is put on the queue (too), then it might happen that the command is send and immediately afterwards the timeout happens. Or the response from the dongle is already in the queue but happens after the timeout happens.
->
-> the main reason is that we have to move away from timer_list usage since we want to fully run outside of the interrupt context. It seems that the cmd_timeout was forgotten when we did the switch to workqueue processing. I did not expect that this change will fix anything right away, but it is the ground work to actually move into simpler locking which could potentially an issue for certain delays and unexpected interactions with the USB subsystem.
->
-> Keep in mind that we currently are using 3 workqueues. The system wide one, and two per HCI controller. I am pretty certain we need to investigate our general HCI packet processing vs the actual HCI command/event processing. For the HCI command/event processing we do rely on this being single threaded and ordered, but for the general HCI packet processing, we might can go multi-threaded and allow work to move from one CPU/core to another.
- >
-> Increasing the timeout like you did is just fixing a symptom. We need to figure out the root cause why a system takes so long to report results of the HCI command and/or what it wastes the time. USB might be a bottle neck here for sure, but then this might needs fixing as well.
->
-> Johan, did you have a look at my patch and see if it is generally sound. Should we include it and see how good (or bad) it is behaving in general. From there on we can optimize or workqueue usage.
+Signed-off-by: vikrampal <vikram.pal@samsung.com>
+---
+ src/sdp-xml.c       | 16 +++++++++++++++-
+ src/sdpd-database.c |  4 ++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-Increasing the timeout isn't fixing a symptom, the timeout itself is the 
-problem. It is arbitrary short and getting a reasonable value for such 
-is almost impossible on non-realtime-systems like Linux. Even on my 
-fastest machine with plenty RAM, I'm able to pause almost everything for 
-some seconds by switching kernel versions in my git kernel repo.
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index 6492781..e0db1e9 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -91,6 +91,10 @@ static struct sdp_xml_data *sdp_xml_data_alloc(void)
+ 	/* Null terminate the text */
+ 	elem->size = DEFAULT_XML_DATA_SIZE;
+ 	elem->text = malloc(DEFAULT_XML_DATA_SIZE);
++	if (!elem->text) {
++		free(elem);
++		return NULL;
++	}
+ 	elem->text[0] = '\0';
+ 
+ 	return elem;
+@@ -333,6 +337,8 @@ static char *sdp_xml_parse_string_decode(const char *data, char encoding,
+ 		int i;
+ 
+ 		decoded = malloc((len >> 1) + 1);
++		if (decoded == NULL)
++			return NULL;
+ 
+ 		/* Ensure the string is a power of 2 */
+ 		len = (len >> 1) << 1;
+@@ -823,7 +829,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 	{
+ 		int num_chars_to_escape = 0;
+ 		int length = value->unitSize - 1;
+-		char *strBuf = 0;
++		char *strBuf;
+ 
+ 		hex = 0;
+ 
+@@ -850,6 +856,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			appender(data, "encoding=\"hex\" ");
+ 			strBuf = malloc(sizeof(char)
+ 						 * ((value->unitSize-1) * 2 + 1));
++			if (!strBuf) {
++				DBG("No memory to convert raw data to xml");
++				return;
++			}
+ 
+ 			/* Unit Size seems to include the size for dtd
+ 			   It is thus off by 1
+@@ -866,6 +876,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			/* escape the XML disallowed chars */
+ 			strBuf = malloc(sizeof(char) *
+ 					(value->unitSize + 1 + num_chars_to_escape * 4));
++			if (!strBuf) {
++				DBG("No memory to convert raw data to xml");
++				return;
++			}
+ 			for (i = 0, j = 0; i < length; i++) {
+ 				if (value->val.str[i] == '&') {
+ 					strBuf[j++] = '&';
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index f65a526..e825f69 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -157,6 +157,10 @@ static int compare_indices(const void *i1, const void *i2)
+ void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
+ {
+ 	sdp_indexed_t *item = malloc(sizeof(sdp_indexed_t));
++	if (!item) {
++		SDPDBG("No memory");
++		return;
++	}
+ 	item->sock = sock;
+ 	item->record = record;
+ 	socket_index = sdp_list_insert_sorted(socket_index, item, compare_indices);
+-- 
+1.9.1
 
-But I'm much more concerned about the fact, that the timeout masks 
-almost all in-kernel errors too. So one never can be sure what the 
-reason for the timeout is. That's why I've ended up with the first 
-patch. Using that patch I can at least be sure that I don't have to 
-search for a deadlock.
-
-Regards,
-
-Alexander Holler
