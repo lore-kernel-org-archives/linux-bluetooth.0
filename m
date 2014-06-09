@@ -1,50 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix SSP acceptor just-works confirmation without MITM
-Date: Mon,  9 Jun 2014 13:58:14 +0300
-Message-Id: <1402311494-28906-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <53958FA2.1090205@ahsoftware.de>
+Date: Mon, 09 Jun 2014 12:42:42 +0200
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Marcel Holtmann <marcel@holtmann.org>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Use struct delayed_work for HCI command timeout
+References: <1401586702-54238-1-git-send-email-marcel@holtmann.org> <538F75A0.8010609@ahsoftware.de> <538F8F49.7050501@ahsoftware.de> <038A5220-47E3-411C-88EE-C4DFE35724BD@holtmann.org>
+In-Reply-To: <038A5220-47E3-411C-88EE-C4DFE35724BD@holtmann.org>
+Content-Type: text/plain; charset=us-ascii; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Am 05.06.2014 12:53, schrieb Marcel Holtmann:
+> Hi Alexander,
+>
+>>>> This is an experimental patch that converts hdev->cmd_timer from
+>>>> struct timer_list to struct delayed_work.
+>>>
+>>> I don't know what this patch should change.
+>>>
+>>> If I understand it correctly, a workqueue is used instead of a timer.
+>>> But besides that nothing else was changed. So instead of a timer, a work
+>>> now kills the hci-cmd-task and posts an error. And that is exactly what
+>>> happened here. So after one (failed) try, I've gone back to use my 2
+>>> small patches.
+>>
+>> I assume the reasoning for the patch was to get the load of system queue somehow into the timeout. But that can't work. E.g. if the queue is already very busy when the hci command is (scheduled to) send and the (delayed) timeout is put on the queue (too), then it might happen that the command is send and immediately afterwards the timeout happens. Or the response from the dongle is already in the queue but happens after the timeout happens.
+>
+> the main reason is that we have to move away from timer_list usage since we want to fully run outside of the interrupt context. It seems that the cmd_timeout was forgotten when we did the switch to workqueue processing. I did not expect that this change will fix anything right away, but it is the ground work to actually move into simpler locking which could potentially an issue for certain delays and unexpected interactions with the USB subsystem.
+>
+> Keep in mind that we currently are using 3 workqueues. The system wide one, and two per HCI controller. I am pretty certain we need to investigate our general HCI packet processing vs the actual HCI command/event processing. For the HCI command/event processing we do rely on this being single threaded and ordered, but for the general HCI packet processing, we might can go multi-threaded and allow work to move from one CPU/core to another.
+ >
+> Increasing the timeout like you did is just fixing a symptom. We need to figure out the root cause why a system takes so long to report results of the HCI command and/or what it wastes the time. USB might be a bottle neck here for sure, but then this might needs fixing as well.
+>
+> Johan, did you have a look at my patch and see if it is generally sound. Should we include it and see how good (or bad) it is behaving in general. From there on we can optimize or workqueue usage.
 
->From the Bluetooth Core Specification 4.1 page 1958:
+Increasing the timeout isn't fixing a symptom, the timeout itself is the 
+problem. It is arbitrary short and getting a reasonable value for such 
+is almost impossible on non-realtime-systems like Linux. Even on my 
+fastest machine with plenty RAM, I'm able to pause almost everything for 
+some seconds by switching kernel versions in my git kernel repo.
 
-"if both devices have set the Authentication_Requirements parameter to
-one of the MITM Protection Not Required options, authentication stage 1
-shall function as if both devices set their IO capabilities to
-DisplayOnly (e.g., Numeric comparison with automatic confirmation on
-both devices)"
+But I'm much more concerned about the fact, that the timeout masks 
+almost all in-kernel errors too. So one never can be sure what the 
+reason for the timeout is. That's why I've ended up with the first 
+patch. Using that patch I can at least be sure that I don't have to 
+search for a deadlock.
 
-So far our implementation has done user confirmation for all just-works
-cases regardless of the MITM requirements, however following the
-specification to the word means that we should not be doing confirmation
-when neither side has the MITM flag set.
+Regards,
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index df7895e8fcc8..67a9cf4143ae 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3622,8 +3622,11 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 
- 		/* If we're not the initiators request authorization to
- 		 * proceed from user space (mgmt_user_confirm with
--		 * confirm_hint set to 1). */
--		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
-+		 * confirm_hint set to 1). The exception is if neither
-+		 * side had MITM in which case we do auto-accept.
-+		 */
-+		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) &&
-+		    (loc_mitm || rem_mitm)) {
- 			BT_DBG("Confirming auto-accept as acceptor");
- 			confirm_hint = 1;
- 			goto confirm;
--- 
-1.9.3
-
+Alexander Holler
