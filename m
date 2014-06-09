@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: 
-References: 
-Subject: SPP profile in Bluez
-From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-To: linux-bluetooth@vger.kernel.org,
-	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
-Message-ID: <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
-Date: Mon, 9 Jun 2014 14:48:44 +0530
-Content-Type: text/plain; charset=US-ASCII
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] android/gatt: Fix error status override
+Date: Mon,  9 Jun 2014 11:26:16 +0300
+Message-Id: <1402302376-22372-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Dear Team,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I want to use SPP in Bluez stack.
+---
+ android/gatt.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-Can anyone help me, from which versions of Bluez SPP is available ?
-
-I would like to use SPP Connect, Disconnect, Read and Write functionalities.
-
-Help me in this regard.
-
-
-Thanks & Regards,
-Vinod.
-
-
-=====-----=====-----=====
-Notice: The information contained in this e-mail
-message and/or attachments to it may contain 
-confidential or privileged information. If you are 
-not the intended recipient, any dissemination, use, 
-review, distribution, printing or copying of the 
-information contained in this e-mail message 
-and/or attachments to it are strictly prohibited. If 
-you have received this communication in error, 
-please notify us by reply e-mail or telephone and 
-immediately and permanently delete the message 
-and any attachments. Thank you
-
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 3fd88fa..7cf70a9 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1950,8 +1950,10 @@ static void handle_client_search_service(const void *buf, uint16_t len)
+ 		if (s) {
+ 			send_client_primary_notify(s, INT_TO_PTR(conn->id));
+ 		} else {
+-			if (!search_dev_for_srvc(conn, &uuid))
++			if (!search_dev_for_srvc(conn, &uuid)) {
+ 				status = HAL_STATUS_FAILED;
++				goto reply;
++			}
+ 
+ 			status = HAL_STATUS_SUCCESS;
+ 			goto reply;
+-- 
+1.8.3.2
 
