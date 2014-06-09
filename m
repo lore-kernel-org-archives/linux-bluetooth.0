@@ -1,47 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Re-run PTS for A2DP
-Date: Mon,  9 Jun 2014 11:38:22 +0200
-Message-Id: <1402306702-32575-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: 
+References: 
+Subject: SPP profile in Bluez
+From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+To: linux-bluetooth@vger.kernel.org,
+	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
+Message-ID: <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
+Date: Mon, 9 Jun 2014 14:48:44 +0530
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PTS session for A2DP which includes new PICS settings with PICS:
-'Additional encoder Codec' set to TRUE as there is aptX support
-added.
----
- android/pics-a2dp.txt | 2 +-
- android/pts-a2dp.txt  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Dear Team,
 
-diff --git a/android/pics-a2dp.txt b/android/pics-a2dp.txt
-index 81debcd..53b3c1c 100644
---- a/android/pics-a2dp.txt
-+++ b/android/pics-a2dp.txt
-@@ -50,7 +50,7 @@ C.1: At least one of the values shall be supported.
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_A2DP_3_1	True		SRC: SBC encoder Codec (M)
--TSPC_A2DP_3_2	False		SRC: Additional encoder Codec (O)
-+TSPC_A2DP_3_2	True (*)	SRC: Additional encoder Codec (O)
- -------------------------------------------------------------------------------
- 
- 
-diff --git a/android/pts-a2dp.txt b/android/pts-a2dp.txt
-index 3670dd0..5780db1 100644
---- a/android/pts-a2dp.txt
-+++ b/android/pts-a2dp.txt
-@@ -1,7 +1,7 @@
- PTS test results for A2DP
- 
- PTS version: 5.1
--Tested: 07-April-2014
-+Tested: 06-June-2014
- Android version: 4.4.2
- 
- Results:
--- 
-1.8.5.3
+I want to use SPP in Bluez stack.
+
+Can anyone help me, from which versions of Bluez SPP is available ?
+
+I would like to use SPP Connect, Disconnect, Read and Write functionalities.
+
+Help me in this regard.
+
+
+Thanks & Regards,
+Vinod.
+
+
+=====-----=====-----=====
+Notice: The information contained in this e-mail
+message and/or attachments to it may contain 
+confidential or privileged information. If you are 
+not the intended recipient, any dissemination, use, 
+review, distribution, printing or copying of the 
+information contained in this e-mail message 
+and/or attachments to it are strictly prohibited. If 
+you have received this communication in error, 
+please notify us by reply e-mail or telephone and 
+immediately and permanently delete the message 
+and any attachments. Thank you
+
+
 
