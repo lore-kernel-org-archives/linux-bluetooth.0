@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ 4/5] android/bluetooth: Add bt_device_set_uuids
-Date: Mon,  9 Jun 2014 11:15:50 +0300
-Message-Id: <1402301751-26353-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [RFC BlueZ 2/5] android/gatt: Do not stop discovery if scanning is not set
+Date: Mon,  9 Jun 2014 11:15:48 +0300
+Message-Id: <1402301751-26353-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1402301751-26353-1-git-send-email-luiz.dentz@gmail.com>
 References: <1402301751-26353-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,47 +11,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+If scanning is not set the discovery might have been initiated by another
+HAL so do not stop it.
 ---
- android/bluetooth.c | 13 +++++++++++++
- android/bluetooth.h |  1 +
- 2 files changed, 14 insertions(+)
+ android/gatt.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 834d687..f8e9181 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1409,6 +1409,19 @@ bool bt_device_is_bonded(const bdaddr_t *bdaddr)
- 	return false;
- }
+diff --git a/android/gatt.c b/android/gatt.c
+index f797e7d..8a8419c 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -661,6 +661,11 @@ connect:
+ 	device_set_state(dev, DEVICE_CONNECT_READY);
+ 	dev->bdaddr_type = addr_type;
  
-+bool bt_device_set_uuids(const bdaddr_t *addr, GSList *uuids)
-+{
-+	struct device *dev;
++	if (!scanning) {
++		connect_next_dev();
++		return;
++	}
 +
-+	dev = find_device(addr);
-+	if (!dev)
-+		return false;
-+
-+	set_device_uuids(dev, uuids);
-+
-+	return true;
-+}
-+
- static bool rssi_above_threshold(int old, int new)
- {
- 	/* only 8 dBm or more */
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 7c64bab..eb50fe1 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -61,6 +61,7 @@ bool bt_is_device_le(const bdaddr_t *addr);
- 
- const char *bt_get_adapter_name(void);
- bool bt_device_is_bonded(const bdaddr_t *bdaddr);
-+bool bt_device_set_uuids(const bdaddr_t *bdaddr, GSList *uuids);
- 
- typedef void (*bt_read_device_rssi_done)(uint8_t status, const bdaddr_t *addr,
- 						int8_t rssi, void *user_data);
+ 	/*
+ 	 * We are ok to perform connect now. Stop discovery
+ 	 * and once it is stopped continue with creating ACL
 -- 
 1.9.3
 
