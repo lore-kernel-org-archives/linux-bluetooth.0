@@ -1,38 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Jun 2014 16:56:31 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
-Subject: Re: SPP profile in Bluez
-Message-ID: <20140609135631.GA11813@t440s.lan>
-References: <20140609094952.GA23710@t440s.lan>
- <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com>
- <OFCB7E0C57.B1D6416B-ON65257CF2.0046FA0F-65257CF2.0046FA12@tcs.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <OFCB7E0C57.B1D6416B-ON65257CF2.0046FA0F-65257CF2.0046FA12@tcs.com>
+In-Reply-To: <1401971470-29048-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1401971470-29048-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 9 Jun 2014 16:31:13 +0300
+Message-ID: <CABBYNZK7tU6TL+M2beds0VPDU6T5AEv-5L8b=_q+r2Y1T_vAWw@mail.gmail.com>
+Subject: Re: [RFC] android/hal-audio: Fix leaving open socket
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vinod,
+Hi Andrei,
 
-On Mon, Jun 09, 2014, Vinod Rayapudi wrote:
-> Thanks for your reply and suggestion too.
+On Thu, Jun 5, 2014 at 3:31 PM, Andrei Emeltchenko
+<Andrei.Emeltchenko.news@gmail.com> wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+>
+> When getting out of the poll loop we shall close socket always.
+> ---
+>  android/hal-audio.c | 12 +++++-------
+>  1 file changed, 5 insertions(+), 7 deletions(-)
+>
+> diff --git a/android/hal-audio.c b/android/hal-audio.c
+> index bfc102f..439b583 100644
+> --- a/android/hal-audio.c
+> +++ b/android/hal-audio.c
+> @@ -1346,14 +1346,12 @@ static void *ipc_handler(void *data)
+>                 /* Check if socket is still alive. Empty while loop.*/
+>                 while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
+>
+> -               if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
+> -                       info("Audio HAL: Socket closed");
+> +               info("Audio HAL: Socket closed");
+>
+> -                       pthread_mutex_lock(&sk_mutex);
+> -                       close(audio_sk);
+> -                       audio_sk = -1;
+> -                       pthread_mutex_unlock(&sk_mutex);
+> -               }
+> +               pthread_mutex_lock(&sk_mutex);
+> +               close(audio_sk);
+> +               audio_sk = -1;
+> +               pthread_mutex_unlock(&sk_mutex);
+>         }
+>
+>         /* audio_sk is closed at this point, just cleanup endpoints states */
+> --
+> 1.8.3.2
 
-No problem, but please make this the last top-posting email you send to
-the list and do in-line quoting in the future.
+Im not quite sure what this does fix, I mean I do understand that the
+if statement might not be required after all we have since we have
+pfd.events = POLLHUP | POLLERR | POLLNVAL but removing it is not a fix
+more a cleanup.
 
-> I want to know, Is the same available with Bluez 4.101 version.
-> I have been working with Bluez 4.x series.
 
-The Profile interface I mentioned doesn't exist for BlueZ 4 but if I
-remember right we did have some other D-Bus interface there. I think it
-was called org.bluez.Serial, but you'll need to find out the rest by
-yourself.
-
-> Can I work with SPP on Bluez 4.101 ?
-
-As I already said, SPP has always been available with BlueZ.
-
-Johan
+-- 
+Luiz Augusto von Dentz
