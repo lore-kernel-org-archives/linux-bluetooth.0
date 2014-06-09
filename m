@@ -1,89 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: vikrampal <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: vikrampal <vikram.pal@samsung.com>
-Subject: [PATCH ] Fixed memory issues to avoid potential crash
-Date: Mon, 09 Jun 2014 15:59:52 +0530
-Message-id: <1402309792-18098-1-git-send-email-vikram.pal@samsung.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Eva Kolanska <eva.kolanska@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update GAP test results
+Date: Mon, 09 Jun 2014 11:56:53 +0200
+Message-ID: <1585060.QofOWshEHF@uw000953>
+In-Reply-To: <1402062885-25627-1-git-send-email-eva.kolanska@tieto.com>
+References: <1402062885-25627-1-git-send-email-eva.kolanska@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: vikrampal <vikram.pal@samsung.com>
----
- src/sdp-xml.c       | 16 +++++++++++++++-
- src/sdpd-database.c |  4 ++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+Hi Eva,
 
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 6492781..e0db1e9 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
-@@ -91,6 +91,10 @@ static struct sdp_xml_data *sdp_xml_data_alloc(void)
- 	/* Null terminate the text */
- 	elem->size = DEFAULT_XML_DATA_SIZE;
- 	elem->text = malloc(DEFAULT_XML_DATA_SIZE);
-+	if (!elem->text) {
-+		free(elem);
-+		return NULL;
-+	}
- 	elem->text[0] = '\0';
- 
- 	return elem;
-@@ -333,6 +337,8 @@ static char *sdp_xml_parse_string_decode(const char *data, char encoding,
- 		int i;
- 
- 		decoded = malloc((len >> 1) + 1);
-+		if (decoded == NULL)
-+			return NULL;
- 
- 		/* Ensure the string is a power of 2 */
- 		len = (len >> 1) << 1;
-@@ -823,7 +829,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 	{
- 		int num_chars_to_escape = 0;
- 		int length = value->unitSize - 1;
--		char *strBuf = 0;
-+		char *strBuf;
- 
- 		hex = 0;
- 
-@@ -850,6 +856,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 			appender(data, "encoding=\"hex\" ");
- 			strBuf = malloc(sizeof(char)
- 						 * ((value->unitSize-1) * 2 + 1));
-+			if (!strBuf) {
-+				DBG("No memory to convert raw data to xml");
-+				return;
-+			}
- 
- 			/* Unit Size seems to include the size for dtd
- 			   It is thus off by 1
-@@ -866,6 +876,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 			/* escape the XML disallowed chars */
- 			strBuf = malloc(sizeof(char) *
- 					(value->unitSize + 1 + num_chars_to_escape * 4));
-+			if (!strBuf) {
-+				DBG("No memory to convert raw data to xml");
-+				return;
-+			}
- 			for (i = 0, j = 0; i < length; i++) {
- 				if (value->val.str[i] == '&') {
- 					strBuf[j++] = '&';
-diff --git a/src/sdpd-database.c b/src/sdpd-database.c
-index f65a526..e825f69 100644
---- a/src/sdpd-database.c
-+++ b/src/sdpd-database.c
-@@ -157,6 +157,10 @@ static int compare_indices(const void *i1, const void *i2)
- void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
- {
- 	sdp_indexed_t *item = malloc(sizeof(sdp_indexed_t));
-+	if (!item) {
-+		SDPDBG("No memory");
-+		return;
-+	}
- 	item->sock = sock;
- 	item->record = record;
- 	socket_index = sdp_list_insert_sorted(socket_index, item, compare_indices);
+On Friday 06 of June 2014 15:54:45 Eva Kolanska wrote:
+> ---
+>  android/pts-gap.txt |   75 +++++++++++++++++++++++++++++++++++++--------------
+>  1 file changed, 55 insertions(+), 20 deletions(-)
+> 
+> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+> index a08e385..9323f3c 100644
+> --- a/android/pts-gap.txt
+> +++ b/android/pts-gap.txt
+
+Applied, thanks.
+
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
