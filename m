@@ -1,56 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 9 Jun 2014 15:22:17 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] HDP: Fix checking always constant error code
-Message-ID: <20140609122215.GA17420@aemeltch-MOBL1>
-References: <1402315699-30381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <DAB243FF-0783-4067-BABB-A7AF93F3E71A@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <DAB243FF-0783-4067-BABB-A7AF93F3E71A@holtmann.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] SDP: Make sdp_set_add_access_protos() return void
+Date: Mon,  9 Jun 2014 15:14:50 +0300
+Message-Id: <1402316090-437-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1402316090-437-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1402316090-437-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Jun 09, 2014 at 02:11:14PM +0200, Marcel Holtmann wrote:
-> Hi Andrei,
-> 
-> > sdp_set_access_protos() always returns 0, there is no sense to check for
-> > error code. Fixes compile warnings.
-> > ---
-> > profiles/health/hdp_util.c | 8 ++------
-> > 1 file changed, 2 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-> > index 58770b5..ff427a6 100644
-> > --- a/profiles/health/hdp_util.c
-> > +++ b/profiles/health/hdp_util.c
-> > @@ -362,7 +362,7 @@ static gboolean set_sdp_services_uuid(sdp_record_t *record, HdpRole role)
-> > static gboolean register_service_protocols(struct hdp_adapter *adapter,
-> > 						sdp_record_t *sdp_record)
-> > {
-> > -	gboolean ret;
-> > +	gboolean ret = TRUE;
-> > 	uuid_t l2cap_uuid, mcap_c_uuid;
-> > 	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
-> > 	sdp_list_t *access_proto_list = NULL;
-> > @@ -425,11 +425,7 @@ static gboolean register_service_protocols(struct hdp_adapter *adapter,
-> > 		goto end;
-> > 	}
-> > 
-> > -	if (sdp_set_access_protos(sdp_record, access_proto_list) < 0) {
-> > -		ret = FALSE;
-> > -		goto end;
-> > -	}
-> > -	ret = TRUE;
-> 
-> might better just a comment here explaining that the call always returns success.
-> 
+Function always returns 0, make it void function.
+---
+ lib/sdp.c     | 4 +---
+ lib/sdp_lib.h | 2 +-
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-This function is used 51 times throughout the code without any check and
-comment, I think we might need to add comments there as well.
+diff --git a/lib/sdp.c b/lib/sdp.c
+index da26b78..11bd532 100644
+--- a/lib/sdp.c
++++ b/lib/sdp.c
+@@ -2394,7 +2394,7 @@ void sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+ 	sdp_attr_add(rec, SDP_ATTR_PROTO_DESC_LIST, protos);
+ }
+ 
+-int sdp_set_add_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
++void sdp_set_add_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+ {
+ 	const sdp_list_t *p;
+ 	sdp_data_t *protos = NULL;
+@@ -2406,8 +2406,6 @@ int sdp_set_add_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+ 
+ 	sdp_attr_add(rec, SDP_ATTR_ADD_PROTO_DESC_LIST,
+ 			protos ? sdp_data_alloc(SDP_SEQ8, protos) : NULL);
+-
+-	return 0;
+ }
+ 
+ /*
+diff --git a/lib/sdp_lib.h b/lib/sdp_lib.h
+index 72922d6..5b2d551 100644
+--- a/lib/sdp_lib.h
++++ b/lib/sdp_lib.h
+@@ -236,7 +236,7 @@ void sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *proto);
+ /*
+  * Set the additional access protocols of the record to those specified in proto
+  */
+-int sdp_set_add_access_protos(sdp_record_t *rec, const sdp_list_t *proto);
++void sdp_set_add_access_protos(sdp_record_t *rec, const sdp_list_t *proto);
+ 
+ /*
+  * Get protocol port (i.e. PSM for L2CAP, Channel for RFCOMM)
+-- 
+1.8.3.2
 
-Best regards 
-Andrei Emeltchenko 
