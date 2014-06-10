@@ -1,40 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] unit/test-hfp: Add test for parsing empty string
-Date: Tue, 10 Jun 2014 11:41:42 +0200
-Message-ID: <2766285.21YZ4l1YyA@uw000953>
-In-Reply-To: <1401903668-27548-1-git-send-email-szymon.janc@tieto.com>
-References: <1401903668-27548-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/README: Update information about GATT HAL support
+Date: Tue, 10 Jun 2014 11:32:09 +0200
+Message-Id: <1402392729-29775-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 04 of June 2014 19:41:07 Szymon Janc wrote:
-> Test if parser is properly handling single '\r'.
-> ---
->  unit/test-hfp.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
-> index 20aa0b5..a8801b0 100644
-> --- a/unit/test-hfp.c
-> +++ b/unit/test-hfp.c
-> @@ -465,6 +465,9 @@ int main(int argc, char *argv[])
->  									'\r'),
->  			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
->  			data_end());
-> +	define_test("/hfp/test_empty", test_fragmented, NULL,
-> +			raw_pdu('\r'),
-> +			data_end());
->  
->  	return g_test_run();
->  }
-> 
+---
+ android/README | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Both patches pushed.
-
+diff --git a/android/README b/android/README
+index 91fc545..435cf56 100644
+--- a/android/README
++++ b/android/README
+@@ -222,9 +222,9 @@ Profile ID    HAL header         Status
+ ---------------------------------------
+ core          bluetooth.h        complete
+ a2dp          bt_av.h            complete
+-gatt          bt_gatt.h          partial
+-              bt_gatt_client.h   partial
+-              bt_gatt_server.h   initial
++gatt          bt_gatt.h          complete
++              bt_gatt_client.h   complete
++              bt_gatt_server.h   complete
+ handsfree     bt_hf.h            complete
+ hidhost       bt_hh.h            complete
+ health        bt_hl.h            initial
+@@ -293,6 +293,14 @@ get_player_app_values_text_cb      NULL JNI implementation
+ set_player_app_value_cb            NULL JNI implementation
+ 
+ 
++HAL GATT
++--------
++
++methods:
++client->set_adv_data               missing kernel support for vendor data
++client->connect                    is_direct parameter is ignored
++
++
+ Known Android issues
+ ====================
+ 
+@@ -324,3 +332,4 @@ HFP		Response and Hold		AT+BTRH, +BTRH
+ HFP		In-band Ring Tone		+BSIR
+ AVRCP		Player Settings			HAL API present but not used
+ AVRCP		Browsing			No HAL API
++GATT		Read multiple characteristics	No HAL API
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
