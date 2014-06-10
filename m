@@ -1,41 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Fix indicating discovery state when canceling inquiry
-Date: Tue, 10 Jun 2014 14:05:57 +0300
-Message-Id: <1402398359-1602-1-git-send-email-johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/2] unit/test-hfp: Add test for parsing empty string
+Date: Tue, 10 Jun 2014 11:41:42 +0200
+Message-ID: <2766285.21YZ4l1YyA@uw000953>
+In-Reply-To: <1401903668-27548-1-git-send-email-szymon.janc@tieto.com>
+References: <1401903668-27548-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+On Wednesday 04 of June 2014 19:41:07 Szymon Janc wrote:
+> Test if parser is properly handling single '\r'.
+> ---
+>  unit/test-hfp.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/unit/test-hfp.c b/unit/test-hfp.c
+> index 20aa0b5..a8801b0 100644
+> --- a/unit/test-hfp.c
+> +++ b/unit/test-hfp.c
+> @@ -465,6 +465,9 @@ int main(int argc, char *argv[])
+>  									'\r'),
+>  			type_pdu(HFP_GW_CMD_TYPE_SET, 0),
+>  			data_end());
+> +	define_test("/hfp/test_empty", test_fragmented, NULL,
+> +			raw_pdu('\r'),
+> +			data_end());
+>  
+>  	return g_test_run();
+>  }
+> 
 
-When inquiry is canceled through the HCI_Cancel_Inquiry command there is
-no Inquiry Complete event generated. Instead, all we get is the command
-complete for the HCI_Inquiry_Cancel command. This means that we must
-call the hci_discovery_set_state() function from the respective command
-complete handler in order to ensure that user space knows the correct
-discovery state.
+Both patches pushed.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 3415c3468f15..ec1b17467133 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -48,6 +48,10 @@ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb)
- 	smp_mb__after_clear_bit(); /* wake_up_bit advises about this barrier */
- 	wake_up_bit(&hdev->flags, HCI_INQUIRY);
- 
-+	hci_dev_lock(hdev);
-+	hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
-+	hci_dev_unlock(hdev);
-+
- 	hci_conn_check_pending(hdev);
- }
- 
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
