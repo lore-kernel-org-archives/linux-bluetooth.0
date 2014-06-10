@@ -1,53 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix setting correct authentication information for SMP STK
-Date: Tue, 10 Jun 2014 15:19:50 +0300
-Message-Id: <1402402790-9844-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: Update GAP TC_CONN_CPUP_BV_06_C test result
+Date: Tue, 10 Jun 2014 14:05:37 +0200
+Message-ID: <4029435.KgTHP1E5xz@uw000953>
+In-Reply-To: <1402323259-15400-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1402323259-15400-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Grzegorz,
 
-When we store the STK in slave role we should set the correct
-authentication information for it. If the pairing is producing a HIGH
-security level the STK is considered authenticated, and otherwise it's
-considered unauthenticated. This patch fixes the value passed to the
-hci_add_ltk() function when adding the STK on the slave side.
+On Monday 09 of June 2014 16:14:19 Grzegorz Kolodziejczyk wrote:
+> ---
+>  android/pts-gap.txt | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+> index f83a8be..2b335a1 100644
+> --- a/android/pts-gap.txt
+> +++ b/android/pts-gap.txt
+> @@ -133,7 +133,12 @@ TC_CONN_CPUP_BV_04_C	PASS	gattc register_client
+>  TC_CONN_CPUP_BV_05_C	PASS	gattc register_client
+>  				gattc connect 1 <pts_bdaddr>
+>  				gattc disconnect 1 <pts_bdaddr> 1
+> -TC_CONN_CPUP_BV_06_C	INC
+> +TC_CONN_CPUP_BV_06_C	PASS	gattc register_client
+> +				gattc connect 1 <pts_bdaddr>
+> +				hcitool lecup <handle> 0x0008 0x0C7B 0x0010
+> +					0x0014
+> +				gattc disconnect <client_if> <pts_bdaddr>
+> +					<conn_id>
+>  TC_CONN_TERM_BV_01_C	PASS
+>  TC_CONN_PRDA_BV_01_C	INC	Privacy feature - not implemented
+>  TC_CONN_PRDA_BV_02_C	INC	Privacy feature - not implemented
+> 
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Patch applied, thanks.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 3d1cc164557d..f2829a7932e2 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -544,7 +544,7 @@ static u8 smp_random(struct smp_chan *smp)
- 		hci_le_start_enc(hcon, ediv, rand, stk);
- 		hcon->enc_key_size = smp->enc_key_size;
- 	} else {
--		u8 stk[16];
-+		u8 stk[16], auth;
- 		__le64 rand = 0;
- 		__le16 ediv = 0;
- 
-@@ -556,8 +556,13 @@ static u8 smp_random(struct smp_chan *smp)
- 		memset(stk + smp->enc_key_size, 0,
- 		       SMP_MAX_ENC_KEY_SIZE - smp->enc_key_size);
- 
-+		if (hcon->pending_sec_level == BT_SECURITY_HIGH)
-+			auth = 1;
-+		else
-+			auth = 0;
-+
- 		hci_add_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
--			    HCI_SMP_STK_SLAVE, 0, stk, smp->enc_key_size,
-+			    HCI_SMP_STK_SLAVE, auth, stk, smp->enc_key_size,
- 			    ediv, rand);
- 	}
- 
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
