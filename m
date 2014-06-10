@@ -1,66 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 10 Jun 2014 10:57:10 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC] android/hal-audio: Fix leaving open socket
-Message-ID: <20140610075709.GA16337@aemeltch-MOBL1>
-References: <1401971470-29048-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <CABBYNZK7tU6TL+M2beds0VPDU6T5AEv-5L8b=_q+r2Y1T_vAWw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <CABBYNZK7tU6TL+M2beds0VPDU6T5AEv-5L8b=_q+r2Y1T_vAWw@mail.gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix check for connection encryption
+Date: Tue, 10 Jun 2014 09:54:24 +0300
+Message-Id: <1402383264-24508-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Mon, Jun 09, 2014 at 04:31:13PM +0300, Luiz Augusto von Dentz wrote:
-> Hi Andrei,
-> 
-> On Thu, Jun 5, 2014 at 3:31 PM, Andrei Emeltchenko
-> <Andrei.Emeltchenko.news@gmail.com> wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> >
-> > When getting out of the poll loop we shall close socket always.
-> > ---
-> >  android/hal-audio.c | 12 +++++-------
-> >  1 file changed, 5 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/android/hal-audio.c b/android/hal-audio.c
-> > index bfc102f..439b583 100644
-> > --- a/android/hal-audio.c
-> > +++ b/android/hal-audio.c
-> > @@ -1346,14 +1346,12 @@ static void *ipc_handler(void *data)
-> >                 /* Check if socket is still alive. Empty while loop.*/
-> >                 while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
-> >
-> > -               if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
-> > -                       info("Audio HAL: Socket closed");
-> > +               info("Audio HAL: Socket closed");
-> >
-> > -                       pthread_mutex_lock(&sk_mutex);
-> > -                       close(audio_sk);
-> > -                       audio_sk = -1;
-> > -                       pthread_mutex_unlock(&sk_mutex);
-> > -               }
-> > +               pthread_mutex_lock(&sk_mutex);
-> > +               close(audio_sk);
-> > +               audio_sk = -1;
-> > +               pthread_mutex_unlock(&sk_mutex);
-> >         }
-> >
-> >         /* audio_sk is closed at this point, just cleanup endpoints states */
-> > --
-> > 1.8.3.2
-> 
-> Im not quite sure what this does fix, I mean I do understand that the
-> if statement might not be required after all we have since we have
-> pfd.events = POLLHUP | POLLERR | POLLNVAL but removing it is not a fix
-> more a cleanup.
+The conn->link_key variable tracks the type of link key in use. It is
+set whenever we respond to a link key request as well as when we get a
+link key notification event.
 
-Yes, it might be more cleanup. But the fact you check for EINTR implies
-that there are other errors unchecked in which case we have resource leak.
+These two events do not however always guarantee that encryption is
+enabled: getting a link key request and responding to it may only mean
+that the remote side has requested authentication but not encryption. On
+the other hand, the encrypt change event is a certain guarantee that
+encryption is enabled. The real encryption state is already tracked in
+the conn->link_mode variable through the HCI_LM_ENCRYPT bit.
 
-Best regards 
-Andrei Emeltchenko 
+This patch fixes a check for encryption in the hci_conn_auth function to
+use the proper conn->link_mode value and thereby eliminates the chance
+of a false positive result.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_conn.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index b9b2bd464bec..ca01d1861854 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -889,7 +889,7 @@ static int hci_conn_auth(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
+ 		/* If we're already encrypted set the REAUTH_PEND flag,
+ 		 * otherwise set the ENCRYPT_PEND.
+ 		 */
+-		if (conn->key_type != 0xff)
++		if (conn->link_mode & HCI_LM_ENCRYPT)
+ 			set_bit(HCI_CONN_REAUTH_PEND, &conn->flags);
+ 		else
+ 			set_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags);
+-- 
+1.9.3
+
