@@ -1,66 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix SSP acceptor just-works confirmation without MITM
-Date: Tue, 10 Jun 2014 10:22:29 +0200
-Message-ID: <3801331.FNIQ7jQ6EV@uw000953>
-In-Reply-To: <1402311494-28906-1-git-send-email-johan.hedberg@gmail.com>
-References: <1402311494-28906-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 10 Jun 2014 10:57:10 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: Re: [RFC] android/hal-audio: Fix leaving open socket
+Message-ID: <20140610075709.GA16337@aemeltch-MOBL1>
+References: <1401971470-29048-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <CABBYNZK7tU6TL+M2beds0VPDU6T5AEv-5L8b=_q+r2Y1T_vAWw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <CABBYNZK7tU6TL+M2beds0VPDU6T5AEv-5L8b=_q+r2Y1T_vAWw@mail.gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Luiz,
 
-On Monday 09 of June 2014 13:58:14 johan.hedberg@gmail.com wrote:
-> From: Johan Hedberg <johan.hedberg@intel.com>
+On Mon, Jun 09, 2014 at 04:31:13PM +0300, Luiz Augusto von Dentz wrote:
+> Hi Andrei,
 > 
-> From the Bluetooth Core Specification 4.1 page 1958:
+> On Thu, Jun 5, 2014 at 3:31 PM, Andrei Emeltchenko
+> <Andrei.Emeltchenko.news@gmail.com> wrote:
+> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> >
+> > When getting out of the poll loop we shall close socket always.
+> > ---
+> >  android/hal-audio.c | 12 +++++-------
+> >  1 file changed, 5 insertions(+), 7 deletions(-)
+> >
+> > diff --git a/android/hal-audio.c b/android/hal-audio.c
+> > index bfc102f..439b583 100644
+> > --- a/android/hal-audio.c
+> > +++ b/android/hal-audio.c
+> > @@ -1346,14 +1346,12 @@ static void *ipc_handler(void *data)
+> >                 /* Check if socket is still alive. Empty while loop.*/
+> >                 while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
+> >
+> > -               if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
+> > -                       info("Audio HAL: Socket closed");
+> > +               info("Audio HAL: Socket closed");
+> >
+> > -                       pthread_mutex_lock(&sk_mutex);
+> > -                       close(audio_sk);
+> > -                       audio_sk = -1;
+> > -                       pthread_mutex_unlock(&sk_mutex);
+> > -               }
+> > +               pthread_mutex_lock(&sk_mutex);
+> > +               close(audio_sk);
+> > +               audio_sk = -1;
+> > +               pthread_mutex_unlock(&sk_mutex);
+> >         }
+> >
+> >         /* audio_sk is closed at this point, just cleanup endpoints states */
+> > --
+> > 1.8.3.2
 > 
-> "if both devices have set the Authentication_Requirements parameter to
-> one of the MITM Protection Not Required options, authentication stage 1
-> shall function as if both devices set their IO capabilities to
-> DisplayOnly (e.g., Numeric comparison with automatic confirmation on
-> both devices)"
-> 
-> So far our implementation has done user confirmation for all just-works
-> cases regardless of the MITM requirements, however following the
-> specification to the word means that we should not be doing confirmation
-> when neither side has the MITM flag set.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/hci_event.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index df7895e8fcc8..67a9cf4143ae 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3622,8 +3622,11 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
->  
->  		/* If we're not the initiators request authorization to
->  		 * proceed from user space (mgmt_user_confirm with
-> -		 * confirm_hint set to 1). */
-> -		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
-> +		 * confirm_hint set to 1). The exception is if neither
-> +		 * side had MITM in which case we do auto-accept.
-> +		 */
-> +		if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) &&
-> +		    (loc_mitm || rem_mitm)) {
->  			BT_DBG("Confirming auto-accept as acceptor");
->  			confirm_hint = 1;
->  			goto confirm;
-> 
+> Im not quite sure what this does fix, I mean I do understand that the
+> if statement might not be required after all we have since we have
+> pfd.events = POLLHUP | POLLERR | POLLNVAL but removing it is not a fix
+> more a cleanup.
 
-I've tested this on top of Nexus4 kernel + backports-20140516 with Android
-CTS "Insecure Server" test and this works OK (no user confirmation on incoming
-pairing).
+Yes, it might be more cleanup. But the fact you check for EINTR implies
+that there are other errors unchecked in which case we have resource leak.
 
-Tested-by: Szymon Janc <szymon.janc@tieto.com>
-
--- 
-Best regards, 
-Szymon Janc
+Best regards 
+Andrei Emeltchenko 
