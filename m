@@ -1,34 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Add clarifying comment for conn->auth_type
+Subject: Re: [PATCH] Bluetooth: Fix check for connection encryption
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402314085-6155-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 10 Jun 2014 11:15:58 +0200
+In-Reply-To: <1402383264-24508-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 10 Jun 2014 11:16:00 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <1D29B295-3466-4B21-AB62-BC5946145453@holtmann.org>
-References: <1402314085-6155-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <7EDA2AF9-4170-4457-9963-5F4EF084C5B1@holtmann.org>
+References: <1402383264-24508-1-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> When responding to an IO capability request when we're the initiators of
-> the pairing we will not yet have the remote IO capability information.
-> Since the conn->auth_type variable is treated as an "absolute"
-> requirement instead of a hint of what's needed later in the user
-> confirmation request handler it's important that it doesn't have the
-> MITM bit set if there's any chance that the remote device doesn't have
-> the necessary IO capabilities.
+> The conn->link_key variable tracks the type of link key in use. It is
+> set whenever we respond to a link key request as well as when we get a
+> link key notification event.
 > 
-> This patch adds a clarifying comment so that conn->auth_type is left
-> untouched in this scenario.
+> These two events do not however always guarantee that encryption is
+> enabled: getting a link key request and responding to it may only mean
+> that the remote side has requested authentication but not encryption. On
+> the other hand, the encrypt change event is a certain guarantee that
+> encryption is enabled. The real encryption state is already tracked in
+> the conn->link_mode variable through the HCI_LM_ENCRYPT bit.
+> 
+> This patch fixes a check for encryption in the hci_conn_auth function to
+> use the proper conn->link_mode value and thereby eliminates the chance
+> of a false positive result.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_event.c | 6 +++++-
-> 1 file changed, 5 insertions(+), 1 deletion(-)
+> net/bluetooth/hci_conn.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 patch has been applied to bluetooth-next tree.
 
