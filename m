@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 05/12] android/hog: Add support to auto discover primary if not set
-Date: Tue, 10 Jun 2014 18:53:56 +0300
-Message-Id: <1402415643-32300-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 03/12] android/gatt: Make application API public
+Date: Tue, 10 Jun 2014 18:53:54 +0300
+Message-Id: <1402415643-32300-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1402415643-32300-1-git-send-email-luiz.dentz@gmail.com>
 References: <1402415643-32300-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,137 +11,326 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support to auto discover primary service stopping once HoG
-UUID is found.
+This in future gonna be used by HoG to receive connection notifications.
 ---
- android/hog.c | 100 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 99 insertions(+), 1 deletion(-)
+ android/gatt.c | 143 ++++++++++++++++++++++++++++++++++++++++++++++-----------
+ android/gatt.h |  15 ++++++
+ 2 files changed, 130 insertions(+), 28 deletions(-)
 
-diff --git a/android/hog.c b/android/hog.c
-index bfb9c17..e929d7d 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -674,7 +674,9 @@ struct bt_hog *bt_hog_new(const char *name, uint16_t vendor, uint16_t product,
- 	hog->vendor = vendor;
- 	hog->product = product;
- 	hog->version = version;
--	hog->primary = g_memdup(primary, sizeof(*primary));
-+
-+	if (primary)
-+		hog->primary = g_memdup(primary, sizeof(*hog->primary));
+diff --git a/android/gatt.c b/android/gatt.c
+index 3fd88fa..c25aed4 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -87,11 +87,6 @@ static const char const *device_state_str[] = {
+ 	"CONNECTED",
+ };
  
- 	return bt_hog_ref(hog);
- }
-@@ -700,6 +702,97 @@ void bt_hog_unref(struct bt_hog *hog)
- 	hog_free(hog);
+-typedef enum {
+-	APP_CLIENT,
+-	APP_SERVER,
+-} gatt_app_type_t;
+-
+ struct pending_trans_data {
+ 	unsigned int id;
+ 	uint8_t opcode;
+@@ -101,10 +96,12 @@ struct gatt_app {
+ 	int32_t id;
+ 	uint8_t uuid[16];
+ 
+-	gatt_app_type_t type;
++	gatt_type_t type;
+ 
+ 	/* Valid for client applications */
+ 	struct queue *notifications;
++
++	gatt_conn_cb_t func;
+ };
+ 
+ struct element_id {
+@@ -617,7 +614,7 @@ static void destroy_gatt_app(void *data)
+ 	 * too. So remove all elements and then destroy queue.
+ 	 */
+ 
+-	if (app->type == APP_CLIENT)
++	if (app->type == GATT_CLIENT)
+ 		while (queue_peek_head(app->notifications)) {
+ 			struct notification_data *notification;
+ 
+@@ -630,14 +627,14 @@ static void destroy_gatt_app(void *data)
+ 	free(app);
  }
  
-+static void find_included_cb(uint8_t status, GSList *services, void *user_data)
-+{
-+	struct bt_hog *hog = user_data;
-+	struct gatt_included *include;
-+	GSList *l;
-+
-+	DBG("");
-+
-+	if (hog->primary)
-+		return;
-+
-+	if (status) {
-+		const char *str = att_ecode2str(status);
-+		DBG("Find included failed: %s", str);
-+		return;
-+	}
-+
-+	if (!services) {
-+		DBG("No included service found");
-+		return;
-+	}
-+
-+	for (l = services; l; l = l->next) {
-+		include = l->data;
-+
-+		if (strcmp(include->uuid, HOG_UUID) == 0)
-+			break;
-+
-+		gatt_find_included(hog->attrib, include->range.start,
-+				include->range.end, find_included_cb, hog);
-+	}
-+
-+	if (!l)
-+		return;
-+
-+	hog->primary = g_new0(struct gatt_primary, 1);
-+	memcpy(hog->primary->uuid, include->uuid, sizeof(include->uuid));
-+	memcpy(&hog->primary->range, &include->range, sizeof(include->range));
-+
-+	gatt_discover_char(hog->attrib, hog->primary->range.start,
-+						hog->primary->range.end, NULL,
-+						char_discovered_cb, hog);
-+}
-+
-+static void primary_cb(uint8_t status, GSList *services, void *user_data)
-+{
-+	struct bt_hog *hog = user_data;
-+	struct gatt_primary *primary;
-+	GSList *l;
-+
-+	DBG("");
-+
-+	if (status) {
-+		const char *str = att_ecode2str(status);
-+		DBG("Discover primary failed: %s", str);
-+		return;
-+	}
-+
-+	if (!services) {
-+		DBG("No primary service found");
-+		return;
-+	}
-+
-+	for (l = services; l; l = l->next) {
-+		primary = l->data;
-+
-+		if (strcmp(primary->uuid, HOG_UUID) == 0)
-+			break;
-+
-+		gatt_find_included(hog->attrib, primary->range.start,
-+				primary->range.end, find_included_cb, hog);
-+	}
-+
-+	if (!l) {
-+		for (l = services; l; l = l->next) {
-+			primary = l->data;
-+
-+			gatt_find_included(hog->attrib, primary->range.start,
-+					primary->range.end, find_included_cb,
-+					hog);
-+		}
-+		return;
-+	}
-+
-+	hog->primary = g_memdup(primary, sizeof(*primary));
-+
-+	gatt_discover_char(hog->attrib, hog->primary->range.start,
-+						hog->primary->range.end, NULL,
-+						char_discovered_cb, hog);
-+}
-+
- bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+-static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
++static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
  {
- 	struct gatt_primary *primary = hog->primary;
-@@ -710,6 +803,11 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ 	static int32_t application_id = 1;
+ 	struct gatt_app *app;
  
- 	hog->attrib = g_attrib_ref(gatt);
+ 	if (queue_find(gatt_apps, match_app_by_uuid, uuid)) {
+ 		error("gatt: app uuid is already on list");
+-		return 0;
++		return NULL;
+ 	}
  
-+	if (!primary) {
-+		gatt_discover_primary(hog->attrib, NULL, primary_cb, hog);
-+		return true;
+ 	app = new0(struct gatt_app, 1);
+@@ -646,14 +643,14 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+ 		return 0;
+ 	}
+ 
+-	app->type = app_type;
++	app->type = type;
+ 
+-	if (app->type == APP_CLIENT) {
++	if (app->type == GATT_CLIENT) {
+ 		app->notifications = queue_new();
+ 		if (!app->notifications) {
+ 			error("gatt: couldn't allocate notifications queue");
+ 			destroy_gatt_app(app);
+-			return 0;
++			return NULL;
+ 		}
+ 	}
+ 
+@@ -664,33 +661,35 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+ 	if (!queue_push_head(gatt_apps, app)) {
+ 		error("gatt: Cannot push app on the list");
+ 		destroy_gatt_app(app);
+-		return 0;
++		return NULL;
+ 	}
+ 
+-	if ((app->type == APP_SERVER) &&
++	if ((app->type == GATT_SERVER) &&
+ 			!queue_push_tail(listen_apps, INT_TO_PTR(app->id))) {
+ 		error("gatt: Cannot push server on the list");
+ 		destroy_gatt_app(app);
+-		return 0;
++		return NULL;
+ 	}
+ 
+-	return app->id;
++	return app;
+ }
+ 
+ static void handle_client_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_register *cmd = buf;
+ 	struct hal_ev_gatt_client_register_client ev;
++	struct gatt_app *app;
+ 
+ 	DBG("");
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+-	ev.client_if = register_app(cmd->uuid, APP_CLIENT);
++	app = register_app(cmd->uuid, GATT_CLIENT);
+ 
+-	if (ev.client_if)
++	if (app) {
++		ev.client_if = app->id;
+ 		ev.status = GATT_SUCCESS;
+-	else
++	} else
+ 		ev.status = GATT_FAILURE;
+ 
+ 	/* We should send notification with given in cmd UUID */
+@@ -708,6 +707,12 @@ static void send_client_disconnection_notify(struct app_connection *connection,
+ {
+ 	struct hal_ev_gatt_client_disconnect ev;
+ 
++	if (connection->app->func) {
++		connection->app->func(&connection->device->bdaddr, -ENOTCONN,
++						connection->device->attrib);
++		return;
 +	}
 +
- 	if (hog->reports == NULL) {
- 		gatt_discover_char(hog->attrib, primary->range.start,
- 						primary->range.end, NULL,
+ 	ev.client_if = connection->app->id;
+ 	ev.conn_id = connection->id;
+ 	ev.status = status;
+@@ -716,6 +721,7 @@ static void send_client_disconnection_notify(struct app_connection *connection,
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+ 				HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
++
+ }
+ 
+ static void send_client_connection_notify(struct app_connection *connection,
+@@ -723,6 +729,13 @@ static void send_client_connection_notify(struct app_connection *connection,
+ {
+ 	struct hal_ev_gatt_client_connect ev;
+ 
++	if (connection->app->func) {
++		connection->app->func(&connection->device->bdaddr,
++					status == GATT_SUCCESS ? 0 : -ENOTCONN,
++					connection->device->attrib);
++		return;
++	}
++
+ 	ev.client_if = connection->app->id;
+ 	ev.conn_id = connection->id;
+ 	ev.status = status;
+@@ -738,6 +751,13 @@ static void send_server_connection_notify(struct app_connection *connection,
+ {
+ 	struct hal_ev_gatt_server_connection ev;
+ 
++	if (connection->app->func) {
++		connection->app->func(&connection->device->bdaddr,
++					connected ? 0 : -ENOTCONN,
++					connection->device->attrib);
++		return;
++	}
++
+ 	ev.server_if = connection->app->id;
+ 	ev.conn_id = connection->id;
+ 	ev.connected = connected;
+@@ -751,7 +771,7 @@ static void send_server_connection_notify(struct app_connection *connection,
+ static void send_app_disconnect_notify(struct app_connection *connection,
+ 								int32_t status)
+ {
+-	if (connection->app->type == APP_CLIENT)
++	if (connection->app->type == GATT_CLIENT)
+ 		send_client_disconnection_notify(connection, status);
+ 	else
+ 		send_server_connection_notify(connection, !!status);
+@@ -760,9 +780,9 @@ static void send_app_disconnect_notify(struct app_connection *connection,
+ static void send_app_connect_notify(struct app_connection *connection,
+ 								int32_t status)
+ {
+-	if (connection->app->type == APP_CLIENT)
++	if (connection->app->type == GATT_CLIENT)
+ 		send_client_connection_notify(connection, status);
+-	else
++	else if (connection->app->type == GATT_SERVER)
+ 		send_server_connection_notify(connection, !status);
+ }
+ 
+@@ -3568,9 +3588,11 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+ 	switch (cmd->command) {
+ 	case GATT_CLIENT_TEST_CMD_ENABLE:
+ 		if (cmd->u1) {
+-			if (!test_client_if)
+-				test_client_if = register_app(TEST_UUID,
+-								APP_CLIENT);
++			if (!test_client_if) {
++				app = register_app(TEST_UUID, GATT_CLIENT);
++				if (app)
++					test_client_if = app->id;
++			}
+ 
+ 			if (test_client_if)
+ 				status = HAL_STATUS_SUCCESS;
+@@ -3615,16 +3637,18 @@ static void handle_server_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_server_register *cmd = buf;
+ 	struct hal_ev_gatt_server_register ev;
++	struct gatt_app *app;
+ 
+ 	DBG("");
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+-	ev.server_if = register_app(cmd->uuid, APP_SERVER);
++	app = register_app(cmd->uuid, GATT_SERVER);
+ 
+-	if (ev.server_if)
++	if (app) {
++		ev.server_if = app->id;
+ 		ev.status = GATT_SUCCESS;
+-	else
++	} else
+ 		ev.status = GATT_FAILURE;
+ 
+ 	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
+@@ -5978,3 +6002,66 @@ void bt_gatt_unregister(void)
+ 	bt_crypto_unref(crypto);
+ 	crypto = NULL;
+ }
++
++
++unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
++							gatt_conn_cb_t func)
++{
++	struct gatt_app *app;
++	bt_uuid_t uuid128;
++
++	bt_string_to_uuid(&uuid128, uuid);
++	app = register_app((void *) &uuid128.value.u128, type);
++	if (!app)
++		return 0;
++
++	app->func = func;
++
++	return app->id;
++}
++
++bool bt_gatt_unregister_app(unsigned int id)
++{
++	uint8_t status;
++
++	status = unregister_client(id);
++
++	return status != HAL_STATUS_FAILED;
++}
++
++bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr)
++{
++	uint8_t status;
++
++	status = handle_connect(id, addr);
++
++	return status != HAL_STATUS_FAILED;
++}
++
++bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr)
++{
++	struct app_connection match;
++	struct app_connection *conn;
++	struct gatt_device *device;
++	struct gatt_app *app;
++
++	app = find_app_by_id(id);
++	if (!app)
++		return false;
++
++	device = find_device_by_addr(addr);
++	if (!device)
++		return false;
++
++	match.device = device;
++	match.app = app;
++
++	conn = queue_find(app_connections, match_connection_by_device_and_app,
++									&match);
++	if (!conn)
++		return false;
++
++	trigger_disconnection(conn);
++
++	return true;
++}
+diff --git a/android/gatt.h b/android/gatt.h
+index d4392d9..5ba9161 100644
+--- a/android/gatt.h
++++ b/android/gatt.h
+@@ -23,3 +23,18 @@
+ 
+ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr);
+ void bt_gatt_unregister(void);
++
++
++typedef enum {
++	GATT_CLIENT,
++	GATT_SERVER,
++} gatt_type_t;
++
++typedef void (*gatt_conn_cb_t)(const bdaddr_t *addr, int err, void *attrib);
++
++unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
++							gatt_conn_cb_t func);
++bool bt_gatt_unregister_app(unsigned int id);
++
++bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
++bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
 -- 
 1.9.3
 
