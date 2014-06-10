@@ -1,54 +1,27 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/README: Update information about GATT HAL support
-Date: Tue, 10 Jun 2014 11:32:09 +0200
-Message-Id: <1402392729-29775-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: Patch for bccmd
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <5396BCBC.2050009@remote-exploit.org>
+Date: Tue, 10 Jun 2014 11:26:20 +0200
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <E880AF5C-0FA3-4103-81C9-F932A0C5C0C1@holtmann.org>
+References: <5396BCBC.2050009@remote-exploit.org>
+To: mmo@remote-exploit.org
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/README | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+Hi Max,
 
-diff --git a/android/README b/android/README
-index 91fc545..435cf56 100644
---- a/android/README
-+++ b/android/README
-@@ -222,9 +222,9 @@ Profile ID    HAL header         Status
- ---------------------------------------
- core          bluetooth.h        complete
- a2dp          bt_av.h            complete
--gatt          bt_gatt.h          partial
--              bt_gatt_client.h   partial
--              bt_gatt_server.h   initial
-+gatt          bt_gatt.h          complete
-+              bt_gatt_client.h   complete
-+              bt_gatt_server.h   complete
- handsfree     bt_hf.h            complete
- hidhost       bt_hh.h            complete
- health        bt_hl.h            initial
-@@ -293,6 +293,14 @@ get_player_app_values_text_cb      NULL JNI implementation
- set_player_app_value_cb            NULL JNI implementation
- 
- 
-+HAL GATT
-+--------
-+
-+methods:
-+client->set_adv_data               missing kernel support for vendor data
-+client->connect                    is_direct parameter is ignored
-+
-+
- Known Android issues
- ====================
- 
-@@ -324,3 +332,4 @@ HFP		Response and Hold		AT+BTRH, +BTRH
- HFP		In-band Ring Tone		+BSIR
- AVRCP		Player Settings			HAL API present but not used
- AVRCP		Browsing			No HAL API
-+GATT		Read multiple characteristics	No HAL API
--- 
-1.9.1
+> i recently had the issue that i was required to interact with a bluecore
+> based device with a non-default vendorid and productid via usb. Plesae
+> find a small patch to introduce two new parameters. If the parameters
+> are omitted, the default value of 0x0a12 0x0001 will be used.
+
+please use git-format-patch and git-send-email for the patch. That way it is easier for us to review it inline and also apply it.
+
+Regards
+
+Marcel
 
