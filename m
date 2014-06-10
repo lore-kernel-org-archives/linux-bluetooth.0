@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 07/12] android/gatt: Fix not detecting device found by Bluetooth HAL
-Date: Tue, 10 Jun 2014 18:53:58 +0300
-Message-Id: <1402415643-32300-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 06/12] android/hidhost: Add support for HoG
+Date: Tue, 10 Jun 2014 18:53:57 +0300
+Message-Id: <1402415643-32300-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1402415643-32300-1-git-send-email-luiz.dentz@gmail.com>
 References: <1402415643-32300-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,294 +11,203 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is necessary so that devices found during regular discovery can be
-handled by gatt HAL.
+This enables using hidhost HAL for LE devices since this is how HoG is
+implemented in Android.
 ---
- android/bluetooth.c |  42 ++++++++++++++-------
- android/bluetooth.h |   5 ++-
- android/gatt.c      | 105 ++++++++++++++++++++++++++++++----------------------
- 3 files changed, 92 insertions(+), 60 deletions(-)
+ android/hidhost.c | 106 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 106 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index d275297..834d687 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -179,6 +179,7 @@ static struct {
- 	uint32_t current_settings;
- 	uint32_t supported_settings;
+diff --git a/android/hidhost.c b/android/hidhost.c
+index 4a158c6..90a3409 100644
+--- a/android/hidhost.c
++++ b/android/hidhost.c
+@@ -48,6 +48,9 @@
+ #include "hal-msg.h"
+ #include "ipc-common.h"
+ #include "ipc.h"
++#include "bluetooth.h"
++#include "gatt.h"
++#include "hog.h"
+ #include "hidhost.h"
+ #include "utils.h"
  
-+	bool le_scanning;
- 	uint8_t cur_discovery_type;
- 	uint8_t exp_discovery_type;
- 	uint32_t discoverable_timeout;
-@@ -1301,10 +1302,8 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 	}
+@@ -77,11 +80,14 @@
+ /* HID Virtual Cable Unplug */
+ #define HID_VIRTUAL_CABLE_UNPLUG	0x05
  
- 	type = adapter.exp_discovery_type;
--	adapter.exp_discovery_type = SCAN_TYPE_NONE;
--
--	if (type == SCAN_TYPE_NONE && gatt_device_found_cb)
--		type = SCAN_TYPE_LE;
-+	adapter.exp_discovery_type = adapter.le_scanning ? SCAN_TYPE_LE :
-+								SCAN_TYPE_NONE;
++#define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
++
+ static bdaddr_t adapter_addr;
  
- 	if (type != SCAN_TYPE_NONE)
- 		start_discovery(type);
-@@ -3392,42 +3391,57 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- 	return false;
+ static GIOChannel *ctrl_io = NULL;
+ static GIOChannel *intr_io = NULL;
+ static GSList *devices = NULL;
++static unsigned int hog_app = 0;
+ 
+ static struct ipc *hal_ipc = NULL;
+ 
+@@ -102,6 +108,7 @@ struct hid_device {
+ 	guint		intr_watch;
+ 	struct bt_uhid	*uhid;
+ 	uint8_t		last_hid_msg;
++	struct bt_hog	*hog;
+ };
+ 
+ static int device_cmp(gconstpointer s, gconstpointer user_data)
+@@ -131,6 +138,9 @@ static void hid_device_free(void *data)
+ 	if (dev->uhid)
+ 		bt_uhid_unref(dev->uhid);
+ 
++	if (dev->hog)
++		bt_hog_unref(dev->hog);
++
+ 	g_free(dev->rd_data);
+ 	g_free(dev);
+ }
+@@ -722,6 +732,67 @@ fail:
+ 	hid_device_remove(dev);
  }
  
-+bool bt_le_register(bt_le_device_found cb)
++static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
 +{
-+	if (gatt_device_found_cb)
-+		return false;
++	GSList *l;
++	struct hid_device *dev;
 +
-+	gatt_device_found_cb = cb;
++	l = g_slist_find_custom(devices, addr, device_cmp);
++	dev = l ? l->data : NULL;
++
++	if (err < 0) {
++		if (!dev)
++			return;
++		goto fail;
++	}
++
++	if (!dev) {
++		dev = g_new0(struct hid_device, 1);
++		bacpy(&dev->dst, addr);
++		devices = g_slist_append(devices, dev);
++		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
++	}
++
++	if (!dev->hog) {
++		/* TODO: Get device details and primary */
++		dev->hog = bt_hog_new("bluez-input-device", dev->vendor,
++					dev->product, dev->version, NULL);
++		if (!dev->hog) {
++			error("HoG: unable to create session");
++			goto fail;
++		}
++	}
++
++	if (!bt_hog_attach(dev->hog, attrib)) {
++		error("HoG: unable to attach");
++		goto fail;
++	}
++
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
++
++	return;
++
++fail:
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
++	hid_device_remove(dev);
++}
++
++static bool hog_connect(struct hid_device *dev)
++{
++	DBG("");
++
++	if (hog_app)
++		return bt_gatt_connect_app(hog_app, &dev->dst);
++
++	hog_app = bt_gatt_register_app(HOG_UUID, GATT_CLIENT, hog_conn_cb);
++	if (!hog_app) {
++		error("hidhost: bt_gatt_register_app failed");
++		return false;
++	}
++
++	return bt_gatt_connect_app(hog_app, &dev->dst);
++}
++
+ static void bt_hid_connect(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_hidhost_connect *cmd = buf;
+@@ -748,6 +819,14 @@ static void bt_hid_connect(const void *buf, uint16_t len)
+ 	ba2str(&dev->dst, addr);
+ 	DBG("connecting to %s", addr);
+ 
++	if (bt_is_device_le(&dst)) {
++		if (!hog_connect(dev)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
++		goto done;
++	}
++
+ 	sdp_uuid16_create(&uuid, PNP_INFO_SVCLASS_ID);
+ 	if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
+ 				hid_sdp_did_search_cb, dev, NULL, 0) < 0) {
+@@ -757,6 +836,7 @@ static void bt_hid_connect(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
++done:
+ 	devices = g_slist_append(devices, dev);
+ 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
+ 
+@@ -767,6 +847,20 @@ failed:
+ 									status);
+ }
+ 
++static bool hog_disconnect(struct hid_device *dev)
++{
++	DBG("");
++
++	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
++
++	if (!bt_gatt_disconnect_app(hog_app, &dev->dst)) {
++		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
++		hid_device_remove(dev);
++	}
 +
 +	return true;
 +}
 +
-+void bt_le_unregister(void)
-+{
-+	gatt_device_found_cb = NULL;
-+}
-+
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
+ static void bt_hid_disconnect(const void *buf, uint16_t len)
  {
-+	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
-+		return false;
-+
-+	adapter.le_scanning = false;
-+
- 	if (adapter.cur_discovery_type != SCAN_TYPE_LE) {
- 		if (cb)
- 			cb();
- 
--		gatt_device_found_cb = NULL;
--
- 		return true;
+ 	const struct hal_cmd_hidhost_disconnect *cmd = buf;
+@@ -786,6 +880,13 @@ static void bt_hid_disconnect(const void *buf, uint16_t len)
  	}
  
- 	if (!stop_discovery(SCAN_TYPE_LE))
- 		return false;
- 
--	gatt_device_found_cb = NULL;
- 	gatt_discovery_stopped_cb = cb;
- 	adapter.exp_discovery_type = SCAN_TYPE_NONE;
- 
- 	return true;
- }
- 
--bool bt_le_discovery_start(bt_le_device_found cb)
-+bool bt_le_discovery_start(void)
- {
- 	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
- 		return false;
- 
-+	adapter.le_scanning = true;
-+
- 	/* If core is discovering, don't bother */
--	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
--		gatt_device_found_cb = cb;
-+	if (adapter.cur_discovery_type != SCAN_TYPE_NONE)
- 		return true;
--	}
- 
--	if (start_discovery(SCAN_TYPE_LE)) {
--		gatt_device_found_cb = cb;
-+	if (start_discovery(SCAN_TYPE_LE))
- 		return true;
--	}
- 
- 	return false;
- }
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 2409d46..7c64bab 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -44,7 +44,10 @@ typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
- 					int rssi, uint16_t eir_len,
- 					const void *eir, bool discoverable,
- 					bool bonded);
--bool bt_le_discovery_start(bt_le_device_found cb);
-+bool bt_le_register(bt_le_device_found cb);
-+void bt_le_unregister(void);
-+
-+bool bt_le_discovery_start(void);
- 
- typedef void (*bt_le_discovery_stopped)(void);
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
-diff --git a/android/gatt.c b/android/gatt.c
-index c25aed4..f797e7d 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -627,6 +627,47 @@ static void destroy_gatt_app(void *data)
- 	free(app);
- }
- 
-+static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
-+						int rssi, uint16_t eir_len,
-+						const void *eir,
-+						bool discoverable, bool bonded)
-+{
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
-+	struct gatt_device *dev;
-+	char bda[18];
-+
-+	if (!scanning || (!discoverable && !bonded))
-+		goto connect;
-+
-+	ba2str(addr, bda);
-+	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
-+
-+	bdaddr2android(addr, ev->bda);
-+	ev->rssi = rssi;
-+	ev->len = eir_len;
-+
-+	memcpy(ev->adv_data, eir, ev->len);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+						HAL_EV_GATT_CLIENT_SCAN_RESULT,
-+						sizeof(*ev) + ev->len, ev);
-+
-+connect:
-+	dev = find_device_by_addr(addr);
-+	if (!dev || (dev->state != DEVICE_CONNECT_INIT))
-+		return;
-+
-+	device_set_state(dev, DEVICE_CONNECT_READY);
-+	dev->bdaddr_type = addr_type;
-+
-+	/*
-+	 * We are ok to perform connect now. Stop discovery
-+	 * and once it is stopped continue with creating ACL
-+	 */
-+	bt_le_discovery_stop(bt_le_discovery_stop_cb);
-+}
-+
- static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
- {
- 	static int32_t application_id = 1;
-@@ -637,6 +678,10 @@ static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
- 		return NULL;
- 	}
- 
-+	/* Register LE once the first app register */
-+	if (queue_isempty(gatt_apps))
-+		bt_le_register(le_device_found_handler);
-+
- 	app = new0(struct gatt_app, 1);
- 	if (!app) {
- 		error("gatt: Cannot allocate memory for registering app");
-@@ -956,47 +1001,6 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	return s;
- }
- 
--static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
--						int rssi, uint16_t eir_len,
--						const void *eir,
--						bool discoverable, bool bonded)
--{
--	uint8_t buf[IPC_MTU];
--	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
--	struct gatt_device *dev;
--	char bda[18];
--
--	if (!scanning || (!discoverable && !bonded))
--		goto connect;
--
--	ba2str(addr, bda);
--	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
--
--	bdaddr2android(addr, ev->bda);
--	ev->rssi = rssi;
--	ev->len = eir_len;
--
--	memcpy(ev->adv_data, eir, ev->len);
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--						HAL_EV_GATT_CLIENT_SCAN_RESULT,
--						sizeof(*ev) + ev->len, ev);
--
--connect:
--	dev = find_device_by_addr(addr);
--	if (!dev || (dev->state != DEVICE_CONNECT_INIT))
--		return;
--
--	device_set_state(dev, DEVICE_CONNECT_READY);
--	dev->bdaddr_type = addr_type;
--
--	/*
--	 * We are ok to perform connect now. Stop discovery
--	 * and once it is stopped continue with creating ACL
--	 */
--	bt_le_discovery_stop(bt_le_discovery_stop_cb);
--}
--
- static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-@@ -1207,7 +1211,7 @@ reply:
- 
- 	/* Check if we should restart scan */
- 	if (scanning)
--		bt_le_discovery_start(le_device_found_handler);
-+		bt_le_discovery_start();
- 
- 	/* FIXME: What to do if discovery won't start here. */
- }
-@@ -1293,7 +1297,7 @@ static void handle_client_scan(const void *buf, uint16_t len)
- 	}
- 
- 	/* Turn on scan */
--	if (!bt_le_discovery_start(le_device_found_handler)) {
-+	if (!bt_le_discovery_start()) {
- 		error("gatt: LE scan switch failed");
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
-@@ -1325,7 +1329,7 @@ static void bt_le_discovery_stop_cb(void)
- 
- 	/* Check now if there is any device ready to connect */
- 	if (connect_next_dev() < 0)
--		bt_le_discovery_start(le_device_found_handler);
-+		bt_le_discovery_start();
- }
- 
- static struct gatt_device *create_device(const bdaddr_t *addr)
-@@ -1434,7 +1438,7 @@ static bool trigger_connection(struct app_connection *connection)
- 
- 	/* after state change trigger discovering */
- 	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
--		if (!bt_le_discovery_start(le_device_found_handler)) {
-+		if (!bt_le_discovery_start()) {
- 			error("gatt: Could not start scan");
- 
- 			return false;
-@@ -5917,6 +5921,15 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	if (!start_listening_io())
- 		return false;
- 
-+	if (!bt_le_register(le_device_found_handler)) {
-+		error("gatt: bt_le_register failed");
-+
-+		g_io_channel_unref(listening_io);
-+		listening_io = NULL;
-+
-+		return false;
+ 	dev = l->data;
++	if (bt_is_device_le(&dst)) {
++		if (!hog_disconnect(dev)) {
++			status = HAL_STATUS_FAILED;
++			goto failed;
++		}
++		goto done;
 +	}
-+
- 	crypto = bt_crypto_new();
- 	if (!crypto) {
- 		error("gatt: Failed to setup crypto");
-@@ -6001,6 +6014,8 @@ void bt_gatt_unregister(void)
  
- 	bt_crypto_unref(crypto);
- 	crypto = NULL;
-+
-+	bt_le_unregister();
- }
+ 	/* Wait either channels to HUP */
+ 	if (dev->intr_io)
+@@ -796,6 +897,8 @@ static void bt_hid_disconnect(const void *buf, uint16_t len)
  
+ 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
+ 
++
++done:
+ 	status = HAL_STATUS_SUCCESS;
+ 
+ failed:
+@@ -1342,6 +1445,9 @@ void bt_hid_unregister(void)
+ {
+ 	DBG("");
+ 
++	if (hog_app > 0)
++		bt_gatt_unregister_app(hog_app);
++
+ 	g_slist_free_full(devices, hid_device_free);
+ 	devices = NULL;
  
 -- 
 1.9.3
