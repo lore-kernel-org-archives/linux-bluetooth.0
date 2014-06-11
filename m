@@ -1,183 +1,195 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH v3 4/4] src/shared/att: Handle incoming response PDUs
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
-Date: Wed, 11 Jun 2014 15:35:14 +0200
-Message-Id: <1402493714-30849-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1402364040-11502-5-git-send-email-armansito@chromium.org>
+Date: Wed, 11 Jun 2014 14:03:19 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <7FD20345-0246-4986-991C-DA9C24E6BFD1@holtmann.org>
+References: <1402364040-11502-1-git-send-email-armansito@chromium.org> <1402364040-11502-5-git-send-email-armansito@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/l2cap.h | 35 +++++++++++++++++++++++++++++++++++
- net/bluetooth/a2mp.c          | 18 ++++--------------
- net/bluetooth/l2cap_core.c    |  6 ++++--
- net/bluetooth/l2cap_sock.c    | 34 +++++++++++++++++++++-------------
- 4 files changed, 64 insertions(+), 29 deletions(-)
+Hi Arman,
 
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 92511034d1d4..e4f4ca69e301 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -602,6 +602,9 @@ struct l2cap_ops {
- 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
- 					       unsigned long hdr_len,
- 					       unsigned long len, int nb);
-+	int			(*memcpy_fromiovec) (struct l2cap_chan *chan,
-+						     unsigned char *kdata,
-+						     struct iovec *iov, int len);
- };
- 
- struct l2cap_conn {
-@@ -857,6 +860,38 @@ static inline long l2cap_chan_no_get_sndtimeo(struct l2cap_chan *chan)
- 	return 0;
- }
- 
-+static inline struct sk_buff *l2cap_chan_no_alloc_skb(struct l2cap_chan *chan,
-+						      unsigned long hdr_len,
-+						      unsigned long len, int nb)
-+{
-+	struct sk_buff *skb;
-+
-+	skb = bt_skb_alloc(hdr_len + len, GFP_KERNEL);
-+	if (!skb)
-+		return ERR_PTR(-ENOMEM);
-+
-+	return skb;
-+}
-+
-+static inline int l2cap_chan_no_memcpy_fromiovec(struct l2cap_chan *chan,
-+						 unsigned char *kdata,
-+						 struct iovec *iov, int len)
-+{
-+	while (len > 0) {
-+		if (iov->iov_len) {
-+			int copy = min_t(unsigned int, len, iov->iov_len);
-+			memcpy(kdata, iov->iov_base, copy);
-+			len -= copy;
-+			kdata += copy;
-+			iov->iov_base += copy;
-+			iov->iov_len -= copy;
-+		}
-+		iov++;
-+	}
-+
-+	return 0;
-+}
-+
- extern bool disable_ertm;
- 
- int l2cap_init_sockets(void);
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 0fd8d1dda709..4cda6213cfc3 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -692,25 +692,15 @@ static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state,
- 	}
- }
- 
--static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
--					      unsigned long hdr_len,
--					      unsigned long len, int nb)
--{
--	struct sk_buff *skb;
--
--	skb = bt_skb_alloc(hdr_len + len, GFP_KERNEL);
--	if (!skb)
--		return ERR_PTR(-ENOMEM);
--
--	return skb;
--}
--
- static const struct l2cap_ops a2mp_chan_ops = {
- 	.name = "L2CAP A2MP channel",
- 	.recv = a2mp_chan_recv_cb,
- 	.close = a2mp_chan_close_cb,
- 	.state_change = a2mp_chan_state_change_cb,
--	.alloc_skb = a2mp_chan_alloc_skb_cb,
-+
-+	/* Use default kernel implementation */
-+	.alloc_skb = l2cap_chan_no_alloc_skb,
-+	.memcpy_fromiovec = l2cap_chan_no_memcpy_fromiovec,
- 
- 	/* Not implemented for A2MP */
- 	.new_connection = l2cap_chan_no_new_connection,
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index b093e98aa968..eb0d43da80d5 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -2112,7 +2112,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
- 	struct sk_buff **frag;
- 	int sent = 0;
- 
--	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
-+	if (chan->ops->memcpy_fromiovec(chan, skb_put(skb, count),
-+					msg->msg_iov, count))
- 		return -EFAULT;
- 
- 	sent += count;
-@@ -2132,7 +2133,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
- 
- 		*frag = tmp;
- 
--		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
-+		if (chan->ops->memcpy_fromiovec(chan, skb_put(*frag, count),
-+						msg->msg_iov, count))
- 			return -EFAULT;
- 
- 		sent += count;
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 6ab282212d5c..e64e1bbba14d 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1318,6 +1318,13 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
- 	return skb;
- }
- 
-+static int l2cap_sock_memcpy_fromiovec_cb(struct l2cap_chan *chan,
-+					  unsigned char *kdata,
-+					  struct iovec *iov, int len)
-+{
-+	return memcpy_fromiovec(kdata, iov, len);
-+}
-+
- static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->data;
-@@ -1384,19 +1391,20 @@ static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
- }
- 
- static const struct l2cap_ops l2cap_chan_ops = {
--	.name		= "L2CAP Socket Interface",
--	.new_connection	= l2cap_sock_new_connection_cb,
--	.recv		= l2cap_sock_recv_cb,
--	.close		= l2cap_sock_close_cb,
--	.teardown	= l2cap_sock_teardown_cb,
--	.state_change	= l2cap_sock_state_change_cb,
--	.ready		= l2cap_sock_ready_cb,
--	.defer		= l2cap_sock_defer_cb,
--	.resume		= l2cap_sock_resume_cb,
--	.suspend	= l2cap_sock_suspend_cb,
--	.set_shutdown	= l2cap_sock_set_shutdown_cb,
--	.get_sndtimeo	= l2cap_sock_get_sndtimeo_cb,
--	.alloc_skb	= l2cap_sock_alloc_skb_cb,
-+	.name			= "L2CAP Socket Interface",
-+	.new_connection		= l2cap_sock_new_connection_cb,
-+	.recv			= l2cap_sock_recv_cb,
-+	.close			= l2cap_sock_close_cb,
-+	.teardown		= l2cap_sock_teardown_cb,
-+	.state_change		= l2cap_sock_state_change_cb,
-+	.ready			= l2cap_sock_ready_cb,
-+	.defer			= l2cap_sock_defer_cb,
-+	.resume			= l2cap_sock_resume_cb,
-+	.suspend		= l2cap_sock_suspend_cb,
-+	.set_shutdown		= l2cap_sock_set_shutdown_cb,
-+	.get_sndtimeo		= l2cap_sock_get_sndtimeo_cb,
-+	.alloc_skb		= l2cap_sock_alloc_skb_cb,
-+	.memcpy_fromiovec	= l2cap_sock_memcpy_fromiovec_cb,
- };
- 
- static void l2cap_sock_destruct(struct sock *sk)
--- 
-1.9.3
+> This patch adds handling for incoming ATT protocol response PDUs. Basic
+> incoming PDU handling logic added to the io read handler.
+> ---
+> src/shared/att.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 117 insertions(+), 1 deletion(-)
+> 
+> diff --git a/src/shared/att.c b/src/shared/att.c
+> index f3ece02..e967273 100644
+> --- a/src/shared/att.c
+> +++ b/src/shared/att.c
+> @@ -370,6 +370,109 @@ set_handler:
+> 	att->writer_active = true;
+> }
+> 
+> +static bool request_complete(struct bt_att *att, uint8_t req_opcode,
+> +					uint8_t rsp_opcode, const void *param,
+> +					uint16_t len)
+> +{
+> +	struct att_send_op *op = att->pending_req;
+> +
+> +	if (!op) {
+> +		/* There is no pending request so the response is unexpected.
+> +		 * TODO: In such a case, the connection should be dropped
+> +		 * entirely. For now, simply ignore the PDU.
+> +		 */
+
+is this what the specification say?
+
+> +		wakeup_writer(att);
+> +		return false;
+> +	}
+> +
+> +	if (op->opcode != req_opcode)
+> +		/* The request opcode corresponding to the received response
+> +		 * opcode does not match the currently pending request.
+> +		 * TODO: The connection should be dropped in this case, since
+> +		 * an invalid response PDU has been received. For now, keep
+> +		 * waiting for the correct response.
+> +		 */
+> +		return false;
+
+In these case { } are a bit of sugar to make it easier on the eyes. The compiler knows what it is, but my brain gets confused too easy ;)
+
+> +
+> +	if (op->callback)
+> +		op->callback(rsp_opcode, param, len, op->user_data);
+> +
+> +	destroy_att_send_op(op);
+> +	att->pending_req = NULL;
+> +
+> +	if (!att->destroyed)
+> +		wakeup_writer(att);
+
+I would have done this:
+
+	if (att->destroyed)
+		return true;
+
+	wakeup_writer(att);
+
+I prefer it this way since it is easier to read when you go through the function. Especially with the att->destroyed cases for the reentrant support. We want to make it clear that we expect that object to be gone.
+
+> +
+> +	return true;
+> +}
+> +
+> +static bool handle_error_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+> +								ssize_t pdu_len)
+> +{
+> +	struct bt_att_error_rsp_param p;
+> +	bool result;
+> +
+> +	if (pdu_len != 5)
+> +		return false;
+> +
+> +	memset(&p, 0, sizeof(p));
+> +	p.request_opcode = pdu[1];
+> +	p.handle = get_le16(pdu + 2);
+> +	p.error_code = pdu[4];
+> +
+> +	/* Note: avoid a tail call */
+
+I do not get this comment. Explain please.
+
+> +	result = request_complete(att, p.request_opcode, opcode, &p, sizeof(p));
+> +	return result;
+
+	return request_complete(..
+
+> +}
+> +
+> +static bool handle_mtu_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+> +								ssize_t pdu_len)
+> +{
+> +	struct bt_att_mtu_rsp_param p;
+> +	bool result;
+> +
+> +	if (pdu_len != 3)
+> +		return false;
+> +
+> +	memset(&p, 0, sizeof(p));
+> +	p.server_rx_mtu = get_le16(pdu + 1);
+> +
+> +	/* Note: avoid a tail call */
+> +	result = request_complete(att, BT_ATT_OP_MTU_REQ, opcode,
+> +								&p, sizeof(p));
+> +	return result;
+
+See above.
+
+> +}
+> +
+> +static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+> +								ssize_t pdu_len)
+> +{
+> +	bool success;
+> +
+> +	switch (opcode) {
+> +	case BT_ATT_OP_ERROR_RSP:
+> +		success = handle_error_rsp(att, opcode, pdu, pdu_len);
+> +		break;
+> +	case BT_ATT_OP_MTU_RSP:
+> +		success = handle_mtu_rsp(att, opcode, pdu, pdu_len);
+> +		break;
+> +	default:
+> +		success = false;
+> +		util_debug(att->debug_callback, att->debug_data,
+> +				"Unknown response opcode: 0x%02x", opcode);
+> +		break;
+> +	}
+> +
+> +	if (success)
+> +		return;
+> +
+> +	util_debug(att->debug_callback, att->debug_data,
+> +			"Failed to handle respone PDU; opcode: 0x%02x", opcode);
+> +
+> +	if (att->pending_req)
+> +		request_complete(att, att->pending_req->opcode,
+> +						BT_ATT_OP_ERROR_RSP, NULL, 0);
+> +}
+> +
+> static void read_watch_destroy(void *user_data)
+> {
+> 	struct bt_att *att = user_data;
+> @@ -389,6 +492,7 @@ static void read_watch_destroy(void *user_data)
+> static bool can_read_data(struct io *io, void *user_data)
+> {
+> 	struct bt_att *att = user_data;
+> +	uint8_t opcode;
+> 	uint8_t *pdu;
+> 	ssize_t bytes_read;
+> 
+> @@ -402,7 +506,19 @@ static bool can_read_data(struct io *io, void *user_data)
+> 	if (bytes_read < ATT_MIN_PDU_LEN)
+> 		goto done;
+> 
+> -	/* TODO: Handle different types of PDUs here */
+> +	pdu = att->buf;
+> +	opcode = pdu[0];
+> +
+> +	/* Act on the received PDU based on the opcode type */
+> +	switch (get_op_type(opcode)) {
+> +	case ATT_OP_TYPE_RSP:
+> +		handle_rsp(att, opcode, pdu, bytes_read);
+> +		break;
+> +	default:
+> +		util_debug(att->debug_callback, att->debug_data,
+> +				"ATT opcode cannot be handled: 0x%02x", opcode);
+> +		break;
+> +	}
+> 
+> done:
+> 	if (att->destroyed)
+
+Regards
+
+Marcel
 
