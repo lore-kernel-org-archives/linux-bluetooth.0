@@ -1,55 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+From: vikrampal <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tester: Update expected UUIDs with MPS
-Date: Wed, 11 Jun 2014 11:25:09 +0200
-Message-Id: <1402478709-24207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Cc: d.kasatkin@samsung.com, vikram.pal@samsung.com
+Subject: [PATCH ] Fixed memory issues to avoid potential crash
+Date: Wed, 11 Jun 2014 15:02:30 +0530
+Message-id: <1402479150-27774-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some tests verify that all local UUIDs are present.
+Signed-off-by: vikrampal <vikram.pal@samsung.com>
 ---
- android/android-tester.c | 20 ++++++++++++++------
- 1 file changed, 14 insertions(+), 6 deletions(-)
+ src/sdp-xml.c       | 16 +++++++++++++++-
+ src/sdpd-database.c |  4 ++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index f04f8ac..bf39517 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -1408,9 +1408,13 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index 6492781..a9c4723 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -91,6 +91,10 @@ static struct sdp_xml_data *sdp_xml_data_alloc(void)
+ 	/* Null terminate the text */
+ 	elem->size = DEFAULT_XML_DATA_SIZE;
+ 	elem->text = malloc(DEFAULT_XML_DATA_SIZE);
++	if (!elem->text) {
++		free(elem);
++		return NULL;
++	}
+ 	elem->text[0] = '\0';
  
- static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
- static const char enable_done_bdname_val[] = "BlueZ for Android";
--static bt_uuid_t enable_done_uuids_val = {
--	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
--					0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
-+static const char enable_done_uuids_val[] = {
-+	/* Multi profile UUID */
-+	0x00, 0x00, 0x11, 0x3b, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-+					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
-+	/* Device identification profile UUID */
-+	0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-+					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
- };
- static bt_device_type_t enable_done_tod_val = BT_DEVICE_DEVTYPE_DUAL;
- static bt_scan_mode_t enable_done_scanmode_val = BT_SCAN_MODE_NONE;
-@@ -1771,9 +1775,13 @@ static const struct generic_data bluetooth_getprop_disctimeout_success_test = {
- 	.expected_adapter_status = BT_STATUS_SUCCESS,
- };
+ 	return elem;
+@@ -333,6 +337,8 @@ static char *sdp_xml_parse_string_decode(const char *data, char encoding,
+ 		int i;
  
--static bt_uuid_t getprop_uuids = {
--	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
--					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB },
-+static const char getprop_uuids[] = {
-+	/* Multi profile UUID */
-+	0x00, 0x00, 0x11, 0x3b, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-+					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
-+	/* Device identification profile UUID */
-+	0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
-+					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
- };
+ 		decoded = malloc((len >> 1) + 1);
++		if (!decoded)
++			return NULL;
  
- static struct priority_property getprop_uuids_props[] = {
+ 		/* Ensure the string is a power of 2 */
+ 		len = (len >> 1) << 1;
+@@ -823,7 +829,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 	{
+ 		int num_chars_to_escape = 0;
+ 		int length = value->unitSize - 1;
+-		char *strBuf = 0;
++		char *strBuf;
+ 
+ 		hex = 0;
+ 
+@@ -850,6 +856,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			appender(data, "encoding=\"hex\" ");
+ 			strBuf = malloc(sizeof(char)
+ 						 * ((value->unitSize-1) * 2 + 1));
++			if (!strBuf) {
++				DBG("No memory to convert raw data to xml");
++				return;
++			}
+ 
+ 			/* Unit Size seems to include the size for dtd
+ 			   It is thus off by 1
+@@ -866,6 +876,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			/* escape the XML disallowed chars */
+ 			strBuf = malloc(sizeof(char) *
+ 					(value->unitSize + 1 + num_chars_to_escape * 4));
++			if (!strBuf) {
++				DBG("No memory to convert raw data to xml");
++				return;
++			}
+ 			for (i = 0, j = 0; i < length; i++) {
+ 				if (value->val.str[i] == '&') {
+ 					strBuf[j++] = '&';
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index f65a526..e825f69 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -157,6 +157,10 @@ static int compare_indices(const void *i1, const void *i2)
+ void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
+ {
+ 	sdp_indexed_t *item = malloc(sizeof(sdp_indexed_t));
++	if (!item) {
++		SDPDBG("No memory");
++		return;
++	}
+ 	item->sock = sock;
+ 	item->record = record;
+ 	socket_index = sdp_list_insert_sorted(socket_index, item, compare_indices);
 -- 
-1.9.2
+1.9.1
 
