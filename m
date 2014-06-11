@@ -1,407 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v3 2/4] src/shared/att: Implement basic boilerplate.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402364040-11502-3-git-send-email-armansito@chromium.org>
-Date: Wed, 11 Jun 2014 13:33:40 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <4F7ACAA8-32BD-4028-9FBA-9F6992E7E288@holtmann.org>
-References: <1402364040-11502-1-git-send-email-armansito@chromium.org> <1402364040-11502-3-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [RFC 3/3] android: Re-enable support for Android 4.4.2
+Date: Wed, 11 Jun 2014 13:31:01 +0200
+Message-Id: <1402486261-22488-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1402486261-22488-1-git-send-email-szymon.janc@tieto.com>
+References: <1402486261-22488-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Due to very unfortunate change Android 4.4.3-r1.1 BT GATT HAL API is
+not backward compatible. This adds support for 4.4.3-r1.1 and 4.4.2.
 
-> This patch implements the getters, setters, creation, ref, and unref
-> functions for struct bt_att. Also added is a simple table for
-> determining the ATT op type given an opcode and the io read handler that
-> currently does nothing.
-> ---
-> src/shared/att.c | 280 +++++++++++++++++++++++++++++++++++++++++++++++++++----
-> 1 file changed, 264 insertions(+), 16 deletions(-)
-> 
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 6398ca7..270a9df 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -34,6 +34,8 @@
-> 
-> #define ATT_DEFAULT_LE_MTU		23
-> #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
-> +#define ATT_OP_CMD_MASK			0x40
-> +#define ATT_OP_SIGNED_MASK		0x80
-> 
-> struct att_send_op;
-> 
-> @@ -51,12 +53,14 @@ struct bt_att {
-> 	struct queue *write_queue;	/* Queue of PDUs ready to send */
-> 	bool writer_active;
-> 
-> -	/* TODO Add queues for registered request and notification handlers */
-> +	/* TODO: Add queues for registered request and notification handlers */
-> +	/* TODO: Add a timeout mechanism for pending ops */
-> 
-> 	uint8_t *buf;
-> 	uint16_t mtu;
-> 
-> 	uint8_t auth_sig[12];
-> +	bool sig_set;
-> 
-> 	unsigned int next_send_id;	/* IDs for "send" ops */
-> 	unsigned int next_reg_id;	/* IDs for registered callbacks */
-> @@ -66,8 +70,68 @@ struct bt_att {
-> 	void *debug_data;
-> };
-> 
-> +typedef enum {
-> +	ATT_OP_TYPE_REQ,
-> +	ATT_OP_TYPE_RSP,
-> +	ATT_OP_TYPE_CMD,
-> +	ATT_OP_TYPE_IND,
-> +	ATT_OP_TYPE_NOT,
-> +	ATT_OP_TYPE_CONF,
-> +	ATT_OP_TYPE_UNKNOWN,
-> +} att_op_type_t;
+On android PLATFORM_VERSION is used to determine which API should be
+used. On Linux we always build with latest API.
+---
+ android/Android.mk  |  3 +++
+ android/Makefile.am |  3 +++
+ android/hal-gatt.c  | 37 ++++++++++++++++++++++++++++++++++++-
+ android/hal-utils.h |  2 ++
+ 4 files changed, 44 insertions(+), 1 deletion(-)
 
-no need for a typedef here.
-
-	enum att_op_type {
-	};
-
-> +
-> +static att_op_type_t get_op_type(uint8_t opcode)
-> +{
-> +	switch (opcode) {
-> +	/* Requests */
-> +	case BT_ATT_OP_MTU_REQ:
-> +	case BT_ATT_OP_FIND_INFO_REQ:
-> +	case BT_ATT_OP_FIND_BY_TYPE_VAL_REQ:
-> +	case BT_ATT_OP_READ_BY_TYPE_REQ:
-> +	case BT_ATT_OP_READ_REQ:
-> +	case BT_ATT_OP_READ_BLOB_REQ:
-> +	case BT_ATT_OP_READ_MULT_REQ:
-> +	case BT_ATT_OP_READ_BY_GRP_TYPE_REQ:
-> +	case BT_ATT_OP_WRITE_REQ:
-> +	case BT_ATT_OP_PREP_WRITE_REQ:
-> +	case BT_ATT_OP_EXEC_WRITE_REQ:
-> +		return ATT_OP_TYPE_REQ;
-> +	/* Commands */
-> +	case BT_ATT_OP_SIGNED_WRITE_CMD:
-> +	case BT_ATT_OP_WRITE_CMD:
-> +		return ATT_OP_TYPE_CMD;
-> +	/* Responses */
-> +	case BT_ATT_OP_ERROR_RSP:
-> +	case BT_ATT_OP_MTU_RSP:
-> +	case BT_ATT_OP_FIND_INFO_RSP:
-> +	case BT_ATT_OP_FIND_BY_TYPE_VAL_RSP:
-> +	case BT_ATT_OP_READ_BY_TYPE_RSP:
-> +	case BT_ATT_OP_READ_RSP:
-> +	case BT_ATT_OP_READ_BLOB_RSP:
-> +	case BT_ATT_OP_READ_MULT_RSP:
-> +	case BT_ATT_OP_READ_BY_GRP_TYPE_RSP:
-> +	case BT_ATT_OP_WRITE_RSP:
-> +	case BT_ATT_OP_PREP_WRITE_RSP:
-> +	case BT_ATT_OP_EXEC_WRITE_RSP:
-> +		return ATT_OP_TYPE_RSP;
-> +	/* Notifications */
-> +	case BT_ATT_OP_HANDLE_VAL_NOT:
-> +		return ATT_OP_TYPE_NOT;
-> +	/* Indications */
-> +	case BT_ATT_OP_HANDLE_VAL_IND:
-> +		return ATT_OP_TYPE_IND;
-> +	/* Confirmations */
-> +	case BT_ATT_OP_HANDLE_VAL_CONF:
-> +		return ATT_OP_TYPE_CONF;
-> +	default:
-> +		return ATT_OP_TYPE_UNKNOWN;
-> +	}
-> +	return ATT_OP_TYPE_UNKNOWN;
-> +}
-
-I have the feeling that a const static table would be easier to read and understand.
-
-	{ BT_ATT_OP_SIGNED_WRITE_CMD,	ATT_OP_TYPE_CMD		},
-	{ BT_ATT_OP_HANDLE_VAL_CONF,	ATT_OP_TYPE_CONF	},
-	{ }
-
-And then a simple helper function to walk the table. See how it looks like if you do it that way.
-
-> +
-> struct att_send_op {
-> 	unsigned int id;
-> +	att_op_type_t op_type;
-> 	uint16_t opcode;
-> 	void *pdu;
-> 	uint16_t len;
-> @@ -76,51 +140,229 @@ struct att_send_op {
-> 	void *user_data;
-> };
-> 
-> +static void destroy_att_send_op(void *data)
-> +{
-> +	struct att_send_op *op = data;
-> +
-> +	if (op->destroy)
-> +		op->destroy(op->user_data);
-> +
-> +	free(op->pdu);
-> +	free(op);
-> +}
-> +
-> +static void read_watch_destroy(void *user_data)
-> +{
-> +	struct bt_att *att = user_data;
-> +
-> +	if (!att->destroyed)
-> +		return;
-> +
-> +	if (att->pending_req)
-> +		destroy_att_send_op(att->pending_req);
-> +
-> +	if (att->pending_ind)
-> +		destroy_att_send_op(att->pending_ind);
-> +
-> +	free(att);
-> +}
-> +
-> +static bool can_read_data(struct io *io, void *user_data)
-> +{
-> +	struct bt_att *att = user_data;
-> +	uint8_t *pdu;
-> +	ssize_t bytes_read;
-> +
-> +	bytes_read = read(att->fd, att->buf, att->mtu);
-> +	if (bytes_read < 0)
-> +		return false;
-> +
-> +	util_hexdump('>', att->buf, bytes_read,
-> +					att->debug_callback, att->debug_data);
-> +
-> +	if (bytes_read < ATT_MIN_PDU_LEN)
-> +		goto done;
-> +
-> +	/* TODO: Handle different types of PDUs here */
-> +
-> +done:
-> +	if (att->destroyed)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> struct bt_att *bt_att_new(int fd)
-> {
-> -	/* TODO */
-> +	struct bt_att *att;
-> +
-> +	if (fd < 0)
-> +		return NULL;
-> +
-> +	att = new0(struct bt_att, 1);
-> +	if (!att)
-> +		return NULL;
-> +
-> +	att->fd = fd;
-> +
-> +	att->mtu = ATT_DEFAULT_LE_MTU;
-> +	att->buf = malloc(att->mtu);
-> +	if (!att->buf)
-> +		goto fail;
-> +
-> +	att->io = io_new(fd);
-> +	if (!att->io)
-> +		goto fail;
-> +
-> +	att->req_queue = queue_new();
-> +	if (!att->req_queue)
-> +		goto fail;
-> +
-> +	att->ind_queue = queue_new();
-> +	if (!att->ind_queue)
-> +		goto fail;
-> +
-> +	att->write_queue = queue_new();
-> +	if (!att->write_queue)
-> +		goto fail;
-> +
-> +	if (!io_set_read_handler(att->io, can_read_data, att,
-> +							read_watch_destroy))
-> +		goto fail;
-> +
-> +	return bt_att_ref(att);
-> +
-> +fail:
-> +	queue_destroy(att->req_queue, NULL);
-> +	queue_destroy(att->ind_queue, NULL);
-> +	queue_destroy(att->write_queue, NULL);
-> +	io_destroy(att->io);
-> +	free(att->buf);
-> +	free(att);
-> +
-> 	return NULL;
-> }
-> 
-> struct bt_att *bt_att_ref(struct bt_att *att)
-> {
-> -	/* TODO */
-> -	return NULL;
-> +	if (!att)
-> +		return NULL;
-> +
-> +	__sync_fetch_and_add(&att->ref_count, 1);
-> +
-> +	return att;
-> }
-> 
-> void bt_att_unref(struct bt_att *att)
-> {
-> -	/* TODO */
-> +	if (!att)
-> +		return;
-> +
-> +	if (__sync_sub_and_fetch(&att->ref_count, 1))
-> +		return;
-> +
-> +	bt_att_cancel_all(att);
-> +
-> +	io_set_write_handler(att->io, NULL, NULL, NULL);
-> +	io_set_read_handler(att->io, NULL, NULL, NULL);
-> +
-> +	queue_destroy(att->req_queue, NULL);
-> +	queue_destroy(att->ind_queue, NULL);
-> +	queue_destroy(att->write_queue, NULL);
-> +	att->req_queue = NULL;
-> +	att->ind_queue = NULL;
-> +	att->write_queue = NULL;
-> +
-> +	io_destroy(att->io);
-> +	att->io = NULL;
-> +
-> +	if (att->close_on_unref)
-> +		close(att->fd);
-> +
-> +	if (att->debug_destroy)
-> +		att->debug_destroy(att->debug_data);
-> +
-> +	free(att->buf);
-> +	att->buf = NULL;
-> +
-> +	/*
-> +	 * Defer freeing the bt_att structure here; if this call to unref
-> +	 * happened during a callback called from the io read handler, we can
-> +	 * end up freeing the structure prematurely, in which case the clean up
-> +	 * should occur in read_watch_destroy.
-> +	 */
-
-I think the comment is meant for the att->destroyed = true one. Within mgmt.c we only protect against the in_notify and you might want to do something similar here. If we are in no single callback we should just free here and return. Otherwise nobody will ever process the att->destroyed handling.
-
-This is a bit complicated handling of unrefing, but needed to allow reentrant handling which you end up encountering from time to time. If you want to keep it simple, then initially you can start without dealing with this detail and remove att->destroyed. We can introduce it later (happened with mgmt as well). Totally your choice.
-
-> +	if (att->pending_req)
-> +		destroy_att_send_op(att->pending_req);
-> +
-> +	if (att->pending_ind)
-> +		destroy_att_send_op(att->pending_ind);
-> +
-> +	att->destroyed = true;
-> }
-> 
-> bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
-> {
-> -	/* TODO */
-> -	return false;
-> +	if (!att)
-> +		return false;
-> +
-> +	att->close_on_unref = do_close;
-> +
-> +	return true;
-> }
-> 
-> bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
-> 				void *user_data, bt_att_destroy_func_t destroy)
-> {
-> -	/* TODO */
-> -	return false;
-> +	if (!att)
-> +		return false;
-> +
-> +	if (att->debug_destroy)
-> +		att->debug_destroy(att->debug_data);
-> +
-> +	att->debug_callback = callback;
-> +	att->debug_destroy = destroy;
-> +	att->debug_data = user_data;
-> +
-> +	return true;
-> }
-> 
-> uint16_t bt_att_get_mtu(struct bt_att *att)
-> {
-> -	/* TODO */
-> -	return 0;
-> +	if (!att)
-> +		return 0;
-> +
-> +	return att->mtu;
-> }
-> 
-> bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
-> {
-> -	/* TODO */
-> -	return false;
-> +	char *buf;
-> +
-> +	if (!att)
-> +		return false;
-> +
-> +	if (mtu < ATT_DEFAULT_LE_MTU)
-> +		return false;
-> +
-> +	buf = malloc(mtu);
-> +	if (!buf)
-> +		return false;
-> +
-> +	free(att->buf);
-> +
-> +	att->mtu = mtu;
-> +	att->buf = buf;
-> +
-> +	return true;
-> }
-> 
-> void bt_att_set_auth_signature(struct bt_att *att, uint8_t signature[12])
-> {
-> -	/* TODO */
-> +	if (!att)
-> +		return;
-> +
-> +	memcpy(att->auth_sig, signature, sizeof(signature));
-> +	att->sig_set = true;
-> }
-> 
-> unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
-> @@ -134,8 +376,14 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
-> 
-> bool bt_att_cancel_all(struct bt_att *att)
-> {
-> -	/* TODO */
-> -	return false;
-> +	if (!att)
-> +		return false;
-> +
-> +	queue_remove_all(att->req_queue, NULL, NULL, destroy_att_send_op);
-> +	queue_remove_all(att->ind_queue, NULL, NULL, destroy_att_send_op);
-> +	queue_remove_all(att->write_queue, NULL, NULL, destroy_att_send_op);
-> +
-> +	return true;
-> }
-> 
-> unsigned int bt_att_register_request(struct bt_att *att,
-
-Regards
-
-Marcel
+diff --git a/android/Android.mk b/android/Android.mk
+index a9a0982..199334f 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -3,12 +3,15 @@ LOCAL_PATH := external/bluetooth
+ # Retrieve BlueZ version from configure.ac file
+ BLUEZ_VERSION := `grep "^AC_INIT" $(LOCAL_PATH)/bluez/configure.ac | sed -e "s/.*,.\(.*\))/\1/"`
+ 
++ANDROID_VERSION := `echo $(PLATFORM_VERSION) | awk -F. '{ printf "0x%02d%02d%02d",$$1,$$2,$$3 }'`
++
+ # Specify pathmap for glib and sbc
+ pathmap_INCL += glib:external/bluetooth/glib \
+ 		sbc:external/bluetooth/sbc \
+ 
+ # Specify common compiler flags
+ BLUEZ_COMMON_CFLAGS := -DVERSION=\"$(BLUEZ_VERSION)\" \
++			-DANDROID_VERSION=$(ANDROID_VERSION) \
+ 			-DANDROID_STORAGEDIR=\"/data/misc/bluetooth\" \
+ 
+ # Enable warnings enabled in autotools build
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 3429adb..a9a9e7d 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -1,4 +1,7 @@
+ if ANDROID
++
++AM_CFLAGS += -DANDROID_VERSION=0xFFFFFF
++
+ android_plugindir = $(abs_top_srcdir)/android/.libs
+ 
+ noinst_PROGRAMS += android/system-emulator
+diff --git a/android/hal-gatt.c b/android/hal-gatt.c
+index a8f5bd1..043c379 100644
+--- a/android/hal-gatt.c
++++ b/android/hal-gatt.c
+@@ -971,7 +971,7 @@ static int get_device_type(const bt_bdaddr_t *bd_addr)
+ 	return dev_type;
+ }
+ 
+-static bt_status_t set_adv_data(int server_if, bool set_scan_rsp,
++static bt_status_t set_adv_data_real(int server_if, bool set_scan_rsp,
+ 				bool include_name, bool include_txpower,
+ 				int min_interval, int max_interval,
+ 				int appearance, uint16_t manufacturer_len,
+@@ -1025,6 +1025,41 @@ static bt_status_t set_adv_data(int server_if, bool set_scan_rsp,
+ 						cmd_len, cmd, 0, NULL, NULL);
+ }
+ 
++/*
++ * This is temporary solution and support for older Android versions might
++ * be removed at any time.
++ */
++#if ANDROID_VERSION < PLATFORM_VER(4,4,3)
++static bt_status_t set_adv_data(int server_if, bool set_scan_rsp,
++				bool include_name, bool include_txpower,
++				int min_interval, int max_interval,
++				int appearance, uint16_t manufacturer_len,
++				char *manufacturer_data)
++{
++	return set_adv_data_real(server_if, set_scan_rsp, include_name,
++					include_txpower, min_interval,
++					max_interval, appearance,
++					manufacturer_len, manufacturer_data,
++					0, NULL, 0, NULL);
++}
++#else
++static bt_status_t set_adv_data(int server_if, bool set_scan_rsp,
++				bool include_name, bool include_txpower,
++				int min_interval, int max_interval,
++				int appearance, uint16_t manufacturer_len,
++				char *manufacturer_data,
++				uint16_t service_data_len, char *service_data,
++				uint16_t service_uuid_len, char *service_uuid)
++{
++	return set_adv_data_real(server_if, set_scan_rsp, include_name,
++					include_txpower, min_interval,
++					max_interval, appearance,
++					manufacturer_len, manufacturer_data,
++					service_data_len, service_data,
++					service_uuid_len, service_uuid);
++}
++#endif
++
+ static bt_status_t test_command(int command, btgatt_test_params_t *params)
+ {
+ 	struct hal_cmd_gatt_client_test_command cmd;
+diff --git a/android/hal-utils.h b/android/hal-utils.h
+index 8a1d015..0c994ee 100644
+--- a/android/hal-utils.h
++++ b/android/hal-utils.h
+@@ -17,6 +17,8 @@
+ 
+ #include <hardware/bluetooth.h>
+ 
++#define PLATFORM_VER(a,b,c) ((a << 16) | ( b << 8) | c)
++
+ #define MAX_UUID_STR_LEN	37
+ #define HAL_UUID_LEN		16
+ #define MAX_ADDR_STR_LEN	18
+-- 
+1.9.1
 
