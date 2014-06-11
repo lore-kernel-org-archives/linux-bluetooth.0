@@ -1,495 +1,183 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v2] Bluetooth: Fix for ACL disconnect when pairing fails
-Date: Wed, 11 Jun 2014 16:02:52 +0200
-Message-Id: <1402495372-4605-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [RFC] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
+Date: Wed, 11 Jun 2014 15:35:14 +0200
+Message-Id: <1402493714-30849-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When pairing fails hci_conn refcnt drops below zero. This cause that
-ACL link is not disconnected when disconnect timeout fires.
-
-Probably this is because l2cap_conn_del calls l2cap_chan_del for each
-channel, and inside l2cap_chan_del conn is dropped. After that loop
-hci_chan_del is called which also drops conn.
-
-Anyway, as it is desrcibed in hci_core.h, it is known that refcnt
-drops below 0 sometimes and it should be fine. If so, let disconnect
-link when hci_conn_timeout fires and refcnt is 0 or below. This patch
-does it.
-
-This affects PTS test SM_TC_JW_BV_05_C
-
-Logs from scenario:
-
-[69713.706227] [6515] pair_device:
-[69713.706230] [6515] hci_conn_add: hci0 dst 00:1b:dc:06:06:22
-[69713.706233] [6515] hci_dev_hold: hci0 orig refcnt 8
-[69713.706235] [6515] hci_conn_init_sysfs: conn ffff88021f65a000
-[69713.706239] [6515] hci_req_add_ev: hci0 opcode 0x200d plen 25
-[69713.706242] [6515] hci_prepare_cmd: skb len 28
-[69713.706243] [6515] hci_req_run: length 1
-[69713.706248] [6515] hci_conn_hold: hcon ffff88021f65a000 orig refcnt 0
-[69713.706251] [6515] hci_dev_put: hci0 orig refcnt 9
-[69713.706281] [8909] hci_cmd_work: hci0 cmd_cnt 1 cmd queued 1
-[69713.706288] [8909] hci_send_frame: hci0 type 1 len 28
-[69713.706290] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 28
-[69713.706316] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.706382] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.711664] [8909] hci_rx_work: hci0
-[69713.711668] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 6
-[69713.711680] [8909] hci_rx_work: hci0 Event packet
-[69713.711683] [8909] hci_cs_le_create_conn: hci0 status 0x00
-[69713.711685] [8909] hci_sent_cmd_data: hci0 opcode 0x200d
-[69713.711688] [8909] hci_req_cmd_complete: opcode 0x200d status 0x00
-[69713.711690] [8909] hci_sent_cmd_data: hci0 opcode 0x200d
-[69713.711695] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.711744] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.818875] [8909] hci_rx_work: hci0
-[69713.818889] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 21
-[69713.818913] [8909] hci_rx_work: hci0 Event packet
-[69713.818917] [8909] hci_le_conn_complete_evt: hci0 status 0x00
-[69713.818922] [8909] hci_send_to_control: len 19
-[69713.818927] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.818938] [8909] hci_conn_add_sysfs: conn ffff88021f65a000
-[69713.818975] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.818981] [6515] hci_sock_recvmsg: sock ffff88005e75a080, sk
-ffff88010323ac00
-[69713.818983] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.818985] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.818987] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.818990] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.818994] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.818998] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.819003] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.819007] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.819021] [8909] hci_dev_hold: hci0 orig refcnt 10
-[69713.819025] [8909] l2cap_connect_cfm: hcon ffff88021f65a000 bdaddr
-00:1b:dc:06:06:22 status 0
-[69713.819028] [8909] hci_chan_create: hci0 hcon ffff88021f65a000
-[69713.819031] [8909] l2cap_conn_add: hcon ffff88021f65a000 conn
-ffff880221005c00 hchan ffff88020d60b1c0
-[69713.819034] [8909] l2cap_conn_ready: conn ffff880221005c00
-[69713.819036] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.819037] [8909] smp_conn_security: conn ffff880221005c00 hcon
-ffff88021f65a000 level 0x02
-[69713.819039] [8909] smp_chan_create:
-[69713.819041] [8909] hci_conn_hold: hcon ffff88021f65a000 orig refcnt 1
-[69713.819043] [8909] smp_send_cmd: code 0x01
-[69713.819045] [8909] hci_send_acl: hci0 chan ffff88020d60b1c0 flags
-0x0000
-[69713.819046] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69713.819049] [8909] hci_queue_acl: hci0 nonfrag skb ffff88005157c100
-len 15
-[69713.819055] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69713.819057] [8909] l2cap_le_conn_ready:
-[69713.819064] [8909] l2cap_chan_create: chan ffff88005ede2c00
-[69713.819066] [8909] l2cap_chan_hold: chan ffff88005ede2c00 orig refcnt
-1
-[69713.819069] [8909] l2cap_sock_init: sk ffff88005ede5800
-[69713.819072] [8909] bt_accept_enqueue: parent ffff880160356000, sk
-ffff88005ede5800
-[69713.819074] [8909] __l2cap_chan_add: conn ffff880221005c00, psm 0x00,
-dcid 0x0004
-[69713.819076] [8909] l2cap_chan_hold: chan ffff88005ede2c00 orig refcnt
-2
-[69713.819078] [8909] hci_conn_hold: hcon ffff88021f65a000 orig refcnt 2
-[69713.819080] [8909] smp_conn_security: conn ffff880221005c00 hcon
-ffff88021f65a000 level 0x01
-[69713.819082] [8909] l2cap_sock_ready_cb: sk ffff88005ede5800, parent
-ffff880160356000
-[69713.819086] [8909] le_pairing_complete_cb: status 0
-[69713.819091] [8909] hci_tx_work: hci0 acl 10 sco 8 le 0
-[69713.819093] [8909] hci_sched_acl: hci0
-[69713.819094] [8909] hci_sched_sco: hci0
-[69713.819096] [8909] hci_sched_esco: hci0
-[69713.819098] [8909] hci_sched_le: hci0
-[69713.819099] [8909] hci_chan_sent: hci0
-[69713.819101] [8909] hci_chan_sent: chan ffff88020d60b1c0 quote 10
-[69713.819104] [8909] hci_sched_le: chan ffff88020d60b1c0 skb
-ffff88005157c100 len 15 priority 7
-[69713.819106] [8909] hci_send_frame: hci0 type 2 len 15
-[69713.819108] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 15
-[69713.819119] [8909] hci_chan_sent: hci0
-[69713.819121] [8909] hci_prio_recalculate: hci0
-[69713.819123] [8909] process_pending_rx:
-[69713.819226] [6450] hci_sock_recvmsg: sock ffff88005e758780, sk
-ffff88010323d400
-[69713.819592] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.819633] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.821872] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.821877] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.821879] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.821881] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.821883] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.821884] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.821886] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.821889] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.821891] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.822008] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.822022] [6450] l2cap_sock_accept: sk ffff880160356000 timeo 0
-[69713.822024] [6450] bt_accept_dequeue: parent ffff880160356000
-[69713.822026] [6450] bt_accept_unlink: sk ffff88005ede5800 state 1
-[69713.822028] [6450] l2cap_sock_accept: new socket ffff88005ede5800
-[69713.822368] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.822375] [6450] l2cap_sock_getsockopt: sk ffff88005ede5800
-[69713.822383] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.822414] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823082] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.823086] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.823087] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.823089] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.823091] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.823093] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.823094] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.823096] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.823098] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823101] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.823224] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823255] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823259] [6450] l2cap_sock_getsockopt: sk ffff88005ede5800
-[69713.824322] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.824330] [6450] l2cap_sock_getsockopt: sk ffff88005ede5800
-[69713.825029] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.825032] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.825034] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.825036] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.825038] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.825040] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.825042] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.825044] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.825046] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.825048] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825049] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825051] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825187] [6450] l2cap_sock_sendmsg: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825189] [6450] bt_sock_wait_ready: sk ffff88005ede5800
-[69713.825192] [6450] l2cap_create_basic_pdu: chan ffff88005ede2c00 len
-3
-[69713.825196] [6450] l2cap_do_send: chan ffff88005ede2c00, skb
-ffff880160b0b500 len 7 priority 0
-[69713.825199] [6450] hci_send_acl: hci0 chan ffff88020d60b1c0 flags
-0x0000
-[69713.825201] [6450] hci_queue_acl: hci0 nonfrag skb ffff880160b0b500
-len 11
-[69713.825210] [8909] hci_tx_work: hci0 acl 9 sco 8 le 0
-[69713.825213] [8909] hci_sched_acl: hci0
-[69713.825214] [8909] hci_sched_sco: hci0
-[69713.825216] [8909] hci_sched_esco: hci0
-[69713.825217] [8909] hci_sched_le: hci0
-[69713.825219] [8909] hci_chan_sent: hci0
-[69713.825221] [8909] hci_chan_sent: chan ffff88020d60b1c0 quote 9
-[69713.825223] [8909] hci_sched_le: chan ffff88020d60b1c0 skb
-ffff880160b0b500 len 11 priority 0
-[69713.825225] [8909] hci_send_frame: hci0 type 2 len 11
-[69713.825227] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 11
-[69713.825242] [8909] hci_chan_sent: hci0
-[69713.825253] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.825253] [8909] hci_prio_recalculate: hci0
-[69713.825292] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.825768] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.825771] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.825773] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.825775] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.825776] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.825778] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.825780] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.825782] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.825784] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.825785] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825787] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.826020] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.826023] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.826025] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.826026] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.826028] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.826030] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.826032] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.826035] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.826037] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.826039] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.826041] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.866902] [8909] hci_rx_work: hci0
-[69713.866921] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 7
-[69713.866928] [8909] hci_rx_work: hci0 Event packet
-[69713.866931] [8909] hci_num_comp_pkts_evt: hci0 num_hndl 1
-[69713.866937] [8909] hci_tx_work: hci0 acl 9 sco 8 le 0
-[69713.866939] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.866940] [8909] hci_sched_acl: hci0
-[69713.866941] [8909] hci_sched_sco: hci0
-[69713.866943] [8909] hci_sched_esco: hci0
-[69713.866944] [8909] hci_sched_le: hci0
-[69713.866953] [8909] hci_chan_sent: hci0
-[69713.866997] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.867840] [28074] hci_rx_work: hci0
-[69713.867844] [28074] hci_send_to_monitor: hdev ffff88021f0c7000 len 7
-[69713.867850] [28074] hci_rx_work: hci0 Event packet
-[69713.867853] [28074] hci_num_comp_pkts_evt: hci0 num_hndl 1
-[69713.867857] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.867858] [28074] hci_tx_work: hci0 acl 10 sco 8 le 0
-[69713.867860] [28074] hci_sched_acl: hci0
-[69713.867861] [28074] hci_sched_sco: hci0
-[69713.867862] [28074] hci_sched_esco: hci0
-[69713.867863] [28074] hci_sched_le: hci0
-[69713.867865] [28074] hci_chan_sent: hci0
-[69713.867888] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69714.145661] [8909] hci_rx_work: hci0
-[69714.145666] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 10
-[69714.145676] [8909] hci_rx_work: hci0 ACL data packet
-[69714.145679] [8909] hci_acldata_packet: hci0 len 6 handle 0x002d flags
-0x0002
-[69714.145681] [8909] hci_conn_enter_active_mode: hcon ffff88021f65a000
-mode 0
-[69714.145683] [8909] l2cap_recv_acldata: conn ffff880221005c00 len 6
-flags 0x2
-[69714.145693] [8909] l2cap_recv_frame: len 2, cid 0x0006
-[69714.145696] [8909] hci_send_to_control: len 14
-[69714.145710] [8909] smp_chan_destroy:
-[69714.145713] [8909] pairing_complete: status 3
-[69714.145714] [8909] cmd_complete: sock ffff88010323ac00
-[69714.145717] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 3
-[69714.145719] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69714.145720] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.145722] [6515] hci_sock_recvmsg: sock ffff88005e75a080, sk
-ffff88010323ac00
-[69714.145724] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.145726] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.145728] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.145729] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.145731] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.145732] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.145735] [6515] hci_sock_recvmsg: sock ffff88005e75a080, sk
-ffff88010323ac00
-[69714.145737] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 2
-[69714.145739] [8909] l2cap_conn_del: hcon ffff88021f65a000 conn
-ffff880221005c00, err 13
-[69714.145740] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.145743] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.145744] [8909] l2cap_chan_hold: chan ffff88005ede2c00 orig refcnt
-3
-[69714.145746] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.145748] [8909] l2cap_chan_del: chan ffff88005ede2c00, conn
-ffff880221005c00, err 13
-[69714.145749] [8909] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-4
-[69714.145751] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 1
-[69714.145754] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.145756] [8909] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-3
-[69714.145759] [8909] hci_chan_del: hci0 hcon ffff88021f65a000 chan
-ffff88020d60b1c0
-[69714.145766] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69714.145769] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69714.145778] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69714.145787] [6515] hci_sock_release: sock ffff88005e75a080 sk
-ffff88010323ac00
-[69714.146002] [6450] hci_sock_recvmsg: sock ffff88005e758780, sk
-ffff88010323d400
-[69714.150795] [6450] l2cap_sock_release: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.150799] [6450] l2cap_sock_shutdown: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.150802] [6450] l2cap_chan_close: chan ffff88005ede2c00 state
-BT_CLOSED
-[69714.150805] [6450] l2cap_sock_kill: sk ffff88005ede5800 state
-BT_CLOSED
-[69714.150806] [6450] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-2
-[69714.150808] [6450] l2cap_sock_destruct: sk ffff88005ede5800
-[69714.150809] [6450] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-1
-[69714.150811] [6450] l2cap_chan_destroy: chan ffff88005ede2c00
-[69714.150970] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.150974] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.150975] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.150977] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.150979] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.150981] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.150983] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.150985] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.150988] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.151181] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.151183] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.151185] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.151186] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.151188] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.151190] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.151191] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.151193] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.151195] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.151379] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.151381] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.151383] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.151384] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.151386] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.151387] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.151389] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.151391] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.151393] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.151991] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 0
-[69716.150339] [8909] hci_conn_timeout: hcon ffff88021f65a000 state
-BT_CONNECTED, refcnt -1
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_conn.c | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ include/net/bluetooth/l2cap.h | 35 +++++++++++++++++++++++++++++++++++
+ net/bluetooth/a2mp.c          | 18 ++++--------------
+ net/bluetooth/l2cap_core.c    |  6 ++++--
+ net/bluetooth/l2cap_sock.c    | 34 +++++++++++++++++++++-------------
+ 4 files changed, 64 insertions(+), 29 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ca01d18..12d1f9a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -289,10 +289,21 @@ static void hci_conn_timeout(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn,
- 					     disc_work.work);
-+	int refcnt = atomic_read(&conn->refcnt);
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 92511034d1d4..e4f4ca69e301 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -602,6 +602,9 @@ struct l2cap_ops {
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long hdr_len,
+ 					       unsigned long len, int nb);
++	int			(*memcpy_fromiovec) (struct l2cap_chan *chan,
++						     unsigned char *kdata,
++						     struct iovec *iov, int len);
+ };
  
- 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
+ struct l2cap_conn {
+@@ -857,6 +860,38 @@ static inline long l2cap_chan_no_get_sndtimeo(struct l2cap_chan *chan)
+ 	return 0;
+ }
  
--	if (atomic_read(&conn->refcnt))
-+	WARN_ON(refcnt < 0);
++static inline struct sk_buff *l2cap_chan_no_alloc_skb(struct l2cap_chan *chan,
++						      unsigned long hdr_len,
++						      unsigned long len, int nb)
++{
++	struct sk_buff *skb;
 +
-+	/*
-+	 * FIXME: It was observed that in pairing failed scenario, refcnt
-+	 * drops below 0. Probably this is because l2cap_conn_del calls
-+	 * l2cap_chan_del for each channel, and inside l2cap_chan_del conn is
-+	 * dropped. After that loop hci_chan_del is called which also drops
-+	 * conn. For now make sure that ACL is alive if refcnt is higher then 0,
-+	 * otherwise drop it.
-+	 */
-+	if (refcnt > 0)
- 		return;
++	skb = bt_skb_alloc(hdr_len + len, GFP_KERNEL);
++	if (!skb)
++		return ERR_PTR(-ENOMEM);
++
++	return skb;
++}
++
++static inline int l2cap_chan_no_memcpy_fromiovec(struct l2cap_chan *chan,
++						 unsigned char *kdata,
++						 struct iovec *iov, int len)
++{
++	while (len > 0) {
++		if (iov->iov_len) {
++			int copy = min_t(unsigned int, len, iov->iov_len);
++			memcpy(kdata, iov->iov_base, copy);
++			len -= copy;
++			kdata += copy;
++			iov->iov_base += copy;
++			iov->iov_len -= copy;
++		}
++		iov++;
++	}
++
++	return 0;
++}
++
+ extern bool disable_ertm;
  
- 	switch (conn->state) {
+ int l2cap_init_sockets(void);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 0fd8d1dda709..4cda6213cfc3 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -692,25 +692,15 @@ static void a2mp_chan_state_change_cb(struct l2cap_chan *chan, int state,
+ 	}
+ }
+ 
+-static struct sk_buff *a2mp_chan_alloc_skb_cb(struct l2cap_chan *chan,
+-					      unsigned long hdr_len,
+-					      unsigned long len, int nb)
+-{
+-	struct sk_buff *skb;
+-
+-	skb = bt_skb_alloc(hdr_len + len, GFP_KERNEL);
+-	if (!skb)
+-		return ERR_PTR(-ENOMEM);
+-
+-	return skb;
+-}
+-
+ static const struct l2cap_ops a2mp_chan_ops = {
+ 	.name = "L2CAP A2MP channel",
+ 	.recv = a2mp_chan_recv_cb,
+ 	.close = a2mp_chan_close_cb,
+ 	.state_change = a2mp_chan_state_change_cb,
+-	.alloc_skb = a2mp_chan_alloc_skb_cb,
++
++	/* Use default kernel implementation */
++	.alloc_skb = l2cap_chan_no_alloc_skb,
++	.memcpy_fromiovec = l2cap_chan_no_memcpy_fromiovec,
+ 
+ 	/* Not implemented for A2MP */
+ 	.new_connection = l2cap_chan_no_new_connection,
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b093e98aa968..eb0d43da80d5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2112,7 +2112,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 	struct sk_buff **frag;
+ 	int sent = 0;
+ 
+-	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
++	if (chan->ops->memcpy_fromiovec(chan, skb_put(skb, count),
++					msg->msg_iov, count))
+ 		return -EFAULT;
+ 
+ 	sent += count;
+@@ -2132,7 +2133,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 
+ 		*frag = tmp;
+ 
+-		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
++		if (chan->ops->memcpy_fromiovec(chan, skb_put(*frag, count),
++						msg->msg_iov, count))
+ 			return -EFAULT;
+ 
+ 		sent += count;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 6ab282212d5c..e64e1bbba14d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1318,6 +1318,13 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ 	return skb;
+ }
+ 
++static int l2cap_sock_memcpy_fromiovec_cb(struct l2cap_chan *chan,
++					  unsigned char *kdata,
++					  struct iovec *iov, int len)
++{
++	return memcpy_fromiovec(kdata, iov, len);
++}
++
+ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk = chan->data;
+@@ -1384,19 +1391,20 @@ static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
+ }
+ 
+ static const struct l2cap_ops l2cap_chan_ops = {
+-	.name		= "L2CAP Socket Interface",
+-	.new_connection	= l2cap_sock_new_connection_cb,
+-	.recv		= l2cap_sock_recv_cb,
+-	.close		= l2cap_sock_close_cb,
+-	.teardown	= l2cap_sock_teardown_cb,
+-	.state_change	= l2cap_sock_state_change_cb,
+-	.ready		= l2cap_sock_ready_cb,
+-	.defer		= l2cap_sock_defer_cb,
+-	.resume		= l2cap_sock_resume_cb,
+-	.suspend	= l2cap_sock_suspend_cb,
+-	.set_shutdown	= l2cap_sock_set_shutdown_cb,
+-	.get_sndtimeo	= l2cap_sock_get_sndtimeo_cb,
+-	.alloc_skb	= l2cap_sock_alloc_skb_cb,
++	.name			= "L2CAP Socket Interface",
++	.new_connection		= l2cap_sock_new_connection_cb,
++	.recv			= l2cap_sock_recv_cb,
++	.close			= l2cap_sock_close_cb,
++	.teardown		= l2cap_sock_teardown_cb,
++	.state_change		= l2cap_sock_state_change_cb,
++	.ready			= l2cap_sock_ready_cb,
++	.defer			= l2cap_sock_defer_cb,
++	.resume			= l2cap_sock_resume_cb,
++	.suspend		= l2cap_sock_suspend_cb,
++	.set_shutdown		= l2cap_sock_set_shutdown_cb,
++	.get_sndtimeo		= l2cap_sock_get_sndtimeo_cb,
++	.alloc_skb		= l2cap_sock_alloc_skb_cb,
++	.memcpy_fromiovec	= l2cap_sock_memcpy_fromiovec_cb,
+ };
+ 
+ static void l2cap_sock_destruct(struct sock *sk)
 -- 
-1.8.4
+1.9.3
 
