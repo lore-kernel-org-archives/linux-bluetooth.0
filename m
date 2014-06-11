@@ -2,68 +2,54 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 02/10] android/hal-ipc: Allow to pass custom path to IPC
-Date: Wed, 11 Jun 2014 16:32:44 +0200
-Message-Id: <1402497172-12436-3-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
-References: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 00/10] Some HAL IPC work
+Date: Wed, 11 Jun 2014 16:32:42 +0200
+Message-Id: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/hal-bluetooth.c | 2 +-
- android/hal-ipc.c       | 4 ++--
- android/hal-ipc.h       | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+Hi,
 
-diff --git a/android/hal-bluetooth.c b/android/hal-bluetooth.c
-index e9a677a..c2a1085 100644
---- a/android/hal-bluetooth.c
-+++ b/android/hal-bluetooth.c
-@@ -420,7 +420,7 @@ static int init(bt_callbacks_t *callbacks)
- 	hal_ipc_register(HAL_SERVICE_ID_BLUETOOTH, ev_handlers,
- 				sizeof(ev_handlers)/sizeof(ev_handlers[0]));
- 
--	if (!hal_ipc_init()) {
-+	if (!hal_ipc_init(BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH))) {
- 		bt_hal_cbacks = NULL;
- 		return BT_STATUS_FAIL;
- 	}
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index 8f5babe..81d3a1b 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -229,7 +229,7 @@ static int accept_connection(int sk)
- 	return new_sk;
- }
- 
--bool hal_ipc_init(void)
-+bool hal_ipc_init(const char *path, size_t size)
- {
- 	struct sockaddr_un addr;
- 	int sk;
-@@ -246,7 +246,7 @@ bool hal_ipc_init(void)
- 	memset(&addr, 0, sizeof(addr));
- 	addr.sun_family = AF_UNIX;
- 
--	memcpy(addr.sun_path, BLUEZ_HAL_SK_PATH, sizeof(BLUEZ_HAL_SK_PATH));
-+	memcpy(addr.sun_path, path, size);
- 
- 	if (bind(sk, (struct sockaddr *) &addr, sizeof(addr)) < 0) {
- 		err = errno;
-diff --git a/android/hal-ipc.h b/android/hal-ipc.h
-index 2fbf30f..0d16cdb 100644
---- a/android/hal-ipc.h
-+++ b/android/hal-ipc.h
-@@ -21,7 +21,7 @@ struct hal_ipc_handler {
- 	size_t data_len;
- };
- 
--bool hal_ipc_init(void);
-+bool hal_ipc_init(const char *path, size_t size);
- void hal_ipc_cleanup(void);
- 
- int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
+Those patches are cleanups and fixes for HAL part of IPC. Those are
+first step to making HAL IPC library like so that it can be reused
+by audio and sco HALs.
+
+Eventually this should also allow for better recovery in case of IPC
+error i.e. not calling exit() directly but custom destroy callback.
+But this is not implemented yet.
+
+Last two patches add FD passing in notification (as of now this is
+needed only for health HAL).
+
+BR
+Szymon Janc
+
+Szymon Janc (10):
+  android/ipc: Make struct service_handler private
+  android/hal-ipc: Allow to pass custom path to IPC
+  android/hal-ipc: Fix missing mutex unlock
+  android/hal-ipc: Move exit calls outside of handle_msg
+  android/hal-ipc: Move exit calls under failed label in hal_ipc_cmd
+  android/hal-ipc: Move exit calls under label in notification_handler
+  android/hal-ipc: Split IPC init and accept to separate functions
+  android/hal-ipc: Move daemon starting to bluetooth HAL
+  android/hal-ipc: Pass FD to notification handlers
+  android/ipc: Add support for sending FD in notifications
+
+ android/hal-a2dp.c      |   4 +-
+ android/hal-avrcp.c     |  24 +++----
+ android/hal-bluetooth.c |  40 +++++++----
+ android/hal-gatt.c      |  62 ++++++++--------
+ android/hal-handsfree.c |  32 ++++-----
+ android/hal-health.c    |   2 +-
+ android/hal-hidhost.c   |  12 ++--
+ android/hal-ipc.c       | 186 ++++++++++++++++++++++++++----------------------
+ android/hal-ipc.h       |   5 +-
+ android/hal-pan.c       |   4 +-
+ android/ipc.c           |  13 +++-
+ android/ipc.h           |   8 +--
+ 12 files changed, 214 insertions(+), 178 deletions(-)
+
 -- 
 1.9.1
 
