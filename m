@@ -2,115 +2,51 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 04/10] android/hal-ipc: Move exit calls outside of handle_msg
-Date: Wed, 11 Jun 2014 16:32:46 +0200
-Message-Id: <1402497172-12436-5-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 01/10] android/ipc: Make struct service_handler private
+Date: Wed, 11 Jun 2014 16:32:43 +0200
+Message-Id: <1402497172-12436-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
 References: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This reduce number of exit points in preparation for destroy callback.
 ---
- android/hal-ipc.c | 37 +++++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 18 deletions(-)
+ android/ipc.c | 5 +++++
+ android/ipc.h | 5 -----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index ee3a04c..abb3b4b 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -62,41 +62,39 @@ void hal_ipc_unregister(uint8_t service)
- 	services[service].size = 0;
- }
+diff --git a/android/ipc.c b/android/ipc.c
+index 8cd34ea..fc58a1c 100644
+--- a/android/ipc.c
++++ b/android/ipc.c
+@@ -40,6 +40,11 @@
+ #include "ipc.h"
+ #include "src/log.h"
  
--static void handle_msg(void *buf, ssize_t len)
-+static bool handle_msg(void *buf, ssize_t len)
- {
- 	struct ipc_hdr *msg = buf;
- 	const struct hal_ipc_handler *handler;
- 	uint8_t opcode;
- 
- 	if (len < (ssize_t) sizeof(*msg)) {
--		error("IPC: message too small (%zd bytes), aborting", len);
--		exit(EXIT_FAILURE);
-+		error("IPC: message too small (%zd bytes)", len);
-+		return false;
- 	}
- 
- 	if (len != (ssize_t) (sizeof(*msg) + msg->len)) {
--		error("IPC: message malformed (%zd bytes), aborting", len);
--		exit(EXIT_FAILURE);
-+		error("IPC: message malformed (%zd bytes)", len);
-+		return false;
- 	}
- 
- 	/* if service is valid */
- 	if (msg->service_id > HAL_SERVICE_ID_MAX) {
--		error("IPC: unknown service (0x%x), aborting",
--							msg->service_id);
--		exit(EXIT_FAILURE);
-+		error("IPC: unknown service (0x%x)", msg->service_id);
-+		return false;
- 	}
- 
- 	/* if service is registered */
- 	if (!services[msg->service_id].handler) {
--		error("IPC: unregistered service (0x%x), aborting",
--							msg->service_id);
--		exit(EXIT_FAILURE);
-+		error("IPC: unregistered service (0x%x)", msg->service_id);
-+		return false;
- 	}
- 
- 	/* if opcode fit valid range */
- 	if (msg->opcode < HAL_MINIMUM_EVENT) {
--		error("IPC: invalid opcode for service 0x%x (0x%x), aborting",
-+		error("IPC: invalid opcode for service 0x%x (0x%x)",
- 						msg->service_id, msg->opcode);
--		exit(EXIT_FAILURE);
-+		return false;
- 	}
- 
- 	/*
-@@ -107,9 +105,9 @@ static void handle_msg(void *buf, ssize_t len)
- 
- 	/* if opcode is valid */
- 	if (opcode >= services[msg->service_id].size) {
--		error("IPC: invalid opcode for service 0x%x (0x%x), aborting",
-+		error("IPC: invalid opcode for service 0x%x (0x%x)",
- 						msg->service_id, msg->opcode);
--		exit(EXIT_FAILURE);
-+		return false;
- 	}
- 
- 	handler = &services[msg->service_id].handler[opcode];
-@@ -118,12 +116,14 @@ static void handle_msg(void *buf, ssize_t len)
- 	if ((handler->var_len && handler->data_len > msg->len) ||
- 			(!handler->var_len && handler->data_len != msg->len)) {
- 		error("IPC: message size invalid for service 0x%x opcode 0x%x "
--				"(%u bytes), aborting",
-+				"(%u bytes)",
- 				msg->service_id, msg->opcode, msg->len);
--		exit(EXIT_FAILURE);
-+		return false;
- 	}
- 
- 	handler->handler(msg->payload, msg->len);
++struct service_handler {
++	const struct ipc_handler *handler;
++	uint8_t size;
++};
 +
-+	return true;
- }
+ struct ipc {
+ 	struct service_handler *services;
+ 	int service_max;
+diff --git a/android/ipc.h b/android/ipc.h
+index cc4e92d..e97f0e6 100644
+--- a/android/ipc.h
++++ b/android/ipc.h
+@@ -27,11 +27,6 @@ struct ipc_handler {
+ 	size_t data_len;
+ };
  
- static void *notification_handler(void *data)
-@@ -184,7 +184,8 @@ static void *notification_handler(void *data)
- 			}
- 		}
+-struct service_handler {
+-	const struct ipc_handler *handler;
+-	uint8_t size;
+-};
+-
+ struct ipc;
  
--		handle_msg(buf, ret);
-+		if (!handle_msg(buf, ret))
-+			exit(EXIT_FAILURE);
- 	}
- 
- 	close(notif_sk);
+ typedef void (*ipc_disconnect_cb) (void *data);
 -- 
 1.9.1
 
