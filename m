@@ -1,95 +1,383 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 1/2] android: Store remote's Identity Resolving Key
-Date: Wed, 11 Jun 2014 10:00:13 +0200
-Message-Id: <1402473614-26767-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <CAN_7+YacJ7gAwtqXpByNg3Su1Ut6dBBxcnV1GTm0sMNcWdsMjQ@mail.gmail.com>
+References: <1402415643-32300-1-git-send-email-luiz.dentz@gmail.com>
+	<1402415643-32300-3-git-send-email-luiz.dentz@gmail.com>
+	<CAN_7+YacJ7gAwtqXpByNg3Su1Ut6dBBxcnV1GTm0sMNcWdsMjQ@mail.gmail.com>
+Date: Wed, 11 Jun 2014 10:37:43 +0300
+Message-ID: <CABBYNZJpnDusFdryqk2MKOZA3dnG1eWGfcDw5hp0Sv8O+TCf2g@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 03/12] android/gatt: Make application API public
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Persistent storage is used so we can load IRKs on startup.
----
- android/bluetooth.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
+Hi Lukasz,
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 36b073e..8638f84 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -1964,6 +1964,62 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
- 		store_csrk(dev);
- }
- 
-+static void store_irk(struct device *dev, const uint8_t *val)
-+{
-+	GKeyFile *key_file;
-+	char key_str[33];
-+	char addr[18];
-+	int i;
-+	gsize length = 0;
-+	char *data;
-+
-+	ba2str(&dev->bdaddr, addr);
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
-+		g_key_file_free(key_file);
-+		return;
-+	}
-+
-+	for (i = 0; i < 16; i++)
-+		sprintf(key_str + (i * 2), "%2.2X", val[i]);
-+
-+	g_key_file_set_string(key_file, addr, "IdentityResolvingKey", key_str);
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+	g_file_set_contents(DEVICES_FILE, data, length, NULL);
-+	g_free(data);
-+
-+	g_key_file_free(key_file);
-+}
-+
-+static void new_irk_callback(uint16_t index, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	const struct mgmt_ev_new_irk *ev = param;
-+	const struct mgmt_addr_info *addr = &ev->key.addr;
-+	struct device *dev;
-+	char dst[18], rpa[18];
-+
-+	if (length < sizeof(*ev)) {
-+		error("To small New Irk Event (%u bytes)", length);
-+		return;
-+	}
-+
-+	ba2str(&ev->key.addr.bdaddr, dst);
-+	ba2str(&ev->rpa, rpa);
-+
-+	DBG("new IRK for %s, RPA %s", dst, rpa);
-+
-+	/* TODO: handle new Identity to RPA mapping */
-+	dev = find_device(&addr->bdaddr);
-+	if (!dev)
-+		return;
-+
-+	if (ev->store_hint)
-+		store_irk(dev, ev->key.val);
-+}
-+
- static void register_mgmt_handlers(void)
- {
- 	mgmt_register(mgmt_if, MGMT_EV_NEW_SETTINGS, adapter.index,
-@@ -2017,6 +2073,9 @@ static void register_mgmt_handlers(void)
- 	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter.index,
- 						new_csrk_callback, NULL, NULL);
- 
-+	mgmt_register(mgmt_if, MGMT_EV_NEW_IRK, adapter.index, new_irk_callback,
-+								NULL, NULL);
-+
- }
- 
- static void load_link_keys_complete(uint8_t status, uint16_t length,
+On Tue, Jun 10, 2014 at 11:08 PM, Lukasz Rymanowski
+<lukasz.rymanowski@gmail.com> wrote:
+> Hi Luiz,
+>
+> On Tue, Jun 10, 2014 at 5:53 PM, Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+>> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>>
+>> This in future gonna be used by HoG to receive connection notifications.
+>> ---
+>>  android/gatt.c | 143 ++++++++++++++++++++++++++++++++++++++++++++++-----------
+>>  android/gatt.h |  15 ++++++
+>>  2 files changed, 130 insertions(+), 28 deletions(-)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index 3fd88fa..c25aed4 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -87,11 +87,6 @@ static const char const *device_state_str[] = {
+>>         "CONNECTED",
+>>  };
+>>
+>> -typedef enum {
+>> -       APP_CLIENT,
+>> -       APP_SERVER,
+>> -} gatt_app_type_t;
+>> -
+> Change of those names seems to be unrelated. Maybe topic for separate patch.
+
+Well I had to change the name since this is now a public API we
+normally use proper namespace prefix, so I have say this is relevant
+to the changes proposed.
+
+>>  struct pending_trans_data {
+>>         unsigned int id;
+>>         uint8_t opcode;
+>> @@ -101,10 +96,12 @@ struct gatt_app {
+>>         int32_t id;
+>>         uint8_t uuid[16];
+>>
+>> -       gatt_app_type_t type;
+>> +       gatt_type_t type;
+>>
+>>         /* Valid for client applications */
+>>         struct queue *notifications;
+>> +
+>> +       gatt_conn_cb_t func;
+>>  };
+>>
+>>  struct element_id {
+>> @@ -617,7 +614,7 @@ static void destroy_gatt_app(void *data)
+>>          * too. So remove all elements and then destroy queue.
+>>          */
+>>
+>> -       if (app->type == APP_CLIENT)
+>> +       if (app->type == GATT_CLIENT)
+>>                 while (queue_peek_head(app->notifications)) {
+>>                         struct notification_data *notification;
+>>
+>> @@ -630,14 +627,14 @@ static void destroy_gatt_app(void *data)
+>>         free(app);
+>>  }
+>>
+>> -static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+>> +static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
+>
+> Maybe it would be better to extend parameters here with gatt_conn_cb_t
+> function? At least less code changes it would introduce. And it would
+> make more sense to attach callback already in register function.
+
+I have actually started with that but most of the callback would be
+set to NULL so Ive keep the callback only for the public API, but now
+thinking about it again it might be useful to actually replace the
+notify path by having a proper notification callback registered
+upfront but this will introduce yet more changes.
+
+>>  {
+>>         static int32_t application_id = 1;
+>>         struct gatt_app *app;
+>>
+>>         if (queue_find(gatt_apps, match_app_by_uuid, uuid)) {
+>>                 error("gatt: app uuid is already on list");
+>> -               return 0;
+>> +               return NULL;
+>>         }
+>>
+>>         app = new0(struct gatt_app, 1);
+>> @@ -646,14 +643,14 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+>>                 return 0;
+>>         }
+>>
+>> -       app->type = app_type;
+>> +       app->type = type;
+>>
+>> -       if (app->type == APP_CLIENT) {
+>> +       if (app->type == GATT_CLIENT) {
+>>                 app->notifications = queue_new();
+>>                 if (!app->notifications) {
+>>                         error("gatt: couldn't allocate notifications queue");
+>>                         destroy_gatt_app(app);
+>> -                       return 0;
+>> +                       return NULL;
+>>                 }
+>>         }
+>>
+>> @@ -664,33 +661,35 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+>>         if (!queue_push_head(gatt_apps, app)) {
+>>                 error("gatt: Cannot push app on the list");
+>>                 destroy_gatt_app(app);
+>> -               return 0;
+>> +               return NULL;
+>>         }
+>>
+>> -       if ((app->type == APP_SERVER) &&
+>> +       if ((app->type == GATT_SERVER) &&
+>>                         !queue_push_tail(listen_apps, INT_TO_PTR(app->id))) {
+>>                 error("gatt: Cannot push server on the list");
+>>                 destroy_gatt_app(app);
+>> -               return 0;
+>> +               return NULL;
+>>         }
+>>
+>> -       return app->id;
+>> +       return app;
+>>  }
+>>
+>>  static void handle_client_register(const void *buf, uint16_t len)
+>>  {
+>>         const struct hal_cmd_gatt_client_register *cmd = buf;
+>>         struct hal_ev_gatt_client_register_client ev;
+>> +       struct gatt_app *app;
+>>
+>>         DBG("");
+>>
+>>         memset(&ev, 0, sizeof(ev));
+>>
+>> -       ev.client_if = register_app(cmd->uuid, APP_CLIENT);
+>> +       app = register_app(cmd->uuid, GATT_CLIENT);
+>>
+>> -       if (ev.client_if)
+>> +       if (app) {
+>> +               ev.client_if = app->id;
+>>                 ev.status = GATT_SUCCESS;
+>> -       else
+>> +       } else
+>>                 ev.status = GATT_FAILURE;
+>>
+>>         /* We should send notification with given in cmd UUID */
+>> @@ -708,6 +707,12 @@ static void send_client_disconnection_notify(struct app_connection *connection,
+>>  {
+>>         struct hal_ev_gatt_client_disconnect ev;
+>>
+>> +       if (connection->app->func) {
+>> +               connection->app->func(&connection->device->bdaddr, -ENOTCONN,
+>> +                                               connection->device->attrib);
+>> +               return;
+>> +       }
+>> +
+>>         ev.client_if = connection->app->id;
+>>         ev.conn_id = connection->id;
+>>         ev.status = status;
+>> @@ -716,6 +721,7 @@ static void send_client_disconnection_notify(struct app_connection *connection,
+>>
+>>         ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
+>>                                 HAL_EV_GATT_CLIENT_DISCONNECT, sizeof(ev), &ev);
+>> +
+> not related to this change.
+
+I Will fix this.
+
+>>
+> }
+>>
+>>  static void send_client_connection_notify(struct app_connection *connection,
+>> @@ -723,6 +729,13 @@ static void send_client_connection_notify(struct app_connection *connection,
+>>  {
+>>         struct hal_ev_gatt_client_connect ev;
+>>
+>> +       if (connection->app->func) {
+>> +               connection->app->func(&connection->device->bdaddr,
+>> +                                       status == GATT_SUCCESS ? 0 : -ENOTCONN,
+>> +                                       connection->device->attrib);
+>> +               return;
+>> +       }
+>> +
+>>         ev.client_if = connection->app->id;
+>>         ev.conn_id = connection->id;
+>>         ev.status = status;
+>> @@ -738,6 +751,13 @@ static void send_server_connection_notify(struct app_connection *connection,
+>>  {
+>>         struct hal_ev_gatt_server_connection ev;
+>>
+>> +       if (connection->app->func) {
+>> +               connection->app->func(&connection->device->bdaddr,
+>> +                                       connected ? 0 : -ENOTCONN,
+>> +                                       connection->device->attrib);
+>> +               return;
+>> +       }
+>> +
+>>         ev.server_if = connection->app->id;
+>>         ev.conn_id = connection->id;
+>>         ev.connected = connected;
+>> @@ -751,7 +771,7 @@ static void send_server_connection_notify(struct app_connection *connection,
+>>  static void send_app_disconnect_notify(struct app_connection *connection,
+>>                                                                 int32_t status)
+>>  {
+>> -       if (connection->app->type == APP_CLIENT)
+>> +       if (connection->app->type == GATT_CLIENT)
+>>                 send_client_disconnection_notify(connection, status);
+>>         else
+>>                 send_server_connection_notify(connection, !!status);
+>> @@ -760,9 +780,9 @@ static void send_app_disconnect_notify(struct app_connection *connection,
+>>  static void send_app_connect_notify(struct app_connection *connection,
+>>                                                                 int32_t status)
+>>  {
+>> -       if (connection->app->type == APP_CLIENT)
+>> +       if (connection->app->type == GATT_CLIENT)
+>>                 send_client_connection_notify(connection, status);
+>> -       else
+>> +       else if (connection->app->type == GATT_SERVER)
+>>                 send_server_connection_notify(connection, !status);
+>>  }
+>>
+>> @@ -3568,9 +3588,11 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+>>         switch (cmd->command) {
+>>         case GATT_CLIENT_TEST_CMD_ENABLE:
+>>                 if (cmd->u1) {
+>> -                       if (!test_client_if)
+>> -                               test_client_if = register_app(TEST_UUID,
+>> -                                                               APP_CLIENT);
+>> +                       if (!test_client_if) {
+>> +                               app = register_app(TEST_UUID, GATT_CLIENT);
+>> +                               if (app)
+>> +                                       test_client_if = app->id;
+>> +                       }
+>>
+>>                         if (test_client_if)
+>>                                 status = HAL_STATUS_SUCCESS;
+>> @@ -3615,16 +3637,18 @@ static void handle_server_register(const void *buf, uint16_t len)
+>>  {
+>>         const struct hal_cmd_gatt_server_register *cmd = buf;
+>>         struct hal_ev_gatt_server_register ev;
+>> +       struct gatt_app *app;
+>>
+>>         DBG("");
+>>
+>>         memset(&ev, 0, sizeof(ev));
+>>
+>> -       ev.server_if = register_app(cmd->uuid, APP_SERVER);
+>> +       app = register_app(cmd->uuid, GATT_SERVER);
+>>
+>> -       if (ev.server_if)
+>> +       if (app) {
+>> +               ev.server_if = app->id;
+>>                 ev.status = GATT_SUCCESS;
+>> -       else
+>> +       } else
+>>                 ev.status = GATT_FAILURE;
+>>
+>>         memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
+>> @@ -5978,3 +6002,66 @@ void bt_gatt_unregister(void)
+>>         bt_crypto_unref(crypto);
+>>         crypto = NULL;
+>>  }
+>> +
+>> +
+>> +unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
+>> +                                                       gatt_conn_cb_t func)
+>> +{
+>> +       struct gatt_app *app;
+>> +       bt_uuid_t uuid128;
+>> +
+>> +       bt_string_to_uuid(&uuid128, uuid);
+>> +       app = register_app((void *) &uuid128.value.u128, type);
+>> +       if (!app)
+>> +               return 0;
+>> +
+>> +       app->func = func;
+>> +
+>> +       return app->id;
+>> +}
+>> +
+>> +bool bt_gatt_unregister_app(unsigned int id)
+>> +{
+>> +       uint8_t status;
+>> +
+>> +       status = unregister_client(id);
+>> +
+>> +       return status != HAL_STATUS_FAILED;
+>> +}
+>> +
+>> +bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr)
+>> +{
+>> +       uint8_t status;
+>> +
+>> +       status = handle_connect(id, addr);
+>> +
+>> +       return status != HAL_STATUS_FAILED;
+>> +}
+>> +
+>> +bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr)
+>> +{
+>> +       struct app_connection match;
+>> +       struct app_connection *conn;
+>> +       struct gatt_device *device;
+>> +       struct gatt_app *app;
+>> +
+>> +       app = find_app_by_id(id);
+>> +       if (!app)
+>> +               return false;
+>> +
+>> +       device = find_device_by_addr(addr);
+>> +       if (!device)
+>> +               return false;
+>> +
+>> +       match.device = device;
+>> +       match.app = app;
+>> +
+>> +       conn = queue_find(app_connections, match_connection_by_device_and_app,
+>> +                                                                       &match);
+>> +       if (!conn)
+>> +               return false;
+>> +
+>> +       trigger_disconnection(conn);
+>> +
+>> +       return true;
+>> +}
+>> diff --git a/android/gatt.h b/android/gatt.h
+>> index d4392d9..5ba9161 100644
+>> --- a/android/gatt.h
+>> +++ b/android/gatt.h
+>> @@ -23,3 +23,18 @@
+>>
+>>  bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr);
+>>  void bt_gatt_unregister(void);
+>> +
+>> +
+>> +typedef enum {
+>> +       GATT_CLIENT,
+>> +       GATT_SERVER,
+>> +} gatt_type_t;
+>> +
+>> +typedef void (*gatt_conn_cb_t)(const bdaddr_t *addr, int err, void *attrib);
+>> +
+>> +unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
+>> +                                                       gatt_conn_cb_t func);
+>> +bool bt_gatt_unregister_app(unsigned int id);
+>> +
+>> +bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
+>> +bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
+>> --
+>> 1.9.3
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+> BR
+> Lukasz
+
+
+
 -- 
-2.0.0
-
+Luiz Augusto von Dentz
