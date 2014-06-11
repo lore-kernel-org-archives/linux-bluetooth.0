@@ -1,392 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v3 3/4] src/shared/att: Implement write handler and bt_att_send.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402364040-11502-4-git-send-email-armansito@chromium.org>
-Date: Wed, 11 Jun 2014 13:56:35 +0200
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <24B5C219-EF6D-4F94-AAE6-ADA64C410934@holtmann.org>
-References: <1402364040-11502-1-git-send-email-armansito@chromium.org> <1402364040-11502-4-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+Subject: Re: [PATCH] android/tester: Update expected UUIDs with MPS
+Date: Wed, 11 Jun 2014 13:34:32 +0200
+Message-ID: <8302076.HcY9oh4MYA@uw000953>
+In-Reply-To: <1402478709-24207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+References: <1402478709-24207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Grzegorz,
 
-> This patch implements the write handler logic, including the way send
-> operations are process from the various internal queues. Added PDU
-> encoding for the Exchange MTU request.
+On Wednesday 11 of June 2014 11:25:09 Grzegorz Kolodziejczyk wrote:
+> Some tests verify that all local UUIDs are present.
 > ---
-> src/shared/att.c | 261 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> 1 file changed, 258 insertions(+), 3 deletions(-)
+>  android/android-tester.c | 20 ++++++++++++++------
+>  1 file changed, 14 insertions(+), 6 deletions(-)
 > 
-> diff --git a/src/shared/att.c b/src/shared/att.c
-> index 270a9df..f3ece02 100644
-> --- a/src/shared/att.c
-> +++ b/src/shared/att.c
-> @@ -26,9 +26,11 @@
-> #endif
+> diff --git a/android/android-tester.c b/android/android-tester.c
+> index f04f8ac..bf39517 100644
+> --- a/android/android-tester.c
+> +++ b/android/android-tester.c
+> @@ -1408,9 +1408,13 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+>  
+>  static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
+>  static const char enable_done_bdname_val[] = "BlueZ for Android";
+> -static bt_uuid_t enable_done_uuids_val = {
+> -	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+> -					0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
+> +static const char enable_done_uuids_val[] = {
+> +	/* Multi profile UUID */
+> +	0x00, 0x00, 0x11, 0x3b, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+> +					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
+> +	/* Device identification profile UUID */
+> +	0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+> +					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
+>  };
+>  static bt_device_type_t enable_done_tod_val = BT_DEVICE_DEVTYPE_DUAL;
+>  static bt_scan_mode_t enable_done_scanmode_val = BT_SCAN_MODE_NONE;
+> @@ -1771,9 +1775,13 @@ static const struct generic_data bluetooth_getprop_disctimeout_success_test = {
+>  	.expected_adapter_status = BT_STATUS_SUCCESS,
+>  };
+>  
+> -static bt_uuid_t getprop_uuids = {
+> -	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+> -					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB },
+> +static const char getprop_uuids[] = {
+> +	/* Multi profile UUID */
+> +	0x00, 0x00, 0x11, 0x3b, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+> +					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
+> +	/* Device identification profile UUID */
+> +	0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+> +					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
+>  };
+>  
+>  static struct priority_property getprop_uuids_props[] = {
 > 
-> #include <unistd.h>
-> +#include <errno.h>
-> 
-> #include "src/shared/io.h"
-> #include "src/shared/queue.h"
-> +#include "src/shared/util.h"
-> #include "lib/uuid.h"
-> #include "src/shared/att.h"
-> 
-> @@ -133,13 +135,155 @@ struct att_send_op {
-> 	unsigned int id;
-> 	att_op_type_t op_type;
-> 	uint16_t opcode;
-> -	void *pdu;
-> +	uint8_t *pdu;
 
-Why? I prefer we operate on void pointers and if you need access to specific elements without being able to have a packed struct, use the unaligned access helpers. You need to do that anyway for anything that is not a 1 octet size field.
+Patch applied, thanks.
 
-> 	uint16_t len;
-> 	bt_att_request_func_t callback;
-> 	bt_att_destroy_func_t destroy;
-> 	void *user_data;
-> };
-> 
-> +static bool encode_mtu_req(struct att_send_op *op, const void *param,
-> +						uint16_t length, uint16_t mtu)
-> +{
-> +	const struct bt_att_mtu_req_param *p = param;
-> +	const uint16_t len = 3;
-> +
-> +	if (length != sizeof(*p))
-> +		return false;
-> +
-> +	if (len > mtu)
-> +		return false;
-> +
-> +	op->pdu = malloc(len);
-> +	if (!op->pdu)
-> +		return false;
-> +
-> +	op->pdu[0] = op->opcode;
-> +	put_le16(p->client_rx_mtu, op->pdu + 1);
-> +	op->len = len;
-
-I see. Just use *((uint8_t *) op->pdu) = op->opcode here. If the pattern of adding opcode plus some extra data repeats, then we might should consider a define or a simpler att_hdr struct.
-
-	struct att_hdr {
-		uint8_t opcode;
-		uint8_t data[0];
-	} __packed;
-
-You need to play a little bit with your options here and see what turns into most readable code.
-
-> +
-> +	return true;
-> +}
-> +
-> +static bool encode_pdu(struct att_send_op *op, const void *param,
-> +						uint16_t length, uint16_t mtu)
-> +{
-> +	/* If no parameters are given, simply set the PDU to consist of the
-> +	 * opcode.
-> +	 */
-
-Is this possible at all? I am just too lazy to open the spec and check, but you might want to give an example n which opcode has this.
-
-> +	if (length == 0) {
-
-Here I am on the fence with !length or length < 1 or length == 0. In general we moved towards !length syntax for new code. So might just do it here as well. Additionally it is also a good idea to check that !param unless it all internal and we know for sure it will never be NULL.
-
-> +		op->len = 1;
-> +		op->pdu = malloc(1);
-> +		if (!op->pdu)
-> +			return false;
-> +
-> +		op->pdu[0] = op->opcode;
-> +		return true;
-> +	}
-> +
-> +	/* TODO: If the opcode has the "signed" bit set, make sure that the
-> +	 * resulting PDU contains the authentication signature. Return an error,
-> +	 * if the provided parameters structure is such that it leaves no room
-> +	 * for an authentication signature in the PDU.
-> +	 */
-
-I want us to handle this in the background. Just make sure we allocate enough memory.
-
-> +
-> +	switch (op->opcode) {
-> +	case BT_ATT_OP_MTU_REQ:
-> +		return encode_mtu_req(op, param, length, mtu);
-> +	dafault:
-> +		break;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static struct att_send_op *create_att_send_op(uint8_t opcode, const void *param,
-> +						uint16_t length, uint16_t mtu,
-> +						bt_att_request_func_t callback,
-> +						void *user_data,
-> +						bt_att_destroy_func_t destroy)
-> +{
-> +	struct att_send_op *op;
-> +	att_op_type_t op_type;
-> +
-> +	op_type = get_op_type(opcode);
-> +	if (op_type == ATT_OP_TYPE_UNKNOWN)
-> +		return NULL;
-> +
-> +	/* If the opcode corresponds to an operation type that does not elicit a
-> +	 * response from the remote end, then no callbacks should have been
-> +	 * provided. Otherwise, at least a callback should be provided.
-> +	 */
-> +	if (op_type == ATT_OP_TYPE_REQ || op_type == ATT_OP_TYPE_IND) {
-> +		if (!callback)
-> +			return NULL;
-> +	} else if (callback || user_data || destroy)
-> +		return NULL;
-
-So I think we should do be basic NULL checks first. However it should never be required to provide user_data and destroy. That is a caller choice and if they want to be stupid so be it. These values are just handed through on bt_att side. We do not care what they are. If they are NULL, then that is fine as well.
-
-> +
-> +	if (length > 0 && !param)
-> +		return NULL;
-
-Same would apply for !length && param as noted above. We need to make sure that these input values are sane.
-
-> +
-> +	op = new0(struct att_send_op, 1);
-> +	if (!op)
-> +		return NULL;
-> +
-> +	op->op_type = op_type;
-> +	op->opcode = opcode;
-> +	op->callback = callback;
-> +	op->destroy = destroy;
-> +	op->user_data = user_data;
-> +
-> +	if (!encode_pdu(op, param, length, mtu)) {
-> +		free(op);
-> +		return NULL;
-> +	}
-> +
-> +	return op;
-> +}
-> +
-> +typedef enum {
-> +	SEND_QUEUE_REQ,
-> +	SEND_QUEUE_IND,
-> +	SEND_QUEUE_WRITE,
-> +} send_queue_t;
-
-enum send_queue_type {
-}
-
-> +
-> +static struct att_send_op *pick_next_send_op(struct bt_att *att,
-> +						send_queue_t *orig_queue)
-> +{
-> +	struct att_send_op *op;
-> +
-> +	/* See if any operations are already in the write queue */
-> +	op = queue_pop_head(att->write_queue);
-> +	if (op) {
-> +		*orig_queue = SEND_QUEUE_WRITE;
-> +		return op;
-> +	}
-> +
-> +	/* If there is no pending request, pick an operation from the
-> +	 * request queue.
-> +	 */
-> +	if (!att->pending_req) {
-> +		op = queue_pop_head(att->req_queue);
-> +		if (op) {
-> +			*orig_queue = SEND_QUEUE_REQ;
-> +			return op;
-> +		}
-> +	}
-> +
-> +	/* There is either a request pending or no requests queued. If there is
-> +	 * no pending indication, pick an operation from the indication queue.
-> +	 */
-> +	if (!att->pending_ind) {
-> +		op = queue_pop_head(att->ind_queue);
-> +		if (op) {
-> +			*orig_queue = SEND_QUEUE_IND;
-> +			return op;
-> +		}
-> +	}
-> +
-> +	return NULL;
-> +}
-
-I feel a bit uneasy about this queue type thing. Maybe I am just not getting it usefulness. You need to explain this to me a bit in detail.
-
-> +
-> static void destroy_att_send_op(void *data)
-> {
-> 	struct att_send_op *op = data;
-> @@ -151,6 +295,81 @@ static void destroy_att_send_op(void *data)
-> 	free(op);
-> }
-> 
-> +static void wakeup_writer(struct bt_att *att);
-> +
-
-I now that we can not always avoid forward declaration, but if possible with reordering some functions, then lets try. If you tell me that you tried and we can not avoid it, then that is fine as well, but at least try to avoid forward declarations.
-
-> +static bool can_write_data(struct io *io, void *user_data)
-> +{
-> +	struct bt_att *att = user_data;
-> +	struct att_send_op *op;
-> +	ssize_t bytes_written;
-> +	send_queue_t orig_queue;
-> +
-> +	op = pick_next_send_op(att, &orig_queue);
-> +	if (!op)
-> +		return false;
-> +
-> +	bytes_written = write(att->fd, op->pdu, op->len);
-> +	if (bytes_written < 0) {
-> +		util_debug(att->debug_callback, att->debug_data,
-> +					"write failed: %s", strerror(errno));
-> +		if (op->callback)
-> +			op->callback(BT_ATT_OP_ERROR_RSP, NULL, 0,
-> +							op->user_data);
-> +
-> +		destroy_att_send_op(op);
-> +		return true;
-> +	}
-> +
-> +	util_debug(att->debug_callback, att->debug_data,
-> +					"ATT op 0x%02x", op->opcode);
-> +
-> +	util_hexdump('<', op->pdu, bytes_written,
-> +					att->debug_callback, att->debug_data);
-> +
-> +	/* Based on the origin queue, set either the pending request or the
-> +	 * pending indication. If it came from the write queue, then there is
-> +	 * no need to keep it around.
-> +	 */
-> +	if (orig_queue == SEND_QUEUE_WRITE)
-> +		destroy_att_send_op(op);
-> +	else if (orig_queue == SEND_QUEUE_REQ)
-> +		att->pending_req = op;
-> +	else if (orig_queue == SEND_QUEUE_IND)
-> +		att->pending_ind = op;
-> +
-> +	/* Try to wake up the writer */
-> +	att->writer_active = false;
-> +	wakeup_writer(att);
-> +
-> +	return false;
-> +}
-
-I do not get this wakeup_writer here. We not just return true and the writer will be called again. Maybe this is where the forward declaration comes from. Seriously, if we still have data in the queue to write, just return true.
-
-Maybe mgmt is a bad example since it does not have these multiple queues and it is really just one write and then wait for a response.
-
-> +
-> +static void wakeup_writer(struct bt_att *att)
-> +{
-> +	if (att->writer_active)
-> +		return;
-> +
-> +	/* Set the write handler only if there is anything that can be sent
-> +	 * at all.
-> +	 */
-> +	if (!queue_isempty(att->write_queue))
-> +		goto set_handler;
-> +
-> +	if (!att->pending_req && !queue_isempty(att->req_queue))
-> +		goto set_handler;
-> +
-> +	if (!att->pending_ind && !queue_isempty(att->ind_queue))
-> +		goto set_handler;
-> +
-> +	return;
-
-I am not liking this goto logic. Can we just turn this around. If here is nothing to write, then just return. If the if statement gets too complex and it is a reoccurring pattern, then helper functions might be needed.
-
-> +
-> +set_handler:
-> +	if (!io_set_write_handler(att->io, can_write_data, att, NULL))
-> +		return;
-> +
-> +	att->writer_active = true;
-> +}
-
-There might be actually a bug in mgmt->writer_active = true since we never set that. Wonder if it is worth patching or something that never occurs since the logic is a lot simpler with the queues protecting the writer operation anyway.
-
-Anyhow, I wonder why are you not setting the IO destroy function to clear out the writer_active = false. This makes it a lot simpler especially when you return true from the IO callback. That way once the IO write handler is removed it is guaranteed the the write_active is set back to false.
-
-> +
-> static void read_watch_destroy(void *user_data)
-> {
-> 	struct bt_att *att = user_data;
-> @@ -370,8 +589,44 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
-> 				bt_att_request_func_t callback, void *user_data,
-> 				bt_att_destroy_func_t destroy)
-> {
-> -	/* TODO */
-> -	return 0;
-> +	struct att_send_op *op;
-> +	struct queue *op_queue;
-> +
-> +	if (!att)
-> +		return 0;
-> +
-> +	op = create_att_send_op(opcode, param, length, att->mtu, callback,
-> +							user_data, destroy);
-> +	if (!op)
-> +		return 0;
-> +
-> +	if (att->next_send_id < 1)
-> +		att->next_send_id = 1;
-> +
-> +	op->id = att->next_send_id++;
-> +
-> +	/* Add the op to the correct queue based on its type */
-> +	switch (op->op_type) {
-> +	case ATT_OP_TYPE_REQ:
-> +		op_queue = att->req_queue;
-> +		break;
-> +	case ATT_OP_TYPE_IND:
-> +		op_queue = att->ind_queue;
-> +		break;
-> +	default:
-> +		op_queue = att->write_queue;
-> +		break;
-> +	}
-> +
-> +	if (!queue_push_tail(op_queue, op)) {
-> +		free(op->pdu);
-> +		free(op);
-> +		return 0;
-> +	}
-
-So I would have done it this way:
-
-	switch (op->op_type) {
-	case ATT_OP_TYPE_REQ:
-		result = queue_push_tail(att->req_queue, op);
-		break;
-	...
-	}
-
-	if (!result) {
-		free(..
-
-> +
-> +	wakeup_writer(att);
-> +
-> +	return op->id;
-> }
-
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
