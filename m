@@ -1,58 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Fix for ACL disconnect when pairing fails
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402478593-19791-1-git-send-email-lukasz.rymanowski@tieto.com>
-Date: Wed, 11 Jun 2014 11:30:26 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6053DFD1-5B79-4EBC-936B-3725E44A9CAA@holtmann.org>
-References: <1402478593-19791-1-git-send-email-lukasz.rymanowski@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/tester: Update expected UUIDs with MPS
+Date: Wed, 11 Jun 2014 11:25:09 +0200
+Message-Id: <1402478709-24207-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Lukasz,
+Some tests verify that all local UUIDs are present.
+---
+ android/android-tester.c | 20 ++++++++++++++------
+ 1 file changed, 14 insertions(+), 6 deletions(-)
 
-> When pairing fails hci_conn refcnt drops below zero. This cause that
-> ACL link is not disconnected when disconnect timeout fires.
-> 
-> Probably this is because l2cap_conn_del calls l2cap_chan_del for each
-> channel, and inside l2cap_chan_del conn is dropped. After that loop
-> hci_chan_del is called which also drops conn.
-
-I wonder if we should actually add a WARN_ON when the reference count drops below. At some point we should look into fixing this for real.
-
-> Anyway, as it is desrcibed in hci_core.h, it is known that refcnt
-> drops below 0 sometimes and it should be fine. If so, let disconnect
-> link when hci_conn_timeout fires and refcnt is 0 or below. This patch
-> does it.
-> 
-> This affects PTS test SM_TC_JW_BV_05_C
-> 
-> Logs from scenario:
-
-<snip>
-
-> 
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index ca01d18..10ec9b7 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -292,7 +292,7 @@ static void hci_conn_timeout(struct work_struct *work)
-> 
-> 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
-
-I would prefer that you add a comment here explaining the details again, why we check for a positive refcount. Since we will forget the reason after a while.
-
-> 
-> -	if (atomic_read(&conn->refcnt))
-> +	if (atomic_read(&conn->refcnt) > 0)
-> 		return;
-> 
-> 	switch (conn->state) {
-
-Regards
-
-Marcel
+diff --git a/android/android-tester.c b/android/android-tester.c
+index f04f8ac..bf39517 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -1408,9 +1408,13 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 
+ static bt_bdaddr_t enable_done_bdaddr_val = { {0x00} };
+ static const char enable_done_bdname_val[] = "BlueZ for Android";
+-static bt_uuid_t enable_done_uuids_val = {
+-	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+-					0x00, 0x80, 0x5f, 0x9b, 0x34, 0xfb},
++static const char enable_done_uuids_val[] = {
++	/* Multi profile UUID */
++	0x00, 0x00, 0x11, 0x3b, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
++					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
++	/* Device identification profile UUID */
++	0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
++					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
+ };
+ static bt_device_type_t enable_done_tod_val = BT_DEVICE_DEVTYPE_DUAL;
+ static bt_scan_mode_t enable_done_scanmode_val = BT_SCAN_MODE_NONE;
+@@ -1771,9 +1775,13 @@ static const struct generic_data bluetooth_getprop_disctimeout_success_test = {
+ 	.expected_adapter_status = BT_STATUS_SUCCESS,
+ };
+ 
+-static bt_uuid_t getprop_uuids = {
+-	.uu = { 0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
+-					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB },
++static const char getprop_uuids[] = {
++	/* Multi profile UUID */
++	0x00, 0x00, 0x11, 0x3b, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
++					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
++	/* Device identification profile UUID */
++	0x00, 0x00, 0x12, 0x00, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00,
++					0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB,
+ };
+ 
+ static struct priority_property getprop_uuids_props[] = {
+-- 
+1.9.2
 
