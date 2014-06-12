@@ -1,73 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 2/2] SDP: Make sdp_set_access_protos() return void
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140612104936.GC27592@aemeltch-MOBL1>
+Date: Thu, 12 Jun 2014 13:33:42 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/4] android/gatt: Change check permissions order
-Date: Thu, 12 Jun 2014 13:39:33 +0200
-Message-ID: <1893660.GnYVkntkUv@uw000953>
-In-Reply-To: <1402564106-27044-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1402564106-27044-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <C211FBB1-8FE3-4D68-9571-8ED8C3945328@holtmann.org>
+References: <1402315699-30381-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1402315699-30381-2-git-send-email-Andrei.Emeltchenko.news@gmail.com> <31CD08C4-C776-4F0F-A0D6-2DD5CB854639@holtmann.org> <20140612104936.GC27592@aemeltch-MOBL1>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Andrei,
 
-On Thursday 12 of June 2014 11:08:23 Marcin Kraglak wrote:
-> Firstly we should check if characteristic needs MITM permissions,
-> and next check for ENCRYPTION permissions. Now remote device can
-> increase security to MITM immediatelly (i.e. from sec LOW to HIGH).
-> ---
->  android/gatt.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
+>>> Function always returns 0, so there is sense to make it void function.
+>>> ---
+>>> lib/sdp.c     | 6 +-----
+>>> lib/sdp_lib.h | 2 +-
+>>> 2 files changed, 2 insertions(+), 6 deletions(-)
+>>> 
+>>> diff --git a/lib/sdp.c b/lib/sdp.c
+>>> index e5e4622..da26b78 100644
+>>> --- a/lib/sdp.c
+>>> +++ b/lib/sdp.c
+>>> @@ -2380,10 +2380,8 @@ static sdp_data_t *access_proto_to_dataseq(sdp_record_t *rec, sdp_list_t *proto)
+>>> *
+>>> * This function replaces the existing sdp_access_proto_t
+>>> * structure (if any) with the new one specified.
+>>> - *
+>>> - * returns 0 if successful or -1 if there is a failure.
+>>> */
+>>> -int sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+>>> +void sdp_set_access_protos(sdp_record_t *rec, const sdp_list_t *ap)
+>> 
+>> if this is libbluetooth API, then we can not do that. I am not planning to break that API.
+>> 
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 558b203..cfcfd9b 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4063,14 +4063,14 @@ static uint8_t check_device_permissions(struct gatt_device *device,
->  		if (!(permissions & GATT_PERM_READ))
->  			return ATT_ECODE_READ_NOT_PERM;
->  
-> -		if ((permissions & GATT_PERM_READ_ENCRYPTED) &&
-> -						sec_level < BT_SECURITY_MEDIUM)
-> -			return ATT_ECODE_INSUFF_ENC;
-> -
->  		if ((permissions & GATT_PERM_READ_MITM) &&
->  						sec_level < BT_SECURITY_HIGH)
->  			return ATT_ECODE_AUTHENTICATION;
->  
-> +		if ((permissions & GATT_PERM_READ_ENCRYPTED) &&
-> +						sec_level < BT_SECURITY_MEDIUM)
-> +			return ATT_ECODE_INSUFF_ENC;
-> +
->  		if (permissions & GATT_PERM_READ_AUTHORIZATION)
->  			return ATT_ECODE_AUTHORIZATION;
->  		break;
-> @@ -4081,14 +4081,14 @@ static uint8_t check_device_permissions(struct gatt_device *device,
->  		if (!(permissions & GATT_PERM_WRITE))
->  			return ATT_ECODE_WRITE_NOT_PERM;
->  
-> -		if ((permissions & GATT_PERM_WRITE_ENCRYPTED) &&
-> -						sec_level < BT_SECURITY_MEDIUM)
-> -			return ATT_ECODE_INSUFF_ENC;
-> -
->  		if ((permissions & GATT_PERM_WRITE_MITM) &&
->  						sec_level < BT_SECURITY_HIGH)
->  			return ATT_ECODE_AUTHENTICATION;
->  
-> +		if ((permissions & GATT_PERM_WRITE_ENCRYPTED) &&
-> +						sec_level < BT_SECURITY_MEDIUM)
-> +			return ATT_ECODE_INSUFF_ENC;
-> +
->  		if (permissions & GATT_PERM_WRITE_AUTHORIZATION)
->  			return ATT_ECODE_AUTHORIZATION;
->  		break;
-> 
+> Is libbluetooth API internal API and only used in our code?
 
-All patches applied. Thanks.
+it is a public API. Can be enabled with --enable-library in configure.
 
--- 
-Best regards, 
-Szymon Janc
+Regards
+
+Marcel
+
