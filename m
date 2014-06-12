@@ -1,31 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1402565437.27142.4.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [RFC] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+MIME-Version: 1.0
+In-Reply-To: <1401586702-54238-1-git-send-email-marcel@holtmann.org>
+References: <1401586702-54238-1-git-send-email-marcel@holtmann.org>
+Date: Thu, 12 Jun 2014 11:25:45 +0200
+Message-ID: <CAN_7+Ya6W+Lvy__O=CEUjVicULGStY58bdsqCML3nMCYtUPzcQ@mail.gmail.com>
+Subject: Re: [RFC] Bluetooth: Use struct delayed_work for HCI command timeout
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 12 Jun 2014 12:30:37 +0300
-In-Reply-To: <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org>
-References: <1402493714-30849-1-git-send-email-marcel@holtmann.org>
-	 <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Sender: linux-bluetooth-owner@vger.kernel.org
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
-On ke, 2014-06-11 at 18:00 +0200, Marcel Holtmann wrote:
-> Hello,
-> 
-> so this patch is just the groundwork to deal with the socket vs kernel internal handling of TX path. And this patch should most likely also be split into providing the default for alloc_skb and then adding memcpy_fromiovec.
+On Sun, Jun 1, 2014 at 3:38 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+> This is an experimental patch that converts hdev->cmd_timer from
+> struct timer_list to struct delayed_work.
+>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci_core.h |  2 +-
+>  net/bluetooth/hci_core.c         | 17 +++++++++--------
+>  net/bluetooth/hci_event.c        |  4 ++--
+>  3 files changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index b386bf17e6c2..de3bb22e83f9 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -273,7 +273,7 @@ struct hci_dev {
+>
+>         struct delayed_work     service_cache;
+>
+> -       struct timer_list       cmd_timer;
+> +       struct delayed_work     cmd_timer;
+>
+>         struct work_struct      rx_work;
+>         struct work_struct      cmd_work;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 0a43cce9a914..9e0368b02a11 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2432,7 +2432,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>         hci_req_lock(hdev);
+>
+>         if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+> -               del_timer_sync(&hdev->cmd_timer);
+> +               cancel_delayed_work_sync(&hdev->cmd_timer);
+>                 hci_req_unlock(hdev);
+>                 return 0;
+>         }
+> @@ -2488,7 +2488,7 @@ static int hci_dev_do_close(struct hci_dev *hdev)
+>
+>         /* Drop last sent command */
+>         if (hdev->sent_cmd) {
+> -               del_timer_sync(&hdev->cmd_timer);
+> +               cancel_delayed_work_sync(&hdev->cmd_timer);
+>                 kfree_skb(hdev->sent_cmd);
+>                 hdev->sent_cmd = NULL;
+>         }
+> @@ -3205,9 +3205,10 @@ void hci_remove_irk(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 addr_type)
+>  }
+>
+>  /* HCI command timer function */
+> -static void hci_cmd_timeout(unsigned long arg)
+> +static void hci_cmd_timeout(struct work_struct *work)
+>  {
+> -       struct hci_dev *hdev = (void *) arg;
+> +       struct hci_dev *hdev = container_of(work, struct hci_dev,
+> +                                           cmd_timer.work);
+>
+>         if (hdev->sent_cmd) {
+>                 struct hci_command_hdr *sent = (void *) hdev->sent_cmd->data;
+> @@ -3884,7 +3885,7 @@ struct hci_dev *hci_alloc_dev(void)
+>
+>         init_waitqueue_head(&hdev->req_wait_q);
+>
+> -       setup_timer(&hdev->cmd_timer, hci_cmd_timeout, (unsigned long) hdev);
+> +       INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
+>
+>         hci_init_sysfs(hdev);
+>         discovery_init(hdev);
+> @@ -5287,10 +5288,10 @@ static void hci_cmd_work(struct work_struct *work)
+>                         atomic_dec(&hdev->cmd_cnt);
+>                         hci_send_frame(hdev, skb);
+>                         if (test_bit(HCI_RESET, &hdev->flags))
+> -                               del_timer(&hdev->cmd_timer);
+> +                               cancel_delayed_work(&hdev->cmd_timer);
+>                         else
+> -                               mod_timer(&hdev->cmd_timer,
+> -                                         jiffies + HCI_CMD_TIMEOUT);
+> +                               schedule_delayed_work(&hdev->cmd_timer,
+> +                                                     HCI_CMD_TIMEOUT);
+>                 } else {
+>                         skb_queue_head(&hdev->cmd_q, skb);
+>                         queue_work(hdev->workqueue, &hdev->cmd_work);
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 6cf9596ff69b..4f942ea43cd8 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -2705,7 +2705,7 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>         }
+>
+>         if (opcode != HCI_OP_NOP)
+> -               del_timer(&hdev->cmd_timer);
+> +               cancel_delayed_work(&hdev->cmd_timer);
+>
+>         hci_req_cmd_complete(hdev, opcode, status);
+>
+> @@ -2796,7 +2796,7 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>         }
+>
+>         if (opcode != HCI_OP_NOP)
+> -               del_timer(&hdev->cmd_timer);
+> +               cancel_delayed_work(&hdev->cmd_timer);
+>
+>         if (ev->status ||
+>             (hdev->sent_cmd && !bt_cb(hdev->sent_cmd)->req.event))
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-Earlier in 6lowpan coc patches, you suggested that we would not use
-msghdr for kernel internal data because of extra memory copy that is
-needed in 6lowpan side. Is that suggestion now reverted?
+When I start to use "[PATCH v3] Bluetooth: Fix for ACL disconnect when
+pairing fails"  I was facing
+hci tx timeout on disconnect command with some chips even I saw in
+btmon that Command Status on disconnect command came on time.
 
+After I apply this patch, that issue has gone.
 
-Cheers,
-Jukka
-
-
+\Lukasz
