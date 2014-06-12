@@ -1,48 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 3/6] android/health: Perform clean up on app unregister call
-Date: Thu, 12 Jun 2014 16:10:15 +0300
-Message-Id: <1402578618-31484-4-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <1402577830.27142.22.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [RFC] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Date: Thu, 12 Jun 2014 15:57:10 +0300
+In-Reply-To: <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org>
+References: <1402493714-30849-1-git-send-email-marcel@holtmann.org>
+	 <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/health.c | 17 ++++++++++++++---
- 1 file changed, 14 insertions(+), 3 deletions(-)
+Hi Marcel,
 
-diff --git a/android/health.c b/android/health.c
-index a117390..397cef6 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -238,10 +238,21 @@ end:
- 
- static void bt_health_unregister_app(const void *buf, uint16_t len)
- {
--	DBG("Not implemented");
-+	const struct hal_cmd_health_unreg_app *cmd = buf;
-+	struct health_app *app;
-+
-+	DBG("");
-+
-+	app = queue_remove_if(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
-+	if (!app) {
-+		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
-+				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_INVALID);
-+		return;
-+	}
- 
--	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_UNREG_APP,
--							HAL_STATUS_UNSUPPORTED);
-+	free_health_app(app);
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
-+				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_SUCCESS);
- }
- 
- static void bt_health_connect_channel(const void *buf, uint16_t len)
--- 
-1.9.1
+On ke, 2014-06-11 at 18:00 +0200, Marcel Holtmann wrote:
+> Hello,
+> 
+> so this patch is just the groundwork to deal with the socket vs kernel internal handling of TX path. And this patch should most likely also be split into providing the default for alloc_skb and then adding memcpy_fromiovec.
+> 
+> And I have just compile-tested this patch. I have not run it yet. I leave this to someone else to actually test if this works ;)
 
+just tested this and it works ok so ACK from me.
+
+
+Cheers,
+Jukka
