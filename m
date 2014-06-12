@@ -2,34 +2,47 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/6] HDP initial implementaion
-Date: Thu, 12 Jun 2014 16:10:12 +0300
-Message-Id: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 3/6] android/health: Perform clean up on app unregister call
+Date: Thu, 12 Jun 2014 16:10:15 +0300
+Message-Id: <1402578618-31484-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v1: Fixed comments from szymon.
+---
+ android/health.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
-RFC_v2: Fixed comments by szymon and fixed issues while sebastian
-testing with PTS.
-
-RFC_v1: patchset is initial implementaion for HDP at daemon side.
-Cacheing application data and prepare SDP record based on MDEPs
-configuration and notify app state.
-
-Ravi kumar Veeramally (6):
-  android/hal-health: Add channel state event handler
-  android/health: Cache health application data on app register call
-  android/health: Perform clean up on app unregister call
-  android/health: Add HDP SDP record
-  android/health: Notify application registration status
-  profile/health: Free sdp list after adding it to record
-
- android/hal-health.c       |  14 +
- android/health.c           | 699 ++++++++++++++++++++++++++++++++++++++++++++-
- profiles/health/hdp_util.c |   2 +
- 3 files changed, 706 insertions(+), 9 deletions(-)
-
+diff --git a/android/health.c b/android/health.c
+index a117390..397cef6 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -238,10 +238,21 @@ end:
+ 
+ static void bt_health_unregister_app(const void *buf, uint16_t len)
+ {
+-	DBG("Not implemented");
++	const struct hal_cmd_health_unreg_app *cmd = buf;
++	struct health_app *app;
++
++	DBG("");
++
++	app = queue_remove_if(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
++	if (!app) {
++		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
++				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_INVALID);
++		return;
++	}
+ 
+-	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_UNREG_APP,
+-							HAL_STATUS_UNSUPPORTED);
++	free_health_app(app);
++	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
++				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_SUCCESS);
+ }
+ 
+ static void bt_health_connect_channel(const void *buf, uint16_t len)
 -- 
 1.9.1
 
