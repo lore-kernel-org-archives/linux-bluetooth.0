@@ -1,75 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <OFBA204D5E.072B210A-ON65257CF5.004A997E-65257CF5.004A9980@LocalDomain>
-References: <OFBA204D5E.072B210A-ON65257CF5.004A997E-65257CF5.004A9980@LocalDomain>,
-	<20140609135631.GA11813@t440s.lan>,
-	<20140609094952.GA23710@t440s.lan> <OF3D8FCC47.DCEA4A21-ON65257CF2.00332791-65257CF2.00332795@tcs.com> <OFCB7E0C57.B1D6416B-ON65257CF2.0046FA0F-65257CF2.0046FA12@tcs.com>
-Subject: Re: SPP profile in Bluez
-From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
-Message-ID: <OF3AE5D5FE.B06AA57A-ON65257CF5.004AC8F5-65257CF5.004AC8F7@tcs.com>
-Date: Thu, 12 Jun 2014 19:06:51 +0530
-Content-Type: text/plain; charset=US-ASCII
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 5/6] android/health: Notify application registration status
+Date: Thu, 12 Jun 2014 16:10:17 +0300
+Message-Id: <1402578618-31484-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ android/health.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-
------Johan Hedberg <johan.hedberg@gmail.com> wrote: -----
-To: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-From: Johan Hedberg <johan.hedberg@gmail.com>
-Date: 06/09/2014 07:26PM
-Cc: linux-bluetooth@vger.kernel.org, linux-bluetooth-owner@vger.kernel.org, autoanswer@vger.kernel.org
-Subject: Re: SPP profile in Bluez
-
-Hi Vinod,
-
-On Mon, Jun 09, 2014, Vinod Rayapudi wrote:
-> Thanks for your reply and suggestion too.
-
-> No problem, but please make this the last top-posting email you send to
-> the list and do in-line quoting in the future.
-Thanks for the input. I will continue in the same way.
-
-> I want to know, Is the same available with Bluez 4.101 version.
-> I have been working with Bluez 4.x series.
-
-> The Profile interface I mentioned doesn't exist for BlueZ 4 but if I
-> remember right we did have some other D-Bus interface there. I think it
-> was called org.bluez.Serial, but you'll need to find out the rest by
-> yourself.
-
-If I initiate SPP connection from d-feet with UUID, I can get an error saying that
-org.bluez.Error:Does Not Exist: Does Not Exist.
-Can you help me, how to proceed further.
-Do I need to change any settings (configuration files or any other).
-
-> Can I work with SPP on Bluez 4.101 ?
-
-> As I already said, SPP has always been available with BlueZ.
-
-I have some problem with SPP to Initiate connection.
-Please help me.
-
-Is there any way, that I can debug BLUEZ ?
-
-Regards,
-Vinod.
-=====-----=====-----=====
-Notice: The information contained in this e-mail
-message and/or attachments to it may contain 
-confidential or privileged information. If you are 
-not the intended recipient, any dissemination, use, 
-review, distribution, printing or copying of the 
-information contained in this e-mail message 
-and/or attachments to it are strictly prohibited. If 
-you have received this communication in error, 
-please notify us by reply e-mail or telephone and 
-immediately and permanently delete the message 
-and any attachments. Thank you
-
-
+diff --git a/android/health.c b/android/health.c
+index 45255df..687dfee 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -105,6 +105,19 @@ static void free_health_app(void *data)
+ 	free(app);
+ }
+ 
++static void send_app_reg_notify(struct health_app *app, uint8_t state)
++{
++	struct hal_ev_health_app_reg_state ev;
++
++	DBG("");
++
++	ev.id = app->id;
++	ev.state = state;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
++				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
++}
++
+ static bool mdep_by_mdep_role(const void *data, const void *user_data)
+ {
+ 	const struct mdep_cfg *mdep = data;
+@@ -660,6 +673,7 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
+ 	}
+ 
+ 	status = HAL_STATUS_SUCCESS;
++	send_app_reg_notify(app, HAL_HEALTH_APP_REG_SUCCESS);
+ 
+ fail:
+ 	if (status != HAL_STATUS_SUCCESS) {
+@@ -686,12 +700,15 @@ static void bt_health_unregister_app(const void *buf, uint16_t len)
+ 		return;
+ 	}
+ 
++	send_app_reg_notify(app, HAL_HEALTH_APP_DEREG_SUCCESS);
++
+ 	if (record_id > 0) {
+ 		bt_adapter_remove_record(record_id);
+ 		record_id = 0;
+ 	}
+ 
+ 	free_health_app(app);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
+ 				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_SUCCESS);
+ }
+-- 
+1.9.1
 
