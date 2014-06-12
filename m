@@ -1,105 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 1/2] android: Store remote's Identity Resolving Key
-Date: Thu, 12 Jun 2014 12:16:12 +0200
-Message-ID: <8994221.GXkAcnXDiz@uw000953>
-In-Reply-To: <1402473614-26767-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1402473614-26767-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [RFC_v2 0/6] HDP initial implementaion
+Date: Thu, 12 Jun 2014 12:10:41 +0200
+Message-ID: <14170751.VX3tVODdaQ@uw000953>
+In-Reply-To: <1402406523-2832-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1402406523-2832-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Ravi,
 
-On Wednesday 11 of June 2014 10:00:13 Jakub Tyszkowski wrote:
-> Persistent storage is used so we can load IRKs on startup.
-> ---
->  android/bluetooth.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 59 insertions(+)
+On Tuesday 10 of June 2014 16:21:57 Ravi kumar Veeramally wrote:
+> v2: Fixed comments by szymon and fixed issues while sebastian
+> testing with PTS.
 > 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index 36b073e..8638f84 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -1964,6 +1964,62 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
->  		store_csrk(dev);
->  }
->  
-> +static void store_irk(struct device *dev, const uint8_t *val)
-> +{
-> +	GKeyFile *key_file;
-> +	char key_str[33];
-> +	char addr[18];
-> +	int i;
-> +	gsize length = 0;
-> +	char *data;
-> +
-> +	ba2str(&dev->bdaddr, addr);
-> +
-> +	key_file = g_key_file_new();
-> +	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
-> +		g_key_file_free(key_file);
-> +		return;
-> +	}
-> +
-> +	for (i = 0; i < 16; i++)
-> +		sprintf(key_str + (i * 2), "%2.2X", val[i]);
-> +
-> +	g_key_file_set_string(key_file, addr, "IdentityResolvingKey", key_str);
-> +
-> +	data = g_key_file_to_data(key_file, &length, NULL);
-> +	g_file_set_contents(DEVICES_FILE, data, length, NULL);
-> +	g_free(data);
-> +
-> +	g_key_file_free(key_file);
-> +}
-> +
-> +static void new_irk_callback(uint16_t index, uint16_t length,
-> +					const void *param, void *user_data)
-> +{
-> +	const struct mgmt_ev_new_irk *ev = param;
-> +	const struct mgmt_addr_info *addr = &ev->key.addr;
-> +	struct device *dev;
-> +	char dst[18], rpa[18];
-> +
-> +	if (length < sizeof(*ev)) {
-> +		error("To small New Irk Event (%u bytes)", length);
-> +		return;
-> +	}
-> +
-> +	ba2str(&ev->key.addr.bdaddr, dst);
-> +	ba2str(&ev->rpa, rpa);
-> +
-> +	DBG("new IRK for %s, RPA %s", dst, rpa);
-> +
-> +	/* TODO: handle new Identity to RPA mapping */
-> +	dev = find_device(&addr->bdaddr);
-> +	if (!dev)
-> +		return;
-> +
-> +	if (ev->store_hint)
-> +		store_irk(dev, ev->key.val);
-> +}
-> +
->  static void register_mgmt_handlers(void)
->  {
->  	mgmt_register(mgmt_if, MGMT_EV_NEW_SETTINGS, adapter.index,
-> @@ -2017,6 +2073,9 @@ static void register_mgmt_handlers(void)
->  	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter.index,
->  						new_csrk_callback, NULL, NULL);
->  
-> +	mgmt_register(mgmt_if, MGMT_EV_NEW_IRK, adapter.index, new_irk_callback,
-> +								NULL, NULL);
-> +
->  }
->  
->  static void load_link_keys_complete(uint8_t status, uint16_t length,
+> v1: patchset is initial implementaion for HDP at daemon side.
+> Cacheing application data and prepare SDP record based on MDEPs
+> configuration and notify app state.
+> 
+> Ravi kumar Veeramally (6):
+>   android/hal-ipc-txt: Update Health MDEP command parameter
+>   android/health: Fix MDEP data type is 2 octets
+>   android/health: Cache health application data on app register call
+>   android/health: Perform clean up on app unregister call
+>   android/health: Add HDP SDP record
+>   android/health: Notify application registration status
+> 
+>  android/hal-ipc-api.txt |   5 +-
+>  android/hal-msg.h       |   2 +-
+>  android/health.c        | 712 +++++++++++++++++++++++++++++++++++++++++++++++-
+>  3 files changed, 707 insertions(+), 12 deletions(-)
+> 
 > 
 
-Both patches applied, thanks.
+I applied patches 1 and 2. Thanks.
 
 -- 
 Best regards, 
