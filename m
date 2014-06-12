@@ -1,37 +1,73 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/gatt: Fix meory leak
-Date: Thu, 12 Jun 2014 14:53:26 +0300
-Message-Id: <1402574006-2794-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/4] android/gatt: Change check permissions order
+Date: Thu, 12 Jun 2014 13:39:33 +0200
+Message-ID: <1893660.GnYVkntkUv@uw000953>
+In-Reply-To: <1402564106-27044-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1402564106-27044-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcin,
 
-Fixes clang warnings:
-...
-android/gatt.c:2823:1: warning: Potential leak of memory pointed to by
-'cb_data'
-...
----
- android/gatt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On Thursday 12 of June 2014 11:08:23 Marcin Kraglak wrote:
+> Firstly we should check if characteristic needs MITM permissions,
+> and next check for ENCRYPTION permissions. Now remote device can
+> increase security to MITM immediatelly (i.e. from sec LOW to HIGH).
+> ---
+>  android/gatt.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 558b203..cfcfd9b 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -4063,14 +4063,14 @@ static uint8_t check_device_permissions(struct gatt_device *device,
+>  		if (!(permissions & GATT_PERM_READ))
+>  			return ATT_ECODE_READ_NOT_PERM;
+>  
+> -		if ((permissions & GATT_PERM_READ_ENCRYPTED) &&
+> -						sec_level < BT_SECURITY_MEDIUM)
+> -			return ATT_ECODE_INSUFF_ENC;
+> -
+>  		if ((permissions & GATT_PERM_READ_MITM) &&
+>  						sec_level < BT_SECURITY_HIGH)
+>  			return ATT_ECODE_AUTHENTICATION;
+>  
+> +		if ((permissions & GATT_PERM_READ_ENCRYPTED) &&
+> +						sec_level < BT_SECURITY_MEDIUM)
+> +			return ATT_ECODE_INSUFF_ENC;
+> +
+>  		if (permissions & GATT_PERM_READ_AUTHORIZATION)
+>  			return ATT_ECODE_AUTHORIZATION;
+>  		break;
+> @@ -4081,14 +4081,14 @@ static uint8_t check_device_permissions(struct gatt_device *device,
+>  		if (!(permissions & GATT_PERM_WRITE))
+>  			return ATT_ECODE_WRITE_NOT_PERM;
+>  
+> -		if ((permissions & GATT_PERM_WRITE_ENCRYPTED) &&
+> -						sec_level < BT_SECURITY_MEDIUM)
+> -			return ATT_ECODE_INSUFF_ENC;
+> -
+>  		if ((permissions & GATT_PERM_WRITE_MITM) &&
+>  						sec_level < BT_SECURITY_HIGH)
+>  			return ATT_ECODE_AUTHENTICATION;
+>  
+> +		if ((permissions & GATT_PERM_WRITE_ENCRYPTED) &&
+> +						sec_level < BT_SECURITY_MEDIUM)
+> +			return ATT_ECODE_INSUFF_ENC;
+> +
+>  		if (permissions & GATT_PERM_WRITE_AUTHORIZATION)
+>  			return ATT_ECODE_AUTHORIZATION;
+>  		break;
+> 
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b673ee8..117bb0b 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2756,7 +2756,8 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE) {
-+	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE &&
-+				cmd->write_type != GATT_WRITE_TYPE_SIGNED) {
- 		cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
- 						cmd->srvc_id.is_primary);
- 		if (!cb_data) {
+All patches applied. Thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
