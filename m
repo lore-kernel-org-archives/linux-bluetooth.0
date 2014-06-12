@@ -1,75 +1,63 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: szymon.janc@tieto.com,
-	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] android/gatt: Allow signed write only on non encrypted link
-Date: Thu, 12 Jun 2014 13:12:30 +0200
-Message-Id: <1402571550-8896-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: Re: [PATCH 00/10] Some HAL IPC work
+Date: Thu, 12 Jun 2014 13:07:47 +0200
+Message-ID: <4128609.vozAJ6Wg1V@uw000953>
+In-Reply-To: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
+References: <1402497172-12436-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/gatt.c | 32 ++++++++++++++++++++++++++++++--
- 1 file changed, 30 insertions(+), 2 deletions(-)
+On Wednesday 11 of June 2014 16:32:42 Szymon Janc wrote:
+> Hi,
+> 
+> Those patches are cleanups and fixes for HAL part of IPC. Those are
+> first step to making HAL IPC library like so that it can be reused
+> by audio and sco HALs.
+> 
+> Eventually this should also allow for better recovery in case of IPC
+> error i.e. not calling exit() directly but custom destroy callback.
+> But this is not implemented yet.
+> 
+> Last two patches add FD passing in notification (as of now this is
+> needed only for health HAL).
+> 
+> BR
+> Szymon Janc
+> 
+> Szymon Janc (10):
+>   android/ipc: Make struct service_handler private
+>   android/hal-ipc: Allow to pass custom path to IPC
+>   android/hal-ipc: Fix missing mutex unlock
+>   android/hal-ipc: Move exit calls outside of handle_msg
+>   android/hal-ipc: Move exit calls under failed label in hal_ipc_cmd
+>   android/hal-ipc: Move exit calls under label in notification_handler
+>   android/hal-ipc: Split IPC init and accept to separate functions
+>   android/hal-ipc: Move daemon starting to bluetooth HAL
+>   android/hal-ipc: Pass FD to notification handlers
+>   android/ipc: Add support for sending FD in notifications
+> 
+>  android/hal-a2dp.c      |   4 +-
+>  android/hal-avrcp.c     |  24 +++----
+>  android/hal-bluetooth.c |  40 +++++++----
+>  android/hal-gatt.c      |  62 ++++++++--------
+>  android/hal-handsfree.c |  32 ++++-----
+>  android/hal-health.c    |   2 +-
+>  android/hal-hidhost.c   |  12 ++--
+>  android/hal-ipc.c       | 186 ++++++++++++++++++++++++++----------------------
+>  android/hal-ipc.h       |   5 +-
+>  android/hal-pan.c       |   4 +-
+>  android/ipc.c           |  13 +++-
+>  android/ipc.h           |   8 +--
+>  12 files changed, 214 insertions(+), 178 deletions(-)
+> 
+> 
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 3ec4118..3e9f092 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2719,6 +2719,22 @@ static bool signed_write_cmd(struct gatt_device *dev, uint16_t handle,
- 	return true;
- }
- 
-+static int get_sec_level(struct gatt_device *dev)
-+{
-+	GIOChannel *io;
-+	int sec_level;
-+
-+	io = g_attrib_get_channel(dev->attrib);
-+
-+	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
-+							BT_IO_OPT_INVALID)) {
-+		error("gatt: Failed to get sec_level");
-+		return -1;
-+	}
-+
-+	return sec_level;
-+}
-+
- static void handle_client_write_characteristic(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_write_characteristic *cmd = buf;
-@@ -2784,8 +2800,14 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 							write_char_cb, cb_data);
- 		break;
- 	case GATT_WRITE_TYPE_SIGNED:
--		res = signed_write_cmd(conn->device, ch->ch.value_handle,
--					cmd->value, cmd->len);
-+		if (get_sec_level(conn->device) != BT_SECURITY_LOW) {
-+			error("gatt: Cannot write signed on encrypted link");
-+			res = HAL_STATUS_FAILED;
-+		} else {
-+			res = signed_write_cmd(conn->device,
-+							ch->ch.value_handle,
-+							cmd->value, cmd->len);
-+		}
- 		break;
- 	default:
- 		error("gatt: Write type %d unsupported", cmd->write_type);
-@@ -5184,6 +5206,12 @@ static void write_signed_cmd_request(const uint8_t *cmd, uint16_t cmd_len,
- 	uint8_t csrk[16];
- 	uint32_t sign_cnt;
- 
-+	if (get_sec_level(dev) != BT_SECURITY_LOW) {
-+		error("gatt: Remote tries write signed on encrypted link");
-+		connection_cleanup(dev);
-+		return;
-+	}
-+
- 	if (!bt_get_csrk(&dev->bdaddr, REMOTE_CSRK, csrk, &sign_cnt)) {
- 		error("gatt: No valid csrk from remote device");
- 		return;
+Pushed.
+
 -- 
-1.8.4
-
+Best regards, 
+Szymon Janc
