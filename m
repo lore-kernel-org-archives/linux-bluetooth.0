@@ -1,45 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/avrcp: Fix adding missing breaks
-Date: Thu, 12 Jun 2014 17:22:18 +0300
-Message-Id: <1402582938-8476-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/ipc-tester: Fix closing invalid fd
+Date: Thu, 12 Jun 2014 17:07:43 +0300
+Message-Id: <1402582063-7584-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Is socket() fails we jumps to failed label.
 ---
- android/avrcp-lib.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ android/ipc-tester.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/android/avrcp-lib.c b/android/avrcp-lib.c
-index 1de313b..32f6ff6 100644
---- a/android/avrcp-lib.c
-+++ b/android/avrcp-lib.c
-@@ -571,18 +571,22 @@ static bool check_value(uint8_t attr, uint8_t number, const uint8_t *values)
- 			if (values[i] < AVRCP_EQUALIZER_OFF ||
- 						values[i] > AVRCP_EQUALIZER_ON)
- 				return false;
-+			break;
- 		case AVRCP_ATTRIBUTE_REPEAT_MODE:
- 			if (values[i] < AVRCP_REPEAT_MODE_OFF ||
- 					values[i] > AVRCP_REPEAT_MODE_GROUP)
- 				return false;
-+			break;
- 		case AVRCP_ATTRIBUTE_SHUFFLE:
- 			if (values[i] < AVRCP_SHUFFLE_OFF ||
- 					values[i] > AVRCP_SHUFFLE_GROUP)
- 				return false;
-+			break;
- 		case AVRCP_ATTRIBUTE_SCAN:
- 			if (values[i] < AVRCP_SCAN_OFF ||
- 					values[i] > AVRCP_SCAN_GROUP)
- 				return false;
-+			break;
- 		}
- 	}
+diff --git a/android/ipc-tester.c b/android/ipc-tester.c
+index 63fd105..f1f93f2 100644
+--- a/android/ipc-tester.c
++++ b/android/ipc-tester.c
+@@ -279,7 +279,8 @@ static void emulator(int pipe, int hci_index)
  
+ failed:
+ 	close(pipe);
+-	close(fd);
++	if (fd >= 0)
++		close(fd);
+ }
+ 
+ static int accept_connection(int sk)
 -- 
 1.8.3.2
 
