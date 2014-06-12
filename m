@@ -1,44 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH] android/gatt: Fix wrong check
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1402567085-26830-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Thu, 12 Jun 2014 12:08:29 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC_v2 0/6] HDP initial implementaion
-Date: Thu, 12 Jun 2014 12:10:41 +0200
-Message-ID: <14170751.VX3tVODdaQ@uw000953>
-In-Reply-To: <1402406523-2832-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1402406523-2832-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <7D349CBE-361A-4F82-8D38-BE57012D65C1@holtmann.org>
+References: <1402567085-26830-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Andrei,
 
-On Tuesday 10 of June 2014 16:21:57 Ravi kumar Veeramally wrote:
-> v2: Fixed comments by szymon and fixed issues while sebastian
-> testing with PTS.
+> android/gatt.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> v1: patchset is initial implementaion for HDP at daemon side.
-> Cacheing application data and prepare SDP record based on MDEPs
-> configuration and notify app state.
+> diff --git a/android/gatt.c b/android/gatt.c
+> index cc3746c..08da856 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -4133,7 +4133,7 @@ static void fill_gatt_response_by_handle(uint16_t handle, uint16_t offset,
 > 
-> Ravi kumar Veeramally (6):
->   android/hal-ipc-txt: Update Health MDEP command parameter
->   android/health: Fix MDEP data type is 2 octets
->   android/health: Cache health application data on app register call
->   android/health: Perform clean up on app unregister call
->   android/health: Add HDP SDP record
->   android/health: Notify application registration status
-> 
->  android/hal-ipc-api.txt |   5 +-
->  android/hal-msg.h       |   2 +-
->  android/health.c        | 712 +++++++++++++++++++++++++++++++++++++++++++++++-
->  3 files changed, 707 insertions(+), 12 deletions(-)
-> 
-> 
+> 	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
+> 							UINT_TO_PTR(handle));
+> -	if (entry) {
+> +	if (!entry) {
+> 		DBG("No pending response found! Bogus android response?");
+> 		return;
 
-I applied patches 1 and 2. Thanks.
+on a different note, if this is a case that is not suppose to happen and indicates a bug in Android Bluetooth service, we should at minimum print a warning here and not debug. Maybe even just print an error.
 
--- 
-Best regards, 
-Szymon Janc
+Regards
+
+Marcel
+
