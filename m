@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 03/10] android/hidhost: Add support for HoG
-Date: Thu, 12 Jun 2014 15:33:22 +0300
-Message-Id: <1402576409-9352-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 02/10] android/bluetooth: Add bt_is_device_le function
+Date: Thu, 12 Jun 2014 15:33:21 +0300
+Message-Id: <1402576409-9352-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1402576409-9352-1-git-send-email-luiz.dentz@gmail.com>
 References: <1402576409-9352-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,208 +11,45 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables using hidhost HAL for LE devices since this is how HoG is
-implemented in Android.
 ---
- android/hidhost.c | 110 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 109 insertions(+), 1 deletion(-)
+ android/bluetooth.c | 11 +++++++++++
+ android/bluetooth.h |  2 ++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 4a158c6..49f7b77 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -48,6 +48,9 @@
- #include "hal-msg.h"
- #include "ipc-common.h"
- #include "ipc.h"
-+#include "bluetooth.h"
-+#include "gatt.h"
-+#include "hog.h"
- #include "hidhost.h"
- #include "utils.h"
- 
-@@ -77,11 +80,14 @@
- /* HID Virtual Cable Unplug */
- #define HID_VIRTUAL_CABLE_UNPLUG	0x05
- 
-+#define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
-+
- static bdaddr_t adapter_addr;
- 
- static GIOChannel *ctrl_io = NULL;
- static GIOChannel *intr_io = NULL;
- static GSList *devices = NULL;
-+static unsigned int hog_app = 0;
- 
- static struct ipc *hal_ipc = NULL;
- 
-@@ -102,6 +108,7 @@ struct hid_device {
- 	guint		intr_watch;
- 	struct bt_uhid	*uhid;
- 	uint8_t		last_hid_msg;
-+	struct bt_hog	*hog;
- };
- 
- static int device_cmp(gconstpointer s, gconstpointer user_data)
-@@ -131,6 +138,9 @@ static void hid_device_free(void *data)
- 	if (dev->uhid)
- 		bt_uhid_unref(dev->uhid);
- 
-+	if (dev->hog)
-+		bt_hog_unref(dev->hog);
-+
- 	g_free(dev->rd_data);
- 	g_free(dev);
- }
-@@ -722,6 +732,67 @@ fail:
- 	hid_device_remove(dev);
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index a864326..fac2637 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1386,6 +1386,17 @@ uint8_t bt_get_device_android_type(const bdaddr_t *addr)
+ 	return get_device_android_type(dev);
  }
  
-+static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
++bool bt_is_device_le(const bdaddr_t *addr)
 +{
-+	GSList *l;
-+	struct hid_device *dev;
++	struct device *dev;
 +
-+	l = g_slist_find_custom(devices, addr, device_cmp);
-+	dev = l ? l->data : NULL;
-+
-+	if (err < 0) {
-+		if (!dev)
-+			return;
-+		goto fail;
-+	}
-+
-+	if (!dev) {
-+		dev = g_new0(struct hid_device, 1);
-+		bacpy(&dev->dst, addr);
-+		devices = g_slist_append(devices, dev);
-+		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
-+	}
-+
-+	if (!dev->hog) {
-+		/* TODO: Get device details and primary */
-+		dev->hog = bt_hog_new("bluez-input-device", dev->vendor,
-+					dev->product, dev->version, NULL);
-+		if (!dev->hog) {
-+			error("HoG: unable to create session");
-+			goto fail;
-+		}
-+	}
-+
-+	if (!bt_hog_attach(dev->hog, attrib)) {
-+		error("HoG: unable to attach");
-+		goto fail;
-+	}
-+
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTED);
-+
-+	return;
-+
-+fail:
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
-+	hid_device_remove(dev);
-+}
-+
-+static bool hog_connect(struct hid_device *dev)
-+{
-+	DBG("");
-+
-+	if (hog_app)
-+		return bt_gatt_connect_app(hog_app, &dev->dst);
-+
-+	hog_app = bt_gatt_register_app(HOG_UUID, GATT_CLIENT, hog_conn_cb);
-+	if (!hog_app) {
-+		error("hidhost: bt_gatt_register_app failed");
++	dev = find_device(addr);
++	if (!dev)
 +		return false;
-+	}
 +
-+	return bt_gatt_connect_app(hog_app, &dev->dst);
++	return dev->le;
 +}
 +
- static void bt_hid_connect(const void *buf, uint16_t len)
+ const char *bt_get_adapter_name(void)
  {
- 	const struct hal_cmd_hidhost_connect *cmd = buf;
-@@ -748,6 +819,14 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 	ba2str(&dev->dst, addr);
- 	DBG("connecting to %s", addr);
+ 	return adapter.name;
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index b4a5f32..2409d46 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -54,6 +54,8 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
+ 							void *user_data);
  
-+	if (bt_is_device_le(&dst)) {
-+		if (!hog_connect(dev)) {
-+			status = HAL_STATUS_FAILED;
-+			goto failed;
-+		}
-+		goto done;
-+	}
+ uint8_t bt_get_device_android_type(const bdaddr_t *addr);
++bool bt_is_device_le(const bdaddr_t *addr);
 +
- 	sdp_uuid16_create(&uuid, PNP_INFO_SVCLASS_ID);
- 	if (bt_search_service(&adapter_addr, &dev->dst, &uuid,
- 				hid_sdp_did_search_cb, dev, NULL, 0) < 0) {
-@@ -757,8 +836,11 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
-+done:
- 	devices = g_slist_append(devices, dev);
--	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
-+
-+	if (dev->state == HAL_HIDHOST_STATE_DISCONNECTED)
-+		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
- 
- 	status = HAL_STATUS_SUCCESS;
- 
-@@ -767,6 +849,20 @@ failed:
- 									status);
- }
- 
-+static bool hog_disconnect(struct hid_device *dev)
-+{
-+	DBG("");
-+
-+	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
-+
-+	if (!bt_gatt_disconnect_app(hog_app, &dev->dst)) {
-+		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTED);
-+		hid_device_remove(dev);
-+	}
-+
-+	return true;
-+}
-+
- static void bt_hid_disconnect(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_hidhost_disconnect *cmd = buf;
-@@ -786,6 +882,13 @@ static void bt_hid_disconnect(const void *buf, uint16_t len)
- 	}
- 
- 	dev = l->data;
-+	if (bt_is_device_le(&dst)) {
-+		if (!hog_disconnect(dev)) {
-+			status = HAL_STATUS_FAILED;
-+			goto failed;
-+		}
-+		goto done;
-+	}
- 
- 	/* Wait either channels to HUP */
- 	if (dev->intr_io)
-@@ -796,6 +899,8 @@ static void bt_hid_disconnect(const void *buf, uint16_t len)
- 
- 	bt_hid_notify_state(dev, HAL_HIDHOST_STATE_DISCONNECTING);
- 
-+
-+done:
- 	status = HAL_STATUS_SUCCESS;
- 
- failed:
-@@ -1342,6 +1447,9 @@ void bt_hid_unregister(void)
- {
- 	DBG("");
- 
-+	if (hog_app > 0)
-+		bt_gatt_unregister_app(hog_app);
-+
- 	g_slist_free_full(devices, hid_device_free);
- 	devices = NULL;
+ const char *bt_get_adapter_name(void);
+ bool bt_device_is_bonded(const bdaddr_t *bdaddr);
  
 -- 
 1.9.3
