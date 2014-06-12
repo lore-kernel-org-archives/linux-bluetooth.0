@@ -1,55 +1,105 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 1/3] android: Update HAL API to Android 4.4.3-r1.1
-Date: Thu, 12 Jun 2014 12:21:52 +0200
-Message-ID: <1967781.v548FO5nCP@uw000953>
-In-Reply-To: <1402486261-22488-1-git-send-email-szymon.janc@tieto.com>
-References: <1402486261-22488-1-git-send-email-szymon.janc@tieto.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2 1/2] android: Store remote's Identity Resolving Key
+Date: Thu, 12 Jun 2014 12:16:12 +0200
+Message-ID: <8994221.GXkAcnXDiz@uw000953>
+In-Reply-To: <1402473614-26767-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1402473614-26767-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Wednesday 11 of June 2014 13:30:59 Szymon Janc wrote:
+Hi Jakub,
+
+On Wednesday 11 of June 2014 10:00:13 Jakub Tyszkowski wrote:
+> Persistent storage is used so we can load IRKs on startup.
 > ---
->  android/hal-gatt.c                | 4 +++-
->  android/hardware/bt_gatt_client.h | 4 +++-
->  2 files changed, 6 insertions(+), 2 deletions(-)
+>  android/bluetooth.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 59 insertions(+)
 > 
-> diff --git a/android/hal-gatt.c b/android/hal-gatt.c
-> index 6f0d2c5..a4ad0f2 100644
-> --- a/android/hal-gatt.c
-> +++ b/android/hal-gatt.c
-> @@ -975,7 +975,9 @@ static bt_status_t set_adv_data(int server_if, bool set_scan_rsp,
->  				bool include_name, bool include_txpower,
->  				int min_interval, int max_interval,
->  				int appearance, uint16_t manufacturer_len,
-> -				char *manufacturer_data)
-> +				char *manufacturer_data,
-> +				uint16_t service_data_len, char *service_data,
-> +				uint16_t service_uuid_len, char *service_uuid)
->  {
->  	char buf[IPC_MTU];
->  	struct hal_cmd_gatt_client_set_adv_data *cmd = (void *) buf;
-> diff --git a/android/hardware/bt_gatt_client.h b/android/hardware/bt_gatt_client.h
-> index d6b0cb4..cf4fabe 100644
-> --- a/android/hardware/bt_gatt_client.h
-> +++ b/android/hardware/bt_gatt_client.h
-> @@ -278,7 +278,9 @@ typedef struct {
->      /** Set the advertising data or scan response data */
->      bt_status_t (*set_adv_data)(int server_if, bool set_scan_rsp, bool include_name,
->                      bool include_txpower, int min_interval, int max_interval, int appearance,
-> -                    uint16_t manufacturer_len, char* manufacturer_data);
-> +                    uint16_t manufacturer_len, char* manufacturer_data,
-> +                    uint16_t service_data_len, char* service_data,
-> +                    uint16_t service_uuid_len, char* service_uuid);
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index 36b073e..8638f84 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -1964,6 +1964,62 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
+>  		store_csrk(dev);
+>  }
 >  
->      /** Test mode interface */
->      bt_status_t (*test_command)( int command, btgatt_test_params_t* params);
+> +static void store_irk(struct device *dev, const uint8_t *val)
+> +{
+> +	GKeyFile *key_file;
+> +	char key_str[33];
+> +	char addr[18];
+> +	int i;
+> +	gsize length = 0;
+> +	char *data;
+> +
+> +	ba2str(&dev->bdaddr, addr);
+> +
+> +	key_file = g_key_file_new();
+> +	if (!g_key_file_load_from_file(key_file, DEVICES_FILE, 0, NULL)) {
+> +		g_key_file_free(key_file);
+> +		return;
+> +	}
+> +
+> +	for (i = 0; i < 16; i++)
+> +		sprintf(key_str + (i * 2), "%2.2X", val[i]);
+> +
+> +	g_key_file_set_string(key_file, addr, "IdentityResolvingKey", key_str);
+> +
+> +	data = g_key_file_to_data(key_file, &length, NULL);
+> +	g_file_set_contents(DEVICES_FILE, data, length, NULL);
+> +	g_free(data);
+> +
+> +	g_key_file_free(key_file);
+> +}
+> +
+> +static void new_irk_callback(uint16_t index, uint16_t length,
+> +					const void *param, void *user_data)
+> +{
+> +	const struct mgmt_ev_new_irk *ev = param;
+> +	const struct mgmt_addr_info *addr = &ev->key.addr;
+> +	struct device *dev;
+> +	char dst[18], rpa[18];
+> +
+> +	if (length < sizeof(*ev)) {
+> +		error("To small New Irk Event (%u bytes)", length);
+> +		return;
+> +	}
+> +
+> +	ba2str(&ev->key.addr.bdaddr, dst);
+> +	ba2str(&ev->rpa, rpa);
+> +
+> +	DBG("new IRK for %s, RPA %s", dst, rpa);
+> +
+> +	/* TODO: handle new Identity to RPA mapping */
+> +	dev = find_device(&addr->bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	if (ev->store_hint)
+> +		store_irk(dev, ev->key.val);
+> +}
+> +
+>  static void register_mgmt_handlers(void)
+>  {
+>  	mgmt_register(mgmt_if, MGMT_EV_NEW_SETTINGS, adapter.index,
+> @@ -2017,6 +2073,9 @@ static void register_mgmt_handlers(void)
+>  	mgmt_register(mgmt_if, MGMT_EV_NEW_CSRK, adapter.index,
+>  						new_csrk_callback, NULL, NULL);
+>  
+> +	mgmt_register(mgmt_if, MGMT_EV_NEW_IRK, adapter.index, new_irk_callback,
+> +								NULL, NULL);
+> +
+>  }
+>  
+>  static void load_link_keys_complete(uint8_t status, uint16_t length,
 > 
 
-Applied.
+Both patches applied, thanks.
 
 -- 
 Best regards, 
