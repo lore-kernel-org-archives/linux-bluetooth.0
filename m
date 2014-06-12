@@ -1,498 +1,139 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH v3] Bluetooth: Fix for ACL disconnect when pairing fails
-Date: Thu, 12 Jun 2014 09:55:09 +0200
-Message-Id: <1402559709-32111-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Adjust PICS for l2cap
+Date: Thu, 12 Jun 2014 08:28:29 +0200
+Message-Id: <1402554509-31021-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When pairing fails hci_conn refcnt drops below zero. This cause that
-ACL link is not disconnected when disconnect timeout fires.
-
-Probably this is because l2cap_conn_del calls l2cap_chan_del for each
-channel, and inside l2cap_chan_del conn is dropped. After that loop
-hci_chan_del is called which also drops conn.
-
-Anyway, as it is desrcibed in hci_core.h, it is known that refcnt
-drops below 0 sometimes and it should be fine. If so, let disconnect
-link when hci_conn_timeout fires and refcnt is 0 or below. This patch
-does it.
-
-This affects PTS test SM_TC_JW_BV_05_C
-
-Logs from scenario:
-
-[69713.706227] [6515] pair_device:
-[69713.706230] [6515] hci_conn_add: hci0 dst 00:1b:dc:06:06:22
-[69713.706233] [6515] hci_dev_hold: hci0 orig refcnt 8
-[69713.706235] [6515] hci_conn_init_sysfs: conn ffff88021f65a000
-[69713.706239] [6515] hci_req_add_ev: hci0 opcode 0x200d plen 25
-[69713.706242] [6515] hci_prepare_cmd: skb len 28
-[69713.706243] [6515] hci_req_run: length 1
-[69713.706248] [6515] hci_conn_hold: hcon ffff88021f65a000 orig refcnt 0
-[69713.706251] [6515] hci_dev_put: hci0 orig refcnt 9
-[69713.706281] [8909] hci_cmd_work: hci0 cmd_cnt 1 cmd queued 1
-[69713.706288] [8909] hci_send_frame: hci0 type 1 len 28
-[69713.706290] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 28
-[69713.706316] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.706382] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.711664] [8909] hci_rx_work: hci0
-[69713.711668] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 6
-[69713.711680] [8909] hci_rx_work: hci0 Event packet
-[69713.711683] [8909] hci_cs_le_create_conn: hci0 status 0x00
-[69713.711685] [8909] hci_sent_cmd_data: hci0 opcode 0x200d
-[69713.711688] [8909] hci_req_cmd_complete: opcode 0x200d status 0x00
-[69713.711690] [8909] hci_sent_cmd_data: hci0 opcode 0x200d
-[69713.711695] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.711744] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.818875] [8909] hci_rx_work: hci0
-[69713.818889] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 21
-[69713.818913] [8909] hci_rx_work: hci0 Event packet
-[69713.818917] [8909] hci_le_conn_complete_evt: hci0 status 0x00
-[69713.818922] [8909] hci_send_to_control: len 19
-[69713.818927] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.818938] [8909] hci_conn_add_sysfs: conn ffff88021f65a000
-[69713.818975] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.818981] [6515] hci_sock_recvmsg: sock ffff88005e75a080, sk
-ffff88010323ac00
-[69713.818983] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.818985] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.818987] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.818990] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.818994] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.818998] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.819003] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.819007] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.819021] [8909] hci_dev_hold: hci0 orig refcnt 10
-[69713.819025] [8909] l2cap_connect_cfm: hcon ffff88021f65a000 bdaddr
-00:1b:dc:06:06:22 status 0
-[69713.819028] [8909] hci_chan_create: hci0 hcon ffff88021f65a000
-[69713.819031] [8909] l2cap_conn_add: hcon ffff88021f65a000 conn
-ffff880221005c00 hchan ffff88020d60b1c0
-[69713.819034] [8909] l2cap_conn_ready: conn ffff880221005c00
-[69713.819036] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.819037] [8909] smp_conn_security: conn ffff880221005c00 hcon
-ffff88021f65a000 level 0x02
-[69713.819039] [8909] smp_chan_create:
-[69713.819041] [8909] hci_conn_hold: hcon ffff88021f65a000 orig refcnt 1
-[69713.819043] [8909] smp_send_cmd: code 0x01
-[69713.819045] [8909] hci_send_acl: hci0 chan ffff88020d60b1c0 flags
-0x0000
-[69713.819046] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69713.819049] [8909] hci_queue_acl: hci0 nonfrag skb ffff88005157c100
-len 15
-[69713.819055] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69713.819057] [8909] l2cap_le_conn_ready:
-[69713.819064] [8909] l2cap_chan_create: chan ffff88005ede2c00
-[69713.819066] [8909] l2cap_chan_hold: chan ffff88005ede2c00 orig refcnt
-1
-[69713.819069] [8909] l2cap_sock_init: sk ffff88005ede5800
-[69713.819072] [8909] bt_accept_enqueue: parent ffff880160356000, sk
-ffff88005ede5800
-[69713.819074] [8909] __l2cap_chan_add: conn ffff880221005c00, psm 0x00,
-dcid 0x0004
-[69713.819076] [8909] l2cap_chan_hold: chan ffff88005ede2c00 orig refcnt
-2
-[69713.819078] [8909] hci_conn_hold: hcon ffff88021f65a000 orig refcnt 2
-[69713.819080] [8909] smp_conn_security: conn ffff880221005c00 hcon
-ffff88021f65a000 level 0x01
-[69713.819082] [8909] l2cap_sock_ready_cb: sk ffff88005ede5800, parent
-ffff880160356000
-[69713.819086] [8909] le_pairing_complete_cb: status 0
-[69713.819091] [8909] hci_tx_work: hci0 acl 10 sco 8 le 0
-[69713.819093] [8909] hci_sched_acl: hci0
-[69713.819094] [8909] hci_sched_sco: hci0
-[69713.819096] [8909] hci_sched_esco: hci0
-[69713.819098] [8909] hci_sched_le: hci0
-[69713.819099] [8909] hci_chan_sent: hci0
-[69713.819101] [8909] hci_chan_sent: chan ffff88020d60b1c0 quote 10
-[69713.819104] [8909] hci_sched_le: chan ffff88020d60b1c0 skb
-ffff88005157c100 len 15 priority 7
-[69713.819106] [8909] hci_send_frame: hci0 type 2 len 15
-[69713.819108] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 15
-[69713.819119] [8909] hci_chan_sent: hci0
-[69713.819121] [8909] hci_prio_recalculate: hci0
-[69713.819123] [8909] process_pending_rx:
-[69713.819226] [6450] hci_sock_recvmsg: sock ffff88005e758780, sk
-ffff88010323d400
-[69713.819592] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.819633] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.821872] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.821877] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.821879] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.821881] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.821883] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.821884] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.821886] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.821889] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.821891] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.822008] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.822022] [6450] l2cap_sock_accept: sk ffff880160356000 timeo 0
-[69713.822024] [6450] bt_accept_dequeue: parent ffff880160356000
-[69713.822026] [6450] bt_accept_unlink: sk ffff88005ede5800 state 1
-[69713.822028] [6450] l2cap_sock_accept: new socket ffff88005ede5800
-[69713.822368] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.822375] [6450] l2cap_sock_getsockopt: sk ffff88005ede5800
-[69713.822383] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.822414] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823082] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.823086] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.823087] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.823089] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.823091] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.823093] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.823094] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.823096] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.823098] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823101] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.823224] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823255] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.823259] [6450] l2cap_sock_getsockopt: sk ffff88005ede5800
-[69713.824322] [6450] l2cap_sock_getname: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.824330] [6450] l2cap_sock_getsockopt: sk ffff88005ede5800
-[69713.825029] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.825032] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.825034] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.825036] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.825038] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.825040] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.825042] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.825044] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.825046] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.825048] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825049] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825051] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825187] [6450] l2cap_sock_sendmsg: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825189] [6450] bt_sock_wait_ready: sk ffff88005ede5800
-[69713.825192] [6450] l2cap_create_basic_pdu: chan ffff88005ede2c00 len
-3
-[69713.825196] [6450] l2cap_do_send: chan ffff88005ede2c00, skb
-ffff880160b0b500 len 7 priority 0
-[69713.825199] [6450] hci_send_acl: hci0 chan ffff88020d60b1c0 flags
-0x0000
-[69713.825201] [6450] hci_queue_acl: hci0 nonfrag skb ffff880160b0b500
-len 11
-[69713.825210] [8909] hci_tx_work: hci0 acl 9 sco 8 le 0
-[69713.825213] [8909] hci_sched_acl: hci0
-[69713.825214] [8909] hci_sched_sco: hci0
-[69713.825216] [8909] hci_sched_esco: hci0
-[69713.825217] [8909] hci_sched_le: hci0
-[69713.825219] [8909] hci_chan_sent: hci0
-[69713.825221] [8909] hci_chan_sent: chan ffff88020d60b1c0 quote 9
-[69713.825223] [8909] hci_sched_le: chan ffff88020d60b1c0 skb
-ffff880160b0b500 len 11 priority 0
-[69713.825225] [8909] hci_send_frame: hci0 type 2 len 11
-[69713.825227] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 11
-[69713.825242] [8909] hci_chan_sent: hci0
-[69713.825253] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.825253] [8909] hci_prio_recalculate: hci0
-[69713.825292] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.825768] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.825771] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.825773] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.825775] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.825776] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.825778] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.825780] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.825782] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.825784] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.825785] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.825787] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.826020] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69713.826023] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69713.826025] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69713.826026] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69713.826028] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69713.826030] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69713.826032] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69713.826035] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69713.826037] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69713.826039] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.826041] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69713.866902] [8909] hci_rx_work: hci0
-[69713.866921] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 7
-[69713.866928] [8909] hci_rx_work: hci0 Event packet
-[69713.866931] [8909] hci_num_comp_pkts_evt: hci0 num_hndl 1
-[69713.866937] [8909] hci_tx_work: hci0 acl 9 sco 8 le 0
-[69713.866939] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.866940] [8909] hci_sched_acl: hci0
-[69713.866941] [8909] hci_sched_sco: hci0
-[69713.866943] [8909] hci_sched_esco: hci0
-[69713.866944] [8909] hci_sched_le: hci0
-[69713.866953] [8909] hci_chan_sent: hci0
-[69713.866997] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.867840] [28074] hci_rx_work: hci0
-[69713.867844] [28074] hci_send_to_monitor: hdev ffff88021f0c7000 len 7
-[69713.867850] [28074] hci_rx_work: hci0 Event packet
-[69713.867853] [28074] hci_num_comp_pkts_evt: hci0 num_hndl 1
-[69713.867857] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69713.867858] [28074] hci_tx_work: hci0 acl 10 sco 8 le 0
-[69713.867860] [28074] hci_sched_acl: hci0
-[69713.867861] [28074] hci_sched_sco: hci0
-[69713.867862] [28074] hci_sched_esco: hci0
-[69713.867863] [28074] hci_sched_le: hci0
-[69713.867865] [28074] hci_chan_sent: hci0
-[69713.867888] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69714.145661] [8909] hci_rx_work: hci0
-[69714.145666] [8909] hci_send_to_monitor: hdev ffff88021f0c7000 len 10
-[69714.145676] [8909] hci_rx_work: hci0 ACL data packet
-[69714.145679] [8909] hci_acldata_packet: hci0 len 6 handle 0x002d flags
-0x0002
-[69714.145681] [8909] hci_conn_enter_active_mode: hcon ffff88021f65a000
-mode 0
-[69714.145683] [8909] l2cap_recv_acldata: conn ffff880221005c00 len 6
-flags 0x2
-[69714.145693] [8909] l2cap_recv_frame: len 2, cid 0x0006
-[69714.145696] [8909] hci_send_to_control: len 14
-[69714.145710] [8909] smp_chan_destroy:
-[69714.145713] [8909] pairing_complete: status 3
-[69714.145714] [8909] cmd_complete: sock ffff88010323ac00
-[69714.145717] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 3
-[69714.145719] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69714.145720] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.145722] [6515] hci_sock_recvmsg: sock ffff88005e75a080, sk
-ffff88010323ac00
-[69714.145724] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.145726] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.145728] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.145729] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.145731] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.145732] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.145735] [6515] hci_sock_recvmsg: sock ffff88005e75a080, sk
-ffff88010323ac00
-[69714.145737] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 2
-[69714.145739] [8909] l2cap_conn_del: hcon ffff88021f65a000 conn
-ffff880221005c00, err 13
-[69714.145740] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.145743] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.145744] [8909] l2cap_chan_hold: chan ffff88005ede2c00 orig refcnt
-3
-[69714.145746] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.145748] [8909] l2cap_chan_del: chan ffff88005ede2c00, conn
-ffff880221005c00, err 13
-[69714.145749] [8909] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-4
-[69714.145751] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 1
-[69714.145754] [6450] bt_sock_poll: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.145756] [8909] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-3
-[69714.145759] [8909] hci_chan_del: hci0 hcon ffff88021f65a000 chan
-ffff88020d60b1c0
-[69714.145766] [5949] hci_sock_recvmsg: sock ffff8800941a9680, sk
-ffff88012bf4d000
-[69714.145769] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69714.145778] [5949] hci_sock_recvmsg: sock ffff8800941a9900, sk
-ffff88012bf4e800
-[69714.145787] [6515] hci_sock_release: sock ffff88005e75a080 sk
-ffff88010323ac00
-[69714.146002] [6450] hci_sock_recvmsg: sock ffff88005e758780, sk
-ffff88010323d400
-[69714.150795] [6450] l2cap_sock_release: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.150799] [6450] l2cap_sock_shutdown: sock ffff8800941ab700, sk
-ffff88005ede5800
-[69714.150802] [6450] l2cap_chan_close: chan ffff88005ede2c00 state
-BT_CLOSED
-[69714.150805] [6450] l2cap_sock_kill: sk ffff88005ede5800 state
-BT_CLOSED
-[69714.150806] [6450] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-2
-[69714.150808] [6450] l2cap_sock_destruct: sk ffff88005ede5800
-[69714.150809] [6450] l2cap_chan_put: chan ffff88005ede2c00 orig refcnt
-1
-[69714.150811] [6450] l2cap_chan_destroy: chan ffff88005ede2c00
-[69714.150970] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.150974] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.150975] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.150977] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.150979] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.150981] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.150983] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.150985] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.150988] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.151181] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.151183] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.151185] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.151186] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.151188] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.151190] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.151191] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.151193] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.151195] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.151379] [6450] bt_sock_poll: sock ffff88005e758500, sk
-ffff88010323b800
-[69714.151381] [6450] bt_sock_poll: sock ffff8801db6b4f00, sk
-ffff880160351c00
-[69714.151383] [6450] bt_sock_poll: sock ffff8801db6b6080, sk
-ffff880160352000
-[69714.151384] [6450] bt_sock_poll: sock ffff8801db6b4000, sk
-ffff880160353800
-[69714.151386] [6450] bt_sock_poll: sock ffff8801db6b6f80, sk
-ffff880160354000
-[69714.151387] [6450] bt_sock_poll: sock ffff8801db6b6580, sk
-ffff880160353c00
-[69714.151389] [6450] bt_sock_poll: sock ffff8801db6b5180, sk
-ffff880160355800
-[69714.151391] [6450] bt_sock_poll: sock ffff8801db6b5400, sk
-ffff88021e775000
-[69714.151393] [6450] bt_sock_poll: sock ffff8801db6b5e00, sk
-ffff880160356000
-[69714.151991] [8909] hci_conn_drop: hcon ffff88021f65a000 orig refcnt 0
-[69716.150339] [8909] hci_conn_timeout: hcon ffff88021f65a000 state
-BT_CONNECTED, refcnt -1
-
-Signed-off-by: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 ---
-v3: fixed checkpatch issues
+ android/pics-l2cap.txt | 12 ++++++------
+ android/pts-l2cap.txt  | 48 ++++++++++++++++++++++++------------------------
+ 2 files changed, 30 insertions(+), 30 deletions(-)
 
- net/bluetooth/hci_conn.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ca01d18..a7a27bc 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -289,10 +289,20 @@ static void hci_conn_timeout(struct work_struct *work)
- {
- 	struct hci_conn *conn = container_of(work, struct hci_conn,
- 					     disc_work.work);
-+	int refcnt = atomic_read(&conn->refcnt);
+diff --git a/android/pics-l2cap.txt b/android/pics-l2cap.txt
+index 096fbf4..5cc9d06 100644
+--- a/android/pics-l2cap.txt
++++ b/android/pics-l2cap.txt
+@@ -70,21 +70,21 @@ TSPC_L2CAP_2_31	False		AMP Manager Support (C.12)
+ TSPC_L2CAP_2_32	False		ERTM over AMP (C.12)
+ TSPC_L2CAP_2_33	False		Streaming Mode Source over AMP Support (C.15)
+ TSPC_L2CAP_2_34	False		Streaming Mode Sink over AMP Support (C.15)
+-TSPC_L2CAP_2_35	False		Unicast Connectionless Data, Reception (C.1, C.16)
+-TSPC_L2CAP_2_36	False		Ability to transmit an unencrypted packet over
++TSPC_L2CAP_2_35	True (*)	Unicast Connectionless Data, Reception (C.1, C.16)
++TSPC_L2CAP_2_36	True (*)	Ability to transmit an unencrypted packet over
+ 					a Unicast connectionless L2CAP
+ 					channel (C.16)
+-TSPC_L2CAP_2_37	False		Ability to transmit an encrypted packet over
++TSPC_L2CAP_2_37	True (*)	Ability to transmit an encrypted packet over
+ 					a Unicast connectionless L2CAP
+ 					channel (C.16)
+-TSPC_L2CAP_2_38	False		Extended Flow Specification for BR/EDR (C.8)
+-TSPC_L2CAP_2_39	False		Extended Window Size (C.8)
++TSPC_L2CAP_2_38	True (*)	Extended Flow Specification for BR/EDR (C.8)
++TSPC_L2CAP_2_39	True (*)	Extended Window Size (C.8)
+ TSPC_L2CAP_2_40	True (*)	Support of Low Energy signaling channel (C.17)
+ TSPC_L2CAP_2_41	True (*)	Support of command reject (C.17)
+ TSPC_L2CAP_2_42	True (*)	Send Connection Parameter Update Request (C.18)
+ TSPC_L2CAP_2_43	True (*)	Send Connection Parameter Update Response (C.19)
+ TSPC_L2CAP_2_44	False		Extended Flow Specification for AMP (C.22)
+-TSPC_L2CAP_2_45	False		Send disconnect request command (O)
++TSPC_L2CAP_2_45	True (*)	Send disconnect request command (O)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory to support at least one of TSPC_L2CAP_2_12 OR TSPC_L2CAP_2_13 OR
+ 	TSPC_L2CAP_2_35 IF BR/EDR BR/EDR/LE AND SUM_ICS 31/7 (CSA1) OR
+diff --git a/android/pts-l2cap.txt b/android/pts-l2cap.txt
+index b14614a..6e012c1 100644
+--- a/android/pts-l2cap.txt
++++ b/android/pts-l2cap.txt
+@@ -41,15 +41,15 @@ TC_COS_IEX_BV_02_C	PASS
+ TC_COS_ECH_BV_01_C	PASS
+ TC_COS_ECH_BV_02_C	PASS	l2ping <bdaddr>
+ TC_CLS_CLR_BV_01_C	N/A
+-TC_CLS_UCD_BV_01_C	N/A
+-TC_CLS_UCD_BV_02_C	N/A
+-TC_CLS_UCD_BV_03_C	N/A
++TC_CLS_UCD_BV_01_C	INC	not tested yet
++TC_CLS_UCD_BV_02_C	INC	not tested yet
++TC_CLS_UCD_BV_03_C	INC	not tested yet
+ TC_EXF_BV_01_C		PASS
+ TC_EXF_BV_02_C		PASS
+ TC_EXF_BV_03_C		PASS
+-TC_EXF_BV_04_C		N/A
++TC_EXF_BV_04_C		INC	not tested yet
+ TC_EXF_BV_05_C		PASS
+-TC_EXF_BV_06_C		N/A
++TC_EXF_BV_06_C		INC	not tested yet
  
- 	BT_DBG("hcon %p state %s", conn, state_to_string(conn->state));
- 
--	if (atomic_read(&conn->refcnt))
-+	WARN_ON(refcnt < 0);
-+
-+	/* FIXME: It was observed that in pairing failed scenario, refcnt
-+	 * drops below 0. Probably this is because l2cap_conn_del calls
-+	 * l2cap_chan_del for each channel, and inside l2cap_chan_del conn is
-+	 * dropped. After that loop hci_chan_del is called which also drops
-+	 * conn. For now make sure that ACL is alive if refcnt is higher then 0,
-+	 * otherwise drop it.
-+	 */
-+	if (refcnt > 0)
- 		return;
- 
- 	switch (conn->state) {
+ TC_CMC_BV_01_C		PASS    l2test -X ertm -P <PSM - not reserved>
+ TC_CMC_BV_02_C		PASS    l2test -X ertm -P <PSM - not reserved>
+@@ -109,7 +109,7 @@ TC_ERM_BV_13_C		PASS
+ TC_ERM_BV_14_C		PASS
+ TC_ERM_BV_15_C		PASS	l2test -X ertm -P <PSM - not reserved> -N 4
+ 				-Y 4
+-TC_ERM_BV_16_C		N/A
++TC_ERM_BV_16_C		INC	not tested yet
+ TC_ERM_BV_17_C		PASS	l2test -X ertm -P <PSM - not reserved>
+ TC_ERM_BV_18_C		PASS
+ TC_ERM_BV_19_C		PASS	l2test -x -X ertm -P <PSM - not reserved> -N 1
+@@ -117,7 +117,7 @@ TC_ERM_BV_20_C		PASS	l2test -x -X ertm -P <PSM - not reserved> -N 1
+ TC_ERM_BV_21_C		PASS	l2test -w -X ertm -P 4097 -N 3
+ TC_ERM_BV_22_C		PASS
+ TC_ERM_BV_23_C		PASS
+-TC_ERM_BI_01_C		N/A
++TC_ERM_BI_01_C		INC	not tested yet
+ TC_ERM_BI_02_C		PASS	l2test -X ertm -P <PSM - not reserved>
+ TC_ERM_BI_03_C		PASS
+ TC_ERM_BI_04_C		PASS
+@@ -129,11 +129,11 @@ TC_STM_BV_03_C		PASS
+ TC_STM_BV_11_C		N/A
+ TC_STM_BV_12_C		N/A
+ TC_STM_BV_13_C		N/A
+-TC_FIX_BV_01_C		N/A
++TC_FIX_BV_01_C		INC	not tested yet
+ TC_FIX_BV_02_C		N/A
+-TC_EWC_BV_01_C		N/A
+-TC_EWC_BV_02_C		N/A
+-TC_EWC_BV_03_C		N/A
++TC_EWC_BV_01_C		INC	not tested yet
++TC_EWC_BV_02_C		INC	not tested yet
++TC_EWC_BV_03_C		INC	not tested yet
+ TC_LSC_BV_01_C		N/A
+ TC_LSC_BV_02_C		N/A
+ TC_LSC_BV_03_C		N/A
+@@ -150,16 +150,16 @@ TC_CCH_BV_01_C		N/A
+ TC_CCH_BV_02_C		N/A
+ TC_CCH_BV_03_C		N/A
+ TC_CCH_BV_04_C		N/A
+-TC_ECF_BV_01_C		N/A
+-TC_ECF_BV_02_C		N/A
+-TC_ECF_BV_03_C		N/A
+-TC_ECF_BV_04_C		N/A
+-TC_ECF_BV_05_C		N/A
+-TC_ECF_BV_06_C		N/A
+-TC_ECF_BV_07_C		N/A
+-TC_ECF_BV_08_C		N/A
+-TC_LE_CPU_BV_01_C	N/A
+-TC_LE_CPU_BV_02_C	N/A
+-TC_LE_CPU_BI_01_C	N/A
+-TC_LE_CPU_BI_02_C	N/A
+-TC_LE_REJ_BV_01_C	N/A
++TC_ECF_BV_01_C		INC	not tested yet
++TC_ECF_BV_02_C		INC	not tested yet
++TC_ECF_BV_03_C		INC	not tested yet
++TC_ECF_BV_04_C		INC	not tested yet
++TC_ECF_BV_05_C		INC	not tested yet
++TC_ECF_BV_06_C		INC	not tested yet
++TC_ECF_BV_07_C		INC	not tested yet
++TC_ECF_BV_08_C		INC	not tested yet
++TC_LE_CPU_BV_01_C	INC	not tested yet
++TC_LE_CPU_BV_02_C	INC	not tested yet
++TC_LE_CPU_BI_01_C	INC	not tested yet
++TC_LE_CPU_BI_02_C	INC	not tested yet
++TC_LE_REJ_BV_01_C	INC	not tested yet
 -- 
-1.8.4
+1.8.5.3
 
