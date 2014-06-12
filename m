@@ -1,28 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1402577830.27142.22.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [RFC] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Thu, 12 Jun 2014 15:57:10 +0300
-In-Reply-To: <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org>
-References: <1402493714-30849-1-git-send-email-marcel@holtmann.org>
-	 <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 10/10] android/bluetooth: Fix not setting expected discovery type
+Date: Thu, 12 Jun 2014 15:33:29 +0300
+Message-Id: <1402576409-9352-10-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1402576409-9352-1-git-send-email-luiz.dentz@gmail.com>
+References: <1402576409-9352-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On ke, 2014-06-11 at 18:00 +0200, Marcel Holtmann wrote:
-> Hello,
-> 
-> so this patch is just the groundwork to deal with the socket vs kernel internal handling of TX path. And this patch should most likely also be split into providing the default for alloc_skb and then adding memcpy_fromiovec.
-> 
-> And I have just compile-tested this patch. I have not run it yet. I leave this to someone else to actually test if this works ;)
+The code was not setting the expected discovery type for the next round
+when discovering is active.
+---
+ android/bluetooth.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-just tested this and it works ok so ACK from me.
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 9d17faa..bc10b38 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1292,8 +1292,11 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
+ 
+ 	adapter.cur_discovery_type = type;
+ 
+-	if (ev->discovering)
++	if (ev->discovering) {
++		adapter.exp_discovery_type = adapter.le_scanning ?
++						SCAN_TYPE_LE : SCAN_TYPE_NONE;
+ 		return;
++	}
+ 
+ 	/* One shot notification about discovery stopped */
+ 	if (gatt_discovery_stopped_cb) {
+-- 
+1.9.3
 
-
-Cheers,
-Jukka
