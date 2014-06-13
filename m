@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 11/11] android/gatt: Fix not setting medium security for paired devices
-Date: Fri, 13 Jun 2014 14:33:59 +0300
-Message-Id: <1402659239-26558-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 10/11] android/bluetooth: Fix not setting expected discovery type
+Date: Fri, 13 Jun 2014 14:33:58 +0300
+Message-Id: <1402659239-26558-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1402659239-26558-1-git-send-email-luiz.dentz@gmail.com>
 References: <1402659239-26558-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Always use medium security when connecting devices already paired since
-some profiles like HoG do require encryption.
+The code was not setting the expected discovery type for the next round
+when discovering is active.
 ---
- android/gatt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index d63efc9..5505cd0 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1430,8 +1430,8 @@ static int connect_le(struct gatt_device *dev)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 9d17faa..bc10b38 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1292,8 +1292,11 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
  
- 	DBG("Connection attempt to: %s", addr);
+ 	adapter.cur_discovery_type = type;
  
--	/* TODO: If we are bonded then we should use higier sec level */
--	sec_level = BT_IO_SEC_LOW;
-+	sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
-+								BT_IO_SEC_LOW;
+-	if (ev->discovering)
++	if (ev->discovering) {
++		adapter.exp_discovery_type = adapter.le_scanning ?
++						SCAN_TYPE_LE : SCAN_TYPE_NONE;
+ 		return;
++	}
  
- 	/*
- 	 * This connection will help us catch any PDUs that comes before
+ 	/* One shot notification about discovery stopped */
+ 	if (gatt_discovery_stopped_cb) {
 -- 
 1.9.3
 
