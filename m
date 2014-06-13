@@ -1,40 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <FA65A4B0-E573-4557-831F-D1F96025C6EB@holtmann.org>
-References: <1402364040-11502-1-git-send-email-armansito@chromium.org>
-	<1402364040-11502-2-git-send-email-armansito@chromium.org>
-	<8304B43A-6644-4766-B089-DB71F34A63EF@holtmann.org>
-	<CAHrH25QZfx1AJZvAaMDEzhkBawWeapCugSOkhkcVH3fbwpNAhg@mail.gmail.com>
-	<FA65A4B0-E573-4557-831F-D1F96025C6EB@holtmann.org>
-Date: Fri, 13 Jun 2014 14:14:56 -0700
-Message-ID: <CAHrH25Q1=tAvg-aYRi1B2qNDAztaJK4m44C5P56tPnVJamYK8A@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] src/shared/att: Introduce struct bt_att.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <1401381413-12782-1-git-send-email-johan.hedberg@gmail.com>
+References: <1401381413-12782-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 13 Jun 2014 12:25:37 -0700
+Message-ID: <CAHZ1yC=AtZu=hiJpfji4+jyb82J806if+VjwtGcYaDuDUqRdHQ@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix properly ignoring LTKs of unknown types
+From: Scott James Remnant <keybuk@google.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+You cc'd this to stable, but didn't Cc the patch that it modifies.
 
->> Hmm, according to the spec the "Optional authentication signature for
->> the Attribute Opcode and Attribute Parameters" is 12 octets in length.
->> See "Core v4.1, Vol 3, Part F, Section 3.3.1, Table 3: Format of
->> Attribute PDU", and tell me what I'm missing. Or are you suggesting
->> that we calculate the authentication signature in bt_att? My idea was
->> that the calculation of the signature and resolving (for incoming
->> signed requests) would be handled by an upper layer.
+Just sayin' ;-)
+
+On Thu, May 29, 2014 at 9:36 AM,  <johan.hedberg@gmail.com> wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
 >
-> We have to calculate the signature brand new anyway since it is generated over the actual PDU. So yes, lets store the master + slave signature keys in bt_att and handle the signature generation and verification internally.
+> In case there are new LTK types in the future we shouldn't just blindly
+> assume that != MGMT_LTK_UNAUTHENTICATED means that the key is
+> authenticated. This patch adds explicit checks for each allowed key type
+> in the form of a switch statement and skips any key which has an unknown
+> value.
 >
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/mgmt.c | 10 ++++++++--
+>  1 file changed, 8 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 5e9c21a5525f..0fce54412ffd 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4546,10 +4546,16 @@ static int load_long_term_keys(struct sock *sk, struct hci_dev *hdev,
+>                 else
+>                         type = HCI_SMP_LTK_SLAVE;
+>
+> -               if (key->type == MGMT_LTK_UNAUTHENTICATED)
+> +               switch (key->type) {
+> +               case MGMT_LTK_UNAUTHENTICATED:
+>                         authenticated = 0x00;
+> -               else
+> +                       break;
+> +               case MGMT_LTK_AUTHENTICATED:
+>                         authenticated = 0x01;
+> +                       break;
+> +               default:
+> +                       continue;
+> +               }
+>
+>                 hci_add_ltk(hdev, &key->addr.bdaddr, addr_type, type,
+>                             authenticated, key->val, key->enc_size, key->ediv,
+> --
+> 1.9.3
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-In that case, we need to access the remote and local sign counters as
-well, which change dynamically. Should bt_att store and internally
-manage that count then? Basically, the first time the CSRK is
-generated, the upper layer stores it by calling
-bt_att_set_signing_key() and that function internally initializes the
-local sign counter to 0? Similarly, bt_att would also keep track of
-the remote sign count?
 
--Arman
+
+-- 
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
