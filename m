@@ -1,294 +1,329 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 04/11] android/gatt: Fix not detecting device found by Bluetooth HAL
-Date: Fri, 13 Jun 2014 14:33:52 +0300
-Message-Id: <1402659239-26558-4-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1402659239-26558-1-git-send-email-luiz.dentz@gmail.com>
-References: <1402659239-26558-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 01/11] android/gatt: Make application API public
+Date: Fri, 13 Jun 2014 14:33:49 +0300
+Message-Id: <1402659239-26558-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is necessary so that devices found during regular discovery can be
-handled by gatt HAL.
+This in future gonna be used by HoG to receive connection notifications.
 ---
- android/bluetooth.c |  42 ++++++++++++++--------
- android/bluetooth.h |   5 ++-
- android/gatt.c      | 101 +++++++++++++++++++++++++++++-----------------------
- 3 files changed, 88 insertions(+), 60 deletions(-)
+v2: Fix hidhost states not being propagated and add patch to set medium
+security for devices paired.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index fac2637..4ec7c7a 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -179,6 +179,7 @@ static struct {
- 	uint32_t current_settings;
- 	uint32_t supported_settings;
- 
-+	bool le_scanning;
- 	uint8_t cur_discovery_type;
- 	uint8_t exp_discovery_type;
- 	uint32_t discoverable_timeout;
-@@ -1301,10 +1302,8 @@ static void mgmt_discovering_event(uint16_t index, uint16_t length,
- 	}
- 
- 	type = adapter.exp_discovery_type;
--	adapter.exp_discovery_type = SCAN_TYPE_NONE;
--
--	if (type == SCAN_TYPE_NONE && gatt_device_found_cb)
--		type = SCAN_TYPE_LE;
-+	adapter.exp_discovery_type = adapter.le_scanning ? SCAN_TYPE_LE :
-+								SCAN_TYPE_NONE;
- 
- 	if (type != SCAN_TYPE_NONE)
- 		start_discovery(type);
-@@ -3512,42 +3511,57 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
- 	return false;
- }
- 
-+bool bt_le_register(bt_le_device_found cb)
-+{
-+	if (gatt_device_found_cb)
-+		return false;
-+
-+	gatt_device_found_cb = cb;
-+
-+	return true;
-+}
-+
-+void bt_le_unregister(void)
-+{
-+	gatt_device_found_cb = NULL;
-+}
-+
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb)
- {
-+	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
-+		return false;
-+
-+	adapter.le_scanning = false;
-+
- 	if (adapter.cur_discovery_type != SCAN_TYPE_LE) {
- 		if (cb)
- 			cb();
- 
--		gatt_device_found_cb = NULL;
--
- 		return true;
- 	}
- 
- 	if (!stop_discovery(SCAN_TYPE_LE))
- 		return false;
- 
--	gatt_device_found_cb = NULL;
- 	gatt_discovery_stopped_cb = cb;
- 	adapter.exp_discovery_type = SCAN_TYPE_NONE;
- 
- 	return true;
- }
- 
--bool bt_le_discovery_start(bt_le_device_found cb)
-+bool bt_le_discovery_start(void)
- {
- 	if (!(adapter.current_settings & MGMT_SETTING_POWERED))
- 		return false;
- 
-+	adapter.le_scanning = true;
-+
- 	/* If core is discovering, don't bother */
--	if (adapter.cur_discovery_type != SCAN_TYPE_NONE) {
--		gatt_device_found_cb = cb;
-+	if (adapter.cur_discovery_type != SCAN_TYPE_NONE)
- 		return true;
--	}
- 
--	if (start_discovery(SCAN_TYPE_LE)) {
--		gatt_device_found_cb = cb;
-+	if (start_discovery(SCAN_TYPE_LE))
- 		return true;
--	}
- 
- 	return false;
- }
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index 2409d46..7c64bab 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -44,7 +44,10 @@ typedef void (*bt_le_device_found)(const bdaddr_t *addr, uint8_t addr_type,
- 					int rssi, uint16_t eir_len,
- 					const void *eir, bool discoverable,
- 					bool bonded);
--bool bt_le_discovery_start(bt_le_device_found cb);
-+bool bt_le_register(bt_le_device_found cb);
-+void bt_le_unregister(void);
-+
-+bool bt_le_discovery_start(void);
- 
- typedef void (*bt_le_discovery_stopped)(void);
- bool bt_le_discovery_stop(bt_le_discovery_stopped cb);
+ android/gatt.c | 142 +++++++++++++++++++++++++++++++++++++++++++++------------
+ android/gatt.h |  15 ++++++
+ 2 files changed, 129 insertions(+), 28 deletions(-)
+
 diff --git a/android/gatt.c b/android/gatt.c
-index a2314e0..13d03e8 100644
+index 741dc38..a2314e0 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -627,6 +627,47 @@ static void destroy_gatt_app(void *data)
+@@ -87,11 +87,6 @@ static const char const *device_state_str[] = {
+ 	"CONNECTED",
+ };
+ 
+-typedef enum {
+-	APP_CLIENT,
+-	APP_SERVER,
+-} gatt_app_type_t;
+-
+ struct pending_trans_data {
+ 	unsigned int id;
+ 	uint8_t opcode;
+@@ -101,10 +96,12 @@ struct gatt_app {
+ 	int32_t id;
+ 	uint8_t uuid[16];
+ 
+-	gatt_app_type_t type;
++	gatt_type_t type;
+ 
+ 	/* Valid for client applications */
+ 	struct queue *notifications;
++
++	gatt_conn_cb_t func;
+ };
+ 
+ struct element_id {
+@@ -617,7 +614,7 @@ static void destroy_gatt_app(void *data)
+ 	 * too. So remove all elements and then destroy queue.
+ 	 */
+ 
+-	if (app->type == APP_CLIENT)
++	if (app->type == GATT_CLIENT)
+ 		while (queue_peek_head(app->notifications)) {
+ 			struct notification_data *notification;
+ 
+@@ -630,14 +627,14 @@ static void destroy_gatt_app(void *data)
  	free(app);
  }
  
-+static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
-+						int rssi, uint16_t eir_len,
-+						const void *eir,
-+						bool discoverable, bool bonded)
-+{
-+	uint8_t buf[IPC_MTU];
-+	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
-+	struct gatt_device *dev;
-+	char bda[18];
-+
-+	if (!scanning || (!discoverable && !bonded))
-+		goto connect;
-+
-+	ba2str(addr, bda);
-+	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
-+
-+	bdaddr2android(addr, ev->bda);
-+	ev->rssi = rssi;
-+	ev->len = eir_len;
-+
-+	memcpy(ev->adv_data, eir, ev->len);
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
-+						HAL_EV_GATT_CLIENT_SCAN_RESULT,
-+						sizeof(*ev) + ev->len, ev);
-+
-+connect:
-+	dev = find_device_by_addr(addr);
-+	if (!dev || (dev->state != DEVICE_CONNECT_INIT))
-+		return;
-+
-+	device_set_state(dev, DEVICE_CONNECT_READY);
-+	dev->bdaddr_type = addr_type;
-+
-+	/*
-+	 * We are ok to perform connect now. Stop discovery
-+	 * and once it is stopped continue with creating ACL
-+	 */
-+	bt_le_discovery_stop(bt_le_discovery_stop_cb);
-+}
-+
- static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
+-static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
++static struct gatt_app *register_app(const uint8_t *uuid, gatt_type_t type)
  {
  	static int32_t application_id = 1;
-@@ -955,47 +996,6 @@ static struct service *create_service(uint8_t id, bool primary, char *uuid,
- 	return s;
- }
+ 	struct gatt_app *app;
  
--static void le_device_found_handler(const bdaddr_t *addr, uint8_t addr_type,
--						int rssi, uint16_t eir_len,
--						const void *eir,
--						bool discoverable, bool bonded)
--{
--	uint8_t buf[IPC_MTU];
--	struct hal_ev_gatt_client_scan_result *ev = (void *) buf;
--	struct gatt_device *dev;
--	char bda[18];
--
--	if (!scanning || (!discoverable && !bonded))
--		goto connect;
--
--	ba2str(addr, bda);
--	DBG("LE Device found: %s, rssi: %d, adv_data: %d", bda, rssi, !!eir);
--
--	bdaddr2android(addr, ev->bda);
--	ev->rssi = rssi;
--	ev->len = eir_len;
--
--	memcpy(ev->adv_data, eir, ev->len);
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_GATT,
--						HAL_EV_GATT_CLIENT_SCAN_RESULT,
--						sizeof(*ev) + ev->len, ev);
--
--connect:
--	dev = find_device_by_addr(addr);
--	if (!dev || (dev->state != DEVICE_CONNECT_INIT))
--		return;
--
--	device_set_state(dev, DEVICE_CONNECT_READY);
--	dev->bdaddr_type = addr_type;
--
--	/*
--	 * We are ok to perform connect now. Stop discovery
--	 * and once it is stopped continue with creating ACL
--	 */
--	bt_le_discovery_stop(bt_le_discovery_stop_cb);
--}
--
- static gboolean disconnected_cb(GIOChannel *io, GIOCondition cond,
- 							gpointer user_data)
- {
-@@ -1206,7 +1206,7 @@ reply:
- 
- 	/* Check if we should restart scan */
- 	if (scanning)
--		bt_le_discovery_start(le_device_found_handler);
-+		bt_le_discovery_start();
- 
- 	/* FIXME: What to do if discovery won't start here. */
- }
-@@ -1292,7 +1292,7 @@ static void handle_client_scan(const void *buf, uint16_t len)
+ 	if (queue_find(gatt_apps, match_app_by_uuid, uuid)) {
+ 		error("gatt: app uuid is already on list");
+-		return 0;
++		return NULL;
  	}
  
- 	/* Turn on scan */
--	if (!bt_le_discovery_start(le_device_found_handler)) {
-+	if (!bt_le_discovery_start()) {
- 		error("gatt: LE scan switch failed");
- 		status = HAL_STATUS_FAILED;
- 		goto reply;
-@@ -1324,7 +1324,7 @@ static void bt_le_discovery_stop_cb(void)
+ 	app = new0(struct gatt_app, 1);
+@@ -646,14 +643,14 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+ 		return 0;
+ 	}
  
- 	/* Check now if there is any device ready to connect */
- 	if (connect_next_dev() < 0)
--		bt_le_discovery_start(le_device_found_handler);
-+		bt_le_discovery_start();
+-	app->type = app_type;
++	app->type = type;
+ 
+-	if (app->type == APP_CLIENT) {
++	if (app->type == GATT_CLIENT) {
+ 		app->notifications = queue_new();
+ 		if (!app->notifications) {
+ 			error("gatt: couldn't allocate notifications queue");
+ 			destroy_gatt_app(app);
+-			return 0;
++			return NULL;
+ 		}
+ 	}
+ 
+@@ -664,33 +661,35 @@ static int register_app(const uint8_t *uuid, gatt_app_type_t app_type)
+ 	if (!queue_push_head(gatt_apps, app)) {
+ 		error("gatt: Cannot push app on the list");
+ 		destroy_gatt_app(app);
+-		return 0;
++		return NULL;
+ 	}
+ 
+-	if ((app->type == APP_SERVER) &&
++	if ((app->type == GATT_SERVER) &&
+ 			!queue_push_tail(listen_apps, INT_TO_PTR(app->id))) {
+ 		error("gatt: Cannot push server on the list");
+ 		destroy_gatt_app(app);
+-		return 0;
++		return NULL;
+ 	}
+ 
+-	return app->id;
++	return app;
  }
  
- static struct gatt_device *create_device(const bdaddr_t *addr)
-@@ -1433,7 +1433,7 @@ static bool trigger_connection(struct app_connection *connection)
+ static void handle_client_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_client_register *cmd = buf;
+ 	struct hal_ev_gatt_client_register_client ev;
++	struct gatt_app *app;
  
- 	/* after state change trigger discovering */
- 	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
--		if (!bt_le_discovery_start(le_device_found_handler)) {
-+		if (!bt_le_discovery_start()) {
- 			error("gatt: Could not start scan");
+ 	DBG("");
  
- 			return false;
-@@ -5901,6 +5901,15 @@ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr)
- 	if (!start_listening_io())
- 		return false;
+ 	memset(&ev, 0, sizeof(ev));
  
-+	if (!bt_le_register(le_device_found_handler)) {
-+		error("gatt: bt_le_register failed");
-+
-+		g_io_channel_unref(listening_io);
-+		listening_io = NULL;
-+
-+		return false;
+-	ev.client_if = register_app(cmd->uuid, APP_CLIENT);
++	app = register_app(cmd->uuid, GATT_CLIENT);
+ 
+-	if (ev.client_if)
++	if (app) {
++		ev.client_if = app->id;
+ 		ev.status = GATT_SUCCESS;
+-	else
++	} else
+ 		ev.status = GATT_FAILURE;
+ 
+ 	/* We should send notification with given in cmd UUID */
+@@ -708,6 +707,12 @@ static void send_client_disconnection_notify(struct app_connection *connection,
+ {
+ 	struct hal_ev_gatt_client_disconnect ev;
+ 
++	if (connection->app->func) {
++		connection->app->func(&connection->device->bdaddr, -ENOTCONN,
++						connection->device->attrib);
++		return;
 +	}
 +
- 	crypto = bt_crypto_new();
- 	if (!crypto) {
- 		error("gatt: Failed to setup crypto");
-@@ -5985,6 +5994,8 @@ void bt_gatt_unregister(void)
+ 	ev.client_if = connection->app->id;
+ 	ev.conn_id = connection->id;
+ 	ev.status = status;
+@@ -723,6 +728,13 @@ static void send_client_connection_notify(struct app_connection *connection,
+ {
+ 	struct hal_ev_gatt_client_connect ev;
  
- 	bt_crypto_unref(crypto);
- 	crypto = NULL;
++	if (connection->app->func) {
++		connection->app->func(&connection->device->bdaddr,
++					status == GATT_SUCCESS ? 0 : -ENOTCONN,
++					connection->device->attrib);
++		return;
++	}
 +
-+	bt_le_unregister();
+ 	ev.client_if = connection->app->id;
+ 	ev.conn_id = connection->id;
+ 	ev.status = status;
+@@ -738,6 +750,13 @@ static void send_server_connection_notify(struct app_connection *connection,
+ {
+ 	struct hal_ev_gatt_server_connection ev;
+ 
++	if (connection->app->func) {
++		connection->app->func(&connection->device->bdaddr,
++					connected ? 0 : -ENOTCONN,
++					connection->device->attrib);
++		return;
++	}
++
+ 	ev.server_if = connection->app->id;
+ 	ev.conn_id = connection->id;
+ 	ev.connected = connected;
+@@ -751,7 +770,7 @@ static void send_server_connection_notify(struct app_connection *connection,
+ static void send_app_disconnect_notify(struct app_connection *connection,
+ 								int32_t status)
+ {
+-	if (connection->app->type == APP_CLIENT)
++	if (connection->app->type == GATT_CLIENT)
+ 		send_client_disconnection_notify(connection, status);
+ 	else
+ 		send_server_connection_notify(connection, !!status);
+@@ -760,9 +779,9 @@ static void send_app_disconnect_notify(struct app_connection *connection,
+ static void send_app_connect_notify(struct app_connection *connection,
+ 								int32_t status)
+ {
+-	if (connection->app->type == APP_CLIENT)
++	if (connection->app->type == GATT_CLIENT)
+ 		send_client_connection_notify(connection, status);
+-	else
++	else if (connection->app->type == GATT_SERVER)
+ 		send_server_connection_notify(connection, !status);
  }
  
+@@ -3566,9 +3585,11 @@ static void handle_client_test_command(const void *buf, uint16_t len)
+ 	switch (cmd->command) {
+ 	case GATT_CLIENT_TEST_CMD_ENABLE:
+ 		if (cmd->u1) {
+-			if (!test_client_if)
+-				test_client_if = register_app(TEST_UUID,
+-								APP_CLIENT);
++			if (!test_client_if) {
++				app = register_app(TEST_UUID, GATT_CLIENT);
++				if (app)
++					test_client_if = app->id;
++			}
  
+ 			if (test_client_if)
+ 				status = HAL_STATUS_SUCCESS;
+@@ -3613,16 +3634,18 @@ static void handle_server_register(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_gatt_server_register *cmd = buf;
+ 	struct hal_ev_gatt_server_register ev;
++	struct gatt_app *app;
+ 
+ 	DBG("");
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+-	ev.server_if = register_app(cmd->uuid, APP_SERVER);
++	app = register_app(cmd->uuid, GATT_SERVER);
+ 
+-	if (ev.server_if)
++	if (app) {
++		ev.server_if = app->id;
+ 		ev.status = GATT_SUCCESS;
+-	else
++	} else
+ 		ev.status = GATT_FAILURE;
+ 
+ 	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
+@@ -5963,3 +5986,66 @@ void bt_gatt_unregister(void)
+ 	bt_crypto_unref(crypto);
+ 	crypto = NULL;
+ }
++
++
++unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
++							gatt_conn_cb_t func)
++{
++	struct gatt_app *app;
++	bt_uuid_t uuid128;
++
++	bt_string_to_uuid(&uuid128, uuid);
++	app = register_app((void *) &uuid128.value.u128, type);
++	if (!app)
++		return 0;
++
++	app->func = func;
++
++	return app->id;
++}
++
++bool bt_gatt_unregister_app(unsigned int id)
++{
++	uint8_t status;
++
++	status = unregister_app(id);
++
++	return status != HAL_STATUS_FAILED;
++}
++
++bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr)
++{
++	uint8_t status;
++
++	status = handle_connect(id, addr);
++
++	return status != HAL_STATUS_FAILED;
++}
++
++bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr)
++{
++	struct app_connection match;
++	struct app_connection *conn;
++	struct gatt_device *device;
++	struct gatt_app *app;
++
++	app = find_app_by_id(id);
++	if (!app)
++		return false;
++
++	device = find_device_by_addr(addr);
++	if (!device)
++		return false;
++
++	match.device = device;
++	match.app = app;
++
++	conn = queue_find(app_connections, match_connection_by_device_and_app,
++									&match);
++	if (!conn)
++		return false;
++
++	trigger_disconnection(conn);
++
++	return true;
++}
+diff --git a/android/gatt.h b/android/gatt.h
+index d4392d9..5ba9161 100644
+--- a/android/gatt.h
++++ b/android/gatt.h
+@@ -23,3 +23,18 @@
+ 
+ bool bt_gatt_register(struct ipc *ipc, const bdaddr_t *addr);
+ void bt_gatt_unregister(void);
++
++
++typedef enum {
++	GATT_CLIENT,
++	GATT_SERVER,
++} gatt_type_t;
++
++typedef void (*gatt_conn_cb_t)(const bdaddr_t *addr, int err, void *attrib);
++
++unsigned int bt_gatt_register_app(const char *uuid, gatt_type_t type,
++							gatt_conn_cb_t func);
++bool bt_gatt_unregister_app(unsigned int id);
++
++bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
++bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
 -- 
 1.9.3
 
