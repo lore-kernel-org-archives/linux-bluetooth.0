@@ -1,30 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Allow change security level on ATT_CID in slave role
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402661302-26674-1-git-send-email-marcin.kraglak@tieto.com>
-Date: Fri, 13 Jun 2014 14:58:28 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <9F285574-AE23-4F81-94BD-7E62DC60D9AE@holtmann.org>
-References: <1402661302-26674-1-git-send-email-marcin.kraglak@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v6 3/4] Bluetooth: 6LoWPAN: Count module usage
+Date: Fri, 13 Jun 2014 15:53:32 +0300
+Message-Id: <1402664013-29358-4-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1402664013-29358-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1402664013-29358-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Count how many 6LoWPAN connections there exists so that we
+do not unload the module if there are still connections alive.
 
-> Kernel supports SMP Security Request so don't block increasing security
-> when we are slave.
-> 
-> Signed-off-by: Marcin Kraglak <marcin.kraglak@tieto.com>
-> ---
-> net/bluetooth/l2cap_sock.c | 5 -----
-> 1 file changed, 5 deletions(-)
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ net/bluetooth/6lowpan.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-patch has been applied to bluetooth tree.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index b477e15..dd72ad2 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -101,6 +101,8 @@ static inline bool peer_del(struct lowpan_dev *dev, struct lowpan_peer *peer)
+ {
+ 	list_del(&peer->list);
+ 
++	module_put(THIS_MODULE);
++
+ 	if (atomic_dec_and_test(&dev->peer_count)) {
+ 		BT_DBG("last peer");
+ 		return true;
+@@ -752,6 +754,9 @@ static inline void chan_ready_cb(struct l2cap_chan *chan)
+ 		}
+ 	}
+ 
++	if (!try_module_get(THIS_MODULE))
++		return;
++
+ 	add_peer_chan(chan, dev);
+ 	ifup(dev->netdev);
+ }
+-- 
+1.8.3.1
 
