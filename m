@@ -1,43 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Fix wrong check
-Date: Fri, 13 Jun 2014 16:44:55 +0200
-Message-ID: <7464350.jhI9E2pFpN@uw000953>
-In-Reply-To: <1402569654-27092-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1402569654-27092-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] android/pts: Add PICS and PIXIT for HOGP
+Date: Fri, 13 Jun 2014 16:44:10 +0200
+Message-ID: <2081366.EEUJuCWOxT@uw000953>
+In-Reply-To: <1402562683-5735-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1402562683-5735-1-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Jakub,
 
-On Thursday 12 of June 2014 13:40:54 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+On Thursday 12 of June 2014 10:44:43 Jakub Tyszkowski wrote:
 > ---
->  android/gatt.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  android/pics-hogp.txt  | 397 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  android/pixit-hogp.txt |  28 ++++
+>  2 files changed, 425 insertions(+)
+>  create mode 100644 android/pics-hogp.txt
+>  create mode 100644 android/pixit-hogp.txt
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index cc3746c..8da77d0 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4133,8 +4133,8 @@ static void fill_gatt_response_by_handle(uint16_t handle, uint16_t offset,
->  
->  	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
->  							UINT_TO_PTR(handle));
-> -	if (entry) {
-> -		DBG("No pending response found! Bogus android response?");
-> +	if (!entry) {
-> +		error("No pending response found! Bogus android response?");
->  		return;
->  	}
+> diff --git a/android/pics-hogp.txt b/android/pics-hogp.txt
+> new file mode 100644
 
-I've already pushed similar fix from Marcin. But please rebase and send
-DBG to error change.
+Applied. Thanks.
 
 -- 
 Best regards, 
