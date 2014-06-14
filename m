@@ -1,60 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/6] android/hal-health: Add channel state event handler
-Date: Mon, 16 Jun 2014 09:25:59 +0200
-Message-ID: <2122561.WZrcmGmJP0@uw000953>
-In-Reply-To: <1402578618-31484-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1402578618-31484-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH v3 1/4] src/shared/att: Introduce struct bt_att.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHrH25Q1=tAvg-aYRi1B2qNDAztaJK4m44C5P56tPnVJamYK8A@mail.gmail.com>
+Date: Sat, 14 Jun 2014 15:45:17 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <F3482ECB-0CC7-4D53-88ED-D7A6BF72162F@holtmann.org>
+References: <1402364040-11502-1-git-send-email-armansito@chromium.org> <1402364040-11502-2-git-send-email-armansito@chromium.org> <8304B43A-6644-4766-B089-DB71F34A63EF@holtmann.org> <CAHrH25QZfx1AJZvAaMDEzhkBawWeapCugSOkhkcVH3fbwpNAhg@mail.gmail.com> <FA65A4B0-E573-4557-831F-D1F96025C6EB@holtmann.org> <CAHrH25Q1=tAvg-aYRi1B2qNDAztaJK4m44C5P56tPnVJamYK8A@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Arman,
 
-On Thursday 12 of June 2014 16:10:13 Ravi kumar Veeramally wrote:
-> ---
->  android/hal-health.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
+>>> Hmm, according to the spec the "Optional authentication signature for
+>>> the Attribute Opcode and Attribute Parameters" is 12 octets in length.
+>>> See "Core v4.1, Vol 3, Part F, Section 3.3.1, Table 3: Format of
+>>> Attribute PDU", and tell me what I'm missing. Or are you suggesting
+>>> that we calculate the authentication signature in bt_att? My idea was
+>>> that the calculation of the signature and resolving (for incoming
+>>> signed requests) would be handled by an upper layer.
+>> 
+>> We have to calculate the signature brand new anyway since it is generated over the actual PDU. So yes, lets store the master + slave signature keys in bt_att and handle the signature generation and verification internally.
+>> 
 > 
-> diff --git a/android/hal-health.c b/android/hal-health.c
-> index 0ef6afc..27e72dc 100644
-> --- a/android/hal-health.c
-> +++ b/android/hal-health.c
-> @@ -41,6 +41,17 @@ static void handle_app_registration_state(void *buf, uint16_t len, int fd)
->  		cbacks->app_reg_state_cb(ev->id, ev->state);
->  }
->  
-> +static void handle_channel_state(void *buf, uint16_t len, int fd)
-> +{
-> +	struct hal_ev_health_channel_state *ev = buf;
-> +
-> +	if (cbacks->channel_state_cb)
-> +		cbacks->channel_state_cb(ev->app_id,
-> +					(bt_bdaddr_t *) ev->bdaddr,
-> +					ev->mdep_index, ev->channel_id,
-> +					ev->channel_state, fd);
-> +}
-> +
->  /*
->   * handlers will be called from notification thread context,
->   * index in table equals to 'opcode - HAL_MINIMUM_EVENT'
-> @@ -49,6 +60,9 @@ static const struct hal_ipc_handler ev_handlers[] = {
->  	/* HAL_EV_HEALTH_APP_REG_STATE */
->  	{ handle_app_registration_state, false,
->  				sizeof(struct hal_ev_health_app_reg_state) },
-> +	/* HAL_EV_HEALTH_CHANNEL_STATE */
-> +	{ handle_channel_state, false,
-> +				sizeof(struct hal_ev_health_channel_state) },
->  };
->  
->  static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
-> 
+> In that case, we need to access the remote and local sign counters as
+> well, which change dynamically. Should bt_att store and internally
+> manage that count then? Basically, the first time the CSRK is
+> generated, the upper layer stores it by calling
+> bt_att_set_signing_key() and that function internally initializes the
+> local sign counter to 0? Similarly, bt_att would also keep track of
+> the remote sign count?
 
-This patch is now applied, thanks.
+so for the ATT channels you will get a new fd for each connection, either from connect() or from accept() and when you create the bt_att via bt_att_new(), then you also need to set they CSRK if you have them available.
 
--- 
-Best regards, 
-Szymon Janc
+But you have a point with the sign counters. I think that for the lifetime of the bt_att, the sign counter should be managed internally. However it might be a good idea to provide the current sign counter when setting the signature key. In addition if we want to make the sign counter persistent, we need a way to read the current one so we can store it.
+
+Regards
+
+Marcel
+
