@@ -2,43 +2,50 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 2/2] android/health: Verify register_app command correctness
-Date: Mon, 16 Jun 2014 15:27:36 +0200
-Message-Id: <1402925256-9096-2-git-send-email-szymon.janc@tieto.com>
-In-Reply-To: <1402925256-9096-1-git-send-email-szymon.janc@tieto.com>
-References: <1402925256-9096-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 1/2] android/hal-health: Fix not setting offsets for empty strings
+Date: Mon, 16 Jun 2014 15:27:35 +0200
+Message-Id: <1402925256-9096-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Make sure that offsets are correct as those will be used to access
-command buffer.
+In register_app command all strings except app name are optional.
+Those are passed over IPC concatenated and offsets are used to
+determine string presence and length.
 ---
- android/health.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ android/hal-health.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index 655d9f9..8279f87 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -48,6 +48,18 @@ static struct ipc *hal_ipc = NULL;
+diff --git a/android/hal-health.c b/android/hal-health.c
+index 012b6b7..ab06658 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -93,23 +93,23 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 	memcpy(cmd->data, reg->application_name, len);
+ 	off += len;
  
- static void bt_health_register_app(const void *buf, uint16_t len)
- {
-+	const struct hal_cmd_health_reg_app *cmd = buf;
-+
-+	if (len != sizeof(*cmd) + cmd->len ||
-+			cmd->app_name_off > cmd->provider_name_off ||
-+			cmd->provider_name_off > cmd->service_name_off ||
-+			cmd->service_name_off > cmd->service_descr_off ||
-+			cmd->service_descr_off > cmd->len) {
-+		error("health: Invalid register app command, terminating");
-+		raise(SIGTERM);
-+		return;
-+	}
-+
- 	DBG("Not implemented");
++	cmd->provider_name_off = off;
+ 	if (reg->provider_name) {
+ 		len = strlen(reg->provider_name) + 1;
+-		cmd->provider_name_off = off;
+ 		memcpy(cmd->data + off, reg->provider_name, len);
+ 		off += len;
+ 	}
  
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
++	cmd->service_name_off = off;
+ 	if (reg->srv_name) {
+ 		len = strlen(reg->srv_name) + 1;
+-		cmd->service_name_off = off;
+ 		memcpy(cmd->data + off, reg->srv_name, len);
+ 		off += len;
+ 	}
+ 
++	cmd->service_descr_off = off;
+ 	if (reg->srv_desp) {
+ 		len = strlen(reg->srv_desp) + 1;
+-		cmd->service_descr_off = off;
+ 		memcpy(cmd->data + off, reg->srv_desp, len);
+ 		off += len;
+ 	}
 -- 
 1.9.1
 
