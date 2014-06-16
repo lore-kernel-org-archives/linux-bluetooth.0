@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
+Message-ID: <539F80DB.2070707@entiance.com>
+Date: Tue, 17 Jun 2014 09:42:19 +1000
+From: Russell McLernon <russell@entiance.com>
+MIME-Version: 1.0
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] android/bluetooth: Clear CSRK information after unpair
-Date: Tue, 17 Jun 2014 08:54:49 +0200
-Message-Id: <1402988090-15544-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Bluetooth on Ubuntu 14.04 uses 100% cpu on HID disconnect
+Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-CSRK information should be removed when unpaired.
----
- android/bluetooth.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Hi all, I noticed that bluetoothd was jumping to 100% cpu usage when I 
+switch my bluetooth keyboard off.  Then when I turn it back on the CPU 
+drops back down.
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index bc10b38..092bdd7 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -796,6 +796,12 @@ static void update_le_state(struct device *dev, bool pairing, bool paired,
- 	} else if (!paired && !dev->bredr_paired) {
- 		bonded_devices = g_slist_remove(bonded_devices, dev);
- 		remove_device_info(dev, DEVICES_FILE);
-+		dev->valid_local_csrk = false;
-+		dev->valid_remote_csrk = false;
-+		dev->local_sign_cnt = 0;
-+		dev->remote_sign_cnt = 0;
-+		memset(dev->local_csrk, 0, sizeof(dev->local_csrk));
-+		memset(dev->remote_csrk, 0, sizeof(dev->remote_csrk));
- 		cache_device(dev);
- 	}
- 
--- 
-1.9.3
+Details:
+Ubuntu 14.04 32bit
+bluetoothd 4.101
+default kernel 3.13, bluetooth module 2.17
 
+I upgraded to bluetoothd 5.19 and it does the same thing.
+
+here is a backtrace from gdb (bluetoothd 5.19):
+
+#0  0x00007ffff71a8fa0 in __poll_nocancel () at 
+../sysdeps/unix/syscall-template.S:81
+#1  0x00007ffff7b1afe4 in ?? () from /lib/x86_64-linux-gnu/libglib-2.0.so.0
+#2  0x00007ffff7b1b30a in g_main_loop_run () from 
+/lib/x86_64-linux-gnu/libglib-2.0.so.0
+#3  0x000000000040a983 in ?? ()
+#4  0x00007fffffffe748 in ?? ()
+#5  0x0000000100000000 in ?? ()
+#6  0x00007fff00000001 in ?? ()
+#7  0x00007ffff7ffe1c8 in _r_debug ()
+#8  0x0000000000000000 in ?? ()
