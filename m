@@ -1,630 +1,311 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 4/6] android/health: Add HDP SDP record
-Date: Mon, 16 Jun 2014 11:26:22 +0200
-Message-ID: <25510840.Z9IdhSoFaK@uw000953>
-In-Reply-To: <539EB66E.9060004@linux.intel.com>
-References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com> <25055319.SA5P6PKI9t@uw000953> <539EB66E.9060004@linux.intel.com>
+Message-ID: <539EB741.9030800@linux.intel.com>
+Date: Mon, 16 Jun 2014 12:22:09 +0300
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/6] android/health: Cache health application data on
+ app register call
+References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1402578618-31484-3-git-send-email-ravikumar.veeramally@linux.intel.com> <1536603.hQuXxHqAUl@uw000953>
+In-Reply-To: <1536603.hQuXxHqAUl@uw000953>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Szymon,
 
-On Monday 16 of June 2014 12:18:38 Ravi kumar Veeramally wrote:
-> Hi Szymon,
-> 
-> On 06/16/2014 11:57 AM, Szymon Janc wrote:
-> > Hi Ravi,
-> >
-> > On Thursday 12 of June 2014 16:10:16 Ravi kumar Veeramally wrote:
-> >> SDP record preparation code copied from profiles/health/hdp_uitl.c.
-> >> So applying GSyC copyrights.
->   I added here in commit message why I am adding GSyc copyrights.
-> >> ---
-> >>   android/health.c | 479 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >>   1 file changed, 478 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/android/health.c b/android/health.c
-> >> index 397cef6..45255df 100644
-> >> --- a/android/health.c
-> >> +++ b/android/health.c
-> >> @@ -3,6 +3,7 @@
-> >>    *  BlueZ - Bluetooth protocol stack for Linux
-> >>    *
-> >>    *  Copyright (C) 2014  Intel Corporation. All rights reserved.
-> >> + *  Copyright (C) 2010 GSyC/LibreSoft, Universidad Rey Juan Carlos.
-> > Add info in commit message why this is added ie. copied code?
->    Commented above.
-
-OK, I must have missed it:)
-
-> 
-> >
-> >>    *
-> >>    *
-> >>    *  This library is free software; you can redistribute it and/or
-> >> @@ -31,6 +32,7 @@
-> >>   #include <unistd.h>
-> >>   #include <glib.h>
-> >>   
-> >> +#include "btio/btio.h"
-> >>   #include "lib/bluetooth.h"
-> >>   #include "lib/sdp.h"
-> >>   #include "lib/sdp_lib.h"
-> >> @@ -44,10 +46,18 @@
-> >>   #include "utils.h"
-> >>   #include "bluetooth.h"
-> >>   #include "health.h"
-> >> +#include "mcap-lib.h"
-> >> +
-> >> +#define SVC_HINT_HEALTH			0x00
-> >> +#define HDP_VERSION			0x0101
-> >> +#define DATA_EXCHANGE_SPEC_11073	0x01
-> >>   
-> >>   static bdaddr_t adapter_addr;
-> >>   static struct ipc *hal_ipc = NULL;
-> >>   static struct queue *apps = NULL;
-> >> +static struct mcap_instance *mcap = NULL;
-> >> +static uint32_t record_id = 0;
-> >> +static uint32_t record_state = 0;
-> >>   
-> >>   struct mdep_cfg {
-> >>   	uint8_t role;
-> >> @@ -95,6 +105,14 @@ static void free_health_app(void *data)
-> >>   	free(app);
-> >>   }
-> >>   
-> >> +static bool mdep_by_mdep_role(const void *data, const void *user_data)
-> >> +{
-> >> +	const struct mdep_cfg *mdep = data;
-> >> +	uint16_t role = PTR_TO_INT(user_data);
-> >> +
-> >> +	return mdep->role == role;
-> >> +}
-> >> +
-> >>   static bool app_by_app_id(const void *data, const void *user_data)
-> >>   {
-> >>   	const struct health_app *app = data;
-> >> @@ -103,6 +121,418 @@ static bool app_by_app_id(const void *data, const void *user_data)
-> >>   	return app->id == app_id;
-> >>   }
-> >>   
-> >> +static int register_service_protocols(sdp_record_t *rec,
-> >> +					struct health_app *app)
-> >> +{
-> >> +	uuid_t l2cap_uuid, mcap_c_uuid;
-> >> +	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
-> >> +	sdp_list_t *access_proto_list = NULL;
-> >> +	sdp_data_t *psm = NULL, *mcap_ver = NULL;
-> >> +	uint32_t ccpsm;
-> >> +	uint16_t version = MCAP_VERSION;
-> >> +	GError *err = NULL;
-> >> +	int ret = -1;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	/* set l2cap information */
-> >> +	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-> >> +	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
-> >> +	if (!l2cap_list)
-> >> +		goto fail;
-> >> +
-> >> +	ccpsm = mcap_get_ctrl_psm(mcap, &err);
-> >> +	if (err)
-> >> +		goto fail;
-> >> +
-> >> +	psm = sdp_data_alloc(SDP_UINT16, &ccpsm);
-> >> +	if (!psm)
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(l2cap_list, psm))
-> >> +		goto fail;
-> >> +
-> >> +	proto_list = sdp_list_append(NULL, l2cap_list);
-> >> +	if (!proto_list)
-> >> +		goto fail;
-> >> +
-> >> +	/* set mcap information */
-> >> +	sdp_uuid16_create(&mcap_c_uuid, MCAP_CTRL_UUID);
-> >> +	mcap_list = sdp_list_append(NULL, &mcap_c_uuid);
-> >> +	if (!mcap_list)
-> >> +		goto fail;
-> >> +
-> >> +	mcap_ver = sdp_data_alloc(SDP_UINT16, &version);
-> >> +	if (!mcap_ver)
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(mcap_list, mcap_ver))
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(proto_list, mcap_list))
-> >> +		goto fail;
-> >> +
-> >> +	/* attach protocol information to service record */
-> >> +	access_proto_list = sdp_list_append(NULL, proto_list);
-> >> +	if (!access_proto_list)
-> >> +		goto fail;
-> >> +
-> >> +	sdp_set_access_protos(rec, access_proto_list);
-> >> +	ret = 0;
-> >> +
-> >> +fail:
-> >> +	sdp_list_free(l2cap_list, NULL);
-> >> +	sdp_list_free(mcap_list, NULL);
-> >> +	sdp_list_free(proto_list, NULL);
-> >> +	sdp_list_free(access_proto_list, NULL);
-> >> +
-> >> +	if (psm)
-> >> +		sdp_data_free(psm);
-> >> +
-> >> +	if (mcap_ver)
-> >> +		sdp_data_free(mcap_ver);
-> >> +
-> >> +	if (err)
-> >> +		g_error_free(err);
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static int register_service_profiles(sdp_record_t *rec)
-> >> +{
-> >> +	int ret;
-> >> +	sdp_list_t *profile_list;
-> >> +	sdp_profile_desc_t hdp_profile;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	/* set hdp information */
-> >> +	sdp_uuid16_create(&hdp_profile.uuid, HDP_SVCLASS_ID);
-> >> +	hdp_profile.version = HDP_VERSION;
-> >> +	profile_list = sdp_list_append(NULL, &hdp_profile);
-> >> +	if (!profile_list)
-> >> +		return -1;
-> >> +
-> >> +	/* set profile descriptor list */
-> >> +	if (sdp_set_profile_descs(rec, profile_list) < 0)
-> >> +		ret = -1;
-> >> +	else
-> >> +		ret = 0;
-> > Why not just  ret = sdp_set_profile_descs() ?
->    Ok.
-> >
-> >> +
-> >> +	sdp_list_free(profile_list, NULL);
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static int register_service_additional_protocols(sdp_record_t *rec,
-> >> +						struct health_app *app)
-> >> +{
-> >> +	int ret = -1;
-> >> +	uuid_t l2cap_uuid, mcap_d_uuid;
-> >> +	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
-> >> +	sdp_list_t *access_proto_list = NULL;
-> >> +	sdp_data_t *psm = NULL;
-> >> +	uint32_t dcpsm;
-> >> +	GError *err;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	/* set l2cap information */
-> >> +	sdp_uuid16_create(&l2cap_uuid, L2CAP_UUID);
-> >> +	l2cap_list = sdp_list_append(NULL, &l2cap_uuid);
-> >> +	if (!l2cap_list)
-> >> +		goto fail;
-> >> +
-> >> +	dcpsm = mcap_get_ctrl_psm(mcap, &err);
-> >> +	if (err)
-> >> +		goto fail;
-> >> +
-> >> +	psm = sdp_data_alloc(SDP_UINT16, &dcpsm);
-> >> +	if (!psm)
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(l2cap_list, psm))
-> >> +		goto fail;
-> >> +
-> >> +	proto_list = sdp_list_append(NULL, l2cap_list);
-> >> +	if (!proto_list)
-> >> +		goto fail;
-> >> +
-> >> +	/* set mcap information */
-> >> +	sdp_uuid16_create(&mcap_d_uuid, MCAP_DATA_UUID);
-> >> +	mcap_list = sdp_list_append(NULL, &mcap_d_uuid);
-> >> +	if (!mcap_list)
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(proto_list, mcap_list))
-> >> +		goto fail;
-> >> +
-> >> +	/* attach protocol information to service record */
-> >> +	access_proto_list = sdp_list_append(NULL, proto_list);
-> >> +	if (!access_proto_list)
-> >> +		goto fail;
-> >> +
-> >> +	sdp_set_add_access_protos(rec, access_proto_list);
-> >> +	ret = 0;
-> >> +
-> >> +fail:
-> >> +	sdp_list_free(l2cap_list, NULL);
-> >> +	sdp_list_free(mcap_list, NULL);
-> >> +	sdp_list_free(proto_list, NULL);
-> >> +	sdp_list_free(access_proto_list, NULL);
-> >> +
-> >> +	if (psm)
-> >> +		sdp_data_free(psm);
-> >> +
-> >> +	if (err)
-> >> +		g_error_free(err);
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static sdp_list_t *mdeps_to_sdp_features(struct mdep_cfg *mdep)
-> >> +{
-> >> +	sdp_data_t *mdepid, *dtype = NULL, *role = NULL, *descr = NULL;
-> >> +	sdp_list_t *f_list = NULL;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	mdepid = sdp_data_alloc(SDP_UINT8, &mdep->id);
-> >> +	if (!mdepid)
-> >> +		return NULL;
-> >> +
-> >> +	dtype = sdp_data_alloc(SDP_UINT16, &mdep->data_type);
-> >> +	if (!dtype)
-> >> +		goto fail;
-> >> +
-> >> +	role = sdp_data_alloc(SDP_UINT8, &mdep->role);
-> >> +	if (!role)
-> >> +		goto fail;
-> >> +
-> >> +	if (mdep->descr) {
-> >> +		descr = sdp_data_alloc(SDP_TEXT_STR8, mdep->descr);
-> >> +		if (!descr)
-> >> +			goto fail;
-> >> +	}
-> >> +
-> >> +	f_list = sdp_list_append(NULL, mdepid);
-> >> +	if (!f_list)
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(f_list, dtype))
-> >> +		goto fail;
-> >> +
-> >> +	if (!sdp_list_append(f_list, role))
-> >> +		goto fail;
-> >> +
-> >> +	if (descr && !sdp_list_append(f_list, descr))
-> >> +		goto fail;
-> >> +
-> >> +	return f_list;
-> >> +
-> >> +fail:
-> >> +	sdp_list_free(f_list, NULL);
-> >> +
-> >> +	if (mdepid)
-> >> +		sdp_data_free(mdepid);
-> >> +
-> >> +	if (dtype)
-> >> +		sdp_data_free(dtype);
-> >> +
-> >> +	if (role)
-> >> +		sdp_data_free(role);
-> >> +
-> >> +	if (descr)
-> >> +		sdp_data_free(descr);
-> >> +
-> >> +	return NULL;
-> >> +}
-> >> +
-> >> +static void free_hdp_list(void *list)
-> >> +{
-> >> +	sdp_list_t *hdp_list = list;
-> >> +
-> >> +	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
-> >> +	hdp_list = NULL;
-> >> +}
-> >> +
-> >> +static void register_features(void *data, void *user_data)
-> >> +{
-> >> +	struct mdep_cfg *mdep = data;
-> >> +	sdp_list_t **sup_features = user_data;
-> >> +	sdp_list_t *hdp_feature;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	hdp_feature = mdeps_to_sdp_features(mdep);
-> >> +	if (!hdp_feature)
-> >> +		return;
-> >> +
-> >> +	if (!*sup_features) {
-> >> +		*sup_features = sdp_list_append(NULL, hdp_feature);
-> >> +		if (!*sup_features) {
-> >> +			sdp_list_free(hdp_feature,
-> >> +					(sdp_free_func_t)sdp_data_free);
-> >> +		}
-> > {} are not needed for this if()
->   Ok.
-> >
-> >> +	} else if (!sdp_list_append(*sup_features, hdp_feature)) {
-> >> +		sdp_list_free(hdp_feature,
-> >> +					(sdp_free_func_t)sdp_data_free);
-> >> +	}
-> >> +}
-> >> +
-> >> +static int register_service_sup_features(sdp_record_t *rec,
-> >> +						struct health_app *app)
-> >> +{
-> >> +	sdp_list_t *sup_features = NULL;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	queue_foreach(app->mdeps, register_features, &sup_features);
-> >> +	if (!sup_features)
-> >> +		return -1;
-> >> +
-> >> +	if (sdp_set_supp_feat(rec, sup_features) < 0) {
-> >> +		sdp_list_free(sup_features, free_hdp_list);
-> >> +		return -1;
-> >> +	}
-> >> +
-> >> +	sdp_list_free(sup_features, free_hdp_list);
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int register_data_exchange_spec(sdp_record_t *rec)
-> >> +{
-> >> +	sdp_data_t *spec;
-> >> +	uint8_t data_spec = DATA_EXCHANGE_SPEC_11073;
-> >> +	/* As of now only 11073 is supported, so we set it as default */
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	spec = sdp_data_alloc(SDP_UINT8, &data_spec);
-> >> +	if (!spec)
-> >> +		return -1;
-> >> +
-> >> +	if (sdp_attr_add(rec, SDP_ATTR_DATA_EXCHANGE_SPEC, spec) < 0) {
-> >> +		sdp_data_free(spec);
-> >> +		return -1;
-> >> +	}
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int register_mcap_features(sdp_record_t *rec)
-> >> +{
-> >> +	sdp_data_t *mcap_proc;
-> >> +	uint8_t mcap_sup_proc = MCAP_SUP_PROC;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	mcap_proc = sdp_data_alloc(SDP_UINT8, &mcap_sup_proc);
-> >> +	if (!mcap_proc)
-> >> +		return -1;
-> >> +
-> >> +	if (sdp_attr_add(rec, SDP_ATTR_MCAP_SUPPORTED_PROCEDURES,
-> >> +							mcap_proc) < 0) {
-> >> +		sdp_data_free(mcap_proc);
-> >> +		return -1;
-> >> +	}
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int set_sdp_services_uuid(sdp_record_t *rec, uint8_t role)
-> >> +{
-> >> +	uuid_t source, sink;
-> >> +	sdp_list_t *list = NULL;
-> >> +
-> >> +	sdp_uuid16_create(&sink, HDP_SINK_SVCLASS_ID);
-> >> +	sdp_uuid16_create(&source, HDP_SOURCE_SVCLASS_ID);
-> >> +	sdp_get_service_classes(rec, &list);
-> >> +
-> >> +	switch (role) {
-> >> +	case HAL_HEALTH_MDEP_ROLE_SOURCE:
-> >> +		if (!sdp_list_find(list, &source, sdp_uuid_cmp))
-> >> +			list = sdp_list_append(list, &source);
-> >> +		break;
-> >> +
-> > This empty line is not needed.
->   Ok.
-> >
-> >> +	case HAL_HEALTH_MDEP_ROLE_SINK:
-> >> +		if (!sdp_list_find(list, &sink, sdp_uuid_cmp))
-> >> +			list = sdp_list_append(list, &sink);
-> > add break here.
->    Ok.
-> >
-> >> +	}
-> >> +
-> >> +	if (sdp_set_service_classes(rec, list) < 0) {
-> >> +		sdp_list_free(list, NULL);
-> >> +		return -1;
-> >> +	}
-> >> +
-> >> +	sdp_list_free(list, NULL);
-> >> +
-> >> +	return 0;
-> >> +}
-> >> +
-> >> +static int health_sdp_record(struct health_app *app)
-> >> +{
-> >> +	sdp_record_t *rec;
-> >> +	uint8_t role;
-> >> +
-> >> +	DBG("");
-> >> +
-> >> +	if (record_id > 0) {
-> >> +		bt_adapter_remove_record(record_id);
-> >> +		record_id = 0;
-> >> +	}
-> > Why is this needed?
->   If any other application register itself as different role or same role
->   with different MDEP configurations implementation in 
-> profiels/health/hdp*.c
->   removes current sdp record and prepares new HDP SDP record. Don't know
->   how exactly it suits to Android HAL api. It might be easy if we have 
-> multiple
-> HDP devices for test purpose. Better I will put TODO comments.
-
-So maybe name this health_sdp_record_update() or update_health_sdp_record().
-And add a comment in code why this is needed.
-
-> >
-> >> +
-> >> +	rec = sdp_record_alloc();
-> >> +	if (!rec)
-> >> +		return -1;
-> >> +
-> >> +	role = HAL_HEALTH_MDEP_ROLE_SOURCE;
-> >> +	if (queue_find(app->mdeps, mdep_by_mdep_role, INT_TO_PTR(role)))
-> >> +		set_sdp_services_uuid(rec, role);
-> >> +
-> >> +	role = HAL_HEALTH_MDEP_ROLE_SINK;
-> >> +	if (queue_find(app->mdeps, mdep_by_mdep_role, INT_TO_PTR(role)))
-> >> +		set_sdp_services_uuid(rec, role);
-> >> +
-> >> +	sdp_set_info_attr(rec, app->service_name, app->provider_name,
-> >> +							app->service_descr);
-> >> +
-> >> +	if (register_service_protocols(rec, app) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (register_service_profiles(rec) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (register_service_additional_protocols(rec, app) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (register_service_sup_features(rec, app) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (register_data_exchange_spec(rec) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (register_mcap_features(rec) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (sdp_set_record_state(rec, record_state++) < 0)
-> >> +		goto fail;
-> >> +
-> >> +	if (bt_adapter_add_record(rec, SVC_HINT_HEALTH) < 0) {
-> >> +		error("Failed to register HEALTH record");
-> >> +		goto fail;
-> >> +	}
-> >> +
-> >> +	record_id = rec->handle;
-> >> +
-> >> +	return 0;
-> >> +
-> >> +fail:
-> >> +	sdp_record_free(rec);
-> >> +
-> >> +	return -1;
-> >> +}
-> >> +
-> >>   static void bt_health_register_app(const void *buf, uint16_t buf_len)
-> >>   {
-> >>   	const struct hal_cmd_health_reg_app *cmd = buf;
-> >> @@ -222,7 +652,13 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
-> >>   		goto end;
-> >>   	}
-> >>   
-> >> -	/* TODO: Create MCAP instance and prepare SDP profile */
-> >> +	/* add sdp record from app data */
-> >> +	if (health_sdp_record(app) < 0) {
-> >> +		error("Error creating HDP SDP record");
-> >> +		status = HAL_STATUS_FAILED;
-> >> +		goto fail;
-> >> +	}
-> >> +
-> >>   	status = HAL_STATUS_SUCCESS;
-> >>   
-> >>   fail:
-> >> @@ -250,6 +686,11 @@ static void bt_health_unregister_app(const void *buf, uint16_t len)
-> >>   		return;
-> >>   	}
-> >>   
-> >> +	if (record_id > 0) {
-> >> +		bt_adapter_remove_record(record_id);
-> >> +		record_id = 0;
-> >> +	}
-> >> +
-> >>   	free_health_app(app);
-> >>   	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
-> >>   				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_SUCCESS);
-> >> @@ -289,14 +730,49 @@ static const struct ipc_handler cmd_handlers[] = {
-> >>   				sizeof(struct hal_cmd_health_destroy_channel) },
-> >>   };
-> >>   
-> >> +static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
-> >> +{
-> >> +	DBG("Not implemented");
-> >> +}
-> >> +
-> >> +static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
-> >> +{
-> >> +	DBG("Not implemented");
-> >> +}
-> >> +
-> >> +static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
-> >> +{
-> >> +	DBG("Not implemented");
-> >> +}
-> >> +
-> >> +static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
-> >> +{
-> >> +	DBG("Not implemented");
-> >> +}
-> >> +
-> >>   bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
-> >>   {
-> >> +	GError *err = NULL;
-> >> +
-> >>   	DBG("");
-> >>   
-> >>   	bacpy(&adapter_addr, addr);
-> >>   
-> >> +	mcap = mcap_create_instance(&adapter_addr, BT_IO_SEC_MEDIUM, 0, 0,
-> >> +					mcl_connected, mcl_reconnected,
-> >> +					mcl_disconnected, mcl_uncached,
-> >> +					NULL, /* CSP is not used right now */
-> >> +					NULL, &err);
-> >> +
-> >> +	if (!mcap) {
-> >> +		error("Error creating MCAP instance : %s", err->message);
-> >> +		g_error_free(err);
-> >> +		return false;
-> >> +	}
-> >> +
-> >>   	hal_ipc = ipc;
-> >>   	apps = queue_new();
-> >> +
-> > Move this in patch that added queue_new().
->    Ok.
-> >
-> >>   	ipc_register(hal_ipc, HAL_SERVICE_ID_HEALTH, cmd_handlers,
-> >>   						G_N_ELEMENTS(cmd_handlers));
-> >>   
-> >> @@ -307,6 +783,7 @@ void bt_health_unregister(void)
-> >>   {
-> >>   	DBG("");
-> >>   
-> >> +	mcap_instance_unref(mcap);
-> >>   	queue_destroy(apps, free_health_app);
-> >>   	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HEALTH);
-> >>   	hal_ipc = NULL;
-> >>
->   Thanks,
->   Ravi.
-
--- 
-Best regards, 
-Szymon Janc
+On 06/16/2014 11:23 AM, Szymon Janc wrote:
+> Hi Ravi,
+>
+> On Thursday 12 of June 2014 16:10:14 Ravi kumar Veeramally wrote:
+>> ---
+>>   android/health.c | 188 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>   1 file changed, 182 insertions(+), 6 deletions(-)
+>>
+>> diff --git a/android/health.c b/android/health.c
+>> index 655d9f9..a117390 100644
+>> --- a/android/health.c
+>> +++ b/android/health.c
+>> @@ -35,6 +35,8 @@
+>>   #include "lib/sdp.h"
+>>   #include "lib/sdp_lib.h"
+>>   #include "src/log.h"
+>> +#include "src/shared/util.h"
+>> +#include "src/shared/queue.h"
+>>   
+>>   #include "hal-msg.h"
+>>   #include "ipc-common.h"
+>> @@ -45,21 +47,193 @@
+>>   
+>>   static bdaddr_t adapter_addr;
+>>   static struct ipc *hal_ipc = NULL;
+>> +static struct queue *apps = NULL;
+>>   
+>> -static void bt_health_register_app(const void *buf, uint16_t len)
+>> +struct mdep_cfg {
+>> +	uint8_t role;
+>> +	uint16_t data_type;
+>> +	uint8_t channel_type;
+>> +	char *descr;
+>> +
+>> +	uint8_t id; /* mdep id */
+>> +};
+>> +
+>> +struct health_app {
+>> +	char *app_name;
+>> +	char *provider_name;
+>> +	char *service_name;
+>> +	char *service_descr;
+>> +	uint8_t num_of_mdep;
+>> +	struct queue *mdeps;
+>> +
+>> +	uint8_t id; /* app id */
+>> +};
+>> +
+>> +static void free_mdep_cfg(void *data)
+>>   {
+>> -	DBG("Not implemented");
+>> +	struct mdep_cfg *cfg = data;
+>>   
+>> -	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
+>> -							HAL_STATUS_UNSUPPORTED);
+>> +	if (!cfg)
+>> +		return;
+>> +
+>> +	free(cfg->descr);
+>> +	free(cfg);
+>> +}
+>> +
+>> +static void free_health_app(void *data)
+>> +{
+>> +	struct health_app *app = data;
+>> +
+>> +	if (!app)
+>> +		return;
+>> +
+>> +	free(app->app_name);
+>> +	free(app->provider_name);
+>> +	free(app->service_name);
+>> +	free(app->service_descr);
+>> +	queue_destroy(app->mdeps, free_mdep_cfg);
+>> +	free(app);
+>> +}
+>> +
+>> +static bool app_by_app_id(const void *data, const void *user_data)
+>> +{
+>> +	const struct health_app *app = data;
+>> +	uint16_t app_id = PTR_TO_INT(user_data);
+>> +
+>> +	return app->id == app_id;
+>> +}
+>> +
+>> +static void bt_health_register_app(const void *buf, uint16_t buf_len)
+>> +{
+>> +	const struct hal_cmd_health_reg_app *cmd = buf;
+>> +	struct hal_rsp_health_reg_app rsp;
+>> +	struct health_app *app;
+>> +	uint16_t off, len;
+>> +
+>> +	DBG("");
+>> +
+>> +	app = new0(struct health_app, 1);
+> Check if allocation succeed.
+  Ok.
+>
+>> +	app->id = queue_length(apps) + 1;
+>> +	app->num_of_mdep = cmd->num_of_mdep;
+>> +
+>> +	off = 0;
+>> +
+>> +	if (cmd->provider_name_off)
+>> +		len = cmd->provider_name_off;
+>> +	else if (cmd->service_name_off)
+>> +		len = cmd->service_name_off;
+>> +	else if (cmd->service_descr_off)
+>> +		len = cmd->service_descr_off;
+>> +	else
+>> +		len = cmd->len;
+> Offsets can be only increased so length is always next offset - current offset
+> ie.
+>
+> app_name_len = provider_name_off - app_name_off
+> provider_name_len = service_name_off - provider_name_off;
+> etc.
+>
+> Also how about factoring this to helper ie. create_health_app() ?
+> struct health_app *create_health_app(const uint8_t *app_name, uint16_t app_len,
+>                                       const uint8_t *provider_name, uint16_t provider_len, ...., int mdeps)
+>
+> and then just call it like:
+>
+> app_name = cmd->data + cmd->app_name_off;
+> app_len = cmd->provider_name_off - cmd->app_name_off;
+> ....
+>
+> app = create_health_app(app_name, app_len, ....);
+> if (!app) {
+>      status = HAL_STATUS_FAILED;
+>      goto failed;
+> }
+>
+> This should make code more readable.
+  Ok, make sense.
+>
+>> +
+>> +	app->app_name = malloc0(len);
+> Check if allocation succeed.
+  Ok.
+>> +	memcpy(app->app_name, cmd->data, len);
+>> +	off += len;
+>> +
+>> +	if (cmd->provider_name_off) {
+> You should be checking for length, not offset here.
+  Ok.
+>
+>> +		if (cmd->service_name_off)
+>> +			len = cmd->service_name_off - cmd->provider_name_off;
+>> +		else if (cmd->service_descr_off)
+>> +			len = cmd->service_descr_off - cmd->provider_name_off;
+>> +		else
+>> +			len = cmd->len - cmd->provider_name_off;
+>> +
+>> +		app->provider_name = malloc0(len);
+>> +		memcpy(app->provider_name, cmd->data + off, len);
+>> +		off += len;
+>> +	} else {
+>> +		app->provider_name = NULL;
+> Else is not needed as struct is already zeroed.
+   Ok.
+>> +	}
+>> +
+>> +	if (cmd->service_name_off) {
+>> +		if (cmd->service_descr_off)
+>> +			len = cmd->service_descr_off - cmd->service_name_off;
+>> +		else
+>> +			len = cmd->len - cmd->service_name_off;
+>> +
+>> +		app->service_name = malloc0(len);
+>> +		memcpy(app->service_name, cmd->data + off, len);
+>> +		off += len;
+>> +	} else {
+>> +		app->service_name = NULL;
+>> +	}
+>> +
+>> +	if (cmd->service_descr_off) {
+>> +		len = cmd->len - cmd->service_descr_off;
+>> +
+>> +		app->service_descr = malloc0(len);
+>> +		memcpy(app->service_descr, cmd->data + off, len);
+>> +		off += len;
+>> +	} else {
+>> +		app->service_descr = NULL;
+>> +	}
+>> +
+>> +	if (app->num_of_mdep > 0)
+>> +		app->mdeps = queue_new();
+> I'd always allocate queue for sanity. It will just be empty if no mdeps.
+  Ok.
+>
+>> +
+>> +	rsp.app_id = app->id;
+>> +
+>> +	if (!queue_push_tail(apps, app)) {
+>> +		free_health_app(app);
+>> +		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
+>> +				HAL_OP_HEALTH_REG_APP, HAL_STATUS_FAILED);
+>> +		return;
+>> +	}
+>> +
+>> +	ipc_send_rsp_full(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
+>> +							sizeof(rsp), &rsp, -1);
+>>   }
+>>   
+>>   static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
+>>   {
+>> -	DBG("Not implemented");
+>> +	const struct hal_cmd_health_mdep *cmd = buf;
+>> +	struct health_app *app;
+>> +	struct mdep_cfg *mdep;
+>> +	uint8_t status;
+>> +
+>> +	DBG("");
+>> +
+>> +	app = queue_find(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
+>> +	if (!app) {
+>> +		status = HAL_STATUS_INVALID;
+>> +		goto fail;
+>> +	}
+>> +
+>> +	mdep = new0(struct mdep_cfg, 1);
+>> +	mdep->role = cmd->role;
+>> +	mdep->data_type = cmd->data_type;
+>> +	mdep->channel_type = cmd->channel_type;
+>> +	mdep->id = queue_length(app->mdeps) + 1;
+>>   
+>> +	if (cmd->descr_len > 0) {
+>> +		mdep->descr = malloc0(cmd->descr_len);
+>> +		memcpy(mdep->descr, cmd->descr, cmd->descr_len);
+>> +	}
+>> +
+>> +	if (!queue_push_tail(app->mdeps, mdep)) {
+>> +		free_mdep_cfg(mdep);
+>> +		status = HAL_STATUS_FAILED;
+>> +		goto fail;
+>> +	}
+>> +
+>> +	if (app->num_of_mdep != queue_length(app->mdeps)) {
+>> +		status = HAL_STATUS_SUCCESS;
+>> +		goto end;
+>> +	}
+>> +
+>> +	/* TODO: Create MCAP instance and prepare SDP profile */
+>> +	status = HAL_STATUS_SUCCESS;
+>> +
+>> +fail:
+>> +	if (status != HAL_STATUS_SUCCESS) {
+> Don't do that. If this is failed label make it handle fail case only.
+> ie
+>
+> ipc_send_rsp(.., SUCCESS);
+> return;
+>
+> failed:
+>   clean_ip();
+>   ips_send_rsp(..., status);
+>
+  Further code is in coming patches, I thought it would be good to put
+TODO comments. Anyway I will change in next version.
+>> +		queue_remove(apps, app);
+>> +		free_health_app(app);
+>> +	}
+>> +
+>> +end:
+>>   	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_MDEP,
+>> -							HAL_STATUS_UNSUPPORTED);
+>> +								status);
+>>   }
+>>   
+>>   static void bt_health_unregister_app(const void *buf, uint16_t len)
+>> @@ -111,6 +285,7 @@ bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+>>   	bacpy(&adapter_addr, addr);
+>>   
+>>   	hal_ipc = ipc;
+>> +	apps = queue_new();
+> For sanity, you should check if this succeed.
+  Ok.
+>
+>>   	ipc_register(hal_ipc, HAL_SERVICE_ID_HEALTH, cmd_handlers,
+>>   						G_N_ELEMENTS(cmd_handlers));
+>>   
+>> @@ -121,6 +296,7 @@ void bt_health_unregister(void)
+>>   {
+>>   	DBG("");
+>>   
+>> +	queue_destroy(apps, free_health_app);
+>>   	ipc_unregister(hal_ipc, HAL_SERVICE_ID_HEALTH);
+>>   	hal_ipc = NULL;
+>>   }
+>>
+  Thanks,
+  Ravi.
