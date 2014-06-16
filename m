@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 17/17] android/hal-health: trivial: Remove empty line
-Date: Mon, 16 Jun 2014 10:57:52 +0300
-Message-Id: <1402905472-17643-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 07/17] android/gatt: Fix meory leak
+Date: Mon, 16 Jun 2014 10:57:42 +0300
+Message-Id: <1402905472-17643-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,22 +11,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Fixes clang warnings:
+...
+android/gatt.c:2823:1: warning: Potential leak of memory pointed to by
+'cb_data'
+...
 ---
- android/hal-health.c | 1 -
- 1 file changed, 1 deletion(-)
+ android/gatt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-health.c b/android/hal-health.c
-index b8df5a7..af31634 100644
---- a/android/hal-health.c
-+++ b/android/hal-health.c
-@@ -143,7 +143,6 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
- 
- 		if (status != BT_STATUS_SUCCESS)
- 			return status;
--
+diff --git a/android/gatt.c b/android/gatt.c
+index c5cb58f..76336a6 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -2888,7 +2888,8 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+ 		goto failed;
  	}
  
- 	*app_id = rsp.app_id;
+-	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE) {
++	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE &&
++				cmd->write_type != GATT_WRITE_TYPE_SIGNED) {
+ 		cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
+ 						cmd->srvc_id.is_primary);
+ 		if (!cb_data) {
 -- 
 1.8.3.2
 
