@@ -2,81 +2,57 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/system-emulator: Allow to run daemon without valgrind
-Date: Mon, 16 Jun 2014 16:25:48 +0200
-Message-Id: <1402928748-16128-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] android: Build btiotest tool
+Date: Mon, 16 Jun 2014 16:09:55 +0200
+Message-Id: <1402927795-14834-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If valgrind is not present on system start bluetoothd directly instead
-of failing silently.
+This is useful for testing.
 ---
- android/system-emulator.c | 35 +++++++++++++++++++++++++++++------
- 1 file changed, 29 insertions(+), 6 deletions(-)
+ android/Android.mk | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/android/system-emulator.c b/android/system-emulator.c
-index c1b1b25..4d41fce 100644
---- a/android/system-emulator.c
-+++ b/android/system-emulator.c
-@@ -47,14 +47,10 @@ static char exec_dir[PATH_MAX + 1];
- static pid_t daemon_pid = -1;
- static pid_t snoop_pid = -1;
+diff --git a/android/Android.mk b/android/Android.mk
+index fc7b59d..ecff9c8 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -620,3 +620,35 @@ LOCAL_MODULE := avinfo
+ LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
  
--static void ctl_start(void)
-+static void run_valgrind(char *prg_name)
- {
--	char prg_name[PATH_MAX + 1];
- 	char *prg_argv[6];
- 	char *prg_envp[3];
--	pid_t pid;
--
--	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
- 
- 	prg_argv[0] = "/usr/bin/valgrind";
- 	prg_argv[1] = "--leak-check=full";
-@@ -67,6 +63,30 @@ static void ctl_start(void)
- 	prg_envp[1] = "G_DEBUG=gc-friendly";
- 	prg_envp[2] = NULL;
- 
-+	execve(prg_argv[0], prg_argv, prg_envp);
-+}
+ include $(BUILD_EXECUTABLE)
 +
-+static void run_bluetoothd(char *prg_name)
-+{
-+	char *prg_argv[3];
-+	char *prg_envp[1];
++#
++# btiotest
++#
 +
-+	prg_argv[0] = prg_name;
-+	prg_argv[1] = "-d";
-+	prg_argv[2] = NULL;
++include $(CLEAR_VARS)
 +
-+	prg_envp[0] = NULL;
++LOCAL_SRC_FILES := \
++	bluez/tools/btiotest.c \
++	bluez/btio/btio.c \
++	bluez/lib/bluetooth.c \
 +
-+	execve(prg_argv[0], prg_argv, prg_envp);
-+}
++LOCAL_C_INCLUDES := \
++	$(LOCAL_PATH)/bluez \
++	$(call include-path-for, glib) \
++	$(call include-path-for, glib)/glib \
 +
-+static void ctl_start(void)
-+{
-+	char prg_name[PATH_MAX + 1];
-+	pid_t pid;
++LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
 +
-+	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
++LOCAL_STATIC_LIBRARIES := \
++	bluetooth-headers \
 +
- 	printf("Starting %s\n", prg_name);
- 
- 	pid = fork();
-@@ -76,7 +96,10 @@ static void ctl_start(void)
- 	}
- 
- 	if (pid == 0) {
--		execve(prg_argv[0], prg_argv, prg_envp);
-+		run_valgrind(prg_name);
++LOCAL_SHARED_LIBRARIES := \
++	libglib \
 +
-+		/* Fallback to no valgrind if running with valgind failed */
-+		run_bluetoothd(prg_name);
- 		exit(0);
- 	}
- 
++LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
++LOCAL_MODULE_TAGS := debug
++LOCAL_MODULE := btiotest
++
++LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
++
++include $(BUILD_EXECUTABLE)
 -- 
 1.9.1
 
