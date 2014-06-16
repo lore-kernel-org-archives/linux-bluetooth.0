@@ -2,377 +2,439 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v4 3/4] src/shared/att: Implement write handler and bt_att_send.
-Date: Mon, 16 Jun 2014 15:43:59 -0700
-Message-Id: <1402958640-1132-4-git-send-email-armansito@chromium.org>
+Subject: [PATCH v4 2/4] src/shared/att: Implement basic boilerplate.
+Date: Mon, 16 Jun 2014 15:43:58 -0700
+Message-Id: <1402958640-1132-3-git-send-email-armansito@chromium.org>
 In-Reply-To: <1402958640-1132-1-git-send-email-armansito@chromium.org>
 References: <1402958640-1132-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the write handler logic, including the way send
-operations are process from the various internal queues. Added PDU
-encoding for the Exchange MTU request.
+This patch implements the getters, setters, creation, ref, and unref
+functions for struct bt_att. Also added is a simple table for
+determining the ATT op type given an opcode and the io read handler that
+currently does nothing.
 ---
- src/shared/att.c | 295 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 292 insertions(+), 3 deletions(-)
+ src/shared/att.c | 314 +++++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 293 insertions(+), 21 deletions(-)
 
 diff --git a/src/shared/att.c b/src/shared/att.c
-index 1c11cd7..0c26811 100644
+index fc75eb8..1c11cd7 100644
 --- a/src/shared/att.c
 +++ b/src/shared/att.c
-@@ -27,10 +27,12 @@
+@@ -25,15 +25,19 @@
+ #include <config.h>
+ #endif
  
- #include <stdlib.h>
++#include <stdlib.h>
  #include <unistd.h>
-+#include <errno.h>
  
  #include "src/shared/io.h"
  #include "src/shared/queue.h"
- #include "src/shared/util.h"
-+#include "src/shared/timeout.h"
++#include "src/shared/util.h"
  #include "lib/uuid.h"
  #include "src/shared/att.h"
  
-@@ -38,6 +40,7 @@
+ #define ATT_DEFAULT_LE_MTU		23
  #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
- #define ATT_OP_CMD_MASK			0x40
- #define ATT_OP_SIGNED_MASK		0x80
-+#define ATT_TIMEOUT_INTERVAL		30000  /* 30000 ms */
++#define ATT_OP_CMD_MASK			0x40
++#define ATT_OP_SIGNED_MASK		0x80
  
  struct att_send_op;
  
-@@ -134,6 +137,7 @@ static enum att_op_type get_op_type(uint8_t opcode)
+@@ -42,7 +46,6 @@ struct bt_att {
+ 	int fd;
+ 	bool close_on_unref;
+ 	struct io *io;
+-	bool destroyed;
  
+ 	struct queue *req_queue;	/* Queued ATT protocol requests */
+ 	struct att_send_op *pending_req;
+@@ -51,7 +54,7 @@ struct bt_att {
+ 	struct queue *write_queue;	/* Queue of PDUs ready to send */
+ 	bool writer_active;
+ 
+-	/* TODO Add notify queue */
++	bool invalid;	/* bt_att becomes invalid, when a request times out */
+ 
+ 	uint8_t *buf;
+ 	uint16_t mtu;
+@@ -73,8 +76,65 @@ struct bt_att {
+ 	void *debug_data;
+ };
+ 
++enum att_op_type {
++	ATT_OP_TYPE_REQ,
++	ATT_OP_TYPE_RSP,
++	ATT_OP_TYPE_CMD,
++	ATT_OP_TYPE_IND,
++	ATT_OP_TYPE_NOT,
++	ATT_OP_TYPE_CONF,
++	ATT_OP_TYPE_UNKNOWN,
++};
++
++static const struct {
++	uint8_t opcode;
++	enum att_op_type type;
++} att_opcode_type_table[] = {
++	{ BT_ATT_OP_ERROR_RSP,			ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_MTU_REQ,			ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_MTU_RSP,			ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_FIND_INFO_REQ,		ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_FIND_INFO_RSP,		ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,	ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_FIND_BY_TYPE_VAL_RSP,	ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_READ_BY_TYPE_REQ,		ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_READ_BY_TYPE_RSP,		ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_READ_REQ,			ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_READ_RSP,			ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_READ_BLOB_REQ,		ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_READ_BLOB_RSP,		ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_READ_MULT_REQ,		ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_READ_MULT_RSP,		ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_READ_BY_GRP_TYPE_REQ,	ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_READ_BY_GRP_TYPE_RSP,	ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_WRITE_REQ,			ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_WRITE_RSP,			ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_WRITE_CMD,			ATT_OP_TYPE_CMD },
++	{ BT_ATT_OP_SIGNED_WRITE_CMD,		ATT_OP_TYPE_CMD },
++	{ BT_ATT_OP_PREP_WRITE_REQ,		ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_PREP_WRITE_RSP,		ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_EXEC_WRITE_REQ,		ATT_OP_TYPE_REQ },
++	{ BT_ATT_OP_EXEC_WRITE_RSP,		ATT_OP_TYPE_RSP },
++	{ BT_ATT_OP_HANDLE_VAL_NOT,		ATT_OP_TYPE_NOT },
++	{ BT_ATT_OP_HANDLE_VAL_IND,		ATT_OP_TYPE_IND },
++	{ BT_ATT_OP_HANDLE_VAL_CONF,		ATT_OP_TYPE_CONF },
++	{ }
++};
++
++static enum att_op_type get_op_type(uint8_t opcode)
++{
++	int i;
++	for (i = 0; att_opcode_type_table[i].opcode; i++) {
++		if (att_opcode_type_table[i].opcode == opcode)
++			return att_opcode_type_table[i].type;
++	}
++
++	return ATT_OP_TYPE_UNKNOWN;
++}
++
  struct att_send_op {
  	unsigned int id;
-+	unsigned int timeout_id;
- 	enum att_op_type type;
++	enum att_op_type type;
  	uint16_t opcode;
  	void *pdu;
-@@ -143,10 +147,140 @@ struct att_send_op {
+ 	uint16_t len;
+@@ -83,61 +143,219 @@ struct att_send_op {
  	void *user_data;
  };
  
-+static bool encode_mtu_req(struct att_send_op *op, const void *param,
-+						uint16_t length, uint16_t mtu)
++static void destroy_att_send_op(void *data)
 +{
-+	const struct bt_att_mtu_req_param *p = param;
-+	const uint16_t len = 3;
++	struct att_send_op *op = data;
 +
-+	if (length != sizeof(*p))
-+		return false;
++	if (op->destroy)
++		op->destroy(op->user_data);
 +
-+	if (len > mtu)
-+		return false;
-+
-+	op->pdu = malloc(len);
-+	if (!op->pdu)
-+		return false;
-+
-+	((uint8_t *) op->pdu)[0] = op->opcode;
-+	put_le16(p->client_rx_mtu, ((uint8_t *) op->pdu) + 1);
-+	op->len = len;
-+
-+	return true;
++	free(op->pdu);
++	free(op);
 +}
 +
-+static bool encode_pdu(struct att_send_op *op, const void *param,
-+						uint16_t length, uint16_t mtu)
-+{
-+	/* If no parameters are given, simply set the PDU to consist of the
-+	 * opcode (e.g. BT_ATT_OP_WRITE_RSP),
-+	 */
-+	if (!length || !param) {
-+		op->len = 1;
-+		op->pdu = malloc(1);
-+		if (!op->pdu)
-+			return false;
-+
-+		((uint8_t *) op->pdu)[0] = op->opcode;
-+		return true;
-+	}
-+
-+	/* TODO: If the opcode has the "signed" bit set, make sure that the
-+	 * resulting PDU contains the authentication signature. Return an error,
-+	 * if the provided parameters structure is such that it leaves no room
-+	 * for an authentication signature in the PDU, or if no signing data
-+	 * has been set to generate the authentication signature.
-+	 */
-+
-+	switch (op->opcode) {
-+	case BT_ATT_OP_MTU_REQ:
-+		return encode_mtu_req(op, param, length, mtu);
-+	dafault:
-+		break;
-+	}
-+
-+	return false;
-+}
-+
-+static struct att_send_op *create_att_send_op(uint8_t opcode, const void *param,
-+						uint16_t length, uint16_t mtu,
-+						bt_att_request_func_t callback,
-+						void *user_data,
-+						bt_att_destroy_func_t destroy)
-+{
-+	struct att_send_op *op;
-+	enum att_op_type op_type;
-+
-+	if (!length && !param)
-+		return NULL;
-+
-+	op_type = get_op_type(opcode);
-+	if (op_type == ATT_OP_TYPE_UNKNOWN)
-+		return NULL;
-+
-+	/* If the opcode corresponds to an operation type that does not elicit a
-+	 * response from the remote end, then no callbacks should have been
-+	 * provided. Otherwise, at least a callback should be provided.
-+	 */
-+	if (!callback == (op_type == ATT_OP_TYPE_REQ || op_type == ATT_OP_TYPE_IND))
-+		return NULL;
-+
-+	op = new0(struct att_send_op, 1);
-+	if (!op)
-+		return NULL;
-+
-+	op->type = op_type;
-+	op->opcode = opcode;
-+	op->callback = callback;
-+	op->destroy = destroy;
-+	op->user_data = user_data;
-+
-+	if (!encode_pdu(op, param, length, mtu)) {
-+		free(op);
-+		return NULL;
-+	}
-+
-+	return op;
-+}
-+
-+static struct att_send_op *pick_next_send_op(struct bt_att *att)
-+{
-+	struct att_send_op *op;
-+
-+	/* See if any operations are already in the write queue */
-+	op = queue_pop_head(att->write_queue);
-+	if (op)
-+		return op;
-+
-+	/* If there is no pending request, pick an operation from the
-+	 * request queue.
-+	 */
-+	if (!att->pending_req) {
-+		op = queue_pop_head(att->req_queue);
-+		if (op)
-+			return op;
-+	}
-+
-+	/* There is either a request pending or no requests queued. If there is
-+	 * no pending indication, pick an operation from the indication queue.
-+	 */
-+	if (!att->pending_ind) {
-+		op = queue_pop_head(att->ind_queue);
-+		if (op)
-+			return op;
-+	}
-+
-+	return NULL;
-+}
-+
- static void destroy_att_send_op(void *data)
- {
- 	struct att_send_op *op = data;
- 
-+	if (op->timeout_id)
-+		timeout_remove(op->timeout_id);
-+
- 	if (op->destroy)
- 		op->destroy(op->user_data);
- 
-@@ -154,6 +288,122 @@ static void destroy_att_send_op(void *data)
- 	free(op);
- }
- 
-+struct timeout_data {
-+	struct bt_att *att;
-+	unsigned int id;
-+};
-+
-+static bool timeout_cb(void *user_data)
-+{
-+	struct timeout_data *timeout = user_data;
-+	struct bt_att *att = timeout->att;
-+	struct att_send_op *op = NULL;
-+
-+	if (att->pending_req && att->pending_req->id == timeout->id) {
-+		op = att->pending_req;
-+		att->pending_req = NULL;
-+	} else if (att->pending_ind && att->pending_ind->id == timeout->id) {
-+		op = att->pending_ind;
-+		att->pending_ind = NULL;
-+	}
-+
-+	if (!op)
-+		return false;
-+
-+	att->invalid = true;
-+
-+	if (att->timeout_callback)
-+		att->timeout_callback(op->id, op->opcode, att->timeout_data);
-+
-+	op->timeout_id = 0;
-+	destroy_att_send_op(op);
-+
-+	return false;
-+}
-+
-+static void write_watch_destroy(void *user_data)
++static bool can_read_data(struct io *io, void *user_data)
 +{
 +	struct bt_att *att = user_data;
++	uint8_t *pdu;
++	ssize_t bytes_read;
 +
-+	att->writer_active = false;
-+}
-+
-+static bool can_write_data(struct io *io, void *user_data)
-+{
-+	struct bt_att *att = user_data;
-+	struct att_send_op *op;
-+	struct timeout_data *timeout;
-+	ssize_t bytes_written;
-+
-+	op = pick_next_send_op(att);
-+	if (!op)
++	bytes_read = read(att->fd, att->buf, att->mtu);
++	if (bytes_read < 0)
 +		return false;
 +
-+	bytes_written = write(att->fd, op->pdu, op->len);
-+	if (bytes_written < 0) {
-+		util_debug(att->debug_callback, att->debug_data,
-+					"write failed: %s", strerror(errno));
-+		if (op->callback)
-+			op->callback(BT_ATT_OP_ERROR_RSP, NULL, 0,
-+							op->user_data);
-+
-+		destroy_att_send_op(op);
-+		return true;
-+	}
-+
-+	util_debug(att->debug_callback, att->debug_data,
-+					"ATT op 0x%02x", op->opcode);
-+
-+	util_hexdump('<', op->pdu, bytes_written,
++	util_hexdump('>', att->buf, bytes_read,
 +					att->debug_callback, att->debug_data);
 +
-+	/* Based on the operation type, set either the pending request or the
-+	 * pending indication. If it came from the write queue, then there is
-+	 * no need to keep it around.
-+	 */
-+	if (op->type == ATT_OP_TYPE_REQ)
-+		att->pending_req = op;
-+	else if (op->type == ATT_OP_TYPE_IND)
-+		att->pending_ind = op;
-+	else {
-+		destroy_att_send_op(op);
-+		return true;
-+	}
-+
-+	timeout = new0(struct timeout_data, 1);
-+	if (!timeout)
++	if (bytes_read < ATT_MIN_PDU_LEN)
 +		return true;
 +
-+	timeout->att = att;
-+	timeout->id = op->id;
-+	op->timeout_id = timeout_add(ATT_TIMEOUT_INTERVAL, timeout_cb,
-+								timeout, free);
-+
-+	/* Return true as there may be more operations ready to write. */
++	/* TODO: Handle different types of PDUs here */
 +	return true;
 +}
 +
-+static void wakeup_writer(struct bt_att *att)
-+{
-+	if (att->writer_active)
-+		return;
-+
-+	/* Set the write handler only if there is anything that can be sent
-+	 * at all.
-+	 */
-+	if (queue_isempty(att->write_queue)) {
-+		if ((att->pending_req || queue_isempty(att->req_queue)) &&
-+			(att->pending_ind || queue_isempty(att->ind_queue)))
-+			return;
-+	}
-+
-+	if (!io_set_write_handler(att->io, can_write_data, att,
-+							write_watch_destroy))
-+		return;
-+
-+	att->writer_active = true;
-+}
-+
- static bool can_read_data(struct io *io, void *user_data)
+ struct bt_att *bt_att_new(int fd)
  {
- 	struct bt_att *att = user_data;
-@@ -363,8 +613,47 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 				bt_att_request_func_t callback, void *user_data,
- 				bt_att_destroy_func_t destroy)
+-	/* TODO */
++	struct bt_att *att;
++
++	if (fd < 0)
++		return NULL;
++
++	att = new0(struct bt_att, 1);
++	if (!att)
++		return NULL;
++
++	att->fd = fd;
++
++	att->mtu = ATT_DEFAULT_LE_MTU;
++	att->buf = malloc(att->mtu);
++	if (!att->buf)
++		goto fail;
++
++	att->io = io_new(fd);
++	if (!att->io)
++		goto fail;
++
++	att->req_queue = queue_new();
++	if (!att->req_queue)
++		goto fail;
++
++	att->ind_queue = queue_new();
++	if (!att->ind_queue)
++		goto fail;
++
++	att->write_queue = queue_new();
++	if (!att->write_queue)
++		goto fail;
++
++	if (!io_set_read_handler(att->io, can_read_data, att, NULL))
++		goto fail;
++
++	return bt_att_ref(att);
++
++fail:
++	queue_destroy(att->req_queue, NULL);
++	queue_destroy(att->ind_queue, NULL);
++	queue_destroy(att->write_queue, NULL);
++	io_destroy(att->io);
++	free(att->buf);
++	free(att);
++
+ 	return NULL;
+ }
+ 
+ struct bt_att *bt_att_ref(struct bt_att *att)
+ {
+-	/* TODO */
+-	return NULL;
++	if (!att)
++		return NULL;
++
++	__sync_fetch_and_add(&att->ref_count, 1);
++
++	return att;
+ }
+ 
+ void bt_att_unref(struct bt_att *att)
+ {
+-	/* TODO */
++	if (!att)
++		return;
++
++	if (__sync_sub_and_fetch(&att->ref_count, 1))
++		return;
++
++	bt_att_cancel_all(att);
++
++	io_set_write_handler(att->io, NULL, NULL, NULL);
++	io_set_read_handler(att->io, NULL, NULL, NULL);
++
++	queue_destroy(att->req_queue, NULL);
++	queue_destroy(att->ind_queue, NULL);
++	queue_destroy(att->write_queue, NULL);
++	att->req_queue = NULL;
++	att->ind_queue = NULL;
++	att->write_queue = NULL;
++
++	io_destroy(att->io);
++	att->io = NULL;
++
++	if (att->close_on_unref)
++		close(att->fd);
++
++	if (att->timeout_destroy)
++		att->timeout_destroy(att->timeout_data);
++
++	if (att->debug_destroy)
++		att->debug_destroy(att->debug_data);
++
++	free(att->buf);
++	att->buf = NULL;
++
++	free(att);
+ }
+ 
+ bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
+ {
+-	/* TODO */
+-	return false;
++	if (!att)
++		return false;
++
++	att->close_on_unref = do_close;
++
++	return true;
+ }
+ 
+ bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
+ 				void *user_data, bt_att_destroy_func_t destroy)
+ {
+-	/* TODO */
+-	return false;
++	if (!att)
++		return false;
++
++	if (att->debug_destroy)
++		att->debug_destroy(att->debug_data);
++
++	att->debug_callback = callback;
++	att->debug_destroy = destroy;
++	att->debug_data = user_data;
++
++	return true;
+ }
+ 
+ uint16_t bt_att_get_mtu(struct bt_att *att)
  {
 -	/* TODO */
 -	return 0;
-+	struct att_send_op *op;
-+	bool result;
-+
 +	if (!att)
 +		return 0;
 +
-+	if (att->invalid)
-+		return 0;
++	return att->mtu;
+ }
+ 
+ bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
+ {
+-	/* TODO */
+-	return false;
++	char *buf;
 +
-+	op = create_att_send_op(opcode, param, length, att->mtu, callback,
-+							user_data, destroy);
++	if (!att)
++		return false;
++
++	if (mtu < ATT_DEFAULT_LE_MTU)
++		return false;
++
++	buf = malloc(mtu);
++	if (!buf)
++		return false;
++
++	free(att->buf);
++
++	att->mtu = mtu;
++	att->buf = buf;
++
++	return true;
+ }
+ 
+ void bt_att_set_signing_data(struct bt_att *att, uint8_t csrk[16],
+ 						uint32_t local_sign_cnt,
+ 						uint32_t remote_sign_cnt)
+ {
+-	/* TODO */
++	if (!att)
++		return;
++
++	memcpy(att->csrk, csrk, sizeof(csrk));
++	att->local_sign_cnt = local_sign_cnt;
++	att->remote_sign_cnt = remote_sign_cnt;
++	att->signing_data_set = true;
+ }
+ 
+ bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
+ 						void *user_data,
+ 						bt_att_destroy_func_t destroy)
+ {
+-	/* TODO */
+-	return false;
++	if (!att)
++		return false;
++
++	if (att->timeout_destroy)
++		att->timeout_destroy(att->timeout_data);
++
++	att->timeout_callback = callback;
++	att->timeout_destroy = destroy;
++	att->timeout_data = user_data;
++
++	return true;
+ }
+ 
+ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
+@@ -149,16 +367,70 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
+ 	return 0;
+ }
+ 
++static bool match_op_id(const void *a, const void *b)
++{
++	const struct att_send_op *op = a;
++	unsigned int id = PTR_TO_UINT(b);
++
++	return op->id == id;
++}
++
+ bool bt_att_cancel(struct bt_att *att, unsigned int id)
+ {
+-	/* TODO */
+-	return false;
++	struct att_send_op *op;
++
++	if (!att || !id)
++		return false;
++
++	if (att->pending_req && att->pending_req->id == id) {
++		op = att->pending_req;
++		goto done;
++	}
++
++	if (att->pending_ind && att->pending_ind->id == id) {
++		op = att->pending_ind;
++		goto done;
++	}
++
++	op = queue_remove_if(att->req_queue, match_op_id, UINT_TO_PTR(id));
++	if (op)
++		goto done;
++
++	op = queue_remove_if(att->ind_queue, match_op_id, UINT_TO_PTR(id));
++	if (op)
++		goto done;
++
++	op = queue_remove_if(att->write_queue, match_op_id, UINT_TO_PTR(id));
++	if (op)
++		goto done;
++
 +	if (!op)
-+		return 0;
++		return false;
 +
-+	if (att->next_send_id < 1)
-+		att->next_send_id = 1;
++done:
++	destroy_att_send_op(op);
 +
-+	op->id = att->next_send_id++;
++	/* TODO: Set the write handler here */
 +
-+	/* Add the op to the correct queue based on its type */
-+	switch (op->type) {
-+	case ATT_OP_TYPE_REQ:
-+		result = queue_push_tail(att->req_queue, op);
-+		break;
-+	case ATT_OP_TYPE_IND:
-+		result = queue_push_tail(att->ind_queue, op);
-+		break;
-+	default:
-+		result = queue_push_tail(att->write_queue, op);
-+		break;
-+	}
-+
-+	if (!result) {
-+		free(op->pdu);
-+		free(op);
-+		return 0;
-+	}
-+
-+	wakeup_writer(att);
-+
-+	return op->id;
++	return true;
  }
  
- static bool match_op_id(const void *a, const void *b)
-@@ -410,7 +699,7 @@ bool bt_att_cancel(struct bt_att *att, unsigned int id)
- done:
- 	destroy_att_send_op(op);
- 
--	/* TODO: Set the write handler here */
-+	wakeup_writer(att);
- 
- 	return true;
+ bool bt_att_cancel_all(struct bt_att *att)
+ {
+-	/* TODO */
+-	return false;
++	if (!att)
++		return false;
++
++	queue_remove_all(att->req_queue, NULL, NULL, destroy_att_send_op);
++	queue_remove_all(att->ind_queue, NULL, NULL, destroy_att_send_op);
++	queue_remove_all(att->write_queue, NULL, NULL, destroy_att_send_op);
++
++	if (att->pending_req)
++		destroy_att_send_op(att->pending_req);
++
++	if (att->pending_ind)
++		destroy_att_send_op(att->pending_ind);
++
++	return true;
  }
+ 
+ unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
 -- 
 1.8.3.2
 
