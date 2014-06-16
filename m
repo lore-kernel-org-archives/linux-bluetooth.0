@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 14/17] android/gatt: Fix error check
-Date: Mon, 16 Jun 2014 10:57:49 +0300
-Message-Id: <1402905472-17643-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 15/17] HDP: Fix possible memory leak
+Date: Mon, 16 Jun 2014 10:57:50 +0300
+Message-Id: <1402905472-17643-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,22 +12,46 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ profiles/health/hdp_util.c | 16 +++++++++-------
+ 1 file changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 76336a6..6ecef55 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -5269,7 +5269,7 @@ static uint8_t find_by_type_request(const uint8_t *cmd, uint16_t cmd_len,
- 		}
+diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
+index 7185805..876a105 100644
+--- a/profiles/health/hdp_util.c
++++ b/profiles/health/hdp_util.c
+@@ -597,6 +597,13 @@ fail:
+ 	return NULL;
+ }
  
- 		data->filter_value = malloc0(search_vlen);
--		if (!data) {
-+		if (!data->filter_value) {
- 			destroy_pending_request(data);
- 			queue_destroy(q, NULL);
- 			return ATT_ECODE_INSUFF_RESOURCES;
++static void free_hdp_list(void *list)
++{
++	sdp_list_t *hdp_list = list;
++
++	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
++}
++
+ static gboolean register_features(struct hdp_application *app,
+ 						sdp_list_t **sup_features)
+ {
+@@ -619,16 +626,11 @@ static gboolean register_features(struct hdp_application *app,
+ fail:
+ 	if (hdp_feature != NULL)
+ 		sdp_list_free(hdp_feature, (sdp_free_func_t)sdp_data_free);
++	if (sup_features != NULL)
++		sdp_list_free(*sup_features, free_hdp_list);
+ 	return FALSE;
+ }
+ 
+-static void free_hdp_list(void *list)
+-{
+-	sdp_list_t *hdp_list = list;
+-
+-	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
+-}
+-
+ static gboolean register_service_sup_features(GSList *app_list,
+ 						sdp_record_t *sdp_record)
+ {
 -- 
 1.8.3.2
 
