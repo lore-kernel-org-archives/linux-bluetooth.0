@@ -1,36 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 0/4] Intiates L2CAP Control Channel
-Date: Tue, 17 Jun 2014 01:02:46 +0300
-Message-Id: <1402956170-18356-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH] android/gatt: Add test command for sign write
+Date: Mon, 16 Jun 2014 23:59:36 +0200
+Message-Id: <1402955976-31684-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2: Fixed Szymon's comments (provided utility to convert
-  wrong HAL channel type defines, minor issues).
+This is needed for some PTS test cases.
+---
+ android/gatt.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-v1: Patchset is initial implementaion for MCL connection. It can
-  be tested with PTS, register application in source or sink role
-  and run source or sink L2CAP control channel tests. Initiate
-  channel connection from haltest, only MCAP MCL gets connected.
-
-Ravi kumar Veeramally (4):
-  profiles/health/hdp: Fix memory leak in SDP record preparati     Sdp
-    record preparation part is copied to android/health.c from    
-    profiles/health/hdp_utils.c. Memory leak is noticed while    
-    testing. Memory summay is from android daemon, but code snippet    
-    is same. It is already fixed in android/health.c while submitting   
-     android related patches.
-  anrdoid/health: Fix wrong channel type defines
-  android/health: Initial connect channel implementation
-  android/health: Notify channel connection status
-
- android/health.c           | 451 ++++++++++++++++++++++++++++++++++++++++++++-
- profiles/health/hdp_util.c |   2 +
- 2 files changed, 450 insertions(+), 3 deletions(-)
-
+diff --git a/android/gatt.c b/android/gatt.c
+index a19fe5c..943704a 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3674,6 +3674,11 @@ static uint8_t test_read_write(bdaddr_t *bdaddr, bt_uuid_t *uuid, uint16_t op,
+ 	case ATT_OP_EXEC_WRITE_REQ:
+ 		length = enc_exec_write_req(u2, pdu, mtu);
+ 		break;
++	case ATT_OP_SIGNED_WRITE_CMD:
++		if (signed_write_cmd(dev, u2, (uint8_t *) &u3, sizeof(u3)))
++			return HAL_STATUS_SUCCESS;
++		else
++			return HAL_STATUS_FAILED;
+ 	default:
+ 		error("gatt: Unknown operation type");
+ 
 -- 
-1.9.1
+1.8.4
 
