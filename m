@@ -1,111 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1402921114.27142.100.camel@jrissane-mobl.ger.corp.intel.com>
-Subject: Re: [PATCH v6 1/4] Bluetooth: 6LoWPAN: Use connected oriented
- channel instead of fixed one
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Date: Mon, 16 Jun 2014 15:18:34 +0300
-In-Reply-To: <C2C016F1-D165-4E26-B19B-9BDA3373CB5B@holtmann.org>
-References: <1402664013-29358-1-git-send-email-jukka.rissanen@linux.intel.com>
-	 <1402664013-29358-2-git-send-email-jukka.rissanen@linux.intel.com>
-	 <2A263CED-602C-48AD-830F-77DA72D89514@holtmann.org>
-	 <1402918352.27142.84.camel@jrissane-mobl.ger.corp.intel.com>
-	 <C2C016F1-D165-4E26-B19B-9BDA3373CB5B@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
+Message-ID: <539EDCC2.8070908@linux.intel.com>
+Date: Mon, 16 Jun 2014 15:02:10 +0300
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+To: Szymon Janc <szymon.janc@tieto.com>
+CC: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/6] android/health: Cache health application data on
+ app register call
+References: <1402578618-31484-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1402578618-31484-3-git-send-email-ravikumar.veeramally@linux.intel.com> <1536603.hQuXxHqAUl@uw000953>
+In-Reply-To: <1536603.hQuXxHqAUl@uw000953>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Szymon,
 
-On ma, 2014-06-16 at 13:49 +0200, Marcel Holtmann wrote:
-> Hi Jukka,
-> 
-> >>> Create a CoC dynamically instead of one fixed channel for communication
-> >>> to peer devices.
-> >>> 
-> > 
-> >>> +static struct l2cap_ops bt_6lowpan_chan_ops;
-> >> 
-> >> Why this does need a forward declaration. Lets avoid this. And just a reminder that l2cap_ops need to be const now.
-> > 
-> > The chan_ops is needed when setting up the channel in new_connection cb,
-> > I did not see a way to avoid forward declaration here.
-> 
-> then why does l2cap_sock.c does not need this forward declaration?
-> 
-> Either your code is doing something funky or our l2cap_ops is not flexible. I think we should not require this forward declaration. Can we fix this?
+On 06/16/2014 11:23 AM, Szymon Janc wrote:
+> Hi Ravi,
+>
+> On Thursday 12 of June 2014 16:10:14 Ravi kumar Veeramally wrote:
+>> ---
+>>   android/health.c | 188 +++++++++++++++++++++++++++++++++++++++++++++++++++++--
+>>   1 file changed, 182 insertions(+), 6 deletions(-)
+>>
+>> +
+>> +static void bt_health_register_app(const void *buf, uint16_t buf_len)
+>> +{
+>> +	const struct hal_cmd_health_reg_app *cmd = buf;
+>> +	struct hal_rsp_health_reg_app rsp;
+>> +	struct health_app *app;
+>> +	uint16_t off, len;
+>> +
+>> +	DBG("");
+>> +
+>> +	app = new0(struct health_app, 1);
+> Check if allocation succeed.
+>
+>> +	app->id = queue_length(apps) + 1;
+>> +	app->num_of_mdep = cmd->num_of_mdep;
+>> +
+>> +	off = 0;
+>> +
+>> +	if (cmd->provider_name_off)
+>> +		len = cmd->provider_name_off;
+>> +	else if (cmd->service_name_off)
+>> +		len = cmd->service_name_off;
+>> +	else if (cmd->service_descr_off)
+>> +		len = cmd->service_descr_off;
+>> +	else
+>> +		len = cmd->len;
+> Offsets can be only increased so length is always next offset - current offset
+> ie.
+>
+> app_name_len = provider_name_off - app_name_off
+> provider_name_len = service_name_off - provider_name_off;
+> etc.
+>
+> Also how about factoring this to helper ie. create_health_app() ?
+> struct health_app *create_health_app(const uint8_t *app_name, uint16_t app_len,
+>                                       const uint8_t *provider_name, uint16_t provider_len, ...., int mdeps)
+>
+> and then just call it like:
+>
+> app_name = cmd->data + cmd->app_name_off;
+> app_len = cmd->provider_name_off - cmd->app_name_off;
+> ....
+>
+> app = create_health_app(app_name, app_len, ....);
+> if (!app) {
+>      status = HAL_STATUS_FAILED;
+>      goto failed;
+> }
+>
+> This should make code more readable.
+  I realized after modifying according to your comments. problem here is 
+not all
+strings are mandatory. Only app_name is present always, rest is optional.
 
-Hmm, it might be that I am doing something wrong. So the current code
-allocates a new channel in new_connection cb, because of that the
-channel's ops field need to be set and forward decl. is needed.
-l2cap_sock.c does the allocation of chan differently but I was not quite
-able to understand the magic behind it.
+app_name = cmd->data + cmd->app_name_off;
+app_len = cmd->provider_name_off - cmd->app_name_off;
 
+this is good only if all offset are present, e,g. : if offset value for 
+provider_name
+is 0 then we have to go for service_name_off, if service_name_off is 0, 
+then go
+for service_name_off , if service_name_off  is zero, the finally it is 
+cmd data length.
 
-> 
-> >>> +	/* Remember the skb so that we can send EAGAIN to the caller if
-> >>> +	 * we run out of credits.
-> >>> +	 */
-> >>> +	chan->data = skb;
-> >> 
-> >> Isn't this one dangerous? Who owns the skb and also more important who frees it? Don't we have to reference the skb somehow?
-> > 
-> > Sure, I will add ref here.
-> 
-> Only if it is needed. I am still curious on how owns this SKB and who is responsible for freeing it. I want to make sure we do not leak memory here.
+Just in case for app name length if rest are optional.
 
-Well, the skb comes from netdev so it should not disappear during BT
-transmit so in theory we would not need to ref the skb. Taking ref just
-increments the skb->users field so this is not very big issue.
-
-
-> 
-> >>> +static struct sk_buff *chan_alloc_skb_cb(struct l2cap_chan *chan,
-> >>> +					 unsigned long hdr_len,
-> >>> +					 unsigned long len, int nb)
-> >>> +{
-> >>> +	return bt_skb_alloc(hdr_len + len, GFP_ATOMIC);
-> >>> +}
-> >> 
-> >> this should no longer be there and just use the default one.
-> >> 
-> > 
-> > Using GFP_KERNEL in standard l2cap_chan_no_alloc_skb() will lead to this
-> > "might sleep" bug:
-> 
-> So why is that? Who is calling l2cap_chan_send and where is it calling it from. The current assumption is that it is called from a context that can sleep. Is the netdev context not able to sleep when doing TX? Can we change this to a netdev context that can sleep?
-
-I am guessing that the culprit is the hard xmit functions as seen in the
-backtrace. I do not think there is a way to change this, we have created
-a network device and our xmit function is now being called whatever way
-netdev decides.
-
-[   43.409028]  [<f848faf2>] bt_xmit+0x1f2/0x2f0 [bluetooth_6lowpan]
-[   43.409028]  [<c1710a1c>] dev_hard_start_xmit+0x2ec/0x5e0
-[   43.409028]  [<c18221ab>] ? _raw_spin_lock+0x6b/0x80
-[   43.409028]  [<c1711080>] __dev_queue_xmit+0x370/0x630
-[   43.409028]  [<c1710d10>] ? dev_hard_start_xmit+0x5e0/0x5e0
-[   43.409028]  [<f848fbf0>] ? bt_xmit+0x2f0/0x2f0 [bluetooth_6lowpan]
-[   43.409028]  [<c171134f>] dev_queue_xmit+0xf/0x20
-
-> 
-> Do we need to provide the gfp_t to alloc_skb or should we let all implementations provide their own version of it. The more issues we uncover with this, the more I think we need to start re-thinking core parts of L2CAP packet handling.
-
-What about keeping it simple and allowing alloc_skb cb to allocate the
-memory anyway it wants to.
-
-> 
-> What we might need is something that can handle iovev/msghdr and fragment it on the spot into a proper SKB with fragments. And something that can take a SKB from a higher layer (for example netdev) and fragment that into ACL packets.
-> 
-> Regards
-> 
-> Marcel
-> 
+	if (cmd->provider_name_off)
+		len = cmd->provider_name_off;
+	else if (cmd->service_name_off)
+		len = cmd->service_name_off;
+	else if (cmd->service_descr_off)
+		len = cmd->service_descr_off;
+	else
+		len = cmd->len;
 
 
-Cheers,
-Jukka
+so, I would keep this code as it is. any comments?
+>
+>> +
+>> +	app->app_name = malloc0(len);
+> Check if allocation succeed.
+>
+>> +	memcpy(app->app_name, cmd->data, len);
+>> +	off += len;
+>> +
+>> +	if (cmd->provider_name_off) {
+> You should be checking for length, not offset here.
+>
+>> +		if (cmd->service_name_off)
+>> +			len = cmd->service_name_off - cmd->provider_name_off;
+>> +		else if (cmd->service_descr_off)
+>> +			len = cmd->service_descr_off - cmd->provider_name_off;
+>> +		else
+>> +			len = cmd->len - cmd->provider_name_off;
+>> +
+>> +		app->provider_name = malloc0(len);
+>> +		memcpy(app->provider_name, cmd->data + off, len);
+>> +		off += len;
+>> +	} else {
+>> +		app->provider_name = NULL;
+> Else is not needed as struct is already zeroed.
+>
+>> +	}
+>> +
+>> +	if (cmd->service_name_off) {
+>> +		if (cmd->service_descr_off)
+>> +			len = cmd->service_descr_off - cmd->service_name_off;
+>> +		else
+>> +			len = cmd->len - cmd->service_name_off;
+>> +
+>> +		app->service_name = malloc0(len);
+>> +		memcpy(app->service_name, cmd->data + off, len);
+>> +		off += len;
+>> +	} else {
+>> +		app->service_name = NULL;
+>> +	}
+>> +
+>> +	if (cmd->service_descr_off) {
+>> +		len = cmd->len - cmd->service_descr_off;
+>> +
+>> +		app->service_descr = malloc0(len);
+>> +		memcpy(app->service_descr, cmd->data + off, len);
+>> +		off += len;
+>> +	} else {
+>> +		app->service_descr = NULL;
+>> +	}
+>> +
+>> +	if (app->num_of_mdep > 0)
+>> +		app->mdeps = queue_new();
+> I'd always allocate queue for sanity. It will just be empty if no mdeps.
+>
 
-
+Regards,
+Ravi.
