@@ -1,79 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <539F59E9.3080301@linux.intel.com>
-Date: Mon, 16 Jun 2014 23:56:09 +0300
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH] android: Build btiotest tool
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1900079.HqpV8RXPni@athlon>
+Date: Mon, 16 Jun 2014 22:40:50 +0200
+Cc: Szymon Janc <szymon.janc@tieto.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <BB33EA45-5B83-4D3F-830F-310D4298CC8D@holtmann.org>
+References: <1402927795-14834-1-git-send-email-szymon.janc@tieto.com> <DC8DF41D-0449-41E5-B8D6-7D8D866BC9B1@holtmann.org> <1900079.HqpV8RXPni@athlon>
 To: Szymon Janc <szymon.janc@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 2/4] anrdoid/hal-health: Fix wrong channel type defines
-References: <1402941074-14407-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1402941074-14407-3-git-send-email-ravikumar.veeramally@linux.intel.com> <25982186.IBKSOpyphk@athlon>
-In-Reply-To: <25982186.IBKSOpyphk@athlon>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Szymon,
 
-On 06/16/2014 11:16 PM, Szymon Janc wrote:
-> Hi Ravi,
->
-> On Monday 16 June 2014 20:51:12 Ravi kumar Veeramally wrote:
->> Enums in bt_hl.h are defined in this order BTHL_CHANNEL_TYPE_RELIABLE,
->> BTHL_CHANNEL_TYPE_STREAMING, BTHL_CHANNEL_TYPE_ANY. But HDP_SPEC_V11(3.4)
->> has no-preference(any)-0, reliable-1, stream-2, reserved(0x03-0xff).
->> ---
->>   android/hal-health.c | 13 ++++++++++++-
->>   android/hal-msg.h    |  6 +++---
->>   2 files changed, 15 insertions(+), 4 deletions(-)
->>
->> diff --git a/android/hal-health.c b/android/hal-health.c
->> index ab06658..32c1b39 100644
->> --- a/android/hal-health.c
->> +++ b/android/hal-health.c
->> @@ -127,7 +127,18 @@ static bt_status_t
->> register_application(bthl_reg_param_t *reg, int *app_id) mdep->app_id =
->> rsp.app_id;
->>   		mdep->role = reg->mdep_cfg[i].mdep_role;
->>   		mdep->data_type = reg->mdep_cfg[i].data_type;
->> -		mdep->channel_type = reg->mdep_cfg[i].channel_type;
->> +
->> +		switch (reg->mdep_cfg[i].channel_type) {
->> +		case BTHL_CHANNEL_TYPE_ANY:
->> +			mdep->channel_type = HAL_HEALTH_CHANNEL_TYPE_ANY;
->> +			break;
->> +		case BTHL_CHANNEL_TYPE_RELIABLE:
->> +			mdep->channel_type = HAL_HEALTH_CHANNEL_TYPE_RELIABLE;
->> +			break;
->> +		case BTHL_CHANNEL_TYPE_STREAMING:
->> +			mdep->channel_type = HAL_HEALTH_CHANNEL_TYPE_STREAMING;
->> +			break;
->> +		}
->>
->>   		if (reg->mdep_cfg[i].mdep_description) {
->>   			mdep->descr_len =
->> diff --git a/android/hal-msg.h b/android/hal-msg.h
->> index 2c21a85..c95ac0f 100644
->> --- a/android/hal-msg.h
->> +++ b/android/hal-msg.h
->> @@ -388,9 +388,9 @@ struct hal_cmd_pan_disconnect {
->>   #define HAL_HEALTH_MDEP_ROLE_SOURCE	0x00
->>   #define HAL_HEALTH_MDEP_ROLE_SINK	0x01
->>
->> -#define HAL_HEALTH_CHANNEL_TYPE_RELIABLE	0x00
->> -#define HAL_HEALTH_CHANNEL_TYPE_STREAMING	0x01
->> -#define HAL_HEALTH_CHANNEL_TYPE_ANY		0x02
->> +#define HAL_HEALTH_CHANNEL_TYPE_ANY		0x00
->> +#define HAL_HEALTH_CHANNEL_TYPE_RELIABLE	0x01
->> +#define HAL_HEALTH_CHANNEL_TYPE_STREAMING	0x02
->>
->>   #define HAL_OP_HEALTH_REG_APP		0x01
->>   struct hal_cmd_health_reg_app {
->
-> HAL library is suppose to be simple pipe as close to HAL API as possible. If
-> such mapping is needed it should be done on daemon side in health.c.
-> Possibly with helpers eg. android2channel_type().
->
-  Ok.
+>>> This is useful for testing.
+>>> ---
+>>> android/Android.mk | 32 ++++++++++++++++++++++++++++++++
+>>> 1 file changed, 32 insertions(+)
+>>> 
+>>> diff --git a/android/Android.mk b/android/Android.mk
+>>> index fc7b59d..ecff9c8 100644
+>>> --- a/android/Android.mk
+>>> +++ b/android/Android.mk
+>>> @@ -620,3 +620,35 @@ LOCAL_MODULE := avinfo
+>>> LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
+>>> 
+>>> include $(BUILD_EXECUTABLE)
+>>> +
+>>> +#
+>>> +# btiotest
+>>> +#
+>>> +
+>>> +include $(CLEAR_VARS)
+>>> +
+>>> +LOCAL_SRC_FILES := \
+>>> +	bluez/tools/btiotest.c \
+>>> +	bluez/btio/btio.c \
+>>> +	bluez/lib/bluetooth.c \
+>> 
+>> I would actually prefer that we get rid of btio and integrated this in
+>> struct io properly. However what can be tested with btiotest that can not
+>> be tested with l2test and other tools.
+> 
+> This is mostly for tests related to (updating) connection security level.
+> 
+> We should be able to craft custom GATT HAL test command for that, although 
+> this is not really related to GATT...
 
-Regards,
-Ravi.
+if it helps right now, then include the tool. However keep in mind that long term all the GLib based stuff has to go away. And especially the Android part of BlueZ should be GLib free first. This means if you are missing test functionality, lets get it into the existing test tools.
+
+Regards
+
+Marcel
+
