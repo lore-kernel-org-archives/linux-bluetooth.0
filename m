@@ -2,35 +2,31 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 0/6] HDP initial implementaion
-Date: Mon, 16 Jun 2014 18:01:34 +0300
-Message-Id: <1402930900-24209-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 6/6] profile/health: Free sdp list after adding it to record
+Date: Mon, 16 Jun 2014 18:01:40 +0300
+Message-Id: <1402930900-24209-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1402930900-24209-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1402930900-24209-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-v2: Fixed comments from Szymon (optimized cache patch,
-    split notify patch, other issues).
-v1: Fixed comments from szymon.
+---
+ profiles/health/hdp_util.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-RFC_v2: Fixed comments by szymon and fixed issues while sebastian
-testing with PTS.
-
-RFC_v1: patchset is initial implementaion for HDP at daemon side.
-Cacheing application data and prepare SDP record based on MDEPs
-configuration and notify app state.
-
-Ravi kumar Veeramally (6):
-  android/health: Cache health application data on app register call
-  android/health: Perform clean up on app unregister call
-  android/health: Add HDP SDP record
-  android/health: Notify application registration status
-  android/health: Notify application deregistration status
-  profile/health: Free sdp list after adding it to record
-
- android/health.c           | 717 ++++++++++++++++++++++++++++++++++++++++++++-
- profiles/health/hdp_util.c |   2 +
- 2 files changed, 711 insertions(+), 8 deletions(-)
-
+diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
+index 58770b5..47c464e 100644
+--- a/profiles/health/hdp_util.c
++++ b/profiles/health/hdp_util.c
+@@ -652,6 +652,8 @@ static gboolean register_service_sup_features(GSList *app_list,
+ 		return FALSE;
+ 	}
+ 
++	sdp_list_free(sup_features, free_hdp_list);
++
+ 	return TRUE;
+ }
+ 
 -- 
 1.9.1
 
