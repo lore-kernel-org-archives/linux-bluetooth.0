@@ -1,91 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal Yadav <vikram.pal@samsung.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: d.kasatkin@samsung.com, p.sinha@samsung.com, sanjay.nm@samsung.com,
-	bharat.panda@samsung.com, vikram.pal@samsung.com
-Subject: [PATCH ] sdp: Fix memory issues to avoid potential crash
-Date: Mon, 16 Jun 2014 16:16:47 +0530
-Message-id: <1402915607-3952-1-git-send-email-vikram.pal@samsung.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFC] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1402577830.27142.22.camel@jrissane-mobl.ger.corp.intel.com>
+Date: Mon, 16 Jun 2014 12:34:42 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <B2A5A19A-21A7-4350-BFF0-A7BF7ACC9812@holtmann.org>
+References: <1402493714-30849-1-git-send-email-marcel@holtmann.org> <7C6C6BF5-0ED9-4900-B8EE-1778BB80187B@holtmann.org> <1402577830.27142.22.camel@jrissane-mobl.ger.corp.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-NULL pointer check added to handle memory allocation
-failure scenarios.
----
- src/sdp-xml.c       | 16 +++++++++++++++-
- src/sdpd-database.c |  4 ++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+Hi Jukka,
 
-diff --git a/src/sdp-xml.c b/src/sdp-xml.c
-index 6492781..a9c4723 100644
---- a/src/sdp-xml.c
-+++ b/src/sdp-xml.c
-@@ -91,6 +91,10 @@ static struct sdp_xml_data *sdp_xml_data_alloc(void)
- 	/* Null terminate the text */
- 	elem->size = DEFAULT_XML_DATA_SIZE;
- 	elem->text = malloc(DEFAULT_XML_DATA_SIZE);
-+	if (!elem->text) {
-+		free(elem);
-+		return NULL;
-+	}
- 	elem->text[0] = '\0';
- 
- 	return elem;
-@@ -333,6 +337,8 @@ static char *sdp_xml_parse_string_decode(const char *data, char encoding,
- 		int i;
- 
- 		decoded = malloc((len >> 1) + 1);
-+		if (!decoded)
-+			return NULL;
- 
- 		/* Ensure the string is a power of 2 */
- 		len = (len >> 1) << 1;
-@@ -823,7 +829,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 	{
- 		int num_chars_to_escape = 0;
- 		int length = value->unitSize - 1;
--		char *strBuf = 0;
-+		char *strBuf;
- 
- 		hex = 0;
- 
-@@ -850,6 +856,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 			appender(data, "encoding=\"hex\" ");
- 			strBuf = malloc(sizeof(char)
- 						 * ((value->unitSize-1) * 2 + 1));
-+			if (!strBuf) {
-+				DBG("No memory to convert raw data to xml");
-+				return;
-+			}
- 
- 			/* Unit Size seems to include the size for dtd
- 			   It is thus off by 1
-@@ -866,6 +876,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
- 			/* escape the XML disallowed chars */
- 			strBuf = malloc(sizeof(char) *
- 					(value->unitSize + 1 + num_chars_to_escape * 4));
-+			if (!strBuf) {
-+				DBG("No memory to convert raw data to xml");
-+				return;
-+			}
- 			for (i = 0, j = 0; i < length; i++) {
- 				if (value->val.str[i] == '&') {
- 					strBuf[j++] = '&';
-diff --git a/src/sdpd-database.c b/src/sdpd-database.c
-index f65a526..e825f69 100644
---- a/src/sdpd-database.c
-+++ b/src/sdpd-database.c
-@@ -157,6 +157,10 @@ static int compare_indices(const void *i1, const void *i2)
- void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
- {
- 	sdp_indexed_t *item = malloc(sizeof(sdp_indexed_t));
-+	if (!item) {
-+		SDPDBG("No memory");
-+		return;
-+	}
- 	item->sock = sock;
- 	item->record = record;
- 	socket_index = sdp_list_insert_sorted(socket_index, item, compare_indices);
--- 
-1.9.1
+>> so this patch is just the groundwork to deal with the socket vs kernel internal handling of TX path. And this patch should most likely also be split into providing the default for alloc_skb and then adding memcpy_fromiovec.
+>> 
+>> And I have just compile-tested this patch. I have not run it yet. I leave this to someone else to actually test if this works ;)
+> 
+> just tested this and it works ok so ACK from me.
+
+I split the patches now and added a proper commit message to them. Just keep in mind this is just the first step here. We should investigate on how we can combine alloc_skb and mempcy_fromiovec callbacks. This interim step is just to no block 6loWPAN support until we have figured it out.
+
+Regards
+
+Marcel
 
