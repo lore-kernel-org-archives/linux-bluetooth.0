@@ -1,80 +1,91 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] doc: Fix bit numbering in mgmt-api
-Date: Mon, 16 Jun 2014 12:41:47 +0200
-Message-ID: <3441889.Jpmp4xIXLo@uw000953>
-In-Reply-To: <1400073481-7099-1-git-send-email-andrzej.kaczmarek@tieto.com>
-References: <1400073481-7099-1-git-send-email-andrzej.kaczmarek@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Vikrampal Yadav <vikram.pal@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: d.kasatkin@samsung.com, p.sinha@samsung.com, sanjay.nm@samsung.com,
+	bharat.panda@samsung.com, vikram.pal@samsung.com
+Subject: [PATCH ] sdp: Fix memory issues to avoid potential crash
+Date: Mon, 16 Jun 2014 16:16:47 +0530
+Message-id: <1402915607-3952-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrzej,
+NULL pointer check added to handle memory allocation
+failure scenarios.
+---
+ src/sdp-xml.c       | 16 +++++++++++++++-
+ src/sdpd-database.c |  4 ++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-On Wednesday 14 of May 2014 15:18:00 Andrzej Kaczmarek wrote:
-> ---
->  doc/mgmt-api.txt | 34 +++++++++++++++++-----------------
->  1 file changed, 17 insertions(+), 17 deletions(-)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index cd5cd24..9374f9d 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -214,20 +214,20 @@ Read Controller Information Command
->  	Current_Settings & Supported_Settings is a bitmask with
->  	currently the following available bits:
->  
-> -		1	Powered
-> -		2	Connectable
-> -		3	Fast Connectable
-> -		4	Discoverable
-> -		5	Pairable
-> -		6	Link Level Security (Sec. mode 3)
-> -		7	Secure Simple Pairing
-> -		8	Basic Rate/Enhanced Data Rate
-> -		9	High Speed
-> -		10	Low Energy
-> -		11	Advertising
-> -		12	Secure Connections
-> -		13	Debug Keys
-> -		14	Privacy
-> +		0	Powered
-> +		1	Connectable
-> +		2	Fast Connectable
-> +		3	Discoverable
-> +		4	Pairable
-> +		5	Link Level Security (Sec. mode 3)
-> +		6	Secure Simple Pairing
-> +		7	Basic Rate/Enhanced Data Rate
-> +		8	High Speed
-> +		9	Low Energy
-> +		10	Advertising
-> +		11	Secure Connections
-> +		12	Debug Keys
-> +		13	Privacy
->  
->  	This command generates a Command Complete event on success or
->  	a Command Status event on failure.
-> @@ -1270,9 +1270,9 @@ Start Discovery Command
->  	Possible values for the Address_Type parameter are a bit-wise or
->  	of the following bits:
->  
-> -		1	BR/EDR
-> -		2	LE Public
-> -		3	LE Random
-> +		0	BR/EDR
-> +		1	LE Public
-> +		2	LE Random
->  
->  	By combining these e.g. the following values are possible:
->  
-> 
-
-This patch is now applied, thanks.
-
+diff --git a/src/sdp-xml.c b/src/sdp-xml.c
+index 6492781..a9c4723 100644
+--- a/src/sdp-xml.c
++++ b/src/sdp-xml.c
+@@ -91,6 +91,10 @@ static struct sdp_xml_data *sdp_xml_data_alloc(void)
+ 	/* Null terminate the text */
+ 	elem->size = DEFAULT_XML_DATA_SIZE;
+ 	elem->text = malloc(DEFAULT_XML_DATA_SIZE);
++	if (!elem->text) {
++		free(elem);
++		return NULL;
++	}
+ 	elem->text[0] = '\0';
+ 
+ 	return elem;
+@@ -333,6 +337,8 @@ static char *sdp_xml_parse_string_decode(const char *data, char encoding,
+ 		int i;
+ 
+ 		decoded = malloc((len >> 1) + 1);
++		if (!decoded)
++			return NULL;
+ 
+ 		/* Ensure the string is a power of 2 */
+ 		len = (len >> 1) << 1;
+@@ -823,7 +829,7 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 	{
+ 		int num_chars_to_escape = 0;
+ 		int length = value->unitSize - 1;
+-		char *strBuf = 0;
++		char *strBuf;
+ 
+ 		hex = 0;
+ 
+@@ -850,6 +856,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			appender(data, "encoding=\"hex\" ");
+ 			strBuf = malloc(sizeof(char)
+ 						 * ((value->unitSize-1) * 2 + 1));
++			if (!strBuf) {
++				DBG("No memory to convert raw data to xml");
++				return;
++			}
+ 
+ 			/* Unit Size seems to include the size for dtd
+ 			   It is thus off by 1
+@@ -866,6 +876,10 @@ static void convert_raw_data_to_xml(sdp_data_t *value, int indent_level,
+ 			/* escape the XML disallowed chars */
+ 			strBuf = malloc(sizeof(char) *
+ 					(value->unitSize + 1 + num_chars_to_escape * 4));
++			if (!strBuf) {
++				DBG("No memory to convert raw data to xml");
++				return;
++			}
+ 			for (i = 0, j = 0; i < length; i++) {
+ 				if (value->val.str[i] == '&') {
+ 					strBuf[j++] = '&';
+diff --git a/src/sdpd-database.c b/src/sdpd-database.c
+index f65a526..e825f69 100644
+--- a/src/sdpd-database.c
++++ b/src/sdpd-database.c
+@@ -157,6 +157,10 @@ static int compare_indices(const void *i1, const void *i2)
+ void sdp_svcdb_set_collectable(sdp_record_t *record, int sock)
+ {
+ 	sdp_indexed_t *item = malloc(sizeof(sdp_indexed_t));
++	if (!item) {
++		SDPDBG("No memory");
++		return;
++	}
+ 	item->sock = sock;
+ 	item->record = record;
+ 	socket_index = sdp_list_insert_sorted(socket_index, item, compare_indices);
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
