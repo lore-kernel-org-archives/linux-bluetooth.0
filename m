@@ -2,42 +2,65 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/4] profiles/health/hdp: Fix memory leak in SDP record preparati Sdp record preparation part is copied to android/health.c from profiles/health/hdp_utils.c. Memory leak is noticed while testing. Memory summay is from android daemon, but code snippet is same. It is already fixed in android/health.c while submitting android related patches.
-Date: Tue, 17 Jun 2014 01:02:47 +0300
-Message-Id: <1402956170-18356-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 2/4] anrdoid/health: Fix wrong channel type defines
+Date: Tue, 17 Jun 2014 01:02:48 +0300
+Message-Id: <1402956170-18356-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1402956170-18356-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1402956170-18356-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-==12515== 286 (16 direct, 270 indirect) bytes in 1 blocks are definitely lost in loss record 158 of 165
-==12515==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==12515==    by 0x44AC45: sdp_list_append (sdp.c:1743)
-==12515==    by 0x4398F9: register_features (health.c:381)
-==12515==    by 0x4091CC: queue_foreach (queue.c:219)
-==12515==    by 0x43A31F: bt_health_mdep_cfg_data (health.c:398)
-==12515==    by 0x418B50: cmd_watch_cb (ipc.c:144)
-==12515==    by 0x4E7FCE4: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-==12515==    by 0x4E80047: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-==12515==    by 0x4E80309: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-==12515==    by 0x4044F2: main (main.c:538)
+Enums in bt_hl.h are defined in this order BTHL_CHANNEL_TYPE_RELIABLE,
+BTHL_CHANNEL_TYPE_STREAMING, BTHL_CHANNEL_TYPE_ANY. But HDP_SPEC_V11(3.4)
+has no-preference(any)-0, reliable-1, stream-2, reserved(0x03-0xff).
+Providing utility to solve this.
 ---
- profiles/health/hdp_util.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/health.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index 58770b5..47c464e 100644
---- a/profiles/health/hdp_util.c
-+++ b/profiles/health/hdp_util.c
-@@ -652,6 +652,8 @@ static gboolean register_service_sup_features(GSList *app_list,
- 		return FALSE;
- 	}
+diff --git a/android/health.c b/android/health.c
+index 7e2c5d6..5a87089 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -52,6 +52,10 @@
+ #define HDP_VERSION			0x0101
+ #define DATA_EXCHANGE_SPEC_11073	0x01
  
-+	sdp_list_free(sup_features, free_hdp_list);
++#define CHANNEL_TYPE_ANY       0x00
++#define CHANNEL_TYPE_RELIABLE  0x01
++#define CHANNEL_TYPE_STREAM    0x02
 +
- 	return TRUE;
+ static bdaddr_t adapter_addr;
+ static struct ipc *hal_ipc = NULL;
+ static struct queue *apps = NULL;
+@@ -639,6 +643,18 @@ fail:
+ 							HAL_STATUS_FAILED);
  }
  
++static uint8_t android2channel_type(uint8_t type)
++{
++	switch (type) {
++	case HAL_HEALTH_CHANNEL_TYPE_RELIABLE:
++		return CHANNEL_TYPE_RELIABLE;
++	case HAL_HEALTH_CHANNEL_TYPE_STREAMING:
++		return CHANNEL_TYPE_STREAM;
++	}
++
++	return CHANNEL_TYPE_ANY;
++}
++
+ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_health_mdep *cmd = buf;
+@@ -662,7 +678,7 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
+ 
+ 	mdep->role = cmd->role;
+ 	mdep->data_type = cmd->data_type;
+-	mdep->channel_type = cmd->channel_type;
++	mdep->channel_type = android2channel_type(cmd->channel_type);
+ 	mdep->id = queue_length(app->mdeps) + 1;
+ 
+ 	if (cmd->descr_len > 0) {
 -- 
 1.9.1
 
