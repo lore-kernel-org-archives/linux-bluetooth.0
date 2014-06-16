@@ -1,46 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 0/6] Bluetooth: Various SMP cleanups & fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1402905633-470-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 16 Jun 2014 18:33:37 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 0/6] HDP initial implementaion
-Date: Mon, 16 Jun 2014 18:41:10 +0200
-Message-ID: <15250945.IhVFAen3Aa@athlon>
-In-Reply-To: <1402930900-24209-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1402930900-24209-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Message-Id: <AB754789-4D96-489C-B719-612F19668153@holtmann.org>
+References: <1402905633-470-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Johan,
 
-On Monday 16 June 2014 18:01:34 Ravi kumar Veeramally wrote:
-> v2: Fixed comments from Szymon (optimized cache patch,
->     split notify patch, other issues).
-> v1: Fixed comments from szymon.
+> Here's a set of cleanups and fixes for the SMP code I've come accross
+> while working with it.
 > 
-> RFC_v2: Fixed comments by szymon and fixed issues while sebastian
-> testing with PTS.
+> Johan
 > 
-> RFC_v1: patchset is initial implementaion for HDP at daemon side.
-> Cacheing application data and prepare SDP record based on MDEPs
-> configuration and notify app state.
+> ----------------------------------------------------------------
+> Johan Hedberg (6):
+>      Bluetooth: Fix missing NULL check for smp_chan_create() return value
+>      Bluetooth: Remove unnecessary SMP STK define
+>      Bluetooth: Remove HCI prefix from SMP LTK defines
+>      Bluetooth: Remove unused LTK authentication defines
+>      Bluetooth: Convert SMP flags into an enum
+>      Bluetooth: Add flexible buffer byte order swapping function
 > 
-> Ravi kumar Veeramally (6):
->   android/health: Cache health application data on app register call
->   android/health: Perform clean up on app unregister call
->   android/health: Add HDP SDP record
->   android/health: Notify application registration status
->   android/health: Notify application deregistration status
->   profile/health: Free sdp list after adding it to record
-> 
->  android/health.c           | 717
-> ++++++++++++++++++++++++++++++++++++++++++++- profiles/health/hdp_util.c | 
->  2 +
->  2 files changed, 711 insertions(+), 8 deletions(-)
+> include/net/bluetooth/hci.h |  9 ---------
+> net/bluetooth/hci_core.c    |  2 +-
+> net/bluetooth/hci_event.c   |  3 ++-
+> net/bluetooth/mgmt.c        |  6 +++---
+> net/bluetooth/smp.c         | 41 +++++++++++++++++++----------------------
+> net/bluetooth/smp.h         |  7 +++++++
+> 6 files changed, 32 insertions(+), 36 deletions(-)
 
-Patches 1-5 are now applied (with changes we discussed on IRC), thanks.
+all 6 patches of v2 have been applied to bluetooth-next tree.
 
--- 
-Szymon K. Janc
-szymon.janc@gmail.com
+Regards
+
+Marcel
+
