@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 08/17] HDP: Add length check
-Date: Mon, 16 Jun 2014 10:57:43 +0300
-Message-Id: <1402905472-17643-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 03/17] android/HDP: Change scope of mdep
+Date: Mon, 16 Jun 2014 10:57:38 +0300
+Message-Id: <1402905472-17643-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes static analyzer warnings related to casting possible error code to
-unsigned.
+Make code cleaner lowering scope for mdep to the place it is actually
+used.
 ---
- profiles/health/hdp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ android/hal-health.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-index e1549cf..65800fa 100644
---- a/profiles/health/hdp.c
-+++ b/profiles/health/hdp.c
-@@ -863,7 +863,10 @@ static gboolean serve_echo(GIOChannel *io_chan, GIOCondition cond,
- 	chan->edata->echo_done = TRUE;
+diff --git a/android/hal-health.c b/android/hal-health.c
+index 012b6b7..b8df5a7 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -68,7 +68,6 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ {
+ 	uint8_t buf[IPC_MTU];
+ 	struct hal_cmd_health_reg_app *cmd = (void *) buf;
+-	struct hal_cmd_health_mdep *mdep = (void *) buf;
+ 	struct hal_rsp_health_reg_app rsp;
+ 	size_t rsp_len = sizeof(rsp);
+ 	bt_status_t status;
+@@ -123,6 +122,8 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 		return status;
  
- 	fd = g_io_channel_unix_get_fd(io_chan);
+ 	for (i = 0; i < reg->number_of_mdeps; i++) {
++		struct hal_cmd_health_mdep *mdep = (void *) buf;
 +
- 	len = read(fd, buf, sizeof(buf));
-+	if (len < 0)
-+		goto fail;
- 
- 	if (send_echo_data(fd, buf, len)  >= 0)
- 		return TRUE;
+ 		memset(buf, 0, IPC_MTU);
+ 		mdep->app_id = rsp.app_id;
+ 		mdep->role = reg->mdep_cfg[i].mdep_role;
 -- 
 1.8.3.2
 
