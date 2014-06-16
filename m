@@ -1,45 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH] tools/l2test: Fix setopts and getopts functions
-Date: Tue, 17 Jun 2014 00:29:57 +0200
-Message-Id: <1402957797-515-1-git-send-email-lukasz.rymanowski@tieto.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 4/4] android/health: Notify channel connection status
+Date: Tue, 17 Jun 2014 01:02:50 +0300
+Message-Id: <1402956170-18356-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1402956170-18356-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1402956170-18356-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Level SOL_L2CAP with optname L2CAP_OPTIONS is supported only for BR/EDR
-Since bdaddr_type is set to BDADDR_BREDR by default, there is no sense
-to check also CID.
-
-This fix le connect which now fails when trying to connect ATT CID on LE
-transport.
 ---
- tools/l2test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ android/health.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index c70bac0..ffad7c4 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -271,7 +271,7 @@ static int getopts(int sk, struct l2cap_options *opts, bool connected)
+diff --git a/android/health.c b/android/health.c
+index 94154c3..e833cc3 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -195,6 +195,24 @@ static void send_app_reg_notify(struct health_app *app, uint8_t state)
+ 				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
+ }
  
- 	memset(opts, 0, sizeof(*opts));
- 
--	if (bdaddr_type == BDADDR_BREDR || cid) {
-+	if (bdaddr_type == BDADDR_BREDR) {
- 		optlen = sizeof(*opts);
- 		return getsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts, &optlen);
- 	}
-@@ -287,7 +287,7 @@ static int getopts(int sk, struct l2cap_options *opts, bool connected)
- 
- static int setopts(int sk, struct l2cap_options *opts)
++static void send_channel_state_notify(struct health_channel *channel,
++						uint8_t state, int fd)
++{
++	struct hal_ev_health_channel_state ev;
++
++	DBG("");
++
++	bdaddr2android(&channel->dev->dst, ev.bdaddr);
++	ev.app_id = channel->dev->app_id;
++	ev.mdep_index = channel->mdep_id;
++	ev.channel_id = channel->id;
++	ev.channel_state = state;
++
++	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
++					HAL_EV_HEALTH_CHANNEL_STATE,
++					sizeof(ev), &ev, fd);
++}
++
+ static bool mdep_by_mdep_role(const void *data, const void *user_data)
  {
--	if (bdaddr_type == BDADDR_BREDR || cid)
-+	if (bdaddr_type == BDADDR_BREDR)
- 		return setsockopt(sk, SOL_L2CAP, L2CAP_OPTIONS, opts,
- 								sizeof(*opts));
+ 	const struct mdep_cfg *mdep = data;
+@@ -1047,11 +1065,11 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
+ 		goto fail;
+ 	}
  
+-	/* TODO: send channel state CONNECTING */
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTING, -1);
+ 	return;
+ 
+ fail:
+-	/* TODO: send channel state DESTROYED*/
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
+ 
+ 	queue_remove(channel->dev->channels, channel);
+ 	free_health_channel(channel);
 -- 
-1.8.4
+1.9.1
 
