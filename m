@@ -1,47 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] android: Build btiotest tool
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1402927795-14834-1-git-send-email-szymon.janc@tieto.com>
-Date: Mon, 16 Jun 2014 18:27:27 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DC8DF41D-0449-41E5-B8D6-7D8D866BC9B1@holtmann.org>
-References: <1402927795-14834-1-git-send-email-szymon.janc@tieto.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 4/6] Bluetooth: Remove unused LTK authentication defines
+Date: Mon, 16 Jun 2014 19:25:17 +0300
+Message-Id: <1402935919-32348-4-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1402935919-32348-1-git-send-email-johan.hedberg@gmail.com>
+References: <1402935919-32348-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> This is useful for testing.
-> ---
-> android/Android.mk | 32 ++++++++++++++++++++++++++++++++
-> 1 file changed, 32 insertions(+)
-> 
-> diff --git a/android/Android.mk b/android/Android.mk
-> index fc7b59d..ecff9c8 100644
-> --- a/android/Android.mk
-> +++ b/android/Android.mk
-> @@ -620,3 +620,35 @@ LOCAL_MODULE := avinfo
-> LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-> 
-> include $(BUILD_EXECUTABLE)
-> +
-> +#
-> +# btiotest
-> +#
-> +
-> +include $(CLEAR_VARS)
-> +
-> +LOCAL_SRC_FILES := \
-> +	bluez/tools/btiotest.c \
-> +	bluez/btio/btio.c \
-> +	bluez/lib/bluetooth.c \
+These defines were probably put in to track authenticated vs
+unauthenticated LTKs, however since the LTK struct has a separate
+boolean authenticated member these were never used.
 
-I would actually prefer that we get rid of btio and integrated this in struct io properly. However what can be tested with btiotest that can not be tested with l2test and other tools.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci.h | 4 ----
+ 1 file changed, 4 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 6ec5b3bd1f67..fe584d78008d 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -348,10 +348,6 @@ enum {
+ #define HCI_LK_UNAUTH_COMBINATION_P256	0x07
+ #define HCI_LK_AUTH_COMBINATION_P256	0x08
+ 
+-/* Long Term Key types */
+-#define HCI_LTK_UNAUTH			0x00
+-#define HCI_LTK_AUTH			0x01
+-
+ /* ---- HCI Error Codes ---- */
+ #define HCI_ERROR_AUTH_FAILURE		0x05
+ #define HCI_ERROR_MEMORY_EXCEEDED	0x07
+-- 
+1.9.3
 
