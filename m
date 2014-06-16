@@ -1,34 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] Bluetooth: Various SMP cleanups & fixes
-Date: Mon, 16 Jun 2014 11:00:27 +0300
-Message-Id: <1402905633-470-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 17/17] android/hal-health: trivial: Remove empty line
+Date: Mon, 16 Jun 2014 10:57:52 +0300
+Message-Id: <1402905472-17643-17-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Here's a set of cleanups and fixes for the SMP code I've come accross
-while working with it.
+---
+ android/hal-health.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (6):
-      Bluetooth: Fix missing NULL check for smp_chan_create() return value
-      Bluetooth: Remove unnecessary SMP STK define
-      Bluetooth: Remove HCI prefix from SMP LTK defines
-      Bluetooth: Remove unused LTK authentication defines
-      Bluetooth: Convert SMP flags into an enum
-      Bluetooth: Add flexible buffer byte order swapping function
-
- include/net/bluetooth/hci.h |  9 ---------
- net/bluetooth/hci_core.c    |  2 +-
- net/bluetooth/hci_event.c   |  3 ++-
- net/bluetooth/mgmt.c        |  6 +++---
- net/bluetooth/smp.c         | 41 +++++++++++++++++++----------------------
- net/bluetooth/smp.h         |  7 +++++++
- 6 files changed, 32 insertions(+), 36 deletions(-)
-
+diff --git a/android/hal-health.c b/android/hal-health.c
+index b8df5a7..af31634 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -143,7 +143,6 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 
+ 		if (status != BT_STATUS_SUCCESS)
+ 			return status;
+-
+ 	}
+ 
+ 	*app_id = rsp.app_id;
+-- 
+1.8.3.2
 
