@@ -1,52 +1,76 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Vikrampal <vikram.pal@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-Subject: Re: BlueZ make error
-Date: Mon, 16 Jun 2014 13:14:44 +0200
-Message-ID: <2956882.SkGP9SSC5Z@uw000953>
-In-Reply-To: <009101cf7f2f$5810a4f0$0831eed0$@samsung.com>
-References: <009101cf7f2f$5810a4f0$0831eed0$@samsung.com>
+To: Andrzej Kaczmarek <andrzej.kaczmarek@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 2/2] lib: Update indexes in mgmt string translation arrays
+Date: Mon, 16 Jun 2014 12:42:30 +0200
+Message-ID: <3966409.YP7ngfbfiK@uw000953>
+In-Reply-To: <1400073481-7099-2-git-send-email-andrzej.kaczmarek@tieto.com>
+References: <1400073481-7099-1-git-send-email-andrzej.kaczmarek@tieto.com> <1400073481-7099-2-git-send-email-andrzej.kaczmarek@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Vikrampal,
+Hi Andrzej,
 
-On Tuesday 03 of June 2014 18:55:33 Vikrampal wrote:
-> Hi,
+On Wednesday 14 of May 2014 15:18:01 Andrzej Kaczmarek wrote:
+> ---
+>  lib/mgmt.h | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> While building the latest BlueZ, I'm getting below error:
+> diff --git a/lib/mgmt.h b/lib/mgmt.h
+> index ab45735..9bdd341 100644
+> --- a/lib/mgmt.h
+> +++ b/lib/mgmt.h
+> @@ -561,7 +561,7 @@ static const char *mgmt_op[] = {
+>  	"Confirm Name",
+>  	"Block Device",
+>  	"Unblock Device",
+> -	"Set Device ID",
+> +	"Set Device ID",		/* 0x0028 */
+>  	"Set Advertising",
+>  	"Set BR/EDR",
+>  	"Set Static Address",
+> @@ -569,7 +569,7 @@ static const char *mgmt_op[] = {
+>  	"Set Secure Connections",
+>  	"Set Debug Keys",
+>  	"Set Privacy",
+> -	"Load Identity Resolving Keys",
+> +	"Load Identity Resolving Keys",	/* 0x0030 */
+>  };
+>  
+>  static const char *mgmt_ev[] = {
+> @@ -597,7 +597,7 @@ static const char *mgmt_ev[] = {
+>  	"Device Unblocked",
+>  	"Device Unpaired",
+>  	"Passkey Notify",
+> -	"New Identity Resolving Key",
+> +	"New Identity Resolving Key",	/* 0x0018 */
+>  	"New Signature Resolving Key",
+>  };
+>  
+> @@ -610,7 +610,7 @@ static const char *mgmt_status[] = {
+>  	"Authentication Failed",
+>  	"Not Paired",
+>  	"No Resources",
+> -	"Timeout",
+> +	"Timeout",			/* 0x08 */
+>  	"Already Connected",
+>  	"Busy",
+>  	"Rejected",
+> @@ -618,7 +618,7 @@ static const char *mgmt_status[] = {
+>  	"Invalid Parameters",
+>  	"Disconnected",
+>  	"Not Powered",
+> -	"Cancelled",
+> +	"Cancelled",			/* 0x10 */
+>  	"Invalid Index",
+>  	"Blocked through rfkill",
+>  };
 > 
-> krampal-ubuntu:~/bluez$ sudo make
 
-Why building as superuser?
-
-> make --no-print-directory all-am
->   CC       client/main.o
-> client/main.c: In function 'cmd_version':
-> client/main.c:1098:28: error: 'VERSION' undeclared (first use in this
-> function)
->   rl_printf("Version %s\n", VERSION);
->                             ^
-> client/main.c:1098:28: note: each undeclared identifier is reported only
-> once for each function it appears in
-> client/main.c: In function 'main':
-> client/main.c:1489:18: error: 'VERSION' undeclared (first use in this
-> function)
->    printf("%s\n", VERSION);
->                   ^
-> make[1]: *** [client/main.o] Error 
-> make: *** [all] Error 2
-> 
-> Please help me. Thanks!
-
-That could happen if you tempered with either Makefile or config.h files
-(both are auto generated).
-
-I suggest running configure (or bootstrap-configure if this is for development)
-again.
+This needs to be rebased.
 
 -- 
 Best regards, 
