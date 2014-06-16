@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/6] Bluetooth: Remove unused LTK authentication defines
-Date: Mon, 16 Jun 2014 19:25:17 +0300
-Message-Id: <1402935919-32348-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 6/6] Bluetooth: Add flexible buffer byte order swapping function
+Date: Mon, 16 Jun 2014 19:25:19 +0300
+Message-Id: <1402935919-32348-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1402935919-32348-1-git-send-email-johan.hedberg@gmail.com>
 References: <1402935919-32348-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,68 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-These defines were probably put in to track authenticated vs
-unauthenticated LTKs, however since the LTK struct has a separate
-boolean authenticated member these were never used.
+Since the SMP code needs to swap ordering of variable length buffers add
+a convenience function that can be used for any length buffer.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h | 4 ----
- 1 file changed, 4 deletions(-)
+ net/bluetooth/smp.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 6ec5b3bd1f67..fe584d78008d 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -348,10 +348,6 @@ enum {
- #define HCI_LK_UNAUTH_COMBINATION_P256	0x07
- #define HCI_LK_AUTH_COMBINATION_P256	0x08
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 6dc26ad750e7..ee29342980c3 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -64,18 +64,12 @@ struct smp_chan {
+ 	unsigned long	flags;
+ };
  
--/* Long Term Key types */
--#define HCI_LTK_UNAUTH			0x00
--#define HCI_LTK_AUTH			0x01
--
- /* ---- HCI Error Codes ---- */
- #define HCI_ERROR_AUTH_FAILURE		0x05
- #define HCI_ERROR_MEMORY_EXCEEDED	0x07
+-static inline void swap128(const u8 src[16], u8 dst[16])
++static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
+ {
+-	int i;
+-	for (i = 0; i < 16; i++)
+-		dst[15 - i] = src[i];
+-}
++	size_t i;
+ 
+-static inline void swap56(const u8 src[7], u8 dst[7])
+-{
+-	int i;
+-	for (i = 0; i < 7; i++)
+-		dst[6 - i] = src[i];
++	for (i = 0; i < len; i++)
++		dst[len - 1 - i] = src[i];
+ }
+ 
+ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
+@@ -94,7 +88,7 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
+ 	desc.flags = 0;
+ 
+ 	/* The most significant octet of key corresponds to k[0] */
+-	swap128(k, tmp);
++	swap_buf(k, tmp, 16);
+ 
+ 	err = crypto_blkcipher_setkey(tfm, tmp, 16);
+ 	if (err) {
+@@ -103,7 +97,7 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
+ 	}
+ 
+ 	/* Most significant octet of plaintextData corresponds to data[0] */
+-	swap128(r, data);
++	swap_buf(r, data, 16);
+ 
+ 	sg_init_one(&sg, data, 16);
+ 
+@@ -112,7 +106,7 @@ static int smp_e(struct crypto_blkcipher *tfm, const u8 *k, u8 *r)
+ 		BT_ERR("Encrypt data error %d", err);
+ 
+ 	/* Most significant octet of encryptedData corresponds to data[0] */
+-	swap128(data, r);
++	swap_buf(data, r, 16);
+ 
+ 	return err;
+ }
 -- 
 1.9.3
 
