@@ -1,46 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/17] HDP: Fix checking always constant error code
-Date: Mon, 16 Jun 2014 10:57:36 +0300
-Message-Id: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 04/17] android/gatt: Change DBG() to error()
+Date: Mon, 16 Jun 2014 10:57:39 +0300
+Message-Id: <1402905472-17643-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-sdp_set_access_protos() always returns 0, there is no sense to check for
-error code. Fixes compile warnings.
 ---
- profiles/health/hdp_util.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index 58770b5..ff427a6 100644
---- a/profiles/health/hdp_util.c
-+++ b/profiles/health/hdp_util.c
-@@ -362,7 +362,7 @@ static gboolean set_sdp_services_uuid(sdp_record_t *record, HdpRole role)
- static gboolean register_service_protocols(struct hdp_adapter *adapter,
- 						sdp_record_t *sdp_record)
- {
--	gboolean ret;
-+	gboolean ret = TRUE;
- 	uuid_t l2cap_uuid, mcap_c_uuid;
- 	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
- 	sdp_list_t *access_proto_list = NULL;
-@@ -425,11 +425,7 @@ static gboolean register_service_protocols(struct hdp_adapter *adapter,
- 		goto end;
+diff --git a/android/gatt.c b/android/gatt.c
+index a19fe5c..eb977d5 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4275,7 +4275,7 @@ static void fill_gatt_response_by_handle(uint16_t handle, uint16_t offset,
+ 	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
+ 							UINT_TO_PTR(handle));
+ 	if (!entry) {
+-		DBG("No pending response found! Bogus android response?");
++		error("No pending response found! Bogus android response?");
+ 		return;
  	}
  
--	if (sdp_set_access_protos(sdp_record, access_proto_list) < 0) {
--		ret = FALSE;
--		goto end;
--	}
--	ret = TRUE;
-+	sdp_set_access_protos(sdp_record, access_proto_list);
- 
- end:
- 	if (l2cap_list != NULL)
 -- 
 1.8.3.2
 
