@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 15/17] HDP: Fix possible memory leak
-Date: Mon, 16 Jun 2014 10:57:50 +0300
-Message-Id: <1402905472-17643-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 11/17] android/ipc-tester: Fix closing invalid fd
+Date: Mon, 16 Jun 2014 10:57:46 +0300
+Message-Id: <1402905472-17643-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,47 +11,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Is socket() fails we jumps to failed label.
 ---
- profiles/health/hdp_util.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+ android/ipc-tester.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index 7185805..876a105 100644
---- a/profiles/health/hdp_util.c
-+++ b/profiles/health/hdp_util.c
-@@ -597,6 +597,13 @@ fail:
- 	return NULL;
+diff --git a/android/ipc-tester.c b/android/ipc-tester.c
+index 63fd105..f1f93f2 100644
+--- a/android/ipc-tester.c
++++ b/android/ipc-tester.c
+@@ -279,7 +279,8 @@ static void emulator(int pipe, int hci_index)
+ 
+ failed:
+ 	close(pipe);
+-	close(fd);
++	if (fd >= 0)
++		close(fd);
  }
  
-+static void free_hdp_list(void *list)
-+{
-+	sdp_list_t *hdp_list = list;
-+
-+	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
-+}
-+
- static gboolean register_features(struct hdp_application *app,
- 						sdp_list_t **sup_features)
- {
-@@ -619,16 +626,11 @@ static gboolean register_features(struct hdp_application *app,
- fail:
- 	if (hdp_feature != NULL)
- 		sdp_list_free(hdp_feature, (sdp_free_func_t)sdp_data_free);
-+	if (sup_features != NULL)
-+		sdp_list_free(*sup_features, free_hdp_list);
- 	return FALSE;
- }
- 
--static void free_hdp_list(void *list)
--{
--	sdp_list_t *hdp_list = list;
--
--	sdp_list_free(hdp_list, (sdp_free_func_t)sdp_data_free);
--}
--
- static gboolean register_service_sup_features(GSList *app_list,
- 						sdp_record_t *sdp_record)
- {
+ static int accept_connection(int sk)
 -- 
 1.8.3.2
 
