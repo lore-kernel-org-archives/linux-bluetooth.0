@@ -1,59 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 17 Jun 2014 10:20:41 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 01/17] HDP: Fix checking always constant error code
-Message-ID: <20140617072040.GA621@aemeltch-MOBL1>
-References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/2] android/bluetooth: Update bonding state after receiving new CSRK.
+Date: Tue, 17 Jun 2014 08:54:50 +0200
+Message-Id: <1402988090-15544-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1402988090-15544-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1402988090-15544-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jun 16, 2014 at 10:57:36AM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Set bonded state if received new CSRK.
+---
+ android/bluetooth.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-ping
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 092bdd7..56c1282 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -1992,6 +1992,9 @@ static void new_csrk_callback(uint16_t index, uint16_t length,
+ 		return;
+ 	}
+ 
++	update_device_state(dev, ev->key.addr.type, HAL_STATUS_SUCCESS, false,
++							true, !!ev->store_hint);
++
+ 	if (ev->store_hint)
+ 		store_csrk(dev);
+ }
+-- 
+1.9.3
 
-
-> 
-> sdp_set_access_protos() always returns 0, there is no sense to check for
-> error code. Fixes compile warnings.
-> ---
->  profiles/health/hdp_util.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-> index 58770b5..ff427a6 100644
-> --- a/profiles/health/hdp_util.c
-> +++ b/profiles/health/hdp_util.c
-> @@ -362,7 +362,7 @@ static gboolean set_sdp_services_uuid(sdp_record_t *record, HdpRole role)
->  static gboolean register_service_protocols(struct hdp_adapter *adapter,
->  						sdp_record_t *sdp_record)
->  {
-> -	gboolean ret;
-> +	gboolean ret = TRUE;
->  	uuid_t l2cap_uuid, mcap_c_uuid;
->  	sdp_list_t *l2cap_list, *proto_list = NULL, *mcap_list = NULL;
->  	sdp_list_t *access_proto_list = NULL;
-> @@ -425,11 +425,7 @@ static gboolean register_service_protocols(struct hdp_adapter *adapter,
->  		goto end;
->  	}
->  
-> -	if (sdp_set_access_protos(sdp_record, access_proto_list) < 0) {
-> -		ret = FALSE;
-> -		goto end;
-> -	}
-> -	ret = TRUE;
-> +	sdp_set_access_protos(sdp_record, access_proto_list);
->  
->  end:
->  	if (l2cap_list != NULL)
-> -- 
-> 1.8.3.2
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
