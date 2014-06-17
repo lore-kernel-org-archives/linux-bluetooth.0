@@ -1,57 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v4 0/4] Initiates L2CAP Control Channel
-Date: Tue, 17 Jun 2014 14:28:08 +0200
-Message-ID: <1901917.c9uNlxatvT@uw000953>
-In-Reply-To: <1403003970-3519-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403003970-3519-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] android/haltest: Auto-accept pairing
+Date: Tue, 17 Jun 2014 15:27:41 +0300
+Message-Id: <1403008061-22502-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Tuesday 17 of June 2014 14:19:26 Ravi kumar Veeramally wrote:
-> v4: Fixed Szymon's comments(minor ones).
-> 
-> v3: Ignore.
-> 
-> v2: Fixed Szymon's comments (provided utility to convert
->   wrong HAL channel type defines, minor issues).
-> 
-> v1: Patchset is initial implementaion for MCL connection. It can
->   be tested with PTS, register application in source or sink role
->   and run source or sink L2CAP control channel tests. Initiate
->   channel connection from haltest, only MCAP MCL gets connected.
-> 
-> SINK
-> -----------
-> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 1 BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> 
-> hl connect_channel 1 00:1b:dc:05:b5:54 0
-> 
-> SOURCE
-> -----------
-> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 1 BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> 
-> hl connect_channel 1 00:1b:dc:05:b5:54 0
-> 
-> Ravi kumar Veeramally (4):
->   profiles/health/hdp: Fix memory leak in SDP record preparation
->   anrdoid/health: Fix wrong channel type defines
->   android/health: Initial connect channel implementation
->   android/health: Notify channel connection status
-> 
->  android/health.c           | 454 ++++++++++++++++++++++++++++++++++++++++++++-
->  profiles/health/hdp_util.c |   2 +
->  2 files changed, 453 insertions(+), 3 deletions(-)
-> 
+Simplify PTS testing by automatically auto accept Just Works pairing.
+---
+ android/client/if-bt.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-All patches applied, thanks.
-
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 4d6ff83..764979e 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -266,7 +266,8 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 			__func__, last_remote_addr, bd_name->name, cod,
+ 			bt_ssp_variant_t2str(pairing_variant), pass_key);
+ 
+-	if (pairing_variant == BT_SSP_VARIANT_PASSKEY_CONFIRMATION) {
++	switch (pairing_variant) {
++	case BT_SSP_VARIANT_PASSKEY_CONFIRMATION:
+ 		sprintf(prompt, "Does other device show %d [Y/n] ?", pass_key);
+ 
+ 		ssp_request_addr = *remote_bd_addr;
+@@ -274,6 +275,14 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 		ssp_request_pask_key = pass_key;
+ 
+ 		terminal_prompt_for(prompt, ssp_request_yes_no_answer);
++		break;
++	case BT_SSP_VARIANT_CONSENT:
++		EXEC(if_bluetooth->ssp_reply, remote_bd_addr, pairing_variant,
++								1, 0);
++		break;
++	default:
++		haltest_info("Not automatically handled\n");
++		break;
+ 	}
+ }
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.2
+
