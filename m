@@ -2,18 +2,20 @@ Return-Path: <cyrus@holtmann.org>
 From: Sebastian Chlad <sebastianx.chlad@intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastianx.chlad@intel.com>
-Subject: [PATCH] android/pts: Adjust PICS for HDP
-Date: Tue, 17 Jun 2014 18:13:54 +0300
-Message-Id: <1403018034-19319-1-git-send-email-sebastianx.chlad@intel.com>
+Subject: [PATCH 2/2] android/pts: Adjust PICS for HDP
+Date: Tue, 17 Jun 2014 17:53:28 +0300
+Message-Id: <1403016808-18689-2-git-send-email-sebastianx.chlad@intel.com>
+In-Reply-To: <1403016808-18689-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1403016808-18689-1-git-send-email-sebastianx.chlad@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/pics-hdp.txt | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ android/pics-hdp.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
-index 3d8020d..3b4cce8 100644
+index 3d8020d..73ff6fc 100644
 --- a/android/pics-hdp.txt
 +++ b/android/pics-hdp.txt
 @@ -47,7 +47,7 @@ TSPC_HDP_2_7	True (*)	Supports General Inquiry (C.5) (C.4)
@@ -25,12 +27,9 @@ index 3d8020d..3b4cce8 100644
  -------------------------------------------------------------------------------
  C.1: Mandatory if TSPC_HDP_2_9 is supported, otherwise Optional.
  C.2: Mandatory if Security Mode 2, 3, or 4 is supported, otherwise Optional.
-@@ -189,9 +189,9 @@ TSPC_HDP_8_5	True		Supports Acceptance of Encryption request (M)
- TSPC_HDP_8_6	True		Supports Initiation of Encryption (M) (C.3)
- TSPC_HDP_8_7	True		Supports General Inquiry (M) C.4)
+@@ -191,7 +191,7 @@ TSPC_HDP_8_7	True		Supports General Inquiry (M) C.4)
  TSPC_HDP_8_8	True		Supports Acceptance of Bonding requests (M)
--TSPC_HDP_8_9	Ture (*)	Supports Initiation of Bonding (O)
-+TSPC_HDP_8_9	True (*)	Supports Initiation of Bonding (O)
+ TSPC_HDP_8_9	Ture (*)	Supports Initiation of Bonding (O)
  TSPC_HDP_8_10	True (*)	Supports Extended Inquiry Response (C.5) (C.6)
 -TSPC_HDP_8_11	True (*)	Supports use of Health Class of Device (O)
 +TSPC_HDP_8_11	Fale		Supports use of Health Class of Device (O)
