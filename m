@@ -1,44 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-From: Seon-Wook Park <seon.wook@swook.net>
-Date: Tue, 17 Jun 2014 19:29:53 +0900
-Message-ID: <CANLOmB5UXAJRModTofiYy-gtj=DvDiq_PU_n6NswrbXw_9_94A@mail.gmail.com>
-Subject: L2CAP socket to HCI handle, opposite possible?
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 0/3] Bluetooth: Security related fixes for SMP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1402999659-4969-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 17 Jun 2014 12:25:10 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <27135E5F-6950-4BD4-BDB0-86E9BB61A523@holtmann.org>
+References: <1402999659-4969-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello,
+Hi Johan,
 
-I'm currently using noble, a BLE library written in node.js.
+> Here's a set of patches to fix handling of MITM requirement and the
+> pending_sec_level value for hci_conn.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (3):
+>      Bluetooth: Fix overriding higher security level in SMP
+>      Bluetooth: Refactor authentication method lookup into its own function
+>      Bluetooth: Fix rejecting pairing in case of insufficient capabilities
+> 
+> net/bluetooth/smp.c | 60 +++++++++++++++++++++++++++++++++++++++------------
+> 1 file changed, 46 insertions(+), 14 deletions(-)
 
-The issue, as mentioned in more detail on GitHub [2], has to do with
-setting connection parameters on connect to a peripheral.
+all 3 patches have been applied to bluetooth-next tree.
 
-The library currently connects to peripherals via a L2CAP socket
-connection. The HCI handle for each connection is retrieved via
-`getsockopt` using the key `L2CAP_CONNINFO`. This HCI handle is then
-used for actions such as retrieving RSSI values.
+Regards
 
-This unfortunately does not allow the setting of connection parameters
-which can later be updated with `hci_le_conn_update` with a long
-interval (15s) between connecting and acknowledging of parameters
-update. This is not appropriate for our use.
+Marcel
 
->From looking through bluez sources, I have gathered that min/max
-interval parameters are taken from a `struct hci_dev` associated with
-the connection attempt, while supervisation_timeout values have
-hardcoded defaults. The `hci_dev` struct is unretrievable however. Is
-there a way I have missed?
-
-These problems could be alleviated if I could create a HCI socket
-connection and retrieve/create a L2CAP channel from it to use in
-further communication. Is this possible?
-
-Thanks,
-
-Seon-Wook Park
-
-[1] https://github.com/sandeepmistry/noble
-[2] https://github.com/sandeepmistry/noble/issues/78
