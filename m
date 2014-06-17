@@ -2,47 +2,61 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 1/4] profiles/health/hdp: Fix memory leak in SDP record preparation
-Date: Tue, 17 Jun 2014 13:16:21 +0300
-Message-Id: <1403000184-1759-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 4/4] android/health: Notify channel connection status
+Date: Tue, 17 Jun 2014 13:16:24 +0300
+Message-Id: <1403000184-1759-5-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1403000184-1759-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1403000184-1759-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Sdp record preparation part is copied to android/health.c from
-profiles/health/hdp_utils.c. Memory leak is noticed while testing. Memory
-summay is from android daemon, but code snippet is same. It is already fixed
-in android/health.c while submitting android related patches.
-
-==12515== 286 (16 direct, 270 indirect) bytes in 1 blocks are definitely lost in loss record 158 of 165
-==12515==    at 0x4C2AB80: malloc (in /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==12515==    by 0x44AC45: sdp_list_append (sdp.c:1743)
-==12515==    by 0x4398F9: register_features (health.c:381)
-==12515==    by 0x4091CC: queue_foreach (queue.c:219)
-==12515==    by 0x43A31F: bt_health_mdep_cfg_data (health.c:398)
-==12515==    by 0x418B50: cmd_watch_cb (ipc.c:144)
-==12515==    by 0x4E7FCE4: g_main_context_dispatch (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-==12515==    by 0x4E80047: ??? (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-==12515==    by 0x4E80309: g_main_loop_run (in /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-==12515==    by 0x4044F2: main (main.c:538)
 ---
- profiles/health/hdp_util.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/health.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-diff --git a/profiles/health/hdp_util.c b/profiles/health/hdp_util.c
-index 58770b5..47c464e 100644
---- a/profiles/health/hdp_util.c
-+++ b/profiles/health/hdp_util.c
-@@ -652,6 +652,8 @@ static gboolean register_service_sup_features(GSList *app_list,
- 		return FALSE;
- 	}
- 
-+	sdp_list_free(sup_features, free_hdp_list);
-+
- 	return TRUE;
+diff --git a/android/health.c b/android/health.c
+index f77b8a6..f503afd 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -195,6 +195,24 @@ static void send_app_reg_notify(struct health_app *app, uint8_t state)
+ 				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
  }
  
++static void send_channel_state_notify(struct health_channel *channel,
++						uint8_t state, int fd)
++{
++	struct hal_ev_health_channel_state ev;
++
++	DBG("");
++
++	bdaddr2android(&channel->dev->dst, ev.bdaddr);
++	ev.app_id = channel->dev->app_id;
++	ev.mdep_index = channel->mdep_id;
++	ev.channel_id = channel->id;
++	ev.channel_state = state;
++
++	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
++					HAL_EV_HEALTH_CHANNEL_STATE,
++					sizeof(ev), &ev, fd);
++}
++
+ static bool mdep_by_mdep_role(const void *data, const void *user_data)
+ {
+ 	const struct mdep_cfg *mdep = data;
+@@ -1047,11 +1065,11 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
+ 		goto fail;
+ 	}
+ 
+-	/* TODO: send channel state CONNECTING */
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTING, -1);
+ 	return;
+ 
+ fail:
+-	/* TODO: send channel state DESTROYED*/
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
+ 
+ 	queue_remove(channel->dev->channels, channel);
+ 	free_health_channel(channel);
 -- 
 1.9.1
 
