@@ -1,48 +1,153 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] android/haltest: Auto-accept pairing
-Date: Tue, 17 Jun 2014 15:27:41 +0300
-Message-Id: <1403008061-22502-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: szymon.janc@tieto.com,
+	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Subject: [PATCH v2 2/2] android/pts: Update SM PTS results
+Date: Tue, 17 Jun 2014 14:22:50 +0200
+Message-Id: <1403007770-17030-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Simplify PTS testing by automatically auto accept Just Works pairing.
 ---
- android/client/if-bt.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+v2: Status of two test updated since we got two fixes in the kernel
+ android/pts-sm.txt | 108 ++++++++++++++++++++++++++++++++++-------------------
+ 1 file changed, 69 insertions(+), 39 deletions(-)
 
-diff --git a/android/client/if-bt.c b/android/client/if-bt.c
-index 4d6ff83..764979e 100644
---- a/android/client/if-bt.c
-+++ b/android/client/if-bt.c
-@@ -266,7 +266,8 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
- 			__func__, last_remote_addr, bd_name->name, cod,
- 			bt_ssp_variant_t2str(pairing_variant), pass_key);
+diff --git a/android/pts-sm.txt b/android/pts-sm.txt
+index 7afc11c..b1c08f1 100644
+--- a/android/pts-sm.txt
++++ b/android/pts-sm.txt
+@@ -3,6 +3,7 @@ PTS test results for SM
+ PTS version: 5.1
+ Tested: 14-May-2014
+ Android version: 4.4.2
++kernel version: 3.17
  
--	if (pairing_variant == BT_SSP_VARIANT_PASSKEY_CONFIRMATION) {
-+	switch (pairing_variant) {
-+	case BT_SSP_VARIANT_PASSKEY_CONFIRMATION:
- 		sprintf(prompt, "Does other device show %d [Y/n] ?", pass_key);
- 
- 		ssp_request_addr = *remote_bd_addr;
-@@ -274,6 +275,14 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
- 		ssp_request_pask_key = pass_key;
- 
- 		terminal_prompt_for(prompt, ssp_request_yes_no_answer);
-+		break;
-+	case BT_SSP_VARIANT_CONSENT:
-+		EXEC(if_bluetooth->ssp_reply, remote_bd_addr, pairing_variant,
-+								1, 0);
-+		break;
-+	default:
-+		haltest_info("Not automatically handled\n");
-+		break;
- 	}
- }
- 
+ Results:
+ PASS	test passed
+@@ -15,11 +16,12 @@ NONE	test result is none
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+ TC_PROT_BV_01_C		PASS
+-TC_PROT_BV_02_C		FAIL	JIRA: BZ-24
++TC_PROT_BV_02_C		PASS
+ 				btmgmt advertising on
+-TC_JW_BV_01_C		FAIL	JIRA: BZ-25
++TC_JW_BV_01_C		PASS	btmgmt pairable off
++				btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_JW_BV_02_C		PASS
+-TC_JW_BV_05_C		INC
++TC_JW_BV_05_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
+ TC_JW_BI_01_C		PASS
+ TC_JW_BI_02_C		PASS
+ TC_JW_BI_03_C		PASS	bluetoothd is NOT running
+@@ -29,41 +31,69 @@ TC_JW_BI_03_C		PASS	bluetoothd is NOT running
+ 				btmgmt pairable on
+ 				btmgmt discov on
+ 				btmgmt advertising on
+-TC_JW_BI_04_C		FAIL
+-TC_PKE_BV_01_C		FAIL
+-TC_PKE_BV_02_C		INC
+-TC_PKE_BV_04_C		FAIL
+-TC_PKE_BV_05_C		INC
+-TC_PKE_BI_01_C		INC
++TC_JW_BI_04_C		PASS	btmgmt pairable off
++				btmgmg pair -c 0x03 -t 0x01 <addr>
++TC_PKE_BV_01_C		PASS	btmgmt pairable off
++				btmgmt pair -c 0x04 -t 0x01 <addr>
++				Note: provide passkey to PTS
++TC_PKE_BV_02_C		PASS	btmgmt pairable off
++				btmgmt io-cap 0x04
++				btmgmt advertising on
++				btmgmt monitor
++				Note: provide passkey
++TC_PKE_BV_04_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
++TC_PKE_BV_05_C		PASS	btmgmt io-cap 0x04
++				l2test -r -J4 -AES -V le_public
++TC_PKE_BI_01_C		PASS	btmgmt pair -c 0x04 -t 0x01 <addr>
++				Note: Enter invalid passkey in PTS
+ TC_PKE_BI_02_C		PASS
+-TC_PKE_BI_03_C		INC
+-TC_OOB_BV_01_C		FAIL
+-TC_OOB_BV_02_C		INC
+-TC_OOB_BV_03_C		FAIL
+-TC_OOB_BV_04_C		INC
+-TC_OOB_BV_05_C		INC
+-TC_OOB_BV_06_C		INC
+-TC_OOB_BV_07_C		INC
+-TC_OOB_BV_08_C		INC
+-TC_OOB_BV_09_C		INC
+-TC_OOB_BV_10_C		INC
+-TC_OOB_BI_01_C		INC
+-TC_OOB_BI_02_C		INC
+-TC_EKS_BV_01_C		INC
+-TC_EKS_BV_02_C		INC
+-TC_EKS_BI_01_C		INC
+-TC_EKS_BI_02_C		INC
+-TC_SIGN_BV_01_C		INC
+-TC_SIGN_BV_03_C		INC
+-TC_SIGN_BI_01_C		INC
+-TC_KDU_BV_01_C		INC
+-TC_KDU_BV_02_C		INC
+-TC_KDU_BV_03_C		INC
+-TC_KDU_BV_04_C		INC
+-TC_KDU_BV_05_C		INC
+-TC_KDU_BV_06_C		INC
+-TC_KDU_BV_07_C		INC
+-TC_SIP_BV_01_C		INC
+-TC_SIP_BV_02_C		FAIL
+-TC_SIE_BV_01_C		INC
++TC_PKE_BI_03_C		PASS	btmgmt io-cap 0x04
++				btmgmt advertising on
++				btmgmt monitor
++				Note: Enter invalid passkey in PTS
++TC_OOB_BV_01_C		NA
++TC_OOB_BV_02_C		NA
++TC_OOB_BV_03_C		NA
++TC_OOB_BV_04_C		NA
++TC_OOB_BV_05_C		PASS
++TC_OOB_BV_06_C		PASS
++TC_OOB_BV_07_C		PASS
++TC_OOB_BV_08_C		PASS
++TC_OOB_BV_09_C		NA
++TC_OOB_BV_10_C		NA
++TC_OOB_BI_01_C		NA
++TC_OOB_BI_02_C		NA
++TC_EKS_BV_01_C		PASS
++TC_EKS_BV_02_C		PASS
++TC_EKS_BI_01_C		PASS	btmgmt io-cap 0x03
++TC_EKS_BI_02_C		PASS
++TC_SIGN_BV_01_C		INC	PTS issue ID: 12305
++TC_SIGN_BV_03_C		PASS	haltest
++				gattc listen
++
++TC_SIGN_BI_01_C		PASS	haltest
++				gattc listen
++TC_KDU_BV_01_C		PASS	btmgmt pairable on
++TC_KDU_BV_02_C		PASS	PTS issue: ID 12302
++				Note: Can pass it with following instructions:
++				btmgmt privacy on
++				btmgmt advetising on
++				Check our random address (valid for 15 min)
++				Set PIXIT TSPX_bd_addr_iut to random address
++				Set PIXIT TSPX_peer_type to 01
++TC_KDU_BV_03_C		PASS	btmgmt pairable on
++				btmgmt advertising on
++
++TC_KDU_BV_04_C		INC	PTS issue: ID: 12301
++TC_KDU_BV_05_C		PASS	PTS issue: ID: 12302
++				Note: Can pass it with following instructions:
++				btmgmt privacy on
++				Check our random address (valid for 15 min)
++				Set PIXIT TSPX_bd_addr_iut to random address
++				Set PIXIT TSPX_peer_type to 01
++TC_KDU_BV_06_C		FAIL	PTS issue: ID: 12301, 12302
++TC_KDU_BV_07_C		PASS	btmgmt pairable on
++TC_SIP_BV_01_C		PASS	btmgmt pair -c 0x03 -t 0x01 <addr>
++TC_SIP_BV_02_C		PASS	l2test -n -J4 -V le_public <addr>
++TC_SIE_BV_01_C		INC	PTS issue: ID: 12306
+ -------------------------------------------------------------------------------
 -- 
-1.8.3.2
+1.8.4
 
