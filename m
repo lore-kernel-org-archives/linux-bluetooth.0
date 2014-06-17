@@ -1,41 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/health: Fix using uninitialized value err
-Date: Tue, 17 Jun 2014 22:03:21 +0200
-Message-ID: <38974833.TK0Se5ZUMM@athlon>
-In-Reply-To: <1402990447-10747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1402990447-10747-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH 1/3] android/gatt: Move get_sec_level function
+Date: Tue, 17 Jun 2014 21:57:11 +0200
+Message-ID: <2294168.zuOePBTdec@athlon>
+In-Reply-To: <1403011871-8354-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1403011871-8354-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcin,
 
-On Tuesday 17 June 2014 10:34:07 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+On Tuesday 17 June 2014 15:31:09 Marcin Kraglak wrote:
+> This will be used in read and write handlers functions.
 > ---
->  android/health.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  android/gatt.c | 32 ++++++++++++++++----------------
+>  1 file changed, 16 insertions(+), 16 deletions(-)
 > 
-> diff --git a/android/health.c b/android/health.c
-> index 7e2c5d6..85100cd 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -242,7 +242,7 @@ static int
-> register_service_additional_protocols(sdp_record_t *rec, sdp_list_t
-> *access_proto_list = NULL;
->  	sdp_data_t *psm = NULL;
->  	uint32_t dcpsm;
-> -	GError *err;
-> +	GError *err = NULL;
+> diff --git a/android/gatt.c b/android/gatt.c
+> index a19fe5c..9531577 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -2715,6 +2715,22 @@ static void read_char_cb(guint8 status, const guint8
+> *pdu, guint16 len, free(data);
+>  }
 > 
->  	DBG("");
+> +static int get_sec_level(struct gatt_device *dev)
+> +{
+> +	GIOChannel *io;
+> +	int sec_level;
+> +
+> +	io = g_attrib_get_channel(dev->attrib);
+> +
+> +	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
+> +							BT_IO_OPT_INVALID)) {
+> +		error("gatt: Failed to get sec_level");
+> +		return -1;
+> +	}
+> +
+> +	return sec_level;
+> +}
+> +
+>  static void handle_client_read_characteristic(const void *buf, uint16_t
+> len) {
+>  	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
+> @@ -2835,22 +2851,6 @@ static bool signed_write_cmd(struct gatt_device *dev,
+> uint16_t handle, return true;
+>  }
+> 
+> -static int get_sec_level(struct gatt_device *dev)
+> -{
+> -	GIOChannel *io;
+> -	int sec_level;
+> -
+> -	io = g_attrib_get_channel(dev->attrib);
+> -
+> -	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
+> -							BT_IO_OPT_INVALID)) {
+> -		error("gatt: Failed to get sec_level");
+> -		return -1;
+> -	}
+> -
+> -	return sec_level;
+> -}
+> -
+>  static void handle_client_write_characteristic(const void *buf, uint16_t
+> len) {
+>  	const struct hal_cmd_gatt_client_write_characteristic *cmd = buf;
 
-Applied, thanks.
+This patch is now applied. Thanks.
 
 -- 
 Szymon K. Janc
