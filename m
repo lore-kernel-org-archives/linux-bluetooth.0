@@ -1,66 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 2/4] anrdoid/health: Fix wrong channel type defines
-Date: Tue, 17 Jun 2014 13:16:22 +0300
-Message-Id: <1403000184-1759-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1403000184-1759-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403000184-1759-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 2/3] Bluetooth: Refactor authentication method lookup into its own function
+Date: Tue, 17 Jun 2014 13:07:38 +0300
+Message-Id: <1402999659-4969-3-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1402999659-4969-1-git-send-email-johan.hedberg@gmail.com>
+References: <1402999659-4969-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Enums in bt_hl.h are defined in this order BTHL_CHANNEL_TYPE_RELIABLE,
-BTHL_CHANNEL_TYPE_STREAMING, BTHL_CHANNEL_TYPE_ANY. But HDP_SPEC_V11(3.4)
-has no-preference(any)-0, reliable-1, stream-2, reserved(0x03-0xff).
-Providing utility to solve this.
----
- android/health.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-diff --git a/android/health.c b/android/health.c
-index 7e2c5d6..f0e7335 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -52,6 +52,10 @@
- #define HDP_VERSION			0x0101
- #define DATA_EXCHANGE_SPEC_11073	0x01
+We'll need to do authentication method lookups from more than one place,
+so refactor the lookup into its own function.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 17 ++++++++++++-----
+ 1 file changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 513d39d5e099..84f0df21547b 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -381,6 +381,16 @@ static const u8 gen_method[5][5] = {
+ 	{ CFM_PASSKEY, CFM_PASSKEY, REQ_PASSKEY, JUST_WORKS, OVERLAP     },
+ };
  
-+#define CHANNEL_TYPE_ANY       0x00
-+#define CHANNEL_TYPE_RELIABLE  0x01
-+#define CHANNEL_TYPE_STREAM    0x02
-+
- static bdaddr_t adapter_addr;
- static struct ipc *hal_ipc = NULL;
- static struct queue *apps = NULL;
-@@ -639,6 +643,18 @@ fail:
- 							HAL_STATUS_FAILED);
- }
- 
-+static uint8_t android2channel_type(uint8_t type)
++static u8 get_auth_method(struct smp_chan *smp, u8 local_io, u8 remote_io)
 +{
-+	switch (type) {
-+	case HAL_HEALTH_CHANNEL_TYPE_RELIABLE:
-+		return CHANNEL_TYPE_RELIABLE;
-+	case HAL_HEALTH_CHANNEL_TYPE_STREAMING:
-+		return CHANNEL_TYPE_STREAM;
-+	default:
-+		return CHANNEL_TYPE_ANY;
-+	}
++	/* If either side has unknown io_caps, use JUST WORKS */
++	if (local_io > SMP_IO_KEYBOARD_DISPLAY ||
++	    remote_io > SMP_IO_KEYBOARD_DISPLAY)
++		return JUST_WORKS;
++
++	return gen_method[remote_io][local_io];
 +}
 +
- static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
+ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 						u8 local_io, u8 remote_io)
  {
- 	const struct hal_cmd_health_mdep *cmd = buf;
-@@ -662,7 +678,7 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
+@@ -397,14 +407,11 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 	BT_DBG("tk_request: auth:%d lcl:%d rem:%d", auth, local_io, remote_io);
  
- 	mdep->role = cmd->role;
- 	mdep->data_type = cmd->data_type;
--	mdep->channel_type = cmd->channel_type;
-+	mdep->channel_type = android2channel_type(cmd->channel_type);
- 	mdep->id = queue_length(app->mdeps) + 1;
+ 	/* If neither side wants MITM, use JUST WORKS */
+-	/* If either side has unknown io_caps, use JUST WORKS */
+ 	/* Otherwise, look up method from the table */
+-	if (!(auth & SMP_AUTH_MITM) ||
+-	    local_io > SMP_IO_KEYBOARD_DISPLAY ||
+-	    remote_io > SMP_IO_KEYBOARD_DISPLAY)
++	if (!(auth & SMP_AUTH_MITM))
+ 		method = JUST_WORKS;
+ 	else
+-		method = gen_method[remote_io][local_io];
++		method = get_auth_method(smp, local_io, remote_io);
  
- 	if (cmd->descr_len > 0) {
+ 	/* If not bonding, don't ask user to confirm a Zero TK */
+ 	if (!(auth & SMP_AUTH_BONDING) && method == JUST_CFM)
 -- 
-1.9.1
+1.9.3
 
