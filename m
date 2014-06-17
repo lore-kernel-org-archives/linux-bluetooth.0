@@ -1,30 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 1/2] android/hal-msg: Add defines of HAL_AUTHENTICATION values
-Date: Wed, 18 Jun 2014 07:43:10 +0200
-Message-Id: <1403070191-2356-1-git-send-email-marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 10/17] android/hal-sco: Fix error code printing
+Date: Tue, 17 Jun 2014 23:49:14 +0200
+Message-ID: <1733778.CPBJFeIyqH@athlon>
+In-Reply-To: <1402905472-17643-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1402905472-17643-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-These values are are used in read characteristic/write characteristic
-functions in gatt_client.
----
- android/hal-msg.h | 4 ++++
- 1 file changed, 4 insertions(+)
+Hi Andrei,
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 2c21a85..841f016 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -1610,3 +1610,7 @@ struct hal_ev_gatt_server_rsp_confirmation {
- #define HAL_GATT_PERMISSION_WRITE_ENCRYPTED_MITM	0x0040
- #define HAL_GATT_PERMISSION_WRITE_SIGNED		0x0080
- #define HAL_GATT_PERMISSION_WRITE_SIGNED_MITM		0x0100
-+
-+#define HAL_AUTHENTICATION_NONE		0
-+#define HAL_AUTHENTICATION_NO_MITM	1
-+#define HAL_AUTHENTICATION_MITM		2
+On Monday 16 June 2014 10:57:45 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> ---
+>  android/hal-sco.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/hal-sco.c b/android/hal-sco.c
+> index ef04dc5..faed406 100644
+> --- a/android/hal-sco.c
+> +++ b/android/hal-sco.c
+> @@ -712,7 +712,7 @@ static int sco_open_output_stream(struct audio_hw_device
+> *dev, RESAMPLER_QUALITY_DEFAULT, NULL,
+>  						&out->resampler);
+>  	if (ret) {
+> -		error("Failed to create resampler (%s)", strerror(ret));
+> +		error("Failed to create resampler (%s)", strerror(-ret));
+>  		goto failed;
+>  	}
+> 
+> @@ -1143,7 +1143,7 @@ static int sco_open_input_stream(struct
+> audio_hw_device *dev, RESAMPLER_QUALITY_DEFAULT, NULL,
+>  						&in->resampler);
+>  	if (ret) {
+> -		error("Failed to create resampler (%s)", strerror(ret));
+> +		error("Failed to create resampler (%s)", strerror(-ret));
+>  		goto failed;
+>  	}
+
+That one doesn't apply. Please rebase, thanks.
+
 -- 
-1.9.3
-
+Szymon K. Janc
+szymon.janc@gmail.com
