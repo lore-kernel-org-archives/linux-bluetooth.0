@@ -1,33 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] health: Fix not setting error
-Date: Tue, 17 Jun 2014 16:53:01 +0300
-Message-Id: <1403013181-8793-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] android/health: Make coding style consistent for array parameter
+Date: Tue, 17 Jun 2014 15:47:14 +0200
+Message-Id: <1403012834-28933-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-When error is not set err->message may be accessed from the other code
-resulting in NULL dereference.
 ---
- android/mcap-lib.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/health.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/android/mcap-lib.c b/android/mcap-lib.c
-index b04eaac..e0e1258 100644
---- a/android/mcap-lib.c
-+++ b/android/mcap-lib.c
-@@ -1932,6 +1932,8 @@ gboolean mcap_create_mcl(struct mcap_instance *mi,
- 		}
- 		mcap_mcl_unref(con->mcl);
- 		g_free(con);
-+		g_set_error(err, MCAP_ERROR, MCAP_ERROR_FAILED,
-+							"MCP connect failed");
- 		return FALSE;
- 	}
+diff --git a/android/health.c b/android/health.c
+index 58323d9..60c4c99 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -1093,8 +1093,7 @@ static int connect_mcl(struct health_channel *channel)
+ 						search_cb, channel, NULL, 0);
+ }
+ 
+-static struct health_device *create_device(uint16_t app_id,
+-						const uint8_t addr[])
++static struct health_device *create_device(uint16_t app_id, const uint8_t *addr)
+ {
+ 	struct health_device *dev;
  
 -- 
-1.8.3.2
+1.9.3
 
