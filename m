@@ -1,34 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/pts: Update PTS GAP test results
-Date: Tue, 17 Jun 2014 15:14:37 +0200
-Message-Id: <1403010877-2391-1-git-send-email-marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/health: Fix wrong parameter passing to android2bdaddr
+Date: Tue, 17 Jun 2014 15:10:09 +0200
+Message-ID: <11409985.TI9k9sRMRi@uw000953>
+In-Reply-To: <1403009607-6232-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403009607-6232-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pts-gap.txt | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+Hi Ravi,
 
-diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-index cd70326..bb7f172 100644
---- a/android/pts-gap.txt
-+++ b/android/pts-gap.txt
-@@ -217,8 +217,11 @@ TC_SEC_AUT_BV_18_C	PASS	haltest: gattc register_client
- 				bluetooth create_bond
- 				gattc read_characteristic
- TC_SEC_AUT_BV_19_C	PASS
--TC_SEC_AUT_BV_20_C	INC	Link security level elevation - not implemented
--TC_SEC_AUT_BV_21_C	INC	Link security level elevation - not implemented
-+TC_SEC_AUT_BV_20_C	INC	PTS issue [ID:12284]
-+TC_SEC_AUT_BV_21_C	PASS	haltest: gattc register_client
-+				gattc connect
-+				bluetooth create_bond
-+				gattc connect
- TC_SEC_AUT_BV_22_C	INC	Link security level elevation - not implemented
- TC_SEC_AUT_BV_23_C	PASS	haltest: gatts register_server
- 				gatts add_service 2 <uuid> 3
+On Tuesday 17 of June 2014 15:53:27 Ravi kumar Veeramally wrote:
+> ---
+>  android/health.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/health.c b/android/health.c
+> index 585d8a4..58323d9 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -1102,7 +1102,7 @@ static struct health_device *create_device(uint16_t app_id,
+>  	if (!dev)
+>  		return NULL;
+>  
+> -	android2bdaddr(&addr, &dev->dst);
+> +	android2bdaddr(addr, &dev->dst);
+>  	dev->app_id = app_id;
+>  
+>  	return dev;
+> 
+
+Pushed. Thanks.
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
