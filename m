@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@gmail.com>
 To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] android/gatt: Move get_sec_level function
-Date: Tue, 17 Jun 2014 21:57:11 +0200
-Message-ID: <2294168.zuOePBTdec@athlon>
-In-Reply-To: <1403011871-8354-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1403011871-8354-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: Re: [PATCH 3/3] android/gatt: Set security level if user requested
+Date: Tue, 17 Jun 2014 21:52:09 +0200
+Message-ID: <18708757.JorTnFHVQT@athlon>
+In-Reply-To: <1403011871-8354-3-git-send-email-marcin.kraglak@tieto.com>
+References: <1403011871-8354-1-git-send-email-marcin.kraglak@tieto.com> <1403011871-8354-3-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,64 +14,132 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcin,
 
-On Tuesday 17 June 2014 15:31:09 Marcin Kraglak wrote:
-> This will be used in read and write handlers functions.
+On Tuesday 17 June 2014 15:31:11 Marcin Kraglak wrote:
+> Set security level if user requested. It is used when frameworks receives
+> INSUFFICIENT_ENCRYPTION or INSUFFICIENT_AUTHENTICATIONS errors on read/write
+> requests and tries to elevate security.
 > ---
->  android/gatt.c | 32 ++++++++++++++++----------------
->  1 file changed, 16 insertions(+), 16 deletions(-)
+>  android/gatt.c | 72
+> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 1 file changed,
+> 72 insertions(+)
 > 
 > diff --git a/android/gatt.c b/android/gatt.c
-> index a19fe5c..9531577 100644
+> index 9531577..b958167 100644
 > --- a/android/gatt.c
 > +++ b/android/gatt.c
-> @@ -2715,6 +2715,22 @@ static void read_char_cb(guint8 status, const guint8
-> *pdu, guint16 len, free(data);
+> @@ -2731,6 +2731,52 @@ static int get_sec_level(struct gatt_device *dev)
+>  	return sec_level;
 >  }
 > 
-> +static int get_sec_level(struct gatt_device *dev)
+> +static bool set_security(struct gatt_device *device, int security)
 > +{
+> +	int req_sec_level, sec_level;
+> +	GError *gerr = NULL;
 > +	GIOChannel *io;
-> +	int sec_level;
 > +
-> +	io = g_attrib_get_channel(dev->attrib);
+> +	if (security < HAL_AUTHENTICATION_NONE ||
+> +					security > HAL_AUTHENTICATION_MITM) {
+> +		error("gatt: Invalid security value: %d", security);
+> +		return false;
+> +	}
+
+Mmove this into default case in switch below.
+
 > +
-> +	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
-> +							BT_IO_OPT_INVALID)) {
-> +		error("gatt: Failed to get sec_level");
-> +		return -1;
+> +	switch (security) {
+> +	case HAL_AUTHENTICATION_MITM:
+> +		req_sec_level = BT_SECURITY_HIGH;
+> +		break;
+> +	case HAL_AUTHENTICATION_NO_MITM:
+> +		req_sec_level = BT_SECURITY_MEDIUM;
+> +		break;
+> +	case HAL_AUTHENTICATION_NONE:
+> +		req_sec_level = BT_SECURITY_LOW;
+> +		break;
 > +	}
 > +
-> +	return sec_level;
+> +	sec_level = get_sec_level(device);
+> +	if (sec_level < 0)
+> +		return false;
+> +
+> +	if (req_sec_level <= sec_level)
+> +		return true;
+> +
+> +	io = g_attrib_get_channel(device->attrib);
+> +	if (!io)
+> +		return false;
+> +
+> +	bt_io_set(io, &gerr, BT_IO_OPT_SEC_LEVEL, req_sec_level,
+> +							BT_IO_OPT_INVALID);
+> +	if (gerr) {
+> +		error("%s\n", gerr->message);
+
+Prefix error with "gatt: Failed to set..."
+
+> +		g_error_free(gerr);
+> +		return false;
+> +	}
+> +
+> +	return true;
 > +}
 > +
 >  static void handle_client_read_characteristic(const void *buf, uint16_t
 > len) {
 >  	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
-> @@ -2835,22 +2851,6 @@ static bool signed_write_cmd(struct gatt_device *dev,
-> uint16_t handle, return true;
->  }
+> @@ -2771,6 +2817,13 @@ static void handle_client_read_characteristic(const
+> void *buf, uint16_t len) goto failed;
+>  	}
 > 
-> -static int get_sec_level(struct gatt_device *dev)
-> -{
-> -	GIOChannel *io;
-> -	int sec_level;
-> -
-> -	io = g_attrib_get_channel(dev->attrib);
-> -
-> -	if (!bt_io_get(io, NULL, BT_IO_OPT_SEC_LEVEL, &sec_level,
-> -							BT_IO_OPT_INVALID)) {
-> -		error("gatt: Failed to get sec_level");
-> -		return -1;
-> -	}
-> -
-> -	return sec_level;
-> -}
-> -
->  static void handle_client_write_characteristic(const void *buf, uint16_t
-> len) {
->  	const struct hal_cmd_gatt_client_write_characteristic *cmd = buf;
-
-This patch is now applied. Thanks.
+> +	if (!set_security(conn->device, cmd->auth_req)) {
+> +		error("gatt: Failed to set security %d", cmd->auth_req);
+> +		status = HAL_STATUS_FAILED;
+> +		free(cb_data);
+> +		goto failed;
+> +	}
+> +
+>  	if (!gatt_read_char(conn->device->attrib, ch->ch.value_handle,
+>  						read_char_cb, cb_data)) {
+>  		error("gatt: Cannot read characteristic with inst_id: %d",
+> @@ -2898,6 +2951,12 @@ static void handle_client_write_characteristic(const
+> void *buf, uint16_t len) }
+>  	}
+> 
+> +	if (!set_security(conn->device, cmd->auth_req)) {
+> +		error("gatt: Failed to set security %d", cmd->auth_req);
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+>  	switch (cmd->write_type) {
+>  	case GATT_WRITE_TYPE_NO_RESPONSE:
+>  		res = gatt_write_cmd(conn->device->attrib, ch->ch.value_handle,
+> @@ -3099,6 +3158,13 @@ static void handle_client_read_descriptor(const void
+> *buf, uint16_t len) goto failed;
+>  	}
+> 
+> +	if (!set_security(conn->device, cmd->auth_req)) {
+> +		error("gatt: Failed to set security %d", cmd->auth_req);
+> +		status = HAL_STATUS_FAILED;
+> +		free(cb_data);
+> +		goto failed;
+> +	}
+> +
+>  	if (!gatt_read_char(conn->device->attrib, descr->handle, read_desc_cb,
+>  								cb_data)) {
+>  		free(cb_data);
+> @@ -3224,6 +3290,12 @@ static void handle_client_write_descriptor(const void
+> *buf, uint16_t len) }
+>  	}
+> 
+> +	if (!set_security(conn->device, cmd->auth_req)) {
+> +		error("gatt: Failed to set security %d", cmd->auth_req);
+> +		status = HAL_STATUS_FAILED;
+> +		goto failed;
+> +	}
+> +
+>  	switch (cmd->write_type) {
+>  	case GATT_WRITE_TYPE_NO_RESPONSE:
+>  		res = gatt_write_cmd(conn->device->attrib, descr->handle,
 
 -- 
 Szymon K. Janc
