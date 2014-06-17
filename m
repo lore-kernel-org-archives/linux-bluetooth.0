@@ -1,146 +1,179 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@gmail.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] android/gatt: Set security level if user requested
-Date: Tue, 17 Jun 2014 21:52:09 +0200
-Message-ID: <18708757.JorTnFHVQT@athlon>
-In-Reply-To: <1403011871-8354-3-git-send-email-marcin.kraglak@tieto.com>
-References: <1403011871-8354-1-git-send-email-marcin.kraglak@tieto.com> <1403011871-8354-3-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Subject: [RFC v2] Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
+Date: Tue, 17 Jun 2014 22:33:56 +0300
+Message-Id: <1403033636-25298-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+The highly optimized TX path for L2CAP channels and its fragmentation
+within the HCI ACL packets requires to copy data from user provided
+IO vectors and also kernel provided memory buffers.
 
-On Tuesday 17 June 2014 15:31:11 Marcin Kraglak wrote:
-> Set security level if user requested. It is used when frameworks receives
-> INSUFFICIENT_ENCRYPTION or INSUFFICIENT_AUTHENTICATIONS errors on read/write
-> requests and tries to elevate security.
-> ---
->  android/gatt.c | 72
-> ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ 1 file changed,
-> 72 insertions(+)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 9531577..b958167 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -2731,6 +2731,52 @@ static int get_sec_level(struct gatt_device *dev)
->  	return sec_level;
->  }
-> 
-> +static bool set_security(struct gatt_device *device, int security)
-> +{
-> +	int req_sec_level, sec_level;
-> +	GError *gerr = NULL;
-> +	GIOChannel *io;
-> +
-> +	if (security < HAL_AUTHENTICATION_NONE ||
-> +					security > HAL_AUTHENTICATION_MITM) {
-> +		error("gatt: Invalid security value: %d", security);
-> +		return false;
-> +	}
+This patch allows channel clients to provide a memcpy_fromiovec callback
+to keep this optimized behavior, but adapt it to kernel vs user memory
+for the TX path. For all kernel internal L2CAP channels, a default
+implementation is provided that can be referenced.
 
-Mmove this into default case in switch below.
+In case of A2MP, this fixes a long-standing issue with wrongly accessing
+kernel memory as user memory.
 
-> +
-> +	switch (security) {
-> +	case HAL_AUTHENTICATION_MITM:
-> +		req_sec_level = BT_SECURITY_HIGH;
-> +		break;
-> +	case HAL_AUTHENTICATION_NO_MITM:
-> +		req_sec_level = BT_SECURITY_MEDIUM;
-> +		break;
-> +	case HAL_AUTHENTICATION_NONE:
-> +		req_sec_level = BT_SECURITY_LOW;
-> +		break;
-> +	}
-> +
-> +	sec_level = get_sec_level(device);
-> +	if (sec_level < 0)
-> +		return false;
-> +
-> +	if (req_sec_level <= sec_level)
-> +		return true;
-> +
-> +	io = g_attrib_get_channel(device->attrib);
-> +	if (!io)
-> +		return false;
-> +
-> +	bt_io_set(io, &gerr, BT_IO_OPT_SEC_LEVEL, req_sec_level,
-> +							BT_IO_OPT_INVALID);
-> +	if (gerr) {
-> +		error("%s\n", gerr->message);
+This patch originally by Marcel Holtmann.
+---
+Hi Marcel,
 
-Prefix error with "gatt: Failed to set..."
+this is almost the same patch that you sent earlier but the kernel
+memcpy version uses kvec instead of iovec.
 
-> +		g_error_free(gerr);
-> +		return false;
-> +	}
-> +
-> +	return true;
-> +}
-> +
->  static void handle_client_read_characteristic(const void *buf, uint16_t
-> len) {
->  	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
-> @@ -2771,6 +2817,13 @@ static void handle_client_read_characteristic(const
-> void *buf, uint16_t len) goto failed;
->  	}
-> 
-> +	if (!set_security(conn->device, cmd->auth_req)) {
-> +		error("gatt: Failed to set security %d", cmd->auth_req);
-> +		status = HAL_STATUS_FAILED;
-> +		free(cb_data);
-> +		goto failed;
-> +	}
-> +
->  	if (!gatt_read_char(conn->device->attrib, ch->ch.value_handle,
->  						read_char_cb, cb_data)) {
->  		error("gatt: Cannot read characteristic with inst_id: %d",
-> @@ -2898,6 +2951,12 @@ static void handle_client_write_characteristic(const
-> void *buf, uint16_t len) }
->  	}
-> 
-> +	if (!set_security(conn->device, cmd->auth_req)) {
-> +		error("gatt: Failed to set security %d", cmd->auth_req);
-> +		status = HAL_STATUS_FAILED;
-> +		goto failed;
-> +	}
-> +
->  	switch (cmd->write_type) {
->  	case GATT_WRITE_TYPE_NO_RESPONSE:
->  		res = gatt_write_cmd(conn->device->attrib, ch->ch.value_handle,
-> @@ -3099,6 +3158,13 @@ static void handle_client_read_descriptor(const void
-> *buf, uint16_t len) goto failed;
->  	}
-> 
-> +	if (!set_security(conn->device, cmd->auth_req)) {
-> +		error("gatt: Failed to set security %d", cmd->auth_req);
-> +		status = HAL_STATUS_FAILED;
-> +		free(cb_data);
-> +		goto failed;
-> +	}
-> +
->  	if (!gatt_read_char(conn->device->attrib, descr->handle, read_desc_cb,
->  								cb_data)) {
->  		free(cb_data);
-> @@ -3224,6 +3290,12 @@ static void handle_client_write_descriptor(const void
-> *buf, uint16_t len) }
->  	}
-> 
-> +	if (!set_security(conn->device, cmd->auth_req)) {
-> +		error("gatt: Failed to set security %d", cmd->auth_req);
-> +		status = HAL_STATUS_FAILED;
-> +		goto failed;
-> +	}
-> +
->  	switch (cmd->write_type) {
->  	case GATT_WRITE_TYPE_NO_RESPONSE:
->  		res = gatt_write_cmd(conn->device->attrib, descr->handle,
+Compile tested only.
 
+
+Cheers,
+Jukka
+
+ include/net/bluetooth/l2cap.h | 29 +++++++++++++++++++++++++++++
+ net/bluetooth/a2mp.c          |  1 +
+ net/bluetooth/l2cap_core.c    |  6 ++++--
+ net/bluetooth/l2cap_sock.c    | 34 +++++++++++++++++++++-------------
+ 4 files changed, 55 insertions(+), 15 deletions(-)
+
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 9251103..1ee6f00 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -602,6 +602,10 @@ struct l2cap_ops {
+ 	struct sk_buff		*(*alloc_skb) (struct l2cap_chan *chan,
+ 					       unsigned long hdr_len,
+ 					       unsigned long len, int nb);
++	int			(*memcpy_fromiovec) (struct l2cap_chan *chan,
++						     unsigned char *kdata,
++						     struct iovec *iov,
++						     int len);
+ };
+ 
+ struct l2cap_conn {
+@@ -857,6 +861,31 @@ static inline long l2cap_chan_no_get_sndtimeo(struct l2cap_chan *chan)
+ 	return 0;
+ }
+ 
++static inline int l2cap_chan_no_memcpy_fromiovec(struct l2cap_chan *chan,
++						 unsigned char *kdata,
++						 struct iovec *iov,
++						 int len)
++{
++	/* Following is safe since for compiler definitions of kvec and
++	 * iovec are identical, yielding the same in-core layout and alignment
++	 */
++	struct kvec *vec = (struct kvec *)iov;
++
++	while (len > 0) {
++		if (vec->iov_len) {
++			int copy = min_t(unsigned int, len, vec->iov_len);
++			memcpy(kdata, vec->iov_base, copy);
++			len -= copy;
++			kdata += copy;
++			vec->iov_base += copy;
++			vec->iov_len -= copy;
++		}
++		vec++;
++	}
++
++	return 0;
++}
++
+ extern bool disable_ertm;
+ 
+ int l2cap_init_sockets(void);
+diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
+index 0fd8d1d..5dcade5 100644
+--- a/net/bluetooth/a2mp.c
++++ b/net/bluetooth/a2mp.c
+@@ -720,6 +720,7 @@ static const struct l2cap_ops a2mp_chan_ops = {
+ 	.resume = l2cap_chan_no_resume,
+ 	.set_shutdown = l2cap_chan_no_set_shutdown,
+ 	.get_sndtimeo = l2cap_chan_no_get_sndtimeo,
++	.memcpy_fromiovec = l2cap_chan_no_memcpy_fromiovec,
+ };
+ 
+ static struct l2cap_chan *a2mp_chan_open(struct l2cap_conn *conn, bool locked)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index ac24614..d0a5fde 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -2118,7 +2118,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 	struct sk_buff **frag;
+ 	int sent = 0;
+ 
+-	if (memcpy_fromiovec(skb_put(skb, count), msg->msg_iov, count))
++	if (chan->ops->memcpy_fromiovec(chan, skb_put(skb, count),
++					msg->msg_iov, count))
+ 		return -EFAULT;
+ 
+ 	sent += count;
+@@ -2138,7 +2139,8 @@ static inline int l2cap_skbuff_fromiovec(struct l2cap_chan *chan,
+ 
+ 		*frag = tmp;
+ 
+-		if (memcpy_fromiovec(skb_put(*frag, count), msg->msg_iov, count))
++		if (chan->ops->memcpy_fromiovec(chan, skb_put(*frag, count),
++						msg->msg_iov, count))
+ 			return -EFAULT;
+ 
+ 		sent += count;
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 55215eb..bf72886 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1313,6 +1313,13 @@ static struct sk_buff *l2cap_sock_alloc_skb_cb(struct l2cap_chan *chan,
+ 	return skb;
+ }
+ 
++static int l2cap_sock_memcpy_fromiovec_cb(struct l2cap_chan *chan,
++					  unsigned char *kdata,
++					  struct iovec *iov, int len)
++{
++	return memcpy_fromiovec(kdata, iov, len);
++}
++
+ static void l2cap_sock_ready_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk = chan->data;
+@@ -1379,19 +1386,20 @@ static void l2cap_sock_suspend_cb(struct l2cap_chan *chan)
+ }
+ 
+ static const struct l2cap_ops l2cap_chan_ops = {
+-	.name		= "L2CAP Socket Interface",
+-	.new_connection	= l2cap_sock_new_connection_cb,
+-	.recv		= l2cap_sock_recv_cb,
+-	.close		= l2cap_sock_close_cb,
+-	.teardown	= l2cap_sock_teardown_cb,
+-	.state_change	= l2cap_sock_state_change_cb,
+-	.ready		= l2cap_sock_ready_cb,
+-	.defer		= l2cap_sock_defer_cb,
+-	.resume		= l2cap_sock_resume_cb,
+-	.suspend	= l2cap_sock_suspend_cb,
+-	.set_shutdown	= l2cap_sock_set_shutdown_cb,
+-	.get_sndtimeo	= l2cap_sock_get_sndtimeo_cb,
+-	.alloc_skb	= l2cap_sock_alloc_skb_cb,
++	.name			= "L2CAP Socket Interface",
++	.new_connection		= l2cap_sock_new_connection_cb,
++	.recv			= l2cap_sock_recv_cb,
++	.close			= l2cap_sock_close_cb,
++	.teardown		= l2cap_sock_teardown_cb,
++	.state_change		= l2cap_sock_state_change_cb,
++	.ready			= l2cap_sock_ready_cb,
++	.defer			= l2cap_sock_defer_cb,
++	.resume			= l2cap_sock_resume_cb,
++	.suspend		= l2cap_sock_suspend_cb,
++	.set_shutdown		= l2cap_sock_set_shutdown_cb,
++	.get_sndtimeo		= l2cap_sock_get_sndtimeo_cb,
++	.alloc_skb		= l2cap_sock_alloc_skb_cb,
++	.memcpy_fromiovec	= l2cap_sock_memcpy_fromiovec_cb,
+ };
+ 
+ static void l2cap_sock_destruct(struct sock *sk)
 -- 
-Szymon K. Janc
-szymon.janc@gmail.com
+1.8.3.1
+
