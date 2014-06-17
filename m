@@ -1,30 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH] android/health: Fix wrong parameter passing to android2bdaddr
-Date: Tue, 17 Jun 2014 15:53:27 +0300
-Message-Id: <1403009607-6232-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Date: Tue, 17 Jun 2014 15:45:46 +0300
+From: 'Andrei Emeltchenko' <andrei.emeltchenko.news@gmail.com>
+To: Vikrampal <vikram.pal@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+Subject: Re: Android AOSP source tree downloading fails
+Message-ID: <20140617124544.GC621@aemeltch-MOBL1>
+References: <014f01cf8a1f$6b1c74c0$41555e40$@samsung.com>
+ <20140617114548.GB621@aemeltch-MOBL1>
+ <015801cf8a29$8660b250$932216f0$@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <015801cf8a29$8660b250$932216f0$@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Vikram,
 
-diff --git a/android/health.c b/android/health.c
-index 585d8a4..58323d9 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1102,7 +1102,7 @@ static struct health_device *create_device(uint16_t app_id,
- 	if (!dev)
- 		return NULL;
- 
--	android2bdaddr(&addr, &dev->dst);
-+	android2bdaddr(addr, &dev->dst);
- 	dev->app_id = app_id;
- 
- 	return dev;
--- 
-1.9.1
+On Tue, Jun 17, 2014 at 06:11:29PM +0530, Vikrampal wrote:
+> Hi Andrei,
+> 
+> >-----Original Message-----
+> >From: Andrei Emeltchenko [mailto:andrei.emeltchenko.news@gmail.com] 
+> >Sent: Tuesday, June 17, 2014 5:16 PM
+> >To: Vikrampal
+> >Cc: linux-bluetooth@vger.kernel.org; cpgs@samsung.com
+> >Subject: Re: Android AOSP source tree downloading fails
+> >
+> >Hi Vikram,
+> >
+> >On Tue, Jun 17, 2014 at 04:59:28PM +0530, Vikrampal wrote:
+> >> Hi,
+> >> 
+> >> I'm trying to download full Android AOSP source tree. I tried 2 methods:
+> >> 1) repo init -u https://code.google.com/p/aosp-bluez.platform-manifest 
+> >> -b kitkat
+> >>      repo sync
+> >> error: Exited sync due to fetch errors
+> >
+> >Which project it cannot fetch?
+> >
+> >Best regards
+> >Andrei Emeltchenko 
+> 
+> platform/packages/apps/PackageInstaller
+> 
 
+Something wrong with proxies?
+
+$ repo sync platform/packages/apps/PackageInstaller
+Fetching project platform/packages/apps/PackageInstaller
+Fetching projects: 100% (1/1), done.  
+
+Best regards 
+Andrei Emeltchenko 
