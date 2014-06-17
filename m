@@ -1,51 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix validating IO capability values in mgmt commands
-Date: Tue, 17 Jun 2014 15:14:48 +0300
-Message-Id: <1403007288-7152-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 17 Jun 2014 14:45:49 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Vikrampal <vikram.pal@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+Subject: Re: Android AOSP source tree downloading fails
+Message-ID: <20140617114548.GB621@aemeltch-MOBL1>
+References: <014f01cf8a1f$6b1c74c0$41555e40$@samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <014f01cf8a1f$6b1c74c0$41555e40$@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Vikram,
 
-The valid range of IO capabilities for the Set IO Capability and Pair
-Device mgmt commands is 0-4 (4 being the KeyboarDisplay capability for
-SMP). We should return an invalid parameters error if user space gives
-us a value outside of this range.
+On Tue, Jun 17, 2014 at 04:59:28PM +0530, Vikrampal wrote:
+> Hi,
+> 
+> I'm trying to download full Android AOSP source tree. I tried 2 methods:
+> 1) repo init -u https://code.google.com/p/aosp-bluez.platform-manifest -b
+> kitkat
+>      repo sync
+> error: Exited sync due to fetch errors
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Which project it cannot fetch?
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 99eb845865ef..5bf032d9bce1 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2766,6 +2766,10 @@ static int set_io_capability(struct sock *sk, struct hci_dev *hdev, void *data,
- 
- 	BT_DBG("");
- 
-+	if (cp->io_capability > SMP_IO_KEYBOARD_DISPLAY)
-+		return cmd_complete(sk, hdev->id, MGMT_OP_SET_IO_CAPABILITY,
-+				    MGMT_STATUS_INVALID_PARAMS, NULL, 0);
-+
- 	hci_dev_lock(hdev);
- 
- 	hdev->io_capability = cp->io_capability;
-@@ -2878,6 +2882,11 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 				    MGMT_STATUS_INVALID_PARAMS,
- 				    &rp, sizeof(rp));
- 
-+	if (cp->io_cap > SMP_IO_KEYBOARD_DISPLAY)
-+		return cmd_complete(sk, hdev->id, MGMT_OP_PAIR_DEVICE,
-+				    MGMT_STATUS_INVALID_PARAMS,
-+				    &rp, sizeof(rp));
-+
- 	hci_dev_lock(hdev);
- 
- 	if (!hdev_is_powered(hdev)) {
--- 
-1.9.3
+Best regards 
+Andrei Emeltchenko 
 
+> 
+> 2) git clone https://code.google.com/p/aosp-bluez.platform-manifest
+> Warning: remote HEAD refers to nonexistent ref, unable to checkout
+> 
+> Both the above methods failed.
+> 
+> Please help me in downloading it. Thanks!
+> 
+> Regards,
+> Vikram
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
