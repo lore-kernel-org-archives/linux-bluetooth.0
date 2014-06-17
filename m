@@ -1,50 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: L2CAP socket to HCI handle, opposite possible?
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CANLOmB5fo8JvrtXGdp+3eqXcPiSauEyD8L6Gcer0cWD6+Qtp_A@mail.gmail.com>
+Date: Tue, 17 Jun 2014 14:55:06 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/pts: Disable OOB from Secure Manager PICS
-Date: Tue, 17 Jun 2014 15:06:36 +0200
-Message-ID: <7930007.4UKpXLPTX4@uw000953>
-In-Reply-To: <1402958397-1415-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1402958397-1415-1-git-send-email-lukasz.rymanowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <FDFE96A3-5B0D-440D-B9BF-1905E4BC2034@holtmann.org>
+References: <CANLOmB5UXAJRModTofiYy-gtj=DvDiq_PU_n6NswrbXw_9_94A@mail.gmail.com> <CD90C45F-0899-43A6-870C-DE24E43E5D04@holtmann.org> <CANLOmB5fo8JvrtXGdp+3eqXcPiSauEyD8L6Gcer0cWD6+Qtp_A@mail.gmail.com>
+To: Seon-Wook Park <seon.wook@swook.net>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Łukasz,
+Hi Sean-Wook,
 
-On Tuesday 17 of June 2014 00:39:56 Lukasz Rymanowski wrote:
-> ---
->  android/pics-sm.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+no top posting on this mailing list please.
+
+> Thank you for your suggestions.
 > 
-> diff --git a/android/pics-sm.txt b/android/pics-sm.txt
-> index 3060d40..239f568 100644
-> --- a/android/pics-sm.txt
-> +++ b/android/pics-sm.txt
-> @@ -25,7 +25,7 @@ Parameter Name	Selected	Description
->  TSPC_SM_2_1	True		Authenticated MITM protection (O)
->  TSPC_SM_2_2	True		Unauthenticated no MITM protection (C.1)
->  TSPC_SM_2_3	True		No security requirements (M)
-> -TSPC_SM_2_4	True		OOB supported (O)
-> +TSPC_SM_2_4	False		OOB supported (O)
->  -------------------------------------------------------------------------------
->  C.1: If TSPC_SM_2_1 is supported then Mandatory, else Optional
->  -------------------------------------------------------------------------------
-> @@ -45,7 +45,7 @@ Parameter Name	Selected	Description
->  -------------------------------------------------------------------------------
->  TSPC_SM_4_1	True		Just Works (O)
->  TSPC_SM_4_2	True		Passkey Entry (C.1)
-> -TSPC_SM_4_3	True		Out of Band (C.1)
-> +TSPC_SM_4_3	False		Out of Band (C.1)
->  -------------------------------------------------------------------------------
->  C.1: If TSPC_SM_2_1 is supported, at least one of these features shall be
->  	supported.
+> I notice in `doc/mgmt-api.txt` that there is no mention of updating
+> connection parameters, which is what we're currently aiming to get by
+> tweaking the library used. These parameters include:
 > 
+> - min. interval
+> - max. interval
+> - latency
+> - supervisor timeout
+> 
+> Is it possible to set connection parameters on BLE connect using the
+> mgmt API? It is possible with `hci_le_conn_create` but not with the
+> opening of an L2CAP socket connection.
 
-Both patches (v2 of 2/2) applied, thanks.
+if you search the archive there is an API proposal for storing proposed connection parameters and being able to load them back on system start. So that once a peripheral has proposed different connection parameters, they will be horned automatically for the next connection creation.
 
--- 
-Best regards, 
-Szymon Janc
+Changing them on the central independent on what the peripheral wants from us is something that only Bluetooth 4.1 devices with link layer topology are suppose to do and for that a new L2CAP socket option would be needed.
+
+Regards
+
+Marcel
+
