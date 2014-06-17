@@ -1,90 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/system-emulator: Allow to run daemon without valgrind
-Date: Tue, 17 Jun 2014 11:11:53 +0200
-Message-ID: <7546385.FRHW8imyP3@uw000953>
-In-Reply-To: <1402928748-16128-1-git-send-email-szymon.janc@tieto.com>
-References: <1402928748-16128-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Subject: [PATCH BlueZ 2/3] tools/mpris-player: Rename to mpris-proxy
+Date: Tue, 17 Jun 2014 11:22:01 +0300
+Message-Id: <1402993322-8392-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1402993322-8392-1-git-send-email-luiz.dentz@gmail.com>
+References: <1402993322-8392-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Monday 16 of June 2014 16:25:48 Szymon Janc wrote:
-> If valgrind is not present on system start bluetoothd directly instead
-> of failing silently.
-> ---
->  android/system-emulator.c | 35 +++++++++++++++++++++++++++++------
->  1 file changed, 29 insertions(+), 6 deletions(-)
-> 
-> diff --git a/android/system-emulator.c b/android/system-emulator.c
-> index c1b1b25..4d41fce 100644
-> --- a/android/system-emulator.c
-> +++ b/android/system-emulator.c
-> @@ -47,14 +47,10 @@ static char exec_dir[PATH_MAX + 1];
->  static pid_t daemon_pid = -1;
->  static pid_t snoop_pid = -1;
->  
-> -static void ctl_start(void)
-> +static void run_valgrind(char *prg_name)
->  {
-> -	char prg_name[PATH_MAX + 1];
->  	char *prg_argv[6];
->  	char *prg_envp[3];
-> -	pid_t pid;
-> -
-> -	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
->  
->  	prg_argv[0] = "/usr/bin/valgrind";
->  	prg_argv[1] = "--leak-check=full";
-> @@ -67,6 +63,30 @@ static void ctl_start(void)
->  	prg_envp[1] = "G_DEBUG=gc-friendly";
->  	prg_envp[2] = NULL;
->  
-> +	execve(prg_argv[0], prg_argv, prg_envp);
-> +}
-> +
-> +static void run_bluetoothd(char *prg_name)
-> +{
-> +	char *prg_argv[3];
-> +	char *prg_envp[1];
-> +
-> +	prg_argv[0] = prg_name;
-> +	prg_argv[1] = "-d";
-> +	prg_argv[2] = NULL;
-> +
-> +	prg_envp[0] = NULL;
-> +
-> +	execve(prg_argv[0], prg_argv, prg_envp);
-> +}
-> +
-> +static void ctl_start(void)
-> +{
-> +	char prg_name[PATH_MAX + 1];
-> +	pid_t pid;
-> +
-> +	snprintf(prg_name, sizeof(prg_name), "%s/%s", exec_dir, "bluetoothd");
-> +
->  	printf("Starting %s\n", prg_name);
->  
->  	pid = fork();
-> @@ -76,7 +96,10 @@ static void ctl_start(void)
->  	}
->  
->  	if (pid == 0) {
-> -		execve(prg_argv[0], prg_argv, prg_envp);
-> +		run_valgrind(prg_name);
-> +
-> +		/* Fallback to no valgrind if running with valgind failed */
-> +		run_bluetoothd(prg_name);
->  		exit(0);
->  	}
->  
-> 
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Applied.
+---
+ Makefile.tools                          | 6 +++---
+ tools/{mpris-player.c => mpris-proxy.c} | 0
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+ rename tools/{mpris-player.c => mpris-proxy.c} (100%)
 
+diff --git a/Makefile.tools b/Makefile.tools
+index c24bdf7..ce04dfc 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -277,7 +277,7 @@ noinst_PROGRAMS += tools/bdaddr tools/avinfo tools/avtest \
+ 			tools/hcieventmask tools/hcisecfilter \
+ 			tools/btmgmt tools/btinfo tools/btattach \
+ 			tools/btsnoop tools/btproxy tools/btiotest \
+-			tools/mpris-player tools/cltest tools/seq2bseq \
++			tools/mpris-proxy tools/cltest tools/seq2bseq \
+ 			tools/hex2hcd tools/ibeacon
+ 
+ tools_bdaddr_SOURCES = tools/bdaddr.c src/oui.h src/oui.c
+@@ -324,8 +324,8 @@ tools_btproxy_SOURCES = tools/btproxy.c monitor/bt.h \
+ tools_btiotest_SOURCES = tools/btiotest.c btio/btio.h btio/btio.c
+ tools_btiotest_LDADD = lib/libbluetooth-internal.la @GLIB_LIBS@
+ 
+-tools_mpris_player_SOURCES = tools/mpris-player.c
+-tools_mpris_player_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
++tools_mpris_proxy_SOURCES = tools/mpris-proxy.c
++tools_mpris_proxy_LDADD = gdbus/libgdbus-internal.la @GLIB_LIBS@ @DBUS_LIBS@
+ 
+ tools_cltest_SOURCES = tools/cltest.c monitor/mainloop.h monitor/mainloop.c
+ tools_cltest_LDADD = lib/libbluetooth-internal.la
+diff --git a/tools/mpris-player.c b/tools/mpris-proxy.c
+similarity index 100%
+rename from tools/mpris-player.c
+rename to tools/mpris-proxy.c
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
