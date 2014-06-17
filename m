@@ -1,44 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/bluetooth: Clear CSRK information after unpair
-Date: Tue, 17 Jun 2014 14:21:31 +0200
-Message-ID: <2691149.0XnAj7QzhB@uw000953>
-In-Reply-To: <1402988090-15544-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1402988090-15544-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix validating IO capability values in mgmt commands
+Date: Tue, 17 Jun 2014 15:14:48 +0300
+Message-Id: <1403007288-7152-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-On Tuesday 17 of June 2014 08:54:49 Marcin Kraglak wrote:
-> CSRK information should be removed when unpaired.
-> ---
->  android/bluetooth.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/android/bluetooth.c b/android/bluetooth.c
-> index bc10b38..092bdd7 100644
-> --- a/android/bluetooth.c
-> +++ b/android/bluetooth.c
-> @@ -796,6 +796,12 @@ static void update_le_state(struct device *dev, bool pairing, bool paired,
->  	} else if (!paired && !dev->bredr_paired) {
->  		bonded_devices = g_slist_remove(bonded_devices, dev);
->  		remove_device_info(dev, DEVICES_FILE);
-> +		dev->valid_local_csrk = false;
-> +		dev->valid_remote_csrk = false;
-> +		dev->local_sign_cnt = 0;
-> +		dev->remote_sign_cnt = 0;
-> +		memset(dev->local_csrk, 0, sizeof(dev->local_csrk));
-> +		memset(dev->remote_csrk, 0, sizeof(dev->remote_csrk));
->  		cache_device(dev);
->  	}
+The valid range of IO capabilities for the Set IO Capability and Pair
+Device mgmt commands is 0-4 (4 being the KeyboarDisplay capability for
+SMP). We should return an invalid parameters error if user space gives
+us a value outside of this range.
 
-Both patches applied, thanks.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 99eb845865ef..5bf032d9bce1 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2766,6 +2766,10 @@ static int set_io_capability(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	BT_DBG("");
+ 
++	if (cp->io_capability > SMP_IO_KEYBOARD_DISPLAY)
++		return cmd_complete(sk, hdev->id, MGMT_OP_SET_IO_CAPABILITY,
++				    MGMT_STATUS_INVALID_PARAMS, NULL, 0);
++
+ 	hci_dev_lock(hdev);
+ 
+ 	hdev->io_capability = cp->io_capability;
+@@ -2878,6 +2882,11 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 				    MGMT_STATUS_INVALID_PARAMS,
+ 				    &rp, sizeof(rp));
+ 
++	if (cp->io_cap > SMP_IO_KEYBOARD_DISPLAY)
++		return cmd_complete(sk, hdev->id, MGMT_OP_PAIR_DEVICE,
++				    MGMT_STATUS_INVALID_PARAMS,
++				    &rp, sizeof(rp));
++
+ 	hci_dev_lock(hdev);
+ 
+ 	if (!hdev_is_powered(hdev)) {
 -- 
-Best regards, 
-Szymon Janc
+1.9.3
+
