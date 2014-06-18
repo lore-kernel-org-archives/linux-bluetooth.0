@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 10/11] android/health: Fix missing error check
-Date: Wed, 18 Jun 2014 16:33:53 +0300
-Message-Id: <1403098434-28193-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 05/11] android/hal-msg: trivial: Correct coding style
+Date: Wed, 18 Jun 2014 16:33:48 +0300
+Message-Id: <1403098434-28193-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,41 +12,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Move rsp close to cmd improving readability of the code.
 ---
- android/mcap-lib.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ android/hal-msg.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/mcap-lib.c b/android/mcap-lib.c
-index 346688e..2a86416 100644
---- a/android/mcap-lib.c
-+++ b/android/mcap-lib.c
-@@ -2654,12 +2654,14 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 2c21a85..d93f557 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -403,6 +403,10 @@ struct hal_cmd_health_reg_app {
+ 	uint8_t  data[0];
+ } __attribute__((packed));
  
- 	while (latency > caps(mcl)->preempt_thresh && --retry >= 0) {
- 
--		clock_gettime(CLK, &t0);
-+		if (clock_gettime(CLK, &t0) < 0)
-+			return FALSE;
- 
- 		if (!read_btclock(mcl, btclock, &btres))
- 			continue;
- 
--		clock_gettime(CLK, base_time);
-+		if (clock_gettime(CLK, base_time) < 0)
-+			return FALSE;
- 
- 		/*
- 		 * Tries to detect preemption between clock_gettime
-@@ -2668,6 +2670,9 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
- 		latency = time_us(base_time) - time_us(&t0);
- 	}
- 
-+	if (retry < 0)
-+		return FALSE;
++struct hal_rsp_health_reg_app {
++	uint16_t app_id;
++} __attribute__((packed));
 +
- 	*timestamp = mcap_get_timestamp(mcl, base_time);
+ #define HAL_OP_HEALTH_MDEP		0x02
+ struct hal_cmd_health_mdep {
+ 	uint16_t app_id;
+@@ -413,10 +417,6 @@ struct hal_cmd_health_mdep {
+ 	uint8_t  descr[0];
+ } __attribute__((packed));
  
- 	return TRUE;
+-struct hal_rsp_health_reg_app {
+-	uint16_t app_id;
+-} __attribute__((packed));
+-
+ #define HAL_OP_HEALTH_UNREG_APP		0x03
+ struct hal_cmd_health_unreg_app {
+ 	uint16_t app_id;
 -- 
 1.8.3.2
 
