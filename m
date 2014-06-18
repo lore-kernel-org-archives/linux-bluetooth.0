@@ -1,57 +1,129 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bharat Panda <bharat.panda@samsung.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
-Subject: [PATCH ] privacy: Add privacy support in adapter properties
-Date: Wed, 18 Jun 2014 11:26:39 +0530
-Message-id: <1403070999-12328-1-git-send-email-bharat.panda@samsung.com>
+Subject: [PATCHv2 2/2] android/gatt: Set security level if user requested
+Date: Wed, 18 Jun 2014 07:43:11 +0200
+Message-Id: <1403070191-2356-2-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1403070191-2356-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1403070191-2356-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Adds LE privacy support to adapter_properties and emits
-signal on privacy settings changed.
+Set security level if user requested. It is used when frameworks receives
+INSUFFICIENT_ENCRYPTION or INSUFFICIENT_AUTHENTICATIONS errors on read/write
+requests and tries to elevate security.
 ---
- src/adapter.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ android/gatt.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index f5f8c8c..dacd30f 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -479,6 +479,10 @@ static void settings_changed(struct btd_adapter *adapter, uint32_t settings)
- 
- 		trigger_pairable_timeout(adapter);
- 	}
-+
-+	if (changed_mask & MGMT_SETTING_PRIVACY)
-+		g_dbus_emit_property_changed(dbus_conn, adapter->path,
-+					ADAPTER_INTERFACE, "Privacy");
+diff --git a/android/gatt.c b/android/gatt.c
+index 9531577..e6014aa 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -2731,6 +2731,49 @@ static int get_sec_level(struct gatt_device *dev)
+ 	return sec_level;
  }
  
- static void new_settings_callback(uint16_t index, uint16_t length,
-@@ -2171,6 +2175,14 @@ static gboolean property_get_modalias(const GDBusPropertyTable *property,
- 	return TRUE;
- }
- 
-+static gboolean property_get_privacy(const GDBusPropertyTable *property,
-+					DBusMessageIter *iter, void *user_data)
++static bool set_security(struct gatt_device *device, int security)
 +{
-+	struct btd_adapter *adapter = user_data;
++	int req_sec_level, sec_level;
++	GError *gerr = NULL;
++	GIOChannel *io;
 +
-+	return property_get_mode(adapter, MGMT_SETTING_PRIVACY, iter);
++	switch (security) {
++	case HAL_AUTHENTICATION_MITM:
++		req_sec_level = BT_SECURITY_HIGH;
++		break;
++	case HAL_AUTHENTICATION_NO_MITM:
++		req_sec_level = BT_SECURITY_MEDIUM;
++		break;
++	case HAL_AUTHENTICATION_NONE:
++		req_sec_level = BT_SECURITY_LOW;
++		break;
++	default:
++		error("gatt: Invalid security value: %d", security);
++		return false;
++	}
++
++	sec_level = get_sec_level(device);
++	if (sec_level < 0)
++		return false;
++
++	if (req_sec_level <= sec_level)
++		return true;
++
++	io = g_attrib_get_channel(device->attrib);
++	if (!io)
++		return false;
++
++	bt_io_set(io, &gerr, BT_IO_OPT_SEC_LEVEL, req_sec_level,
++							BT_IO_OPT_INVALID);
++	if (gerr) {
++		error("%s\n", gerr->message);
++		g_error_free(gerr);
++		return false;
++	}
++
++	return true;
 +}
 +
- static int device_path_cmp(gconstpointer a, gconstpointer b)
+ static void handle_client_read_characteristic(const void *buf, uint16_t len)
  {
- 	const struct btd_device *device = a;
-@@ -2238,6 +2250,7 @@ static const GDBusPropertyTable adapter_properties[] = {
- 	{ "UUIDs", "as", property_get_uuids },
- 	{ "Modalias", "s", property_get_modalias, NULL,
- 					property_exists_modalias },
-+	{ "Privacy", "b", property_get_privacy },
- 	{ }
- };
+ 	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
+@@ -2771,6 +2814,13 @@ static void handle_client_read_characteristic(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
  
++	if (!set_security(conn->device, cmd->auth_req)) {
++		error("gatt: Failed to set security %d", cmd->auth_req);
++		status = HAL_STATUS_FAILED;
++		free(cb_data);
++		goto failed;
++	}
++
+ 	if (!gatt_read_char(conn->device->attrib, ch->ch.value_handle,
+ 						read_char_cb, cb_data)) {
+ 		error("gatt: Cannot read characteristic with inst_id: %d",
+@@ -2898,6 +2948,12 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
+ 		}
+ 	}
+ 
++	if (!set_security(conn->device, cmd->auth_req)) {
++		error("gatt: Failed to set security %d", cmd->auth_req);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
+ 	switch (cmd->write_type) {
+ 	case GATT_WRITE_TYPE_NO_RESPONSE:
+ 		res = gatt_write_cmd(conn->device->attrib, ch->ch.value_handle,
+@@ -3099,6 +3155,13 @@ static void handle_client_read_descriptor(const void *buf, uint16_t len)
+ 		goto failed;
+ 	}
+ 
++	if (!set_security(conn->device, cmd->auth_req)) {
++		error("gatt: Failed to set security %d", cmd->auth_req);
++		status = HAL_STATUS_FAILED;
++		free(cb_data);
++		goto failed;
++	}
++
+ 	if (!gatt_read_char(conn->device->attrib, descr->handle, read_desc_cb,
+ 								cb_data)) {
+ 		free(cb_data);
+@@ -3224,6 +3287,12 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
+ 		}
+ 	}
+ 
++	if (!set_security(conn->device, cmd->auth_req)) {
++		error("gatt: Failed to set security %d", cmd->auth_req);
++		status = HAL_STATUS_FAILED;
++		goto failed;
++	}
++
+ 	switch (cmd->write_type) {
+ 	case GATT_WRITE_TYPE_NO_RESPONSE:
+ 		res = gatt_write_cmd(conn->device->attrib, descr->handle,
 -- 
-1.9.1
+1.9.3
 
