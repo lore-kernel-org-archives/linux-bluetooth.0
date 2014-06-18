@@ -1,35 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 04/11] android/hal-health: trivial: Correct coding style
-Date: Wed, 18 Jun 2014 16:33:47 +0300
-Message-Id: <1403098434-28193-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastianx.chlad@intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] HoG PTS testing
+Date: Wed, 18 Jun 2014 15:26:45 +0200
+Message-ID: <2651042.xT0JmIg2E8@uw000953>
+In-Reply-To: <1403075322-15168-1-git-send-email-sebastianx.chlad@intel.com>
+References: <1403075322-15168-1-git-send-email-sebastianx.chlad@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Sebastian,
 
----
- android/hal-health.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+On Wednesday 18 of June 2014 10:08:41 Sebastian Chlad wrote:
+> Interim results for HoG testing.
+> 
+> Sebastian Chlad (1):
+>   android/pts: PTS tests for HoG
+> 
+>  android/pts-hog.txt | 80 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>  create mode 100644 android/pts-hog.txt
+> 
+> 
 
-diff --git a/android/hal-health.c b/android/hal-health.c
-index ac6e87f..0d9136d 100644
---- a/android/hal-health.c
-+++ b/android/hal-health.c
-@@ -116,8 +116,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
- 	cmd->len = off;
- 	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
- 						sizeof(*cmd) + cmd->len, buf,
--							&rsp_len, &rsp, NULL);
--
-+						&rsp_len, &rsp, NULL);
- 	if (status != BT_STATUS_SUCCESS)
- 		return status;
- 
+Applied after changing name to pts-hogp.txt, thanks.
+
 -- 
-1.8.3.2
-
+Best regards, 
+Szymon Janc
