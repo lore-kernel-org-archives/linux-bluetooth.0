@@ -1,52 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 18 Jun 2014 11:46:11 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 05/17] android/gatt: Fix wrong initial value
-Message-ID: <20140618084609.GC12463@aemeltch-MOBL1>
-References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1402905472-17643-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <3045098.LyDRGR9gjU@athlon>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3045098.LyDRGR9gjU@athlon>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH] android/pts: Update GAP results
+Date: Wed, 18 Jun 2014 09:38:16 +0200
+Message-Id: <1403077096-4020-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+---
+ android/pts-gap.txt | 36 ++++++++++++++++++++++++++++++------
+ 1 file changed, 30 insertions(+), 6 deletions(-)
 
-On Tue, Jun 17, 2014 at 11:21:16PM +0200, Szymon Janc wrote:
-> Hi Andrei,
-> 
-> On Monday 16 June 2014 10:57:40 Andrei Emeltchenko wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Initialize value_len to -1 since otherwise check value_len >= 0 does not
-> > make sense.
-> > ---
-> >  android/gatt.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/android/gatt.c b/android/gatt.c
-> > index eb977d5..c5cb58f 100644
-> > --- a/android/gatt.c
-> > +++ b/android/gatt.c
-> > @@ -4288,7 +4288,7 @@ static void read_requested_attributes(void *data, void
-> > *user_data) struct request_processing_data *process_data = user_data;
-> >  	uint32_t permissions;
-> >  	uint8_t *value, error;
-> > -	int value_len = 0;
-> > +	int value_len = -1;
-> > 
-> >  	if (!gatt_db_get_attribute_permissions(gatt_db, resp_data->handle,
-> >  								&permissions)) {
-> 
-> This is not correct. value_len == -1 means that callback was called from 
-> gatt_db_read() and response will be filled later.
+diff --git a/android/pts-gap.txt b/android/pts-gap.txt
+index cd70326..c8d4a73 100644
+--- a/android/pts-gap.txt
++++ b/android/pts-gap.txt
+@@ -114,17 +114,23 @@ TC_CONN_UCON_BV_04_C	N/A
+ TC_CONN_UCON_BV_05_C	N/A
+ TC_CONN_ACEP_BV_01_C	INC	No white list support
+ 				Note: pass on some chips with 'gattc connect'
+-TC_CONN_ACEP_BV_02_C	INC	Privacy feature - not implemented
++TC_CONN_ACEP_BV_02_C	INC	No white list support
+ TC_CONN_GCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
+ TC_CONN_GCEP_BV_02_C	PASS	'gattc connect' prior to pressing OK on PTS
+-TC_CONN_GCEP_BV_03_C	INC	Privacy feature - not implemented
++TC_CONN_GCEP_BV_03_C	PASS	gattc connect
++				bluetooth create_bond
++				gattc connect
++				gattc disconnect
+ TC_CONN_GCEP_BV_04_C	INC	Privacy feature - not implemented
+ TC_CONN_SCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
+ TC_CONN_SCEP_BV_02_C	INC	Privacy feature - not implemented
+ TC_CONN_DCEP_BV_01_C	PASS	'gattc connect' prior to pressing OK on PTS
+ TC_CONN_DCEP_BV_02_C	INC	Privacy feature - not implemented
+ TC_CONN_DCEP_BV_03_C	PASS
+-TC_CONN_DCEP_BV_04_C	INC	Privacy feature - not implemented
++TC_CONN_DCEP_BV_04_C	PASS	gattc connect
++				gattc create_bond
++				gattc connect
++				gattc disconnect
+ TC_CONN_CPUP_BV_01_C	N/A
+ TC_CONN_CPUP_BV_02_C	N/A
+ TC_CONN_CPUP_BV_03_C	N/A
+@@ -272,10 +278,28 @@ TC_SEC_CSIGN_BI_02_C	PASS	haltest:
+ 				gattc disconnect
+ TC_SEC_CSIGN_BI_03_C	INC	Link security level elevation - not implemented
+ TC_SEC_CSIGN_BI_04_C	INC	Link security level elevation - not implemented
+-TC_PRIV_CONN_BV_01_C	INC	Privacy feature - not implemented
+-TC_PRIV_CONN_BV_02_C	INC	Privacy feature - not implemented
++TC_PRIV_CONN_BV_01_C	PASS	gattc connect
++				gattc create_bond
++				gattc search service
++				gattc get_characteristic
++				gattc write_characteristic (privacy flag)
++				gattc write_characteristic (reconnection addr.)
++				gattc disconnect
++TC_PRIV_CONN_BV_02_C	PASS	gattc connect
++				gattc search service
++				gattc get_characteristic
++				gattc write_characteristic (reconnection addr.)
++				gattc disconnect
+ TC_PRIV_CONN_BV_03_C	INC	Privacy feature - not implemented
+-TC_PRIV_CONN_BV_04_C	INC	Privacy feature - not implemented
++TC_PRIV_CONN_BV_04_C	PASS	gattc connect
++				gattc create_bond
++				gattc search service
++				gattc get_characteristic
++				gattc write_characteristic (privacy flag)
++				gattc write_characteristic (reconnection addr.)
++				gattc disconnect
++				gattc connect
++				gattc disconnect
+ TC_PRIV_CONN_BV_05_C	N/A
+ TC_PRIV_CONN_BV_06_C	N/A
+ TC_PRIV_CONN_BV_07_C	N/A
+-- 
+2.0.0
 
-Do you mean that in gatt_db_read() we should check for !*length not
-!length like it is checked now? Otherwise it does not have effect.
-
-Best regards 
-Andrei Emeltchenko 
