@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 08/11] android/health: Remove unneeded check
-Date: Wed, 18 Jun 2014 16:33:51 +0300
-Message-Id: <1403098434-28193-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 01/11] android/gatt: Change DBG() to error()
+Date: Wed, 18 Jun 2014 16:33:44 +0300
+Message-Id: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-In case of error err is always set so the check is not needed.
 ---
- android/health.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/android/health.c b/android/health.c
-index 0462e99..f893d0f 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1063,9 +1063,7 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
- 	if (!mcap_create_mcl(mcap, &channel->dev->dst, channel->dev->ccpsm,
- 					create_mcl_cb, channel, NULL, &gerr)) {
- 		error("error creating mcl %s", gerr->message);
--
--		if (gerr)
--			g_error_free(gerr);
-+		g_error_free(gerr);
- 
- 		goto fail;
+diff --git a/android/gatt.c b/android/gatt.c
+index b256077..cb27f34 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4280,7 +4280,7 @@ static void fill_gatt_response_by_handle(uint16_t handle, uint16_t offset,
+ 	entry = queue_find(dev->pending_requests, match_dev_request_by_handle,
+ 							UINT_TO_PTR(handle));
+ 	if (!entry) {
+-		DBG("No pending response found! Bogus android response?");
++		error("gatt: No pending response! Bogus android response?");
+ 		return;
  	}
+ 
 -- 
 1.8.3.2
 
