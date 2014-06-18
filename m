@@ -2,418 +2,526 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v5 2/4] src/shared/att: Implement basic boilerplate.
-Date: Wed, 18 Jun 2014 13:25:41 -0700
-Message-Id: <1403123143-17543-3-git-send-email-armansito@chromium.org>
+Subject: [PATCH v5 1/4] src/shared/att: Introduce struct bt_att.
+Date: Wed, 18 Jun 2014 13:25:40 -0700
+Message-Id: <1403123143-17543-2-git-send-email-armansito@chromium.org>
 In-Reply-To: <1403123143-17543-1-git-send-email-armansito@chromium.org>
 References: <1403123143-17543-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the getters, setters, creation, ref, and unref
-functions for struct bt_att. Also added is a simple table for
-determining the ATT op type given an opcode and the io read handler that
-currently does nothing.
----
- src/shared/att.c | 306 +++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 286 insertions(+), 20 deletions(-)
+This patch introduces struct bt_att, which handles the transport and
+encoding/decoding for the ATT protocol. The structure of the code
+follows that of src/shared/mgmt and lib/mgmt.h, where individual
+parameter structures are defined for all ATT protocol requests, responses,
+commands, indications, and notifications. The serialization and
+endianness conversion for all parameters are handled by bt_att.
 
+struct bt_att is based around struct io and operates on a raw file
+descriptor.
+---
+ Makefile.am            |   3 +-
+ src/shared/att-types.h | 222 +++++++++++++++++++++++++++++++++++++++++++++++++
+ src/shared/att.c       | 170 +++++++++++++++++++++++++++++++++++++
+ src/shared/att.h       |  69 +++++++++++++++
+ 4 files changed, 463 insertions(+), 1 deletion(-)
+ create mode 100644 src/shared/att-types.h
+ create mode 100644 src/shared/att.c
+ create mode 100644 src/shared/att.h
+
+diff --git a/Makefile.am b/Makefile.am
+index dc88816..d10b573 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -156,7 +156,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
+ 			src/shared/timeout.h src/shared/timeout-glib.c \
+ 			src/shared/queue.h src/shared/queue.c \
+ 			src/shared/util.h src/shared/util.c \
+-			src/shared/mgmt.h src/shared/mgmt.c
++			src/shared/mgmt.h src/shared/mgmt.c \
++			src/shared/att-types.h src/shared/att.h src/shared/att.c
+ src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
+ 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
+ src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
+diff --git a/src/shared/att-types.h b/src/shared/att-types.h
+new file mode 100644
+index 0000000..636a5e3
+--- /dev/null
++++ b/src/shared/att-types.h
+@@ -0,0 +1,222 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#include <stdint.h>
++
++/* Error response */
++#define BT_ATT_OP_ERROR_RSP	      		0x01
++struct bt_att_error_rsp_param {
++	uint8_t request_opcode;
++	uint16_t handle;
++	uint8_t	error_code;
++};
++
++/* Exchange MTU */
++#define BT_ATT_OP_MTU_REQ			0x02
++struct bt_att_mtu_req_param {
++	uint16_t client_rx_mtu;
++};
++
++#define BT_ATT_OP_MTU_RSP			0x03
++struct bt_att_mtu_rsp_param {
++	uint16_t server_rx_mtu;
++};
++
++/* Find Information */
++#define BT_ATT_OP_FIND_INFO_REQ			0x04
++struct bt_att_find_info_req_param {
++	uint16_t start_handle;
++	uint16_t end_handle;
++};
++
++#define BT_ATT_OP_FIND_INFO_RSP			0x05
++struct bt_att_find_info_rsp_param {
++	uint8_t format;
++	const uint8_t *info_data;
++	uint16_t length;
++};
++
++/* Find By Type Value */
++#define BT_ATT_OP_FIND_BY_TYPE_VAL_REQ		0x06
++struct bt_att_find_by_type_value_req_param {
++	uint16_t start_handle;
++	uint16_t end_handle;
++	uint16_t type;  /* 2 octet UUID */
++	const uint8_t *value;
++	uint16_t length;  /* MAX length: (ATT_MTU - 7) */
++};
++
++#define BT_ATT_OP_FIND_BY_TYPE_VAL_RSP		0x07
++struct bt_att_find_by_type_value_rsp_param {
++	const uint8_t *handles_info_list;
++	uint16_t length;
++};
++
++/* Read By Type */
++#define BT_ATT_OP_READ_BY_TYPE_REQ		0x08
++struct bt_att_read_by_type_req_param {
++	uint16_t start_handle;
++	uint16_t end_handle;
++	bt_uuid_t type;  /* 2 or 16 octet UUID */
++};
++
++#define BT_ATT_OP_READ_BY_TYPE_RSP		0x09
++struct bt_att_read_by_type_rsp_param {
++	uint8_t length;
++	const uint8_t *attr_data_list;
++	uint16_t list_length;  /* Length of "attr_data_list" */
++};
++
++/* Read */
++#define BT_ATT_OP_READ_REQ			0x0a
++struct bt_att_read_req_param {
++	uint16_t handle;
++};
++
++#define BT_ATT_OP_READ_RSP			0x0b
++struct bt_att_read_rsp_param {
++	const uint8_t *value;
++	uint16_t length;
++};
++
++/* Read Blob */
++#define BT_ATT_OP_READ_BLOB_REQ			0x0c
++struct bt_att_read_blob_req_param {
++	uint16_t handle;
++	uint16_t offset;
++};
++
++#define BT_ATT_OP_READ_BLOB_RSP			0x0d
++struct bt_att_read_blob_rsp_param {
++	const uint8_t *part_value;
++	uint16_t length;
++};
++
++/* Read Multiple */
++#define BT_ATT_OP_READ_MULT_REQ			0x0e
++struct bt_att_read_multiple_req_param {
++	const uint16_t *handles;
++	uint16_t num_handles;
++};
++
++#define BT_ATT_OP_READ_MULT_RSP			0x0f
++struct bt_att_read_multiple_rsp_param {
++	const uint8_t *values;
++	uint16_t length;
++};
++
++/* Read By Group Type */
++#define BT_ATT_OP_READ_BY_GRP_TYPE_REQ		0x10
++struct bt_att_read_by_group_type_req_param {
++	uint16_t start_handle;
++	uint16_t end_handle;
++	bt_uuid_t type;
++};
++
++#define BT_ATT_OP_READ_BY_GRP_TYPE_RSP		0x11
++struct bt_att_read_by_group_type_rsp_param {
++	uint8_t length;
++	const uint8_t *attr_data_list;
++	uint16_t list_length;  /* Length of "attr_data_list" */
++};
++
++/* Write Request */
++#define BT_ATT_OP_WRITE_REQ			0x12
++/*
++ * bt_att_write_param is used for write request and signed and unsigned write
++ * command.
++ */
++struct bt_att_write_param {
++	uint16_t handle;
++	const uint8_t *value;
++	uint16_t length;
++};
++
++#define BT_ATT_OP_WRITE_RSP			0x13  /* No parameters */
++
++/* Write Command */
++#define BT_ATT_OP_WRITE_CMD			0x52
++
++/* Signed Write Command */
++#define BT_ATT_OP_SIGNED_WRITE_CMD		0xD2
++
++/* Prepare Write */
++#define BT_ATT_OP_PREP_WRITE_REQ		0x16
++struct bt_att_prepare_write_req_param {
++	uint16_t handle;
++	uint16_t offset;
++	const uint8_t *part_value;
++	uint16_t length;
++};
++
++#define BT_ATT_OP_PREP_WRITE_RSP		0x17
++struct bt_att_prepare_write_rsp_param {
++	uint16_t handle;
++	uint16_t offset;
++	const uint8_t *part_value;
++	uint16_t length;
++};
++
++/* Execute Write */
++#define BT_ATT_OP_EXEC_WRITE_REQ		0x18
++typedef enum {
++	BT_ATT_EXEC_WRITE_FLAG_CANCEL	= 0x00,
++	BT_ATT_EXEC_WRITE_FLAG_WRITE	= 0x01,
++} bt_att_exec_write_flag_t;
++
++struct bt_att_exec_write_req_param {
++	bt_att_exec_write_flag_t flags;
++};
++
++#define BT_ATT_OP_EXEC_WRITE_RSP		0x19
++
++/* Handle Value Notification/Indication */
++#define BT_ATT_OP_HANDLE_VAL_NOT		0x1B
++#define BT_ATT_OP_HANDLE_VAL_IND		0x1D
++struct bt_att_notify_param {
++	uint16_t handle;
++	const uint8_t *value;
++	uint16_t length;
++};
++
++/* Handle Value Confirmation */
++#define BT_ATT_OP_HANDLE_VAL_CONF		0x1E
++
++/* Error codes for Error response PDU */
++#define BT_ATT_ERROR_INVALID_HANDLE			0x01
++#define BT_ATT_ERROR_READ_NOT_PERMITTED			0x02
++#define BT_ATT_ERROR_WRITE_NOT_PERMITTED		0x03
++#define BT_ATT_ERROR_INVALID_PDU			0x04
++#define BT_ATT_ERROR_AUTHENTICATION			0x05
++#define BT_ATT_ERROR_REQUEST_NOT_SUPPORTED		0x06
++#define BT_ATT_ERROR_INVALID_OFFSET			0x07
++#define BT_ATT_ERROR_AUTHORIZATION			0x08
++#define BT_ATT_ERROR_PREPARE_QUEUE_FULL			0x09
++#define BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND		0x0A
++#define BT_ATT_ERROR_ATTRIBUTE_NOT_LONG			0x0B
++#define BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION_KEY_SIZE	0x0C
++#define BT_ATT_ERROR_INVALID_ATTRIBUTE_VALUE_LEN	0x0D
++#define BT_ATT_ERROR_UNLIKELY				0x0E
++#define BT_ATT_ERROR_INSUFFICIENT_ENCRYPTION		0x0F
++#define BT_ATT_ERROR_UNSUPPORTED_GROUP_TYPE		0x10
++#define BT_ATT_ERROR_INSUFFICIENT_RESOURCES		0x11
 diff --git a/src/shared/att.c b/src/shared/att.c
-index 4a1cac4..4659674 100644
---- a/src/shared/att.c
+new file mode 100644
+index 0000000..4a1cac4
+--- /dev/null
 +++ b/src/shared/att.c
-@@ -25,15 +25,19 @@
- #include <config.h>
- #endif
- 
-+#include <stdlib.h>
- #include <unistd.h>
- 
- #include "src/shared/io.h"
- #include "src/shared/queue.h"
-+#include "src/shared/util.h"
- #include "lib/uuid.h"
- #include "src/shared/att.h"
- 
- #define ATT_DEFAULT_LE_MTU		23
- #define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
-+#define ATT_OP_CMD_MASK			0x40
-+#define ATT_OP_SIGNED_MASK		0x80
- 
- struct att_send_op;
- 
-@@ -51,8 +55,6 @@ struct bt_att {
- 	struct queue *write_queue;	/* Queue of PDUs ready to send */
- 	bool writer_active;
- 
--	/* TODO Add notify queue */
--
- 	uint8_t *buf;
- 	uint16_t mtu;
- 
-@@ -68,8 +70,66 @@ struct bt_att {
- 	void *debug_data;
- };
- 
-+enum att_op_type {
-+	ATT_OP_TYPE_REQ,
-+	ATT_OP_TYPE_RSP,
-+	ATT_OP_TYPE_CMD,
-+	ATT_OP_TYPE_IND,
-+	ATT_OP_TYPE_NOT,
-+	ATT_OP_TYPE_CONF,
-+	ATT_OP_TYPE_UNKNOWN,
+@@ -0,0 +1,170 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <unistd.h>
++
++#include "src/shared/io.h"
++#include "src/shared/queue.h"
++#include "lib/uuid.h"
++#include "src/shared/att.h"
++
++#define ATT_DEFAULT_LE_MTU		23
++#define ATT_MIN_PDU_LEN			1  /* At least 1 byte for the opcode. */
++
++struct att_send_op;
++
++struct bt_att {
++	int ref_count;
++	int fd;
++	bool close_on_unref;
++	struct io *io;
++	bool invalid;  /* bt_att becomes invalid when a request times out */
++
++	struct queue *req_queue;	/* Queued ATT protocol requests */
++	struct att_send_op *pending_req;
++	struct queue *ind_queue;	/* Queued ATT protocol indications */
++	struct att_send_op *pending_ind;
++	struct queue *write_queue;	/* Queue of PDUs ready to send */
++	bool writer_active;
++
++	/* TODO Add notify queue */
++
++	uint8_t *buf;
++	uint16_t mtu;
++
++	unsigned int next_send_id;	/* IDs for "send" ops */
++	unsigned int next_reg_id;	/* IDs for registered callbacks */
++
++	bt_att_timeout_func_t timeout_callback;
++	bt_att_destroy_func_t timeout_destroy;
++	void *timeout_data;
++
++	bt_att_debug_func_t debug_callback;
++	bt_att_destroy_func_t debug_destroy;
++	void *debug_data;
 +};
 +
-+static const struct {
-+	uint8_t opcode;
-+	enum att_op_type type;
-+} att_opcode_type_table[] = {
-+	{ BT_ATT_OP_ERROR_RSP,			ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_MTU_REQ,			ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_MTU_RSP,			ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_FIND_INFO_REQ,		ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_FIND_INFO_RSP,		ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,	ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_FIND_BY_TYPE_VAL_RSP,	ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_READ_BY_TYPE_REQ,		ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_READ_BY_TYPE_RSP,		ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_READ_REQ,			ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_READ_RSP,			ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_READ_BLOB_REQ,		ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_READ_BLOB_RSP,		ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_READ_MULT_REQ,		ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_READ_MULT_RSP,		ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_READ_BY_GRP_TYPE_REQ,	ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_READ_BY_GRP_TYPE_RSP,	ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_WRITE_REQ,			ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_WRITE_RSP,			ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_WRITE_CMD,			ATT_OP_TYPE_CMD },
-+	{ BT_ATT_OP_SIGNED_WRITE_CMD,		ATT_OP_TYPE_CMD },
-+	{ BT_ATT_OP_PREP_WRITE_REQ,		ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_PREP_WRITE_RSP,		ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_EXEC_WRITE_REQ,		ATT_OP_TYPE_REQ },
-+	{ BT_ATT_OP_EXEC_WRITE_RSP,		ATT_OP_TYPE_RSP },
-+	{ BT_ATT_OP_HANDLE_VAL_NOT,		ATT_OP_TYPE_NOT },
-+	{ BT_ATT_OP_HANDLE_VAL_IND,		ATT_OP_TYPE_IND },
-+	{ BT_ATT_OP_HANDLE_VAL_CONF,		ATT_OP_TYPE_CONF },
-+	{ }
++struct att_send_op {
++	unsigned int id;
++	uint16_t opcode;
++	void *pdu;
++	uint16_t len;
++	bt_att_request_func_t callback;
++	bt_att_destroy_func_t destroy;
++	void *user_data;
 +};
 +
-+static enum att_op_type get_op_type(uint8_t opcode)
++struct bt_att *bt_att_new(int fd)
 +{
-+	int i;
-+
-+	for (i = 0; att_opcode_type_table[i].opcode; i++) {
-+		if (att_opcode_type_table[i].opcode == opcode)
-+			return att_opcode_type_table[i].type;
-+	}
-+
-+	return ATT_OP_TYPE_UNKNOWN;
++	/* TODO */
++	return NULL;
 +}
 +
- struct att_send_op {
- 	unsigned int id;
-+	enum att_op_type type;
- 	uint16_t opcode;
- 	void *pdu;
- 	uint16_t len;
-@@ -78,54 +138,206 @@ struct att_send_op {
- 	void *user_data;
- };
- 
-+static void destroy_att_send_op(void *data)
++struct bt_att *bt_att_ref(struct bt_att *att)
 +{
-+	struct att_send_op *op = data;
-+
-+	if (op->destroy)
-+		op->destroy(op->user_data);
-+
-+	free(op->pdu);
-+	free(op);
++	/* TODO */
++	return NULL;
 +}
 +
-+static bool can_read_data(struct io *io, void *user_data)
++void bt_att_unref(struct bt_att *att)
 +{
-+	struct bt_att *att = user_data;
-+	uint8_t *pdu;
-+	ssize_t bytes_read;
-+
-+	bytes_read = read(att->fd, att->buf, att->mtu);
-+	if (bytes_read < 0)
-+		return false;
-+
-+	util_hexdump('>', att->buf, bytes_read,
-+					att->debug_callback, att->debug_data);
-+
-+	if (bytes_read < ATT_MIN_PDU_LEN)
-+		return true;
-+
-+	/* TODO: Handle different types of PDUs here */
-+	return true;
++	/* TODO */
 +}
 +
- struct bt_att *bt_att_new(int fd)
- {
--	/* TODO */
-+	struct bt_att *att;
-+
-+	if (fd < 0)
-+		return NULL;
-+
-+	att = new0(struct bt_att, 1);
-+	if (!att)
-+		return NULL;
-+
-+	att->fd = fd;
-+
-+	att->mtu = ATT_DEFAULT_LE_MTU;
-+	att->buf = malloc(att->mtu);
-+	if (!att->buf)
-+		goto fail;
-+
-+	att->io = io_new(fd);
-+	if (!att->io)
-+		goto fail;
-+
-+	att->req_queue = queue_new();
-+	if (!att->req_queue)
-+		goto fail;
-+
-+	att->ind_queue = queue_new();
-+	if (!att->ind_queue)
-+		goto fail;
-+
-+	att->write_queue = queue_new();
-+	if (!att->write_queue)
-+		goto fail;
-+
-+	if (!io_set_read_handler(att->io, can_read_data, att, NULL))
-+		goto fail;
-+
-+	return bt_att_ref(att);
-+
-+fail:
-+	queue_destroy(att->req_queue, NULL);
-+	queue_destroy(att->ind_queue, NULL);
-+	queue_destroy(att->write_queue, NULL);
-+	io_destroy(att->io);
-+	free(att->buf);
-+	free(att);
-+
- 	return NULL;
- }
- 
- struct bt_att *bt_att_ref(struct bt_att *att)
- {
--	/* TODO */
--	return NULL;
-+	if (!att)
-+		return NULL;
-+
-+	__sync_fetch_and_add(&att->ref_count, 1);
-+
-+	return att;
- }
- 
- void bt_att_unref(struct bt_att *att)
- {
--	/* TODO */
-+	if (!att)
-+		return;
-+
-+	if (__sync_sub_and_fetch(&att->ref_count, 1))
-+		return;
-+
-+	bt_att_cancel_all(att);
-+
-+	io_set_write_handler(att->io, NULL, NULL, NULL);
-+	io_set_read_handler(att->io, NULL, NULL, NULL);
-+
-+	queue_destroy(att->req_queue, NULL);
-+	queue_destroy(att->ind_queue, NULL);
-+	queue_destroy(att->write_queue, NULL);
-+	att->req_queue = NULL;
-+	att->ind_queue = NULL;
-+	att->write_queue = NULL;
-+
-+	io_destroy(att->io);
-+	att->io = NULL;
-+
-+	if (att->close_on_unref)
-+		close(att->fd);
-+
-+	if (att->timeout_destroy)
-+		att->timeout_destroy(att->timeout_data);
-+
-+	if (att->debug_destroy)
-+		att->debug_destroy(att->debug_data);
-+
-+	free(att->buf);
-+	att->buf = NULL;
-+
-+	free(att);
- }
- 
- bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
- {
--	/* TODO */
--	return false;
-+	if (!att)
-+		return false;
-+
-+	att->close_on_unref = do_close;
-+
-+	return true;
- }
- 
- bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
- 				void *user_data, bt_att_destroy_func_t destroy)
- {
--	/* TODO */
--	return false;
-+	if (!att)
-+		return false;
-+
-+	if (att->debug_destroy)
-+		att->debug_destroy(att->debug_data);
-+
-+	att->debug_callback = callback;
-+	att->debug_destroy = destroy;
-+	att->debug_data = user_data;
-+
-+	return true;
- }
- 
- uint16_t bt_att_get_mtu(struct bt_att *att)
- {
--	/* TODO */
--	return 0;
-+	if (!att)
-+		return 0;
-+
-+	return att->mtu;
- }
- 
- bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
- {
--	/* TODO */
--	return false;
-+	char *buf;
-+
-+	if (!att)
-+		return false;
-+
-+	if (mtu < ATT_DEFAULT_LE_MTU)
-+		return false;
-+
-+	buf = malloc(mtu);
-+	if (!buf)
-+		return false;
-+
-+	free(att->buf);
-+
-+	att->mtu = mtu;
-+	att->buf = buf;
-+
-+	return true;
- }
- 
- bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
- 						void *user_data,
- 						bt_att_destroy_func_t destroy)
- {
--	/* TODO */
--	return false;
-+	if (!att)
-+		return false;
-+
-+	if (att->timeout_destroy)
-+		att->timeout_destroy(att->timeout_data);
-+
-+	att->timeout_callback = callback;
-+	att->timeout_destroy = destroy;
-+	att->timeout_data = user_data;
-+
-+	return true;
- }
- 
- unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
-@@ -137,16 +349,70 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 	return 0;
- }
- 
-+static bool match_op_id(const void *a, const void *b)
++bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close)
 +{
-+	const struct att_send_op *op = a;
-+	unsigned int id = PTR_TO_UINT(b);
-+
-+	return op->id == id;
++	/* TODO */
++	return false;
 +}
 +
- bool bt_att_cancel(struct bt_att *att, unsigned int id)
- {
--	/* TODO */
--	return false;
-+	struct att_send_op *op;
++bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
++				void *user_data, bt_att_destroy_func_t destroy)
++{
++	/* TODO */
++	return false;
++}
 +
-+	if (!att || !id)
-+		return false;
++uint16_t bt_att_get_mtu(struct bt_att *att)
++{
++	/* TODO */
++	return 0;
++}
 +
-+	if (att->pending_req && att->pending_req->id == id) {
-+		op = att->pending_req;
-+		goto done;
-+	}
++bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu)
++{
++	/* TODO */
++	return false;
++}
 +
-+	if (att->pending_ind && att->pending_ind->id == id) {
-+		op = att->pending_ind;
-+		goto done;
-+	}
++bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
++						void *user_data,
++						bt_att_destroy_func_t destroy)
++{
++	/* TODO */
++	return false;
++}
 +
-+	op = queue_remove_if(att->req_queue, match_op_id, UINT_TO_PTR(id));
-+	if (op)
-+		goto done;
++unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
++				const void *param, uint16_t length,
++				bt_att_request_func_t callback, void *user_data,
++				bt_att_destroy_func_t destroy)
++{
++	/* TODO */
++	return 0;
++}
 +
-+	op = queue_remove_if(att->ind_queue, match_op_id, UINT_TO_PTR(id));
-+	if (op)
-+		goto done;
++bool bt_att_cancel(struct bt_att *att, unsigned int id)
++{
++	/* TODO */
++	return false;
++}
 +
-+	op = queue_remove_if(att->write_queue, match_op_id, UINT_TO_PTR(id));
-+	if (op)
-+		goto done;
++bool bt_att_cancel_all(struct bt_att *att)
++{
++	/* TODO */
++	return false;
++}
 +
-+	if (!op)
-+		return false;
++unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
++				bt_att_request_func_t callback,
++				void *user_data, bt_att_destroy_func_t destroy)
++{
++	/* TODO */
++	return 0;
++}
 +
-+done:
-+	destroy_att_send_op(op);
++bool bt_att_unregister(struct bt_att *att, unsigned int id)
++{
++	/* TODO */
++	return false;
++}
 +
-+	/* TODO: Set the write handler here */
++bool bt_att_unregister_all(struct bt_att *att)
++{
++	/* TODO */
++	return false;
++}
+diff --git a/src/shared/att.h b/src/shared/att.h
+new file mode 100644
+index 0000000..65c2152
+--- /dev/null
++++ b/src/shared/att.h
+@@ -0,0 +1,69 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2014  Google Inc.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ *  You should have received a copy of the GNU Lesser General Public
++ *  License along with this library; if not, write to the Free Software
++ *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
++ *
++ */
 +
-+	return true;
- }
- 
- bool bt_att_cancel_all(struct bt_att *att)
- {
--	/* TODO */
--	return false;
-+	if (!att)
-+		return false;
++#include <stdbool.h>
++#include <stdint.h>
 +
-+	queue_remove_all(att->req_queue, NULL, NULL, destroy_att_send_op);
-+	queue_remove_all(att->ind_queue, NULL, NULL, destroy_att_send_op);
-+	queue_remove_all(att->write_queue, NULL, NULL, destroy_att_send_op);
++#include "src/shared/att-types.h"
 +
-+	if (att->pending_req)
-+		destroy_att_send_op(att->pending_req);
++struct bt_att;
 +
-+	if (att->pending_ind)
-+		destroy_att_send_op(att->pending_ind);
++struct bt_att *bt_att_new(int fd);
 +
-+	return true;
- }
- 
- unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
++struct bt_att *bt_att_ref(struct bt_att *att);
++void bt_att_unref(struct bt_att *att);
++
++bool bt_att_set_close_on_unref(struct bt_att *att, bool do_close);
++
++typedef void (*bt_att_request_func_t)(uint8_t opcode, const void *param,
++					uint16_t length, void *user_data);
++typedef void (*bt_att_destroy_func_t)(void *user_data);
++typedef void (*bt_att_debug_func_t)(const char *str, void *user_data);
++typedef void (*bt_att_notify_func_t)(uint8_t opcode,
++					const struct bt_att_notify_param *param,
++					void *user_data);
++typedef void (*bt_att_timeout_func_t)(unsigned int id, uint8_t opcode,
++							void *user_data);
++
++bool bt_att_set_debug(struct bt_att *att, bt_att_debug_func_t callback,
++				void *user_data, bt_att_destroy_func_t destroy);
++
++uint16_t bt_att_get_mtu(struct bt_att *att);
++bool bt_att_set_mtu(struct bt_att *att, uint16_t mtu);
++
++bool bt_att_set_timeout_cb(struct bt_att *att, bt_att_timeout_func_t callback,
++						void *user_data,
++						bt_att_destroy_func_t destroy);
++
++unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
++				const void *param, uint16_t length,
++				bt_att_request_func_t callback, void *user_data,
++				bt_att_destroy_func_t destroy);
++bool bt_att_cancel(struct bt_att *att, unsigned int id);
++bool bt_att_cancel_all(struct bt_att *att);
++
++unsigned int bt_att_register(struct bt_att *att, uint8_t opcode,
++				bt_att_request_func_t callback,
++				void *user_data, bt_att_destroy_func_t destroy);
++bool bt_att_unregister(struct bt_att *att, unsigned int id);
++bool bt_att_unregister_all(struct bt_att *att);
 -- 
 1.8.3.2
 
