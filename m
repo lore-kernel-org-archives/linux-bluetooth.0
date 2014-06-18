@@ -1,129 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/2] android/gatt: Set security level if user requested
-Date: Wed, 18 Jun 2014 07:43:11 +0200
-Message-Id: <1403070191-2356-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1403070191-2356-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1403070191-2356-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCHv2 1/2] android/hal-msg: Add defines of HAL_AUTHENTICATION values
+Date: Wed, 18 Jun 2014 07:43:10 +0200
+Message-Id: <1403070191-2356-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Set security level if user requested. It is used when frameworks receives
-INSUFFICIENT_ENCRYPTION or INSUFFICIENT_AUTHENTICATIONS errors on read/write
-requests and tries to elevate security.
+These values are are used in read characteristic/write characteristic
+functions in gatt_client.
 ---
- android/gatt.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 69 insertions(+)
+ android/hal-msg.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9531577..e6014aa 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2731,6 +2731,49 @@ static int get_sec_level(struct gatt_device *dev)
- 	return sec_level;
- }
- 
-+static bool set_security(struct gatt_device *device, int security)
-+{
-+	int req_sec_level, sec_level;
-+	GError *gerr = NULL;
-+	GIOChannel *io;
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index 2c21a85..841f016 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -1610,3 +1610,7 @@ struct hal_ev_gatt_server_rsp_confirmation {
+ #define HAL_GATT_PERMISSION_WRITE_ENCRYPTED_MITM	0x0040
+ #define HAL_GATT_PERMISSION_WRITE_SIGNED		0x0080
+ #define HAL_GATT_PERMISSION_WRITE_SIGNED_MITM		0x0100
 +
-+	switch (security) {
-+	case HAL_AUTHENTICATION_MITM:
-+		req_sec_level = BT_SECURITY_HIGH;
-+		break;
-+	case HAL_AUTHENTICATION_NO_MITM:
-+		req_sec_level = BT_SECURITY_MEDIUM;
-+		break;
-+	case HAL_AUTHENTICATION_NONE:
-+		req_sec_level = BT_SECURITY_LOW;
-+		break;
-+	default:
-+		error("gatt: Invalid security value: %d", security);
-+		return false;
-+	}
-+
-+	sec_level = get_sec_level(device);
-+	if (sec_level < 0)
-+		return false;
-+
-+	if (req_sec_level <= sec_level)
-+		return true;
-+
-+	io = g_attrib_get_channel(device->attrib);
-+	if (!io)
-+		return false;
-+
-+	bt_io_set(io, &gerr, BT_IO_OPT_SEC_LEVEL, req_sec_level,
-+							BT_IO_OPT_INVALID);
-+	if (gerr) {
-+		error("%s\n", gerr->message);
-+		g_error_free(gerr);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- static void handle_client_read_characteristic(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
-@@ -2771,6 +2814,13 @@ static void handle_client_read_characteristic(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
-+	if (!set_security(conn->device, cmd->auth_req)) {
-+		error("gatt: Failed to set security %d", cmd->auth_req);
-+		status = HAL_STATUS_FAILED;
-+		free(cb_data);
-+		goto failed;
-+	}
-+
- 	if (!gatt_read_char(conn->device->attrib, ch->ch.value_handle,
- 						read_char_cb, cb_data)) {
- 		error("gatt: Cannot read characteristic with inst_id: %d",
-@@ -2898,6 +2948,12 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 		}
- 	}
- 
-+	if (!set_security(conn->device, cmd->auth_req)) {
-+		error("gatt: Failed to set security %d", cmd->auth_req);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
- 	switch (cmd->write_type) {
- 	case GATT_WRITE_TYPE_NO_RESPONSE:
- 		res = gatt_write_cmd(conn->device->attrib, ch->ch.value_handle,
-@@ -3099,6 +3155,13 @@ static void handle_client_read_descriptor(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
-+	if (!set_security(conn->device, cmd->auth_req)) {
-+		error("gatt: Failed to set security %d", cmd->auth_req);
-+		status = HAL_STATUS_FAILED;
-+		free(cb_data);
-+		goto failed;
-+	}
-+
- 	if (!gatt_read_char(conn->device->attrib, descr->handle, read_desc_cb,
- 								cb_data)) {
- 		free(cb_data);
-@@ -3224,6 +3287,12 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
- 		}
- 	}
- 
-+	if (!set_security(conn->device, cmd->auth_req)) {
-+		error("gatt: Failed to set security %d", cmd->auth_req);
-+		status = HAL_STATUS_FAILED;
-+		goto failed;
-+	}
-+
- 	switch (cmd->write_type) {
- 	case GATT_WRITE_TYPE_NO_RESPONSE:
- 		res = gatt_write_cmd(conn->device->attrib, descr->handle,
++#define HAL_AUTHENTICATION_NONE		0
++#define HAL_AUTHENTICATION_NO_MITM	1
++#define HAL_AUTHENTICATION_MITM		2
 -- 
 1.9.3
 
