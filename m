@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 05/11] android/hal-msg: trivial: Correct coding style
-Date: Wed, 18 Jun 2014 16:33:48 +0300
-Message-Id: <1403098434-28193-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 06/11] android/gatt: Fix warning by rearranging allocation
+Date: Wed, 18 Jun 2014 16:33:49 +0300
+Message-Id: <1403098434-28193-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,37 +12,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Move rsp close to cmd improving readability of the code.
----
- android/hal-msg.h | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+We need to allocate array of uint8_t so fix allocation parameter, this
+also removes unneeded type conversion.
 
-diff --git a/android/hal-msg.h b/android/hal-msg.h
-index 2c21a85..d93f557 100644
---- a/android/hal-msg.h
-+++ b/android/hal-msg.h
-@@ -403,6 +403,10 @@ struct hal_cmd_health_reg_app {
- 	uint8_t  data[0];
- } __attribute__((packed));
+This fixes clang warnings:
+...
+android/gatt.c:5967:29: warning: Result of 'calloc' is converted to a
+pointer of type 'uint8_t', which is incompatible with sizeof operand
+type 'uint16_t'
+        entry->value = (uint8_t *) new0(uint16_t, 1);
+                        ~~~~~~~~~  ^~~~~~~~~~~~~~~~~
+./src/shared/util.h:81:26: note: expanded from macro 'new0'
+                         ^~~~~~      ~~~~~~~~~
+...
+---
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index 626a65d..2bef5ab 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -5969,7 +5969,7 @@ static void gatt_srvc_change_read_cb(uint16_t handle, uint16_t offset,
+ 	ccc = bt_get_gatt_ccc(&dev->bdaddr);
+ 	entry->state = REQUEST_DONE;
  
-+struct hal_rsp_health_reg_app {
-+	uint16_t app_id;
-+} __attribute__((packed));
-+
- #define HAL_OP_HEALTH_MDEP		0x02
- struct hal_cmd_health_mdep {
- 	uint16_t app_id;
-@@ -413,10 +417,6 @@ struct hal_cmd_health_mdep {
- 	uint8_t  descr[0];
- } __attribute__((packed));
+-	entry->value = (uint8_t *) new0(uint16_t, 1);
++	entry->value = new0(uint8_t, 2);
+ 	if (!entry->value) {
+ 		entry->error = ATT_ECODE_INSUFF_RESOURCES;
  
--struct hal_rsp_health_reg_app {
--	uint16_t app_id;
--} __attribute__((packed));
--
- #define HAL_OP_HEALTH_UNREG_APP		0x03
- struct hal_cmd_health_unreg_app {
- 	uint16_t app_id;
 -- 
 1.8.3.2
 
