@@ -1,52 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] android/gatt: Fix not freeing discover_srvc_data
-Date: Wed, 18 Jun 2014 14:58:53 +0200
-Message-Id: <1403096334-23297-1-git-send-email-jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <1403089780-21734-1-git-send-email-johan.hedberg@gmail.com>
+References: <1403089780-21734-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 18 Jun 2014 14:46:36 +0200
+Message-ID: <CAN_7+YbhUSyWDLuJMWykts+UzWrGNLfeLZakrBAY32HFXgcEDw@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix checking for master LTKs
+From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This fixes the following issue:
+Hi Johan
 
-32 bytes in 1 blocks are definitely lost in loss record 92 of 142
-==19365==    at 0x4C29DB4: calloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==19365==    by 0x43275A: search_dev_for_srvc (gatt.c:1302)
-==19365==    by 0x4354C9: connect_cb (gatt.c:1424)
-==19365==    by 0x448AD3: accept_cb (btio.c:203)
-==19365==    by 0x4E79D12: g_main_context_dispatch (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==19365==    by 0x4E7A05F: ??? (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==19365==    by 0x4E7A459: g_main_loop_run (in
-/lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-==19365==    by 0x40459D: main (main.c:538)
----
- android/gatt.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On Wed, Jun 18, 2014 at 1:09 PM,  <johan.hedberg@gmail.com> wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
+>
+> When the rename of STK_SLAVE to simply STK happened we missed this place
+> in the ltk_type_master function. Now, checking for master is as simple
+> as checking whether the type is SMP_LTK. The helper function is kept
+> around for better readability in the (right now three) callers and for
+> simpler extension with new key types in the future.
+>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/hci_core.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 6001b9293905..c3d184fd24de 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -2974,10 +2974,7 @@ static bool hci_persistent_key(struct hci_dev *hdev, struct hci_conn *conn,
+>
+>  static bool ltk_type_master(u8 type)
+>  {
+> -       if (type == SMP_STK || type == SMP_LTK)
+> -               return true;
+> -
+> -       return false;
+> +       return (type == SMP_LTK);
+>  }
+>
+>  struct smp_ltk *hci_find_ltk(struct hci_dev *hdev, __le16 ediv, __le64 rand,
+> --
+> 1.9.3
+>
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b256077..7dd37ab 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1245,11 +1245,15 @@ static void discover_primary_cb(uint8_t status, GSList *services,
- 	if (status) {
- 		error("gatt: Discover all primary services failed: %s",
- 							att_ecode2str(status));
-+		free(cb_data);
-+
- 		return;
- 	}
- 
- 	if (!services) {
- 		info("gatt: No primary services found");
-+		free(cb_data);
-+
- 		return;
- 	}
- 
--- 
-2.0.0
+Now bonding as responder works just fine.
 
+Tested-by Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+BR
+Lukasz
