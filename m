@@ -1,63 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Fix not freeing discover_srvc_data
-Date: Wed, 18 Jun 2014 15:40:24 +0200
-Message-ID: <1788801.NPzh0SoE2F@uw000953>
-In-Reply-To: <1403096334-23297-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1403096334-23297-1-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v8 5/5] Bluetooth: 6LoWPAN: Remove network devices when unloading
+Date: Wed, 18 Jun 2014 16:37:11 +0300
+Message-Id: <1403098631-4115-6-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1403098631-4115-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1403098631-4115-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+When the module is unloaded, unregister the network device
+so that the system does not try to access non-existing device.
 
-On Wednesday 18 of June 2014 14:58:53 Jakub Tyszkowski wrote:
-> This fixes the following issue:
-> 
-> 32 bytes in 1 blocks are definitely lost in loss record 92 of 142
-> ==19365==    at 0x4C29DB4: calloc (in
-> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==19365==    by 0x43275A: search_dev_for_srvc (gatt.c:1302)
-> ==19365==    by 0x4354C9: connect_cb (gatt.c:1424)
-> ==19365==    by 0x448AD3: accept_cb (btio.c:203)
-> ==19365==    by 0x4E79D12: g_main_context_dispatch (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==19365==    by 0x4E7A05F: ??? (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==19365==    by 0x4E7A459: g_main_loop_run (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.3200.4)
-> ==19365==    by 0x40459D: main (main.c:538)
-> ---
->  android/gatt.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index b256077..7dd37ab 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -1245,11 +1245,15 @@ static void discover_primary_cb(uint8_t status, GSList *services,
->  	if (status) {
->  		error("gatt: Discover all primary services failed: %s",
->  							att_ecode2str(status));
-> +		free(cb_data);
-> +
->  		return;
->  	}
->  
->  	if (!services) {
->  		info("gatt: No primary services found");
-> +		free(cb_data);
-> +
->  		return;
->  	}
->  
-> 
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ net/bluetooth/6lowpan.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 54 insertions(+)
 
-Both patches applied. Thanks.
-
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index ba6c641..5a7f81d 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -607,6 +607,17 @@ static void ifup(struct net_device *netdev)
+ 	rtnl_unlock();
+ }
+ 
++static void ifdown(struct net_device *netdev)
++{
++	int err;
++
++	rtnl_lock();
++	err = dev_close(netdev);
++	if (err < 0)
++		BT_INFO("iface %s cannot be closed (%d)", netdev->name, err);
++	rtnl_unlock();
++}
++
+ static void do_notify_peers(struct work_struct *work)
+ {
+ 	struct lowpan_dev *dev = container_of(work, struct lowpan_dev,
+@@ -829,6 +840,8 @@ static void chan_close_cb(struct l2cap_chan *chan)
+ 
+ 		cancel_delayed_work_sync(&dev->notify_peers);
+ 
++		ifdown(dev->netdev);
++
+ 		if (!removed) {
+ 			INIT_WORK(&entry->delete_netdev, delete_netdev);
+ 			schedule_work(&entry->delete_netdev);
+@@ -1186,6 +1199,43 @@ static const struct file_operations lowpan_control_fops = {
+ 	.release	= single_release,
+ };
+ 
++static void disconnect_devices(void)
++{
++	struct lowpan_dev *entry, *tmp, *new_dev;
++	struct list_head devices;
++	unsigned long flags;
++
++	INIT_LIST_HEAD(&devices);
++
++	/* We make a separate list of devices because the unregister_netdev()
++	 * will call device_event() which will also want to modify the same
++	 * devices list.
++	 */
++
++	read_lock_irqsave(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices, list) {
++		new_dev = kmalloc(sizeof(*new_dev), GFP_ATOMIC);
++		if (!new_dev)
++			break;
++
++		new_dev->netdev = entry->netdev;
++		INIT_LIST_HEAD(&new_dev->list);
++
++		list_add(&new_dev->list, &devices);
++	}
++
++	read_unlock_irqrestore(&devices_lock, flags);
++
++	list_for_each_entry_safe(entry, tmp, &devices, list) {
++		ifdown(entry->netdev);
++		BT_DBG("Unregistering netdev %s %p",
++		       entry->netdev->name, entry->netdev);
++		unregister_netdev(entry->netdev);
++		kfree(entry);
++	}
++}
++
+ static int device_event(struct notifier_block *unused,
+ 			unsigned long event, void *ptr)
+ {
+@@ -1202,6 +1252,8 @@ static int device_event(struct notifier_block *unused,
+ 		list_for_each_entry_safe(entry, tmp, &bt_6lowpan_devices,
+ 					 list) {
+ 			if (entry->netdev == netdev) {
++				BT_DBG("Unregistered netdev %s %p",
++				       netdev->name, netdev);
+ 				list_del(&entry->list);
+ 				kfree(entry);
+ 				break;
+@@ -1240,6 +1292,8 @@ static void __exit bt_6lowpan_exit(void)
+ 		l2cap_chan_put(listen_chan);
+ 	}
+ 
++	disconnect_devices();
++
+ 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
+ 
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.1
+
