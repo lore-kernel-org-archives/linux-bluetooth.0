@@ -1,91 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 0/5] Bluetooth LE 6LoWPAN using CoC
-Date: Wed, 18 Jun 2014 16:37:06 +0300
-Message-Id: <1403098631-4115-1-git-send-email-jukka.rissanen@linux.intel.com>
+Subject: [PATCHv2 07/11] android/haltest: Auto-accept pairing
+Date: Wed, 18 Jun 2014 16:33:50 +0300
+Message-Id: <1403098434-28193-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-v8:
-- forgot to commit one change to patch 2 so this version now
-  contains kvec fixes (using kvec instead of iovec). Sorry for the spam.
+Simplify PTS testing by automatically auto accept Just Works pairing.
+---
+ android/client/if-bt.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-v7:
-- patch 1 is originally from Marcel but with slight modifications
-  that avoid the sparse error by using kvec instead of iovec in
-  kernel's memcpy path. I tested this with 6lowpan and also using
-  L2CAP user sockets.
-- avoid chan_ops forward declaration
-- this version did not change the GFP_ATOMIC in alloc_skb cb as it
-  is needed because the alloc function is called in atomic context
-- also no need to ref skb because the caller will wait until we
-  are finished
-- various chan ref issues fixed
-
-v6:
-- rebased on top of Marcel's "Bluetooth: Provide L2CAP ops callback
-  for memcpy_fromiovec" patch
-- re-wrote the debugfs psm value handler using DEFINE_SIMPLE_ATTRIBUTE
-- renamed and refactored the module init/exit functions, also checked
-  that debugfs_remove() will gracefully accept NULL values
-- added comment to disconnect_devices() why we have two separate
-  lists
-
-v5:
-- memory buffer made const in patch 1
-- misc changes and refactoring in patch 2
-
-v4:
-- renamed l2cap_from_skbuf() to more logical l2cap_copy_into_skbuff()
-  in l2cap_core.c (patch 1)
-- fixed the module usage count code in patch 4
-
-Usage:
-
-In the slave side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ hciconfig hci0 leadv
-
-In the master side do this:
-
-$ modprobe bluetooth_6lowpan
-$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-$ echo 'connect E0:06:E6:B7:2A:73 1' > \
-                  /sys/kernel/debug/bluetooth/6lowpan_control
-
-
-Cheers,
-Jukka
-
-
-Jukka Rissanen (5):
-  Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
-  Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed
-    one
-  Bluetooth: 6LoWPAN: Create a kernel module
-  Bluetooth: 6LoWPAN: Count module usage
-  Bluetooth: 6LoWPAN: Remove network devices when unloading
-
- include/net/bluetooth/hci.h      |   1 -
- include/net/bluetooth/hci_core.h |   1 -
- include/net/bluetooth/l2cap.h    |  30 +-
- net/bluetooth/6lowpan.c          | 857 +++++++++++++++++++++++++++++----------
- net/bluetooth/6lowpan.h          |  47 ---
- net/bluetooth/Kconfig            |   6 +-
- net/bluetooth/Makefile           |   4 +-
- net/bluetooth/a2mp.c             |   1 +
- net/bluetooth/hci_core.c         |  45 --
- net/bluetooth/hci_event.c        |   3 -
- net/bluetooth/l2cap_core.c       |  26 +-
- net/bluetooth/l2cap_sock.c       |  34 +-
- 12 files changed, 718 insertions(+), 337 deletions(-)
- delete mode 100644 net/bluetooth/6lowpan.h
-
+diff --git a/android/client/if-bt.c b/android/client/if-bt.c
+index 4d6ff83..764979e 100644
+--- a/android/client/if-bt.c
++++ b/android/client/if-bt.c
+@@ -266,7 +266,8 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 			__func__, last_remote_addr, bd_name->name, cod,
+ 			bt_ssp_variant_t2str(pairing_variant), pass_key);
+ 
+-	if (pairing_variant == BT_SSP_VARIANT_PASSKEY_CONFIRMATION) {
++	switch (pairing_variant) {
++	case BT_SSP_VARIANT_PASSKEY_CONFIRMATION:
+ 		sprintf(prompt, "Does other device show %d [Y/n] ?", pass_key);
+ 
+ 		ssp_request_addr = *remote_bd_addr;
+@@ -274,6 +275,14 @@ static void ssp_request_cb(bt_bdaddr_t *remote_bd_addr, bt_bdname_t *bd_name,
+ 		ssp_request_pask_key = pass_key;
+ 
+ 		terminal_prompt_for(prompt, ssp_request_yes_no_answer);
++		break;
++	case BT_SSP_VARIANT_CONSENT:
++		EXEC(if_bluetooth->ssp_reply, remote_bd_addr, pairing_variant,
++								1, 0);
++		break;
++	default:
++		haltest_info("Not automatically handled\n");
++		break;
+ 	}
+ }
+ 
 -- 
-1.8.3.1
+1.8.3.2
 
