@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 11/11] android/health: trivial: Remove empty line
-Date: Wed, 18 Jun 2014 16:33:54 +0300
-Message-Id: <1403098434-28193-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 04/11] android/hal-health: trivial: Correct coding style
+Date: Wed, 18 Jun 2014 16:33:47 +0300
+Message-Id: <1403098434-28193-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1402905472-17643-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403098434-28193-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,21 +13,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/health.c | 1 -
- 1 file changed, 1 deletion(-)
+ android/hal-health.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index f893d0f..8625779 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1255,7 +1255,6 @@ bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 					mcl_disconnected, mcl_uncached,
- 					NULL, /* CSP is not used right now */
- 					NULL, &err);
+diff --git a/android/hal-health.c b/android/hal-health.c
+index ac6e87f..0d9136d 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -116,8 +116,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 	cmd->len = off;
+ 	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
+ 						sizeof(*cmd) + cmd->len, buf,
+-							&rsp_len, &rsp, NULL);
 -
- 	if (!mcap) {
- 		error("Error creating MCAP instance : %s", err->message);
- 		g_error_free(err);
++						&rsp_len, &rsp, NULL);
+ 	if (status != BT_STATUS_SUCCESS)
+ 		return status;
+ 
 -- 
 1.8.3.2
 
