@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Fix checking for master LTKs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403089780-21734-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 18 Jun 2014 15:06:42 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D0AE5F0A-2869-46AC-89AC-82EA8BE50525@holtmann.org>
-References: <1403089780-21734-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 2/2] android/gatt: Minor coding style fix
+Date: Wed, 18 Jun 2014 14:58:54 +0200
+Message-Id: <1403096334-23297-2-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1403096334-23297-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1403096334-23297-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+---
+ android/gatt.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> When the rename of STK_SLAVE to simply STK happened we missed this place
-> in the ltk_type_master function. Now, checking for master is as simple
-> as checking whether the type is SMP_LTK. The helper function is kept
-> around for better readability in the (right now three) callers and for
-> simpler extension with new key types in the future.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_core.c | 5 +----
-> 1 file changed, 1 insertion(+), 4 deletions(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/android/gatt.c b/android/gatt.c
+index 7dd37ab..30328b9 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -3773,8 +3773,9 @@ static void handle_server_register(const void *buf, uint16_t len)
+ 	if (app) {
+ 		ev.server_if = app->id;
+ 		ev.status = GATT_SUCCESS;
+-	} else
++	} else {
+ 		ev.status = GATT_FAILURE;
++	}
+ 
+ 	memcpy(ev.uuid, cmd->uuid, sizeof(ev.uuid));
+ 
+-- 
+2.0.0
 
