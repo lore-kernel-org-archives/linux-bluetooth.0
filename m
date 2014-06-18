@@ -1,42 +1,135 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 1/4] android/hal-msg: Add defines of HAL_GATT_AUTHENTICATION values
-Date: Wed, 18 Jun 2014 15:36:37 +0200
-Message-ID: <2155679.I4XT9HXyCq@uw000953>
-In-Reply-To: <1403082499-2349-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1403082499-2349-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v8 3/5] Bluetooth: 6LoWPAN: Create a kernel module
+Date: Wed, 18 Jun 2014 16:37:09 +0300
+Message-Id: <1403098631-4115-4-git-send-email-jukka.rissanen@linux.intel.com>
+In-Reply-To: <1403098631-4115-1-git-send-email-jukka.rissanen@linux.intel.com>
+References: <1403098631-4115-1-git-send-email-jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Instead of adding the 6LoWPAN functionality to Bluetooth module,
+we create a separate kernel module for it.
 
-On Wednesday 18 of June 2014 11:08:16 Marcin Kraglak wrote:
-> These values are are used in read characteristic/write characteristic
-> functions in gatt_client.
-> ---
->  android/hal-msg.h | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/android/hal-msg.h b/android/hal-msg.h
-> index 2c21a85..57872c6 100644
-> --- a/android/hal-msg.h
-> +++ b/android/hal-msg.h
-> @@ -1610,3 +1610,7 @@ struct hal_ev_gatt_server_rsp_confirmation {
->  #define HAL_GATT_PERMISSION_WRITE_ENCRYPTED_MITM	0x0040
->  #define HAL_GATT_PERMISSION_WRITE_SIGNED		0x0080
->  #define HAL_GATT_PERMISSION_WRITE_SIGNED_MITM		0x0100
-> +
-> +#define HAL_GATT_AUTHENTICATION_NONE		0
-> +#define HAL_GATT_AUTHENTICATION_NO_MITM		1
-> +#define HAL_GATT_AUTHENTICATION_MITM		2
-> 
+Usage:
 
-All patches applied, thanks.
+In the slave side do this:
 
+$ modprobe bluetooth_6lowpan
+$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
+$ hciconfig hci0 leadv
+
+In the master side do this:
+
+$ modprobe bluetooth_6lowpan
+$ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
+$ echo 'connect E0:06:E6:B7:2A:73 1' > \
+                  /sys/kernel/debug/bluetooth/6lowpan_control
+
+The 6LoWPAN functionality can be controlled by psm value. If it
+is left to 0, then the module is disabled and all the 6LoWPAN
+connections are dropped if there were any. In the above example,
+the psm value is just an example and not a real value for
+6LoWPAN service. The real psm value is yet to be defined in
+Bluetooth specification.
+
+The 6lowpan controlling interface is a temporary solution
+until the specifications are ready.
+
+Signed-off-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+---
+ net/bluetooth/6lowpan.c | 13 +++++++++++--
+ net/bluetooth/Kconfig   |  6 +++---
+ net/bluetooth/Makefile  |  4 +++-
+ 3 files changed, 17 insertions(+), 6 deletions(-)
+
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index bdb01eb..ceffe20 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -14,6 +14,7 @@
+ #include <linux/if_arp.h>
+ #include <linux/netdevice.h>
+ #include <linux/etherdevice.h>
++#include <linux/module.h>
+ #include <linux/debugfs.h>
+ 
+ #include <net/ipv6.h>
+@@ -1212,7 +1213,7 @@ static struct notifier_block bt_6lowpan_dev_notifier = {
+ 	.notifier_call = device_event,
+ };
+ 
+-int bt_6lowpan_init(void)
++static int __init bt_6lowpan_init(void)
+ {
+ 	lowpan_psm_debugfs = debugfs_create_file("6lowpan_psm", 0644,
+ 						 bt_debugfs, NULL,
+@@ -1224,7 +1225,7 @@ int bt_6lowpan_init(void)
+ 	return register_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
+ 
+-void bt_6lowpan_exit(void)
++static void __exit bt_6lowpan_exit(void)
+ {
+ 	debugfs_remove(lowpan_psm_debugfs);
+ 	debugfs_remove(lowpan_control_debugfs);
+@@ -1236,3 +1237,11 @@ void bt_6lowpan_exit(void)
+ 
+ 	unregister_netdevice_notifier(&bt_6lowpan_dev_notifier);
+ }
++
++module_init(bt_6lowpan_init);
++module_exit(bt_6lowpan_exit);
++
++MODULE_AUTHOR("Jukka Rissanen <jukka.rissanen@linux.intel.com>");
++MODULE_DESCRIPTION("Bluetooth 6LoWPAN");
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
+diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+index 06ec144..f5afaa2 100644
+--- a/net/bluetooth/Kconfig
++++ b/net/bluetooth/Kconfig
+@@ -6,7 +6,6 @@ menuconfig BT
+ 	tristate "Bluetooth subsystem support"
+ 	depends on NET && !S390
+ 	depends on RFKILL || !RFKILL
+-	select 6LOWPAN_IPHC if BT_6LOWPAN
+ 	select CRC16
+ 	select CRYPTO
+ 	select CRYPTO_BLKCIPHER
+@@ -41,10 +40,11 @@ menuconfig BT
+ 	  more information, see <http://www.bluez.org/>.
+ 
+ config BT_6LOWPAN
+-	bool "Bluetooth 6LoWPAN support"
++	tristate "Bluetooth 6LoWPAN support"
+ 	depends on BT && IPV6
++	select 6LOWPAN_IPHC if BT_6LOWPAN
+ 	help
+-	  IPv6 compression over Bluetooth.
++	  IPv6 compression over Bluetooth Low Energy.
+ 
+ source "net/bluetooth/rfcomm/Kconfig"
+ 
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index ca51246..886e9aa 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -7,10 +7,12 @@ obj-$(CONFIG_BT_RFCOMM)	+= rfcomm/
+ obj-$(CONFIG_BT_BNEP)	+= bnep/
+ obj-$(CONFIG_BT_CMTP)	+= cmtp/
+ obj-$(CONFIG_BT_HIDP)	+= hidp/
++obj-$(CONFIG_BT_6LOWPAN) += bluetooth_6lowpan.o
++
++bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o sco.o lib.o \
+ 	a2mp.o amp.o
+-bluetooth-$(CONFIG_BT_6LOWPAN) += 6lowpan.o
+ 
+ subdir-ccflags-y += -D__CHECK_ENDIAN__
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.1
+
