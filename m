@@ -3,47 +3,75 @@ From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: szymon.janc@tieto.com,
 	Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 3/4] android/gatt: Expose function to set security on GATT
-Date: Thu, 19 Jun 2014 00:41:25 +0200
-Message-Id: <1403131286-15028-4-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 2/4] android/gatt: Add helper to set security level
+Date: Thu, 19 Jun 2014 00:41:24 +0200
+Message-Id: <1403131286-15028-3-git-send-email-lukasz.rymanowski@tieto.com>
 In-Reply-To: <1403131286-15028-1-git-send-email-lukasz.rymanowski@tieto.com>
 References: <1403131286-15028-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/gatt.c | 10 ++++++++++
- android/gatt.h |  2 ++
- 2 files changed, 12 insertions(+)
+ android/gatt.c | 35 ++++++++++++++++++++---------------
+ 1 file changed, 20 insertions(+), 15 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 7061924..9471eaf 100644
+index 004dead..7061924 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -6286,3 +6286,13 @@ bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr)
- 
- 	return true;
+@@ -2735,12 +2735,29 @@ static int get_sec_level(struct gatt_device *dev)
+ 	return sec_level;
  }
-+
-+void bt_gatt_set_security(const bdaddr_t *addr, int sec_level)
-+{
-+	struct gatt_device *dev = find_device_by_addr(addr);
-+
-+	if (!dev)
-+		return;
-+
-+	set_security_level(dev, sec_level);
-+}
-diff --git a/android/gatt.h b/android/gatt.h
-index 5ba9161..d4f8a8e 100644
---- a/android/gatt.h
-+++ b/android/gatt.h
-@@ -38,3 +38,5 @@ bool bt_gatt_unregister_app(unsigned int id);
  
- bool bt_gatt_connect_app(unsigned int id, const bdaddr_t *addr);
- bool bt_gatt_disconnect_app(unsigned int id, const bdaddr_t *addr);
+-static bool set_security_by_auth(struct gatt_device *device, int auth_type)
++static bool set_security_level(struct gatt_device *dev, int sec_level)
+ {
+-	int req_sec_level, sec_level;
+ 	GError *gerr = NULL;
+ 	GIOChannel *io;
+ 
++	io = g_attrib_get_channel(dev->attrib);
++	if (!io)
++		return false;
 +
-+void bt_gatt_set_security(const bdaddr_t *addr, int sec_level);
++	bt_io_set(io, &gerr, BT_IO_OPT_SEC_LEVEL, sec_level, BT_IO_OPT_INVALID);
++	if (gerr) {
++		error("gatt: Failed to set security level: %s", gerr->message);
++		g_error_free(gerr);
++		return false;
++	}
++
++	return true;
++}
++
++static bool set_security_by_auth(struct gatt_device *device, int auth_type)
++{
++	int req_sec_level, sec_level;
++
+ 	switch (auth_type) {
+ 	case HAL_GATT_AUTHENTICATION_MITM:
+ 		req_sec_level = BT_SECURITY_HIGH;
+@@ -2763,19 +2780,7 @@ static bool set_security_by_auth(struct gatt_device *device, int auth_type)
+ 	if (req_sec_level <= sec_level)
+ 		return true;
+ 
+-	io = g_attrib_get_channel(device->attrib);
+-	if (!io)
+-		return false;
+-
+-	bt_io_set(io, &gerr, BT_IO_OPT_SEC_LEVEL, req_sec_level,
+-							BT_IO_OPT_INVALID);
+-	if (gerr) {
+-		error("gatt: Failed to set security level: %s", gerr->message);
+-		g_error_free(gerr);
+-		return false;
+-	}
+-
+-	return true;
++	return set_security_level(device, req_sec_level);
+ }
+ 
+ static void handle_client_read_characteristic(const void *buf, uint16_t len)
 -- 
 1.8.4
 
