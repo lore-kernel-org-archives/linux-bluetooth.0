@@ -2,32 +2,37 @@ Return-Path: <cyrus@holtmann.org>
 From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 2/2] android/pts: Update GAP PTS status
-Date: Fri, 20 Jun 2014 00:50:34 +0200
-Message-Id: <1403218234-19996-2-git-send-email-lukasz.rymanowski@tieto.com>
-In-Reply-To: <1403218234-19996-1-git-send-email-lukasz.rymanowski@tieto.com>
-References: <1403218234-19996-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 1/2] android/pics: Enable privacy for peripheral
+Date: Fri, 20 Jun 2014 00:50:33 +0200
+Message-Id: <1403218234-19996-1-git-send-email-lukasz.rymanowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-After enabling privacy for peripheral one more test gets enabled in PTS
 ---
- android/pts-gap.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/pics-gap.txt | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/pts-gap.txt b/android/pts-gap.txt
-index db2690f..02430f4 100644
---- a/android/pts-gap.txt
-+++ b/android/pts-gap.txt
-@@ -335,7 +335,7 @@ TC_PRIV_CONN_BV_06_C	N/A
- TC_PRIV_CONN_BV_07_C	N/A
- TC_PRIV_CONN_BV_08_C	N/A
- TC_PRIV_CONN_BV_09_C	N/A
--TC_PRIV_CONN_BV_10_C	N/A
-+TC_PRIV_CONN_BV_10_C	INC	PTS issue #12312
- TC_PRIV_CONN_BV_11_C	INC	PTS issue #12310
- TC_ADV_BV_01_C		N/A
- TC_ADV_BV_02_C		FAIL	PTS issue #12254
+diff --git a/android/pics-gap.txt b/android/pics-gap.txt
+index 5b36d4a..b3b896c 100644
+--- a/android/pics-gap.txt
++++ b/android/pics-gap.txt
+@@ -461,12 +461,12 @@ C.2: Mandatory if TSPC_GAP_0A_1 and TSPC_GAP_27_4 are supported,
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_GAP_26_1	False		Peripheral: Privacy Feature (O)
+-TSPC_GAP_26_1A	False		Peripheral: Privacy Feature v1.1 (O)
+-TSPC_GAP_26_2	False		Peripheral: Non-Resolvable Private Address
++TSPC_GAP_26_1A	True (*)	Peripheral: Privacy Feature v1.1 (O)
++TSPC_GAP_26_2	True (*)	Peripheral: Non-Resolvable Private Address
+ 					Generation Procedure (C.1)
+-TSPC_GAP_26_3	False		Peripheral: Resolvable Private Address
++TSPC_GAP_26_3	True (*)	Peripheral: Resolvable Private Address
+ 					Generation Procedure (C.2)
+-TSPC_GAP_26_4	False		Peripheral: Resolvable Private Address
++TSPC_GAP_26_4	True (*)	Peripheral: Resolvable Private Address
+ 					Generation Procedure (C.4)
+ -------------------------------------------------------------------------------
+ C.1: Optional if TSPC_GAP_26_1 is supported, otherwise Excluded.
 -- 
 1.8.4
 
