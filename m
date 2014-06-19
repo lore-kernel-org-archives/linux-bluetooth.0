@@ -1,38 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/9] tools/csr: Fix wrong error check
-Date: Thu, 19 Jun 2014 16:55:31 +0300
-Message-Id: <1403186136-30041-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/9] android/ipc-tester: Fix possible double close
+Date: Thu, 19 Jun 2014 16:55:28 +0300
+Message-Id: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+I case of error we may close fd and pipe twice.
 ---
- tools/csr.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ android/ipc-tester.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/csr.c b/tools/csr.c
-index b4ea1fb..36af921 100644
---- a/tools/csr.c
-+++ b/tools/csr.c
-@@ -2750,10 +2750,12 @@ static int parse_line(char *str)
- 	char *off, *end;
+diff --git a/android/ipc-tester.c b/android/ipc-tester.c
+index f1f93f2..f23e4b6 100644
+--- a/android/ipc-tester.c
++++ b/android/ipc-tester.c
+@@ -275,7 +275,7 @@ static void emulator(int pipe, int hci_index)
  
- 	pskey = strtol(str + 1, NULL, 16);
--	off = strstr(str, "=") + 1;
-+	off = strstr(str, "=");
- 	if (!off)
- 		return -EIO;
+ 	close(pipe);
+ 	close(fd);
+-	bluetoothd_start(hci_index);
++	return bluetoothd_start(hci_index);
  
-+	off++;
-+
- 	while (1) {
- 		value = strtol(off, &end, 16);
- 		if (value == 0 && off == end)
+ failed:
+ 	close(pipe);
 -- 
 1.8.3.2
 
