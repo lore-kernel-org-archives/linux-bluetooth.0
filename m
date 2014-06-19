@@ -1,38 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-Subject: [PATCH 1/2] android/pics: Enable privacy for peripheral
-Date: Fri, 20 Jun 2014 00:50:33 +0200
-Message-Id: <1403218234-19996-1-git-send-email-lukasz.rymanowski@tieto.com>
+Subject: [PATCH 9/9] Fix using address of array instead of size
+Date: Thu, 19 Jun 2014 16:55:36 +0300
+Message-Id: <1403186136-30041-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-gap.txt | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-diff --git a/android/pics-gap.txt b/android/pics-gap.txt
-index 5b36d4a..b3b896c 100644
---- a/android/pics-gap.txt
-+++ b/android/pics-gap.txt
-@@ -461,12 +461,12 @@ C.2: Mandatory if TSPC_GAP_0A_1 and TSPC_GAP_27_4 are supported,
- Parameter Name	Selected	Description
- -------------------------------------------------------------------------------
- TSPC_GAP_26_1	False		Peripheral: Privacy Feature (O)
--TSPC_GAP_26_1A	False		Peripheral: Privacy Feature v1.1 (O)
--TSPC_GAP_26_2	False		Peripheral: Non-Resolvable Private Address
-+TSPC_GAP_26_1A	True (*)	Peripheral: Privacy Feature v1.1 (O)
-+TSPC_GAP_26_2	True (*)	Peripheral: Non-Resolvable Private Address
- 					Generation Procedure (C.1)
--TSPC_GAP_26_3	False		Peripheral: Resolvable Private Address
-+TSPC_GAP_26_3	True (*)	Peripheral: Resolvable Private Address
- 					Generation Procedure (C.2)
--TSPC_GAP_26_4	False		Peripheral: Resolvable Private Address
-+TSPC_GAP_26_4	True (*)	Peripheral: Resolvable Private Address
- 					Generation Procedure (C.4)
- -------------------------------------------------------------------------------
- C.1: Optional if TSPC_GAP_26_1 is supported, otherwise Excluded.
+---
+ src/device.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/src/device.c b/src/device.c
+index a9b644b..2003c7f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -595,7 +595,11 @@ static gboolean dev_property_get_name(const GDBusPropertyTable *property,
+ 	struct btd_device *device = data;
+ 	const char *empty = "", *ptr;
+ 
+-	ptr = device->name ?: empty;
++	if (strlen(device->name) > 0)
++		ptr = device->name;
++	else
++		ptr = empty;
++
+ 	dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING, &ptr);
+ 
+ 	return TRUE;
 -- 
-1.8.4
+1.8.3.2
 
