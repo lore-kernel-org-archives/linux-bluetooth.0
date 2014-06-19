@@ -1,71 +1,125 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-From: David Narvaez <david.narvaez@computer.org>
-Date: Thu, 19 Jun 2014 21:17:05 -0400
-Message-ID: <CACFh1D5A64SVvKU7FfsMRr8Yz31=-g92Z6k8=NgQjPE1SxsxEg@mail.gmail.com>
-Subject: SSH Shell Over Bluetooth
-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <CABBYNZJjdpohiQ62qwsrkmg-FqLcDtrTMeYhe__fLf2LO=UaEg@mail.gmail.com>
+References: <1403131286-15028-1-git-send-email-lukasz.rymanowski@tieto.com>
+	<1403131286-15028-5-git-send-email-lukasz.rymanowski@tieto.com>
+	<CABBYNZJjdpohiQ62qwsrkmg-FqLcDtrTMeYhe__fLf2LO=UaEg@mail.gmail.com>
+Date: Fri, 20 Jun 2014 01:18:32 +0200
+Message-ID: <CAMudyAujJUfE9w10FxCgXTjex2oX-9PFpmJE8+wQ+4TsGixBsw@mail.gmail.com>
+Subject: Re: [PATCH 4/4] android/hidhost: Start encryption for HOG when bonded
+From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Szymon Janc <szymon.janc@tieto.com>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+HI Luiz,
 
-I have an RPi with a bluetooth dongle and my ultimate goal is to be
-able to SSH into the RPi over bluetooth from my laptop. Back in the
-days, PAND was the way to do this, but now that it is gone I don't see
-any documentation explaining how to set up TPC/IP over bluetooth.
+On 19 June 2014 15:25, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+> Hi Lukasz,
+>
+> On Thu, Jun 19, 2014 at 1:41 AM, Lukasz Rymanowski
+> <lukasz.rymanowski@tieto.com> wrote:
+>> HOG requires encryption on connection, so make sure it is on.
+>>
+>> On the other hand we don't need medium security always when
+>> connecting LE device even device are bonded. It depends on permissions
+>> on characteristics. That's why we want security low in connect_le()
+>> ---
+>>  android/gatt.c    | 6 +-----
+>>  android/hidhost.c | 4 ++++
+>>  2 files changed, 5 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/android/gatt.c b/android/gatt.c
+>> index 9471eaf..746316d 100644
+>> --- a/android/gatt.c
+>> +++ b/android/gatt.c
+>> @@ -1419,7 +1419,6 @@ reply:
+>>
+>>  static int connect_le(struct gatt_device *dev)
+>>  {
+>> -       BtIOSecLevel sec_level;
+>>         GIOChannel *io;
+>>         GError *gerr = NULL;
+>>         char addr[18];
+>> @@ -1434,9 +1433,6 @@ static int connect_le(struct gatt_device *dev)
+>>
+>>         DBG("Connection attempt to: %s", addr);
+>>
+>> -       sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
+>> -                                                               BT_IO_SEC_LOW;
+>> -
+>>         /*
+>>          * This connection will help us catch any PDUs that comes before
+>>          * pairing finishes
+>> @@ -1448,7 +1444,7 @@ static int connect_le(struct gatt_device *dev)
+>>                         BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
+>>                         BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
+>>                         BT_IO_OPT_CID, ATT_CID,
+>> -                       BT_IO_OPT_SEC_LEVEL, sec_level,
+>> +                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
+>>                         BT_IO_OPT_INVALID);
+>>         if (!io) {
+>>                 error("gatt: Failed bt_io_connect(%s): %s", addr,
+>> diff --git a/android/hidhost.c b/android/hidhost.c
+>> index 846dd57..1f66454 100644
+>> --- a/android/hidhost.c
+>> +++ b/android/hidhost.c
+>> @@ -777,6 +777,10 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
+>>                 bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
+>>         }
+>>
+>> +       /* If device is bonded lets enable encryption */
+>> +       if (bt_device_is_bonded(addr))
+>> +               bt_gatt_set_security(addr, BT_SECURITY_MEDIUM);
+>> +
+>
+> Don't we need to wait the encryption change to only then start sending
+> commands? Actually this gets more complicate since the specs says the
+> following:
+>
+> "If the HID Host receives the L2CAP Connection Parameter Update
+> request but has not
+> yet completed service discovery or has not completed encryption, the
+> HID Host may
+> send the L2CAP Connection Parameter Update Response with the Result field
+> indicating that the request has been rejected."
+>
+As far as I understand, socket will stop flow until the security level
+is updated.
 
->From reading API docs, mailing list archives and a lot of guessing,
-these are the steps I have so far:
+> So it seems HoG may have some requirements on L2CAP as well so it is
+> not per characteristics, so perhaps connect_le should take the initial
+> security level then we can add some security requirement to
+> bt_gatt_connect_app or something like that. Btw, Im not aware of any
+> drawback regarding encryption even if is not mandatory it will just
+> make the connection more secure, but perhaps this is fixing another
+> problem?
 
-1) I copied tests/test-nap to the RPi
+One of the drawback is GATT PTS testcase TC_GAW_CL_BV_02_C which test
+signed wrtie. Scenario is that device do bonding and exchange CSRK,
+then disconnect and connect again. Once their are reconnected signed
+write should be performed. Note that signed write is no allowed on
+encrypted link.
 
-# python2 test-nap
-Server for nap registered for tether
-Press CTRL-C to disconnect
+>
+>>         if (!dev->hog) {
+>>                 /* TODO: Get device details and primary */
+>>                 dev->hog = bt_hog_new("bluez-input-device", dev->vendor,
+>> --
+>> 1.8.4
+>>
+>> --
+>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+>> the body of a message to majordomo@vger.kernel.org
+>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-2) I now can see NAP being offered from the RPi
-
-[bluetooth]# show
-Controller 00:02:5B:05:2D:85
-        Name: alarmpi
-        Alias: alarmpi
-        Class: 0x020000
-        Powered: yes
-        Discoverable: yes
-        Pairable: yes
-        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
-        UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-        UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
-        Modalias: usb:v1D6Bp0246d0513
-        Discovering: no
-
-3) I added a bridge called tether in the RPi
-
-# brctl addbr tether
-# brctl show
-bridge name     bridge id               STP enabled     interfaces
-tether          8000.000000000000       no
-
-4) I use the test-device script in my laptop to connect to the NAP
-service. Unlike the example in the archives[0], I use the UUID of the
-service
-
-$ ./test-device connect 00:02:5B:05:2D:85 00001116-0000-1000-8000-00805f9b34fb
-
-5) Now I have bnep0 in both the RPi and the host, so I configure them
-with ifconfig
-6) I try to ping but I get "Destination Host Unreachable"
-
-I'm using Bluez 5.19 in both my RPi and my laptop, and the test
-scripts are all from git. What am I missing?
-
-Thanks.
-
-David E. Narvaez
-
-[0] http://www.spinics.net/lists/linux-bluetooth/msg46846.html
+BR
+Lukasz
