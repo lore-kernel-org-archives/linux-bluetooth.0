@@ -1,75 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ] doc/obex-api: Add API for PBAP 1.2 features
-Date: Thu, 19 Jun 2014 16:09:34 +0300
-Message-Id: <1403183374-16994-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] android/dis: Add bt_dis_set_notification
+Date: Thu, 19 Jun 2014 15:58:55 +0300
+Message-Id: <1403182736-11030-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1403182736-11030-1-git-send-email-luiz.dentz@gmail.com>
+References: <1403182736-11030-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Function bt_dis_set_notification can be used to set notify callback.
 ---
-These changes add support for PBAP 1.2 features, the idea is that upon
-connecting the stack will auto retrieve the DatabaseIdentifier which will
-very likely be used by applications to detect if anything should be done.
+ android/dis.c | 21 +++++++++++++++++++++
+ android/dis.h |  7 +++++++
+ 2 files changed, 28 insertions(+)
 
-In case DatabaseIdentifier is present the user application can then
-request the folder version via GetVersion.
-
-Two new filter are added, Operator which should be used along with Fields
-and ResetNewMissedCalls which can only be used in mch and cch folders.
-
- doc/obex-api.txt | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
-
-diff --git a/doc/obex-api.txt b/doc/obex-api.txt
-index 9542a30..f86903c 100644
---- a/doc/obex-api.txt
-+++ b/doc/obex-api.txt
-@@ -431,6 +431,14 @@ Methods		void Select(string location, string phonebook)
- 			Possible errors: org.bluez.obex.Error.Forbidden
- 					 org.bluez.obex.Error.Failed
+diff --git a/android/dis.c b/android/dis.c
+index 7914293..3237c03 100644
+--- a/android/dis.c
++++ b/android/dis.c
+@@ -51,6 +51,8 @@ struct bt_dis {
+ 	GAttrib			*attrib;	/* GATT connection */
+ 	struct gatt_primary	*primary;	/* Primary details */
+ 	GSList			*chars;		/* Characteristics */
++	bt_dis_notify		notify;
++	void			*notify_data;
+ };
  
-+		uint16, uint16 GetVersion()
+ struct characteristic {
+@@ -132,6 +134,13 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	dis->vendor = get_le16(&value[1]);
+ 	dis->product = get_le16(&value[3]);
+ 	dis->version = get_le16(&value[5]);
 +
-+			Return the primary and secondy folder version counters
-+			for the selected phonebook.
++	DBG("source: 0x%02X vendor: 0x%04X product: 0x%04X version: 0x%04X",
++			dis->source, dis->vendor, dis->product, dis->version);
 +
-+			Possible errors: org.bluez.obex.Error.Forbidden
-+					 org.bluez.obex.Error.Failed
-+
- 		array{string} ListFilterFields()
++	if (dis->notify)
++		dis->notify(dis->source, dis->vendor, dis->product,
++						dis->version, dis->notify_data);
+ }
  
- 			Return All Available fields that can be used in Fields
-@@ -465,6 +473,27 @@ Filter:		string Format:
+ static void process_deviceinfo_char(struct characteristic *ch)
+@@ -194,3 +203,15 @@ void bt_dis_detach(struct bt_dis *dis)
+ 	g_attrib_unref(dis->attrib);
+ 	dis->attrib = NULL;
+ }
++
++bool bt_dis_set_notification(struct bt_dis *dis, bt_dis_notify func,
++							void *user_data)
++{
++	if (!dis)
++		return false;
++
++	dis->notify = func;
++	dis->notify_data = user_data;
++
++	return true;
++}
+diff --git a/android/dis.h b/android/dis.h
+index 6cc0b58..faf27b3 100644
+--- a/android/dis.h
++++ b/android/dis.h
+@@ -30,3 +30,10 @@ void bt_dis_unref(struct bt_dis *dis);
  
- 			Possible values can be query with ListFilterFields.
- 
-+		bool Operator:
+ bool bt_dis_attach(struct bt_dis *dis, void *gatt);
+ void bt_dis_detach(struct bt_dis *dis);
 +
-+			Filter items by fields. Default do not filter by
-+			fields.
++typedef void (*bt_dis_notify) (uint8_t source, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					void *user_data);
 +
-+			True: all (AND logic)
-+			False: any (OR logic)
-+
-+		bool ResetNewMissedCalls
-+
-+			Reset new the missed calls items, shall only be used
-+			for folders mch and cch.
-+
-+Properties	string Folder [readonly]
-+
-+			Current folder.
-+
-+		string DatabaseIdentifier [readonly]
-+
-+			Optional. 128 bits persistent identifier.
-+
- 
- Synchronization hierarchy
- =========================
++bool bt_dis_set_notification(struct bt_dis *dis, bt_dis_notify func,
++							void *user_data);
 -- 
 1.9.3
 
