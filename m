@@ -3,55 +3,27 @@ From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
 Subject: [PATCH] android/pts: Initial test files for BAS
-Date: Fri, 20 Jun 2014 11:52:21 +0200
-Message-Id: <1403257941-26754-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Fri, 20 Jun 2014 11:33:35 +0200
+Message-Id: <1403256815-24627-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/Makefile.am   |  5 ++++-
  android/pics-bas.txt  | 62 +++++++++++++++++++++++++++++++++++++++++++++++++++
  android/pixit-bas.txt | 25 +++++++++++++++++++++
  android/pts-bas.txt   | 26 +++++++++++++++++++++
- 4 files changed, 117 insertions(+), 1 deletion(-)
+ 3 files changed, 113 insertions(+)
  create mode 100644 android/pics-bas.txt
  create mode 100644 android/pixit-bas.txt
  create mode 100644 android/pts-bas.txt
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 51c8253..09128b3 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -248,6 +248,7 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pics-sm.txt \
- 				android/pics-mps.txt \
- 				android/pics-hogp.txt \
-+				android/pics-bas.txt \
- 				android/pixit-l2cap.txt \
- 				android/pixit-gap.txt \
- 				android/pixit-did.txt \
-@@ -268,6 +269,7 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pixit-sm.txt \
- 				android/pixit-mps.txt \
- 				android/pixit-hogp.txt \
-+				android/pixit-bas.txt \
- 				android/bite-rfcomm.txt \
- 				android/bite-spp.txt \
- 				android/pts-l2cap.txt \
-@@ -289,4 +291,5 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pts-mcap.txt \
- 				android/pts-mps.txt \
- 				android/pts-sm.txt \
--				android/pts-hogp.txt
-+				android/pts-hogp.txt \
-+				android/pts-bas.txt
 diff --git a/android/pics-bas.txt b/android/pics-bas.txt
 new file mode 100644
-index 0000000..170caa0
+index 0000000..2ab247e
 --- /dev/null
 +++ b/android/pics-bas.txt
 @@ -0,0 +1,62 @@
-+BAS PICS for the PTS tool.
++SM PICS for the PTS tool.
 +
 +PTS version: 5.1
 +
@@ -115,11 +87,11 @@ index 0000000..170caa0
 +-------------------------------------------------------------------------------
 diff --git a/android/pixit-bas.txt b/android/pixit-bas.txt
 new file mode 100644
-index 0000000..d50c8c0
+index 0000000..48b0b99
 --- /dev/null
 +++ b/android/pixit-bas.txt
 @@ -0,0 +1,25 @@
-+BAS PIXIT for the PTS tool.
++SM PIXIT for the PTS tool.
 +
 +PTS version: 5.1
 +
@@ -146,11 +118,11 @@ index 0000000..d50c8c0
 +-------------------------------------------------------------------------------
 diff --git a/android/pts-bas.txt b/android/pts-bas.txt
 new file mode 100644
-index 0000000..0e35de3
+index 0000000..101fa12
 --- /dev/null
 +++ b/android/pts-bas.txt
 @@ -0,0 +1,26 @@
-+PTS test results for BAS
++PTS test results for SM
 +
 +PTS version:
 +Tested: not tested
