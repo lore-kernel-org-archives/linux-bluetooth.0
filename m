@@ -2,196 +2,186 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 5/7] android/health: Create and connect MDL
-Date: Fri, 20 Jun 2014 15:23:34 +0300
-Message-Id: <1403267016-28422-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 2/7] android/health: Check if device and channel already exists or not
+Date: Fri, 20 Jun 2014 15:23:31 +0300
+Message-Id: <1403267016-28422-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Request for md_create_mdl and on successful response
-connect mdl and pass fd. First data channel should be reliable
-data channel.
+On channel connect request, check if device is already exists or not.
+Also check if channel is already created for remote device or not.
 ---
- android/health.c | 122 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 120 insertions(+), 2 deletions(-)
+ android/health.c | 83 ++++++++++++++++++++++++++++++++++++++++----------------
+ 1 file changed, 59 insertions(+), 24 deletions(-)
 
 diff --git a/android/health.c b/android/health.c
-index fff999d..ec5a413 100644
+index 7553467..083ab1e 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -87,6 +87,7 @@ struct health_device {
- 
- 	uint16_t ccpsm;
- 	uint16_t dcpsm;
-+	bool fr; /* first reliable channel */
- };
- 
- struct health_channel {
-@@ -146,6 +147,16 @@ static void send_channel_state_notify(struct health_channel *channel,
+@@ -213,6 +213,22 @@ static void send_channel_state_notify(struct health_channel *channel,
  					sizeof(ev), &ev, fd);
  }
  
-+static void unref_mdl(struct health_channel *channel)
++static bool dev_by_addr(const void *data, const void *user_data)
 +{
-+	if (!channel || !channel->mdl)
-+		return;
++	const struct health_device *dev = data;
++	const bdaddr_t *addr = user_data;
 +
-+	mcap_mdl_unref(channel->mdl);
-+	channel->mdl = NULL;
-+	channel->mdl_conn = false;
++	return !bacmp(&dev->dst, addr);
 +}
 +
- static void free_health_channel(void *data)
++static bool channel_by_mdep_id(const void *data, const void *user_data)
++{
++	const struct health_channel *channel = data;
++	uint16_t mdep_id = PTR_TO_INT(user_data);
++
++	return channel->mdep_id == mdep_id;
++}
++
+ static bool mdep_by_mdep_role(const void *data, const void *user_data)
  {
- 	struct health_channel *channel = data;
-@@ -153,6 +164,7 @@ static void free_health_channel(void *data)
- 	if (!channel)
- 		return;
+ 	const struct mdep_cfg *mdep = data;
+@@ -1094,25 +1110,44 @@ static int connect_mcl(struct health_channel *channel)
  
-+	unref_mdl(channel);
- 	free(channel);
+ static struct health_device *create_device(uint16_t app_id, const uint8_t *addr)
+ {
++	struct health_app *app;
+ 	struct health_device *dev;
++	bdaddr_t bdaddr;
+ 
++	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
++	if (!app)
++		return NULL;
++
++	android2bdaddr(addr, &bdaddr);
++	dev = queue_find(app->devices, dev_by_addr, &bdaddr);
++	if (dev)
++		return dev;
++
++	/* create device and push it to devices queue */
+ 	dev = new0(struct health_device, 1);
+ 	if (!dev)
+ 		return NULL;
+ 
+ 	android2bdaddr(addr, &dev->dst);
+ 	dev->app_id = app_id;
++
+ 	dev->channels = queue_new();
+ 	if (!dev->channels) {
+ 		free_health_device(dev);
+ 		return NULL;
+ 	}
+ 
++	if (!queue_push_tail(app->devices, dev)) {
++		free_health_device(dev);
++		return NULL;
++	}
++
+ 	return dev;
  }
  
-@@ -1016,6 +1028,93 @@ static void mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
- 	DBG("Not Implemeneted");
- }
- 
-+static void connect_mdl_cb(struct mcap_mdl *mdl, GError *gerr, gpointer data)
-+{
-+	struct health_channel *channel = data;
-+	int fd;
-+
-+	DBG("");
-+
-+	if (gerr) {
-+		error("error connecting to MDL %s", gerr->message);
-+		goto fail;
-+	}
-+
-+	fd = mcap_mdl_get_fd(channel->mdl);
-+	if (fd < 0) {
-+		error("error retrieving fd");
-+		goto fail;
-+	}
-+
-+	DBG("MDL connected");
-+	channel->mdl_conn = true;
-+
-+	/* first data channel should be reliable data channel */
-+	if (!channel->dev->fr)
-+		if (channel->type == CHANNEL_TYPE_RELIABLE)
-+			channel->dev->fr = true;
-+
-+	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTED, fd);
-+
-+	return;
-+
-+fail:
-+	/* TODO: mcap_mdl_abort */
-+	destroy_channel(channel);
-+}
-+
-+static void create_mdl_cb(struct mcap_mdl *mdl, uint8_t type, GError *gerr,
-+								gpointer data)
-+{
-+	struct health_channel *channel = data;
-+	uint8_t mode;
-+	GError *err = NULL;
-+
-+	DBG("");
-+	if (gerr) {
-+		error("error creating MDL %s", gerr->message);
-+		goto fail;
-+	}
-+
-+	if (channel->type == CHANNEL_TYPE_ANY && type != CHANNEL_TYPE_ANY)
-+		channel->type = type;
-+
-+	/*
-+	 * if requested channel type is not same as preferred
-+	 * channel type from remote device, then abort the connection.
-+	 */
-+	if (channel->type != type) {
-+		/* TODO: abort mdl */
-+		error("abort, channel-type requested %d, preferred %d not same",
-+							channel->type, type);
-+		goto fail;
-+	}
-+
-+	if (!channel->mdl)
-+		channel->mdl = mcap_mdl_ref(mdl);
-+
-+	channel->type = type;
-+	channel->mdl_id = mcap_mdl_get_mdlid(mdl);
-+
-+	if (channel->type == CHANNEL_TYPE_RELIABLE)
-+		mode = L2CAP_MODE_ERTM;
-+	else
-+		mode = L2CAP_MODE_STREAMING;
-+
-+	if (!mcap_connect_mdl(channel->mdl, mode, channel->dev->dcpsm,
-+						connect_mdl_cb, channel,
-+						NULL, &err)) {
-+		error("error connecting to mdl");
-+		g_error_free(err);
-+		goto fail;
-+	}
-+
-+	return;
-+
-+fail:
-+	destroy_channel(channel);
-+}
-+
- static bool check_role(uint8_t rec_role, uint8_t app_role)
+ static struct health_channel *create_channel(uint16_t app_id,
+-						uint8_t mdep_index)
++						uint8_t mdep_index,
++						struct health_device *dev)
  {
- 	if ((rec_role == HAL_HEALTH_MDEP_ROLE_SINK &&
-@@ -1078,7 +1177,8 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
- 	struct health_channel *channel = user_data;
  	struct health_app *app;
  	struct mdep_cfg *mdep;
--	uint8_t mdep_id;
-+	uint8_t mdep_id, type;
-+	GError *gerr = NULL;
+@@ -1120,22 +1155,37 @@ static struct health_channel *create_channel(uint16_t app_id,
+ 	uint8_t index;
+ 	static unsigned int channel_id = 1;
  
- 	if (err < 0 || !recs) {
- 		error("error getting remote SDP records");
-@@ -1102,7 +1202,18 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
- 
- 	channel->remote_mdep = mdep_id;
- 
--	/* TODO : create mdl */
-+	if (mdep->role == HAL_HEALTH_MDEP_ROLE_SOURCE)
-+		type = channel->type;
-+	else
-+		type = CHANNEL_TYPE_ANY;
++	if (!dev)
++		return NULL;
 +
-+	if (!mcap_create_mdl(channel->dev->mcl, channel->remote_mdep,
-+				type, create_mdl_cb, channel, NULL, &gerr)) {
-+		error("error creating mdl %s", gerr->message);
-+		g_error_free(gerr);
-+		goto fail;
++	index = mdep_index + 1;
++	channel = queue_find(dev->channels, channel_by_mdep_id,
++							INT_TO_PTR(index));
++	if (channel)
++		return channel;
++
+ 	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
+ 	if (!app)
+ 		return NULL;
+ 
+-	index = mdep_index + 1;
+ 	mdep = queue_find(app->mdeps, mdep_by_mdep_id, INT_TO_PTR(index));
+ 	if (!mdep)
+ 		return NULL;
+ 
++	/* create channel and push it to device */
+ 	channel = new0(struct health_channel, 1);
+ 	if (!channel)
+ 		return NULL;
+ 
+-	channel->mdep_id = mdep_index;
++	channel->mdep_id = mdep->id;
+ 	channel->type = mdep->channel_type;
+ 	channel->id = channel_id++;
++	channel->dev = dev;
++
++	if (!queue_push_tail(dev->channels, channel)) {
++		free_health_channel(channel);
++		return NULL;
 +	}
-+
- 	return;
  
- fail:
-@@ -1321,6 +1432,13 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+ 	return channel;
+ }
+@@ -1144,38 +1194,24 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+ {
+ 	const struct hal_cmd_health_connect_channel *cmd = buf;
+ 	struct hal_rsp_health_connect_channel rsp;
+-	struct health_app *app;
+ 	struct health_device *dev = NULL;
+ 	struct health_channel *channel = NULL;
+ 
+ 	DBG("");
+ 
+-	app = queue_find(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
+-	if (!app)
+-		goto fail;
+-
+ 	dev = create_device(cmd->app_id, cmd->bdaddr);
+ 	if (!dev)
+ 		goto fail;
+ 
+-	channel = create_channel(cmd->app_id, cmd->mdep_index);
++	channel = create_channel(cmd->app_id, cmd->mdep_index, dev);
  	if (!channel)
  		goto fail;
  
-+	if (!dev->fr) {
-+		if (channel->type != CHANNEL_TYPE_RELIABLE) {
-+			error("error, first data shannel should be reliable");
+-	channel->dev = dev;
+-
+-	if (!queue_push_tail(app->devices, dev))
+-		goto fail;
+-
+-	if (!queue_push_tail(dev->channels, channel)) {
+-		queue_remove(app->devices, dev);
+-		goto fail;
+-	}
+-
+-	if (connect_mcl(channel) < 0) {
+-		error("error retrieving HDP SDP record");
+-		queue_remove(app->devices, dev);
+-		goto fail;
++	if (!dev->mcl) {
++		if (connect_mcl(channel) < 0) {
++			error("error retrieving HDP SDP record");
 +			goto fail;
 +		}
-+	}
-+
- 	if (!dev->mcl) {
- 		if (connect_mcl(channel) < 0) {
- 			error("error retrieving HDP SDP record");
+ 	}
+ 
+ 	rsp.channel_id = channel->id;
+@@ -1186,7 +1222,6 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+ 
+ fail:
+ 	free_health_channel(channel);
+-	free_health_device(dev);
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
+ 			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
+ }
 -- 
 1.9.1
 
