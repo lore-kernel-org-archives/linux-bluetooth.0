@@ -1,164 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Initial test files for DIS
-Date: Fri, 20 Jun 2014 12:07:06 +0200
-Message-Id: <1403258826-28190-2-git-send-email-sebastian.chlad@tieto.com>
-In-Reply-To: <1403258826-28190-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1403258826-28190-1-git-send-email-sebastian.chlad@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Message-ID: <53A40687.80004@ahsoftware.de>
+Date: Fri, 20 Jun 2014 12:01:43 +0200
+From: Alexander Holler <holler@ahsoftware.de>
+MIME-Version: 1.0
+To: Peng Chen <pengchen@qti.qualcomm.com>, gustavo@padovan.org,
+ linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+CC: kumo@qca.qualcomm.com, taowang@qti.qualcomm.com
+Subject: Re: [PATCH] Add a new PID/VID 0cf3/e005 for AR3012.
+References: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com>
+In-Reply-To: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com>
+Content-Type: text/plain; charset=ISO-8859-15; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-dis.txt  | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++
- android/pixit-dis.txt | 25 ++++++++++++++++++++++
- android/pts-dis.txt   | 38 +++++++++++++++++++++++++++++++++
- 3 files changed, 122 insertions(+)
- create mode 100644 android/pics-dis.txt
- create mode 100644 android/pixit-dis.txt
- create mode 100644 android/pts-dis.txt
+Am 30.08.2013 11:09, schrieb Peng Chen:
+> ---
+>   drivers/bluetooth/ath3k.c |    2 ++
+>   drivers/bluetooth/btusb.c |    1 +
+>   2 files changed, 3 insertions(+)
+>
+> diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+> index 11f467c..10e9a64 100644
+> --- a/drivers/bluetooth/ath3k.c
+> +++ b/drivers/bluetooth/ath3k.c
+> @@ -85,6 +85,7 @@ static struct usb_device_id ath3k_table[] = {
+>   	{ USB_DEVICE(0x04CA, 0x3008) },
+>   	{ USB_DEVICE(0x13d3, 0x3362) },
+>   	{ USB_DEVICE(0x0CF3, 0xE004) },
+> +	{ USB_DEVICE(0x0CF3, 0xE005) },
+>   	{ USB_DEVICE(0x0930, 0x0219) },
+>   	{ USB_DEVICE(0x0489, 0xe057) },
+>   	{ USB_DEVICE(0x13d3, 0x3393) },
+> @@ -122,6 +123,7 @@ static struct usb_device_id ath3k_blist_tbl[] = {
+>   	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+> +	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index de4cf4d..299df99 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -148,6 +148,7 @@ static struct usb_device_id blacklist_table[] = {
+>   	{ USB_DEVICE(0x04ca, 0x3008), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x13d3, 0x3362), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0cf3, 0xe004), .driver_info = BTUSB_ATH3012 },
+> +	{ USB_DEVICE(0x0cf3, 0xe005), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0930, 0x0219), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x0489, 0xe057), .driver_info = BTUSB_ATH3012 },
+>   	{ USB_DEVICE(0x13d3, 0x3393), .driver_info = BTUSB_ATH3012 },
 
-diff --git a/android/pics-dis.txt b/android/pics-dis.txt
-new file mode 100644
-index 0000000..e0c61de
---- /dev/null
-+++ b/android/pics-dis.txt
-@@ -0,0 +1,59 @@
-+DIS PICS for the PTS tool.
-+
-+PTS version: 5.1
-+
-+* - different than PTS defaults
-+
-+M - mandatory
-+O - optional
-+
-+		Transport Requirements
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_DIS_1_1	False (*)	Service supported over BR/EDR (C.1)
-+TSPC_DIS_1_2	True		Service supported over LE (C.1)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory to support at least one of 1/1 or 1/2.
-+-------------------------------------------------------------------------------
-+
-+
-+		Service Requirements
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_DIS_2_1			Device Information Service (M)
-+TSPC_DIS_2_2			Manufacturer Name String Characteristic (O)
-+TSPC_DIS_2_3			Model Number String Characteristic (O)
-+TSPC_DIS_2_4			Serial Number String Characteristic (O)
-+TSPC_DIS_2_5			Hardware Revision String Characteristic (O)
-+TSPC_DIS_2_6			Firmware Revision String Characteristic (O)
-+TSPC_DIS_2_7			Software Revision String Characteristic (O)
-+TSPC_DIS_2_8			System ID Characteristic (O)
-+TSPC_DIS_2_9			IEEE 11073-20601 Regulatory Certification
-+				Data List Characteristic (O)
-+TSPC_DIS_2_10	False		SDP Interoperability (C.1)
-+TSPC_DIS_2_11			PnP ID (O)
-+-------------------------------------------------------------------------------
-+C.1: Mandatory if 1/1 (BR/EDR) is supported, otherwise excluded.
-+-------------------------------------------------------------------------------
-+
-+
-+		GATT Requirements
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_DIS_3_1	True		Generic Attribute Profile Server (M)
-+-------------------------------------------------------------------------------
-+
-+
-+		SDP Requirements
-+-------------------------------------------------------------------------------
-+Parameter Name	Selected	Description
-+-------------------------------------------------------------------------------
-+TSPC_DIS_4_1	False (*)	Support for server role (M)
-+TSPC_DIS_4_2	False (*)	ProtocolDescriptorList (M)
-+TSPC_DIS_4_3	False (*)	BrowseGroupList (M)
-+-------------------------------------------------------------------------------
-+Note: Marked as False as TSPC_DIS_1_1 is set to False
-+-------------------------------------------------------------------------------
-diff --git a/android/pixit-dis.txt b/android/pixit-dis.txt
-new file mode 100644
-index 0000000..366bb5a
---- /dev/null
-+++ b/android/pixit-dis.txt
-@@ -0,0 +1,25 @@
-+DIS PIXIT for the PTS tool.
-+
-+PTS version: 5.1
-+
-+* - different than PTS defaults
-+& - should be set to IUT Bluetooth address
-+
-+		Required PIXIT settings
-+-------------------------------------------------------------------------------
-+Parameter Name						Value
-+-------------------------------------------------------------------------------
-+TSPX_bd_addr_iut					112233445566 (*&)
-+TSPX_time_guard						180000
-+TSPX_use_implicit_send					TRUE
-+TSPX_tester_database_file				C:/Program Files/...
-+TSPX_mtu_size						23
-+TSPX_secure_simple_pairing_pass_key_confirmation	FALSE
-+TSPX_delete_link_key					FALSE
-+TSPX_pin_code						0000
-+TSPX_use_dynamic_pin					FALSE
-+TSPX_delete_ltk						FALSE
-+TSPX_security_enabled					FALSE
-+TSPX_iut_setup_att_over_br_edr				FALSE
-+TSPX_tester_appearance					0000
-+-------------------------------------------------------------------------------
-diff --git a/android/pts-dis.txt b/android/pts-dis.txt
-new file mode 100644
-index 0000000..8734611
---- /dev/null
-+++ b/android/pts-dis.txt
-@@ -0,0 +1,38 @@
-+PTS test results for DIS
-+
-+PTS version:
-+Tested: not tested
-+Android version:
-+kernel version:
-+
-+Results:
-+PASS	test passed
-+FAIL	test failed
-+INC	test is inconclusive
-+N/A	test is disabled due to PICS setup
-+NONE	test result is none
-+
-+-------------------------------------------------------------------------------
-+Test Name		Result	Notes
-+-------------------------------------------------------------------------------
-+TC_SD_BV_01_C		INC
-+TC_DEC_BV_01_C		INC
-+TC_DEC_BV_02_C		INC
-+TC_DEC_BV_03_C		INC
-+TC_DEC_BV_04_C		INC
-+TC_DEC_BV_05_C		INC
-+TC_DEC_BV_06_C		INC
-+TC_DEC_BV_07_C		INC
-+TC_DEC_BV_08_C		INC
-+TC_DEC_BV_09_C		INC
-+TC_CR_BV_01_C		INC
-+TC_CR_BV_02_C		INC
-+TC_CR_BV_03_C		INC
-+TC_CR_BV_04_C		INC
-+TC_CR_BV_05_C		INC
-+TC_CR_BV_06_C		INC
-+TC_CR_BV_07_C		INC
-+TC_CR_BV_08_C		INC
-+TC_CR_BV_09_C		INC
-+TC_SDP_BV_01_C		N/A
-+-------------------------------------------------------------------------------
--- 
-1.8.5.3
+This patch ended up in 3.15 as
 
+-----
+[aholler@krabat linux]# git diff ca58e5~1..ca58e5
+diff --git a/drivers/bluetooth/ath3k.c b/drivers/bluetooth/ath3k.c
+index 59b2e6a..bc5cf90 100644
+--- a/drivers/bluetooth/ath3k.c
++++ b/drivers/bluetooth/ath3k.c
+@@ -89,6 +89,7 @@ static const struct usb_device_id ath3k_table[] = {
+         { USB_DEVICE(0x0b05, 0x17d0) },
+         { USB_DEVICE(0x0CF3, 0x0036) },
+         { USB_DEVICE(0x0CF3, 0x3004) },
++       { USB_DEVICE(0x0CF3, 0x3005) },
+         { USB_DEVICE(0x0CF3, 0x3008) },
+         { USB_DEVICE(0x0CF3, 0x311D) },
+         { USB_DEVICE(0x0CF3, 0x311E) },
+@@ -137,6 +138,7 @@ static const struct usb_device_id ath3k_blist_tbl[] = {
+         { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0CF3, 0x0036), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++       { USB_DEVICE(0x0cf3, 0x3005), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x311D), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x311E), .driver_info = BTUSB_ATH3012 },
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 199b9d4..f338b0c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -159,6 +159,7 @@ static const struct usb_device_id blacklist_table[] = {
+         { USB_DEVICE(0x0b05, 0x17d0), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x0036), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x3004), .driver_info = BTUSB_ATH3012 },
++       { USB_DEVICE(0x0cf3, 0x3005), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x3008), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x311d), .driver_info = BTUSB_ATH3012 },
+         { USB_DEVICE(0x0cf3, 0x311e), .driver_info = BTUSB_ATH3012 },
+-----
+
+which is wrong and disables the ath3k driver.
+
+Alexander Holler
