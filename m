@@ -1,90 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/7] android/health: Fix queue creation for mdeps and devices
-Date: Fri, 20 Jun 2014 15:23:30 +0300
-Message-Id: <1403267016-28422-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [RFC] doc: Add extra mode for a reduced LE privacy mode
+Date: Fri, 20 Jun 2014 14:06:24 +0200
+Message-Id: <1403265984-41194-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Create queue for mdeps, devices and channels when creating app
-and device struct. It is simpler to read code than on demand
-creation.
 ---
- android/health.c | 33 +++++++++++++--------------------
- 1 file changed, 13 insertions(+), 20 deletions(-)
+ doc/mgmt-api.txt | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index 0462e99..7553467 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -678,6 +678,14 @@ static struct health_app *create_health_app(const char *app_name,
- 			goto fail;
- 	}
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index e15a78f3e4b7..7001142cede6 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1646,8 +1646,16 @@ Set Privacy Command
+ 	This command is used to enable Low Energy Privacy feature using
+ 	resolvable private addresses.
  
-+	app->mdeps = queue_new();
-+	if (!app->mdeps)
-+		goto fail;
+-	The value 0x00 disables privacy mode, the value 0x01 enables
+-	privacy mode.
++	The value 0x00 disables privacy mode, the values 0x01 and 0x02
++	enable privacy mode.
 +
-+	app->devices = queue_new();
-+	if (!app->devices)
-+		goto fail;
++	With value 0x01 the kernel will always use the privacy mode and
++	this resolvable private addresses. With value 0x02 the kernel will
++	use the identity address when discoverable. When the controller
++	is not discoverable, the resolvable private address is used.
 +
- 	return app;
++	In addition with value 0x02 the kernel will also use the identity
++	address when pairing is initiated.
  
- fail:
-@@ -784,14 +792,6 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
- 		memcpy(mdep->descr, cmd->descr, cmd->descr_len);
- 	}
- 
--	if (app->num_of_mdep > 0 && !app->mdeps) {
--		app->mdeps = queue_new();
--		if (!app->mdeps) {
--			status = HAL_STATUS_FAILED;
--			goto fail;
--		}
--	}
--
- 	if (!queue_push_tail(app->mdeps, mdep)) {
- 		status = HAL_STATUS_FAILED;
- 		goto fail;
-@@ -1102,6 +1102,11 @@ static struct health_device *create_device(uint16_t app_id, const uint8_t *addr)
- 
- 	android2bdaddr(addr, &dev->dst);
- 	dev->app_id = app_id;
-+	dev->channels = queue_new();
-+	if (!dev->channels) {
-+		free_health_device(dev);
-+		return NULL;
-+	}
- 
- 	return dev;
- }
-@@ -1159,21 +1164,9 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
- 
- 	channel->dev = dev;
- 
--	if (!app->devices) {
--		app->devices = queue_new();
--		if (!app->devices)
--			goto fail;
--	}
--
- 	if (!queue_push_tail(app->devices, dev))
- 		goto fail;
- 
--	if (!dev->channels) {
--		dev->channels = queue_new();
--		if (!dev->channels)
--			goto fail;
--	}
--
- 	if (!queue_push_tail(dev->channels, channel)) {
- 		queue_remove(app->devices, dev);
- 		goto fail;
+ 	When the controller has a public address (mandatory for dual-mode
+ 	controllers) it is used as identity address. In case the controller
 -- 
-1.9.1
+1.9.3
 
