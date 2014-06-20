@@ -1,48 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] doc: Add extra mode for a reduced LE privacy mode
-Date: Fri, 20 Jun 2014 23:52:58 +0200
-Message-Id: <1403301178-18988-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] android/bluetooth: Pass device to send_device_property function
+Date: Fri, 20 Jun 2014 17:35:38 +0200
+Message-ID: <1674514.g4fsiS35xK@uw000953>
+In-Reply-To: <1403277735-14070-1-git-send-email-szymon.janc@tieto.com>
+References: <1403277735-14070-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 21 +++++++++++++++++++--
- 1 file changed, 19 insertions(+), 2 deletions(-)
+On Friday 20 of June 2014 17:22:15 Szymon Janc wrote:
+> ---
+>  android/bluetooth.c | 20 +++++++++-----------
+>  1 file changed, 9 insertions(+), 11 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index a1e03ce..71458f2 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -846,14 +846,14 @@ static void update_device_state(struct device *dev, uint8_t addr_type,
+>  		send_bond_state_change(&dev->bdaddr, status, new_bond);
+>  }
+>  
+> -static  void send_device_property(const bdaddr_t *bdaddr, uint8_t type,
+> +static  void send_device_property(struct device *dev, uint8_t type,
+>  						uint16_t len, const void *val)
+>  {
+>  	uint8_t buf[BASELEN_REMOTE_DEV_PROP + len];
+>  	struct hal_ev_remote_device_props *ev = (void *) buf;
+>  
+>  	ev->status = HAL_STATUS_SUCCESS;
+> -	bdaddr2android(bdaddr, ev->bdaddr);
+> +	bdaddr2android(&dev->bdaddr, ev->bdaddr);
+>  	ev->num_props = 1;
+>  	ev->props[0].type = type;
+>  	ev->props[0].len = len;
+> @@ -874,8 +874,7 @@ static void send_device_uuids_notif(struct device *dev)
+>  		ptr += sizeof(uint128_t);
+>  	}
+>  
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_UUIDS, sizeof(buf),
+> -									buf);
+> +	send_device_property(dev, HAL_PROP_DEVICE_UUIDS, sizeof(buf), buf);
+>  }
+>  
+>  static void set_device_uuids(struct device *dev, GSList *uuids)
+> @@ -1065,7 +1064,7 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+>  
+>  static uint8_t get_device_name(struct device *dev)
+>  {
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_NAME,
+> +	send_device_property(dev, HAL_PROP_DEVICE_NAME,
+>  						strlen(dev->name), dev->name);
+>  
+>  	return HAL_STATUS_SUCCESS;
+> @@ -4154,7 +4153,7 @@ static uint8_t get_device_uuids(struct device *dev)
+>  
+>  static uint8_t get_device_class(struct device *dev)
+>  {
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_CLASS,
+> +	send_device_property(dev, HAL_PROP_DEVICE_CLASS,
+>  					sizeof(dev->class), &dev->class);
+>  
+>  	return HAL_STATUS_SUCCESS;
+> @@ -4164,8 +4163,7 @@ static uint8_t get_device_type(struct device *dev)
+>  {
+>  	uint8_t type = get_device_android_type(dev);
+>  
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TYPE,
+> -							sizeof(type), &type);
+> +	send_device_property(dev, HAL_PROP_DEVICE_TYPE, sizeof(type), &type);
+>  
+>  	return HAL_STATUS_SUCCESS;
+>  }
+> @@ -4184,7 +4182,7 @@ static uint8_t get_device_friendly_name(struct device *dev)
+>  	if (!dev->friendly_name)
+>  		return HAL_STATUS_FAILED;
+>  
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_FRIENDLY_NAME,
+> +	send_device_property(dev, HAL_PROP_DEVICE_FRIENDLY_NAME,
+>  				strlen(dev->friendly_name), dev->friendly_name);
+>  
+>  	return HAL_STATUS_SUCCESS;
+> @@ -4195,7 +4193,7 @@ static uint8_t get_device_rssi(struct device *dev)
+>  	if (!dev->rssi)
+>  		return HAL_STATUS_FAILED;
+>  
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_RSSI,
+> +	send_device_property(dev, HAL_PROP_DEVICE_RSSI,
+>  						sizeof(dev->rssi), &dev->rssi);
+>  
+>  	return HAL_STATUS_SUCCESS;
+> @@ -4216,7 +4214,7 @@ static uint8_t get_device_timestamp(struct device *dev)
+>  
+>  	timestamp = device_timestamp(dev);
+>  
+> -	send_device_property(&dev->bdaddr, HAL_PROP_DEVICE_TIMESTAMP,
+> +	send_device_property(dev, HAL_PROP_DEVICE_TIMESTAMP,
+>  						sizeof(timestamp), &timestamp);
+>  
+>  	return HAL_STATUS_SUCCESS;
+> 
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index e15a78f3e4b7..dfcf719dc757 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -1646,8 +1646,25 @@ Set Privacy Command
- 	This command is used to enable Low Energy Privacy feature using
- 	resolvable private addresses.
- 
--	The value 0x00 disables privacy mode, the value 0x01 enables
--	privacy mode.
-+	The value 0x00 disables privacy mode, the values 0x01 and 0x02
-+	enable privacy mode.
-+
-+	With value 0x01 the kernel will always use the privacy mode. This
-+	means resolvable private address is used when the controller is
-+	discoverable and also when pairing is initiated.
-+
-+	With value 0x02 the kernel will use privacy mode with resolvable
-+	private address. In case the conroller is pairable and discoverable
-+	the identity address is used. Also when pairing is initiated, the
-+	connection will be established with the identity address.
-+
-+	Exposing the identity address when pairable and discoverable or
-+	during initated pairing can be a privacy issue. For dual-mode
-+	controllers this can be neglected since its public address will
-+	be exposed over BR/EDR anyway. The benefit of exposing the
-+	identity address for pairing purposes is that it makes matching
-+	up devices with dual-mode topology during device discovery now
-+	possible.
- 
- 	When the controller has a public address (mandatory for dual-mode
- 	controllers) it is used as identity address. In case the controller
+Pushed.
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
