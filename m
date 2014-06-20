@@ -2,56 +2,107 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 6/7] android/health: Implement mcap_mdl_deleted_cb
-Date: Fri, 20 Jun 2014 15:23:35 +0300
-Message-Id: <1403267016-28422-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 4/7] android/health: Notify channel status on channel destroy call
+Date: Fri, 20 Jun 2014 15:23:33 +0300
+Message-Id: <1403267016-28422-5-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-mcap_mdl_deleted_cb will be called if remote device sends MDL_DELETE_REQ.
-Free channel data and notify channel is destroyed.
 ---
- android/health.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+ android/health.c | 64 ++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
 
 diff --git a/android/health.c b/android/health.c
-index ec5a413..b379ee1 100644
+index 506c859..fff999d 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1007,9 +1007,30 @@ static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
- 	DBG("Not Implemeneted");
- }
+@@ -115,6 +115,37 @@ struct health_app {
+ 	struct queue *devices;
+ };
  
-+static void notify_channel(void *data, void *user_data)
++static void send_app_reg_notify(struct health_app *app, uint8_t state)
 +{
-+	struct health_channel *channel = data;
-+
-+	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
-+}
-+
- static void mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
- {
--	DBG("Not Implemeneted");
-+	struct health_channel *channel = data;
-+	struct health_device *dev;
++	struct hal_ev_health_app_reg_state ev;
 +
 +	DBG("");
 +
-+	dev = channel->dev;
-+	/* mdl == NULL means, delete all mdls */
-+	if (!mdl) {
-+		queue_foreach(dev->channels, notify_channel, NULL);
-+		queue_destroy(dev->channels, free_health_channel);
-+		dev->channels = NULL;
-+		return;
-+	}
++	ev.id = app->id;
++	ev.state = state;
 +
-+	destroy_channel(channel);
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
++				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
++}
++
++static void send_channel_state_notify(struct health_channel *channel,
++						uint8_t state, int fd)
++{
++	struct hal_ev_health_channel_state ev;
++
++	DBG("");
++
++	bdaddr2android(&channel->dev->dst, ev.bdaddr);
++	ev.app_id = channel->dev->app_id;
++	ev.mdep_index = channel->mdep_id;
++	ev.channel_id = channel->id;
++	ev.channel_state = state;
++
++	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
++					HAL_EV_HEALTH_CHANNEL_STATE,
++					sizeof(ev), &ev, fd);
++}
++
+ static void free_health_channel(void *data)
+ {
+ 	struct health_channel *channel = data;
+@@ -132,7 +163,7 @@ static void destroy_channel(void *data)
+ 	if (!channel)
+ 		return;
+ 
+-	/* TODO: Notify channel connection status DESTROYED */
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
+ 	queue_remove(channel->dev->channels, channel);
+ 	free_health_channel(channel);
+ }
+@@ -187,37 +218,6 @@ static void free_health_app(void *data)
+ 	free(app);
  }
  
- static void mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
+-static void send_app_reg_notify(struct health_app *app, uint8_t state)
+-{
+-	struct hal_ev_health_app_reg_state ev;
+-
+-	DBG("");
+-
+-	ev.id = app->id;
+-	ev.state = state;
+-
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
+-				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
+-}
+-
+-static void send_channel_state_notify(struct health_channel *channel,
+-						uint8_t state, int fd)
+-{
+-	struct hal_ev_health_channel_state ev;
+-
+-	DBG("");
+-
+-	bdaddr2android(&channel->dev->dst, ev.bdaddr);
+-	ev.app_id = channel->dev->app_id;
+-	ev.mdep_index = channel->mdep_id;
+-	ev.channel_id = channel->id;
+-	ev.channel_state = state;
+-
+-	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
+-					HAL_EV_HEALTH_CHANNEL_STATE,
+-					sizeof(ev), &ev, fd);
+-}
+-
+ static bool dev_by_addr(const void *data, const void *user_data)
+ {
+ 	const struct health_device *dev = data;
 -- 
 1.9.1
 
