@@ -1,53 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <FDFE96A3-5B0D-440D-B9BF-1905E4BC2034@holtmann.org>
-References: <CANLOmB5UXAJRModTofiYy-gtj=DvDiq_PU_n6NswrbXw_9_94A@mail.gmail.com>
- <CD90C45F-0899-43A6-870C-DE24E43E5D04@holtmann.org> <CANLOmB5fo8JvrtXGdp+3eqXcPiSauEyD8L6Gcer0cWD6+Qtp_A@mail.gmail.com>
- <FDFE96A3-5B0D-440D-B9BF-1905E4BC2034@holtmann.org>
-From: Seon-Wook Park <seon.wook@swook.net>
-Date: Fri, 20 Jun 2014 14:18:04 +0900
-Message-ID: <CANLOmB5K6=B3H3-7DMVBspJVNzgSF2rc=GAa7oqvTBk1QtWvjQ@mail.gmail.com>
-Subject: Re: L2CAP socket to HCI handle, opposite possible?
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
+From: David Narvaez <david.narvaez@computer.org>
+Date: Thu, 19 Jun 2014 21:17:05 -0400
+Message-ID: <CACFh1D5A64SVvKU7FfsMRr8Yz31=-g92Z6k8=NgQjPE1SxsxEg@mail.gmail.com>
+Subject: SSH Shell Over Bluetooth
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Marcel,
+Hi,
 
->> Thank you for your suggestions.
->>
->> I notice in `doc/mgmt-api.txt` that there is no mention of updating
->> connection parameters, which is what we're currently aiming to get by
->> tweaking the library used. These parameters include:
->>
->> - min. interval
->> - max. interval
->> - latency
->> - supervisor timeout
->>
->> Is it possible to set connection parameters on BLE connect using the
->> mgmt API? It is possible with `hci_le_conn_create` but not with the
->> opening of an L2CAP socket connection.
->
-> if you search the archive there is an API proposal for storing proposed c=
-onnection parameters and being able to load them back on system start. So t=
-hat once a peripheral has proposed different connection parameters, they wi=
-ll be horned automatically for the next connection creation.
->
-> Changing them on the central independent on what the peripheral wants fro=
-m us is something that only Bluetooth 4.1 devices with link layer topology =
-are suppose to do and for that a new L2CAP socket option would be needed.
+I have an RPi with a bluetooth dongle and my ultimate goal is to be
+able to SSH into the RPi over bluetooth from my laptop. Back in the
+days, PAND was the way to do this, but now that it is gone I don't see
+any documentation explaining how to set up TPC/IP over bluetooth.
 
-Thanks yet again for your response.
+>From reading API docs, mailing list archives and a lot of guessing,
+these are the steps I have so far:
 
-I found that the L2CAP socket open does reuse existing HCI
-connections. Therefore one can create a HCI connection, then open a
-L2CAP socket to use custom connection parameters.
+1) I copied tests/test-nap to the RPi
 
-This has solved our issue for now, though I will definitely keep your
-comments in mind for when I next work with low-level BLE.
+# python2 test-nap
+Server for nap registered for tether
+Press CTRL-C to disconnect
 
-Thanks and best regards,
+2) I now can see NAP being offered from the RPi
 
-Seon-Wook Park
+[bluetooth]# show
+Controller 00:02:5B:05:2D:85
+        Name: alarmpi
+        Alias: alarmpi
+        Class: 0x020000
+        Powered: yes
+        Discoverable: yes
+        Pairable: yes
+        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+        UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+        UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+        UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+        UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+        UUID: NAP                       (00001116-0000-1000-8000-00805f9b34fb)
+        Modalias: usb:v1D6Bp0246d0513
+        Discovering: no
+
+3) I added a bridge called tether in the RPi
+
+# brctl addbr tether
+# brctl show
+bridge name     bridge id               STP enabled     interfaces
+tether          8000.000000000000       no
+
+4) I use the test-device script in my laptop to connect to the NAP
+service. Unlike the example in the archives[0], I use the UUID of the
+service
+
+$ ./test-device connect 00:02:5B:05:2D:85 00001116-0000-1000-8000-00805f9b34fb
+
+5) Now I have bnep0 in both the RPi and the host, so I configure them
+with ifconfig
+6) I try to ping but I get "Destination Host Unreachable"
+
+I'm using Bluez 5.19 in both my RPi and my laptop, and the test
+scripts are all from git. What am I missing?
+
+Thanks.
+
+David E. Narvaez
+
+[0] http://www.spinics.net/lists/linux-bluetooth/msg46846.html
