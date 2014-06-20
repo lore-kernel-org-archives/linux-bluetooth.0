@@ -1,136 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAMudyAujJUfE9w10FxCgXTjex2oX-9PFpmJE8+wQ+4TsGixBsw@mail.gmail.com>
-References: <1403131286-15028-1-git-send-email-lukasz.rymanowski@tieto.com>
-	<1403131286-15028-5-git-send-email-lukasz.rymanowski@tieto.com>
-	<CABBYNZJjdpohiQ62qwsrkmg-FqLcDtrTMeYhe__fLf2LO=UaEg@mail.gmail.com>
-	<CAMudyAujJUfE9w10FxCgXTjex2oX-9PFpmJE8+wQ+4TsGixBsw@mail.gmail.com>
-Date: Fri, 20 Jun 2014 08:18:19 +0200
-Message-ID: <CAMudyAuxrwet5iZKzQk59iVs7PN_X7skNbY99PhNSiWaxc74rw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] android/hidhost: Start encryption for HOG when bonded
-From: Lukasz Rymanowski <lukasz.rymanowski@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	Szymon Janc <szymon.janc@tieto.com>
+In-Reply-To: <FDFE96A3-5B0D-440D-B9BF-1905E4BC2034@holtmann.org>
+References: <CANLOmB5UXAJRModTofiYy-gtj=DvDiq_PU_n6NswrbXw_9_94A@mail.gmail.com>
+ <CD90C45F-0899-43A6-870C-DE24E43E5D04@holtmann.org> <CANLOmB5fo8JvrtXGdp+3eqXcPiSauEyD8L6Gcer0cWD6+Qtp_A@mail.gmail.com>
+ <FDFE96A3-5B0D-440D-B9BF-1905E4BC2034@holtmann.org>
+From: Seon-Wook Park <seon.wook@swook.net>
+Date: Fri, 20 Jun 2014 14:18:04 +0900
+Message-ID: <CANLOmB5K6=B3H3-7DMVBspJVNzgSF2rc=GAa7oqvTBk1QtWvjQ@mail.gmail.com>
+Subject: Re: L2CAP socket to HCI handle, opposite possible?
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hello Marcel,
 
-On 20 June 2014 01:18, Lukasz Rymanowski <lukasz.rymanowski@tieto.com> wrote:
-> HI Luiz,
->
-> On 19 June 2014 15:25, Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->> Hi Lukasz,
+>> Thank you for your suggestions.
 >>
->> On Thu, Jun 19, 2014 at 1:41 AM, Lukasz Rymanowski
->> <lukasz.rymanowski@tieto.com> wrote:
->>> HOG requires encryption on connection, so make sure it is on.
->>>
->>> On the other hand we don't need medium security always when
->>> connecting LE device even device are bonded. It depends on permissions
->>> on characteristics. That's why we want security low in connect_le()
->>> ---
->>>  android/gatt.c    | 6 +-----
->>>  android/hidhost.c | 4 ++++
->>>  2 files changed, 5 insertions(+), 5 deletions(-)
->>>
->>> diff --git a/android/gatt.c b/android/gatt.c
->>> index 9471eaf..746316d 100644
->>> --- a/android/gatt.c
->>> +++ b/android/gatt.c
->>> @@ -1419,7 +1419,6 @@ reply:
->>>
->>>  static int connect_le(struct gatt_device *dev)
->>>  {
->>> -       BtIOSecLevel sec_level;
->>>         GIOChannel *io;
->>>         GError *gerr = NULL;
->>>         char addr[18];
->>> @@ -1434,9 +1433,6 @@ static int connect_le(struct gatt_device *dev)
->>>
->>>         DBG("Connection attempt to: %s", addr);
->>>
->>> -       sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
->>> -                                                               BT_IO_SEC_LOW;
->>> -
->>>         /*
->>>          * This connection will help us catch any PDUs that comes before
->>>          * pairing finishes
->>> @@ -1448,7 +1444,7 @@ static int connect_le(struct gatt_device *dev)
->>>                         BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
->>>                         BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
->>>                         BT_IO_OPT_CID, ATT_CID,
->>> -                       BT_IO_OPT_SEC_LEVEL, sec_level,
->>> +                       BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_LOW,
->>>                         BT_IO_OPT_INVALID);
->>>         if (!io) {
->>>                 error("gatt: Failed bt_io_connect(%s): %s", addr,
->>> diff --git a/android/hidhost.c b/android/hidhost.c
->>> index 846dd57..1f66454 100644
->>> --- a/android/hidhost.c
->>> +++ b/android/hidhost.c
->>> @@ -777,6 +777,10 @@ static void hog_conn_cb(const bdaddr_t *addr, int err, void *attrib)
->>>                 bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
->>>         }
->>>
->>> +       /* If device is bonded lets enable encryption */
->>> +       if (bt_device_is_bonded(addr))
->>> +               bt_gatt_set_security(addr, BT_SECURITY_MEDIUM);
->>> +
+>> I notice in `doc/mgmt-api.txt` that there is no mention of updating
+>> connection parameters, which is what we're currently aiming to get by
+>> tweaking the library used. These parameters include:
 >>
->> Don't we need to wait the encryption change to only then start sending
->> commands? Actually this gets more complicate since the specs says the
->> following:
+>> - min. interval
+>> - max. interval
+>> - latency
+>> - supervisor timeout
 >>
->> "If the HID Host receives the L2CAP Connection Parameter Update
->> request but has not
->> yet completed service discovery or has not completed encryption, the
->> HID Host may
->> send the L2CAP Connection Parameter Update Response with the Result field
->> indicating that the request has been rejected."
->>
-> As far as I understand, socket will stop flow until the security level
-> is updated.
+>> Is it possible to set connection parameters on BLE connect using the
+>> mgmt API? It is possible with `hci_le_conn_create` but not with the
+>> opening of an L2CAP socket connection.
 >
->> So it seems HoG may have some requirements on L2CAP as well so it is
->> not per characteristics, so perhaps connect_le should take the initial
->> security level then we can add some security requirement to
->> bt_gatt_connect_app or something like that. Btw, Im not aware of any
->> drawback regarding encryption even if is not mandatory it will just
->> make the connection more secure, but perhaps this is fixing another
->> problem?
+> if you search the archive there is an API proposal for storing proposed c=
+onnection parameters and being able to load them back on system start. So t=
+hat once a peripheral has proposed different connection parameters, they wi=
+ll be horned automatically for the next connection creation.
 >
-> One of the drawback is GATT PTS testcase TC_GAW_CL_BV_02_C which test
-> signed wrtie. Scenario is that device do bonding and exchange CSRK,
-> then disconnect and connect again. Once their are reconnected signed
-> write should be performed. Note that signed write is no allowed on
-> encrypted link.
->
-Just to be clear here, LTK is also exchange during bonding. So you
-might argue that PTS should request CSRK only, but would be not sure
-about that. I saw devices which request LTK and CSRK in the same time,
-even though don't know if CSRK is used.
+> Changing them on the central independent on what the peripheral wants fro=
+m us is something that only Bluetooth 4.1 devices with link layer topology =
+are suppose to do and for that a new L2CAP socket option would be needed.
 
->>
->>>         if (!dev->hog) {
->>>                 /* TODO: Get device details and primary */
->>>                 dev->hog = bt_hog_new("bluez-input-device", dev->vendor,
->>> --
->>> 1.8.4
->>>
->>> --
->>> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
->>> the body of a message to majordomo@vger.kernel.org
->>> More majordomo info at  http://vger.kernel.org/majordomo-info.html
->>
->>
->>
->> --
->> Luiz Augusto von Dentz
->
-> BR
-> Lukasz
+Thanks yet again for your response.
 
-\Lukasz
+I found that the L2CAP socket open does reuse existing HCI
+connections. Therefore one can create a HCI connection, then open a
+L2CAP socket to use custom connection parameters.
+
+This has solved our issue for now, though I will definitely keep your
+comments in mind for when I next work with low-level BLE.
+
+Thanks and best regards,
+
+Seon-Wook Park
