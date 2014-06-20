@@ -2,55 +2,56 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 7/7] anrdroid/client/health: Cache fd and close on channel disconnection
-Date: Fri, 20 Jun 2014 15:23:36 +0300
-Message-Id: <1403267016-28422-8-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 6/7] android/health: Implement mcap_mdl_deleted_cb
+Date: Fri, 20 Jun 2014 15:23:35 +0300
+Message-Id: <1403267016-28422-7-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Cache fd and close them on channel disconnect or destroy notification.
-When running PTS tests it is expecting to close all data channels before
-exiting test case.
+mcap_mdl_deleted_cb will be called if remote device sends MDL_DELETE_REQ.
+Free channel data and notify channel is destroyed.
 ---
- android/client/if-hl.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ android/health.c | 23 ++++++++++++++++++++++-
+ 1 file changed, 22 insertions(+), 1 deletion(-)
 
-diff --git a/android/client/if-hl.c b/android/client/if-hl.c
-index 557a205..5940526 100644
---- a/android/client/if-hl.c
-+++ b/android/client/if-hl.c
-@@ -17,6 +17,7 @@
- 
- #include<stdio.h>
- #include<ctype.h>
-+#include<unistd.h>
- 
- #include<hardware/bluetooth.h>
- #include<hardware/bt_hl.h>
-@@ -52,6 +53,7 @@ SINTMAP(bthl_channel_state_t, -1, "(unknown)")
- ENDMAP
- 
- const bthl_interface_t *if_hl = NULL;
-+static int fd_list[256] = {-1};
- 
- static void app_reg_state_cb(int app_id, bthl_app_reg_state_t state)
- {
-@@ -69,6 +71,13 @@ static void channel_state_cb(int app_id, bt_bdaddr_t *bd_addr,
- 			"channel_id=%d channel_state=%s fd=%d\n", __func__,
- 			app_id, bt_bdaddr_t2str(bd_addr, addr), mdep_cfg_index,
- 			channel_id, bthl_channel_state_t2str(state), fd);
-+
-+	if (state == BTHL_CONN_STATE_CONNECTED)
-+		fd_list[channel_id] = fd;
-+
-+	if (state == BTHL_CONN_STATE_DISCONNECTED ||
-+			state == BTHL_CONN_STATE_DESTROYED)
-+		close(fd_list[channel_id]);
+diff --git a/android/health.c b/android/health.c
+index ec5a413..b379ee1 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -1007,9 +1007,30 @@ static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+ 	DBG("Not Implemeneted");
  }
  
- static bthl_callbacks_t hl_cbacks = {
++static void notify_channel(void *data, void *user_data)
++{
++	struct health_channel *channel = data;
++
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
++}
++
+ static void mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
+ {
+-	DBG("Not Implemeneted");
++	struct health_channel *channel = data;
++	struct health_device *dev;
++
++	DBG("");
++
++	dev = channel->dev;
++	/* mdl == NULL means, delete all mdls */
++	if (!mdl) {
++		queue_foreach(dev->channels, notify_channel, NULL);
++		queue_destroy(dev->channels, free_health_channel);
++		dev->channels = NULL;
++		return;
++	}
++
++	destroy_channel(channel);
+ }
+ 
+ static void mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
 -- 
 1.9.1
 
