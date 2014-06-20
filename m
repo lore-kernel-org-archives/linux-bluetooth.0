@@ -1,46 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] doc: Add mode for enabling generation of debug keys
-Date: Sat, 21 Jun 2014 04:21:08 +0200
-Message-Id: <1403317268-1162-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] doc: Add extra mode for a reduced LE privacy mode
+Date: Fri, 20 Jun 2014 23:52:58 +0200
+Message-Id: <1403301178-18988-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- doc/mgmt-api.txt | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ doc/mgmt-api.txt | 21 +++++++++++++++++++--
+ 1 file changed, 19 insertions(+), 2 deletions(-)
 
 diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index e15a78f3e4b7..5a7d2ef0e5d3 100644
+index e15a78f3e4b7..dfcf719dc757 100644
 --- a/doc/mgmt-api.txt
 +++ b/doc/mgmt-api.txt
-@@ -1622,8 +1622,23 @@ Set Debug Keys Command
+@@ -1646,8 +1646,25 @@ Set Privacy Command
+ 	This command is used to enable Low Energy Privacy feature using
+ 	resolvable private addresses.
  
- 	This command is used to tell the kernel whether to accept the
- 	usage of debug keys or not. The allowed values for this parameter
--	are 0x00 and 0x01. All other values will return an Invalid Parameters
--	response.
-+	are 0x00, 0x01 and 0x02. All other values will return an Invalid
-+	Parameters response.
+-	The value 0x00 disables privacy mode, the value 0x01 enables
+-	privacy mode.
++	The value 0x00 disables privacy mode, the values 0x01 and 0x02
++	enable privacy mode.
 +
-+	With a value of 0x00 any generated debug key will be discarded
-+	as soon as the connection terminates.
++	With value 0x01 the kernel will always use the privacy mode. This
++	means resolvable private address is used when the controller is
++	discoverable and also when pairing is initiated.
 +
-+	With a value of 0x01 generated debug keys will be kept and can
-+	be used for future connections. However debug keys are always
-+	marked as non persistent and should not be stored. This means
-+	a reboot or changing the value back to 0x00 will delete them.
++	With value 0x02 the kernel will use privacy mode with resolvable
++	private address. In case the conroller is pairable and discoverable
++	the identity address is used. Also when pairing is initiated, the
++	connection will be established with the identity address.
 +
-+	With a value of 0x02 generated debug keys will be kept and can
-+	be used for future connections. This has the same affect as
-+	with value 0x01. However in addition this value will also
-+	enter the controller mode to generate debug keys for each
-+	new pairing. Changing the value back to 0x01 or 0x00 will
-+	disable the controller mode for generating debug keys.
++	Exposing the identity address when pairable and discoverable or
++	during initated pairing can be a privacy issue. For dual-mode
++	controllers this can be neglected since its public address will
++	be exposed over BR/EDR anyway. The benefit of exposing the
++	identity address for pairing purposes is that it makes matching
++	up devices with dual-mode topology during device discovery now
++	possible.
  
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
+ 	When the controller has a public address (mandatory for dual-mode
+ 	controllers) it is used as identity address. In case the controller
 -- 
 1.9.3
 
