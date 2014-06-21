@@ -1,71 +1,210 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v2 2/7] android/health: Check if device and channel already exists or not
+Date: Sat, 21 Jun 2014 15:49:44 +0200
+Message-ID: <4022830.oGcTA3MTqb@leonov>
+In-Reply-To: <1403267016-28422-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1403267016-28422-3-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
-In-Reply-To: <1403301178-18988-1-git-send-email-marcel@holtmann.org>
-References: <1403301178-18988-1-git-send-email-marcel@holtmann.org>
-Date: Sat, 21 Jun 2014 17:14:21 +0200
-Message-ID: <CAN_7+YbRr0Nfnr0jCUBU-ujxNs0HtwoUpQkyZ_cHKT9LmC5XEQ@mail.gmail.com>
-Subject: Re: [PATCH v2] doc: Add extra mode for a reduced LE privacy mode
-From: Lukasz Rymanowski <lukasz.rymanowski@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Ravi,
 
-On Fri, Jun 20, 2014 at 11:52 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Friday 20 of June 2014 15:23:31 Ravi kumar Veeramally wrote:
+> On channel connect request, check if device is already exists or not.
+> Also check if channel is already created for remote device or not.
 > ---
->  doc/mgmt-api.txt | 21 +++++++++++++++++++--
->  1 file changed, 19 insertions(+), 2 deletions(-)
->
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index e15a78f3e4b7..dfcf719dc757 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -1646,8 +1646,25 @@ Set Privacy Command
->         This command is used to enable Low Energy Privacy feature using
->         resolvable private addresses.
->
-> -       The value 0x00 disables privacy mode, the value 0x01 enables
-> -       privacy mode.
-> +       The value 0x00 disables privacy mode, the values 0x01 and 0x02
-> +       enable privacy mode.
+>  android/health.c | 83
+> ++++++++++++++++++++++++++++++++++++++++---------------- 1 file changed, 59
+> insertions(+), 24 deletions(-)
+> 
+> diff --git a/android/health.c b/android/health.c
+> index 7553467..083ab1e 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -213,6 +213,22 @@ static void send_channel_state_notify(struct
+> health_channel *channel, sizeof(ev), &ev, fd);
+>  }
+> 
+> +static bool dev_by_addr(const void *data, const void *user_data)
+> +{
+> +	const struct health_device *dev = data;
+> +	const bdaddr_t *addr = user_data;
 > +
-> +       With value 0x01 the kernel will always use the privacy mode. This
-> +       means resolvable private address is used when the controller is
-> +       discoverable and also when pairing is initiated.
+> +	return !bacmp(&dev->dst, addr);
+> +}
 > +
-> +       With value 0x02 the kernel will use privacy mode with resolvable
-> +       private address. In case the conroller is pairable and discoverable
-> +       the identity address is used. Also when pairing is initiated, the
-> +       connection will be established with the identity address.
+> +static bool channel_by_mdep_id(const void *data, const void *user_data)
+> +{
+> +	const struct health_channel *channel = data;
+> +	uint16_t mdep_id = PTR_TO_INT(user_data);
 > +
-So once device is not discoverable, RPA will be used in advertising, right?
+> +	return channel->mdep_id == mdep_id;
+> +}
+> +
+>  static bool mdep_by_mdep_role(const void *data, const void *user_data)
+>  {
+>  	const struct mdep_cfg *mdep = data;
+> @@ -1094,25 +1110,44 @@ static int connect_mcl(struct health_channel
+> *channel)
+> 
+>  static struct health_device *create_device(uint16_t app_id, const uint8_t
+> *addr) {
+> +	struct health_app *app;
+>  	struct health_device *dev;
+> +	bdaddr_t bdaddr;
+> 
+> +	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
+> +	if (!app)
+> +		return NULL;
+> +
+> +	android2bdaddr(addr, &bdaddr);
+> +	dev = queue_find(app->devices, dev_by_addr, &bdaddr);
+> +	if (dev)
+> +		return dev;
+> +
 
-> +       Exposing the identity address when pairable and discoverable or
-> +       during initated pairing can be a privacy issue. For dual-mode
-> +       controllers this can be neglected since its public address will
-> +       be exposed over BR/EDR anyway.
+I'd rather have create_device() to just create device and add wrapper 
+get_device() that would call find + create when needed .
 
-Since privacy mode 0x02 for LE controllers seems to have a little or
-even no sense, maybe it should be not allowed ?
+> +	/* create device and push it to devices queue */
+>  	dev = new0(struct health_device, 1);
+>  	if (!dev)
+>  		return NULL;
+> 
+>  	android2bdaddr(addr, &dev->dst);
+>  	dev->app_id = app_id;
+> +
+>  	dev->channels = queue_new();
+>  	if (!dev->channels) {
+>  		free_health_device(dev);
+>  		return NULL;
+>  	}
+> 
+> +	if (!queue_push_tail(app->devices, dev)) {
+> +		free_health_device(dev);
+> +		return NULL;
+> +	}
+> +
+>  	return dev;
+>  }
+> 
+>  static struct health_channel *create_channel(uint16_t app_id,
+> -						uint8_t mdep_index)
+> +						uint8_t mdep_index,
+> +						struct health_device *dev)
+>  {
+>  	struct health_app *app;
+>  	struct mdep_cfg *mdep;
+> @@ -1120,22 +1155,37 @@ static struct health_channel
+> *create_channel(uint16_t app_id, uint8_t index;
+>  	static unsigned int channel_id = 1;
+> 
+> +	if (!dev)
+> +		return NULL;
+> +
+> +	index = mdep_index + 1;
+> +	channel = queue_find(dev->channels, channel_by_mdep_id,
+> +							INT_TO_PTR(index));
+> +	if (channel)
+> +		return channel;
+
+Same here.
+
+> +
+>  	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
+>  	if (!app)
+>  		return NULL;
+> 
+> -	index = mdep_index + 1;
+>  	mdep = queue_find(app->mdeps, mdep_by_mdep_id, INT_TO_PTR(index));
+>  	if (!mdep)
+>  		return NULL;
+> 
+> +	/* create channel and push it to device */
+>  	channel = new0(struct health_channel, 1);
+>  	if (!channel)
+>  		return NULL;
+> 
+> -	channel->mdep_id = mdep_index;
+> +	channel->mdep_id = mdep->id;
+>  	channel->type = mdep->channel_type;
+>  	channel->id = channel_id++;
+> +	channel->dev = dev;
+> +
+> +	if (!queue_push_tail(dev->channels, channel)) {
+> +		free_health_channel(channel);
+> +		return NULL;
+> +	}
+> 
+>  	return channel;
+>  }
+> @@ -1144,38 +1194,24 @@ static void bt_health_connect_channel(const void
+> *buf, uint16_t len) {
+>  	const struct hal_cmd_health_connect_channel *cmd = buf;
+>  	struct hal_rsp_health_connect_channel rsp;
+> -	struct health_app *app;
+>  	struct health_device *dev = NULL;
+>  	struct health_channel *channel = NULL;
+> 
+>  	DBG("");
+> 
+> -	app = queue_find(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
+> -	if (!app)
+> -		goto fail;
+> -
+>  	dev = create_device(cmd->app_id, cmd->bdaddr);
+>  	if (!dev)
+>  		goto fail;
+> 
+> -	channel = create_channel(cmd->app_id, cmd->mdep_index);
+> +	channel = create_channel(cmd->app_id, cmd->mdep_index, dev);
+>  	if (!channel)
+>  		goto fail;
+> 
+> -	channel->dev = dev;
+> -
+> -	if (!queue_push_tail(app->devices, dev))
+> -		goto fail;
+> -
+> -	if (!queue_push_tail(dev->channels, channel)) {
+> -		queue_remove(app->devices, dev);
+> -		goto fail;
+> -	}
+> -
+> -	if (connect_mcl(channel) < 0) {
+> -		error("error retrieving HDP SDP record");
+> -		queue_remove(app->devices, dev);
+> -		goto fail;
+> +	if (!dev->mcl) {
+> +		if (connect_mcl(channel) < 0) {
+> +			error("error retrieving HDP SDP record");
+> +			goto fail;
+> +		}
+>  	}
+> 
+>  	rsp.channel_id = channel->id;
+> @@ -1186,7 +1222,6 @@ static void bt_health_connect_channel(const void *buf,
+> uint16_t len)
+> 
+>  fail:
+>  	free_health_channel(channel);
+> -	free_health_device(dev);
+
+So command failed and yet new device is on app->devices list?
+
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
+>  			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
+>  }
 
 
-The benefit of exposing the
-> +       identity address for pairing purposes is that it makes matching
-> +       up devices with dual-mode topology during device discovery now
-> +       possible.
->
->         When the controller has a public address (mandatory for dual-mode
->         controllers) it is used as identity address. In case the controller
-> --
-> 1.9.3
->
+Also a general note: please prefix all info() and error() messages with 
+"health: ".
 
+-- 
 BR
-Lukasz
-
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+Szymon Janc
