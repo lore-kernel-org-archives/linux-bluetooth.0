@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 2/7] android/health: Check if device and channel already exists or not
-Date: Sat, 21 Jun 2014 15:49:44 +0200
-Message-ID: <4022830.oGcTA3MTqb@leonov>
-In-Reply-To: <1403267016-28422-3-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1403267016-28422-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH_v2 1/7] android/health: Fix queue creation for mdeps and devices
+Date: Sat, 21 Jun 2014 15:32:44 +0200
+Message-ID: <1814869.P8mjeKbRhZ@leonov>
+In-Reply-To: <1403267016-28422-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403267016-28422-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1403267016-28422-2-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,196 +14,86 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ravi,
 
-On Friday 20 of June 2014 15:23:31 Ravi kumar Veeramally wrote:
-> On channel connect request, check if device is already exists or not.
-> Also check if channel is already created for remote device or not.
+On Friday 20 of June 2014 15:23:30 Ravi kumar Veeramally wrote:
+> Create queue for mdeps, devices and channels when creating app
+> and device struct. It is simpler to read code than on demand
+> creation.
 > ---
->  android/health.c | 83
-> ++++++++++++++++++++++++++++++++++++++++---------------- 1 file changed, 59
-> insertions(+), 24 deletions(-)
+>  android/health.c | 33 +++++++++++++--------------------
+>  1 file changed, 13 insertions(+), 20 deletions(-)
 > 
 > diff --git a/android/health.c b/android/health.c
-> index 7553467..083ab1e 100644
+> index 0462e99..7553467 100644
 > --- a/android/health.c
 > +++ b/android/health.c
-> @@ -213,6 +213,22 @@ static void send_channel_state_notify(struct
-> health_channel *channel, sizeof(ev), &ev, fd);
->  }
+> @@ -678,6 +678,14 @@ static struct health_app *create_health_app(const char
+> *app_name, goto fail;
+>  	}
 > 
-> +static bool dev_by_addr(const void *data, const void *user_data)
-> +{
-> +	const struct health_device *dev = data;
-> +	const bdaddr_t *addr = user_data;
+> +	app->mdeps = queue_new();
+> +	if (!app->mdeps)
+> +		goto fail;
 > +
-> +	return !bacmp(&dev->dst, addr);
-> +}
+> +	app->devices = queue_new();
+> +	if (!app->devices)
+> +		goto fail;
 > +
-> +static bool channel_by_mdep_id(const void *data, const void *user_data)
-> +{
-> +	const struct health_channel *channel = data;
-> +	uint16_t mdep_id = PTR_TO_INT(user_data);
-> +
-> +	return channel->mdep_id == mdep_id;
-> +}
-> +
->  static bool mdep_by_mdep_role(const void *data, const void *user_data)
->  {
->  	const struct mdep_cfg *mdep = data;
-> @@ -1094,25 +1110,44 @@ static int connect_mcl(struct health_channel
-> *channel)
+>  	return app;
 > 
->  static struct health_device *create_device(uint16_t app_id, const uint8_t
-> *addr) {
-> +	struct health_app *app;
->  	struct health_device *dev;
-> +	bdaddr_t bdaddr;
+>  fail:
+> @@ -784,14 +792,6 @@ static void bt_health_mdep_cfg_data(const void *buf,
+> uint16_t len) memcpy(mdep->descr, cmd->descr, cmd->descr_len);
+>  	}
 > 
-> +	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
-> +	if (!app)
-> +		return NULL;
-> +
-> +	android2bdaddr(addr, &bdaddr);
-> +	dev = queue_find(app->devices, dev_by_addr, &bdaddr);
-> +	if (dev)
-> +		return dev;
-> +
-
-I'd rather have create_device() to just create device and add wrapper 
-get_device() that would call find + create when needed .
-
-> +	/* create device and push it to devices queue */
->  	dev = new0(struct health_device, 1);
->  	if (!dev)
->  		return NULL;
+> -	if (app->num_of_mdep > 0 && !app->mdeps) {
+> -		app->mdeps = queue_new();
+> -		if (!app->mdeps) {
+> -			status = HAL_STATUS_FAILED;
+> -			goto fail;
+> -		}
+> -	}
+> -
+>  	if (!queue_push_tail(app->mdeps, mdep)) {
+>  		status = HAL_STATUS_FAILED;
+>  		goto fail;
+> @@ -1102,6 +1102,11 @@ static struct health_device *create_device(uint16_t
+> app_id, const uint8_t *addr)
 > 
 >  	android2bdaddr(addr, &dev->dst);
 >  	dev->app_id = app_id;
-> +
->  	dev->channels = queue_new();
->  	if (!dev->channels) {
->  		free_health_device(dev);
->  		return NULL;
->  	}
-> 
-> +	if (!queue_push_tail(app->devices, dev)) {
+> +	dev->channels = queue_new();
+> +	if (!dev->channels) {
 > +		free_health_device(dev);
 > +		return NULL;
 > +	}
-> +
+> 
 >  	return dev;
 >  }
+> @@ -1159,21 +1164,9 @@ static void bt_health_connect_channel(const void
+> *buf, uint16_t len)
 > 
->  static struct health_channel *create_channel(uint16_t app_id,
-> -						uint8_t mdep_index)
-> +						uint8_t mdep_index,
-> +						struct health_device *dev)
->  {
->  	struct health_app *app;
->  	struct mdep_cfg *mdep;
-> @@ -1120,22 +1155,37 @@ static struct health_channel
-> *create_channel(uint16_t app_id, uint8_t index;
->  	static unsigned int channel_id = 1;
+>  	channel->dev = dev;
 > 
-> +	if (!dev)
-> +		return NULL;
-> +
-> +	index = mdep_index + 1;
-> +	channel = queue_find(dev->channels, channel_by_mdep_id,
-> +							INT_TO_PTR(index));
-> +	if (channel)
-> +		return channel;
-
-Same here.
-
-> +
->  	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
->  	if (!app)
->  		return NULL;
-> 
-> -	index = mdep_index + 1;
->  	mdep = queue_find(app->mdeps, mdep_by_mdep_id, INT_TO_PTR(index));
->  	if (!mdep)
->  		return NULL;
-> 
-> +	/* create channel and push it to device */
->  	channel = new0(struct health_channel, 1);
->  	if (!channel)
->  		return NULL;
-> 
-> -	channel->mdep_id = mdep_index;
-> +	channel->mdep_id = mdep->id;
->  	channel->type = mdep->channel_type;
->  	channel->id = channel_id++;
-> +	channel->dev = dev;
-> +
-> +	if (!queue_push_tail(dev->channels, channel)) {
-> +		free_health_channel(channel);
-> +		return NULL;
-> +	}
-> 
->  	return channel;
->  }
-> @@ -1144,38 +1194,24 @@ static void bt_health_connect_channel(const void
-> *buf, uint16_t len) {
->  	const struct hal_cmd_health_connect_channel *cmd = buf;
->  	struct hal_rsp_health_connect_channel rsp;
-> -	struct health_app *app;
->  	struct health_device *dev = NULL;
->  	struct health_channel *channel = NULL;
-> 
->  	DBG("");
-> 
-> -	app = queue_find(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
-> -	if (!app)
-> -		goto fail;
-> -
->  	dev = create_device(cmd->app_id, cmd->bdaddr);
->  	if (!dev)
->  		goto fail;
-> 
-> -	channel = create_channel(cmd->app_id, cmd->mdep_index);
-> +	channel = create_channel(cmd->app_id, cmd->mdep_index, dev);
->  	if (!channel)
->  		goto fail;
-> 
-> -	channel->dev = dev;
-> -
-> -	if (!queue_push_tail(app->devices, dev))
-> -		goto fail;
-> -
-> -	if (!queue_push_tail(dev->channels, channel)) {
-> -		queue_remove(app->devices, dev);
-> -		goto fail;
+> -	if (!app->devices) {
+> -		app->devices = queue_new();
+> -		if (!app->devices)
+> -			goto fail;
 > -	}
 > -
-> -	if (connect_mcl(channel) < 0) {
-> -		error("error retrieving HDP SDP record");
-> -		queue_remove(app->devices, dev);
-> -		goto fail;
-> +	if (!dev->mcl) {
-> +		if (connect_mcl(channel) < 0) {
-> +			error("error retrieving HDP SDP record");
-> +			goto fail;
-> +		}
->  	}
+>  	if (!queue_push_tail(app->devices, dev))
+>  		goto fail;
 > 
->  	rsp.channel_id = channel->id;
-> @@ -1186,7 +1222,6 @@ static void bt_health_connect_channel(const void *buf,
-> uint16_t len)
-> 
->  fail:
->  	free_health_channel(channel);
-> -	free_health_device(dev);
+> -	if (!dev->channels) {
+> -		dev->channels = queue_new();
+> -		if (!dev->channels)
+> -			goto fail;
+> -	}
+> -
+>  	if (!queue_push_tail(dev->channels, channel)) {
+>  		queue_remove(app->devices, dev);
+>  		goto fail;
 
-So command failed and yet new device is on app->devices list?
-
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
->  			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
->  }
-
-
-Also a general note: please prefix all info() and error() messages with 
-"health: ".
+This patch is now applied, thanks.
 
 -- 
 BR
