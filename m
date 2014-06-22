@@ -2,86 +2,97 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/7] android/bluetooth: Fix passing address type to SSP replies
-Date: Sun, 22 Jun 2014 22:47:03 +0200
-Message-Id: <1403470027-24720-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 6/7] android/gatt: Use proper address when connecting
+Date: Sun, 22 Jun 2014 22:47:06 +0200
+Message-Id: <1403470027-24720-7-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 References: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+If device was using RPA but address was resolved IDA must be used.
 ---
- android/bluetooth.c | 20 +++++++++++---------
- 1 file changed, 11 insertions(+), 9 deletions(-)
+ android/bluetooth.c | 14 ++++++++++++++
+ android/bluetooth.h |  2 ++
+ android/gatt.c      | 16 ++++++++++++++--
+ 3 files changed, 30 insertions(+), 2 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 4031b17..be50a1a 100644
+index 166337f..beb806b 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -4056,7 +4056,8 @@ failed:
- 									status);
+@@ -1438,6 +1438,20 @@ bool bt_is_device_le(const bdaddr_t *addr)
+ 	return dev->le;
  }
  
--static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
-+static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, uint8_t type,
-+								bool accept)
++const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type)
++{
++	struct device *dev;
++
++	dev = find_device(addr);
++	if (!dev)
++		return NULL;
++
++	if (type)
++		*type = dev->bdaddr_type;
++
++	return &dev->bdaddr;
++}
++
+ const char *bt_get_adapter_name(void)
  {
- 	struct mgmt_addr_info cp;
- 	uint16_t opcode;
-@@ -4067,7 +4068,7 @@ static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
- 		opcode = MGMT_OP_USER_CONFIRM_NEG_REPLY;
+ 	return adapter.name;
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index eb50fe1..dde477d 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -76,3 +76,5 @@ void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
+ void bt_store_gatt_ccc(const bdaddr_t *addr, uint16_t value);
  
- 	bacpy(&cp.bdaddr, bdaddr);
--	cp.type = BDADDR_BREDR;
-+	cp.type = type;
+ uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
++
++const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
+diff --git a/android/gatt.c b/android/gatt.c
+index 32853fa..f0b035e 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1423,6 +1423,8 @@ static int connect_le(struct gatt_device *dev)
+ 	GIOChannel *io;
+ 	GError *gerr = NULL;
+ 	char addr[18];
++	const bdaddr_t *bdaddr;
++	uint8_t bdaddr_type;
  
- 	if (mgmt_reply(mgmt_if, opcode, adapter.index, sizeof(cp), &cp,
- 							NULL, NULL, NULL) > 0)
-@@ -4076,8 +4077,8 @@ static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
- 	return HAL_STATUS_FAILED;
- }
+ 	ba2str(&dev->bdaddr, addr);
  
--static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
--							uint32_t passkey)
-+static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, uint8_t type,
-+						bool accept, uint32_t passkey)
- {
- 	unsigned int id;
+@@ -1437,6 +1439,16 @@ static int connect_le(struct gatt_device *dev)
+ 	sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
+ 								BT_IO_SEC_LOW;
  
-@@ -4086,7 +4087,7 @@ static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
- 
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.addr.bdaddr, bdaddr);
--		cp.addr.type = BDADDR_BREDR;
-+		cp.addr.type = type;
- 		cp.passkey = htobl(passkey);
- 
- 		id = mgmt_reply(mgmt_if, MGMT_OP_USER_PASSKEY_REPLY,
-@@ -4097,7 +4098,7 @@ static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
- 
- 		memset(&cp, 0, sizeof(cp));
- 		bacpy(&cp.addr.bdaddr, bdaddr);
--		cp.addr.type = BDADDR_BREDR;
-+		cp.addr.type = type;
- 
- 		id = mgmt_reply(mgmt_if, MGMT_OP_USER_PASSKEY_NEG_REPLY,
- 						adapter.index, sizeof(cp), &cp,
-@@ -4130,11 +4131,12 @@ static void handle_ssp_reply_cmd(const void *buf, uint16_t len)
- 	switch (cmd->ssp_variant) {
- 	case HAL_SSP_VARIANT_CONFIRM:
- 	case HAL_SSP_VARIANT_CONSENT:
--		status = user_confirm_reply(&dev->bdaddr, cmd->accept);
-+		status = user_confirm_reply(&dev->bdaddr, dev->bdaddr_type,
-+								cmd->accept);
- 		break;
- 	case HAL_SSP_VARIANT_ENTRY:
--		status = user_passkey_reply(&dev->bdaddr, cmd->accept,
--								cmd->passkey);
-+		status = user_passkey_reply(&dev->bdaddr, dev->bdaddr_type,
-+						cmd->accept, cmd->passkey);
- 		break;
- 	case HAL_SSP_VARIANT_NOTIF:
- 		status = HAL_STATUS_SUCCESS;
++
++	if (dev->bdaddr_type == BDADDR_LE_RANDOM) {
++		bdaddr = bt_get_id_addr(&dev->bdaddr, &bdaddr_type);
++		if (!bdaddr)
++			return -EINVAL;
++	} else {
++		bdaddr = &dev->bdaddr;
++		bdaddr_type = dev->bdaddr_type;
++	}
++
+ 	/*
+ 	 * This connection will help us catch any PDUs that comes before
+ 	 * pairing finishes
+@@ -1445,8 +1457,8 @@ static int connect_le(struct gatt_device *dev)
+ 			BT_IO_OPT_SOURCE_BDADDR,
+ 			&adapter_addr,
+ 			BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
+-			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
+-			BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
++			BT_IO_OPT_DEST_BDADDR, bdaddr,
++			BT_IO_OPT_DEST_TYPE, bdaddr_type,
+ 			BT_IO_OPT_CID, ATT_CID,
+ 			BT_IO_OPT_SEC_LEVEL, sec_level,
+ 			BT_IO_OPT_INVALID);
 -- 
 1.9.3
 
