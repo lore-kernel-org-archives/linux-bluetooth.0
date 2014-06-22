@@ -2,55 +2,107 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 6/6] anrdroid/client/health: Cache fd and close on channel disconnection
-Date: Sun, 22 Jun 2014 14:59:01 +0300
-Message-Id: <1403438341-14321-7-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 3/6] android/health: Notify channel status on channel destroy call
+Date: Sun, 22 Jun 2014 14:58:58 +0300
+Message-Id: <1403438341-14321-4-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Cache fd and close them on channel disconnect or destroy notification.
-When running PTS tests it is expecting to close all data channels before
-exiting test case.
 ---
- android/client/if-hl.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ android/health.c | 64 ++++++++++++++++++++++++++++----------------------------
+ 1 file changed, 32 insertions(+), 32 deletions(-)
 
-diff --git a/android/client/if-hl.c b/android/client/if-hl.c
-index 557a205..5940526 100644
---- a/android/client/if-hl.c
-+++ b/android/client/if-hl.c
-@@ -17,6 +17,7 @@
+diff --git a/android/health.c b/android/health.c
+index a68f5e9..c68bf15 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -115,6 +115,37 @@ struct health_app {
+ 	struct queue *devices;
+ };
  
- #include<stdio.h>
- #include<ctype.h>
-+#include<unistd.h>
- 
- #include<hardware/bluetooth.h>
- #include<hardware/bt_hl.h>
-@@ -52,6 +53,7 @@ SINTMAP(bthl_channel_state_t, -1, "(unknown)")
- ENDMAP
- 
- const bthl_interface_t *if_hl = NULL;
-+static int fd_list[256] = {-1};
- 
- static void app_reg_state_cb(int app_id, bthl_app_reg_state_t state)
++static void send_app_reg_notify(struct health_app *app, uint8_t state)
++{
++	struct hal_ev_health_app_reg_state ev;
++
++	DBG("");
++
++	ev.id = app->id;
++	ev.state = state;
++
++	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
++				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
++}
++
++static void send_channel_state_notify(struct health_channel *channel,
++						uint8_t state, int fd)
++{
++	struct hal_ev_health_channel_state ev;
++
++	DBG("");
++
++	bdaddr2android(&channel->dev->dst, ev.bdaddr);
++	ev.app_id = channel->dev->app_id;
++	ev.mdep_index = channel->mdep_id;
++	ev.channel_id = channel->id;
++	ev.channel_state = state;
++
++	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
++					HAL_EV_HEALTH_CHANNEL_STATE,
++					sizeof(ev), &ev, fd);
++}
++
+ static void free_health_channel(void *data)
  {
-@@ -69,6 +71,13 @@ static void channel_state_cb(int app_id, bt_bdaddr_t *bd_addr,
- 			"channel_id=%d channel_state=%s fd=%d\n", __func__,
- 			app_id, bt_bdaddr_t2str(bd_addr, addr), mdep_cfg_index,
- 			channel_id, bthl_channel_state_t2str(state), fd);
-+
-+	if (state == BTHL_CONN_STATE_CONNECTED)
-+		fd_list[channel_id] = fd;
-+
-+	if (state == BTHL_CONN_STATE_DISCONNECTED ||
-+			state == BTHL_CONN_STATE_DESTROYED)
-+		close(fd_list[channel_id]);
+ 	struct health_channel *channel = data;
+@@ -132,7 +163,7 @@ static void destroy_channel(void *data)
+ 	if (!channel)
+ 		return;
+ 
+-	/* TODO: Notify channel connection status DESTROYED */
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
+ 	queue_remove(channel->dev->channels, channel);
+ 	free_health_channel(channel);
+ }
+@@ -187,37 +218,6 @@ static void free_health_app(void *data)
+ 	free(app);
  }
  
- static bthl_callbacks_t hl_cbacks = {
+-static void send_app_reg_notify(struct health_app *app, uint8_t state)
+-{
+-	struct hal_ev_health_app_reg_state ev;
+-
+-	DBG("");
+-
+-	ev.id = app->id;
+-	ev.state = state;
+-
+-	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
+-				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
+-}
+-
+-static void send_channel_state_notify(struct health_channel *channel,
+-						uint8_t state, int fd)
+-{
+-	struct hal_ev_health_channel_state ev;
+-
+-	DBG("");
+-
+-	bdaddr2android(&channel->dev->dst, ev.bdaddr);
+-	ev.app_id = channel->dev->app_id;
+-	ev.mdep_index = channel->mdep_id;
+-	ev.channel_id = channel->id;
+-	ev.channel_state = state;
+-
+-	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
+-					HAL_EV_HEALTH_CHANNEL_STATE,
+-					sizeof(ev), &ev, fd);
+-}
+-
+ static bool dev_by_addr(const void *data, const void *user_data)
+ {
+ 	const struct health_device *dev = data;
 -- 
 1.9.1
 
