@@ -2,70 +2,86 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 7/7] android/bluetooth: Log error if loading LTKs or IRKs failed
-Date: Sun, 22 Jun 2014 22:47:07 +0200
-Message-Id: <1403470027-24720-8-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 3/7] android/bluetooth: Fix passing address type to SSP replies
+Date: Sun, 22 Jun 2014 22:47:03 +0200
+Message-Id: <1403470027-24720-4-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 References: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/bluetooth.c | 22 ++++++++++++++++++++--
- 1 file changed, 20 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index beb806b..c686205 100644
+index 4031b17..be50a1a 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -2281,6 +2281,15 @@ static void load_link_keys(GSList *keys, bt_bluetooth_ready cb)
- 	}
+@@ -4056,7 +4056,8 @@ failed:
+ 									status);
  }
  
-+static void load_ltk_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	if (status == MGMT_STATUS_SUCCESS)
-+		return;
-+
-+	info("Failed to load LTKs: %s (0x%02x)", mgmt_errstr(status), status);
-+}
-+
- static void load_ltks(GSList *ltks)
+-static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
++static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, uint8_t type,
++								bool accept)
  {
- 	struct mgmt_cp_load_long_term_keys *cp;
-@@ -2307,12 +2316,21 @@ static void load_ltks(GSList *ltks)
- 		memcpy(ltk, ltks->data, sizeof(*ltk));
+ 	struct mgmt_addr_info cp;
+ 	uint16_t opcode;
+@@ -4067,7 +4068,7 @@ static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
+ 		opcode = MGMT_OP_USER_CONFIRM_NEG_REPLY;
  
- 	if (mgmt_send(mgmt_if, MGMT_OP_LOAD_LONG_TERM_KEYS, adapter.index,
--					cp_size, cp, NULL, NULL, NULL) == 0)
-+			cp_size, cp, load_ltk_complete, NULL, NULL) == 0)
- 		error("Failed to load LTKs");
+ 	bacpy(&cp.bdaddr, bdaddr);
+-	cp.type = BDADDR_BREDR;
++	cp.type = type;
  
- 	g_free(cp);
+ 	if (mgmt_reply(mgmt_if, opcode, adapter.index, sizeof(cp), &cp,
+ 							NULL, NULL, NULL) > 0)
+@@ -4076,8 +4077,8 @@ static uint8_t user_confirm_reply(const bdaddr_t *bdaddr, bool accept)
+ 	return HAL_STATUS_FAILED;
  }
  
-+static void load_irk_complete(uint8_t status, uint16_t length,
-+					const void *param, void *user_data)
-+{
-+	if (status == MGMT_STATUS_SUCCESS)
-+		return;
-+
-+	info("Failed to load IRKs: %s (0x%02x)", mgmt_errstr(status), status);
-+}
-+
- static void load_irks(GSList *irks)
+-static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
+-							uint32_t passkey)
++static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, uint8_t type,
++						bool accept, uint32_t passkey)
  {
- 	struct mgmt_cp_load_irks *cp;
-@@ -2334,7 +2352,7 @@ static void load_irks(GSList *irks)
- 		memcpy(irk, irks->data, sizeof(*irk));
+ 	unsigned int id;
  
- 	if (mgmt_send(mgmt_if, MGMT_OP_LOAD_IRKS, adapter.index, cp_size, cp,
--							NULL, NULL, NULL) == 0)
-+					load_irk_complete, NULL, NULL) == 0)
- 		error("Failed to load IRKs");
+@@ -4086,7 +4087,7 @@ static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
  
- 	g_free(cp);
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.addr.bdaddr, bdaddr);
+-		cp.addr.type = BDADDR_BREDR;
++		cp.addr.type = type;
+ 		cp.passkey = htobl(passkey);
+ 
+ 		id = mgmt_reply(mgmt_if, MGMT_OP_USER_PASSKEY_REPLY,
+@@ -4097,7 +4098,7 @@ static uint8_t user_passkey_reply(const bdaddr_t *bdaddr, bool accept,
+ 
+ 		memset(&cp, 0, sizeof(cp));
+ 		bacpy(&cp.addr.bdaddr, bdaddr);
+-		cp.addr.type = BDADDR_BREDR;
++		cp.addr.type = type;
+ 
+ 		id = mgmt_reply(mgmt_if, MGMT_OP_USER_PASSKEY_NEG_REPLY,
+ 						adapter.index, sizeof(cp), &cp,
+@@ -4130,11 +4131,12 @@ static void handle_ssp_reply_cmd(const void *buf, uint16_t len)
+ 	switch (cmd->ssp_variant) {
+ 	case HAL_SSP_VARIANT_CONFIRM:
+ 	case HAL_SSP_VARIANT_CONSENT:
+-		status = user_confirm_reply(&dev->bdaddr, cmd->accept);
++		status = user_confirm_reply(&dev->bdaddr, dev->bdaddr_type,
++								cmd->accept);
+ 		break;
+ 	case HAL_SSP_VARIANT_ENTRY:
+-		status = user_passkey_reply(&dev->bdaddr, cmd->accept,
+-								cmd->passkey);
++		status = user_passkey_reply(&dev->bdaddr, dev->bdaddr_type,
++						cmd->accept, cmd->passkey);
+ 		break;
+ 	case HAL_SSP_VARIANT_NOTIF:
+ 		status = HAL_STATUS_SUCCESS;
 -- 
 1.9.3
 
