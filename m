@@ -1,46 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jun 2014 10:55:29 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 9/9] Fix using address of array instead of size
-Message-ID: <20140623075529.GA29804@t440s>
-References: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403186136-30041-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1403186136-30041-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 7/7] android/bluetooth: Log error if loading LTKs or IRKs failed
+Date: Sun, 22 Jun 2014 22:47:07 +0200
+Message-Id: <1403470027-24720-8-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
+References: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+---
+ android/bluetooth.c | 22 ++++++++++++++++++++--
+ 1 file changed, 20 insertions(+), 2 deletions(-)
 
-On Thu, Jun 19, 2014, Andrei Emeltchenko wrote:
-> ---
->  src/device.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index beb806b..c686205 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2281,6 +2281,15 @@ static void load_link_keys(GSList *keys, bt_bluetooth_ready cb)
+ 	}
+ }
+ 
++static void load_ltk_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status == MGMT_STATUS_SUCCESS)
++		return;
++
++	info("Failed to load LTKs: %s (0x%02x)", mgmt_errstr(status), status);
++}
++
+ static void load_ltks(GSList *ltks)
+ {
+ 	struct mgmt_cp_load_long_term_keys *cp;
+@@ -2307,12 +2316,21 @@ static void load_ltks(GSList *ltks)
+ 		memcpy(ltk, ltks->data, sizeof(*ltk));
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_LOAD_LONG_TERM_KEYS, adapter.index,
+-					cp_size, cp, NULL, NULL, NULL) == 0)
++			cp_size, cp, load_ltk_complete, NULL, NULL) == 0)
+ 		error("Failed to load LTKs");
+ 
+ 	g_free(cp);
+ }
+ 
++static void load_irk_complete(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status == MGMT_STATUS_SUCCESS)
++		return;
++
++	info("Failed to load IRKs: %s (0x%02x)", mgmt_errstr(status), status);
++}
++
+ static void load_irks(GSList *irks)
+ {
+ 	struct mgmt_cp_load_irks *cp;
+@@ -2334,7 +2352,7 @@ static void load_irks(GSList *irks)
+ 		memcpy(irk, irks->data, sizeof(*irk));
+ 
+ 	if (mgmt_send(mgmt_if, MGMT_OP_LOAD_IRKS, adapter.index, cp_size, cp,
+-							NULL, NULL, NULL) == 0)
++					load_irk_complete, NULL, NULL) == 0)
+ 		error("Failed to load IRKs");
+ 
+ 	g_free(cp);
+-- 
+1.9.3
 
-I've pushed patches 1-8 (with fixes to 7 and 8 due to messed up
-indentation). This one doesn't make much sense though:
-
-> diff --git a/src/device.c b/src/device.c
-> index a9b644b..2003c7f 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -595,7 +595,11 @@ static gboolean dev_property_get_name(const GDBusPropertyTable *property,
->  	struct btd_device *device = data;
->  	const char *empty = "", *ptr;
->  
-> -	ptr = device->name ?: empty;
-> +	if (strlen(device->name) > 0)
-> +		ptr = device->name;
-> +	else
-> +		ptr = empty;
-
-Why do you need the whole "empty" variable here? If strlen(device->name)
-is 0 then you've got the exact same thing: a pointer to an empty string.
-So to me it seems that this snippet should be changed to simply:
-
-	ptr = device->name;
-
-Johan
