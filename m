@@ -2,97 +2,173 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 6/7] android/gatt: Use proper address when connecting
-Date: Sun, 22 Jun 2014 22:47:06 +0200
-Message-Id: <1403470027-24720-7-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 4/7] android/bluetooth: Add get_device_android_addr helper
+Date: Sun, 22 Jun 2014 22:47:04 +0200
+Message-Id: <1403470027-24720-5-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 References: <1403470027-24720-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If device was using RPA but address was resolved IDA must be used.
+This will be used to fake address for Android Framework.
 ---
- android/bluetooth.c | 14 ++++++++++++++
- android/bluetooth.h |  2 ++
- android/gatt.c      | 16 ++++++++++++++--
- 3 files changed, 30 insertions(+), 2 deletions(-)
+ android/bluetooth.c | 43 +++++++++++++++++++++++++++++--------------
+ 1 file changed, 29 insertions(+), 14 deletions(-)
 
 diff --git a/android/bluetooth.c b/android/bluetooth.c
-index 166337f..beb806b 100644
+index be50a1a..c664461 100644
 --- a/android/bluetooth.c
 +++ b/android/bluetooth.c
-@@ -1438,6 +1438,20 @@ bool bt_is_device_le(const bdaddr_t *addr)
- 	return dev->le;
- }
+@@ -218,6 +218,11 @@ static GSList *browse_reqs;
  
-+const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type)
+ static struct ipc *hal_ipc = NULL;
+ 
++static void get_device_android_addr(struct device *dev, uint8_t *addr)
 +{
-+	struct device *dev;
-+
-+	dev = find_device(addr);
-+	if (!dev)
-+		return NULL;
-+
-+	if (type)
-+		*type = dev->bdaddr_type;
-+
-+	return &dev->bdaddr;
++	bdaddr2android(&dev->bdaddr, addr);
 +}
 +
- const char *bt_get_adapter_name(void)
+ static void mgmt_debug(const char *str, void *user_data)
  {
- 	return adapter.name;
-diff --git a/android/bluetooth.h b/android/bluetooth.h
-index eb50fe1..dde477d 100644
---- a/android/bluetooth.h
-+++ b/android/bluetooth.h
-@@ -76,3 +76,5 @@ void bt_update_sign_counter(const bdaddr_t *addr, enum bt_csrk_type type);
- void bt_store_gatt_ccc(const bdaddr_t *addr, uint16_t value);
+ 	const char *prefix = user_data;
+@@ -752,7 +757,7 @@ static void send_bond_state_change(struct device *dev, uint8_t status,
  
- uint16_t bt_get_gatt_ccc(const bdaddr_t *addr);
+ 	ev.status = status;
+ 	ev.state = state;
+-	bdaddr2android(addr, ev.bdaddr);
++	get_device_android_addr(dev, ev.bdaddr);
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 				HAL_EV_BOND_STATE_CHANGED, sizeof(ev), &ev);
+@@ -871,7 +876,7 @@ static void send_device_property(struct device *dev, uint8_t type,
+ 	struct hal_ev_remote_device_props *ev = (void *) buf;
+ 
+ 	ev->status = HAL_STATUS_SUCCESS;
+-	bdaddr2android(&dev->bdaddr, ev->bdaddr);
++	get_device_android_addr(dev, ev->bdaddr);
+ 	ev->num_props = 1;
+ 	ev->props[0].type = type;
+ 	ev->props[0].len = len;
+@@ -1118,7 +1123,7 @@ static void pin_code_request_callback(uint16_t index, uint16_t length,
+ 
+ 	/* Name already sent in remote device prop */
+ 	memset(&hal_ev, 0, sizeof(hal_ev));
+-	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
++	get_device_android_addr(dev, hal_ev.bdaddr);
+ 	hal_ev.class_of_dev = dev->class;
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH, HAL_EV_PIN_REQUEST,
+@@ -1132,7 +1137,7 @@ static void send_ssp_request(struct device *dev, uint8_t variant,
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+-	bdaddr2android(&dev->bdaddr, ev.bdaddr);
++	get_device_android_addr(dev, ev.bdaddr);
+ 	memcpy(ev.name, dev->name, strlen(dev->name));
+ 	ev.class_of_dev = dev->class;
+ 
+@@ -1459,7 +1464,7 @@ static void update_new_device(struct device *dev, int8_t rssi,
+ {
+ 	uint8_t buf[IPC_MTU];
+ 	struct hal_ev_device_found *ev = (void *) buf;
+-	bdaddr_t android_bdaddr;
++	uint8_t android_bdaddr[6];
+ 	uint8_t android_type;
+ 	int size;
+ 
+@@ -1470,10 +1475,9 @@ static void update_new_device(struct device *dev, int8_t rssi,
+ 
+ 	size = sizeof(*ev);
+ 
+-	bdaddr2android(&dev->bdaddr, &android_bdaddr);
++	get_device_android_addr(dev, android_bdaddr);
+ 	size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_ADDR,
+-						sizeof(android_bdaddr),
+-						&android_bdaddr);
++				sizeof(android_bdaddr), android_bdaddr);
+ 	ev->num_props++;
+ 
+ 	android_type = get_device_android_type(dev);
+@@ -1536,7 +1540,7 @@ static void update_device(struct device *dev, int8_t rssi,
+ 	size = sizeof(*ev);
+ 
+ 	ev->status = HAL_STATUS_SUCCESS;
+-	bdaddr2android(&dev->bdaddr, ev->bdaddr);
++	get_device_android_addr(dev, ev->bdaddr);
+ 
+ 	old_type = get_device_android_type(dev);
+ 
+@@ -1715,6 +1719,7 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+ {
+ 	const struct mgmt_ev_device_connected *ev = param;
+ 	struct hal_ev_acl_state_changed hal_ev;
++	struct device *dev;
+ 
+ 	if (length < sizeof(*ev)) {
+ 		error("Too short device connected event (%u bytes)", length);
+@@ -1726,7 +1731,12 @@ static void mgmt_device_connected_event(uint16_t index, uint16_t length,
+ 
+ 	hal_ev.status = HAL_STATUS_SUCCESS;
+ 	hal_ev.state = HAL_ACL_STATE_CONNECTED;
+-	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
 +
-+const bdaddr_t *bt_get_id_addr(const bdaddr_t *addr, uint8_t *type);
-diff --git a/android/gatt.c b/android/gatt.c
-index 32853fa..f0b035e 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1423,6 +1423,8 @@ static int connect_le(struct gatt_device *dev)
- 	GIOChannel *io;
- 	GError *gerr = NULL;
- 	char addr[18];
-+	const bdaddr_t *bdaddr;
-+	uint8_t bdaddr_type;
- 
- 	ba2str(&dev->bdaddr, addr);
- 
-@@ -1437,6 +1439,16 @@ static int connect_le(struct gatt_device *dev)
- 	sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
- 								BT_IO_SEC_LOW;
- 
++	dev = find_device(&ev->addr.bdaddr);
++	if (!dev)
++		return;
 +
-+	if (dev->bdaddr_type == BDADDR_LE_RANDOM) {
-+		bdaddr = bt_get_id_addr(&dev->bdaddr, &bdaddr_type);
-+		if (!bdaddr)
-+			return -EINVAL;
-+	} else {
-+		bdaddr = &dev->bdaddr;
-+		bdaddr_type = dev->bdaddr_type;
-+	}
++	get_device_android_addr(dev, hal_ev.bdaddr);
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev);
+@@ -1738,15 +1748,20 @@ static void mgmt_device_disconnected_event(uint16_t index, uint16_t length,
+ {
+ 	const struct mgmt_ev_device_disconnected *ev = param;
+ 	struct hal_ev_acl_state_changed hal_ev;
++	struct device *dev;
+ 
+ 	if (length < sizeof(*ev)) {
+ 		error("Too short device disconnected event (%u bytes)", length);
+ 		return;
+ 	}
+ 
++	dev = find_device(&ev->addr.bdaddr);
++	if (!dev)
++		return;
 +
- 	/*
- 	 * This connection will help us catch any PDUs that comes before
- 	 * pairing finishes
-@@ -1445,8 +1457,8 @@ static int connect_le(struct gatt_device *dev)
- 			BT_IO_OPT_SOURCE_BDADDR,
- 			&adapter_addr,
- 			BT_IO_OPT_SOURCE_TYPE, BDADDR_LE_PUBLIC,
--			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
--			BT_IO_OPT_DEST_TYPE, dev->bdaddr_type,
-+			BT_IO_OPT_DEST_BDADDR, bdaddr,
-+			BT_IO_OPT_DEST_TYPE, bdaddr_type,
- 			BT_IO_OPT_CID, ATT_CID,
- 			BT_IO_OPT_SEC_LEVEL, sec_level,
- 			BT_IO_OPT_INVALID);
+ 	hal_ev.status = HAL_STATUS_SUCCESS;
+ 	hal_ev.state = HAL_ACL_STATE_DISCONNECTED;
+-	bdaddr2android(&ev->addr.bdaddr, hal_ev.bdaddr);
++	get_device_android_addr(dev, hal_ev.bdaddr);
+ 
+ 	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_BLUETOOTH,
+ 			HAL_EV_ACL_STATE_CHANGED, sizeof(hal_ev), &hal_ev);
+@@ -3345,7 +3360,7 @@ static uint8_t get_adapter_bonded_devices(void)
+ 	for (l = bonded_devices; l; l = g_slist_next(l)) {
+ 		struct device *dev = l->data;
+ 
+-		bdaddr2android(&dev->bdaddr, buf + (i * sizeof(bdaddr_t)));
++		get_device_android_addr(dev, buf + (i * sizeof(bdaddr_t)));
+ 		i++;
+ 	}
+ 
+@@ -3461,7 +3476,7 @@ static void get_adapter_properties(void)
+ 	for (i = 0, l = bonded_devices; l; l = g_slist_next(l), i++) {
+ 		struct device *dev = l->data;
+ 
+-		bdaddr2android(&dev->bdaddr, bonded + (i * sizeof(bdaddr_t)));
++		get_device_android_addr(dev, bonded + (i * sizeof(bdaddr_t)));
+ 	}
+ 
+ 	size += fill_hal_prop(buf + size, HAL_PROP_ADAPTER_BONDED_DEVICES,
+@@ -4255,7 +4270,7 @@ static void get_remote_device_props(struct device *dev)
+ 	size = sizeof(*ev);
+ 
+ 	ev->status = HAL_STATUS_SUCCESS;
+-	bdaddr2android(&dev->bdaddr, ev->bdaddr);
++	get_device_android_addr(dev, ev->bdaddr);
+ 
+ 	android_type = get_device_android_type(dev);
+ 	size += fill_hal_prop(buf + size, HAL_PROP_DEVICE_TYPE,
 -- 
 1.9.3
 
