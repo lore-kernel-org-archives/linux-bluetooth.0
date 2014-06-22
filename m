@@ -2,107 +2,188 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 3/6] android/health: Notify channel status on channel destroy call
-Date: Sun, 22 Jun 2014 14:58:58 +0300
-Message-Id: <1403438341-14321-4-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 4/6] android/health: Create and connect MDL
+Date: Sun, 22 Jun 2014 14:58:59 +0300
+Message-Id: <1403438341-14321-5-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Request for md_create_mdl and on successful response
+connect mdl and pass fd. First data channel should be reliable
+data channel.
 ---
- android/health.c | 64 ++++++++++++++++++++++++++++----------------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ android/health.c | 121 ++++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 119 insertions(+), 2 deletions(-)
 
 diff --git a/android/health.c b/android/health.c
-index a68f5e9..c68bf15 100644
+index c68bf15..6003aaa 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -115,6 +115,37 @@ struct health_app {
- 	struct queue *devices;
- };
+@@ -146,6 +146,16 @@ static void send_channel_state_notify(struct health_channel *channel,
+ 					sizeof(ev), &ev, fd);
+ }
  
-+static void send_app_reg_notify(struct health_app *app, uint8_t state)
++static void unref_mdl(struct health_channel *channel)
 +{
-+	struct hal_ev_health_app_reg_state ev;
++	if (!channel || !channel->mdl)
++		return;
 +
-+	DBG("");
-+
-+	ev.id = app->id;
-+	ev.state = state;
-+
-+	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
-+				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
-+}
-+
-+static void send_channel_state_notify(struct health_channel *channel,
-+						uint8_t state, int fd)
-+{
-+	struct hal_ev_health_channel_state ev;
-+
-+	DBG("");
-+
-+	bdaddr2android(&channel->dev->dst, ev.bdaddr);
-+	ev.app_id = channel->dev->app_id;
-+	ev.mdep_index = channel->mdep_id;
-+	ev.channel_id = channel->id;
-+	ev.channel_state = state;
-+
-+	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
-+					HAL_EV_HEALTH_CHANNEL_STATE,
-+					sizeof(ev), &ev, fd);
++	mcap_mdl_unref(channel->mdl);
++	channel->mdl = NULL;
++	channel->mdl_conn = false;
 +}
 +
  static void free_health_channel(void *data)
  {
  	struct health_channel *channel = data;
-@@ -132,7 +163,7 @@ static void destroy_channel(void *data)
+@@ -153,6 +163,7 @@ static void free_health_channel(void *data)
  	if (!channel)
  		return;
  
--	/* TODO: Notify channel connection status DESTROYED */
-+	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_DESTROYED, -1);
- 	queue_remove(channel->dev->channels, channel);
- 	free_health_channel(channel);
- }
-@@ -187,37 +218,6 @@ static void free_health_app(void *data)
- 	free(app);
++	unref_mdl(channel);
+ 	free(channel);
  }
  
--static void send_app_reg_notify(struct health_app *app, uint8_t state)
--{
--	struct hal_ev_health_app_reg_state ev;
--
--	DBG("");
--
--	ev.id = app->id;
--	ev.state = state;
--
--	ipc_send_notif(hal_ipc, HAL_SERVICE_ID_HEALTH,
--				HAL_EV_HEALTH_APP_REG_STATE, sizeof(ev), &ev);
--}
--
--static void send_channel_state_notify(struct health_channel *channel,
--						uint8_t state, int fd)
--{
--	struct hal_ev_health_channel_state ev;
--
--	DBG("");
--
--	bdaddr2android(&channel->dev->dst, ev.bdaddr);
--	ev.app_id = channel->dev->app_id;
--	ev.mdep_index = channel->mdep_id;
--	ev.channel_id = channel->id;
--	ev.channel_state = state;
--
--	ipc_send_notif_with_fd(hal_ipc, HAL_SERVICE_ID_HEALTH,
--					HAL_EV_HEALTH_CHANNEL_STATE,
--					sizeof(ev), &ev, fd);
--}
--
- static bool dev_by_addr(const void *data, const void *user_data)
+@@ -1016,6 +1027,93 @@ static void mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
+ 	DBG("Not Implemeneted");
+ }
+ 
++static void connect_mdl_cb(struct mcap_mdl *mdl, GError *gerr, gpointer data)
++{
++	struct health_channel *channel = data;
++	int fd;
++
++	DBG("");
++
++	if (gerr) {
++		error("health: error connecting to MDL %s", gerr->message);
++		goto fail;
++	}
++
++	fd = mcap_mdl_get_fd(channel->mdl);
++	if (fd < 0) {
++		error("health: error retrieving fd");
++		goto fail;
++	}
++
++	info("health: MDL connected");
++	channel->mdl_conn = true;
++
++	/* first data channel should be reliable data channel */
++	if (!queue_length(channel->dev->channels))
++		if (channel->type != CHANNEL_TYPE_RELIABLE)
++			goto fail;
++
++	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTED, fd);
++
++	return;
++
++fail:
++	/* TODO: mcap_mdl_abort */
++	destroy_channel(channel);
++}
++
++static void create_mdl_cb(struct mcap_mdl *mdl, uint8_t type, GError *gerr,
++								gpointer data)
++{
++	struct health_channel *channel = data;
++	uint8_t mode;
++	GError *err = NULL;
++
++	DBG("");
++	if (gerr) {
++		error("health: error creating MDL %s", gerr->message);
++		goto fail;
++	}
++
++	if (channel->type == CHANNEL_TYPE_ANY && type != CHANNEL_TYPE_ANY)
++		channel->type = type;
++
++	/*
++	 * if requested channel type is not same as preferred
++	 * channel type from remote device, then abort the connection.
++	 */
++	if (channel->type != type) {
++		/* TODO: abort mdl */
++		error("abort, channel-type requested %d, preferred %d not same",
++							channel->type, type);
++		goto fail;
++	}
++
++	if (!channel->mdl)
++		channel->mdl = mcap_mdl_ref(mdl);
++
++	channel->type = type;
++	channel->mdl_id = mcap_mdl_get_mdlid(mdl);
++
++	if (channel->type == CHANNEL_TYPE_RELIABLE)
++		mode = L2CAP_MODE_ERTM;
++	else
++		mode = L2CAP_MODE_STREAMING;
++
++	if (!mcap_connect_mdl(channel->mdl, mode, channel->dev->dcpsm,
++						connect_mdl_cb, channel,
++						NULL, &err)) {
++		error("health: error connecting to mdl");
++		g_error_free(err);
++		goto fail;
++	}
++
++	return;
++
++fail:
++	destroy_channel(channel);
++}
++
+ static bool check_role(uint8_t rec_role, uint8_t app_role)
  {
- 	const struct health_device *dev = data;
+ 	if ((rec_role == HAL_HEALTH_MDEP_ROLE_SINK &&
+@@ -1078,7 +1176,8 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 	struct health_channel *channel = user_data;
+ 	struct health_app *app;
+ 	struct mdep_cfg *mdep;
+-	uint8_t mdep_id;
++	uint8_t mdep_id, type;
++	GError *gerr = NULL;
+ 
+ 	if (err < 0 || !recs) {
+ 		error("health: error getting remote SDP records");
+@@ -1102,7 +1201,18 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 
+ 	channel->remote_mdep = mdep_id;
+ 
+-	/* TODO : create mdl */
++	if (mdep->role == HAL_HEALTH_MDEP_ROLE_SOURCE)
++		type = channel->type;
++	else
++		type = CHANNEL_TYPE_ANY;
++
++	if (!mcap_create_mdl(channel->dev->mcl, channel->remote_mdep,
++				type, create_mdl_cb, channel, NULL, &gerr)) {
++		error("health: error creating mdl %s", gerr->message);
++		g_error_free(gerr);
++		goto fail;
++	}
++
+ 	return;
+ 
+ fail:
+@@ -1345,6 +1455,13 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
+ 	if (!channel)
+ 		goto fail;
+ 
++	if (!queue_length(dev->channels)) {
++		if (channel->type != CHANNEL_TYPE_RELIABLE) {
++			error("error, first data shannel should be reliable");
++			goto fail;
++		}
++	}
++
+ 	if (!dev->mcl) {
+ 		if (connect_mcl(channel) < 0) {
+ 			error("health:error retrieving HDP SDP record");
 -- 
 1.9.1
 
