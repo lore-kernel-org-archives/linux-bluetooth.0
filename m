@@ -1,26 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 23 Jun 2014 14:38:27 +0300
+Date: Mon, 23 Jun 2014 14:36:32 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Fix using address of array instead of size
-Message-ID: <20140623113827.GC24897@t440s>
-References: <20140623075529.GA29804@t440s>
- <1403522375-30438-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] Bluetooth: Add support LE slave connection update
+ procedure
+Message-ID: <20140623113632.GB24897@t440s>
+References: <1403518731-16989-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1403522375-30438-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <1403518731-16989-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Marcel,
 
-On Mon, Jun 23, 2014, Andrei Emeltchenko wrote:
-> Address of array is always not NULL.
+On Mon, Jun 23, 2014, Marcel Holtmann wrote:
+> When the current LE connection parameters of a slave connection do not
+> match up with the controller defined values, then trigger the connection
+> update procedure to allow adjusting them.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  src/device.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  net/bluetooth/l2cap_core.c | 19 +++++++++++++++++++
+>  1 file changed, 19 insertions(+)
 
-Applied. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
