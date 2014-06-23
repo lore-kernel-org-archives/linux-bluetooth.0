@@ -1,93 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=windows-1252
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v7 0/5] Bluetooth LE 6LoWPAN using CoC
+Subject: Re: [PATCH v5 0/4] bt_att initial implementation
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403097386-27919-1-git-send-email-jukka.rissanen@linux.intel.com>
-Date: Mon, 23 Jun 2014 10:57:20 +0200
+In-Reply-To: <1403123143-17543-1-git-send-email-armansito@chromium.org>
+Date: Mon, 23 Jun 2014 10:38:20 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <E5C7ADCA-91BD-4FFD-B13B-FCBDC68A3590@holtmann.org>
-References: <1403097386-27919-1-git-send-email-jukka.rissanen@linux.intel.com>
-To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+Message-Id: <4DFB3E01-48C3-4F80-8040-6165B4456ABE@holtmann.org>
+References: <1403123143-17543-1-git-send-email-armansito@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jukka,
+Hi Arman,
 
-> v7:
-> - patch 1 is originally from Marcel but with slight modifications
->  that avoid the sparse error by using kvec instead of iovec in
->  kernel's memcpy path. I tested this with 6lowpan and also using
->  L2CAP user sockets.
-> - avoid chan_ops forward declaration
-> - this version did not change the GFP_ATOMIC in alloc_skb cb as it
->  is needed because the alloc function is called in atomic context
-> - also no need to ref skb because the caller will wait until we
->  are finished
-> - various chan ref issues fixed
-> 
-> v6:
-> - rebased on top of Marcel's "Bluetooth: Provide L2CAP ops callback
->  for memcpy_fromiovec" patch
-> - re-wrote the debugfs psm value handler using DEFINE_SIMPLE_ATTRIBUTE
-> - renamed and refactored the module init/exit functions, also checked
->  that debugfs_remove() will gracefully accept NULL values
-> - added comment to disconnect_devices() why we have two separate
->  lists
-> 
 > v5:
-> - memory buffer made const in patch 1
-> - misc changes and refactoring in patch 2
-> 
-> v4:
-> - renamed l2cap_from_skbuf() to more logical l2cap_copy_into_skbuff()
->  in l2cap_core.c (patch 1)
-> - fixed the module usage count code in patch 4
-> 
-> Usage:
-> 
-> In the slave side do this:
-> 
-> $ modprobe bluetooth_6lowpan
-> $ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-> $ hciconfig hci0 leadv
-> 
-> In the master side do this:
-> 
-> $ modprobe bluetooth_6lowpan
-> $ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
-> $ echo 'connect E0:06:E6:B7:2A:73 1' > \
->                  /sys/kernel/debug/bluetooth/6lowpan_control
-> 
-> 
-> Cheers,
-> Jukka
-> 
-> 
-> Jukka Rissanen (5):
->  Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
->  Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed
->    one
->  Bluetooth: 6LoWPAN: Create a kernel module
->  Bluetooth: 6LoWPAN: Count module usage
->  Bluetooth: 6LoWPAN: Remove network devices when unloading
-> 
-> include/net/bluetooth/hci.h      |   1 -
-> include/net/bluetooth/hci_core.h |   1 -
-> include/net/bluetooth/l2cap.h    |  30 +-
-> net/bluetooth/6lowpan.c          | 857 +++++++++++++++++++++++++++++----------
-> net/bluetooth/6lowpan.h          |  47 ---
-> net/bluetooth/Kconfig            |   6 +-
-> net/bluetooth/Makefile           |   4 +-
-> net/bluetooth/a2mp.c             |   1 +
-> net/bluetooth/hci_core.c         |  45 --
-> net/bluetooth/hci_event.c        |   3 -
-> net/bluetooth/l2cap_core.c       |  26 +-
-> net/bluetooth/l2cap_sock.c       |  34 +-
-> 12 files changed, 718 insertions(+), 337 deletions(-)
-> delete mode 100644 net/bluetooth/6lowpan.h
+>  - Removed the PDU signing related functions for now. We"ll revisit them once
+>  we start implementing/testing the signed write command.
+>  - Minor cosmetic changes.
 
-all 5 patches have been applied to bluetooth-next tree.
+forget my previous comment, I mixed up v4 with v5 :(
+
+> Arman Uguray (4):
+>  src/shared/att: Introduce struct bt_att.
+>  src/shared/att: Implement basic boilerplate.
+>  src/shared/att: Implement write handler and bt_att_send.
+>  src/shared/att: Handle incoming response PDUs
+
+A prefix of shared: or shared/att: is enough. The src/ part is too much.
+
+> 
+> Makefile.am            |   3 +-
+> src/shared/att-types.h | 222 +++++++++++++
+> src/shared/att.c       | 840 +++++++++++++++++++++++++++++++++++++++++++++++++
+> src/shared/att.h       |  69 ++++
+> 4 files changed, 1133 insertions(+), 1 deletion(-)
+> create mode 100644 src/shared/att-types.h
+> create mode 100644 src/shared/att.c
+> create mode 100644 src/shared/att.h
+
+However, you really need to use a proper compiler that gives you a decent amount of warnings.
+
+  CC       src/shared/bluetoothd-att.o
+src/shared/att.c: In function ‘encode_pdu’:
+src/shared/att.c:194:2: error: label ‘dafault’ defined but not used [-Werror=unused-label]
+  dafault:
+  ^
+src/shared/att.c: In function ‘handle_error_rsp’:
+src/shared/att.c:447:8: error: unused variable ‘result’ [-Werror=unused-variable]
+  bool result;
+        ^
+src/shared/att.c: In function ‘handle_mtu_rsp’:
+src/shared/att.c:464:8: error: unused variable ‘result’ [-Werror=unused-variable]
+  bool result;
+        ^
+src/shared/att.c: In function ‘bt_att_set_mtu’:
+src/shared/att.c:689:11: error: pointer targets in assignment differ in signedness [-Werror=pointer-sign]
+  att->buf = buf;
+           ^
+
+I fixed them all up for you since they were dead simple fixes, but please be a bit more careful for the next set of patches.
 
 Regards
 
