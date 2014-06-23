@@ -1,36 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Mon, 23 Jun 2014 11:09:38 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 9/9] Fix using address of array instead of size
+Message-ID: <20140623080936.GA9927@aemeltch-MOBL1>
+References: <1403186136-30041-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1403186136-30041-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20140623075529.GA29804@t440s>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v4 4/4] src/shared/att: Handle incoming response PDUs
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHrH25QXfopPAeUbfkxkv0iuZLOnR8a2b1QSasWtR=0R4+OUXA@mail.gmail.com>
-Date: Mon, 23 Jun 2014 10:25:46 +0200
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Message-Id: <4049FA5C-5AF3-4F35-A7B1-F5DB75F51539@holtmann.org>
-References: <1402958640-1132-1-git-send-email-armansito@chromium.org> <1402958640-1132-5-git-send-email-armansito@chromium.org> <F0DE0097-7AD2-4C16-8A64-613495021AEB@holtmann.org> <CAHrH25QXfopPAeUbfkxkv0iuZLOnR8a2b1QSasWtR=0R4+OUXA@mail.gmail.com>
-To: Arman Uguray <armansito@chromium.org>
+In-Reply-To: <20140623075529.GA29804@t440s>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
-
->> I am still not buying this tail call optimization. However we might need to thing about how we can make sure we do not need this. It feels bad to me every time I look at it. However this is not something that holds up merging this patchset. It is just something that I prefer to get somehow worked out. Especially since I am afraid we have then similar issues in the whole codebase if this holds true. Maybe we need a magic gcc option.
->> 
+On Mon, Jun 23, 2014 at 10:55:29AM +0300, Johan Hedberg wrote:
+> Hi Andrei,
 > 
-> To be honest, this doesn't make sense to me either. Any decent
-> compiler should be able to detect that a pointer to a local variable
-> is being passed to the tail call and determine not to pop the stack. I
-> don't really know why I've been getting these weird crashes; then
-> again, they stopped happening after I moved things around. It is a
-> mystery to me why the tail call actually made a difference, but for
-> now I'm removing the comment and the weird work around from the patch.
-> We can investigate later if this is actually an issue or has something
-> to do with the compiler configuration I'm building with.
+> On Thu, Jun 19, 2014, Andrei Emeltchenko wrote:
+> > ---
+> >  src/device.c | 6 +++++-
+> >  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
+> I've pushed patches 1-8 (with fixes to 7 and 8 due to messed up
+> indentation). This one doesn't make much sense though:
+> 
+> > diff --git a/src/device.c b/src/device.c
+> > index a9b644b..2003c7f 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -595,7 +595,11 @@ static gboolean dev_property_get_name(const GDBusPropertyTable *property,
+> >  	struct btd_device *device = data;
+> >  	const char *empty = "", *ptr;
+> >  
+> > -	ptr = device->name ?: empty;
+> > +	if (strlen(device->name) > 0)
+> > +		ptr = device->name;
+> > +	else
+> > +		ptr = empty;
+> 
+> Why do you need the whole "empty" variable here? If strlen(device->name)
+> is 0 then you've got the exact same thing: a pointer to an empty string.
+> So to me it seems that this snippet should be changed to simply:
+> 
+> 	ptr = device->name;
 
-quick question, are you sending a new version without the tail call optimization fix or do you want me to apply this set?
+Yes, correct.
 
-Regards
-
-Marcel
-
+Best regards 
+Andrei Emeltchenko 
