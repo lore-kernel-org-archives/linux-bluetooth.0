@@ -1,31 +1,127 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Ignore H5 non-link packets in non-active state
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <50C3158CF44D924791C15F1437EF2EC62438004B@HASMSX104.ger.corp.intel.com>
-Date: Mon, 23 Jun 2014 17:24:08 +0200
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Message-Id: <778D5FB8-193A-42A0-B4C8-787630124123@holtmann.org>
-References: <1403528983-9314-1-git-send-email-loic.poulain@intel.com>,<9B6ECBFE-E31A-4C5B-9892-F383F180F350@holtmann.org> <50C3158CF44D924791C15F1437EF2EC62438004B@HASMSX104.ger.corp.intel.com>
-To: "Poulain, Loic" <loic.poulain@intel.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 5/5] android/health: Update PTS results
+Date: Mon, 23 Jun 2014 18:06:04 +0300
+Message-Id: <1403535964-32644-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1403535964-32644-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403535964-32644-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Loic,
+Update test results for TC_SRC_CC_BV_03_C, TC_SRC_CC_BV_07_C,
+TC_SNK_CC_BV_04_C, TC_SNK_HCT_BV_01_I, TC_SNK_CC_BV_08_C and
+TC_SRC_HCT_BV_01_I.
+---
+ android/pts-hdp.txt | 81 +++++++++++++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 75 insertions(+), 6 deletions(-)
 
-no top-posting on this mailing list please.
-
-> Sorry, but I omitted to precise that this patch fixes a NULL pointer dereference.
-> Indeed, h5->rx_skb was freed in h5_reset_rx and dereferenced in the next 
-> h5_rx_payload call. So I think it should go to stable tree.
-
-and if you think this should go to stable, then you have to have a proper commit message explaining what is happening and what the impact is. Feel free to send a new version.
-
-Regards
-
-Marcel
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index bdf8eca..99aa2d6 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -58,12 +58,46 @@ TC_SRC_CC_BV_01_C	PASS	haltest:
+ 
+ 				when prompted: bluetooth ssp_reply <args>
+ TC_SRC_CC_BV_02_C	PASS	when prompted: bluetooth ssp_reply <args>
+-TC_SRC_CC_BV_03_C	INC
++TC_SRC_CC_BV_03_C	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
++				when prompted: bluetooth ssp_reply <args>
++
+ TC_SRC_CC_BV_05_C	INC
+-TC_SRC_CC_BV_07_C	INC
++TC_SRC_CC_BV_07_C	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 2
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
++
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
++				when prompted: bluetooth ssp_reply <args>
++
++				when prompted:
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
+ TC_SRC_CC_BV_09_C	INC
+ TC_SRC_CC_BI_12_C	INC
+-TC_SRC_HCT_BV_01_I	INC
++TC_SRC_HCT_BV_01_I	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
++				when prompted: bluetooth ssp_reply <args>
+ TC_SRC_HCT_BV_02_I	INC
+ TC_SRC_HCT_BV_03_I	N/A
+ TC_SRC_HCT_BV_04_I	INC
+@@ -113,12 +147,47 @@ TC_SNK_CC_BV_01_C	PASS	haltest:
+ 
+ 				when prompted: bluetooth ssp_reply <args>
+ TC_SNK_CC_BV_02_C	PASS	when prompted: bluetooth ssp_reply <args>
+-TC_SNK_CC_BV_04_C	INC
++TC_SNK_CC_BV_04_C	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
++				when prompted: bluetooth ssp_reply <args>
++
+ TC_SNK_CC_BV_06_C	INC
+-TC_SNK_CC_BV_08_C	INC
++TC_SNK_CC_BV_08_C	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 2
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
++
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
++				when prompted: bluetooth ssp_reply <args>
++
++				when prompted:
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
+ TC_SNK_CC_BV_10_C	INC
+ TC_SNK_CC_BI_11_C	INC
+-TC_SNK_HCT_BV_01_I	INC
++TC_SNK_HCT_BV_01_I	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				hl connect_channel <app_id> <bd_addr>
++				<mdep_cfg_index>
++
++				when prompted: bluetooth ssp_reply <args>
+ TC_SNK_HCT_BV_02_I	INC
+ TC_SNK_HCT_BV_03_I	N/A
+ TC_SNK_HCT_BV_04_I	INC
+-- 
+1.9.1
 
