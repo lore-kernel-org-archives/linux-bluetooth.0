@@ -1,75 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH v7 0/5] Bluetooth LE 6LoWPAN using CoC
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1403097386-27919-1-git-send-email-jukka.rissanen@linux.intel.com>
+Date: Mon, 23 Jun 2014 10:57:20 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v3 0/6] Initial implementation for MCAP data channel
-Date: Mon, 23 Jun 2014 11:15:31 +0200
-Message-ID: <15258901.WdTfi0p35E@uw000953>
-In-Reply-To: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <E5C7ADCA-91BD-4FFD-B13B-FCBDC68A3590@holtmann.org>
+References: <1403097386-27919-1-git-send-email-jukka.rissanen@linux.intel.com>
+To: Jukka Rissanen <jukka.rissanen@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Jukka,
 
-On Sunday 22 of June 2014 14:58:55 Ravi kumar Veeramally wrote:
-> v3: Fixed Szymon's comments.
+> v7:
+> - patch 1 is originally from Marcel but with slight modifications
+>  that avoid the sparse error by using kvec instead of iovec in
+>  kernel's memcpy path. I tested this with 6lowpan and also using
+>  L2CAP user sockets.
+> - avoid chan_ops forward declaration
+> - this version did not change the GFP_ATOMIC in alloc_skb cb as it
+>  is needed because the alloc function is called in atomic context
+> - also no need to ref skb because the caller will wait until we
+>  are finished
+> - various chan ref issues fixed
 > 
-> v2: Few cleanups and support for streaming data channel.
+> v6:
+> - rebased on top of Marcel's "Bluetooth: Provide L2CAP ops callback
+>  for memcpy_fromiovec" patch
+> - re-wrote the debugfs psm value handler using DEFINE_SIMPLE_ATTRIBUTE
+> - renamed and refactored the module init/exit functions, also checked
+>  that debugfs_remove() will gracefully accept NULL values
+> - added comment to disconnect_devices() why we have two separate
+>  lists
 > 
-> v1: Patchset implements initial MCAP MDL creation and connection. On
->     successful MDL (reliable) connection fd will be passed to HAL.
+> v5:
+> - memory buffer made const in patch 1
+> - misc changes and refactoring in patch 2
 > 
-> PTS tests:
+> v4:
+> - renamed l2cap_from_skbuf() to more logical l2cap_copy_into_skbuff()
+>  in l2cap_core.c (patch 1)
+> - fixed the module usage count code in patch 4
 > 
-> TC_SRC_CC_BV_03_C:
+> Usage:
 > 
-> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 1 BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+> In the slave side do this:
 > 
-> hl connect_channel 1 00:1b:dc:05:b5:54 0
+> $ modprobe bluetooth_6lowpan
+> $ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
+> $ hciconfig hci0 leadv
 > 
-> TC_SRC_CC_BV_07_C:
+> In the master side do this:
 > 
-> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 2 BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter  BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
-> 
-> hl connect_channel 1 00:1b:dc:05:b5:54 0
-> hl connect_channel 1 00:1b:dc:05:b5:54 1
-> 
-> 
-> TC_SNK_CC_BV_04_C:
-> TC_SNK_HCT_BV_01_I:
-> 
-> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 1 BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-> 
-> hl connect_channel 1 00:1b:dc:05:b5:54 0
-> 
-> 
-> TC_SNK_CC_BV_08_C:
-> 
-> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 2 BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter  BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
-> 
-> hl connect_channel 1 00:1b:dc:05:b5:54 0
-> hl connect_channel 1 00:1b:dc:05:b5:54 1
-> 
-> 
-> Ravi kumar Veeramally (6):
->   android/health: Check if device and channel already exists or not
->   android/health: Cache remote mdep id on channel connect request
->   android/health: Notify channel status on channel destroy call
->   android/health: Create and connect MDL
->   android/health: Implement mcap_mdl_deleted_cb
->   anrdroid/client/health: Cache fd and close on channel disconnection
-> 
->  android/client/if-hl.c |   9 ++
->  android/health.c       | 415 +++++++++++++++++++++++++++++++++++++++++++------
->  2 files changed, 376 insertions(+), 48 deletions(-)
+> $ modprobe bluetooth_6lowpan
+> $ echo 62 > /sys/kernel/debug/bluetooth/6lowpan_psm
+> $ echo 'connect E0:06:E6:B7:2A:73 1' > \
+>                  /sys/kernel/debug/bluetooth/6lowpan_control
 > 
 > 
+> Cheers,
+> Jukka
+> 
+> 
+> Jukka Rissanen (5):
+>  Bluetooth: Provide L2CAP ops callback for memcpy_fromiovec
+>  Bluetooth: 6LoWPAN: Use connected oriented channel instead of fixed
+>    one
+>  Bluetooth: 6LoWPAN: Create a kernel module
+>  Bluetooth: 6LoWPAN: Count module usage
+>  Bluetooth: 6LoWPAN: Remove network devices when unloading
+> 
+> include/net/bluetooth/hci.h      |   1 -
+> include/net/bluetooth/hci_core.h |   1 -
+> include/net/bluetooth/l2cap.h    |  30 +-
+> net/bluetooth/6lowpan.c          | 857 +++++++++++++++++++++++++++++----------
+> net/bluetooth/6lowpan.h          |  47 ---
+> net/bluetooth/Kconfig            |   6 +-
+> net/bluetooth/Makefile           |   4 +-
+> net/bluetooth/a2mp.c             |   1 +
+> net/bluetooth/hci_core.c         |  45 --
+> net/bluetooth/hci_event.c        |   3 -
+> net/bluetooth/l2cap_core.c       |  26 +-
+> net/bluetooth/l2cap_sock.c       |  34 +-
+> 12 files changed, 718 insertions(+), 337 deletions(-)
+> delete mode 100644 net/bluetooth/6lowpan.h
 
-All patches are now applied, thanks.
+all 5 patches have been applied to bluetooth-next tree.
 
--- 
-Best regards, 
-Szymon Janc
+Regards
+
+Marcel
+
