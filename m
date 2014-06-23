@@ -1,43 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org,
-	gustavo@padovan.org,
-	johan.hedberg@gmail.com
-Cc: linux-bluetooth@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCH] Bluetooth: Remove redundant calls to h5_reset_rx
-Date: Mon, 23 Jun 2014 15:29:47 +0200
-Message-Id: <1403530187-9851-1-git-send-email-loic.poulain@intel.com>
+MIME-Version: 1.0
+In-Reply-To: <4DFB3E01-48C3-4F80-8040-6165B4456ABE@holtmann.org>
+References: <1403123143-17543-1-git-send-email-armansito@chromium.org>
+	<4DFB3E01-48C3-4F80-8040-6165B4456ABE@holtmann.org>
+Date: Mon, 23 Jun 2014 06:13:14 -0700
+Message-ID: <CAHrH25RGq=xzjrNqjGj1iTmbnnTZxkGxPgExSmrO5=tzQmVJPA@mail.gmail.com>
+Subject: Re: [PATCH v5 0/4] bt_att initial implementation
+From: Arman Uguray <armansito@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Arman Uguray <armansito@chromium.org>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-h5_reset_rx is unconditionally called at the end of
-h5_complete_rx_pkt, no need to call it anymore after
-that.
+Hi Marcel,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- drivers/bluetooth/hci_h5.c | 2 --
- 1 file changed, 2 deletions(-)
+> However, you really need to use a proper compiler that gives you a decent=
+ amount of warnings.
+>
+>   CC       src/shared/bluetoothd-att.o
+> src/shared/att.c: In function =E2=80=98encode_pdu=E2=80=99:
+> src/shared/att.c:194:2: error: label =E2=80=98dafault=E2=80=99 defined bu=
+t not used [-Werror=3Dunused-label]
+>   dafault:
+>   ^
+> src/shared/att.c: In function =E2=80=98handle_error_rsp=E2=80=99:
+> src/shared/att.c:447:8: error: unused variable =E2=80=98result=E2=80=99 [=
+-Werror=3Dunused-variable]
+>   bool result;
+>         ^
+> src/shared/att.c: In function =E2=80=98handle_mtu_rsp=E2=80=99:
+> src/shared/att.c:464:8: error: unused variable =E2=80=98result=E2=80=99 [=
+-Werror=3Dunused-variable]
+>   bool result;
+>         ^
+> src/shared/att.c: In function =E2=80=98bt_att_set_mtu=E2=80=99:
+> src/shared/att.c:689:11: error: pointer targets in assignment differ in s=
+ignedness [-Werror=3Dpointer-sign]
+>   att->buf =3D buf;
+>            ^
+>
+> I fixed them all up for you since they were dead simple fixes, but please=
+ be a bit more careful for the next set of patches.
+>
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 04680ea..e521730 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -358,7 +358,6 @@ static int h5_rx_crc(struct hci_uart *hu, unsigned char c)
- 	struct h5 *h5 = hu->priv;
- 
- 	h5_complete_rx_pkt(hu);
--	h5_reset_rx(h5);
- 
- 	return 0;
- }
-@@ -373,7 +372,6 @@ static int h5_rx_payload(struct hci_uart *hu, unsigned char c)
- 		h5->rx_pending = 2;
- 	} else {
- 		h5_complete_rx_pkt(hu);
--		h5_reset_rx(h5);
- 	}
- 
- 	return 0;
--- 
-1.8.3.2
+Thanks for doing that. I've been compiling for Chrome OS using the
+portage based toolchain, which really just runs the included configure
+scripts and compiles with gcc. I'll just explicitly stick in -Werror
+somewhere next time.
+
+Thanks!
+Arman
