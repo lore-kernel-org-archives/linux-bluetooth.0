@@ -1,40 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/tools: Rearrange headers include
-Date: Mon, 23 Jun 2014 14:52:38 +0300
-Message-Id: <1403524358-31967-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Mon, 23 Jun 2014 14:38:27 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Fix using address of array instead of size
+Message-ID: <20140623113827.GC24897@t440s>
+References: <20140623075529.GA29804@t440s>
+ <1403522375-30438-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1403522375-30438-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
----
- android/client/if-sco.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On Mon, Jun 23, 2014, Andrei Emeltchenko wrote:
+> Address of array is always not NULL.
+> ---
+>  src/device.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 456c529..4919fd9 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -15,13 +15,13 @@
-  *
-  */
- 
--#include "../src/shared/util.h"
-+#include <pthread.h>
-+#include <unistd.h>
-+#include <math.h>
- 
-+#include "../src/shared/util.h"
- #include "if-main.h"
- #include "../hal-utils.h"
--#include "pthread.h"
--#include "unistd.h"
--#include <math.h>
- 
- audio_hw_device_t *if_audio_sco = NULL;
- static struct audio_stream_out *stream_out = NULL;
--- 
-1.8.3.2
+Applied. Thanks.
 
+Johan
