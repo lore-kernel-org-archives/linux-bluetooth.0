@@ -1,37 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Loic Poulain <loic.poulain@intel.com>
-To: marcel@holtmann.org, johan.hedberg@gmail.com, gustavo@padovan.org
-Cc: linux-bluetooth@vger.kernel.org, stable@vger.kernel.org,
-	Loic Poulain <loic.poulain@intel.com>
-Subject: [PATCHv2] Bluetooth: Ignore H5 non-link packets in non-active state
-Date: Mon, 23 Jun 2014 17:42:44 +0200
-Message-Id: <1403538164-11505-1-git-send-email-loic.poulain@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH] Bluetooth: Ignore H5 non-link packets in non-active state
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <50C3158CF44D924791C15F1437EF2EC62438004B@HASMSX104.ger.corp.intel.com>
+Date: Mon, 23 Jun 2014 17:24:08 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Message-Id: <778D5FB8-193A-42A0-B4C8-787630124123@holtmann.org>
+References: <1403528983-9314-1-git-send-email-loic.poulain@intel.com>,<9B6ECBFE-E31A-4C5B-9892-F383F180F350@holtmann.org> <50C3158CF44D924791C15F1437EF2EC62438004B@HASMSX104.ger.corp.intel.com>
+To: "Poulain, Loic" <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When detecting a non-link packet, h5_reset_rx() frees the Rx skb.
-Not returning after that will cause the upcoming h5_rx_payload()
-call to dereference a now NULL Rx skb and trigger a kernel oops.
+Hi Loic,
 
-Signed-off-by: Loic Poulain <loic.poulain@intel.com>
----
- v2: commit message update (pointer deref)
+no top-posting on this mailing list please.
 
- drivers/bluetooth/hci_h5.c | 1 +
- 1 file changed, 1 insertion(+)
+> Sorry, but I omitted to precise that this patch fixes a NULL pointer dereference.
+> Indeed, h5->rx_skb was freed in h5_reset_rx and dereferenced in the next 
+> h5_rx_payload call. So I think it should go to stable tree.
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 04680ea..fede8ca 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -406,6 +406,7 @@ static int h5_rx_3wire_hdr(struct hci_uart *hu, unsigned char c)
- 	    H5_HDR_PKT_TYPE(hdr) != HCI_3WIRE_LINK_PKT) {
- 		BT_ERR("Non-link packet received in non-active state");
- 		h5_reset_rx(h5);
-+		return 0;
- 	}
- 
- 	h5->rx_func = h5_rx_payload;
--- 
-1.8.3.2
+and if you think this should go to stable, then you have to have a proper commit message explaining what is happening and what the impact is. Feel free to send a new version.
+
+Regards
+
+Marcel
 
