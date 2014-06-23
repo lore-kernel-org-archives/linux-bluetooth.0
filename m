@@ -1,52 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Store current LE connection parameters in hci_conn struct
-Date: Mon, 23 Jun 2014 11:40:04 +0200
-Message-Id: <1403516405-2184-1-git-send-email-marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH_v3 0/6] Initial implementation for MCAP data channel
+Date: Mon, 23 Jun 2014 11:15:31 +0200
+Message-ID: <15258901.WdTfi0p35E@uw000953>
+In-Reply-To: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403438341-14321-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The LE connection parameters are needed later on to be able to decide
-if it is required to trigger connection update procedures. So when the
-connection has been established successfully, store the current used
-parameters in hci_conn struct.
+Hi Ravi,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci_core.h | 3 +++
- net/bluetooth/hci_event.c        | 4 ++++
- 2 files changed, 7 insertions(+)
+On Sunday 22 of June 2014 14:58:55 Ravi kumar Veeramally wrote:
+> v3: Fixed Szymon's comments.
+> 
+> v2: Few cleanups and support for streaming data channel.
+> 
+> v1: Patchset implements initial MCAP MDL creation and connection. On
+>     successful MDL (reliable) connection fd will be passed to HAL.
+> 
+> PTS tests:
+> 
+> TC_SRC_CC_BV_03_C:
+> 
+> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 1 BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+> 
+> hl connect_channel 1 00:1b:dc:05:b5:54 0
+> 
+> TC_SRC_CC_BV_07_C:
+> 
+> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 2 BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter  BTHL_MDEP_ROLE_SOURCE 4100 BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
+> 
+> hl connect_channel 1 00:1b:dc:05:b5:54 0
+> hl connect_channel 1 00:1b:dc:05:b5:54 1
+> 
+> 
+> TC_SNK_CC_BV_04_C:
+> TC_SNK_HCT_BV_01_I:
+> 
+> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 1 BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+> 
+> hl connect_channel 1 00:1b:dc:05:b5:54 0
+> 
+> 
+> TC_SNK_CC_BV_08_C:
+> 
+> hl register_application bluez-android Bluez  bluez-hdp health-device-profile 2 BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter  BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING pulse-oximeter
+> 
+> hl connect_channel 1 00:1b:dc:05:b5:54 0
+> hl connect_channel 1 00:1b:dc:05:b5:54 1
+> 
+> 
+> Ravi kumar Veeramally (6):
+>   android/health: Check if device and channel already exists or not
+>   android/health: Cache remote mdep id on channel connect request
+>   android/health: Notify channel status on channel destroy call
+>   android/health: Create and connect MDL
+>   android/health: Implement mcap_mdl_deleted_cb
+>   anrdroid/client/health: Cache fd and close on channel disconnection
+> 
+>  android/client/if-hl.c |   9 ++
+>  android/health.c       | 415 +++++++++++++++++++++++++++++++++++++++++++------
+>  2 files changed, 376 insertions(+), 48 deletions(-)
+> 
+> 
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index c81de0d366df..cd73a82cc713 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -381,6 +381,9 @@ struct hci_conn {
- 	__u16		setting;
- 	__u16		le_conn_min_interval;
- 	__u16		le_conn_max_interval;
-+	__u16		le_conn_interval;
-+	__u16		le_conn_latency;
-+	__u16		le_supv_timeout;
- 	__s8		rssi;
- 	__s8		tx_power;
- 	__s8		max_tx_power;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e5b430113cfb..3d4741d789d3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4056,6 +4056,10 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	conn->handle = __le16_to_cpu(ev->handle);
- 	conn->state = BT_CONNECTED;
- 
-+	conn->le_conn_interval = le16_to_cpu(ev->interval);
-+	conn->le_conn_latency = le16_to_cpu(ev->latency);
-+	conn->le_supv_timeout = le16_to_cpu(ev->supervision_timeout);
-+
- 	hci_conn_add_sysfs(conn);
- 
- 	hci_proto_connect_cfm(conn, ev->status);
+All patches are now applied, thanks.
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
