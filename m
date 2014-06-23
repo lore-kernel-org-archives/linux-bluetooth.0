@@ -1,47 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/hidhost: Fix adding hidhost device on devices list
-Date: Mon, 23 Jun 2014 16:18:17 +0200
-Message-Id: <1403533097-23511-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCHv2] Bluetooth: Remove redundant calls to h5_reset_rx
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1403531386-10331-1-git-send-email-loic.poulain@intel.com>
+Date: Mon, 23 Jun 2014 16:04:40 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <D3B18699-747A-43A1-92C8-5686CC355D8B@holtmann.org>
+References: <1403531386-10331-1-git-send-email-loic.poulain@intel.com>
+To: Loic Poulain <loic.poulain@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Create hog connection cb functionality tried to operate on stored on
-list hidhost device. Adding hidhost device to list should be done
-before operating on it.
+Hi Loic,
 
-It caused sending bogus connecting state change.
----
- android/hidhost.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+> h5_reset_rx is unconditionally called at the end of
+> h5_complete_rx_pkt, no need to call it anymore after
+> that.
+> 
+> Signed-off-by: Loic Poulain <loic.poulain@intel.com>
+> ---
+> v2: remove unused h5
+> 
+> drivers/bluetooth/hci_h5.c | 4 ----
+> 1 file changed, 4 deletions(-)
 
-diff --git a/android/hidhost.c b/android/hidhost.c
-index 846dd57..fdbe885 100644
---- a/android/hidhost.c
-+++ b/android/hidhost.c
-@@ -846,9 +846,12 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 	ba2str(&dev->dst, addr);
- 	DBG("connecting to %s", addr);
- 
-+	devices = g_slist_append(devices, dev);
-+
- 	if (bt_is_device_le(&dst)) {
- 		if (!hog_connect(dev)) {
- 			status = HAL_STATUS_FAILED;
-+			hid_device_remove(dev);
- 			goto failed;
- 		}
- 		goto done;
-@@ -864,8 +867,6 @@ static void bt_hid_connect(const void *buf, uint16_t len)
- 	}
- 
- done:
--	devices = g_slist_append(devices, dev);
--
- 	if (dev->state == HAL_HIDHOST_STATE_DISCONNECTED)
- 		bt_hid_notify_state(dev, HAL_HIDHOST_STATE_CONNECTING);
- 
--- 
-1.9.3
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
