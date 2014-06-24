@@ -1,11 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluteooth: Convert hci_conn->link_mode into flags
-Date: Tue, 24 Jun 2014 17:03:50 +0300
-Message-Id: <1403618630-7656-1-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1403618355-5882-1-git-send-email-johan.hedberg@gmail.com>
-References: <1403618355-5882-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluteooth: Convert hci_conn->link_mode into flags
+Date: Tue, 24 Jun 2014 16:59:15 +0300
+Message-Id: <1403618355-5882-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -20,8 +18,6 @@ link_mode style value.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
-v2: Fix variable tpe in get_link_mode()
-
  include/net/bluetooth/hci_core.h | 10 +++++++---
  net/bluetooth/hci_conn.c         | 43 ++++++++++++++++++++++++++++++----------
  net/bluetooth/hci_event.c        | 28 +++++++++++++-------------
@@ -72,7 +68,7 @@ index 4f70605e0399..0b0597d81827 100644
  	read_lock(&hci_cb_list_lock);
  	list_for_each_entry(cb, &hci_cb_list, list) {
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index a7a27bc2c0b1..626160c37103 100644
+index a7a27bc2c0b1..afa30d6a31a9 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
 @@ -67,7 +67,7 @@ static void hci_acl_create_connection(struct hci_conn *conn)
@@ -154,7 +150,7 @@ index a7a27bc2c0b1..626160c37103 100644
  
 +static u32 get_link_mode(struct hci_conn *conn)
 +{
-+	u32 link_mode = 0;
++	u8 link_mode = 0;
 +
 +	if (test_bit(HCI_CONN_MASTER, &conn->flags))
 +		link_mode |= HCI_LM_MASTER;
