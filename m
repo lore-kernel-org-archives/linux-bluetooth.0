@@ -1,43 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Date: Tue, 24 Jun 2014 11:43:43 +0300
+From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH_v2 1/5] android/health: Fix wrong mdep config index
-Date: Tue, 24 Jun 2014 10:57:19 +0200
-Message-ID: <1506158.r3vhe5zJ2o@uw000953>
-In-Reply-To: <1403535964-32644-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403535964-32644-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [RFC] queue: Add queue_foreach_if
+Message-ID: <20140624084305.GC22942@aemeltch-MOBL1>
+References: <1403598452-4391-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <FDFF8D9B-E5C8-44C2-9C14-189C02E54672@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <FDFF8D9B-E5C8-44C2-9C14-189C02E54672@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ravi,
+Hi Marcel,
 
-On Monday 23 of June 2014 18:06:00 Ravi kumar Veeramally wrote:
-> MDEP Id starts from 1, (0 value for Echo). HAL api sends mdep cfg index
-> which starts from 0.
-> ---
->  android/health.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Jun 24, 2014 at 10:35:38AM +0200, Marcel Holtmann wrote:
+> Hi Andrei,
 > 
-> diff --git a/android/health.c b/android/health.c
-> index effa5e2..183608b 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -137,7 +137,7 @@ static void send_channel_state_notify(struct health_channel *channel,
->  
->  	bdaddr2android(&channel->dev->dst, ev.bdaddr);
->  	ev.app_id = channel->dev->app_id;
-> -	ev.mdep_index = channel->mdep_id;
-> +	ev.mdep_index = channel->mdep_id - 1;
->  	ev.channel_id = channel->id;
->  	ev.channel_state = state;
->  
+> > Function allows to search for a second level queue inside first level
+> > queue. In the current implementation since head is hidden this is not
+> > possible.
+> 
+> this is not something we want in a generic helper. This is a specific case and better model that on top of queue and not within it. Queues of queues are not a thing.
 > 
 
-All patches applied, thanks.
+So what is the best way to search for queue inside queue?
 
--- 
-Best regards, 
-Szymon Janc
+Best regards 
+Andrei Emeltchenko 
+
