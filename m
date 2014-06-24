@@ -1,48 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ 1/2] android/pics-hogp: Fix having both types of discover set
-Date: Tue, 24 Jun 2014 09:51:43 +0200
-Message-ID: <280722635.R9amvn24Ia@uw000953>
-In-Reply-To: <1403527577-16254-1-git-send-email-luiz.dentz@gmail.com>
-References: <1403527577-16254-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 23 Jun 2014 17:37:15 -0700
+Message-ID: <CAGXr9JHWb+Gg=Xnm-Nx5iQ3=DK_4fTtFCeR35WpVmcsYhj5=1g@mail.gmail.com>
+Subject: BlueZ 5.19: BLE HoG device reconnect issues
+From: Petri Gynther <pgynther@google.com>
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+With BlueZ 5.19 stack and BLE HoG remote controls, I'm seeing 3
+different issues when trying to reconnect a previously paired BLE HoG
+remote control:
 
-On Monday 23 of June 2014 15:46:16 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> Currently the code discover by service handle and not by UUID.
-> ---
->  android/pics-hogp.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/android/pics-hogp.txt b/android/pics-hogp.txt
-> index 81e182c..6544b54 100644
-> --- a/android/pics-hogp.txt
-> +++ b/android/pics-hogp.txt
-> @@ -330,10 +330,10 @@ TSPC_HOGP_13_1	True		Attribute Protocol supported over LE Transport
->  				(M)
->  TSPC_HOGP_13_2	True		Generic Attribute Profile Client (M)
->  TSPC_HOGP_13_3	True		Discover All Primary Services (C.1)
-> -TSPC_HOGP_13_4	True		Discover Primary Services by Service UUID (C.1)
-> +TSPC_HOGP_13_4	False		Discover Primary Services by Service UUID (C.1)
->  TSPC_HOGP_13_5	True		Find Included Services (M)
->  TSPC_HOGP_13_6	True		Discover All Characteristics of a Service (C.2)
-> -TSPC_HOGP_13_7	True		Discover Characteristics by UUID (C.2)
-> +TSPC_HOGP_13_7	False		Discover Characteristics by UUID (C.2)
->  TSPC_HOGP_13_8	True		Discover All Characteristic Descriptors (M)
->  TSPC_HOGP_13_9	True		Read Characteristic Value (M)
->  TSPC_HOGP_13_10	True		Read using Characteristic UUID (O)
-> 
+Full log:
+[72241.012] bluez: bluetoothd[29263]:
+src/adapter.c:discovering_callback() hci0 type 6 discovering 1
+[72251.269] bluez: bluetoothd[29263]:
+src/adapter.c:device_found_callback() hci0 addr 88:33:14:E6:XX:XX,
+rssi -81 flags 0x0000 eir_len 16
+[72251.270] bluez: bluetoothd[29263]: src/device.c:device_set_legacy() legacy 0
+[72251.270] bluez: bluetoothd[29263]: src/adapter.c:stop_passive_scanning()
+[72251.270] bluez: bluetoothd[29263]:
+src/adapter.c:discovering_callback() hci0 type 6 discovering 0
+[72251.270] bluez: bluetoothd[29263]:
+src/adapter.c:trigger_passive_scanning()
+[72251.270] bluez: bluetoothd[29263]:
+src/adapter.c:stop_passive_scanning_complete() status 0x0b (Rejected)
+[72251.270] bluez: bluetoothd[29263]: Stopping passive scanning failed: Rejected
+[72255.015] bluez: bluetoothd[29263]:
+src/adapter.c:passive_scanning_complete() status 0x00
+[72255.015] bluez: bluetoothd[29263]:
+src/adapter.c:discovering_callback() hci0 type 6 discovering 1
+[72258.550] bluez: bluetoothd[29263]:
+src/adapter.c:device_found_callback() hci0 addr 88:33:14:E6:XX:XX,
+rssi -76 flags 0x0000 eir_len 16
+[72258.551] bluez: bluetoothd[29263]: src/device.c:device_set_legacy() legacy 0
+[72258.551] bluez: bluetoothd[29263]: src/adapter.c:stop_passive_scanning()
+[72258.551] bluez: bluetoothd[29263]:
+src/adapter.c:device_found_callback() hci0 addr CB:36:E5:F5:XX:XX,
+rssi -82 flags 0x0000 eir_len 36
+[72258.558] bluez: bluetoothd[29263]:
+src/adapter.c:stop_passive_scanning_complete() status 0x00 (Success)
+[72258.558] bluez: bluetoothd[29263]: src/device.c:device_connect_le()
+Connection attempt to: 88:33:14:E6:XX:XX
+[72258.558] bluez: bluetoothd[29263]:
+src/adapter.c:discovering_callback() hci0 type 6 discovering 0
+[72278.629] bluez: bluetoothd[29263]:
+src/adapter.c:connect_failed_callback() hci0 88:33:14:E6:XX:XX status
+2
+[72278.629] bluez: bluetoothd[29263]: plugins/policy.c:conn_fail_cb() status 2
+[72278.629] bluez: bluetoothd[29263]:
+src/adapter.c:bonding_attempt_complete() hci0 bdaddr 88:33:14:E6:XX:XX
+type 1 status 0x2
+[72278.629] bluez: bluetoothd[29263]:
+src/device.c:device_bonding_complete() bonding (nil) status 0x02
+[72278.629] bluez: bluetoothd[29263]:
+src/device.c:device_bonding_failed() status 2
+[72278.629] bluez: bluetoothd[29263]: src/adapter.c:resume_discovery()
+[72278.629] bluez: bluetoothd[29263]: src/device.c:att_connect_cb()
+connect error: Transport endpoint is not connected (134)
+[72278.629] bluez: bluetoothd[29263]: src/device.c:att_error_cb()
+Enabling automatic connections
+[72278.630] bluez: bluetoothd[29263]:
+src/adapter.c:adapter_connect_list_add() ignoring already added device
+/org/bluez/hci0/dev_88_33_14_E6_XX_XX
 
-Both patches applied. Thanks.
+Issues 1 and 2:
+[72251.270] bluez: bluetoothd[29263]: src/adapter.c:stop_passive_scanning()
+[72251.270] bluez: bluetoothd[29263]:
+src/adapter.c:discovering_callback() hci0 type 6 discovering 0
+[72251.270] bluez: bluetoothd[29263]:
+src/adapter.c:trigger_passive_scanning()
+[72251.270] bluez: bluetoothd[29263]:
+src/adapter.c:stop_passive_scanning_complete() status 0x0b (Rejected)
+[72251.270] bluez: bluetoothd[29263]: Stopping passive scanning failed: Rejected
 
--- 
-Best regards, 
-Szymon Janc
+1) device_found_callback() -> update_found_devices() ->
+stop_passive_scanning() needs to stop passive scanning because BlueZ
+is about to connect to previously paired BLE device. But,
+discovering_callback() doesn't take the pending BLE connection into
+account and still calls trigger_passive_scanning() when it shouldn't.
+
+2) stop_passive_scanning() can actually fail because passive scanning
+was already stopped in kernel due to passive scan timer expiring. But,
+stop_passive_scanning_complete() handles the Reject case as an error
+and never attempts the pending BLE connection in that case.
+
+Issue 3:
+[72278.629] bluez: bluetoothd[29263]: src/device.c:att_connect_cb()
+connect error: Transport endpoint is not connected (134)
+[72278.629] bluez: bluetoothd[29263]: src/device.c:att_error_cb()
+Enabling automatic connections
+[72278.630] bluez: bluetoothd[29263]:
+src/adapter.c:adapter_connect_list_add() ignoring already added device
+/org/bluez/hci0/dev_88_33_14_E6_XX_XX
+
+If there is an error connecting to BLE device, att_error_cb() adds the
+failed device back to adapter connect list, but if it is already
+there, no code actually calls trigger_passive_scanning(). So, from
+this point on, no BLE device is ever going to reconnect back to BlueZ,
+because the passive scanning is disabled and nothing will re-enable
+it.
+
+
+Here is my proposed diff for fixing these issues:
+@@ -1228,7 +1228,7 @@ static void
+stop_passive_scanning_complete(uint8_t status, uint16_t length,
+        dev = adapter->connect_le;
+        adapter->connect_le = NULL;
+
+-       if (status != MGMT_STATUS_SUCCESS) {
++       if (status != MGMT_STATUS_SUCCESS && status != MGMT_STATUS_REJECTED) {
+                error("Stopping passive scanning failed: %s",
+                                                        mgmt_errstr(status));
+                return;
+
+@@ -1500,6 +1500,10 @@ static void discovering_callback(uint16_t
+index, uint16_t length,
+         * passive scanning attempt.
+         */
+        if (!adapter->discovery_list) {
++               if (adapter->connect_le) {
++                       DBG("LE connect pending, skip
+trigger_passive_scanning");
++                       return;
++               }
+                trigger_passive_scanning(adapter);
+                return;
+        }
+
+@@ -3675,6 +3676,7 @@ static void att_error_cb(const GError *gerr,
+gpointer user_data)
+        if (device_get_auto_connect(device)) {
+                DBG("Enabling automatic connections");
+                adapter_connect_list_add(device->adapter, device);
++               trigger_passive_scanning(device->adapter);
+        }
+ }
+
+
+Let me know if this looks good. I'll then e-mail proper patch for review.
+
+-- Petri
