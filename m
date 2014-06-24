@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/6] Bluetooth: Convert hcon->flush_key to a proper flag
-Date: Tue, 24 Jun 2014 13:15:53 +0300
-Message-Id: <1403604953-19539-6-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 5/6] Bluetooth: Fix ignoring debug keys in mgmt_load_link_keys
+Date: Tue, 24 Jun 2014 13:15:52 +0300
+Message-Id: <1403604953-19539-5-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1403604953-19539-1-git-send-email-johan.hedberg@gmail.com>
 References: <1403604953-19539-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,62 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There's no point in having boolean variables in the hci_conn struct
-since it already has a flags member. This patch converts the flush_key
-member into a proper flag.
+If support for debug keys is not enabled we should simply ignore any
+debug keys fed to us from user space using the mgmt_load_link_keys
+command.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 2 +-
- net/bluetooth/hci_event.c        | 8 ++++++--
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ net/bluetooth/mgmt.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 888911d205dc..4f70605e0399 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -394,7 +394,6 @@ struct hci_conn {
- 	__u8		remote_cap;
- 	__u8		remote_auth;
- 	__u8		remote_id;
--	bool		flush_key;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 634b44ddc9f9..49c9a4dbfd15 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2426,6 +2426,11 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	for (i = 0; i < key_count; i++) {
+ 		struct mgmt_link_key_info *key = &cp->keys[i];
  
- 	unsigned int	sent;
- 
-@@ -524,6 +523,7 @@ enum {
- 	HCI_CONN_AES_CCM,
- 	HCI_CONN_POWER_SAVE,
- 	HCI_CONN_REMOTE_OOB,
-+	HCI_CONN_FLUSH_KEY,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index c92c5a020fe7..90cba6a8293b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2159,7 +2159,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	mgmt_device_disconnected(hdev, &conn->dst, conn->type, conn->dst_type,
- 				reason, mgmt_connected);
- 
--	if (conn->type == ACL_LINK && conn->flush_key)
-+	if (conn->type == ACL_LINK &&
-+	    test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
- 		hci_remove_link_key(hdev, &conn->dst);
- 
- 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
-@@ -3145,7 +3146,10 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		list_del(&key->list);
- 		kfree(key);
- 	} else if (conn) {
--		conn->flush_key = !persistent;
-+		if (persistent)
-+			clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
-+		else
-+			set_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
++		/* Ignore debug keys if support is not enabled */
++		if (key->type == HCI_LK_DEBUG_COMBINATION &&
++		    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->flags))
++			continue;
++
+ 		hci_add_link_key(hdev, NULL, &key->addr.bdaddr, key->val,
+ 				 key->type, key->pin_len, NULL);
  	}
- 
- unlock:
 -- 
 1.9.3
 
