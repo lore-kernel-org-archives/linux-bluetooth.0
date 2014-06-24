@@ -1,49 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH 5/6] Bluetooth: Fix ignoring debug keys in mgmt_load_link_keys
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403604953-19539-5-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 24 Jun 2014 12:33:58 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F49469DF-37EF-4DAA-BEF4-B71DDB4C380D@holtmann.org>
-References: <1403604953-19539-1-git-send-email-johan.hedberg@gmail.com> <1403604953-19539-5-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 6/6] Bluetooth: Convert hcon->flush_key to a proper flag
+Date: Tue, 24 Jun 2014 13:15:53 +0300
+Message-Id: <1403604953-19539-6-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1403604953-19539-1-git-send-email-johan.hedberg@gmail.com>
+References: <1403604953-19539-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> If support for debug keys is not enabled we should simply ignore any
-> debug keys fed to us from user space using the mgmt_load_link_keys
-> command.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 5 +++++
-> 1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 634b44ddc9f9..49c9a4dbfd15 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -2426,6 +2426,11 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
-> 	for (i = 0; i < key_count; i++) {
-> 		struct mgmt_link_key_info *key = &cp->keys[i];
-> 
-> +		/* Ignore debug keys if support is not enabled */
-> +		if (key->type == HCI_LK_DEBUG_COMBINATION &&
-> +		    !test_bit(HCI_KEEP_DEBUG_KEYS, &hdev->flags))
-> +			continue;
-> +
+There's no point in having boolean variables in the hci_conn struct
+since it already has a flags member. This patch converts the flush_key
+member into a proper flag.
 
-I would just always ignore debug keys. It makes no sense to allow loading them via userspace.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 2 +-
+ net/bluetooth/hci_event.c        | 8 ++++++--
+ 2 files changed, 7 insertions(+), 3 deletions(-)
 
-The Load Link Keys command is normally only ever used once. However Set Debug Keys might change during lifetime. Which means that debug keys you load here will be removed when we switch the mode back to no debug keys allowed. Then you would need to load all keys again. That sounds like really really complicated.
-
-So my take is that we should always ignore debug keys loaded into the kernel. If you want a debug key, then pair with the device again. At least this way we know that a power cycle will always fix this, no matter what the setting of debug keys mode is.
-
-Regards
-
-Marcel
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 888911d205dc..4f70605e0399 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -394,7 +394,6 @@ struct hci_conn {
+ 	__u8		remote_cap;
+ 	__u8		remote_auth;
+ 	__u8		remote_id;
+-	bool		flush_key;
+ 
+ 	unsigned int	sent;
+ 
+@@ -524,6 +523,7 @@ enum {
+ 	HCI_CONN_AES_CCM,
+ 	HCI_CONN_POWER_SAVE,
+ 	HCI_CONN_REMOTE_OOB,
++	HCI_CONN_FLUSH_KEY,
+ };
+ 
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index c92c5a020fe7..90cba6a8293b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2159,7 +2159,8 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	mgmt_device_disconnected(hdev, &conn->dst, conn->type, conn->dst_type,
+ 				reason, mgmt_connected);
+ 
+-	if (conn->type == ACL_LINK && conn->flush_key)
++	if (conn->type == ACL_LINK &&
++	    test_bit(HCI_CONN_FLUSH_KEY, &conn->flags))
+ 		hci_remove_link_key(hdev, &conn->dst);
+ 
+ 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+@@ -3145,7 +3146,10 @@ static void hci_link_key_notify_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		list_del(&key->list);
+ 		kfree(key);
+ 	} else if (conn) {
+-		conn->flush_key = !persistent;
++		if (persistent)
++			clear_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
++		else
++			set_bit(HCI_CONN_FLUSH_KEY, &conn->flags);
+ 	}
+ 
+ unlock:
+-- 
+1.9.3
 
