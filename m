@@ -1,23 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 01/12] android/dis: Add copy to Device Info implementation
-Date: Tue, 24 Jun 2014 11:36:08 +0300
-Message-Id: <1403598979-31032-1-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFC] queue: Add queue_foreach_if
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1403598452-4391-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Tue, 24 Jun 2014 10:35:38 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FDFF8D9B-E5C8-44C2-9C14-189C02E54672@holtmann.org>
+References: <1403598452-4391-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+To: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Andrei,
 
----
- profiles/deviceinfo/deviceinfo.c => android/dis.c | 0
- 1 file changed, 0 insertions(+), 0 deletions(-)
- copy profiles/deviceinfo/deviceinfo.c => android/dis.c (100%)
+> Function allows to search for a second level queue inside first level
+> queue. In the current implementation since head is hidden this is not
+> possible.
 
-diff --git a/profiles/deviceinfo/deviceinfo.c b/android/dis.c
-similarity index 100%
-copy from profiles/deviceinfo/deviceinfo.c
-copy to android/dis.c
--- 
-1.9.3
+this is not something we want in a generic helper. This is a specific case and better model that on top of queue and not within it. Queues of queues are not a thing.
+
+Regards
+
+Marcel
 
