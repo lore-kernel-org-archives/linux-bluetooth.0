@@ -1,33 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 09/11] android/health: Add actual error message to error print
-Date: Tue, 24 Jun 2014 15:12:00 +0300
-Message-Id: <1403611922-26901-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 01/11] android/hal-health: trivial: Correct coding style
+Date: Tue, 24 Jun 2014 15:11:52 +0300
+Message-Id: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/hal-health.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index c4df17a..2613ca6 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1285,7 +1285,7 @@ static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
+diff --git a/android/hal-health.c b/android/hal-health.c
+index ac6e87f..0d9136d 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -116,8 +116,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 	cmd->len = off;
+ 	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
+ 						sizeof(*cmd) + cmd->len, buf,
+-							&rsp_len, &rsp, NULL);
+-
++						&rsp_len, &rsp, NULL);
+ 	if (status != BT_STATUS_SUCCESS)
+ 		return status;
  
- 	ret = set_mcl_cb(channel->dev->mcl, channel->dev, &gerr);
- 	if (!ret) {
--		error("health: error setting mdl callbacks on mcl");
-+		error("health: error setting mdl callbacks: %s", gerr->message);
- 		g_error_free(gerr);
- 		goto fail;
- 	}
 -- 
 1.8.3.2
 
