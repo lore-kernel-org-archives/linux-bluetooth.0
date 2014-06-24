@@ -4,9 +4,9 @@ Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
 Subject: Re: [PATCH 6/6] Bluetooth: Convert hcon->flush_key to a proper flag
 From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1403604953-19539-6-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 24 Jun 2014 12:38:54 +0200
+Date: Tue, 24 Jun 2014 12:38:45 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F745A30C-F191-441A-8B7F-B743CC9D66A1@holtmann.org>
+Message-Id: <ED2C4AD6-F4FA-492B-AE85-B7B8398D297A@holtmann.org>
 References: <1403604953-19539-1-git-send-email-johan.hedberg@gmail.com> <1403604953-19539-6-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
