@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/11] android/health: Fix missing error check
-Date: Tue, 24 Jun 2014 15:11:55 +0300
-Message-Id: <1403611922-26901-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 03/11] android/health: Fix possible overflow
+Date: Tue, 24 Jun 2014 15:11:54 +0300
+Message-Id: <1403611922-26901-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,40 +12,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/mcap-lib.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ android/mcap-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/android/mcap-lib.c b/android/mcap-lib.c
-index 346688e..2a86416 100644
+index be9ce79..346688e 100644
 --- a/android/mcap-lib.c
 +++ b/android/mcap-lib.c
-@@ -2654,12 +2654,14 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
+@@ -2357,7 +2357,7 @@ void mcap_sync_stop(struct mcap_mcl *mcl)
  
- 	while (latency > caps(mcl)->preempt_thresh && --retry >= 0) {
+ static uint64_t time_us(struct timespec *tv)
+ {
+-	return tv->tv_sec * 1000000 + tv->tv_nsec / 1000;
++	return tv->tv_sec * 1000000ll + tv->tv_nsec / 1000ll;
+ }
  
--		clock_gettime(CLK, &t0);
-+		if (clock_gettime(CLK, &t0) < 0)
-+			return FALSE;
- 
- 		if (!read_btclock(mcl, btclock, &btres))
- 			continue;
- 
--		clock_gettime(CLK, base_time);
-+		if (clock_gettime(CLK, base_time) < 0)
-+			return FALSE;
- 
- 		/*
- 		 * Tries to detect preemption between clock_gettime
-@@ -2668,6 +2670,9 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
- 		latency = time_us(base_time) - time_us(&t0);
- 	}
- 
-+	if (retry < 0)
-+		return FALSE;
-+
- 	*timestamp = mcap_get_timestamp(mcl, base_time);
- 
- 	return TRUE;
+ static int64_t bt2us(int bt)
 -- 
 1.8.3.2
 
