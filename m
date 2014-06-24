@@ -1,173 +1,136 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLyJ_BB0z5+=GRYxqaLkTfkRV5C24sPbg4bmH+Ho0nD6g@mail.gmail.com>
-References: <CAGXr9JHWb+Gg=Xnm-Nx5iQ3=DK_4fTtFCeR35WpVmcsYhj5=1g@mail.gmail.com>
-	<CABBYNZLyJ_BB0z5+=GRYxqaLkTfkRV5C24sPbg4bmH+Ho0nD6g@mail.gmail.com>
-Date: Tue, 24 Jun 2014 17:44:41 -0700
-Message-ID: <CAGXr9JHMO5tdy1HH2wX0X4=kB2hE-_b_bwt5WJ6yL0DCNhZN4Q@mail.gmail.com>
-Subject: Re: BlueZ 5.19: BLE HoG device reconnect issues
-From: Petri Gynther <pgynther@google.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Date: Tue, 24 Jun 2014 23:53:50 +0200
+Message-ID: <CAA7pwKPXFO3cAHSCkwk8xqbPrshquOimBvtx=FHF4idYncJsVQ@mail.gmail.com>
+Subject: Bluetooth: hci0 failed to open Intel firmware file: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq(-11)
+From: Patrik Lundquist <patrik.lundquist@gmail.com>
+To: linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi,
 
-On Tue, Jun 24, 2014 at 4:48 AM, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
-> Hi Petri,
->
-> On Tue, Jun 24, 2014 at 3:37 AM, Petri Gynther <pgynther@google.com> wrote:
->> With BlueZ 5.19 stack and BLE HoG remote controls, I'm seeing 3
->> different issues when trying to reconnect a previously paired BLE HoG
->> remote control:
->>
->> Full log:
->> [72241.012] bluez: bluetoothd[29263]:
->> src/adapter.c:discovering_callback() hci0 type 6 discovering 1
->> [72251.269] bluez: bluetoothd[29263]:
->> src/adapter.c:device_found_callback() hci0 addr 88:33:14:E6:XX:XX,
->> rssi -81 flags 0x0000 eir_len 16
->> [72251.270] bluez: bluetoothd[29263]: src/device.c:device_set_legacy() legacy 0
->> [72251.270] bluez: bluetoothd[29263]: src/adapter.c:stop_passive_scanning()
->> [72251.270] bluez: bluetoothd[29263]:
->> src/adapter.c:discovering_callback() hci0 type 6 discovering 0
->> [72251.270] bluez: bluetoothd[29263]:
->> src/adapter.c:trigger_passive_scanning()
->> [72251.270] bluez: bluetoothd[29263]:
->> src/adapter.c:stop_passive_scanning_complete() status 0x0b (Rejected)
->> [72251.270] bluez: bluetoothd[29263]: Stopping passive scanning failed: Rejected
->> [72255.015] bluez: bluetoothd[29263]:
->> src/adapter.c:passive_scanning_complete() status 0x00
->> [72255.015] bluez: bluetoothd[29263]:
->> src/adapter.c:discovering_callback() hci0 type 6 discovering 1
->> [72258.550] bluez: bluetoothd[29263]:
->> src/adapter.c:device_found_callback() hci0 addr 88:33:14:E6:XX:XX,
->> rssi -76 flags 0x0000 eir_len 16
->> [72258.551] bluez: bluetoothd[29263]: src/device.c:device_set_legacy() legacy 0
->> [72258.551] bluez: bluetoothd[29263]: src/adapter.c:stop_passive_scanning()
->> [72258.551] bluez: bluetoothd[29263]:
->> src/adapter.c:device_found_callback() hci0 addr CB:36:E5:F5:XX:XX,
->> rssi -82 flags 0x0000 eir_len 36
->> [72258.558] bluez: bluetoothd[29263]:
->> src/adapter.c:stop_passive_scanning_complete() status 0x00 (Success)
->> [72258.558] bluez: bluetoothd[29263]: src/device.c:device_connect_le()
->> Connection attempt to: 88:33:14:E6:XX:XX
->> [72258.558] bluez: bluetoothd[29263]:
->> src/adapter.c:discovering_callback() hci0 type 6 discovering 0
->> [72278.629] bluez: bluetoothd[29263]:
->> src/adapter.c:connect_failed_callback() hci0 88:33:14:E6:XX:XX status
->> 2
->> [72278.629] bluez: bluetoothd[29263]: plugins/policy.c:conn_fail_cb() status 2
->> [72278.629] bluez: bluetoothd[29263]:
->> src/adapter.c:bonding_attempt_complete() hci0 bdaddr 88:33:14:E6:XX:XX
->> type 1 status 0x2
->> [72278.629] bluez: bluetoothd[29263]:
->> src/device.c:device_bonding_complete() bonding (nil) status 0x02
->> [72278.629] bluez: bluetoothd[29263]:
->> src/device.c:device_bonding_failed() status 2
->> [72278.629] bluez: bluetoothd[29263]: src/adapter.c:resume_discovery()
->> [72278.629] bluez: bluetoothd[29263]: src/device.c:att_connect_cb()
->> connect error: Transport endpoint is not connected (134)
->> [72278.629] bluez: bluetoothd[29263]: src/device.c:att_error_cb()
->> Enabling automatic connections
->> [72278.630] bluez: bluetoothd[29263]:
->> src/adapter.c:adapter_connect_list_add() ignoring already added device
->> /org/bluez/hci0/dev_88_33_14_E6_XX_XX
->>
->> Issues 1 and 2:
->> [72251.270] bluez: bluetoothd[29263]: src/adapter.c:stop_passive_scanning()
->> [72251.270] bluez: bluetoothd[29263]:
->> src/adapter.c:discovering_callback() hci0 type 6 discovering 0
->> [72251.270] bluez: bluetoothd[29263]:
->> src/adapter.c:trigger_passive_scanning()
->> [72251.270] bluez: bluetoothd[29263]:
->> src/adapter.c:stop_passive_scanning_complete() status 0x0b (Rejected)
->> [72251.270] bluez: bluetoothd[29263]: Stopping passive scanning failed: Rejected
->>
->> 1) device_found_callback() -> update_found_devices() ->
->> stop_passive_scanning() needs to stop passive scanning because BlueZ
->> is about to connect to previously paired BLE device. But,
->> discovering_callback() doesn't take the pending BLE connection into
->> account and still calls trigger_passive_scanning() when it shouldn't.
->>
->> 2) stop_passive_scanning() can actually fail because passive scanning
->> was already stopped in kernel due to passive scan timer expiring. But,
->> stop_passive_scanning_complete() handles the Reject case as an error
->> and never attempts the pending BLE connection in that case.
->>
->> Issue 3:
->> [72278.629] bluez: bluetoothd[29263]: src/device.c:att_connect_cb()
->> connect error: Transport endpoint is not connected (134)
->> [72278.629] bluez: bluetoothd[29263]: src/device.c:att_error_cb()
->> Enabling automatic connections
->> [72278.630] bluez: bluetoothd[29263]:
->> src/adapter.c:adapter_connect_list_add() ignoring already added device
->> /org/bluez/hci0/dev_88_33_14_E6_XX_XX
->>
->> If there is an error connecting to BLE device, att_error_cb() adds the
->> failed device back to adapter connect list, but if it is already
->> there, no code actually calls trigger_passive_scanning(). So, from
->> this point on, no BLE device is ever going to reconnect back to BlueZ,
->> because the passive scanning is disabled and nothing will re-enable
->> it.
->>
->>
->> Here is my proposed diff for fixing these issues:
->> @@ -1228,7 +1228,7 @@ static void
->> stop_passive_scanning_complete(uint8_t status, uint16_t length,
->>         dev = adapter->connect_le;
->>         adapter->connect_le = NULL;
->>
->> -       if (status != MGMT_STATUS_SUCCESS) {
->> +       if (status != MGMT_STATUS_SUCCESS && status != MGMT_STATUS_REJECTED) {
->>                 error("Stopping passive scanning failed: %s",
->>                                                         mgmt_errstr(status));
->>                 return;
->>
->> @@ -1500,6 +1500,10 @@ static void discovering_callback(uint16_t
->> index, uint16_t length,
->>          * passive scanning attempt.
->>          */
->>         if (!adapter->discovery_list) {
->> +               if (adapter->connect_le) {
->> +                       DBG("LE connect pending, skip
->> trigger_passive_scanning");
->> +                       return;
->> +               }
->>                 trigger_passive_scanning(adapter);
->>                 return;
->>         }
->>
->> @@ -3675,6 +3676,7 @@ static void att_error_cb(const GError *gerr,
->> gpointer user_data)
->>         if (device_get_auto_connect(device)) {
->>                 DBG("Enabling automatic connections");
->>                 adapter_connect_list_add(device->adapter, device);
->> +               trigger_passive_scanning(device->adapter);
->>         }
->>  }
->>
->>
->> Let me know if this looks good. I'll then e-mail proper patch for review.
->
-> Haven't tested it yet but has this code been changed recently? I
-> wonder how does 5.20 behave in this regard since I did change some
-> parts of uHID implementation but not the scanning logic. Anyway in
-> future we will be changing the scanning logic and let the kernel do
-> the scanning (real passive scanning and perhaps whitelist) for us but
-> in the meantime it is good to have this fixed if still reproducible
-> with 5.20.
+the Bluetooth firmware sometimes fail to load during hci_power_on with
+an Intel 7260 in a ThinkPad X240. Running Ubuntu 14.04 but with their
+mainline kernel 3.15.1-031501-generic. Fails maybe one out of ten
+times when resuming from standby.
 
-I just tested with BlueZ 5.20, and I'm seeing the same 3 issues. I'll
-e-mail patches shortly. I'll fix issue #3 inside
-adapter_connect_list_add(), instead of modifying att_error_cb().
+Not sure if it's a Bluetooth bug or another part of the kernel. Do you
+want me to file a bug report in the kernel Bugzilla?
 
--- Petri
+/Patrik
 
->
->
-> --
-> Luiz Augusto von Dentz
+
+[ 4960.609125] Bluetooth: hci0: read Intel version: 370710018002030d00
+[ 4960.609219] Bluetooth: hci0: Intel Bluetooth firmware file:
+intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
+[ 4960.721239] Bluetooth: hci0: Intel Bluetooth firmware patch
+completed and activated
+
+[suspend/resume]
+
+[ 5802.489224] Bluetooth: hci0: read Intel version: 370710018002030d00
+[ 5802.489233] ------------[ cut here ]------------
+[ 5802.489240] WARNING: CPU: 2 PID: 615 at
+/home/apw/COD/linux/drivers/base/firmware_class.c:1105
+_request_firmware+0x1be/0x1e0()
+[ 5802.489241] Modules linked in: ctr ccm arc4 rfcomm bnep intel_rapl
+iwlmvm thinkpad_acpi mac80211 nvram x86_pkg_temp_thermal
+intel_powerclamp coretemp snd_hda_codec_hdmi snd_seq_midi
+snd_hda_codec_realtek kvm_intel snd_seq_midi_event
+snd_hda_codec_generic kvm snd_rawmidi snd_hda_intel snd_hda_controller
+iwlwifi btusb snd_hda_codec bluetooth nls_iso8859_1 snd_hwdep snd_seq
+snd_pcm joydev serio_raw cfg80211 6lowpan_iphc rtsx_pci_ms
+snd_seq_device lpc_ich memstick snd_timer snd soundcore parport_pc
+ppdev intel_smartconnect lp mac_hid parport dm_crypt rtsx_pci_sdmmc
+crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel
+aes_x86_64 lrw gf128mul glue_helper i915 ablk_helper cryptd psmouse
+i2c_algo_bit e1000e drm_kms_helper ahci libahci drm rtsx_pci ptp
+pps_core wmi video
+[ 5802.489291] CPU: 2 PID: 615 Comm: kworker/u17:2 Not tainted
+3.15.1-031501-generic #201406161841
+[ 5802.489292] Hardware name: LENOVO 20AM009DMS/20AM009DMS, BIOS
+GIET74WW (2.24 ) 05/13/2014
+[ 5802.489307] Workqueue: hci0 hci_power_on [bluetooth]
+[ 5802.489309]  0000000000000451 ffff8802314ebb48 ffffffff8176e144
+0000000000000007
+[ 5802.489312]  0000000000000000 ffff8802314ebb88 ffffffff8106ce2c
+0000000000000000
+[ 5802.489314]  ffff8802314ebc68 ffff8800a2b11a88 0000000000003a98
+0000000000000005
+[ 5802.489317] Call Trace:
+[ 5802.489323]  [<ffffffff8176e144>] dump_stack+0x46/0x58
+[ 5802.489326]  [<ffffffff8106ce2c>] warn_slowpath_common+0x8c/0xc0
+[ 5802.489328]  [<ffffffff8106ce7a>] warn_slowpath_null+0x1a/0x20
+[ 5802.489331]  [<ffffffff814c75ae>] _request_firmware+0x1be/0x1e0
+[ 5802.489334]  [<ffffffff814c76cc>] request_firmware+0x3c/0x60
+[ 5802.489339]  [<ffffffffa03f1bd2>] btusb_setup_intel_get_fw+0x92/0x160 [btusb]
+[ 5802.489342]  [<ffffffffa03f2877>] btusb_setup_intel+0x127/0x450 [btusb]
+[ 5802.489347]  [<ffffffff81572450>] ? usb_autopm_put_interface+0x30/0x40
+[ 5802.489356]  [<ffffffffa0387fc5>] hci_dev_do_open+0x245/0x330 [bluetooth]
+[ 5802.489365]  [<ffffffffa03880ee>] hci_power_on+0x3e/0x160 [bluetooth]
+[ 5802.489369]  [<ffffffff8108935f>] process_one_work+0x17f/0x4c0
+[ 5802.489372]  [<ffffffff8108a57b>] worker_thread+0x11b/0x3d0
+[ 5802.489375]  [<ffffffff8108a460>] ? manage_workers.isra.21+0x190/0x190
+[ 5802.489377]  [<ffffffff810913c9>] kthread+0xc9/0xe0
+[ 5802.489380]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
+[ 5802.489384]  [<ffffffff817845bc>] ret_from_fork+0x7c/0xb0
+[ 5802.489386]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
+[ 5802.489388] ---[ end trace 82f5306631f275cf ]---
+[ 5802.489392] bluetooth hci0: firmware:
+intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq will not be loaded
+[ 5802.489396] Bluetooth: hci0 failed to open Intel firmware file:
+intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq(-11)
+[ 5802.489398] ------------[ cut here ]------------
+[ 5802.489402] WARNING: CPU: 2 PID: 615 at
+/home/apw/COD/linux/drivers/base/firmware_class.c:1105
+_request_firmware+0x1be/0x1e0()
+[ 5802.489403] Modules linked in: ctr ccm arc4 rfcomm bnep intel_rapl
+iwlmvm thinkpad_acpi mac80211 nvram x86_pkg_temp_thermal
+intel_powerclamp coretemp snd_hda_codec_hdmi snd_seq_midi
+snd_hda_codec_realtek kvm_intel snd_seq_midi_event
+snd_hda_codec_generic kvm snd_rawmidi snd_hda_intel snd_hda_controller
+iwlwifi btusb snd_hda_codec bluetooth nls_iso8859_1 snd_hwdep snd_seq
+snd_pcm joydev serio_raw cfg80211 6lowpan_iphc rtsx_pci_ms
+snd_seq_device lpc_ich memstick snd_timer snd soundcore parport_pc
+ppdev intel_smartconnect lp mac_hid parport dm_crypt rtsx_pci_sdmmc
+crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel
+aes_x86_64 lrw gf128mul glue_helper i915 ablk_helper cryptd psmouse
+i2c_algo_bit e1000e drm_kms_helper ahci libahci drm rtsx_pci ptp
+pps_core wmi video
+[ 5802.489439] CPU: 2 PID: 615 Comm: kworker/u17:2 Tainted: G        W
+    3.15.1-031501-generic #201406161841
+[ 5802.489441] Hardware name: LENOVO 20AM009DMS/20AM009DMS, BIOS
+GIET74WW (2.24 ) 05/13/2014
+[ 5802.489449] Workqueue: hci0 hci_power_on [bluetooth]
+[ 5802.489451]  0000000000000451 ffff8802314ebb48 ffffffff8176e144
+0000000000000007
+[ 5802.489453]  0000000000000000 ffff8802314ebb88 ffffffff8106ce2c
+0000000000000000
+[ 5802.489456]  ffff8802314ebc68 ffff8800a2b11a88 0000000000003a98
+0000000000000005
+[ 5802.489458] Call Trace:
+[ 5802.489462]  [<ffffffff8176e144>] dump_stack+0x46/0x58
+[ 5802.489464]  [<ffffffff8106ce2c>] warn_slowpath_common+0x8c/0xc0
+[ 5802.489466]  [<ffffffff8106ce7a>] warn_slowpath_null+0x1a/0x20
+[ 5802.489469]  [<ffffffff814c75ae>] _request_firmware+0x1be/0x1e0
+[ 5802.489472]  [<ffffffff814c76cc>] request_firmware+0x3c/0x60
+[ 5802.489476]  [<ffffffffa03f1c5c>]
+btusb_setup_intel_get_fw+0x11c/0x160 [btusb]
+[ 5802.489480]  [<ffffffffa03f2877>] btusb_setup_intel+0x127/0x450 [btusb]
+[ 5802.489483]  [<ffffffff81572450>] ? usb_autopm_put_interface+0x30/0x40
+[ 5802.489491]  [<ffffffffa0387fc5>] hci_dev_do_open+0x245/0x330 [bluetooth]
+[ 5802.489500]  [<ffffffffa03880ee>] hci_power_on+0x3e/0x160 [bluetooth]
+[ 5802.489503]  [<ffffffff8108935f>] process_one_work+0x17f/0x4c0
+[ 5802.489505]  [<ffffffff8108a57b>] worker_thread+0x11b/0x3d0
+[ 5802.489508]  [<ffffffff8108a460>] ? manage_workers.isra.21+0x190/0x190
+[ 5802.489511]  [<ffffffff810913c9>] kthread+0xc9/0xe0
+[ 5802.489513]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
+[ 5802.489516]  [<ffffffff817845bc>] ret_from_fork+0x7c/0xb0
+[ 5802.489518]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
+[ 5802.489519] ---[ end trace 82f5306631f275d0 ]---
+[ 5802.489522] bluetooth hci0: firmware: intel/ibt-hw-37.7.bseq will
+not be loaded
+[ 5802.489523] Bluetooth: hci0 failed to open default Intel fw file:
+intel/ibt-hw-37.7.bseq
