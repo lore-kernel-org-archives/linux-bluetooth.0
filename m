@@ -1,136 +1,192 @@
 Return-Path: <cyrus@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2 1/7] android/bluetooth: Add helper for finding device with android address
+Date: Tue, 24 Jun 2014 22:45:29 +0200
+Message-ID: <1850993.QsL8CxT3Rs@athlon>
+In-Reply-To: <1403533714-5188-1-git-send-email-szymon.janc@tieto.com>
+References: <1403533714-5188-1-git-send-email-szymon.janc@tieto.com>
 MIME-Version: 1.0
-Date: Tue, 24 Jun 2014 23:53:50 +0200
-Message-ID: <CAA7pwKPXFO3cAHSCkwk8xqbPrshquOimBvtx=FHF4idYncJsVQ@mail.gmail.com>
-Subject: Bluetooth: hci0 failed to open Intel firmware file: intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq(-11)
-From: Patrik Lundquist <patrik.lundquist@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+On Monday 23 June 2014 16:28:28 Szymon Janc wrote:
+> ---
+>  android/bluetooth.c | 67
+> ++++++++++++++++++++++++++++++----------------------- 1 file changed, 38
+> insertions(+), 29 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index fc5d529..d42fe8c 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -477,6 +477,24 @@ static struct device *get_device(const bdaddr_t
+> *bdaddr, uint8_t type) return dev;
+>  }
+> 
+> +static struct device *find_device_android(const uint8_t *addr)
+> +{
+> +	bdaddr_t bdaddr;
+> +
+> +	android2bdaddr(addr, &bdaddr);
+> +
+> +	return find_device(&bdaddr);
+> +}
+> +
+> +static struct device *get_device_android(const uint8_t *addr)
+> +{
+> +	bdaddr_t bdaddr;
+> +
+> +	android2bdaddr(addr, &bdaddr);
+> +
+> +	return get_device(&bdaddr, BDADDR_BREDR);
+> +}
+> +
+>  static  void send_adapter_property(uint8_t type, uint16_t len, const void
+> *val) {
+>  	uint8_t buf[BASELEN_PROP_CHANGED + len];
+> @@ -3865,13 +3883,11 @@ static void handle_create_bond_cmd(const void *buf,
+> uint16_t len) uint8_t status;
+>  	struct mgmt_cp_pair_device cp;
+> 
+> -	cp.io_cap = DEFAULT_IO_CAPABILITY;
+> -	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+> -
+> -	/* type is used only as fallback when device is not in cache */
+> -	dev = get_device(&cp.addr.bdaddr, BDADDR_BREDR);
+> +	dev = get_device_android(cmd->bdaddr);
+> 
+> +	cp.io_cap = DEFAULT_IO_CAPABILITY;
+>  	cp.addr.type = select_device_bearer(dev);
+> +	bacpy(&cp.addr.bdaddr, &dev->bdaddr);
+> 
+>  	if (device_is_paired(dev, cp.addr.type)) {
+>  		status = HAL_STATUS_FAILED;
+> @@ -3901,15 +3917,14 @@ static void handle_cancel_bond_cmd(const void *buf,
+> uint16_t len) struct device *dev;
+>  	uint8_t status;
+> 
+> -	android2bdaddr(cmd->bdaddr, &cp.bdaddr);
+> -
+> -	dev = find_device(&cp.bdaddr);
+> +	dev = find_device_android(cmd->bdaddr);
+>  	if (!dev) {
+>  		status = HAL_STATUS_FAILED;
+>  		goto failed;
+>  	}
+> 
+>  	cp.type = select_device_bearer(dev);
+> +	bacpy(&cp.bdaddr, &dev->bdaddr);
+> 
+>  	if (mgmt_reply(mgmt_if, MGMT_OP_CANCEL_PAIR_DEVICE,
+>  					adapter.index, sizeof(cp), &cp,
+> @@ -3951,15 +3966,15 @@ static void handle_remove_bond_cmd(const void *buf,
+> uint16_t len) struct device *dev;
+>  	uint8_t status;
+> 
+> -	cp.disconnect = 1;
+> -	android2bdaddr(cmd->bdaddr, &cp.addr.bdaddr);
+> -
+> -	dev = find_device(&cp.addr.bdaddr);
+> +	dev = find_device_android(cmd->bdaddr);
+>  	if (!dev) {
+>  		status = HAL_STATUS_FAILED;
+>  		goto failed;
+>  	}
+> 
+> +	cp.disconnect = 1;
+> +	bacpy(&cp.addr.bdaddr, &dev->bdaddr);
+> +
+>  	if (dev->le_paired) {
+>  		cp.addr.type = dev->bdaddr_type;
+> 
+> @@ -4098,24 +4113,27 @@ static uint8_t user_passkey_reply(const bdaddr_t
+> *bdaddr, bool accept, static void handle_ssp_reply_cmd(const void *buf,
+> uint16_t len)
+>  {
+>  	const struct hal_cmd_ssp_reply *cmd = buf;
+> -	bdaddr_t bdaddr;
+> +	struct device *dev;
+>  	uint8_t status;
+>  	char addr[18];
+> 
+>  	/* TODO should parameters sanity be verified here? */
+> 
+> -	android2bdaddr(cmd->bdaddr, &bdaddr);
+> -	ba2str(&bdaddr, addr);
+> +	dev = find_device_android(cmd->bdaddr);
+> +	if (!dev)
+> +		return;
+> +
+> +	ba2str(&dev->bdaddr, addr);
+> 
+>  	DBG("%s variant %u accept %u", addr, cmd->ssp_variant, cmd->accept);
+> 
+>  	switch (cmd->ssp_variant) {
+>  	case HAL_SSP_VARIANT_CONFIRM:
+>  	case HAL_SSP_VARIANT_CONSENT:
+> -		status = user_confirm_reply(&bdaddr, cmd->accept);
+> +		status = user_confirm_reply(&dev->bdaddr, cmd->accept);
+>  		break;
+>  	case HAL_SSP_VARIANT_ENTRY:
+> -		status = user_passkey_reply(&bdaddr, cmd->accept,
+> +		status = user_passkey_reply(&dev->bdaddr, cmd->accept,
+>  								cmd->passkey);
+>  		break;
+>  	case HAL_SSP_VARIANT_NOTIF:
+> @@ -4355,11 +4373,8 @@ static void handle_get_remote_device_props_cmd(const
+> void *buf, uint16_t len) const struct hal_cmd_get_remote_device_props *cmd
+> = buf;
+>  	struct device *dev;
+>  	uint8_t status;
+> -	bdaddr_t addr;
+> -
+> -	android2bdaddr(cmd->bdaddr, &addr);
+> 
+> -	dev = find_device(&addr);
+> +	dev = find_device_android(cmd->bdaddr);
+>  	if (!dev) {
+>  		status = HAL_STATUS_INVALID;
+>  		goto failed;
+> @@ -4379,11 +4394,8 @@ static void handle_get_remote_device_prop_cmd(const
+> void *buf, uint16_t len) const struct hal_cmd_get_remote_device_prop *cmd =
+> buf;
+>  	struct device *dev;
+>  	uint8_t status;
+> -	bdaddr_t addr;
+> -
+> -	android2bdaddr(cmd->bdaddr, &addr);
+> 
+> -	dev = find_device(&addr);
+> +	dev = find_device_android(cmd->bdaddr);
+>  	if (!dev) {
+>  		status = HAL_STATUS_INVALID;
+>  		goto failed;
+> @@ -4461,7 +4473,6 @@ static void handle_set_remote_device_prop_cmd(const
+> void *buf, uint16_t len) const struct hal_cmd_set_remote_device_prop *cmd =
+> buf;
+>  	struct device *dev;
+>  	uint8_t status;
+> -	bdaddr_t addr;
+> 
+>  	if (len != sizeof(*cmd) + cmd->len) {
+>  		error("Invalid set remote device prop cmd (0x%x), terminating",
+> @@ -4470,9 +4481,7 @@ static void handle_set_remote_device_prop_cmd(const
+> void *buf, uint16_t len) return;
+>  	}
+> 
+> -	android2bdaddr(cmd->bdaddr, &addr);
+> -
+> -	dev = find_device(&addr);
+> +	dev = find_device_android(cmd->bdaddr);
+>  	if (!dev) {
+>  		status = HAL_STATUS_INVALID;
+>  		goto failed;
 
-the Bluetooth firmware sometimes fail to load during hci_power_on with
-an Intel 7260 in a ThinkPad X240. Running Ubuntu 14.04 but with their
-mainline kernel 3.15.1-031501-generic. Fails maybe one out of ten
-times when resuming from standby.
+Applied.
 
-Not sure if it's a Bluetooth bug or another part of the kernel. Do you
-want me to file a bug report in the kernel Bugzilla?
-
-/Patrik
-
-
-[ 4960.609125] Bluetooth: hci0: read Intel version: 370710018002030d00
-[ 4960.609219] Bluetooth: hci0: Intel Bluetooth firmware file:
-intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
-[ 4960.721239] Bluetooth: hci0: Intel Bluetooth firmware patch
-completed and activated
-
-[suspend/resume]
-
-[ 5802.489224] Bluetooth: hci0: read Intel version: 370710018002030d00
-[ 5802.489233] ------------[ cut here ]------------
-[ 5802.489240] WARNING: CPU: 2 PID: 615 at
-/home/apw/COD/linux/drivers/base/firmware_class.c:1105
-_request_firmware+0x1be/0x1e0()
-[ 5802.489241] Modules linked in: ctr ccm arc4 rfcomm bnep intel_rapl
-iwlmvm thinkpad_acpi mac80211 nvram x86_pkg_temp_thermal
-intel_powerclamp coretemp snd_hda_codec_hdmi snd_seq_midi
-snd_hda_codec_realtek kvm_intel snd_seq_midi_event
-snd_hda_codec_generic kvm snd_rawmidi snd_hda_intel snd_hda_controller
-iwlwifi btusb snd_hda_codec bluetooth nls_iso8859_1 snd_hwdep snd_seq
-snd_pcm joydev serio_raw cfg80211 6lowpan_iphc rtsx_pci_ms
-snd_seq_device lpc_ich memstick snd_timer snd soundcore parport_pc
-ppdev intel_smartconnect lp mac_hid parport dm_crypt rtsx_pci_sdmmc
-crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel
-aes_x86_64 lrw gf128mul glue_helper i915 ablk_helper cryptd psmouse
-i2c_algo_bit e1000e drm_kms_helper ahci libahci drm rtsx_pci ptp
-pps_core wmi video
-[ 5802.489291] CPU: 2 PID: 615 Comm: kworker/u17:2 Not tainted
-3.15.1-031501-generic #201406161841
-[ 5802.489292] Hardware name: LENOVO 20AM009DMS/20AM009DMS, BIOS
-GIET74WW (2.24 ) 05/13/2014
-[ 5802.489307] Workqueue: hci0 hci_power_on [bluetooth]
-[ 5802.489309]  0000000000000451 ffff8802314ebb48 ffffffff8176e144
-0000000000000007
-[ 5802.489312]  0000000000000000 ffff8802314ebb88 ffffffff8106ce2c
-0000000000000000
-[ 5802.489314]  ffff8802314ebc68 ffff8800a2b11a88 0000000000003a98
-0000000000000005
-[ 5802.489317] Call Trace:
-[ 5802.489323]  [<ffffffff8176e144>] dump_stack+0x46/0x58
-[ 5802.489326]  [<ffffffff8106ce2c>] warn_slowpath_common+0x8c/0xc0
-[ 5802.489328]  [<ffffffff8106ce7a>] warn_slowpath_null+0x1a/0x20
-[ 5802.489331]  [<ffffffff814c75ae>] _request_firmware+0x1be/0x1e0
-[ 5802.489334]  [<ffffffff814c76cc>] request_firmware+0x3c/0x60
-[ 5802.489339]  [<ffffffffa03f1bd2>] btusb_setup_intel_get_fw+0x92/0x160 [btusb]
-[ 5802.489342]  [<ffffffffa03f2877>] btusb_setup_intel+0x127/0x450 [btusb]
-[ 5802.489347]  [<ffffffff81572450>] ? usb_autopm_put_interface+0x30/0x40
-[ 5802.489356]  [<ffffffffa0387fc5>] hci_dev_do_open+0x245/0x330 [bluetooth]
-[ 5802.489365]  [<ffffffffa03880ee>] hci_power_on+0x3e/0x160 [bluetooth]
-[ 5802.489369]  [<ffffffff8108935f>] process_one_work+0x17f/0x4c0
-[ 5802.489372]  [<ffffffff8108a57b>] worker_thread+0x11b/0x3d0
-[ 5802.489375]  [<ffffffff8108a460>] ? manage_workers.isra.21+0x190/0x190
-[ 5802.489377]  [<ffffffff810913c9>] kthread+0xc9/0xe0
-[ 5802.489380]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
-[ 5802.489384]  [<ffffffff817845bc>] ret_from_fork+0x7c/0xb0
-[ 5802.489386]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
-[ 5802.489388] ---[ end trace 82f5306631f275cf ]---
-[ 5802.489392] bluetooth hci0: firmware:
-intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq will not be loaded
-[ 5802.489396] Bluetooth: hci0 failed to open Intel firmware file:
-intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq(-11)
-[ 5802.489398] ------------[ cut here ]------------
-[ 5802.489402] WARNING: CPU: 2 PID: 615 at
-/home/apw/COD/linux/drivers/base/firmware_class.c:1105
-_request_firmware+0x1be/0x1e0()
-[ 5802.489403] Modules linked in: ctr ccm arc4 rfcomm bnep intel_rapl
-iwlmvm thinkpad_acpi mac80211 nvram x86_pkg_temp_thermal
-intel_powerclamp coretemp snd_hda_codec_hdmi snd_seq_midi
-snd_hda_codec_realtek kvm_intel snd_seq_midi_event
-snd_hda_codec_generic kvm snd_rawmidi snd_hda_intel snd_hda_controller
-iwlwifi btusb snd_hda_codec bluetooth nls_iso8859_1 snd_hwdep snd_seq
-snd_pcm joydev serio_raw cfg80211 6lowpan_iphc rtsx_pci_ms
-snd_seq_device lpc_ich memstick snd_timer snd soundcore parport_pc
-ppdev intel_smartconnect lp mac_hid parport dm_crypt rtsx_pci_sdmmc
-crct10dif_pclmul crc32_pclmul ghash_clmulni_intel aesni_intel
-aes_x86_64 lrw gf128mul glue_helper i915 ablk_helper cryptd psmouse
-i2c_algo_bit e1000e drm_kms_helper ahci libahci drm rtsx_pci ptp
-pps_core wmi video
-[ 5802.489439] CPU: 2 PID: 615 Comm: kworker/u17:2 Tainted: G        W
-    3.15.1-031501-generic #201406161841
-[ 5802.489441] Hardware name: LENOVO 20AM009DMS/20AM009DMS, BIOS
-GIET74WW (2.24 ) 05/13/2014
-[ 5802.489449] Workqueue: hci0 hci_power_on [bluetooth]
-[ 5802.489451]  0000000000000451 ffff8802314ebb48 ffffffff8176e144
-0000000000000007
-[ 5802.489453]  0000000000000000 ffff8802314ebb88 ffffffff8106ce2c
-0000000000000000
-[ 5802.489456]  ffff8802314ebc68 ffff8800a2b11a88 0000000000003a98
-0000000000000005
-[ 5802.489458] Call Trace:
-[ 5802.489462]  [<ffffffff8176e144>] dump_stack+0x46/0x58
-[ 5802.489464]  [<ffffffff8106ce2c>] warn_slowpath_common+0x8c/0xc0
-[ 5802.489466]  [<ffffffff8106ce7a>] warn_slowpath_null+0x1a/0x20
-[ 5802.489469]  [<ffffffff814c75ae>] _request_firmware+0x1be/0x1e0
-[ 5802.489472]  [<ffffffff814c76cc>] request_firmware+0x3c/0x60
-[ 5802.489476]  [<ffffffffa03f1c5c>]
-btusb_setup_intel_get_fw+0x11c/0x160 [btusb]
-[ 5802.489480]  [<ffffffffa03f2877>] btusb_setup_intel+0x127/0x450 [btusb]
-[ 5802.489483]  [<ffffffff81572450>] ? usb_autopm_put_interface+0x30/0x40
-[ 5802.489491]  [<ffffffffa0387fc5>] hci_dev_do_open+0x245/0x330 [bluetooth]
-[ 5802.489500]  [<ffffffffa03880ee>] hci_power_on+0x3e/0x160 [bluetooth]
-[ 5802.489503]  [<ffffffff8108935f>] process_one_work+0x17f/0x4c0
-[ 5802.489505]  [<ffffffff8108a57b>] worker_thread+0x11b/0x3d0
-[ 5802.489508]  [<ffffffff8108a460>] ? manage_workers.isra.21+0x190/0x190
-[ 5802.489511]  [<ffffffff810913c9>] kthread+0xc9/0xe0
-[ 5802.489513]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
-[ 5802.489516]  [<ffffffff817845bc>] ret_from_fork+0x7c/0xb0
-[ 5802.489518]  [<ffffffff81091300>] ? flush_kthread_worker+0xb0/0xb0
-[ 5802.489519] ---[ end trace 82f5306631f275d0 ]---
-[ 5802.489522] bluetooth hci0: firmware: intel/ibt-hw-37.7.bseq will
-not be loaded
-[ 5802.489523] Bluetooth: hci0 failed to open default Intel fw file:
-intel/ibt-hw-37.7.bseq
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
