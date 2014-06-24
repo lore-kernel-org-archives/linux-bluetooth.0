@@ -1,31 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 01/11] android/hal-health: trivial: Correct coding style
-Date: Tue, 24 Jun 2014 15:11:52 +0300
-Message-Id: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 02/11] android/health: Remove unneeded check
+Date: Tue, 24 Jun 2014 15:11:53 +0300
+Message-Id: <1403611922-26901-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403611922-26901-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+In case of error err is always set so the check is not needed.
 ---
- android/hal-health.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ android/health.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/android/hal-health.c b/android/hal-health.c
-index ac6e87f..0d9136d 100644
---- a/android/hal-health.c
-+++ b/android/hal-health.c
-@@ -116,8 +116,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
- 	cmd->len = off;
- 	status = hal_ipc_cmd(HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_REG_APP,
- 						sizeof(*cmd) + cmd->len, buf,
--							&rsp_len, &rsp, NULL);
+diff --git a/android/health.c b/android/health.c
+index f45ae51..361e052 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -1324,10 +1324,7 @@ static void search_cb(sdp_list_t *recs, int err, gpointer data)
+ 	if (!mcap_create_mcl(mcap, &channel->dev->dst, channel->dev->ccpsm,
+ 					create_mcl_cb, channel, NULL, &gerr)) {
+ 		error("health: error creating mcl %s", gerr->message);
 -
-+						&rsp_len, &rsp, NULL);
- 	if (status != BT_STATUS_SUCCESS)
- 		return status;
+-		if (gerr)
+-			g_error_free(gerr);
+-
++		g_error_free(gerr);
+ 		goto fail;
+ 	}
  
 -- 
 1.8.3.2
