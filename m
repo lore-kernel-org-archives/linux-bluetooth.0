@@ -1,161 +1,93 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Vikrampal Yadav <vikram.pal@samsung.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 1/3] android/health: Rename matching functions
-Date: Wed, 25 Jun 2014 14:45:15 +0300
-Message-Id: <1403696717-32664-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Cc: d.kasatkin@samsung.com, p.sinha@samsung.com, sanjay.nm@samsung.com,
+	bharat.panda@samsung.com, vikram.pal@samsung.com
+Subject: [PATCH ] tools: Fix memory related stuffs
+Date: Wed, 25 Jun 2014 15:47:36 +0530
+Message-id: <1403691456-15688-1-git-send-email-vikram.pal@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Handle memory (de)allocation scenarios.
 ---
- android/health.c | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ tools/hciattach_ath3k.c |  2 ++
+ tools/sdptool.c         | 25 ++++++++++++++++++++++---
+ 2 files changed, 24 insertions(+), 3 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index f45ae51..07bfa77 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -229,7 +229,7 @@ static void free_health_app(void *data)
- 	free(app);
- }
+diff --git a/tools/hciattach_ath3k.c b/tools/hciattach_ath3k.c
+index 23208c6..058def0 100644
+--- a/tools/hciattach_ath3k.c
++++ b/tools/hciattach_ath3k.c
+@@ -409,6 +409,8 @@ static int ath_parse_ps(FILE *stream)
  
--static bool dev_by_addr(const void *data, const void *user_data)
-+static bool match_dev_by_addr(const void *data, const void *user_data)
- {
- 	const struct health_device *dev = data;
- 	const bdaddr_t *addr = user_data;
-@@ -237,7 +237,7 @@ static bool dev_by_addr(const void *data, const void *user_data)
- 	return !bacmp(&dev->dst, addr);
- }
+ 			tag->len = byte_count;
+ 			tag->data = (uint8_t *)malloc(byte_count);
++			if (!tag->data)
++				return -ENOMEM;
  
--static bool channel_by_mdep_id(const void *data, const void *user_data)
-+static bool match_channel_by_mdep_id(const void *data, const void *user_data)
- {
- 	const struct health_channel *channel = data;
- 	uint16_t mdep_id = PTR_TO_INT(user_data);
-@@ -245,7 +245,7 @@ static bool channel_by_mdep_id(const void *data, const void *user_data)
- 	return channel->mdep_id == mdep_id;
- }
+ 			status.section = PS_DATA;
+ 			status.line_count = 0;
+diff --git a/tools/sdptool.c b/tools/sdptool.c
+index 1600c3e..988379b 100644
+--- a/tools/sdptool.c
++++ b/tools/sdptool.c
+@@ -889,7 +889,7 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
+ 	uint8_t uuid16 = SDP_UUID16;
+ 	uint8_t uint32 = SDP_UINT32;
+ 	uint8_t str8 = SDP_TEXT_STR8;
+-	int i, ret = 0;
++	int i, j, ret = 0;
  
--static bool mdep_by_mdep_role(const void *data, const void *user_data)
-+static bool match_mdep_by_role(const void *data, const void *user_data)
- {
- 	const struct mdep_cfg *mdep = data;
- 	uint16_t role = PTR_TO_INT(user_data);
-@@ -253,7 +253,7 @@ static bool mdep_by_mdep_role(const void *data, const void *user_data)
- 	return mdep->role == role;
- }
+ 	/* Get the old SDP record */
+ 	attrid_list = sdp_list_append(NULL, &range);
+@@ -903,8 +903,21 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
  
--static bool mdep_by_mdep_id(const void *data, const void *user_data)
-+static bool match_mdep_by_id(const void *data, const void *user_data)
- {
- 	const struct mdep_cfg *mdep = data;
- 	uint16_t mdep_id = PTR_TO_INT(user_data);
-@@ -261,7 +261,7 @@ static bool mdep_by_mdep_id(const void *data, const void *user_data)
- 	return mdep->id == mdep_id;
- }
+ 	/* Create arrays */
+ 	dtdArray = (void **)malloc(argc * sizeof(void *));
++	if (!dtdArray)
++		return -ENOMEM;
++
+ 	valueArray = (void **)malloc(argc * sizeof(void *));
++	if (!valueArray) {
++		free (dtdArray);
++		return -ENOMEM;
++	}
++
+ 	allocArray = (void **)malloc(argc * sizeof(void *));
++	if (!allocArray) {
++		free (dtdArray);
++		free (valueArray);
++		return -ENOMEM;
++	}
  
--static bool app_by_app_id(const void *data, const void *user_data)
-+static bool match_app_by_id(const void *data, const void *user_data)
- {
- 	const struct health_app *app = data;
- 	uint16_t app_id = PTR_TO_INT(user_data);
-@@ -629,11 +629,11 @@ static int update_sdp_record(struct health_app *app)
- 		return -1;
+ 	/* Loop on all args, add them in arrays */
+ 	for (i = 0; i < argc; i++) {
+@@ -913,6 +926,11 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
+ 			/* UUID16 */
+ 			uint16_t value_int = strtoul((argv[i]) + 3, NULL, 16);
+ 			uuid_t *value_uuid = (uuid_t *) malloc(sizeof(uuid_t));
++			if (!value_uuid) {
++				ret = -ENOMEM;
++				goto end;
++			}
++
+ 			allocArray[i] = value_uuid;
+ 			sdp_uuid16_create(value_uuid, value_int);
  
- 	role = HAL_HEALTH_MDEP_ROLE_SOURCE;
--	if (queue_find(app->mdeps, mdep_by_mdep_role, INT_TO_PTR(role)))
-+	if (queue_find(app->mdeps, match_mdep_by_role, INT_TO_PTR(role)))
- 		set_sdp_services_uuid(rec, role);
+@@ -948,9 +966,10 @@ static int set_attribseq(sdp_session_t *session, uint32_t handle, uint16_t attri
+ 	} else
+ 		printf("Failed to create pSequenceHolder\n");
  
- 	role = HAL_HEALTH_MDEP_ROLE_SINK;
--	if (queue_find(app->mdeps, mdep_by_mdep_role, INT_TO_PTR(role)))
-+	if (queue_find(app->mdeps, match_mdep_by_role, INT_TO_PTR(role)))
- 		set_sdp_services_uuid(rec, role);
++end:
+ 	/* Cleanup */
+-	for (i = 0; i < argc; i++)
+-		free(allocArray[i]);
++	for (j = 0; j < i; j++)
++		free(allocArray[j]);
  
- 	sdp_set_info_attr(rec, app->service_name, app->provider_name,
-@@ -802,7 +802,7 @@ static void bt_health_mdep_cfg_data(const void *buf, uint16_t len)
- 
- 	DBG("");
- 
--	app = queue_find(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
-+	app = queue_find(apps, match_app_by_id, INT_TO_PTR(cmd->app_id));
- 	if (!app) {
- 		status = HAL_STATUS_INVALID;
- 		goto fail;
-@@ -871,7 +871,7 @@ static void bt_health_unregister_app(const void *buf, uint16_t len)
- 
- 	DBG("");
- 
--	app = queue_remove_if(apps, app_by_app_id, INT_TO_PTR(cmd->app_id));
-+	app = queue_remove_if(apps, match_app_by_id, INT_TO_PTR(cmd->app_id));
- 	if (!app) {
- 		ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
- 				HAL_OP_HEALTH_UNREG_APP, HAL_STATUS_INVALID);
-@@ -1205,11 +1205,12 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
- 		goto fail;
- 	}
- 
--	app = queue_find(apps, app_by_app_id, INT_TO_PTR(channel->dev->app_id));
-+	app = queue_find(apps, match_app_by_id,
-+					INT_TO_PTR(channel->dev->app_id));
- 	if (!app)
- 		goto fail;
- 
--	mdep = queue_find(app->mdeps, mdep_by_mdep_id,
-+	mdep = queue_find(app->mdeps, match_mdep_by_id,
- 						INT_TO_PTR(channel->mdep_id));
- 	if (!mdep)
- 		goto fail;
-@@ -1358,7 +1359,7 @@ static struct health_device *create_device(uint16_t app_id, const uint8_t *addr)
- 	struct health_app *app;
- 	struct health_device *dev;
- 
--	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
-+	app = queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
- 	if (!app)
- 		return NULL;
- 
-@@ -1389,12 +1390,12 @@ static struct health_device *get_device(uint16_t app_id, const uint8_t *addr)
- 	struct health_device *dev;
- 	bdaddr_t bdaddr;
- 
--	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
-+	app = queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
- 	if (!app)
- 		return NULL;
- 
- 	android2bdaddr(addr, &bdaddr);
--	dev = queue_find(app->devices, dev_by_addr, &bdaddr);
-+	dev = queue_find(app->devices, match_dev_by_addr, &bdaddr);
- 	if (dev)
- 		return dev;
- 
-@@ -1414,12 +1415,12 @@ static struct health_channel *create_channel(uint16_t app_id,
- 	if (!dev)
- 		return NULL;
- 
--	app = queue_find(apps, app_by_app_id, INT_TO_PTR(app_id));
-+	app = queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
- 	if (!app)
- 		return NULL;
- 
- 	index = mdep_index + 1;
--	mdep = queue_find(app->mdeps, mdep_by_mdep_id, INT_TO_PTR(index));
-+	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(index));
- 	if (!mdep)
- 		return NULL;
- 
-@@ -1452,7 +1453,7 @@ static struct health_channel *get_channel(uint16_t app_id,
- 		return NULL;
- 
- 	index = mdep_index + 1;
--	channel = queue_find(dev->channels, channel_by_mdep_id,
-+	channel = queue_find(dev->channels, match_channel_by_mdep_id,
- 							INT_TO_PTR(index));
- 	if (channel)
- 		return channel;
+ 	free(dtdArray);
+ 	free(valueArray);
 -- 
 1.9.1
 
