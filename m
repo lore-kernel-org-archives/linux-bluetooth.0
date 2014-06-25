@@ -1,48 +1,84 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Jun 2014 08:18:02 -0700 (PDT)
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/gatt: Remove dead code
-Message-ID: <3179188.quvouCAdva@uw000953>
-In-Reply-To: <1403173701-23206-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1403173701-23206-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Wed, 25 Jun 2014 11:30:06 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth 2014-06-25
+Message-ID: <20140625143006.GA18018@joana>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="tThc/1wpZn/ma/RB"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
 
-On Thursday 19 of June 2014 13:28:21 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> The code apparently left after wrong rebase as it duplicates code
-> several lines above.
-> ---
->  android/gatt.c | 5 -----
->  1 file changed, 5 deletions(-)
-> 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 24884e9..5007817 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -5310,11 +5310,6 @@ static uint8_t find_info_handle(const uint8_t *cmd, uint16_t cmd_len,
->  
->  	}
->  
-> -	if (!adl) {
-> -		queue_destroy(q, NULL);
-> -		return ATT_ECODE_INSUFF_RESOURCES;
-> -	}
-> -
->  	len = enc_find_info_resp(ATT_FIND_INFO_RESP_FMT_16BIT, adl, rsp,
->  								rsp_size);
->  	if (!len)
-> 
+--tThc/1wpZn/ma/RB
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Patch applied, thanks.
+Hi John,
 
--- 
-Best regards, 
-Szymon Janc
+A few fixes for 3.16. This pull request contains a NULL dereference fix,
+and some security/pairing fixes. Please pull. Thanks!
+
+	Gustavo
+
+---
+The following changes since commit 616a8394b5df8c88f4dd416f4527439a4e365034:
+
+  rt2x00: fix rfkill regression on rt2500pci (2014-06-17 14:11:16 -0400)
+
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+
+for you to fetch changes up to 48439d501e3d9e8634bdc0c418e066870039599d:
+
+  Bluetooth: Ignore H5 non-link packets in non-active state (2014-06-23 18:22:48 +0200)
+
+----------------------------------------------------------------
+Johan Hedberg (3):
+      Bluetooth: Fix overriding higher security level in SMP
+      Bluetooth: Refactor authentication method lookup into its own function
+      Bluetooth: Fix rejecting pairing in case of insufficient capabilities
+
+Loic Poulain (1):
+      Bluetooth: Ignore H5 non-link packets in non-active state
+
+Lukasz Rymanowski (1):
+      Bluetooth: Fix for ACL disconnect when pairing fails
+
+Marcel Holtmann (1):
+      Revert "Bluetooth: Add a new PID/VID 0cf3/e005 for AR3012."
+
+ drivers/bluetooth/ath3k.c  |  2 --
+ drivers/bluetooth/btusb.c  |  1 -
+ drivers/bluetooth/hci_h5.c |  1 +
+ net/bluetooth/hci_conn.c   | 12 ++++++++++-
+ net/bluetooth/smp.c        | 60 ++++++++++++++++++++++++++++++++++++++++-------------
+ 5 files changed, 58 insertions(+), 18 deletions(-)
+
+
+--tThc/1wpZn/ma/RB
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJTqtzuAAoJEPs3PUX4s20oA54QAJD3YwZjoL5ZCb6CPz09/Fnf
+pdWxKLc1qzoMtWnn5bWro/ujEZVSNrQ1GFYIPE7pkBxIKRveGiQ7qe21PyT4jPpN
+RObiuFFyqpyTa8+VyXqdasMYbYKCd+K4QV1fGP0AOOOc0qosXcYl9CuerIx2v10H
+1ecw59M/XMhBRqGx2zKXNshPNQQKc/33pDdwVqmh728+Lza9HQdZ2nJHJK6IFxT5
+rteav6H5I7hQACcGyLcMCloLpa4TxOrj98Fq34NIDipzC6Tuue+6UBIOVLlOsjgI
+WaK5DqzDleWDSwpxosmI52hcYrg5/OSE9jEevPH5V1X9za1AFCM+ISCIfdWugz2W
+6RGeKKTBET+uL7agSLooIQfYBZ49jBbxlN0UeZcTPGFvNRLIcMAx6XoYesiPNViK
+hsQNpwg51viyL8BauXfS4972rbcEh4SYfQhphD+EmBsV3GpVL1711yyZytiu+mLd
+ECTzm62qc+1yEpE7hP5aBcYnFpce2wl8S4IA4MifZ6YwMMOOvXZg8agwiEdxWw5b
+66EocXmdYH3eTfdNbfxQ75QWuph0dNqpuJAFYOQmN1l8TCzi9Yu1RYAJWqHI18Zb
+e79yaJnZkUwbnXjawk4NjJm1IPwYmJ35VQrroAQ6Fg/XVPEdhAMvsGU1P4RTURAj
+qyyKydv+5DIhUBy093BG
+=ZbpF
+-----END PGP SIGNATURE-----
+
+--tThc/1wpZn/ma/RB--
