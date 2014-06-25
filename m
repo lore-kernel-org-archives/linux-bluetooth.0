@@ -1,119 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v3 2/3] android/health: Provide a helper funtion to search channel by id
-Date: Wed, 25 Jun 2014 19:30:14 +0300
-Message-Id: <1403713815-3906-2-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1403713815-3906-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403713815-3906-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [RFC 3/5] tools/mcaptest: Support connect
+Date: Wed, 25 Jun 2014 17:49:59 +0200
+Message-Id: <1403711401-11247-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1403711401-11247-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1403711401-11247-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This triggers the connection.
 ---
- android/health.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 64 insertions(+), 1 deletion(-)
+ tools/mcaptest.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 64 insertions(+), 3 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index 0aa588a..1ab5af1 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -115,6 +115,12 @@ struct health_app {
- 	struct queue *devices;
+diff --git a/tools/mcaptest.c b/tools/mcaptest.c
+index cc2d9cd..2793b9f 100644
+--- a/tools/mcaptest.c
++++ b/tools/mcaptest.c
+@@ -50,8 +50,10 @@ static GMainLoop *mloop;
+ static int ccpsm = 0x1003, dcpsm = 0x1005;
+ 
+ static struct mcap_instance *mcap = NULL;
++static struct mcap_mdl *mdl = NULL;
++static uint16_t mdlid;
+ 
+-int control_mode = MODE_LISTEN;
++static int control_mode = MODE_LISTEN;
+ 
+ static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
+ {
+@@ -67,8 +69,9 @@ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+ 
+ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+ {
+-	/* TODO */
+ 	printf("MCL disconnected\n");
++
++	g_main_loop_quit(mloop);
+ }
+ 
+ static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+@@ -77,6 +80,50 @@ static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
+ 	printf("MCL uncached unsupported\n");
+ }
+ 
++static void connect_mdl_cb(struct mcap_mdl *mdl, GError *gerr, gpointer data)
++{
++	mdlid = mcap_mdl_get_mdlid(mdl);
++
++	printf("MDL %d connected\n", mdlid);
++}
++
++static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
++								gpointer data)
++{
++	GError *err = NULL;
++
++	if (gerr) {
++		printf("MDL error: %s\n", gerr->message);
++
++		exit(1);
++	}
++
++	mdl = mcap_mdl_ref(mcap_mdl);
++
++	if (!mcap_connect_mdl(mdl, L2CAP_MODE_ERTM, dcpsm, connect_mdl_cb, NULL,
++								NULL, &err)) {
++		printf("Error connecting to mdl: %s\n", err->message);
++		g_error_free(err);
++	}
++}
++
++static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
++{
++	GError *gerr = NULL;
++
++	if (err) {
++		printf("Could not connect MCL: %s\n", err->message);
++
++		exit(1);
++	}
++
++	mcap_create_mdl(mcl, 1, 0, create_mdl_cb, NULL, NULL, &gerr);
++	if (gerr) {
++		printf("Could not connect MDL: %s\n", gerr->message);
++		g_error_free(gerr);
++	}
++}
++
+ static void usage(void)
+ {
+ 	printf("mcaptest - MCAP testing ver %s\n", VERSION);
+@@ -98,12 +145,12 @@ static struct option main_options[] = {
+ 	{ "data_ch",	1, 0, 'D' },
+ 	{ 0, 0, 0, 0 }
  };
- 
-+/* helper structs */
-+struct channel_search {
-+	uint16_t channel_id;
-+	struct health_channel *channel;
-+};
-+
- static void send_app_reg_notify(struct health_app *app, uint8_t state)
+-
+ int main(int argc, char *argv[])
  {
- 	struct hal_ev_health_app_reg_state ev;
-@@ -229,6 +235,14 @@ static void free_health_app(void *data)
- 	free(app);
- }
+ 	GError *err = NULL;
+ 	bdaddr_t src, dst;
+ 	int opt;
++	char bdastr[18];
  
-+static bool match_channel_by_id(const void *data, const void *user_data)
-+{
-+	const struct health_channel *channel = data;
-+	uint16_t channel_id = PTR_TO_INT(user_data);
-+
-+	return channel->id == channel_id;
-+}
-+
- static bool match_dev_by_addr(const void *data, const void *user_data)
- {
- 	const struct health_device *dev = data;
-@@ -269,6 +283,42 @@ static bool match_app_by_id(const void *data, const void *user_data)
- 	return app->id == app_id;
- }
+ 	hci_devba(0, &src);
+ 	bacpy(&dst, BDADDR_ANY);
+@@ -165,6 +212,20 @@ int main(int argc, char *argv[])
  
-+static void device_search_channel(void *data, void *user_data)
-+{
-+	struct health_device *dev = data;
-+	struct channel_search *search = user_data;
+ 	switch (control_mode) {
+ 	case MODE_CONNECT:
++		ba2str(&dst, bdastr);
++		printf("Connecting to %s\n", bdastr);
 +
-+	if (search->channel)
-+		return;
++		mcap_create_mcl(mcap, &dst, ccpsm, create_mcl_cb, NULL, NULL,
++									&err);
 +
-+	search->channel = queue_find(dev->channels, match_channel_by_id,
-+						INT_TO_PTR(search->channel_id));
-+}
++		if (err) {
++			printf("MCAP create error %s\n", err->message);
++			g_error_free(err);
 +
-+static void app_search_channel(void *data, void *user_data)
-+{
-+	struct health_app *app = data;
-+	struct channel_search *search = user_data;
++			exit(1);
++		}
 +
-+	if (search->channel)
-+		return;
-+
-+	queue_foreach(app->devices, device_search_channel, search);
-+}
-+
-+static struct health_channel *search_channel_by_id(uint16_t id)
-+{
-+	struct channel_search search;
-+
-+	DBG("");
-+
-+	search.channel_id = id;
-+	search.channel = NULL;
-+	queue_foreach(apps, app_search_channel, &search);
-+
-+	return search.channel;
-+}
-+
- static int register_service_protocols(sdp_record_t *rec,
- 					struct health_app *app)
- {
-@@ -1518,10 +1568,23 @@ fail:
- 
- static void bt_health_destroy_channel(const void *buf, uint16_t len)
- {
--	DBG("Not implemented");
-+	const struct hal_cmd_health_destroy_channel *cmd = buf;
-+	struct health_channel *channel;
-+
-+	DBG("Not Implemented");
-+
-+	channel = search_channel_by_id(cmd->channel_id);
-+	if (!channel)
-+		goto fail;
- 
- 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
- 			HAL_OP_HEALTH_DESTROY_CHANNEL, HAL_STATUS_UNSUPPORTED);
-+
-+	return;
-+
-+fail:
-+	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH,
-+			HAL_OP_HEALTH_DESTROY_CHANNEL, HAL_STATUS_INVALID);
- }
- 
- static const struct ipc_handler cmd_handlers[] = {
++		break;
+ 	case MODE_NONE:
+ 	default:
+ 		goto done;
 -- 
-1.9.1
+2.0.0
 
