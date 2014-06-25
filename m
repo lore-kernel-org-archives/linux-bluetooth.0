@@ -1,84 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 25 Jun 2014 11:30:06 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth 2014-06-25
-Message-ID: <20140625143006.GA18018@joana>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="tThc/1wpZn/ma/RB"
-Sender: linux-kernel-owner@vger.kernel.org
+In-Reply-To: <CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
+References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
+	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
+	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
+Date: Wed, 25 Jun 2014 06:23:43 -0700
+Message-ID: <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
+Subject: Fwd: LE mouse reconnect problem
+From: Ryan Press <ryan@presslab.us>
+To: linux-bluetooth@vger.kernel.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Luiz,
 
---tThc/1wpZn/ma/RB
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yes it will repeat the scan every few seconds.
 
-Hi John,
+I paired the device in the Gnome applet.  In the bluetoothctl I could
+see the pair and trust messages like so:
 
-A few fixes for 3.16. This pull request contains a NULL dereference fix,
-and some security/pairing fixes. Please pull. Thanks!
+[NEW] Device C5:8C:97:E6:9C:81 Arc Touch Mouse SE
+[CHG] Device C5:8C:97:E6:9C:81 Connected: yes
+[CHG] Device C5:8C:97:E6:9C:81 UUIDs:
+    00001800-0000-1000-8000-00805f9b34fb
+    00001801-0000-1000-8000-00805f9b34fb
+    0000180a-0000-1000-8000-00805f9b34fb
+    0000180f-0000-1000-8000-00805f9b34fb
+    00001812-0000-1000-8000-00805f9b34fb
+[CHG] Device C5:8C:97:E6:9C:81 Paired: yes
+[CHG] Device C5:8C:97:E6:9C:81 Trusted: yes
+[CHG] Device C5:8C:97:E6:9C:81 Modalias: usb:v045Ep07F3d0001
 
-	Gustavo
+Thanks,
 
----
-The following changes since commit 616a8394b5df8c88f4dd416f4527439a4e365034:
-
-  rt2x00: fix rfkill regression on rt2500pci (2014-06-17 14:11:16 -0400)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
-
-for you to fetch changes up to 48439d501e3d9e8634bdc0c418e066870039599d:
-
-  Bluetooth: Ignore H5 non-link packets in non-active state (2014-06-23 18:22:48 +0200)
-
-----------------------------------------------------------------
-Johan Hedberg (3):
-      Bluetooth: Fix overriding higher security level in SMP
-      Bluetooth: Refactor authentication method lookup into its own function
-      Bluetooth: Fix rejecting pairing in case of insufficient capabilities
-
-Loic Poulain (1):
-      Bluetooth: Ignore H5 non-link packets in non-active state
-
-Lukasz Rymanowski (1):
-      Bluetooth: Fix for ACL disconnect when pairing fails
-
-Marcel Holtmann (1):
-      Revert "Bluetooth: Add a new PID/VID 0cf3/e005 for AR3012."
-
- drivers/bluetooth/ath3k.c  |  2 --
- drivers/bluetooth/btusb.c  |  1 -
- drivers/bluetooth/hci_h5.c |  1 +
- net/bluetooth/hci_conn.c   | 12 ++++++++++-
- net/bluetooth/smp.c        | 60 ++++++++++++++++++++++++++++++++++++++++-------------
- 5 files changed, 58 insertions(+), 18 deletions(-)
+Ryan
 
 
---tThc/1wpZn/ma/RB
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTqtzuAAoJEPs3PUX4s20oA54QAJD3YwZjoL5ZCb6CPz09/Fnf
-pdWxKLc1qzoMtWnn5bWro/ujEZVSNrQ1GFYIPE7pkBxIKRveGiQ7qe21PyT4jPpN
-RObiuFFyqpyTa8+VyXqdasMYbYKCd+K4QV1fGP0AOOOc0qosXcYl9CuerIx2v10H
-1ecw59M/XMhBRqGx2zKXNshPNQQKc/33pDdwVqmh728+Lza9HQdZ2nJHJK6IFxT5
-rteav6H5I7hQACcGyLcMCloLpa4TxOrj98Fq34NIDipzC6Tuue+6UBIOVLlOsjgI
-WaK5DqzDleWDSwpxosmI52hcYrg5/OSE9jEevPH5V1X9za1AFCM+ISCIfdWugz2W
-6RGeKKTBET+uL7agSLooIQfYBZ49jBbxlN0UeZcTPGFvNRLIcMAx6XoYesiPNViK
-hsQNpwg51viyL8BauXfS4972rbcEh4SYfQhphD+EmBsV3GpVL1711yyZytiu+mLd
-ECTzm62qc+1yEpE7hP5aBcYnFpce2wl8S4IA4MifZ6YwMMOOvXZg8agwiEdxWw5b
-66EocXmdYH3eTfdNbfxQ75QWuph0dNqpuJAFYOQmN1l8TCzi9Yu1RYAJWqHI18Zb
-e79yaJnZkUwbnXjawk4NjJm1IPwYmJ35VQrroAQ6Fg/XVPEdhAMvsGU1P4RTURAj
-qyyKydv+5DIhUBy093BG
-=ZbpF
------END PGP SIGNATURE-----
-
---tThc/1wpZn/ma/RB--
+On Jun 25, 2014 12:08 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> wrote:
+>
+> Hi Ryan,
+>
+> On Wed, Jun 25, 2014 at 5:27 AM, Ryan Press <ryan@presslab.us> wrote:
+> > I have a Microsoft Arc mouse, Surface edition.  This uses Bluetooth
+> > Low Energy.  Under dual boot Windows 8.1 I can connect this mouse, and
+> > it will reconnect just fine if I turn the mouse off/on or Bluetooth
+> > off/on.
+> >
+> > In Fedora rawhide I have Bluez 5.18-2.  I can pair this mouse just
+> > fine, and it will continue to work until I turn the mouse off/on or
+> > turn the computer off/on.  Then it won't reconnect automatically.  If
+> > I go into bluetoothctl I can connect it again and it will then work.
+> >
+> > I looked at bluetoothd and it seems to be doing the LE scan with:
+> > bluetoothd[2356]: src/adapter.c:trigger_passive_scanning()
+> > bluetoothd[2356]: src/adapter.c:passive_scanning_complete() status 0x00
+> > bluetoothd[2356]: src/adapter.c:discovering_callback() hci0 type 6 discovering 1
+> >
+> > I look also at hcidump and I see:
+> > < HCI Command: LE Set Random Address (0x08|0x0005) plen 6
+> >     bdaddr 39:6D:E2:EC:17:37
+> >> HCI Event: Command Complete (0x0e) plen 4
+> >     LE Set Random Address (0x08|0x0005) ncmd 1
+> >     status 0x00
+> > < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+> >     type 0x01 (active)
+> >     interval 11.250ms window 11.250ms
+> >     own address: 0x01 (Random) policy: All
+> >> HCI Event: Command Complete (0x0e) plen 4
+> >     LE Set Scan Parameters (0x08|0x000b) ncmd 1
+> >     status 0x00
+> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+> >     value 0x01 (scanning enabled)
+> >     filter duplicates 0x01 (enabled)
+> >> HCI Event: Command Complete (0x0e) plen 4
+> >     LE Set Scan Enable (0x08|0x000c) ncmd 2
+> >     status 0x00
+> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+> >     value 0x00 (scanning disabled)
+> >     filter duplicates 0x00 (disabled)
+> >
+> >
+> > It doesn't seem to be finding anything?  Is there something else I should try?
+>
+> Does it continue to scan or it scan a single time and stops, and have
+> you paired or just connect?
+>
+>
+> --
+> Luiz Augusto von Dentz
