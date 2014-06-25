@@ -1,15 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Date: Wed, 25 Jun 2014 19:37:58 +0200
-Message-ID: <CANzaTi5n9deMB6F_n9j8jpX99Xt9xNeADB-BAehigm1SghBouw@mail.gmail.com>
-Subject: Observer Role?
-From: dogan yazar <doganyazar@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v3 3/3] android/hal-health: Return app_id and channel_id -1 in case of error
+Date: Wed, 25 Jun 2014 19:30:15 +0300
+Message-Id: <1403713815-3906-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1403713815-3906-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403713815-3906-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Is there a way to implement observer role using BlueZ 5.x D-Bus api?
-I just want to listen to the data from the broadcaster peripherals.
+Right now returning only status of request but java layer expecting
+-1 for app_id and channel_id in failure case.
+---
+ android/hal-health.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Thanks
+diff --git a/android/hal-health.c b/android/hal-health.c
+index 0d9136d..858d499 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -82,6 +82,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 	if (!reg || !app_id || !reg->application_name)
+ 		return BT_STATUS_PARM_INVALID;
+ 
++	*app_id = -1;
+ 	memset(buf, 0, IPC_MTU);
+ 
+ 	cmd->num_of_mdep = reg->number_of_mdeps;
+@@ -180,6 +181,7 @@ static bt_status_t connect_channel(int app_id, bt_bdaddr_t *bd_addr,
+ 	if (!bd_addr || !channel_id)
+ 		return BT_STATUS_PARM_INVALID;
+ 
++	*channel_id = -1;
+ 	cmd.app_id = app_id;
+ 	cmd.mdep_index = mdep_cfg_index;
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
+-- 
+1.9.1
+
