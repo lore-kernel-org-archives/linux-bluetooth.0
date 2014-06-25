@@ -1,162 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC 2/4] Bluetooth: Connection Parameter Update Procedure
+Subject: Re: [RFC 3/4] Bluetooth: Move is_identity_address() to hci_core.h
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403725710-29750-3-git-send-email-andre.guedes@openbossa.org>
-Date: Wed, 25 Jun 2014 22:18:30 +0200
+In-Reply-To: <1403725710-29750-4-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 25 Jun 2014 22:16:27 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0D963057-25A4-464F-9964-3FFE13793E52@holtmann.org>
-References: <1403725710-29750-1-git-send-email-andre.guedes@openbossa.org> <1403725710-29750-3-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <8886F344-FB0A-407C-955F-C0DB2BE08647@holtmann.org>
+References: <1403725710-29750-1-git-send-email-andre.guedes@openbossa.org> <1403725710-29750-4-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch adds support for LE Connection Parameters Request Link
-> Layer control procedure introduced in Core spec 4.1. This procedure
-> allows a Peripheral or Central to update the Link Layer connection
-> parameters of an established connection.
-> 
-> Regarding the acceptance of connection parameters, the LL procedure
-> follows the same approach of L2CAP procedure (see l2cap_conn_param_
-> update_req function). We accept any connection parameters values as
-> long as they are within the valid range.
+> This patch adds the prefix hci_ to is_identity_address() helper and
+> moves it to hci_core.h so it can be reused in other files.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci.h | 28 +++++++++++++++++++++++++
-> net/bluetooth/hci_event.c   | 50 +++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 78 insertions(+)
+> include/net/bluetooth/hci_core.h | 12 ++++++++++++
+> net/bluetooth/hci_core.c         | 14 +-------------
+> 2 files changed, 13 insertions(+), 13 deletions(-)
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index cc2e88d..59bad0b 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -355,6 +355,7 @@ enum {
-> #define HCI_LK_AUTH_COMBINATION_P256	0x08
-> 
-> /* ---- HCI Error Codes ---- */
-> +#define HCI_ERROR_UNKNOWN_CONN_ID	0x02
-> #define HCI_ERROR_AUTH_FAILURE		0x05
-> #define HCI_ERROR_MEMORY_EXCEEDED	0x07
-> #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
-> @@ -364,6 +365,7 @@ enum {
-> #define HCI_ERROR_REMOTE_POWER_OFF	0x15
-> #define HCI_ERROR_LOCAL_HOST_TERM	0x16
-> #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
-> +#define HCI_ERROR_INVALID_LL_PARAMS	0x1E
-> #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
-> 
-> /* Flow control modes */
-> @@ -1288,6 +1290,23 @@ struct hci_rp_le_read_supported_states {
-> 	__u8	le_states[8];
-> } __packed;
-> 
-> +#define HCI_OP_LE_CONN_PARAM_REQ_REPLY	0x2020
-> +struct hci_cp_le_conn_param_req_reply {
-> +	__le16	handle;
-> +	__le16	interval_min;
-> +	__le16	interval_max;
-> +	__le16	latency;
-> +	__le16	timeout;
-> +	__le16	min_ce_len;
-> +	__le16	max_ce_len;
-> +} __packed;
-> +
-> +#define HCI_OP_LE_CONN_PARAM_REQ_NEG_REPLY	0x2021
-> +struct hci_cp_le_conn_param_req_neg_reply {
-> +	__le16	handle;
-> +	__u8	reason;
-> +} __packed;
-> +
-> /* ---- HCI Events ---- */
-> #define HCI_EV_INQUIRY_COMPLETE		0x01
-> 
-> @@ -1683,6 +1702,15 @@ struct hci_ev_le_ltk_req {
-> 	__le16	ediv;
-> } __packed;
-> 
-> +#define HCI_EV_LE_REMOTE_CONN_PARAM_REQ	0x06
-> +struct hci_ev_le_remote_conn_param_req {
-> +	__le16 handle;
-> +	__le16 interval_min;
-> +	__le16 interval_max;
-> +	__le16 latency;
-> +	__le16 timeout;
-> +} __packed;
-> +
-> /* Advertising report event types */
-> #define LE_ADV_IND		0x00
-> #define LE_ADV_DIRECT_IND	0x01
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 7a23324..4ded97b 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4309,6 +4309,52 @@ not_found:
-> 	hci_dev_unlock(hdev);
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 016d262..b6b1c86 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1164,6 +1164,18 @@ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
+> 	return false;
 > }
 > 
-> +static void send_conn_param_neg_reply(struct hci_dev *hdev, u16 handle,
-> +				      u8 reason)
+> +static inline bool hci_is_identity_address(bdaddr_t *addr, u8 addr_type)
 > +{
-> +	struct hci_cp_le_conn_param_req_neg_reply cp;
+> +	if (addr_type == ADDR_LE_DEV_PUBLIC)
+> +		return true;
 > +
-> +	cp.handle = cpu_to_le16(handle);
-> +	cp.reason = reason;
+> +	/* Check for Random Static address type */
+> +	if ((addr->b[5] & 0xc0) == 0xc0)
+> +		return true;
 > +
-> +	hci_send_cmd(hdev, HCI_OP_LE_CONN_PARAM_REQ_NEG_REPLY, sizeof(cp),
-> +		     &cp);
+> +	return false;
 > +}
 > +
-> +static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev,
-> +					     struct sk_buff *skb)
-> +{
-> +	struct hci_ev_le_remote_conn_param_req *ev = (void *) skb->data;
-> +	struct hci_cp_le_conn_param_req_reply cp;
-> +	struct hci_conn *hcon;
-> +	u16 handle, min, max, latency, timeout;
-> +
-> +	handle = le16_to_cpu(ev->handle);
-> +	min = le16_to_cpu(ev->interval_min);
-> +	max = le16_to_cpu(ev->interval_max);
-> +	latency = le16_to_cpu(ev->latency);
-> +	timeout = le16_to_cpu(ev->timeout);
-> +
-> +	hcon = hci_conn_hash_lookup_handle(hdev, handle);
-> +	if (!hcon || hcon->state != BT_CONNECTED)
-> +		return send_conn_param_neg_reply(hdev, handle,
-> +						 HCI_ERROR_UNKNOWN_CONN_ID);
-> +
-> +	if (hci_check_conn_params(min, max, latency, timeout))
-> +		return send_conn_param_neg_reply(hdev, handle,
-> +						 HCI_ERROR_INVALID_LL_PARAMS);
-> +
-> +	cp.handle = ev->handle;
-> +	cp.interval_min = ev->interval_min;
-> +	cp.interval_max = ev->interval_max;
-> +	cp.latency = ev->latency;
-> +	cp.timeout = ev->timeout;
-> +	cp.min_ce_len = 0;
-> +	cp.max_ce_len = 0;
-> +
-> +	hci_send_cmd(hdev, HCI_OP_LE_CONN_PARAM_REQ_REPLY, sizeof(cp), &cp);
-> +}
-> +
-> static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> static inline struct smp_irk *hci_get_irk(struct hci_dev *hdev,
+> 					  bdaddr_t *bdaddr, u8 addr_type)
 > {
-> 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
-> @@ -4332,6 +4378,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
-> 		hci_le_ltk_request_evt(hdev, skb);
-> 		break;
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 9852449..b8b901c 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -3369,18 +3369,6 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
+> 	return true;
+> }
 > 
-> +	case HCI_EV_LE_REMOTE_CONN_PARAM_REQ:
-> +		hci_le_remote_conn_param_req_evt(hdev, skb);
-> +		break;
-> +
+> -static bool is_identity_address(bdaddr_t *addr, u8 addr_type)
+> -{
+> -	if (addr_type == ADDR_LE_DEV_PUBLIC)
+> -		return true;
+> -
+> -	/* Check for Random Static address type */
+> -	if ((addr->b[5] & 0xc0) == 0xc0)
+> -		return true;
+> -
+> -	return false;
+> -}
+> -
+> /* This function requires the caller holds hdev->lock */
+> int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+> 			u8 auto_connect, u16 conn_min_interval,
+> @@ -3388,7 +3376,7 @@ int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+> {
+> 	struct hci_conn_params *params;
+> 
+> -	if (!is_identity_address(addr, addr_type))
+> +	if (!hci_is_identity_address(addr, addr_type))
+> 		return -EINVAL;
 
-you also need a patch that will enable this event.
+I do not really get the logic here. Why do we need to do this.
 
 Regards
 
