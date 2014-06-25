@@ -1,92 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
-References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
-	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
-	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
-Date: Wed, 25 Jun 2014 06:23:43 -0700
-Message-ID: <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
-Subject: Fwd: LE mouse reconnect problem
-From: Ryan Press <ryan@presslab.us>
-To: linux-bluetooth@vger.kernel.org,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFC v3] doc: Connection Parameters command and event
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZJ5+1XjWLn2o68yNjTzEj-XtzV_p_VH89fHfUXRuPhorA@mail.gmail.com>
+Date: Wed, 25 Jun 2014 15:14:55 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Andre Guedes <andre.guedes@openbossa.org>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <53698982-4F49-4BD9-8E6A-29A017302F95@holtmann.org>
+References: <1396906610-3853-1-git-send-email-andre.guedes@openbossa.org> <03ACEBDE-F9B0-44F2-8466-CC578C37D8C1@holtmann.org> <20140408095622.GA21390@t440s.spectrum.wifi> <BEB72C39-8137-4270-8C93-2634CC329AF9@holtmann.org> <CABBYNZJ5+1XjWLn2o68yNjTzEj-XtzV_p_VH89fHfUXRuPhorA@mail.gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Luiz,
 
-Yes it will repeat the scan every few seconds.
+>>>>> +Load Connection Parameters Command
+>>>>> +====================================
+>>>>> +
+>>>>> +   Command Code:           0x0031
+>>>>> +   Controller Index:       <controller id>
+>>>>> +   Command Parameters:     Params_Count (2 Octets)
+>>>> 
+>>>>                             Param_Count
+>>>> 
+>>>>> +                           Params1 {
+>>>> 
+>>>>                             Param1
+>>>>> +                                   Address (6 Octets)
+>>>>> +                                   Address_Type (1 Octet)
+>>>>> +                                   Min_Connection_Interval (2 Octets)
+>>>>> +                                   Max_Connection_Interval (2 Octes)
+>>>>> +                                   Connection_Latency (2 Octets)
+>>>>> +                                   Supervision_Timeout (2 Octets)
+>>>>> +                           }
+>>>>> +                           Params2 {  }
+> 
+> Regarding the parameters it seems we should include the scan interval
+> and window as well otherwise the logic will not be completely in the
+> kernel and the userspace will still have to keep a list of devices and
+> set the scan parameters by itself. IMO it would be better the leave
+> the kernel to control everything, anyway it will have to deal with
+> scanning logic based on connection list, so it will be able to detect
+> if a certain connection requires a more aggressive scanning and also
+> relax the scanning once connected.
 
-I paired the device in the Gnome applet.  In the bluetoothctl I could
-see the pair and trust messages like so:
+the reason why did it this way is, because these are the exact parameters used by the Connection Update Procedure. The scan parameters are actually not really of a concern.
 
-[NEW] Device C5:8C:97:E6:9C:81 Arc Touch Mouse SE
-[CHG] Device C5:8C:97:E6:9C:81 Connected: yes
-[CHG] Device C5:8C:97:E6:9C:81 UUIDs:
-    00001800-0000-1000-8000-00805f9b34fb
-    00001801-0000-1000-8000-00805f9b34fb
-    0000180a-0000-1000-8000-00805f9b34fb
-    0000180f-0000-1000-8000-00805f9b34fb
-    00001812-0000-1000-8000-00805f9b34fb
-[CHG] Device C5:8C:97:E6:9C:81 Paired: yes
-[CHG] Device C5:8C:97:E6:9C:81 Trusted: yes
-[CHG] Device C5:8C:97:E6:9C:81 Modalias: usb:v045Ep07F3d0001
+Also keep in mind that these parameters are triggered mainly by the slave to update the parameters of the connection. And picking the right ones from the start increases the connection establishment time and the overall latency.
 
-Thanks,
+I left the scan parameters out on purpose since I do not want to have two policy engines fighting over who decides which scan parameters to use. My expectation is that the scan parameters will be mainly driven by the daemon that decides on how to use them. Today, we have already this. Userspace configured them and it is up to the kernel to just enforce it.
 
-Ryan
+For connection establishment without a whitelist, you pick parameters with scan window and scan interval as the same value. Which essentially means a continues scan until the device has been found. So having extra scan parameters will not help you there. For the passive background scanning, userspace can happily tell the kernel and then the kernel can just adjust the scanning.
 
+Regards
 
-On Jun 25, 2014 12:08 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> wrote:
->
-> Hi Ryan,
->
-> On Wed, Jun 25, 2014 at 5:27 AM, Ryan Press <ryan@presslab.us> wrote:
-> > I have a Microsoft Arc mouse, Surface edition.  This uses Bluetooth
-> > Low Energy.  Under dual boot Windows 8.1 I can connect this mouse, and
-> > it will reconnect just fine if I turn the mouse off/on or Bluetooth
-> > off/on.
-> >
-> > In Fedora rawhide I have Bluez 5.18-2.  I can pair this mouse just
-> > fine, and it will continue to work until I turn the mouse off/on or
-> > turn the computer off/on.  Then it won't reconnect automatically.  If
-> > I go into bluetoothctl I can connect it again and it will then work.
-> >
-> > I looked at bluetoothd and it seems to be doing the LE scan with:
-> > bluetoothd[2356]: src/adapter.c:trigger_passive_scanning()
-> > bluetoothd[2356]: src/adapter.c:passive_scanning_complete() status 0x00
-> > bluetoothd[2356]: src/adapter.c:discovering_callback() hci0 type 6 discovering 1
-> >
-> > I look also at hcidump and I see:
-> > < HCI Command: LE Set Random Address (0x08|0x0005) plen 6
-> >     bdaddr 39:6D:E2:EC:17:37
-> >> HCI Event: Command Complete (0x0e) plen 4
-> >     LE Set Random Address (0x08|0x0005) ncmd 1
-> >     status 0x00
-> > < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
-> >     type 0x01 (active)
-> >     interval 11.250ms window 11.250ms
-> >     own address: 0x01 (Random) policy: All
-> >> HCI Event: Command Complete (0x0e) plen 4
-> >     LE Set Scan Parameters (0x08|0x000b) ncmd 1
-> >     status 0x00
-> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-> >     value 0x01 (scanning enabled)
-> >     filter duplicates 0x01 (enabled)
-> >> HCI Event: Command Complete (0x0e) plen 4
-> >     LE Set Scan Enable (0x08|0x000c) ncmd 2
-> >     status 0x00
-> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
-> >     value 0x00 (scanning disabled)
-> >     filter duplicates 0x00 (disabled)
-> >
-> >
-> > It doesn't seem to be finding anything?  Is there something else I should try?
->
-> Does it continue to scan or it scan a single time and stops, and have
-> you paired or just connect?
->
->
-> --
-> Luiz Augusto von Dentz
+Marcel
+
