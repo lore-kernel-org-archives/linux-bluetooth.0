@@ -1,33 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use macro instead of hard-coded value
-Date: Wed, 25 Jun 2014 16:44:45 -0300
-Message-Id: <1403725485-29556-1-git-send-email-andre.guedes@openbossa.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 25 Jun 2014 14:22:57 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth 2014-06-25
+Message-ID: <20140625182256.GD3445@tuxdriver.com>
+References: <20140625143006.GA18018@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140625143006.GA18018@joana>
+Sender: linux-wireless-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch replaces the hard-coded value in hci_bdaddr_is_rpa() helper
-by the corresponding macro ADDR_LE_DEV_RANDOM.
+On Wed, Jun 25, 2014 at 11:30:06AM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> A few fixes for 3.16. This pull request contains a NULL dereference fix,
+> and some security/pairing fixes. Please pull. Thanks!
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 616a8394b5df8c88f4dd416f4527439a4e365034:
+> 
+>   rt2x00: fix rfkill regression on rt2500pci (2014-06-17 14:11:16 -0400)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git for-upstream
+> 
+> for you to fetch changes up to 48439d501e3d9e8634bdc0c418e066870039599d:
+> 
+>   Bluetooth: Ignore H5 non-link packets in non-active state (2014-06-23 18:22:48 +0200)
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (3):
+>       Bluetooth: Fix overriding higher security level in SMP
+>       Bluetooth: Refactor authentication method lookup into its own function
+>       Bluetooth: Fix rejecting pairing in case of insufficient capabilities
+> 
+> Loic Poulain (1):
+>       Bluetooth: Ignore H5 non-link packets in non-active state
+> 
+> Lukasz Rymanowski (1):
+>       Bluetooth: Fix for ACL disconnect when pairing fails
+> 
+> Marcel Holtmann (1):
+>       Revert "Bluetooth: Add a new PID/VID 0cf3/e005 for AR3012."
 
-Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
----
- include/net/bluetooth/hci_core.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Pulling now...
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 0b0597d..dda7f00 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1155,7 +1155,7 @@ static inline bool eir_has_data_type(u8 *data, size_t data_len, u8 type)
- 
- static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
- {
--	if (addr_type != 0x01)
-+	if (addr_type != ADDR_LE_DEV_RANDOM)
- 		return false;
- 
- 	if ((bdaddr->b[5] & 0xc0) == 0x40)
 -- 
-1.9.1
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
