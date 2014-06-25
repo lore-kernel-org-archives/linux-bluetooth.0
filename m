@@ -1,83 +1,147 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC 3/4] Bluetooth: Move is_identity_address() to hci_core.h
+Subject: Re: [RFC 4/4] Bluetooth: Introduce "New Connection Parameter" Event
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403725710-29750-4-git-send-email-andre.guedes@openbossa.org>
-Date: Wed, 25 Jun 2014 22:16:27 +0200
+In-Reply-To: <1403725710-29750-5-git-send-email-andre.guedes@openbossa.org>
+Date: Wed, 25 Jun 2014 22:14:00 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <8886F344-FB0A-407C-955F-C0DB2BE08647@holtmann.org>
-References: <1403725710-29750-1-git-send-email-andre.guedes@openbossa.org> <1403725710-29750-4-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <66DADBCA-A680-4D69-BFFC-62816EAED6AF@holtmann.org>
+References: <1403725710-29750-1-git-send-email-andre.guedes@openbossa.org> <1403725710-29750-5-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch adds the prefix hci_ to is_identity_address() helper and
-> moves it to hci_core.h so it can be reused in other files.
+> This patch introduces a new Mgmt event called "New Connection Parameter".
+> This event indicates to userspace the connection parameters values the
+> remote device requested.
+> 
+> The user may store these values and load them into kernel (an upcoming
+> patch will introduce a Mgmt command to do that). This way, next time a
+> connection is established to that device, the kernel will use those
+> parameters values instead of the default ones.
+> 
+> This event is sent when the remote device requests new connection
+> parameters through Link Layer or L2CAP connection parameter update
+> procedures.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h | 12 ++++++++++++
-> net/bluetooth/hci_core.c         | 14 +-------------
-> 2 files changed, 13 insertions(+), 13 deletions(-)
+> include/net/bluetooth/hci_core.h |  3 +++
+> include/net/bluetooth/mgmt.h     | 10 ++++++++++
+> net/bluetooth/hci_event.c        |  3 +++
+> net/bluetooth/l2cap_core.c       |  6 +++++-
+> net/bluetooth/mgmt.c             | 34 ++++++++++++++++++++++++++++++++++
+> 5 files changed, 55 insertions(+), 1 deletion(-)
 > 
 > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 016d262..b6b1c86 100644
+> index b6b1c86..d792a1e 100644
 > --- a/include/net/bluetooth/hci_core.h
 > +++ b/include/net/bluetooth/hci_core.h
-> @@ -1164,6 +1164,18 @@ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
-> 	return false;
+> @@ -1334,6 +1334,9 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
+> void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
+> void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
+> 		   bool persistent);
+> +void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
+> +			 u8 bdaddr_type, u16 min_interval, u16 max_interval,
+> +			 u16 latency, u16 timeout);
+> void mgmt_reenable_advertising(struct hci_dev *hdev);
+> void mgmt_smp_complete(struct hci_conn *conn, bool complete);
+> 
+> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+> index bcffc9a..de22982 100644
+> --- a/include/net/bluetooth/mgmt.h
+> +++ b/include/net/bluetooth/mgmt.h
+> @@ -578,3 +578,13 @@ struct mgmt_ev_new_csrk {
+> 	__u8 store_hint;
+> 	struct mgmt_csrk_info key;
+> } __packed;
+> +
+> +#define MGMT_EV_NEW_CONN_PARAM		0x001a
+> +struct mgmt_ev_new_conn_param {
+> +	struct mgmt_addr_info addr;
+> +	__u8 store_hint;
+> +	__le16 min_interval;
+> +	__le16 max_interval;
+> +	__le16 latency;
+> +	__le16 timeout;
+> +} __packed;
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 4ded97b..0a103ad 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -4344,6 +4344,9 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev,
+> 		return send_conn_param_neg_reply(hdev, handle,
+> 						 HCI_ERROR_INVALID_LL_PARAMS);
+> 
+> +	mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type, min, max,
+> +			    latency, timeout);
+> +
+> 	cp.handle = ev->handle;
+> 	cp.interval_min = ev->interval_min;
+> 	cp.interval_max = ev->interval_max;
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index e203a5f..058b3b2 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -5249,8 +5249,12 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
+> 	l2cap_send_cmd(conn, cmd->ident, L2CAP_CONN_PARAM_UPDATE_RSP,
+> 		       sizeof(rsp), &rsp);
+> 
+> -	if (!err)
+> +	if (!err) {
+> +		mgmt_new_conn_param(hcon->hdev, &hcon->dst, hcon->dst_type,
+> +				    min, max, latency, to_multiplier);
+> +
+> 		hci_le_conn_update(hcon, min, max, latency, to_multiplier);
+> +	}
+> 
+> 	return 0;
+> }
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index f75a090..708cc0a 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -111,6 +111,7 @@ static const u16 mgmt_events[] = {
+> 	MGMT_EV_PASSKEY_NOTIFY,
+> 	MGMT_EV_NEW_IRK,
+> 	MGMT_EV_NEW_CSRK,
+> +	MGMT_EV_NEW_CONN_PARAM,
+> };
+> 
+> #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+> @@ -5384,6 +5385,39 @@ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
+> 	mgmt_event(MGMT_EV_NEW_CSRK, hdev, &ev, sizeof(ev), NULL);
 > }
 > 
-> +static inline bool hci_is_identity_address(bdaddr_t *addr, u8 addr_type)
+> +void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
+> +			 u8 bdaddr_type, u16 min_interval, u16 max_interval,
+> +			 u16 latency, u16 timeout)
 > +{
-> +	if (addr_type == ADDR_LE_DEV_PUBLIC)
-> +		return true;
+> +	struct mgmt_ev_new_conn_param ev;
+> +	struct smp_irk *irk;
 > +
-> +	/* Check for Random Static address type */
-> +	if ((addr->b[5] & 0xc0) == 0xc0)
-> +		return true;
+> +	memset(&ev, 0, sizeof(ev));
 > +
-> +	return false;
-> +}
+> +	irk = hci_get_irk(hdev, bdaddr, bdaddr_type);
+> +	if (irk) {
+> +		bacpy(&ev.addr.bdaddr, &irk->bdaddr);
+> +		ev.addr.type = link_to_bdaddr(LE_LINK, irk->addr_type);
 > +
-> static inline struct smp_irk *hci_get_irk(struct hci_dev *hdev,
-> 					  bdaddr_t *bdaddr, u8 addr_type)
-> {
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 9852449..b8b901c 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3369,18 +3369,6 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
-> 	return true;
-> }
-> 
-> -static bool is_identity_address(bdaddr_t *addr, u8 addr_type)
-> -{
-> -	if (addr_type == ADDR_LE_DEV_PUBLIC)
-> -		return true;
-> -
-> -	/* Check for Random Static address type */
-> -	if ((addr->b[5] & 0xc0) == 0xc0)
-> -		return true;
-> -
-> -	return false;
-> -}
-> -
-> /* This function requires the caller holds hdev->lock */
-> int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
-> 			u8 auto_connect, u16 conn_min_interval,
-> @@ -3388,7 +3376,7 @@ int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
-> {
-> 	struct hci_conn_params *params;
-> 
-> -	if (!is_identity_address(addr, addr_type))
-> +	if (!hci_is_identity_address(addr, addr_type))
-> 		return -EINVAL;
+> +		ev.store_hint = 0x01;
+> +	} else {
+> +		bacpy(&ev.addr.bdaddr, bdaddr);
+> +		ev.addr.type = link_to_bdaddr(LE_LINK, bdaddr_type);
+> +
+> +		if (hci_is_identity_address(bdaddr, bdaddr_type))
+> +			ev.store_hint = 0x01;
+> +		else
+> +			ev.store_hint = 0x00;
+> +	}
 
-I do not really get the logic here. Why do we need to do this.
+this whole IRK check and matching it up to store_hint makes no sense. Just start out with having store_hint set to 0x00 and we fix the correct handling for that part later.
 
 Regards
 
