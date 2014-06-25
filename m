@@ -1,31 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] android/hog: Fix using invalid range for external report
-Date: Wed, 25 Jun 2014 14:49:07 +0300
-Message-Id: <1403696947-6777-1-git-send-email-luiz.dentz@gmail.com>
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 3/3] android/hal-health: Return app_id and channel_id -1 in case of error
+Date: Wed, 25 Jun 2014 14:45:17 +0300
+Message-Id: <1403696717-32664-3-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1403696717-32664-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403696717-32664-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
+Right now returning only status of request but java layer expecting
+-1 for app_id and channel_id in failure case.
 ---
- android/hog.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/hal-health.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/hog.c b/android/hog.c
-index 652c374..4f1a4a8 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -303,7 +303,7 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
- 	DBG("External report reference read, external report characteristic "
- 						"UUID: 0x%04x", uuid16);
- 	bt_uuid16_create(&uuid, uuid16);
--	gatt_discover_char(hog->attrib, 0x00, 0xff, &uuid,
-+	gatt_discover_char(hog->attrib, 0x0001, 0xffff, &uuid,
- 					external_service_char_cb, hog);
- }
+diff --git a/android/hal-health.c b/android/hal-health.c
+index ac6e87f..35ac5c6 100644
+--- a/android/hal-health.c
++++ b/android/hal-health.c
+@@ -82,6 +82,7 @@ static bt_status_t register_application(bthl_reg_param_t *reg, int *app_id)
+ 	if (!reg || !app_id || !reg->application_name)
+ 		return BT_STATUS_PARM_INVALID;
  
++	*app_id = -1;
+ 	memset(buf, 0, IPC_MTU);
+ 
+ 	cmd->num_of_mdep = reg->number_of_mdeps;
+@@ -181,6 +182,7 @@ static bt_status_t connect_channel(int app_id, bt_bdaddr_t *bd_addr,
+ 	if (!bd_addr || !channel_id)
+ 		return BT_STATUS_PARM_INVALID;
+ 
++	*channel_id = -1;
+ 	cmd.app_id = app_id;
+ 	cmd.mdep_index = mdep_cfg_index;
+ 	memcpy(cmd.bdaddr, bd_addr, sizeof(cmd.bdaddr));
 -- 
-1.9.3
+1.9.1
 
