@@ -1,98 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 8/9] android/health: Add handling for ECHO service
-Date: Fri, 27 Jun 2014 10:40:02 +0300
-Message-Id: <1403854803-28850-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403854803-28850-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1403784265-1455-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403854803-28850-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [PATCH 10/10] shared/att: Implement outgoing "Execute Write" request/response.
+Date: Thu, 26 Jun 2014 16:14:17 -0700
+Message-Id: <1403824457-22461-11-git-send-email-armansito@chromium.org>
+In-Reply-To: <1403824457-22461-1-git-send-email-armansito@chromium.org>
+References: <1403824457-22461-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Reply received buffer back for ECHO service.
+This patch adds support for "Execute Write" requests sent via
+bt_att_send and the corresponding response.
 ---
- android/health.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 62 insertions(+), 1 deletion(-)
+ src/shared/att.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/android/health.c b/android/health.c
-index 4f15f93..9631d9e 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1054,9 +1054,70 @@ static int get_dcpsm(sdp_list_t *recs, uint16_t *dcpsm)
- 	return -1;
+diff --git a/src/shared/att.c b/src/shared/att.c
+index d6c2a63..0e67786 100644
+--- a/src/shared/att.c
++++ b/src/shared/att.c
+@@ -447,6 +447,29 @@ static bool encode_prep_write_req(struct att_send_op *op, const void *param,
+ 	return true;
  }
  
-+static int send_echo_data(int sock, const void *buf, uint32_t size)
++static bool encode_exec_write_req(struct att_send_op *op, const void *param,
++						uint16_t length, uint16_t mtu)
 +{
-+	const uint8_t *buf_b = buf;
-+	uint32_t sent = 0;
++	const struct bt_att_exec_write_req_param *p = param;
++	uint16_t len = 2;
 +
-+	while (sent < size) {
-+		int n = write(sock, buf_b + sent, size - sent);
-+		if (n < 0)
-+			return -1;
-+		sent += n;
-+	}
++	if (length != sizeof(*p))
++		return false;
 +
-+	return 0;
++	if (len > mtu)
++		return false;
++
++	op->pdu = malloc(len);
++	if (!op->pdu)
++		return false;
++
++	((uint8_t *) op->pdu)[0] = op->opcode;
++	((uint8_t *) op->pdu)[1] = p->flags;
++	op->len = len;
++
++	return true;
 +}
 +
-+static gboolean serve_echo(GIOChannel *io, GIOCondition cond, gpointer data)
-+{
-+	struct health_channel *channel = data;
-+	uint8_t buf[MCAP_DC_MTU];
-+	int fd, len;
-+
-+	DBG("channel %p", channel);
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		DBG("Error condition on channel");
-+		return FALSE;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(io);
-+
-+	len = read(fd, buf, sizeof(buf));
-+	if (len < 0)
-+		goto fail;
-+
-+	if (send_echo_data(fd, buf, len)  >= 0)
-+		return TRUE;
-+
-+fail:
-+	free_health_device(channel->dev);
-+	return FALSE;
-+}
-+
- static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+ static bool encode_pdu(struct att_send_op *op, const void *param,
+ 						uint16_t length, uint16_t mtu)
  {
--	DBG("Not Implemeneted");
-+	struct health_channel *channel = data;
-+
-+	if (!channel->mdl)
-+		channel->mdl = mcap_mdl_ref(mdl);
-+
-+	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
-+
-+	if (channel->mdep_id == HDP_MDEP_ECHO) {
-+		GIOChannel *io;
-+		int fd;
-+
-+		fd = mcap_mdl_get_fd(channel->mdl);
-+		if (fd < 0)
-+			return;
-+
-+		io = g_io_channel_unix_new(fd);
-+		g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL | G_IO_IN,
-+							serve_echo, channel);
-+		g_io_channel_unref(io);
-+	}
+@@ -491,6 +514,8 @@ static bool encode_pdu(struct att_send_op *op, const void *param,
+ 		return encode_write_pdu(op, param, length, mtu);
+ 	case BT_ATT_OP_PREP_WRITE_REQ:
+ 		return encode_prep_write_req(op, param, length, mtu);
++	case BT_ATT_OP_EXEC_WRITE_REQ:
++		return encode_exec_write_req(op, param, length, mtu);
+ 	default:
+ 		break;
+ 	}
+@@ -956,6 +981,15 @@ static bool handle_prep_write_rsp(struct bt_att *att, uint8_t opcode,
+ 								sizeof(param));
  }
  
- static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
++static bool handle_exec_write_rsp(struct bt_att *att, uint8_t opcode,
++						uint8_t *pdu, ssize_t pdu_len)
++{
++	if (pdu_len > 1)
++		return false;
++
++	return request_complete(att, BT_ATT_OP_EXEC_WRITE_REQ, opcode, NULL, 0);
++}
++
+ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 								ssize_t pdu_len)
+ {
+@@ -997,6 +1031,9 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 	case BT_ATT_OP_PREP_WRITE_RSP:
+ 		success = handle_prep_write_rsp(att, opcode, pdu, pdu_len);
+ 		break;
++	case BT_ATT_OP_EXEC_WRITE_RSP:
++		success = handle_exec_write_rsp(att, opcode, pdu, pdu_len);
++		break;
+ 	default:
+ 		success = false;
+ 		util_debug(att->debug_callback, att->debug_data,
 -- 
-1.8.3.2
+2.0.0.526.g5318336
 
