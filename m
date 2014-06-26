@@ -2,131 +2,205 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 7/7] android/pts: Update MCAP results
-Date: Thu, 26 Jun 2014 15:09:11 +0200
-Message-Id: <1403788151-21025-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/7] android/mcaptest: Support incomming connections
+Date: Thu, 26 Jun 2014 15:09:08 +0200
+Message-Id: <1403788151-21025-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1403788151-21025-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1403788151-21025-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This adds support for handling incomming Control Link (MCL) and Data
+Link (MDL) connections.
 ---
- android/pts-mcap.txt | 80 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 40 insertions(+), 40 deletions(-)
+ android/mcaptest.c | 115 ++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 100 insertions(+), 15 deletions(-)
 
-diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-index 9a77839..9542b8c 100644
---- a/android/pts-mcap.txt
-+++ b/android/pts-mcap.txt
-@@ -1,7 +1,7 @@
- PTS test results for MCAP
+diff --git a/android/mcaptest.c b/android/mcaptest.c
+index 0ad51a6..8d30e4d 100644
+--- a/android/mcaptest.c
++++ b/android/mcaptest.c
+@@ -54,11 +54,47 @@ static struct mcap_mdl *mdl = NULL;
+ static uint16_t mdlid;
  
- PTS version: 5.1
--Tested: not tested
-+Tested: 26-June-2014
- Android version: 4.4.2
+ static int control_mode = MODE_LISTEN;
++static int data_mode = MODE_LISTEN;
  
- Results:
-@@ -13,28 +13,28 @@ N/A	test is disabled due to PICS setup
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
--TC_MCAP_CE_BV_01_C	INC
--TC_MCAP_CE_BV_02_C	INC
--TC_MCAP_CE_BV_03_C	INC
--TC_MCAP_CE_BV_04_C	INC
-+TC_MCAP_CE_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
-+TC_MCAP_CE_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CE_BV_03_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
-+TC_MCAP_CE_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_CM_ABT_BV_01_C	N/A
--TC_MCAP_CM_ABT_BV_02_C	INC
-+TC_MCAP_CM_ABT_BV_02_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_ABT_BV_03_C	N/A
- TC_MCAP_CM_DEL_BV_01_C	N/A
--TC_MCAP_CM_DEL_BV_02_C	INC
-+TC_MCAP_CM_DEL_BV_02_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_DEL_BV_02_C	N/A
--TC_MCAP_CM_DEL_BV_04_C	INC
--TC_MCAP_CM_DIS_BV_01_C	INC
--TC_MCAP_CM_DIS_BV_02_C	INC
--TC_MCAP_CM_DIS_BV_03_C	INC
--TC_MCAP_CM_DIS_BV_04_C	INC
--TC_MCAP_CM_DIS_BV_05_C	INC
-+TC_MCAP_CM_DEL_BV_04_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DIS_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
-+TC_MCAP_CM_DIS_BV_02_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DIS_BV_03_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_CM_DIS_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
-+TC_MCAP_CM_DIS_BV_05_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_01_C	N/A
--TC_MCAP_CM_REC_BV_02_C	INC
-+TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_03_C	N/A
--TC_MCAP_CM_REC_BV_04_C	INC
-+TC_MCAP_CM_REC_BV_04_C	INC	possible PTS issue #12182
- TC_MCAP_CM_REC_BV_05_C	N/A
--TC_MCAP_CM_REC_BV_06_C	INC
-+TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CS_ERR_BI_01_C	N/A
- TC_MCAP_CS_ERR_BI_02_C	N/A
- TC_MCAP_CS_ERR_BI_03_C	N/A
-@@ -47,31 +47,31 @@ TC_MCAP_CS_R_BV_01_I	N/A
- TC_MCAP_CS_R_BV_02_I	N/A
- TC_MCAP_CS_R_BV_03_C	N/A
- TC_MCAP_CS_T_BV_04_C	N/A
--TC_MCAP_ERR_BI_01_C	INC
--TC_MCAP_ERR_BI_02_C	INC
--TC_MCAP_ERR_BI_03_C	INC
--TC_MCAP_ERR_BI_04_C	INC
--TC_MCAP_ERR_BI_05_C	INC
--TC_MCAP_ERR_BI_06_C	INC
--TC_MCAP_ERR_BI_07_C	INC
--TC_MCAP_ERR_BI_08_C	INC
--TC_MCAP_ERR_BI_09_C	INC
--TC_MCAP_ERR_BI_10_C	INC
--TC_MCAP_ERR_BI_11_C	INC
-+TC_MCAP_ERR_BI_01_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_03_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_05_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_06_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_07_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_08_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_09_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_10_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_11_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_ERR_BI_12_C	INC
--TC_MCAP_ERR_BI_13_C	INC
--TC_MCAP_ERR_BI_14_C	INC
--TC_MCAP_ERR_BI_15_C	INC
-+TC_MCAP_ERR_BI_13_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_14_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_ERR_BI_15_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_ERR_BI_16_C	INC
--TC_MCAP_ERR_BI_17_C	INC
--TC_MCAP_ERR_BI_18_C	INC
--TC_MCAP_ERR_BI_19_C	INC
-+TC_MCAP_ERR_BI_17_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_18_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_ERR_BI_19_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_ERR_BI_20_C	INC
--TC_MCAP_INV_BI_01_C	INC
--TC_MCAP_INV_BI_02_C	INC
--TC_MCAP_INV_BI_03_C	INC
--TC_MCAP_INV_BI_04_C	INC
--TC_MCAP_INV_BI_05_C	INC
--TC_MCAP_INV_BI_06_C	INC
--TC_MCAP_INV_BI_07_C	INC
-+TC_MCAP_INV_BI_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
-+TC_MCAP_INV_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
-+TC_MCAP_INV_BI_03_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
-+TC_MCAP_INV_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
-+TC_MCAP_INV_BI_05_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_INV_BI_06_C	PASS	mcaptest -C 4099 -D 4101
-+TC_MCAP_INV_BI_07_C	PASS	mcaptest -C 4099 -D 4101
- -------------------------------------------------------------------------------
+-static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
++static struct mcap_mcl *mcl = NULL;
++
++static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
++{
++	/* TODO */
++	printf("%s\n", __func__);
++}
++
++static void mdl_closed_cb(struct mcap_mdl *mdl, void *data)
++{
++	/* TODO */
++	printf("%s\n", __func__);
++}
++
++static void mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
++{
++	/* TODO */
++	printf("%s\n", __func__);
++}
++
++static void mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
+ {
+ 	/* TODO */
+-	printf("MCL connected unsupported\n");
++	printf("%s\n", __func__);
++}
++
++static uint8_t mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
++				uint16_t mdlid, uint8_t *conf, void *data)
++{
++	printf("%s\n", __func__);
++
++	return MCAP_SUCCESS;
++}
++
++static uint8_t mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
++{
++	printf("%s\n", __func__);
++
++	return MCAP_SUCCESS;
+ }
+ 
+ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+@@ -109,30 +145,69 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 	}
+ }
+ 
+-static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
++static void trigger_mdl_action(int mode)
+ {
+ 	GError *gerr = NULL;
++	gboolean ret;
++
++	ret = mcap_mcl_set_cb(mcl, NULL, &gerr,
++		MCAP_MDL_CB_CONNECTED, mdl_connected_cb,
++		MCAP_MDL_CB_CLOSED, mdl_closed_cb,
++		MCAP_MDL_CB_DELETED, mdl_deleted_cb,
++		MCAP_MDL_CB_ABORTED, mdl_aborted_cb,
++		MCAP_MDL_CB_REMOTE_CONN_REQ, mdl_conn_req_cb,
++		MCAP_MDL_CB_REMOTE_RECONN_REQ, mdl_reconn_req_cb,
++		MCAP_MDL_CB_INVALID);
++
++	if (!ret && gerr) {
++		printf("MCL cannot handle connection %s\n",
++							gerr->message);
++		g_error_free(gerr);
++	}
++
++	if (mode == MODE_CONNECT) {
++		mcap_create_mdl(mcl, 1, 0, create_mdl_cb, NULL, NULL, &gerr);
++		if (gerr) {
++			printf("Could not connect MDL: %s\n", gerr->message);
++			g_error_free(gerr);
++		}
++	}
++}
+ 
++static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
++{
++	printf("%s\n", __func__);
++
++	if (mcl)
++		mcap_mcl_unref(mcl);
++
++	mcl = mcap_mcl_ref(mcap_mcl);
++	trigger_mdl_action(data_mode);
++}
++
++static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
++{
+ 	if (err) {
+ 		printf("Could not connect MCL: %s\n", err->message);
+ 
+ 		return;
+ 	}
+ 
+-	mcap_create_mdl(mcl, 1, 0, create_mdl_cb, NULL, NULL, &gerr);
+-	if (gerr) {
+-		printf("Could not connect MDL: %s\n", gerr->message);
+-		g_error_free(gerr);
+-	}
+-}
++	if (mcl)
++		mcap_mcl_unref(mcl);
+ 
++	mcl = mcap_mcl_ref(mcap_mcl);
++	trigger_mdl_action(data_mode);
++}
+ static void usage(void)
+ {
+ 	printf("mcaptest - MCAP testing ver %s\n", VERSION);
+ 	printf("Usage:\n"
+-		"\tmcaptest <mode> [options]\n");
+-	printf("Modes:\n"
+-		"\t-c connect <dst_addr> (than wait for disconnect)\n");
++		"\tmcaptest <control_mode> <data_mode> [options]\n");
++	printf("Control Link Mode:\n"
++		"\t-c connect <dst_addr>\n");
++	printf("Data Link Mode:\n"
++		"\t-d connect\n");
+ 	printf("Options:\n"
+ 		"\t-i <hcidev>        HCI device\n"
+ 		"\t-C <control_ch>    Control channel PSM\n"
+@@ -142,7 +217,8 @@ static void usage(void)
+ static struct option main_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "device",	1, 0, 'i' },
+-	{ "connect",	1, 0, 'c' },
++	{ "connect_cl",	1, 0, 'c' },
++	{ "connect_dl",	0, 0, 'd' },
+ 	{ "control_ch",	1, 0, 'C' },
+ 	{ "data_ch",	1, 0, 'D' },
+ 	{ 0, 0, 0, 0 }
+@@ -164,7 +240,7 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	while ((opt = getopt_long(argc, argv, "+i:c:C:D:h",
++	while ((opt = getopt_long(argc, argv, "+i:c:C:D:hd",
+ 						main_options, NULL)) != EOF) {
+ 		switch (opt) {
+ 		case 'i':
+@@ -181,6 +257,11 @@ int main(int argc, char *argv[])
+ 
+ 			break;
+ 
++		case 'd':
++			data_mode = MODE_CONNECT;
++
++			break;
++
+ 		case 'C':
+ 			ccpsm = atoi(optarg);
+ 
+@@ -198,7 +279,7 @@ int main(int argc, char *argv[])
+ 		}
+ 	}
+ 
+-	mcap = mcap_create_instance(&src, BT_IO_SEC_MEDIUM, 0, 0,
++	mcap = mcap_create_instance(&src, BT_IO_SEC_MEDIUM, ccpsm, dcpsm,
+ 					mcl_connected, mcl_reconnected,
+ 					mcl_disconnected, mcl_uncached,
+ 					NULL, /* CSP is not used right now */
+@@ -228,6 +309,10 @@ int main(int argc, char *argv[])
+ 		}
+ 
+ 		break;
++	case MODE_LISTEN:
++		printf("Listening for control channel connection\n");
++
++		break;
+ 	case MODE_NONE:
+ 	default:
+ 		goto done;
 -- 
 2.0.0
 
