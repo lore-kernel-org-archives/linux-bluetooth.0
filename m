@@ -1,38 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 26 Jun 2014 10:57:17 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Petri Gynther <pgynther@google.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] core: Fix stop_passive_scanning_complete()
-Message-ID: <20140626075717.GA21340@t440s.lan>
-References: <20140625173804.13C85100934@puck.mtv.corp.google.com>
+Subject: Re: [PATCH BlueZ] android/hog: Fix using invalid range for external report
+Date: Thu, 26 Jun 2014 09:45:10 +0200
+Message-ID: <1424193.PU3ordgJzu@uw000953>
+In-Reply-To: <1403696947-6777-1-git-send-email-luiz.dentz@gmail.com>
+References: <1403696947-6777-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140625173804.13C85100934@puck.mtv.corp.google.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Petri,
+Hi Luiz,
 
-On Wed, Jun 25, 2014, Petri Gynther wrote:
-> Consider MGMT_STATUS_REJECTED as success for stop_passive_scanning().
-> MGMT_STATUS_REJECTED may be returned from kernel because the passive
-> scan timer had expired in kernel and passive scan was disabled just
-> around the time we called stop_passive_scanning().
+On Wednesday 25 of June 2014 14:49:07 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> This issue can be seen with BLE HoG devices trying to reconnect to BlueZ:
-> bluetoothd[931]: src/adapter.c:device_found_callback() hci0 addr ...
-> bluetoothd[931]: src/device.c:device_set_legacy() legacy 0
-> bluetoothd[931]: src/device.c:device_set_rssi() rssi -75
-> bluetoothd[931]: src/adapter.c:stop_passive_scanning()
-> bluetoothd[931]: src/adapter.c:discovering_callback() hci0 type 6 discovering 0
-> bluetoothd[931]: src/adapter.c:trigger_passive_scanning()
-> bluetoothd[931]: src/adapter.c:stop_passive_scanning_complete() status 0x0b (Rejected)
-> bluetoothd[931]: Stopping passive scanning failed: Rejected
 > ---
->  src/adapter.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  android/hog.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/android/hog.c b/android/hog.c
+> index 652c374..4f1a4a8 100644
+> --- a/android/hog.c
+> +++ b/android/hog.c
+> @@ -303,7 +303,7 @@ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
+>  	DBG("External report reference read, external report characteristic "
+>  						"UUID: 0x%04x", uuid16);
+>  	bt_uuid16_create(&uuid, uuid16);
+> -	gatt_discover_char(hog->attrib, 0x00, 0xff, &uuid,
+> +	gatt_discover_char(hog->attrib, 0x0001, 0xffff, &uuid,
+>  					external_service_char_cb, hog);
+>  }
+>  
 
-All three of these patches have been applied. Thanks.
+Applied, thanks. 
 
-Johan
+-- 
+Best regards, 
+Szymon Janc
