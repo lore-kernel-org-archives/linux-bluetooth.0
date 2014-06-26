@@ -2,37 +2,39 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 10/10] shared/att: Implement outgoing "Execute Write" request/response.
-Date: Thu, 26 Jun 2014 16:14:17 -0700
-Message-Id: <1403824457-22461-11-git-send-email-armansito@chromium.org>
+Subject: [PATCH 08/10] shared/att: Implement outgoing "Write" request/response.
+Date: Thu, 26 Jun 2014 16:14:15 -0700
+Message-Id: <1403824457-22461-9-git-send-email-armansito@chromium.org>
 In-Reply-To: <1403824457-22461-1-git-send-email-armansito@chromium.org>
 References: <1403824457-22461-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch adds support for "Execute Write" requests sent via
-bt_att_send and the corresponding response.
+This patch adds support for "Write" requests sent via bt_att_send and
+the corresponding response. The same encode helper will also be used for the
+"Write" and "Signed Write" commands in the future.
 ---
- src/shared/att.c | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ src/shared/att.c | 47 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 47 insertions(+)
 
 diff --git a/src/shared/att.c b/src/shared/att.c
-index d6c2a63..0e67786 100644
+index 3406b24..caf7d35 100644
 --- a/src/shared/att.c
 +++ b/src/shared/att.c
-@@ -447,6 +447,29 @@ static bool encode_prep_write_req(struct att_send_op *op, const void *param,
+@@ -379,6 +379,39 @@ static bool encode_read_by_grp_type_req(struct att_send_op *op,
  	return true;
  }
  
-+static bool encode_exec_write_req(struct att_send_op *op, const void *param,
++static bool encode_write_pdu(struct att_send_op *op, const void *param,
 +						uint16_t length, uint16_t mtu)
 +{
-+	const struct bt_att_exec_write_req_param *p = param;
-+	uint16_t len = 2;
++	const struct bt_att_write_param *p = param;
++	uint16_t len;
 +
 +	if (length != sizeof(*p))
 +		return false;
 +
++	len = 3 + p->length;
 +	if (len > mtu)
 +		return false;
 +
@@ -41,8 +43,17 @@ index d6c2a63..0e67786 100644
 +		return false;
 +
 +	((uint8_t *) op->pdu)[0] = op->opcode;
-+	((uint8_t *) op->pdu)[1] = p->flags;
++	put_le16(p->handle, ((uint8_t *) op->pdu) + 1);
 +	op->len = len;
++
++	if (p->length) {
++		if (!p->value) {
++			free(op->pdu);
++			return false;
++		}
++
++		memcpy(((uint8_t *) op->pdu) + 3, p->value, p->length);
++	}
 +
 +	return true;
 +}
@@ -50,37 +61,37 @@ index d6c2a63..0e67786 100644
  static bool encode_pdu(struct att_send_op *op, const void *param,
  						uint16_t length, uint16_t mtu)
  {
-@@ -491,6 +514,8 @@ static bool encode_pdu(struct att_send_op *op, const void *param,
- 		return encode_write_pdu(op, param, length, mtu);
- 	case BT_ATT_OP_PREP_WRITE_REQ:
- 		return encode_prep_write_req(op, param, length, mtu);
-+	case BT_ATT_OP_EXEC_WRITE_REQ:
-+		return encode_exec_write_req(op, param, length, mtu);
+@@ -419,6 +452,8 @@ static bool encode_pdu(struct att_send_op *op, const void *param,
+ 		return encode_read_mult_req(op, param, length, mtu);
+ 	case BT_ATT_OP_READ_BY_GRP_TYPE_REQ:
+ 		return encode_read_by_grp_type_req(op, param, length, mtu);
++	case BT_ATT_OP_WRITE_REQ:
++		return encode_write_pdu(op, param, length, mtu);
  	default:
  		break;
  	}
-@@ -956,6 +981,15 @@ static bool handle_prep_write_rsp(struct bt_att *att, uint8_t opcode,
- 								sizeof(param));
+@@ -848,6 +883,15 @@ static bool handle_read_by_grp_type_rsp(struct bt_att *att, uint8_t opcode,
+ 							&param, sizeof(param));
  }
  
-+static bool handle_exec_write_rsp(struct bt_att *att, uint8_t opcode,
-+						uint8_t *pdu, ssize_t pdu_len)
++static bool handle_write_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
++								ssize_t pdu_len)
 +{
 +	if (pdu_len > 1)
 +		return false;
 +
-+	return request_complete(att, BT_ATT_OP_EXEC_WRITE_REQ, opcode, NULL, 0);
++	return request_complete(att, BT_ATT_OP_WRITE_REQ, opcode, NULL, 0);
 +}
 +
  static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
  								ssize_t pdu_len)
  {
-@@ -997,6 +1031,9 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
- 	case BT_ATT_OP_PREP_WRITE_RSP:
- 		success = handle_prep_write_rsp(att, opcode, pdu, pdu_len);
+@@ -883,6 +927,9 @@ static void handle_rsp(struct bt_att *att, uint8_t opcode, uint8_t *pdu,
+ 		success = handle_read_by_grp_type_rsp(att, opcode,
+ 								pdu, pdu_len);
  		break;
-+	case BT_ATT_OP_EXEC_WRITE_RSP:
-+		success = handle_exec_write_rsp(att, opcode, pdu, pdu_len);
++	case BT_ATT_OP_WRITE_RSP:
++		success = handle_write_rsp(att, opcode, pdu, pdu_len);
 +		break;
  	default:
  		success = false;
