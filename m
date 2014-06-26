@@ -1,60 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-version: 1.0
-Content-type: text/plain; CHARSET=US-ASCII
-From: d.eriksson@me.com
-Subject: BLE (HOGP) Direct Adv -> Re-connect request, mysterious ~5sec latency
-Message-id: <99041177-7FBC-46E9-830F-0B92A6187048@me.com>
-Date: Thu, 26 Jun 2014 17:57:26 +0200
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 15/15] android/hog: Add support for multiple instaces
+Date: Thu, 26 Jun 2014 17:46:48 +0300
+Message-Id: <1403794008-18585-15-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
+References: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-I'm trying to figure out why we get a 4-5sec delay between a BLE reconnect (direct-advertise) to when the first event pops up in the kernel/bluez.
+This is necessary to pass PTS tests which does include 2 instances.
+---
+ android/hog.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 40 insertions(+), 8 deletions(-)
 
-I can see in wireshark that as soon as my BLE-device advertises, the TI-BLE chip on the linux 3.13 host-side responds immediately, but from here to when we get the hid device up and ready, it takes another 4-5seconds. Any ideas why!?
+diff --git a/android/hog.c b/android/hog.c
+index 5fa8b94..01229ff 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -95,6 +95,7 @@ struct bt_hog {
+ 	struct bt_dis		*dis;
+ 	struct bt_scpp		*scpp;
+ 	struct bt_bas		*bas;
++	GSList			*instances;
+ };
+ 
+ struct report {
+@@ -648,8 +649,11 @@ static void report_free(void *data)
+ 	g_free(report);
+ }
+ 
+-static void hog_free(struct bt_hog *hog)
++static void hog_free(void *data)
+ {
++	struct bt_hog *hog = data;
++
++	g_slist_free_full(hog->instances, hog_free);
+ 	bt_dis_unref(hog->dis);
+ 	bt_scpp_unref(hog->scpp);
+ 	bt_bas_unref(hog->bas);
+@@ -804,6 +808,27 @@ static void hog_attach_bas(struct bt_hog *hog, struct gatt_primary *primary)
+ 		bt_bas_attach(hog->bas, hog->attrib);
+ }
+ 
++static void hog_attach_hog(struct bt_hog *hog, struct gatt_primary *primary)
++{
++	struct bt_hog *instance;
++
++	if (!hog->primary) {
++		hog->primary = g_memdup(primary, sizeof(*primary));
++		gatt_discover_char(hog->attrib, primary->range.start,
++						primary->range.end, NULL,
++						char_discovered_cb, hog);
++		return;
++	}
++
++	instance = bt_hog_new(hog->name, hog->vendor, hog->product,
++							hog->version, primary);
++	if (!instance)
++		return;
++
++	bt_hog_attach(instance, hog->attrib);
++	hog->instances = g_slist_append(hog->instances, instance);
++}
++
+ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+@@ -842,16 +867,11 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 		}
+ 
+ 		if (strcmp(primary->uuid, HOG_UUID) == 0)
+-			hog->primary = g_memdup(primary, sizeof(*primary));
++			hog_attach_hog(hog, primary);
+ 	}
+ 
+-	if (hog->primary) {
+-		gatt_discover_char(hog->attrib, hog->primary->range.start,
+-						hog->primary->range.end, NULL,
+-						char_discovered_cb, hog);
+-
++	if (hog->primary)
+ 		return;
+-	}
+ 
+ 	for (l = services; l; l = l->next) {
+ 		primary = l->data;
+@@ -886,6 +906,12 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ 	if (hog->bas)
+ 		bt_bas_attach(hog->bas, gatt);
+ 
++	for (l = hog->instances; l; l = l->next) {
++		struct bt_hog *instance = l->data;
++
++		bt_hog_attach(instance, gatt);
++	}
++
+ 	if (hog->reports == NULL) {
+ 		gatt_discover_char(hog->attrib, primary->range.start,
+ 						primary->range.end, NULL,
+@@ -912,6 +938,12 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	if (!hog->attrib)
+ 		return;
+ 
++	for (l = hog->instances; l; l = l->next) {
++		struct bt_hog *instance = l->data;
++
++		bt_hog_detach(instance);
++	}
++
+ 	for (l = hog->reports; l; l = l->next) {
+ 		struct report *r = l->data;
+ 
+-- 
+1.9.3
 
-
-See the btmon + corresponding "wire-shark dump" (made using a wireless sniffer) between ~105-110sec.
-(note that the second offset between the two are off by ~2sec)
-
-	https://mega.co.nz/#!LQlVQQ5J!ouwcuee61u3cqwtVqIMVjRf5WgXBXDQJvelClDS4WDU
-
-
-on the btmon side you can see the below behaviour
-
-
-
-> ACL Data RX: Handle 1025 flags 0x02 dlen 12                                                                                   [hci0] 107.714506
-      ATT: Read Response (0x0b) len 7
-        Value: 02672302000100
-> HCI Event: Number of Completed Packets (0x13) plen 5                                                                          [hci0] 107.742699
-        Num handles: 1
-        Handle: 1025
-        Count: 1
-> ACL Data RX: Handle 1025 flags 0x02 dlen 16                                                                                  
-[hci0] 111.638371
-      LE L2CAP: Connection Parameter Update Request (0x12) ident 2 len 8
-        Min interval: 6
-        Max interval: 24
-        Slave latency: 6
-        Timeout multiplier: 30
-< ACL Data TX: Handle 1025 flags 0x00 dlen 10                                                                                   [hci0] 111.638484
-      LE L2CAP: Connection Parameter Update Response (0x13) ident 2 len 2
-        Result: Connection Parameters accepted (0x0000)
-< HCI Command: LE Connection Update (0x08|0x0013) plen 14                                                                       [hci0] 111.638531
-        Handle: 1025
-        Min connection interval: 7.50 msec (0x0006)
-        Max connection interval: 30.00 msec (0x0018)
-        Connection latency: 0x0006
-        Supervision timeout: 300 msec (0x001e)
-        Min connection length: 0.625 msec (0x0001)
-        Max connection length: 0.625 msec (0x0001)
-> HCI Event: Command Status (0x0f) plen 4                                                                                       [hci0] 111.639402
-      LE Connection Update (0x08|0x0013) ncmd 1
-        Status: Success (0x00)
-
-
-
-best David
