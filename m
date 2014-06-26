@@ -1,67 +1,132 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/mcap: Fix possible uninitialized use
-Date: Thu, 26 Jun 2014 16:45:32 +0300
-Message-Id: <1403790332-27829-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCH 7/7] android/pts: Update MCAP results
+Date: Thu, 26 Jun 2014 15:09:11 +0200
+Message-Id: <1403788151-21025-7-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1403788151-21025-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1403788151-21025-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-In case of maximum number of retries has reached, base_time may be used
-uninitialized. Fixes following warnings:
-
-...
-external/bluetooth/bluez/android/mcap-lib.c: In function
-'sync_send_indication.part.35':
-external/bluetooth/bluez/android/mcap-lib.c:2366:20: warning:
-'base_time.tv_sec' may be used uninitialized in this function
-[-Wuninitialized]
-external/bluetooth/bluez/android/mcap-lib.c:2693:18: note:
-'base_time.tv_sec' was declared here
-external/bluetooth/bluez/android/mcap-lib.c:2366:46: warning:
-'base_time.tv_nsec' may be used uninitialized in this function
-[-Wuninitialized]
-external/bluetooth/bluez/android/mcap-lib.c:2693:18: note:
-'base_time.tv_nsec' was declared here
-external/bluetooth/bluez/android/mcap-lib.c: In function
-'sync_send_indication':
-external/bluetooth/bluez/android/mcap-lib.c:2366:20: warning:
-'base_time.tv_sec' may be used uninitialized in this function
-[-Wuninitialized]
-external/bluetooth/bluez/android/mcap-lib.c:2693:18: note:
-'base_time.tv_sec' was declared here
-external/bluetooth/bluez/android/mcap-lib.c:2366:46: warning:
-'base_time.tv_nsec' may be used uninitialized in this function
-[-Wuninitialized]
-external/bluetooth/bluez/android/mcap-lib.c:2693:18: note:
-'base_time.tv_nsec' was declared here
-...
 ---
- android/mcap-lib.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ android/pts-mcap.txt | 80 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 40 insertions(+), 40 deletions(-)
 
-diff --git a/android/mcap-lib.c b/android/mcap-lib.c
-index 256abe1..dd688d9 100644
---- a/android/mcap-lib.c
-+++ b/android/mcap-lib.c
-@@ -2663,12 +2663,12 @@ static gboolean get_all_clocks(struct mcap_mcl *mcl, uint32_t *btclock,
- 		if (clock_gettime(CLK, &t0) < 0)
- 			return FALSE;
+diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
+index 9a77839..9542b8c 100644
+--- a/android/pts-mcap.txt
++++ b/android/pts-mcap.txt
+@@ -1,7 +1,7 @@
+ PTS test results for MCAP
  
--		if (!read_btclock(mcl, btclock, &btres))
--			continue;
--
- 		if (clock_gettime(CLK, base_time) < 0)
- 			return FALSE;
+ PTS version: 5.1
+-Tested: not tested
++Tested: 26-June-2014
+ Android version: 4.4.2
  
-+		if (!read_btclock(mcl, btclock, &btres))
-+			continue;
-+
- 		/*
- 		 * Tries to detect preemption between clock_gettime
- 		 * and read_btclock by measuring transaction time
+ Results:
+@@ -13,28 +13,28 @@ N/A	test is disabled due to PICS setup
+ -------------------------------------------------------------------------------
+ Test Name		Result	Notes
+ -------------------------------------------------------------------------------
+-TC_MCAP_CE_BV_01_C	INC
+-TC_MCAP_CE_BV_02_C	INC
+-TC_MCAP_CE_BV_03_C	INC
+-TC_MCAP_CE_BV_04_C	INC
++TC_MCAP_CE_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
++TC_MCAP_CE_BV_02_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CE_BV_03_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
++TC_MCAP_CE_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -d
+ TC_MCAP_CM_ABT_BV_01_C	N/A
+-TC_MCAP_CM_ABT_BV_02_C	INC
++TC_MCAP_CM_ABT_BV_02_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_CM_ABT_BV_03_C	N/A
+ TC_MCAP_CM_DEL_BV_01_C	N/A
+-TC_MCAP_CM_DEL_BV_02_C	INC
++TC_MCAP_CM_DEL_BV_02_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_CM_DEL_BV_02_C	N/A
+-TC_MCAP_CM_DEL_BV_04_C	INC
+-TC_MCAP_CM_DIS_BV_01_C	INC
+-TC_MCAP_CM_DIS_BV_02_C	INC
+-TC_MCAP_CM_DIS_BV_03_C	INC
+-TC_MCAP_CM_DIS_BV_04_C	INC
+-TC_MCAP_CM_DIS_BV_05_C	INC
++TC_MCAP_CM_DEL_BV_04_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_DIS_BV_01_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
++TC_MCAP_CM_DIS_BV_02_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_DIS_BV_03_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_CM_DIS_BV_04_C	PASS	mcaptest -C 4099 -D 4101 -e 2 -f 2
++TC_MCAP_CM_DIS_BV_05_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_CM_REC_BV_01_C	N/A
+-TC_MCAP_CM_REC_BV_02_C	INC
++TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_CM_REC_BV_03_C	N/A
+-TC_MCAP_CM_REC_BV_04_C	INC
++TC_MCAP_CM_REC_BV_04_C	INC	possible PTS issue #12182
+ TC_MCAP_CM_REC_BV_05_C	N/A
+-TC_MCAP_CM_REC_BV_06_C	INC
++TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_CS_ERR_BI_01_C	N/A
+ TC_MCAP_CS_ERR_BI_02_C	N/A
+ TC_MCAP_CS_ERR_BI_03_C	N/A
+@@ -47,31 +47,31 @@ TC_MCAP_CS_R_BV_01_I	N/A
+ TC_MCAP_CS_R_BV_02_I	N/A
+ TC_MCAP_CS_R_BV_03_C	N/A
+ TC_MCAP_CS_T_BV_04_C	N/A
+-TC_MCAP_ERR_BI_01_C	INC
+-TC_MCAP_ERR_BI_02_C	INC
+-TC_MCAP_ERR_BI_03_C	INC
+-TC_MCAP_ERR_BI_04_C	INC
+-TC_MCAP_ERR_BI_05_C	INC
+-TC_MCAP_ERR_BI_06_C	INC
+-TC_MCAP_ERR_BI_07_C	INC
+-TC_MCAP_ERR_BI_08_C	INC
+-TC_MCAP_ERR_BI_09_C	INC
+-TC_MCAP_ERR_BI_10_C	INC
+-TC_MCAP_ERR_BI_11_C	INC
++TC_MCAP_ERR_BI_01_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_ERR_BI_03_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_ERR_BI_05_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_06_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_ERR_BI_07_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_08_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_ERR_BI_09_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_10_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_11_C	PASS	mcaptest -C 4099 -D 4101 -d
+ TC_MCAP_ERR_BI_12_C	INC
+-TC_MCAP_ERR_BI_13_C	INC
+-TC_MCAP_ERR_BI_14_C	INC
+-TC_MCAP_ERR_BI_15_C	INC
++TC_MCAP_ERR_BI_13_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_14_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_ERR_BI_15_C	PASS	mcaptest -C 4099 -D 4101 -d
+ TC_MCAP_ERR_BI_16_C	INC
+-TC_MCAP_ERR_BI_17_C	INC
+-TC_MCAP_ERR_BI_18_C	INC
+-TC_MCAP_ERR_BI_19_C	INC
++TC_MCAP_ERR_BI_17_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_ERR_BI_18_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_ERR_BI_19_C	PASS	mcaptest -C 4099 -D 4101
+ TC_MCAP_ERR_BI_20_C	INC
+-TC_MCAP_INV_BI_01_C	INC
+-TC_MCAP_INV_BI_02_C	INC
+-TC_MCAP_INV_BI_03_C	INC
+-TC_MCAP_INV_BI_04_C	INC
+-TC_MCAP_INV_BI_05_C	INC
+-TC_MCAP_INV_BI_06_C	INC
+-TC_MCAP_INV_BI_07_C	INC
++TC_MCAP_INV_BI_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
++TC_MCAP_INV_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
++TC_MCAP_INV_BI_03_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
++TC_MCAP_INV_BI_04_C	PASS	mcaptest -C 4099 -D 4101 -c <PTS addr>
++TC_MCAP_INV_BI_05_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_INV_BI_06_C	PASS	mcaptest -C 4099 -D 4101
++TC_MCAP_INV_BI_07_C	PASS	mcaptest -C 4099 -D 4101
+ -------------------------------------------------------------------------------
 -- 
-1.8.3.2
+2.0.0
 
