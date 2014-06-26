@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 15/15] android/hog: Add support for multiple instaces
-Date: Thu, 26 Jun 2014 17:46:48 +0300
-Message-Id: <1403794008-18585-15-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 13/15] lib/uuid: Add define for Battery UUID
+Date: Thu, 26 Jun 2014 17:46:46 +0300
+Message-Id: <1403794008-18585-13-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 References: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,109 +11,22 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is necessary to pass PTS tests which does include 2 instances.
 ---
- android/hog.c | 48 ++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 40 insertions(+), 8 deletions(-)
+ lib/uuid.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/android/hog.c b/android/hog.c
-index 5fa8b94..01229ff 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -95,6 +95,7 @@ struct bt_hog {
- 	struct bt_dis		*dis;
- 	struct bt_scpp		*scpp;
- 	struct bt_bas		*bas;
-+	GSList			*instances;
- };
+diff --git a/lib/uuid.h b/lib/uuid.h
+index b44d6ae..7901d34 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -60,6 +60,7 @@ extern "C" {
+ #define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
+ #define LINK_LOSS_UUID		"00001803-0000-1000-8000-00805f9b34fb"
+ #define TX_POWER_UUID		"00001804-0000-1000-8000-00805f9b34fb"
++#define BATTERY_UUID		"0000180f-0000-1000-8000-00805f9b34fb"
+ #define SCAN_PARAMETERS_UUID	"00001813-0000-1000-8000-00805f9b34fb"
  
- struct report {
-@@ -648,8 +649,11 @@ static void report_free(void *data)
- 	g_free(report);
- }
- 
--static void hog_free(struct bt_hog *hog)
-+static void hog_free(void *data)
- {
-+	struct bt_hog *hog = data;
-+
-+	g_slist_free_full(hog->instances, hog_free);
- 	bt_dis_unref(hog->dis);
- 	bt_scpp_unref(hog->scpp);
- 	bt_bas_unref(hog->bas);
-@@ -804,6 +808,27 @@ static void hog_attach_bas(struct bt_hog *hog, struct gatt_primary *primary)
- 		bt_bas_attach(hog->bas, hog->attrib);
- }
- 
-+static void hog_attach_hog(struct bt_hog *hog, struct gatt_primary *primary)
-+{
-+	struct bt_hog *instance;
-+
-+	if (!hog->primary) {
-+		hog->primary = g_memdup(primary, sizeof(*primary));
-+		gatt_discover_char(hog->attrib, primary->range.start,
-+						primary->range.end, NULL,
-+						char_discovered_cb, hog);
-+		return;
-+	}
-+
-+	instance = bt_hog_new(hog->name, hog->vendor, hog->product,
-+							hog->version, primary);
-+	if (!instance)
-+		return;
-+
-+	bt_hog_attach(instance, hog->attrib);
-+	hog->instances = g_slist_append(hog->instances, instance);
-+}
-+
- static void primary_cb(uint8_t status, GSList *services, void *user_data)
- {
- 	struct bt_hog *hog = user_data;
-@@ -842,16 +867,11 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 		}
- 
- 		if (strcmp(primary->uuid, HOG_UUID) == 0)
--			hog->primary = g_memdup(primary, sizeof(*primary));
-+			hog_attach_hog(hog, primary);
- 	}
- 
--	if (hog->primary) {
--		gatt_discover_char(hog->attrib, hog->primary->range.start,
--						hog->primary->range.end, NULL,
--						char_discovered_cb, hog);
--
-+	if (hog->primary)
- 		return;
--	}
- 
- 	for (l = services; l; l = l->next) {
- 		primary = l->data;
-@@ -886,6 +906,12 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 	if (hog->bas)
- 		bt_bas_attach(hog->bas, gatt);
- 
-+	for (l = hog->instances; l; l = l->next) {
-+		struct bt_hog *instance = l->data;
-+
-+		bt_hog_attach(instance, gatt);
-+	}
-+
- 	if (hog->reports == NULL) {
- 		gatt_discover_char(hog->attrib, primary->range.start,
- 						primary->range.end, NULL,
-@@ -912,6 +938,12 @@ void bt_hog_detach(struct bt_hog *hog)
- 	if (!hog->attrib)
- 		return;
- 
-+	for (l = hog->instances; l; l = l->next) {
-+		struct bt_hog *instance = l->data;
-+
-+		bt_hog_detach(instance);
-+	}
-+
- 	for (l = hog->reports; l; l = l->next) {
- 		struct report *r = l->data;
- 
+ #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
 -- 
 1.9.3
 
