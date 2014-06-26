@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 04/15] android/dis: Only cache the handle not all the characteristics
-Date: Thu, 26 Jun 2014 17:46:37 +0300
-Message-Id: <1403794008-18585-4-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 02/15] android/dis: Strip dependencies from deviceinfo plugin
+Date: Thu, 26 Jun 2014 17:46:35 +0300
+Message-Id: <1403794008-18585-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 References: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,96 +11,283 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This strip any dependecy from deviceinfo plugin so the code can be reused
+by HoG implementation.
 ---
- android/dis.c | 33 +++++++++------------------------
- 1 file changed, 9 insertions(+), 24 deletions(-)
+ android/Android.mk          |   1 +
+ android/Makefile.am         |   1 +
+ android/dis.c               | 154 +++++++++++++++++++++-----------------------
+ android/{health.h => dis.h} |  11 +++-
+ 4 files changed, 83 insertions(+), 84 deletions(-)
+ copy android/{health.h => dis.h} (78%)
 
+diff --git a/android/Android.mk b/android/Android.mk
+index fc7b59d..7485c0f 100644
+--- a/android/Android.mk
++++ b/android/Android.mk
+@@ -35,6 +35,7 @@ include $(CLEAR_VARS)
+ LOCAL_SRC_FILES := \
+ 	bluez/android/main.c \
+ 	bluez/android/bluetooth.c \
++	bluez/android/dis.c \
+ 	bluez/android/hog.c \
+ 	bluez/android/hidhost.c \
+ 	bluez/android/socket.c \
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 51c8253..0349f38 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -38,6 +38,7 @@ android_bluetoothd_SOURCES = android/main.c \
+ 				src/shared/uhid.h src/shared/uhid.c \
+ 				android/bluetooth.h android/bluetooth.c \
+ 				android/hidhost.h android/hidhost.c \
++				android/dis.h android/dis.c \
+ 				android/hog.h android/hog.c \
+ 				android/ipc-common.h \
+ 				android/ipc.h android/ipc.c \
 diff --git a/android/dis.c b/android/dis.c
-index 3237c03..ce6e063 100644
+index 208598a..7914293 100644
 --- a/android/dis.c
 +++ b/android/dis.c
-@@ -44,13 +44,13 @@
+@@ -29,55 +29,86 @@
  
- struct bt_dis {
- 	int			ref_count;
-+	uint16_t		handle;
- 	uint8_t			source;
- 	uint16_t		vendor;
- 	uint16_t		product;
- 	uint16_t		version;
+ #include <glib.h>
+ 
++#include "src/log.h"
++
+ #include "lib/uuid.h"
+-#include "src/plugin.h"
+-#include "src/adapter.h"
+-#include "src/device.h"
+-#include "src/profile.h"
+-#include "src/service.h"
+ #include "src/shared/util.h"
++
+ #include "attrib/gattrib.h"
+-#include "src/attio.h"
+ #include "attrib/att.h"
+ #include "attrib/gatt.h"
+-#include "src/log.h"
++
++#include "android/dis.h"
+ 
+ #define PNP_ID_SIZE	7
+ 
+-struct deviceinfo {
+-	struct btd_device	*dev;		/* Device reference */
++struct bt_dis {
++	int			ref_count;
++	uint8_t			source;
++	uint16_t		vendor;
++	uint16_t		product;
++	uint16_t		version;
  	GAttrib			*attrib;	/* GATT connection */
- 	struct gatt_primary	*primary;	/* Primary details */
--	GSList			*chars;		/* Characteristics */
- 	bt_dis_notify		notify;
- 	void			*notify_data;
+-	guint			attioid;	/* Att watcher id */
+-	struct att_range	*svc_range;	/* DeviceInfo range */
++	struct gatt_primary	*primary;	/* Primary details */
+ 	GSList			*chars;		/* Characteristics */
  };
-@@ -65,8 +65,6 @@ static void dis_free(struct bt_dis *dis)
- 	if (dis->attrib)
- 		g_attrib_unref(dis->attrib);
  
--	g_slist_free_full(dis->chars, g_free);
--
- 	g_free(dis->primary);
- 	g_free(dis);
+ struct characteristic {
+ 	struct gatt_char	attr;	/* Characteristic */
+-	struct deviceinfo	*d;	/* deviceinfo where the char belongs */
++	struct bt_dis		*d;	/* deviceinfo where the char belongs */
+ };
+ 
+-static void deviceinfo_driver_remove(struct btd_service *service)
++static void dis_free(struct bt_dis *dis)
++{
++	if (dis->attrib)
++		g_attrib_unref(dis->attrib);
++
++	g_slist_free_full(dis->chars, g_free);
++
++	g_free(dis->primary);
++	g_free(dis);
++}
++
++struct bt_dis *bt_dis_new(void *primary)
+ {
+-	struct deviceinfo *d = btd_service_get_user_data(service);
++	struct bt_dis *dis;
+ 
+-	if (d->attioid > 0)
+-		btd_device_remove_attio_callback(d->dev, d->attioid);
++	dis = g_try_new0(struct bt_dis, 1);
++	if (!dis)
++		return NULL;
+ 
+-	if (d->attrib != NULL)
+-		g_attrib_unref(d->attrib);
++	if (primary)
++		dis->primary = g_memdup(primary, sizeof(*dis->primary));
+ 
+-	g_slist_free_full(d->chars, g_free);
++	return bt_dis_ref(dis);
++}
++
++struct bt_dis *bt_dis_ref(struct bt_dis *dis)
++{
++	if (!dis)
++		return NULL;
+ 
+-	btd_device_unref(d->dev);
+-	g_free(d->svc_range);
+-	g_free(d);
++	__sync_fetch_and_add(&dis->ref_count, 1);
++
++	return dis;
++}
++
++void bt_dis_unref(struct bt_dis *dis)
++{
++	if (!dis)
++		return;
++
++	if (__sync_sub_and_fetch(&dis->ref_count, 1))
++		return;
++
++	dis_free(dis);
  }
-@@ -109,8 +107,7 @@ void bt_dis_unref(struct bt_dis *dis)
+ 
  static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
  							gpointer user_data)
  {
--	struct characteristic *ch = user_data;
--	struct bt_dis *dis = ch->d;
-+	struct bt_dis *dis = user_data;
+ 	struct characteristic *ch = user_data;
++	struct bt_dis *dis = ch->d;
  	uint8_t value[PNP_ID_SIZE];
  	ssize_t vlen;
  
-@@ -143,13 +140,6 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
- 						dis->version, dis->notify_data);
+@@ -97,8 +128,10 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 		return;
+ 	}
+ 
+-	btd_device_set_pnpid(ch->d->dev, value[0], get_le16(&value[1]),
+-				get_le16(&value[3]), get_le16(&value[5]));
++	dis->source = value[0];
++	dis->vendor = get_le16(&value[1]);
++	dis->product = get_le16(&value[3]);
++	dis->version = get_le16(&value[5]);
  }
  
--static void process_deviceinfo_char(struct characteristic *ch)
--{
--	if (g_strcmp0(ch->attr.uuid, PNPID_UUID) == 0)
--		gatt_read_char(ch->d->attrib, ch->attr.value_handle,
--							read_pnpid_cb, ch);
--}
--
+ static void process_deviceinfo_char(struct characteristic *ch)
+@@ -111,7 +144,7 @@ static void process_deviceinfo_char(struct characteristic *ch)
  static void configure_deviceinfo_cb(uint8_t status, GSList *characteristics,
  								void *user_data)
  {
-@@ -164,18 +154,12 @@ static void configure_deviceinfo_cb(uint8_t status, GSList *characteristics,
+-	struct deviceinfo *d = user_data;
++	struct bt_dis *d = user_data;
+ 	GSList *l;
  
- 	for (l = characteristics; l; l = l->next) {
- 		struct gatt_char *c = l->data;
--		struct characteristic *ch;
--
--		ch = g_new0(struct characteristic, 1);
--		ch->attr.handle = c->handle;
--		ch->attr.properties = c->properties;
--		ch->attr.value_handle = c->value_handle;
--		memcpy(ch->attr.uuid, c->uuid, MAX_LEN_UUID_STR + 1);
--		ch->d = d;
--
--		d->chars = g_slist_append(d->chars, ch);
- 
--		process_deviceinfo_char(ch);
-+		if (strcmp(c->uuid, PNPID_UUID) == 0) {
-+			d->handle = c->value_handle;
-+			gatt_read_char(d->attrib, d->handle, read_pnpid_cb, d);
-+			break;
-+		}
+ 	if (status != 0) {
+@@ -136,71 +169,28 @@ static void configure_deviceinfo_cb(uint8_t status, GSList *characteristics,
+ 		process_deviceinfo_char(ch);
  	}
  }
+-static void attio_connected_cb(GAttrib *attrib, gpointer user_data)
+-{
+-	struct deviceinfo *d = user_data;
+-
+-	d->attrib = g_attrib_ref(attrib);
+-
+-	gatt_discover_char(d->attrib, d->svc_range->start, d->svc_range->end,
+-					NULL, configure_deviceinfo_cb, d);
+-}
  
-@@ -188,7 +172,8 @@ bool bt_dis_attach(struct bt_dis *dis, void *attrib)
+-static void attio_disconnected_cb(gpointer user_data)
++bool bt_dis_attach(struct bt_dis *dis, void *attrib)
+ {
+-	struct deviceinfo *d = user_data;
++	struct gatt_primary *primary = dis->primary;
  
- 	dis->attrib = g_attrib_ref(attrib);
+-	g_attrib_unref(d->attrib);
+-	d->attrib = NULL;
+-}
+-
+-static int deviceinfo_register(struct btd_service *service,
+-						struct gatt_primary *prim)
+-{
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct deviceinfo *d;
++	if (dis->attrib || !primary)
++		return false;
  
--	gatt_discover_char(dis->attrib, primary->range.start,
-+	if (!dis->handle)
-+		gatt_discover_char(dis->attrib, primary->range.start,
- 						primary->range.end, NULL,
- 						configure_deviceinfo_cb, dis);
+-	d = g_new0(struct deviceinfo, 1);
+-	d->dev = btd_device_ref(device);
+-	d->svc_range = g_new0(struct att_range, 1);
+-	d->svc_range->start = prim->range.start;
+-	d->svc_range->end = prim->range.end;
++	dis->attrib = g_attrib_ref(attrib);
  
+-	btd_service_set_user_data(service, d);
++	gatt_discover_char(dis->attrib, primary->range.start,
++						primary->range.end, NULL,
++						configure_deviceinfo_cb, dis);
+ 
+-	d->attioid = btd_device_add_attio_callback(device, attio_connected_cb,
+-						attio_disconnected_cb, d);
+-	return 0;
++	return true;
+ }
+ 
+-static int deviceinfo_driver_probe(struct btd_service *service)
++void bt_dis_detach(struct bt_dis *dis)
+ {
+-	struct btd_device *device = btd_service_get_device(service);
+-	struct gatt_primary *prim;
+-
+-	prim = btd_device_get_primary(device, DEVICE_INFORMATION_UUID);
+-	if (prim == NULL)
+-		return -EINVAL;
+-
+-	return deviceinfo_register(service, prim);
+-}
+-
+-static struct btd_profile deviceinfo_profile = {
+-	.name		= "deviceinfo",
+-	.remote_uuid	= DEVICE_INFORMATION_UUID,
+-	.device_probe	= deviceinfo_driver_probe,
+-	.device_remove	= deviceinfo_driver_remove
+-};
+-
+-static int deviceinfo_init(void)
+-{
+-	return btd_profile_register(&deviceinfo_profile);
+-}
++	if (!dis->attrib)
++		return;
+ 
+-static void deviceinfo_exit(void)
+-{
+-	btd_profile_unregister(&deviceinfo_profile);
++	g_attrib_unref(dis->attrib);
++	dis->attrib = NULL;
+ }
+-
+-BLUETOOTH_PLUGIN_DEFINE(deviceinfo, VERSION, BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
+-					deviceinfo_init, deviceinfo_exit)
+diff --git a/android/health.h b/android/dis.h
+similarity index 78%
+copy from android/health.h
+copy to android/dis.h
+index 0b32fd3..6cc0b58 100644
+--- a/android/health.h
++++ b/android/dis.h
+@@ -21,5 +21,12 @@
+  *
+  */
+ 
+-bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
+-void bt_health_unregister(void);
++struct bt_dis;
++
++struct bt_dis *bt_dis_new(void *primary);
++
++struct bt_dis *bt_dis_ref(struct bt_dis *dis);
++void bt_dis_unref(struct bt_dis *dis);
++
++bool bt_dis_attach(struct bt_dis *dis, void *gatt);
++void bt_dis_detach(struct bt_dis *dis);
 -- 
 1.9.3
 
