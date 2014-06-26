@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/15] android/scpp: Add bt_scpp_set_interval and bt_scpp_set_window
-Date: Thu, 26 Jun 2014 17:46:42 +0300
-Message-Id: <1403794008-18585-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 10/15] android/scpp: Check for cached handles on attach
+Date: Thu, 26 Jun 2014 17:46:43 +0300
+Message-Id: <1403794008-18585-10-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 References: <1403794008-18585-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,112 +11,97 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-These functions can be used to change the current values.
 ---
- android/scpp.c | 43 +++++++++++++++++++++++++++++++++++++------
- android/scpp.h |  3 +++
- 2 files changed, 40 insertions(+), 6 deletions(-)
+ android/scpp.c | 46 ++++++++++++++++++++++++++++------------------
+ 1 file changed, 28 insertions(+), 18 deletions(-)
 
 diff --git a/android/scpp.c b/android/scpp.c
-index c73a015..751d3f2 100644
+index 751d3f2..0fc75f3 100644
 --- a/android/scpp.c
 +++ b/android/scpp.c
-@@ -77,6 +77,9 @@ struct bt_scpp *bt_scpp_new(void *primary)
- 	if (!scan)
- 		return NULL;
+@@ -148,12 +148,22 @@ static void ccc_written_cb(guint8 status, const guint8 *pdu,
+ 				refresh_value_cb, scan, NULL);
+ }
  
-+	scan->interval = SCAN_INTERVAL;
-+	scan->window = SCAN_WINDOW;
++static void write_ccc(GAttrib *attrib, uint16_t handle, void *user_data)
++{
++	uint8_t value[2];
 +
- 	if (primary)
- 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
- 
-@@ -104,12 +107,13 @@ void bt_scpp_unref(struct bt_scpp *scan)
- 	scpp_free(scan);
- }
- 
--static void write_scan_params(GAttrib *attrib, uint16_t handle)
-+static void write_scan_params(GAttrib *attrib, uint16_t handle,
-+					uint16_t interval, uint16_t window)
++	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
++
++	gatt_write_char(attrib, handle, value, sizeof(value), ccc_written_cb,
++								user_data);
++}
++
+ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 								void *user_data)
  {
- 	uint8_t value[4];
+ 	struct bt_scpp *scan = user_data;
+ 	struct gatt_desc *desc;
+-	uint8_t value[2];
++
  
--	put_le16(SCAN_INTERVAL, &value[0]);
--	put_le16(SCAN_WINDOW, &value[2]);
-+	put_le16(interval, &value[0]);
-+	put_le16(window, &value[2]);
+ 	if (status != 0) {
+ 		error("Discover descriptors failed: %s", att_ecode2str(status));
+@@ -163,9 +173,9 @@ static void discover_descriptor_cb(uint8_t status, GSList *descs,
+ 	/* There will be only one descriptor on list and it will be CCC */
+ 	desc = descs->data;
  
- 	gatt_write_cmd(attrib, handle, value, sizeof(value), NULL, NULL);
- }
-@@ -122,7 +126,8 @@ static void refresh_value_cb(const uint8_t *pdu, uint16_t len,
- 	DBG("Server requires refresh: %d", pdu[3]);
- 
- 	if (pdu[3] == SERVER_REQUIRES_REFRESH)
--		write_scan_params(scan->attrib, scan->iwhandle);
-+		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
-+								scan->window);
- }
- 
- static void ccc_written_cb(guint8 status, const guint8 *pdu,
-@@ -215,7 +220,8 @@ static void iwin_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- 
- 	DBG("Scan Interval Window handle: 0x%04x", scan->iwhandle);
- 
--	write_scan_params(scan->attrib, scan->iwhandle);
-+	write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
-+								scan->window);
+-	put_le16(GATT_CLIENT_CHARAC_CFG_NOTIF_BIT, value);
+-	gatt_write_char(scan->attrib, desc->handle, value, sizeof(value),
+-						ccc_written_cb, user_data);
++	scan->refresh_handle = desc->handle;
++
++	write_ccc(scan->attrib, desc->handle, scan);
  }
  
- bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
-@@ -228,7 +234,8 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ static void refresh_discovered_cb(uint8_t status, GSList *chars,
+@@ -196,8 +206,6 @@ static void refresh_discovered_cb(uint8_t status, GSList *chars,
+ 	if (start > end)
+ 		return;
+ 
+-	scan->refresh_handle = chr->value_handle;
+-
+ 	bt_uuid16_create(&uuid, GATT_CLIENT_CHARAC_CFG_UUID);
+ 
+ 	gatt_discover_desc(scan->attrib, start, end, &uuid,
+@@ -233,22 +241,24 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ 
  	scan->attrib = g_attrib_ref(attrib);
  
- 	if (scan->iwhandle) {
--		write_scan_params(scan->attrib, scan->iwhandle);
-+		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
-+								scan->window);
- 		return true;
+-	if (scan->iwhandle) {
++	if (scan->iwhandle)
+ 		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
+ 								scan->window);
+-		return true;
++	else {
++		bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
++		gatt_discover_char(scan->attrib, scan->primary->range.start,
++					scan->primary->range.end, &iwin_uuid,
++					iwin_discovered_cb, scan);
  	}
  
-@@ -254,3 +261,27 @@ void bt_scpp_detach(struct bt_scpp *scan)
- 	g_attrib_unref(scan->attrib);
- 	scan->attrib = NULL;
- }
-+
-+bool bt_scpp_set_interval(struct bt_scpp *scan, uint16_t value)
-+{
-+	if (!scan)
-+		return false;
-+
-+	/* TODO: Check valid range */
-+
-+	scan->interval = value;
-+
-+	return true;
-+}
-+
-+bool bt_scpp_set_window(struct bt_scpp *scan, uint16_t value)
-+{
-+	if (!scan)
-+		return false;
-+
-+	/* TODO: Check valid range */
-+
-+	scan->window = value;
-+
-+	return true;
-+}
-diff --git a/android/scpp.h b/android/scpp.h
-index f374cee..048fb9f 100644
---- a/android/scpp.h
-+++ b/android/scpp.h
-@@ -30,3 +30,6 @@ void bt_scpp_unref(struct bt_scpp *scan);
+-	bt_uuid16_create(&iwin_uuid, SCAN_INTERVAL_WIN_UUID);
+-	bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
+-
+-	gatt_discover_char(scan->attrib, scan->primary->range.start,
+-				scan->primary->range.end, &iwin_uuid,
+-				iwin_discovered_cb, scan);
+-
+-	gatt_discover_char(scan->attrib, scan->primary->range.start,
+-				scan->primary->range.end, &refresh_uuid,
+-				refresh_discovered_cb, scan);
++	if (scan->refresh_handle)
++		write_ccc(scan->attrib, scan->refresh_handle, scan);
++	else {
++		bt_uuid16_create(&refresh_uuid, SCAN_REFRESH_UUID);
++		gatt_discover_char(scan->attrib, scan->primary->range.start,
++					scan->primary->range.end, &refresh_uuid,
++					refresh_discovered_cb, scan);
++	}
  
- bool bt_scpp_attach(struct bt_scpp *scan, void *gatt);
- void bt_scpp_detach(struct bt_scpp *scan);
-+
-+bool bt_scpp_set_interval(struct bt_scpp *scan, uint16_t value);
-+bool bt_scpp_set_window(struct bt_scpp *scan, uint16_t value);
+ 	return true;
+ }
 -- 
 1.9.3
 
