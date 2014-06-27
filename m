@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 0/5] Implement MDL disconnect and reconnect
-Date: Fri, 27 Jun 2014 15:32:13 +0200
-Message-ID: <5183728.I9e57dWrje@uw000953>
-In-Reply-To: <1403818246-20205-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1403818246-20205-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH] android/health: Fix wrong user data passing in set_mcl_cb
+Date: Fri, 27 Jun 2014 15:31:53 +0200
+Message-ID: <1453660.8hzhqKDWXg@uw000953>
+In-Reply-To: <1403816654-19539-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1403816654-19539-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,27 +14,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Ravi,
 
-On Friday 27 of June 2014 00:30:41 Ravi kumar Veeramally wrote:
-> Patshset introduces extra api in haltest tool (close_channel).
-> PTS test case for MDL disconnect and reconnect expects only
-> channel disconnection/close not deletion. It can not be called
-> with current HAL api. This call just shutdown specified fd, which
-> triggers channel disconnection. Another attempt for connection
-> means simply start with reconnect request.
+On Friday 27 of June 2014 00:04:14 Ravi kumar Veeramally wrote:
+> It used to be channel, when set_mcl_cb refactored
+> it got changed to channed->dev.
+> commit 32180fa3a649ec26f9f3891a0ff5e4fe16592b91 introduced it.
+> ---
+>  android/health.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Ravi kumar Veeramally (5):
->   android/client/health: Introduce close_channel API.
->   android/health: Implement mdl_closed_cb callback
->   android/health: Fix deleting channels queue
->   android/health: Implement mdl reconnect
->   android/health: Implement destroy_channel call
-> 
->  android/client/if-hl.c | 29 +++++++++++++++
->  android/health.c       | 98 +++++++++++++++++++++++++++++++++++++++++++++++---
->  2 files changed, 122 insertions(+), 5 deletions(-)
+> diff --git a/android/health.c b/android/health.c
+> index 42c9a6e..30a6166 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -1341,7 +1341,7 @@ static void create_mcl_cb(struct mcap_mcl *mcl, GError *err, gpointer data)
+>  	channel->dev->mcl_conn = true;
+>  	info("MCL connected");
+>  
+> -	ret = set_mcl_cb(channel->dev->mcl, channel->dev, &gerr);
+> +	ret = set_mcl_cb(channel->dev->mcl, channel, &gerr);
+>  	if (!ret) {
+>  		error("health: error setting mdl callbacks: %s", gerr->message);
+>  		g_error_free(gerr);
 > 
 
-All patches applied. Thanks. 
+Applied, thanks.
 
 -- 
 Best regards, 
