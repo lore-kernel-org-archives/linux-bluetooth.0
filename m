@@ -1,36 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v3 01/15] android/dis: Add copy to Device Info implementation
-Date: Fri, 27 Jun 2014 18:35:24 +0200
-Message-ID: <1803230.Jg3oY3U5Hy@uw000953>
-In-Reply-To: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
-References: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv4 01/10] android/health: Add error check when creating app
+Date: Fri, 27 Jun 2014 18:16:02 +0300
+Message-Id: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Friday 27 of June 2014 11:27:45 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> ---
-> v3: Fix passing wrong handle to g_attrib_register in ScPP
-> 
->  profiles/deviceinfo/deviceinfo.c => android/dis.c | 0
->  1 file changed, 0 insertions(+), 0 deletions(-)
->  copy profiles/deviceinfo/deviceinfo.c => android/dis.c (100%)
-> 
-> diff --git a/profiles/deviceinfo/deviceinfo.c b/android/dis.c
-> similarity index 100%
-> copy from profiles/deviceinfo/deviceinfo.c
-> copy to android/dis.c
+---
+ android/health.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-ScPP related patches (6-11) are now applied. Thanks. 
-
+diff --git a/android/health.c b/android/health.c
+index 7d64a63..0eeb0bd 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -820,6 +820,8 @@ static void bt_health_register_app(const void *buf, uint16_t len)
+ 
+ 	app = create_health_app(app_name, provider, srv_name, srv_descr,
+ 							cmd->num_of_mdep);
++	if (!app)
++		goto fail;
+ 
+ 	if (!queue_push_tail(apps, app))
+ 		goto fail;
 -- 
-Best regards, 
-Szymon Janc
+1.8.3.2
+
