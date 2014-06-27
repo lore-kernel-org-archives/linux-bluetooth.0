@@ -2,88 +2,143 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 2/3] android/mcaptest: Support unavailable response to first MDL connect
-Date: Fri, 27 Jun 2014 12:08:02 +0200
-Message-Id: <1403863683-9844-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1403863683-9844-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1403863683-9844-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 1/3] android/mcaptest: Send clock sync capabilities request
+Date: Fri, 27 Jun 2014 12:08:01 +0200
+Message-Id: <1403863683-9844-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This is needed to pass TC_MCAP_ERR_BI_16_C
+This adds option to send synchronization capabilities and requirements
+request on MCL connection.
 ---
- android/mcaptest.c | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+ android/mcaptest.c | 43 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 39 insertions(+), 4 deletions(-)
 
 diff --git a/android/mcaptest.c b/android/mcaptest.c
-index 642dbf4..f727a79 100644
+index 9869abb..642dbf4 100644
 --- a/android/mcaptest.c
 +++ b/android/mcaptest.c
-@@ -57,6 +57,8 @@ static uint16_t mdlid;
+@@ -57,6 +57,7 @@ static uint16_t mdlid;
  static int control_mode = MODE_LISTEN;
  static int data_mode = MODE_LISTEN;
  
-+static int mdl_conn_req_result = MCAP_SUCCESS;
-+
- static gboolean send_synccap_req = FALSE;
++static gboolean send_synccap_req = FALSE;
  static gboolean mcl_disconnect = FALSE;
  static gboolean mdl_disconnect = FALSE;
-@@ -109,9 +111,15 @@ static void mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
- static uint8_t mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 				uint16_t mdlid, uint8_t *conf, void *data)
- {
-+	int ret;
-+
- 	printf("%s\n", __func__);
+ static int mcl_disconnect_timeout = -1;
+@@ -64,6 +65,8 @@ static int mdl_disconnect_timeout = -1;
  
--	return MCAP_SUCCESS;
-+	ret = mdl_conn_req_result;
+ static struct mcap_mcl *mcl = NULL;
+ 
++#define REQ_CLOCK_ACC 0x1400
 +
-+	mdl_conn_req_result = MCAP_SUCCESS;
-+
-+	return ret;
+ static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+ {
+ 	int fd = -1;
+@@ -178,6 +181,15 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 	}
  }
  
- static uint8_t mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
-@@ -269,7 +277,8 @@ static void usage(void)
- 		"\t-g send clock sync capability request if MCL connected\n");
++static void sync_cap_cb(struct mcap_mcl *mcl, uint8_t mcap_err,
++			uint8_t btclockres, uint16_t synclead,
++			uint16_t tmstampres, uint16_t tmstampacc, GError *err,
++			gpointer data)
++{
++	/* TODO */
++	printf("%s\n", __func__);
++}
++
+ static void trigger_mdl_action(int mode)
+ {
+ 	GError *gerr = NULL;
+@@ -205,14 +217,26 @@ static void trigger_mdl_action(int mode)
+ 			g_error_free(gerr);
+ 		}
+ 	}
++
++	if (send_synccap_req && mcap->csp_enabled) {
++		mcap_sync_init(mcl);
++
++		mcap_sync_cap_req(mcl, REQ_CLOCK_ACC, sync_cap_cb, NULL, &gerr);
++		if (gerr) {
++			printf("MCAP Sync req error: %s\n", gerr->message);
++			g_error_free(gerr);
++		}
++	}
+ }
+ 
+ static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
+ {
+ 	printf("%s\n", __func__);
+ 
+-	if (mcl)
++	if (mcl) {
++		mcap_sync_stop(mcl);
+ 		mcap_mcl_unref(mcl);
++	}
+ 
+ 	mcl = mcap_mcl_ref(mcap_mcl);
+ 	trigger_mdl_action(data_mode);
+@@ -226,8 +250,10 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
+ 		return;
+ 	}
+ 
+-	if (mcl)
++	if (mcl) {
++		mcap_sync_stop(mcl);
+ 		mcap_mcl_unref(mcl);
++	}
+ 
+ 	mcl = mcap_mcl_ref(mcap_mcl);
+ 	trigger_mdl_action(data_mode);
+@@ -239,7 +265,8 @@ static void usage(void)
+ 		"\tmcaptest <control_mode> <data_mode> [options]\n");
+ 	printf("Control Link Mode:\n"
+ 		"\t-c connect <dst_addr>\n"
+-		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n");
++		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n"
++		"\t-g send clock sync capability request if MCL connected\n");
  	printf("Data Link Mode:\n"
  		"\t-d connect\n"
--		"\t-f <timeout> disconnect MDL after it's connected\n");
-+		"\t-f <timeout> disconnect MDL after it's connected\n"
-+		"\t-u send \'Unavailable\' on first MDL connection request\n");
- 	printf("Options:\n"
- 		"\t-i <hcidev>        HCI device\n"
- 		"\t-C <control_ch>    Control channel PSM\n"
-@@ -284,6 +293,7 @@ static struct option main_options[] = {
- 	{ "synccap_req",	0, 0, 'g' },
+ 		"\t-f <timeout> disconnect MDL after it's connected\n");
+@@ -254,6 +281,7 @@ static struct option main_options[] = {
+ 	{ "device",		1, 0, 'i' },
+ 	{ "connect_cl",		1, 0, 'c' },
+ 	{ "disconnect_cl",	1, 0, 'e' },
++	{ "synccap_req",	0, 0, 'g' },
  	{ "connect_dl",		0, 0, 'd' },
  	{ "disconnect_dl",	1, 0, 'f' },
-+	{ "unavailable_dl",	0, 0, 'u' },
  	{ "control_ch",		1, 0, 'C' },
- 	{ "data_ch",		1, 0, 'D' },
- 	{ 0, 0, 0, 0 }
-@@ -305,7 +315,7 @@ int main(int argc, char *argv[])
+@@ -277,7 +305,7 @@ int main(int argc, char *argv[])
  		exit(1);
  	}
  
--	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dgh",
-+	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dghu",
+-	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:hd",
++	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dgh",
  						main_options, NULL)) != EOF) {
  		switch (opt) {
  		case 'i':
-@@ -344,6 +354,11 @@ int main(int argc, char *argv[])
+@@ -311,6 +339,11 @@ int main(int argc, char *argv[])
  
  			break;
  
-+		case 'u':
-+			mdl_conn_req_result = MCAP_RESOURCE_UNAVAILABLE;
++		case 'g':
++			send_synccap_req = TRUE;
 +
 +			break;
 +
  		case 'C':
  			ccpsm = atoi(optarg);
  
+@@ -341,6 +374,8 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
++	mcap_enable_csp(mcap);
++
+ 	switch (control_mode) {
+ 	case MODE_CONNECT:
+ 		ba2str(&dst, bdastr);
 -- 
 2.0.0
 
