@@ -1,45 +1,243 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH 0/6] Bluetooth: Various SMP cleanups & fixes
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 27 Jun 2014 13:40:28 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <010EDA1D-030B-4F77-86AC-B910975F0198@holtmann.org>
-References: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 06/12] android/health: Add channel connect
+Date: Fri, 27 Jun 2014 14:24:57 +0300
+Message-Id: <1403868303-8129-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-> Here's a set of cleanups and fixes for SMP. I'd consider all of them as
-> bluetooth-next material, but it could be debated whether the first patch
-> should go to bluetooth.git first (I don't have any obvious way of
-> exploiting it so I don't consider it very critical).
-> 
-> Johan
-> 
-> ----------------------------------------------------------------
-> Johan Hedberg (6):
->      Bluetooth: Fix missing hdev locking in smp_cmd_ident_addr_info
->      Bluetooth: Add dedicated AES instance for each SMP context
->      Bluetooth: Update SMP crypto functions to take the SMP context
->      Bluetooth: Remove unnecessary hci_dev_unlock for smp_user_confirm_reply
->      Bluetooth: Fix missing check for SMP session in smp_user_confirm_reply
->      Bluetooth: Remove unnecessary hcon->smp_conn variable
-> 
-> include/net/bluetooth/hci_core.h |  1 -
-> net/bluetooth/mgmt.c             |  7 ----
-> net/bluetooth/smp.c              | 73 ++++++++++++++++++++------------------
-> 3 files changed, 38 insertions(+), 43 deletions(-)
+Connect channel on incoming connection callback
+---
+ android/health.c | 190 ++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 111 insertions(+), 79 deletions(-)
 
-all 6 patches have been applied to bluetooth-next tree.
-
-And even patch 1/6 is not something I would consider for 3.16-rcX unless we see real bugs about it. If anyone stumbles over it, we promote it to -stable once 3.16 has been released.
-
-Regards
-
-Marcel
+diff --git a/android/health.c b/android/health.c
+index d664324..ff2c663 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -1098,14 +1098,125 @@ static void mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
+ 	DBG("Not Implemeneted");
+ }
+ 
++static struct health_device *create_device(struct health_app *app,
++							const uint8_t *addr)
++{
++	struct health_device *dev;
++
++	if (!app)
++		return NULL;
++
++	/* create device and push it to devices queue */
++	dev = new0(struct health_device, 1);
++	if (!dev)
++		return NULL;
++
++	android2bdaddr(addr, &dev->dst);
++	dev->channels = queue_new();
++	if (!dev->channels) {
++		free_health_device(dev);
++		return NULL;
++	}
++
++	if (!queue_push_tail(app->devices, dev)) {
++		free_health_device(dev);
++		return NULL;
++	}
++
++	return dev;
++}
++
++static struct health_device *get_device(struct health_app *app,
++							const uint8_t *addr)
++{
++	struct health_device *dev;
++	bdaddr_t bdaddr;
++
++	android2bdaddr(addr, &bdaddr);
++	dev = queue_find(app->devices, match_dev_by_addr, &bdaddr);
++	if (dev)
++		return dev;
++
++	return create_device(app, addr);
++}
++
++static struct health_channel *create_channel(struct health_app *app,
++						uint8_t mdep_index,
++						struct health_device *dev)
++{
++	struct mdep_cfg *mdep;
++	struct health_channel *channel;
++	uint8_t index;
++	static unsigned int channel_id = 1;
++
++	DBG("mdep %u", mdep_index);
++
++	if (!dev || !app)
++		return NULL;
++
++	index = mdep_index + 1;
++	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(index));
++	if (!mdep)
++		return NULL;
++
++	/* create channel and push it to device */
++	channel = new0(struct health_channel, 1);
++	if (!channel)
++		return NULL;
++
++	channel->mdep_id = mdep->id;
++	channel->type = mdep->channel_type;
++	channel->id = channel_id++;
++	channel->dev = dev;
++
++	if (!queue_push_tail(dev->channels, channel)) {
++		free_health_channel(channel);
++		return NULL;
++	}
++
++	return channel;
++}
++
++static struct health_channel *connect_channel(struct mcap_mcl *mcl,
++								uint8_t mdepid)
++{
++	struct health_app *app;
++	struct health_device *device;
++	struct health_channel *channel = NULL;
++	bdaddr_t addr;
++
++	mcap_mcl_get_addr(mcl, &addr);
++
++	/* TODO: Search app for mdepid */
++
++	if (mdepid == HDP_MDEP_ECHO) {
++		/* For echo service take last app */
++		app = queue_peek_tail(apps);
++		if (!app)
++			return NULL;
++
++		device = get_device(app, (uint8_t *) &addr);
++		if (!device)
++			return NULL;
++
++		channel = create_channel(app, mdepid, device);
++	}
++
++	return channel;
++}
++
+ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
+ 				uint16_t mdlid, uint8_t *conf, void *data)
+ {
+ 	GError *gerr = NULL;
++	struct health_channel *channel;
+ 
+ 	DBG("Data channel request: mdepid %u mdlid %u", mdepid, mdlid);
+ 
+ 	/* TODO: find / create device */
++	channel = connect_channel(mcl, mdepid);
++	if (!channel)
++		return MCAP_MDL_BUSY;
+ 
+ 	if (mdepid == HDP_MDEP_ECHO) {
+ 		switch (*conf) {
+@@ -1449,90 +1560,11 @@ static int connect_mcl(struct health_channel *channel)
+ 						search_cb, channel, NULL, 0);
+ }
+ 
+-static struct health_device *create_device(struct health_app *app,
+-							const uint8_t *addr)
+-{
+-	struct health_device *dev;
+-
+-	if (!app)
+-		return NULL;
+-
+-	/* create device and push it to devices queue */
+-	dev = new0(struct health_device, 1);
+-	if (!dev)
+-		return NULL;
+-
+-	android2bdaddr(addr, &dev->dst);
+-	dev->channels = queue_new();
+-	if (!dev->channels) {
+-		free_health_device(dev);
+-		return NULL;
+-	}
+-
+-	if (!queue_push_tail(app->devices, dev)) {
+-		free_health_device(dev);
+-		return NULL;
+-	}
+-
+-	return dev;
+-}
+-
+ static struct health_app *get_app(uint16_t app_id)
+ {
+ 	return queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
+ }
+ 
+-static struct health_device *get_device(struct health_app *app,
+-							const uint8_t *addr)
+-{
+-	struct health_device *dev;
+-	bdaddr_t bdaddr;
+-
+-	android2bdaddr(addr, &bdaddr);
+-	dev = queue_find(app->devices, match_dev_by_addr, &bdaddr);
+-	if (dev)
+-		return dev;
+-
+-	return create_device(app, addr);
+-}
+-
+-static struct health_channel *create_channel(struct health_app *app,
+-						uint8_t mdep_index,
+-						struct health_device *dev)
+-{
+-	struct mdep_cfg *mdep;
+-	struct health_channel *channel;
+-	uint8_t index;
+-	static unsigned int channel_id = 1;
+-
+-	DBG("mdep %u", mdep_index);
+-
+-	if (!dev || !app)
+-		return NULL;
+-
+-	index = mdep_index + 1;
+-	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(index));
+-	if (!mdep)
+-		return NULL;
+-
+-	/* create channel and push it to device */
+-	channel = new0(struct health_channel, 1);
+-	if (!channel)
+-		return NULL;
+-
+-	channel->mdep_id = mdep->id;
+-	channel->type = mdep->channel_type;
+-	channel->id = channel_id++;
+-	channel->dev = dev;
+-
+-	if (!queue_push_tail(dev->channels, channel)) {
+-		free_health_channel(channel);
+-		return NULL;
+-	}
+-
+-	return channel;
+-}
+-
+ static struct health_channel *get_channel(struct health_app *app,
+ 						uint8_t mdep_index,
+ 						struct health_device *dev)
+-- 
+1.8.3.2
 
