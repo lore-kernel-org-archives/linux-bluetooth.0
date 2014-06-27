@@ -2,11 +2,11 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 03/12] android/health: Add HDP definitions
-Date: Fri, 27 Jun 2014 15:41:26 +0200
-Message-ID: <3223275.HdhLqHhAxx@uw000953>
-In-Reply-To: <1403868303-8129-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1403868303-8129-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCHv3 01/12] android/health: Add error check when creating app
+Date: Fri, 27 Jun 2014 15:38:46 +0200
+Message-ID: <1496860.huqqFjPjZI@uw000953>
+In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -14,35 +14,40 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andrei,
 
-On Friday 27 of June 2014 14:24:54 Andrei Emeltchenko wrote:
+On Friday 27 of June 2014 14:24:52 Andrei Emeltchenko wrote:
 > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
 > ---
->  android/health.h | 8 ++++++++
->  1 file changed, 8 insertions(+)
+>  android/health.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> diff --git a/android/health.h b/android/health.h
-> index 0b32fd3..ab7d478 100644
-> --- a/android/health.h
-> +++ b/android/health.h
-> @@ -21,5 +21,13 @@
->   *
->   */
+> diff --git a/android/health.c b/android/health.c
+> index 42c9a6e..de67475 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -820,6 +820,8 @@ static void bt_health_register_app(const void *buf, uint16_t len)
 >  
-> +#define HDP_MDEP_ECHO		0x00
-> +#define HDP_MDEP_INITIAL	0x01
-> +#define HDP_MDEP_FINAL		0x7F
+>  	app = create_health_app(app_name, provider, srv_name, srv_descr,
+>  							cmd->num_of_mdep);
+> +	if (!app)
+> +		goto fail;
+>  
+>  	if (!queue_push_tail(apps, app))
+>  		goto fail;
+> @@ -830,7 +832,9 @@ static void bt_health_register_app(const void *buf, uint16_t len)
+>  	return;
+>  
+>  fail:
+> -	free_health_app(app);
+> +	if (app)
+> +		free_health_app(app);
 > +
-> +#define HDP_NO_PREFERENCE_DC	0x00
-> +#define HDP_RELIABLE_DC		0x01
-> +#define HDP_STREAMING_DC	0x02
 
-Are those going to be used outside of health.c ?
-Also last three are already defined in health.c.
+This is not needed. free_health_app() already checks for NULL.
 
-> +
->  bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
->  void bt_health_unregister(void);
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_MDEP,
+>  							HAL_STATUS_FAILED);
+>  }
 > 
 
 -- 
