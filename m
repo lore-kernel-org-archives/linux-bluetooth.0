@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/9] android/health: Add handling MDL connection request
-Date: Fri, 27 Jun 2014 10:39:57 +0300
-Message-Id: <1403854803-28850-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 9/9] android/health: Improve debug
+Date: Fri, 27 Jun 2014 10:40:03 +0300
+Message-Id: <1403854803-28850-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403854803-28850-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403784265-1455-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403854803-28850-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,53 +13,56 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/health.c | 33 ++++++++++++++++++++++++++++++++-
- 1 file changed, 32 insertions(+), 1 deletion(-)
+ android/health.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/android/health.c b/android/health.c
-index 140afee..3cb2016 100644
+index 9631d9e..093bdea 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1101,7 +1101,38 @@ static void mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
- static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 				uint16_t mdlid, uint8_t *conf, void *data)
+@@ -160,6 +160,8 @@ static void free_health_channel(void *data)
  {
--	DBG("Not Implemeneted");
-+	GError *gerr = NULL;
-+
-+	DBG("Data channel request: mdepid %u mdlid %u", mdepid, mdlid);
-+
-+	/* TODO: find / create device */
-+
-+	if (mdepid == HDP_MDEP_ECHO) {
-+		switch (*conf) {
-+		case HDP_NO_PREFERENCE_DC:
-+			*conf = HDP_RELIABLE_DC;
-+		case HDP_RELIABLE_DC:
-+			break;
-+		case HDP_STREAMING_DC:
-+			return MCAP_CONFIGURATION_REJECTED;
-+		default:
-+			/* Special case defined in HDP spec 3.4. When an invalid
-+			* configuration is received we shall close the MCL when
-+			* we are still processing the callback. */
-+			/* TODO close device */
-+			return MCAP_CONFIGURATION_REJECTED; /* not processed */
-+		}
-+
-+		if (!mcap_set_data_chan_mode(mcap, L2CAP_MODE_ERTM, &gerr)) {
-+			error("Error: %s", gerr->message);
-+			g_error_free(gerr);
-+			return MCAP_MDL_BUSY;
-+		}
-+
-+		/* TODO: Create channel */
-+
-+		return MCAP_SUCCESS;
-+	}
+ 	struct health_channel *channel = data;
  
- 	return MCAP_SUCCESS;
- }
++	DBG("channel %p", channel);
++
+ 	if (!channel)
+ 		return;
+ 
+@@ -1137,12 +1139,13 @@ static void mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
+ 	struct health_channel *channel = data;
+ 	struct health_device *dev;
+ 
+-	DBG("");
+-
+ 	if (!channel)
+ 		return;
+ 
+ 	dev = channel->dev;
++
++	DBG("device %p channel %p mdl %p", dev, channel, mdl);
++
+ 	/* mdl == NULL means, delete all mdls */
+ 	if (!mdl) {
+ 		queue_foreach(dev->channels, notify_channel, NULL);
+@@ -1258,6 +1261,8 @@ static struct health_channel *connect_channel(struct mcap_mcl *mcl,
+ 	struct health_channel *channel = NULL;
+ 	bdaddr_t addr;
+ 
++	DBG("mcl %p mdepid %u", mcl, mdepid);
++
+ 	mcap_mcl_get_addr(mcl, &addr);
+ 
+ 	/* TODO: Search app for mdepid */
+@@ -1500,7 +1505,7 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
+ 
+ 	if (!get_mdep_from_rec(recs->data, mdep->role, mdep->data_type,
+ 								&mdep_id)) {
+-		error("health: no matching MDEP found");
++		error("health: no matching MDEP: %u", channel->mdep_id);
+ 		goto fail;
+ 	}
+ 
 -- 
 1.8.3.2
 
