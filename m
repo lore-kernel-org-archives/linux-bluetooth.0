@@ -1,72 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] [RFC] doc: Add StartDiscoveryWithOptions
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403896589-6135-1-git-send-email-scott@netsplit.com>
-Date: Fri, 27 Jun 2014 22:15:09 +0200
+MIME-Version: 1.0
+In-Reply-To: <B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org>
+References: <1403897492-6233-1-git-send-email-scott@netsplit.com>
+	<B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org>
+Date: Fri, 27 Jun 2014 13:15:09 -0700
+Message-ID: <CA+bD78i9+VUdNrGub8Df=EHLqgUzqo4LKs8JFu+BatQSXNgruA@mail.gmail.com>
+Subject: Re: [RFC] doc: Add EIR to device properties
+From: Scott James Remnant <scott@netsplit.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <90AEC8D9-5894-4083-AD82-F8D9A8DC1000@holtmann.org>
-References: <1403896589-6135-1-git-send-email-scott@netsplit.com>
-To: Scott James Remnant <scott@netsplit.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+On Fri, Jun 27, 2014 at 12:55 PM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
 
-> This patch proposes an extension to the D-Bus Adapter API to permit
-> the application to specify whether it wishes to discover BR/EDR
-> or LE devices.
-> 
-> Rationale is to permit an application, only interested in an LE device
-> with intent on using GATT to not cause the large power drain of
-> performing BR/EDR Inquiry.
-> ---
-> doc/adapter-api.txt | 23 +++++++++++++++++++++++
-> 1 file changed, 23 insertions(+)
-> 
-> diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
-> index 74d235a..668644d 100644
-> --- a/doc/adapter-api.txt
-> +++ b/doc/adapter-api.txt
-> @@ -22,6 +22,29 @@ Methods		void StartDiscovery()
-> 			Possible errors: org.bluez.Error.NotReady
-> 					 org.bluez.Error.Failed
-> 
-> +		void StartDiscoveryWithOptions(dict options)
-> +
-> +			This method starts the device discovery session, as
-> +			StartDiscovery(), but lets the client specify
-> +			additional options. Use StopDiscovery to release the
-> +			sessions acquired.
-> +
-> +			possible options:
-> +
-> +				boolean Classic:
-> +
-> +					Specifies whether discovery of BR/EDR
-> +					devices should be performed.
-> +
-> +				boolean LowEnergy:
-> +
-> +					Specifies whether discovery of LE
-> +					devices should be performed.
+>> This patch proposes an extension to the D-Bus Device API to allow
+>> an application access to the last EIR data received from a device
+>> in inquiry or advertising mode.
+>>
+> in general I have no objections in exposing the EIR and AD information. H=
+owever I do not like to use EIR as property key. I know that on mgmt API we=
+ simply went with EIR_Data, but on the D-Bus API we most likely need to fin=
+d a name that is a bit more generic and allows to represent EIR and AD info=
+rmation.
+>
 
-I hoped that we will be able to avoid adding an StartDiscoveryWithOptions. However the way the LE application world is going, we need to provide application the option to search for their counterpart peripheral.
+I did indeed just copy the mgmt API terminology here, since it's
+obviously _also_ not just the AD report but also the SR report as well
+since they're concatenated in the kernel during active scanning.
 
-We however will most likely not need this for BR/EDR since that application model there is pretty clear that we only do discovery from the settings screen and not from a specific application.
+> One important thing we have to consider are dual-mode devices that are fo=
+und via LE and BR/EDR. With dual-mode topology from Bluetooth 4.1 this will=
+ become a real possibility and we want them to show under one object path. =
+I think we need to brainstorm a little on how this can be done best.
+>
 
-If I take one step back and look from an application point of view, then I might actually want something totally different. I think what really want is a FindDevices method that will return a list of objects that fulfill my search pattern. So each application can start their own FindDevices method and bluetoothd will take care of making sure that each application is served properly.
+The other interesting issue for 4.1 dual-mode topology, which turns
+out to be somewhat related, is that if there's only one object path
+for a BR/EDR/LE dual-mode device, which bearer is connected when the
+application calls org.bluez.Device1.Connect ?
 
-I do realize that you are going for the simple approach with just starting LE active scanning and then filtering out the results in a higher layer. However I get the feeling that we better do that inside the daemon and provide the application with a pre-filtered list. And if no search patterns are given, then you get the complete list and can filter by yourself later on.
+At least the ConnectToProfile call makes that explicit since there's a
+Profile object, but even then, if the device supports LE L2CAP
+Connection Oriented Channels, do you want that profile connected over
+the BR/EDR or LE bearer if the device supports both?
 
-The reason why I like to keep discovery separate from searching for a known device, these are separate operations. There is subtle difference between advertising non-discoverable and advertising discoverable. While many devices always advertise discoverable, they do not need it. And StartDiscovery will not report non-discoverable devices back. However a FindDevice of course can look for a specific device matching its search pattern even if it is not discoverable.
+But that method isn't used for establishing the GATT connection on the
+LE bearer. (And then you have the whole GATT over BR/EDR thing to
+worry about too).
 
-Keep also in mind that it might be neat to have a feature where you register an observer like agent that gets notified when a device with certain pattern is found. Once we have all the background scanning figured out in the kernel, this becomes a possibility. And that is a better approach than always triggering active scanning. The simplest pattern could just be the identity address of a device. With all this beacon stuff you might want to find a device, but have no need to connect since all the data is present the advertising data. Or it could be simply that the service data contains a sequence counter that allows you to tell if connection is required or not.
 
-These are just a few thoughts that come to mind when we are talking about LE scanning. I like to get LE passive scanning enabled in the kernel and have a mgmt API that we then can map to multiple use cases over D-Bus. And I like it to be smart and as low power consumption as possible.
+(I also don't remember reading any limitation that a BR/EDR/LE device
+_must_ use its Public address during LE Advertisement, but you'd know
+better than me on that. Would there be a case where we see advertising
+from a device, that on pairing/connection turns out to be, via
+receiving IRK, a BR/EDR device we already knew about, and thus we'd
+have to deal with device objects merging?)
 
-Regards
-
-Marcel
-
+Scott
+--=20
+Have you ever, ever felt like this?
+Had strange things happen?  Are you going round the twist?
