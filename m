@@ -1,104 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <90AEC8D9-5894-4083-AD82-F8D9A8DC1000@holtmann.org>
-References: <1403896589-6135-1-git-send-email-scott@netsplit.com>
-	<90AEC8D9-5894-4083-AD82-F8D9A8DC1000@holtmann.org>
-Date: Fri, 27 Jun 2014 13:49:08 -0700
-Message-ID: <CA+bD78gN-9XUHr+kvLCPrt_XmPttkdSH75N-8Cuh9pLuEdOKZA@mail.gmail.com>
-Subject: Re: [PATCH] [RFC] doc: Add StartDiscoveryWithOptions
-From: Scott James Remnant <scott@netsplit.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFC] doc: Add EIR to device properties
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CA+bD78i9+VUdNrGub8Df=EHLqgUzqo4LKs8JFu+BatQSXNgruA@mail.gmail.com>
+Date: Fri, 27 Jun 2014 22:26:52 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <5C89CD2F-648F-475D-8E08-7F90493AA912@holtmann.org>
+References: <1403897492-6233-1-git-send-email-scott@netsplit.com> <B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org> <CA+bD78i9+VUdNrGub8Df=EHLqgUzqo4LKs8JFu+BatQSXNgruA@mail.gmail.com>
+To: Scott James Remnant <scott@netsplit.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 27, 2014 at 1:15 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+Hi Scott,
 
->> Rationale is to permit an application, only interested in an LE device
->> with intent on using GATT to not cause the large power drain of
->> performing BR/EDR Inquiry.
+>>> This patch proposes an extension to the D-Bus Device API to allow
+>>> an application access to the last EIR data received from a device
+>>> in inquiry or advertising mode.
+>>> 
+>> in general I have no objections in exposing the EIR and AD information. However I do not like to use EIR as property key. I know that on mgmt API we simply went with EIR_Data, but on the D-Bus API we most likely need to find a name that is a bit more generic and allows to represent EIR and AD information.
+>> 
+> 
+> I did indeed just copy the mgmt API terminology here, since it's
+> obviously _also_ not just the AD report but also the SR report as well
+> since they're concatenated in the kernel during active scanning.
 
-> If I take one step back and look from an application point of view, then =
-I might actually want something totally different. I think what really want=
- is a FindDevices method that will return a list of objects that fulfill my=
- search pattern. So each application can start their own FindDevices method=
- and bluetoothd will take care of making sure that each application is serv=
-ed properly.
->
+maybe something generic like InformationData. Honestly I do not know yet. I do however have bad feeling with calling it just EIR.
 
-This kind of API makes sense too.
+>> One important thing we have to consider are dual-mode devices that are found via LE and BR/EDR. With dual-mode topology from Bluetooth 4.1 this will become a real possibility and we want them to show under one object path. I think we need to brainstorm a little on how this can be done best.
+>> 
+> 
+> The other interesting issue for 4.1 dual-mode topology, which turns
+> out to be somewhat related, is that if there's only one object path
+> for a BR/EDR/LE dual-mode device, which bearer is connected when the
+> application calls org.bluez.Device1.Connect ?
 
-Would you just want the method to return a list of objects, in which
-case what would the timeout be? Or would you want a session-like API
-as with discovery?
+Simple answer without overthinking it is both.
 
-It seems to fit typical use cases:
+> At least the ConnectToProfile call makes that explicit since there's a
+> Profile object, but even then, if the device supports LE L2CAP
+> Connection Oriented Channels, do you want that profile connected over
+> the BR/EDR or LE bearer if the device supports both?
 
- - FindDevices( { health heart rate profile } ) -> list of nearby
-heart rate monitors
+We do not have services that will expose L2CAP Connection Oriented channels on both BR/EDR and LE and use the same UUID. The classic BR/EDR profiles will not be mapped over LE at this moment.
 
- - FindDevices( { BR/EDR profile } ) -> list of paired devices that support=
- it
+> But that method isn't used for establishing the GATT connection on the
+> LE bearer. (And then you have the whole GATT over BR/EDR thing to
+> worry about too).
 
-What about the "I lost my keys" use case?
+The database is suppose to be the same. And honestly with dual-mode topology, the GATT over BR/EDR is essentially pointless. You will be just doing it over LE which is way simpler.
 
- 1. FindDevices( { profile id of stickies } ) -> list of nearby stickies
- 2. Check objects EIR for the specific UUID of the beacon attached to
-your keys, repeat until it's visible
- 3. Watch for DeviceChanged notifications on that object, checking the
-RSSI property each time, until you're on top of them
+> (I also don't remember reading any limitation that a BR/EDR/LE device
+> _must_ use its Public address during LE Advertisement, but you'd know
+> better than me on that. Would there be a case where we see advertising
+> from a device, that on pairing/connection turns out to be, via
+> receiving IRK, a BR/EDR device we already knew about, and thus we'd
+> have to deal with device objects merging?)
 
-If the beacon-ish profile the particular sticky you're using has
-decided to just use a completely custom field in the AD with no
-standard fields (who'd do that, I mean, seriously?!), I guess you'd
-just FindDevices() and filter them all by hand.
+There is no requirement to use your public address in advertising. You can always use random private address.
 
-> Keep also in mind that it might be neat to have a feature where you regis=
-ter an observer like agent that gets notified when a device with certain pa=
-ttern is found. Once we have all the background scanning figured out in the=
- kernel, this becomes a possibility. And that is a better approach than alw=
-ays triggering active scanning. The simplest pattern could just be the iden=
-tity address of a device. With all this beacon stuff you might want to find=
- a device, but have no need to connect since all the data is present the ad=
-vertising data. Or it could be simply that the service data contains a sequ=
-ence counter that allows you to tell if connection is required or not.
->
+And public address on BR/EDR and RPA on LE can be the case. The iPhone being the prime example here. And we already merge the objects together as good as we can. Johan can explain this since I have to admit I spaced out when he told me on how he did it. Or I just imagined it, which is possible ;)
 
-This would suggest more of an observer API, than a method call to
-return devices. The thing I like here is that it could even map
-directly to controller methods, so for certain searches the controller
-could remain in passive scan even while the host is in a sleep state,
-and wake the host using the usual mechanisms when found.
+If you have seen my proposal for Privacy mode 0x02, then I think that we are going for using public address when we are discoverable and RPA when non-discoverable. That allows us to avoid trackability in the most cases and still allow for a smoother operation during pairing.
 
-e.g. this would be more like
+Regards
 
-  <- org.bluez.Search1.RegisterSearch(object searcher, dict search)
+Marcel
 
-  -> org.bluez.Search1.DeviceFound(object device)
-  -> org.bluez.Search1.DeviceFound(object device)
-  -> org.bluez.Search1.DeviceFound(object device)
-
-than
-
- <- org.bluez.Adapter1.FindDevices(dict search)
- -> object[]
-
-
-If the search dictionary has the option to search by address, e.g. :
-
-  <- org.bluez.Search1.RegisterSearch(this, { address: "addr" })
-
-then that would cutely map to:
-
-  HCI LE Set Scan Parameters( ScanningFilter=3D0x01 )
-  HCI LE Add Device To White List( address=3Daddr )
-
-if no other searches were ongoing, and assumedly just extend the white
-list for paired HoG devices if those were already being passively
-scanned that way.
-
-Scott
---=20
-Have you ever, ever felt like this?
-Had strange things happen?  Are you going round the twist?
