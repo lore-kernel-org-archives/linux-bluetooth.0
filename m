@@ -1,144 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 1/3] android/mcaptest: Send clock sync capabilities request
-Date: Fri, 27 Jun 2014 12:08:01 +0200
-Message-Id: <1403863683-9844-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH] doc: Add management command to get clock information
+Date: Fri, 27 Jun 2014 11:52:24 +0200
+Message-Id: <1403862744-38756-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds option to send synchronization capabilities and requirements
-request on MCL connection.
 ---
- android/mcaptest.c | 43 +++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
+ doc/mgmt-api.txt | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/android/mcaptest.c b/android/mcaptest.c
-index 9869abb..642dbf4 100644
---- a/android/mcaptest.c
-+++ b/android/mcaptest.c
-@@ -57,6 +57,7 @@ static uint16_t mdlid;
- static int control_mode = MODE_LISTEN;
- static int data_mode = MODE_LISTEN;
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 85bb7a44265f..283df8bc0aa1 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1829,6 +1829,47 @@ Load Connection Parameters Command
+ 				Not Supported
  
-+static gboolean send_synccap_req = FALSE;
- static gboolean mcl_disconnect = FALSE;
- static gboolean mdl_disconnect = FALSE;
- static int mcl_disconnect_timeout = -1;
-@@ -64,6 +65,8 @@ static int mdl_disconnect_timeout = -1;
  
- static struct mcap_mcl *mcl = NULL;
- 
-+#define REQ_CLOCK_ACC 0x1400
++Get Clock Information Command
++=============================
 +
- static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- {
- 	int fd = -1;
-@@ -178,6 +181,15 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
- 	}
- }
- 
-+static void sync_cap_cb(struct mcap_mcl *mcl, uint8_t mcap_err,
-+			uint8_t btclockres, uint16_t synclead,
-+			uint16_t tmstampres, uint16_t tmstampacc, GError *err,
-+			gpointer data)
-+{
-+	/* TODO */
-+	printf("%s\n", __func__);
-+}
++	Command Code:		0x0033
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Local_Clock (4 Octets)
++				Piconet_Clock (4 Octets)
++				Accuracy (2 Octets)
++				Clock_Offset (2 Octets)
 +
- static void trigger_mdl_action(int mode)
- {
- 	GError *gerr = NULL;
-@@ -205,14 +217,26 @@ static void trigger_mdl_action(int mode)
- 			g_error_free(gerr);
- 		}
- 	}
++	This command is used to get local and piconet clock information.
 +
-+	if (send_synccap_req && mcap->csp_enabled) {
-+		mcap_sync_init(mcl);
++	Possible values for the Address_Type parameter:
++		0	BR/EDR
++		1	Reserved (not in use)
++		2	Reserved (not in use)
 +
-+		mcap_sync_cap_req(mcl, REQ_CLOCK_ACC, sync_cap_cb, NULL, &gerr);
-+		if (gerr) {
-+			printf("MCAP Sync req error: %s\n", gerr->message);
-+			g_error_free(gerr);
-+		}
-+	}
- }
- 
- static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
- {
- 	printf("%s\n", __func__);
- 
--	if (mcl)
-+	if (mcl) {
-+		mcap_sync_stop(mcl);
- 		mcap_mcl_unref(mcl);
-+	}
- 
- 	mcl = mcap_mcl_ref(mcap_mcl);
- 	trigger_mdl_action(data_mode);
-@@ -226,8 +250,10 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
- 		return;
- 	}
- 
--	if (mcl)
-+	if (mcl) {
-+		mcap_sync_stop(mcl);
- 		mcap_mcl_unref(mcl);
-+	}
- 
- 	mcl = mcap_mcl_ref(mcap_mcl);
- 	trigger_mdl_action(data_mode);
-@@ -239,7 +265,8 @@ static void usage(void)
- 		"\tmcaptest <control_mode> <data_mode> [options]\n");
- 	printf("Control Link Mode:\n"
- 		"\t-c connect <dst_addr>\n"
--		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n");
-+		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n"
-+		"\t-g send clock sync capability request if MCL connected\n");
- 	printf("Data Link Mode:\n"
- 		"\t-d connect\n"
- 		"\t-f <timeout> disconnect MDL after it's connected\n");
-@@ -254,6 +281,7 @@ static struct option main_options[] = {
- 	{ "device",		1, 0, 'i' },
- 	{ "connect_cl",		1, 0, 'c' },
- 	{ "disconnect_cl",	1, 0, 'e' },
-+	{ "synccap_req",	0, 0, 'g' },
- 	{ "connect_dl",		0, 0, 'd' },
- 	{ "disconnect_dl",	1, 0, 'f' },
- 	{ "control_ch",		1, 0, 'C' },
-@@ -277,7 +305,7 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
--	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:hd",
-+	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dgh",
- 						main_options, NULL)) != EOF) {
- 		switch (opt) {
- 		case 'i':
-@@ -311,6 +339,11 @@ int main(int argc, char *argv[])
- 
- 			break;
- 
-+		case 'g':
-+			send_synccap_req = TRUE;
++	The Accuracy can be set to 0xffff which means the value is unknown.
 +
-+			break;
++	The Clock_Offset can be set to 0x0000 when the local controller
++	is a slave.
 +
- 		case 'C':
- 			ccpsm = atoi(optarg);
- 
-@@ -341,6 +374,8 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
-+	mcap_enable_csp(mcap);
++	If the Address is set to 00:00:00:00:00:00, then only the
++	Local_Clock field has a valid value. The Piconet_Clock, Accuracy
++	and Clock_Offset fields are invalid and shall be ignored.
 +
- 	switch (control_mode) {
- 	case MODE_CONNECT:
- 		ba2str(&dst, bdastr);
++	This command generates a Command Complete event on success and
++	on failure. In case of failure only Address and Address_Type fields
++	are valid and values of remaining parameters are considered invalid
++	and shall be ignored.
++
++	Possible errors:	Not Connected
++				Not Powered
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-2.0.0
+1.9.3
 
