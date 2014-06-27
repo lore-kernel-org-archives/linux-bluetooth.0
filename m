@@ -1,43 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Jun 2014 17:13:02 +0300
-From: Andrei Emeltchenko <andrei.emeltchenko.news@gmail.com>
-To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC 5/5] android/health: Implement destroy_channel call
-Message-ID: <20140627141224.GB21456@aemeltch-MOBL1>
-References: <1403818246-20205-1-git-send-email-ravikumar.veeramally@linux.intel.com>
- <1403818246-20205-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCHv3 11/12] android/mcap: Fix using uninitialised value
+Date: Fri, 27 Jun 2014 16:11:38 +0200
+Message-ID: <1598691.f0BZeCj0yB@uw000953>
+In-Reply-To: <1403868303-8129-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com> <1403868303-8129-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1403818246-20205-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 27, 2014 at 12:30:46AM +0300, Ravi kumar Veeramally wrote:
-> Delete MDL channel with MDL_DELETE_REQ.
-> ---
->  android/health.c | 25 +++++++++++++++++++++++--
->  1 file changed, 23 insertions(+), 2 deletions(-)
+Hi Andrei,
+
+On Friday 27 of June 2014 14:25:02 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> diff --git a/android/health.c b/android/health.c
-> index db3ae9c..e464f78 100644
-> --- a/android/health.c
-> +++ b/android/health.c
-> @@ -1637,19 +1637,40 @@ fail:
->  			HAL_OP_HEALTH_CONNECT_CHANNEL, HAL_STATUS_FAILED);
->  }
+> Fixes clang warning:
+> ...
+> android/mcap-lib.c:2366:20: warning: The left operand of '*' is a
+> garbage value
+>         return tv->tv_sec * 1000000ll + tv->tv_nsec / 1000ll;
+>                ~~~~~~~~~~ ^
+> 1 warning generated.
+> ...
+> ---
+>  android/mcap-lib.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/android/mcap-lib.c b/android/mcap-lib.c
+> index 256abe1..79f6ce2 100644
+> --- a/android/mcap-lib.c
+> +++ b/android/mcap-lib.c
+> @@ -2454,7 +2454,8 @@ uint64_t mcap_get_timestamp(struct mcap_mcl *mcl,
+>  	if (given_time)
+>  		now = *given_time;
+>  	else
+> -		clock_gettime(CLK, &now);
+> +		if (clock_gettime(CLK, &now) < 0)
+> +			return MCAP_TMSTAMP_DONTSET;
 >  
-> +static void channel_delete_cb(GError *gerr, gpointer data)
-> +{
-> +	struct health_channel *channel = data;
-> +
-> +	DBG("");
-> +
-> +	if (!gerr) {
-> +		error("health: channel delete failed %s", gerr->message);
+>  	tmstamp = time_us(&now) - time_us(&mcl->csp->base_time)
+>  		+ mcl->csp->base_tmstamp;
+> 
 
-I think this one may not work. I have sent a patch for this issue.
+Patch applied. Thanks.
 
-Best regards 
-Andrei Emeltchenko 
-
+-- 
+Best regards, 
+Szymon Janc
