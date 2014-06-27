@@ -1,125 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 05/12] android/health: Refactor channel creation
-Date: Fri, 27 Jun 2014 14:24:56 +0300
-Message-Id: <1403868303-8129-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 01/12] android/health: Add error check when creating app
+Date: Fri, 27 Jun 2014 14:24:52 +0300
+Message-Id: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Avoid using app_id when we shall use app structure itself. Otherwise we
-end up with unnecessary searches for app and problems for incoming
-connections.
 ---
- android/health.c | 43 ++++++++++++++++++++++---------------------
- 1 file changed, 22 insertions(+), 21 deletions(-)
+ android/health.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/android/health.c b/android/health.c
-index 3cb2016..d664324 100644
+index 42c9a6e..de67475 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1477,43 +1477,37 @@ static struct health_device *create_device(struct health_app *app,
- 	return dev;
- }
+@@ -820,6 +820,8 @@ static void bt_health_register_app(const void *buf, uint16_t len)
  
--static struct health_device *get_device(uint16_t app_id, const uint8_t *addr)
-+static struct health_app *get_app(uint16_t app_id)
-+{
-+	return queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
-+}
-+
-+static struct health_device *get_device(struct health_app *app,
-+							const uint8_t *addr)
- {
--	struct health_app *app;
- 	struct health_device *dev;
- 	bdaddr_t bdaddr;
- 
--	app = queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
--	if (!app)
--		return NULL;
--
- 	android2bdaddr(addr, &bdaddr);
- 	dev = queue_find(app->devices, match_dev_by_addr, &bdaddr);
- 	if (dev)
- 		return dev;
- 
--	dev = create_device(app, addr);
--	if (dev)
--		dev->app_id = app_id;
--
--	return dev;
-+	return create_device(app, addr);
- }
- 
--static struct health_channel *create_channel(uint16_t app_id,
-+static struct health_channel *create_channel(struct health_app *app,
- 						uint8_t mdep_index,
- 						struct health_device *dev)
- {
--	struct health_app *app;
- 	struct mdep_cfg *mdep;
- 	struct health_channel *channel;
- 	uint8_t index;
- 	static unsigned int channel_id = 1;
- 
--	if (!dev)
--		return NULL;
-+	DBG("mdep %u", mdep_index);
- 
--	app = queue_find(apps, match_app_by_id, INT_TO_PTR(app_id));
--	if (!app)
-+	if (!dev || !app)
- 		return NULL;
- 
- 	index = mdep_index + 1;
-@@ -1539,7 +1533,7 @@ static struct health_channel *create_channel(uint16_t app_id,
- 	return channel;
- }
- 
--static struct health_channel *get_channel(uint16_t app_id,
-+static struct health_channel *get_channel(struct health_app *app,
- 						uint8_t mdep_index,
- 						struct health_device *dev)
- {
-@@ -1555,7 +1549,7 @@ static struct health_channel *get_channel(uint16_t app_id,
- 	if (channel)
- 		return channel;
- 
--	return create_channel(app_id, mdep_index, dev);
-+	return create_channel(app, index, dev);
- }
- 
- static void bt_health_connect_channel(const void *buf, uint16_t len)
-@@ -1564,14 +1558,21 @@ static void bt_health_connect_channel(const void *buf, uint16_t len)
- 	struct hal_rsp_health_connect_channel rsp;
- 	struct health_device *dev = NULL;
- 	struct health_channel *channel = NULL;
-+	struct health_app *app;
- 
- 	DBG("");
- 
--	dev = get_device(cmd->app_id, cmd->bdaddr);
-+	app = get_app(cmd->app_id);
+ 	app = create_health_app(app_name, provider, srv_name, srv_descr,
+ 							cmd->num_of_mdep);
 +	if (!app)
 +		goto fail;
-+
-+	dev = get_device(app, cmd->bdaddr);
- 	if (!dev)
- 		goto fail;
  
--	channel = get_channel(cmd->app_id, cmd->mdep_index, dev);
-+	dev->app_id = cmd->app_id;
-+
-+	channel = get_channel(app, cmd->mdep_index, dev);
- 	if (!channel)
+ 	if (!queue_push_tail(apps, app))
  		goto fail;
+@@ -830,7 +832,9 @@ static void bt_health_register_app(const void *buf, uint16_t len)
+ 	return;
  
+ fail:
+-	free_health_app(app);
++	if (app)
++		free_health_app(app);
++
+ 	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_HEALTH, HAL_OP_HEALTH_MDEP,
+ 							HAL_STATUS_FAILED);
+ }
 -- 
 1.8.3.2
 
