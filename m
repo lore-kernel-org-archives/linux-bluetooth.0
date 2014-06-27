@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 11/12] android/mcap: Fix using uninitialised value
-Date: Fri, 27 Jun 2014 14:25:02 +0300
-Message-Id: <1403868303-8129-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 12/12] android/pts: Update HDP test results
+Date: Fri, 27 Jun 2014 14:25:03 +0300
+Message-Id: <1403868303-8129-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,32 +12,50 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes clang warning:
-...
-android/mcap-lib.c:2366:20: warning: The left operand of '*' is a
-garbage value
-        return tv->tv_sec * 1000000ll + tv->tv_nsec / 1000ll;
-               ~~~~~~~~~~ ^
-1 warning generated.
-...
+Mark ECHO server tests passed.
 ---
- android/mcap-lib.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ android/pts-hdp.txt | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/android/mcap-lib.c b/android/mcap-lib.c
-index 256abe1..79f6ce2 100644
---- a/android/mcap-lib.c
-+++ b/android/mcap-lib.c
-@@ -2454,7 +2454,8 @@ uint64_t mcap_get_timestamp(struct mcap_mcl *mcl,
- 	if (given_time)
- 		now = *given_time;
- 	else
--		clock_gettime(CLK, &now);
-+		if (clock_gettime(CLK, &now) < 0)
-+			return MCAP_TMSTAMP_DONTSET;
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index 99aa2d6..f2b1528 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for HDP
  
- 	tmstamp = time_us(&now) - time_us(&mcl->csp->base_time)
- 		+ mcl->csp->base_tmstamp;
+ PTS version: 5.1
+-Tested: 17-June-2014
++Tested: 27-June-2014
+ Android version: 4.4.2
+ 
+ Results:
+@@ -105,7 +105,11 @@ TC_SRC_HCT_BV_05_C	N/A
+ TC_SRC_HCT_BV_06_C	INC
+ TC_SRC_HCT_BV_07_C	INC
+ TC_SRC_DE_BV_01_I	INC
+-TC_SRC_DE_BV_02_I	INC
++TC_SRC_DE_BV_02_I	PASS	haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SRC_DEP_BV_01_I	INC
+ TC_SRC_DEP_BV_02_I	N/A
+ TC_SNK_CON_BV_01_I	PASS	haltest:
+@@ -195,7 +199,11 @@ TC_SNK_HCT_BV_05_C	N/A
+ TC_SNK_HCT_BV_06_C	INC
+ TC_SNK_HCT_BV_07_C	INC
+ TC_SNK_DE_BV_01_I	N/A
+-TC_SNK_DE_BV_02_I	INC
++TC_SNK_DE_BV_02_I	PASS	haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SNK_DEP_BV_03_I	INC
+ TC_SNK_DEP_BV_04_I	INC
+ -------------------------------------------------------------------------------
 -- 
 1.8.3.2
 
