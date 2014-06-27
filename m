@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 09/10] android/health: Improve debug
-Date: Fri, 27 Jun 2014 18:16:10 +0300
-Message-Id: <1403882171-16308-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 07/10] android/health: Create mdep for ECHO channel
+Date: Fri, 27 Jun 2014 18:16:08 +0300
+Message-Id: <1403882171-16308-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,56 +12,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/health.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ android/health.c | 22 +++++++++++++++++-----
+ 1 file changed, 17 insertions(+), 5 deletions(-)
 
 diff --git a/android/health.c b/android/health.c
-index 1796d7c..43e5967 100644
+index 9551408..8bd857d 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -164,6 +164,8 @@ static void free_health_channel(void *data)
+@@ -1157,7 +1157,6 @@ static struct health_channel *create_channel(struct health_app *app,
  {
- 	struct health_channel *channel = data;
+ 	struct mdep_cfg *mdep;
+ 	struct health_channel *channel;
+-	uint8_t index;
+ 	static unsigned int channel_id = 1;
  
-+	DBG("channel %p", channel);
+ 	DBG("mdep %u", mdep_index);
+@@ -1165,10 +1164,23 @@ static struct health_channel *create_channel(struct health_app *app,
+ 	if (!dev || !app)
+ 		return NULL;
+ 
+-	index = mdep_index + 1;
+-	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(index));
+-	if (!mdep)
+-		return NULL;
++	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(mdep_index));
++	if (!mdep) {
++		if (mdep_index == MDEP_ECHO) {
++			mdep = new0(struct mdep_cfg, 1);
++			if (!mdep)
++				return NULL;
 +
- 	if (!channel)
- 		return;
- 
-@@ -1147,12 +1149,13 @@ static void mcap_mdl_deleted_cb(struct mcap_mdl *mdl, void *data)
- 	struct health_channel *channel = data;
- 	struct health_device *dev;
- 
--	DBG("");
--
- 	if (!channel)
- 		return;
- 
- 	dev = channel->dev;
++			/* Leave other configuration zeroes */
++			mdep->id = MDEP_ECHO;
 +
-+	DBG("device %p channel %p mdl %p", dev, channel, mdl);
-+
- 	/* mdl == NULL means, delete all mdls */
- 	if (!mdl) {
- 		queue_foreach(dev->channels, notify_channel, NULL);
-@@ -1270,6 +1273,8 @@ static struct health_channel *connect_channel(struct mcap_mcl *mcl,
- 	struct health_channel *channel = NULL;
- 	bdaddr_t addr;
++			if (!queue_push_tail(app->mdeps, mdep)) {
++				free_mdep_cfg(mdep);
++				return NULL;
++			}
++		} else
++			return NULL;
++	}
  
-+	DBG("mcl %p mdepid %u", mcl, mdepid);
-+
- 	mcap_mcl_get_addr(mcl, &addr);
- 
- 	/* TODO: Search app for mdepid */
-@@ -1565,7 +1570,7 @@ static void get_mdep_cb(sdp_list_t *recs, int err, gpointer user_data)
- 
- 	if (!get_mdep_from_rec(recs->data, mdep->role, mdep->data_type,
- 								&mdep_id)) {
--		error("health: no matching MDEP found");
-+		error("health: no matching MDEP: %u", channel->mdep_id);
- 		goto fail;
- 	}
- 
+ 	/* create channel and push it to device */
+ 	channel = new0(struct health_channel, 1);
 -- 
 1.8.3.2
 
