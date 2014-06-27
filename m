@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 11/15] android/hog: Add support for Scan Parameter Service
-Date: Fri, 27 Jun 2014 11:27:55 +0300
-Message-Id: <1403857679-14341-11-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 09/15] android/scpp: Add bt_scpp_set_interval and bt_scpp_set_window
+Date: Fri, 27 Jun 2014 11:27:53 +0300
+Message-Id: <1403857679-14341-9-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 References: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,92 +11,112 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-If primary is not provided meaning primary should be auto discovered it
-probably means other primary services such as Scan Parameter Profile
-are not being handled either so just handle ScPP as well in such case.
+These functions can be used to change the current values.
 ---
- android/hog.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ android/scpp.c | 43 +++++++++++++++++++++++++++++++++++++------
+ android/scpp.h |  3 +++
+ 2 files changed, 40 insertions(+), 6 deletions(-)
 
-diff --git a/android/hog.c b/android/hog.c
-index 007146a..d891930 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -53,6 +53,7 @@
- #include "btio/btio.h"
+diff --git a/android/scpp.c b/android/scpp.c
+index c73a015..751d3f2 100644
+--- a/android/scpp.c
++++ b/android/scpp.c
+@@ -77,6 +77,9 @@ struct bt_scpp *bt_scpp_new(void *primary)
+ 	if (!scan)
+ 		return NULL;
  
- #include "android/dis.h"
-+#include "android/scpp.h"
- #include "android/hog.h"
++	scan->interval = SCAN_INTERVAL;
++	scan->window = SCAN_WINDOW;
++
+ 	if (primary)
+ 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
  
- #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
-@@ -91,6 +92,7 @@ struct bt_hog {
- 	uint16_t		ctrlpt_handle;
- 	uint8_t			flags;
- 	struct bt_dis		*dis;
-+	struct bt_scpp		*scpp;
- };
- 
- struct report {
-@@ -647,6 +649,7 @@ static void report_free(void *data)
- static void hog_free(struct bt_hog *hog)
- {
- 	bt_dis_unref(hog->dis);
-+	bt_scpp_unref(hog->scpp);
- 	bt_uhid_unref(hog->uhid);
- 	g_slist_free_full(hog->reports, report_free);
- 	g_attrib_unref(hog->attrib);
-@@ -774,6 +777,18 @@ static void hog_attach_dis(struct bt_hog *hog, struct gatt_primary *primary)
- 	}
+@@ -104,12 +107,13 @@ void bt_scpp_unref(struct bt_scpp *scan)
+ 	scpp_free(scan);
  }
  
-+static void hog_attach_scpp(struct bt_hog *hog, struct gatt_primary *primary)
-+{
-+	if (hog->scpp) {
-+		bt_scpp_attach(hog->scpp, hog->attrib);
-+		return;
-+	}
+-static void write_scan_params(GAttrib *attrib, uint16_t handle)
++static void write_scan_params(GAttrib *attrib, uint16_t handle,
++					uint16_t interval, uint16_t window)
+ {
+ 	uint8_t value[4];
+ 
+-	put_le16(SCAN_INTERVAL, &value[0]);
+-	put_le16(SCAN_WINDOW, &value[2]);
++	put_le16(interval, &value[0]);
++	put_le16(window, &value[2]);
+ 
+ 	gatt_write_cmd(attrib, handle, value, sizeof(value), NULL, NULL);
+ }
+@@ -122,7 +126,8 @@ static void refresh_value_cb(const uint8_t *pdu, uint16_t len,
+ 	DBG("Server requires refresh: %d", pdu[3]);
+ 
+ 	if (pdu[3] == SERVER_REQUIRES_REFRESH)
+-		write_scan_params(scan->attrib, scan->iwhandle);
++		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
++								scan->window);
+ }
+ 
+ static void ccc_written_cb(guint8 status, const guint8 *pdu,
+@@ -215,7 +220,8 @@ static void iwin_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ 
+ 	DBG("Scan Interval Window handle: 0x%04x", scan->iwhandle);
+ 
+-	write_scan_params(scan->attrib, scan->iwhandle);
++	write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
++								scan->window);
+ }
+ 
+ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+@@ -228,7 +234,8 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
+ 	scan->attrib = g_attrib_ref(attrib);
+ 
+ 	if (scan->iwhandle) {
+-		write_scan_params(scan->attrib, scan->iwhandle);
++		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
++								scan->window);
+ 		return true;
+ 	}
+ 
+@@ -254,3 +261,27 @@ void bt_scpp_detach(struct bt_scpp *scan)
+ 	g_attrib_unref(scan->attrib);
+ 	scan->attrib = NULL;
+ }
 +
-+	hog->scpp = bt_scpp_new(primary);
-+	if (hog->scpp)
-+		bt_scpp_attach(hog->scpp, hog->attrib);
++bool bt_scpp_set_interval(struct bt_scpp *scan, uint16_t value)
++{
++	if (!scan)
++		return false;
++
++	/* TODO: Check valid range */
++
++	scan->interval = value;
++
++	return true;
 +}
 +
- static void primary_cb(uint8_t status, GSList *services, void *user_data)
- {
- 	struct bt_hog *hog = user_data;
-@@ -801,6 +816,11 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
- 			continue;
- 		}
- 
-+		if (strcmp(primary->uuid, SCAN_PARAMETERS_UUID) == 0) {
-+			hog_attach_scpp(hog, primary);
-+			continue;
-+		}
++bool bt_scpp_set_window(struct bt_scpp *scan, uint16_t value)
++{
++	if (!scan)
++		return false;
 +
- 		if (strcmp(primary->uuid, HOG_UUID) == 0)
- 			hog->primary = g_memdup(primary, sizeof(*primary));
- 	}
-@@ -840,6 +860,9 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 	if (hog->dis)
- 		bt_dis_attach(hog->dis, gatt);
- 
-+	if (hog->scpp)
-+		bt_scpp_attach(hog->scpp, gatt);
++	/* TODO: Check valid range */
 +
- 	if (hog->reports == NULL) {
- 		gatt_discover_char(hog->attrib, primary->range.start,
- 						primary->range.end, NULL,
-@@ -875,6 +898,9 @@ void bt_hog_detach(struct bt_hog *hog)
- 	if (hog->dis)
- 		bt_dis_detach(hog->dis);
- 
-+	if (hog->scpp)
-+		bt_scpp_detach(hog->scpp);
++	scan->window = value;
 +
- 	g_attrib_unref(hog->attrib);
- 	hog->attrib = NULL;
- }
++	return true;
++}
+diff --git a/android/scpp.h b/android/scpp.h
+index f374cee..048fb9f 100644
+--- a/android/scpp.h
++++ b/android/scpp.h
+@@ -30,3 +30,6 @@ void bt_scpp_unref(struct bt_scpp *scan);
+ 
+ bool bt_scpp_attach(struct bt_scpp *scan, void *gatt);
+ void bt_scpp_detach(struct bt_scpp *scan);
++
++bool bt_scpp_set_interval(struct bt_scpp *scan, uint16_t value);
++bool bt_scpp_set_window(struct bt_scpp *scan, uint16_t value);
 -- 
 1.9.3
 
