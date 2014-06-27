@@ -1,115 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53AD3126.3060909@message-id.googlemail.com>
-Date: Fri, 27 Jun 2014 10:53:58 +0200
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
 MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: [PATCH BlueZ 3/5] unit/test-queue: Add /queue/foreach_remove_all
- test
-References: <1400754843-4759-1-git-send-email-luiz.dentz@gmail.com> <1400754843-4759-3-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1400754843-4759-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
+References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
+	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
+	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
+	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
+Date: Fri, 27 Jun 2014 11:32:00 +0300
+Message-ID: <CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
+Subject: Re: LE mouse reconnect problem
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Ryan Press <ryan@presslab.us>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Ryan,
 
-Am 22.05.2014 12:34, schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This tests queue_remove_all from queue_foreach callback.
+On Wed, Jun 25, 2014 at 4:23 PM, Ryan Press <ryan@presslab.us> wrote:
+> Hi Luiz,
+>
+> Yes it will repeat the scan every few seconds.
+>
+> I paired the device in the Gnome applet.  In the bluetoothctl I could
+> see the pair and trust messages like so:
+>
+> [NEW] Device C5:8C:97:E6:9C:81 Arc Touch Mouse SE
+> [CHG] Device C5:8C:97:E6:9C:81 Connected: yes
+> [CHG] Device C5:8C:97:E6:9C:81 UUIDs:
+>     00001800-0000-1000-8000-00805f9b34fb
+>     00001801-0000-1000-8000-00805f9b34fb
+>     0000180a-0000-1000-8000-00805f9b34fb
+>     0000180f-0000-1000-8000-00805f9b34fb
+>     00001812-0000-1000-8000-00805f9b34fb
+> [CHG] Device C5:8C:97:E6:9C:81 Paired: yes
+> [CHG] Device C5:8C:97:E6:9C:81 Trusted: yes
+> [CHG] Device C5:8C:97:E6:9C:81 Modalias: usb:v045Ep07F3d0001
+>
+> Thanks,
+>
+> Ryan
+>
+>
+> On Jun 25, 2014 12:08 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Ryan,
+>>
+>> On Wed, Jun 25, 2014 at 5:27 AM, Ryan Press <ryan@presslab.us> wrote:
+>> > I have a Microsoft Arc mouse, Surface edition.  This uses Bluetooth
+>> > Low Energy.  Under dual boot Windows 8.1 I can connect this mouse, and
+>> > it will reconnect just fine if I turn the mouse off/on or Bluetooth
+>> > off/on.
+>> >
+>> > In Fedora rawhide I have Bluez 5.18-2.  I can pair this mouse just
+>> > fine, and it will continue to work until I turn the mouse off/on or
+>> > turn the computer off/on.  Then it won't reconnect automatically.  If
+>> > I go into bluetoothctl I can connect it again and it will then work.
+>> >
+>> > I looked at bluetoothd and it seems to be doing the LE scan with:
+>> > bluetoothd[2356]: src/adapter.c:trigger_passive_scanning()
+>> > bluetoothd[2356]: src/adapter.c:passive_scanning_complete() status 0x00
+>> > bluetoothd[2356]: src/adapter.c:discovering_callback() hci0 type 6 discovering 1
+>> >
+>> > I look also at hcidump and I see:
+>> > < HCI Command: LE Set Random Address (0x08|0x0005) plen 6
+>> >     bdaddr 39:6D:E2:EC:17:37
+>> >> HCI Event: Command Complete (0x0e) plen 4
+>> >     LE Set Random Address (0x08|0x0005) ncmd 1
+>> >     status 0x00
+>> > < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
+>> >     type 0x01 (active)
+>> >     interval 11.250ms window 11.250ms
+>> >     own address: 0x01 (Random) policy: All
+>> >> HCI Event: Command Complete (0x0e) plen 4
+>> >     LE Set Scan Parameters (0x08|0x000b) ncmd 1
+>> >     status 0x00
+>> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>> >     value 0x01 (scanning enabled)
+>> >     filter duplicates 0x01 (enabled)
+>> >> HCI Event: Command Complete (0x0e) plen 4
+>> >     LE Set Scan Enable (0x08|0x000c) ncmd 2
+>> >     status 0x00
+>> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
+>> >     value 0x00 (scanning disabled)
+>> >     filter duplicates 0x00 (disabled)
+>> >
+>> >
+>> > It doesn't seem to be finding anything?  Is there something else I should try?
+>>
+>> Does it continue to scan or it scan a single time and stops, and have
+>> you paired or just connect?
 
-this test is broken. It always fails.
+Can you try with current master, we have applied a few patches for reconnection.
 
-export MALLOC_CHECK_=3
-export MALLOC_PERTURB_=69
-
-seife@susi:/local/seife/src/git-repos/bluez-git> unit/test-queue 
-/queue/basic: OK
-/queue/foreach_destroy: OK
-/queue/foreach_remove_all: Segmentation fault
-
-in gdb:
-
-/queue/basic: OK
-/queue/foreach_destroy: OK
-/queue/foreach_remove_all: 
-Program received signal SIGSEGV, Segmentation fault.
-queue_foreach (queue=0x55555575a140, function=0x555555554b20 <foreach_remove_all>, user_data=0x55555575a140)
-    at src/shared/queue.c:206
-206                     entry = tmp->next;
-(gdb) bt
-#0  queue_foreach (queue=0x55555575a140, function=0x555555554b20 <foreach_remove_all>, 
-    user_data=0x55555575a140) at src/shared/queue.c:206
-#1  0x00007ffff7b408f1 in test_case_run (tc=0x55555575a260) at gtestutils.c:2059
-#2  g_test_run_suite_internal (suite=suite@entry=0x555555759840, path=path@entry=0x7ffff7b96d5e "")
-    at gtestutils.c:2120
-#3  0x00007ffff7b40ab6 in g_test_run_suite_internal (suite=suite@entry=0x555555759820, 
-    path=path@entry=0x7ffff7b96d5e "") at gtestutils.c:2131
-#4  0x00007ffff7b40e0b in g_test_run_suite (suite=0x555555759820) at gtestutils.c:2184
-#5  0x00007ffff7b40e41 in g_test_run () at gtestutils.c:1488
-#6  0x00005555555549fb in main (argc=1, argv=0x7fffffffdae8) at unit/test-queue.c:109
-(gdb) print tmp
-$1 = (struct queue_entry *) 0x4545454545454545
-(gdb) 
-
-
-I noticed the build failing after trying to update openSUSE
-Factory to bluez 5.20 and bisected the problem to this test.
-
-For now I disabled the test in the openSUSE package.
-
-Best regards,
-
-	Stefan
-
-> ---
->  unit/test-queue.c | 21 +++++++++++++++++++++
->  1 file changed, 21 insertions(+)
-> 
-> diff --git a/unit/test-queue.c b/unit/test-queue.c
-> index 55273e3..af7dfd3 100644
-> --- a/unit/test-queue.c
-> +++ b/unit/test-queue.c
-> @@ -78,12 +78,33 @@ static void test_foreach_destroy(void)
->  	queue_foreach(queue, foreach_destroy, queue);
->  }
->  
-> +static void foreach_remove_all(void *data, void *user_data)
-> +{
-> +	struct queue *queue = user_data;
-> +
-> +	queue_remove_all(queue, NULL, NULL, NULL);
-> +}
-> +
-> +static void test_foreach_remove_all(void)
-> +{
-> +	struct queue *queue;
-> +
-> +	queue = queue_new();
-> +	g_assert(queue != NULL);
-> +
-> +	queue_push_tail(queue, UINT_TO_PTR(1));
-> +	queue_push_tail(queue, UINT_TO_PTR(2));
-> +
-> +	queue_foreach(queue, foreach_remove_all, queue);
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->  	g_test_init(&argc, &argv, NULL);
->  
->  	g_test_add_func("/queue/basic", test_basic);
->  	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
-> +	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
->  
->  	return g_test_run();
->  }
 
 -- 
-Stefan Seyfried
-Linux Consultant & Developer -- GPG Key: 0x731B665B
-
-B1 Systems GmbH
-Osterfeldstraße 7 / 85088 Vohburg / http://www.b1-systems.de
-GF: Ralph Dehner / Unternehmenssitz: Vohburg / AG: Ingolstadt,HRB 3537
+Luiz Augusto von Dentz
