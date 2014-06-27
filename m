@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 07/10] android/health: Create mdep for ECHO channel
-Date: Fri, 27 Jun 2014 18:16:08 +0300
-Message-Id: <1403882171-16308-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 02/10] android/health: Add HDP definitions
+Date: Fri, 27 Jun 2014 18:16:03 +0300
+Message-Id: <1403882171-16308-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,49 +12,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/health.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ android/health.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/android/health.c b/android/health.c
-index 9551408..8bd857d 100644
+index 0eeb0bd..9857240 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1157,7 +1157,6 @@ static struct health_channel *create_channel(struct health_app *app,
- {
- 	struct mdep_cfg *mdep;
- 	struct health_channel *channel;
--	uint8_t index;
- 	static unsigned int channel_id = 1;
+@@ -60,6 +60,10 @@
+ #define CHANNEL_TYPE_RELIABLE  0x01
+ #define CHANNEL_TYPE_STREAM    0x02
  
- 	DBG("mdep %u", mdep_index);
-@@ -1165,10 +1164,23 @@ static struct health_channel *create_channel(struct health_app *app,
- 	if (!dev || !app)
- 		return NULL;
- 
--	index = mdep_index + 1;
--	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(index));
--	if (!mdep)
--		return NULL;
-+	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(mdep_index));
-+	if (!mdep) {
-+		if (mdep_index == MDEP_ECHO) {
-+			mdep = new0(struct mdep_cfg, 1);
-+			if (!mdep)
-+				return NULL;
++#define MDEP_ECHO		0x00
++#define MDEP_INITIAL		0x01
++#define MDEP_FINAL		0x7F
 +
-+			/* Leave other configuration zeroes */
-+			mdep->id = MDEP_ECHO;
-+
-+			if (!queue_push_tail(app->mdeps, mdep)) {
-+				free_mdep_cfg(mdep);
-+				return NULL;
-+			}
-+		} else
-+			return NULL;
-+	}
- 
- 	/* create channel and push it to device */
- 	channel = new0(struct health_channel, 1);
+ static bdaddr_t adapter_addr;
+ static struct ipc *hal_ipc = NULL;
+ static struct queue *apps = NULL;
 -- 
 1.8.3.2
 
