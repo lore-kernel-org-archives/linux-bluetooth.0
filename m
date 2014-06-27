@@ -1,35 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53AD4CF3.50806@message-id.googlemail.com>
-Date: Fri, 27 Jun 2014 12:52:35 +0200
-From: Stefan Seyfried <stefan.seyfried@googlemail.com>
-MIME-Version: 1.0
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ] shared/queue: Fix invalid read
-References: <1403866069-15394-1-git-send-email-luiz.dentz@gmail.com>
-In-Reply-To: <1403866069-15394-1-git-send-email-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] doc: Add management command to get clock information
+Date: Fri, 27 Jun 2014 12:48:23 +0200
+Message-Id: <1403866103-56918-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+---
+ doc/mgmt-api.txt | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-This also fixes my unit/test-queue failure.
-
-Thanks!
-
-Stefan
-
-Am 27.06.2014 12:47, schrieb Luiz Augusto von Dentz:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> If the queue elements are destroyed by queue_destroy the head will point
-> to freed memory causing the following error when unit/test-queue is run:
-[...]
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 85bb7a44265f..d329d4a66d9c 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -1829,6 +1829,43 @@ Load Connection Parameters Command
+ 				Not Supported
+ 
+ 
++Get Clock Information Command
++=============================
++
++	Command Code:		0x0033
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Local_Clock (4 Octets)
++				Piconet_Clock (4 Octets)
++				Accuracy (2 Octets)
++
++	This command is used to get local and piconet clock information.
++
++	Possible values for the Address_Type parameter:
++		0	BR/EDR
++		1	Reserved (not in use)
++		2	Reserved (not in use)
++
++	The Accuracy can be set to 0xffff which means the value is unknown.
++
++	If the Address is set to 00:00:00:00:00:00, then only the
++	Local_Clock field has a valid value. The Piconet_Clock and
++	Accuracy fields are invalid and shall be ignored.
++
++	This command generates a Command Complete event on success and
++	on failure. In case of failure only Address and Address_Type fields
++	are valid and values of remaining parameters are considered invalid
++	and shall be ignored.
++
++	Possible errors:	Not Connected
++				Not Powered
++				Invalid Parameters
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
 -- 
-Stefan Seyfried
-Linux Consultant & Developer -- GPG Key: 0x731B665B
+1.9.3
 
-B1 Systems GmbH
-Osterfeldstraße 7 / 85088 Vohburg / http://www.b1-systems.de
-GF: Ralph Dehner / Unternehmenssitz: Vohburg / AG: Ingolstadt,HRB 3537
