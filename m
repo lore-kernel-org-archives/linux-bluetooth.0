@@ -1,39 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Initial test files for ScPP
-Date: Fri, 27 Jun 2014 18:36:34 +0200
-Message-ID: <11702433.hDmtY3Zx7U@uw000953>
-In-Reply-To: <1403263532-3370-1-git-send-email-sebastian.chlad@tieto.com>
-References: <1403263532-3370-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: Re: [PATCH BlueZ v3 01/15] android/dis: Add copy to Device Info implementation
+Date: Fri, 27 Jun 2014 18:35:24 +0200
+Message-ID: <1803230.Jg3oY3U5Hy@uw000953>
+In-Reply-To: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
+References: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+Hi Luiz,
 
-On Friday 20 of June 2014 13:25:31 Sebastian Chlad wrote:
-> Some PICS for ScPP are optional. These PICS should be filled accordingly by
-> developers so it will be clear what is supported and what should be tested.
+On Friday 27 of June 2014 11:27:45 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > 
-> As of now most of the tests in pts-scpp.txt are set to INC.
+> ---
+> v3: Fix passing wrong handle to g_attrib_register in ScPP
 > 
-> Sebastian Chlad (1):
->   android/pts: Initial test files for ScPP
+>  profiles/deviceinfo/deviceinfo.c => android/dis.c | 0
+>  1 file changed, 0 insertions(+), 0 deletions(-)
+>  copy profiles/deviceinfo/deviceinfo.c => android/dis.c (100%)
 > 
->  android/Makefile.am    |   5 +-
->  android/pics-scpp.txt  | 143 +++++++++++++++++++++++++++++++++++++++++++++++++
->  android/pixit-scpp.txt |  24 +++++++++
->  android/pts-scpp.txt   |  25 +++++++++
->  4 files changed, 196 insertions(+), 1 deletion(-)
->  create mode 100644 android/pics-scpp.txt
->  create mode 100644 android/pixit-scpp.txt
->  create mode 100644 android/pts-scpp.txt
-> 
+> diff --git a/profiles/deviceinfo/deviceinfo.c b/android/dis.c
+> similarity index 100%
+> copy from profiles/deviceinfo/deviceinfo.c
+> copy to android/dis.c
 
-I've updated PICS and test results and applied patch. Thanks.
+ScPP related patches (6-11) are now applied. Thanks. 
 
 -- 
 Best regards, 
