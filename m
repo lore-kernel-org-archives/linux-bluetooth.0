@@ -1,32 +1,23 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 0/6] Bluetooth: Various SMP cleanups & fixes
-Date: Fri, 27 Jun 2014 14:23:01 +0300
-Message-Id: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 27 Jun 2014 14:18:02 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] doc: Add management command to get clock information
+Message-ID: <20140627111802.GA18819@t440s.lan>
+References: <1403866103-56918-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1403866103-56918-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-Here's a set of cleanups and fixes for SMP. I'd consider all of them as
-bluetooth-next material, but it could be debated whether the first patch
-should go to bluetooth.git first (I don't have any obvious way of
-exploiting it so I don't consider it very critical).
+On Fri, Jun 27, 2014, Marcel Holtmann wrote:
+> ---
+>  doc/mgmt-api.txt | 37 +++++++++++++++++++++++++++++++++++++
+>  1 file changed, 37 insertions(+)
+
+Applied. Thanks.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (6):
-      Bluetooth: Fix missing hdev locking in smp_cmd_ident_addr_info
-      Bluetooth: Add dedicated AES instance for each SMP context
-      Bluetooth: Update SMP crypto functions to take the SMP context
-      Bluetooth: Remove unnecessary hci_dev_unlock for smp_user_confirm_reply
-      Bluetooth: Fix missing check for SMP session in smp_user_confirm_reply
-      Bluetooth: Remove unnecessary hcon->smp_conn variable
-
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/mgmt.c             |  7 ----
- net/bluetooth/smp.c              | 73 ++++++++++++++++++++------------------
- 3 files changed, 38 insertions(+), 43 deletions(-)
-
