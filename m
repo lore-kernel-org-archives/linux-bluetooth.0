@@ -1,82 +1,115 @@
 Return-Path: <cyrus@holtmann.org>
-From: Kiran Kumar Raparthy <kiran.kumar@linaro.org>
-To: linux-kernel@vger.kernel.org
-Cc: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Android Kernel Team <kernel-team@android.com>,
-	John Stultz <john.stultz@linaro.org>,
-	Jaikumar Ganesh <jaikumarg@android.com>,
-	Kiran Raparthy <kiran.kumar@linaro.org>
-Subject: [PATCH - RESEND] Bluetooth: Keep master role when SCO or eSCO is active
-Date: Fri, 27 Jun 2014 14:50:13 +0530
-Message-Id: <1403860813-360-1-git-send-email-kiran.kumar@linaro.org>
+Message-ID: <53AD3126.3060909@message-id.googlemail.com>
+Date: Fri, 27 Jun 2014 10:53:58 +0200
+From: Stefan Seyfried <stefan.seyfried@googlemail.com>
+MIME-Version: 1.0
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: Re: [PATCH BlueZ 3/5] unit/test-queue: Add /queue/foreach_remove_all
+ test
+References: <1400754843-4759-1-git-send-email-luiz.dentz@gmail.com> <1400754843-4759-3-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1400754843-4759-3-git-send-email-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
+Hi Luiz,
 
-Preserve the master role when SCO or eSCO is active
-as this improves compatability with lots of
-headset and chipset combinations.
+Am 22.05.2014 12:34, schrieb Luiz Augusto von Dentz:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This tests queue_remove_all from queue_foreach callback.
 
-This is one of the number of patches from the Android AOSP
-common.git tree, which is used on almost all Android devices.
-It looks like it would improve support for compatibility with
-lot of headset,so I wanted to submit it for review to see
-if it should go upstream.
+this test is broken. It always fails.
 
-v3: Fixed formatting issues pointed by Sergei
+export MALLOC_CHECK_=3
+export MALLOC_PERTURB_=69
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: Android Kernel Team <kernel-team@android.com>
-Cc: John Stultz <john.stultz@linaro.org>
-Signed-off-by: hyungseoung.yoo <hyungseoung.yoo@samsung.com>
-Signed-off-by: Jaikumar Ganesh <jaikumarg@android.com>
-[kiran: Added context to commit message]
-Signed-off-by: Kiran Raparthy <kiran.kumar@linaro.org>
----
- net/bluetooth/hci_event.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+seife@susi:/local/seife/src/git-repos/bluez-git> unit/test-queue 
+/queue/basic: OK
+/queue/foreach_destroy: OK
+/queue/foreach_remove_all: Segmentation fault
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 15010a2..cfb1355 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1915,6 +1915,14 @@ unlock:
- 	hci_conn_check_pending(hdev);
- }
- 
-+static inline bool is_sco_active(struct hci_dev *hdev)
-+{
-+	if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
-+	    hci_conn_hash_lookup_state(hdev, ESCO_LINK, BT_CONNECTED))
-+		return true;
-+	return false;
-+}
-+
- static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_ev_conn_request *ev = (void *) skb->data;
-@@ -1961,7 +1969,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 			bacpy(&cp.bdaddr, &ev->bdaddr);
- 
--			if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
-+			if (lmp_rswitch_capable(hdev) &&
-+			    ((mask & HCI_LM_MASTER) ||
-+			    is_sco_active(hdev)))
- 				cp.role = 0x00; /* Become master */
- 			else
- 				cp.role = 0x01; /* Remain slave */
+in gdb:
+
+/queue/basic: OK
+/queue/foreach_destroy: OK
+/queue/foreach_remove_all: 
+Program received signal SIGSEGV, Segmentation fault.
+queue_foreach (queue=0x55555575a140, function=0x555555554b20 <foreach_remove_all>, user_data=0x55555575a140)
+    at src/shared/queue.c:206
+206                     entry = tmp->next;
+(gdb) bt
+#0  queue_foreach (queue=0x55555575a140, function=0x555555554b20 <foreach_remove_all>, 
+    user_data=0x55555575a140) at src/shared/queue.c:206
+#1  0x00007ffff7b408f1 in test_case_run (tc=0x55555575a260) at gtestutils.c:2059
+#2  g_test_run_suite_internal (suite=suite@entry=0x555555759840, path=path@entry=0x7ffff7b96d5e "")
+    at gtestutils.c:2120
+#3  0x00007ffff7b40ab6 in g_test_run_suite_internal (suite=suite@entry=0x555555759820, 
+    path=path@entry=0x7ffff7b96d5e "") at gtestutils.c:2131
+#4  0x00007ffff7b40e0b in g_test_run_suite (suite=0x555555759820) at gtestutils.c:2184
+#5  0x00007ffff7b40e41 in g_test_run () at gtestutils.c:1488
+#6  0x00005555555549fb in main (argc=1, argv=0x7fffffffdae8) at unit/test-queue.c:109
+(gdb) print tmp
+$1 = (struct queue_entry *) 0x4545454545454545
+(gdb) 
+
+
+I noticed the build failing after trying to update openSUSE
+Factory to bluez 5.20 and bisected the problem to this test.
+
+For now I disabled the test in the openSUSE package.
+
+Best regards,
+
+	Stefan
+
+> ---
+>  unit/test-queue.c | 21 +++++++++++++++++++++
+>  1 file changed, 21 insertions(+)
+> 
+> diff --git a/unit/test-queue.c b/unit/test-queue.c
+> index 55273e3..af7dfd3 100644
+> --- a/unit/test-queue.c
+> +++ b/unit/test-queue.c
+> @@ -78,12 +78,33 @@ static void test_foreach_destroy(void)
+>  	queue_foreach(queue, foreach_destroy, queue);
+>  }
+>  
+> +static void foreach_remove_all(void *data, void *user_data)
+> +{
+> +	struct queue *queue = user_data;
+> +
+> +	queue_remove_all(queue, NULL, NULL, NULL);
+> +}
+> +
+> +static void test_foreach_remove_all(void)
+> +{
+> +	struct queue *queue;
+> +
+> +	queue = queue_new();
+> +	g_assert(queue != NULL);
+> +
+> +	queue_push_tail(queue, UINT_TO_PTR(1));
+> +	queue_push_tail(queue, UINT_TO_PTR(2));
+> +
+> +	queue_foreach(queue, foreach_remove_all, queue);
+> +}
+> +
+>  int main(int argc, char *argv[])
+>  {
+>  	g_test_init(&argc, &argv, NULL);
+>  
+>  	g_test_add_func("/queue/basic", test_basic);
+>  	g_test_add_func("/queue/foreach_destroy", test_foreach_destroy);
+> +	g_test_add_func("/queue/foreach_remove_all", test_foreach_remove_all);
+>  
+>  	return g_test_run();
+>  }
+
 -- 
-1.8.2.1
+Stefan Seyfried
+Linux Consultant & Developer -- GPG Key: 0x731B665B
+
+B1 Systems GmbH
+Osterfeldstraße 7 / 85088 Vohburg / http://www.b1-systems.de
+GF: Ralph Dehner / Unternehmenssitz: Vohburg / AG: Ingolstadt,HRB 3537
