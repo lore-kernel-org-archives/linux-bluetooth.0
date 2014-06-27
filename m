@@ -1,47 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 02/12] android/health: Fix wrong callback return type
-Date: Fri, 27 Jun 2014 14:24:53 +0300
-Message-Id: <1403868303-8129-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 6/6] Bluetooth: Remove unnecessary hcon->smp_conn variable
+Date: Fri, 27 Jun 2014 14:23:07 +0300
+Message-Id: <1403868187-19396-7-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
+References: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
+The smp_conn member of struct hci_conn was simply a pointer to the
+l2cap_conn object. Since we already have hcon->l2cap_data that points to
+the same thing there's no need to have this second variable. This patch
+removes it and changes the single place that was using it to use
+hcon->l2cap_data instead.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- android/health.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h | 1 -
+ net/bluetooth/smp.c              | 4 +---
+ 2 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index de67475..140afee 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1098,15 +1098,19 @@ static void mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
- 	DBG("Not Implemeneted");
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dda7f00c07c5..ca2a99807615 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -409,7 +409,6 @@ struct hci_conn {
+ 	struct hci_dev	*hdev;
+ 	void		*l2cap_data;
+ 	void		*sco_data;
+-	void		*smp_conn;
+ 	struct amp_mgr	*amp_mgr;
+ 
+ 	struct hci_conn	*link;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 641ce8b69d2a..414c5151aa46 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -584,7 +584,6 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 
+ 	smp->conn = conn;
+ 	conn->smp_chan = smp;
+-	conn->hcon->smp_conn = conn;
+ 
+ 	hci_conn_hold(conn->hcon);
+ 
+@@ -626,13 +625,12 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ 
+ 	kfree(smp);
+ 	conn->smp_chan = NULL;
+-	conn->hcon->smp_conn = NULL;
+ 	hci_conn_drop(conn->hcon);
  }
  
--static void mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
-+static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 				uint16_t mdlid, uint8_t *conf, void *data)
+ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
  {
- 	DBG("Not Implemeneted");
-+
-+	return MCAP_SUCCESS;
- }
+-	struct l2cap_conn *conn = hcon->smp_conn;
++	struct l2cap_conn *conn = hcon->l2cap_data;
+ 	struct smp_chan *smp;
+ 	u32 value;
  
--static void mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
-+static uint8_t mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
- {
- 	DBG("Not Implemeneted");
-+
-+	return MCAP_SUCCESS;
- }
- 
- static void connect_mdl_cb(struct mcap_mdl *mdl, GError *gerr, gpointer data)
 -- 
-1.8.3.2
+1.9.3
 
