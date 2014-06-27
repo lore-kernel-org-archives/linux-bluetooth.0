@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 09/12] android/health: Add handling for ECHO service
-Date: Fri, 27 Jun 2014 14:25:00 +0300
-Message-Id: <1403868303-8129-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 03/12] android/health: Add HDP definitions
+Date: Fri, 27 Jun 2014 14:24:54 +0300
+Message-Id: <1403868303-8129-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,87 +12,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Reply received buffer back for ECHO service.
 ---
- android/health.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 62 insertions(+), 1 deletion(-)
+ android/health.h | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/android/health.c b/android/health.c
-index 4f15f93..9631d9e 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1054,9 +1054,70 @@ static int get_dcpsm(sdp_list_t *recs, uint16_t *dcpsm)
- 	return -1;
- }
+diff --git a/android/health.h b/android/health.h
+index 0b32fd3..ab7d478 100644
+--- a/android/health.h
++++ b/android/health.h
+@@ -21,5 +21,13 @@
+  *
+  */
  
-+static int send_echo_data(int sock, const void *buf, uint32_t size)
-+{
-+	const uint8_t *buf_b = buf;
-+	uint32_t sent = 0;
++#define HDP_MDEP_ECHO		0x00
++#define HDP_MDEP_INITIAL	0x01
++#define HDP_MDEP_FINAL		0x7F
 +
-+	while (sent < size) {
-+		int n = write(sock, buf_b + sent, size - sent);
-+		if (n < 0)
-+			return -1;
-+		sent += n;
-+	}
++#define HDP_NO_PREFERENCE_DC	0x00
++#define HDP_RELIABLE_DC		0x01
++#define HDP_STREAMING_DC	0x02
 +
-+	return 0;
-+}
-+
-+static gboolean serve_echo(GIOChannel *io, GIOCondition cond, gpointer data)
-+{
-+	struct health_channel *channel = data;
-+	uint8_t buf[MCAP_DC_MTU];
-+	int fd, len;
-+
-+	DBG("channel %p", channel);
-+
-+	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-+		DBG("Error condition on channel");
-+		return FALSE;
-+	}
-+
-+	fd = g_io_channel_unix_get_fd(io);
-+
-+	len = read(fd, buf, sizeof(buf));
-+	if (len < 0)
-+		goto fail;
-+
-+	if (send_echo_data(fd, buf, len)  >= 0)
-+		return TRUE;
-+
-+fail:
-+	free_health_device(channel->dev);
-+	return FALSE;
-+}
-+
- static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- {
--	DBG("Not Implemeneted");
-+	struct health_channel *channel = data;
-+
-+	if (!channel->mdl)
-+		channel->mdl = mcap_mdl_ref(mdl);
-+
-+	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
-+
-+	if (channel->mdep_id == HDP_MDEP_ECHO) {
-+		GIOChannel *io;
-+		int fd;
-+
-+		fd = mcap_mdl_get_fd(channel->mdl);
-+		if (fd < 0)
-+			return;
-+
-+		io = g_io_channel_unix_new(fd);
-+		g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL | G_IO_IN,
-+							serve_echo, channel);
-+		g_io_channel_unref(io);
-+	}
- }
- 
- static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+ bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode);
+ void bt_health_unregister(void);
 -- 
 1.8.3.2
 
