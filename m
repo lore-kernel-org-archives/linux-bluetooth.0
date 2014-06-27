@@ -2,75 +2,143 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/2] android/pts: Update MCAP results
-Date: Fri, 27 Jun 2014 11:30:05 +0200
-Message-Id: <1403861405-2503-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1403861405-2503-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1403861405-2503-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 1/2] android/mcaptest: Send clock sync capabilities request
+Date: Fri, 27 Jun 2014 11:30:04 +0200
+Message-Id: <1403861405-2503-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This adds option to send synchronization capabilities and requirements
+request on MCL connection.
 ---
- android/pts-mcap.txt | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ android/mcaptest.c | 43 +++++++++++++++++++++++++++++++++++++++----
+ 1 file changed, 39 insertions(+), 4 deletions(-)
 
-diff --git a/android/pts-mcap.txt b/android/pts-mcap.txt
-index 9542b8c..d6b7216 100644
---- a/android/pts-mcap.txt
-+++ b/android/pts-mcap.txt
-@@ -1,7 +1,7 @@
- PTS test results for MCAP
+diff --git a/android/mcaptest.c b/android/mcaptest.c
+index 9869abb..642dbf4 100644
+--- a/android/mcaptest.c
++++ b/android/mcaptest.c
+@@ -57,6 +57,7 @@ static uint16_t mdlid;
+ static int control_mode = MODE_LISTEN;
+ static int data_mode = MODE_LISTEN;
  
- PTS version: 5.1
--Tested: 26-June-2014
-+Tested: 27-June-2014
- Android version: 4.4.2
++static gboolean send_synccap_req = FALSE;
+ static gboolean mcl_disconnect = FALSE;
+ static gboolean mdl_disconnect = FALSE;
+ static int mcl_disconnect_timeout = -1;
+@@ -64,6 +65,8 @@ static int mdl_disconnect_timeout = -1;
  
- Results:
-@@ -10,6 +10,9 @@ FAIL	test failed
- INC	test is inconclusive
- N/A	test is disabled due to PICS setup
+ static struct mcap_mcl *mcl = NULL;
  
-+Note: Test were done with ssp enabled and in most of the cases requires pairing
-+	confirmation. This can be done easily by using 'btmgmt monitor'.
++#define REQ_CLOCK_ACC 0x1400
 +
- -------------------------------------------------------------------------------
- Test Name		Result	Notes
- -------------------------------------------------------------------------------
-@@ -32,7 +35,10 @@ TC_MCAP_CM_DIS_BV_05_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_01_C	N/A
- TC_MCAP_CM_REC_BV_02_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CM_REC_BV_03_C	N/A
--TC_MCAP_CM_REC_BV_04_C	INC	possible PTS issue #12182
-+TC_MCAP_CM_REC_BV_04_C	PASS	mcaptest -C 4099 -D 4101
-+				Note: It may be necessary to confirm pairing
-+					twice (second time when UIT is back in
-+					range).
- TC_MCAP_CM_REC_BV_05_C	N/A
- TC_MCAP_CM_REC_BV_06_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_CS_ERR_BI_01_C	N/A
-@@ -58,15 +64,18 @@ TC_MCAP_ERR_BI_08_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_ERR_BI_09_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_ERR_BI_10_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_ERR_BI_11_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_12_C	INC
-+TC_MCAP_ERR_BI_12_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_ERR_BI_13_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_ERR_BI_14_C	PASS	mcaptest -C 4099 -D 4101
- TC_MCAP_ERR_BI_15_C	PASS	mcaptest -C 4099 -D 4101 -d
--TC_MCAP_ERR_BI_16_C	INC
-+TC_MCAP_ERR_BI_16_C	PASS	mcaptest -C 4099 -D 4101
-+				Note: Select 'Cancel' when PTS asks to switch to
-+					'unavailable state', as we are not
-+					supporting it.
- TC_MCAP_ERR_BI_17_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_ERR_BI_18_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_ERR_BI_19_C	PASS	mcaptest -C 4099 -D 4101
--TC_MCAP_ERR_BI_20_C	INC
-+TC_MCAP_ERR_BI_20_C	PASS	mcaptest -C 4099 -D 4101 -g
- TC_MCAP_INV_BI_01_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
- TC_MCAP_INV_BI_02_C	PASS	mcaptest -C 4099 -D 4101 -d
- TC_MCAP_INV_BI_03_C	PASS	mcaptest -C 4099 -D 4101 -dc <PTS addr>
+ static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
+ {
+ 	int fd = -1;
+@@ -178,6 +181,15 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
+ 	}
+ }
+ 
++static void sync_cap_cb(struct mcap_mcl *mcl, uint8_t mcap_err,
++			uint8_t btclockres, uint16_t synclead,
++			uint16_t tmstampres, uint16_t tmstampacc, GError *err,
++			gpointer data)
++{
++	/* TODO */
++	printf("%s\n", __func__);
++}
++
+ static void trigger_mdl_action(int mode)
+ {
+ 	GError *gerr = NULL;
+@@ -205,14 +217,26 @@ static void trigger_mdl_action(int mode)
+ 			g_error_free(gerr);
+ 		}
+ 	}
++
++	if (send_synccap_req && mcap->csp_enabled) {
++		mcap_sync_init(mcl);
++
++		mcap_sync_cap_req(mcl, REQ_CLOCK_ACC, sync_cap_cb, NULL, &gerr);
++		if (gerr) {
++			printf("MCAP Sync req error: %s\n", gerr->message);
++			g_error_free(gerr);
++		}
++	}
+ }
+ 
+ static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
+ {
+ 	printf("%s\n", __func__);
+ 
+-	if (mcl)
++	if (mcl) {
++		mcap_sync_stop(mcl);
+ 		mcap_mcl_unref(mcl);
++	}
+ 
+ 	mcl = mcap_mcl_ref(mcap_mcl);
+ 	trigger_mdl_action(data_mode);
+@@ -226,8 +250,10 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
+ 		return;
+ 	}
+ 
+-	if (mcl)
++	if (mcl) {
++		mcap_sync_stop(mcl);
+ 		mcap_mcl_unref(mcl);
++	}
+ 
+ 	mcl = mcap_mcl_ref(mcap_mcl);
+ 	trigger_mdl_action(data_mode);
+@@ -239,7 +265,8 @@ static void usage(void)
+ 		"\tmcaptest <control_mode> <data_mode> [options]\n");
+ 	printf("Control Link Mode:\n"
+ 		"\t-c connect <dst_addr>\n"
+-		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n");
++		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n"
++		"\t-g send clock sync capability request if MCL connected\n");
+ 	printf("Data Link Mode:\n"
+ 		"\t-d connect\n"
+ 		"\t-f <timeout> disconnect MDL after it's connected\n");
+@@ -254,6 +281,7 @@ static struct option main_options[] = {
+ 	{ "device",		1, 0, 'i' },
+ 	{ "connect_cl",		1, 0, 'c' },
+ 	{ "disconnect_cl",	1, 0, 'e' },
++	{ "synccap_req",	0, 0, 'g' },
+ 	{ "connect_dl",		0, 0, 'd' },
+ 	{ "disconnect_dl",	1, 0, 'f' },
+ 	{ "control_ch",		1, 0, 'C' },
+@@ -277,7 +305,7 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
+-	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:hd",
++	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dgh",
+ 						main_options, NULL)) != EOF) {
+ 		switch (opt) {
+ 		case 'i':
+@@ -311,6 +339,11 @@ int main(int argc, char *argv[])
+ 
+ 			break;
+ 
++		case 'g':
++			send_synccap_req = TRUE;
++
++			break;
++
+ 		case 'C':
+ 			ccpsm = atoi(optarg);
+ 
+@@ -341,6 +374,8 @@ int main(int argc, char *argv[])
+ 		exit(1);
+ 	}
+ 
++	mcap_enable_csp(mcap);
++
+ 	switch (control_mode) {
+ 	case MODE_CONNECT:
+ 		ba2str(&dst, bdastr);
 -- 
 2.0.0
 
