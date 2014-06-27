@@ -1,31 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 01/10] android/health: Add error check when creating app
-Date: Fri, 27 Jun 2014 18:16:02 +0300
-Message-Id: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 10/10] android/pts: Update HDP test results
+Date: Fri, 27 Jun 2014 18:16:11 +0300
+Message-Id: <1403882171-16308-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403882171-16308-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Mark ECHO server tests passed.
 ---
- android/health.c | 2 ++
- 1 file changed, 2 insertions(+)
+ android/pts-hdp.txt | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index 7d64a63..0eeb0bd 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -820,6 +820,8 @@ static void bt_health_register_app(const void *buf, uint16_t len)
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index 99aa2d6..f2b1528 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -1,7 +1,7 @@
+ PTS test results for HDP
  
- 	app = create_health_app(app_name, provider, srv_name, srv_descr,
- 							cmd->num_of_mdep);
-+	if (!app)
-+		goto fail;
+ PTS version: 5.1
+-Tested: 17-June-2014
++Tested: 27-June-2014
+ Android version: 4.4.2
  
- 	if (!queue_push_tail(apps, app))
- 		goto fail;
+ Results:
+@@ -105,7 +105,11 @@ TC_SRC_HCT_BV_05_C	N/A
+ TC_SRC_HCT_BV_06_C	INC
+ TC_SRC_HCT_BV_07_C	INC
+ TC_SRC_DE_BV_01_I	INC
+-TC_SRC_DE_BV_02_I	INC
++TC_SRC_DE_BV_02_I	PASS	haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SRC_DEP_BV_01_I	INC
+ TC_SRC_DEP_BV_02_I	N/A
+ TC_SNK_CON_BV_01_I	PASS	haltest:
+@@ -195,7 +199,11 @@ TC_SNK_HCT_BV_05_C	N/A
+ TC_SNK_HCT_BV_06_C	INC
+ TC_SNK_HCT_BV_07_C	INC
+ TC_SNK_DE_BV_01_I	N/A
+-TC_SNK_DE_BV_02_I	INC
++TC_SNK_DE_BV_02_I	PASS	haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SNK_DEP_BV_03_I	INC
+ TC_SNK_DEP_BV_04_I	INC
+ -------------------------------------------------------------------------------
 -- 
 1.8.3.2
 
