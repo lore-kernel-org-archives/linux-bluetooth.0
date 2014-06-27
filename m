@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 08/12] android/health: Create mdep for ECHO channel
-Date: Fri, 27 Jun 2014 14:24:59 +0300
-Message-Id: <1403868303-8129-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 04/12] android/health: Add handling MDL connection request
+Date: Fri, 27 Jun 2014 14:24:55 +0300
+Message-Id: <1403868303-8129-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -13,49 +13,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/health.c | 22 +++++++++++++++++-----
- 1 file changed, 17 insertions(+), 5 deletions(-)
+ android/health.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
 diff --git a/android/health.c b/android/health.c
-index d9731fd..4f15f93 100644
+index 140afee..3cb2016 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1146,7 +1146,6 @@ static struct health_channel *create_channel(struct health_app *app,
+@@ -1101,7 +1101,38 @@ static void mcap_mdl_aborted_cb(struct mcap_mdl *mdl, void *data)
+ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
+ 				uint16_t mdlid, uint8_t *conf, void *data)
  {
- 	struct mdep_cfg *mdep;
- 	struct health_channel *channel;
--	uint8_t index;
- 	static unsigned int channel_id = 1;
- 
- 	DBG("mdep %u", mdep_index);
-@@ -1154,10 +1153,23 @@ static struct health_channel *create_channel(struct health_app *app,
- 	if (!dev || !app)
- 		return NULL;
- 
--	index = mdep_index + 1;
--	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(index));
--	if (!mdep)
--		return NULL;
-+	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(mdep_index));
-+	if (!mdep) {
-+		if (mdep_index == HDP_MDEP_ECHO) {
-+			mdep = new0(struct mdep_cfg, 1);
-+			if (!mdep)
-+				return NULL;
+-	DBG("Not Implemeneted");
++	GError *gerr = NULL;
 +
-+			/* Leave other configuration zeroes */
-+			mdep->id = HDP_MDEP_ECHO;
++	DBG("Data channel request: mdepid %u mdlid %u", mdepid, mdlid);
 +
-+			if (!queue_push_tail(app->mdeps, mdep)) {
-+				free_mdep_cfg(mdep);
-+				return NULL;
-+			}
-+		} else
-+			return NULL;
++	/* TODO: find / create device */
++
++	if (mdepid == HDP_MDEP_ECHO) {
++		switch (*conf) {
++		case HDP_NO_PREFERENCE_DC:
++			*conf = HDP_RELIABLE_DC;
++		case HDP_RELIABLE_DC:
++			break;
++		case HDP_STREAMING_DC:
++			return MCAP_CONFIGURATION_REJECTED;
++		default:
++			/* Special case defined in HDP spec 3.4. When an invalid
++			* configuration is received we shall close the MCL when
++			* we are still processing the callback. */
++			/* TODO close device */
++			return MCAP_CONFIGURATION_REJECTED; /* not processed */
++		}
++
++		if (!mcap_set_data_chan_mode(mcap, L2CAP_MODE_ERTM, &gerr)) {
++			error("Error: %s", gerr->message);
++			g_error_free(gerr);
++			return MCAP_MDL_BUSY;
++		}
++
++		/* TODO: Create channel */
++
++		return MCAP_SUCCESS;
 +	}
  
- 	/* create channel and push it to device */
- 	channel = new0(struct health_channel, 1);
+ 	return MCAP_SUCCESS;
+ }
 -- 
 1.8.3.2
 
