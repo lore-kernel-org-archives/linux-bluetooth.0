@@ -1,68 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Send HCI_Read_Clock_Offset before disconnecting
-Date: Fri, 27 Jun 2014 13:45:10 +0200
-Message-Id: <1403869510-30820-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Remove reason parameter from hci_amp_disconn function
+Date: Fri, 27 Jun 2014 13:45:08 +0200
+Message-Id: <1403869510-30820-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the connection is in master role and it is going to be
-disconnected based on the disconnection timeout, then send
-the HCI_Read_Clock_Offset command in an attempt to update the
-clock offset value in the inquiry cache.
+The hci_amp_disconn function is a local function and there is no
+need for a reason parameter. That one can be retrieved from the
+hci_conn object easily.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci.h |  5 +++++
- net/bluetooth/hci_conn.c    | 18 ++++++++++++++++++
- 2 files changed, 23 insertions(+)
+ net/bluetooth/hci_conn.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index cc2e88dd20ea..6933766e7215 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -533,6 +533,11 @@ struct hci_cp_read_remote_version {
- 	__le16   handle;
- } __packed;
- 
-+#define HCI_OP_READ_CLOCK_OFFSET	0x041f
-+struct hci_cp_read_clock_offset {
-+	__le16   handle;
-+} __packed;
-+
- #define HCI_OP_SETUP_SYNC_CONN		0x0428
- struct hci_cp_setup_sync_conn {
- 	__le16   handle;
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6d0fe3df2fa5..f477756966b9 100644
+index 626160c37103..cc64fbe952fa 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -309,6 +309,24 @@ static void hci_conn_timeout(struct work_struct *work)
- 			hci_amp_disconn(conn);
- 		} else {
- 			__u8 reason = hci_proto_disconn_ind(conn);
-+
-+			/* When we are master of an established connection
-+			 * and it enters the disconnect timeout, then go
-+			 * ahead and try to read the current clock offset.
-+			 *
-+			 * Processing of the result is done within the
-+			 * event handling and hci_clock_offset_evt function.
-+			 */
-+			if (test_bit(HCI_CONN_MASTER, &conn->flags)) {
-+				struct hci_dev *hdev = conn->hdev;
-+				struct hci_cp_read_clock_offset cp;
-+
-+				cp.handle = cpu_to_le16(conn->handle);
-+
-+				hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET,
-+					     sizeof(cp), &cp);
-+			}
-+
- 			hci_disconnect(conn, reason);
- 		}
+@@ -136,7 +136,7 @@ void hci_disconnect(struct hci_conn *conn, __u8 reason)
+ 	hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
+ }
+ 
+-static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
++static void hci_amp_disconn(struct hci_conn *conn)
+ {
+ 	struct hci_cp_disconn_phy_link cp;
+ 
+@@ -145,7 +145,7 @@ static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
+ 	conn->state = BT_DISCONN;
+ 
+ 	cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
+-	cp.reason = reason;
++	cp.reason = hci_proto_disconn_ind(conn);
+ 	hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
+ 		     sizeof(cp), &cp);
+ }
+@@ -273,13 +273,14 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
+ 
+ static void hci_conn_disconnect(struct hci_conn *conn)
+ {
+-	__u8 reason = hci_proto_disconn_ind(conn);
++	__u8 reason;
+ 
+ 	switch (conn->type) {
+ 	case AMP_LINK:
+-		hci_amp_disconn(conn, reason);
++		hci_amp_disconn(conn);
  		break;
+ 	default:
++		reason = hci_proto_disconn_ind(conn);
+ 		hci_disconnect(conn, reason);
+ 		break;
+ 	}
 -- 
 1.9.3
 
