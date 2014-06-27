@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 09/15] android/scpp: Add bt_scpp_set_interval and bt_scpp_set_window
-Date: Fri, 27 Jun 2014 11:27:53 +0300
-Message-Id: <1403857679-14341-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 05/15] android/hog: Add support for reading device details via DIS
+Date: Fri, 27 Jun 2014 11:27:49 +0300
+Message-Id: <1403857679-14341-5-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 References: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,112 +11,136 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-These functions can be used to change the current values.
+If primary is not provided meaning primary should be auto discovered it
+probably means other primary services such as Device Information
+Service are not being handled either so just handle DIS as well in such
+case.
 ---
- android/scpp.c | 43 +++++++++++++++++++++++++++++++++++++------
- android/scpp.h |  3 +++
- 2 files changed, 40 insertions(+), 6 deletions(-)
+ android/hog.c | 61 +++++++++++++++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 49 insertions(+), 12 deletions(-)
 
-diff --git a/android/scpp.c b/android/scpp.c
-index c73a015..751d3f2 100644
---- a/android/scpp.c
-+++ b/android/scpp.c
-@@ -77,6 +77,9 @@ struct bt_scpp *bt_scpp_new(void *primary)
- 	if (!scan)
- 		return NULL;
+diff --git a/android/hog.c b/android/hog.c
+index c88fe9d..007146a 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -52,6 +52,7 @@
  
-+	scan->interval = SCAN_INTERVAL;
-+	scan->window = SCAN_WINDOW;
-+
- 	if (primary)
- 		scan->primary = g_memdup(primary, sizeof(*scan->primary));
+ #include "btio/btio.h"
  
-@@ -104,12 +107,13 @@ void bt_scpp_unref(struct bt_scpp *scan)
- 	scpp_free(scan);
- }
++#include "android/dis.h"
+ #include "android/hog.h"
  
--static void write_scan_params(GAttrib *attrib, uint16_t handle)
-+static void write_scan_params(GAttrib *attrib, uint16_t handle,
-+					uint16_t interval, uint16_t window)
+ #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+@@ -89,6 +90,7 @@ struct bt_hog {
+ 	uint16_t		proto_mode_handle;
+ 	uint16_t		ctrlpt_handle;
+ 	uint8_t			flags;
++	struct bt_dis		*dis;
+ };
+ 
+ struct report {
+@@ -644,6 +646,7 @@ static void report_free(void *data)
+ 
+ static void hog_free(struct bt_hog *hog)
  {
- 	uint8_t value[4];
- 
--	put_le16(SCAN_INTERVAL, &value[0]);
--	put_le16(SCAN_WINDOW, &value[2]);
-+	put_le16(interval, &value[0]);
-+	put_le16(window, &value[2]);
- 
- 	gatt_write_cmd(attrib, handle, value, sizeof(value), NULL, NULL);
- }
-@@ -122,7 +126,8 @@ static void refresh_value_cb(const uint8_t *pdu, uint16_t len,
- 	DBG("Server requires refresh: %d", pdu[3]);
- 
- 	if (pdu[3] == SERVER_REQUIRES_REFRESH)
--		write_scan_params(scan->attrib, scan->iwhandle);
-+		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
-+								scan->window);
++	bt_dis_unref(hog->dis);
+ 	bt_uhid_unref(hog->uhid);
+ 	g_slist_free_full(hog->reports, report_free);
+ 	g_attrib_unref(hog->attrib);
+@@ -747,6 +750,30 @@ static void find_included_cb(uint8_t status, GSList *services, void *user_data)
+ 						char_discovered_cb, hog);
  }
  
- static void ccc_written_cb(guint8 status, const guint8 *pdu,
-@@ -215,7 +220,8 @@ static void iwin_discovered_cb(uint8_t status, GSList *chars, void *user_data)
++static void dis_notify(uint8_t source, uint16_t vendor, uint16_t product,
++					uint16_t version, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++
++	hog->vendor = vendor;
++	hog->product = product;
++	hog->version = version;
++}
++
++static void hog_attach_dis(struct bt_hog *hog, struct gatt_primary *primary)
++{
++	if (hog->dis) {
++		bt_dis_attach(hog->dis, hog->attrib);
++		return;
++	}
++
++	hog->dis = bt_dis_new(primary);
++	if (hog->dis) {
++		bt_dis_set_notification(hog->dis, dis_notify, hog);
++		bt_dis_attach(hog->dis, hog->attrib);
++	}
++}
++
+ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+@@ -769,26 +796,30 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 	for (l = services; l; l = l->next) {
+ 		primary = l->data;
  
- 	DBG("Scan Interval Window handle: 0x%04x", scan->iwhandle);
++		if (strcmp(primary->uuid, DEVICE_INFORMATION_UUID) == 0) {
++			hog_attach_dis(hog, primary);
++			continue;
++		}
++
+ 		if (strcmp(primary->uuid, HOG_UUID) == 0)
+-			break;
++			hog->primary = g_memdup(primary, sizeof(*primary));
+ 	}
  
--	write_scan_params(scan->attrib, scan->iwhandle);
-+	write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
-+								scan->window);
+-	if (!l) {
+-		for (l = services; l; l = l->next) {
+-			primary = l->data;
++	if (hog->primary) {
++		gatt_discover_char(hog->attrib, hog->primary->range.start,
++						hog->primary->range.end, NULL,
++						char_discovered_cb, hog);
+ 
+-			gatt_find_included(hog->attrib, primary->range.start,
+-					primary->range.end, find_included_cb,
+-					hog);
+-		}
+ 		return;
+ 	}
+ 
+-	hog->primary = g_memdup(primary, sizeof(*primary));
++	for (l = services; l; l = l->next) {
++		primary = l->data;
+ 
+-	gatt_discover_char(hog->attrib, hog->primary->range.start,
+-						hog->primary->range.end, NULL,
+-						char_discovered_cb, hog);
++		gatt_find_included(hog->attrib, primary->range.start,
++				primary->range.end, find_included_cb,
++				hog);
++	}
  }
  
- bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
-@@ -228,7 +234,8 @@ bool bt_scpp_attach(struct bt_scpp *scan, void *attrib)
- 	scan->attrib = g_attrib_ref(attrib);
- 
- 	if (scan->iwhandle) {
--		write_scan_params(scan->attrib, scan->iwhandle);
-+		write_scan_params(scan->attrib, scan->iwhandle, scan->interval,
-+								scan->window);
+ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+@@ -806,6 +837,9 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
  		return true;
  	}
  
-@@ -254,3 +261,27 @@ void bt_scpp_detach(struct bt_scpp *scan)
- 	g_attrib_unref(scan->attrib);
- 	scan->attrib = NULL;
- }
++	if (hog->dis)
++		bt_dis_attach(hog->dis, gatt);
 +
-+bool bt_scpp_set_interval(struct bt_scpp *scan, uint16_t value)
-+{
-+	if (!scan)
-+		return false;
-+
-+	/* TODO: Check valid range */
-+
-+	scan->interval = value;
-+
-+	return true;
-+}
-+
-+bool bt_scpp_set_window(struct bt_scpp *scan, uint16_t value)
-+{
-+	if (!scan)
-+		return false;
-+
-+	/* TODO: Check valid range */
-+
-+	scan->window = value;
-+
-+	return true;
-+}
-diff --git a/android/scpp.h b/android/scpp.h
-index f374cee..048fb9f 100644
---- a/android/scpp.h
-+++ b/android/scpp.h
-@@ -30,3 +30,6 @@ void bt_scpp_unref(struct bt_scpp *scan);
+ 	if (hog->reports == NULL) {
+ 		gatt_discover_char(hog->attrib, primary->range.start,
+ 						primary->range.end, NULL,
+@@ -838,6 +872,9 @@ void bt_hog_detach(struct bt_hog *hog)
+ 		g_attrib_unregister(hog->attrib, r->notifyid);
+ 	}
  
- bool bt_scpp_attach(struct bt_scpp *scan, void *gatt);
- void bt_scpp_detach(struct bt_scpp *scan);
++	if (hog->dis)
++		bt_dis_detach(hog->dis);
 +
-+bool bt_scpp_set_interval(struct bt_scpp *scan, uint16_t value);
-+bool bt_scpp_set_window(struct bt_scpp *scan, uint16_t value);
+ 	g_attrib_unref(hog->attrib);
+ 	hog->attrib = NULL;
+ }
 -- 
 1.9.3
 
