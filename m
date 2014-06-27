@@ -1,69 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Send HCI_Read_Clock_Offset before disconnecting
-Date: Fri, 27 Jun 2014 14:32:16 +0200
-Message-Id: <1403872336-46436-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Store LMP handle when HCI_Read_LMP_Handle completes
+Date: Fri, 27 Jun 2014 14:16:46 +0200
+Message-Id: <1403871406-41269-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the connection is in master role and it is going to be
-disconnected based on the disconnection timeout, then send
-the HCI_Read_Clock_Offset command in an attempt to update the
-clock offset value in the inquiry cache.
+When the HCI_Read_LMP_Handle completes and is successfull, then store
+the LMP handle from SCO and eSCO connections in the hci_conn structure.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci.h |  5 +++++
- net/bluetooth/hci_conn.c    | 19 +++++++++++++++++++
- 2 files changed, 24 insertions(+)
+ include/net/bluetooth/hci.h      | 11 +++++++++++
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_event.c        | 23 +++++++++++++++++++++++
+ 3 files changed, 35 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index cc2e88dd20ea..6933766e7215 100644
+index 6933766e7215..0664e5441f24 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -533,6 +533,11 @@ struct hci_cp_read_remote_version {
+@@ -538,6 +538,17 @@ struct hci_cp_read_clock_offset {
  	__le16   handle;
  } __packed;
  
-+#define HCI_OP_READ_CLOCK_OFFSET	0x041f
-+struct hci_cp_read_clock_offset {
++#define HCI_OP_READ_LMP_HANDLE		0x0420
++struct hci_cp_read_lmp_handle {
 +	__le16   handle;
++} __packed;
++struct hci_rp_read_lmp_handle {
++	__u8     status;
++	__le16   handle;
++	__u8     lmp_handle;
++	__le32   reserved;
 +} __packed;
 +
  #define HCI_OP_SETUP_SYNC_CONN		0x0428
  struct hci_cp_setup_sync_conn {
  	__le16   handle;
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 6d0fe3df2fa5..8a0c7a0ac1b6 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -309,6 +309,25 @@ static void hci_conn_timeout(struct work_struct *work)
- 			hci_amp_disconn(conn);
- 		} else {
- 			__u8 reason = hci_proto_disconn_ind(conn);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ca2a99807615..d066237ab219 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -363,6 +363,7 @@ struct hci_conn {
+ 	__u8		type;
+ 	bool		out;
+ 	__u8		attempt;
++	__u8		lmp_handle;
+ 	__u8		dev_class[3];
+ 	__u8		features[HCI_MAX_PAGES][8];
+ 	__u16		pkt_type;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7a23324eac39..783c45874d65 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -88,6 +88,25 @@ static void hci_cc_remote_name_req_cancel(struct hci_dev *hdev,
+ 	BT_DBG("%s", hdev->name);
+ }
+ 
++static void hci_cc_read_lmp_handle(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct hci_rp_read_lmp_handle *rp = (void *) skb->data;
++	struct hci_conn *conn;
 +
-+			/* When we are master of an established connection
-+			 * and it enters the disconnect timeout, then go
-+			 * ahead and try to read the current clock offset.
-+			 *
-+			 * Processing of the result is done within the
-+			 * event handling and hci_clock_offset_evt function.
-+			 */
-+			if (conn->type == ACL_LINK &&
-+			    test_bit(HCI_CONN_MASTER, &conn->flags)) {
-+				struct hci_dev *hdev = conn->hdev;
-+				struct hci_cp_read_clock_offset cp;
++	BT_DBG("%s status 0x%2.2x", hdev->name, rp->status);
 +
-+				cp.handle = cpu_to_le16(conn->handle);
++	if (rp->status)
++		return;
 +
-+				hci_send_cmd(hdev, HCI_OP_READ_CLOCK_OFFSET,
-+					     sizeof(cp), &cp);
-+			}
++	hci_dev_lock(hdev);
 +
- 			hci_disconnect(conn, reason);
- 		}
++	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(rp->handle));
++	if (conn)
++		conn->lmp_handle = rp->lmp_handle;
++
++	hci_dev_unlock(hdev);
++}
++
+ static void hci_cc_role_discovery(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_rp_role_discovery *rp = (void *) skb->data;
+@@ -2473,6 +2492,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_cc_remote_name_req_cancel(hdev, skb);
+ 		break;
+ 
++	case HCI_OP_READ_LMP_HANDLE:
++		hci_cc_read_lmp_handle(hdev, skb);
++		break;
++
+ 	case HCI_OP_ROLE_DISCOVERY:
+ 		hci_cc_role_discovery(hdev, skb);
  		break;
 -- 
 1.9.3
