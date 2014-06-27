@@ -1,60 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 0/6] Bluetooth: Various SMP cleanups & fixes
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Remove reason parameter from hci_amp_disconn function
-Date: Fri, 27 Jun 2014 13:45:08 +0200
-Message-Id: <1403869510-30820-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 27 Jun 2014 13:40:28 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <010EDA1D-030B-4F77-86AC-B910975F0198@holtmann.org>
+References: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The hci_amp_disconn function is a local function and there is no
-need for a reason parameter. That one can be retrieved from the
-hci_conn object easily.
+Hi Johan,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_conn.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+> Here's a set of cleanups and fixes for SMP. I'd consider all of them as
+> bluetooth-next material, but it could be debated whether the first patch
+> should go to bluetooth.git first (I don't have any obvious way of
+> exploiting it so I don't consider it very critical).
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (6):
+>      Bluetooth: Fix missing hdev locking in smp_cmd_ident_addr_info
+>      Bluetooth: Add dedicated AES instance for each SMP context
+>      Bluetooth: Update SMP crypto functions to take the SMP context
+>      Bluetooth: Remove unnecessary hci_dev_unlock for smp_user_confirm_reply
+>      Bluetooth: Fix missing check for SMP session in smp_user_confirm_reply
+>      Bluetooth: Remove unnecessary hcon->smp_conn variable
+> 
+> include/net/bluetooth/hci_core.h |  1 -
+> net/bluetooth/mgmt.c             |  7 ----
+> net/bluetooth/smp.c              | 73 ++++++++++++++++++++------------------
+> 3 files changed, 38 insertions(+), 43 deletions(-)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 626160c37103..cc64fbe952fa 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -136,7 +136,7 @@ void hci_disconnect(struct hci_conn *conn, __u8 reason)
- 	hci_send_cmd(conn->hdev, HCI_OP_DISCONNECT, sizeof(cp), &cp);
- }
- 
--static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
-+static void hci_amp_disconn(struct hci_conn *conn)
- {
- 	struct hci_cp_disconn_phy_link cp;
- 
-@@ -145,7 +145,7 @@ static void hci_amp_disconn(struct hci_conn *conn, __u8 reason)
- 	conn->state = BT_DISCONN;
- 
- 	cp.phy_handle = HCI_PHY_HANDLE(conn->handle);
--	cp.reason = reason;
-+	cp.reason = hci_proto_disconn_ind(conn);
- 	hci_send_cmd(conn->hdev, HCI_OP_DISCONN_PHY_LINK,
- 		     sizeof(cp), &cp);
- }
-@@ -273,13 +273,14 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
- 
- static void hci_conn_disconnect(struct hci_conn *conn)
- {
--	__u8 reason = hci_proto_disconn_ind(conn);
-+	__u8 reason;
- 
- 	switch (conn->type) {
- 	case AMP_LINK:
--		hci_amp_disconn(conn, reason);
-+		hci_amp_disconn(conn);
- 		break;
- 	default:
-+		reason = hci_proto_disconn_ind(conn);
- 		hci_disconnect(conn, reason);
- 		break;
- 	}
--- 
-1.9.3
+all 6 patches have been applied to bluetooth-next tree.
+
+And even patch 1/6 is not something I would consider for 3.16-rcX unless we see real bugs about it. If anyone stumbles over it, we promote it to -stable once 3.16 has been released.
+
+Regards
+
+Marcel
 
