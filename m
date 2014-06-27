@@ -1,98 +1,102 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
-References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
-	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
-	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
-	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
-Date: Fri, 27 Jun 2014 11:32:00 +0300
-Message-ID: <CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
-Subject: Re: LE mouse reconnect problem
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Ryan Press <ryan@presslab.us>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 14/15] android/hog: Add support for Battery Service
+Date: Fri, 27 Jun 2014 11:27:58 +0300
+Message-Id: <1403857679-14341-14-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
+References: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Ryan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jun 25, 2014 at 4:23 PM, Ryan Press <ryan@presslab.us> wrote:
-> Hi Luiz,
->
-> Yes it will repeat the scan every few seconds.
->
-> I paired the device in the Gnome applet.  In the bluetoothctl I could
-> see the pair and trust messages like so:
->
-> [NEW] Device C5:8C:97:E6:9C:81 Arc Touch Mouse SE
-> [CHG] Device C5:8C:97:E6:9C:81 Connected: yes
-> [CHG] Device C5:8C:97:E6:9C:81 UUIDs:
->     00001800-0000-1000-8000-00805f9b34fb
->     00001801-0000-1000-8000-00805f9b34fb
->     0000180a-0000-1000-8000-00805f9b34fb
->     0000180f-0000-1000-8000-00805f9b34fb
->     00001812-0000-1000-8000-00805f9b34fb
-> [CHG] Device C5:8C:97:E6:9C:81 Paired: yes
-> [CHG] Device C5:8C:97:E6:9C:81 Trusted: yes
-> [CHG] Device C5:8C:97:E6:9C:81 Modalias: usb:v045Ep07F3d0001
->
-> Thanks,
->
-> Ryan
->
->
-> On Jun 25, 2014 12:08 AM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> wrote:
->>
->> Hi Ryan,
->>
->> On Wed, Jun 25, 2014 at 5:27 AM, Ryan Press <ryan@presslab.us> wrote:
->> > I have a Microsoft Arc mouse, Surface edition.  This uses Bluetooth
->> > Low Energy.  Under dual boot Windows 8.1 I can connect this mouse, and
->> > it will reconnect just fine if I turn the mouse off/on or Bluetooth
->> > off/on.
->> >
->> > In Fedora rawhide I have Bluez 5.18-2.  I can pair this mouse just
->> > fine, and it will continue to work until I turn the mouse off/on or
->> > turn the computer off/on.  Then it won't reconnect automatically.  If
->> > I go into bluetoothctl I can connect it again and it will then work.
->> >
->> > I looked at bluetoothd and it seems to be doing the LE scan with:
->> > bluetoothd[2356]: src/adapter.c:trigger_passive_scanning()
->> > bluetoothd[2356]: src/adapter.c:passive_scanning_complete() status 0x00
->> > bluetoothd[2356]: src/adapter.c:discovering_callback() hci0 type 6 discovering 1
->> >
->> > I look also at hcidump and I see:
->> > < HCI Command: LE Set Random Address (0x08|0x0005) plen 6
->> >     bdaddr 39:6D:E2:EC:17:37
->> >> HCI Event: Command Complete (0x0e) plen 4
->> >     LE Set Random Address (0x08|0x0005) ncmd 1
->> >     status 0x00
->> > < HCI Command: LE Set Scan Parameters (0x08|0x000b) plen 7
->> >     type 0x01 (active)
->> >     interval 11.250ms window 11.250ms
->> >     own address: 0x01 (Random) policy: All
->> >> HCI Event: Command Complete (0x0e) plen 4
->> >     LE Set Scan Parameters (0x08|0x000b) ncmd 1
->> >     status 0x00
->> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->> >     value 0x01 (scanning enabled)
->> >     filter duplicates 0x01 (enabled)
->> >> HCI Event: Command Complete (0x0e) plen 4
->> >     LE Set Scan Enable (0x08|0x000c) ncmd 2
->> >     status 0x00
->> > < HCI Command: LE Set Scan Enable (0x08|0x000c) plen 2
->> >     value 0x00 (scanning disabled)
->> >     filter duplicates 0x00 (disabled)
->> >
->> >
->> > It doesn't seem to be finding anything?  Is there something else I should try?
->>
->> Does it continue to scan or it scan a single time and stops, and have
->> you paired or just connect?
+If primary is not provided meaning primary should be auto discovered it
+probably means other primary services such as Battery Service are not
+being handled either so just handle BaS as well in such case.
+---
+ android/hog.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-Can you try with current master, we have applied a few patches for reconnection.
-
-
+diff --git a/android/hog.c b/android/hog.c
+index d891930..5fa8b94 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -54,6 +54,7 @@
+ 
+ #include "android/dis.h"
+ #include "android/scpp.h"
++#include "android/bas.h"
+ #include "android/hog.h"
+ 
+ #define HOG_UUID		"00001812-0000-1000-8000-00805f9b34fb"
+@@ -93,6 +94,7 @@ struct bt_hog {
+ 	uint8_t			flags;
+ 	struct bt_dis		*dis;
+ 	struct bt_scpp		*scpp;
++	struct bt_bas		*bas;
+ };
+ 
+ struct report {
+@@ -650,6 +652,7 @@ static void hog_free(struct bt_hog *hog)
+ {
+ 	bt_dis_unref(hog->dis);
+ 	bt_scpp_unref(hog->scpp);
++	bt_bas_unref(hog->bas);
+ 	bt_uhid_unref(hog->uhid);
+ 	g_slist_free_full(hog->reports, report_free);
+ 	g_attrib_unref(hog->attrib);
+@@ -789,6 +792,18 @@ static void hog_attach_scpp(struct bt_hog *hog, struct gatt_primary *primary)
+ 		bt_scpp_attach(hog->scpp, hog->attrib);
+ }
+ 
++static void hog_attach_bas(struct bt_hog *hog, struct gatt_primary *primary)
++{
++	if (hog->bas) {
++		bt_bas_attach(hog->bas, hog->attrib);
++		return;
++	}
++
++	hog->bas = bt_bas_new(primary);
++	if (hog->bas)
++		bt_bas_attach(hog->bas, hog->attrib);
++}
++
+ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ {
+ 	struct bt_hog *hog = user_data;
+@@ -821,6 +836,11 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ 			continue;
+ 		}
+ 
++		if (strcmp(primary->uuid, BATTERY_UUID) == 0) {
++			hog_attach_bas(hog, primary);
++			continue;
++		}
++
+ 		if (strcmp(primary->uuid, HOG_UUID) == 0)
+ 			hog->primary = g_memdup(primary, sizeof(*primary));
+ 	}
+@@ -863,6 +883,9 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ 	if (hog->scpp)
+ 		bt_scpp_attach(hog->scpp, gatt);
+ 
++	if (hog->bas)
++		bt_bas_attach(hog->bas, gatt);
++
+ 	if (hog->reports == NULL) {
+ 		gatt_discover_char(hog->attrib, primary->range.start,
+ 						primary->range.end, NULL,
+@@ -901,6 +924,9 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	if (hog->scpp)
+ 		bt_scpp_detach(hog->scpp);
+ 
++	if (hog->bas)
++		bt_bas_detach(hog->bas);
++
+ 	g_attrib_unref(hog->attrib);
+ 	hog->attrib = NULL;
+ }
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
