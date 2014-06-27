@@ -1,144 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/2] android/mcaptest: Send clock sync capabilities request
-Date: Fri, 27 Jun 2014 11:30:04 +0200
-Message-Id: <1403861405-2503-1-git-send-email-jakub.tyszkowski@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Kiran Kumar Raparthy' <kiran.kumar@linaro.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: hyungseoung.yoo <hyungseoung.yoo@samsung.com>, Marcel Holtmann
+	<marcel@holtmann.org>, Gustavo Padovan <gustavo@padovan.org>, Johan Hedberg
+	<johan.hedberg@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Android Kernel Team
+	<kernel-team@android.com>, John Stultz <john.stultz@linaro.org>, "Jaikumar
+ Ganesh" <jaikumarg@android.com>
+Subject: RE: [PATCH - RESEND] Bluetooth: Keep master role when SCO or eSCO
+ is active
+Date: Fri, 27 Jun 2014 09:24:36 +0000
+Message-ID: <063D6719AE5E284EB5DD2968C1650D6D17267FAF@AcuExch.aculab.com>
+References: <1403860813-360-1-git-send-email-kiran.kumar@linaro.org>
+In-Reply-To: <1403860813-360-1-git-send-email-kiran.kumar@linaro.org>
+Content-Type: text/plain; charset="Windows-1252"
+MIME-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds option to send synchronization capabilities and requirements
-request on MCL connection.
----
- android/mcaptest.c | 43 +++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 39 insertions(+), 4 deletions(-)
+From: Kiran Kumar Raparthy
+> From: "hyungseoung.yoo" <hyungseoung.yoo@samsung.com>
+>=20
+> Preserve the master role when SCO or eSCO is active
+> as this improves compatability with lots of
+> headset and chipset combinations.
+>=20
+> This is one of the number of patches from the Android AOSP
+> common.git tree, which is used on almost all Android devices.
+> It looks like it would improve support for compatibility with
+> lot of headset,so I wanted to submit it for review to see
+> if it should go upstream.
+...
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 15010a2..cfb1355 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -1915,6 +1915,14 @@ unlock:
+>  	hci_conn_check_pending(hdev);
+>  }
+>=20
+> +static inline bool is_sco_active(struct hci_dev *hdev)
+> +{
+> +	if (hci_conn_hash_lookup_state(hdev, SCO_LINK, BT_CONNECTED) ||
+> +	    hci_conn_hash_lookup_state(hdev, ESCO_LINK, BT_CONNECTED))
+> +		return true;
+> +	return false;
+> +}
 
-diff --git a/android/mcaptest.c b/android/mcaptest.c
-index 9869abb..642dbf4 100644
---- a/android/mcaptest.c
-+++ b/android/mcaptest.c
-@@ -57,6 +57,7 @@ static uint16_t mdlid;
- static int control_mode = MODE_LISTEN;
- static int data_mode = MODE_LISTEN;
- 
-+static gboolean send_synccap_req = FALSE;
- static gboolean mcl_disconnect = FALSE;
- static gboolean mdl_disconnect = FALSE;
- static int mcl_disconnect_timeout = -1;
-@@ -64,6 +65,8 @@ static int mdl_disconnect_timeout = -1;
- 
- static struct mcap_mcl *mcl = NULL;
- 
-+#define REQ_CLOCK_ACC 0x1400
-+
- static void mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- {
- 	int fd = -1;
-@@ -178,6 +181,15 @@ static void create_mdl_cb(struct mcap_mdl *mcap_mdl, uint8_t type, GError *gerr,
- 	}
- }
- 
-+static void sync_cap_cb(struct mcap_mcl *mcl, uint8_t mcap_err,
-+			uint8_t btclockres, uint16_t synclead,
-+			uint16_t tmstampres, uint16_t tmstampacc, GError *err,
-+			gpointer data)
-+{
-+	/* TODO */
-+	printf("%s\n", __func__);
-+}
-+
- static void trigger_mdl_action(int mode)
- {
- 	GError *gerr = NULL;
-@@ -205,14 +217,26 @@ static void trigger_mdl_action(int mode)
- 			g_error_free(gerr);
- 		}
- 	}
-+
-+	if (send_synccap_req && mcap->csp_enabled) {
-+		mcap_sync_init(mcl);
-+
-+		mcap_sync_cap_req(mcl, REQ_CLOCK_ACC, sync_cap_cb, NULL, &gerr);
-+		if (gerr) {
-+			printf("MCAP Sync req error: %s\n", gerr->message);
-+			g_error_free(gerr);
-+		}
-+	}
- }
- 
- static void mcl_connected(struct mcap_mcl *mcap_mcl, gpointer data)
- {
- 	printf("%s\n", __func__);
- 
--	if (mcl)
-+	if (mcl) {
-+		mcap_sync_stop(mcl);
- 		mcap_mcl_unref(mcl);
-+	}
- 
- 	mcl = mcap_mcl_ref(mcap_mcl);
- 	trigger_mdl_action(data_mode);
-@@ -226,8 +250,10 @@ static void create_mcl_cb(struct mcap_mcl *mcap_mcl, GError *err, gpointer data)
- 		return;
- 	}
- 
--	if (mcl)
-+	if (mcl) {
-+		mcap_sync_stop(mcl);
- 		mcap_mcl_unref(mcl);
-+	}
- 
- 	mcl = mcap_mcl_ref(mcap_mcl);
- 	trigger_mdl_action(data_mode);
-@@ -239,7 +265,8 @@ static void usage(void)
- 		"\tmcaptest <control_mode> <data_mode> [options]\n");
- 	printf("Control Link Mode:\n"
- 		"\t-c connect <dst_addr>\n"
--		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n");
-+		"\t-e <timeout> disconnect MCL and quit after MDL is closed\n"
-+		"\t-g send clock sync capability request if MCL connected\n");
- 	printf("Data Link Mode:\n"
- 		"\t-d connect\n"
- 		"\t-f <timeout> disconnect MDL after it's connected\n");
-@@ -254,6 +281,7 @@ static struct option main_options[] = {
- 	{ "device",		1, 0, 'i' },
- 	{ "connect_cl",		1, 0, 'c' },
- 	{ "disconnect_cl",	1, 0, 'e' },
-+	{ "synccap_req",	0, 0, 'g' },
- 	{ "connect_dl",		0, 0, 'd' },
- 	{ "disconnect_dl",	1, 0, 'f' },
- 	{ "control_ch",		1, 0, 'C' },
-@@ -277,7 +305,7 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
--	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:hd",
-+	while ((opt = getopt_long(argc, argv, "+i:c:C:D:e:f:dgh",
- 						main_options, NULL)) != EOF) {
- 		switch (opt) {
- 		case 'i':
-@@ -311,6 +339,11 @@ int main(int argc, char *argv[])
- 
- 			break;
- 
-+		case 'g':
-+			send_synccap_req = TRUE;
-+
-+			break;
-+
- 		case 'C':
- 			ccpsm = atoi(optarg);
- 
-@@ -341,6 +374,8 @@ int main(int argc, char *argv[])
- 		exit(1);
- 	}
- 
-+	mcap_enable_csp(mcap);
-+
- 	switch (control_mode) {
- 	case MODE_CONNECT:
- 		ba2str(&dst, bdastr);
--- 
-2.0.0
+Why not just return the value of the Boolean expression?
 
+	David
