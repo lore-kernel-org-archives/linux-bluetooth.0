@@ -1,64 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] doc: Add management command to get clock information
-Date: Fri, 27 Jun 2014 12:48:23 +0200
-Message-Id: <1403866103-56918-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH BlueZ] shared/queue: Fix invalid read
+Date: Fri, 27 Jun 2014 13:47:49 +0300
+Message-Id: <1403866069-15394-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 37 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 37 insertions(+)
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 85bb7a44265f..d329d4a66d9c 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -1829,6 +1829,43 @@ Load Connection Parameters Command
- 				Not Supported
+If the queue elements are destroyed by queue_destroy the head will point
+to freed memory causing the following error when unit/test-queue is run:
+
+Invalid read of size 8
+   at 0x401040: queue_foreach (queue.c:194)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x40083E: main (test-queue.c:109)
+ Address 0x7f65738 is 8 bytes inside a block of size 16 free'd
+   at 0x4C28577: free (in /usr/lib64/valgrind/vgpreload_memcheck-amd64-linux.so)
+   by 0x400E29: queue_destroy (queue.c:93)
+   by 0x40102C: queue_foreach (queue.c:219)
+   by 0x4E9E5E0: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9E7A5: ??? (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x4E9EB1A: g_test_run_suite (in /usr/lib64/libglib-2.0.so.0.3800.2)
+   by 0x40083E: main (test-queue.c:109)
+---
+ src/shared/queue.c | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
+
+diff --git a/src/shared/queue.c b/src/shared/queue.c
+index 4013293..3bdc1ec 100644
+--- a/src/shared/queue.c
++++ b/src/shared/queue.c
+@@ -75,23 +75,10 @@ struct queue *queue_new(void)
  
+ void queue_destroy(struct queue *queue, queue_destroy_func_t destroy)
+ {
+-	struct queue_entry *entry;
+-
+ 	if (!queue)
+ 		return;
  
-+Get Clock Information Command
-+=============================
-+
-+	Command Code:		0x0033
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+	Return Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				Local_Clock (4 Octets)
-+				Piconet_Clock (4 Octets)
-+				Accuracy (2 Octets)
-+
-+	This command is used to get local and piconet clock information.
-+
-+	Possible values for the Address_Type parameter:
-+		0	BR/EDR
-+		1	Reserved (not in use)
-+		2	Reserved (not in use)
-+
-+	The Accuracy can be set to 0xffff which means the value is unknown.
-+
-+	If the Address is set to 00:00:00:00:00:00, then only the
-+	Local_Clock field has a valid value. The Piconet_Clock and
-+	Accuracy fields are invalid and shall be ignored.
-+
-+	This command generates a Command Complete event on success and
-+	on failure. In case of failure only Address and Address_Type fields
-+	are valid and values of remaining parameters are considered invalid
-+	and shall be ignored.
-+
-+	Possible errors:	Not Connected
-+				Not Powered
-+				Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
+-	entry = queue->head;
+-
+-	while (entry) {
+-		struct queue_entry *tmp = entry;
+-
+-		if (destroy)
+-			destroy(entry->data);
+-
+-		entry = entry->next;
+-
+-		free(tmp);
+-	}
++	queue_remove_all(queue, NULL, NULL, destroy);
  
+ 	queue_unref(queue);
+ }
 -- 
 1.9.3
 
