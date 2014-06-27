@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/6] Bluetooth: Remove unnecessary hci_dev_unlock for smp_user_confirm_reply
-Date: Fri, 27 Jun 2014 14:23:05 +0300
-Message-Id: <1403868187-19396-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/6] Bluetooth: Add dedicated AES instance for each SMP context
+Date: Fri, 27 Jun 2014 14:23:03 +0300
+Message-Id: <1403868187-19396-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
 References: <1403868187-19396-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,34 +11,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Now that the SMP context has it's own crypto handle it doesn't need to
-lock the hci_dev anymore for most operations. This means that it is safe
-to call smp_user_confirm_reply with the lock already held.
+Many places have to be extra careful to not hold the hdev lock when
+calling into the SMP code. This is because the SMP crypto functions use
+the crypto handle that's part of the hci_dev struct. Giving the SMP
+context its own handle helps simplifying the locking logic and removes
+the risk for deadlocks.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 7 -------
- 1 file changed, 7 deletions(-)
+ net/bluetooth/smp.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f75a090cd7e4..d542f8af6a5d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3052,14 +3052,7 @@ static int user_pairing_resp(struct sock *sk, struct hci_dev *hdev,
- 	}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index a38941593e8b..39ca9616d2de 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -62,6 +62,8 @@ struct smp_chan {
+ 	struct smp_ltk	*slave_ltk;
+ 	struct smp_irk	*remote_irk;
+ 	unsigned long	flags;
++
++	struct crypto_blkcipher	*tfm_aes;
+ };
  
- 	if (addr->type == BDADDR_LE_PUBLIC || addr->type == BDADDR_LE_RANDOM) {
--		/* Continue with pairing via SMP. The hdev lock must be
--		 * released as SMP may try to recquire it for crypto
--		 * purposes.
--		 */
--		hci_dev_unlock(hdev);
- 		err = smp_user_confirm_reply(conn, mgmt_op, passkey);
--		hci_dev_lock(hdev);
--
- 		if (!err)
- 			err = cmd_complete(sk, hdev->id, mgmt_op,
- 					   MGMT_STATUS_SUCCESS, addr,
+ static inline void swap_buf(const u8 *src, u8 *dst, size_t len)
+@@ -583,6 +585,13 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 	if (!smp)
+ 		return NULL;
+ 
++	smp->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
++	if (IS_ERR(smp->tfm_aes)) {
++		BT_ERR("Unable to create ECB crypto context");
++		kfree(smp);
++		return NULL;
++	}
++
+ 	smp->conn = conn;
+ 	conn->smp_chan = smp;
+ 	conn->hcon->smp_conn = conn;
+@@ -605,6 +614,8 @@ void smp_chan_destroy(struct l2cap_conn *conn)
+ 	kfree(smp->csrk);
+ 	kfree(smp->slave_csrk);
+ 
++	crypto_free_blkcipher(smp->tfm_aes);
++
+ 	/* If pairing failed clean up any keys we might have */
+ 	if (!complete) {
+ 		if (smp->ltk) {
 -- 
 1.9.3
 
