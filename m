@@ -1,91 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 27 Jun 2014 17:26:47 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv3 09/12] android/health: Add handling for ECHO service
-Message-ID: <20140627142646.GC21456@aemeltch-MOBL1>
-References: <1403855994-29262-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403868303-8129-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1403868303-8129-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <2101847.l1r4UDlVof@uw000953>
+Subject: Re: [PATCH] android/health: Fix NULL dereference
+Date: Fri, 27 Jun 2014 16:12:48 +0200
+Message-ID: <13247510.96PXbMmBKk@uw000953>
+In-Reply-To: <1403878054-26178-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1403878054-26178-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <2101847.l1r4UDlVof@uw000953>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Fri, Jun 27, 2014 at 04:09:18PM +0200, Szymon Janc wrote:
-> Hi Andrei,
+On Friday 27 of June 2014 17:07:34 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> On Friday 27 of June 2014 14:25:00 Andrei Emeltchenko wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Reply received buffer back for ECHO service.
-> > ---
-> >  android/health.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++++++-
-> >  1 file changed, 62 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/android/health.c b/android/health.c
-> > index 4f15f93..9631d9e 100644
-> > --- a/android/health.c
-> > +++ b/android/health.c
-> > @@ -1054,9 +1054,70 @@ static int get_dcpsm(sdp_list_t *recs, uint16_t *dcpsm)
-> >  	return -1;
-> >  }
-> >  
-> > +static int send_echo_data(int sock, const void *buf, uint32_t size)
-> > +{
-> > +	const uint8_t *buf_b = buf;
-> > +	uint32_t sent = 0;
-> > +
-> > +	while (sent < size) {
-> > +		int n = write(sock, buf_b + sent, size - sent);
-> > +		if (n < 0)
-> > +			return -1;
-> > +		sent += n;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static gboolean serve_echo(GIOChannel *io, GIOCondition cond, gpointer data)
-> > +{
-> > +	struct health_channel *channel = data;
-> > +	uint8_t buf[MCAP_DC_MTU];
-> > +	int fd, len;
-> > +
-> > +	DBG("channel %p", channel);
-> > +
-> > +	if (cond & (G_IO_ERR | G_IO_HUP | G_IO_NVAL)) {
-> > +		DBG("Error condition on channel");
-> > +		return FALSE;
-> > +	}
-> > +
-> > +	fd = g_io_channel_unix_get_fd(io);
-> > +
-> > +	len = read(fd, buf, sizeof(buf));
-> > +	if (len < 0)
-> > +		goto fail;
-> > +
-> > +	if (send_echo_data(fd, buf, len)  >= 0)
-> > +		return TRUE;
+> ---
+>  android/health.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Shouldn't initiator send only one single data packet in echo test function?
+> diff --git a/android/health.c b/android/health.c
+> index 5f86727..2dc35d4 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -1878,7 +1878,7 @@ static void channel_delete_cb(GError *gerr, gpointer data)
+>  
+>  	DBG("");
+>  
+> -	if (!gerr) {
+> +	if (gerr) {
+>  		error("health: channel delete failed %s", gerr->message);
+>  		return;
+>  	}
 > 
 
-yes you are right here.
+Applied, thanks.
 
-> > +
-> > +fail:
-> > +	free_health_device(channel->dev);
-> 
-> Wouldn't that leave dangling pointer in channel? Also, why is this free here?
-> 
-
-I will rework this patch.
-
-Best regards 
-Andrei Emeltchenko 
+-- 
+Best regards, 
+Szymon Janc
