@@ -1,31 +1,25 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <CACFh1D5A64SVvKU7FfsMRr8Yz31=-g92Z6k8=NgQjPE1SxsxEg@mail.gmail.com>
+References: <CACFh1D5A64SVvKU7FfsMRr8Yz31=-g92Z6k8=NgQjPE1SxsxEg@mail.gmail.com>
+From: David Narvaez <david.narvaez@computer.org>
+Date: Fri, 27 Jun 2014 09:59:18 -0400
+Message-ID: <CACFh1D5MbZxjrpfjBhy2ENZgk0ACA0s93GBtoFDLeJ_5nEypQA@mail.gmail.com>
+Subject: Re: SSH Shell Over Bluetooth
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] android/health: Fix NULL dereference
-Date: Fri, 27 Jun 2014 17:07:34 +0300
-Message-Id: <1403878054-26178-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thu, Jun 19, 2014 at 9:17 PM, David Narvaez
+<david.narvaez@computer.org> wrote:
+> Hi,
+>
+> I have an RPi with a bluetooth dongle and my ultimate goal is to be
+> able to SSH into the RPi over bluetooth from my laptop. Back in the
+> days, PAND was the way to do this, but now that it is gone I don't see
+> any documentation explaining how to set up TPC/IP over bluetooth.
 
----
- android/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Ping.
 
-diff --git a/android/health.c b/android/health.c
-index 5f86727..2dc35d4 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1878,7 +1878,7 @@ static void channel_delete_cb(GError *gerr, gpointer data)
- 
- 	DBG("");
- 
--	if (!gerr) {
-+	if (gerr) {
- 		error("health: channel delete failed %s", gerr->message);
- 		return;
- 	}
--- 
-1.8.3.2
-
+David E. Narvaez
