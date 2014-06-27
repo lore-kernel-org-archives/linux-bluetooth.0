@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v3 06/15] lib/uuid: Add define for Scan Parameter UUID
-Date: Fri, 27 Jun 2014 11:27:50 +0300
-Message-Id: <1403857679-14341-6-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v3 03/15] android/dis: Add bt_dis_set_notification
+Date: Fri, 27 Jun 2014 11:27:47 +0300
+Message-Id: <1403857679-14341-3-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 References: <1403857679-14341-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,70 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+Function bt_dis_set_notification can be used to set notify callback.
 ---
- lib/uuid.h                | 1 +
- profiles/scanparam/scan.c | 2 --
- 2 files changed, 1 insertion(+), 2 deletions(-)
+ android/dis.c | 21 +++++++++++++++++++++
+ android/dis.h |  7 +++++++
+ 2 files changed, 28 insertions(+)
 
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 814fd92..b44d6ae 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -60,6 +60,7 @@ extern "C" {
- #define IMMEDIATE_ALERT_UUID	"00001802-0000-1000-8000-00805f9b34fb"
- #define LINK_LOSS_UUID		"00001803-0000-1000-8000-00805f9b34fb"
- #define TX_POWER_UUID		"00001804-0000-1000-8000-00805f9b34fb"
-+#define SCAN_PARAMETERS_UUID	"00001813-0000-1000-8000-00805f9b34fb"
+diff --git a/android/dis.c b/android/dis.c
+index 7914293..3237c03 100644
+--- a/android/dis.c
++++ b/android/dis.c
+@@ -51,6 +51,8 @@ struct bt_dis {
+ 	GAttrib			*attrib;	/* GATT connection */
+ 	struct gatt_primary	*primary;	/* Primary details */
+ 	GSList			*chars;		/* Characteristics */
++	bt_dis_notify		notify;
++	void			*notify_data;
+ };
  
- #define SAP_UUID		"0000112D-0000-1000-8000-00805f9b34fb"
+ struct characteristic {
+@@ -132,6 +134,13 @@ static void read_pnpid_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	dis->vendor = get_le16(&value[1]);
+ 	dis->product = get_le16(&value[3]);
+ 	dis->version = get_le16(&value[5]);
++
++	DBG("source: 0x%02X vendor: 0x%04X product: 0x%04X version: 0x%04X",
++			dis->source, dis->vendor, dis->product, dis->version);
++
++	if (dis->notify)
++		dis->notify(dis->source, dis->vendor, dis->product,
++						dis->version, dis->notify_data);
+ }
  
-diff --git a/profiles/scanparam/scan.c b/profiles/scanparam/scan.c
-index 25c906e..3eece9d 100644
---- a/profiles/scanparam/scan.c
-+++ b/profiles/scanparam/scan.c
-@@ -42,8 +42,6 @@
- #include "attrib/gatt.h"
- #include "src/attio.h"
+ static void process_deviceinfo_char(struct characteristic *ch)
+@@ -194,3 +203,15 @@ void bt_dis_detach(struct bt_dis *dis)
+ 	g_attrib_unref(dis->attrib);
+ 	dis->attrib = NULL;
+ }
++
++bool bt_dis_set_notification(struct bt_dis *dis, bt_dis_notify func,
++							void *user_data)
++{
++	if (!dis)
++		return false;
++
++	dis->notify = func;
++	dis->notify_data = user_data;
++
++	return true;
++}
+diff --git a/android/dis.h b/android/dis.h
+index 6cc0b58..faf27b3 100644
+--- a/android/dis.h
++++ b/android/dis.h
+@@ -30,3 +30,10 @@ void bt_dis_unref(struct bt_dis *dis);
  
--#define SCAN_PARAMETERS_UUID		"00001813-0000-1000-8000-00805f9b34fb"
--
- #define SCAN_INTERVAL_WIN_UUID		0x2A4F
- #define SCAN_REFRESH_UUID		0x2A31
- 
+ bool bt_dis_attach(struct bt_dis *dis, void *gatt);
+ void bt_dis_detach(struct bt_dis *dis);
++
++typedef void (*bt_dis_notify) (uint8_t source, uint16_t vendor,
++					uint16_t product, uint16_t version,
++					void *user_data);
++
++bool bt_dis_set_notification(struct bt_dis *dis, bt_dis_notify func,
++							void *user_data);
 -- 
 1.9.3
 
