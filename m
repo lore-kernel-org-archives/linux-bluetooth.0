@@ -1,26 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH 1/3] Bluetooth: Use kzalloc instead of kmalloc for pending mgmt commands
+Subject: Re: [PATCH 2/3] Bluetooth: Add tracking of local and piconet clock values
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403967247-15728-1-git-send-email-johan.hedberg@gmail.com>
-Date: Sat, 28 Jun 2014 18:54:26 +0200
+In-Reply-To: <1403967247-15728-2-git-send-email-johan.hedberg@gmail.com>
+Date: Sat, 28 Jun 2014 18:54:49 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <29AA7F07-CD19-4880-8AA3-3255916164A6@holtmann.org>
-References: <1403967247-15728-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <A2652086-7744-455D-B78A-144677E2C699@holtmann.org>
+References: <1403967247-15728-1-git-send-email-johan.hedberg@gmail.com> <1403967247-15728-2-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> By using kzalloc we ensure that there are no struct members, such as the
-> user_data pointer, left uninitialized.
+> This patch adds support for storing the local and piconet clock values
+> from the HCI_Read_Clock command response to the hci_dev and hci_conn
+> structs. This will be later used in another patch to implement support
+> for the Get Clock Info mgmt command.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/mgmt.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> include/net/bluetooth/hci.h      | 12 ++++++++++++
+> include/net/bluetooth/hci_core.h |  4 ++++
+> net/bluetooth/hci_event.c        | 39 +++++++++++++++++++++++++++++++++++++++
+> 3 files changed, 55 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
