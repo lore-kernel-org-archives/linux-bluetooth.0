@@ -1,55 +1,51 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Update background scanning from hci_conn_params_clear
-Date: Sun, 29 Jun 2014 13:41:51 +0200
-Message-Id: <1404042111-60574-3-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/3] Bluetooth: Clear pending connections from hci_conn_params_clear
+Date: Sun, 29 Jun 2014 13:41:50 +0200
+Message-Id: <1404042111-60574-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When calling hci_conn_params_clear function, it should update the
-background scanning properly and not require a separate call to
-update it.
-
-For the case when the function is used during unregister of a
-controller, an extra safe guard is but in place.
+When hci_conn_params_clear is called, it is always followed by a
+call to hci_pend_le_conns_clear. So instead of making this explicit
+just make sure it is always called. This makes this function similar
+on how hci_conn_params_add and hci_conn_params_del work.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ net/bluetooth/hci_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8b206d0942aa..c566b57610c9 100644
+index ffee5f547506..8b206d0942aa 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
 @@ -959,7 +959,6 @@ static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
  	} else if (memcmp(buf, "clr", 3) == 0) {
  		hci_dev_lock(hdev);
  		hci_conn_params_clear(hdev);
--		hci_update_background_scan(hdev);
+-		hci_pend_le_conns_clear(hdev);
+ 		hci_update_background_scan(hdev);
  		hci_dev_unlock(hdev);
  	} else {
- 		err = -EINVAL;
-@@ -3483,6 +3482,8 @@ void hci_pend_le_conns_clear(struct hci_dev *hdev)
+@@ -3561,6 +3560,8 @@ void hci_conn_params_clear(struct hci_dev *hdev)
+ 		kfree(params);
  	}
  
- 	BT_DBG("All LE pending connections cleared");
++	hci_pend_le_conns_clear(hdev);
 +
-+	hci_update_background_scan(hdev);
+ 	BT_DBG("All LE connection parameters were removed");
  }
  
- /* This function requires the caller holds hdev->lock */
-@@ -5293,6 +5294,9 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 	struct hci_conn *conn;
- 	int err;
+@@ -4006,7 +4007,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_remote_oob_data_clear(hdev);
+ 	hci_white_list_clear(hdev);
+ 	hci_conn_params_clear(hdev);
+-	hci_pend_le_conns_clear(hdev);
+ 	hci_dev_unlock(hdev);
  
-+	if (test_bit(HCI_UNREGISTER, &hdev->dev_flags))
-+		return;
-+
- 	hci_req_init(&req, hdev);
- 
- 	if (list_empty(&hdev->pend_le_conns)) {
+ 	hci_dev_put(hdev);
 -- 
 1.9.3
 
