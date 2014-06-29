@@ -1,51 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Clear pending connections from hci_conn_params_clear
-Date: Sun, 29 Jun 2014 13:41:50 +0200
-Message-Id: <1404042111-60574-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Don't use non-resolvable private address for passive scanning
+Date: Sun, 29 Jun 2014 12:20:15 +0200
+Message-Id: <1404037215-42235-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When hci_conn_params_clear is called, it is always followed by a
-call to hci_pend_le_conns_clear. So instead of making this explicit
-just make sure it is always called. This makes this function similar
-on how hci_conn_params_add and hci_conn_params_del work.
+The usage of non-resovlable private addresses for passive scanning is
+a bad idea. Passive scanning will not send any SCAN_REQ and thus using
+your identity address for passive scanning is not a privacy issue.
+
+It is important to use the identity address during passive scanning
+since that is the only way devices using direct advertising will be
+reported correctly by the controller. This is overlooked detail in
+the Bluetooth specification that current controllers are not able
+to report direct advertising events for other than their current
+address.
+
+When remote peers are using direct advertising and scanning is done
+with non-resolvable private address these devices will not be found.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ffee5f547506..8b206d0942aa 100644
+index 50db0201213c..3ee2885dd9bc 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -959,7 +959,6 @@ static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
- 	} else if (memcmp(buf, "clr", 3) == 0) {
- 		hci_dev_lock(hdev);
- 		hci_conn_params_clear(hdev);
--		hci_pend_le_conns_clear(hdev);
- 		hci_update_background_scan(hdev);
- 		hci_dev_unlock(hdev);
- 	} else {
-@@ -3561,6 +3560,8 @@ void hci_conn_params_clear(struct hci_dev *hdev)
- 		kfree(params);
- 	}
+@@ -5250,12 +5250,13 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 own_addr_type;
  
-+	hci_pend_le_conns_clear(hdev);
-+
- 	BT_DBG("All LE connection parameters were removed");
- }
+-	/* Set require_privacy to true to avoid identification from
+-	 * unknown peer devices. Since this is passive scanning, no
+-	 * SCAN_REQ using the local identity should be sent. Mandating
+-	 * privacy is just an extra precaution.
++	/* Set require_privacy to false since no SCAN_REQ are send
++	 * during passive scanning. Not using an unresolvable address
++	 * here is important so that peer devices using direct
++	 * advertising with our address will be correctly reported
++	 * by the controller.
+ 	 */
+-	if (hci_update_random_address(req, true, &own_addr_type))
++	if (hci_update_random_address(req, false, &own_addr_type))
+ 		return;
  
-@@ -4006,7 +4007,6 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_remote_oob_data_clear(hdev);
- 	hci_white_list_clear(hdev);
- 	hci_conn_params_clear(hdev);
--	hci_pend_le_conns_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
- 	hci_dev_put(hdev);
+ 	memset(&param_cp, 0, sizeof(param_cp));
 -- 
 1.9.3
 
