@@ -1,34 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Sun, 29 Jun 2014 15:34:24 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v4 01/12] android/dis: Add copy to Device Info implementation
-Date: Sun, 29 Jun 2014 14:58:48 +0200
-Message-ID: <4861094.ThFtovcaRR@leonov>
-In-Reply-To: <1403892540-21222-1-git-send-email-luiz.dentz@gmail.com>
-References: <1403892540-21222-1-git-send-email-luiz.dentz@gmail.com>
+Subject: Re: [PATCH 1/3] Bluetooth: Move hci_pend_le_conn_* functions to
+ different location
+Message-ID: <20140629123424.GC7248@t440s.P-661HNU-F1>
+References: <1404042111-60574-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404042111-60574-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Marcel,
 
-On Friday 27 of June 2014 21:08:49 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Sun, Jun 29, 2014, Marcel Holtmann wrote:
+> The hci_pend_le_conn_* function should be placed before their actual
+> users. So move them before hci_conn_params_* functions.
 > 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  profiles/deviceinfo/deviceinfo.c => android/dis.c | 0
->  1 file changed, 0 insertions(+), 0 deletions(-)
->  copy profiles/deviceinfo/deviceinfo.c => android/dis.c (100%)
-> 
-> diff --git a/profiles/deviceinfo/deviceinfo.c b/android/dis.c
-> similarity index 100%
-> copy from profiles/deviceinfo/deviceinfo.c
-> copy to android/dis.c
+>  net/bluetooth/hci_core.c | 144 +++++++++++++++++++++++------------------------
+>  1 file changed, 72 insertions(+), 72 deletions(-)
 
-All patches applied, thanks.
+All three patches have been applied to bluetooth-next. Thanks.
 
--- 
-BR
-Szymon Janc
+Johan
