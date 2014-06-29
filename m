@@ -1,44 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 29 Jun 2014 23:16:04 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Add Device Added and Device Removed
- management events
-Message-ID: <20140629201604.GA24273@t440s.P-661HNU-F1>
-References: <1404066386-10741-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404066386-10741-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <561D56AB-F5CF-464C-A8D5-73BED4F95CA7@holtmann.org>
+References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
+	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
+	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
+	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
+	<CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
+	<CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com>
+	<CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com>
+	<CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com>
+	<CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com>
+	<20140629051442.GA31085@t440s.P-661HNU-F1>
+	<20140629052949.GA32130@t440s>
+	<E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
+	<CAHZ1yCniScfX+Cvoyv0B3GaYWL41qPJD4V+Le+3HENYS5kUdYw@mail.gmail.com>
+	<60346ECF-9A0B-4D3B-BDD6-A617797550D9@holtmann.org>
+	<CAHZ1yCnSMQqhJ_x-=5VPibThBBU12M_LvkmCpCWR1b5np0V8Hw@mail.gmail.com>
+	<561D56AB-F5CF-464C-A8D5-73BED4F95CA7@holtmann.org>
+Date: Sun, 29 Jun 2014 13:02:38 -0700
+Message-ID: <CAHZ1yC=1NsY=88OnnW6kg4r1xNo8TutF_BcCwd8czy+EesUpig@mail.gmail.com>
+Subject: Re: LE mouse reconnect problem
+From: Scott James Remnant <keybuk@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, Ryan Press <ryan@presslab.us>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+On Sun, Jun 29, 2014 at 12:56 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
 
-On Sun, Jun 29, 2014, Marcel Holtmann wrote:
-> +static void device_added(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type,
-> +			 u8 action)
-> +{
-> +	struct pending_cmd *cmd;
-> +	struct mgmt_ev_device_added ev;
-> +
-> +	cmd = mgmt_pending_find(MGMT_OP_ADD_DEVICE, hdev);
+>>> the same applies to the HP mouse btw.
+>>>
+>>
+>> Which HP Mouse are you referring to?
+>>
+>> An HP Mouse I have uses general connectable advertising when it wants
+>> to reconnect.
+>
+> it says HP Mouse Z8000. And at least the one that I have is using directed advertising for re-connection.
+>
 
-This is not going to work since you're not creating a pending command
-struct for either one of the new mgmt commands (i.e. using
-mgmt_pending_add). Not using mgmt_pending_add makes perfect sense here
-since this is all synchronous (no HCI commands etc). What I'd suggest is
-to pass the struct sock to the function or even do the signal sending
-inline in the command handler function (as it's not many lines of code
-and you've only got a single caller).
+Don't have one of those, I'll grab for testing.
 
-> +static void device_removed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type)
-> +{
-> +	struct pending_cmd *cmd;
-> +	struct mgmt_ev_device_removed ev;
-> +
-> +	cmd = mgmt_pending_find(MGMT_OP_REMOVE_DEVICE, hdev);
+The one I have just describes itself as "HP BLE Mouse"
 
-Same here.
-
-Johan
+Scott
+-- 
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
