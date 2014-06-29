@@ -1,170 +1,110 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4] doc: Add management support for controller configuration
-Date: Sun, 29 Jun 2014 23:31:38 +0200
-Message-Id: <1404077498-37038-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH v2] Bluetooth: Add Device Added and Device Removed management events
+Date: Sun, 29 Jun 2014 22:28:34 +0200
+Message-Id: <1404073714-36369-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- doc/mgmt-api.txt | 132 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 132 insertions(+)
+When devices are added or removed, then make sure that events are send
+out to all other clients so that the list of devices can be easily
+tracked. This is especially important when external clients are
+adding or removing devices within the auto-connection list.
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 6fe7e1e55a15..7d4e9be07e77 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -244,6 +244,7 @@ Read Controller Information Command
- 		11	Secure Connections
- 		12	Debug Keys
- 		13	Privacy
-+		14	Controller Configuration
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/mgmt.h | 11 +++++++++++
+ net/bluetooth/mgmt.c         | 29 +++++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index bc9b105f2b50..1f95ad4fce02 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -603,3 +603,14 @@ struct mgmt_ev_new_csrk {
+ 	__u8 store_hint;
+ 	struct mgmt_csrk_info key;
+ } __packed;
++
++#define MGMT_EV_DEVICE_ADDED		0x001a
++struct mgmt_ev_device_added {
++	struct mgmt_addr_info addr;
++	__u8 action;
++} __packed;
++
++#define MGMT_EV_DEVICE_REMOVED		0x001b
++struct mgmt_ev_device_removed {
++	struct mgmt_addr_info addr;
++} __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 64b55c7881ee..d83197f9e727 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -114,6 +114,8 @@ static const u16 mgmt_events[] = {
+ 	MGMT_EV_PASSKEY_NOTIFY,
+ 	MGMT_EV_NEW_IRK,
+ 	MGMT_EV_NEW_CSRK,
++	MGMT_EV_DEVICE_ADDED,
++	MGMT_EV_DEVICE_REMOVED,
+ };
  
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -1939,6 +1940,121 @@ Load Connection Parameters Command
- 				Not Supported
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+@@ -4968,6 +4970,18 @@ unlock:
+ 	return err;
+ }
  
++static void device_added(struct sock *sk, struct hci_dev *hdev,
++			 bdaddr_t *bdaddr, u8 type, u8 action)
++{
++	struct mgmt_ev_device_added ev;
++
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = type;
++	ev.action = action;
++
++	mgmt_event(MGMT_EV_DEVICE_ADDED, hdev, &ev, sizeof(ev), sk);
++}
++
+ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		      void *data, u16 len)
+ {
+@@ -5009,6 +5023,8 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
  
-+Read Unconfigured Controller Index List Command
-+===============================================
++	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
 +
-+	Command Code:		0x0036
-+	Controller Index:	<non-controller>
-+	Command Parameters:
-+	Return Parameters:	Num_Controllers (2 Octets)
-+				Controller_Index[i] (2 Octets)
-+
-+	This command returns the list of currently unconfigured controllers.
-+	Unconfigured controllers added after calling this command can be
-+	monitored using the Unconfigured Index Added event.
-+
-+	An unconfigured controller can either move to a configured state
-+	indicated by the Index Added event or it can be removed which
-+	would be indicated by the Index Removed event.
-+
-+	Only controllers that require configuration will be listed with
-+	this command. A controller that is fully configured will not
-+	be listed even if it supports configuration changes.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+
-+Read Controller Configuration Information Command
-+=================================================
-+
-+	Command Code:		0x0037
-+	Controller Index:	<controller id>
-+	Command Parameters:
-+	Return Parameters:	Manufacturer (2 Octets)
-+				Supported_Configurations (4 Octets)
-+				Missing_Configurations (4 Octets)
-+
-+	This command is used to retreive the supported configuration
-+	options of a controller and the missing configuration options.
-+
-+	The missing options are required to be configured before the
-+	controller is considered fully configured and ready for standard
-+	operation. The command is typically used right after getting the
-+	response to Read Unconfigured Controller Index List command or
-+	Unconfigured Index Added event.
-+
-+	Supported_Configurations and Missing_Configurations is a
-+	bitmask with currently the following available bits:
-+
-+		0	Bluetooth public address configuration
-+
-+	It is valid to call this command on controllers that do not
-+	require any configuration. It is possible that a fully configured
-+	controller offers additional support for configuration.
-+
-+	For example a controller may contain a valid Bluetooth public
-+	device address, but also allows to configure it from the host
-+	stack. In this case the general support for configurations will
-+	be indicated by the Controller Configuration settings. For
-+	controllers where no configuration options are available that
-+	setting option will not be present.
-+
-+	When all configurations have been completed and as a result the
-+	Missing_Configurations mask would become empty, then the now
-+	ready controller will be announced via Index Added event.
-+
-+	This command generates a Command Complete event on success or
-+	a Command Status event on failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Invalid Index
-+
-+
-+Set Public Address Command
-+==========================
-+
-+	Command Code:		0x0038
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address (6 Octets)
-+	Return Parameters:	Missing_Configurations (4 Octets)
-+
-+	This command allows configuration of public address. Since a vendor
-+	specific procedure is required, this command might not be supported
-+	by all controllers. Actually most likely only a handful embedded
-+	controllers will offer support for this command.
-+
-+	When the suport for Bluetooth public address configuration is
-+	indicated in the Supported Configurations mask, then this command
-+	can be used to configure the public address.
-+
-+	It is only possible to configure the public address when the
-+	controller is powered off.
-+
-+	For an unconfigured controller and when Missing_Configurations
-+	returns an empty mask, this means that a Index Added event for
-+	the now fully configured controller can be expected.
-+
-+	For a fully configured controller, the current controller index
-+	will become invalid and an Index Removed event will be send. Once
-+	the address has been successfully changed an Index Added event
-+	will be send. There is no guarantee that the controller index
-+	stays the same.
-+
-+	All previous configured parameters and settings are lost when
-+	this command succeeds. The controller has to be treated as new
-+	one. Use this command for a fully configured controller only when
-+	you really know what you are doing.
-+
-+	This command generates a Command Complete event on success or a
-+	Command Status event on failure.
-+
-+	Possible errors:	Rejected
-+				Not Supported
-+				Invalid Parameters
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
+ 			   MGMT_STATUS_SUCCESS, &cp->addr, sizeof(cp->addr));
  
-@@ -2611,3 +2727,19 @@ New Connection Parameter Event
- 	The Min_Connection_Interval, Max_Connection_Interval,
- 	Connection_Latency and Supervision_Timeout parameters are
- 	encoded as described in Core 4.1 spec, Vol 2, 7.7.65.3.
+@@ -5017,6 +5033,17 @@ unlock:
+ 	return err;
+ }
+ 
++static void device_removed(struct sock *sk, struct hci_dev *hdev,
++			   bdaddr_t *bdaddr, u8 type)
++{
++	struct mgmt_ev_device_removed ev;
 +
++	bacpy(&ev.addr.bdaddr, bdaddr);
++	ev.addr.type = type;
 +
-+Unconfigured Index Added Event
-+==============================
++	mgmt_event(MGMT_EV_DEVICE_REMOVED, hdev, &ev, sizeof(ev), sk);
++}
 +
-+	Event Code:		0x001d
-+	Controller Index:	<controller id>
-+	Event Parameters:
+ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			 void *data, u16 len)
+ {
+@@ -5043,6 +5070,8 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			addr_type = ADDR_LE_DEV_RANDOM;
+ 
+ 		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
 +
-+	This event indicates that a new unconfigured controller has been
-+	added to the system. It is usually followed by a Read Controller
-+	Configuration Information command.
-+
-+	Only when a controller requires further configuration, it will
-+	be announced with this event. If it supports configuration, but
-+	does not require it, then an Index Added event will be used.
++		device_removed(sk, hdev, &cp->addr.bdaddr, cp->addr.type);
+ 	} else {
+ 		if (cp->addr.type) {
+ 			err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
 -- 
 1.9.3
 
