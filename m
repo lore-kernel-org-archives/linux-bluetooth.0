@@ -1,151 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Replace le_auto_conn debugfs with device_list entry
-Date: Sun, 29 Jun 2014 16:15:49 +0200
-Message-Id: <1404051349-28707-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Add support for Add/Remove Device management commands
+Date: Sun, 29 Jun 2014 15:41:57 +0200
+Message-Id: <1404049317-26310-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since the auto-connection handling has gained offical management
-command support, remove the le_auto_conn debugfs entry.
+This allows adding or removing devices from the background scanning
+list the kernel maintains. Device flagged for auto-connection will
+be automatically connected if they are found.
 
-For debugging purposes replace it a simple device_list debugfs
-entry that allows listing of the current internal auto-connection
-list used for passive scanning.
+The passive scanning required for auto-connection will be started
+and stopped on demand.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 93 +++++-------------------------------------------
- 1 file changed, 9 insertions(+), 84 deletions(-)
+ include/net/bluetooth/mgmt.h |  13 ++++++
+ net/bluetooth/mgmt.c         | 100 ++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 112 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index c566b57610c9..b2b7f6ed3c89 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -879,104 +879,29 @@ static int adv_channel_map_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
- 			adv_channel_map_set, "%llu\n");
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 3109dec13409..bc9b105f2b50 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -436,6 +436,19 @@ struct mgmt_rp_get_clock_info {
+ 	__le16  accuracy;
+ } __packed;
  
--static int le_auto_conn_show(struct seq_file *sf, void *ptr)
-+static int device_list_show(struct seq_file *f, void *ptr)
- {
--	struct hci_dev *hdev = sf->private;
-+	struct hci_dev *hdev = f->private;
- 	struct hci_conn_params *p;
- 
- 	hci_dev_lock(hdev);
--
- 	list_for_each_entry(p, &hdev->le_conn_params, list) {
--		seq_printf(sf, "%pMR %u %u\n", &p->addr, p->addr_type,
-+		seq_printf(f, "%pMR %u %u\n", &p->addr, p->addr_type,
- 			   p->auto_connect);
- 	}
--
- 	hci_dev_unlock(hdev);
- 
- 	return 0;
- }
- 
--static int le_auto_conn_open(struct inode *inode, struct file *file)
--{
--	return single_open(file, le_auto_conn_show, inode->i_private);
--}
--
--static ssize_t le_auto_conn_write(struct file *file, const char __user *data,
--				  size_t count, loff_t *offset)
-+static int device_list_open(struct inode *inode, struct file *file)
- {
--	struct seq_file *sf = file->private_data;
--	struct hci_dev *hdev = sf->private;
--	u8 auto_connect = 0;
--	bdaddr_t addr;
--	u8 addr_type;
--	char *buf;
--	int err = 0;
--	int n;
--
--	/* Don't allow partial write */
--	if (*offset != 0)
--		return -EINVAL;
--
--	if (count < 3)
--		return -EINVAL;
--
--	buf = memdup_user(data, count);
--	if (IS_ERR(buf))
--		return PTR_ERR(buf);
--
--	if (memcmp(buf, "add", 3) == 0) {
--		n = sscanf(&buf[4], "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu %hhu",
--			   &addr.b[5], &addr.b[4], &addr.b[3], &addr.b[2],
--			   &addr.b[1], &addr.b[0], &addr_type,
--			   &auto_connect);
--
--		if (n < 7) {
--			err = -EINVAL;
--			goto done;
--		}
--
--		hci_dev_lock(hdev);
--		err = hci_conn_params_add(hdev, &addr, addr_type, auto_connect,
--					  hdev->le_conn_min_interval,
--					  hdev->le_conn_max_interval);
--		hci_dev_unlock(hdev);
--
--		if (err)
--			goto done;
--	} else if (memcmp(buf, "del", 3) == 0) {
--		n = sscanf(&buf[4], "%hhx:%hhx:%hhx:%hhx:%hhx:%hhx %hhu",
--			   &addr.b[5], &addr.b[4], &addr.b[3], &addr.b[2],
--			   &addr.b[1], &addr.b[0], &addr_type);
--
--		if (n < 7) {
--			err = -EINVAL;
--			goto done;
--		}
--
--		hci_dev_lock(hdev);
--		hci_conn_params_del(hdev, &addr, addr_type);
--		hci_dev_unlock(hdev);
--	} else if (memcmp(buf, "clr", 3) == 0) {
--		hci_dev_lock(hdev);
--		hci_conn_params_clear(hdev);
--		hci_dev_unlock(hdev);
--	} else {
--		err = -EINVAL;
--	}
--
--done:
--	kfree(buf);
--
--	if (err)
--		return err;
--	else
--		return count;
-+	return single_open(file, device_list_show, inode->i_private);
- }
- 
--static const struct file_operations le_auto_conn_fops = {
--	.open		= le_auto_conn_open,
-+static const struct file_operations device_list_fops = {
-+	.open		= device_list_open,
- 	.read		= seq_read,
--	.write		= le_auto_conn_write,
- 	.llseek		= seq_lseek,
- 	.release	= single_release,
++#define MGMT_OP_ADD_DEVICE		0x0033
++struct mgmt_cp_add_device {
++	struct mgmt_addr_info addr;
++	__u8	action;
++} __packed;
++#define MGMT_ADD_DEVICE_SIZE		(MGMT_ADDR_INFO_SIZE + 1)
++
++#define MGMT_OP_REMOVE_DEVICE		0x0034
++struct mgmt_cp_remove_device {
++	struct mgmt_addr_info addr;
++} __packed;
++#define MGMT_REMOVE_DEVICE_SIZE		MGMT_ADDR_INFO_SIZE
++
+ #define MGMT_EV_CMD_COMPLETE		0x0001
+ struct mgmt_ev_cmd_complete {
+ 	__le16	opcode;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 41b1aec0c5dc..b9d193157a27 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -86,6 +86,8 @@ static const u16 mgmt_commands[] = {
+ 	MGMT_OP_LOAD_IRKS,
+ 	MGMT_OP_GET_CONN_INFO,
+ 	MGMT_OP_GET_CLOCK_INFO,
++	MGMT_OP_ADD_DEVICE,
++	MGMT_OP_REMOVE_DEVICE,
  };
-@@ -1785,8 +1710,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &conn_max_interval_fops);
- 		debugfs_create_file("adv_channel_map", 0644, hdev->debugfs,
- 				    hdev, &adv_channel_map_fops);
--		debugfs_create_file("le_auto_conn", 0644, hdev->debugfs, hdev,
--				    &le_auto_conn_fops);
-+		debugfs_create_file("device_list", 0444, hdev->debugfs, hdev,
-+				    &device_list_fops);
- 		debugfs_create_u16("discov_interleaved_timeout", 0644,
- 				   hdev->debugfs,
- 				   &hdev->discov_interleaved_timeout);
+ 
+ static const u16 mgmt_events[] = {
+@@ -4966,6 +4968,101 @@ unlock:
+ 	return err;
+ }
+ 
++static int add_device(struct sock *sk, struct hci_dev *hdev,
++		      void *data, u16 len)
++{
++	struct mgmt_cp_add_device *cp = data;
++	u8 auto_conn, addr_type;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	if (!bdaddr_type_is_le(cp->addr.type) ||
++	    !bacmp(&cp->addr.bdaddr, BDADDR_ANY))
++		return cmd_status(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	if (cp->action != 0x00 && cp->action != 0x01)
++		return cmd_status(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++				  MGMT_STATUS_INVALID_PARAMS);
++
++	hci_dev_lock(hdev);
++
++	if (cp->addr.type == BDADDR_LE_PUBLIC)
++		addr_type = ADDR_LE_DEV_PUBLIC;
++	else
++		addr_type = ADDR_LE_DEV_RANDOM;
++
++	if (cp->action)
++		auto_conn = HCI_AUTO_CONN_ALWAYS;
++	else
++		auto_conn = HCI_AUTO_CONN_DISABLED;
++
++	if (hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type, auto_conn,
++				hdev->le_conn_min_interval,
++				hdev->le_conn_max_interval) < 0) {
++		err = cmd_status(sk, hdev->id, MGMT_OP_ADD_DEVICE,
++				 MGMT_STATUS_REJECTED);
++		goto unlock;
++	}
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE, 0, NULL, 0);
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
++}
++
++static int remove_device(struct sock *sk, struct hci_dev *hdev,
++			 void *data, u16 len)
++{
++	struct mgmt_cp_remove_device *cp = data;
++	int err;
++
++	BT_DBG("%s", hdev->name);
++
++	if (!lmp_le_capable(hdev))
++		return cmd_status(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
++				  MGMT_STATUS_NOT_SUPPORTED);
++
++	hci_dev_lock(hdev);
++
++	if (bacmp(&cp->addr.bdaddr, BDADDR_ANY)) {
++		u8 addr_type;
++
++		if (!bdaddr_type_is_le(cp->addr.type)) {
++			err = cmd_status(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
++					 MGMT_STATUS_INVALID_PARAMS);
++			goto unlock;
++		}
++
++		if (cp->addr.type == BDADDR_LE_PUBLIC)
++			addr_type = ADDR_LE_DEV_PUBLIC;
++		else
++			addr_type = ADDR_LE_DEV_RANDOM;
++
++		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
++	} else {
++		if (cp->addr.type) {
++			err = cmd_status(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
++					 MGMT_STATUS_INVALID_PARAMS);
++			goto unlock;
++		}
++
++		hci_conn_params_clear(hdev);
++	}
++
++	err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE, 0, NULL, 0);
++
++unlock:
++	hci_dev_unlock(hdev);
++	return err;
++}
++
+ static const struct mgmt_handler {
+ 	int (*func) (struct sock *sk, struct hci_dev *hdev, void *data,
+ 		     u16 data_len);
+@@ -5023,9 +5120,10 @@ static const struct mgmt_handler {
+ 	{ load_irks,              true,  MGMT_LOAD_IRKS_SIZE },
+ 	{ get_conn_info,          false, MGMT_GET_CONN_INFO_SIZE },
+ 	{ get_clock_info,         false, MGMT_GET_CLOCK_INFO_SIZE },
++	{ add_device,             false, MGMT_ADD_DEVICE_SIZE },
++	{ remove_device,          false, MGMT_REMOVE_DEVICE_SIZE },
+ };
+ 
+-
+ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ {
+ 	void *buf;
 -- 
 1.9.3
 
