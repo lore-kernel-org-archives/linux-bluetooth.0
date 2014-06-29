@@ -1,6 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
+In-Reply-To: <5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org>
 References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
 	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
 	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
@@ -13,42 +13,52 @@ References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
 	<20140629051442.GA31085@t440s.P-661HNU-F1>
 	<20140629052949.GA32130@t440s>
 	<E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
-Date: Sun, 29 Jun 2014 12:03:06 -0700
-Message-ID: <CAHZ1yCniScfX+Cvoyv0B3GaYWL41qPJD4V+Le+3HENYS5kUdYw@mail.gmail.com>
+	<CABx3TkUP3Y9nJJk=u2ghFnunQRh9x-v6PG_ncyiM+mUqaoRtWg@mail.gmail.com>
+	<5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org>
+Date: Sun, 29 Jun 2014 12:01:49 -0700
+Message-ID: <CABx3TkVt3t_dyRmY6rjrwzw9BoTRaZinHOQEEbyVND+_NjLSVQ@mail.gmail.com>
 Subject: Re: LE mouse reconnect problem
-From: Scott James Remnant <keybuk@google.com>
+From: Ryan Press <ryan@presslab.us>
 To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Ryan Press <ryan@presslab.us>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+Cc: Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
 	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Sun, Jun 29, 2014 at 2:43 AM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+Hi Marcel,
 
-> The biggest problem here is that even if you are trying to be private and=
- doing everything right, the mouse will broadcast your public address every=
- time it tries to reconnect. So thank you Microsoft for forcing us to be tr=
-ackable.
+On Sun, Jun 29, 2014 at 10:52 AM, Marcel Holtmann <marcel@holtmann.org> wro=
+te:
+> Hi Ryan,
 >
-
-\o/
-
-(I'd had an open bug to investigate why this mouse wasn't
-reconnecting, y'all beat me to it)
-
-> Now the biggest problem is that with 3.15 and 3.16-rcX kernels we would n=
-eed to go back to using our identity address for discovery. This means acti=
-ve scanning and it means we are broadcasting our identity address to everyb=
-ody when trying to find this mouse. I rather not do that.
+>> I have one other question with it.  When it first reconnects the mouse
+>> pointer is really jerky, like it's updating really slow.  Then after a
+>> few seconds it is normal; in fact it is very responsive compared to my
+>> old Bluetooth mouse.  With Windows 8.1 it reconnects lightning fast
+>> when I turn it on, and it is not jerky at first.
+>>
+> this is a kernel issue with not remembering the previous connection param=
+eters. What you see is that we start connecting with the default values and=
+ then the slave (the mouse) will correct us and tell us what connection par=
+ameters it needs. We accept them and actually change the LE link to use the=
+se parameters. However we end up forgetting them. So every time you connect=
+ this procedure keeps repeating itself.
 >
+> I fixed this as well, but for that you will need a bluetooth-next kernel =
+where I enabled the management API for passive scanning and a modified blue=
+toothd that will then allow you a smooth experience. If the slave updates t=
+he connection parameters we remember them for devices using auto-connection=
+. So once the connection is triggered via passive scanning the values will =
+be remembered.
+>
+> At the moment, I have one minor issue with the re-connection within bluet=
+oothd and once that is fixed this should be pretty instant.
 
-I think we would rather just document that this mouse isn't going to
-reconnect, since you can at least use the UI to reconnect by hand.
-Switching back to active scanning on the identity address would make
-our devices trackable, which is very definitely not on our wish list.
 
-Scott
---=20
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+Okay, great, glad to hear that you're already on it.  I'm really
+looking forward to the seamless Bluetooth experience on Linux!  When
+everything is ready and in the master branch let me know and I will
+try them out.
+
+Thanks,
+Ryan
