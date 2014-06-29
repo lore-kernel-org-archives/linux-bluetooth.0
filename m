@@ -1,64 +1,69 @@
 Return-Path: <cyrus@holtmann.org>
+From: andrea <mariofutire@gmail.com>
+Message-ID: <53B06189.20401@googlemail.com>
+Date: Sun, 29 Jun 2014 19:57:13 +0100
 MIME-Version: 1.0
-In-Reply-To: <5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org>
-References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
-	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
-	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
-	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
-	<CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
-	<CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com>
-	<CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com>
-	<CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com>
-	<CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com>
-	<20140629051442.GA31085@t440s.P-661HNU-F1>
-	<20140629052949.GA32130@t440s>
-	<E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
-	<CABx3TkUP3Y9nJJk=u2ghFnunQRh9x-v6PG_ncyiM+mUqaoRtWg@mail.gmail.com>
-	<5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org>
-Date: Sun, 29 Jun 2014 12:01:49 -0700
-Message-ID: <CABx3TkVt3t_dyRmY6rjrwzw9BoTRaZinHOQEEbyVND+_NjLSVQ@mail.gmail.com>
-Subject: Re: LE mouse reconnect problem
-From: Ryan Press <ryan@presslab.us>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+To: "linux-bluetooth@vger.kernel.org development"
+	<linux-bluetooth@vger.kernel.org>
+Subject: PS3 sixaxis BT 4.0 vs 2.0
+Content-Type: text/plain; charset=ISO-8859-1
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi,
 
-On Sun, Jun 29, 2014 at 10:52 AM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
-> Hi Ryan,
->
->> I have one other question with it.  When it first reconnects the mouse
->> pointer is really jerky, like it's updating really slow.  Then after a
->> few seconds it is normal; in fact it is very responsive compared to my
->> old Bluetooth mouse.  With Windows 8.1 it reconnects lightning fast
->> when I turn it on, and it is not jerky at first.
->>
-> this is a kernel issue with not remembering the previous connection param=
-eters. What you see is that we start connecting with the default values and=
- then the slave (the mouse) will correct us and tell us what connection par=
-ameters it needs. We accept them and actually change the LE link to use the=
-se parameters. However we end up forgetting them. So every time you connect=
- this procedure keeps repeating itself.
->
-> I fixed this as well, but for that you will need a bluetooth-next kernel =
-where I enabled the management API for passive scanning and a modified blue=
-toothd that will then allow you a smooth experience. If the slave updates t=
-he connection parameters we remember them for devices using auto-connection=
-. So once the connection is triggered via passive scanning the values will =
-be remembered.
->
-> At the moment, I have one minor issue with the re-connection within bluet=
-oothd and once that is fixed this should be pretty instant.
+I would like to know if there is any chance of running a PS3 sixaxis controller with a BT dongle 2.0
+
+I know it works well with BT 4.0 and bluez 5.18.
+My hope that it works with a dongle 2.0 is because when I used to run sixad (before bluez 5.xx) it
+worked well.
+
+I've logged some data with 2 dongles hoping some of you guys can find what the difference is.
+Basically the controller is paired well in both cases, it gets connected and creates a
+/dev/input/js0 device.
+
+The problem with 2.0 is that /dev/input/js0 does not produce much data. Just a few lines at the
+begin and then nothing else. With 4.0 whenever I touch the buttons, more data is read from it.
+
+I've logged data with
+
+hcidump -X -w /tmp/b2.0.txt
+and then processed it with
+btmon -r b2.0.txt > b2.0.out.txt
+
+I've uploaded the 4 files here
+
+http://utente.xoom.it/depo/scambio/b2.0.txt
+http://utente.xoom.it/depo/scambio/b2.0.out.txt
+http://utente.xoom.it/depo/scambio/b4.0.txt
+http://utente.xoom.it/depo/scambio/b4.0.out.txt
+
+I've running these tests with
+
+Linux thinkpad 3.14.8-200.fc20.i686 #1 SMP Mon Jun 16 22:36:56 UTC 2014 i686 i686 i386 GNU/Linux
+
+and bluez 5.18
+
+BT 2.0:
+
+Bus 003 Device 010: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+
+hci0:   Type: BR/EDR  Bus: USB
+        BD Address: 00:15:83:0C:BF:EB  ACL MTU: 339:8  SCO MTU: 128:2
+        HCI Version: 2.0 (0x3)  Revision: 0xc5c
+        LMP Version: 2.0 (0x3)  Subversion: 0xc5c
+        Manufacturer: Cambridge Silicon Radio (10)
 
 
-Okay, great, glad to hear that you're already on it.  I'm really
-looking forward to the seamless Bluetooth experience on Linux!  When
-everything is ready and in the master branch let me know and I will
-try them out.
 
-Thanks,
-Ryan
+BT 4.0
+
+Bus 003 Device 011: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Dongle (HCI mode)
+
+hci0:   Type: BR/EDR  Bus: USB
+        BD Address: 00:1A:7D:DA:71:0B  ACL MTU: 310:10  SCO MTU: 64:8
+        HCI Version: 4.0 (0x6)  Revision: 0x22bb
+        LMP Version: 4.0 (0x6)  Subversion: 0x22bb
+        Manufacturer: Cambridge Silicon Radio (10)
+
+nothing strange (or different) is logged.
