@@ -1,94 +1,92 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH BlueZ v2 01/12] android/hog: Add bt_hog_send
-Date: Mon, 30 Jun 2014 18:56:42 +0200
-Message-ID: <2047237.sJOmoChR6N@uw000953>
-In-Reply-To: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
-References: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 1/5] android/health: Implement mcl_disconnected cb
+Date: Mon, 30 Jun 2014 19:58:24 +0300
+Message-Id: <1404147508-22756-2-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Provide a utility to find device by mcl and update the
+mcl status.
+---
+ android/health.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
-On Monday 30 of June 2014 17:17:30 Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This function can be used to send data using Output Report if one is
-> available.
-> ---
-> v2: Fix patch 02/12 to check if a hog instance exists.
-> 
->  android/hog.c | 37 +++++++++++++++++++++++++++++++++++++
->  android/hog.h |  1 +
->  2 files changed, 38 insertions(+)
-> 
-> diff --git a/android/hog.c b/android/hog.c
-> index 7e61790..5d33c63 100644
-> --- a/android/hog.c
-> +++ b/android/hog.c
-> @@ -1009,3 +1009,40 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
->  
->  	return 0;
->  }
-> +
-> +int bt_hog_send(struct bt_hog *hog, void *data, size_t size)
-> +{
-> +	struct report *report;
-> +	GSList *l;
-> +
-> +	if (!hog)
-> +		return -EINVAL;
-> +
-> +	if (!hog->attrib)
-> +		return -ENOTCONN;
-> +
-> +	l = g_slist_find_custom(hog->reports,
-> +				GUINT_TO_POINTER(HOG_REPORT_TYPE_OUTPUT),
-> +				report_type_cmp);
-> +	if (!l)
-> +		return -ENOTSUP;
-> +
-> +	report = l->data;
-> +
-> +	DBG("Sending data to handle 0x%X", report->decl->value_handle);
-> +
-> +	if (report->decl->properties & GATT_CHR_PROP_WRITE)
-> +		gatt_write_char(hog->attrib, report->decl->value_handle,
-> +				data, size, output_written_cb, hog);
-> +	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
-> +		gatt_write_cmd(hog->attrib, report->decl->value_handle,
-> +						data, size, NULL, NULL);
-> +
-> +	for (l = hog->instances; l; l = l->next) {
-> +		struct bt_hog *instance = l->data;
-> +
-> +		bt_hog_send(instance, data, size);
-> +	}
-> +
-> +	return 0;
-> +}
-> diff --git a/android/hog.h b/android/hog.h
-> index 7cf446b..4ebc83e 100644
-> --- a/android/hog.h
-> +++ b/android/hog.h
-> @@ -33,3 +33,4 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt);
->  void bt_hog_detach(struct bt_hog *hog);
->  
->  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
-> +int bt_hog_send(struct bt_hog *hog, void *data, size_t size);
-> 
-
-
-I've applied patches 3-12 and updated PTS tests results. Thanks.
-
-For first two I'm not sure yet, we would need similar code for input
-and feature reports to pass PTS tests. I'll try using gattc interface
-for those and see how it works out. Then we can decide.
-
+diff --git a/android/health.c b/android/health.c
+index 3225617..1905862 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -243,6 +243,14 @@ static bool match_channel_by_id(const void *data, const void *user_data)
+ 	return channel->id == channel_id;
+ }
+ 
++static bool match_dev_by_mcl(const void *data, const void *user_data)
++{
++	const struct health_device *dev = data;
++	const struct mcap_mcl *mcl = user_data;
++
++	return dev->mcl == mcl;
++}
++
+ static bool match_dev_by_addr(const void *data, const void *user_data)
+ {
+ 	const struct health_device *dev = data;
+@@ -329,6 +337,36 @@ static struct health_channel *search_channel_by_id(uint16_t id)
+ 	return search.channel;
+ }
+ 
++struct mcl_search {
++	struct mcap_mcl *mcl;
++	struct health_device *dev;
++};
++
++static void app_search_dev(void *data, void *user_data)
++{
++	struct health_app *app = data;
++	struct mcl_search *search = user_data;
++
++	if (search->dev)
++		return;
++
++	search->dev = queue_find(app->devices, match_dev_by_mcl, search->mcl);
++}
++
++static struct health_device *search_dev_by_mcl(struct mcap_mcl *mcl)
++{
++	struct mcl_search search;
++
++	DBG("");
++
++	search.mcl = mcl;
++	search.dev = NULL;
++
++	queue_foreach(apps, app_search_dev, &search);
++
++	return search.dev;
++}
++
+ struct app_search {
+ 	uint8_t mdepid;
+ 	struct health_app *app;
+@@ -1977,7 +2015,13 @@ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+ 
+ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+ {
+-	DBG("Not implemented");
++	struct health_device *dev;
++
++	DBG("");
++
++	dev = search_dev_by_mcl(mcl);
++	if (dev)
++		dev->mcl_conn = false;
+ }
+ 
+ static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
 -- 
-Best regards, 
-Szymon Janc
+1.9.1
+
