@@ -1,95 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jun 2014 13:33:50 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Update PTS test results for HDP
-Message-ID: <20140630103348.GA13693@aemeltch-MOBL1>
-References: <1404120352-11532-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404120352-11532-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: Expose default connection latency setting via debugfs
+Date: Mon, 30 Jun 2014 12:16:09 +0200
+Message-Id: <1404123370-56018-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jun 30, 2014 at 12:25:52PM +0300, Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
+The controller has a default value for the connection latency. Expose
+this via debugfs for testing purposes.
 
-Please wait till I update this patch.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
 
-Best regards 
-Andrei Emeltchenko 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 94551c33c4c6..79d292cfb867 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -851,6 +851,34 @@ static int conn_max_interval_get(void *data, u64 *val)
+ DEFINE_SIMPLE_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
+ 			conn_max_interval_set, "%llu\n");
+ 
++static int conn_latency_set(void *data, u64 val)
++{
++	struct hci_dev *hdev = data;
++
++	if (val > 0x01f3)
++		return -EINVAL;
++
++	hci_dev_lock(hdev);
++	hdev->le_conn_latency = val;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++static int conn_latency_get(void *data, u64 *val)
++{
++	struct hci_dev *hdev = data;
++
++	hci_dev_lock(hdev);
++	*val = hdev->le_conn_latency;
++	hci_dev_unlock(hdev);
++
++	return 0;
++}
++
++DEFINE_SIMPLE_ATTRIBUTE(conn_latency_fops, conn_latency_get,
++			conn_latency_set, "%llu\n");
++
+ static int adv_channel_map_set(void *data, u64 val)
+ {
+ 	struct hci_dev *hdev = data;
+@@ -1708,6 +1736,8 @@ static int __hci_init(struct hci_dev *hdev)
+ 				    hdev, &conn_min_interval_fops);
+ 		debugfs_create_file("conn_max_interval", 0644, hdev->debugfs,
+ 				    hdev, &conn_max_interval_fops);
++		debugfs_create_file("conn_latency", 0644, hdev->debugfs,
++				    hdev, &conn_latency_fops);
+ 		debugfs_create_file("adv_channel_map", 0644, hdev->debugfs,
+ 				    hdev, &adv_channel_map_fops);
+ 		debugfs_create_file("device_list", 0444, hdev->debugfs, hdev,
+-- 
+1.9.3
 
-> ---
->  android/pts-hdp.txt | 30 +++++++++++++++++++++++++-----
->  1 file changed, 25 insertions(+), 5 deletions(-)
-> 
-> diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-> index f2b1528..06d956c 100644
-> --- a/android/pts-hdp.txt
-> +++ b/android/pts-hdp.txt
-> @@ -1,7 +1,7 @@
->  PTS test results for HDP
->  
->  PTS version: 5.1
-> -Tested: 27-June-2014
-> +Tested: 30-June-2014
->  Android version: 4.4.2
->  
->  Results:
-> @@ -98,7 +98,11 @@ TC_SRC_HCT_BV_01_I	PASS    haltest:
->  				<mdep_cfg_index>
->  
->  				when prompted: bluetooth ssp_reply <args>
-> -TC_SRC_HCT_BV_02_I	INC
-> +TC_SRC_HCT_BV_02_I	PASS	haltest:
-> +				hl register_application bluez-android Bluez
-> +				bluez-hdp health-device-profile 1
-> +				BTHL_MDEP_ROLE_SOURCE 4100
-> +				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
->  TC_SRC_HCT_BV_03_I	N/A
->  TC_SRC_HCT_BV_04_I	INC
->  TC_SRC_HCT_BV_05_C	N/A
-> @@ -162,7 +166,13 @@ TC_SNK_CC_BV_04_C	PASS    haltest:
->  
->  				when prompted: bluetooth ssp_reply <args>
->  
-> -TC_SNK_CC_BV_06_C	INC
-> +TC_SNK_CC_BV_06_C	PASS	haltest:
-> +				hl register_application bluez-android Bluez
-> +				bluez-hdp health-device-profile 2
-> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE
-> +				pulse-oximeter
-> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING
-> +				pulse-oximeter
->  TC_SNK_CC_BV_08_C	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 2
-> @@ -180,8 +190,18 @@ TC_SNK_CC_BV_08_C	PASS    haltest:
->  				hl connect_channel <app_id> <bd_addr>
->  				<mdep_cfg_index>
->  
-> -TC_SNK_CC_BV_10_C	INC
-> -TC_SNK_CC_BI_11_C	INC
-> +TC_SNK_CC_BV_10_C	PASS	haltest:
-> +				hl register_application bluez-android Bluez
-> +				bluez-hdp health-device-profile 2
-> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE
-> +				pulse-oximeter
-> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING
-> +				pulse-oximeter
-> +TC_SNK_CC_BI_11_C	PASS	haltest:
-> +				hl register_application bluez-android Bluez
-> +				bluez-hdp health-device-profile 1
-> +				BTHL_MDEP_ROLE_SINK 4100
-> +				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
->  TC_SNK_HCT_BV_01_I	PASS    haltest:
->  				hl register_application bluez-android Bluez
->  				bluez-hdp health-device-profile 1
-> -- 
-> 1.8.3.2
-> 
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
