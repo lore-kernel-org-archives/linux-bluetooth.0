@@ -1,28 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 30 Jun 2014 18:16:13 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Start background scanning only when
- controller is ready
-Message-ID: <20140630151613.GA23879@t440s.P-661HNU-F1>
-References: <1404137052-15424-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404137052-15424-1-git-send-email-marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v2 12/12] android/dis: Detach on free
+Date: Mon, 30 Jun 2014 17:17:41 +0300
+Message-Id: <1404137861-9313-12-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
+References: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jun 30, 2014, Marcel Holtmann wrote:
-> When the controller is not active or in init/setup phase, do not
-> try to start or stop background scanning.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+---
+ android/dis.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/android/dis.c b/android/dis.c
+index ce6e063..0a2a18e 100644
+--- a/android/dis.c
++++ b/android/dis.c
+@@ -62,8 +62,7 @@ struct characteristic {
+ 
+ static void dis_free(struct bt_dis *dis)
+ {
+-	if (dis->attrib)
+-		g_attrib_unref(dis->attrib);
++	bt_dis_detach(dis);
+ 
+ 	g_free(dis->primary);
+ 	g_free(dis);
+-- 
+1.9.3
 
-Johan
