@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 09/12] android/scpp: Fix not detaching on free
-Date: Mon, 30 Jun 2014 17:17:38 +0300
-Message-Id: <1404137861-9313-9-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 08/12] android/scpp: Fix not unregistering on detach
+Date: Mon, 30 Jun 2014 17:17:37 +0300
+Message-Id: <1404137861-9313-8-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
 References: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,23 +12,25 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/scpp.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ android/scpp.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/android/scpp.c b/android/scpp.c
-index b831680..9d8bb10 100644
+index 81d698b..b831680 100644
 --- a/android/scpp.c
 +++ b/android/scpp.c
-@@ -62,8 +62,7 @@ struct bt_scpp {
+@@ -270,6 +270,11 @@ void bt_scpp_detach(struct bt_scpp *scan)
+ 	if (!scan || !scan->attrib)
+ 		return;
  
- static void scpp_free(struct bt_scpp *scan)
- {
--	if (scan->attrib)
--		g_attrib_unref(scan->attrib);
-+	bt_scpp_detach(scan);
- 
- 	g_free(scan->primary);
- 	g_free(scan);
++	if (scan->refresh_cb_id > 0) {
++		g_attrib_unregister(scan->attrib, scan->refresh_cb_id);
++		scan->refresh_cb_id = 0;
++	}
++
+ 	g_attrib_unref(scan->attrib);
+ 	scan->attrib = NULL;
+ }
 -- 
 1.9.3
 
