@@ -1,47 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <86D12A3EE8C39046AB3F026D471074661D244170@POCITMSEXMB02.LntUniverse.com>
-References: <86D12A3EE8C39046AB3F026D471074661D244170@POCITMSEXMB02.LntUniverse.com>
-Date: Mon, 30 Jun 2014 17:11:50 +0300
-Message-ID: <CABBYNZLpSJ86b9O1w=XqZDJBwZ6zxz1qA_b2-XC_G20XiDX+Gw@mail.gmail.com>
-Subject: Re: Query on BLE profile contribution
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Amith Raghunath <Amith.Raghunath@lnttechservices.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-	"marcel@holtmann.org" <marcel@holtmann.org>, Wins Thomas <Wins.Thomas@lnttechservices.com>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Start background scanning only when controller is ready
+Date: Mon, 30 Jun 2014 16:04:12 +0200
+Message-Id: <1404137052-15424-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When the controller is not active or in init/setup phase, do not
+try to start or stop background scanning.
 
-On Mon, Jun 30, 2014 at 12:26 PM, Amith Raghunath
-<Amith.Raghunath@lnttechservices.com> wrote:
-> Hi Marcel/John,
->     We are planning to contribute a BLE Findme profile for the "Locator Role" to the Bluez Stack.
->     It is around 300 lines of code (excluding comments & blank lines).
->     We request your kind self to let us know the following:
->            a)  Approximate time that it would take for this code to get reviewed.
->            b)  The procedure to add this file to the Bluez GIT
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-The guidelines are about the same for kernel and userspace, so you are
-suppose to provide a with proper git patches (git format-patch + git
-send-email). Regarding the profile itself I would probably hold on to
-use the new infrastructure from bt_gatt or do as we did with BAS, DIS
-and HoG in android where we use GAttrib only internally.
-
-I would probably suggest creating LGPL helpers under src/shared/
-before the implementing any plugin, e.g.:
-
-- bt_<profile>_new(primary): Allocate the data structures
-- bt_<profile>_attach(instance, connection): On the first attach you
-are suppose to discover the handles and cache them, once the handle
-are cached then you can proceed with notification and read/write
-operations required by the profile.
-- bt_<profile>_detach(instance): Unref any connection reference and
-cleanup any notification etc.
-- bt_<profile>_set_notification(instance, callback, data): This is
-optional in case the profile does provide notifications.
-- bt_<profile>_unref: Detach and free the data structures
-
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index adea7de95633..2312e77582b0 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5317,7 +5317,10 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 	struct hci_conn *conn;
+ 	int err;
+ 
+-	if (test_bit(HCI_UNREGISTER, &hdev->dev_flags))
++	if (!test_bit(HCI_UP, &hdev->flags) ||
++	    test_bit(HCI_INIT, &hdev->flags) ||
++	    test_bit(HCI_SETUP, &hdev->dev_flags) ||
++	    test_bit(HCI_UNREGISTER, &hdev->dev_flags))
+ 		return;
+ 
+ 	hci_req_init(&req, hdev);
 -- 
-Luiz Augusto von Dentz
+1.9.3
+
