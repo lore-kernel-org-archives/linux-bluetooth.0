@@ -1,140 +1,99 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/health: Set L2CAP mode for MCAP channels
-Date: Mon, 30 Jun 2014 11:14:56 +0300
-Message-Id: <1404116096-21971-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1404116096-21971-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1404116096-21971-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/2] android/health: Add handling incoming connection
+Date: Mon, 30 Jun 2014 11:14:55 +0300
+Message-Id: <1404116096-21971-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Check configuration and set L2CAP mode. Enables several PTS test cases.
+Add support for normal data channel creation. Also add search helper for
+searching apps for suitable mdepid.
 ---
- android/health.c | 72 ++++++++++++++++++++++++++++++++++++++++++++------------
- 1 file changed, 57 insertions(+), 15 deletions(-)
+ android/health.c | 56 +++++++++++++++++++++++++++++++++++++++++++++-----------
+ 1 file changed, 45 insertions(+), 11 deletions(-)
 
 diff --git a/android/health.c b/android/health.c
-index 83ae107..2b8562f 100644
+index 709e621..83ae107 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -1301,24 +1301,18 @@ static struct health_channel *create_channel(struct health_app *app,
- 	return channel;
+@@ -329,6 +329,38 @@ static struct health_channel *search_channel_by_id(uint16_t id)
+ 	return search.channel;
  }
  
--static struct health_channel *connect_channel(struct mcap_mcl *mcl,
--								uint8_t mdepid)
-+static struct health_channel *connect_channel(struct health_app *app,
-+							struct mcap_mcl *mcl,
-+							uint8_t mdepid)
++struct app_search {
++	uint8_t mdepid;
++	struct health_app *app;
++};
++
++static void app_search_mdep(void *data, void *user_data)
++{
++	struct health_app *app = data;
++	struct app_search *search = user_data;
++
++	if (search->app)
++		return;
++
++	if (queue_find(app->mdeps, match_mdep_by_id,
++						INT_TO_PTR(search->mdepid)))
++		search->app = app;
++}
++
++static struct health_app *search_app_by_mdepid(uint8_t mdepid)
++{
++	struct app_search search;
++
++	DBG("");
++
++	search.mdepid = mdepid;
++	search.app = NULL;
++
++	queue_foreach(apps, app_search_mdep, &search);
++
++	return search.app;
++}
++
+ static int register_service_protocols(sdp_record_t *rec,
+ 					struct health_app *app)
  {
--	struct health_app *app;
- 	struct health_device *device;
- 	struct health_channel *channel = NULL;
- 	bdaddr_t addr;
- 
--	DBG("mcl %p mdepid %u", mcl, mdepid);
-+	DBG("app %p mdepid %u", app, mdepid);
+@@ -1281,22 +1313,24 @@ static struct health_channel *connect_channel(struct mcap_mcl *mcl,
  
  	mcap_mcl_get_addr(mcl, &addr);
  
--	if (mdepid == MDEP_ECHO)
--		/* For echo service take last app */
--		app = queue_peek_tail(apps);
--	else
--		app = search_app_by_mdepid(mdepid);
+-	/* TODO: Search app for mdepid */
 -
- 	if (!app) {
- 		DBG("No app found for mdepid %u", mdepid);
- 		return NULL;
-@@ -1330,25 +1324,41 @@ static struct health_channel *connect_channel(struct mcap_mcl *mcl,
- 
- 	channel = create_channel(app, mdepid, device);
- 
--	/* Channel is assigned here after creation */
--	mcl->cb->user_data = channel;
--
- 	return channel;
- }
- 
-+static uint8_t conf_to_l2cap(uint8_t conf)
-+{
-+	return conf == CHANNEL_TYPE_STREAM ? L2CAP_MODE_STREAMING :
-+								L2CAP_MODE_ERTM;
-+}
-+
- static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 				uint16_t mdlid, uint8_t *conf, void *data)
- {
- 	GError *gerr = NULL;
- 	struct health_channel *channel;
-+	struct health_app *app;
-+	struct mdep_cfg *mdep;
- 
- 	DBG("Data channel request: mdepid %u mdlid %u", mdepid, mdlid);
- 
--	/* TODO: find / create device */
--	channel = connect_channel(mcl, mdepid);
+-	if (mdepid == MDEP_ECHO) {
 +	if (mdepid == MDEP_ECHO)
-+		/* For echo service take last app */
-+		app = queue_peek_tail(apps);
+ 		/* For echo service take last app */
+ 		app = queue_peek_tail(apps);
+-		if (!app)
+-			return NULL;
+-
+-		device = get_device(app, (uint8_t *) &addr);
+-		if (!device)
+-			return NULL;
 +	else
 +		app = search_app_by_mdepid(mdepid);
-+
-+	if (!app)
-+		return MCAP_MDL_BUSY;
-+
-+	channel = connect_channel(app, mcl, mdepid);
- 	if (!channel)
- 		return MCAP_MDL_BUSY;
  
-+	/* Channel is assigned here after creation */
-+	mcl->cb->user_data = channel;
-+
- 	if (mdepid == MDEP_ECHO) {
- 		switch (*conf) {
- 		case CHANNEL_TYPE_ANY:
-@@ -1379,6 +1389,38 @@ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 		return MCAP_SUCCESS;
+-		channel = create_channel(app, mdepid, device);
++	if (!app) {
++		DBG("No app found for mdepid %u", mdepid);
++		return NULL;
  	}
  
-+	mdep = queue_find(app->mdeps, match_mdep_by_id, INT_TO_PTR(mdepid));
-+	if (!mdep)
-+		return MCAP_MDL_BUSY;
+-	/* Device is created here */
++	device = get_device(app, (uint8_t *) &addr);
++	if (!device)
++		return NULL;
 +
-+	switch (*conf) {
-+	case CHANNEL_TYPE_ANY:
-+		if (mdep->role == HAL_HEALTH_MDEP_ROLE_SINK)
-+			return MCAP_CONFIGURATION_REJECTED;
-+		else
-+			*conf = CHANNEL_TYPE_RELIABLE;
-+		break;
-+	case CHANNEL_TYPE_STREAM:
-+		if (mdep->role == HAL_HEALTH_MDEP_ROLE_SOURCE)
-+			return MCAP_CONFIGURATION_REJECTED;
-+	case CHANNEL_TYPE_RELIABLE:
-+		if (mdep->role == HAL_HEALTH_MDEP_ROLE_SOURCE)
-+			return MCAP_CONFIGURATION_REJECTED;
-+		break;
-+	default:
-+		/* Special case defined in HDP spec 3.4. When an invalid
-+		* configuration is received we shall close the MCL when
-+		* we are still processing the callback. */
-+		/* TODO: close device */
-+		return MCAP_CONFIGURATION_REJECTED; /* not processed */
-+	}
++	channel = create_channel(app, mdepid, device);
 +
-+	if (!mcap_set_data_chan_mode(mcap, conf_to_l2cap(*conf), &gerr)) {
-+		error("health: error setting L2CAP mode: %s", gerr->message);
-+		g_error_free(gerr);
-+		return MCAP_MDL_BUSY;
-+	}
-+
- 	return MCAP_SUCCESS;
- }
++	/* Channel is assigned here after creation */
+ 	mcl->cb->user_data = channel;
  
+ 	return channel;
 -- 
 1.8.3.2
 
