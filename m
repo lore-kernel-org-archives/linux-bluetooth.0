@@ -1,36 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 05/12] android/hog: Fix not resetting properly on detach
-Date: Mon, 30 Jun 2014 16:47:52 +0300
-Message-Id: <1404136079-24846-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 04/12] android/hog: Read CCC initial value for Input Report
+Date: Mon, 30 Jun 2014 16:47:51 +0300
+Message-Id: <1404136079-24846-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1404136079-24846-1-git-send-email-luiz.dentz@gmail.com>
 References: <1404136079-24846-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
+This is required by the following test:
+
+ - TP/HGRF/RH/BV-05-I [Read Client Characteristic Configuration Descriptors
+for Report Characteristics – Input Report]
 ---
- android/hog.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/hog.c | 16 +++++++++++++++-
+ 1 file changed, 15 insertions(+), 1 deletion(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 1069cca..2cce4e9 100644
+index f69fe2a..1069cca 100644
 --- a/android/hog.c
 +++ b/android/hog.c
-@@ -1007,7 +1007,10 @@ void bt_hog_detach(struct bt_hog *hog)
- 	for (l = hog->reports; l; l = l->next) {
- 		struct report *r = l->data;
+@@ -177,6 +177,19 @@ static void write_ccc(GAttrib *attrib, uint16_t handle, void *user_data)
+ 					report_ccc_written_cb, user_data);
+ }
  
--		g_attrib_unregister(hog->attrib, r->notifyid);
-+		if (r->notifyid > 0) {
-+			g_attrib_unregister(hog->attrib, r->notifyid);
-+			r->notifyid = 0;
-+		}
- 	}
++static void ccc_read_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct report *report = user_data;
++
++	if (status != 0) {
++		error("Error reading CCC value: %s", att_ecode2str(status));
++		return;
++	}
++
++	write_ccc(report->hog->attrib, report->ccc_handle, report);
++}
++
+ static void report_reference_cb(guint8 status, const guint8 *pdu,
+ 					guint16 plen, gpointer user_data)
+ {
+@@ -199,7 +212,8 @@ static void report_reference_cb(guint8 status, const guint8 *pdu,
  
- 	if (hog->scpp)
+ 	/* Enable notifications only for Input Reports */
+ 	if (report->type == HOG_REPORT_TYPE_INPUT)
+-		write_ccc(report->hog->attrib, report->ccc_handle, report);
++		gatt_read_char(report->hog->attrib, report->ccc_handle,
++							ccc_read_cb, report);
+ }
+ 
+ static void external_report_reference_cb(guint8 status, const guint8 *pdu,
 -- 
 1.9.3
 
