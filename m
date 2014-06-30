@@ -2,48 +2,29 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 3/5] android/health: Fix do not set mdl callbacks on mcl_reconneced call back
-Date: Mon, 30 Jun 2014 19:58:26 +0300
-Message-Id: <1404147508-22756-4-git-send-email-ravikumar.veeramally@linux.intel.com>
-In-Reply-To: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-References: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 0/5] Implement disconenct and reconnect
+Date: Mon, 30 Jun 2014 19:58:23 +0300
+Message-Id: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-MDL related callbacks should be already set when creating mcl. Only
-update connection status.
----
- android/health.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+v2: Fixed Szymon's comment.
 
-diff --git a/android/health.c b/android/health.c
-index 7518dad..0327542 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -2001,16 +2001,17 @@ static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
- 
- static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
- {
--	GError *gerr = NULL;
--	bool ret;
-+	struct health_device *dev;
- 
- 	DBG("");
- 
--	ret = set_mcl_cb(mcl, NULL, &gerr);
--	if (!ret) {
--		error("health: error setting mcl callbacks: %s", gerr->message);
--		g_error_free(gerr);
-+	dev = search_dev_by_mcl(mcl);
-+	if (!dev) {
-+		error("device data does not exists");
-+		return;
- 	}
-+
-+	dev->mcl_conn = true;
- }
- 
- static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
+v1: Patchset supports incoming MCL and MDL disconnection and
+reconnection.
+
+Ravi kumar Veeramally (5):
+  android/health: Implement mcl_disconnected cb
+  android/health: Implement mcl_uncached callback
+  android/health: Fix do not set mdl callbacks on mcl_reconneced call
+    back
+  android/health: Implement MDL reconnection from remote device
+  android/health: Update PTS result
+
+ android/health.c    | 127 +++++++++++++++++++++++++++++++++++++++++++++++-----
+ android/pts-hdp.txt |  24 ++++++++--
+ 2 files changed, 136 insertions(+), 15 deletions(-)
+
 -- 
 1.9.1
 
