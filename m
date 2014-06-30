@@ -1,32 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC v2 1/4] Bluetooth: Connection parameters check helper
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1403743975-31114-1-git-send-email-andre.guedes@openbossa.org>
-Date: Mon, 30 Jun 2014 17:43:29 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <CFA7C547-35F2-44B2-8E73-0AFEF57B2EFC@holtmann.org>
-References: <1403743975-31114-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 5/5] android/health: Update PTS result
+Date: Mon, 30 Jun 2014 18:31:54 +0300
+Message-Id: <1404142314-20795-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Results for TC_SRC_HCT_BV_04_I, TC_SRC_HCT_BV_06_C and
+TC_SNK_HCT_BV_04_I.
+---
+ android/pts-hdp.txt | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-> This patch renames l2cap_check_conn_param() to hci_check_conn_params()
-> and moves it to hci_core.h so it can reused in others files. This helper
-> will be reused in the next patch.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
-> ---
-> include/net/bluetooth/hci_core.h | 21 +++++++++++++++++++++
-> net/bluetooth/l2cap_core.c       | 23 +----------------------
-> 2 files changed, 22 insertions(+), 22 deletions(-)
-
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index fc5bd93..29a2434 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -108,9 +108,21 @@ TC_SRC_HCT_BV_02_I	PASS	haltest:
+ 				BTHL_MDEP_ROLE_SOURCE 4100
+ 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SRC_HCT_BV_03_I	N/A
+-TC_SRC_HCT_BV_04_I	INC
++TC_SRC_HCT_BV_04_I	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				when prompted: bluetooth ssp_reply <args>
+ TC_SRC_HCT_BV_05_C	N/A
+-TC_SRC_HCT_BV_06_C	INC
++TC_SRC_HCT_BV_06_C	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				when prompted: bluetooth ssp_reply <args>
+ TC_SRC_HCT_BV_07_C	INC
+ TC_SRC_DE_BV_01_I	INC
+ TC_SRC_DE_BV_02_I	PASS	haltest:
+@@ -222,7 +234,13 @@ TC_SNK_HCT_BV_02_I	PASS	haltest:
+ 				BTHL_MDEP_ROLE_SINK 4100
+ 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SNK_HCT_BV_03_I	N/A
+-TC_SNK_HCT_BV_04_I	INC
++TC_SNK_HCT_BV_04_I	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
++
++				when prompted: bluetooth ssp_reply <args>
+ TC_SNK_HCT_BV_05_C	N/A
+ TC_SNK_HCT_BV_06_C	PASS	haltest:
+ 				hl register_application bluez-android Bluez
+-- 
+1.9.1
 
