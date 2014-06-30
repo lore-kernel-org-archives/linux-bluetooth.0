@@ -1,28 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/5] Implement disconenct and reconnect
-Date: Mon, 30 Jun 2014 18:31:49 +0300
-Message-Id: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Mon, 30 Jun 2014 18:16:13 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Start background scanning only when
+ controller is ready
+Message-ID: <20140630151613.GA23879@t440s.P-661HNU-F1>
+References: <1404137052-15424-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404137052-15424-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Patchset supports incoming MCL and MDL disconnection and
-reconnection.
+Hi Marcel,
 
-Ravi kumar Veeramally (5):
-  android/health: Implement mcl_disconnected cb
-  android/health: Implement mcl_uncached callback
-  android/health: Fix do not set mdl callbacks on mcl_reconneced call
-    back
-  android/health: Implement MDL reconnection from remote device
-  android/health: Update PTS result
+On Mon, Jun 30, 2014, Marcel Holtmann wrote:
+> When the controller is not active or in init/setup phase, do not
+> try to start or stop background scanning.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
- android/health.c    | 122 ++++++++++++++++++++++++++++++++++++++++++++++------
- android/pts-hdp.txt |  24 +++++++++--
- 2 files changed, 131 insertions(+), 15 deletions(-)
+Applied to bluetooth-next. Thanks.
 
--- 
-1.9.1
-
+Johan
