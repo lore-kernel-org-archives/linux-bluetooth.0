@@ -2,124 +2,91 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 4/5] android/health: Implement MDL reconnection from remote device
-Date: Mon, 30 Jun 2014 18:31:53 +0300
-Message-Id: <1404142314-20795-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 1/5] android/health: Implement mcl_disconnected cb
+Date: Mon, 30 Jun 2014 18:31:50 +0300
+Message-Id: <1404142314-20795-2-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Provide a utility to find device by mcl and update the
+mcl status.
 ---
- android/health.c | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 52 insertions(+), 4 deletions(-)
+ android/health.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 45 insertions(+), 1 deletion(-)
 
 diff --git a/android/health.c b/android/health.c
-index 0327542..b77ab4e 100644
+index 3225617..1905862 100644
 --- a/android/health.c
 +++ b/android/health.c
-@@ -235,6 +235,14 @@ static void free_health_app(void *data)
- 	free(app);
+@@ -243,6 +243,14 @@ static bool match_channel_by_id(const void *data, const void *user_data)
+ 	return channel->id == channel_id;
  }
  
-+static bool match_channel_by_mdl(const void *data, const void *user_data)
++static bool match_dev_by_mcl(const void *data, const void *user_data)
 +{
-+	const struct health_channel *channel = data;
-+	const struct mcap_mdl *mdl = user_data;
++	const struct health_device *dev = data;
++	const struct mcap_mcl *mcl = user_data;
 +
-+	return channel->mdl == mdl;
++	return dev->mcl == mcl;
 +}
 +
- static bool match_channel_by_id(const void *data, const void *user_data)
+ static bool match_dev_by_addr(const void *data, const void *user_data)
  {
- 	const struct health_channel *channel = data;
-@@ -298,6 +306,7 @@ static bool match_app_by_id(const void *data, const void *user_data)
-  */
- struct channel_search {
- 	uint16_t channel_id;
-+	struct mcap_mdl *mdl;
- 	struct health_channel *channel;
- };
- 
-@@ -309,8 +318,13 @@ static void device_search_channel(void *data, void *user_data)
- 	if (search->channel)
- 		return;
- 
--	search->channel = queue_find(dev->channels, match_channel_by_id,
-+	if (search->channel_id)
-+		search->channel = queue_find(dev->channels, match_channel_by_id,
- 						INT_TO_PTR(search->channel_id));
-+	else if (search->mdl)
-+		search->channel = queue_find(dev->channels,
-+						match_channel_by_mdl,
-+						search->mdl);
+ 	const struct health_device *dev = data;
+@@ -329,6 +337,36 @@ static struct health_channel *search_channel_by_id(uint16_t id)
+ 	return search.channel;
  }
  
- static void app_search_channel(void *data, void *user_data)
-@@ -331,6 +345,21 @@ static struct health_channel *search_channel_by_id(uint16_t id)
- 	DBG("");
- 
- 	search.channel_id = id;
-+	search.mdl = NULL;
-+	search.channel = NULL;
-+	queue_foreach(apps, app_search_channel, &search);
++struct mcl_search {
++	struct mcap_mcl *mcl;
++	struct health_device *dev;
++};
 +
-+	return search.channel;
++static void app_search_dev(void *data, void *user_data)
++{
++	struct health_app *app = data;
++	struct mcl_search *search = user_data;
++
++	if (search->dev)
++		return;
++
++	search->dev = queue_find(app->devices, match_dev_by_mcl, search->mcl);
 +}
 +
-+static struct health_channel *search_channel_by_mdl(struct mcap_mdl *mdl)
++static struct health_device *search_dev_by_mcl(struct mcap_mcl *mcl)
 +{
-+	struct channel_search search;
++	struct mcl_search search;
 +
 +	DBG("");
 +
-+	search.channel_id = 0;
-+	search.mdl = mdl;
- 	search.channel = NULL;
- 	queue_foreach(apps, app_search_channel, &search);
- 
-@@ -1176,11 +1205,14 @@ static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- 	struct health_channel *channel = data;
- 	int fd;
- 
-+	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
++	search.mcl = mcl;
++	search.dev = NULL;
 +
-+	if (!channel)
-+		channel = search_channel_by_mdl(mdl);
++	queue_foreach(apps, app_search_dev, &search);
 +
- 	if (!channel->mdl)
- 		channel->mdl = mcap_mdl_ref(mdl);
++	return search.dev;
++}
++
+ struct app_search {
+ 	uint8_t mdepid;
+ 	struct health_app *app;
+@@ -1977,7 +2015,13 @@ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
  
--	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
--
- 	fd = mcap_mdl_get_fd(channel->mdl);
- 	if (fd < 0) {
- 		error("health: error retrieving fd");
-@@ -1475,7 +1507,23 @@ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 
- static uint8_t mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
+ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
  {
--	DBG("Not Implemeneted");
-+	struct health_channel *channel;
-+	GError *err = NULL;
+-	DBG("Not implemented");
++	struct health_device *dev;
 +
 +	DBG("");
 +
-+	channel = search_channel_by_mdl(mdl);
-+	if (!channel) {
-+		error("health: channel data does not exist");
-+		return MCAP_UNSPECIFIED_ERROR;
-+	}
-+
-+	if (!mcap_set_data_chan_mode(mcap,
-+			conf_to_l2cap(channel->type), &err)) {
-+		error("health: %s", err->message);
-+		g_error_free(err);
-+		return MCAP_MDL_BUSY;
-+	}
- 
- 	return MCAP_SUCCESS;
++	dev = search_dev_by_mcl(mcl);
++	if (dev)
++		dev->mcl_conn = false;
  }
+ 
+ static void mcl_uncached(struct mcap_mcl *mcl, gpointer data)
 -- 
 1.9.1
 
