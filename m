@@ -2,129 +2,63 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH_v2 4/5] android/health: Implement MDL reconnection from remote device
-Date: Mon, 30 Jun 2014 19:58:27 +0300
-Message-Id: <1404147508-22756-5-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH_v2 5/5] android/health: Update PTS result
+Date: Mon, 30 Jun 2014 19:58:28 +0300
+Message-Id: <1404147508-22756-6-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Results for TC_SRC_HCT_BV_04_I, TC_SRC_HCT_BV_06_C and
+TC_SNK_HCT_BV_04_I.
 ---
- android/health.c | 61 ++++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 57 insertions(+), 4 deletions(-)
+ android/pts-hdp.txt | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/android/health.c b/android/health.c
-index 0327542..1943ced 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -235,6 +235,14 @@ static void free_health_app(void *data)
- 	free(app);
- }
- 
-+static bool match_channel_by_mdl(const void *data, const void *user_data)
-+{
-+	const struct health_channel *channel = data;
-+	const struct mcap_mdl *mdl = user_data;
+diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+index fc5bd93..29a2434 100644
+--- a/android/pts-hdp.txt
++++ b/android/pts-hdp.txt
+@@ -108,9 +108,21 @@ TC_SRC_HCT_BV_02_I	PASS	haltest:
+ 				BTHL_MDEP_ROLE_SOURCE 4100
+ 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SRC_HCT_BV_03_I	N/A
+-TC_SRC_HCT_BV_04_I	INC
++TC_SRC_HCT_BV_04_I	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
 +
-+	return channel->mdl == mdl;
-+}
++				when prompted: bluetooth ssp_reply <args>
+ TC_SRC_HCT_BV_05_C	N/A
+-TC_SRC_HCT_BV_06_C	INC
++TC_SRC_HCT_BV_06_C	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SOURCE 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
 +
- static bool match_channel_by_id(const void *data, const void *user_data)
- {
- 	const struct health_channel *channel = data;
-@@ -298,6 +306,7 @@ static bool match_app_by_id(const void *data, const void *user_data)
-  */
- struct channel_search {
- 	uint16_t channel_id;
-+	struct mcap_mdl *mdl;
- 	struct health_channel *channel;
- };
- 
-@@ -309,8 +318,13 @@ static void device_search_channel(void *data, void *user_data)
- 	if (search->channel)
- 		return;
- 
--	search->channel = queue_find(dev->channels, match_channel_by_id,
-+	if (search->channel_id)
-+		search->channel = queue_find(dev->channels, match_channel_by_id,
- 						INT_TO_PTR(search->channel_id));
-+	else if (search->mdl)
-+		search->channel = queue_find(dev->channels,
-+						match_channel_by_mdl,
-+						search->mdl);
- }
- 
- static void app_search_channel(void *data, void *user_data)
-@@ -331,6 +345,21 @@ static struct health_channel *search_channel_by_id(uint16_t id)
- 	DBG("");
- 
- 	search.channel_id = id;
-+	search.mdl = NULL;
-+	search.channel = NULL;
-+	queue_foreach(apps, app_search_channel, &search);
++				when prompted: bluetooth ssp_reply <args>
+ TC_SRC_HCT_BV_07_C	INC
+ TC_SRC_DE_BV_01_I	INC
+ TC_SRC_DE_BV_02_I	PASS	haltest:
+@@ -222,7 +234,13 @@ TC_SNK_HCT_BV_02_I	PASS	haltest:
+ 				BTHL_MDEP_ROLE_SINK 4100
+ 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+ TC_SNK_HCT_BV_03_I	N/A
+-TC_SNK_HCT_BV_04_I	INC
++TC_SNK_HCT_BV_04_I	PASS    haltest:
++				hl register_application bluez-android Bluez
++				bluez-hdp health-device-profile 1
++				BTHL_MDEP_ROLE_SINK 4100
++				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
 +
-+	return search.channel;
-+}
-+
-+static struct health_channel *search_channel_by_mdl(struct mcap_mdl *mdl)
-+{
-+	struct channel_search search;
-+
-+	DBG("");
-+
-+	search.channel_id = 0;
-+	search.mdl = mdl;
- 	search.channel = NULL;
- 	queue_foreach(apps, app_search_channel, &search);
- 
-@@ -1176,11 +1205,19 @@ static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- 	struct health_channel *channel = data;
- 	int fd;
- 
-+	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
-+
-+	if (!channel) {
-+		channel = search_channel_by_mdl(mdl);
-+		if (!channel) {
-+			error("health: channel data does not exist");
-+			return;
-+		}
-+	}
-+
- 	if (!channel->mdl)
- 		channel->mdl = mcap_mdl_ref(mdl);
- 
--	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
--
- 	fd = mcap_mdl_get_fd(channel->mdl);
- 	if (fd < 0) {
- 		error("health: error retrieving fd");
-@@ -1475,7 +1512,23 @@ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 
- static uint8_t mcap_mdl_reconn_req_cb(struct mcap_mdl *mdl, void *data)
- {
--	DBG("Not Implemeneted");
-+	struct health_channel *channel;
-+	GError *err = NULL;
-+
-+	DBG("");
-+
-+	channel = search_channel_by_mdl(mdl);
-+	if (!channel) {
-+		error("health: channel data does not exist");
-+		return MCAP_UNSPECIFIED_ERROR;
-+	}
-+
-+	if (!mcap_set_data_chan_mode(mcap,
-+			conf_to_l2cap(channel->type), &err)) {
-+		error("health: %s", err->message);
-+		g_error_free(err);
-+		return MCAP_MDL_BUSY;
-+	}
- 
- 	return MCAP_SUCCESS;
- }
++				when prompted: bluetooth ssp_reply <args>
+ TC_SNK_HCT_BV_05_C	N/A
+ TC_SNK_HCT_BV_06_C	PASS	haltest:
+ 				hl register_application bluez-android Bluez
 -- 
 1.9.1
 
