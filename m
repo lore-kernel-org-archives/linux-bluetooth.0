@@ -2,63 +2,48 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 5/5] android/health: Update PTS result
-Date: Mon, 30 Jun 2014 18:31:54 +0300
-Message-Id: <1404142314-20795-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 3/5] android/health: Fix do not set mdl callbacks on mcl_reconneced call back
+Date: Mon, 30 Jun 2014 18:31:52 +0300
+Message-Id: <1404142314-20795-4-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1404142314-20795-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Results for TC_SRC_HCT_BV_04_I, TC_SRC_HCT_BV_06_C and
-TC_SNK_HCT_BV_04_I.
+MDL related callbacks should be already set when creating mcl. Only
+update connection status.
 ---
- android/pts-hdp.txt | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
+ android/health.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-index fc5bd93..29a2434 100644
---- a/android/pts-hdp.txt
-+++ b/android/pts-hdp.txt
-@@ -108,9 +108,21 @@ TC_SRC_HCT_BV_02_I	PASS	haltest:
- 				BTHL_MDEP_ROLE_SOURCE 4100
- 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
- TC_SRC_HCT_BV_03_I	N/A
--TC_SRC_HCT_BV_04_I	INC
-+TC_SRC_HCT_BV_04_I	PASS    haltest:
-+				hl register_application bluez-android Bluez
-+				bluez-hdp health-device-profile 1
-+				BTHL_MDEP_ROLE_SOURCE 4100
-+				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+diff --git a/android/health.c b/android/health.c
+index 7518dad..0327542 100644
+--- a/android/health.c
++++ b/android/health.c
+@@ -2001,16 +2001,17 @@ static void mcl_connected(struct mcap_mcl *mcl, gpointer data)
+ 
+ static void mcl_reconnected(struct mcap_mcl *mcl, gpointer data)
+ {
+-	GError *gerr = NULL;
+-	bool ret;
++	struct health_device *dev;
+ 
+ 	DBG("");
+ 
+-	ret = set_mcl_cb(mcl, NULL, &gerr);
+-	if (!ret) {
+-		error("health: error setting mcl callbacks: %s", gerr->message);
+-		g_error_free(gerr);
++	dev = search_dev_by_mcl(mcl);
++	if (!dev) {
++		error("device data does not exists");
++		return;
+ 	}
 +
-+				when prompted: bluetooth ssp_reply <args>
- TC_SRC_HCT_BV_05_C	N/A
--TC_SRC_HCT_BV_06_C	INC
-+TC_SRC_HCT_BV_06_C	PASS    haltest:
-+				hl register_application bluez-android Bluez
-+				bluez-hdp health-device-profile 1
-+				BTHL_MDEP_ROLE_SOURCE 4100
-+				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-+
-+				when prompted: bluetooth ssp_reply <args>
- TC_SRC_HCT_BV_07_C	INC
- TC_SRC_DE_BV_01_I	INC
- TC_SRC_DE_BV_02_I	PASS	haltest:
-@@ -222,7 +234,13 @@ TC_SNK_HCT_BV_02_I	PASS	haltest:
- 				BTHL_MDEP_ROLE_SINK 4100
- 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
- TC_SNK_HCT_BV_03_I	N/A
--TC_SNK_HCT_BV_04_I	INC
-+TC_SNK_HCT_BV_04_I	PASS    haltest:
-+				hl register_application bluez-android Bluez
-+				bluez-hdp health-device-profile 1
-+				BTHL_MDEP_ROLE_SINK 4100
-+				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
-+
-+				when prompted: bluetooth ssp_reply <args>
- TC_SNK_HCT_BV_05_C	N/A
- TC_SNK_HCT_BV_06_C	PASS	haltest:
- 				hl register_application bluez-android Bluez
++	dev->mcl_conn = true;
+ }
+ 
+ static void mcl_disconnected(struct mcap_mcl *mcl, gpointer data)
 -- 
 1.9.1
 
