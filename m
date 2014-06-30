@@ -1,70 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org>
-References: <1403897492-6233-1-git-send-email-scott@netsplit.com>
-	<B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org>
-Date: Mon, 30 Jun 2014 13:26:23 -0700
-Message-ID: <CA+bD78j4bSfqvn7MHnsV7PKp_dGXN4dLApW2G5p4oN-Tsu+h1Q@mail.gmail.com>
-Subject: Re: [RFC] doc: Add EIR to device properties
-From: Scott James Remnant <scott@netsplit.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH] sdp: Fix requests with invalid size
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404158326-12178-1-git-send-email-arakhov@chromium.org>
+Date: Mon, 30 Jun 2014 22:18:05 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Message-Id: <5382E942-D849-40EB-BA9A-F36BDD5B6888@holtmann.org>
+References: <1403929003-31639-1-git-send-email-arakhov@chromium.org> <1404158326-12178-1-git-send-email-arakhov@chromium.org>
+To: Artem Rakhov <arakhov@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 27, 2014 at 12:55 PM, Marcel Holtmann <marcel@holtmann.org> wro=
-te:
+Hi Artem,
 
->> This patch proposes an extension to the D-Bus Device API to allow
->> an application access to the last EIR data received from a device
->> in inquiry or advertising mode.
->>
-> in general I have no objections in exposing the EIR and AD information. H=
-owever I do not like to use EIR as property key. I know that on mgmt API we=
- simply went with EIR_Data, but on the D-Bus API we most likely need to fin=
-d a name that is a bit more generic and allows to represent EIR and AD info=
-rmation.
->
+> This patch fixes processing of SDP requests which have wrong PDU size in header.
+> 
+> Every SDP request consists of two parts: header and data.
+> Header always contains 3 values: request code (identifies it's type),
+> transaction ID (in order to match response with request), and data's size.
+> 
+> According to Bluetooth specification, when the data's size is wrong,
+> SDP server should return SDP_ErrorResponse with "Invalid PDU Size" parameter.
+> But now the server doesn't respond at all, and corresponding socket on
+> client's side crashes.
+> 
+> The patch actually reverts commit 388761cdc8f8a1293bb0b1a5bd576b5fb41616ca,
+> because the size of request should be checked inside handle_request() function
+> in order to be able to respond with SDP_ErrorResponse, instead of stopping
+> the connection.
+> ---
+> src/sdpd-server.c | 6 +++++-
+> 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Thinking about this a little bit more, I'm not sure this should be a
-Device property either. The advertisement data isn't really a property
-of the device, but a property of the advertisement itself.
+patch has been applied.
 
-A peripheral could theoretically send different advertisements, a
-weird example might be a peripheral sending a non-connectable
-undirected advertisement generally, and a connectable directed
-advertisement to us directly, with different AD.
+Regards
 
-This seems to fold back nicely into the discussion about a "Find
-Devices" API, intended for applications and separate from the
-StartDiscovery API. If that were an "agent" mode, it could look
-something like this:
+Marcel
 
-    <- Search( { Data: "FF4C000214" }, agent_object_path )
-    -> DeviceFound( device_object_path, data )
-    -> DeviceFound( device_object_path, data )
-    -> DeviceFound( device_object_path, data )
-
-Where data in the agent method is the unparsed advertisement data, if
-the application is interested in it. The above example is looking for
-an iBeacon by presence of a specific data structure, so the app
-probably wants the unparsed data parameter and doesn't care so much
-about the object path.
-
-But looking for heart rate monitors might be:
-
-    <- Search( { UUID: "180D" }, agent_object_path )
-    -> DeviceFound( device_object_path, data )
-    -> DeviceFound( device_object_path, data )
-    -> DeviceFound( device_object_path, data )
-
-In which case the application probably just wants the device object path.
-
-
-If this is broadly along the lines you're thinking, I'll draft a doc
-to begin discussion.
-
-Scott
---=20
-Have you ever, ever felt like this?
-Had strange things happen?  Are you going round the twist?
