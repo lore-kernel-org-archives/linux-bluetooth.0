@@ -1,38 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: Fabian Frederick <fabf@skynet.be>
-To: linux-kernel@vger.kernel.org
-Cc: Fabian Frederick <fabf@skynet.be>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Gustavo Padovan <gustavo@padovan.org>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/1] Bluetooth: constify seq_operations
-Date: Mon, 30 Jun 2014 19:26:23 +0200
-Message-Id: <1404149183-7059-1-git-send-email-fabf@skynet.be>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH BlueZ v2 01/12] android/hog: Add bt_hog_send
+Date: Mon, 30 Jun 2014 18:56:42 +0200
+Message-ID: <2047237.sJOmoChR6N@uw000953>
+In-Reply-To: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
+References: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-bt_seq_ops is only used with __seq_open_private as
-const struct seq_operations *
+Hi Luiz,
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Gustavo Padovan <gustavo@padovan.org>
-Cc: linux-bluetooth@vger.kernel.org
-Signed-off-by: Fabian Frederick <fabf@skynet.be>
----
- net/bluetooth/af_bluetooth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Monday 30 of June 2014 17:17:30 Luiz Augusto von Dentz wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> This function can be used to send data using Output Report if one is
+> available.
+> ---
+> v2: Fix patch 02/12 to check if a hog instance exists.
+> 
+>  android/hog.c | 37 +++++++++++++++++++++++++++++++++++++
+>  android/hog.h |  1 +
+>  2 files changed, 38 insertions(+)
+> 
+> diff --git a/android/hog.c b/android/hog.c
+> index 7e61790..5d33c63 100644
+> --- a/android/hog.c
+> +++ b/android/hog.c
+> @@ -1009,3 +1009,40 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+>  
+>  	return 0;
+>  }
+> +
+> +int bt_hog_send(struct bt_hog *hog, void *data, size_t size)
+> +{
+> +	struct report *report;
+> +	GSList *l;
+> +
+> +	if (!hog)
+> +		return -EINVAL;
+> +
+> +	if (!hog->attrib)
+> +		return -ENOTCONN;
+> +
+> +	l = g_slist_find_custom(hog->reports,
+> +				GUINT_TO_POINTER(HOG_REPORT_TYPE_OUTPUT),
+> +				report_type_cmp);
+> +	if (!l)
+> +		return -ENOTSUP;
+> +
+> +	report = l->data;
+> +
+> +	DBG("Sending data to handle 0x%X", report->decl->value_handle);
+> +
+> +	if (report->decl->properties & GATT_CHR_PROP_WRITE)
+> +		gatt_write_char(hog->attrib, report->decl->value_handle,
+> +				data, size, output_written_cb, hog);
+> +	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+> +		gatt_write_cmd(hog->attrib, report->decl->value_handle,
+> +						data, size, NULL, NULL);
+> +
+> +	for (l = hog->instances; l; l = l->next) {
+> +		struct bt_hog *instance = l->data;
+> +
+> +		bt_hog_send(instance, data, size);
+> +	}
+> +
+> +	return 0;
+> +}
+> diff --git a/android/hog.h b/android/hog.h
+> index 7cf446b..4ebc83e 100644
+> --- a/android/hog.h
+> +++ b/android/hog.h
+> @@ -33,3 +33,4 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt);
+>  void bt_hog_detach(struct bt_hog *hog);
+>  
+>  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
+> +int bt_hog_send(struct bt_hog *hog, void *data, size_t size);
+> 
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 2021c48..4dca029 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -639,7 +639,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 	return 0;
- }
- 
--static struct seq_operations bt_seq_ops = {
-+static const struct seq_operations bt_seq_ops = {
- 	.start = bt_seq_start,
- 	.next  = bt_seq_next,
- 	.stop  = bt_seq_stop,
+
+I've applied patches 3-12 and updated PTS tests results. Thanks.
+
+For first two I'm not sure yet, we would need similar code for input
+and feature reports to pass PTS tests. I'll try using gattc interface
+for those and see how it works out. Then we can decide.
+
 -- 
-1.8.4.5
+Best regards, 
+Szymon Janc
