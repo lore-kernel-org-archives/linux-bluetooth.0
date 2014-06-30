@@ -1,46 +1,95 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+Date: Mon, 30 Jun 2014 13:33:50 +0300
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 5/5] Bluetooth: Add default connection parameters before pairing
-Date: Mon, 30 Jun 2014 12:34:40 +0200
-Message-Id: <1404124480-60343-5-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] android/pts: Update PTS test results for HDP
+Message-ID: <20140630103348.GA13693@aemeltch-MOBL1>
+References: <1404120352-11532-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404120352-11532-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When trying to pair a new Bluetooth Low Energy device, then make sure
-that the default connections parameters are in place before trying to
-establish the first connection to that device. With the connection
-parameters structure allocated, the slave preferred values can now
-easily be tracked and all future connections will use the correct
-values from that start decreasing connection establishment time.
+On Mon, Jun 30, 2014 at 12:25:52PM +0300, Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+Please wait till I update this patch.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index e30d0ebb5018..6baba309f9e2 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2947,6 +2947,17 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		else
- 			addr_type = ADDR_LE_DEV_RANDOM;
- 
-+		/* When pairing a new device, it is expected to remember
-+		 * this device for future connections. Adding the connection
-+		 * parameter information ahead of time allows tracking
-+		 * of the slave preferred values and will speed up any
-+		 * further connection establishment.
-+		 *
-+		 * If connection parameters already exist, then they
-+		 * will be kept and this function does nothing.
-+		 */
-+		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type);
-+
- 		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
- 				      sec_level, auth_type);
- 	}
--- 
-1.9.3
+Best regards 
+Andrei Emeltchenko 
 
+> ---
+>  android/pts-hdp.txt | 30 +++++++++++++++++++++++++-----
+>  1 file changed, 25 insertions(+), 5 deletions(-)
+> 
+> diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+> index f2b1528..06d956c 100644
+> --- a/android/pts-hdp.txt
+> +++ b/android/pts-hdp.txt
+> @@ -1,7 +1,7 @@
+>  PTS test results for HDP
+>  
+>  PTS version: 5.1
+> -Tested: 27-June-2014
+> +Tested: 30-June-2014
+>  Android version: 4.4.2
+>  
+>  Results:
+> @@ -98,7 +98,11 @@ TC_SRC_HCT_BV_01_I	PASS    haltest:
+>  				<mdep_cfg_index>
+>  
+>  				when prompted: bluetooth ssp_reply <args>
+> -TC_SRC_HCT_BV_02_I	INC
+> +TC_SRC_HCT_BV_02_I	PASS	haltest:
+> +				hl register_application bluez-android Bluez
+> +				bluez-hdp health-device-profile 1
+> +				BTHL_MDEP_ROLE_SOURCE 4100
+> +				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+>  TC_SRC_HCT_BV_03_I	N/A
+>  TC_SRC_HCT_BV_04_I	INC
+>  TC_SRC_HCT_BV_05_C	N/A
+> @@ -162,7 +166,13 @@ TC_SNK_CC_BV_04_C	PASS    haltest:
+>  
+>  				when prompted: bluetooth ssp_reply <args>
+>  
+> -TC_SNK_CC_BV_06_C	INC
+> +TC_SNK_CC_BV_06_C	PASS	haltest:
+> +				hl register_application bluez-android Bluez
+> +				bluez-hdp health-device-profile 2
+> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE
+> +				pulse-oximeter
+> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING
+> +				pulse-oximeter
+>  TC_SNK_CC_BV_08_C	PASS    haltest:
+>  				hl register_application bluez-android Bluez
+>  				bluez-hdp health-device-profile 2
+> @@ -180,8 +190,18 @@ TC_SNK_CC_BV_08_C	PASS    haltest:
+>  				hl connect_channel <app_id> <bd_addr>
+>  				<mdep_cfg_index>
+>  
+> -TC_SNK_CC_BV_10_C	INC
+> -TC_SNK_CC_BI_11_C	INC
+> +TC_SNK_CC_BV_10_C	PASS	haltest:
+> +				hl register_application bluez-android Bluez
+> +				bluez-hdp health-device-profile 2
+> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_RELIABLE
+> +				pulse-oximeter
+> +				BTHL_MDEP_ROLE_SINK 4100 BTHL_CHANNEL_TYPE_STREAMING
+> +				pulse-oximeter
+> +TC_SNK_CC_BI_11_C	PASS	haltest:
+> +				hl register_application bluez-android Bluez
+> +				bluez-hdp health-device-profile 1
+> +				BTHL_MDEP_ROLE_SINK 4100
+> +				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+>  TC_SNK_HCT_BV_01_I	PASS    haltest:
+>  				hl register_application bluez-android Bluez
+>  				bluez-hdp health-device-profile 1
+> -- 
+> 1.8.3.2
+> 
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
