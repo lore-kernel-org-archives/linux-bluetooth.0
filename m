@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 07/12] android/hog: Remove unused code
-Date: Mon, 30 Jun 2014 17:17:36 +0300
-Message-Id: <1404137861-9313-7-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 06/12] android/hog: Fix not detaching on free
+Date: Mon, 30 Jun 2014 17:17:35 +0300
+Message-Id: <1404137861-9313-6-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
 References: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,31 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-report_free is only called once after detaching so this code is no longer
-necessary.
 ---
- android/hog.c | 4 ----
- 1 file changed, 4 deletions(-)
+ android/hog.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/android/hog.c b/android/hog.c
-index 5a758f3..319cb2a 100644
+index 2cce4e9..5a758f3 100644
 --- a/android/hog.c
 +++ b/android/hog.c
-@@ -699,10 +699,6 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
- static void report_free(void *data)
+@@ -712,6 +712,8 @@ static void hog_free(void *data)
  {
- 	struct report *report = data;
--	struct bt_hog *hog = report->hog;
--
--	if (hog->attrib)
--		g_attrib_unregister(hog->attrib, report->notifyid);
+ 	struct bt_hog *hog = data;
  
- 	g_free(report->decl);
- 	g_free(report);
++	bt_hog_detach(hog);
++
+ 	g_slist_free_full(hog->instances, hog_free);
+ 
+ 	bt_scpp_unref(hog->scpp);
+@@ -719,7 +721,6 @@ static void hog_free(void *data)
+ 	bt_bas_unref(hog->bas);
+ 	bt_uhid_unref(hog->uhid);
+ 	g_slist_free_full(hog->reports, report_free);
+-	g_attrib_unref(hog->attrib);
+ 	g_free(hog->name);
+ 	g_free(hog->primary);
+ 	g_free(hog);
 -- 
 1.9.3
 
