@@ -1,68 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Expose default connection latency setting via debugfs
-Date: Mon, 30 Jun 2014 12:16:09 +0200
-Message-Id: <1404123370-56018-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/3] Bluetooth: Provide defaults for LE connection latency and timeout
+Date: Mon, 30 Jun 2014 12:16:08 +0200
+Message-Id: <1404123370-56018-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The controller has a default value for the connection latency. Expose
-this via debugfs for testing purposes.
+Store the connection latency and supervision timeout default values
+with all the other controller defaults. And when needed use them
+for new connections.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ include/net/bluetooth/hci_core.h | 2 ++
+ net/bluetooth/hci_conn.c         | 4 ++--
+ net/bluetooth/hci_core.c         | 6 ++++--
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 182044824495..ed842c7e5cf1 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -203,6 +203,8 @@ struct hci_dev {
+ 	__u16		le_scan_window;
+ 	__u16		le_conn_min_interval;
+ 	__u16		le_conn_max_interval;
++	__u16		le_conn_latency;
++	__u16		le_supv_timeout;
+ 	__u16		discov_interleaved_timeout;
+ 	__u16		conn_info_min_age;
+ 	__u16		conn_info_max_age;
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index e7ee7267f846..d00aaf976efc 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -773,8 +773,8 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	} else {
+ 		conn->le_conn_min_interval = hdev->le_conn_min_interval;
+ 		conn->le_conn_max_interval = hdev->le_conn_max_interval;
+-		conn->le_conn_latency = 0x0000;
+-		conn->le_supv_timeout = 0x002a;
++		conn->le_conn_latency = hdev->le_conn_latency;
++		conn->le_supv_timeout = hdev->le_supv_timeout;
+ 	}
+ 
+ 	/* If controller is scanning, we stop it since some controllers are
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 94551c33c4c6..79d292cfb867 100644
+index 8d972023196b..94551c33c4c6 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -851,6 +851,34 @@ static int conn_max_interval_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
- 			conn_max_interval_set, "%llu\n");
+@@ -3439,8 +3439,8 @@ int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ update:
+ 	params->conn_min_interval = conn_min_interval;
+ 	params->conn_max_interval = conn_max_interval;
+-	params->conn_latency = 0x0000;
+-	params->supervision_timeout = 0x002a;
++	params->conn_latency = hdev->le_conn_latency;
++	params->supervision_timeout = hdev->le_supv_timeout;
+ 	params->auto_connect = auto_connect;
  
-+static int conn_latency_set(void *data, u64 val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	if (val > 0x01f3)
-+		return -EINVAL;
-+
-+	hci_dev_lock(hdev);
-+	hdev->le_conn_latency = val;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int conn_latency_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	hci_dev_lock(hdev);
-+	*val = hdev->le_conn_latency;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(conn_latency_fops, conn_latency_get,
-+			conn_latency_set, "%llu\n");
-+
- static int adv_channel_map_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-@@ -1708,6 +1736,8 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &conn_min_interval_fops);
- 		debugfs_create_file("conn_max_interval", 0644, hdev->debugfs,
- 				    hdev, &conn_max_interval_fops);
-+		debugfs_create_file("conn_latency", 0644, hdev->debugfs,
-+				    hdev, &conn_latency_fops);
- 		debugfs_create_file("adv_channel_map", 0644, hdev->debugfs,
- 				    hdev, &adv_channel_map_fops);
- 		debugfs_create_file("device_list", 0444, hdev->debugfs, hdev,
+ 	switch (auto_connect) {
+@@ -3706,6 +3706,8 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->le_scan_window = 0x0030;
+ 	hdev->le_conn_min_interval = 0x0028;
+ 	hdev->le_conn_max_interval = 0x0038;
++	hdev->le_conn_latency = 0x0000;
++	hdev->le_supv_timeout = 0x002a;
+ 
+ 	hdev->rpa_timeout = HCI_DEFAULT_RPA_TIMEOUT;
+ 	hdev->discov_interleaved_timeout = DISCOV_INTERLEAVED_TIMEOUT;
 -- 
 1.9.3
 
