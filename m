@@ -1,50 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Artem Rakhov <arakhov@chromium.org>
-To: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org
-Cc: Artem Rakhov <arakhov@chromium.org>
-Subject: [PATCH] sdp: Fix requests with invalid size
-Date: Mon, 30 Jun 2014 12:58:46 -0700
-Message-Id: <1404158326-12178-1-git-send-email-arakhov@chromium.org>
-In-Reply-To: <1403929003-31639-1-git-send-email-arakhov@chromium.org>
-References: <1403929003-31639-1-git-send-email-arakhov@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 1/1] Bluetooth: constify seq_operations
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404149183-7059-1-git-send-email-fabf@skynet.be>
+Date: Mon, 30 Jun 2014 19:45:11 +0200
+Cc: linux-kernel@vger.kernel.org,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <AD5E0363-1B57-42E9-B82A-F50B765FCC26@holtmann.org>
+References: <1404149183-7059-1-git-send-email-fabf@skynet.be>
+To: Fabian Frederick <fabf@skynet.be>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch fixes processing of SDP requests which have wrong PDU size in header.
+Hi Fabian,
 
-Every SDP request consists of two parts: header and data.
-Header always contains 3 values: request code (identifies it's type),
-transaction ID (in order to match response with request), and data's size.
+> bt_seq_ops is only used with __seq_open_private as
+> const struct seq_operations *
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: linux-bluetooth@vger.kernel.org
+> Signed-off-by: Fabian Frederick <fabf@skynet.be>
+> ---
+> net/bluetooth/af_bluetooth.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-According to Bluetooth specification, when the data's size is wrong,
-SDP server should return SDP_ErrorResponse with "Invalid PDU Size" parameter.
-But now the server doesn't respond at all, and corresponding socket on
-client's side crashes.
+patch has been applied to bluetooth-next tree.
 
-The patch actually reverts commit 388761cdc8f8a1293bb0b1a5bd576b5fb41616ca,
-because the size of request should be checked inside handle_request() function
-in order to be able to respond with SDP_ErrorResponse, instead of stopping
-the connection.
----
- src/sdpd-server.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+Regards
 
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index b411abe..015551d 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -176,7 +176,11 @@ static gboolean io_session_event(GIOChannel *chan, GIOCondition cond, gpointer d
- 		return TRUE;
- 
- 	len = recv(sk, buf, size, 0);
--	if (len != size) {
-+	/* Check here only that the received message is not empty.
-+	 * Incorrect length of message should be processed later
-+	 * inside handle_request() in order to produce ErrorResponse.
-+	 */
-+	if (len <= 0) {
- 		sdp_svcdb_collect_all(sk);
- 		free(buf);
- 		return FALSE;
--- 
-2.0.0.526.g5318336
+Marcel
+
