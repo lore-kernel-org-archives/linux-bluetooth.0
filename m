@@ -1,77 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <86D12A3EE8C39046AB3F026D471074661D244170@POCITMSEXMB02.LntUniverse.com>
+References: <86D12A3EE8C39046AB3F026D471074661D244170@POCITMSEXMB02.LntUniverse.com>
+Date: Mon, 30 Jun 2014 17:11:50 +0300
+Message-ID: <CABBYNZLpSJ86b9O1w=XqZDJBwZ6zxz1qA_b2-XC_G20XiDX+Gw@mail.gmail.com>
+Subject: Re: Query on BLE profile contribution
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 01/12] android/hog: Add bt_hog_send
-Date: Mon, 30 Jun 2014 17:17:30 +0300
-Message-Id: <1404137861-9313-1-git-send-email-luiz.dentz@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+To: Amith Raghunath <Amith.Raghunath@lnttechservices.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	"marcel@holtmann.org" <marcel@holtmann.org>, Wins Thomas <Wins.Thomas@lnttechservices.com>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi,
 
-This function can be used to send data using Output Report if one is
-available.
----
-v2: Fix patch 02/12 to check if a hog instance exists.
+On Mon, Jun 30, 2014 at 12:26 PM, Amith Raghunath
+<Amith.Raghunath@lnttechservices.com> wrote:
+> Hi Marcel/John,
+>     We are planning to contribute a BLE Findme profile for the "Locator Role" to the Bluez Stack.
+>     It is around 300 lines of code (excluding comments & blank lines).
+>     We request your kind self to let us know the following:
+>            a)  Approximate time that it would take for this code to get reviewed.
+>            b)  The procedure to add this file to the Bluez GIT
 
- android/hog.c | 37 +++++++++++++++++++++++++++++++++++++
- android/hog.h |  1 +
- 2 files changed, 38 insertions(+)
+The guidelines are about the same for kernel and userspace, so you are
+suppose to provide a with proper git patches (git format-patch + git
+send-email). Regarding the profile itself I would probably hold on to
+use the new infrastructure from bt_gatt or do as we did with BAS, DIS
+and HoG in android where we use GAttrib only internally.
 
-diff --git a/android/hog.c b/android/hog.c
-index 7e61790..5d33c63 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -1009,3 +1009,40 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
- 
- 	return 0;
- }
-+
-+int bt_hog_send(struct bt_hog *hog, void *data, size_t size)
-+{
-+	struct report *report;
-+	GSList *l;
-+
-+	if (!hog)
-+		return -EINVAL;
-+
-+	if (!hog->attrib)
-+		return -ENOTCONN;
-+
-+	l = g_slist_find_custom(hog->reports,
-+				GUINT_TO_POINTER(HOG_REPORT_TYPE_OUTPUT),
-+				report_type_cmp);
-+	if (!l)
-+		return -ENOTSUP;
-+
-+	report = l->data;
-+
-+	DBG("Sending data to handle 0x%X", report->decl->value_handle);
-+
-+	if (report->decl->properties & GATT_CHR_PROP_WRITE)
-+		gatt_write_char(hog->attrib, report->decl->value_handle,
-+				data, size, output_written_cb, hog);
-+	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
-+		gatt_write_cmd(hog->attrib, report->decl->value_handle,
-+						data, size, NULL, NULL);
-+
-+	for (l = hog->instances; l; l = l->next) {
-+		struct bt_hog *instance = l->data;
-+
-+		bt_hog_send(instance, data, size);
-+	}
-+
-+	return 0;
-+}
-diff --git a/android/hog.h b/android/hog.h
-index 7cf446b..4ebc83e 100644
---- a/android/hog.h
-+++ b/android/hog.h
-@@ -33,3 +33,4 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt);
- void bt_hog_detach(struct bt_hog *hog);
- 
- int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
-+int bt_hog_send(struct bt_hog *hog, void *data, size_t size);
+I would probably suggest creating LGPL helpers under src/shared/
+before the implementing any plugin, e.g.:
+
+- bt_<profile>_new(primary): Allocate the data structures
+- bt_<profile>_attach(instance, connection): On the first attach you
+are suppose to discover the handles and cache them, once the handle
+are cached then you can proceed with notification and read/write
+operations required by the profile.
+- bt_<profile>_detach(instance): Unref any connection reference and
+cleanup any notification etc.
+- bt_<profile>_set_notification(instance, callback, data): This is
+optional in case the profile does provide notifications.
+- bt_<profile>_unref: Detach and free the data structures
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
