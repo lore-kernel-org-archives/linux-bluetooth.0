@@ -1,46 +1,111 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add default connection parameters before pairing
-Date: Mon, 30 Jun 2014 11:50:36 +0200
-Message-Id: <1404121836-48355-1-git-send-email-marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 1/2] android/health: Add handling incoming connection
+Date: Mon, 30 Jun 2014 11:35:08 +0200
+Message-ID: <2253548.JBL4HLj2DM@uw000953>
+In-Reply-To: <1404116096-21971-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1404116096-21971-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When trying to pair a new Bluetooth Low Energy device, then make sure
-that the default connections parameters are in place before trying to
-establish the first connection to that device. With the connection
-parameters structure allocated, the slave preferred values can now
-easily be tracked and all future connections will use the correct
-values from that start decreasing connection establishment time.
+Hi Andrei,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/mgmt.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+On Monday 30 of June 2014 11:14:55 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> Add support for normal data channel creation. Also add search helper for
+> searching apps for suitable mdepid.
+> ---
+>  android/health.c | 56 +++++++++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 45 insertions(+), 11 deletions(-)
+> 
+> diff --git a/android/health.c b/android/health.c
+> index 709e621..83ae107 100644
+> --- a/android/health.c
+> +++ b/android/health.c
+> @@ -329,6 +329,38 @@ static struct health_channel *search_channel_by_id(uint16_t id)
+>  	return search.channel;
+>  }
+>  
+> +struct app_search {
+> +	uint8_t mdepid;
+> +	struct health_app *app;
+> +};
+> +
+> +static void app_search_mdep(void *data, void *user_data)
+> +{
+> +	struct health_app *app = data;
+> +	struct app_search *search = user_data;
+> +
+> +	if (search->app)
+> +		return;
+> +
+> +	if (queue_find(app->mdeps, match_mdep_by_id,
+> +						INT_TO_PTR(search->mdepid)))
+> +		search->app = app;
+> +}
+> +
+> +static struct health_app *search_app_by_mdepid(uint8_t mdepid)
+> +{
+> +	struct app_search search;
+> +
+> +	DBG("");
+> +
+> +	search.mdepid = mdepid;
+> +	search.app = NULL;
+> +
+> +	queue_foreach(apps, app_search_mdep, &search);
+> +
+> +	return search.app;
+> +}
+> +
+>  static int register_service_protocols(sdp_record_t *rec,
+>  					struct health_app *app)
+>  {
+> @@ -1281,22 +1313,24 @@ static struct health_channel *connect_channel(struct mcap_mcl *mcl,
+>  
+>  	mcap_mcl_get_addr(mcl, &addr);
+>  
+> -	/* TODO: Search app for mdepid */
+> -
+> -	if (mdepid == MDEP_ECHO) {
+> +	if (mdepid == MDEP_ECHO)
+>  		/* For echo service take last app */
+>  		app = queue_peek_tail(apps);
+> -		if (!app)
+> -			return NULL;
+> -
+> -		device = get_device(app, (uint8_t *) &addr);
+> -		if (!device)
+> -			return NULL;
+> +	else
+> +		app = search_app_by_mdepid(mdepid);
+>  
+> -		channel = create_channel(app, mdepid, device);
+> +	if (!app) {
+> +		DBG("No app found for mdepid %u", mdepid);
+> +		return NULL;
+>  	}
+>  
+> -	/* Device is created here */
+> +	device = get_device(app, (uint8_t *) &addr);
+> +	if (!device)
+> +		return NULL;
+> +
+> +	channel = create_channel(app, mdepid, device);
+> +
+> +	/* Channel is assigned here after creation */
+>  	mcl->cb->user_data = channel;
+>  
+>  	return channel;
+> 
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index d83197f9e727..ba3c049d729a 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -2947,6 +2947,17 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 		else
- 			addr_type = ADDR_LE_DEV_RANDOM;
- 
-+		/* When pairing a new device, it is expected to remember
-+		 * this device for future connections. Adding the connection
-+		 * parameter information ahead of time allows tracking
-+		 * of the slave preferred values and will speed up any
-+		 * further connection establishment.
-+		 */
-+		hci_conn_params_add(hdev, &cp->addr.bdaddr, addr_type,
-+				    HCI_AUTO_CONN_DISABLED,
-+				    hdev->le_conn_min_interval,
-+				    hdev->le_conn_max_interval);
-+
- 		conn = hci_connect_le(hdev, &cp->addr.bdaddr, addr_type,
- 				      sec_level, auth_type);
- 	}
+Patch 1/2 applied, thanks.
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
