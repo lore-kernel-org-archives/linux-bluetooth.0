@@ -1,36 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Start background scanning only when controller is ready
-Date: Mon, 30 Jun 2014 16:04:12 +0200
-Message-Id: <1404137052-15424-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH BlueZ 07/12] android/hog: Remove unused code
+Date: Mon, 30 Jun 2014 16:47:54 +0300
+Message-Id: <1404136079-24846-7-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1404136079-24846-1-git-send-email-luiz.dentz@gmail.com>
+References: <1404136079-24846-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When the controller is not active or in init/setup phase, do not
-try to start or stop background scanning.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+report_free is only called once after detaching so this code is no longer
+necessary.
 ---
- net/bluetooth/hci_core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/hog.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index adea7de95633..2312e77582b0 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5317,7 +5317,10 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 	struct hci_conn *conn;
- 	int err;
+diff --git a/android/hog.c b/android/hog.c
+index 5a758f3..319cb2a 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -699,10 +699,6 @@ static void char_discovered_cb(uint8_t status, GSList *chars, void *user_data)
+ static void report_free(void *data)
+ {
+ 	struct report *report = data;
+-	struct bt_hog *hog = report->hog;
+-
+-	if (hog->attrib)
+-		g_attrib_unregister(hog->attrib, report->notifyid);
  
--	if (test_bit(HCI_UNREGISTER, &hdev->dev_flags))
-+	if (!test_bit(HCI_UP, &hdev->flags) ||
-+	    test_bit(HCI_INIT, &hdev->flags) ||
-+	    test_bit(HCI_SETUP, &hdev->dev_flags) ||
-+	    test_bit(HCI_UNREGISTER, &hdev->dev_flags))
- 		return;
- 
- 	hci_req_init(&req, hdev);
+ 	g_free(report->decl);
+ 	g_free(report);
 -- 
 1.9.3
 
