@@ -1,36 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <90AEC8D9-5894-4083-AD82-F8D9A8DC1000@holtmann.org>
-References: <1403896589-6135-1-git-send-email-scott@netsplit.com>
-	<90AEC8D9-5894-4083-AD82-F8D9A8DC1000@holtmann.org>
-Date: Mon, 30 Jun 2014 13:16:34 -0700
-Message-ID: <CA+bD78jRm4_Xd3UhhAwnA7jA1H3o2khKcqr3ZtRYmbMcTW4HdA@mail.gmail.com>
-Subject: Re: [PATCH] [RFC] doc: Add StartDiscoveryWithOptions
-From: Scott James Remnant <scott@netsplit.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@gmail.com>
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH_v2 0/5] Implement disconenct and reconnect
+Date: Mon, 30 Jun 2014 21:59:56 +0200
+Message-ID: <2908792.A2SPhYzojf@athlon>
+In-Reply-To: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+References: <1404147508-22756-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Fri, Jun 27, 2014 at 1:15 PM, Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
+Hi Ravi,
 
->
-> The reason why I like to keep discovery separate from searching for a kno=
-wn device, these are separate operations. There is subtle difference betwee=
-n advertising non-discoverable and advertising discoverable. While many dev=
-ices always advertise discoverable, they do not need it. And StartDiscovery=
- will not report non-discoverable devices back. However a FindDevice of cou=
-rse can look for a specific device matching its search pattern even if it i=
-s not discoverable.
->
+On Monday 30 June 2014 19:58:23 Ravi kumar Veeramally wrote:
+> v2: Fixed Szymon's comment.
+> 
+> v1: Patchset supports incoming MCL and MDL disconnection and
+> reconnection.
+> 
+> Ravi kumar Veeramally (5):
+>   android/health: Implement mcl_disconnected cb
+>   android/health: Implement mcl_uncached callback
+>   android/health: Fix do not set mdl callbacks on mcl_reconneced call
+>     back
+>   android/health: Implement MDL reconnection from remote device
+>   android/health: Update PTS result
+> 
+>  android/health.c    | 127
+> +++++++++++++++++++++++++++++++++++++++++++++++----- android/pts-hdp.txt | 
+> 24 ++++++++--
+>  2 files changed, 136 insertions(+), 15 deletions(-)
 
-Thinking about this a bit more, does StartDiscovery return devices
-advertising with non-connectable undirected advertising? If the goal
-of that method is for the UI then does it make sense for it to be
-returning devices we can't connect to as well?
+All patches applied, thanks.
 
-Scott
---=20
-Have you ever, ever felt like this?
-Had strange things happen?  Are you going round the twist?
+-- 
+Szymon K. Janc
+szymon.janc@gmail.com
