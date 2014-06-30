@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] android/health: Add channel_notify for incoming connections
-Date: Mon, 30 Jun 2014 14:48:23 +0300
-Message-Id: <1404128905-27695-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/4] android/client: Fix using unvalidated index to access array
+Date: Mon, 30 Jun 2014 14:48:24 +0300
+Message-Id: <1404128905-27695-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404128905-27695-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404128905-27695-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,57 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-For other then ECHO mdep send send_channel_state_notify with fd.
+Fixes static analyzers warnings.
 ---
- android/health.c | 21 ++++++++++++++++-----
- 1 file changed, 16 insertions(+), 5 deletions(-)
+ android/client/if-hl.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/android/health.c b/android/health.c
-index 2b8562f..e088ec7 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1136,25 +1136,36 @@ static gboolean serve_echo(GIOChannel *io, GIOCondition cond, gpointer data)
- static void mcap_mdl_connected_cb(struct mcap_mdl *mdl, void *data)
- {
- 	struct health_channel *channel = data;
-+	int fd;
+diff --git a/android/client/if-hl.c b/android/client/if-hl.c
+index 949c574..7b75575 100644
+--- a/android/client/if-hl.c
++++ b/android/client/if-hl.c
+@@ -295,7 +295,16 @@ static void close_channel_p(int argc, const char **argv)
+ 	}
  
- 	if (!channel->mdl)
- 		channel->mdl = mcap_mdl_ref(mdl);
- 
- 	DBG("Data channel connected: mdl %p channel %p", mdl, channel);
- 
-+	fd = mcap_mdl_get_fd(channel->mdl);
-+	if (fd < 0) {
-+		error("health: error retrieving fd");
-+		goto fail;
+ 	app_id = (uint32_t) atoi(argv[2]);
++	if (app_id >= APP_ID_SIZE) {
++		haltest_error("Wrong app_id specidied: %u\n", app_id);
++		return;
 +	}
 +
- 	if (channel->mdep_id == MDEP_ECHO) {
- 		GIOChannel *io;
--		int fd;
--
--		fd = mcap_mdl_get_fd(channel->mdl);
--		if (fd < 0)
--			return;
- 
- 		io = g_io_channel_unix_new(fd);
- 		g_io_add_watch(io, G_IO_ERR | G_IO_HUP | G_IO_NVAL | G_IO_IN,
- 							serve_echo, channel);
- 		g_io_channel_unref(io);
-+
+ 	mdep_cfg_index = (uint8_t) atoi(argv[3]);
++	if (mdep_cfg_index >= MDEP_CFG_SIZE) {
++		haltest_error("Wrong mdep cgf index: %u\n", mdep_cfg_index);
 +		return;
- 	}
-+
-+	send_channel_state_notify(channel, HAL_HEALTH_CHANNEL_CONNECTED, fd);
-+
-+	return;
-+fail:
-+	/* TODO: mcap_mdl_abort */
-+	destroy_channel(channel);
- }
++	}
  
- static void mcap_mdl_closed_cb(struct mcap_mdl *mdl, void *data)
+ 	if (app_info[app_id][mdep_cfg_index][2] >= 0) {
+ 		shutdown(app_info[app_id][mdep_cfg_index][2], SHUT_RDWR);
 -- 
 1.8.3.2
 
