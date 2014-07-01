@@ -1,43 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Drop LE connections for blocked devices
-Date: Tue,  1 Jul 2014 22:54:15 +0300
-Message-Id: <1404244455-15651-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1404244455-15651-1-git-send-email-johan.hedberg@gmail.com>
-References: <1404244455-15651-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Centralize looking up blocked devices to l2cap_recv_frame
+Date: Tue,  1 Jul 2014 22:54:14 +0300
+Message-Id: <1404244455-15651-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Unlike BR/EDR we cannot reject LE connections of blocked devices but
-have to do it as soon as we get a LE Connection Complete event. The
-patch adds a blacklist check to the hci_le_conn_complete_evt function
-and drops all connections for blocked devices.
+The ATT channel isn't the only one that we should ensure doesn't receive
+data from blocked devices. SMP is another, and in general we don't want
+data packets going to any of the various handlers. Therefore, add a
+single check to the l2cap_recv_frame function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ net/bluetooth/l2cap_core.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b0b760dd66a3..173043ebb1bb 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4119,6 +4119,12 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->dst_type = irk->addr_type;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index e203a5fdf874..904f0d0f6a47 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6874,9 +6874,6 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
+ 
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+ 
+-	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst, hcon->dst_type))
+-		goto drop;
+-
+ 	if (chan->imtu < skb->len)
+ 		goto drop;
+ 
+@@ -6909,6 +6906,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		return;
  	}
  
-+	/* Drop the connection if he device is blocked */
-+	if (hci_blacklist_lookup(hdev, &conn->dst, conn->dst_type)) {
-+		hci_conn_drop(conn);
-+		goto unlock;
++	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst, hcon->dst_type)) {
++		kfree_skb(skb);
++		return;
 +	}
 +
- 	if (ev->status) {
- 		hci_le_conn_failed(conn, ev->status);
- 		goto unlock;
+ 	BT_DBG("len %d, cid 0x%4.4x", len, cid);
+ 
+ 	switch (cid) {
 -- 
 1.9.3
 
