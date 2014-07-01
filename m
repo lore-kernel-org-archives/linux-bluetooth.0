@@ -1,46 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] android/pts: Update HOGP tests result
-Date: Tue,  1 Jul 2014 15:44:20 +0200
-Message-Id: <1404222260-3936-3-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 2/3] android/pts: Update PIXIT for HOGP
+Date: Tue,  1 Jul 2014 15:44:19 +0200
+Message-Id: <1404222260-3936-2-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1404222260-3936-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1404222260-3936-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Test results for write report characteristic update.
+This changes write report data.
 ---
- android/pts-hogp.txt | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ android/pixit-hogp.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/pts-hogp.txt b/android/pts-hogp.txt
-index 39b954c..6bb21c7 100644
---- a/android/pts-hogp.txt
-+++ b/android/pts-hogp.txt
-@@ -54,10 +54,18 @@ TC_HGRF_BH_BV_15_I	N/A
- TC_HGRF_BH_BV_16_I	N/A
- TC_HGRF_BH_BV_17_I	N/A
- TC_HGRF_HH_BV_18_I	N/A
--TC_HGWF_RH_BV_01_I	INC
--TC_HGWF_RH_BV_02_I	INC
--TC_HGWF_RH_BV_03_I	INC
--TC_HGWF_RH_BV_04_I	INC
-+TC_HGWF_RH_BV_01_I	PASS	haltest: hidhost connect <addr>
-+				hidhost send_data AB2301
-+				hidhost disconnect <addr>
-+TC_HGWF_RH_BV_02_I	PASS	haltest: hidhost connect <addr>
-+				hidhost send_data CD6745
-+				hidhost disconnect <addr>
-+TC_HGWF_RH_BV_03_I	PASS	haltest: hidhost connect <addr>
-+				hidhost send_data CD6745
-+				hidhost disconnect <addr>
-+TC_HGWF_RH_BV_04_I	PASS	haltest: hidhost connect <addr>
-+				hidhost send_data EF0189
-+				hidhost disconnect <addr>
- TC_HGWF_RH_BV_05_I	N/A
- TC_HGWF_RH_BV_06_I	N/A
- TC_HGWF_RH_BV_07_I	N/A
+diff --git a/android/pixit-hogp.txt b/android/pixit-hogp.txt
+index 4fe1e0f..20ec723 100644
+--- a/android/pixit-hogp.txt
++++ b/android/pixit-hogp.txt
+@@ -21,8 +21,8 @@ TSPX_pin_code						0000
+ TSPX_use_dynamic_pin					FALSE
+ TSPX_delete_ltk						FALSE
+ TSPX_security_enabled					TRUE
+-TSPX_input_report_data					CDA6F8B3AA
+-TSPX_output_report_data					001234567890EF
+-TSPX_feature_report_data				872D3F45EA
++TSPX_input_report_data					0123ABA2 (*)
++TSPX_output_report_data					4567CDA2 (*)
++TSPX_feature_report_data				8901EFA2 (*)
+ TSPX_tester_appearance					03C0
+ -------------------------------------------------------------------------------
 -- 
 1.9.3
 
