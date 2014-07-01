@@ -1,66 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 2/4] Bluetooth: Move LE event mask setting into init3 phase
-Date: Tue,  1 Jul 2014 18:10:09 -0300
-Message-Id: <1404249011-23645-2-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v3 3/4] Bluetooth: Enable new LE meta event
+Date: Tue,  1 Jul 2014 18:10:10 -0300
+Message-Id: <1404249011-23645-3-git-send-email-andre.guedes@openbossa.org>
 In-Reply-To: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
 References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-During init2 phase, the LE local features have not be read yet so
-we aren't able to rely on hdev->le_features to determine if the
-controller supports the Connection Parameters Request Procedure.
-
-For that reason, this patch moves LE event mask setting from init2
-into init3 initialization phase.
-
-The hdev->le_features mask will be checked by the next patch in order
-to know if "LE Remote Connection Parameter Request Event" should be
-enabled.
+The Bluetooth 4.1 introduces a new LE meta event called "LE Remote
+Connection Parameter Request" event. In order to the controller
+sends this event to host, we should enable it during controller
+initialization.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- net/bluetooth/hci_core.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ include/net/bluetooth/hci.h | 3 +++
+ net/bluetooth/hci_core.c    | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 95b7547..66358af 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -307,6 +307,9 @@ enum {
+ #define LMP_HOST_LE_BREDR	0x04
+ #define LMP_HOST_SC		0x08
+ 
++/* LE features */
++#define HCI_LE_CONN_PARAM_REQ_PROC	0x02
++
+ /* Connection modes */
+ #define HCI_CM_ACTIVE	0x0000
+ #define HCI_CM_HOLD	0x0001
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 72eb414..5788e03 100644
+index 5788e03..8a54ca2 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1437,13 +1437,6 @@ static void hci_setup_event_mask(struct hci_request *req)
- 		events[7] |= 0x20;	/* LE Meta-Event */
+@@ -1611,6 +1611,13 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
  
- 	hci_req_add(req, HCI_OP_SET_EVENT_MASK, sizeof(events), events);
--
--	if (lmp_le_capable(hdev)) {
--		memset(events, 0, sizeof(events));
--		events[0] = 0x1f;
--		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK,
--			    sizeof(events), events);
--	}
- }
- 
- static void hci_init2_req(struct hci_request *req, unsigned long opt)
-@@ -1613,8 +1606,16 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
- 	if (hdev->commands[5] & 0x10)
- 		hci_setup_link_policy(req);
- 
--	if (lmp_le_capable(hdev))
-+	if (lmp_le_capable(hdev)) {
-+		u8 events[8];
+ 		memset(events, 0, sizeof(events));
+ 		events[0] = 0x1f;
 +
-+		memset(events, 0, sizeof(events));
-+		events[0] = 0x1f;
-+		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
-+			    events);
++		/* If controller supports the Connection Parameters Request
++		 * Link Layer Procedure, enable the corresponding event.
++		 */
++		if (hdev->le_features[0] & HCI_LE_CONN_PARAM_REQ_PROC)
++			events[0] = events[0] | 0x20;
 +
- 		hci_set_le_support(req);
-+	}
+ 		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
+ 			    events);
  
- 	/* Read features beyond page 1 if available */
- 	for (p = 2; p < HCI_MAX_PAGES && p <= hdev->max_page; p++) {
 -- 
 1.9.1
 
