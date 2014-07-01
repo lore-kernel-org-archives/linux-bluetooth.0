@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] android/gatt: Fix duplicate const
-Date: Tue,  1 Jul 2014 15:50:43 +0300
-Message-Id: <1404219043-4216-5-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ] README: Add HACKING section
+Date: Tue,  1 Jul 2014 15:50:40 +0300
+Message-Id: <1404219043-4216-2-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1404219043-4216-1-git-send-email-luiz.dentz@gmail.com>
 References: <1404219043-4216-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,22 +12,29 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ README | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 677a337..95de221 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -82,7 +82,7 @@ typedef enum {
- 	DEVICE_CONNECTED,		/* connection has been established */
- } gatt_device_state_t;
+diff --git a/README b/README
+index c991ab0..fd32464 100644
+--- a/README
++++ b/README
+@@ -125,3 +125,15 @@ Mailing lists:
  
--static const char const *device_state_str[] = {
-+static const char *device_state_str[] = {
- 	"DISCONNECTED",
- 	"CONNECT INIT",
- 	"CONNECT READY",
+ For additional information about the project visit BlueZ web site:
+ 	http://www.bluez.org
++
++Hacking
++=======
++
++It is recommended to use bootstrap-configure over configure when hacking, in
++addition to that it is also recommended to use Sparse if possible e.g:
++	./boostrap-configure CC=cgcc
++
++Valgrind shall always be used when testing changes:
++	G_SLICE=always-malloc G_DEBUG=gc-friendly,resident-module valgrind
++	--trace-children=yes --track-origins=yes --show-possibly-lost=no
++	--leak-check=full ./bluetoothd
 -- 
 1.9.3
 
