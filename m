@@ -1,31 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: LE mouse reconnect problem
+Subject: Re: [RFC] doc: Add EIR to device properties
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAHZ1yCnSMQqhJ_x-=5VPibThBBU12M_LvkmCpCWR1b5np0V8Hw@mail.gmail.com>
-Date: Tue, 1 Jul 2014 18:01:26 +0200
-Cc: Johan Hedberg <johan.hedberg@gmail.com>,
-	Ryan Press <ryan@presslab.us>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Message-Id: <C43AD631-D51D-46A9-98BB-99D94774CC89@holtmann.org>
-References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com> <CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com> <CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com> <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com> <CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com> <CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com> <CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com> <CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com> <CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com> <20140629051442.GA31085@t440s.P-661HNU-F1> <20140629052949.GA32130@t440s> <E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org> <CAHZ1yCniScfX+Cvoyv0B3GaYWL41qPJD4V+Le+3HENYS5kUdYw@mail.gmail.com> <60346ECF-9A0B-4D3B-BDD6-A617797550D9@holtmann.org> <CAHZ1yCnSMQqhJ_x-=5VPibThBBU12M_LvkmCpCWR1b5np0V8Hw@mail.gmail.com>
-To: Scott James Remnant <keybuk@google.com>
+In-Reply-To: <E324D0BB-4042-4E4F-8F14-16B09C34B259@holtmann.org>
+Date: Tue, 1 Jul 2014 17:58:25 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <724A0273-FB02-49DF-B286-4C3440C049F7@holtmann.org>
+References: <1403897492-6233-1-git-send-email-scott@netsplit.com> <B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org> <CA+bD78j4bSfqvn7MHnsV7PKp_dGXN4dLApW2G5p4oN-Tsu+h1Q@mail.gmail.com> <F49C47A1-077C-41E2-A36B-3DE9EF1A9E19@holtmann.org> <CA+bD78j4RfvZdMoKLcfDdtsy1g_bgZ-vnbAOY80W_JcZDNuEyA@mail.gmail.com> <E324D0BB-4042-4E4F-8F14-16B09C34B259@holtmann.org>
+To: Scott James Remnant <scott@netsplit.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Scott,
 
->> the same applies to the HP mouse btw.
+>>>>>> This patch proposes an extension to the D-Bus Device API to allow
+>>>>>> an application access to the last EIR data received from a device
+>>>>>> in inquiry or advertising mode.
+>>>>>> 
+>>> 
+>>> I think this looks pretty along the lines what I am looking for. However I was thinking in a bit more detail likes this:
+>>> 
+>>>       <- Search method call
+>>>       -> New Device object / Updated device object
+>>>       -> New Device object / Updated device object
+>>>       -> Search method return -> array of objects with properties
+>>> 
+>>> So you can treat the search dead simple and just display the results. However that way you can not monitor progress. If you want to monitor progress while search is running, you need to monitor changes to the device objects.
+>>> 
 >> 
+>> Sounds reasonable, would make it very easy from an application point of view.
+>> 
+>> This would place the EIR/AD/SR data in the device objects as a property then?
 > 
-> Which HP Mouse are you referring to?
-> 
-> An HP Mouse I have uses general connectable advertising when it wants
-> to reconnect.
+> we could do that, but I would like to discuss this a bit more. For example we might not duplicate the information that we have properties for. For example device name or appearance.
 
-might want to check HCI Remote Version Information (via hcitool cmd) for that device. So what we found out today is that the Nordic based HID devices only do direct advertising. However my CSR based one does direct advertising first and if it times out, it falls back to undirected advertising.
+coming to think about it, we might should just focus on the manufacturer specific field and make sure that gets exposed over D-Bus. The other ones are Bluetooth SIG defined and we can define good properties for it.
+
+We could add a property with array{uint16,array{byte}} that allows us to provide all the manufacturer information we find. On BR/EDR they are pretty static and would just stay around. On LE they would be removed (same as RSSI) once the result becomes invalid. For dual-mode devices found on both transports we just combine them.
 
 Regards
 
