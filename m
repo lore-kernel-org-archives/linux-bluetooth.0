@@ -1,38 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Allow L2CAP getpeername() for BT_CONFIG state
-Date: Tue,  1 Jul 2014 12:07:23 +0300
-Message-Id: <1404205643-31443-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Use bool for smp_ltk_encrypt return value
+Date: Tue,  1 Jul 2014 10:59:24 +0200
+Message-Id: <1404205164-46988-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+The return value of smp_ltk_encrypt is simple boolean, so just use
+bool and make the code a bit more readable.
 
-We have all the necessary remote information for getpeername() when we
-are in the BT_CONFIG state so this should be allowed. This is
-particularly important for LE sockets where changing the security level
-will temporarily move the socket into BT_CONFIG state.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_sock.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index bf72886de6ef..9bb4d1b3a483 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -361,7 +361,8 @@ static int l2cap_sock_getname(struct socket *sock, struct sockaddr *addr,
- 	BT_DBG("sock %p, sk %p", sock, sk);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 414c5151aa46..35f57090ddd0 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -837,7 +837,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	return smp_random(smp);
+ }
  
- 	if (peer && sk->sk_state != BT_CONNECTED &&
--	    sk->sk_state != BT_CONNECT && sk->sk_state != BT_CONNECT2)
-+	    sk->sk_state != BT_CONNECT && sk->sk_state != BT_CONNECT2 &&
-+	    sk->sk_state != BT_CONFIG)
- 		return -ENOTCONN;
+-static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
++static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
+ {
+ 	struct smp_ltk *key;
+ 	struct hci_conn *hcon = conn->hcon;
+@@ -845,18 +845,18 @@ static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
+ 	key = hci_find_ltk_by_addr(hcon->hdev, &hcon->dst, hcon->dst_type,
+ 				   hcon->out);
+ 	if (!key)
+-		return 0;
++		return false;
  
- 	memset(la, 0, sizeof(struct sockaddr_l2));
+ 	if (sec_level > BT_SECURITY_MEDIUM && !key->authenticated)
+-		return 0;
++		return false;
+ 
+ 	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
+-		return 1;
++		return true;
+ 
+ 	hci_le_start_enc(hcon, key->ediv, key->rand, key->val);
+ 	hcon->enc_key_size = key->enc_size;
+ 
+-	return 1;
++	return true;
+ }
+ 
+ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
 -- 
 1.9.3
 
