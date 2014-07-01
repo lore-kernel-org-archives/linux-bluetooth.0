@@ -1,41 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC v3 4/4] Bluetooth: Introduce "New Connection Parameter" Event
+Subject: Re: [RFC v3 3/4] Bluetooth: Enable new LE meta event
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404249011-23645-4-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 1 Jul 2014 23:45:40 +0200
+In-Reply-To: <1404249011-23645-3-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 1 Jul 2014 23:37:26 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <831A7F81-23CA-403B-A17E-29C20676B2CE@holtmann.org>
-References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org> <1404249011-23645-4-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <DB3CDC5E-0EB4-49FA-85CC-8588676E01B8@holtmann.org>
+References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org> <1404249011-23645-3-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> This patch introduces a new Mgmt event called "New Connection Parameter".
-> This event indicates to userspace the connection parameters values the
-> remote device requested.
-> 
-> The user may store these values and load them into kernel. This way, next
-> time a connection is established to that device, the kernel will use those
-> parameters values instead of the default ones.
-> 
-> This event is sent when the remote device requests new connection
-> parameters through connection parameter update procedure. This event is
-> not sent for slave connections.
+> The Bluetooth 4.1 introduces a new LE meta event called "LE Remote
+> Connection Parameter Request" event. In order to the controller
+> sends this event to host, we should enable it during controller
+> initialization.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci_core.h |  3 +++
-> include/net/bluetooth/mgmt.h     | 10 ++++++++++
-> net/bluetooth/hci_event.c        |  4 ++++
-> net/bluetooth/l2cap_core.c       |  6 +++++-
-> net/bluetooth/mgmt.c             | 19 +++++++++++++++++++
-> 5 files changed, 41 insertions(+), 1 deletion(-)
+> include/net/bluetooth/hci.h | 3 +++
+> net/bluetooth/hci_core.c    | 7 +++++++
+> 2 files changed, 10 insertions(+)
 
 patch has been applied to bluetooth-next tree.
+
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index 95b7547..66358af 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -307,6 +307,9 @@ enum {
+> #define LMP_HOST_LE_BREDR	0x04
+> #define LMP_HOST_SC		0x08
+> 
+> +/* LE features */
+> +#define HCI_LE_CONN_PARAM_REQ_PROC	0x02
+> +
+> /* Connection modes */
+> #define HCI_CM_ACTIVE	0x0000
+> #define HCI_CM_HOLD	0x0001
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 5788e03..8a54ca2 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1611,6 +1611,13 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
+> 
+> 		memset(events, 0, sizeof(events));
+> 		events[0] = 0x1f;
+> +
+> +		/* If controller supports the Connection Parameters Request
+> +		 * Link Layer Procedure, enable the corresponding event.
+> +		 */
+> +		if (hdev->le_features[0] & HCI_LE_CONN_PARAM_REQ_PROC)
+> +			events[0] = events[0] | 0x20;
+> +
+
+However I fixed this to do this properly:
+
+			events[0] |= 0x20;
+
+We used this everywhere else. No idea why you had to make it so complicated ;)
 
 Regards
 
