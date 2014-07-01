@@ -1,46 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
-References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
-	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
-Date: Tue, 1 Jul 2014 15:18:13 +0100
-Message-ID: <CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add Realtek 8723/8761 support
-From: Daniel Drake <drake@endlessm.com>
-To: Marcel Holtmann <marcel@holtmann.org>, Larry.Finger@lwfinger.net
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] android/hog: Write all report characteristics for bt_hog_send
+Date: Tue,  1 Jul 2014 15:44:18 +0200
+Message-Id: <1404222260-3936-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 1, 2014 at 2:41 PM, Marcel Holtmann <marcel@holtmann.org> wrote:
->         .driver_info = BTUSB_RTK | BTUSB_RTL...
->
-> The think with RTL vs RTK is now confusing me even more. So what are the official model numbers from Realtek anyway. Maybe we should start using them now and not bother carrying around some legacy from the Ethernet or WiFi drivers.
+This allows to write all hog report characeteristics (input, output,
+feature). This is only test command designed for test purposes
+e.g. PTS Write Report Characteristics.
+---
+ android/hog.c | 39 +++++++++++++++++++++++++++------------
+ 1 file changed, 27 insertions(+), 12 deletions(-)
 
-The product codes are RTLxxxx so perhaps I will update it to use 'rtl'
-instead of 'rtk' everywhere. That 'rtk' just came from the vendor
-driver. Maybe Larry has some knowledge of the conventions here.
+diff --git a/android/hog.c b/android/hog.c
+index 319cb2a..019cd57 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -1039,31 +1039,26 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+ 	return 0;
+ }
+ 
+-int bt_hog_send(struct bt_hog *hog, void *data, size_t size)
++static int write_report(struct bt_hog *hog, void *data, size_t size,
++							int report_type)
+ {
+ 	struct report *report;
+ 	GSList *l;
+ 
+-	if (!hog)
+-		return -EINVAL;
+-
+-	if (!hog->attrib)
+-		return -ENOTCONN;
+-
+-	l = g_slist_find_custom(hog->reports,
+-				GUINT_TO_POINTER(HOG_REPORT_TYPE_OUTPUT),
+-				report_type_cmp);
++	l = g_slist_find_custom(hog->reports, GUINT_TO_POINTER(report_type),
++							report_type_cmp);
+ 	if (!l)
+ 		return -ENOTSUP;
+ 
+ 	report = l->data;
+ 
+-	DBG("Sending data to handle 0x%X", report->decl->value_handle);
++	DBG("hog: Write report, handle 0x%X", report->decl->value_handle);
+ 
+ 	if (report->decl->properties & GATT_CHR_PROP_WRITE)
+ 		gatt_write_char(hog->attrib, report->decl->value_handle,
+ 				data, size, output_written_cb, hog);
+-	else if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
++
++	if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+ 		gatt_write_cmd(hog->attrib, report->decl->value_handle,
+ 						data, size, NULL, NULL);
+ 
+@@ -1075,3 +1070,23 @@ int bt_hog_send(struct bt_hog *hog, void *data, size_t size)
+ 
+ 	return 0;
+ }
++
++int bt_hog_send(struct bt_hog *hog, void *data, size_t size)
++{
++	if (!hog)
++		return -EINVAL;
++
++	if (!hog->attrib)
++		return -ENOTCONN;
++
++	if (write_report(hog, data, size, HOG_REPORT_TYPE_OUTPUT) < 0)
++		error("hog: can't write output report: %s", strerror(ENOTSUP));
++
++	if (write_report(hog, data, size, HOG_REPORT_TYPE_INPUT) < 0)
++		error("hog: can't write input report: %s", strerror(ENOTSUP));
++
++	if (write_report(hog, data, size, HOG_REPORT_TYPE_FEATURE) < 0)
++		error("hog: can't write feature report: %s", strerror(ENOTSUP));
++
++	return 0;
++}
+-- 
+1.9.3
 
-> There is also no generic vendor command that we can run first to get the model information? Do we really need to use USB vendor and product ids to pick the right one. I personally hate using vendor and product ids.
-
-I'm no expert on this hardware, just happened to receive one instance,
-and then found the vendor driver on Larry's github. The vendor driver
-uses USB IDs for this purpose, and I don't have any extra insight (nor
-access to other devices).
-
-However, I just noticed that we only have 2 of the 7 main firmware
-files available. Larry, do you have all of the ones mentioned in the
-driver? e.g. ones like rtl8761aw8192eu_fw are missing from your repo.
-
-Googling around, it looks like these other devices are really not
-common, maybe we should just reduce it to RTL8723A and RTL8723B
-support, especially if we don't have firmware for the others. There is
-only 1 type of firmware for each variant there, the code would be
-simpler, no need for VID/PID lookup. That would be enough to make me
-happy, plus all the people filing issues on Larry's github.
-
-Only caveat there is that someone might push us to return to the
-RTL8761 mess (different firmware for different VID/PID) some day.
-
-Daniel
