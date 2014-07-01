@@ -1,66 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <724A0273-FB02-49DF-B286-4C3440C049F7@holtmann.org>
-References: <1403897492-6233-1-git-send-email-scott@netsplit.com>
-	<B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org>
-	<CA+bD78j4bSfqvn7MHnsV7PKp_dGXN4dLApW2G5p4oN-Tsu+h1Q@mail.gmail.com>
-	<F49C47A1-077C-41E2-A36B-3DE9EF1A9E19@holtmann.org>
-	<CA+bD78j4RfvZdMoKLcfDdtsy1g_bgZ-vnbAOY80W_JcZDNuEyA@mail.gmail.com>
-	<E324D0BB-4042-4E4F-8F14-16B09C34B259@holtmann.org>
-	<724A0273-FB02-49DF-B286-4C3440C049F7@holtmann.org>
-Date: Tue, 1 Jul 2014 09:09:15 -0700
-Message-ID: <CA+bD78g+AU4VKq5qPLGBGQM1+2ciqVmm77VvETw2XmBV_cM=sQ@mail.gmail.com>
-Subject: Re: [RFC] doc: Add EIR to device properties
-From: Scott James Remnant <scott@netsplit.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Allow re-encryption with LTK when STK is in use
+Date: Tue,  1 Jul 2014 19:02:09 +0300
+Message-Id: <1404230529-16137-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1404230529-16137-1-git-send-email-johan.hedberg@gmail.com>
+References: <1404230529-16137-1-git-send-email-johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 1, 2014 at 8:58 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+From: Johan Hedberg <johan.hedberg@intel.com>
 
->>> This would place the EIR/AD/SR data in the device objects as a property=
- then?
->>
->> we could do that, but I would like to discuss this a bit more. For examp=
-le we might not duplicate the information that we have properties for. For =
-example device name or appearance.
->
-> coming to think about it, we might should just focus on the manufacturer =
-specific field and make sure that gets exposed over D-Bus. The other ones a=
-re Bluetooth SIG defined and we can define good properties for it.
->
+If we're encrypted with the STK we should allow re-encryption with an
+LTK even though the acheived security level is the same. This patch adds
+the necessary logic to the smp_sufficient_security function which is
+used to determine whether to proceed with encryption or not.
 
-The main missing SIG defined fields which don't have properties would be:
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
- - TX Power (CSSv4 1.5)
- - URL (https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=
-=3D287247)
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index de29ad74e571..6407b22c1a00 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -868,6 +868,14 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level)
+ 	if (sec_level == BT_SECURITY_LOW)
+ 		return true;
+ 
++	/* If we're encrypted with an STK always claim insufficient
++	 * security. This way we allow the connection to be re-encrypted
++	 * with an LTK, even if the LTK provides the same level of
++	 * security.
++	 */
++	if (test_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags))
++		return false;
++
+ 	if (hcon->sec_level >= sec_level)
+ 		return true;
+ 
+-- 
+1.9.3
 
-All of the others are reasonably internal to BlueZ and not of interest
-to applications.
-
-> We could add a property with array{uint16,array{byte}} that allows us to =
-provide all the manufacturer information we find. On BR/EDR they are pretty=
- static and would just stay around. On LE they would be removed (same as RS=
-SI) once the result becomes invalid. For dual-mode devices found on both tr=
-ansports we just combine them.
->
-
-If multiple fields of manufacturer data for the same manufacturer are
-found, we'd just duplicate them in the array? e.g.
-
- [
-    ( 004C, [ 01, 08, ... ] ),
-    ( 004C, [ 02, 15, ... ] )
-  ]
-
-For a fruit-flavored device acting as both an Airdrop target and an
-iBeacon (this seems to be how they show up - but could be a side
-effect of one field being in AD and one in SR)
-
-Scott
---=20
-Have you ever, ever felt like this?
-Had strange things happen?  Are you going round the twist?
