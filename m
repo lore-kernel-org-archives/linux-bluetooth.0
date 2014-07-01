@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC v3 1/4] Bluetooth: Connection Parameter Update Procedure
+Subject: Re: [PATCH] Bluetooth: btmrvl: indicate pscan scheduling instant in a debug event
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 1 Jul 2014 23:35:49 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F8B83648-F87F-4406-AAB6-2F43F3892D04@holtmann.org>
-References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
-To: Andre Guedes <andre.guedes@openbossa.org>
+In-Reply-To: <1396302104-11582-1-git-send-email-bzhao@marvell.com>
+Date: Tue, 1 Jul 2014 23:24:50 +0200
+Cc: Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Scott James Remnant <keybuk@chromium.org>,
+	Avinash Patil <patila@marvell.com>,
+	Amitkumar Karwar <akarwar@marvell.com>
+Message-Id: <998FB51B-91B7-43C9-9771-9348963A9FDB@holtmann.org>
+References: <1396302104-11582-1-git-send-email-bzhao@marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andre,
+Hi Bing,
 
-> This patch adds support for LE Connection Parameters Request Link
-> Layer control procedure introduced in Core spec 4.1. This procedure
-> allows a Peripheral or Central to update the Link Layer connection
-> parameters of an established connection.
+> A vendor specific command is sent to firmware during
+> initialization to enable this feature. This command is for
+> SD8897 only.
 > 
-> Regarding the acceptance of connection parameters, the LL procedure
-> follows the same approach of L2CAP procedure (see l2cap_conn_param_
-> update_req function). We accept any connection parameters values as
-> long as they are within the valid range.
-> 
-> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
 > ---
-> include/net/bluetooth/hci.h | 28 +++++++++++++++++++++++++
-> net/bluetooth/hci_event.c   | 50 +++++++++++++++++++++++++++++++++++++++++++++
-> 2 files changed, 78 insertions(+)
+> drivers/bluetooth/btmrvl_drv.h  |  1 +
+> drivers/bluetooth/btmrvl_main.c | 19 +++++++++++++++++++
+> drivers/bluetooth/btmrvl_sdio.c |  5 +++++
+> drivers/bluetooth/btmrvl_sdio.h |  2 ++
+> 4 files changed, 27 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
