@@ -1,67 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC v3 3/4] Bluetooth: Enable new LE meta event
+Subject: Re: [RFC v3 2/4] Bluetooth: Move LE event mask setting into init3 phase
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404249011-23645-3-git-send-email-andre.guedes@openbossa.org>
-Date: Tue, 1 Jul 2014 23:37:26 +0200
+In-Reply-To: <1404249011-23645-2-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 1 Jul 2014 23:36:14 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <DB3CDC5E-0EB4-49FA-85CC-8588676E01B8@holtmann.org>
-References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org> <1404249011-23645-3-git-send-email-andre.guedes@openbossa.org>
+Message-Id: <B29F21FD-BDB9-4CCB-A19A-08B434B0D628@holtmann.org>
+References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org> <1404249011-23645-2-git-send-email-andre.guedes@openbossa.org>
 To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Andre,
 
-> The Bluetooth 4.1 introduces a new LE meta event called "LE Remote
-> Connection Parameter Request" event. In order to the controller
-> sends this event to host, we should enable it during controller
-> initialization.
+> During init2 phase, the LE local features have not be read yet so
+> we aren't able to rely on hdev->le_features to determine if the
+> controller supports the Connection Parameters Request Procedure.
+> 
+> For that reason, this patch moves LE event mask setting from init2
+> into init3 initialization phase.
+> 
+> The hdev->le_features mask will be checked by the next patch in order
+> to know if "LE Remote Connection Parameter Request Event" should be
+> enabled.
 > 
 > Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 > ---
-> include/net/bluetooth/hci.h | 3 +++
-> net/bluetooth/hci_core.c    | 7 +++++++
-> 2 files changed, 10 insertions(+)
+> net/bluetooth/hci_core.c | 17 +++++++++--------
+> 1 file changed, 9 insertions(+), 8 deletions(-)
 
 patch has been applied to bluetooth-next tree.
-
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 95b7547..66358af 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -307,6 +307,9 @@ enum {
-> #define LMP_HOST_LE_BREDR	0x04
-> #define LMP_HOST_SC		0x08
-> 
-> +/* LE features */
-> +#define HCI_LE_CONN_PARAM_REQ_PROC	0x02
-> +
-> /* Connection modes */
-> #define HCI_CM_ACTIVE	0x0000
-> #define HCI_CM_HOLD	0x0001
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 5788e03..8a54ca2 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1611,6 +1611,13 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
-> 
-> 		memset(events, 0, sizeof(events));
-> 		events[0] = 0x1f;
-> +
-> +		/* If controller supports the Connection Parameters Request
-> +		 * Link Layer Procedure, enable the corresponding event.
-> +		 */
-> +		if (hdev->le_features[0] & HCI_LE_CONN_PARAM_REQ_PROC)
-> +			events[0] = events[0] | 0x20;
-> +
-
-However I fixed this to do this properly:
-
-			events[0] |= 0x20;
-
-We used this everywhere else. No idea why you had to make it so complicated ;)
 
 Regards
 
