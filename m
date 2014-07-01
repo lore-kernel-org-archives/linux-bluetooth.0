@@ -1,55 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Centralize looking up blocked devices to l2cap_recv_frame
-Date: Wed,  2 Jul 2014 09:36:21 +0300
-Message-Id: <1404282982-26114-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/2] Bluetooth: Add public address configration for Broadcom USB devices
+Date: Wed,  2 Jul 2014 00:53:48 +0200
+Message-Id: <1404255228-51661-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+For the Broadcom based USB devices add support for configuration of
+the public device address.
 
-The ATT channel isn't the only one that we should ensure doesn't receive
-data from blocked devices. SMP is another, and in general we don't want
-data packets going to any of the various handlers. Therefore, add a
-single check to the l2cap_recv_frame function.
-
-The patch fixes at the same time the use of a correct address type. The
-blacklist stores the values with the user space facing triple type
-wheras hci_conn->dst_type uses the HCI address type (0x00 or 0x01).
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/bluetooth/btusb.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 058b3b2b59b5..a6e276204ae9 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6878,9 +6878,6 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 6250fc2fb93a..e0e39cc1af31 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1530,6 +1530,23 @@ done:
+ 	return ret;
+ }
  
- 	BT_DBG("chan %p, len %d", chan, skb->len);
- 
--	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst, hcon->dst_type))
--		goto drop;
--
- 	if (chan->imtu < skb->len)
- 		goto drop;
- 
-@@ -6913,6 +6910,12 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return;
- 	}
- 
-+	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst,
-+				 bdaddr_type(hcon, hcon->dst_type))) {
-+		kfree_skb(skb);
-+		return;
-+	}
++static int btusb_set_bdaddr_bcm(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	long ret;
 +
- 	BT_DBG("len %d, cid 0x%4.4x", len, cid);
++	skb = __hci_cmd_sync(hdev, 0xfc01, 6, bdaddr, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: BCM: Change address command failed (%ld)",
++			hdev->name, ret);
++		return ret;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 				const struct usb_device_id *id)
+ {
+@@ -1635,8 +1652,10 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_BCM92035)
+ 		hdev->setup = btusb_setup_bcm92035;
  
- 	switch (cid) {
+-	if (id->driver_info & BTUSB_BCM_PATCHRAM)
++	if (id->driver_info & BTUSB_BCM_PATCHRAM) {
+ 		hdev->setup = btusb_setup_bcm_patchram;
++		hdev->set_bdaddr = btusb_set_bdaddr_bcm;
++	}
+ 
+ 	if (id->driver_info & BTUSB_INTEL)
+ 		hdev->setup = btusb_setup_intel;
 -- 
 1.9.3
 
