@@ -1,44 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andre Guedes <andre.guedes@openbossa.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] btmgmt: Fix endianess in cmd_scan_params()
-Date: Tue,  1 Jul 2014 19:25:18 -0300
-Message-Id: <1404253518-24132-1-git-send-email-andre.guedes@openbossa.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [RFC v3 4/4] Bluetooth: Introduce "New Connection Parameter" Event
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404249011-23645-4-git-send-email-andre.guedes@openbossa.org>
+Date: Tue, 1 Jul 2014 23:45:40 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <831A7F81-23CA-403B-A17E-29C20676B2CE@holtmann.org>
+References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org> <1404249011-23645-4-git-send-email-andre.guedes@openbossa.org>
+To: Andre Guedes <andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The kernel expects Mgmt commands parameters in little-endian byte order
-so this patch fixes cp.interval and cp.window in cmd_scan_params().
----
- tools/btmgmt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Hi Andre,
 
-diff --git a/tools/btmgmt.c b/tools/btmgmt.c
-index 066fde9..b0da592 100644
---- a/tools/btmgmt.c
-+++ b/tools/btmgmt.c
-@@ -2404,6 +2404,7 @@ static void cmd_scan_params(struct mgmt *mgmt, uint16_t index,
- 							int argc, char **argv)
- {
- 	struct mgmt_cp_set_scan_params cp;
-+	uint16_t interval, window;
- 
- 	if (argc < 3) {
- 		scan_params_usage();
-@@ -2413,8 +2414,11 @@ static void cmd_scan_params(struct mgmt *mgmt, uint16_t index,
- 	if (index == MGMT_INDEX_NONE)
- 		index = 0;
- 
--	cp.interval = strtol(argv[1], NULL, 0);
--	cp.window = strtol(argv[2], NULL, 0);
-+	interval = strtol(argv[1], NULL, 0);
-+	window = strtol(argv[2], NULL, 0);
-+
-+	put_le16(interval, &cp.interval);
-+	put_le16(window, &cp.window);
- 
- 	if (mgmt_send(mgmt, MGMT_OP_SET_SCAN_PARAMS, index, sizeof(cp), &cp,
- 					scan_params_rsp, NULL, NULL) == 0) {
--- 
-1.9.1
+> This patch introduces a new Mgmt event called "New Connection Parameter".
+> This event indicates to userspace the connection parameters values the
+> remote device requested.
+> 
+> The user may store these values and load them into kernel. This way, next
+> time a connection is established to that device, the kernel will use those
+> parameters values instead of the default ones.
+> 
+> This event is sent when the remote device requests new connection
+> parameters through connection parameter update procedure. This event is
+> not sent for slave connections.
+> 
+> Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
+> ---
+> include/net/bluetooth/hci_core.h |  3 +++
+> include/net/bluetooth/mgmt.h     | 10 ++++++++++
+> net/bluetooth/hci_event.c        |  4 ++++
+> net/bluetooth/l2cap_core.c       |  6 +++++-
+> net/bluetooth/mgmt.c             | 19 +++++++++++++++++++
+> 5 files changed, 41 insertions(+), 1 deletion(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
