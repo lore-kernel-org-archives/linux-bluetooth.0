@@ -1,59 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [RFC] doc: Add EIR to device properties
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CA+bD78g+AU4VKq5qPLGBGQM1+2ciqVmm77VvETw2XmBV_cM=sQ@mail.gmail.com>
-Date: Tue, 1 Jul 2014 18:14:47 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <F66A2DC8-B724-4846-9B4C-81528365E854@holtmann.org>
-References: <1403897492-6233-1-git-send-email-scott@netsplit.com> <B3B3E392-D840-4924-86B6-951649CD7B79@holtmann.org> <CA+bD78j4bSfqvn7MHnsV7PKp_dGXN4dLApW2G5p4oN-Tsu+h1Q@mail.gmail.com> <F49C47A1-077C-41E2-A36B-3DE9EF1A9E19@holtmann.org> <CA+bD78j4RfvZdMoKLcfDdtsy1g_bgZ-vnbAOY80W_JcZDNuEyA@mail.gmail.com> <E324D0BB-4042-4E4F-8F14-16B09C34B259@holtmann.org> <724A0273-FB02-49DF-B286-4C3440C049F7@holtmann.org> <CA+bD78g+AU4VKq5qPLGBGQM1+2ciqVmm77VvETw2XmBV_cM=sQ@mail.gmail.com>
-To: Scott James Remnant <scott@netsplit.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 2/2] Bluetooth: Allow re-encryption with LTK when STK is in use
+Date: Tue,  1 Jul 2014 19:14:13 +0300
+Message-Id: <1404231253-21119-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1404231253-21119-1-git-send-email-johan.hedberg@gmail.com>
+References: <1404231253-21119-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Scott,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
->>>> This would place the EIR/AD/SR data in the device objects as a property then?
->>> 
->>> we could do that, but I would like to discuss this a bit more. For example we might not duplicate the information that we have properties for. For example device name or appearance.
->> 
->> coming to think about it, we might should just focus on the manufacturer specific field and make sure that gets exposed over D-Bus. The other ones are Bluetooth SIG defined and we can define good properties for it.
->> 
-> 
-> The main missing SIG defined fields which don't have properties would be:
-> 
-> - TX Power (CSSv4 1.5)
+If we're encrypted with the STK we should allow re-encryption with an
+LTK even though the acheived security level is the same. This patch adds
+the necessary logic to the smp_sufficient_security function which is
+used to determine whether to proceed with encryption or not.
 
-we should do the proper math here and provide Pathloss when discovered (again, similar disappearance to RSSI).
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> - URL (https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=287247)
-
-Is that one new? Could be. That seems to be dead simple and can really just get its own property.
-
-> All of the others are reasonably internal to BlueZ and not of interest
-> to applications.
-
-Examples would be Service Solicitation as mentioned before. However there bluetoothd should just combine all fields into a single array with UUID-128.
-
->> We could add a property with array{uint16,array{byte}} that allows us to provide all the manufacturer information we find. On BR/EDR they are pretty static and would just stay around. On LE they would be removed (same as RSSI) once the result becomes invalid. For dual-mode devices found on both transports we just combine them.
->> 
-> 
-> If multiple fields of manufacturer data for the same manufacturer are
-> found, we'd just duplicate them in the array? e.g.
-> 
-> [
->    ( 004C, [ 01, 08, ... ] ),
->    ( 004C, [ 02, 15, ... ] )
->  ]
-> 
-> For a fruit-flavored device acting as both an Airdrop target and an
-> iBeacon (this seems to be how they show up - but could be a side
-> effect of one field being in AD and one in SR)
-
-That is what I am thinking is the safest. Same as on BR/EDR they will give you the product name so you can pick the right icon. I also think that for manufacturer specific entries it is explicitly allowed to show up more than once.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 68e6f245581c..55c41de2f5a0 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -868,6 +868,14 @@ bool smp_sufficient_security(struct hci_conn *hcon, u8 sec_level)
+ 	if (sec_level == BT_SECURITY_LOW)
+ 		return true;
+ 
++	/* If we're encrypted with an STK always claim insufficient
++	 * security. This way we allow the connection to be re-encrypted
++	 * with an LTK, even if the LTK provides the same level of
++	 * security.
++	 */
++	if (test_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags))
++		return false;
++
+ 	if (hcon->sec_level >= sec_level)
+ 		return true;
+ 
+-- 
+1.9.3
 
