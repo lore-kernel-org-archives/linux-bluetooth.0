@@ -1,75 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Change hci_conn_params_add to return the parameter struct
-Date: Tue,  1 Jul 2014 12:11:04 +0200
-Message-Id: <1404209466-64712-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+In-Reply-To: <BABA9B45-3DA7-40E4-9850-56CE967013BD@holtmann.org>
+References: <1404205896-25742-1-git-send-email-drake@endlessm.com>
+	<BABA9B45-3DA7-40E4-9850-56CE967013BD@holtmann.org>
+Date: Tue, 1 Jul 2014 10:58:29 +0100
+Message-ID: <CAD8Lp46KFEbqi2eAotwa+J++Qo_p6cZR-KdmpWbDPcMavTPYzg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek 8723/8761 support
+From: Daniel Drake <drake@endlessm.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	linux-bluetooth@vger.kernel.org, Larry.Finger@lwfinger.net
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-When adding new connection parameters, it is useful to return either
-the existing struct or the newly created one.
+Hi,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci_core.h |  3 ++-
- net/bluetooth/hci_core.c         | 11 ++++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+Thanks for the fast review!
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ec830871b9b8..5a83621672bf 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -852,7 +852,8 @@ int hci_white_list_del(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 type);
- 
- struct hci_conn_params *hci_conn_params_lookup(struct hci_dev *hdev,
- 					       bdaddr_t *addr, u8 addr_type);
--int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type);
-+struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
-+					    bdaddr_t *addr, u8 addr_type);
- int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
- 			u8 auto_connect, u16 conn_min_interval,
- 			u16 conn_max_interval);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2312e77582b0..883ddd52344d 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3472,21 +3472,22 @@ void hci_pend_le_conns_clear(struct hci_dev *hdev)
- }
- 
- /* This function requires the caller holds hdev->lock */
--int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
-+struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
-+					    bdaddr_t *addr, u8 addr_type)
- {
- 	struct hci_conn_params *params;
- 
- 	if (!is_identity_address(addr, addr_type))
--		return -EINVAL;
-+		return NULL;
- 
- 	params = hci_conn_params_lookup(hdev, addr, addr_type);
- 	if (params)
--		return 0;
-+		return params;
- 
- 	params = kzalloc(sizeof(*params), GFP_KERNEL);
- 	if (!params) {
- 		BT_ERR("Out of memory");
--		return -ENOMEM;
-+		return NULL;
- 	}
- 
- 	bacpy(&params->addr, addr);
-@@ -3502,7 +3503,7 @@ int hci_conn_params_add(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type)
- 
- 	BT_DBG("addr %pMR (type %u)", addr, addr_type);
- 
--	return 0;
-+	return params;
- }
- 
- /* This function requires the caller holds hdev->lock */
--- 
-1.9.3
+On Tue, Jul 1, 2014 at 10:26 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+>> +     chip_id = (uint16_t *)(epatch_fw->data +
+>> +                            sizeof(struct rtk_epatch_header));
+>> +     patch_length = (uint16_t *)((unsigned char *) chip_id +
+>> +                                 (sizeof(uint16_t)
+>> +                                  * epatch_info->num_patches));
+>> +     patch_offset = (uint32_t *)((unsigned char *) patch_length +
+>> +                                 (sizeof(uint16_t)
+>> +                                  * epatch_info->num_patches));
+>
+> Using the unaligned helpers is not an option?
 
+Can you go into a bit more detail here?
+
+I should indeed use get_unaligned for accessing the 32-bit
+patch_offset values as they might not be 4-byte aligned.
+The others should be fine though.
+
+Or are you suggesting some helper that I can use to clean up the code
+in this area? If so, could you be a little more specific?
+
+> Do you really want to name the directory rtl_bt and not rtk or realtek or something more that makes actually sense. I have no idea where rtl comes from.
+
+There is already /lib/firmware/rtl_nic used by r8169 driver, I was
+going for consistency with that. There is also /lib/firmware/rtlwifi.
+Does that influence your preference?
+
+I'll address all other comments in the next patch.
+
+Thanks
+Daniel
