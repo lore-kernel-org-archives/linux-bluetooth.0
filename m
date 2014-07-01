@@ -1,76 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Add flag to track STK encryption
-Date: Tue,  1 Jul 2014 19:02:08 +0300
-Message-Id: <1404230529-16137-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: LE mouse reconnect problem
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CAHZ1yCnSMQqhJ_x-=5VPibThBBU12M_LvkmCpCWR1b5np0V8Hw@mail.gmail.com>
+Date: Tue, 1 Jul 2014 18:01:26 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Ryan Press <ryan@presslab.us>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <C43AD631-D51D-46A9-98BB-99D94774CC89@holtmann.org>
+References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com> <CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com> <CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com> <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com> <CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com> <CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com> <CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com> <CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com> <CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com> <20140629051442.GA31085@t440s.P-661HNU-F1> <20140629052949.GA32130@t440s> <E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org> <CAHZ1yCniScfX+Cvoyv0B3GaYWL41qPJD4V+Le+3HENYS5kUdYw@mail.gmail.com> <60346ECF-9A0B-4D3B-BDD6-A617797550D9@holtmann.org> <CAHZ1yCnSMQqhJ_x-=5VPibThBBU12M_LvkmCpCWR1b5np0V8Hw@mail.gmail.com>
+To: Scott James Remnant <keybuk@google.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Scott,
 
-There are certain subtle differences in behavior when we're encrypted
-with the STK, such as allowing re-encryption even though the security
-level stays the same. Because of this, add a flag to track whether we're
-encrypted with an STK or not.
+>> the same applies to the HP mouse btw.
+>> 
+> 
+> Which HP Mouse are you referring to?
+> 
+> An HP Mouse I have uses general connectable advertising when it wants
+> to reconnect.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_event.c        | 3 +++
- net/bluetooth/smp.c              | 4 ++++
- 3 files changed, 8 insertions(+)
+might want to check HCI Remote Version Information (via hcitool cmd) for that device. So what we found out today is that the Nordic based HID devices only do direct advertising. However my CSR based one does direct advertising first and if it times out, it falls back to undirected advertising.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index eb0add396595..9078da681f16 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -536,6 +536,7 @@ enum {
- 	HCI_CONN_AUTH,
- 	HCI_CONN_SECURE,
- 	HCI_CONN_FIPS,
-+	HCI_CONN_STK_ENCRYPT,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8097559ebb48..b0b760dd66a3 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4365,8 +4365,11 @@ static void hci_le_ltk_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	 * using a distributed LTK.
- 	 */
- 	if (ltk->type == SMP_STK) {
-+		set_bit(HCI_CONN_STK_ENCRYPT, &conn->flags);
- 		list_del(&ltk->list);
- 		kfree(ltk);
-+	} else {
-+		clear_bit(HCI_CONN_STK_ENCRYPT, &conn->flags);
- 	}
- 
- 	hci_dev_unlock(hdev);
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 6ce7785a2708..de29ad74e571 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -538,6 +538,7 @@ static u8 smp_random(struct smp_chan *smp)
- 
- 		hci_le_start_enc(hcon, ediv, rand, stk);
- 		hcon->enc_key_size = smp->enc_key_size;
-+		set_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags);
- 	} else {
- 		u8 stk[16], auth;
- 		__le64 rand = 0;
-@@ -856,6 +857,9 @@ static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
- 	hci_le_start_enc(hcon, key->ediv, key->rand, key->val);
- 	hcon->enc_key_size = key->enc_size;
- 
-+	/* We never store STKs for central, so clear this flag */
-+	clear_bit(HCI_CONN_STK_ENCRYPT, &hcon->flags);
-+
- 	return true;
- }
- 
--- 
-1.9.3
+Regards
+
+Marcel
 
