@@ -1,84 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 1 Jul 2014 13:36:27 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Daniel Drake <drake@endlessm.com>
-Cc: marcel@holtmann.org, gustavo@padovan.org,
-	linux-bluetooth@vger.kernel.org, Larry.Finger@lwfinger.net
-Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek 8723/8761 support
-Message-ID: <20140701103627.GC4781@t440s.lan>
-References: <1404205896-25742-1-git-send-email-drake@endlessm.com>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404205896-25742-1-git-send-email-drake@endlessm.com>
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH] [RFC] doc: Add StartDiscoveryWithOptions
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CA+bD78jRm4_Xd3UhhAwnA7jA1H3o2khKcqr3ZtRYmbMcTW4HdA@mail.gmail.com>
+Date: Tue, 1 Jul 2014 12:31:36 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <4F821DBD-AE7F-4DBA-8FB9-0F12217F2BC3@holtmann.org>
+References: <1403896589-6135-1-git-send-email-scott@netsplit.com> <90AEC8D9-5894-4083-AD82-F8D9A8DC1000@holtmann.org> <CA+bD78jRm4_Xd3UhhAwnA7jA1H3o2khKcqr3ZtRYmbMcTW4HdA@mail.gmail.com>
+To: Scott James Remnant <scott@netsplit.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Daniel,
+Hi Scott,
 
-On Tue, Jul 01, 2014, Daniel Drake wrote:
-> +static int rtk_read_eversion(struct hci_dev *hdev)
-> +{
-> +	struct rtk_eversion_evt *eversion;
-> +	struct sk_buff *skb;
-> +
-> +	/* Read RTK ROM version command */
-> +	skb = __hci_cmd_sync(hdev, 0xfc6d, 0, NULL, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		BT_ERR("Read ROM version failed (%ld)", PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (skb->len != sizeof(*eversion)) {
-> +		BT_ERR("RTK version event length mismatch");
-> +		kfree_skb(skb);
-> +		return -EIO;
-> +	}
-> +
-> +	eversion = (struct rtk_eversion_evt *) skb->data;
-> +	BT_DBG("eversion status=%x version=%x",
-> +	       eversion->status, eversion->version);
-> +	if (eversion->status)
-> +		return 0;
-> +	else
-> +		return eversion->version;
-> +}
+>> The reason why I like to keep discovery separate from searching for a known device, these are separate operations. There is subtle difference between advertising non-discoverable and advertising discoverable. While many devices always advertise discoverable, they do not need it. And StartDiscovery will not report non-discoverable devices back. However a FindDevice of course can look for a specific device matching its search pattern even if it is not discoverable.
+>> 
+> 
+> Thinking about this a bit more, does StartDiscovery return devices
+> advertising with non-connectable undirected advertising? If the goal
+> of that method is for the UI then does it make sense for it to be
+> returning devices we can't connect to as well?
 
-Looks like you're leaking skb here.
+this is an interesting question. So non-connectable or scannable undirected advertising events will not allow for any connection whatsoever. Even if they have the discoverable or limited discoverable flags set.
 
-> +static bool rtk_fw_upload_needed(struct hci_dev *hdev, enum rtk_variant variant)
-> +{
-> +	struct hci_rp_read_local_version *resp;
-> +	u16 lmp_version = rtk_fw_info[variant].lmp_sub;
-> +	struct sk_buff *skb;
-> +
-> +	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_VERSION, 0, NULL,
-> +			     HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		BT_ERR("rtk fw version read command failed (%ld)",
-> +		       PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (skb->len != sizeof(*resp)) {
-> +		BT_ERR("rtk version event length mismatch");
-> +		kfree_skb(skb);
-> +		return -EIO;
-> +	}
-> +
-> +	resp = (struct hci_rp_read_local_version *) skb->data;
-> +	if (resp->status) {
-> +		BT_ERR("rtk fw version event failed (%02x)", resp->status);
-> +		kfree_skb(skb);
-> +		return bt_to_errno(resp->status);
-> +	}
-> +
-> +	BT_DBG("rtk fw: lmp_subver=%x vs %x", resp->lmp_subver, lmp_version);
-> +
-> +	/* Firmware upload is only needed when the running version matches the
-> +	 * one listed in the driver. If versions differ, we assume that no
-> +	 * firmware update is necessary. */
-> +	return resp->lmp_subver == lmp_version;
-> +}
+For the D-Bus API, I think we should only return devices with discoverable and limited discoverable flags set when calling StartDiscovery since that are the ones we are looking for at that point. Should we also return devices that are not connectable is something we might need to discuss.
 
-Same here.
+I think we should not return them since you would expect users to be able to just click on these and pair them. That however will never succeed sine you can not connect to these devices. An alternative option is to just add a property Connectable that allows us to see if we can connect or not. Feels a bit weird to me.
 
-Johan
+For the kernel side, we have to report a lot of things. However since we now enabled passive scanning, we can be a bit more detailed in what we are supporting.
+
+First thing we have to do is add a new flag to Device Found event that indicates if the device is connectable or not. That is needed no matter what. That alone will allow bluetoothd to do the right filtering and transactions.
+
+In addition to that, I am thinking that Start Discovery triggered Device Found should be limited to connectable and discoverable events. Unless of course we have them also in Add Device. Then they should be reported out always.
+
+And then we start building proper observer API for D-Bus and also extra filtering for the kernel side.
+
+Regards
+
+Marcel
+
