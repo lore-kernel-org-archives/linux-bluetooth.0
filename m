@@ -1,50 +1,87 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Centralize looking up blocked devices to l2cap_recv_frame
-Date: Tue,  1 Jul 2014 22:54:14 +0300
-Message-Id: <1404244455-15651-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] Bluetooth: Use NRPA discovery only when background scanning is active
+Date: Tue,  1 Jul 2014 21:52:31 +0200
+Message-Id: <1404244351-26011-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-The ATT channel isn't the only one that we should ensure doesn't receive
-data from blocked devices. SMP is another, and in general we don't want
-data packets going to any of the various handlers. Therefore, add a
-single check to the l2cap_recv_frame function.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/l2cap_core.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/mgmt.c        | 24 +++++++++++++++++++++++-
+ 2 files changed, 24 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index e203a5fdf874..904f0d0f6a47 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6874,9 +6874,6 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 58c5930dea60..37f967360f9a 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -134,6 +134,7 @@ enum {
+ 	HCI_SC_ENABLED,
+ 	HCI_SC_ONLY,
+ 	HCI_PRIVACY,
++	HCI_NRPA_DISCOV,
+ 	HCI_RPA_EXPIRED,
+ 	HCI_RPA_RESOLVING,
+ 	HCI_HS_ENABLED,
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ba5e215a7561..cbe002b884c0 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3488,6 +3488,7 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 	/* General inquiry access code (GIAC) */
+ 	u8 lap[3] = { 0x33, 0x8b, 0x9e };
+ 	u8 status, own_addr_type;
++	bool require_privacy;
+ 	int err;
  
- 	BT_DBG("chan %p, len %d", chan, skb->len);
- 
--	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst, hcon->dst_type))
--		goto drop;
--
- 	if (chan->imtu < skb->len)
- 		goto drop;
- 
-@@ -6909,6 +6906,11 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
- 		return;
- 	}
- 
-+	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst, hcon->dst_type)) {
-+		kfree_skb(skb);
-+		return;
-+	}
+ 	BT_DBG("%s", hdev->name);
+@@ -3584,8 +3585,15 @@ static int start_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		/* All active scans will be done with either a resolvable
+ 		 * private address (when privacy feature has been enabled)
+ 		 * or unresolvable private address.
++		 *
++		 * However if background scanning is not activated, then for
++		 * compatibility reasons, it is better to not require the
++		 * use of non-resolvable private addresses.
+ 		 */
+-		err = hci_update_random_address(&req, true, &own_addr_type);
++		require_privacy = test_bit(HCI_NRPA_DISCOV, &hdev->dev_flags);
 +
- 	BT_DBG("len %d, cid 0x%4.4x", len, cid);
++		err = hci_update_random_address(&req, require_privacy,
++						&own_addr_type);
+ 		if (err < 0) {
+ 			err = cmd_status(sk, hdev->id, MGMT_OP_START_DISCOVERY,
+ 					 MGMT_STATUS_FAILED);
+@@ -5051,6 +5059,13 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
+ 			   MGMT_STATUS_SUCCESS, &cp->addr, sizeof(cp->addr));
  
- 	switch (cid) {
++	/* If this command is issued at least once, the controller
++	 * will be using background scanning for all auto-connection
++	 * procedures. This means that for discovery a non-resolvable
++	 * private address can be used.
++	 */
++	set_bit(HCI_NRPA_DISCOV, &hdev->dev_flags);
++
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
+@@ -5109,6 +5124,13 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 	err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
+ 			   MGMT_STATUS_SUCCESS, &cp->addr, sizeof(cp->addr));
+ 
++	/* If this command is issued at least once, the controller
++	 * will be using background scanning for all auto-connection
++	 * procedures. This means that for discovery a non-resolvable
++	 * private address can be used.
++	 */
++	set_bit(HCI_NRPA_DISCOV, &hdev->dev_flags);
++
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
 -- 
 1.9.3
 
