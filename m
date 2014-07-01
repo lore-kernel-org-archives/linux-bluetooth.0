@@ -1,57 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andre Guedes <andre.guedes@openbossa.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3 3/4] Bluetooth: Enable new LE meta event
-Date: Tue,  1 Jul 2014 18:10:10 -0300
-Message-Id: <1404249011-23645-3-git-send-email-andre.guedes@openbossa.org>
-In-Reply-To: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
-References: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
+Subject: [RFC v3 1/4] Bluetooth: Connection Parameter Update Procedure
+Date: Tue,  1 Jul 2014 18:10:08 -0300
+Message-Id: <1404249011-23645-1-git-send-email-andre.guedes@openbossa.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth 4.1 introduces a new LE meta event called "LE Remote
-Connection Parameter Request" event. In order to the controller
-sends this event to host, we should enable it during controller
-initialization.
+This patch adds support for LE Connection Parameters Request Link
+Layer control procedure introduced in Core spec 4.1. This procedure
+allows a Peripheral or Central to update the Link Layer connection
+parameters of an established connection.
+
+Regarding the acceptance of connection parameters, the LL procedure
+follows the same approach of L2CAP procedure (see l2cap_conn_param_
+update_req function). We accept any connection parameters values as
+long as they are within the valid range.
 
 Signed-off-by: Andre Guedes <andre.guedes@openbossa.org>
 ---
- include/net/bluetooth/hci.h | 3 +++
- net/bluetooth/hci_core.c    | 7 +++++++
- 2 files changed, 10 insertions(+)
+ include/net/bluetooth/hci.h | 28 +++++++++++++++++++++++++
+ net/bluetooth/hci_event.c   | 50 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 78 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 95b7547..66358af 100644
+index 58c5930..95b7547 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -307,6 +307,9 @@ enum {
- #define LMP_HOST_LE_BREDR	0x04
- #define LMP_HOST_SC		0x08
+@@ -355,6 +355,7 @@ enum {
+ #define HCI_LK_AUTH_COMBINATION_P256	0x08
  
-+/* LE features */
-+#define HCI_LE_CONN_PARAM_REQ_PROC	0x02
-+
- /* Connection modes */
- #define HCI_CM_ACTIVE	0x0000
- #define HCI_CM_HOLD	0x0001
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 5788e03..8a54ca2 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1611,6 +1611,13 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
+ /* ---- HCI Error Codes ---- */
++#define HCI_ERROR_UNKNOWN_CONN_ID	0x02
+ #define HCI_ERROR_AUTH_FAILURE		0x05
+ #define HCI_ERROR_MEMORY_EXCEEDED	0x07
+ #define HCI_ERROR_CONNECTION_TIMEOUT	0x08
+@@ -364,6 +365,7 @@ enum {
+ #define HCI_ERROR_REMOTE_POWER_OFF	0x15
+ #define HCI_ERROR_LOCAL_HOST_TERM	0x16
+ #define HCI_ERROR_PAIRING_NOT_ALLOWED	0x18
++#define HCI_ERROR_INVALID_LL_PARAMS	0x1E
+ #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
  
- 		memset(events, 0, sizeof(events));
- 		events[0] = 0x1f;
-+
-+		/* If controller supports the Connection Parameters Request
-+		 * Link Layer Procedure, enable the corresponding event.
-+		 */
-+		if (hdev->le_features[0] & HCI_LE_CONN_PARAM_REQ_PROC)
-+			events[0] = events[0] | 0x20;
-+
- 		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
- 			    events);
+ /* Flow control modes */
+@@ -1305,6 +1307,23 @@ struct hci_rp_le_read_supported_states {
+ 	__u8	le_states[8];
+ } __packed;
  
++#define HCI_OP_LE_CONN_PARAM_REQ_REPLY	0x2020
++struct hci_cp_le_conn_param_req_reply {
++	__le16	handle;
++	__le16	interval_min;
++	__le16	interval_max;
++	__le16	latency;
++	__le16	timeout;
++	__le16	min_ce_len;
++	__le16	max_ce_len;
++} __packed;
++
++#define HCI_OP_LE_CONN_PARAM_REQ_NEG_REPLY	0x2021
++struct hci_cp_le_conn_param_req_neg_reply {
++	__le16	handle;
++	__u8	reason;
++} __packed;
++
+ /* ---- HCI Events ---- */
+ #define HCI_EV_INQUIRY_COMPLETE		0x01
+ 
+@@ -1700,6 +1719,15 @@ struct hci_ev_le_ltk_req {
+ 	__le16	ediv;
+ } __packed;
+ 
++#define HCI_EV_LE_REMOTE_CONN_PARAM_REQ	0x06
++struct hci_ev_le_remote_conn_param_req {
++	__le16 handle;
++	__le16 interval_min;
++	__le16 interval_max;
++	__le16 latency;
++	__le16 timeout;
++} __packed;
++
+ /* Advertising report event types */
+ #define LE_ADV_IND		0x00
+ #define LE_ADV_DIRECT_IND	0x01
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index b0b760d..544e2ef 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4382,6 +4382,52 @@ not_found:
+ 	hci_dev_unlock(hdev);
+ }
+ 
++static void send_conn_param_neg_reply(struct hci_dev *hdev, u16 handle,
++				      u8 reason)
++{
++	struct hci_cp_le_conn_param_req_neg_reply cp;
++
++	cp.handle = cpu_to_le16(handle);
++	cp.reason = reason;
++
++	hci_send_cmd(hdev, HCI_OP_LE_CONN_PARAM_REQ_NEG_REPLY, sizeof(cp),
++		     &cp);
++}
++
++static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev,
++					     struct sk_buff *skb)
++{
++	struct hci_ev_le_remote_conn_param_req *ev = (void *) skb->data;
++	struct hci_cp_le_conn_param_req_reply cp;
++	struct hci_conn *hcon;
++	u16 handle, min, max, latency, timeout;
++
++	handle = le16_to_cpu(ev->handle);
++	min = le16_to_cpu(ev->interval_min);
++	max = le16_to_cpu(ev->interval_max);
++	latency = le16_to_cpu(ev->latency);
++	timeout = le16_to_cpu(ev->timeout);
++
++	hcon = hci_conn_hash_lookup_handle(hdev, handle);
++	if (!hcon || hcon->state != BT_CONNECTED)
++		return send_conn_param_neg_reply(hdev, handle,
++						 HCI_ERROR_UNKNOWN_CONN_ID);
++
++	if (hci_check_conn_params(min, max, latency, timeout))
++		return send_conn_param_neg_reply(hdev, handle,
++						 HCI_ERROR_INVALID_LL_PARAMS);
++
++	cp.handle = ev->handle;
++	cp.interval_min = ev->interval_min;
++	cp.interval_max = ev->interval_max;
++	cp.latency = ev->latency;
++	cp.timeout = ev->timeout;
++	cp.min_ce_len = 0;
++	cp.max_ce_len = 0;
++
++	hci_send_cmd(hdev, HCI_OP_LE_CONN_PARAM_REQ_REPLY, sizeof(cp), &cp);
++}
++
+ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_le_meta *le_ev = (void *) skb->data;
+@@ -4405,6 +4451,10 @@ static void hci_le_meta_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		hci_le_ltk_request_evt(hdev, skb);
+ 		break;
+ 
++	case HCI_EV_LE_REMOTE_CONN_PARAM_REQ:
++		hci_le_remote_conn_param_req_evt(hdev, skb);
++		break;
++
+ 	default:
+ 		break;
+ 	}
 -- 
 1.9.1
 
