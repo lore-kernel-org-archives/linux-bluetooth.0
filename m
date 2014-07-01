@@ -1,60 +1,64 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Add public address configration for Broadcom USB devices
-Date: Wed,  2 Jul 2014 00:53:48 +0200
-Message-Id: <1404255228-51661-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Add support for hdev->set_bdaddr callback handling
+Date: Wed,  2 Jul 2014 00:53:47 +0200
+Message-Id: <1404255228-51661-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For the Broadcom based USB devices add support for configuration of
-the public device address.
+Some embedded controllers allow the programming of a public address
+and this adds vendor support for supporting OEM confguration of such
+addresses.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btusb.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h |  2 ++
+ net/bluetooth/hci_core.c         | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6250fc2fb93a..e0e39cc1af31 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1530,6 +1530,23 @@ done:
- 	return ret;
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 01fbbe20defb..ee480a86e558 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -171,6 +171,7 @@ struct hci_dev {
+ 	__u8		bus;
+ 	__u8		dev_type;
+ 	bdaddr_t	bdaddr;
++	bdaddr_t	public_addr;
+ 	bdaddr_t	random_addr;
+ 	bdaddr_t	static_addr;
+ 	__u8		adv_addr_type;
+@@ -344,6 +345,7 @@ struct hci_dev {
+ 	int (*setup)(struct hci_dev *hdev);
+ 	int (*send)(struct hci_dev *hdev, struct sk_buff *skb);
+ 	void (*notify)(struct hci_dev *hdev, unsigned int evt);
++	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+ };
  
-+static int btusb_set_bdaddr_bcm(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	long ret;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc01, 6, bdaddr, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		ret = PTR_ERR(skb);
-+		BT_ERR("%s: BCM: Change address command failed (%ld)",
-+			hdev->name, ret);
-+		return ret;
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 615d0cf5e511..63197d70d8eb 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2249,6 +2249,17 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 	if (hdev->setup && test_bit(HCI_SETUP, &hdev->dev_flags))
+ 		ret = hdev->setup(hdev);
+ 
++	/* If public address change is configured, ensure that the
++	 * address gets programmed. If the driver does not support
++	 * changing the public address, fail the power on procedure.
++	 */
++	if (!ret && bacmp(&hdev->public_addr, BDADDR_ANY)) {
++		if (hdev->set_bdaddr)
++			ret = hdev->set_bdaddr(hdev, &hdev->public_addr);
++		else
++			ret = -EADDRNOTAVAIL;
 +	}
-+	kfree_skb(skb);
 +
-+	return 0;
-+}
-+
- static int btusb_probe(struct usb_interface *intf,
- 				const struct usb_device_id *id)
- {
-@@ -1635,8 +1652,10 @@ static int btusb_probe(struct usb_interface *intf,
- 	if (id->driver_info & BTUSB_BCM92035)
- 		hdev->setup = btusb_setup_bcm92035;
- 
--	if (id->driver_info & BTUSB_BCM_PATCHRAM)
-+	if (id->driver_info & BTUSB_BCM_PATCHRAM) {
- 		hdev->setup = btusb_setup_bcm_patchram;
-+		hdev->set_bdaddr = btusb_set_bdaddr_bcm;
-+	}
- 
- 	if (id->driver_info & BTUSB_INTEL)
- 		hdev->setup = btusb_setup_intel;
+ 	if (!ret) {
+ 		if (!test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks) &&
+ 		    !test_bit(HCI_USER_CHANNEL, &hdev->dev_flags))
 -- 
 1.9.3
 
