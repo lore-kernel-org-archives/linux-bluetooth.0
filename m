@@ -1,50 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <BABA9B45-3DA7-40E4-9850-56CE967013BD@holtmann.org>
-References: <1404205896-25742-1-git-send-email-drake@endlessm.com>
-	<BABA9B45-3DA7-40E4-9850-56CE967013BD@holtmann.org>
-Date: Tue, 1 Jul 2014 10:58:29 +0100
-Message-ID: <CAD8Lp46KFEbqi2eAotwa+J++Qo_p6cZR-KdmpWbDPcMavTPYzg@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Add Realtek 8723/8761 support
-From: Daniel Drake <drake@endlessm.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
-	linux-bluetooth@vger.kernel.org, Larry.Finger@lwfinger.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: LE mouse reconnect problem
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABx3TkVt3t_dyRmY6rjrwzw9BoTRaZinHOQEEbyVND+_NjLSVQ@mail.gmail.com>
+Date: Tue, 1 Jul 2014 11:49:48 +0200
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Message-Id: <F2336E43-F4C9-411A-A3A3-1D0BF659C1F7@holtmann.org>
+References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com> <CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com> <CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com> <CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com> <CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com> <CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com> <CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com> <CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com> <CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com> <20140629051442.GA31085@t440s.P-661HNU-F1> <20140629052949.GA32130@t440s> <E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org> <CABx3TkUP3Y9nJJk=u2ghFnunQRh9x-v6PG_ncyiM+mUqaoRtWg@mail.gmail.com> <5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org> <CABx3TkVt3t_dyRmY6rjrwzw9BoTRaZinHOQEEbyVND+_NjLSVQ@mail.gmail.com>
+To: Ryan Press <ryan@presslab.us>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Ryan,
 
-Thanks for the fast review!
+>>> I have one other question with it.  When it first reconnects the mouse
+>>> pointer is really jerky, like it's updating really slow.  Then after a
+>>> few seconds it is normal; in fact it is very responsive compared to my
+>>> old Bluetooth mouse.  With Windows 8.1 it reconnects lightning fast
+>>> when I turn it on, and it is not jerky at first.
+>>> 
+>> this is a kernel issue with not remembering the previous connection parameters. What you see is that we start connecting with the default values and then the slave (the mouse) will correct us and tell us what connection parameters it needs. We accept them and actually change the LE link to use these parameters. However we end up forgetting them. So every time you connect this procedure keeps repeating itself.
+>> 
+>> I fixed this as well, but for that you will need a bluetooth-next kernel where I enabled the management API for passive scanning and a modified bluetoothd that will then allow you a smooth experience. If the slave updates the connection parameters we remember them for devices using auto-connection. So once the connection is triggered via passive scanning the values will be remembered.
+>> 
+>> At the moment, I have one minor issue with the re-connection within bluetoothd and once that is fixed this should be pretty instant.
+> 
+> 
+> Okay, great, glad to hear that you're already on it.  I'm really
+> looking forward to the seamless Bluetooth experience on Linux!  When
+> everything is ready and in the master branch let me know and I will
+> try them out.
 
-On Tue, Jul 1, 2014 at 10:26 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->> +     chip_id = (uint16_t *)(epatch_fw->data +
->> +                            sizeof(struct rtk_epatch_header));
->> +     patch_length = (uint16_t *)((unsigned char *) chip_id +
->> +                                 (sizeof(uint16_t)
->> +                                  * epatch_info->num_patches));
->> +     patch_offset = (uint32_t *)((unsigned char *) patch_length +
->> +                                 (sizeof(uint16_t)
->> +                                  * epatch_info->num_patches));
->
-> Using the unaligned helpers is not an option?
+the current bluetooth-next tree and bluez.git should now make this work smoothly. The first connection after starting bluetoothd will still use the wrong connection parameters, but all future ones will be snappy.
 
-Can you go into a bit more detail here?
+Regards
 
-I should indeed use get_unaligned for accessing the 32-bit
-patch_offset values as they might not be 4-byte aligned.
-The others should be fine though.
+Marcel
 
-Or are you suggesting some helper that I can use to clean up the code
-in this area? If so, could you be a little more specific?
-
-> Do you really want to name the directory rtl_bt and not rtk or realtek or something more that makes actually sense. I have no idea where rtl comes from.
-
-There is already /lib/firmware/rtl_nic used by r8169 driver, I was
-going for consistency with that. There is also /lib/firmware/rtlwifi.
-Does that influence your preference?
-
-I'll address all other comments in the next patch.
-
-Thanks
-Daniel
