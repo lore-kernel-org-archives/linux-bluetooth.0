@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/4] android: Fix non-ANSI function declaration
-Date: Tue,  1 Jul 2014 15:50:41 +0300
-Message-Id: <1404219043-4216-3-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/4] android: Fix local variables not being marked as static
+Date: Tue,  1 Jul 2014 15:50:42 +0300
+Message-Id: <1404219043-4216-4-git-send-email-luiz.dentz@gmail.com>
 In-Reply-To: <1404219043-4216-1-git-send-email-luiz.dentz@gmail.com>
 References: <1404219043-4216-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,82 +12,63 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
 ---
- android/gatt.c      | 2 +-
- android/hal-a2dp.c  | 4 ++--
- android/hal-avrcp.c | 4 ++--
- android/hal-pan.c   | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
+ android/ipc-tester.c | 8 ++++----
+ android/pan.c        | 4 ++--
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 9c2b5dc..677a337 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -415,7 +415,7 @@ static struct gatt_device *find_device_by_addr(const bdaddr_t *addr)
- 	return queue_find(gatt_devices, match_device_by_bdaddr, addr);
- }
+diff --git a/android/ipc-tester.c b/android/ipc-tester.c
+index f23e4b6..99cc31f 100644
+--- a/android/ipc-tester.c
++++ b/android/ipc-tester.c
+@@ -601,7 +601,7 @@ struct vardata {
+ 				_servicelist);				\
+ 	} while (0)
  
--static struct gatt_device *find_pending_device()
-+static struct gatt_device *find_pending_device(void)
- {
- 	return queue_find(gatt_devices, match_pending_device, NULL);
- }
-diff --git a/android/hal-a2dp.c b/android/hal-a2dp.c
-index 7d3a651..99cd147 100644
---- a/android/hal-a2dp.c
-+++ b/android/hal-a2dp.c
-@@ -118,7 +118,7 @@ static bt_status_t init(btav_callbacks_t *callbacks)
- 	return ret;
- }
- 
--static void cleanup()
-+static void cleanup(void)
- {
- 	struct hal_cmd_unregister_module cmd;
- 
-@@ -145,7 +145,7 @@ static btav_interface_t iface = {
- 	.cleanup = cleanup
+-struct regmod_msg register_bt_msg = {
++static struct regmod_msg register_bt_msg = {
+ 	.header = {
+ 		.service_id = HAL_SERVICE_ID_CORE,
+ 		.opcode = HAL_OP_REGISTER_MODULE,
+@@ -612,7 +612,7 @@ struct regmod_msg register_bt_msg = {
+ 		},
  };
  
--btav_interface_t *bt_get_a2dp_interface()
-+btav_interface_t *bt_get_a2dp_interface(void)
- {
- 	return &iface;
- }
-diff --git a/android/hal-avrcp.c b/android/hal-avrcp.c
-index 51ab7da..761ddfb 100644
---- a/android/hal-avrcp.c
-+++ b/android/hal-avrcp.c
-@@ -645,7 +645,7 @@ static bt_status_t set_volume(uint8_t volume)
- 					sizeof(cmd), &cmd, NULL, NULL, NULL);
- }
- 
--static void cleanup()
-+static void cleanup(void)
- {
- 	struct hal_cmd_unregister_module cmd;
- 
-@@ -680,7 +680,7 @@ static btrc_interface_t iface = {
- 	.cleanup = cleanup
+-struct regmod_msg register_bt_malformed_size_msg = {
++static struct regmod_msg register_bt_malformed_size_msg = {
+ 	.header = {
+ 		.service_id = HAL_SERVICE_ID_CORE,
+ 		.opcode = HAL_OP_REGISTER_MODULE,
+@@ -645,13 +645,13 @@ static struct malformed_data3_struct malformed_data3_msg = {
+ 	. redundant_data = 666,
  };
  
--btrc_interface_t *bt_get_avrcp_interface()
-+btrc_interface_t *bt_get_avrcp_interface(void)
- {
- 	return &iface;
- }
-diff --git a/android/hal-pan.c b/android/hal-pan.c
-index 0f71ef6..d9e042a 100644
---- a/android/hal-pan.c
-+++ b/android/hal-pan.c
-@@ -196,7 +196,7 @@ static btpan_interface_t pan_if = {
- 	.cleanup = pan_cleanup
+-struct ipc_hdr enable_unknown_service_hdr = {
++static struct ipc_hdr enable_unknown_service_hdr = {
+ 	.service_id = HAL_SERVICE_ID_MAX + 1,
+ 	.opcode = HAL_OP_REGISTER_MODULE,
+ 	.len = 0,
  };
  
--btpan_interface_t *bt_get_pan_interface()
-+btpan_interface_t *bt_get_pan_interface(void)
- {
- 	return &pan_if;
- }
+-struct ipc_hdr enable_bt_service_hdr = {
++static struct ipc_hdr enable_bt_service_hdr = {
+ 	.service_id = HAL_SERVICE_ID_BLUETOOTH,
+ 	.opcode = HAL_OP_ENABLE,
+ 	.len = 0,
+diff --git a/android/pan.c b/android/pan.c
+index 9eab932..c11ee29 100644
+--- a/android/pan.c
++++ b/android/pan.c
+@@ -63,8 +63,8 @@
+ #define BNEP_NAP_INTERFACE "bt-pan%d"
+ 
+ static bdaddr_t adapter_addr;
+-GSList *devices = NULL;
+-uint8_t local_role = HAL_PAN_ROLE_NONE;
++static GSList *devices = NULL;
++static uint8_t local_role = HAL_PAN_ROLE_NONE;
+ static struct ipc *hal_ipc = NULL;
+ 
+ struct pan_device {
 -- 
 1.9.3
 
