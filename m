@@ -1,56 +1,71 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Use bool for smp_ltk_encrypt return value
-Date: Tue,  1 Jul 2014 10:59:24 +0200
-Message-Id: <1404205164-46988-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <CACUGKYMsJs8aE2woNnFjO+k_xkbY+xK-ZvE1ojpu4tuAERLZHg@mail.gmail.com>
+References: <CACUGKYMsJs8aE2woNnFjO+k_xkbY+xK-ZvE1ojpu4tuAERLZHg@mail.gmail.com>
+Date: Tue, 1 Jul 2014 10:41:32 +0300
+Message-ID: <CABBYNZLVwDr0ZYEFbSGbFu3Rh0H836g9YmTQ1WworC_6qhaxpg@mail.gmail.com>
+Subject: Re: bluetooth device
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: John Tobias <john.tobias.ph@gmail.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The return value of smp_ltk_encrypt is simple boolean, so just use
-bool and make the code a bit more readable.
+Hi John,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/smp.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On Tue, Jul 1, 2014 at 4:44 AM, John Tobias <john.tobias.ph@gmail.com> wrote:
+> Hi All,
+>
+> I am using iMX6SL-eval board, running kernel 3.16.0-rc3-next-20140630,
+> PulseAudio 5.0, Bluez 5.20. I ran bluetoothd and pulseaudio as
+> follows:
+>
+> /usr/libexec/bluetooth/bluetoothd -EC
+> /usr/bin/pulseaudio --system
+>
+> I was able to connect to the device through my phone as well as
+> streaming music and the bluetooth able to capture the play/pause...
+>
+>
+> If I ran pactl list sources short, I got the following:
+>
+> 0       alsa_output.platform-sound.analog-stereo.monitor
+> module-alsa-card.c      s16le 2ch 44100Hz       SUSPENDED
+> 1       alsa_input.platform-sound.analog-stereo module-alsa-card.c
+>  s16le 2ch 44100Hz       SUSPENDED
+> 2       bluez_source.D8_D1_XX_XX_XX_XX  module-bluez5-device.c  s16le
+> 2ch 44100Hz       IDLE
+>
+> Then, for pact list sinks short:
+>
+> 0       alsa_output.platform-sound.analog-stereo
+> module-alsa-card.c      s16le 2ch 44100Hz       SUSPENDED
+>
+>
+> I load pulseaudio module:
+>
+> pactl load-module module-loopback
+> source=bluez_source.D8_D1_XX_XX_XX_XX
+> sink=alsa_output.platform-tas57xx.14.analog-stereo
+>
+> I checked the logs for pulseaudio and I was getting an error:
+>
+> Jan 01 00:27:09 localhost pulseaudio[283]: E: [pulseaudio]
+> module-loopback.c: No such sink.
+> Jan 01 00:27:09 localhost pulseaudio[283]: E: [pulseaudio] module.c:
+> Failed to load module "module-loopback" (argument:
+> "source=bluez_source.D8_D1_XX_XX_XX_XX
+> sink=alsa_output.platform-tas57xx.14.analog-stereo"): initialization
+> failed
+>
+>
+> Any idea?.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 414c5151aa46..35f57090ddd0 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -837,7 +837,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
- 	return smp_random(smp);
- }
- 
--static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
-+static bool smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
- {
- 	struct smp_ltk *key;
- 	struct hci_conn *hcon = conn->hcon;
-@@ -845,18 +845,18 @@ static u8 smp_ltk_encrypt(struct l2cap_conn *conn, u8 sec_level)
- 	key = hci_find_ltk_by_addr(hcon->hdev, &hcon->dst, hcon->dst_type,
- 				   hcon->out);
- 	if (!key)
--		return 0;
-+		return false;
- 
- 	if (sec_level > BT_SECURITY_MEDIUM && !key->authenticated)
--		return 0;
-+		return false;
- 
- 	if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
--		return 1;
-+		return true;
- 
- 	hci_le_start_enc(hcon, key->ediv, key->rand, key->val);
- 	hcon->enc_key_size = key->enc_size;
- 
--	return 1;
-+	return true;
- }
- 
- static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+You better ask this question in PulseAudio mailing list, btw usually
+module-bluetooth-policy will take care of creating of loading the
+loopback module but perhaps you don't have in your default.pa.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
