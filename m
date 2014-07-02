@@ -1,32 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Fix sparse warning with btmrvl driver
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404308739-26797-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 2 Jul 2014 16:45:34 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0B87CEA0-AC47-40C8-934D-941D89D2020A@holtmann.org>
-References: <1404308739-26797-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Don't announce raw-only devices over management interface
+Date: Wed,  2 Jul 2014 16:43:29 +0200
+Message-Id: <1404312209-42720-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+When the HCI_QUIRK_RAW_DEVICE is set, then the controller existence
+should not be announced over the management interface.
 
-> This patch fixes the following sparse warning caused by a missing
-> declaration in the header file:
-> 
-> drivers/bluetooth/btmrvl_main.c:218:5: warning: symbol 'btmrvl_pscan_window_reporting' was not declared. Should it be static?
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> drivers/bluetooth/btmrvl_drv.h | 1 +
-> 1 file changed, 1 insertion(+)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 21a4c8dfb874..9e983b242057 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2275,6 +2275,7 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+ 		hci_notify(hdev, HCI_DEV_UP);
+ 		if (!test_bit(HCI_SETUP, &hdev->dev_flags) &&
+ 		    !test_bit(HCI_USER_CHANNEL, &hdev->dev_flags) &&
++		    !test_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks) &&
+ 		    hdev->dev_type == HCI_BREDR) {
+ 			hci_dev_lock(hdev);
+ 			mgmt_powered(hdev, 1);
+-- 
+1.9.3
 
