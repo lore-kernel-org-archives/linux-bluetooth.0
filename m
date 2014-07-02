@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 06/10] Bluetooth: Fix missing update of conn params
-Date: Wed,  2 Jul 2014 16:35:57 +0300
-Message-Id: <1404308161-15100-7-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 09/10] Bluetooth: Make is_identity_address a global function
+Date: Wed,  2 Jul 2014 16:36:00 +0300
+Message-Id: <1404308161-15100-10-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1404308161-15100-1-git-send-email-johan.hedberg@gmail.com>
 References: <1404308161-15100-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,42 +11,71 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We should update any stored connection parameters when we receive the LE
-Remove Connection Parameter Request HCI event. This patch adds the
-necessary code to the function that handles the event.
+There are more places that can take advantage of is_identity_address()
+besides hci_core.c. This patch moves the function to hci_core.h and
+gives it the appropriate hci_ prefix.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 14 +++++++++++++-
- 1 file changed, 13 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci_core.h | 12 ++++++++++++
+ net/bluetooth/hci_core.c         | 14 +-------------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b9d16e0ed661..03779e4f21f6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4417,9 +4417,21 @@ static void hci_le_remote_conn_param_req_evt(struct hci_dev *hdev,
- 		return send_conn_param_neg_reply(hdev, handle,
- 						 HCI_ERROR_INVALID_LL_PARAMS);
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index cf99c20739d9..3f1fb2760823 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1179,6 +1179,18 @@ static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
+ 	return false;
+ }
  
--	if (test_bit(HCI_CONN_MASTER, &hcon->flags))
-+	if (test_bit(HCI_CONN_MASTER, &hcon->flags)) {
-+		struct hci_conn_params *params;
++static inline bool hci_is_identity_address(bdaddr_t *addr, u8 addr_type)
++{
++	if (addr_type == ADDR_LE_DEV_PUBLIC)
++		return true;
 +
-+		params = hci_conn_params_lookup(hdev, &hcon->dst,
-+						hcon->dst_type);
-+		if (params) {
-+			params->conn_min_interval = min;
-+			params->conn_max_interval = max;
-+			params->conn_latency = latency;
-+			params->supervision_timeout = timeout;
-+		}
++	/* Check for Random Static address type */
++	if ((addr->b[5] & 0xc0) == 0xc0)
++		return true;
 +
- 		mgmt_new_conn_param(hdev, &hcon->dst, hcon->dst_type, min, max,
- 				    latency, timeout);
-+	}
++	return false;
++}
++
+ static inline struct smp_irk *hci_get_irk(struct hci_dev *hdev,
+ 					  bdaddr_t *bdaddr, u8 addr_type)
+ {
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 81442c0cc4ac..d1cf3b59022a 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3412,18 +3412,6 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
+ 	return true;
+ }
  
- 	cp.handle = ev->handle;
- 	cp.interval_min = ev->interval_min;
+-static bool is_identity_address(bdaddr_t *addr, u8 addr_type)
+-{
+-	if (addr_type == ADDR_LE_DEV_PUBLIC)
+-		return true;
+-
+-	/* Check for Random Static address type */
+-	if ((addr->b[5] & 0xc0) == 0xc0)
+-		return true;
+-
+-	return false;
+-}
+-
+ /* This function requires the caller holds hdev->lock */
+ struct bdaddr_list *hci_pend_le_conn_lookup(struct hci_dev *hdev,
+ 					    bdaddr_t *addr, u8 addr_type)
+@@ -3504,7 +3492,7 @@ struct hci_conn_params *hci_conn_params_add(struct hci_dev *hdev,
+ {
+ 	struct hci_conn_params *params;
+ 
+-	if (!is_identity_address(addr, addr_type))
++	if (!hci_is_identity_address(addr, addr_type))
+ 		return NULL;
+ 
+ 	params = hci_conn_params_lookup(hdev, addr, addr_type);
 -- 
 1.9.3
 
