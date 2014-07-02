@@ -1,85 +1,107 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <F2336E43-F4C9-411A-A3A3-1D0BF659C1F7@holtmann.org>
-References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
-	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
-	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
-	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
-	<CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
-	<CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com>
-	<CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com>
-	<CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com>
-	<CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com>
-	<20140629051442.GA31085@t440s.P-661HNU-F1>
-	<20140629052949.GA32130@t440s>
-	<E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
-	<CABx3TkUP3Y9nJJk=u2ghFnunQRh9x-v6PG_ncyiM+mUqaoRtWg@mail.gmail.com>
-	<5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org>
-	<CABx3TkVt3t_dyRmY6rjrwzw9BoTRaZinHOQEEbyVND+_NjLSVQ@mail.gmail.com>
-	<F2336E43-F4C9-411A-A3A3-1D0BF659C1F7@holtmann.org>
-Date: Wed, 2 Jul 2014 20:01:25 -0700
-Message-ID: <CABx3TkXFUnV_awEQUL8oicyEWXd-d5qPWjC8q-qRJL0VHQCvXA@mail.gmail.com>
-Subject: Re: LE mouse reconnect problem
-From: Ryan Press <ryan@presslab.us>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Support HCI_QUIRK_RAW_DEVICE for hci_vhci driver
+Date: Thu,  3 Jul 2014 01:35:10 +0200
+Message-Id: <1404344110-4468-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+This adds support for configuring the hci_vhci virtual controllers
+as a raw-only device using HCI_QUIRK_RAW_DEVICE. This is useful for
+testing the kernel internal infrastructure.
 
-On Tue, Jul 1, 2014 at 2:49 AM, Marcel Holtmann <marcel@holtmann.org> wrote=
-:
-> Hi Ryan,
->
->>>> I have one other question with it.  When it first reconnects the mouse
->>>> pointer is really jerky, like it's updating really slow.  Then after a
->>>> few seconds it is normal; in fact it is very responsive compared to my
->>>> old Bluetooth mouse.  With Windows 8.1 it reconnects lightning fast
->>>> when I turn it on, and it is not jerky at first.
->>>>
->>> this is a kernel issue with not remembering the previous connection par=
-ameters. What you see is that we start connecting with the default values a=
-nd then the slave (the mouse) will correct us and tell us what connection p=
-arameters it needs. We accept them and actually change the LE link to use t=
-hese parameters. However we end up forgetting them. So every time you conne=
-ct this procedure keeps repeating itself.
->>>
->>> I fixed this as well, but for that you will need a bluetooth-next kerne=
-l where I enabled the management API for passive scanning and a modified bl=
-uetoothd that will then allow you a smooth experience. If the slave updates=
- the connection parameters we remember them for devices using auto-connecti=
-on. So once the connection is triggered via passive scanning the values wil=
-l be remembered.
->>>
->>> At the moment, I have one minor issue with the re-connection within blu=
-etoothd and once that is fixed this should be pretty instant.
->>
->>
->> Okay, great, glad to hear that you're already on it.  I'm really
->> looking forward to the seamless Bluetooth experience on Linux!  When
->> everything is ready and in the master branch let me know and I will
->> try them out.
->
-> the current bluetooth-next tree and bluez.git should now make this work s=
-moothly. The first connection after starting bluetoothd will still use the =
-wrong connection parameters, but all future ones will be snappy.
->
-> Regards
->
-> Marcel
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/hci_vhci.c | 30 +++++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 9 deletions(-)
 
-I have installed bluetooth-next and bluez git.  I had to merge with
-rc3 because rc1 wouldn't boot on my machine for some other reason.  At
-first I had rfkill soft blocked when resuming from standby but then I
-pulled again and it fixed it.  I saw Johan made a commit about blocked
-devices maybe that was it.
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index add1c6a72063..aa446c7eb7e5 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -40,7 +40,7 @@
+ #include <net/bluetooth/bluetooth.h>
+ #include <net/bluetooth/hci_core.h>
+ 
+-#define VERSION "1.4"
++#define VERSION "1.5"
+ 
+ static bool amp;
+ 
+@@ -95,10 +95,21 @@ static int vhci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
+-static int vhci_create_device(struct vhci_data *data, __u8 dev_type)
++static int vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	struct hci_dev *hdev;
+ 	struct sk_buff *skb;
++	__u8 dev_type;
++
++	/* bits 0-1 are dev_type (BR/EDR or AMP) */
++	dev_type = opcode & 0x03;
++
++	if (dev_type != HCI_BREDR && dev_type != HCI_AMP)
++		return -EINVAL;
++
++	/* bits 2-6 are reserved (must be zero) */
++	if (opcode & 0x7c)
++		return -EINVAL;
+ 
+ 	skb = bt_skb_alloc(4, GFP_KERNEL);
+ 	if (!skb)
+@@ -121,6 +132,10 @@ static int vhci_create_device(struct vhci_data *data, __u8 dev_type)
+ 	hdev->flush = vhci_flush;
+ 	hdev->send  = vhci_send_frame;
+ 
++	/* bit 7 is for raw device */
++	if (opcode & 0x80)
++		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
++
+ 	if (hci_register_dev(hdev) < 0) {
+ 		BT_ERR("Can't register HCI device");
+ 		hci_free_dev(hdev);
+@@ -132,7 +147,7 @@ static int vhci_create_device(struct vhci_data *data, __u8 dev_type)
+ 	bt_cb(skb)->pkt_type = HCI_VENDOR_PKT;
+ 
+ 	*skb_put(skb, 1) = 0xff;
+-	*skb_put(skb, 1) = dev_type;
++	*skb_put(skb, 1) = opcode;
+ 	put_unaligned_le16(hdev->id, skb_put(skb, 2));
+ 	skb_queue_tail(&data->readq, skb);
+ 
+@@ -146,7 +161,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ {
+ 	size_t len = iov_length(iov, count);
+ 	struct sk_buff *skb;
+-	__u8 pkt_type, dev_type;
++	__u8 pkt_type, opcode;
+ 	unsigned long i;
+ 	int ret;
+ 
+@@ -190,7 +205,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 
+ 		cancel_delayed_work_sync(&data->open_timeout);
+ 
+-		dev_type = *((__u8 *) skb->data);
++		opcode = *((__u8 *) skb->data);
+ 		skb_pull(skb, 1);
+ 
+ 		if (skb->len > 0) {
+@@ -200,10 +215,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 
+ 		kfree_skb(skb);
+ 
+-		if (dev_type != HCI_BREDR && dev_type != HCI_AMP)
+-			return -EINVAL;
+-
+-		ret = vhci_create_device(data, dev_type);
++		ret = vhci_create_device(data, opcode);
+ 		break;
+ 
+ 	default:
+-- 
+1.9.3
 
-So it works really well!  Connections are instant and the mouse
-reconnects every time.  The only time that connection is slow is the
-first time after a reboot, like you mention above; that's not really a
-problem.
-
-Thanks,
-Ryan
