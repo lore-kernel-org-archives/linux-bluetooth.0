@@ -1,51 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 1/3] android/health: Handle incoming streaming data channel request
-Date: Wed,  2 Jul 2014 12:32:00 +0300
-Message-Id: <1404293522-7220-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH] Bluetooth: Add public address configration for Intel USB devices
+Date: Wed,  2 Jul 2014 11:25:25 +0200
+Message-Id: <1404293125-14202-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-First data channel should be reliable data channel when remote device
-in sink role request data channel with option any.
----
- android/health.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+For the Intel based USB devices add support for configuration of
+the public device address.
 
-diff --git a/android/health.c b/android/health.c
-index 1943ced..2d80365 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -1423,7 +1423,8 @@ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
- 	struct health_app *app;
- 	struct mdep_cfg *mdep;
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 21 ++++++++++++++++++++-
+ 1 file changed, 20 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index e0e39cc1af31..66966b9c4244 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1382,6 +1382,23 @@ exit_mfg_deactivate:
+ 	return 0;
+ }
  
--	DBG("Data channel request: mdepid %u mdlid %u", mdepid, mdlid);
-+	DBG("Data channel request: mdepid %u mdlid %u conf %u",
-+							mdepid, mdlid, *conf);
++static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct sk_buff *skb;
++	long ret;
++
++	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		ret = PTR_ERR(skb);
++		BT_ERR("%s: changing Intel device address failed (%ld)",
++			hdev->name, ret);
++		return ret;
++	}
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int btusb_setup_bcm_patchram(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -1657,8 +1674,10 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->set_bdaddr = btusb_set_bdaddr_bcm;
+ 	}
  
- 	if (mdepid == MDEP_ECHO)
- 		/* For echo service take last app */
-@@ -1478,10 +1479,14 @@ static uint8_t mcap_mdl_conn_req_cb(struct mcap_mcl *mcl, uint8_t mdepid,
+-	if (id->driver_info & BTUSB_INTEL)
++	if (id->driver_info & BTUSB_INTEL) {
+ 		hdev->setup = btusb_setup_intel;
++		hdev->set_bdaddr = btusb_set_bdaddr_intel;
++	}
  
- 	switch (*conf) {
- 	case CHANNEL_TYPE_ANY:
--		if (mdep->role == HAL_HEALTH_MDEP_ROLE_SINK)
-+		if (mdep->role == HAL_HEALTH_MDEP_ROLE_SINK) {
- 			return MCAP_CONFIGURATION_REJECTED;
--		else
--			*conf = CHANNEL_TYPE_RELIABLE;
-+		} else {
-+			if (queue_length(channel->dev->channels) <= 1)
-+				*conf = CHANNEL_TYPE_RELIABLE;
-+			else
-+				*conf = CHANNEL_TYPE_STREAM;
-+		}
- 		break;
- 	case CHANNEL_TYPE_STREAM:
- 		if (mdep->role == HAL_HEALTH_MDEP_ROLE_SOURCE)
+ 	/* Interface numbers are hardcoded in the specification */
+ 	data->isoc = usb_ifnum_to_if(data->udev, 1);
 -- 
-1.9.1
+1.9.3
 
