@@ -1,38 +1,47 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/10] Bluetooth: Connection parameter support
-Date: Wed,  2 Jul 2014 16:35:51 +0300
-Message-Id: <1404308161-15100-1-git-send-email-johan.hedberg@gmail.com>
+From: Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Subject: Thoughts about new hciattach
+Message-Id: <ECBBC064-4E80-4B2F-9B4F-2BC43329A36A@holtmann.org>
+Date: Wed, 2 Jul 2014 15:34:38 +0200
+To: Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hello everyone,
 
-This patch set implements the Load Connection Parameters command and
-contains other connection parameter related fixes and improvements.
+the hciattach source has been bitrotting for a while and is by far the most ugly code there is in the whole tree. There is a long history on this code and it is what it is, but maybe with newer kernels this can be all simplified. One major problem is that that all the initialization code (patching, config etc.) needs a working HCI transport. That is simple enough for H:4, but H:5 or BCSP it is way more complicated.
 
-Johan
+Since we added HCI_CHANNEL_USER support in Linux 3.13 and I just finished some fixes for the whole HCI_QUIRK_RAW_DEVICE for Linux 3.17, I think we can just easily combine this now. So here is what I think how an init procedure for btattach (the new hciattach) should look like.
 
-----------------------------------------------------------------
-Johan Hedberg (10):
-      Bluetooth: Rename hci_conn_params_clear to hci_conn_params_clear_all
-      Bluetooth: Add specific connection parameter clear functions
-      Bluetooth: Add new auto_conn value matching mgmt action 0x00
-      Bluetooth: Remove only enabled entries with Remove Device command
-      Bluetooth: Add Load Connection Parameters command
-      Bluetooth: Fix missing update of conn params
-      Bluetooth: Make hci_le_conn_update return any updated parameters
-      Bluetooth: Pass store hint to mgmt_new_conn_param
-      Bluetooth: Make is_identity_address a global function
-      Bluetooth: Set store_hint to 0 for non-identity addresses
+	 1) open serial port
+	 2) set initial baud rate
+	 3) attach N_HCI line discipline
+	 3) call HCIUARTSETFLAGS with HCI_UART_RAW_DEVICE
+	 4) call HCIUARTSETPROTO with H:4, H:5, BCSP etc.
+	 5) call HCIUARTGETDEVICE to get dev_id
+	 6) open HCI_CHANNEL_USER for dev_id
 
- include/net/bluetooth/hci_core.h |  26 ++++++--
- include/net/bluetooth/mgmt.h     |  15 +++++
- net/bluetooth/hci_conn.c         |   7 ++-
- net/bluetooth/hci_core.c         |  53 +++++++++++-----
- net/bluetooth/hci_event.c        |  22 ++++++-
- net/bluetooth/l2cap_core.c       |  15 ++++-
- net/bluetooth/mgmt.c             | 113 +++++++++++++++++++++++++++++++++--
- 7 files changed, 218 insertions(+), 33 deletions(-)
+	--> run vendor HCI commands (src/shared/hci.h can be of help)
+
+	 7) close HCI_CHANNEL_USER for dev_id
+	 8) remove N_HCI line discipline
+	 9) set new baud rate
+	10) attach H_HCI line discipline
+	11) call HCIUARTSETFLAGS without HCI_UART_RAW_DEVICE
+	12) call HCIUARTSETPROTO with H:4, H:5, BCSP etc.
+
+	--> normal operation (bluetoothd in action)
+
+	13) remove N_HCI line discipline
+	14) close serial port
+
+The neat trick here is that raw devices will not be announced over management interface, but they can be used from the user channel interface. However in both cases the actual transport protocol is run by the kernel and thus does not need to be duplicated. Especially for H:5 and BCSP this should make things a lot simpler.
+
+So this is just an idea. I have not tried how well the TTY layer behaves and if setting the line discipline, removing it and setting it again actually works as expected.
+
+Regards
+
+Marcel
 
