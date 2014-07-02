@@ -1,32 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH v2 2/2] Bluetooth: Drop LE connections for blocked devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404282982-26114-2-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 2 Jul 2014 09:08:45 +0200
+Date: Wed, 2 Jul 2014 09:39:39 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6E10CD3D-83F1-4D76-9307-06F4137EC627@holtmann.org>
-References: <1404282982-26114-1-git-send-email-johan.hedberg@gmail.com> <1404282982-26114-2-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 1/2] Bluetooth: Add support for hdev->set_bdaddr callback
+ handling
+Message-ID: <20140702063939.GA26245@t440s.P-661HNU-F1>
+References: <1404255228-51661-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404255228-51661-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> Unlike BR/EDR we cannot reject LE connections of blocked devices but
-> have to do it as soon as we get a LE Connection Complete event. The
-> patch adds a blacklist check to the hci_le_conn_complete_evt function
-> and drops all connections for blocked devices.
+On Wed, Jul 02, 2014, Marcel Holtmann wrote:
+> Some embedded controllers allow the programming of a public address
+> and this adds vendor support for supporting OEM confguration of such
+> addresses.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> net/bluetooth/hci_event.c | 12 ++++++++++++
-> 1 file changed, 12 insertions(+)
+>  include/net/bluetooth/hci_core.h |  2 ++
+>  net/bluetooth/hci_core.c         | 11 +++++++++++
+>  2 files changed, 13 insertions(+)
 
-patch has been applied to bluetooth-next tree.
+Both patches have been applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
-
+Johan
