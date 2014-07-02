@@ -1,36 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix sparse warning with btmrvl driver
-Date: Wed,  2 Jul 2014 16:45:39 +0300
-Message-Id: <1404308739-26797-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 2 Jul 2014 16:42:01 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Check for default address of Broadcom
+ BCM20702A0 controllers
+Message-ID: <20140702134201.GD15249@t440s.P-661HNU-F1>
+References: <1404297502-26014-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404297502-26014-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-This patch fixes the following sparse warning caused by a missing
-declaration in the header file:
+On Wed, Jul 02, 2014, Marcel Holtmann wrote:
+> The Broadcom BCM20702A0 USB controllers might come with the default
+> address 00:20:70:02:A0:00 when booting up. If this happens, then warn
+> about such address being used.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/btusb.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+>  1 file changed, 40 insertions(+), 2 deletions(-)
 
-drivers/bluetooth/btmrvl_main.c:218:5: warning: symbol 'btmrvl_pscan_window_reporting' was not declared. Should it be static?
+Applied to bluetooth-next. Thanks.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- drivers/bluetooth/btmrvl_drv.h | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
-index a8a9d3380e59..caf684119a4e 100644
---- a/drivers/bluetooth/btmrvl_drv.h
-+++ b/drivers/bluetooth/btmrvl_drv.h
-@@ -145,6 +145,7 @@ bool btmrvl_check_evtpkt(struct btmrvl_private *priv, struct sk_buff *skb);
- int btmrvl_process_event(struct btmrvl_private *priv, struct sk_buff *skb);
- 
- int btmrvl_send_module_cfg_cmd(struct btmrvl_private *priv, u8 subcmd);
-+int btmrvl_pscan_window_reporting(struct btmrvl_private *priv, u8 subcmd);
- int btmrvl_send_hscfg_cmd(struct btmrvl_private *priv);
- int btmrvl_enable_ps(struct btmrvl_private *priv);
- int btmrvl_prepare_command(struct btmrvl_private *priv);
--- 
-1.9.3
-
+Johan
