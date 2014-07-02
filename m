@@ -1,56 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/2] Bluetooth: Drop LE connections for blocked devices
-Date: Wed,  2 Jul 2014 09:36:22 +0300
-Message-Id: <1404282982-26114-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1404282982-26114-1-git-send-email-johan.hedberg@gmail.com>
-References: <1404282982-26114-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/2] Bluetooth: Centralize looking up blocked devices to l2cap_recv_frame
+Date: Wed,  2 Jul 2014 09:36:21 +0300
+Message-Id: <1404282982-26114-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Unlike BR/EDR we cannot reject LE connections of blocked devices but
-have to do it as soon as we get a LE Connection Complete event. The
-patch adds a blacklist check to the hci_le_conn_complete_evt function
-and drops all connections for blocked devices.
+The ATT channel isn't the only one that we should ensure doesn't receive
+data from blocked devices. SMP is another, and in general we don't want
+data packets going to any of the various handlers. Therefore, add a
+single check to the l2cap_recv_frame function.
+
+The patch fixes at the same time the use of a correct address type. The
+blacklist stores the values with the user space facing triple type
+wheras hci_conn->dst_type uses the HCI address type (0x00 or 0x01).
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/bluetooth/l2cap_core.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b9d16e0ed661..ed49a065dd67 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4038,6 +4038,7 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_ev_le_conn_complete *ev = (void *) skb->data;
- 	struct hci_conn *conn;
- 	struct smp_irk *irk;
-+	u8 addr_type;
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 058b3b2b59b5..a6e276204ae9 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6878,9 +6878,6 @@ static void l2cap_att_channel(struct l2cap_conn *conn,
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
  
-@@ -4119,6 +4120,17 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		conn->dst_type = irk->addr_type;
+-	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst, hcon->dst_type))
+-		goto drop;
+-
+ 	if (chan->imtu < skb->len)
+ 		goto drop;
+ 
+@@ -6913,6 +6910,12 @@ static void l2cap_recv_frame(struct l2cap_conn *conn, struct sk_buff *skb)
+ 		return;
  	}
  
-+	if (conn->dst_type == ADDR_LE_DEV_PUBLIC)
-+		addr_type = BDADDR_LE_PUBLIC;
-+	else
-+		addr_type = BDADDR_LE_RANDOM;
-+
-+	/* Drop the connection if he device is blocked */
-+	if (hci_blacklist_lookup(hdev, &conn->dst, addr_type)) {
-+		hci_conn_drop(conn);
-+		goto unlock;
++	if (hci_blacklist_lookup(hcon->hdev, &hcon->dst,
++				 bdaddr_type(hcon, hcon->dst_type))) {
++		kfree_skb(skb);
++		return;
 +	}
 +
- 	if (ev->status) {
- 		hci_le_conn_failed(conn, ev->status);
- 		goto unlock;
+ 	BT_DBG("len %d, cid 0x%4.4x", len, cid);
+ 
+ 	switch (cid) {
 -- 
 1.9.3
 
