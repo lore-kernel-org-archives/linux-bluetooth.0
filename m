@@ -1,54 +1,50 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Support scanning for devices using RPA
-Date: Wed,  2 Jul 2014 23:09:24 +0300
-Message-Id: <1404331764-24731-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: Allow mgmt_device_found events for kernel-side scanning
+Date: Wed,  2 Jul 2014 22:42:01 +0300
+Message-Id: <1404330122-18770-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1404330122-18770-1-git-send-email-johan.hedberg@gmail.com>
+References: <1404330122-18770-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When we're scanning for specific devices that use an RPA we need to
-convert the RPA to the identity address before looking up the entry in
-the connection parameters. This patch adds the necessary code to do this
-in the process_adv_report() function.
+When the kernel is doing LE scanning because of one or more devices
+added with action 0x00 through the Add Device command we do want to let
+mgmt_device_found() to proceed with sending an event. This kind of
+devices are tracked with hdev->pend_le_reports, so check this value
+before bailing out from the function.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ net/bluetooth/mgmt.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 87a704bd7eb7..dd70e3a4fea5 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4231,6 +4231,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 	 */
- 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
- 		struct hci_conn_params *param;
-+		struct smp_irk *irk;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1a78d26b0049..189cf0a7fbb2 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -6401,8 +6401,16 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 	struct smp_irk *irk;
+ 	size_t ev_size;
  
- 		if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND)
- 			check_pending_le_conn(hdev, bdaddr, bdaddr_type);
-@@ -4241,6 +4242,17 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 		if (type == LE_ADV_DIRECT_IND)
- 			return;
- 
-+		/* Check if we need to convert to identity address */
-+		irk = hci_get_irk(hdev, bdaddr, bdaddr_type);
-+		if (irk) {
-+			bdaddr = &irk->bdaddr;
-+			bdaddr_type = irk->addr_type;
-+		}
-+
-+		/* The conn params list only contains identity addresses */
-+		if (!hci_is_identity_address(bdaddr, bdaddr_type))
+-	if (!hci_discovery_active(hdev))
+-		return;
++	/* Don't send events for a non-kernel initiated discovery. With
++	 * LE one exception is if we have pend_le_reports > 0 in which
++	 * case we're doing passive scanning and want these events.
++	 */
++	if (!hci_discovery_active(hdev)) {
++		if (link_type == ACL_LINK)
 +			return;
-+
- 		param = hci_conn_params_lookup(hdev, bdaddr, bdaddr_type);
- 		if (!param || param->auto_connect != HCI_AUTO_CONN_REPORT)
- 			return;
++		if (link_type == LE_LINK && !hdev->pend_le_reports)
++			return;
++	}
+ 
+ 	/* Make sure that the buffer is big enough. The 5 extra bytes
+ 	 * are for the potential CoD field.
 -- 
 1.9.3
 
