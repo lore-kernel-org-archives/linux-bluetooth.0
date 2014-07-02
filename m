@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 04/10] Bluetooth: Remove only enabled entries with Remove Device command
-Date: Wed,  2 Jul 2014 16:35:55 +0300
-Message-Id: <1404308161-15100-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 03/10] Bluetooth: Add new auto_conn value matching mgmt action 0x00
+Date: Wed,  2 Jul 2014 16:35:54 +0300
+Message-Id: <1404308161-15100-4-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1404308161-15100-1-git-send-email-johan.hedberg@gmail.com>
 References: <1404308161-15100-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,66 +11,54 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The Remove Device mgmt command is supposed to undo what the Add Device
-command does. An entry added by Add Device cannot have the
-HCI_AUTO_CONN_DISABLED auto_connect value, so we should treat this as an
-invalid entry to remove. This patch adds the necessary pieces to the
-Remove Device command handler so that it only removes entries which were
-added by Add Device.
+The 0x00 action value of mgmt means "scan and report" but do not
+connect. This is different from HCI_AUTO_CONN_DISABLED so we need a new
+value for it.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 23 +++++++++++++++++++++--
- 1 file changed, 21 insertions(+), 2 deletions(-)
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_core.c         | 1 +
+ net/bluetooth/mgmt.c             | 2 +-
+ 3 files changed, 3 insertions(+), 1 deletion(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 2091e0013b8c..f4a2f50f30b5 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -449,6 +449,7 @@ struct hci_conn_params {
+ 
+ 	enum {
+ 		HCI_AUTO_CONN_DISABLED,
++		HCI_AUTO_CONN_REPORT,
+ 		HCI_AUTO_CONN_ALWAYS,
+ 		HCI_AUTO_CONN_LINK_LOSS,
+ 	} auto_connect;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1b30b34ee9c7..81442c0cc4ac 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3547,6 +3547,7 @@ int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ 
+ 	switch (auto_connect) {
+ 	case HCI_AUTO_CONN_DISABLED:
++	case HCI_AUTO_CONN_REPORT:
+ 	case HCI_AUTO_CONN_LINK_LOSS:
+ 		hci_pend_le_conn_del(hdev, addr, addr_type);
+ 		break;
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f7217f9eda03..574dd9f7c39e 100644
+index 29850e76ea3c..f7217f9eda03 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5079,6 +5079,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
+@@ -5034,7 +5034,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 	if (cp->action)
+ 		auto_conn = HCI_AUTO_CONN_ALWAYS;
+ 	else
+-		auto_conn = HCI_AUTO_CONN_DISABLED;
++		auto_conn = HCI_AUTO_CONN_REPORT;
  
- 	if (bacmp(&cp->addr.bdaddr, BDADDR_ANY)) {
-+		struct hci_conn_params *params;
- 		u8 addr_type;
- 
- 		if (!bdaddr_type_is_le(cp->addr.type)) {
-@@ -5093,7 +5094,25 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
- 		else
- 			addr_type = ADDR_LE_DEV_RANDOM;
- 
--		hci_conn_params_del(hdev, &cp->addr.bdaddr, addr_type);
-+		params = hci_conn_params_lookup(hdev, &cp->addr.bdaddr,
-+						addr_type);
-+		if (!params) {
-+			err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
-+					   MGMT_STATUS_INVALID_PARAMS,
-+					   &cp->addr, sizeof(cp->addr));
-+			goto unlock;
-+		}
-+
-+		if (params->auto_connect == HCI_AUTO_CONN_DISABLED) {
-+			err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
-+					   MGMT_STATUS_INVALID_PARAMS,
-+					   &cp->addr, sizeof(cp->addr));
-+			goto unlock;
-+		}
-+
-+		hci_pend_le_conn_del(hdev, &cp->addr.bdaddr, addr_type);
-+		list_del(&params->list);
-+		kfree(params);
- 
- 		device_removed(sk, hdev, &cp->addr.bdaddr, cp->addr.type);
- 	} else {
-@@ -5104,7 +5123,7 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
- 			goto unlock;
- 		}
- 
--		hci_conn_params_clear_all(hdev);
-+		hci_conn_params_clear_enabled(hdev);
- 	}
- 
- 	err = cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
+ 	/* If the connection parameters don't exist for this device,
+ 	 * they will be created and configured with defaults.
 -- 
 1.9.3
 
