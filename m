@@ -1,60 +1,89 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add public address configration for Intel USB devices
-Date: Wed,  2 Jul 2014 11:25:25 +0200
-Message-Id: <1404293125-14202-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+In-Reply-To: <1404287892-13170-1-git-send-email-szymon.janc@tieto.com>
+References: <1404287892-13170-1-git-send-email-szymon.janc@tieto.com>
+Date: Wed, 2 Jul 2014 11:25:40 +0300
+Message-ID: <CABBYNZ+KeA9JGBWyKnUsMKSE3EGubbps5+Shyz0-D0JW4VHMKg@mail.gmail.com>
+Subject: Re: [PATCH 1/3] android/hog: Add bt_hog_send_report
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Szymon Janc <szymon.janc@tieto.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-For the Intel based USB devices add support for configuration of
-the public device address.
+Hi Szymon,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 21 ++++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+On Wed, Jul 2, 2014 at 10:58 AM, Szymon Janc <szymon.janc@tieto.com> wrote:
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+>
+> This function can be used to send data using specified report if one is
+> available.
+> ---
+>  android/hog.c | 37 +++++++++++++++++++++++++++++++++++++
+>  android/hog.h |  1 +
+>  2 files changed, 38 insertions(+)
+>
+> diff --git a/android/hog.c b/android/hog.c
+> index 43bd266..9f8c7e5 100644
+> --- a/android/hog.c
+> +++ b/android/hog.c
+> @@ -1038,3 +1038,40 @@ int bt_hog_set_control_point(struct bt_hog *hog, bool suspend)
+>
+>         return 0;
+>  }
+> +
+> +int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type)
+> +{
+> +       struct report *report;
+> +       GSList *l;
+> +
+> +       if (!hog)
+> +               return -EINVAL;
+> +
+> +       if (!hog->attrib)
+> +               return -ENOTCONN;
+> +
+> +       l = g_slist_find_custom(hog->reports, GUINT_TO_POINTER(type),
+> +                                                       report_type_cmp);
+> +       if (!l)
+> +               return -ENOTSUP;
+> +
+> +       report = l->data;
+> +
+> +       DBG("hog: Write report, handle 0x%X", report->decl->value_handle);
+> +
+> +       if (report->decl->properties & GATT_CHR_PROP_WRITE)
+> +               gatt_write_char(hog->attrib, report->decl->value_handle,
+> +                               data, size, output_written_cb, hog);
+> +
+> +       if (report->decl->properties & GATT_CHR_PROP_WRITE_WITHOUT_RESP)
+> +               gatt_write_cmd(hog->attrib, report->decl->value_handle,
+> +                                               data, size, NULL, NULL);
+> +
+> +       for (l = hog->instances; l; l = l->next) {
+> +               struct bt_hog *instance = l->data;
+> +
+> +               bt_hog_send_report(instance, data, size, type);
+> +       }
+> +
+> +       return 0;
+> +}
+> diff --git a/android/hog.h b/android/hog.h
+> index 7cf446b..ddb2cea 100644
+> --- a/android/hog.h
+> +++ b/android/hog.h
+> @@ -33,3 +33,4 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt);
+>  void bt_hog_detach(struct bt_hog *hog);
+>
+>  int bt_hog_set_control_point(struct bt_hog *hog, bool suspend);
+> +int bt_hog_send_report(struct bt_hog *hog, void *data, size_t size, int type);
+> --
+> 1.9.1
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index e0e39cc1af31..66966b9c4244 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1382,6 +1382,23 @@ exit_mfg_deactivate:
- 	return 0;
- }
- 
-+static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-+{
-+	struct sk_buff *skb;
-+	long ret;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc31, 6, bdaddr, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		ret = PTR_ERR(skb);
-+		BT_ERR("%s: changing Intel device address failed (%ld)",
-+			hdev->name, ret);
-+		return ret;
-+	}
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- static int btusb_setup_bcm_patchram(struct hci_dev *hdev)
- {
- 	struct btusb_data *data = hci_get_drvdata(hdev);
-@@ -1657,8 +1674,10 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_bdaddr = btusb_set_bdaddr_bcm;
- 	}
- 
--	if (id->driver_info & BTUSB_INTEL)
-+	if (id->driver_info & BTUSB_INTEL) {
- 		hdev->setup = btusb_setup_intel;
-+		hdev->set_bdaddr = btusb_set_bdaddr_intel;
-+	}
- 
- 	/* Interface numbers are hardcoded in the specification */
- 	data->isoc = usb_ifnum_to_if(data->udev, 1);
+Applied, thanks.
+
+
 -- 
-1.9.3
-
+Luiz Augusto von Dentz
