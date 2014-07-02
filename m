@@ -1,118 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Check for default address of Intel USB controllers
-Date: Wed,  2 Jul 2014 12:06:45 +0200
-Message-Id: <1404295605-23326-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Default to internal use manufacturer identifier
+Date: Wed,  2 Jul 2014 11:30:51 +0200
+Message-Id: <1404293451-14505-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Some Intel Bluetooth controllers come with a default address. If this
-address is found, print an error to warn the user about it.
-
-The controller is fully operational, but the danger of duplicate
-Bluetooth addresses might causes issues. At least with a clear
-error it becomes easier to debug these cases.
+When allocating a new controller structure, then default to the internal
+use value 0xffff first. Default to 0x0000 is a bad idea since that is
+the manufacturer identifier of Ericsson Technology Licensing.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/btusb.c | 49 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+ net/bluetooth/hci_core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 66966b9c4244..32aabea731f2 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1182,6 +1182,49 @@ static int btusb_setup_intel_patching(struct hci_dev *hdev,
- 	return 0;
- }
- 
-+#define BDADDR_INTEL (&(bdaddr_t) {{0x00, 0x8b, 0x9e, 0x19, 0x03, 0x00}})
-+
-+static int btusb_check_bdaddr_intel(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	struct hci_rp_read_bd_addr *rp;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_BD_ADDR, 0, NULL,
-+			     HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		BT_ERR("%s reading Intel device address failed (%ld)",
-+		       hdev->name, PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->len != sizeof(*rp)) {
-+		BT_ERR("%s Intel device address length mismatch", hdev->name);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	rp = (struct hci_rp_read_bd_addr *) skb->data;
-+	if (rp->status) {
-+		BT_ERR("%s Intel device address result failed (%02x)",
-+		       hdev->name, rp->status);
-+		kfree_skb(skb);
-+		return -bt_to_errno(rp->status);
-+	}
-+
-+	/* For some Intel based controllers, the default Bluetooth device
-+	 * address 00:03:19:9E:8B:00 can be found. These controllers are
-+	 * fully operational, but have the danger of duplicate addresses
-+	 * and that in turn can cause problems with Bluetooth operation.
-+	 */
-+	if (!bacmp(&rp->bdaddr, BDADDR_INTEL))
-+		BT_ERR("%s found Intel default device address (%pMR)",
-+		       hdev->name, &rp->bdaddr);
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
- static int btusb_setup_intel(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -1254,6 +1297,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 		BT_INFO("%s: Intel device is already patched. patch num: %02x",
- 			hdev->name, ver->fw_patch_num);
- 		kfree_skb(skb);
-+		btusb_check_bdaddr_intel(hdev);
- 		return 0;
- 	}
- 
-@@ -1266,6 +1310,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	fw = btusb_setup_intel_get_fw(hdev, ver);
- 	if (!fw) {
- 		kfree_skb(skb);
-+		btusb_check_bdaddr_intel(hdev);
- 		return 0;
- 	}
- 	fw_ptr = fw->data;
-@@ -1345,6 +1390,7 @@ static int btusb_setup_intel(struct hci_dev *hdev)
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and activated",
- 		hdev->name);
- 
-+	btusb_check_bdaddr_intel(hdev);
- 	return 0;
- 
- exit_mfg_disable:
-@@ -1359,6 +1405,8 @@ exit_mfg_disable:
- 	kfree_skb(skb);
- 
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed", hdev->name);
-+
-+	btusb_check_bdaddr_intel(hdev);
- 	return 0;
- 
- exit_mfg_deactivate:
-@@ -1379,6 +1427,7 @@ exit_mfg_deactivate:
- 	BT_INFO("%s: Intel Bluetooth firmware patch completed and deactivated",
- 		hdev->name);
- 
-+	btusb_check_bdaddr_intel(hdev);
- 	return 0;
- }
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 63197d70d8eb..21a4c8dfb874 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3796,6 +3796,7 @@ struct hci_dev *hci_alloc_dev(void)
+ 	hdev->link_mode = (HCI_LM_ACCEPT);
+ 	hdev->num_iac = 0x01;		/* One IAC support is mandatory */
+ 	hdev->io_capability = 0x03;	/* No Input No Output */
++	hdev->manufacturer = 0xffff;	/* Default to internal use */
+ 	hdev->inq_tx_power = HCI_TX_POWER_INVALID;
+ 	hdev->adv_tx_power = HCI_TX_POWER_INVALID;
  
 -- 
 1.9.3
