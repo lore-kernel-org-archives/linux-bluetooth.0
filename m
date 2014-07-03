@@ -1,155 +1,85 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 06/19] android/tester-ng: Add callback mechanism
-Date: Thu,  3 Jul 2014 18:00:09 +0200
-Message-Id: <1404403222-26911-7-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 05/19] android/tester-bluetooth: Add enable success test case
+Date: Thu,  3 Jul 2014 18:00:08 +0200
+Message-Id: <1404403222-26911-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1404403222-26911-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1404403222-26911-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-
-This patch adds bt_cb_data to be used for passing callback data from
-asynchronous call to tester's main loop. As for now this struct contains
-only state but will be extended to handle various callbacks.
+This adds also enable action which enable bluetooth adapter.
 ---
- android/tester-bluetooth.c |  4 ++++
- android/tester-main.c      | 45 ++++++++++++++++++++++++++++++++++++++++++++-
- android/tester-main.h      | 32 ++++++++++++++++++++++++++++++++
- 3 files changed, 80 insertions(+), 1 deletion(-)
+ android/tester-bluetooth.c | 15 +++++++++++++++
+ android/tester-main.c      | 11 +++++++++++
+ android/tester-main.h      |  1 +
+ 3 files changed, 27 insertions(+)
 
 diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index 0f55d9e..d9f26a8 100644
+index c912d7d..0f55d9e 100644
 --- a/android/tester-bluetooth.c
 +++ b/android/tester-bluetooth.c
-@@ -35,6 +35,10 @@ static struct step bluetooth_enable_success_steps[] = {
- 		.action_result.status = BT_STATUS_SUCCESS,
- 		.action = bluetooth_enable_action,
- 	},
+@@ -30,6 +30,18 @@ static struct test_case bluetooth_init = {
+ 	.step_num = get_test_case_step_num(dummy_steps),
+ };
+ 
++static struct step bluetooth_enable_success_steps[] = {
 +	{
-+		.callback = CB_BT_ADAPTER_STATE_CHANGED,
-+		.callback_result.state = BT_STATE_ON,
++		.action_result.status = BT_STATUS_SUCCESS,
++		.action = bluetooth_enable_action,
 +	},
- };
- static struct test_case bluetooth_enable_success_tc = {
- 	.step = bluetooth_enable_success_steps,
-diff --git a/android/tester-main.c b/android/tester-main.c
-index f49ce82..326853a 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -417,9 +417,52 @@ static void verify_step(struct step *step, queue_destroy_func_t cleanup_cb)
- 		next_step->action();
- }
- 
-+/*
-+ * NOTICE:
-+ * Its mandatory for callback to set proper step.callback value so that
-+ * step verification could pass and move to next test step
-+ */
-+
-+static void destroy_callback_step(void *data)
-+{
-+	struct step *step = data;
-+
-+	g_free(step);
-+	g_atomic_int_dec_and_test(&scheduled_cbacks_num);
-+}
-+
-+static gboolean verify_callback(gpointer user_data)
-+{
-+	struct step *step = user_data;
-+
-+	/*
-+	 * TODO: This may call action from next step before callback data
-+	 * from previous step was freed.
-+	 */
-+	verify_step(step, destroy_callback_step);
-+
-+	return FALSE;
-+}
-+
-+static void schedule_callback_call(struct step *step)
-+{
-+	g_atomic_int_inc(&scheduled_cbacks_num);
-+	g_idle_add(verify_callback, step);
-+}
-+
-+static void adapter_state_changed_cb(bt_state_t state)
-+{
-+	struct step *step = g_new0(struct step, 1);
-+
-+	step->callback_result.state = state;
-+	step->callback = CB_BT_ADAPTER_STATE_CHANGED;
-+
-+	schedule_callback_call(step);
-+}
-+
- static bt_callbacks_t bt_callbacks = {
- 	.size = sizeof(bt_callbacks),
--	.adapter_state_changed_cb = NULL,
-+	.adapter_state_changed_cb = adapter_state_changed_cb,
- 	.adapter_properties_cb = NULL,
- 	.remote_device_properties_cb = NULL,
- 	.device_found_cb = NULL,
-diff --git a/android/tester-main.h b/android/tester-main.h
-index d79e4c5..6ea9603 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -47,6 +47,26 @@
- 
- #define get_test_case_step_num(tc) (sizeof(tc) / sizeof(struct step))
- 
-+/*
-+ * NOTICE:
-+ * Callback enum sections should be
-+ * updated while adding new HAL to tester.
-+ */
-+typedef enum {
-+	CB_BT_ADAPTER_STATE_CHANGED = 1,
-+	CB_BT_ADAPTER_PROPERTIES,
-+	CB_BT_REMOTE_DEVICE_PROPERTIES,
-+	CB_BT_DEVICE_FOUND,
-+	CB_BT_DISCOVERY_STATE_CHANGED,
-+	CB_BT_PIN_REQUEST,
-+	CB_BT_SSP_REQUEST,
-+	CB_BT_BOND_STATE_CHANGED,
-+	CB_BT_ACL_STATE_CHANGED,
-+	CB_BT_THREAD_EVT,
-+	CB_BT_DUT_MODE_RECV,
-+	CB_BT_LE_TEST_MODE,
-+} expected_bt_callback_t;
-+
- struct test_data {
- 	struct mgmt *mgmt;
- 	struct hw_device_t *device;
-@@ -77,12 +97,24 @@ struct bt_action_data {
- };
- 
- /*
-+ * Callback data structure should be enhanced with data
-+ * returned by callbacks. It's used for test case step
-+ * matching with expected step data.
-+ */
-+struct bt_callback_data {
-+	bt_state_t state;
++};
++static struct test_case bluetooth_enable_success_tc = {
++	.step = bluetooth_enable_success_steps,
++	.title = "Bluetooth Enable - Success",
++	.step_num = get_test_case_step_num(bluetooth_enable_success_steps),
 +};
 +
-+/*
-  * Step structure contains expected step data and step
-  * action, which should be performed before step check.
-  */
- struct step {
- 	void (*action)(void);
- 	struct bt_action_data action_result;
-+
-+	expected_bt_callback_t callback;
-+	struct bt_callback_data callback_result;
- };
+ struct queue *get_bluetooth_tests(void)
+ {
+ 	list = queue_new();
+@@ -37,6 +49,9 @@ struct queue *get_bluetooth_tests(void)
+ 	if (!queue_push_tail(list, &bluetooth_init))
+ 		return NULL;
  
- /* Get, remove test cases API */
++	if (!queue_push_tail(list, &bluetooth_enable_success_tc))
++		return NULL;
++
+ 	return list;
+ }
+ 
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 51326f5..f49ce82 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -544,6 +544,17 @@ void dummy_action(void)
+ 	verify_step(&step, NULL);
+ }
+ 
++void bluetooth_enable_action(void)
++{
++	struct test_data *data = tester_get_data();
++	struct step step;
++
++	memset(&step, 0, sizeof(step));
++	step.action_result.status = data->if_bluetooth->enable();
++
++	verify_step(&step, NULL);
++}
++
+ static void generic_test_function(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+diff --git a/android/tester-main.h b/android/tester-main.h
+index a4f2ed8..d79e4c5 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -91,3 +91,4 @@ void remove_bluetooth_tests(void);
+ 
+ /* Actions */
+ void dummy_action(void);
++void bluetooth_enable_action(void);
 -- 
 1.9.3
 
