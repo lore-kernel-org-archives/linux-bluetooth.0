@@ -1,85 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
 From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 05/19] android/tester-bluetooth: Add enable success test case
-Date: Thu,  3 Jul 2014 18:00:08 +0200
-Message-Id: <1404403222-26911-6-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: [PATCH 03/19] android/tester-bluetooth: Initial bluetooth HAL tester
+Date: Thu,  3 Jul 2014 18:00:06 +0200
+Message-Id: <1404403222-26911-4-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 In-Reply-To: <1404403222-26911-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 References: <1404403222-26911-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds also enable action which enable bluetooth adapter.
+This is initial patch for android bluetooth HAL tester. It'll contain
+test cases for bluetooth hal using android tester framework
+(tester-main). Test step actions for this and every tester should be
+declared in main tester. Cohesion of test action make action function
+more useful and centralized.
 ---
- android/tester-bluetooth.c | 15 +++++++++++++++
- android/tester-main.c      | 11 +++++++++++
- android/tester-main.h      |  1 +
- 3 files changed, 27 insertions(+)
+ android/Makefile.am        |  1 +
+ android/tester-bluetooth.c | 32 ++++++++++++++++++++++++++++++++
+ android/tester-main.h      |  4 ++++
+ 3 files changed, 37 insertions(+)
+ create mode 100644 android/tester-bluetooth.c
 
+diff --git a/android/Makefile.am b/android/Makefile.am
+index 0192935..8cb10ab 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -178,6 +178,7 @@ android_android_tester_ng_SOURCES = emulator/btdev.h emulator/btdev.c \
+ 				src/shared/timeout.h src/shared/timeout-glib.c \
+ 				monitor/rfcomm.h \
+ 				android/hardware/hardware.c \
++				android/tester-bluetooth.c \
+ 				android/tester-main.h android/tester-main.c
+ 
+ android_android_tester_ng_CFLAGS = $(AM_CFLAGS) -I$(srcdir)/android \
 diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index c912d7d..0f55d9e 100644
---- a/android/tester-bluetooth.c
+new file mode 100644
+index 0000000..9acf999
+--- /dev/null
 +++ b/android/tester-bluetooth.c
-@@ -30,6 +30,18 @@ static struct test_case bluetooth_init = {
- 	.step_num = get_test_case_step_num(dummy_steps),
- };
- 
-+static struct step bluetooth_enable_success_steps[] = {
-+	{
-+		.action_result.status = BT_STATUS_SUCCESS,
-+		.action = bluetooth_enable_action,
-+	},
-+};
-+static struct test_case bluetooth_enable_success_tc = {
-+	.step = bluetooth_enable_success_steps,
-+	.title = "Bluetooth Enable - Success",
-+	.step_num = get_test_case_step_num(bluetooth_enable_success_steps),
-+};
+@@ -0,0 +1,32 @@
++/*
++ * Copyright (C) 2014 Intel Corporation
++ *
++ * Licensed under the Apache License, Version 2.0 (the "License");
++ * you may not use this file except in compliance with the License.
++ * You may obtain a copy of the License at
++ *
++ *      http://www.apache.org/licenses/LICENSE-2.0
++ *
++ * Unless required by applicable law or agreed to in writing, software
++ * distributed under the License is distributed on an "AS IS" BASIS,
++ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
++ * See the License for the specific language governing permissions and
++ * limitations under the License.
++ *
++ */
 +
- struct queue *get_bluetooth_tests(void)
- {
- 	list = queue_new();
-@@ -37,6 +49,9 @@ struct queue *get_bluetooth_tests(void)
- 	if (!queue_push_tail(list, &bluetooth_init))
- 		return NULL;
- 
-+	if (!queue_push_tail(list, &bluetooth_enable_success_tc))
-+		return NULL;
++#include "tester-main.h"
 +
- 	return list;
- }
- 
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 51326f5..f49ce82 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -544,6 +544,17 @@ void dummy_action(void)
- 	verify_step(&step, NULL);
- }
- 
-+void bluetooth_enable_action(void)
++static struct queue *list; /* List of bluetooth test cases */
++
++struct queue *get_bluetooth_tests(void)
 +{
-+	struct test_data *data = tester_get_data();
-+	struct step step;
++	list = queue_new();
 +
-+	memset(&step, 0, sizeof(step));
-+	step.action_result.status = data->if_bluetooth->enable();
-+
-+	verify_step(&step, NULL);
++	return list;
 +}
 +
- static void generic_test_function(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
++void remove_bluetooth_tests(void)
++{
++	queue_destroy(list, NULL);
++}
 diff --git a/android/tester-main.h b/android/tester-main.h
-index a4f2ed8..d79e4c5 100644
+index da87c8b..8f10e9f 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -91,3 +91,4 @@ void remove_bluetooth_tests(void);
- 
- /* Actions */
- void dummy_action(void);
-+void bluetooth_enable_action(void);
+@@ -84,3 +84,7 @@ struct step {
+ 	void (*action)(void);
+ 	struct bt_action_data action_result;
+ };
++
++/* Get, remove test cases API */
++struct queue *get_bluetooth_tests(void);
++void remove_bluetooth_tests(void);
 -- 
 1.9.3
 
