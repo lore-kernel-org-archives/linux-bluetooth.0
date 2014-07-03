@@ -1,111 +1,316 @@
-Return-Path: <cyrus@holtmann.org>
+Content-Type: multipart/alternative;
+	boundary="Apple-Mail=_9E34E40F-3528-4D44-B9F3-5486B017C972"
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add Realtek 8723/8761 support
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support for controller configuration info command
-Date: Fri,  4 Jul 2014 00:46:56 +0200
-Message-Id: <1404427616-34654-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>
+Date: Thu, 3 Jul 2014 20:12:27 +0200
+Cc: Larry Finger <Larry.Finger@lwfinger.net>,
+ Daniel Drake <drake@endlessm.com>,
+ "Gustavo F. Padovan" <gustavo@padovan.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>,
+ Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
+Message-Id: <B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>
+References: <1404218878-14218-1-git-send-email-drake@endlessm.com> <16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org> <CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com> <53B2D160.4010306@lwfinger.net> <F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org> <54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>
+To: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Read Controller Configuration Information command allows retrieving
-details about possible configurations option. The supported options are
-returned and also the missing options (if any).
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/mgmt.h | 11 +++++++++++
- net/bluetooth/mgmt.c         | 28 ++++++++++++++++++++++++++++
- 2 files changed, 39 insertions(+)
+--Apple-Mail=_9E34E40F-3528-4D44-B9F3-5486B017C972
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+	charset=GB2312
 
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index e0786cfa5490..0579eb3952e3 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -97,6 +97,7 @@ struct mgmt_rp_read_index_list {
- #define MGMT_SETTING_SECURE_CONN	0x00000800
- #define MGMT_SETTING_DEBUG_KEYS		0x00001000
- #define MGMT_SETTING_PRIVACY		0x00002000
-+#define MGMT_SETTING_CONFIGURATION	0x00004000
- 
- #define MGMT_OP_READ_INFO		0x0004
- #define MGMT_READ_INFO_SIZE		0
-@@ -471,6 +472,16 @@ struct mgmt_rp_read_unconf_index_list {
- 	__le16	index[0];
- } __packed;
- 
-+#define MGMT_OPTION_PUBLIC_ADDRESS	0x00000001
-+
-+#define MGMT_OP_READ_CONFIG_INFO	0x0037
-+#define MGMT_READ_CONFIG_INFO_SIZE	0
-+struct mgmt_rp_read_config_info {
-+	__le16	manufacturer;
-+	__le32	supported_options;
-+	__le32	missing_options;
-+} __packed;
-+
- #define MGMT_EV_CMD_COMPLETE		0x0001
- struct mgmt_ev_cmd_complete {
- 	__le16	opcode;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 59ca4057955c..474b6dcdf665 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -90,6 +90,7 @@ static const u16 mgmt_commands[] = {
- 	MGMT_OP_REMOVE_DEVICE,
- 	MGMT_OP_LOAD_CONN_PARAM,
- 	MGMT_OP_READ_UNCONF_INDEX_LIST,
-+	MGMT_OP_READ_CONFIG_INFO,
- };
- 
- static const u16 mgmt_events[] = {
-@@ -440,6 +441,29 @@ static int read_unconf_index_list(struct sock *sk, struct hci_dev *hdev,
- 	return err;
- }
- 
-+static int read_config_info(struct sock *sk, struct hci_dev *hdev,
-+			    void *data, u16 data_len)
-+{
-+	struct mgmt_rp_read_config_info rp;
-+
-+	BT_DBG("sock %p %s", sk, hdev->name);
-+
-+	hci_dev_lock(hdev);
-+
-+	memset(&rp, 0, sizeof(rp));
-+	rp.manufacturer = cpu_to_le16(hdev->manufacturer);
-+	if (hdev->set_bdaddr)
-+		rp.supported_options = cpu_to_le32(MGMT_OPTION_PUBLIC_ADDRESS);
-+	else
-+		rp.supported_options = cpu_to_le32(0);
-+	rp.missing_options = cpu_to_le32(0);
-+
-+	hci_dev_unlock(hdev);
-+
-+	return cmd_complete(sk, hdev->id, MGMT_OP_READ_CONFIG_INFO, 0, &rp,
-+			    sizeof(rp));
-+}
-+
- static u32 get_supported_settings(struct hci_dev *hdev)
- {
- 	u32 settings = 0;
-@@ -472,6 +496,9 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 		settings |= MGMT_SETTING_PRIVACY;
- 	}
- 
-+	if (hdev->set_bdaddr)
-+		settings |= MGMT_SETTING_CONFIGURATION;
-+
- 	return settings;
- }
- 
-@@ -5371,6 +5398,7 @@ static const struct mgmt_handler {
- 	{ remove_device,          false, MGMT_REMOVE_DEVICE_SIZE },
- 	{ load_conn_param,        true,  MGMT_LOAD_CONN_PARAM_SIZE },
- 	{ read_unconf_index_list, false, MGMT_READ_UNCONF_INDEX_LIST_SIZE },
-+	{ read_config_info,       false, MGMT_READ_CONFIG_INFO_SIZE },
- };
- 
- int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
--- 
-1.9.3
+Hi Champion,
 
+> 1.  RTL vs RTK , it is ok to use "rtl " to comply with wifi drivers
+
+lets be consistent and keep using rtl.
+=20
+> 2. firmware table, when module is powered on the default LMP versions =
+are different. After download firmware ,the LMP version will change to =
+firmware version.
+> <image003.jpg>=20
+> module
+> LMP Subversion
+> HCI Revision
+> RTL8723A
+> 0X1200
+> 0X000B
+> RTL8723B
+> 0X8723
+> 0X000B
+> RTL8761A
+> 0X8761
+> 0X000A
+> RTL8821A
+> 0X8821
+> 0X000A
+> =20
+> 8723A/8723B/8821A are combo modules both with wifi and Bluetooth;
+> 8761A is Bluetooth only chip, but can be used to with wifi 8812/8192, =
+and will use different bluetooth firmware for each combination.
+> This can only be distinguished by pids.
+> I think it is OK to only support 8723A &8723B and leave others for =
+next time driver update.
+
+Can you share the Realtek HCI Vendor Command specification with me =
+privately. The command above is Bluetooth standard, but we are also =
+having at least the baud rate change for UART based controllers and the =
+ROM version command. We most likely also need a vendor command to set =
+the BD_ADDR in case it is not configured or an OEM wants to change it.
+
+I also like to know what is the right procedure for loading the ROM =
+patches and/or settings. Getting this nicely documented would be of =
+great benefit. We have the Intel and Broadcom procedures nicely =
+documented inside the code.
+=20
+> 2.     I read the codes in kernel 3.13 , some companies such as Intel =
+add setup function for their modules in general btusb driver ;  while =
+some provide another driver and set BTUSB_IGNORE in btusb_probe, how can =
+it work for their private driver only download firmware and do not call =
+any functions of bluez hci layer ?
+
+There are two ways current silicon vendors have done. Either have a =
+special USB VID/PID or descriptors, attach the firmware loading driver =
+and load the firmware. The device disconnects from USB and re-connects =
+with its new identity. And then btusb driver takes over.
+
+The second method is doing the setup stage all in the driver. So the =
+Bluetooth core is actually providing a running transport that is driven =
+by the transport driver (in this case btusb), but before it takes =
+control it allows the driver to issue certain HCI commands. This is =
+mostly used for firmware loading. You can see that for Intel and =
+Broadcom.
+
+If your firmware loading, setup, patching or whatever is done with HCI =
+commands, you should go the setup callback broke since that way you do =
+not have to deal with transport details. It will just work. If you speak =
+a non-HCI protocol, then the method with a separate firmware loading =
+driver is beneficial.
+
+For Realtek it seems the setup stage like what we do with Intel and =
+Broadcom silicon is exactly what you want.
+
+Can you provide a list of USB/PID that match to modules which require =
+the firmware loading or optionally support the firmware loading. That =
+would make it easier to populate the matching table. The decision on the =
+module can be easily done by reading the HCI Local Version Information =
+first.
+
+Regards
+
+Marcel
+
+
+--Apple-Mail=_9E34E40F-3528-4D44-B9F3-5486B017C972
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html;
+	charset=GB2312
+
+<html><head><meta http-equiv=3D"Content-Type" content=3D"text/html =
+charset=3DGB2312"></head><body style=3D"word-wrap: break-word; =
+-webkit-nbsp-mode: space; -webkit-line-break: =
+after-white-space;"><div>Hi Champion,</div><div><br><blockquote =
+type=3D"cite"><div lang=3D"ZH-CN" link=3D"blue" vlink=3D"purple" =
+style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant: normal; font-weight: normal; letter-spacing: normal; =
+line-height: normal; orphans: auto; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; widows: auto; word-spacing: =
+0px; -webkit-text-stroke-width: 0px;"><div class=3D"WordSection1" =
+style=3D"page: WordSection1;"><div style=3D"margin: 0cm 0cm 0.0001pt; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">1. &nbsp;RTL vs RTK , it is ok to use "rtl " to comply =
+with wifi =
+drivers</span></div></div></div></blockquote><div><br></div>lets be =
+consistent and keep using rtl.</div><div><span style=3D"font-family: =
+Calibri, sans-serif; font-size: 10.5pt;">&nbsp;</span><br><blockquote =
+type=3D"cite"><div lang=3D"ZH-CN" link=3D"blue" vlink=3D"purple" =
+style=3D"font-family: Helvetica; font-size: 12px; font-style: normal; =
+font-variant: normal; font-weight: normal; letter-spacing: normal; =
+line-height: normal; orphans: auto; text-align: start; text-indent: 0px; =
+text-transform: none; white-space: normal; widows: auto; word-spacing: =
+0px; -webkit-text-stroke-width: 0px;"><div class=3D"WordSection1" =
+style=3D"page: WordSection1;"><div style=3D"margin: 0cm 0cm 0.0001pt; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">2.</span><span lang=3D"EN-US"><span =
+class=3D"Apple-converted-space">&nbsp;</span>firmware table, when module =
+is powered on the default LMP versions are different. After download =
+firmware ,the LMP version will change to firmware =
+version.<o:p></o:p></span></div><div style=3D"margin: 0cm 0cm 0.0001pt; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US"><span>&lt;image003.jpg&gt;</span>&nbsp;<o:p></o:p></span></=
+div><table class=3D"MsoNormalTable" border=3D"1" cellspacing=3D"0" =
+cellpadding=3D"0" style=3D"border-collapse: collapse; border: none; =
+position: static; z-index: auto;"><tbody><tr><td width=3D"178" =
+valign=3D"top" style=3D"width: 106.5pt; border: 1pt solid black; =
+background-color: rgb(204, 255, 255); padding: 0cm 5.4pt; =
+background-position: initial initial; background-repeat: initial =
+initial;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><b><span =
+lang=3D"EN-US">module<o:p></o:p></span></b></div></td><td width=3D"151" =
+valign=3D"top" style=3D"width: 90.3pt; border-style: solid solid solid =
+none; border-top-color: black; border-right-color: black; =
+border-bottom-color: black; border-top-width: 1pt; border-right-width: =
+1pt; border-bottom-width: 1pt; background-color: rgb(204, 255, 255); =
+padding: 0cm 5.4pt; background-position: initial initial; =
+background-repeat: initial initial;"><div style=3D"margin: 0cm 0cm =
+0.0001pt; text-align: left; font-size: 10.5pt; font-family: Calibri, =
+sans-serif;"><b><span lang=3D"EN-US">LMP =
+Subversion<o:p></o:p></span></b></div></td><td width=3D"205" =
+valign=3D"top" style=3D"width: 122.75pt; border-style: solid solid solid =
+none; border-top-color: black; border-right-color: black; =
+border-bottom-color: black; border-top-width: 1pt; border-right-width: =
+1pt; border-bottom-width: 1pt; background-color: rgb(204, 255, 255); =
+padding: 0cm 5.4pt; background-position: initial initial; =
+background-repeat: initial initial;"><div style=3D"margin: 0cm 0cm =
+0.0001pt; text-align: left; font-size: 10.5pt; font-family: Calibri, =
+sans-serif;"><b><span lang=3D"EN-US">HCI =
+Revision<o:p></o:p></span></b></div></td></tr><tr><td width=3D"178" =
+valign=3D"top" style=3D"width: 106.5pt; border-style: none solid solid; =
+border-right-color: black; border-bottom-color: black; =
+border-left-color: black; border-right-width: 1pt; border-bottom-width: =
+1pt; border-left-width: 1pt; padding: 0cm 5.4pt;"><div style=3D"margin: =
+0cm 0cm 0.0001pt; text-align: left; font-size: 10.5pt; font-family: =
+Calibri, sans-serif;"><span =
+lang=3D"EN-US">RTL8723A<o:p></o:p></span></div></td><td width=3D"151" =
+valign=3D"top" style=3D"width: 90.3pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X1200<o:p></o:p></span></div></td><td width=3D"205" =
+valign=3D"top" style=3D"width: 122.75pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X000B<o:p></o:p></span></div></td></tr><tr><td =
+width=3D"178" valign=3D"top" style=3D"width: 106.5pt; border-style: none =
+solid solid; border-right-color: black; border-bottom-color: black; =
+border-left-color: black; border-right-width: 1pt; border-bottom-width: =
+1pt; border-left-width: 1pt; padding: 0cm 5.4pt;"><div style=3D"margin: =
+0cm 0cm 0.0001pt; text-align: left; font-size: 10.5pt; font-family: =
+Calibri, sans-serif;"><span =
+lang=3D"EN-US">RTL8723B<o:p></o:p></span></div></td><td width=3D"151" =
+valign=3D"top" style=3D"width: 90.3pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X8723<o:p></o:p></span></div></td><td width=3D"205" =
+valign=3D"top" style=3D"width: 122.75pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X000B<o:p></o:p></span></div></td></tr><tr><td =
+width=3D"178" valign=3D"top" style=3D"width: 106.5pt; border-style: none =
+solid solid; border-right-color: black; border-bottom-color: black; =
+border-left-color: black; border-right-width: 1pt; border-bottom-width: =
+1pt; border-left-width: 1pt; padding: 0cm 5.4pt;"><div style=3D"margin: =
+0cm 0cm 0.0001pt; text-align: left; font-size: 10.5pt; font-family: =
+Calibri, sans-serif;"><span =
+lang=3D"EN-US">RTL8761A<o:p></o:p></span></div></td><td width=3D"151" =
+valign=3D"top" style=3D"width: 90.3pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X8761<o:p></o:p></span></div></td><td width=3D"205" =
+valign=3D"top" style=3D"width: 122.75pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X000A<o:p></o:p></span></div></td></tr><tr><td =
+width=3D"178" valign=3D"top" style=3D"width: 106.5pt; border-style: none =
+solid solid; border-right-color: black; border-bottom-color: black; =
+border-left-color: black; border-right-width: 1pt; border-bottom-width: =
+1pt; border-left-width: 1pt; padding: 0cm 5.4pt;"><div style=3D"margin: =
+0cm 0cm 0.0001pt; text-align: left; font-size: 10.5pt; font-family: =
+Calibri, sans-serif;"><span =
+lang=3D"EN-US">RTL8821A<o:p></o:p></span></div></td><td width=3D"151" =
+valign=3D"top" style=3D"width: 90.3pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X8821<o:p></o:p></span></div></td><td width=3D"205" =
+valign=3D"top" style=3D"width: 122.75pt; border-style: none solid solid =
+none; border-bottom-color: black; border-bottom-width: 1pt; =
+border-right-color: black; border-right-width: 1pt; padding: 0cm =
+5.4pt;"><div style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">0X000A<o:p></o:p></span></div></td></tr></tbody></table><di=
+v style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; font-size: =
+10.5pt; font-family: Calibri, sans-serif;"><span lang=3D"EN-US" =
+style=3D"font-size: 10pt;">&nbsp;</span></div><div style=3D"margin: 0cm =
+0cm 0.0001pt; text-align: left; font-size: 10.5pt; font-family: Calibri, =
+sans-serif;"><span lang=3D"EN-US" style=3D"font-size: =
+10pt;">8723A/8723B/8821A are combo modules both with wifi and =
+Bluetooth;<o:p></o:p></span></div><div style=3D"margin: 0cm 0cm =
+0.0001pt; text-align: left; font-size: 10.5pt; font-family: Calibri, =
+sans-serif;"><span lang=3D"EN-US" style=3D"font-size: 10pt;">8761A is =
+Bluetooth only chip, but can be used to with wifi 8812/8192, and will =
+use different bluetooth firmware for each =
+combination.<o:p></o:p></span></div><div style=3D"margin: 0cm 0cm =
+0.0001pt; text-align: left; font-size: 10.5pt; font-family: Calibri, =
+sans-serif;"><span lang=3D"EN-US" style=3D"font-size: 10pt;">This can =
+only be distinguished by pids.<o:p></o:p></span></div><div =
+style=3D"margin: 0cm 0cm 0.0001pt; text-align: left; font-size: 10.5pt; =
+font-family: Calibri, sans-serif;"><span lang=3D"EN-US" =
+style=3D"font-size: 10pt;">I think it is OK to only support 8723A =
+&amp;8723B and leave others for next time driver =
+update.</span></div></div></div></blockquote><div><br></div>Can you =
+share the Realtek HCI Vendor Command specification with me privately. =
+The command above is Bluetooth standard, but we are also having at least =
+the baud rate change for UART based controllers and the ROM version =
+command. We most likely also need a vendor command to set the BD_ADDR in =
+case it is not configured or an OEM wants to change it.</div><div><span =
+style=3D"font-family: Calibri, sans-serif; font-size: =
+10pt;"><br></span></div><div>I also like to know what is the right =
+procedure for loading the ROM patches and/or settings. Getting this =
+nicely documented would be of great benefit. We have the Intel and =
+Broadcom procedures nicely documented inside the code.</div><div><span =
+style=3D"font-family: Calibri, sans-serif; font-size: =
+10pt;">&nbsp;</span></div><div><blockquote type=3D"cite"><div =
+lang=3D"ZH-CN" link=3D"blue" vlink=3D"purple" style=3D"font-family: =
+Helvetica; font-size: 12px; font-style: normal; font-variant: normal; =
+font-weight: normal; letter-spacing: normal; line-height: normal; =
+orphans: auto; text-align: start; text-indent: 0px; text-transform: =
+none; white-space: normal; widows: auto; word-spacing: 0px; =
+-webkit-text-stroke-width: 0px;"><div class=3D"WordSection1" =
+style=3D"page: WordSection1;"><div style=3D"margin: 0cm 0cm 0.0001pt; =
+font-size: 10.5pt; font-family: Calibri, sans-serif;"><span =
+lang=3D"EN-US">2.&nbsp;&nbsp;&nbsp;&nbsp; I read the codes in kernel =
+3.13 , some companies such as Intel add setup function for their modules =
+in general btusb driver ; &nbsp;while some provide another driver and =
+set BTUSB_IGNORE in btusb_probe, how can it work for their private =
+driver only download firmware and do not call any functions of bluez hci =
+layer ?</span></div></div></div></blockquote><div><br></div>There are =
+two ways current silicon vendors have done. Either have a special USB =
+VID/PID or descriptors, attach the firmware loading driver and load the =
+firmware. The device disconnects from USB and re-connects with its new =
+identity. And then btusb driver takes over.</div><div><br></div><div>The =
+second method is doing the setup stage all in the driver. So the =
+Bluetooth core is actually providing a running transport that is driven =
+by the transport driver (in this case btusb), but before it takes =
+control it allows the driver to issue certain HCI commands. This is =
+mostly used for firmware loading. You can see that for Intel and =
+Broadcom.</div><div><br></div><div>If your firmware loading, setup, =
+patching or whatever is done with HCI commands, you should go the setup =
+callback broke since that way you do not have to deal with transport =
+details. It will just work. If you speak a non-HCI protocol, then the =
+method with a separate firmware loading driver is =
+beneficial.</div><div><br></div><div>For Realtek it seems the setup =
+stage like what we do with Intel and Broadcom silicon is exactly what =
+you want.</div><div><br></div><div>Can you provide a list of USB/PID =
+that match to modules which require the firmware loading or optionally =
+support the firmware loading. That would make it easier to populate the =
+matching table. The decision on the module can be easily done by reading =
+the HCI Local Version Information =
+first.</div><div><br></div><div>Regards</div><div><br></div><div>Marcel</d=
+iv><div><br></div></body></html>=
+
+--Apple-Mail=_9E34E40F-3528-4D44-B9F3-5486B017C972--
