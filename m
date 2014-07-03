@@ -1,53 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2] android/hal-health: Clear NONBLOCK flag from fd
-Date: Thu,  3 Jul 2014 13:58:06 +0300
-Message-Id: <1404385086-27763-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] android/pics: Update HDP settings
+Date: Thu, 03 Jul 2014 12:44:25 +0200
+Message-ID: <1697396.AyCnejtYSf@uw000953>
+In-Reply-To: <1404373801-5974-1-git-send-email-szymon.janc@tieto.com>
+References: <1404373801-5974-1-git-send-email-szymon.janc@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+On Thursday 03 of July 2014 09:50:01 Szymon Janc wrote:
+> ---
+>  android/pics-hdp.txt | 2 +-
+>  android/pts-hdp.txt  | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
+> index f23aa74..d48e576 100644
+> --- a/android/pics-hdp.txt
+> +++ b/android/pics-hdp.txt
+> @@ -167,7 +167,7 @@ Parameter Name	Selected	Description
+>  TSPC_HDP_7_1	False		Supports Initiation of Echo Test (O)
+>  TSPC_HDP_7_2	True		Supports Acceptance of Echo Test (M)
+>  TSPC_HDP_7_3	True		Supports IEEE 11073-20601 (M)
+> -TSPC_HDP_7_4	True		Supports IEEE 11073-20601 Agent Role (C.1)
+> +TSPC_HDP_7_4	False (*)	Supports IEEE 11073-20601 Agent Role (C.1)
+>  TSPC_HDP_7_5	True (*)	Supports IEEE 11073-20601 Manager Role (C.1)
+>  TSPC_HDP_7_6	False		Supports Initiation of Association Release (O)
+>  -------------------------------------------------------------------------------
+> diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
+> index f254bd0..4337e0e 100644
+> --- a/android/pts-hdp.txt
+> +++ b/android/pts-hdp.txt
+> @@ -146,7 +146,7 @@ TC_SRC_DE_BV_02_I	PASS	haltest:
+>  				bluez-hdp health-device-profile 1
+>  				BTHL_MDEP_ROLE_SOURCE 4100
+>  				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
+> -TC_SRC_DEP_BV_01_I	INC	PTS issue #12340
+> +TC_SRC_DEP_BV_01_I	N/A
+>  TC_SRC_DEP_BV_02_I	N/A
+>  TC_SNK_CON_BV_01_I	PASS	haltest:
+>  				hl register_application <args>
+> 
 
-Java expects file descriptor passed with channel_state_cb() to be
-blocking.
----
- android/hal-health.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Applied with some extra comment in commit message.
 
-diff --git a/android/hal-health.c b/android/hal-health.c
-index 20ba459..bfc4f74 100644
---- a/android/hal-health.c
-+++ b/android/hal-health.c
-@@ -19,6 +19,9 @@
- #include <stddef.h>
- #include <string.h>
- #include <stdlib.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <errno.h>
- 
- #include "hal-log.h"
- #include "hal.h"
-@@ -44,6 +47,18 @@ static void handle_app_registration_state(void *buf, uint16_t len, int fd)
- static void handle_channel_state(void *buf, uint16_t len, int fd)
- {
- 	struct hal_ev_health_channel_state *ev = buf;
-+	int flags;
-+
-+	flags = fcntl(fd, F_GETFL, 0);
-+	if (flags < 0) {
-+		error("health: fcntl GETFL error: %s", strerror(errno));
-+		return;
-+	}
-+
-+	if (fcntl(fd, F_SETFL, flags & ~O_NONBLOCK) < 0) {
-+		error("health: fcntl SETFL error: %s", strerror(errno));
-+		return;
-+	}
- 
- 	if (cbacks->channel_state_cb)
- 		cbacks->channel_state_cb(ev->app_id, (bt_bdaddr_t *) ev->bdaddr,
 -- 
-1.9.1
-
+Best regards, 
+Szymon Janc
