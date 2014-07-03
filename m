@@ -1,44 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/pics: Update HDP settings
-Date: Thu,  3 Jul 2014 09:50:01 +0200
-Message-Id: <1404373801-5974-1-git-send-email-szymon.janc@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
+Subject: Re: [PATCH 3/3] Bluetooth: Add support for background LE scanning
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404330122-18770-3-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 3 Jul 2014 09:45:44 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <E2F749DD-1515-438D-A99D-69E466172C27@holtmann.org>
+References: <1404330122-18770-1-git-send-email-johan.hedberg@gmail.com> <1404330122-18770-3-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/pics-hdp.txt | 2 +-
- android/pts-hdp.txt  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Hi Johan,
 
-diff --git a/android/pics-hdp.txt b/android/pics-hdp.txt
-index f23aa74..d48e576 100644
---- a/android/pics-hdp.txt
-+++ b/android/pics-hdp.txt
-@@ -167,7 +167,7 @@ Parameter Name	Selected	Description
- TSPC_HDP_7_1	False		Supports Initiation of Echo Test (O)
- TSPC_HDP_7_2	True		Supports Acceptance of Echo Test (M)
- TSPC_HDP_7_3	True		Supports IEEE 11073-20601 (M)
--TSPC_HDP_7_4	True		Supports IEEE 11073-20601 Agent Role (C.1)
-+TSPC_HDP_7_4	False (*)	Supports IEEE 11073-20601 Agent Role (C.1)
- TSPC_HDP_7_5	True (*)	Supports IEEE 11073-20601 Manager Role (C.1)
- TSPC_HDP_7_6	False		Supports Initiation of Association Release (O)
- -------------------------------------------------------------------------------
-diff --git a/android/pts-hdp.txt b/android/pts-hdp.txt
-index f254bd0..4337e0e 100644
---- a/android/pts-hdp.txt
-+++ b/android/pts-hdp.txt
-@@ -146,7 +146,7 @@ TC_SRC_DE_BV_02_I	PASS	haltest:
- 				bluez-hdp health-device-profile 1
- 				BTHL_MDEP_ROLE_SOURCE 4100
- 				BTHL_CHANNEL_TYPE_RELIABLE pulse-oximeter
--TC_SRC_DEP_BV_01_I	INC	PTS issue #12340
-+TC_SRC_DEP_BV_01_I	N/A
- TC_SRC_DEP_BV_02_I	N/A
- TC_SNK_CON_BV_01_I	PASS	haltest:
- 				hl register_application <args>
--- 
-1.9.1
+> If we have one or more devices with HCI_AUTO_CONN_REPORT we should do
+> background scanning and emit mgmt_device_found events. This patch
+> modifies the hci_update_background_scan() function to extend the
+> conditions needed to trigger scanning, and adds the necessary code to
+> process_adv_report() to emit mgmt_device_found events.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_core.c  |  7 ++++---
+> net/bluetooth/hci_event.c | 25 +++++++++++++++++++++++--
+> 2 files changed, 27 insertions(+), 5 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
