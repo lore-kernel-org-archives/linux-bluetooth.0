@@ -1,32 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.2\))
-Subject: Re: [PATCH] Bluetooth: Support scanning for devices using RPA
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404331764-24731-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 3 Jul 2014 09:45:39 +0200
+Date: Thu, 3 Jul 2014 10:34:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <86B74E15-F91C-4B60-AA5C-8310CDC3892A@holtmann.org>
-References: <1404331764-24731-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Support HCI_QUIRK_RAW_DEVICE for hci_vhci
+ driver
+Message-ID: <20140703073445.GB3275@t440s.lan>
+References: <1404344110-4468-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404344110-4468-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> When we're scanning for specific devices that use an RPA we need to
-> convert the RPA to the identity address before looking up the entry in
-> the connection parameters. This patch adds the necessary code to do this
-> in the process_adv_report() function.
+On Thu, Jul 03, 2014, Marcel Holtmann wrote:
+> This adds support for configuring the hci_vhci virtual controllers
+> as a raw-only device using HCI_QUIRK_RAW_DEVICE. This is useful for
+> testing the kernel internal infrastructure.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> net/bluetooth/hci_event.c | 12 ++++++++++++
-> 1 file changed, 12 insertions(+)
+>  drivers/bluetooth/hci_vhci.c | 30 +++++++++++++++++++++---------
+>  1 file changed, 21 insertions(+), 9 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+Applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
-
+Johan
