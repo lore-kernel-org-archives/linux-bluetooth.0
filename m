@@ -1,38 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/12] Bluetooth: Further LE scanning fixes & cleanups
-Date: Fri,  4 Jul 2014 12:37:15 +0300
-Message-Id: <1404466647-16352-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 4 Jul 2014 08:52:37 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Add support for controller configuration info
+ command
+Message-ID: <20140704055237.GA5208@t440s.P-661HNU-F1>
+References: <1404427616-34654-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404427616-34654-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-Here's another set of patches to fix and clean up various things with LE
-scanning. The core part of these changes are related to unifuing the
-list usage for the various types of connection parameter entries.
+On Fri, Jul 04, 2014, Marcel Holtmann wrote:
+> The Read Controller Configuration Information command allows retrieving
+> details about possible configurations option. The supported options are
+> returned and also the missing options (if any).
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/mgmt.h | 11 +++++++++++
+>  net/bluetooth/mgmt.c         | 28 ++++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
+
+Applied to bluetooth-next. Thanks.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (12):
-      Bluetooth: Fix missing return statement in process_adv_report
-      Bluetooth: Convert pend_le_conn list to a generic action list
-      Bluetooth: Convert pend_le_reports into a list
-      Bluetooth: Simplify use of hci_pend_le_conns_clear()
-      Bluetooth: Don't bother doing anything if auto_connect doesn't change
-      Bluetooth: Simplify hci_conn_params->action list usage
-      Bluetooth: Remove unused hci_pend_le_conn_del() function
-      Bluetooth: Fix clearing and restarting all LE actions on power cycle
-      Bluetooth: Remove unnecessary usage of hci_pend_le_conn_add
-      Bluetooth: Remove unused hci_pend_le_conn_add function
-      Bluetooth: Make hci_pend_le_conn_lookup more general purposed
-      Bluetooth: Use hci_pend_le_action_lookup to look up report entries
-
- include/net/bluetooth/hci_core.h | 12 ++---
- net/bluetooth/hci_core.c         | 93 ++++++++++++++----------------------
- net/bluetooth/hci_event.c        | 21 ++++----
- net/bluetooth/mgmt.c             | 41 ++++++++--------
- 4 files changed, 73 insertions(+), 94 deletions(-)
-
