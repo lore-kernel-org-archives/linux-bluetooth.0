@@ -1,98 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Move mgmt_event helper function to different location
-Date: Fri,  4 Jul 2014 19:06:22 +0200
-Message-Id: <1404493583-56960-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 2/2] Bluetooth: Add support for New Configuration Options management event
+Date: Fri,  4 Jul 2014 19:06:23 +0200
+Message-Id: <1404493583-56960-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Move the mgmt_event function higher up in the code so that no forward
-declaration is needed.
+When one or more of the missing configuration options change, then send
+this even to all the other management interface clients.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 60 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
+ include/net/bluetooth/mgmt.h |  2 ++
+ net/bluetooth/mgmt.c         | 11 +++++++++++
+ 2 files changed, 13 insertions(+)
 
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index c7d537f1bd19..80606d2fe086 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -669,3 +669,5 @@ struct mgmt_ev_new_conn_param {
+ #define MGMT_EV_UNCONF_INDEX_ADDED	0x001d
+ 
+ #define MGMT_EV_UNCONF_INDEX_REMOVED	0x001e
++
++#define MGMT_EV_NEW_CONFIG_OPTIONS	0x001f
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 91bccef63f30..4ef73523d95b 100644
+index 4ef73523d95b..f514eb15e0fb 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -212,6 +212,36 @@ static u8 mgmt_status(u8 hci_status)
- 	return MGMT_STATUS_FAILED;
+@@ -123,6 +123,7 @@ static const u16 mgmt_events[] = {
+ 	MGMT_EV_NEW_CONN_PARAM,
+ 	MGMT_EV_UNCONF_INDEX_ADDED,
+ 	MGMT_EV_UNCONF_INDEX_REMOVED,
++	MGMT_EV_NEW_CONFIG_OPTIONS,
+ };
+ 
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+@@ -500,6 +501,14 @@ static __le32 get_missing_options(struct hci_dev *hdev)
+ 	return cpu_to_le32(options);
  }
  
-+static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
-+		      struct sock *skip_sk)
++static int new_options(struct hci_dev *hdev, struct sock *skip)
 +{
-+	struct sk_buff *skb;
-+	struct mgmt_hdr *hdr;
++	__le32 options = get_missing_options(hdev);
 +
-+	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdr = (void *) skb_put(skb, sizeof(*hdr));
-+	hdr->opcode = cpu_to_le16(event);
-+	if (hdev)
-+		hdr->index = cpu_to_le16(hdev->id);
-+	else
-+		hdr->index = cpu_to_le16(MGMT_INDEX_NONE);
-+	hdr->len = cpu_to_le16(data_len);
-+
-+	if (data)
-+		memcpy(skb_put(skb, data_len), data, data_len);
-+
-+	/* Time stamp */
-+	__net_timestamp(skb);
-+
-+	hci_send_to_control(skb, skip_sk);
-+	kfree_skb(skb);
-+
-+	return 0;
++	return mgmt_event(MGMT_EV_NEW_CONFIG_OPTIONS, hdev, &options,
++			  sizeof(options), skip);
 +}
 +
- static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
+ static int send_options_rsp(struct sock *sk, u16 opcode, struct hci_dev *hdev)
  {
- 	struct sk_buff *skb;
-@@ -1364,36 +1394,6 @@ failed:
- 	return err;
- }
+ 	__le32 options = get_missing_options(hdev);
+@@ -5415,6 +5424,8 @@ static int set_external_config(struct sock *sk, struct hci_dev *hdev,
+ 	if (!changed)
+ 		goto unlock;
  
--static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
--		      struct sock *skip_sk)
--{
--	struct sk_buff *skb;
--	struct mgmt_hdr *hdr;
--
--	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
--	if (!skb)
--		return -ENOMEM;
--
--	hdr = (void *) skb_put(skb, sizeof(*hdr));
--	hdr->opcode = cpu_to_le16(event);
--	if (hdev)
--		hdr->index = cpu_to_le16(hdev->id);
--	else
--		hdr->index = cpu_to_le16(MGMT_INDEX_NONE);
--	hdr->len = cpu_to_le16(data_len);
--
--	if (data)
--		memcpy(skb_put(skb, data_len), data, data_len);
--
--	/* Time stamp */
--	__net_timestamp(skb);
--
--	hci_send_to_control(skb, skip_sk);
--	kfree_skb(skb);
--
--	return 0;
--}
--
- static int new_settings(struct hci_dev *hdev, struct sock *skip)
- {
- 	__le32 ev;
++	err = new_options(hdev, sk);
++
+ 	if (test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) == is_configured(hdev)) {
+ 		mgmt_index_removed(hdev);
+ 		change_bit(HCI_UNCONFIGURED, &hdev->dev_flags);
 -- 
 1.9.3
 
