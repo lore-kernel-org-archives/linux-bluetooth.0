@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 14/32] android/hal-sco: Fix memory leak
-Date: Fri,  4 Jul 2014 16:46:59 +0300
-Message-Id: <1404481637-900-15-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 28/32] android/handsfree: Refactor SCO audio connect sequence
+Date: Fri,  4 Jul 2014 16:47:13 +0300
+Message-Id: <1404481637-900-29-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,27 +11,91 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Release resampler on exit.
+Use connect_pending to identify when we need to return msg to HAL.
 ---
- android/hal-sco.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ android/handsfree.c | 41 ++++++++++++++++++++++++++++++-----------
+ 1 file changed, 30 insertions(+), 11 deletions(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index e084c31..a3fb710 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -731,8 +731,10 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
+diff --git a/android/handsfree.c b/android/handsfree.c
+index a2e3921..01db292 100644
+--- a/android/handsfree.c
++++ b/android/handsfree.c
+@@ -169,7 +169,8 @@ static GIOChannel *hsp_server = NULL;
  
- 	close_sco_socket();
+ static GIOChannel *sco_server = NULL;
  
--	if (out->resampler)
-+	if (out->resampler) {
- 		release_resampler(out->resampler);
-+		free(out->resample_buf);
+-static void bt_sco_connect(const void *buf, uint16_t len);
++static bool connect_pending = false;
++static void bt_sco_connect_rsp(bool is_error);
+ 
+ static void device_set_state(uint8_t state)
+ {
+@@ -896,7 +897,7 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
+ 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
+ 
+ 	if (ipc_is_connected(sco_ipc))
+-		bt_sco_connect(NULL, 0);
++		bt_sco_connect_rsp(false);
+ }
+ 
+ static bool connect_sco(void)
+@@ -2574,22 +2575,22 @@ static void disable_sco_server(void)
+ 	}
+ }
+ 
+-static void bt_sco_connect(const void *buf, uint16_t len)
++static void bt_sco_connect_rsp(bool is_error)
+ {
+ 	int fd;
+-	GError *err;
++	GError *err = NULL;
+ 	struct sco_rsp_connect rsp;
+ 
+-	DBG("");
++	DBG("error %d pending %d", is_error, connect_pending);
+ 
+-	if (!device.sco) {
+-		DBG("SCO is not established, connecting...");
+-		if (!connect_audio())
+-			goto failed;
++	if (!connect_pending)
+ 		return;
+-	}
+ 
+-	err = NULL;
++	connect_pending = false;
++
++	if (is_error)
++		goto failed;
++
+ 	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
+ 							BT_IO_OPT_INVALID)) {
+ 		error("Unable to get MTU: %s\n", err->message);
+@@ -2610,6 +2611,24 @@ failed:
+ 	ipc_send_rsp(sco_ipc, SCO_SERVICE_ID, SCO_OP_STATUS, SCO_STATUS_FAILED);
+ }
+ 
++static void bt_sco_connect(const void *buf, uint16_t len)
++{
++	DBG("");
++
++	connect_pending = true;
++
++	if (!device.sco) {
++		DBG("SCO is not established, connecting...");
++		if (!connect_audio()) {
++			DBG("Connect audio failed");
++			return bt_sco_connect_rsp(true);
++		} else
++			return;
 +	}
- 
- 	free(out->cache);
- 	free(out->downmix_buf);
++
++	return bt_sco_connect_rsp(false);
++}
++
+ static const struct ipc_handler sco_handlers[] = {
+ 	/* SCO_OP_CONNECT */
+ 	{ bt_sco_connect, false, 0 }
 -- 
 1.9.1
 
