@@ -1,30 +1,98 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Jul 2014 21:13:34 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] Bluetooth: Add quirk for external configuration
- requirement
-Message-ID: <20140704181334.GA17855@t440s.P-661HNU-F1>
-References: <1404487415-15089-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404487415-15089-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] Bluetooth: Move mgmt_event helper function to different location
+Date: Fri,  4 Jul 2014 19:06:22 +0200
+Message-Id: <1404493583-56960-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Move the mgmt_event function higher up in the code so that no forward
+declaration is needed.
 
-On Fri, Jul 04, 2014, Marcel Holtmann wrote:
-> When a controller requires external configuration, then setting this
-> quirk will allow indicating this.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/net/bluetooth/hci.h | 9 +++++++++
->  net/bluetooth/hci_core.c    | 3 ++-
->  net/bluetooth/mgmt.c        | 9 ++++++++-
->  3 files changed, 19 insertions(+), 2 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 60 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 30 insertions(+), 30 deletions(-)
 
-All three patches have been applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 91bccef63f30..4ef73523d95b 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -212,6 +212,36 @@ static u8 mgmt_status(u8 hci_status)
+ 	return MGMT_STATUS_FAILED;
+ }
+ 
++static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
++		      struct sock *skip_sk)
++{
++	struct sk_buff *skb;
++	struct mgmt_hdr *hdr;
++
++	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	hdr = (void *) skb_put(skb, sizeof(*hdr));
++	hdr->opcode = cpu_to_le16(event);
++	if (hdev)
++		hdr->index = cpu_to_le16(hdev->id);
++	else
++		hdr->index = cpu_to_le16(MGMT_INDEX_NONE);
++	hdr->len = cpu_to_le16(data_len);
++
++	if (data)
++		memcpy(skb_put(skb, data_len), data, data_len);
++
++	/* Time stamp */
++	__net_timestamp(skb);
++
++	hci_send_to_control(skb, skip_sk);
++	kfree_skb(skb);
++
++	return 0;
++}
++
+ static int cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
+ {
+ 	struct sk_buff *skb;
+@@ -1364,36 +1394,6 @@ failed:
+ 	return err;
+ }
+ 
+-static int mgmt_event(u16 event, struct hci_dev *hdev, void *data, u16 data_len,
+-		      struct sock *skip_sk)
+-{
+-	struct sk_buff *skb;
+-	struct mgmt_hdr *hdr;
+-
+-	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
+-	if (!skb)
+-		return -ENOMEM;
+-
+-	hdr = (void *) skb_put(skb, sizeof(*hdr));
+-	hdr->opcode = cpu_to_le16(event);
+-	if (hdev)
+-		hdr->index = cpu_to_le16(hdev->id);
+-	else
+-		hdr->index = cpu_to_le16(MGMT_INDEX_NONE);
+-	hdr->len = cpu_to_le16(data_len);
+-
+-	if (data)
+-		memcpy(skb_put(skb, data_len), data, data_len);
+-
+-	/* Time stamp */
+-	__net_timestamp(skb);
+-
+-	hci_send_to_control(skb, skip_sk);
+-	kfree_skb(skb);
+-
+-	return 0;
+-}
+-
+ static int new_settings(struct hci_dev *hdev, struct sock *skip)
+ {
+ 	__le32 ev;
+-- 
+1.9.3
 
-Johan
