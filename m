@@ -1,53 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 4 Jul 2014 17:55:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 00/12] Varios fixes
-Message-ID: <20140704145559.GA12719@t440s.P-661HNU-F1>
-References: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <10484533.kHJZOD5Lcv@uw000953>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <10484533.kHJZOD5Lcv@uw000953>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 4/4] Bluetooth: Allow reading configuration info when unconfigured
+Date: Fri,  4 Jul 2014 16:54:40 +0200
+Message-Id: <1404485680-1682-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Reading the controller configuration information is a valid management
+command when the controller is unconfigured. Allow this command, but
+return invalid index on all other commands.
 
-On Fri, Jul 04, 2014, Szymon Janc wrote:
-> On Friday 04 of July 2014 16:43:49 Andrei Emeltchenko wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Fixes hanging in my tree for some time
-> > 
-> > Andrei Emeltchenko (12):
-> >   android/gatt: Change DBG() to error()
-> >   android/gatt: Fix memory leak
-> >   android/hal-msg: trivial: Correct coding style
-> >   android/gatt: Fix warning by rearranging allocation
-> >   android/haltest: Auto-accept pairing
-> >   android/hal-gatt: Remove unneeded never read initialization
-> >   android/gatt: Add missing error check
-> >   android/haltest: Add check for valid channel
-> >   android/tester: Remove unused assignment
-> >   android/gatt: Fix length check
-> >   cups: Remove dead code
-> >   core: Remove dead code
-> > 
-> >  android/android-tester.c |  2 +-
-> >  android/client/if-bt.c   | 16 +++++++++++++++-
-> >  android/client/if-hl.c   |  4 ++++
-> >  android/gatt.c           | 17 +++++++++++------
-> >  android/hal-gatt.c       |  4 +---
-> >  android/hal-msg.h        |  8 ++++----
-> >  profiles/cups/main.c     |  7 +------
-> >  src/profile.c            |  4 ----
-> >  8 files changed, 37 insertions(+), 25 deletions(-)
-> 
-> Patches 1-10 are now applied, thanks. 
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-And I applied the remaining two.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index c7e5d4651021..766411e11ac7 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -5455,12 +5455,18 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
+ 		}
+ 
+ 		if (test_bit(HCI_SETUP, &hdev->dev_flags) ||
+-		    test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) ||
+ 		    test_bit(HCI_USER_CHANNEL, &hdev->dev_flags)) {
+ 			err = cmd_status(sk, index, opcode,
+ 					 MGMT_STATUS_INVALID_INDEX);
+ 			goto done;
+ 		}
++
++		if (test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) &&
++		    opcode != MGMT_OP_READ_CONFIG_INFO) {
++			err = cmd_status(sk, index, opcode,
++					 MGMT_STATUS_INVALID_INDEX);
++			goto done;
++		}
+ 	}
+ 
+ 	if (opcode >= ARRAY_SIZE(mgmt_handlers) ||
+-- 
+1.9.3
 
-Johan
