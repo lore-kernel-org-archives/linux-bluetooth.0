@@ -1,59 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 00/32] Android SCO HAL
-Date: Fri,  4 Jul 2014 16:46:45 +0300
-Message-Id: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 22/32] android/haltest: Add mono to stereo conversion for loopback
+Date: Fri,  4 Jul 2014 16:47:07 +0300
+Message-Id: <1404481637-900-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Implementation for Android SCO HAL, second iteration of patches.
+---
+ android/client/if-sco.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
-Andrei Emeltchenko (32):
-  android/ipc: Add ipc_is_connected() check
-  android/handsfree: Connect SCO audio on demand
-  android/hal-sco: Use nanosleep for SCO synchronization
-  android/hal-sco: Fixes for unreliable mtu
-  android/hal-sco: Add SCO packet cache
-  android/hal-sco: Make use of config parameter
-  android/hal-sco: Implement open input stream
-  android/hal-sco: Check file descriptor >= 0
-  android/hal-sco: Use global sco file descriptor
-  android/haltest: Add open/close input stream commands
-  android/haltest: Add read command.
-  android/haltest: Add loop command
-  android/hal-sco: Make debug more readable
-  android/hal-sco: Fix memory leak
-  android/hal-sco: Implement read
-  android/haltest: Implement read to file
-  android/hal-sco: Connect SCO when opening input stream
-  android/haltest: Add sample rate parameter when opening audio streams
-  android/hal-sco: Skip resampling for output stream with 8k
-  android/hal-sco: Skip resampling for input of 8k
-  android/haltest: Correct check for similar buffer size
-  android/haltest: Add mono to stereo conversion for loopback
-  android/hal-sco: Choose buffer size
-  android/hal-sco: Add stream synchronization
-  android/haltest: Refactor stop and closing streams
-  android/hal-sco: Connect SCO audio on demand
-  android/hal-sco: Disconnect SCO audio on standby()
-  android/handsfree: Refactor SCO audio connect sequence
-  android/hal-sco: Fix incorrect assignment
-  android/hal-audio: Fix leaving open socket
-  android/hal-sco: Fix leaving open socket
-  android/hal-sco: Fix error code printing
-
- android/Android.mk      |   3 +
- android/client/if-sco.c | 291 ++++++++++++++++++++++-
- android/hal-audio.c     |  12 +-
- android/hal-sco.c       | 610 ++++++++++++++++++++++++++++++++++++++++++------
- android/handsfree.c     |  38 ++-
- android/ipc.c           |   5 +
- android/ipc.h           |   1 +
- 7 files changed, 863 insertions(+), 97 deletions(-)
-
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+index 0b884c3..0e27a9d 100644
+--- a/android/client/if-sco.c
++++ b/android/client/if-sco.c
+@@ -174,10 +174,24 @@ static void prepare_sample(void)
+ 	sample_pos = 0;
+ }
+ 
++static void mono_to_stereo_pcm16(const int16_t *in, int16_t *out, size_t samples)
++{
++	int16_t mono;
++	size_t i;
++
++	for (i = 0; i < samples; i++) {
++		mono = get_unaligned(&in[i]);
++
++		put_unaligned(mono, &out[2 * i]);
++		put_unaligned(mono, &out[2 * i + 1]);
++	}
++}
++
+ static void *playback_thread(void *data)
+ {
+ 	int (*filbuff_cb) (short*, void*);
+ 	short buffer[buffer_size / sizeof(short)];
++	short buffer_in[buffer_size_in / sizeof(short)];
+ 	size_t len = 0;
+ 	ssize_t w_len = 0;
+ 	FILE *in = data;
+@@ -217,7 +231,19 @@ static void *playback_thread(void *data)
+ 
+ 		pthread_mutex_unlock(&state_mutex);
+ 
+-		len = filbuff_cb(buffer, cb_data);
++		if (data && data == stream_in) {
++			int chan_in = popcount(stream_in->common.get_channels(&stream_in->common));
++			int chan_out = popcount(stream_out->common.get_channels(&stream_out->common));
++
++			len = filbuff_cb(buffer_in, cb_data);
++
++			if (chan_in == 1 && chan_out == 2) {
++				mono_to_stereo_pcm16(buffer_in,
++							buffer,
++							buffer_size_in / 2);
++			}
++		} else
++			len = filbuff_cb(buffer, cb_data);
+ 
+ 		pthread_mutex_lock(&outstream_mutex);
+ 		if (!stream_out) {
 -- 
 1.9.1
 
