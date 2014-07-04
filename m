@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 26/32] android/hal-sco: Connect SCO audio on demand
-Date: Fri,  4 Jul 2014 16:47:11 +0300
-Message-Id: <1404481637-900-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 10/32] android/haltest: Add open/close input stream commands
+Date: Fri,  4 Jul 2014 16:46:55 +0300
+Message-Id: <1404481637-900-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,52 +12,87 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ android/client/if-sco.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 79c13dc..1627b83 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -280,15 +280,16 @@ failed:
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+index b7f5a80..c71d0b4 100644
+--- a/android/client/if-sco.c
++++ b/android/client/if-sco.c
+@@ -23,8 +23,10 @@
  
- static int ipc_connect_sco(void)
+ audio_hw_device_t *if_audio_sco = NULL;
+ static struct audio_stream_out *stream_out = NULL;
++static struct audio_stream_in *stream_in = NULL;
+ 
+ static size_t buffer_size = 0;
++static size_t buffer_size_in = 0;
+ static pthread_t play_thread = 0;
+ static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -340,6 +342,53 @@ static void close_output_stream_p(int argc, const char **argv)
+ 	buffer_size = 0;
+ }
+ 
++static void open_input_stream_p(int argc, const char **argv)
++{
++	int err;
++
++	RETURN_IF_NULL(if_audio_sco);
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state == STATE_PLAYING) {
++		haltest_error("Already playing!\n");
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++	pthread_mutex_unlock(&state_mutex);
++
++	err = if_audio_sco->open_input_stream(if_audio_sco,
++						0,
++						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
++						NULL,
++						&stream_in);
++	if (err < 0) {
++		haltest_error("open output stream returned %d\n", err);
++		return;
++	}
++
++	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
++	if (buffer_size_in == 0)
++		haltest_error("Invalid buffer size received!\n");
++	else
++		haltest_info("Using buffer size: %zu\n", buffer_size_in);
++}
++
++static void close_input_stream_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_in);
++
++	stop_p(argc, argv);
++
++	haltest_info("Waiting for playback thread...\n");
++	pthread_join(play_thread, NULL);
++
++	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
++
++	stream_in = NULL;
++	buffer_size_in = 0;
++}
++
+ static void cleanup_p(int argc, const char **argv)
  {
--	struct sco_rsp_connect rsp;
--	size_t rsp_len = sizeof(rsp);
- 	int ret = SCO_STATUS_SUCCESS;
- 
--	DBG("");
--
- 	pthread_mutex_lock(&sco_mutex);
- 
- 	if (sco_fd < 0) {
-+		struct sco_rsp_connect rsp;
-+		size_t rsp_len = sizeof(rsp);
-+
-+		DBG("Connecting SCO");
-+
- 		ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL,
- 						&rsp_len, &rsp, &sco_fd);
- 
-@@ -445,7 +446,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 
- 	DBG("write to fd %d bytes %zu", sco_fd, bytes);
- 
--	if (sco_fd < 0)
-+	if (ipc_connect_sco() != SCO_STATUS_SUCCESS)
- 		return -1;
- 
- 	if (!out->downmix_buf) {
-@@ -1009,7 +1010,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
- 
- 	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
- 
--	if (sco_fd < 0)
-+	if (ipc_connect_sco() != SCO_STATUS_SUCCESS)
- 		return -1;
- 
- 	if (!in->resampler && in->cfg.rate != AUDIO_STREAM_SCO_RATE) {
+ 	int err;
+@@ -499,6 +548,8 @@ static struct method methods[] = {
+ 	STD_METHOD(cleanup),
+ 	STD_METHOD(open_output_stream),
+ 	STD_METHOD(close_output_stream),
++	STD_METHOD(open_input_stream),
++	STD_METHOD(close_input_stream),
+ 	STD_METHODH(play, "<path to pcm file>"),
+ 	STD_METHOD(stop),
+ 	STD_METHOD(suspend),
 -- 
 1.9.1
 
