@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 28/32] android/handsfree: Refactor SCO audio connect sequence
-Date: Fri,  4 Jul 2014 16:47:13 +0300
-Message-Id: <1404481637-900-29-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 30/32] android/hal-audio: Fix leaving open socket
+Date: Fri,  4 Jul 2014 16:47:15 +0300
+Message-Id: <1404481637-900-31-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,91 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use connect_pending to identify when we need to return msg to HAL.
+When getting out of the poll loop we shall close socket always.
 ---
- android/handsfree.c | 41 ++++++++++++++++++++++++++++++-----------
- 1 file changed, 30 insertions(+), 11 deletions(-)
+ android/hal-audio.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/android/handsfree.c b/android/handsfree.c
-index a2e3921..01db292 100644
---- a/android/handsfree.c
-+++ b/android/handsfree.c
-@@ -169,7 +169,8 @@ static GIOChannel *hsp_server = NULL;
+diff --git a/android/hal-audio.c b/android/hal-audio.c
+index 1a3d3ae..d7a06fa 100644
+--- a/android/hal-audio.c
++++ b/android/hal-audio.c
+@@ -1377,14 +1377,12 @@ static void *ipc_handler(void *data)
+ 		/* Check if socket is still alive. Empty while loop.*/
+ 		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
  
- static GIOChannel *sco_server = NULL;
+-		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
+-			info("Audio HAL: Socket closed");
++		info("Audio HAL: Socket closed");
  
--static void bt_sco_connect(const void *buf, uint16_t len);
-+static bool connect_pending = false;
-+static void bt_sco_connect_rsp(bool is_error);
- 
- static void device_set_state(uint8_t state)
- {
-@@ -896,7 +897,7 @@ static void connect_sco_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 	device_set_audio_state(HAL_EV_HANDSFREE_AUDIO_STATE_CONNECTED);
- 
- 	if (ipc_is_connected(sco_ipc))
--		bt_sco_connect(NULL, 0);
-+		bt_sco_connect_rsp(false);
- }
- 
- static bool connect_sco(void)
-@@ -2574,22 +2575,22 @@ static void disable_sco_server(void)
+-			pthread_mutex_lock(&sk_mutex);
+-			close(audio_sk);
+-			audio_sk = -1;
+-			pthread_mutex_unlock(&sk_mutex);
+-		}
++		pthread_mutex_lock(&sk_mutex);
++		close(audio_sk);
++		audio_sk = -1;
++		pthread_mutex_unlock(&sk_mutex);
  	}
- }
  
--static void bt_sco_connect(const void *buf, uint16_t len)
-+static void bt_sco_connect_rsp(bool is_error)
- {
- 	int fd;
--	GError *err;
-+	GError *err = NULL;
- 	struct sco_rsp_connect rsp;
- 
--	DBG("");
-+	DBG("error %d pending %d", is_error, connect_pending);
- 
--	if (!device.sco) {
--		DBG("SCO is not established, connecting...");
--		if (!connect_audio())
--			goto failed;
-+	if (!connect_pending)
- 		return;
--	}
- 
--	err = NULL;
-+	connect_pending = false;
-+
-+	if (is_error)
-+		goto failed;
-+
- 	if (!bt_io_get(device.sco, &err, BT_IO_OPT_MTU, &rsp.mtu,
- 							BT_IO_OPT_INVALID)) {
- 		error("Unable to get MTU: %s\n", err->message);
-@@ -2610,6 +2611,24 @@ failed:
- 	ipc_send_rsp(sco_ipc, SCO_SERVICE_ID, SCO_OP_STATUS, SCO_STATUS_FAILED);
- }
- 
-+static void bt_sco_connect(const void *buf, uint16_t len)
-+{
-+	DBG("");
-+
-+	connect_pending = true;
-+
-+	if (!device.sco) {
-+		DBG("SCO is not established, connecting...");
-+		if (!connect_audio()) {
-+			DBG("Connect audio failed");
-+			return bt_sco_connect_rsp(true);
-+		} else
-+			return;
-+	}
-+
-+	return bt_sco_connect_rsp(false);
-+}
-+
- static const struct ipc_handler sco_handlers[] = {
- 	/* SCO_OP_CONNECT */
- 	{ bt_sco_connect, false, 0 }
+ 	/* audio_sk is closed at this point, just cleanup endpoints states */
 -- 
 1.9.1
 
