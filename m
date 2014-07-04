@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 22/32] android/haltest: Add mono to stereo conversion for loopback
-Date: Fri,  4 Jul 2014 16:47:07 +0300
-Message-Id: <1404481637-900-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 31/32] android/hal-sco: Fix leaving open socket
+Date: Fri,  4 Jul 2014 16:47:16 +0300
+Message-Id: <1404481637-900-32-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,35 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Close accepted socket always after poll loop.
 ---
- android/client/if-sco.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+ android/hal-sco.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 0b884c3..0e27a9d 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -174,10 +174,24 @@ static void prepare_sample(void)
- 	sample_pos = 0;
- }
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index d405b41..6a46e90 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -1252,14 +1252,12 @@ static void *ipc_handler(void *data)
+ 		/* Check if socket is still alive. Empty while loop.*/
+ 		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
  
-+static void mono_to_stereo_pcm16(const int16_t *in, int16_t *out, size_t samples)
-+{
-+	int16_t mono;
-+	size_t i;
-+
-+	for (i = 0; i < samples; i++) {
-+		mono = get_unaligned(&in[i]);
-+
-+		put_unaligned(mono, &out[2 * i]);
-+		put_unaligned(mono, &out[2 * i + 1]);
-+	}
-+}
-+
- static void *playback_thread(void *data)
- {
- 	int (*filbuff_cb) (short*, void*);
- 	short buffer[buffer_size / sizeof(short)];
-+	short buffer_in[buffer_size_in / sizeof(short)];
- 	size_t len = 0;
- 	ssize_t w_len = 0;
- 	FILE *in = data;
-@@ -217,7 +231,19 @@ static void *playback_thread(void *data)
+-		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
+-			info("SCO HAL: Socket closed");
++		info("SCO HAL: Socket closed");
  
- 		pthread_mutex_unlock(&state_mutex);
+-			pthread_mutex_lock(&sk_mutex);
+-			close(ipc_sk);
+-			ipc_sk = -1;
+-			pthread_mutex_unlock(&sk_mutex);
+-		}
++		pthread_mutex_lock(&sk_mutex);
++		close(ipc_sk);
++		ipc_sk = -1;
++		pthread_mutex_unlock(&sk_mutex);
+ 	}
  
--		len = filbuff_cb(buffer, cb_data);
-+		if (data && data == stream_in) {
-+			int chan_in = popcount(stream_in->common.get_channels(&stream_in->common));
-+			int chan_out = popcount(stream_out->common.get_channels(&stream_out->common));
-+
-+			len = filbuff_cb(buffer_in, cb_data);
-+
-+			if (chan_in == 1 && chan_out == 2) {
-+				mono_to_stereo_pcm16(buffer_in,
-+							buffer,
-+							buffer_size_in / 2);
-+			}
-+		} else
-+			len = filbuff_cb(buffer, cb_data);
- 
- 		pthread_mutex_lock(&outstream_mutex);
- 		if (!stream_out) {
+ 	info("Closing SCO IPC thread");
 -- 
 1.9.1
 
