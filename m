@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 25/32] android/haltest: Refactor stop and closing streams
-Date: Fri,  4 Jul 2014 16:47:10 +0300
-Message-Id: <1404481637-900-26-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 07/32] android/hal-sco: Implement open input stream
+Date: Fri,  4 Jul 2014 16:46:52 +0300
+Message-Id: <1404481637-900-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,59 +12,220 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/client/if-sco.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ android/hal-sco.c | 175 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 173 insertions(+), 2 deletions(-)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 0e27a9d..456c529 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -458,6 +458,9 @@ failed:
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index e476f84..905d6fc 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -75,9 +75,17 @@ struct sco_stream_out {
+ 	uint32_t resample_frame_num;
+ };
  
- static void stop_p(int argc, const char **argv)
++struct sco_stream_in {
++	struct audio_stream_in stream;
++
++	struct sco_audio_config cfg;
++	int fd;
++};
++
+ struct sco_dev {
+ 	struct audio_hw_device dev;
+ 	struct sco_stream_out *out;
++	struct sco_stream_in *in;
+ };
+ 
+ /*
+@@ -789,23 +797,186 @@ static size_t sco_get_input_buffer_size(const struct audio_hw_device *dev,
+ 	return -ENOSYS;
+ }
+ 
++static uint32_t in_get_sample_rate(const struct audio_stream *stream)
++{
++	struct sco_stream_in *in = (struct sco_stream_in *) stream;
++
++	DBG("rate %u", in->cfg.rate);
++
++	return in->cfg.rate;
++}
++
++static int in_set_sample_rate(struct audio_stream *stream, uint32_t rate)
++{
++	DBG("rate %u", rate);
++
++	return 0;
++}
++
++static size_t in_get_buffer_size(const struct audio_stream *stream)
++{
++	struct sco_stream_in *in = (struct sco_stream_in *) stream;
++	size_t size = audio_stream_frame_size(&in->stream.common) *
++							in->cfg.frame_num;
++
++	DBG("buf size %zd", size);
++
++	return size;
++}
++
++static uint32_t in_get_channels(const struct audio_stream *stream)
++{
++	struct sco_stream_in *in = (struct sco_stream_in *) stream;
++
++	DBG("channels num: %u", popcount(in->cfg.channels));
++
++	return in->cfg.channels;
++}
++
++static audio_format_t in_get_format(const struct audio_stream *stream)
++{
++	struct sco_stream_in *in = (struct sco_stream_in *) stream;
++
++	DBG("format: %u", in->cfg.format);
++
++	return in->cfg.format;
++}
++
++static int in_set_format(struct audio_stream *stream, audio_format_t format)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int in_standby(struct audio_stream *stream)
++{
++	DBG("");
++
++	return 0;
++}
++
++static int in_dump(const struct audio_stream *stream, int fd)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int in_set_parameters(struct audio_stream *stream, const char *kvpairs)
++{
++	DBG("%s", kvpairs);
++
++	return 0;
++}
++
++static char *in_get_parameters(const struct audio_stream *stream,
++							const char *keys)
++{
++	DBG("");
++
++	return strdup("");
++}
++
++static int in_add_audio_effect(const struct audio_stream *stream,
++							effect_handle_t effect)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int in_remove_audio_effect(const struct audio_stream *stream,
++							effect_handle_t effect)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static int in_set_gain(struct audio_stream_in *stream, float gain)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
++								size_t bytes)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
++static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
++{
++	DBG("");
++
++	return -ENOSYS;
++}
++
+ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 					audio_io_handle_t handle,
+ 					audio_devices_t devices,
+ 					struct audio_config *config,
+ 					struct audio_stream_in **stream_in)
  {
-+	RETURN_IF_NULL(if_audio_sco);
-+	RETURN_IF_NULL(play_thread);
++	struct sco_dev *sco_dev = (struct sco_dev *) dev;
++	struct sco_stream_in *in;
 +
- 	pthread_mutex_lock(&state_mutex);
- 	if (current_state == STATE_STOPPED || current_state == STATE_STOPPING) {
- 		pthread_mutex_unlock(&state_mutex);
-@@ -467,6 +470,9 @@ static void stop_p(int argc, const char **argv)
- 	current_state = STATE_STOPPING;
- 	pthread_mutex_unlock(&state_mutex);
+ 	DBG("");
  
-+	pthread_join(play_thread, NULL);
-+	play_thread = 0;
++	in = calloc(1, sizeof(struct sco_stream_in));
++	if (!in)
++		return -ENOMEM;
 +
- 	pthread_mutex_lock(&outstream_mutex);
- 	stream_out->common.standby(&stream_out->common);
- 	pthread_mutex_unlock(&outstream_mutex);
-@@ -528,10 +534,8 @@ static void close_output_stream_p(int argc, const char **argv)
- 	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_out);
++	in->stream.common.get_sample_rate = in_get_sample_rate;
++	in->stream.common.set_sample_rate = in_set_sample_rate;
++	in->stream.common.get_buffer_size = in_get_buffer_size;
++	in->stream.common.get_channels = in_get_channels;
++	in->stream.common.get_format = in_get_format;
++	in->stream.common.set_format = in_set_format;
++	in->stream.common.standby = in_standby;
++	in->stream.common.dump = in_dump;
++	in->stream.common.set_parameters = in_set_parameters;
++	in->stream.common.get_parameters = in_get_parameters;
++	in->stream.common.add_audio_effect = in_add_audio_effect;
++	in->stream.common.remove_audio_effect = in_remove_audio_effect;
++	in->stream.set_gain = in_set_gain;
++	in->stream.read = in_read;
++	in->stream.get_input_frames_lost = in_get_input_frames_lost;
++
++	if (config) {
++		DBG("config: rate %u chan mask %x format %d offload %p",
++				config->sample_rate, config->channel_mask,
++				config->format, &config->offload_info);
++
++		in->cfg.format = config->format;
++		in->cfg.channels = config->channel_mask;
++		in->cfg.rate = config->sample_rate;
++	} else {
++		in->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
++		in->cfg.channels = AUDIO_CHANNEL_OUT_MONO;
++		in->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	}
++
++	*stream_in = &in->stream;
++	sco_dev->in = in;
++
+ 	return 0;
+ }
  
--	stop_p(argc, argv);
--
--	haltest_info("Waiting for playback thread...\n");
--	pthread_join(play_thread, NULL);
-+	if (play_thread)
-+		stop_p(argc, argv);
+ static void sco_close_input_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_in *stream_in)
+ {
+-	DBG("");
++	struct sco_dev *sco_dev = (struct sco_dev *) dev;
++	struct sco_stream_in *in = (struct sco_stream_in *) stream_in;
++
++	DBG("dev %p stream %p fd %d", dev, in, in->fd);
  
- 	if_audio_sco->close_output_stream(if_audio_sco, stream_out);
+-	free(stream_in);
++	free(in);
++	sco_dev->in = NULL;
+ }
  
-@@ -592,10 +596,8 @@ static void close_input_stream_p(int argc, const char **argv)
- 	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_in);
- 
--	stop_p(argc, argv);
--
--	haltest_info("Waiting for playback thread...\n");
--	pthread_join(play_thread, NULL);
-+	if (play_thread)
-+		stop_p(argc, argv);
- 
- 	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
- 
+ static int sco_dump(const audio_hw_device_t *device, int fd)
 -- 
 1.9.1
 
