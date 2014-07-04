@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 13/32] android/hal-sco: Make debug more readable
-Date: Fri,  4 Jul 2014 16:46:58 +0300
-Message-Id: <1404481637-900-14-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 26/32] android/hal-sco: Connect SCO audio on demand
+Date: Fri,  4 Jul 2014 16:47:11 +0300
+Message-Id: <1404481637-900-27-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,44 +12,52 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+ android/hal-sco.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 09fcf5b..e084c31 100644
+index 79c13dc..1627b83 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -656,8 +656,6 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 		return -ENOMEM;
- 	}
+@@ -280,15 +280,16 @@ failed:
  
--	DBG("size %zd", out_get_buffer_size(&out->stream.common));
+ static int ipc_connect_sco(void)
+ {
+-	struct sco_rsp_connect rsp;
+-	size_t rsp_len = sizeof(rsp);
+ 	int ret = SCO_STATUS_SUCCESS;
+ 
+-	DBG("");
 -
- 	/* Channel numbers for resampler */
- 	chan_num = 1;
+ 	pthread_mutex_lock(&sco_mutex);
  
-@@ -669,9 +667,6 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 		goto failed;
- 	}
+ 	if (sco_fd < 0) {
++		struct sco_rsp_connect rsp;
++		size_t rsp_len = sizeof(rsp);
++
++		DBG("Connecting SCO");
++
+ 		ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL,
+ 						&rsp_len, &rsp, &sco_fd);
  
--	DBG("Created resampler: input rate [%d] output rate [%d] channels [%d]",
--				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num);
--
- 	out->resample_frame_num = get_resample_frame_num(AUDIO_STREAM_SCO_RATE,
- 							out->cfg.rate,
- 							out->cfg.frame_num, 1);
-@@ -690,8 +685,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 		goto failed;
- 	}
+@@ -445,7 +446,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
  
--	DBG("resampler: frame num %u buf size %zd bytes",
--					out->resample_frame_num, resample_size);
-+	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
-+				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num,
-+				out->resample_frame_num, resample_size);
+ 	DBG("write to fd %d bytes %zu", sco_fd, bytes);
  
- 	*stream_out = &out->stream;
- 	adev->out = out;
+-	if (sco_fd < 0)
++	if (ipc_connect_sco() != SCO_STATUS_SUCCESS)
+ 		return -1;
+ 
+ 	if (!out->downmix_buf) {
+@@ -1009,7 +1010,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+ 
+ 	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
+ 
+-	if (sco_fd < 0)
++	if (ipc_connect_sco() != SCO_STATUS_SUCCESS)
+ 		return -1;
+ 
+ 	if (!in->resampler && in->cfg.rate != AUDIO_STREAM_SCO_RATE) {
 -- 
 1.9.1
 
