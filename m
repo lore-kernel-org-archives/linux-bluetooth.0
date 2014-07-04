@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 12/12] core: Remove dead code
-Date: Fri,  4 Jul 2014 16:44:01 +0300
-Message-Id: <1404481441-734-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 04/12] android/gatt: Fix warning by rearranging allocation
+Date: Fri,  4 Jul 2014 16:43:53 +0300
+Message-Id: <1404481441-734-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,26 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-rfcomm can only be NULL in this path
----
- src/profile.c | 4 ----
- 1 file changed, 4 deletions(-)
+We need to allocate array of uint8_t so fix allocation parameter, this
+also removes unneeded type conversion.
 
-diff --git a/src/profile.c b/src/profile.c
-index f30f4f6..528525a 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1295,10 +1295,6 @@ failed:
- 		ext->servers = g_slist_remove(ext->servers, l2cap);
- 		ext_io_destroy(l2cap);
- 	}
--	if (rfcomm) {
--		ext->servers = g_slist_remove(ext->servers, rfcomm);
--		ext_io_destroy(rfcomm);
--	}
+This fixes clang warnings:
+...
+android/gatt.c:5967:29: warning: Result of 'calloc' is converted to a
+pointer of type 'uint8_t', which is incompatible with sizeof operand
+type 'uint16_t'
+        entry->value = (uint8_t *) new0(uint16_t, 1);
+                        ~~~~~~~~~  ^~~~~~~~~~~~~~~~~
+./src/shared/util.h:81:26: note: expanded from macro 'new0'
+                         ^~~~~~      ~~~~~~~~~
+...
+---
+ android/gatt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/android/gatt.c b/android/gatt.c
+index ca4bd1d..b47ba83 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6062,7 +6062,7 @@ static void gatt_srvc_change_read_cb(uint16_t handle, uint16_t offset,
+ 	ccc = bt_get_gatt_ccc(&dev->bdaddr);
+ 	entry->state = REQUEST_DONE;
  
- 	return 0;
- }
+-	entry->value = (uint8_t *) new0(uint16_t, 1);
++	entry->value = new0(uint8_t, 2);
+ 	if (!entry->value) {
+ 		entry->error = ATT_ECODE_INSUFF_RESOURCES;
+ 
 -- 
 1.9.1
 
