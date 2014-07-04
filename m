@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 02/12] android/gatt: Fix memory leak
-Date: Fri,  4 Jul 2014 16:43:51 +0300
-Message-Id: <1404481441-734-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 07/12] android/gatt: Add missing error check
+Date: Fri,  4 Jul 2014 16:43:56 +0300
+Message-Id: <1404481441-734-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,29 +11,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes clang warnings:
+Fixes clang warning:
 ...
-android/gatt.c:2823:1: warning: Potential leak of memory pointed to by
-'cb_data'
+android/gatt.c:2097:4: warning: Value stored to 'srvc_search_success' is
+never read
+       srvc_search_success = search_dev_for_srvc(conn, NULL);
 ...
 ---
- android/gatt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ android/gatt.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/android/gatt.c b/android/gatt.c
-index 5cb08ec..ca4bd1d 100644
+index b47ba83..fa7e1c3 100644
 --- a/android/gatt.c
 +++ b/android/gatt.c
-@@ -2957,7 +2957,8 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE) {
-+	if (cmd->write_type != GATT_WRITE_TYPE_NO_RESPONSE &&
-+				cmd->write_type != GATT_WRITE_TYPE_SIGNED) {
- 		cb_data = create_char_op_data(cmd->conn_id, &srvc->id, &ch->id,
- 						cmd->srvc_id.is_primary);
- 		if (!cb_data) {
+@@ -2093,9 +2093,13 @@ static void handle_client_search_service(const void *buf, uint16_t len)
+ 		}
+ 	} else {
+ 		/* Refresh service cache if only partial search was performed */
+-		if (conn->device->partial_srvc_search)
++		if (conn->device->partial_srvc_search) {
+ 			srvc_search_success = search_dev_for_srvc(conn, NULL);
+-		else
++			if (!srvc_search_success) {
++				status = HAL_STATUS_FAILED;
++				goto reply;
++			}
++		} else
+ 			queue_foreach(conn->device->services,
+ 						send_client_primary_notify,
+ 						INT_TO_PTR(cmd->conn_id));
 -- 
 1.9.1
 
