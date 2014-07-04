@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 08/32] android/hal-sco: Check file descriptor >= 0
-Date: Fri,  4 Jul 2014 16:46:53 +0300
-Message-Id: <1404481637-900-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 21/32] android/haltest: Correct check for similar buffer size
+Date: Fri,  4 Jul 2014 16:47:06 +0300
+Message-Id: <1404481637-900-22-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,30 +11,38 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+The new check takes into account number of channels.
 ---
- android/hal-sco.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/client/if-sco.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 905d6fc..bcaa820 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -715,11 +715,11 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
- 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
- 	struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+index 14b7dcc..0b884c3 100644
+--- a/android/client/if-sco.c
++++ b/android/client/if-sco.c
+@@ -354,16 +354,21 @@ fail:
  
--	DBG("dev %p stream %p fd %d", dev, stream_out, sco_dev->out->fd);
-+	DBG("dev %p stream %p fd %d", dev, out, sco_dev->out->fd);
+ static void loop_p(int argc, const char **argv)
+ {
++	int chan_out, chan_in;
++
+ 	RETURN_IF_NULL(if_audio_sco);
+ 	RETURN_IF_NULL(stream_out);
+ 	RETURN_IF_NULL(stream_in);
  
--	if (sco_dev->out && sco_dev->out->fd) {
--		close(sco_dev->out->fd);
--		sco_dev->out->fd = -1;
-+	if (out && out->fd >= 0) {
-+		close(out->fd);
-+		out->fd = -1;
++	chan_out = popcount(stream_out->common.get_channels(&stream_out->common));
++	chan_in = popcount(stream_in->common.get_channels(&stream_in->common));
++
+ 	if (!buffer_size || !buffer_size_in) {
+ 		haltest_error("Invalid buffer sizes. Streams opened\n");
+ 		return;
  	}
  
- 	if (out->resampler)
+-	if (buffer_size != buffer_size_in) {
++	if (buffer_size / chan_out != buffer_size_in / chan_in) {
+ 		haltest_error("read/write buffers differ, not supported\n");
+ 		return;
+ 	}
 -- 
 1.9.1
 
