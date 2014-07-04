@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 07/12] android/gatt: Add missing error check
-Date: Fri,  4 Jul 2014 16:43:56 +0300
-Message-Id: <1404481441-734-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 03/12] android/hal-msg: trivial: Correct coding style
+Date: Fri,  4 Jul 2014 16:43:52 +0300
+Message-Id: <1404481441-734-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,36 +11,37 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes clang warning:
-...
-android/gatt.c:2097:4: warning: Value stored to 'srvc_search_success' is
-never read
-       srvc_search_success = search_dev_for_srvc(conn, NULL);
-...
+Move rsp close to cmd improving readability of the code.
 ---
- android/gatt.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ android/hal-msg.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index b47ba83..fa7e1c3 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2093,9 +2093,13 @@ static void handle_client_search_service(const void *buf, uint16_t len)
- 		}
- 	} else {
- 		/* Refresh service cache if only partial search was performed */
--		if (conn->device->partial_srvc_search)
-+		if (conn->device->partial_srvc_search) {
- 			srvc_search_success = search_dev_for_srvc(conn, NULL);
--		else
-+			if (!srvc_search_success) {
-+				status = HAL_STATUS_FAILED;
-+				goto reply;
-+			}
-+		} else
- 			queue_foreach(conn->device->services,
- 						send_client_primary_notify,
- 						INT_TO_PTR(cmd->conn_id));
+diff --git a/android/hal-msg.h b/android/hal-msg.h
+index af859c6..7f13e84 100644
+--- a/android/hal-msg.h
++++ b/android/hal-msg.h
+@@ -403,6 +403,10 @@ struct hal_cmd_health_reg_app {
+ 	uint8_t  data[0];
+ } __attribute__((packed));
+ 
++struct hal_rsp_health_reg_app {
++	uint16_t app_id;
++} __attribute__((packed));
++
+ #define HAL_OP_HEALTH_MDEP		0x02
+ struct hal_cmd_health_mdep {
+ 	uint16_t app_id;
+@@ -413,10 +417,6 @@ struct hal_cmd_health_mdep {
+ 	uint8_t  descr[0];
+ } __attribute__((packed));
+ 
+-struct hal_rsp_health_reg_app {
+-	uint16_t app_id;
+-} __attribute__((packed));
+-
+ #define HAL_OP_HEALTH_UNREG_APP		0x03
+ struct hal_cmd_health_unreg_app {
+ 	uint16_t app_id;
 -- 
 1.9.1
 
