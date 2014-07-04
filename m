@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 30/32] android/hal-audio: Fix leaving open socket
-Date: Fri,  4 Jul 2014 16:47:15 +0300
-Message-Id: <1404481637-900-31-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 23/32] android/hal-sco: Choose buffer size
+Date: Fri,  4 Jul 2014 16:47:08 +0300
+Message-Id: <1404481637-900-24-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,46 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When getting out of the poll loop we shall close socket always.
+For 8k choose buffer size 576 which is multiple from 48 and 64.
 ---
- android/hal-audio.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ android/hal-sco.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 1a3d3ae..d7a06fa 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -1377,14 +1377,12 @@ static void *ipc_handler(void *data)
- 		/* Check if socket is still alive. Empty while loop.*/
- 		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 9bf9a19..ff85210 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -40,7 +40,7 @@
  
--		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
--			info("Audio HAL: Socket closed");
-+		info("Audio HAL: Socket closed");
+ #define OUT_BUFFER_SIZE			2560
+ #define OUT_STREAM_FRAMES		2560
+-#define IN_STREAM_FRAMES		/* 5292 */ 5120
++#define IN_STREAM_FRAMES		5292
  
--			pthread_mutex_lock(&sk_mutex);
--			close(audio_sk);
--			audio_sk = -1;
--			pthread_mutex_unlock(&sk_mutex);
--		}
-+		pthread_mutex_lock(&sk_mutex);
-+		close(audio_sk);
-+		audio_sk = -1;
-+		pthread_mutex_unlock(&sk_mutex);
- 	}
+ #define SOCKET_POLL_TIMEOUT_MS		500
  
- 	/* audio_sk is closed at this point, just cleanup endpoints states */
+@@ -492,6 +492,10 @@ static size_t out_get_buffer_size(const struct audio_stream *stream)
+ 	size_t size = audio_stream_frame_size(&out->stream.common) *
+ 							out->cfg.frame_num;
+ 
++	/* buffer size without resampling */
++	if (out->cfg.rate == AUDIO_STREAM_SCO_RATE)
++		size = 576 * 2;
++
+ 	DBG("buf size %zd", size);
+ 
+ 	return size;
+@@ -838,6 +842,10 @@ static size_t in_get_buffer_size(const struct audio_stream *stream)
+ 	size_t size = audio_stream_frame_size(&in->stream.common) *
+ 							in->cfg.frame_num;
+ 
++	/* buffer size without resampling */
++	if (in->cfg.rate == AUDIO_STREAM_SCO_RATE)
++		size = 576;
++
+ 	DBG("buf size %zd", size);
+ 
+ 	return size;
 -- 
 1.9.1
 
