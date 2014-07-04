@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 11/32] android/haltest: Add read command.
-Date: Fri,  4 Jul 2014 16:46:56 +0300
-Message-Id: <1404481637-900-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 12/32] android/haltest: Add loop command
+Date: Fri,  4 Jul 2014 16:46:57 +0300
+Message-Id: <1404481637-900-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,72 +11,69 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Read command makes stream_in->read() call to Audio HAL.
+loop command makes stream_in->read() and then stream_out->write(). At
+the moment buffers shall be equal.
 ---
- android/client/if-sco.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ android/client/if-sco.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
 diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index c71d0b4..b4c3506 100644
+index b4c3506..39c3e3a 100644
 --- a/android/client/if-sco.c
 +++ b/android/client/if-sco.c
-@@ -230,6 +230,45 @@ static void *playback_thread(void *data)
- 	return NULL;
+@@ -148,6 +148,11 @@ static int feed_from_generator(short *buffer, void *data)
+ 	return buffer_size;
  }
  
-+static void *read_thread(void *data)
++static int feed_from_in(short *buffer, void *data)
 +{
-+	int (*filbuff_cb) (short*, void*) = feed_from_in;
-+	short buffer[buffer_size / sizeof(short)];
-+	size_t len = 0;
-+	void *cb_data = NULL;
-+
-+	pthread_mutex_lock(&state_mutex);
-+	current_state = STATE_PLAYING;
-+	pthread_mutex_unlock(&state_mutex);
-+
-+	do {
-+		pthread_mutex_lock(&state_mutex);
-+
-+		if (current_state == STATE_STOPPING) {
-+			haltest_info("Detected stopping\n");
-+			pthread_mutex_unlock(&state_mutex);
-+			break;
-+		} else if (current_state == STATE_SUSPENDED) {
-+			pthread_mutex_unlock(&state_mutex);
-+			usleep(500);
-+			continue;
-+		}
-+
-+		pthread_mutex_unlock(&state_mutex);
-+
-+		len = filbuff_cb(buffer, cb_data);
-+		haltest_info("len %zd\n", len);
-+	} while (len);
-+
-+	pthread_mutex_lock(&state_mutex);
-+	current_state = STATE_STOPPED;
-+	pthread_mutex_unlock(&state_mutex);
-+
-+	haltest_info("Done reading.\n");
-+
-+	return NULL;
++	return stream_in->read(stream_in, buffer, buffer_size_in);
 +}
 +
- static void play_p(int argc, const char **argv)
+ static void prepare_sample(void)
  {
- 	const char *fname = NULL;
-@@ -276,6 +315,30 @@ fail:
+ 	int x;
+@@ -179,8 +184,12 @@ static void *playback_thread(void *data)
+ 
+ 	/* Use file or fall back to generator */
+ 	if (in) {
+-		filbuff_cb = feed_from_file;
+-		cb_data = in;
++		if (data == stream_in)
++			filbuff_cb = feed_from_in;
++		else {
++			filbuff_cb = feed_from_file;
++			cb_data = in;
++		}
+ 	} else {
+ 		prepare_sample();
+ 		filbuff_cb = feed_from_generator;
+@@ -218,7 +227,7 @@ static void *playback_thread(void *data)
+ 		pthread_mutex_unlock(&outstream_mutex);
+ 	} while (len && w_len > 0);
+ 
+-	if (in)
++	if (in && data != stream_in)
+ 		fclose(in);
+ 
+ 	pthread_mutex_lock(&state_mutex);
+@@ -315,6 +324,35 @@ fail:
  		fclose(in);
  }
  
-+static void read_p(int argc, const char **argv)
++static void loop_p(int argc, const char **argv)
 +{
 +	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
 +	RETURN_IF_NULL(stream_in);
 +
-+	if (!buffer_size_in) {
++	if (!buffer_size || !buffer_size_in) {
 +		haltest_error("Invalid buffer sizes. Streams opened\n");
++		return;
++	}
++
++	if (buffer_size != buffer_size_in) {
++		haltest_error("read/write buffers differ, not supported\n");
 +		return;
 +	}
 +
@@ -88,20 +85,19 @@ index c71d0b4..b4c3506 100644
 +	}
 +	pthread_mutex_unlock(&state_mutex);
 +
-+	if (pthread_create(&play_thread, NULL, read_thread,
++	if (pthread_create(&play_thread, NULL, playback_thread,
 +							stream_in) != 0)
 +		haltest_error("Cannot create playback thread!\n");
-+
 +}
 +
- static void stop_p(int argc, const char **argv)
+ static void read_p(int argc, const char **argv)
  {
- 	pthread_mutex_lock(&state_mutex);
-@@ -551,6 +614,7 @@ static struct method methods[] = {
- 	STD_METHOD(open_input_stream),
+ 	RETURN_IF_NULL(if_audio_sco);
+@@ -615,6 +653,7 @@ static struct method methods[] = {
  	STD_METHOD(close_input_stream),
  	STD_METHODH(play, "<path to pcm file>"),
-+	STD_METHOD(read),
+ 	STD_METHOD(read),
++	STD_METHOD(loop),
  	STD_METHOD(stop),
  	STD_METHOD(suspend),
  	STD_METHOD(resume),
