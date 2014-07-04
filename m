@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 10/32] android/haltest: Add open/close input stream commands
-Date: Fri,  4 Jul 2014 16:46:55 +0300
-Message-Id: <1404481637-900-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 06/32] android/hal-sco: Make use of config parameter
+Date: Fri,  4 Jul 2014 16:46:51 +0300
+Message-Id: <1404481637-900-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,88 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Use config parameter when opening output stream.
 ---
- android/client/if-sco.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ android/hal-sco.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index b7f5a80..c71d0b4 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -23,8 +23,10 @@
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 7e1a981..e476f84 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -584,7 +584,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	size_t resample_size;
+ 	uint16_t mtu;
  
- audio_hw_device_t *if_audio_sco = NULL;
- static struct audio_stream_out *stream_out = NULL;
-+static struct audio_stream_in *stream_in = NULL;
+-	DBG("");
++	DBG("config %p device flags 0x%02x", config, devices);
  
- static size_t buffer_size = 0;
-+static size_t buffer_size_in = 0;
- static pthread_t play_thread = 0;
- static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
- static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
-@@ -340,6 +342,53 @@ static void close_output_stream_p(int argc, const char **argv)
- 	buffer_size = 0;
- }
+ 	if (ipc_connect_sco(&fd, &mtu) != SCO_STATUS_SUCCESS) {
+ 		error("sco: cannot get fd");
+@@ -614,10 +614,20 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	out->stream.write = out_write;
+ 	out->stream.get_render_position = out_get_render_position;
  
-+static void open_input_stream_p(int argc, const char **argv)
-+{
-+	int err;
+-	/* Configuration for Android */
+-	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
+-	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+-	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	if (config) {
++		DBG("config: rate %u chan mask %x format %d offload %p",
++				config->sample_rate, config->channel_mask,
++				config->format, &config->offload_info);
 +
-+	RETURN_IF_NULL(if_audio_sco);
-+
-+	pthread_mutex_lock(&state_mutex);
-+	if (current_state == STATE_PLAYING) {
-+		haltest_error("Already playing!\n");
-+		pthread_mutex_unlock(&state_mutex);
-+		return;
-+	}
-+	pthread_mutex_unlock(&state_mutex);
-+
-+	err = if_audio_sco->open_input_stream(if_audio_sco,
-+						0,
-+						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
-+						NULL,
-+						&stream_in);
-+	if (err < 0) {
-+		haltest_error("open output stream returned %d\n", err);
-+		return;
++		out->cfg.format = config->format;
++		out->cfg.channels = config->channel_mask;
++		out->cfg.rate = config->sample_rate;
++	} else {
++		out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
++		out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
++		out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
 +	}
 +
-+	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
-+	if (buffer_size_in == 0)
-+		haltest_error("Invalid buffer size received!\n");
-+	else
-+		haltest_info("Using buffer size: %zu\n", buffer_size_in);
-+}
-+
-+static void close_input_stream_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_audio_sco);
-+	RETURN_IF_NULL(stream_in);
-+
-+	stop_p(argc, argv);
-+
-+	haltest_info("Waiting for playback thread...\n");
-+	pthread_join(play_thread, NULL);
-+
-+	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
-+
-+	stream_in = NULL;
-+	buffer_size_in = 0;
-+}
-+
- static void cleanup_p(int argc, const char **argv)
- {
- 	int err;
-@@ -499,6 +548,8 @@ static struct method methods[] = {
- 	STD_METHOD(cleanup),
- 	STD_METHOD(open_output_stream),
- 	STD_METHOD(close_output_stream),
-+	STD_METHOD(open_input_stream),
-+	STD_METHOD(close_input_stream),
- 	STD_METHODH(play, "<path to pcm file>"),
- 	STD_METHOD(stop),
- 	STD_METHOD(suspend),
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+ 
+ 	/* we get wrong mtu size for some reason */
 -- 
 1.9.1
 
