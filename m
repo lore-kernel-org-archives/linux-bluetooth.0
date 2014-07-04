@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 06/32] android/hal-sco: Make use of config parameter
-Date: Fri,  4 Jul 2014 16:46:51 +0300
-Message-Id: <1404481637-900-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 17/32] android/hal-sco: Connect SCO when opening input stream
+Date: Fri,  4 Jul 2014 16:47:02 +0300
+Message-Id: <1404481637-900-18-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1404481637-900-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,49 +11,28 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Use config parameter when opening output stream.
 ---
- android/hal-sco.c | 20 +++++++++++++++-----
- 1 file changed, 15 insertions(+), 5 deletions(-)
+ android/hal-sco.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 7e1a981..e476f84 100644
+index ed90b23..1f5eb23 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -584,7 +584,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+@@ -1040,7 +1040,12 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 	int chan_num, ret;
  	size_t resample_size;
- 	uint16_t mtu;
  
 -	DBG("");
 +	DBG("config %p device flags 0x%02x", config, devices);
- 
- 	if (ipc_connect_sco(&fd, &mtu) != SCO_STATUS_SUCCESS) {
- 		error("sco: cannot get fd");
-@@ -614,10 +614,20 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	out->stream.write = out_write;
- 	out->stream.get_render_position = out_get_render_position;
- 
--	/* Configuration for Android */
--	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
--	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
--	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
-+	if (config) {
-+		DBG("config: rate %u chan mask %x format %d offload %p",
-+				config->sample_rate, config->channel_mask,
-+				config->format, &config->offload_info);
 +
-+		out->cfg.format = config->format;
-+		out->cfg.channels = config->channel_mask;
-+		out->cfg.rate = config->sample_rate;
-+	} else {
-+		out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
-+		out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
-+		out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	if (ipc_connect_sco() != SCO_STATUS_SUCCESS) {
++		error("sco: cannot get fd");
++		return -EIO;
 +	}
-+
- 	out->cfg.frame_num = OUT_STREAM_FRAMES;
  
- 	/* we get wrong mtu size for some reason */
+ 	in = calloc(1, sizeof(struct sco_stream_in));
+ 	if (!in)
 -- 
 1.9.1
 
