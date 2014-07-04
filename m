@@ -1,40 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 00/12] Varios fixes
-Date: Fri,  4 Jul 2014 16:43:49 +0300
-Message-Id: <1404481441-734-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Date: Fri, 4 Jul 2014 16:21:44 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] monitor: Fix possible resource leak
+Message-ID: <20140704132144.GA8955@t440s.lan>
+References: <1404477938-15036-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404477938-15036-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Andrei,
 
-Fixes hanging in my tree for some time
+On Fri, Jul 04, 2014, Andrei Emeltchenko wrote:
+> This fixes following memory leak:
+> ...
+> ==14887== 24 bytes in 1 blocks are definitely lost in loss record 2 of 4
+> ==14887==    at 0x4C2CC70: calloc (in
+> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
+> ==14887==    by 0x425B6C: btsnoop_open (btsnoop.c:83)
+> ==14887==    by 0x424837: analyze_trace (analyze.c:262)
+> ==14887==    by 0x40249A: main (main.c:189)
+> ...
+> ---
+>  monitor/analyze.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Andrei Emeltchenko (12):
-  android/gatt: Change DBG() to error()
-  android/gatt: Fix memory leak
-  android/hal-msg: trivial: Correct coding style
-  android/gatt: Fix warning by rearranging allocation
-  android/haltest: Auto-accept pairing
-  android/hal-gatt: Remove unneeded never read initialization
-  android/gatt: Add missing error check
-  android/haltest: Add check for valid channel
-  android/tester: Remove unused assignment
-  android/gatt: Fix length check
-  cups: Remove dead code
-  core: Remove dead code
+Applied. Thanks.
 
- android/android-tester.c |  2 +-
- android/client/if-bt.c   | 16 +++++++++++++++-
- android/client/if-hl.c   |  4 ++++
- android/gatt.c           | 17 +++++++++++------
- android/hal-gatt.c       |  4 +---
- android/hal-msg.h        |  8 ++++----
- profiles/cups/main.c     |  7 +------
- src/profile.c            |  4 ----
- 8 files changed, 37 insertions(+), 25 deletions(-)
-
--- 
-1.9.1
-
+Johan
