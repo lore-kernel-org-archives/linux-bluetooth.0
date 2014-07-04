@@ -1,45 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 4/4] Bluetooth: Allow reading configuration info when unconfigured
-Date: Fri,  4 Jul 2014 16:54:40 +0200
-Message-Id: <1404485680-1682-4-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 3/4] Bluetooth: Set HCI_QUIRK_INVALID_BADDR for BCM20702A0 default address
+Date: Fri,  4 Jul 2014 16:54:39 +0200
+Message-Id: <1404485680-1682-3-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Reading the controller configuration information is a valid management
-command when the controller is unconfigured. Allow this command, but
-return invalid index on all other commands.
+When the Broadcom USB controller has a default address, then set the quirk
+so the Bluetooth core knows that controller configuration is required.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/mgmt.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btusb.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index c7e5d4651021..766411e11ac7 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -5455,12 +5455,18 @@ int mgmt_control(struct sock *sk, struct msghdr *msg, size_t msglen)
- 		}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 825f3e16651f..61d8385666e9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -1624,9 +1624,11 @@ reset_fw:
+ 	/* The address 00:20:70:02:A0:00 indicates a BCM20702A0 controller
+ 	 * with no configured address.
+ 	 */
+-	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0))
++	if (!bacmp(&bda->bdaddr, BDADDR_BCM20702A0)) {
+ 		BT_INFO("%s: BCM: using default device address (%pMR)",
+ 			hdev->name, &bda->bdaddr);
++		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++	}
  
- 		if (test_bit(HCI_SETUP, &hdev->dev_flags) ||
--		    test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) ||
- 		    test_bit(HCI_USER_CHANNEL, &hdev->dev_flags)) {
- 			err = cmd_status(sk, index, opcode,
- 					 MGMT_STATUS_INVALID_INDEX);
- 			goto done;
- 		}
-+
-+		if (test_bit(HCI_UNCONFIGURED, &hdev->dev_flags) &&
-+		    opcode != MGMT_OP_READ_CONFIG_INFO) {
-+			err = cmd_status(sk, index, opcode,
-+					 MGMT_STATUS_INVALID_INDEX);
-+			goto done;
-+		}
- 	}
+ 	kfree_skb(skb);
  
- 	if (opcode >= ARRAY_SIZE(mgmt_handlers) ||
 -- 
 1.9.3
 
