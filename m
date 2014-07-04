@@ -1,40 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] monitor: Fix possible resource leak
-Date: Fri,  4 Jul 2014 15:45:38 +0300
-Message-Id: <1404477938-15036-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 4 Jul 2014 15:00:35 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix constant for public address configuration
+Message-ID: <20140704120035.GA30698@t440s.lan>
+References: <1404473018-18975-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404473018-18975-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Marcel,
 
-This fixes following memory leak:
-...
-==14887== 24 bytes in 1 blocks are definitely lost in loss record 2 of 4
-==14887==    at 0x4C2CC70: calloc (in
-/usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-==14887==    by 0x425B6C: btsnoop_open (btsnoop.c:83)
-==14887==    by 0x424837: analyze_trace (analyze.c:262)
-==14887==    by 0x40249A: main (main.c:189)
-...
----
- monitor/analyze.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Fri, Jul 04, 2014, Marcel Holtmann wrote:
+> The public address configuration option is value 0x02 since the generic
+> external configuration is value 0x01. So adjust this accordingly and
+> also add the value 0x01 to the list.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/mgmt.h | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index a5ed5f4..5288cf3 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -272,7 +272,7 @@ void analyze_trace(const char *path)
- 		break;
- 	default:
- 		fprintf(stderr, "Unsupported packet format\n");
--		return;
-+		goto done;
- 	}
- 
- 	dev_list = queue_new();
--- 
-1.9.1
+Applied to bluetooth-next. Thanks.
 
+Johan
