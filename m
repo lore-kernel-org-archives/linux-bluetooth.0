@@ -1,33 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix updating background scan for LE connect complete
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404650663-4037-1-git-send-email-johan.hedberg@gmail.com>
-Date: Sun, 6 Jul 2014 15:05:30 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C97562AC-025C-4AA4-B399-D2A26BE2D463@holtmann.org>
-References: <1404650663-4037-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Ignore isochronous endpoints for Intel USB bootloader
+Date: Sun,  6 Jul 2014 14:53:55 +0200
+Message-Id: <1404651235-51172-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+The isochronous endpoints are not valid when the Intel Bluetooth
+controller boots up in bootloader mode. So just mark these endpoints
+as broken and then they will not be configured.
 
-> When we get an LE connection complete event we should restart background
-> scanning if there are any any devices needing it. So far the code was
-> only making the decision based on whether the completed connection had
-> any stored parameters or not. This patch ensures that we trigger
-> background scanning always when necessary.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 5 ++---
-> 1 file changed, 2 insertions(+), 3 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index fe24f600ed65..b7d0fed3417f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -120,7 +120,8 @@ static const struct usb_device_id btusb_table[] = {
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01) },
+ 
+ 	/* Intel Bluetooth USB Bootloader (RAM module) */
+-	{ USB_DEVICE(0x8087, 0x0a5a), .driver_info = BTUSB_INTEL_BOOT },
++	{ USB_DEVICE(0x8087, 0x0a5a),
++	  .driver_info = BTUSB_INTEL_BOOT | BTUSB_BROKEN_ISOC },
+ 
+ 	{ }	/* Terminating entry */
+ };
+-- 
+1.9.3
 
