@@ -1,85 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Use lower timeout for LE auto-connections
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add support for Intel bootloader devices
-Date: Sun,  6 Jul 2014 13:29:58 +0200
-Message-Id: <1404646198-40633-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1404643275-22676-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 6 Jul 2014 12:52:38 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <627C26AC-1CA3-413C-B550-59CB1D8BEBE3@holtmann.org>
+References: <1404643275-22676-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Intel Bluetooth devices that boot up in bootloader mode can not
-be used as generic HCI devices, but their HCI transport is still
-valuable and so bring that up as raw-only devices.
+Hi Johan,
 
-T:  Bus=02 Lev=02 Prnt=03 Port=00 Cnt=01 Dev#= 14 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=ff(vend.) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=8087 ProdID=0a5a Rev= 0.00
-S:  Manufacturer=Intel(R) Corporation
-S:  Product=Intel(R) Wilkins Peak 2x2
-S:  SerialNumber=001122334455 WP_A0
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=81(I) Atr=03(Int.) MxPS=  64 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=(none)
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> When we establish connections as a consequence of receiving an
+> advertising report it makes no sense to wait the normal 20 second LE
+> connection timeout. This patch modifies the hci_connect_le function to
+> take an extra timeout value and uses a lower 2 second timeout for the
+> auto-connection case. This timeout is intentionally chosen to be just a
+> bit higher than the 1.28 second timeout that High Duty Cycle Advertising
+> uses.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci.h      | 1 +
+> include/net/bluetooth/hci_core.h | 4 +++-
+> net/bluetooth/hci_conn.c         | 4 +++-
+> net/bluetooth/hci_event.c        | 4 ++--
+> net/bluetooth/l2cap_core.c       | 2 +-
+> net/bluetooth/mgmt.c             | 3 ++-
+> 6 files changed, 12 insertions(+), 6 deletions(-)
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- drivers/bluetooth/btusb.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 61d8385666e9..21f10cac4fac 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -49,7 +49,8 @@ static struct usb_driver btusb_driver;
- #define BTUSB_WRONG_SCO_MTU	0x40
- #define BTUSB_ATH3012		0x80
- #define BTUSB_INTEL		0x100
--#define BTUSB_BCM_PATCHRAM	0x200
-+#define BTUSB_INTEL_BOOT	0x200
-+#define BTUSB_BCM_PATCHRAM	0x400
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -121,6 +122,9 @@ static const struct usb_device_id btusb_table[] = {
- 	/* IMC Networks - Broadcom based */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x13d3, 0xff, 0x01, 0x01) },
- 
-+	/* Intel Bluetooth USB Bootloader (RAM module) */
-+	{ USB_DEVICE(0x8087, 0x0a5a), .driver_info = BTUSB_INTEL_BOOT },
-+
- 	{ }	/* Terminating entry */
- };
- 
-@@ -1770,6 +1774,9 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_bdaddr = btusb_set_bdaddr_intel;
- 	}
- 
-+	if (id->driver_info & BTUSB_INTEL_BOOT)
-+		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
-+
- 	/* Interface numbers are hardcoded in the specification */
- 	data->isoc = usb_ifnum_to_if(data->udev, 1);
- 
--- 
-1.9.3
+Regards
+
+Marcel
 
