@@ -1,40 +1,42 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Use lower timeout for LE auto-connections
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404643275-22676-1-git-send-email-johan.hedberg@gmail.com>
-Date: Sun, 6 Jul 2014 12:52:38 +0200
+Date: Sun, 6 Jul 2014 13:43:34 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <627C26AC-1CA3-413C-B550-59CB1D8BEBE3@holtmann.org>
-References: <1404643275-22676-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Subject: Re: [PATCH 1/3] Bluetooth: Run controller setup after external
+ configuration
+Message-ID: <20140706104334.GA22860@t440s.Elisa>
+References: <1404641476-24971-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404641476-24971-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcel,
 
-> When we establish connections as a consequence of receiving an
-> advertising report it makes no sense to wait the normal 20 second LE
-> connection timeout. This patch modifies the hci_connect_le function to
-> take an extra timeout value and uses a lower 2 second timeout for the
-> auto-connection case. This timeout is intentionally chosen to be just a
-> bit higher than the 1.28 second timeout that High Duty Cycle Advertising
-> uses.
+On Sun, Jul 06, 2014, Marcel Holtmann wrote:
+> When the external configuration triggers the switch to a configured
+> controller, it means the setup needs to be run. Controllers that start
+> out unconfigured have only run limited set of HCI commands. This is
+> not enough for complete operation and thus run the setup procedure
+> before announcing the new controller index.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> This introduces HCI_CONFIG flag as companion to HCI_SETUP flag. The
+> HCI_SETUP flag is only used once for the initial setup procedure. And
+> during that procedure hdev->setup driver callback is called. With the
+> new HCI_CONFIG the switch from unconfigured to configured state is
+> triggering the same setup procedure just without hdev->setup. This
+> is required since bringing a controller back to unconfigured state
+> from configured state is possible.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
-> include/net/bluetooth/hci.h      | 1 +
-> include/net/bluetooth/hci_core.h | 4 +++-
-> net/bluetooth/hci_conn.c         | 4 +++-
-> net/bluetooth/hci_event.c        | 4 ++--
-> net/bluetooth/l2cap_core.c       | 2 +-
-> net/bluetooth/mgmt.c             | 3 ++-
-> 6 files changed, 12 insertions(+), 6 deletions(-)
+>  include/net/bluetooth/hci.h |  1 +
+>  net/bluetooth/hci_core.c    | 17 ++++++++++++++---
+>  net/bluetooth/hci_sock.c    |  3 ++-
+>  net/bluetooth/mgmt.c        | 14 ++++++++++++--
+>  4 files changed, 29 insertions(+), 6 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+All three patches have been applied to bluetooth-next. Thanks.
 
-Regards
-
-Marcel
-
+Johan
