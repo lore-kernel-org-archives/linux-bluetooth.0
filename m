@@ -1,29 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 6 Jul 2014 16:19:52 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Handle Intel USB bootloader with buggy
- interrupt
-Message-ID: <20140706131952.GA8018@t440s.Elisa>
-References: <1404651235-51172-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404651235-51172-1-git-send-email-marcel@holtmann.org>
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Fix updating background scan for LE connect complete
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404650663-4037-1-git-send-email-johan.hedberg@gmail.com>
+Date: Sun, 6 Jul 2014 15:05:30 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <C97562AC-025C-4AA4-B399-D2A26BE2D463@holtmann.org>
+References: <1404650663-4037-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-On Sun, Jul 06, 2014, Marcel Holtmann wrote:
-> The interrupt interface for the Intel USB bootloader devices is only
-> enabled after receiving SetInterface(0, AltSetting=0). When this USB
-> command is not send, then no HCI events will be received.
+> When we get an LE connection complete event we should restart background
+> scanning if there are any any devices needing it. So far the code was
+> only making the decision based on whether the completed connection had
+> any stored parameters or not. This patch ensures that we trigger
+> background scanning always when necessary.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  drivers/bluetooth/btusb.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+> net/bluetooth/hci_event.c | 5 ++---
+> 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Both patches have been applied to bluetooth-next. Thanks.
+patch has been applied to bluetooth-next tree.
 
-Johan
+Regards
+
+Marcel
+
