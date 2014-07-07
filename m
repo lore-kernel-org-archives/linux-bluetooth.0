@@ -1,38 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: marcel@holtmann.org,
-	Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 0/2] shared/att: Improve client support.
-Date: Mon,  7 Jul 2014 22:04:59 -0700
-Message-Id: <1404795901-29367-1-git-send-email-armansito@chromium.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 1/2] Bluetooth: Remove auth_type parameter from hci_connect_le()
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404734548-3380-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 7 Jul 2014 15:21:06 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <FCAA3470-FE4E-4B8D-A0A8-AD4890499AAC@holtmann.org>
+References: <1404734548-3380-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch set makes the following additions/changes:
+Hi Johan,
 
-  - The opcode + param structure semantics are no longer used. bt_att_send now
-    takes in the PDU as it will be sent over the physical link and it won't
-    perform any explicit encoding or decoding of PDUs between host order and BT
-    order. Any packed structs that get passed to bt_att_send need to be
-    formatted according to the correct endianness.
+> The auth_type value which gets assigned to hci_conn->auth_type is
+> something that's only used for BR/EDR connections and is of no value for
+> LE connections. It makes therefore little sense to pass it to the
+> hci_connect_le() function. This patch removes the parameter from the
+> function.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci_core.h | 3 +--
+> net/bluetooth/hci_conn.c         | 5 +----
+> net/bluetooth/hci_event.c        | 2 +-
+> net/bluetooth/l2cap_core.c       | 6 ++----
+> net/bluetooth/mgmt.c             | 3 +--
+> 5 files changed, 6 insertions(+), 13 deletions(-)
 
-  - bt_att_register and bt_att_unregister* functions are implemented. Callbacks
-    are registered for a particular opcode and they get invoked when an incoming
-    PDU of type "request", "indication", or "notification" is received.
+patch has been applied to bluetooth-next tree.
 
-This provides the basic functionality needed to implement a GATT client layer,
-except for PDU signing and verifications of incoming signed PDUs. This isn't
-immediately needed to implement a functioning client and could be left to the
-upper layer.
+Regards
 
-Arman Uguray (2):
-  shared/att: Remove parameters structures.
-  shared/att: Implement bt_att_register.
+Marcel
 
- src/shared/att-types.h | 153 +-------------------
- src/shared/att.c       | 383 ++++++++++++++++++++++++++++++++-----------------
- src/shared/att.h       |  19 +--
- 3 files changed, 267 insertions(+), 288 deletions(-)
-
--- 
-2.0.0.526.g5318336
