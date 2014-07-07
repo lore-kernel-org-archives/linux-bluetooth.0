@@ -1,111 +1,74 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Fix connecting devices during LE device discovery
-Date: Mon,  7 Jul 2014 12:35:14 +0300
-Message-Id: <1404725715-1414-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Sender: armansito@google.com
+In-Reply-To: <74327474-414D-420B-89A1-B4BCA957527B@holtmann.org>
+References: <1403824457-22461-1-git-send-email-armansito@chromium.org>
+	<1403824457-22461-2-git-send-email-armansito@chromium.org>
+	<3C1DD48A-E6D0-4F6C-BD38-3F8AB023663E@holtmann.org>
+	<CAHrH25Q+dP_pFoBhdrL6MT31WdHma_URZVM38R0n=SDs_BircA@mail.gmail.com>
+	<74327474-414D-420B-89A1-B4BCA957527B@holtmann.org>
+Date: Mon, 7 Jul 2014 02:02:36 -0700
+Message-ID: <CAHrH25SS=LtH5+LHg0rJRw0H-hDMHywfGYGqdNzqoU5EA3KA=A@mail.gmail.com>
+Subject: Re: [PATCH 01/10] shared/att: Implement outgoing "Find Information" request/response.
+From: Arman Uguray <armansito@chromium.org>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-If we have devices set as to be connected we should connect to them even
-during normal discovery if we get a connectable advertising event. If we
-also have HCI_CONNECTABLE set we should connect ADV_DIRECT_IND events
-even to devices that we don't have in our pend_le_conns list. This patch
-implements such behavior by passing the advertising report type to
-check_pending_le_conn() and calls that function regardless of what type
-of scanning we are doing.
+>>  1. Change the bt_att_send signature: bt_att_send(struct bt_att *att,
+>> void *pdu, uint16_t len, ...); No opcode is passed as it's contained
+>> in the first byte of the PDU.
+>
+> Keep it as opcode + payload. I really want the opcode in the signature.
+>
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 51 ++++++++++++++++++++++++++++-------------------
- 1 file changed, 31 insertions(+), 20 deletions(-)
+Sounds good to me. But we still expect the passed in pdu to contain
+the opcode as the first byte right? Or are we saying to pass in the
+opcode + the rest of the PDU separately?
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 57837cad9919..b5998417e63a 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4229,13 +4229,30 @@ static void hci_le_conn_update_complete_evt(struct hci_dev *hdev,
- 
- /* This function requires the caller holds hdev->lock */
- static bool check_pending_le_conn(struct hci_dev *hdev, bdaddr_t *addr,
--				  u8 addr_type)
-+				  u8 addr_type, u8 adv_type)
- {
- 	struct hci_conn *conn;
- 
-+	/* If the event is not connectable don't proceed further */
-+	if (adv_type != LE_ADV_IND && adv_type != LE_ADV_DIRECT_IND)
-+		return false;
-+
-+	/* Ignore if the device is blocked */
-+	if (hci_blacklist_lookup(hdev, addr, addr_type))
-+		return false;
-+
-+	/* If we're connectable, always connect any ADV_DIRECT_IND event */
-+	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
-+	    adv_type == LE_ADV_DIRECT_IND)
-+		goto connect;
-+
-+	/* If we're not connectable only connect devices that we have in
-+	 * our pend_le_conns list.
-+	 */
- 	if (!hci_pend_le_action_lookup(&hdev->pend_le_conns, addr, addr_type))
- 		return false;
- 
-+connect:
- 	conn = hci_connect_le(hdev, addr, addr_type, BT_SECURITY_LOW,
- 			      HCI_AT_NO_BONDING, HCI_LE_AUTOCONN_TIMEOUT);
- 	if (!IS_ERR(conn))
-@@ -4260,34 +4277,28 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
- 			       u8 bdaddr_type, s8 rssi, u8 *data, u8 len)
- {
- 	struct discovery_state *d = &hdev->discovery;
--	bool match;
-+	bool match, pend_conn;
-+	struct smp_irk *irk;
- 	u32 flags;
- 
-+	/* Check if we need to convert to identity address */
-+	irk = hci_get_irk(hdev, bdaddr, bdaddr_type);
-+	if (irk) {
-+		bdaddr = &irk->bdaddr;
-+		bdaddr_type = irk->addr_type;
-+	}
-+
-+	/* Check if we have been requested to connect to this device */
-+	pend_conn = check_pending_le_conn(hdev, bdaddr, bdaddr_type, type);
-+
- 	/* Passive scanning shouldn't trigger any device found events,
- 	 * except for devices marked as CONN_REPORT for which we do send
- 	 * device found events.
- 	 */
- 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
- 		struct hci_conn_params *param;
--		struct smp_irk *irk;
--
--		/* Check if we need to convert to identity address */
--		irk = hci_get_irk(hdev, bdaddr, bdaddr_type);
--		if (irk) {
--			bdaddr = &irk->bdaddr;
--			bdaddr_type = irk->addr_type;
--		}
--
--		/* Ignore if the device is blocked */
--		if (hci_blacklist_lookup(hdev, bdaddr, bdaddr_type))
--			return;
--
--		if (type == LE_ADV_IND || type == LE_ADV_DIRECT_IND) {
--			if (check_pending_le_conn(hdev, bdaddr, bdaddr_type))
--				return;
--		}
- 
--		if (type == LE_ADV_DIRECT_IND)
-+		if (pend_conn || type == LE_ADV_DIRECT_IND)
- 			return;
- 
- 		param = hci_pend_le_action_lookup(&hdev->pend_le_reports,
--- 
-1.9.3
+>>  2. Change the misnamed bt_att_request_func_t to: typedef
+>> (*bt_att_pdu_func_t)(const void *pdu, uint16_t len, void *user_data),
+>> to be invoked upon a response to a request and for all incoming PDUs.
+>
+> Not sure why? I want the difference between bt_att_send and bt_att_regist=
+er.
+>
 
+No difference in the callback signatures if that's what you're asking.
+My original intention was to have the (same type of) callback passed
+to bt_att_send and bt_att_register take in a void pointer to a param
+structure. Now the callback will just accept the raw PDU (or opcode +
+the rest of the PDU in separate args). bt_att_request_func_t is a bit
+misnamed (since it doesn't only apply to ATT protocol requests), so
+changing that to bt_att_pdu_func_t. Also removing
+bt_att_notify_func_t.
+
+> Such helpers seems to be at first glance a good idea, but the devil is in=
+ the detail. Some helpers might be a really good idea. Others might end up =
+just being too complex and you end up in spaghetti code.
+>
+> What I think might be useful that for simple and rather common ATT comman=
+ds, we have a wrapper around bt_att_send. As mentioned earlier, bt_att_find=
+_info might such a wrapper. It takes start and end parameters and calls a p=
+roper callback with all information available.
+>
+> That said, it might be also better to have this all in GATT procedures. S=
+o that we get bt_gatt_discover_primary_services as such function and intern=
+ally it uses many bt_att_send.
+>
+> I am not a big fan of too many abstractions. They all look reasonable in =
+the beginning, but later on they just make code more complicated for no app=
+arent reason. I can name numerous examples where actually not having wrappe=
+rs or extra abstraction created cleaner code for us.
+>
+> So my advice would be to take one step back now. Look at what we really n=
+eed in terms of GATT procedures and start with adding bt_gatt (src/share/ga=
+tt.c). Do all the encoding and decoding of ATT payloads in bt_gatt and then=
+ figure out where the pain points are. If you find common code that justifi=
+es a more generic bt_att helper, then move it to bt_att.
+>
+
+Sounds good to me.
