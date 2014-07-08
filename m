@@ -1,108 +1,46 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Fix setting STOPPING state for discovery
-Date: Tue,  8 Jul 2014 16:05:06 +0300
-Message-Id: <1404824706-1057-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1404824706-1057-1-git-send-email-johan.hedberg@gmail.com>
-References: <1404824706-1057-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 0/7] Bluetooth: Scanning & advertising co-existence fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404821273-28005-1-git-send-email-johan.hedberg@gmail.com>
+Date: Tue, 8 Jul 2014 14:32:47 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F3833BE9-9124-494E-8493-FC0A7A9CD5E1@holtmann.org>
+References: <1404821273-28005-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-If any of the HCI commands from the hci_stop_discovery function were
-successfully sent we need to set the discovery state to STOPPING. The
-Stop Discovery code was already handling this, but the code in
-clean_up_hci_state was not. This patch updates the hci_stop_discovery to
-return a bool to indicate whether it queued any commands and the
-clean_up_hci_state() function respectively to look at the return value
-and call hci_discovery_set_state() if necessary.
+> This set of patches tries to improve the current behavior of LE scanning
+> and advertising so that both features can be used nicely together to the
+> extent that current LE hardware supports them.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (7):
+>      Bluetooth: Add flag to track the real advertising state
+>      Bluetooth: Remove unnecessary mgmt_advertising function
+>      Bluetooth: Use real advertising state to random address update decision
+>      Bluetooth: Simplify usage of the enable_advertising function
+>      Bluetooth: Use the correct flag to decide to disable advertising
+>      Bluetooth: Stop advertising always before initiating a connection
+>      Bluetooth: Fix advertising and active scanning co-existence
+> 
+> include/net/bluetooth/hci.h      |  4 +-
+> include/net/bluetooth/hci_core.h |  1 -
+> net/bluetooth/hci_conn.c         | 29 +++++++++--
+> net/bluetooth/hci_core.c         |  2 +-
+> net/bluetooth/hci_event.c        | 16 ++++--
+> net/bluetooth/mgmt.c             | 98 ++++++++++++++++---------------------
+> 6 files changed, 83 insertions(+), 67 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 25 ++++++++++++++++++-------
- 1 file changed, 18 insertions(+), 7 deletions(-)
+all 7 patches have been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 944e6463fd61..a4232bc237f3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1251,7 +1251,7 @@ static void clean_up_hci_complete(struct hci_dev *hdev, u8 status)
- 	}
- }
- 
--static void hci_stop_discovery(struct hci_request *req)
-+static bool hci_stop_discovery(struct hci_request *req)
- {
- 	struct hci_dev *hdev = req->hdev;
- 	struct hci_cp_remote_name_req_cancel cp;
-@@ -1266,32 +1266,39 @@ static void hci_stop_discovery(struct hci_request *req)
- 			hci_req_add_le_scan_disable(req);
- 		}
- 
--		break;
-+		return true;
- 
- 	case DISCOVERY_RESOLVING:
- 		e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY,
- 						     NAME_PENDING);
- 		if (!e)
--			return;
-+			break;
- 
- 		bacpy(&cp.bdaddr, &e->data.bdaddr);
- 		hci_req_add(req, HCI_OP_REMOTE_NAME_REQ_CANCEL, sizeof(cp),
- 			    &cp);
- 
--		break;
-+		return true;
- 
- 	default:
- 		/* Passive scanning */
--		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags))
-+		if (test_bit(HCI_LE_SCAN, &hdev->dev_flags)) {
- 			hci_req_add_le_scan_disable(req);
-+			return true;
-+		}
-+
- 		break;
- 	}
-+
-+	return false;
- }
- 
- static int clean_up_hci_state(struct hci_dev *hdev)
- {
- 	struct hci_request req;
- 	struct hci_conn *conn;
-+	bool discov_stopped;
-+	int err;
- 
- 	hci_req_init(&req, hdev);
- 
-@@ -1304,7 +1311,7 @@ static int clean_up_hci_state(struct hci_dev *hdev)
- 	if (test_bit(HCI_LE_ADV, &hdev->dev_flags))
- 		disable_advertising(&req);
- 
--	hci_stop_discovery(&req);
-+	discov_stopped = hci_stop_discovery(&req);
- 
- 	list_for_each_entry(conn, &hdev->conn_hash.list, list) {
- 		struct hci_cp_disconnect dc;
-@@ -1338,7 +1345,11 @@ static int clean_up_hci_state(struct hci_dev *hdev)
- 		}
- 	}
- 
--	return hci_req_run(&req, clean_up_hci_complete);
-+	err = hci_req_run(&req, clean_up_hci_complete);
-+	if (!err && discov_stopped)
-+		hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
-+
-+	return err;
- }
- 
- static int set_powered(struct sock *sk, struct hci_dev *hdev, void *data,
--- 
-1.9.3
+Regards
+
+Marcel
 
