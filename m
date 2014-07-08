@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/7] Bluetooth: Remove unnecessary mgmt_advertising function
-Date: Tue,  8 Jul 2014 15:07:48 +0300
-Message-Id: <1404821273-28005-3-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/7] Bluetooth: Add flag to track the real advertising state
+Date: Tue,  8 Jul 2014 15:07:47 +0300
+Message-Id: <1404821273-28005-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1404821273-28005-1-git-send-email-johan.hedberg@gmail.com>
 References: <1404821273-28005-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,77 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since the real advertising state is now tracked with its own flag we can
-simply set/unset the HCI_ADVERTISING flag in the
-set_advertising_complete function.
+Having a single HCI_ADVERTISING flag is problematic since it tries to
+track both the real advertising state and the corresponding mgmt
+setting. To make the logic simpler and more reliable add a new flag that
+only tracks the actual advertising state that has been written to the
+controller.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 -
- net/bluetooth/hci_event.c        |  2 --
- net/bluetooth/mgmt.c             | 17 +++++------------
- 3 files changed, 5 insertions(+), 15 deletions(-)
+ include/net/bluetooth/hci.h | 4 ++--
+ net/bluetooth/hci_event.c   | 4 ++++
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5701d15779dd..c98de309967e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1292,7 +1292,6 @@ int mgmt_powered(struct hci_dev *hdev, u8 powered);
- void mgmt_discoverable_timeout(struct hci_dev *hdev);
- void mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
- void mgmt_connectable(struct hci_dev *hdev, u8 connectable);
--void mgmt_advertising(struct hci_dev *hdev, u8 advertising);
- void mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status);
- void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
- 		       bool persistent);
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 5481d1c8badb..6ed1f7288f13 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -175,7 +175,7 @@ enum {
+ 	HCI_UNCONFIGURED,
+ 	HCI_USER_CHANNEL,
+ 	HCI_EXT_CONFIGURED,
+-
++	HCI_LE_ADV,
+ 	HCI_LE_SCAN,
+ 	HCI_SSP_ENABLED,
+ 	HCI_SC_ENABLED,
+@@ -200,7 +200,7 @@ enum {
+  * or the HCI device is closed.
+  */
+ #define HCI_PERSISTENT_MASK (BIT(HCI_LE_SCAN) | BIT(HCI_PERIODIC_INQ) | \
+-			      BIT(HCI_FAST_CONNECTABLE))
++			      BIT(HCI_FAST_CONNECTABLE) | BIT(HCI_LE_ADV))
+ 
+ /* HCI ioctl defines */
+ #define HCIDEVUP	_IOW('H', 201, int)
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 10f8de9400bc..8fbf604ba228 100644
+index a6816498b0b9..10f8de9400bc 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -1080,8 +1080,6 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 		clear_bit(HCI_LE_ADV, &hdev->dev_flags);
- 	}
+@@ -1069,11 +1069,15 @@ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (*sent) {
+ 		struct hci_conn *conn;
  
--	mgmt_advertising(hdev, *sent);
--
- 	hci_dev_unlock(hdev);
- }
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 9cc7108f4c45..dda1eb124208 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4034,6 +4034,11 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status)
- 		return;
- 	}
- 
-+	if (test_bit(HCI_LE_ADV, &hdev->dev_flags))
-+		set_bit(HCI_ADVERTISING, &hdev->dev_flags);
-+	else
-+		clear_bit(HCI_ADVERTISING, &hdev->dev_flags);
++		set_bit(HCI_LE_ADV, &hdev->dev_flags);
 +
- 	mgmt_pending_foreach(MGMT_OP_SET_ADVERTISING, hdev, settings_rsp,
- 			     &match);
+ 		conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+ 		if (conn)
+ 			queue_delayed_work(hdev->workqueue,
+ 					   &conn->le_conn_timeout,
+ 					   conn->conn_timeout);
++	} else {
++		clear_bit(HCI_LE_ADV, &hdev->dev_flags);
+ 	}
  
-@@ -5978,18 +5983,6 @@ void mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- 		new_settings(hdev, NULL);
- }
- 
--void mgmt_advertising(struct hci_dev *hdev, u8 advertising)
--{
--	/* Powering off may stop advertising - don't let that interfere */
--	if (!advertising && mgmt_pending_find(MGMT_OP_SET_POWERED, hdev))
--		return;
--
--	if (advertising)
--		set_bit(HCI_ADVERTISING, &hdev->dev_flags);
--	else
--		clear_bit(HCI_ADVERTISING, &hdev->dev_flags);
--}
--
- void mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status)
- {
- 	u8 mgmt_err = mgmt_status(status);
+ 	mgmt_advertising(hdev, *sent);
 -- 
 1.9.3
 
