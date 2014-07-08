@@ -1,42 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix connectable and discoverable supported settings values
-Date: Tue,  8 Jul 2014 16:07:34 +0300
-Message-Id: <1404824854-1358-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/2] Bluetooth: Fix check for re-enabling advertising
+Date: Tue,  8 Jul 2014 16:05:05 +0300
+Message-Id: <1404824706-1057-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-The connectable and discoverable mgmt settings are supported both for LE
-and BR/EDR controllers so they do not belong behind a lmp_bredr_capable()
-condition. This patch fixes the issue in get_supported_settings().
+There are many different places that can disable LE scanning but we only
+want to re-enable advertising in hci_cc_le_set_scan_enable() for a very
+specific use case, which is when the active scanning part of Start
+Discovery is complete. Because of this, fix the discovery state check to
+test for the exact state.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a4232bc237f3..376b164c5250 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -555,12 +555,12 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 	settings |= MGMT_SETTING_POWERED;
- 	settings |= MGMT_SETTING_PAIRABLE;
- 	settings |= MGMT_SETTING_DEBUG_KEYS;
-+	settings |= MGMT_SETTING_CONNECTABLE;
-+	settings |= MGMT_SETTING_DISCOVERABLE;
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5d3095d7d4b0..2b3d366e5d98 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1188,7 +1188,7 @@ static void hci_cc_le_set_scan_enable(struct hci_dev *hdev,
+ 				       &hdev->dev_flags))
+ 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+ 		else if (!test_bit(HCI_LE_ADV, &hdev->dev_flags) &&
+-			 hdev->discovery.state != DISCOVERY_STARTING)
++			 hdev->discovery.state == DISCOVERY_FINDING)
+ 			mgmt_reenable_advertising(hdev);
  
- 	if (lmp_bredr_capable(hdev)) {
--		settings |= MGMT_SETTING_CONNECTABLE;
- 		if (hdev->hci_ver >= BLUETOOTH_VER_1_2)
- 			settings |= MGMT_SETTING_FAST_CONNECTABLE;
--		settings |= MGMT_SETTING_DISCOVERABLE;
- 		settings |= MGMT_SETTING_BREDR;
- 		settings |= MGMT_SETTING_LINK_SECURITY;
- 
+ 		break;
 -- 
 1.9.3
 
