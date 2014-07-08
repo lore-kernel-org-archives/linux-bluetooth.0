@@ -1,72 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53BC3569.2060908@cs.stanford.edu>
-Date: Tue, 08 Jul 2014 11:16:09 -0700
-From: Amit Levy <levya@cs.stanford.edu>
-MIME-Version: 1.0
+From: Szymon Janc <szymon.janc@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: Connectin to an L2CAP channel over an LE
-Content-Type: text/plain; charset=ISO-8859-1
+Cc: Szymon Janc <szymon.janc@gmail.com>
+Subject: [PATCH] client: Allow to terminate if bluetoothd was not started
+Date: Tue,  8 Jul 2014 19:52:26 +0200
+Message-Id: <1404841946-14501-1-git-send-email-szymon.janc@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi all,
+This allows to terminate bluetoothctl with CTRL-C if daemon didn't
+start. Otherwise input is not functional and user must kill
+bluetoothctl by sending signal from another terminal.
+---
+ client/main.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-I'm writing some code to benchmark various bluetooth low energy chips,
-and am having issues connecting to an L2CAP channel. I'm able to pair
-with the device with `hci_le_create_connection` (and on the device side
-I can see the connection being established), however, I get some errors
-I can't decypher when I try to `connect` to the ATT l2cap channel.
-
-Piecing together from what gatttool and test/l2cap.c seem to do, I first
-create a socket:
-
-```
-    int s = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_L2CAP);
-    if (s < 0) {
-      perror("socket");
-      goto finish;
-    }
-```
-
-then, I `bind` the socket to the ATT channel:
-
-```
-struct sockaddr_l2 bind_addr = { 0 };
-bind_addr.l2_family = AF_BLUETOOTH;
-bind_addr.l2_cid = htobs(4); // ATT CID
-bacpy(&bind_addr.l2_bdaddr, BDADDR_ANY);
-bind_addr.l2_bdaddr_type = BDADDR_LE_PUBLIC;
-
-err = bind(s, (struct sockaddr*)&bind_addr, sizeof(bind_addr));
-if (err) {
-  perror("L2CAP bind");
-  goto finish;
-}
-```
-
-next, I set the socket options to make it an L2CAP_LM_MASTER and set
-security to low. Finally, I try to connect:
-
-```
-struct sockaddr_l2 conn_addr = { 0 };
-conn_addr.l2_family = AF_BLUETOOTH;
-conn_addr.l2_cid = htobs(4); // ATT CID
-bacpy(&conn_addr.l2_bdaddr, &dst_addr);
-conn_addr.l2_bdaddr_type = dst_addr_type;
-
-err = connect(s, (struct sockaddr*)&conn_addr, sizeof(conn_addr));
-if (err) {
-    perror("L2CAP connect");
-    goto finish;
-}
-```
-
-However, I always get an error EAGAIN (Device or resource busy), even
-though I never set the socket to O_NONBLOCKING.
-
-I'd really appreciate a pointer to either documentation or an example of
-writing code to connect to an LE device.
-
-Thanks!
-Amit
+diff --git a/client/main.c b/client/main.c
+index 774c0cd..ae8aa92 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -60,6 +60,8 @@ static GDBusProxy *default_ctrl;
+ static GList *ctrl_list;
+ static GList *dev_list;
+ 
++static guint input = 0;
++
+ static const char * const agent_arguments[] = {
+ 	"on",
+ 	"off",
+@@ -1386,11 +1388,20 @@ static gboolean signal_handler(GIOChannel *channel, GIOCondition condition,
+ 
+ 	switch (si.ssi_signo) {
+ 	case SIGINT:
+-		rl_replace_line("", 0);
+-		rl_crlf();
+-		rl_on_new_line();
+-		rl_redisplay();
+-		break;
++		if (input) {
++			rl_replace_line("", 0);
++			rl_crlf();
++			rl_on_new_line();
++			rl_redisplay();
++			break;
++		}
++
++		/*
++		 * If input was not yet setup up that means signal was received
++		 * while daemon was not yet running. Since user is not able
++		 * to terminate client by CTRL-D or typing exit treat this as
++		 * exit and fall through.
++		 */
+ 	case SIGTERM:
+ 		if (__terminated == 0) {
+ 			rl_replace_line("", 0);
+@@ -1476,7 +1487,7 @@ int main(int argc, char *argv[])
+ 	GOptionContext *context;
+ 	GError *error = NULL;
+ 	GDBusClient *client;
+-	guint signal, input;
++	guint signal;
+ 
+ 	context = g_option_context_new(NULL);
+ 	g_option_context_add_main_entries(context, options, NULL);
+-- 
+2.0.1
 
