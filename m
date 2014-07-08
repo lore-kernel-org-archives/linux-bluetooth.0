@@ -3,36 +3,21 @@ From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
 Subject: [PATCH] android/pts: Initial PTS docs for RFCOMM
-Date: Tue,  8 Jul 2014 16:21:26 +0200
-Message-Id: <1404829286-15065-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Tue,  8 Jul 2014 16:10:42 +0200
+Message-Id: <1404828642-14050-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/Makefile.am      |  3 +-
  android/bite-rfcomm.txt  | 35 ---------------------
  android/pics-rfcomm.txt  | 79 ++++++++++++++++++++++++++++--------------------
  android/pixit-rfcomm.txt | 28 +++++++++++++++++
  android/pts-rfcomm.txt   | 34 +++++++++++++++++++++
- 5 files changed, 110 insertions(+), 69 deletions(-)
+ 4 files changed, 108 insertions(+), 68 deletions(-)
  delete mode 100644 android/bite-rfcomm.txt
  create mode 100644 android/pixit-rfcomm.txt
  create mode 100644 android/pts-rfcomm.txt
 
-diff --git a/android/Makefile.am b/android/Makefile.am
-index 730be2f..2cf05c7 100644
---- a/android/Makefile.am
-+++ b/android/Makefile.am
-@@ -286,7 +286,8 @@ EXTRA_DIST += android/Android.mk android/README \
- 				android/pixit-hogp.txt \
- 				android/pixit-scpp.txt \
- 				android/pixit-dis.txt \
--				android/bite-rfcomm.txt \
-+				android/pixit-rfcomm.txt \
-+				android/pts-rfcomm.txt \
- 				android/bite-spp.txt \
- 				android/pts-l2cap.txt \
- 				android/pts-gap.txt \
 diff --git a/android/bite-rfcomm.txt b/android/bite-rfcomm.txt
 deleted file mode 100644
 index cf0e94a..0000000
@@ -75,7 +60,7 @@ index cf0e94a..0000000
 -TP/RFC/BV-24-C	PASS
 --------------------------------------------------------------------------------
 diff --git a/android/pics-rfcomm.txt b/android/pics-rfcomm.txt
-index 09cea18..9dfb32e 100644
+index 09cea18..36a4578 100644
 --- a/android/pics-rfcomm.txt
 +++ b/android/pics-rfcomm.txt
 @@ -1,17 +1,19 @@
@@ -136,33 +121,33 @@ index 09cea18..9dfb32e 100644
 -F.1.1.23	True		IUT Responds to Establishment of a DLC (C.1)
 +Parameter Name		Selected	Description
 +-------------------------------------------------------------------------------
-+TSPC_RFCOMM_1_1		True (*)	Initialize RFCOMM Session (C.2)
-+TSPC_RFCOMM_1_2		True (*)	Respond to Initialization of an RFCOMM
++TSPC_RFCOMM_1_1		False		Initialize RFCOMM Session (C.2)
++TSPC_RFCOMM_1_2		False		Respond to Initialization of an RFCOMM
 +					Session (C.2)
 +TSPC_RFCOMM_1_3		True		Shutdown RFCOMM Session (M)
 +TSPC_RFCOMM_1_4		True		Respond to a Shutdown of an RFCOMM
 +					Session (M)
-+TSPC_RFCOMM_1_5		True (*)	Establish DLC (C.2)
-+TSPC_RFCOMM_1_6		True (*)	Respond to Establishment of a DLC (C.1)
++TSPC_RFCOMM_1_5		False		Establish DLC (C.2)
++TSPC_RFCOMM_1_6		False		Respond to Establishment of a DLC (C.1)
 +TSPC_RFCOMM_1_7		True		Disconnect DLC (M)
 +TSPC_RFCOMM_1_8		True		Respond to Disconnection of a DLC (M)
 +TSPC_RFCOMM_1_9		True		Respond to and send MSC Command (M)
 +TSPC_RFCOMM_1_10	True		Initiate Transfer Information (M)
 +TSPC_RFCOMM_1_11	True		Respond to Test Command (M)
-+TSPC_RFCOMM_1_12	True (*)	Send Test Command (O)
++TSPC_RFCOMM_1_12	False		Send Test Command (O)
 +TSPC_RFCOMM_1_13	True		React to Aggregate Flow Control (M)
 +TSPC_RFCOMM_1_14	True		Respond to RLS Command (M)
 +TSPC_RFCOMM_1_15	False		Send RLS Command (O)
 +TSPC_RFCOMM_1_16	True		Respond to PN Command (M)
-+TSPC_RFCOMM_1_17	True (*)	Send PN Command (C.3)
-+TSPC_RFCOMM_1_18	True (*)	Send Non-Supported Command (NSC)
++TSPC_RFCOMM_1_17	False		Send PN Command (C.3)
++TSPC_RFCOMM_1_18	False		Send Non-Supported Command (NSC)
 +					response (C.4)
 +TSPC_RFCOMM_1_19	True		Respond to RPN Command (M)
-+TSPC_RFCOMM_1_20	True (*)	Send RPN Command (O)
-+TSPC_RFCOMM_1_21	True (*)	Closing Multiplexer by First Sending
++TSPC_RFCOMM_1_20	False		Send RPN Command (O)
++TSPC_RFCOMM_1_21	False		Closing Multiplexer by First Sending
 +					a DISC Command (O)
 +TSPC_RFCOMM_1_22	True		Support of Credit Based Flow Control (M)
-+TSPC_RFCOMM_1_23	True (*)	IUT Responds to Establishment of
++TSPC_RFCOMM_1_23	False		IUT Responds to Establishment of
 +					a DLC (C.1)
  -------------------------------------------------------------------------------
  C.1: Mandatory if SPP 1/2 (Device B) is supported, otherwise Excluded.
