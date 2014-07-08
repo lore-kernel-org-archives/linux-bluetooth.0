@@ -1,31 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix clearing HCI_LE_ADV for LE connections
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404829311-6903-1-git-send-email-johan.hedberg@gmail.com>
-Date: Tue, 8 Jul 2014 16:54:37 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <D3A7737D-AD13-4A12-A2E2-D400381091C8@holtmann.org>
-References: <1404829311-6903-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix clearing HCI_LE_ADV for LE connections
+Date: Tue,  8 Jul 2014 17:21:51 +0300
+Message-Id: <1404829311-6903-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> All LE controllers always implicitly stop advertising when establishing
-> connections. Therefore, be sure to clear the flag in the event handler
-> for new LE connections.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_event.c | 5 +++++
-> 1 file changed, 5 insertions(+)
+All LE controllers always implicitly stop advertising when establishing
+connections. Therefore, be sure to clear the flag in the event handler
+for new LE connections.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 2b3d366e5d98..f6997901bdd7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4097,6 +4097,11 @@ static void hci_le_conn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	hci_dev_lock(hdev);
+ 
++	/* All controllers implicitly stop advertising in the event of a
++	 * connection, so ensure that the state bit is cleared.
++	 */
++	clear_bit(HCI_LE_ADV, &hdev->dev_flags);
++
+ 	conn = hci_conn_hash_lookup_state(hdev, LE_LINK, BT_CONNECT);
+ 	if (!conn) {
+ 		conn = hci_conn_add(hdev, LE_LINK, &ev->bdaddr);
+-- 
+1.9.3
 
