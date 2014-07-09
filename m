@@ -1,43 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 0/7] Bluetooth: White list support for BR/EDR
-Date: Wed,  9 Jul 2014 11:43:05 +0300
-Message-Id: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 9 Jul 2014 11:19:58 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix enabling Authenticated Payload Timeout
+ Expired event
+Message-ID: <20140709081958.GA7133@t440s.P-661HNU-F1>
+References: <1404892145-4242-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404892145-4242-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+Hi Marcel,
 
-Here's a v2 with fixes for single-mode controllers and updating page
-scan when clearing all entries.
+On Wed, Jul 09, 2014, Marcel Holtmann wrote:
+> The Authenticated Payload Timeout Expired event is valid for
+> controllers with BR/EDR Secure Connections support, but also for
+> LE only controllers supporting LE Ping feature. When either of them
+> is available enable this event. Previous it was not enabled when
+> the controller was only supporting LE operation.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  include/net/bluetooth/hci.h | 1 +
+>  net/bluetooth/hci_core.c    | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 
->From original cover letter:
-
-This patch set extends the Add/Remove Device commands with the
-possibility of passing BR/EDR addresses to them. For now only action
-0x01 ("connect") is supported. It has the behavior of enabling page scan
-even if the adapter is not set as connectable and will accept
-connections from devices which are in the white list.
+Applied to bluetooth-next. Thanks.
 
 Johan
-
-----------------------------------------------------------------
-Johan Hedberg (7):
-      Bluetooth: Unify helpers for bdaddr_list manipulations
-      Bluetooth: Introduce a whitelist for BR/EDR devices
-      Bluetooth: Update page scan when necessary for Add/Remove Device
-      Bluetooth: Fix incorrectly setting HCI_CONNECTABLE
-      Bluetooth: Refactor connection request handling
-      Bluetooth: Enable page scan also if there are white list entries
-      Bluetooth: Add white list lookup for incoming connection requests
-
- include/net/bluetooth/hci_core.h |  16 ++---
- net/bluetooth/hci_core.c         | 114 +++++++++++--------------------
- net/bluetooth/hci_event.c        | 133 ++++++++++++++++++++----------------
- net/bluetooth/hci_sock.c         |   4 +-
- net/bluetooth/l2cap_core.c       |   7 +-
- net/bluetooth/mgmt.c             |  99 +++++++++++++++++++++++++--
- 6 files changed, 222 insertions(+), 151 deletions(-)
-
-
