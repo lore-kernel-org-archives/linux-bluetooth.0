@@ -1,68 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Jul 2014 12:48:48 +0300
+Date: Wed, 9 Jul 2014 12:45:28 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 3/7] Bluetooth: Update page scan when necessary for
- Add/Remove Device
-Message-ID: <20140709094848.GB13302@t440s.P-661HNU-F1>
+Subject: Re: [PATCH v2 2/7] Bluetooth: Introduce a whitelist for BR/EDR
+ devices
+Message-ID: <20140709094528.GA13302@t440s.P-661HNU-F1>
 References: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
- <1404895392-12588-4-git-send-email-johan.hedberg@gmail.com>
- <3DF0F8C8-F681-40AB-AD14-81ECD2C897CA@holtmann.org>
+ <1404895392-12588-3-git-send-email-johan.hedberg@gmail.com>
+ <C1F2DD39-B0C1-43A8-94DA-691C76841231@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <3DF0F8C8-F681-40AB-AD14-81ECD2C897CA@holtmann.org>
+In-Reply-To: <C1F2DD39-B0C1-43A8-94DA-691C76841231@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Wed, Jul 09, 2014, Marcel Holtmann wrote:
-> > When we're removing the last item in the white list or adding the first
-> > one to it and HCI_CONNECTABLE is not set we need to update the current
-> > page scan. This patch adds a simple helper function for the purpose and
-> > calls it from the respective mgmt command handlers.
+> > @@ -5230,8 +5230,26 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+> > 				    MGMT_STATUS_INVALID_PARAMS,
+> > 				    &cp->addr, sizeof(cp->addr));
 > > 
-> > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> > ---
-> > net/bluetooth/mgmt.c | 31 +++++++++++++++++++++++++++++++
-> > 1 file changed, 31 insertions(+)
-> > 
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index 431d5e4aa34b..f5f0763266e0 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -5198,6 +5198,24 @@ unlock:
-> > 	return err;
-> > }
-> > 
-> > +/* Helper for Add/Remove Device commands */
-> > +static void update_page_scan(struct hci_dev *hdev, u8 scan)
-> > +{
-> > +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
-> > +		return;
+> > +	if (cp->action != 0x00 && cp->action != 0x01)
 > > +
-> > +	if (!hdev_is_powered(hdev))
-> > +		return;
-> > +
-> > +	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
-> > +		return;
 > 
-> wouldn't it be better to check the HCI_PSCAN flag here to see if page
-> scan is actually enabled on the controller?
+> something is wrong here. Shouldn't this return invalid params?
 
-Maybe I was a bit too smart here, but the code is actually correct. We
-also call update_page_scan() with SCAN_DISABLE (0x00) for the
-remove_device case and there if HCI_CONNECTABLE is set we should return
-from the function. Checking for HCI_PSCAN would do the wrong thing.
-
-I can leave the patch as-is, or add a bit more complex logic there:
-
-	if (PSCAN && scan)
-		return;
-
-	if (!PSCAN && !scan)
-		return;
-
-Let me know what you prefer.
+Yes, very good catch. Seems I did cut&paste instead of copy&paste and
+neither I nor the compiler noticed it.
 
 Johan
