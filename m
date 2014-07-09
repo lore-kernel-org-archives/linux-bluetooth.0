@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 4/7] Bluetooth: Fix incorrectly setting HCI_CONNECTABLE
-Date: Wed,  9 Jul 2014 11:43:09 +0300
-Message-Id: <1404895392-12588-5-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 7/7] Bluetooth: Add white list lookup for incoming connection requests
+Date: Wed,  9 Jul 2014 11:43:12 +0300
+Message-Id: <1404895392-12588-8-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
 References: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,43 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since page scan might be enabled by Add Device we should not implicitly
-set connectable whenever something else than Set Connectable changes it.
-This patch makes sure that we don't set HCI_CONNECTABLE for these cases
-if there are any entries in the white list.
+This patch adds support for looking up entries in the white list when
+HCI_CONNECTABLE is not set. The logic is fairly simple: if we're
+connectable check the black list, if we're not connectable check the
+white list.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ net/bluetooth/hci_event.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index f5f0763266e0..83435a08b0c0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6075,6 +6075,14 @@ void mgmt_connectable(struct hci_dev *hdev, u8 connectable)
- 	if (!connectable && mgmt_pending_find(MGMT_OP_SET_POWERED, hdev))
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 6d1d5b3e9cd4..c8ae9ee3cb12 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2149,10 +2149,18 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
  		return;
+ 	}
  
-+	/* If something else than mgmt changed the page scan state we
-+	 * can't differentiate this from a change triggered by adding
-+	 * the first element to the whitelist. Therefore, avoid
-+	 * incorrectly setting HCI_CONNECTABLE.
-+	 */
-+	if (connectable && !list_empty(&hdev->whitelist))
-+		return;
-+
- 	if (connectable)
- 		changed = !test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
- 	else
+-	if (!hci_bdaddr_list_lookup(&hdev->blacklist, &ev->bdaddr,
+-				    BDADDR_BREDR)) {
+-		hci_reject_conn(hdev, &ev->bdaddr);
+-		return;
++	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags)) {
++		if (hci_bdaddr_list_lookup(&hdev->blacklist, &ev->bdaddr,
++					   BDADDR_BREDR)) {
++			hci_reject_conn(hdev, &ev->bdaddr);
++			return;
++		}
++	} else {
++		if (!hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
++					    BDADDR_BREDR)) {
++			hci_reject_conn(hdev, &ev->bdaddr);
++			return;
++		}
+ 	}
+ 
+ 	/* Connection accepted */
 -- 
 1.9.3
 
