@@ -1,53 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
-To: Marcin Kraglak <marcin.kraglak@tieto.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v2 3/7] Bluetooth: Update page scan when necessary for Add/Remove Device
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404895392-12588-4-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 9 Jul 2014 10:54:08 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] android/gatt: Fix sending incorrect frames
-Date: Wed, 09 Jul 2014 11:31:52 +0200
-Message-ID: <4147685.7A3m3PkMs2@uw000953>
-In-Reply-To: <1404896033-17337-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1404896033-17337-1-git-send-email-marcin.kraglak@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Message-Id: <3DF0F8C8-F681-40AB-AD14-81ECD2C897CA@holtmann.org>
+References: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com> <1404895392-12588-4-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcin,
+Hi Johan,
 
-On Wednesday 09 of July 2014 10:53:52 Marcin Kraglak wrote:
-> Don't send pdu if encoding failed. It cause errors when trying
-> send notification larger than MTU - encoding pdu failed, and
-> length passed to g_attrib_send was 0. I caused errors.
+> When we're removing the last item in the white list or adding the first
+> one to it and HCI_CONNECTABLE is not set we need to update the current
+> page scan. This patch adds a simple helper function for the purpose and
+> calls it from the respective mgmt command handlers.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
->  android/gatt.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+> net/bluetooth/mgmt.c | 31 +++++++++++++++++++++++++++++++
+> 1 file changed, 31 insertions(+)
 > 
-> diff --git a/android/gatt.c b/android/gatt.c
-> index 2ee2d05..cccf23e 100644
-> --- a/android/gatt.c
-> +++ b/android/gatt.c
-> @@ -4884,9 +4884,14 @@ static void handle_server_send_indication(const void *buf, uint16_t len)
->  						(uint8_t *)cmd->value, cmd->len,
->  						pdu, mtu);
->  
-> -	g_attrib_send(conn->device->attrib, 0, pdu, length, NULL, NULL, NULL);
-> -
-> -	status = HAL_STATUS_SUCCESS;
-> +	if (length == 0) {
-> +		error("gatt: Failed to encode indication");
-> +		status = HAL_STATUS_FAILED;
-> +	} else {
-> +		g_attrib_send(conn->device->attrib, 0, pdu, length, NULL, NULL,
-> +									NULL);
-> +		status = HAL_STATUS_SUCCESS;
-> +	}
->  
->  reply:
->  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index 431d5e4aa34b..f5f0763266e0 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -5198,6 +5198,24 @@ unlock:
+> 	return err;
+> }
 > 
+> +/* Helper for Add/Remove Device commands */
+> +static void update_page_scan(struct hci_dev *hdev, u8 scan)
+> +{
+> +	if (!test_bit(HCI_BREDR_ENABLED, &hdev->dev_flags))
+> +		return;
+> +
+> +	if (!hdev_is_powered(hdev))
+> +		return;
+> +
+> +	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags))
+> +		return;
 
-Both patches applied, thanks.
+wouldn't it be better to check the HCI_PSCAN flag here to see if page scan is actually enabled on the controller?
 
--- 
-Best regards, 
-Szymon Janc
+> +
+> +	if (test_bit(HCI_DISCOVERABLE, &hdev->dev_flags))
+> +		scan |= SCAN_INQUIRY;
+> +
+> +	hci_send_cmd(hdev, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+> +}
+> +
+
+Regards
+
+Marcel
+
