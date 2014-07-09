@@ -1,33 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 0/7] Bluetooth: White list support for BR/EDR
-Date: Wed,  9 Jul 2014 12:59:12 +0300
-Message-Id: <1404899959-16479-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [RFC] Bluetooth: Don't send ERTM configuration option when disabled
+Date: Wed,  9 Jul 2014 11:53:35 +0200
+Message-Id: <1404899615-4918-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+When ERTM support is disabled, then do not even send ERTM configuration
+option even if the remote side supports it.
 
-Here's v3 of the set with the feedback from Marcel taken into account.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/l2cap_core.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Johan
-
-----------------------------------------------------------------
-Johan Hedberg (7):
-      Bluetooth: Unify helpers for bdaddr_list manipulations
-      Bluetooth: Introduce a whitelist for BR/EDR devices
-      Bluetooth: Update page scan when necessary for Add/Remove Device
-      Bluetooth: Fix incorrectly setting HCI_CONNECTABLE
-      Bluetooth: Refactor connection request handling
-      Bluetooth: Enable page scan also if there are white list entries
-      Bluetooth: Add white list lookup for incoming connection requests
-
- include/net/bluetooth/hci_core.h |  16 ++---
- net/bluetooth/hci_core.c         | 114 +++++++++++-------------------
- net/bluetooth/hci_event.c        | 133 ++++++++++++++++++++---------------
- net/bluetooth/hci_sock.c         |   4 +-
- net/bluetooth/l2cap_core.c       |   7 +-
- net/bluetooth/mgmt.c             | 100 ++++++++++++++++++++++++--
- 6 files changed, 223 insertions(+), 151 deletions(-)
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index bf379a379fa0..87eb4b37e243 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -3233,6 +3233,9 @@ done:
+ 
+ 	switch (chan->mode) {
+ 	case L2CAP_MODE_BASIC:
++		if (disable_ertm)
++			break;
++
+ 		if (!(chan->conn->feat_mask & L2CAP_FEAT_ERTM) &&
+ 		    !(chan->conn->feat_mask & L2CAP_FEAT_STREAMING))
+ 			break;
+-- 
+1.9.3
 
