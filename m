@@ -2,85 +2,53 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH 3/3] android/gatt: Choose LE or BR/EDR based on last seen bearer
-Date: Wed,  9 Jul 2014 14:41:38 +0200
-Message-Id: <1404909698-12242-3-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH 2/3] android/bluetooth: Add function for checking last seen bearer
+Date: Wed,  9 Jul 2014 14:41:37 +0200
+Message-Id: <1404909698-12242-2-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1404909698-12242-1-git-send-email-szymon.janc@tieto.com>
 References: <1404909698-12242-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to connect both over LE and BR/EDR bearer.
 ---
- android/gatt.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 48 insertions(+)
+ android/bluetooth.c | 11 +++++++++++
+ android/bluetooth.h |  1 +
+ 2 files changed, 12 insertions(+)
 
-diff --git a/android/gatt.c b/android/gatt.c
-index bb9ea0b..6e1ce22 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -1701,6 +1701,49 @@ static void app_disconnect_devices(struct gatt_app *client)
- 	}
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index 54c69b8..a2ab445 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -3985,6 +3985,17 @@ static uint8_t select_device_bearer(struct device *dev)
+ 	return dev->bredr ? BDADDR_BREDR : dev->bdaddr_type;
  }
  
-+static int connect_bredr(struct gatt_device *dev)
++uint8_t bt_device_last_seen_bearer(const bdaddr_t *bdaddr)
 +{
-+	BtIOSecLevel sec_level;
-+	GIOChannel *io;
-+	GError *gerr = NULL;
-+	char addr[18];
++	 struct device *dev;
 +
-+	ba2str(&dev->bdaddr, addr);
++	dev = find_device(bdaddr);
++	if (!dev)
++		return BDADDR_BREDR;
 +
-+	/* There is one connection attempt going on */
-+	if (dev->att_io) {
-+		info("gatt: connection to dev %s is ongoing", addr);
-+		return -EALREADY;
-+	}
-+
-+	DBG("Connection attempt to: %s", addr);
-+
-+	sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
-+								BT_IO_SEC_LOW;
-+
-+	io = bt_io_connect(connect_cb, device_ref(dev), NULL, &gerr,
-+			BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
-+			BT_IO_OPT_SOURCE_TYPE, BDADDR_BREDR,
-+			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
-+			BT_IO_OPT_DEST_TYPE, BDADDR_BREDR,
-+			BT_IO_OPT_PSM, ATT_PSM,
-+			BT_IO_OPT_SEC_LEVEL, sec_level,
-+			BT_IO_OPT_INVALID);
-+	if (!io) {
-+		error("gatt: Failed bt_io_connect(%s): %s", addr,
-+							gerr->message);
-+		g_error_free(gerr);
-+		return -EIO;
-+	}
-+
-+	device_set_state(dev, DEVICE_CONNECT_READY);
-+
-+	/* Keep this, so we can cancel the connection */
-+	dev->att_io = io;
-+
-+	return 0;
++	return select_device_bearer(dev);
 +}
 +
- static bool trigger_connection(struct app_connection *connection)
+ static bool device_is_paired(struct device *dev, uint8_t addr_type)
  {
- 	switch (connection->device->state) {
-@@ -1714,6 +1757,11 @@ static bool trigger_connection(struct app_connection *connection)
- 		break;
- 	}
+ 	if (addr_type == BDADDR_BREDR)
+diff --git a/android/bluetooth.h b/android/bluetooth.h
+index dde477d..e00634c 100644
+--- a/android/bluetooth.h
++++ b/android/bluetooth.h
+@@ -58,6 +58,7 @@ bool bt_le_set_advertising(bool advertising, bt_le_set_advertising_done cb,
  
-+	/* If device was last seen over BR/EDR connect over it */
-+	if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
-+								BDADDR_BREDR)
-+		return connect_bredr(connection->device) == 0;
-+
- 	/* after state change trigger discovering */
- 	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
- 		if (!bt_le_discovery_start()) {
+ uint8_t bt_get_device_android_type(const bdaddr_t *addr);
+ bool bt_is_device_le(const bdaddr_t *addr);
++uint8_t bt_device_last_seen_bearer(const bdaddr_t *bdaddr);
+ 
+ const char *bt_get_adapter_name(void);
+ bool bt_device_is_bonded(const bdaddr_t *bdaddr);
 -- 
 1.9.1
 
