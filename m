@@ -1,33 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 9 Jul 2014 12:45:28 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] Bluetooth: Introduce a whitelist for BR/EDR
- devices
-Message-ID: <20140709094528.GA13302@t440s.P-661HNU-F1>
-References: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
- <1404895392-12588-3-git-send-email-johan.hedberg@gmail.com>
- <C1F2DD39-B0C1-43A8-94DA-691C76841231@holtmann.org>
+Subject: Re: [PATCH 1/2] android/gatt: Fix sending incorrect frames
+Date: Wed, 09 Jul 2014 11:31:52 +0200
+Message-ID: <4147685.7A3m3PkMs2@uw000953>
+In-Reply-To: <1404896033-17337-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1404896033-17337-1-git-send-email-marcin.kraglak@tieto.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <C1F2DD39-B0C1-43A8-94DA-691C76841231@holtmann.org>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Marcin,
 
-On Wed, Jul 09, 2014, Marcel Holtmann wrote:
-> > @@ -5230,8 +5230,26 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
-> > 				    MGMT_STATUS_INVALID_PARAMS,
-> > 				    &cp->addr, sizeof(cp->addr));
-> > 
-> > +	if (cp->action != 0x00 && cp->action != 0x01)
-> > +
+On Wednesday 09 of July 2014 10:53:52 Marcin Kraglak wrote:
+> Don't send pdu if encoding failed. It cause errors when trying
+> send notification larger than MTU - encoding pdu failed, and
+> length passed to g_attrib_send was 0. I caused errors.
+> ---
+>  android/gatt.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
 > 
-> something is wrong here. Shouldn't this return invalid params?
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 2ee2d05..cccf23e 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -4884,9 +4884,14 @@ static void handle_server_send_indication(const void *buf, uint16_t len)
+>  						(uint8_t *)cmd->value, cmd->len,
+>  						pdu, mtu);
+>  
+> -	g_attrib_send(conn->device->attrib, 0, pdu, length, NULL, NULL, NULL);
+> -
+> -	status = HAL_STATUS_SUCCESS;
+> +	if (length == 0) {
+> +		error("gatt: Failed to encode indication");
+> +		status = HAL_STATUS_FAILED;
+> +	} else {
+> +		g_attrib_send(conn->device->attrib, 0, pdu, length, NULL, NULL,
+> +									NULL);
+> +		status = HAL_STATUS_SUCCESS;
+> +	}
+>  
+>  reply:
+>  	ipc_send_rsp(hal_ipc, HAL_SERVICE_ID_GATT,
+> 
 
-Yes, very good catch. Seems I did cut&paste instead of copy&paste and
-neither I nor the compiler noticed it.
+Both patches applied, thanks.
 
-Johan
+-- 
+Best regards, 
+Szymon Janc
