@@ -1,147 +1,176 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v2 2/7] Bluetooth: Introduce a whitelist for BR/EDR devices
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404895392-12588-3-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 9 Jul 2014 10:51:48 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <C1F2DD39-B0C1-43A8-94DA-691C76841231@holtmann.org>
-References: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com> <1404895392-12588-3-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 5/7] Bluetooth: Refactor connection request handling
+Date: Wed,  9 Jul 2014 11:43:10 +0300
+Message-Id: <1404895392-12588-6-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
+References: <1404895392-12588-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> This patch extends the Add/Remove device commands by letting user space
-> pass BR/EDR addresses to them. The resulting entries get stored in a new
-> hdev->whitelist list. The idea is that we can now selectively accept
-> connections from devices in the list even though HCI_CONNECTABLE is not
-> set (the actual implementation of this is coming in a subsequent patch).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         | 29 ++++++++++++++++++++++++
-> net/bluetooth/mgmt.c             | 48 ++++++++++++++++++++++++++++++++++++++--
-> 3 files changed, 76 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 3a1caf10cc8d..cba4837dcaa5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -305,6 +305,7 @@ struct hci_dev {
-> 
-> 	struct list_head	mgmt_pending;
-> 	struct list_head	blacklist;
-> +	struct list_head	whitelist;
-> 	struct list_head	uuids;
-> 	struct list_head	link_keys;
-> 	struct list_head	long_term_keys;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 705f8df7af96..728a6ee471ea 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -191,6 +191,31 @@ static const struct file_operations blacklist_fops = {
-> 	.release	= single_release,
-> };
-> 
-> +static int whitelist_show(struct seq_file *f, void *p)
-> +{
-> +	struct hci_dev *hdev = f->private;
-> +	struct bdaddr_list *b;
-> +
-> +	hci_dev_lock(hdev);
-> +	list_for_each_entry(b, &hdev->whitelist, list)
-> +		seq_printf(f, "%pMR (type %u)\n", &b->bdaddr, b->bdaddr_type);
-> +	hci_dev_unlock(hdev);
-> +
-> +	return 0;
-> +}
-> +
-> +static int whitelist_open(struct inode *inode, struct file *file)
-> +{
-> +	return single_open(file, whitelist_show, inode->i_private);
-> +}
-> +
-> +static const struct file_operations whitelist_fops = {
-> +	.open		= whitelist_open,
-> +	.read		= seq_read,
-> +	.llseek		= seq_lseek,
-> +	.release	= single_release,
-> +};
-> +
-> static int uuids_show(struct seq_file *f, void *p)
-> {
-> 	struct hci_dev *hdev = f->private;
-> @@ -1707,6 +1732,8 @@ static int __hci_init(struct hci_dev *hdev)
-> 	debugfs_create_u16("hci_revision", 0444, hdev->debugfs, &hdev->hci_rev);
-> 	debugfs_create_file("blacklist", 0444, hdev->debugfs, hdev,
-> 			    &blacklist_fops);
-> +	debugfs_create_file("whitelist", 0444, hdev->debugfs, hdev,
-> +			    &whitelist_fops);
-> 	debugfs_create_file("uuids", 0444, hdev->debugfs, hdev, &uuids_fops);
-> 
-> 	debugfs_create_file("conn_info_min_age", 0644, hdev->debugfs, hdev,
-> @@ -3825,6 +3852,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 
-> 	INIT_LIST_HEAD(&hdev->mgmt_pending);
-> 	INIT_LIST_HEAD(&hdev->blacklist);
-> +	INIT_LIST_HEAD(&hdev->whitelist);
-> 	INIT_LIST_HEAD(&hdev->uuids);
-> 	INIT_LIST_HEAD(&hdev->link_keys);
-> 	INIT_LIST_HEAD(&hdev->long_term_keys);
-> @@ -4036,6 +4064,7 @@ void hci_unregister_dev(struct hci_dev *hdev)
-> 
-> 	hci_dev_lock(hdev);
-> 	hci_bdaddr_list_clear(&hdev->blacklist);
-> +	hci_bdaddr_list_clear(&hdev->whitelist);
-> 	hci_uuids_clear(hdev);
-> 	hci_link_keys_clear(hdev);
-> 	hci_smp_ltks_clear(hdev);
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 592e73eea76d..431d5e4aa34b 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -5219,7 +5219,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
-> 
-> 	BT_DBG("%s", hdev->name);
-> 
-> -	if (!bdaddr_type_is_le(cp->addr.type) ||
-> +	if (!bdaddr_type_is_valid(cp->addr.type) ||
-> 	    !bacmp(&cp->addr.bdaddr, BDADDR_ANY))
-> 		return cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
-> 				    MGMT_STATUS_INVALID_PARAMS,
-> @@ -5230,8 +5230,26 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
-> 				    MGMT_STATUS_INVALID_PARAMS,
-> 				    &cp->addr, sizeof(cp->addr));
-> 
-> +	if (cp->action != 0x00 && cp->action != 0x01)
-> +
+The conditions for accepting an incoming connections are already
+non-trivial and will become more so once a white list is added. This
+patch breaks up the checks for when to reject the request by creating a
+helper function for it.
 
-something is wrong here. Shouldn't this return invalid params?
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 112 +++++++++++++++++++++++++---------------------
+ 1 file changed, 60 insertions(+), 52 deletions(-)
 
-> 	hci_dev_lock(hdev);
-> 
-> +	if (cp->addr.type == BDADDR_BREDR) {
-> +		/* Only "connect" action supported for now */
-> +		if (cp->action != 0x01) {
-> +			err = cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
-> +					   MGMT_STATUS_INVALID_PARAMS,
-> +					   &cp->addr, sizeof(cp->addr));
-> +			goto unlock;
-> +		}
-> +
-> +		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
-> +					  cp->addr.type);
-> +		if (err)
-> +			goto unlock;
-> +		goto added;
-> +	}
-> +
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 381c631423f1..6d1d5b3e9cd4 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2121,10 +2121,21 @@ unlock:
+ 	hci_conn_check_pending(hdev);
+ }
+ 
++static void hci_reject_conn(struct hci_dev *hdev, bdaddr_t *bdaddr)
++{
++	struct hci_cp_reject_conn_req cp;
++
++	bacpy(&cp.bdaddr, bdaddr);
++	cp.reason = HCI_ERROR_REJ_BAD_ADDR;
++	hci_send_cmd(hdev, HCI_OP_REJECT_CONN_REQ, sizeof(cp), &cp);
++}
++
+ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct hci_ev_conn_request *ev = (void *) skb->data;
+ 	int mask = hdev->link_mode;
++	struct inquiry_entry *ie;
++	struct hci_conn *conn;
+ 	__u8 flags = 0;
+ 
+ 	BT_DBG("%s bdaddr %pMR type 0x%x", hdev->name, &ev->bdaddr,
+@@ -2133,74 +2144,71 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	mask |= hci_proto_connect_ind(hdev, &ev->bdaddr, ev->link_type,
+ 				      &flags);
+ 
+-	if ((mask & HCI_LM_ACCEPT) &&
+-	    !hci_bdaddr_list_lookup(&hdev->blacklist, &ev->bdaddr,
++	if (!(mask & HCI_LM_ACCEPT)) {
++		hci_reject_conn(hdev, &ev->bdaddr);
++		return;
++	}
++
++	if (!hci_bdaddr_list_lookup(&hdev->blacklist, &ev->bdaddr,
+ 				    BDADDR_BREDR)) {
+-		/* Connection accepted */
+-		struct inquiry_entry *ie;
+-		struct hci_conn *conn;
++		hci_reject_conn(hdev, &ev->bdaddr);
++		return;
++	}
+ 
+-		hci_dev_lock(hdev);
++	/* Connection accepted */
+ 
+-		ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
+-		if (ie)
+-			memcpy(ie->data.dev_class, ev->dev_class, 3);
++	hci_dev_lock(hdev);
+ 
+-		conn = hci_conn_hash_lookup_ba(hdev, ev->link_type,
+-					       &ev->bdaddr);
++	ie = hci_inquiry_cache_lookup(hdev, &ev->bdaddr);
++	if (ie)
++		memcpy(ie->data.dev_class, ev->dev_class, 3);
++
++	conn = hci_conn_hash_lookup_ba(hdev, ev->link_type,
++			&ev->bdaddr);
++	if (!conn) {
++		conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr);
+ 		if (!conn) {
+-			conn = hci_conn_add(hdev, ev->link_type, &ev->bdaddr);
+-			if (!conn) {
+-				BT_ERR("No memory for new connection");
+-				hci_dev_unlock(hdev);
+-				return;
+-			}
++			BT_ERR("No memory for new connection");
++			hci_dev_unlock(hdev);
++			return;
+ 		}
++	}
+ 
+-		memcpy(conn->dev_class, ev->dev_class, 3);
++	memcpy(conn->dev_class, ev->dev_class, 3);
+ 
+-		hci_dev_unlock(hdev);
++	hci_dev_unlock(hdev);
+ 
+-		if (ev->link_type == ACL_LINK ||
+-		    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
+-			struct hci_cp_accept_conn_req cp;
+-			conn->state = BT_CONNECT;
++	if (ev->link_type == ACL_LINK ||
++	    (!(flags & HCI_PROTO_DEFER) && !lmp_esco_capable(hdev))) {
++		struct hci_cp_accept_conn_req cp;
++		conn->state = BT_CONNECT;
+ 
+-			bacpy(&cp.bdaddr, &ev->bdaddr);
++		bacpy(&cp.bdaddr, &ev->bdaddr);
+ 
+-			if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+-				cp.role = 0x00; /* Become master */
+-			else
+-				cp.role = 0x01; /* Remain slave */
++		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
++			cp.role = 0x00; /* Become master */
++		else
++			cp.role = 0x01; /* Remain slave */
+ 
+-			hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp),
+-				     &cp);
+-		} else if (!(flags & HCI_PROTO_DEFER)) {
+-			struct hci_cp_accept_sync_conn_req cp;
+-			conn->state = BT_CONNECT;
++		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
++	} else if (!(flags & HCI_PROTO_DEFER)) {
++		struct hci_cp_accept_sync_conn_req cp;
++		conn->state = BT_CONNECT;
+ 
+-			bacpy(&cp.bdaddr, &ev->bdaddr);
+-			cp.pkt_type = cpu_to_le16(conn->pkt_type);
++		bacpy(&cp.bdaddr, &ev->bdaddr);
++		cp.pkt_type = cpu_to_le16(conn->pkt_type);
+ 
+-			cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
+-			cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
+-			cp.max_latency    = cpu_to_le16(0xffff);
+-			cp.content_format = cpu_to_le16(hdev->voice_setting);
+-			cp.retrans_effort = 0xff;
++		cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
++		cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
++		cp.max_latency    = cpu_to_le16(0xffff);
++		cp.content_format = cpu_to_le16(hdev->voice_setting);
++		cp.retrans_effort = 0xff;
+ 
+-			hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ,
+-				     sizeof(cp), &cp);
+-		} else {
+-			conn->state = BT_CONNECT2;
+-			hci_proto_connect_cfm(conn, 0);
+-		}
++		hci_send_cmd(hdev, HCI_OP_ACCEPT_SYNC_CONN_REQ, sizeof(cp),
++			     &cp);
+ 	} else {
+-		/* Connection rejected */
+-		struct hci_cp_reject_conn_req cp;
+-
+-		bacpy(&cp.bdaddr, &ev->bdaddr);
+-		cp.reason = HCI_ERROR_REJ_BAD_ADDR;
+-		hci_send_cmd(hdev, HCI_OP_REJECT_CONN_REQ, sizeof(cp), &cp);
++		conn->state = BT_CONNECT2;
++		hci_proto_connect_cfm(conn, 0);
+ 	}
+ }
+ 
+-- 
+1.9.3
 
