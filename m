@@ -1,45 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53BD1DF2.7060607@ahsoftware.de>
-Date: Wed, 09 Jul 2014 12:48:18 +0200
-From: Alexander Holler <holler@ahsoftware.de>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Peng Chen <pengchen@qti.qualcomm.com>,
- "Gustavo F. Padovan" <gustavo@padovan.org>,
- Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
- kumo@qca.qualcomm.com, taowang@qti.qualcomm.com
-Subject: Re: [PATCH] Add a new PID/VID 0cf3/e005 for AR3012.
-References: <1377853792-17589-1-git-send-email-pengchen@qca.qualcomm.com> <53A40687.80004@ahsoftware.de> <850D59CB-8032-4095-AB96-61920042DC55@holtmann.org> <53BB9E5F.9020101@ahsoftware.de> <D0167450-1E5D-49A1-8D49-6D6AC528C463@holtmann.org> <53BBCCA3.9040706@ahsoftware.de>
-In-Reply-To: <53BBCCA3.9040706@ahsoftware.de>
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Fix setting HCI_CONNECTABLE from ioctl code
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404901706-19308-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 9 Jul 2014 12:32:41 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <F27C9142-87CE-4A6C-815F-7AA558E49C83@holtmann.org>
+References: <1404901706-19308-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Am 08.07.2014 12:49, schrieb Alexander Holler:
-> Am 08.07.2014 12:35, schrieb Marcel Holtmann:
->> Hi Alexander,
->>
->>>>> which is wrong and disables the ath3k driver.
->>>>
->>>> I reverted the broken patch in bluetooth.git now and marked it for
->>>> 3.15 stable.
->>>
->>> Must got missed, it's not in 3.15.4 nor in 3.15.5.
->>>
->>> As my solution was a revert too, I can offer a Tested-By, if such is
->>> needed, at least in regard to the point that ath3k-dongles will work
->>> again after reverting ca58e5.
->>
->> it is in net tree, but not in 3.16-rcX yet. Only after it got into
->> Linus' tree it can be backported to stable tree.
->
-> Ah, the funny maze of linux kernel repos. ;)
+Hi Johan,
 
-That lead me to the idea to rename bluetooth-next to bluetooth-ubernext 
-because that what be more appropriate if bluetooth-next ends up in 
-net-next or linux-next or something-else-next. ;)
+> When the white list is in use the code would not update the
+> HCI_CONNECTABLE flag if it gets changed through the ioctl code (e.g.
+> hciconfig hci0 pscan). Since the flag is important for properly
+> accepting incoming connections add code to fix it up if necessary and
+> emit a New Settings mgmt event.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/hci_core.c         | 17 +++++++++++++++++
+> net/bluetooth/mgmt.c             |  5 +++++
+> 3 files changed, 23 insertions(+)
 
-Sorry for the joke. ;)
+patch has been applied to bluetooth-next tree.
 
-Regards,
+Regards
 
-Alexander Holler
+Marcel
+
