@@ -1,48 +1,86 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 0/2] shared/att: Improve client support.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1404795901-29367-1-git-send-email-armansito@chromium.org>
-Date: Wed, 9 Jul 2014 15:38:38 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0808B431-893B-4318-A353-4E2E8B0901C9@holtmann.org>
-References: <1404795901-29367-1-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH 3/3] android/gatt: Choose LE or BR/EDR based on last seen bearer
+Date: Wed,  9 Jul 2014 14:41:38 +0200
+Message-Id: <1404909698-12242-3-git-send-email-szymon.janc@tieto.com>
+In-Reply-To: <1404909698-12242-1-git-send-email-szymon.janc@tieto.com>
+References: <1404909698-12242-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+This allows to connect both over LE and BR/EDR bearer.
+---
+ android/gatt.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-> This patch set makes the following additions/changes:
-> 
->  - The opcode + param structure semantics are no longer used. bt_att_send now
->    takes in the PDU as it will be sent over the physical link and it won't
->    perform any explicit encoding or decoding of PDUs between host order and BT
->    order. Any packed structs that get passed to bt_att_send need to be
->    formatted according to the correct endianness.
-> 
->  - bt_att_register and bt_att_unregister* functions are implemented. Callbacks
->    are registered for a particular opcode and they get invoked when an incoming
->    PDU of type "request", "indication", or "notification" is received.
-> 
-> This provides the basic functionality needed to implement a GATT client layer,
-> except for PDU signing and verifications of incoming signed PDUs. This isn't
-> immediately needed to implement a functioning client and could be left to the
-> upper layer.
-> 
-> Arman Uguray (2):
->  shared/att: Remove parameters structures.
->  shared/att: Implement bt_att_register.
-> 
-> src/shared/att-types.h | 153 +-------------------
-> src/shared/att.c       | 383 ++++++++++++++++++++++++++++++++-----------------
-> src/shared/att.h       |  19 +--
-> 3 files changed, 267 insertions(+), 288 deletions(-)
-
-I have applied both patches. However please keep in mind that the CSRK signing and resolving still needs to happen in this low-level ATT. The signatures are calculated over the whole PDU including opcode. Our BlueZ for Android code is capable of using signed write, so you can test against that one.
-
-Regards
-
-Marcel
+diff --git a/android/gatt.c b/android/gatt.c
+index bb9ea0b..6e1ce22 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1701,6 +1701,49 @@ static void app_disconnect_devices(struct gatt_app *client)
+ 	}
+ }
+ 
++static int connect_bredr(struct gatt_device *dev)
++{
++	BtIOSecLevel sec_level;
++	GIOChannel *io;
++	GError *gerr = NULL;
++	char addr[18];
++
++	ba2str(&dev->bdaddr, addr);
++
++	/* There is one connection attempt going on */
++	if (dev->att_io) {
++		info("gatt: connection to dev %s is ongoing", addr);
++		return -EALREADY;
++	}
++
++	DBG("Connection attempt to: %s", addr);
++
++	sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
++								BT_IO_SEC_LOW;
++
++	io = bt_io_connect(connect_cb, device_ref(dev), NULL, &gerr,
++			BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++			BT_IO_OPT_SOURCE_TYPE, BDADDR_BREDR,
++			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
++			BT_IO_OPT_DEST_TYPE, BDADDR_BREDR,
++			BT_IO_OPT_PSM, ATT_PSM,
++			BT_IO_OPT_SEC_LEVEL, sec_level,
++			BT_IO_OPT_INVALID);
++	if (!io) {
++		error("gatt: Failed bt_io_connect(%s): %s", addr,
++							gerr->message);
++		g_error_free(gerr);
++		return -EIO;
++	}
++
++	device_set_state(dev, DEVICE_CONNECT_READY);
++
++	/* Keep this, so we can cancel the connection */
++	dev->att_io = io;
++
++	return 0;
++}
++
+ static bool trigger_connection(struct app_connection *connection)
+ {
+ 	switch (connection->device->state) {
+@@ -1714,6 +1757,11 @@ static bool trigger_connection(struct app_connection *connection)
+ 		break;
+ 	}
+ 
++	/* If device was last seen over BR/EDR connect over it */
++	if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
++								BDADDR_BREDR)
++		return connect_bredr(connection->device) == 0;
++
+ 	/* after state change trigger discovering */
+ 	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
+ 		if (!bt_le_discovery_start()) {
+-- 
+1.9.1
 
