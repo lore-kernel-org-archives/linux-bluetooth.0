@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 3/3] Bluetooth: Fix incorrect clearing of SMP_FLAG_INITIATOR
-Date: Wed,  9 Jul 2014 19:18:11 +0300
-Message-Id: <1404922691-3881-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 1/3] Bluetooth: Always confirm incoming SMP just-works requests
+Date: Wed,  9 Jul 2014 19:18:09 +0300
+Message-Id: <1404922691-3881-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1404922691-3881-1-git-send-email-johan.hedberg@gmail.com>
 References: <1404922691-3881-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,41 +11,53 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-When the SMP context is created all flags default to zero. To determine
-that we are the initiators it's therefore best to simply change the flag
-value when we know we're sending the first SMP PDU. Clearing the flag
-when receiving a Pairing Request is not correct since the request may be
-a response to a previous Security Request from us (for which we would
-already have correctly set the flag). Same goes for receiving a Security
-Request which may be coming after us already starting pairing by sending
-a Pairing Request.
+For incoming requests we want to let the user know that pairing is
+happening since otherwise there could be access to MEDIUM security
+services without any user interaction at all. Therefore, set the
+selected method to JUST_CFM instead of JUST_WORKS and let it be
+converted back to JUST_WORKS later if we are the initators.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 4 ----
- 1 file changed, 4 deletions(-)
+ net/bluetooth/smp.c | 16 +++++++++++-----
+ 1 file changed, 11 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a5e51c686469..627d683203cf 100644
+index 55c41de2f5a0..a17761c83820 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
-@@ -735,8 +735,6 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (ret)
- 		return SMP_UNSPECIFIED;
+@@ -391,10 +391,12 @@ static const u8 gen_method[5][5] = {
  
--	clear_bit(SMP_FLAG_INITIATOR, &smp->flags);
--
- 	return 0;
+ static u8 get_auth_method(struct smp_chan *smp, u8 local_io, u8 remote_io)
+ {
+-	/* If either side has unknown io_caps, use JUST WORKS */
++	/* If either side has unknown io_caps, use JUST_CFM (which gets
++	 * converted later to JUST_WORKS if we're initiators.
++	 */
+ 	if (local_io > SMP_IO_KEYBOARD_DISPLAY ||
+ 	    remote_io > SMP_IO_KEYBOARD_DISPLAY)
+-		return JUST_WORKS;
++		return JUST_CFM;
+ 
+ 	return gen_method[remote_io][local_io];
  }
+@@ -414,10 +416,14 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
  
-@@ -927,8 +925,6 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	BT_DBG("tk_request: auth:%d lcl:%d rem:%d", auth, local_io, remote_io);
  
- 	smp_send_cmd(conn, SMP_CMD_PAIRING_REQ, sizeof(cp), &cp);
- 
--	clear_bit(SMP_FLAG_INITIATOR, &smp->flags);
--
- 	return 0;
- }
+-	/* If neither side wants MITM, use JUST WORKS */
+-	/* Otherwise, look up method from the table */
++	/* If neither side wants MITM, either "just" confirm an incoming
++	 * request or use just-works for outgoing ones. The JUST_CFM
++	 * will be converted to JUST_WORKS if necessary later in this
++	 * function. If either side has MITM look up the method from the
++	 * table.
++	 */
+ 	if (!(auth & SMP_AUTH_MITM))
+-		method = JUST_WORKS;
++		method = JUST_CFM;
+ 	else
+ 		method = get_auth_method(smp, local_io, remote_io);
  
 -- 
 1.9.3
