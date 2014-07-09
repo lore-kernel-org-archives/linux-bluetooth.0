@@ -1,39 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix advertising parameter update when toggling connectable
-Date: Thu, 10 Jul 2014 10:51:27 +0300
-Message-Id: <1404978687-7723-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 0/3] Bluetooth: SMP fixes
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1404922691-3881-1-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 9 Jul 2014 18:25:14 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <0773145D-E504-4D3F-BB29-89661452BCFF@holtmann.org>
+References: <1404922691-3881-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-When we change the connectable state and have advertising enabled we
-should update the advertising parameters no matter what. The code was
-incorrectly only updating them if advertising was not already active.
-This patch fixes the issue.
+> Here's a set of patches I ended up creating when testing HoG
+> reconnections. Now that we react to any direct advertising report when
+> connectable it's particularly important that we have the user
+> interaction semantics for incoming connections right.
+> 
+> Strictly speaking the Core spec simply tells us to use "just-works" when
+> no side has MITM required, so these changes should be checked against
+> current PTS and Android CTS tests. That said, imo this is still doing a
+> just-works pairing but simply with an extra user consent for proceeding
+> with the pairing for incoming requests.
+> 
+> Johan
+> 
+> ----------------------------------------------------------------
+> Johan Hedberg (3):
+>      Bluetooth: Always confirm incoming SMP just-works requests
+>      Bluetooth: Fix forcing SMP just-works with no-bonding
+>      Bluetooth: Fix incorrect clearing of SMP_FLAG_INITIATOR
+> 
+> net/bluetooth/smp.c | 24 +++++++++++-------------
+> 1 file changed, 11 insertions(+), 13 deletions(-)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/mgmt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+all 3 patches have been applied to bluetooth-next tree.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b49e6e711166..233e6c128727 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -1897,8 +1897,8 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
- 	if (cp->val || test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
- 		write_fast_connectable(&req, false);
- 
--	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags) &&
--	    !test_bit(HCI_LE_ADV, &hdev->dev_flags))
-+	/* Update the advertising parameters if necessary */
-+	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags))
- 		enable_advertising(&req);
- 
- 	err = hci_req_run(&req, set_connectable_complete);
--- 
-1.9.3
+Regards
+
+Marcel
 
