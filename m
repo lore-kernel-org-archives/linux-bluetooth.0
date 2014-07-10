@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Remove unneeded mgmt_discoverable function
-Date: Thu, 10 Jul 2014 11:02:56 +0300
-Message-Id: <1404979377-9497-2-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 3/3] Bluetooth: Remove unneeded mgmt_write_scan_failed function
+Date: Thu, 10 Jul 2014 11:02:57 +0300
+Message-Id: <1404979377-9497-3-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1404979377-9497-1-git-send-email-johan.hedberg@gmail.com>
 References: <1404979377-9497-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,228 +11,66 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-Since the HCISETSCAN ioctl is the only non-mgmt user we care about for
-setting the right discoverable state we can simply do the necessary
-updates in the ioctl handler function instead. This then allows the
-removal of the mgmt_discoverable function and should simplify that state
-handling considerably.
+The Set Connectable/Discoverable mgmt handlers use a hci_request with a
+proper callback to handle the HCI command sending. It makes therefore
+little sense to have this extra function to be called from hci_event.c
+for command failures.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  2 +-
- net/bluetooth/hci_core.c         | 35 +++++++++++++++++-----
- net/bluetooth/hci_event.c        | 19 ++++--------
- net/bluetooth/mgmt.c             | 64 +++++++++++++---------------------------
- 4 files changed, 54 insertions(+), 66 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 -
+ net/bluetooth/hci_event.c        |  1 -
+ net/bluetooth/mgmt.c             | 13 -------------
+ 3 files changed, 15 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 76675c55be15..b65efb22be54 100644
+index b65efb22be54..7e9e95633a85 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1286,8 +1286,8 @@ void mgmt_index_added(struct hci_dev *hdev);
- void mgmt_index_removed(struct hci_dev *hdev);
- void mgmt_set_powered_failed(struct hci_dev *hdev, int err);
+@@ -1288,7 +1288,6 @@ void mgmt_set_powered_failed(struct hci_dev *hdev, int err);
  int mgmt_powered(struct hci_dev *hdev, u8 powered);
-+int mgmt_update_adv_data(struct hci_dev *hdev);
+ int mgmt_update_adv_data(struct hci_dev *hdev);
  void mgmt_discoverable_timeout(struct hci_dev *hdev);
--void mgmt_discoverable(struct hci_dev *hdev, u8 discoverable);
- void mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status);
+-void mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status);
  void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
  		       bool persistent);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b6415ce7e7f5..bb531fe650db 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2716,21 +2716,40 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg)
- 		err = hci_req_sync(hdev, hci_scan_req, dr.dev_opt,
- 				   HCI_INIT_TIMEOUT);
- 
--		/* Ensure that the connectable state gets correctly
--		 * modified as this was a non-mgmt change.
-+		/* Ensure that the connectable and discoverable states
-+		 * get correctly modified as this was a non-mgmt change.
- 		 */
- 		if (!err) {
--			bool changed;
-+			bool cchg, dchg;
- 
- 			if ((dr.dev_opt & SCAN_PAGE))
--				changed = !test_and_set_bit(HCI_CONNECTABLE,
--							    &hdev->dev_flags);
-+				cchg = !test_and_set_bit(HCI_CONNECTABLE,
-+							&hdev->dev_flags);
- 			else
--				changed = test_and_set_bit(HCI_CONNECTABLE,
--							   &hdev->dev_flags);
-+				cchg = test_and_set_bit(HCI_CONNECTABLE,
-+							&hdev->dev_flags);
-+
-+			if ((dr.dev_opt & SCAN_INQUIRY)) {
-+				dchg = !test_and_set_bit(HCI_DISCOVERABLE,
-+							&hdev->dev_flags);
-+			} else {
-+				clear_bit(HCI_LIMITED_DISCOVERABLE,
-+					  &hdev->dev_flags);
-+				dchg = test_and_set_bit(HCI_DISCOVERABLE,
-+							&hdev->dev_flags);
-+			}
-+
-+			if (!test_bit(HCI_MGMT, &hdev->dev_flags))
-+				break;
- 
--			if (changed && test_bit(HCI_MGMT, &hdev->dev_flags))
-+			if (cchg || dchg) {
-+				/* In case this was disabled through mgmt */
-+				set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
-+
-+				if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags))
-+					mgmt_update_adv_data(hdev);
- 				mgmt_new_settings(hdev);
-+			}
- 		}
- 		break;
- 
+ void mgmt_device_connected(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 38a0e457eaf9..760bbd88f3c5 100644
+index 760bbd88f3c5..a62e918d2641 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -296,7 +296,6 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	__u8 status = *((__u8 *) skb->data);
- 	__u8 param;
--	int old_pscan, old_iscan;
- 	void *sent;
+@@ -309,7 +309,6 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hci_dev_lock(hdev);
  
- 	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-@@ -315,23 +314,15 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (status) {
+-		mgmt_write_scan_failed(hdev, param, status);
+ 		hdev->discov_timeout = 0;
  		goto done;
  	}
- 
--	/* We need to ensure that we set this back on if someone changed
--	 * the scan mode through a raw HCI socket.
--	 */
--	set_bit(HCI_BREDR_ENABLED, &hdev->dev_flags);
--
--	old_pscan = test_and_clear_bit(HCI_PSCAN, &hdev->flags);
--	old_iscan = test_and_clear_bit(HCI_ISCAN, &hdev->flags);
--
--	if (param & SCAN_INQUIRY) {
-+	if (param & SCAN_INQUIRY)
- 		set_bit(HCI_ISCAN, &hdev->flags);
--		if (!old_iscan)
--			mgmt_discoverable(hdev, 1);
--	} else if (old_iscan)
--		mgmt_discoverable(hdev, 0);
-+	else
-+		clear_bit(HCI_ISCAN, &hdev->flags);
- 
- 	if (param & SCAN_PAGE)
- 		set_bit(HCI_PSCAN, &hdev->flags);
-+	else
-+		clear_bit(HCI_ISCAN, &hdev->flags);
- 
- done:
- 	hci_dev_unlock(hdev);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index a91f238f16c3..ae9331b939ca 100644
+index ae9331b939ca..b49e6e711166 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -906,6 +906,16 @@ static void update_adv_data(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_ADV_DATA, sizeof(cp), &cp);
- }
- 
-+int mgmt_update_adv_data(struct hci_dev *hdev)
-+{
-+	struct hci_request req;
-+
-+	hci_req_init(&req, hdev);
-+	update_adv_data(&req);
-+
-+	return hci_req_run(&req, NULL);
-+}
-+
- static void create_eir(struct hci_dev *hdev, u8 *data)
- {
- 	u8 *ptr = data;
-@@ -1743,7 +1753,7 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- {
- 	struct pending_cmd *cmd;
- 	struct mgmt_mode *cp;
--	bool changed;
-+	bool cchg, dchg;
- 
- 	BT_DBG("status 0x%02x", status);
- 
-@@ -1760,15 +1770,20 @@ static void set_connectable_complete(struct hci_dev *hdev, u8 status)
- 	}
- 
- 	cp = cmd->param;
--	if (cp->val)
--		changed = !test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
--	else
--		changed = test_and_clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+	if (cp->val) {
-+		cchg = !test_and_set_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+		dchg = false;
-+	} else {
-+		cchg = test_and_clear_bit(HCI_CONNECTABLE, &hdev->dev_flags);
-+		dchg = test_and_clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
-+	}
- 
- 	send_settings_rsp(cmd->sk, MGMT_OP_SET_CONNECTABLE, hdev);
- 
--	if (changed) {
-+	if (cchg || dchg) {
- 		new_settings(hdev, cmd->sk);
-+		if (dchg)
-+			mgmt_update_adv_data(hdev);
- 		hci_update_background_scan(hdev);
- 	}
- 
-@@ -6031,43 +6046,6 @@ void mgmt_discoverable_timeout(struct hci_dev *hdev)
+@@ -6046,19 +6046,6 @@ void mgmt_discoverable_timeout(struct hci_dev *hdev)
  	hci_dev_unlock(hdev);
  }
  
--void mgmt_discoverable(struct hci_dev *hdev, u8 discoverable)
+-void mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status)
 -{
--	bool changed;
+-	u8 mgmt_err = mgmt_status(status);
 -
--	/* Nothing needed here if there's a pending command since that
--	 * commands request completion callback takes care of everything
--	 * necessary.
--	 */
--	if (mgmt_pending_find(MGMT_OP_SET_DISCOVERABLE, hdev))
--		return;
+-	if (scan & SCAN_PAGE)
+-		mgmt_pending_foreach(MGMT_OP_SET_CONNECTABLE, hdev,
+-				     cmd_status_rsp, &mgmt_err);
 -
--	/* Powering off may clear the scan mode - don't let that interfere */
--	if (!discoverable && mgmt_pending_find(MGMT_OP_SET_POWERED, hdev))
--		return;
--
--	if (discoverable) {
--		changed = !test_and_set_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
--	} else {
--		clear_bit(HCI_LIMITED_DISCOVERABLE, &hdev->dev_flags);
--		changed = test_and_clear_bit(HCI_DISCOVERABLE, &hdev->dev_flags);
--	}
--
--	if (changed) {
--		struct hci_request req;
--
--		/* In case this change in discoverable was triggered by
--		 * a disabling of connectable there could be a need to
--		 * update the advertising flags.
--		 */
--		hci_req_init(&req, hdev);
--		update_adv_data(&req);
--		hci_req_run(&req, NULL);
--
--		new_settings(hdev, NULL);
--	}
+-	if (scan & SCAN_INQUIRY)
+-		mgmt_pending_foreach(MGMT_OP_SET_DISCOVERABLE, hdev,
+-				     cmd_status_rsp, &mgmt_err);
 -}
 -
- void mgmt_write_scan_failed(struct hci_dev *hdev, u8 scan, u8 status)
+ void mgmt_new_link_key(struct hci_dev *hdev, struct link_key *key,
+ 		       bool persistent)
  {
- 	u8 mgmt_err = mgmt_status(status);
 -- 
 1.9.3
 
