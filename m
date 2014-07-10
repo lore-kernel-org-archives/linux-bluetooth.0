@@ -1,34 +1,88 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 10 Jul 2014 14:59:18 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v2] Bluetooth: Mark controller is down when HCI_AUTO_OFF
- is set
-Message-ID: <20140710115918.GA10018@t440s.P-661HNU-F1>
-References: <1404991057-55075-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1404991057-55075-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Mark controller is down when HCI_AUTO_OFF is set
+Date: Thu, 10 Jul 2014 13:17:37 +0200
+Message-Id: <1404991057-55075-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+During the initial setup phase, the controller is powered on and will
+be powered off again if it is not used within the auto-off timeout.
 
-On Thu, Jul 10, 2014, Marcel Holtmann wrote:
-> During the initial setup phase, the controller is powered on and will
-> be powered off again if it is not used within the auto-off timeout.
-> 
-> Userspace using ioctl does not know about the difference between the
-> initial setup phase and a controller being present. It is a bad idea
-> to keep the controller powered by just looking at the device list or
-> device information. Instead just tell userspace that the controller
-> is still down.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  net/bluetooth/hci_core.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
+Userspace using ioctl does not know about the difference between the
+initial setup phase and a controller being present. It is a bad idea
+to keep the controller powered by just looking at the device list or
+device information. Instead just tell userspace that the controller
+is still down.
 
-Applied to bluetooth-next. Thanks.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 25 +++++++++++++++++++------
+ 1 file changed, 19 insertions(+), 6 deletions(-)
 
-Johan
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 3321c65c73ac..96e0acc3fc92 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2817,14 +2817,20 @@ int hci_get_dev_list(void __user *arg)
+ 
+ 	read_lock(&hci_dev_list_lock);
+ 	list_for_each_entry(hdev, &hci_dev_list, list) {
+-		if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+-			cancel_delayed_work(&hdev->power_off);
++		unsigned long flags = hdev->flags;
++
++		/* When the auto-off is configured it means the transport
++		 * is running, but in that case still indicate that the
++		 * device is actually down.
++		 */
++		if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
++			flags &= ~BIT(HCI_UP);
+ 
+ 		if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+ 			set_bit(HCI_PAIRABLE, &hdev->dev_flags);
+ 
+ 		(dr + n)->dev_id  = hdev->id;
+-		(dr + n)->dev_opt = hdev->flags;
++		(dr + n)->dev_opt = flags;
+ 
+ 		if (++n >= dev_num)
+ 			break;
+@@ -2844,6 +2850,7 @@ int hci_get_dev_info(void __user *arg)
+ {
+ 	struct hci_dev *hdev;
+ 	struct hci_dev_info di;
++	unsigned long flags;
+ 	int err = 0;
+ 
+ 	if (copy_from_user(&di, arg, sizeof(di)))
+@@ -2853,8 +2860,14 @@ int hci_get_dev_info(void __user *arg)
+ 	if (!hdev)
+ 		return -ENODEV;
+ 
+-	if (test_and_clear_bit(HCI_AUTO_OFF, &hdev->dev_flags))
+-		cancel_delayed_work_sync(&hdev->power_off);
++	/* When the auto-off is configured it means the transport
++	 * is running, but in that case still indicate that the
++	 * device is actually down.
++	 */
++	if (test_bit(HCI_AUTO_OFF, &hdev->dev_flags))
++		flags = hdev->flags & ~BIT(HCI_UP);
++	else
++		flags = hdev->flags;
+ 
+ 	if (!test_bit(HCI_MGMT, &hdev->dev_flags))
+ 		set_bit(HCI_PAIRABLE, &hdev->dev_flags);
+@@ -2862,7 +2875,7 @@ int hci_get_dev_info(void __user *arg)
+ 	strcpy(di.name, hdev->name);
+ 	di.bdaddr   = hdev->bdaddr;
+ 	di.type     = (hdev->bus & 0x0f) | ((hdev->dev_type & 0x03) << 4);
+-	di.flags    = hdev->flags;
++	di.flags    = flags;
+ 	di.pkt_type = hdev->pkt_type;
+ 	if (lmp_bredr_capable(hdev)) {
+ 		di.acl_mtu  = hdev->acl_mtu;
+-- 
+1.9.3
+
