@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Mark controller is down when HCI_AUTO_OFF is set
-Date: Thu, 10 Jul 2014 13:17:37 +0200
-Message-Id: <1404991057-55075-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Mark controller is down when HCI_AUTO_OFF is set
+Date: Thu, 10 Jul 2014 12:08:09 +0200
+Message-Id: <1404986889-52589-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,14 +18,14 @@ is still down.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 25 +++++++++++++++++++------
- 1 file changed, 19 insertions(+), 6 deletions(-)
+ net/bluetooth/hci_core.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 3321c65c73ac..96e0acc3fc92 100644
+index 3321c65c73ac..02e464e7391f 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2817,14 +2817,20 @@ int hci_get_dev_list(void __user *arg)
+@@ -2817,8 +2817,14 @@ int hci_get_dev_list(void __user *arg)
  
  	read_lock(&hci_dev_list_lock);
  	list_for_each_entry(hdev, &hci_dev_list, list) {
@@ -42,13 +42,6 @@ index 3321c65c73ac..96e0acc3fc92 100644
  
  		if (!test_bit(HCI_MGMT, &hdev->dev_flags))
  			set_bit(HCI_PAIRABLE, &hdev->dev_flags);
- 
- 		(dr + n)->dev_id  = hdev->id;
--		(dr + n)->dev_opt = hdev->flags;
-+		(dr + n)->dev_opt = flags;
- 
- 		if (++n >= dev_num)
- 			break;
 @@ -2844,6 +2850,7 @@ int hci_get_dev_info(void __user *arg)
  {
  	struct hci_dev *hdev;
