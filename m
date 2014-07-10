@@ -1,57 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluteooth: Reject SMP bonding if HCI_PAIRABLE is not set
-Date: Thu, 10 Jul 2014 11:02:07 +0300
-Message-Id: <1404979327-9384-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix advertising parameter update when toggling connectable
+Date: Thu, 10 Jul 2014 10:51:27 +0300
+Message-Id: <1404978687-7723-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If the remote device tries to initiate bonding with us and we don't have
-HCI_PAIRABLE set we should just flat out reject the request. This brings
-SMP in line with how the flag is used for BR/EDR SSP.
+When we change the connectable state and have advertising enabled we
+should update the advertising parameters no matter what. The code was
+incorrectly only updating them if advertising was not already active.
+This patch fixes the issue.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ net/bluetooth/mgmt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index fa81a3a9dbaf..4ea31b021714 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -683,6 +683,7 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
- static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- {
- 	struct smp_cmd_pairing rsp, *req = (void *) skb->data;
-+	struct hci_dev *hdev = conn->hcon->hdev;
- 	struct smp_chan *smp;
- 	u8 key_size, auth, sec_level;
- 	int ret;
-@@ -703,6 +704,10 @@ static u8 smp_cmd_pairing_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (!smp)
- 		return SMP_UNSPECIFIED;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b49e6e711166..233e6c128727 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1897,8 +1897,8 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	if (cp->val || test_bit(HCI_FAST_CONNECTABLE, &hdev->dev_flags))
+ 		write_fast_connectable(&req, false);
  
-+	if (!test_bit(HCI_PAIRABLE, &hdev->dev_flags) &&
-+	    (req->auth_req & SMP_AUTH_BONDING))
-+		return SMP_PAIRING_NOTSUPP;
-+
- 	smp->preq[0] = SMP_CMD_PAIRING_REQ;
- 	memcpy(&smp->preq[1], req, sizeof(*req));
- 	skb_pull(skb, sizeof(*req));
-@@ -918,6 +923,10 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
- 		return 0;
+-	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags) &&
+-	    !test_bit(HCI_LE_ADV, &hdev->dev_flags))
++	/* Update the advertising parameters if necessary */
++	if (test_bit(HCI_ADVERTISING, &hdev->dev_flags))
+ 		enable_advertising(&req);
  
-+	if (!test_bit(HCI_PAIRABLE, &hcon->hdev->dev_flags) &&
-+	    (rp->auth_req & SMP_AUTH_BONDING))
-+		return SMP_PAIRING_NOTSUPP;
-+
- 	smp = smp_chan_create(conn);
- 	if (!smp)
- 		return SMP_UNSPECIFIED;
+ 	err = hci_req_run(&req, set_connectable_complete);
 -- 
 1.9.3
 
