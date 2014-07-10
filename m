@@ -1,70 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Update PTS files for AVCTP
-Date: Thu, 10 Jul 2014 14:57:45 +0200
-Message-Id: <1404997065-23966-1-git-send-email-sebastian.chlad@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Thu, 10 Jul 2014 14:59:18 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v2] Bluetooth: Mark controller is down when HCI_AUTO_OFF
+ is set
+Message-ID: <20140710115918.GA10018@t440s.P-661HNU-F1>
+References: <1404991057-55075-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1404991057-55075-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PICS and PIXITs updated to PTS 5.2. Regression done for Android
-4.4.4.
----
- android/pics-avctp.txt  | 2 +-
- android/pixit-avctp.txt | 4 ++--
- android/pts-avctp.txt   | 6 +++---
- 3 files changed, 6 insertions(+), 6 deletions(-)
+Hi Marcel,
 
-diff --git a/android/pics-avctp.txt b/android/pics-avctp.txt
-index 3490db5..5900d00 100644
---- a/android/pics-avctp.txt
-+++ b/android/pics-avctp.txt
-@@ -1,6 +1,6 @@
- AVCTP PICS for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-avctp.txt b/android/pixit-avctp.txt
-index a9b3f4f..3c6a864 100644
---- a/android/pixit-avctp.txt
-+++ b/android/pixit-avctp.txt
-@@ -1,6 +1,6 @@
- AVCTP PIXIT for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -12,7 +12,7 @@ Parameter Name			Value
- -------------------------------------------------------------------------------
- TSPX_avctp_psm			0017
- TSPX_avctp_profile_id		110E
--TSPX_connect_avdtp		TRUE
-+TSPX_connect_avdtp		FALSE (*)
- TSPX_avctp_tester_command_data
- TSPX_avctp_tester_response_data
- TSPX_avctp_iut_command_data
-diff --git a/android/pts-avctp.txt b/android/pts-avctp.txt
-index d8e7230..a461ee9 100644
---- a/android/pts-avctp.txt
-+++ b/android/pts-avctp.txt
-@@ -1,8 +1,8 @@
- PTS test results for AVCTP
- 
--PTS version: 5.1
--Tested: 07-April-2014
--Android version: 4.4.2
-+PTS version: 5.2
-+Tested: 10-July-2014
-+Android version: 4.4.4
- 
- Results:
- PASS	test passed
--- 
-1.8.5.3
+On Thu, Jul 10, 2014, Marcel Holtmann wrote:
+> During the initial setup phase, the controller is powered on and will
+> be powered off again if it is not used within the auto-off timeout.
+> 
+> Userspace using ioctl does not know about the difference between the
+> initial setup phase and a controller being present. It is a bad idea
+> to keep the controller powered by just looking at the device list or
+> device information. Instead just tell userspace that the controller
+> is still down.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 25 +++++++++++++++++++------
+>  1 file changed, 19 insertions(+), 6 deletions(-)
 
+Applied to bluetooth-next. Thanks.
+
+Johan
