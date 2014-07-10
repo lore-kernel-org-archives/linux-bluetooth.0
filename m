@@ -2,74 +2,85 @@ Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH v2 4/5] shared/gatt: Add function for getting service UUID
-Date: Thu, 10 Jul 2014 16:30:35 +0200
-Message-Id: <1405002636-10737-4-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH v2 3/5] android/gatt: Choose LE or BR/EDR based on last seen bearer
+Date: Thu, 10 Jul 2014 16:30:34 +0200
+Message-Id: <1405002636-10737-3-git-send-email-szymon.janc@tieto.com>
 In-Reply-To: <1405002636-10737-1-git-send-email-szymon.janc@tieto.com>
 References: <1405002636-10737-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+This allows to connect both over LE and BR/EDR bearer.
 ---
- src/shared/gatt-db.c | 31 +++++++++++++++++++++++++++++++
- src/shared/gatt-db.h |  2 ++
- 2 files changed, 33 insertions(+)
+ android/gatt.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-index 9cbf409..bd25d47 100644
---- a/src/shared/gatt-db.c
-+++ b/src/shared/gatt-db.c
-@@ -732,6 +732,37 @@ uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle)
- 	return service->attributes[0]->handle + service->num_handles - 1;
+diff --git a/android/gatt.c b/android/gatt.c
+index e07226c..6f04439 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -1702,6 +1702,49 @@ static void app_disconnect_devices(struct gatt_app *client)
+ 	}
  }
  
-+bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
-+								bt_uuid_t *uuid)
++static int connect_bredr(struct gatt_device *dev)
 +{
-+	struct gatt_db_service *service;
++	BtIOSecLevel sec_level;
++	GIOChannel *io;
++	GError *gerr = NULL;
++	char addr[18];
 +
-+	service = queue_find(db->services, find_service_for_handle,
-+						INT_TO_PTR(handle));
-+	if (!service)
-+		return false;
++	ba2str(&dev->bdaddr, addr);
 +
-+	if (service->attributes[0]->value_len == 2) {
-+		uint16_t value;
-+
-+		value = get_le16(service->attributes[0]->value);
-+		bt_uuid16_create(uuid, value);
-+
-+		return true;
++	/* There is one connection attempt going on */
++	if (dev->att_io) {
++		info("gatt: connection to dev %s is ongoing", addr);
++		return -EALREADY;
 +	}
 +
-+	if (service->attributes[0]->value_len == 8) {
-+		uint128_t value;
++	DBG("Connection attempt to: %s", addr);
 +
-+		bswap_128(service->attributes[0]->value, &value);
-+		bt_uuid128_create(uuid, value);
++	sec_level = bt_device_is_bonded(&dev->bdaddr) ? BT_IO_SEC_MEDIUM :
++								BT_IO_SEC_LOW;
 +
-+		return true;
++	io = bt_io_connect(connect_cb, device_ref(dev), NULL, &gerr,
++			BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
++			BT_IO_OPT_SOURCE_TYPE, BDADDR_BREDR,
++			BT_IO_OPT_DEST_BDADDR, &dev->bdaddr,
++			BT_IO_OPT_DEST_TYPE, BDADDR_BREDR,
++			BT_IO_OPT_PSM, ATT_PSM,
++			BT_IO_OPT_SEC_LEVEL, sec_level,
++			BT_IO_OPT_INVALID);
++	if (!io) {
++		error("gatt: Failed bt_io_connect(%s): %s", addr,
++							gerr->message);
++		g_error_free(gerr);
++		return -EIO;
 +	}
 +
-+	return false;
++	device_set_state(dev, DEVICE_CONNECT_READY);
++
++	/* Keep this, so we can cancel the connection */
++	dev->att_io = io;
++
++	return 0;
 +}
 +
- bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 							uint32_t *permissions)
+ static bool trigger_connection(struct app_connection *connection)
  {
-diff --git a/src/shared/gatt-db.h b/src/shared/gatt-db.h
-index a88f637..8d18434 100644
---- a/src/shared/gatt-db.h
-+++ b/src/shared/gatt-db.h
-@@ -91,6 +91,8 @@ const bt_uuid_t *gatt_db_get_attribute_type(struct gatt_db *db,
- 							uint16_t handle);
+ 	switch (connection->device->state) {
+@@ -1715,6 +1758,11 @@ static bool trigger_connection(struct app_connection *connection)
+ 		break;
+ 	}
  
- uint16_t gatt_db_get_end_handle(struct gatt_db *db, uint16_t handle);
-+bool gatt_db_get_service_uuid(struct gatt_db *db, uint16_t handle,
-+							bt_uuid_t *uuid);
- 
- bool gatt_db_get_attribute_permissions(struct gatt_db *db, uint16_t handle,
- 							uint32_t *permissions);
++	/* If device was last seen over BR/EDR connect over it */
++	if (bt_device_last_seen_bearer(&connection->device->bdaddr) ==
++								BDADDR_BREDR)
++		return connect_bredr(connection->device) == 0;
++
+ 	/* after state change trigger discovering */
+ 	if (!scanning && (connection->device->state == DEVICE_CONNECT_INIT))
+ 		if (!bt_le_discovery_start()) {
 -- 
 1.9.1
 
