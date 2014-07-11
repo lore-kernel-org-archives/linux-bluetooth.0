@@ -1,104 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-To: Daniel Drake <drake@endlessm.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Larry Finger
-	<Larry.Finger@lwfinger.net>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IFtQQVRDSCB2Ml0gQmx1ZXRvb3RoOiBidHVzYjog?==?utf-8?Q?Add_Realtek_8723/8761_support?=
-Date: Fri, 11 Jul 2014 08:44:34 +0000
-Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A45FC1E92@rsex2.realsil.com.cn>
-References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
-	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
-	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>
-	<53B2D160.4010306@lwfinger.net>
-	<F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org>
-	<54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>
-	<B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>
-	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn>
- <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com>
-In-Reply-To: <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+From: Alexander Aring <alex.aring@gmail.com>
+To: netdev@vger.kernel.org
+Cc: marcel@holtmann.org,
+	jukka.rissanen@linux.intel.com,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>
+Subject: [PATCH net-next 0/2] Introduce generic 6LoWPAN branch
+Date: Fri, 11 Jul 2014 10:24:17 +0200
+Message-Id: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRGFuaWVsLA0KCVRoZSA4NzYxIG1vZHVsZSB1c2VkIHdpdGggZGlmZmVyZW50IHdpZmkgY2hp
-cCBjYW4gb25seSBiZSBkaXN0aW5ndWlzaGVkIGJ5IHBpZCwgYW5kIGRvIG5vdCBzdXBwb3J0IHZl
-bmRvciBjb21tYW5kIHRvIGdldCBpbmZvcm1hdGlvbiBmcm9tIHJvbSBjb2RlLg0KVGhlIHNldHVw
-IGZ1bmN0aW9uIG9ubHkgaGFzIGhjaV9kZXYgcGFyYW1ldGVyIC4gDQp3ZSBjYW4gYWRkIGRyaXZl
-cl9pbmZvIGFuZCBzZXQgZGlmZmVyZW50IHNldHVwIGZ1bmNpdG9ucy4gV2lsbCB0aGlzIGJlIGFj
-Y2VwdGFibGUgb3IgZG8geW91IGhhdmUgb3RoZXIgc3VnZ2VzdGlvbnM/IA0KCQ0KKDEpDQojZGVm
-aW5lIEJUVVNCX1JUTAkJCTB4MjAwDQojZGVmaW5lIEJUVVNCX1JUTDg3NjFBVzgxOTJFVQkweDQw
-MA0KI2RlZmluZSBCVFVTQl9SVEw4NzYxQVU4MTkyRUUJMHg4MDANCiNkZWZpbmUgQlRVU0JfUlRM
-ODc2MUFVODgxMkFFCTB4MTAwMA0KDQooMikNCmJsYWNrbGlzdF90YWJsZVtdID0gew0KLi4uLi4N
-CgkvKlJUTDg3NjFBVyArIDgxOTJFVSovDQoJeyBVU0JfREVWSUNFKDB4ODE4QiwgMHgwYmRhKSwg
-LmRyaXZlcl9pbmZvID0gQlRVU0JfUlRMODc2MUFXODE5MkVVfSwNCgl7IFVTQl9ERVZJQ0UoMHg4
-MThjLCAweDBiZGEpLCAuZHJpdmVyX2luZm8gPSBCVFVTQl9SVEw4NzYxQVc4MTkyRVV9LA0KCS8q
-UnRsODc2MUFVICsgODE5MkVFKi8NCgl7IFVTQl9ERVZJQ0UoMHg4NzYwLCAweDBiZGEpLCAuZHJp
-dmVyX2luZm8gPSBCVFVTQl9SVEw4NzYxQVU4MTkyRUV9LA0KCXsgVVNCX0RFVklDRSgweDg3NjEs
-IDB4MGJkYSksIC5kcml2ZXJfaW5mbyA9IEJUVVNCX1JUTDg3NjFBVTgxOTJFRX0sDQoJeyBVU0Jf
-REVWSUNFKDB4Qjc2MSwgMHgwYmRhKSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfUlRMODc2MUFVODE5
-MkVFfSwNCgkvKlJUTDg3NjFBVSArIDg4MTJBRSovDQoJeyBVU0JfREVWSUNFKDB4OEE2MCwgMHgw
-YmRhKSwgLmRyaXZlcl9pbmZvID0gQlRVU0JfUlRMODc2MUFVODgxMkFFfSwNCg0KKDMpIA0KYnR1
-c2JfcHJvYmUoKXsNCglpZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfUlRMKQ0KCQloZGV2LT5z
-ZXR1cCA9IGJ0dXNiX3NldHVwX3J0bDsNCglpZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfUlRM
-ODc2MUFXODE5MkVVKQ0KCQloZGV2LT5zZXR1cCA9IGJ0dXNiX3NldHVwX3J0bDg3NjFhdzgxOTJl
-dTsNCglpZiAoaWQtPmRyaXZlcl9pbmZvICYgQlRVU0JfUlRMODc2MUFVODE5MkVFKQ0KCQloZGV2
-LT5zZXR1cCA9IGJ0dXNiX3NldHVwX3J0bDg3NjFhdTgxOTJlZTsNCglpZiAoaWQtPmRyaXZlcl9p
-bmZvICYgQlRVU0JfUlRMODc2MUFVODgxMkFFKQ0KCQloZGV2LT5zZXR1cCA9IGJ0dXNiX3NldHVw
-X3J0bDg3NjFhdTg4MTJhZTsNCg0KRm9yIHRoZXNlIHNwZWNpYWwgY2FzZXMsIHdlIGFyZSBzdGls
-bCB1bmRlciBkZXZlbG9wICwgSSB0aGluayB3ZSBjYW4gdXBkYXRlIG5leHQgdGltZS4NCg0KIiBI
-b3dldmVyLCB5b3VyIG5ldyBjb2RlIGFsc28gZHJvcHMgdXNhZ2Ugb2YgdGhlIGNvbmZpZyBmaXJt
-d2FyZSBmaWxlcyBlLmcuIHJ0bDg3MjNiX2NvbmZpZy4NCkNhbiB5b3UgZXhwbGFpbiB3aGF0IHRo
-ZXNlIGZpbGVzIGFyZSBmb3IsIGFuZCBpZiB0aGV5IGFyZSBzYWZlIHRvIGlnbm9yZSBsaWtlIHlv
-dXIgbmV3IGNvZGUgZG9lcz8iIA0KRm9yIGVhY2ggbW9kdWxlLCB0aGVyZSBtYXkgYmUgdXNlZCBh
-cyBvbmUgYW50ZW5uYSBvciB0d28gYW50ZW5uYSAuIENvbmZpZyBmaWxlIGNhbiBiZSB1c2VkIHRv
-IGNoYW5nZSB0aGUgYW50ZW5uYSBzZXR0aW5ncyBhbmQgb3RoZXIgZmVhdHVyZSBzdWNoIGFzIGJ0
-IGFkZHJlc3MgYW5kIHBvd2VyLiBJZiBjb25maWcgZmlsZSBpcyBub3QgcHJvdmlkZWQgLG1vZHVs
-ZXMgd2lsbCB1c2UgdGhlIGRlZmF1bHQgc2V0dGluZ3MuDQpJIHdpbGwgYWRkIHRoZSBjb25maWcg
-ZmlsZSBpbiBkcml2ZXIgLg0KDQoNCkNoYW1waW9uDQpFeHQ6NjMyNQ0KDQoNCi0tLS0t6YKu5Lu2
-5Y6f5Lu2LS0tLS0NCuWPkeS7tuS6ujogRGFuaWVsIERyYWtlIFttYWlsdG86ZHJha2VAZW5kbGVz
-c20uY29tXSANCuWPkemAgeaXtumXtDogMjAxNOW5tDfmnIg45pelIDE1OjU3DQrmlLbku7bkuro6
-IOmZiOiJs+iQjQ0K5oqE6YCBOiBNYXJjZWwgSG9sdG1hbm47IExhcnJ5IEZpbmdlcjsgR3VzdGF2
-byBGLiBQYWRvdmFuOyBKb2hhbiBIZWRiZXJnOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBsaXN0
-DQrkuLvpopg6IFJlOiDnrZTlpI06IFtQQVRDSCB2Ml0gQmx1ZXRvb3RoOiBidHVzYjogQWRkIFJl
-YWx0ZWsgODcyMy84NzYxIHN1cHBvcnQNCg0KSGkgQ2hhbXBpb24sDQoNCk9uIEZyaSwgSnVsIDQs
-IDIwMTQgYXQgMTE6MTEgQU0sIOmZiOiJs+iQjSA8Y2hhbXBpb25fY2hlbkByZWFsc2lsLmNvbS5j
-bj4gd3JvdGU6DQo+ICAgICAgICAgIEF0dGFjaGVkIGZpbGUgaW5jbHVkZXMgdmVuZG9yIGNvbW1h
-bmRzIG9mIHJlYWx0ZWsgQmx1ZXRvb3RoIG1vZHVsZXMgaW4gaW5pdGlhbGl6ZSBwcm9jZWR1cmUu
-DQo+DQo+IEFuZCBidHVzYiBpcyBleGFtcGxlIG9mIGFkZCBydGwgc2V0dXAgY2FsbGJhY2tzIChu
-b3QgZmluaXNoZWQpDQoNClRoYW5rcyBhIGxvdCBmb3IgcHJvdmlkaW5nIHRoaXMgaW5mb3JtYXRp
-b24hDQoNClRoZSBidHVzYiBleGFtcGxlIHlvdSBhdHRhY2hlZCBhbHNvIHRoZSBVU0ItSUQtdG8t
-ZmlybXdhcmUtbmFtZSBsb29rdXAgdGFibGUgdGhhdCBNYXJjZWwgd2FzIG5vdCBzbyBoYXBweSBh
-Ym91dC4gSW5zdGVhZCBpdCByZWFkcyB0aGUgdmVyc2lvbiBpbmZvIGZyb20gdGhlIGRldmljZSBh
-bmQgdXNlcyB0aGF0IHRvIGRlY2lkZSB3aGljaCBvZiB0aGUgZmlybXdhcmUgZmlsZXMgdG8gdXNl
-IChlLmcuIHJ0bDg3MjNhX2Z3KS4gSXQgY2FuIGRvIHRoaXMgYmVjYXVzZSBpdCBkcm9wcyBzdXBw
-b3J0IGZvciB0aGUgZm9sbG93aW5nICJwcm9ibGVtYXRpYyIgUlRMODc2MS1iYXNlZCBkZXZpY2Vz
-IHdoaWNoIG5lZWQgYSBzcGVjaWFsIGZpcm13YXJlIGZvciBlYWNoIHZhcmlhbnQgb2YgdGhlIGNh
-cmQ6DQoNCiAgICB7IDB4ODE4QiwgMHg4NzYxLCAicnRsODc2MWF3ODE5MmV1X2Z3IiwgInJ0bDg3
-NjFhX2NvbmZpZyIsIE5VTEwsIDAgfSwgLy9SdGw4NzYxQXcgKyA4MTkyRVUNCiAgICB7IDB4ODc2
-MCwgMHg4NzYxLCAicnRsODc2MWF1ODE5MmVlX2Z3IiwgInJ0bDg3NjFhX2NvbmZpZyIsIE5VTEws
-IDAgfSwgLy9SdGw4NzYxQVUgKyA4MTkyRUUNCiAgICB7IDB4Qjc2MSwgMHg4NzYxLCAicnRsODc2
-MWF1ODE5MmVlX2Z3IiwgInJ0bDg3NjFhX2NvbmZpZyIsIE5VTEwsIDAgfSwgLy9SdGw4NzYxQVUg
-KyA4MTkyRUUNCiAgICB7IDB4ODc2MSwgMHg4NzYxLCAicnRsODc2MWF1ODE5MmVlX2Z3IiwgInJ0
-bDg3NjFhX2NvbmZpZyIsIE5VTEwsIDAgfSwgLy9SdGw4NzYxQVUgKyA4MTkyRUUgZm9yIExJDQog
-ICAgeyAweDhBNjAsIDB4ODc2MSwgInJ0bDg3NjFhdTg4MTJhZV9mdyIsICJydGw4NzYxYV9jb25m
-aWciLCBOVUxMLCAwIH0sIC8vUnRsODc2MUFVICsgODgxMkFFIChmcm9tIGh0dHBzOi8vZ2l0aHVi
-LmNvbS9sd2Zpbmdlci9ydGw4NzIzYXVfYnQvYmxvYi9uZXcvcnRrX2J0dXNiLmMjTDE0NTAgKQ0K
-DQpJZiB0aGVzZSBwYXJ0aWN1bGFyIGRldmljZXMgYXJlIG5vdCBjb21tb24gdGhlbiBpbmRlZWQg
-bWF5YmUgd2UgY2FuIG5vdCB3b3JyeSBhYm91dCBzdXBwb3J0aW5nIHRoZW0gZm9yIG5vdy4NCg0K
-SG93ZXZlciwgeW91ciBuZXcgY29kZSBhbHNvIGRyb3BzIHVzYWdlIG9mIHRoZSBjb25maWcgZmly
-bXdhcmUgZmlsZXMgZS5nLiBydGw4NzIzYl9jb25maWcuDQpDYW4geW91IGV4cGxhaW4gd2hhdCB0
-aGVzZSBmaWxlcyBhcmUgZm9yLCBhbmQgaWYgdGhleSBhcmUgc2FmZSB0byBpZ25vcmUgbGlrZSB5
-b3VyIG5ldyBjb2RlIGRvZXM/DQoNCllvdXIgbmV3IGNvZGUgcmVmZXJlbmNlcyAyIGZpcm13YXJl
-IGZpbGVzIHRoYXQgd2UgZG9uJ3QgaGF2ZToNCnJ0bDg4MjFhX2Z3IGFuZCBydGw4NzYxYV9mdy4g
-UGxlYXNlIGNvdWxkIHlvdSBzZW5kIHRoZW0gb3ZlciwgYW5kIGNvbmZpcm0gdGhhdCB0aGV5IGFy
-ZSByZWRpc3RyaWJ1dGFibGU/DQoNClBsZWFzZSBhbHNvIGNvbmZpcm0gdGhhdCB3ZSBoYXZlIHRo
-ZSBsYXRlc3QgdmVyc2lvbnMgb2YgdGhlIG90aGVyIDIgZmlsZXM6DQoNCnJ0bDg3MjNhX2Z3OiAy
-NDM1NiBieXRlcw0KbWQ1c3VtIGI0YTMyOTIxMmFiMTUwYjg4YzNjNmZmNGM0MmM1MWQ2DQoNCnJ0
-bDg3MjNiX2Z3OiAzODk3NiBieXRlcw0KbWQ1c3VtIGViZjg5NGI3YjkxY2JlYmNlOGFlYjViYTYz
-YzIyOTE0DQoNClRoZXNlIGNhbiBiZSBmb3VuZCBhdCBodHRwczovL2dpdGh1Yi5jb20vbHdmaW5n
-ZXIvcnRsODcyM2F1X2J0L3RyZWUvbmV3DQoNClRoYW5rcw0KRGFuaWVsDQo=
+Hi,
+
+this patch series add a new branch "net/6lowpan" for generic 6LoWPAN code.
+
+Since commit 8df8c56a5abc70af5862aa7cac2875aeeb17a42b ("6lowpan: Moving
+generic compression code into 6lowpan_iphc.c") the IPHC compression is shared
+between bluetooth 6LoWPAN and IEEE 802.15.4 6LoWPAN. The new 6LoWPAN directory
+will contain generic code for 6LoWPAN and futhermore 6LoWPAN upper layer
+protocols.
+
+The shared code between bluetooth and 802.15.4 should be review from both
+communities. The current behaviour is that get_maintainers.pl returns the
+IEEE 802.15.4 community only.
+
+
+I request a new mailinglist for the IEEE 802.15.4 subsystem at vger but I didn't
+get a response now so I add the current sourceforge IEEE 802.15.4 mailinglist to
+the MAINTAINERS file. I will update them soon.
+
+- Alex
+
+Alexander Aring (2):
+  6lowpan: introduce new net/6lowpan directory
+  MAINTAINERS: add net/6lowpan/ maintainer entry
+
+ MAINTAINERS                                       | 7 +++++++
+ net/6lowpan/Kconfig                               | 6 ++++++
+ net/6lowpan/Makefile                              | 3 +++
+ net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} | 0
+ net/Kconfig                                       | 1 +
+ net/Makefile                                      | 3 ++-
+ net/bluetooth/Kconfig                             | 3 +--
+ net/ieee802154/Kconfig                            | 9 +--------
+ net/ieee802154/Makefile                           | 5 ++---
+ 9 files changed, 23 insertions(+), 14 deletions(-)
+ create mode 100644 net/6lowpan/Kconfig
+ create mode 100644 net/6lowpan/Makefile
+ rename net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} (100%)
+
+-- 
+2.0.1
