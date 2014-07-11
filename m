@@ -1,36 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 11 Jul 2014 13:54:13 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Move HCI socket definitions into its own
- header file
-Message-ID: <20140711105413.GA14378@t440s.P-661HNU-F1>
-References: <1405047509-46346-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405047509-46346-1-git-send-email-marcel@holtmann.org>
+Message-ID: <1405074304.9749.64.camel@jrissane-mobl.ger.corp.intel.com>
+Subject: Re: [PATCH net-next 0/2] Introduce generic 6LoWPAN branch
+From: Jukka Rissanen <jukka.rissanen@linux.intel.com>
+To: Alexander Aring <alex.aring@gmail.com>
+Cc: netdev@vger.kernel.org, marcel@holtmann.org,
+	linux-zigbee-devel@lists.sourceforge.net, linux-bluetooth@vger.kernel.org
+Date: Fri, 11 Jul 2014 13:25:04 +0300
+In-Reply-To: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
+References: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Alex,
 
-On Fri, Jul 11, 2014, Marcel Holtmann wrote:
-> All the HCI sockets and ioctl based definitions have been in a global
-> header file that also includes all the HCI protocol structures. To
-> make this a bit cleaner, move them into its own file.
+On pe, 2014-07-11 at 10:24 +0200, Alexander Aring wrote:
+> Hi,
 > 
-> This also adjusts fs/compat_ioctl.c to only include this new file
-> and not all the protocol structures that are not needed.
+> this patch series add a new branch "net/6lowpan" for generic 6LoWPAN code.
 > 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  fs/compat_ioctl.c                |   2 +-
->  include/net/bluetooth/hci.h      | 149 ---------------------------------
->  include/net/bluetooth/hci_core.h |   1 +
->  include/net/bluetooth/hci_sock.h | 175 +++++++++++++++++++++++++++++++++++++++
->  4 files changed, 177 insertions(+), 150 deletions(-)
->  create mode 100644 include/net/bluetooth/hci_sock.h
+> Since commit 8df8c56a5abc70af5862aa7cac2875aeeb17a42b ("6lowpan: Moving
+> generic compression code into 6lowpan_iphc.c") the IPHC compression is shared
+> between bluetooth 6LoWPAN and IEEE 802.15.4 6LoWPAN. The new 6LoWPAN directory
+> will contain generic code for 6LoWPAN and futhermore 6LoWPAN upper layer
+> protocols.
+> 
+> The shared code between bluetooth and 802.15.4 should be review from both
+> communities. The current behaviour is that get_maintainers.pl returns the
+> IEEE 802.15.4 community only.
+> 
+> 
+> I request a new mailinglist for the IEEE 802.15.4 subsystem at vger but I didn't
+> get a response now so I add the current sourceforge IEEE 802.15.4 mailinglist to
+> the MAINTAINERS file. I will update them soon.
 
-Applied to bluetooth-next. Thanks.
+This is great idea.
 
-Johan
+Acked-by: Jukka Rissanen <jukka.rissanen@linux.intel.com>
