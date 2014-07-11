@@ -1,19 +1,22 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v2] Bluetooth: Fix tracking local SSP authentication requirement
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405081943-28785-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 11 Jul 2014 15:24:01 +0200
+From: Szymon Janc <szymon.janc@tieto.com>
+To: johan.hedberg@gmail.com
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0C97449C-9B0B-4881-B212-C83E0148666E@holtmann.org>
+Subject: Re: [PATCH v2] Bluetooth: Fix tracking local SSP authentication requirement
+Date: Fri, 11 Jul 2014 15:20:41 +0200
+Message-ID: <2168442.sf02pQEdly@uw000953>
+In-Reply-To: <1405081943-28785-1-git-send-email-johan.hedberg@gmail.com>
 References: <1405081943-28785-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi,
 
+On Friday 11 of July 2014 15:32:23 johan.hedberg@gmail.com wrote:
+> From: Johan Hedberg <johan.hedberg@intel.com>
+> 
 > When we need to make the decision whether to perform just-works or real
 > user confirmation we need to know the exact local authentication
 > requirement that was passed to the controller. So far conn->auth_type
@@ -36,12 +39,57 @@ Hi Johan,
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> net/bluetooth/hci_event.c | 17 ++++++++---------
-> 1 file changed, 8 insertions(+), 9 deletions(-)
+>  net/bluetooth/hci_event.c | 17 ++++++++---------
+>  1 file changed, 8 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index f0f220057f21..8980bd24b8c0 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -3664,18 +3664,14 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>  
+>  		/* If we are initiators, there is no remote information yet */
+>  		if (conn->remote_auth == 0xff) {
+> -			cp.authentication = conn->auth_type;
+> -
+>  			/* Request MITM protection if our IO caps allow it
+>  			 * except for the no-bonding case.
+> -			 * conn->auth_type is not updated here since
+> -			 * that might cause the user confirmation to be
+> -			 * rejected in case the remote doesn't have the
+> -			 * IO capabilities for MITM.
+>  			 */
+>  			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
+>  			    cp.authentication != HCI_AT_NO_BONDING)
+> -				cp.authentication |= 0x01;
+> +				conn->auth_type |= 0x01;
+> +
+> +			cp.authentication = conn->auth_type;
+>  		} else {
+>  			conn->auth_type = hci_get_auth_req(conn);
+>  			cp.authentication = conn->auth_type;
+> @@ -3747,9 +3743,12 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+>  	rem_mitm = (conn->remote_auth & 0x01);
+>  
+>  	/* If we require MITM but the remote device can't provide that
+> -	 * (it has NoInputNoOutput) then reject the confirmation request
+> +	 * (it has NoInputNoOutput) then reject the confirmation
+> +	 * request. We check the security level here since it doesn't
+> +	 * necessarily match conn->auth_type.
+>  	 */
+> -	if (loc_mitm && conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
+> +	if (conn->pending_sec_level > BT_SECURITY_MEDIUM &&
+> +	    conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
+>  		BT_DBG("Rejecting request: remote device can't provide MITM");
+>  		hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
+>  			     sizeof(ev->bdaddr), &ev->bdaddr);
+> 
 
-patch has been applied to bluetooth-next tree.
+I've tested this on Android with CTS secure/insecure server scenarios and this
+seems to work OK. Also tested pairing with Nokia BH-505 headset.
 
-Regards
+Tested-by: Szymon Janc <szymon.janc@tieto.com>
 
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
