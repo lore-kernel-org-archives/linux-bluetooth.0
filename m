@@ -1,65 +1,62 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Move struct hci_pinfo into net/bluetooth/hci_sock.c
-Date: Fri, 11 Jul 2014 05:41:00 +0200
-Message-Id: <1405050060-43569-1-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Move struct hci_sec_filter next to its user
+Date: Fri, 11 Jul 2014 05:36:39 +0200
+Message-Id: <1405049800-40462-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-There exists no external user of struct hci_pinfo and hci_pi and thus
-move it into the one place that is actually using it.
+There is only single location using struct hci_sec_filter and with
+that there is no point in putting this declaration into a global
+header file. So move it right next to its user and make the code
+a lot more simpler.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 11 -----------
- net/bluetooth/hci_sock.c         | 11 +++++++++++
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ include/net/bluetooth/hci_core.h | 9 ---------
+ net/bluetooth/hci_sock.c         | 8 ++++++++
+ 2 files changed, 8 insertions(+), 9 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index e1930749fac7..fffd0da2e0fc 100644
+index 5c52a17d6326..e1930749fac7 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1349,17 +1349,6 @@ void mgmt_new_conn_param(struct hci_dev *hdev, bdaddr_t *bdaddr,
- void mgmt_reenable_advertising(struct hci_dev *hdev);
- void mgmt_smp_complete(struct hci_conn *conn, bool complete);
+@@ -1360,15 +1360,6 @@ struct hci_pinfo {
+ 	unsigned short   channel;
+ };
  
--/* HCI info for socket */
--#define hci_pi(sk) ((struct hci_pinfo *) sk)
+-/* HCI security filter */
+-#define HCI_SFLT_MAX_OGF  5
 -
--struct hci_pinfo {
--	struct bt_sock    bt;
--	struct hci_dev    *hdev;
--	struct hci_filter filter;
--	__u32             cmsg_mask;
--	unsigned short   channel;
+-struct hci_sec_filter {
+-	__u32 type_mask;
+-	__u32 event_mask[2];
+-	__u32 ocf_mask[HCI_SFLT_MAX_OGF + 1][4];
 -};
 -
  /* ----- HCI requests ----- */
  #define HCI_REQ_DONE	  0
  #define HCI_REQ_PEND	  1
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 0753fa4970c0..115f149362ba 100644
+index c64728d571ae..7805fd1b4a78 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
-@@ -35,6 +35,17 @@ static atomic_t monitor_promisc = ATOMIC_INIT(0);
+@@ -41,6 +41,14 @@ static inline int hci_test_bit(int nr, void *addr)
+ }
  
- /* ----- HCI socket interface ----- */
- 
-+/* Socket info */
-+#define hci_pi(sk) ((struct hci_pinfo *) sk)
+ /* Security filter */
++#define HCI_SFLT_MAX_OGF  5
 +
-+struct hci_pinfo {
-+	struct bt_sock    bt;
-+	struct hci_dev    *hdev;
-+	struct hci_filter filter;
-+	__u32             cmsg_mask;
-+	unsigned short    channel;
++struct hci_sec_filter {
++	__u32 type_mask;
++	__u32 event_mask[2];
++	__u32 ocf_mask[HCI_SFLT_MAX_OGF + 1][4];
 +};
 +
- static inline int hci_test_bit(int nr, void *addr)
- {
- 	return *((__u32 *) addr + (nr >> 5)) & ((__u32) 1 << (nr & 31));
+ static struct hci_sec_filter hci_sec_filter = {
+ 	/* Packet types */
+ 	0x10,
 -- 
 1.9.3
 
