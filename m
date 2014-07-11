@@ -1,131 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH net-next 1/2] 6lowpan: introduce new net/6lowpan directory
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add Realtek 8723/8761 support
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405067059-18782-2-git-send-email-alex.aring@gmail.com>
-Date: Fri, 11 Jul 2014 13:23:52 +0200
-Cc: netdev@vger.kernel.org, jukka.rissanen@linux.intel.com,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <8A1EF84C-3EDC-4540-B8F4-1FCBF4BF8D93@holtmann.org>
-References: <1405067059-18782-1-git-send-email-alex.aring@gmail.com> <1405067059-18782-2-git-send-email-alex.aring@gmail.com>
-To: Alexander Aring <alex.aring@gmail.com>
-Sender: netdev-owner@vger.kernel.org
+In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A45FC1F15@rsex2.realsil.com.cn>
+Date: Fri, 11 Jul 2014 13:19:37 +0200
+Cc: Daniel Drake <drake@endlessm.com>,
+	Larry Finger <Larry.Finger@lwfinger.net>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <9E14663D-314D-4C07-9C92-22DE693F5B2A@holtmann.org>
+References: <1404218878-14218-1-git-send-email-drake@endlessm.com> <16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org> <CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com> <53B2D160.4010306@lwfinger.net> <F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org> <54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn> <B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org> <54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn> <CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com> <54F70642BAB21D4498E1AA3EFE3D519A45FC1E92@rsex2.realsil.com.cn> <CAD8Lp44eaR3yMh6HUtwcMp1HRYBj-ec9+-FvSBJHyFh3WQstDg@mail.gmail.com> <54F70642BAB21D4498E1AA3EFE3D519A45FC1F15@rsex2.realsil.com.cn>
+To: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+Hi Champion,
 
-> This patch moves generic code which is used by bluetooth and ieee802154
-> 6lowpan to a new net/6lowpan directory. This directory contains generic
-> 6LoWPAN code which is shared between bluetooth and ieee802154 MAC-Layer.
-> 
-> This is the IPHC - "IPv6 Header Compression" format at the moment. Which
-> is described by RFC 6282 [0]. The BLTE 6LoWPAN draft describes that the
-> IPHC is the same format like IEEE 802.15.4, see [1].
-> 
-> Futuremore we can put more code into this directory which is shared
-> between BLTE and IEEE 802.15.4 6LoWPAN like RFC 6775 or the routing
-> protocol RPL RFC 6550.
-> 
-> To avoid naming conflicts I renamed 6lowpan-y to ieee802154_6lowpan-y
-> in net/ieee802154/Makefile.
-> 
-> [0] http://tools.ietf.org/html/rfc6282
-> [1] http://tools.ietf.org/html/draft-ietf-6lowpan-btle-12#section-3.2
-> [2] http://tools.ietf.org/html/rfc6775
-> [3] http://tools.ietf.org/html/rfc6550
-> 
-> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
-> ---
-> net/6lowpan/Kconfig                               | 6 ++++++
-> net/6lowpan/Makefile                              | 3 +++
-> net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} | 0
-> net/Kconfig                                       | 1 +
-> net/Makefile                                      | 3 ++-
-> net/bluetooth/Kconfig                             | 3 +--
-> net/ieee802154/Kconfig                            | 9 +--------
-> net/ieee802154/Makefile                           | 5 ++---
-> 8 files changed, 16 insertions(+), 14 deletions(-)
-> create mode 100644 net/6lowpan/Kconfig
-> create mode 100644 net/6lowpan/Makefile
-> rename net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} (100%)
-> 
-> diff --git a/net/6lowpan/Kconfig b/net/6lowpan/Kconfig
-> new file mode 100644
-> index 0000000..028a5c6
-> --- /dev/null
-> +++ b/net/6lowpan/Kconfig
-> @@ -0,0 +1,6 @@
-> +config 6LOWPAN
-> +	bool "6LoWPAN Support"
-> +	depends on IPV6
-> +	---help---
-> +	  This enables IPv6 over Low power Wireless Personal Area Network -
-> +	  "6LoWPAN" which is supported by IEEE 802.15.4 or Bluetooth stacks.
-> diff --git a/net/6lowpan/Makefile b/net/6lowpan/Makefile
-> new file mode 100644
-> index 0000000..415886b
-> --- /dev/null
-> +++ b/net/6lowpan/Makefile
-> @@ -0,0 +1,3 @@
-> +obj-$(CONFIG_6LOWPAN) := 6lowpan.o
-> +
-> +6lowpan-y := iphc.o
-> diff --git a/net/ieee802154/6lowpan_iphc.c b/net/6lowpan/iphc.c
-> similarity index 100%
-> rename from net/ieee802154/6lowpan_iphc.c
-> rename to net/6lowpan/iphc.c
-> diff --git a/net/Kconfig b/net/Kconfig
-> index d92afe4..4051fdf 100644
-> --- a/net/Kconfig
-> +++ b/net/Kconfig
-> @@ -214,6 +214,7 @@ source "drivers/net/appletalk/Kconfig"
-> source "net/x25/Kconfig"
-> source "net/lapb/Kconfig"
-> source "net/phonet/Kconfig"
-> +source "net/6lowpan/Kconfig"
-> source "net/ieee802154/Kconfig"
-> source "net/mac802154/Kconfig"
-> source "net/sched/Kconfig"
-> diff --git a/net/Makefile b/net/Makefile
-> index cbbbe6d..7ed1970 100644
-> --- a/net/Makefile
-> +++ b/net/Makefile
-> @@ -57,7 +57,8 @@ obj-$(CONFIG_CAIF)		+= caif/
-> ifneq ($(CONFIG_DCB),)
-> obj-y				+= dcb/
-> endif
-> -obj-y				+= ieee802154/
-> +obj-$(CONFIG_6LOWPAN)		+= 6lowpan/
-> +obj-$(CONFIG_IEEE802154)	+= ieee802154/
-> obj-$(CONFIG_MAC802154)		+= mac802154/
-> 
-> ifeq ($(CONFIG_NET),y)
-> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> index 06ec144..a54777d 100644
-> --- a/net/bluetooth/Kconfig
-> +++ b/net/bluetooth/Kconfig
-> @@ -6,7 +6,6 @@ menuconfig BT
-> 	tristate "Bluetooth subsystem support"
-> 	depends on NET && !S390
-> 	depends on RFKILL || !RFKILL
-> -	select 6LOWPAN_IPHC if BT_6LOWPAN
-> 	select CRC16
-> 	select CRYPTO
-> 	select CRYPTO_BLKCIPHER
-> @@ -42,7 +41,7 @@ menuconfig BT
-> 
-> config BT_6LOWPAN
-> 	bool "Bluetooth 6LoWPAN support"
-> -	depends on BT && IPV6
-> +	depends on BT && 6LOWPAN
-> 	help
-> 	  IPv6 compression over Bluetooth.
+> 	The setup function is provided in kernel v3.12 , before this version we do not have ways to add in btusb.c and we do not want to change the generic driver too much so we rewrite rtk_btusb.c. 
+> 	If the setup function is the way you preferred, we will develop based on generic driver. This seems make btusb.c more complex. We will provide you all the firmware after complete test . If you want to get them before test complete I will send later.
 
-this will conflict with our changes in wireless-next tree. We converted out 6LoWPAN support into a separate module.
+the hdev->setup function is the preferred way since I do not want to duplicate any HCI USB transport logic in any driver.
 
-Dave, can we take this through bluetooth-next and wireless-next trees?
+> 	Most modules can work properly without config file, but some customers may want a special way for example they want to use own bt MAC address rather than the one in modules. The config file provide a flex software way instead of rewrite effuse setting in modules. The config file here is an example and customers may change it if they need. This depend on customer , most notebook products may not need , but smart phone or tablet may use it. I think we cannot cover all the situations and just provide the most common settings.
+
+The case with using an OEM specific BD_ADDR is solved. You just need to add support for hdev->set_bdaddr driver callback and you can modify your Bluetooth public device address. We have a whole set of APIs that just deal with configuring this. The only requirement is that it uses HCI transport.
+
+We also fully integrate chips that have no valid BD_ADDR. Then you just set HCI_QUIRK_INVALID_BDADDR and the kernel keeps the device in unconfigured state until Set Public Address management command is used.
+
+I send details about this to the mailing list. This is tested with chips from Intel and Broadcom in all combinations and works nicely.
 
 Regards
 
