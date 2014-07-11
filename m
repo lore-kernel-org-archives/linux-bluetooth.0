@@ -1,60 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53BFB51F.5010608@gmail.com>
-Date: Fri, 11 Jul 2014 15:27:51 +0530
-From: Varka Bhadram <varkabhadram@gmail.com>
+From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
+To: Daniel Drake <drake@endlessm.com>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Larry Finger
+	<Larry.Finger@lwfinger.net>,
+        "Gustavo F. Padovan" <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>
+Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IOetlOWkjTogW1BBVENIIHYyXSBCbHVldG9vdGg6?==?utf-8?Q?_btusb:_Add_Realtek_8723/8761_support?=
+Date: Fri, 11 Jul 2014 09:58:09 +0000
+Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A45FC1F15@rsex2.realsil.com.cn>
+References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
+	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
+	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>
+	<53B2D160.4010306@lwfinger.net>
+	<F9E90F3A-5FE4-407C-833A-5E852A260984@holtmann.org>
+	<54F70642BAB21D4498E1AA3EFE3D519A45FBED07@rsex2.realsil.com.cn>
+	<B6A2794A-32D2-4D66-9D61-A27D7DA247B1@holtmann.org>
+	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn>
+	<CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com>
+	<54F70642BAB21D4498E1AA3EFE3D519A45FC1E92@rsex2.realsil.com.cn>
+ <CAD8Lp44eaR3yMh6HUtwcMp1HRYBj-ec9+-FvSBJHyFh3WQstDg@mail.gmail.com>
+In-Reply-To: <CAD8Lp44eaR3yMh6HUtwcMp1HRYBj-ec9+-FvSBJHyFh3WQstDg@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-To: Alexander Aring <alex.aring@gmail.com>, netdev@vger.kernel.org
-CC: linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
- linux-zigbee-devel@lists.sourceforge.net
-Subject: Re: [Linux-zigbee-devel] [PATCH net-next 0/2] Introduce generic 6LoWPAN
- branch
-References: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
-In-Reply-To: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On 07/11/2014 01:54 PM, Alexander Aring wrote:
-> Hi,
->
-> this patch series add a new branch "net/6lowpan" for generic 6LoWPAN code.
->
-> Since commit 8df8c56a5abc70af5862aa7cac2875aeeb17a42b ("6lowpan: Moving
-> generic compression code into 6lowpan_iphc.c") the IPHC compression is shared
-> between bluetooth 6LoWPAN and IEEE 802.15.4 6LoWPAN. The new 6LoWPAN directory
-> will contain generic code for 6LoWPAN and futhermore 6LoWPAN upper layer
-> protocols.
->
-> The shared code between bluetooth and 802.15.4 should be review from both
-> communities. The current behaviour is that get_maintainers.pl returns the
-> IEEE 802.15.4 community only.
->
->
-> I request a new mailinglist for the IEEE 802.15.4 subsystem at vger but I didn't
-> get a response now so I add the current sourceforge IEEE 802.15.4 mailinglist to
-> the MAINTAINERS file. I will update them soon.
->
-> - Alex
->
-> Alexander Aring (2):
->    6lowpan: introduce new net/6lowpan directory
->    MAINTAINERS: add net/6lowpan/ maintainer entry
->
->   MAINTAINERS                                       | 7 +++++++
->   net/6lowpan/Kconfig                               | 6 ++++++
->   net/6lowpan/Makefile                              | 3 +++
->   net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} | 0
->   net/Kconfig                                       | 1 +
->   net/Makefile                                      | 3 ++-
->   net/bluetooth/Kconfig                             | 3 +--
->   net/ieee802154/Kconfig                            | 9 +--------
->   net/ieee802154/Makefile                           | 5 ++---
->   9 files changed, 23 insertions(+), 14 deletions(-)
->   create mode 100644 net/6lowpan/Kconfig
->   create mode 100644 net/6lowpan/Makefile
->   rename net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} (100%)
->
-Tested-by: Varka Bhadram <varkab@cdac.in>
-
--- 
-Regards,
-Varka Bhadram.
+SGkgRGFuaWVsLA0KCVRoZSBzZXR1cCBmdW5jdGlvbiBpcyBwcm92aWRlZCBpbiBrZXJuZWwgdjMu
+MTIgLCBiZWZvcmUgdGhpcyB2ZXJzaW9uIHdlIGRvIG5vdCBoYXZlIHdheXMgdG8gYWRkIGluIGJ0
+dXNiLmMgYW5kIHdlIGRvIG5vdCB3YW50IHRvIGNoYW5nZSB0aGUgZ2VuZXJpYyBkcml2ZXIgdG9v
+IG11Y2ggc28gd2UgcmV3cml0ZSBydGtfYnR1c2IuYy4gDQoJSWYgdGhlIHNldHVwIGZ1bmN0aW9u
+IGlzIHRoZSB3YXkgeW91IHByZWZlcnJlZCwgd2Ugd2lsbCBkZXZlbG9wIGJhc2VkIG9uIGdlbmVy
+aWMgZHJpdmVyLiBUaGlzIHNlZW1zIG1ha2UgYnR1c2IuYyBtb3JlIGNvbXBsZXguIFdlIHdpbGwg
+cHJvdmlkZSB5b3UgYWxsIHRoZSBmaXJtd2FyZSBhZnRlciBjb21wbGV0ZSB0ZXN0IC4gSWYgeW91
+IHdhbnQgdG8gZ2V0IHRoZW0gYmVmb3JlIHRlc3QgY29tcGxldGUgSSB3aWxsIHNlbmQgbGF0ZXIu
+DQoJTW9zdCBtb2R1bGVzIGNhbiB3b3JrIHByb3Blcmx5IHdpdGhvdXQgY29uZmlnIGZpbGUsIGJ1
+dCBzb21lIGN1c3RvbWVycyBtYXkgd2FudCBhIHNwZWNpYWwgd2F5IGZvciBleGFtcGxlIHRoZXkg
+d2FudCB0byB1c2Ugb3duIGJ0IE1BQyBhZGRyZXNzIHJhdGhlciB0aGFuIHRoZSBvbmUgaW4gbW9k
+dWxlcy4gVGhlIGNvbmZpZyBmaWxlIHByb3ZpZGUgYSBmbGV4IHNvZnR3YXJlIHdheSBpbnN0ZWFk
+IG9mIHJld3JpdGUgZWZmdXNlIHNldHRpbmcgaW4gbW9kdWxlcy4gVGhlIGNvbmZpZyBmaWxlIGhl
+cmUgaXMgYW4gZXhhbXBsZSBhbmQgY3VzdG9tZXJzIG1heSBjaGFuZ2UgaXQgaWYgdGhleSBuZWVk
+LiBUaGlzIGRlcGVuZCBvbiBjdXN0b21lciAsIG1vc3Qgbm90ZWJvb2sgcHJvZHVjdHMgbWF5IG5v
+dCBuZWVkICwgYnV0IHNtYXJ0IHBob25lIG9yIHRhYmxldCBtYXkgdXNlIGl0LiBJIHRoaW5rIHdl
+IGNhbm5vdCBjb3ZlciBhbGwgdGhlIHNpdHVhdGlvbnMgYW5kIGp1c3QgcHJvdmlkZSB0aGUgbW9z
+dCBjb21tb24gc2V0dGluZ3MuDQoNCg0KQ2hhbXBpb24NCkV4dDo2MzI1DQoNCg0KLS0tLS3pgq7k
+u7bljp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6OiBEYW5pZWwgRHJha2UgW21haWx0bzpkcmFrZUBlbmRs
+ZXNzbS5jb21dIA0K5Y+R6YCB5pe26Ze0OiAyMDE05bm0N+aciDEx5pelIDE3OjEyDQrmlLbku7bk
+uro6IOmZiOiJs+iQjQ0K5oqE6YCBOiBNYXJjZWwgSG9sdG1hbm47IExhcnJ5IEZpbmdlcjsgR3Vz
+dGF2byBGLiBQYWRvdmFuOyBKb2hhbiBIZWRiZXJnOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBs
+aXN0DQrkuLvpopg6IFJlOiDnrZTlpI06IOetlOWkjTogW1BBVENIIHYyXSBCbHVldG9vdGg6IGJ0
+dXNiOiBBZGQgUmVhbHRlayA4NzIzLzg3NjEgc3VwcG9ydA0KDQpIaSBDaGFtcGlvbiwNCg0KVGhh
+bmtzIGZvciB0aGUgcmVzcG9uc2UgLSB0aGUgc2l0dWF0aW9uIGlzIGJlY29taW5nIGNsZWFyZXIu
+DQoNCk9uIEZyaSwgSnVsIDExLCAyMDE0IGF0IDk6NDQgQU0sIOmZiOiJs+iQjSA8Y2hhbXBpb25f
+Y2hlbkByZWFsc2lsLmNvbS5jbj4gd3JvdGU6DQo+IEhpIERhbmllbCwNCj4gICAgICAgICBUaGUg
+ODc2MSBtb2R1bGUgdXNlZCB3aXRoIGRpZmZlcmVudCB3aWZpIGNoaXAgY2FuIG9ubHkgYmUgZGlz
+dGluZ3Vpc2hlZCBieSBwaWQsIGFuZCBkbyBub3Qgc3VwcG9ydCB2ZW5kb3IgY29tbWFuZCB0byBn
+ZXQgaW5mb3JtYXRpb24gZnJvbSByb20gY29kZS4NCj4gVGhlIHNldHVwIGZ1bmN0aW9uIG9ubHkg
+aGFzIGhjaV9kZXYgcGFyYW1ldGVyIC4NCj4gd2UgY2FuIGFkZCBkcml2ZXJfaW5mbyBhbmQgc2V0
+IGRpZmZlcmVudCBzZXR1cCBmdW5jaXRvbnMuIFdpbGwgdGhpcyBiZSBhY2NlcHRhYmxlIG9yIGRv
+IHlvdSBoYXZlIG90aGVyIHN1Z2dlc3Rpb25zPw0KDQpJIHdpbGwgaGF2ZSB0byBkaXNjdXNzIHRo
+aXMgd2l0aCBNYXJjZWwuIEhlIHdhcyBub3Qgc28ga2VlbiBvbiB0aGlzIGFwcHJvYWNoLCBidXQg
+Z2l2ZW4gdGhhdCB5b3UgaGF2ZSBub3cgY2xhcmlmaWVkIGV4YWN0bHkgd2hhdCB0aGUgc2l0dWF0
+aW9uIGlzICh0aGFua3MhKSwgd2Ugd2lsbCBoYXZlIHRvIHJldmlzaXQuDQoNCkhvd2V2ZXIsIHdo
+YXQgaXMgY2xlYXIgaXMgdGhhdCB3ZSB3aWxsIG5vdCBhZGQgc3VwcG9ydCBmb3IgYW55IGhhcmR3
+YXJlIHdoZXJlIHdlIGRvIG5vdCBhbHNvIHN1Ym1pdCB0aGUgZmlybXdhcmUgdG8gdGhlIGxpbnV4
+LWZpcm13YXJlIGdpdCByZXBvc2l0b3J5LiBBdCB0aGUgbW9tZW50IHdlIG9ubHkgaGF2ZSBydGw4
+NzIzYSBhbmQgODcyM2IgZmlybXdhcmUgYW5kIGNvbmZpZ3M6DQoNCnJ0bDg3MjNhX2Z3OiAyNDM1
+NiBieXRlcw0KbWQ1c3VtIGI0YTMyOTIxMmFiMTUwYjg4YzNjNmZmNGM0MmM1MWQ2DQoNCnJ0bDg3
+MjNiX2Z3OiAzODk3NiBieXRlcw0KbWQ1c3VtIGViZjg5NGI3YjkxY2JlYmNlOGFlYjViYTYzYzIy
+OTE0DQoNClRoZXNlIGNhbiBiZSBmb3VuZCBhdCBodHRwczovL2dpdGh1Yi5jb20vbHdmaW5nZXIv
+cnRsODcyM2F1X2J0L3RyZWUvbmV3DQoNCldlIGFyZSBtaXNzaW5nIGFsbCBvZiB0aGUgZm9sbG93
+aW5nOg0KcnRsODgyMWFfZncNCnJ0bDg3NjFhX2Z3DQpydGw4NzYxYXVfZncNCnJ0bDg3NjFhdzgx
+OTJldV9mdw0KcnRsODc2MWF1ODE5MmVlX2Z3DQpydGw4NzYxYXU4ODEyYWVfZncNCnJ0bDg3NjFh
+X2NvbmZpZw0KcnRsODgyMWFfY29uZmlnDQoNClBsZWFzZSBjb3VsZCB5b3Ugc2VuZCB0aGVtIG92
+ZXIsIGFuZCBjb25maXJtIHRoYXQgYWxsIGFyZSByZWRpc3RyaWJ1dGFibGU/DQoNCkFib3V0IHRo
+ZSBjb25maWcgZmlsZXMsIEkgYW0gc3RpbGwgbm90IHJlYWxseSBjbGVhciBpZiB0aGV5IGFyZSBu
+ZWNlc3NhcnkuIFlvdSBzYXkgdGhlIGhhcmR3YXJlIHdpbGwgdXNlIGRlZmF1bHQgc2V0dGluZ3Mg
+aWYgdGhleSBhcmUgbm90IHByb3ZpZGVkLiBNeSBSVEw4NzIzQiBkb2VzIHdvcmsgZmluZSB3aXRo
+b3V0IHRoZSBjb25maWcuIFdoYXQgaXMgdGhlIGFkdmFudGFnZSBvZiB1cGxvYWRpbmcgdGhlc2Ug
+Y29uZmlnIGZpbGVzIHRoZW4sIGhhdmUgeW91IGNoYW5nZWQvaW1wcm92ZSB0aGUgc2V0dGluZ3Mg
+c2luY2UgcHJvZHVjdGlvbj8NCg0KVGhhbmtzDQpEYW5pZWwNCg==
