@@ -1,16 +1,6 @@
 Return-Path: <cyrus@holtmann.org>
-From: =?utf-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
-To: Daniel Drake <drake@endlessm.com>
-CC: Marcel Holtmann <marcel@holtmann.org>,
-        Larry Finger
-	<Larry.Finger@lwfinger.net>,
-        "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>
-Subject: =?utf-8?B?562U5aSNOiDnrZTlpI06IOetlOWkjTogW1BBVENIIHYyXSBCbHVldG9vdGg6?==?utf-8?Q?_btusb:_Add_Realtek_8723/8761_support?=
-Date: Fri, 11 Jul 2014 09:58:09 +0000
-Message-ID: <54F70642BAB21D4498E1AA3EFE3D519A45FC1F15@rsex2.realsil.com.cn>
+MIME-Version: 1.0
+In-Reply-To: <54F70642BAB21D4498E1AA3EFE3D519A45FC1E92@rsex2.realsil.com.cn>
 References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
 	<16AC594D-6B3C-4CB6-B951-0763F3E4E27A@holtmann.org>
 	<CAD8Lp45HbA03MycDVu6akTfEET_ZzxrwGpH1TbiQrw5Z178aeA@mail.gmail.com>
@@ -21,63 +11,66 @@ References: <1404218878-14218-1-git-send-email-drake@endlessm.com>
 	<54F70642BAB21D4498E1AA3EFE3D519A45FBF299@rsex2.realsil.com.cn>
 	<CAD8Lp44-=9RNWf2tfmCL14dWJRiZhGCtj042TprR7Q3m9hbNzA@mail.gmail.com>
 	<54F70642BAB21D4498E1AA3EFE3D519A45FC1E92@rsex2.realsil.com.cn>
- <CAD8Lp44eaR3yMh6HUtwcMp1HRYBj-ec9+-FvSBJHyFh3WQstDg@mail.gmail.com>
-In-Reply-To: <CAD8Lp44eaR3yMh6HUtwcMp1HRYBj-ec9+-FvSBJHyFh3WQstDg@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
+Date: Fri, 11 Jul 2014 10:11:35 +0100
+Message-ID: <CAD8Lp44eaR3yMh6HUtwcMp1HRYBj-ec9+-FvSBJHyFh3WQstDg@mail.gmail.com>
+Subject: =?UTF-8?B?UmU6IOetlOWkjTog562U5aSNOiBbUEFUQ0ggdjJdIEJsdWV0b290aDogYnR1c2I6IEFkZA==?=
+	=?UTF-8?B?IFJlYWx0ZWsgODcyMy84NzYxIHN1cHBvcnQ=?=
+From: Daniel Drake <drake@endlessm.com>
+To: =?UTF-8?B?6ZmI6Imz6JCN?= <champion_chen@realsil.com.cn>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Larry Finger <Larry.Finger@lwfinger.net>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-SGkgRGFuaWVsLA0KCVRoZSBzZXR1cCBmdW5jdGlvbiBpcyBwcm92aWRlZCBpbiBrZXJuZWwgdjMu
-MTIgLCBiZWZvcmUgdGhpcyB2ZXJzaW9uIHdlIGRvIG5vdCBoYXZlIHdheXMgdG8gYWRkIGluIGJ0
-dXNiLmMgYW5kIHdlIGRvIG5vdCB3YW50IHRvIGNoYW5nZSB0aGUgZ2VuZXJpYyBkcml2ZXIgdG9v
-IG11Y2ggc28gd2UgcmV3cml0ZSBydGtfYnR1c2IuYy4gDQoJSWYgdGhlIHNldHVwIGZ1bmN0aW9u
-IGlzIHRoZSB3YXkgeW91IHByZWZlcnJlZCwgd2Ugd2lsbCBkZXZlbG9wIGJhc2VkIG9uIGdlbmVy
-aWMgZHJpdmVyLiBUaGlzIHNlZW1zIG1ha2UgYnR1c2IuYyBtb3JlIGNvbXBsZXguIFdlIHdpbGwg
-cHJvdmlkZSB5b3UgYWxsIHRoZSBmaXJtd2FyZSBhZnRlciBjb21wbGV0ZSB0ZXN0IC4gSWYgeW91
-IHdhbnQgdG8gZ2V0IHRoZW0gYmVmb3JlIHRlc3QgY29tcGxldGUgSSB3aWxsIHNlbmQgbGF0ZXIu
-DQoJTW9zdCBtb2R1bGVzIGNhbiB3b3JrIHByb3Blcmx5IHdpdGhvdXQgY29uZmlnIGZpbGUsIGJ1
-dCBzb21lIGN1c3RvbWVycyBtYXkgd2FudCBhIHNwZWNpYWwgd2F5IGZvciBleGFtcGxlIHRoZXkg
-d2FudCB0byB1c2Ugb3duIGJ0IE1BQyBhZGRyZXNzIHJhdGhlciB0aGFuIHRoZSBvbmUgaW4gbW9k
-dWxlcy4gVGhlIGNvbmZpZyBmaWxlIHByb3ZpZGUgYSBmbGV4IHNvZnR3YXJlIHdheSBpbnN0ZWFk
-IG9mIHJld3JpdGUgZWZmdXNlIHNldHRpbmcgaW4gbW9kdWxlcy4gVGhlIGNvbmZpZyBmaWxlIGhl
-cmUgaXMgYW4gZXhhbXBsZSBhbmQgY3VzdG9tZXJzIG1heSBjaGFuZ2UgaXQgaWYgdGhleSBuZWVk
-LiBUaGlzIGRlcGVuZCBvbiBjdXN0b21lciAsIG1vc3Qgbm90ZWJvb2sgcHJvZHVjdHMgbWF5IG5v
-dCBuZWVkICwgYnV0IHNtYXJ0IHBob25lIG9yIHRhYmxldCBtYXkgdXNlIGl0LiBJIHRoaW5rIHdl
-IGNhbm5vdCBjb3ZlciBhbGwgdGhlIHNpdHVhdGlvbnMgYW5kIGp1c3QgcHJvdmlkZSB0aGUgbW9z
-dCBjb21tb24gc2V0dGluZ3MuDQoNCg0KQ2hhbXBpb24NCkV4dDo2MzI1DQoNCg0KLS0tLS3pgq7k
-u7bljp/ku7YtLS0tLQ0K5Y+R5Lu25Lq6OiBEYW5pZWwgRHJha2UgW21haWx0bzpkcmFrZUBlbmRs
-ZXNzbS5jb21dIA0K5Y+R6YCB5pe26Ze0OiAyMDE05bm0N+aciDEx5pelIDE3OjEyDQrmlLbku7bk
-uro6IOmZiOiJs+iQjQ0K5oqE6YCBOiBNYXJjZWwgSG9sdG1hbm47IExhcnJ5IEZpbmdlcjsgR3Vz
-dGF2byBGLiBQYWRvdmFuOyBKb2hhbiBIZWRiZXJnOyBMaW51eCBCbHVldG9vdGggbWFpbGluZyBs
-aXN0DQrkuLvpopg6IFJlOiDnrZTlpI06IOetlOWkjTogW1BBVENIIHYyXSBCbHVldG9vdGg6IGJ0
-dXNiOiBBZGQgUmVhbHRlayA4NzIzLzg3NjEgc3VwcG9ydA0KDQpIaSBDaGFtcGlvbiwNCg0KVGhh
-bmtzIGZvciB0aGUgcmVzcG9uc2UgLSB0aGUgc2l0dWF0aW9uIGlzIGJlY29taW5nIGNsZWFyZXIu
-DQoNCk9uIEZyaSwgSnVsIDExLCAyMDE0IGF0IDk6NDQgQU0sIOmZiOiJs+iQjSA8Y2hhbXBpb25f
-Y2hlbkByZWFsc2lsLmNvbS5jbj4gd3JvdGU6DQo+IEhpIERhbmllbCwNCj4gICAgICAgICBUaGUg
-ODc2MSBtb2R1bGUgdXNlZCB3aXRoIGRpZmZlcmVudCB3aWZpIGNoaXAgY2FuIG9ubHkgYmUgZGlz
-dGluZ3Vpc2hlZCBieSBwaWQsIGFuZCBkbyBub3Qgc3VwcG9ydCB2ZW5kb3IgY29tbWFuZCB0byBn
-ZXQgaW5mb3JtYXRpb24gZnJvbSByb20gY29kZS4NCj4gVGhlIHNldHVwIGZ1bmN0aW9uIG9ubHkg
-aGFzIGhjaV9kZXYgcGFyYW1ldGVyIC4NCj4gd2UgY2FuIGFkZCBkcml2ZXJfaW5mbyBhbmQgc2V0
-IGRpZmZlcmVudCBzZXR1cCBmdW5jaXRvbnMuIFdpbGwgdGhpcyBiZSBhY2NlcHRhYmxlIG9yIGRv
-IHlvdSBoYXZlIG90aGVyIHN1Z2dlc3Rpb25zPw0KDQpJIHdpbGwgaGF2ZSB0byBkaXNjdXNzIHRo
-aXMgd2l0aCBNYXJjZWwuIEhlIHdhcyBub3Qgc28ga2VlbiBvbiB0aGlzIGFwcHJvYWNoLCBidXQg
-Z2l2ZW4gdGhhdCB5b3UgaGF2ZSBub3cgY2xhcmlmaWVkIGV4YWN0bHkgd2hhdCB0aGUgc2l0dWF0
-aW9uIGlzICh0aGFua3MhKSwgd2Ugd2lsbCBoYXZlIHRvIHJldmlzaXQuDQoNCkhvd2V2ZXIsIHdo
-YXQgaXMgY2xlYXIgaXMgdGhhdCB3ZSB3aWxsIG5vdCBhZGQgc3VwcG9ydCBmb3IgYW55IGhhcmR3
-YXJlIHdoZXJlIHdlIGRvIG5vdCBhbHNvIHN1Ym1pdCB0aGUgZmlybXdhcmUgdG8gdGhlIGxpbnV4
-LWZpcm13YXJlIGdpdCByZXBvc2l0b3J5LiBBdCB0aGUgbW9tZW50IHdlIG9ubHkgaGF2ZSBydGw4
-NzIzYSBhbmQgODcyM2IgZmlybXdhcmUgYW5kIGNvbmZpZ3M6DQoNCnJ0bDg3MjNhX2Z3OiAyNDM1
-NiBieXRlcw0KbWQ1c3VtIGI0YTMyOTIxMmFiMTUwYjg4YzNjNmZmNGM0MmM1MWQ2DQoNCnJ0bDg3
-MjNiX2Z3OiAzODk3NiBieXRlcw0KbWQ1c3VtIGViZjg5NGI3YjkxY2JlYmNlOGFlYjViYTYzYzIy
-OTE0DQoNClRoZXNlIGNhbiBiZSBmb3VuZCBhdCBodHRwczovL2dpdGh1Yi5jb20vbHdmaW5nZXIv
-cnRsODcyM2F1X2J0L3RyZWUvbmV3DQoNCldlIGFyZSBtaXNzaW5nIGFsbCBvZiB0aGUgZm9sbG93
-aW5nOg0KcnRsODgyMWFfZncNCnJ0bDg3NjFhX2Z3DQpydGw4NzYxYXVfZncNCnJ0bDg3NjFhdzgx
-OTJldV9mdw0KcnRsODc2MWF1ODE5MmVlX2Z3DQpydGw4NzYxYXU4ODEyYWVfZncNCnJ0bDg3NjFh
-X2NvbmZpZw0KcnRsODgyMWFfY29uZmlnDQoNClBsZWFzZSBjb3VsZCB5b3Ugc2VuZCB0aGVtIG92
-ZXIsIGFuZCBjb25maXJtIHRoYXQgYWxsIGFyZSByZWRpc3RyaWJ1dGFibGU/DQoNCkFib3V0IHRo
-ZSBjb25maWcgZmlsZXMsIEkgYW0gc3RpbGwgbm90IHJlYWxseSBjbGVhciBpZiB0aGV5IGFyZSBu
-ZWNlc3NhcnkuIFlvdSBzYXkgdGhlIGhhcmR3YXJlIHdpbGwgdXNlIGRlZmF1bHQgc2V0dGluZ3Mg
-aWYgdGhleSBhcmUgbm90IHByb3ZpZGVkLiBNeSBSVEw4NzIzQiBkb2VzIHdvcmsgZmluZSB3aXRo
-b3V0IHRoZSBjb25maWcuIFdoYXQgaXMgdGhlIGFkdmFudGFnZSBvZiB1cGxvYWRpbmcgdGhlc2Ug
-Y29uZmlnIGZpbGVzIHRoZW4sIGhhdmUgeW91IGNoYW5nZWQvaW1wcm92ZSB0aGUgc2V0dGluZ3Mg
-c2luY2UgcHJvZHVjdGlvbj8NCg0KVGhhbmtzDQpEYW5pZWwNCg==
+Hi Champion,
+
+Thanks for the response - the situation is becoming clearer.
+
+On Fri, Jul 11, 2014 at 9:44 AM, =E9=99=88=E8=89=B3=E8=90=8D <champion_chen=
+@realsil.com.cn> wrote:
+> Hi Daniel,
+>         The 8761 module used with different wifi chip can only be disting=
+uished by pid, and do not support vendor command to get information from ro=
+m code.
+> The setup function only has hci_dev parameter .
+> we can add driver_info and set different setup funcitons. Will this be ac=
+ceptable or do you have other suggestions?
+
+I will have to discuss this with Marcel. He was not so keen on this
+approach, but given that you have now clarified exactly what the
+situation is (thanks!), we will have to revisit.
+
+However, what is clear is that we will not add support for any
+hardware where we do not also submit the firmware to the
+linux-firmware git repository. At the moment we only have rtl8723a and
+8723b firmware and configs:
+
+rtl8723a_fw: 24356 bytes
+md5sum b4a329212ab150b88c3c6ff4c42c51d6
+
+rtl8723b_fw: 38976 bytes
+md5sum ebf894b7b91cbebce8aeb5ba63c22914
+
+These can be found at https://github.com/lwfinger/rtl8723au_bt/tree/new
+
+We are missing all of the following:
+rtl8821a_fw
+rtl8761a_fw
+rtl8761au_fw
+rtl8761aw8192eu_fw
+rtl8761au8192ee_fw
+rtl8761au8812ae_fw
+rtl8761a_config
+rtl8821a_config
+
+Please could you send them over, and confirm that all are redistributable?
+
+About the config files, I am still not really clear if they are
+necessary. You say the hardware will use default settings if they are
+not provided. My RTL8723B does work fine without the config. What is
+the advantage of uploading these config files then, have you
+changed/improve the settings since production?
+
+Thanks
+Daniel
