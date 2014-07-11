@@ -1,58 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Add support for external configuration with UART driver
-Date: Fri, 11 Jul 2014 07:12:58 +0200
-Message-Id: <1405055578-30621-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 4/4] Bluetooth: Move SCO timeout constants into net/bluetooth/sco.c
+Date: Fri, 11 Jul 2014 06:19:44 +0200
+Message-Id: <1405052384-5981-4-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The quirk for enabling external configuration with UART needs to be
-provided via the HCI UART flags. Add a new flag for it and declare
-it as valid.
+There is no external user of the SCO timeout constants and thus
+move them into net/bluetooth/sco.c where they are actuallu used.
+
+In addition just remove SCO_CONN_IDLE_TIMEOUT since it is unused.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- drivers/bluetooth/hci_ldisc.c | 6 +++++-
- drivers/bluetooth/hci_uart.h  | 1 +
- 2 files changed, 6 insertions(+), 1 deletion(-)
+ include/net/bluetooth/sco.h | 4 ----
+ net/bluetooth/sco.c         | 3 +++
+ 2 files changed, 3 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index a49ee1b42439..401a3be57cda 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -431,6 +431,9 @@ static int hci_uart_register_dev(struct hci_uart *hu)
- 	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+diff --git a/include/net/bluetooth/sco.h b/include/net/bluetooth/sco.h
+index ab8b1ed550d2..f40ddb4264fc 100644
+--- a/include/net/bluetooth/sco.h
++++ b/include/net/bluetooth/sco.h
+@@ -28,10 +28,6 @@
+ /* SCO defaults */
+ #define SCO_DEFAULT_MTU		500
  
-+	if (test_bit(HCI_UART_EXT_CONFIG, &hu->hdev_flags))
-+		set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
+-#define SCO_CONN_TIMEOUT	(HZ * 40)
+-#define SCO_DISCONN_TIMEOUT	(HZ * 2)
+-#define SCO_CONN_IDLE_TIMEOUT	(HZ * 60)
+-
+ /* SCO socket address */
+ struct sockaddr_sco {
+ 	sa_family_t	sco_family;
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 9868ec7c7dc4..e6c7b636b901 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -72,6 +72,9 @@ struct sco_pinfo {
+ };
+ 
+ /* ---- SCO timers ---- */
++#define SCO_CONN_TIMEOUT	(HZ * 40)
++#define SCO_DISCONN_TIMEOUT	(HZ * 2)
 +
- 	if (!test_bit(HCI_UART_RESET_ON_INIT, &hu->hdev_flags))
- 		set_bit(HCI_QUIRK_RESET_ON_CLOSE, &hdev->quirks);
- 
-@@ -482,7 +485,8 @@ static int hci_uart_set_flags(struct hci_uart *hu, unsigned long flags)
- 	unsigned long valid_flags = BIT(HCI_UART_RAW_DEVICE) |
- 				    BIT(HCI_UART_RESET_ON_INIT) |
- 				    BIT(HCI_UART_CREATE_AMP) |
--				    BIT(HCI_UART_INIT_PENDING);
-+				    BIT(HCI_UART_INIT_PENDING) |
-+				    BIT(HCI_UART_EXT_CONFIG);
- 
- 	if ((flags & ~valid_flags))
- 		return -EINVAL;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 12df101ca942..247488edcbf9 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -48,6 +48,7 @@
- #define HCI_UART_RESET_ON_INIT	1
- #define HCI_UART_CREATE_AMP	2
- #define HCI_UART_INIT_PENDING	3
-+#define HCI_UART_EXT_CONFIG	4
- 
- struct hci_uart;
- 
+ static void sco_sock_timeout(unsigned long arg)
+ {
+ 	struct sock *sk = (struct sock *) arg;
 -- 
 1.9.3
 
