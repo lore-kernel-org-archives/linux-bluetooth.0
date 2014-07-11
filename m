@@ -1,95 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sat, 12 Jul 2014 00:54:04 +0200
-From: Alexander Aring <alex.aring@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: Network Development <netdev@vger.kernel.org>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH net-next 1/2] 6lowpan: introduce new net/6lowpan directory
-Message-ID: <20140711225340.GA7561@omega>
-References: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
- <1405067059-18782-2-git-send-email-alex.aring@gmail.com>
- <8A1EF84C-3EDC-4540-B8F4-1FCBF4BF8D93@holtmann.org>
- <20140711113507.GA24370@omega>
- <E54EDE3F-99A2-49C0-842B-D15E8B7826D2@holtmann.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-In-Reply-To: <E54EDE3F-99A2-49C0-842B-D15E8B7826D2@holtmann.org>
+In-Reply-To: <CA+eFSM3LusFHD0+UT_NRX_Zepw-Tuc+sJ1M3f6Aujrzqf4-_MA@mail.gmail.com>
+References: <CA+eFSM3LusFHD0+UT_NRX_Zepw-Tuc+sJ1M3f6Aujrzqf4-_MA@mail.gmail.com>
+Date: Sat, 12 Jul 2014 06:51:16 +0800
+Message-ID: <CA+eFSM10Fu8hKgJXOz1dqzcazdWq_GSmBF-PbWK7Aq3J4wKeug@mail.gmail.com>
+Subject: Re: Bluetooth device AR3012 [0cf3:e005] sometimes can't work on XHCI
+ host controller
+From: Gavin Guo <gavin.guo@canonical.com>
+To: linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+	"Nyman, Mathias" <mathias.nyman@intel.com>,
+	dan.j.williams@intel.com
+Cc: Sarah Sharp <sarah.a.sharp@linux.intel.com>,
+	Anthony Wong <anthony.wong@canonical.com>,
+	YK <yk@canonical.com>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi all,
 
-On Fri, Jul 11, 2014 at 02:33:03PM +0200, Marcel Holtmann wrote:
-> Hi Alexander,
-> 
-> >>> index cbbbe6d..7ed1970 100644
-> >>> --- a/net/Makefile
-> >>> +++ b/net/Makefile
-> >>> @@ -57,7 +57,8 @@ obj-$(CONFIG_CAIF)		+= caif/
-> >>> ifneq ($(CONFIG_DCB),)
-> >>> obj-y				+= dcb/
-> >>> endif
-> >>> -obj-y				+= ieee802154/
-> >>> +obj-$(CONFIG_6LOWPAN)		+= 6lowpan/
-> >>> +obj-$(CONFIG_IEEE802154)	+= ieee802154/
-> >>> obj-$(CONFIG_MAC802154)		+= mac802154/
-> >>> 
-> >>> ifeq ($(CONFIG_NET),y)
-> >>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-> >>> index 06ec144..a54777d 100644
-> >>> --- a/net/bluetooth/Kconfig
-> >>> +++ b/net/bluetooth/Kconfig
-> >>> @@ -6,7 +6,6 @@ menuconfig BT
-> >>> 	tristate "Bluetooth subsystem support"
-> >>> 	depends on NET && !S390
-> >>> 	depends on RFKILL || !RFKILL
-> >>> -	select 6LOWPAN_IPHC if BT_6LOWPAN
-> >>> 	select CRC16
-> >>> 	select CRYPTO
-> >>> 	select CRYPTO_BLKCIPHER
-> >>> @@ -42,7 +41,7 @@ menuconfig BT
-> >>> 
-> >>> config BT_6LOWPAN
-> >>> 	bool "Bluetooth 6LoWPAN support"
-> >>> -	depends on BT && IPV6
-> >>> +	depends on BT && 6LOWPAN
-> >>> 	help
-> >>> 	  IPv6 compression over Bluetooth.
-> >> 
-> >> this will conflict with our changes in wireless-next tree. We converted out 6LoWPAN support into a separate module.
-> >> 
-> > 
-> > oops, sorry I didn't check on this. I simple based it on net-next,
-> > because the patch series adds a new branch.
-> > 
-> > 
-> > 
-> > btw. we need to talk about who branch will commit changes to iphc code
-> > to avoid conflicts.
-> 
-> a few years back we decided to merge bluetooth-next via John's wireless-next tree so that any interaction with 802.11 and Bluetooth can be sorted out in John's tree. We are now also merging NFC into the wireless-next tree.
-> 
-> So it might be a good idea to include the 6LoWPAN parts into the wireless-next tree as well. If there are conflicts with 802.15.4, maybe that should also go through his trees.
-> 
+On Mon, Jun 30, 2014 at 10:38 AM, Gavin Guo <gavin.guo@canonical.com> wrote:
+> Hi all,
+>
+> Recently, I found that the AR3012 bluetooth sometimes can't work with the
+> 00:14.0 USB controller [0c03]: Intel Corporation Lynx Point USB xHCI
+> Host Controller [8086:8c31] (rev 05).
+>
+> The dmesg is attached, and following is how I tested:
+>
+> The port which AR3012 uses on the platform is default routed to XHCI
+> controller. So, when booting up the machine, I found those messages in
+> dmesg:
+>
+> [   18.128566] Bluetooth: Error in firmware loading err = -110,len =
+> 448, size = 4096
+> [   18.128574] Bluetooth: Loading patch file failed
+> [   18.128583] ath3k: probe of 3-6:1.0 failed with error -110
+>
+> Obviously, there is firmware loading error with the XHCI host
+> controller, and there are also XHCI debugging messages showing before
+> these ones. Because we found that the AR3012 works fine with EHCI host
+> controller, so we wrote a module, xhci_quirk, to change the port to
+> bind to EHCI host controller, which changes the USB_INTEL_XUSB2PR
+> register. After insmoding the xhci_quirk module, we see the following
+> lines:
+>
+> [  199.248468] xhci_quirk: module verification failed: signature
+> and/or  required key missing - tainting kernel
+> [  199.255687] old = 0x3fff, new = 0x3cdf
+> [  199.255689] Planted return probe at usb_enable_intel_xhci_ports:
+> ffffffff815950c0
+>
+> After that the port disconnected from the XHCI host controller, and
+> then the AR3012 is attached to the EHCI host controller:
+>
+> [  199.936571] usb 1-1.2: new full-speed USB device number 4 using ehci-pci
+> [  215.026596] usb 1-1.2: device descriptor read/64, error -110
+> [  230.220811] usb 1-1.2: device descriptor read/64, error -110
+> [  230.396975] usb 1-1.2: new full-speed USB device number 5 using ehci-pci
+> [  235.495101] usb 1-1.2: unable to read config index 0 descriptor/all
+> [  235.495105] usb 1-1.2: can't read configurations, error -110
+> [  235.571216] usb 1-1.2: new full-speed USB device number 6 using ehci-pci
+> [  235.592617] usb 1-1.2: New USB device found, idVendor=0cf3, idProduct=e005
+> [  235.592621] usb 1-1.2: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=0
+> [  235.705440] usb 1-1.2: USB disconnect, device number 6
+> [  235.903613] usb 1-1.2: new full-speed USB device number 7 using ehci-pci
+> [  241.002841] usb 1-1.2: New USB device found, idVendor=0cf3, idProduct=e005
+> [  241.002844] usb 1-1.2: New USB device strings: Mfr=0, Product=0,
+> SerialNumber=0
+>
+> After a while, the Bluetooth icon shows up in the right-upper corner
+> (Ubuntu 12.04). I can use normal Bluetooth operations such as file
+> transfer, headset, and mouse.
+>
+> Next, I did an experiment to remove the xhci_quirk module and the port
+> will be routed to the XHCI host controller again. And something
+> strange happened, I found that the Bluetooth device AR3012 _WORKS_ on
+> XHCI host controller.
+>
+> Summary:
+> * The ath3k.c firwmare loading error doesn't always happen on the XHCI
+> host controller, it succeed sometimes. After the successful loading
+> firmware, AR3012 works fine.
+>
+> * After sucessful loading the firmware through the EHCI controller, I
+> found that the firmware status still remained and can work with XHCI
+> host controller through dynamic changing the port routing.
+>
+> If there is any restriction that Bluetooth device AR3012 can't work on
+> XHCI host controller?
+>
+> Thanks,
+> Gavin Guo
 
-Ok. I am maintainer since three days ago and I need some time to setup
-my infrastructure, then I will ask him. At the end I need to update the
-MAINTAINERS file to the new infrastructure.
-
-> If you want I can also take the net/6lowpan stuff through bluetooth-next tree.
-> 
-
-Yes, please Marcel. This is one file at the moment. I have in my local
-branch also some patches (most of them use IPv6 API for address scopes
-instead using the self builded macros). There is also a issue with error
-handling which should be a long overdue fix. You will get some patches
-for these issues in the next days.
-
-
-If we have more implementation stuff in there, then we should setup a
-own 6lowpan mailinglist maybe. At the moment this is fine.
-
-Thanks.
-
-- Alex
+Add Mathias and Dan to the list, Mathias is now the XHCI driver maintainer.
