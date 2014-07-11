@@ -1,74 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH net-next 1/2] 6lowpan: introduce new net/6lowpan directory
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20140711113507.GA24370@omega>
-Date: Fri, 11 Jul 2014 14:33:03 +0200
-Cc: Network Development <netdev@vger.kernel.org>,
-	Jukka Rissanen <jukka.rissanen@linux.intel.com>,
-	linux-zigbee-devel@lists.sourceforge.net,
-	linux-bluetooth@vger.kernel.org
-Message-Id: <E54EDE3F-99A2-49C0-842B-D15E8B7826D2@holtmann.org>
-References: <1405067059-18782-1-git-send-email-alex.aring@gmail.com> <1405067059-18782-2-git-send-email-alex.aring@gmail.com> <8A1EF84C-3EDC-4540-B8F4-1FCBF4BF8D93@holtmann.org> <20140711113507.GA24370@omega>
-To: Alexander Aring <alex.aring@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix tracking local SSP authentication requirement
+Date: Fri, 11 Jul 2014 15:32:23 +0300
+Message-Id: <1405081943-28785-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Alexander,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
->>> index cbbbe6d..7ed1970 100644
->>> --- a/net/Makefile
->>> +++ b/net/Makefile
->>> @@ -57,7 +57,8 @@ obj-$(CONFIG_CAIF)		+= caif/
->>> ifneq ($(CONFIG_DCB),)
->>> obj-y				+= dcb/
->>> endif
->>> -obj-y				+= ieee802154/
->>> +obj-$(CONFIG_6LOWPAN)		+= 6lowpan/
->>> +obj-$(CONFIG_IEEE802154)	+= ieee802154/
->>> obj-$(CONFIG_MAC802154)		+= mac802154/
->>> 
->>> ifeq ($(CONFIG_NET),y)
->>> diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
->>> index 06ec144..a54777d 100644
->>> --- a/net/bluetooth/Kconfig
->>> +++ b/net/bluetooth/Kconfig
->>> @@ -6,7 +6,6 @@ menuconfig BT
->>> 	tristate "Bluetooth subsystem support"
->>> 	depends on NET && !S390
->>> 	depends on RFKILL || !RFKILL
->>> -	select 6LOWPAN_IPHC if BT_6LOWPAN
->>> 	select CRC16
->>> 	select CRYPTO
->>> 	select CRYPTO_BLKCIPHER
->>> @@ -42,7 +41,7 @@ menuconfig BT
->>> 
->>> config BT_6LOWPAN
->>> 	bool "Bluetooth 6LoWPAN support"
->>> -	depends on BT && IPV6
->>> +	depends on BT && 6LOWPAN
->>> 	help
->>> 	  IPv6 compression over Bluetooth.
->> 
->> this will conflict with our changes in wireless-next tree. We converted out 6LoWPAN support into a separate module.
->> 
-> 
-> oops, sorry I didn't check on this. I simple based it on net-next,
-> because the patch series adds a new branch.
-> 
-> 
-> 
-> btw. we need to talk about who branch will commit changes to iphc code
-> to avoid conflicts.
+When we need to make the decision whether to perform just-works or real
+user confirmation we need to know the exact local authentication
+requirement that was passed to the controller. So far conn->auth_type
+(the local requirement) wasn't in one case updated appropriately in fear
+of the user confirmation being rejected later.
 
-a few years back we decided to merge bluetooth-next via John's wireless-next tree so that any interaction with 802.11 and Bluetooth can be sorted out in John's tree. We are now also merging NFC into the wireless-next tree.
+The real problem however was not really that conn->auth_type couldn't
+represent the true value but that we were checking the local MITM
+requirement in an incorrect way. It's perfectly fine to let auth_type
+follow what we tell the controller since we're still tracking the target
+security level with conn->pending_sec_level.
 
-So it might be a good idea to include the 6LoWPAN parts into the wireless-next tree as well. If there are conflicts with 802.15.4, maybe that should also go through his trees.
+This patch updates the check for local MITM requirement in the
+hci_user_confirm_request_evt function to use the locally requested
+security level and ensures that auth_type always represents what we tell
+the controller. All other code in hci_user_confirm_request_evt still
+uses the auth_type instead of pending_sec_level for determining whether
+to do just-works or not, since that's the only value that's in sync with
+what the remote device knows.
 
-If you want I can also take the net/6lowpan stuff through bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_event.c | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index f0f220057f21..8980bd24b8c0 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3664,18 +3664,14 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 		/* If we are initiators, there is no remote information yet */
+ 		if (conn->remote_auth == 0xff) {
+-			cp.authentication = conn->auth_type;
+-
+ 			/* Request MITM protection if our IO caps allow it
+ 			 * except for the no-bonding case.
+-			 * conn->auth_type is not updated here since
+-			 * that might cause the user confirmation to be
+-			 * rejected in case the remote doesn't have the
+-			 * IO capabilities for MITM.
+ 			 */
+ 			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
+ 			    cp.authentication != HCI_AT_NO_BONDING)
+-				cp.authentication |= 0x01;
++				conn->auth_type |= 0x01;
++
++			cp.authentication = conn->auth_type;
+ 		} else {
+ 			conn->auth_type = hci_get_auth_req(conn);
+ 			cp.authentication = conn->auth_type;
+@@ -3747,9 +3743,12 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+ 	rem_mitm = (conn->remote_auth & 0x01);
+ 
+ 	/* If we require MITM but the remote device can't provide that
+-	 * (it has NoInputNoOutput) then reject the confirmation request
++	 * (it has NoInputNoOutput) then reject the confirmation
++	 * request. We check the security level here since it doesn't
++	 * necessarily match conn->auth_type.
+ 	 */
+-	if (loc_mitm && conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
++	if (conn->pending_sec_level > BT_SECURITY_MEDIUM &&
++	    conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
+ 		BT_DBG("Rejecting request: remote device can't provide MITM");
+ 		hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
+ 			     sizeof(ev->bdaddr), &ev->bdaddr);
+-- 
+1.9.3
 
