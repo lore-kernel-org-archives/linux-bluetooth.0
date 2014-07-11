@@ -1,81 +1,70 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix tracking local SSP authentication requirement
-Date: Fri, 11 Jul 2014 15:02:09 +0300
-Message-Id: <1405080129-27193-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 11 Jul 2014 13:35:10 +0200
+From: Alexander Aring <alex.aring@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: netdev@vger.kernel.org, jukka.rissanen@linux.intel.com,
+	linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH net-next 1/2] 6lowpan: introduce new net/6lowpan directory
+Message-ID: <20140711113507.GA24370@omega>
+References: <1405067059-18782-1-git-send-email-alex.aring@gmail.com>
+ <1405067059-18782-2-git-send-email-alex.aring@gmail.com>
+ <8A1EF84C-3EDC-4540-B8F4-1FCBF4BF8D93@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+In-Reply-To: <8A1EF84C-3EDC-4540-B8F4-1FCBF4BF8D93@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Marcel,
 
-When we need to make the decision whether to perform just-works or real
-user confirmation we need to know the exact local authentication
-requirement that was passed to the controller. So far conn->auth_type
-(the local requirement) wasn't in one case updated appropriately in fear
-of the user confirmation being rejected later.
+On Fri, Jul 11, 2014 at 01:23:52PM +0200, Marcel Holtmann wrote:
+> Hi Alexander,
+> 
+...
+> > index cbbbe6d..7ed1970 100644
+> > --- a/net/Makefile
+> > +++ b/net/Makefile
+> > @@ -57,7 +57,8 @@ obj-$(CONFIG_CAIF)		+= caif/
+> > ifneq ($(CONFIG_DCB),)
+> > obj-y				+= dcb/
+> > endif
+> > -obj-y				+= ieee802154/
+> > +obj-$(CONFIG_6LOWPAN)		+= 6lowpan/
+> > +obj-$(CONFIG_IEEE802154)	+= ieee802154/
+> > obj-$(CONFIG_MAC802154)		+= mac802154/
+> > 
+> > ifeq ($(CONFIG_NET),y)
+> > diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
+> > index 06ec144..a54777d 100644
+> > --- a/net/bluetooth/Kconfig
+> > +++ b/net/bluetooth/Kconfig
+> > @@ -6,7 +6,6 @@ menuconfig BT
+> > 	tristate "Bluetooth subsystem support"
+> > 	depends on NET && !S390
+> > 	depends on RFKILL || !RFKILL
+> > -	select 6LOWPAN_IPHC if BT_6LOWPAN
+> > 	select CRC16
+> > 	select CRYPTO
+> > 	select CRYPTO_BLKCIPHER
+> > @@ -42,7 +41,7 @@ menuconfig BT
+> > 
+> > config BT_6LOWPAN
+> > 	bool "Bluetooth 6LoWPAN support"
+> > -	depends on BT && IPV6
+> > +	depends on BT && 6LOWPAN
+> > 	help
+> > 	  IPv6 compression over Bluetooth.
+> 
+> this will conflict with our changes in wireless-next tree. We converted out 6LoWPAN support into a separate module.
+> 
 
-The real problem however was not really that conn->auth_type couldn't
-represent the true value but that we were checking the local MITM
-requirement in an incorrect way. It's perfectly fine to let auth_type
-follow what we tell the controller since we're still tracking the target
-security level with conn->pending_sec_level.
+oops, sorry I didn't check on this. I simple based it on net-next,
+because the patch series adds a new branch.
 
-This patch updates the check for local MITM requirement in the
-hci_user_confirm_request_evt function to use the locally requested
-security level and ensures that auth_type always represents what we tell
-the controller. All other code in hci_user_confirm_request_evt still
-uses the auth_type instead of pending_sec_level for determining whether
-to do just-works or not, since that's the only value that's in sync with
-what the remote device knows.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_event.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f0f220057f21..2ba3113cb608 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3664,18 +3664,15 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 		/* If we are initiators, there is no remote information yet */
- 		if (conn->remote_auth == 0xff) {
--			cp.authentication = conn->auth_type;
--
- 			/* Request MITM protection if our IO caps allow it
- 			 * except for the no-bonding case.
--			 * conn->auth_type is not updated here since
--			 * that might cause the user confirmation to be
--			 * rejected in case the remote doesn't have the
--			 * IO capabilities for MITM.
- 			 */
- 			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
- 			    cp.authentication != HCI_AT_NO_BONDING)
--				cp.authentication |= 0x01;
-+				conn->auth_type |= 0x01;
-+
-+			cp.authentication = conn->auth_type;
-+
- 		} else {
- 			conn->auth_type = hci_get_auth_req(conn);
- 			cp.authentication = conn->auth_type;
-@@ -3747,9 +3744,12 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
- 	rem_mitm = (conn->remote_auth & 0x01);
- 
- 	/* If we require MITM but the remote device can't provide that
--	 * (it has NoInputNoOutput) then reject the confirmation request
-+	 * (it has NoInputNoOutput) then reject the confirmation
-+	 * request. We check the security level here since it doesn't
-+	 * necessarily match conn->auth_type.
- 	 */
--	if (loc_mitm && conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
-+	if (conn->pending_sec_level > BT_SECURITY_MEDIUM &&
-+	    conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) {
- 		BT_DBG("Rejecting request: remote device can't provide MITM");
- 		hci_send_cmd(hdev, HCI_OP_USER_CONFIRM_NEG_REPLY,
- 			     sizeof(ev->bdaddr), &ev->bdaddr);
--- 
-1.9.3
+btw. we need to talk about who branch will commit changes to iphc code
+to avoid conflicts.
 
+- Alex
