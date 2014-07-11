@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: Fix tracking local SSP authentication requirement
-Date: Fri, 11 Jul 2014 15:32:23 +0300
-Message-Id: <1405081943-28785-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix tracking local SSP authentication requirement
+Date: Fri, 11 Jul 2014 15:02:09 +0300
+Message-Id: <1405080129-27193-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -31,14 +31,14 @@ what the remote device knows.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_event.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ net/bluetooth/hci_event.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index f0f220057f21..8980bd24b8c0 100644
+index f0f220057f21..2ba3113cb608 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -3664,18 +3664,14 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3664,18 +3664,15 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
  		/* If we are initiators, there is no remote information yet */
  		if (conn->remote_auth == 0xff) {
@@ -57,10 +57,11 @@ index f0f220057f21..8980bd24b8c0 100644
 +				conn->auth_type |= 0x01;
 +
 +			cp.authentication = conn->auth_type;
++
  		} else {
  			conn->auth_type = hci_get_auth_req(conn);
  			cp.authentication = conn->auth_type;
-@@ -3747,9 +3743,12 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
+@@ -3747,9 +3744,12 @@ static void hci_user_confirm_request_evt(struct hci_dev *hdev,
  	rem_mitm = (conn->remote_auth & 0x01);
  
  	/* If we require MITM but the remote device can't provide that
