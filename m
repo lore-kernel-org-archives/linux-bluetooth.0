@@ -1,48 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Read LE Advertising Channel TX Power only when available
-Date: Sat, 12 Jul 2014 23:20:50 +0200
-Message-Id: <1405200050-23210-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 12 Jul 2014 18:38:33 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Fix HCIUARTGETDEVICE ioctl when UART is not
+ registered
+Message-ID: <20140712153833.GA3127@t440s.P-661HNU-F1>
+References: <1405177229-13849-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1405177229-13849-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Read LE Advertising Channel TX Power command is not mandatory for
-a Bluetooth HCI controller only supporting receiption. Move the command
-to the third stage of the controller initialization and only execute it
-when support for it has been indicated.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+On Sat, Jul 12, 2014, Marcel Holtmann wrote:
+> The protocol for the UART might be configured, but that does not
+> mean the HCI device is registered. Return an error in that case
+> and only return the index number when HCI_UART_REGISTERED is set.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  drivers/bluetooth/hci_ldisc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 347f84fb66f9..b29a984f7dd4 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1348,9 +1348,6 @@ static void le_setup(struct hci_request *req)
- 	/* Read LE Supported States */
- 	hci_req_add(req, HCI_OP_LE_READ_SUPPORTED_STATES, 0, NULL);
- 
--	/* Read LE Advertising Channel TX Power */
--	hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
--
- 	/* Read LE White List Size */
- 	hci_req_add(req, HCI_OP_LE_READ_WHITE_LIST_SIZE, 0, NULL);
- 
-@@ -1657,6 +1654,11 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
- 		hci_req_add(req, HCI_OP_LE_SET_EVENT_MASK, sizeof(events),
- 			    events);
- 
-+		if (hdev->commands[25] & 0x40) {
-+			/* Read LE Advertising Channel TX Power */
-+			hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
-+		}
-+
- 		hci_set_le_support(req);
- 	}
- 
--- 
-1.9.3
+Applied to bluetooth-next. Thanks.
 
+Johan
