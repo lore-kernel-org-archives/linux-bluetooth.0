@@ -1,80 +1,78 @@
 Return-Path: <cyrus@holtmann.org>
-From: Szymon Janc <szymon.janc@tieto.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Szymon Janc <szymon.janc@tieto.com>
-Subject: [PATCH] android/cts: Update test results for CTS 4.4 R3
-Date: Sat, 12 Jul 2014 23:44:34 +0200
-Message-Id: <1405201474-17469-1-git-send-email-szymon.janc@tieto.com>
+Subject: [PATCH] Bluetooth: Enable LE encryption events only when supported
+Date: Sat, 12 Jul 2014 23:36:16 +0200
+Message-Id: <1405200976-27292-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/cts.txt | 45 +++++++++++++++++++++++++++++++++++----------
- 1 file changed, 35 insertions(+), 10 deletions(-)
+The support for LE encryption is optional. When encryption is not
+supported then also do not enable the encryption related events.
 
-diff --git a/android/cts.txt b/android/cts.txt
-index 5193571..68f4bcd 100644
---- a/android/cts.txt
-+++ b/android/cts.txt
-@@ -1,9 +1,16 @@
- Android Compatibility Test Suite results
+This moves the event mask setting to the third initialization
+stage to ensure that the LE features are available.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_core.c    | 11 +++++++----
+ 2 files changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 7f754a246ca5..2fee852816ee 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -329,6 +329,7 @@ enum {
+ #define LMP_HOST_SC		0x08
  
--Tested: 25-June-2014
--Android version: 4.4.2
-+Tested: 11-July-2014
-+Android version: 4.4.4
- CTS version: 4.4 R3
+ /* LE features */
++#define HCI_LE_ENCRYPTION		0x01
+ #define HCI_LE_CONN_PARAM_REQ_PROC	0x02
+ #define HCI_LE_PING			0x10
  
-+Note:
-+CTS reliable write GATT tests require using CTS from master branch
-+or https://android-review.googlesource.com/99354 applied.
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b29a984f7dd4..ff150e3c7ad1 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1422,14 +1422,17 @@ static void hci_setup_event_mask(struct hci_request *req)
+ 		/* Use a different default for LE-only devices */
+ 		memset(events, 0, sizeof(events));
+ 		events[0] |= 0x10; /* Disconnection Complete */
+-		events[0] |= 0x80; /* Encryption Change */
+ 		events[1] |= 0x08; /* Read Remote Version Information Complete */
+ 		events[1] |= 0x20; /* Command Complete */
+ 		events[1] |= 0x40; /* Command Status */
+ 		events[1] |= 0x80; /* Hardware Error */
+ 		events[2] |= 0x04; /* Number of Completed Packets */
+ 		events[3] |= 0x02; /* Data Buffer Overflow */
+-		events[5] |= 0x80; /* Encryption Key Refresh Complete */
 +
-+Due to bug in Bluedroid L2CAP implementation GATT server connect test fails
-+without modified Linux kernel. Patches for Linux and/or Bluedroid are still TBD.
-+
- -------------------------------------------------------------------------------
- android.bluetooth.cts.BasicAdapterTest (automated tests)
- Test Name				Result	Notes
-@@ -22,12 +29,30 @@ test_listenUsingRfcommWithServiceRecord	PASS
++		if (hdev->le_features[0] & HCI_LE_ENCRYPTION) {
++			events[0] |= 0x80; /* Encryption Change */
++			events[5] |= 0x80; /* Encryption Key Refresh Complete */
++		}
+ 	}
  
- -------------------------------------------------------------------------------
- com.android.cts.verifier (manual tests)
--Test Name		Result	Notes
---------------------------------------------------------------------------------
--Toggle Bluetooth	PASS
--Insecure Client		PASS
--Insecure Server		PASS	Required kernel patch commit ID:
--				6453462e99e8be13a2c8f2b3535f340b742d8192
--Secure Client		PASS
--Secure Server		PASS
-+Test Name				Result	Notes
- -------------------------------------------------------------------------------
-+Toggle Bluetooth			PASS
-+BLE Client Test:
-+	connect				PASS
-+	discover service		PASS
-+	read/write characteristic	PASS
-+	reliable write			PASS
-+	notify characteristic		PASS
-+	read/write descriptor		PASS
-+	read RSSI			PASS
-+	disconnect			PASS
-+BLE Server Test:
-+	add service			PASS
-+	connection			PASS
-+	read characteristic request	PASS
-+	write characteristic request	PASS
-+	read descriptor request		PASS
-+	write descriptor request	PASS
-+	reliable write			PASS
-+	disconnection			PASS
-+Insecure Client				PASS
-+Insecure Server				PASS	Required kernel patch commit ID:
-+						ba15a58b179ed76a7e887177f2b06de1
-+Secure Client				PASS
-+Secure Server				PASS
-+-------------------------------------------------------------------------------
-\ No newline at end of file
+ 	if (lmp_inq_rssi_capable(hdev))
+@@ -1482,8 +1485,6 @@ static void hci_init2_req(struct hci_request *req, unsigned long opt)
+ 	if (lmp_le_capable(hdev))
+ 		le_setup(req);
+ 
+-	hci_setup_event_mask(req);
+-
+ 	/* AVM Berlin (31), aka "BlueFRITZ!", doesn't support the read
+ 	 * local supported commands HCI command.
+ 	 */
+@@ -1611,6 +1612,8 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 p;
+ 
++	hci_setup_event_mask(req);
++
+ 	/* Some Broadcom based Bluetooth controllers do not support the
+ 	 * Delete Stored Link Key command. They are clearly indicating its
+ 	 * absence in the bit mask of supported commands.
 -- 
 1.9.3
 
