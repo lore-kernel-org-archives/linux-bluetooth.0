@@ -1,37 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Szymon Janc <szymon.janc@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Enable LE Long Term Key Request event only when supported
-Date: Sun, 13 Jul 2014 00:29:22 +0200
-Message-Id: <1405204162-64758-1-git-send-email-marcel@holtmann.org>
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/cts: Update test results for CTS 4.4 R3
+Date: Sat, 12 Jul 2014 23:44:34 +0200
+Message-Id: <1405201474-17469-1-git-send-email-szymon.janc@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The support for LE encryption is optional and with that also the
-LE Long Term Key Request event. If encryption is not supported, then
-do not bother enabling this event.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/cts.txt | 45 +++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 35 insertions(+), 10 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ff150e3c7ad1..188bfd3d7c43 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1644,7 +1644,10 @@ static void hci_init3_req(struct hci_request *req, unsigned long opt)
- 		u8 events[8];
+diff --git a/android/cts.txt b/android/cts.txt
+index 5193571..68f4bcd 100644
+--- a/android/cts.txt
++++ b/android/cts.txt
+@@ -1,9 +1,16 @@
+ Android Compatibility Test Suite results
  
- 		memset(events, 0, sizeof(events));
--		events[0] = 0x1f;
-+		events[0] = 0x0f;
+-Tested: 25-June-2014
+-Android version: 4.4.2
++Tested: 11-July-2014
++Android version: 4.4.4
+ CTS version: 4.4 R3
+ 
++Note:
++CTS reliable write GATT tests require using CTS from master branch
++or https://android-review.googlesource.com/99354 applied.
 +
-+		if (hdev->le_features[0] & HCI_LE_ENCRYPTION)
-+			events[0] |= 0x10;	/* LE Long Term Key Request */
++Due to bug in Bluedroid L2CAP implementation GATT server connect test fails
++without modified Linux kernel. Patches for Linux and/or Bluedroid are still TBD.
++
+ -------------------------------------------------------------------------------
+ android.bluetooth.cts.BasicAdapterTest (automated tests)
+ Test Name				Result	Notes
+@@ -22,12 +29,30 @@ test_listenUsingRfcommWithServiceRecord	PASS
  
- 		/* If controller supports the Connection Parameters Request
- 		 * Link Layer Procedure, enable the corresponding event.
+ -------------------------------------------------------------------------------
+ com.android.cts.verifier (manual tests)
+-Test Name		Result	Notes
+--------------------------------------------------------------------------------
+-Toggle Bluetooth	PASS
+-Insecure Client		PASS
+-Insecure Server		PASS	Required kernel patch commit ID:
+-				6453462e99e8be13a2c8f2b3535f340b742d8192
+-Secure Client		PASS
+-Secure Server		PASS
++Test Name				Result	Notes
+ -------------------------------------------------------------------------------
++Toggle Bluetooth			PASS
++BLE Client Test:
++	connect				PASS
++	discover service		PASS
++	read/write characteristic	PASS
++	reliable write			PASS
++	notify characteristic		PASS
++	read/write descriptor		PASS
++	read RSSI			PASS
++	disconnect			PASS
++BLE Server Test:
++	add service			PASS
++	connection			PASS
++	read characteristic request	PASS
++	write characteristic request	PASS
++	read descriptor request		PASS
++	write descriptor request	PASS
++	reliable write			PASS
++	disconnection			PASS
++Insecure Client				PASS
++Insecure Server				PASS	Required kernel patch commit ID:
++						ba15a58b179ed76a7e887177f2b06de1
++Secure Client				PASS
++Secure Server				PASS
++-------------------------------------------------------------------------------
+\ No newline at end of file
 -- 
 1.9.3
 
