@@ -1,28 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 13 Jul 2014 21:40:41 +0300
+Date: Sun, 13 Jul 2014 21:40:21 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
 To: Marcel Holtmann <marcel@holtmann.org>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] Bluetooth: Remove unneeded forward declaration of
- __sco_chan_add
-Message-ID: <20140713184041.GB3344@t440s.P-661HNU-F1>
-References: <1405274089-22043-1-git-send-email-marcel@holtmann.org>
+Subject: Re: [PATCH] Bluetooth: Allocate struct inquiry_entry with GFP_KERNEL
+Message-ID: <20140713184021.GA3344@t440s.P-661HNU-F1>
+References: <1405264945-15164-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405274089-22043-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <1405264945-15164-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Marcel,
 
 On Sun, Jul 13, 2014, Marcel Holtmann wrote:
-> The forward declaration of __sco_chan_add is not needed and thus just
-> remove it. Move __sco_chan_add into the proper location.
+> The allocation of inquiry cache entries is triggered as a result of
+> processing HCI events. Since the processing is done in the context
+> of a workqueue, there is no needed to allocate with GFP_ATOMIC in
+> that case. Switch it to GFP_KERNEL.
 > 
 > Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 > ---
->  net/bluetooth/sco.c | 23 +++++++++++------------
->  1 file changed, 11 insertions(+), 12 deletions(-)
+>  net/bluetooth/hci_core.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Both patches have been applied to bluetooth-next. Thanks.
+Applied to bluetooth-next. Thanks.
 
 Johan
