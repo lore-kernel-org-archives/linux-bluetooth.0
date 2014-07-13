@@ -1,35 +1,29 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Allocate struct inquiry_entry with GFP_KERNEL
-Date: Sun, 13 Jul 2014 17:22:25 +0200
-Message-Id: <1405264945-15164-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sun, 13 Jul 2014 08:51:15 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Enable LE Long Term Key Request event only
+ when supported
+Message-ID: <20140713055115.GC9869@t440s.P-661HNU-F1>
+References: <1405204162-64758-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1405204162-64758-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The allocation of inquiry cache entries is triggered as a result of
-processing HCI events. Since the processing is done in the context
-of a workqueue, there is no needed to allocate with GFP_ATOMIC in
-that case. Switch it to GFP_KERNEL.
+Hi Marcel,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Sun, Jul 13, 2014, Marcel Holtmann wrote:
+> The support for LE encryption is optional and with that also the
+> LE Long Term Key Request event. If encryption is not supported, then
+> do not bother enabling this event.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 188bfd3d7c43..172041e2b15a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2088,7 +2088,7 @@ u32 hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
- 	}
- 
- 	/* Entry not in the cache. Add new one. */
--	ie = kzalloc(sizeof(struct inquiry_entry), GFP_ATOMIC);
-+	ie = kzalloc(sizeof(struct inquiry_entry), GFP_KERNEL);
- 	if (!ie) {
- 		flags |= MGMT_DEV_FOUND_CONFIRM_NAME;
- 		goto done;
--- 
-1.9.3
+Applied to bluetooth-next. Thanks.
 
+Johan
