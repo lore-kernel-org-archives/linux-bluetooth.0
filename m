@@ -1,101 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Remove unneeded forward declaration of sco_chan_del
-Date: Sun, 13 Jul 2014 19:54:49 +0200
-Message-Id: <1405274089-22043-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH 1/2] Bluetooth: Remove unneeded forward declaration of __sco_chan_add
+Date: Sun, 13 Jul 2014 19:54:48 +0200
+Message-Id: <1405274089-22043-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The forward declaration of sco_chan_del is not needed and thus just
-remove it. Move sco_chan_del into the proper location.
+The forward declaration of __sco_chan_add is not needed and thus just
+remove it. Move __sco_chan_add into the proper location.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/sco.c | 56 ++++++++++++++++++++++++++---------------------------
- 1 file changed, 27 insertions(+), 29 deletions(-)
+ net/bluetooth/sco.c | 23 +++++++++++------------
+ 1 file changed, 11 insertions(+), 12 deletions(-)
 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 75cffc14ab6e..4d67b0354d23 100644
+index e6c7b636b901..75cffc14ab6e 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -53,8 +53,6 @@ struct sco_conn {
+@@ -53,7 +53,6 @@ struct sco_conn {
  #define sco_conn_lock(c)	spin_lock(&c->lock);
  #define sco_conn_unlock(c)	spin_unlock(&c->lock);
  
--static void sco_chan_del(struct sock *sk, int err);
--
- static void sco_sock_close(struct sock *sk);
- static void sco_sock_kill(struct sock *sk);
+-static void __sco_chan_add(struct sco_conn *conn, struct sock *sk, struct sock *parent);
+ static void sco_chan_del(struct sock *sk, int err);
  
-@@ -138,6 +136,33 @@ static struct sock *sco_chan_get(struct sco_conn *conn)
- 	return sk;
+ static void sco_sock_close(struct sock *sk);
+@@ -164,6 +163,17 @@ static int sco_conn_del(struct hci_conn *hcon, int err)
+ 	return 0;
  }
  
-+/* Delete channel.
-+ * Must be called on the locked socket. */
-+static void sco_chan_del(struct sock *sk, int err)
++static void __sco_chan_add(struct sco_conn *conn, struct sock *sk, struct sock *parent)
 +{
-+	struct sco_conn *conn;
++	BT_DBG("conn %p", conn);
 +
-+	conn = sco_pi(sk)->conn;
++	sco_pi(sk)->conn = conn;
++	conn->sk = sk;
 +
-+	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
-+
-+	if (conn) {
-+		sco_conn_lock(conn);
-+		conn->sk = NULL;
-+		sco_pi(sk)->conn = NULL;
-+		sco_conn_unlock(conn);
-+
-+		if (conn->hcon)
-+			hci_conn_drop(conn->hcon);
-+	}
-+
-+	sk->sk_state = BT_CLOSED;
-+	sk->sk_err   = err;
-+	sk->sk_state_change(sk);
-+
-+	sock_set_flag(sk, SOCK_ZAPPED);
++	if (parent)
++		bt_accept_enqueue(parent, sk);
 +}
 +
- static int sco_conn_del(struct hci_conn *hcon, int err)
+ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
+ 			struct sock *parent)
  {
- 	struct sco_conn *conn = hcon->sco_data;
-@@ -978,33 +1003,6 @@ static int sco_sock_release(struct socket *sock)
+@@ -968,17 +978,6 @@ static int sco_sock_release(struct socket *sock)
  	return err;
  }
  
--/* Delete channel.
-- * Must be called on the locked socket. */
--static void sco_chan_del(struct sock *sk, int err)
+-static void __sco_chan_add(struct sco_conn *conn, struct sock *sk, struct sock *parent)
 -{
--	struct sco_conn *conn;
+-	BT_DBG("conn %p", conn);
 -
--	conn = sco_pi(sk)->conn;
+-	sco_pi(sk)->conn = conn;
+-	conn->sk = sk;
 -
--	BT_DBG("sk %p, conn %p, err %d", sk, conn, err);
--
--	if (conn) {
--		sco_conn_lock(conn);
--		conn->sk = NULL;
--		sco_pi(sk)->conn = NULL;
--		sco_conn_unlock(conn);
--
--		if (conn->hcon)
--			hci_conn_drop(conn->hcon);
--	}
--
--	sk->sk_state = BT_CLOSED;
--	sk->sk_err   = err;
--	sk->sk_state_change(sk);
--
--	sock_set_flag(sk, SOCK_ZAPPED);
+-	if (parent)
+-		bt_accept_enqueue(parent, sk);
 -}
 -
- static void sco_conn_ready(struct sco_conn *conn)
- {
- 	struct sock *parent;
+ /* Delete channel.
+  * Must be called on the locked socket. */
+ static void sco_chan_del(struct sock *sk, int err)
 -- 
 1.9.3
 
