@@ -1,144 +1,54 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 14 Jul 2014 18:49:44 -0300
-From: Gustavo Padovan <gustavo@padovan.org>
-To: linville@tuxdriver.com
-Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: pull request: bluetooth-next 2014-07-14
-Message-ID: <20140714214944.GA4374@joana>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-	protocol="application/pgp-signature"; boundary="C7zPtVaVf+AK4Oqc"
-Sender: linux-kernel-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: cmtp: Remove unnecessary null test
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20140714203412.GA16532@himangi-Dell>
+Date: Mon, 14 Jul 2014 23:02:26 +0200
+Cc: "Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-kernel@vger.kernel.org, julia.lawall@lip6.fr
+Message-Id: <E909042B-4973-4601-92AD-07D948BBDA83@holtmann.org>
+References: <20140714203412.GA16532@himangi-Dell>
+To: Himangi Saraogi <himangi774@gmail.com>
+Sender: netdev-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Himangi,
 
---C7zPtVaVf+AK4Oqc
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+> This patch removes the null test on ctrl. ctrl is initialized at the
+> beginning of the function to &session->ctrl. Since session is
+> dereferenced prior to the null test, session must be a valid pointer,
+> and &session->ctrl cannot be null.
+> 
+> The following Coccinelle script is used for detecting the change:
+> 
+> @r@
+> expression e,f;
+> identifier g,y;
+> statement S1,S2;
+> @@
+> 
+> *e = &f->g
+> <+...
+> f->y
+> ...+>
+> *if (e != NULL || ...)
+> S1 else S2
+> 
+> Signed-off-by: Himangi Saraogi <himangi774@gmail.com>
+> Acked-by: Julia Lawall <julia.lawall@lip6.fr>
+> ---
+> net/bluetooth/cmtp/capi.c | 6 ------
+> 1 file changed, 6 deletions(-)
 
-Hi John,
+patch has been applied to bluetooth-next tree.
 
-Some more patches for 3.17. The most important change here is the move of
-the 6lowpan code to net/6lowpan. It has been agreed with Davem that this
-change will go through the bluetooth tree. The rest are mostly clean up and
-fixes.
+Regards
 
-Please pull! or let me know of any issues. Thanks!
+Marcel
 
-	Gustavo
-
----
-The following changes since commit 6fea7ad1d338dba592d65423427a997f1b7ff485:
-
-  Bluetooth: Don't send ERTM configuration option when disabled (2014-07-09 13:53:36 +0300)
-
-are available in the git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 4d042654afb342386cb5c33e29843b76d598ab61:
-
-  Bluetooth: cmtp: Remove unnecessary null test (2014-07-14 23:00:13 +0200)
-
-----------------------------------------------------------------
-Alexander Aring (2):
-      6lowpan: introduce new net/6lowpan directory
-      MAINTAINERS: add net/6lowpan/ maintainer entry
-
-Himangi Saraogi (1):
-      Bluetooth: cmtp: Remove unnecessary null test
-
-Johan Hedberg (12):
-      Bluetooth: Always confirm incoming SMP just-works requests
-      Bluetooth: Fix forcing SMP just-works with no-bonding
-      Bluetooth: Fix incorrect clearing of SMP_FLAG_INITIATOR
-      Bluetooth: Fix advertising parameter update when toggling connectable
-      Bluteooth: Reject SMP bonding if HCI_PAIRABLE is not set
-      Bluetooth: Fix using test_and_clear instead of test_and_set
-      Bluetooth: Remove unneeded mgmt_connectable function
-      Bluetooth: Refactor ioctl scan state update to its own function
-      Bluetooth: Remove unneeded mgmt_discoverable function
-      Bluetooth: Remove unneeded mgmt_write_scan_failed function
-      Bluetooth: Fix tracking local SSP authentication requirement
-      Bluetooth: Fix trying LTK re-encryption when we don't have an LTK
-
-Marcel Holtmann (23):
-      Bluetooth: Mark controller is down when HCI_AUTO_OFF is set
-      Bluetooth: Set HCI_PAIRABLE during power on for legacy ioctl
-      Bluetooth: Move HCI socket definitions into its own header file
-      Bluetooth: Move struct hci_sec_filter next to its user
-      Bluetooth: Delcare the hci_sec_filter as const
-      Bluetooth: Move struct hci_pinfo into net/bluetooth/hci_sock.c
-      Bluetooth: Move HCI request internals to net/bluetooth/hci_core.c
-      Bluetooth: Update the list of L2CAP fixed channels
-      Bluetooth: Move struct sco_pinfo into net/bluetooth/sco.c
-      Bluetooth: Move struct sco_conn into net/bluetooth/sco.c
-      Bluetooth: Remove unused SCO_DEFAULT_FLUSH_TO constant
-      Bluetooth: Move SCO timeout constants into net/bluetooth/sco.c
-      Bluetooth: Check for valid HCI UART driver flags
-      Bluetooth: Add support for external configuration with UART driver
-      Bluetooth: Fix HCIUARTGETDEVICE ioctl when UART is not registered
-      Bluetooth: Read LE Advertising Channel TX Power only when available
-      Bluetooth: Enable LE encryption events only when supported
-      Bluetooth: Enable LE Long Term Key Request event only when supported
-      Bluetooth: Allocate struct inquiry_entry with GFP_KERNEL
-      Bluetooth: Remove unneeded forward declaration of __sco_chan_add
-      Bluetooth: Remove unneeded forward declaration of sco_chan_del
-      Bluetooth: Convert L2CAP ident spinlock into a mutex
-      Bluetooth: Remove sco_chan_get helper function
-
- MAINTAINERS                                       |   7 ++
- drivers/bluetooth/hci_ldisc.c                     |  25 +++++-
- drivers/bluetooth/hci_uart.h                      |   1 +
- fs/compat_ioctl.c                                 |   2 +-
- include/net/bluetooth/hci.h                       | 150 +------------------------------
- include/net/bluetooth/hci_core.h                  |  34 +------
- include/net/bluetooth/hci_sock.h                  | 175 +++++++++++++++++++++++++++++++++++++
- include/net/bluetooth/l2cap.h                     |   8 +-
- include/net/bluetooth/sco.h                       |  30 -------
- net/6lowpan/Kconfig                               |   6 ++
- net/6lowpan/Makefile                              |   3 +
- net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} |   0
- net/Kconfig                                       |   1 +
- net/Makefile                                      |   3 +-
- net/bluetooth/Kconfig                             |   3 +-
- net/bluetooth/cmtp/capi.c                         |   6 --
- net/bluetooth/hci_core.c                          | 134 ++++++++++++++++++++--------
- net/bluetooth/hci_event.c                         |  45 ++++------
- net/bluetooth/hci_sock.c                          |  21 ++++-
- net/bluetooth/l2cap_core.c                        |   8 +-
- net/bluetooth/mgmt.c                              | 116 ++++++------------------
- net/bluetooth/sco.c                               | 119 +++++++++++++++----------
- net/bluetooth/smp.c                               |  40 +++++----
- net/ieee802154/Kconfig                            |   9 +-
- net/ieee802154/Makefile                           |   5 +-
- 25 files changed, 492 insertions(+), 459 deletions(-)
- create mode 100644 include/net/bluetooth/hci_sock.h
- create mode 100644 net/6lowpan/Kconfig
- create mode 100644 net/6lowpan/Makefile
- rename net/{ieee802154/6lowpan_iphc.c => 6lowpan/iphc.c} (100%)
-
-
---C7zPtVaVf+AK4Oqc
-Content-Type: application/pgp-signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iQIcBAEBAgAGBQJTxFB4AAoJEPs3PUX4s20ozJMQALUn8JE8hnJWcXgChJxLDeKZ
-ldYdlsnRoA6+E4OsY7b9Qh1KdJzJC2ZW0fGrXa4wuvfoA5bYnMPx6J1wIzSw+/GV
-YkMurLXZHlMRYIznAoBcPq4MOb1kNibQtPLa0B0eHP3/i0diDTgZ6nH+r8io0+Zx
-KX3jR5PDcFapczSF1MU2bDNTSj9Kj3jlpTcG1p+h3byqiup8kju+priX4cnAwPLu
-7oYqzIOzfHskX7jd61Qaz3Vgri/IXAJBGf7X+vxelv7jWGatGaIT4np0K7P3tmPD
-I8fLyY5QjJ5lAIcbT8DRT9RFsrCrLmXW0lW3daLvBf061fsakqaA/nGhsH/rOvjp
-V9kHGA8oMClRhqCgb2yrnABJ5u1kz8GGAJTPdkhuvnku0B9wnEX4J8N/fpr1+Wij
-e0HAyPUm0inARP3mU4n7J8l6npxVkhoK10zAuLfx+pdNM9dgmH2ft03Ntgrf3fLS
-YJg8khElf9wNklyQT7yn9wqDMP+VHCBuYcE3Y8RcC1dz2JBMp9/bflXtAOKBcgBx
-wFc5NHGMm2jHS2HxZOSozdq+QrqN19/BAl2REE5Te2Vi6TYwZ+/3mBfWEnvO/T95
-iISZ0sJ0cUHZnugxfZodbNLMCGwiiFV22vu39+siq6WbICAOtxwVhDaY+4noqvTP
-W3YpdNYJ3UxiCiVrlQBX
-=LKjk
------END PGP SIGNATURE-----
-
---C7zPtVaVf+AK4Oqc--
