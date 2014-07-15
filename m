@@ -1,216 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53C52541.50300@mentor.com>
-Date: Tue, 15 Jul 2014 05:57:37 -0700
-From: Jiada Wang <jiada_wang@mentor.com>
-MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: "Gustavo F. Padovan" <gustavo@padovan.org>, Johan Hedberg
-	<johan.hedberg@gmail.com>, Linux Bluetooth mailing list
-	<linux-bluetooth@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	<Dean_Jenkins@mentor.com>
-Subject: Re: [PATCH v2] Bluetooth: BCSP fails to ACK re-transmitted frames
- from the peer
-References: <1405417294-24832-1-git-send-email-jiada_wang@mentor.com> <B8E404C6-6A75-41E8-9506-0B05AA4C56D6@holtmann.org>
-In-Reply-To: <B8E404C6-6A75-41E8-9506-0B05AA4C56D6@holtmann.org>
-Content-Type: text/plain; charset="ISO-8859-1"; format=flowed
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Update PTS files for AVRCP
+Date: Tue, 15 Jul 2014 14:51:44 +0200
+Message-Id: <1405428704-10324-1-git-send-email-sebastian.chlad@tieto.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel
+Regression test round using PTS 5.2 and Android 4.4.4
+---
+ android/pics-avrcp.txt  | 2 +-
+ android/pixit-avrcp.txt | 2 +-
+ android/pts-avrcp.txt   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-On 07/15/2014 04:42 AM, Marcel Holtmann wrote:
-> Hi Jiada,
->
->> Send an ACK frame with the current txack value in response to
->> every received reliable frame unless a TX reliable frame is being
->> sent. This modification allows re-transmitted frames from the remote
->> peer to be acknowledged rather than ignored. It means that the remote
->> peer knows which frame number to start re-transmitting from.
->>
->> Without this modification, the recovery time to a missing frame
->> from the remote peer was unnecessarily being extended because the
->> headers of the out of order reliable frames were being discarded rather
->> than being processed. The frame headers of received frames will
->> indicate whether the local peer's transmissions have been
->> acknowledged by the remote peer. Therefore, the local peer may
->> unnecessarily re-transmit despite the remote peer already indicating
->> that the frame had been acknowledged in out of order reliable frame.
->>
->> Signed-off-by: Dean Jenkins <djenkins@mvista.com>
->> Signed-off-by: Jiada Wang <jiada_wang@mentor.com>
->> ---
->> drivers/bluetooth/hci_bcsp.c | 94 ++++++++++++++++++++++++++++----------------
->> 1 file changed, 60 insertions(+), 34 deletions(-)
->>
->> diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
->> index 21cc45b..0f4664d 100644
->> --- a/drivers/bluetooth/hci_bcsp.c
->> +++ b/drivers/bluetooth/hci_bcsp.c
->> @@ -478,13 +478,29 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
->> static void bcsp_complete_rx_pkt(struct hci_uart *hu)
->> {
->> 	struct bcsp_struct *bcsp = hu->priv;
->> -	int pass_up;
->> +	int pass_up = 0;
->>
->> 	if (bcsp->rx_skb->data[0] & 0x80) {	/* reliable pkt */
->> 		BT_DBG("Received seqno %u from card", bcsp->rxseq_txack);
->> -		bcsp->rxseq_txack++;
->> -		bcsp->rxseq_txack %= 0x8;
->> -		bcsp->txack_req    = 1;
->> +
->> +		/* check the rx sequence number is as expected */
->> +		if ((bcsp->rx_skb->data[0] & 0x07) == bcsp->rxseq_txack) {
->> +			bcsp->rxseq_txack++;
->> +			bcsp->rxseq_txack %= 0x8;
->> +		} else {
->> +			/*
->> +			 * handle re-transmitted packet or
->> +			 * when packet was missed
->> +			 */
->
-> Comment style is wrong.
->
-> 	/* aaa
-> 	 * bbb
-> 	 */
->
->> +			BT_ERR ("Out-of-order packet arrived, got %u expected %u",
->> +				bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
->
-> It is BT_ERR(" and not BT_ERR (".
->
->> +
->> +			/* do not process out-of-order packet payload */
->> +			pass_up = 2;
->> +		}
->> +
->> +		/* send current txack value to all recieved reliable packets */
->> +		bcsp->txack_req = 1;
->>
->> 		/* If needed, transmit an ack pkt */
->> 		hci_uart_tx_wakeup(hu);
->> @@ -493,26 +509,36 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
->> 	bcsp->rxack = (bcsp->rx_skb->data[0] >> 3) & 0x07;
->> 	BT_DBG("Request for pkt %u from card", bcsp->rxack);
->>
->> +	/*
->> +	 * handle recieved ACK indications,
->> +	 * including those from out-of-order packets
->> +	 */
->
-> Same here. Please fix comment style.
->
->> 	bcsp_pkt_cull(bcsp);
->> -	if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
->> -			bcsp->rx_skb->data[0] & 0x80) {
->> -		bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
->> -		pass_up = 1;
->> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
->> -			bcsp->rx_skb->data[0] & 0x80) {
->> -		bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
->> -		pass_up = 1;
->> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
->> -		bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
->> -		pass_up = 1;
->> -	} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
->> -			!(bcsp->rx_skb->data[0] & 0x80)) {
->> -		bcsp_handle_le_pkt(hu);
->> -		pass_up = 0;
->> -	} else
->> -		pass_up = 0;
->> -
->> -	if (!pass_up) {
->> +
->> +	if (pass_up != 2) {
->> +		if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
->> +				bcsp->rx_skb->data[0] & 0x80) {
->
-> Fix indentation here.
+diff --git a/android/pics-avrcp.txt b/android/pics-avrcp.txt
+index 969be6a..f339689 100644
+--- a/android/pics-avrcp.txt
++++ b/android/pics-avrcp.txt
+@@ -1,6 +1,6 @@
+ AVRCP PICS for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-avrcp.txt b/android/pixit-avrcp.txt
+index ceae884..7ab5f18 100644
+--- a/android/pixit-avrcp.txt
++++ b/android/pixit-avrcp.txt
+@@ -1,6 +1,6 @@
+ AVRCP PIXIT for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-avrcp.txt b/android/pts-avrcp.txt
+index b05bdbf..c8663be 100644
+--- a/android/pts-avrcp.txt
++++ b/android/pts-avrcp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for AVRCP
+ 
+-PTS version: 5.1
+-Tested: 07-April-2014
+-Android version: 4.4.2
++PTS version: 5.2
++Tested: 15-July-2014
++Android version: 4.4.4
+ 
+ Results:
+ PASS	test passed
+-- 
+1.8.5.3
 
-Can you tell me what should be the correct indentation.
->
->> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
->> +			pass_up = 1;
->> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
->> +				bcsp->rx_skb->data[0] & 0x80) {
->
-> And here.
->
->> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
->> +			pass_up = 1;
->> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
->> +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_SCODATA_PKT;
->> +			pass_up = 1;
->> +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 1 &&
->> +				!(bcsp->rx_skb->data[0] & 0x80)) {
->
-> Same here.
->
->> +			bcsp_handle_le_pkt(hu);
->> +			pass_up = 0;
->> +		} else {
->> +			pass_up = 0;
->> +		}
->> +	}
->> +
->> +	switch (pass_up) {
->> +	case 0:
->> +	{
->> 		struct hci_event_hdr hdr;
->> 		u8 desc = (bcsp->rx_skb->data[1] & 0x0f);
->
-> In general I do not prefer using { } in case statements. Please declare the variables where they are needed or use if else.
->
->>
->> @@ -537,11 +563,21 @@ static void bcsp_complete_rx_pkt(struct hci_uart *hu)
->> 			}
->> 		} else
->> 			kfree_skb(bcsp->rx_skb);
->> -	} else {
->> +		break;
->> +	}
->> +	case 1:
->> 		/* Pull out BCSP hdr */
->> 		skb_pull(bcsp->rx_skb, 4);
->>
->> 		hci_recv_frame(hu->hdev, bcsp->rx_skb);
->> +		break;
->> +	default:
->> +		/*
->> +		 * ignore packet payload of already ACKed re-transmitted
->> +		 * packets or when a packet was missed in the BCSP window
->> +		 */
->
-> Fix up comment style.
->
->> +		kfree_skb(bcsp->rx_skb);
->> +		break;
->> 	}
->>
->> 	bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
->> @@ -587,16 +623,6 @@ static int bcsp_recv(struct hci_uart *hu, void *data, int count)
->> 				bcsp->rx_count = 0;
->> 				continue;
->> 			}
->> -			if (bcsp->rx_skb->data[0] & 0x80	/* reliable pkt */
->> -			    		&& (bcsp->rx_skb->data[0] & 0x07) != bcsp->rxseq_txack) {
->> -				BT_ERR ("Out-of-order packet arrived, got %u expected %u",
->> -					bcsp->rx_skb->data[0] & 0x07, bcsp->rxseq_txack);
->> -
->> -				kfree_skb(bcsp->rx_skb);
->> -				bcsp->rx_state = BCSP_W4_PKT_DELIMITER;
->> -				bcsp->rx_count = 0;
->> -				continue;
->> -			}
->> 			bcsp->rx_state = BCSP_W4_DATA;
->> 			bcsp->rx_count = (bcsp->rx_skb->data[1] >> 4) +
->> 					(bcsp->rx_skb->data[2] << 4);	/* May be 0 */
->
-> Regards
->
-> Marcel
->
-
-
-Thanks,
-Jiada
