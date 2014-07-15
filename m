@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/8] android/haltest: Add read command.
-Date: Tue, 15 Jul 2014 10:59:21 +0300
-Message-Id: <1405411167-15638-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 1/8] android/haltest: Add open/close input stream commands
+Date: Tue, 15 Jul 2014 10:59:20 +0300
+Message-Id: <1405411167-15638-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,100 +11,88 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Read command makes stream_in->read() call to Audio HAL.
 ---
- android/client/if-sco.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 64 insertions(+)
+ android/client/if-sco.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index c71d0b4..b4c3506 100644
+index b7f5a80..c71d0b4 100644
 --- a/android/client/if-sco.c
 +++ b/android/client/if-sco.c
-@@ -230,6 +230,45 @@ static void *playback_thread(void *data)
- 	return NULL;
+@@ -23,8 +23,10 @@
+ 
+ audio_hw_device_t *if_audio_sco = NULL;
+ static struct audio_stream_out *stream_out = NULL;
++static struct audio_stream_in *stream_in = NULL;
+ 
+ static size_t buffer_size = 0;
++static size_t buffer_size_in = 0;
+ static pthread_t play_thread = 0;
+ static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
+ static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
+@@ -340,6 +342,53 @@ static void close_output_stream_p(int argc, const char **argv)
+ 	buffer_size = 0;
  }
  
-+static void *read_thread(void *data)
++static void open_input_stream_p(int argc, const char **argv)
 +{
-+	int (*filbuff_cb) (short*, void*) = feed_from_in;
-+	short buffer[buffer_size / sizeof(short)];
-+	size_t len = 0;
-+	void *cb_data = NULL;
++	int err;
++
++	RETURN_IF_NULL(if_audio_sco);
 +
 +	pthread_mutex_lock(&state_mutex);
-+	current_state = STATE_PLAYING;
-+	pthread_mutex_unlock(&state_mutex);
-+
-+	do {
-+		pthread_mutex_lock(&state_mutex);
-+
-+		if (current_state == STATE_STOPPING) {
-+			haltest_info("Detected stopping\n");
-+			pthread_mutex_unlock(&state_mutex);
-+			break;
-+		} else if (current_state == STATE_SUSPENDED) {
-+			pthread_mutex_unlock(&state_mutex);
-+			usleep(500);
-+			continue;
-+		}
-+
++	if (current_state == STATE_PLAYING) {
++		haltest_error("Already playing!\n");
 +		pthread_mutex_unlock(&state_mutex);
-+
-+		len = filbuff_cb(buffer, cb_data);
-+		haltest_info("len %zd\n", len);
-+	} while (len);
-+
-+	pthread_mutex_lock(&state_mutex);
-+	current_state = STATE_STOPPED;
++		return;
++	}
 +	pthread_mutex_unlock(&state_mutex);
 +
-+	haltest_info("Done reading.\n");
++	err = if_audio_sco->open_input_stream(if_audio_sco,
++						0,
++						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
++						NULL,
++						&stream_in);
++	if (err < 0) {
++		haltest_error("open output stream returned %d\n", err);
++		return;
++	}
 +
-+	return NULL;
++	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
++	if (buffer_size_in == 0)
++		haltest_error("Invalid buffer size received!\n");
++	else
++		haltest_info("Using buffer size: %zu\n", buffer_size_in);
 +}
 +
- static void play_p(int argc, const char **argv)
- {
- 	const char *fname = NULL;
-@@ -276,6 +315,30 @@ fail:
- 		fclose(in);
- }
- 
-+static void read_p(int argc, const char **argv)
++static void close_input_stream_p(int argc, const char **argv)
 +{
 +	RETURN_IF_NULL(if_audio_sco);
 +	RETURN_IF_NULL(stream_in);
 +
-+	if (!buffer_size_in) {
-+		haltest_error("Invalid buffer sizes. Streams opened\n");
-+		return;
-+	}
++	stop_p(argc, argv);
 +
-+	pthread_mutex_lock(&state_mutex);
-+	if (current_state != STATE_STOPPED) {
-+		haltest_error("Already playing or stream suspended!\n");
-+		pthread_mutex_unlock(&state_mutex);
-+		return;
-+	}
-+	pthread_mutex_unlock(&state_mutex);
++	haltest_info("Waiting for playback thread...\n");
++	pthread_join(play_thread, NULL);
 +
-+	if (pthread_create(&play_thread, NULL, read_thread,
-+							stream_in) != 0)
-+		haltest_error("Cannot create playback thread!\n");
++	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
 +
++	stream_in = NULL;
++	buffer_size_in = 0;
 +}
 +
- static void stop_p(int argc, const char **argv)
+ static void cleanup_p(int argc, const char **argv)
  {
- 	pthread_mutex_lock(&state_mutex);
-@@ -551,6 +614,7 @@ static struct method methods[] = {
- 	STD_METHOD(open_input_stream),
- 	STD_METHOD(close_input_stream),
+ 	int err;
+@@ -499,6 +548,8 @@ static struct method methods[] = {
+ 	STD_METHOD(cleanup),
+ 	STD_METHOD(open_output_stream),
+ 	STD_METHOD(close_output_stream),
++	STD_METHOD(open_input_stream),
++	STD_METHOD(close_input_stream),
  	STD_METHODH(play, "<path to pcm file>"),
-+	STD_METHOD(read),
  	STD_METHOD(stop),
  	STD_METHOD(suspend),
- 	STD_METHOD(resume),
 -- 
 1.9.1
 
