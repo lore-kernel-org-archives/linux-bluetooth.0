@@ -1,98 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/8] android/haltest: Add open/close input stream commands
-Date: Tue, 15 Jul 2014 10:59:20 +0300
-Message-Id: <1405411167-15638-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH] Bluetooth: Remove unnecessary params variable from process_adv_report()
+Date: Tue, 15 Jul 2014 08:07:59 +0300
+Message-Id: <1405400879-28788-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
+The params variable was just used for storing the return value from the
+hci_pend_le_action_lookup() function and then checking whether it's NULL
+or not. We can simplify the code by checking the return value directly.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- android/client/if-sco.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 51 insertions(+)
+ net/bluetooth/hci_event.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index b7f5a80..c71d0b4 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -23,8 +23,10 @@
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 8980bd24b8c0..bf2926b2e4a9 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4314,14 +4314,11 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	 * device found events.
+ 	 */
+ 	if (hdev->le_scan_type == LE_SCAN_PASSIVE) {
+-		struct hci_conn_params *param;
+-
+ 		if (type == LE_ADV_DIRECT_IND)
+ 			return;
  
- audio_hw_device_t *if_audio_sco = NULL;
- static struct audio_stream_out *stream_out = NULL;
-+static struct audio_stream_in *stream_in = NULL;
+-		param = hci_pend_le_action_lookup(&hdev->pend_le_reports,
+-						  bdaddr, bdaddr_type);
+-		if (!param)
++		if (!hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					       bdaddr, bdaddr_type))
+ 			return;
  
- static size_t buffer_size = 0;
-+static size_t buffer_size_in = 0;
- static pthread_t play_thread = 0;
- static pthread_mutex_t outstream_mutex = PTHREAD_MUTEX_INITIALIZER;
- static pthread_mutex_t state_mutex = PTHREAD_MUTEX_INITIALIZER;
-@@ -340,6 +342,53 @@ static void close_output_stream_p(int argc, const char **argv)
- 	buffer_size = 0;
- }
- 
-+static void open_input_stream_p(int argc, const char **argv)
-+{
-+	int err;
-+
-+	RETURN_IF_NULL(if_audio_sco);
-+
-+	pthread_mutex_lock(&state_mutex);
-+	if (current_state == STATE_PLAYING) {
-+		haltest_error("Already playing!\n");
-+		pthread_mutex_unlock(&state_mutex);
-+		return;
-+	}
-+	pthread_mutex_unlock(&state_mutex);
-+
-+	err = if_audio_sco->open_input_stream(if_audio_sco,
-+						0,
-+						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
-+						NULL,
-+						&stream_in);
-+	if (err < 0) {
-+		haltest_error("open output stream returned %d\n", err);
-+		return;
-+	}
-+
-+	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
-+	if (buffer_size_in == 0)
-+		haltest_error("Invalid buffer size received!\n");
-+	else
-+		haltest_info("Using buffer size: %zu\n", buffer_size_in);
-+}
-+
-+static void close_input_stream_p(int argc, const char **argv)
-+{
-+	RETURN_IF_NULL(if_audio_sco);
-+	RETURN_IF_NULL(stream_in);
-+
-+	stop_p(argc, argv);
-+
-+	haltest_info("Waiting for playback thread...\n");
-+	pthread_join(play_thread, NULL);
-+
-+	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
-+
-+	stream_in = NULL;
-+	buffer_size_in = 0;
-+}
-+
- static void cleanup_p(int argc, const char **argv)
- {
- 	int err;
-@@ -499,6 +548,8 @@ static struct method methods[] = {
- 	STD_METHOD(cleanup),
- 	STD_METHOD(open_output_stream),
- 	STD_METHOD(close_output_stream),
-+	STD_METHOD(open_input_stream),
-+	STD_METHOD(close_input_stream),
- 	STD_METHODH(play, "<path to pcm file>"),
- 	STD_METHOD(stop),
- 	STD_METHOD(suspend),
+ 		if (type == LE_ADV_NONCONN_IND || type == LE_ADV_SCAN_IND)
 -- 
-1.9.1
+1.9.3
 
