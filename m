@@ -1,27 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 15 Jul 2014 17:44:59 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/2] monitor: Exit with error if failed to open file for
- writing
-Message-ID: <20140715144459.GA22120@t440s.P-661HNU-F1>
-References: <1405420237-12054-1-git-send-email-szymon.janc@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405420237-12054-1-git-send-email-szymon.janc@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Update PTS files for HSP
+Date: Tue, 15 Jul 2014 16:20:56 +0200
+Message-Id: <1405434056-17558-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Re-run PTS tests for HSP on PTS 5.2 and Android 4.4.4
+---
+ android/pics-hsp.txt  | 2 +-
+ android/pixit-hsp.txt | 2 +-
+ android/pts-hsp.txt   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-On Tue, Jul 15, 2014, Szymon Janc wrote:
-> ---
->  monitor/control.c | 4 +++-
->  monitor/control.h | 2 +-
->  monitor/main.c    | 6 ++++--
->  3 files changed, 8 insertions(+), 4 deletions(-)
+diff --git a/android/pics-hsp.txt b/android/pics-hsp.txt
+index 3c4962c..330a197 100644
+--- a/android/pics-hsp.txt
++++ b/android/pics-hsp.txt
+@@ -1,6 +1,6 @@
+ HSP PICS for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
+index 2d5b14b..a097277 100644
+--- a/android/pixit-hsp.txt
++++ b/android/pixit-hsp.txt
+@@ -1,6 +1,6 @@
+ HSP PIXIT for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
+index 7da71e8..0df9806 100644
+--- a/android/pts-hsp.txt
++++ b/android/pts-hsp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for HSP
+ 
+-PTS version: 5.1
+-Tested: 10-April-2014
+-Android version: 4.4.2
++PTS version: 5.2
++Tested: 15-July-2014
++Android version: 4.4.4
+ 
+ Results:
+ PASS    test passed
+-- 
+1.8.5.3
 
-Both patches have been applied. Thanks.
-
-Johan
