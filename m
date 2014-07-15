@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 5/8] android/haltest: Add sample rate parameter when opening audio streams
-Date: Tue, 15 Jul 2014 10:59:24 +0300
-Message-Id: <1405411167-15638-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 3/8] android/haltest: Add loop command
+Date: Tue, 15 Jul 2014 10:59:22 +0300
+Message-Id: <1405411167-15638-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,124 +11,96 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Opening input/output audio streams makes use of config with sample rate.
+loop command makes stream_in->read() and then stream_out->write(). At
+the moment buffers shall be equal.
 ---
- android/client/if-sco.c | 46 ++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 40 insertions(+), 6 deletions(-)
+ android/client/if-sco.c | 45 ++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 42 insertions(+), 3 deletions(-)
 
 diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 06ac6e8..14b7dcc 100644
+index b4c3506..39c3e3a 100644
 --- a/android/client/if-sco.c
 +++ b/android/client/if-sco.c
-@@ -445,6 +445,7 @@ static void stop_p(int argc, const char **argv)
- 
- static void open_output_stream_p(int argc, const char **argv)
- {
-+	struct audio_config *config;
- 	int err;
- 
- 	RETURN_IF_NULL(if_audio_sco);
-@@ -457,15 +458,28 @@ static void open_output_stream_p(int argc, const char **argv)
- 	}
- 	pthread_mutex_unlock(&state_mutex);
- 
-+	if (argc < 3) {
-+		haltest_info("No sampling rate specified. Use default conf\n");
-+		config = NULL;
-+	} else {
-+		config = calloc(1, sizeof(struct audio_config));
-+		if (!config)
-+			return;
-+
-+		config->sample_rate = atoi(argv[2]);
-+		config->channel_mask = AUDIO_CHANNEL_OUT_STEREO;
-+		config->format = AUDIO_FORMAT_PCM_16_BIT;
-+	}
-+
- 	err = if_audio_sco->open_output_stream(if_audio_sco,
- 						0,
- 						AUDIO_DEVICE_OUT_ALL_SCO,
- 						AUDIO_OUTPUT_FLAG_NONE,
--						NULL,
-+						config,
- 						&stream_out);
- 	if (err < 0) {
- 		haltest_error("open output stream returned %d\n", err);
--		return;
-+		goto failed;
- 	}
- 
- 	buffer_size = stream_out->common.get_buffer_size(&stream_out->common);
-@@ -473,6 +487,9 @@ static void open_output_stream_p(int argc, const char **argv)
- 		haltest_error("Invalid buffer size received!\n");
- 	else
- 		haltest_info("Using buffer size: %zu\n", buffer_size);
-+failed:
-+	if (config)
-+		free(config);
+@@ -148,6 +148,11 @@ static int feed_from_generator(short *buffer, void *data)
+ 	return buffer_size;
  }
  
- static void close_output_stream_p(int argc, const char **argv)
-@@ -493,6 +510,7 @@ static void close_output_stream_p(int argc, const char **argv)
- 
- static void open_input_stream_p(int argc, const char **argv)
++static int feed_from_in(short *buffer, void *data)
++{
++	return stream_in->read(stream_in, buffer, buffer_size_in);
++}
++
+ static void prepare_sample(void)
  {
-+	struct audio_config *config;
- 	int err;
+ 	int x;
+@@ -179,8 +184,12 @@ static void *playback_thread(void *data)
  
- 	RETURN_IF_NULL(if_audio_sco);
-@@ -505,14 +523,27 @@ static void open_input_stream_p(int argc, const char **argv)
- 	}
- 	pthread_mutex_unlock(&state_mutex);
+ 	/* Use file or fall back to generator */
+ 	if (in) {
+-		filbuff_cb = feed_from_file;
+-		cb_data = in;
++		if (data == stream_in)
++			filbuff_cb = feed_from_in;
++		else {
++			filbuff_cb = feed_from_file;
++			cb_data = in;
++		}
+ 	} else {
+ 		prepare_sample();
+ 		filbuff_cb = feed_from_generator;
+@@ -218,7 +227,7 @@ static void *playback_thread(void *data)
+ 		pthread_mutex_unlock(&outstream_mutex);
+ 	} while (len && w_len > 0);
  
-+	if (argc < 3) {
-+		haltest_info("No sampling rate specified. Use default conf\n");
-+		config = NULL;
-+	} else {
-+		config = calloc(1, sizeof(struct audio_config));
-+		if (!config)
-+			return;
-+
-+		config->sample_rate = atoi(argv[2]);
-+		config->channel_mask = AUDIO_CHANNEL_OUT_MONO;
-+		config->format = AUDIO_FORMAT_PCM_16_BIT;
-+	}
-+
- 	err = if_audio_sco->open_input_stream(if_audio_sco,
- 						0,
- 						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
--						NULL,
-+						config,
- 						&stream_in);
- 	if (err < 0) {
- 		haltest_error("open output stream returned %d\n", err);
--		return;
-+		goto failed;
- 	}
+-	if (in)
++	if (in && data != stream_in)
+ 		fclose(in);
  
- 	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
-@@ -520,6 +551,9 @@ static void open_input_stream_p(int argc, const char **argv)
- 		haltest_error("Invalid buffer size received!\n");
- 	else
- 		haltest_info("Using buffer size: %zu\n", buffer_size_in);
-+failed:
-+	if (config)
-+		free(config);
+ 	pthread_mutex_lock(&state_mutex);
+@@ -315,6 +324,35 @@ fail:
+ 		fclose(in);
  }
  
- static void close_input_stream_p(int argc, const char **argv)
-@@ -695,9 +729,9 @@ static void init_check_p(int argc, const char **argv)
- static struct method methods[] = {
- 	STD_METHOD(init),
- 	STD_METHOD(cleanup),
--	STD_METHOD(open_output_stream),
-+	STD_METHODH(open_output_stream, "sample_rate"),
- 	STD_METHOD(close_output_stream),
--	STD_METHOD(open_input_stream),
-+	STD_METHODH(open_input_stream, "sampling rate"),
++static void loop_p(int argc, const char **argv)
++{
++	RETURN_IF_NULL(if_audio_sco);
++	RETURN_IF_NULL(stream_out);
++	RETURN_IF_NULL(stream_in);
++
++	if (!buffer_size || !buffer_size_in) {
++		haltest_error("Invalid buffer sizes. Streams opened\n");
++		return;
++	}
++
++	if (buffer_size != buffer_size_in) {
++		haltest_error("read/write buffers differ, not supported\n");
++		return;
++	}
++
++	pthread_mutex_lock(&state_mutex);
++	if (current_state != STATE_STOPPED) {
++		haltest_error("Already playing or stream suspended!\n");
++		pthread_mutex_unlock(&state_mutex);
++		return;
++	}
++	pthread_mutex_unlock(&state_mutex);
++
++	if (pthread_create(&play_thread, NULL, playback_thread,
++							stream_in) != 0)
++		haltest_error("Cannot create playback thread!\n");
++}
++
+ static void read_p(int argc, const char **argv)
+ {
+ 	RETURN_IF_NULL(if_audio_sco);
+@@ -615,6 +653,7 @@ static struct method methods[] = {
  	STD_METHOD(close_input_stream),
  	STD_METHODH(play, "<path to pcm file>"),
  	STD_METHOD(read),
++	STD_METHOD(loop),
+ 	STD_METHOD(stop),
+ 	STD_METHOD(suspend),
+ 	STD_METHOD(resume),
 -- 
 1.9.1
 
