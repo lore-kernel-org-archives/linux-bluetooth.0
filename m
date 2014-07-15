@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 6/8] android/haltest: Correct check for similar buffer size
-Date: Tue, 15 Jul 2014 10:59:25 +0300
-Message-Id: <1405411167-15638-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 7/8] android/haltest: Add mono to stereo conversion for loopback
+Date: Tue, 15 Jul 2014 10:59:26 +0300
+Message-Id: <1405411167-15638-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,38 +11,60 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The new check takes into account number of channels.
 ---
- android/client/if-sco.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ android/client/if-sco.c | 28 +++++++++++++++++++++++++++-
+ 1 file changed, 27 insertions(+), 1 deletion(-)
 
 diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 14b7dcc..0b884c3 100644
+index 0b884c3..0e27a9d 100644
 --- a/android/client/if-sco.c
 +++ b/android/client/if-sco.c
-@@ -354,16 +354,21 @@ fail:
+@@ -174,10 +174,24 @@ static void prepare_sample(void)
+ 	sample_pos = 0;
+ }
  
- static void loop_p(int argc, const char **argv)
++static void mono_to_stereo_pcm16(const int16_t *in, int16_t *out, size_t samples)
++{
++	int16_t mono;
++	size_t i;
++
++	for (i = 0; i < samples; i++) {
++		mono = get_unaligned(&in[i]);
++
++		put_unaligned(mono, &out[2 * i]);
++		put_unaligned(mono, &out[2 * i + 1]);
++	}
++}
++
+ static void *playback_thread(void *data)
  {
-+	int chan_out, chan_in;
-+
- 	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_out);
- 	RETURN_IF_NULL(stream_in);
+ 	int (*filbuff_cb) (short*, void*);
+ 	short buffer[buffer_size / sizeof(short)];
++	short buffer_in[buffer_size_in / sizeof(short)];
+ 	size_t len = 0;
+ 	ssize_t w_len = 0;
+ 	FILE *in = data;
+@@ -217,7 +231,19 @@ static void *playback_thread(void *data)
  
-+	chan_out = popcount(stream_out->common.get_channels(&stream_out->common));
-+	chan_in = popcount(stream_in->common.get_channels(&stream_in->common));
-+
- 	if (!buffer_size || !buffer_size_in) {
- 		haltest_error("Invalid buffer sizes. Streams opened\n");
- 		return;
- 	}
+ 		pthread_mutex_unlock(&state_mutex);
  
--	if (buffer_size != buffer_size_in) {
-+	if (buffer_size / chan_out != buffer_size_in / chan_in) {
- 		haltest_error("read/write buffers differ, not supported\n");
- 		return;
- 	}
+-		len = filbuff_cb(buffer, cb_data);
++		if (data && data == stream_in) {
++			int chan_in = popcount(stream_in->common.get_channels(&stream_in->common));
++			int chan_out = popcount(stream_out->common.get_channels(&stream_out->common));
++
++			len = filbuff_cb(buffer_in, cb_data);
++
++			if (chan_in == 1 && chan_out == 2) {
++				mono_to_stereo_pcm16(buffer_in,
++							buffer,
++							buffer_size_in / 2);
++			}
++		} else
++			len = filbuff_cb(buffer, cb_data);
+ 
+ 		pthread_mutex_lock(&outstream_mutex);
+ 		if (!stream_out) {
 -- 
 1.9.1
 
