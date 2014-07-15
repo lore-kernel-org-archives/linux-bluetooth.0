@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 8/8] android/haltest: Refactor stop and closing streams
-Date: Tue, 15 Jul 2014 10:59:27 +0300
-Message-Id: <1405411167-15638-9-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/8] android/haltest: Add sample rate parameter when opening audio streams
+Date: Tue, 15 Jul 2014 10:59:24 +0300
+Message-Id: <1405411167-15638-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,60 +11,124 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Opening input/output audio streams makes use of config with sample rate.
 ---
- android/client/if-sco.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+ android/client/if-sco.c | 46 ++++++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 40 insertions(+), 6 deletions(-)
 
 diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 0e27a9d..456c529 100644
+index 06ac6e8..14b7dcc 100644
 --- a/android/client/if-sco.c
 +++ b/android/client/if-sco.c
-@@ -458,6 +458,9 @@ failed:
+@@ -445,6 +445,7 @@ static void stop_p(int argc, const char **argv)
  
- static void stop_p(int argc, const char **argv)
+ static void open_output_stream_p(int argc, const char **argv)
  {
-+	RETURN_IF_NULL(if_audio_sco);
-+	RETURN_IF_NULL(play_thread);
-+
- 	pthread_mutex_lock(&state_mutex);
- 	if (current_state == STATE_STOPPED || current_state == STATE_STOPPING) {
- 		pthread_mutex_unlock(&state_mutex);
-@@ -467,6 +470,9 @@ static void stop_p(int argc, const char **argv)
- 	current_state = STATE_STOPPING;
++	struct audio_config *config;
+ 	int err;
+ 
+ 	RETURN_IF_NULL(if_audio_sco);
+@@ -457,15 +458,28 @@ static void open_output_stream_p(int argc, const char **argv)
+ 	}
  	pthread_mutex_unlock(&state_mutex);
  
-+	pthread_join(play_thread, NULL);
-+	play_thread = 0;
++	if (argc < 3) {
++		haltest_info("No sampling rate specified. Use default conf\n");
++		config = NULL;
++	} else {
++		config = calloc(1, sizeof(struct audio_config));
++		if (!config)
++			return;
 +
- 	pthread_mutex_lock(&outstream_mutex);
- 	stream_out->common.standby(&stream_out->common);
- 	pthread_mutex_unlock(&outstream_mutex);
-@@ -528,10 +534,8 @@ static void close_output_stream_p(int argc, const char **argv)
++		config->sample_rate = atoi(argv[2]);
++		config->channel_mask = AUDIO_CHANNEL_OUT_STEREO;
++		config->format = AUDIO_FORMAT_PCM_16_BIT;
++	}
++
+ 	err = if_audio_sco->open_output_stream(if_audio_sco,
+ 						0,
+ 						AUDIO_DEVICE_OUT_ALL_SCO,
+ 						AUDIO_OUTPUT_FLAG_NONE,
+-						NULL,
++						config,
+ 						&stream_out);
+ 	if (err < 0) {
+ 		haltest_error("open output stream returned %d\n", err);
+-		return;
++		goto failed;
+ 	}
+ 
+ 	buffer_size = stream_out->common.get_buffer_size(&stream_out->common);
+@@ -473,6 +487,9 @@ static void open_output_stream_p(int argc, const char **argv)
+ 		haltest_error("Invalid buffer size received!\n");
+ 	else
+ 		haltest_info("Using buffer size: %zu\n", buffer_size);
++failed:
++	if (config)
++		free(config);
+ }
+ 
+ static void close_output_stream_p(int argc, const char **argv)
+@@ -493,6 +510,7 @@ static void close_output_stream_p(int argc, const char **argv)
+ 
+ static void open_input_stream_p(int argc, const char **argv)
+ {
++	struct audio_config *config;
+ 	int err;
+ 
  	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_out);
+@@ -505,14 +523,27 @@ static void open_input_stream_p(int argc, const char **argv)
+ 	}
+ 	pthread_mutex_unlock(&state_mutex);
  
--	stop_p(argc, argv);
--
--	haltest_info("Waiting for playback thread...\n");
--	pthread_join(play_thread, NULL);
-+	if (play_thread)
-+		stop_p(argc, argv);
++	if (argc < 3) {
++		haltest_info("No sampling rate specified. Use default conf\n");
++		config = NULL;
++	} else {
++		config = calloc(1, sizeof(struct audio_config));
++		if (!config)
++			return;
++
++		config->sample_rate = atoi(argv[2]);
++		config->channel_mask = AUDIO_CHANNEL_OUT_MONO;
++		config->format = AUDIO_FORMAT_PCM_16_BIT;
++	}
++
+ 	err = if_audio_sco->open_input_stream(if_audio_sco,
+ 						0,
+ 						AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET,
+-						NULL,
++						config,
+ 						&stream_in);
+ 	if (err < 0) {
+ 		haltest_error("open output stream returned %d\n", err);
+-		return;
++		goto failed;
+ 	}
  
- 	if_audio_sco->close_output_stream(if_audio_sco, stream_out);
+ 	buffer_size_in = stream_in->common.get_buffer_size(&stream_in->common);
+@@ -520,6 +551,9 @@ static void open_input_stream_p(int argc, const char **argv)
+ 		haltest_error("Invalid buffer size received!\n");
+ 	else
+ 		haltest_info("Using buffer size: %zu\n", buffer_size_in);
++failed:
++	if (config)
++		free(config);
+ }
  
-@@ -592,10 +596,8 @@ static void close_input_stream_p(int argc, const char **argv)
- 	RETURN_IF_NULL(if_audio_sco);
- 	RETURN_IF_NULL(stream_in);
- 
--	stop_p(argc, argv);
--
--	haltest_info("Waiting for playback thread...\n");
--	pthread_join(play_thread, NULL);
-+	if (play_thread)
-+		stop_p(argc, argv);
- 
- 	if_audio_sco->close_input_stream(if_audio_sco, stream_in);
- 
+ static void close_input_stream_p(int argc, const char **argv)
+@@ -695,9 +729,9 @@ static void init_check_p(int argc, const char **argv)
+ static struct method methods[] = {
+ 	STD_METHOD(init),
+ 	STD_METHOD(cleanup),
+-	STD_METHOD(open_output_stream),
++	STD_METHODH(open_output_stream, "sample_rate"),
+ 	STD_METHOD(close_output_stream),
+-	STD_METHOD(open_input_stream),
++	STD_METHODH(open_input_stream, "sampling rate"),
+ 	STD_METHOD(close_input_stream),
+ 	STD_METHODH(play, "<path to pcm file>"),
+ 	STD_METHOD(read),
 -- 
 1.9.1
 
