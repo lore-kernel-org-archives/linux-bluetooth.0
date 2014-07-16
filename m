@@ -1,97 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 16 Jul 2014 13:31:52 +0300
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: Szymon Janc <szymon.janc@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [RFC] android/gatt: Fix daemon crash
-Message-ID: <20140716103149.GA12472@aemeltch-MOBL1>
-References: <1405498111-4585-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <7211018.Nn2NFf5858@uw000953>
+Subject: Re: [PATCH 0/8] haltest support for Audio SCO HAL testing
+Date: Wed, 16 Jul 2014 12:06:03 +0200
+Message-ID: <2531197.yT6D9yrepN@uw000953>
+In-Reply-To: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405411167-15638-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <7211018.Nn2NFf5858@uw000953>
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Szymon,
+Hi Andrei,
 
-On Wed, Jul 16, 2014 at 11:28:45AM +0200, Szymon Janc wrote:
-> Hi Andrei,
+On Tuesday 15 of July 2014 10:59:19 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 > 
-> On Wednesday 16 of July 2014 11:08:31 Andrei Emeltchenko wrote:
-> > From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> > 
-> > Due to insufficient error check bluetooth daemon goes to crash loop with
-> > logs shown below. The patch adds error check in a case crypto failed to
-> > initialize with the same approach as in other helper functions.
+> Helps to test Audio SCO HAL
 > 
-> The fix is correct, but commit message is not. Maybe something like:
+> Andrei Emeltchenko (8):
+>   android/haltest: Add open/close input stream commands
+>   android/haltest: Add read command.
+>   android/haltest: Add loop command
+>   android/haltest: Implement read to file
+>   android/haltest: Add sample rate parameter when opening audio streams
+>   android/haltest: Correct check for similar buffer size
+>   android/haltest: Add mono to stereo conversion for loopback
+>   android/haltest: Refactor stop and closing streams
 > 
-> shared/gatt: Fix NULL pointer dereference on destroy
+>  android/Android.mk      |   3 +
+>  android/client/if-sco.c | 291 ++++++++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 283 insertions(+), 11 deletions(-)
 > 
-> This patch adds pointer check to gatt_db_destroy allowing user to call
-> it with NULL pointer. This follow convention used in shared code for
-> destroy functions. This fix following android bluetoothd crash in a case
-> crypto failed to initialize.
 
-Looks OK, do you need me to resend this patch?
+All patches applied. Thanks.
 
-Best regards 
-Andrei Emeltchenko 
+(I've changed android/haltest to android/client in commits messages)
 
-> 
-> 
-> > 
-> > ...
-> > I/ProbeModule(24651): insmod_by_dep: parse base black list error -1
-> > E/ProbeModule(24651): insmod_by_dep: cannot find module's dependency
-> > info: [net-pf-38]
-> > I/bluetoothd(24639): bluetoothd[24640]: gatt: Failed to setup crypto
-> > ...
-> > I/DEBUG   (16237): *** *** *** *** *** *** *** *** *** *** *** *** ***
-> > *** *** ***
-> > I/DEBUG   (16237): Build fingerprint:
-> > 'Intel/hsb/hsb:4.4.2/KOT49H/eng.android.20140514.123328:eng/test-keys'
-> > I/DEBUG   (16237): Revision: '0'
-> > I/DEBUG   (16237): pid: 24640, tid: 24640, name: bluetoothd-main  >>>
-> > /system/bin/bluetoothd-main <<<
-> > I/DEBUG   (16237): signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr
-> > 00000004
-> > ...
-> > I/DEBUG   (16237): stack:
-> > I/DEBUG   (16237):          ff81a9dc  ff81aa14  [stack]
-> > I/DEBUG   (16237):          ff81a9e0  00000000
-> > I/DEBUG   (16237):          ff81a9e4  f75c2e06  /system/lib/libc.so
-> > (vsyslog+6)
-> > I/DEBUG   (16237):          ff81a9e8  f77c0cd8
-> > /system/bin/bluetoothd-main
-> > I/DEBUG   (16237):          ff81a9ec  f778692c
-> > /system/bin/bluetoothd-main (gatt_db_destroy+12)
-> > I/DEBUG   (16237):     #00  ff81a9f0  00000003
-> > I/DEBUG   (16237):          ff81a9f4  f77865c0
-> > /system/bin/bluetoothd-main (gatt_db_service_destroy)
-> > I/DEBUG   (16237):          ff81a9f8  f7784709
-> > ...
-> > ---
-> >  src/shared/gatt-db.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> > index f671480..b3f95d2 100644
-> > --- a/src/shared/gatt-db.c
-> > +++ b/src/shared/gatt-db.c
-> > @@ -138,6 +138,9 @@ static void gatt_db_service_destroy(void *data)
-> >  
-> >  void gatt_db_destroy(struct gatt_db *db)
-> >  {
-> > +	if (!db)
-> > +		return;
-> > +
-> >  	queue_destroy(db->services, gatt_db_service_destroy);
-> >  	free(db);
-> >  }
-> > 
-> 
-> -- 
-> Best regards, 
-> Szymon Janc
+-- 
+Best regards, 
+Szymon Janc
