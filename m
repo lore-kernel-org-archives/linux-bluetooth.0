@@ -1,57 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix always checking the blacklist for incoming connections
-Date: Wed, 16 Jul 2014 16:19:21 +0300
-Message-Id: <1405516761-20590-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] shared/gatt: Fix NULL pointer dereference on destroy
+Date: Wed, 16 Jul 2014 15:17:30 +0300
+Message-Id: <1405513050-10779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-We should check the blacklist no matter what, meaning also when we're
-not connectable. This patch fixes the respective logic in the function
-making the decision whether to accept a connection or not.
+This patch adds pointer check to gatt_db_destroy allowing user to call
+it with NULL pointer. This follow convention used in shared code for
+destroy functions. This fix following android bluetoothd crash in a case
+crypto failed to initialize.
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+...
+I/ProbeModule(24651): insmod_by_dep: parse base black list error -1
+E/ProbeModule(24651): insmod_by_dep: cannot find module's dependency
+info: [net-pf-38]
+I/bluetoothd(24639): bluetoothd[24640]: gatt: Failed to setup crypto
+...
+I/DEBUG   (16237): *** *** *** *** *** *** *** *** *** *** *** *** ***
+*** *** ***
+I/DEBUG   (16237): Build fingerprint:
+'Intel/hsb/hsb:4.4.2/KOT49H/eng.android.20140514.123328:eng/test-keys'
+I/DEBUG   (16237): Revision: '0'
+I/DEBUG   (16237): pid: 24640, tid: 24640, name: bluetoothd-main  >>>
+/system/bin/bluetoothd-main <<<
+I/DEBUG   (16237): signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr
+00000004
+...
+I/DEBUG   (16237): stack:
+I/DEBUG   (16237):          ff81a9dc  ff81aa14  [stack]
+I/DEBUG   (16237):          ff81a9e0  00000000
+I/DEBUG   (16237):          ff81a9e4  f75c2e06  /system/lib/libc.so
+(vsyslog+6)
+I/DEBUG   (16237):          ff81a9e8  f77c0cd8
+/system/bin/bluetoothd-main
+I/DEBUG   (16237):          ff81a9ec  f778692c
+/system/bin/bluetoothd-main (gatt_db_destroy+12)
+I/DEBUG   (16237):     #00  ff81a9f0  00000003
+I/DEBUG   (16237):          ff81a9f4  f77865c0
+/system/bin/bluetoothd-main (gatt_db_service_destroy)
+I/DEBUG   (16237):          ff81a9f8  f7784709
+...
 ---
- net/bluetooth/hci_event.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ src/shared/gatt-db.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index ceaffd681f8b..8339f729921b 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2129,18 +2129,17 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index f671480..b3f95d2 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -138,6 +138,9 @@ static void gatt_db_service_destroy(void *data)
  
--	if (test_bit(HCI_CONNECTABLE, &hdev->dev_flags)) {
--		if (hci_bdaddr_list_lookup(&hdev->blacklist, &ev->bdaddr,
--					   BDADDR_BREDR)) {
--			hci_reject_conn(hdev, &ev->bdaddr);
--			return;
--		}
--	} else {
--		if (!hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
--					    BDADDR_BREDR)) {
--			hci_reject_conn(hdev, &ev->bdaddr);
--			return;
--		}
-+	if (hci_bdaddr_list_lookup(&hdev->blacklist, &ev->bdaddr,
-+				   BDADDR_BREDR)) {
-+		hci_reject_conn(hdev, &ev->bdaddr);
+ void gatt_db_destroy(struct gatt_db *db)
+ {
++	if (!db)
 +		return;
-+	}
 +
-+	if (!test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
-+	    !hci_bdaddr_list_lookup(&hdev->whitelist, &ev->bdaddr,
-+				    BDADDR_BREDR)) {
-+		    hci_reject_conn(hdev, &ev->bdaddr);
-+		    return;
- 	}
- 
- 	/* Connection accepted */
+ 	queue_destroy(db->services, gatt_db_service_destroy);
+ 	free(db);
+ }
 -- 
-1.9.3
+1.9.1
 
