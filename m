@@ -1,37 +1,28 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 1/3] Bluetooth: Add a role parameter to hci_conn_add()
+Subject: Re: [PATCH 3/3] Bluetooth: Fix trying to initiate connections when acting as LE slave
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405500969-17578-1-git-send-email-johan.hedberg@gmail.com>
-Date: Wed, 16 Jul 2014 12:01:22 +0200
+In-Reply-To: <1405500969-17578-3-git-send-email-johan.hedberg@gmail.com>
+Date: Wed, 16 Jul 2014 12:01:19 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <548ECC5A-889B-4366-ADD1-C2D69FAF6E1B@holtmann.org>
-References: <1405500969-17578-1-git-send-email-johan.hedberg@gmail.com>
+Message-Id: <C2A482A9-2693-4313-AAC5-A7B4FB6D29A2@holtmann.org>
+References: <1405500969-17578-1-git-send-email-johan.hedberg@gmail.com> <1405500969-17578-3-git-send-email-johan.hedberg@gmail.com>
 To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Johan,
 
-> We need to be able to track slave vs master LE connections in
-> hci_conn_hash, and to be able to do that we need to know the role of the
-> connection by the time hci_conn_add_has() is called. This means in
-> practice the hci_conn_add() call that creates the hci_conn_object.
-> 
-> This patch adds a new role parameter to hci_conn_add() function to give
-> the object its initial role value, and updates the callers to pass the
-> appropriate role to it. Since the function now takes care of
-> initializing both conn->role and conn->out values we can remove some
-> other unnecessary assignments.
+> When we have at least one LE slave connection most (probably all)
+> controllers will refuse to initiate any new connections. To avoid
+> unnecessary failures simply check for this situation up-front and skip
+> the connection attempt.
 > 
 > Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 > ---
-> include/net/bluetooth/hci_core.h |  3 ++-
-> net/bluetooth/amp.c              |  4 ++--
-> net/bluetooth/hci_conn.c         | 17 +++++++++--------
-> net/bluetooth/hci_event.c        | 17 ++++++-----------
-> 4 files changed, 19 insertions(+), 22 deletions(-)
+> net/bluetooth/hci_event.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
