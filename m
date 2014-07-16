@@ -1,75 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
 From: Szymon Janc <szymon.janc@tieto.com>
-To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] shared/gatt: Fix NULL pointer dereference on destroy
-Date: Wed, 16 Jul 2014 17:53:22 +0200
-Message-ID: <8174973.ezf6VjRdXk@uw000953>
-In-Reply-To: <1405513050-10779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1405513050-10779-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: Re: [PATCH] android/pts: Update PTS files for HSP
+Date: Wed, 16 Jul 2014 17:41:54 +0200
+Message-ID: <3490966.soiaHUpBEg@uw000953>
+In-Reply-To: <1405434056-17558-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1405434056-17558-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Andrei,
+Hi Sebastian,
 
-On Wednesday 16 of July 2014 15:17:30 Andrei Emeltchenko wrote:
-> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-> 
-> This patch adds pointer check to gatt_db_destroy allowing user to call
-> it with NULL pointer. This follow convention used in shared code for
-> destroy functions. This fix following android bluetoothd crash in a case
-> crypto failed to initialize.
-> 
-> ...
-> I/ProbeModule(24651): insmod_by_dep: parse base black list error -1
-> E/ProbeModule(24651): insmod_by_dep: cannot find module's dependency
-> info: [net-pf-38]
-> I/bluetoothd(24639): bluetoothd[24640]: gatt: Failed to setup crypto
-> ...
-> I/DEBUG   (16237): *** *** *** *** *** *** *** *** *** *** *** *** ***
-> *** *** ***
-> I/DEBUG   (16237): Build fingerprint:
-> 'Intel/hsb/hsb:4.4.2/KOT49H/eng.android.20140514.123328:eng/test-keys'
-> I/DEBUG   (16237): Revision: '0'
-> I/DEBUG   (16237): pid: 24640, tid: 24640, name: bluetoothd-main  >>>
-> /system/bin/bluetoothd-main <<<
-> I/DEBUG   (16237): signal 11 (SIGSEGV), code 1 (SEGV_MAPERR), fault addr
-> 00000004
-> ...
-> I/DEBUG   (16237): stack:
-> I/DEBUG   (16237):          ff81a9dc  ff81aa14  [stack]
-> I/DEBUG   (16237):          ff81a9e0  00000000
-> I/DEBUG   (16237):          ff81a9e4  f75c2e06  /system/lib/libc.so
-> (vsyslog+6)
-> I/DEBUG   (16237):          ff81a9e8  f77c0cd8
-> /system/bin/bluetoothd-main
-> I/DEBUG   (16237):          ff81a9ec  f778692c
-> /system/bin/bluetoothd-main (gatt_db_destroy+12)
-> I/DEBUG   (16237):     #00  ff81a9f0  00000003
-> I/DEBUG   (16237):          ff81a9f4  f77865c0
-> /system/bin/bluetoothd-main (gatt_db_service_destroy)
-> I/DEBUG   (16237):          ff81a9f8  f7784709
-> ...
+On Tuesday 15 of July 2014 16:20:56 Sebastian Chlad wrote:
+> Re-run PTS tests for HSP on PTS 5.2 and Android 4.4.4
 > ---
->  src/shared/gatt-db.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  android/pics-hsp.txt  | 2 +-
+>  android/pixit-hsp.txt | 2 +-
+>  android/pts-hsp.txt   | 6 +++---
+>  3 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> index f671480..b3f95d2 100644
-> --- a/src/shared/gatt-db.c
-> +++ b/src/shared/gatt-db.c
-> @@ -138,6 +138,9 @@ static void gatt_db_service_destroy(void *data)
+> diff --git a/android/pics-hsp.txt b/android/pics-hsp.txt
+> index 3c4962c..330a197 100644
+> --- a/android/pics-hsp.txt
+> +++ b/android/pics-hsp.txt
+> @@ -1,6 +1,6 @@
+>  HSP PICS for the PTS tool.
 >  
->  void gatt_db_destroy(struct gatt_db *db)
->  {
-> +	if (!db)
-> +		return;
-> +
->  	queue_destroy(db->services, gatt_db_service_destroy);
->  	free(db);
->  }
+> -PTS version: 5.1
+> +PTS version: 5.2
+>  
+>  * - different than PTS defaults
+>  # - not yet implemented/supported
+> diff --git a/android/pixit-hsp.txt b/android/pixit-hsp.txt
+> index 2d5b14b..a097277 100644
+> --- a/android/pixit-hsp.txt
+> +++ b/android/pixit-hsp.txt
+> @@ -1,6 +1,6 @@
+>  HSP PIXIT for the PTS tool.
+>  
+> -PTS version: 5.1
+> +PTS version: 5.2
+>  
+>  * - different than PTS defaults
+>  & - should be set to IUT Bluetooth address
+> diff --git a/android/pts-hsp.txt b/android/pts-hsp.txt
+> index 7da71e8..0df9806 100644
+> --- a/android/pts-hsp.txt
+> +++ b/android/pts-hsp.txt
+> @@ -1,8 +1,8 @@
+>  PTS test results for HSP
+>  
+> -PTS version: 5.1
+> -Tested: 10-April-2014
+> -Android version: 4.4.2
+> +PTS version: 5.2
+> +Tested: 15-July-2014
+> +Android version: 4.4.4
+>  
+>  Results:
+>  PASS    test passed
 > 
 
 Patch applied, thanks.
