@@ -1,44 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <993441F6-4EC2-4A4A-B9E0-18EE88F51ACB@me.com>
-References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
-	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
-	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
-	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
-	<CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
-	<CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com>
-	<CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com>
-	<CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com>
-	<CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com>
-	<20140629051442.GA31085@t440s.P-661HNU-F1>
-	<20140629052949.GA32130@t440s>
-	<E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
-	<CABx3TkUP3Y9nJJk=u2ghFnunQRh9x-v6PG_ncyiM+mUqaoRtWg@mail.gmail.com>
-	<5A1EE16D-11BB-414E-B572-92FBF305B4E5@holtmann.org>
-	<35F01C64-F255-433B-A07A-1AD84CA6574A@me.com>
-	<9D9BAF08-F0CE-4A5A-B8E7-039DE916D93E@holtmann.org>
-	<993441F6-4EC2-4A4A-B9E0-18EE88F51ACB@me.com>
-Date: Wed, 16 Jul 2014 22:40:53 -0700
-Message-ID: <CAHZ1yCkgN1apeGyFVNqgvW+H09RmC2gfHdb1bi26HK+7c+ibeA@mail.gmail.com>
-Subject: Re: LE mouse reconnect problem
-From: Scott James Remnant <keybuk@google.com>
-To: d.eriksson@me.com
-Cc: Marcel Holtmann <marcel@holtmann.org>, Ryan Press <ryan@presslab.us>,
-	Johan Hedberg <johan.hedberg@gmail.com>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 2/2] Bluetooth: btmrvl: add public address configuration support
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1405538486-23533-2-git-send-email-bzhao@marvell.com>
+Date: Wed, 16 Jul 2014 23:34:41 +0200
+Cc: Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Amitkumar Karwar <akarwar@marvell.com>,
+	Avinash Patil <patila@marvell.com>,
+	Chin-Ran Lo <crlo@marvell.com>, Xinming Hu <huxm@marvell.com>
+Message-Id: <A5D7B02F-3913-4501-A007-B11A3E7FA7EB@holtmann.org>
+References: <1405538486-23533-1-git-send-email-bzhao@marvell.com> <1405538486-23533-2-git-send-email-bzhao@marvell.com>
+To: Bing Zhao <bzhao@marvell.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Thu, Jul 3, 2014 at 9:40 AM,  <d.eriksson@me.com> wrote:
+Hi Bing,
 
-> Sounds great. I really wanted the passive scan option as well.
-> Would bluetooth-next work under 3.13?
->
+> .set_bdaddr handler is implemented for public address configuration.
+> 
+> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+> Signed-off-by: Bing Zhao <bzhao@marvell.com>
+> ---
+> drivers/bluetooth/btmrvl_drv.h  |  1 +
+> drivers/bluetooth/btmrvl_main.c | 15 +++++++++++++++
+> 2 files changed, 16 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+> index caf6841..38ad662 100644
+> --- a/drivers/bluetooth/btmrvl_drv.h
+> +++ b/drivers/bluetooth/btmrvl_drv.h
+> @@ -91,6 +91,7 @@ struct btmrvl_private {
+> 
+> /* Vendor specific Bluetooth commands */
+> #define BT_CMD_PSCAN_WIN_REPORT_ENABLE	0xFC03
+> +#define BT_CMD_SET_BDADDR		0xFC22
+> #define BT_CMD_AUTO_SLEEP_MODE		0xFC23
+> #define BT_CMD_HOST_SLEEP_CONFIG	0xFC59
+> #define BT_CMD_HOST_SLEEP_ENABLE	0xFC5A
+> diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+> index cc65fd2..1a325fe 100644
+> --- a/drivers/bluetooth/btmrvl_main.c
+> +++ b/drivers/bluetooth/btmrvl_main.c
+> @@ -539,6 +539,20 @@ static int btmrvl_setup(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +static int btmrvl_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> +{
+> +	struct btmrvl_private *priv = hci_get_drvdata(hdev);
+> +	long ret;
+> +	u8 buf[8];
+> +
+> +	buf[0] = MRVL_VENDOR_PKT;
+> +	buf[1] = sizeof(bdaddr_t);
+> +	bacpy((bdaddr_t *)&buf[2], bdaddr);
 
-Chrome OS is running bluetooth-next on as old a kernel as 3.8 -- we
-have an unshipped backport all the way to 3.4 -- so yes, it's
-definitely possible.
+same thing here. Just use a memcpy.
 
-Scott
--- 
-Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
+> +	ret = btmrvl_send_sync_cmd(priv, BT_CMD_SET_BDADDR, buf, sizeof(buf));
+
+So I keep wondering why you need the btmrvl_send_sync_cmd here. The HCI transport is up and running at this stage and sending vendor command should do the right thing. Similar to what you do in btusb driver.
+
+You might have explained this to, but I must have clearly not understood it.
+
+Regards
+
+Marcel
+
