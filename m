@@ -3,9 +3,9 @@ From: Jiada Wang <jiada_wang@mentor.com>
 To: <marcel@holtmann.org>, <gustavo@padovan.org>, <johan.hedberg@gmail.com>
 CC: <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<Dean_Jenkins@mentor.com>
-Subject: [PATCH v4] Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
-Date: Wed, 16 Jul 2014 15:25:01 +0900
-Message-ID: <1405491901-31307-1-git-send-email-jiada_wang@mentor.com>
+Subject: [PATCH v3] Bluetooth: BCSP fails to ACK re-transmitted frames from the peer
+Date: Wed, 16 Jul 2014 15:05:10 +0900
+Message-ID: <1405490710-24524-1-git-send-email-jiada_wang@mentor.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -34,7 +34,7 @@ Signed-off-by: Jiada Wang <jiada_wang@mentor.com>
  1 file changed, 51 insertions(+), 34 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_bcsp.c b/drivers/bluetooth/hci_bcsp.c
-index 21cc45b..a0cbd69 100644
+index 21cc45b..602f2a1 100644
 --- a/drivers/bluetooth/hci_bcsp.c
 +++ b/drivers/bluetooth/hci_bcsp.c
 @@ -478,13 +478,28 @@ static inline void bcsp_unslip_one_byte(struct bcsp_struct *bcsp, unsigned char
@@ -100,11 +100,11 @@ index 21cc45b..a0cbd69 100644
 +
 +	if (pass_up != 2) {
 +		if ((bcsp->rx_skb->data[1] & 0x0f) == 6 &&
-+		    (bcsp->rx_skb->data[0] & 0x80)) {
++		    bcsp->rx_skb->data[0] & 0x80) {
 +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_ACLDATA_PKT;
 +			pass_up = 1;
 +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 5 &&
-+			   (bcsp->rx_skb->data[0] & 0x80)) {
++			   bcsp->rx_skb->data[0] & 0x80) {
 +			bt_cb(bcsp->rx_skb)->pkt_type = HCI_EVENT_PKT;
 +			pass_up = 1;
 +		} else if ((bcsp->rx_skb->data[1] & 0x0f) == 7) {
