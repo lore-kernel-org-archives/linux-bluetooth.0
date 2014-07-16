@@ -1,81 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 1/2] Bluetooth: add public address configuration for Marvell USB devices
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Bing Zhao <bzhao@marvell.com>
+To: <linux-bluetooth@vger.kernel.org>
+CC: Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan
+	<gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Amitkumar
+ Karwar <akarwar@marvell.com>,
+        Avinash Patil <patila@marvell.com>, Chin-Ran Lo
+	<crlo@marvell.com>,
+        Xinming Hu <huxm@marvell.com>, Bing Zhao
+	<bzhao@marvell.com>
+Subject: [PATCH 2/2] Bluetooth: btmrvl: add public address configuration support
+Date: Wed, 16 Jul 2014 12:21:26 -0700
+Message-ID: <1405538486-23533-2-git-send-email-bzhao@marvell.com>
 In-Reply-To: <1405538486-23533-1-git-send-email-bzhao@marvell.com>
-Date: Wed, 16 Jul 2014 23:06:33 +0200
-Cc: Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Amitkumar Karwar <akarwar@marvell.com>,
-	Avinash Patil <patila@marvell.com>,
-	Chin-Ran Lo <crlo@marvell.com>, Xinming Hu <huxm@marvell.com>
-Message-Id: <968A8F45-B932-4343-A9C4-AA25BC91344A@holtmann.org>
 References: <1405538486-23533-1-git-send-email-bzhao@marvell.com>
-To: Bing Zhao <bzhao@marvell.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bing,
+From: Amitkumar Karwar <akarwar@marvell.com>
 
-> Implemented .set_bdaddr handler provided by bluetooth stack for
-> Marvell devices for public address configuration.
-> 
-> Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
-> Signed-off-by: Bing Zhao <bzhao@marvell.com>
-> ---
-> drivers/bluetooth/btusb.c | 31 +++++++++++++++++++++++++++++++
-> 1 file changed, 31 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index ed7b33b..9846fc4 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -48,6 +48,7 @@ static struct usb_driver btusb_driver;
-> #define BTUSB_INTEL		0x100
-> #define BTUSB_INTEL_BOOT	0x200
-> #define BTUSB_BCM_PATCHRAM	0x400
-> +#define BTUSB_MARVELL		0x800
-> 
-> static const struct usb_device_id btusb_table[] = {
-> 	/* Generic Bluetooth USB device */
-> @@ -242,6 +243,10 @@ static const struct usb_device_id blacklist_table[] = {
-> 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
-> 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
-> 
-> +	/* Marvell device */
-> +	{ USB_DEVICE(0x1286, 0x2044), .driver_info = BTUSB_MARVELL },
-> +	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
-> +
-> 	{ }	/* Terminating entry */
-> };
-> 
-> @@ -1455,6 +1460,29 @@ static int btusb_set_bdaddr_intel(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> 	return 0;
-> }
-> 
-> +static int btusb_set_bdaddr_marvell(struct hci_dev *hdev,
-> +				    const bdaddr_t *bdaddr)
-> +{
-> +	struct sk_buff *skb;
-> +	u8 buf[8];
-> +	long ret;
-> +
-> +	buf[0] = 0xfe;
-> +	buf[1] = sizeof(bdaddr_t);
-> +	bacpy((bdaddr_t *)&buf[2], bdaddr);
+.set_bdaddr handler is implemented for public address configuration.
 
-you could define a packed struct for this or just use memcpy here instead.
+Signed-off-by: Amitkumar Karwar <akarwar@marvell.com>
+Signed-off-by: Bing Zhao <bzhao@marvell.com>
+---
+ drivers/bluetooth/btmrvl_drv.h  |  1 +
+ drivers/bluetooth/btmrvl_main.c | 15 +++++++++++++++
+ 2 files changed, 16 insertions(+)
 
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc22, sizeof(buf), buf, HCI_INIT_TIMEOUT);
-
-Is this opcode writing the address into flash and making it permanent or will a reboot restore it to its original address?
-
-I am asking because for Ericsson chips this exact command with user_id 0xfe was actually making a permanent change of the BD_ADDR. What we want here is a volatile change of the address.
-
-Regards
-
-Marcel
-
+diff --git a/drivers/bluetooth/btmrvl_drv.h b/drivers/bluetooth/btmrvl_drv.h
+index caf6841..38ad662 100644
+--- a/drivers/bluetooth/btmrvl_drv.h
++++ b/drivers/bluetooth/btmrvl_drv.h
+@@ -91,6 +91,7 @@ struct btmrvl_private {
+ 
+ /* Vendor specific Bluetooth commands */
+ #define BT_CMD_PSCAN_WIN_REPORT_ENABLE	0xFC03
++#define BT_CMD_SET_BDADDR		0xFC22
+ #define BT_CMD_AUTO_SLEEP_MODE		0xFC23
+ #define BT_CMD_HOST_SLEEP_CONFIG	0xFC59
+ #define BT_CMD_HOST_SLEEP_ENABLE	0xFC5A
+diff --git a/drivers/bluetooth/btmrvl_main.c b/drivers/bluetooth/btmrvl_main.c
+index cc65fd2..1a325fe 100644
+--- a/drivers/bluetooth/btmrvl_main.c
++++ b/drivers/bluetooth/btmrvl_main.c
+@@ -539,6 +539,20 @@ static int btmrvl_setup(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int btmrvl_set_bdaddr(struct hci_dev *hdev, const bdaddr_t *bdaddr)
++{
++	struct btmrvl_private *priv = hci_get_drvdata(hdev);
++	long ret;
++	u8 buf[8];
++
++	buf[0] = MRVL_VENDOR_PKT;
++	buf[1] = sizeof(bdaddr_t);
++	bacpy((bdaddr_t *)&buf[2], bdaddr);
++	ret = btmrvl_send_sync_cmd(priv, BT_CMD_SET_BDADDR, buf, sizeof(buf));
++
++	return 0;
++}
++
+ /*
+  * This function handles the event generated by firmware, rx data
+  * received from firmware, and tx data sent from kernel.
+@@ -632,6 +646,7 @@ int btmrvl_register_hdev(struct btmrvl_private *priv)
+ 	hdev->flush = btmrvl_flush;
+ 	hdev->send  = btmrvl_send_frame;
+ 	hdev->setup = btmrvl_setup;
++	hdev->set_bdaddr = btmrvl_set_bdaddr;
+ 
+ 	hdev->dev_type = priv->btmrvl_dev.dev_type;
+ 
+-- 
+1.8.2.3
