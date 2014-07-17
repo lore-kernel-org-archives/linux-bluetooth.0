@@ -4,7 +4,7 @@ Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
 Subject: Re: [PATCH] bluetooth: never linger on process exit
 From: Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <1405412728-4706-1-git-send-email-vdavydov@parallels.com>
-Date: Thu, 17 Jul 2014 12:16:53 +0200
+Date: Thu, 17 Jul 2014 12:05:26 +0200
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Network Development <netdev@vger.kernel.org>,
 	LKML <linux-kernel@vger.kernel.org>,
@@ -12,13 +12,15 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Johan Hedberg <johan.hedberg@gmail.com>,
 	Linux Bluetooth mailing list
 	<linux-bluetooth@vger.kernel.org>
-Message-Id: <8B552C8E-08D7-4536-92CD-130AF58B1E9D@holtmann.org>
+Message-Id: <2ECFA3A4-C890-4512-86CD-B17EFDB57663@holtmann.org>
 References: <1405412728-4706-1-git-send-email-vdavydov@parallels.com>
 To: Vladimir Davydov <vdavydov@parallels.com>
-Sender: linux-kernel-owner@vger.kernel.org
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Vladimir,
+
+please always include linux-bluetooth@vger.kernel.org since otherwise it might be missed in the massive amount of emails that is LKML.
 
 > If the current process is exiting, lingering on socket close will make
 > it unkillable, so we should avoid it.
@@ -57,8 +59,23 @@ Hi Vladimir,
 > net/bluetooth/rfcomm/sock.c |    3 ++-
 > net/bluetooth/sco.c         |    6 ++++--
 > 3 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+> index e1378693cc90..d0fd8b04f2e6 100644
+> --- a/net/bluetooth/l2cap_sock.c
+> +++ b/net/bluetooth/l2cap_sock.c
+> @@ -1111,7 +1111,8 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
+> 		l2cap_chan_close(chan, 0);
+> 		lock_sock(sk);
+> 
+> -		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime)
+> +		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
+> +		    !(current->flags & PF_EXITING))
+> 			err = bt_sock_wait_state(sk, BT_CLOSED,
+> 						 sk->sk_lingertime);
+> 	}
 
-patch has been applied to bluetooth-next tree.
+The only other example of using PF_EXITING I found is net/ipv4/af_inet.c and if this is the preferred way of handling this, the patch looks fine to me.
 
 Regards
 
