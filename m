@@ -1,46 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 00/23] Audio SCO HAL second patch set
-Date: Thu, 17 Jul 2014 11:54:00 +0300
-Message-Id: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 5/8] android/gatt: Fix read responses with o length value
+Date: Thu, 17 Jul 2014 10:42:47 +0200
+Message-Id: <1405586570-16851-5-git-send-email-marcin.kraglak@tieto.com>
+In-Reply-To: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Attribute's value length can be 0, so fill read response and send.
+---
+ android/gatt.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-This patch set makes Audio SCO HAL usable
-
-Andrei Emeltchenko (23):
-  android/hal-sco: Use nanosleep for SCO synchronization
-  android/hal-sco: Fixes for unreliable mtu
-  android/hal-sco: Add SCO packet cache
-  android/hal-sco: Make use of config parameter
-  android/hal-sco: Implement open input stream
-  android/hal-sco: Check file descriptor >= 0
-  android/hal-sco: Use global sco file descriptor
-  android/hal-sco: Make debug more readable
-  android/hal-sco: Fix memory leak
-  android/hal-sco: Implement read
-  android/hal-sco: Skip resampling for output stream with 8k
-  android/hal-sco: Skip resampling for input of 8k
-  android/hal-sco: Choose buffer size
-  android/hal-sco: Add stream synchronization
-  android/hal-sco: Connect SCO audio on demand
-  android/hal-sco: Defer SCO connection to write()
-  android/hal-sco: Fix incorrect assignment
-  android/hal-audio: Fix leaving open socket
-  android/hal-sco: Fix leaving open socket
-  android/hal-sco: Fix error code printing
-  android/hal-audio: Remove dead code
-  android/hal-sco: Remove unneeded statement
-  android/tools: Rearrange headers include
-
- android/client/if-sco.c |   8 +-
- android/hal-audio.c     |  15 +-
- android/hal-sco.c       | 605 ++++++++++++++++++++++++++++++++++++++++++------
- 3 files changed, 538 insertions(+), 90 deletions(-)
-
+diff --git a/android/gatt.c b/android/gatt.c
+index 002592c..4d16d1e 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -4488,7 +4488,7 @@ static void read_requested_attributes(void *data, void *user_data)
+ 	struct pending_request *resp_data = data;
+ 	struct request_processing_data *process_data = user_data;
+ 	uint32_t permissions;
+-	uint8_t *value, error;
++	uint8_t *value = NULL, error;
+ 	int value_len = 0;
+ 
+ 	if (!gatt_db_get_attribute_permissions(gatt_db, resp_data->handle,
+@@ -4524,7 +4524,7 @@ static void read_requested_attributes(void *data, void *user_data)
+ 		error = ATT_ECODE_UNLIKELY;
+ 
+ 	/* We have value here already if no callback will be called */
+-	if (value_len > 0)
++	if (value_len >= 0)
+ 		fill_gatt_response(resp_data, resp_data->handle,
+ 					resp_data->offset, error, value_len,
+ 					value);
 -- 
-1.9.1
+1.9.0
 
