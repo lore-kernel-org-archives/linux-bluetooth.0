@@ -1,52 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/build: Add rfcomm tool to Android build
-Date: Thu, 17 Jul 2014 12:44:59 +0200
-Message-Id: <1405593899-2226-1-git-send-email-sebastian.chlad@tieto.com>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] bluetooth: never linger on process exit
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1405412728-4706-1-git-send-email-vdavydov@parallels.com>
+Date: Thu, 17 Jul 2014 12:16:53 +0200
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Network Development <netdev@vger.kernel.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Linux Bluetooth mailing list
+	<linux-bluetooth@vger.kernel.org>
+Message-Id: <8B552C8E-08D7-4536-92CD-130AF58B1E9D@holtmann.org>
+References: <1405412728-4706-1-git-send-email-vdavydov@parallels.com>
+To: Vladimir Davydov <vdavydov@parallels.com>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
----
- android/Android.mk | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+Hi Vladimir,
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 51a792f..404caf9 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -661,3 +661,30 @@ LOCAL_MODULE := avinfo
- LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
- 
- include $(BUILD_EXECUTABLE)
-+
-+#
-+# rfcomm
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/tools/rfcomm.c \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/bluez \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := debug
-+LOCAL_MODULE := rfcomm
-+
-+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-+
-+include $(BUILD_EXECUTABLE)
--- 
-1.8.5.3
+> If the current process is exiting, lingering on socket close will make
+> it unkillable, so we should avoid it.
+> 
+> Reproducer:
+> 
+>  #include <sys/types.h>
+>  #include <sys/socket.h>
+> 
+>  #define BTPROTO_L2CAP   0
+>  #define BTPROTO_SCO     2
+>  #define BTPROTO_RFCOMM  3
+> 
+>  int main()
+>  {
+>          int fd;
+>          struct linger ling;
+> 
+>          fd = socket(PF_BLUETOOTH, SOCK_STREAM, BTPROTO_RFCOMM);
+>          //or: fd = socket(PF_BLUETOOTH, SOCK_DGRAM, BTPROTO_L2CAP);
+>          //or: fd = socket(PF_BLUETOOTH, SOCK_SEQPACKET, BTPROTO_SCO);
+> 
+>          ling.l_onoff = 1;
+>          ling.l_linger = 1000000000;
+>          setsockopt(fd, SOL_SOCKET, SO_LINGER, &ling, sizeof(ling));
+> 
+>          return 0;
+>  }
+> 
+> Signed-off-by: Vladimir Davydov <vdavydov@parallels.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Gustavo Padovan <gustavo@padovan.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> ---
+> net/bluetooth/l2cap_sock.c  |    3 ++-
+> net/bluetooth/rfcomm/sock.c |    3 ++-
+> net/bluetooth/sco.c         |    6 ++++--
+> 3 files changed, 8 insertions(+), 4 deletions(-)
+
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
