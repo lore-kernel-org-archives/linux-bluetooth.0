@@ -1,46 +1,32 @@
 Return-Path: <cyrus@holtmann.org>
-From: Bing Zhao <bzhao@marvell.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: Linux Bluetooth mailing list <linux-bluetooth@vger.kernel.org>,
-        "Gustavo
- F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Amitkumar Karwar <akarwar@marvell.com>,
-        Avinash Patil <patila@marvell.com>, Chin-Ran Lo <crlo@marvell.com>,
-        Xinming Hu <huxm@marvell.com>
-Date: Thu, 17 Jul 2014 11:31:45 -0700
-Subject: RE: [PATCH 2/2] Bluetooth: btmrvl: add public address configuration
- support
-Message-ID: <477F20668A386D41ADCC57781B1F7043122FCE9C75@SC-VEXCH1.marvell.com>
-References: <1405538486-23533-1-git-send-email-bzhao@marvell.com>
- <1405538486-23533-2-git-send-email-bzhao@marvell.com>
- <A5D7B02F-3913-4501-A007-B11A3E7FA7EB@holtmann.org>
-In-Reply-To: <A5D7B02F-3913-4501-A007-B11A3E7FA7EB@holtmann.org>
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 3/3] Bluetooth: Fix allowing initiating pairing when not pairable
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1405600540-28292-3-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 17 Jul 2014 14:42:23 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <A40779A3-5CAB-4AE4-80E3-E487A6DB5866@holtmann.org>
+References: <1405600540-28292-1-git-send-email-johan.hedberg@gmail.com> <1405600540-28292-3-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Johan,
 
-> > +	ret =3D btmrvl_send_sync_cmd(priv, BT_CMD_SET_BDADDR, buf, sizeof(buf=
-));
->=20
-> So I keep wondering why you need the btmrvl_send_sync_cmd here. The HCI t=
-ransport is up and running
-> at this stage and sending vendor command should do the right thing. Simil=
-ar to what you do in btusb
-> driver.
->=20
-> You might have explained this to, but I must have clearly not understood =
-it.
+> When we're not pairable we should still allow us to act as initiators
+> for pairing, i.e. the HCI_PAIRABLE flag should only be affecting
+> incoming pairing attempts. This patch fixes the relevant checks for the
+> hci_io_capa_request_evt() and hci_pin_code_request_evt() functions.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_event.c | 9 +++++++--
+> 1 file changed, 7 insertions(+), 2 deletions(-)
 
-We will check if btmrvl_send_sync_cmd() can be replaced by __hci_cmd_sync()=
- and get back to you.
+patch has been applied to bluetooth-next tree.
 
-Thanks,
-Bing
+Regards
 
->=20
-> Regards
->=20
-> Marcel
+Marcel
+
