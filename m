@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 15/23] android/hal-sco: Connect SCO audio on demand
-Date: Thu, 17 Jul 2014 11:54:15 +0300
-Message-Id: <1405587263-19867-16-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 12/23] android/hal-sco: Skip resampling for input of 8k
+Date: Thu, 17 Jul 2014 11:54:12 +0300
+Message-Id: <1405587263-19867-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,52 +12,83 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ android/hal-sco.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 79c13dc..1627b83 100644
+index f316340..3d53737 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -280,15 +280,16 @@ failed:
- 
- static int ipc_connect_sco(void)
- {
--	struct sco_rsp_connect rsp;
--	size_t rsp_len = sizeof(rsp);
- 	int ret = SCO_STATUS_SUCCESS;
- 
--	DBG("");
--
- 	pthread_mutex_lock(&sco_mutex);
- 
- 	if (sco_fd < 0) {
-+		struct sco_rsp_connect rsp;
-+		size_t rsp_len = sizeof(rsp);
-+
-+		DBG("Connecting SCO");
-+
- 		ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL,
- 						&rsp_len, &rsp, &sco_fd);
- 
-@@ -445,7 +446,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
- 
- 	DBG("write to fd %d bytes %zu", sco_fd, bytes);
- 
--	if (sco_fd < 0)
-+	if (ipc_connect_sco() != SCO_STATUS_SUCCESS)
- 		return -1;
- 
- 	if (!out->downmix_buf) {
-@@ -1009,7 +1010,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+@@ -979,7 +979,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+ 	size_t frame_num = bytes / frame_size;
+ 	size_t input_frame_num = frame_num;
+ 	void *read_buf = buffer;
+-	size_t total, read_frames;
++	size_t total = bytes;
+ 	int ret;
  
  	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
+@@ -1000,27 +1000,29 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+ 		}
  
--	if (sco_fd < 0)
-+	if (ipc_connect_sco() != SCO_STATUS_SUCCESS)
+ 		read_buf = in->resample_buf;
+-	}
+ 
+-	total = input_frame_num * sizeof(int16_t) * 1;
++		total = input_frame_num * sizeof(int16_t) * 1;
++	}
+ 
+ 	if(!read_data(in, read_buf, total))
  		return -1;
  
- 	if (!in->resampler && in->cfg.rate != AUDIO_STREAM_SCO_RATE) {
+-	read_frames = input_frame_num;
+-
+-	ret = in->resampler->resample_from_input(in->resampler,
++	if (in->resampler) {
++		ret = in->resampler->resample_from_input(in->resampler,
+ 							in->resample_buf,
+-							&read_frames,
++							&input_frame_num,
+ 							(int16_t *) buffer,
+ 							&frame_num);
+-	if (ret) {
+-		error("Failed to resample frames: %zd input %zd (%s)",
+-				frame_num, input_frame_num, strerror(ret));
+-		return -1;
+-	}
++		if (ret) {
++			error("Failed to resample frames: %zd input %zd (%s)",
++					frame_num, input_frame_num,
++					strerror(ret));
++			return -1;
++		}
+ 
+-        DBG("resampler: remain %zd output %zd frames", read_frames, frame_num);
++		DBG("resampler: remain %zd output %zd frames", input_frame_num,
++								frame_num);
++	}
+ 
+ 	return bytes;
+ }
+@@ -1081,6 +1083,9 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 
+ 	in->cfg.frame_num = IN_STREAM_FRAMES;
+ 
++	if (in->cfg.rate == AUDIO_STREAM_SCO_RATE)
++		goto skip_resampler;
++
+ 	/* Channel numbers for resampler */
+ 	chan_num = 1;
+ 
+@@ -1108,7 +1113,7 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
+ 				AUDIO_STREAM_SCO_RATE, in->cfg.rate, chan_num,
+ 				in->resample_frame_num, resample_size);
+-
++skip_resampler:
+ 	*stream_in = &in->stream;
+ 	sco_dev->in = in;
+ 
 -- 
 1.9.1
 
