@@ -3,13 +3,14 @@ From: wu.zheng@intel.com
 To: <linux-bluetooth@vger.kernel.org>
 Cc: wu.zheng@intel.com, Gu Chaojie <chao.jie.gu@intel.com>
 Subject: [PATCH] GATT Hirarchy for gatt-api
-Date: Thu, 17 Jul 2014 17:52:00 +0800
-Message-Id: <1405590720-31525-1-git-send-email-wu.zheng@intel.com>
+Date: Thu, 17 Jul 2014 17:50:19 +0800
+Message-Id: <1405590619-31484-1-git-send-email-wu.zheng@intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Gu Chaojie <chao.jie.gu@intel.com>
 
+Signed-off-by: Gu Chaojie <chao.jie.gu@intel.com>
 ---
  src/device.c |  895 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++-
  1 file changed, 886 insertions(+), 9 deletions(-)
