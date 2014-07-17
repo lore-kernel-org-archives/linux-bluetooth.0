@@ -1,77 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Introduce a flag to track who really initiates authentication
-Date: Thu, 17 Jul 2014 15:35:39 +0300
-Message-Id: <1405600540-28292-2-git-send-email-johan.hedberg@gmail.com>
-In-Reply-To: <1405600540-28292-1-git-send-email-johan.hedberg@gmail.com>
-References: <1405600540-28292-1-git-send-email-johan.hedberg@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH v2] Bluetooth: Fix resetting remote authentication requirement after pairing
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1405599290-22911-1-git-send-email-johan.hedberg@gmail.com>
+Date: Thu, 17 Jul 2014 14:30:43 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <6369DF29-6C17-44F7-8F60-695E0E55E0EE@holtmann.org>
+References: <1405599161-22759-1-git-send-email-johan.hedberg@gmail.com> <1405599290-22911-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Johan,
 
-Even though our side requests authentication, the original action that
-caused it may be remotely triggered, such as an incoming L2CAP or RFCOMM
-connect request. To track this information introduce a new hci_conn flag
-called HCI_CONN_AUTH_INITIATOR.
+> When a new hci_conn object is created the remote SSP authentication
+> requirement is set to the invalid value 0xff to indicate that it is
+> unknown. Once pairing completes however the code was leaving it as-is.
+> In case a new pairing happens over the same connection it is important
+> that we reset the value back to unknown so that the pairing code doesn't
+> make false assumptions about the requirements.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> v2: Fix incomplete sentence in commit message
+> 
+> net/bluetooth/hci_event.c | 3 +++
+> 1 file changed, 3 insertions(+)
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_conn.c         | 3 +++
- net/bluetooth/hci_event.c        | 5 +++++
- 3 files changed, 9 insertions(+)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index eb2b9c9e3480..996ed065b6c2 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -547,6 +547,7 @@ enum {
- 	HCI_CONN_SECURE,
- 	HCI_CONN_FIPS,
- 	HCI_CONN_STK_ENCRYPT,
-+	HCI_CONN_AUTH_INITIATOR,
- };
- 
- static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 76c5a38e5997..0d76054efd26 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1027,6 +1027,9 @@ auth:
- 	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
- 		return 0;
- 
-+	if (initiator)
-+		set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
-+
- 	if (!hci_conn_auth(conn, sec_level, auth_type))
- 		return 0;
- 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 495d6d5c1146..af2cdca03d73 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -1645,6 +1645,8 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
- 	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
- 		struct hci_cp_auth_requested auth_cp;
- 
-+		set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
-+
- 		auth_cp.handle = __cpu_to_le16(conn->handle);
- 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED,
- 			     sizeof(auth_cp), &auth_cp);
-@@ -2387,6 +2389,9 @@ check_auth:
- 
- 	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
- 		struct hci_cp_auth_requested cp;
-+
-+		set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
-+
- 		cp.handle = __cpu_to_le16(conn->handle);
- 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
- 	}
--- 
-1.9.3
+Regards
+
+Marcel
 
