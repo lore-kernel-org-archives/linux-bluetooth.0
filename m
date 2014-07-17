@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 12/23] android/hal-sco: Skip resampling for input of 8k
-Date: Thu, 17 Jul 2014 11:54:12 +0300
-Message-Id: <1405587263-19867-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 02/23] android/hal-sco: Fixes for unreliable mtu
+Date: Thu, 17 Jul 2014 11:54:02 +0300
+Message-Id: <1405587263-19867-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,83 +12,33 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/hal-sco.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+ android/hal-sco.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index f316340..3d53737 100644
+index 701d15e..ecf7a09 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -979,7 +979,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
- 	size_t frame_num = bytes / frame_size;
- 	size_t input_frame_num = frame_num;
- 	void *read_buf = buffer;
--	size_t total, read_frames;
-+	size_t total = bytes;
+@@ -300,7 +300,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 	struct pollfd pfd;
+ 	size_t len, written = 0;
  	int ret;
+-	uint16_t mtu = /* out->cfg.mtu */ 48;
++	uint16_t mtu = out->cfg.mtu;
+ 	uint64_t audio_sent_us, audio_passed_us;
  
- 	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
-@@ -1000,27 +1000,29 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
- 		}
- 
- 		read_buf = in->resample_buf;
--	}
- 
--	total = input_frame_num * sizeof(int16_t) * 1;
-+		total = input_frame_num * sizeof(int16_t) * 1;
-+	}
- 
- 	if(!read_data(in, read_buf, total))
- 		return -1;
- 
--	read_frames = input_frame_num;
--
--	ret = in->resampler->resample_from_input(in->resampler,
-+	if (in->resampler) {
-+		ret = in->resampler->resample_from_input(in->resampler,
- 							in->resample_buf,
--							&read_frames,
-+							&input_frame_num,
- 							(int16_t *) buffer,
- 							&frame_num);
--	if (ret) {
--		error("Failed to resample frames: %zd input %zd (%s)",
--				frame_num, input_frame_num, strerror(ret));
--		return -1;
--	}
-+		if (ret) {
-+			error("Failed to resample frames: %zd input %zd (%s)",
-+					frame_num, input_frame_num,
-+					strerror(ret));
-+			return -1;
-+		}
- 
--        DBG("resampler: remain %zd output %zd frames", read_frames, frame_num);
-+		DBG("resampler: remain %zd output %zd frames", input_frame_num,
-+								frame_num);
-+	}
- 
- 	return bytes;
- }
-@@ -1081,6 +1083,9 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
- 
- 	in->cfg.frame_num = IN_STREAM_FRAMES;
- 
-+	if (in->cfg.rate == AUDIO_STREAM_SCO_RATE)
-+		goto skip_resampler;
+ 	pfd.fd = out->fd;
+@@ -594,7 +594,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+ 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+-	out->cfg.mtu = mtu;
 +
- 	/* Channel numbers for resampler */
- 	chan_num = 1;
++	/* we get wrong mtu size for some reason */
++	out->cfg.mtu = /* mtu */ 48;
  
-@@ -1108,7 +1113,7 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
- 	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
- 				AUDIO_STREAM_SCO_RATE, in->cfg.rate, chan_num,
- 				in->resample_frame_num, resample_size);
--
-+skip_resampler:
- 	*stream_in = &in->stream;
- 	sco_dev->in = in;
- 
+ 	out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
+ 	if (!out->downmix_buf) {
 -- 
 1.9.1
 
