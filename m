@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 10/23] android/hal-sco: Implement read
-Date: Thu, 17 Jul 2014 11:54:10 +0300
-Message-Id: <1405587263-19867-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 06/23] android/hal-sco: Check file descriptor >= 0
+Date: Thu, 17 Jul 2014 11:54:06 +0300
+Message-Id: <1405587263-19867-7-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,216 +11,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Add read and resampling from 8000 to 44100.
 ---
- android/hal-sco.c | 151 +++++++++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 149 insertions(+), 2 deletions(-)
+ android/hal-sco.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index a3fb710..ed90b23 100644
+index 905d6fc..bcaa820 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -40,6 +40,7 @@
- 
- #define OUT_BUFFER_SIZE			2560
- #define OUT_STREAM_FRAMES		2560
-+#define IN_STREAM_FRAMES		/* 5292 */ 5120
- 
- #define SOCKET_POLL_TIMEOUT_MS		500
- 
-@@ -81,6 +82,10 @@ struct sco_stream_in {
- 	struct audio_stream_in stream;
- 
- 	struct sco_audio_config cfg;
-+
-+	struct resampler_itfe *resampler;
-+	int16_t *resample_buf;
-+	uint32_t resample_frame_num;
- };
- 
- struct sco_dev {
-@@ -912,12 +917,109 @@ static int in_set_gain(struct audio_stream_in *stream, float gain)
- 	return -ENOSYS;
- }
- 
-+static bool read_data(struct sco_stream_in *in, char *buffer, size_t bytes)
-+{
-+	struct pollfd pfd;
-+	size_t len, read_bytes = 0;
-+
-+	pfd.fd = sco_fd;
-+	pfd.events = POLLIN | POLLHUP | POLLNVAL;
-+
-+	while (bytes > read_bytes) {
-+		int ret;
-+
-+		/* poll for reading */
-+		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
-+			DBG("timeout fd %d", sco_fd);
-+			return false;
-+		}
-+
-+		if (pfd.revents & (POLLHUP | POLLNVAL)) {
-+			error("error fd %d, events 0x%x", sco_fd, pfd.revents);
-+			return false;
-+		}
-+
-+		len = bytes - read_bytes > sco_mtu ? sco_mtu :
-+							bytes - read_bytes;
-+
-+		ret = read(sco_fd, buffer + read_bytes, len);
-+		if (ret > 0) {
-+			read_bytes += ret;
-+			DBG("read %d total %zd", ret, read_bytes);
-+			continue;
-+		}
-+
-+		if (errno == EAGAIN) {
-+			ret = errno;
-+			warn("read failed (%d)", ret);
-+			continue;
-+		}
-+
-+		if (errno != EINTR) {
-+			ret = errno;
-+			error("read failed (%d) fd %d bytes %zd", ret, sco_fd,
-+									bytes);
-+			return false;
-+		}
-+	}
-+
-+	DBG("read %zd bytes", read_bytes);
-+
-+	return true;
-+}
-+
- static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
- 								size_t bytes)
- {
--	DBG("");
-+	struct sco_stream_in *in = (struct sco_stream_in *) stream;
-+	size_t frame_size = audio_stream_frame_size(&stream->common);
-+	size_t frame_num = bytes / frame_size;
-+	size_t input_frame_num = frame_num;
-+	void *read_buf = buffer;
-+	size_t total, read_frames;
-+	int ret;
- 
--	return -ENOSYS;
-+	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
-+
-+	if (!in->resampler && in->cfg.rate != AUDIO_STREAM_SCO_RATE) {
-+		error("Cannot find resampler");
-+		return -1;
-+	}
-+
-+	if (in->resampler) {
-+		input_frame_num = get_resample_frame_num(AUDIO_STREAM_SCO_RATE,
-+							in->cfg.rate,
-+							frame_num, 0);
-+		if (input_frame_num > in->resample_frame_num) {
-+			DBG("resize input frames from %zd to %d",
-+				input_frame_num, in->resample_frame_num);
-+			input_frame_num = in->resample_frame_num;
-+		}
-+
-+		read_buf = in->resample_buf;
-+	}
-+
-+	total = input_frame_num * sizeof(int16_t) * 1;
-+
-+	if(!read_data(in, read_buf, total))
-+		return -1;
-+
-+	read_frames = input_frame_num;
-+
-+	ret = in->resampler->resample_from_input(in->resampler,
-+							in->resample_buf,
-+							&read_frames,
-+							(int16_t *) buffer,
-+							&frame_num);
-+	if (ret) {
-+		error("Failed to resample frames: %zd input %zd (%s)",
-+				frame_num, input_frame_num, strerror(ret));
-+		return -1;
-+	}
-+
-+        DBG("resampler: remain %zd output %zd frames", read_frames, frame_num);
-+
-+	return bytes;
- }
- 
- static uint32_t in_get_input_frames_lost(struct audio_stream_in *stream)
-@@ -935,6 +1037,8 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
- {
+@@ -715,11 +715,11 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
  	struct sco_dev *sco_dev = (struct sco_dev *) dev;
- 	struct sco_stream_in *in;
-+	int chan_num, ret;
-+	size_t resample_size;
+ 	struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
  
- 	DBG("");
+-	DBG("dev %p stream %p fd %d", dev, stream_out, sco_dev->out->fd);
++	DBG("dev %p stream %p fd %d", dev, out, sco_dev->out->fd);
  
-@@ -972,10 +1076,48 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
- 		in->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
+-	if (sco_dev->out && sco_dev->out->fd) {
+-		close(sco_dev->out->fd);
+-		sco_dev->out->fd = -1;
++	if (out && out->fd >= 0) {
++		close(out->fd);
++		out->fd = -1;
  	}
  
-+	in->cfg.frame_num = IN_STREAM_FRAMES;
-+
-+	/* Channel numbers for resampler */
-+	chan_num = 1;
-+
-+	ret = create_resampler(AUDIO_STREAM_SCO_RATE, in->cfg.rate, chan_num,
-+						RESAMPLER_QUALITY_DEFAULT, NULL,
-+						&in->resampler);
-+	if (ret) {
-+		error("Failed to create resampler (%s)", strerror(ret));
-+		goto failed;
-+	}
-+
-+	in->resample_frame_num = get_resample_frame_num(AUDIO_STREAM_SCO_RATE,
-+							in->cfg.rate,
-+							in->cfg.frame_num, 0);
-+
-+	resample_size = sizeof(int16_t) * chan_num * in->resample_frame_num;
-+
-+	in->resample_buf = malloc(resample_size);
-+	if (!in->resample_buf) {
-+		error("failed to allocate resample buffer for %d frames",
-+							in->resample_frame_num);
-+		goto failed;
-+	}
-+
-+	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
-+				AUDIO_STREAM_SCO_RATE, in->cfg.rate, chan_num,
-+				in->resample_frame_num, resample_size);
-+
- 	*stream_in = &in->stream;
- 	sco_dev->in = in;
- 
- 	return 0;
-+failed:
-+	if (in->resampler)
-+		release_resampler(in->resampler);
-+	free(in);
-+	*stream_in = NULL;
-+	sco_dev->in = NULL;
-+
-+	return ret;
- }
- 
- static void sco_close_input_stream(struct audio_hw_device *dev,
-@@ -988,6 +1130,11 @@ static void sco_close_input_stream(struct audio_hw_device *dev,
- 
- 	close_sco_socket();
- 
-+	if (in->resampler) {
-+		release_resampler(in->resampler);
-+		free(in->resample_buf);
-+	}
-+
- 	free(in);
- 	sco_dev->in = NULL;
- }
+ 	if (out->resampler)
 -- 
 1.9.1
 
