@@ -1,39 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix using uninitialized variable when pairing
-Date: Thu, 17 Jul 2014 11:56:33 +0300
-Message-Id: <1405587393-3058-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCHv1 09/23] android/hal-sco: Fix memory leak
+Date: Thu, 17 Jul 2014 11:54:09 +0300
+Message-Id: <1405587263-19867-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Commit 6c53823ae0e10e723131055e1e65dd6a328a228e reshuffled the way the
-authentication requirement gets set in the hci_io_capa_request_evt()
-function, but at the same time it failed to update an if-statement where
-cp.authentication is used before it has been initialized. The correct
-value the code should be looking for in this if-statement is
-conn->auth_type.
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+Release resampler on exit.
 ---
- net/bluetooth/hci_event.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/hal-sco.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 8339f729921b..1bd4de7e74fc 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3658,7 +3658,7 @@ static void hci_io_capa_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			 * except for the no-bonding case.
- 			 */
- 			if (conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
--			    cp.authentication != HCI_AT_NO_BONDING)
-+			    conn->auth_type != HCI_AT_NO_BONDING)
- 				conn->auth_type |= 0x01;
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index e084c31..a3fb710 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -731,8 +731,10 @@ static void sco_close_output_stream(struct audio_hw_device *dev,
  
- 			cp.authentication = conn->auth_type;
+ 	close_sco_socket();
+ 
+-	if (out->resampler)
++	if (out->resampler) {
+ 		release_resampler(out->resampler);
++		free(out->resample_buf);
++	}
+ 
+ 	free(out->cache);
+ 	free(out->downmix_buf);
 -- 
-1.9.3
+1.9.1
 
