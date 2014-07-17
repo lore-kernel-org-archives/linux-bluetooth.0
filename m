@@ -1,184 +1,77 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: Pass initiator/acceptor information to hci_conn_security()
-Date: Thu, 17 Jul 2014 15:35:38 +0300
-Message-Id: <1405600540-28292-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: Introduce a flag to track who really initiates authentication
+Date: Thu, 17 Jul 2014 15:35:39 +0300
+Message-Id: <1405600540-28292-2-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1405600540-28292-1-git-send-email-johan.hedberg@gmail.com>
+References: <1405600540-28292-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-We're interested in whether an authentication request is because of a
-remote or local action. So far hci_conn_security() has been used both
-for incoming and outgoing actions (e.g. RFCOMM or L2CAP connect
-requests) so without some modifications it cannot know which peer is
-responsible for requesting authentication.
-
-This patch adds a new "bool initiator" parameter to hci_conn_security()
-to indicate which side is responsible for the request and updates the
-current users to pass this information correspondingly.
+Even though our side requests authentication, the original action that
+caused it may be remotely triggered, such as an incoming L2CAP or RFCOMM
+connect request. To track this information introduce a new hci_conn flag
+called HCI_CONN_AUTH_INITIATOR.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  3 ++-
- include/net/bluetooth/l2cap.h    |  2 +-
- net/bluetooth/hci_conn.c         |  3 ++-
- net/bluetooth/l2cap_core.c       | 15 ++++++++-------
- net/bluetooth/l2cap_sock.c       |  2 +-
- net/bluetooth/mgmt.c             |  2 +-
- net/bluetooth/rfcomm/core.c      |  3 ++-
- 7 files changed, 17 insertions(+), 13 deletions(-)
+ include/net/bluetooth/hci_core.h | 1 +
+ net/bluetooth/hci_conn.c         | 3 +++
+ net/bluetooth/hci_event.c        | 5 +++++
+ 3 files changed, 9 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 73e16ecfd6b9..eb2b9c9e3480 100644
+index eb2b9c9e3480..996ed065b6c2 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -720,7 +720,8 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 				 __u16 setting);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
--int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type);
-+int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
-+		      bool initiator);
- int hci_conn_change_link_key(struct hci_conn *conn);
- int hci_conn_switch_role(struct hci_conn *conn, __u8 role);
+@@ -547,6 +547,7 @@ enum {
+ 	HCI_CONN_SECURE,
+ 	HCI_CONN_FIPS,
+ 	HCI_CONN_STK_ENCRYPT,
++	HCI_CONN_AUTH_INITIATOR,
+ };
  
-diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-index 1fffd92808b0..8df15ad0d43f 100644
---- a/include/net/bluetooth/l2cap.h
-+++ b/include/net/bluetooth/l2cap.h
-@@ -905,7 +905,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 		       bdaddr_t *dst, u8 dst_type);
- int l2cap_chan_send(struct l2cap_chan *chan, struct msghdr *msg, size_t len);
- void l2cap_chan_busy(struct l2cap_chan *chan, int busy);
--int l2cap_chan_check_security(struct l2cap_chan *chan);
-+int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator);
- void l2cap_chan_set_defaults(struct l2cap_chan *chan);
- int l2cap_ertm_init(struct l2cap_chan *chan);
- void l2cap_chan_add(struct l2cap_conn *conn, struct l2cap_chan *chan);
+ static inline bool hci_conn_ssp_enabled(struct hci_conn *conn)
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ad5f0b819e90..76c5a38e5997 100644
+index 76c5a38e5997..0d76054efd26 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -973,7 +973,8 @@ static void hci_conn_encrypt(struct hci_conn *conn)
- }
+@@ -1027,6 +1027,9 @@ auth:
+ 	if (test_bit(HCI_CONN_ENCRYPT_PEND, &conn->flags))
+ 		return 0;
  
- /* Enable security */
--int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type)
-+int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
-+		      bool initiator)
- {
- 	BT_DBG("hcon %p", conn);
++	if (initiator)
++		set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
++
+ 	if (!hci_conn_auth(conn, sec_level, auth_type))
+ 		return 0;
  
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index d0f36336b6ce..c8c259f21d80 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -775,7 +775,7 @@ static inline u8 l2cap_get_auth_type(struct l2cap_chan *chan)
- }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 495d6d5c1146..af2cdca03d73 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1645,6 +1645,8 @@ static void hci_cs_remote_name_req(struct hci_dev *hdev, __u8 status)
+ 	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_auth_requested auth_cp;
  
- /* Service level security */
--int l2cap_chan_check_security(struct l2cap_chan *chan)
-+int l2cap_chan_check_security(struct l2cap_chan *chan, bool initiator)
- {
- 	struct l2cap_conn *conn = chan->conn;
- 	__u8 auth_type;
-@@ -785,7 +785,8 @@ int l2cap_chan_check_security(struct l2cap_chan *chan)
++		set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
++
+ 		auth_cp.handle = __cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED,
+ 			     sizeof(auth_cp), &auth_cp);
+@@ -2387,6 +2389,9 @@ check_auth:
  
- 	auth_type = l2cap_get_auth_type(chan);
- 
--	return hci_conn_security(conn->hcon, chan->sec_level, auth_type);
-+	return hci_conn_security(conn->hcon, chan->sec_level, auth_type,
-+				 initiator);
- }
- 
- static u8 l2cap_get_ident(struct l2cap_conn *conn)
-@@ -1278,7 +1279,7 @@ static void l2cap_do_start(struct l2cap_chan *chan)
- 		if (!(conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE))
- 			return;
- 
--		if (l2cap_chan_check_security(chan) &&
-+		if (l2cap_chan_check_security(chan, true) &&
- 		    __l2cap_no_conn_pending(chan)) {
- 			l2cap_start_connection(chan);
- 		}
-@@ -1357,7 +1358,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 		}
- 
- 		if (chan->state == BT_CONNECT) {
--			if (!l2cap_chan_check_security(chan) ||
-+			if (!l2cap_chan_check_security(chan, true) ||
- 			    !__l2cap_no_conn_pending(chan)) {
- 				l2cap_chan_unlock(chan);
- 				continue;
-@@ -1379,7 +1380,7 @@ static void l2cap_conn_start(struct l2cap_conn *conn)
- 			rsp.scid = cpu_to_le16(chan->dcid);
- 			rsp.dcid = cpu_to_le16(chan->scid);
- 
--			if (l2cap_chan_check_security(chan)) {
-+			if (l2cap_chan_check_security(chan, false)) {
- 				if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
- 					rsp.result = cpu_to_le16(L2CAP_CR_PEND);
- 					rsp.status = cpu_to_le16(L2CAP_CS_AUTHOR_PEND);
-@@ -3849,7 +3850,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	chan->ident = cmd->ident;
- 
- 	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_DONE) {
--		if (l2cap_chan_check_security(chan)) {
-+		if (l2cap_chan_check_security(chan, false)) {
- 			if (test_bit(FLAG_DEFER_SETUP, &chan->flags)) {
- 				l2cap_state_change(chan, BT_CONNECT2);
- 				result = L2CAP_CR_PEND;
-@@ -7191,7 +7192,7 @@ int l2cap_chan_connect(struct l2cap_chan *chan, __le16 psm, u16 cid,
- 	if (hcon->state == BT_CONNECTED) {
- 		if (chan->chan_type != L2CAP_CHAN_CONN_ORIENTED) {
- 			__clear_chan_timer(chan);
--			if (l2cap_chan_check_security(chan))
-+			if (l2cap_chan_check_security(chan, true))
- 				l2cap_state_change(chan, BT_CONNECTED);
- 		} else
- 			l2cap_do_start(chan);
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 0bc67dc5dcce..3bb1cdf34f07 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -797,7 +797,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
- 		} else if ((sk->sk_state == BT_CONNECT2 &&
- 			    test_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) ||
- 			   sk->sk_state == BT_CONNECTED) {
--			if (!l2cap_chan_check_security(chan))
-+			if (!l2cap_chan_check_security(chan, true))
- 				set_bit(BT_SK_SUSPEND, &bt_sk(sk)->flags);
- 			else
- 				sk->sk_state_change(sk);
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index b981bfb87f86..190668367e42 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3202,7 +3202,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
- 	cmd->user_data = conn;
- 
- 	if (conn->state == BT_CONNECTED &&
--	    hci_conn_security(conn, sec_level, auth_type))
-+	    hci_conn_security(conn, sec_level, auth_type, true))
- 		pairing_complete(cmd, 0);
- 
- 	err = 0;
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 754b6fe4f742..a0690a84f3e9 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -227,7 +227,8 @@ static int rfcomm_check_security(struct rfcomm_dlc *d)
- 		break;
+ 	if (!test_and_set_bit(HCI_CONN_AUTH_PEND, &conn->flags)) {
+ 		struct hci_cp_auth_requested cp;
++
++		set_bit(HCI_CONN_AUTH_INITIATOR, &conn->flags);
++
+ 		cp.handle = __cpu_to_le16(conn->handle);
+ 		hci_send_cmd(hdev, HCI_OP_AUTH_REQUESTED, sizeof(cp), &cp);
  	}
- 
--	return hci_conn_security(conn->hcon, d->sec_level, auth_type);
-+	return hci_conn_security(conn->hcon, d->sec_level, auth_type,
-+				 d->out);
- }
- 
- static void rfcomm_session_timeout(unsigned long arg)
 -- 
 1.9.3
 
