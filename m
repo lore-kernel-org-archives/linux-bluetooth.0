@@ -1,33 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcin Kraglak <marcin.kraglak@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/8] attrib: Fix discovering descriptors
-Date: Thu, 17 Jul 2014 10:42:44 +0200
-Message-Id: <1405586570-16851-2-git-send-email-marcin.kraglak@tieto.com>
-In-Reply-To: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
-References: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
+Subject: [PATCH 1/8] android/gatt: Fix service class id of built in gatt services
+Date: Thu, 17 Jul 2014 10:42:43 +0200
+Message-Id: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Discover all attributes in given range. In same cases we ommited
-last attribute in range.
 ---
- attrib/gatt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ android/gatt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/attrib/gatt.c b/attrib/gatt.c
-index 27fb0b3..f8ff2a5 100644
---- a/attrib/gatt.c
-+++ b/attrib/gatt.c
-@@ -1004,7 +1004,7 @@ static void desc_discovered_cb(guint8 status, const guint8 *ipdu,
+diff --git a/android/gatt.c b/android/gatt.c
+index 986f435..19d9b60 100644
+--- a/android/gatt.c
++++ b/android/gatt.c
+@@ -6199,6 +6199,7 @@ static void register_gap_service(void)
+ 	gatt_db_service_set_active(gatt_db, gap_srvc_data.srvc , true);
  
- 	att_data_list_free(list);
+ 	/* SDP */
++	bt_uuid16_create(&uuid, 0x1800);
+ 	start = gap_srvc_data.srvc;
+ 	end = gatt_db_get_end_handle(gatt_db, gap_srvc_data.srvc);
+ 	gap_sdp_handle = add_sdp_record(&uuid, start, end,
+@@ -6308,6 +6309,7 @@ static void register_device_info_service(void)
+ 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
  
--	if (last + 1 < dd->end && !uuid_found) {
-+	if (last < dd->end && !uuid_found) {
- 		guint16 oplen;
- 		size_t buflen;
- 		uint8_t *buf;
+ 	/* SDP */
++	bt_uuid16_create(&uuid, 0x180a);
+ 	end_handle = gatt_db_get_end_handle(gatt_db, srvc_handle);
+ 	dis_sdp_handle = add_sdp_record(&uuid, srvc_handle, end_handle,
+ 						"Device Information Service");
+@@ -6404,6 +6406,7 @@ static void register_gatt_service(void)
+ 	gatt_db_service_set_active(gatt_db, srvc_handle, true);
+ 
+ 	/* SDP */
++	bt_uuid16_create(&uuid, 0x1801);
+ 	end_handle = gatt_db_get_end_handle(gatt_db, srvc_handle);
+ 	gatt_sdp_handle = add_sdp_record(&uuid, srvc_handle, end_handle,
+ 						"Generic Attribute Profile");
 -- 
 1.9.0
 
