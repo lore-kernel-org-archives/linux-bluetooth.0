@@ -1,53 +1,60 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/build: Add rctest tool to Android build
-Date: Thu, 17 Jul 2014 13:04:32 +0200
-Message-Id: <1405595072-7749-1-git-send-email-sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: Update PTS files for HFP
+Date: Thu, 17 Jul 2014 12:54:18 +0200
+Message-Id: <1405594458-32267-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+PICS and PIXITs updated to PTS 5.2. Regression done for Android
+4.4.4.
 ---
- android/Android.mk | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ android/pics-hfp.txt  | 2 +-
+ android/pixit-hfp.txt | 2 +-
+ android/pts-hfp.txt   | 6 +++---
+ 3 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/android/Android.mk b/android/Android.mk
-index 51a792f..afbe804 100644
---- a/android/Android.mk
-+++ b/android/Android.mk
-@@ -661,3 +661,31 @@ LOCAL_MODULE := avinfo
- LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
+diff --git a/android/pics-hfp.txt b/android/pics-hfp.txt
+index 1a13edc..acbd25c 100644
+--- a/android/pics-hfp.txt
++++ b/android/pics-hfp.txt
+@@ -1,6 +1,6 @@
+ HFP PICS for the PTS tool.
  
- include $(BUILD_EXECUTABLE)
-+
-+#
-+# rctest
-+#
-+
-+include $(CLEAR_VARS)
-+
-+LOCAL_SRC_FILES := \
-+	bluez/tools/rctest.c \
-+	bluez/lib/bluetooth.c \
-+	bluez/lib/hci.c \
-+	bluez/lib/sdp.c \
-+
-+LOCAL_C_INCLUDES := \
-+	$(LOCAL_PATH)/bluez \
-+
-+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
-+
-+LOCAL_STATIC_LIBRARIES := \
-+	bluetooth-headers \
-+
-+LOCAL_MODULE_PATH := $(TARGET_OUT_OPTIONAL_EXECUTABLES)
-+LOCAL_MODULE_TAGS := debug
-+LOCAL_MODULE := rctest
-+
-+LOCAL_ADDITIONAL_DEPENDENCIES := $(LOCAL_PATH)/bluez/configure.ac
-+
-+include $(BUILD_EXECUTABLE)
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ # - not yet implemented/supported
+diff --git a/android/pixit-hfp.txt b/android/pixit-hfp.txt
+index ebf73c8..eaccc75 100644
+--- a/android/pixit-hfp.txt
++++ b/android/pixit-hfp.txt
+@@ -1,6 +1,6 @@
+ HFP PIXIT for the PTS tool.
+ 
+-PTS version: 5.1
++PTS version: 5.2
+ 
+ * - different than PTS defaults
+ & - should be set to IUT Bluetooth address
+diff --git a/android/pts-hfp.txt b/android/pts-hfp.txt
+index 196fa14..a281d6b 100644
+--- a/android/pts-hfp.txt
++++ b/android/pts-hfp.txt
+@@ -1,8 +1,8 @@
+ PTS test results for HFP
+ 
+-PTS version: 5.1
+-Tested: 25-Mar-2014
+-Android version: 4.4.2
++PTS version: 5.2
++Tested: 14-Jul-2014
++Android version: 4.4.4
+ 
+ Results:
+ PASS	test passed
 -- 
-1.8.5.3
+1.9.3
 
