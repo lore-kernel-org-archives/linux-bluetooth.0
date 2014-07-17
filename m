@@ -1,125 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: Update PTS files for MAP
-Date: Thu, 17 Jul 2014 10:17:06 +0200
-Message-Id: <1405585026-21486-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+In-Reply-To: <C43AD631-D51D-46A9-98BB-99D94774CC89@holtmann.org>
+References: <CABx3TkUE_qFJggDNw8wUCcQzrdo6L5p3Ag3djpiUewwk_uJu5Q@mail.gmail.com>
+	<CABBYNZLhONv81vAN8OAFX1dK5UCm44AYb2sZLyUp2gRQ4CywcA@mail.gmail.com>
+	<CABx3TkVgs6J1UR8Z5Rbyd2e90p74RfggpzsvnxzgWGgN9c2Epg@mail.gmail.com>
+	<CABx3TkUbD+svVpNW+0vjWS3pujZsECTOO0XxJmUQY6wOEkkZQw@mail.gmail.com>
+	<CABBYNZKyd_jgSO-NpzbMhVo=Y1ZzWC29bX4q1YBQd73Mm4HWaQ@mail.gmail.com>
+	<CABx3TkW-PhVeD2=Nr2pj5iL2uUm8T0B+w+WFB2EwaeW7OtChtQ@mail.gmail.com>
+	<CABBYNZK2v-US-kOh6v28EKnqsLyjXrDUGpNJE6Wcfqv3YBwm9A@mail.gmail.com>
+	<CABx3TkU+JvmekRYBS1iYuriJaprMznH=g6vw2MVYi+2Vqc7Y5w@mail.gmail.com>
+	<CABx3TkXsRXUNG4RudXnYifyN4Tq4MssVGXZE6uQtPtxU34bw7A@mail.gmail.com>
+	<20140629051442.GA31085@t440s.P-661HNU-F1>
+	<20140629052949.GA32130@t440s>
+	<E8C350F2-6B3C-4ECD-A281-DDC25C339489@holtmann.org>
+	<CAHZ1yCniScfX+Cvoyv0B3GaYWL41qPJD4V+Le+3HENYS5kUdYw@mail.gmail.com>
+	<60346ECF-9A0B-4D3B-BDD6-A617797550D9@holtmann.org>
+	<CAHZ1yCnSMQqhJ_x-=5VPibThBBU12M_LvkmCpCWR1b5np0V8Hw@mail.gmail.com>
+	<C43AD631-D51D-46A9-98BB-99D94774CC89@holtmann.org>
+Date: Wed, 16 Jul 2014 22:42:11 -0700
+Message-ID: <CAHZ1yCmh5oarHY03sJM_CxD64PK9K85+2RPW84c3-AgZBv3kug@mail.gmail.com>
+Subject: Re: LE mouse reconnect problem
+From: Scott James Remnant <keybuk@google.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>,
+	Ryan Press <ryan@presslab.us>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Regression tests for MAP on PTS 5.2 and Android 4.4.4.
----
- android/pics-map.txt  |  2 +-
- android/pixit-map.txt |  7 ++-----
- android/pts-map.txt   | 42 +++++++++++++++++++-----------------------
- 3 files changed, 22 insertions(+), 29 deletions(-)
+Hey Marcel,
 
-diff --git a/android/pics-map.txt b/android/pics-map.txt
-index 1e0695f..461c6ce 100644
---- a/android/pics-map.txt
-+++ b/android/pics-map.txt
-@@ -1,6 +1,6 @@
- MAP PICS for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- # - not yet implemented/supported
-diff --git a/android/pixit-map.txt b/android/pixit-map.txt
-index ba687c1..45a374a 100644
---- a/android/pixit-map.txt
-+++ b/android/pixit-map.txt
-@@ -1,6 +1,6 @@
- MAP PIXIT for the PTS tool.
- 
--PTS version: 5.1
-+PTS version: 5.2
- 
- * - different than PTS defaults
- & - should be set to IUT Bluetooth address
-@@ -36,12 +36,9 @@ TSPX_filter_recipient					PTS
- TSPX_filter_originator					PTS
- TSPX_default_message_upload_folder_in_msg		draft
- TSPX_default_test_folder_in_msg				inbox
--TSPX_use_fixed_MASInstanceID				FALSE
--TSPX_MASInstanceID_SMS					0
--TSPX_MASInstanceID_MMS					0
--TSPX_MASInstanceID_Email				0
- TSPX_message_notification_l2cap_psm			1003
- TSPX_message_notification_rfcomm_channel		9
- TSPX_upload_msg_phonenumber				123456789 (#)
- TSPX_upload_msg_emailaddress				IUT-email ($)
-+TSPX_Automation						FALSE
- -------------------------------------------------------------------------------
-diff --git a/android/pts-map.txt b/android/pts-map.txt
-index b19a678..98ab9e1 100644
---- a/android/pts-map.txt
-+++ b/android/pts-map.txt
-@@ -1,7 +1,7 @@
- PTS test results for MAP
- 
--PTS version: 5.1
--Tested: 07-April-2014
-+PTS version: 5.2
-+Tested: 16-July-2014
- 
- Results:
- PASS	test passed
-@@ -49,35 +49,31 @@ TC_MCE_SRMP_BV_01_I	N/A
- TC_MCE_SRMP_BV_04_I	N/A
- TC_MCE_SRMP_BV_05_I	N/A
- TC_MCE_SRMP_BV_06_I	N/A
--TC_MSE_MSM_BV_05_I	PASS	If prompted tester must accept obex request
--TC_MSE_MSM_BV_06_I	PASS	If prompted tester must accept obex request
--TC_MSE_MSM_BV_07_I	PASS	If prompted tester must accept obex request
--TC_MSE_MSM_BV_08_I	PASS	If prompted tester must accept obex request
-+TC_MSE_MSM_BV_05_I	PASS
-+TC_MSE_MSM_BV_06_I	PASS
-+TC_MSE_MSM_BV_07_I	PASS
-+TC_MSE_MSM_BV_08_I	PASS
- TC_MSE_MSM_BV_09_I	N/A
- TC_MSE_MSM_BV_10_I	N/A
- TC_MSE_MSM_BV_11_I	N/A
- TC_MSE_MSM_BV_12_I	N/A
--TC_MSE_MNR_BV_03_I	PASS	If prompted tester must accept obex request
--TC_MSE_MNR_BV_04_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMB_BV_09_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMB_BV_10_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMB_BV_11_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMB_BV_20_I	PASS	If prompted tester must accept obex request
-+TC_MSE_MNR_BV_03_I	PASS
-+TC_MSE_MNR_BV_04_I	PASS
-+TC_MSE_MMB_BV_09_I	PASS
-+TC_MSE_MMB_BV_10_I	PASS
-+TC_MSE_MMB_BV_11_I	PASS
-+TC_MSE_MMB_BV_20_I	PASS
- TC_MSE_MMB_BV_12_I	N/A
- TC_MSE_MMB_BV_18_I	N/A
--TC_MSE_MMB_BV_13_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMB_BV_14_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMB_BV_15_I	PASS	If prompted tester must accept obex request
-+TC_MSE_MMB_BV_13_I	PASS
-+TC_MSE_MMB_BV_14_I	PASS
-+TC_MSE_MMB_BV_15_I	PASS
- TC_MSE_MMB_BV_16_I	PASS	Android MAP server bug, fix provided at
- 				android-review.googlesource.com/#/c/82757
--TC_MSE_MMD_BV_02_I	PASS	If prompted tester must accept obex request
--TC_MSE_MMU_BV_02_I	PASS	If prompted tester must accept obex request,
--				at least one SMS must be present in inbox
--TC_MSE_MMU_BV_03_I	PASS	If prompted tester must accept obex request,
--				when asked by PTS tester must verify that SMS
--				was successfully delivered onto network
--TC_MSE_MMN_BV_02_I	PASS	If prompted tester must accept obex request,
--				when asked by PTS tester must send SMS to IUT
-+TC_MSE_MMD_BV_02_I	PASS
-+TC_MSE_MMU_BV_02_I	PASS	At least one SMS must be present in inbox
-+TC_MSE_MMU_BV_03_I	PASS
-+TC_MSE_MMN_BV_02_I	PASS
- TC_MSE_MMN_BV_04_I	N/A
- TC_MSE_MMI_BV_02_I	N/A
- TC_MSE_MFB_BV_02_I	N/A
+On Tue, Jul 1, 2014 at 9:01 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
+
+>>> the same applies to the HP mouse btw.
+>>>
+>>
+>> Which HP Mouse are you referring to?
+>>
+>> An HP Mouse I have uses general connectable advertising when it wants
+>> to reconnect.
+>
+> might want to check HCI Remote Version Information (via hcitool cmd) for that device. So what we found out today is that the Nordic based HID devices only do direct advertising. However my CSR based one does direct advertising first and if it times out, it falls back to undirected advertising.
+>
+
+I confirm this at my end.
+
+Our CSR-based devices are the ones falling back to undirected, while
+the Nordic ones are not.
+
+In the Z8000 case at least there's a cute blue Connect button that
+resets it back to undirected advertising.
+
+Scott
 -- 
-1.8.5.3
-
+Scott James Remnant | Chrome OS Systems | keybuk@google.com | Google
