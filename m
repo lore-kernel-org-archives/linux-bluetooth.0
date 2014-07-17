@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv1 23/23] android/tools: Rearrange headers include
-Date: Thu, 17 Jul 2014 11:54:23 +0300
-Message-Id: <1405587263-19867-24-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv1 22/23] android/hal-sco: Remove unneeded statement
+Date: Thu, 17 Jul 2014 11:54:22 +0300
+Message-Id: <1405587263-19867-23-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587263-19867-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -12,31 +12,23 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
 ---
- android/client/if-sco.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ android/hal-sco.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 456c529..4919fd9 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -15,13 +15,13 @@
-  *
-  */
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 0e87aad..1ffd9f9 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -265,9 +265,6 @@ static int sco_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
+ 			goto failed;
+ 	}
  
--#include "../src/shared/util.h"
-+#include <pthread.h>
-+#include <unistd.h>
-+#include <math.h>
+-	if (rsp_len)
+-		*rsp_len = cmd.len;
+-
+ 	return SCO_STATUS_SUCCESS;
  
-+#include "../src/shared/util.h"
- #include "if-main.h"
- #include "../hal-utils.h"
--#include "pthread.h"
--#include "unistd.h"
--#include <math.h>
- 
- audio_hw_device_t *if_audio_sco = NULL;
- static struct audio_stream_out *stream_out = NULL;
+ failed:
 -- 
 1.9.1
 
