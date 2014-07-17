@@ -1,36 +1,44 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH v2] Bluetooth: Fix resetting remote authentication requirement after pairing
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405599290-22911-1-git-send-email-johan.hedberg@gmail.com>
-Date: Thu, 17 Jul 2014 14:30:43 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6369DF29-6C17-44F7-8F60-695E0E55E0EE@holtmann.org>
-References: <1405599161-22759-1-git-send-email-johan.hedberg@gmail.com> <1405599290-22911-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix resetting remote authentication requirement after pairing
+Date: Thu, 17 Jul 2014 15:14:50 +0300
+Message-Id: <1405599290-22911-1-git-send-email-johan.hedberg@gmail.com>
+In-Reply-To: <1405599161-22759-1-git-send-email-johan.hedberg@gmail.com>
+References: <1405599161-22759-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> When a new hci_conn object is created the remote SSP authentication
-> requirement is set to the invalid value 0xff to indicate that it is
-> unknown. Once pairing completes however the code was leaving it as-is.
-> In case a new pairing happens over the same connection it is important
-> that we reset the value back to unknown so that the pairing code doesn't
-> make false assumptions about the requirements.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> v2: Fix incomplete sentence in commit message
-> 
-> net/bluetooth/hci_event.c | 3 +++
-> 1 file changed, 3 insertions(+)
+When a new hci_conn object is created the remote SSP authentication
+requirement is set to the invalid value 0xff to indicate that it is
+unknown. Once pairing completes however the code was leaving it as-is.
+In case a new pairing happens over the same connection it is important
+that we reset the value back to unknown so that the pairing code doesn't
+make false assumptions about the requirements.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+v2: Fix incomplete sentence in commit message
 
-Regards
+ net/bluetooth/hci_event.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 041e5c018891..4c41774aa556 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -3880,6 +3880,9 @@ static void hci_simple_pair_complete_evt(struct hci_dev *hdev,
+ 	if (!conn)
+ 		goto unlock;
+ 
++	/* Reset the authentication requirement to unknown */
++	conn->remote_auth = 0xff;
++
+ 	/* To avoid duplicate auth_failed events to user space we check
+ 	 * the HCI_CONN_AUTH_PEND flag which will be set if we
+ 	 * initiated the authentication. A traditional auth_complete
+-- 
+1.9.3
 
