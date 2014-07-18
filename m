@@ -2,37 +2,59 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 07/11] shared/gatt: Implement "Read" procedure.
-Date: Fri, 18 Jul 2014 14:13:53 -0700
-Message-Id: <1405718037-15401-8-git-send-email-armansito@chromium.org>
+Subject: [PATCH 09/11] shared/gatt: Implement "Write Value" and "Write Without Response" procedures.
+Date: Fri, 18 Jul 2014 14:13:55 -0700
+Message-Id: <1405718037-15401-10-git-send-email-armansito@chromium.org>
 In-Reply-To: <1405718037-15401-1-git-send-email-armansito@chromium.org>
 References: <1405718037-15401-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements bt_gatt_read_value, which can be used to read the value of
-a characteristic or descriptor.
+This patch implements the bt_gatt_write_without_response and bt_gatt_write_value
+functions.
 ---
- src/shared/gatt-helpers.c | 70 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 68 insertions(+), 2 deletions(-)
+ src/shared/gatt-helpers.c | 80 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 75 insertions(+), 5 deletions(-)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index 302cc89..d614d3e 100644
+index 8db80e7..fdaf973 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -771,13 +771,79 @@ bool bt_gatt_discover_descriptors(struct bt_att *att,
- 	return true;
- }
+@@ -1055,11 +1055,58 @@ bool bt_gatt_read_long_value(struct bt_att *att,
  
-+struct read_op {
-+	bt_gatt_read_callback_t callback;
+ bool bt_gatt_write_without_response(struct bt_att *att,
+ 					uint16_t value_handle,
+-                                        bool signed_write,
++					bool signed_write,
+ 					uint8_t *value, uint16_t length)
+ {
+-	/* TODO */
+-	return false;
++	uint8_t pdu[2 + length];
++
++	if (!att)
++		return 0;
++
++	/* TODO: Support this once bt_att_send supports signed writes. */
++	if (signed_write)
++		return 0;
++
++	put_le16(value_handle, pdu);
++	memcpy(pdu + 2, value, length);
++
++	return bt_att_send(att, BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
++							NULL, NULL, NULL);
++}
++
++struct write_op {
++	bt_gatt_result_callback_t callback;
 +	void *user_data;
 +	bt_gatt_destroy_func_t destroy;
 +};
 +
-+static void destroy_read_op(void *data)
++static void destroy_write_op(void *data)
 +{
-+	struct read_op *op = data;
++	struct write_op *op = data;
 +
 +	if (op->destroy)
 +		op->destroy(op->user_data);
@@ -40,48 +62,39 @@ index 302cc89..d614d3e 100644
 +	free(op);
 +}
 +
-+static void read_cb(uint8_t opcode, const void *pdu, uint16_t length,
++static void write_cb(uint8_t opcode, const void *pdu, uint16_t length,
 +								void *user_data)
 +{
-+	struct read_op *op = user_data;
-+	uint16_t status;
-+	const uint8_t *value = NULL;
-+	uint16_t value_len = 0;
++	struct write_op *op = user_data;
++	uint16_t status = 0;
 +
 +	if (opcode == BT_ATT_OP_ERROR_RSP) {
 +		status = process_error(pdu, length);
 +		goto done;
 +	}
 +
-+	if (opcode != BT_ATT_OP_READ_RSP || (!pdu && length)) {
++	if (opcode != BT_ATT_OP_WRITE_RSP || pdu || length)
 +		status = BT_GATT_ERROR_INVALID_RSP;
-+		goto done;
-+	}
-+
-+	status = 0;
-+	value_len = length;
-+	if (value_len)
-+		value = pdu;
 +
 +done:
 +	if (op->callback)
-+		op->callback(status, value, length, op->user_data);
-+}
-+
- bool bt_gatt_read_value(struct bt_att *att, uint16_t value_handle,
- 					bt_gatt_read_callback_t callback,
++		op->callback(status, op->user_data);
+ }
+ 
+ bool bt_gatt_write_value(struct bt_att *att, uint16_t value_handle,
+@@ -1068,8 +1115,31 @@ bool bt_gatt_write_value(struct bt_att *att, uint16_t value_handle,
  					void *user_data,
  					bt_gatt_destroy_func_t destroy)
  {
 -	/* TODO */
 -	return false;
-+	struct read_op *op;
-+	uint8_t pdu[2];
++	struct write_op *op;
++	uint8_t pdu[2 + length];
 +
 +	if (!att)
 +		return false;
 +
-+	op = new0(struct read_op, 1);
++	op = new0(struct write_op, 1);
 +	if (!op)
 +		return false;
 +
@@ -90,10 +103,11 @@ index 302cc89..d614d3e 100644
 +	op->destroy = destroy;
 +
 +	put_le16(value_handle, pdu);
++	memcpy(pdu + 2, value, length);
 +
-+	if (!bt_att_send(att, BT_ATT_OP_READ_REQ, pdu, sizeof(pdu),
-+							read_cb, op,
-+							destroy_read_op)) {
++	if (!bt_att_send(att, BT_ATT_OP_WRITE_REQ, pdu, sizeof(pdu),
++							write_cb, op,
++							destroy_write_op)) {
 +		free(op);
 +		return false;
 +	}
@@ -101,7 +115,7 @@ index 302cc89..d614d3e 100644
 +	return true;
  }
  
- bool bt_gatt_read_long_value(struct bt_att *att,
+ bool bt_gatt_write_long_value(struct bt_att *att, bool reliable,
 -- 
 2.0.0.526.g5318336
 
