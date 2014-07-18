@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 11/21] android/hal-sco: Skip resampling for output stream with 8k
-Date: Fri, 18 Jul 2014 12:48:10 +0300
-Message-Id: <1405676900-17703-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 04/21] android/hal-sco: Make use of config parameter
+Date: Fri, 18 Jul 2014 12:48:03 +0300
+Message-Id: <1405676900-17703-5-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,33 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Use config parameter when opening output stream.
 ---
- android/hal-sco.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ android/hal-sco.c | 20 +++++++++++++++-----
+ 1 file changed, 15 insertions(+), 5 deletions(-)
 
 diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 3b8920a..97cab84 100644
+index 7e1a981..e476f84 100644
 --- a/android/hal-sco.c
 +++ b/android/hal-sco.c
-@@ -661,6 +661,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 		return -ENOMEM;
- 	}
+@@ -584,7 +584,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	size_t resample_size;
+ 	uint16_t mtu;
  
-+	if (out->cfg.rate == AUDIO_STREAM_SCO_RATE)
-+		goto skip_resampler;
+-	DBG("");
++	DBG("config %p device flags 0x%02x", config, devices);
+ 
+ 	if (ipc_connect_sco(&fd, &mtu) != SCO_STATUS_SUCCESS) {
+ 		error("sco: cannot get fd");
+@@ -614,10 +614,20 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 	out->stream.write = out_write;
+ 	out->stream.get_render_position = out_get_render_position;
+ 
+-	/* Configuration for Android */
+-	out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
+-	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
+-	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	if (config) {
++		DBG("config: rate %u chan mask %x format %d offload %p",
++				config->sample_rate, config->channel_mask,
++				config->format, &config->offload_info);
 +
- 	/* Channel numbers for resampler */
- 	chan_num = 1;
++		out->cfg.format = config->format;
++		out->cfg.channels = config->channel_mask;
++		out->cfg.rate = config->sample_rate;
++	} else {
++		out->cfg.format = AUDIO_STREAM_DEFAULT_FORMAT;
++		out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
++		out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
++	}
++
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
  
-@@ -693,7 +696,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
- 				out->cfg.rate, AUDIO_STREAM_SCO_RATE, chan_num,
- 				out->resample_frame_num, resample_size);
--
-+skip_resampler:
- 	*stream_out = &out->stream;
- 	adev->out = out;
- 
+ 	/* we get wrong mtu size for some reason */
 -- 
 1.9.1
 
