@@ -2,113 +2,475 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 7/9] android/tester-ng: Add set remote friendly name success case
-Date: Fri, 18 Jul 2014 11:50:19 +0200
-Message-Id: <1405677021-18877-7-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 9/9] android/tester: Remove old test cases
+Date: Fri, 18 Jul 2014 11:50:21 +0200
+Message-Id: <1405677021-18877-9-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1405677021-18877-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1405677021-18877-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Those tests are now in the newer tester.
 ---
- android/tester-bluetooth.c | 23 +++++++++++++++++++++++
- android/tester-main.c      | 21 +++++++++++++++++++++
- android/tester-main.h      |  2 ++
- 3 files changed, 46 insertions(+)
+ android/android-tester.c | 438 -----------------------------------------------
+ 1 file changed, 438 deletions(-)
 
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index 91c5a1a..480c92e 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -175,9 +175,16 @@ static struct bt_action_data prop_emu_ble_remote_verinfo_req = {
- 	.prop_type = BT_PROPERTY_REMOTE_VERSION_INFO,
- };
- 
-+static const char prop_test_fname_val[] = "FriendlyTestName";
-+static bt_property_t prop_emu_ble_remote_fname_prop = {
-+	.type = BT_PROPERTY_REMOTE_FRIENDLY_NAME,
-+	.val = &prop_test_fname_val,
-+	.len = sizeof(prop_test_fname_val) - 1,
-+};
- static struct bt_action_data prop_emu_ble_remote_fname_req = {
- 	.addr = &emu_remote_bdaddr_val,
- 	.prop_type = BT_PROPERTY_REMOTE_FRIENDLY_NAME,
-+	.prop = &prop_emu_ble_remote_fname_prop,
- };
- 
- static bt_property_t prop_emu_default_set[] = {
-@@ -672,6 +679,22 @@ static struct test_case test_cases[] = {
- 		ACTION_FAIL(bt_get_device_prop_action,
- 						&prop_emu_ble_remote_fname_req),
- 	),
-+	TEST_CASE("Bluetooth Device Set FRIENDLY_NAME - Success",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_SUCCESS(bt_set_device_prop_action,
-+						&prop_emu_ble_remote_fname_req),
-+		ACTION_SUCCESS(bt_get_device_prop_action,
-+						&prop_emu_ble_remote_fname_req),
-+		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_fname_prop, 1),
-+	),
- };
- 
- struct queue *get_bluetooth_tests(void)
-diff --git a/android/tester-main.c b/android/tester-main.c
-index 59762bb..4c7a5e7 100644
---- a/android/tester-main.c
-+++ b/android/tester-main.c
-@@ -1078,6 +1078,27 @@ void bt_get_device_prop_action(void)
- 	verify_step(&step, NULL);
+diff --git a/android/android-tester.c b/android/android-tester.c
+index ff14fc8..2b72bd8 100644
+--- a/android/android-tester.c
++++ b/android/android-tester.c
+@@ -2163,289 +2163,6 @@ static void test_dummy(const void *test_data)
+ 	tester_test_passed();
  }
  
-+void bt_set_device_prop_action(void)
-+{
-+	struct test_data *data = tester_get_data();
-+	struct step *current_data_step = queue_peek_head(data->steps);
-+	struct bt_action_data *action_data = current_data_step->set_data;
-+	struct step step;
-+
-+	if (!action_data) {
-+		tester_warn("No arguments for 'set remote device prop' req.");
-+		tester_test_failed();
-+		return;
-+	}
-+
-+	memset(&step, 0, sizeof(step));
-+	step.action_status = data->if_bluetooth->set_remote_device_property(
-+							action_data->addr,
-+							action_data->prop);
-+
-+	verify_step(&step, NULL);
-+}
-+
- static void generic_test_function(const void *test_data)
- {
- 	struct test_data *data = tester_get_data();
-diff --git a/android/tester-main.h b/android/tester-main.h
-index ef8c3d5..2f6252d 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -181,6 +181,7 @@ struct bt_action_data {
+-static void test_discovery_start_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-	bt_status_t status;
+-
+-	init_test_conditions(data);
+-
+-	status = data->if_bluetooth->start_discovery();
+-	check_expected_status(status);
+-}
+-
+-static void test_discovery_stop_done(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-	bt_status_t status;
+-
+-	init_test_conditions(data);
+-
+-	status = data->if_bluetooth->cancel_discovery();
+-	check_expected_status(status);
+-}
+-
+-static void test_discovery_stop_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_discovery_start_done(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_discovery_device_found(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprops_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_bdname_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_uuids_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_cod_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_tod_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_rssi_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_timestamp_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_bdaddr_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_servrec_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_scanmode_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_bondeddev_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_disctimeout_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_verinfo_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_getprop_fname_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_fname_success(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_bdname_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_uuids_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_cod_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_tod_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_rssi_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_timestamp_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_bdaddr_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_servrec_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_scanmode_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_bondeddev_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+-static void test_dev_setprop_disctimeout_fail(const void *test_data)
+-{
+-	struct test_data *data = tester_get_data();
+-
+-	init_test_conditions(data);
+-
+-	data->if_bluetooth->start_discovery();
+-}
+-
+ static void bond_device_auth_fail_callback(uint16_t index, uint16_t length,
+ 							const void *param,
+ 							void *user_data)
+@@ -3659,161 +3376,6 @@ int main(int argc, char *argv[])
  
- 	/* Remote props action arguments */
- 	int prop_type;
-+	bt_property_t *prop;
- };
+ 	tester_init(&argc, &argv);
  
- /*
-@@ -239,3 +240,4 @@ void bt_start_discovery_action(void);
- void bt_cancel_discovery_action(void);
- void bt_get_device_props_action(void);
- void bt_get_device_prop_action(void);
-+void bt_set_device_prop_action(void);
+-	test_bredrle("Bluetooth BR/EDR Discovery Start - Success",
+-				&bluetooth_discovery_start_success_test,
+-				setup_enabled_adapter,
+-				test_discovery_start_success, teardown);
+-
+-	test_bredrle("Bluetooth BR/EDR Discovery Start - Success 2",
+-				&bluetooth_discovery_start_success2_test,
+-				setup_enabled_adapter,
+-				test_discovery_start_done, teardown);
+-
+-	test_bredrle("Bluetooth BR/EDR Discovery Stop - Success",
+-				&bluetooth_discovery_stop_success_test,
+-				setup_enabled_adapter,
+-				test_discovery_stop_success, teardown);
+-
+-	test_bredrle("Bluetooth BR/EDR Discovery Stop - Success 2",
+-				&bluetooth_discovery_stop_success2_test,
+-				setup_enabled_adapter,
+-				test_discovery_stop_done, teardown);
+-
+-	test_bredr("Bluetooth BR/EDR Discovery Device Found",
+-				&bluetooth_discovery_device_found_test,
+-				setup_enabled_adapter,
+-				test_discovery_device_found, teardown);
+-
+-	test_bredr("Bluetooth Device Get Props - Success",
+-					&bt_dev_getprops_success_test,
+-					setup_enabled_adapter,
+-					test_dev_getprops_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get BDNAME - Success",
+-				&bt_dev_getprop_bdname_success_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_bdname_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get UUIDS - Success",
+-				&bt_dev_getprop_uuids_success_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_uuids_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get COD - Success",
+-					&bt_dev_getprop_cod_success_test,
+-					setup_enabled_adapter,
+-					test_dev_getprop_cod_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get TOD - Success",
+-					&bt_dev_getprop_tod_success_test,
+-					setup_enabled_adapter,
+-					test_dev_getprop_tod_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get RSSI - Success",
+-				&bt_dev_getprop_rssi_success_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_rssi_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get TIMESTAMP - Success",
+-				&bt_dev_getprop_timpestamp_success_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_timestamp_success, teardown);
+-
+-	test_bredr("Bluetooth Device Get BDADDR - Fail",
+-				&bt_dev_getprop_bdaddr_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_bdaddr_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Get SERVICE_RECORD - Fail",
+-				&bt_dev_getprop_servrec_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_servrec_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Get SCAN_MODE - Fail",
+-				&bt_dev_getprop_scanmode_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_scanmode_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Get BONDED_DEVICES - Fail",
+-				&bt_dev_getprop_bondeddev_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_bondeddev_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Get DISCOVERY_TIMEOUT - Fail",
+-				&bt_dev_getprop_disctimeout_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_disctimeout_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Get VERSION_INFO - Fail",
+-				&bt_dev_getprop_verinfo_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_getprop_verinfo_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Get FRIENDLY_NAME - Fail",
+-					&bt_dev_getprop_fname_fail_test,
+-					setup_enabled_adapter,
+-					test_dev_getprop_fname_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set FRIENDLY_NAME - Success",
+-				&bt_dev_setprop_fname_success_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_fname_success, teardown);
+-
+-	test_bredr("Bluetooth Device Set BDNAME - Fail",
+-					&bt_dev_setprop_bdname_fail_test,
+-					setup_enabled_adapter,
+-					test_dev_setprop_bdname_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set UUIDS - Fail",
+-					&bt_dev_setprop_uuids_fail_test,
+-					setup_enabled_adapter,
+-					test_dev_setprop_uuids_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set COD - Fail",
+-					&bt_dev_setprop_cod_fail_test,
+-					setup_enabled_adapter,
+-					test_dev_setprop_cod_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set TOD - Fail",
+-					&bt_dev_setprop_tod_fail_test,
+-					setup_enabled_adapter,
+-					test_dev_setprop_tod_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set RSSI - Fail",
+-				&bt_dev_setprop_rssi_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_rssi_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set TIMESTAMP - Fail",
+-				&bt_dev_setprop_timpestamp_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_timestamp_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set BDADDR - Fail",
+-				&bt_dev_setprop_bdaddr_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_bdaddr_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set SERVICE_RECORD - Fail",
+-				&bt_dev_setprop_servrec_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_servrec_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set SCAN_MODE - Fail",
+-				&bt_dev_setprop_scanmode_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_scanmode_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set BONDED_DEVICES - Fail",
+-				&bt_dev_setprop_bondeddev_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_bondeddev_fail, teardown);
+-
+-	test_bredr("Bluetooth Device Set DISCOVERY_TIMEOUT - Fail",
+-				&bt_dev_setprop_disctimeout_fail_test,
+-				setup_enabled_adapter,
+-				test_dev_setprop_disctimeout_fail, teardown);
+-
+ 	test_bredr("Bluetooth Create Bond PIN - Success",
+ 					&bt_bond_create_pin_success_test,
+ 					setup_enabled_adapter,
 -- 
 1.9.1
 
