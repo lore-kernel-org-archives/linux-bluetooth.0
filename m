@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 18/21] android/hal-audio: Fix leaving open socket
-Date: Fri, 18 Jul 2014 12:48:17 +0300
-Message-Id: <1405676900-17703-19-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 20/21] android/hal-sco: Fix error code printing
+Date: Fri, 18 Jul 2014 12:48:19 +0300
+Message-Id: <1405676900-17703-21-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,32 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When getting out of the poll loop we shall close socket always.
 ---
- android/hal-audio.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
+ android/hal-sco.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index 1a3d3ae..d7a06fa 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -1377,14 +1377,12 @@ static void *ipc_handler(void *data)
- 		/* Check if socket is still alive. Empty while loop.*/
- 		while (poll(&pfd, 1, -1) < 0 && errno == EINTR);
- 
--		if (pfd.revents & (POLLHUP | POLLERR | POLLNVAL)) {
--			info("Audio HAL: Socket closed");
-+		info("Audio HAL: Socket closed");
- 
--			pthread_mutex_lock(&sk_mutex);
--			close(audio_sk);
--			audio_sk = -1;
--			pthread_mutex_unlock(&sk_mutex);
--		}
-+		pthread_mutex_lock(&sk_mutex);
-+		close(audio_sk);
-+		audio_sk = -1;
-+		pthread_mutex_unlock(&sk_mutex);
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index b6ba55f..0e87aad 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -697,7 +697,7 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 						RESAMPLER_QUALITY_DEFAULT, NULL,
+ 						&out->resampler);
+ 	if (ret) {
+-		error("Failed to create resampler (%s)", strerror(ret));
++		error("Failed to create resampler (%s)", strerror(-ret));
+ 		goto failed;
  	}
  
- 	/* audio_sk is closed at this point, just cleanup endpoints states */
+@@ -1128,7 +1128,7 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 						RESAMPLER_QUALITY_DEFAULT, NULL,
+ 						&in->resampler);
+ 	if (ret) {
+-		error("Failed to create resampler (%s)", strerror(ret));
++		error("Failed to create resampler (%s)", strerror(-ret));
+ 		goto failed;
+ 	}
+ 
 -- 
 1.9.1
 
