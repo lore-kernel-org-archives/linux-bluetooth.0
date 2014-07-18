@@ -1,35 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Use EOPNOTSUPP instead of ENOTSUPP
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405671326-32431-1-git-send-email-johan.hedberg@gmail.com>
-Date: Fri, 18 Jul 2014 11:22:31 +0200
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Marcin Kraglak <marcin.kraglak@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <20C90689-7821-44A4-96D6-9E5C45452492@holtmann.org>
-References: <1405671326-32431-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+Subject: Re: [PATCH 1/8] android/gatt: Fix service class id of built in gatt services
+Date: Fri, 18 Jul 2014 11:15:49 +0200
+Message-ID: <1490799.Vggir6MhC3@uw000953>
+In-Reply-To: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
+References: <1405586570-16851-1-git-send-email-marcin.kraglak@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Marcin,
 
-> The EOPNOTSUPP and ENOTSUPP errors are very similar in meaning, but
-> ENOTSUPP is a fairly new addition to POSIX. Not all libc versions know
-> about the value the kernel uses for ENOTSUPP so it's better to use
-> EOPNOTSUPP to ensure understandable error messages.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+On Thursday 17 of July 2014 10:42:43 Marcin Kraglak wrote:
 > ---
-> net/bluetooth/hci_conn.c   | 2 +-
-> net/bluetooth/l2cap_core.c | 2 +-
-> net/bluetooth/l2cap_sock.c | 2 +-
-> net/bluetooth/smp.c        | 4 ++--
-> 4 files changed, 5 insertions(+), 5 deletions(-)
+>  android/gatt.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/android/gatt.c b/android/gatt.c
+> index 986f435..19d9b60 100644
+> --- a/android/gatt.c
+> +++ b/android/gatt.c
+> @@ -6199,6 +6199,7 @@ static void register_gap_service(void)
+>  	gatt_db_service_set_active(gatt_db, gap_srvc_data.srvc , true);
+>  
+>  	/* SDP */
+> +	bt_uuid16_create(&uuid, 0x1800);
+>  	start = gap_srvc_data.srvc;
+>  	end = gatt_db_get_end_handle(gatt_db, gap_srvc_data.srvc);
+>  	gap_sdp_handle = add_sdp_record(&uuid, start, end,
+> @@ -6308,6 +6309,7 @@ static void register_device_info_service(void)
+>  	gatt_db_service_set_active(gatt_db, srvc_handle, true);
+>  
+>  	/* SDP */
+> +	bt_uuid16_create(&uuid, 0x180a);
+>  	end_handle = gatt_db_get_end_handle(gatt_db, srvc_handle);
+>  	dis_sdp_handle = add_sdp_record(&uuid, srvc_handle, end_handle,
+>  						"Device Information Service");
+> @@ -6404,6 +6406,7 @@ static void register_gatt_service(void)
+>  	gatt_db_service_set_active(gatt_db, srvc_handle, true);
+>  
+>  	/* SDP */
+> +	bt_uuid16_create(&uuid, 0x1801);
+>  	end_handle = gatt_db_get_end_handle(gatt_db, srvc_handle);
+>  	gatt_sdp_handle = add_sdp_record(&uuid, srvc_handle, end_handle,
+>  						"Generic Attribute Profile");
+> 
 
-patch has been applied to bluetooth-next tree.
+All patches applied, thanks.
 
-Regards
-
-Marcel
-
+-- 
+Best regards, 
+Szymon Janc
