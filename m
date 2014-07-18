@@ -1,37 +1,33 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: 
-References: 
-Subject: Empty SCO packets after end of call
-From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-To: Majordomo@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Message-ID: <OF88C5CA2A.8245708A-ON65257D19.004EF351-65257D19.004EF354@tcs.com>
-Date: Fri, 18 Jul 2014 19:52:21 +0530
-Content-Type: text/plain; charset=US-ASCII
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv2 2/6] android/core: Remove unneeded assignment
+Date: Fri, 18 Jul 2014 16:28:27 +0300
+Message-Id: <1405690111-27097-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1405690111-27097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1405690111-27097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-I can see lot of empty SCO packets after end of phone call. This lead to my system hang.
+---
+ android/bluetooth.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-Can anyone help me on this issue.
-
-
-Thanks & Regards,
-Vinod.
-=====-----=====-----=====
-Notice: The information contained in this e-mail
-message and/or attachments to it may contain 
-confidential or privileged information. If you are 
-not the intended recipient, any dissemination, use, 
-review, distribution, printing or copying of the 
-information contained in this e-mail message 
-and/or attachments to it are strictly prohibited. If 
-you have received this communication in error, 
-please notify us by reply e-mail or telephone and 
-immediately and permanently delete the message 
-and any attachments. Thank you
-
-
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index a2ab445..5b72a36 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -291,7 +291,6 @@ static void load_adapter_config(void)
+ 	if (gerr) {
+ 		adapter.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
+ 		g_error_free(gerr);
+-		gerr = NULL;
+ 	}
+ 
+ 	g_key_file_free(key_file);
+-- 
+1.9.1
 
