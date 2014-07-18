@@ -1,138 +1,265 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 1/9] emulator: Add flags param to advertise enabling function
-Date: Fri, 18 Jul 2014 11:50:13 +0200
-Message-Id: <1405677021-18877-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 07/21] android/hal-sco: Use global sco file descriptor
+Date: Fri, 18 Jul 2014 12:48:06 +0300
+Message-Id: <1405676900-17703-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This allows to pass additional parameter describing wheter to set
-flags parameter in advertising data.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-This is needed to make device discoverable.
+Android may open input/output stream independently so we use global sco
+file descriptor and mutexes.
 ---
- android/android-tester.c |  2 +-
- emulator/bthost.c        | 21 ++++++++++++++++++++-
- emulator/bthost.h        |  3 ++-
- tools/l2cap-tester.c     |  2 +-
- tools/mgmt-tester.c      |  2 +-
- tools/smp-tester.c       |  2 +-
- 6 files changed, 26 insertions(+), 6 deletions(-)
+ android/hal-sco.c | 85 ++++++++++++++++++++++++++++++++-----------------------
+ 1 file changed, 50 insertions(+), 35 deletions(-)
 
-diff --git a/android/android-tester.c b/android/android-tester.c
-index eb5c513..ff14fc8 100644
---- a/android/android-tester.c
-+++ b/android/android-tester.c
-@@ -701,7 +701,7 @@ static void setup_powered_emulated_remote(void)
- 	bthost_set_cmd_complete_cb(bthost, emu_connectable_complete, data);
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index bcaa820..09fcf5b 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -46,6 +46,10 @@
+ static int listen_sk = -1;
+ static int ipc_sk = -1;
  
- 	if (data->hciemu_type == HCIEMU_TYPE_LE)
--		bthost_set_adv_enable(bthost, 0x01);
-+		bthost_set_adv_enable(bthost, 0x01, 0x00);
- 	else
- 		bthost_write_scan_enable(bthost, 0x03);
- }
-diff --git a/emulator/bthost.c b/emulator/bthost.c
-index 298edcf..b30999b 100644
---- a/emulator/bthost.c
-+++ b/emulator/bthost.c
-@@ -747,6 +747,8 @@ static void evt_cmd_complete(struct bthost *bthost, const void *data,
- 		break;
- 	case BT_HCI_CMD_LE_LTK_REQ_NEG_REPLY:
- 		break;
-+	case BT_HCI_CMD_LE_SET_ADV_DATA:
-+		break;
- 	default:
- 		printf("Unhandled cmd_complete opcode 0x%04x\n", opcode);
- 		break;
-@@ -2072,7 +2074,7 @@ void bthost_write_scan_enable(struct bthost *bthost, uint8_t scan)
- 	send_command(bthost, BT_HCI_CMD_WRITE_SCAN_ENABLE, &scan, 1);
++static int sco_fd = -1;
++static uint16_t sco_mtu = 0;
++static pthread_mutex_t sco_mutex = PTHREAD_MUTEX_INITIALIZER;
++
+ static pthread_t ipc_th = 0;
+ static pthread_mutex_t sk_mutex = PTHREAD_MUTEX_INITIALIZER;
+ 
+@@ -53,7 +57,6 @@ struct sco_audio_config {
+ 	uint32_t rate;
+ 	uint32_t channels;
+ 	uint32_t frame_num;
+-	uint16_t mtu;
+ 	audio_format_t format;
+ };
+ 
+@@ -61,7 +64,6 @@ struct sco_stream_out {
+ 	struct audio_stream_out stream;
+ 
+ 	struct sco_audio_config cfg;
+-	int fd;
+ 
+ 	uint8_t *downmix_buf;
+ 	uint8_t *cache;
+@@ -79,7 +81,6 @@ struct sco_stream_in {
+ 	struct audio_stream_in stream;
+ 
+ 	struct sco_audio_config cfg;
+-	int fd;
+ };
+ 
+ struct sco_dev {
+@@ -257,18 +258,25 @@ failed:
+ 	return SCO_STATUS_FAILED;
  }
  
--void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable)
-+void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable, uint8_t flags)
+-static int ipc_connect_sco(int *fd, uint16_t *mtu)
++static int ipc_connect_sco(void)
  {
- 	struct bt_hci_cmd_le_set_adv_parameters cp;
+ 	struct sco_rsp_connect rsp;
+ 	size_t rsp_len = sizeof(rsp);
+-	int ret;
++	int ret = SCO_STATUS_SUCCESS;
  
-@@ -2080,6 +2082,23 @@ void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable)
- 	send_command(bthost, BT_HCI_CMD_LE_SET_ADV_PARAMETERS,
- 							&cp, sizeof(cp));
+ 	DBG("");
  
-+	if (flags) {
-+		struct bt_hci_cmd_le_set_adv_data adv_cp;
+-	ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL, &rsp_len,
+-								&rsp, fd);
++	pthread_mutex_lock(&sco_mutex);
 +
-+		memset(adv_cp.data, 0, 31);
++	if (sco_fd < 0) {
++		ret = sco_ipc_cmd(SCO_SERVICE_ID, SCO_OP_CONNECT, 0, NULL,
++						&rsp_len, &rsp, &sco_fd);
 +
-+		adv_cp.data[0] = 0x02;	/* Field length */
-+		adv_cp.data[1] = 0x01;	/* Flags */
-+		adv_cp.data[2] = flags;
++		/* Sometimes mtu returned is wrong */
++		sco_mtu = /* rsp.mtu */ 48;
++	}
+ 
+-	*mtu = rsp.mtu;
++	pthread_mutex_unlock(&sco_mutex);
+ 
+ 	return ret;
+ }
+@@ -311,28 +319,27 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 	struct pollfd pfd;
+ 	size_t len, written = 0;
+ 	int ret;
+-	uint16_t mtu = out->cfg.mtu;
+ 	uint8_t *p;
+ 	uint64_t audio_sent_us, audio_passed_us;
+ 
+-	pfd.fd = out->fd;
+-	pfd.events = POLLOUT | POLLIN | POLLHUP | POLLNVAL;
++	pfd.fd = sco_fd;
++	pfd.events = POLLOUT | POLLHUP | POLLNVAL;
+ 
+ 	while (bytes > written) {
+ 		struct timespec now;
+ 
+ 		/* poll for sending */
+ 		if (poll(&pfd, 1, SOCKET_POLL_TIMEOUT_MS) == 0) {
+-			DBG("timeout fd %d", out->fd);
++			DBG("timeout fd %d", sco_fd);
+ 			return false;
+ 		}
+ 
+ 		if (pfd.revents & (POLLHUP | POLLNVAL)) {
+-			error("error fd %d, events 0x%x", out->fd, pfd.revents);
++			error("error fd %d, events 0x%x", sco_fd, pfd.revents);
+ 			return false;
+ 		}
+ 
+-		len = bytes - written > mtu ? mtu : bytes - written;
++		len = bytes - written > sco_mtu ? sco_mtu : bytes - written;
+ 
+ 		clock_gettime(CLOCK_REALTIME, &now);
+ 		/* Mark start of the stream */
+@@ -357,10 +364,10 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 		if (out->cache_len) {
+ 			DBG("First packet cache_len %zd", out->cache_len);
+ 			memcpy(out->cache + out->cache_len, buffer,
+-							mtu - out->cache_len);
++						sco_mtu - out->cache_len);
+ 			p = out->cache;
+ 		} else {
+-			if (bytes - written >= mtu)
++			if (bytes - written >= sco_mtu)
+ 				p = (void *) buffer + written;
+ 			else {
+ 				memcpy(out->cache, buffer + written,
+@@ -373,10 +380,10 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 			}
+ 		}
+ 
+-		ret = write(out->fd, p, len);
++		ret = write(sco_fd, p, len);
+ 		if (ret > 0) {
+ 			if (out->cache_len) {
+-				written = mtu - out->cache_len;
++				written = sco_mtu - out->cache_len;
+ 				out->cache_len = 0;
+ 			} else
+ 				written += ret;
+@@ -396,7 +403,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
+ 
+ 		if (errno != EINTR) {
+ 			ret = errno;
+-			error("write failed (%d) fd %d bytes %zd", ret, out->fd,
++			error("write failed (%d) fd %d bytes %zd", ret, sco_fd,
+ 									bytes);
+ 			return false;
+ 		}
+@@ -416,7 +423,7 @@ static ssize_t out_write(struct audio_stream_out *stream, const void *buffer,
+ 	void *send_buf = out->downmix_buf;
+ 	size_t total;
+ 
+-	DBG("write to fd %d bytes %zu", out->fd, bytes);
++	DBG("write to fd %d bytes %zu", sco_fd, bytes);
+ 
+ 	if (!out->downmix_buf) {
+ 		error("sco: downmix buffer not initialized");
+@@ -587,19 +594,17 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ {
+ 	struct sco_dev *adev = (struct sco_dev *) dev;
+ 	struct sco_stream_out *out;
+-	int fd = -1;
+ 	int chan_num, ret;
+ 	size_t resample_size;
+-	uint16_t mtu;
+ 
+ 	DBG("config %p device flags 0x%02x", config, devices);
+ 
+-	if (ipc_connect_sco(&fd, &mtu) != SCO_STATUS_SUCCESS) {
++	if (ipc_connect_sco() != SCO_STATUS_SUCCESS) {
+ 		error("sco: cannot get fd");
+ 		return -EIO;
+ 	}
+ 
+-	DBG("got sco fd %d mtu %u", fd, mtu);
++	DBG("got sco fd %d mtu %u", sco_fd, sco_mtu);
+ 
+ 	out = calloc(1, sizeof(struct sco_stream_out));
+ 	if (!out)
+@@ -638,16 +643,13 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 
+ 	out->cfg.frame_num = OUT_STREAM_FRAMES;
+ 
+-	/* we get wrong mtu size for some reason */
+-	out->cfg.mtu = /* mtu */ 48;
+-
+ 	out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
+ 	if (!out->downmix_buf) {
+ 		free(out);
+ 		return -ENOMEM;
+ 	}
+ 
+-	out->cache = malloc(out->cfg.mtu);
++	out->cache = malloc(sco_mtu);
+ 	if (!out->cache) {
+ 		free(out->downmix_buf);
+ 		free(out);
+@@ -693,7 +695,6 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
+ 
+ 	*stream_out = &out->stream;
+ 	adev->out = out;
+-	out->fd = fd;
+ 
+ 	return 0;
+ failed:
+@@ -709,18 +710,30 @@ failed:
+ 	return ret;
+ }
+ 
++static void close_sco_socket(void)
++{
++	DBG("");
 +
-+		adv_cp.data[3] = 0x00;	/* Field terminator */
++	pthread_mutex_lock(&sco_mutex);
 +
-+		adv_cp.len = 1 + adv_cp.data[0];
-+
-+		send_command(bthost, BT_HCI_CMD_LE_SET_ADV_DATA, &adv_cp,
-+								sizeof(adv_cp));
++	if (sco_fd >= 0) {
++		shutdown(sco_fd, SHUT_RDWR);
++		close(sco_fd);
++		sco_fd = -1;
 +	}
 +
- 	send_command(bthost, BT_HCI_CMD_LE_SET_ADV_ENABLE, &enable, 1);
- }
++	pthread_mutex_unlock(&sco_mutex);
++}
++
+ static void sco_close_output_stream(struct audio_hw_device *dev,
+ 					struct audio_stream_out *stream_out)
+ {
+ 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
+ 	struct sco_stream_out *out = (struct sco_stream_out *) stream_out;
  
-diff --git a/emulator/bthost.h b/emulator/bthost.h
-index b00bcd6..4a7e2bd 100644
---- a/emulator/bthost.h
-+++ b/emulator/bthost.h
-@@ -70,7 +70,8 @@ bool bthost_l2cap_req(struct bthost *bthost, uint16_t handle, uint8_t req,
+-	DBG("dev %p stream %p fd %d", dev, out, sco_dev->out->fd);
++	DBG("dev %p stream %p fd %d", dev, out, sco_fd);
  
- void bthost_write_scan_enable(struct bthost *bthost, uint8_t scan);
+-	if (out && out->fd >= 0) {
+-		close(out->fd);
+-		out->fd = -1;
+-	}
++	close_sco_socket();
  
--void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable);
-+void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable,
-+								uint8_t flags);
+ 	if (out->resampler)
+ 		release_resampler(out->resampler);
+@@ -973,7 +986,9 @@ static void sco_close_input_stream(struct audio_hw_device *dev,
+ 	struct sco_dev *sco_dev = (struct sco_dev *) dev;
+ 	struct sco_stream_in *in = (struct sco_stream_in *) stream_in;
  
- void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode);
+-	DBG("dev %p stream %p fd %d", dev, in, in->fd);
++	DBG("dev %p stream %p fd %d", dev, in, sco_fd);
++
++	close_sco_socket();
  
-diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
-index 79362b2..6841341 100644
---- a/tools/l2cap-tester.c
-+++ b/tools/l2cap-tester.c
-@@ -535,7 +535,7 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
- 	bthost = hciemu_client_get_host(data->hciemu);
- 	bthost_set_cmd_complete_cb(bthost, client_cmd_complete, user_data);
- 	if (data->hciemu_type == HCIEMU_TYPE_LE)
--		bthost_set_adv_enable(bthost, 0x01);
-+		bthost_set_adv_enable(bthost, 0x01, 0x00);
- 	else
- 		bthost_write_scan_enable(bthost, 0x03);
- }
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 16c3656..c813314 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -2946,7 +2946,7 @@ static void setup_bthost(void)
- 	bthost = hciemu_client_get_host(data->hciemu);
- 	bthost_set_cmd_complete_cb(bthost, client_cmd_complete, data);
- 	if (data->hciemu_type == HCIEMU_TYPE_LE)
--		bthost_set_adv_enable(bthost, 0x01);
-+		bthost_set_adv_enable(bthost, 0x01, 0x00);
- 	else
- 		bthost_write_scan_enable(bthost, 0x03);
- }
-diff --git a/tools/smp-tester.c b/tools/smp-tester.c
-index 12e0bed..c9639e6 100644
---- a/tools/smp-tester.c
-+++ b/tools/smp-tester.c
-@@ -411,7 +411,7 @@ static void setup_powered_client_callback(uint8_t status, uint16_t length,
- 
- 	bthost = hciemu_client_get_host(data->hciemu);
- 	bthost_set_cmd_complete_cb(bthost, client_connectable_complete, data);
--	bthost_set_adv_enable(bthost, 0x01);
-+	bthost_set_adv_enable(bthost, 0x01, 0x00);
- }
- 
- static void setup_powered_client(const void *test_data)
+ 	free(in);
+ 	sco_dev->in = NULL;
 -- 
 1.9.1
 
