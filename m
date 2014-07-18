@@ -2,306 +2,153 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 8/9] android/tester-ng: Add remote device set property fail cases
-Date: Fri, 18 Jul 2014 11:50:20 +0200
-Message-Id: <1405677021-18877-8-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCH 4/9] android/tester-ng: Replace action result with status
+Date: Fri, 18 Jul 2014 11:50:16 +0200
+Message-Id: <1405677021-18877-4-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1405677021-18877-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1405677021-18877-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Those set property requests should fail as they request to set remotes
-adapter properties.
+Action (HAL api call) result is always status or file descriptor.
+Integer value is enough to hold both so it replaced the truct.
 ---
- android/tester-bluetooth.c | 205 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 205 insertions(+)
+ android/tester-main.c | 20 ++++++++++----------
+ android/tester-main.h | 13 +++----------
+ 2 files changed, 13 insertions(+), 20 deletions(-)
 
-diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
-index 480c92e..c36b507 100644
---- a/android/tester-bluetooth.c
-+++ b/android/tester-bluetooth.c
-@@ -228,6 +228,11 @@ static bt_property_t prop_test_bdname = {
- 	.val = test_bdname,
- 	.len = sizeof(test_bdname) - 1,
- };
-+static struct bt_action_data prop_test_ble_remote_bdname_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_BDNAME,
-+	.prop = &prop_test_bdname,
-+};
+diff --git a/android/tester-main.c b/android/tester-main.c
+index f5ac281..dde04b9 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -407,7 +407,7 @@ static bool match_data(struct step *step)
+ 		return false;
+ 	}
  
- static bt_scan_mode_t test_scan_mode_connectable_discoverable =
- 					BT_SCAN_MODE_CONNECTABLE_DISCOVERABLE;
-@@ -243,6 +248,11 @@ static bt_property_t prop_test_disctimeout = {
- 	.val = &test_disctimeout_val,
- 	.len = sizeof(test_disctimeout_val),
- };
-+static struct bt_action_data prop_test_ble_remote_disc_timeout_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_ADAPTER_DISCOVERY_TIMEOUT,
-+	.prop = &prop_test_disctimeout,
-+};
+-	if (exp->action_result.status != step->action_result.status) {
++	if (exp->action_status != step->action_status) {
+ 		tester_debug("Action status don't match");
+ 		return false;
+ 	}
+@@ -916,10 +916,10 @@ static void emu_connectable_complete(uint16_t opcode, uint8_t status,
  
- static unsigned char test_uuids_val[] = { 0xfb, 0x34, 0x9b, 0x5f, 0x80, 0x00,
- 			0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00,
-@@ -252,6 +262,11 @@ static bt_property_t prop_test_uuid = {
- 	.val = &test_uuids_val,
- 	.len = sizeof(test_uuids_val),
- };
-+static struct bt_action_data prop_test_ble_remote_uuids_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_UUIDS,
-+	.prop = &prop_test_uuid,
-+};
+ 	if (status) {
+ 		tester_warn("Emulated remote setup failed.");
+-		step.action_result.status = BT_STATUS_FAIL;
++		step.action_status = BT_STATUS_FAIL;
+ 	} else {
+ 		tester_warn("Emulated remote setup done.");
+-		step.action_result.status = BT_STATUS_SUCCESS;
++		step.action_status = BT_STATUS_SUCCESS;
+ 	}
  
- static uint32_t test_cod_val = 0;
- static bt_property_t prop_test_cod = {
-@@ -259,6 +274,11 @@ static bt_property_t prop_test_cod = {
- 	.val = &test_cod_val,
- 	.len = sizeof(test_cod_val),
- };
-+static struct bt_action_data prop_test_ble_remote_cod_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_CLASS_OF_DEVICE,
-+	.prop = &prop_test_cod,
-+};
+ 	verify_step(&step, NULL);
+@@ -956,7 +956,7 @@ void bluetooth_enable_action(void)
+ 	struct step step;
  
- static uint32_t test_tod_val = BT_DEVICE_DEVTYPE_BLE;
- static bt_property_t prop_test_tod = {
-@@ -266,6 +286,11 @@ static bt_property_t prop_test_tod = {
- 	.val = &test_tod_val,
- 	.len = sizeof(test_tod_val),
- };
-+static struct bt_action_data prop_test_ble_remote_tod_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_TYPE_OF_DEVICE,
-+	.prop = &prop_test_tod,
-+};
+ 	memset(&step, 0, sizeof(step));
+-	step.action_result.status = data->if_bluetooth->enable();
++	step.action_status = data->if_bluetooth->enable();
  
- static int32_t test_remote_rssi_val = -9;
- static bt_property_t prop_test_remote_rssi = {
-@@ -273,6 +298,11 @@ static bt_property_t prop_test_remote_rssi = {
- 	.val = &test_remote_rssi_val,
- 	.len = sizeof(test_remote_rssi_val),
- };
-+static struct bt_action_data prop_test_ble_remote_rssi_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_REMOTE_RSSI,
-+	.prop = &prop_test_remote_rssi,
-+};
+ 	verify_step(&step, NULL);
+ }
+@@ -967,7 +967,7 @@ void bluetooth_disable_action(void)
+ 	struct step step;
  
- static bt_service_record_t test_srvc_record_val =  {
- 	.uuid = { {0x00} },
-@@ -284,6 +314,11 @@ static bt_property_t prop_test_srvc_record = {
- 	.val = &test_srvc_record_val,
- 	.len = sizeof(test_srvc_record_val),
- };
-+static struct bt_action_data prop_test_ble_remote_srvc_record_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_SERVICE_RECORD,
-+	.prop = &prop_test_srvc_record,
-+};
+ 	memset(&step, 0, sizeof(step));
+-	step.action_result.status = data->if_bluetooth->disable();
++	step.action_status = data->if_bluetooth->disable();
  
- static bt_bdaddr_t test_bdaddr_val = {
- 	.address = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
-@@ -293,6 +328,11 @@ static bt_property_t prop_test_bdaddr = {
- 	.val = &test_bdaddr_val,
- 	.len = sizeof(test_bdaddr_val),
- };
-+static struct bt_action_data prop_test_ble_remote_bdaddr_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_BDADDR,
-+	.prop = &prop_test_bdaddr,
-+};
+ 	verify_step(&step, NULL);
+ }
+@@ -988,7 +988,7 @@ void bt_set_property_action(void)
+ 	prop = (bt_property_t *)current_data_step->set_data;
  
- static bt_scan_mode_t setprop_scan_mode_conn_val = BT_SCAN_MODE_CONNECTABLE;
+ 	memset(&step, 0, sizeof(step));
+-	step.action_result.status = data->if_bluetooth->set_adapter_property(
++	step.action_status = data->if_bluetooth->set_adapter_property(
+ 									prop);
  
-@@ -308,6 +348,11 @@ static bt_property_t prop_test_scan_mode_none = {
- 	.val = &test_scan_mode_none_val,
- 	.len = sizeof(test_scan_mode_none_val),
- };
-+static struct bt_action_data prop_test_ble_remote_scanmode_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_ADAPTER_SCAN_MODE,
-+	.prop = &prop_test_scan_mode_none,
-+};
+ 	verify_step(&step, NULL);
+@@ -1010,7 +1010,7 @@ void bt_get_property_action(void)
+ 	prop = (bt_property_t *)current_data_step->set_data;
  
- static bt_bdaddr_t test_bonded_dev_addr_val = {
- 	.address = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05 },
-@@ -317,6 +362,23 @@ static bt_property_t prop_test_bonded_dev_addr = {
- 	.val = &test_bonded_dev_addr_val,
- 	.len = sizeof(test_bonded_dev_addr_val),
- };
-+static struct bt_action_data prop_test_ble_bonded_dev_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_ADAPTER_BONDED_DEVICES,
-+	.prop = &prop_test_bonded_dev_addr,
-+};
-+
-+static long test_remote_timestamp_val = 0x7f3d79965adf;
-+static bt_property_t prop_test_ble_remote_timestamp_prop = {
-+	.type = BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP,
-+	.val = &test_remote_timestamp_val,
-+	.len = sizeof(test_remote_timestamp_val),
-+};
-+static struct bt_action_data prop_test_ble_remote_timestamp_req = {
-+	.addr = &emu_remote_bdaddr_val,
-+	.prop_type = BT_PROPERTY_REMOTE_DEVICE_TIMESTAMP,
-+	.prop = &prop_test_ble_remote_timestamp_prop,
-+};
+ 	memset(&step, 0, sizeof(step));
+-	step.action_result.status = data->if_bluetooth->get_adapter_property(
++	step.action_status = data->if_bluetooth->get_adapter_property(
+ 								prop->type);
  
- static struct test_case test_cases[] = {
- 	TEST_CASE("Bluetooth Init",
-@@ -695,6 +757,149 @@ static struct test_case test_cases[] = {
- 						&prop_emu_ble_remote_fname_req),
- 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_fname_prop, 1),
- 	),
-+	TEST_CASE("Bluetooth Device Set BDNAME - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_bdname_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set UUIDS - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_uuids_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set COD - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+						&prop_test_ble_remote_cod_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set TOD - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+						&prop_test_ble_remote_tod_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set RSSI - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+						&prop_test_ble_remote_rssi_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set TIMESTAMP - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_timestamp_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set BDADDR - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_bdaddr_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set SERVICE_RECORD - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_srvc_record_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set SCAN_MODE - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_scanmode_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set BONDED_DEVICES - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+						&prop_test_ble_bonded_dev_req),
-+	),
-+	TEST_CASE("Bluetooth Device Set DISCOVERY_TIMEOUT - Fail",
-+		ACTION_SUCCESS(bluetooth_enable_action, NULL),
-+		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
-+		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
-+		ACTION_SUCCESS(bt_start_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STARTED),
-+		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
-+		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
-+							BT_DISCOVERY_STOPPED),
-+		ACTION_FAIL(bt_set_device_prop_action,
-+					&prop_test_ble_remote_disc_timeout_req),
-+	),
+ 	verify_step(&step, NULL);
+@@ -1021,7 +1021,7 @@ void bt_start_discovery_action(void)
+ 	struct test_data *data = tester_get_data();
+ 	struct step step;
+ 
+-	step.action_result.status = data->if_bluetooth->start_discovery();
++	step.action_status = data->if_bluetooth->start_discovery();
+ 
+ 	verify_step(&step, NULL);
+ }
+@@ -1032,7 +1032,7 @@ void bt_cancel_discovery_action(void)
+ 	struct step step;
+ 
+ 	memset(&step, 0, sizeof(step));
+-	step.action_result.status = data->if_bluetooth->cancel_discovery();
++	step.action_status = data->if_bluetooth->cancel_discovery();
+ 
+ 	verify_step(&step, NULL);
+ }
+@@ -1050,7 +1050,7 @@ void bt_get_device_props_action(void)
+ 	}
+ 
+ 	memset(&step, 0, sizeof(step));
+-	step.action_result.status =
++	step.action_status =
+ 		data->if_bluetooth->get_remote_device_properties(
+ 						current_data_step->set_data);
+ 
+diff --git a/android/tester-main.h b/android/tester-main.h
+index b81487d..920f82c 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -57,13 +57,13 @@
+ 	}
+ 
+ #define ACTION_SUCCESS(act_fun, data_set) { \
+-		.action_result.status = BT_STATUS_SUCCESS, \
++		.action_status = BT_STATUS_SUCCESS, \
+ 		.action = act_fun, \
+ 		.set_data = data_set, \
+ 	}
+ 
+ #define ACTION_FAIL(act_fun, data_set) { \
+-		.action_result.status = BT_STATUS_FAIL, \
++		.action_status = BT_STATUS_FAIL, \
+ 		.action = act_fun, \
+ 		.set_data = data_set, \
+ 	}
+@@ -174,13 +174,6 @@ struct test_data {
  };
  
- struct queue *get_bluetooth_tests(void)
+ /*
+- * Struct of data to check within step action.
+- */
+-struct bt_action_data {
+-	uint8_t status;
+-};
+-
+-/*
+  * Callback data structure should be enhanced with data
+  * returned by callbacks. It's used for test case step
+  * matching with expected step data.
+@@ -198,7 +191,7 @@ struct bt_callback_data {
+  */
+ struct step {
+ 	void (*action)(void);
+-	struct bt_action_data action_result;
++	int action_status;
+ 
+ 	expected_bt_callback_t callback;
+ 	struct bt_callback_data callback_result;
 -- 
 1.9.1
 
