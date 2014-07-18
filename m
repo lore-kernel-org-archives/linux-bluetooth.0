@@ -1,45 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Arman Uguray <armansito@chromium.org>
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH 00/11] Add shared/gatt-helpers
-Date: Fri, 18 Jul 2014 14:13:46 -0700
-Message-Id: <1405718037-15401-1-git-send-email-armansito@chromium.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Fri, 18 Jul 2014 13:42:04 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-07-14
+Message-ID: <20140718174203.GE31114@tuxdriver.com>
+References: <20140714214944.GA4374@joana>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140714214944.GA4374@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch-set introduces src/shared/gatt-helpers, which provides helper
-functions for client-side procedures defined for the Generic Attribute Profile.
-These helpers are useful, since most of them are performed over several ATT
-protocol requests over a wide attribute range (all discovery and long read/write
-procedures). These functions also handle the encoding/decoding of the ATT
-protocol PDU involved in these requests.
+On Mon, Jul 14, 2014 at 06:49:44PM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> Some more patches for 3.17. The most important change here is the move of
+> the 6lowpan code to net/6lowpan. It has been agreed with Davem that this
+> change will go through the bluetooth tree. The rest are mostly clean up and
+> fixes.
+> 
+> Please pull! or let me know of any issues. Thanks!
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 6fea7ad1d338dba592d65423427a997f1b7ff485:
+> 
+>   Bluetooth: Don't send ERTM configuration option when disabled (2014-07-09 13:53:36 +0300)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to 4d042654afb342386cb5c33e29843b76d598ab61:
+> 
+>   Bluetooth: cmtp: Remove unnecessary null test (2014-07-14 23:00:13 +0200)
 
-All GATT client procedures except the "Signed Write Without Response" have been
-implemented, as this requires signed PDUs to be handled correctly by
-bt_att_send, which will be implemented in a future patch-set.
-
-Arman Uguray (11):
-  shared/gatt: Introduce gatt-helpers.h skeleton.
-  shared/gatt: Implement bt_gatt_exchange_mtu.
-  shared/gatt: Implement "Discover All Primary Services" procedure.
-  shared/gatt: Implement "Discover Primary Service by UUID" procedure.
-  shared/gatt: Implement "Characteristic Discovery" procedures.
-  shared/gatt: Implement "Descriptor Discovery" procedure.
-  shared/gatt: Implement "Read" procedure.
-  shared/gatt: Implement "Read Long Characteristic Values" procedure.
-  shared/gatt: Implement "Write Value" and "Write Without Response"
-    procedures.
-  shared/gatt: Implement "Write Long Values" procedure.
-  shared/gatt: Implement notification/indication helper.
-
- Makefile.am               |    3 +-
- src/shared/gatt-helpers.c | 1445 +++++++++++++++++++++++++++++++++++++++++++++
- src/shared/gatt-helpers.h |  135 +++++
- 3 files changed, 1582 insertions(+), 1 deletion(-)
- create mode 100644 src/shared/gatt-helpers.c
- create mode 100644 src/shared/gatt-helpers.h
+Pulling now...
 
 -- 
-2.0.0.526.g5318336
-
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
