@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 4/6] tools/rctest: Remove dead code
-Date: Fri, 18 Jul 2014 16:28:29 +0300
-Message-Id: <1405690111-27097-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 3/6] tools/rctest: Remove unneeded return
+Date: Fri, 18 Jul 2014 16:28:28 +0300
+Message-Id: <1405690111-27097-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1405690111-27097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1405690111-27097-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,36 +12,24 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Since do_listen() never returns remove hanging code
+Code is unreachable since we use exit() before
 ---
- tools/rctest.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ tools/rctest.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/tools/rctest.c b/tools/rctest.c
-index a09a973..e61f7e2 100644
+index 2c7e45b..a09a973 100644
 --- a/tools/rctest.c
 +++ b/tools/rctest.c
-@@ -629,10 +629,8 @@ static void automated_send_recv()
- 	char device[18];
+@@ -437,8 +437,6 @@ static void do_listen(void (*handler)(int sk))
+ 		exit(0);
+ 	}
  
- 	if (fork()) {
--		if (!savefile) {
-+		if (!savefile)
- 			do_listen(recv_mode);
--			return;
--		}
- 
- 		save_fd = open(savefile, O_CREAT | O_WRONLY,
- 						S_IRUSR | S_IWUSR);
-@@ -640,8 +638,6 @@ static void automated_send_recv()
- 			syslog(LOG_ERR, "Failed to open file to save data");
- 
- 		do_listen(save_mode);
+-	return;
 -
--		close(save_fd);
- 	} else {
- 		ba2str(&bdaddr, device);
- 
+ error:
+ 	close(sk);
+ 	exit(1);
 -- 
 1.9.1
 
