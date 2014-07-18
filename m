@@ -1,45 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 18 Jul 2014 13:42:04 -0400
-From: "John W. Linville" <linville@tuxdriver.com>
-To: Gustavo Padovan <gustavo@padovan.org>,
-	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2014-07-14
-Message-ID: <20140718174203.GE31114@tuxdriver.com>
-References: <20140714214944.GA4374@joana>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <20140714214944.GA4374@joana>
-Sender: linux-kernel-owner@vger.kernel.org
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] android/hal-sco: Remove unneeded check
+Date: Fri, 18 Jul 2014 17:35:29 +0300
+Message-Id: <1405694130-6277-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Mon, Jul 14, 2014 at 06:49:44PM -0300, Gustavo Padovan wrote:
-> Hi John,
-> 
-> Some more patches for 3.17. The most important change here is the move of
-> the 6lowpan code to net/6lowpan. It has been agreed with Davem that this
-> change will go through the bluetooth tree. The rest are mostly clean up and
-> fixes.
-> 
-> Please pull! or let me know of any issues. Thanks!
-> 
-> 	Gustavo
-> 
-> ---
-> The following changes since commit 6fea7ad1d338dba592d65423427a997f1b7ff485:
-> 
->   Bluetooth: Don't send ERTM configuration option when disabled (2014-07-09 13:53:36 +0300)
-> 
-> are available in the git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-> 
-> for you to fetch changes up to 4d042654afb342386cb5c33e29843b76d598ab61:
-> 
->   Bluetooth: cmtp: Remove unnecessary null test (2014-07-14 23:00:13 +0200)
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Pulling now...
+rsp_len cannot be NULL since it checked for NULL in the beginning of the
+function.
+---
+ android/hal-sco.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index b13eb91..62e16a8 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -265,8 +265,7 @@ static int sco_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
+ 			goto failed;
+ 	}
+ 
+-	if (rsp_len)
+-		*rsp_len = cmd.len;
++	*rsp_len = cmd.len;
+ 
+ 	return SCO_STATUS_SUCCESS;
+ 
 -- 
-John W. Linville		Someday the world will need a hero, and you
-linville@tuxdriver.com			might be all we have.  Be ready.
+1.9.1
+
