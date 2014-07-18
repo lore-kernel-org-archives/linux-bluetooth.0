@@ -1,50 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 00/21] Second iteration of SCO Audio HAL fixes
-Date: Fri, 18 Jul 2014 12:47:59 +0300
-Message-Id: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 12/21] android/hal-sco: Skip resampling for input of 8k
+Date: Fri, 18 Jul 2014 12:48:11 +0300
+Message-Id: <1405676900-17703-13-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-The code makes SCO Audio HAL working with Intel device and USB Bluetooth.
+---
+ android/hal-sco.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
-Changes:
-	* v2: Remove connect SCO from Audio HAL, change function to get_fd(),
-	fixing other comments from review.
-
-Andrei Emeltchenko (21):
-  android/hal-sco: Use nanosleep for SCO synchronization
-  android/hal-sco: Move mtu assignment to open_stream()
-  android/hal-sco: Add SCO packet cache
-  android/hal-sco: Make use of config parameter
-  android/hal-sco: Implement open input stream
-  android/hal-sco: Check file descriptor >= 0
-  android/hal-sco: Use global sco file descriptor
-  android/hal-sco: Make debug more readable
-  android/hal-sco: Fix memory leak
-  android/hal-sco: Implement read
-  android/hal-sco: Skip resampling for output stream with 8k
-  android/hal-sco: Skip resampling for input of 8k
-  android/hal-sco: Choose buffer size
-  android/hal-sco: Add stream synchronization
-  android/hal-sco: Get SCO audio fd on demand
-  android/hal-sco: Defer SCO connection to write()
-  android/hal-sco: Fix incorrect assignment
-  android/hal-audio: Fix leaving open socket
-  android/hal-sco: Fix leaving open socket
-  android/hal-sco: Fix error code printing
-  android/ipc: Rename connect_sco to get_fd
-
- android/hal-audio.c     |  12 +-
- android/hal-sco.c       | 602 ++++++++++++++++++++++++++++++++++++++++++------
- android/handsfree.c     |  10 +-
- android/sco-ipc-api.txt |   6 +-
- android/sco-msg.h       |   4 +-
- 5 files changed, 544 insertions(+), 90 deletions(-)
-
+diff --git a/android/hal-sco.c b/android/hal-sco.c
+index 97cab84..2c1aeed 100644
+--- a/android/hal-sco.c
++++ b/android/hal-sco.c
+@@ -979,7 +979,7 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+ 	size_t frame_num = bytes / frame_size;
+ 	size_t input_frame_num = frame_num;
+ 	void *read_buf = buffer;
+-	size_t total, read_frames;
++	size_t total = bytes;
+ 	int ret;
+ 
+ 	DBG("Read from fd %d bytes %zu", sco_fd, bytes);
+@@ -1000,27 +1000,29 @@ static ssize_t in_read(struct audio_stream_in *stream, void *buffer,
+ 		}
+ 
+ 		read_buf = in->resample_buf;
+-	}
+ 
+-	total = input_frame_num * sizeof(int16_t) * 1;
++		total = input_frame_num * sizeof(int16_t) * 1;
++	}
+ 
+ 	if(!read_data(in, read_buf, total))
+ 		return -1;
+ 
+-	read_frames = input_frame_num;
+-
+-	ret = in->resampler->resample_from_input(in->resampler,
++	if (in->resampler) {
++		ret = in->resampler->resample_from_input(in->resampler,
+ 							in->resample_buf,
+-							&read_frames,
++							&input_frame_num,
+ 							(int16_t *) buffer,
+ 							&frame_num);
+-	if (ret) {
+-		error("Failed to resample frames: %zd input %zd (%s)",
+-				frame_num, input_frame_num, strerror(ret));
+-		return -1;
+-	}
++		if (ret) {
++			error("Failed to resample frames: %zd input %zd (%s)",
++					frame_num, input_frame_num,
++					strerror(ret));
++			return -1;
++		}
+ 
+-        DBG("resampler: remain %zd output %zd frames", read_frames, frame_num);
++		DBG("resampler: remain %zd output %zd frames", input_frame_num,
++								frame_num);
++	}
+ 
+ 	return bytes;
+ }
+@@ -1081,6 +1083,9 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 
+ 	in->cfg.frame_num = IN_STREAM_FRAMES;
+ 
++	if (in->cfg.rate == AUDIO_STREAM_SCO_RATE)
++		goto skip_resampler;
++
+ 	/* Channel numbers for resampler */
+ 	chan_num = 1;
+ 
+@@ -1108,7 +1113,7 @@ static int sco_open_input_stream(struct audio_hw_device *dev,
+ 	DBG("Resampler: input %d output %d chan %d frames %u size %zd",
+ 				AUDIO_STREAM_SCO_RATE, in->cfg.rate, chan_num,
+ 				in->resample_frame_num, resample_size);
+-
++skip_resampler:
+ 	*stream_in = &in->stream;
+ 	sco_dev->in = in;
+ 
 -- 
 1.9.1
 
