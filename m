@@ -1,45 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 02/21] android/hal-sco: Move mtu assignment to open_stream()
-Date: Fri, 18 Jul 2014 12:48:01 +0300
-Message-Id: <1405676900-17703-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1405676900-17703-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH] Bluetooth: Use EOPNOTSUPP instead of ENOTSUPP
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1405671326-32431-1-git-send-email-johan.hedberg@gmail.com>
+Date: Fri, 18 Jul 2014 11:22:31 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <20C90689-7821-44A4-96D6-9E5C45452492@holtmann.org>
+References: <1405671326-32431-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi Johan,
 
-mtu shall be assigned when opening stream to be logically correct.
----
- android/hal-sco.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+> The EOPNOTSUPP and ENOTSUPP errors are very similar in meaning, but
+> ENOTSUPP is a fairly new addition to POSIX. Not all libc versions know
+> about the value the kernel uses for ENOTSUPP so it's better to use
+> EOPNOTSUPP to ensure understandable error messages.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_conn.c   | 2 +-
+> net/bluetooth/l2cap_core.c | 2 +-
+> net/bluetooth/l2cap_sock.c | 2 +-
+> net/bluetooth/smp.c        | 4 ++--
+> 4 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/android/hal-sco.c b/android/hal-sco.c
-index 701d15e..ecf7a09 100644
---- a/android/hal-sco.c
-+++ b/android/hal-sco.c
-@@ -300,7 +300,7 @@ static bool write_data(struct sco_stream_out *out, const uint8_t *buffer,
- 	struct pollfd pfd;
- 	size_t len, written = 0;
- 	int ret;
--	uint16_t mtu = /* out->cfg.mtu */ 48;
-+	uint16_t mtu = out->cfg.mtu;
- 	uint64_t audio_sent_us, audio_passed_us;
- 
- 	pfd.fd = out->fd;
-@@ -594,7 +594,9 @@ static int sco_open_output_stream(struct audio_hw_device *dev,
- 	out->cfg.channels = AUDIO_CHANNEL_OUT_STEREO;
- 	out->cfg.rate = AUDIO_STREAM_DEFAULT_RATE;
- 	out->cfg.frame_num = OUT_STREAM_FRAMES;
--	out->cfg.mtu = mtu;
-+
-+	/* we get wrong mtu size for some reason */
-+	out->cfg.mtu = /* mtu */ 48;
- 
- 	out->downmix_buf = malloc(out_get_buffer_size(&out->stream.common));
- 	if (!out->downmix_buf) {
--- 
-1.9.1
+patch has been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
