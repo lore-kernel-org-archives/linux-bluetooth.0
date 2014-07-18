@@ -1,36 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] android/hal-audio: Remove unneeded check
-Date: Fri, 18 Jul 2014 17:35:30 +0300
-Message-Id: <1405694130-6277-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1405694130-6277-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1405694130-6277-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+In-Reply-To: <OF88C5CA2A.8245708A-ON65257D19.004EF351-65257D19.004EF354@LocalDomain>
+References: <OF88C5CA2A.8245708A-ON65257D19.004EF351-65257D19.004EF354@LocalDomain>
+Subject: Empty SCO packets after end of call
+From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
+To: autoanswer@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Message-ID: <OF883A3598.A88ED292-ON65257D19.004F62FF-65257D19.004F6302@tcs.com>
+Date: Fri, 18 Jul 2014 19:57:06 +0530
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+Hi,
 
-rsp_len cannot be NULL here because of NULL check in the beginning of
-the function.
----
- android/hal-audio.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I can see lot of empty SCO packets after end of phone call. This lead to my system hang.
 
-diff --git a/android/hal-audio.c b/android/hal-audio.c
-index d7a06fa..66dc46a 100644
---- a/android/hal-audio.c
-+++ b/android/hal-audio.c
-@@ -286,8 +286,7 @@ static int audio_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len,
- 			goto failed;
- 	}
- 
--	if (rsp_len)
--		*rsp_len = cmd.len;
-+	*rsp_len = cmd.len;
- 
- 	return AUDIO_STATUS_SUCCESS;
- 
--- 
-1.9.1
+Can anyone help me on this issue.
+
+
+Thanks & Regards,
+Vinod.
+=====-----=====-----=====
+Notice: The information contained in this e-mail
+message and/or attachments to it may contain 
+confidential or privileged information. If you are 
+not the intended recipient, any dissemination, use, 
+review, distribution, printing or copying of the 
+information contained in this e-mail message 
+and/or attachments to it are strictly prohibited. If 
+you have received this communication in error, 
+please notify us by reply e-mail or telephone and 
+immediately and permanently delete the message 
+and any attachments. Thank you
+
+
 
