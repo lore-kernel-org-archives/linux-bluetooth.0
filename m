@@ -1,13 +1,12 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <OF88C5CA2A.8245708A-ON65257D19.004EF351-65257D19.004EF354@LocalDomain>
-References: <OF88C5CA2A.8245708A-ON65257D19.004EF351-65257D19.004EF354@LocalDomain>
+In-Reply-To: 
+References: 
 Subject: Empty SCO packets after end of call
 From: Vinod Rayapudi <vinod.rayapudi@tcs.com>
-To: autoanswer@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Message-ID: <OF883A3598.A88ED292-ON65257D19.004F62FF-65257D19.004F6302@tcs.com>
-Date: Fri, 18 Jul 2014 19:57:06 +0530
+To: Majordomo@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Message-ID: <OF88C5CA2A.8245708A-ON65257D19.004EF351-65257D19.004EF354@tcs.com>
+Date: Fri, 18 Jul 2014 19:52:21 +0530
 Content-Type: text/plain; charset=US-ASCII
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
