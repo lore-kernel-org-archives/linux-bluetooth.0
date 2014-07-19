@@ -1,45 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Disable HCI_CONNECTABLE based passive scanning for now
-Date: Sun, 20 Jul 2014 17:10:45 +0300
-Message-Id: <1405865445-4441-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Arman Uguray <armansito@chromium.org>
+Subject: [RFC 0/1] doc/gatt-api: New API properties and methods for the GATT D-Bus API.
+Date: Fri, 18 Jul 2014 23:06:47 -0700
+Message-Id: <1405750008-7652-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+In the upcoming beta release of Chrome OS (which uses BlueZ as its Bluetooth
+stack) we have implemented the chrome.bluetoothLowEnergy JavaScript API for
+Chrome browser applications
+(https://developer.chrome.com/apps/bluetoothLowEnergy). For Chrome OS, we wrote
+an implementation of the proposed GATT D-Bus API for bluetoothd, during which we
+ran into some issues with the current proposal and changed things up a bit.
 
-When HCI_CONNECTABLE is set the code has been enabling passive scanning
-in order to be consistent with BR/EDR and accept connections from any
-device doing directed advertising to us. However, some hardware
-(particularly CSR) can get very noisy even when doing duplicates
-filtering, making this feature waste resources.
+This set includes one patch that proposes changes for the currently
+unimplemented GATT D-Bus API for desktop bluetoothd. The following changes are
+proposed:
 
-Considering that the feature is for fairly corner-case use (devices
-who'd use directed advertising would likely be in the whitelist anyway)
-it's better to disable it for now. It may still be brought back later,
-possibly with a better implementation (e.g. through improved scan
-parameters).
+ * The addition of the following new properties:
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/hci_core.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+   - org.bluez.GattService1: "Primary", "Device", "Characteristics"
+   - org.bluez.GattCharacteristic1: "Notifying", "Descriptors"
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f575abdf2b4e..f82a6cf1aaa8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5465,8 +5465,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
- 
- 	hci_req_init(&req, hdev);
- 
--	if (!test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
--	    list_empty(&hdev->pend_le_conns) &&
-+	if (list_empty(&hdev->pend_le_conns) &&
- 	    list_empty(&hdev->pend_le_reports)) {
- 		/* If there is no pending LE connections or devices
- 		 * to be scanned for, we should stop the background
+   While all characteristic and descriptor objects become available via
+   ObjectManager as soon as they get discovered, the "Characteristics" and
+   "Descriptors" properties of service and characteristic objects do not get set
+   until all characteristics and descriptors of a service have been discovered.
+   This is used to let applications know that discovery of a service is complete
+   and that the service is ready to interact with.
+
+ * Removal of the "Permissions" property from org.bluez.GattDescriptor1.
+
+ * Removal of the "Value" property from org.bluez.GattCharacteristic1 and
+   GattDescriptor1. The introduction of the following asynchronous methods and
+   signals:
+
+   - ReadValue method, which always reads the value of a characteristic or
+     descriptor from the remote device and returns the result asynchronously.
+     This removes the problems of the org.freedesktop.DBus.Properties.Get
+     method when the value is implemented as a property:
+
+     -- The Get and GetAll methods are synchronous. This causes problems when a
+        round-trip is required to obtain the value from the remote device.
+     -- The ambiguity involved in the role of Get/GetAll when a characteristic
+        doesn't support reads. Some characteristics are only writable and some
+        make their values known via notifications and not reads.
+
+   - WriteValue method, which is used to write the value of a characteristic or
+     descriptor.
+
+   - ValueUpdated signal, emitted when a characteristic notification or
+     indication is received.
+
+  * Addition of the StartNotify and StopNotify methods to
+    org.bluez.GattCharacteristic1. This allows multiple applications to enable
+    notifications from a characteristic without interfering with each other and
+    applications are not permitted to directly write to the "Client
+    Characteristic Configuration" descriptor.
+
+
+Arman Uguray (1):
+  doc/gatt-api: New API properties and methods for the GATT D-Bus API.
+
+ doc/gatt-api.txt | 118 ++++++++++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 104 insertions(+), 14 deletions(-)
+
 -- 
-1.9.3
+2.0.0.526.g5318336
 
