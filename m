@@ -1,207 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-To: Arman Uguray <armansito@chromium.org>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [RFC 1/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
-Date: Mon, 21 Jul 2014 01:50:32 +0000
-Message-ID: <3D02B219753AD44CBDDDE484323B1774112CE1BC@SHSMSX104.ccr.corp.intel.com>
-References: <1405750008-7652-1-git-send-email-armansito@chromium.org>
- <1405750008-7652-2-git-send-email-armansito@chromium.org>
-In-Reply-To: <1405750008-7652-2-git-send-email-armansito@chromium.org>
-Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
+From: Ben Davis <bendavis78@gmail.com>
+Date: Sun, 20 Jul 2014 18:13:15 -0500
+Message-ID: <CAHGZte6L-phK3NjbKX2gXzguA4SVRDB3XNcBfriKsSby1Vvo4A@mail.gmail.com>
+Subject: Refusing input device connect: No such file or directory (2)
+To: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi, arman
-	 We are working on GATT D-Bus API for Tizen LE GATT Client too. For your proposal, I totally agree your part of proposal such as add Primary property into org.bluez.GattService1, because all the hierarchy services cannot differentiate between primary and included service. And device property is also very useful because It can help user to trace the services belong to which device.
-	However , you add Write/Read/Notify method into GATT-API , I think it is good proposal but not essential. Because it is about implementation method problem, not the GATT DBus API problem.
-	For example, The Get and GetAll methods are synchronous, So you can read value from remote device asynchronously when you setup the DBus hierarchy.
-	And you add notify method , I think it should put into LE profile to do this such as heartrate profile. Gatt DBus Hierarchy just listen this event and emit propertychanged signal when remote characteristic Value updated.
+I cannot connect my bluetooth keyboard. I'm using bluez 5.21-2 on
+archlinux. I'm using bluetoothctl, and am running "bluetoothd -nd" to
+view debug output. When I press the pair button on my keyboard, the
+device shows up and is then immediately removed. This is what it shows
+in bluetoothctl:
 
-Thanks
-Chaojie
+[NEW] Device 28:37:37:2A:BC:7A Apple Wireless Keyboard
+[CHG] Device 28:37:37:2A:BC:7A Connected: no
+[DEL] Device 28:37:37:2A:BC:7A Apple Wireless Keyboard
 
------Original Message-----
-From: linux-bluetooth-owner@vger.kernel.org [mailto:linux-bluetooth-owner@vger.kernel.org] On Behalf Of Arman Uguray
-Sent: Saturday, July 19, 2014 2:07 PM
-To: linux-bluetooth@vger.kernel.org
-Cc: Arman Uguray
-Subject: [RFC 1/1] doc/gatt-api: New API properties and methods for the GATT D-Bus API.
 
-This patch proposes changes to the currently unimplemented GATT D-Bus API for desktop bluetoothd. This is the first step in implementing a GATT client layer for bluetoothd that will change the way remote attributes are accessed via bluetoothd plugins and external applications.
----
- doc/gatt-api.txt | 118 ++++++++++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 104 insertions(+), 14 deletions(-)
+And this is the output from bluetoothd during the event:
 
-diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt index 8c7975c..bec9674 100644
---- a/doc/gatt-api.txt
-+++ b/doc/gatt-api.txt
-@@ -32,6 +32,25 @@ Properties	string UUID [read-only]
- 
- 			128-bit service UUID.
- 
-+		boolean Primary [read-only]
-+
-+			Indicates whether or not this GATT service is a
-+			primary service. If false, the service is secondary.
-+
-+		object Device [read-only, optional]
-+
-+			Object path of the Bluetooth device the service
-+			belongs to. Only present on services from remote
-+			devices.
-+
-+		array{object} Characteristics [read-only]
-+
-+			Array of object paths representing the characteristics
-+			of this service. This property is set only when the
-+			characteristic discovery has been completed, however the
-+			characteristic objects will become available via
-+			ObjectManager as soon as they get discovered.
-+
- 		array{object} Includes [read-only]: Not implemented
- 
- 			Array of object paths representing the included
-@@ -48,6 +67,54 @@ Service		org.bluez
- Interface	org.bluez.GattCharacteristic1 [Experimental]
- Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY
- 
-+Methods		array{byte} ReadValue()
-+
-+			Issues a request to read the value of the
-+			characteristic and returns the value if the
-+			operation was successful.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.ReadNotPermitted
-+					 org.bluez.Error.Authentication
-+					 org.bluez.Error.Authorization
-+					 org.bluez.Error.Encryption
-+
-+		void WriteValue(array{byte} value)
-+
-+			Issues a request to write the value of the
-+			characteristic.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.WriteNotPermitted
-+					 org.bluez.Error.Authentication
-+					 org.bluez.Error.Authorization
-+					 org.bluez.Error.Encryption
-+
-+		void StartNotify()
-+
-+			Starts a notification session from this characteristic
-+			if it supports value notifications or indications.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.NotSupported
-+
-+		void StopNotify()
-+
-+			This method will cancel any previous StartNotify
-+			transaction. Note that notifications from a
-+			characteristic are shared between sessions thus
-+			calling StopNotify will release a single session.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+
-+Signals		void ValueUpdated(array{bytes} value)
-+
-+			This signal is launched when a characteristic handle
-+			value notification or indication is received.
-+
- Properties	string UUID [read-only]
- 
- 			128-bit characteristic UUID.
-@@ -57,12 +124,12 @@ Properties	string UUID [read-only]
- 			Object path of the GATT service the characteristc
- 			belongs to.
- 
--		array{byte} Value [read-write]
-+		boolean Notifying [read-only]
- 
--			Value read from the remote Bluetooth device or from
--			the external application implementing GATT services.
-+			True, if notifications or indications on this
-+			characteristic are currently enabled.
- 
--		array{string} Flags [read-only, optional]
-+		array{string} Flags [read-only]
- 
- 			Defines how the characteristic value can be used. See
- 			Core spec "Table 3.5: Characteristic Properties bit
-@@ -79,6 +146,14 @@ Properties	string UUID [read-only]
- 				"reliable-write"
- 				"writable-auxiliaries"
- 
-+		array{object} Descriptors [read-only]
-+
-+			Array of object paths representing the descriptors
-+			of this service. This property is set only when the
-+			descriptor discovery has been completed, however the
-+			descriptor objects will become available via
-+			ObjectManager as soon as they get discovered.
-+
- 
- Characteristic Descriptors hierarchy
- ====================================
-@@ -89,6 +164,31 @@ Service		org.bluez
- Interface	org.bluez.GattDescriptor1 [Experimental]
- Object path	[variable prefix]/{hci0,hci1,...}/dev_XX_XX_XX_XX_XX_XX/serviceXX/charYYYY/descriptorZZZ
- 
-+Methods		array{byte} ReadValue()
-+
-+			Issues a request to read the value of the
-+			characteristic and returns the value if the
-+			operation was successful.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.ReadNotPermitted
-+					 org.bluez.Error.Authentication
-+					 org.bluez.Error.Authorization
-+					 org.bluez.Error.Encryption
-+
-+		void WriteValue(array{byte} value)
-+
-+			Issues a request to write the value of the
-+			characteristic.
-+
-+			Possible Errors: org.bluez.Error.Failed
-+					 org.bluez.Error.InProgress
-+					 org.bluez.Error.WriteNotPermitted
-+					 org.bluez.Error.Authentication
-+					 org.bluez.Error.Authorization
-+					 org.bluez.Error.Encryption
-+
- Properties	string UUID [read-only]
- 
- 			128-bit descriptor UUID.
-@@ -98,16 +198,6 @@ Properties	string UUID [read-only]
- 			Object path of the GATT characteristc the descriptor
- 			belongs to.
- 
--		array{byte} Value [read-write]
--
--			Raw characteristic descriptor value read from the
--			remote Bluetooth device or from the external
--			application implementing GATT services.
--
--		string Permissions [read-only]: To be defined
--
--			Defines read/write authentication and authorization
--			requirements.
- 
- Service Manager hierarchy
- =============================
---
-2.0.0.526.g5318336
+bluetoothd[8708]: src/adapter.c:connected_callback() hci0 device
+28:37:37:2A:BC:7A connected eir_len 5
+bluetoothd[8708]: src/device.c:device_create() dst 28:37:37:2A:BC:7A
+bluetoothd[8708]: src/device.c:device_new() address 28:37:37:2A:BC:7A
+bluetoothd[8708]: src/device.c:device_new() Creating device
+/org/bluez/hci0/dev_28_37_37_2A_BC_7A
+bluetoothd[8708]: src/device.c:btd_device_set_temporary() temporary 1
+bluetoothd[8708]: src/adapter.c:adapter_connect_list_remove() device
+/org/bluez/hci0/dev_28_37_37_2A_BC_7A is not on the list, ignoring
+bluetoothd[8708]: src/device.c:device_set_class()
+/org/bluez/hci0/dev_28_37_37_2A_BC_7A 0x002540
+bluetoothd[8708]: profiles/input/server.c:connect_event_cb() Incoming
+connection from 28:37:37:2A:BC:7A on PSM 17
+bluetoothd[8708]: profiles/input/device.c:input_device_set_channel()
+idev (nil) psm 17
+bluetoothd[8708]: Refusing input device connect: No such file or directory (2)
+bluetoothd[8708]: profiles/input/server.c:confirm_event_cb()
+bluetoothd[8708]: Refusing connection from 28:37:37:2A:BC:7A: unknown device
+bluetoothd[8708]: src/adapter.c:dev_disconnected() Device
+28:37:37:2A:BC:7A disconnected, reason 3
+bluetoothd[8708]: src/adapter.c:adapter_remove_connection()
+bluetoothd[8708]: src/adapter.c:adapter_remove_connection() Removing
+temporary device /org/bluez/hci0/dev_28_37_37_2A_BC_7A
+bluetoothd[8708]: src/device.c:device_remove() Removing device
+/org/bluez/hci0/dev_28_37_37_2A_BC_7A
+bluetoothd[8708]: src/device.c:btd_device_unref() Freeing device
+/org/bluez/hci0/dev_28_37_37_2A_BC_7A
+bluetoothd[8708]: src/device.c:device_free() 0xedcae0
+bluetoothd[8708]: plugins/policy.c:disconnect_cb() reason 3
+bluetoothd[8708]: src/adapter.c:bonding_attempt_complete() hci0 bdaddr
+28:37:37:2A:BC:7A type 0 status 0xe
+bluetoothd[8708]: src/adapter.c:resume_discovery()
 
---
-To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in the body of a message to majordomo@vger.kernel.org More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+I'm assuming the problem has something to do with the "Refusing input
+device connect: No such file or directory (2)".  What exactly is it
+trying to access that doesn't exist?
