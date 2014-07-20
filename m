@@ -1,39 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Disable HCI_CONNECTABLE based passive scanning for now
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405865445-4441-1-git-send-email-johan.hedberg@gmail.com>
-Date: Sun, 20 Jul 2014 16:17:19 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <A019E03A-E59E-4B4F-84AD-6CBB041C3945@holtmann.org>
-References: <1405865445-4441-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Disable HCI_CONNECTABLE based passive scanning for now
+Date: Sun, 20 Jul 2014 17:10:45 +0300
+Message-Id: <1405865445-4441-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> When HCI_CONNECTABLE is set the code has been enabling passive scanning
-> in order to be consistent with BR/EDR and accept connections from any
-> device doing directed advertising to us. However, some hardware
-> (particularly CSR) can get very noisy even when doing duplicates
-> filtering, making this feature waste resources.
-> 
-> Considering that the feature is for fairly corner-case use (devices
-> who'd use directed advertising would likely be in the whitelist anyway)
-> it's better to disable it for now. It may still be brought back later,
-> possibly with a better implementation (e.g. through improved scan
-> parameters).
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/hci_core.c | 3 +--
-> 1 file changed, 1 insertion(+), 2 deletions(-)
+When HCI_CONNECTABLE is set the code has been enabling passive scanning
+in order to be consistent with BR/EDR and accept connections from any
+device doing directed advertising to us. However, some hardware
+(particularly CSR) can get very noisy even when doing duplicates
+filtering, making this feature waste resources.
 
-patch has been applied to bluetooth-next tree.
+Considering that the feature is for fairly corner-case use (devices
+who'd use directed advertising would likely be in the whitelist anyway)
+it's better to disable it for now. It may still be brought back later,
+possibly with a better implementation (e.g. through improved scan
+parameters).
 
-Regards
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/hci_core.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Marcel
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index f575abdf2b4e..f82a6cf1aaa8 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5465,8 +5465,7 @@ void hci_update_background_scan(struct hci_dev *hdev)
+ 
+ 	hci_req_init(&req, hdev);
+ 
+-	if (!test_bit(HCI_CONNECTABLE, &hdev->dev_flags) &&
+-	    list_empty(&hdev->pend_le_conns) &&
++	if (list_empty(&hdev->pend_le_conns) &&
+ 	    list_empty(&hdev->pend_le_reports)) {
+ 		/* If there is no pending LE connections or devices
+ 		 * to be scanned for, we should stop the background
+-- 
+1.9.3
 
