@@ -1,51 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Sun, 20 Jul 2014 18:43:19 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix endian and alignment issue with ath3k
- version handling
-Message-ID: <20140720154319.GA7032@t440s.P-661HNU-F1>
-References: <1405870199-32499-1-git-send-email-marcel@holtmann.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405870199-32499-1-git-send-email-marcel@holtmann.org>
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Remove unneeded variable assignment in hmac_sha256
+Date: Sun, 20 Jul 2014 17:43:07 +0200
+Message-Id: <1405870987-40038-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+The variable ret does not need to be assigned when declaring it. So
+remove this initial assignment.
 
-On Sun, Jul 20, 2014, Marcel Holtmann wrote:
-> The ath3k driver is treating the version information badly when it
-> comes to loading the right firmware version and comparing that it
-> actually matches with the hardware.
-> 
-> Initially this showed up as this:
-> 
->   CHECK   drivers/bluetooth/ath3k.c
-> drivers/bluetooth/ath3k.c:373:17: warning: cast to restricted __le32
-> drivers/bluetooth/ath3k.c:435:17: warning: cast to restricted __le32
-> 
-> However when fixing this by actually using __packed and __le32 for
-> the ath3_version structure, more issues came up:
-> 
->   CHECK   drivers/bluetooth/ath3k.c
-> drivers/bluetooth/ath3k.c:381:32: warning: incorrect type in assignment (different base types)
-> drivers/bluetooth/ath3k.c:381:32:    expected restricted __le32 [usertype] rom_version
-> drivers/bluetooth/ath3k.c:381:32:    got int [signed] <noident>
-> drivers/bluetooth/ath3k.c:382:34: warning: incorrect type in assignment (different base types)
-> drivers/bluetooth/ath3k.c:382:34:    expected restricted __le32 [usertype] build_version
-> drivers/bluetooth/ath3k.c:382:34:    got int [signed] <noident>
-> drivers/bluetooth/ath3k.c:386:28: warning: restricted __le32 degrades to integer
-> drivers/bluetooth/ath3k.c:386:56: warning: restricted __le32 degrades to integer
-> 
-> This patch fixes every instance of the firmware version handling and
-> makes sure it is endian safe and uses proper unaligned access.
-> 
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  drivers/bluetooth/ath3k.c | 29 ++++++++++++++++-------------
->  1 file changed, 16 insertions(+), 13 deletions(-)
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/amp.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to bluetooth-next. Thanks.
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index e60603a8969f..016cdb66df6c 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -133,8 +133,8 @@ struct hci_conn *phylink_add(struct hci_dev *hdev, struct amp_mgr *mgr,
+ /* AMP crypto key generation interface */
+ static int hmac_sha256(u8 *key, u8 ksize, char *plaintext, u8 psize, u8 *output)
+ {
+-	int ret = 0;
+ 	struct crypto_shash *tfm;
++	int ret;
+ 
+ 	if (!ksize)
+ 		return -EINVAL;
+-- 
+1.9.3
 
-Johan
