@@ -1,46 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: Missing vendor-specific ID for BCM20702A0
+Subject: Re: [PATCH] Bluetooth: Prefer sizeof(*ptr) when allocating memory
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAFd36Bj_SiUoeeu0h7kbEZnUx=6iXExCSTCvht_NLh4MY2-zSw@mail.gmail.com>
-Date: Mon, 21 Jul 2014 13:03:18 +0200
+In-Reply-To: <1405929006-21537-1-git-send-email-johan.hedberg@gmail.com>
+Date: Mon, 21 Jul 2014 13:01:37 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <6DC4CADB-8928-48F8-82F7-662425143FB7@holtmann.org>
-References: <CAFd36Bj_SiUoeeu0h7kbEZnUx=6iXExCSTCvht_NLh4MY2-zSw@mail.gmail.com>
-To: Jerome Leclanche <jerome@leclan.ch>
+Message-Id: <E04B1162-F78C-4312-9AA8-A00A4CED13EC@holtmann.org>
+References: <1405929006-21537-1-git-send-email-johan.hedberg@gmail.com>
+To: Johan Hedberg <johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jerome,
+Hi Johan,
 
-> I have a Z97-DELUXE motherboard. This includes a BCM20702A0 bluetooth chip.
-> In order to be able to use it, I have to do 'echo "0b05 17cf" >>
-> /sys/bus/usb/drivers/btusb/new_id' every reboot, otherwise I don't
-> have an hci0 available. Was told this would be the best place to
-> report this to.
+> It's safer practice to use sizeof(*ptr) instead of sizeof(ptr_type) when
+> allocating memory in case the type changes. This also fixes the
+> following style of warnings from static analyzers:
 > 
-> lsusb:
-> Bus 001 Device 003: ID 0b05:17cf ASUSTek Computer, Inc.
-> Device Descriptor:
->  bLength                18
->  bDescriptorType         1
->  bcdUSB               2.00
->  bDeviceClass          255 Vendor Specific Class
->  bDeviceSubClass         1
->  bDeviceProtocol         1
->  bMaxPacketSize0        64
->  idVendor           0x0b05 ASUSTek Computer, Inc.
->  idProduct          0x17cf
->  bcdDevice            1.12
->  iManufacturer           1 Broadcom Corp
->  iProduct                2 BCM20702A0
->  iSerial                 3 54271E910064
->  bNumConfigurations      1
+> CHECK: Prefer kzalloc(sizeof(*ie)...) over kzalloc(sizeof(struct inquiry_entry)...)
+> +	ie = kzalloc(sizeof(struct inquiry_entry), GFP_KERNEL);
 > 
-> Note: Not subscribed, please CC.
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+> net/bluetooth/hci_conn.c   | 4 ++--
+> net/bluetooth/hci_core.c   | 6 +++---
+> net/bluetooth/l2cap_core.c | 2 +-
+> 3 files changed, 6 insertions(+), 6 deletions(-)
 
-actually the content of /sys/kernel/debug/usb/devices is a bit more helpful in determine what kind of entry needs to be added to the module list of btusb driver.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
