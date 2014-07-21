@@ -2,49 +2,476 @@ Return-Path: <cyrus@holtmann.org>
 From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 03/11] android/tester-ng: Improve callback defining makro
-Date: Mon, 21 Jul 2014 09:40:21 +0200
-Message-Id: <1405928429-11491-4-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 02/11] android/tester-ng: Improve result print
+Date: Mon, 21 Jul 2014 09:40:20 +0200
+Message-Id: <1405928429-11491-3-git-send-email-jakub.tyszkowski@tieto.com>
 In-Reply-To: <1405928429-11491-1-git-send-email-jakub.tyszkowski@tieto.com>
 References: <1405928429-11491-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This makes CALLBACK_DEVICE_PROPS and CALLBACK_DEVICE_FOUND use more
-generic CALLBACK_PROPS makro.
+It might be usefull to print if test involves LE or BREDR adapter and
+remotes. Test case title length had to be reduced for better results
+format.
 ---
- android/tester-main.h | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ android/tester-bluetooth.c | 108 ++++++++++++++++++++++-----------------------
+ android/tester-main.h      |   4 +-
+ 2 files changed, 56 insertions(+), 56 deletions(-)
 
+diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
+index d80fe68..df9340b 100644
+--- a/android/tester-bluetooth.c
++++ b/android/tester-bluetooth.c
+@@ -381,150 +381,150 @@ static struct bt_action_data prop_test_ble_remote_timestamp_req = {
+ };
+ 
+ static struct test_case test_cases[] = {
+-	TEST_CASE_BREDRLE("Bluetooth Init",
++	TEST_CASE_BREDRLE("Bt. Init",
+ 		ACTION_SUCCESS(dummy_action, NULL),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Enable - Success",
++	TEST_CASE_BREDRLE("Bt. Enable - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_ADAPTER_PROPS(prop_emu_default_set, 8),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Enable - Success 2",
++	TEST_CASE_BREDRLE("Bt. Enable - Success 2",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_ADAPTER_PROPS(prop_emu_default_set, 8),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Disable - Success",
++	TEST_CASE_BREDRLE("Bt. Disable - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set BDNAME - Success",
++	TEST_CASE_BREDRLE("Bt. Set BDNAME - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_set_property_action, &prop_test_bdname),
+ 		CALLBACK_ADAPTER_PROPS(&prop_test_bdname, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set SCAN_MODE - Success",
++	TEST_CASE_BREDRLE("Bt. Set SCAN_MODE - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_set_property_action,
+ 					&prop_test_scanmode_conn_discov),
+ 		CALLBACK_ADAPTER_PROPS(&prop_test_scanmode_conn_discov, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set DISCOVERY_TIMEOUT - Success",
++	TEST_CASE_BREDRLE("Bt. Set DISCOVERY_TIMEOUT - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_set_property_action, &prop_test_disctimeout),
+ 		CALLBACK_ADAPTER_PROPS(&prop_test_disctimeout, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get BDADDR - Success",
++	TEST_CASE_BREDRLE("Bt. Get BDADDR - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_bdaddr),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_bdaddr, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get BDNAME - Success",
++	TEST_CASE_BREDRLE("Bt. Get BDNAME - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_bdname),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_bdname, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set UUID - Fail",
++	TEST_CASE_BREDRLE("Bt. Set UUID - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_uuid),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set CLASS_OF_DEVICE - Fail",
++	TEST_CASE_BREDRLE("Bt. Set CLASS_OF_DEVICE - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_cod),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set TYPE_OF_DEVICE - Fail",
++	TEST_CASE_BREDRLE("Bt. Set TYPE_OF_DEVICE - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_tod),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set REMOTE_RSSI - Fail",
++	TEST_CASE_BREDRLE("Bt. Set REMOTE_RSSI - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_remote_rssi),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set SERVICE_RECORD - Fail",
++	TEST_CASE_BREDRLE("Bt. Set SERVICE_RECORD - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_srvc_record),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set BDADDR - Fail",
++	TEST_CASE_BREDRLE("Bt. Set BDADDR - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_bdaddr),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set SCAN_MODE_CONNECTABLE - SUCCESS",
++	TEST_CASE_BREDRLE("Bt. Set SCAN_MODE_CONNECTABLE - SUCCESS",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_set_property_action,
+ 						&prop_test_scan_mode_conn),
+ 		CALLBACK_ADAPTER_PROPS(&prop_test_scan_mode_conn, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set BONDED_DEVICES - Fail",
++	TEST_CASE_BREDRLE("Bt. Set BONDED_DEVICES - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_FAIL(bt_set_property_action, &prop_test_bonded_dev_addr),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get CLASS_OF_DEVICE - Success",
++	TEST_CASE_BREDRLE("Bt. Get CLASS_OF_DEVICE - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_cod),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_cod, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get TYPE_OF_DEVICE - Success",
++	TEST_CASE_BREDRLE("Bt. Get TYPE_OF_DEVICE - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_tod),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_tod, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get SCAN_MODE - Success",
++	TEST_CASE_BREDRLE("Bt. Get SCAN_MODE - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_scan_mode),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_scan_mode, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get DISCOVERY_TIMEOUT - Success",
++	TEST_CASE_BREDRLE("Bt. Get DISCOVERY_TIMEOUT - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_disc_timeout),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_disc_timeout, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get UUIDS - Success",
++	TEST_CASE_BREDRLE("Bt. Get UUIDS - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_uuids),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_uuids, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Get BONDED_DEVICES - Success",
++	TEST_CASE_BREDRLE("Bt. Get BONDED_DEVICES - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_get_property_action, &prop_emu_bonded_devs),
+ 		CALLBACK_ADAPTER_PROPS(&prop_emu_bonded_devs, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Set SCAN_MODE - Success 2",
++	TEST_CASE_BREDRLE("Bt. Set SCAN_MODE - Success 2",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_set_property_action,
+ 						&prop_test_scan_mode_none),
+ 		CALLBACK_ADAPTER_PROPS(&prop_test_scan_mode_none, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth BR/EDR Discovery Start - Success",
++	TEST_CASE_BREDRLE("Bt. Discovery Start - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
+ 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
+ 							BT_DISCOVERY_STARTED),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth BR/EDR Discovery Start - Done",
++	TEST_CASE_BREDRLE("Bt. Discovery Start - Done",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
+@@ -532,7 +532,7 @@ static struct test_case test_cases[] = {
+ 							BT_DISCOVERY_STARTED),
+ 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth BR/EDR Discovery Stop - Success",
++	TEST_CASE_BREDRLE("Bt. Discovery Stop - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
+@@ -542,7 +542,7 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
+ 							BT_DISCOVERY_STOPPED),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth BR/EDR Discovery Stop - Done",
++	TEST_CASE_BREDRLE("Bt. Discovery Stop - Done",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
+@@ -553,7 +553,7 @@ static struct test_case test_cases[] = {
+ 							BT_DISCOVERY_STOPPED),
+ 		ACTION_SUCCESS(bt_start_discovery_action, NULL),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth BR/EDR Discovery Device Found",
++	TEST_CASE_BREDRLE("Bt. Discovery Device Found",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -565,7 +565,7 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
+ 							BT_DISCOVERY_STOPPED),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get Props - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get Props - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -579,7 +579,7 @@ static struct test_case test_cases[] = {
+ 							&emu_remote_bdaddr_val),
+ 		CALLBACK_DEVICE_PROPS(prop_emu_ble_remotes_query_set, 6),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get BDNAME - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get BDNAME - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -593,7 +593,7 @@ static struct test_case test_cases[] = {
+ 					&prop_emu_ble_remote_bdname_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_bdname_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get UUIDS - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get UUIDS - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -607,7 +607,7 @@ static struct test_case test_cases[] = {
+ 						&prop_emu_ble_remote_uuids_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_uuids_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get COD - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get COD - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -621,7 +621,7 @@ static struct test_case test_cases[] = {
+ 						&prop_emu_ble_remote_cod_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_cod_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get TOD - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get TOD - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -635,7 +635,7 @@ static struct test_case test_cases[] = {
+ 						&prop_emu_ble_remote_tod_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_tod_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get RSSI - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get RSSI - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -649,7 +649,7 @@ static struct test_case test_cases[] = {
+ 						&prop_emu_ble_remote_rssi_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_rssi_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get TIMESTAMP - Success",
++	TEST_CASE_BREDRLE("Bt. Device Get TIMESTAMP - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -663,7 +663,7 @@ static struct test_case test_cases[] = {
+ 					&prop_emu_ble_remote_timestamp_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_timestamp_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get BDADDR - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Get BDADDR - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -676,7 +676,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_get_device_prop_action,
+ 					&prop_emu_ble_remote_bdaddr_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get SCAN_MODE - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Get SCAN_MODE - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -689,7 +689,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_get_device_prop_action,
+ 					&prop_emu_ble_remote_scan_mode_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get BONDED_DEVICES - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Get BONDED_DEVICES - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -702,7 +702,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_get_device_prop_action,
+ 					&prop_emu_ble_remote_bondeddev_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get DISCOVERY_TIMEOUT - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Get DISCOVERY_TIMEOUT - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -715,7 +715,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_get_device_prop_action,
+ 					&prop_emu_ble_remote_disctimeout_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get VERSION_INFO - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Get VERSION_INFO - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -728,7 +728,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_get_device_prop_action,
+ 					&prop_emu_ble_remote_verinfo_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Get FRIENDLY_NAME - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Get FRIENDLY_NAME - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -741,7 +741,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_get_device_prop_action,
+ 						&prop_emu_ble_remote_fname_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set FRIENDLY_NAME - Success",
++	TEST_CASE_BREDRLE("Bt. Device Set FRIENDLY_NAME - Success",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -757,7 +757,7 @@ static struct test_case test_cases[] = {
+ 						&prop_emu_ble_remote_fname_req),
+ 		CALLBACK_DEVICE_PROPS(&prop_emu_ble_remote_fname_prop, 1),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set BDNAME - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set BDNAME - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -770,7 +770,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 					&prop_test_ble_remote_bdname_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set UUIDS - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set UUIDS - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -783,7 +783,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 					&prop_test_ble_remote_uuids_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set COD - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set COD - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -796,7 +796,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 						&prop_test_ble_remote_cod_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set TOD - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set TOD - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -809,7 +809,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 						&prop_test_ble_remote_tod_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set RSSI - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set RSSI - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -822,7 +822,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 						&prop_test_ble_remote_rssi_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set TIMESTAMP - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set TIMESTAMP - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -835,7 +835,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 					&prop_test_ble_remote_timestamp_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set BDADDR - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set BDADDR - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -848,7 +848,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 					&prop_test_ble_remote_bdaddr_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set SERVICE_RECORD - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set SERVICE_RECORD - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -861,7 +861,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 					&prop_test_ble_remote_srvc_record_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set SCAN_MODE - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set SCAN_MODE - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -874,7 +874,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 					&prop_test_ble_remote_scanmode_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set BONDED_DEVICES - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set BONDED_DEVICES - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
+@@ -887,7 +887,7 @@ static struct test_case test_cases[] = {
+ 		ACTION_FAIL(bt_set_device_prop_action,
+ 						&prop_test_ble_bonded_dev_req),
+ 	),
+-	TEST_CASE_BREDRLE("Bluetooth Device Set DISCOVERY_TIMEOUT - Fail",
++	TEST_CASE_BREDRLE("Bt. Device Set DISCOVERY_TIMEOUT - Fail",
+ 		ACTION_SUCCESS(bluetooth_enable_action, NULL),
+ 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
+ 		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
 diff --git a/android/tester-main.h b/android/tester-main.h
-index a5ed5b1..883ec4d 100644
+index e8eedf4..a5ed5b1 100644
 --- a/android/tester-main.h
 +++ b/android/tester-main.h
-@@ -87,17 +87,17 @@
- 		.callback_result.num_properties = prop_cnt, \
+@@ -52,14 +52,14 @@
+ 
+ #define TEST_CASE_BREDR(text, ...) { \
+ 		HCIEMU_TYPE_BREDR, \
+-		text, \
++		"[BR/EDR] "text, \
+ 		sizeof((struct step[]) {__VA_ARGS__}) / sizeof(struct step), \
+ 		(struct step[]) {__VA_ARGS__}, \
  	}
  
--#define CALLBACK_DEVICE_PROPS(props, prop_cnt) { \
--		.callback = CB_BT_REMOTE_DEVICE_PROPERTIES, \
-+#define CALLBACK_PROPS(cb, props, prop_cnt) { \
-+		.callback = cb, \
- 		.callback_result.properties = props, \
- 		.callback_result.num_properties = prop_cnt, \
+ #define TEST_CASE_BREDRLE(text, ...) { \
+ 		HCIEMU_TYPE_BREDRLE, \
+-		text, \
++		"[DUAL] "text, \
+ 		sizeof((struct step[]) {__VA_ARGS__}) / sizeof(struct step), \
+ 		(struct step[]) {__VA_ARGS__}, \
  	}
- 
--#define CALLBACK_DEVICE_FOUND(props, prop_cnt) { \
--		.callback = CB_BT_DEVICE_FOUND, \
--		.callback_result.properties = props, \
--		.callback_result.num_properties = prop_cnt, \
--	}
-+#define CALLBACK_DEVICE_PROPS(props, prop_cnt) \
-+	CALLBACK_PROPS(CB_BT_REMOTE_DEVICE_PROPERTIES, props, prop_cnt)
-+
-+#define CALLBACK_DEVICE_FOUND(props, prop_cnt) \
-+	CALLBACK_PROPS(CB_BT_DEVICE_FOUND, props, prop_cnt)
- 
- /*
-  * NOTICE:
 -- 
 1.9.1
 
