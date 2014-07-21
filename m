@@ -1,94 +1,94 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Prefer sizeof(*ptr) when allocating memory
-Date: Mon, 21 Jul 2014 10:50:06 +0300
-Message-Id: <1405929006-21537-1-git-send-email-johan.hedberg@gmail.com>
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2 08/11] android/tester-ng: Add wrong PIN reply test case
+Date: Mon, 21 Jul 2014 09:40:26 +0200
+Message-Id: <1405928429-11491-9-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1405928429-11491-1-git-send-email-jakub.tyszkowski@tieto.com>
+References: <1405928429-11491-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
-
-It's safer practice to use sizeof(*ptr) instead of sizeof(ptr_type) when
-allocating memory in case the type changes. This also fixes the
-following style of warnings from static analyzers:
-
-CHECK: Prefer kzalloc(sizeof(*ie)...) over kzalloc(sizeof(struct inquiry_entry)...)
-+	ie = kzalloc(sizeof(struct inquiry_entry), GFP_KERNEL);
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/hci_conn.c   | 4 ++--
- net/bluetooth/hci_core.c   | 6 +++---
- net/bluetooth/l2cap_core.c | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ android/tester-bluetooth.c | 32 ++++++++++++++++++++++++++++++++
+ android/tester-main.h      |  8 ++++++++
+ 2 files changed, 40 insertions(+)
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 1ac9f7f52acd..b50dabb3f86a 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -428,7 +428,7 @@ struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
+diff --git a/android/tester-bluetooth.c b/android/tester-bluetooth.c
+index 3a70f2b..dbcd782 100644
+--- a/android/tester-bluetooth.c
++++ b/android/tester-bluetooth.c
+@@ -199,11 +199,19 @@ static struct bt_action_data prop_emu_remote_ble_fname_req = {
+ static bt_pin_code_t emu_pin_value = {
+ 	.pin = { 0x30, 0x30, 0x30, 0x30 },
+ };
++static bt_pin_code_t emu_pin_invalid_value = {
++	.pin = { 0x30, 0x10, 0x30, 0x30 },
++};
+ static struct bt_action_data emu_pin_set_req = {
+ 	.addr = &emu_remote_bdaddr_val,
+ 	.pin = &emu_pin_value,
+ 	.pin_len = 4,
+ };
++static struct bt_action_data emu_pin_set_invalid_req = {
++	.addr = &emu_remote_bdaddr_val,
++	.pin = &emu_pin_invalid_value,
++	.pin_len = 4,
++};
  
- 	BT_DBG("%s dst %pMR", hdev->name, dst);
+ static bt_property_t prop_emu_default_set[] = {
+ 	{ BT_PROPERTY_BDADDR, sizeof(emu_bdaddr_val), NULL },
+@@ -960,6 +968,30 @@ static struct test_case test_cases[] = {
+ 		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDED,
+ 						&prop_emu_remote_bdadr, 1),
+ 	),
++	TEST_CASE_BREDR("Bt. Create Bond PIN - Bad PIN",
++		ACTION_SUCCESS(bluetooth_enable_action, NULL),
++		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
++		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
++		ACTION_SUCCESS(emu_set_pin_code_action, &emu_pin_set_req),
++		ACTION_SUCCESS(bt_start_discovery_action, NULL),
++		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
++							BT_DISCOVERY_STARTED),
++		CALLBACK_DEVICE_FOUND(prop_emu_remotes_default_set, 3),
++		ACTION_SUCCESS(bt_cancel_discovery_action, NULL),
++		CALLBACK_STATE(CB_BT_DISCOVERY_STATE_CHANGED,
++							BT_DISCOVERY_STOPPED),
++		ACTION_SUCCESS(bt_create_bond_action,
++					&prop_test_remote_ble_bdaddr_req),
++		CALLBACK_BOND_STATE(BT_BOND_STATE_BONDING,
++						&prop_emu_remote_bdadr, 1),
++		CALLBACK_PROPS(CB_BT_PIN_REQUEST, prop_emu_remotes_pin_req_set,
++									2),
++		ACTION_SUCCESS(bt_pin_reply_accept_action,
++						&emu_pin_set_invalid_req),
++		CALLBACK_BOND_STATE_FAILED(BT_BOND_STATE_NONE,
++						&prop_emu_remote_bdadr, 1,
++						BT_STATUS_AUTH_FAILURE),
++	),
+ };
  
--	conn = kzalloc(sizeof(struct hci_conn), GFP_KERNEL);
-+	conn = kzalloc(sizeof(*conn), GFP_KERNEL);
- 	if (!conn)
- 		return NULL;
- 
-@@ -1282,7 +1282,7 @@ struct hci_chan *hci_chan_create(struct hci_conn *conn)
- 
- 	BT_DBG("%s hcon %p", hdev->name, conn);
- 
--	chan = kzalloc(sizeof(struct hci_chan), GFP_KERNEL);
-+	chan = kzalloc(sizeof(*chan), GFP_KERNEL);
- 	if (!chan)
- 		return NULL;
- 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f82a6cf1aaa8..cfcb6055ced8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2088,7 +2088,7 @@ u32 hci_inquiry_cache_update(struct hci_dev *hdev, struct inquiry_data *data,
+ struct queue *get_bluetooth_tests(void)
+diff --git a/android/tester-main.h b/android/tester-main.h
+index a8cf4a2..d49344e 100644
+--- a/android/tester-main.h
++++ b/android/tester-main.h
+@@ -106,6 +106,14 @@
+ 		.callback_result.num_properties = prop_cnt, \
  	}
  
- 	/* Entry not in the cache. Add new one. */
--	ie = kzalloc(sizeof(struct inquiry_entry), GFP_KERNEL);
-+	ie = kzalloc(sizeof(*ie), GFP_KERNEL);
- 	if (!ie) {
- 		flags |= MGMT_DEV_FOUND_CONFIRM_NAME;
- 		goto done;
-@@ -3492,7 +3492,7 @@ int hci_bdaddr_list_add(struct list_head *list, bdaddr_t *bdaddr, u8 type)
- 	if (hci_bdaddr_list_lookup(list, bdaddr, type))
- 		return -EEXIST;
- 
--	entry = kzalloc(sizeof(struct bdaddr_list), GFP_KERNEL);
-+	entry = kzalloc(sizeof(*entry), GFP_KERNEL);
- 	if (!entry)
- 		return -ENOMEM;
- 
-@@ -3897,7 +3897,7 @@ struct hci_dev *hci_alloc_dev(void)
- {
- 	struct hci_dev *hdev;
- 
--	hdev = kzalloc(sizeof(struct hci_dev), GFP_KERNEL);
-+	hdev = kzalloc(sizeof(*hdev), GFP_KERNEL);
- 	if (!hdev)
- 		return NULL;
- 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index f3fb61c9f96f..46547b920f88 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -6985,7 +6985,7 @@ static struct l2cap_conn *l2cap_conn_add(struct hci_conn *hcon)
- 	if (!hchan)
- 		return NULL;
- 
--	conn = kzalloc(sizeof(struct l2cap_conn), GFP_KERNEL);
-+	conn = kzalloc(sizeof(*conn), GFP_KERNEL);
- 	if (!conn) {
- 		hci_chan_del(hchan);
- 		return NULL;
++#define CALLBACK_BOND_STATE_FAILED(cb_res, props, prop_cnt, reason) { \
++		.callback = CB_BT_BOND_STATE_CHANGED, \
++		.callback_result.state = cb_res, \
++		.callback_result.status = reason, \
++		.callback_result.properties = props, \
++		.callback_result.num_properties = prop_cnt, \
++	}
++
+ /*
+  * NOTICE:
+  * Callback enum sections should be
 -- 
-1.9.3
+1.9.1
 
