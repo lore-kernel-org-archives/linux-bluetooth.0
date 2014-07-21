@@ -1,159 +1,144 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <1405718037-15401-5-git-send-email-armansito@chromium.org>
-References: <1405718037-15401-1-git-send-email-armansito@chromium.org>
-	<1405718037-15401-5-git-send-email-armansito@chromium.org>
-Date: Mon, 21 Jul 2014 11:39:21 +0200
-Message-ID: <CAMv5GbeUSG45-S2_zKXXDmYJPZ9hhmsNgGEFJNy_c0KLjL83Ew@mail.gmail.com>
-Subject: Re: [PATCH 04/11] shared/gatt: Implement "Discover Primary Service by
- UUID" procedure.
-From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
-To: Arman Uguray <armansito@chromium.org>
-Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Bharat Panda <bharat.panda@samsung.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: cpgs@samsung.com, Bharat Panda <bharat.panda@samsung.com>
+Subject: [PATCH ] tools: Add unregister gatt service
+Date: Mon, 21 Jul 2014 14:50:33 +0530
+Message-id: <1405934433-29723-1-git-send-email-bharat.panda@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Unregister gatt service on proxy disconnect and removes service
+data on Unregister complete.
+---
+ tools/gatt-service.c | 77 ++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 75 insertions(+), 2 deletions(-)
 
-On 18 July 2014 23:13, Arman Uguray <armansito@chromium.org> wrote:
-> This patch implements bt_gatt_discover_primary_services for the case when a UUID
-> is provided.
-> ---
->  src/shared/gatt-helpers.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 93 insertions(+), 2 deletions(-)
->
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 4fbf2eb..fb5a7b6 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -164,6 +164,8 @@ static void put_uuid_le(const bt_uuid_t *src, void *dst)
->  {
->         if (src->type == BT_UUID16)
->                 put_le16(src->value.u16, dst);
-> +       else if (src->type == BT_UUID32)
-> +               put_le32(src->value.u32, dst);
+diff --git a/tools/gatt-service.c b/tools/gatt-service.c
+index 6bca404..2102230 100644
+--- a/tools/gatt-service.c
++++ b/tools/gatt-service.c
+@@ -53,6 +53,8 @@ static GMainLoop *main_loop;
+ static GSList *services;
+ static DBusConnection *connection;
+ 
++static int id;
++
+ struct characteristic {
+ 	char *uuid;
+ 	char *path;
+@@ -332,10 +334,10 @@ static gboolean register_characteristic(const char *chr_uuid,
+ 
+ static char *register_service(const char *uuid)
+ {
+-	static int id = 1;
+ 	char *path;
+ 
+-	path = g_strdup_printf("/service%d", id++);
++	id++;
++	path = g_strdup_printf("/service%d", id);
+ 	if (!g_dbus_register_interface(connection, path, GATT_SERVICE_IFACE,
+ 				NULL, NULL, service_properties,
+ 				g_strdup(uuid), g_free)) {
+@@ -373,6 +375,40 @@ static void create_services()
+ 	printf("Registered service: %s\n", service_path);
+ }
+ 
++static void remove_services()
++{
++	char *service_path = g_strdup_printf("/service%d", id);;
++
++	services = g_slist_remove(services, service_path);
++	g_dbus_unregister_interface(connection, service_path,
++						GATT_SERVICE_IFACE);
++
++	printf("Unregistered: %s\n", service_path);
++	g_free(service_path);
++}
++
++static void unregister_external_service_reply(DBusPendingCall *call,
++							void *user_data)
++{
++	DBusMessage *reply = dbus_pending_call_steal_reply(call);
++	DBusError derr;
++
++	dbus_error_init(&derr);
++	dbus_set_error_from_message(&derr, reply);
++
++	if (dbus_error_is_set(&derr)) {
++		printf("UnRegisterService: %s\n", derr.message);
++		goto done;
++	}
++
++	printf("UnRegisterService: OK\n");
++	remove_services();
++
++done:
++	dbus_message_unref(reply);
++	dbus_error_free(&derr);
++}
++
+ static void register_external_service_reply(DBusPendingCall *call,
+ 							void *user_data)
+ {
+@@ -391,6 +427,37 @@ static void register_external_service_reply(DBusPendingCall *call,
+ 	dbus_error_free(&derr);
+ }
+ 
++static void unregister_external_service(gpointer a, gpointer b)
++{
++	DBusConnection *conn = b;
++	const char *path = a;
++	DBusMessage *msg;
++	DBusPendingCall *call;
++	DBusMessageIter iter;
++
++	msg = dbus_message_new_method_call("org.bluez", "/org/bluez",
++					GATT_MGR_IFACE, "UnregisterService");
++	if (!msg) {
++		printf("Couldn't allocate D-Bus message\n");
++		return;
++	}
++
++	dbus_message_iter_init_append(msg, &iter);
++
++	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
++
++	if (!g_dbus_send_message_with_reply(conn, msg, &call, -1)) {
++		dbus_message_unref(msg);
++		return;
++	}
++
++	dbus_message_unref(msg);
++
++	dbus_pending_call_set_notify(call, unregister_external_service_reply,
++								NULL, NULL);
++	dbus_pending_call_unref(call);
++}
++
+ static void register_external_service(gpointer a, gpointer b)
+ {
+ 	DBusConnection *conn = b;
+@@ -432,6 +499,11 @@ static void connect_handler(DBusConnection *conn, void *user_data)
+ 	g_slist_foreach(services, register_external_service, conn);
+ }
+ 
++static void disconnect_handler(DBusConnection *conn, void *user_data)
++{
++	g_slist_foreach(services, unregister_external_service, conn);
++}
++
+ static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+ 							gpointer user_data)
+ {
+@@ -524,6 +596,7 @@ int main(int argc, char *argv[])
+ 	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
+ 
+ 	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
++	g_dbus_client_set_disconnect_watch(client, disconnect_handler, NULL);
+ 
+ 	g_main_loop_run(main_loop);
+ 
+-- 
+1.9.1
 
-Specification Core 4.1 says that 32bit UUIDS in GATT should be
-converted to 128bit. Please check it [Vol. 3] Part G, Section 2.5.4
-
->         else
->                 bswap_128(&src->value.u128, dst);
->  }
-> @@ -273,6 +275,82 @@ done:
->                 op->callback(status, results, op->user_data);
->  }
->
-> +static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
-> +                                       uint16_t length, void *user_data)
-> +{
-> +       struct discovery_op *op = user_data;
-> +       uint16_t status = 0;
-> +       struct queue *results = NULL;
-> +       uint16_t last_end;
-> +       int i;
-> +
-> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
-> +               status = process_error(pdu, length);
-> +
-> +               if (status == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
-> +                                               !queue_isempty(op->results))
-> +                       goto success;
-> +
-> +               goto done;
-> +       }
-> +
-> +       /* PDU must contain 4 bytes and it must be a multiple of 4, where each
-> +        * 4 bytes contain the 16-bit attribute and group end handles.
-> +        */
-> +       if (opcode != BT_ATT_OP_FIND_BY_TYPE_VAL_RSP || !pdu || !length ||
-> +                                                               length % 4) {
-> +               status = BT_GATT_ERROR_INVALID_RSP;
-> +               goto done;
-> +       }
-> +
-> +       for (i = 0; i < length; i += 4) {
-> +               struct bt_gatt_service *service;
-> +               bt_uuid_t uuid;
-> +
-> +               service = new0(struct bt_gatt_service, 1);
-> +               if (!service)
-> +                       goto done;
-> +
-> +               service->start = get_le16(pdu + i);
-> +               last_end = get_le16(pdu + i + 2);
-> +               service->end = last_end;
-> +
-> +               bt_uuid_to_uuid128(&op->uuid, &uuid);
-> +               memcpy(service->uuid, uuid.value.u128.data, 16);
-> +
-> +               queue_push_tail(op->results, service);
-> +       }
-> +
-> +       if (last_end != 0xFFFF) {
-> +               uint8_t pdu[6 + bt_uuid_len(&op->uuid)];
-> +
-> +               put_le16(last_end + 1, pdu);
-> +               put_le16(0xFFFF, pdu + 2);
-> +               put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
-> +               put_uuid_le(&op->uuid, pdu + 6);
-> +
-> +               if (bt_att_send(op->att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
-> +                                                       pdu, sizeof(pdu),
-> +                                                       find_by_type_val_cb,
-> +                                                       discovery_op_ref(op),
-> +                                                       discovery_op_unref))
-> +                       return;
-> +
-> +               discovery_op_unref(op);
-> +               status = BT_GATT_ERROR_UNKNOWN;
-> +               goto done;
-> +       }
-> +
-> +success:
-> +       /* End of procedure */
-> +       results = op->results;
-> +       status = 0;
-> +
-> +done:
-> +       if (op->callback)
-> +               op->callback(status, results, op->user_data);
-> +}
-> +
->  bool bt_gatt_discover_primary_services(struct bt_att *att,
->                                         bt_uuid_t *uuid,
->                                         bt_gatt_discovery_callback_t callback,
-> @@ -314,8 +392,21 @@ bool bt_gatt_discover_primary_services(struct bt_att *att,
->                                                         discovery_op_ref(op),
->                                                         discovery_op_unref);
->         } else {
-> -               free(op);
-> -               return false;
-> +               uint8_t pdu[6 + bt_uuid_len(uuid)];
-> +
-> +               /* Discover by UUID */
-> +               op->uuid = *uuid;
-> +
-> +               put_le16(0x0001, pdu);
-> +               put_le16(0xFFFF, pdu + 2);
-> +               put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
-> +               put_uuid_le(&op->uuid, pdu + 6);
-> +
-> +               result = bt_att_send(att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
-> +                                                       pdu, sizeof(pdu),
-> +                                                       find_by_type_val_cb,
-> +                                                       discovery_op_ref(op),
-> +                                                       discovery_op_unref);
->         }
->
->         if (!result) {
-> --
-> 2.0.0.526.g5318336
->
-> --
-> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
-> the body of a message to majordomo@vger.kernel.org
-> More majordomo info at  http://vger.kernel.org/majordomo-info.html
-
-Best regards,
-Grzegorz
