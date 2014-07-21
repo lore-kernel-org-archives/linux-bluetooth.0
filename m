@@ -1,110 +1,159 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Jul 2014 12:43:55 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Bharat Panda <bharat.panda@samsung.com>
-Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
-Subject: Re: [PATCH ] tools: Add unregister gatt service
-Message-ID: <20140721094355.GA29317@t440s.lan>
-References: <1405934433-29723-1-git-send-email-bharat.panda@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405934433-29723-1-git-send-email-bharat.panda@samsung.com>
+In-Reply-To: <1405718037-15401-5-git-send-email-armansito@chromium.org>
+References: <1405718037-15401-1-git-send-email-armansito@chromium.org>
+	<1405718037-15401-5-git-send-email-armansito@chromium.org>
+Date: Mon, 21 Jul 2014 11:39:21 +0200
+Message-ID: <CAMv5GbeUSG45-S2_zKXXDmYJPZ9hhmsNgGEFJNy_c0KLjL83Ew@mail.gmail.com>
+Subject: Re: [PATCH 04/11] shared/gatt: Implement "Discover Primary Service by
+ UUID" procedure.
+From: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Arman Uguray <armansito@chromium.org>
+Cc: linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Bharat,
+Hi Arman,
 
-On Mon, Jul 21, 2014, Bharat Panda wrote:
-> +static int id;
-> +
->  struct characteristic {
->  	char *uuid;
->  	char *path;
-> @@ -332,10 +334,10 @@ static gboolean register_characteristic(const char *chr_uuid,
->  
->  static char *register_service(const char *uuid)
+On 18 July 2014 23:13, Arman Uguray <armansito@chromium.org> wrote:
+> This patch implements bt_gatt_discover_primary_services for the case when a UUID
+> is provided.
+> ---
+>  src/shared/gatt-helpers.c | 95 ++++++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 93 insertions(+), 2 deletions(-)
+>
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index 4fbf2eb..fb5a7b6 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -164,6 +164,8 @@ static void put_uuid_le(const bt_uuid_t *src, void *dst)
 >  {
-> -	static int id = 1;
+>         if (src->type == BT_UUID16)
+>                 put_le16(src->value.u16, dst);
+> +       else if (src->type == BT_UUID32)
+> +               put_le32(src->value.u32, dst);
 
-Making id public looks unnecessary to me since after the registration
-you've got the path which you can pass to the unregistration procedure.
+Specification Core 4.1 says that 32bit UUIDS in GATT should be
+converted to 128bit. Please check it [Vol. 3] Part G, Section 2.5.4
 
-> +static void remove_services()
-> +{
-> +	char *service_path = g_strdup_printf("/service%d", id);;
-> +
-> +	services = g_slist_remove(services, service_path);
-
-This makes even less sense to me. You allocate a new pointer
-(service_path) and expect it to magically exist in the services list?
-That's not how g_slist_remove works. It knows nothing about strings.
-Instead you'd want to get hold of the original path string and remove
-the right entry based on that.
-
-> +	if (dbus_error_is_set(&derr)) {
-> +		printf("UnRegisterService: %s\n", derr.message);
-
-It's UnregisterService. Not UnRegisterService.
-
-> +	printf("UnRegisterService: OK\n");
-
-Same here.
-
-> +static void unregister_external_service(gpointer a, gpointer b)
-> +{
-> +	DBusConnection *conn = b;
-> +	const char *path = a;
-> +	DBusMessage *msg;
-> +	DBusPendingCall *call;
-> +	DBusMessageIter iter;
-> +
-> +	msg = dbus_message_new_method_call("org.bluez", "/org/bluez",
-> +					GATT_MGR_IFACE, "UnregisterService");
-> +	if (!msg) {
-> +		printf("Couldn't allocate D-Bus message\n");
-> +		return;
-> +	}
-> +
-> +	dbus_message_iter_init_append(msg, &iter);
-> +
-> +	dbus_message_iter_append_basic(&iter, DBUS_TYPE_OBJECT_PATH, &path);
-> +
-> +	if (!g_dbus_send_message_with_reply(conn, msg, &call, -1)) {
-> +		dbus_message_unref(msg);
-> +		return;
-> +	}
-> +
-> +	dbus_message_unref(msg);
-> +
-> +	dbus_pending_call_set_notify(call, unregister_external_service_reply,
-> +								NULL, NULL);
-> +	dbus_pending_call_unref(call);
-> +}
-> +
->  static void register_external_service(gpointer a, gpointer b)
->  {
->  	DBusConnection *conn = b;
-> @@ -432,6 +499,11 @@ static void connect_handler(DBusConnection *conn, void *user_data)
->  	g_slist_foreach(services, register_external_service, conn);
+>         else
+>                 bswap_128(&src->value.u128, dst);
 >  }
->  
-> +static void disconnect_handler(DBusConnection *conn, void *user_data)
+> @@ -273,6 +275,82 @@ done:
+>                 op->callback(status, results, op->user_data);
+>  }
+>
+> +static void find_by_type_val_cb(uint8_t opcode, const void *pdu,
+> +                                       uint16_t length, void *user_data)
 > +{
-> +	g_slist_foreach(services, unregister_external_service, conn);
+> +       struct discovery_op *op = user_data;
+> +       uint16_t status = 0;
+> +       struct queue *results = NULL;
+> +       uint16_t last_end;
+> +       int i;
+> +
+> +       if (opcode == BT_ATT_OP_ERROR_RSP) {
+> +               status = process_error(pdu, length);
+> +
+> +               if (status == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+> +                                               !queue_isempty(op->results))
+> +                       goto success;
+> +
+> +               goto done;
+> +       }
+> +
+> +       /* PDU must contain 4 bytes and it must be a multiple of 4, where each
+> +        * 4 bytes contain the 16-bit attribute and group end handles.
+> +        */
+> +       if (opcode != BT_ATT_OP_FIND_BY_TYPE_VAL_RSP || !pdu || !length ||
+> +                                                               length % 4) {
+> +               status = BT_GATT_ERROR_INVALID_RSP;
+> +               goto done;
+> +       }
+> +
+> +       for (i = 0; i < length; i += 4) {
+> +               struct bt_gatt_service *service;
+> +               bt_uuid_t uuid;
+> +
+> +               service = new0(struct bt_gatt_service, 1);
+> +               if (!service)
+> +                       goto done;
+> +
+> +               service->start = get_le16(pdu + i);
+> +               last_end = get_le16(pdu + i + 2);
+> +               service->end = last_end;
+> +
+> +               bt_uuid_to_uuid128(&op->uuid, &uuid);
+> +               memcpy(service->uuid, uuid.value.u128.data, 16);
+> +
+> +               queue_push_tail(op->results, service);
+> +       }
+> +
+> +       if (last_end != 0xFFFF) {
+> +               uint8_t pdu[6 + bt_uuid_len(&op->uuid)];
+> +
+> +               put_le16(last_end + 1, pdu);
+> +               put_le16(0xFFFF, pdu + 2);
+> +               put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +               put_uuid_le(&op->uuid, pdu + 6);
+> +
+> +               if (bt_att_send(op->att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+> +                                                       pdu, sizeof(pdu),
+> +                                                       find_by_type_val_cb,
+> +                                                       discovery_op_ref(op),
+> +                                                       discovery_op_unref))
+> +                       return;
+> +
+> +               discovery_op_unref(op);
+> +               status = BT_GATT_ERROR_UNKNOWN;
+> +               goto done;
+> +       }
+> +
+> +success:
+> +       /* End of procedure */
+> +       results = op->results;
+> +       status = 0;
+> +
+> +done:
+> +       if (op->callback)
+> +               op->callback(status, results, op->user_data);
 > +}
 > +
->  static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
->  							gpointer user_data)
->  {
-> @@ -524,6 +596,7 @@ int main(int argc, char *argv[])
->  	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
->  
->  	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
-> +	g_dbus_client_set_disconnect_watch(client, disconnect_handler, NULL);
+>  bool bt_gatt_discover_primary_services(struct bt_att *att,
+>                                         bt_uuid_t *uuid,
+>                                         bt_gatt_discovery_callback_t callback,
+> @@ -314,8 +392,21 @@ bool bt_gatt_discover_primary_services(struct bt_att *att,
+>                                                         discovery_op_ref(op),
+>                                                         discovery_op_unref);
+>         } else {
+> -               free(op);
+> -               return false;
+> +               uint8_t pdu[6 + bt_uuid_len(uuid)];
+> +
+> +               /* Discover by UUID */
+> +               op->uuid = *uuid;
+> +
+> +               put_le16(0x0001, pdu);
+> +               put_le16(0xFFFF, pdu + 2);
+> +               put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +               put_uuid_le(&op->uuid, pdu + 6);
+> +
+> +               result = bt_att_send(att, BT_ATT_OP_FIND_BY_TYPE_VAL_REQ,
+> +                                                       pdu, sizeof(pdu),
+> +                                                       find_by_type_val_cb,
+> +                                                       discovery_op_ref(op),
+> +                                                       discovery_op_unref);
+>         }
+>
+>         if (!result) {
+> --
+> 2.0.0.526.g5318336
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
 
-When exactly would disconnect_handler be called in practice? At least
-one case seems to be if bluetoothd exits in which case it seems quite
-wasteful to try to make any method calls to a non-existing service.
-What other scenarios would disconnect_handler be called in?
-
-Johan
+Best regards,
+Grzegorz
