@@ -1,46 +1,26 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Jul 2014 11:44:50 +0300
+Date: Mon, 21 Jul 2014 11:42:47 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCHv2 00/11] Rest of the android bluetooth core tests
-Message-ID: <20140721084450.GB24049@t440s.lan>
-References: <1405928429-11491-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: Re: [PATCH 1/2] android/hal-sco: Remove unneeded check
+Message-ID: <20140721084247.GA24049@t440s.lan>
+References: <1405694130-6277-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405928429-11491-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1405694130-6277-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Andrei,
 
-On Mon, Jul 21, 2014, Jakub Tyszkowski wrote:
-> Those are the last few test cases left for core bluetooth profile.
-> 
-> v2 is just a rebased v1.
-> 
-> Jakub Tyszkowski (11):
->   android/tester-ng: Allow test framework user to choose emu type
->   android/tester-ng: Improve result print
->   android/tester-ng: Improve callback defining makro
->   android/tester-ng: Improve variable's names
->   android/tester-ng: Add missing check for callback status
->   android/tester-ng: Add pin request and bond state callbacks
->   android/tester-ng: Add BREDR pairing with pin test case
->   android/tester-ng: Add wrong PIN reply test case
->   android/tester-ng: Add ssp confirmation cases
->   android/tester-ng: Add more bonding cases
->   android/tester: Remove old bluetooth core test cases
-> 
->  android/android-tester.c   | 282 ------------------------
->  android/tester-bluetooth.c | 521 +++++++++++++++++++++++++++++++++------------
->  android/tester-gatt.c      |   2 +-
->  android/tester-hidhost.c   |   2 +-
->  android/tester-main.c      | 263 +++++++++++++++++++++--
->  android/tester-main.h      |  58 ++++-
->  android/tester-socket.c    |   2 +-
->  7 files changed, 677 insertions(+), 453 deletions(-)
+On Fri, Jul 18, 2014, Andrei Emeltchenko wrote:
+> rsp_len cannot be NULL since it checked for NULL in the beginning of the
+> function.
+> ---
+>  android/hal-sco.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
-All patches in this set have been applied. Thanks.
+Both patches have been applied. Thanks.
 
 Johan
