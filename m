@@ -1,27 +1,24 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Mon, 21 Jul 2014 11:56:08 +0300
+Date: Mon, 21 Jul 2014 11:45:30 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Grzegorz Kolodziejczyk <grzegorz.kolodziejczyk@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Android/pts: Update PTS files for HID
-Message-ID: <20140721085608.GA27596@t440s.lan>
-References: <1405684796-1902-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+Subject: Re: [PATCH] android/pts: Interim PTS tests results for RFCOMM
+Message-ID: <20140721084530.GC24049@t440s.lan>
+References: <1405929255-8632-1-git-send-email-sebastian.chlad@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405684796-1902-1-git-send-email-grzegorz.kolodziejczyk@tieto.com>
+In-Reply-To: <1405929255-8632-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Grzegorz,
+Hi Sebastian,
 
-On Fri, Jul 18, 2014, Grzegorz Kolodziejczyk wrote:
-> PICS and PIXITs updated to PTS 5.2. Regression done for Android
-> 4.4.4.
+On Mon, Jul 21, 2014, Sebastian Chlad wrote:
 > ---
->  android/pics-hid.txt  | 83 +++++++++++++++++++++++++++------------------------
->  android/pixit-hid.txt |  2 +-
->  android/pts-hid.txt   |  4 +--
->  3 files changed, 47 insertions(+), 42 deletions(-)
+>  android/pixit-rfcomm.txt |  2 +-
+>  android/pts-rfcomm.txt   | 31 +++++++++++++++++++------------
+>  2 files changed, 20 insertions(+), 13 deletions(-)
 
 Applied. Thanks.
 
