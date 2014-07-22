@@ -1,27 +1,40 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Jul 2014 11:37:29 +0300
+Date: Tue, 22 Jul 2014 11:34:46 +0300
 From: Johan Hedberg <johan.hedberg@intel.com>
 To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
 Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 3/3] android/tester-ng: Minor title fix for core cases
-Message-ID: <20140722083729.GB26403@t440s.lan>
+Subject: Re: [PATCH 1/3] doc: Update Android tests coverage
+Message-ID: <20140722083446.GA26403@t440s.lan>
 References: <1405949020-27462-1-git-send-email-jakub.tyszkowski@tieto.com>
- <1405949020-27462-3-git-send-email-jakub.tyszkowski@tieto.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405949020-27462-3-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <1405949020-27462-1-git-send-email-jakub.tyszkowski@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Jakub,
 
 On Mon, Jul 21, 2014, Jakub Tyszkowski wrote:
-> Now with more space for test case's title in the summary, we can use full
-> "Bluetooth" for all core bluetooth interface test cases.
+> One test case was not ported to new tester framework as it was
+> considered invalid.
 > ---
->  android/tester-bluetooth.c | 124 ++++++++++++++++++++++-----------------------
->  1 file changed, 62 insertions(+), 62 deletions(-)
+>  doc/test-coverage.txt | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+> index 0da8321..e19e6c7 100644
+> --- a/doc/test-coverage.txt
+> +++ b/doc/test-coverage.txt
+> @@ -53,7 +53,7 @@ Android end-to-end testing
+>  
+>  Application		Count	Description
+>  -------------------------------------------
+> -android-tester		  86	Android HAL interface testing
+> +android-tester		  85	Android HAL interface testing
+>  ipc-tester		  94	Android IPC resistance testing
+>  			-----
+>  			 180
 
-Patches 2 and 3 have been applied. Thanks.
+It seems like you've forgotten to update the total count?
 
 Johan
