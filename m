@@ -1,101 +1,133 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <2774A89A-B2EE-4346-BAD1-DBA0E3014661@holtmann.org>
-References: <1405718037-15401-1-git-send-email-armansito@chromium.org>
-	<1405718037-15401-2-git-send-email-armansito@chromium.org>
-	<2774A89A-B2EE-4346-BAD1-DBA0E3014661@holtmann.org>
-Date: Tue, 22 Jul 2014 18:22:25 -0700
-Message-ID: <CAHrH25TprAhCBBOUJZrwDPpttuxXE=+QMBnKL9WpsR_h3g70QQ@mail.gmail.com>
-Subject: Re: [PATCH 01/11] shared/gatt: Introduce gatt-helpers.h skeleton.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 02/11] shared/gatt: Implement bt_gatt_exchange_mtu.
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1405718037-15401-3-git-send-email-armansito@chromium.org>
+Date: Wed, 23 Jul 2014 01:25:41 +0200
+Cc: linux-bluetooth@vger.kernel.org
+Message-Id: <8A469641-D16A-4AF9-8557-AD5EE3B17571@holtmann.org>
+References: <1405718037-15401-1-git-send-email-armansito@chromium.org> <1405718037-15401-3-git-send-email-armansito@chromium.org>
+To: Arman Uguray <armansito@chromium.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Arman,
 
->> + * The callbacks below encode the operation status in a 16-bit unsigned integer,
->> + * where 0-255 are allocated for ATT protocol errors.
->> + *
->> + *  - 0x0000: Success
->> + *  - 0x0001: Invalid handle (ATT protocol error)
->> + *  - 0x0100: Unknown failure (bluetoothd defined)
->
-> do we really need this? I am feeling a bit uneasy about these kind of error splits where we are overloading wire protocol errors with internal errors.
->
+> This patch implements the helper function bt_gatt_exchange_mtu, which performs
+> an ATT "Exchange MTU" request and resizes the internal buffer based on the
+> result.
+> ---
+> src/shared/gatt-helpers.c | 87 +++++++++++++++++++++++++++++++++++++++++++++--
+> 1 file changed, 85 insertions(+), 2 deletions(-)
+> 
+> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
+> index 3d85868..9cf05cf 100644
+> --- a/src/shared/gatt-helpers.c
+> +++ b/src/shared/gatt-helpers.c
+> @@ -30,14 +30,97 @@
+> #include "src/shared/att.h"
+> #include "lib/uuid.h"
+> #include "src/shared/gatt-helpers.h"
+> +#include "src/shared/util.h"
+> +
+> +#ifndef MIN
+> +#define MIN(a, b) ((a) < (b) ? (a) : (b))
+> +#endif
+> +
+> +struct mtu_op {
+> +	struct bt_att *att;
+> +	uint16_t client_rx_mtu;
+> +	bt_gatt_result_callback_t callback;
+> +	void *user_data;
+> +	bt_gatt_destroy_func_t destroy;
+> +};
+> +
+> +static void destroy_mtu_op(void *user_data)
+> +{
+> +	struct mtu_op *op = user_data;
+> +
+> +	if (op->destroy)
+> +		op->destroy(op->user_data);
+> +
+> +	free(op);
+> +}
+> +
+> +static uint16_t process_error(const void *pdu, uint16_t length)
+> +{
+> +	if (!pdu || length != 4)
+> +		return BT_GATT_ERROR_INVALID_RSP;
+> +
+> +	return (uint16_t)((uint8_t *) pdu)[3];
+> +}
 
-I think they are useful. I think it ends up being cleaner than
-returning two separate arguments in callbacks, one for ATT protocol
-errors and one for application-specific errors and we clearly document
-above that the LSB is for ATT protocol errors only.
+I am not convinced by the uint16 status, but in case you do these things, create a uint16_t local variable and assign the uint8_t value to it and then return.  It is a clearer, then the double casting.
 
+> +
+> +static void mtu_cb(uint8_t opcode, const void *pdu, uint16_t length,
+> +								void *user_data)
+> +{
+> +	struct mtu_op *op = user_data;
+> +	uint16_t result = 0;
+> +	uint16_t server_rx_mtu;
+> +
+> +	if (opcode == BT_ATT_OP_ERROR_RSP) {
+> +		result = process_error(pdu, length);
+> +		goto done;
+> +	}
+> +
+> +	if (opcode != BT_ATT_OP_MTU_RSP || !pdu || length != 2) {
+> +		result = BT_GATT_ERROR_INVALID_RSP;
+> +		goto done;
+> +	}
+> +
+> +	server_rx_mtu = get_le16(pdu);
+> +	bt_att_set_mtu(op->att, MIN(op->client_rx_mtu, server_rx_mtu));
+> +
+> +done:
+> +	if (op->callback)
+> +		op->callback(result, op->user_data);
+> +}
+> 
+> bool bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
+> 					bt_gatt_result_callback_t callback,
+> 					void *user_data,
+> 					bt_gatt_destroy_func_t destroy)
+> {
+> -	/* TODO */
+> -	return false;
+> +	struct mtu_op *op;
+> +	uint8_t pdu[2];
+> +
+> +	if (!att)
+> +		return false;
+> +
+> +	if (!client_rx_mtu)
+> +		return false;
+> +
+> +	op = new0(struct mtu_op, 1);
+> +	if (!op)
+> +		return false;
+> +
+> +	op->att = att;
+> +	op->client_rx_mtu = client_rx_mtu;
+> +	op->callback = callback;
+> +	op->user_data = user_data;
+> +	op->destroy = destroy;
+> +
+> +	put_le16(client_rx_mtu, pdu);
+> +
+> +	if (!bt_att_send(att, BT_ATT_OP_MTU_REQ, pdu, sizeof(pdu),
+> +							mtu_cb, op,
+> +							destroy_mtu_op)) {
+> +		free(op);
+> +		return false;
+> +	}
+> +
+> +	return true;
+> }
 
->> +#define BT_GATT_ERROR_UNKNOWN                0x0100
->> +#define BT_GATT_ERROR_INVALID_RSP    0x0101
->
-> Especially with the background of invalid response as listed here, I think the only real result is a disconnect anyway, so we might better introduce a disconnect reason with the disconnect callback. Just an idea.
->
+Regards
 
-Well with some errors you want to disconnect but not with all errors.
-For example, in the case of verified writes, if the response PDU
-didn't match the blob that we sent, we would report that the
-verification failed in an error like this but this wouldn't warrant a
-disconnect.
+Marcel
 
-In general, though, I agree with having a disconnect callback. In this
-case though, I feel that, from a layering perspective, these helpers
-should just return an error in the result callback and have the upper
-layer interpret that as a requirement for disconnect. After all,
-reporting these helper-defined errors in a result callback is not all
-that different from what you're suggesting.
-
-We can then go and add that exact "disconnect required" callback to
-src/shared/gatt.h when we add it later. I'd like to leave these as
-just GATT procedure helper functions without doing any big state
-keeping here.
-
-
->> +
->> +typedef void (*bt_gatt_destroy_func_t)(void *user_data);
->> +
->> +typedef void (*bt_gatt_result_callback_t)(uint16_t status, void *user_data);
->> +typedef void (*bt_gatt_discovery_callback_t)(uint16_t status,
->> +                                     struct queue *results, void *user_data);
->
-> Can we please avoid internal data structures exposed here. I would say this needs to provide its own GATT specific data structure for the result. Most likely an allocated array or pointer array with a dedicated free function.
-
-Interesting, I was under the impression that struct queue was to be
-used like GSList or other list structures used elsewhere and it was ok
-to use it here since this is all going into src/shared. Are you
-suggesting something like:
-
- typedef void (*bt_gatt_services_callback_t)(uint16_t status, struct
-bt_gatt_service *services, size_t len, ...);
- typedef void (*bt_gatt_characteristics_callback_t)(uint16_t status,
-struct bt_gatt_characteristic *chrcs, ...);
-
-...etc?
-
-
->> +bool bt_gatt_read_value(struct bt_att *att, uint16_t value_handle,
->> +                                     bt_gatt_read_callback_t callback,
->> +                                     void *user_data,
->> +                                     bt_gatt_destroy_func_t destroy);
->> +bool bt_gatt_read_long_value(struct bt_att *att,
->> +                                     uint16_t value_handle, uint16_t offset,
->> +                                     bt_gatt_read_callback_t callback,
->> +                                     void *user_data,
->> +                                     bt_gatt_destroy_func_t destroy);
->
-> Does this need an explicit function? Wouldn't it make more sense to handle the long reads (and writes for that matter) internally.
->
-
-I think so. I like to keep these procedures more or less inline with
-what is defined in the core spec. The distinction between these is
-simple enough that the upper layer can correctly determine which one
-to use as needed.
-
-Cheers,
-Arman
