@@ -1,96 +1,43 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Tue, 22 Jul 2014 13:51:08 -0400
+From: "John W. Linville" <linville@tuxdriver.com>
+To: Gustavo Padovan <gustavo@padovan.org>,
+	linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2014-07-21
+Message-ID: <20140722175108.GD1299@tuxdriver.com>
+References: <20140722142506.GC1628@joana>
 MIME-Version: 1.0
-In-Reply-To: <20140722085507.GA29664@t440s.lan>
-References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
-	<20140722085507.GA29664@t440s.lan>
-Date: Tue, 22 Jul 2014 13:40:48 -0700
-Message-ID: <CAHrH25SR83cXq-xGQz4x7axjcW=CUL_VCcAfhny_RyZ+t0oZ-g@mail.gmail.com>
-Subject: Re: [RFC v1 0/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
-From: Arman Uguray <armansito@chromium.org>
-To: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>, chao.jie.gu@intel.com
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140722142506.GC1628@joana>
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chaojie, Johan,
+On Tue, Jul 22, 2014 at 11:25:06AM -0300, Gustavo Padovan wrote:
+> Hi John,
+> 
+> Here follows some more patches for 3.17. These are mostly fixes to what
+> we've sent to you before for next merge window.
+> 
+> Please pull! Thanks.
+> 
+> 	Gustavo
+> 
+> ---
+> The following changes since commit 4d042654afb342386cb5c33e29843b76d598ab61:
+> 
+>   Bluetooth: cmtp: Remove unnecessary null test (2014-07-14 23:00:13 +0200)
+> 
+> are available in the git repository at:
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
+> 
+> for you to fetch changes up to c2aef6e8cbebd60f79555baeb9266e220f135a44:
+> 
+>   Bluetooth: Add support for Broadcom device of Asus Z97-DELUXE motherboard (2014-07-21 15:07:08 +0300)
 
-Please see my responses inline:
+Pulling now...
 
-
->> +             array{object} Characteristics [read-only]
->> +
->> +                     Array of object paths representing the characteristics
->> +                     of this service. This property is set only when the
->> +                     characteristic discovery has been completed, however the
->> +                     characteristic objects will become available via
->> +                     ObjectManager as soon as they get discovered.
-> For this new property, I think there is not essential as other property,
-> because when characteristic discovery happen , all the object path will setup
-> on DBus Hierarchy. And user can get all the characteristic by ObjectManger.
-
-The problem is that ObjectManager has no clear way to tell a client
-that "this subset of object paths have been published" and when they
-are all available via GetManagedObjects. The most a client can do is
-observe the InterfacesAdded signal and that signal is sent on a per
-object path basis. For most external applications, it might be enough
-but I would like application APIs to have to ability to say "all
-objects published, service is ready to use".
-
-
-> Through this, User can use their own structure to get this array of object.
-> That is also why we need object property such as Device, Service and so on.
->
-> And another reason , it have to wait for characteristic discovery completed, it
-> also can say that it have to wait for characteristic setup DBus Hirarchy is
-> ready. There exists asynchronous issues, if user get this property operation
-> before all the characteristic DBus setup is ready, it will make a mistake.
->
-
-This is exactly the problem. A simple update of this property lets the
-user know that the hierarchy has been set up. For all I care, this
-could even be a simple boolean property such as "DiscoveryComplete"
-but I kind of like the list of characteristics even though
-GetManagedObjects/InterfacesAdded, as you say, can achieve the same
-result. We have the similar "Includes" property already, so it's not
-entirely inconsistent from an API standpoint.
-
-
->> +             void StartNotify()
->> +
->> +                     Starts a notification session from this characteristic
->> +                     if it supports value notifications or indications.
->> +
->> +                     Possible Errors: org.bluez.Error.Failed
->> +                                      org.bluez.Error.InProgress
->> +                                      org.bluez.Error.NotSupported
-> About this method , I think other LE profile offer similar interface to user,
-> such as in heartrate profile. It will give registerwatcher method, in which
-> it will enable notify for heartrate. This will help to trace descriptor
-> including notification bit changed and send Propertychanged signal.
-
-Are you referring to the HeartRateManager1 hierarchy? Since we're now
-building a generic API, we need a proper way of reference-counted,
-per-connection way to access the Client Characteristic Configuration
-descriptor. In this proposal, calling WriteValue on the CCC descriptor
-will always fail with WriteNotPermitted.
-
-Do you have any suggestions for the method name or are you OK with
-StartNotify for now? We can always change it later.
-
-
-> "Insufficient Authorization" seems different from the other two in that
-> it's something that can't be attempted to be "fixed" from the client
-> side. It effectively means that our request was rejected by the remote
-> user, doesn't it?
-
-Good point, there is really not much bluetoothd or the external app
-can do in this case so we should probably propagate the authentication
-error separately from the NotPaired cases. Or do you think that it
-would be beneficial to have separate error definitions for Encryption
-and Authentication as well? Having Error.NotPaired and
-Error.Authentication seems reasonable to me.
-
-Cheers,
-Arman
+-- 
+John W. Linville		Someday the world will need a hero, and you
+linville@tuxdriver.com			might be all we have.  Be ready.
