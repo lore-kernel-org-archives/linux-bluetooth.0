@@ -1,344 +1,270 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 01/11] shared/gatt: Introduce gatt-helpers.h skeleton.
+Subject: Re: [PATCH 03/11] shared/gatt: Implement "Discover All Primary Services" procedure.
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405718037-15401-2-git-send-email-armansito@chromium.org>
-Date: Wed, 23 Jul 2014 01:23:31 +0200
+In-Reply-To: <1405718037-15401-4-git-send-email-armansito@chromium.org>
+Date: Wed, 23 Jul 2014 01:23:29 +0200
 Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <2774A89A-B2EE-4346-BAD1-DBA0E3014661@holtmann.org>
-References: <1405718037-15401-1-git-send-email-armansito@chromium.org> <1405718037-15401-2-git-send-email-armansito@chromium.org>
+Message-Id: <63491528-A612-40A9-BB08-2C0983555865@holtmann.org>
+References: <1405718037-15401-1-git-send-email-armansito@chromium.org> <1405718037-15401-4-git-send-email-armansito@chromium.org>
 To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 Hi Arman,
 
-> This patch introduces the skeleton for src/shared/gatt-helpers, which defines
-> helper functions for over-the-air GATT client-side procedures that will be
-> frequently used by clients. Most of these functions require several sequential
-> ATT protocol requests and it is useful to abstract these details away from the
-> upper layer.
+> This patch implements bt_gatt_discover_primary_services for the case when no
+> UUID is provided.
 > ---
-> Makefile.am               |   3 +-
-> src/shared/gatt-helpers.c | 141 ++++++++++++++++++++++++++++++++++++++++++++++
-> src/shared/gatt-helpers.h | 133 +++++++++++++++++++++++++++++++++++++++++++
-> 3 files changed, 276 insertions(+), 1 deletion(-)
-> create mode 100644 src/shared/gatt-helpers.c
-> create mode 100644 src/shared/gatt-helpers.h
+> src/shared/gatt-helpers.c | 197 +++++++++++++++++++++++++++++++++++++++++++++-
+> src/shared/gatt-helpers.h |   1 +
+> 2 files changed, 196 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Makefile.am b/Makefile.am
-> index 4588ce8..e4f7df2 100644
-> --- a/Makefile.am
-> +++ b/Makefile.am
-> @@ -157,7 +157,8 @@ src_bluetoothd_SOURCES = $(builtin_sources) \
-> 			src/shared/queue.h src/shared/queue.c \
-> 			src/shared/util.h src/shared/util.c \
-> 			src/shared/mgmt.h src/shared/mgmt.c \
-> -			src/shared/att-types.h src/shared/att.h src/shared/att.c
-> +			src/shared/att-types.h src/shared/att.h src/shared/att.c \
-> +			src/shared/gatt-helpers.h src/shared/gatt-helpers.c
-> src_bluetoothd_LDADD = lib/libbluetooth-internal.la gdbus/libgdbus-internal.la \
-> 			@GLIB_LIBS@ @DBUS_LIBS@ -ldl -lrt
-> src_bluetoothd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic \
 > diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> new file mode 100644
-> index 0000000..3d85868
-> --- /dev/null
+> index 9cf05cf..4fbf2eb 100644
+> --- a/src/shared/gatt-helpers.c
 > +++ b/src/shared/gatt-helpers.c
-> @@ -0,0 +1,141 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Google Inc.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
+> @@ -36,6 +36,11 @@
+> #define MIN(a, b) ((a) < (b) ? (a) : (b))
+> #endif
+> 
+> +static uint8_t bt_base_uuid[16] = {
+> +	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00,
+> +	0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB
+> +};
 > +
+
+as a general rule, make these const as well.
+
+> struct mtu_op {
+> 	struct bt_att *att;
+> 	uint16_t client_rx_mtu;
+> @@ -123,14 +128,202 @@ bool bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
+> 	return true;
+> }
+> 
+> +struct discovery_op {
+> +	struct bt_att *att;
+> +	int ref_count;
+> +	bt_uuid_t uuid;
+> +	struct queue *results;
+> +	bt_gatt_discovery_callback_t callback;
+> +	void *user_data;
+> +	bt_gatt_destroy_func_t destroy;
+> +};
 > +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
-> +
-> +#include "src/shared/queue.h"
-> +#include "src/shared/att.h"
-> +#include "lib/uuid.h"
-> +#include "src/shared/gatt-helpers.h"
-> +
-> +bool bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
-> +					bt_gatt_result_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
+> +static struct discovery_op* discovery_op_ref(struct discovery_op *op)
 > +{
-> +	/* TODO */
-> +	return false;
+> +	__sync_fetch_and_add(&op->ref_count, 1);
+> +
+> +	return op;
 > +}
 > +
-> +bool bt_gatt_discover_primary_services(struct bt_att *att,
-> +					bt_uuid_t *uuid,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
+> +static void discovery_op_unref(void *data)
 > +{
-> +	/* TODO */
-> +	return false;
+> +	struct discovery_op *op = data;
+> +
+> +	if (__sync_sub_and_fetch(&op->ref_count, 1))
+> +		return;
+> +
+> +	if (op->destroy)
+> +		op->destroy(op->user_data);
+> +
+> +	queue_destroy(op->results, free);
+> +
+> +	free(op);
 > +}
 > +
-> +bool bt_gatt_discover_included_services(struct bt_att *att,
-> +					uint16_t start, uint16_t end,
-> +					bt_uuid_t *uuid,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
+> +static void put_uuid_le(const bt_uuid_t *src, void *dst)
 > +{
-> +	/* TODO */
-> +	return false;
+> +	if (src->type == BT_UUID16)
+> +		put_le16(src->value.u16, dst);
+> +	else
+> +		bswap_128(&src->value.u128, dst);
+> +}
+
+Actually 32-bit UUIDs are defined for GATT internally. It just for the wire protocol, the 32-bit UUID always needs to be converted to 128-bit. So you might want to take care of this detail here as well.
+
+> +
+> +static bool convert_uuid_le(const uint8_t *src, size_t len, uint8_t dst[16])
+> +{
+> +	if (len == 16) {
+> +		bswap_128(src, dst);
+> +		return true;
+> +	}
+> +
+> +	if (len != 2)
+> +		return false;
+> +
+> +	memcpy(dst, bt_base_uuid, sizeof(bt_base_uuid));
+> +	dst[2] = src[1];
+> +	dst[3] = src[0];
+> +
+> +	return true;
 > +}
 > +
-> +bool bt_gatt_discover_characteristics(struct bt_att *att,
-> +					uint16_t start, uint16_t end,
-> +					bt_uuid_t *uuid,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
+> +static void read_by_grp_type_cb(uint8_t opcode, const void *pdu,
+> +					uint16_t length, void *user_data)
 > +{
-> +	/* TODO */
-> +	return false;
+> +	struct discovery_op *op = user_data;
+> +	uint16_t status;
+> +	struct queue *results = NULL;
+> +	size_t data_length;
+> +	size_t list_length;
+> +	uint16_t last_end;
+> +	int i;
+> +
+> +	if (opcode == BT_ATT_OP_ERROR_RSP) {
+> +		status = process_error(pdu, length);
+> +
+> +		if (status == BT_ATT_ERROR_ATTRIBUTE_NOT_FOUND &&
+> +						!queue_isempty(op->results))
+> +			goto success;
+> +
+> +		goto done;
+> +	}
+> +
+> +	/* PDU must contain at least the following (sans opcode):
+> +	 * - Attr Data Length (1 octet)
+> +	 * - Attr Data List (at least 6 octets):
+> +	 *   -- 2 octets: Attribute handle
+> +	 *   -- 2 octets: End group handle
+> +	 *   -- 2 or 16 octets: service UUID
+> +	 */
+> +	if (opcode != BT_ATT_OP_READ_BY_GRP_TYPE_RSP || !pdu || length < 7) {
+> +		status = BT_GATT_ERROR_INVALID_RSP;
+> +		goto done;
+> +	}
+> +
+> +	data_length = ((uint8_t *) pdu)[0];
+> +	list_length = length - 1;
+> +
+> +	if ((list_length % data_length) ||
+> +				(data_length != 6 && data_length != 20)) {
+> +		status = BT_GATT_ERROR_INVALID_RSP;
+> +		goto done;
+> +	}
+> +
+> +	for (i = 1; i < length; i += data_length) {
+> +		struct bt_gatt_service *service;
+> +
+> +		service = new0(struct bt_gatt_service, 1);
+> +		if (!service) {
+> +			status = BT_GATT_ERROR_FAILED_ALLOC;
+> +			goto done;
+> +		}
+> +
+> +		service->start = get_le16(pdu + i);
+> +		last_end = get_le16(pdu + i + 2);
+> +		service->end = last_end;
+> +		convert_uuid_le(pdu + i + 4, data_length - 4, service->uuid);
+> +
+> +		queue_push_tail(op->results, service);
+> +	}
+> +
+> +	if (last_end != 0xFFFF) {
+
+Generally we do 0xffff in lower-case. There might cases in the code that do not follow this as strictly, but we should not introduce new code doing the same thing.
+
+> +		uint8_t pdu[6];
+> +
+> +		put_le16(last_end + 1, pdu);
+> +		put_le16(0xFFFF, pdu + 2);
+> +		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+
+So I have no problem in doing initially manual PDU building this way, but I thing latest in follow up patches we need to introduce packed structs (where it makes sense since the data is static). If we don't, then this get easily out of control and the code becomes really hard to read later on since it is not obvious what PDU you are building.
+
+> +
+> +		if (bt_att_send(op->att, BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
+> +							pdu, sizeof(pdu),
+> +							read_by_grp_type_cb,
+> +							discovery_op_ref(op),
+> +							discovery_op_unref))
+> +			return;
+> +
+> +		discovery_op_unref(op);
+> +		status = BT_GATT_ERROR_UNKNOWN;
+> +		goto done;
+> +	}
+> +
+> +success:
+> +	/* End of procedure */
+> +	results = op->results;
+> +	status = 0;
+> +
+> +done:
+> +	if (op->callback)
+> +		op->callback(status, results, op->user_data);
 > +}
 > +
-> +bool bt_gatt_discover_descriptors(struct bt_att *att,
-> +					uint16_t start, uint16_t end,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> bool bt_gatt_discover_primary_services(struct bt_att *att,
+> 					bt_uuid_t *uuid,
+> 					bt_gatt_discovery_callback_t callback,
+> 					void *user_data,
+> 					bt_gatt_destroy_func_t destroy)
+> {
+> -	/* TODO */
+> -	return false;
+> +	struct discovery_op *op;
+> +	bool result;
 > +
-> +bool bt_gatt_read_value(struct bt_att *att, uint16_t value_handle,
-> +					bt_gatt_read_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> +	if (!att)
+> +		return false;
 > +
-> +bool bt_gatt_read_long_value(struct bt_att *att,
-> +					uint16_t value_handle, uint16_t offset,
-> +					bt_gatt_read_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> +	op = new0(struct discovery_op, 1);
+> +	if (!op)
+> +		return false;
 > +
-> +bool bt_gatt_write_without_response(struct bt_att *att,
-> +					uint16_t value_handle,
-> +                                        bool signed_write,
-> +					uint8_t *value, uint16_t length)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> +	op->results = queue_new();
+> +	if (!op->results) {
+> +		free(op);
+> +		return false;
+> +	}
 > +
-> +bool bt_gatt_write_value(struct bt_att *att, uint16_t value_handle,
-> +					uint8_t *value, uint16_t length,
-> +					bt_gatt_result_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> +	op->att = att;
+> +	op->callback = callback;
+> +	op->user_data = user_data;
+> +	op->destroy = destroy;
 > +
-> +bool bt_gatt_write_long_value(struct bt_att *att, bool reliable,
-> +					uint16_t value_handle, uint16_t offset,
-> +					uint8_t *value, uint16_t length,
-> +					bt_gatt_result_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> +	/* If UUID is NULL, then discover all primary services */
+> +	if (!uuid) {
+> +		uint8_t pdu[6];
 > +
-> +unsigned int bt_gatt_register(struct bt_att *att, bool indications,
-> +					bt_gatt_notify_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy)
-> +{
-> +	/* TODO */
-> +	return false;
-> +}
+> +		put_le16(0x0001, pdu);
+> +		put_le16(0xFFFF, pdu + 2);
+> +		put_le16(GATT_PRIM_SVC_UUID, pdu + 4);
+> +
+> +		result = bt_att_send(att, BT_ATT_OP_READ_BY_GRP_TYPE_REQ,
+> +							pdu, sizeof(pdu),
+> +							read_by_grp_type_cb,
+> +							discovery_op_ref(op),
+> +							discovery_op_unref);
+> +	} else {
+> +		free(op);
+> +		return false;
+> +	}
+> +
+> +	if (!result) {
+> +		queue_destroy(op->results, free);
+> +		free(op);
+> +	}
+> +
+> +	return result;
+> }
+> 
+> bool bt_gatt_discover_included_services(struct bt_att *att,
 > diff --git a/src/shared/gatt-helpers.h b/src/shared/gatt-helpers.h
-> new file mode 100644
-> index 0000000..b711324
-> --- /dev/null
+> index b711324..068c4bb 100644
+> --- a/src/shared/gatt-helpers.h
 > +++ b/src/shared/gatt-helpers.h
-> @@ -0,0 +1,133 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2014  Google Inc.
-> + *
-> + *
-> + *  This library is free software; you can redistribute it and/or
-> + *  modify it under the terms of the GNU Lesser General Public
-> + *  License as published by the Free Software Foundation; either
-> + *  version 2.1 of the License, or (at your option) any later version.
-> + *
-> + *  This library is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-> + *  Lesser General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU Lesser General Public
-> + *  License along with this library; if not, write to the Free Software
-> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
-> + *
-> + */
-> +
-> +/* This file defines helpers for performing client-side procedures defined by
-> + * the Generic Attribute Profile.
-> + */
-> +
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +
-> +struct bt_gatt_service {
-> +	uint16_t start;
-> +	uint16_t end;
-> +	uint8_t uuid[16];
-> +};
-> +
-> +struct bt_gatt_characteristic {
-> +	uint16_t start;
-> +	uint16_t end;
-> +	uint16_t value;
-> +	uint8_t properties;
-> +	uint8_t uuid[16];
-> +};
-> +
-> +struct bt_gatt_descriptor {
-> +	uint16_t handle;
-> +	uint8_t uuid[16];
-> +};
-> +
-> +/* Operations can report two kinds of errors:
-> + *
-> + *  1. ATT protocol error codes
-> + *  2. bluetoothd defined errors
-> + *
-> + * The callbacks below encode the operation status in a 16-bit unsigned integer,
-> + * where 0-255 are allocated for ATT protocol errors.
-> + *
-> + *  - 0x0000: Success
-> + *  - 0x0001: Invalid handle (ATT protocol error)
-> + *  - 0x0100: Unknown failure (bluetoothd defined)
-
-do we really need this? I am feeling a bit uneasy about these kind of error splits where we are overloading wire protocol errors with internal errors.
-
-> + *
-> + */
-> +#define BT_GATT_ERROR_UNKNOWN		0x0100
-> +#define BT_GATT_ERROR_INVALID_RSP	0x0101
-
-Especially with the background of invalid response as listed here, I think the only real result is a disconnect anyway, so we might better introduce a disconnect reason with the disconnect callback. Just an idea.
-
-> +
-> +typedef void (*bt_gatt_destroy_func_t)(void *user_data);
-> +
-> +typedef void (*bt_gatt_result_callback_t)(uint16_t status, void *user_data);
-> +typedef void (*bt_gatt_discovery_callback_t)(uint16_t status,
-> +					struct queue *results, void *user_data);
-
-Can we please avoid internal data structures exposed here. I would say this needs to provide its own GATT specific data structure for the result. Most likely an allocated array or pointer array with a dedicated free function.
-
-> +typedef void (*bt_gatt_read_callback_t)(uint16_t status, const uint8_t *value,
-> +					uint16_t length, void *user_data);
-> +
-> +typedef void (*bt_gatt_notify_callback_t)(uint16_t value_handle,
-> +					const uint8_t *value, uint16_t length,
-> +					void *user_data);
-> +
-> +bool bt_gatt_exchange_mtu(struct bt_att *att, uint16_t client_rx_mtu,
-> +					bt_gatt_result_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +
-> +bool bt_gatt_discover_primary_services(struct bt_att *att, bt_uuid_t *uuid,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +bool bt_gatt_discover_included_services(struct bt_att *att,
-> +					uint16_t start, uint16_t end,
-> +					bt_uuid_t *uuid,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +bool bt_gatt_discover_characteristics(struct bt_att *att,
-> +					uint16_t start, uint16_t end,
-> +					bt_uuid_t *uuid,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +bool bt_gatt_discover_descriptors(struct bt_att *att,
-> +					uint16_t start, uint16_t end,
-> +					bt_gatt_discovery_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +
-> +bool bt_gatt_read_value(struct bt_att *att, uint16_t value_handle,
-> +					bt_gatt_read_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +bool bt_gatt_read_long_value(struct bt_att *att,
-> +					uint16_t value_handle, uint16_t offset,
-> +					bt_gatt_read_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-
-Does this need an explicit function? Wouldn't it make more sense to handle the long reads (and writes for that matter) internally.
-
-> +
-> +bool bt_gatt_write_without_response(struct bt_att *att, uint16_t value_handle,
-> +					bool signed_write,
-> +					uint8_t *value, uint16_t length);
-> +bool bt_gatt_write_value(struct bt_att *att, uint16_t value_handle,
-> +					uint8_t *value, uint16_t length,
-> +					bt_gatt_result_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +bool bt_gatt_write_long_value(struct bt_att *att, bool reliable,
-> +					uint16_t value_handle, uint16_t offset,
-> +					uint8_t *value, uint16_t length,
-> +					bt_gatt_result_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
-> +
-> +unsigned int bt_gatt_register(struct bt_att *att, bool indications,
-> +					bt_gatt_notify_callback_t callback,
-> +					void *user_data,
-> +					bt_gatt_destroy_func_t destroy);
+> @@ -62,6 +62,7 @@ struct bt_gatt_descriptor {
+>  */
+> #define BT_GATT_ERROR_UNKNOWN		0x0100
+> #define BT_GATT_ERROR_INVALID_RSP	0x0101
+> +#define BT_GATT_ERROR_FAILED_ALLOC	0x0102
+> 
+> typedef void (*bt_gatt_destroy_func_t)(void *user_data);
 
 Regards
 
