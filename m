@@ -1,40 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Jul 2014 11:34:46 +0300
-From: Johan Hedberg <johan.hedberg@intel.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 1/3] doc: Update Android tests coverage
-Message-ID: <20140722083446.GA26403@t440s.lan>
-References: <1405949020-27462-1-git-send-email-jakub.tyszkowski@tieto.com>
+Date: Tue, 22 Jul 2014 11:00:45 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Bharat Bhusan Panda <bharat.panda@samsung.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+Subject: Re: [PATCH ] tools: Add unregister gatt service
+Message-ID: <20140722080045.GC25167@t440s.lan>
+References: <1405934433-29723-1-git-send-email-bharat.panda@samsung.com>
+ <20140721094355.GA29317@t440s.lan>
+ <00c501cfa4d9$77fc36b0$67f4a410$@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405949020-27462-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <00c501cfa4d9$77fc36b0$67f4a410$@samsung.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+Hi Bharat,
 
-On Mon, Jul 21, 2014, Jakub Tyszkowski wrote:
-> One test case was not ported to new tester framework as it was
-> considered invalid.
-> ---
->  doc/test-coverage.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+On Mon, Jul 21, 2014, Bharat Bhusan Panda wrote:
+> > > +static int id;
+> > > +
+> > >  struct characteristic {
+> > >  	char *uuid;
+> > >  	char *path;
+> > > @@ -332,10 +334,10 @@ static gboolean register_characteristic(const
+> > > char *chr_uuid,
+> > >
+> > >  static char *register_service(const char *uuid)  {
+> > > -	static int id = 1;
+> > 
+> > Making id public looks unnecessary to me since after the
+> > registration you've got the path which you can pass to the
+> > unregistration procedure.
 > 
-> diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
-> index 0da8321..e19e6c7 100644
-> --- a/doc/test-coverage.txt
-> +++ b/doc/test-coverage.txt
-> @@ -53,7 +53,7 @@ Android end-to-end testing
->  
->  Application		Count	Description
->  -------------------------------------------
-> -android-tester		  86	Android HAL interface testing
-> +android-tester		  85	Android HAL interface testing
->  ipc-tester		  94	Android IPC resistance testing
->  			-----
->  			 180
+> The id was made public, because service path was not public. We need
+> to make either id or service path as public to unregister interface
+> path.
 
-It seems like you've forgotten to update the total count?
+Can't you just pass it as user_data to unregister_external_service_reply?
+
+> > >  static gboolean signal_handler(GIOChannel *channel, GIOCondition cond,
+> > >  							gpointer user_data)
+> > >  {
+> > > @@ -524,6 +596,7 @@ int main(int argc, char *argv[])
+> > >  	client = g_dbus_client_new(connection, "org.bluez", "/org/bluez");
+> > >
+> > >  	g_dbus_client_set_connect_watch(client, connect_handler, NULL);
+> > > +	g_dbus_client_set_disconnect_watch(client, disconnect_handler,
+> > > +NULL);
+> > 
+> > When exactly would disconnect_handler be called in practice? At
+> > least one case seems to be if bluetoothd exits in which case it
+> > seems quite wasteful to try to make any method calls to a
+> > non-existing service. What other scenarios would disconnect_handler
+> > be called in?
+> 
+> On running the gatt-service, it registers the service and updates gatt db
+> with the service path.
+> On exiting the gatt-service, it should call "UnregisterService" and clear
+> the gatt service db. 
+
+How exactly does gatt-service exit? If it stops iterating the main loop
+your D-Bus reply callback would never get called and most of the new
+code you're adding would never get run.
+
+> Otherwise, on next run of gatt-service, when it registers the same service
+> path, it gets an error, service already exists. 
+
+bluetoothd should monitor all of its clients and clean up after them if
+they exit without unregistering. If that's not happening then it's a bug
+that's much more important to fix than what you're trying to do here. A
+quick look at src/gatt-dbus.c shows that it's at least trying to clean
+up, but maybe there's a bug somewhere there.
 
 Johan
