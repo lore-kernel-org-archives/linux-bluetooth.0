@@ -1,47 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 22 Jul 2014 10:51:53 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Sebastian Chlad <sebastian.chlad@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] android/pts: Initial PTS docs for SPP
-Message-ID: <20140722075153.GA25167@t440s.lan>
-References: <1405953581-9541-1-git-send-email-sebastian.chlad@tieto.com>
- <1405953581-9541-2-git-send-email-sebastian.chlad@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1405953581-9541-2-git-send-email-sebastian.chlad@tieto.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] android/client: Rearrange headers include
+Date: Tue, 22 Jul 2014 10:42:53 +0300
+Message-Id: <1406014973-14498-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Sebastian,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-On Mon, Jul 21, 2014, Sebastian Chlad wrote:
-> PTS tests done on Android 4.4.4 and PTS 5.2
-> ---
->  android/Makefile.am   |  2 +-
->  android/bite-spp.txt  | 19 ----------------
->  android/pics-spp.txt  | 61 ++++++++++++++++++++++++++++++++++++++++-----------
->  android/pixit-spp.txt | 19 ++++++++++++++++
->  android/pts-spp.txt   | 26 ++++++++++++++++++++++
->  5 files changed, 94 insertions(+), 33 deletions(-)
->  delete mode 100644 android/bite-spp.txt
->  create mode 100644 android/pixit-spp.txt
->  create mode 100644 android/pts-spp.txt
-> 
-> diff --git a/android/Makefile.am b/android/Makefile.am
-> index 057e92a..13633d1 100644
-> --- a/android/Makefile.am
-> +++ b/android/Makefile.am
-> @@ -316,7 +316,7 @@ EXTRA_DIST += android/Android.mk android/README \
->  				android/pixit-dis.txt \
->  				android/pixit-rfcomm.txt \
->  				android/pts-rfcomm.txt \
-> -				android/bite-spp.txt \
-> +				android/pts-spp.txt \
->  				android/pts-l2cap.txt \
->  				android/pts-gap.txt \
->  				android/pts-did.txt \
+Streamline headers include for if-audio HAL client
+---
+ android/client/if-audio.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-Seems like you're forgetting to add pixit-spp.txt to Makefile.am?
+diff --git a/android/client/if-audio.c b/android/client/if-audio.c
+index 6a48025..f3f87fb 100644
+--- a/android/client/if-audio.c
++++ b/android/client/if-audio.c
+@@ -15,11 +15,12 @@
+  *
+  */
+ 
++#include <pthread.h>
++#include <unistd.h>
++#include <math.h>
++
+ #include "if-main.h"
+ #include "../hal-utils.h"
+-#include "pthread.h"
+-#include "unistd.h"
+-#include <math.h>
+ 
+ audio_hw_device_t *if_audio = NULL;
+ static struct audio_stream_out *stream_out = NULL;
+-- 
+1.9.1
 
-Johan
