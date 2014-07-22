@@ -1,57 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vignesh Raman <Vignesh_Raman@mentor.com>
-To: <linux-bluetooth@vger.kernel.org>, <marcel@holtmann.org>,
-	<gustavo@padovan.org>
-CC: <Dean_Jenkins@mentor.com>, <Vitaly_Kuzmichev@mentor.com>
-Subject: [PATCH v2] Bluetooth: Avoid use of session socket after the session gets freed
-Date: Tue, 22 Jul 2014 19:24:25 +0530
-Message-ID: <1406037265-16301-1-git-send-email-Vignesh_Raman@mentor.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+Subject: [PATCHv2] doc: Update Android tests coverage
+Date: Tue, 22 Jul 2014 14:42:02 +0200
+Message-Id: <1406032922-25256-1-git-send-email-jakub.tyszkowski@tieto.com>
+In-Reply-To: <20140722083446.GA26403@t440s.lan>
+References: <20140722083446.GA26403@t440s.lan>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The commits 08c30aca9e698faddebd34f81e1196295f9dc063 "Bluetooth: Remove
-RFCOMM session refcnt" and 8ff52f7d04d9cc31f1e81dcf9a2ba6335ed34905
-"Bluetooth: Return RFCOMM session ptrs to avoid freed session"
-allow rfcomm_recv_ua and rfcomm_session_close to delete the session
-(and free the corresponding socket) and propagate NULL session pointer
-to the upper callers.
-
-Additional fix is required to terminate the loop in rfcomm_process_rx
-function to avoid use of freed 'sk' memory.
-
-The issue is only reproducible with kernel option CONFIG_PAGE_POISONING
-enabled making freed memory being changed and filled up with fixed char
-value used to unmask use-after-free issues.
-
-Signed-off-by: Vignesh Raman <Vignesh_Raman@mentor.com>
-Signed-off-by: Vitaly Kuzmichev <Vitaly_Kuzmichev@mentor.com>
-Acked-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+One test case was not ported to new tester framework as it was
+considered invalid.
 ---
- net/bluetooth/rfcomm/core.c |    7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ doc/test-coverage.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index 754b6fe..881f7de 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -1909,10 +1909,13 @@ static struct rfcomm_session *rfcomm_process_rx(struct rfcomm_session *s)
- 	/* Get data directly from socket receive queue without copying it. */
- 	while ((skb = skb_dequeue(&sk->sk_receive_queue))) {
- 		skb_orphan(skb);
--		if (!skb_linearize(skb))
-+		if (!skb_linearize(skb)) {
- 			s = rfcomm_recv_frame(s, skb);
--		else
-+			if (!s)
-+				break;
-+		} else {
- 			kfree_skb(skb);
-+		}
- 	}
+diff --git a/doc/test-coverage.txt b/doc/test-coverage.txt
+index 0da8321..6b274b3 100644
+--- a/doc/test-coverage.txt
++++ b/doc/test-coverage.txt
+@@ -53,10 +53,10 @@ Android end-to-end testing
  
- 	if (s && (sk->sk_state == BT_CLOSED))
+ Application		Count	Description
+ -------------------------------------------
+-android-tester		  86	Android HAL interface testing
++android-tester		  85	Android HAL interface testing
+ ipc-tester		  94	Android IPC resistance testing
+ 			-----
+-			 180
++			 179
+ 
+ 
+ Android automated unit testing
 -- 
-1.7.9.5
+1.9.1
 
