@@ -1,113 +1,96 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH 11/11] shared/gatt: Implement notification/indication helper.
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1405718037-15401-12-git-send-email-armansito@chromium.org>
-Date: Wed, 23 Jul 2014 01:23:26 +0200
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <0C7FBBC1-18EC-4EA9-8157-B531ECFB2E8D@holtmann.org>
-References: <1405718037-15401-1-git-send-email-armansito@chromium.org> <1405718037-15401-12-git-send-email-armansito@chromium.org>
-To: Arman Uguray <armansito@chromium.org>
+MIME-Version: 1.0
+In-Reply-To: <20140722085507.GA29664@t440s.lan>
+References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
+	<20140722085507.GA29664@t440s.lan>
+Date: Tue, 22 Jul 2014 13:40:48 -0700
+Message-ID: <CAHrH25SR83cXq-xGQz4x7axjcW=CUL_VCcAfhny_RyZ+t0oZ-g@mail.gmail.com>
+Subject: Re: [RFC v1 0/1] doc/gatt-api: New API properties and methods for the
+ GATT D-Bus API.
+From: Arman Uguray <armansito@chromium.org>
+To: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>, chao.jie.gu@intel.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Arman,
+Hi Chaojie, Johan,
 
-> This patch implements bt_gatt_register, which sets up internal callbacks for
-> incoming notifications and indications, parses the PDU and provides it to the
-> upper layer. It also automatically sends out a confirmation when an indication
-> is received.
-> ---
-> src/shared/gatt-helpers.c | 64 +++++++++++++++++++++++++++++++++++++++++++++--
-> 1 file changed, 62 insertions(+), 2 deletions(-)
-> 
-> diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-> index 5afe91e..f82bb59 100644
-> --- a/src/shared/gatt-helpers.c
-> +++ b/src/shared/gatt-helpers.c
-> @@ -1375,11 +1375,71 @@ bool bt_gatt_write_long_value(struct bt_att *att, bool reliable,
-> 	return true;
-> }
-> 
-> +struct notify_data {
-> +	struct bt_att *att;
-> +	bt_gatt_notify_callback_t callback;
-> +	void *user_data;
-> +	bt_gatt_destroy_func_t destroy;
-> +};
-> +
-> +static void notify_data_destroy(void *data)
-> +{
-> +	struct notify_data *notd = data;
-> +
-> +	if (notd->destroy)
-> +		notd->destroy(notd->user_data);
-> +
-> +	free(notd);
-> +}
-> +
-> +static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
-> +								void *user_data)
-> +{
-> +	struct notify_data *data = user_data;
-> +	bool indication;
-> +	uint16_t value_handle;
-> +	const uint8_t *value = NULL;
-> +
-> +	indication = (opcode == BT_ATT_OP_HANDLE_VAL_IND);
+Please see my responses inline:
 
-andy reason for this interim variable?
 
-> +	value_handle = get_le16(pdu);
-> +
-> +	if (length > 2)
-> +		value = pdu + 2;
-> +
-> +	if (data->callback)
-> +		data->callback(value_handle, value, length - 2, data->user_data);
-> +
-> +	if (indication)
+>> +             array{object} Characteristics [read-only]
+>> +
+>> +                     Array of object paths representing the characteristics
+>> +                     of this service. This property is set only when the
+>> +                     characteristic discovery has been completed, however the
+>> +                     characteristic objects will become available via
+>> +                     ObjectManager as soon as they get discovered.
+> For this new property, I think there is not essential as other property,
+> because when characteristic discovery happen , all the object path will setup
+> on DBus Hierarchy. And user can get all the characteristic by ObjectManger.
 
-I would just check the opcode here and add a comment on why we are doing it this way.
+The problem is that ObjectManager has no clear way to tell a client
+that "this subset of object paths have been published" and when they
+are all available via GetManagedObjects. The most a client can do is
+observe the InterfacesAdded signal and that signal is sent on a per
+object path basis. For most external applications, it might be enough
+but I would like application APIs to have to ability to say "all
+objects published, service is ready to use".
 
-> +		bt_att_send(data->att, BT_ATT_OP_HANDLE_VAL_CONF, NULL, 0,
-> +							NULL, NULL, NULL);
-> +}
-> +
-> unsigned int bt_gatt_register(struct bt_att *att, bool indications,
-> 					bt_gatt_notify_callback_t callback,
-> 					void *user_data,
-> 					bt_gatt_destroy_func_t destroy)
-> {
-> -	/* TODO */
-> -	return false;
-> +	struct notify_data *data;
-> +	uint8_t opcode;
-> +	unsigned int id;
-> +
-> +	if (!att)
-> +		return 0;
-> +
-> +	data = new0(struct notify_data, 1);
-> +	if (!data)
-> +		return 0;
-> +
-> +	data->att = att;
-> +	data->callback = callback;
-> +	data->user_data = user_data;
-> +	data->destroy = destroy;
-> +
-> +	opcode = indications ? BT_ATT_OP_HANDLE_VAL_IND : BT_ATT_OP_HANDLE_VAL_NOT;
-> +
-> +	id = bt_att_register(att, opcode, notify_cb, data, notify_data_destroy);
-> +	if (!id)
-> +		free(data);
-> +
-> +	return id;
-> }
 
-Regards
+> Through this, User can use their own structure to get this array of object.
+> That is also why we need object property such as Device, Service and so on.
+>
+> And another reason , it have to wait for characteristic discovery completed, it
+> also can say that it have to wait for characteristic setup DBus Hirarchy is
+> ready. There exists asynchronous issues, if user get this property operation
+> before all the characteristic DBus setup is ready, it will make a mistake.
+>
 
-Marcel
+This is exactly the problem. A simple update of this property lets the
+user know that the hierarchy has been set up. For all I care, this
+could even be a simple boolean property such as "DiscoveryComplete"
+but I kind of like the list of characteristics even though
+GetManagedObjects/InterfacesAdded, as you say, can achieve the same
+result. We have the similar "Includes" property already, so it's not
+entirely inconsistent from an API standpoint.
 
+
+>> +             void StartNotify()
+>> +
+>> +                     Starts a notification session from this characteristic
+>> +                     if it supports value notifications or indications.
+>> +
+>> +                     Possible Errors: org.bluez.Error.Failed
+>> +                                      org.bluez.Error.InProgress
+>> +                                      org.bluez.Error.NotSupported
+> About this method , I think other LE profile offer similar interface to user,
+> such as in heartrate profile. It will give registerwatcher method, in which
+> it will enable notify for heartrate. This will help to trace descriptor
+> including notification bit changed and send Propertychanged signal.
+
+Are you referring to the HeartRateManager1 hierarchy? Since we're now
+building a generic API, we need a proper way of reference-counted,
+per-connection way to access the Client Characteristic Configuration
+descriptor. In this proposal, calling WriteValue on the CCC descriptor
+will always fail with WriteNotPermitted.
+
+Do you have any suggestions for the method name or are you OK with
+StartNotify for now? We can always change it later.
+
+
+> "Insufficient Authorization" seems different from the other two in that
+> it's something that can't be attempted to be "fixed" from the client
+> side. It effectively means that our request was rejected by the remote
+> user, doesn't it?
+
+Good point, there is really not much bluetoothd or the external app
+can do in this case so we should probably propagate the authentication
+error separately from the NotPaired cases. Or do you think that it
+would be beneficial to have separate error definitions for Encryption
+and Authentication as well? Having Error.NotPaired and
+Error.Authentication seems reasonable to me.
+
+Cheers,
+Arman
