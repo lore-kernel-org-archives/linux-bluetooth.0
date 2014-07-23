@@ -1,72 +1,52 @@
 Return-Path: <cyrus@holtmann.org>
+Message-ID: <53CFD895.6020507@bigfoot.com>
+Date: Wed, 23 Jul 2014 17:45:25 +0200
+From: DrYak <blackkitty@bigfoot.com>
 MIME-Version: 1.0
-In-Reply-To: <3D02B219753AD44CBDDDE484323B1774112D121F@SHSMSX104.ccr.corp.intel.com>
-References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
-	<20140722085507.GA29664@t440s.lan>
-	<CAHrH25SR83cXq-xGQz4x7axjcW=CUL_VCcAfhny_RyZ+t0oZ-g@mail.gmail.com>
-	<3D02B219753AD44CBDDDE484323B1774112D121F@SHSMSX104.ccr.corp.intel.com>
-Date: Wed, 23 Jul 2014 09:18:58 -0700
-Message-ID: <CAHrH25RpdMCS=eizPUa5S-y0qBHyWQk6co1sJcwAQO9iC0xL=Q@mail.gmail.com>
-Subject: Re: [RFC v1 0/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
-From: Arman Uguray <armansito@chromium.org>
-To: "Gu, Chao Jie" <chao.jie.gu@intel.com>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To: linux-bluetooth@vger.kernel.org
+Subject: Reverse tethering DUN
+Content-Type: text/plain; charset=ISO-8859-1
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Chaojie,
+Hello!
 
-> Of course if DBus has these array object of characteristic property, there is more clear and easy for client to get. However, in my opinion, bluez just put out least but enough information in DBus Hierarchy for application to use. Just you said, to add array object property , this could even be a simple boolean property such as "DiscoveryComplete". That would be add more property in DBus, so on the contrary it would not let DBus Hierarchy look simple and clear.
-> Through the objectAdded and InterfaceAdded Signal, application can acquire this subset of object in fact.
+I would like to know which is the current modern way to do DUN reverse
+tethering using Bluez version >= 5.
 
-Explain to me how, using only the InterfacesAdded signal, an
-application can know that all characteristic objects under a service
-hierarchy have been added? The only way is if the external application
-already knows about service it's interacting with, which is not the
-case if you're building a generic application API on top of
-bluetoothd. Without what I'm proposing, you can't build a generic GATT
-application API without requiring cumbersome event handling for each
-service, characteristic, and descriptor object as they get added and
-have only partial access to these objects in the handlers as the
-objects are getting processed. This might be fine for low-level
-applications that interact with D-Bus directly, but for higher level
-app developers this is a real issue that we want to handle properly
-and make their lives easier.
+I have an old PDA that I use sometime (a Tapwave Zodiac running PalmOS5.
+It's similar to Palm Tungsten, etc.) These old devices don't have Wifi,
+only Bluetooth.
+For networking over Bluetooth, these old devices don't support PAN, only
+DUN.
 
+So to provide them networking, one need to share a desktop PC's
+connection over bluetooth DUN.
 
->why adapter did not export array object of devices and device not export array object of services ?
+Up until Bluez version 4, the standard way to provide networking over
+bluetooth for such PalmOS 5 devices was:
+https://wiki.debian.org/BluetoothPalmOSConnection
 
-Because it doesn't need to. You always deal with individual devices as
-they get added. You do NOT have this hierarchy with adapter where
-doing anything meaningful with the adapter requires you to have seen a
-certain set of multiple device objects.
+Basically:
+- run "dund" to listen for incoming connection.
+- once the palmos device connects to the PC, have dund start PPPD with
+parameters tailored for the device
+- use iptables to forward the connection.
 
+My problem:
+- I've read that bluez 5 changed the way DUN is handled and thus support
+for the old "dund" was dropped.
+- Indeed there's no "bluez-compat" package available anymore for my
+current distro (opensuse 13.1, runs bluez 5.18)
 
-> I am totally ok with generic notify API to application, but I am afraid that there would be conflict between LE profile and generic notify API. Because application does not know RegisterWatcher method has enable the notification. I do not know org.bluez.Inprogress error code could warn this condition or not.
->
+So my question:
+- What's the modern successor of "dund --listen" for bluez 5 ?
 
-You're right, as we move to the new shared GATT/ATT stack, we will
-have to change the way the LE plugins work. We need an internal API
-for bluetoothd that will handle discovery and other resource
-management (such as the CCC write) among daemon plugins and external
-applications. Without that, there will be conflict since the plugins,
-as they are today, perform these operations directly.
+How should I setup a DUN service on my computer to which to connect from
+my PDA ?
 
-Eventually what we want is to allow plugins to expose methods such as
-RegisterWatcher but have that call an internal API method so that
-UnregisterWatcher won't cause a write to the CCC descriptor if an
-external app called StartNotify on that characteristic and vice versa.
+I've looked around, but I haven't been able to find any guide.
 
-So yes, there will be conflict unless we fix the whole stack, but
-that's what we'll do as we deprecate attrib/*.
+Thank you for your help.
 
-
-> BTW, you saidi that calling WriteValue on the CCC descriptor will always fail with WriteNotPermitted. I think gatt_write_char function can write CCC descriptor , do you mean in WriteValue method to refuse write CCC descriptor on purpose and return WriteNotPermitted ?
-
-Yes, I meant the latter (WriteValue method will refuse on purpose).
-
-Cheers and thanks for the comments,
-Arman
+- Ivan
