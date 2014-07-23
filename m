@@ -1,34 +1,45 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dibyendu Roy <dibyendu.roy@samsung.com>
-To: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
-Subject: Query regarding gatt server implementation on Tizen
-Date: Wed, 23 Jul 2014 17:29:51 +0530
-Message-id: <003401cfa66d$9ec5c140$dc5143c0$@samsung.com>
-MIME-version: 1.0
-Content-type: text/plain; charset=us-ascii
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/4] android/client: Fix crash reading not connected SCO
+Date: Wed, 23 Jul 2014 14:34:59 +0300
+Message-Id: <1406115301-18812-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406115301-18812-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1406115301-18812-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Claudio,
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Greetings!!!  I'm trying  to test bluez-5.20  gatt-server on Tizen.
+When SCO is not connected we get -1 from in_read() HAL function.
+---
+ android/client/if-sco.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-I have a query regarding gatt server implementation in bluez.
-
-Please let me know how bluez will get the properties exported through
-interfaces mentioned in the bluez doc/gatt-api.txt (org.bluez.GattService1
-etc.).
-
-And is it required to emit the InterfacesAdded/InterfacesRemoved signals
-after exporting interfaces org.bluez.GattService1,
-org.bluez.GattCharacteristic1? 
-
-What does bluez do with those signals in case of gatt-server.
-
-Thanks in advance.
-
-BR-
-Dibyendu Roy
-
-
+diff --git a/android/client/if-sco.c b/android/client/if-sco.c
+index 70e2737..c33b012 100644
+--- a/android/client/if-sco.c
++++ b/android/client/if-sco.c
+@@ -287,7 +287,7 @@ static void *read_thread(void *data)
+ {
+ 	int (*filbuff_cb) (short*, void*) = feed_from_in;
+ 	short buffer[buffer_size_in / sizeof(short)];
+-	size_t len = 0;
++	ssize_t len = 0;
+ 	void *cb_data = NULL;
+ 	FILE *out = data;
+ 
+@@ -311,6 +311,10 @@ static void *read_thread(void *data)
+ 		pthread_mutex_unlock(&state_mutex);
+ 
+ 		len = filbuff_cb(buffer, cb_data);
++		if (len < 0) {
++			haltest_error("Error receiving SCO data");
++			break;
++		}
+ 
+ 		haltest_info("Read %zd bytes\n", len);
+ 
+-- 
+1.9.1
 
