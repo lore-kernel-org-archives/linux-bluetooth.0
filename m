@@ -1,14 +1,15 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/2] Bluetooth: Get MWS transport configuration of the controller
-Date: Wed, 23 Jul 2014 19:24:57 +0200
-Message-Id: <1406136297-31644-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] Bluetooth: Read list of local codecs supported by the controller
+Date: Wed, 23 Jul 2014 19:13:24 +0200
+Message-Id: <1406135604-26220-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the Bluetooth controller supports Get MWS Transport Layer
-Configuration command, then issue it during initialization.
+If the Bluetooth controller supports Read Local Supported Codecs
+command, the issue it during initialization so that the list of
+codecs is known.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
@@ -17,29 +18,29 @@ Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
  2 files changed, 6 insertions(+)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 5d30919eaba9..e3fd926df13f 100644
+index f0a3d8890760..5d30919eaba9 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -1172,6 +1172,8 @@ struct hci_rp_write_remote_amp_assoc {
- 	__u8     phy_handle;
+@@ -1074,6 +1074,8 @@ struct hci_rp_read_data_block_size {
+ 	__le16   num_blocks;
  } __packed;
  
-+#define HCI_OP_GET_MWS_TRANSPORT_CONFIG	0x140c
++#define HCI_OP_READ_LOCAL_CODECS	0x100b
 +
- #define HCI_OP_ENABLE_DUT_MODE		0x1803
- 
- #define HCI_OP_WRITE_SSP_DEBUG_MODE	0x1804
+ #define HCI_OP_READ_PAGE_SCAN_ACTIVITY	0x0c1b
+ struct hci_rp_read_page_scan_activity {
+ 	__u8     status;
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index f3e14103b76b..078f1ecbc058 100644
+index cfcb6055ced8..f3e14103b76b 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1690,6 +1690,10 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
- 	if (hdev->commands[29] & 0x20)
- 		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
+@@ -1686,6 +1686,10 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
+ 	if (hdev->commands[22] & 0x04)
+ 		hci_set_event_mask_page_2(req);
  
-+	/* Get MWS transport configuration if the HCI command is supported */
-+	if (hdev->commands[30] & 0x08)
-+		hci_req_add(req, HCI_OP_GET_MWS_TRANSPORT_CONFIG, 0, NULL);
++	/* Read local codec list if the HCI command is supported */
++	if (hdev->commands[29] & 0x20)
++		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
 +
  	/* Check for Synchronization Train support */
  	if (lmp_sync_train_capable(hdev))
