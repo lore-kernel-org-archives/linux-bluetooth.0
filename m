@@ -1,57 +1,34 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <1406119074.21242.55.camel@pc.interlinx.bc.ca>
-Subject: phone connects and then disconnects immediately
-From: "Brian J. Murrell" <brian@interlinx.bc.ca>
-To: linux-bluetooth@vger.kernel.org
-Date: Wed, 23 Jul 2014 08:37:54 -0400
-Content-Type: multipart/signed; micalg="pgp-sha1"; protocol="application/pgp-signature";
-	boundary="=-2qB53CKVLhwofdunZi2U"
-Mime-Version: 1.0
+From: Dibyendu Roy <dibyendu.roy@samsung.com>
+To: linux-bluetooth@vger.kernel.org, claudio.takahasi@openbossa.org
+Subject: Query regarding gatt server implementation on Tizen
+Date: Wed, 23 Jul 2014 17:29:51 +0530
+Message-id: <003401cfa66d$9ec5c140$dc5143c0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+Hi Claudio,
 
---=-2qB53CKVLhwofdunZi2U
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Greetings!!!  I'm trying  to test bluez-5.20  gatt-server on Tizen.
 
-Hi,
+I have a query regarding gatt server implementation in bluez.
 
-I am using Bluez 5.18 on my Fedora 20 machine and trying to play music
-from my Android (Nexus 4 with KK 4.4.4) phone to the F20 as a Bluetooth
-sink.
+Please let me know how bluez will get the properties exported through
+interfaces mentioned in the bluez doc/gatt-api.txt (org.bluez.GattService1
+etc.).
 
-I have successfully paired the phone and the F20 machine and the phone
-sees it as advertising an Audio Sink but when I try to connect the phone
-bluetoothctl shows the connect immediately followed by a disconnect:
+And is it required to emit the InterfacesAdded/InterfacesRemoved signals
+after exporting interfaces org.bluez.GattService1,
+org.bluez.GattCharacteristic1? 
 
-[CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
-[CHG] Device XX:XX:XX:XX:XX:XX Connected: no
+What does bluez do with those signals in case of gatt-server.
 
-No messages in the syslog to indicate any problems.
+Thanks in advance.
 
-Any ideas why the immediate disconection or next steps to debug?
-
-Cheers,
-b.
+BR-
+Dibyendu Roy
 
 
---=-2qB53CKVLhwofdunZi2U
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v2.0.22 (GNU/Linux)
-
-iQEcBAABAgAGBQJTz6yiAAoJENrB0DQWy8igOZ0H/0UhYwTTag8Tw654B+LMd0n9
-Vld07a1+q8mZ/PosIdmdzxIkiUxF1PD08X5HyqKVYir0sFeaHzF0TaVGTPKbWL84
-ArFzDv4VBem47/xweewazUIFLB0aJ+wqNlDa8jNdN8KHL0WBQKLh9Fs0O2GUl1oy
-rXgnd9cKC5R5udWYMR/HbZ6I+QypfzV2ptYT3ijLqp20m5HnRZ0E0k+qQXcjxGUC
-gWZjCQy+WR8GfDYYexeawgHNV9AYn52wf03KhRyRBNQL37Ndsvu1RRpA6uGJTdw6
-faeHmZRRdev5swUaHdKzjaPz+NGBK+n6fS/yXFa4Phs9BAzToVbON8dGHf+k03c=
-=9fqH
------END PGP SIGNATURE-----
-
---=-2qB53CKVLhwofdunZi2U--
 
