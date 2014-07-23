@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/4] android/client: Fix crash reading not connected SCO
-Date: Wed, 23 Jul 2014 14:34:59 +0300
-Message-Id: <1406115301-18812-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCH 4/4] android/doc: Add Audio SCO HAL documentation
+Date: Wed, 23 Jul 2014 14:35:01 +0300
+Message-Id: <1406115301-18812-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1406115301-18812-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1406115301-18812-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,35 +11,49 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-When SCO is not connected we get -1 from in_read() HAL function.
 ---
- android/client/if-sco.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ android/README | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/android/client/if-sco.c b/android/client/if-sco.c
-index 70e2737..c33b012 100644
---- a/android/client/if-sco.c
-+++ b/android/client/if-sco.c
-@@ -287,7 +287,7 @@ static void *read_thread(void *data)
- {
- 	int (*filbuff_cb) (short*, void*) = feed_from_in;
- 	short buffer[buffer_size_in / sizeof(short)];
--	size_t len = 0;
-+	ssize_t len = 0;
- 	void *cb_data = NULL;
- 	FILE *out = data;
+diff --git a/android/README b/android/README
+index 72b157a..279530c 100644
+--- a/android/README
++++ b/android/README
+@@ -300,6 +300,34 @@ methods:
+ client->set_adv_data               missing kernel support for vendor data
+ client->connect                    is_direct parameter is ignored
  
-@@ -311,6 +311,10 @@ static void *read_thread(void *data)
- 		pthread_mutex_unlock(&state_mutex);
++Audio SCO HAL
++=============
++
++When Bluetooth chip's audio is not wired directly to device audio, Audio SCO
++HAL is used to enable SCO support. It needs to be loaded by AudioFlinger
++following audio_policy.cong configuration. Example of configuration is shown
++below:
++
++...
++  sco {
++    outputs {
++      sco {
++        sampling_rates 8000|44100
++        channel_masks AUDIO_CHANNEL_OUT_STEREO
++        formats AUDIO_FORMAT_PCM_16_BIT
++        devices AUDIO_DEVICE_OUT_ALL_SCO
++      }
++    }
++    inputs {
++      sco {
++        sampling_rates 8000|44100
++        channel_masks AUDIO_CHANNEL_IN_MONO
++        formats AUDIO_FORMAT_PCM_16_BIT
++        devices AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET
++      }
++    }
++  }
++...
  
- 		len = filbuff_cb(buffer, cb_data);
-+		if (len < 0) {
-+			haltest_error("Error receiving SCO data");
-+			break;
-+		}
- 
- 		haltest_info("Read %zd bytes\n", len);
- 
+ Known Android issues
+ ====================
 -- 
 1.9.1
 
