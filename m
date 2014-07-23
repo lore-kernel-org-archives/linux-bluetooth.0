@@ -1,120 +1,83 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] doc: Add support for Identify Device and Cancel Identify Device
-Date: Thu, 24 Jul 2014 00:50:34 +0200
-Message-Id: <1406155834-50603-1-git-send-email-marcel@holtmann.org>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Wed, 23 Jul 2014 19:03:11 -0300
+From: Gustavo Padovan <gustavo@padovan.org>
+To: linville@tuxdriver.com
+Cc: linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: pull request: bluetooth-next 2014-07-23
+Message-ID: <20140723220311.GD1628@joana>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+	protocol="application/pgp-signature"; boundary="DiL7RhKs8rK9YGuF"
+Sender: linux-kernel-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
+
+--DiL7RhKs8rK9YGuF
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+Hi John,
+
+Some last minute fixes for -next. We have a fix for a use after free in
+RFCOMM, another fix to an issue with ADV_DIRECT_IND and one for ADV_IND with
+auto-connection handling.  Last, we added support for reading the codec and
+MWS setting for controllers that support these features.
+
+Please pull! Thanks!
+
+	Gustavo
+
 ---
- doc/mgmt-api.txt | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 93 insertions(+)
+The following changes since commit c2aef6e8cbebd60f79555baeb9266e220f135a44:
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ca5bbc6670fa..42428b507745 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2134,6 +2134,99 @@ Set Public Address Command
- 				Invalid Index
- 
- 
-+Identify Device Command
-+=======================
-+
-+	Command Code:		0x003A
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				IO_Capability (1 Octet)
-+	Return Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+
-+	This command is used to resolve the identity of a remote device
-+	using resolvable private addresses. The IO_Capability command
-+	parameter is used to temporarily (for this command only) override
-+	the global IO Capaility (set using the Set IO Capability command).
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	Possible values for the IO_Capability parameter:
-+		0	DisplayOnly
-+		1	DisplayYesNo
-+		2	KeyboardOnly
-+		3	NoInputNoOutput
-+		4	KeyboardDisplay
-+
-+	The Address and Address_Type of the return parameters will
-+	return the identity address if known. In case of resolvable
-+	random address given as command parameters and the remote
-+	provides an identity resolving key, the return parameters
-+	will provide the resolved address.
-+
-+	To allow tracking of which resolvable random address changed
-+	into which identity address, the New Identity Resolving Key
-+	event will be send before receiving Command Complete event
-+	for this command.
-+
-+	Using Pair Device to bound with a remote device will identify
-+	the device in case it uses resolvable random address. In that
-+	case it is not needed to call this command. It is provided for
-+	the case where a device needs to be identified, but a bonding
-+	using a Long Term Key is not desired.
-+
-+	When using this command to identity a device not using a
-+	resolvable public address, the identity information are
-+	still acquired. However they will match exactly the public
-+	or static address used.
-+
-+	The Connection Signature Resolving Keys are also exchanged
-+	if they are available.
-+
-+	This command can only be used when the controller is powered.
-+
-+	This command generates a Command Complete event on success
-+	or failure.
-+
-+	Possible errors:	Connect Failed
-+				Busy
-+				Invalid Parameters
-+				Not Powered
-+				Invalid Index
-+
-+
-+Cancel Identify Device
-+======================
-+
-+	Command Code:		0x003B
-+	Controller Index:	<controller id>
-+	Command Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+	Return Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+
-+	The Address and Address_Type parameters should match what was
-+	given to a preceding Identity Device command.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	This command can only be used when the controller is powered.
-+
-+	This command generates a Command Complete event on success
-+	or failure.
-+
-+	Possible errors:	Invalid Parameters
-+				Not Powered
-+				Invalid Index
-+
-+
- Command Complete Event
- ======================
- 
--- 
-1.9.3
+  Bluetooth: Add support for Broadcom device of Asus Z97-DELUXE motherboard (2014-07-21 15:07:08 +0300)
 
+are available in the git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+
+for you to fetch changes up to 4b9e7e7516135b1d5f047ad59188b5355bacc106:
+
+  Bluetooth: Fix issue with ADV_IND reports and auto-connection handling (2014-07-24 00:37:23 +0300)
+
+----------------------------------------------------------------
+Marcel Holtmann (4):
+      Bluetooth: Read list of local codecs supported by the controller
+      Bluetooth: Get MWS transport configuration of the controller
+      Bluetooth: Ignore ADV_DIRECT_IND attempts from unknown devices
+      Bluetooth: Fix issue with ADV_IND reports and auto-connection handling
+
+Vignesh Raman (1):
+      Bluetooth: Avoid use of session socket after the session gets freed
+
+ include/net/bluetooth/hci.h      |  4 ++++
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         |  9 +++++++++
+ net/bluetooth/hci_event.c        | 33 ++++++++++++++++++++++++++-------
+ net/bluetooth/mgmt.c             |  9 ++++++---
+ net/bluetooth/rfcomm/core.c      |  7 +++++--
+ 6 files changed, 51 insertions(+), 12 deletions(-)
+
+--DiL7RhKs8rK9YGuF
+Content-Type: application/pgp-signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJT0DEfAAoJEPs3PUX4s20ojjEQALgjJ05wDu6l0B/4OId4SgqF
+Brb1f5+PlDV4to5je968rUqPGUvYP647Swho7fikYDZ+1I1Gm3pnDYSUY6CcTINr
+buiEC++QAVmTbgEazHW1MboLobBeBWuXDlrpl+fZbtOIqgCRM3fYRXQL9LHuA7dB
+t9W52/EGBpjzmFoFABVuVaPzm7GDSVXBPkOQ5/0ilKtr5dU/L4Q2pz0KDfm4p2jn
+msaNNiXy9zGbrvXr23aSm+nYz3KPcw/ABJA5LOdUwTj8pvre/gj4JV8DkCu/xnvA
+WimUUwiUUshDpB38PIVOr9EL+cfKW6DRQfdhXG00Dz2O95dTiEn4X9dE4qeb9fF/
+wv8EfnIsibGQfN3bRm9866garnf1dghQzKTVr7OdDobTE6LWBzvx+siuTis2R9Rf
+2pLVO9z7HtwBalOEpB3bPGVxMJNHsL8cp+cKaM2mXWNaUiR9conT1VQMCnq1FbkH
+zC4BS16USMZmo0KK3nN/UPypVoDRcB5Y9oW7D5Nw3BYjVuZ9kIykEcHJK4LUezWZ
+suxQR243himj1k5iNSI5VAX7EQxVQf+e2gEsmjpeWeoz7M9lSDCZ6CroNtnY9pEM
+PxOY4yShaRzGkp1CLEmD9uEaLlJyzszHShW+BSphOiXsHONmb5jPJHgVyCQhy2vA
+yL+zNO3dOKo405bCfyLm
+=Mxyf
+-----END PGP SIGNATURE-----
+
+--DiL7RhKs8rK9YGuF--
