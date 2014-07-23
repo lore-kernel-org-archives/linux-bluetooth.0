@@ -1,53 +1,38 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Wed, 23 Jul 2014 13:14:13 +0300
-From: Dan Carpenter <dan.carpenter@oracle.com>
-To: johan.hedberg@intel.com
-Cc: linux-bluetooth@vger.kernel.org
-Subject: re: Bluetooth: Don't bother user space without IO capabilities
-Message-ID: <20140723101413.GA24653@mwanda>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+From: Marcin Kraglak <marcin.kraglak@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/2] android/pts: Update PICS for GATT
+Date: Wed, 23 Jul 2014 11:22:24 +0200
+Message-Id: <1406107345-2510-1-git-send-email-marcin.kraglak@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hello Johan Hedberg,
+---
+ android/pics-gatt.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The patch 02f3e2545791: "Bluetooth: Don't bother user space without
-IO capabilities" from Jul 16, 2014, leads to the following static
-checker warning:
+diff --git a/android/pics-gatt.txt b/android/pics-gatt.txt
+index 9cdbe85..0179d6d 100644
+--- a/android/pics-gatt.txt
++++ b/android/pics-gatt.txt
+@@ -29,7 +29,7 @@ C.4: Optional IF TSPC_GATT_1_2 is supported, otherwise Excluded
+ -------------------------------------------------------------------------------
+ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+-TSPC_GATT_2_1	False (*)	Attribute Protocol Supported over BR/EDR
++TSPC_GATT_2_1	True		Attribute Protocol Supported over BR/EDR
+ 					(L2CAP fixed channel support) (C.1)
+ TSPC_GATT_2_2	True		Attribute Protocol Supported over LE (C.2)
+ -------------------------------------------------------------------------------
+@@ -221,7 +221,7 @@ Parameter Name	Selected	Description
+ -------------------------------------------------------------------------------
+ TSPC_GATT_6_2	True		Discover GATT Services using Service Discovery
+ 					Profile (C.1)
+-TSPC_GATT_6_3	False (*)	Publish SDP record for GATT services support
++TSPC_GATT_6_3	True		Publish SDP record for GATT services support
+ 					via BR/EDR (C.2)
+ -------------------------------------------------------------------------------
+ C.1: Mandatory IF TSPC_GATT_1_1 is supported, otherwise Excluded
+-- 
+1.9.3
 
-	net/bluetooth/hci_event.c:3770 hci_user_confirm_request_evt()
-	warn: we tested 'rem_mitm' before and it was 'false'
-
-net/bluetooth/hci_event.c
-  3760          /* If no side requires MITM protection; auto-accept */
-  3761          if ((!loc_mitm || conn->remote_cap == HCI_IO_NO_INPUT_OUTPUT) &&
-  3762              (!rem_mitm || conn->io_capability == HCI_IO_NO_INPUT_OUTPUT)) {
-  3763  
-  3764                  /* If we're not the initiators request authorization to
-  3765                   * proceed from user space (mgmt_user_confirm with
-  3766                   * confirm_hint set to 1). The exception is if neither
-  3767                   * side had MITM or if the local IO capability is
-  3768                   * NoInputNoOutput, in which case we do auto-accept
-  3769                   */
-  3770                  if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) &&
-  3771                      conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
-  3772                      (loc_mitm || rem_mitm)) {
-
-Checking for "conn->io_capability != HCI_IO_NO_INPUT_OUTPUT" implies
-"rem_mitm" is false.  So this could be written as:
-
-			if (!test_bit(HCI_CONN_AUTH_PEND, &conn->flags) &&
-			    conn->io_capability != HCI_IO_NO_INPUT_OUTPUT &&
-			    loc_mitm) {
-
-But it's not totally clear which is more readable.  Feel free to ignore
-this email if you want.  :)
-
-  3773                          BT_DBG("Confirming auto-accept as acceptor");
-  3774                          confirm_hint = 1;
-  3775                          goto confirm;
-  3776                  }
-
-regards,
-dan carpenter
