@@ -1,80 +1,120 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <C4C119D8-6EEA-405E-A6DE-D88A7F471CD9@holtmann.org>
-References: <1405718037-15401-1-git-send-email-armansito@chromium.org>
-	<1405718037-15401-2-git-send-email-armansito@chromium.org>
-	<2774A89A-B2EE-4346-BAD1-DBA0E3014661@holtmann.org>
-	<CAHrH25TprAhCBBOUJZrwDPpttuxXE=+QMBnKL9WpsR_h3g70QQ@mail.gmail.com>
-	<C4C119D8-6EEA-405E-A6DE-D88A7F471CD9@holtmann.org>
-Date: Wed, 23 Jul 2014 15:54:26 -0700
-Message-ID: <CAHrH25R3RAiwHU-PN=DVa-65wWTV807Tz2m0WyfOUH5VSbBC7w@mail.gmail.com>
-Subject: Re: [PATCH 01/11] shared/gatt: Introduce gatt-helpers.h skeleton.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC] doc: Add support for Identify Device and Cancel Identify Device
+Date: Thu, 24 Jul 2014 00:50:34 +0200
+Message-Id: <1406155834-50603-1-git-send-email-marcel@holtmann.org>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+---
+ doc/mgmt-api.txt | 93 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 93 insertions(+)
 
-> I am feeling uneasy about doing it this way. Can we try to start with jus=
-t using a uint8 for the ATT error and see how far that gets us. I have bad =
-experience with overloading values from standards and binary protocols with=
- our own. And I know range wise this is safe (at least at the moment).
->
-> Or for that case we have an extra parameter indicating the success or fai=
-lure of a verified write. It might be better to make it procedure specific =
-instead of generalizing it.
->
-> We do not have to do it all at once. This is why I think we should start =
-just reporting the ATT errors and see how far that gets us. So we learn whi=
-ch are the cases that will actually need special handling.
->
-> For the cases of protocol errors, there is not much point in telling the =
-higher layers about the exact violation. If it happens, you are in trouble.=
- Nothing you do will fix it.
->
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index ca5bbc6670fa..42428b507745 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -2134,6 +2134,99 @@ Set Public Address Command
+ 				Invalid Index
+ 
+ 
++Identify Device Command
++=======================
++
++	Command Code:		0x003A
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				IO_Capability (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++
++	This command is used to resolve the identity of a remote device
++	using resolvable private addresses. The IO_Capability command
++	parameter is used to temporarily (for this command only) override
++	the global IO Capaility (set using the Set IO Capability command).
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	Possible values for the IO_Capability parameter:
++		0	DisplayOnly
++		1	DisplayYesNo
++		2	KeyboardOnly
++		3	NoInputNoOutput
++		4	KeyboardDisplay
++
++	The Address and Address_Type of the return parameters will
++	return the identity address if known. In case of resolvable
++	random address given as command parameters and the remote
++	provides an identity resolving key, the return parameters
++	will provide the resolved address.
++
++	To allow tracking of which resolvable random address changed
++	into which identity address, the New Identity Resolving Key
++	event will be send before receiving Command Complete event
++	for this command.
++
++	Using Pair Device to bound with a remote device will identify
++	the device in case it uses resolvable random address. In that
++	case it is not needed to call this command. It is provided for
++	the case where a device needs to be identified, but a bonding
++	using a Long Term Key is not desired.
++
++	When using this command to identity a device not using a
++	resolvable public address, the identity information are
++	still acquired. However they will match exactly the public
++	or static address used.
++
++	The Connection Signature Resolving Keys are also exchanged
++	if they are available.
++
++	This command can only be used when the controller is powered.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Connect Failed
++				Busy
++				Invalid Parameters
++				Not Powered
++				Invalid Index
++
++
++Cancel Identify Device
++======================
++
++	Command Code:		0x003B
++	Controller Index:	<controller id>
++	Command Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++	Return Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++
++	The Address and Address_Type parameters should match what was
++	given to a preceding Identity Device command.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	This command can only be used when the controller is powered.
++
++	This command generates a Command Complete event on success
++	or failure.
++
++	Possible errors:	Invalid Parameters
++				Not Powered
++				Invalid Index
++
++
+ Command Complete Event
+ ======================
+ 
+-- 
+1.9.3
 
-Now that I look at it, there are 4 errors that I have defined:
-  - UNKNOWN, which is only returned when a malloc fails in a call to
-bt_att_send.
-  - INVALID_RSP, returned when the server sends a malformed PDU
-  - FAILED_ALLOC, returned when a malloc fails in bt_gatt routines/subrouti=
-nes
-  - RELIABLE_WRITE, returned when the reliable write verification fails
-
-The first 3 of these have no good way of recovering from other than
-killing the connection or crashing/exiting and the last one applies to
-only one specific GATT procedure. So I'll go with your suggestion
-here. All existing callback functions will accept a "bool success" and
-a "uint8_t att_ecode" parameter. If att_ecode is 0 but success is
-false, then one of the first 3 conditions above happened. For reliable
-writes I'll add a new callback which also takes in a "bool
-reliable_verified", that if false, indicates that the write failed
-because it couldn't be verified.
-
-The other case that I can think of is the signed write, for which we
-can have a specific callback as well.
-
-Sound good?
-
-
->> I think so. I like to keep these procedures more or less inline with
->> what is defined in the core spec. The distinction between these is
->> simple enough that the upper layer can correctly determine which one
->> to use as needed.
->
-> We can do that of course, but for me the questions is always if it gets r=
-eally used that way. Will any code really make the distinction and care abo=
-ut it. If not, then this is just bloat that makes the higher layers work fo=
-r something they should not.
->
-
-I see value in having these separate routines. I will keep them for
-now, but I'd be happy to remove/revise them later if unifying them
-turns out to be better as the whole thing starts getting clearer as I
-work on it.
-
-Cheers,
-Arman
