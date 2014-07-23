@@ -1,50 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [RFC v1 0/1] doc/gatt-api: New API properties and methods for the GATT D-Bus API.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Read list of local codecs supported by the controller
-Date: Wed, 23 Jul 2014 19:13:24 +0200
-Message-Id: <1406135604-26220-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CAHrH25RpdMCS=eizPUa5S-y0qBHyWQk6co1sJcwAQO9iC0xL=Q@mail.gmail.com>
+Date: Wed, 23 Jul 2014 18:32:56 +0200
+Cc: "Gu, Chao Jie" <chao.jie.gu@intel.com>,
+	BlueZ development <linux-bluetooth@vger.kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>
+Message-Id: <D03CCCE3-51B5-4B3F-AB2D-AA9D766DCCCC@holtmann.org>
+References: <1405986034-29122-1-git-send-email-armansito@chromium.org> <20140722085507.GA29664@t440s.lan> <CAHrH25SR83cXq-xGQz4x7axjcW=CUL_VCcAfhny_RyZ+t0oZ-g@mail.gmail.com> <3D02B219753AD44CBDDDE484323B1774112D121F@SHSMSX104.ccr.corp.intel.com> <CAHrH25RpdMCS=eizPUa5S-y0qBHyWQk6co1sJcwAQO9iC0xL=Q@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-If the Bluetooth controller supports Read Local Supported Codecs
-command, the issue it during initialization so that the list of
-codecs is known.
+Hi Arman,
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- include/net/bluetooth/hci.h | 2 ++
- net/bluetooth/hci_core.c    | 4 ++++
- 2 files changed, 6 insertions(+)
+>> Of course if DBus has these array object of characteristic property, there is more clear and easy for client to get. However, in my opinion, bluez just put out least but enough information in DBus Hierarchy for application to use. Just you said, to add array object property , this could even be a simple boolean property such as "DiscoveryComplete". That would be add more property in DBus, so on the contrary it would not let DBus Hierarchy look simple and clear.
+>> Through the objectAdded and InterfaceAdded Signal, application can acquire this subset of object in fact.
+> 
+> Explain to me how, using only the InterfacesAdded signal, an
+> application can know that all characteristic objects under a service
+> hierarchy have been added? The only way is if the external application
+> already knows about service it's interacting with, which is not the
+> case if you're building a generic application API on top of
+> bluetoothd. Without what I'm proposing, you can't build a generic GATT
+> application API without requiring cumbersome event handling for each
+> service, characteristic, and descriptor object as they get added and
+> have only partial access to these objects in the handlers as the
+> objects are getting processed. This might be fine for low-level
+> applications that interact with D-Bus directly, but for higher level
+> app developers this is a real issue that we want to handle properly
+> and make their lives easier.
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index f0a3d8890760..5d30919eaba9 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1074,6 +1074,8 @@ struct hci_rp_read_data_block_size {
- 	__le16   num_blocks;
- } __packed;
- 
-+#define HCI_OP_READ_LOCAL_CODECS	0x100b
-+
- #define HCI_OP_READ_PAGE_SCAN_ACTIVITY	0x0c1b
- struct hci_rp_read_page_scan_activity {
- 	__u8     status;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cfcb6055ced8..f3e14103b76b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1686,6 +1686,10 @@ static void hci_init4_req(struct hci_request *req, unsigned long opt)
- 	if (hdev->commands[22] & 0x04)
- 		hci_set_event_mask_page_2(req);
- 
-+	/* Read local codec list if the HCI command is supported */
-+	if (hdev->commands[29] & 0x20)
-+		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
-+
- 	/* Check for Synchronization Train support */
- 	if (lmp_sync_train_capable(hdev))
- 		hci_req_add(req, HCI_OP_READ_SYNC_TRAIN_PARAMS, 0, NULL);
--- 
-1.9.3
+since InterfacesAdded is per object path, the extra Characteristics array makes sense. However that really only applies to application passively monitoring the bus objects and properties. The initiator of service discovery should only return from that method call when all other object signals have been send out. Similar to what we are doing with pairing or other potential long run asynchronous method calls.
+
+Regards
+
+Marcel
 
