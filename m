@@ -1,159 +1,68 @@
 Return-Path: <cyrus@holtmann.org>
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [PATCH 01/11] shared/gatt: Introduce gatt-helpers.h skeleton.
 From: Marcel Holtmann <marcel@holtmann.org>
-To: linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: Add support for using controller white list filtering
-Date: Thu, 24 Jul 2014 02:37:53 +0200
-Message-Id: <1406162273-51761-1-git-send-email-marcel@holtmann.org>
+In-Reply-To: <CAHrH25R3RAiwHU-PN=DVa-65wWTV807Tz2m0WyfOUH5VSbBC7w@mail.gmail.com>
+Date: Thu, 24 Jul 2014 01:00:42 +0200
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>
+Message-Id: <9A86525A-DA3F-4113-AEBA-F27A7630F16B@holtmann.org>
+References: <1405718037-15401-1-git-send-email-armansito@chromium.org> <1405718037-15401-2-git-send-email-armansito@chromium.org> <2774A89A-B2EE-4346-BAD1-DBA0E3014661@holtmann.org> <CAHrH25TprAhCBBOUJZrwDPpttuxXE=+QMBnKL9WpsR_h3g70QQ@mail.gmail.com> <C4C119D8-6EEA-405E-A6DE-D88A7F471CD9@holtmann.org> <CAHrH25R3RAiwHU-PN=DVa-65wWTV807Tz2m0WyfOUH5VSbBC7w@mail.gmail.com>
+To: Arman Uguray <armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth controller can use a white list filter when scanning
-to avoid waking up the host for devices that are of no interest.
+Hi Arman,
 
-Devices marked as reporting, direct connection (incoming) or general
-connection are now added to the controller white list. The update of
-the white list happens just before enabling passive scanning.
+>> I am feeling uneasy about doing it this way. Can we try to start with just using a uint8 for the ATT error and see how far that gets us. I have bad experience with overloading values from standards and binary protocols with our own. And I know range wise this is safe (at least at the moment).
+>> 
+>> Or for that case we have an extra parameter indicating the success or failure of a verified write. It might be better to make it procedure specific instead of generalizing it.
+>> 
+>> We do not have to do it all at once. This is why I think we should start just reporting the ATT errors and see how far that gets us. So we learn which are the cases that will actually need special handling.
+>> 
+>> For the cases of protocol errors, there is not much point in telling the higher layers about the exact violation. If it happens, you are in trouble. Nothing you do will fix it.
+>> 
+> 
+> Now that I look at it, there are 4 errors that I have defined:
+>  - UNKNOWN, which is only returned when a malloc fails in a call to
+> bt_att_send.
+>  - INVALID_RSP, returned when the server sends a malformed PDU
+>  - FAILED_ALLOC, returned when a malloc fails in bt_gatt routines/subroutines
+>  - RELIABLE_WRITE, returned when the reliable write verification fails
+> 
+> The first 3 of these have no good way of recovering from other than
+> killing the connection or crashing/exiting and the last one applies to
+> only one specific GATT procedure. So I'll go with your suggestion
+> here. All existing callback functions will accept a "bool success" and
+> a "uint8_t att_ecode" parameter. If att_ecode is 0 but success is
+> false, then one of the first 3 conditions above happened. For reliable
+> writes I'll add a new callback which also takes in a "bool
+> reliable_verified", that if false, indicates that the write failed
+> because it couldn't be verified.
+> 
+> The other case that I can think of is the signed write, for which we
+> can have a specific callback as well.
+> 
+> Sound good?
 
-In case the white list is full and can not hold all devices, the
-white list is not used and the filter policy set to accept all
-advertisements.
+sounds good to me. Please go ahead with it.
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
----
- net/bluetooth/hci_core.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 86 insertions(+), 2 deletions(-)
+>>> I think so. I like to keep these procedures more or less inline with
+>>> what is defined in the core spec. The distinction between these is
+>>> simple enough that the upper layer can correctly determine which one
+>>> to use as needed.
+>> 
+>> We can do that of course, but for me the questions is always if it gets really used that way. Will any code really make the distinction and care about it. If not, then this is just bloat that makes the higher layers work for something they should not.
+>> 
+> 
+> I see value in having these separate routines. I will keep them for
+> now, but I'd be happy to remove/revise them later if unifying them
+> turns out to be better as the whole thing starts getting clearer as I
+> work on it.
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d8f91d5b0e56..543a8e35f702 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3636,6 +3636,13 @@ int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
- 	if (params->auto_connect == auto_connect)
- 		return 0;
- 
-+	/* Update setting for auto_connect so that when updating
-+	 * the white list, the correct values are available. Any
-+	 * changes to the controller white list will happen just
-+	 * before enabling passive scanning.
-+	 */
-+	params->auto_connect = auto_connect;
-+
- 	list_del_init(&params->action);
- 
- 	switch (auto_connect) {
-@@ -3656,8 +3663,6 @@ int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
- 		break;
- 	}
- 
--	params->auto_connect = auto_connect;
--
- 	BT_DBG("addr %pMR (type %u) auto_connect %u", addr, addr_type,
- 	       auto_connect);
- 
-@@ -5406,12 +5411,84 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
- 
-+static u8 update_white_list(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_conn_params *params;
-+	struct bdaddr_list *b;
-+	uint8_t white_list_entries = 0;
-+
-+	/* Go through the current white list programmed into the
-+	 * controller one by one and check if that address is still
-+	 * in the list of devices. If not present then queue the
-+	 * command to remove it from the controller.
-+	 */
-+	list_for_each_entry(b, &hdev->le_white_list, list) {
-+		struct hci_cp_le_del_from_white_list cp;
-+
-+		params = hci_conn_params_lookup(hdev, &b->bdaddr,
-+						b->bdaddr_type);
-+		if (params) {
-+			if (params->auto_connect == HCI_AUTO_CONN_REPORT ||
-+			    params->auto_connect == HCI_AUTO_CONN_DIRECT ||
-+			    params->auto_connect == HCI_AUTO_CONN_ALWAYS) {
-+				white_list_entries++;
-+				continue;
-+			}
-+		}
-+
-+		cp.bdaddr_type = b->bdaddr_type;
-+		bacpy(&cp.bdaddr, &b->bdaddr);
-+
-+		hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
-+			    sizeof(cp), &cp);
-+	}
-+
-+	/* Since all no longer valid white list entries have been
-+	 * removed, walk through the list of devices and ensure
-+	 * that any new device gets programmed into the controller.
-+	 *
-+	 * If the list of the devices is larger than the list of
-+	 * available white list entries in the controller, then
-+	 * just abort and return filer policy value to not use the
-+	 * white list.
-+	 */
-+	list_for_each_entry(params, &hdev->le_conn_params, list) {
-+		struct hci_cp_le_add_to_white_list cp;
-+
-+		if (params->auto_connect != HCI_AUTO_CONN_REPORT &&
-+		    params->auto_connect != HCI_AUTO_CONN_DIRECT &&
-+		    params->auto_connect != HCI_AUTO_CONN_ALWAYS)
-+			continue;
-+
-+		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
-+					   &params->addr, params->addr_type))
-+			continue;
-+
-+		if (white_list_entries >= hdev->le_white_list_size) {
-+			/* Select filter policy to accept all advertising */
-+			return 0x00;
-+		}
-+
-+		white_list_entries++;
-+
-+		cp.bdaddr_type = params->addr_type;
-+		bacpy(&cp.bdaddr, &params->addr);
-+
-+		hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
-+	}
-+
-+	/* Select filter policy to use white list */
-+	return 0x01;
-+}
-+
- void hci_req_add_le_passive_scan(struct hci_request *req)
- {
- 	struct hci_cp_le_set_scan_param param_cp;
- 	struct hci_cp_le_set_scan_enable enable_cp;
- 	struct hci_dev *hdev = req->hdev;
- 	u8 own_addr_type;
-+	u8 filter_policy;
- 
- 	/* Set require_privacy to false since no SCAN_REQ are send
- 	 * during passive scanning. Not using an unresolvable address
-@@ -5422,11 +5499,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 	if (hci_update_random_address(req, false, &own_addr_type))
- 		return;
- 
-+	/* Adding or removing entries from the white list must
-+	 * happen before enabling scanning. The controller does
-+	 * not allow white list modification while scanning.
-+	 */
-+	filter_policy = update_white_list(req);
-+
- 	memset(&param_cp, 0, sizeof(param_cp));
- 	param_cp.type = LE_SCAN_PASSIVE;
- 	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
- 	param_cp.window = cpu_to_le16(hdev->le_scan_window);
- 	param_cp.own_address_type = own_addr_type;
-+	param_cp.filter_policy = filter_policy;
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
- 		    &param_cp);
- 
--- 
-1.9.3
+Fair enough.
+
+Regards
+
+Marcel
 
