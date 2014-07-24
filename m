@@ -1,77 +1,156 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-In-Reply-To: <20140724100820.GA13332@t440s.lan>
-References: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
-	<20140724083116.GB9891@t440s.lan>
-	<45F17F5803927D43967AFEED068E781E0879ACDB@CAMEUREXM02.EUROPE.ROOT.PRI>
-	<20140724100820.GA13332@t440s.lan>
-Date: Thu, 24 Jul 2014 17:12:05 +0200
-Message-ID: <CANq1E4QBGf68iHuhLX8SX4A=Rokg4p6OWpgY1hMKhnJvze4PGA@mail.gmail.com>
-Subject: Re: Bluetooth Low Energy service crash report - when trying read a
- HID feature report
-From: David Herrmann <dh.herrmann@gmail.com>
-To: Murat Kilivan <Murat.Kilivan@csr.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+From: Marcel Holtmann <marcel@holtmann.org>
+To: linux-bluetooth@vger.kernel.org
+Subject: [RFC v4 1/2] Bluetooth: Add support for using controller white list filtering
+Date: Thu, 24 Jul 2014 15:20:57 +0200
+Message-Id: <1406208058-15299-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi
+The Bluetooth controller can use a white list filter when scanning
+to avoid waking up the host for devices that are of no interest.
 
-On Thu, Jul 24, 2014 at 12:08 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
-> Hi Murat,
->
-> On Thu, Jul 24, 2014, Murat Kilivan wrote:
->> ==10991== Process terminating with default action of signal 5 (SIGTRAP)
->> ==10991==    at 0x40A340A: g_logv (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==    by 0x40A3522: g_log (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==    by 0x40A1C1D: g_malloc (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==    by 0x40B9E75: g_memdup (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==    by 0x80781C5: gatt_write_char (gatt.c:900)
->> ==10991==    by 0x8072A7B: forward_report (hog.c:368)
->> ==10991==    by 0x80A5B0D: queue_foreach (queue.c:206)
->> ==10991==    by 0x807208E: uhid_read_handler (uhid.c:98)
->> ==10991==    by 0x80A53F2: read_callback (io-glib.c:168)
->> ==10991==    by 0x40E1E04: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==    by 0x409C0A6: g_main_context_dispatch (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==    by 0x409C467: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991== Invalid free() / delete / delete[] / realloc()
->> ==10991==    at 0x402B3D8: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
->> ==10991==    by 0x4304F54: __libc_freeres (in /lib/i386-linux-gnu/libc-2.19.so)
->> ==10991==    by 0x4024526: _vgnU_freeres (in /usr/lib/valgrind/vgpreload_core-x86-linux.so)
->> ==10991==    by 0x40E4F6D: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->> ==10991==  Address 0xffffffff is not stack'd, malloc'd or (recently) free'd
->
-> This helps a lot. Thanks. I'd bet the following code from forward_report() is
-> responsible:
->
->         if (hogdev->has_report_id) {
->                 data = ev->u.output.data + 1;
->                 size = ev->u.output.size - 1;
->         } else {
->                 data = ev->u.output.data;
->                 size = ev->u.output.size;
->         }
+Devices marked as reporting, direct connection (incoming) or general
+connection are now added to the controller white list. The update of
+the white list happens just before enabling passive scanning.
 
-The kernel bails out if size==0, so this never happens. The bt_uhid_*
-helpers are fine, however, hog.c forward_report() is totally broken.
-You use:
+In case the white list is full and can not hold all devices, the
+white list is not used and the filter policy set to accept all
+advertisements.
 
-bt_uhid_register(hogdev->uhid, UHID_OUTPUT, forward_report, hogdev);
-bt_uhid_register(hogdev->uhid, UHID_FEATURE, forward_report, hogdev);
+Using the white list for scanning allows for power saving with
+controllers that do not handle the duplicate filtering correctly.
 
-Therefore, you register *THE SAME* handler for UHID_OUTPUT *AND*
-UHID_FEATURE. However, in forward_report() you access ev->u.output,
-but this is only valid for UHID_OUTPUT. If you get a UHID_FEATURE
-report you must never access anything but ev->u.feature!
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/hci_core.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 96 insertions(+)
 
-Furthermore, if you receive UHID_FEATURE, the kernel blocks until you
-send the answer as UHID_FEATURE_ANSWER. I really recommend dropping
-this line:
-    bt_uhid_register(hogdev->uhid, UHID_FEATURE, forward_report, hogdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index d8f91d5b0e56..ecff30ab22a0 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -5406,12 +5406,101 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
+ }
+ 
++static void add_to_white_list(struct hci_request *req,
++			      struct hci_conn_params *params)
++{
++	struct hci_cp_le_add_to_white_list cp;
++
++	cp.bdaddr_type = params->addr_type;
++	bacpy(&cp.bdaddr, &params->addr);
++
++	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
++}
++
++static u8 update_white_list(struct hci_request *req)
++{
++	struct hci_dev *hdev = req->hdev;
++	struct hci_conn_params *params;
++	struct bdaddr_list *b;
++	uint8_t white_list_entries = 0;
++
++	/* Go through the current white list programmed into the
++	 * controller one by one and check if that address is still
++	 * in the list of pending connections or list of devices to
++	 * report. If not present in either list, then queue the
++	 * command to remove it from the controller.
++	 */
++	list_for_each_entry(b, &hdev->le_white_list, list) {
++		struct hci_cp_le_del_from_white_list cp;
++
++		if (hci_pend_le_action_lookup(&hdev->pend_le_conns,
++					      &b->bdaddr, b->bdaddr_type) ||
++		    hci_pend_le_action_lookup(&hdev->pend_le_reports,
++					      &b->bdaddr, b->bdaddr_type)) {
++			white_list_entries++;
++			continue;
++		}
++
++		cp.bdaddr_type = b->bdaddr_type;
++		bacpy(&cp.bdaddr, &b->bdaddr);
++
++		hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
++			    sizeof(cp), &cp);
++	}
++
++	/* Since all no longer valid white list entries have been
++	 * removed, walk through the list of pending connections
++	 * and ensure that any new device gets programmed into
++	 * the controller.
++	 *
++	 * If the list of the devices is larger than the list of
++	 * available white list entries in the controller, then
++	 * just abort and return filer policy value to not use the
++	 * white list.
++	 */
++	list_for_each_entry(params, &hdev->pend_le_conns, action) {
++		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
++					   &params->addr, params->addr_type))
++			continue;
++
++		if (white_list_entries >= hdev->le_white_list_size) {
++			/* Select filter policy to accept all advertising */
++			return 0x00;
++		}
++
++		white_list_entries++;
++		add_to_white_list(req, params);
++	}
++
++	/* After adding all new pending connections, walk through
++	 * the list of pending reports and also add these to the
++	 * white list if there is still space.
++	 */
++	list_for_each_entry(params, &hdev->pend_le_reports, action) {
++		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
++					   &params->addr, params->addr_type))
++			continue;
++
++		if (white_list_entries >= hdev->le_white_list_size) {
++			/* Select filter policy to accept all advertising */
++			return 0x00;
++		}
++
++		white_list_entries++;
++		add_to_white_list(req, params);
++	}
++
++	/* Select filter policy to use white list */
++	return 0x01;
++}
++
+ void hci_req_add_le_passive_scan(struct hci_request *req)
+ {
+ 	struct hci_cp_le_set_scan_param param_cp;
+ 	struct hci_cp_le_set_scan_enable enable_cp;
+ 	struct hci_dev *hdev = req->hdev;
+ 	u8 own_addr_type;
++	u8 filter_policy;
+ 
+ 	/* Set require_privacy to false since no SCAN_REQ are send
+ 	 * during passive scanning. Not using an unresolvable address
+@@ -5422,11 +5511,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	if (hci_update_random_address(req, false, &own_addr_type))
+ 		return;
+ 
++	/* Adding or removing entries from the white list must
++	 * happen before enabling scanning. The controller does
++	 * not allow white list modification while scanning.
++	 */
++	filter_policy = update_white_list(req);
++
+ 	memset(&param_cp, 0, sizeof(param_cp));
+ 	param_cp.type = LE_SCAN_PASSIVE;
+ 	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
+ 	param_cp.window = cpu_to_le16(hdev->le_scan_window);
+ 	param_cp.own_address_type = own_addr_type;
++	param_cp.filter_policy = filter_policy;
+ 	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
+ 		    &param_cp);
+ 
+-- 
+1.9.3
 
-Add it again once you implemented UHID_FEATURE properly. Currently,
-it's totally broken.
-
-Thanks
-David
