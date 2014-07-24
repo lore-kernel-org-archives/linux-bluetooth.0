@@ -1,40 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Jul 2014 11:31:16 +0300
+Date: Thu, 24 Jul 2014 11:16:59 +0300
 From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Murat Kilivan <Murat.Kilivan@csr.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluetooth Low Energy service crash report - when trying read a
- HID feature report
-Message-ID: <20140724083116.GB9891@t440s.lan>
-References: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
+To: "Brian J. Murrell" <brian@interlinx.bc.ca>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: phone connects and then disconnects immediately
+Message-ID: <20140724081659.GA9891@t440s.lan>
+References: <1406119074.21242.55.camel@pc.interlinx.bc.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
+In-Reply-To: <1406119074.21242.55.camel@pc.interlinx.bc.ca>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Murat,
+Hi Brian,
 
-On Wed, Jul 23, 2014, Murat Kilivan wrote:
-> I have successfully connected to a BLE HID (peripheral) device and /dev/hidraw1 file is created. I am able to read raw data successfully from hidraw1. However, when I try to read a feature report from this device, the Bluetooth service crashes. The bluetooth service log and my source code are below.
+On Wed, Jul 23, 2014, Brian J. Murrell wrote:
+> I am using Bluez 5.18 on my Fedora 20 machine and trying to play music
+> from my Android (Nexus 4 with KK 4.4.4) phone to the F20 as a Bluetooth
+> sink.
 > 
-> Enviroments:
-> ------------
-> Linux Mint-17 KDE
-> Kernel 3.13.0-24-generic
-> BlueZ 5.21
+> I have successfully paired the phone and the F20 machine and the phone
+> sees it as advertising an Audio Sink but when I try to connect the phone
+> bluetoothctl shows the connect immediately followed by a disconnect:
 > 
-> Output of Bluetooth service:
-> ----------------------------
-> # bluetooth -d -n
-> ...
-> ...
-> bluetoothd[2610]: profiles/input/hog.c:forward_report() Sending report type 3 to device 0x000C handle 0x1C
-> (bluetoothd:2610): GLib-ERROR **: /build/buildd/glib2.0-2.40.0/./glib/gmem.c:103: failed to allocate 4294967295 bytes
+> [CHG] Device XX:XX:XX:XX:XX:XX Connected: yes
+> [CHG] Device XX:XX:XX:XX:XX:XX Connected: no
+> 
+> No messages in the syslog to indicate any problems.
+> 
+> Any ideas why the immediate disconection or next steps to debug?
 
-4294967295 is the same as (uint32_t) -1 so seems like there might be a
-missing error check somewhere. Could you please try to get the full
-bluetoothd backtrace by running it through gdb or valgrind? If possible
-do this with the latest git version.
+To analyze the matter further we'd need to get bluetoothd debug logs
+(for which you need to pass -d to the daemon) as well as HCI-level logs
+(e.g. using btmon) of this connection failure.
 
 Johan
