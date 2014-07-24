@@ -1,152 +1,112 @@
 Return-Path: <cyrus@holtmann.org>
-From: Vikrampal <vikram.pal@samsung.com>
-To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org,
-	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
-	p.sinha@samsung.com, sanjay.nm@samsung.com,
-	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
-References: <1406026672-3127-1-git-send-email-vikram.pal@samsung.com>
- <CABBYNZ+dyL0qUiGKDFfLHH1nDGMuopYyJ8XD0MRfEqc2yJdq7w@mail.gmail.com>
-In-reply-to: <CABBYNZ+dyL0qUiGKDFfLHH1nDGMuopYyJ8XD0MRfEqc2yJdq7w@mail.gmail.com>
-Subject: RE: [PATCH ] monitor: Add AVCTP support to btmon
-Date: Thu, 24 Jul 2014 15:32:24 +0530
-Message-id: <006b01cfa726$5f53ff90$1dfbfeb0$@samsung.com>
+From: Bharat Bhusan Panda <bharat.panda@samsung.com>
+To: 'Johan Hedberg' <johan.hedberg@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org, cpgs@samsung.com
+References: <1405934433-29723-1-git-send-email-bharat.panda@samsung.com>
+ <20140721094355.GA29317@t440s.lan>
+ <00c501cfa4d9$77fc36b0$67f4a410$@samsung.com>
+ <20140722080045.GC25167@t440s.lan>
+In-reply-to: <20140722080045.GC25167@t440s.lan>
+Subject: RE: [PATCH ] tools: Add unregister gatt service
+Date: Thu, 24 Jul 2014 14:38:39 +0530
+Message-id: <00e101cfa71e$dc9cba30$95d62e90$@samsung.com>
 MIME-version: 1.0
-Content-type: text/plain; charset=utf-8
+Content-type: text/plain; charset=us-ascii
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Luiz,
+Hi Johan,
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
-> Sent: Thursday, July 24, 2014 1:41 PM
-> To: Vikrampal Yadav
-> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin;
-> p.sinha@samsung.com; sanjay.nm@samsung.com; Bharat Panda;
-> cpgs@samsung.com
-> Subject: Re: [PATCH ] monitor: Add AVCTP support to btmon
-> 
-> Hi,
-> 
-> On Tue, Jul 22, 2014 at 1:57 PM, Vikrampal Yadav
-> <vikram.pal@samsung.com> wrote:
-> > Support for decoding AVCTP packets added in Bluetooth monitor.
-> > ---
-> >  monitor/l2cap.c | 64
-> > +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 64 insertions(+)
+> > > > +static int id;
+> > > > +
+> > > >  struct characteristic {
+> > > >  	char *uuid;
+> > > >  	char *path;
+> > > > @@ -332,10 +334,10 @@ static gboolean
+> > > > register_characteristic(const char *chr_uuid,
+> > > >
+> > > >  static char *register_service(const char *uuid)  {
+> > > > -	static int id = 1;
+> > >
+> > > Making id public looks unnecessary to me since after the
+> > > registration you've got the path which you can pass to the
+> > > unregistration procedure.
 > >
-> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index 993aa8b..3475263
-> > 100644
-> > --- a/monitor/l2cap.c
-> > +++ b/monitor/l2cap.c
-> > @@ -2220,6 +2220,66 @@ static void att_packet(uint16_t index, bool in,
-> uint16_t handle,
-> >         opcode_data->func(&frame);
-> >  }
+> > The id was made public, because service path was not public. We need
+> > to make either id or service path as public to unregister interface
+> > path.
+> 
+> Can't you just pass it as user_data to unregister_external_service_reply?
+
+Yes, I will modify it accordingly.
+> 
+> > > >  static gboolean signal_handler(GIOChannel *channel, GIOCondition
+> cond,
+> > > >  							gpointer
+user_data)
+> > > >  {
+> > > > @@ -524,6 +596,7 @@ int main(int argc, char *argv[])
+> > > >  	client = g_dbus_client_new(connection, "org.bluez",
+> > > > "/org/bluez");
+> > > >
+> > > >  	g_dbus_client_set_connect_watch(client, connect_handler,
+NULL);
+> > > > +	g_dbus_client_set_disconnect_watch(client,
+disconnect_handler,
+> > > > +NULL);
+> > >
+> > > When exactly would disconnect_handler be called in practice? At
+> > > least one case seems to be if bluetoothd exits in which case it
+> > > seems quite wasteful to try to make any method calls to a
+> > > non-existing service. What other scenarios would disconnect_handler
+> > > be called in?
 > >
-> > +static void avrcp_control_packet(const struct l2cap_frame *frame) { }
-> > +
-> > +static void avrcp_browsing_packet(const struct l2cap_frame *frame,
-> > +uint8_t hdr) { }
+> > On running the gatt-service, it registers the service and updates gatt
+> > db with the service path.
+> > On exiting the gatt-service, it should call "UnregisterService" and
+> > clear the gatt service db.
 > 
-> Please use avctp prefix while processing AVCTP part of the packets.
+> How exactly does gatt-service exit? If it stops iterating the main loop
+your D-
+> Bus reply callback would never get called and most of the new code you're
+> adding would never get run.
 
-The above function skeleton is meant for AVRCP decoding. Otherwise, I've used
-avctp prefix while processing AVCTP part of the packets.
-
-> 
-> > +static void avrcp_packet(const struct l2cap_frame *frame, uint8_t hdr,
-> > +                               uint16_t psm) {
-> > +        switch (psm) {
-> > +                case 0x17:
-> > +                        avrcp_control_packet(frame);
-> > +                        break;
-> > +                case 0x1B:
-> > +                        avrcp_browsing_packet(frame, hdr);
-> > +                        break;
-> > +                default:
-> > +                        packet_hexdump(frame->data, frame->size);
-> > +        }
-> > +}
-> 
-> Here as well.
-
-The above function skeleton is meant for AVRCP decoding. Otherwise, I've used
-avctp prefix while processing AVCTP part of the packets.
+The gatt-service exits on IO interrupts, I have checked gatt-dbus.c, it
+cleans up the client db on client disconnect.
+So there should not be any disconnect handler for the same in
+gatt-service.c. 
 
 > 
-> > +static void avctp_packet(const struct l2cap_frame *frame, uint16_t
-> > +psm) {
-> > +        uint8_t hdr;
-> > +        uint16_t pid;
-> > +        struct l2cap_frame avctp_frame;
-> > +        const char *pdu_color;
-> > +
-> > +        if (frame->size < 3) {
-> > +                print_text(COLOR_ERROR, "frame too short");
-> > +                packet_hexdump(frame->data, frame->size);
-> > +                return;
-> > +        }
-> > +
-> > +        hdr = *((uint8_t *) frame->data);
-> > +
-> > +        pid = get_be16(frame->data + 1);
-> > +
-> > +        if (frame->in)
-> > +                pdu_color = COLOR_MAGENTA;
-> > +        else
-> > +                pdu_color = COLOR_BLUE;
-> > +
-> > +        print_indent(6, pdu_color, "AVCTP", "", COLOR_OFF,
-> > +                        " %s: %s: Packet_type 0x%02x Transaction label %d "
-> > +                        "PID 0x%04x",
-> > +                        psm == 23 ? "Control" : "Browsing",
-> > +                        hdr & 0x02 ? "Response" : "Command",
-> > +                        hdr & 0x0c, hdr >> 4, pid);
-> > +
-> > +        l2cap_frame_pull(&avctp_frame, frame, 3);
-> > +
-> > +        if (pid == 0x110e || pid == 0x110c)
-> > +                avrcp_packet(&avctp_frame, hdr, psm);
-> > +        else
-> > +                packet_hexdump(frame->data + 3, frame->size - 3); }
-> > +
-> >  static void print_addr(const uint8_t *addr, uint8_t addr_type)  {
-> >         const char *str;
-> > @@ -2634,6 +2694,10 @@ static void l2cap_frame(uint16_t index, bool in,
-> uint16_t handle,
-> >                 case 0x001f:
-> >                         att_packet(index, in, handle, cid, data, size);
-> >                         break;
-> > +               case 0x0017:
-> > +               case 0x001B:
-> > +                       avctp_packet(&frame, psm);
-> > +                       break;
-> >                 default:
-> >                         packet_hexdump(data, size);
-> >                         break;
+> > Otherwise, on next run of gatt-service, when it registers the same
+> > service path, it gets an error, service already exists.
 > 
-> Perhaps we should split this into avctp.c to keep l2cap.c just for L2CAP layer,
-> otherwise this file will grow quite big.
+> bluetoothd should monitor all of its clients and clean up after them if
+they
+> exit without unregistering. If that's not happening then it's a bug that's
+much
+> more important to fix than what you're trying to do here. A quick look at
+> src/gatt-dbus.c shows that it's at least trying to clean up, but maybe
+there's a
+> bug somewhere there.
+To register and unregister multiple services, if gatt-service can be
+modified so that it provides choice to user for registering/unregistering
+multiple time.
+Please suggest, if we can add switch case options to iterate through
+resgister/unregister service as per the data input to gatt-service.
 
-Ok, I'll do that and submit again. Thanks!
+#gatt-service
+Usage: gatt-service [Register/Unregister] [options]
 
-> 
-> > --
-> > 1.9.1
-> >
-> > --
-> > To unsubscribe from this list: send the line "unsubscribe
-> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
-> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
-> 
-> 
-> 
-> --
-> Luiz Augusto von Dentz
-
-Regards,
-Vikram
+Options:
+	Service_UUID
+	Included_serv_UUID
+	Char_UUID
+	Char value
+	Desc UUID
+	Desc value
+Unregister:
+	Service_UUID
+ 
+Best Regards,
+Bharat
 
