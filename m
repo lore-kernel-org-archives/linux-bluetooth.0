@@ -1,65 +1,152 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Thu, 24 Jul 2014 13:08:20 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Murat Kilivan <Murat.Kilivan@csr.com>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: Bluetooth Low Energy service crash report - when trying read a
- HID feature report
-Message-ID: <20140724100820.GA13332@t440s.lan>
-References: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
- <20140724083116.GB9891@t440s.lan>
- <45F17F5803927D43967AFEED068E781E0879ACDB@CAMEUREXM02.EUROPE.ROOT.PRI>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <45F17F5803927D43967AFEED068E781E0879ACDB@CAMEUREXM02.EUROPE.ROOT.PRI>
+From: Vikrampal <vikram.pal@samsung.com>
+To: 'Luiz Augusto von Dentz' <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	'Dmitry Kasatkin' <d.kasatkin@samsung.com>,
+	p.sinha@samsung.com, sanjay.nm@samsung.com,
+	'Bharat Panda' <bharat.panda@samsung.com>, cpgs@samsung.com
+References: <1406026672-3127-1-git-send-email-vikram.pal@samsung.com>
+ <CABBYNZ+dyL0qUiGKDFfLHH1nDGMuopYyJ8XD0MRfEqc2yJdq7w@mail.gmail.com>
+In-reply-to: <CABBYNZ+dyL0qUiGKDFfLHH1nDGMuopYyJ8XD0MRfEqc2yJdq7w@mail.gmail.com>
+Subject: RE: [PATCH ] monitor: Add AVCTP support to btmon
+Date: Thu, 24 Jul 2014 15:32:24 +0530
+Message-id: <006b01cfa726$5f53ff90$1dfbfeb0$@samsung.com>
+MIME-version: 1.0
+Content-type: text/plain; charset=utf-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Murat,
+Hi Luiz,
 
-On Thu, Jul 24, 2014, Murat Kilivan wrote:
-> ==10991== Process terminating with default action of signal 5 (SIGTRAP)
-> ==10991==    at 0x40A340A: g_logv (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==    by 0x40A3522: g_log (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==    by 0x40A1C1D: g_malloc (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==    by 0x40B9E75: g_memdup (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==    by 0x80781C5: gatt_write_char (gatt.c:900)
-> ==10991==    by 0x8072A7B: forward_report (hog.c:368)
-> ==10991==    by 0x80A5B0D: queue_foreach (queue.c:206)
-> ==10991==    by 0x807208E: uhid_read_handler (uhid.c:98)
-> ==10991==    by 0x80A53F2: read_callback (io-glib.c:168)
-> ==10991==    by 0x40E1E04: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==    by 0x409C0A6: g_main_context_dispatch (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==    by 0x409C467: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991== Invalid free() / delete / delete[] / realloc()
-> ==10991==    at 0x402B3D8: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
-> ==10991==    by 0x4304F54: __libc_freeres (in /lib/i386-linux-gnu/libc-2.19.so)
-> ==10991==    by 0x4024526: _vgnU_freeres (in /usr/lib/valgrind/vgpreload_core-x86-linux.so)
-> ==10991==    by 0x40E4F6D: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==10991==  Address 0xffffffff is not stack'd, malloc'd or (recently) free'd
+> -----Original Message-----
+> From: Luiz Augusto von Dentz [mailto:luiz.dentz@gmail.com]
+> Sent: Thursday, July 24, 2014 1:41 PM
+> To: Vikrampal Yadav
+> Cc: linux-bluetooth@vger.kernel.org; Dmitry Kasatkin;
+> p.sinha@samsung.com; sanjay.nm@samsung.com; Bharat Panda;
+> cpgs@samsung.com
+> Subject: Re: [PATCH ] monitor: Add AVCTP support to btmon
+> 
+> Hi,
+> 
+> On Tue, Jul 22, 2014 at 1:57 PM, Vikrampal Yadav
+> <vikram.pal@samsung.com> wrote:
+> > Support for decoding AVCTP packets added in Bluetooth monitor.
+> > ---
+> >  monitor/l2cap.c | 64
+> > +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 64 insertions(+)
+> >
+> > diff --git a/monitor/l2cap.c b/monitor/l2cap.c index 993aa8b..3475263
+> > 100644
+> > --- a/monitor/l2cap.c
+> > +++ b/monitor/l2cap.c
+> > @@ -2220,6 +2220,66 @@ static void att_packet(uint16_t index, bool in,
+> uint16_t handle,
+> >         opcode_data->func(&frame);
+> >  }
+> >
+> > +static void avrcp_control_packet(const struct l2cap_frame *frame) { }
+> > +
+> > +static void avrcp_browsing_packet(const struct l2cap_frame *frame,
+> > +uint8_t hdr) { }
+> 
+> Please use avctp prefix while processing AVCTP part of the packets.
 
-This helps a lot. Thanks. I'd bet the following code from forward_report() is
-responsible:
+The above function skeleton is meant for AVRCP decoding. Otherwise, I've used
+avctp prefix while processing AVCTP part of the packets.
 
-        if (hogdev->has_report_id) {
-                data = ev->u.output.data + 1;
-                size = ev->u.output.size - 1;
-        } else {
-                data = ev->u.output.data;
-                size = ev->u.output.size;
-        }
+> 
+> > +static void avrcp_packet(const struct l2cap_frame *frame, uint8_t hdr,
+> > +                               uint16_t psm) {
+> > +        switch (psm) {
+> > +                case 0x17:
+> > +                        avrcp_control_packet(frame);
+> > +                        break;
+> > +                case 0x1B:
+> > +                        avrcp_browsing_packet(frame, hdr);
+> > +                        break;
+> > +                default:
+> > +                        packet_hexdump(frame->data, frame->size);
+> > +        }
+> > +}
+> 
+> Here as well.
 
-You could add some debug logs there to be completely certain, but I have
-a feeling the first branch is taken and ev->u.output.size is 0, giving
-us the "0 - 1" value which you see in the failed memory allocation.
+The above function skeleton is meant for AVRCP decoding. Otherwise, I've used
+avctp prefix while processing AVCTP part of the packets.
 
-Now the question is what the right fix is. Should the if-statement
-instead be as follows:
+> 
+> > +static void avctp_packet(const struct l2cap_frame *frame, uint16_t
+> > +psm) {
+> > +        uint8_t hdr;
+> > +        uint16_t pid;
+> > +        struct l2cap_frame avctp_frame;
+> > +        const char *pdu_color;
+> > +
+> > +        if (frame->size < 3) {
+> > +                print_text(COLOR_ERROR, "frame too short");
+> > +                packet_hexdump(frame->data, frame->size);
+> > +                return;
+> > +        }
+> > +
+> > +        hdr = *((uint8_t *) frame->data);
+> > +
+> > +        pid = get_be16(frame->data + 1);
+> > +
+> > +        if (frame->in)
+> > +                pdu_color = COLOR_MAGENTA;
+> > +        else
+> > +                pdu_color = COLOR_BLUE;
+> > +
+> > +        print_indent(6, pdu_color, "AVCTP", "", COLOR_OFF,
+> > +                        " %s: %s: Packet_type 0x%02x Transaction label %d "
+> > +                        "PID 0x%04x",
+> > +                        psm == 23 ? "Control" : "Browsing",
+> > +                        hdr & 0x02 ? "Response" : "Command",
+> > +                        hdr & 0x0c, hdr >> 4, pid);
+> > +
+> > +        l2cap_frame_pull(&avctp_frame, frame, 3);
+> > +
+> > +        if (pid == 0x110e || pid == 0x110c)
+> > +                avrcp_packet(&avctp_frame, hdr, psm);
+> > +        else
+> > +                packet_hexdump(frame->data + 3, frame->size - 3); }
+> > +
+> >  static void print_addr(const uint8_t *addr, uint8_t addr_type)  {
+> >         const char *str;
+> > @@ -2634,6 +2694,10 @@ static void l2cap_frame(uint16_t index, bool in,
+> uint16_t handle,
+> >                 case 0x001f:
+> >                         att_packet(index, in, handle, cid, data, size);
+> >                         break;
+> > +               case 0x0017:
+> > +               case 0x001B:
+> > +                       avctp_packet(&frame, psm);
+> > +                       break;
+> >                 default:
+> >                         packet_hexdump(data, size);
+> >                         break;
+> 
+> Perhaps we should split this into avctp.c to keep l2cap.c just for L2CAP layer,
+> otherwise this file will grow quite big.
 
-	if (hogdev->has_report_id && ev->u.output.size > 0)
-		...
+Ok, I'll do that and submit again. Thanks!
 
-Could you try modifying your code base to verify that this is indeed the
-cause of the crash? Thanks.
+> 
+> > --
+> > 1.9.1
+> >
+> > --
+> > To unsubscribe from this list: send the line "unsubscribe
+> > linux-bluetooth" in the body of a message to majordomo@vger.kernel.org
+> > More majordomo info at  http://vger.kernel.org/majordomo-info.html
+> 
+> 
+> 
+> --
+> Luiz Augusto von Dentz
 
-Johan
+Regards,
+Vikram
+
