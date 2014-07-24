@@ -1,90 +1,41 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v4 2/2] Bluetooth: Fix white list handling with resolvable private addresses
-Date: Thu, 24 Jul 2014 15:20:58 +0200
-Message-Id: <1406208058-15299-2-git-send-email-marcel@holtmann.org>
+Subject: [PATCH] android/client: Set default handsfree mode for host
+Date: Thu, 24 Jul 2014 14:32:54 +0300
+Message-Id: <1406201574-11891-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Devices using resolvable private addresses are required to provide
-an identity resolving key. These devices can not be found using
-the current controller white list support. This means if the kernel
-knows about any devices with an identity resolving key, the white
-list filtering must be disabled.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-However so far the kernel kept identity resolving keys around even
-for devices that are not using resolvable private addresses. The
-notification to userspace clearly hints to not store the key and
-so it is best to just remove the key from the kernel as well at
-that point.
-
-With this it easy now to detect when using the white list is
-possible or when kernel side resolving of addresses is required.
-
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+For testing set default handsfree mode to HF
 ---
- net/bluetooth/hci_core.c | 12 ++++++++++++
- net/bluetooth/smp.c      | 16 ++++++++++++++++
- 2 files changed, 28 insertions(+)
+ android/cutils/properties.h | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ecff30ab22a0..2e2961a3cf6f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -5468,6 +5468,12 @@ static u8 update_white_list(struct hci_request *req)
- 			return 0x00;
- 		}
+diff --git a/android/cutils/properties.h b/android/cutils/properties.h
+index ef40f01..8b3d84d 100644
+--- a/android/cutils/properties.h
++++ b/android/cutils/properties.h
+@@ -31,6 +31,7 @@
+ #define PROPERTY_VALUE_MAX 32
  
-+		if (hci_find_irk_by_addr(hdev, &params->addr,
-+					 params->addr_type)) {
-+			/* White list can not be used with RPAs */
-+			return 0x00;
-+		}
-+
- 		white_list_entries++;
- 		add_to_white_list(req, params);
- 	}
-@@ -5486,6 +5492,12 @@ static u8 update_white_list(struct hci_request *req)
- 			return 0x00;
- 		}
+ #define BLUETOOTH_MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
++#define BLUETOOTH_MODE_PROPERTY_HANDSFREE "persist.sys.bluetooth.handsfree"
  
-+		if (hci_find_irk_by_addr(hdev, &params->addr,
-+					 params->addr_type)) {
-+			/* White list can not be used with RPAs */
-+			return 0x00;
-+		}
-+
- 		white_list_entries++;
- 		add_to_white_list(req, params);
- 	}
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index e49c83d8b957..a7c344b4acbc 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -1291,6 +1291,22 @@ static void smp_notify_keys(struct l2cap_conn *conn)
- 		bacpy(&hcon->dst, &smp->remote_irk->bdaddr);
- 		hcon->dst_type = smp->remote_irk->addr_type;
- 		l2cap_conn_update_id_addr(hcon);
-+
-+		/* When receiving an indentity resolving key for
-+		 * a remote device that does not use a resolvable
-+		 * private address, just remove the key so that
-+		 * it is possible to use the controller white
-+		 * list for scanning.
-+		 *
-+		 * Userspace will have been told to not store
-+		 * this key at this point. So it is safe to
-+		 * just remove it.
-+		 */
-+		if (!bacmp(&smp->remote_irk->rpa, BDADDR_ANY)) {
-+			list_del(&smp->remote_irk->list);
-+			kfree(smp->remote_irk);
-+			smp->remote_irk = NULL;
-+		}
- 	}
+ static inline int property_get(const char *key, char *value,
+ 						const char *default_value)
+@@ -40,6 +41,9 @@ static inline int property_get(const char *key, char *value,
+ 	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_NAME))
+ 		prop = getenv("BLUETOOTH_MODE");
  
- 	/* The LTKs and CSRKs should be persistent only if both sides
++	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_HANDSFREE))
++		prop = "hfp";
++
+ 	if (!prop)
+ 		prop = default_value;
+ 
 -- 
-1.9.3
+1.9.1
 
