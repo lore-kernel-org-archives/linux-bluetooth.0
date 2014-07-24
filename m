@@ -1,81 +1,59 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCH 2/5] android/tester-ng: Fix structure members constness
-Date: Fri, 25 Jul 2014 12:45:03 +0200
-Message-Id: <1406285106-14588-2-git-send-email-jakub.tyszkowski@tieto.com>
-In-Reply-To: <1406285106-14588-1-git-send-email-jakub.tyszkowski@tieto.com>
-References: <1406285106-14588-1-git-send-email-jakub.tyszkowski@tieto.com>
+Subject: [RFC] Bluetooth: Set Simultaneous LE and BR/EDR controller option to zero
+Date: Thu, 24 Jul 2014 20:04:16 +0200
+Message-Id: <1406225056-16491-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-It's better to know what actually may change by looking at the structure
-definitions. Some api calls can modify their parameters (returning file
-descriptor in socket HAL API) but most of them don't.
+With the Bluetooth 4.1 specification the Simultaneous LE and BR/EDR
+controller option has been deprecated. It shall be set to zero and
+ignored otherwise.
 
-This patch mostly applies to action_data and test_case structs that defines
-the actual test case.
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- android/tester-main.h | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+ net/bluetooth/hci_core.c | 2 +-
+ net/bluetooth/mgmt.c     | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/android/tester-main.h b/android/tester-main.h
-index 1bff9b3..e2ecaab 100644
---- a/android/tester-main.h
-+++ b/android/tester-main.h
-@@ -216,28 +216,28 @@ struct bt_action_data {
- 	bt_bdaddr_t *addr;
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2e2961a3cf6f..a85f2ae98393 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1567,7 +1567,7 @@ static void hci_set_le_support(struct hci_request *req)
  
- 	/* Remote props action arguments */
--	int prop_type;
--	bt_property_t *prop;
-+	const int prop_type;
-+	const bt_property_t *prop;
+ 	if (test_bit(HCI_LE_ENABLED, &hdev->dev_flags)) {
+ 		cp.le = 0x01;
+-		cp.simul = lmp_le_br_capable(hdev);
++		cp.simul = 0x00;
+ 	}
  
- 	/* Bonding requests parameters */
- 	bt_pin_code_t *pin;
--	uint8_t pin_len;
--	uint8_t ssp_variant;
--	bool accept;
-+	const uint8_t pin_len;
-+	const uint8_t ssp_variant;
-+	const bool accept;
+ 	if (cp.le != lmp_host_le_capable(hdev))
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index ccc4653ce658..b5027804a3ca 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -2264,7 +2264,7 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  
- 	/* Socket HAL specific params */
--	btsock_type_t sock_type;
--	int channel;
-+	const btsock_type_t sock_type;
-+	const int channel;
- 	const uint8_t *service_uuid;
- 	const char *service_name;
--	int flags;
-+	const int flags;
- 	int *fd;
- };
+ 	if (val) {
+ 		hci_cp.le = val;
+-		hci_cp.simul = lmp_le_br_capable(hdev);
++		hci_cp.simul = 0x00;
+ 	} else {
+ 		if (test_bit(HCI_LE_ADV, &hdev->dev_flags))
+ 			disable_advertising(&req);
+@@ -5925,8 +5925,8 @@ static int powered_update_hci(struct hci_dev *hdev)
+ 	    lmp_bredr_capable(hdev)) {
+ 		struct hci_cp_write_le_host_supported cp;
  
- /* bthost's l2cap server setup parameters */
- struct emu_set_l2cap_data {
--	uint16_t psm;
--	bthost_l2cap_connect_cb func;
-+	const uint16_t psm;
-+	const bthost_l2cap_connect_cb func;
- 	void *user_data;
- };
+-		cp.le = 1;
+-		cp.simul = lmp_le_br_capable(hdev);
++		cp.le = 0x01;
++		cp.simul = 0x00;
  
-@@ -271,9 +271,9 @@ struct step {
- };
- 
- struct test_case {
--	uint8_t emu_type;
--	char *title;
--	uint16_t step_num;
-+	const uint8_t emu_type;
-+	const char *title;
-+	const uint16_t step_num;
- 	const struct step const *step;
- };
- 
+ 		/* Check first if we already have the right
+ 		 * host state (host features set)
 -- 
-1.9.1
+1.9.3
 
