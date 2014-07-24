@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v2] Bluetooth: Add support for using controller white list filtering
-Date: Thu, 24 Jul 2014 03:50:14 +0200
-Message-Id: <1406166614-1160-1-git-send-email-marcel@holtmann.org>
+Subject: [RFC] Bluetooth: Add support for using controller white list filtering
+Date: Thu, 24 Jul 2014 02:37:53 +0200
+Message-Id: <1406162273-51761-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -18,16 +18,13 @@ In case the white list is full and can not hold all devices, the
 white list is not used and the filter policy set to accept all
 advertisements.
 
-Using the white list for scanning allows for power saving with
-controllers that do not handle the duplicate filtering correctly.
-
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 103 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_core.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 86 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d8f91d5b0e56..797b3cdc55e0 100644
+index d8f91d5b0e56..543a8e35f702 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
 @@ -3636,6 +3636,13 @@ int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
@@ -53,21 +50,10 @@ index d8f91d5b0e56..797b3cdc55e0 100644
  	BT_DBG("addr %pMR (type %u) auto_connect %u", addr, addr_type,
  	       auto_connect);
  
-@@ -5406,12 +5411,101 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+@@ -5406,12 +5411,84 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
  	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  }
  
-+static void add_to_white_list(struct hci_request *req,
-+			      struct hci_conn_params *params)
-+{
-+	struct hci_cp_le_add_to_white_list cp;
-+
-+	cp.bdaddr_type = params->addr_type;
-+	bacpy(&cp.bdaddr, &params->addr);
-+
-+	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
-+}
-+
 +static u8 update_white_list(struct hci_request *req)
 +{
 +	struct hci_dev *hdev = req->hdev;
@@ -77,19 +63,21 @@ index d8f91d5b0e56..797b3cdc55e0 100644
 +
 +	/* Go through the current white list programmed into the
 +	 * controller one by one and check if that address is still
-+	 * in the list of pending connections or list of devices to
-+	 * report. If not present in either list, then queue the
++	 * in the list of devices. If not present then queue the
 +	 * command to remove it from the controller.
 +	 */
 +	list_for_each_entry(b, &hdev->le_white_list, list) {
 +		struct hci_cp_le_del_from_white_list cp;
 +
-+		if (hci_pend_le_action_lookup(&hdev->pend_le_conns,
-+					      &b->bdaddr, b->bdaddr_type) ||
-+		    hci_pend_le_action_lookup(&hdev->pend_le_reports,
-+					      &b->bdaddr, b->bdaddr_type)) {
-+			white_list_entries++;
-+			continue;
++		params = hci_conn_params_lookup(hdev, &b->bdaddr,
++						b->bdaddr_type);
++		if (params) {
++			if (params->auto_connect == HCI_AUTO_CONN_REPORT ||
++			    params->auto_connect == HCI_AUTO_CONN_DIRECT ||
++			    params->auto_connect == HCI_AUTO_CONN_ALWAYS) {
++				white_list_entries++;
++				continue;
++			}
 +		}
 +
 +		cp.bdaddr_type = b->bdaddr_type;
@@ -100,16 +88,22 @@ index d8f91d5b0e56..797b3cdc55e0 100644
 +	}
 +
 +	/* Since all no longer valid white list entries have been
-+	 * removed, walk through the list of pending connections
-+	 * and ensure that any new device gets programmed into
-+	 * the controller.
++	 * removed, walk through the list of devices and ensure
++	 * that any new device gets programmed into the controller.
 +	 *
 +	 * If the list of the devices is larger than the list of
 +	 * available white list entries in the controller, then
 +	 * just abort and return filer policy value to not use the
 +	 * white list.
 +	 */
-+	list_for_each_entry(params, &hdev->pend_le_conns, action) {
++	list_for_each_entry(params, &hdev->le_conn_params, list) {
++		struct hci_cp_le_add_to_white_list cp;
++
++		if (params->auto_connect != HCI_AUTO_CONN_REPORT &&
++		    params->auto_connect != HCI_AUTO_CONN_DIRECT &&
++		    params->auto_connect != HCI_AUTO_CONN_ALWAYS)
++			continue;
++
 +		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
 +					   &params->addr, params->addr_type))
 +			continue;
@@ -120,25 +114,11 @@ index d8f91d5b0e56..797b3cdc55e0 100644
 +		}
 +
 +		white_list_entries++;
-+		add_to_white_list(req, params);
-+	}
 +
-+	/* After adding all new pending connections, walk through
-+	 * the list of pending reports and also add these to the
-+	 * white list if there is still space.
-+	 */
-+	list_for_each_entry(params, &hdev->pend_le_reports, action) {
-+		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
-+					   &params->addr, params->addr_type))
-+			continue;
++		cp.bdaddr_type = params->addr_type;
++		bacpy(&cp.bdaddr, &params->addr);
 +
-+		if (white_list_entries >= hdev->le_white_list_size) {
-+			/* Select filter policy to accept all advertising */
-+			return 0x00;
-+		}
-+
-+		white_list_entries++;
-+		add_to_white_list(req, params);
++		hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
 +	}
 +
 +	/* Select filter policy to use white list */
@@ -155,7 +135,7 @@ index d8f91d5b0e56..797b3cdc55e0 100644
  
  	/* Set require_privacy to false since no SCAN_REQ are send
  	 * during passive scanning. Not using an unresolvable address
-@@ -5422,11 +5516,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+@@ -5422,11 +5499,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
  	if (hci_update_random_address(req, false, &own_addr_type))
  		return;
  
