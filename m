@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v3] Bluetooth: Add support for using controller white list filtering
-Date: Thu, 24 Jul 2014 04:53:31 +0200
-Message-Id: <1406170411-1523-1-git-send-email-marcel@holtmann.org>
+Subject: [RFC v2] Bluetooth: Add support for using controller white list filtering
+Date: Thu, 24 Jul 2014 03:50:14 +0200
+Message-Id: <1406166614-1160-1-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
@@ -23,14 +23,37 @@ controllers that do not handle the duplicate filtering correctly.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 96 insertions(+)
+ net/bluetooth/hci_core.c | 105 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 103 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d8f91d5b0e56..ecff30ab22a0 100644
+index d8f91d5b0e56..797b3cdc55e0 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -5406,12 +5406,101 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
+@@ -3636,6 +3636,13 @@ int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ 	if (params->auto_connect == auto_connect)
+ 		return 0;
+ 
++	/* Update setting for auto_connect so that when updating
++	 * the white list, the correct values are available. Any
++	 * changes to the controller white list will happen just
++	 * before enabling passive scanning.
++	 */
++	params->auto_connect = auto_connect;
++
+ 	list_del_init(&params->action);
+ 
+ 	switch (auto_connect) {
+@@ -3656,8 +3663,6 @@ int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr, u8 addr_type,
+ 		break;
+ 	}
+ 
+-	params->auto_connect = auto_connect;
+-
+ 	BT_DBG("addr %pMR (type %u) auto_connect %u", addr, addr_type,
+ 	       auto_connect);
+ 
+@@ -5406,12 +5411,101 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
  	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
  }
  
@@ -132,7 +155,7 @@ index d8f91d5b0e56..ecff30ab22a0 100644
  
  	/* Set require_privacy to false since no SCAN_REQ are send
  	 * during passive scanning. Not using an unresolvable address
-@@ -5422,11 +5511,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+@@ -5422,11 +5516,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
  	if (hci_update_random_address(req, false, &own_addr_type))
  		return;
  
