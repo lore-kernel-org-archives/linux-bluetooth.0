@@ -1,156 +1,90 @@
 Return-Path: <cyrus@holtmann.org>
 From: Marcel Holtmann <marcel@holtmann.org>
 To: linux-bluetooth@vger.kernel.org
-Subject: [RFC v4 1/2] Bluetooth: Add support for using controller white list filtering
-Date: Thu, 24 Jul 2014 15:20:57 +0200
-Message-Id: <1406208058-15299-1-git-send-email-marcel@holtmann.org>
+Subject: [RFC v4 2/2] Bluetooth: Fix white list handling with resolvable private addresses
+Date: Thu, 24 Jul 2014 15:20:58 +0200
+Message-Id: <1406208058-15299-2-git-send-email-marcel@holtmann.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-The Bluetooth controller can use a white list filter when scanning
-to avoid waking up the host for devices that are of no interest.
+Devices using resolvable private addresses are required to provide
+an identity resolving key. These devices can not be found using
+the current controller white list support. This means if the kernel
+knows about any devices with an identity resolving key, the white
+list filtering must be disabled.
 
-Devices marked as reporting, direct connection (incoming) or general
-connection are now added to the controller white list. The update of
-the white list happens just before enabling passive scanning.
+However so far the kernel kept identity resolving keys around even
+for devices that are not using resolvable private addresses. The
+notification to userspace clearly hints to not store the key and
+so it is best to just remove the key from the kernel as well at
+that point.
 
-In case the white list is full and can not hold all devices, the
-white list is not used and the filter policy set to accept all
-advertisements.
-
-Using the white list for scanning allows for power saving with
-controllers that do not handle the duplicate filtering correctly.
+With this it easy now to detect when using the white list is
+possible or when kernel side resolving of addresses is required.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- net/bluetooth/hci_core.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 96 insertions(+)
+ net/bluetooth/hci_core.c | 12 ++++++++++++
+ net/bluetooth/smp.c      | 16 ++++++++++++++++
+ 2 files changed, 28 insertions(+)
 
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d8f91d5b0e56..ecff30ab22a0 100644
+index ecff30ab22a0..2e2961a3cf6f 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -5406,12 +5406,101 @@ void hci_req_add_le_scan_disable(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(cp), &cp);
- }
+@@ -5468,6 +5468,12 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 		}
  
-+static void add_to_white_list(struct hci_request *req,
-+			      struct hci_conn_params *params)
-+{
-+	struct hci_cp_le_add_to_white_list cp;
-+
-+	cp.bdaddr_type = params->addr_type;
-+	bacpy(&cp.bdaddr, &params->addr);
-+
-+	hci_req_add(req, HCI_OP_LE_ADD_TO_WHITE_LIST, sizeof(cp), &cp);
-+}
-+
-+static u8 update_white_list(struct hci_request *req)
-+{
-+	struct hci_dev *hdev = req->hdev;
-+	struct hci_conn_params *params;
-+	struct bdaddr_list *b;
-+	uint8_t white_list_entries = 0;
-+
-+	/* Go through the current white list programmed into the
-+	 * controller one by one and check if that address is still
-+	 * in the list of pending connections or list of devices to
-+	 * report. If not present in either list, then queue the
-+	 * command to remove it from the controller.
-+	 */
-+	list_for_each_entry(b, &hdev->le_white_list, list) {
-+		struct hci_cp_le_del_from_white_list cp;
-+
-+		if (hci_pend_le_action_lookup(&hdev->pend_le_conns,
-+					      &b->bdaddr, b->bdaddr_type) ||
-+		    hci_pend_le_action_lookup(&hdev->pend_le_reports,
-+					      &b->bdaddr, b->bdaddr_type)) {
-+			white_list_entries++;
-+			continue;
-+		}
-+
-+		cp.bdaddr_type = b->bdaddr_type;
-+		bacpy(&cp.bdaddr, &b->bdaddr);
-+
-+		hci_req_add(req, HCI_OP_LE_DEL_FROM_WHITE_LIST,
-+			    sizeof(cp), &cp);
-+	}
-+
-+	/* Since all no longer valid white list entries have been
-+	 * removed, walk through the list of pending connections
-+	 * and ensure that any new device gets programmed into
-+	 * the controller.
-+	 *
-+	 * If the list of the devices is larger than the list of
-+	 * available white list entries in the controller, then
-+	 * just abort and return filer policy value to not use the
-+	 * white list.
-+	 */
-+	list_for_each_entry(params, &hdev->pend_le_conns, action) {
-+		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
-+					   &params->addr, params->addr_type))
-+			continue;
-+
-+		if (white_list_entries >= hdev->le_white_list_size) {
-+			/* Select filter policy to accept all advertising */
++		if (hci_find_irk_by_addr(hdev, &params->addr,
++					 params->addr_type)) {
++			/* White list can not be used with RPAs */
 +			return 0x00;
 +		}
 +
-+		white_list_entries++;
-+		add_to_white_list(req, params);
-+	}
-+
-+	/* After adding all new pending connections, walk through
-+	 * the list of pending reports and also add these to the
-+	 * white list if there is still space.
-+	 */
-+	list_for_each_entry(params, &hdev->pend_le_reports, action) {
-+		if (hci_bdaddr_list_lookup(&hdev->le_white_list,
-+					   &params->addr, params->addr_type))
-+			continue;
-+
-+		if (white_list_entries >= hdev->le_white_list_size) {
-+			/* Select filter policy to accept all advertising */
+ 		white_list_entries++;
+ 		add_to_white_list(req, params);
+ 	}
+@@ -5486,6 +5492,12 @@ static u8 update_white_list(struct hci_request *req)
+ 			return 0x00;
+ 		}
+ 
++		if (hci_find_irk_by_addr(hdev, &params->addr,
++					 params->addr_type)) {
++			/* White list can not be used with RPAs */
 +			return 0x00;
 +		}
 +
-+		white_list_entries++;
-+		add_to_white_list(req, params);
-+	}
+ 		white_list_entries++;
+ 		add_to_white_list(req, params);
+ 	}
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index e49c83d8b957..a7c344b4acbc 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -1291,6 +1291,22 @@ static void smp_notify_keys(struct l2cap_conn *conn)
+ 		bacpy(&hcon->dst, &smp->remote_irk->bdaddr);
+ 		hcon->dst_type = smp->remote_irk->addr_type;
+ 		l2cap_conn_update_id_addr(hcon);
 +
-+	/* Select filter policy to use white list */
-+	return 0x01;
-+}
-+
- void hci_req_add_le_passive_scan(struct hci_request *req)
- {
- 	struct hci_cp_le_set_scan_param param_cp;
- 	struct hci_cp_le_set_scan_enable enable_cp;
- 	struct hci_dev *hdev = req->hdev;
- 	u8 own_addr_type;
-+	u8 filter_policy;
++		/* When receiving an indentity resolving key for
++		 * a remote device that does not use a resolvable
++		 * private address, just remove the key so that
++		 * it is possible to use the controller white
++		 * list for scanning.
++		 *
++		 * Userspace will have been told to not store
++		 * this key at this point. So it is safe to
++		 * just remove it.
++		 */
++		if (!bacmp(&smp->remote_irk->rpa, BDADDR_ANY)) {
++			list_del(&smp->remote_irk->list);
++			kfree(smp->remote_irk);
++			smp->remote_irk = NULL;
++		}
+ 	}
  
- 	/* Set require_privacy to false since no SCAN_REQ are send
- 	 * during passive scanning. Not using an unresolvable address
-@@ -5422,11 +5511,18 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 	if (hci_update_random_address(req, false, &own_addr_type))
- 		return;
- 
-+	/* Adding or removing entries from the white list must
-+	 * happen before enabling scanning. The controller does
-+	 * not allow white list modification while scanning.
-+	 */
-+	filter_policy = update_white_list(req);
-+
- 	memset(&param_cp, 0, sizeof(param_cp));
- 	param_cp.type = LE_SCAN_PASSIVE;
- 	param_cp.interval = cpu_to_le16(hdev->le_scan_interval);
- 	param_cp.window = cpu_to_le16(hdev->le_scan_window);
- 	param_cp.own_address_type = own_addr_type;
-+	param_cp.filter_policy = filter_policy;
- 	hci_req_add(req, HCI_OP_LE_SET_SCAN_PARAM, sizeof(param_cp),
- 		    &param_cp);
- 
+ 	/* The LTKs and CSRKs should be persistent only if both sides
 -- 
 1.9.3
 
