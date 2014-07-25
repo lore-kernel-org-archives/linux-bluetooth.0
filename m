@@ -1,39 +1,80 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Fri, 25 Jul 2014 14:36:07 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
-To: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Cc: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH 5/5] android/tester-ng: Fix not freeing porperties value
-Message-ID: <20140725113607.GA30968@t440s.P-661HNU-F1>
-References: <1406285106-14588-1-git-send-email-jakub.tyszkowski@tieto.com>
- <1406285106-14588-5-git-send-email-jakub.tyszkowski@tieto.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406285106-14588-5-git-send-email-jakub.tyszkowski@tieto.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
+To: linux-bluetooth@vger.kernel.org
+Cc: Szymon Janc <szymon.janc@tieto.com>
+Subject: [PATCH] android/cts: Update test results for CTS 4.4 R3
+Date: Fri, 25 Jul 2014 13:10:42 +0200
+Message-Id: <1406286642-31184-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Jakub,
+From: Szymon Janc <szymon.janc@tieto.com>
 
-On Fri, Jul 25, 2014, Jakub Tyszkowski wrote:
-> This fixes 3 valgrind reports like:
-> 
-> 8 bytes in 2 blocks are definitely lost in loss record 7 of 47
-> ==8437==    at 0x4C2AB80: malloc (in
-> /usr/lib/valgrind/vgpreload_memcheck-amd64-linux.so)
-> ==8437==    by 0x5089610: g_malloc (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==8437==    by 0x50A0B57: g_memdup (in
-> /lib/x86_64-linux-gnu/libglib-2.0.so.0.4000.0)
-> ==8437==    by 0x40E94E: create_property (tester-main.c:623)
-> ==8437==    by 0x40F96C: ssp_request_cb (tester-main.c:741)
-> ==8437==    by 0x5F70E5A: notification_handler (hal-ipc.c:125)
-> ==8437==    by 0x534B181: start_thread (pthread_create.c:312)
-> ==8437==    by 0x565C30C: clone (clone.S:111)
-> ---
->  android/tester-main.c | 3 +++
->  1 file changed, 3 insertions(+)
+---
+ android/cts.txt | 43 ++++++++++++++++++++++++++++++++++---------
+ 1 file changed, 34 insertions(+), 9 deletions(-)
 
-All patches in this set have been applied. Thanks.
+diff --git a/android/cts.txt b/android/cts.txt
+index 5193571..9a7f651 100644
+--- a/android/cts.txt
++++ b/android/cts.txt
+@@ -1,9 +1,16 @@
+ Android Compatibility Test Suite results
+ 
+-Tested: 25-June-2014
+-Android version: 4.4.2
++Tested: 11-July-2014
++Android version: 4.4.4
+ CTS version: 4.4 R3
+ 
++Note:
++CTS reliable write GATT tests require using CTS from master branch
++or https://android-review.googlesource.com/99354 applied.
++
++(*) Due to bug in Bluedroid L2CAP implementation GATT server connect tests fails
++without modified Linux kernel. Patches for Linux and/or Bluedroid are still TBD.
++
+ -------------------------------------------------------------------------------
+ android.bluetooth.cts.BasicAdapterTest (automated tests)
+ Test Name				Result	Notes
+@@ -22,12 +29,30 @@ test_listenUsingRfcommWithServiceRecord	PASS
+ 
+ -------------------------------------------------------------------------------
+ com.android.cts.verifier (manual tests)
+-Test Name		Result	Notes
++Test Name				Result	Notes
+ -------------------------------------------------------------------------------
+-Toggle Bluetooth	PASS
+-Insecure Client		PASS
+-Insecure Server		PASS	Required kernel patch commit ID:
+-				6453462e99e8be13a2c8f2b3535f340b742d8192
+-Secure Client		PASS
+-Secure Server		PASS
++Toggle Bluetooth			PASS
++BLE Client Test:
++	connect				PASS
++	discover service		PASS
++	read/write characteristic	PASS
++	reliable write			PASS
++	notify characteristic		PASS
++	read/write descriptor		PASS
++	read RSSI			PASS
++	disconnect			PASS
++BLE Server Test:
++	add service			PASS
++	connection			FAIL	(*) bluedroid issue.
++	read characteristic request	FAIL	(*)
++	write characteristic request	FAIL	(*)
++	read descriptor request		FAIL	(*)
++	write descriptor request	FAIL	(*)
++	reliable write			FAIL	(*)
++	disconnection			FAIL	(*)
++Insecure Client				PASS
++Insecure Server				PASS	Required kernel patch commit ID:
++						ba15a58b179ed76a7e887177f2b06de1
++Secure Client				PASS
++Secure Server				PASS
+ -------------------------------------------------------------------------------
+-- 
+1.8.5.3
 
-Johan
