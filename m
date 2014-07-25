@@ -2,122 +2,98 @@ Return-Path: <cyrus@holtmann.org>
 From: Arman Uguray <armansito@chromium.org>
 To: linux-bluetooth@vger.kernel.org
 Cc: Arman Uguray <armansito@chromium.org>
-Subject: [PATCH v2 09/11] shared/gatt: Implement "Write Value" and "Write Without Response" procedures.
-Date: Fri, 25 Jul 2014 15:08:41 -0700
-Message-Id: <1406326123-10564-10-git-send-email-armansito@chromium.org>
+Subject: [PATCH v2 11/11] shared/gatt: Implement notification/indication helper.
+Date: Fri, 25 Jul 2014 15:08:43 -0700
+Message-Id: <1406326123-10564-12-git-send-email-armansito@chromium.org>
 In-Reply-To: <1406326123-10564-1-git-send-email-armansito@chromium.org>
 References: <1406326123-10564-1-git-send-email-armansito@chromium.org>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This patch implements the bt_gatt_write_without_response and bt_gatt_write_value
-functions.
+This patch implements bt_gatt_register, which sets up internal callbacks for
+incoming notifications and indications, parses the PDU and provides it to the
+upper layer. It also automatically sends out a confirmation when an indication
+is received.
 ---
- src/shared/gatt-helpers.c | 82 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 77 insertions(+), 5 deletions(-)
+ src/shared/gatt-helpers.c | 62 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 60 insertions(+), 2 deletions(-)
 
 diff --git a/src/shared/gatt-helpers.c b/src/shared/gatt-helpers.c
-index 215d35e..a1e8d79 100644
+index 59fddab..489b8c4 100644
 --- a/src/shared/gatt-helpers.c
 +++ b/src/shared/gatt-helpers.c
-@@ -1141,11 +1141,60 @@ bool bt_gatt_read_long_value(struct bt_att *att,
+@@ -1477,11 +1477,69 @@ bool bt_gatt_write_long_value(struct bt_att *att, bool reliable,
+ 	return true;
+ }
  
- bool bt_gatt_write_without_response(struct bt_att *att,
- 					uint16_t value_handle,
--                                        bool signed_write,
-+					bool signed_write,
- 					uint8_t *value, uint16_t length)
- {
--	/* TODO */
--	return false;
-+	uint8_t pdu[2 + length];
-+
-+	if (!att)
-+		return 0;
-+
-+	/* TODO: Support this once bt_att_send supports signed writes. */
-+	if (signed_write)
-+		return 0;
-+
-+	put_le16(value_handle, pdu);
-+	memcpy(pdu + 2, value, length);
-+
-+	return bt_att_send(att, BT_ATT_OP_WRITE_CMD, pdu, sizeof(pdu),
-+							NULL, NULL, NULL);
-+}
-+
-+struct write_op {
-+	bt_gatt_result_callback_t callback;
++struct notify_data {
++	struct bt_att *att;
++	bt_gatt_notify_callback_t callback;
 +	void *user_data;
 +	bt_gatt_destroy_func_t destroy;
 +};
 +
-+static void destroy_write_op(void *data)
++static void notify_data_destroy(void *data)
 +{
-+	struct write_op *op = data;
++	struct notify_data *notd = data;
 +
-+	if (op->destroy)
-+		op->destroy(op->user_data);
++	if (notd->destroy)
++		notd->destroy(notd->user_data);
 +
-+	free(op);
++	free(notd);
 +}
 +
-+static void write_cb(uint8_t opcode, const void *pdu, uint16_t length,
++static void notify_cb(uint8_t opcode, const void *pdu, uint16_t length,
 +								void *user_data)
 +{
-+	struct write_op *op = user_data;
-+	bool success = true;
-+	uint8_t att_ecode = 0;
++	struct notify_data *data = user_data;
++	uint16_t value_handle;
++	const uint8_t *value = NULL;
 +
-+	if (opcode == BT_ATT_OP_ERROR_RSP) {
-+		success = false;
-+		att_ecode = process_error(pdu, length);
-+		goto done;
-+	}
++	value_handle = get_le16(pdu);
 +
-+	if (opcode != BT_ATT_OP_WRITE_RSP || pdu || length)
-+		success = false;
++	if (length > 2)
++		value = pdu + 2;
 +
-+done:
-+	if (op->callback)
-+		op->callback(success, att_ecode, op->user_data);
- }
- 
- bool bt_gatt_write_value(struct bt_att *att, uint16_t value_handle,
-@@ -1154,8 +1203,31 @@ bool bt_gatt_write_value(struct bt_att *att, uint16_t value_handle,
++	if (data->callback)
++		data->callback(value_handle, value, length - 2, data->user_data);
++
++	if (opcode == BT_ATT_OP_HANDLE_VAL_IND)
++		bt_att_send(data->att, BT_ATT_OP_HANDLE_VAL_CONF, NULL, 0,
++							NULL, NULL, NULL);
++}
++
+ unsigned int bt_gatt_register(struct bt_att *att, bool indications,
+ 					bt_gatt_notify_callback_t callback,
  					void *user_data,
  					bt_gatt_destroy_func_t destroy)
  {
 -	/* TODO */
 -	return false;
-+	struct write_op *op;
-+	uint8_t pdu[2 + length];
++	struct notify_data *data;
++	uint8_t opcode;
++	unsigned int id;
 +
 +	if (!att)
-+		return false;
++		return 0;
 +
-+	op = new0(struct write_op, 1);
-+	if (!op)
-+		return false;
++	data = new0(struct notify_data, 1);
++	if (!data)
++		return 0;
 +
-+	op->callback = callback;
-+	op->user_data = user_data;
-+	op->destroy = destroy;
++	data->att = att;
++	data->callback = callback;
++	data->user_data = user_data;
++	data->destroy = destroy;
 +
-+	put_le16(value_handle, pdu);
-+	memcpy(pdu + 2, value, length);
++	opcode = indications ? BT_ATT_OP_HANDLE_VAL_IND : BT_ATT_OP_HANDLE_VAL_NOT;
 +
-+	if (!bt_att_send(att, BT_ATT_OP_WRITE_REQ, pdu, sizeof(pdu),
-+							write_cb, op,
-+							destroy_write_op)) {
-+		free(op);
-+		return false;
-+	}
++	id = bt_att_register(att, opcode, notify_cb, data, notify_data_destroy);
++	if (!id)
++		free(data);
 +
-+	return true;
++	return id;
  }
- 
- bool bt_gatt_write_long_value(struct bt_att *att, bool reliable,
 -- 
 2.0.0.526.g5318336
 
