@@ -1,101 +1,39 @@
 Return-Path: <cyrus@holtmann.org>
-From: Georg Lukas <georg@op-co.de>
-To: linux-bluetooth@vger.kernel.org
-Cc: Georg Lukas <georg@op-co.de>
-Subject: [PATCH 2/2] Bluetooth: Expose default LE advertising interval via debugfs
-Date: Sat, 26 Jul 2014 13:59:58 +0200
-Message-Id: <1406375998-15288-3-git-send-email-georg@op-co.de>
-In-Reply-To: <1406375998-15288-1-git-send-email-georg@op-co.de>
-References: <1406375998-15288-1-git-send-email-georg@op-co.de>
-Sender: linux-bluetooth-owner@vger.kernel.org
+Date: Sat, 26 Jul 2014 14:17:03 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC v4 1/2] Bluetooth: Add support for using controller white
+ list filtering
+Message-ID: <20140726111703.GA7107@t440s.P-661HNU-F1>
+References: <1406208058-15299-1-git-send-email-marcel@holtmann.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1406208058-15299-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Expose the default values for minimum and maximum LE advertising
-interval via debugfs for testing purposes.
+Hi Marcel,
 
-Signed-off-by: Georg Lukas <georg@op-co.de>
----
- net/bluetooth/hci_core.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+On Thu, Jul 24, 2014, Marcel Holtmann wrote:
+> The Bluetooth controller can use a white list filter when scanning
+> to avoid waking up the host for devices that are of no interest.
+> 
+> Devices marked as reporting, direct connection (incoming) or general
+> connection are now added to the controller white list. The update of
+> the white list happens just before enabling passive scanning.
+> 
+> In case the white list is full and can not hold all devices, the
+> white list is not used and the filter policy set to accept all
+> advertisements.
+> 
+> Using the white list for scanning allows for power saving with
+> controllers that do not handle the duplicate filtering correctly.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 96 insertions(+)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8292bba..3911fef 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -970,6 +970,62 @@ static int adv_channel_map_get(void *data, u64 *val)
- DEFINE_SIMPLE_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
- 			adv_channel_map_set, "%llu\n");
- 
-+static int adv_min_interval_set(void *data, u64 val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval)
-+		return -EINVAL;
-+
-+	hci_dev_lock(hdev);
-+	hdev->le_adv_min_interval = val;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int adv_min_interval_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	hci_dev_lock(hdev);
-+	*val = hdev->le_adv_min_interval;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
-+			adv_min_interval_set, "%llu\n");
-+
-+static int adv_max_interval_set(void *data, u64 val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval)
-+		return -EINVAL;
-+
-+	hci_dev_lock(hdev);
-+	hdev->le_adv_max_interval = val;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+static int adv_max_interval_get(void *data, u64 *val)
-+{
-+	struct hci_dev *hdev = data;
-+
-+	hci_dev_lock(hdev);
-+	*val = hdev->le_adv_max_interval;
-+	hci_dev_unlock(hdev);
-+
-+	return 0;
-+}
-+
-+DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
-+			adv_max_interval_set, "%llu\n");
-+
- static int device_list_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
-@@ -1833,6 +1889,10 @@ static int __hci_init(struct hci_dev *hdev)
- 				    hdev, &supervision_timeout_fops);
- 		debugfs_create_file("adv_channel_map", 0644, hdev->debugfs,
- 				    hdev, &adv_channel_map_fops);
-+		debugfs_create_file("adv_min_interval", 0644, hdev->debugfs,
-+				    hdev, &adv_min_interval_fops);
-+		debugfs_create_file("adv_max_interval", 0644, hdev->debugfs,
-+				    hdev, &adv_max_interval_fops);
- 		debugfs_create_file("device_list", 0444, hdev->debugfs, hdev,
- 				    &device_list_fops);
- 		debugfs_create_u16("discov_interleaved_timeout", 0644,
--- 
-2.0.1
+Both of these patches have been applied to bluetooth-next. Thanks.
 
+Johan
