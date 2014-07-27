@@ -1,97 +1,30 @@
 Return-Path: <cyrus@holtmann.org>
+Date: Sun, 27 Jul 2014 10:27:11 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Marcel Holtmann <marcel@holtmann.org>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [RFC] Bluetooth: Set Simultaneous LE and BR/EDR controller
+ option to zero
+Message-ID: <20140727072711.GA12453@t440s.P-661HNU-F1>
+References: <1406225056-16491-1-git-send-email-marcel@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
-References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
-Date: Mon, 28 Jul 2014 11:21:53 +0300
-Message-ID: <CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
-Subject: Re: [A2DP] Incoming connections do not succeed
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: Artem Rakhov <arakhov@chromium.org>
-Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Sender: linux-bluetooth-owner@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1406225056-16491-1-git-send-email-marcel@holtmann.org>
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Artem,
+Hi Marcel,
 
-On Sat, Jul 26, 2014 at 4:33 AM, Artem Rakhov <arakhov@chromium.org> wrote:
-> Hello,
->
-> I have a problem with A2DP incoming connections. I have a BT speaker
-> (Monster Clarity HD), which automatically reconnects on startup to the
-> last connected source. It works fine with BlueZ 4, but it never
-> reconnects successfully when using BlueZ 5.19
->
-> Here is btmon log:
-> < ACL Data TX: Handle 21 flags 0x00 dlen 16
->                [hci0] 3471.224113
->       L2CAP: Connection Response (0x03) ident 2 len 8
->         Destination CID: 64
->         Source CID: 108
->         Result: Connection pending (0x0001)
->         Status: Authorization pending (0x0002)
-> < ACL Data TX: Handle 21 flags 0x00 dlen 16
->                [hci0] 3471.224313
->       L2CAP: Connection Response (0x03) ident 2 len 8
->         Destination CID: 64
->         Source CID: 108
->         Result: Connection successful (0x0000)
->         Status: No further information available (0x0000)
-> < ACL Data TX: Handle 21 flags 0x00 dlen 12
->                [hci0] 3471.224417
->       L2CAP: Configure Request (0x04) ident 2 len 4
->         Destination CID: 108
->         Flags: 0x0000
->> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.226831
->         Num handles: 1
->         Handle: 21
->         Count: 1
->> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.227794
->         Num handles: 1
->         Handle: 21
->         Count: 1
->> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.228807
->         Num handles: 1
->         Handle: 21
->         Count: 1
->> ACL Data RX: Handle 21 flags 0x02 dlen 12                                           [hci0] 3471.256507
->       L2CAP: Disconnection Request (0x06) ident 3 len 4
->         Destination CID: 64
->         Source CID: 108
-> < ACL Data TX: Handle 21 flags 0x00 dlen 12
->                [hci0] 3471.256592
->       L2CAP: Disconnection Response (0x07) ident 3 len 4
->         Destination CID: 64
->         Source CID: 108
->> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.258773
->         Num handles: 1
->         Handle: 21
->         Count: 1
->> HCI Event: Vendor (0xff) plen 7                                                     [hci0] 3471.549833
->         82 00 01 00 01 15 00                             .......
->> HCI Event: Disconnect Complete (0x05) plen 4                                        [hci0] 3471.550757
->         Status: Success (0x00)
->         Handle: 21
->         Reason: Remote User Terminated Connection (0x13)
-> @ Device Disconnected: 10:B7:F6:01:31:ED (0) reason 3
->
->
-> As could be seen from the log, after the source sends L2CAP Configure
-> Request the speaker does not answer and disconnects (sends L2CAP
-> Disconnection Request).
->
-> Debugging avdtp.c showed that processing of incoming connections is
-> held in avdtp_confirm_cb() function. There, at some point after
-> successful authorization G_IO_ERR and G_IO_HUP events appear. And then
-> session_cb() function is called (as callback for these events), which
-> drops the connection.
+On Thu, Jul 24, 2014, Marcel Holtmann wrote:
+> With the Bluetooth 4.1 specification the Simultaneous LE and BR/EDR
+> controller option has been deprecated. It shall be set to zero and
+> ignored otherwise.
+> 
+> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+> ---
+>  net/bluetooth/hci_core.c | 2 +-
+>  net/bluetooth/mgmt.c     | 6 +++---
+>  2 files changed, 4 insertions(+), 4 deletions(-)
 
-This looks pretty strange as the remote seems to be disconnecting not
-us, btw did you tried to mark the device as trusted? Regarding it
-working with BlueZ 4, what kernel are you using with that and can you
-try to compare what is the difference in the logs, perhaps the remote
-does like the Configure Request for some reason.
+Applied to bluetooth-next. Thanks.
 
-
--- 
-Luiz Augusto von Dentz
+Johan
