@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/5] Bluetooth: Add convenience function to check for pending power off
-Date: Mon, 28 Jul 2014 15:10:12 +0300
-Message-Id: <1406549416-9229-2-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 5/5] Bluetooth: Fix incorrectly disabling page scan when toggling connectable
+Date: Mon, 28 Jul 2014 15:10:16 +0300
+Message-Id: <1406549416-9229-6-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1406549416-9229-1-git-send-email-johan.hedberg@gmail.com>
 References: <1406549416-9229-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,107 +11,41 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-There are several situations where we're interested in knowing whether
-we're currently in the process of powering off an adapter. This patch
-adds a convenience function for the purpose and makes it public since
-we'll soon need to access it from hci_event.c as well.
+If we have entries in the whitelist we shouldn't disable page scanning
+when disabling connectable mode. This patch adds the necessary check to
+the Set Connectable command handler.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/mgmt.c             | 52 +++++++++++++++++++++-------------------
- 2 files changed, 29 insertions(+), 24 deletions(-)
+ net/bluetooth/mgmt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b5d5af3aa469..8394abc4fd87 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1351,6 +1351,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
- void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-+bool mgmt_powering_down(struct hci_dev *hdev);
- void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
- void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
- void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index eb25a1259271..3824975c3486 100644
+index 4d96913484cd..b2741db957f6 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -6269,25 +6269,35 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_remove(cmd);
- }
+@@ -1881,7 +1881,12 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (cp->val) {
+ 			scan = SCAN_PAGE;
+ 		} else {
+-			scan = 0;
++			if (list_empty(&hdev->whitelist))
++				scan = SCAN_DISABLED;
++			else if (test_bit(HCI_ISCAN, &hdev->flags))
++				scan = SCAN_PAGE;
++			else
++				goto no_scan_update;
  
-+bool mgmt_powering_down(struct hci_dev *hdev)
-+{
-+	struct pending_cmd *cmd;
-+	struct mgmt_mode *cp;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
-+	if (!cmd)
-+		return false;
-+
-+	cp = cmd->param;
-+	if (!cp->val)
-+		return true;
-+
-+	return false;
-+}
-+
- void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			      u8 link_type, u8 addr_type, u8 reason,
- 			      bool mgmt_connected)
- {
- 	struct mgmt_ev_device_disconnected ev;
--	struct pending_cmd *power_off;
- 	struct sock *sk = NULL;
- 
--	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (power_off) {
--		struct mgmt_mode *cp = power_off->param;
--
--		/* The connection is still in hci_conn_hash so test for 1
--		 * instead of 0 to know if this is the last one.
--		 */
--		if (!cp->val && hci_conn_count(hdev) == 1) {
--			cancel_delayed_work(&hdev->power_off);
--			queue_work(hdev->req_workqueue, &hdev->power_off.work);
--		}
-+	/* The connection is still in hci_conn_hash so test for 1
-+	 * instead of 0 to know if this is the last one.
-+	 */
-+	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
-+		cancel_delayed_work(&hdev->power_off);
-+		queue_work(hdev->req_workqueue, &hdev->power_off.work);
+ 			if (test_bit(HCI_ISCAN, &hdev->flags) &&
+ 			    hdev->discov_timeout > 0)
+@@ -1891,6 +1896,7 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
  	}
  
- 	if (!mgmt_connected)
-@@ -6347,19 +6357,13 @@ void mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			 u8 addr_type, u8 status)
- {
- 	struct mgmt_ev_connect_failed ev;
--	struct pending_cmd *power_off;
--
--	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (power_off) {
--		struct mgmt_mode *cp = power_off->param;
- 
--		/* The connection is still in hci_conn_hash so test for 1
--		 * instead of 0 to know if this is the last one.
--		 */
--		if (!cp->val && hci_conn_count(hdev) == 1) {
--			cancel_delayed_work(&hdev->power_off);
--			queue_work(hdev->req_workqueue, &hdev->power_off.work);
--		}
-+	/* The connection is still in hci_conn_hash so test for 1
-+	 * instead of 0 to know if this is the last one.
-+	 */
-+	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
-+		cancel_delayed_work(&hdev->power_off);
-+		queue_work(hdev->req_workqueue, &hdev->power_off.work);
- 	}
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
++no_scan_update:
+ 	/* If we're going from non-connectable to connectable or
+ 	 * vice-versa when fast connectable is enabled ensure that fast
+ 	 * connectable gets disabled. write_fast_connectable won't do
 -- 
 1.9.3
 
