@@ -1,38 +1,37 @@
 Return-Path: <cyrus@holtmann.org>
-From: Alexander Aring <alex.aring@gmail.com>
-To: linux-zigbee-devel@lists.sourceforge.net
-Cc: linux-bluetooth@vger.kernel.org,
-	Alexander Aring <alex.aring@gmail.com>
-Subject: [PATCH bluetooth-next] MAINTAINERS: add 6lowpan header file
-Date: Mon, 28 Jul 2014 15:16:30 +0200
-Message-Id: <1406553390-3351-1-git-send-email-alex.aring@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCHv3 08/11] android/ipc: Remove unneeded check
+Date: Mon, 28 Jul 2014 15:46:46 +0300
+Message-Id: <1406551609-17546-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406551609-17546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1406551609-17546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Since commit 68d96dcfc6c09b565d57897c127b61afbab74c6f ("MAINTAINERS: add
-net/6lowpan/ maintainer entry") we have a 6lowpan branch. This patch
-adds a forgotten file which should also be maintained by this branch.
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Signed-off-by: Alexander Aring <alex.aring@gmail.com>
+rsp_len cannot be NULL since it is checked above and dereferenced.
+Remove static analyzers warnings.
 ---
-Based on bluetooth-next, because 68d96dcfc6c09b565d57897c127b61afbab74c6f is
-not in net-next which depends on it, I hope this is ok.
+ android/hal-ipc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 0057ff5..1859c2d 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -154,6 +154,7 @@ L:	linux-zigbee-devel@lists.sourceforge.net (moderated for non-subscribers)
- L:	linux-bluetooth@vger.kernel.org
- S:	Maintained
- F:	net/6lowpan/
-+F:	include/net/6lowpan.h
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 494ba85..363072c 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -462,8 +462,7 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
+ 		}
+ 	}
  
- 6PACK NETWORK DRIVER FOR AX.25
- M:	Andreas Koensgen <ajk@comnets.uni-bremen.de>
+-	if (rsp_len)
+-		*rsp_len = cmd.len;
++	*rsp_len = cmd.len;
+ 
+ 	return BT_STATUS_SUCCESS;
+ 
 -- 
-2.0.3
+1.9.1
 
