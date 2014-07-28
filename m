@@ -1,58 +1,82 @@
 Return-Path: <cyrus@holtmann.org>
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
-To: linux-bluetooth@vger.kernel.org,
-	marcel@holtmann.org,
-	gustavo@padovan.org
-Cc: Dean_Jenkins@mentor.com
-Subject: [RFC] Bluetooth: Make rfcomm_dlc_clear_timer() SMP safe
-Date: Fri, 25 Jul 2014 13:58:12 +0100
-Message-Id: <1406293092-3000-1-git-send-email-Dean_Jenkins@mentor.com>
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZJgxPy1qpqNuB-wW7Pq5dh_zixQG0x2J0=icddvwdg1_A@mail.gmail.com>
+References: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
+	<20140724083116.GB9891@t440s.lan>
+	<45F17F5803927D43967AFEED068E781E0879ACDB@CAMEUREXM02.EUROPE.ROOT.PRI>
+	<20140724100820.GA13332@t440s.lan>
+	<CANq1E4QBGf68iHuhLX8SX4A=Rokg4p6OWpgY1hMKhnJvze4PGA@mail.gmail.com>
+	<CABBYNZJgxPy1qpqNuB-wW7Pq5dh_zixQG0x2J0=icddvwdg1_A@mail.gmail.com>
+Date: Mon, 28 Jul 2014 10:53:43 +0200
+Message-ID: <CANq1E4QNBP_fGpcxzgsg=gh4aGDXFdi-+Abx=OsK74v9f-kwRQ@mail.gmail.com>
+Subject: Re: Bluetooth Low Energy service crash report - when trying read a
+ HID feature report
+From: David Herrmann <dh.herrmann@gmail.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Murat Kilivan <Murat.Kilivan@csr.com>,
+	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-rfcomm_dlc_clear_timer() is used to cancel the timer
-expiry callback rfcomm_dlc_timeout(). However, del_timer()
-was used to cancel the timer which is not always SMP safe.
+Hi
 
-If del_timer() returns a non-zero result then
-rfcomm_dlc_clear_timer() calls rfcomm_dlc_put(d) which decrements
-d->refcnt and if the refcnt becomes zero it frees the structure
-rfcomm_dlc pointed to by d.
+>> The kernel bails out if size==0, so this never happens. The bt_uhid_*
+>> helpers are fine, however, hog.c forward_report() is totally broken.
+>> You use:
+>>
+>> bt_uhid_register(hogdev->uhid, UHID_OUTPUT, forward_report, hogdev);
+>> bt_uhid_register(hogdev->uhid, UHID_FEATURE, forward_report, hogdev);
+>>
+>> Therefore, you register *THE SAME* handler for UHID_OUTPUT *AND*
+>> UHID_FEATURE. However, in forward_report() you access ev->u.output,
+>> but this is only valid for UHID_OUTPUT. If you get a UHID_FEATURE
+>> report you must never access anything but ev->u.feature!
+>
+> Does the ev->u.features structure matches HID protocol, can I send as
+> it is or do I need to reformat it?
 
-If rfcomm_dlc_timeout() runs then it also calls rfcomm_dlc_put(d)
-which decrements d->refcnt and if the refcnt becomes zero it frees
-the structure rfcomm_dlc pointed to by d.
+The uhid.h header includes these definitions:
 
-del_timer() may not prevent rfcomm_dlc_timeout() running on
-another CPU when del_timer() returns a non-zero value. This race
-condition allows rfcomm_dlc_put(d) to be called twice which
-results in a malfunction of the refcnt value as the refcnt is
-decremented 1 time too many. This potentially leads to an early
-freeing of the rfcomm_dlc structure. Consequently, further decrements
-of d->refcnt may be performed on freed memory which will cause memory
-corruption.
+struct uhid_feature_req {
+        __u32 id;
+        __u8 rnum;
+        __u8 rtype;
+} __attribute__((__packed__));
 
-The solution is to use del_timer_sync() instead of del_timer()
-because del_timer_sync() will wait for rfcomm_dlc_timeout() to
-complete execution (assumes rfcomm_dlc_timeout() was scheduled
-to run at the point del_timer_sync() was called).
+struct uhid_feature_answer_req {
+        __u32 id;
+        __u16 err;
+        __u16 size;
+        __u8 data[UHID_DATA_MAX];
+} __attribute__((__packed__));
 
-Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
----
- net/bluetooth/rfcomm/core.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>> Furthermore, if you receive UHID_FEATURE, the kernel blocks until you
+>> send the answer as UHID_FEATURE_ANSWER.
+>
+> So if I got this right in addition to send the request we should
+> process the response as UHID_FEATURE_ANSWER otherwise it will block
+> other events?
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index af73bc3..f9de2ee 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -279,7 +279,7 @@ static void rfcomm_dlc_clear_timer(struct rfcomm_dlc *d)
- {
- 	BT_DBG("dlc %p state %ld", d, d->state);
- 
--	if (del_timer(&d->timer))
-+	if (del_timer_sync(&d->timer))
- 		rfcomm_dlc_put(d);
- }
- 
--- 
-1.7.9.5
+Kernel HID drivers can use a kernel-internal function to query an
+HID-feature. This call is blocking and waits for the answer from the
+device. uhid copied that design to avoid rewriting all drivers.
+Therefore, IFF you get an UHID_FEATURE event, you have to send the
+feature request to the device, somewhere store the context, and once
+the device answers you have to find that context again and write the
+answer via UHID_FEATURE_ANSWER to the kernel. The "id" field in
+uhid_feature_req and uhid_feature_answer_req must match and are used
+for context-tracking.
+
+Note that this is only used for HID drivers that require synchronous
+feature queries. All other drivers use UHID_OUTPUT for all outoing
+reports. The "rtype" field specifies whether it's an INPUT, OUTPUT or
+FEATURE report that has to be written. It it thus totally ok to ignore
+UHID_FEATURE as only few drivers use it.
+
+Note that the uhid interface so far is a bit crappy. My TODO list
+contains "cleanup uhid API" but so far I haven't found the time for
+it, sorry.
+
+Thanks
+David
