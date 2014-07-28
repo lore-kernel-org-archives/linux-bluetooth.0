@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv3 02/11] android/core: Remove unneeded assignment
-Date: Mon, 28 Jul 2014 15:46:40 +0300
-Message-Id: <1406551609-17546-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv3 04/11] tools/rctest: Remove dead code
+Date: Mon, 28 Jul 2014 15:46:42 +0300
+Message-Id: <1406551609-17546-4-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1406551609-17546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1406551609-17546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,22 +12,36 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
+Since do_listen() never returns remove hanging code
 ---
- android/bluetooth.c | 1 -
- 1 file changed, 1 deletion(-)
+ tools/rctest.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index a2ab445..5b72a36 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -291,7 +291,6 @@ static void load_adapter_config(void)
- 	if (gerr) {
- 		adapter.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
- 		g_error_free(gerr);
--		gerr = NULL;
- 	}
+diff --git a/tools/rctest.c b/tools/rctest.c
+index a09a973..e61f7e2 100644
+--- a/tools/rctest.c
++++ b/tools/rctest.c
+@@ -629,10 +629,8 @@ static void automated_send_recv()
+ 	char device[18];
  
- 	g_key_file_free(key_file);
+ 	if (fork()) {
+-		if (!savefile) {
++		if (!savefile)
+ 			do_listen(recv_mode);
+-			return;
+-		}
+ 
+ 		save_fd = open(savefile, O_CREAT | O_WRONLY,
+ 						S_IRUSR | S_IWUSR);
+@@ -640,8 +638,6 @@ static void automated_send_recv()
+ 			syslog(LOG_ERR, "Failed to open file to save data");
+ 
+ 		do_listen(save_mode);
+-
+-		close(save_fd);
+ 	} else {
+ 		ba2str(&bdaddr, device);
+ 
 -- 
 1.9.1
 
