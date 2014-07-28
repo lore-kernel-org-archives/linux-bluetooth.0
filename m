@@ -1,114 +1,196 @@
 Return-Path: <cyrus@holtmann.org>
-From: Murat Kilivan <Murat.Kilivan@csr.com>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	David Herrmann <dh.herrmann@gmail.com>
-CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: <COMMERCIAL>: Re: Bluetooth Low Energy service crash report -
- when trying read a HID feature report
-Date: Mon, 28 Jul 2014 12:39:29 +0000
-Message-ID: <45F17F5803927D43967AFEED068E781E0879C2C1@CAMEUREXM02.EUROPE.ROOT.PRI>
-References: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
-	<20140724083116.GB9891@t440s.lan>
-	<45F17F5803927D43967AFEED068E781E0879ACDB@CAMEUREXM02.EUROPE.ROOT.PRI>
-	<20140724100820.GA13332@t440s.lan>
-	<CANq1E4QBGf68iHuhLX8SX4A=Rokg4p6OWpgY1hMKhnJvze4PGA@mail.gmail.com>
-	<CABBYNZJgxPy1qpqNuB-wW7Pq5dh_zixQG0x2J0=icddvwdg1_A@mail.gmail.com>
-	<CANq1E4QNBP_fGpcxzgsg=gh4aGDXFdi-+Abx=OsK74v9f-kwRQ@mail.gmail.com>
- <CABBYNZLvF_SeW80apJaZH44Yzr83f304nkztdyHRQh2-u_sDEA@mail.gmail.com>
-In-Reply-To: <CABBYNZLvF_SeW80apJaZH44Yzr83f304nkztdyHRQh2-u_sDEA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <1406201801-27715-1-git-send-email-vikram.pal@samsung.com>
+References: <1406201801-27715-1-git-send-email-vikram.pal@samsung.com>
+Date: Mon, 28 Jul 2014 15:35:07 +0300
+Message-ID: <CABBYNZ+qGmr3x7yGtJA=ehZc4EkSxyOokqbgoPZxKR6k6+7Bmw@mail.gmail.com>
+Subject: Re: [PATCH] monitor: Add AVCTP support to btmon
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: Vikrampal Yadav <vikram.pal@samsung.com>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+	Dmitry Kasatkin <d.kasatkin@samsung.com>, p.sinha@samsung.com,
+	sanjay.nm@samsung.com, Bharat Panda <bharat.panda@samsung.com>,
+	cpgs@samsung.com
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-PkhpIERhdmlkLCBNdXJhdCwNCg0KSGkgTHVpeiwNCg0KPg0KPk9uIE1vbiwg
-SnVsIDI4LCAyMDE0IGF0IDExOjUzIEFNLCBEYXZpZCBIZXJybWFubiA8ZGgu
-aGVycm1hbm5AZ21haWwuY29tPiB3cm90ZToNCj4+IEhpDQo+Pg0KPj4+PiBU
-aGUga2VybmVsIGJhaWxzIG91dCBpZiBzaXplPT0wLCBzbyB0aGlzIG5ldmVy
-IGhhcHBlbnMuIFRoZSANCj4+Pj4gYnRfdWhpZF8qIGhlbHBlcnMgYXJlIGZp
-bmUsIGhvd2V2ZXIsIGhvZy5jIGZvcndhcmRfcmVwb3J0KCkgaXMgdG90YWxs
-eSBicm9rZW4uDQo+Pj4+IFlvdSB1c2U6DQo+Pj4+DQo+Pj4+IGJ0X3VoaWRf
-cmVnaXN0ZXIoaG9nZGV2LT51aGlkLCBVSElEX09VVFBVVCwgZm9yd2FyZF9y
-ZXBvcnQsIGhvZ2Rldik7IA0KPj4+PiBidF91aGlkX3JlZ2lzdGVyKGhvZ2Rl
-di0+dWhpZCwgVUhJRF9GRUFUVVJFLCBmb3J3YXJkX3JlcG9ydCwgDQo+Pj4+
-IGhvZ2Rldik7DQo+Pj4+DQo+Pj4+IFRoZXJlZm9yZSwgeW91IHJlZ2lzdGVy
-ICpUSEUgU0FNRSogaGFuZGxlciBmb3IgVUhJRF9PVVRQVVQgKkFORCogDQo+
-Pj4+IFVISURfRkVBVFVSRS4gSG93ZXZlciwgaW4gZm9yd2FyZF9yZXBvcnQo
-KSB5b3UgYWNjZXNzIGV2LT51Lm91dHB1dCwgDQo+Pj4+IGJ1dCB0aGlzIGlz
-IG9ubHkgdmFsaWQgZm9yIFVISURfT1VUUFVULiBJZiB5b3UgZ2V0IGEgVUhJ
-RF9GRUFUVVJFIA0KPj4+PiByZXBvcnQgeW91IG11c3QgbmV2ZXIgYWNjZXNz
-IGFueXRoaW5nIGJ1dCBldi0+dS5mZWF0dXJlIQ0KPj4+DQo+Pj4gRG9lcyB0
-aGUgZXYtPnUuZmVhdHVyZXMgc3RydWN0dXJlIG1hdGNoZXMgSElEIHByb3Rv
-Y29sLCBjYW4gSSBzZW5kIGFzIA0KPj4+IGl0IGlzIG9yIGRvIEkgbmVlZCB0
-byByZWZvcm1hdCBpdD8NCj4+DQo+PiBUaGUgdWhpZC5oIGhlYWRlciBpbmNs
-dWRlcyB0aGVzZSBkZWZpbml0aW9uczoNCj4+DQo+PiBzdHJ1Y3QgdWhpZF9m
-ZWF0dXJlX3JlcSB7DQo+PiAgICAgICAgIF9fdTMyIGlkOw0KPj4gICAgICAg
-ICBfX3U4IHJudW07DQo+PiAgICAgICAgIF9fdTggcnR5cGU7DQo+PiB9IF9f
-YXR0cmlidXRlX18oKF9fcGFja2VkX18pKTsNCj4+DQo+PiBzdHJ1Y3QgdWhp
-ZF9mZWF0dXJlX2Fuc3dlcl9yZXEgew0KPj4gICAgICAgICBfX3UzMiBpZDsN
-Cj4+ICAgICAgICAgX191MTYgZXJyOw0KPj4gICAgICAgICBfX3UxNiBzaXpl
-Ow0KPj4gICAgICAgICBfX3U4IGRhdGFbVUhJRF9EQVRBX01BWF07DQo+PiB9
-IF9fYXR0cmlidXRlX18oKF9fcGFja2VkX18pKTsNCj4NCj5UaGF0IEkgZ290
-IGl0LCB3aGF0IEkgd2FzIGFza2luZyB3YXMgaWYgdGhhdCBpcyB0aGUgZXhh
-Y3Qgc2FtZSBmb3JtYXQgdXNlZCBpbiBISUQgc28gdGhhdCBJIGNvdWxkIHNl
-bnQgYXMgaXQgaXMgdG8gdGhlIHJlbW90ZSBkZXZpY2UuIEltIGFmcmFpZCB0
-aGUgYW5zd2VyIGlzIG5vIGJlY2F1c2UgaWQgYW5kIHNvbWUgb3RoZXIgZmll
-bGRzIHNlZW1zIHRvIGJlIGp1c3QgZm9yIGNvbnRleHQgdHJhY2tpbmcgYXMg
-eW91IG1lbnRpb24gYmVsbG93Lg0KPg0KPj4+PiBGdXJ0aGVybW9yZSwgaWYg
-eW91IHJlY2VpdmUgVUhJRF9GRUFUVVJFLCB0aGUga2VybmVsIGJsb2NrcyB1
-bnRpbCANCj4+Pj4geW91IHNlbmQgdGhlIGFuc3dlciBhcyBVSElEX0ZFQVRV
-UkVfQU5TV0VSLg0KPj4+DQo+Pj4gU28gaWYgSSBnb3QgdGhpcyByaWdodCBp
-biBhZGRpdGlvbiB0byBzZW5kIHRoZSByZXF1ZXN0IHdlIHNob3VsZCANCj4+
-PiBwcm9jZXNzIHRoZSByZXNwb25zZSBhcyBVSElEX0ZFQVRVUkVfQU5TV0VS
-IG90aGVyd2lzZSBpdCB3aWxsIGJsb2NrIA0KPj4+IG90aGVyIGV2ZW50cz8N
-Cj4+DQo+PiBLZXJuZWwgSElEIGRyaXZlcnMgY2FuIHVzZSBhIGtlcm5lbC1p
-bnRlcm5hbCBmdW5jdGlvbiB0byBxdWVyeSBhbiANCj4+IEhJRC1mZWF0dXJl
-LiBUaGlzIGNhbGwgaXMgYmxvY2tpbmcgYW5kIHdhaXRzIGZvciB0aGUgYW5z
-d2VyIGZyb20gdGhlIA0KPj4gZGV2aWNlLiB1aGlkIGNvcGllZCB0aGF0IGRl
-c2lnbiB0byBhdm9pZCByZXdyaXRpbmcgYWxsIGRyaXZlcnMuDQo+PiBUaGVy
-ZWZvcmUsIElGRiB5b3UgZ2V0IGFuIFVISURfRkVBVFVSRSBldmVudCwgeW91
-IGhhdmUgdG8gc2VuZCB0aGUgDQo+PiBmZWF0dXJlIHJlcXVlc3QgdG8gdGhl
-IGRldmljZSwgc29tZXdoZXJlIHN0b3JlIHRoZSBjb250ZXh0LCBhbmQgb25j
-ZSANCj4+IHRoZSBkZXZpY2UgYW5zd2VycyB5b3UgaGF2ZSB0byBmaW5kIHRo
-YXQgY29udGV4dCBhZ2FpbiBhbmQgd3JpdGUgdGhlIA0KPj4gYW5zd2VyIHZp
-YSBVSElEX0ZFQVRVUkVfQU5TV0VSIHRvIHRoZSBrZXJuZWwuIFRoZSAiaWQi
-IGZpZWxkIGluIA0KPj4gdWhpZF9mZWF0dXJlX3JlcSBhbmQgdWhpZF9mZWF0
-dXJlX2Fuc3dlcl9yZXEgbXVzdCBtYXRjaCBhbmQgYXJlIHVzZWQgDQo+PiBm
-b3IgY29udGV4dC10cmFja2luZy4NCj4+DQo+PiBOb3RlIHRoYXQgdGhpcyBp
-cyBvbmx5IHVzZWQgZm9yIEhJRCBkcml2ZXJzIHRoYXQgcmVxdWlyZSBzeW5j
-aHJvbm91cyANCj4+IGZlYXR1cmUgcXVlcmllcy4gQWxsIG90aGVyIGRyaXZl
-cnMgdXNlIFVISURfT1VUUFVUIGZvciBhbGwgb3V0b2luZyANCj4+IHJlcG9y
-dHMuIFRoZSAicnR5cGUiIGZpZWxkIHNwZWNpZmllcyB3aGV0aGVyIGl0J3Mg
-YW4gSU5QVVQsIE9VVFBVVCBvciANCj4+IEZFQVRVUkUgcmVwb3J0IHRoYXQg
-aGFzIHRvIGJlIHdyaXR0ZW4uIEl0IGl0IHRodXMgdG90YWxseSBvayB0byBp
-Z25vcmUgDQo+PiBVSElEX0ZFQVRVUkUgYXMgb25seSBmZXcgZHJpdmVycyB1
-c2UgaXQuDQo+DQo+QE11cmF0LCBJIGd1ZXNzIHlvdXIgaW5wdXQgaXMgbmVl
-ZGVkIGhlcmUsIHdoeSBhcmUgeW91IHVzaW5nIFVISURfRkVBVFVSRSBpbnN0
-ZWFkIG9mIFVISURfT1VUUFVUPyBDYW4gd2UgZHJvcCBVSElEX0ZFQVRVUkUg
-b3IgeW91ciBkcml2ZXIgcmVhbGx5IHJlcXVpcmVzIGl0Pw0KDQpUaGUgZGV2
-aWNlIHdoaWNoIEkgdHJpZWQgdG8gcmVhZCBmZWF0dXJlIHJlcG9ydCBoYXMg
-Y29uZmlndXJhdGlvbiBpbmZvcm1hdGlvbiAoRm9yIGV4YW1wbGUsIHNvZnR3
-YXJlIGZlYXR1cmUsIGZpcm13YXJlIHZlcnNpb24gYW5kIHNvIGZvcnRoKS4g
-VGhpcyBkYXRhIGlzIG5vdCBhdmFpbGFibGUgb3ZlciBVSElEX09VVFBVVC4g
-QWNjb3JkaW5nIHRvIHRoZSBVU0Igc3BlY2lmaWNhdGlvbiwgc2VjdGlvbiA2
-LjIuMi41LCB0aGlzIGtpbmQgb2YgZGF0YSBpcyBkZXNjcmliZWQgJ0ZlYXR1
-cmUgSXRlbXMnLiANCg0KPg0KPj4gTm90ZSB0aGF0IHRoZSB1aGlkIGludGVy
-ZmFjZSBzbyBmYXIgaXMgYSBiaXQgY3JhcHB5LiBNeSBUT0RPIGxpc3QgDQo+
-PiBjb250YWlucyAiY2xlYW51cCB1aGlkIEFQSSIgYnV0IHNvIGZhciBJIGhh
-dmVuJ3QgZm91bmQgdGhlIHRpbWUgZm9yIA0KPj4gaXQsIHNvcnJ5Lg0KPg0K
-Pk5vIHByb2JsZW0sIG91ciBIb0cgcGx1Z2luIG5lZWRzIGEgbGl0dGxlIGJp
-dCBvZiBjbGVhbnVwIGFzIHdlbGwuDQoNCk11cmF0DQoKCk1lbWJlciBvZiB0
-aGUgQ1NSIHBsYyBncm91cCBvZiBjb21wYW5pZXMuIENTUiBwbGMgcmVnaXN0
-ZXJlZCBpbiBFbmdsYW5kIGFuZCBXYWxlcywgcmVnaXN0ZXJlZCBudW1iZXIg
-NDE4NzM0NiwgcmVnaXN0ZXJlZCBvZmZpY2UgQ2h1cmNoaWxsIEhvdXNlLCBD
-YW1icmlkZ2UgQnVzaW5lc3MgUGFyaywgQ293bGV5IFJvYWQsIENhbWJyaWRn
-ZSwgQ0I0IDBXWiwgVW5pdGVkIEtpbmdkb20KTW9yZSBpbmZvcm1hdGlvbiBj
-YW4gYmUgZm91bmQgYXQgd3d3LmNzci5jb20uIEtlZXAgdXAgdG8gZGF0ZSB3
-aXRoIENTUiBvbiBvdXIgdGVjaG5pY2FsIGJsb2csIHd3dy5jc3IuY29tL2Js
-b2csIENTUiBwZW9wbGUgYmxvZywgd3d3LmNzci5jb20vcGVvcGxlLCBZb3VU
-dWJlLCB3d3cueW91dHViZS5jb20vdXNlci9DU1JwbGMsIEZhY2Vib29rLCB3
-d3cuZmFjZWJvb2suY29tL3BhZ2VzL0NTUi8xOTEwMzg0MzQyNTM1MzQsIG9y
-IGZvbGxvdyB1cyBvbiBUd2l0dGVyIGF0IHd3dy50d2l0dGVyLmNvbS9DU1Jf
-cGxjLgpOZXcgZm9yIDIwMTQsIHlvdSBjYW4gbm93IGFjY2VzcyB0aGUgd2lk
-ZSByYW5nZSBvZiBwcm9kdWN0cyBwb3dlcmVkIGJ5IGFwdFggYXQgd3d3LmFw
-dHguY29tLgo=
+Hi,
+
+On Thu, Jul 24, 2014 at 2:36 PM, Vikrampal Yadav <vikram.pal@samsung.com> wrote:
+> Support for decoding AVCTP packets added in Bluetooth monitor.
+> ---
+>  Makefile.tools  |  1 +
+>  monitor/avctp.c | 75 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  monitor/avctp.h | 25 +++++++++++++++++++
+>  monitor/l2cap.c |  5 ++++
+>  4 files changed, 106 insertions(+)
+>  create mode 100644 monitor/avctp.c
+>  create mode 100644 monitor/avctp.h
+>
+> diff --git a/Makefile.tools b/Makefile.tools
+> index dc9dde9..9226386 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -26,6 +26,7 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+>                                 monitor/ll.h monitor/ll.c \
+>                                 monitor/l2cap.h monitor/l2cap.c \
+>                                 monitor/sdp.h monitor/sdp.c \
+> +                               monitor/avctp.h monitor/avctp.c \
+>                                 monitor/uuid.h monitor/uuid.c \
+>                                 monitor/hwdb.h monitor/hwdb.c \
+>                                 monitor/keys.h monitor/keys.c \
+> diff --git a/monitor/avctp.c b/monitor/avctp.c
+> new file mode 100644
+> index 0000000..68a5a56
+> --- /dev/null
+> +++ b/monitor/avctp.c
+> @@ -0,0 +1,75 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011-2014  Intel Corporation
+> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <string.h>
+> +#include <inttypes.h>
+> +
+> +#include <bluetooth/bluetooth.h>
+> +
+> +#include "src/shared/util.h"
+> +#include "bt.h"
+> +#include "packet.h"
+> +#include "display.h"
+> +#include "l2cap.h"
+> +#include "uuid.h"
+> +#include "keys.h"
+> +#include "sdp.h"
+> +#include "avctp.h"
+> +
+> +void avctp_packet(const struct l2cap_frame *frame, uint16_t psm)
+> +{
+> +        uint8_t hdr;
+> +        uint16_t pid;
+> +        const char *pdu_color;
+> +
+> +        if (frame->size < 3) {
+> +                print_text(COLOR_ERROR, "frame too short");
+> +                packet_hexdump(frame->data, frame->size);
+> +                return;
+> +        }
+> +
+> +        hdr = *((uint8_t *) frame->data);
+> +
+> +        pid = get_be16(frame->data + 1);
+> +
+> +        if (frame->in)
+> +                pdu_color = COLOR_MAGENTA;
+> +        else
+> +                pdu_color = COLOR_BLUE;
+> +
+> +        print_indent(6, pdu_color, "AVCTP", "", COLOR_OFF,
+> +                        " %s: %s: Packet_type 0x%02x Transaction label %d "
+> +                        "PID 0x%04x",
+> +                        psm == 23 ? "Control" : "Browsing",
+> +                        hdr & 0x02 ? "Response" : "Command",
+> +                        hdr & 0x0c, hdr >> 4, pid);
+> +
+> +       packet_hexdump(frame->data + 3, frame->size - 3);
+> +}
+> diff --git a/monitor/avctp.h b/monitor/avctp.h
+> new file mode 100644
+> index 0000000..559193e
+> --- /dev/null
+> +++ b/monitor/avctp.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2011-2014  Intel Corporation
+> + *  Copyright (C) 2002-2010  Marcel Holtmann <marcel@holtmann.org>
+> + *
+> + *
+> + *  This library is free software; you can redistribute it and/or
+> + *  modify it under the terms of the GNU Lesser General Public
+> + *  License as published by the Free Software Foundation; either
+> + *  version 2.1 of the License, or (at your option) any later version.
+> + *
+> + *  This library is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> + *  Lesser General Public License for more details.
+> + *
+> + *  You should have received a copy of the GNU Lesser General Public
+> + *  License along with this library; if not, write to the Free Software
+> + *  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+> + *
+> + */
+> +
+> +void avctp_packet(const struct l2cap_frame *frame, uint16_t psm);
+> diff --git a/monitor/l2cap.c b/monitor/l2cap.c
+> index 993aa8b..2752ee4 100644
+> --- a/monitor/l2cap.c
+> +++ b/monitor/l2cap.c
+> @@ -41,6 +41,7 @@
+>  #include "uuid.h"
+>  #include "keys.h"
+>  #include "sdp.h"
+> +#include "avctp.h"
+>
+>  #define MAX_CHAN 64
+>
+> @@ -2634,6 +2635,10 @@ static void l2cap_frame(uint16_t index, bool in, uint16_t handle,
+>                 case 0x001f:
+>                         att_packet(index, in, handle, cid, data, size);
+>                         break;
+> +               case 0x0017:
+> +               case 0x001B:
+> +                       avctp_packet(&frame, psm);
+> +                       break;
+
+This looks almost good enough I just don't get why we need to pass the
+psm, that btw should probably be made part of l2cap_frame, just have 2
+different functions avctp_control_packet and avctp_browsing_packet
+they could internally call the same function to print AVCTP header
+details but you don't really need to check the PSM twice.
+
+>                 default:
+>                         packet_hexdump(data, size);
+>                         break;
+> --
+> 1.9.1
+>
+> --
+> To unsubscribe from this list: send the line "unsubscribe linux-bluetooth" in
+> the body of a message to majordomo@vger.kernel.org
+> More majordomo info at  http://vger.kernel.org/majordomo-info.html
+
+
+
+-- 
+Luiz Augusto von Dentz
