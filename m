@@ -1,84 +1,97 @@
 Return-Path: <cyrus@holtmann.org>
 MIME-Version: 1.0
-In-Reply-To: <CANq1E4QBGf68iHuhLX8SX4A=Rokg4p6OWpgY1hMKhnJvze4PGA@mail.gmail.com>
-References: <45F17F5803927D43967AFEED068E781E0879A30E@CAMEUREXM02.EUROPE.ROOT.PRI>
-	<20140724083116.GB9891@t440s.lan>
-	<45F17F5803927D43967AFEED068E781E0879ACDB@CAMEUREXM02.EUROPE.ROOT.PRI>
-	<20140724100820.GA13332@t440s.lan>
-	<CANq1E4QBGf68iHuhLX8SX4A=Rokg4p6OWpgY1hMKhnJvze4PGA@mail.gmail.com>
-Date: Mon, 28 Jul 2014 11:38:10 +0300
-Message-ID: <CABBYNZJgxPy1qpqNuB-wW7Pq5dh_zixQG0x2J0=icddvwdg1_A@mail.gmail.com>
-Subject: Re: Bluetooth Low Energy service crash report - when trying read a
- HID feature report
+In-Reply-To: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
+References: <CAD81oNZL0qATu_z_TJT8psaMhpmV34w6xmA2+=OKerSE1NSvOw@mail.gmail.com>
+Date: Mon, 28 Jul 2014 11:21:53 +0300
+Message-ID: <CABBYNZ+zRKzv4yTc8M2Fi0eN6gC921b9zaey5FKGVq_bJJueBg@mail.gmail.com>
+Subject: Re: [A2DP] Incoming connections do not succeed
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: David Herrmann <dh.herrmann@gmail.com>
-Cc: Murat Kilivan <Murat.Kilivan@csr.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+To: Artem Rakhov <arakhov@chromium.org>
+Cc: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi David,
+Hi Artem,
 
-On Thu, Jul 24, 2014 at 6:12 PM, David Herrmann <dh.herrmann@gmail.com> wrote:
-> Hi
+On Sat, Jul 26, 2014 at 4:33 AM, Artem Rakhov <arakhov@chromium.org> wrote:
+> Hello,
 >
-> On Thu, Jul 24, 2014 at 12:08 PM, Johan Hedberg <johan.hedberg@gmail.com> wrote:
->> Hi Murat,
->>
->> On Thu, Jul 24, 2014, Murat Kilivan wrote:
->>> ==10991== Process terminating with default action of signal 5 (SIGTRAP)
->>> ==10991==    at 0x40A340A: g_logv (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==    by 0x40A3522: g_log (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==    by 0x40A1C1D: g_malloc (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==    by 0x40B9E75: g_memdup (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==    by 0x80781C5: gatt_write_char (gatt.c:900)
->>> ==10991==    by 0x8072A7B: forward_report (hog.c:368)
->>> ==10991==    by 0x80A5B0D: queue_foreach (queue.c:206)
->>> ==10991==    by 0x807208E: uhid_read_handler (uhid.c:98)
->>> ==10991==    by 0x80A53F2: read_callback (io-glib.c:168)
->>> ==10991==    by 0x40E1E04: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==    by 0x409C0A6: g_main_context_dispatch (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==    by 0x409C467: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991== Invalid free() / delete / delete[] / realloc()
->>> ==10991==    at 0x402B3D8: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
->>> ==10991==    by 0x4304F54: __libc_freeres (in /lib/i386-linux-gnu/libc-2.19.so)
->>> ==10991==    by 0x4024526: _vgnU_freeres (in /usr/lib/valgrind/vgpreload_core-x86-linux.so)
->>> ==10991==    by 0x40E4F6D: ??? (in /lib/i386-linux-gnu/libglib-2.0.so.0.4000.0)
->>> ==10991==  Address 0xffffffff is not stack'd, malloc'd or (recently) free'd
->>
->> This helps a lot. Thanks. I'd bet the following code from forward_report() is
->> responsible:
->>
->>         if (hogdev->has_report_id) {
->>                 data = ev->u.output.data + 1;
->>                 size = ev->u.output.size - 1;
->>         } else {
->>                 data = ev->u.output.data;
->>                 size = ev->u.output.size;
->>         }
+> I have a problem with A2DP incoming connections. I have a BT speaker
+> (Monster Clarity HD), which automatically reconnects on startup to the
+> last connected source. It works fine with BlueZ 4, but it never
+> reconnects successfully when using BlueZ 5.19
 >
-> The kernel bails out if size==0, so this never happens. The bt_uhid_*
-> helpers are fine, however, hog.c forward_report() is totally broken.
-> You use:
+> Here is btmon log:
+> < ACL Data TX: Handle 21 flags 0x00 dlen 16
+>                [hci0] 3471.224113
+>       L2CAP: Connection Response (0x03) ident 2 len 8
+>         Destination CID: 64
+>         Source CID: 108
+>         Result: Connection pending (0x0001)
+>         Status: Authorization pending (0x0002)
+> < ACL Data TX: Handle 21 flags 0x00 dlen 16
+>                [hci0] 3471.224313
+>       L2CAP: Connection Response (0x03) ident 2 len 8
+>         Destination CID: 64
+>         Source CID: 108
+>         Result: Connection successful (0x0000)
+>         Status: No further information available (0x0000)
+> < ACL Data TX: Handle 21 flags 0x00 dlen 12
+>                [hci0] 3471.224417
+>       L2CAP: Configure Request (0x04) ident 2 len 4
+>         Destination CID: 108
+>         Flags: 0x0000
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.226831
+>         Num handles: 1
+>         Handle: 21
+>         Count: 1
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.227794
+>         Num handles: 1
+>         Handle: 21
+>         Count: 1
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.228807
+>         Num handles: 1
+>         Handle: 21
+>         Count: 1
+>> ACL Data RX: Handle 21 flags 0x02 dlen 12                                           [hci0] 3471.256507
+>       L2CAP: Disconnection Request (0x06) ident 3 len 4
+>         Destination CID: 64
+>         Source CID: 108
+> < ACL Data TX: Handle 21 flags 0x00 dlen 12
+>                [hci0] 3471.256592
+>       L2CAP: Disconnection Response (0x07) ident 3 len 4
+>         Destination CID: 64
+>         Source CID: 108
+>> HCI Event: Number of Completed Packets (0x13) plen 5                                [hci0] 3471.258773
+>         Num handles: 1
+>         Handle: 21
+>         Count: 1
+>> HCI Event: Vendor (0xff) plen 7                                                     [hci0] 3471.549833
+>         82 00 01 00 01 15 00                             .......
+>> HCI Event: Disconnect Complete (0x05) plen 4                                        [hci0] 3471.550757
+>         Status: Success (0x00)
+>         Handle: 21
+>         Reason: Remote User Terminated Connection (0x13)
+> @ Device Disconnected: 10:B7:F6:01:31:ED (0) reason 3
 >
-> bt_uhid_register(hogdev->uhid, UHID_OUTPUT, forward_report, hogdev);
-> bt_uhid_register(hogdev->uhid, UHID_FEATURE, forward_report, hogdev);
 >
-> Therefore, you register *THE SAME* handler for UHID_OUTPUT *AND*
-> UHID_FEATURE. However, in forward_report() you access ev->u.output,
-> but this is only valid for UHID_OUTPUT. If you get a UHID_FEATURE
-> report you must never access anything but ev->u.feature!
+> As could be seen from the log, after the source sends L2CAP Configure
+> Request the speaker does not answer and disconnects (sends L2CAP
+> Disconnection Request).
+>
+> Debugging avdtp.c showed that processing of incoming connections is
+> held in avdtp_confirm_cb() function. There, at some point after
+> successful authorization G_IO_ERR and G_IO_HUP events appear. And then
+> session_cb() function is called (as callback for these events), which
+> drops the connection.
 
-Does the ev->u.features structure matches HID protocol, can I send as
-it is or do I need to reformat it?
+This looks pretty strange as the remote seems to be disconnecting not
+us, btw did you tried to mark the device as trusted? Regarding it
+working with BlueZ 4, what kernel are you using with that and can you
+try to compare what is the difference in the logs, perhaps the remote
+does like the Configure Request for some reason.
 
-> Furthermore, if you receive UHID_FEATURE, the kernel blocks until you
-> send the answer as UHID_FEATURE_ANSWER.
-
-So if I got this right in addition to send the request we should
-process the response as UHID_FEATURE_ANSWER otherwise it will block
-other events?
 
 -- 
 Luiz Augusto von Dentz
