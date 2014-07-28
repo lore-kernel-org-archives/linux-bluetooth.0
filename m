@@ -1,115 +1,57 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/2] Bluetooth: Add convenience function to check for pending power off
-Date: Mon, 28 Jul 2014 14:00:35 +0300
-Message-Id: <1406545236-1447-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/client: Set default handsfree mode for host
+Date: Mon, 28 Jul 2014 12:46:23 +0200
+Message-ID: <1625661.E497b1LD2C@uw000953>
+In-Reply-To: <1406201574-11891-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1406201574-11891-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-There are several situations where we're interested in knowing whether
-we're currently in the process of powering off an adapter. This patch
-adds a convenience function for the purpose and makes it public since
-we'll soon need to access it from hci_event.c as well.
+On Thursday 24 of July 2014 14:32:54 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> For testing set default handsfree mode to HF
+> ---
+>  android/cutils/properties.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/android/cutils/properties.h b/android/cutils/properties.h
+> index ef40f01..8b3d84d 100644
+> --- a/android/cutils/properties.h
+> +++ b/android/cutils/properties.h
+> @@ -31,6 +31,7 @@
+>  #define PROPERTY_VALUE_MAX 32
+>  
+>  #define BLUETOOTH_MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
+> +#define BLUETOOTH_MODE_PROPERTY_HANDSFREE "persist.sys.bluetooth.handsfree"
+>  
+>  static inline int property_get(const char *key, char *value,
+>  						const char *default_value)
+> @@ -40,6 +41,9 @@ static inline int property_get(const char *key, char *value,
+>  	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_NAME))
+>  		prop = getenv("BLUETOOTH_MODE");
+>  
+> +	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_HANDSFREE))
+> +		prop = "hfp";
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/mgmt.c             | 52 +++++++++++++++++++++-------------------
- 2 files changed, 29 insertions(+), 24 deletions(-)
+I'd prefer to not have this hardcoded. So please use getenv() for getting
+handsfree mode (similar to what is now with bluetooth mode).
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b5d5af3aa469..8394abc4fd87 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1351,6 +1351,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
- void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
-+bool mgmt_powering_down(struct hci_dev *hdev);
- void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
- void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
- void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index eb25a1259271..3824975c3486 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -6269,25 +6269,35 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
- 	mgmt_pending_remove(cmd);
- }
- 
-+bool mgmt_powering_down(struct hci_dev *hdev)
-+{
-+	struct pending_cmd *cmd;
-+	struct mgmt_mode *cp;
-+
-+	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
-+	if (!cmd)
-+		return false;
-+
-+	cp = cmd->param;
-+	if (!cp->val)
-+		return true;
-+
-+	return false;
-+}
-+
- void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 			      u8 link_type, u8 addr_type, u8 reason,
- 			      bool mgmt_connected)
- {
- 	struct mgmt_ev_device_disconnected ev;
--	struct pending_cmd *power_off;
- 	struct sock *sk = NULL;
- 
--	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (power_off) {
--		struct mgmt_mode *cp = power_off->param;
--
--		/* The connection is still in hci_conn_hash so test for 1
--		 * instead of 0 to know if this is the last one.
--		 */
--		if (!cp->val && hci_conn_count(hdev) == 1) {
--			cancel_delayed_work(&hdev->power_off);
--			queue_work(hdev->req_workqueue, &hdev->power_off.work);
--		}
-+	/* The connection is still in hci_conn_hash so test for 1
-+	 * instead of 0 to know if this is the last one.
-+	 */
-+	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
-+		cancel_delayed_work(&hdev->power_off);
-+		queue_work(hdev->req_workqueue, &hdev->power_off.work);
- 	}
- 
- 	if (!mgmt_connected)
-@@ -6347,19 +6357,13 @@ void mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 			 u8 addr_type, u8 status)
- {
- 	struct mgmt_ev_connect_failed ev;
--	struct pending_cmd *power_off;
--
--	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
--	if (power_off) {
--		struct mgmt_mode *cp = power_off->param;
- 
--		/* The connection is still in hci_conn_hash so test for 1
--		 * instead of 0 to know if this is the last one.
--		 */
--		if (!cp->val && hci_conn_count(hdev) == 1) {
--			cancel_delayed_work(&hdev->power_off);
--			queue_work(hdev->req_workqueue, &hdev->power_off.work);
--		}
-+	/* The connection is still in hci_conn_hash so test for 1
-+	 * instead of 0 to know if this is the last one.
-+	 */
-+	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
-+		cancel_delayed_work(&hdev->power_off);
-+		queue_work(hdev->req_workqueue, &hdev->power_off.work);
- 	}
- 
- 	bacpy(&ev.addr.bdaddr, bdaddr);
+This will allow for easy testing of all configurations on Linux host.
+
+> +
+>  	if (!prop)
+>  		prop = default_value;
+>  
+> 
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
