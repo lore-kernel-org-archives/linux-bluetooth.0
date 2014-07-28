@@ -1,64 +1,67 @@
 Return-Path: <cyrus@holtmann.org>
-MIME-Version: 1.0
-Sender: armansito@google.com
-In-Reply-To: <409335B4-82B3-40D2-970A-D39416F02591@holtmann.org>
-References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
-	<1405986034-29122-2-git-send-email-armansito@chromium.org>
-	<3D02B219753AD44CBDDDE484323B1774112D2C2C@SHSMSX104.ccr.corp.intel.com>
-	<CAHrH25QAR=y6Dtn4Y-t=EX1h6Oxn9ir7rWft2m+mVsBHfab1Wg@mail.gmail.com>
-	<409335B4-82B3-40D2-970A-D39416F02591@holtmann.org>
-Date: Mon, 28 Jul 2014 16:31:45 -0700
-Message-ID: <CAHrH25To=NvJC+4E6U-2S5pMc1qORvKOpbG2atY9=CFn4Zwcew@mail.gmail.com>
-Subject: Re: [RFC v1 1/1] doc/gatt-api: New API properties and methods for the
- GATT D-Bus API.
-From: Arman Uguray <armansito@chromium.org>
-To: Marcel Holtmann <marcel@holtmann.org>
-Cc: "Gu, Chao Jie" <chao.jie.gu@intel.com>,
-	"linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
+Subject: Re: [RFC] Bluetooth: Make rfcomm_dlc_clear_timer() SMP safe
+From: Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1406293092-3000-1-git-send-email-Dean_Jenkins@mentor.com>
+Date: Mon, 28 Jul 2014 15:36:49 -0700
+Cc: BlueZ development <linux-bluetooth@vger.kernel.org>,
+	"Gustavo F. Padovan" <gustavo@padovan.org>
+Message-Id: <F0748C5B-79D6-4B34-BA55-7E1715AC43BA@holtmann.org>
+References: <1406293092-3000-1-git-send-email-Dean_Jenkins@mentor.com>
+To: Dean Jenkins <Dean_Jenkins@mentor.com>
+Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Dean,
 
+> rfcomm_dlc_clear_timer() is used to cancel the timer
+> expiry callback rfcomm_dlc_timeout(). However, del_timer()
+> was used to cancel the timer which is not always SMP safe.
+> 
+> If del_timer() returns a non-zero result then
+> rfcomm_dlc_clear_timer() calls rfcomm_dlc_put(d) which decrements
+> d->refcnt and if the refcnt becomes zero it frees the structure
+> rfcomm_dlc pointed to by d.
+> 
+> If rfcomm_dlc_timeout() runs then it also calls rfcomm_dlc_put(d)
+> which decrements d->refcnt and if the refcnt becomes zero it frees
+> the structure rfcomm_dlc pointed to by d.
+> 
+> del_timer() may not prevent rfcomm_dlc_timeout() running on
+> another CPU when del_timer() returns a non-zero value. This race
+> condition allows rfcomm_dlc_put(d) to be called twice which
+> results in a malfunction of the refcnt value as the refcnt is
+> decremented 1 time too many. This potentially leads to an early
+> freeing of the rfcomm_dlc structure. Consequently, further decrements
+> of d->refcnt may be performed on freed memory which will cause memory
+> corruption.
+> 
+> The solution is to use del_timer_sync() instead of del_timer()
+> because del_timer_sync() will wait for rfcomm_dlc_timeout() to
+> complete execution (assumes rfcomm_dlc_timeout() was scheduled
+> to run at the point del_timer_sync() was called).
+> 
+> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
+> ---
+> net/bluetooth/rfcomm/core.c |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+> index af73bc3..f9de2ee 100644
+> --- a/net/bluetooth/rfcomm/core.c
+> +++ b/net/bluetooth/rfcomm/core.c
+> @@ -279,7 +279,7 @@ static void rfcomm_dlc_clear_timer(struct rfcomm_dlc *d)
+> {
+> 	BT_DBG("dlc %p state %ld", d, d->state);
+> 
+> -	if (del_timer(&d->timer))
+> +	if (del_timer_sync(&d->timer))
+> 		rfcomm_dlc_put(d);
 
-> I think one detail that has to be clear os that most likely nobody is cal=
-ling Get directly. I will be available, but mostly all applications will ge=
-t the value from calling GetManagedObjects.
->
-> So lets say we talk about standard service like Device Information or Bat=
-tery Status etc., every application gets these information in one go. This =
-is comparing to x number of application calling ReadValue for each value in=
-dividually. For values that do not change at all or change only every x day=
-s this is something that makes sense and I really want. It means that appli=
-cations do not have to do anything extra for these values. They are just av=
-ailable and they are most likely recent or recent enough.
->
+I have no objections here and the explanation looks good. Any reason why you are posting this as RFC and not as patch. I assume you have tested this and verified that it fixes the described race condition.
 
-Fair enough, this was enough to sell this to me :)
+Regards
 
-> I think this depends a little bit. Most values will be return the exact s=
-ame value that you write into it. That is what they are suppose to do anywa=
-y. The only exception here are control endpoints. So I would agree that for=
- control endpoints we do not expose the Value property at all.
->
+Marcel
 
-Yes, we shouldn't expose the Value property if the characteristic
-properties field doesn't contain "read", "notify", or "indicate". With
-respect to caching the value before a write operation, I'm still
-hesitant towards making any assumptions about the value. I wouldn't
-want to cache the value until after the write operation has completed
-successfully (which is only possible to determine with the "write
-request" and "reliable long write" procedure) and there may be some
-race conditions where a characteristic might immediately change it's
-value and send a notification before we had a chance to store the
-write value. In this case the latest cached value would be incorrect.
-I understand that this is an edge case but it's enough to raise some
-concern.
-
-Anyway, we can start out by caching the write value and if people run
-into any issues in the field, we can then change the behavior in the
-future.
-
-
-Cheers,
-Arman
