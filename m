@@ -1,30 +1,31 @@
 Return-Path: <cyrus@holtmann.org>
 Content-Type: text/plain; charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix clearing HCI_PSCAN flag
+Subject: Re: [PATCH bluetooth-next] MAINTAINERS: add 6lowpan header file
 From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1406551531-16144-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 28 Jul 2014 07:51:37 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <84604E68-53D7-4E52-A7DE-BBB98DACFD10@holtmann.org>
-References: <1406551531-16144-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+In-Reply-To: <1406553390-3351-1-git-send-email-alex.aring@gmail.com>
+Date: Mon, 28 Jul 2014 07:49:57 -0700
+Cc: linux-zigbee-devel@lists.sourceforge.net,
+	linux-bluetooth@vger.kernel.org
+Message-Id: <DA471FAC-A330-428F-97A0-66B14DDEFACA@holtmann.org>
+References: <1406553390-3351-1-git-send-email-alex.aring@gmail.com>
+To: Alexander Aring <alex.aring@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+Hi Alex,
 
-> This patch fixes a typo in the hci_cc_write_scan_enable() function where
-> we want to clear the HCI_PSCAN flag if the SCAN_PAGE bit of the HCI
-> command parameter was not set.
+> Since commit 68d96dcfc6c09b565d57897c127b61afbab74c6f ("MAINTAINERS: add
+> net/6lowpan/ maintainer entry") we have a 6lowpan branch. This patch
+> adds a forgotten file which should also be maintained by this branch.
 > 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> Signed-off-by: Alexander Aring <alex.aring@gmail.com>
 > ---
-> This one should be applied before the following 5-patch set:
-> Subject: [PATCH v2 0/5] Bluetooth: Page scan fixes & improvements
+> Based on bluetooth-next, because 68d96dcfc6c09b565d57897c127b61afbab74c6f is
+> not in net-next which depends on it, I hope this is ok.
 > 
-> net/bluetooth/hci_event.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> MAINTAINERS | 1 +
+> 1 file changed, 1 insertion(+)
 
 patch has been applied to bluetooth-next tree.
 
