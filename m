@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/5] Bluetooth: Fix updating whitelist state for existing connections
-Date: Mon, 28 Jul 2014 15:10:14 +0300
-Message-Id: <1406549416-9229-4-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH v2 1/5] Bluetooth: Add convenience function to check for pending power off
+Date: Mon, 28 Jul 2014 15:10:12 +0300
+Message-Id: <1406549416-9229-2-git-send-email-johan.hedberg@gmail.com>
 In-Reply-To: <1406549416-9229-1-git-send-email-johan.hedberg@gmail.com>
 References: <1406549416-9229-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
@@ -11,80 +11,107 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Johan Hedberg <johan.hedberg@intel.com>
 
-If Add/Remove device is called while we have an existing connection we
-should update the corresponding flag for that connection instead of
-modifying hdev->whitelist. This patch adds the necessary code to the
-respective mgmt command handlers along with a helper function to update
-the whitelist flag for any existing connection.
+There are several situations where we're interested in knowing whether
+we're currently in the process of powering off an adapter. This patch
+adds a convenience function for the purpose and makes it public since
+we'll soon need to access it from hci_event.c as well.
 
 Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/mgmt.c | 37 ++++++++++++++++++++++++++++++++++---
- 1 file changed, 34 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/mgmt.c             | 52 +++++++++++++++++++++-------------------
+ 2 files changed, 29 insertions(+), 24 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index b5d5af3aa469..8394abc4fd87 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1351,6 +1351,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 		      u8 addr_type, s8 rssi, u8 *name, u8 name_len);
+ void mgmt_discovering(struct hci_dev *hdev, u8 discovering);
++bool mgmt_powering_down(struct hci_dev *hdev);
+ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent);
+ void mgmt_new_irk(struct hci_dev *hdev, struct smp_irk *irk);
+ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3824975c3486..4f56855c1fbb 100644
+index eb25a1259271..3824975c3486 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5223,6 +5223,26 @@ unlock:
- 	return err;
+@@ -6269,25 +6269,35 @@ static void unpair_device_rsp(struct pending_cmd *cmd, void *data)
+ 	mgmt_pending_remove(cmd);
  }
  
-+static bool set_conn_whitelist(struct hci_dev *hdev, bdaddr_t *bdaddr,
-+			       bool set)
++bool mgmt_powering_down(struct hci_dev *hdev)
 +{
-+	struct hci_conn *conn;
++	struct pending_cmd *cmd;
++	struct mgmt_mode *cp;
 +
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, bdaddr);
-+	if (!conn)
++	cmd = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
++	if (!cmd)
 +		return false;
 +
-+	if (conn->state != BT_CONNECTED && conn->state != BT_CONFIG)
-+		return false;
++	cp = cmd->param;
++	if (!cp->val)
++		return true;
 +
-+	if (set)
-+		set_bit(HCI_CONN_WHITELIST, &conn->flags);
-+	else
-+		clear_bit(HCI_CONN_WHITELIST, &conn->flags);
-+
-+	return true;
++	return false;
 +}
 +
- /* Helper for Add/Remove Device commands */
- static void update_page_scan(struct hci_dev *hdev, u8 scan)
+ void mgmt_device_disconnected(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			      u8 link_type, u8 addr_type, u8 reason,
+ 			      bool mgmt_connected)
  {
-@@ -5289,10 +5309,16 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- 			goto unlock;
- 		}
+ 	struct mgmt_ev_device_disconnected ev;
+-	struct pending_cmd *power_off;
+ 	struct sock *sk = NULL;
  
--		update_scan = list_empty(&hdev->whitelist);
-+		if (set_conn_whitelist(hdev, &cp->addr.bdaddr, true)) {
-+			update_scan = false;
-+			err = 0;
-+		} else {
-+			update_scan = list_empty(&hdev->whitelist);
-+			err = hci_bdaddr_list_add(&hdev->whitelist,
-+						  &cp->addr.bdaddr,
-+						  cp->addr.type);
-+		}
+-	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
+-	if (power_off) {
+-		struct mgmt_mode *cp = power_off->param;
+-
+-		/* The connection is still in hci_conn_hash so test for 1
+-		 * instead of 0 to know if this is the last one.
+-		 */
+-		if (!cp->val && hci_conn_count(hdev) == 1) {
+-			cancel_delayed_work(&hdev->power_off);
+-			queue_work(hdev->req_workqueue, &hdev->power_off.work);
+-		}
++	/* The connection is still in hci_conn_hash so test for 1
++	 * instead of 0 to know if this is the last one.
++	 */
++	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
++		cancel_delayed_work(&hdev->power_off);
++		queue_work(hdev->req_workqueue, &hdev->power_off.work);
+ 	}
  
--		err = hci_bdaddr_list_add(&hdev->whitelist, &cp->addr.bdaddr,
--					  cp->addr.type);
- 		if (err)
- 			goto unlock;
+ 	if (!mgmt_connected)
+@@ -6347,19 +6357,13 @@ void mgmt_connect_failed(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
+ 			 u8 addr_type, u8 status)
+ {
+ 	struct mgmt_ev_connect_failed ev;
+-	struct pending_cmd *power_off;
+-
+-	power_off = mgmt_pending_find(MGMT_OP_SET_POWERED, hdev);
+-	if (power_off) {
+-		struct mgmt_mode *cp = power_off->param;
  
-@@ -5372,6 +5398,11 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
- 			err = hci_bdaddr_list_del(&hdev->whitelist,
- 						  &cp->addr.bdaddr,
- 						  cp->addr.type);
-+
-+			if (err && set_conn_whitelist(hdev, &cp->addr.bdaddr,
-+						      false))
-+				err = 0;
-+
- 			if (err) {
- 				err = cmd_complete(sk, hdev->id,
- 						   MGMT_OP_REMOVE_DEVICE,
+-		/* The connection is still in hci_conn_hash so test for 1
+-		 * instead of 0 to know if this is the last one.
+-		 */
+-		if (!cp->val && hci_conn_count(hdev) == 1) {
+-			cancel_delayed_work(&hdev->power_off);
+-			queue_work(hdev->req_workqueue, &hdev->power_off.work);
+-		}
++	/* The connection is still in hci_conn_hash so test for 1
++	 * instead of 0 to know if this is the last one.
++	 */
++	if (mgmt_powering_down(hdev) && hci_conn_count(hdev) == 1) {
++		cancel_delayed_work(&hdev->power_off);
++		queue_work(hdev->req_workqueue, &hdev->power_off.work);
+ 	}
+ 
+ 	bacpy(&ev.addr.bdaddr, bdaddr);
 -- 
 1.9.3
 
