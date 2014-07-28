@@ -1,31 +1,55 @@
 Return-Path: <cyrus@holtmann.org>
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 7.3 \(1878.6\))
-Subject: Re: [PATCH] Bluetooth: Fix incorrectly disabling page scan when toggling connectable
-From: Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1406570038-18842-1-git-send-email-johan.hedberg@gmail.com>
-Date: Mon, 28 Jul 2014 11:31:13 -0700
-Cc: linux-bluetooth@vger.kernel.org
-Message-Id: <76167C85-3009-4186-8899-11537475928A@holtmann.org>
-References: <1406570038-18842-1-git-send-email-johan.hedberg@gmail.com>
-To: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix incorrectly disabling page scan when toggling connectable
+Date: Mon, 28 Jul 2014 20:53:58 +0300
+Message-Id: <1406570038-18842-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Johan,
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-> If we have entries in the whitelist we shouldn't disable page scanning
-> when disabling connectable mode. This patch adds the necessary check to
-> the Set Connectable command handler.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
-> net/bluetooth/mgmt.c | 14 +++++++++++++-
-> 1 file changed, 13 insertions(+), 1 deletion(-)
+If we have entries in the whitelist we shouldn't disable page scanning
+when disabling connectable mode. This patch adds the necessary check to
+the Set Connectable command handler.
 
-patch has been applied to bluetooth-next tree.
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 4d96913484cd..04fa7b2f8d7f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1881,7 +1881,18 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (cp->val) {
+ 			scan = SCAN_PAGE;
+ 		} else {
+-			scan = 0;
++			/* If we don't have any whitelist entries just
++			 * disable all scanning. If there are entries
++			 * and we had both page and inquiry scanning
++			 * enabled then fall back to only page scanning.
++			 * Otherwise no changes are needed.
++			 */
++			if (list_empty(&hdev->whitelist))
++				scan = SCAN_DISABLED;
++			else if (test_bit(HCI_ISCAN, &hdev->flags))
++				scan = SCAN_PAGE;
++			else
++				goto no_scan_update;
+ 
+ 			if (test_bit(HCI_ISCAN, &hdev->flags) &&
+ 			    hdev->discov_timeout > 0)
+@@ -1891,6 +1902,7 @@ static int set_connectable(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
+ 	}
+ 
++no_scan_update:
+ 	/* If we're going from non-connectable to connectable or
+ 	 * vice-versa when fast connectable is enabled ensure that fast
+ 	 * connectable gets disabled. write_fast_connectable won't do
+-- 
+1.9.3
 
