@@ -1,34 +1,35 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] shared/queue: Fix not allowing to remove NULL entries
-Date: Tue, 29 Jul 2014 17:29:29 +0300
-Message-Id: <1406644169-31298-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCHv4 06/12] tools/l2test: Remove unneeded return
+Date: Tue, 29 Jul 2014 17:20:55 +0300
+Message-Id: <1406643661-29323-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-queue_remove should not check the data pointer since both queue_push_head
-and queue_push_tail don't check it is possible to have NULL pointers in
-the queue therefore queue_remove shall be able to remove them.
+Remove dead code after exit()
 ---
- src/shared/queue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/l2test.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/src/shared/queue.c b/src/shared/queue.c
-index 3bdc1ec..3ca3ca6 100644
---- a/src/shared/queue.c
-+++ b/src/shared/queue.c
-@@ -238,7 +238,7 @@ bool queue_remove(struct queue *queue, void *data)
- {
- 	struct queue_entry *entry, *prev;
+diff --git a/tools/l2test.c b/tools/l2test.c
+index ffad7c4..67ca70a 100644
+--- a/tools/l2test.c
++++ b/tools/l2test.c
+@@ -768,8 +768,6 @@ static void do_listen(void (*handler)(int sk))
+ 		exit(0);
+ 	}
  
--	if (!queue || !data)
-+	if (!queue)
- 		return false;
- 
- 	for (entry = queue->head, prev = NULL; entry;
+-	return;
+-
+ error:
+ 	close(sk);
+ 	exit(1);
 -- 
-1.9.3
+1.9.1
 
