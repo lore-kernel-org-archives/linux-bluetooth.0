@@ -1,85 +1,58 @@
 Return-Path: <cyrus@holtmann.org>
-Message-ID: <53D75517.5080702@mentor.com>
-Date: Tue, 29 Jul 2014 09:02:31 +0100
-From: Dean Jenkins <Dean_Jenkins@mentor.com>
+Date: Tue, 29 Jul 2014 10:50:14 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv3 02/11] android/core: Remove unneeded assignment
+Message-ID: <20140729075014.GB5465@t440s.lan>
+References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1406551609-17546-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <1406551609-17546-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+ <20140728135750.GA17010@t440s.P-661HNU-F1>
+ <20140729074200.GA29412@aemeltch-MOBL1>
 MIME-Version: 1.0
-To: Marcel Holtmann <marcel@holtmann.org>
-CC: BlueZ development <linux-bluetooth@vger.kernel.org>,
-	"Gustavo F. Padovan" <gustavo@padovan.org>
-Subject: Re: [RFC] Bluetooth: Make rfcomm_dlc_clear_timer() SMP safe
-References: <1406293092-3000-1-git-send-email-Dean_Jenkins@mentor.com> <F0748C5B-79D6-4B34-BA55-7E1715AC43BA@holtmann.org>
-In-Reply-To: <F0748C5B-79D6-4B34-BA55-7E1715AC43BA@holtmann.org>
-Content-Type: text/plain; charset=ISO-8859-1; format=flowed
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20140729074200.GA29412@aemeltch-MOBL1>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Hi Marcel,
+Hi Andrei,
 
-On 28/07/14 23:36, Marcel Holtmann wrote:
-> Hi Dean,
->
->> rfcomm_dlc_clear_timer() is used to cancel the timer
->> expiry callback rfcomm_dlc_timeout(). However, del_timer()
->> was used to cancel the timer which is not always SMP safe.
->>
->> If del_timer() returns a non-zero result then
->> rfcomm_dlc_clear_timer() calls rfcomm_dlc_put(d) which decrements
->> d->refcnt and if the refcnt becomes zero it frees the structure
->> rfcomm_dlc pointed to by d.
->>
->> If rfcomm_dlc_timeout() runs then it also calls rfcomm_dlc_put(d)
->> which decrements d->refcnt and if the refcnt becomes zero it frees
->> the structure rfcomm_dlc pointed to by d.
->>
->> del_timer() may not prevent rfcomm_dlc_timeout() running on
->> another CPU when del_timer() returns a non-zero value. This race
->> condition allows rfcomm_dlc_put(d) to be called twice which
->> results in a malfunction of the refcnt value as the refcnt is
->> decremented 1 time too many. This potentially leads to an early
->> freeing of the rfcomm_dlc structure. Consequently, further decrements
->> of d->refcnt may be performed on freed memory which will cause memory
->> corruption.
->>
->> The solution is to use del_timer_sync() instead of del_timer()
->> because del_timer_sync() will wait for rfcomm_dlc_timeout() to
->> complete execution (assumes rfcomm_dlc_timeout() was scheduled
->> to run at the point del_timer_sync() was called).
->>
->> Signed-off-by: Dean Jenkins <Dean_Jenkins@mentor.com>
->> ---
->> net/bluetooth/rfcomm/core.c |    2 +-
->> 1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
->> index af73bc3..f9de2ee 100644
->> --- a/net/bluetooth/rfcomm/core.c
->> +++ b/net/bluetooth/rfcomm/core.c
->> @@ -279,7 +279,7 @@ static void rfcomm_dlc_clear_timer(struct rfcomm_dlc *d)
->> {
->> 	BT_DBG("dlc %p state %ld", d, d->state);
->>
->> -	if (del_timer(&d->timer))
->> +	if (del_timer_sync(&d->timer))
->> 		rfcomm_dlc_put(d);
-> I have no objections here and the explanation looks good. Any reason why you are posting this as RFC and not as patch. I assume you have tested this and verified that it fixes the described race condition.
-Thanks for your feedback. Thanks for agreeing with my explanation.
+On Tue, Jul 29, 2014, Andrei Emeltchenko wrote:
+> On Mon, Jul 28, 2014 at 04:57:50PM +0300, Johan Hedberg wrote:
+> > Hi Andrei,
+> > 
+> > On Mon, Jul 28, 2014, Andrei Emeltchenko wrote:
+> > > ---
+> > >  android/bluetooth.c | 1 -
+> > >  1 file changed, 1 deletion(-)
+> > > 
+> > > diff --git a/android/bluetooth.c b/android/bluetooth.c
+> > > index a2ab445..5b72a36 100644
+> > > --- a/android/bluetooth.c
+> > > +++ b/android/bluetooth.c
+> > > @@ -291,7 +291,6 @@ static void load_adapter_config(void)
+> > >  	if (gerr) {
+> > >  		adapter.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
+> > >  		g_error_free(gerr);
+> > > -		gerr = NULL;
+> > >  	}
+> > >  
+> > >  	g_key_file_free(key_file);
+> > 
+> > I don't think patches like this are a good idea since they make the code
+> > more prone to bugs in the future. In this case if the function was ever
+> > extended and gerr reused one would need to remember to "fix" the old
+> > code so that it's re-initialized to NULL.
+> 
+> This is common practice, to initialize if needed value before use
+> (especially if value is reused). Makes code more clean.
 
-I posted it as RFC because it has not yet been tested.
+Then use at least g_clear_error instead of g_error_free.
 
-On our multi-core ARM based embedded system, we observe use-after-free 
-memory corruption which potentially could be due to a rogue reference 
-counter decrement. Consequently, we started looking for reference 
-counters in the kernel which used del_timer() before decrementing the 
-reference counter.
+> This also fixes static analyzer warnings.
 
-Therefore, the proposed change is theoretical and is based on the known 
-weakness of del_timer() in SMP systems.
+To me it looks more like this is not just a nice side effect (which you
+imply by your "also ...") but the main reason you created this patch.
 
-It is a challenge to test it due to the small probability of the race 
-occurring. However, we will endeavour to run some tests and get back to you.
-
-Thanks,
-
-Regards,
-Dean Jenkins
-Mentor Graphics
+Johan
