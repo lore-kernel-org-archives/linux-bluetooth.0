@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 08/12] android/ipc: Remove unneeded check
-Date: Tue, 29 Jul 2014 17:20:57 +0300
-Message-Id: <1406643661-29323-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 12/12] attrib: Fix memory leak
+Date: Tue, 29 Jul 2014 17:21:01 +0300
+Message-Id: <1406643661-29323-12-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,26 +12,30 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-rsp_len cannot be NULL since it is checked above and dereferenced.
-Remove static analyzers warnings.
 ---
- android/hal-ipc.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ attrib/gatttool.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/android/hal-ipc.c b/android/hal-ipc.c
-index 494ba85..363072c 100644
---- a/android/hal-ipc.c
-+++ b/android/hal-ipc.c
-@@ -462,8 +462,7 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
- 		}
- 	}
+diff --git a/attrib/gatttool.c b/attrib/gatttool.c
+index bca7f69..db5da62 100644
+--- a/attrib/gatttool.c
++++ b/attrib/gatttool.c
+@@ -340,6 +340,7 @@ static gboolean characteristics_write(gpointer user_data)
  
--	if (rsp_len)
--		*rsp_len = cmd.len;
-+	*rsp_len = cmd.len;
+ 	gatt_write_cmd(attrib, opt_handle, value, len, mainloop_quit, value);
  
- 	return BT_STATUS_SUCCESS;
++	g_free(value);
+ 	return FALSE;
  
+ error:
+@@ -393,6 +394,7 @@ static gboolean characteristics_write_req(gpointer user_data)
+ 	gatt_write_char(attrib, opt_handle, value, len, char_write_req_cb,
+ 									NULL);
+ 
++	g_free(value);
+ 	return FALSE;
+ 
+ error:
 -- 
 1.9.1
 
