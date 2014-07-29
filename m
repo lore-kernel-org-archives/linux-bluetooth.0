@@ -1,60 +1,65 @@
 Return-Path: <cyrus@holtmann.org>
-From: Sebastian Chlad <sebastian.chlad@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
-Subject: [PATCH] android/pts: RFCOMM PTS update.
-Date: Tue, 29 Jul 2014 16:06:43 +0200
-Message-Id: <1406642803-16541-1-git-send-email-sebastian.chlad@tieto.com>
+Message-ID: <53D79E72.5000303@tieto.com>
+Date: Tue, 29 Jul 2014 15:15:30 +0200
+From: Tyszkowski Jakub <jakub.tyszkowski@tieto.com>
+MIME-Version: 1.0
+To: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH 7/8] android/tester-ng: Add PAN Enable NAP test case
+References: <1406635292-30691-1-git-send-email-ravikumar.veeramally@linux.intel.com> <1406635292-30691-8-git-send-email-ravikumar.veeramally@linux.intel.com>
+In-Reply-To: <1406635292-30691-8-git-send-email-ravikumar.veeramally@linux.intel.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Number of issues on RFCOMM tests in PTS 5.2 found. Problems with Credits,
-Channel disconnect, accepting UIH and UA frames.
----
- android/pts-rfcomm.txt | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
+Hi Ravi,
 
-diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
-index b96caab..9bfc7a2 100644
---- a/android/pts-rfcomm.txt
-+++ b/android/pts-rfcomm.txt
-@@ -17,17 +17,21 @@ Test Name		Result	Notes
- TC_RFC_BV_01_C		PASS	rctest -n -P 1 <btaddr>
- TC_RFC_BV_02_C		PASS	rctest -r -P 1
- TC_RFC_BV_03_C		PASS	rctest -r -P 1
--TC_RFC_BV_04_C		FAIL
-+TC_RFC_BV_04_C		FAIL	PTS issue #12421
-+				PTS issue #12414
- 				NOTE: DISC on DLC is expected; IUT disconnects
- 					rfcomm session (close)
--TC_RFC_BV_05_C		INC
-+TC_RFC_BV_05_C		PASS	rctest -n -P 4 <btaddr>
-+				Note: test requires IUT to connect on the given
-+				channel. sdptool browse <btaddr> to check the
-+				channel.
- TC_RFC_BV_06_C		PASS	rctest -r -P 1
- TC_RFC_BV_07_C		PASS	rctest -r -P 1
--TC_RFC_BV_08_C		INC
-+TC_RFC_BV_08_C		INC	PTS issue #12397
- 				NOTE: Incorrect frame type sent in response to
- 					the DISC command
- TC_RFC_BV_11_C		PASS	rctest -r -P 1
--TC_RFC_BV_13_C		FAIL
-+TC_RFC_BV_13_C		FAIL	PTS issue #12397
- 				NOTE: IUT sent the correct frame type (UIH)
- 				but the parameters did not match the
- 				requirements
-@@ -35,7 +39,7 @@ TC_RFC_BV_14_C		N/A
- TC_RFC_BV_15_C		PASS	rctest -r -P 1
- TC_RFC_BV_17_C		PASS	rctest -d -P 1
- TC_RFC_BV_19_C		PASS
--TC_RFC_BV_21_C		INC
--TC_RFC_BV_22_C		INC
--TC_RFC_BV_25_C		INC
-+TC_RFC_BV_21_C		INC	PTS issue #12421
-+TC_RFC_BV_22_C		INC	PTS issue #12421
-+TC_RFC_BV_25_C		INC	PTS issue #12421
- -------------------------------------------------------------------------------
--- 
-1.8.5.3
+On 07/29/2014 02:01 PM, Ravi kumar Veeramally wrote:
+> ---
+>   android/tester-pan.c | 13 +++++++++++++
+>   1 file changed, 13 insertions(+)
+>
+> diff --git a/android/tester-pan.c b/android/tester-pan.c
+> index 7b013cc..1acc460 100644
+> --- a/android/tester-pan.c
+> +++ b/android/tester-pan.c
+> @@ -121,6 +121,16 @@ static void pan_enable_panu_action(void)
+>   	schedule_action_verification(step);
+>   }
+>
+> +static void pan_enable_nap_action(void)
+> +{
+> +	struct test_data *data = tester_get_data();
+> +	struct step *step = g_new0(struct step, 1);
+> +
+> +	step->action_status = data->if_pan->enable(BTPAN_ROLE_PANNAP);
+> +
+> +	schedule_action_verification(step);
+> +}
+> +
+>   static struct test_case test_cases[] = {
+>   	TEST_CASE_BREDRLE("PAN Init",
+>   		ACTION_SUCCESS(dummy_action, NULL),
+> @@ -172,6 +182,9 @@ static struct test_case test_cases[] = {
+>   	TEST_CASE_BREDRLE("PAN Enable PANU - Success",
+>   		ACTION(BT_STATUS_UNSUPPORTED, pan_enable_panu_action, NULL),
+>   	),
+> +	TEST_CASE_BREDRLE("PAN Enable NAP - Success",
+> +		ACTION_SUCCESS(pan_enable_nap_action, NULL),
+> +	),
 
+Shouldn't btpan_control_state_callback be verified after the enable?
+
+Snipped from hardware/bt_pan.h:
+"The result state of enabl will be returned by 
+btpan_control_state_callback."
+
+Same applies to the previous case (enable PANU).
+
+>   };
+>
+>   struct queue *get_pan_tests(void)
+>
+
+Regards,
+Jakub
