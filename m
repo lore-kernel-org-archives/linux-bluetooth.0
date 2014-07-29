@@ -1,56 +1,53 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix SMP authentication requirement when initiator
-Date: Tue, 29 Jul 2014 12:07:39 +0300
-Message-Id: <1406624859-17294-1-git-send-email-johan.hedberg@gmail.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCHv2] android/client: Set default handsfree mode for host
+Date: Tue, 29 Jul 2014 11:00:55 +0200
+Message-ID: <1561073.xvDMEqai6q@uw000953>
+In-Reply-To: <1406548639-15884-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1406548639-15884-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+Hi Andrei,
 
-Even if we're not pairable (the HCI_PAIRABLE flag is unset) we should
-still allow initiating pairing with bonding. This patch adds a missing
-check for SMP_FLAG_INITIATOR to build_pairing_cmd() and ensures this
-flag is properly set before calling the function.
+On Monday 28 of July 2014 14:57:19 Andrei Emeltchenko wrote:
+> From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
+> 
+> For testing set default handsfree mode to HF
+> ---
+>  android/cutils/properties.h | 4 ++++
+>  1 file changed, 4 insertions(+)
+> 
+> diff --git a/android/cutils/properties.h b/android/cutils/properties.h
+> index ef40f01..43f07f1 100644
+> --- a/android/cutils/properties.h
+> +++ b/android/cutils/properties.h
+> @@ -31,6 +31,7 @@
+>  #define PROPERTY_VALUE_MAX 32
+>  
+>  #define BLUETOOTH_MODE_PROPERTY_NAME "persist.sys.bluetooth.mode"
+> +#define BLUETOOTH_MODE_PROPERTY_HANDSFREE "persist.sys.bluetooth.handsfree"
+>  
+>  static inline int property_get(const char *key, char *value,
+>  						const char *default_value)
+> @@ -40,6 +41,9 @@ static inline int property_get(const char *key, char *value,
+>  	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_NAME))
+>  		prop = getenv("BLUETOOTH_MODE");
+>  
+> +	if (!strcmp(key, BLUETOOTH_MODE_PROPERTY_HANDSFREE))
+> +		prop = getenv("BLUETOOTH_HANDSFREE_MODE");
+> +
+>  	if (!prop)
+>  		prop = default_value;
+>  
+> 
 
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
----
- net/bluetooth/smp.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Patch applied (I've updated commit message), thanks.
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index a7c344b4acbc..7e914477721a 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -307,7 +307,8 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
- 	struct hci_dev *hdev = hcon->hdev;
- 	u8 local_dist = 0, remote_dist = 0;
- 
--	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags)) {
-+	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags) ||
-+	    test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
- 		local_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
- 		remote_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
- 		authreq |= SMP_AUTH_BONDING;
-@@ -985,6 +986,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
- 		authreq |= SMP_AUTH_MITM;
- 
-+	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
-+
- 	if (hcon->role == HCI_ROLE_MASTER) {
- 		struct smp_cmd_pairing cp;
- 
-@@ -999,8 +1002,6 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
- 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
- 	}
- 
--	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
--
- 	return 0;
- }
- 
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
