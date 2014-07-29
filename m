@@ -1,119 +1,75 @@
 Return-Path: <cyrus@holtmann.org>
-From: johan.hedberg@gmail.com
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix SMP context tracking leading to a kernel crash
-Date: Tue, 29 Jul 2014 14:18:48 +0300
-Message-Id: <1406632728-23547-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH BlueZ 2/2] android/hog: Add support for UHID_FEATURE event
+Date: Tue, 29 Jul 2014 14:12:45 +0300
+Message-Id: <1406632365-21136-2-git-send-email-luiz.dentz@gmail.com>
+In-Reply-To: <1406632365-21136-1-git-send-email-luiz.dentz@gmail.com>
+References: <1406632365-21136-1-git-send-email-luiz.dentz@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Johan Hedberg <johan.hedberg@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The HCI_CONN_LE_SMP_PEND flag is supposed to indicate whether we have an
-SMP context or not. If the context creation fails, or some other error
-is indicated between setting the flag and creating the context the flag
-must be cleared first.
-
-This patch ensures that smp_chan_create() clears the flag in case of
-allocation failure as well as reorders code in smp_cmd_security_req()
-that could lead to returning an error between setting the flag and
-creating the context.
-
-Without the patch the following kind of kernel crash could be observed
-(this one because of unacceptable authentication requirements in a
-Security Request):
-
-[  +0.000855] kernel BUG at net/bluetooth/smp.c:606!
-[  +0.000000] invalid opcode: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC
-[  +0.000000] CPU: 0 PID: 58 Comm: kworker/u5:2 Tainted: G        W     3.16.0-rc1+ #785
-[  +0.008391] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
-[  +0.000000] Workqueue: hci0 hci_rx_work
-[  +0.000000] task: f4dc8f90 ti: f4ef0000 task.ti: f4ef0000
-[  +0.000000] EIP: 0060:[<c13432b6>] EFLAGS: 00010246 CPU: 0
-[  +0.000000] EIP is at smp_chan_destroy+0x1e/0x145
-[  +0.000709] EAX: f46db870 EBX: 00000000 ECX: 00000000 EDX: 00000005
-[  +0.000000] ESI: f46db870 EDI: f46db870 EBP: f4ef1dc0 ESP: f4ef1db0
-[  +0.000000]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
-[  +0.000000] CR0: 8005003b CR2: b666b0b0 CR3: 00022000 CR4: 00000690
-[  +0.000000] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
-[  +0.000000] DR6: fffe0ff0 DR7: 00000400
-[  +0.000000] Stack:
-[  +0.000000]  00000005 f17b7840 f46db870 f4ef1dd4 f4ef1de4 c1343441 c134342e 00000000
-[  +0.000000]  c1343441 00000005 00000002 00000000 f17b7840 f4ef1e38 c134452a 00002aae
-[  +0.000000]  01ef1e00 00002aae f46bd980 f46db870 00000039 ffffffff 00000007 f4ef1e34
-[  +0.000000] Call Trace:
-[  +0.000000]  [<c1343441>] smp_failure+0x64/0x6c
-[  +0.000000]  [<c134342e>] ? smp_failure+0x51/0x6c
-[  +0.000000]  [<c1343441>] ? smp_failure+0x64/0x6c
-[  +0.000000]  [<c134452a>] smp_sig_channel+0xad6/0xafc
-[  +0.000000]  [<c1053b61>] ? vprintk_emit+0x343/0x366
-[  +0.000000]  [<c133f34e>] l2cap_recv_frame+0x1337/0x1ac4
-[  +0.000000]  [<c133f34e>] ? l2cap_recv_frame+0x1337/0x1ac4
-[  +0.000000]  [<c1172307>] ? __dynamic_pr_debug+0x3e/0x40
-[  +0.000000]  [<c11702a1>] ? debug_smp_processor_id+0x12/0x14
-[  +0.000000]  [<c1340bc9>] l2cap_recv_acldata+0xe8/0x239
-[  +0.000000]  [<c1340bc9>] ? l2cap_recv_acldata+0xe8/0x239
-[  +0.000000]  [<c1169931>] ? __const_udelay+0x1a/0x1c
-[  +0.000000]  [<c131f120>] hci_rx_work+0x1a1/0x286
-[  +0.000000]  [<c137244e>] ? mutex_unlock+0x8/0xa
-[  +0.000000]  [<c131f120>] ? hci_rx_work+0x1a1/0x286
-[  +0.000000]  [<c1038fe5>] process_one_work+0x128/0x1df
-[  +0.000000]  [<c1038fe5>] ? process_one_work+0x128/0x1df
-[  +0.000000]  [<c10392df>] worker_thread+0x222/0x2de
-[  +0.000000]  [<c10390bd>] ? process_scheduled_works+0x21/0x21
-[  +0.000000]  [<c103d34c>] kthread+0x82/0x87
-[  +0.000000]  [<c1040000>] ? create_new_namespaces+0x90/0x105
-[  +0.000000]  [<c13738e1>] ret_from_kernel_thread+0x21/0x30
-[  +0.000000]  [<c103d2ca>] ? __kthread_parkme+0x50/0x50
-[  +0.000000] Code: 65 f4 89 f0 5b 5e 5f 5d 8d 67 f8 5f c3 57 8d 7c 24 08 83 e4 f8 ff 77 fc 55 89 e5 57 89 c7 56 53 52 8b 98 e0 00 00 00 85 db 75 02 <0f> 0b 8b b3 80 00 00 00 8b 00 c1 ee 03 83 e6 01 89 f2 e8 ef 09
-[  +0.000000] EIP: [<c13432b6>] smp_chan_destroy+0x1e/0x145 SS:ESP 0068:f4ef1db0
-
-Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- net/bluetooth/smp.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ android/hog.c | 37 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 37 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 7e914477721a..36110e0b1f30 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -580,13 +580,16 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 	struct smp_chan *smp;
+diff --git a/android/hog.c b/android/hog.c
+index 85a6982..09a16d5 100644
+--- a/android/hog.c
++++ b/android/hog.c
+@@ -439,6 +439,42 @@ static void forward_report(struct uhid_event *ev, void *user_data)
+ 						data, size, NULL, NULL);
+ }
  
- 	smp = kzalloc(sizeof(*smp), GFP_ATOMIC);
--	if (!smp)
-+	if (!smp) {
-+		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
- 		return NULL;
++static void get_report(struct uhid_event *ev, void *user_data)
++{
++	struct bt_hog *hog = user_data;
++	struct report *report;
++	GSList *l;
++	struct uhid_event rsp;
++	int err;
++
++	memset(&rsp, 0, sizeof(rsp));
++	rsp.type = UHID_FEATURE_ANSWER;
++	rsp.u.feature_answer.id = ev->u.feature.id;
++
++	l = g_slist_find_custom(hog->reports,
++				GUINT_TO_POINTER(ev->u.feature.rtype),
++				report_type_cmp);
++	if (!l) {
++		rsp.u.feature_answer.err = ENOTSUP;
++		goto done;
 +	}
- 
- 	smp->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
- 	if (IS_ERR(smp->tfm_aes)) {
- 		BT_ERR("Unable to create ECB crypto context");
- 		kfree(smp);
-+		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
- 		return NULL;
++
++	report = l->data;
++
++	if (!report->value) {
++		rsp.u.feature_answer.err = EIO;
++		goto done;
++	}
++
++	rsp.u.feature_answer.size = report->len;
++	memcpy(rsp.u.feature_answer.data, report->value, report->len);
++
++done:
++	err = bt_uhid_send(hog->uhid, &rsp);
++	if (err < 0)
++		error("bt_uhid_send: %s", strerror(-err));
++}
++
+ static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen, ssize_t *len,
+ 								bool *is_long)
+ {
+@@ -576,6 +612,7 @@ static void report_map_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
  	}
  
-@@ -924,14 +927,14 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
- 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
- 		return 0;
+ 	bt_uhid_register(hog->uhid, UHID_OUTPUT, forward_report, hog);
++	bt_uhid_register(hog->uhid, UHID_FEATURE, get_report, hog);
+ }
  
--	if (!test_bit(HCI_PAIRABLE, &hcon->hdev->dev_flags) &&
--	    (rp->auth_req & SMP_AUTH_BONDING))
--		return SMP_PAIRING_NOTSUPP;
--
- 	smp = smp_chan_create(conn);
- 	if (!smp)
- 		return SMP_UNSPECIFIED;
- 
-+	if (!test_bit(HCI_PAIRABLE, &hcon->hdev->dev_flags) &&
-+	    (rp->auth_req & SMP_AUTH_BONDING))
-+		return SMP_PAIRING_NOTSUPP;
-+
- 	skb_pull(skb, sizeof(*rp));
- 
- 	memset(&cp, 0, sizeof(cp));
+ static void info_read_cb(guint8 status, const guint8 *pdu, guint16 plen,
 -- 
 1.9.3
 
