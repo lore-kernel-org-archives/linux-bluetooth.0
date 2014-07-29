@@ -1,61 +1,56 @@
 Return-Path: <cyrus@holtmann.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] android/hog: Cache report value
-Date: Tue, 29 Jul 2014 14:12:44 +0300
-Message-Id: <1406632365-21136-1-git-send-email-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: Fix SMP authentication requirement when initiator
+Date: Tue, 29 Jul 2014 12:07:39 +0300
+Message-Id: <1406624859-17294-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Report value will be used for implementing support for UHID_FEATURE
-event.
+Even if we're not pairable (the HCI_PAIRABLE flag is unset) we should
+still allow initiating pairing with bonding. This patch adds a missing
+check for SMP_FLAG_INITIATOR to build_pairing_cmd() and ensures this
+flag is properly set before calling the function.
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
 ---
- android/hog.c | 15 ++++++++++++++-
- 1 file changed, 14 insertions(+), 1 deletion(-)
+ net/bluetooth/smp.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/android/hog.c b/android/hog.c
-index ef5690c..85a6982 100644
---- a/android/hog.c
-+++ b/android/hog.c
-@@ -105,6 +105,8 @@ struct report {
- 	uint16_t		ccc_handle;
- 	guint			notifyid;
- 	struct gatt_char	*decl;
-+	uint16_t		len;
-+	uint8_t			*value;
- };
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index a7c344b4acbc..7e914477721a 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -307,7 +307,8 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+ 	struct hci_dev *hdev = hcon->hdev;
+ 	u8 local_dist = 0, remote_dist = 0;
  
- static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-@@ -290,8 +292,18 @@ static void discover_report(GAttrib *attrib, uint16_t start, uint16_t end,
- static void report_read_cb(guint8 status, const guint8 *pdu, guint16 len,
- 							gpointer user_data)
- {
--	if (status != 0)
-+	struct report *report = user_data;
+-	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags)) {
++	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags) ||
++	    test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
+ 		local_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
+ 		remote_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
+ 		authreq |= SMP_AUTH_BONDING;
+@@ -985,6 +986,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
+ 		authreq |= SMP_AUTH_MITM;
+ 
++	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
 +
-+	if (status != 0) {
- 		error("Error reading Report value: %s", att_ecode2str(status));
-+		return;
-+	}
-+
-+	if (report->value)
-+		g_free(report->value);
-+
-+	report->value = g_memdup(pdu, len);
-+	report->len = len;
+ 	if (hcon->role == HCI_ROLE_MASTER) {
+ 		struct smp_cmd_pairing cp;
+ 
+@@ -999,8 +1002,6 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+ 		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+ 	}
+ 
+-	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
+-
+ 	return 0;
  }
  
- static struct report *report_new(struct bt_hog *hog, struct gatt_char *chr)
-@@ -690,6 +702,7 @@ static void report_free(void *data)
- {
- 	struct report *report = data;
- 
-+	g_free(report->value);
- 	g_free(report->decl);
- 	g_free(report);
- }
 -- 
 1.9.3
 
