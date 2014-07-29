@@ -1,72 +1,200 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 2/3] monitor: Fix segmentation fault with malformed packet
-Date: Tue, 29 Jul 2014 17:18:23 +0300
-Message-Id: <1406643504-29232-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 1/3] monitor: Add save to file SCO audio
+Date: Tue, 29 Jul 2014 17:18:22 +0300
+Message-Id: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Do not allow to read more then buffer size.
-This fixes segmentation fault reading capture from target (apparently
-end of the trace was broken).
+Add new option which makes possible to save audio SCO trace to file. The
+file can be played with sox using command line:
+btmon -a <cap> -S<audio-file>
+$ play -c 1 -t s16 -r 8000 <audio-file>
 ---
- monitor/btsnoop.c    | 7 +++++++
- src/shared/btsnoop.c | 5 +++++
- src/shared/btsnoop.h | 2 ++
- 3 files changed, 14 insertions(+)
+ monitor/analyze.c | 44 ++++++++++++++++++++++++++++++++++++++++++--
+ monitor/analyze.h |  2 ++
+ monitor/main.c    | 17 ++++++++++++++---
+ monitor/packet.h  |  1 +
+ 4 files changed, 59 insertions(+), 5 deletions(-)
 
-diff --git a/monitor/btsnoop.c b/monitor/btsnoop.c
-index fafeff8..ec19812 100644
---- a/monitor/btsnoop.c
-+++ b/monitor/btsnoop.c
-@@ -304,6 +304,13 @@ int btsnoop_read_hci(struct timeval *tv, uint16_t *index, uint16_t *opcode,
- 	}
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 5288cf3..7aa98b0 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -28,15 +28,22 @@
  
- 	toread = be32toh(pkt.size);
-+	if (toread > MAX_PACKET_SIZE) {
-+		perror("Packet len suspicially big: %u", toread);
-+		close(btsnoop_fd);
-+		btsnoop_fd = -1;
-+		return -1;
+ #include <stdio.h>
+ #include <string.h>
++#include <unistd.h>
++#include <fcntl.h>
++#include <sys/stat.h>
+ 
+ #include "src/shared/util.h"
+ #include "src/shared/queue.h"
+ #include "src/shared/btsnoop.h"
+ #include "monitor/bt.h"
++#include "monitor/packet.h"
+ #include "analyze.h"
+ 
+ #define MAX_PACKET_SIZE		(1486 + 4)
+ 
++static int sco_fd = -1;
++static unsigned long filter_mask = 0;
++
+ struct hci_dev {
+ 	uint16_t index;
+ 	uint8_t type;
+@@ -237,12 +244,22 @@ static void acl_pkt(struct timeval *tv, uint16_t index,
+ 	dev->num_acl++;
+ }
+ 
+-static void sco_pkt(struct timeval *tv, uint16_t index,
++void analyze_set_filter(unsigned long filter)
++{
++	filter_mask = filter;
++}
++
++static void sco_pkt(struct timeval *tv, uint16_t index, bool in,
+ 					const void *data, uint16_t size)
+ {
+ 	const struct bt_hci_sco_hdr *hdr = data;
+ 	struct hci_dev *dev;
+ 
++	if (size < sizeof(*hdr)) {
++		fprintf(stderr, "Malformed SCO packet of size %u", size);
++		return;
 +	}
 +
- 	flags = be32toh(pkt.flags);
+ 	data += sizeof(*hdr);
+ 	size -= sizeof(*hdr);
  
- 	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
-diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
-index 17a872c..521be10 100644
---- a/src/shared/btsnoop.c
-+++ b/src/shared/btsnoop.c
-@@ -415,6 +415,11 @@ bool btsnoop_read_hci(struct btsnoop *btsnoop, struct timeval *tv,
- 	}
+@@ -251,6 +268,15 @@ static void sco_pkt(struct timeval *tv, uint16_t index,
+ 		return;
  
- 	toread = be32toh(pkt.size);
-+	if (toread > MAX_PACKET_SIZE) {
-+		btsnoop->aborted = true;
+ 	dev->num_sco++;
++
++	if (size != 48) {
++		fprintf(stderr, "Drop malformed packet of size %u\n", size);
++		return;
++	}
++
++	if ((filter_mask & PACKET_FILTER_SAVE_SCO_DATA) && in)
++		if (write(sco_fd, data, size) < 0)
++			return;
+ }
+ 
+ void analyze_trace(const char *path)
+@@ -308,8 +334,10 @@ void analyze_trace(const char *path)
+ 			acl_pkt(&tv, index, buf, pktlen);
+ 			break;
+ 		case BTSNOOP_OPCODE_SCO_TX_PKT:
++			sco_pkt(&tv, index, false, buf, pktlen);
++			break;
+ 		case BTSNOOP_OPCODE_SCO_RX_PKT:
+-			sco_pkt(&tv, index, buf, pktlen);
++			sco_pkt(&tv, index, true, buf, pktlen);
+ 			break;
+ 		}
+ 
+@@ -321,5 +349,17 @@ void analyze_trace(const char *path)
+ 	queue_destroy(dev_list, dev_destroy);
+ 
+ done:
++	if (sco_fd >= 0)
++		close(sco_fd);
+ 	btsnoop_unref(btsnoop_file);
+ }
++
++bool open_sco_dump(const char *path)
++{
++	sco_fd = open(path, O_WRONLY | O_CREAT | O_TRUNC | O_CLOEXEC,
++					S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH);
++	if (sco_fd < 0)
 +		return false;
++
++	return true;
++}
+diff --git a/monitor/analyze.h b/monitor/analyze.h
+index c643d35..50bbf07 100644
+--- a/monitor/analyze.h
++++ b/monitor/analyze.h
+@@ -23,3 +23,5 @@
+  */
+ 
+ void analyze_trace(const char *path);
++void analyze_set_filter(unsigned long filter);
++bool open_sco_dump(const char *path);
+diff --git a/monitor/main.c b/monitor/main.c
+index f0922eb..ac34262 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -76,7 +76,7 @@ static const struct option main_options[] = {
+ 	{ "index",   required_argument, NULL, 'i' },
+ 	{ "time",    no_argument,       NULL, 't' },
+ 	{ "date",    no_argument,       NULL, 'T' },
+-	{ "sco",     no_argument,	NULL, 'S' },
++	{ "sco",     optional_argument,	NULL, 'S' },
+ 	{ "ellisys", required_argument, NULL, 'E' },
+ 	{ "todo",    no_argument,       NULL, '#' },
+ 	{ "version", no_argument,       NULL, 'v' },
+@@ -91,6 +91,7 @@ int main(int argc, char *argv[])
+ 	const char *writer_path = NULL;
+ 	const char *analyze_path = NULL;
+ 	const char *ellisys_server = NULL;
++	const char *sco_path = NULL;
+ 	unsigned short ellisys_port = 0;
+ 	const char *str;
+ 	int exit_status;
+@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "r:w:a:s:i:tTSE:vh",
++		opt = getopt_long(argc, argv, "r:w:a:s:i:tTS::E:vh",
+ 						main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -142,7 +143,11 @@ int main(int argc, char *argv[])
+ 			filter_mask |= PACKET_FILTER_SHOW_DATE;
+ 			break;
+ 		case 'S':
+-			filter_mask |= PACKET_FILTER_SHOW_SCO_DATA;
++			if (optarg) {
++				filter_mask |= PACKET_FILTER_SAVE_SCO_DATA;
++				sco_path = optarg;
++			} else
++				filter_mask |= PACKET_FILTER_SHOW_SCO_DATA;
+ 			break;
+ 		case 'E':
+ 			ellisys_server = optarg;
+@@ -184,6 +189,12 @@ int main(int argc, char *argv[])
+ 	keys_setup();
+ 
+ 	packet_set_filter(filter_mask);
++	analyze_set_filter(filter_mask);
++
++	if (sco_path && !open_sco_dump(sco_path)) {
++		printf("Failed to open '%s'\n", sco_path);
++		return EXIT_FAILURE;
 +	}
-+
- 	flags = be32toh(pkt.flags);
  
- 	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
-diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
-index 2c55d02..9f73913 100644
---- a/src/shared/btsnoop.h
-+++ b/src/shared/btsnoop.h
-@@ -44,6 +44,8 @@
- #define BTSNOOP_OPCODE_SCO_TX_PKT	6
- #define BTSNOOP_OPCODE_SCO_RX_PKT	7
+ 	if (analyze_path) {
+ 		analyze_trace(analyze_path);
+diff --git a/monitor/packet.h b/monitor/packet.h
+index c39816b..d75b3ba 100644
+--- a/monitor/packet.h
++++ b/monitor/packet.h
+@@ -32,6 +32,7 @@
+ #define PACKET_FILTER_SHOW_TIME_OFFSET	(1 << 3)
+ #define PACKET_FILTER_SHOW_ACL_DATA	(1 << 4)
+ #define PACKET_FILTER_SHOW_SCO_DATA	(1 << 5)
++#define PACKET_FILTER_SAVE_SCO_DATA	(1 << 6)
  
-+#define MAX_PACKET_SIZE (1486 + 4)
-+
- struct btsnoop_opcode_new_index {
- 	uint8_t  type;
- 	uint8_t  bus;
+ void packet_set_filter(unsigned long filter);
+ void packet_add_filter(unsigned long filter);
 -- 
 1.9.1
 
