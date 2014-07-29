@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 10/12] obexd: Fix memory leak
-Date: Tue, 29 Jul 2014 17:20:59 +0300
-Message-Id: <1406643661-29323-10-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 08/12] android/ipc: Remove unneeded check
+Date: Tue, 29 Jul 2014 17:20:57 +0300
+Message-Id: <1406643661-29323-8-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,27 +12,26 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Fixes memory leak for folder_listing_cb().
+rsp_len cannot be NULL since it is checked above and dereferenced.
+Remove static analyzers warnings.
 ---
- obexd/client/map.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ android/hal-ipc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/obexd/client/map.c b/obexd/client/map.c
-index d2d3d81..331aebc 100644
---- a/obexd/client/map.c
-+++ b/obexd/client/map.c
-@@ -271,8 +271,10 @@ static void folder_listing_cb(struct obc_session *session,
+diff --git a/android/hal-ipc.c b/android/hal-ipc.c
+index 494ba85..363072c 100644
+--- a/android/hal-ipc.c
++++ b/android/hal-ipc.c
+@@ -462,8 +462,7 @@ int hal_ipc_cmd(uint8_t service_id, uint8_t opcode, uint16_t len, void *param,
+ 		}
  	}
  
- 	reply = dbus_message_new_method_return(request->msg);
--	if (reply == NULL)
-+	if (reply == NULL) {
-+		g_free(contents);
- 		return;
-+	}
+-	if (rsp_len)
+-		*rsp_len = cmd.len;
++	*rsp_len = cmd.len;
  
- 	dbus_message_iter_init_append(reply, &iter);
- 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
+ 	return BT_STATUS_SUCCESS;
+ 
 -- 
 1.9.1
 
