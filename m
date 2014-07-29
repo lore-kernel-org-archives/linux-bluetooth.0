@@ -1,66 +1,119 @@
 Return-Path: <cyrus@holtmann.org>
-Date: Tue, 29 Jul 2014 14:48:12 +0300
-From: Johan Hedberg <johan.hedberg@gmail.com>
+From: johan.hedberg@gmail.com
 To: linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: Fix SMP authentication requirement when
- initiator
-Message-ID: <20140729114812.GA26881@t440s.lan>
-References: <1406624859-17294-1-git-send-email-johan.hedberg@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-In-Reply-To: <1406624859-17294-1-git-send-email-johan.hedberg@gmail.com>
+Subject: [PATCH] Bluetooth: Fix SMP context tracking leading to a kernel crash
+Date: Tue, 29 Jul 2014 14:18:48 +0300
+Message-Id: <1406632728-23547-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-On Tue, Jul 29, 2014, johan.hedberg@gmail.com wrote:
-> Even if we're not pairable (the HCI_PAIRABLE flag is unset) we should
-> still allow initiating pairing with bonding. This patch adds a missing
-> check for SMP_FLAG_INITIATOR to build_pairing_cmd() and ensures this
-> flag is properly set before calling the function.
-> 
-> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
-> ---
->  net/bluetooth/smp.c | 7 ++++---
->  1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index a7c344b4acbc..7e914477721a 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -307,7 +307,8 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
->  	struct hci_dev *hdev = hcon->hdev;
->  	u8 local_dist = 0, remote_dist = 0;
->  
-> -	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags)) {
-> +	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags) ||
-> +	    test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
->  		local_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
->  		remote_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
->  		authreq |= SMP_AUTH_BONDING;
-> @@ -985,6 +986,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
->  	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
->  		authreq |= SMP_AUTH_MITM;
->  
-> +	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
-> +
->  	if (hcon->role == HCI_ROLE_MASTER) {
->  		struct smp_cmd_pairing cp;
->  
-> @@ -999,8 +1002,6 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
->  		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
->  	}
->  
-> -	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
-> -
->  	return 0;
->  }
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-Hold on with this patch for a bit. There are some SM test cases that
-require us to be able to initiate no-bonding pairing (e.g.
-TP/JW/BV-01-C). So we have to retain somehow the capability of doing
-this.
+The HCI_CONN_LE_SMP_PEND flag is supposed to indicate whether we have an
+SMP context or not. If the context creation fails, or some other error
+is indicated between setting the flag and creating the context the flag
+must be cleared first.
 
-A simple solution would be to revert bluez.git back to always enabling
-pairable and then forget about this kernel patch.
+This patch ensures that smp_chan_create() clears the flag in case of
+allocation failure as well as reorders code in smp_cmd_security_req()
+that could lead to returning an error between setting the flag and
+creating the context.
 
-Johan
+Without the patch the following kind of kernel crash could be observed
+(this one because of unacceptable authentication requirements in a
+Security Request):
+
+[  +0.000855] kernel BUG at net/bluetooth/smp.c:606!
+[  +0.000000] invalid opcode: 0000 [#1] PREEMPT SMP DEBUG_PAGEALLOC
+[  +0.000000] CPU: 0 PID: 58 Comm: kworker/u5:2 Tainted: G        W     3.16.0-rc1+ #785
+[  +0.008391] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[  +0.000000] Workqueue: hci0 hci_rx_work
+[  +0.000000] task: f4dc8f90 ti: f4ef0000 task.ti: f4ef0000
+[  +0.000000] EIP: 0060:[<c13432b6>] EFLAGS: 00010246 CPU: 0
+[  +0.000000] EIP is at smp_chan_destroy+0x1e/0x145
+[  +0.000709] EAX: f46db870 EBX: 00000000 ECX: 00000000 EDX: 00000005
+[  +0.000000] ESI: f46db870 EDI: f46db870 EBP: f4ef1dc0 ESP: f4ef1db0
+[  +0.000000]  DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068
+[  +0.000000] CR0: 8005003b CR2: b666b0b0 CR3: 00022000 CR4: 00000690
+[  +0.000000] DR0: 00000000 DR1: 00000000 DR2: 00000000 DR3: 00000000
+[  +0.000000] DR6: fffe0ff0 DR7: 00000400
+[  +0.000000] Stack:
+[  +0.000000]  00000005 f17b7840 f46db870 f4ef1dd4 f4ef1de4 c1343441 c134342e 00000000
+[  +0.000000]  c1343441 00000005 00000002 00000000 f17b7840 f4ef1e38 c134452a 00002aae
+[  +0.000000]  01ef1e00 00002aae f46bd980 f46db870 00000039 ffffffff 00000007 f4ef1e34
+[  +0.000000] Call Trace:
+[  +0.000000]  [<c1343441>] smp_failure+0x64/0x6c
+[  +0.000000]  [<c134342e>] ? smp_failure+0x51/0x6c
+[  +0.000000]  [<c1343441>] ? smp_failure+0x64/0x6c
+[  +0.000000]  [<c134452a>] smp_sig_channel+0xad6/0xafc
+[  +0.000000]  [<c1053b61>] ? vprintk_emit+0x343/0x366
+[  +0.000000]  [<c133f34e>] l2cap_recv_frame+0x1337/0x1ac4
+[  +0.000000]  [<c133f34e>] ? l2cap_recv_frame+0x1337/0x1ac4
+[  +0.000000]  [<c1172307>] ? __dynamic_pr_debug+0x3e/0x40
+[  +0.000000]  [<c11702a1>] ? debug_smp_processor_id+0x12/0x14
+[  +0.000000]  [<c1340bc9>] l2cap_recv_acldata+0xe8/0x239
+[  +0.000000]  [<c1340bc9>] ? l2cap_recv_acldata+0xe8/0x239
+[  +0.000000]  [<c1169931>] ? __const_udelay+0x1a/0x1c
+[  +0.000000]  [<c131f120>] hci_rx_work+0x1a1/0x286
+[  +0.000000]  [<c137244e>] ? mutex_unlock+0x8/0xa
+[  +0.000000]  [<c131f120>] ? hci_rx_work+0x1a1/0x286
+[  +0.000000]  [<c1038fe5>] process_one_work+0x128/0x1df
+[  +0.000000]  [<c1038fe5>] ? process_one_work+0x128/0x1df
+[  +0.000000]  [<c10392df>] worker_thread+0x222/0x2de
+[  +0.000000]  [<c10390bd>] ? process_scheduled_works+0x21/0x21
+[  +0.000000]  [<c103d34c>] kthread+0x82/0x87
+[  +0.000000]  [<c1040000>] ? create_new_namespaces+0x90/0x105
+[  +0.000000]  [<c13738e1>] ret_from_kernel_thread+0x21/0x30
+[  +0.000000]  [<c103d2ca>] ? __kthread_parkme+0x50/0x50
+[  +0.000000] Code: 65 f4 89 f0 5b 5e 5f 5d 8d 67 f8 5f c3 57 8d 7c 24 08 83 e4 f8 ff 77 fc 55 89 e5 57 89 c7 56 53 52 8b 98 e0 00 00 00 85 db 75 02 <0f> 0b 8b b3 80 00 00 00 8b 00 c1 ee 03 83 e6 01 89 f2 e8 ef 09
+[  +0.000000] EIP: [<c13432b6>] smp_chan_destroy+0x1e/0x145 SS:ESP 0068:f4ef1db0
+
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/smp.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 7e914477721a..36110e0b1f30 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -580,13 +580,16 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
+ 	struct smp_chan *smp;
+ 
+ 	smp = kzalloc(sizeof(*smp), GFP_ATOMIC);
+-	if (!smp)
++	if (!smp) {
++		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+ 		return NULL;
++	}
+ 
+ 	smp->tfm_aes = crypto_alloc_blkcipher("ecb(aes)", 0, CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(smp->tfm_aes)) {
+ 		BT_ERR("Unable to create ECB crypto context");
+ 		kfree(smp);
++		clear_bit(HCI_CONN_LE_SMP_PEND, &conn->hcon->flags);
+ 		return NULL;
+ 	}
+ 
+@@ -924,14 +927,14 @@ static u8 smp_cmd_security_req(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (test_and_set_bit(HCI_CONN_LE_SMP_PEND, &hcon->flags))
+ 		return 0;
+ 
+-	if (!test_bit(HCI_PAIRABLE, &hcon->hdev->dev_flags) &&
+-	    (rp->auth_req & SMP_AUTH_BONDING))
+-		return SMP_PAIRING_NOTSUPP;
+-
+ 	smp = smp_chan_create(conn);
+ 	if (!smp)
+ 		return SMP_UNSPECIFIED;
+ 
++	if (!test_bit(HCI_PAIRABLE, &hcon->hdev->dev_flags) &&
++	    (rp->auth_req & SMP_AUTH_BONDING))
++		return SMP_PAIRING_NOTSUPP;
++
+ 	skb_pull(skb, sizeof(*rp));
+ 
+ 	memset(&cp, 0, sizeof(cp));
+-- 
+1.9.3
+
