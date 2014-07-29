@@ -3,14 +3,13 @@ From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
 Subject: [PATCH] android/pts: RFCOMM PTS update.
-Date: Tue, 29 Jul 2014 16:12:18 +0200
-Message-Id: <1406643138-16988-1-git-send-email-sebastian.chlad@tieto.com>
+Date: Tue, 29 Jul 2014 16:06:43 +0200
+Message-Id: <1406642803-16541-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Number of issues on PTS 5.2 for RFCOMM found. Problems with Credits
-(PTS issue #12421), Channel disconnect (PTS issue #12414), accepting
-UIH and UA frames (PTS issue #12397).
+Number of issues on RFCOMM tests in PTS 5.2 found. Problems with Credits,
+Channel disconnect, accepting UIH and UA frames.
 ---
  android/pts-rfcomm.txt | 18 +++++++++++-------
  1 file changed, 11 insertions(+), 7 deletions(-)
