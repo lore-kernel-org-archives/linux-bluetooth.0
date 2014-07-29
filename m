@@ -1,9 +1,9 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 06/12] tools/l2test: Remove unneeded return
-Date: Tue, 29 Jul 2014 17:20:55 +0300
-Message-Id: <1406643661-29323-6-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv4 11/12] obexd: Fix memory leak
+Date: Tue, 29 Jul 2014 17:21:00 +0300
+Message-Id: <1406643661-29323-11-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 In-Reply-To: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
  <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
@@ -12,24 +12,27 @@ List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-Remove dead code after exit()
+Fixes memory leak for message_listing_cb()
 ---
- tools/l2test.c | 2 --
- 1 file changed, 2 deletions(-)
+ obexd/client/map.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index ffad7c4..67ca70a 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -768,8 +768,6 @@ static void do_listen(void (*handler)(int sk))
- 		exit(0);
+diff --git a/obexd/client/map.c b/obexd/client/map.c
+index 331aebc..5d7f0dc 100644
+--- a/obexd/client/map.c
++++ b/obexd/client/map.c
+@@ -1182,8 +1182,10 @@ static void message_listing_cb(struct obc_session *session,
  	}
  
--	return;
--
- error:
- 	close(sk);
- 	exit(1);
+ 	reply = dbus_message_new_method_return(request->msg);
+-	if (reply == NULL)
++	if (reply == NULL) {
++		g_free(contents);
+ 		return;
++	}
+ 
+ 	dbus_message_iter_init_append(reply, &iter);
+ 	dbus_message_iter_open_container(&iter, DBUS_TYPE_ARRAY,
 -- 
 1.9.1
 
