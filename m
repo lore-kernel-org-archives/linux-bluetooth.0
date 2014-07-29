@@ -1,35 +1,61 @@
 Return-Path: <cyrus@holtmann.org>
-From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
+From: Sebastian Chlad <sebastian.chlad@tieto.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv2 3/3] monitor: Handle default switch case
-Date: Tue, 29 Jul 2014 17:18:24 +0300
-Message-Id: <1406643504-29232-3-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Cc: Sebastian Chlad <sebastian.chlad@tieto.com>
+Subject: [PATCH] android/pts: RFCOMM PTS update.
+Date: Tue, 29 Jul 2014 16:12:18 +0200
+Message-Id: <1406643138-16988-1-git-send-email-sebastian.chlad@tieto.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
-
-Fixes issues with junk packets.
+Number of issues on PTS 5.2 for RFCOMM found. Problems with Credits
+(PTS issue #12421), Channel disconnect (PTS issue #12414), accepting
+UIH and UA frames (PTS issue #12397).
 ---
- monitor/analyze.c | 3 +++
- 1 file changed, 3 insertions(+)
+ android/pts-rfcomm.txt | 18 +++++++++++-------
+ 1 file changed, 11 insertions(+), 7 deletions(-)
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index 7aa98b0..9ec6b06 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -339,6 +339,9 @@ void analyze_trace(const char *path)
- 		case BTSNOOP_OPCODE_SCO_RX_PKT:
- 			sco_pkt(&tv, index, true, buf, pktlen);
- 			break;
-+		default:
-+			fprintf(stderr, "Wrong opcode %u", opcode);
-+			goto done;
- 		}
- 
- 		num_packets++;
+diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
+index b96caab..9bfc7a2 100644
+--- a/android/pts-rfcomm.txt
++++ b/android/pts-rfcomm.txt
+@@ -17,17 +17,21 @@ Test Name		Result	Notes
+ TC_RFC_BV_01_C		PASS	rctest -n -P 1 <btaddr>
+ TC_RFC_BV_02_C		PASS	rctest -r -P 1
+ TC_RFC_BV_03_C		PASS	rctest -r -P 1
+-TC_RFC_BV_04_C		FAIL
++TC_RFC_BV_04_C		FAIL	PTS issue #12421
++				PTS issue #12414
+ 				NOTE: DISC on DLC is expected; IUT disconnects
+ 					rfcomm session (close)
+-TC_RFC_BV_05_C		INC
++TC_RFC_BV_05_C		PASS	rctest -n -P 4 <btaddr>
++				Note: test requires IUT to connect on the given
++				channel. sdptool browse <btaddr> to check the
++				channel.
+ TC_RFC_BV_06_C		PASS	rctest -r -P 1
+ TC_RFC_BV_07_C		PASS	rctest -r -P 1
+-TC_RFC_BV_08_C		INC
++TC_RFC_BV_08_C		INC	PTS issue #12397
+ 				NOTE: Incorrect frame type sent in response to
+ 					the DISC command
+ TC_RFC_BV_11_C		PASS	rctest -r -P 1
+-TC_RFC_BV_13_C		FAIL
++TC_RFC_BV_13_C		FAIL	PTS issue #12397
+ 				NOTE: IUT sent the correct frame type (UIH)
+ 				but the parameters did not match the
+ 				requirements
+@@ -35,7 +39,7 @@ TC_RFC_BV_14_C		N/A
+ TC_RFC_BV_15_C		PASS	rctest -r -P 1
+ TC_RFC_BV_17_C		PASS	rctest -d -P 1
+ TC_RFC_BV_19_C		PASS
+-TC_RFC_BV_21_C		INC
+-TC_RFC_BV_22_C		INC
+-TC_RFC_BV_25_C		INC
++TC_RFC_BV_21_C		INC	PTS issue #12421
++TC_RFC_BV_22_C		INC	PTS issue #12421
++TC_RFC_BV_25_C		INC	PTS issue #12421
+ -------------------------------------------------------------------------------
 -- 
-1.9.1
+1.8.5.3
 
