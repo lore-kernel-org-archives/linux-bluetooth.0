@@ -1,41 +1,48 @@
 Return-Path: <cyrus@holtmann.org>
-From: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Cc: Jakub Tyszkowski <jakub.tyszkowski@tieto.com>
-Subject: [PATCHv2 0/9] android/tester-ng: Add HIDHost test cases
-Date: Tue, 29 Jul 2014 09:18:23 +0200
-Message-Id: <1406618312-15059-1-git-send-email-jakub.tyszkowski@tieto.com>
+From: "Gu, Chao Jie" <chao.jie.gu@intel.com>
+To: Arman Uguray <armansito@chromium.org>,
+	Marcel Holtmann <marcel@holtmann.org>
+CC: "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [RFC v1 1/1] doc/gatt-api: New API properties and methods for
+ the GATT D-Bus API.
+Date: Tue, 29 Jul 2014 06:03:10 +0000
+Message-ID: <3D02B219753AD44CBDDDE484323B1774112D2F48@SHSMSX104.ccr.corp.intel.com>
+References: <1405986034-29122-1-git-send-email-armansito@chromium.org>
+	<1405986034-29122-2-git-send-email-armansito@chromium.org>
+	<3D02B219753AD44CBDDDE484323B1774112D2C2C@SHSMSX104.ccr.corp.intel.com>
+	<CAHrH25QAR=y6Dtn4Y-t=EX1h6Oxn9ir7rWft2m+mVsBHfab1Wg@mail.gmail.com>
+	<409335B4-82B3-40D2-970A-D39416F02591@holtmann.org>
+ <CAHrH25To=NvJC+4E6U-2S5pMc1qORvKOpbG2atY9=CFn4Zwcew@mail.gmail.com>
+In-Reply-To: <CAHrH25To=NvJC+4E6U-2S5pMc1qORvKOpbG2atY9=CFn4Zwcew@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-This adds last set of test cases ported to newer tester framework.
-Last patch removes the old 'android-tester' and renames 'android-tester-ng'
-to 'android-tester'.
-
-v2changes:
-	* improved/cleaned up some cases step flow
-	* renamed the 'android-tester-ng' to 'android-tester'
-
-Jakub Tyszkowski (9):
-  android/tester-ng: Add HIDHost connect, disconnect cases
-  android/tester-ng: Add HIDHost virtual unplug test case
-  android/tester-ng: Add HIDHost get protocol mode case
-  android/tester-ng: Add HIDHost set protocol mode case
-  android/tester-ng: Add HIDHost get report case
-  android/tester-ng: Add HIDHost set report case
-  android/tester-ng: Add HIDHost send data case
-  android/tester: Remove old HIDHost test cases
-  android/tester: Remove old android-tester
-
- .gitignore               |    1 -
- android/Makefile.am      |   30 +-
- android/android-tester.c | 2812 ----------------------------------------------
- android/tester-hidhost.c |  533 ++++++++-
- android/tester-main.c    |   80 +-
- android/tester-main.h    |   27 +
- 6 files changed, 637 insertions(+), 2846 deletions(-)
- delete mode 100644 android/android-tester.c
-
---
-1.9.1
-
+SGkgYXJtYW4sDQoNCjwgWWVzLCB3ZSBzaG91bGRuJ3QgZXhwb3NlIHRoZSBWYWx1ZSBwcm9wZXJ0
+eSBpZiB0aGUgY2hhcmFjdGVyaXN0aWMgcHJvcGVydGllcyBmaWVsZCBkb2Vzbid0IGNvbnRhaW4g
+InJlYWQiLCAibm90aWZ5Iiwgb3IgImluZGljYXRlIi4gV2l0aCByZXNwZWN0IHRvIGNhY2hpbmcg
+dGhlDQo8IHZhbHVlIGJlZm9yZSBhIHdyaXRlIG9wZXJhdGlvbiwgSSdtIHN0aWxsIGhlc2l0YW50
+IHRvd2FyZHMgbWFraW5nIGFueSBhc3N1bXB0aW9ucyBhYm91dCB0aGUgdmFsdWUuIEkgd291bGRu
+J3Qgd2FudCB0byBjYWNoZSB0aGUgdmFsdWUgdW50aWwgYWZ0ZXIgdGhlIHdyaXRlDQo8IG9wZXJh
+dGlvbiBoYXMgY29tcGxldGVkIHN1Y2Nlc3NmdWxseSAod2hpY2ggaXMgb25seSBwb3NzaWJsZSB0
+byBkZXRlcm1pbmUgd2l0aCB0aGUgIndyaXRlIHJlcXVlc3QiIGFuZCAicmVsaWFibGUgbG9uZyB3
+cml0ZSIgcHJvY2VkdXJlKSBhbmQgdGhlcmUgbWF5IGJlDQo8IHNvbWUgcmFjZSBjb25kaXRpb25z
+IHdoZXJlIGEgY2hhcmFjdGVyaXN0aWMgbWlnaHQgaW1tZWRpYXRlbHkgY2hhbmdlIGl0J3MgdmFs
+dWUgYW5kIHNlbmQgYSBub3RpZmljYXRpb24gYmVmb3JlIHdlIGhhZCBhIGNoYW5jZSB0byBzdG9y
+ZSB0aGUgd3JpdGUgdmFsdWUuIEluDQo8IHRoaXMgY2FzZSB0aGUgbGF0ZXN0IGNhY2hlZCB2YWx1
+ZSB3b3VsZCBiZSBpbmNvcnJlY3QuDQo8SSB1bmRlcnN0YW5kIHRoYXQgdGhpcyBpcyBhbiBlZGdl
+IGNhc2UgYnV0IGl0J3MgZW5vdWdoIHRvIHJhaXNlIHNvbWUgY29uY2Vybi4NCg0KSWYgd2UgZW5j
+b3VudGVyIG9uZSBjb25kaXRpb24gdGhhdCB0aGUgdmFsdWUgaXMgZGV0ZXJtaW5lIHdpdGggdGhl
+ICJXcml0ZSBDb21tYW5kIiBwcm9jZWR1cmUgd2hpY2ggbm8gcmVzcG9uc2UgZm9yIGNsaWVudCwg
+c2hvdWxkIHdlIGV4cG9zZSB0aGlzIGtpbmQgb2YgcHJvcGVydHkgPyBJZiB3ZSBleHBvc2UgaXQs
+IHdlIGhhdmUgdG8gd3JpdGUgY29tbWFuZCB0byB0aGUgcmVtb3RlIGFuZCByZWFkIHZhbHVlIGJh
+Y2sgaW1tZWRpYXRlbHksIHRoZW4gZW1pdCBwcm9wZXJ0eWNoYW5nZWQgc2lnbmFsIGlmIHJlYWQg
+dmFsdWUgZXF1YWxzIHRvIHdyaXRlIHZhbHVlKGRpZmZlcmVudCBmcm9tIG9sZCBvbmUpLg0KDQpJ
+biB5b3VyIHByb3Bvc2FsICwgSSB0aGluayB3ZSBhbHNvIHNob3VsZCByZWFkIGluaXRpYWwgdmFs
+dWUgZnJvbSByZW1vdGUgYXQgdGhlIGJlZ2lubmluZyBvZiBEQnVzIEhpZXJhY2h5IHNldHVwLiBX
+aGF0ZXZlciAicmVhZCIsICJub3RpZnkiLCBvciAiaW5kaWNhdGUiIGV2ZW4gd3JpdGUgcmVxdWVz
+dCB0byByZW1vdGUsIG9ubHkgZGlmZmVyZW50IHZhbHVlIGNvbXBhcmVkIHdpdGggZXhpc3QgY2Fj
+aGUgdmFsdWUgc3VjaCBhcyBpbml0aWFsIHZhbHVlLCB0aGVuIGJsdWV6IGVtaXQgcHJvcGVydHlj
+aGFuZ2VkIHNpZ25hbC4gVGhpcyB3b3VsZCBiZSBnb29kLCByaWdodD8NCg0KVGhhbmtzDQpDaGFv
+amllIA0KDQo=
