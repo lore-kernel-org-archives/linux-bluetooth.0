@@ -1,30 +1,66 @@
 Return-Path: <cyrus@holtmann.org>
-From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
+Date: Tue, 29 Jul 2014 14:48:12 +0300
+From: Johan Hedberg <johan.hedberg@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 0/8] Add PAN test cases
-Date: Tue, 29 Jul 2014 15:01:24 +0300
-Message-Id: <1406635292-30691-1-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: Re: [PATCH] Bluetooth: Fix SMP authentication requirement when
+ initiator
+Message-ID: <20140729114812.GA26881@t440s.lan>
+References: <1406624859-17294-1-git-send-email-johan.hedberg@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <1406624859-17294-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Ravi kumar Veeramally (8):
-  android/tester: Fix memory leak
-  android/tester-ng: Add PAN init test case
-  android/tester-ng: Add PAN Connect test case
-  android/tester-ng: Add PAN Disconnect test case
-  anrdroid/tester-ng: Add PAN Get Local Role test case
-  android/tester-ng: Add PAN Enable PANU test case
-  android/tester-ng: Add PAN Enable NAP test case
-  android/tester-ng: Add PAN Enable None test case
+On Tue, Jul 29, 2014, johan.hedberg@gmail.com wrote:
+> Even if we're not pairable (the HCI_PAIRABLE flag is unset) we should
+> still allow initiating pairing with bonding. This patch adds a missing
+> check for SMP_FLAG_INITIATOR to build_pairing_cmd() and ensures this
+> flag is properly set before calling the function.
+> 
+> Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+> ---
+>  net/bluetooth/smp.c | 7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index a7c344b4acbc..7e914477721a 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -307,7 +307,8 @@ static void build_pairing_cmd(struct l2cap_conn *conn,
+>  	struct hci_dev *hdev = hcon->hdev;
+>  	u8 local_dist = 0, remote_dist = 0;
+>  
+> -	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags)) {
+> +	if (test_bit(HCI_PAIRABLE, &conn->hcon->hdev->dev_flags) ||
+> +	    test_bit(SMP_FLAG_INITIATOR, &smp->flags)) {
+>  		local_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
+>  		remote_dist = SMP_DIST_ENC_KEY | SMP_DIST_SIGN;
+>  		authreq |= SMP_AUTH_BONDING;
+> @@ -985,6 +986,8 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  	    hcon->pending_sec_level > BT_SECURITY_MEDIUM)
+>  		authreq |= SMP_AUTH_MITM;
+>  
+> +	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
+> +
+>  	if (hcon->role == HCI_ROLE_MASTER) {
+>  		struct smp_cmd_pairing cp;
+>  
+> @@ -999,8 +1002,6 @@ int smp_conn_security(struct hci_conn *hcon, __u8 sec_level)
+>  		smp_send_cmd(conn, SMP_CMD_SECURITY_REQ, sizeof(cp), &cp);
+>  	}
+>  
+> -	set_bit(SMP_FLAG_INITIATOR, &smp->flags);
+> -
+>  	return 0;
+>  }
 
- android/Makefile.am   |   1 +
- android/tester-main.c |  83 +++++++++++++++++++
- android/tester-main.h |   8 ++
- android/tester-pan.c  | 219 ++++++++++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 311 insertions(+)
- create mode 100644 android/tester-pan.c
+Hold on with this patch for a bit. There are some SM test cases that
+require us to be able to initiate no-bonding pairing (e.g.
+TP/JW/BV-01-C). So we have to retain somehow the capability of doing
+this.
 
--- 
-1.9.1
+A simple solution would be to revert bluez.git back to always enabling
+pairable and then forget about this kernel patch.
 
+Johan
