@@ -1,37 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
 From: Andrei Emeltchenko <Andrei.Emeltchenko.news@gmail.com>
 To: linux-bluetooth@vger.kernel.org
-Subject: [PATCHv4 02/12] android/core: Use g_clear_error instead of free and assignment
-Date: Tue, 29 Jul 2014 17:20:51 +0300
-Message-Id: <1406643661-29323-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-In-Reply-To: <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
-References: <1405587306-20020-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
- <1406643661-29323-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+Subject: [PATCHv2 2/3] monitor: Fix segmentation fault with malformed packet
+Date: Tue, 29 Jul 2014 17:18:23 +0300
+Message-Id: <1406643504-29232-2-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+In-Reply-To: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
+References: <1406643504-29232-1-git-send-email-Andrei.Emeltchenko.news@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 From: Andrei Emeltchenko <andrei.emeltchenko@intel.com>
 
-g_clear_error() frees err and set it to NULL. This fixes dead code
-warnings from analyzers.
+Do not allow to read more then buffer size.
+This fixes segmentation fault reading capture from target (apparently
+end of the trace was broken).
 ---
- android/bluetooth.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ monitor/btsnoop.c    | 7 +++++++
+ src/shared/btsnoop.c | 5 +++++
+ src/shared/btsnoop.h | 2 ++
+ 3 files changed, 14 insertions(+)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index a2ab445..52d816f 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -290,8 +290,7 @@ static void load_adapter_config(void)
- 				"General", "DiscoverableTimeout", &gerr);
- 	if (gerr) {
- 		adapter.discoverable_timeout = DEFAULT_DISCOVERABLE_TIMEOUT;
--		g_error_free(gerr);
--		gerr = NULL;
-+		g_clear_error(&gerr);
+diff --git a/monitor/btsnoop.c b/monitor/btsnoop.c
+index fafeff8..ec19812 100644
+--- a/monitor/btsnoop.c
++++ b/monitor/btsnoop.c
+@@ -304,6 +304,13 @@ int btsnoop_read_hci(struct timeval *tv, uint16_t *index, uint16_t *opcode,
  	}
  
- 	g_key_file_free(key_file);
+ 	toread = be32toh(pkt.size);
++	if (toread > MAX_PACKET_SIZE) {
++		perror("Packet len suspicially big: %u", toread);
++		close(btsnoop_fd);
++		btsnoop_fd = -1;
++		return -1;
++	}
++
+ 	flags = be32toh(pkt.flags);
+ 
+ 	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
+diff --git a/src/shared/btsnoop.c b/src/shared/btsnoop.c
+index 17a872c..521be10 100644
+--- a/src/shared/btsnoop.c
++++ b/src/shared/btsnoop.c
+@@ -415,6 +415,11 @@ bool btsnoop_read_hci(struct btsnoop *btsnoop, struct timeval *tv,
+ 	}
+ 
+ 	toread = be32toh(pkt.size);
++	if (toread > MAX_PACKET_SIZE) {
++		btsnoop->aborted = true;
++		return false;
++	}
++
+ 	flags = be32toh(pkt.flags);
+ 
+ 	ts = be64toh(pkt.ts) - 0x00E03AB44A676000ll;
+diff --git a/src/shared/btsnoop.h b/src/shared/btsnoop.h
+index 2c55d02..9f73913 100644
+--- a/src/shared/btsnoop.h
++++ b/src/shared/btsnoop.h
+@@ -44,6 +44,8 @@
+ #define BTSNOOP_OPCODE_SCO_TX_PKT	6
+ #define BTSNOOP_OPCODE_SCO_RX_PKT	7
+ 
++#define MAX_PACKET_SIZE (1486 + 4)
++
+ struct btsnoop_opcode_new_index {
+ 	uint8_t  type;
+ 	uint8_t  bus;
 -- 
 1.9.1
 
