@@ -2,41 +2,77 @@ Return-Path: <cyrus@holtmann.org>
 From: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
 To: linux-bluetooth@vger.kernel.org
 Cc: Ravi kumar Veeramally <ravikumar.veeramally@linux.intel.com>
-Subject: [PATCH 5/8] anrdroid/tester-ng: Add PAN Get Local Role test case
-Date: Tue, 29 Jul 2014 15:01:29 +0300
-Message-Id: <1406635292-30691-6-git-send-email-ravikumar.veeramally@linux.intel.com>
+Subject: [PATCH 3/8] android/tester-ng: Add PAN Connect test case
+Date: Tue, 29 Jul 2014 15:01:27 +0300
+Message-Id: <1406635292-30691-4-git-send-email-ravikumar.veeramally@linux.intel.com>
 In-Reply-To: <1406635292-30691-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 References: <1406635292-30691-1-git-send-email-ravikumar.veeramally@linux.intel.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
 ---
- android/tester-pan.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ android/tester-pan.c | 69 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
 diff --git a/android/tester-pan.c b/android/tester-pan.c
-index 5048a43..1db4a85 100644
+index caead9c..baf1d68 100644
 --- a/android/tester-pan.c
 +++ b/android/tester-pan.c
-@@ -92,6 +92,25 @@ static void pan_disconnect_action(void)
- 	schedule_action_verification(step);
- }
+@@ -23,10 +23,79 @@
  
-+static void pan_get_local_role_action(void)
+ static struct queue *list; /* List of pan test cases */
+ 
++struct emu_cid_data {
++	uint16_t nap_handle;
++	uint16_t nap_cid;
++};
++
++struct emu_cid_data cid_data;
++static uint8_t pan_conn_req_pdu[] = {0x01, 0x01, 0x02, 0x11, 0x16, 0x11, 0x15};
++static uint8_t pan_conn_rsp_pdu[] = {0x01, 0x02, 0x00, 0x00};
++
++static void pan_nap_cid_hook_cb(const void *data, uint16_t len, void *user_data)
++{
++	struct test_data *t_data = tester_get_data();
++	struct emu_cid_data *cid_data = user_data;
++	struct bthost *bthost = hciemu_client_get_host(t_data->hciemu);
++
++	if (!memcmp((uint8_t *) data, pan_conn_req_pdu,
++						sizeof(pan_conn_req_pdu)))
++		bthost_send_cid(bthost, cid_data->nap_handle, cid_data->nap_cid,
++				pan_conn_rsp_pdu, sizeof(pan_conn_rsp_pdu));
++}
++
++static void pan_connect_request_cb(uint16_t handle, uint16_t cid,
++							void *user_data)
++{
++	struct test_data *data = tester_get_data();
++	struct bthost *bthost = hciemu_client_get_host(data->hciemu);
++
++	cid_data.nap_handle = handle;
++	cid_data.nap_cid = cid;
++
++	bthost_add_cid_hook(bthost, handle, cid, pan_nap_cid_hook_cb,
++								&cid_data);
++}
++
++static struct emu_set_l2cap_data l2cap_setup_data = {
++	.psm = 15,
++	.func = pan_connect_request_cb,
++	.user_data = NULL,
++};
++
++static void pan_connect_action(void)
 +{
 +	struct test_data *data = tester_get_data();
 +	const uint8_t *pan_addr = hciemu_get_client_bdaddr(data->hciemu);
 +	struct step *step = g_new0(struct step, 1);
 +	bt_bdaddr_t bdaddr;
-+	int role;
 +
 +	bdaddr2android((const bdaddr_t *) pan_addr, &bdaddr);
 +
-+	role = data->if_pan->get_local_role();
-+	if (role == BTPAN_ROLE_PANU)
-+		step->action_status = BT_STATUS_SUCCESS;
-+	else
-+		step->action_status = BT_STATUS_FAIL;
++	step->action_status = data->if_pan->connect(&bdaddr,
++					BTPAN_ROLE_PANU, BTPAN_ROLE_PANNAP);
 +
 +	schedule_action_verification(step);
 +}
@@ -44,11 +80,8 @@ index 5048a43..1db4a85 100644
  static struct test_case test_cases[] = {
  	TEST_CASE_BREDRLE("PAN Init",
  		ACTION_SUCCESS(dummy_action, NULL),
-@@ -125,6 +144,21 @@ static struct test_case test_cases[] = {
- 		ACTION_SUCCESS(bluetooth_disable_action, NULL),
- 		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_OFF),
  	),
-+	TEST_CASE_BREDRLE("PAN GetLocalRole - Success",
++	TEST_CASE_BREDRLE("PAN Connect - Success",
 +		ACTION_SUCCESS(bluetooth_enable_action, NULL),
 +		CALLBACK_STATE(CB_BT_ADAPTER_STATE_CHANGED, BT_STATE_ON),
 +		ACTION_SUCCESS(emu_setup_powered_remote_action, NULL),
@@ -57,7 +90,6 @@ index 5048a43..1db4a85 100644
 +		ACTION_SUCCESS(pan_connect_action, NULL),
 +		CALLBACK_STATE(CB_PAN_CONNECTION_STATE,
 +						BTPAN_STATE_CONNECTED),
-+		ACTION_SUCCESS(pan_get_local_role_action, NULL),
 +		ACTION_SUCCESS(bluetooth_disable_action, NULL),
 +		CALLBACK_STATE(CB_PAN_CONNECTION_STATE,
 +						BTPAN_STATE_DISCONNECTED),
