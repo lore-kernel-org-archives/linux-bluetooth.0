@@ -1,25 +1,36 @@
 Return-Path: <cyrus@holtmann.org>
-From: varkabhadram@gmail.com
-To: linux-zigbee-devel@lists.sourceforge.net
-Cc: linux-bluetooth@vger.kernel.org, alex.aring@gmail.com,
-	Varka Bhadram <varkab@cdac.in>
-Subject: [PATCH bluetooth-next 0/2] 6lowpan cleanup
-Date: Wed, 30 Jul 2014 11:05:10 +0530
-Message-Id: <1406698512-29405-1-git-send-email-varkabhadram@gmail.com>
+From: johan.hedberg@gmail.com
+To: linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Fix check for connected state when pairing
+Date: Wed, 30 Jul 2014 08:35:48 +0300
+Message-Id: <1406698548-14240-1-git-send-email-johan.hedberg@gmail.com>
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-From: Varka Bhadram <varkab@cdac.in>
+From: Johan Hedberg <johan.hedberg@intel.com>
 
-This series removes the unused macros and function for 6lowpan
+Both BT_CONNECTED and BT_CONFIG state mean that we have a baseband link
+available. We should therefore check for either of these when pairing
+and deciding whether to call hci_conn_security() directly.
 
-Varka Bhadram (2):
-  6lowpan: remove unused macros
-  6lowpan: remove unused function
+Signed-off-by: Johan Hedberg <johan.hedberg@intel.com>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- include/net/6lowpan.h |   26 --------------------------
- 1 file changed, 26 deletions(-)
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 5d18efcb8467..0b15b7618beb 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3213,7 +3213,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	conn->io_capability = cp->io_cap;
+ 	cmd->user_data = conn;
+ 
+-	if (conn->state == BT_CONNECTED &&
++	if ((conn->state == BT_CONNECTED || conn->state == BT_CONFIG) &&
+ 	    hci_conn_security(conn, sec_level, auth_type, true))
+ 		pairing_complete(cmd, 0);
+ 
 -- 
-1.7.9.5
+1.9.3
 
