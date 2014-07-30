@@ -1,126 +1,72 @@
 Return-Path: <cyrus@holtmann.org>
-From: Marcin Kraglak <marcin.kraglak@tieto.com>
-To: linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/5] android/gatt: Split set_security() function
-Date: Wed, 30 Jul 2014 11:38:46 +0200
-Message-Id: <1406713130-3825-1-git-send-email-marcin.kraglak@tieto.com>
+From: Szymon Janc <szymon.janc@tieto.com>
+To: Sebastian Chlad <sebastian.chlad@tieto.com>
+Cc: linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] android/pts: RFCOMM PTS update.
+Date: Wed, 30 Jul 2014 11:26:24 +0200
+Message-ID: <13529513.ev1i7PCfTT@uw000953>
+In-Reply-To: <1406643138-16988-1-git-send-email-sebastian.chlad@tieto.com>
+References: <1406643138-16988-1-git-send-email-sebastian.chlad@tieto.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Sender: linux-bluetooth-owner@vger.kernel.org
 List-ID: <linux-bluetooth.vger.kernel.org>
 
-Split function to set_security() and set_auth_type(). Set_security()
-will be used in public API.
----
- android/gatt.c | 51 +++++++++++++++++++++++++++++----------------------
- 1 file changed, 29 insertions(+), 22 deletions(-)
+Hi Sebastian,
 
-diff --git a/android/gatt.c b/android/gatt.c
-index 2ddbf29..31558d0 100644
---- a/android/gatt.c
-+++ b/android/gatt.c
-@@ -2832,27 +2832,12 @@ static int get_sec_level(struct gatt_device *dev)
- 	return sec_level;
- }
- 
--static bool set_security(struct gatt_device *device, int auth_type)
-+static bool set_security(struct gatt_device *device, int req_sec_level)
- {
--	int req_sec_level, sec_level;
-+	int sec_level;
- 	GError *gerr = NULL;
- 	GIOChannel *io;
- 
--	switch (auth_type) {
--	case HAL_GATT_AUTHENTICATION_MITM:
--		req_sec_level = BT_SECURITY_HIGH;
--		break;
--	case HAL_GATT_AUTHENTICATION_NO_MITM:
--		req_sec_level = BT_SECURITY_MEDIUM;
--		break;
--	case HAL_GATT_AUTHENTICATION_NONE:
--		req_sec_level = BT_SECURITY_LOW;
--		break;
--	default:
--		error("gatt: Invalid auth_type value: %d", auth_type);
--		return false;
--	}
--
- 	sec_level = get_sec_level(device);
- 	if (sec_level < 0)
- 		return false;
-@@ -2875,6 +2860,28 @@ static bool set_security(struct gatt_device *device, int auth_type)
- 	return true;
- }
- 
-+static bool set_auth_type(struct gatt_device *device, int auth_type)
-+{
-+	int sec_level;
-+
-+	switch (auth_type) {
-+	case HAL_GATT_AUTHENTICATION_MITM:
-+		sec_level = BT_SECURITY_HIGH;
-+		break;
-+	case HAL_GATT_AUTHENTICATION_NO_MITM:
-+		sec_level = BT_SECURITY_MEDIUM;
-+		break;
-+	case HAL_GATT_AUTHENTICATION_NONE:
-+		sec_level = BT_SECURITY_LOW;
-+		break;
-+	default:
-+		error("gatt: Invalid auth_type value: %d", auth_type);
-+		return false;
-+	}
-+
-+	return set_security(device, sec_level);
-+}
-+
- static void handle_client_read_characteristic(const void *buf, uint16_t len)
- {
- 	const struct hal_cmd_gatt_client_read_characteristic *cmd = buf;
-@@ -2915,7 +2922,7 @@ static void handle_client_read_characteristic(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	if (!set_security(conn->device, cmd->auth_req)) {
-+	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
- 		status = HAL_STATUS_FAILED;
- 		free(cb_data);
-@@ -3052,7 +3059,7 @@ static void handle_client_write_characteristic(const void *buf, uint16_t len)
- 		}
- 	}
- 
--	if (!set_security(conn->device, cmd->auth_req)) {
-+	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
-@@ -3267,7 +3274,7 @@ static void handle_client_read_descriptor(const void *buf, uint16_t len)
- 		goto failed;
- 	}
- 
--	if (!set_security(conn->device, cmd->auth_req)) {
-+	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
- 		status = HAL_STATUS_FAILED;
- 		free(cb_data);
-@@ -3399,7 +3406,7 @@ static void handle_client_write_descriptor(const void *buf, uint16_t len)
- 		}
- 	}
- 
--	if (!set_security(conn->device, cmd->auth_req)) {
-+	if (!set_auth_type(conn->device, cmd->auth_req)) {
- 		error("gatt: Failed to set security %d", cmd->auth_req);
- 		status = HAL_STATUS_FAILED;
- 		goto failed;
-@@ -3882,7 +3889,7 @@ static uint8_t test_increase_security(bdaddr_t *bdaddr, uint16_t u1)
- 	if (!device)
- 		return HAL_STATUS_FAILED;
- 
--	if (!set_security(device, u1))
-+	if (!set_auth_type(device, u1))
- 		return HAL_STATUS_FAILED;
- 
- 	return HAL_STATUS_SUCCESS;
+On Tuesday 29 of July 2014 16:12:18 Sebastian Chlad wrote:
+> Number of issues on PTS 5.2 for RFCOMM found. Problems with Credits
+> (PTS issue #12421), Channel disconnect (PTS issue #12414), accepting
+> UIH and UA frames (PTS issue #12397).
+> ---
+>  android/pts-rfcomm.txt | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
+> 
+> diff --git a/android/pts-rfcomm.txt b/android/pts-rfcomm.txt
+> index b96caab..9bfc7a2 100644
+> --- a/android/pts-rfcomm.txt
+> +++ b/android/pts-rfcomm.txt
+> @@ -17,17 +17,21 @@ Test Name		Result	Notes
+>  TC_RFC_BV_01_C		PASS	rctest -n -P 1 <btaddr>
+>  TC_RFC_BV_02_C		PASS	rctest -r -P 1
+>  TC_RFC_BV_03_C		PASS	rctest -r -P 1
+> -TC_RFC_BV_04_C		FAIL
+> +TC_RFC_BV_04_C		FAIL	PTS issue #12421
+> +				PTS issue #12414
+>  				NOTE: DISC on DLC is expected; IUT disconnects
+>  					rfcomm session (close)
+> -TC_RFC_BV_05_C		INC
+> +TC_RFC_BV_05_C		PASS	rctest -n -P 4 <btaddr>
+> +				Note: test requires IUT to connect on the given
+> +				channel. sdptool browse <btaddr> to check the
+> +				channel.
+>  TC_RFC_BV_06_C		PASS	rctest -r -P 1
+>  TC_RFC_BV_07_C		PASS	rctest -r -P 1
+> -TC_RFC_BV_08_C		INC
+> +TC_RFC_BV_08_C		INC	PTS issue #12397
+>  				NOTE: Incorrect frame type sent in response to
+>  					the DISC command
+>  TC_RFC_BV_11_C		PASS	rctest -r -P 1
+> -TC_RFC_BV_13_C		FAIL
+> +TC_RFC_BV_13_C		FAIL	PTS issue #12397
+>  				NOTE: IUT sent the correct frame type (UIH)
+>  				but the parameters did not match the
+>  				requirements
+> @@ -35,7 +39,7 @@ TC_RFC_BV_14_C		N/A
+>  TC_RFC_BV_15_C		PASS	rctest -r -P 1
+>  TC_RFC_BV_17_C		PASS	rctest -d -P 1
+>  TC_RFC_BV_19_C		PASS
+> -TC_RFC_BV_21_C		INC
+> -TC_RFC_BV_22_C		INC
+> -TC_RFC_BV_25_C		INC
+> +TC_RFC_BV_21_C		INC	PTS issue #12421
+> +TC_RFC_BV_22_C		INC	PTS issue #12421
+> +TC_RFC_BV_25_C		INC	PTS issue #12421
+>  -------------------------------------------------------------------------------
+> 
+
+Applied, thanks.
+
 -- 
-1.9.3
-
+Best regards, 
+Szymon Janc
